@@ -1,0 +1,29 @@
+The app has a set of pre-recorded driver names in /sounds/driver_names. These are used when reading messages about a particular driver (e.g. "smith ahead is pitting"). The app also listens for driver names in voice commands (e.g. the player asks "where is smith?").
+
+In order to do these operations, the app has to derive a usable driver name from the name of the driver in-game (which I call the raw name). For Project Cars, the in-game name is the driver's Steam name. In Race Room the in-game name is set up when the player registers for the service (and can be changed). Typically, Race Room names are normal names (firstname lastname), where as Project Cars names are player handles (combinations of letters, numbers and other characters).
+
+In order to work out what name to use, the app first looks in a file called names.txt - this is in /sounds/driver_names/. Each line in this file contains the in-game name, then a colon, then the name the game will use. 
+
+My steam ID is mr_belowski and my real name is Jim Britton, so I have an entry in names.txt for me which is mr_belowski:belowski. It's important to note that this isn't my real name. When playing project cars, people will see "mr_belowski" in the drivers list. If I map this to "Britton", when the app says "Britton is pitting now" other players will have no idea who that's referring to. So in Project Cars, I'm "belowski".
+
+If there's no entry in driver_names.txt for a driver's raw driver name, the app will do some basic parsing of the raw name to see if it can extract something usable. It's looking for an unambiguous last name. If the name is 2 Strings separated by a space ("Jim Britton") the app will take the text after the space and use this. The app also knows that text like "van ", "von ", " "de la ", "del " etc are part of a last name. So in Race Room, the app uses "Britton" for my raw driver name of Jim Britton, and would use "Van Dyke" for a raw name of "Dick Van Dyke". This doesn't require an entry in names.txt. The app will trim off numbers, replace underscores and some other characters with spaces, remove text inside square brackets, and a few other things in other to work out a usable name. If after doing this, it's left with a some text, it'll use it. So a steam ID of, say, "jimmy75_[ukcd]" will be transformed into a usable driver name of "jimmy". For Race Room and for AI drivers this approach works well enough that most driver names don't need an entry in names.txt. For the steam IDs used in Project Cars, it usually fails to get a usable driver name so PCars players will usually need an explicit entry in names.txt.
+
+If the app has been able to derive a usable driver name, it adds this to the voice recognition engine and also looks for a .wav file in /sounds/driver_names which has the same name (for me, it looks for a file called belowski.wav). If it finds this file, it loads that clip and can then use it when constructing messages at include a driver name. If it doesn't find this file, messages referring to that driver by name won't be played. If it can't derive a usable driver name then the app won't be able to respond to voice requests about that driver.
+
+You can edit names.txt and add mappings. There might already be a recording in the driver_names folder that you can use for a given steam ID / driver raw name. Or you can add your own driver name recordings if you wish but expect it to sound a little unnatural as it'll be combined with my voice in the messages. 
+
+If you've added some names, or want to test some names that I've added, create a new file in the root of your /sounds/ folder called names_test.txt. Add the raw driver names you want to test, one line at a time so it looks like this:
+
+Lino Carreira
+Ianmiller40
+[LDGR]smokeyadam
+*Falcon*
+
+When you start the app, in addition to the standard 'radio check' message, you'll hear a few messages about each driver in that list. The app will use the standard mechanism for getting the sound files - i.e. it'll look the raw names up in names.txt and if it doesn't find them, it'll invoke the name parser to try and extract a name. The console window will warn you if it's unable to the a name or a sound file for any of the drivers.
+
+Finally, if you've got a bunch of names you want to add recordings for, just ask :). I'll need them in the same format as the names.txt file - raw name:usable name so it looks like this:
+
+Lino Carreira:Lino	
+Ianmiller40:Ian
+[LDGR]smokeyadam:Smokey
+*Falcon*:Falcon
