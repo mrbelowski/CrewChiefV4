@@ -55,7 +55,7 @@ namespace CrewChiefV4.PCars
         private IPEndPoint broadcastAddress;
         private UdpClient udpClient;
 
-        private static Boolean[] buttonsState = new Boolean[8];
+        private static Boolean[] buttonsState = new Boolean[24];
 
         public static Boolean getButtonState(int index) 
         {
@@ -222,7 +222,7 @@ namespace CrewChiefV4.PCars
                     if (sequenceCheckOK || !telemIsOutOfSequence(telem))
                     {
                         // TODO: implement joypad stuff
-                        buttonsState = ConvertByteToBoolArray(telem.sDPad);
+                        buttonsState = ConvertByteToBoolArray(telem.sDPad, telem.sJoyPad);
                         lastSequenceNumberForTelemPacket = sequence;
                         workingGameState = StructHelper.MergeWithExistingState(workingGameState, telem);
                         newSpotterData = workingGameState.hasNewPositionData;
@@ -326,7 +326,7 @@ namespace CrewChiefV4.PCars
             lastValidTelemCurrentLapTime = -1;
             lastValidTelemLapsCompleted = 0; 
             rateEstimate = 0;
-            buttonsState = new Boolean[8];
+            buttonsState = new Boolean[24];
         }
 
         public int getButtonIndexForAssignment()
@@ -354,21 +354,24 @@ namespace CrewChiefV4.PCars
                 udpClient.Close();
                 this.initialised = false;
             }
-            buttonsState = new Boolean[8];
+            buttonsState = new Boolean[24];
             initialised = false;
             return pressedIndex;
         }
 
-        public static bool[] ConvertByteToBoolArray(byte b)
+        public static bool[] ConvertByteToBoolArray(byte dpad, ushort joypad)
         {
-            bool[] result = new bool[8];
+            bool[] result = new bool[24];
             // check each bit in the byte. if 1 set to true, if 0 set to false
             for (int i = 0; i < 8; i++)
             {
-                result[i] = (b & (1 << i)) == 0 ? false : true;
+                result[i] = (dpad & (1 << i)) == 0 ? false : true;
+            }
+            for (int i = 0; i < 16; i++)
+            {
+                result[i + 8] = (joypad & (1 << i)) == 0 ? false : true;
             }
             // reverse the array?
-            Array.Reverse(result);
             return result;
         }
     }
