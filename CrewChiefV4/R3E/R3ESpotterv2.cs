@@ -100,8 +100,11 @@ namespace CrewChiefV4.RaceRoom
             if (currentPlayerData.in_pitlane == 0)
             {
                 List<float[]> currentOpponentPositions = new List<float[]>();
-                List<float> opponentsSpeeds = new List<float>();
-                float playerSpeed = currentState.CarSpeed;
+                float[] playerVelocityData = new float[3];
+                playerVelocityData[0] = currentState.CarSpeed;
+                playerVelocityData[1] = currentPlayerData.position.X;
+                playerVelocityData[2] = currentPlayerData.position.Z;
+
 
                 foreach (DriverData driverData in currentState.all_drivers_data)
                 {
@@ -110,7 +113,6 @@ namespace CrewChiefV4.RaceRoom
                         continue;
                     }
                     currentOpponentPositions.Add(new float[] { driverData.position.X, driverData.position.Z });
-                    opponentsSpeeds.Add(driverData.car_speed);
                 }
                 float playerRotation = currentState.CarOrientation.Yaw;                
                 if (playerRotation < 0)
@@ -118,7 +120,7 @@ namespace CrewChiefV4.RaceRoom
                     playerRotation = (float)(2 * Math.PI) + playerRotation;
                 }
                 playerRotation = (float)(2 * Math.PI) - playerRotation;
-                internalSpotter.triggerInternal(playerRotation, currentPlayerPosition, playerSpeed, opponentsSpeeds, currentOpponentPositions);
+                internalSpotter.triggerInternal(playerRotation, currentPlayerPosition, playerVelocityData, currentOpponentPositions);
             }
         }
 

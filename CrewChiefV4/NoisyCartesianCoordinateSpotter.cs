@@ -8,8 +8,26 @@ using CrewChiefV4.Events;
 
 namespace CrewChiefV4
 {
+    class PreviousPositionAndVelocityData {
+        public float xPosition;
+        public float yPosition;
+        public DateTime timeWhenLastUpdated;
+
+        public List<float> previousXSpeeds = new List<float>();
+        public List<float> previousYSpeeds = new List<float>();
+
+        public PreviousPositionAndVelocityData(float xPosition, float yPosition, DateTime timeWhenLastUpdated) {
+            this.xPosition = xPosition;
+            this.yPosition = yPosition;
+            previousXSpeeds.Add(0f);
+            previousYSpeeds.Add(0f);
+            this.timeWhenLastUpdated = timeWhenLastUpdated;
+        }
+    }
     class NoisyCartesianCoordinateSpotter
     {
+        private int speedsToAverage = 7;
+
         // if the audio player is in the middle of another message, this 'immediate' message will have to wait.
         // If it's older than 1000 milliseconds by the time the player's got round to playing it, it's expired
         private int clearMessageExpiresAfter = 2000;
@@ -80,6 +98,8 @@ namespace CrewChiefV4
 
         private Dictionary<int, int> lastKnownOpponentStateUseCounter = new Dictionary<int, int>();
 
+        private Dictionary<int, PreviousPositionAndVelocityData> previousPositionAndVelocityData = new Dictionary<int, PreviousPositionAndVelocityData>();
+
         private int maxSavedStateReuse = 10;
 
         private enum NextMessageType
@@ -109,16 +129,17 @@ namespace CrewChiefV4
             lastKnownOpponentState.Clear();
             lastKnownOpponentStateUseCounter.Clear();
             audioPlayer.closeChannel();
+            previousPositionAndVelocityData.Clear();
         }
         
         public void triggerInternal(float playerRotationInRadians, float[] currentPlayerPosition,
-            float playerSpeed, List<float> opponentSpeeds, List<float[]> currentOpponentPositions)
+            float[] playerVelocityData, List<float[]> currentOpponentPositions)
         {
             DateTime now = DateTime.Now;
 
             if (currentPlayerPosition[0] != 0 && currentPlayerPosition[1] != 0 &&
                 currentPlayerPosition[0] != -1 && currentPlayerPosition[1] != -1 &&
-                playerSpeed > minSpeedForSpotterToOperate)
+                playerVelocityData[0] > minSpeedForSpotterToOperate)
             {
                 int carsOnLeft = 0;
                 int carsOnRight = 0;
@@ -133,11 +154,36 @@ namespace CrewChiefV4
                     if (currentOpponentPosition[0] != 0 && currentOpponentPosition[1] != 0 &&   
                         currentOpponentPosition[0] != -1 && currentOpponentPosition[1] != -1)
                     {
-                        float opponentSpeed = opponentSpeeds[i];
                         if (opponentPositionInRange(currentOpponentPosition, currentPlayerPosition))
                         {
-                            Boolean isOpponentSpeedInRange = opponentSpeedInRange(opponentSpeed, playerSpeed);
-                            Side side = getSide(playerRotationInRadians, currentPlayerPosition[0], currentPlayerPosition[1], currentOpponentPosition[0], currentOpponentPosition[1], isOpponentSpeedInRange);
+                            Boolean isOpponentVelocityInRange = true;
+                            if (previousPositionAndVelocityData.ContainsKey(i))
+                            {
+                                PreviousPositionAndVelocityData opponentPreviousPositionAndVelocityData = previousPositionAndVelocityData[i];                                
+                                //if (hasMoved(mapKey, currentOpponentPosition[0], currentOpponentPosition[1])) {
+                                // Wayhay, he's moved. Store the current position, the calculated velocity and the time
+                                if (opponentPreviousPositionAndVelocityData.previousXSpeeds.Count == speedsToAverage)
+                                {
+                                    opponentPreviousPositionAndVelocityData.previousXSpeeds.RemoveAt(speedsToAverage - 1);
+                                    opponentPreviousPositionAndVelocityData.previousYSpeeds.RemoveAt(speedsToAverage - 1);
+                                }
+                                opponentPreviousPositionAndVelocityData.previousXSpeeds.Insert(0,
+                                        1000f * (currentOpponentPosition[0] - opponentPreviousPositionAndVelocityData.xPosition) / (now - opponentPreviousPositionAndVelocityData.timeWhenLastUpdated).Milliseconds);
+                                opponentPreviousPositionAndVelocityData.previousYSpeeds.Insert(0,
+                                        1000f * (currentOpponentPosition[1] - opponentPreviousPositionAndVelocityData.yPosition) / (now - opponentPreviousPositionAndVelocityData.timeWhenLastUpdated).Milliseconds);
+                                opponentPreviousPositionAndVelocityData.xPosition = currentOpponentPosition[0];
+                                opponentPreviousPositionAndVelocityData.yPosition = currentOpponentPosition[1];
+                                opponentPreviousPositionAndVelocityData.timeWhenLastUpdated = now;
+                                //}
+                                isOpponentVelocityInRange = checkOpponentVelocityInRange(playerVelocityData[1], playerVelocityData[2],
+                                        opponentPreviousPositionAndVelocityData.previousXSpeeds.Average(), opponentPreviousPositionAndVelocityData.previousYSpeeds.Average());
+                                
+                            }
+                            else
+                            {
+                                previousPositionAndVelocityData.Add(i, new PreviousPositionAndVelocityData(currentOpponentPosition[0], currentOpponentPosition[1], now));
+                            }
+                            Side side = getSide(playerRotationInRadians, currentPlayerPosition[0], currentPlayerPosition[1], currentOpponentPosition[0], currentOpponentPosition[1], isOpponentVelocityInRange);
                             if (side == Side.left)
                             {
                                 carsOnLeft++;
@@ -233,6 +279,11 @@ namespace CrewChiefV4
             }
         }
 
+        private Boolean checkOpponentVelocityInRange(float playerX, float playerZ, float opponentX, float opponentZ)
+        {
+            return Math.Abs(playerX - opponentX) < maxClosingSpeed && Math.Abs(playerZ - opponentZ) < maxClosingSpeed;
+        }
+
         private Side getSide(float playerRotationInRadians, float playerX, float playerY, float oppponentX, float opponentY, Boolean isOpponentSpeedInRange)
         {
             float rawXCoordinate = oppponentX - playerX;
@@ -290,11 +341,6 @@ namespace CrewChiefV4
             float deltaX = Math.Abs(opponentPosition[0] - playerPosition[0]);
             float deltaY = Math.Abs(opponentPosition[1] - playerPosition[1]);
             return deltaX <= trackWidth && deltaY <= trackWidth;
-        }
-
-        private Boolean opponentSpeedInRange(float opponentSpeed, float playerSpeed)
-        {
-            return Math.Abs(opponentSpeed - playerSpeed) <= maxClosingSpeed;
         }
 
         private void getNextMessage(int carsOnLeftCount, int carsOnRightCount, DateTime now)

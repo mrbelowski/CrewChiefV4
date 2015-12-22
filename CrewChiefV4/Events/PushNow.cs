@@ -8,8 +8,8 @@ namespace CrewChiefV4.Events
 {
     class PushNow : AbstractEvent
     {
-        private float maxSeparationForPitExitWarning = 250;   // metres
-        private float minSeparationForPitExitWarning = 20;   // metres
+        private float maxSeparationForPitExitWarning = 300;   // metres
+        private float minSeparationForPitExitWarning = 10;   // metres
 
         // TODO: use driver names here?
         private String folderPushToImprove = "push_now/push_to_improve";
@@ -102,7 +102,8 @@ namespace CrewChiefV4.Events
 
             foreach (KeyValuePair<Object, OpponentData> opponent in currentGameState.OpponentData)
             {
-                if (opponent.Value.OpponentLapData.Count > 0 && !opponent.Value.isEnteringPits() && !opponent.Value.isExitingPits() &&
+                if ((opponent.Value.OpponentLapData.Count > 0 || !startCheckPointIsInSector1) && opponent.Value.Speed > 0 && 
+                    !opponent.Value.isEnteringPits() && !opponent.Value.isExitingPits() &&
                     ((startCheckPointIsInSector1 && opponent.Value.DistanceRoundTrack > distanceStartCheckPoint && opponent.Value.DistanceRoundTrack < distanceEndCheckPoint) ||
                      (!startCheckPointIsInSector1 && (opponent.Value.DistanceRoundTrack > distanceStartCheckPoint || opponent.Value.DistanceRoundTrack < distanceEndCheckPoint))))
                 {

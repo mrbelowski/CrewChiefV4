@@ -123,8 +123,10 @@ namespace CrewChiefV4.PCars
                 if (currentState.mPitMode == (uint)ePitMode.PIT_MODE_NONE)
                 {
                     List<float[]> currentOpponentPositions = new List<float[]>();
-                    List<float> opponentSpeeds = new List<float>();
-                    float playerSpeed = currentState.mSpeed;
+                    float[] playerVelocityData = new float[3];
+                    playerVelocityData[0] = currentState.mSpeed;
+                    playerVelocityData[1] = currentState.mWorldVelocity[0];
+                    playerVelocityData[2] = currentState.mWorldVelocity[2];
 
                     for (int i = 0; i < currentState.mParticipantData.Count(); i++)
                     {
@@ -137,43 +139,6 @@ namespace CrewChiefV4.PCars
                         {
                             float[] currentPositions = new float[] { opponentData.mWorldPosition[0], opponentData.mWorldPosition[2] };
                             currentOpponentPositions.Add(currentPositions);
-                            try
-                            {
-                                pCarsAPIParticipantStruct previousOpponentData = PCarsGameStateMapper.getParticipantDataForName(lastState.mParticipantData, opponentData.mName, i);
-                                float[] previousPositions = new float[] { previousOpponentData.mWorldPosition[0], previousOpponentData.mWorldPosition[2] };
-                                float opponentSpeed;
-
-                                // TODO: check that the network data are up to the task of calculating opponent speeds
-                                if (CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_NETWORK && !checkCarSpeedsForNetworkSpotter) 
-                                {
-                                    opponentSpeed = playerSpeed;
-                                }
-                                else 
-                                {
-                                    opponentSpeed = getSpeed(currentPositions, previousPositions, interval);
-                                }
-                                if (previousOpponentSpeeds.ContainsKey(opponentData.mName))
-                                {
-                                    List<float> speeds = previousOpponentSpeeds[opponentData.mName];
-                                    speeds.Add(opponentSpeed);
-                                    if (speeds.Count == 5)
-                                    {
-                                        speeds.RemoveAt(0);
-                                        opponentSpeed = speeds.Average();
-                                    }
-                                }
-                                else
-                                {
-                                    List<float> speeds = new List<float>();
-                                    speeds.Add(opponentSpeed);
-                                    previousOpponentSpeeds.Add(opponentData.mName, speeds);
-                                }
-                                opponentSpeeds.Add(opponentSpeed);
-                            }
-                            catch (Exception)
-                            {
-                                opponentSpeeds.Add(playerSpeed);
-                            }
                         }
                     }
                     float playerRotation = currentState.mOrientation[1];
@@ -182,7 +147,7 @@ namespace CrewChiefV4.PCars
                         playerRotation = (float)(2 * Math.PI) + playerRotation;
                     }
                     playerRotation = (float)(2 * Math.PI) - playerRotation;
-                    internalSpotter.triggerInternal(playerRotation, currentPlayerPosition, playerSpeed, opponentSpeeds, currentOpponentPositions);
+                    internalSpotter.triggerInternal(playerRotation, currentPlayerPosition, playerVelocityData, currentOpponentPositions);
                 }
             }
         }
