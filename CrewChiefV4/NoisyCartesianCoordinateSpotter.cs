@@ -168,9 +168,9 @@ namespace CrewChiefV4
                                     opponentPreviousPositionAndVelocityData.previousYSpeeds.RemoveAt(speedsToAverage - 1);
                                 }
                                 opponentPreviousPositionAndVelocityData.previousXSpeeds.Insert(0,
-                                        1000f * (currentOpponentPosition[0] - opponentPreviousPositionAndVelocityData.xPosition) / (now - opponentPreviousPositionAndVelocityData.timeWhenLastUpdated).Milliseconds);
+                                        1000f * (currentOpponentPosition[0] - opponentPreviousPositionAndVelocityData.xPosition) / (float)(now - opponentPreviousPositionAndVelocityData.timeWhenLastUpdated).TotalMilliseconds);
                                 opponentPreviousPositionAndVelocityData.previousYSpeeds.Insert(0,
-                                        1000f * (currentOpponentPosition[1] - opponentPreviousPositionAndVelocityData.yPosition) / (now - opponentPreviousPositionAndVelocityData.timeWhenLastUpdated).Milliseconds);
+                                        1000f * (currentOpponentPosition[1] - opponentPreviousPositionAndVelocityData.yPosition) / (float)(now - opponentPreviousPositionAndVelocityData.timeWhenLastUpdated).TotalMilliseconds);
                                 opponentPreviousPositionAndVelocityData.xPosition = currentOpponentPosition[0];
                                 opponentPreviousPositionAndVelocityData.yPosition = currentOpponentPosition[1];
                                 opponentPreviousPositionAndVelocityData.timeWhenLastUpdated = now;
