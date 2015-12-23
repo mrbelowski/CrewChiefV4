@@ -102,8 +102,8 @@ namespace CrewChiefV4.RaceRoom
                 List<float[]> currentOpponentPositions = new List<float[]>();
                 float[] playerVelocityData = new float[3];
                 playerVelocityData[0] = currentState.CarSpeed;
-                playerVelocityData[1] = currentPlayerData.position.X;
-                playerVelocityData[2] = currentPlayerData.position.Z;
+                playerVelocityData[1] = (float)currentState.Player.Velocity.X;
+                playerVelocityData[2] = (float)currentState.Player.Velocity.Z;
 
 
                 foreach (DriverData driverData in currentState.all_drivers_data)
