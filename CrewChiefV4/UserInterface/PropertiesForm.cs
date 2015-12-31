@@ -159,7 +159,7 @@ namespace CrewChiefV4
                     save();
                     if (!System.Diagnostics.Debugger.IsAttached)
                     {
-                        System.Diagnostics.Process.Start(Application.ExecutablePath); // to start new instance of application
+                        System.Diagnostics.Process.Start(Application.ExecutablePath, String.Join(" ", Environment.GetCommandLineArgs())); // to start new instance of application
                         parent.Close(); //to turn off current app
                     }
                 }

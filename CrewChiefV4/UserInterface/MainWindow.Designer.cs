@@ -66,6 +66,10 @@ namespace CrewChiefV4
             this.recordSession = new System.Windows.Forms.CheckBox();
             this.playbackInterval = new System.Windows.Forms.TextBox();
             this.app_version = new System.Windows.Forms.Label();
+            this.soundPackProgressBar = new System.Windows.Forms.ProgressBar();
+            this.downloadSoundPackButton = new System.Windows.Forms.Button();
+            this.downloadDriverNamesButton = new System.Windows.Forms.Button();
+            this.driverNamesProgressBar = new System.Windows.Forms.ProgressBar();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.messagesVolumeSlider)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.backgroundVolumeSlider)).BeginInit();
@@ -73,13 +77,13 @@ namespace CrewChiefV4
             // 
             // textBox1
             // 
-            this.textBox1.Location = new System.Drawing.Point(41, 80);
+            this.textBox1.Location = new System.Drawing.Point(41, 165);
             this.textBox1.MaxLength = 99999999;
             this.textBox1.Multiline = true;
             this.textBox1.Name = "textBox1";
             this.textBox1.ReadOnly = true;
             this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.textBox1.Size = new System.Drawing.Size(1093, 417);
+            this.textBox1.Size = new System.Drawing.Size(1093, 332);
             this.textBox1.TabIndex = 1;
             // 
             // startApplicationButton
@@ -274,9 +278,9 @@ namespace CrewChiefV4
             "Project Cars (32 bit)",
             "Race Room",
             "Project Cars (network data)"});
-            this.gameDefinitionList.Location = new System.Drawing.Point(782, 26);
+            this.gameDefinitionList.Location = new System.Drawing.Point(782, 28);
             this.gameDefinitionList.Name = "gameDefinitionList";
-            this.gameDefinitionList.Size = new System.Drawing.Size(203, 43);
+            this.gameDefinitionList.Size = new System.Drawing.Size(203, 56);
             this.gameDefinitionList.TabIndex = 21;
             this.gameDefinitionList.SelectedValueChanged += new System.EventHandler(this.updateSelectedGameDefinition);
             // 
@@ -331,11 +335,51 @@ namespace CrewChiefV4
             this.app_version.TabIndex = 27;
             this.app_version.Text = "app_version";
             // 
+            // soundPackProgressBar
+            // 
+            this.soundPackProgressBar.Location = new System.Drawing.Point(39, 136);
+            this.soundPackProgressBar.Name = "soundPackProgressBar";
+            this.soundPackProgressBar.Size = new System.Drawing.Size(219, 23);
+            this.soundPackProgressBar.TabIndex = 28;
+            // 
+            // downloadSoundPackButton
+            // 
+            this.downloadSoundPackButton.Enabled = false;
+            this.downloadSoundPackButton.Location = new System.Drawing.Point(41, 93);
+            this.downloadSoundPackButton.Name = "downloadSoundPackButton";
+            this.downloadSoundPackButton.Size = new System.Drawing.Size(217, 37);
+            this.downloadSoundPackButton.TabIndex = 29;
+            this.downloadSoundPackButton.Text = "Sound pack is up to date";
+            this.downloadSoundPackButton.UseVisualStyleBackColor = true;
+            this.downloadSoundPackButton.Click += new System.EventHandler(this.downloadSoundPackButtonPress);
+            // 
+            // downloadDriverNamesButton
+            // 
+            this.downloadDriverNamesButton.Enabled = false;
+            this.downloadDriverNamesButton.Location = new System.Drawing.Point(314, 93);
+            this.downloadDriverNamesButton.Name = "downloadDriverNamesButton";
+            this.downloadDriverNamesButton.Size = new System.Drawing.Size(232, 37);
+            this.downloadDriverNamesButton.TabIndex = 30;
+            this.downloadDriverNamesButton.Text = "Driver names are up to date";
+            this.downloadDriverNamesButton.UseVisualStyleBackColor = true;
+            this.downloadDriverNamesButton.Click += new System.EventHandler(this.downloadDriverNamesButtonPress);
+            // 
+            // driverNamesProgressBar
+            // 
+            this.driverNamesProgressBar.Location = new System.Drawing.Point(314, 136);
+            this.driverNamesProgressBar.Name = "driverNamesProgressBar";
+            this.driverNamesProgressBar.Size = new System.Drawing.Size(232, 23);
+            this.driverNamesProgressBar.TabIndex = 31;
+            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1146, 692);
+            this.Controls.Add(this.driverNamesProgressBar);
+            this.Controls.Add(this.downloadDriverNamesButton);
+            this.Controls.Add(this.downloadSoundPackButton);
+            this.Controls.Add(this.soundPackProgressBar);
             this.Controls.Add(this.app_version);
             this.Controls.Add(this.playbackInterval);
             this.Controls.Add(this.recordSession);
@@ -359,8 +403,9 @@ namespace CrewChiefV4
             this.Controls.Add(this.startApplicationButton);
             this.Controls.Add(this.textBox1);
             this.Name = "MainWindow";
-            this.Text = "Crew Chief V3";
+            this.Text = "Crew Chief V4";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.stopApp);
+            this.Load += new System.EventHandler(this.FormMain_Load);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.messagesVolumeSlider)).EndInit();
@@ -398,6 +443,10 @@ namespace CrewChiefV4
         private System.Windows.Forms.CheckBox recordSession;
         private System.Windows.Forms.TextBox playbackInterval;
         private System.Windows.Forms.Label app_version;
+        private System.Windows.Forms.ProgressBar soundPackProgressBar;
+        private System.Windows.Forms.Button downloadSoundPackButton;
+        private System.Windows.Forms.Button downloadDriverNamesButton;
+        private System.Windows.Forms.ProgressBar driverNamesProgressBar;
 
     }
 }

@@ -14,6 +14,13 @@ namespace CrewChiefV4
         public Dictionary<String, String> propertyHelp = new Dictionary<String, String>();
         private UserSettings()
         {
+            // Copy user settings from previous application version if necessary
+            if (Properties.Settings.Default.UpdateSettings)
+            {
+                Properties.Settings.Default.Upgrade();
+                Properties.Settings.Default.UpdateSettings = false;
+                Properties.Settings.Default.Save();
+            }
             propertyHelp.Add("sound_files_path", "The path (relative to CrewChief.exe) of the sound pack you want to use");
             propertyHelp.Add("background_volume", "The volume of the background sounds (0 - 1)");
             propertyHelp.Add("update_interval", "The time (milliseconds) between app updates");

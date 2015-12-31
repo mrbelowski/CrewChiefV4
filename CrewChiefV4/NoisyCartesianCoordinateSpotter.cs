@@ -175,8 +175,7 @@ namespace CrewChiefV4
                                 opponentPreviousPositionAndVelocityData.yPosition = currentOpponentPosition[1];
                                 opponentPreviousPositionAndVelocityData.timeWhenLastUpdated = now;
                                 //}
-                                Console.WriteLine(playerVelocityData[1] + "," + playerVelocityData[2] + "," +
-                                        opponentPreviousPositionAndVelocityData.previousXSpeeds.Average() + "," + opponentPreviousPositionAndVelocityData.previousYSpeeds.Average());
+                                
                                 isOpponentVelocityInRange = checkOpponentVelocityInRange(playerVelocityData[1], playerVelocityData[2],
                                         opponentPreviousPositionAndVelocityData.previousXSpeeds.Average(), opponentPreviousPositionAndVelocityData.previousYSpeeds.Average());
                                 

@@ -12,11 +12,24 @@ using System.Threading;
 using System.IO;
 using SharpDX.DirectInput;
 using System.Runtime.InteropServices;
+using AutoUpdaterDotNET;
+using System.Net;
+using System.Xml.Linq;
+using System.IO.Compression;
 
 namespace CrewChiefV4
 {
     public partial class MainWindow : Form
     {
+        private String driverNamesDownloadLocation = "https://www.dropbox.com/s/6mrlq93pv6uf8hi/driver_names_lo_fi_auto_updated.zip?dl=1";
+        private String driverNamesTempFileName = "temp_driver_names.zip";
+        private String soundPackDownloadLocation = "https://www.dropbox.com/s/zbmrq7qcefu6z6x/sounds_lo_fi_auto_updated.zip?dl=1";
+        private String soundPackTempFileName = "temp_sound_pack.zip";
+        private Boolean isDownloadingDriverNames = false;
+        private Boolean isDownloadingSoundPack = false;
+        private Boolean newSoundPackAvailable = false;
+        private Boolean newDriverNamesAvailable = false;
+
         private ControllerConfiguration controllerConfiguration;
         
         private CrewChief crewChief;
@@ -32,6 +45,47 @@ namespace CrewChiefV4
         private TimeSpan buttonCheckInterval = TimeSpan.FromMilliseconds(100);
 
         private VoiceOptionEnum voiceOption;
+
+        private static String autoUpdateXMLURL = "https://www.dropbox.com/s/to5q1z5dmvfhuwm/auto_update_data.xml?dl=1";
+
+        private float latestSoundPackVersion = 0;
+        private float latestDriverNamesVersion = 0;
+
+        private void FormMain_Load(object sender, EventArgs e)
+        {
+            //Uncomment below line to see Russian version
+
+            //AutoUpdater.CurrentCulture = CultureInfo.CreateSpecificCulture("ru-RU");
+
+            //If you want to open download page when user click on download button uncomment below line.
+
+            //AutoUpdater.OpenDownloadPage = true;
+
+            //Don't want user to select remind later time in AutoUpdater notification window then uncomment 3 lines below so default remind later time will be set to 2 days.
+
+            //AutoUpdater.LetUserSelectRemindLater = false;
+            //AutoUpdater.RemindLaterTimeSpan = RemindLaterFormat.Days;
+            //AutoUpdater.RemindLaterAt = 2;
+
+            AutoUpdater.Start(autoUpdateXMLURL);
+            // now get the latest sound pack versions
+            string xml = new WebClient().DownloadString(autoUpdateXMLURL);
+            XDocument doc = XDocument.Parse(xml);
+            float.TryParse(doc.Descendants("soundpackversion").First().Value, out latestSoundPackVersion);
+            float.TryParse(doc.Descendants("drivernamesversion").First().Value, out latestDriverNamesVersion);
+            if (latestSoundPackVersion > AudioPlayer.soundPackVersion)
+            {
+                downloadSoundPackButton.Enabled = true;
+                downloadSoundPackButton.Text = "Updated sound pack available, press to download";
+                newSoundPackAvailable = true;
+            }
+            if (latestDriverNamesVersion > AudioPlayer.driverNamesVersion)
+            {
+                downloadDriverNamesButton.Enabled = true;
+                downloadDriverNamesButton.Text = "Updated driver names available, press to download";
+                newDriverNamesAvailable = true;
+            }
+        }
         
         private void messagesVolumeSlider_Scroll(object sender, EventArgs e)
         {
@@ -67,6 +121,8 @@ namespace CrewChiefV4
             {
                 _IsAppRunning = value;
                 startApplicationButton.Text = _IsAppRunning ? "Stop" : "Start Application";
+                downloadDriverNamesButton.Enabled = !value && newDriverNamesAvailable;
+                downloadSoundPackButton.Enabled = !value && newSoundPackAvailable;
             }
         }
 
@@ -614,6 +670,102 @@ namespace CrewChiefV4
             }
             getControllers();
         }  
+
+        private void startDownload(Boolean isSoundPack)
+        {
+            using (WebClient wc = new WebClient())
+            {
+                if (isSoundPack)
+                {
+                    isDownloadingSoundPack = true;
+                    wc.DownloadProgressChanged += new DownloadProgressChangedEventHandler(soundpack_DownloadProgressChanged);
+                    wc.DownloadFileCompleted += new AsyncCompletedEventHandler(soundpack_DownloadFileCompleted);
+                    wc.DownloadFileAsync(new Uri(soundPackDownloadLocation), 
+                        AudioPlayer.soundFilesPath + "/" + soundPackTempFileName);
+                }
+                else
+                {
+                    isDownloadingDriverNames = true;
+                    wc.DownloadProgressChanged += new DownloadProgressChangedEventHandler(drivernames_DownloadProgressChanged);
+                    wc.DownloadFileCompleted += new AsyncCompletedEventHandler(drivernames_DownloadFileCompleted);
+                    wc.DownloadFileAsync(new Uri(driverNamesDownloadLocation),
+                        AudioPlayer.soundFilesPath + "/" + driverNamesTempFileName);
+                }
+            }
+        }
+
+        void soundpack_DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
+        {
+            double bytesIn = double.Parse(e.BytesReceived.ToString());
+            double totalBytes = double.Parse(e.TotalBytesToReceive.ToString());
+            double percentage = bytesIn / totalBytes * 100;
+            soundPackProgressBar.Value = int.Parse(Math.Truncate(percentage).ToString());
+        }
+
+        void drivernames_DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
+        {
+            double bytesIn = double.Parse(e.BytesReceived.ToString());
+            double totalBytes = double.Parse(e.TotalBytesToReceive.ToString());
+            double percentage = bytesIn / totalBytes * 100;
+            driverNamesProgressBar.Value = int.Parse(Math.Truncate(percentage).ToString());
+        }
+        void soundpack_DownloadFileCompleted(object sender, AsyncCompletedEventArgs e)
+        {
+            downloadSoundPackButton.Text = "Extracting sound pack...";
+            ZipFile.ExtractToDirectory(AudioPlayer.soundFilesPath + "/" + soundPackTempFileName, AudioPlayer.soundFilesPath);
+            downloadSoundPackButton.Text = "Sound pack is up to date";
+            soundPackProgressBar.Value = 0;
+            isDownloadingSoundPack = false;
+            if (!isDownloadingDriverNames)
+            {
+                doRestart();        
+            }
+        }
+        void drivernames_DownloadFileCompleted(object sender, AsyncCompletedEventArgs e)
+        {
+            downloadSoundPackButton.Text = "Extracting driver names...";
+            ZipFile.ExtractToDirectory(AudioPlayer.soundFilesPath + "/" + driverNamesTempFileName, AudioPlayer.soundFilesPath);
+            downloadDriverNamesButton.Text = "Driver names are up to date";
+            driverNamesProgressBar.Value = 0;
+            isDownloadingDriverNames = false;
+            if (!isDownloadingSoundPack)
+            {
+                doRestart();             
+            }
+        }
+
+        private void doRestart()
+        {
+            String warningMessage = "The application must be restarted to load the new sounds. Click OK to restart the application.";
+            if (System.Diagnostics.Debugger.IsAttached)
+            {
+                warningMessage = "The app must be restarted manually to load the new sounds";
+            }
+            if (MessageBox.Show(warningMessage, "Save changes", MessageBoxButtons.OK) == DialogResult.OK)
+            {
+                if (!System.Diagnostics.Debugger.IsAttached)
+                {
+                    System.Diagnostics.Process.Start(Application.ExecutablePath, String.Join(" ", Environment.GetCommandLineArgs())); // to start new instance of application
+                    this.Close(); //to turn off current app
+                }
+            }   
+        }
+
+        private void downloadSoundPackButtonPress(object sender, EventArgs e)
+        {
+            startApplicationButton.Enabled = false;
+            downloadSoundPackButton.Text = "Downloading sound pack...";
+            downloadSoundPackButton.Enabled = false;
+            startDownload(true);
+
+        }
+        private void downloadDriverNamesButtonPress(object sender, EventArgs e)
+        {
+            startApplicationButton.Enabled = false;
+            downloadDriverNamesButton.Text = "Downloading driver names...";
+            downloadDriverNamesButton.Enabled = false;
+            startDownload(false);
+        }
     }
 
     public class ControlWriter : TextWriter

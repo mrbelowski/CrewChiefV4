@@ -41,13 +41,13 @@ namespace CrewChiefV4.Events
         {
             List<OpponentData> driversToTest = new List<OpponentData>();
             List<String> rawDriverNames = new List<string>();
-            DirectoryInfo soundDirectory = new DirectoryInfo(audioPlayer.soundFilesPath);
+            DirectoryInfo soundDirectory = new DirectoryInfo(AudioPlayer.soundFilesPath);
             FileInfo[] filesInSoundDirectory = soundDirectory.GetFiles();
             foreach (FileInfo fileInSoundDirectory in filesInSoundDirectory)
             {
                 if (fileInSoundDirectory.Name == "names_test.txt")
                 {
-                    String[] lines = File.ReadAllLines(Path.Combine(audioPlayer.soundFilesPath, fileInSoundDirectory.Name));
+                    String[] lines = File.ReadAllLines(Path.Combine(AudioPlayer.soundFilesPath, fileInSoundDirectory.Name));
                     foreach (String line in lines)
                     {
                         if (line.Trim().Length > 0)
@@ -61,7 +61,7 @@ namespace CrewChiefV4.Events
             if (rawDriverNames.Count > 0)
             {
                 Console.WriteLine("Playing test sounds for drivers " + String.Join(", ", rawDriverNames));
-                List<String> usableDriverNames = DriverNameHelper.getUsableDriverNames(rawDriverNames, audioPlayer.soundFilesPath);
+                List<String> usableDriverNames = DriverNameHelper.getUsableDriverNames(rawDriverNames, AudioPlayer.soundFilesPath);
                 foreach (String usableDriverName in usableDriverNames)
                 {
                     AudioPlayer.availableDriverNames.Add(usableDriverName);

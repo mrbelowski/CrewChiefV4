@@ -92,7 +92,7 @@ namespace CrewChiefV4
 
         MediaPlayer backgroundPlayer;
 
-        public String soundFilesPath;
+        public static String soundFilesPath;
 
         private String backgroundFilesPath;
 
@@ -116,13 +116,12 @@ namespace CrewChiefV4
 
         public Boolean initialised = false;
 
+        public static float soundPackVersion = 0;
+        public static float driverNamesVersion = 0;
+
         public AudioPlayer(CrewChief crewChief)
         {
             this.crewChief = crewChief;
-        }
-
-        public void initialise()
-        {
             if (soundFolderName.Length > 3 && (soundFolderName.Substring(1, 2) == @":\" || soundFolderName.Substring(1, 2) == @":/"))
             {
                 soundFilesPath = soundFolderName;
@@ -140,7 +139,21 @@ namespace CrewChiefV4
                                             System.Reflection.Assembly.GetEntryAssembly().Location), soundFolderName);
                 }
             }
+            DirectoryInfo soundDirectory = new DirectoryInfo(soundFilesPath);
+            if (soundDirectory.Exists) 
+            {
+                float[] versions = getSoundPackAndDriverNamesVersions(soundDirectory);
+                soundPackVersion = versions[0];
+                driverNamesVersion = versions[1];
+            }
+            else
+            {
+                soundDirectory.Create();
+            }
+        }
 
+        public void initialise()
+        {
             voiceFolderPath = Path.Combine(soundFilesPath, "voice");
             fxFolderPath = Path.Combine(soundFilesPath, "fx");
             driverNamesFolderPath = Path.Combine(soundFilesPath, "driver_names");
@@ -154,8 +167,7 @@ namespace CrewChiefV4
             {
                 Console.WriteLine("Unable to find sound directory " + soundDirectory.FullName);
                 return;
-            }
-            float soundPackVersion = getSoundPackVersion(soundDirectory);
+            }            
             if (soundPackVersion == -1 || soundPackVersion == 0)
             {
                 Console.WriteLine("Unable to get sound pack version - expected a file called version_info with a single line containing a version number, e.g. 2.0");
@@ -408,10 +420,10 @@ namespace CrewChiefV4
             return volume;
         }
 
-        public float getSoundPackVersion(DirectoryInfo soundDirectory)
+        public float[] getSoundPackAndDriverNamesVersions(DirectoryInfo soundDirectory)
         {
             FileInfo[] filesInSoundDirectory = soundDirectory.GetFiles();
-
+            float[] versions = new float[] { 0, 0 };
             float soundfilesVersion = -1f;
             foreach (FileInfo fileInSoundDirectory in filesInSoundDirectory)
             {
@@ -420,14 +432,18 @@ namespace CrewChiefV4
                     String[] lines = File.ReadAllLines(Path.Combine(soundFilesPath, fileInSoundDirectory.Name));
                     foreach (String line in lines)
                     {
-                        if (float.TryParse(line, out soundfilesVersion))
+                        if (line.StartsWith("soundPack"))
                         {
-                            return soundfilesVersion;
+                            float.TryParse(line.Split(':')[1], out versions[0]);
+                        }
+                        if (line.StartsWith("driverNames"))
+                        {
+                            float.TryParse(line.Split(':')[1], out versions[0]);
                         }
                     }
                 }
             }
-            return soundfilesVersion;
+            return versions;
         }
 
         public void setBackgroundSound(String backgroundSoundName)

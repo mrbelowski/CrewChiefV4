@@ -212,31 +212,31 @@ namespace CrewChiefV4
             tyreTempThresholds.Add(TyreType.Bias_Ply, biasPlyTyreTempsThresholds);
 
             List<CornerData.EnumWithThresholds> ironRoadBrakeTempsThresholds = new List<CornerData.EnumWithThresholds>();
-            ironRoadBrakeTempsThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.COLD, -10000, maxColdIronRoadBrakeTemp));
-            ironRoadBrakeTempsThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.WARM, maxColdIronRoadBrakeTemp, maxWarmIronRoadBrakeTemp));
-            ironRoadBrakeTempsThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.HOT, maxWarmIronRoadBrakeTemp, maxHotIronRoadBrakeTemp));
-            ironRoadBrakeTempsThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.COOKING, maxHotIronRoadBrakeTemp, 10000));
+            ironRoadBrakeTempsThresholds.Add(new CornerData.EnumWithThresholds(BrakeTemp.COLD, -10000, maxColdIronRoadBrakeTemp));
+            ironRoadBrakeTempsThresholds.Add(new CornerData.EnumWithThresholds(BrakeTemp.WARM, maxColdIronRoadBrakeTemp, maxWarmIronRoadBrakeTemp));
+            ironRoadBrakeTempsThresholds.Add(new CornerData.EnumWithThresholds(BrakeTemp.HOT, maxWarmIronRoadBrakeTemp, maxHotIronRoadBrakeTemp));
+            ironRoadBrakeTempsThresholds.Add(new CornerData.EnumWithThresholds(BrakeTemp.COOKING, maxHotIronRoadBrakeTemp, 10000));
             brakeTempThresholds.Add(BrakeType.Iron_Road, ironRoadBrakeTempsThresholds);
 
             List<CornerData.EnumWithThresholds> ironRaceBrakeTempsThresholds = new List<CornerData.EnumWithThresholds>();
-            ironRaceBrakeTempsThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.COLD, -10000, maxColdIronRaceBrakeTemp));
-            ironRaceBrakeTempsThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.WARM, maxColdIronRaceBrakeTemp, maxWarmIronRaceBrakeTemp));
-            ironRaceBrakeTempsThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.HOT, maxWarmIronRaceBrakeTemp, maxHotIronRaceBrakeTemp));
-            ironRaceBrakeTempsThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.COOKING, maxHotIronRaceBrakeTemp, 10000));
+            ironRaceBrakeTempsThresholds.Add(new CornerData.EnumWithThresholds(BrakeTemp.COLD, -10000, maxColdIronRaceBrakeTemp));
+            ironRaceBrakeTempsThresholds.Add(new CornerData.EnumWithThresholds(BrakeTemp.WARM, maxColdIronRaceBrakeTemp, maxWarmIronRaceBrakeTemp));
+            ironRaceBrakeTempsThresholds.Add(new CornerData.EnumWithThresholds(BrakeTemp.HOT, maxWarmIronRaceBrakeTemp, maxHotIronRaceBrakeTemp));
+            ironRaceBrakeTempsThresholds.Add(new CornerData.EnumWithThresholds(BrakeTemp.COOKING, maxHotIronRaceBrakeTemp, 10000));
             brakeTempThresholds.Add(BrakeType.Iron_Race, ironRaceBrakeTempsThresholds);
 
             List<CornerData.EnumWithThresholds> ceramicBrakeTempsThresholds = new List<CornerData.EnumWithThresholds>();
-            ceramicBrakeTempsThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.COLD, -10000, maxColdCeramicBrakeTemp));
-            ceramicBrakeTempsThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.WARM, maxColdCeramicBrakeTemp, maxWarmCeramicBrakeTemp));
-            ceramicBrakeTempsThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.HOT, maxWarmCeramicBrakeTemp, maxHotCeramicBrakeTemp));
-            ceramicBrakeTempsThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.COOKING, maxHotCeramicBrakeTemp, 10000));
+            ceramicBrakeTempsThresholds.Add(new CornerData.EnumWithThresholds(BrakeTemp.COLD, -10000, maxColdCeramicBrakeTemp));
+            ceramicBrakeTempsThresholds.Add(new CornerData.EnumWithThresholds(BrakeTemp.WARM, maxColdCeramicBrakeTemp, maxWarmCeramicBrakeTemp));
+            ceramicBrakeTempsThresholds.Add(new CornerData.EnumWithThresholds(BrakeTemp.HOT, maxWarmCeramicBrakeTemp, maxHotCeramicBrakeTemp));
+            ceramicBrakeTempsThresholds.Add(new CornerData.EnumWithThresholds(BrakeTemp.COOKING, maxHotCeramicBrakeTemp, 10000));
             brakeTempThresholds.Add(BrakeType.Ceramic, ceramicBrakeTempsThresholds);
 
             List<CornerData.EnumWithThresholds> carbonBrakeTempsThresholds = new List<CornerData.EnumWithThresholds>();
-            carbonBrakeTempsThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.COLD, -10000, maxColdCarbonBrakeTemp));
-            carbonBrakeTempsThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.WARM, maxColdCarbonBrakeTemp, maxWarmCarbonBrakeTemp));
-            carbonBrakeTempsThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.HOT, maxWarmCarbonBrakeTemp, maxHotCarbonBrakeTemp));
-            carbonBrakeTempsThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.COOKING, maxHotCarbonBrakeTemp, 10000));
+            carbonBrakeTempsThresholds.Add(new CornerData.EnumWithThresholds(BrakeTemp.COLD, -10000, maxColdCarbonBrakeTemp));
+            carbonBrakeTempsThresholds.Add(new CornerData.EnumWithThresholds(BrakeTemp.WARM, maxColdCarbonBrakeTemp, maxWarmCarbonBrakeTemp));
+            carbonBrakeTempsThresholds.Add(new CornerData.EnumWithThresholds(BrakeTemp.HOT, maxWarmCarbonBrakeTemp, maxHotCarbonBrakeTemp));
+            carbonBrakeTempsThresholds.Add(new CornerData.EnumWithThresholds(BrakeTemp.COOKING, maxHotCarbonBrakeTemp, 10000));
             brakeTempThresholds.Add(BrakeType.Carbon, carbonBrakeTempsThresholds);
         }
 

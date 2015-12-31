@@ -442,7 +442,7 @@ namespace CrewChiefV4
                                     }
                                     if (rawDriverNames.Count > 0)
                                     {
-                                        List<String> usableDriverNames = DriverNameHelper.getUsableDriverNames(rawDriverNames, audioPlayer.soundFilesPath);
+                                        List<String> usableDriverNames = DriverNameHelper.getUsableDriverNames(rawDriverNames, AudioPlayer.soundFilesPath);
                                         if (speechRecogniser != null && speechRecogniser.initialised)
                                         {
                                             speechRecogniser.addOpponentSpeechRecognition(usableDriverNames, enableDriverNames);
