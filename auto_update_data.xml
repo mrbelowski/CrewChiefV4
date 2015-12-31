@@ -1,7 +1,8 @@
-<?xml version="1.0" encoding="utf-8"?><item>
-<title>Crew Chief 4.0.1.0 is now available, its ace but I have no idea how the auto updater works</title>
-<version>4.0.1.0</version>
-<url>https://drive.google.com/uc?export=download&amp;id=0B4KQS820QNFbZWRxVWxkcHhVdGM</url>
+<?xml version="1.0" encoding="utf-8"?>
+<item>
+<title>Crew Chief 4.0.0.0 is now available, its ace but I have no idea how the auto updater works</title>
+<version>4.0.0.0</version>
+<url>https://www.dropbox.com/s/gsiclt3y5k3miup/CrewChiefV4.msi?dl=1</url>
 <changelog>https://www.dropbox.com/s/iyaamv977epmq8d/change_log_for_auto_updated.txt?raw=1</changelog>
 <soundpackversion>100</soundpackversion>
 <drivernamesversion>100</drivernamesversion>

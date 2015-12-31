@@ -13,6 +13,7 @@
     <FileAlignment>512</FileAlignment>
     <NuGetPackageImportStamp>b4e49d91</NuGetPackageImportStamp>
     <TargetFrameworkProfile />
+    <IsWebBootstrapper>false</IsWebBootstrapper>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -25,7 +26,6 @@
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
@@ -54,8 +54,9 @@
     <ApplicationIcon>engineer_edited.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AutoUpdater.NET">
-      <HintPath>..\..\..\AutoUpdater.NET 1.3.1\Unsigned\AutoUpdater.NET.dll</HintPath>
+    <Reference Include="AutoUpdater.NET, Version=1.3.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\auto_updater_source\AutoUpdater.NET\trunk\AutoUpdater.NET\bin\Debug\AutoUpdater.NET.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Speech, Version=11.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -210,15 +211,18 @@
     </EmbeddedResource>
     <EmbeddedResource Include="UserInterface\PropertiesForm.resx">
       <DependentUpon>PropertiesForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="UserInterface\MainWindow.resx">
       <DependentUpon>MainWindow.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UserInterface\Spacer.resx">
       <DependentUpon>Spacer.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="UserInterface\StringPropertyControl.resx">
       <DependentUpon>StringPropertyControl.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="UserInterface\BooleanPropertyControl.resx">
       <DependentUpon>BooleanPropertyControl.cs</DependentUpon>
