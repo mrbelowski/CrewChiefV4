@@ -17,7 +17,7 @@ namespace CrewChiefV4
     {
         public Boolean disablePearlsOfWisdom = false;   // used for the last 2 laps / 3 minutes of a race session only
         public Boolean mute = false;
-        public static float minimumSoundPackVersion = 41f;
+        public static float minimumSoundPackVersion = 100f;
 
         private CrewChief crewChief;
 
@@ -142,9 +142,8 @@ namespace CrewChiefV4
             DirectoryInfo soundDirectory = new DirectoryInfo(soundFilesPath);
             if (soundDirectory.Exists) 
             {
-                float[] versions = getSoundPackAndDriverNamesVersions(soundDirectory);
-                soundPackVersion = versions[0];
-                driverNamesVersion = versions[1];
+                soundPackVersion = getSoundPackVersion(soundDirectory);
+                driverNamesVersion = getDriverNamesVersion(soundDirectory);
             }
             else
             {
@@ -181,7 +180,7 @@ namespace CrewChiefV4
             }
             else
             {
-                Console.WriteLine("Minimum sound pack version = " + minimumSoundPackVersion + " using sound pack version " + soundPackVersion);
+                Console.WriteLine("Minimum sound pack version = " + minimumSoundPackVersion + " using sound pack version " + soundPackVersion + " and driver names version " + driverNamesVersion);
             }
             pearlsOfWisdom = new PearlsOfWisdom();
             int soundsCount = 0;
@@ -420,30 +419,57 @@ namespace CrewChiefV4
             return volume;
         }
 
-        public float[] getSoundPackAndDriverNamesVersions(DirectoryInfo soundDirectory)
+        public float getSoundPackVersion(DirectoryInfo soundDirectory)
         {
             FileInfo[] filesInSoundDirectory = soundDirectory.GetFiles();
-            float[] versions = new float[] { 0, 0 };
-            float soundfilesVersion = -1f;
+            float version = 0;
             foreach (FileInfo fileInSoundDirectory in filesInSoundDirectory)
             {
-                if (fileInSoundDirectory.Name == "version_info")
+                if (fileInSoundDirectory.Name == "sound_pack_version_info")
                 {
                     String[] lines = File.ReadAllLines(Path.Combine(soundFilesPath, fileInSoundDirectory.Name));
                     foreach (String line in lines)
                     {
-                        if (line.StartsWith("soundPack"))
+                        if (float.TryParse(line, out version))
                         {
-                            float.TryParse(line.Split(':')[1], out versions[0]);
-                        }
-                        if (line.StartsWith("driverNames"))
-                        {
-                            float.TryParse(line.Split(':')[1], out versions[0]);
+                            return version;
                         }
                     }
+                    break;
                 }
             }
-            return versions;
+            return version;
+        }
+
+        public float getDriverNamesVersion(DirectoryInfo soundDirectory)
+        {
+            DirectoryInfo[] directories = soundDirectory.GetDirectories();
+            float version = 0;
+
+            foreach (DirectoryInfo folderInSoundDirectory in directories)
+            {
+                if (folderInSoundDirectory.Name == "driver_names")
+                {
+                    FileInfo[] filesInDriverNamesDirectory = folderInSoundDirectory.GetFiles();
+                    foreach (FileInfo fileInDriverNameDirectory in filesInDriverNamesDirectory)
+                    {
+                        if (fileInDriverNameDirectory.Name == "driver_names_version_info")
+                        {
+                            String[] lines = File.ReadAllLines(Path.Combine(Path.Combine(soundFilesPath, folderInSoundDirectory.Name), fileInDriverNameDirectory.Name));
+                            foreach (String line in lines)
+                            {
+                                if (float.TryParse(line, out version))
+                                {
+                                    return version;
+                                }
+                            }
+                            break;
+                        }
+                    }
+                    break;
+                }
+            }
+            return version;
         }
 
         public void setBackgroundSound(String backgroundSoundName)

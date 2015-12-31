@@ -716,6 +716,7 @@ namespace CrewChiefV4
             downloadSoundPackButton.Text = "Sound pack is up to date";
             soundPackProgressBar.Value = 0;
             isDownloadingSoundPack = false;
+            File.Delete(AudioPlayer.soundFilesPath + "/" + soundPackTempFileName);
             if (!isDownloadingDriverNames)
             {
                 doRestart();        
@@ -728,6 +729,7 @@ namespace CrewChiefV4
             downloadDriverNamesButton.Text = "Driver names are up to date";
             driverNamesProgressBar.Value = 0;
             isDownloadingDriverNames = false;
+            File.Delete(AudioPlayer.soundFilesPath + "/" + driverNamesTempFileName);
             if (!isDownloadingSoundPack)
             {
                 doRestart();             
