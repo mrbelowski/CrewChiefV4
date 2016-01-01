@@ -73,16 +73,31 @@ namespace CrewChiefV4
             XDocument doc = XDocument.Parse(xml);
             float.TryParse(doc.Descendants("soundpackversion").First().Value, out latestSoundPackVersion);
             float.TryParse(doc.Descendants("drivernamesversion").First().Value, out latestDriverNamesVersion);
+
             if (latestSoundPackVersion > AudioPlayer.soundPackVersion)
             {
                 downloadSoundPackButton.Enabled = true;
-                downloadSoundPackButton.Text = "Updated sound pack available, press to download";
+                if (AudioPlayer.soundPackVersion == -1)
+                {
+                    downloadSoundPackButton.Text = "No sound pack detected, press to download";
+                }
+                else
+                {
+                    downloadSoundPackButton.Text = "Updated sound pack available, press to download";
+                }
                 newSoundPackAvailable = true;
             }
             if (latestDriverNamesVersion > AudioPlayer.driverNamesVersion)
             {
                 downloadDriverNamesButton.Enabled = true;
-                downloadDriverNamesButton.Text = "Updated driver names available, press to download";
+                if (AudioPlayer.driverNamesVersion == -1)
+                {
+                    downloadDriverNamesButton.Text = "No driver names detected, press to download";
+                }
+                else
+                {
+                    downloadDriverNamesButton.Text = "Updated driver names available, press to download";
+                }
                 newDriverNamesAvailable = true;
             }
         }

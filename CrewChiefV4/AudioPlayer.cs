@@ -116,8 +116,8 @@ namespace CrewChiefV4
 
         public Boolean initialised = false;
 
-        public static float soundPackVersion = 0;
-        public static float driverNamesVersion = 0;
+        public static float soundPackVersion = -1;
+        public static float driverNamesVersion = -1;
 
         public AudioPlayer(CrewChief crewChief)
         {
@@ -167,9 +167,9 @@ namespace CrewChiefV4
                 Console.WriteLine("Unable to find sound directory " + soundDirectory.FullName);
                 return;
             }            
-            if (soundPackVersion == -1 || soundPackVersion == 0)
+            if (soundPackVersion == -1)
             {
-                Console.WriteLine("Unable to get sound pack version - expected a file called version_info with a single line containing a version number, e.g. 2.0");
+                Console.WriteLine("Unable to get sound pack version");
             }
             else if (soundPackVersion < minimumSoundPackVersion)
             {
@@ -422,7 +422,7 @@ namespace CrewChiefV4
         public float getSoundPackVersion(DirectoryInfo soundDirectory)
         {
             FileInfo[] filesInSoundDirectory = soundDirectory.GetFiles();
-            float version = 0;
+            float version = -1;
             foreach (FileInfo fileInSoundDirectory in filesInSoundDirectory)
             {
                 if (fileInSoundDirectory.Name == "sound_pack_version_info")
@@ -444,7 +444,7 @@ namespace CrewChiefV4
         public float getDriverNamesVersion(DirectoryInfo soundDirectory)
         {
             DirectoryInfo[] directories = soundDirectory.GetDirectories();
-            float version = 0;
+            float version = -1;
 
             foreach (DirectoryInfo folderInSoundDirectory in directories)
             {
