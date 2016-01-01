@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <item>
-<title>Crew Chief 4.0.0.0 is now available, its ace but I have no idea how the auto updater works</title>
+<title>Crew Chief 4.0.0.0. This is the initial release of version 4</title>
 <version>4.0.0.0</version>
 <url>https://www.dropbox.com/s/gsiclt3y5k3miup/CrewChiefV4.msi?dl=1</url>
 <changelog>https://www.dropbox.com/s/iyaamv977epmq8d/change_log_for_auto_updated.txt?raw=1</changelog>
 <soundpackversion>100</soundpackversion>
+<soundpackurl>https://www.dropbox.com/s/zbmrq7qcefu6z6x/sounds_lo_fi_auto_updated.zip?dl=1</soundpackurl>
 <drivernamesversion>100</drivernamesversion>
+<drivernamesurl>https://www.dropbox.com/s/6mrlq93pv6uf8hi/driver_names_lo_fi_auto_updated.zip?dl=1</drivernamesurl>
 </item>

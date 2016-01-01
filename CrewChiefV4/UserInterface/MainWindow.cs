@@ -73,7 +73,8 @@ namespace CrewChiefV4
             XDocument doc = XDocument.Parse(xml);
             float.TryParse(doc.Descendants("soundpackversion").First().Value, out latestSoundPackVersion);
             float.TryParse(doc.Descendants("drivernamesversion").First().Value, out latestDriverNamesVersion);
-
+            soundPackDownloadLocation = doc.Descendants("soundpackurl").First().Value;
+            driverNamesDownloadLocation = doc.Descendants("drivernamesurl").First().Value;
             if (latestSoundPackVersion > AudioPlayer.soundPackVersion)
             {
                 downloadSoundPackButton.Enabled = true;
@@ -738,6 +739,10 @@ namespace CrewChiefV4
                 if (e.Error == null && !e.Cancelled)
                 {
                     downloadSoundPackButton.Text = "Extracting sound pack...";
+                    if (Directory.Exists(AudioPlayer.soundFilesPath + "/sounds_temp"))
+                    {
+                        Directory.Delete(AudioPlayer.soundFilesPath + "/sounds_temp", true);
+                    }
                     ZipFile.ExtractToDirectory(AudioPlayer.soundFilesPath + "/" + soundPackTempFileName, AudioPlayer.soundFilesPath + "/sounds_temp");
                     if (Directory.Exists(AudioPlayer.soundFilesPath + "/background_sounds"))
                     {
@@ -755,11 +760,11 @@ namespace CrewChiefV4
                     {
                         File.Delete(AudioPlayer.soundFilesPath + "/sound_pack_version_info.txt");
                     }
-                    Directory.Move(AudioPlayer.soundFilesPath + "/sounds_temp/background_sounds", AudioPlayer.soundFilesPath);
-                    Directory.Move(AudioPlayer.soundFilesPath + "/sounds_temp/fx", AudioPlayer.soundFilesPath);
-                    Directory.Move(AudioPlayer.soundFilesPath + "/sounds_temp/voice", AudioPlayer.soundFilesPath);
-                    File.Move(AudioPlayer.soundFilesPath + "/sounds_temp/sound_pack_version_info.txt", AudioPlayer.soundFilesPath);
-                    Directory.Delete(AudioPlayer.soundFilesPath + "/sounds_temp");
+                    Directory.Move(AudioPlayer.soundFilesPath + "/sounds_temp/background_sounds", AudioPlayer.soundFilesPath + "/background_sounds");
+                    Directory.Move(AudioPlayer.soundFilesPath + "/sounds_temp/fx", AudioPlayer.soundFilesPath + "/fx");
+                    Directory.Move(AudioPlayer.soundFilesPath + "/sounds_temp/voice", AudioPlayer.soundFilesPath + "/voice");
+                    File.Move(AudioPlayer.soundFilesPath + "/sounds_temp/sound_pack_version_info.txt", AudioPlayer.soundFilesPath + "/sound_pack_version_info.txt");
+                    Directory.Delete(AudioPlayer.soundFilesPath + "/sounds_temp", true);
 
                     success = true;
                     downloadSoundPackButton.Text = "Sound pack is up to date";
@@ -806,7 +811,11 @@ namespace CrewChiefV4
             {
                 if (e.Error == null && !e.Cancelled)
                 {
-                    downloadDriverNamesButton.Text = "Driver names are up to date";
+                    downloadDriverNamesButton.Text = "Extracting driver names...";
+                    if (Directory.Exists(AudioPlayer.soundFilesPath + "/driver_names_temp"))
+                    {
+                        Directory.Delete(AudioPlayer.soundFilesPath + "/driver_names_temp");
+                    }
                     ZipFile.ExtractToDirectory(AudioPlayer.soundFilesPath + "/" + driverNamesTempFileName, AudioPlayer.soundFilesPath + "/driver_names_temp", Encoding.UTF8);
                     if (Directory.Exists(AudioPlayer.soundFilesPath + "/driver_names"))
                     {

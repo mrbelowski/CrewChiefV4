@@ -1,3 +1,3 @@
 4.0.0.0
 -----
-Initial release of version 4. It's ace.
+Version 4.0.0.0: Initial release of version 4. The app now comes packaged as a single auto-updating .msi installer and includes integrated sound and driver names pack updating. The spotter has been overhauled, brake temp messages fixed, and car class and driver names for RaceRoom Formula 2 drivers have been added.
