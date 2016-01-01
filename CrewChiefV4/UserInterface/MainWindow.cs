@@ -23,7 +23,7 @@ namespace CrewChiefV4
     {
         private String driverNamesDownloadLocation = "https://www.dropbox.com/s/6mrlq93pv6uf8hi/driver_names_lo_fi_auto_updated.zip?dl=1";
         private String driverNamesTempFileName = "temp_driver_names.zip";
-        private String soundPackDownloadLocation = "https://www.dropbox.com/s/zbmrq7qcefu6z6x/sounds_lo_fi_auto_updated.zip?dl=1";
+        private String soundPackDownloadLocation = "https://www.dropbox.com/s/zbmrq7qcefu6z6x/ounds_lo_fi_auto_updated.zip?dl=1";
         private String soundPackTempFileName = "temp_sound_pack.zip";
         private Boolean isDownloadingDriverNames = false;
         private Boolean isDownloadingSoundPack = false;
@@ -101,7 +101,7 @@ namespace CrewChiefV4
                 newDriverNamesAvailable = true;
             }
         }
-        
+                
         private void messagesVolumeSlider_Scroll(object sender, EventArgs e)
         {
             float volFloat = (float) messagesVolumeSlider.Value / 10;
@@ -714,7 +714,10 @@ namespace CrewChiefV4
             double bytesIn = double.Parse(e.BytesReceived.ToString());
             double totalBytes = double.Parse(e.TotalBytesToReceive.ToString());
             double percentage = bytesIn / totalBytes * 100;
-            soundPackProgressBar.Value = int.Parse(Math.Truncate(percentage).ToString());
+            if (percentage > 0)
+            {
+                soundPackProgressBar.Value = int.Parse(Math.Truncate(percentage).ToString());
+            }
         }
 
         void drivernames_DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
@@ -722,32 +725,103 @@ namespace CrewChiefV4
             double bytesIn = double.Parse(e.BytesReceived.ToString());
             double totalBytes = double.Parse(e.TotalBytesToReceive.ToString());
             double percentage = bytesIn / totalBytes * 100;
-            driverNamesProgressBar.Value = int.Parse(Math.Truncate(percentage).ToString());
+            if (percentage > 0)
+            {
+                driverNamesProgressBar.Value = int.Parse(Math.Truncate(percentage).ToString());
+            }
         }
         void soundpack_DownloadFileCompleted(object sender, AsyncCompletedEventArgs e)
         {
-            downloadSoundPackButton.Text = "Extracting sound pack...";
-            ZipFile.ExtractToDirectory(AudioPlayer.soundFilesPath + "/" + soundPackTempFileName, AudioPlayer.soundFilesPath);
-            downloadSoundPackButton.Text = "Sound pack is up to date";
-            soundPackProgressBar.Value = 0;
-            isDownloadingSoundPack = false;
-            File.Delete(AudioPlayer.soundFilesPath + "/" + soundPackTempFileName);
-            if (!isDownloadingDriverNames)
+            Boolean success = false;
+            try
             {
-                doRestart();        
+                if (e.Error == null && !e.Cancelled)
+                {
+                    downloadSoundPackButton.Text = "Extracting sound pack...";
+                    ZipFile.ExtractToDirectory(AudioPlayer.soundFilesPath + "/" + soundPackTempFileName, AudioPlayer.soundFilesPath);
+                    success = true;
+                    downloadSoundPackButton.Text = "Sound pack is up to date";
+                }
+            }
+            catch (Exception) { }
+            finally
+            {
+                try
+                {
+                    File.Delete(AudioPlayer.soundFilesPath + "/" + soundPackTempFileName);
+                }
+                catch (Exception) { }
+                soundPackProgressBar.Value = 0;
+                isDownloadingSoundPack = false;                    
+                if (success && !isDownloadingDriverNames)
+                {
+                    doRestart();
+                }
+            }
+            if (!success)
+            {
+                startApplicationButton.Enabled = !isDownloadingDriverNames;
+                if (AudioPlayer.soundPackVersion == -1)
+                {
+                    downloadSoundPackButton.Text = "No sound pack detected, press to download";
+                }
+                else
+                {
+                    downloadSoundPackButton.Text = "Updated sound pack available, press to download";
+                }
+                downloadSoundPackButton.Enabled = true;
+                if (!e.Cancelled)
+                {
+                    MessageBox.Show("Error downloading sound pack, check the readme file for instructions on how to manually download and install this.", "Unable to download sound pack",
+                        MessageBoxButtons.OK);
+                }
             }
         }
         void drivernames_DownloadFileCompleted(object sender, AsyncCompletedEventArgs e)
         {
-            downloadSoundPackButton.Text = "Extracting driver names...";
-            ZipFile.ExtractToDirectory(AudioPlayer.soundFilesPath + "/" + driverNamesTempFileName, AudioPlayer.soundFilesPath);
-            downloadDriverNamesButton.Text = "Driver names are up to date";
-            driverNamesProgressBar.Value = 0;
-            isDownloadingDriverNames = false;
-            File.Delete(AudioPlayer.soundFilesPath + "/" + driverNamesTempFileName);
-            if (!isDownloadingSoundPack)
+            Boolean success = false;
+            try
             {
-                doRestart();             
+                if (e.Error == null && !e.Cancelled)
+                {
+                    downloadDriverNamesButton.Text = "Driver names are up to date";
+                    ZipFile.ExtractToDirectory(AudioPlayer.soundFilesPath + "/" + driverNamesTempFileName, AudioPlayer.soundFilesPath);
+                    success = true;
+                    downloadDriverNamesButton.Text = "Driver names are up to date";
+                }
+            }
+            catch (Exception) { }
+            finally
+            {
+                try
+                {
+                    File.Delete(AudioPlayer.soundFilesPath + "/" + driverNamesTempFileName);
+                }
+                catch (Exception) { }
+                driverNamesProgressBar.Value = 0;
+                isDownloadingDriverNames = false;
+                if (success && !isDownloadingSoundPack)
+                {
+                    doRestart();
+                }
+            }
+            if (!success)
+            {
+                startApplicationButton.Enabled = !isDownloadingSoundPack;
+                if (AudioPlayer.soundPackVersion == -1)
+                {
+                    downloadDriverNamesButton.Text = "No driver names detected, press to download";
+                }
+                else
+                {
+                    downloadDriverNamesButton.Text = "Updated driver names available, press to download";
+                }
+                downloadDriverNamesButton.Enabled = true;
+                if (e.Error != null)
+                {
+                    MessageBox.Show("Error downloading driver names, check the readme file for instructions on how to manually download and install this.", "Unable to download driver names",
+                        MessageBoxButtons.OK);
+                }
             }
         }
 
@@ -758,7 +832,7 @@ namespace CrewChiefV4
             {
                 warningMessage = "The app must be restarted manually to load the new sounds";
             }
-            if (MessageBox.Show(warningMessage, "Save changes", MessageBoxButtons.OK) == DialogResult.OK)
+            if (MessageBox.Show(warningMessage, "Load new sounds", MessageBoxButtons.OK) == DialogResult.OK)
             {
                 if (!System.Diagnostics.Debugger.IsAttached)
                 {
