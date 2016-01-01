@@ -188,6 +188,7 @@ namespace CrewChiefV4.PCars
                 else
                 {
                     existingPartInfo.mWorldPosition = new float[] { 0, 0, 0 };
+                    existingPartInfo.mIsActive = false;
                 }
                 existingState.mParticipantData[i] = existingPartInfo;
             }

@@ -221,7 +221,6 @@ namespace CrewChiefV4.PCars
                     sTelemetryData telem = (sTelemetryData)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(sTelemetryData));
                     if (sequenceCheckOK || !telemIsOutOfSequence(telem))
                     {
-                        // TODO: implement joypad stuff
                         buttonsState = ConvertByteToBoolArray(telem.sDPad, telem.sJoyPad);
                         lastSequenceNumberForTelemPacket = sequence;
                         workingGameState = StructHelper.MergeWithExistingState(workingGameState, telem);

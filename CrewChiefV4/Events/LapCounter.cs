@@ -101,6 +101,15 @@ namespace CrewChiefV4.Events
                 Console.WriteLine("pre-start message for P " + currentGameState.SessionData.Position);
                 possibleMessages.Add(new QueuedMessage(Position.folderStub + currentGameState.SessionData.Position, 0, this));
             }
+            if (currentGameState.SessionData.SessionNumberOfLaps > 0) {
+                possibleMessages.Add(new QueuedMessage("race_distance", MessageContents(
+                        QueuedMessage.folderNameNumbersStub + currentGameState.SessionData.SessionNumberOfLaps, folderLapsMakeThemCount), 0, this));
+            } else if (currentGameState.SessionData.SessionHasFixedTime && currentGameState.SessionData.SessionRunTime > 0 && currentGameState.SessionData.SessionRunTime < 1800 &&
+                    currentGameState.SessionData.Position > 3) {
+                int minutes = (int)currentGameState.SessionData.SessionRunTime / 60;
+                possibleMessages.Add(new QueuedMessage("race_time", MessageContents(
+                        QueuedMessage.folderNameNumbersStub + minutes, folderMinutesYouNeedToGetOnWithIt), 0, this));
+            }
             // now pick a random selection
             if (possibleMessages.Count > 0)
             {

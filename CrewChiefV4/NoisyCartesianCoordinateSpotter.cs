@@ -159,25 +159,24 @@ namespace CrewChiefV4
                             Boolean isOpponentVelocityInRange = true;
                             if (previousPositionAndVelocityData.ContainsKey(i))
                             {
-                                PreviousPositionAndVelocityData opponentPreviousPositionAndVelocityData = previousPositionAndVelocityData[i];                                
-                                //if (hasMoved(mapKey, currentOpponentPosition[0], currentOpponentPosition[1])) {
-                                // Wayhay, he's moved. Store the current position, the calculated velocity and the time
-                                if (opponentPreviousPositionAndVelocityData.previousXSpeeds.Count == speedsToAverage)
+                                PreviousPositionAndVelocityData opponentPreviousPositionAndVelocityData = previousPositionAndVelocityData[i];   
+                                float timeDiffSeconds = ((float)(now - opponentPreviousPositionAndVelocityData.timeWhenLastUpdated).TotalMilliseconds) / 1000f;
+                                if (timeDiffSeconds > 0)
                                 {
-                                    opponentPreviousPositionAndVelocityData.previousXSpeeds.RemoveAt(speedsToAverage - 1);
-                                    opponentPreviousPositionAndVelocityData.previousYSpeeds.RemoveAt(speedsToAverage - 1);
+                                    if (opponentPreviousPositionAndVelocityData.previousXSpeeds.Count == speedsToAverage)
+                                    {
+                                        opponentPreviousPositionAndVelocityData.previousXSpeeds.RemoveAt(speedsToAverage - 1);
+                                        opponentPreviousPositionAndVelocityData.previousYSpeeds.RemoveAt(speedsToAverage - 1);
+                                    }
+                                    opponentPreviousPositionAndVelocityData.previousXSpeeds.Insert(0, (currentOpponentPosition[0] - opponentPreviousPositionAndVelocityData.xPosition) / timeDiffSeconds);
+                                    opponentPreviousPositionAndVelocityData.previousYSpeeds.Insert(0, (currentOpponentPosition[1] - opponentPreviousPositionAndVelocityData.yPosition) /timeDiffSeconds);
+                                    opponentPreviousPositionAndVelocityData.xPosition = currentOpponentPosition[0];
+                                    opponentPreviousPositionAndVelocityData.yPosition = currentOpponentPosition[1];
+                                    opponentPreviousPositionAndVelocityData.timeWhenLastUpdated = now;
+
+                                    isOpponentVelocityInRange = checkOpponentVelocityInRange(playerVelocityData[1], playerVelocityData[2],
+                                            opponentPreviousPositionAndVelocityData.previousXSpeeds.Average(), opponentPreviousPositionAndVelocityData.previousYSpeeds.Average());
                                 }
-                                opponentPreviousPositionAndVelocityData.previousXSpeeds.Insert(0,
-                                        1000f * (currentOpponentPosition[0] - opponentPreviousPositionAndVelocityData.xPosition) / (float)(now - opponentPreviousPositionAndVelocityData.timeWhenLastUpdated).TotalMilliseconds);
-                                opponentPreviousPositionAndVelocityData.previousYSpeeds.Insert(0,
-                                        1000f * (currentOpponentPosition[1] - opponentPreviousPositionAndVelocityData.yPosition) / (float)(now - opponentPreviousPositionAndVelocityData.timeWhenLastUpdated).TotalMilliseconds);
-                                opponentPreviousPositionAndVelocityData.xPosition = currentOpponentPosition[0];
-                                opponentPreviousPositionAndVelocityData.yPosition = currentOpponentPosition[1];
-                                opponentPreviousPositionAndVelocityData.timeWhenLastUpdated = now;
-                                //}
-                                
-                                isOpponentVelocityInRange = checkOpponentVelocityInRange(playerVelocityData[1], playerVelocityData[2],
-                                        opponentPreviousPositionAndVelocityData.previousXSpeeds.Average(), opponentPreviousPositionAndVelocityData.previousYSpeeds.Average());
                                 
                             }
                             else

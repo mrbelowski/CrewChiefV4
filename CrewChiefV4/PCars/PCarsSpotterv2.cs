@@ -14,8 +14,6 @@ namespace CrewChiefV4.PCars
 
         private Boolean paused = false;
 
-        private Boolean checkCarSpeedsForNetworkSpotter = true;
-
         // don't activate the spotter unless this many seconds have elapsed (race starts are messy)
         private int timeAfterRaceStartToActivate = UserSettings.GetUserSettings().getInt("time_after_race_start_for_spotter");
 

@@ -1,6 +1,6 @@
-Update the increment Assembly Information Assembly Version in CrewChiefV4 -> project -> properties (4.x.y.0) - this is needed for the autoupdater to work
+Update the Assembly Information Assembly Version in CrewChiefV4 -> project -> properties (4.x.y.0) - this is needed for the autoupdater to work
 
-Go to General Information in Organize Your Setup
+Go to General Information in Organize Your Setup (in the build project in Solution Explorer)
 
 Update the Product Version to match the Assembly Version
 CAREFULLY change Product Code in Organize Setup -> General Info -> product code, generate a new GUID (on right of UI). DO NOT CHANGE THE UPGRADE CODE GUID
@@ -12,3 +12,8 @@ Update the contents of auto_update_data.xml - the title and version elements, an
 Update the change_log_for_auto_updated.txt
 
 Push the newly built /.../SingleImage/DiskImages/DISK1/CrewChiefV4.msi and the 2 text files up to DropBox, overwriting the existing ones (and therefore keeping the same URLs)
+
+
+The sound pack and driver names pack each have a version info file - sound_pack_version_info and driver_names_version_info. These are in the root of the sounds folder and the root of the driver_names folder respectively. These start at 100.
+
+The sound pack is the voice, fx, background_sounds folders and sound_pack_version_info file, zipped from the root of sounds (i.e. no additional top level folder in the .zip). The driver names pack is just the zipped driver_names folder (the zip file contains a single folder called driver_names, which has the all the contents in it, including the version file).

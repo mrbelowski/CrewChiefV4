@@ -344,15 +344,17 @@ namespace CrewChiefV4
             foreach (KeyValuePair<String, int> entry in numberToNumber)
             {
                 opponentChoices.Add(WHATS + " " + POSITION + " " + entry.Key + "'s " + LAST_LAP);
-                opponentChoices.Add(WHATS + " " + POSITION + " " + entry.Key + "'s " + LAST_LAP);
                 opponentChoices.Add(WHATS + " " + POSITION + " " + entry.Key + "'s " + BEST_LAP);
                 opponentChoices.Add(WHAT_TYRE_IS + " " + POSITION + " " + entry.Key + " on");
                 opponentChoices.Add(WHAT_TYRES_IS + " " + POSITION + " " + entry.Key + " on");
                 opponentChoices.Add(WHATS + " " + PEA + " " + entry.Key + "'s " + LAST_LAP);
                 opponentChoices.Add(WHATS + " " + PEA + " " + entry.Key + "'s " + BEST_LAP);
                 opponentChoices.Add(WHOS_IN + " " + PEA + " " + entry.Key);
+                opponentChoices.Add(WHOS_IN + " " + POSITION + " " + entry.Key);
                 opponentChoices.Add(WHAT_TYRE_IS + " " + PEA + " " + entry.Key + " on");
                 opponentChoices.Add(WHAT_TYRES_IS + " " + PEA + " " + entry.Key + " on");
+                opponentChoices.Add(WHERE_IS + " " + PEA + " " + entry.Key);
+                opponentChoices.Add(WHERE_IS + " " + POSITION + " " + entry.Key);
             }
             opponentChoices.Add(WHATS + " " + THE_LEADER +"'s " + BEST_LAP);
             opponentChoices.Add(WHATS + " " + THE_LEADER + "'s " + LAST_LAP);
