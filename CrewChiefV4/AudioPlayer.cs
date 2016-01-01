@@ -425,7 +425,7 @@ namespace CrewChiefV4
             float version = -1;
             foreach (FileInfo fileInSoundDirectory in filesInSoundDirectory)
             {
-                if (fileInSoundDirectory.Name == "sound_pack_version_info")
+                if (fileInSoundDirectory.Name == "sound_pack_version_info.txt")
                 {
                     String[] lines = File.ReadAllLines(Path.Combine(soundFilesPath, fileInSoundDirectory.Name));
                     foreach (String line in lines)
@@ -453,7 +453,7 @@ namespace CrewChiefV4
                     FileInfo[] filesInDriverNamesDirectory = folderInSoundDirectory.GetFiles();
                     foreach (FileInfo fileInDriverNameDirectory in filesInDriverNamesDirectory)
                     {
-                        if (fileInDriverNameDirectory.Name == "driver_names_version_info")
+                        if (fileInDriverNameDirectory.Name == "driver_names_version_info.txt")
                         {
                             String[] lines = File.ReadAllLines(Path.Combine(Path.Combine(soundFilesPath, folderInSoundDirectory.Name), fileInDriverNameDirectory.Name));
                             foreach (String line in lines)

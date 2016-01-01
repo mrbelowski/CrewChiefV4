@@ -45,7 +45,6 @@ namespace CrewChiefV4
                     }
                 }
             }
-
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new MainWindow());

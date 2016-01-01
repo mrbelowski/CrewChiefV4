@@ -738,7 +738,29 @@ namespace CrewChiefV4
                 if (e.Error == null && !e.Cancelled)
                 {
                     downloadSoundPackButton.Text = "Extracting sound pack...";
-                    ZipFile.ExtractToDirectory(AudioPlayer.soundFilesPath + "/" + soundPackTempFileName, AudioPlayer.soundFilesPath);
+                    ZipFile.ExtractToDirectory(AudioPlayer.soundFilesPath + "/" + soundPackTempFileName, AudioPlayer.soundFilesPath + "/sounds_temp");
+                    if (Directory.Exists(AudioPlayer.soundFilesPath + "/background_sounds"))
+                    {
+                        Directory.Delete(AudioPlayer.soundFilesPath + "/background_sounds", true);
+                    }
+                    if (Directory.Exists(AudioPlayer.soundFilesPath + "/fx"))
+                    {
+                        Directory.Delete(AudioPlayer.soundFilesPath + "/fx", true);
+                    }
+                    if (Directory.Exists(AudioPlayer.soundFilesPath + "/voice"))
+                    {
+                        Directory.Delete(AudioPlayer.soundFilesPath + "/voice", true);
+                    }
+                    if (File.Exists(AudioPlayer.soundFilesPath + "/sound_pack_version_info.txt"))
+                    {
+                        File.Delete(AudioPlayer.soundFilesPath + "/sound_pack_version_info.txt");
+                    }
+                    Directory.Move(AudioPlayer.soundFilesPath + "/sounds_temp/background_sounds", AudioPlayer.soundFilesPath);
+                    Directory.Move(AudioPlayer.soundFilesPath + "/sounds_temp/fx", AudioPlayer.soundFilesPath);
+                    Directory.Move(AudioPlayer.soundFilesPath + "/sounds_temp/voice", AudioPlayer.soundFilesPath);
+                    File.Move(AudioPlayer.soundFilesPath + "/sounds_temp/sound_pack_version_info.txt", AudioPlayer.soundFilesPath);
+                    Directory.Delete(AudioPlayer.soundFilesPath + "/sounds_temp");
+
                     success = true;
                     downloadSoundPackButton.Text = "Sound pack is up to date";
                 }
@@ -785,7 +807,13 @@ namespace CrewChiefV4
                 if (e.Error == null && !e.Cancelled)
                 {
                     downloadDriverNamesButton.Text = "Driver names are up to date";
-                    ZipFile.ExtractToDirectory(AudioPlayer.soundFilesPath + "/" + driverNamesTempFileName, AudioPlayer.soundFilesPath);
+                    ZipFile.ExtractToDirectory(AudioPlayer.soundFilesPath + "/" + driverNamesTempFileName, AudioPlayer.soundFilesPath + "/driver_names_temp", Encoding.UTF8);
+                    if (Directory.Exists(AudioPlayer.soundFilesPath + "/driver_names"))
+                    {
+                        Directory.Delete(AudioPlayer.soundFilesPath + "/driver_names", true);
+                    }
+                    Directory.Move(AudioPlayer.soundFilesPath + "/driver_names_temp/driver_names", AudioPlayer.soundFilesPath + "/driver_names");
+                    Directory.Delete(AudioPlayer.soundFilesPath + "/driver_names_temp");
                     success = true;
                     downloadDriverNamesButton.Text = "Driver names are up to date";
                 }

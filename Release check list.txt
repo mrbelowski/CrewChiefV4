@@ -17,3 +17,5 @@ Push the newly built /.../SingleImage/DiskImages/DISK1/CrewChiefV4.msi and the 2
 The sound pack and driver names pack each have a version info file - sound_pack_version_info and driver_names_version_info. These are in the root of the sounds folder and the root of the driver_names folder respectively. These start at 100.
 
 The sound pack is the voice, fx, background_sounds folders and sound_pack_version_info file, zipped from the root of sounds (i.e. no additional top level folder in the .zip). The driver names pack is just the zipped driver_names folder (the zip file contains a single folder called driver_names, which has the all the contents in it, including the version file).
+
+ZIP ENCODING!!!	The auto updater stuff requires UTF-8 Always as the encoding. This will NOT work with Windows built in Zip file viewer. This means we need to zip the auto update driver names zip file using UTF-8 "Always" encoding and unzip it with Encoding.UTF8. The sound files doesn't have this complication
