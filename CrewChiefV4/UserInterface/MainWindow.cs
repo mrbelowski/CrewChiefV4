@@ -23,7 +23,7 @@ namespace CrewChiefV4
     {
         private String driverNamesDownloadLocation = "https://www.dropbox.com/s/6mrlq93pv6uf8hi/driver_names_lo_fi_auto_updated.zip?dl=1";
         private String driverNamesTempFileName = "temp_driver_names.zip";
-        private String soundPackDownloadLocation = "https://www.dropbox.com/s/zbmrq7qcefu6z6x/ounds_lo_fi_auto_updated.zip?dl=1";
+        private String soundPackDownloadLocation = "https://www.dropbox.com/s/zbmrq7qcefu6z6x/sounds_lo_fi_auto_updated.zip?dl=1";
         private String soundPackTempFileName = "temp_sound_pack.zip";
         private Boolean isDownloadingDriverNames = false;
         private Boolean isDownloadingSoundPack = false;
