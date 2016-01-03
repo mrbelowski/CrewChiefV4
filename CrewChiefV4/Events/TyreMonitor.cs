@@ -543,8 +543,8 @@ namespace CrewChiefV4.Events
             }
             else
             {
-                audioPlayer.playClipImmediately(new QueuedMessage("tyre_temps", MessageContents(folderLeftFront, leftFrontTyreTemp, folderRightFront, rightFrontTyreTemp,
-                        folderLeftRear, leftRearTyreTemp, folderRightRear, rightRearTyreTemp), 0, this), false);
+                audioPlayer.playClipImmediately(new QueuedMessage("tyre_temps", MessageContents(folderLeftFront, leftFrontTyreTemp, useFahrenheit ? ConditionsMonitor.folderFahrenheit : ConditionsMonitor.folderCelsius,
+                    folderRightFront, rightFrontTyreTemp, folderLeftRear, leftRearTyreTemp, folderRightRear, rightRearTyreTemp), 0, this), false);
             }
             audioPlayer.closeChannel();
         }
@@ -557,8 +557,8 @@ namespace CrewChiefV4.Events
             }
             else
             {
-                audioPlayer.playClipImmediately(new QueuedMessage("brake_temps", MessageContents(folderLeftFront, leftFrontBrakeTemp, folderRightFront, rightFrontBrakeTemp,
-                        folderLeftRear, leftRearBrakeTemp, folderRightRear, rightRearBrakeTemp), 0, this), false);
+                audioPlayer.playClipImmediately(new QueuedMessage("brake_temps", MessageContents(folderLeftFront, leftFrontBrakeTemp, useFahrenheit ? ConditionsMonitor.folderFahrenheit : ConditionsMonitor.folderCelsius, 
+                    folderRightFront, rightFrontBrakeTemp, folderLeftRear, leftRearBrakeTemp, folderRightRear, rightRearBrakeTemp), 0, this), false);
             }
             audioPlayer.closeChannel();
         }
