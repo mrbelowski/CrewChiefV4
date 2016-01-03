@@ -130,6 +130,7 @@
     <Compile Include="R3E\R3ESpotterv2.cs" />
     <Compile Include="TimeSpanWrapper.cs" />
     <Compile Include="TrackData.cs" />
+    <Compile Include="UpdateHelper.cs" />
     <Compile Include="UserInterface\FloatPropertyControl.cs">
       <SubType>UserControl</SubType>
     </Compile>

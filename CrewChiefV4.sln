@@ -5,12 +5,7 @@ VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrewChiefV4", "CrewChiefV4\CrewChiefV4.csproj", "{4240B0E2-69BC-4260-9706-C0CC5AAE04A5}"
 EndProject
-Project("{6141683F-8A12-4E36-9623-2EB02B2C2303}") = "CrewChiefV4_no_sound_files", "CrewChiefV4_no_sound_files\CrewChiefV4_no_sound_files.isproj", "{63DF477B-E005-4D23-B3CA-2A118D88383D}"
-	ProjectSection(ProjectDependencies) = postProject
-		{4240B0E2-69BC-4260-9706-C0CC5AAE04A5} = {4240B0E2-69BC-4260-9706-C0CC5AAE04A5}
-	EndProjectSection
-EndProject
-Project("{6141683F-8A12-4E36-9623-2EB02B2C2303}") = "CrewChiefV4_with_base_sounds", "CrewChiefV4_with_base_sounds\CrewChiefV4_with_base_sounds.isproj", "{86FA9B1D-FBA0-489A-9D97-F96D6DF8A939}"
+Project("{6141683F-8A12-4E36-9623-2EB02B2C2303}") = "CrewChiefV4_setup_project", "CrewChiefV4_no_sound_files\CrewChiefV4_setup_project.isproj", "{63DF477B-E005-4D23-B3CA-2A118D88383D}"
 	ProjectSection(ProjectDependencies) = postProject
 		{4240B0E2-69BC-4260-9706-C0CC5AAE04A5} = {4240B0E2-69BC-4260-9706-C0CC5AAE04A5}
 	EndProjectSection
@@ -44,16 +39,6 @@ Global
 		{63DF477B-E005-4D23-B3CA-2A118D88383D}.Release|Any CPU.Build.0 = SingleImage
 		{63DF477B-E005-4D23-B3CA-2A118D88383D}.SingleImage|Any CPU.ActiveCfg = SingleImage
 		{63DF477B-E005-4D23-B3CA-2A118D88383D}.SingleImage|Any CPU.Build.0 = SingleImage
-		{86FA9B1D-FBA0-489A-9D97-F96D6DF8A939}.CD_ROM|Any CPU.ActiveCfg = CD_ROM
-		{86FA9B1D-FBA0-489A-9D97-F96D6DF8A939}.CD_ROM|Any CPU.Build.0 = CD_ROM
-		{86FA9B1D-FBA0-489A-9D97-F96D6DF8A939}.Debug|Any CPU.ActiveCfg = DVD-5
-		{86FA9B1D-FBA0-489A-9D97-F96D6DF8A939}.Debug|Any CPU.Build.0 = DVD-5
-		{86FA9B1D-FBA0-489A-9D97-F96D6DF8A939}.DVD-5|Any CPU.ActiveCfg = DVD-5
-		{86FA9B1D-FBA0-489A-9D97-F96D6DF8A939}.DVD-5|Any CPU.Build.0 = DVD-5
-		{86FA9B1D-FBA0-489A-9D97-F96D6DF8A939}.Release|Any CPU.ActiveCfg = SingleImage
-		{86FA9B1D-FBA0-489A-9D97-F96D6DF8A939}.Release|Any CPU.Build.0 = SingleImage
-		{86FA9B1D-FBA0-489A-9D97-F96D6DF8A939}.SingleImage|Any CPU.ActiveCfg = SingleImage
-		{86FA9B1D-FBA0-489A-9D97-F96D6DF8A939}.SingleImage|Any CPU.Build.0 = SingleImage
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -21,10 +21,16 @@ namespace CrewChiefV4
 {
     public partial class MainWindow : Form
     {
-        private String driverNamesDownloadLocation = "https://www.dropbox.com/s/6mrlq93pv6uf8hi/driver_names_lo_fi_auto_updated.zip?dl=1";
+        private String baseDriverNamesDownloadLocation;
+        private String updateDriverNamesDownloadLocation;
         private String driverNamesTempFileName = "temp_driver_names.zip";
-        private String soundPackDownloadLocation = "https://www.dropbox.com/s/zbmrq7qcefu6z6x/sounds_lo_fi_auto_updated.zip?dl=1";
+        private Boolean getBaseDriverNames = false;
+
+        private String baseSoundPackDownloadLocation;
+        private String updateSoundPackDownloadLocation;
         private String soundPackTempFileName = "temp_sound_pack.zip";
+        private Boolean getBaseSoundPack = false;
+
         private Boolean isDownloadingDriverNames = false;
         private Boolean isDownloadingSoundPack = false;
         private Boolean newSoundPackAvailable = false;
@@ -46,7 +52,7 @@ namespace CrewChiefV4
 
         private VoiceOptionEnum voiceOption;
 
-        private static String autoUpdateXMLURL = "https://www.dropbox.com/s/to5q1z5dmvfhuwm/auto_update_data.xml?dl=1";
+        private static String autoUpdateXMLURL = "https://drive.google.com/uc?export=download&id=0B4KQS820QNFbWWFjaDAzRldMNUE";
 
         private float latestSoundPackVersion = 0;
         private float latestDriverNamesVersion = 0;
@@ -73,14 +79,17 @@ namespace CrewChiefV4
             XDocument doc = XDocument.Parse(xml);
             float.TryParse(doc.Descendants("soundpackversion").First().Value, out latestSoundPackVersion);
             float.TryParse(doc.Descendants("drivernamesversion").First().Value, out latestDriverNamesVersion);
-            soundPackDownloadLocation = doc.Descendants("soundpackurl").First().Value;
-            driverNamesDownloadLocation = doc.Descendants("drivernamesurl").First().Value;
+            baseSoundPackDownloadLocation = doc.Descendants("basesoundpackurl").First().Value;
+            baseDriverNamesDownloadLocation = doc.Descendants("basedrivernamesurl").First().Value; 
+            updateSoundPackDownloadLocation = doc.Descendants("updatesoundpackurl").First().Value;
+            updateDriverNamesDownloadLocation = doc.Descendants("updatedrivernamesurl").First().Value;
             if (latestSoundPackVersion > AudioPlayer.soundPackVersion)
             {
                 downloadSoundPackButton.Enabled = true;
                 if (AudioPlayer.soundPackVersion == -1)
                 {
                     downloadSoundPackButton.Text = "No sound pack detected, press to download";
+                    getBaseSoundPack = true;
                 }
                 else
                 {
@@ -94,6 +103,7 @@ namespace CrewChiefV4
                 if (AudioPlayer.driverNamesVersion == -1)
                 {
                     downloadDriverNamesButton.Text = "No driver names detected, press to download";
+                    getBaseDriverNames = true;
                 }
                 else
                 {
@@ -696,16 +706,28 @@ namespace CrewChiefV4
                     isDownloadingSoundPack = true;
                     wc.DownloadProgressChanged += new DownloadProgressChangedEventHandler(soundpack_DownloadProgressChanged);
                     wc.DownloadFileCompleted += new AsyncCompletedEventHandler(soundpack_DownloadFileCompleted);
-                    wc.DownloadFileAsync(new Uri(soundPackDownloadLocation), 
-                        AudioPlayer.soundFilesPath + "/" + soundPackTempFileName);
+                    if (getBaseSoundPack)
+                    {
+                        wc.DownloadFileAsync(new Uri(baseSoundPackDownloadLocation), AudioPlayer.soundFilesPath + "/" + soundPackTempFileName);
+                    }
+                    else
+                    {
+                        wc.DownloadFileAsync(new Uri(updateSoundPackDownloadLocation), AudioPlayer.soundFilesPath + "/" + soundPackTempFileName);
+                    }
                 }
                 else
                 {
                     isDownloadingDriverNames = true;
                     wc.DownloadProgressChanged += new DownloadProgressChangedEventHandler(drivernames_DownloadProgressChanged);
                     wc.DownloadFileCompleted += new AsyncCompletedEventHandler(drivernames_DownloadFileCompleted);
-                    wc.DownloadFileAsync(new Uri(driverNamesDownloadLocation),
-                        AudioPlayer.soundFilesPath + "/" + driverNamesTempFileName);
+                    if (getBaseDriverNames) 
+                    {
+                        wc.DownloadFileAsync(new Uri(baseDriverNamesDownloadLocation),  AudioPlayer.soundFilesPath + "/" + driverNamesTempFileName);
+                    }
+                    else
+                    {
+                        wc.DownloadFileAsync(new Uri(updateDriverNamesDownloadLocation), AudioPlayer.soundFilesPath + "/" + driverNamesTempFileName);
+                    }
                 }
             }
         }
@@ -744,28 +766,8 @@ namespace CrewChiefV4
                         Directory.Delete(AudioPlayer.soundFilesPath + "/sounds_temp", true);
                     }
                     ZipFile.ExtractToDirectory(AudioPlayer.soundFilesPath + "/" + soundPackTempFileName, AudioPlayer.soundFilesPath + "/sounds_temp");
-                    if (Directory.Exists(AudioPlayer.soundFilesPath + "/background_sounds"))
-                    {
-                        Directory.Delete(AudioPlayer.soundFilesPath + "/background_sounds", true);
-                    }
-                    if (Directory.Exists(AudioPlayer.soundFilesPath + "/fx"))
-                    {
-                        Directory.Delete(AudioPlayer.soundFilesPath + "/fx", true);
-                    }
-                    if (Directory.Exists(AudioPlayer.soundFilesPath + "/voice"))
-                    {
-                        Directory.Delete(AudioPlayer.soundFilesPath + "/voice", true);
-                    }
-                    if (File.Exists(AudioPlayer.soundFilesPath + "/sound_pack_version_info.txt"))
-                    {
-                        File.Delete(AudioPlayer.soundFilesPath + "/sound_pack_version_info.txt");
-                    }
-                    Directory.Move(AudioPlayer.soundFilesPath + "/sounds_temp/background_sounds", AudioPlayer.soundFilesPath + "/background_sounds");
-                    Directory.Move(AudioPlayer.soundFilesPath + "/sounds_temp/fx", AudioPlayer.soundFilesPath + "/fx");
-                    Directory.Move(AudioPlayer.soundFilesPath + "/sounds_temp/voice", AudioPlayer.soundFilesPath + "/voice");
-                    File.Move(AudioPlayer.soundFilesPath + "/sounds_temp/sound_pack_version_info.txt", AudioPlayer.soundFilesPath + "/sound_pack_version_info.txt");
+                    UpdateHelper.MoveDirectory(AudioPlayer.soundFilesPath + "/sounds_temp", AudioPlayer.soundFilesPath);
                     Directory.Delete(AudioPlayer.soundFilesPath + "/sounds_temp", true);
-
                     success = true;
                     downloadSoundPackButton.Text = "Sound pack is up to date";
                 }
@@ -817,11 +819,7 @@ namespace CrewChiefV4
                         Directory.Delete(AudioPlayer.soundFilesPath + "/driver_names_temp");
                     }
                     ZipFile.ExtractToDirectory(AudioPlayer.soundFilesPath + "/" + driverNamesTempFileName, AudioPlayer.soundFilesPath + "/driver_names_temp", Encoding.UTF8);
-                    if (Directory.Exists(AudioPlayer.soundFilesPath + "/driver_names"))
-                    {
-                        Directory.Delete(AudioPlayer.soundFilesPath + "/driver_names", true);
-                    }
-                    Directory.Move(AudioPlayer.soundFilesPath + "/driver_names_temp/driver_names", AudioPlayer.soundFilesPath + "/driver_names");
+                    UpdateHelper.MoveDirectory(AudioPlayer.soundFilesPath + "/driver_names_temp", AudioPlayer.soundFilesPath + "/driver_names");
                     Directory.Delete(AudioPlayer.soundFilesPath + "/driver_names_temp");
                     success = true;
                     downloadDriverNamesButton.Text = "Driver names are up to date";

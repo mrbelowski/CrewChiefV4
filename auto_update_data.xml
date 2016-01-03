@@ -2,10 +2,12 @@
 <item>
 <title>Crew Chief 4.0.0.0. This is the initial release of version 4</title>
 <version>4.0.0.0</version>
-<url>https://www.dropbox.com/s/gsiclt3y5k3miup/CrewChiefV4.msi?dl=1</url>
-<changelog>https://www.dropbox.com/s/iyaamv977epmq8d/change_log_for_auto_updated.txt?raw=1</changelog>
+<url>http://crewchief.isnais.de/CrewChiefV4.msi</url>
+<changelog>http://crewchief.isnais.de/change_log_for_auto_updated.txt</changelog>
 <soundpackversion>100</soundpackversion>
-<soundpackurl>https://www.dropbox.com/s/zbmrq7qcefu6z6x/sounds_lo_fi_auto_updated.zip?dl=1</soundpackurl>
+<basesoundpackurl>http://crewchief.isnais.de/base_sound_pack.zip</basesoundpackurl>
+<updatesoundpackurl>http://crewchief.isnais.de/update_sound_pack.zip</updatesoundpackurl>
 <drivernamesversion>100</drivernamesversion>
-<drivernamesurl>https://www.dropbox.com/s/6mrlq93pv6uf8hi/driver_names_lo_fi_auto_updated.zip?dl=1</drivernamesurl>
+<basedrivernamesurl>http://crewchief.isnais.de/base_driver_names.zip</basedrivernamesurl>
+<updatedrivernamesurl>http://crewchief.isnais.de/update_driver_names.zip</updatedrivernamesurl>
 </item>
