@@ -215,7 +215,6 @@ namespace CrewChiefV4.Events
 
         public override void respond(string voiceMessage)
         {
-            // TODO: handle times and laps > 60 - maybe just use "lots" and "ages"...
             if (sessionLengthIsTime)
             {
                 if (leaderHasFinishedRace)
@@ -224,15 +223,11 @@ namespace CrewChiefV4.Events
                     audioPlayer.playClipImmediately(new QueuedMessage(folderThisIsTheLastLap, 0, this), false);
                     audioPlayer.closeChannel();
                 }
-                else if (timeLeft >= 3600)
-                {
-                    Console.WriteLine("Unable to process times higher than 59 minutes in this version...");
-                }
-                else if (timeLeft >= 120)
+                if (timeLeft >= 120)
                 {
                     TimeSpan timeLeftTimeSpan = TimeSpan.FromSeconds(timeLeft);
                     audioPlayer.playClipImmediately(new QueuedMessage("RaceTime/time_remaining",
-                        MessageContents(QueuedMessage.folderNameNumbersStub + timeLeftTimeSpan.Minutes, folderMinutesLeft), 0, this), false);
+                        MessageContents(timeLeftTimeSpan.Minutes, folderMinutesLeft), 0, this), false);
                     audioPlayer.closeChannel();
                 }
                 else if (timeLeft >= 60)
@@ -265,14 +260,10 @@ namespace CrewChiefV4.Events
             }
             else
             {
-                if (lapsLeft > 59)
-                {
-                    Console.WriteLine("Unable to process numbers higher than 59 in this version...");
-                }
-                else if (lapsLeft > 2)
+                if (lapsLeft > 2)
                 {
                     audioPlayer.playClipImmediately(new QueuedMessage("RaceTime/laps_remaining",
-                        MessageContents(QueuedMessage.folderNameNumbersStub + lapsLeft, folderLapsLeft), 0, this), false);
+                        MessageContents(lapsLeft, folderLapsLeft), 0, this), false);
 
                     audioPlayer.closeChannel();
                 }

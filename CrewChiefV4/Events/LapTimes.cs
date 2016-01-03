@@ -387,8 +387,7 @@ namespace CrewChiefV4.Events
                                         // only play qual / prac deltas for Raceroom as the PCars data is inaccurate for sessions joined part way through
                                         if ((!disablePCarspracAndQualPoleDeltaReports || 
                                             CrewChief.gameDefinition.gameEnum == GameDefinition.raceRoom.gameEnum) &&
-                                            ((gapBehind.Seconds > 0 || gapBehind.Milliseconds > 50) &&
-                                            gapBehind.Seconds < 60))
+                                            (gapBehind.Seconds > 0 || gapBehind.Milliseconds > 50))
                                         {
                                             // delay this a bit...
                                             audioPlayer.queueClip(new QueuedMessage("lapTimeNotRaceGap",
@@ -911,8 +910,7 @@ namespace CrewChiefV4.Events
                                 audioPlayer.playClipImmediately(new QueuedMessage(folderQuickestOverall, 0, null), false);
                             }
                             TimeSpan gapBehind = deltaPlayerBestToSessionBestOverall.Negate();
-                            if ((gapBehind.Seconds > 0 || gapBehind.Milliseconds > 50) &&
-                                gapBehind.Seconds < 60)
+                            if (gapBehind.Seconds > 0 || gapBehind.Milliseconds > 50)
                             {
                                 // delay this a bit...
                                 audioPlayer.queueClip(new QueuedMessage("lapTimeNotRaceGap",

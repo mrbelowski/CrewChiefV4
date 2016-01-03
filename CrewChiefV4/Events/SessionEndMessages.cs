@@ -125,7 +125,7 @@ namespace CrewChiefV4.Events
                     if (position > 24)
                     {
                         audioPlayer.queueClip(new QueuedMessage(sessionEndMessageIdentifier, AbstractEvent.MessageContents(folderEndOfSession,
-                        Position.folderStub, QueuedMessage.folderNameNumbersStub + position), 0, null));
+                        Position.folderStub, position), 0, null));
                     }
                     else
                     {

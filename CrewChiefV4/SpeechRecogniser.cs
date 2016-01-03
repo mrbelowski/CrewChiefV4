@@ -46,6 +46,8 @@ namespace CrewChiefV4
         public static String PEA = "pea";
         public static String PACE = "pace";
 
+        public static String WHAT_ARE_MY = "what are my";
+
         private static String KEEP_QUIET = "keep quiet";
         private static String SHUT_UP = "shut up";
         private static String I_KNOW_WHAT_IM_DOING = "I know what I'm doing";
@@ -258,10 +260,19 @@ namespace CrewChiefV4
                 gb4.Append(info4);
                 Grammar g4 = new Grammar(gb4);
 
+                Choices info5 = new Choices();
+                info5.Add(new string[] { TYRE_TEMPS, TYRE_TEMPERATURES, BRAKE_TEMPS, BRAKE_TEMPERATURES });
+                GrammarBuilder gb5 = new GrammarBuilder();
+                gb5.Culture = cultureInfo;
+                gb5.Append(WHAT_ARE_MY);
+                gb5.Append(info5);
+                Grammar g5 = new Grammar(gb5);
+
                 sre.LoadGrammar(g1);
                 sre.LoadGrammar(g2);
                 sre.LoadGrammar(g3);
                 sre.LoadGrammar(g4);
+                sre.LoadGrammar(g5);
             }
             catch (Exception e)
             {

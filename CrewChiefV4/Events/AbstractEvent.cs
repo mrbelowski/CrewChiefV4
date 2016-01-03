@@ -13,7 +13,32 @@ namespace CrewChiefV4.Events
         protected PearlsOfWisdom pearlsOfWisdom;
 
         // some convienence methods for building up compound messages
-        public static List<MessageFragment> MessageContents(Object o1, Object o2, Object o3, Object o4, Object o5,Object o6)
+        public static List<MessageFragment> MessageContents(Object o1, Object o2, Object o3, Object o4, Object o5, Object o6, Object o7, Object o8)
+        {
+            List<MessageFragment> messages = new List<MessageFragment>();
+            addObjectToMessages(messages, o1);
+            addObjectToMessages(messages, o2);
+            addObjectToMessages(messages, o3);
+            addObjectToMessages(messages, o4);
+            addObjectToMessages(messages, o5);
+            addObjectToMessages(messages, o6);
+            addObjectToMessages(messages, o7);
+            addObjectToMessages(messages, o8);
+            return messages;
+        }
+        public static List<MessageFragment> MessageContents(Object o1, Object o2, Object o3, Object o4, Object o5,Object o6, Object o7)
+        {
+            List<MessageFragment> messages = new List<MessageFragment>();
+            addObjectToMessages(messages, o1);
+            addObjectToMessages(messages, o2);
+            addObjectToMessages(messages, o3);
+            addObjectToMessages(messages, o4);
+            addObjectToMessages(messages, o5);
+            addObjectToMessages(messages, o6);
+            addObjectToMessages(messages, o7);
+            return messages;
+        }
+                public static List<MessageFragment> MessageContents(Object o1, Object o2, Object o3, Object o4, Object o5, Object o6)
         {
             List<MessageFragment> messages = new List<MessageFragment>();
             addObjectToMessages(messages, o1);
@@ -81,8 +106,13 @@ namespace CrewChiefV4.Events
             {
                 messageFragments.Add(MessageFragment.Time(new TimeSpanWrapper((TimeSpan)o)));
             }
-            else if (o.GetType() == typeof(OpponentData)) {
+            else if (o.GetType() == typeof(OpponentData))
+            {
                 messageFragments.Add(MessageFragment.Opponent((OpponentData)o));
+            }
+            else if (o.GetType() == typeof(int))
+            {
+                messageFragments.Add(MessageFragment.Integer((int)o));
             } 
         }
 
@@ -173,6 +203,11 @@ namespace CrewChiefV4.Events
                 }
             }
             return true;
+        }
+
+        public static int celciusToFahrenheit(float celcius)
+        {
+            return (int)Math.Round((celcius * (9f / 5f)) + 32f);
         }
     }
 }

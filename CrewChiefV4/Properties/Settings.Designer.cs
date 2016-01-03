@@ -1243,5 +1243,17 @@ namespace CrewChiefV4.Properties {
                 this["UpdateSettings"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool use_fahrenheit {
+            get {
+                return ((bool)(this["use_fahrenheit"]));
+            }
+            set {
+                this["use_fahrenheit"] = value;
+            }
+        }
     }
 }

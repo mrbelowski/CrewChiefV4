@@ -39,8 +39,11 @@ namespace CrewChiefV4.Events
         public static String folderTrackTempIncreasing = "conditions/track_temp_increasing_its_now";
         public static String folderTrackTempDecreasing = "conditions/track_temp_decreasing_its_now";
         public static String folderCelsius = "conditions/celsius";
+        public static String folderFahrenheit = "conditions/fahrenheit";
         public static String folderSeeingSomeRain = "conditions/seeing_some_rain";
         public static String folderStoppedRaining = "conditions/stopped_raining";
+
+        private static Boolean useFahrenheit = UserSettings.GetUserSettings().getBoolean("use_fahrenheit");
 
         private Conditions.ConditionsSample currentConditions;
 
@@ -89,8 +92,8 @@ namespace CrewChiefV4.Events
                             lastTrackTempReport = currentGameState.Now;
                             // do the reporting
                             audioPlayer.queueClip(new QueuedMessage("conditionsAirAndTrackIncreasing1", MessageContents
-                                (folderAirAndTrackTempIncreasing, folderAirTempIsNow, QueuedMessage.folderNameNumbersStub + Math.Round(currentConditions.AmbientTemperature),
-                                folderTrackTempIsNow, QueuedMessage.folderNameNumbersStub + Math.Round(currentConditions.TrackTemperature), folderCelsius), 0, this));
+                                (folderAirAndTrackTempIncreasing, folderAirTempIsNow, useFahrenheit ? celciusToFahrenheit(currentConditions.AmbientTemperature) : (int)Math.Round(currentConditions.AmbientTemperature),
+                                folderTrackTempIsNow, useFahrenheit ? celciusToFahrenheit(currentConditions.TrackTemperature) : (int)Math.Round(currentConditions.TrackTemperature), useFahrenheit ? folderFahrenheit : folderCelsius), 0, this));
                             reportedCombinedTemps = true;
                         }
                         else if (currentConditions.TrackTemperature < trackTempAtLastReport - minTrackTempDeltaToReport && currentConditions.AmbientTemperature < airTempAtLastReport - minAirTempDeltaToReport)
@@ -101,8 +104,8 @@ namespace CrewChiefV4.Events
                             lastTrackTempReport = currentGameState.Now;
                             // do the reporting
                             audioPlayer.queueClip(new QueuedMessage("conditionsAirAndTrackDecreasing1", MessageContents
-                                (folderAirAndTrackTempDecreasing, folderAirTempIsNow, QueuedMessage.folderNameNumbersStub + Math.Round(currentConditions.AmbientTemperature),
-                                folderTrackTempIsNow, QueuedMessage.folderNameNumbersStub + Math.Round(currentConditions.TrackTemperature), folderCelsius), 0, this));
+                                (folderAirAndTrackTempDecreasing, folderAirTempIsNow, useFahrenheit ? celciusToFahrenheit(currentConditions.AmbientTemperature) : (int)Math.Round(currentConditions.AmbientTemperature),
+                                folderTrackTempIsNow, useFahrenheit ? celciusToFahrenheit(currentConditions.TrackTemperature) : (int)Math.Round(currentConditions.TrackTemperature), useFahrenheit ? folderFahrenheit : folderCelsius), 0, this));
                             reportedCombinedTemps = true;
                         }
                     }
@@ -114,7 +117,7 @@ namespace CrewChiefV4.Events
                             lastAirTempReport = currentGameState.Now;
                             // do the reporting
                             audioPlayer.queueClip(new QueuedMessage("conditionsAirIncreasing", MessageContents
-                                (folderAirTempIncreasing, QueuedMessage.folderNameNumbersStub + Math.Round(currentConditions.AmbientTemperature), folderCelsius), 0, this));
+                                (folderAirTempIncreasing, useFahrenheit ? celciusToFahrenheit(currentConditions.AmbientTemperature) : (int)Math.Round(currentConditions.AmbientTemperature), useFahrenheit ? folderFahrenheit : folderCelsius), 0, this));
                         }
                         else if (currentConditions.AmbientTemperature < airTempAtLastReport - minAirTempDeltaToReport)
                         {
@@ -122,7 +125,7 @@ namespace CrewChiefV4.Events
                             lastAirTempReport = currentGameState.Now;
                             // do the reporting
                             audioPlayer.queueClip(new QueuedMessage("conditionsAirDecreasing", MessageContents
-                                (folderAirTempDecreasing, QueuedMessage.folderNameNumbersStub + Math.Round(currentConditions.AmbientTemperature), folderCelsius), 0, this));
+                                (folderAirTempDecreasing, useFahrenheit ? celciusToFahrenheit(currentConditions.AmbientTemperature) : (int)Math.Round(currentConditions.AmbientTemperature), useFahrenheit ? folderFahrenheit : folderCelsius), 0, this));
                         }
                     }
                     if (!reportedCombinedTemps && canReportTrackChange)
@@ -133,7 +136,7 @@ namespace CrewChiefV4.Events
                             lastTrackTempReport = currentGameState.Now;
                             // do the reporting
                             audioPlayer.queueClip(new QueuedMessage("conditionsTrackIncreasing", MessageContents
-                                (folderTrackTempIncreasing, QueuedMessage.folderNameNumbersStub + Math.Round(currentConditions.TrackTemperature), folderCelsius), 0, this));
+                                (folderTrackTempIncreasing, useFahrenheit ? celciusToFahrenheit(currentConditions.TrackTemperature) : (int)Math.Round(currentConditions.TrackTemperature), useFahrenheit ? folderFahrenheit : folderCelsius), 0, this));
                         }
                         else if (currentConditions.TrackTemperature < trackTempAtLastReport - minTrackTempDeltaToReport)
                         {
@@ -141,7 +144,7 @@ namespace CrewChiefV4.Events
                             lastTrackTempReport = currentGameState.Now;
                             // do the reporting
                             audioPlayer.queueClip(new QueuedMessage("conditionsTrackDecreasing", MessageContents
-                                (folderTrackTempDecreasing, QueuedMessage.folderNameNumbersStub + Math.Round(currentConditions.TrackTemperature), folderCelsius), 0, this));
+                                (folderTrackTempDecreasing, useFahrenheit ? celciusToFahrenheit(currentConditions.TrackTemperature) : (int)Math.Round(currentConditions.TrackTemperature), useFahrenheit ? folderFahrenheit : folderCelsius), 0, this));
                         }
                     }
                     if (currentGameState.Now > lastRainReport.Add(RainReportMaxFrequency))
@@ -175,13 +178,13 @@ namespace CrewChiefV4.Events
                 if (voiceMessage.Contains(SpeechRecogniser.WHATS_THE_AIR_TEMP) || voiceMessage.Contains(SpeechRecogniser.WHATS_THE_AIR_TEMP))
                 {
                     audioPlayer.playClipImmediately(new QueuedMessage("airTempResponse",
-                        MessageContents(folderAirTempIsNow, QueuedMessage.folderNameNumbersStub + Math.Round(currentConditions.AmbientTemperature), folderCelsius), 0, null), false);
+                        MessageContents(folderAirTempIsNow, useFahrenheit ? celciusToFahrenheit(currentConditions.AmbientTemperature) : (int)Math.Round(currentConditions.TrackTemperature), useFahrenheit ? folderFahrenheit : folderCelsius), 0, null), false);
                     audioPlayer.closeChannel();
                 }
                 if (voiceMessage.Contains(SpeechRecogniser.WHATS_THE_TRACK_TEMP) || voiceMessage.Contains(SpeechRecogniser.WHATS_THE_TRACK_TEMPERATURE))
                 {
                     audioPlayer.playClipImmediately(new QueuedMessage("trackTempResponse",
-                        MessageContents(folderTrackTempIsNow, QueuedMessage.folderNameNumbersStub + Math.Round(currentConditions.TrackTemperature), folderCelsius), 0, null), false);
+                        MessageContents(folderTrackTempIsNow, useFahrenheit ? celciusToFahrenheit(currentConditions.TrackTemperature) : (int)Math.Round(currentConditions.TrackTemperature), useFahrenheit ? folderFahrenheit : folderCelsius), 0, null), false);
                     audioPlayer.closeChannel();
                 }
             }

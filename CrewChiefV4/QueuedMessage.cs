@@ -11,12 +11,13 @@ namespace CrewChiefV4
     {
         public enum FragmentType
         {
-            Text, Time, Opponent
+            Text, Time, Opponent, Integer
         }
 
         public String text;
         public TimeSpanWrapper timeSpanWrapper;
         public OpponentData opponent;
+        public int integer;
         public FragmentType type;
 
         private MessageFragment(String text, TimeSpanWrapper timeSpanWrapper, OpponentData opponent, FragmentType type)
@@ -27,16 +28,15 @@ namespace CrewChiefV4
             this.type = type;
         }
 
-        private MessageFragment(String text, OpponentData opponent, FragmentType type)
+        private MessageFragment(int integer, FragmentType type)
         {
-            this.text = text;
-            this.opponent = opponent;
+            this.integer = integer;
             this.type = type;
         }
 
         public static MessageFragment Text(String text)
         {
-            return new MessageFragment(text, null, FragmentType.Text);
+            return new MessageFragment(text, null, null, FragmentType.Text);
         }
         public static MessageFragment Time(TimeSpanWrapper timeSpanWrapper)
         {
@@ -45,7 +45,12 @@ namespace CrewChiefV4
 
         public static MessageFragment Opponent(OpponentData opponent)
         {
-            return new MessageFragment(null, opponent, FragmentType.Opponent);
+            return new MessageFragment(null, null, opponent, FragmentType.Opponent);
+        }
+
+        public static MessageFragment Integer(int integer)
+        {
+            return new MessageFragment(integer, FragmentType.Integer);
         }
     }
 
@@ -55,7 +60,11 @@ namespace CrewChiefV4
 
         public static String folderNameOh = "numbers/oh";
         public static String folderNamePoint = "numbers/point";
-        public static String folderNameNumbersStub = "numbers/";
+        private static String folderNameNumbersStub = "numbers/";
+        private static String folderNameThousand = "numbers/thousand";
+        private static String folderNameThousandAnd = "numbers/thousand_and";
+        private static String folderNameHundred = "numbers/hundred";
+        private static String folderNameHundredAnd = "numbers/hundred_and";
         public static String folderZeroZero = "numbers/zerozero";
         public static String folderSeconds = "numbers/seconds";
         public static String folderSecond = "numbers/second";
@@ -209,6 +218,22 @@ namespace CrewChiefV4
                             }
                         }                        
                         break;
+                    case MessageFragment.FragmentType.Integer:
+                        List<String> integerFolders = getIntegerMessageFolders(messageFragment.integer);
+                        if (integerFolders.Count() == 0) {
+                            canBePlayed = false;
+                            break;
+                        } else {
+                            foreach (String integerFolder in integerFolders) {
+                                if (!AudioPlayer.allMessageNames.Contains(integerFolder))
+                                {
+                                    canBePlayed = false;
+                                    break;
+                                }
+                            }
+                        }
+                        messages.AddRange(integerFolders);
+                        break;
                 }
                 if (!canBePlayed)
                 {
@@ -217,6 +242,61 @@ namespace CrewChiefV4
             }
             return messages;
         }
+
+        private List<String> getIntegerMessageFolders(int integer) {
+        List<String> messages = new List<String>();
+        if (integer == 0) {
+            messages.Add(folderNameNumbersStub + 0);
+        } else if (integer < 100000 && integer > 0){
+            char[] digits = integer.ToString().ToCharArray();
+            String tensAndUnits = null;
+            String hundreds = null;
+            String thousands = null;
+
+            if (digits.Count() == 1 || (digits[digits.Count() - 2] == '0' && digits[digits.Count() - 1] != '0'))
+            {
+                tensAndUnits = digits[digits.Count() - 1].ToString();
+            }
+            else if (digits[digits.Count() - 2] != '0' || digits[digits.Count() - 1] != '0')
+            {
+                tensAndUnits = digits[digits.Count() - 2].ToString() + digits[digits.Count() - 1].ToString();
+            }
+            if (digits.Count() == 4 && digits[0] == '1' && digits[1] != '0') {
+                hundreds = digits[0].ToString() + digits[1].ToString();
+            } else {
+                if (digits.Count() >= 3) {
+                    if (digits[digits.Count() - 3] != '0') {
+                        hundreds = digits[digits.Count() - 3].ToString();
+                    }
+                    if (digits.Count() == 4) {
+                        thousands = digits[0].ToString();
+                    } else if (digits.Count() == 5) {
+                        thousands = digits[0].ToString() + digits[1].ToString();
+                    }
+                }
+            }
+            if (thousands != null) {
+                messages.Add(folderNameNumbersStub + thousands);
+                if (hundreds == null && tensAndUnits != null) {
+                    messages.Add(folderNameThousandAnd);
+                } else {
+                    messages.Add(folderNameThousand);
+                }
+            }
+            if (hundreds != null) {
+                messages.Add(folderNameNumbersStub + hundreds);
+                if (tensAndUnits != null) {
+                    messages.Add(folderNameHundredAnd);
+                } else {
+                    messages.Add(folderNameHundred);
+                }
+            }
+            if (tensAndUnits != null) {
+                messages.Add(folderNameNumbersStub + tensAndUnits);
+            }
+        }
+        return messages;
+    }
 
         private List<String> getTimeMessageFolders(TimeSpan timeSpan, Boolean includeSeconds)
         {

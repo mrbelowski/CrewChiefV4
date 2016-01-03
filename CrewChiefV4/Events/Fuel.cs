@@ -184,11 +184,7 @@ namespace CrewChiefV4.Events
                             if (currentGameState.PitData.IsRefuellingAllowed) 
                             {
                                 audioPlayer.queueClip(new QueuedMessage(RaceTime.folderHalfWayHome, 0, this));
-                                if (estimatedFuelLapsLeft < 60)
-                                {
-                                    audioPlayer.queueClip(new QueuedMessage("Fuel/estimate", MessageContents(folderWeEstimate, 
-                                        QueuedMessage.folderNameNumbersStub + estimatedFuelLapsLeft, folderLapsRemaining), 0, this));
-                                }
+                                audioPlayer.queueClip(new QueuedMessage("Fuel/estimate", MessageContents(folderWeEstimate, estimatedFuelLapsLeft, folderLapsRemaining), 0, this));
                             }
                             else
                             {
@@ -238,11 +234,9 @@ namespace CrewChiefV4.Events
                             {
                                 int minutesLeft = (int)Math.Floor(currentGameState.FuelData.FuelLeft / averageUsagePerMinute);
                                 audioPlayer.queueClip(new QueuedMessage(RaceTime.folderHalfWayHome, 0, this));
-                                if (minutesLeft < 60)
-                                {
-                                    audioPlayer.queueClip(new QueuedMessage("Fuel/estimate", MessageContents(
-                                        folderWeEstimate, QueuedMessage.folderNameNumbersStub + minutesLeft, folderMinutesRemaining), 0, this));
-                                }
+                                audioPlayer.queueClip(new QueuedMessage("Fuel/estimate", MessageContents(
+                                    folderWeEstimate, minutesLeft, folderMinutesRemaining), 0, this));
+
                             }
                             else
                             {
@@ -326,10 +320,10 @@ namespace CrewChiefV4.Events
                     audioPlayer.playClipImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null), false);
                     audioPlayer.closeChannel();
                 }
-                else if (currentFuel < 60 && currentFuel >= 2)
+                else if (currentFuel >= 2)
                 {
                     audioPlayer.playClipImmediately(new QueuedMessage("Fuel/level",
-                                MessageContents(QueuedMessage.folderNameNumbersStub + (int)currentFuel, folderLitresRemaining), 0, null), false);
+                                MessageContents((int)currentFuel, folderLitresRemaining), 0, null), false);
                     audioPlayer.closeChannel();
                 }
                 else
@@ -346,12 +340,7 @@ namespace CrewChiefV4.Events
                     if (averageUsagePerLap > 0)
                     {
                         int lapsOfFuelLeft = (int)Math.Floor(currentFuel / averageUsagePerLap);
-                        if (lapsOfFuelLeft > 60)
-                        {
-                            audioPlayer.playClipImmediately(new QueuedMessage(folderPlentyOfFuel, 0, null), false);
-                            audioPlayer.closeChannel();
-                        }
-                        else if (lapsOfFuelLeft <= 1)
+                        if (lapsOfFuelLeft <= 1)
                         {
                             audioPlayer.playClipImmediately(new QueuedMessage("Fuel/estimate",
                                 MessageContents(folderAboutToRunOut), 0, null), false);
@@ -360,7 +349,7 @@ namespace CrewChiefV4.Events
                         else
                         {
                             audioPlayer.playClipImmediately(new QueuedMessage("Fuel/estimate",
-                                MessageContents(folderWeEstimate, QueuedMessage.folderNameNumbersStub + lapsOfFuelLeft, folderLapsRemaining), 0, null), false);
+                                MessageContents(folderWeEstimate, lapsOfFuelLeft, folderLapsRemaining), 0, null), false);
                             audioPlayer.closeChannel();
                         }
                         haveData = true;
@@ -368,12 +357,7 @@ namespace CrewChiefV4.Events
                     else if (averageUsagePerMinute > 0)
                     {
                         int minutesOfFuelLeft = (int)Math.Floor(currentFuel / averageUsagePerMinute);
-                        if (minutesOfFuelLeft > 60)
-                        {
-                            audioPlayer.playClipImmediately(new QueuedMessage(folderPlentyOfFuel, 0, null), false);
-                            audioPlayer.closeChannel();
-                        }
-                        else if (minutesOfFuelLeft <= 1)
+                        if (minutesOfFuelLeft <= 1)
                         {
                             audioPlayer.playClipImmediately(new QueuedMessage("Fuel/estimate",
                                 MessageContents(folderAboutToRunOut), 0, null), false);
@@ -382,7 +366,7 @@ namespace CrewChiefV4.Events
                         else
                         {
                             audioPlayer.playClipImmediately(new QueuedMessage("Fuel/estimate",
-                                MessageContents(folderWeEstimate, QueuedMessage.folderNameNumbersStub + minutesOfFuelLeft, folderMinutesRemaining), 0, null), false);
+                                MessageContents(folderWeEstimate, minutesOfFuelLeft, folderMinutesRemaining), 0, null), false);
                             audioPlayer.closeChannel();
                         }
                         haveData = true;
@@ -394,10 +378,10 @@ namespace CrewChiefV4.Events
                     {
                         audioPlayer.playClipImmediately(new QueuedMessage(folderPlentyOfFuel, 0, null), false);
                     }
-                    else if (currentFuel < 60 && currentFuel >= 2)
+                    else if (currentFuel >= 2)
                     {
                         audioPlayer.playClipImmediately(new QueuedMessage("Fuel/level",
-                                    MessageContents(QueuedMessage.folderNameNumbersStub + (int)currentFuel, folderLitresRemaining), 0, null), false);
+                                    MessageContents((int)currentFuel, folderLitresRemaining), 0, null), false);
                         audioPlayer.closeChannel();
                     }
                     else

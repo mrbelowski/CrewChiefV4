@@ -26,6 +26,11 @@ namespace CrewChiefV4.Events
         private String folderHotRightTyres = "tyre_monitor/hot_right_tyres";
         private String folderHotTyresAllRound = "tyre_monitor/hot_tyres_all_round";
 
+        public static String folderLeftFront = "type_monitor/left_front";
+        public static String folderRightFront = "type_monitor/right_front";
+        public static String folderLeftRear = "type_monitor/left_rear";
+        public static String folderRightRear = "type_monitor/right_rear";
+
         private String folderCookingLeftFrontTyre = "tyre_monitor/cooking_left_front_tyre";
         private String folderCookingLeftRearTyre = "tyre_monitor/cooking_left_rear_tyre";
         private String folderCookingRightFrontTyre = "tyre_monitor/cooking_right_front_tyre";
@@ -99,6 +104,8 @@ namespace CrewChiefV4.Events
         private static Boolean enableBrakeTempWarnings = UserSettings.GetUserSettings().getBoolean("enable_brake_temp_warnings");
         private static Boolean enableTyreWearWarnings = UserSettings.GetUserSettings().getBoolean("enable_tyre_wear_warnings");
 
+        private static Boolean useFahrenheit = UserSettings.GetUserSettings().getBoolean("use_fahrenheit");
+
         private static Boolean enableWheelSpinWarnings = UserSettings.GetUserSettings().getBoolean("enable_wheel_spin_warnings");
         private static Boolean enableBrakeLockWarnings = UserSettings.GetUserSettings().getBoolean("enable_brake_lock_warnings");
 
@@ -149,6 +156,16 @@ namespace CrewChiefV4.Events
         private float timeLeftRearIsSpinningForLap = 0;
         private float timeRightRearIsSpinningForLap = 0;
 
+        private int leftFrontTyreTemp = 0;
+        private int rightFrontTyreTemp = 0;
+        private int leftRearTyreTemp = 0;
+        private int rightRearTyreTemp = 0;
+
+        private int leftFrontBrakeTemp = 0;
+        private int rightFrontBrakeTemp = 0;
+        private int leftRearBrakeTemp = 0;
+        private int rightRearBrakeTemp = 0;
+
         private float totalLockupThresholdForNextLap = initialTotalLapLockupThreshold;
         private float totalWheelspinThresholdForNextLap = initialTotalWheelspinThreshold;
         
@@ -198,6 +215,16 @@ namespace CrewChiefV4.Events
             warnedOnLockingForLap = false;
             warnedOnWheelspinForLap = false;
             nextLockingAndSpinningCheck = DateTime.MinValue;
+
+            leftFrontTyreTemp = 0;
+            rightFrontTyreTemp = 0;
+            leftRearTyreTemp = 0;
+            rightRearTyreTemp = 0;
+
+            leftFrontBrakeTemp = 0;
+            rightFrontBrakeTemp = 0;
+            leftRearBrakeTemp = 0;
+            rightRearBrakeTemp = 0;
         }
 
         private Boolean isBrakeTempPeakForLap(float leftFront, float rightFront, float leftRear, float rightRear) 
@@ -258,7 +285,16 @@ namespace CrewChiefV4.Events
                 }
                 nextLockingAndSpinningCheck = currentGameState.Now.Add(lockingAndSpinningCheckInterval);
             }
-            
+
+            leftFrontBrakeTemp = useFahrenheit ? celciusToFahrenheit(currentGameState.TyreData.LeftFrontBrakeTemp) : (int)currentGameState.TyreData.LeftFrontBrakeTemp;
+            rightFrontBrakeTemp = useFahrenheit ? celciusToFahrenheit(currentGameState.TyreData.RightFrontBrakeTemp) : (int)currentGameState.TyreData.RightFrontBrakeTemp;
+            leftRearBrakeTemp = useFahrenheit ? celciusToFahrenheit(currentGameState.TyreData.LeftRearBrakeTemp) : (int)currentGameState.TyreData.LeftRearBrakeTemp;
+            rightRearBrakeTemp = useFahrenheit ? celciusToFahrenheit(currentGameState.TyreData.RightRearBrakeTemp) : (int)currentGameState.TyreData.RightRearBrakeTemp;
+            leftFrontTyreTemp = useFahrenheit ? celciusToFahrenheit(currentGameState.TyreData.FrontLeft_CenterTemp) : (int)currentGameState.TyreData.FrontLeft_CenterTemp;
+            rightFrontTyreTemp = useFahrenheit ? celciusToFahrenheit(currentGameState.TyreData.FrontRight_CenterTemp) : (int)currentGameState.TyreData.FrontRight_CenterTemp;
+            leftRearTyreTemp = useFahrenheit ? celciusToFahrenheit(currentGameState.TyreData.RearLeft_CenterTemp) : (int)currentGameState.TyreData.RearLeft_CenterTemp;
+            rightRearTyreTemp = useFahrenheit ? celciusToFahrenheit(currentGameState.TyreData.RearRight_CenterTemp) : (int)currentGameState.TyreData.RearRight_CenterTemp;
+
             if (currentGameState.TyreData.TireWearActive)
             {
                 leftFrontWearPercent = currentGameState.TyreData.FrontLeftPercentWear;
@@ -405,7 +441,7 @@ namespace CrewChiefV4.Events
         {
             if (immediate)
             {
-                if (minutesRemainingOnTheseTyres > 59 || minutesRemainingOnTheseTyres > (timeInSession - timeElapsed) / 60)
+                if (minutesRemainingOnTheseTyres > (timeInSession - timeElapsed) / 60)
                 {
                     audioPlayer.playClipImmediately(new QueuedMessage(folderGoodWear, 0, null), false);
                     audioPlayer.closeChannel();
@@ -418,11 +454,11 @@ namespace CrewChiefV4.Events
                     return;
                 }
             }
-            if (minutesRemainingOnTheseTyres < 59 && minutesRemainingOnTheseTyres > 1 &&
+            if (minutesRemainingOnTheseTyres > 1 &&
                         minutesRemainingOnTheseTyres <= (timeInSession - timeElapsed) / 60)
             {
                 QueuedMessage queuedMessage = new QueuedMessage("minutes_on_current_tyres",
-                    MessageContents(folderMinutesOnCurrentTyresIntro, QueuedMessage.folderNameNumbersStub + minutesRemainingOnTheseTyres, folderMinutesOnCurrentTyresOutro), 0, null);
+                    MessageContents(folderMinutesOnCurrentTyresIntro, minutesRemainingOnTheseTyres, folderMinutesOnCurrentTyresOutro), 0, null);
                 if (immediate)
                 {
                     audioPlayer.playClipImmediately(queuedMessage, false);
@@ -444,7 +480,7 @@ namespace CrewChiefV4.Events
         {
             if (immediate)
             {
-                if (lapsRemainingOnTheseTyres > 59 || lapsRemainingOnTheseTyres > lapsInSession - completedLaps)
+                if (lapsRemainingOnTheseTyres > lapsInSession - completedLaps)
                 {
                     audioPlayer.playClipImmediately(new QueuedMessage(folderGoodWear, 0, null), false);
                     audioPlayer.closeChannel();
@@ -457,11 +493,11 @@ namespace CrewChiefV4.Events
                     return;
                 }
             }
-            if (lapsRemainingOnTheseTyres < 59 && lapsRemainingOnTheseTyres > 1 &&
+            if (lapsRemainingOnTheseTyres > 1 &&
                         lapsRemainingOnTheseTyres <= lapsInSession - completedLaps)
             {
                 QueuedMessage queuedMessage = new QueuedMessage("laps_on_current_tyres",
-                    MessageContents(folderLapsOnCurrentTyresIntro, QueuedMessage.folderNameNumbersStub + lapsRemainingOnTheseTyres, folderLapsOnCurrentTyresOutro), 0, null);
+                    MessageContents(folderLapsOnCurrentTyresIntro, lapsRemainingOnTheseTyres, folderLapsOnCurrentTyresOutro), 0, null);
                 if (immediate)
                 {
                     audioPlayer.playClipImmediately(queuedMessage, false);
@@ -499,30 +535,72 @@ namespace CrewChiefV4.Events
             }
         }
 
+        private void reportCurrentTyreTemps()
+        {
+            if (leftFrontTyreTemp == 0 && rightFrontTyreTemp == 0 && leftRearTyreTemp == 0 && rightRearTyreTemp == 0)
+            {
+                audioPlayer.playClipImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null), false);
+            }
+            else
+            {
+                audioPlayer.playClipImmediately(new QueuedMessage("tyre_temps", MessageContents(folderLeftFront, leftFrontTyreTemp, folderRightFront, rightFrontTyreTemp,
+                        folderLeftRear, leftRearTyreTemp, folderRightRear, rightRearTyreTemp), 0, this), false);
+            }
+            audioPlayer.closeChannel();
+        }
+
+        private void reportCurrentBrakeTemps()
+        {
+            if (leftFrontBrakeTemp == 0 && rightFrontBrakeTemp == 0 && leftRearBrakeTemp == 0 && rightRearBrakeTemp == 0)
+            {
+                audioPlayer.playClipImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null), false);
+            }
+            else
+            {
+                audioPlayer.playClipImmediately(new QueuedMessage("brake_temps", MessageContents(folderLeftFront, leftFrontBrakeTemp, folderRightFront, rightFrontBrakeTemp,
+                        folderLeftRear, leftRearBrakeTemp, folderRightRear, rightRearBrakeTemp), 0, this), false);
+            }
+            audioPlayer.closeChannel();
+        }
+
         public override void respond(string voiceMessage)
         {
             if (voiceMessage.Contains(SpeechRecogniser.TYRE_TEMPS) || voiceMessage.Contains(SpeechRecogniser.TYRE_TEMPERATURES))
             {
-                if (currentTyreTempStatus != null)
+                if (voiceMessage.Contains(SpeechRecogniser.WHAT_ARE_MY))
                 {
-                    reportCurrentTyreTempStatus(true);
+                    reportCurrentTyreTemps();
                 }
                 else
                 {
-                    audioPlayer.playClipImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null), false);
-                    audioPlayer.closeChannel();
+                    if (currentTyreTempStatus != null)
+                    {
+                        reportCurrentTyreTempStatus(true);
+                    }
+                    else
+                    {
+                        audioPlayer.playClipImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null), false);
+                        audioPlayer.closeChannel();
+                    }
                 }
             }
             else if (voiceMessage.Contains(SpeechRecogniser.BRAKE_TEMPS) || voiceMessage.Contains(SpeechRecogniser.BRAKE_TEMPERATURES))
             {
-                if (currentBrakeTempStatus != null)
+                if (voiceMessage.Contains(SpeechRecogniser.WHAT_ARE_MY))
                 {
-                    reportCurrentBrakeTempStatus(true);
+                    reportCurrentBrakeTemps();
                 }
                 else
                 {
-                    audioPlayer.playClipImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null), false);
-                    audioPlayer.closeChannel();
+                    if (currentBrakeTempStatus != null)
+                    {
+                        reportCurrentBrakeTempStatus(true);
+                    }
+                    else
+                    {
+                        audioPlayer.playClipImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null), false);
+                        audioPlayer.closeChannel();
+                    }
                 }
             }
             else if (voiceMessage.Contains(SpeechRecogniser.TYRE_WEAR))

@@ -44,6 +44,8 @@ namespace CrewChiefV4.Events
 
         private Boolean enableGreenLightMessages = UserSettings.GetUserSettings().getBoolean("enable_green_light_messages");
 
+        private static Boolean useFahrenheit = UserSettings.GetUserSettings().getBoolean("use_fahrenheit");
+
         public override List<SessionPhase> applicableSessionPhases
         {
             get { return new List<SessionPhase> { SessionPhase.Countdown, SessionPhase.Formation, SessionPhase.Gridwalk, SessionPhase.Green, SessionPhase.Checkered, SessionPhase.Finished }; }
@@ -74,22 +76,24 @@ namespace CrewChiefV4.Events
             List<QueuedMessage> possibleMessages = new List<QueuedMessage>();
             if (currentConditions != null)
             {
-                possibleMessages.Add(new QueuedMessage("trackTemp", MessageContents(ConditionsMonitor.folderTrackTempIs, 
-                    QueuedMessage.folderNameNumbersStub + Math.Round(currentConditions.TrackTemperature), ConditionsMonitor.folderCelsius,
-                    ConditionsMonitor.folderAirTempIs, QueuedMessage.folderNameNumbersStub + Math.Round(currentConditions.AmbientTemperature), 
-                    ConditionsMonitor.folderCelsius), 0, null));
+                possibleMessages.Add(new QueuedMessage("trackTemp", MessageContents(ConditionsMonitor.folderTrackTempIs,
+                    useFahrenheit ? celciusToFahrenheit(currentConditions.TrackTemperature) : (int)Math.Round(currentConditions.TrackTemperature),
+                    useFahrenheit ? ConditionsMonitor.folderFahrenheit : ConditionsMonitor.folderCelsius), 0, null));
+                possibleMessages.Add(new QueuedMessage("air_temp", MessageContents(ConditionsMonitor.folderAirTempIs,
+                    useFahrenheit ? celciusToFahrenheit(currentConditions.AmbientTemperature) : (int)Math.Round(currentConditions.AmbientTemperature),
+                    useFahrenheit ? ConditionsMonitor.folderFahrenheit : ConditionsMonitor.folderCelsius), 0, null));
             }
             if (currentGameState.PitData.HasMandatoryPitStop)
             {
                 if (currentGameState.SessionData.SessionHasFixedTime)
                 {
                     possibleMessages.Add(new QueuedMessage("pit_window_time", MessageContents(MandatoryPitStops.folderMandatoryPitStopsPitWindowOpensAfter,
-                        QueuedMessage.folderNameNumbersStub + currentGameState.PitData.PitWindowStart, MandatoryPitStops.folderMandatoryPitStopsMinutes), 0, this));
+                        currentGameState.PitData.PitWindowStart, MandatoryPitStops.folderMandatoryPitStopsMinutes), 0, this));
                 } 
                 else
                 {
                     possibleMessages.Add(new QueuedMessage("pit_window_lap", MessageContents(MandatoryPitStops.folderMandatoryPitStopsPitWindowOpensOnLap,
-                        QueuedMessage.folderNameNumbersStub + currentGameState.PitData.PitWindowStart), 0, this));
+                        currentGameState.PitData.PitWindowStart), 0, this));
                 }
             }
             if (currentGameState.SessionData.Position == 1)
@@ -103,12 +107,12 @@ namespace CrewChiefV4.Events
             }
             if (currentGameState.SessionData.SessionNumberOfLaps > 0) {
                 possibleMessages.Add(new QueuedMessage("race_distance", MessageContents(
-                        QueuedMessage.folderNameNumbersStub + currentGameState.SessionData.SessionNumberOfLaps, folderLapsMakeThemCount), 0, this));
+                        currentGameState.SessionData.SessionNumberOfLaps, folderLapsMakeThemCount), 0, this));
             } else if (currentGameState.SessionData.SessionHasFixedTime && currentGameState.SessionData.SessionRunTime > 0 && currentGameState.SessionData.SessionRunTime < 1800 &&
                     currentGameState.SessionData.Position > 3) {
                 int minutes = (int)currentGameState.SessionData.SessionRunTime / 60;
                 possibleMessages.Add(new QueuedMessage("race_time", MessageContents(
-                        QueuedMessage.folderNameNumbersStub + minutes, folderMinutesYouNeedToGetOnWithIt), 0, this));
+                        minutes, folderMinutesYouNeedToGetOnWithIt), 0, this));
             }
             // now pick a random selection
             if (possibleMessages.Count > 0)

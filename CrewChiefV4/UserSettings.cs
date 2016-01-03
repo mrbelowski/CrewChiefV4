@@ -10,7 +10,7 @@ namespace CrewChiefV4
     class UserSettings
     {
         private String[] reservedNameStarts = new String[] { "CHANNEL_", "TOGGLE_", "VOICE_OPTION", "background_volume", 
-            "messages_volume", "last_game_definition", "REPEAT_LAST_MESSAGE_BUTTON"};
+            "messages_volume", "last_game_definition", "REPEAT_LAST_MESSAGE_BUTTON", "UpdateSettings"};
         public Dictionary<String, String> propertyHelp = new Dictionary<String, String>();
         private UserSettings()
         {

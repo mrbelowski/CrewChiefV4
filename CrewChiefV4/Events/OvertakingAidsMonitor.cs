@@ -110,11 +110,16 @@ namespace CrewChiefV4.Events
                             folderPushToPassNowAvailable, folderOneActivationRemaining), 0, this));
                         pushToPassActivationsRemaining = 1;
                     }
+                    else if (currentGameState.OvertakingAids.PushToPassActivationsRemaining > 0)
+                    {
+                        audioPlayer.queueClip(new QueuedMessage("push_to_pass_remaining", MessageContents(folderPushToPassNowAvailable,
+                            currentGameState.OvertakingAids.PushToPassActivationsRemaining, folderActivationsRemaining), 0, this));
+                        pushToPassActivationsRemaining = currentGameState.OvertakingAids.PushToPassActivationsRemaining;
+                    }
                     else
                     {
-                        audioPlayer.queueClip(new QueuedMessage("one_push_to_pass_remaining", MessageContents(folderPushToPassNowAvailable,
-                            QueuedMessage.folderNameNumbersStub + currentGameState.OvertakingAids.PushToPassActivationsRemaining, folderActivationsRemaining), 0, this));
-                        pushToPassActivationsRemaining = currentGameState.OvertakingAids.PushToPassActivationsRemaining;
+                        audioPlayer.queueClip(new QueuedMessage("no_push_to_pass_remaining", MessageContents(folderNoActivationsRemaining), 0, this));
+                        pushToPassActivationsRemaining = 0;
                     }
                 }
             }

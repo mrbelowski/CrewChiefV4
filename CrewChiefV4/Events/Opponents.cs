@@ -368,7 +368,7 @@ namespace CrewChiefV4.Events
                                 int position = entry.Value.Position;
                                 OpponentData.OpponentDelta opponentDelta = entry.Value.getTimeDifferenceToPlayer(currentGameState.SessionData);
                                 audioPlayer.playClipImmediately(new QueuedMessage("opponentPosition", 
-                                    MessageContents(Position.folderStub, QueuedMessage.folderNameNumbersStub + position), 0, null), false);
+                                    MessageContents(Position.folderStub, position), 0, null), false);
                                 if (opponentDelta != null && (opponentDelta.lapDifference != 0 || Math.Abs(opponentDelta.time) > 0.05))
                                 {
                                     if (opponentDelta.lapDifference == 1)
@@ -378,7 +378,7 @@ namespace CrewChiefV4.Events
                                     else if (opponentDelta.lapDifference > 1)
                                     {
                                         audioPlayer.playClipImmediately(new QueuedMessage("opponentTimeDelta",
-                                            MessageContents(QueuedMessage.folderNameNumbersStub + opponentDelta.lapDifference, Position.folderLapsBehind), 0, null), false);
+                                            MessageContents(opponentDelta.lapDifference, Position.folderLapsBehind), 0, null), false);
                                     }
                                     else if (opponentDelta.lapDifference == -1)
                                     {
@@ -387,7 +387,7 @@ namespace CrewChiefV4.Events
                                     else if (opponentDelta.lapDifference < -1)
                                     {
                                         audioPlayer.playClipImmediately(new QueuedMessage("opponentTimeDelta",
-                                            MessageContents(QueuedMessage.folderNameNumbersStub + opponentDelta.lapDifference, Position.folderLapsAhead), 0, null), false);
+                                            MessageContents(opponentDelta.lapDifference, Position.folderLapsAhead), 0, null), false);
                                     }
                                     else
                                     {
@@ -419,8 +419,8 @@ namespace CrewChiefV4.Events
                     {
                         OpponentData opponent = currentGameState.OpponentData[opponentKey];
                         QueuedMessage queuedMessage = new QueuedMessage("opponentNameAndPosition", MessageContents(currentGameState.OpponentData[opponentKey],
-                            Position.folderStub, QueuedMessage.folderNameNumbersStub + opponent.Position),
-                            MessageContents(Position.folderStub, QueuedMessage.folderNameNumbersStub + opponent.Position, folderCantPronounceName), 0, null);
+                            Position.folderStub, opponent.Position),
+                            MessageContents(Position.folderStub, opponent.Position, folderCantPronounceName), 0, null);
                         if (queuedMessage.canBePlayed)
                         {
                             audioPlayer.playClipImmediately(queuedMessage, false);
@@ -436,8 +436,8 @@ namespace CrewChiefV4.Events
                     {
                         OpponentData opponent = currentGameState.OpponentData[opponentKey];
                         QueuedMessage queuedMessage = new QueuedMessage("opponentName", MessageContents(currentGameState.OpponentData[opponentKey],
-                            Position.folderStub, QueuedMessage.folderNameNumbersStub + opponent.Position),
-                            MessageContents(Position.folderStub, QueuedMessage.folderNameNumbersStub + opponent.Position, folderCantPronounceName), 0, null);
+                            Position.folderStub, opponent.Position),
+                            MessageContents(Position.folderStub, opponent.Position, folderCantPronounceName), 0, null);
                         if (queuedMessage.canBePlayed)
                         {
                             audioPlayer.playClipImmediately(queuedMessage, false);

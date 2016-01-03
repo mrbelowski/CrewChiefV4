@@ -389,13 +389,13 @@ namespace CrewChiefV4.Events
             else if (pitWindowOpenLap > 0)
             {
                 audioPlayer.playClipImmediately(new QueuedMessage("yesBoxOnLap",
-                    MessageContents(folderMandatoryPitStopsYesStopOnLap, QueuedMessage.folderNameNumbersStub + pitWindowOpenLap), 0, null), false);
+                    MessageContents(folderMandatoryPitStopsYesStopOnLap, pitWindowOpenLap), 0, null), false);
                 audioPlayer.closeChannel();
             }
             else if (pitWindowOpenTime > 0)
             {
                 audioPlayer.playClipImmediately(new QueuedMessage("yesBoxAfter",
-                    MessageContents(folderMandatoryPitStopsYesStopAfter, QueuedMessage.folderNameNumbersStub + pitWindowOpenTime, folderMandatoryPitStopsMinutes), 0, null), false);
+                    MessageContents(folderMandatoryPitStopsYesStopAfter, pitWindowOpenTime, folderMandatoryPitStopsMinutes), 0, null), false);
                 audioPlayer.closeChannel();
             }            
             else
