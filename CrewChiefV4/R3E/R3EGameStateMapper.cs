@@ -66,9 +66,10 @@ namespace CrewChiefV4.RaceRoom
 
         private Boolean gotBaselineEngineData = false;
         private int baselineEngineDataSamples = 0;
-        // record the average temperature between minutes 3 and 5
-        private double baselineEngineDataStartSeconds = 180;
-        private double baselineEngineDataFinishSeconds = 300;
+        // record the average temperature between minutes 3 and 5 of driving
+        private int baselineEngineDataSamplesStart = (int)(3d * 60d / CrewChief._timeInterval.TotalSeconds);
+        private int baselineEngineDataSamplesEnd = (int)(5d * 60d / CrewChief._timeInterval.TotalSeconds);
+
         private float baselineEngineDataOilTemp = 0;
         private float baselineEngineDataWaterTemp = 0;
         private float targetEngineWaterTemp = 88;
@@ -78,7 +79,9 @@ namespace CrewChiefV4.RaceRoom
 
 
         // TODO: now we're much stricter with the bollocks opponents data (duplicates, missing entries, stuff randomly being given the wrong
-        // slot_id), can we remove this grotty delayed-position hack and all the associated crap it creates?
+        // slot_id), can we remove this grotty delayed-position hack and all the associated crap it creates? Turns out that no, we can't. 
+        // The data are broken and unreliable in multiple ways - the opponent data get jumbled up, and the data *within each opponent slot*
+        // get jumbled up too. Can't criticise too strongly though, there's no shortage of shit code right here...
         private Dictionary<String, PendingRacePositionChange> PendingRacePositionChanges = new Dictionary<String, PendingRacePositionChange>();
         private TimeSpan PositionChangeLag = TimeSpan.FromMilliseconds(1000);
         class PendingRacePositionChange
@@ -788,19 +791,24 @@ namespace CrewChiefV4.RaceRoom
 
             if (!gotBaselineEngineData)
             {
-                if (currentGameState.SessionData.SessionRunningTime > baselineEngineDataStartSeconds && 
-                    currentGameState.SessionData.SessionRunningTime < baselineEngineDataFinishSeconds && isCarRunning)
+                if (isCarRunning)
                 {
                     baselineEngineDataSamples++;
-                    baselineEngineDataWaterTemp += shared.EngineWaterTemp;
-                    baselineEngineDataOilTemp += shared.EngineOilTemp;
-                }
-                else if (currentGameState.SessionData.SessionRunningTime >= baselineEngineDataFinishSeconds && baselineEngineDataSamples > 0)
-                {
-                    gotBaselineEngineData = true;
-                    baselineEngineDataOilTemp = baselineEngineDataOilTemp / baselineEngineDataSamples;
-                    baselineEngineDataWaterTemp = baselineEngineDataWaterTemp / baselineEngineDataSamples;
-                    Console.WriteLine("Got baseline engine temps, water = " + baselineEngineDataWaterTemp + ", oil = " + baselineEngineDataOilTemp);
+                    if (baselineEngineDataSamples > baselineEngineDataSamplesStart)
+                    {
+                        if (baselineEngineDataSamples < baselineEngineDataSamplesEnd)
+                        {
+                            baselineEngineDataWaterTemp += shared.EngineWaterTemp;
+                            baselineEngineDataOilTemp += shared.EngineOilTemp;
+                        }
+                        else
+                        {
+                            gotBaselineEngineData = true;
+                            baselineEngineDataOilTemp = baselineEngineDataOilTemp / baselineEngineDataSamples;
+                            baselineEngineDataWaterTemp = baselineEngineDataWaterTemp / baselineEngineDataSamples;
+                            Console.WriteLine("Got baseline engine temps, water = " + baselineEngineDataWaterTemp + ", oil = " + baselineEngineDataOilTemp);
+                        }
+                    }
                 }
             }
             else

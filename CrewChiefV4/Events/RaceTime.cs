@@ -227,7 +227,7 @@ namespace CrewChiefV4.Events
                 {
                     TimeSpan timeLeftTimeSpan = TimeSpan.FromSeconds(timeLeft);
                     audioPlayer.playClipImmediately(new QueuedMessage("RaceTime/time_remaining",
-                        MessageContents(timeLeftTimeSpan.Minutes, folderMinutesLeft), 0, this), false);
+                        MessageContents(timeLeftTimeSpan.TotalMinutes, folderMinutesLeft), 0, this), false);
                     audioPlayer.closeChannel();
                 }
                 else if (timeLeft >= 60)

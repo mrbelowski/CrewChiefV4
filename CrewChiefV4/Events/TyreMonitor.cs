@@ -26,10 +26,10 @@ namespace CrewChiefV4.Events
         private String folderHotRightTyres = "tyre_monitor/hot_right_tyres";
         private String folderHotTyresAllRound = "tyre_monitor/hot_tyres_all_round";
 
-        public static String folderLeftFront = "type_monitor/left_front";
-        public static String folderRightFront = "type_monitor/right_front";
-        public static String folderLeftRear = "type_monitor/left_rear";
-        public static String folderRightRear = "type_monitor/right_rear";
+        public static String folderLeftFront = "tyre_monitor/left_front";
+        public static String folderRightFront = "tyre_monitor/right_front";
+        public static String folderLeftRear = "tyre_monitor/left_rear";
+        public static String folderRightRear = "tyre_monitor/right_rear";
 
         private String folderCookingLeftFrontTyre = "tyre_monitor/cooking_left_front_tyre";
         private String folderCookingLeftRearTyre = "tyre_monitor/cooking_left_rear_tyre";
@@ -156,15 +156,15 @@ namespace CrewChiefV4.Events
         private float timeLeftRearIsSpinningForLap = 0;
         private float timeRightRearIsSpinningForLap = 0;
 
-        private int leftFrontTyreTemp = 0;
-        private int rightFrontTyreTemp = 0;
-        private int leftRearTyreTemp = 0;
-        private int rightRearTyreTemp = 0;
+        private float leftFrontTyreTemp = 0;
+        private float rightFrontTyreTemp = 0;
+        private float leftRearTyreTemp = 0;
+        private float rightRearTyreTemp = 0;
 
-        private int leftFrontBrakeTemp = 0;
-        private int rightFrontBrakeTemp = 0;
-        private int leftRearBrakeTemp = 0;
-        private int rightRearBrakeTemp = 0;
+        private float leftFrontBrakeTemp = 0;
+        private float rightFrontBrakeTemp = 0;
+        private float leftRearBrakeTemp = 0;
+        private float rightRearBrakeTemp = 0;
 
         private float totalLockupThresholdForNextLap = initialTotalLapLockupThreshold;
         private float totalWheelspinThresholdForNextLap = initialTotalWheelspinThreshold;
@@ -286,14 +286,14 @@ namespace CrewChiefV4.Events
                 nextLockingAndSpinningCheck = currentGameState.Now.Add(lockingAndSpinningCheckInterval);
             }
 
-            leftFrontBrakeTemp = useFahrenheit ? celciusToFahrenheit(currentGameState.TyreData.LeftFrontBrakeTemp) : (int)currentGameState.TyreData.LeftFrontBrakeTemp;
-            rightFrontBrakeTemp = useFahrenheit ? celciusToFahrenheit(currentGameState.TyreData.RightFrontBrakeTemp) : (int)currentGameState.TyreData.RightFrontBrakeTemp;
-            leftRearBrakeTemp = useFahrenheit ? celciusToFahrenheit(currentGameState.TyreData.LeftRearBrakeTemp) : (int)currentGameState.TyreData.LeftRearBrakeTemp;
-            rightRearBrakeTemp = useFahrenheit ? celciusToFahrenheit(currentGameState.TyreData.RightRearBrakeTemp) : (int)currentGameState.TyreData.RightRearBrakeTemp;
-            leftFrontTyreTemp = useFahrenheit ? celciusToFahrenheit(currentGameState.TyreData.FrontLeft_CenterTemp) : (int)currentGameState.TyreData.FrontLeft_CenterTemp;
-            rightFrontTyreTemp = useFahrenheit ? celciusToFahrenheit(currentGameState.TyreData.FrontRight_CenterTemp) : (int)currentGameState.TyreData.FrontRight_CenterTemp;
-            leftRearTyreTemp = useFahrenheit ? celciusToFahrenheit(currentGameState.TyreData.RearLeft_CenterTemp) : (int)currentGameState.TyreData.RearLeft_CenterTemp;
-            rightRearTyreTemp = useFahrenheit ? celciusToFahrenheit(currentGameState.TyreData.RearRight_CenterTemp) : (int)currentGameState.TyreData.RearRight_CenterTemp;
+            leftFrontBrakeTemp = currentGameState.TyreData.LeftFrontBrakeTemp;
+            rightFrontBrakeTemp = currentGameState.TyreData.RightFrontBrakeTemp;
+            leftRearBrakeTemp = currentGameState.TyreData.LeftRearBrakeTemp;
+            rightRearBrakeTemp = currentGameState.TyreData.RightRearBrakeTemp;
+            leftFrontTyreTemp = currentGameState.TyreData.FrontLeft_CenterTemp;
+            rightFrontTyreTemp = currentGameState.TyreData.FrontRight_CenterTemp;
+            leftRearTyreTemp = currentGameState.TyreData.RearLeft_CenterTemp;
+            rightRearTyreTemp = currentGameState.TyreData.RearRight_CenterTemp;
 
             if (currentGameState.TyreData.TireWearActive)
             {
@@ -543,8 +543,8 @@ namespace CrewChiefV4.Events
             }
             else
             {
-                audioPlayer.playClipImmediately(new QueuedMessage("tyre_temps", MessageContents(folderLeftFront, leftFrontTyreTemp, useFahrenheit ? ConditionsMonitor.folderFahrenheit : ConditionsMonitor.folderCelsius,
-                    folderRightFront, rightFrontTyreTemp, folderLeftRear, leftRearTyreTemp, folderRightRear, rightRearTyreTemp), 0, this), false);
+                audioPlayer.playClipImmediately(new QueuedMessage("tyre_temps", MessageContents(folderLeftFront, convertTemp(leftFrontTyreTemp), 
+                    folderRightFront, convertTemp(rightFrontTyreTemp), folderLeftRear, convertTemp(leftRearTyreTemp), folderRightRear, convertTemp(rightRearTyreTemp), getTempUnit()), 0, this), false);
             }
             audioPlayer.closeChannel();
         }
@@ -557,8 +557,8 @@ namespace CrewChiefV4.Events
             }
             else
             {
-                audioPlayer.playClipImmediately(new QueuedMessage("brake_temps", MessageContents(folderLeftFront, leftFrontBrakeTemp, useFahrenheit ? ConditionsMonitor.folderFahrenheit : ConditionsMonitor.folderCelsius, 
-                    folderRightFront, rightFrontBrakeTemp, folderLeftRear, leftRearBrakeTemp, folderRightRear, rightRearBrakeTemp), 0, this), false);
+                audioPlayer.playClipImmediately(new QueuedMessage("brake_temps", MessageContents(folderLeftFront, convertTemp(leftFrontBrakeTemp, 50), 
+                    folderRightFront, convertTemp(rightFrontBrakeTemp, 50), folderLeftRear, convertTemp(leftRearBrakeTemp, 50), folderRightRear, convertTemp(rightRearBrakeTemp, 50), getTempUnit()), 0, this), false);
             }
             audioPlayer.closeChannel();
         }

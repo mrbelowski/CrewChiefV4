@@ -8,6 +8,10 @@ namespace CrewChiefV4.Events
 {
     public abstract class AbstractEvent
     {
+        private static String folderCelsius = "conditions/celsius";
+        private static String folderFahrenheit = "conditions/fahrenheit";
+        private static Boolean useFahrenheit = UserSettings.GetUserSettings().getBoolean("use_fahrenheit");
+
         protected AudioPlayer audioPlayer;
 
         protected PearlsOfWisdom pearlsOfWisdom;
@@ -219,7 +223,22 @@ namespace CrewChiefV4.Events
             return true;
         }
 
-        public static int celciusToFahrenheit(float celcius)
+        public String getTempUnit()
+        {
+            return useFahrenheit ? folderFahrenheit : folderCelsius;
+        }
+
+        public int convertTemp(float temp)
+        {
+            return convertTemp(temp, 1);
+        }
+
+        public int convertTemp(float temp, int precision)
+        {
+            return useFahrenheit ? celciusToFahrenheit(temp) : (int)(Math.Round(temp / (double)precision) * precision);
+        }
+
+        private static int celciusToFahrenheit(float celcius)
         {
             return (int)Math.Round((celcius * (9f / 5f)) + 32f);
         }

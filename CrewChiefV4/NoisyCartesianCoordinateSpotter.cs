@@ -29,11 +29,11 @@ namespace CrewChiefV4
         private int speedsToAverage = 7;
 
         // if the audio player is in the middle of another message, this 'immediate' message will have to wait.
-        // If it's older than 1000 milliseconds by the time the player's got round to playing it, it's expired
+        // If it's older than 2000 milliseconds by the time the player's got round to playing it, it's expired
         private int clearMessageExpiresAfter = 2000;
         private int clearAllRoundMessageExpiresAfter = 2000;
-        private int holdMessageExpiresAfter = 1000;
-        private int inTheMiddleMessageExpiresAfter = 1000;
+        private int holdMessageExpiresAfter = 2000;
+        private int inTheMiddleMessageExpiresAfter = 2000;
 
         private float carLength;
 
