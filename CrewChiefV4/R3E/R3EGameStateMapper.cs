@@ -389,6 +389,12 @@ namespace CrewChiefV4.RaceRoom
             if (currentGameState.SessionData.IsNewLap)
             {
                 currentGameState.SessionData.formattedPlayerLapTimes.Add(TimeSpan.FromSeconds(shared.LapTimePrevious).ToString(@"mm\:ss\.fff"));
+                // quick n dirty hack here - if the current car class is unknown, try and get it again
+                if (currentGameState.carClass.carClassEnum == CarData.CarClassEnum.UNKNOWN_RACE)
+                {
+                    currentGameState.carClass = CarData.getCarClassForRaceRoomId(shared.all_drivers_data[shared.slot_id].driver_info.class_id);
+                    brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(currentGameState.carClass, null);                    
+                }
             }
             if (previousGameState != null && !currentGameState.SessionData.IsNewSession)
             {
@@ -622,7 +628,7 @@ namespace CrewChiefV4.RaceRoom
                                     isEnteringPits || isLeavingPits, participantStruct.current_lap_valid == 1,
                                     currentGameState.SessionData.SessionRunningTime, secondsSinceLastUpdate,
                                     new float[] { participantStruct.position.X, participantStruct.position.Z }, previousOpponentWorldPosition,
-                                    participantStruct.lap_distance, participantStruct.tire_type);
+                                    participantStruct.lap_distance, participantStruct.tire_type, participantStruct.driver_info.class_id);
                             if (newOpponentLap)
                             {
                                 if (currentOpponentData.CurrentBestLapTime > 0)
@@ -1240,7 +1246,7 @@ namespace CrewChiefV4.RaceRoom
 
         private void upateOpponentData(OpponentData opponentData, int racePosition, int unfilteredRacePosition, int completedLaps, int sector, float sectorTime, 
             float completedLapTime, Boolean isInPits, Boolean lapIsValid, float sessionRunningTime, float secondsSinceLastUpdate, float[] currentWorldPosition, 
-            float[] previousWorldPosition, float distanceRoundTrack, int tire_type)
+            float[] previousWorldPosition, float distanceRoundTrack, int tire_type, int carClassId)
         {
             opponentData.DistanceRoundTrack = distanceRoundTrack;
             float speed;
@@ -1263,6 +1269,7 @@ namespace CrewChiefV4.RaceRoom
             opponentData.IsNewLap = false;            
             if (opponentData.CurrentSectorNumber != sector)
             {
+                opponentData.CarClass = CarData.getCarClassForRaceRoomId(carClassId);
                 if (opponentData.CurrentSectorNumber == 3 && sector == 1)
                 {
                     if (opponentData.OpponentLapData.Count > 0)
