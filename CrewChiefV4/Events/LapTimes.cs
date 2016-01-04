@@ -946,8 +946,8 @@ namespace CrewChiefV4.Events
                             {
                                 reportOption = SectorReportOption.ALL_SECTORS;
                             }
-                            List<MessageFragment> sectorDeltaMessages = getSectorDeltaMessages(reportOption, currentGameState.SessionData.PlayerBestLapSector1Time, bestOpponentLapData[1],
-                                currentGameState.SessionData.PlayerBestLapSector2Time, bestOpponentLapData[2], currentGameState.SessionData.PlayerBestLapSector3Time, bestOpponentLapData[3], true);
+                            List<MessageFragment> sectorDeltaMessages = getSectorDeltaMessages(reportOption, currentGameState.SessionData.LastSector1Time, bestOpponentLapData[1],
+                                currentGameState.SessionData.LastSector2Time, bestOpponentLapData[2], currentGameState.SessionData.LastSector3Time, bestOpponentLapData[3], true);
                             if (sectorDeltaMessages.Count > 0)
                             {
                                 audioPlayer.playClipImmediately(new QueuedMessage("non-race_sector_times_report", sectorDeltaMessages, 0, null), false);

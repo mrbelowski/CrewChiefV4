@@ -76,6 +76,8 @@ namespace CrewChiefV4
         public List<String> messageFolders;
         public Boolean playEvenWhenSilenced;
 
+        private Random rand = new Random();
+
         // some snapshot of pertentent data at the point of creation, 
         // which can be validated before it actually gets played. E.g.
         // e.g. {SessionData.Position = 1}
@@ -285,8 +287,12 @@ namespace CrewChiefV4
             }
             if (hundreds != null) {
                 messages.Add(folderNameNumbersStub + hundreds);
+                // don't always use "hundred and"
                 if (tensAndUnits != null) {
-                    messages.Add(folderNameHundredAnd);
+                    if (thousands != null || rand.NextDouble() > 0.6)
+                    {
+                        messages.Add(folderNameHundredAnd);
+                    }
                 } else {
                     messages.Add(folderNameHundred);
                 }

@@ -557,8 +557,8 @@ namespace CrewChiefV4.Events
             }
             else
             {
-                audioPlayer.playClipImmediately(new QueuedMessage("brake_temps", MessageContents(folderLeftFront, convertTemp(leftFrontBrakeTemp, 50), 
-                    folderRightFront, convertTemp(rightFrontBrakeTemp, 50), folderLeftRear, convertTemp(leftRearBrakeTemp, 50), folderRightRear, convertTemp(rightRearBrakeTemp, 50), getTempUnit()), 0, this), false);
+                audioPlayer.playClipImmediately(new QueuedMessage("brake_temps", MessageContents(folderLeftFront, convertTemp(leftFrontBrakeTemp, 10), 
+                    folderRightFront, convertTemp(rightFrontBrakeTemp, 10), folderLeftRear, convertTemp(leftRearBrakeTemp, 10), folderRightRear, convertTemp(rightRearBrakeTemp, 10), getTempUnit()), 0, this), false);
             }
             audioPlayer.closeChannel();
         }
