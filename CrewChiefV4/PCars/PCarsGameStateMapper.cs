@@ -18,6 +18,7 @@ namespace CrewChiefV4.PCars
     {
         private Boolean attemptPitDetection = UserSettings.GetUserSettings().getBoolean("attempt_pcars_opponent_pit_detection");
         private static String userSpecifiedSteamId = UserSettings.GetUserSettings().getString("pcars_steam_id");
+        private Boolean usePCarsNetworkOpponentCarClassFlag = UserSettings.GetUserSettings().getBoolean("enable_pcars_opponent_class_detection");
         private static String playerSteamId = null;
         private static Boolean getPlayerByName = true;
 
@@ -324,23 +325,24 @@ namespace CrewChiefV4.PCars
                 }
                 currentGameState.SessionData.DriverRawName = viewedParticipant.mName;
                 currentGameState.PitData.IsRefuellingAllowed = true;
-
-                for (int i=0; i < shared.mParticipantData.Length; i++)
-                {
-                    pCarsAPIParticipantStruct participantStruct = shared.mParticipantData[i];
-                    if (i != playerDataIndex && participantStruct.mIsActive && participantStruct.mName != null && participantStruct.mName.Length > 0)
-                    {
-                        if (!currentGameState.OpponentData.ContainsKey(participantStruct.mName))
-                        {
-                            currentGameState.OpponentData.Add(participantStruct.mName, createOpponentData(participantStruct, false));
-                        }
-                    }
-                }
+                
                 currentGameState.carClass = CarData.getCarClassForPCarsClassName(shared.mCarClassName);
                 Console.WriteLine("Player is using car class " + currentGameState.carClass.carClassEnum + " (class name " + shared.mCarClassName + ")");
                 brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(currentGameState.carClass, shared.mCarName);
                 // no tyre data in the block so get the default tyre types for this car
                 defaultTyreTypeForPlayersCar = CarData.getDefaultTyreType(currentGameState.carClass, shared.mCarName);
+                for (int i = 0; i < shared.mParticipantData.Length; i++)
+                {
+                    pCarsAPIParticipantStruct participantStruct = shared.mParticipantData[i];
+                    if (i != playerDataIndex && participantStruct.mIsActive && participantStruct.mName != null && participantStruct.mName.Length > 0)
+                    {
+                        CarData.CarClass opponentCarClass = shared.hasOpponentClassData && shared.isSameClassAsPlayer[i] ? currentGameState.carClass : CarData.getDefaultCarClass();
+                        if (!currentGameState.OpponentData.ContainsKey(participantStruct.mName))
+                        {
+                            currentGameState.OpponentData.Add(participantStruct.mName, createOpponentData(participantStruct, false, opponentCarClass));
+                        }
+                    }
+                }
             }
             else
             {
@@ -540,6 +542,9 @@ namespace CrewChiefV4.PCars
                 if (i != playerDataIndex)
                 {
                     pCarsAPIParticipantStruct participantStruct = shared.mParticipantData[i];
+                    CarData.CarClass opponentCarClass = !usePCarsNetworkOpponentCarClassFlag || (shared.hasOpponentClassData && shared.isSameClassAsPlayer[i]) ? 
+                        currentGameState.carClass : CarData.getDefaultCarClass();
+
                     if (participantStruct.mName != null && currentGameState.OpponentData.ContainsKey(participantStruct.mName))
                     {
                         OpponentData currentOpponentData = currentGameState.OpponentData[participantStruct.mName];
@@ -645,20 +650,30 @@ namespace CrewChiefV4.PCars
                                         currentOpponentSector, isEnteringPits || isLeavingPits, currentGameState.SessionData.SessionRunningTime, secondsSinceLastUpdate,
                                         new float[] { participantStruct.mWorldPosition[0], participantStruct.mWorldPosition[2] }, previousOpponentWorldPosition,
                                         previousOpponentSpeed, shared.mWorldFastestLapTime, participantStruct.mCurrentLapDistance, shared.mRainDensity == 1, 
-                                        shared.mAmbientTemperature, shared.mTrackTemperature);
+                                        shared.mAmbientTemperature, shared.mTrackTemperature, opponentCarClass);
                                 if (currentOpponentData.IsNewLap && currentOpponentData.CurrentBestLapTime > 0)
                                 {
-                                    // the car class is always Unknown for PCars - it's not in the opponent data
                                     if (currentGameState.SessionData.OpponentsLapTimeSessionBestOverall == -1 ||
                                         currentOpponentData.CurrentBestLapTime < currentGameState.SessionData.OpponentsLapTimeSessionBestOverall)
                                     {
                                         currentGameState.SessionData.OpponentsLapTimeSessionBestOverall = currentOpponentData.CurrentBestLapTime;
-                                        currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass = currentOpponentData.CurrentBestLapTime;
                                         if (currentGameState.SessionData.OverallSessionBestLapTime == -1 ||
                                             currentGameState.SessionData.OverallSessionBestLapTime > currentOpponentData.CurrentBestLapTime)
                                         {
                                             currentGameState.SessionData.OverallSessionBestLapTime = currentOpponentData.CurrentBestLapTime;
-                                            currentGameState.SessionData.PlayerClassSessionBestLapTime = currentOpponentData.CurrentBestLapTime;
+                                        }
+                                    }
+                                    if (currentOpponentData.CarClass.carClassEnum == currentGameState.carClass.carClassEnum)
+                                    {
+                                        if (currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass == -1 ||
+                                            currentOpponentData.CurrentBestLapTime < currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass)
+                                        {
+                                            currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass = currentOpponentData.CurrentBestLapTime;
+                                            if (currentGameState.SessionData.PlayerClassSessionBestLapTime == -1 ||
+                                                currentGameState.SessionData.PlayerClassSessionBestLapTime > currentOpponentData.CurrentBestLapTime)
+                                            {
+                                                currentGameState.SessionData.PlayerClassSessionBestLapTime = currentOpponentData.CurrentBestLapTime;
+                                            }
                                         }
                                     }
                                 }
@@ -674,7 +689,7 @@ namespace CrewChiefV4.PCars
                         if (participantStruct.mIsActive && participantStruct.mName != null && participantStruct.mName.Length > 0)
                         {
                             Console.WriteLine("Creating opponent for name " + participantStruct.mName);
-                            currentGameState.OpponentData.Add(participantStruct.mName, createOpponentData(participantStruct, true));
+                            currentGameState.OpponentData.Add(participantStruct.mName, createOpponentData(participantStruct, true, opponentCarClass));
                         }
                     }
                 }
@@ -954,7 +969,7 @@ namespace CrewChiefV4.PCars
 
         private void upateOpponentData(OpponentData opponentData, int racePosition, int completedLaps, int sector, Boolean isInPits,
             float sessionRunningTime, float secondsSinceLastUpdate, float[] currentWorldPosition, float[] previousWorldPosition,
-            float previousSpeed, float worldRecordLapTime, float distanceRoundTrack, Boolean isRaining, float trackTemp, float airTemp)
+            float previousSpeed, float worldRecordLapTime, float distanceRoundTrack, Boolean isRaining, float trackTemp, float airTemp, CarData.CarClass carClass)
         {
             opponentData.DistanceRoundTrack = distanceRoundTrack;
             float speed;
@@ -999,6 +1014,7 @@ namespace CrewChiefV4.PCars
             opponentData.UnFilteredPosition = racePosition;
             opponentData.WorldPosition = currentWorldPosition;
             opponentData.IsNewLap = false;
+            opponentData.CarClass = carClass;
             if (opponentData.CurrentSectorNumber != sector)
             {
                 if (opponentData.CurrentSectorNumber == 3 && sector == 1)
@@ -1025,13 +1041,16 @@ namespace CrewChiefV4.PCars
             opponentData.CompletedLaps = completedLaps;
         }
 
-        private OpponentData createOpponentData(pCarsAPIParticipantStruct participantStruct, Boolean loadDriverName)
+        private OpponentData createOpponentData(pCarsAPIParticipantStruct participantStruct, Boolean loadDriverName, CarData.CarClass carClass)
         {            
             OpponentData opponentData = new OpponentData();
-            opponentData.DriverRawName = participantStruct.mName.Trim();
-            if (loadDriverName && CrewChief.enableDriverNames)
+            if (participantStruct.mName != null)
             {
-                speechRecogniser.addNewOpponentName(opponentData.DriverRawName);
+                opponentData.DriverRawName = participantStruct.mName.Trim();
+                if (loadDriverName && CrewChief.enableDriverNames)
+                {
+                    speechRecogniser.addNewOpponentName(opponentData.DriverRawName);
+                }
             }
             opponentData.Position = (int)participantStruct.mRacePosition;
             opponentData.UnFilteredPosition = opponentData.Position;
@@ -1039,6 +1058,9 @@ namespace CrewChiefV4.PCars
             opponentData.CurrentSectorNumber = (int)participantStruct.mCurrentSector;
             opponentData.WorldPosition = new float[] { participantStruct.mWorldPosition[0], participantStruct.mWorldPosition[2] };
             opponentData.DistanceRoundTrack = participantStruct.mCurrentLapDistance;
+            opponentData.CarClass = carClass;
+            String nameToLog = opponentData.DriverRawName == null ? "unknown" : opponentData.DriverRawName;
+            Console.WriteLine("New driver " + nameToLog + " is using car class " + opponentData.CarClass.carClassEnum);
             return opponentData;
         }
         

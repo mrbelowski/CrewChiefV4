@@ -235,12 +235,13 @@ namespace CrewChiefV4.Events
 
         public int convertTemp(float temp, int precision)
         {
-            return useFahrenheit ? celciusToFahrenheit(temp) : (int)(Math.Round(temp / (double)precision) * precision);
+            return useFahrenheit ? celciusToFahrenheit(temp, precision) : (int)(Math.Round(temp / (double)precision) * precision);
         }
 
-        private static int celciusToFahrenheit(float celcius)
+        private static int celciusToFahrenheit(float celcius, int precision)
         {
-            return (int)Math.Round((celcius * (9f / 5f)) + 32f);
+            float temp = (int)Math.Round((celcius * (9f / 5f)) + 32f);
+            return (int)(Math.Round(temp / (double)precision) * precision);
         }
     }
 }

@@ -643,8 +643,7 @@ namespace CrewChiefV4.RaceRoom
                                             currentGameState.SessionData.OverallSessionBestLapTime = currentOpponentData.CurrentBestLapTime;
                                         }
                                     }
-                                    if (currentOpponentData.CarClass.carClassEnum == CarData.CarClassEnum.UNKNOWN_RACE || currentGameState.carClass.carClassEnum == CarData.CarClassEnum.UNKNOWN_RACE ||
-                                        currentOpponentData.CarClass.carClassEnum == currentGameState.carClass.carClassEnum)
+                                    if (currentOpponentData.CarClass.carClassEnum == currentGameState.carClass.carClassEnum)
                                     {
                                         if (currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass == -1 ||
                                             currentOpponentData.CurrentBestLapTime < currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass)

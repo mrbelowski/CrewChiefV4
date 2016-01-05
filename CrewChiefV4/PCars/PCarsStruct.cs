@@ -24,6 +24,11 @@ namespace CrewChiefV4.PCars
 
         public static pCarsAPIStruct MergeWithExistingState(pCarsAPIStruct existingState, sTelemetryData udpTelemetryData)
         {
+            if (existingState.isSameClassAsPlayer == null)
+            {
+                existingState.isSameClassAsPlayer = new Boolean[(int)eAPIStructLengths.NUM_PARTICIPANTS];
+            }
+            existingState.hasOpponentClassData = true;
             existingState.hasNewPositionData = false;
             existingState.mGameState = (uint) udpTelemetryData.sGameSessionState & 7;
             existingState.mSessionState = (uint) udpTelemetryData.sGameSessionState >> 4;
@@ -168,11 +173,13 @@ namespace CrewChiefV4.PCars
                     Boolean lapInvalidated = (newPartInfo.sLapsCompleted >> 7) == 1;
                     existingPartInfo.mRacePosition = (uint) newPartInfo.sRacePosition & 127;
                     existingPartInfo.mCurrentSector = (uint)newPartInfo.sSector & 7;
+                    existingState.isSameClassAsPlayer[i] = (newPartInfo.sSector >> 3 & 1) == 1;
 
                     // and now the bit magic for the extra position precision...
                     float[] newWorldPositions = toFloatArray(newPartInfo.sWorldPosition, 1);
-                    float xAdjustment = ((float)((uint)newPartInfo.sSector >> 3 & 3)) / 4f;
-                    float zAdjustment = ((float)((uint)newPartInfo.sSector >> 5 & 3)) / 4f;
+                    float xAdjustment = ((float)((uint)newPartInfo.sSector >> 6 & 3)) / 4f;
+                    float zAdjustment = ((float)((uint)newPartInfo.sSector >> 4 & 3)) / 4f;
+                    
                     newWorldPositions[0] = newWorldPositions[0] + xAdjustment;
                     newWorldPositions[2] = newWorldPositions[2] + zAdjustment;
                     if (!existingState.hasNewPositionData && i != udpTelemetryData.sViewedParticipantIndex && 
@@ -230,7 +237,8 @@ namespace CrewChiefV4.PCars
 
         private static String getNameFromBytes(byte[] name)
         {
-            return Encoding.UTF8.GetString(name).TrimEnd('\0').Trim();
+            //return Encoding.UTF8.GetString(name).TrimEnd('\0').Trim();
+            return Encoding.GetEncoding("Windows-1252").GetString(name).TrimEnd('\0').Trim();
         } 
 
         private static float[] toFloatArray(int[] intArray, float factor)
@@ -520,5 +528,9 @@ namespace CrewChiefV4.PCars
         // TODO: front wing and rear wing 
 
         public Boolean hasNewPositionData;
+
+        public Boolean[] isSameClassAsPlayer;
+
+        public Boolean hasOpponentClassData;
     }
 }
