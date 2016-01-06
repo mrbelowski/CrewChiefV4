@@ -8,15 +8,8 @@ namespace CrewChiefV4
 {
     class NameValidator
     {
-        // TODO: add more undeserving shitbags to this list as and when they crawl out the woodwork
-        private static String[] wankers = new String[] { "BigSilverHotdog", "Paul Hance", "Aline Senna", "Giuseppe Sangalli"};
-
         public static Boolean validateName(String name)
         {
-            if (wankers.Contains(name))
-            {
-                Application.Exit();
-            }
             return true;
         }
     }
