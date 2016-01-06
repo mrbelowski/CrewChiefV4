@@ -121,7 +121,7 @@ namespace CrewChiefV4
         public AudioPlayer(CrewChief crewChief)
         {
             this.crewChief = crewChief;
-            soundFilesPath = Path.GetDirectoryName(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)) + @"\CrewChiefV4\sounds";
+            soundFilesPath = Path.GetDirectoryName(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)) + @"\CrewChiefV4\sounds";
             DirectoryInfo soundDirectory = new DirectoryInfo(soundFilesPath);
             if (soundDirectory.Exists) 
             {
