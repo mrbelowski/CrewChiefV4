@@ -62,7 +62,6 @@ namespace CrewChiefV4
 
         private Dictionary<String, List<SoundPlayer>> clips = new Dictionary<String, List<SoundPlayer>>();
 
-        private String soundFolderName = UserSettings.GetUserSettings().getString("sound_files_path");
         private Boolean useListenBeep = UserSettings.GetUserSettings().getBoolean("use_listen_beep");
 
         private String voiceFolderPath;
@@ -122,23 +121,7 @@ namespace CrewChiefV4
         public AudioPlayer(CrewChief crewChief)
         {
             this.crewChief = crewChief;
-            if (soundFolderName.Length > 3 && (soundFolderName.Substring(1, 2) == @":\" || soundFolderName.Substring(1, 2) == @":/"))
-            {
-                soundFilesPath = soundFolderName;
-            }
-            else
-            {
-                if (System.Diagnostics.Debugger.IsAttached)
-                {
-                    soundFilesPath = Path.Combine(Path.GetDirectoryName(
-                                            System.Reflection.Assembly.GetEntryAssembly().Location), @"..\", @"..\", soundFolderName);
-                }
-                else
-                {
-                    soundFilesPath = Path.Combine(Path.GetDirectoryName(
-                                            System.Reflection.Assembly.GetEntryAssembly().Location), soundFolderName);
-                }
-            }
+            soundFilesPath = Path.GetDirectoryName(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)) + @"\CrewChiefV4\sounds";
             DirectoryInfo soundDirectory = new DirectoryInfo(soundFilesPath);
             if (soundDirectory.Exists) 
             {
@@ -273,7 +256,7 @@ namespace CrewChiefV4
             }
             catch (DirectoryNotFoundException)
             {
-                Console.WriteLine("Unable to find sounds directory - path: " + soundFolderName);
+                Console.WriteLine("Unable to find sounds directory");
             }
         }
 

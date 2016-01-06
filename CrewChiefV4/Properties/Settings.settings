@@ -2,9 +2,6 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="CrewChiefV4.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
-    <Setting Name="sound_files_path" Type="System.String" Scope="User">
-      <Value Profile="(Default)">sounds</Value>
-    </Setting>
     <Setting Name="background_volume" Type="System.Single" Scope="User">
       <Value Profile="(Default)">0.3</Value>
     </Setting>

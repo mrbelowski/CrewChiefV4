@@ -54,8 +54,8 @@ namespace CrewChiefV4
 
         private static String autoUpdateXMLURL = "https://drive.google.com/uc?export=download&id=0B4KQS820QNFbWWFjaDAzRldMNUE";
 
-        private float latestSoundPackVersion = 0;
-        private float latestDriverNamesVersion = 0;
+        private float latestSoundPackVersion = -1;
+        private float latestDriverNamesVersion = -1;
 
         private void FormMain_Load(object sender, EventArgs e)
         {
@@ -73,17 +73,29 @@ namespace CrewChiefV4
             //AutoUpdater.RemindLaterTimeSpan = RemindLaterFormat.Days;
             //AutoUpdater.RemindLaterAt = 2;
 
-            AutoUpdater.Start(autoUpdateXMLURL);
-            // now get the latest sound pack versions
-            string xml = new WebClient().DownloadString(autoUpdateXMLURL);
-            XDocument doc = XDocument.Parse(xml);
-            float.TryParse(doc.Descendants("soundpackversion").First().Value, out latestSoundPackVersion);
-            float.TryParse(doc.Descendants("drivernamesversion").First().Value, out latestDriverNamesVersion);
-            baseSoundPackDownloadLocation = doc.Descendants("basesoundpackurl").First().Value;
-            baseDriverNamesDownloadLocation = doc.Descendants("basedrivernamesurl").First().Value; 
-            updateSoundPackDownloadLocation = doc.Descendants("updatesoundpackurl").First().Value;
-            updateDriverNamesDownloadLocation = doc.Descendants("updatedrivernamesurl").First().Value;
-            if (latestSoundPackVersion > AudioPlayer.soundPackVersion)
+            try
+            {
+                AutoUpdater.Start(autoUpdateXMLURL);
+                // now get the latest sound pack versions
+                string xml = new WebClient().DownloadString(autoUpdateXMLURL);
+                XDocument doc = XDocument.Parse(xml);
+                float.TryParse(doc.Descendants("soundpackversion").First().Value, out latestSoundPackVersion);
+                float.TryParse(doc.Descendants("drivernamesversion").First().Value, out latestDriverNamesVersion);
+                baseSoundPackDownloadLocation = doc.Descendants("basesoundpackurl").First().Value;
+                baseDriverNamesDownloadLocation = doc.Descendants("basedrivernamesurl").First().Value;
+                updateSoundPackDownloadLocation = doc.Descendants("updatesoundpackurl").First().Value;
+                updateDriverNamesDownloadLocation = doc.Descendants("updatedrivernamesurl").First().Value;
+            }
+            catch (Exception error)
+            {
+                Console.WriteLine("Unable to get auto update details: " + error.Message);
+            }
+            if (latestSoundPackVersion == -1 && AudioPlayer.soundPackVersion == -1)
+            {
+                downloadSoundPackButton.Text = "No sound pack detected, unable to locate update";
+                downloadSoundPackButton.Enabled = false;
+            }
+            else if (latestSoundPackVersion > AudioPlayer.soundPackVersion)
             {
                 downloadSoundPackButton.Enabled = true;
                 if (AudioPlayer.soundPackVersion == -1)
@@ -97,7 +109,11 @@ namespace CrewChiefV4
                 }
                 newSoundPackAvailable = true;
             }
-            if (latestDriverNamesVersion > AudioPlayer.driverNamesVersion)
+            if (latestDriverNamesVersion == -1 && AudioPlayer.driverNamesVersion == -1) {
+                downloadDriverNamesButton.Text = "No driver names detected, unable to locate update";
+                downloadDriverNamesButton.Enabled = false;
+            } 
+            else if (latestDriverNamesVersion > AudioPlayer.driverNamesVersion)
             {
                 downloadDriverNamesButton.Enabled = true;
                 if (AudioPlayer.driverNamesVersion == -1)

@@ -21,7 +21,6 @@ namespace CrewChiefV4
                 Properties.Settings.Default.UpdateSettings = false;
                 Properties.Settings.Default.Save();
             }
-            propertyHelp.Add("sound_files_path", "The path (relative to CrewChief.exe) of the sound pack you want to use");
             propertyHelp.Add("background_volume", "The volume of the background sounds (0 - 1)");
             propertyHelp.Add("update_interval", "The time (milliseconds) between app updates");
             propertyHelp.Add("use_sweary_messages", "A few messages contain swearing - then enables / disables these");
