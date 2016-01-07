@@ -70,10 +70,10 @@ namespace CrewChiefV4.RaceRoom
         private int baselineEngineDataSamplesStart = (int)(3d * 60d / CrewChief._timeInterval.TotalSeconds);
         private int baselineEngineDataSamplesEnd = (int)(5d * 60d / CrewChief._timeInterval.TotalSeconds);
 
-        private float baselineEngineDataOilTemp = 0;
-        private float baselineEngineDataWaterTemp = 0;
         private float targetEngineWaterTemp = 88;
         private float targetEngineOilTemp = 105;
+        private float baselineEngineDataOilTemp = 88;
+        private float baselineEngineDataWaterTemp = 105;
 
         private SpeechRecogniser speechRecogniser;
 
@@ -171,8 +171,8 @@ namespace CrewChiefV4.RaceRoom
                 // reset the engine temp monitor stuff
                 gotBaselineEngineData = false;
                 baselineEngineDataSamples = 0;
-                baselineEngineDataOilTemp = 0;
-                baselineEngineDataWaterTemp = 0;
+                baselineEngineDataOilTemp = targetEngineOilTemp;
+                baselineEngineDataWaterTemp = targetEngineWaterTemp;
                 for (int i = 0; i < shared.all_drivers_data.Length; i++)
                 {
                     DriverData participantStruct = shared.all_drivers_data[i];
@@ -287,8 +287,8 @@ namespace CrewChiefV4.RaceRoom
                         // reset the engine temp monitor stuff
                         gotBaselineEngineData = false;
                         baselineEngineDataSamples = 0;
-                        baselineEngineDataOilTemp = 0;
-                        baselineEngineDataWaterTemp = 0;
+                        baselineEngineDataOilTemp = targetEngineOilTemp;
+                        baselineEngineDataWaterTemp = targetEngineWaterTemp;
 
                         Console.WriteLine("SessionType " + currentGameState.SessionData.SessionType);
                         Console.WriteLine("SessionPhase " + currentGameState.SessionData.SessionPhase);
@@ -796,6 +796,8 @@ namespace CrewChiefV4.RaceRoom
 
             if (!gotBaselineEngineData)
             {
+                currentGameState.EngineData.EngineOilTemp = shared.EngineOilTemp;
+                currentGameState.EngineData.EngineWaterTemp = shared.EngineWaterTemp;
                 if (isCarRunning)
                 {
                     baselineEngineDataSamples++;
@@ -809,8 +811,8 @@ namespace CrewChiefV4.RaceRoom
                         else
                         {
                             gotBaselineEngineData = true;
-                            baselineEngineDataOilTemp = baselineEngineDataOilTemp / baselineEngineDataSamples;
-                            baselineEngineDataWaterTemp = baselineEngineDataWaterTemp / baselineEngineDataSamples;
+                            baselineEngineDataOilTemp = baselineEngineDataOilTemp / (baselineEngineDataSamples - baselineEngineDataSamplesStart);
+                            baselineEngineDataWaterTemp = baselineEngineDataWaterTemp / (baselineEngineDataSamples - baselineEngineDataSamplesStart);
                             Console.WriteLine("Got baseline engine temps, water = " + baselineEngineDataWaterTemp + ", oil = " + baselineEngineDataOilTemp);
                         }
                     }
@@ -1189,7 +1191,7 @@ namespace CrewChiefV4.RaceRoom
 
         private Boolean CheckIsCarRunning(RaceRoomData.RaceRoomShared shared)
         {
-            return shared.EngineRps > 0.001 || shared.Gear > 0 || shared.CarSpeed > 0.001;
+            return shared.Gear > 0 || shared.CarSpeed > 0.001;
         }
 
         private TyreCondition getTyreCondition(float percentWear)
