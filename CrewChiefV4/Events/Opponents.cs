@@ -215,9 +215,10 @@ namespace CrewChiefV4.Events
             }
         }
 
-        private Object getOpponentKey(String voiceMessage, String expectedNumberSuffix)
+        private Tuple<Object, Boolean> getOpponentKey(String voiceMessage, String expectedNumberSuffix)
         {
             Object opponentKey = null;
+            Boolean gotByPositionNumber = false;
             if (voiceMessage.Contains(SpeechRecogniser.THE_LEADER))
             {
                 if (currentGameState.SessionData.Position > 1)
@@ -269,6 +270,7 @@ namespace CrewChiefV4.Events
                 {
                     opponentKey = positionIsPlayerKey;
                 }
+                gotByPositionNumber = true;
             }
             else
             {
@@ -282,7 +284,7 @@ namespace CrewChiefV4.Events
                     }
                 }
             }
-            return opponentKey;
+            return new Tuple<object, bool>(opponentKey, gotByPositionNumber);
         }
 
         private float getOpponentLastLap(Object opponentKey)
@@ -310,7 +312,7 @@ namespace CrewChiefV4.Events
             {
                 if (voiceMessage.StartsWith(SpeechRecogniser.WHAT_TYRE_IS) || voiceMessage.StartsWith(SpeechRecogniser.WHAT_TYRES_IS))
                 {
-                    Object opponentKey = getOpponentKey(voiceMessage, " on");
+                    Object opponentKey = getOpponentKey(voiceMessage, " on").Item1;
                     if (opponentKey != null)
                     {
                         OpponentData opponentData = currentGameState.OpponentData[opponentKey];
@@ -334,7 +336,7 @@ namespace CrewChiefV4.Events
                 {
                     if (voiceMessage.EndsWith(SpeechRecogniser.LAST_LAP))
                     {
-                        float lastLap = getOpponentLastLap(getOpponentKey(voiceMessage, "'s "));
+                        float lastLap = getOpponentLastLap(getOpponentKey(voiceMessage, "'s ").Item1);
                         if (lastLap != -1)
                         {
                             gotData = true;
@@ -345,7 +347,7 @@ namespace CrewChiefV4.Events
                     }
                     else
                     {
-                        float bestLap = getOpponentBestLap(getOpponentKey(voiceMessage, "'s "));
+                        float bestLap = getOpponentBestLap(getOpponentKey(voiceMessage, "'s ").Item1);
                         if (bestLap != -1)
                         {
                             gotData = true;
@@ -357,18 +359,26 @@ namespace CrewChiefV4.Events
                 } 
                 else if (voiceMessage.StartsWith(SpeechRecogniser.WHERE_IS))
                 {
-                    object opponentKey = getOpponentKey(voiceMessage, "");
+                    Tuple<Object, Boolean> response = getOpponentKey(voiceMessage, "");
+                    object opponentKey = response.Item1;
+                    Boolean gotByPositionNumber = response.Item2;
                     if (opponentKey != null && currentGameState.OpponentData.ContainsKey(opponentKey))
                     {
                         OpponentData opponent = currentGameState.OpponentData[opponentKey];
                         if (opponent.IsActive)
                         {
+                            Boolean playedMessage = false;
                             int position = opponent.Position;
                             OpponentData.OpponentDelta opponentDelta = opponent.getTimeDifferenceToPlayer(currentGameState.SessionData);
-                            audioPlayer.playClipImmediately(new QueuedMessage("opponentPosition",
-                                MessageContents(Position.folderStub, position), 0, null), false);
+                            if (!gotByPositionNumber)
+                            {
+                                audioPlayer.playClipImmediately(new QueuedMessage("opponentPosition",
+                                    MessageContents(Position.folderStub, position), 0, null), false);
+                                playedMessage = true;
+                            }
                             if (opponentDelta != null && (opponentDelta.lapDifference != 0 || Math.Abs(opponentDelta.time) > 0.05))
                             {
+                                playedMessage = true;
                                 if (opponentDelta.lapDifference == 1)
                                 {
                                     audioPlayer.playClipImmediately(new QueuedMessage(Position.folderOneLapBehind, 0, null), false);
@@ -399,8 +409,11 @@ namespace CrewChiefV4.Events
                                         MessageContents(delta, aheadOrBehind), 0, null), false);
                                 }
                             }
-                            audioPlayer.closeChannel();
-                            gotData = true;
+                            if (playedMessage)
+                            {
+                                audioPlayer.closeChannel();
+                                gotData = true;
+                            }
                         }
                         else
                         {
