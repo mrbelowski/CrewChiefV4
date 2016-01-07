@@ -33,6 +33,8 @@ namespace CrewChiefV4.RaceRoom
 
         private float carWidth = 1.8f;
 
+        private DateTime previousTime;
+
         public R3ESpotterv2(AudioPlayer audioPlayer, Boolean initialEnabledState)
         {
             this.audioPlayer = audioPlayer;
@@ -87,9 +89,19 @@ namespace CrewChiefV4.RaceRoom
 
             DateTime now = DateTime.Now;
             DriverData currentPlayerData;
+            DriverData previousPlayerData;
+            float timeDiffSeconds;
             try
             {
                 currentPlayerData = getDriverData(currentState, currentState.slot_id);
+                previousPlayerData = getDriverData(lastState, currentState.slot_id);
+                timeDiffSeconds = ((float)(now - previousTime).TotalMilliseconds) / 1000f;
+                previousTime = now;
+                if (timeDiffSeconds <= 0)
+                {
+                    // WTF?
+                    return;
+                }
             }
             catch (Exception)
             {
@@ -102,9 +114,8 @@ namespace CrewChiefV4.RaceRoom
                 List<float[]> currentOpponentPositions = new List<float[]>();
                 float[] playerVelocityData = new float[3];
                 playerVelocityData[0] = currentState.CarSpeed;
-                playerVelocityData[1] = (float)currentState.Player.Velocity.X;
-                playerVelocityData[2] = (float)currentState.Player.Velocity.Z;
-
+                playerVelocityData[1] = (currentPlayerData.position.X - previousPlayerData.position.X) / timeDiffSeconds;
+                playerVelocityData[2] = (currentPlayerData.position.Z - previousPlayerData.position.Z) / timeDiffSeconds;
 
                 foreach (DriverData driverData in currentState.all_drivers_data)
                 {
