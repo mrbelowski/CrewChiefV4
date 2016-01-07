@@ -71,7 +71,9 @@ namespace CrewChiefV4.PCars
 
         private TimeSpan minimumSessionParticipationTime = TimeSpan.FromSeconds(6);
 
-        private Dictionary<String, int> previousSpeedReuseCount = new Dictionary<string, int>();
+        private Dictionary<String, List<float>> opponentSpeedsWindow = new Dictionary<string, List<float>>();
+
+        private int opponentSpeedsToAverage = 10;
 
         private SpeechRecogniser speechRecogniser;
         
@@ -974,11 +976,11 @@ namespace CrewChiefV4.PCars
             opponentData.DistanceRoundTrack = distanceRoundTrack;
             float speed;
             Boolean validSpeed = true;
-            if ((currentWorldPosition[0] == 0 && currentWorldPosition[1] == 0) || (previousWorldPosition[0] == 0 && previousWorldPosition[1] == 0))
+            if (secondsSinceLastUpdate == 0)
             {
-                speed = previousSpeed;
+                speed = opponentData.Speed;
             }
-            else 
+            else
             {
                 speed = (float)Math.Sqrt(Math.Pow(currentWorldPosition[0] - previousWorldPosition[0], 2) + Math.Pow(currentWorldPosition[1] - previousWorldPosition[1], 2)) / secondsSinceLastUpdate;
             }
@@ -986,30 +988,25 @@ namespace CrewChiefV4.PCars
             {
                 // faster than 500m/s (1000+mph) suggests the player has quit to the pit. Might need to reassess this as the data are quite noisy
                 validSpeed = false;
-                opponentData.Speed = 0;
+                speed = opponentData.Speed;
             }
-            else if (speed == 0 && previousSpeed > 5)
-            {
-                if (previousSpeedReuseCount.ContainsKey(opponentData.DriverRawName))
-                {
-                    if (previousSpeedReuseCount[opponentData.DriverRawName] > 5)
-                    {
-                        // we've reused 5 previous values, reset
-                        previousSpeedReuseCount[opponentData.DriverRawName] = 0;
-                    }
-                    else
-                    {
-                        speed = previousSpeed;
-                        previousSpeedReuseCount[opponentData.DriverRawName] = previousSpeedReuseCount[opponentData.DriverRawName] + 1;
-                    }
+            if (opponentSpeedsWindow.ContainsKey(opponentData.DriverRawName)) {
+                List<float> speeds = opponentSpeedsWindow[opponentData.DriverRawName];
+                if (speeds.Count() == opponentSpeedsToAverage) {
+                    speeds.RemoveAt(opponentSpeedsToAverage - 1);
                 }
-                else
-                {
-                    previousSpeedReuseCount.Add(opponentData.DriverRawName, 1);
-                    speed = previousSpeed;
+                speeds.Insert(0, speed);
+                float sum = 0f;
+                foreach (float item in speeds) {
+                    sum += item;
                 }
+                opponentData.Speed = sum / speeds.Count();
+            } else {
+                List<float> speeds = new List<float>();
+                speeds.Add(speed);
+                opponentSpeedsWindow.Add(opponentData.DriverRawName, speeds);
+                opponentData.Speed = speed;
             }
-            opponentData.Speed = speed;
             opponentData.Position = racePosition;
             opponentData.UnFilteredPosition = racePosition;
             opponentData.WorldPosition = currentWorldPosition;

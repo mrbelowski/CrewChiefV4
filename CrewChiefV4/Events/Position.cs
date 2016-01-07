@@ -157,7 +157,7 @@ namespace CrewChiefV4.Events
                         {
                             // TODO: check if we need to do a pit check here - don't think so
                             OpponentData carWeJustPassed = currentGameState.OpponentData[currentOpponentBehindKey];
-                            if (carWeJustPassed.CompletedLaps == currentGameState.SessionData.CompletedLaps)
+                            if (carWeJustPassed.CompletedLaps == currentGameState.SessionData.CompletedLaps && carWeJustPassed.CarClass == currentGameState.carClass)
                             {
                                 timeWhenWeMadeAPass = currentGameState.Now;
                                 opponentKeyForCarWeJustPassed = currentOpponentBehindKey;
@@ -171,7 +171,7 @@ namespace CrewChiefV4.Events
                         {
                             // TODO: check if we need to do a pit check here - don't think so
                             OpponentData carThatJustPassedUs = currentGameState.OpponentData[currentOpponentAheadKey];
-                            if (carThatJustPassedUs.CompletedLaps == currentGameState.SessionData.CompletedLaps)
+                            if (carThatJustPassedUs.CompletedLaps == currentGameState.SessionData.CompletedLaps && carThatJustPassedUs.CarClass == currentGameState.carClass)
                             {
                                 timeWhenWeWerePassed = currentGameState.Now;
                                 opponentKeyForCarThatJustPassedUs = currentOpponentAheadKey;
@@ -212,7 +212,7 @@ namespace CrewChiefV4.Events
                     {
                         // check the pass is still valid
                         if (!currentGameState.SessionData.CurrentLapIsValid || carWeJustPassed.isEnteringPits() ||
-                                Math.Abs(carWeJustPassed.Speed - currentGameState.PositionAndMotionData.CarSpeed) > maxSpeedDifferenceForReportablePass)
+                                currentGameState.PositionAndMotionData.CarSpeed - carWeJustPassed.Speed > maxSpeedDifferenceForReportablePass)
                         {
                             opponentKeyForCarWeJustPassed = null;
                             gapsAhead.Clear();
@@ -250,7 +250,7 @@ namespace CrewChiefV4.Events
                     {
                         // check the pass is still valid - no lap validity check here because we're being passed
                         if (carThatJustPassedUs.isEnteringPits() ||
-                                Math.Abs(carThatJustPassedUs.Speed - currentGameState.PositionAndMotionData.CarSpeed) > maxSpeedDifferenceForReportablePass)
+                                carThatJustPassedUs.Speed - currentGameState.PositionAndMotionData.CarSpeed > maxSpeedDifferenceForReportablePass)
                         {
                             opponentKeyForCarThatJustPassedUs = null;
                             gapsBehind.Clear();
