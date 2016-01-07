@@ -62,9 +62,10 @@ namespace CrewChiefV4.Events
 
         private float minAverageGapForPassMessage;
         private float minAverageGapForBeingPassedMessage;
-        private int passCheckSamplesToCheck ;
-        private int beingPassedCheckSamplesToCheck;
-        private float maxSpeedDifferenceForReportablePass = 10;
+        private int passCheckSamplesToCheck = 100;
+        private int beingPassedCheckSamplesToCheck = 100;
+        private float maxSpeedDifferenceForReportablePass = 0;
+        private float maxSpeedDifferenceForReportableBeingPassed = 0;
         private float minTimeDeltaForPassToBeCompleted = 0.15f;
         private TimeSpan minTimeBetweenOvertakeMessages;
 
@@ -89,8 +90,16 @@ namespace CrewChiefV4.Events
             // 9 means you need to be < 4.5 seconds apart for at least 11 seconds
             minAverageGapForPassMessage = 0.2f * (float)frequencyOfOvertakingMessages;
             minAverageGapForBeingPassedMessage = 0.4f * (float)frequencyOfBeingOvertakenMessages;
-            passCheckSamplesToCheck = (int)(100 / frequencyOfOvertakingMessages);
-            beingPassedCheckSamplesToCheck = (int)(100 / frequencyOfBeingOvertakenMessages);
+            if (frequencyOfOvertakingMessages > 0)
+            {
+                passCheckSamplesToCheck = (int)(100 / frequencyOfOvertakingMessages);
+                maxSpeedDifferenceForReportablePass = frequencyOfOvertakingMessages + 2;
+            }
+            if (frequencyOfBeingOvertakenMessages > 0)
+            {
+                beingPassedCheckSamplesToCheck = (int)(100 / frequencyOfBeingOvertakenMessages);
+                maxSpeedDifferenceForReportableBeingPassed = frequencyOfBeingOvertakenMessages + 2;
+            }
 
             minTimeBetweenOvertakeMessages = TimeSpan.FromSeconds(20);
         }
@@ -250,7 +259,7 @@ namespace CrewChiefV4.Events
                     {
                         // check the pass is still valid - no lap validity check here because we're being passed
                         if (carThatJustPassedUs.isEnteringPits() ||
-                                carThatJustPassedUs.Speed - currentGameState.PositionAndMotionData.CarSpeed > maxSpeedDifferenceForReportablePass)
+                                carThatJustPassedUs.Speed - currentGameState.PositionAndMotionData.CarSpeed > maxSpeedDifferenceForReportableBeingPassed)
                         {
                             opponentKeyForCarThatJustPassedUs = null;
                             gapsBehind.Clear();
