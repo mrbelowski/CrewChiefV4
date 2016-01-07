@@ -1255,5 +1255,17 @@ namespace CrewChiefV4.Properties {
                 this["enable_pcars_opponent_class_detection"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string override_default_sound_pack_location {
+            get {
+                return ((string)(this["override_default_sound_pack_location"]));
+            }
+            set {
+                this["override_default_sound_pack_location"] = value;
+            }
+        }
     }
 }

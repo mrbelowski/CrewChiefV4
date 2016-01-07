@@ -135,11 +135,7 @@ namespace CrewChiefV4.Events
         private Boolean lapIsValid;
 
         private LastLapRating lastLapRating;
-
-        private TimeSpan deltaPlayerBestToSessionBestInClass;
-
-        private Boolean deltaPlayerBestToSessionBestInClassSet = false;
-
+        
         private TimeSpan deltaPlayerLastToSessionBestInClass;
 
         private Boolean deltaPlayerLastToSessionBestInClassSet = false;
@@ -198,9 +194,7 @@ namespace CrewChiefV4.Events
             lastConsistencyMessage = ConsistencyResult.NOT_APPLICABLE;
             lapIsValid = true;
             lastLapRating = LastLapRating.NO_DATA;
-            deltaPlayerBestToSessionBestInClass = TimeSpan.MaxValue;
             deltaPlayerLastToSessionBestInClass = TimeSpan.MaxValue;
-            deltaPlayerBestToSessionBestInClassSet = false;
             deltaPlayerLastToSessionBestInClassSet = false;
             lastLapTime = 0;
             bestLapTime = 0;
@@ -216,6 +210,7 @@ namespace CrewChiefV4.Events
             this.currentGameState = currentGameState;
             if (currentGameState.SessionData.IsNewLap)
             {
+                deltaPlayerLastToSessionBestInClassSet = false;
                 if (currentGameState.SessionData.LapTimePrevious > 0)
                 {
                     if (currentGameState.OpponentData.Count > 0)
@@ -232,16 +227,6 @@ namespace CrewChiefV4.Events
                         deltaPlayerLastToSessionBestInClass = TimeSpan.FromSeconds(currentGameState.SessionData.LapTimePrevious - currentGameState.SessionData.PlayerLapTimeSessionBest);
                         deltaPlayerLastToSessionBestInClassSet = true;
                     }
-                    if (currentGameState.SessionData.LapTimePrevious <= currentGameState.SessionData.PlayerLapTimeSessionBest)
-                    {
-                        deltaPlayerBestToSessionBestInClass = deltaPlayerLastToSessionBestInClass;
-                        deltaPlayerBestToSessionBestInClassSet = true;
-                    }
-                }
-                else
-                {
-                    // the last lap was invalid so the delta is undefined
-                    deltaPlayerLastToSessionBestInClassSet = false;
                 }
             }
             currentPosition = currentGameState.SessionData.Position;
@@ -286,7 +271,7 @@ namespace CrewChiefV4.Events
                 }
             }
 
-            if (!currentGameState.PitData.OnInLap && !currentGameState.PitData.OnOutLap)
+            if (!currentGameState.PitData.OnInLap && !previousGameState.PitData.OnOutLap)   // as this is a new lap, check whether the *previous* state was an outlap
             {
                 Boolean sectorsReportedForLap = false;                
                 if (currentGameState.SessionData.IsNewLap && 
@@ -325,24 +310,24 @@ namespace CrewChiefV4.Events
                                 playedLapTime = true;
                             }
 
-                            if (deltaPlayerBestToSessionBestInClassSet && 
+                            if (deltaPlayerLastToSessionBestInClassSet && 
                                 (currentGameState.SessionData.SessionType == SessionType.Qualify || currentGameState.SessionData.SessionType == SessionType.Practice ||
                                 currentGameState.SessionData.SessionType == SessionType.HotLap))
                             {
                                 if (currentGameState.SessionData.SessionType == SessionType.HotLap || currentGameState.OpponentData.Count == 0)
                                 {
-                                    if (lastLapRating == LastLapRating.BEST_IN_CLASS || (deltaPlayerBestToSessionBestInClass <= TimeSpan.Zero))
+                                    if (lastLapRating == LastLapRating.BEST_IN_CLASS || (deltaPlayerLastToSessionBestInClass <= TimeSpan.Zero))
                                     {
                                         audioPlayer.queueClip(new QueuedMessage(folderPersonalBest, 0, this));
                                     }
-                                    else if (deltaPlayerBestToSessionBestInClass < TimeSpan.FromMilliseconds(50))
+                                    else if (deltaPlayerLastToSessionBestInClass < TimeSpan.FromMilliseconds(50))
                                     {
                                         audioPlayer.queueClip(new QueuedMessage(folderLessThanATenthOffThePace, 0, this));
                                     }
-                                    else if (deltaPlayerBestToSessionBestInClass < TimeSpan.MaxValue)
+                                    else if (deltaPlayerLastToSessionBestInClass < TimeSpan.MaxValue)
                                     {
                                         audioPlayer.queueClip(new QueuedMessage("lapTimeNotRaceGap",
-                                            MessageContents(folderGapIntro, deltaPlayerBestToSessionBestInClass, folderGapOutroOffPace), 0, this));
+                                            MessageContents(folderGapIntro, deltaPlayerLastToSessionBestInClass, folderGapOutroOffPace), 0, this));
                                     }
                                     if (practiceAndQualSectorReportsLapEnd && frequencyOfPracticeAndQualSectorDeltaReports > random.NextDouble() * 10)
                                     {
@@ -358,9 +343,10 @@ namespace CrewChiefV4.Events
                                     // need to be careful with the rating here as it's based on the known opponent laps, and we may have joined the session part way through
                                 else if (currentGameState.SessionData.Position == 1) 
                                 {
+                                    // TODO: rework this grotty logic...
                                     Boolean newGapToSecond = false;
                                     if (previousGameState != null && previousGameState.SessionData.Position > 1)
-                                    {
+                                    {                                        
                                         newGapToSecond = true;
                                         if (currentGameState.SessionData.SessionType == SessionType.Qualify)
                                         {
@@ -371,14 +357,13 @@ namespace CrewChiefV4.Events
                                             audioPlayer.queueClip(new QueuedMessage(Position.folderStub + 1, 0, this));
                                         }
                                     }
-                                    else if (deltaPlayerLastToSessionBestInClass < lastGapToSecondWhenLeadingPracOrQual)
+                                    if (deltaPlayerLastToSessionBestInClass < lastGapToSecondWhenLeadingPracOrQual)
                                     {
                                         newGapToSecond = true;
                                         lastGapToSecondWhenLeadingPracOrQual = deltaPlayerLastToSessionBestInClass;
                                     }
                                     if (newGapToSecond)
                                     {
-                                        lastGapToSecondWhenLeadingPracOrQual = deltaPlayerLastToSessionBestInClass;
                                         TimeSpan gapBehind = deltaPlayerLastToSessionBestInClass.Negate();
                                         // only play qual / prac deltas for Raceroom as the PCars data is inaccurate for sessions joined part way through
                                         if ((!disablePCarspracAndQualPoleDeltaReports || 
@@ -400,7 +385,7 @@ namespace CrewChiefV4.Events
                                     }
                                     // don't read this message if the rounded time gap is 0.0 seconds or it's more than 59 seconds
                                     // only play qual / prac deltas for Raceroom as the PCars data is inaccurate for sessions joined part way through
-                                    if ((!disablePCarspracAndQualPoleDeltaReports || CrewChief.gameDefinition.gameEnum == GameDefinition.raceRoom.gameEnum) && 
+                                    if ((!disablePCarspracAndQualPoleDeltaReports || CrewChief.gameDefinition.gameEnum == GameDefinition.raceRoom.gameEnum) &&
                                         (deltaPlayerLastToSessionBestInClass.Seconds > 0 || deltaPlayerLastToSessionBestInClass.Milliseconds > 50) &&
                                         deltaPlayerLastToSessionBestInClass.Seconds < 60)
                                     {
@@ -912,7 +897,6 @@ namespace CrewChiefV4.Events
                                 audioPlayer.queueClip(new QueuedMessage("lapTimeNotRaceGap",
                                     MessageContents(folderGapIntro, gapBehind, folderQuickerThanSecondPlace), 0, this));
                             }
-                            
                         }
                         else if (deltaPlayerLastToSessionBestInClass.Seconds == 0 && deltaPlayerLastToSessionBestInClass.Milliseconds < 50)
                         {
