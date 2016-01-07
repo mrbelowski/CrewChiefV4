@@ -33,7 +33,7 @@ namespace CrewChiefV4.RaceRoom
 
         private float carWidth = 1.8f;
 
-        private DateTime previousTime;
+        private DateTime previousTime = DateTime.Now;
 
         public R3ESpotterv2(AudioPlayer audioPlayer, Boolean initialEnabledState)
         {
@@ -46,6 +46,7 @@ namespace CrewChiefV4.RaceRoom
         public void clearState()
         {
             audioPlayer.closeChannel();
+            previousTime = DateTime.Now;
         }
 
         public void pause()

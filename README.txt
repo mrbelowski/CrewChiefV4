@@ -2,6 +2,10 @@ CrewChief version 4.
 
 Changelog
 ---------
+Version 4.0.2.0: Added optional default sound pack installation location override property ('override_default_sound_pack_location'); Fixed RaceRoom spotter ghost calls at some tracks; reworked laptime comparisons for practice and qual sessions; fixed "where's p X" response.
+
+Version 4.0.1.0: Fixed sound pack installation location - this now uses /Users/[username]/AppData/Local/CrewChiefV4/sounds
+
 Version 4.0.0.0: Initial release of version 4. The app now comes packaged as a single auto-updating .msi installer and includes integrated sound and driver names pack updating. The spotter has been overhauled, brake temp messages fixed, and car class and driver names for RaceRoom Formula 2 drivers have been added.
 
 
@@ -108,17 +112,6 @@ Updating the app
 If a new version of the app is available the auto updater will prompt you to download it. This will download and run a new .msi installer - just point it at the existing install location and it'll update your old installation. It won't remove your existing sound pack or your settings.
 
 If a new sound pack or driver names pack is available the appropriate Download button(s) will be enabled - these will download and unpack the updated sounds / driver names, then restart the application.
-
-If the sounds download fails you can manually update to the latest version by downloading the sounds and / or driver names packs and unzipping them over your existing installation.
-
-The app, the voice recognition packs, and the sound pack, and the driver names pack are all available separately. To install a new version of the app, simply download the CrewChiefV4.x.y_no_sounds and unzip it over the top of your existing installation. If the sound pack also needs to be updated, when you run the app you'll get an error in the console window telling you to update the sound pack. To do this, download the latest sound pack and replace the existing one with this new one. If you want to update your driver names, you can download the latest driver_names pack and unzip this into your install directory, overwriting the /sounds/driver_names folder. At the time of writing, I plan to keep adding to the driver_names package, making it a single ever-growing set of names, rather than releasing names in small chunks. But that might change.
-
-the full app with sounds & driver names can be downloaded here 	 : https://drive.google.com/file/d/0B4KQS820QNFbN1VfZHRZMDdSc1k/view?usp=sharing
-the application (with no sounds) can be downloaded here    		 : https://drive.google.com/file/d/0B4KQS820QNFbdGF6X2xhZzk3aG8/view?usp=sharing
-the sound pack can be downloaded here 	 						 : https://drive.google.com/file/d/0B4KQS820QNFbM0xoWVExOERnR2s/view?usp=sharing
-the 'lo-fi' (more radio-like) sound pack can be downloaded here  : https://drive.google.com/file/d/0B4KQS820QNFbS0N3emliWW9ONHc/view?usp=sharing
-the latest driver names can be downloaded here                 	 : https://drive.google.com/file/d/0B4KQS820QNFbZHRlUmxfOVV3NHc/view?usp=sharing
-the latest 'lo-fi' driver names can be downloaded here           : https://drive.google.com/file/d/0B4KQS820QNFbdEd2b1FFQS1ldFE/view?usp=sharing
 
 the 64bit speech recognition installers can be downloaded here 	 : https://drive.google.com/file/d/0B4KQS820QNFbY05tVnhiNVFnYkU/view?usp=sharing
 the 32bit speech recognition installers can be downloaded here   : https://drive.google.com/file/d/0B4KQS820QNFbRVJrVjU4X1NxSEU/view?usp=sharing
