@@ -59,75 +59,85 @@ namespace CrewChiefV4
 
         private void FormMain_Load(object sender, EventArgs e)
         {
-            //Uncomment below line to see Russian version
-
-            //AutoUpdater.CurrentCulture = CultureInfo.CreateSpecificCulture("ru-RU");
-
-            //If you want to open download page when user click on download button uncomment below line.
-
-            //AutoUpdater.OpenDownloadPage = true;
-
-            //Don't want user to select remind later time in AutoUpdater notification window then uncomment 3 lines below so default remind later time will be set to 2 days.
-
-            //AutoUpdater.LetUserSelectRemindLater = false;
-            //AutoUpdater.RemindLaterTimeSpan = RemindLaterFormat.Days;
-            //AutoUpdater.RemindLaterAt = 2;
-
-            try
+            // do the auto updating stuff in a separate Thread
+            new Thread(() =>
             {
-                AutoUpdater.Start(autoUpdateXMLURL);
-                // now get the latest sound pack versions
-                string xml = new WebClient().DownloadString(autoUpdateXMLURL);
-                XDocument doc = XDocument.Parse(xml);
-                float.TryParse(doc.Descendants("soundpackversion").First().Value, out latestSoundPackVersion);
-                float.TryParse(doc.Descendants("drivernamesversion").First().Value, out latestDriverNamesVersion);
-                baseSoundPackDownloadLocation = doc.Descendants("basesoundpackurl").First().Value;
-                baseDriverNamesDownloadLocation = doc.Descendants("basedrivernamesurl").First().Value;
-                updateSoundPackDownloadLocation = doc.Descendants("updatesoundpackurl").First().Value;
-                updateDriverNamesDownloadLocation = doc.Descendants("updatedrivernamesurl").First().Value;
-            }
-            catch (Exception error)
-            {
-                Console.WriteLine("Unable to get auto update details: " + error.Message);
-            }
-            if (latestSoundPackVersion == -1 && AudioPlayer.soundPackVersion == -1)
-            {
-                downloadSoundPackButton.Text = "No sound pack detected, unable to locate update";
-                downloadSoundPackButton.Enabled = false;
-            }
-            else if (latestSoundPackVersion > AudioPlayer.soundPackVersion)
-            {
-                downloadSoundPackButton.Enabled = true;
-                if (AudioPlayer.soundPackVersion == -1)
+                Thread.CurrentThread.IsBackground = true;                
+                try
                 {
-                    downloadSoundPackButton.Text = "No sound pack detected, press to download";
-                    getBaseSoundPack = true;
+                    AutoUpdater.Start(autoUpdateXMLURL);
                 }
-                else
+                catch (Exception)
                 {
-                    downloadSoundPackButton.Text = "Updated sound pack available, press to download";
+                    Console.WriteLine("Unable to start auto updater");
                 }
-                newSoundPackAvailable = true;
-            }
-            if (latestDriverNamesVersion == -1 && AudioPlayer.driverNamesVersion == -1) {
-                downloadDriverNamesButton.Text = "No driver names detected, unable to locate update";
-                downloadDriverNamesButton.Enabled = false;
-            } 
-            else if (latestDriverNamesVersion > AudioPlayer.driverNamesVersion)
-            {
-                downloadDriverNamesButton.Enabled = true;
-                if (AudioPlayer.driverNamesVersion == -1)
+                try 
                 {
-                    downloadDriverNamesButton.Text = "No driver names detected, press to download";
-                    getBaseDriverNames = true;
+                    // now the sound packs
+                    downloadSoundPackButton.Text = "Checking sound pack version...";
+                    downloadDriverNamesButton.Text = "Checking driver names version...";
+                    string xml = new WebClient().DownloadString(autoUpdateXMLURL);
+                    XDocument doc = XDocument.Parse(xml);
+                    float.TryParse(doc.Descendants("soundpackversion").First().Value, out latestSoundPackVersion);
+                    float.TryParse(doc.Descendants("drivernamesversion").First().Value, out latestDriverNamesVersion);
+                    baseSoundPackDownloadLocation = doc.Descendants("basesoundpackurl").First().Value;
+                    baseDriverNamesDownloadLocation = doc.Descendants("basedrivernamesurl").First().Value;
+                    updateSoundPackDownloadLocation = doc.Descendants("updatesoundpackurl").First().Value;
+                    updateDriverNamesDownloadLocation = doc.Descendants("updatedrivernamesurl").First().Value;
+                    if (latestSoundPackVersion == -1 && AudioPlayer.soundPackVersion == -1)
+                    {
+                        downloadSoundPackButton.Text = "No sound pack detected, unable to locate update";
+                        downloadSoundPackButton.Enabled = false;
+                    }
+                    else if (latestSoundPackVersion > AudioPlayer.soundPackVersion)
+                    {
+                        downloadSoundPackButton.Enabled = true;
+                        if (AudioPlayer.soundPackVersion == -1)
+                        {
+                            downloadSoundPackButton.Text = "No sound pack detected, press to download";
+                            getBaseSoundPack = true;
+                        }
+                        else
+                        {
+                            downloadSoundPackButton.Text = "Updated sound pack available, press to download";
+                        }
+                        newSoundPackAvailable = true;
+                        downloadSoundPackButton.Enabled = false;
+                    }
+                    else
+                    {
+                        downloadSoundPackButton.Text = "Sound pack is up to date";
+                    }
+                    if (latestDriverNamesVersion == -1 && AudioPlayer.driverNamesVersion == -1) {
+                        downloadDriverNamesButton.Text = "No driver names detected, unable to locate update";
+                        downloadDriverNamesButton.Enabled = false;
+                    } 
+                    else if (latestDriverNamesVersion > AudioPlayer.driverNamesVersion)
+                    {
+                        downloadDriverNamesButton.Enabled = true;
+                        if (AudioPlayer.driverNamesVersion == -1)
+                        {
+                            downloadDriverNamesButton.Text = "No driver names detected, press to download";
+                            getBaseDriverNames = true;
+                        }
+                        else
+                        {
+                            downloadDriverNamesButton.Text = "Updated driver names available, press to download";
+                        }
+                        newDriverNamesAvailable = true;
+                    }
+                    else
+                    {
+                        downloadDriverNamesButton.Text = "Driver names are up to date";
+                        downloadDriverNamesButton.Enabled = false;
+                    }
                 }
-                else
+                catch (Exception error)
                 {
-                    downloadDriverNamesButton.Text = "Updated driver names available, press to download";
+                    Console.WriteLine("Unable to get auto update details: " + error.Message);
                 }
-                newDriverNamesAvailable = true;
-            }
-        }
+            }).Start();
+        }            
                 
         private void messagesVolumeSlider_Scroll(object sender, EventArgs e)
         {
