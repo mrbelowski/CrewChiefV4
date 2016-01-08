@@ -2,6 +2,8 @@ CrewChief version 4.
 
 Changelog
 ---------
+Version 4.0.3.0: Fixed overtaking messages in PCars (caused by noise in the opponent speed data - this is now based on a sliding average); Fixed baseline engine temperature calculations for RaceRoom; Corrected brake temp thresholds and engine damage thresholds; Some internal bug fixes in the spotter and numeric message handling; Do auto update checks in a background Thread; Fixed session time left reporting
+
 Version 4.0.2.0: Added optional default sound pack installation location override property ('override_default_sound_pack_location'); Fixed RaceRoom spotter ghost calls at some tracks; reworked laptime comparisons for practice and qual sessions; fixed "where's p X" response.
 
 Version 4.0.1.0: Fixed sound pack installation location - this now uses /Users/[username]/AppData/Local/CrewChiefV4/sounds
@@ -64,6 +66,7 @@ I've not finished implementing this but currently the app understands and respon
 "do I still have a penalty / do I have a penalty / have I served my penalty"
 "do I have to pit / do I need to pit / do I have a mandatory pit stop / do I have a mandatory stop / do I have to make a pit stop"
 "where's [opponent driver last name]"
+"where's P [opponent position]"
 "what's [opponent driver last name]'s last lap"
 "what's [opponent driver last name]'s best lap"
 "what's [opponent race position]'s last lap" (for example, "what's p 4's best lap", or "what's position 4's last lap")
@@ -82,6 +85,8 @@ I've not finished implementing this but currently the app understands and respon
 "don't tell me the gaps / don't tell me the deltas / no more gaps / no more deltas" (switch off deltas mode)
 "repeat last message / say again" (replays the last message)
 "What's the air temp / what's the air temperature / what's the track temp / what's the track temperature" (current air / track temps in celsius)
+"What are my [brake / tyre] [temperatures / temps]"
+
 
 
 Other button assignments
