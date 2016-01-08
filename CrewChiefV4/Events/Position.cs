@@ -415,9 +415,17 @@ namespace CrewChiefV4.Events
                     audioPlayer.playClipImmediately(new QueuedMessage(folderLeading, 0, this), false);
                     audioPlayer.closeChannel();
                 }
-                else
-                {
-                    audioPlayer.playClipImmediately(new QueuedMessage(folderStub + currentPosition, 0, this), false);
+                else if (currentPosition > 0) {
+                    if (currentPosition < 25) {
+                        audioPlayer.playClipImmediately(new QueuedMessage(folderStub + currentPosition, 0, this), false);
+                        audioPlayer.closeChannel();
+                    } else {
+                        audioPlayer.playClipImmediately(new QueuedMessage("position", MessageContents(currentPosition), 0, this), false);
+                        audioPlayer.closeChannel();
+                    }
+                }
+                else {
+                    audioPlayer.playClipImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null), false);
                     audioPlayer.closeChannel();
                 }
             }
