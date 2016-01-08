@@ -128,7 +128,8 @@ namespace CrewChiefV4.Events
             {
                 messageFragments.Add(MessageFragment.Opponent((OpponentData)o));
             }
-            else if (o.GetType() == typeof(int))
+            else if (o.GetType() == typeof(int) || o.GetType() == typeof(double) || o.GetType() == typeof(float) ||
+                o.GetType() == typeof(short) || o.GetType() == typeof(long) || o.GetType() == typeof(decimal) || o.GetType() == typeof(uint))
             {
                 messageFragments.Add(MessageFragment.Integer((int)o));
             } 

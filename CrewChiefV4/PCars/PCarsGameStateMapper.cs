@@ -41,10 +41,10 @@ namespace CrewChiefV4.PCars
             (uint)eTerrain.TERRAIN_LOW_GRIP_ROAD, (uint)eTerrain.TERRAIN_MARBLES,(uint)eTerrain.TERRAIN_PAVEMENT,
             (uint)eTerrain.TERRAIN_ROAD, (uint)eTerrain.TERRAIN_RUMBLE_STRIPS, (uint)eTerrain.TERRAIN_SAND_ROAD};
 
-        private float trivialEngineDamageThreshold = 0.02f;
-        private float minorEngineDamageThreshold = 0.10f;
-        private float severeEngineDamageThreshold = 0.35f;
-        private float destroyedEngineDamageThreshold = 0.80f;
+        private float trivialEngineDamageThreshold = 0.1f;
+        private float minorEngineDamageThreshold = 0.30f;
+        private float severeEngineDamageThreshold = 0.65f;
+        private float destroyedEngineDamageThreshold = 0.90f;
 
         private float trivialSuspensionDamageThreshold = 0.02f;
         private float minorSuspensionDamageThreshold = 0.10f;

@@ -139,13 +139,16 @@ namespace CrewChiefV4.PCars
                             currentOpponentPositions.Add(currentPositions);
                         }
                     }
-                    float playerRotation = currentState.mOrientation[1];
-                    if (playerRotation < 0)
+                    if (currentOpponentPositions.Count() > 0)
                     {
-                        playerRotation = (float)(2 * Math.PI) + playerRotation;
+                        float playerRotation = currentState.mOrientation[1];
+                        if (playerRotation < 0)
+                        {
+                            playerRotation = (float)(2 * Math.PI) + playerRotation;
+                        }
+                        playerRotation = (float)(2 * Math.PI) - playerRotation;
+                        internalSpotter.triggerInternal(playerRotation, currentPlayerPosition, playerVelocityData, currentOpponentPositions);
                     }
-                    playerRotation = (float)(2 * Math.PI) - playerRotation;
-                    internalSpotter.triggerInternal(playerRotation, currentPlayerPosition, playerVelocityData, currentOpponentPositions);
                 }
             }
         }

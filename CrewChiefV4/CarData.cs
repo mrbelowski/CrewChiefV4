@@ -31,25 +31,23 @@ namespace CrewChiefV4
         private static float maxColdBiasPlyTyreTempPeak = 70;
         private static float maxWarmBiasPlyTyreTempPeak = 100;
         private static float maxHotBiasPlyTyreTempPeak = 120;
-
-
+        
         private static float maxColdIronRoadBrakeTemp = 80;
-        private static float maxWarmIronRoadBrakeTemp = 300;
-        private static float maxHotIronRoadBrakeTemp = 600;
+        private static float maxWarmIronRoadBrakeTemp = 500;
+        private static float maxHotIronRoadBrakeTemp = 750;
 
         private static float maxColdIronRaceBrakeTemp = 150;
-        private static float maxWarmIronRaceBrakeTemp = 500;
-        private static float maxHotIronRaceBrakeTemp = 700;
+        private static float maxWarmIronRaceBrakeTemp = 650;
+        private static float maxHotIronRaceBrakeTemp = 850;
 
         private static float maxColdCeramicBrakeTemp = 150;
-        private static float maxWarmCeramicBrakeTemp = 800;
-        private static float maxHotCeramicBrakeTemp = 1000;
+        private static float maxWarmCeramicBrakeTemp = 950;
+        private static float maxHotCeramicBrakeTemp = 1200;
 
         private static float maxColdCarbonBrakeTemp = 400;
         private static float maxWarmCarbonBrakeTemp = 1200;
-        private static float maxHotCarbonBrakeTemp = 1400;
-
-
+        private static float maxHotCarbonBrakeTemp = 1500;
+        
         private static float maxRoadSafeWaterTemp = 96;
         private static float maxRoadSafeOilTemp = 115;
 

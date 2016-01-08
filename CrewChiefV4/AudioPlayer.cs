@@ -109,7 +109,7 @@ namespace CrewChiefV4
 
         private PearlsOfWisdom pearlsOfWisdom;
 
-        DateTime timeLastPearlOfWisdomPlayed = DateTime.UtcNow;
+        DateTime timeLastPearlOfWisdomPlayed = DateTime.Now;
 
         private Boolean backgroundPlayerInitialised = false;
 
@@ -265,7 +265,7 @@ namespace CrewChiefV4
             catch (DirectoryNotFoundException)
             {
                 Console.WriteLine("Unable to find sounds directory");
-            }
+            }            
         }
 
         public void cacheDriverName(String driverName)
@@ -500,6 +500,7 @@ namespace CrewChiefV4
             {
                 if (requestChannelOpen)
                 {
+                    // TODO: port the android approach here - only open the channel when we hit the first message in the queue
                     openRadioChannelInternal();
                     requestChannelOpen = false;
                     holdChannelOpen = true;
@@ -762,10 +763,37 @@ namespace CrewChiefV4
             }
         }
 
+        private void playSyncWithRetry(String eventName, int retries)
+        {            
+            Boolean played = false;
+            try
+            {
+                List<SoundPlayer> clipsList = clips[eventName];
+                int index = random.Next(0, clipsList.Count);
+                SoundPlayer clip = clipsList[index];
+                DateTime start = DateTime.Now;
+                clip.PlaySync();
+                played = (DateTime.Now - start).TotalMilliseconds > 100;
+                if (!played) {
+                    Console.WriteLine("Failed to play clip " + eventName + " at index " + index + " after " + retries + " retries");
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error playing clip " + eventName + ", " + e.Message);
+            }
+            if (!played && retries < 3)            
+            {
+                playSyncWithRetry(eventName, retries++);
+            }
+        }
+
         private List<String> playSounds(List<String> eventNames, Boolean isImmediateMessages, out Boolean wasInterrupted)
         {
-            //Console.WriteLine("Playing sounds, events: " + String.Join(", ", eventNames));
+            Console.WriteLine("Playing sounds, events: " + String.Join(", ", eventNames));
             List<String> soundsProcessed = new List<String>();
+            List<String> clipsPlayed = new List<String>();
+
             OrderedDictionary thisQueue = isImmediateMessages ? immediateClips : queuedClips;
             wasInterrupted = false;
             int playedEventCount = 0;
@@ -805,13 +833,10 @@ namespace CrewChiefV4
                             }
                             else
                             {
-                                timeLastPearlOfWisdomPlayed = DateTime.UtcNow;
-                                List<SoundPlayer> clipsList = clips[eventName];
-                                int index = random.Next(0, clipsList.Count);
-                                SoundPlayer clip = clipsList[index];
+                                timeLastPearlOfWisdomPlayed = DateTime.Now;
                                 if (!mute)
                                 {
-                                    clip.PlaySync();
+                                    playSyncWithRetry(eventName, 0);
                                 }
                             }
                         }
@@ -820,12 +845,9 @@ namespace CrewChiefV4
                             lastMessagePlayed = thisMessage;
                             foreach (String message in thisMessage.messageFolders)
                             {
-                                List<SoundPlayer> clipsList = clips[message];
-                                int index = random.Next(0, clipsList.Count);
-                                SoundPlayer clip = clipsList[index];
                                 if (!mute)
                                 {
-                                    clip.PlaySync();
+                                    playSyncWithRetry(message, 0);
                                 }
                             }
                             if (playedMessagesCount.ContainsKey(eventName))
@@ -857,6 +879,7 @@ namespace CrewChiefV4
             else
             {
                 Console.WriteLine("*** Processed " + String.Join(", ", soundsProcessed.ToArray()));
+                Console.WriteLine("*** Played clips " + String.Join(", ", clipsPlayed.ToArray()));
             }
             return soundsProcessed;
         }
@@ -1145,6 +1168,7 @@ namespace CrewChiefV4
             {
                 if (immediateClips.Contains(eventName))
                 {
+                    Console.WriteLine("Removing immediate clip " + eventName);
                     immediateClips.Remove(eventName);
                     return true;
                 }
@@ -1219,7 +1243,7 @@ namespace CrewChiefV4
 
         private Boolean hasPearlJustBeenPlayed()
         {
-            return timeLastPearlOfWisdomPlayed.Add(minTimeBetweenPearlsOfWisdom) > DateTime.UtcNow;
+            return timeLastPearlOfWisdomPlayed.Add(minTimeBetweenPearlsOfWisdom) > DateTime.Now;
         }
 
         public void suspendPearlsOfWisdom()
