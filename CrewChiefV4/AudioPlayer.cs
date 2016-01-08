@@ -773,9 +773,10 @@ namespace CrewChiefV4
                 SoundPlayer clip = clipsList[index];
                 DateTime start = DateTime.Now;
                 clip.PlaySync();
-                played = (DateTime.Now - start).TotalMilliseconds > 100;
+                double waited = (DateTime.Now - start).TotalMilliseconds;
+                played = waited > 100;
                 if (!played) {
-                    Console.WriteLine("Failed to play clip " + eventName + " at index " + index + " after " + retries + " retries");
+                    Console.WriteLine("Failed to play clip " + eventName + " at index " + index + " after " + retries + " retries, waited " + waited + " ms");
                 }
             }
             catch (Exception e)

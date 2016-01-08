@@ -131,7 +131,7 @@ namespace CrewChiefV4.Events
             else if (o.GetType() == typeof(int) || o.GetType() == typeof(double) || o.GetType() == typeof(float) ||
                 o.GetType() == typeof(short) || o.GetType() == typeof(long) || o.GetType() == typeof(decimal) || o.GetType() == typeof(uint))
             {
-                messageFragments.Add(MessageFragment.Integer((int)o));
+                messageFragments.Add(MessageFragment.Integer(Convert.ToInt32(o)));
             } 
         }
 
