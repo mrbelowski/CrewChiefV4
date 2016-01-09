@@ -727,7 +727,7 @@ namespace CrewChiefV4.Events
                 }
                 audioPlayer.closeChannel();
             }
-            if (voiceMessage.Contains(SpeechRecogniser.WHATS_MY_LAST_SECTOR_TIME))
+            else if (voiceMessage.Contains(SpeechRecogniser.WHATS_MY_LAST_SECTOR_TIME))
             {
                 if (currentGameState.SessionData.SectorNumber == 1 && currentGameState.SessionData.LastSector3Time > -1)
                 {
@@ -750,13 +750,28 @@ namespace CrewChiefV4.Events
                 }
                 audioPlayer.closeChannel();
             }
-            if ((voiceMessage.Contains(SpeechRecogniser.LAST_LAP_TIME) ||
+            else if (voiceMessage.Contains(SpeechRecogniser.BEST_LAP) ||
+                voiceMessage.Contains(SpeechRecogniser.BEST_LAP_TIME))
+            {
+                if (bestLapTime > 0)
+                {
+                    audioPlayer.playClipImmediately(new QueuedMessage("bestLapTime",
+                        MessageContents(TimeSpan.FromSeconds(bestLapTime)), 0, this), false);
+                    audioPlayer.closeChannel();
+                }
+                else
+                {
+                    audioPlayer.playClipImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, this), false);
+                    audioPlayer.closeChannel();
+                }
+            }
+            else if ((voiceMessage.Contains(SpeechRecogniser.LAST_LAP_TIME) ||
                 voiceMessage.Contains(SpeechRecogniser.LAP_TIME) ||
                 voiceMessage.Contains(SpeechRecogniser.LAST_LAP)))
             {
                 if (lastLapTime > 0)
                 {
-                    audioPlayer.playClipImmediately(new QueuedMessage("lasTLapTime",
+                    audioPlayer.playClipImmediately(new QueuedMessage("lastLapTime",
                         MessageContents(folderLapTimeIntro, TimeSpan.FromSeconds(lastLapTime)), 0, this), false);
                     audioPlayer.closeChannel();
                 }
@@ -765,22 +780,7 @@ namespace CrewChiefV4.Events
                     audioPlayer.playClipImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, this), false);
                     audioPlayer.closeChannel();
                 }
-            }
-            if (voiceMessage.Contains(SpeechRecogniser.BEST_LAP) ||
-                voiceMessage.Contains(SpeechRecogniser.BEST_LAP_TIME))
-            {
-                if (bestLapTime > 0)
-                {
-                    audioPlayer.playClipImmediately(new QueuedMessage("bestLapTime",
-                        MessageContents(folderLapTimeIntro, TimeSpan.FromSeconds(bestLapTime)), 0, this), false);
-                    audioPlayer.closeChannel();
-                }
-                else
-                {
-                    audioPlayer.playClipImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, this), false);
-                    audioPlayer.closeChannel();
-                }
-            }
+            }            
             else if (voiceMessage.Contains(SpeechRecogniser.PACE))
             {
                 if (sessionType == SessionType.Race)

@@ -63,7 +63,7 @@ namespace CrewChiefV4.Events
 
         private int fuelUseWindowLength = 3;
 
-        private List<float> fuelUseWindow;
+        private List<float> fuelUseWindow = new List<float>();
 
         private float gameTimeAtLastFuelWindowUpdate;
 

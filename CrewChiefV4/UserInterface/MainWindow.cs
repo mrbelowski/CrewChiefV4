@@ -102,7 +102,7 @@ namespace CrewChiefV4
                             downloadSoundPackButton.Text = "Updated sound pack available, press to download";
                         }
                         newSoundPackAvailable = true;
-                        downloadSoundPackButton.Enabled = false;
+                        downloadSoundPackButton.Enabled = true;
                     }
                     else
                     {
