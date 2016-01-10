@@ -93,12 +93,12 @@ namespace CrewChiefV4.Events
             if (frequencyOfOvertakingMessages > 0)
             {
                 passCheckSamplesToCheck = (int)(100 / frequencyOfOvertakingMessages);
-                maxSpeedDifferenceForReportablePass = frequencyOfOvertakingMessages + 2;
+                maxSpeedDifferenceForReportablePass = frequencyOfOvertakingMessages + 8;
             }
             if (frequencyOfBeingOvertakenMessages > 0)
             {
                 beingPassedCheckSamplesToCheck = (int)(100 / frequencyOfBeingOvertakenMessages);
-                maxSpeedDifferenceForReportableBeingPassed = frequencyOfBeingOvertakenMessages + 2;
+                maxSpeedDifferenceForReportableBeingPassed = frequencyOfBeingOvertakenMessages + 8;
             }
 
             minTimeBetweenOvertakeMessages = TimeSpan.FromSeconds(20);

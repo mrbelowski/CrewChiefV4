@@ -73,7 +73,7 @@ namespace CrewChiefV4.PCars
 
         private Dictionary<String, List<float>> opponentSpeedsWindow = new Dictionary<string, List<float>>();
 
-        private int opponentSpeedsToAverage = 10;
+        private int opponentSpeedsToAverage = 20;
 
         private SpeechRecogniser speechRecogniser;
         

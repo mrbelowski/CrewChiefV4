@@ -179,7 +179,7 @@ namespace CrewChiefV4.PCars
                     float[] newWorldPositions = toFloatArray(newPartInfo.sWorldPosition, 1);
                     float xAdjustment = ((float)((uint)newPartInfo.sSector >> 6 & 3)) / 4f;
                     float zAdjustment = ((float)((uint)newPartInfo.sSector >> 4 & 3)) / 4f;
-                    
+
                     newWorldPositions[0] = newWorldPositions[0] + xAdjustment;
                     newWorldPositions[2] = newWorldPositions[2] + zAdjustment;
                     if (!existingState.hasNewPositionData && i != udpTelemetryData.sViewedParticipantIndex && 

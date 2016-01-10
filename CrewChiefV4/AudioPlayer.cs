@@ -793,7 +793,6 @@ namespace CrewChiefV4
         {
             Console.WriteLine("Playing sounds, events: " + String.Join(", ", eventNames));
             List<String> soundsProcessed = new List<String>();
-            List<String> clipsPlayed = new List<String>();
 
             OrderedDictionary thisQueue = isImmediateMessages ? immediateClips : queuedClips;
             wasInterrupted = false;
@@ -880,7 +879,6 @@ namespace CrewChiefV4
             else
             {
                 Console.WriteLine("*** Processed " + String.Join(", ", soundsProcessed.ToArray()));
-                Console.WriteLine("*** Played clips " + String.Join(", ", clipsPlayed.ToArray()));
             }
             return soundsProcessed;
         }
