@@ -25,10 +25,7 @@ namespace CrewChiefV4
 
     class NoisyCartesianCoordinateSpotter
     {
-
         private float calculateOpponentSpeedsEvery = 200f;
-
-        private int speedsToAverage = 7;
 
         private float carBehindExtraLength = 0.6f;
 
@@ -160,7 +157,7 @@ namespace CrewChiefV4
                                     opponentPreviousPositionAndVelocityData.xPosition = currentOpponentPosition[0];
                                     opponentPreviousPositionAndVelocityData.zPosition = currentOpponentPosition[1];
                                 }
-                                // we've updated this guys cached position and velocity, but we only need to check his speed if we don't already have an overlap
+                                // we've updated this guys cached position and velocity, but we only need to check his speed if we don't already have an overlap on both sides
                                 if (carsOnLeft == 0 || carsOnRight == 0)
                                 {
                                     isOpponentVelocityInRange = checkOpponentVelocityInRange(playerVelocityData[1], playerVelocityData[2],
