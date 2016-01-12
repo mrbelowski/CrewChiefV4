@@ -118,7 +118,7 @@ namespace CrewChiefV4.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("4.7")]
+        [global::System.Configuration.DefaultSettingValueAttribute("4.5")]
         public float r3e_spotter_car_length {
             get {
                 return ((float)(this["r3e_spotter_car_length"]));
@@ -178,7 +178,7 @@ namespace CrewChiefV4.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("7")]
+        [global::System.Configuration.DefaultSettingValueAttribute("10")]
         public float max_closing_speed_for_spotter {
             get {
                 return ((float)(this["max_closing_speed_for_spotter"]));
@@ -610,7 +610,7 @@ namespace CrewChiefV4.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("4.7")]
+        [global::System.Configuration.DefaultSettingValueAttribute("4.5")]
         public float pcars_spotter_car_length {
             get {
                 return ((float)(this["pcars_spotter_car_length"]));

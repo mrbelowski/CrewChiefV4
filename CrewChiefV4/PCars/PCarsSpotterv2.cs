@@ -31,10 +31,6 @@ namespace CrewChiefV4.PCars
 
         private Dictionary<String, List<float>> previousOpponentSpeeds = new Dictionary<String, List<float>>();
 
-        private float maxClosingSpeed = 30;
-
-        private float trackWidth = 10f;
-
         private float carWidth = 1.8f;
 
         private float udpMaxClosingSpeed = 60;
@@ -50,11 +46,11 @@ namespace CrewChiefV4.PCars
             this.initialEnabledState = initialEnabledState;
             if (CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_NETWORK)
             {
-                this.internalSpotter = new NoisyCartesianCoordinateSpotter(audioPlayer, initialEnabledState, carLength, udpCarWidth, udpTrackWidth, udpMaxClosingSpeed);
+                this.internalSpotter = new NoisyCartesianCoordinateSpotter(audioPlayer, initialEnabledState, carLength, udpCarWidth);
             }
             else
             {
-                this.internalSpotter = new NoisyCartesianCoordinateSpotter(audioPlayer, initialEnabledState, carLength, carWidth, trackWidth, maxClosingSpeed);
+                this.internalSpotter = new NoisyCartesianCoordinateSpotter(audioPlayer, initialEnabledState, carLength, carWidth);
             }
         }
 

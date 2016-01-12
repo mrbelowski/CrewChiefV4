@@ -27,7 +27,7 @@
       <Value Profile="(Default)">en</Value>
     </Setting>
     <Setting Name="r3e_spotter_car_length" Type="System.Single" Scope="User">
-      <Value Profile="(Default)">4.7</Value>
+      <Value Profile="(Default)">4.5</Value>
     </Setting>
     <Setting Name="spotter_gap_for_clear" Type="System.Single" Scope="User">
       <Value Profile="(Default)">0.5</Value>
@@ -42,7 +42,7 @@
       <Value Profile="(Default)">3</Value>
     </Setting>
     <Setting Name="max_closing_speed_for_spotter" Type="System.Single" Scope="User">
-      <Value Profile="(Default)">7</Value>
+      <Value Profile="(Default)">10</Value>
     </Setting>
     <Setting Name="spotter_only_when_being_passed" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
@@ -150,7 +150,7 @@
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="pcars_spotter_car_length" Type="System.Single" Scope="User">
-      <Value Profile="(Default)">4.7</Value>
+      <Value Profile="(Default)">4.5</Value>
     </Setting>
     <Setting Name="last_game_definition" Type="System.String" Scope="User">
       <Value Profile="(Default)" />

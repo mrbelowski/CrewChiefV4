@@ -27,10 +27,6 @@ namespace CrewChiefV4.RaceRoom
 
         private AudioPlayer audioPlayer;
 
-        private float maxClosingSpeed = 30;
-
-        private float trackWidth = 10f;
-
         private float carWidth = 1.8f;
 
         private DateTime previousTime = DateTime.Now;
@@ -40,7 +36,7 @@ namespace CrewChiefV4.RaceRoom
             this.audioPlayer = audioPlayer;
             this.enabled = initialEnabledState;
             this.initialEnabledState = initialEnabledState;
-            this.internalSpotter = new NoisyCartesianCoordinateSpotter(audioPlayer, initialEnabledState, carLength, carWidth, trackWidth, maxClosingSpeed);
+            this.internalSpotter = new NoisyCartesianCoordinateSpotter(audioPlayer, initialEnabledState, carLength, carWidth);
         }
 
         public void clearState()

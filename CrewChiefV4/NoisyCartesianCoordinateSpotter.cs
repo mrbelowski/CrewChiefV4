@@ -28,6 +28,8 @@ namespace CrewChiefV4
     {
         private int speedsToAverage = 7;
 
+        private float carBehindExtraLength = 0.6f;
+
         // if the audio player is in the middle of another message, this 'immediate' message will have to wait.
         // If it's older than 2000 milliseconds by the time the player's got round to playing it, it's expired
         private int clearMessageExpiresAfter = 2000;
@@ -56,9 +58,9 @@ namespace CrewChiefV4
         private Boolean hasCarLeft;
         private Boolean hasCarRight;
 
-        private float trackWidth;
+        private float trackZoneToConsider = 15f;
         private float carWidth;
-        private float maxClosingSpeed;
+        private float maxClosingSpeed = UserSettings.GetUserSettings().getFloat("max_closing_speed_for_spotter");
 
         private String folderStillThere = "spotter/still_there";
         private String folderInTheMiddle = "spotter/in_the_middle";
@@ -94,27 +96,19 @@ namespace CrewChiefV4
             right, left, none
         }
 
-        private Dictionary<int, Side> lastKnownOpponentState = new Dictionary<int, Side>();
-
-        private Dictionary<int, int> lastKnownOpponentStateUseCounter = new Dictionary<int, int>();
-
         private Dictionary<int, PreviousPositionAndVelocityData> previousPositionAndVelocityData = new Dictionary<int, PreviousPositionAndVelocityData>();
-
-        private int maxSavedStateReuse = 10;
 
         private enum NextMessageType
         {
             none, clearLeft, clearRight, clearAllRound, carLeft, carRight, threeWide, stillThere
         }
 
-        public NoisyCartesianCoordinateSpotter(AudioPlayer audioPlayer, Boolean initialEnabledState, float carLength, float carWidth, float trackWidth, float maxClosingSpeed)
+        public NoisyCartesianCoordinateSpotter(AudioPlayer audioPlayer, Boolean initialEnabledState, float carLength, float carWidth)
         {
             this.audioPlayer = audioPlayer;
             this.carLength = carLength;
             this.longCarLength = carLength + gapNeededForClear;
             this.carWidth = carWidth;
-            this.trackWidth = trackWidth;
-            this.maxClosingSpeed = maxClosingSpeed;
         }
 
         public void clearState()
@@ -126,8 +120,6 @@ namespace CrewChiefV4
             nextMessageType = NextMessageType.none;
             this.reportedOverlapLeft = false;
             this.reportedOverlapRight = false;
-            lastKnownOpponentState.Clear();
-            lastKnownOpponentStateUseCounter.Clear();
             audioPlayer.closeChannel();
             previousPositionAndVelocityData.Clear();
         }
@@ -143,23 +135,20 @@ namespace CrewChiefV4
             {
                 int carsOnLeft = 0;
                 int carsOnRight = 0;
+                List<int> activeIDs = new List<int>();
                 for (int i = 0; i < currentOpponentPositions.Count; i++)
                 {
-                    if (carsOnLeft >= 1 && carsOnRight >= 1)
-                    {
-                        // stop processing - we already know there's a car on both sides
-                        break;
-                    }
                     float[] currentOpponentPosition = currentOpponentPositions[i];
                     if (currentOpponentPosition[0] != 0 && currentOpponentPosition[1] != 0 &&   
                         currentOpponentPosition[0] != -1 && currentOpponentPosition[1] != -1)
                     {
+                        activeIDs.Add(i);
                         if (opponentPositionInRange(currentOpponentPosition, currentPlayerPosition))
                         {
                             Boolean isOpponentVelocityInRange = true;
                             if (previousPositionAndVelocityData.ContainsKey(i))
                             {
-                                PreviousPositionAndVelocityData opponentPreviousPositionAndVelocityData = previousPositionAndVelocityData[i];   
+                                PreviousPositionAndVelocityData opponentPreviousPositionAndVelocityData = previousPositionAndVelocityData[i];
                                 float timeDiffSeconds = ((float)(now - opponentPreviousPositionAndVelocityData.timeWhenLastUpdated).TotalMilliseconds) / 1000f;
                                 if (timeDiffSeconds > 0)
                                 {
@@ -169,92 +158,59 @@ namespace CrewChiefV4
                                         opponentPreviousPositionAndVelocityData.previousYSpeeds.RemoveAt(speedsToAverage - 1);
                                     }
                                     opponentPreviousPositionAndVelocityData.previousXSpeeds.Insert(0, (currentOpponentPosition[0] - opponentPreviousPositionAndVelocityData.xPosition) / timeDiffSeconds);
-                                    opponentPreviousPositionAndVelocityData.previousYSpeeds.Insert(0, (currentOpponentPosition[1] - opponentPreviousPositionAndVelocityData.yPosition) /timeDiffSeconds);
+                                    opponentPreviousPositionAndVelocityData.previousYSpeeds.Insert(0, (currentOpponentPosition[1] - opponentPreviousPositionAndVelocityData.yPosition) / timeDiffSeconds);
                                     opponentPreviousPositionAndVelocityData.xPosition = currentOpponentPosition[0];
                                     opponentPreviousPositionAndVelocityData.yPosition = currentOpponentPosition[1];
                                     opponentPreviousPositionAndVelocityData.timeWhenLastUpdated = now;
 
-                                    isOpponentVelocityInRange = checkOpponentVelocityInRange(playerVelocityData[1], playerVelocityData[2],
-                                            opponentPreviousPositionAndVelocityData.previousXSpeeds.Average(), opponentPreviousPositionAndVelocityData.previousYSpeeds.Average());
+                                    // we've updated this guys cached position and velocity, but we only need to check his speed if we don't already have an overlap
+                                    if (carsOnLeft == 0 || carsOnRight == 0)
+                                    {
+                                        isOpponentVelocityInRange = checkOpponentVelocityInRange(playerVelocityData[1], playerVelocityData[2],
+                                                opponentPreviousPositionAndVelocityData.previousXSpeeds.Average(), opponentPreviousPositionAndVelocityData.previousYSpeeds.Average());
+                                    }
                                 }
-                                
+
                             }
                             else
                             {
                                 previousPositionAndVelocityData.Add(i, new PreviousPositionAndVelocityData(currentOpponentPosition[0], currentOpponentPosition[1], now));
                             }
-                            Side side = getSide(playerRotationInRadians, currentPlayerPosition[0], currentPlayerPosition[1], currentOpponentPosition[0], currentOpponentPosition[1], isOpponentVelocityInRange);
-                            if (side == Side.left)
+                            // again, if we already have an overlaps on both sides here we don't need to calculate another
+                            if (carsOnLeft == 0 || carsOnRight == 0)
                             {
-                                carsOnLeft++;
-                                if (lastKnownOpponentState.ContainsKey(i))
-                                {
-                                    lastKnownOpponentState[i] = Side.left;
-                                }
-                                else
-                                {
-                                    lastKnownOpponentState.Add(i, Side.left);
-                                }
-                            }
-                            else if (side == Side.right)
-                            {
-                                carsOnRight++;
-                                if (lastKnownOpponentState.ContainsKey(i))
-                                {
-                                    lastKnownOpponentState[i] = Side.right;
-                                }
-                                else
-                                {
-                                    lastKnownOpponentState.Add(i, Side.right);
-                                }
-                            }
-                            else
-                            {
-                                if (lastKnownOpponentState.ContainsKey(i))
-                                {
-                                    lastKnownOpponentState[i] = Side.none;
-                                }
-                                else
-                                {
-                                    lastKnownOpponentState.Add(i, Side.none);
-                                }
-                            }
-                        }
-                    }
-                    else
-                    {
-                        // no usable position data, use the last known state
-                        if (lastKnownOpponentState.ContainsKey(i)) {
-                            int lastStateUseCount = 1;
-                            if (lastKnownOpponentStateUseCounter.ContainsKey(i))
-                            {
-                                lastStateUseCount = lastKnownOpponentStateUseCounter[i] + 1;
-                            }
-                            else
-                            {
-                                lastKnownOpponentStateUseCounter.Add(i, 0);
-                            }
-                            if (lastStateUseCount < maxSavedStateReuse)
-                            {
-                                lastKnownOpponentStateUseCounter[i] = lastStateUseCount;
-                                if (lastKnownOpponentState[i] == Side.left)
+                                Side side = getSide(playerRotationInRadians, currentPlayerPosition[0], currentPlayerPosition[1], currentOpponentPosition[0], 
+                                    currentOpponentPosition[1], isOpponentVelocityInRange);
+                                if (side == Side.left)
                                 {
                                     carsOnLeft++;
                                 }
-                                else if (lastKnownOpponentState[i] == Side.right)
+                                else if (side == Side.right)
                                 {
                                     carsOnRight++;
                                 }
                             }
-                            else
-                            {
-                                // we've used too many saved states for this missing opponent position
-                                lastKnownOpponentState.Remove(i);
-                                lastKnownOpponentStateUseCounter.Remove(i);
-                            }
+                        } 
+                        else if (previousPositionAndVelocityData.ContainsKey(i))
+                        {
+                            // once this opponent goes out of range, we must reset his cached speed and position data
+                            previousPositionAndVelocityData.Remove(i);
                         }
                     }
-                }     
+                }  
+                List<int> opponentsToPurge = new List<int>();
+                foreach (int cachedOpponentDataKey in previousPositionAndVelocityData.Keys)
+                {
+                    if (!activeIDs.Contains(cachedOpponentDataKey)) {
+                        opponentsToPurge.Add(cachedOpponentDataKey);
+                    }
+                }
+                foreach (int idToPurge in opponentsToPurge) {
+                    if (previousPositionAndVelocityData.ContainsKey(idToPurge))
+                    {
+                        previousPositionAndVelocityData.Remove(idToPurge);
+                    }
+                }
                 getNextMessage(carsOnLeft, carsOnRight, now);
                 playNextMessage(carsOnLeft, carsOnRight, now);
                 hasCarLeft = carsOnLeft > 0;
@@ -300,7 +256,7 @@ namespace CrewChiefV4
             // If we're already overlapping, use the 'long' car length - this means we don't call 'clear' till there's a small gap
 
             // we only want to check for width separation if we haven't already got an overlap
-            if (Math.Abs(alignedXCoordinate) < trackWidth)
+            if (Math.Abs(alignedXCoordinate) < trackZoneToConsider)
             {
                 // we're within a track width of this car
                 if (alignedXCoordinate < 0)
@@ -312,7 +268,8 @@ namespace CrewChiefV4
                             return Side.right;
                         }
                     }
-                    else if (Math.Abs(alignedYCoordinate) < carLength && alignedXCoordinate * -1 > carWidth && isOpponentSpeedInRange)
+                    else if (((alignedYCoordinate < 0 && alignedYCoordinate * -1 < carLength) || (alignedYCoordinate > 0 && alignedYCoordinate < carLength + carBehindExtraLength)) && 
+                        isOpponentSpeedInRange)
                     {
                         // we have a new overlap on this side, it's only valid if we're not inside the other car and the speed isn't out of range
                         return Side.right;
@@ -327,7 +284,8 @@ namespace CrewChiefV4
                             return Side.left;
                         }
                     }
-                    else if (Math.Abs(alignedYCoordinate) < carLength && alignedXCoordinate > carWidth && isOpponentSpeedInRange)
+                    else if (((alignedYCoordinate < 0 && alignedYCoordinate * -1 < carLength) || (alignedYCoordinate > 0 && alignedYCoordinate < carLength + carBehindExtraLength)) &&
+                        isOpponentSpeedInRange)
                     {
                         return Side.left;
                     }
@@ -340,7 +298,7 @@ namespace CrewChiefV4
         {
             float deltaX = Math.Abs(opponentPosition[0] - playerPosition[0]);
             float deltaY = Math.Abs(opponentPosition[1] - playerPosition[1]);
-            return deltaX <= trackWidth && deltaY <= trackWidth;
+            return deltaX <= trackZoneToConsider && deltaY <= trackZoneToConsider;
         }
 
         private void getNextMessage(int carsOnLeftCount, int carsOnRightCount, DateTime now)
