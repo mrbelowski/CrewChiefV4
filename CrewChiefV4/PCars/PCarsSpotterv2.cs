@@ -32,11 +32,7 @@ namespace CrewChiefV4.PCars
         private Dictionary<String, List<float>> previousOpponentSpeeds = new Dictionary<String, List<float>>();
 
         private float carWidth = 1.8f;
-
-        private float udpMaxClosingSpeed = 60;
-
-        private float udpTrackWidth = 7f;
-
+        
         private float udpCarWidth = 1.5f;
 
         public PCarsSpotterv2(AudioPlayer audioPlayer, Boolean initialEnabledState)

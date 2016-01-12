@@ -10,22 +10,24 @@ namespace CrewChiefV4
 {
     class PreviousPositionAndVelocityData {
         public float xPosition;
-        public float yPosition;
+        public float zPosition;
+        public float xSpeed = 0;
+        public float zSpeed = 0;
         public DateTime timeWhenLastUpdated;
 
-        public List<float> previousXSpeeds = new List<float>();
-        public List<float> previousYSpeeds = new List<float>();
-
-        public PreviousPositionAndVelocityData(float xPosition, float yPosition, DateTime timeWhenLastUpdated) {
+        public PreviousPositionAndVelocityData(float xPosition, float zPosition, DateTime timeWhenLastUpdated)
+        {
             this.xPosition = xPosition;
-            this.yPosition = yPosition;
-            previousXSpeeds.Add(0f);
-            previousYSpeeds.Add(0f);
+            this.zPosition = zPosition;
             this.timeWhenLastUpdated = timeWhenLastUpdated;
         }
     }
+
     class NoisyCartesianCoordinateSpotter
     {
+
+        private float calculateOpponentSpeedsEvery = 250f;
+
         private int speedsToAverage = 7;
 
         private float carBehindExtraLength = 0.6f;
@@ -145,32 +147,25 @@ namespace CrewChiefV4
                         activeIDs.Add(i);
                         if (opponentPositionInRange(currentOpponentPosition, currentPlayerPosition))
                         {
-                            Boolean isOpponentVelocityInRange = true;
+                            Boolean isOpponentVelocityInRange = false;
                             if (previousPositionAndVelocityData.ContainsKey(i))
                             {
                                 PreviousPositionAndVelocityData opponentPreviousPositionAndVelocityData = previousPositionAndVelocityData[i];
-                                float timeDiffSeconds = ((float)(now - opponentPreviousPositionAndVelocityData.timeWhenLastUpdated).TotalMilliseconds) / 1000f;
-                                if (timeDiffSeconds > 0)
+                                float timeDiffMillis = ((float)(now - opponentPreviousPositionAndVelocityData.timeWhenLastUpdated).TotalMilliseconds);
+                                if (timeDiffMillis >= calculateOpponentSpeedsEvery)
                                 {
-                                    if (opponentPreviousPositionAndVelocityData.previousXSpeeds.Count == speedsToAverage)
-                                    {
-                                        opponentPreviousPositionAndVelocityData.previousXSpeeds.RemoveAt(speedsToAverage - 1);
-                                        opponentPreviousPositionAndVelocityData.previousYSpeeds.RemoveAt(speedsToAverage - 1);
-                                    }
-                                    opponentPreviousPositionAndVelocityData.previousXSpeeds.Insert(0, (currentOpponentPosition[0] - opponentPreviousPositionAndVelocityData.xPosition) / timeDiffSeconds);
-                                    opponentPreviousPositionAndVelocityData.previousYSpeeds.Insert(0, (currentOpponentPosition[1] - opponentPreviousPositionAndVelocityData.yPosition) / timeDiffSeconds);
-                                    opponentPreviousPositionAndVelocityData.xPosition = currentOpponentPosition[0];
-                                    opponentPreviousPositionAndVelocityData.yPosition = currentOpponentPosition[1];
                                     opponentPreviousPositionAndVelocityData.timeWhenLastUpdated = now;
-
-                                    // we've updated this guys cached position and velocity, but we only need to check his speed if we don't already have an overlap
-                                    if (carsOnLeft == 0 || carsOnRight == 0)
-                                    {
-                                        isOpponentVelocityInRange = checkOpponentVelocityInRange(playerVelocityData[1], playerVelocityData[2],
-                                                opponentPreviousPositionAndVelocityData.previousXSpeeds.Average(), opponentPreviousPositionAndVelocityData.previousYSpeeds.Average());
-                                    }
+                                    opponentPreviousPositionAndVelocityData.xSpeed = 1000f * (currentOpponentPosition[0] - opponentPreviousPositionAndVelocityData.xPosition) / timeDiffMillis;
+                                    opponentPreviousPositionAndVelocityData.zSpeed = 1000f * (currentOpponentPosition[1] - opponentPreviousPositionAndVelocityData.zPosition) / timeDiffMillis;
+                                    opponentPreviousPositionAndVelocityData.xPosition = currentOpponentPosition[0];
+                                    opponentPreviousPositionAndVelocityData.zPosition = currentOpponentPosition[1];
                                 }
-
+                                // we've updated this guys cached position and velocity, but we only need to check his speed if we don't already have an overlap
+                                if (carsOnLeft == 0 || carsOnRight == 0)
+                                {
+                                    isOpponentVelocityInRange = checkOpponentVelocityInRange(playerVelocityData[1], playerVelocityData[2],
+                                            opponentPreviousPositionAndVelocityData.xSpeed, opponentPreviousPositionAndVelocityData.zSpeed);
+                                }
                             }
                             else
                             {
