@@ -37,8 +37,8 @@ namespace CrewChiefV4
         private static float maxHotIronRoadBrakeTemp = 750;
 
         private static float maxColdIronRaceBrakeTemp = 150;
-        private static float maxWarmIronRaceBrakeTemp = 650;
-        private static float maxHotIronRaceBrakeTemp = 850;
+        private static float maxWarmIronRaceBrakeTemp = 700;
+        private static float maxHotIronRaceBrakeTemp = 900;
 
         private static float maxColdCeramicBrakeTemp = 150;
         private static float maxWarmCeramicBrakeTemp = 950;

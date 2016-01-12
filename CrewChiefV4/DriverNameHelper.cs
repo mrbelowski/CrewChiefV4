@@ -41,22 +41,29 @@ namespace CrewChiefV4
         {
             int counter = 0;
             string line;
-            StreamReader file = new StreamReader(soundsFolderName +@"\driver_names\names.txt");
-            while ((line = file.ReadLine()) != null)
+            try
             {
-                int separatorIndex = line.LastIndexOf(":");
-                if (separatorIndex > 0 && line.Length > separatorIndex + 1)
+                StreamReader file = new StreamReader(soundsFolderName + @"\driver_names\names.txt");
+                while ((line = file.ReadLine()) != null)
                 {
-                    String lowerCaseRawName = line.Substring(0, separatorIndex).ToLower();
-                    String usableName = line.Substring(separatorIndex + 1).Trim();
-                    if (usableName != null && usableName.Length > 0 && !lowerCaseRawNameToUsableName.ContainsKey(lowerCaseRawName))
+                    int separatorIndex = line.LastIndexOf(":");
+                    if (separatorIndex > 0 && line.Length > separatorIndex + 1)
                     {
-                        lowerCaseRawNameToUsableName.Add(lowerCaseRawName, usableName);
+                        String lowerCaseRawName = line.Substring(0, separatorIndex).ToLower();
+                        String usableName = line.Substring(separatorIndex + 1).Trim();
+                        if (usableName != null && usableName.Length > 0 && !lowerCaseRawNameToUsableName.ContainsKey(lowerCaseRawName))
+                        {
+                            lowerCaseRawNameToUsableName.Add(lowerCaseRawName, usableName);
+                        }
                     }
+                    counter++;
                 }
-                counter++;
+                file.Close();
             }
-            file.Close();
+            catch (IOException e)
+            {
+
+            }
             rawNamesToUsableNamesFileRead = true;
         }
 

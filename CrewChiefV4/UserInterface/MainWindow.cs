@@ -421,6 +421,12 @@ namespace CrewChiefV4
                 this.button1.Enabled = false;
                 ThreadStart crewChiefWork = runApp;
                 Thread crewChiefThread = new Thread(crewChiefWork);
+
+                // this call is not part of the standard AutoUpdater API - I added a 'stopped' flag to prevent the auto updater timer
+                // or other Threads firing when the game is running. It's not needed 99% of the time, it just stops that edge case where
+                // the AutoUpdater triggers and steals focus while the player is racing
+                AutoUpdater.Stop();
+
                 crewChiefThread.Start();
                 runListenForChannelOpenThread = controllerConfiguration.listenForChannelOpen()
                     && voiceOption == VoiceOptionEnum.HOLD && crewChief.speechRecogniser.initialised;

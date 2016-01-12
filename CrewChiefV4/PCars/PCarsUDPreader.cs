@@ -13,11 +13,13 @@ using System.Threading.Tasks;
 namespace CrewChiefV4.PCars
 {
     public class PCarsUDPreader : GameDataReader
-    {
-        private float rateEstimate = 0;
-        private long ticksAtRateEstimateStart = 0;
-        private int estimateRateStartPacket = 1000;
-        private int estimateRateEndPacket = 2000;
+    {        
+        private int packetRateCheckInterval = 500;
+        private int packetCountAtStartOfCurrentRateCheck = 0;
+        private int packetCountAtStartOfNextRateCheck = 0;
+        private long ticksAtStartOfCurrentPacketRateCheck = 0;
+        private float lastPacketRateEstimate = -1;
+
         private int sequenceWrapsAt = 63;
         private Boolean strictPacketOrdering = false;    // when false, out-of-order packets are checked before being discarded
 
@@ -102,8 +104,12 @@ namespace CrewChiefV4.PCars
                 totalPacketCount = 0;
                 lastValidTelemCurrentLapTime = -1;
                 lastValidTelemLapsCompleted = 0;
-                rateEstimate = 0;
-                ticksAtRateEstimateStart = -1;
+
+                packetCountAtStartOfCurrentRateCheck = 0;
+                packetCountAtStartOfNextRateCheck = packetRateCheckInterval;
+                ticksAtStartOfCurrentPacketRateCheck = DateTime.Now.Ticks;
+                lastPacketRateEstimate = -1;
+
                 if (dumpToFile)
                 {
                     dataToDump = new List<CrewChiefV4.PCars.PCarsSharedMemoryReader.PCarsStructWrapper>();
@@ -193,13 +199,13 @@ namespace CrewChiefV4.PCars
         private int readFromOffset(int offset, byte[] rawData)
         {
             totalPacketCount++;
-            if (totalPacketCount == estimateRateStartPacket)
+            if (totalPacketCount > packetCountAtStartOfNextRateCheck)
             {
-                ticksAtRateEstimateStart = DateTime.Now.Ticks;
-            }
-            else if (totalPacketCount == estimateRateEndPacket && ticksAtRateEstimateStart > 0)
-            {
-                rateEstimate = (float)(TimeSpan.TicksPerSecond * (estimateRateEndPacket - estimateRateStartPacket)) / (float)(DateTime.Now.Ticks - ticksAtRateEstimateStart);
+                lastPacketRateEstimate = (totalPacketCount - packetCountAtStartOfCurrentRateCheck) / ((DateTime.Now.Ticks - ticksAtStartOfCurrentPacketRateCheck) / TimeSpan.TicksPerSecond);
+                Console.WriteLine("Packet rate = " + lastPacketRateEstimate + "Hz");
+                packetCountAtStartOfCurrentRateCheck = totalPacketCount;
+                packetCountAtStartOfNextRateCheck = packetCountAtStartOfCurrentRateCheck + packetRateCheckInterval;
+                ticksAtStartOfCurrentPacketRateCheck = DateTime.Now.Ticks;
             }
             // the first 2 bytes are the version - discard it for now
             int frameTypeAndSequence = rawData[offset + 2];
@@ -312,19 +318,13 @@ namespace CrewChiefV4.PCars
             }
             Console.WriteLine("Stopped UDP data receiver, received " + telemPacketCount + 
                 " telem packets, accepted " + acceptedOutOfSequenceTelemCount + " out-of-sequence packets, discarded " + discardedTelemCount + " packets");
-            if (rateEstimate > 0) 
-            {
-                Console.WriteLine("Received " + totalPacketCount + " total packets at an estimated rate of " + rateEstimate + "Hz");
-            }
             this.initialised = false;
             acceptedOutOfSequenceTelemCount = 0;
             discardedTelemCount = 0;
             telemPacketCount = 0;
             totalPacketCount = 0;
-            ticksAtRateEstimateStart = -1;
             lastValidTelemCurrentLapTime = -1;
             lastValidTelemLapsCompleted = 0; 
-            rateEstimate = 0;
             buttonsState = new Boolean[24];
         }
 
