@@ -42,7 +42,7 @@
       <Value Profile="(Default)">3</Value>
     </Setting>
     <Setting Name="max_closing_speed_for_spotter" Type="System.Single" Scope="User">
-      <Value Profile="(Default)">10</Value>
+      <Value Profile="(Default)">12</Value>
     </Setting>
     <Setting Name="spotter_only_when_being_passed" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>

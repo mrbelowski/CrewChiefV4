@@ -26,7 +26,7 @@ namespace CrewChiefV4
     class NoisyCartesianCoordinateSpotter
     {
 
-        private float calculateOpponentSpeedsEvery = 250f;
+        private float calculateOpponentSpeedsEvery = 200f;
 
         private int speedsToAverage = 7;
 
@@ -60,7 +60,7 @@ namespace CrewChiefV4
         private Boolean hasCarLeft;
         private Boolean hasCarRight;
 
-        private float trackZoneToConsider = 15f;
+        private float trackZoneToConsider = 20f;
         private float carWidth;
         private float maxClosingSpeed = UserSettings.GetUserSettings().getFloat("max_closing_speed_for_spotter");
 
