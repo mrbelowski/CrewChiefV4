@@ -786,7 +786,8 @@ namespace CrewChiefV4.PCars
                             break;
                         }
                     }
-                    if (!matched) {
+                    if (!matched || !currentGameState.OpponentData[opponentName].IsActive)
+                    {
                         keysToRemove.Add(opponentName);
                     }
                 }
@@ -1160,6 +1161,7 @@ namespace CrewChiefV4.PCars
             opponentData.WorldPosition = new float[] { participantStruct.mWorldPosition[0], participantStruct.mWorldPosition[2] };
             opponentData.DistanceRoundTrack = participantStruct.mCurrentLapDistance;
             opponentData.CarClass = carClass;
+            opponentData.IsActive = true;
             String nameToLog = opponentData.DriverRawName == null ? "unknown" : opponentData.DriverRawName;
             Console.WriteLine("New driver " + nameToLog + " is using car class " + opponentData.CarClass.carClassEnum);
             return opponentData;

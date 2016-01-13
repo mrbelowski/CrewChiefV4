@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <html>
 <body>
+<h2>Version 4.0.3.5</h2>
+<ul>
+	<li>Fixed major regression for Project Cars - hold all internal Strings as raw byte arrays (which may or may not have a null first character) and decode them when we need them</li>
+</ul>
 <h2>Version 4.0.3.4</h2>
 <ul>
 	<li>Internal rework for Project Cars to handle String data which occasionally starts with a null character. Should fix 'missing' opponents and incorrect car classes</li>
