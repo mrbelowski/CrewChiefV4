@@ -156,7 +156,7 @@ namespace CrewChiefV4.PCars
 
             if (existingState.mParticipantData == null)
             {
-                existingState.mParticipantData = new pCarsAPIParticipantStruct[udpTelemetryData.sParticipantInfo.Count()];
+                existingState.mParticipantData = new pCarsAPIParticipantStruct[56];
             }
             for (int i = 0; i < udpTelemetryData.sParticipantInfo.Count(); i++) 
             {
@@ -206,44 +206,50 @@ namespace CrewChiefV4.PCars
 
         public static pCarsAPIStruct MergeWithExistingState(pCarsAPIStruct existingState, sParticipantInfoStringsAdditional udpAdditionalStrings)
         {
+            int offset = udpAdditionalStrings.sOffset;
             if (existingState.mParticipantData == null)
             {
-                existingState.mParticipantData = new pCarsAPIParticipantStruct[udpAdditionalStrings.sName.Count()];
+                existingState.mParticipantData = new pCarsAPIParticipantStruct[56];
             }
-            for (int i = 0; i < udpAdditionalStrings.sName.Count(); i++)
+            for (int i = offset; i < offset + 16 && i<existingState.mParticipantData.Length; i++) 
             {
-                Tuple<String, String> name = getNameFromBytes(udpAdditionalStrings.sName[i].nameByteArray);
-                existingState.mParticipantData[i].mIsActive = name.Item2 != null && name.Item2.Length > 0;
-                existingState.mParticipantData[i].mNameFirstChar = name.Item1;
-                existingState.mParticipantData[i].mNameRest = name.Item2;
+                existingState.mParticipantData[i].mName = udpAdditionalStrings.sName[i].nameByteArray;
             }
             return existingState;
         }
 
         public static pCarsAPIStruct MergeWithExistingState(pCarsAPIStruct existingState, sParticipantInfoStrings udpParticipantStrings)
         {
-            existingState.mCarClassNameFirstChar = udpParticipantStrings.sCarClassNameFirstChar;
-            existingState.mCarClassNameRest = udpParticipantStrings.sCarClassNameRest;
-            existingState.mCarNameFirstChar = udpParticipantStrings.sCarNameFirstChar;
-            existingState.mCarNameRest = udpParticipantStrings.sCarNameRest;
+            existingState.mCarClassName = udpParticipantStrings.sCarClassName;
+            existingState.mCarName = udpParticipantStrings.sCarName;
 
             existingState.mTrackLocation = udpParticipantStrings.sTrackLocation;
             existingState.mTrackVariation = udpParticipantStrings.sTrackVariation;
+            if (existingState.mParticipantData == null)
+            {
+                existingState.mParticipantData = new pCarsAPIParticipantStruct[56];
+            }
             for (int i = 0; i < udpParticipantStrings.sName.Count(); i++)
             {
-                Tuple<String, String> name = getNameFromBytes(udpParticipantStrings.sName[i].nameByteArray);
-                existingState.mParticipantData[i].mIsActive = name.Item2 != null && name.Item2.Length > 0;
-                existingState.mParticipantData[i].mNameFirstChar = name.Item1;
-                existingState.mParticipantData[i].mNameRest = name.Item2;
+                existingState.mParticipantData[i].mName = udpParticipantStrings.sName[i].nameByteArray;
             }
             return existingState;
         }
 
-        private static Tuple<String, String> getNameFromBytes(byte[] name)
+        public static String getNameFromBytes(byte[] name)
         {
             //return Encoding.UTF8.GetString(name).TrimEnd('\0').Trim();
-            return new Tuple<String, String>(Encoding.GetEncoding("Windows-1252").GetString(name, 0, 1).TrimEnd('\0').Trim(), 
-                Encoding.GetEncoding("Windows-1252").GetString(name, 1, name.Length - 1).TrimEnd('\0').Trim());
+            String firstChar = Encoding.GetEncoding("Windows-1252").GetString(name, 0, 1).TrimEnd('\0');
+            String rest = Encoding.GetEncoding("Windows-1252").GetString(name, 1, name.Length - 1).TrimEnd('\0');
+            if ((firstChar == null || firstChar.Length == 0) && (rest != null && rest.Length > 0))
+            {
+                firstChar = PCarsGameStateMapper.FIRST_CHAR_STAND_IN;
+            }
+            else
+            {
+                firstChar = firstChar.Trim();
+            }
+            return (firstChar + rest).Trim();
         } 
 
         private static float[] toFloatArray(int[] intArray, float factor)
@@ -303,10 +309,8 @@ namespace CrewChiefV4.PCars
         [MarshalAs(UnmanagedType.I1)]
         public bool mIsActive;
 
-        [MarshalAsAttribute(UnmanagedType.ByValTStr, SizeConst = 1)]
-        public string mNameFirstChar;   
-        [MarshalAsAttribute(UnmanagedType.ByValTStr, SizeConst = ((int)eAPIStructLengths.STRING_LENGTH_MAX - 1))]
-        public string mNameRest;                                    // [ string ]
+        [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = (int)eAPIStructLengths.STRING_LENGTH_MAX)]
+        public byte[] mName;                                    // [ string ]
 
         [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = (int)eVector.VEC_MAX)]
         public float[] mWorldPosition;                          // [ UNITS = World Space  X  Y  Z ]
@@ -345,22 +349,17 @@ namespace CrewChiefV4.PCars
         public float mUnfilteredClutch;                         // [ RANGE = 0.0f->1.0f ]
 
         // Vehicle & Track information
-        [MarshalAsAttribute(UnmanagedType.ByValTStr, SizeConst = 1)]
-        public string mCarNameFirstChar;                                 // [ string ]
-        [MarshalAsAttribute(UnmanagedType.ByValTStr, SizeConst = ((int)eAPIStructLengths.STRING_LENGTH_MAX - 1))]
-        public string mCarNameRest;                                 // [ string ]
-
-        [MarshalAsAttribute(UnmanagedType.ByValTStr, SizeConst = 1)]
-        public string mCarClassNameFirstChar;                            // [ string ]
-        [MarshalAsAttribute(UnmanagedType.ByValTStr, SizeConst = ((int)eAPIStructLengths.STRING_LENGTH_MAX - 1))]
-        public string mCarClassNameRest;                            // [ string ]
+        [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = (int)eAPIStructLengths.STRING_LENGTH_MAX)]
+        public byte[] mCarName;                                 // [ string ]
+        [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = (int)eAPIStructLengths.STRING_LENGTH_MAX)]
+        public byte[] mCarClassName;                            // [ string ]
 
         public uint mLapsInEvent;                               // [ RANGE = 0->... ]   [ UNSET = 0 ]
    
-        [MarshalAsAttribute(UnmanagedType.ByValTStr, SizeConst = ((int)eAPIStructLengths.STRING_LENGTH_MAX))]
-        public string mTrackLocation;     
-        [MarshalAsAttribute(UnmanagedType.ByValTStr, SizeConst = ((int)eAPIStructLengths.STRING_LENGTH_MAX))]
-        public string mTrackVariation;                          // [ string ]
+        [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = ((int)eAPIStructLengths.STRING_LENGTH_MAX))]
+        public byte[] mTrackLocation;
+        [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = ((int)eAPIStructLengths.STRING_LENGTH_MAX))]
+        public byte[] mTrackVariation;                          // [ string ]
 
         public float mTrackLength;                              // [ UNITS = Metres ]   [ RANGE = 0.0f->... ]    [ UNSET = 0.0f ]
 

@@ -8,13 +8,9 @@ namespace CrewChiefV4
 {
     class NameValidator
     {
-        public static Boolean validateName(String firstChar, String rest)
-        {
-            
-            return true;
-        }
         public static Boolean validateName(String name)
         {
+            
             return true;
         }
     }

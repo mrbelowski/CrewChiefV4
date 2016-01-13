@@ -1,5 +1,6 @@
 ﻿using CrewChiefV4.Events;
 using CrewChiefV4.GameState;
+using CrewChiefV4.PCars;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -235,19 +236,12 @@ namespace CrewChiefV4
             brakeTempThresholds.Add(BrakeType.Carbon, carbonBrakeTempsThresholds);
         }
 
-        public static CarClass getCarClassForPCarsClassName(String carClassNameFirstChar, String carClassNameRest)
+        public static CarClass getCarClassForPCarsClassName(String carClassName)
         {
-            if (carClassNameRest != null && carClassNameRest.Trim().Length > 0) 
-            { 
-                String carClassName;
-                if (carClassNameFirstChar == null || carClassNameFirstChar.Trim().Length == 0)
-                {
-                    Console.WriteLine("Missing first char of car class name, class derivation may be inaccurate");
-                    carClassName = carClassNameRest;
-                }
-                else
-                {
-                    carClassName = carClassNameFirstChar.Trim() + carClassNameRest.Trim();
+            if (carClassName != null && carClassName.Length > 1)
+            {
+                if (carClassName.StartsWith(PCarsGameStateMapper.FIRST_CHAR_STAND_IN)) {
+                    carClassName = carClassName.Substring(1);
                 }
                 foreach (CarClass carClass in carClasses)
                 {
@@ -260,7 +254,7 @@ namespace CrewChiefV4
                             return carClass;
                         }
                     }
-                }                
+                }    
             }
             return getDefaultCarClass();
         }

@@ -17,18 +17,14 @@ namespace CrewChiefV4.PCars
     {
         public ushort sBuildVersionNumber;	// 0
         public byte sPacketType;	// 2
-        [MarshalAsAttribute(UnmanagedType.ByValTStr, SizeConst = 1)]
-        public string sCarNameFirstChar;	// 3
-        [MarshalAsAttribute(UnmanagedType.ByValTStr, SizeConst = 63)]
-        public string sCarNameRest;	// 3
-        [MarshalAsAttribute(UnmanagedType.ByValTStr, SizeConst = 1)]
-        public string sCarClassNameFirstChar;	// 131 
-        [MarshalAsAttribute(UnmanagedType.ByValTStr, SizeConst = 63)]
-        public string sCarClassNameRest;	// 131
-        [MarshalAsAttribute(UnmanagedType.ByValTStr, SizeConst = 64)]
-        public string sTrackLocation;	// 195        
-        [MarshalAsAttribute(UnmanagedType.ByValTStr, SizeConst = 64)]
-        public string sTrackVariation;	// 259
+        [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 64)]
+        public byte[] sCarName;	// 3
+        [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 64)]
+        public byte[] sCarClassName;	// 131 
+        [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 64)]
+        public byte[] sTrackLocation;	// 195        
+        [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 64)]
+        public byte[] sTrackVariation;	// 259
         [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 16)]
         public nameString[]	sName;	// 323
     // 1347
