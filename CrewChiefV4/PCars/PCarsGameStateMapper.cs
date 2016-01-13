@@ -161,7 +161,7 @@ namespace CrewChiefV4.PCars
                     if (likelyName == null || likelyName.Length == 0 || likelyName.StartsWith(FIRST_CHAR_STAND_IN))
                     {
                         getPlayerByName = false;
-                        Console.WriteLine("Player steam ID is not valid, falling back to viewedParticipantIndex");
+                        Console.WriteLine("Player steam ID - "+ likelyName + " is not valid, falling back to viewedParticipantIndex");
                     }
                     else 
                     {
@@ -198,7 +198,7 @@ namespace CrewChiefV4.PCars
 
         public static void addOpponentForName(String name, OpponentData opponentData, GameStateData gameState)
         {
-            if (name == null || name.Trim().Length == 0)
+            if (name == null || name.Length == 0)
             {
                 return;
             }

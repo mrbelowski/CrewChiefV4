@@ -213,7 +213,7 @@ namespace CrewChiefV4.PCars
             }
             for (int i = offset; i < offset + 16 && i<existingState.mParticipantData.Length; i++) 
             {
-                existingState.mParticipantData[i].mName = udpAdditionalStrings.sName[i].nameByteArray;
+                existingState.mParticipantData[i].mName = udpAdditionalStrings.sName[i - offset].nameByteArray;
             }
             return existingState;
         }
@@ -239,9 +239,17 @@ namespace CrewChiefV4.PCars
         public static String getNameFromBytes(byte[] name)
         {
             //return Encoding.UTF8.GetString(name).TrimEnd('\0').Trim();
+            if (name == null || name.Length == 0)
+            {
+                return "";
+            }
             String firstChar = Encoding.GetEncoding("Windows-1252").GetString(name, 0, 1).TrimEnd('\0');
+            if (name.Length == 1)
+            {
+                return firstChar;
+            }
             String rest = Encoding.GetEncoding("Windows-1252").GetString(name, 1, name.Length - 1).TrimEnd('\0');
-            if ((firstChar == null || firstChar.Length == 0) && (rest != null && rest.Length > 0))
+            if ((firstChar == null || firstChar.Trim().Length == 0) && (rest != null && rest.Trim().Length > 0))
             {
                 firstChar = PCarsGameStateMapper.FIRST_CHAR_STAND_IN;
             }
