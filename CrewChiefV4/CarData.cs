@@ -117,10 +117,7 @@ namespace CrewChiefV4
 
         public static Dictionary<TyreType, List<CornerData.EnumWithThresholds>> tyreTempThresholds = new Dictionary<TyreType, List<CornerData.EnumWithThresholds>>();
         public static Dictionary<BrakeType, List<CornerData.EnumWithThresholds>> brakeTempThresholds = new Dictionary<BrakeType, List<CornerData.EnumWithThresholds>>();
-
-        private static Dictionary<String, BrakeType> brakeTypesPerCarName = new Dictionary<string, BrakeType>();
-        private static Dictionary<String, TyreType> defaultTyreTypesPerCarName = new Dictionary<string, TyreType>();
-
+        
         static CarData() 
         {
             carClasses.Add(new CarClass(CarClassEnum.UNKNOWN_RACE, new String[] { "" }, new int[] { -1 }, BrakeType.Iron_Race, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp));
@@ -238,19 +235,32 @@ namespace CrewChiefV4
             brakeTempThresholds.Add(BrakeType.Carbon, carbonBrakeTempsThresholds);
         }
 
-        public static CarClass getCarClassForPCarsClassName(String carClassName)
+        public static CarClass getCarClassForPCarsClassName(String carClassNameFirstChar, String carClassNameRest)
         {
-            if (carClassName != null)
-            {
+            if (carClassNameRest != null && carClassNameRest.Trim().Length > 0) 
+            { 
+                String carClassName;
+                if (carClassNameFirstChar == null || carClassNameFirstChar.Trim().Length == 0)
+                {
+                    Console.WriteLine("Missing first char of car class name, class derivation may be inaccurate");
+                    carClassName = carClassNameRest;
+                }
+                else
+                {
+                    carClassName = carClassNameFirstChar.Trim() + carClassNameRest.Trim();
+                }
                 foreach (CarClass carClass in carClasses)
                 {
-                    if (carClass.pCarsClassNames.Contains(carClassName))
+                    foreach (String className in carClass.pCarsClassNames)
                     {
-                        Console.WriteLine("Using car class " + carClass.carClassEnum + " for class name " + carClassName);
-                        return carClass;
+                        // .Contains here as the specified car class name might be missing the first character
+                        if (className.Contains(carClassName))
+                        {
+                            Console.WriteLine("Using car class " + carClass.carClassEnum + " for class name " + carClassName);
+                            return carClass;
+                        }
                     }
-                    
-                }
+                }                
             }
             return getDefaultCarClass();
         }
@@ -289,21 +299,13 @@ namespace CrewChiefV4
             return carClasses[0];
         }
 
-        public static List<CornerData.EnumWithThresholds> getBrakeTempThresholds(CarClass carClass, String carName)
+        public static List<CornerData.EnumWithThresholds> getBrakeTempThresholds(CarClass carClass)
         {
-            if (carName!= null && brakeTypesPerCarName.ContainsKey(carName))
-            {
-                return brakeTempThresholds[brakeTypesPerCarName[carName]];
-            }
             return brakeTempThresholds[carClass.brakeType];
         }
 
-        public static TyreType getDefaultTyreType(CarClass carClass, String carName)
+        public static TyreType getDefaultTyreType(CarClass carClass)
         {
-            if (carName != null && defaultTyreTypesPerCarName.ContainsKey(carName))
-            {
-                return defaultTyreTypesPerCarName[carName];
-            }
             return carClass.defaultTyreType;
         }
     }

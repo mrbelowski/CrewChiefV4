@@ -191,7 +191,7 @@ namespace CrewChiefV4.RaceRoom
                         currentGameState.PositionAndMotionData.DistanceRoundTrack = participantStruct.lap_distance;
                         currentGameState.carClass = CarData.getCarClassForRaceRoomId(participantStruct.driver_info.class_id);
                         Console.WriteLine("Player is using car class " + currentGameState.carClass.carClassEnum + " (class ID " + participantStruct.driver_info.class_id + ")");
-                        brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(currentGameState.carClass, null);
+                        brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(currentGameState.carClass);
                     }
                     else
                     {
@@ -235,7 +235,7 @@ namespace CrewChiefV4.RaceRoom
                         currentGameState.SessionData.SessionStartTime = currentGameState.Now;
                         currentGameState.carClass = CarData.getCarClassForRaceRoomId(shared.all_drivers_data[shared.slot_id].driver_info.class_id);
                         Console.WriteLine("Player is using car class " + currentGameState.carClass.carClassEnum);
-                        brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(currentGameState.carClass, null);
+                        brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(currentGameState.carClass);
                         if (previousGameState != null)
                         {
                             currentGameState.PitData.IsRefuellingAllowed = previousGameState.PitData.IsRefuellingAllowed;
@@ -393,7 +393,7 @@ namespace CrewChiefV4.RaceRoom
                 if (currentGameState.carClass.carClassEnum == CarData.CarClassEnum.UNKNOWN_RACE)
                 {
                     currentGameState.carClass = CarData.getCarClassForRaceRoomId(shared.all_drivers_data[shared.slot_id].driver_info.class_id);
-                    brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(currentGameState.carClass, null);                    
+                    brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(currentGameState.carClass);                    
                 }
             }
             if (previousGameState != null && !currentGameState.SessionData.IsNewSession)
@@ -413,7 +413,7 @@ namespace CrewChiefV4.RaceRoom
                         {
                             currentGameState.carClass = newClass;
                             Console.WriteLine("Player is using car class " + currentGameState.carClass.carClassEnum + " (class ID " + participantStruct.driver_info.class_id + ")");
-                            brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(currentGameState.carClass, null);
+                            brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(currentGameState.carClass);
                         }
                     }
                     currentGameState.SessionData.IsNewSector = participantStruct.track_sector != 0 && currentGameState.SessionData.SectorNumber != participantStruct.track_sector;

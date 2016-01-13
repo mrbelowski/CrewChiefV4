@@ -212,33 +212,38 @@ namespace CrewChiefV4.PCars
             }
             for (int i = 0; i < udpAdditionalStrings.sName.Count(); i++)
             {
-                String name = getNameFromBytes(udpAdditionalStrings.sName[i].nameByteArray);
-                // TODO: will the mIsActive flag always have been set by the time we reach here?
-                existingState.mParticipantData[i + udpAdditionalStrings.sOffset].mIsActive = name != null && name.Length > 0;
-                existingState.mParticipantData[i + udpAdditionalStrings.sOffset].mName = name;
+                Tuple<String, String> name = getNameFromBytes(udpAdditionalStrings.sName[i].nameByteArray);
+                existingState.mParticipantData[i].mIsActive = name.Item2 != null && name.Item2.Length > 0;
+                existingState.mParticipantData[i].mNameFirstChar = name.Item1;
+                existingState.mParticipantData[i].mNameRest = name.Item2;
             }
             return existingState;
         }
 
         public static pCarsAPIStruct MergeWithExistingState(pCarsAPIStruct existingState, sParticipantInfoStrings udpParticipantStrings)
         {
-            existingState.mCarClassName = udpParticipantStrings.sCarClassName;
-            existingState.mCarName = udpParticipantStrings.sCarName;
+            existingState.mCarClassNameFirstChar = udpParticipantStrings.sCarClassNameFirstChar;
+            existingState.mCarClassNameRest = udpParticipantStrings.sCarClassNameRest;
+            existingState.mCarNameFirstChar = udpParticipantStrings.sCarNameFirstChar;
+            existingState.mCarNameRest = udpParticipantStrings.sCarNameRest;
+
             existingState.mTrackLocation = udpParticipantStrings.sTrackLocation;
             existingState.mTrackVariation = udpParticipantStrings.sTrackVariation;
             for (int i = 0; i < udpParticipantStrings.sName.Count(); i++)
             {
-                String name = getNameFromBytes(udpParticipantStrings.sName[i].nameByteArray);
-                existingState.mParticipantData[i].mIsActive = name != null && name.Length > 0;
-                existingState.mParticipantData[i].mName = name;
+                Tuple<String, String> name = getNameFromBytes(udpParticipantStrings.sName[i].nameByteArray);
+                existingState.mParticipantData[i].mIsActive = name.Item2 != null && name.Item2.Length > 0;
+                existingState.mParticipantData[i].mNameFirstChar = name.Item1;
+                existingState.mParticipantData[i].mNameRest = name.Item2;
             }
             return existingState;
         }
 
-        private static String getNameFromBytes(byte[] name)
+        private static Tuple<String, String> getNameFromBytes(byte[] name)
         {
             //return Encoding.UTF8.GetString(name).TrimEnd('\0').Trim();
-            return Encoding.GetEncoding("Windows-1252").GetString(name).TrimEnd('\0').Trim();
+            return new Tuple<String, String>(Encoding.GetEncoding("Windows-1252").GetString(name, 0, 1).TrimEnd('\0').Trim(), 
+                Encoding.GetEncoding("Windows-1252").GetString(name, 1, name.Length - 1).TrimEnd('\0').Trim());
         } 
 
         private static float[] toFloatArray(int[] intArray, float factor)
@@ -298,8 +303,10 @@ namespace CrewChiefV4.PCars
         [MarshalAs(UnmanagedType.I1)]
         public bool mIsActive;
 
-        [MarshalAsAttribute(UnmanagedType.ByValTStr, SizeConst = (int)eAPIStructLengths.STRING_LENGTH_MAX)]
-        public string mName;                                    // [ string ]
+        [MarshalAsAttribute(UnmanagedType.ByValTStr, SizeConst = 1)]
+        public string mNameFirstChar;   
+        [MarshalAsAttribute(UnmanagedType.ByValTStr, SizeConst = ((int)eAPIStructLengths.STRING_LENGTH_MAX - 1))]
+        public string mNameRest;                                    // [ string ]
 
         [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = (int)eVector.VEC_MAX)]
         public float[] mWorldPosition;                          // [ UNITS = World Space  X  Y  Z ]
@@ -338,18 +345,21 @@ namespace CrewChiefV4.PCars
         public float mUnfilteredClutch;                         // [ RANGE = 0.0f->1.0f ]
 
         // Vehicle & Track information
-        [MarshalAsAttribute(UnmanagedType.ByValTStr, SizeConst = (int)eAPIStructLengths.STRING_LENGTH_MAX)]
-        public string mCarName;                                 // [ string ]
+        [MarshalAsAttribute(UnmanagedType.ByValTStr, SizeConst = 1)]
+        public string mCarNameFirstChar;                                 // [ string ]
+        [MarshalAsAttribute(UnmanagedType.ByValTStr, SizeConst = ((int)eAPIStructLengths.STRING_LENGTH_MAX - 1))]
+        public string mCarNameRest;                                 // [ string ]
 
-        [MarshalAsAttribute(UnmanagedType.ByValTStr, SizeConst = (int)eAPIStructLengths.STRING_LENGTH_MAX)]
-        public string mCarClassName;                            // [ string ]
+        [MarshalAsAttribute(UnmanagedType.ByValTStr, SizeConst = 1)]
+        public string mCarClassNameFirstChar;                            // [ string ]
+        [MarshalAsAttribute(UnmanagedType.ByValTStr, SizeConst = ((int)eAPIStructLengths.STRING_LENGTH_MAX - 1))]
+        public string mCarClassNameRest;                            // [ string ]
 
         public uint mLapsInEvent;                               // [ RANGE = 0->... ]   [ UNSET = 0 ]
-
-        [MarshalAsAttribute(UnmanagedType.ByValTStr, SizeConst = (int)eAPIStructLengths.STRING_LENGTH_MAX)]
-        public string mTrackLocation;                           // [ string ]
-
-        [MarshalAsAttribute(UnmanagedType.ByValTStr, SizeConst = (int)eAPIStructLengths.STRING_LENGTH_MAX)]
+   
+        [MarshalAsAttribute(UnmanagedType.ByValTStr, SizeConst = ((int)eAPIStructLengths.STRING_LENGTH_MAX))]
+        public string mTrackLocation;     
+        [MarshalAsAttribute(UnmanagedType.ByValTStr, SizeConst = ((int)eAPIStructLengths.STRING_LENGTH_MAX))]
         public string mTrackVariation;                          // [ string ]
 
         public float mTrackLength;                              // [ UNITS = Metres ]   [ RANGE = 0.0f->... ]    [ UNSET = 0.0f ]
