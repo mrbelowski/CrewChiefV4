@@ -152,7 +152,7 @@ namespace CrewChiefV4.Audio
             }
             if (this.soundCache == null)
             {
-                soundCache = new SoundCache(new DirectoryInfo(soundFilesPath), new String[] { "numbers", "pearls_of_wisdom", "spotter" }, sweary, true);
+                soundCache = new SoundCache(new DirectoryInfo(soundFilesPath), new String[] { "numbers", "pearls_of_wisdom", "spotter", "acknowledge"  }, sweary, true);
             }
             initialised = true;
         }

@@ -19,7 +19,7 @@ namespace CrewChiefV4.Audio
         private Boolean useSwearyMessages;
         private Boolean allowCaching;
         private String[] eventTypesToKeepCached;
-        private int maxCacheSize = 500;
+        private int maxCacheSize = 600;
         private int purgeBlockSize = 100;
         private int currentLoadedCount;
 
@@ -45,7 +45,7 @@ namespace CrewChiefV4.Audio
                 }
             }
             Console.WriteLine("Finished preparing sounds cache, loaded " + singleSounds.Count + " single sounds and " + soundSets.Count + 
-                " sound sets, with " + currentLoadedCount + " activeSoundPlayer objects");
+                " sound sets, with " + currentLoadedCount + " active SoundPlayer objects");
         }
 
         public void Play(String soundName)
@@ -82,9 +82,11 @@ namespace CrewChiefV4.Audio
             if (currentLoadedCount > maxCacheSize)
             {
                 int purgeCount = 0;
+                List<String> purgedList = new List<string>();
                 for (int i = 0; i < maxCacheSize && i < dynamicLoadedSounds.Count && i < purgeBlockSize; i++)
                 {
                     String soundToPurge = dynamicLoadedSounds[i];
+                    purgedList.Add(soundToPurge);
                     if (soundSets.ContainsKey(soundToPurge))
                     {
                         purgeCount += soundSets[soundToPurge].UnLoadAll();
@@ -97,8 +99,12 @@ namespace CrewChiefV4.Audio
                         }
                     }
                 }
+                foreach (String purged in purgedList)
+                {
+                    dynamicLoadedSounds.Remove(purged);
+                }
                 currentLoadedCount = currentLoadedCount - purgeCount;
-                Console.WriteLine("Purged " + purgeCount + " infrequently used sounds, leaving " + currentLoadedCount + " active SoundPlayer objects");
+                Console.WriteLine("Purged " + purgedList.Count + " sounds, there are now " + currentLoadedCount + " active SoundPlayer objects");
             }
         }
 

@@ -89,15 +89,17 @@ namespace CrewChiefV4.Events
         {
             audioPlayer.queueClip(new QueuedMessage(folderTest, 0, this));
             testDriverNames();
-            
-            /*audioPlayer.queueClip(new QueuedMessage("conditionsAirAndTrackIncreasing1", MessageContents
+
+            /*
+            audioPlayer.queueClip(new QueuedMessage("conditionsAirAndTrackIncreasing1", MessageContents
                                (ConditionsMonitor.folderAirAndTrackTempIncreasing, 
                                ConditionsMonitor.folderAirTempIsNow, QueuedMessage.folderNameNumbersStub + 26,
                                ConditionsMonitor.folderTrackTempIsNow, QueuedMessage.folderNameNumbersStub + 32, ConditionsMonitor.folderCelsius), 0, this));
             audioPlayer.queueClip(new QueuedMessage("Fuel/estimate", MessageContents(
-                                        Fuel.folderWeEstimate, QueuedMessage.folderNameNumbersStub + 12, Fuel.folderMinutesRemaining), 0, this));            
+                                        Fuel.folderWeEstimate, QueuedMessage.folderNameNumbersStub + 12, Fuel.folderMinutesRemaining), 0, this));
             audioPlayer.queueClip(new QueuedMessage("laptime", MessageContents(LapTimes.folderLapTimeIntro, 
                 TimeSpan.FromSeconds(60 + (random.NextDouble() * 60))), 0, this));
+
             audioPlayer.queueClip(new QueuedMessage("yesBoxAfter", MessageContents(MandatoryPitStops.folderMandatoryPitStopsYesStopAfter,
                 QueuedMessage.folderNameNumbersStub + 10, MandatoryPitStops.folderMandatoryPitStopsMinutes), 0, null));
             audioPlayer.queueClip(new QueuedMessage("laps_on_current_tyres", MessageContents(TyreMonitor.folderLapsOnCurrentTyresIntro,
