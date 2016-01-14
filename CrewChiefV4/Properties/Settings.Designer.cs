@@ -1267,5 +1267,17 @@ namespace CrewChiefV4.Properties {
                 this["override_default_sound_pack_location"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool cache_sounds {
+            get {
+                return ((bool)(this["cache_sounds"]));
+            }
+            set {
+                this["cache_sounds"] = value;
+            }
+        }
     }
 }

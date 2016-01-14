@@ -61,6 +61,7 @@ namespace CrewChiefV4.Audio
         private readonly TimeSpan minTimeBetweenPearlsOfWisdom = TimeSpan.FromSeconds(UserSettings.GetUserSettings().getInt("minimum_time_between_pearls_of_wisdom"));
 
         private Boolean sweary = UserSettings.GetUserSettings().getBoolean("use_sweary_messages");
+        private Boolean allowCaching = UserSettings.GetUserSettings().getBoolean("cache_sounds");
 
         // if this is true, no 'green green green', 'get ready', or spotter messages are played
         private Boolean disableImmediateMessages = UserSettings.GetUserSettings().getBoolean("disable_immediate_messages");
@@ -152,7 +153,8 @@ namespace CrewChiefV4.Audio
             }
             if (this.soundCache == null)
             {
-                soundCache = new SoundCache(new DirectoryInfo(soundFilesPath), new String[] { "numbers", "pearls_of_wisdom", "spotter", "acknowledge"  }, sweary, true);
+                soundCache = new SoundCache(new DirectoryInfo(soundFilesPath),
+                    new String[] { "numbers", "pearls_of_wisdom", "spotter", "acknowledge"  }, sweary, allowCaching);
             }
             initialised = true;
         }

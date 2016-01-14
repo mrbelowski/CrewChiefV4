@@ -142,26 +142,38 @@ namespace CrewChiefV4.Audio
                 {
                     if (bleepFile.Name.StartsWith(alternate_prefix + "start"))
                     {
-                        currentLoadedCount++;
-                        singleSounds.Add("start_bleep", new SingleSound(bleepFile.FullName, true, true, true));
+                        if (allowCaching)
+                        {
+                            currentLoadedCount++;
+                        }
+                        singleSounds.Add("start_bleep", new SingleSound(bleepFile.FullName, this.allowCaching, this.allowCaching, this.allowCaching));
                         availableSounds.Add("start_bleep");
                     }
                     else if (bleepFile.Name.StartsWith(alternate_prefix + "end"))
                     {
-                        currentLoadedCount++;
-                        singleSounds.Add("end_bleep", new SingleSound(bleepFile.FullName, true, true, true));
+                        if (allowCaching)
+                        {
+                            currentLoadedCount++;
+                        } 
+                        singleSounds.Add("end_bleep", new SingleSound(bleepFile.FullName, this.allowCaching, this.allowCaching, this.allowCaching));
                         availableSounds.Add("end_bleep");
                     }
                     else if (bleepFile.Name.StartsWith(alternate_prefix + "short_start"))
                     {
-                        currentLoadedCount++;
-                        singleSounds.Add("short_start_bleep", new SingleSound(bleepFile.FullName, true, true, true));
+                        if (allowCaching)
+                        {
+                            currentLoadedCount++;
+                        } 
+                        singleSounds.Add("short_start_bleep", new SingleSound(bleepFile.FullName, this.allowCaching, this.allowCaching, this.allowCaching));
                         availableSounds.Add("short_start_bleep");
                     }
                     else if (bleepFile.Name.StartsWith("listen_start"))
                     {
-                        currentLoadedCount++;
-                        singleSounds.Add("listen_start_sound", new SingleSound(bleepFile.FullName, true, true, true));
+                        if (allowCaching)
+                        {
+                            currentLoadedCount++;
+                        } 
+                        singleSounds.Add("listen_start_sound", new SingleSound(bleepFile.FullName, this.allowCaching, this.allowCaching, this.allowCaching));
                         availableSounds.Add("listen_start_sound");
                     }
                 }
@@ -173,7 +185,7 @@ namespace CrewChiefV4.Audio
             DirectoryInfo[] eventFolders = voiceDirectory.GetDirectories();
             foreach (DirectoryInfo eventFolder in eventFolders)
             {
-                Boolean alwaysKeepCached = this.eventTypesToKeepCached.Contains(eventFolder.Name);
+                Boolean alwaysKeepCached = this.allowCaching && this.eventTypesToKeepCached.Contains(eventFolder.Name);
                 try
                 {
                     DirectoryInfo[] eventDetailFolders = eventFolder.GetDirectories();
@@ -207,7 +219,7 @@ namespace CrewChiefV4.Audio
                 if (driverNameFile.Name.EndsWith(".wav"))
                 {                    
                     String name = driverNameFile.Name.ToLowerInvariant().Split(new[] { ".wav" }, StringSplitOptions.None)[0];
-                    singleSounds.Add(name, new SingleSound(driverNameFile.FullName, false, false, true));
+                    singleSounds.Add(name, new SingleSound(driverNameFile.FullName, false, false, this.allowCaching));
                     availableDriverNames.Add(name);
                 }
             }
@@ -247,7 +259,7 @@ namespace CrewChiefV4.Audio
                     if (soundFile.Name.EndsWith(".wav") && (this.useSwearyMessages || !soundFile.Name.StartsWith("sweary")))
                     {
                         hasSounds = true;
-                        singleSounds.Add(new SingleSound(soundFile.FullName, true, this.keepCached, this.allowCaching));
+                        singleSounds.Add(new SingleSound(soundFile.FullName, this.allowCaching, this.keepCached, this.allowCaching));
                         soundsCount++;
                     }
                 }                
@@ -326,7 +338,7 @@ namespace CrewChiefV4.Audio
             {
                 SoundPlayer soundPlayer = new SoundPlayer(fullPath);
                 soundPlayer.Load();
-                soundPlayer.Play();
+                soundPlayer.PlaySync();
                 soundPlayer.Dispose();
             }
             else

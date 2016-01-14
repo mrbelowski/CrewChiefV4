@@ -89,7 +89,6 @@ namespace CrewChiefV4.Events
         {
             audioPlayer.queueClip(new QueuedMessage(folderTest, 0, this));
             testDriverNames();
-
             /*
             audioPlayer.queueClip(new QueuedMessage("conditionsAirAndTrackIncreasing1", MessageContents
                                (ConditionsMonitor.folderAirAndTrackTempIncreasing, 
