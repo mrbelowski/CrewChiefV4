@@ -11,7 +11,7 @@ using System.Collections.Specialized;
 using CrewChiefV4.GameState;
 using System.Collections;
 
-namespace CrewChiefV4
+namespace CrewChiefV4.Audio
 {
     public class AudioPlayer
     {
@@ -42,10 +42,6 @@ namespace CrewChiefV4
 
         private Dictionary<String, int> playedMessagesCount = new Dictionary<String, int>();
 
-        public static List<String> allMessageNames = new List<String>();
-
-        public static List<String> availableDriverNames = new List<String>();
-
         private Boolean monitorRunning = false;
 
         private Boolean keepQuiet = false;
@@ -60,15 +56,7 @@ namespace CrewChiefV4
 
         private readonly int immediateMessagesMonitorInterval = 20;
 
-        private Dictionary<String, List<SoundPlayer>> clips = new Dictionary<String, List<SoundPlayer>>();
-
         private Boolean useListenBeep = UserSettings.GetUserSettings().getBoolean("use_listen_beep");
-
-        private String voiceFolderPath;
-
-        private String fxFolderPath;
-
-        private String driverNamesFolderPath;
 
         private readonly TimeSpan minTimeBetweenPearlsOfWisdom = TimeSpan.FromSeconds(UserSettings.GetUserSettings().getInt("minimum_time_between_pearls_of_wisdom"));
 
@@ -82,13 +70,7 @@ namespace CrewChiefV4
         private OrderedDictionary queuedClips = new OrderedDictionary();
 
         private OrderedDictionary immediateClips = new OrderedDictionary();
-
-        List<String> enabledSounds = new List<String>();
-
-        Boolean enableStartBleep = false;
-
-        Boolean enableEndBleep = false;
-
+        
         MediaPlayer backgroundPlayer;
 
         public static String soundFilesPath;
@@ -107,7 +89,7 @@ namespace CrewChiefV4
         private Boolean loadNewBackground = false;
         private String backgroundToLoad;
 
-        private PearlsOfWisdom pearlsOfWisdom;
+        private PearlsOfWisdom pearlsOfWisdom = new PearlsOfWisdom();
 
         DateTime timeLastPearlOfWisdomPlayed = DateTime.Now;
 
@@ -117,6 +99,8 @@ namespace CrewChiefV4
 
         public static float soundPackVersion = -1;
         public static float driverNamesVersion = -1;
+
+        private SoundCache soundCache;
 
         public AudioPlayer(CrewChief crewChief)
         {
@@ -144,20 +128,13 @@ namespace CrewChiefV4
 
         public void initialise()
         {
-            voiceFolderPath = Path.Combine(soundFilesPath, "voice");
-            fxFolderPath = Path.Combine(soundFilesPath, "fx");
-            driverNamesFolderPath = Path.Combine(soundFilesPath, "driver_names");
-            backgroundFilesPath = Path.Combine(soundFilesPath, "background_sounds");
-            Console.WriteLine("Voice dir full path = " + voiceFolderPath);
-            Console.WriteLine("FX dir full path = " + fxFolderPath);
-            Console.WriteLine("driver names full path = " + driverNamesFolderPath);
-            Console.WriteLine("Background sound dir full path = " + backgroundFilesPath);
             DirectoryInfo soundDirectory = new DirectoryInfo(soundFilesPath);
+            backgroundFilesPath = Path.Combine(soundFilesPath, "background_sounds");
             if (!soundDirectory.Exists)
             {
                 Console.WriteLine("Unable to find sound directory " + soundDirectory.FullName);
                 return;
-            }            
+            }
             if (soundPackVersion == -1)
             {
                 Console.WriteLine("Unable to get sound pack version");
@@ -173,194 +150,11 @@ namespace CrewChiefV4
             {
                 Console.WriteLine("Minimum sound pack version = " + minimumSoundPackVersion + " using sound pack version " + soundPackVersion + " and driver names version " + driverNamesVersion);
             }
-            pearlsOfWisdom = new PearlsOfWisdom();
-            int soundsCount = 0;
-            try
+            if (this.soundCache == null)
             {
-                DirectoryInfo fxSoundDirectory = new DirectoryInfo(fxFolderPath);
-                if (!fxSoundDirectory.Exists)
-                {
-                    Console.WriteLine("Unable to find fx directory " + fxSoundDirectory.FullName);
-                    return;
-                }
-                FileInfo[] bleepFiles = fxSoundDirectory.GetFiles();
-                String alternate_prefix = useAlternateBeeps ? "alternate_" : "";
-                foreach (FileInfo bleepFile in bleepFiles)
-                {
-                    if (bleepFile.Name.EndsWith(".wav"))
-                    {
-                        if (bleepFile.Name.StartsWith(alternate_prefix + "start"))
-                        {
-                            enableStartBleep = true;
-                            openAndCacheClip("start_bleep", bleepFile.FullName);
-                        }
-                        else if (bleepFile.Name.StartsWith(alternate_prefix + "end"))
-                        {
-                            enableEndBleep = true;
-                            openAndCacheClip("end_bleep", bleepFile.FullName);
-                        }
-                        else if (bleepFile.Name.StartsWith(alternate_prefix + "short_start"))
-                        {
-                            enableEndBleep = true;
-                            openAndCacheClip("short_start_bleep", bleepFile.FullName);
-                        }
-                        else if (bleepFile.Name.StartsWith("listen_start"))
-                        {
-                            openAndCacheClip("listen_start_sound", bleepFile.FullName);
-                        }
-                    }
-                }
-                DirectoryInfo voiceSoundDirectory = new DirectoryInfo(voiceFolderPath);
-                if (!voiceSoundDirectory.Exists)
-                {
-                    Console.WriteLine("Unable to find voice directory " + voiceSoundDirectory.FullName);
-                    return;
-                }
-                DirectoryInfo[] eventFolders = voiceSoundDirectory.GetDirectories();
-                foreach (DirectoryInfo eventFolder in eventFolders)
-                {
-                    try
-                    {
-                        //Console.WriteLine("Got event folder " + eventFolder.Name);
-                        DirectoryInfo[] eventDetailFolders = eventFolder.GetDirectories();
-                        foreach (DirectoryInfo eventDetailFolder in eventDetailFolders)
-                        {
-                            //Console.WriteLine("Got event detail subfolder " + eventDetailFolder.Name);
-                            String fullEventName = eventFolder + "/" + eventDetailFolder;
-                            try
-                            {
-                                FileInfo[] soundFiles = eventDetailFolder.GetFiles();
-                                foreach (FileInfo soundFile in soundFiles)
-                                {
-                                    if (soundFile.Name.EndsWith(".wav") && (sweary || !soundFile.Name.StartsWith("sweary")))
-                                    {
-                                        //Console.WriteLine("Got sound file " + soundFile.FullName);
-                                        soundsCount++;
-                                        openAndCacheClip(eventFolder + "/" + eventDetailFolder, soundFile.FullName);
-                                        if (!enabledSounds.Contains(fullEventName))
-                                        {
-                                            enabledSounds.Add(fullEventName);
-                                        }
-                                    }
-                                }
-                                if (!enabledSounds.Contains(fullEventName))
-                                {
-                                    Console.WriteLine("Event " + fullEventName + " has no sound files");
-                                }
-                            }
-                            catch (DirectoryNotFoundException)
-                            {
-                                Console.WriteLine("Event subfolder " + fullEventName + " not found");
-                            }
-                        }
-                    }
-                    catch (DirectoryNotFoundException)
-                    {
-                        Console.WriteLine("Unable to find events folder");
-                    }
-                }
-                Console.WriteLine("Cached " + soundsCount + " clips");
-                initialised = true;
+                soundCache = new SoundCache(new DirectoryInfo(soundFilesPath), new String[] { "numbers", "pearls_of_wisdom", "spotter" }, sweary, true);
             }
-            catch (DirectoryNotFoundException)
-            {
-                Console.WriteLine("Unable to find sounds directory");
-            }            
-        }
-
-        public void cacheDriverName(String driverName)
-        {
-            DirectoryInfo driverNamesSoundDirectory = new DirectoryInfo(driverNamesFolderPath);
-            if (!driverNamesSoundDirectory.Exists)
-            {
-                Console.WriteLine("Unable to find driver names directory " + driverNamesSoundDirectory.FullName);
-                return;
-            }
-            FileInfo[] driverNamesFiles = driverNamesSoundDirectory.GetFiles();
-            foreach (FileInfo driverNameFile in driverNamesFiles)
-            {
-                if (driverNameFile.Name.EndsWith(".wav"))
-                {
-                    if (driverNameFile.Name.ToLower().Equals(driverName.ToLower() + ".wav") ||
-                            driverNameFile.Name.Equals(driverName + ".wav") ||
-                        driverNameFile.Name.ToLowerInvariant().Equals(driverName.ToLower() + ".wav"))
-                    {
-                        if (!clips.ContainsKey(driverName))
-                        {
-                            Console.WriteLine("Caching driver name sound file for " + driverName);
-                            SoundPlayer clip = new SoundPlayer(driverNameFile.FullName);
-                            clip.Load();
-                            List<SoundPlayer> driverNameClips = new List<SoundPlayer>();
-                            driverNameClips.Add(clip);
-                            clips.Add(driverName, driverNameClips);
-                        }
-                        if (!availableDriverNames.Contains(driverName))
-                        {
-                            availableDriverNames.Add(driverName);
-                        }
-                    }
-                }
-            }
-        }
-
-        public void cacheDriverNames(List<String> driverNames)
-        {
-            List<String> namesWithNoSoundFile = new List<string>();
-            List<String> namesWithSoundFile = new List<String>();
-            namesWithNoSoundFile.AddRange(driverNames);
-            try
-            {
-                availableDriverNames.Clear();
-                DirectoryInfo driverNamesSoundDirectory = new DirectoryInfo(driverNamesFolderPath);
-                if (!driverNamesSoundDirectory.Exists)
-                {
-                    Console.WriteLine("Unable to find driver names directory " + driverNamesSoundDirectory.FullName);
-                    return;
-                }
-                FileInfo[] driverNamesFiles = driverNamesSoundDirectory.GetFiles();
-                foreach (FileInfo driverNameFile in driverNamesFiles)
-                {
-                    if (driverNameFile.Name.EndsWith(".wav"))
-                    {
-                        foreach (String driverName in driverNames)
-                        {
-                            if (driverNameFile.Name.ToLower().Equals(driverName.ToLower() + ".wav") ||
-                                driverNameFile.Name.Equals(driverName + ".wav") ||
-                                driverNameFile.Name.ToLowerInvariant().Equals(driverName.ToLower() + ".wav"))
-                            {
-                                namesWithNoSoundFile.Remove(driverName);
-                                namesWithSoundFile.Add(driverName);
-                                if (!clips.ContainsKey(driverName))
-                                {
-                                    SoundPlayer clip = new SoundPlayer(driverNameFile.FullName);
-                                    clip.Load();
-                                    List<SoundPlayer> driverNameClips = new List<SoundPlayer>();
-                                    driverNameClips.Add(clip);
-                                    clips.Add(driverName, driverNameClips);
-                                }
-                                if (!availableDriverNames.Contains(driverName))
-                                {
-                                    availableDriverNames.Add(driverName);
-                                }
-                            }
-                        }
-                    }
-                }
-                if (namesWithSoundFile.Count > 0)
-                {
-                    Console.WriteLine("Cached sound files for driver names:");
-                    Console.WriteLine(String.Join(", ", namesWithSoundFile));
-                }
-                if (namesWithNoSoundFile.Count > 0)
-                {
-                    Console.WriteLine("These driver names have no sound file:");
-                    Console.WriteLine(String.Join(", ", namesWithNoSoundFile));
-                }
-            }
-            catch (DirectoryNotFoundException)
-            {
-                Console.WriteLine("Unable to find driver names directory - path: " + driverNamesFolderPath);
-            }
+            initialised = true;
         }
 
         public void startMonitor()
@@ -763,32 +557,6 @@ namespace CrewChiefV4
             }
         }
 
-        private void playSyncWithRetry(String eventName, int retries)
-        {            
-            Boolean played = false;
-            try
-            {
-                List<SoundPlayer> clipsList = clips[eventName];
-                int index = random.Next(0, clipsList.Count);
-                SoundPlayer clip = clipsList[index];
-                DateTime start = DateTime.Now;
-                clip.PlaySync();
-                double waited = (DateTime.Now - start).TotalMilliseconds;
-                played = waited > 100;
-                if (!played) {
-                    Console.WriteLine("Failed to play clip " + eventName + " at index " + index + " after " + retries + " retries, waited " + waited + " ms");
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Error playing clip " + eventName + ", " + e.Message);
-            }
-            if (!played && retries < 3)            
-            {
-                playSyncWithRetry(eventName, retries++);
-            }
-        }
-
         private List<String> playSounds(List<String> eventNames, Boolean isImmediateMessages, out Boolean wasInterrupted)
         {
             Console.WriteLine("Playing sounds, events: " + String.Join(", ", eventNames));
@@ -836,7 +604,7 @@ namespace CrewChiefV4
                                 timeLastPearlOfWisdomPlayed = DateTime.Now;
                                 if (!mute)
                                 {
-                                    playSyncWithRetry(eventName, 0);
+                                    soundCache.Play(eventName);
                                 }
                             }
                         }
@@ -847,7 +615,7 @@ namespace CrewChiefV4
                             {
                                 if (!mute)
                                 {
-                                    playSyncWithRetry(message, 0);
+                                    soundCache.Play(message);
                                 }
                             }
                             if (playedMessagesCount.ContainsKey(eventName))
@@ -924,16 +692,13 @@ namespace CrewChiefV4
                     backgroundPlayer.Play();
                 }
 
-                if (enableStartBleep)
+                if (useShortBeepWhenOpeningChannel)
                 {
-                    if (useShortBeepWhenOpeningChannel)
-                    {
-                        playShortStartSpeakingBeep();
-                    }
-                    else
-                    {
-                        playStartSpeakingBeep();
-                    }
+                    playShortStartSpeakingBeep();
+                }
+                else
+                {
+                    playStartSpeakingBeep();
                 }
             }
         }
@@ -942,10 +707,7 @@ namespace CrewChiefV4
         {
             if (channelOpen)
             {
-                if (enableEndBleep)
-                {
-                    playEndSpeakingBeep();
-                }
+                playEndSpeakingBeep();
                 if (getBackgroundVolume() > 0 && !mute)
                 {
                     if (!backgroundPlayerInitialised)
@@ -962,66 +724,49 @@ namespace CrewChiefV4
                     }
                 }
                 channelOpen = false;
+                soundCache.ExpireCachedSounds();
             }
             useShortBeepWhenOpeningChannel = false;
         }
 
         public void playStartSpeakingBeep()
         {
-            List<SoundPlayer> bleeps = clips["start_bleep"];
-            int bleepIndex = random.Next(0, bleeps.Count);
-            //Console.WriteLine("*** Opening channel, using bleep start_bleep at position " + bleepIndex);
             if (!mute)
             {
-                bleeps[bleepIndex].PlaySync();
+                soundCache.Play("start_bleep");
             }
         }
 
         public void playStartListeningBeep()
         {
-            if (useListenBeep && clips.ContainsKey("listen_start_sound"))
+            if (useListenBeep)
             {
-                List<SoundPlayer> bleeps = clips["listen_start_sound"];
-                int bleepIndex = random.Next(0, bleeps.Count);
-                Console.WriteLine("*** Listening, using sound listen_start_sound at position " + bleepIndex);
                 if (!mute)
                 {
-                    bleeps[bleepIndex].Play();
+                    soundCache.Play("listen_start_sound");
                 }
             }
         }
 
         public void playShortStartSpeakingBeep()
         {
-            List<SoundPlayer> bleeps = clips["short_start_bleep"];
-            int bleepIndex = random.Next(0, bleeps.Count);
-            // Console.WriteLine("*** Opening channel, using bleep short_bleep at position " + bleepIndex);
             if (!mute)
             {
-                bleeps[bleepIndex].Play();
+                soundCache.Play("short_start_bleep");
             }
         }
 
         public void playEndSpeakingBeep()
         {
-            List<SoundPlayer> bleeps = clips["end_bleep"];
-            int bleepIndex = random.Next(0, bleeps.Count);
-            // Console.WriteLine("*** Closing channel, using bleep end_bleep at position " + bleepIndex);
             if (!mute)
             {
-                bleeps[bleepIndex].PlaySync();
+                soundCache.Play("end_bleep");
             }
         }
 
         public void purgeQueues()
         {
-            foreach (KeyValuePair<string, List<SoundPlayer>> entry in clips)
-            {
-                foreach (SoundPlayer clip in entry.Value)
-                {
-                    clip.Stop();
-                }
-            }
+            soundCache.StopAll();
             lock (queuedClips)
             {
                 ArrayList keysToPurge = new ArrayList(queuedClips.Keys);
@@ -1175,22 +920,6 @@ namespace CrewChiefV4
             }
         }
 
-        private void openAndCacheClip(String eventName, String file)
-        {
-            SoundPlayer clip = new SoundPlayer(file);
-            clip.Load();
-            if (!clips.ContainsKey(eventName))
-            {
-                clips.Add(eventName, new List<SoundPlayer>());
-                if (!allMessageNames.Contains(eventName))
-                {
-                    allMessageNames.Add(eventName);
-                }
-            }
-            clips[eventName].Add(clip);
-            // Console.WriteLine("cached clip " + file + " into set " + eventName);
-        }
-
         private void backgroundPlayer_MediaEnded(object sender, EventArgs e)
         {
             Console.WriteLine("looping...");
@@ -1256,6 +985,15 @@ namespace CrewChiefV4
             {
                 playClipImmediately(lastMessagePlayed, false);
                 closeChannel();
+            }
+        }
+
+        public void Dispose()
+        {
+            if (soundCache != null)
+            {
+                soundCache.StopAndUnloadAll();
+                soundCache = null;
             }
         }
     }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using CrewChiefV4.Events;
 using CrewChiefV4.GameState;
+using CrewChiefV4.Audio;
 
 namespace CrewChiefV4
 {
@@ -60,7 +61,7 @@ namespace CrewChiefV4
 
         public static String folderNameOh = "numbers/oh";
         public static String folderNamePoint = "numbers/point";
-        private static String folderNameNumbersStub = "numbers/";
+        public static String folderNameNumbersStub = "numbers/";
         private static String folderNameThousand = "numbers/thousand";
         private static String folderNameThousandAnd = "numbers/thousand_and";
         private static String folderNameHundred = "numbers/hundred";
@@ -180,8 +181,8 @@ namespace CrewChiefV4
                 switch (messageFragment.type)
                 {
                     case MessageFragment.FragmentType.Text:
-                        if (AudioPlayer.allMessageNames.Contains(messageFragment.text) || 
-                            AudioPlayer.availableDriverNames.Contains(messageFragment.text))
+                        if (SoundCache.availableSounds.Contains(messageFragment.text) ||
+                            SoundCache.availableDriverNames.Contains(messageFragment.text))
                         {
                             messages.Add(messageFragment.text);
                         }
@@ -199,7 +200,7 @@ namespace CrewChiefV4
                         else { 
                             foreach (String timeFolder in timeFolders)
                             {
-                                if (!AudioPlayer.allMessageNames.Contains(timeFolder))
+                                if (!SoundCache.availableSounds.Contains(timeFolder))
                                 {
                                     canBePlayed = false;
                                     break;
@@ -213,7 +214,7 @@ namespace CrewChiefV4
                         if (messageFragment.opponent != null)
                         {
                             String usableName = DriverNameHelper.getUsableNameForRawName(messageFragment.opponent.DriverRawName);
-                            if (AudioPlayer.availableDriverNames.Contains(usableName))
+                            if (SoundCache.availableDriverNames.Contains(usableName))
                             {
                                 messages.Add(usableName);
                                 canBePlayed = true;
@@ -227,7 +228,7 @@ namespace CrewChiefV4
                             break;
                         } else {
                             foreach (String integerFolder in integerFolders) {
-                                if (!AudioPlayer.allMessageNames.Contains(integerFolder))
+                                if (!SoundCache.availableSounds.Contains(integerFolder))
                                 {
                                     canBePlayed = false;
                                     break;

@@ -84,10 +84,11 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Audio\Sounds.cs" />
     <Compile Include="CarData.cs" />
     <Compile Include="DriverNameHelper.cs" />
     <Compile Include="Events\AbstractEvent.cs" />
-    <Compile Include="AudioPlayer.cs" />
+    <Compile Include="Audio\AudioPlayer.cs" />
     <Compile Include="ControllerConfiguration.cs" />
     <Compile Include="Events\CommonDataContainers.cs" />
     <Compile Include="Events\OvertakingAidsMonitor.cs" />

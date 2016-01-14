@@ -6,6 +6,7 @@ using CrewChiefV4.RaceRoom.RaceRoomData;
 using System.Threading;
 using CrewChiefV4.GameState;
 using System.IO;
+using CrewChiefV4.Audio;
 
 namespace CrewChiefV4.Events
 {
@@ -62,15 +63,10 @@ namespace CrewChiefV4.Events
             {
                 Console.WriteLine("Playing test sounds for drivers " + String.Join(", ", rawDriverNames));
                 List<String> usableDriverNames = DriverNameHelper.getUsableDriverNames(rawDriverNames, AudioPlayer.soundFilesPath);
-                foreach (String usableDriverName in usableDriverNames)
-                {
-                    AudioPlayer.availableDriverNames.Add(usableDriverName);
-                }
-                audioPlayer.cacheDriverNames(usableDriverNames);
                 int index = 0;
                 foreach (OpponentData driverToTest in driversToTest)
                 {
-                    if (AudioPlayer.availableDriverNames.Contains(DriverNameHelper.getUsableNameForRawName(driverToTest.DriverRawName)))
+                    if (SoundCache.availableDriverNames.Contains(DriverNameHelper.getUsableNameForRawName(driverToTest.DriverRawName)))
                     {
                         audioPlayer.queueClip(new QueuedMessage("gap_in_front" + index,
                                         MessageContents(Timings.folderTheGapTo, driverToTest, Timings.folderAheadIsIncreasing,
@@ -94,7 +90,7 @@ namespace CrewChiefV4.Events
             audioPlayer.queueClip(new QueuedMessage(folderTest, 0, this));
             testDriverNames();
             
-            /*audioPlayer.queueClip(new QueuedMessage("conditionsAirAndTrackIncreasing1", MessageContents
+            audioPlayer.queueClip(new QueuedMessage("conditionsAirAndTrackIncreasing1", MessageContents
                                (ConditionsMonitor.folderAirAndTrackTempIncreasing, 
                                ConditionsMonitor.folderAirTempIsNow, QueuedMessage.folderNameNumbersStub + 26,
                                ConditionsMonitor.folderTrackTempIsNow, QueuedMessage.folderNameNumbersStub + 32, ConditionsMonitor.folderCelsius), 0, this));
@@ -105,7 +101,7 @@ namespace CrewChiefV4.Events
             audioPlayer.queueClip(new QueuedMessage("yesBoxAfter", MessageContents(MandatoryPitStops.folderMandatoryPitStopsYesStopAfter,
                 QueuedMessage.folderNameNumbersStub + 10, MandatoryPitStops.folderMandatoryPitStopsMinutes), 0, null));
             audioPlayer.queueClip(new QueuedMessage("laps_on_current_tyres", MessageContents(TyreMonitor.folderLapsOnCurrentTyresIntro,
-                QueuedMessage.folderNameNumbersStub + 5, TyreMonitor.folderLapsOnCurrentTyresOutro), 0, this));*/
+                QueuedMessage.folderNameNumbersStub + 5, TyreMonitor.folderLapsOnCurrentTyresOutro), 0, this));
             
         }
     }

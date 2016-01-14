@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using CrewChiefV4.Events;
 using System.Threading;
+using CrewChiefV4.Audio;
 
 namespace CrewChiefV4
 {
@@ -305,7 +306,6 @@ namespace CrewChiefV4
                     {
                         return;
                     }
-                    crewChief.audioPlayer.cacheDriverName(usableName);
                     if (initialised)
                     {                        
                         Choices opponentChoices = new Choices();

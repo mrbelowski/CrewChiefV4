@@ -16,6 +16,7 @@ using AutoUpdaterDotNET;
 using System.Net;
 using System.Xml.Linq;
 using System.IO.Compression;
+using CrewChiefV4.Audio;
 
 namespace CrewChiefV4
 {

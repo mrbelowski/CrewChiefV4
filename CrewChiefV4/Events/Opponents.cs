@@ -5,6 +5,7 @@ using System.Text;
 using CrewChiefV4.RaceRoom.RaceRoomData;
 using System.Threading;
 using CrewChiefV4.GameState;
+using CrewChiefV4.Audio;
 
 namespace CrewChiefV4.Events
 {
@@ -119,7 +120,7 @@ namespace CrewChiefV4.Events
                         // a tenth quicker then his previous best we do...
                         if (((currentGameState.SessionData.SessionType == SessionType.Race && opponentData.CompletedLaps > 2) ||
                             (currentGameState.SessionData.SessionType != SessionType.Race && opponentData.CompletedLaps > 1)) && opponentData.LastLapTime <= currentFastestLap &&
-                            AudioPlayer.availableDriverNames.Contains(DriverNameHelper.getUsableNameForRawName(opponentData.DriverRawName)))
+                            SoundCache.availableDriverNames.Contains(DriverNameHelper.getUsableNameForRawName(opponentData.DriverRawName)))
                         {
                             audioPlayer.queueClip(new QueuedMessage("new_fastest_lap", MessageContents(folderNewFastestLapFor, opponentData,
                                         TimeSpan.FromSeconds(opponentData.LastLapTime)), 0, this));

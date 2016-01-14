@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using CrewChiefV4.GameState;
 using CrewChiefV4.PCars;
 using CrewChiefV4.RaceRoom.RaceRoomData;
+using CrewChiefV4.Audio;
 
 
 namespace CrewChiefV4
@@ -125,6 +126,10 @@ namespace CrewChiefV4
             if (speechRecogniser != null)
             {
                 speechRecogniser.Dispose();
+            }
+            if (audioPlayer != null)
+            {
+                audioPlayer.Dispose();
             }
         }
 
@@ -447,7 +452,6 @@ namespace CrewChiefV4
                                         {
                                             speechRecogniser.addOpponentSpeechRecognition(usableDriverNames, enableDriverNames);
                                         }
-                                        audioPlayer.cacheDriverNames(usableDriverNames);
                                     }
                                 }                                
                             }
