@@ -16,7 +16,7 @@ namespace CrewChiefV4.Events
 
         private String folderGreenGreenGreen = "lap_counter/green_green_green";
 
-        private String folderGetReady = "lap_counter/get_ready";
+        public static String folderGetReady = "lap_counter/get_ready";
 
         private String folderLastLap = "lap_counter/last_lap";
 
