@@ -11,11 +11,7 @@ namespace CrewChiefV4.Audio
     public class SoundCache
     {
         private Boolean useAlternateBeeps = UserSettings.GetUserSettings().getBoolean("use_alternate_beeps");
-
-        // TODO: proper implementation of current player name - need multiple reusable recordings with it it - 
-        // e.g. "come on [jim]...", "OK [jim]...", "fuck's sake [jim]..." and a way to represent where to
-        // put this recording and which one to select based on (I think) the filename
-
+        
         private List<String> dynamicLoadedSounds = new List<String>();
         public static Dictionary<String, SoundSet> soundSets = new Dictionary<String, SoundSet>();
         private Dictionary<String, SingleSound> singleSounds = new Dictionary<String, SingleSound>();
@@ -61,33 +57,69 @@ namespace CrewChiefV4.Audio
                 " sound sets, with " + currentLoadedCount + " active SoundPlayer objects");
         }
 
+        public void Play(List<String> soundNames)
+        {
+            SoundSet prefix = null;
+            SoundSet suffix = null;
+            List<SingleSound> singleSoundsToPlay = new List<SingleSound>();
+            foreach (String soundName in soundNames)
+            {
+                SingleSound singleSound = null;
+                if (soundSets.ContainsKey(soundName))
+                {
+                    SoundSet soundSet = soundSets[soundName];
+                    singleSound = soundSet.getSingleSound();
+                    if (!soundSet.keepCached)
+                    {
+                        if (dynamicLoadedSounds.Contains(soundName))
+                        {
+                            dynamicLoadedSounds.Remove(soundName);
+                        }
+                        dynamicLoadedSounds.Add(soundName);
+                    }
+                } 
+                else if (singleSounds.ContainsKey(soundName))
+                {
+                    singleSound = singleSounds[soundName];
+                }
+                if (singleSound != null)
+                {
+                    if (singleSound.prefixSoundSet != null)
+                    {
+                        prefix = singleSound.prefixSoundSet;
+                    }
+                    if (singleSound.suffixSoundSet != null)
+                    {
+                        suffix = singleSound.suffixSoundSet;
+                    }
+                    singleSoundsToPlay.Add(singleSound);
+                }
+            }
+            if (singleSounds.Count > 0)
+            {
+                if (prefix != null)
+                {
+                    singleSoundsToPlay.Insert(0, prefix.getSingleSound());
+                }
+                if (suffix != null)
+                {
+                    singleSoundsToPlay.Add(prefix.getSingleSound());
+                }
+                foreach (SingleSound singleSound in singleSoundsToPlay)
+                {
+                    if (singleSound.Play())
+                    {
+                        currentLoadedCount++;
+                    }
+                }
+            }
+        }
+
         public void Play(String soundName)
         {
-            if (soundSets.ContainsKey(soundName))
-            {
-                SoundSet soundSet = soundSets[soundName];
-                Boolean newlyLoaded = soundSets[soundName].Play();
-                // now if this sound is a dynamic one, move it to the front of the cache (end of the list)
-                if (!soundSet.keepCached)
-                {
-                    if (dynamicLoadedSounds.Contains(soundName))
-                    {
-                        dynamicLoadedSounds.Remove(soundName);
-                    }
-                    dynamicLoadedSounds.Add(soundName);
-                }
-                if (newlyLoaded)
-                {
-                    currentLoadedCount++;
-                }
-            }
-            else if (singleSounds.ContainsKey(soundName))
-            {
-                if (singleSounds[soundName].Play())
-                {
-                    currentLoadedCount++;
-                }
-            }
+            List<String> l = new List<String>();
+            l.Add(soundName);
+            Play(l);
         }
 
         public void ExpireCachedSounds()
@@ -334,18 +366,21 @@ namespace CrewChiefV4.Audio
             }
             initialised = true;
         }
-
-        public Boolean Play() {
+        
+        public SingleSound getSingleSound()
+        {
             if (!initialised)
             {
                 initialise();
             }
-            Boolean hadToLoadSound = false;
             if (singleSounds.Count > 0)
             {
-                hadToLoadSound = singleSounds[SoundSet.random.Next(0, singleSounds.Count)].Play();
+                return singleSounds[SoundSet.random.Next(0, singleSounds.Count)];
             }
-            return hadToLoadSound;
+            else
+            {
+                return null;
+            }
         }
 
         public int UnLoadAll()
@@ -401,10 +436,6 @@ namespace CrewChiefV4.Audio
 
         public Boolean Play()
         {
-            if (prefixSoundSet != null)
-            {
-                prefixSoundSet.Play();
-            }
             Boolean hadToLoadSound = false;
             if (!allowCaching)
             {
@@ -421,10 +452,6 @@ namespace CrewChiefV4.Audio
                     hadToLoadSound = true;
                 }
                 this.soundPlayer.PlaySync();
-            }
-            if (suffixSoundSet != null)
-            {
-                suffixSoundSet.Play();
             }
             return hadToLoadSound;
         }

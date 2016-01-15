@@ -613,12 +613,9 @@ namespace CrewChiefV4.Audio
                         else
                         {
                             lastMessagePlayed = thisMessage;
-                            foreach (String message in thisMessage.messageFolders)
+                            if (!mute)
                             {
-                                if (!mute)
-                                {
-                                    soundCache.Play(message);
-                                }
+                                soundCache.Play(thisMessage.messageFolders);
                             }
                             if (playedMessagesCount.ContainsKey(eventName))
                             {
