@@ -404,7 +404,7 @@ namespace CrewChiefV4.Audio
         }
     }
 
-    class SingleSound
+    public class SingleSound
     {
         private String fullPath;
         private byte[] fileBytes;
