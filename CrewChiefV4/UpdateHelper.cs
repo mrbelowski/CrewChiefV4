@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CrewChiefV4.Audio;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -27,6 +28,31 @@ namespace CrewChiefV4
                 }
             }
             Directory.Delete(source, true);
+        }
+
+        public static void RemoveDeletedFiles(String source)
+        {
+            try {
+                StreamReader file = new StreamReader(source + @"\deletions.txt");
+                int count = 0;
+                string line;
+                while ((line = file.ReadLine()) != null)
+                {
+                    try { 
+                        File.Delete(AudioPlayer.soundFilesPath + @"\" + line);
+                        count++;
+                    }
+                    catch (Exception e)
+                    {
+
+                    }
+                }
+                Console.WriteLine("Successfully deleted " + count + " outdated sound files");
+                file.Close();
+                File.Delete(source + @"\deletions.txt");
+            } catch (Exception e) {
+
+            }
         }
     }
 }

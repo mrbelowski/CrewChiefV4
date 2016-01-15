@@ -25,8 +25,10 @@ namespace CrewChiefV4.Audio
         private int purgeBlockSize = 100;
         private int currentLoadedCount;
 
-        public static String PREFIX_IDENTIFIER = "prefix";
-        public static String SUFFIX_IDENTIFIER = "suffix";
+        public static String OPTIONAL_PREFIX_IDENTIFIER = "op_prefix";
+        public static String OPTIONAL_SUFFIX_IDENTIFIER = "op_suffix";
+        public static String REQUIRED_PREFIX_IDENTIFIER = "rq_prefix";
+        public static String REQUIRED_SUFFIX_IDENTIFIER = "rq_suffix";
 
         public SoundCache(DirectoryInfo soundsFolder, String[] eventTypesToKeepCached, Boolean useSwearyMessages, Boolean allowCaching)
         {
@@ -323,10 +325,12 @@ namespace CrewChiefV4.Audio
                 {
                     if (soundFile.Name.EndsWith(".wav")) {                        
                         if (this.useSwearyMessages || !soundFile.Name.StartsWith("sweary"))
-                        {                            
-                            if (soundFile.Name.Contains(SoundCache.PREFIX_IDENTIFIER) || soundFile.Name.Contains(SoundCache.SUFFIX_IDENTIFIER))
+                        {
+                            if (soundFile.Name.Contains(SoundCache.REQUIRED_PREFIX_IDENTIFIER) || soundFile.Name.Contains(SoundCache.REQUIRED_SUFFIX_IDENTIFIER) ||
+                                soundFile.Name.Contains(SoundCache.OPTIONAL_PREFIX_IDENTIFIER) || soundFile.Name.Contains(SoundCache.OPTIONAL_PREFIX_IDENTIFIER))
                             {
-                                // for this to be valid it must have a corresponding prefix
+                                Boolean isOptional = soundFile.Name.Contains(SoundCache.OPTIONAL_PREFIX_IDENTIFIER) || soundFile.Name.Contains(SoundCache.OPTIONAL_PREFIX_IDENTIFIER);
+                                Boolean added = false;
                                 foreach (String prefixSuffixName in SoundCache.availablePrefixesAndSuffixes)
                                 {
                                     if (soundFile.Name.Contains(prefixSuffixName) && SoundCache.soundSets.ContainsKey(prefixSuffixName))
@@ -336,7 +340,7 @@ namespace CrewChiefV4.Audio
                                         {
                                             hasSounds = true;
                                             SingleSound singleSound = new SingleSound(soundFile.FullName, this.allowCaching, this.keepCached, this.allowCaching);
-                                            if (soundFile.Name.Contains(SoundCache.SUFFIX_IDENTIFIER))
+                                            if (soundFile.Name.Contains(SoundCache.OPTIONAL_SUFFIX_IDENTIFIER) || soundFile.Name.Contains(SoundCache.REQUIRED_SUFFIX_IDENTIFIER))
                                             {
                                                 singleSound.suffixSoundSet = additionalSoundSet;
                                             }
@@ -345,10 +349,17 @@ namespace CrewChiefV4.Audio
                                                 singleSound.prefixSoundSet = additionalSoundSet;
                                             }
                                             singleSounds.Add(singleSound);
+                                            added = true;
                                             soundsCount++;
                                         }
                                         break;
                                     }
+                                }
+                                if (!added && isOptional)
+                                {
+                                    hasSounds = true;
+                                    singleSounds.Add(new SingleSound(soundFile.FullName, this.allowCaching, this.keepCached, this.allowCaching));
+                                    soundsCount++;
                                 }
                             }
                             else
