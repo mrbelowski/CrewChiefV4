@@ -358,7 +358,7 @@ namespace CrewChiefV4.Events
                         }
                         else if (mandatoryTyreChangeTyreType == TyreType.Option)
                         {
-                            audioPlayer.queueClip(new QueuedMessage("box_now_for_options", MessageContents(folderMandatoryPitStopsPitNow, folderMandatoryPitStopsPrimeTyres), 3, this));
+                            audioPlayer.queueClip(new QueuedMessage("box_now_for_options", MessageContents(folderMandatoryPitStopsPitNow, folderMandatoryPitStopsOptionTyres), 3, this));
                         }
                         else
                         {
