@@ -1279,5 +1279,17 @@ namespace CrewChiefV4.Properties {
                 this["cache_sounds"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("60")]
+        public int min_time_between_personalised_messages {
+            get {
+                return ((int)(this["min_time_between_personalised_messages"]));
+            }
+            set {
+                this["min_time_between_personalised_messages"] = value;
+            }
+        }
     }
 }

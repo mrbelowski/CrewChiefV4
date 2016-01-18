@@ -11,6 +11,7 @@ namespace CrewChiefV4.Audio
     public class SoundCache
     {
         private Boolean useAlternateBeeps = UserSettings.GetUserSettings().getBoolean("use_alternate_beeps");
+        private TimeSpan minTimeBetweenPersonalisedMessages = TimeSpan.FromSeconds(UserSettings.GetUserSettings().getInt("min_time_between_personalised_messages"));
         
         private List<String> dynamicLoadedSounds = new List<String>();
         public static Dictionary<String, SoundSet> soundSets = new Dictionary<String, SoundSet>();
@@ -29,6 +30,8 @@ namespace CrewChiefV4.Audio
         public static String OPTIONAL_SUFFIX_IDENTIFIER = "op_suffix";
         public static String REQUIRED_PREFIX_IDENTIFIER = "rq_prefix";
         public static String REQUIRED_SUFFIX_IDENTIFIER = "rq_suffix";
+
+        private DateTime lastPersonalisedMessageTime = DateTime.MinValue;
 
         public SoundCache(DirectoryInfo soundsFolder, String[] eventTypesToKeepCached, Boolean useSwearyMessages, Boolean allowCaching)
         {
@@ -61,6 +64,7 @@ namespace CrewChiefV4.Audio
 
         public void Play(List<String> soundNames)
         {
+            Boolean canUsePersonalised = lastPersonalisedMessageTime.Add(minTimeBetweenPersonalisedMessages) > DateTime.Now;
             SoundSet prefix = null;
             SoundSet suffix = null;
             List<SingleSound> singleSoundsToPlay = new List<SingleSound>();
@@ -70,7 +74,7 @@ namespace CrewChiefV4.Audio
                 if (soundSets.ContainsKey(soundName))
                 {
                     SoundSet soundSet = soundSets[soundName];
-                    singleSound = soundSet.getSingleSound();
+                    singleSound = soundSet.getSingleSound(canUsePersonalised);
                     if (!soundSet.keepCached)
                     {
                         if (dynamicLoadedSounds.Contains(soundName))
@@ -101,11 +105,13 @@ namespace CrewChiefV4.Audio
             {
                 if (prefix != null)
                 {
-                    singleSoundsToPlay.Insert(0, prefix.getSingleSound());
+                    singleSoundsToPlay.Insert(0, prefix.getSingleSound(false));
+                    lastPersonalisedMessageTime = DateTime.Now;
                 }
                 if (suffix != null)
                 {
-                    singleSoundsToPlay.Add(prefix.getSingleSound());
+                    singleSoundsToPlay.Add(prefix.getSingleSound(false));
+                    lastPersonalisedMessageTime = DateTime.Now;
                 }
                 foreach (SingleSound singleSound in singleSoundsToPlay)
                 {
@@ -297,7 +303,8 @@ namespace CrewChiefV4.Audio
     {
         private static Random random = new Random();
 
-        private List<SingleSound> singleSounds = new List<SingleSound>();
+        private List<SingleSound> singleSoundsNoPrefixOrSuffix = new List<SingleSound>();
+        private List<SingleSound> singleSoundsWithPrefixOrSuffix = new List<SingleSound>();
         private DirectoryInfo soundFolder;
         private Boolean useSwearyMessages;
         public Boolean keepCached;
@@ -348,7 +355,7 @@ namespace CrewChiefV4.Audio
                                             {
                                                 singleSound.prefixSoundSet = additionalSoundSet;
                                             }
-                                            singleSounds.Add(singleSound);
+                                            singleSoundsWithPrefixOrSuffix.Add(singleSound);
                                             added = true;
                                             soundsCount++;
                                         }
@@ -358,14 +365,14 @@ namespace CrewChiefV4.Audio
                                 if (!added && isOptional)
                                 {
                                     hasSounds = true;
-                                    singleSounds.Add(new SingleSound(soundFile.FullName, this.allowCaching, this.keepCached, this.allowCaching));
+                                    singleSoundsNoPrefixOrSuffix.Add(new SingleSound(soundFile.FullName, this.allowCaching, this.keepCached, this.allowCaching));
                                     soundsCount++;
                                 }
                             }
                             else
                             {
                                 hasSounds = true;
-                                singleSounds.Add(new SingleSound(soundFile.FullName, this.allowCaching, this.keepCached, this.allowCaching));
+                                singleSoundsNoPrefixOrSuffix.Add(new SingleSound(soundFile.FullName, this.allowCaching, this.keepCached, this.allowCaching));
                                 soundsCount++;
                             }                         
                         }
@@ -378,15 +385,19 @@ namespace CrewChiefV4.Audio
             initialised = true;
         }
         
-        public SingleSound getSingleSound()
+        public SingleSound getSingleSound(Boolean preferPersonalised)
         {
             if (!initialised)
             {
                 initialise();
             }
-            if (singleSounds.Count > 0)
+            if (preferPersonalised && singleSoundsWithPrefixOrSuffix.Count > 0)
             {
-                return singleSounds[SoundSet.random.Next(0, singleSounds.Count)];
+                return singleSoundsWithPrefixOrSuffix[SoundSet.random.Next(0, singleSoundsWithPrefixOrSuffix.Count)];
+            } 
+            else if (singleSoundsNoPrefixOrSuffix.Count > 0)
+            {
+                return singleSoundsNoPrefixOrSuffix[SoundSet.random.Next(0, singleSoundsNoPrefixOrSuffix.Count)];
             }
             else
             {
@@ -397,7 +408,15 @@ namespace CrewChiefV4.Audio
         public int UnLoadAll()
         {
             int unloadedCount = 0;
-            foreach (SingleSound singleSound in singleSounds) {
+            foreach (SingleSound singleSound in singleSoundsNoPrefixOrSuffix)
+            {
+                if (singleSound.UnLoad())
+                {
+                    unloadedCount++;
+                }
+            } 
+            foreach (SingleSound singleSound in singleSoundsWithPrefixOrSuffix)
+            {
                 if (singleSound.UnLoad())
                 {
                     unloadedCount++;
@@ -408,7 +427,11 @@ namespace CrewChiefV4.Audio
 
         public void StopAll()
         {
-            foreach (SingleSound singleSound in singleSounds)
+            foreach (SingleSound singleSound in singleSoundsNoPrefixOrSuffix)
+            {
+                singleSound.Stop();
+            } 
+            foreach (SingleSound singleSound in singleSoundsWithPrefixOrSuffix)
             {
                 singleSound.Stop();
             }
