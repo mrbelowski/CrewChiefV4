@@ -64,7 +64,7 @@ namespace CrewChiefV4.Audio
 
         public void Play(List<String> soundNames)
         {
-            Boolean canUsePersonalised = lastPersonalisedMessageTime.Add(minTimeBetweenPersonalisedMessages) > DateTime.Now;
+            Boolean canUsePersonalised = lastPersonalisedMessageTime.Add(minTimeBetweenPersonalisedMessages) < DateTime.Now;
             SoundSet prefix = null;
             SoundSet suffix = null;
             List<SingleSound> singleSoundsToPlay = new List<SingleSound>();
