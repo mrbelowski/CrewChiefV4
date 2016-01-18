@@ -61,7 +61,7 @@ namespace CrewChiefV4
 
         public static String folderNameOh = "numbers/oh";
         public static String folderNamePoint = "numbers/point";
-        public static String folderNameNumbersStub = "numbers/";
+        private static String folderNameNumbersStub = "numbers/";
         private static String folderNameThousand = "numbers/thousand";
         private static String folderNameThousandAnd = "numbers/thousand_and";
         private static String folderNameHundred = "numbers/hundred";
@@ -289,17 +289,27 @@ namespace CrewChiefV4
             if (hundreds != null) {
                 messages.Add(folderNameNumbersStub + hundreds);
                 // don't always use "hundred and"
+                Boolean addedHundreds = false;
                 if (tensAndUnits != null) {
                     if (thousands != null || rand.NextDouble() > 0.6)
                     {
                         messages.Add(folderNameHundredAnd);
+                        addedHundreds = true;
                     }
                 } else {
                     messages.Add(folderNameHundred);
+                    addedHundreds = true;
+                }
+                if (!addedHundreds && tensAndUnits != null && tensAndUnits.Count() == 1)
+                {
+                    // need to modify the tensAndUnits here - we've skipped "hundreds" even though the number is > 99.
+                    // This is fine if the tensAndUnits > 9 (it'll be read as "One twenty five"), but if the tensAndUnits < 10
+                    // this will be read as "One two" instead of "One oh two".
+                    tensAndUnits = "0" + tensAndUnits;
                 }
             }
             if (tensAndUnits != null) {
-                messages.Add(folderNameNumbersStub + tensAndUnits);
+                messages.Add(folderNameNumbersStub + tensAndUnits);                
             }
         }
         return messages;
@@ -382,7 +392,6 @@ namespace CrewChiefV4
             List<String> names = new List<String>();
             if (number < 60)
             {
-                // only numbers < 60 are supported
                 if (number < 10)
                 {
                     // if the number is < 10, use the "oh two" files if we've asked for "oh" instead of "zero"
