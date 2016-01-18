@@ -39,22 +39,26 @@ namespace CrewChiefV4
                 string line;
                 while ((line = file.ReadLine()) != null)
                 {
-                    try {
-                        String[] directives = line.Split('|');
-                        if (directives[0] == "rename")
-                        {
-                            File.Move(AudioPlayer.soundFilesPath + @"\" + directives[1], AudioPlayer.soundFilesPath + @"\" + directives[2]);
-                            renamedCount++;
-                        }
-                        else if (directives[0] == "delete")
-                        {
-                            File.Delete(AudioPlayer.soundFilesPath + @"\" + directives[1]);
-                            deletedCount++;
-                        }                        
-                    }
-                    catch (Exception e)
+                    if (line.Trim().Length > 0 && !line.StartsWith("#"))
                     {
+                        try
+                        {
+                            String[] directives = line.Split('|');
+                            if (directives[0] == "rename")
+                            {
+                                File.Move(AudioPlayer.soundFilesPath + @"\" + directives[1], AudioPlayer.soundFilesPath + @"\" + directives[2]);
+                                renamedCount++;
+                            }
+                            else if (directives[0] == "delete")
+                            {
+                                File.Delete(AudioPlayer.soundFilesPath + @"\" + directives[1]);
+                                deletedCount++;
+                            }
+                        }
+                        catch (Exception e)
+                        {
 
+                        }
                     }
                 }
                 Console.WriteLine("Successfully deleted " + deletedCount + " and renamed " + renamedCount + " sound files");

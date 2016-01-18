@@ -52,6 +52,9 @@ namespace CrewChiefV4.Audio
         private Boolean holdChannelOpen = false;
         private Boolean useShortBeepWhenOpeningChannel = false;
 
+        private TimeSpan maxTimeToHoldEmptyChannelOpen = TimeSpan.FromSeconds(UserSettings.GetUserSettings().getInt("spotter_hold_repeat_frequency") + 1);
+        private DateTime timeOfLastMessageEnd = DateTime.MinValue;
+
         private readonly TimeSpan queueMonitorInterval = TimeSpan.FromMilliseconds(1000);
 
         private readonly int immediateMessagesMonitorInterval = 20;
@@ -301,7 +304,7 @@ namespace CrewChiefV4.Audio
                     requestChannelOpen = false;
                     holdChannelOpen = true;
                 }
-                if (!holdChannelOpen && channelOpen)
+                if (channelOpen && (!holdChannelOpen || DateTime.Now > timeOfLastMessageEnd + maxTimeToHoldEmptyChannelOpen))
                 {
                     closeRadioInternalChannel();
                 }
@@ -599,6 +602,7 @@ namespace CrewChiefV4.Audio
                                     if (!mute)
                                     {
                                         soundCache.Play(eventName);
+                                        timeOfLastMessageEnd = DateTime.Now;
                                     }
                                 }
                             }
@@ -608,6 +612,7 @@ namespace CrewChiefV4.Audio
                                 if (!mute)
                                 {
                                     soundCache.Play(thisMessage.messageFolders);
+                                    timeOfLastMessageEnd = DateTime.Now;
                                 }
                                 if (playedMessagesCount.ContainsKey(eventName))
                                 {
