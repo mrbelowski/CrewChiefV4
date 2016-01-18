@@ -30,26 +30,36 @@ namespace CrewChiefV4
             Directory.Delete(source, true);
         }
 
-        public static void RemoveDeletedFiles(String source)
+        public static void ProcessFileUpdates(String source)
         {
             try {
-                StreamReader file = new StreamReader(source + @"\deletions.txt");
-                int count = 0;
+                StreamReader file = new StreamReader(source + @"\updates.txt");
+                int deletedCount = 0;
+                int renamedCount = 0;
                 string line;
                 while ((line = file.ReadLine()) != null)
                 {
-                    try { 
-                        File.Delete(AudioPlayer.soundFilesPath + @"\" + line);
-                        count++;
+                    try {
+                        String[] directives = line.Split('|');
+                        if (directives[0] == "rename")
+                        {
+                            File.Move(AudioPlayer.soundFilesPath + @"\" + directives[1], AudioPlayer.soundFilesPath + @"\" + directives[2]);
+                            renamedCount++;
+                        }
+                        else if (directives[0] == "delete")
+                        {
+                            File.Delete(AudioPlayer.soundFilesPath + @"\" + directives[1]);
+                            deletedCount++;
+                        }                        
                     }
                     catch (Exception e)
                     {
 
                     }
                 }
-                Console.WriteLine("Successfully deleted " + count + " outdated sound files");
+                Console.WriteLine("Successfully deleted " + deletedCount + " and renamed " + renamedCount + " sound files");
                 file.Close();
-                File.Delete(source + @"\deletions.txt");
+                File.Delete(source + @"\updates.txt");
             } catch (Exception e) {
 
             }
