@@ -491,21 +491,8 @@ namespace CrewChiefV4.Audio
             Boolean wasInterrupted = false;
             if (oneOrMoreEventsEnabled)
             {
-                // block for immediate messages...
-                if (isImmediateMessages)
-                {
-                    lock (queueToPlay)
-                    {
-                        openRadioChannelInternal();
-                        soundsProcessed.AddRange(playSounds(keysToPlay, isImmediateMessages, out wasInterrupted));
-                    }
-                }
-                else
-                {
-                    // for queued messages, allow other messages to be inserted into the queue while these are being read
-                    openRadioChannelInternal();
-                    soundsProcessed.AddRange(playSounds(keysToPlay, isImmediateMessages, out wasInterrupted));
-                }
+                openRadioChannelInternal();
+                soundsProcessed.AddRange(playSounds(keysToPlay, isImmediateMessages, out wasInterrupted));
             }
             else
             {
@@ -524,7 +511,9 @@ namespace CrewChiefV4.Audio
                     }
                 }
             }
-            if (queueHasDueMessages(queueToPlay, isImmediateMessages) && !wasInterrupted && !isImmediateMessages)
+            // now we go back and play anything else that's been inserted into the queue since we started, but only if
+            // we've not been interrupted
+            if (queueHasDueMessages(queueToPlay, isImmediateMessages) && (isImmediateMessages || !wasInterrupted))
             {
                 Console.WriteLine("There are " + queueToPlay.Count + " more events in the queue, playing them...");
                 playQueueContents(queueToPlay, isImmediateMessages);

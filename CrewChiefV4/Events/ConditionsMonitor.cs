@@ -173,6 +173,7 @@ namespace CrewChiefV4.Events
             if (currentConditions == null)
             {
                 audioPlayer.playClipImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null), false);
+                audioPlayer.closeChannel();
             }
             else
             {

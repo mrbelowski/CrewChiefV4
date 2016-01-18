@@ -126,10 +126,12 @@ namespace CrewChiefV4.Events
         public override bool isMessageStillValid(string eventSubType, GameStateData currentGameState, Dictionary<String, Object> validationData)
         {
             Boolean isStillInThisPosition = true;
-            if (validationData != null && validationData.ContainsKey(positionValidationKey) &&
-                (int) validationData[positionValidationKey] != currentGameState.SessionData.Position)
+            if (validationData != null)
             {
-                isStillInThisPosition = false;
+                if (validationData.ContainsKey(positionValidationKey) && (int)validationData[positionValidationKey] != currentGameState.SessionData.Position)
+                {
+                    isStillInThisPosition = false;
+                }
             }
             return isApplicableForCurrentSessionAndPhase(currentGameState.SessionData.SessionType, currentGameState.SessionData.SessionPhase) &&
                 !currentGameState.PitData.InPitlane && isStillInThisPosition;
@@ -214,7 +216,9 @@ namespace CrewChiefV4.Events
                             gapsAhead.Clear();
                             // adding a 'good' pearl with 0 probability of playing seems odd, but this forces the app to only
                             // allow an existing queued pearl to be played if it's type is 'good'
-                            audioPlayer.queueClip(new QueuedMessage(folderOvertaking, 0, this), PearlsOfWisdom.PearlType.GOOD, 0);
+                            Dictionary<String, Object> validationData = new Dictionary<String, Object>();
+                            validationData.Add(positionValidationKey, currentGameState.SessionData.Position);
+                            audioPlayer.queueClip(new QueuedMessage(folderOvertaking, 0, this, validationData), PearlsOfWisdom.PearlType.GOOD, 5);
                             reported = true;
                         }
                     }
@@ -252,7 +256,9 @@ namespace CrewChiefV4.Events
                             gapsBehind.Clear();
                             // adding a 'bad' pearl with 0 probability of playing seems odd, but this forces the app to only
                             // allow an existing queued pearl to be played if it's type is 'bad'
-                            audioPlayer.queueClip(new QueuedMessage(folderBeingOvertaken, 0, this), PearlsOfWisdom.PearlType.BAD, 0);
+                            Dictionary<String, Object> validationData = new Dictionary<String, Object>();
+                            validationData.Add(positionValidationKey, currentGameState.SessionData.Position);
+                            audioPlayer.queueClip(new QueuedMessage(folderBeingOvertaken, 0, this, validationData), PearlsOfWisdom.PearlType.BAD, 5);
                             reported = true;
                         }
                     }

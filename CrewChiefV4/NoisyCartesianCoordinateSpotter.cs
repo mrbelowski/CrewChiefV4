@@ -28,7 +28,7 @@ namespace CrewChiefV4
     {
         private float calculateOpponentSpeedsEvery = 200f;
 
-        private float carBehindExtraLength = 0.6f;
+        private float carBehindExtraLength = 0.4f;
 
         // if the audio player is in the middle of another message, this 'immediate' message will have to wait.
         // If it's older than 2000 milliseconds by the time the player's got round to playing it, it's expired
@@ -233,15 +233,15 @@ namespace CrewChiefV4
             return Math.Abs(playerX - opponentX) < maxClosingSpeed && Math.Abs(playerZ - opponentZ) < maxClosingSpeed;
         }
 
-        private Side getSide(float playerRotationInRadians, float playerX, float playerY, float oppponentX, float opponentY, Boolean isOpponentSpeedInRange)
+        private Side getSide(float playerRotationInRadians, float playerX, float playerZ, float oppponentX, float opponentZ, Boolean isOpponentSpeedInRange)
         {
             float rawXCoordinate = oppponentX - playerX;
-            float rawYCoordinate = opponentY - playerY;
+            float rawZCoordinate = opponentZ - playerZ;
 
             // now transform the position by rotating the frame of reference to align it north-south. The player's car is at the origin pointing north.
             // We assume that both cars have similar orientations (or at least, any orientation difference isn't going to be relevant)
-            float alignedXCoordinate = ((float)Math.Cos(playerRotationInRadians) * rawXCoordinate) + ((float)Math.Sin(playerRotationInRadians) * rawYCoordinate);
-            float alignedYCoordinate = ((float)Math.Cos(playerRotationInRadians) * rawYCoordinate) - ((float)Math.Sin(playerRotationInRadians) * rawXCoordinate);
+            float alignedXCoordinate = ((float)Math.Cos(playerRotationInRadians) * rawXCoordinate) + ((float)Math.Sin(playerRotationInRadians) * rawZCoordinate);
+            float alignedZCoordinate = ((float)Math.Cos(playerRotationInRadians) * rawZCoordinate) - ((float)Math.Sin(playerRotationInRadians) * rawXCoordinate);
 
             //Console.WriteLine("raw x " + rawXCoordinate + ", raw y = " + rawYCoordinate + ", aligned x " + alignedXCoordinate + ", aligned y " + alignedYCoordinate);
 
@@ -256,13 +256,13 @@ namespace CrewChiefV4
                 {
                     if (hasCarRight)
                     {
-                        if (Math.Abs(alignedYCoordinate) < longCarLength)
+                        if (Math.Abs(alignedZCoordinate) < longCarLength)
                         {
                             return Side.right;
                         }
                     }
-                    else if (((alignedYCoordinate < 0 && alignedYCoordinate * -1 < carLength) || (alignedYCoordinate > 0 && alignedYCoordinate < carLength + carBehindExtraLength)) && 
-                        isOpponentSpeedInRange)
+                    else if (((alignedZCoordinate < 0 && alignedZCoordinate * -1 < carLength) || (alignedZCoordinate > 0 && alignedZCoordinate < carLength + carBehindExtraLength)) &&
+                        Math.Abs(alignedXCoordinate) > carWidth && isOpponentSpeedInRange)
                     {
                         // we have a new overlap on this side, it's only valid if we're not inside the other car and the speed isn't out of range
                         return Side.right;
@@ -272,13 +272,13 @@ namespace CrewChiefV4
                 {
                     if (hasCarLeft)
                     {
-                        if (Math.Abs(alignedYCoordinate) < longCarLength)
+                        if (Math.Abs(alignedZCoordinate) < longCarLength)
                         {
                             return Side.left;
                         }
                     }
-                    else if (((alignedYCoordinate < 0 && alignedYCoordinate * -1 < carLength) || (alignedYCoordinate > 0 && alignedYCoordinate < carLength + carBehindExtraLength)) &&
-                        isOpponentSpeedInRange)
+                    else if (((alignedZCoordinate < 0 && alignedZCoordinate * -1 < carLength) || (alignedZCoordinate > 0 && alignedZCoordinate < carLength + carBehindExtraLength)) &&
+                        Math.Abs(alignedXCoordinate) > carWidth && isOpponentSpeedInRange)
                     {
                         return Side.left;
                     }
