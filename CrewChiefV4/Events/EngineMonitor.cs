@@ -130,12 +130,12 @@ namespace CrewChiefV4.Events
                         audioPlayer.playClipImmediately(new QueuedMessage(folderHotOilAndWater, 0, null), false);
                         break;
                 }
-                audioPlayer.closeChannel();
+                
             }
             if (!gotData)
             {
                 audioPlayer.playClipImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, this), false);
-                audioPlayer.closeChannel();
+                
             }
         }
 

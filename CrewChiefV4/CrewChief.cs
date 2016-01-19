@@ -176,7 +176,7 @@ namespace CrewChiefV4
                 readOpponentDeltasForEveryLap = true;
             }
             audioPlayer.playClipImmediately(new QueuedMessage(AudioPlayer.folderDeltasEnabled, 0, null), false);
-            audioPlayer.closeChannel();
+            
         }
 
         public void disableDeltasMode()
@@ -186,7 +186,7 @@ namespace CrewChiefV4
                 readOpponentDeltasForEveryLap = false;
             }
             audioPlayer.playClipImmediately(new QueuedMessage(AudioPlayer.folderDeltasDisabled, 0, null), false);
-            audioPlayer.closeChannel();
+            
         }
 
         public void toggleSpotterMode()
@@ -242,7 +242,7 @@ namespace CrewChiefV4
         public void youWot()
         {
             audioPlayer.playClipImmediately(new QueuedMessage(AudioPlayer.folderDidntUnderstand, 0, null), false);
-            audioPlayer.closeChannel();
+            
         }
 
         private void startSpotterThread()
@@ -410,7 +410,7 @@ namespace CrewChiefV4
                                 sessionEndMessages.trigger(previousGameState.SessionData.SessionRunningTime, previousGameState.SessionData.SessionType, currentGameState.SessionData.SessionPhase,
                                     previousGameState.SessionData.Position, previousGameState.SessionData.NumCarsAtStartOfSession, previousGameState.SessionData.CompletedLaps, 
                                     previousGameState.SessionData.IsDisqualified);
-                                audioPlayer.closeChannel();
+                                
                                 sessionFinished = true;
                                 audioPlayer.disablePearlsOfWisdom = false;
                                 if (loadDataFromFile)
@@ -428,7 +428,7 @@ namespace CrewChiefV4
                                 {
                                     Console.WriteLine("Clearing game state...");
                                     audioPlayer.purgeQueues();
-                                    audioPlayer.closeChannel();
+                                    
                                     foreach (KeyValuePair<String, AbstractEvent> entry in eventsList)
                                     {
                                         entry.Value.clearState();

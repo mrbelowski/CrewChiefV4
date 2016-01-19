@@ -398,14 +398,14 @@ namespace CrewChiefV4.Events
                 if (isLeading && isRace)
                 {
                     audioPlayer.playClipImmediately(new QueuedMessage(Position.folderLeading, 0, this), false);
-                    audioPlayer.closeChannel();
+                    
                     haveData = true;
                 }
                 else 
                 {
                     audioPlayer.playClipImmediately(new QueuedMessage("Timings/gaps",
                         MessageContents(TimeSpanWrapper.FromMilliseconds(currentGapInFront * 1000, true)), 0, this), false);
-                    audioPlayer.closeChannel();
+                    
                     haveData = true;
                 }
             }
@@ -415,21 +415,21 @@ namespace CrewChiefV4.Events
                 if (isLast && isRace)
                 {
                     audioPlayer.playClipImmediately(new QueuedMessage(Position.folderLast, 0, this), false);
-                    audioPlayer.closeChannel();
+                    
                     haveData = true;
                 }
                 else
                 {
                     audioPlayer.playClipImmediately(new QueuedMessage("Timings/gaps",
                         MessageContents(TimeSpanWrapper.FromMilliseconds(currentGapBehind * 1000, true)), 0, this), false);
-                    audioPlayer.closeChannel();
+                    
                     haveData = true;
                 }
             }
             if (!haveData)
             {
                 audioPlayer.playClipImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, this), false);
-                audioPlayer.closeChannel();
+                
             }
         }
 

@@ -55,7 +55,7 @@ namespace CrewChiefV4.PCars
         public void clearState()
         {
             timeToStartSpotting = DateTime.Now;
-            audioPlayer.closeChannel();
+            
         }
 
         public void pause()
@@ -72,7 +72,7 @@ namespace CrewChiefV4.PCars
         {
             if (paused)
             {
-                audioPlayer.closeChannel();
+                
                 return;
             }
             CrewChiefV4.PCars.PCarsSharedMemoryReader.PCarsStructWrapper currentWrapper = (CrewChiefV4.PCars.PCarsSharedMemoryReader.PCarsStructWrapper)currentStateObj;
@@ -84,7 +84,7 @@ namespace CrewChiefV4.PCars
                 currentState.mGameState == (uint)eGameState.GAME_VIEWING_REPLAY || currentState.mGameState == (uint)eGameState.GAME_EXITED)
             {
                 // don't ignore the paused game updates if we're in debug mode
-                audioPlayer.closeChannel();
+                
                 return;
             }
             CrewChiefV4.PCars.PCarsSharedMemoryReader.PCarsStructWrapper previousWrapper = (CrewChiefV4.PCars.PCarsSharedMemoryReader.PCarsStructWrapper)lastStateObj;
@@ -151,14 +151,14 @@ namespace CrewChiefV4.PCars
         {
             enabled = true;
             audioPlayer.playClipImmediately(new QueuedMessage(AudioPlayer.folderEnableSpotter, 0, null), false);
-            audioPlayer.closeChannel();
+            
         }
 
         public void disableSpotter()
         {
             enabled = false;
             audioPlayer.playClipImmediately(new QueuedMessage(AudioPlayer.folderDisableSpotter, 0, null), false);
-            audioPlayer.closeChannel();
+            
         }
 
         private float getSpeed(float[] current, float[] previous, float timeInterval)

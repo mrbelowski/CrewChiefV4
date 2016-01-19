@@ -321,13 +321,11 @@ namespace CrewChiefV4.Events
                         {
                             gotData = true;
                             audioPlayer.playClipImmediately(new QueuedMessage(MandatoryPitStops.folderMandatoryPitStopsOptionTyres, 0, null), false);
-                            audioPlayer.closeChannel();
                         }
                         else if (opponentData.CurrentTyres == TyreType.Prime)
                         {
                             gotData = true;
                             audioPlayer.playClipImmediately(new QueuedMessage(MandatoryPitStops.folderMandatoryPitStopsPrimeTyres, 0, null), false);
-                            audioPlayer.closeChannel();
                         }
                     }
                 }
@@ -343,7 +341,7 @@ namespace CrewChiefV4.Events
                             gotData = true;
                             audioPlayer.playClipImmediately(new QueuedMessage("opponentLastLap", MessageContents(
                                 TimeSpanWrapper.FromSeconds(lastLap, true)), 0, null), false);
-                            audioPlayer.closeChannel();
+                            
                         }                       
                     }
                     else
@@ -354,7 +352,7 @@ namespace CrewChiefV4.Events
                             gotData = true;
                             audioPlayer.playClipImmediately(new QueuedMessage("opponentBestLap", MessageContents(
                                 TimeSpanWrapper.FromSeconds(bestLap, true)), 0, null), false);
-                            audioPlayer.closeChannel();
+                            
                         }
                     }  
                 } 
@@ -412,7 +410,7 @@ namespace CrewChiefV4.Events
                             }
                             if (playedMessage)
                             {
-                                audioPlayer.closeChannel();
+                                
                                 gotData = true;
                             }
                         }
@@ -434,7 +432,7 @@ namespace CrewChiefV4.Events
                         if (queuedMessage.canBePlayed)
                         {
                             audioPlayer.playClipImmediately(queuedMessage, false);
-                            audioPlayer.closeChannel();
+                            
                             gotData = true;
                         }
                     }
@@ -451,7 +449,7 @@ namespace CrewChiefV4.Events
                         if (queuedMessage.canBePlayed)
                         {
                             audioPlayer.playClipImmediately(queuedMessage, false);
-                            audioPlayer.closeChannel();
+                            
                             gotData = true;
                         }
                     }
@@ -461,7 +459,7 @@ namespace CrewChiefV4.Events
                     if (currentGameState.isLast())
                     {
                         audioPlayer.playClipImmediately(new QueuedMessage(Position.folderLast, 0, null), false);
-                        audioPlayer.closeChannel();
+                        
                         gotData = true;
                     } 
                     else 
@@ -473,7 +471,7 @@ namespace CrewChiefV4.Events
                             if (queuedMessage.canBePlayed)
                             {
                                 audioPlayer.playClipImmediately(queuedMessage, false);
-                                audioPlayer.closeChannel();
+                                
                                 gotData = true;
                             }
                         }
@@ -485,7 +483,7 @@ namespace CrewChiefV4.Events
                     if (currentGameState.SessionData.Position == 1)
                     {
                         audioPlayer.playClipImmediately(new QueuedMessage(Position.folderLeading, 0, null), false);
-                        audioPlayer.closeChannel();
+                        
                         gotData = true;
                     }
                     else
@@ -497,7 +495,7 @@ namespace CrewChiefV4.Events
                             if (queuedMessage.canBePlayed)
                             {
                                 audioPlayer.playClipImmediately(queuedMessage, false);
-                                audioPlayer.closeChannel();
+                                
                                 gotData = true;
                             }
                         }
@@ -512,7 +510,7 @@ namespace CrewChiefV4.Events
                         if (queuedMessage.canBePlayed)
                         {
                             audioPlayer.playClipImmediately(queuedMessage, false);
-                            audioPlayer.closeChannel();
+                            
                             gotData = true;
                         }
                     }
@@ -525,7 +523,7 @@ namespace CrewChiefV4.Events
                         if (opponentKey == positionIsPlayerKey)
                         {
                             audioPlayer.playClipImmediately(new QueuedMessage(folderWeAre, 0, null), false);
-                            audioPlayer.closeChannel();
+                            
                             gotData = true;
                         }
                         else if (currentGameState.OpponentData.ContainsKey(opponentKey))
@@ -535,7 +533,7 @@ namespace CrewChiefV4.Events
                             if (queuedMessage.canBePlayed)
                             {
                                 audioPlayer.playClipImmediately(queuedMessage, false);
-                                audioPlayer.closeChannel();
+                                
                                 gotData = true;
                             }
                         }
@@ -545,7 +543,7 @@ namespace CrewChiefV4.Events
             if (!gotData)
             {
                 audioPlayer.playClipImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null), false);
-                audioPlayer.closeChannel();
+                
             }       
         }
 

@@ -176,7 +176,7 @@ namespace CrewChiefV4.RaceRoom
                 for (int i = 0; i < shared.all_drivers_data.Length; i++)
                 {
                     DriverData participantStruct = shared.all_drivers_data[i];
-                    String driverName = getNameFromBytes(participantStruct.driver_info.nameByteArray);
+                    String driverName = getNameFromBytes(participantStruct.driver_info.nameByteArray).ToLower();
                     if (participantStruct.driver_info.slot_id == shared.slot_id)
                     {
                         currentGameState.SessionData.IsNewSector = previousGameState == null || participantStruct.track_sector != previousGameState.SessionData.SectorNumber;
@@ -504,7 +504,7 @@ namespace CrewChiefV4.RaceRoom
             {
                 if (participantStruct.driver_info.slot_id != -1 && participantStruct.driver_info.slot_id != shared.slot_id)
                 {
-                    String driverName = getNameFromBytes(participantStruct.driver_info.nameByteArray);
+                    String driverName = getNameFromBytes(participantStruct.driver_info.nameByteArray).ToLower();
                     if (driverName.Length == 0 || driverName == currentGameState.SessionData.DriverRawName || opponentDriverNamesProcessedThisUpdate.Contains(driverName) || participantStruct.place < 1) 
                     {
                         continue;

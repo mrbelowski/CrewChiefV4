@@ -746,6 +746,11 @@ namespace CrewChiefV4
                     isDownloadingSoundPack = true;
                     wc.DownloadProgressChanged += new DownloadProgressChangedEventHandler(soundpack_DownloadProgressChanged);
                     wc.DownloadFileCompleted += new AsyncCompletedEventHandler(soundpack_DownloadFileCompleted);
+                    try
+                    {
+                        File.Delete(AudioPlayer.soundFilesPath + @"\" + soundPackTempFileName);
+                    }
+                    catch (Exception) { }
                     if (getBaseSoundPack)
                     {
                         wc.DownloadFileAsync(new Uri(baseSoundPackDownloadLocation), AudioPlayer.soundFilesPath + @"\" + soundPackTempFileName);
@@ -760,6 +765,11 @@ namespace CrewChiefV4
                     isDownloadingDriverNames = true;
                     wc.DownloadProgressChanged += new DownloadProgressChangedEventHandler(drivernames_DownloadProgressChanged);
                     wc.DownloadFileCompleted += new AsyncCompletedEventHandler(drivernames_DownloadFileCompleted);
+                    try
+                    {
+                        File.Delete(AudioPlayer.soundFilesPath + @"\" + driverNamesTempFileName);
+                    }
+                    catch (Exception) { }
                     if (getBaseDriverNames) 
                     {
                         wc.DownloadFileAsync(new Uri(baseDriverNamesDownloadLocation),  AudioPlayer.soundFilesPath + @"\" + driverNamesTempFileName);
@@ -815,11 +825,14 @@ namespace CrewChiefV4
             catch (Exception) { }
             finally
             {
-                try
+                if (success)
                 {
-                    File.Delete(AudioPlayer.soundFilesPath + @"\" + soundPackTempFileName);
+                    try
+                    {
+                        File.Delete(AudioPlayer.soundFilesPath + @"\" + soundPackTempFileName);
+                    }
+                    catch (Exception) { }
                 }
-                catch (Exception) { }
                 soundPackProgressBar.Value = 0;
                 isDownloadingSoundPack = false;                    
                 if (success && !isDownloadingDriverNames)
@@ -856,7 +869,7 @@ namespace CrewChiefV4
                     downloadDriverNamesButton.Text = "Extracting driver names...";
                     if (Directory.Exists(AudioPlayer.soundFilesPath + @"\driver_names_temp"))
                     {
-                        Directory.Delete(AudioPlayer.soundFilesPath + @"\driver_names_temp");
+                        Directory.Delete(AudioPlayer.soundFilesPath + @"\driver_names_temp", true);
                     }
                     ZipFile.ExtractToDirectory(AudioPlayer.soundFilesPath + @"\" + driverNamesTempFileName, AudioPlayer.soundFilesPath + @"\driver_names_temp", Encoding.UTF8);
                     UpdateHelper.MoveDirectory(AudioPlayer.soundFilesPath + @"\driver_names_temp", AudioPlayer.soundFilesPath);
@@ -867,11 +880,14 @@ namespace CrewChiefV4
             catch (Exception) { }
             finally
             {
-                try
+                if (success)
                 {
-                    File.Delete(AudioPlayer.soundFilesPath + @"\" + driverNamesTempFileName);
+                    try
+                    {
+                        File.Delete(AudioPlayer.soundFilesPath + @"\" + driverNamesTempFileName);
+                    }
+                    catch (Exception) { }
                 }
-                catch (Exception) { }
                 driverNamesProgressBar.Value = 0;
                 isDownloadingDriverNames = false;
                 if (success && !isDownloadingSoundPack)

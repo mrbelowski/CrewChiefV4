@@ -255,7 +255,7 @@ namespace CrewChiefV4.Events
             if (!hasHadAPenalty)
             {
                 audioPlayer.playClipImmediately(new QueuedMessage(folderYouDontHaveAPenalty, 0, null), false);
-                audioPlayer.closeChannel();
+                
                 return;
             }
             if (voiceMessage.Contains(SpeechRecogniser.DO_I_HAVE_A_PENALTY))
@@ -264,17 +264,17 @@ namespace CrewChiefV4.Events
                     if (lapsCompleted - penaltyLap == 2) {
                         audioPlayer.playClipImmediately(new QueuedMessage("youHaveAPenaltyBoxThisLap",
                             MessageContents(folderYouHavePenalty, MandatoryPitStops.folderMandatoryPitStopsPitThisLap), 0, null), false);
-                        audioPlayer.closeChannel();
+                        
                     } else
                     {
                         audioPlayer.playClipImmediately(new QueuedMessage(folderYouHavePenalty, 0, null), false);
-                        audioPlayer.closeChannel();
+                        
                     }
                 }
                 else
                 {
                     audioPlayer.playClipImmediately(new QueuedMessage(folderYouDontHaveAPenalty, 0, null), false);
-                    audioPlayer.closeChannel();
+                    
                 }
             }
             else if (voiceMessage.Contains(SpeechRecogniser.HAVE_I_SERVED_MY_PENALTY))
@@ -289,13 +289,13 @@ namespace CrewChiefV4.Events
                         messages.Add(MessageFragment.Text(MandatoryPitStops.folderMandatoryPitStopsPitThisLap));
                     }
                     audioPlayer.playClipImmediately(new QueuedMessage("noYouStillHaveAPenalty", messages, 0, null), false);
-                    audioPlayer.closeChannel();
+                    
                 }
                 else
                 {
                     audioPlayer.playClipImmediately(new QueuedMessage("yesYouServedYourPenalty",
                         MessageContents(AudioPlayer.folderYes, folderPenaltyServed), 0, null), false);
-                    audioPlayer.closeChannel();
+                    
                 }
             } else if (voiceMessage.Contains(SpeechRecogniser.DO_I_STILL_HAVE_A_PENALTY))
             {
@@ -309,13 +309,13 @@ namespace CrewChiefV4.Events
                         messages.Add(MessageFragment.Text(MandatoryPitStops.folderMandatoryPitStopsPitThisLap));
                     }
                     audioPlayer.playClipImmediately(new QueuedMessage("yesYouStillHaveAPenalty", messages, 0, null), false);
-                    audioPlayer.closeChannel();
+                    
                 }
                 else
                 {
                     audioPlayer.playClipImmediately(new QueuedMessage("noYouServedYourPenalty",
                         MessageContents(AudioPlayer.folderNo, folderPenaltyServed), 0, null), false);
-                    audioPlayer.closeChannel();
+                    
                 }                
             }
         }

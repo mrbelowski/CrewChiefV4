@@ -12,9 +12,9 @@ namespace CrewChiefV4.Events
         public static String folderMandatoryPitStopsPitWindowOpensOnLap = "mandatory_pit_stops/pit_window_opens_on_lap";
         public static String folderMandatoryPitStopsPitWindowOpensAfter = "mandatory_pit_stops/pit_window_opens_after";
 
-        private String folderMandatoryPitStopsFitPrimesThisLap = "mandatory_pit_stops/box_to_fit_primes_now";
+        public static String folderMandatoryPitStopsFitPrimesThisLap = "mandatory_pit_stops/box_to_fit_primes_now";
 
-        private String folderMandatoryPitStopsFitOptionsThisLap = "mandatory_pit_stops/box_to_fit_options_now";
+        public static String folderMandatoryPitStopsFitOptionsThisLap = "mandatory_pit_stops/box_to_fit_options_now";
 
         public static String folderMandatoryPitStopsPrimeTyres = "mandatory_pit_stops/prime_tyres";
 
@@ -374,35 +374,35 @@ namespace CrewChiefV4.Events
             if (!hasMandatoryPitStop || mandatoryStopCompleted)
             {
                 audioPlayer.playClipImmediately(new QueuedMessage(AudioPlayer.folderNo, 0, null), false);
-                audioPlayer.closeChannel();
+                
             }
             else if (mandatoryStopMissed)
             {
                 audioPlayer.playClipImmediately(new QueuedMessage(folderMandatoryPitStopsMissedStop, 0, null), false);
-                audioPlayer.closeChannel();
+                
             }
             else if (mandatoryStopBoxThisLap)
             {
                 audioPlayer.playClipImmediately(new QueuedMessage("yesBoxThisLap",
                     MessageContents(AudioPlayer.folderYes, folderMandatoryPitStopsPitThisLap), 0, null), false);
-                audioPlayer.closeChannel();
+                
             }
             else if (pitWindowOpenLap > 0)
             {
                 audioPlayer.playClipImmediately(new QueuedMessage("yesBoxOnLap",
                     MessageContents(folderMandatoryPitStopsYesStopOnLap, pitWindowOpenLap), 0, null), false);
-                audioPlayer.closeChannel();
+                
             }
             else if (pitWindowOpenTime > 0)
             {
                 audioPlayer.playClipImmediately(new QueuedMessage("yesBoxAfter",
                     MessageContents(folderMandatoryPitStopsYesStopAfter, pitWindowOpenTime, folderMandatoryPitStopsMinutes), 0, null), false);
-                audioPlayer.closeChannel();
+                
             }            
             else
             {
                 audioPlayer.playClipImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null), false);
-                audioPlayer.closeChannel();
+                
             }
         }
     }

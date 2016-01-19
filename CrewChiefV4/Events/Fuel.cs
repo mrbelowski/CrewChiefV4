@@ -349,18 +349,18 @@ namespace CrewChiefV4.Events
                 if (!fuelUseActive)
                 {
                     audioPlayer.playClipImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null), false);
-                    audioPlayer.closeChannel();
+                    
                 }
                 else if (currentFuel >= 2)
                 {
                     audioPlayer.playClipImmediately(new QueuedMessage("Fuel/level",
                                 MessageContents((int)currentFuel, folderLitresRemaining), 0, null), false);
-                    audioPlayer.closeChannel();
+                    
                 }
                 else
                 {
                     audioPlayer.playClipImmediately(new QueuedMessage(folderAboutToRunOut, 0, null), false);
-                    audioPlayer.closeChannel();
+                    
                 }
             }
             else if (voiceMessage.Contains(SpeechRecogniser.FUEL)) 
@@ -375,13 +375,13 @@ namespace CrewChiefV4.Events
                         {
                             audioPlayer.playClipImmediately(new QueuedMessage("Fuel/estimate",
                                 MessageContents(folderAboutToRunOut), 0, null), false);
-                            audioPlayer.closeChannel();
+                            
                         }
                         else
                         {
                             audioPlayer.playClipImmediately(new QueuedMessage("Fuel/estimate",
                                 MessageContents(folderWeEstimate, lapsOfFuelLeft, folderLapsRemaining), 0, null), false);
-                            audioPlayer.closeChannel();
+                            
                         }
                         haveData = true;
                     }
@@ -392,13 +392,13 @@ namespace CrewChiefV4.Events
                         {
                             audioPlayer.playClipImmediately(new QueuedMessage("Fuel/estimate",
                                 MessageContents(folderAboutToRunOut), 0, null), false);
-                            audioPlayer.closeChannel();
+                            
                         }
                         else
                         {
                             audioPlayer.playClipImmediately(new QueuedMessage("Fuel/estimate",
                                 MessageContents(folderWeEstimate, minutesOfFuelLeft, folderMinutesRemaining), 0, null), false);
-                            audioPlayer.closeChannel();
+                            
                         }
                         haveData = true;
                     }
@@ -413,13 +413,13 @@ namespace CrewChiefV4.Events
                     {
                         audioPlayer.playClipImmediately(new QueuedMessage("Fuel/level",
                                     MessageContents((int)currentFuel, folderLitresRemaining), 0, null), false);
-                        audioPlayer.closeChannel();
+                        
                     }
                     else
                     {
                         audioPlayer.playClipImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null), false);
                     }
-                    audioPlayer.closeChannel();
+                    
                 }
             }            
         }

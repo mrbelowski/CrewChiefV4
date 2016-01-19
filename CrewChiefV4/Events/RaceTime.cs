@@ -222,19 +222,19 @@ namespace CrewChiefV4.Events
                 {
                     Console.WriteLine("Playing last lap message, timeleft = " + timeLeft);
                     audioPlayer.playClipImmediately(new QueuedMessage(folderThisIsTheLastLap, 0, this), false);
-                    audioPlayer.closeChannel();
+                    
                 }
                 if (timeLeft >= 120)
                 {
                     TimeSpan timeLeftTimeSpan = TimeSpan.FromSeconds(timeLeft);
                     audioPlayer.playClipImmediately(new QueuedMessage("RaceTime/time_remaining",
                         MessageContents(timeLeftTimeSpan.TotalMinutes, folderMinutesLeft), 0, this), false);
-                    audioPlayer.closeChannel();
+                    
                 }
                 else if (timeLeft >= 60)
                 {
                     audioPlayer.playClipImmediately(new QueuedMessage(folderOneMinuteRemaining, 0, this), false);
-                    audioPlayer.closeChannel();
+                    
                 }
                 else if (timeLeft <= 0)
                 {
@@ -242,13 +242,13 @@ namespace CrewChiefV4.Events
                     {
                         Console.WriteLine("Playing DTM one more lap message, timeleft = " + timeLeft);
                         audioPlayer.playClipImmediately(new QueuedMessage(folderOneLapAfterThisOne, 0, this), false);
-                        audioPlayer.closeChannel();
+                        
                     }
                     else 
                     {
                         Console.WriteLine("Playing last lap message, timeleft = " + timeLeft);
                         audioPlayer.playClipImmediately(new QueuedMessage(folderThisIsTheLastLap, 0, this), false);
-                        audioPlayer.closeChannel();
+                        
                     }                   
                 }
                 else if (timeLeft < 60)
@@ -256,7 +256,7 @@ namespace CrewChiefV4.Events
                     // TODO: check these - if the timeLeft value contains -1 for some reason this message will be wrong
                     Console.WriteLine("Playing less than a minute message, timeleft = " + timeLeft);
                     audioPlayer.playClipImmediately(new QueuedMessage(folderLessThanOneMinute, 0, this), false);
-                    audioPlayer.closeChannel();
+                    
                 }
             }
             else
@@ -266,18 +266,18 @@ namespace CrewChiefV4.Events
                     audioPlayer.playClipImmediately(new QueuedMessage("RaceTime/laps_remaining",
                         MessageContents(lapsLeft, folderLapsLeft), 0, this), false);
 
-                    audioPlayer.closeChannel();
+                    
                 }
                 else if (lapsLeft == 2)
                 {
                     // TODO: revised logic to this is correct for PCars - check it's OK for R3E
                     audioPlayer.playClipImmediately(new QueuedMessage(folderOneLapAfterThisOne, 0, this), false);
-                    audioPlayer.closeChannel();
+                    
                 }
                 else if (lapsLeft == 1)
                 {
                     audioPlayer.playClipImmediately(new QueuedMessage(folderThisIsTheLastLap, 0, this), false);
-                    audioPlayer.closeChannel();
+                    
                 }
             }     
         }

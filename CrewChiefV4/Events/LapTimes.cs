@@ -726,7 +726,7 @@ namespace CrewChiefV4.Events
                 {
                     audioPlayer.playClipImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, this), false);
                 }
-                audioPlayer.closeChannel();
+                
             }
             else if (voiceMessage.Contains(SpeechRecogniser.WHATS_MY_LAST_SECTOR_TIME))
             {
@@ -749,7 +749,7 @@ namespace CrewChiefV4.Events
                 {
                     audioPlayer.playClipImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, this), false);
                 }
-                audioPlayer.closeChannel();
+                
             }
             else if (voiceMessage.Contains(SpeechRecogniser.BEST_LAP) ||
                 voiceMessage.Contains(SpeechRecogniser.BEST_LAP_TIME))
@@ -758,12 +758,12 @@ namespace CrewChiefV4.Events
                 {
                     audioPlayer.playClipImmediately(new QueuedMessage("bestLapTime",
                         MessageContents(TimeSpan.FromSeconds(bestLapTime)), 0, this), false);
-                    audioPlayer.closeChannel();
+                    
                 }
                 else
                 {
                     audioPlayer.playClipImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, this), false);
-                    audioPlayer.closeChannel();
+                    
                 }
             }
             else if ((voiceMessage.Contains(SpeechRecogniser.LAST_LAP_TIME) ||
@@ -774,12 +774,12 @@ namespace CrewChiefV4.Events
                 {
                     audioPlayer.playClipImmediately(new QueuedMessage("lastLapTime",
                         MessageContents(folderLapTimeIntro, TimeSpan.FromSeconds(lastLapTime)), 0, this), false);
-                    audioPlayer.closeChannel();
+                    
                 }
                 else
                 {
                     audioPlayer.playClipImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, this), false);
-                    audioPlayer.closeChannel();
+                    
                 }
             }            
             else if (voiceMessage.Contains(SpeechRecogniser.PACE))
@@ -870,11 +870,11 @@ namespace CrewChiefV4.Events
                         {
                             audioPlayer.playClipImmediately(new QueuedMessage("race_sector_times_report", sectorDeltaMessages, 0, null), false);
                         }
-                        audioPlayer.closeChannel();
+                        
                     }
                     else {
                         audioPlayer.playClipImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null), false);
-                        audioPlayer.closeChannel();
+                        
                     }
                 }
                 else
@@ -942,11 +942,11 @@ namespace CrewChiefV4.Events
                         {
                             Console.WriteLine("Unable to get sector deltas: " + e.Message);
                         }
-                        audioPlayer.closeChannel();
+                        
                     }
                     else {
                         audioPlayer.playClipImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null), false);
-                        audioPlayer.closeChannel();
+                        
                     }
                 }
             }

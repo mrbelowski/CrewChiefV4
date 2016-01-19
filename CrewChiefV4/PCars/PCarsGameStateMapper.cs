@@ -181,7 +181,7 @@ namespace CrewChiefV4.PCars
                 for (int i = 0; i < pCarsAPIParticipantStructArray.Length; i++)
                 {
                     String name = StructHelper.getNameFromBytes(pCarsAPIParticipantStructArray[i].mName);
-                    if (name == null || name.Length == 0 || name.StartsWith(FIRST_CHAR_STAND_IN))
+                    if (name.Length == 0 || name.StartsWith(FIRST_CHAR_STAND_IN))
                     {
                         continue;
                     }
@@ -412,7 +412,7 @@ namespace CrewChiefV4.PCars
                 for (int i = 0; i < shared.mParticipantData.Length; i++)
                 {
                     pCarsAPIParticipantStruct participantStruct = shared.mParticipantData[i];
-                    String participantName = StructHelper.getNameFromBytes(participantStruct.mName);
+                    String participantName = StructHelper.getNameFromBytes(participantStruct.mName).ToLower();
                     if (i != playerDataIndex && participantStruct.mIsActive && participantName != null && participantName.Length > 0)
                     {
                         CarData.CarClass opponentCarClass = shared.hasOpponentClassData && shared.isSameClassAsPlayer[i] ? currentGameState.carClass : CarData.getDefaultCarClass();
@@ -621,7 +621,7 @@ namespace CrewChiefV4.PCars
                     pCarsAPIParticipantStruct participantStruct = shared.mParticipantData[i];
                     CarData.CarClass opponentCarClass = !usePCarsNetworkOpponentCarClassFlag || (shared.hasOpponentClassData && shared.isSameClassAsPlayer[i]) ? 
                         currentGameState.carClass : CarData.getDefaultCarClass();
-                    String participantName = StructHelper.getNameFromBytes(participantStruct.mName);
+                    String participantName = StructHelper.getNameFromBytes(participantStruct.mName).ToLower();
 
                     if (participantName != null && participantName.Length > 0)
                     {
@@ -1148,7 +1148,7 @@ namespace CrewChiefV4.PCars
         private OpponentData createOpponentData(pCarsAPIParticipantStruct participantStruct, Boolean loadDriverName, CarData.CarClass carClass)
         {            
             OpponentData opponentData = new OpponentData();
-            String participantName = StructHelper.getNameFromBytes(participantStruct.mName);
+            String participantName = StructHelper.getNameFromBytes(participantStruct.mName).ToLower();
             opponentData.DriverRawName = participantName;
             if (participantName != null && participantName.Length > 0 && !participantName.StartsWith(FIRST_CHAR_STAND_IN) && loadDriverName && CrewChief.enableDriverNames)
             {

@@ -383,7 +383,7 @@ namespace CrewChiefV4.Events
             if (playImmediately)
             {
                 audioPlayer.playClipImmediately(new QueuedMessage("tyre_temps", messageContents, 0, null), false);
-                audioPlayer.closeChannel();
+                
             }
             else if (lastTyreTempMessage == null || !messagesHaveSameContent(lastTyreTempMessage, messageContents))
             {
@@ -406,7 +406,7 @@ namespace CrewChiefV4.Events
             if (playImmediately)
             {
                 audioPlayer.playClipImmediately(new QueuedMessage("brake_temps", messageContents, 0, null), false);
-                audioPlayer.closeChannel();
+                
             }
             else if (lastBrakeTempMessage == null || !messagesHaveSameContent(lastBrakeTempMessage, messageContents))
             {
@@ -429,7 +429,7 @@ namespace CrewChiefV4.Events
             if (playImmediately)
             {
                 audioPlayer.playClipImmediately(new QueuedMessage("tyre_condition", messageContents, 0, null), false);
-                audioPlayer.closeChannel();
+                
             }
             else if (playEvenIfUnchanged || (lastTyreConditionMessage != null && !messagesHaveSameContent(lastTyreConditionMessage, messageContents)))
             {
@@ -445,13 +445,13 @@ namespace CrewChiefV4.Events
                 if (minutesRemainingOnTheseTyres > (timeInSession - timeElapsed) / 60)
                 {
                     audioPlayer.playClipImmediately(new QueuedMessage(folderGoodWear, 0, null), false);
-                    audioPlayer.closeChannel();
+                    
                     return;
                 }
                 else if (minutesRemainingOnTheseTyres < 1)
                 {
                     audioPlayer.playClipImmediately(new QueuedMessage(folderKnackeredAllRound, 0, null), false);
-                    audioPlayer.closeChannel();
+                    
                     return;
                 }
             }
@@ -463,7 +463,7 @@ namespace CrewChiefV4.Events
                 if (immediate)
                 {
                     audioPlayer.playClipImmediately(queuedMessage, false);
-                    audioPlayer.closeChannel();
+                    
                 }
                 else
                 {
@@ -473,7 +473,7 @@ namespace CrewChiefV4.Events
             else if (immediate)
             {
                 audioPlayer.playClipImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null), false);
-                audioPlayer.closeChannel();
+                
             }
         }
 
@@ -484,13 +484,13 @@ namespace CrewChiefV4.Events
                 if (lapsRemainingOnTheseTyres > lapsInSession - completedLaps)
                 {
                     audioPlayer.playClipImmediately(new QueuedMessage(folderGoodWear, 0, null), false);
-                    audioPlayer.closeChannel();
+                    
                     return;
                 }
                 else if (lapsRemainingOnTheseTyres < 1)
                 {
                     audioPlayer.playClipImmediately(new QueuedMessage(folderKnackeredAllRound, 0, null), false);
-                    audioPlayer.closeChannel();
+                    
                     return;
                 }
             }
@@ -502,7 +502,7 @@ namespace CrewChiefV4.Events
                 if (immediate)
                 {
                     audioPlayer.playClipImmediately(queuedMessage, false);
-                    audioPlayer.closeChannel();
+                    
                 }
                 else
                 {
@@ -512,7 +512,7 @@ namespace CrewChiefV4.Events
             else if (immediate)
             {
                 audioPlayer.playClipImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null), false);
-                audioPlayer.closeChannel();
+                
             }
         }
 
@@ -547,7 +547,7 @@ namespace CrewChiefV4.Events
                 audioPlayer.playClipImmediately(new QueuedMessage("tyre_temps", MessageContents(folderLeftFront, convertTemp(leftFrontTyreTemp), 
                     folderRightFront, convertTemp(rightFrontTyreTemp), folderLeftRear, convertTemp(leftRearTyreTemp), folderRightRear, convertTemp(rightRearTyreTemp), getTempUnit()), 0, this), false);
             }
-            audioPlayer.closeChannel();
+            
         }
 
         private void reportCurrentBrakeTemps()
@@ -561,7 +561,7 @@ namespace CrewChiefV4.Events
                 audioPlayer.playClipImmediately(new QueuedMessage("brake_temps", MessageContents(folderLeftFront, convertTemp(leftFrontBrakeTemp, 10), 
                     folderRightFront, convertTemp(rightFrontBrakeTemp, 10), folderLeftRear, convertTemp(leftRearBrakeTemp, 10), folderRightRear, convertTemp(rightRearBrakeTemp, 10), getTempUnit()), 0, this), false);
             }
-            audioPlayer.closeChannel();
+            
         }
 
         public override void respond(string voiceMessage)
@@ -581,7 +581,7 @@ namespace CrewChiefV4.Events
                     else
                     {
                         audioPlayer.playClipImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null), false);
-                        audioPlayer.closeChannel();
+                        
                     }
                 }
             }
@@ -600,7 +600,7 @@ namespace CrewChiefV4.Events
                     else
                     {
                         audioPlayer.playClipImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null), false);
-                        audioPlayer.closeChannel();
+                        
                     }
                 }
             }
@@ -613,7 +613,7 @@ namespace CrewChiefV4.Events
                 else
                 {
                     audioPlayer.playClipImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null), false);
-                    audioPlayer.closeChannel();
+                    
                 }
             }
         }

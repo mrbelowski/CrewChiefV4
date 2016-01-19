@@ -173,7 +173,6 @@ namespace CrewChiefV4.Events
             if (currentConditions == null)
             {
                 audioPlayer.playClipImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null), false);
-                audioPlayer.closeChannel();
             }
             else
             {
@@ -181,13 +180,11 @@ namespace CrewChiefV4.Events
                 {
                     audioPlayer.playClipImmediately(new QueuedMessage("airTempResponse",
                         MessageContents(folderAirTempIsNow, convertTemp(currentConditions.AmbientTemperature), getTempUnit()), 0, null), false);
-                    audioPlayer.closeChannel();
                 }
                 if (voiceMessage.Contains(SpeechRecogniser.WHATS_THE_TRACK_TEMP) || voiceMessage.Contains(SpeechRecogniser.WHATS_THE_TRACK_TEMPERATURE))
                 {
                     audioPlayer.playClipImmediately(new QueuedMessage("trackTempResponse",
                         MessageContents(folderTrackTempIsNow, convertTemp(currentConditions.TrackTemperature), getTempUnit()), 0, null), false);
-                    audioPlayer.closeChannel();
                 }
             }
         }

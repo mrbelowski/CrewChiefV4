@@ -183,7 +183,7 @@ namespace CrewChiefV4.RaceRoom
                                     clearMessage.expiryTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + clearMessageExpiresAfter;
                                     audioPlayer.removeImmediateClip(folderStillThere);
                                     audioPlayer.playClipImmediately(clearMessage, false);
-                                    audioPlayer.closeChannel();
+                                    
                                 }
                                 else
                                 {
@@ -257,7 +257,7 @@ namespace CrewChiefV4.RaceRoom
                     {
                         Console.WriteLine("Had " + maxTimeToKeepChannelOpenWhileReceivingUnusableData.Seconds + " seconds of unusable spotter data, closing channel");
                         isCurrentlyOverlapping = false;
-                        audioPlayer.closeChannel();
+                        
                     }
                 }
             }
@@ -273,7 +273,7 @@ namespace CrewChiefV4.RaceRoom
                     Console.WriteLine("Closing channel left open in spotter");
                     timeWhenChannelShouldBeClosed = DateTime.MaxValue; 
                     isCurrentlyOverlapping = false;
-                    audioPlayer.closeChannel();
+                    
                     channelLeftOpenTimerStarted = false;
                     isCurrentlyOverlapping = false;
                 }      
@@ -284,14 +284,14 @@ namespace CrewChiefV4.RaceRoom
         {
             enabled = true;
             audioPlayer.playClipImmediately(new QueuedMessage(AudioPlayer.folderEnableSpotter, 0, null), false);
-            audioPlayer.closeChannel();
+            
         }
 
         public void disableSpotter()
         {
             enabled = false;
             audioPlayer.playClipImmediately(new QueuedMessage(AudioPlayer.folderDisableSpotter, 0, null), false);
-            audioPlayer.closeChannel();
+            
         }
     }
 }

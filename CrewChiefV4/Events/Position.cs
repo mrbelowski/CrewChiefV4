@@ -218,7 +218,7 @@ namespace CrewChiefV4.Events
                             // allow an existing queued pearl to be played if it's type is 'good'
                             Dictionary<String, Object> validationData = new Dictionary<String, Object>();
                             validationData.Add(positionValidationKey, currentGameState.SessionData.Position);
-                            audioPlayer.queueClip(new QueuedMessage(folderOvertaking, 0, this, validationData), PearlsOfWisdom.PearlType.GOOD, 5);
+                            audioPlayer.queueClip(new QueuedMessage(folderOvertaking, 0, this, validationData), PearlsOfWisdom.PearlType.GOOD, 0);
                             reported = true;
                         }
                     }
@@ -258,7 +258,7 @@ namespace CrewChiefV4.Events
                             // allow an existing queued pearl to be played if it's type is 'bad'
                             Dictionary<String, Object> validationData = new Dictionary<String, Object>();
                             validationData.Add(positionValidationKey, currentGameState.SessionData.Position);
-                            audioPlayer.queueClip(new QueuedMessage(folderBeingOvertaken, 0, this, validationData), PearlsOfWisdom.PearlType.BAD, 5);
+                            audioPlayer.queueClip(new QueuedMessage(folderBeingOvertaken, 0, this, validationData), PearlsOfWisdom.PearlType.BAD, 0);
                             reported = true;
                         }
                     }
@@ -415,25 +415,25 @@ namespace CrewChiefV4.Events
                 if (isLast)
                 {
                     audioPlayer.playClipImmediately(new QueuedMessage(folderLast, 0, this), false);
-                    audioPlayer.closeChannel();
+                    
                 }
                 else if (currentPosition == 1)
                 {
                     audioPlayer.playClipImmediately(new QueuedMessage(folderLeading, 0, this), false);
-                    audioPlayer.closeChannel();
+                    
                 }
                 else if (currentPosition > 0) {
                     if (currentPosition < 25) {
                         audioPlayer.playClipImmediately(new QueuedMessage(folderStub + currentPosition, 0, this), false);
-                        audioPlayer.closeChannel();
+                        
                     } else {
                         audioPlayer.playClipImmediately(new QueuedMessage("position", MessageContents(currentPosition), 0, this), false);
-                        audioPlayer.closeChannel();
+                        
                     }
                 }
                 else {
                     audioPlayer.playClipImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null), false);
-                    audioPlayer.closeChannel();
+                    
                 }
             }
         }

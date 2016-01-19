@@ -271,7 +271,7 @@ namespace CrewChiefV4.Audio
             {
                 if (driverNameFile.Name.EndsWith(".wav"))
                 {                    
-                    String name = driverNameFile.Name.ToLowerInvariant().Split(new[] { ".wav" }, StringSplitOptions.None)[0];
+                    String name = driverNameFile.Name.ToLower().Split(new[] { ".wav" }, StringSplitOptions.None)[0];
                     singleSounds.Add(name, new SingleSound(driverNameFile.FullName, false, false, this.allowCaching));
                     availableDriverNames.Add(name);
                 }

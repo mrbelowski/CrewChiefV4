@@ -173,7 +173,7 @@ namespace CrewChiefV4.Events
             {
                 audioPlayer.removeQueuedClip(folderGetReady);
                 audioPlayer.playClipImmediately(new QueuedMessage(folderGreenGreenGreen, 0, this), false);
-                audioPlayer.closeChannel();
+                
                 audioPlayer.disablePearlsOfWisdom = false;
             }
             if (currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.IsNewLap && currentGameState.SessionData.CompletedLaps > 0)

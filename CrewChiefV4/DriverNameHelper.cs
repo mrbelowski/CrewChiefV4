@@ -50,7 +50,7 @@ namespace CrewChiefV4
                     if (separatorIndex > 0 && line.Length > separatorIndex + 1)
                     {
                         String lowerCaseRawName = line.Substring(0, separatorIndex).ToLower();
-                        String usableName = line.Substring(separatorIndex + 1).Trim();
+                        String usableName = line.Substring(separatorIndex + 1).Trim().ToLower();
                         if (usableName != null && usableName.Length > 0 && !lowerCaseRawNameToUsableName.ContainsKey(lowerCaseRawName))
                         {
                             lowerCaseRawNameToUsableName.Add(lowerCaseRawName, usableName);

@@ -47,8 +47,6 @@ namespace CrewChiefV4.Audio
         private Boolean keepQuiet = false;
         private Boolean channelOpen = false;
 
-        private Boolean requestChannelOpen = false;
-        private Boolean requestChannelClose = false;
         private Boolean holdChannelOpen = false;
         private Boolean useShortBeepWhenOpeningChannel = false;
 
@@ -299,14 +297,13 @@ namespace CrewChiefV4.Audio
             DateTime nextQueueCheck = DateTime.Now;
             while (monitorRunning)
             {
-                if (requestChannelOpen)
-                {
-                    requestChannelOpen = false;
-                    holdChannelOpen = true;
-                }
                 if (channelOpen && (!holdChannelOpen || DateTime.Now > timeOfLastMessageEnd + maxTimeToHoldEmptyChannelOpen))
                 {
-                    closeRadioInternalChannel();
+                    if (!queueHasDueMessages(queuedClips, false) && !queueHasDueMessages(immediateClips, true))
+                    {
+                        holdChannelOpen = false;
+                        closeRadioInternalChannel();
+                    }
                 }
                 if (immediateClips.Count > 0)
                 {
@@ -323,24 +320,7 @@ namespace CrewChiefV4.Audio
                         }
                     }
                 }
-                if (requestChannelClose)
-                {
-                    if (channelOpen)
-                    {
-                        if (!queueHasDueMessages(queuedClips, false) && !queueHasDueMessages(immediateClips, true))
-                        {
-                            requestChannelClose = false;
-                            holdChannelOpen = false;
-                            closeRadioInternalChannel();
-                        }
-                    }
-                    else
-                    {
-                        requestChannelClose = false;
-                        holdChannelOpen = false;
-                    }
-                }
-                if (DateTime.Now > nextQueueCheck)
+                else if (DateTime.Now > nextQueueCheck)
                 {
                     nextQueueCheck = nextQueueCheck.Add(queueMonitorInterval);
                     try
@@ -361,7 +341,7 @@ namespace CrewChiefV4.Audio
                 {
                     Thread.Sleep(immediateMessagesMonitorInterval);
                     continue;
-                }
+                }                
             }
             //writeMessagePlayedStats();
             playedMessagesCount.Clear();
@@ -380,14 +360,12 @@ namespace CrewChiefV4.Audio
         public void enableKeepQuietMode()
         {
             playClipImmediately(new QueuedMessage(folderAcknowlegeEnableKeepQuiet, 0, null), false);
-            closeChannel();
             keepQuiet = true;
         }
 
         public void disableKeepQuietMode()
         {
             playClipImmediately(new QueuedMessage(folderAcknowlegeDisableKeepQuiet, 0, null), false);
-            closeChannel();
             keepQuiet = false;
         }
 
@@ -786,25 +764,6 @@ namespace CrewChiefV4.Audio
             }
         }
 
-        private void openChannel(Boolean useShortBeep)
-        {
-            useShortBeepWhenOpeningChannel = useShortBeep;
-            requestChannelOpen = true;
-        }
-
-        private void holdOpenChannel(Boolean useShortBeep)
-        {
-            useShortBeepWhenOpeningChannel = useShortBeep;
-            requestChannelOpen = true;
-            holdChannelOpen = true;
-            requestChannelClose = false;
-        }
-
-        public void closeChannel()
-        {
-            requestChannelClose = true;
-        }
-
         public Boolean isChannelOpen()
         {
             return channelOpen;
@@ -837,14 +796,8 @@ namespace CrewChiefV4.Audio
                     }
                     else
                     {
-                        if (keepChannelOpen)
-                        {
-                            holdOpenChannel(useShortBeep);
-                        }
-                        else
-                        {
-                            openChannel(useShortBeep);
-                        }
+                        this.useShortBeepWhenOpeningChannel = useShortBeep;
+                        this.holdChannelOpen = keepChannelOpen;
                         immediateClips.Add(queuedMessage.messageName, queuedMessage);
                     }
                 }
@@ -982,7 +935,6 @@ namespace CrewChiefV4.Audio
             if (lastMessagePlayed != null)
             {
                 playClipImmediately(lastMessagePlayed, false);
-                closeChannel();
             }
         }
 

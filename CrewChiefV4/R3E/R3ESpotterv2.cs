@@ -42,7 +42,7 @@ namespace CrewChiefV4.RaceRoom
 
         public void clearState()
         {
-            audioPlayer.closeChannel();
+            
             previousTime = DateTime.Now;
         }
 
@@ -137,14 +137,14 @@ namespace CrewChiefV4.RaceRoom
         {
             enabled = true;
             audioPlayer.playClipImmediately(new QueuedMessage(AudioPlayer.folderEnableSpotter, 0, null), false);
-            audioPlayer.closeChannel();
+            
         }
 
         public void disableSpotter()
         {
             enabled = false;
             audioPlayer.playClipImmediately(new QueuedMessage(AudioPlayer.folderDisableSpotter, 0, null), false);
-            audioPlayer.closeChannel();
+            
         }
     }
 }

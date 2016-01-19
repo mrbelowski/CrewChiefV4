@@ -120,7 +120,7 @@ namespace CrewChiefV4
             nextMessageType = NextMessageType.none;
             this.reportedOverlapLeft = false;
             this.reportedOverlapRight = false;
-            audioPlayer.closeChannel();
+            
             previousPositionAndVelocityData.Clear();
         }
         
@@ -222,7 +222,7 @@ namespace CrewChiefV4
                     timeWhenChannelShouldBeClosed = DateTime.MaxValue;
                     hasCarLeft = false;
                     hasCarRight = false;
-                    audioPlayer.closeChannel();
+                    
                     channelLeftOpenTimerStarted = false;
                 }
             }
@@ -452,7 +452,7 @@ namespace CrewChiefV4
                                 audioPlayer.playClipImmediately(clearAllRoundMessage, false);
                                 nextMessageType = NextMessageType.none;
                             }
-                            audioPlayer.closeChannel();
+                            
                             reportedOverlapLeft = false;
                             reportedOverlapRight = false;
                             wasInMiddle = false;
@@ -472,7 +472,7 @@ namespace CrewChiefV4
                                     audioPlayer.removeImmediateClip(folderClearLeft);
                                     audioPlayer.playClipImmediately(clearAllRoundMessage, false);
                                     nextMessageType = NextMessageType.none;
-                                    audioPlayer.closeChannel();
+                                    
                                     reportedOverlapRight = false;
                                     wasInMiddle = false;
                                 }
@@ -500,7 +500,7 @@ namespace CrewChiefV4
                             }
                             if (carsOnRightCount == 0)
                             {
-                                audioPlayer.closeChannel();
+                                
                             }
                             reportedOverlapLeft = false;
                             break;
@@ -519,7 +519,7 @@ namespace CrewChiefV4
                                     audioPlayer.removeImmediateClip(folderClearRight);
                                     audioPlayer.playClipImmediately(clearAllRoundMessage, false);
                                     nextMessageType = NextMessageType.none;
-                                    audioPlayer.closeChannel();
+                                    
                                     reportedOverlapLeft = false;
                                     wasInMiddle = false;
                                 }
@@ -547,7 +547,7 @@ namespace CrewChiefV4
                             }
                             if (carsOnLeftCount == 0)
                             {
-                                audioPlayer.closeChannel();
+                                
                             }
                             reportedOverlapRight = false;
                             break;
@@ -570,7 +570,7 @@ namespace CrewChiefV4
                 }
                 else
                 {
-                    audioPlayer.closeChannel();
+                    
                     reportedOverlapLeft = false;
                     reportedOverlapRight = false;
                 }
