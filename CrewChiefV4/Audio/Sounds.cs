@@ -337,7 +337,6 @@ namespace CrewChiefV4.Audio
                                 soundFile.Name.Contains(SoundCache.OPTIONAL_PREFIX_IDENTIFIER) || soundFile.Name.Contains(SoundCache.OPTIONAL_PREFIX_IDENTIFIER))
                             {
                                 Boolean isOptional = soundFile.Name.Contains(SoundCache.OPTIONAL_PREFIX_IDENTIFIER) || soundFile.Name.Contains(SoundCache.OPTIONAL_PREFIX_IDENTIFIER);
-                                Boolean added = false;
                                 foreach (String prefixSuffixName in SoundCache.availablePrefixesAndSuffixes)
                                 {
                                     if (soundFile.Name.Contains(prefixSuffixName) && SoundCache.soundSets.ContainsKey(prefixSuffixName))
@@ -356,13 +355,12 @@ namespace CrewChiefV4.Audio
                                                 singleSound.prefixSoundSet = additionalSoundSet;
                                             }
                                             singleSoundsWithPrefixOrSuffix.Add(singleSound);
-                                            added = true;
                                             soundsCount++;
                                         }
                                         break;
                                     }
                                 }
-                                if (!added && isOptional)
+                                if (isOptional)
                                 {
                                     hasSounds = true;
                                     singleSoundsNoPrefixOrSuffix.Add(new SingleSound(soundFile.FullName, this.allowCaching, this.keepCached, this.allowCaching));
@@ -514,11 +512,25 @@ namespace CrewChiefV4.Audio
             if (loadedSoundPlayer)
             {
                 unloaded = true;
-                this.soundPlayer.Stop();
-                this.soundPlayer.Dispose();
-                this.soundPlayer = null;
-                this.memoryStream.Dispose();
-                this.memoryStream = null;
+                if (this.soundPlayer != null)
+                {
+                    this.soundPlayer.Stop();
+                    try
+                    {
+                        this.soundPlayer.Dispose();
+                    }
+                    catch (Exception) { }
+                    this.soundPlayer = null;
+                }
+                if (this.memoryStream != null)
+                {
+                    try
+                    {
+                        this.memoryStream.Dispose();
+                    }
+                    catch (Exception) { }
+                    this.memoryStream = null;
+                }
                 loadedSoundPlayer = false;
             }
             return unloaded;
