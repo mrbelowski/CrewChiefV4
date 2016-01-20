@@ -297,7 +297,7 @@ namespace CrewChiefV4.Audio
             DateTime nextQueueCheck = DateTime.Now;
             while (monitorRunning)
             {
-                if (channelOpen && (!holdChannelOpen || DateTime.Now > timeOfLastMessageEnd + maxTimeToHoldEmptyChannelOpen))
+                if (!soundsArePlaying && channelOpen && (!holdChannelOpen || DateTime.Now > timeOfLastMessageEnd + maxTimeToHoldEmptyChannelOpen))
                 {
                     if (!queueHasDueMessages(queuedClips, false) && !queueHasDueMessages(immediateClips, true))
                     {
@@ -629,7 +629,6 @@ namespace CrewChiefV4.Audio
                 if (soundsProcessed.Count == 0)
                 {
                     Console.WriteLine("Processed no messages in this queue");
-                    holdChannelOpen = true;
                 }
                 else
                 {

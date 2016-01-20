@@ -26,6 +26,7 @@ namespace CrewChiefV4.Audio
         private int maxCacheSize = 600;
         private int purgeBlockSize = 100;
         private int currentLoadedCount;
+        public static int prefixesAndSuffixesCount = 0;
 
         public static String OPTIONAL_PREFIX_IDENTIFIER = "op_prefix";
         public static String OPTIONAL_SUFFIX_IDENTIFIER = "op_suffix";
@@ -61,6 +62,11 @@ namespace CrewChiefV4.Audio
             }
             Console.WriteLine("Finished preparing sounds cache, loaded " + singleSounds.Count + " single sounds and " + soundSets.Count + 
                 " sound sets, with " + currentLoadedCount + " active SoundPlayer objects");
+
+            if (prefixesAndSuffixesCount > 0)
+            {
+                Console.WriteLine(prefixesAndSuffixesCount + " sounds have personalisations");
+            }
         }
 
         public Boolean eventHasPersonalisedPrefixOrSuffix(String eventName)
@@ -377,6 +383,7 @@ namespace CrewChiefV4.Audio
                                                 singleSound.prefixSoundSet = additionalSoundSet;
                                             }
                                             singleSoundsWithPrefixOrSuffix.Add(singleSound);
+                                            SoundCache.prefixesAndSuffixesCount++;
                                             soundsCount++;
                                         }
                                         break;
@@ -401,7 +408,7 @@ namespace CrewChiefV4.Audio
             }
             catch (DirectoryNotFoundException)
             {
-            }
+            }            
             initialised = true;
         }
         
