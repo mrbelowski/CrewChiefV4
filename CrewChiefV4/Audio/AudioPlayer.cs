@@ -404,6 +404,7 @@ namespace CrewChiefV4.Audio
             lock (queueToPlay)
             {
                 int willBePlayedCount = queueToPlay.Count;
+                String firstEventWithPrefix = null;
                 foreach (String key in queueToPlay.Keys)
                 {
                     QueuedMessage queuedMessage = (QueuedMessage)queueToPlay[key];
@@ -415,7 +416,14 @@ namespace CrewChiefV4.Audio
                         if ((isImmediateMessages || !keepQuiet || queuedMessage.playEvenWhenSilenced) && queuedMessage.canBePlayed &&
                             messageIsStillValid && !keysToPlay.Contains(key) && !queueTooLongForMessage && !messageHasExpired)
                         {
-                            keysToPlay.Add(key);
+                            if (firstEventWithPrefix == null && soundCache.eventHasPersonalisedPrefix(key))
+                            {
+                                firstEventWithPrefix = key;
+                            }
+                            else
+                            {
+                                keysToPlay.Add(key);
+                            }
                         }
                         else
                         {
@@ -444,7 +452,11 @@ namespace CrewChiefV4.Audio
                             soundsProcessed.Add(key);
                             willBePlayedCount--;
                         }
-                    }
+                    }                    
+                }
+                if (firstEventWithPrefix != null)
+                {
+                    keysToPlay.Insert(0, firstEventWithPrefix);
                 }
                 if (keysToPlay.Count > 0)
                 {

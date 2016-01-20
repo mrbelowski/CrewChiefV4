@@ -10,8 +10,9 @@ namespace CrewChiefV4.Audio
 {
     public class SoundCache
     {
+        public static Random random = new Random();
         private Boolean useAlternateBeeps = UserSettings.GetUserSettings().getBoolean("use_alternate_beeps");
-        private TimeSpan minTimeBetweenPersonalisedMessages = TimeSpan.FromSeconds(UserSettings.GetUserSettings().getInt("min_time_between_personalised_messages"));
+        private double minSecondsBetweenPersonalisedMessages = (double)UserSettings.GetUserSettings().getInt("min_time_between_personalised_messages");
         
         private List<String> dynamicLoadedSounds = new List<String>();
         public static Dictionary<String, SoundSet> soundSets = new Dictionary<String, SoundSet>();
@@ -62,9 +63,26 @@ namespace CrewChiefV4.Audio
                 " sound sets, with " + currentLoadedCount + " active SoundPlayer objects");
         }
 
+        public Boolean eventHasPersonalisedPrefix(String eventName)
+        {
+            return soundSets.ContainsKey(eventName) && soundSets[eventName].hasPrefix;
+        }
+
         public void Play(List<String> soundNames)
         {
-            Boolean canUsePersonalised = lastPersonalisedMessageTime.Add(minTimeBetweenPersonalisedMessages) < DateTime.Now;
+            double secondsSinceLastPersonalisedMessage = (DateTime.Now - lastPersonalisedMessageTime).TotalSeconds;
+            Boolean preferPersonalised = false;
+            if (minSecondsBetweenPersonalisedMessages <= 0)
+            {
+                preferPersonalised = true;
+            }
+            else if (secondsSinceLastPersonalisedMessage > minSecondsBetweenPersonalisedMessages)
+            {
+                // we can now select a personalised message, but we don't always do this - the probability is based 
+                // on the time since the last one
+                preferPersonalised = random.NextDouble() < (secondsSinceLastPersonalisedMessage / minSecondsBetweenPersonalisedMessages) - 1;
+            }
+
             SoundSet prefix = null;
             SoundSet suffix = null;
             List<SingleSound> singleSoundsToPlay = new List<SingleSound>();
@@ -74,7 +92,7 @@ namespace CrewChiefV4.Audio
                 if (soundSets.ContainsKey(soundName))
                 {
                     SoundSet soundSet = soundSets[soundName];
-                    singleSound = soundSet.getSingleSound(canUsePersonalised);
+                    singleSound = soundSet.getSingleSound(preferPersonalised);
                     if (!soundSet.keepCached)
                     {
                         if (dynamicLoadedSounds.Contains(soundName))
@@ -301,8 +319,6 @@ namespace CrewChiefV4.Audio
 
     public class SoundSet
     {
-        private static Random random = new Random();
-
         private List<SingleSound> singleSoundsNoPrefixOrSuffix = new List<SingleSound>();
         private List<SingleSound> singleSoundsWithPrefixOrSuffix = new List<SingleSound>();
         private DirectoryInfo soundFolder;
@@ -312,6 +328,7 @@ namespace CrewChiefV4.Audio
         private Boolean initialised = false;
         public Boolean hasSounds = false;
         public int soundsCount;
+        public Boolean hasPrefix = false;
 
         public SoundSet(DirectoryInfo soundFolder, Boolean useSwearyMessages, Boolean keepCached, Boolean allowCaching)
         {
@@ -353,6 +370,7 @@ namespace CrewChiefV4.Audio
                                             else
                                             {
                                                 singleSound.prefixSoundSet = additionalSoundSet;
+                                                hasPrefix = true;
                                             }
                                             singleSoundsWithPrefixOrSuffix.Add(singleSound);
                                             soundsCount++;
@@ -391,11 +409,11 @@ namespace CrewChiefV4.Audio
             }
             if (preferPersonalised && singleSoundsWithPrefixOrSuffix.Count > 0)
             {
-                return singleSoundsWithPrefixOrSuffix[SoundSet.random.Next(0, singleSoundsWithPrefixOrSuffix.Count)];
+                return singleSoundsWithPrefixOrSuffix[SoundCache.random.Next(0, singleSoundsWithPrefixOrSuffix.Count)];
             } 
             else if (singleSoundsNoPrefixOrSuffix.Count > 0)
             {
-                return singleSoundsNoPrefixOrSuffix[SoundSet.random.Next(0, singleSoundsNoPrefixOrSuffix.Count)];
+                return singleSoundsNoPrefixOrSuffix[SoundCache.random.Next(0, singleSoundsNoPrefixOrSuffix.Count)];
             }
             else
             {
