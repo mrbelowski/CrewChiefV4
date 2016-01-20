@@ -68,6 +68,11 @@ namespace CrewChiefV4.Audio
             return soundSets.ContainsKey(eventName) && soundSets[eventName].hasPrefix;
         }
 
+        public Boolean eventHasPersonalisedSuffix(String eventName)
+        {
+            return soundSets.ContainsKey(eventName) && soundSets[eventName].hasSuffix;
+        }
+
         public void Play(List<String> soundNames)
         {
             double secondsSinceLastPersonalisedMessage = (DateTime.Now - lastPersonalisedMessageTime).TotalSeconds;
@@ -329,6 +334,7 @@ namespace CrewChiefV4.Audio
         public Boolean hasSounds = false;
         public int soundsCount;
         public Boolean hasPrefix = false;
+        public Boolean hasSuffix = false;
 
         public SoundSet(DirectoryInfo soundFolder, Boolean useSwearyMessages, Boolean keepCached, Boolean allowCaching)
         {
@@ -366,6 +372,7 @@ namespace CrewChiefV4.Audio
                                             if (soundFile.Name.Contains(SoundCache.OPTIONAL_SUFFIX_IDENTIFIER) || soundFile.Name.Contains(SoundCache.REQUIRED_SUFFIX_IDENTIFIER))
                                             {
                                                 singleSound.suffixSoundSet = additionalSoundSet;
+                                                hasSuffix = true;
                                             }
                                             else
                                             {
