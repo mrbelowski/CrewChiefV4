@@ -63,31 +63,30 @@ namespace CrewChiefV4.Audio
                 " sound sets, with " + currentLoadedCount + " active SoundPlayer objects");
         }
 
-        public Boolean eventHasPersonalisedPrefix(String eventName)
+        public Boolean eventHasPersonalisedPrefixOrSuffix(String eventName)
         {
-            return soundSets.ContainsKey(eventName) && soundSets[eventName].hasPrefix;
+            return soundSets.ContainsKey(eventName) && soundSets[eventName].hasPrefixOrSuffix;
         }
-
-        public Boolean eventHasPersonalisedSuffix(String eventName)
-        {
-            return soundSets.ContainsKey(eventName) && soundSets[eventName].hasSuffix;
-        }
-
-        public void Play(List<String> soundNames)
+        
+        public Boolean personalisedMessageIsDue()
         {
             double secondsSinceLastPersonalisedMessage = (DateTime.Now - lastPersonalisedMessageTime).TotalSeconds;
-            Boolean preferPersonalised = false;
+            Boolean due = false;
             if (minSecondsBetweenPersonalisedMessages <= 0)
             {
-                preferPersonalised = true;
+                due = true;
             }
             else if (secondsSinceLastPersonalisedMessage > minSecondsBetweenPersonalisedMessages)
             {
                 // we can now select a personalised message, but we don't always do this - the probability is based 
                 // on the time since the last one
-                preferPersonalised = random.NextDouble() < (secondsSinceLastPersonalisedMessage / minSecondsBetweenPersonalisedMessages) - 1;
+                due = random.NextDouble() < (secondsSinceLastPersonalisedMessage / minSecondsBetweenPersonalisedMessages) - 1;
             }
+            return due;
+        }
 
+        public void Play(List<String> soundNames)
+        {           
             SoundSet prefix = null;
             SoundSet suffix = null;
             List<SingleSound> singleSoundsToPlay = new List<SingleSound>();
@@ -97,7 +96,7 @@ namespace CrewChiefV4.Audio
                 if (soundSets.ContainsKey(soundName))
                 {
                     SoundSet soundSet = soundSets[soundName];
-                    singleSound = soundSet.getSingleSound(preferPersonalised);
+                    singleSound = soundSet.getSingleSound(personalisedMessageIsDue());
                     if (!soundSet.keepCached)
                     {
                         if (dynamicLoadedSounds.Contains(soundName))
@@ -333,8 +332,7 @@ namespace CrewChiefV4.Audio
         private Boolean initialised = false;
         public Boolean hasSounds = false;
         public int soundsCount;
-        public Boolean hasPrefix = false;
-        public Boolean hasSuffix = false;
+        public Boolean hasPrefixOrSuffix = false;
 
         public SoundSet(DirectoryInfo soundFolder, Boolean useSwearyMessages, Boolean keepCached, Boolean allowCaching)
         {
@@ -363,21 +361,20 @@ namespace CrewChiefV4.Audio
                                 foreach (String prefixSuffixName in SoundCache.availablePrefixesAndSuffixes)
                                 {
                                     if (soundFile.Name.Contains(prefixSuffixName) && SoundCache.soundSets.ContainsKey(prefixSuffixName))
-                                    {
+                                    {                                       
                                         SoundSet additionalSoundSet = SoundCache.soundSets[prefixSuffixName];
                                         if (additionalSoundSet.hasSounds)
                                         {
+                                            hasPrefixOrSuffix = true;
                                             hasSounds = true;
                                             SingleSound singleSound = new SingleSound(soundFile.FullName, this.allowCaching, this.keepCached, this.allowCaching);
                                             if (soundFile.Name.Contains(SoundCache.OPTIONAL_SUFFIX_IDENTIFIER) || soundFile.Name.Contains(SoundCache.REQUIRED_SUFFIX_IDENTIFIER))
                                             {
                                                 singleSound.suffixSoundSet = additionalSoundSet;
-                                                hasSuffix = true;
                                             }
                                             else
                                             {
                                                 singleSound.prefixSoundSet = additionalSoundSet;
-                                                hasPrefix = true;
                                             }
                                             singleSoundsWithPrefixOrSuffix.Add(singleSound);
                                             soundsCount++;

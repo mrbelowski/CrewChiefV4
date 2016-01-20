@@ -404,8 +404,7 @@ namespace CrewChiefV4.Audio
             lock (queueToPlay)
             {
                 int willBePlayedCount = queueToPlay.Count;
-                String firstEventWithPrefix = null;
-                String firstEventWithSuffix = null;
+                String firstEventWithPrefixOrSuffix = null;
                 foreach (String key in queueToPlay.Keys)
                 {
                     QueuedMessage queuedMessage = (QueuedMessage)queueToPlay[key];
@@ -417,14 +416,10 @@ namespace CrewChiefV4.Audio
                         if ((isImmediateMessages || !keepQuiet || queuedMessage.playEvenWhenSilenced) && queuedMessage.canBePlayed &&
                             messageIsStillValid && !keysToPlay.Contains(key) && !queueTooLongForMessage && !messageHasExpired)
                         {
-                            if (firstEventWithPrefix == null && soundCache.eventHasPersonalisedPrefix(key))
+                            if (firstEventWithPrefixOrSuffix == null && soundCache.eventHasPersonalisedPrefixOrSuffix(key))
                             {
-                                firstEventWithPrefix = key;
+                                firstEventWithPrefixOrSuffix = key;
                             } 
-                            else if (firstEventWithSuffix == null && soundCache.eventHasPersonalisedSuffix(key))
-                            {
-                                firstEventWithSuffix = key;
-                            }
                             else
                             {
                                 keysToPlay.Add(key);
@@ -459,14 +454,10 @@ namespace CrewChiefV4.Audio
                         }
                     }                    
                 }
-                if (firstEventWithPrefix != null)
+                if (firstEventWithPrefixOrSuffix != null)
                 {
-                    keysToPlay.Insert(0, firstEventWithPrefix);
+                    keysToPlay.Insert(0, firstEventWithPrefixOrSuffix);
                 } 
-                if (firstEventWithSuffix != null)
-                {
-                    keysToPlay.Add(firstEventWithSuffix);
-                }
                 if (keysToPlay.Count > 0)
                 {
                     if (keysToPlay.Count == 1 && clipIsPearlOfWisdom(keysToPlay[0]))

@@ -1,6 +1,16 @@
 <!DOCTYPE html>
 <html>
 <body>
+<h2>Version 4.1.0.0</h2>
+<ul>
+	<li>Internal audio handling overhaul - better queue handling, smarter caching of sound objects, more reliable radio channel state management (should prevent channel being left open)</li>
+	<li>Added support for personalised message prefixes and suffixes</li>
+	<li>Spotter fix - reinstated missing width separation check to prevent spotter calls being made when a car is directly in front / behind but within the car length parameter</li>
+	<li>Internal audio handling overhaul - better queue handling, more reliable radio channel state management (should prevent channel being left open)</li>
+	<li>Fixed number reading for some numbers</li>
+	<li>Fixed DTM 2014 tyre compound error in the 'box now' message</li>
+	<li>Validate overtake messages to ensure they're not out of date by the time they're played</li>
+</ul>
 <h2>Version 4.0.3.5</h2>
 <ul>
 	<li>Fixed major regression for Project Cars - hold all internal Strings as raw byte arrays (which may or may not have a null first character) and decode them when we need them</li>
