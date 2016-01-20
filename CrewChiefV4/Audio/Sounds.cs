@@ -128,7 +128,7 @@ namespace CrewChiefV4.Audio
                 }
                 if (suffix != null)
                 {
-                    singleSoundsToPlay.Add(prefix.getSingleSound(false));
+                    singleSoundsToPlay.Add(suffix.getSingleSound(false));
                     lastPersonalisedMessageTime = DateTime.Now;
                 }
                 foreach (SingleSound singleSound in singleSoundsToPlay)
@@ -353,7 +353,7 @@ namespace CrewChiefV4.Audio
                             if (soundFile.Name.Contains(SoundCache.REQUIRED_PREFIX_IDENTIFIER) || soundFile.Name.Contains(SoundCache.REQUIRED_SUFFIX_IDENTIFIER) ||
                                 soundFile.Name.Contains(SoundCache.OPTIONAL_PREFIX_IDENTIFIER) || soundFile.Name.Contains(SoundCache.OPTIONAL_PREFIX_IDENTIFIER))
                             {
-                                Boolean isOptional = soundFile.Name.Contains(SoundCache.OPTIONAL_PREFIX_IDENTIFIER) || soundFile.Name.Contains(SoundCache.OPTIONAL_PREFIX_IDENTIFIER);
+                                Boolean isOptional = soundFile.Name.Contains(SoundCache.OPTIONAL_PREFIX_IDENTIFIER) || soundFile.Name.Contains(SoundCache.OPTIONAL_SUFFIX_IDENTIFIER);
                                 foreach (String prefixSuffixName in SoundCache.availablePrefixesAndSuffixes)
                                 {
                                     if (soundFile.Name.Contains(prefixSuffixName) && SoundCache.soundSets.ContainsKey(prefixSuffixName))
