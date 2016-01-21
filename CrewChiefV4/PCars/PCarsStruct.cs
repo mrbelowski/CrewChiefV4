@@ -11,6 +11,7 @@ namespace CrewChiefV4.PCars
 {
     public class StructHelper
     {
+        public static String NULL_CHAR = Encoding.GetEncoding("Windows-1252").GetString(new byte[]{0}, 0, 1);
         public static pCarsAPIStruct Clone<pCarsAPIStruct>(pCarsAPIStruct pcarsStruct)
         {
             using (var ms = new MemoryStream())
@@ -251,11 +252,18 @@ namespace CrewChiefV4.PCars
             String rest = Encoding.GetEncoding("Windows-1252").GetString(name, 1, name.Length - 1).TrimEnd('\0');
             if ((firstChar == null || firstChar.Trim().Length == 0) && (rest != null && rest.Trim().Length > 0))
             {
-                firstChar = PCarsGameStateMapper.FIRST_CHAR_STAND_IN;
+                firstChar = PCarsGameStateMapper.NULL_CHAR_STAND_IN;
             }
             else
             {
                 firstChar = firstChar.Trim();
+            }
+            // the game sometimes doesn't clear the byte array for a string when this string changes. This means we sometimes get the 
+            // actual string bytes, followed by whatever was in the remaining positions in that byte array from the previous String it
+            // contained. We can't do much about this except trim off any remaining characters after the first null. 
+            if (rest.Contains(NULL_CHAR))
+            {
+                rest = rest.Substring(0, rest.IndexOf(NULL_CHAR));
             }
             return (firstChar + rest).Trim();
         } 

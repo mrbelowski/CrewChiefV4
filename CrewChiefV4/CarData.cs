@@ -240,7 +240,7 @@ namespace CrewChiefV4
         {
             if (carClassName != null && carClassName.Length > 1)
             {
-                if (carClassName.StartsWith(PCarsGameStateMapper.FIRST_CHAR_STAND_IN)) {
+                if (carClassName.StartsWith(PCarsGameStateMapper.NULL_CHAR_STAND_IN)) {
                     carClassName = carClassName.Substring(1);
                 }
                 foreach (CarClass carClass in carClasses)

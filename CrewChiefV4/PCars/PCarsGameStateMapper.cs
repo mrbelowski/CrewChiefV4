@@ -16,7 +16,7 @@ namespace CrewChiefV4.PCars
 {
     class PCarsGameStateMapper : GameStateMapper
     {
-        public static String FIRST_CHAR_STAND_IN = "?";
+        public static String NULL_CHAR_STAND_IN = "?";
 
         private Boolean attemptPitDetection = UserSettings.GetUserSettings().getBoolean("attempt_pcars_opponent_pit_detection");
         private static String userSpecifiedSteamId = UserSettings.GetUserSettings().getString("pcars_steam_id");
@@ -129,11 +129,11 @@ namespace CrewChiefV4.PCars
         {
             if (name1 != null && name1.Length > 0 && name2 != null && name2.Length > 0)
             {
-                if (name1.StartsWith(FIRST_CHAR_STAND_IN) && name2.StartsWith((FIRST_CHAR_STAND_IN)))
+                if (name1.StartsWith(NULL_CHAR_STAND_IN) && name2.StartsWith((NULL_CHAR_STAND_IN)))
                 {
                     return name1.Equals(name2);
                 }
-                else if (name1.StartsWith(FIRST_CHAR_STAND_IN) || name2.StartsWith(FIRST_CHAR_STAND_IN))
+                else if (name1.StartsWith(NULL_CHAR_STAND_IN) || name2.StartsWith(NULL_CHAR_STAND_IN))
                 {
                     return name1.Length > 1 && name2.Length > 1 && name1.Substring(1).Equals(name2.Substring(1));
                 }
@@ -158,7 +158,7 @@ namespace CrewChiefV4.PCars
                     // get the player ID from the first viewed participant the app 'sees' and use this for the remainder of the app's run time
                     pCarsAPIParticipantStruct likelyParticipantData = pCarsAPIParticipantStructArray[viewedParticipantIndex];
                     String likelyName = StructHelper.getNameFromBytes(likelyParticipantData.mName);
-                    if (likelyName == null || likelyName.Length == 0 || likelyName.StartsWith(FIRST_CHAR_STAND_IN))
+                    if (likelyName == null || likelyName.Length == 0 || likelyName.StartsWith(NULL_CHAR_STAND_IN))
                     {
                         getPlayerByName = false;
                         Console.WriteLine("Player steam ID - "+ likelyName + " is not valid, falling back to viewedParticipantIndex");
@@ -181,7 +181,7 @@ namespace CrewChiefV4.PCars
                 for (int i = 0; i < pCarsAPIParticipantStructArray.Length; i++)
                 {
                     String name = StructHelper.getNameFromBytes(pCarsAPIParticipantStructArray[i].mName);
-                    if (name.Length == 0 || name.StartsWith(FIRST_CHAR_STAND_IN))
+                    if (name.Length == 0 || name.StartsWith(NULL_CHAR_STAND_IN))
                     {
                         continue;
                     }
@@ -220,7 +220,7 @@ namespace CrewChiefV4.PCars
                 return null;
             }
             String nameToFindWithNoFirstChar = nameToFind.Substring(1);
-            if (nameToFind.StartsWith(FIRST_CHAR_STAND_IN))
+            if (nameToFind.StartsWith(NULL_CHAR_STAND_IN))
             {
                 // oh dear, the game has decided not to send us the first character of the name                
                 foreach (String name in gameState.OpponentData.Keys)
@@ -241,7 +241,7 @@ namespace CrewChiefV4.PCars
                 {
                     foreach (String name in gameState.OpponentData.Keys)
                     {
-                        if (name.StartsWith(FIRST_CHAR_STAND_IN) && name.Substring(1).Equals(nameToFindWithNoFirstChar))
+                        if (name.StartsWith(NULL_CHAR_STAND_IN) && name.Substring(1).Equals(nameToFindWithNoFirstChar))
                         {
                             return gameState.OpponentData[name];
                         }
@@ -1072,7 +1072,7 @@ namespace CrewChiefV4.PCars
             float sessionRunningTime, float secondsSinceLastUpdate, float[] currentWorldPosition, float[] previousWorldPosition,
             float previousSpeed, float worldRecordLapTime, float distanceRoundTrack, Boolean isRaining, float trackTemp, float airTemp, CarData.CarClass carClass)
         {
-            if (opponentData.DriverRawName.StartsWith(FIRST_CHAR_STAND_IN) && name != null && name.Trim().Length > 0 && !name.StartsWith(FIRST_CHAR_STAND_IN))
+            if (opponentData.DriverRawName.StartsWith(NULL_CHAR_STAND_IN) && name != null && name.Trim().Length > 0 && !name.StartsWith(NULL_CHAR_STAND_IN))
             {
                 opponentData.DriverRawName = name;
                 if (CrewChief.enableDriverNames)
@@ -1151,7 +1151,7 @@ namespace CrewChiefV4.PCars
             String participantName = StructHelper.getNameFromBytes(participantStruct.mName).ToLower();
             opponentData.DriverRawName = participantName;
             opponentData.DriverNameSet = true;
-            if (participantName != null && participantName.Length > 0 && !participantName.StartsWith(FIRST_CHAR_STAND_IN) && loadDriverName && CrewChief.enableDriverNames)
+            if (participantName != null && participantName.Length > 0 && !participantName.StartsWith(NULL_CHAR_STAND_IN) && loadDriverName && CrewChief.enableDriverNames)
             {
                 speechRecogniser.addNewOpponentName(opponentData.DriverRawName);
             } 
