@@ -175,7 +175,6 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="R3E\R3ESpotter.cs" />
     <Compile Include="Events\Timings.cs" />
     <Compile Include="Events\TyreMonitor.cs" />
     <Compile Include="UserInterface\StringPropertyControl.cs">

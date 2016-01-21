@@ -273,6 +273,8 @@ namespace CrewChiefV4.GameState
         // the name read directly from the game data - might be a 'handle' with all kinds of random crap in it
         public String DriverRawName = null;
 
+        public Boolean DriverNameSet = false;
+
         public int Position = 0;
 
         public int UnFilteredPosition = 0;

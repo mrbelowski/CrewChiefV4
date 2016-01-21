@@ -1072,7 +1072,7 @@ namespace CrewChiefV4.PCars
             float sessionRunningTime, float secondsSinceLastUpdate, float[] currentWorldPosition, float[] previousWorldPosition,
             float previousSpeed, float worldRecordLapTime, float distanceRoundTrack, Boolean isRaining, float trackTemp, float airTemp, CarData.CarClass carClass)
         {
-            if (opponentData.DriverRawName.StartsWith(FIRST_CHAR_STAND_IN) && name != null && name.Trim().Length > 0)
+            if (opponentData.DriverRawName.StartsWith(FIRST_CHAR_STAND_IN) && name != null && name.Trim().Length > 0 && !name.StartsWith(FIRST_CHAR_STAND_IN))
             {
                 opponentData.DriverRawName = name;
                 if (CrewChief.enableDriverNames)
@@ -1150,6 +1150,7 @@ namespace CrewChiefV4.PCars
             OpponentData opponentData = new OpponentData();
             String participantName = StructHelper.getNameFromBytes(participantStruct.mName).ToLower();
             opponentData.DriverRawName = participantName;
+            opponentData.DriverNameSet = true;
             if (participantName != null && participantName.Length > 0 && !participantName.StartsWith(FIRST_CHAR_STAND_IN) && loadDriverName && CrewChief.enableDriverNames)
             {
                 speechRecogniser.addNewOpponentName(opponentData.DriverRawName);

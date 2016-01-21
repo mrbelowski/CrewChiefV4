@@ -55,7 +55,7 @@ namespace CrewChiefV4.Audio
 
         private readonly TimeSpan queueMonitorInterval = TimeSpan.FromMilliseconds(1000);
 
-        private readonly int immediateMessagesMonitorInterval = 20;
+        private readonly int immediateMessagesMonitorInterval = 10;
 
         private Boolean useListenBeep = UserSettings.GetUserSettings().getBoolean("use_listen_beep");
 
@@ -101,8 +101,6 @@ namespace CrewChiefV4.Audio
 
         public static float soundPackVersion = -1;
         public static float driverNamesVersion = -1;
-
-        private Boolean soundsArePlaying = false;
 
         private SoundCache soundCache;
 
@@ -297,7 +295,7 @@ namespace CrewChiefV4.Audio
             DateTime nextQueueCheck = DateTime.Now;
             while (monitorRunning)
             {
-                if (!soundsArePlaying && channelOpen && (!holdChannelOpen || DateTime.Now > timeOfLastMessageEnd + maxTimeToHoldEmptyChannelOpen))
+                if (channelOpen && (!holdChannelOpen || DateTime.Now > timeOfLastMessageEnd + maxTimeToHoldEmptyChannelOpen))
                 {
                     if (!queueHasDueMessages(queuedClips, false) && !queueHasDueMessages(immediateClips, true))
                     {
@@ -404,7 +402,7 @@ namespace CrewChiefV4.Audio
             lock (queueToPlay)
             {
                 int willBePlayedCount = queueToPlay.Count;
-                String firstEventWithPrefixOrSuffix = null;
+                String firstMovableEventWithPrefixOrSuffix = null;
                 foreach (String key in queueToPlay.Keys)
                 {
                     QueuedMessage queuedMessage = (QueuedMessage)queueToPlay[key];
@@ -416,9 +414,11 @@ namespace CrewChiefV4.Audio
                         if ((isImmediateMessages || !keepQuiet || queuedMessage.playEvenWhenSilenced) && queuedMessage.canBePlayed &&
                             messageIsStillValid && !keysToPlay.Contains(key) && !queueTooLongForMessage && !messageHasExpired)
                         {
-                            if (firstEventWithPrefixOrSuffix == null && soundCache.eventHasPersonalisedPrefixOrSuffix(key))
+                            // special case for 'get ready' event here - we don't want to move this to the top of the queue because 
+                            // it makes it sound shit. Bit of a hack, needs a better solution
+                            if (firstMovableEventWithPrefixOrSuffix == null && key != LapCounter.folderGetReady && soundCache.eventHasPersonalisedPrefixOrSuffix(key))
                             {
-                                firstEventWithPrefixOrSuffix = key;
+                                firstMovableEventWithPrefixOrSuffix = key;
                             } 
                             else
                             {
@@ -454,9 +454,9 @@ namespace CrewChiefV4.Audio
                         }
                     }                    
                 }
-                if (firstEventWithPrefixOrSuffix != null)
+                if (firstMovableEventWithPrefixOrSuffix != null)
                 {
-                    keysToPlay.Insert(0, firstEventWithPrefixOrSuffix);
+                    keysToPlay.Insert(0, firstMovableEventWithPrefixOrSuffix);
                 } 
                 if (keysToPlay.Count > 0)
                 {
@@ -549,92 +549,99 @@ namespace CrewChiefV4.Audio
             OrderedDictionary thisQueue = isImmediateMessages ? immediateClips : queuedClips;
             wasInterrupted = false;
             int playedEventCount = 0;
-            if (!soundsArePlaying)
+            foreach (String eventName in eventNames)
             {
-                soundsArePlaying = true;
-                foreach (String eventName in eventNames)
+                // if there's anything in the immediateClips queue, stop processing
+                if (isImmediateMessages || immediateClips.Count == 0)
                 {
-                    // if there's anything in the immediateClips queue, stop processing
-                    if (isImmediateMessages || immediateClips.Count == 0)
+                    if (thisQueue.Contains(eventName))
                     {
-                        if (thisQueue.Contains(eventName))
+                        QueuedMessage thisMessage = (QueuedMessage)thisQueue[eventName];
+                        if (!isImmediateMessages && playedEventCount > 0 && pauseBetweenMessages > 0)
                         {
-                            QueuedMessage thisMessage = (QueuedMessage)thisQueue[eventName];
-                            if (!isImmediateMessages && playedEventCount > 0 && pauseBetweenMessages > 0)
-                            {
-                                Console.WriteLine("Pausing before " + eventName);
-                                Thread.Sleep(TimeSpan.FromSeconds(pauseBetweenMessages));
-                            }
-                            if (clipIsPearlOfWisdom(eventName))
+                            Console.WriteLine("Pausing before " + eventName);
+                            Thread.Sleep(TimeSpan.FromSeconds(pauseBetweenMessages));
+                        }
+                        //  now double check this is still valid
+                        if (!isImmediateMessages)
+                        {
+                            Boolean messageHasExpired = thisMessage.expiryTime != 0 && thisMessage.expiryTime < DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond; ;
+                            Boolean messageIsStillValid = thisMessage.isMessageStillValid(eventName, crewChief.currentGameState);
+                            if (messageHasExpired || !messageIsStillValid)
                             {
                                 soundsProcessed.Add(eventName);
-                                if (hasPearlJustBeenPlayed())
-                                {
-                                    Console.WriteLine("Rejecting pearl of wisdom " + eventName +
-                                        " because one has been played in the last " + minTimeBetweenPearlsOfWisdom + " seconds");
-                                    continue;
-                                }
-                                else if (!allowPearlsOnNextPlay)
-                                {
-                                    Console.WriteLine("Rejecting pearl of wisdom " + eventName +
-                                        " because they've been temporarily disabled");
-                                    continue;
-                                }
-                                else if (disablePearlsOfWisdom)
-                                {
-                                    Console.WriteLine("Rejecting pearl of wisdom " + eventName +
-                                           " because pearls have been disabled for the last phase of the race");
-                                    continue;
-                                }
-                                else
-                                {
-                                    timeLastPearlOfWisdomPlayed = DateTime.Now;
-                                    if (!mute)
-                                    {
-                                        soundCache.Play(eventName);
-                                        timeOfLastMessageEnd = DateTime.Now;
-                                    }
-                                }
+                                continue;
+                            }
+                        }
+                        if (clipIsPearlOfWisdom(eventName))
+                        {
+                            soundsProcessed.Add(eventName);
+                            if (hasPearlJustBeenPlayed())
+                            {
+                                Console.WriteLine("Rejecting pearl of wisdom " + eventName +
+                                    " because one has been played in the last " + minTimeBetweenPearlsOfWisdom + " seconds");
+                                continue;
+                            }
+                            else if (!allowPearlsOnNextPlay)
+                            {
+                                Console.WriteLine("Rejecting pearl of wisdom " + eventName +
+                                    " because they've been temporarily disabled");
+                                continue;
+                            }
+                            else if (disablePearlsOfWisdom)
+                            {
+                                Console.WriteLine("Rejecting pearl of wisdom " + eventName +
+                                        " because pearls have been disabled for the last phase of the race");
+                                continue;
                             }
                             else
                             {
-                                lastMessagePlayed = thisMessage;
+                                timeLastPearlOfWisdomPlayed = DateTime.Now;
                                 if (!mute)
                                 {
-                                    soundCache.Play(thisMessage.messageFolders);
+                                    soundCache.Play(eventName);
                                     timeOfLastMessageEnd = DateTime.Now;
                                 }
-                                if (playedMessagesCount.ContainsKey(eventName))
-                                {
-                                    int count = playedMessagesCount[eventName] + 1;
-                                    playedMessagesCount[eventName] = count;
-                                }
-                                else
-                                {
-                                    playedMessagesCount.Add(eventName, 1);
-                                }
-                                soundsProcessed.Add(eventName);
                             }
-                            playedEventCount++;
                         }
+                        else
+                        {
+                            lastMessagePlayed = thisMessage;
+                            if (!mute)
+                            {
+                                soundCache.Play(thisMessage.messageFolders);
+                                timeOfLastMessageEnd = DateTime.Now;
+                            }
+                            if (playedMessagesCount.ContainsKey(eventName))
+                            {
+                                int count = playedMessagesCount[eventName] + 1;
+                                playedMessagesCount[eventName] = count;
+                            }
+                            else
+                            {
+                                playedMessagesCount.Add(eventName, 1);
+                            }
+                            soundsProcessed.Add(eventName);
+                        }
+                        playedEventCount++;
                     }
-                    else
-                    {
-                        Console.WriteLine("we've been interrupted after playing " + playedEventCount + " events");
-                        wasInterrupted = true;
-                        break;
-                    }
-                }
-                soundsArePlaying = false;
-                if (soundsProcessed.Count == 0)
-                {
-                    Console.WriteLine("Processed no messages in this queue");
                 }
                 else
                 {
-                    Console.WriteLine("*** Processed " + String.Join(", ", soundsProcessed.ToArray()));
+                    Console.WriteLine("we've been interrupted after playing " + playedEventCount + " events");
+                    wasInterrupted = true;
+                    break;
                 }
             }
+            if (soundsProcessed.Count == 0)
+            {
+                Console.WriteLine("Processed no messages in this queue");
+            }
+            else
+            {
+                Console.WriteLine("*** Processed " + String.Join(", ", soundsProcessed.ToArray()));
+            }
+            
             return soundsProcessed;
         }
 
@@ -714,6 +721,11 @@ namespace CrewChiefV4.Audio
             }
             useShortBeepWhenOpeningChannel = false;
             channelOpen = false;
+        }
+
+        public void cancelChannelHoldOpen()
+        {
+            this.holdChannelOpen = false;
         }
 
         public void playStartSpeakingBeep()
@@ -864,21 +876,18 @@ namespace CrewChiefV4.Audio
             }
         }
 
-        public Boolean removeImmediateClip(String eventName)
+        public void removeImmediateClips(String[] eventNames)
         {
-            if (disableImmediateMessages)
-            {
-                return false;
-            }
             lock (immediateClips)
             {
-                if (immediateClips.Contains(eventName))
+                foreach (String eventName in eventNames)
                 {
-                    Console.WriteLine("Removing immediate clip " + eventName);
-                    immediateClips.Remove(eventName);
-                    return true;
+                    if (immediateClips.Contains(eventName))
+                    {
+                        Console.WriteLine("Removing immediate clip " + eventName);
+                        immediateClips.Remove(eventName);
+                    }
                 }
-                return false;
             }
         }
 
