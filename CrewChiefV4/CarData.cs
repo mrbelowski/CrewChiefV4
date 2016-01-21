@@ -69,7 +69,7 @@ namespace CrewChiefV4
 
         public enum CarClassEnum
         {
-            GT1X, GT1, GT2, ADAC_GTM_2014, ADAC_GTM_2013, GT3, GT4, GT5, Kart, LMP1, LMP2, LMP3, ROAD, ROAD_SUPERCAR, GROUPC, GROUPA, GROUP4, GROUP5, VINTAGE_RACE_SLICKS,
+            GT1X, GT1, GT2, ADAC_GTM_2014, ADAC_GTM_2013, GT3, GT4, GT5, Kart, LMP1, LMP2, LMP3, ROAD_B, ROAD_C1, ROAD_C2, ROAD_D, ROAD_SUPERCAR, GROUPC, GROUPA, GROUP4, GROUP5, VINTAGE_RACE_SLICKS,
             VINTAGE_RACE_BIAS_PLY, STOCK_CAR, F1, F2, F3, F4, FF, TC1, TC2, AUDI_TT_CUP, CLIO_CUP, DTM, DTM_2013, DTM_2014, DTM_2015, TRANS_AM, HILL_CLIMB_ICONS, UNKNOWN_RACE
         }
 
@@ -166,7 +166,10 @@ namespace CrewChiefV4
             carClasses.Add(new CarClass(CarClassEnum.TC2, new String[] { "BTCC, WTCC_2013", "TC2" }, new int[] { 1922 }, BrakeType.Iron_Race, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp)); // clios
             carClasses.Add(new CarClass(CarClassEnum.AUDI_TT_CUP, new String[] { "Audi TT Cup" }, new int[] { 4680 }, BrakeType.Iron_Race, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp, carMinTyreCircumference, carMaxTyreCircumference));
 
-            carClasses.Add(new CarClass(CarClassEnum.ROAD, new String[] { "Road B", "Road C1", "Road C2", "Road D" }, new int[] { }, BrakeType.Iron_Road, TyreType.Road, maxRoadSafeWaterTemp, maxRoadSafeOilTemp));
+            carClasses.Add(new CarClass(CarClassEnum.ROAD_D, new String[] { "Road D" }, new int[] { }, BrakeType.Iron_Road, TyreType.Road, maxRoadSafeWaterTemp, maxRoadSafeOilTemp));
+            carClasses.Add(new CarClass(CarClassEnum.ROAD_C2, new String[] { "Road C2"}, new int[] { }, BrakeType.Iron_Road, TyreType.Road, maxRoadSafeWaterTemp, maxRoadSafeOilTemp));
+            carClasses.Add(new CarClass(CarClassEnum.ROAD_C1, new String[] { "Road C1" }, new int[] { }, BrakeType.Iron_Road, TyreType.Road, maxRoadSafeWaterTemp, maxRoadSafeOilTemp));
+            carClasses.Add(new CarClass(CarClassEnum.ROAD_B, new String[] { "Road B" }, new int[] { }, BrakeType.Iron_Road, TyreType.Road, maxRoadSafeWaterTemp, maxRoadSafeOilTemp));
             carClasses.Add(new CarClass(CarClassEnum.ROAD_SUPERCAR, new String[] { "Road A" }, new int[] { }, BrakeType.Ceramic, TyreType.Road, maxRoadSafeWaterTemp, maxRoadSafeOilTemp));
 
             carClasses.Add(new CarClass(CarClassEnum.HILL_CLIMB_ICONS, new String[] { }, new int[] { 1685 }, BrakeType.Ceramic, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp));

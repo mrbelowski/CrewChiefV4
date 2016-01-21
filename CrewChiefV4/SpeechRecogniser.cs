@@ -307,7 +307,8 @@ namespace CrewChiefV4
                         return;
                     }
                     if (initialised)
-                    {                        
+                    {
+                        Console.WriteLine("Adding " + usableName + " to speech recogniser");
                         Choices opponentChoices = new Choices();
                         opponentChoices.Add(WHERE_IS + " " + usableName);
                         opponentChoices.Add(WHATS + " " + usableName + "'s " + LAST_LAP);
