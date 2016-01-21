@@ -722,12 +722,7 @@ namespace CrewChiefV4.Audio
             useShortBeepWhenOpeningChannel = false;
             channelOpen = false;
         }
-
-        public void cancelChannelHoldOpen()
-        {
-            this.holdChannelOpen = false;
-        }
-
+        
         public void playStartSpeakingBeep()
         {
             if (!mute)

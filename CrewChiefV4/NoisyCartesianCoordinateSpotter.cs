@@ -456,21 +456,18 @@ namespace CrewChiefV4
                                     QueuedMessage clearLeftMessage = new QueuedMessage(folderClearLeft, 0, null);
                                     clearLeftMessage.expiryTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + clearMessageExpiresAfter;
                                     audioPlayer.removeImmediateClips(new String[] {folderCarLeft, folderStillThere, folderCarRight, folderInTheMiddle, folderClearRight, folderClearAllRound});
-                                    audioPlayer.playClipImmediately(clearLeftMessage, false);
                                     if (wasInMiddle)
                                     {
+                                        audioPlayer.playClipImmediately(clearLeftMessage, true, false);
                                         nextMessageType = NextMessageType.carRight;
                                         nextMessageDue = now.Add(repeatHoldFrequency);
                                     }
                                     else
                                     {
+                                        audioPlayer.playClipImmediately(clearLeftMessage, false);
                                         nextMessageType = NextMessageType.none;
                                     }
                                 }
-                            }
-                            if (carsOnRightCount == 0)
-                            {
-                                audioPlayer.cancelChannelHoldOpen();
                             }
                             reportedOverlapLeft = false;
                             break;
@@ -492,22 +489,19 @@ namespace CrewChiefV4
                                 {
                                     QueuedMessage clearRightMessage = new QueuedMessage(folderClearRight, 0, null);
                                     clearRightMessage.expiryTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + clearMessageExpiresAfter;
-                                    audioPlayer.removeImmediateClips(new String[] {folderCarLeft, folderStillThere, folderCarRight, folderInTheMiddle, folderClearLeft, folderClearAllRound});
-                                    audioPlayer.playClipImmediately(clearRightMessage, false);
+                                    audioPlayer.removeImmediateClips(new String[] {folderCarLeft, folderStillThere, folderCarRight, folderInTheMiddle, folderClearLeft, folderClearAllRound});                                    
                                     if (wasInMiddle)
                                     {
+                                        audioPlayer.playClipImmediately(clearRightMessage, true, false);
                                         nextMessageType = NextMessageType.carLeft;
                                         nextMessageDue = now.Add(repeatHoldFrequency);
                                     }
                                     else
                                     {
+                                        audioPlayer.playClipImmediately(clearRightMessage, false);
                                         nextMessageType = NextMessageType.none;
                                     }
                                 }
-                            }
-                            if (carsOnLeftCount == 0)
-                            {
-                                audioPlayer.cancelChannelHoldOpen();   
                             }
                             reportedOverlapRight = false;
                             break;

@@ -14,24 +14,24 @@ namespace CrewChiefV4
         // These are the peaks. If the tyre exceeds these temps even for one tick over a lap, we'll warn about it. This is why they look so high
 
         private static float maxColdRoadTyreTempPeak = 65;
-        private static float maxWarmRoadTyreTempPeak = 95;
-        private static float maxHotRoadTyreTempPeak = 115;
+        private static float maxWarmRoadTyreTempPeak = 106;
+        private static float maxHotRoadTyreTempPeak = 120;
 
         private static float maxColdUnknownRaceTyreTempPeak = 70;
-        private static float maxWarmUnknownRaceTyreTempPeak = 115;
-        private static float maxHotUnknownRaceTyreTempPeak = 135;
+        private static float maxWarmUnknownRaceTyreTempPeak = 117;
+        private static float maxHotUnknownRaceTyreTempPeak = 137;
 
         private static float maxColdDtmOptionTyreTempPeak = 70;
         private static float maxWarmDtmOptionTyreTempPeak = 110;
-        private static float maxHotDtmOptionTyreTempPeak = 125;
+        private static float maxHotDtmOptionTyreTempPeak = 127;
 
         private static float maxColdDtmPrimeTyreTempPeak = 80;
-        private static float maxWarmDtmPrimeTyreTempPeak = 115;
-        private static float maxHotDtmPrimeTyreTempPeak = 135;
+        private static float maxWarmDtmPrimeTyreTempPeak = 117;
+        private static float maxHotDtmPrimeTyreTempPeak = 137;
 
         private static float maxColdBiasPlyTyreTempPeak = 70;
-        private static float maxWarmBiasPlyTyreTempPeak = 100;
-        private static float maxHotBiasPlyTyreTempPeak = 120;
+        private static float maxWarmBiasPlyTyreTempPeak = 103;
+        private static float maxHotBiasPlyTyreTempPeak = 123;
         
         private static float maxColdIronRoadBrakeTemp = 80;
         private static float maxWarmIronRoadBrakeTemp = 500;
