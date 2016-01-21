@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <html>
 <body>
+<h2>Version 4.1.0.1</h2>
+<ul>
+	<li>More internal fixes to the radio channel handling logic to handle a couple of edge-cases where it wasn't closing the channel promptly</li>
+	<li>Spotter performance and latency improvements</li>
+	<li>Spotter logic fixes for cases where a '3 wide' turns into a 'car left' / 'car right'</li>
+	<li>Don't attempt to update and load a new driver name for an existing player if the new name isn't valid / usable</li>
+	<li>Tyre temp range tweaks</li>
+	<li>Check messages for validity and timeout just before playing them</li>
+</ul>
 <h2>Version 4.1.0.0</h2>
 <ul>
 	<li>Internal audio handling overhaul - better queue handling, smarter caching of sound objects, more reliable radio channel state management (should prevent channel being left open)</li>
