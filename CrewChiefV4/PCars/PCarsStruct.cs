@@ -29,7 +29,7 @@ namespace CrewChiefV4.PCars
             {
                 existingState.isSameClassAsPlayer = new Boolean[(int)eAPIStructLengths.NUM_PARTICIPANTS];
             }
-            existingState.hasOpponentClassData = true;
+            existingState.hasOpponentClassData = false;
             existingState.hasNewPositionData = false;
             existingState.mGameState = (uint) udpTelemetryData.sGameSessionState & 7;
             existingState.mSessionState = (uint) udpTelemetryData.sGameSessionState >> 4;
@@ -174,7 +174,12 @@ namespace CrewChiefV4.PCars
                     Boolean lapInvalidated = (newPartInfo.sLapsCompleted >> 7) == 1;
                     existingPartInfo.mRacePosition = (uint) newPartInfo.sRacePosition & 127;
                     existingPartInfo.mCurrentSector = (uint)newPartInfo.sSector & 7;
-                    existingState.isSameClassAsPlayer[i] = (newPartInfo.sSector >> 3 & 1) == 1;
+                    Boolean sameClassAsPlayer = (newPartInfo.sSector >> 3 & 1) == 1;
+                    if (sameClassAsPlayer) {
+                        existingState.hasOpponentClassData = true;
+                    }
+                    existingState.isSameClassAsPlayer[i] = sameClassAsPlayer;
+
 
                     // and now the bit magic for the extra position precision...
                     float[] newWorldPositions = toFloatArray(newPartInfo.sWorldPosition, 1);

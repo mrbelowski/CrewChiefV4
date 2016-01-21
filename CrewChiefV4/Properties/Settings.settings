@@ -308,9 +308,6 @@
     <Setting Name="use_fahrenheit" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="enable_pcars_opponent_class_detection" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
-    </Setting>
     <Setting Name="override_default_sound_pack_location" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>

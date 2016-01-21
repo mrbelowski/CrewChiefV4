@@ -20,7 +20,6 @@ namespace CrewChiefV4.PCars
 
         private Boolean attemptPitDetection = UserSettings.GetUserSettings().getBoolean("attempt_pcars_opponent_pit_detection");
         private static String userSpecifiedSteamId = UserSettings.GetUserSettings().getString("pcars_steam_id");
-        private Boolean usePCarsNetworkOpponentCarClassFlag = UserSettings.GetUserSettings().getBoolean("enable_pcars_opponent_class_detection");
         private static String playerSteamId = null;
         private static Boolean getPlayerByName = true;
 
@@ -415,7 +414,7 @@ namespace CrewChiefV4.PCars
                     String participantName = StructHelper.getNameFromBytes(participantStruct.mName).ToLower();
                     if (i != playerDataIndex && participantStruct.mIsActive && participantName != null && participantName.Length > 0)
                     {
-                        CarData.CarClass opponentCarClass = shared.hasOpponentClassData && shared.isSameClassAsPlayer[i] ? currentGameState.carClass : CarData.getDefaultCarClass();
+                        CarData.CarClass opponentCarClass = !shared.hasOpponentClassData || shared.isSameClassAsPlayer[i] ? currentGameState.carClass : CarData.getDefaultCarClass();
                         addOpponentForName(participantName, createOpponentData(participantStruct, false, opponentCarClass), currentGameState);
                     }
                 }
@@ -619,8 +618,7 @@ namespace CrewChiefV4.PCars
                 if (i != playerDataIndex)
                 {
                     pCarsAPIParticipantStruct participantStruct = shared.mParticipantData[i];
-                    CarData.CarClass opponentCarClass = !usePCarsNetworkOpponentCarClassFlag || (shared.hasOpponentClassData && shared.isSameClassAsPlayer[i]) ? 
-                        currentGameState.carClass : CarData.getDefaultCarClass();
+                    CarData.CarClass opponentCarClass = !shared.hasOpponentClassData || shared.isSameClassAsPlayer[i] ? currentGameState.carClass : CarData.getDefaultCarClass();
                     String participantName = StructHelper.getNameFromBytes(participantStruct.mName).ToLower();
 
                     if (participantName != null && participantName.Length > 0)
