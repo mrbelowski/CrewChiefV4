@@ -408,7 +408,7 @@ namespace CrewChiefV4
                                     Console.WriteLine(String.Join(";", currentGameState.SessionData.formattedPlayerLapTimes));
                                 }
                                 sessionEndMessages.trigger(previousGameState.SessionData.SessionRunningTime, previousGameState.SessionData.SessionType, currentGameState.SessionData.SessionPhase,
-                                    previousGameState.SessionData.Position, previousGameState.SessionData.NumCarsAtStartOfSession, previousGameState.SessionData.CompletedLaps, 
+                                    previousGameState.SessionData.SessionStartPosition, previousGameState.SessionData.Position, previousGameState.SessionData.NumCarsAtStartOfSession, previousGameState.SessionData.CompletedLaps, 
                                     previousGameState.SessionData.IsDisqualified);
                                 
                                 sessionFinished = true;

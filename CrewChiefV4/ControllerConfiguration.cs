@@ -10,7 +10,7 @@ namespace CrewChiefV4
 {
     class ControllerConfiguration : IDisposable
     {
-        private static Guid NETWORK_CONSOLE_CONTROLLER_GUID = new Guid("2bbfed03-a04f-4408-91cf-e0aa6b20b8ff");
+        private static Guid UDP_NETWORK_CONTROLLER_GUID = new Guid("2bbfed03-a04f-4408-91cf-e0aa6b20b8ff");
 
         public Boolean listenForAssignment = false;
         DirectInput directInput = new DirectInput();
@@ -26,7 +26,7 @@ namespace CrewChiefV4
         public static String TOGGLE_READ_OPPONENT_DELTAS = "Toggle opponent deltas on/off for each lap";
         public static String REPEAT_LAST_MESSAGE_BUTTON = "Press to replay the last message";
 
-        private ControllerData networkGamePad = new ControllerData("Console controller", DeviceType.Gamepad, NETWORK_CONSOLE_CONTROLLER_GUID);
+        private ControllerData networkGamePad = new ControllerData("UDP network data buttons", DeviceType.Gamepad, UDP_NETWORK_CONTROLLER_GUID);
         
         // yuk...
         public Dictionary<String, int> buttonAssignmentIndexes = new Dictionary<String, int>();
@@ -110,7 +110,7 @@ namespace CrewChiefV4
 
                     }
                 }
-                else if (ba.controller.guid == NETWORK_CONSOLE_CONTROLLER_GUID)
+                else if (ba.controller.guid == UDP_NETWORK_CONTROLLER_GUID)
                 {
                     if (PCarsUDPreader.getButtonState(ba.buttonIndex))
                     {
@@ -135,8 +135,8 @@ namespace CrewChiefV4
         {
             foreach (ButtonAssignment buttonAssignment in buttonAssignments)
             {
-                if (buttonAssignment.action == CHANNEL_OPEN_FUNCTION && buttonAssignment.buttonIndex != -1 
-                    && (buttonAssignment.joystick != null || (buttonAssignment.controller != null && buttonAssignment.controller.guid == NETWORK_CONSOLE_CONTROLLER_GUID)))
+                if (buttonAssignment.action == CHANNEL_OPEN_FUNCTION && buttonAssignment.buttonIndex != -1
+                    && (buttonAssignment.joystick != null || (buttonAssignment.controller != null && buttonAssignment.controller.guid == UDP_NETWORK_CONTROLLER_GUID)))
                 {
                     return true;
                 }
@@ -149,7 +149,7 @@ namespace CrewChiefV4
             foreach (ButtonAssignment buttonAssignment in buttonAssignments)
             {
                 if ((channelOpenIsToggle || buttonAssignment.action != CHANNEL_OPEN_FUNCTION) &&
-                    (buttonAssignment.joystick != null || (buttonAssignment.controller != null && buttonAssignment.controller.guid == NETWORK_CONSOLE_CONTROLLER_GUID)) 
+                    (buttonAssignment.joystick != null || (buttonAssignment.controller != null && buttonAssignment.controller.guid == UDP_NETWORK_CONTROLLER_GUID)) 
                     && buttonAssignment.buttonIndex != -1)
                 {
                     return true;
@@ -184,7 +184,7 @@ namespace CrewChiefV4
                     actionId = "REPEAT_LAST_MESSAGE_BUTTON";
                 }
 
-                if (buttonAssignment.controller != null && (buttonAssignment.joystick != null || buttonAssignment.controller.guid == NETWORK_CONSOLE_CONTROLLER_GUID) && buttonAssignment.buttonIndex != -1)
+                if (buttonAssignment.controller != null && (buttonAssignment.joystick != null || buttonAssignment.controller.guid == UDP_NETWORK_CONTROLLER_GUID) && buttonAssignment.buttonIndex != -1)
                 {
                     UserSettings.GetUserSettings().setProperty(actionId + "_button_index", buttonAssignment.buttonIndex);
                     UserSettings.GetUserSettings().setProperty(actionId + "_device_guid", buttonAssignment.controller.guid.ToString());
@@ -238,7 +238,7 @@ namespace CrewChiefV4
 
         private void loadAssignment(System.Windows.Forms.Form parent, String functionName, int buttonIndex, String deviceGuid)
         {
-            if (deviceGuid == NETWORK_CONSOLE_CONTROLLER_GUID.ToString())
+            if (deviceGuid == UDP_NETWORK_CONTROLLER_GUID.ToString())
             {
                 addNetworkControllerToList();
             }
@@ -248,7 +248,7 @@ namespace CrewChiefV4
                 {
                     buttonAssignments[buttonAssignmentIndexes[functionName]].controller = controller;
                     buttonAssignments[buttonAssignmentIndexes[functionName]].buttonIndex = buttonIndex;
-                    if (controller.guid != NETWORK_CONSOLE_CONTROLLER_GUID)
+                    if (controller.guid != UDP_NETWORK_CONTROLLER_GUID)
                     {
                         var joystick = new Joystick(directInput, controller.guid);
                         // Acquire the joystick
@@ -335,7 +335,7 @@ namespace CrewChiefV4
         private Boolean getFirstPressedButton(System.Windows.Forms.Form parent, ControllerData controllerData, ButtonAssignment buttonAssignment)
         {
             Boolean gotAssignment = false;
-            if (controllerData.guid == NETWORK_CONSOLE_CONTROLLER_GUID)
+            if (controllerData.guid == UDP_NETWORK_CONTROLLER_GUID)
             {
                 PCarsUDPreader gameDataReader = (PCarsUDPreader)GameStateReaderFactory.getInstance().getGameStateReader(GameDefinition.pCarsNetwork);
                 int assignedButton = gameDataReader.getButtonIndexForAssignment();

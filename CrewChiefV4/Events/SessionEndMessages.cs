@@ -17,6 +17,8 @@ namespace CrewChiefV4.Events
 
         private String folderFinishedRace = "lap_counter/finished_race";
 
+        private String folderGoodFinish = "lap_counter/finished_race_good_finish";
+
         private String folderFinishedRaceLast = "lap_counter/finished_race_last";
 
         private String folderEndOfSession = "lap_counter/end_of_session";
@@ -32,7 +34,7 @@ namespace CrewChiefV4.Events
             this.audioPlayer = audioPlayer;
         }
 
-        public void trigger(float sessionRunningTime, SessionType sessionType, SessionPhase lastSessionPhase, 
+        public void trigger(float sessionRunningTime, SessionType sessionType, SessionPhase lastSessionPhase, int startPosition,
             int finishPosition, int numCars, int completedLaps, Boolean isDisqualified)
         {
             if (!enableSessionEndMessages)
@@ -47,7 +49,7 @@ namespace CrewChiefV4.Events
                     if (lastSessionPhase == SessionPhase.Finished)
                     {
                         // only play session end message for races if we've actually finished, not restarted
-                        playFinishMessage(sessionType, finishPosition, numCars, isDisqualified);
+                        playFinishMessage(sessionType, startPosition, finishPosition, numCars, isDisqualified);
                     }
                     else
                     {
@@ -65,7 +67,7 @@ namespace CrewChiefV4.Events
                 {
                     if (lastSessionPhase == SessionPhase.Green || lastSessionPhase == SessionPhase.Finished || lastSessionPhase == SessionPhase.Checkered)
                     {
-                        playFinishMessage(sessionType, finishPosition, numCars, false);
+                        playFinishMessage(sessionType, startPosition, finishPosition, numCars, false);
                     }
                     else
                     {
@@ -79,7 +81,7 @@ namespace CrewChiefV4.Events
             }
         }
 
-        public void playFinishMessage(SessionType sessionType, int position, int numCars, Boolean isDisqualified)
+        public void playFinishMessage(SessionType sessionType, int startPosition, int position, int numCars, Boolean isDisqualified)
         {
             audioPlayer.suspendPearlsOfWisdom();
             if (position < 1)
@@ -106,8 +108,20 @@ namespace CrewChiefV4.Events
                 }
                 else if (position >= 4 && !isLast)
                 {
-                    audioPlayer.queueClip(new QueuedMessage(sessionEndMessageIdentifier, AbstractEvent.MessageContents(
-                        Position.folderStub + position, folderFinishedRace), 0, null));
+                    // check if this a significant improvement over the start position
+                    if (startPosition > position &&
+                        ((startPosition <= 6 && position <= 5) ||
+                         (startPosition <= 10 && position <= 6) ||
+                         (startPosition - position >= 6)))
+                    {
+                        audioPlayer.queueClip(new QueuedMessage(sessionEndMessageIdentifier, AbstractEvent.MessageContents(
+                                Position.folderStub + position, folderGoodFinish), 0, null));
+                    }
+                    else
+                    {
+                        audioPlayer.queueClip(new QueuedMessage(sessionEndMessageIdentifier, AbstractEvent.MessageContents(
+                            Position.folderStub + position, folderFinishedRace), 0, null));
+                    }
                 }
                 else if (isLast)
                 {
