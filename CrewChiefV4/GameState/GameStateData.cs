@@ -527,6 +527,12 @@ namespace CrewChiefV4.GameState
             {
                 OpponentLapData[OpponentLapData.Count - 1].InLap = true;
             }
+            else
+            {
+                LapData lapData = new LapData();
+                lapData.InLap = true;
+                OpponentLapData.Add(lapData);
+            }
         }
 
         public OpponentDelta getTimeDifferenceToPlayer(SessionData playerSessionData)
