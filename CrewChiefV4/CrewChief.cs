@@ -239,6 +239,11 @@ namespace CrewChiefV4
             }            
         }
 
+        public void respondToRadioCheck()
+        {
+            audioPlayer.playClipImmediately(new QueuedMessage(AudioPlayer.folderRadioCheckResponse, 0, null), false);
+        }
+
         public void youWot()
         {
             audioPlayer.playClipImmediately(new QueuedMessage(AudioPlayer.folderDidntUnderstand, 0, null), false);

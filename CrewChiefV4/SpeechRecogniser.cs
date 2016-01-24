@@ -119,6 +119,8 @@ namespace CrewChiefV4
         public static String WHATS_THE_AIR_TEMPERATURE = "what's the air temperature"; 
         public static String WHATS_THE_TRACK_TEMP = "what's the track temp"; 
         public static String WHATS_THE_TRACK_TEMPERATURE = "what's the track temperature";
+
+        public static String RADIO_CHECK = "can you hear me";
         
         private CrewChief crewChief;
 
@@ -255,7 +257,7 @@ namespace CrewChiefV4
                     NO_MORE_DELTAS, NO_MORE_GAPS, KEEP_ME_INFORMED, KEEP_ME_POSTED, KEEP_ME_UPDATED, TELL_ME_THE_GAPS, GIVE_ME_THE_DELTAS, TELL_ME_THE_DELTAS,
                     HOW_LONGS_LEFT, HOW_MANY_LAPS_LEFT, HOW_MANY_LAPS_TO_GO, SPOT, DONT_SPOT, REPEAT_LAST_MESSAGE, SAY_AGAIN,HAVE_I_SERVED_MY_PENALTY, DO_I_HAVE_A_PENALTY, DO_I_STILL_HAVE_A_PENALTY,
                     DO_I_HAVE_A_MANDATORY_PIT_STOP, DO_I_NEED_TO_PIT, DO_I_HAVE_A_MANDATORY_STOP, DO_I_HAVE_TO_MAKE_A_PIT_STOP, DO_I_HAVE_TO_PIT, WHAT_ARE_MY_SECTOR_TIMES, WHATS_MY_LAST_SECTOR_TIME,
-                    WHATS_THE_AIR_TEMP, WHATS_THE_AIR_TEMPERATURE, WHATS_THE_TRACK_TEMP, WHATS_THE_TRACK_TEMPERATURE});
+                    WHATS_THE_AIR_TEMP, WHATS_THE_AIR_TEMPERATURE, WHATS_THE_TRACK_TEMP, WHATS_THE_TRACK_TEMPERATURE, RADIO_CHECK});
                 GrammarBuilder gb4 = new GrammarBuilder();
                 gb4.Culture = cultureInfo;
                 gb4.Append(info4);
@@ -470,7 +472,11 @@ namespace CrewChiefV4
 
         private AbstractEvent getEventForSpeech(String recognisedSpeech)
         {
-            if (recognisedSpeech.Contains(DONT_SPOT))
+            if (recognisedSpeech.Contains(RADIO_CHECK))
+            {
+                crewChief.respondToRadioCheck();
+            }
+            else if (recognisedSpeech.Contains(DONT_SPOT))
             {
                 crewChief.disableSpotter();
             }
