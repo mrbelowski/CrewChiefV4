@@ -11,15 +11,15 @@ namespace CrewChiefV4.Events
     {
         public static String sessionEndMessageIdentifier = "SESSION_END";
 
-        private String folderPodiumFinish = "lap_counter/podium_finish";
+        public static String folderPodiumFinish = "lap_counter/podium_finish";
 
         private String folderWonRace = "lap_counter/won_race";
 
-        private String folderFinishedRace = "lap_counter/finished_race";
+        public static String folderFinishedRace = "lap_counter/finished_race";
 
         private String folderGoodFinish = "lap_counter/finished_race_good_finish";
 
-        private String folderFinishedRaceLast = "lap_counter/finished_race_last";
+        public static String folderFinishedRaceLast = "lap_counter/finished_race_last";
 
         private String folderEndOfSession = "lap_counter/end_of_session";
 

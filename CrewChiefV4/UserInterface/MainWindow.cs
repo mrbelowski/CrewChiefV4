@@ -816,6 +816,9 @@ namespace CrewChiefV4
                         Directory.Delete(AudioPlayer.soundFilesPath + @"\sounds_temp", true);
                     }
                     ZipFile.ExtractToDirectory(AudioPlayer.soundFilesPath + @"\" + soundPackTempFileName, AudioPlayer.soundFilesPath + @"\sounds_temp");
+                    // It's important to note that the order of these two calls must *not* matter. If it does, the update process results will be inconsistent.
+                    // The update pack can contain file rename instructions and file delete instructions but it can *never* contain obsolete files (or files
+                    // with old names). As long as this is the case, it shouldn't matter what order we do these in...
                     UpdateHelper.ProcessFileUpdates(AudioPlayer.soundFilesPath + @"\sounds_temp");
                     UpdateHelper.MoveDirectory(AudioPlayer.soundFilesPath + @"\sounds_temp", AudioPlayer.soundFilesPath);    
                     success = true;
