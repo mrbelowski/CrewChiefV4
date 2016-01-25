@@ -66,14 +66,14 @@ namespace CrewChiefV4.Events
                         {
                             case EngineStatus.ALL_CLEAR:
                                 lastStatusMessage = currentEngineStatus;
-                                audioPlayer.queueClip(new QueuedMessage(folderAllClear, 0, this));
+                                audioPlayer.playMessage(new QueuedMessage(folderAllClear, 0, this));
                                 break;
                             case EngineStatus.HOT_OIL:
                                 // don't play this if the last message was about hot oil *and* water - wait for 'all clear'
                                 if (lastStatusMessage != EngineStatus.HOT_OIL_AND_WATER)
                                 {
                                     lastStatusMessage = currentEngineStatus;
-                                    audioPlayer.queueClip(new QueuedMessage(folderHotOil, 0, this));
+                                    audioPlayer.playMessage(new QueuedMessage(folderHotOil, 0, this));
                                 }
                                 break;
                             case EngineStatus.HOT_WATER:
@@ -81,12 +81,12 @@ namespace CrewChiefV4.Events
                                 if (lastStatusMessage != EngineStatus.HOT_OIL_AND_WATER)
                                 {
                                     lastStatusMessage = currentEngineStatus;
-                                    audioPlayer.queueClip(new QueuedMessage(folderHotWater, 0, this));
+                                    audioPlayer.playMessage(new QueuedMessage(folderHotWater, 0, this));
                                 }
                                 break;
                             case EngineStatus.HOT_OIL_AND_WATER:
                                 lastStatusMessage = currentEngineStatus;
-                                audioPlayer.queueClip(new QueuedMessage(folderHotOilAndWater, 0, this));
+                                audioPlayer.playMessage(new QueuedMessage(folderHotOilAndWater, 0, this));
                                 break;
                         }
                     }
@@ -107,14 +107,14 @@ namespace CrewChiefV4.Events
                 {
                     case EngineStatus.ALL_CLEAR:
                         lastStatusMessage = currentEngineStatus;
-                        audioPlayer.playClipImmediately(new QueuedMessage(folderAllClear, 0, null), false);
+                        audioPlayer.playMessageImmediately(new QueuedMessage(folderAllClear, 0, null), false);
                         break;
                     case EngineStatus.HOT_OIL:
                         // don't play this if the last message was about hot oil *and* water - wait for 'all clear'
                         if (lastStatusMessage != EngineStatus.HOT_OIL_AND_WATER)
                         {
                             lastStatusMessage = currentEngineStatus;
-                            audioPlayer.playClipImmediately(new QueuedMessage(folderHotOil, 0, null), false);
+                            audioPlayer.playMessageImmediately(new QueuedMessage(folderHotOil, 0, null), false);
                         }
                         break;
                     case EngineStatus.HOT_WATER:
@@ -122,19 +122,19 @@ namespace CrewChiefV4.Events
                         if (lastStatusMessage != EngineStatus.HOT_OIL_AND_WATER)
                         {
                             lastStatusMessage = currentEngineStatus;
-                            audioPlayer.playClipImmediately(new QueuedMessage(folderHotWater, 0, null), false);
+                            audioPlayer.playMessageImmediately(new QueuedMessage(folderHotWater, 0, null), false);
                         }
                         break;
                     case EngineStatus.HOT_OIL_AND_WATER:
                         lastStatusMessage = currentEngineStatus;
-                        audioPlayer.playClipImmediately(new QueuedMessage(folderHotOilAndWater, 0, null), false);
+                        audioPlayer.playMessageImmediately(new QueuedMessage(folderHotOilAndWater, 0, null), false);
                         break;
                 }
                 
             }
             if (!gotData)
             {
-                audioPlayer.playClipImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, this), false);
+                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, this), false);
                 
             }
         }

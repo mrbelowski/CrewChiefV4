@@ -68,13 +68,13 @@ namespace CrewChiefV4.Events
                 {
                     if (SoundCache.availableDriverNames.Contains(DriverNameHelper.getUsableNameForRawName(driverToTest.DriverRawName)))
                     {
-                        audioPlayer.queueClip(new QueuedMessage("gap_in_front" + index,
+                        audioPlayer.playMessage(new QueuedMessage("gap_in_front" + index,
                                         MessageContents(Timings.folderTheGapTo, driverToTest, Timings.folderAheadIsIncreasing,
                                         TimeSpanWrapper.FromSeconds((float)random.NextDouble() * 10, true)),
                                         MessageContents(Timings.folderGapInFrontIncreasing, TimeSpanWrapper.FromSeconds((float)random.NextDouble() * 10, true)), 0, this));
-                        audioPlayer.queueClip(new QueuedMessage("leader_pitting" + index,
+                        audioPlayer.playMessage(new QueuedMessage("leader_pitting" + index,
                             MessageContents(Opponents.folderTheLeader, driverToTest, Opponents.folderIsPitting), 0, this));
-                        audioPlayer.queueClip(new QueuedMessage("new_fastest_lap" + index, MessageContents(Opponents.folderNewFastestLapFor, driverToTest,
+                        audioPlayer.playMessage(new QueuedMessage("new_fastest_lap" + index, MessageContents(Opponents.folderNewFastestLapFor, driverToTest,
                                             TimeSpan.FromSeconds(random.NextDouble() * 100)), 0, this));
                         index++;
                     }
@@ -87,7 +87,7 @@ namespace CrewChiefV4.Events
         }
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
-            audioPlayer.queueClip(new QueuedMessage(folderTest, 0, this));        
+            audioPlayer.playMessage(new QueuedMessage(folderTest, 0, this));        
             testDriverNames();
             /*
             audioPlayer.queueClip(new QueuedMessage(LapCounter.folderGetReady, 0, this));

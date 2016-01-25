@@ -48,7 +48,7 @@ namespace CrewChiefV4.Events
                 if (currentGameState.Now > lastBlackFlagTime.Add(timeBetweenBlackFlagMessages))
                 {
                     lastBlackFlagTime = currentGameState.Now;
-                    audioPlayer.queueClip(new QueuedMessage(folderBlackFlag, 0, this));
+                    audioPlayer.playMessage(new QueuedMessage(folderBlackFlag, 0, this));
                 }
             }
             else if (!currentGameState.PitData.InPitlane && currentGameState.SessionData.Flag == FlagEnum.BLUE)
@@ -56,7 +56,7 @@ namespace CrewChiefV4.Events
                 if (currentGameState.Now > lastBlueFlagTime.Add(timeBetweenBlueFlagMessages))
                 {
                     lastBlueFlagTime = currentGameState.Now;
-                    audioPlayer.queueClip(new QueuedMessage(folderBlueFlag, 0, this));
+                    audioPlayer.playMessage(new QueuedMessage(folderBlueFlag, 0, this));
                 }
             }
             else if (!currentGameState.PitData.InPitlane && currentGameState.SessionData.Flag == FlagEnum.YELLOW)
@@ -64,7 +64,7 @@ namespace CrewChiefV4.Events
                 if (currentGameState.Now > lastYellowFlagTime.Add(timeBetweenYellowFlagMessages))
                 {
                     lastYellowFlagTime = currentGameState.Now;
-                    audioPlayer.queueClip(new QueuedMessage(folderYellowFlag, 0, this));
+                    audioPlayer.playMessage(new QueuedMessage(folderYellowFlag, 0, this));
                 }
             }
             else if (currentGameState.SessionData.Flag == FlagEnum.WHITE)
@@ -72,7 +72,7 @@ namespace CrewChiefV4.Events
                 if (currentGameState.Now > lastWhiteFlagTime.Add(timeBetweenWhiteFlagMessages))
                 {
                     lastWhiteFlagTime = currentGameState.Now;
-                    audioPlayer.queueClip(new QueuedMessage(folderWhiteFlag, 0, this));
+                    audioPlayer.playMessage(new QueuedMessage(folderWhiteFlag, 0, this));
                 }
             }
             else if (!currentGameState.PitData.InPitlane && currentGameState.SessionData.Flag == FlagEnum.DOUBLE_YELLOW)
@@ -80,7 +80,7 @@ namespace CrewChiefV4.Events
                 if (currentGameState.Now > lastYellowFlagTime.Add(timeBetweenYellowFlagMessages))
                 {
                     lastYellowFlagTime = currentGameState.Now;
-                    audioPlayer.queueClip(new QueuedMessage(folderDoubleYellowFlag, 0, this));
+                    audioPlayer.playMessage(new QueuedMessage(folderDoubleYellowFlag, 0, this));
                 }
             }
         }

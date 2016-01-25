@@ -218,7 +218,7 @@ namespace CrewChiefV4.Events
                             // allow an existing queued pearl to be played if it's type is 'good'
                             Dictionary<String, Object> validationData = new Dictionary<String, Object>();
                             validationData.Add(positionValidationKey, currentGameState.SessionData.Position);
-                            audioPlayer.queueClip(new QueuedMessage(folderOvertaking, 0, this, validationData), PearlsOfWisdom.PearlType.GOOD, 0);
+                            audioPlayer.playMessage(new QueuedMessage(folderOvertaking, 0, this, validationData), PearlsOfWisdom.PearlType.GOOD, 0);
                             reported = true;
                         }
                     }
@@ -258,7 +258,7 @@ namespace CrewChiefV4.Events
                             // allow an existing queued pearl to be played if it's type is 'bad'
                             Dictionary<String, Object> validationData = new Dictionary<String, Object>();
                             validationData.Add(positionValidationKey, currentGameState.SessionData.Position);
-                            audioPlayer.queueClip(new QueuedMessage(folderBeingOvertaken, 0, this, validationData), PearlsOfWisdom.PearlType.BAD, 0);
+                            audioPlayer.playMessage(new QueuedMessage(folderBeingOvertaken, 0, this, validationData), PearlsOfWisdom.PearlType.BAD, 0);
                             reported = true;
                         }
                     }
@@ -307,20 +307,20 @@ namespace CrewChiefV4.Events
                     {
                         if (currentGameState.SessionData.SessionStartPosition + 1 < currentGameState.SessionData.Position)
                         {
-                            audioPlayer.queueClip(new QueuedMessage(folderBadStart, 0, this));
+                            audioPlayer.playMessage(new QueuedMessage(folderBadStart, 0, this));
                         }
                         else if (!isLast && (currentGameState.SessionData.Position == 1 || currentGameState.SessionData.SessionStartPosition > currentGameState.SessionData.Position + 2))
                         {
-                            audioPlayer.queueClip(new QueuedMessage(folderGoodStart, 0, this));
+                            audioPlayer.playMessage(new QueuedMessage(folderGoodStart, 0, this));
                         }
                         else if (currentGameState.SessionData.SessionStartPosition + 5 < currentGameState.SessionData.Position)
                         {
-                            audioPlayer.queueClip(new QueuedMessage(folderTerribleStart, 0, this));
+                            audioPlayer.playMessage(new QueuedMessage(folderTerribleStart, 0, this));
                         }
                         else if (!isLast && rand.NextDouble() > 0.6)
                         {
                             // only play the OK start message sometimes
-                            audioPlayer.queueClip(new QueuedMessage(folderOKStart, 0, this));
+                            audioPlayer.playMessage(new QueuedMessage(folderOKStart, 0, this));
                         }
                     }
                 }
@@ -376,29 +376,29 @@ namespace CrewChiefV4.Events
                         {
                             if (currentGameState.SessionData.SessionType == SessionType.Race)
                             {
-                                audioPlayer.queueClip(new QueuedMessage(folderLeading, 0, this, validationData), pearlType, pearlLikelihood);
+                                audioPlayer.playMessage(new QueuedMessage(folderLeading, 0, this, validationData), pearlType, pearlLikelihood);
                             }
                             else if (currentGameState.SessionData.SessionType == SessionType.Practice)
                             {
-                                audioPlayer.queueClip(new QueuedMessage(folderStub + 1, 0, this, validationData), pearlType, pearlLikelihood);
+                                audioPlayer.playMessage(new QueuedMessage(folderStub + 1, 0, this, validationData), pearlType, pearlLikelihood);
                             }
                             // no p1 for pole - this is in the laptime tracker (yuk)
                         }
                         else if (!isLast)
                         {
-                            audioPlayer.queueClip(new QueuedMessage(folderStub + currentGameState.SessionData.Position, 0, this), pearlType, pearlLikelihood);
+                            audioPlayer.playMessage(new QueuedMessage(folderStub + currentGameState.SessionData.Position, 0, this), pearlType, pearlLikelihood);
                         }
                         else if (isLast)
                         {
                             if (numberOfLapsInLastPlace > 3)
                             {
                                 audioPlayer.suspendPearlsOfWisdom();
-                                audioPlayer.queueClip(new QueuedMessage(folderConsistentlyLast, 0, this, validationData));
+                                audioPlayer.playMessage(new QueuedMessage(folderConsistentlyLast, 0, this, validationData));
                             }
                             else
                             {
                                 audioPlayer.suspendPearlsOfWisdom();
-                                audioPlayer.queueClip(new QueuedMessage(folderLast, 0, this, validationData));
+                                audioPlayer.playMessage(new QueuedMessage(folderLast, 0, this, validationData));
                             }
                         }
                         previousPosition = currentGameState.SessionData.Position;
@@ -414,25 +414,25 @@ namespace CrewChiefV4.Events
             {
                 if (isLast)
                 {
-                    audioPlayer.playClipImmediately(new QueuedMessage(folderLast, 0, this), false);
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderLast, 0, this), false);
                     
                 }
                 else if (currentPosition == 1)
                 {
-                    audioPlayer.playClipImmediately(new QueuedMessage(folderLeading, 0, this), false);
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderLeading, 0, this), false);
                     
                 }
                 else if (currentPosition > 0) {
                     if (currentPosition < 25) {
-                        audioPlayer.playClipImmediately(new QueuedMessage(folderStub + currentPosition, 0, this), false);
+                        audioPlayer.playMessageImmediately(new QueuedMessage(folderStub + currentPosition, 0, this), false);
                         
                     } else {
-                        audioPlayer.playClipImmediately(new QueuedMessage("position", MessageContents(currentPosition), 0, this), false);
+                        audioPlayer.playMessageImmediately(new QueuedMessage("position", MessageContents(currentPosition), 0, this), false);
                         
                     }
                 }
                 else {
-                    audioPlayer.playClipImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null), false);
+                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null), false);
                     
                 }
             }

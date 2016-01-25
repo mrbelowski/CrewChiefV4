@@ -122,7 +122,7 @@ namespace CrewChiefV4.Events
                             (currentGameState.SessionData.SessionType != SessionType.Race && opponentData.CompletedLaps > 1)) && opponentData.LastLapTime <= currentFastestLap &&
                             SoundCache.availableDriverNames.Contains(DriverNameHelper.getUsableNameForRawName(opponentData.DriverRawName)))
                         {
-                            audioPlayer.queueClip(new QueuedMessage("new_fastest_lap", MessageContents(folderNewFastestLapFor, opponentData,
+                            audioPlayer.playMessage(new QueuedMessage("new_fastest_lap", MessageContents(folderNewFastestLapFor, opponentData,
                                         TimeSpan.FromSeconds(opponentData.LastLapTime)), 0, this));
                         }
                         else if ((currentGameState.SessionData.SessionType == SessionType.Race &&
@@ -137,7 +137,7 @@ namespace CrewChiefV4.Events
                             {
                                 // he's leading, and has recorded 3 or more laps, and this one's his fastest
                                 Console.WriteLine("Leader fast lap - this lap time = " + opponentData.LastLapTime +" session best = " + currentFastestLap);
-                                audioPlayer.queueClip(new QueuedMessage("leader_good_laptime", MessageContents(folderLeaderHasJustDoneA,
+                                audioPlayer.playMessage(new QueuedMessage("leader_good_laptime", MessageContents(folderLeaderHasJustDoneA,
                                         TimeSpan.FromSeconds(opponentData.LastLapTime)), 0, this));
                             }
                             else if (currentGameState.SessionData.UnFilteredPosition > 1 && opponentData.UnFilteredPosition == currentGameState.SessionData.Position - 1 &&
@@ -145,7 +145,7 @@ namespace CrewChiefV4.Events
                             {
                                 // he's ahead of us, and has recorded 3 or more laps, and this one's his fastest
                                 Console.WriteLine("Car ahead fast lap - this lap time = " + opponentData.LastLapTime + " session best = " + currentFastestLap);
-                                 audioPlayer.queueClip(new QueuedMessage("car_ahead_good_laptime", MessageContents(folderTheCarAheadHasJustDoneA,
+                                 audioPlayer.playMessage(new QueuedMessage("car_ahead_good_laptime", MessageContents(folderTheCarAheadHasJustDoneA,
                                         TimeSpan.FromSeconds(opponentData.LastLapTime)), 0, this));
                             }
                             else if (!currentGameState.isLast() && opponentData.UnFilteredPosition == currentGameState.SessionData.Position + 1 &&
@@ -153,7 +153,7 @@ namespace CrewChiefV4.Events
                             {
                                 // he's behind us, and has recorded 3 or more laps, and this one's his fastest
                                 Console.WriteLine("Car behind fast lap - this lap time = " + opponentData.LastLapTime + " session best = " + currentFastestLap);
-                                audioPlayer.queueClip(new QueuedMessage("car_behind_good_laptime", MessageContents(folderTheCarBehindHasJustDoneA,
+                                audioPlayer.playMessage(new QueuedMessage("car_behind_good_laptime", MessageContents(folderTheCarBehindHasJustDoneA,
                                         TimeSpan.FromSeconds(opponentData.LastLapTime)), 0, this));
                             }
                         }
@@ -171,7 +171,7 @@ namespace CrewChiefV4.Events
                         OpponentData opponentData = currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position - 1, false);
                         if (opponentData != null && !opponentData.isEnteringPits())
                         {
-                            audioPlayer.queueClip(new QueuedMessage("new_car_ahead", MessageContents(folderNextCarIs, opponentData),
+                            audioPlayer.playMessage(new QueuedMessage("new_car_ahead", MessageContents(folderNextCarIs, opponentData),
                                 random.Next(Position.maxSecondsToWaitBeforeReportingPass + 1, Position.maxSecondsToWaitBeforeReportingPass + 3), this,
                                 new Dictionary<string, object> { { validationDriverAheadKey, opponentData.DriverRawName } }));
                             nextCarAheadChangeMessage = currentGameState.Now.Add(TimeSpan.FromSeconds(30));
@@ -187,7 +187,7 @@ namespace CrewChiefV4.Events
                         if (currentGameState.SessionData.Position > 1 && previousGameState.SessionData.Position > 1 && currentGameState.Now > nextLeadChangeMessage)
                         {
                             Console.WriteLine("Lead change, current leader is " + name + " laps completed = " + currentGameState.SessionData.CompletedLaps);
-                            audioPlayer.queueClip(new QueuedMessage("new_leader", MessageContents(currentGameState.getOpponentAtPosition(1, false), folderIsNowLeading), 0, this));
+                            audioPlayer.playMessage(new QueuedMessage("new_leader", MessageContents(currentGameState.getOpponentAtPosition(1, false), folderIsNowLeading), 0, this));
                             nextLeadChangeMessage = currentGameState.Now.Add(TimeSpan.FromSeconds(30));
                         }
                     }                    
@@ -196,21 +196,21 @@ namespace CrewChiefV4.Events
                 if (currentGameState.PitData.LeaderIsPitting && 
                     currentGameState.SessionData.SessionPhase != SessionPhase.Countdown && currentGameState.SessionData.SessionPhase != SessionPhase.Formation)
                 {
-                    audioPlayer.queueClip(new QueuedMessage("leader_is_pitting", MessageContents(folderTheLeader, currentGameState.PitData.OpponentForLeaderPitting, 
+                    audioPlayer.playMessage(new QueuedMessage("leader_is_pitting", MessageContents(folderTheLeader, currentGameState.PitData.OpponentForLeaderPitting, 
                         folderIsPitting), MessageContents(folderLeaderIsPitting), 0, this));
                 }
 
                 if (currentGameState.PitData.CarInFrontIsPitting && currentGameState.SessionData.TimeDeltaFront > 3 &&
                     currentGameState.SessionData.SessionPhase != SessionPhase.Countdown && currentGameState.SessionData.SessionPhase != SessionPhase.Formation)
                 {
-                    audioPlayer.queueClip(new QueuedMessage("car_in_front_is_pitting", MessageContents(currentGameState.PitData.OpponentForCarAheadPitting, 
+                    audioPlayer.playMessage(new QueuedMessage("car_in_front_is_pitting", MessageContents(currentGameState.PitData.OpponentForCarAheadPitting, 
                         folderAheadIsPitting), MessageContents(folderCarAheadIsPitting), 0, this));
                 }
 
                 if (currentGameState.PitData.CarBehindIsPitting && currentGameState.SessionData.TimeDeltaBehind > 3 &&
                     currentGameState.SessionData.SessionPhase != SessionPhase.Countdown && currentGameState.SessionData.SessionPhase != SessionPhase.Formation)
                 {
-                    audioPlayer.queueClip(new QueuedMessage("car_behind_is_pitting", MessageContents(currentGameState.PitData.OpponentForCarBehindPitting,
+                    audioPlayer.playMessage(new QueuedMessage("car_behind_is_pitting", MessageContents(currentGameState.PitData.OpponentForCarBehindPitting,
                         folderBehindIsPitting), MessageContents(folderCarBehindIsPitting), 0, this));
                 }
             }
@@ -320,12 +320,12 @@ namespace CrewChiefV4.Events
                         if (opponentData.CurrentTyres == TyreType.Option)
                         {
                             gotData = true;
-                            audioPlayer.playClipImmediately(new QueuedMessage(MandatoryPitStops.folderMandatoryPitStopsOptionTyres, 0, null), false);
+                            audioPlayer.playMessageImmediately(new QueuedMessage(MandatoryPitStops.folderMandatoryPitStopsOptionTyres, 0, null), false);
                         }
                         else if (opponentData.CurrentTyres == TyreType.Prime)
                         {
                             gotData = true;
-                            audioPlayer.playClipImmediately(new QueuedMessage(MandatoryPitStops.folderMandatoryPitStopsPrimeTyres, 0, null), false);
+                            audioPlayer.playMessageImmediately(new QueuedMessage(MandatoryPitStops.folderMandatoryPitStopsPrimeTyres, 0, null), false);
                         }
                     }
                 }
@@ -339,7 +339,7 @@ namespace CrewChiefV4.Events
                         if (lastLap != -1)
                         {
                             gotData = true;
-                            audioPlayer.playClipImmediately(new QueuedMessage("opponentLastLap", MessageContents(
+                            audioPlayer.playMessageImmediately(new QueuedMessage("opponentLastLap", MessageContents(
                                 TimeSpanWrapper.FromSeconds(lastLap, true)), 0, null), false);
                             
                         }                       
@@ -350,7 +350,7 @@ namespace CrewChiefV4.Events
                         if (bestLap != -1)
                         {
                             gotData = true;
-                            audioPlayer.playClipImmediately(new QueuedMessage("opponentBestLap", MessageContents(
+                            audioPlayer.playMessageImmediately(new QueuedMessage("opponentBestLap", MessageContents(
                                 TimeSpanWrapper.FromSeconds(bestLap, true)), 0, null), false);
                             
                         }
@@ -371,7 +371,7 @@ namespace CrewChiefV4.Events
                             OpponentData.OpponentDelta opponentDelta = opponent.getTimeDifferenceToPlayer(currentGameState.SessionData);
                             if (!gotByPositionNumber)
                             {
-                                audioPlayer.playClipImmediately(new QueuedMessage("opponentPosition",
+                                audioPlayer.playMessageImmediately(new QueuedMessage("opponentPosition",
                                     MessageContents(Position.folderStub, position), 0, null), false);
                                 playedMessage = true;
                             }
@@ -380,20 +380,20 @@ namespace CrewChiefV4.Events
                                 playedMessage = true;
                                 if (opponentDelta.lapDifference == 1)
                                 {
-                                    audioPlayer.playClipImmediately(new QueuedMessage(Position.folderOneLapBehind, 0, null), false);
+                                    audioPlayer.playMessageImmediately(new QueuedMessage(Position.folderOneLapBehind, 0, null), false);
                                 }
                                 else if (opponentDelta.lapDifference > 1)
                                 {
-                                    audioPlayer.playClipImmediately(new QueuedMessage("opponentTimeDelta",
+                                    audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta",
                                         MessageContents(opponentDelta.lapDifference, Position.folderLapsBehind), 0, null), false);
                                 }
                                 else if (opponentDelta.lapDifference == -1)
                                 {
-                                    audioPlayer.playClipImmediately(new QueuedMessage(Position.folderOneLapAhead, 0, null), false);
+                                    audioPlayer.playMessageImmediately(new QueuedMessage(Position.folderOneLapAhead, 0, null), false);
                                 }
                                 else if (opponentDelta.lapDifference < -1)
                                 {
-                                    audioPlayer.playClipImmediately(new QueuedMessage("opponentTimeDelta",
+                                    audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta",
                                         MessageContents(opponentDelta.lapDifference, Position.folderLapsAhead), 0, null), false);
                                 }
                                 else
@@ -404,7 +404,7 @@ namespace CrewChiefV4.Events
                                     {
                                         aheadOrBehind = Position.folderBehind;
                                     }
-                                    audioPlayer.playClipImmediately(new QueuedMessage("opponentTimeDelta",
+                                    audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta",
                                         MessageContents(delta, aheadOrBehind), 0, null), false);
                                 }
                             }
@@ -431,7 +431,7 @@ namespace CrewChiefV4.Events
                             MessageContents(Position.folderStub, opponent.Position, folderCantPronounceName), 0, null);
                         if (queuedMessage.canBePlayed)
                         {
-                            audioPlayer.playClipImmediately(queuedMessage, false);
+                            audioPlayer.playMessageImmediately(queuedMessage, false);
                             
                             gotData = true;
                         }
@@ -448,7 +448,7 @@ namespace CrewChiefV4.Events
                             MessageContents(Position.folderStub, opponent.Position, folderCantPronounceName), 0, null);
                         if (queuedMessage.canBePlayed)
                         {
-                            audioPlayer.playClipImmediately(queuedMessage, false);
+                            audioPlayer.playMessageImmediately(queuedMessage, false);
                             
                             gotData = true;
                         }
@@ -458,7 +458,7 @@ namespace CrewChiefV4.Events
                 {
                     if (currentGameState.isLast())
                     {
-                        audioPlayer.playClipImmediately(new QueuedMessage(Position.folderLast, 0, null), false);
+                        audioPlayer.playMessageImmediately(new QueuedMessage(Position.folderLast, 0, null), false);
                         
                         gotData = true;
                     } 
@@ -470,7 +470,7 @@ namespace CrewChiefV4.Events
                             QueuedMessage queuedMessage = new QueuedMessage("opponentName", MessageContents(opponent), MessageContents(folderCantPronounceName), 0, null);
                             if (queuedMessage.canBePlayed)
                             {
-                                audioPlayer.playClipImmediately(queuedMessage, false);
+                                audioPlayer.playMessageImmediately(queuedMessage, false);
                                 
                                 gotData = true;
                             }
@@ -482,7 +482,7 @@ namespace CrewChiefV4.Events
                 {
                     if (currentGameState.SessionData.Position == 1)
                     {
-                        audioPlayer.playClipImmediately(new QueuedMessage(Position.folderLeading, 0, null), false);
+                        audioPlayer.playMessageImmediately(new QueuedMessage(Position.folderLeading, 0, null), false);
                         
                         gotData = true;
                     }
@@ -494,7 +494,7 @@ namespace CrewChiefV4.Events
                             QueuedMessage queuedMessage = new QueuedMessage("opponentName", MessageContents(opponent), MessageContents(folderCantPronounceName), 0, null);
                             if (queuedMessage.canBePlayed)
                             {
-                                audioPlayer.playClipImmediately(queuedMessage, false);
+                                audioPlayer.playMessageImmediately(queuedMessage, false);
                                 
                                 gotData = true;
                             }
@@ -509,7 +509,7 @@ namespace CrewChiefV4.Events
                         QueuedMessage queuedMessage = new QueuedMessage("opponentName", MessageContents(opponent), MessageContents(folderCantPronounceName), 0, null);
                         if (queuedMessage.canBePlayed)
                         {
-                            audioPlayer.playClipImmediately(queuedMessage, false);
+                            audioPlayer.playMessageImmediately(queuedMessage, false);
                             
                             gotData = true;
                         }
@@ -522,7 +522,7 @@ namespace CrewChiefV4.Events
                     {
                         if (opponentKey == positionIsPlayerKey)
                         {
-                            audioPlayer.playClipImmediately(new QueuedMessage(folderWeAre, 0, null), false);
+                            audioPlayer.playMessageImmediately(new QueuedMessage(folderWeAre, 0, null), false);
                             
                             gotData = true;
                         }
@@ -532,7 +532,7 @@ namespace CrewChiefV4.Events
                             QueuedMessage queuedMessage = new QueuedMessage("opponentName", MessageContents(opponent), MessageContents(folderCantPronounceName), 0, null);
                             if (queuedMessage.canBePlayed)
                             {
-                                audioPlayer.playClipImmediately(queuedMessage, false);
+                                audioPlayer.playMessageImmediately(queuedMessage, false);
                                 
                                 gotData = true;
                             }
@@ -542,7 +542,7 @@ namespace CrewChiefV4.Events
             }
             if (!gotData)
             {
-                audioPlayer.playClipImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null), false);
+                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null), false);
                 
             }       
         }

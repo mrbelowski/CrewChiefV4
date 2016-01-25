@@ -68,11 +68,11 @@ namespace CrewChiefV4.Events
                 if (isOpponentApproachingPitExit(currentGameState))
                 {
                     // we've exited into clean air
-                    audioPlayer.queueClip(new QueuedMessage(folderTrafficBehindExitingPits, 0, this));
+                    audioPlayer.playMessage(new QueuedMessage(folderTrafficBehindExitingPits, 0, this));
                 }
                 else
                 {
-                    audioPlayer.queueClip(new QueuedMessage(folderPushExitingPits, 0, this));
+                    audioPlayer.playMessage(new QueuedMessage(folderPushExitingPits, 0, this));
                 }
             }
         }
@@ -124,19 +124,19 @@ namespace CrewChiefV4.Events
                     // going flat out, we're going to catch the guy ahead us before the end
                     if (currentGameState.SessionData.Position == 2)
                     {
-                        audioPlayer.queueClip(new QueuedMessage(folderPushToGetWin, 0, this));
+                        audioPlayer.playMessage(new QueuedMessage(folderPushToGetWin, 0, this));
                     }
                     else if (currentGameState.SessionData.Position == 3)
                     {
-                        audioPlayer.queueClip(new QueuedMessage(folderPushToGetSecond, 0, this));
+                        audioPlayer.playMessage(new QueuedMessage(folderPushToGetSecond, 0, this));
                     }
                     else if (currentGameState.SessionData.Position == 4)
                     {
-                        audioPlayer.queueClip(new QueuedMessage(folderPushToGetThird, 0, this));
+                        audioPlayer.playMessage(new QueuedMessage(folderPushToGetThird, 0, this));
                     }
                     else
                     {
-                        audioPlayer.queueClip(new QueuedMessage(folderPushToImprove, 0, this));
+                        audioPlayer.playMessage(new QueuedMessage(folderPushToImprove, 0, this));
                     }
                     return true;
                 }
@@ -150,7 +150,7 @@ namespace CrewChiefV4.Events
                     // even with us going flat out, the guy behind is going to catch us before the end
                     Console.WriteLine("might lose this position. Player best lap = " + currentGameState.SessionData.PlayerLapTimeSessionBest + " laps left = " + numLapsLeft +
                         " opponent best lap = " + opponentBehindBestLap + " time delta = " + currentGameState.SessionData.TimeDeltaBehind);
-                    audioPlayer.queueClip(new QueuedMessage(folderPushToHoldPosition, 0, this));
+                    audioPlayer.playMessage(new QueuedMessage(folderPushToHoldPosition, 0, this));
                     return true;
                 }
             }

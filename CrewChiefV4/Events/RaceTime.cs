@@ -137,16 +137,16 @@ namespace CrewChiefV4.Events
                     if (currentGameState.SessionData.Position == 1)
                     {
                         // don't add a pearl here - the audio clip already contains encouragement
-                        audioPlayer.queueClip(new QueuedMessage(folderLastLapLeading, 0, this), pearlType, 0);
+                        audioPlayer.playMessage(new QueuedMessage(folderLastLapLeading, 0, this), pearlType, 0);
                     }
                     else if (currentGameState.SessionData.Position < 4)
                     {
                         // don't add a pearl here - the audio clip already contains encouragement
-                        audioPlayer.queueClip(new QueuedMessage(folderLastLapPodium, 0, this), pearlType, 0);
+                        audioPlayer.playMessage(new QueuedMessage(folderLastLapPodium, 0, this), pearlType, 0);
                     }
                     else
                     {
-                        audioPlayer.queueClip(new QueuedMessage(folderLastLap, 0, this), pearlType, 0.7);
+                        audioPlayer.playMessage(new QueuedMessage(folderLastLap, 0, this), pearlType, 0.7);
                     }
                 }
                 if (currentGameState.SessionData.SessionRunningTime > 60 && timeLeft / 60 < 3 && timeLeft / 60 > 2.9)
@@ -163,7 +163,7 @@ namespace CrewChiefV4.Events
                     played20mins = true;
                     playedHalfWayHome = true;
                     audioPlayer.suspendPearlsOfWisdom();
-                    audioPlayer.queueClip(new QueuedMessage(folder2mins, 0, this));
+                    audioPlayer.playMessage(new QueuedMessage(folder2mins, 0, this));
                 } if (currentGameState.SessionData.SessionRunningTime > 60 && !played5mins && timeLeft / 60 < 5 && timeLeft / 60 > 4.9)
                 {
                     played5mins = true;
@@ -174,16 +174,16 @@ namespace CrewChiefV4.Events
                     if (currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.Position == 1)
                     {
                         // don't add a pearl here - the audio clip already contains encouragement
-                        audioPlayer.queueClip(new QueuedMessage(folder5minsLeading, 0, this), pearlType, 0);
+                        audioPlayer.playMessage(new QueuedMessage(folder5minsLeading, 0, this), pearlType, 0);
                     }
                     else if (currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.Position < 4)
                     {
                         // don't add a pearl here - the audio clip already contains encouragement
-                        audioPlayer.queueClip(new QueuedMessage(folder5minsPodium, 0, this), pearlType, 0);
+                        audioPlayer.playMessage(new QueuedMessage(folder5minsPodium, 0, this), pearlType, 0);
                     }
                     else
                     {
-                        audioPlayer.queueClip(new QueuedMessage(folder5mins, 0, this), pearlType, 0.7);
+                        audioPlayer.playMessage(new QueuedMessage(folder5mins, 0, this), pearlType, 0.7);
                     }
                 }
                 if (currentGameState.SessionData.SessionRunningTime > 60 && !played10mins && timeLeft / 60 < 10 && timeLeft / 60 > 9.9)
@@ -191,25 +191,25 @@ namespace CrewChiefV4.Events
                     played10mins = true;
                     played15mins = true;
                     played20mins = true;
-                    audioPlayer.queueClip(new QueuedMessage(folder10mins, 0, this), pearlType, 0.7);
+                    audioPlayer.playMessage(new QueuedMessage(folder10mins, 0, this), pearlType, 0.7);
                 }
                 if (currentGameState.SessionData.SessionRunningTime > 60 && !played15mins && timeLeft / 60 < 15 && timeLeft / 60 > 14.9)
                 {
                     played15mins = true;
                     played20mins = true;
-                    audioPlayer.queueClip(new QueuedMessage(folder15mins, 0, this), pearlType, 0.7);
+                    audioPlayer.playMessage(new QueuedMessage(folder15mins, 0, this), pearlType, 0.7);
                 }
                 if (currentGameState.SessionData.SessionRunningTime > 60 && !played20mins && timeLeft / 60 < 20 && timeLeft / 60 > 19.9)
                 {
                     played20mins = true;
-                    audioPlayer.queueClip(new QueuedMessage(folder20mins, 0, this), pearlType, 0.7);
+                    audioPlayer.playMessage(new QueuedMessage(folder20mins, 0, this), pearlType, 0.7);
                 }
                 else if (currentGameState.SessionData.SessionType == SessionType.Race &&
                     currentGameState.SessionData.SessionRunningTime > 60 && !playedHalfWayHome && timeLeft > 0 && timeLeft < halfTime)
                 {
                     // this one sounds weird in practice and qual sessions, so skip it
                     playedHalfWayHome = true;
-                    audioPlayer.queueClip(new QueuedMessage(folderHalfWayHome, 0, this), pearlType, 0.7);
+                    audioPlayer.playMessage(new QueuedMessage(folderHalfWayHome, 0, this), pearlType, 0.7);
                 }
             }
         }
@@ -221,19 +221,19 @@ namespace CrewChiefV4.Events
                 if (leaderHasFinishedRace)
                 {
                     Console.WriteLine("Playing last lap message, timeleft = " + timeLeft);
-                    audioPlayer.playClipImmediately(new QueuedMessage(folderThisIsTheLastLap, 0, this), false);
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderThisIsTheLastLap, 0, this), false);
                     
                 }
                 if (timeLeft >= 120)
                 {
                     TimeSpan timeLeftTimeSpan = TimeSpan.FromSeconds(timeLeft);
-                    audioPlayer.playClipImmediately(new QueuedMessage("RaceTime/time_remaining",
+                    audioPlayer.playMessageImmediately(new QueuedMessage("RaceTime/time_remaining",
                         MessageContents(timeLeftTimeSpan.TotalMinutes, folderMinutesLeft), 0, this), false);
                     
                 }
                 else if (timeLeft >= 60)
                 {
-                    audioPlayer.playClipImmediately(new QueuedMessage(folderOneMinuteRemaining, 0, this), false);
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderOneMinuteRemaining, 0, this), false);
                     
                 }
                 else if (timeLeft <= 0)
@@ -241,13 +241,13 @@ namespace CrewChiefV4.Events
                     if (addExtraLapForDTM2015 && !startedDTM2015ExtraLap)
                     {
                         Console.WriteLine("Playing DTM one more lap message, timeleft = " + timeLeft);
-                        audioPlayer.playClipImmediately(new QueuedMessage(folderOneLapAfterThisOne, 0, this), false);
+                        audioPlayer.playMessageImmediately(new QueuedMessage(folderOneLapAfterThisOne, 0, this), false);
                         
                     }
                     else 
                     {
                         Console.WriteLine("Playing last lap message, timeleft = " + timeLeft);
-                        audioPlayer.playClipImmediately(new QueuedMessage(folderThisIsTheLastLap, 0, this), false);
+                        audioPlayer.playMessageImmediately(new QueuedMessage(folderThisIsTheLastLap, 0, this), false);
                         
                     }                   
                 }
@@ -255,7 +255,7 @@ namespace CrewChiefV4.Events
                 {
                     // TODO: check these - if the timeLeft value contains -1 for some reason this message will be wrong
                     Console.WriteLine("Playing less than a minute message, timeleft = " + timeLeft);
-                    audioPlayer.playClipImmediately(new QueuedMessage(folderLessThanOneMinute, 0, this), false);
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderLessThanOneMinute, 0, this), false);
                     
                 }
             }
@@ -263,7 +263,7 @@ namespace CrewChiefV4.Events
             {
                 if (lapsLeft > 2)
                 {
-                    audioPlayer.playClipImmediately(new QueuedMessage("RaceTime/laps_remaining",
+                    audioPlayer.playMessageImmediately(new QueuedMessage("RaceTime/laps_remaining",
                         MessageContents(lapsLeft, folderLapsLeft), 0, this), false);
 
                     
@@ -271,12 +271,12 @@ namespace CrewChiefV4.Events
                 else if (lapsLeft == 2)
                 {
                     // TODO: revised logic to this is correct for PCars - check it's OK for R3E
-                    audioPlayer.playClipImmediately(new QueuedMessage(folderOneLapAfterThisOne, 0, this), false);
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderOneLapAfterThisOne, 0, this), false);
                     
                 }
                 else if (lapsLeft == 1)
                 {
-                    audioPlayer.playClipImmediately(new QueuedMessage(folderThisIsTheLastLap, 0, this), false);
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderThisIsTheLastLap, 0, this), false);
                     
                 }
             }     

@@ -382,12 +382,12 @@ namespace CrewChiefV4.Events
 
             if (playImmediately)
             {
-                audioPlayer.playClipImmediately(new QueuedMessage("tyre_temps", messageContents, 0, null), false);
+                audioPlayer.playMessageImmediately(new QueuedMessage("tyre_temps", messageContents, 0, null), false);
                 
             }
             else if (lastTyreTempMessage == null || !messagesHaveSameContent(lastTyreTempMessage, messageContents))
             {
-                audioPlayer.queueClip(new QueuedMessage("tyre_temps", messageContents, random.Next(0, 10), this));
+                audioPlayer.playMessage(new QueuedMessage("tyre_temps", messageContents, random.Next(0, 10), this));
             }
             lastTyreTempMessage = messageContents;
         }
@@ -405,12 +405,12 @@ namespace CrewChiefV4.Events
 
             if (playImmediately)
             {
-                audioPlayer.playClipImmediately(new QueuedMessage("brake_temps", messageContents, 0, null), false);
+                audioPlayer.playMessageImmediately(new QueuedMessage("brake_temps", messageContents, 0, null), false);
                 
             }
             else if (lastBrakeTempMessage == null || !messagesHaveSameContent(lastBrakeTempMessage, messageContents))
             {
-                audioPlayer.queueClip(new QueuedMessage("brake_temps", messageContents, random.Next(0, 10), this));
+                audioPlayer.playMessage(new QueuedMessage("brake_temps", messageContents, random.Next(0, 10), this));
             }
             lastBrakeTempMessage = messageContents;
         }
@@ -428,12 +428,12 @@ namespace CrewChiefV4.Events
 
             if (playImmediately)
             {
-                audioPlayer.playClipImmediately(new QueuedMessage("tyre_condition", messageContents, 0, null), false);
+                audioPlayer.playMessageImmediately(new QueuedMessage("tyre_condition", messageContents, 0, null), false);
                 
             }
             else if (playEvenIfUnchanged || (lastTyreConditionMessage != null && !messagesHaveSameContent(lastTyreConditionMessage, messageContents)))
             {
-                audioPlayer.queueClip(new QueuedMessage("tyre_condition", messageContents, random.Next(0, 10), this));
+                audioPlayer.playMessage(new QueuedMessage("tyre_condition", messageContents, random.Next(0, 10), this));
             }
             lastTyreConditionMessage = messageContents;
         }
@@ -444,13 +444,13 @@ namespace CrewChiefV4.Events
             {
                 if (minutesRemainingOnTheseTyres > (timeInSession - timeElapsed) / 60)
                 {
-                    audioPlayer.playClipImmediately(new QueuedMessage(folderGoodWear, 0, null), false);
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderGoodWear, 0, null), false);
                     
                     return;
                 }
                 else if (minutesRemainingOnTheseTyres < 1)
                 {
-                    audioPlayer.playClipImmediately(new QueuedMessage(folderKnackeredAllRound, 0, null), false);
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderKnackeredAllRound, 0, null), false);
                     
                     return;
                 }
@@ -462,17 +462,17 @@ namespace CrewChiefV4.Events
                     MessageContents(folderMinutesOnCurrentTyresIntro, minutesRemainingOnTheseTyres, folderMinutesOnCurrentTyresOutro), 0, null);
                 if (immediate)
                 {
-                    audioPlayer.playClipImmediately(queuedMessage, false);
+                    audioPlayer.playMessageImmediately(queuedMessage, false);
                     
                 }
                 else
                 {
-                    audioPlayer.queueClip(queuedMessage);
+                    audioPlayer.playMessage(queuedMessage);
                 }
             }
             else if (immediate)
             {
-                audioPlayer.playClipImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null), false);
+                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null), false);
                 
             }
         }
@@ -483,13 +483,13 @@ namespace CrewChiefV4.Events
             {
                 if (lapsRemainingOnTheseTyres > lapsInSession - completedLaps)
                 {
-                    audioPlayer.playClipImmediately(new QueuedMessage(folderGoodWear, 0, null), false);
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderGoodWear, 0, null), false);
                     
                     return;
                 }
                 else if (lapsRemainingOnTheseTyres < 1)
                 {
-                    audioPlayer.playClipImmediately(new QueuedMessage(folderKnackeredAllRound, 0, null), false);
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderKnackeredAllRound, 0, null), false);
                     
                     return;
                 }
@@ -501,17 +501,17 @@ namespace CrewChiefV4.Events
                     MessageContents(folderLapsOnCurrentTyresIntro, lapsRemainingOnTheseTyres, folderLapsOnCurrentTyresOutro), 0, null);
                 if (immediate)
                 {
-                    audioPlayer.playClipImmediately(queuedMessage, false);
+                    audioPlayer.playMessageImmediately(queuedMessage, false);
                     
                 }
                 else
                 {
-                    audioPlayer.queueClip(queuedMessage);
+                    audioPlayer.playMessage(queuedMessage);
                 }                
             }
             else if (immediate)
             {
-                audioPlayer.playClipImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null), false);
+                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null), false);
                 
             }
         }
@@ -540,11 +540,11 @@ namespace CrewChiefV4.Events
         {
             if (leftFrontTyreTemp == 0 && rightFrontTyreTemp == 0 && leftRearTyreTemp == 0 && rightRearTyreTemp == 0)
             {
-                audioPlayer.playClipImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null), false);
+                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null), false);
             }
             else
             {
-                audioPlayer.playClipImmediately(new QueuedMessage("tyre_temps", MessageContents(folderLeftFront, convertTemp(leftFrontTyreTemp), 
+                audioPlayer.playMessageImmediately(new QueuedMessage("tyre_temps", MessageContents(folderLeftFront, convertTemp(leftFrontTyreTemp), 
                     folderRightFront, convertTemp(rightFrontTyreTemp), folderLeftRear, convertTemp(leftRearTyreTemp), folderRightRear, convertTemp(rightRearTyreTemp), getTempUnit()), 0, this), false);
             }
             
@@ -554,11 +554,11 @@ namespace CrewChiefV4.Events
         {
             if (leftFrontBrakeTemp == 0 && rightFrontBrakeTemp == 0 && leftRearBrakeTemp == 0 && rightRearBrakeTemp == 0)
             {
-                audioPlayer.playClipImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null), false);
+                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null), false);
             }
             else
             {
-                audioPlayer.playClipImmediately(new QueuedMessage("brake_temps", MessageContents(folderLeftFront, convertTemp(leftFrontBrakeTemp, 10), 
+                audioPlayer.playMessageImmediately(new QueuedMessage("brake_temps", MessageContents(folderLeftFront, convertTemp(leftFrontBrakeTemp, 10), 
                     folderRightFront, convertTemp(rightFrontBrakeTemp, 10), folderLeftRear, convertTemp(leftRearBrakeTemp, 10), folderRightRear, convertTemp(rightRearBrakeTemp, 10), getTempUnit()), 0, this), false);
             }
             
@@ -580,7 +580,7 @@ namespace CrewChiefV4.Events
                     }
                     else
                     {
-                        audioPlayer.playClipImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null), false);
+                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null), false);
                         
                     }
                 }
@@ -599,7 +599,7 @@ namespace CrewChiefV4.Events
                     }
                     else
                     {
-                        audioPlayer.playClipImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null), false);
+                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null), false);
                         
                     }
                 }
@@ -612,7 +612,7 @@ namespace CrewChiefV4.Events
                 }
                 else
                 {
-                    audioPlayer.playClipImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null), false);
+                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null), false);
                     
                 }
             }
@@ -990,12 +990,12 @@ namespace CrewChiefV4.Events
                     if (timeRightFrontIsLockedForLap > totalLockupThresholdForNextLap / 2)
                     {
                         // lots of left front locking, some right front locking
-                        audioPlayer.queueClip(new QueuedMessage(folderLockingFrontsForLapWarning, messageDelay, this));
+                        audioPlayer.playMessage(new QueuedMessage(folderLockingFrontsForLapWarning, messageDelay, this));
                     }
                     else
                     {
                         // just left front locking
-                        audioPlayer.queueClip(new QueuedMessage(folderLockingLeftFrontForLapWarning, messageDelay, this));
+                        audioPlayer.playMessage(new QueuedMessage(folderLockingLeftFrontForLapWarning, messageDelay, this));
                     }
                 }
                 else if (timeRightFrontIsLockedForLap > totalLockupThresholdForNextLap)
@@ -1004,12 +1004,12 @@ namespace CrewChiefV4.Events
                     if (timeLeftFrontIsLockedForLap > totalLockupThresholdForNextLap / 2)
                     {
                         // lots of right front locking, some left front locking
-                        audioPlayer.queueClip(new QueuedMessage(folderLockingFrontsForLapWarning, messageDelay, this));
+                        audioPlayer.playMessage(new QueuedMessage(folderLockingFrontsForLapWarning, messageDelay, this));
                     }
                     else
                     {
                         // just right front locking
-                        audioPlayer.queueClip(new QueuedMessage(folderLockingRightFrontForLapWarning, messageDelay, this));
+                        audioPlayer.playMessage(new QueuedMessage(folderLockingRightFrontForLapWarning, messageDelay, this));
                     }
                 }
                 else if (timeLeftRearIsLockedForLap > totalLockupThresholdForNextLap)
@@ -1018,12 +1018,12 @@ namespace CrewChiefV4.Events
                     if (timeRightRearIsLockedForLap > totalLockupThresholdForNextLap / 2)
                     {
                         // lots of left rear locking, some right rear locking
-                        audioPlayer.queueClip(new QueuedMessage(folderLockingRearsForLapWarning, messageDelay, this));
+                        audioPlayer.playMessage(new QueuedMessage(folderLockingRearsForLapWarning, messageDelay, this));
                     }
                     else
                     {
                         // just left rear locking
-                        audioPlayer.queueClip(new QueuedMessage(folderLockingLeftRearForLapWarning, messageDelay, this));
+                        audioPlayer.playMessage(new QueuedMessage(folderLockingLeftRearForLapWarning, messageDelay, this));
                     }
                 }
                 else if (timeRightRearIsLockedForLap > totalLockupThresholdForNextLap)
@@ -1032,12 +1032,12 @@ namespace CrewChiefV4.Events
                     if (timeLeftRearIsLockedForLap > totalLockupThresholdForNextLap / 2)
                     {
                         // lots of right rear locking, some left rear locking
-                        audioPlayer.queueClip(new QueuedMessage(folderLockingRearsForLapWarning, messageDelay, this));
+                        audioPlayer.playMessage(new QueuedMessage(folderLockingRearsForLapWarning, messageDelay, this));
                     }
                     else
                     {
                         // just right rear locking
-                        audioPlayer.queueClip(new QueuedMessage(folderLockingRightRearForLapWarning, messageDelay, this));
+                        audioPlayer.playMessage(new QueuedMessage(folderLockingRightRearForLapWarning, messageDelay, this));
                     }
                 }
             }
@@ -1054,12 +1054,12 @@ namespace CrewChiefV4.Events
                     if (timeRightFrontIsSpinningForLap > totalWheelspinThresholdForNextLap / 2)
                     {
                         // lots of left front spinning, some right front spinning
-                        audioPlayer.queueClip(new QueuedMessage(folderSpinningFrontsForLapWarning, messageDelay, this));
+                        audioPlayer.playMessage(new QueuedMessage(folderSpinningFrontsForLapWarning, messageDelay, this));
                     }
                     else
                     {
                         // just left front spinning
-                        audioPlayer.queueClip(new QueuedMessage(folderSpinningLeftFrontForLapWarning, messageDelay, this));
+                        audioPlayer.playMessage(new QueuedMessage(folderSpinningLeftFrontForLapWarning, messageDelay, this));
                     }
                 }
                 else if (timeRightFrontIsSpinningForLap > totalWheelspinThresholdForNextLap)
@@ -1068,12 +1068,12 @@ namespace CrewChiefV4.Events
                     if (timeLeftFrontIsSpinningForLap > totalWheelspinThresholdForNextLap / 2)
                     {
                         // lots of right front spinning, some left front spinning
-                        audioPlayer.queueClip(new QueuedMessage(folderSpinningFrontsForLapWarning, messageDelay, this));
+                        audioPlayer.playMessage(new QueuedMessage(folderSpinningFrontsForLapWarning, messageDelay, this));
                     }
                     else
                     {
                         // just right front spinning
-                        audioPlayer.queueClip(new QueuedMessage(folderSpinningRightFrontForLapWarning, messageDelay, this));
+                        audioPlayer.playMessage(new QueuedMessage(folderSpinningRightFrontForLapWarning, messageDelay, this));
                     }
                 }
                 else if (timeLeftRearIsSpinningForLap > totalWheelspinThresholdForNextLap)
@@ -1082,12 +1082,12 @@ namespace CrewChiefV4.Events
                     if (timeRightRearIsSpinningForLap > totalWheelspinThresholdForNextLap / 2)
                     {
                         // lots of left rear spinning, some right rear spinning
-                        audioPlayer.queueClip(new QueuedMessage(folderSpinningRearsForLapWarning, messageDelay, this));
+                        audioPlayer.playMessage(new QueuedMessage(folderSpinningRearsForLapWarning, messageDelay, this));
                     }
                     else
                     {
                         // just left rear spinning
-                        audioPlayer.queueClip(new QueuedMessage(folderSpinningLeftRearForLapWarning, messageDelay, this));
+                        audioPlayer.playMessage(new QueuedMessage(folderSpinningLeftRearForLapWarning, messageDelay, this));
                     }
                 }
                 else if (timeRightRearIsSpinningForLap > totalWheelspinThresholdForNextLap)
@@ -1096,12 +1096,12 @@ namespace CrewChiefV4.Events
                     if (timeLeftRearIsSpinningForLap > totalWheelspinThresholdForNextLap / 2)
                     {
                         // lots of right rear spinning, some left rear spinning
-                        audioPlayer.queueClip(new QueuedMessage(folderSpinningRearsForLapWarning, messageDelay, this));
+                        audioPlayer.playMessage(new QueuedMessage(folderSpinningRearsForLapWarning, messageDelay, this));
                     }
                     else
                     {
                         // just right rear spinning
-                        audioPlayer.queueClip(new QueuedMessage(folderSpinningRightRearForLapWarning, messageDelay, this));
+                        audioPlayer.playMessage(new QueuedMessage(folderSpinningRightRearForLapWarning, messageDelay, this));
                     }
                 }
             }

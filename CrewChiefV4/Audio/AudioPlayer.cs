@@ -358,13 +358,13 @@ namespace CrewChiefV4.Audio
 
         public void enableKeepQuietMode()
         {
-            playClipImmediately(new QueuedMessage(folderAcknowlegeEnableKeepQuiet, 0, null), false);
+            playMessageImmediately(new QueuedMessage(folderAcknowlegeEnableKeepQuiet, 0, null), false);
             keepQuiet = true;
         }
 
         public void disableKeepQuietMode()
         {
-            playClipImmediately(new QueuedMessage(folderAcknowlegeDisableKeepQuiet, 0, null), false);
+            playMessageImmediately(new QueuedMessage(folderAcknowlegeDisableKeepQuiet, 0, null), false);
             keepQuiet = false;
         }
 
@@ -788,17 +788,17 @@ namespace CrewChiefV4.Audio
             return channelOpen;
         }
 
-        public void queueClip(QueuedMessage queuedMessage)
+        public void playMessage(QueuedMessage queuedMessage)
         {
-            queueClip(queuedMessage, PearlsOfWisdom.PearlType.NONE, 0);
+            playMessage(queuedMessage, PearlsOfWisdom.PearlType.NONE, 0);
         }
 
-        public void playClipImmediately(QueuedMessage queuedMessage, Boolean useShortBeep)
+        public void playMessageImmediately(QueuedMessage queuedMessage, Boolean useShortBeep)
         {
-            playClipImmediately(queuedMessage, false, useShortBeep);
+            playMessageImmediately(queuedMessage, false, useShortBeep);
         }
 
-        public void playClipImmediately(QueuedMessage queuedMessage, Boolean keepChannelOpen, Boolean useShortBeep)
+        public void playMessageImmediately(QueuedMessage queuedMessage, Boolean keepChannelOpen, Boolean useShortBeep)
         {
             if (disableImmediateMessages)
             {
@@ -823,7 +823,7 @@ namespace CrewChiefV4.Audio
             }
         }
 
-        public void queueClip(QueuedMessage queuedMessage, PearlsOfWisdom.PearlType pearlType, double pearlMessageProbability)
+        public void playMessage(QueuedMessage queuedMessage, PearlsOfWisdom.PearlType pearlType, double pearlMessageProbability)
         {
             if (queuedMessage.canBePlayed)
             {
@@ -859,7 +859,7 @@ namespace CrewChiefV4.Audio
             }
         }
 
-        public Boolean removeQueuedClip(String eventName)
+        public Boolean removeQueuedMessage(String eventName)
         {
             lock (queuedClips)
             {
@@ -872,7 +872,7 @@ namespace CrewChiefV4.Audio
             }
         }
 
-        public void removeImmediateClips(String[] eventNames)
+        public void removeImmediateMessages(String[] eventNames)
         {
             lock (immediateClips)
             {
@@ -950,7 +950,7 @@ namespace CrewChiefV4.Audio
         {
             if (lastMessagePlayed != null)
             {
-                playClipImmediately(lastMessagePlayed, false);
+                playMessageImmediately(lastMessagePlayed, false);
             }
         }
 

@@ -239,7 +239,7 @@ namespace CrewChiefV4.Events
                                 sectorsSinceLastCloseCarAheadReport = 0;
                                 sectorsUntilNextCloseCarAheadReport = adjustForMidLapPreference(currentGameState.SessionData.SectorNumber,
                                     rand.Next(closeAheadMinSectorWait, closeAheadMaxSectorWait));
-                                audioPlayer.queueClip(new QueuedMessage(folderBeingHeldUp, 0, this, new Dictionary<string, object> { { "position", currentGameState.SessionData.Position } }));
+                                audioPlayer.playMessage(new QueuedMessage(folderBeingHeldUp, 0, this, new Dictionary<string, object> { { "position", currentGameState.SessionData.Position } }));
                                 gapInFrontAtLastReport = gapsInFront[0];
                             }
                         }
@@ -254,19 +254,19 @@ namespace CrewChiefV4.Events
                             {
                                 if (gapInFrontStatus == GapStatus.INCREASING)
                                 {
-                                    audioPlayer.queueClip(new QueuedMessage("Timings/gap_in_front",
+                                    audioPlayer.playMessage(new QueuedMessage("Timings/gap_in_front",
                                         MessageContents(folderTheGapTo, currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position - 1, false), folderAheadIsIncreasing,
                                         gapInFront), MessageContents(folderGapInFrontIncreasing, gapInFront), 0, this, new Dictionary<string, object> { { "position", currentGameState.SessionData.Position } }));
                                 }
                                 else if (gapInFrontStatus == GapStatus.DECREASING)
                                 {
-                                    audioPlayer.queueClip(new QueuedMessage("Timings/gap_in_front",
+                                    audioPlayer.playMessage(new QueuedMessage("Timings/gap_in_front",
                                         MessageContents(folderYoureReeling, currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position - 1, false),
                                         folderInTheGapIsNow, gapInFront), MessageContents(folderGapInFrontDecreasing, gapInFront), 0, this, new Dictionary<string, object> { { "position", currentGameState.SessionData.Position } }));
                                 }
                                 else if (gapInFrontStatus == GapStatus.OTHER)
                                 {
-                                    audioPlayer.queueClip(new QueuedMessage("Timings/gap_in_front",
+                                    audioPlayer.playMessage(new QueuedMessage("Timings/gap_in_front",
                                         MessageContents(folderTheGapTo, currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position - 1, false),
                                         folderAheadIsNow, gapInFront), MessageContents(folderGapInFrontIsNow, gapInFront), 0, this, new Dictionary<string, object> { { "position", currentGameState.SessionData.Position } }));
                                 }
@@ -283,7 +283,7 @@ namespace CrewChiefV4.Events
                                 sectorsSinceLastCloseCarBehindReport = 0;
                                 sectorsUntilNextCloseCarBehindReport = adjustForMidLapPreference(currentGameState.SessionData.SectorNumber,
                                     rand.Next(closeBehindMinSectorWait, closeBehindMaxSectorWait));
-                                audioPlayer.queueClip(new QueuedMessage(folderBeingPressured, 0, this, new Dictionary<string, object> { { "position", currentGameState.SessionData.Position } }));
+                                audioPlayer.playMessage(new QueuedMessage(folderBeingPressured, 0, this, new Dictionary<string, object> { { "position", currentGameState.SessionData.Position } }));
                                 gapBehindAtLastReport = gapsBehind[0];
                             }
                         }
@@ -298,19 +298,19 @@ namespace CrewChiefV4.Events
                             {
                                 if (gapBehindStatus == GapStatus.INCREASING)
                                 {
-                                    audioPlayer.queueClip(new QueuedMessage("Timings/gap_behind",
+                                    audioPlayer.playMessage(new QueuedMessage("Timings/gap_behind",
                                         MessageContents(folderTheGapTo, currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position + 1, false),
                                         folderBehindIsIncreasing, gapBehind), MessageContents(folderGapBehindIncreasing, gapBehind), 0, this, new Dictionary<string, object> { { "position", currentGameState.SessionData.Position } }));
                                 }
                                 else if (gapBehindStatus == GapStatus.DECREASING)
                                 {
-                                    audioPlayer.queueClip(new QueuedMessage("Timings/gap_behind",
+                                    audioPlayer.playMessage(new QueuedMessage("Timings/gap_behind",
                                         MessageContents(currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position + 1, false), folderIsReelingYouIn, gapBehind),
                                         MessageContents(folderGapBehindDecreasing, gapBehind), 0, this, new Dictionary<string, object> { { "position", currentGameState.SessionData.Position } }));
                                 }
                                 else if (gapBehindStatus == GapStatus.OTHER)
                                 {
-                                    audioPlayer.queueClip(new QueuedMessage("Timings/gap_behind",
+                                    audioPlayer.playMessage(new QueuedMessage("Timings/gap_behind",
                                         MessageContents(folderTheGapTo, currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position + 1, false),
                                         folderBehindIsNow, gapBehind), MessageContents(folderGapBehindIsNow, gapBehind), 0, this, new Dictionary<string, object> { { "position", currentGameState.SessionData.Position } }));
                                 }
@@ -330,7 +330,7 @@ namespace CrewChiefV4.Events
                                 currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position - 1, false), folderAheadIsNow, gap),
                                 MessageContents(folderGapInFrontIsNow, gap), 0, this, new Dictionary<string,object>{ {"position", currentGameState.SessionData.Position} });
                             message.playEvenWhenSilenced = true;
-                            audioPlayer.queueClip(message);
+                            audioPlayer.playMessage(message);
                         }
                     }
                     if (!currentGameState.isLast())
@@ -345,7 +345,7 @@ namespace CrewChiefV4.Events
                                 currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position + 1, false), folderBehindIsNow, gap),
                                 MessageContents(folderGapBehindIsNow, gap), 0, this, new Dictionary<string, object> { { "position", currentGameState.SessionData.Position } });
                             message.playEvenWhenSilenced = true;
-                            audioPlayer.queueClip(message);
+                            audioPlayer.playMessage(message);
                         }
                     }
                 }
@@ -397,13 +397,13 @@ namespace CrewChiefV4.Events
             {
                 if (isLeading && isRace)
                 {
-                    audioPlayer.playClipImmediately(new QueuedMessage(Position.folderLeading, 0, this), false);
+                    audioPlayer.playMessageImmediately(new QueuedMessage(Position.folderLeading, 0, this), false);
                     
                     haveData = true;
                 }
                 else 
                 {
-                    audioPlayer.playClipImmediately(new QueuedMessage("Timings/gaps",
+                    audioPlayer.playMessageImmediately(new QueuedMessage("Timings/gaps",
                         MessageContents(TimeSpanWrapper.FromMilliseconds(currentGapInFront * 1000, true)), 0, this), false);
                     
                     haveData = true;
@@ -414,13 +414,13 @@ namespace CrewChiefV4.Events
             {
                 if (isLast && isRace)
                 {
-                    audioPlayer.playClipImmediately(new QueuedMessage(Position.folderLast, 0, this), false);
+                    audioPlayer.playMessageImmediately(new QueuedMessage(Position.folderLast, 0, this), false);
                     
                     haveData = true;
                 }
                 else
                 {
-                    audioPlayer.playClipImmediately(new QueuedMessage("Timings/gaps",
+                    audioPlayer.playMessageImmediately(new QueuedMessage("Timings/gaps",
                         MessageContents(TimeSpanWrapper.FromMilliseconds(currentGapBehind * 1000, true)), 0, this), false);
                     
                     haveData = true;
@@ -428,7 +428,7 @@ namespace CrewChiefV4.Events
             }
             if (!haveData)
             {
-                audioPlayer.playClipImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, this), false);
+                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, this), false);
                 
             }
         }

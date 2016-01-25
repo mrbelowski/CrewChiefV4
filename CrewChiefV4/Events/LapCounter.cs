@@ -125,7 +125,7 @@ namespace CrewChiefV4.Events
                     {
                         break;
                     }
-                    audioPlayer.queueClip(message);
+                    audioPlayer.playMessage(message);
                 }            
             }
             // TODO: in the countdown / pre-lights phase, we don't know how long the race is going to be so we can't use the 'get on with it' messages :(
@@ -157,7 +157,7 @@ namespace CrewChiefV4.Events
                 {
                     audioPlayer.purgeQueues();
                 }
-                audioPlayer.queueClip(new QueuedMessage(folderGetReady, 0, this));
+                audioPlayer.playMessage(new QueuedMessage(folderGetReady, 0, this));
                 playedGetReady = true;
             }
             /*if (!playedGreenGreenGreen && previousGameState != null && currentGameState.SessionData.SessionType == SessionType.Race &&
@@ -171,8 +171,8 @@ namespace CrewChiefV4.Events
                 (previousGameState.SessionData.SessionPhase == SessionPhase.Formation ||
                  previousGameState.SessionData.SessionPhase == SessionPhase.Countdown))
             {
-                audioPlayer.removeQueuedClip(folderGetReady);
-                audioPlayer.playClipImmediately(new QueuedMessage(folderGreenGreenGreen, 0, this), false);
+                audioPlayer.removeQueuedMessage(folderGetReady);
+                audioPlayer.playMessageImmediately(new QueuedMessage(folderGreenGreenGreen, 0, this), false);
                 
                 audioPlayer.disablePearlsOfWisdom = false;
             }
@@ -184,19 +184,19 @@ namespace CrewChiefV4.Events
                 {
                     if (position == 1)
                     {
-                        audioPlayer.queueClip(new QueuedMessage(folderLastLapLeading, 0, this));
+                        audioPlayer.playMessage(new QueuedMessage(folderLastLapLeading, 0, this));
                     }
                     else if (position < 4)
                     {
-                        audioPlayer.queueClip(new QueuedMessage(folderLastLapTopThree, 0, this));
+                        audioPlayer.playMessage(new QueuedMessage(folderLastLapTopThree, 0, this));
                     }
                     else if (position >= 4)
                     {
-                        audioPlayer.queueClip(new QueuedMessage(folderLastLap, 0, this), PearlsOfWisdom.PearlType.NEUTRAL, 0.5);
+                        audioPlayer.playMessage(new QueuedMessage(folderLastLap, 0, this), PearlsOfWisdom.PearlType.NEUTRAL, 0.5);
                     }
                     else if (position >= 10)
                     {
-                        audioPlayer.queueClip(new QueuedMessage(folderLastLap, 0, this), PearlsOfWisdom.PearlType.BAD, 0.5);
+                        audioPlayer.playMessage(new QueuedMessage(folderLastLap, 0, this), PearlsOfWisdom.PearlType.BAD, 0.5);
                     }
                     else
                     {
@@ -207,19 +207,19 @@ namespace CrewChiefV4.Events
                 {
                     if (position == 1)
                     {
-                        audioPlayer.queueClip(new QueuedMessage(folderTwoLeftLeading, 0, this));
+                        audioPlayer.playMessage(new QueuedMessage(folderTwoLeftLeading, 0, this));
                     }
                     else if (position < 4)
                     {
-                        audioPlayer.queueClip(new QueuedMessage(folderTwoLeftTopThree, 0, this));
+                        audioPlayer.playMessage(new QueuedMessage(folderTwoLeftTopThree, 0, this));
                     }
                     else if (position >= 4)
                     {
-                        audioPlayer.queueClip(new QueuedMessage(folderTwoLeft, 0, this), PearlsOfWisdom.PearlType.NEUTRAL, 0.5);
+                        audioPlayer.playMessage(new QueuedMessage(folderTwoLeft, 0, this), PearlsOfWisdom.PearlType.NEUTRAL, 0.5);
                     }
                     else if (position >= 10)
                     {
-                        audioPlayer.queueClip(new QueuedMessage(folderTwoLeft, 0, this), PearlsOfWisdom.PearlType.BAD, 0.5);
+                        audioPlayer.playMessage(new QueuedMessage(folderTwoLeft, 0, this), PearlsOfWisdom.PearlType.BAD, 0.5);
                     }
                     else
                     {

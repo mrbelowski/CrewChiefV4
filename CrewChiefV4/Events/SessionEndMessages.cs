@@ -93,17 +93,17 @@ namespace CrewChiefV4.Events
                 Boolean isLast = position == numCars;
                 if (isDisqualified) 
                 {
-                    audioPlayer.queueClip(new QueuedMessage(sessionEndMessageIdentifier, AbstractEvent.MessageContents(
+                    audioPlayer.playMessage(new QueuedMessage(sessionEndMessageIdentifier, AbstractEvent.MessageContents(
                         Penalties.folderDisqualified), 0, null));
                 }
                 else if (position == 1)
                 {
-                    audioPlayer.queueClip(new QueuedMessage(sessionEndMessageIdentifier, AbstractEvent.MessageContents(
+                    audioPlayer.playMessage(new QueuedMessage(sessionEndMessageIdentifier, AbstractEvent.MessageContents(
                         folderWonRace), 0, null));
                 }
                 else if (position < 4)
                 {
-                    audioPlayer.queueClip(new QueuedMessage(sessionEndMessageIdentifier, AbstractEvent.MessageContents(
+                    audioPlayer.playMessage(new QueuedMessage(sessionEndMessageIdentifier, AbstractEvent.MessageContents(
                         folderPodiumFinish), 0, null));
                 }
                 else if (position >= 4 && !isLast)
@@ -114,18 +114,18 @@ namespace CrewChiefV4.Events
                          (startPosition <= 10 && position <= 6) ||
                          (startPosition - position >= 6)))
                     {
-                        audioPlayer.queueClip(new QueuedMessage(sessionEndMessageIdentifier, AbstractEvent.MessageContents(
+                        audioPlayer.playMessage(new QueuedMessage(sessionEndMessageIdentifier, AbstractEvent.MessageContents(
                                 Position.folderStub + position, folderGoodFinish), 0, null));
                     }
                     else
                     {
-                        audioPlayer.queueClip(new QueuedMessage(sessionEndMessageIdentifier, AbstractEvent.MessageContents(
+                        audioPlayer.playMessage(new QueuedMessage(sessionEndMessageIdentifier, AbstractEvent.MessageContents(
                             Position.folderStub + position, folderFinishedRace), 0, null));
                     }
                 }
                 else if (isLast)
                 {
-                    audioPlayer.queueClip(new QueuedMessage(sessionEndMessageIdentifier, 
+                    audioPlayer.playMessage(new QueuedMessage(sessionEndMessageIdentifier, 
                         AbstractEvent.MessageContents(folderFinishedRaceLast), 0, null));
                 }
             }
@@ -133,18 +133,18 @@ namespace CrewChiefV4.Events
             {
                 if (sessionType == SessionType.Qualify && position == 1)
                 {
-                    audioPlayer.queueClip(new QueuedMessage(folderEndOfSessionPole, 0, null));
+                    audioPlayer.playMessage(new QueuedMessage(folderEndOfSessionPole, 0, null));
                 }
                 else
                 {
                     if (position > 24)
                     {
-                        audioPlayer.queueClip(new QueuedMessage(sessionEndMessageIdentifier, AbstractEvent.MessageContents(folderEndOfSession,
+                        audioPlayer.playMessage(new QueuedMessage(sessionEndMessageIdentifier, AbstractEvent.MessageContents(folderEndOfSession,
                         Position.folderStub, position), 0, null));
                     }
                     else
                     {
-                        audioPlayer.queueClip(new QueuedMessage(sessionEndMessageIdentifier, AbstractEvent.MessageContents(folderEndOfSession,
+                        audioPlayer.playMessage(new QueuedMessage(sessionEndMessageIdentifier, AbstractEvent.MessageContents(folderEndOfSession,
                         Position.folderStub + position), 0, null));
                     }
                 }
