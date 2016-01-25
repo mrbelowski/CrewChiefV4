@@ -13,6 +13,7 @@ namespace CrewChiefV4.Audio
         public static Random random = new Random();
         private Boolean useAlternateBeeps = UserSettings.GetUserSettings().getBoolean("use_alternate_beeps");
         private double minSecondsBetweenPersonalisedMessages = (double)UserSettings.GetUserSettings().getInt("min_time_between_personalised_messages");
+        public static Boolean eagerLoadSoundFiles = UserSettings.GetUserSettings().getBoolean("load_sound_files_on_startup");
         
         private List<String> dynamicLoadedSounds = new List<String>();
         public static Dictionary<String, SoundSet> soundSets = new Dictionary<String, SoundSet>();
@@ -373,7 +374,7 @@ namespace CrewChiefV4.Audio
                                         {
                                             hasPrefixOrSuffix = true;
                                             hasSounds = true;
-                                            SingleSound singleSound = new SingleSound(soundFile.FullName, this.allowCaching, this.keepCached, this.allowCaching);
+                                            SingleSound singleSound = new SingleSound(soundFile.FullName, SoundCache.eagerLoadSoundFiles, this.keepCached, this.allowCaching);
                                             if (soundFile.Name.Contains(SoundCache.OPTIONAL_SUFFIX_IDENTIFIER) || soundFile.Name.Contains(SoundCache.REQUIRED_SUFFIX_IDENTIFIER))
                                             {
                                                 singleSound.suffixSoundSet = additionalSoundSet;
@@ -392,14 +393,14 @@ namespace CrewChiefV4.Audio
                                 if (isOptional)
                                 {
                                     hasSounds = true;
-                                    singleSoundsNoPrefixOrSuffix.Add(new SingleSound(soundFile.FullName, this.allowCaching, this.keepCached, this.allowCaching));
+                                    singleSoundsNoPrefixOrSuffix.Add(new SingleSound(soundFile.FullName, SoundCache.eagerLoadSoundFiles, this.keepCached, this.allowCaching));
                                     soundsCount++;
                                 }
                             }
                             else
                             {
                                 hasSounds = true;
-                                singleSoundsNoPrefixOrSuffix.Add(new SingleSound(soundFile.FullName, this.allowCaching, this.keepCached, this.allowCaching));
+                                singleSoundsNoPrefixOrSuffix.Add(new SingleSound(soundFile.FullName, SoundCache.eagerLoadSoundFiles, this.keepCached, this.allowCaching));
                                 soundsCount++;
                             }                         
                         }
