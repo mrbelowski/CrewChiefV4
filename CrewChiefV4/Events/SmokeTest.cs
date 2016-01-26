@@ -90,41 +90,41 @@ namespace CrewChiefV4.Events
             audioPlayer.playMessage(new QueuedMessage(folderTest, 0, this));        
             testDriverNames();
             /*
-            audioPlayer.queueClip(new QueuedMessage(LapCounter.folderGetReady, 0, this));
-            audioPlayer.queueClip(new QueuedMessage(MandatoryPitStops.folderMandatoryPitStopsPitThisLap, 0, this));
-            audioPlayer.queueClip(new QueuedMessage(MandatoryPitStops.folderMandatoryPitStopsFitPrimesThisLap, 0, this));
-            audioPlayer.queueClip(new QueuedMessage(Position.folderBeingOvertaken, 0, this));
-            audioPlayer.queueClip(new QueuedMessage(Position.folderOvertaking, 0, this));
-            audioPlayer.queueClip(new QueuedMessage(SessionEndMessages.folderFinishedRace, 0, this));
-            audioPlayer.queueClip(new QueuedMessage(SessionEndMessages.folderFinishedRaceLast, 0, this));
-            audioPlayer.queueClip(new QueuedMessage(SessionEndMessages.folderPodiumFinish, 0, this));
+            audioPlayer.playMessage(new QueuedMessage(LapCounter.folderGetReady, 0, this));
+            audioPlayer.playMessage(new QueuedMessage(MandatoryPitStops.folderMandatoryPitStopsPitThisLap, 0, this));
+            audioPlayer.playMessage(new QueuedMessage(MandatoryPitStops.folderMandatoryPitStopsFitPrimesThisLap, 0, this));
+            audioPlayer.playMessage(new QueuedMessage(Position.folderBeingOvertaken, 0, this));
+            audioPlayer.playMessage(new QueuedMessage(Position.folderOvertaking, 0, this));
+            audioPlayer.playMessage(new QueuedMessage(SessionEndMessages.folderFinishedRace, 0, this));
+            audioPlayer.playMessage(new QueuedMessage(SessionEndMessages.folderFinishedRaceLast, 0, this));
+            audioPlayer.playMessage(new QueuedMessage(SessionEndMessages.folderPodiumFinish, 0, this));
             
-            audioPlayer.queueClip(new QueuedMessage(LapCounter.folderGetReady, 0, this));
-            audioPlayer.queueClip(new QueuedMessage("rain1", MessageContents(
+            audioPlayer.playMessage(new QueuedMessage(LapCounter.folderGetReady, 0, this));
+            audioPlayer.playMessage(new QueuedMessage("rain1", MessageContents(
                                         ConditionsMonitor.folderSeeingSomeRain), 0, this));
-            audioPlayer.queueClip(new QueuedMessage("rain2", MessageContents(
+            audioPlayer.playMessage(new QueuedMessage("rain2", MessageContents(
                                         ConditionsMonitor.folderStoppedRaining), 0, this));
-            audioPlayer.queueClip(new QueuedMessage("pearl1", MessageContents(
+            audioPlayer.playMessage(new QueuedMessage("pearl1", MessageContents(
                                                     PearlsOfWisdom.folderKeepItUp), 0, this));
-            audioPlayer.queueClip(new QueuedMessage("pearl2", MessageContents(
+            audioPlayer.playMessage(new QueuedMessage("pearl2", MessageContents(
                                                                 PearlsOfWisdom.folderMustDoBetter), 0, this));
-            audioPlayer.queueClip(new QueuedMessage("getReady", MessageContents(
+            audioPlayer.playMessage(new QueuedMessage("getReady", MessageContents(
                                                     LapCounter.folderGetReady), 0, this));
 
-            audioPlayer.queueClip(new QueuedMessage("conditionsAirAndTrackIncreasing1", MessageContents
+            audioPlayer.playMessage(new QueuedMessage("conditionsAirAndTrackIncreasing1", MessageContents
                                (ConditionsMonitor.folderAirAndTrackTempIncreasing, 
                                ConditionsMonitor.folderAirTempIsNow, 26,
                                ConditionsMonitor.folderTrackTempIsNow, 32, ConditionsMonitor.folderCelsius), 0, this));
-            audioPlayer.queueClip(new QueuedMessage("Fuel/estimate", MessageContents(
+            audioPlayer.playMessage(new QueuedMessage("Fuel/estimate", MessageContents(
                                         Fuel.folderWeEstimate, QueuedMessage.folderNameNumbersStub + 12, Fuel.folderMinutesRemaining), 0, this));
-            audioPlayer.queueClip(new QueuedMessage("laptime", MessageContents(LapTimes.folderLapTimeIntro, 
+            audioPlayer.playMessage(new QueuedMessage("laptime", MessageContents(LapTimes.folderLapTimeIntro, 
                 TimeSpan.FromSeconds(60 + (random.NextDouble() * 60))), 0, this));
 
-            audioPlayer.queueClip(new QueuedMessage("yesBoxAfter", MessageContents(MandatoryPitStops.folderMandatoryPitStopsYesStopAfter,
+            audioPlayer.playMessage(new QueuedMessage("yesBoxAfter", MessageContents(MandatoryPitStops.folderMandatoryPitStopsYesStopAfter,
                 QueuedMessage.folderNameNumbersStub + 10, MandatoryPitStops.folderMandatoryPitStopsMinutes), 0, null));
             audioPlayer.queueClip(new QueuedMessage("laps_on_current_tyres", MessageContents(TyreMonitor.folderLapsOnCurrentTyresIntro,
                 QueuedMessage.folderNameNumbersStub + 5, TyreMonitor.folderLapsOnCurrentTyresOutro), 0, this));*/
-            
+
         }
     }
 }
