@@ -96,10 +96,12 @@ namespace CrewChiefV4
                     {
                         downloadSoundPackButton.Text = "No sound pack detected, unable to locate update";
                         downloadSoundPackButton.Enabled = false;
+                        downloadSoundPackButton.BackColor = Color.LightGray;
                     }
                     else if (latestSoundPackVersion > AudioPlayer.soundPackVersion)
                     {
                         downloadSoundPackButton.Enabled = true;
+                        downloadSoundPackButton.BackColor = Color.LightGreen;
                         if (AudioPlayer.soundPackVersion == -1)
                         {
                             downloadSoundPackButton.Text = "No sound pack detected, press to download";
@@ -115,14 +117,17 @@ namespace CrewChiefV4
                     else
                     {
                         downloadSoundPackButton.Text = "Sound pack is up to date";
+                        downloadSoundPackButton.BackColor = Color.LightGray;
                     }
                     if (latestDriverNamesVersion == -1 && AudioPlayer.driverNamesVersion == -1) {
                         downloadDriverNamesButton.Text = "No driver names detected, unable to locate update";
                         downloadDriverNamesButton.Enabled = false;
+                        downloadDriverNamesButton.BackColor = Color.LightGray;
                     } 
                     else if (latestDriverNamesVersion > AudioPlayer.driverNamesVersion)
                     {
                         downloadDriverNamesButton.Enabled = true;
+                        downloadDriverNamesButton.BackColor = Color.LightGreen;
                         if (AudioPlayer.driverNamesVersion == -1)
                         {
                             downloadDriverNamesButton.Text = "No driver names detected, press to download";
@@ -138,6 +143,7 @@ namespace CrewChiefV4
                     {
                         downloadDriverNamesButton.Text = "Driver names are up to date";
                         downloadDriverNamesButton.Enabled = false;
+                        downloadDriverNamesButton.BackColor = Color.LightGray;
                     }
                 }
                 catch (Exception error)

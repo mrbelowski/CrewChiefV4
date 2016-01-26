@@ -89,8 +89,8 @@ namespace CrewChiefV4.Events
         {
             audioPlayer.playMessage(new QueuedMessage(folderTest, 0, this));        
             testDriverNames();
-            /*
-            audioPlayer.playMessage(new QueuedMessage(LapCounter.folderGetReady, 0, this));
+            
+            /* audioPlayer.playMessage(new QueuedMessage(LapCounter.folderGetReady, 0, this));
             audioPlayer.playMessage(new QueuedMessage(MandatoryPitStops.folderMandatoryPitStopsPitThisLap, 0, this));
             audioPlayer.playMessage(new QueuedMessage(MandatoryPitStops.folderMandatoryPitStopsFitPrimesThisLap, 0, this));
             audioPlayer.playMessage(new QueuedMessage(Position.folderBeingOvertaken, 0, this));
