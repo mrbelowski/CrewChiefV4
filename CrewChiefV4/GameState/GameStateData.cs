@@ -353,22 +353,25 @@ namespace CrewChiefV4.GameState
                 for (int i = OpponentLapData.Count - 2; i >= OpponentLapData.Count - lapsToCheck && i >= 0; i--)
                 {
                     LapData thisLapTime = OpponentLapData[i];
-                    if (bestLapTimeAndSectorsSectors[0] == -1 ||
-                        (thisLapTime.IsValid && thisLapTime.LapTime != -1 && thisLapTime.LapTime < bestLapTimeAndSectorsSectors[0]))
+                    if (thisLapTime.IsValid)
                     {
-                        bestLapTimeAndSectorsSectors[0] = thisLapTime.LapTime;
-                        int sectorCount = thisLapTime.SectorTimes.Count();
-                        if (sectorCount > 0)
+                        if (bestLapTimeAndSectorsSectors[0] == -1 ||
+                            (thisLapTime.LapTime != -1 && thisLapTime.LapTime < bestLapTimeAndSectorsSectors[0]))
                         {
-                            bestLapTimeAndSectorsSectors[1] = thisLapTime.SectorTimes[0];
-                        }
-                        if (sectorCount > 1)
-                        {
-                            bestLapTimeAndSectorsSectors[2] = thisLapTime.SectorTimes[1];
-                        }
-                        if (sectorCount > 2)
-                        {
-                            bestLapTimeAndSectorsSectors[3] = thisLapTime.SectorTimes[2];
+                            bestLapTimeAndSectorsSectors[0] = thisLapTime.LapTime;
+                            int sectorCount = thisLapTime.SectorTimes.Count();
+                            if (sectorCount > 0)
+                            {
+                                bestLapTimeAndSectorsSectors[1] = thisLapTime.SectorTimes[0];
+                            }
+                            if (sectorCount > 1)
+                            {
+                                bestLapTimeAndSectorsSectors[2] = thisLapTime.SectorTimes[1];
+                            }
+                            if (sectorCount > 2)
+                            {
+                                bestLapTimeAndSectorsSectors[3] = thisLapTime.SectorTimes[2];
+                            }
                         }
                     }
                 }
