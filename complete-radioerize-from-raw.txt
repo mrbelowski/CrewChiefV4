@@ -1,0 +1,7 @@
+Compressor: Threshold=-60.000000 NoiseFloor=-75.000000 Ratio=10.000000 AttackTime=0.200000 ReleaseTime=1.000000 Normalize=yes UsePeak=yes
+Equalization: FilterLength=4001 CurveName="Bass Cut" InterpolateLin=no interpolationMethod=B-spline
+Equalization: FilterLength=4001 CurveName="pit radio" InterpolateLin=no interpolationMethod=B-spline
+TrimSilence...: thresh=-30.000000
+Amplify: Ratio=1.303167
+Compressor: Threshold=-1.000000 NoiseFloor=-35.000000 Ratio=4.500000 AttackTime=0.200000 ReleaseTime=1.000000 Normalize=yes UsePeak=no
+ExportWav:
