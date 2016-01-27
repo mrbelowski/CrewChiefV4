@@ -89,7 +89,8 @@ namespace CrewChiefV4.Events
                 }
                 if (!playedOpponentHasDRSOnThisLap && currentGameState.SessionData.TimeDeltaBehind <= currentGameState.OvertakingAids.DrsRange && 
                     currentGameState.SessionData.LapTimeCurrent > currentGameState.SessionData.TimeDeltaBehind &&
-                    currentGameState.SessionData.LapTimeCurrent < currentGameState.SessionData.TimeDeltaBehind + 1)
+                    currentGameState.SessionData.LapTimeCurrent < currentGameState.SessionData.TimeDeltaBehind + 1 &&
+                    currentGameState.OvertakingAids.DrsAvailable)
                 {
                     Object opponentBehindKey = currentGameState.getOpponentKeyBehind(false);
                     playedOpponentHasDRSOnThisLap = true;
