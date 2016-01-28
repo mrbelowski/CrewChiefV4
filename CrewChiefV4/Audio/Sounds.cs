@@ -340,6 +340,10 @@ namespace CrewChiefV4.Audio
         public Boolean hasSounds = false;
         public int soundsCount;
         public Boolean hasPrefixOrSuffix = false;
+        private List<int> prefixOrSuffixIndexes = null;
+        private int prefixOrSuffixIndexesPosition = 0;
+        private List<int> indexes = null;
+        private int indexesPosition = 0;
 
         public SoundSet(DirectoryInfo soundFolder, Boolean useSwearyMessages, Boolean keepCached, Boolean allowCaching)
         {
@@ -349,6 +353,19 @@ namespace CrewChiefV4.Audio
             this.allowCaching = allowCaching;
             this.keepCached = keepCached;
             initialise();
+        }
+
+        private void shuffle(List<int> list)
+        {
+            int n = list.Count;
+            while (n > 1)
+            {
+                n--;
+                int k = SoundCache.random.Next(n + 1);
+                int value = list[k];
+                list[k] = list[n];
+                list[n] = value;
+            }
         }
 
         private void initialise()
@@ -421,16 +438,41 @@ namespace CrewChiefV4.Audio
             }
             if (preferPersonalised && singleSoundsWithPrefixOrSuffix.Count > 0)
             {
-                return singleSoundsWithPrefixOrSuffix[SoundCache.random.Next(0, singleSoundsWithPrefixOrSuffix.Count)];
+                if (prefixOrSuffixIndexes == null || prefixOrSuffixIndexesPosition == prefixOrSuffixIndexes.Count)
+                {
+                    prefixOrSuffixIndexes = createIndexes(singleSoundsWithPrefixOrSuffix.Count());
+                    prefixOrSuffixIndexesPosition = 0;
+                }
+                SingleSound ss = singleSoundsWithPrefixOrSuffix[prefixOrSuffixIndexes[prefixOrSuffixIndexesPosition]];
+                prefixOrSuffixIndexesPosition++;
+                return ss;
             } 
             else if (singleSoundsNoPrefixOrSuffix.Count > 0)
             {
-                return singleSoundsNoPrefixOrSuffix[SoundCache.random.Next(0, singleSoundsNoPrefixOrSuffix.Count)];
+                if (indexes == null || indexesPosition == indexes.Count)
+                {
+                    indexes = createIndexes(singleSoundsNoPrefixOrSuffix.Count());
+                    indexesPosition = 0;
+                }
+                SingleSound ss = singleSoundsNoPrefixOrSuffix[indexes[indexesPosition]];
+                indexesPosition++;
+                return ss;
             }
             else
             {
                 return null;
             }
+        }
+
+        private List<int> createIndexes(int count)
+        {
+            List<int> indexes = new List<int>();
+            for (int i = 0; i < count; i++)
+            {
+                indexes.Add(i);
+            }
+            shuffle(indexes);
+            return indexes;
         }
 
         public int UnLoadAll()

@@ -90,7 +90,7 @@ namespace CrewChiefV4.Events
             audioPlayer.playMessage(new QueuedMessage(folderTest, 0, this));        
             testDriverNames();
             
-            /* audioPlayer.playMessage(new QueuedMessage(LapCounter.folderGetReady, 0, this));
+             audioPlayer.playMessage(new QueuedMessage(LapCounter.folderGetReady, 0, this));
             audioPlayer.playMessage(new QueuedMessage(MandatoryPitStops.folderMandatoryPitStopsPitThisLap, 0, this));
             audioPlayer.playMessage(new QueuedMessage(MandatoryPitStops.folderMandatoryPitStopsFitPrimesThisLap, 0, this));
             audioPlayer.playMessage(new QueuedMessage(Position.folderBeingOvertaken, 0, this));
@@ -116,14 +116,14 @@ namespace CrewChiefV4.Events
                                ConditionsMonitor.folderAirTempIsNow, 26,
                                ConditionsMonitor.folderTrackTempIsNow, 32, ConditionsMonitor.folderCelsius), 0, this));
             audioPlayer.playMessage(new QueuedMessage("Fuel/estimate", MessageContents(
-                                        Fuel.folderWeEstimate, QueuedMessage.folderNameNumbersStub + 12, Fuel.folderMinutesRemaining), 0, this));
+                                        Fuel.folderWeEstimate, 12, Fuel.folderMinutesRemaining), 0, this));
             audioPlayer.playMessage(new QueuedMessage("laptime", MessageContents(LapTimes.folderLapTimeIntro, 
                 TimeSpan.FromSeconds(60 + (random.NextDouble() * 60))), 0, this));
 
             audioPlayer.playMessage(new QueuedMessage("yesBoxAfter", MessageContents(MandatoryPitStops.folderMandatoryPitStopsYesStopAfter,
-                QueuedMessage.folderNameNumbersStub + 10, MandatoryPitStops.folderMandatoryPitStopsMinutes), 0, null));
-            audioPlayer.queueClip(new QueuedMessage("laps_on_current_tyres", MessageContents(TyreMonitor.folderLapsOnCurrentTyresIntro,
-                QueuedMessage.folderNameNumbersStub + 5, TyreMonitor.folderLapsOnCurrentTyresOutro), 0, this));*/
+                10, MandatoryPitStops.folderMandatoryPitStopsMinutes), 0, null));
+            audioPlayer.playMessage(new QueuedMessage("laps_on_current_tyres", MessageContents(TyreMonitor.folderLapsOnCurrentTyresIntro,
+                5, TyreMonitor.folderLapsOnCurrentTyresOutro), 0, this));
 
         }
     }
