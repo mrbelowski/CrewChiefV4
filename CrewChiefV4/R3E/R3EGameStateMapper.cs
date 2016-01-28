@@ -628,7 +628,8 @@ namespace CrewChiefV4.RaceRoom
                                     isEnteringPits || isLeavingPits, participantStruct.current_lap_valid == 1,
                                     currentGameState.SessionData.SessionRunningTime, secondsSinceLastUpdate,
                                     new float[] { participantStruct.position.X, participantStruct.position.Z }, previousOpponentWorldPosition,
-                                    participantStruct.lap_distance, participantStruct.tire_type, participantStruct.driver_info.class_id);
+                                    participantStruct.lap_distance, participantStruct.tire_type, participantStruct.driver_info.class_id,
+                                    currentGameState.SessionData.SessionHasFixedTime, currentGameState.SessionData.SessionTimeRemaining);
                             if (newOpponentLap)
                             {
                                 if (currentOpponentData.CurrentBestLapTime > 0)
@@ -1246,8 +1247,8 @@ namespace CrewChiefV4.RaceRoom
         }
 
         private void upateOpponentData(OpponentData opponentData, int racePosition, int unfilteredRacePosition, int completedLaps, int sector, float sectorTime, 
-            float completedLapTime, Boolean isInPits, Boolean lapIsValid, float sessionRunningTime, float secondsSinceLastUpdate, float[] currentWorldPosition, 
-            float[] previousWorldPosition, float distanceRoundTrack, int tire_type, int carClassId)
+            float completedLapTime, Boolean isInPits, Boolean lapIsValid, float sessionRunningTime, float secondsSinceLastUpdate, float[] currentWorldPosition,
+            float[] previousWorldPosition, float distanceRoundTrack, int tire_type, int carClassId, Boolean sessionLengthIsTime, float sessionTimeRemaining)
         {
             opponentData.DistanceRoundTrack = distanceRoundTrack;
             float speed;
@@ -1276,7 +1277,7 @@ namespace CrewChiefV4.RaceRoom
                     if (opponentData.OpponentLapData.Count > 0)
                     {
                         opponentData.CompleteLapWithProvidedLapTime(racePosition, sessionRunningTime, completedLapTime,
-                            lapIsValid && validSpeed, false, 20, 20);
+                            lapIsValid && validSpeed, false, 20, 20, sessionLengthIsTime, sessionTimeRemaining);
                     }
                     opponentData.StartNewLap(completedLaps + 1, racePosition, isInPits, sessionRunningTime, false, 20, 20);
                     opponentData.IsNewLap = true;

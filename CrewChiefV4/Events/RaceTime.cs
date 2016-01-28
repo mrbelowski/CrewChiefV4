@@ -71,7 +71,7 @@ namespace CrewChiefV4.Events
             addExtraLapForDTM2015 = false;
             startedDTM2015ExtraLap = false;
         }
-
+        
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
             addExtraLapForDTM2015 = currentGameState.carClass.carClassEnum == CarData.CarClassEnum.DTM_2015;
@@ -117,36 +117,43 @@ namespace CrewChiefV4.Events
                     }
                 }
 
-                // this event only works if we're leading because we don't know when the leader 
-                // crosses the line :(
-
-                // TODO: the above is no longer true - rework this
                 if (currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.IsNewLap &&
-                    currentGameState.SessionData.SessionRunningTime > 60 && !playedLastLap &&
-                    currentGameState.SessionData.Position == 1 &&
-                    ((!addExtraLapForDTM2015 && timeLeft > 0 && timeLeft < currentGameState.SessionData.PlayerLapTimeSessionBest) ||
-                    (addExtraLapForDTM2015 && timeLeft <= 0)))
+                    currentGameState.SessionData.SessionRunningTime > 60 && !playedLastLap)
                 {
-                    playedLastLap = true;
-                    played2mins = true;
-                    played5mins = true;
-                    played10mins = true;
-                    played15mins = true;
-                    played20mins = true;
-                    playedHalfWayHome = true;
+                    Boolean timeWillBeZeroAtEndOfLeadersLap = false;
                     if (currentGameState.SessionData.Position == 1)
                     {
-                        // don't add a pearl here - the audio clip already contains encouragement
-                        audioPlayer.playMessage(new QueuedMessage(folderLastLapLeading, 0, this), pearlType, 0);
-                    }
-                    else if (currentGameState.SessionData.Position < 4)
-                    {
-                        // don't add a pearl here - the audio clip already contains encouragement
-                        audioPlayer.playMessage(new QueuedMessage(folderLastLapPodium, 0, this), pearlType, 0);
+                        timeWillBeZeroAtEndOfLeadersLap = timeLeft > 0 && currentGameState.SessionData.PlayerLapTimeSessionBest > 0 &&
+                            timeLeft < currentGameState.SessionData.PlayerLapTimeSessionBest - 5;
                     }
                     else
                     {
-                        audioPlayer.playMessage(new QueuedMessage(folderLastLap, 0, this), pearlType, 0.7);
+                        OpponentData leader = currentGameState.getOpponentAtPosition(1, true);
+                        timeWillBeZeroAtEndOfLeadersLap = leader != null && leader.isProbablyLastLap;
+                    }
+                    if ((addExtraLapForDTM2015 && timeLeft <= 0) ||
+                        (!addExtraLapForDTM2015 && timeWillBeZeroAtEndOfLeadersLap)) {
+                        playedLastLap = true;
+                        played2mins = true;
+                        played5mins = true;
+                        played10mins = true;
+                        played15mins = true;
+                        played20mins = true;
+                        playedHalfWayHome = true;
+                        if (currentGameState.SessionData.Position == 1)
+                        {
+                            // don't add a pearl here - the audio clip already contains encouragement
+                            audioPlayer.playMessage(new QueuedMessage(folderLastLapLeading, 0, this), pearlType, 0);
+                        }
+                        else if (currentGameState.SessionData.Position < 4)
+                        {
+                            // don't add a pearl here - the audio clip already contains encouragement
+                            audioPlayer.playMessage(new QueuedMessage(folderLastLapPodium, 0, this), pearlType, 0);
+                        }
+                        else
+                        {
+                            audioPlayer.playMessage(new QueuedMessage(folderLastLap, 0, this), pearlType, 0.7);
+                        }
                     }
                 }
                 if (currentGameState.SessionData.SessionRunningTime > 60 && timeLeft / 60 < 3 && timeLeft / 60 > 2.9)

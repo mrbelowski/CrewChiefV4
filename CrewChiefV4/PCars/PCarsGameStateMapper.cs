@@ -728,7 +728,8 @@ namespace CrewChiefV4.PCars
                                             currentOpponentSector, isEnteringPits || isLeavingPits, currentGameState.SessionData.SessionRunningTime, secondsSinceLastUpdate,
                                             new float[] { participantStruct.mWorldPosition[0], participantStruct.mWorldPosition[2] }, previousOpponentWorldPosition,
                                             previousOpponentSpeed, shared.mWorldFastestLapTime, participantStruct.mCurrentLapDistance, shared.mRainDensity == 1,
-                                            shared.mAmbientTemperature, shared.mTrackTemperature, opponentCarClass);
+                                            shared.mAmbientTemperature, shared.mTrackTemperature, opponentCarClass,
+                                            currentGameState.SessionData.SessionHasFixedTime, currentGameState.SessionData.SessionTimeRemaining);
                                     if (currentOpponentData.IsNewLap && currentOpponentData.CurrentBestLapTime > 0)
                                     {
                                         if (currentGameState.SessionData.OpponentsLapTimeSessionBestOverall == -1 ||
@@ -1068,7 +1069,8 @@ namespace CrewChiefV4.PCars
 
         private void upateOpponentData(OpponentData opponentData, String name, int racePosition, int completedLaps, int sector, Boolean isInPits,
             float sessionRunningTime, float secondsSinceLastUpdate, float[] currentWorldPosition, float[] previousWorldPosition,
-            float previousSpeed, float worldRecordLapTime, float distanceRoundTrack, Boolean isRaining, float trackTemp, float airTemp, CarData.CarClass carClass)
+            float previousSpeed, float worldRecordLapTime, float distanceRoundTrack, Boolean isRaining, float trackTemp, float airTemp, CarData.CarClass carClass,
+            Boolean sessionLengthIsTime, float sessionTimeRemaining)
         {
             if (opponentData.DriverRawName.StartsWith(NULL_CHAR_STAND_IN) && name != null && name.Trim().Length > 0 && !name.StartsWith(NULL_CHAR_STAND_IN))
             {
@@ -1125,7 +1127,7 @@ namespace CrewChiefV4.PCars
                     if (opponentData.OpponentLapData.Count > 0)
                     {
                         opponentData.CompleteLapWithEstimatedLapTime(racePosition, sessionRunningTime, worldRecordLapTime, validSpeed,
-                            isRaining, trackTemp, airTemp);
+                            isRaining, trackTemp, airTemp, sessionLengthIsTime, sessionTimeRemaining);
                     }
                     opponentData.StartNewLap(completedLaps + 1, racePosition, isInPits, sessionRunningTime, isRaining, trackTemp, airTemp);
                     opponentData.IsNewLap = true;

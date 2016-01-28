@@ -316,6 +316,8 @@ namespace CrewChiefV4.GameState
 
         public TyreType CurrentTyres = TyreType.Unknown_Race;
 
+        public Boolean isProbablyLastLap = false;
+
         public LapData getCurrentLapData()
         {
             if (OpponentLapData.Count > 0)
@@ -435,7 +437,7 @@ namespace CrewChiefV4.GameState
         }
 
         public void CompleteLapWithEstimatedLapTime(int position, float gameTimeAtLapEnd, float worldRecordLapTime,
-            Boolean lapIsValid, Boolean isRaining, float trackTemp, float airTemp)
+            Boolean lapIsValid, Boolean isRaining, float trackTemp, float airTemp, Boolean sessionLengthIsTime, float sessionTimeRemaining)
         {
             AddSectorData(position, -1, gameTimeAtLapEnd, lapIsValid, isRaining, trackTemp, airTemp);
             if (OpponentLapData.Count > 0)
@@ -462,10 +464,14 @@ namespace CrewChiefV4.GameState
                     }
                 }
             }
+            if (sessionLengthIsTime && sessionTimeRemaining > 0 && CurrentBestLapTime > 0 && sessionTimeRemaining < CurrentBestLapTime - 5)
+            {
+                isProbablyLastLap = true;
+            }
         }
 
         public void CompleteLapWithProvidedLapTime(int position, float gameTimeAtLapEnd, float providedLapTime,
-            Boolean lapIsValid, Boolean isRaining, float trackTemp, float airTemp)
+            Boolean lapIsValid, Boolean isRaining, float trackTemp, float airTemp, Boolean sessionLengthIsTime, float sessionTimeRemaining)
         {            
             if (OpponentLapData.Count > 0)
             {                
@@ -479,6 +485,10 @@ namespace CrewChiefV4.GameState
                     CurrentBestLapTime = lapData.LapTime;
                 }
                 LastLapValid = lapData.IsValid;
+            }
+            if (sessionLengthIsTime && sessionTimeRemaining > 0 && CurrentBestLapTime > 0 && sessionTimeRemaining < CurrentBestLapTime - 5)
+            {
+                isProbablyLastLap = true;
             }
         }
 
@@ -911,7 +921,7 @@ namespace CrewChiefV4.GameState
         {
             return SessionData.UnFilteredPosition == SessionData.NumCars;
         }
-
+        
         public List<String> getRawDriverNames()
         {
             List<String> rawDriverNames = new List<String>();
