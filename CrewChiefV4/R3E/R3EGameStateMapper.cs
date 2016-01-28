@@ -442,6 +442,10 @@ namespace CrewChiefV4.RaceRoom
                                     currentGameState.SessionData.PlayerBestLapSector3Time = currentGameState.SessionData.LastSector3Time;
                                 }
                             }
+                            else
+                            {
+                                currentGameState.SessionData.LastSector3Time = -1;
+                            }
                         }
                         else if (participantStruct.track_sector == 2)
                         {
@@ -453,7 +457,11 @@ namespace CrewChiefV4.RaceRoom
                                 {
                                     currentGameState.SessionData.PlayerBestSector1Time = currentGameState.SessionData.LastSector1Time;
                                 }
-                            }                           
+                            }
+                            else
+                            {
+                                currentGameState.SessionData.LastSector1Time = -1;
+                            }                        
                         }
                         else if (participantStruct.track_sector == 3)
                         {
@@ -466,6 +474,10 @@ namespace CrewChiefV4.RaceRoom
                                 {
                                     currentGameState.SessionData.PlayerBestSector2Time = currentGameState.SessionData.LastSector2Time;
                                 }
+                            }
+                            else
+                            {
+                                currentGameState.SessionData.LastSector2Time = -1;
                             }
                         }
 
