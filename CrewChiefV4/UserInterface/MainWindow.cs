@@ -22,8 +22,6 @@ namespace CrewChiefV4
 {
     public partial class MainWindow : Form
     {
-        public static StringBuilder debugSB = new StringBuilder();
-
         private String baseDriverNamesDownloadLocation;
         private String updateDriverNamesDownloadLocation;
         private String driverNamesTempFileName = "temp_driver_names.zip";
@@ -259,6 +257,7 @@ namespace CrewChiefV4
             this.playbackInterval.Visible = System.Diagnostics.Debugger.IsAttached;
             CheckForIllegalCrossThreadCalls = false;
             Console.SetOut(new ControlWriter(textBox1));
+
             crewChief = new CrewChief();
             float messagesVolume = UserSettings.GetUserSettings().getFloat("messages_volume");
             float backgroundVolume = UserSettings.GetUserSettings().getFloat("background_volume");
@@ -726,7 +725,6 @@ namespace CrewChiefV4
                     lock (this)
                     {
                         textBox1.Text = "";
-                        debugSB.Clear();
                     }
                 }
                 catch (Exception)
@@ -967,53 +965,23 @@ namespace CrewChiefV4
     public class ControlWriter : TextWriter
     {
         private TextBox textbox;
-        private DateTime lastWrite = DateTime.Now;
-        private TimeSpan timeBetweenLogs = TimeSpan.FromSeconds(1);
-        private Boolean hasNewText = false;
         public ControlWriter(TextBox textbox)
         {
             this.textbox = textbox;
-            new Thread(() =>
-            {
-                Thread.CurrentThread.IsBackground = true;
-                while (!textbox.IsDisposed)
-                {
-                    String textToAdd = null;
-                    lock (this)
-                    {
-                        if (hasNewText)
-                        {
-                            textToAdd = MainWindow.debugSB.ToString();
-                            hasNewText = false;
-                            MainWindow.debugSB.Clear();
-                        }
-                    }
-                    if (textToAdd != null) 
-                    {
-                        try
-                        {
-                            textbox.AppendText(textToAdd);
-                        }
-                        catch (Exception) { }                        
-                    }
-                    Thread.Sleep(timeBetweenLogs);
-                }
-            }).Start();
         }
 
         public override void WriteLine(string value)
-        {            
-            lock (this)
+        {
+            if (!textbox.IsDisposed)
             {
                 try
                 {
-                    MainWindow.debugSB.Append(DateTime.Now.ToString("HH:mm:ss.fff"));
-                    MainWindow.debugSB.Append(" : ");
-                    MainWindow.debugSB.Append(value);
-                    MainWindow.debugSB.AppendLine();
-                    hasNewText = true;
+                    StringBuilder sb = new StringBuilder();
+                    sb.Append(DateTime.Now.ToString("HH:mm:ss.fff")).Append(" : ").Append(value).AppendLine();
+                    textbox.AppendText(sb.ToString());
                 }
-                catch (Exception) { 
+                catch (Exception)
+                {
                     // swallow - nothing to log it to
                 }
             }
