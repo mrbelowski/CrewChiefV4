@@ -966,42 +966,29 @@ namespace CrewChiefV4
             this.textbox = textbox;
         }
 
-        public override void Write(char value)
-        {
-            if (!textbox.IsDisposed)
-            {
-                textbox.AppendText(value.ToString());
-            }
-        }
-
-        public override void Write(string value)
-        {
-            if (!textbox.IsDisposed)
-            {
-                textbox.AppendText(value);
-            }
-        }
-
         public override void WriteLine(string value)
         {
-            if (!textbox.IsDisposed)
+            lock (this)
             {
-                try
+                if (!textbox.IsDisposed)
                 {
-                    textbox.AppendText(DateTime.Now.ToString("HH:mm:ss.fff"));
-                    textbox.AppendText(" : ");
-                    textbox.AppendText(value + "\n");
-                }
-                catch (Exception)
-                {
-                    // swallow - nothing to log it to
+                    try
+                    {
+                        textbox.AppendText(DateTime.Now.ToString("HH:mm:ss.fff"));
+                        textbox.AppendText(" : ");
+                        textbox.AppendText(value + "\n");
+                    }
+                    catch (Exception)
+                    {
+                        // swallow - nothing to log it to
+                    }
                 }
             }
         }
 
         public override Encoding Encoding
         {
-            get { return Encoding.ASCII; }
+            get { return Encoding.UTF8; }
         }
     }
 

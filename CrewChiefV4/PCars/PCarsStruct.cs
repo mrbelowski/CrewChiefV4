@@ -11,7 +11,19 @@ namespace CrewChiefV4.PCars
 {
     public class StructHelper
     {
-        public static String NULL_CHAR = Encoding.GetEncoding("Windows-1252").GetString(new byte[]{0}, 0, 1);
+        public static String ENCODING = "UTF-8";
+        public static String NULL_CHAR;
+        static StructHelper() {
+            try {
+                NULL_CHAR = Encoding.GetEncoding(ENCODING).GetString(new byte[] { 0 }, 0, 1);
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("Using default encoding");
+                ENCODING = "windows-1252";
+                NULL_CHAR = Encoding.GetEncoding(ENCODING).GetString(new byte[] { 0 }, 0, 1);
+            }
+        }
         public static pCarsAPIStruct Clone<pCarsAPIStruct>(pCarsAPIStruct pcarsStruct)
         {
             using (var ms = new MemoryStream())
@@ -249,12 +261,12 @@ namespace CrewChiefV4.PCars
             {
                 return "";
             }
-            String firstChar = Encoding.GetEncoding("Windows-1252").GetString(name, 0, 1).TrimEnd('\0');
+            String firstChar = Encoding.GetEncoding(ENCODING).GetString(name, 0, 1).TrimEnd('\0');
             if (name.Length == 1)
             {
                 return firstChar;
             }
-            String rest = Encoding.GetEncoding("Windows-1252").GetString(name, 1, name.Length - 1).TrimEnd('\0');
+            String rest = Encoding.GetEncoding(ENCODING).GetString(name, 1, name.Length - 1).TrimEnd('\0');
             if ((firstChar == null || firstChar.Trim().Length == 0) && (rest != null && rest.Trim().Length > 0))
             {
                 firstChar = PCarsGameStateMapper.NULL_CHAR_STAND_IN;

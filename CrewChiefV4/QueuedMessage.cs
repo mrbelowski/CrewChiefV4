@@ -291,7 +291,7 @@ namespace CrewChiefV4
                 // don't always use "hundred and"
                 Boolean addedHundreds = false;
                 if (tensAndUnits != null) {
-                    if (thousands != null || rand.NextDouble() > 0.6)
+                    if (hundreds.Count() == 2 || thousands != null || rand.NextDouble() > 0.6)
                     {
                         messages.Add(folderNameHundredAnd);
                         addedHundreds = true;
