@@ -978,18 +978,23 @@ namespace CrewChiefV4
                 Thread.CurrentThread.IsBackground = true;
                 while (!textbox.IsDisposed)
                 {
+                    String textToAdd = null;
                     lock (this)
                     {
                         if (hasNewText)
                         {
-                            try
-                            {
-                                textbox.AppendText(MainWindow.debugSB.ToString());
-                            }
-                            catch (Exception) { }
+                            textToAdd = MainWindow.debugSB.ToString();
                             hasNewText = false;
                             MainWindow.debugSB.Clear();
                         }
+                    }
+                    if (textToAdd != null) 
+                    {
+                        try
+                        {
+                            textbox.AppendText(textToAdd);
+                        }
+                        catch (Exception) { }                        
                     }
                     Thread.Sleep(timeBetweenLogs);
                 }
