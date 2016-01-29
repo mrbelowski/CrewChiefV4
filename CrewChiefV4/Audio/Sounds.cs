@@ -96,14 +96,15 @@ namespace CrewChiefV4.Audio
         {           
             SoundSet prefix = null;
             SoundSet suffix = null;
-            List<SingleSound> singleSoundsToPlay = new List<SingleSound>();
+            List<SingleSound> singleSoundsToPlay = new List<SingleSound>();            
             foreach (String soundName in soundNames)
             {
+                Boolean preferPersonalised = personalisedMessageIsDue();
                 SingleSound singleSound = null;
                 if (soundSets.ContainsKey(soundName))
                 {
                     SoundSet soundSet = soundSets[soundName];
-                    singleSound = soundSet.getSingleSound(personalisedMessageIsDue());
+                    singleSound = soundSet.getSingleSound(preferPersonalised);
                     if (!soundSet.keepCached)
                     {
                         if (dynamicLoadedSounds.Contains(soundName))
@@ -119,11 +120,14 @@ namespace CrewChiefV4.Audio
                 }
                 if (singleSound != null)
                 {
-                    if (singleSound.prefixSoundSet != null)
+                    // hack... we double check the prefer setting here and only play the prefix / suffix if it's true.
+                    // The list without prefixes and suffixes includes items which have optional ones, so we might want to
+                    // play a sound that can have the prefix / suffix, but not the associated prefix / suffix
+                    if (preferPersonalised && singleSound.prefixSoundSet != null)
                     {
                         prefix = singleSound.prefixSoundSet;
                     }
-                    if (singleSound.suffixSoundSet != null)
+                    if (preferPersonalised && singleSound.suffixSoundSet != null)
                     {
                         suffix = singleSound.suffixSoundSet;
                     }
