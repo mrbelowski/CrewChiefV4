@@ -20,7 +20,7 @@ namespace CrewChiefV4.PCars
             catch (Exception)
             {
                 Console.WriteLine("Using default encoding");
-                ENCODING = "iso-8859-15";
+                ENCODING = "cp1252";
                 NULL_CHAR = Encoding.GetEncoding(ENCODING).GetString(new byte[] { 0 }, 0, 1);
             }
         }

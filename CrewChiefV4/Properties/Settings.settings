@@ -321,7 +321,7 @@
       <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="pcars_character_encoding" Type="System.String" Scope="User">
-      <Value Profile="(Default)">iso-8859-15</Value>
+      <Value Profile="(Default)">cp1252</Value>
     </Setting>
   </Settings>
 </SettingsFile>

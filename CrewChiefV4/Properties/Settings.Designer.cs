@@ -1294,7 +1294,7 @@ namespace CrewChiefV4.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("iso-8859-15")]
+        [global::System.Configuration.DefaultSettingValueAttribute("cp1252")]
         public string pcars_character_encoding {
             get {
                 return ((string)(this["pcars_character_encoding"]));
