@@ -17,10 +17,10 @@ namespace CrewChiefV4.PCars
             try {
                 NULL_CHAR = Encoding.GetEncoding(ENCODING).GetString(new byte[] { 0 }, 0, 1);
             }
-            catch (Exception)
+            catch (System.ArgumentException)
             {
                 Console.WriteLine("Using default encoding");
-                ENCODING = "cp1252";
+                ENCODING = "windows-1252";
                 NULL_CHAR = Encoding.GetEncoding(ENCODING).GetString(new byte[] { 0 }, 0, 1);
             }
         }
