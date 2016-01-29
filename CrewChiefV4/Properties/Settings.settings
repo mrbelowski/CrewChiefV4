@@ -320,5 +320,8 @@
     <Setting Name="load_sound_files_on_startup" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
+    <Setting Name="pcars_character_encoding" Type="System.String" Scope="User">
+      <Value Profile="(Default)">iso-8859-15</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

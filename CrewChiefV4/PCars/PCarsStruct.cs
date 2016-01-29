@@ -11,7 +11,7 @@ namespace CrewChiefV4.PCars
 {
     public class StructHelper
     {
-        public static String ENCODING = "UTF-8";
+        public static String ENCODING = UserSettings.GetUserSettings().getString("pcars_character_encoding");
         public static String NULL_CHAR;
         static StructHelper() {
             try {
@@ -20,7 +20,7 @@ namespace CrewChiefV4.PCars
             catch (Exception)
             {
                 Console.WriteLine("Using default encoding");
-                ENCODING = "windows-1252";
+                ENCODING = "iso-8859-15";
                 NULL_CHAR = Encoding.GetEncoding(ENCODING).GetString(new byte[] { 0 }, 0, 1);
             }
         }

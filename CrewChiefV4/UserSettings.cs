@@ -75,7 +75,8 @@ namespace CrewChiefV4
             propertyHelp.Add("report_track_temp_changes_greater_than", "Report track temperature if it's changed by more than this amount (in celsius)");
             propertyHelp.Add("pause_between_messages", "Time pause between messages (in seconds) when reading multiple messages together in a single group.");
             propertyHelp.Add("load_sound_files_on_startup", "Load all the sounds when the app starts up. This may make app start times quite long, but prevents the app having to load stuff while you're racing.");
-            
+            propertyHelp.Add("pcars_character_encoding", "For PC and XBox this will usually be iso-8859-15. For PS4 always use UTF-8.");
+
         }
 
         public String getHelp(String propertyId)

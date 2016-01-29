@@ -1291,5 +1291,17 @@ namespace CrewChiefV4.Properties {
                 this["load_sound_files_on_startup"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("iso-8859-15")]
+        public string pcars_character_encoding {
+            get {
+                return ((string)(this["pcars_character_encoding"]));
+            }
+            set {
+                this["pcars_character_encoding"] = value;
+            }
+        }
     }
 }
