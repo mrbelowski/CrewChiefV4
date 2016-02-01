@@ -69,9 +69,9 @@ namespace CrewChiefV4
 
         public enum CarClassEnum
         {
-            GT1X, GT1, GT2, ADAC_GTM_2014, ADAC_GTM_2013, GT3, GT4, GT5, Kart_1, Kart_2, LMP1, LMP2, LMP3, ROAD_B, ROAD_C1, ROAD_C2, ROAD_D, ROAD_SUPERCAR, GROUPC, GROUPA, GROUP4, GROUP5,
+            GT1X, GT1, GT2, ADAC_GTM_2014, ADAC_GTM_2013, GT3, GT4, GT5, Kart_1, Kart_2, LMP1, LMP2, LMP3, ROAD_B, ROAD_C1, ROAD_C2, ROAD_D, ROAD_SUPERCAR, GROUPC, GROUPA, GROUP4, GROUP5, GROUP6,
             VINTAGE_F1_A, VINTAGE_GT3, VINTAGE_GT, HISTORIC_TOURING_1, HISTORIC_TOURING_2, VINTAGE_F1_B, VINTAGE_F1_C, STOCK_CAR, F1, F2, F3, F4, FF, TC1, TC2, AUDI_TT_CUP, CLIO_CUP, DTM, DTM_2013,
-            V8_SUPERCAR, DTM_2014, DTM_2015, TRANS_AM, HILL_CLIMB_ICONS, UNKNOWN_RACE
+            V8_SUPERCAR, DTM_2014, DTM_2015, TRANS_AM, HILL_CLIMB_ICONS, FORMULA_RENAULT, MEGANE_TROPHY, UNKNOWN_RACE
         }
 
         public class CarClass
@@ -143,12 +143,15 @@ namespace CrewChiefV4
             carClasses.Add(new CarClass(CarClassEnum.LMP3, new String[] { "LMP3" }, new int[] { 1828, 255 }, BrakeType.Ceramic, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp));
 
             carClasses.Add(new CarClass(CarClassEnum.GROUPC, new String[] { "Group C1" }, new int[] { }, BrakeType.Ceramic, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp));
+            carClasses.Add(new CarClass(CarClassEnum.GROUP6, new String[] { "Group 6" }, new int[] { }, BrakeType.Iron_Race, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp));
             carClasses.Add(new CarClass(CarClassEnum.GROUP5, new String[] { "Group 5" }, new int[] { 1708, 1713 }, BrakeType.Iron_Race, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp));
             carClasses.Add(new CarClass(CarClassEnum.GROUP4, new String[] { "Group 4" }, new int[] { 2378 }, BrakeType.Iron_Race, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp));
             carClasses.Add(new CarClass(CarClassEnum.GROUPA, new String[] { "Group A" }, new int[] { 1712, 3499 }, BrakeType.Iron_Race, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp)); // just for reference...
 
             carClasses.Add(new CarClass(CarClassEnum.F1, new String[] { "FA" }, new int[] {  }, BrakeType.Carbon, TyreType.Unknown_Race, maxExoticRaceSafeWaterTemp, maxExoticRaceSafeOilTemp));
             carClasses.Add(new CarClass(CarClassEnum.F2, new String[] { "FB" }, new int[] {4597 }, BrakeType.Carbon, TyreType.Unknown_Race, maxExoticRaceSafeWaterTemp, maxExoticRaceSafeOilTemp));
+            carClasses.Add(new CarClass(CarClassEnum.FORMULA_RENAULT, new String[] { "Forumula Renault" }, new int[] { }, BrakeType.Carbon, TyreType.Unknown_Race, maxExoticRaceSafeWaterTemp, maxExoticRaceSafeOilTemp, carMinTyreCircumference, carMaxTyreCircumference));
+
             carClasses.Add(new CarClass(CarClassEnum.F3, new String[] { "FC" }, new int[] {  }, BrakeType.Ceramic, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp));
             carClasses.Add(new CarClass(CarClassEnum.F4, new String[] { "F4" }, new int[] {  }, BrakeType.Iron_Race, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp));
             carClasses.Add(new CarClass(CarClassEnum.FF, new String[] { "F5" }, new int[] {  }, BrakeType.Iron_Race, TyreType.Unknown_Race, maxRoadSafeWaterTemp, maxRoadSafeOilTemp));   // formula ford
@@ -170,6 +173,7 @@ namespace CrewChiefV4
             carClasses.Add(new CarClass(CarClassEnum.DTM_2014, new String[] { }, new int[] { 3086 }, BrakeType.Carbon, TyreType.Unknown_Race, maxExoticRaceSafeWaterTemp, maxExoticRaceSafeOilTemp)); // modern DTM
             carClasses.Add(new CarClass(CarClassEnum.DTM_2015, new String[] { }, new int[] { 4260 }, BrakeType.Carbon, TyreType.Unknown_Race, maxExoticRaceSafeWaterTemp, maxExoticRaceSafeOilTemp)); // modern DTM
             carClasses.Add(new CarClass(CarClassEnum.CLIO_CUP, new String[] { "TC1" }, new int[] { }, BrakeType.Iron_Race, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp)); // clios
+            carClasses.Add(new CarClass(CarClassEnum.MEGANE_TROPHY, new String[] { "Megane Trophy" }, new int[] { }, BrakeType.Iron_Race, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp)); // clios
             carClasses.Add(new CarClass(CarClassEnum.TC1, new String[] { "WTCC_2014" }, new int[] { 3905 }, BrakeType.Iron_Race, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp)); // clios
             carClasses.Add(new CarClass(CarClassEnum.TC2, new String[] { "BTCC, WTCC_2013", "TC2" }, new int[] { 1922 }, BrakeType.Iron_Race, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp)); // clios
             carClasses.Add(new CarClass(CarClassEnum.AUDI_TT_CUP, new String[] { "Audi TT Cup" }, new int[] { 4680 }, BrakeType.Iron_Race, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp, carMinTyreCircumference, carMaxTyreCircumference));

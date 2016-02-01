@@ -178,9 +178,10 @@ namespace CrewChiefV4.PCars
                 sParticipantInfo newPartInfo = udpTelemetryData.sParticipantInfo[i];
                 Boolean isActive = (newPartInfo.sRacePosition >> 7) == 1;
                 pCarsAPIParticipantStruct existingPartInfo = existingState.mParticipantData[i];
-                existingPartInfo.mIsActive = isActive;
+                
                 if (isActive)
-                {                      
+                {
+                    existingPartInfo.mIsActive = i < existingState.mNumParticipants;
                     existingPartInfo.mCurrentLap = newPartInfo.sCurrentLap;
                     existingPartInfo.mCurrentLapDistance = newPartInfo.sCurrentLapDistance;
                     existingPartInfo.mLapsCompleted = (uint) newPartInfo.sLapsCompleted & 127;

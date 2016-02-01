@@ -231,10 +231,17 @@ namespace CrewChiefV4
                 String lastDef = UserSettings.GetUserSettings().getString("last_game_definition");
                 if (lastDef != null && lastDef.Length > 0)
                 {
-                    GameDefinition gameDefinition = GameDefinition.getGameDefinitionForEnumName(lastDef);
-                    if (gameDefinition != null)
+                    try
                     {
-                        this.gameDefinitionList.Text = gameDefinition.friendlyName;
+                        GameDefinition gameDefinition = GameDefinition.getGameDefinitionForEnumName(lastDef);
+                        if (gameDefinition != null)
+                        {
+                            this.gameDefinitionList.Text = gameDefinition.friendlyName;
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        //ignore, just don't set the value in the list
                     }
                 }
             }

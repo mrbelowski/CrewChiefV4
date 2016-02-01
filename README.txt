@@ -2,6 +2,30 @@ CrewChief version 4.
 
 Changelog
 ---------
+Version 4.1.1.4: Added some car classes and Bannockbrae track for PCars; Remove stale opponents in PCars; Some internal error handling
+
+Version 4.1.1.3: Allow messages with optional prefixes / suffixes to play without their prefixes or suffixes; Tidied up String encoding handling; Reverted console logging change (after a couple of attempts - hence the version number jump)
+
+Version 4.1.1.0: Better selection of sound files from those available for each message - should give less repetition;Made the console logging a bit more efficient; Some String encoding rework for PCars. PS4 users should use UTF-8 for the pcars_character_encoding property, XBox and PC should use windows-1252; Added PCars V8 Supercar to car classes (more to come here); Fixed last-lap message for R3E timed races (should now work when you're not leading)
+
+Version 4.1.0.3: Fixed possible bug in pit detection that could cause repeated messages; Added 'can you hear me' speech recognition to check it's working (should respond with 'yes, I can hear you'); Take start position into account when generating race end message; A couple of internal bug fixes; A few sound pack tweaks to make the personalisation sounds work a little better
+
+Version 4.1.0.2: Renamed UDP network button data option to make it clearer that this takes button presses from the UDP stream, rather than from the device directly
+
+Version 4.1.0.1: More internal fixes to the radio channel handling logic to handle a couple of edge-cases where it wasn't closing the channel promptly; Spotter performance and latency improvements; Spotter logic fixes for cases where a '3 wide' turns into a 'car left' / 'car right'; Don't attempt to update and load a new driver name for an existing player if the new name isn't valid / usable; Tyre temp range tweaks; Check messages for validity and timeout just before playing them; Use separate class for each PCars Road car class; Handle broken PCars string data which had null characters in the middle of the String; PCars car class handling improvements
+
+Version 4.1.0.0: Internal audio handling overhaul - better queue handling, smarter caching of sound objects, more reliable radio channel state management (should prevent channel being left open); Added support for personalised message prefixes and suffixes; Spotter fix - reinstated missing width separation check to prevent spotter calls being made when a car is directly in front / behind but within the car length parameter; Internal audio handling overhaul - better queue handling, more reliable radio channel state management (should prevent channel being left open); Fixed number reading for some numbers; Fixed DTM 2014 tyre compound error in the 'box now' message; Validate overtake messages to ensure they're not out of date by the time they're played
+
+Version 4.0.3.5: Fixed major regression for Project Cars - hold all internal Strings as raw byte arrays (which may or may not have a null first character) and decode them when we need them
+
+Version 4.0.3.4: Internal rework for Project Cars to handle String data which occasionally starts with a null character. Should fix 'missing' opponents and incorrect car classes
+
+Version 4.0.3.3: Major spotter overhaul - changed the way app calculates opponent speeds, much more accurate. Should make a difference to the ghost calls
+
+Version 4.0.3.2: Overtaking messages tweak - make these a bit more likely; Increased some brake temp thresholds: Fixed "what's my best lap time" response; Stop the autoupdater running when the app starts listening for data; Added packet rate estimate to console output for PCars Network data
+
+Version 4.0.3.1: Fixed startup bug on initial install; Some fuel useage warning rework
+
 Version 4.0.3.0: Fixed overtaking messages in PCars (caused by noise in the opponent speed data - this is now based on a sliding average); Fixed baseline engine temperature calculations for RaceRoom; Corrected brake temp thresholds and engine damage thresholds; Some internal bug fixes in the spotter and numeric message handling; Do auto update checks in a background Thread; Fixed session time left reporting
 
 Version 4.0.2.0: Added optional default sound pack installation location override property ('override_default_sound_pack_location'); Fixed RaceRoom spotter ghost calls at some tracks; reworked laptime comparisons for practice and qual sessions; fixed "where's p X" response.
