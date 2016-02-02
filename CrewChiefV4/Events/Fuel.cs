@@ -121,6 +121,12 @@ namespace CrewChiefV4.Events
             hasBeenRefuelled = false;
         }
 
+        // fuel not implemented for HotLap modes
+        public override List<SessionType> applicableSessionTypes
+        {
+            get { return new List<SessionType> { SessionType.Practice, SessionType.Qualify, SessionType.Race }; }
+        }
+
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
             fuelUseActive = currentGameState.FuelData.FuelUseActive;

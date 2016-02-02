@@ -1253,7 +1253,7 @@ namespace CrewChiefV4.PCars
                     return SessionPhase.Finished;
                 }
             }
-            else if (sessionType == SessionType.Practice || sessionType == SessionType.Qualify)
+            else if (sessionType == SessionType.Practice || sessionType == SessionType.Qualify || sessionType == SessionType.HotLap)
             {
                 // yeah yeah....
                 if (sessionRunTime > 0 && sessionTimeRemaining <= 1)

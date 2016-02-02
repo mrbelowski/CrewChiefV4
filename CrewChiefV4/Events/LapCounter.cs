@@ -52,6 +52,11 @@ namespace CrewChiefV4.Events
             get { return new List<SessionPhase> { SessionPhase.Countdown, SessionPhase.Formation, SessionPhase.Gridwalk, SessionPhase.Green, SessionPhase.Checkered, SessionPhase.Finished }; }
         }
 
+        public override List<SessionType> applicableSessionTypes
+        {
+            get { return new List<SessionType> { SessionType.Practice, SessionType.Qualify, SessionType.Race }; }
+        }
+
         public LapCounter(AudioPlayer audioPlayer)
         {
             this.audioPlayer = audioPlayer;

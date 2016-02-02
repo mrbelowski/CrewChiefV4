@@ -55,6 +55,11 @@ namespace CrewChiefV4.Events
             minImprovementBeforeReadingOpponentRaceTime = (1f - maxOffPaceBeforeReadingOpponentRaceTime) / 5f;
         }
 
+        public override List<SessionType> applicableSessionTypes
+        {
+            get { return new List<SessionType> { SessionType.Practice, SessionType.Qualify, SessionType.Race }; }
+        }
+
         public override void clearState()
         {
             currentGameState = null;

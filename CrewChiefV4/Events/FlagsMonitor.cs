@@ -33,6 +33,11 @@ namespace CrewChiefV4.Events
             this.audioPlayer = audioPlayer;
         }
 
+        public override List<SessionType> applicableSessionTypes
+        {
+            get { return new List<SessionType> { SessionType.Practice, SessionType.Qualify, SessionType.Race }; }
+        }
+
         public override void clearState()
         {
             lastYellowFlagTime = DateTime.MinValue;

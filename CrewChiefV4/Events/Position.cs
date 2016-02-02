@@ -105,6 +105,11 @@ namespace CrewChiefV4.Events
             minTimeBetweenOvertakeMessages = TimeSpan.FromSeconds(20);
         }
 
+        public override List<SessionType> applicableSessionTypes
+        {
+            get { return new List<SessionType> { SessionType.Practice, SessionType.Qualify, SessionType.Race }; }
+        }
+
         public override void clearState()
         {
             previousPosition = 0;

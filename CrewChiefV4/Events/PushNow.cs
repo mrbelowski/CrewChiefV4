@@ -38,6 +38,11 @@ namespace CrewChiefV4.Events
             playedNearEndTimePush = false;
             playedNearEndLapsPush = false;
         }
+
+        public override List<SessionType> applicableSessionTypes
+        {
+            get { return new List<SessionType> { SessionType.Practice, SessionType.Qualify, SessionType.Race }; }
+        }
         
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {

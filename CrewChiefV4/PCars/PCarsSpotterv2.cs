@@ -71,8 +71,7 @@ namespace CrewChiefV4.PCars
         public void trigger(Object lastStateObj, Object currentStateObj)
         {
             if (paused)
-            {
-                
+            {                
                 return;
             }
             CrewChiefV4.PCars.PCarsSharedMemoryReader.PCarsStructWrapper currentWrapper = (CrewChiefV4.PCars.PCarsSharedMemoryReader.PCarsStructWrapper)currentStateObj;
@@ -83,8 +82,7 @@ namespace CrewChiefV4.PCars
                 (currentState.mGameState == (uint)eGameState.GAME_INGAME_PAUSED && !System.Diagnostics.Debugger.IsAttached) ||
                 currentState.mGameState == (uint)eGameState.GAME_VIEWING_REPLAY || currentState.mGameState == (uint)eGameState.GAME_EXITED)
             {
-                // don't ignore the paused game updates if we're in debug mode
-                
+                // don't ignore the paused game updates if we're in debug mode                
                 return;
             }
             CrewChiefV4.PCars.PCarsSharedMemoryReader.PCarsStructWrapper previousWrapper = (CrewChiefV4.PCars.PCarsSharedMemoryReader.PCarsStructWrapper)lastStateObj;
@@ -105,7 +103,7 @@ namespace CrewChiefV4.PCars
                 return;
             }
 
-            if (enabled && currentState.mParticipantData.Count() > 1)
+            if (enabled && currentState.mNumParticipants > 1 && currentState.mSessionState != (uint)eSessionState.SESSION_TIME_ATTACK)
             {
                 Tuple<int, pCarsAPIParticipantStruct> playerDataWithIndex = PCarsGameStateMapper.getPlayerDataStruct(currentState.mParticipantData, currentState.mViewedParticipantIndex);
                 int playerIndex = playerDataWithIndex.Item1;

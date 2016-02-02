@@ -138,7 +138,7 @@ namespace CrewChiefV4.Events
 
         public virtual List<SessionType> applicableSessionTypes 
         {
-            get { return new List<SessionType> { SessionType.Practice, SessionType.Qualify, SessionType.Race }; }
+            get { return new List<SessionType> { SessionType.Practice, SessionType.Qualify, SessionType.Race, SessionType.HotLap }; }
         }
 
         public virtual List<SessionPhase> applicableSessionPhases
