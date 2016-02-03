@@ -1,4 +1,5 @@
 ﻿using CrewChiefV4.GameState;
+using CrewChiefV4.UserInterface;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,13 +13,13 @@ namespace CrewChiefV4
     }
     public class GameDefinition
     {
-        public static GameDefinition pCars64Bit = new GameDefinition(GameEnum.PCARS_64BIT, "Project Cars (64 bit)", "pCARS64",
+        public static GameDefinition pCars64Bit = new GameDefinition(GameEnum.PCARS_64BIT, UIText.getString("pcars_64_bit"), "pCARS64",
             "CrewChiefV4.PCars.PCarsSpotterv2", "pcars64_launch_exe", "pcars64_launch_params", "launch_pcars");
-        public static GameDefinition pCars32Bit = new GameDefinition(GameEnum.PCARS_32BIT, "Project Cars (32 bit)", "pCARS",
+        public static GameDefinition pCars32Bit = new GameDefinition(GameEnum.PCARS_32BIT, UIText.getString("pcars_32_bit"), "pCARS",
             "CrewChiefV4.PCars.PCarsSpotterv2", "pcars32_launch_exe", "pcars32_launch_params", "launch_pcars");
-        public static GameDefinition raceRoom = new GameDefinition(GameEnum.RACE_ROOM, "Race Room", "RRRE", "CrewChiefV4.RaceRoom.R3ESpotterv2",
+        public static GameDefinition raceRoom = new GameDefinition(GameEnum.RACE_ROOM, UIText.getString("race_room"), "RRRE", "CrewChiefV4.RaceRoom.R3ESpotterv2",
             "r3e_launch_exe", "r3e_launch_params", "launch_raceroom");
-        public static GameDefinition pCarsNetwork = new GameDefinition(GameEnum.PCARS_NETWORK, "Project Cars (network data)", null, "CrewChiefV4.PCars.PCarsSpotterv2",
+        public static GameDefinition pCarsNetwork = new GameDefinition(GameEnum.PCARS_NETWORK, UIText.getString("pcars_udp"), null, "CrewChiefV4.PCars.PCarsSpotterv2",
             null, null, null);
 
         public static List<GameDefinition> getAllGameDefinitions()

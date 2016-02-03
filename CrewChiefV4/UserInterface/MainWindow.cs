@@ -17,6 +17,7 @@ using System.Net;
 using System.Xml.Linq;
 using System.IO.Compression;
 using CrewChiefV4.Audio;
+using CrewChiefV4.UserInterface;
 
 namespace CrewChiefV4
 {
@@ -82,8 +83,8 @@ namespace CrewChiefV4
                 try 
                 {
                     // now the sound packs
-                    downloadSoundPackButton.Text = "Checking sound pack version...";
-                    downloadDriverNamesButton.Text = "Checking driver names version...";
+                    downloadSoundPackButton.Text = UIText.getString("checking_sound_pack_version");
+                    downloadDriverNamesButton.Text = UIText.getString("checking_driver_names_version");
                     string xml = new WebClient().DownloadString(autoUpdateXMLURL);
                     XDocument doc = XDocument.Parse(xml);
                     float.TryParse(doc.Descendants("soundpackversion").First().Value, out latestSoundPackVersion);
@@ -94,7 +95,7 @@ namespace CrewChiefV4
                     updateDriverNamesDownloadLocation = doc.Descendants("updatedrivernamesurl").First().Value;
                     if (latestSoundPackVersion == -1 && AudioPlayer.soundPackVersion == -1)
                     {
-                        downloadSoundPackButton.Text = "No sound pack detected, unable to locate update";
+                        downloadSoundPackButton.Text = UIText.getString("no_sound_pack_detected_unable_to_locate_update");
                         downloadSoundPackButton.Enabled = false;
                         downloadSoundPackButton.BackColor = Color.LightGray;
                     }
@@ -104,23 +105,23 @@ namespace CrewChiefV4
                         downloadSoundPackButton.BackColor = Color.LightGreen;
                         if (AudioPlayer.soundPackVersion == -1)
                         {
-                            downloadSoundPackButton.Text = "No sound pack detected, press to download";
+                            downloadSoundPackButton.Text = UIText.getString("no_sound_pack_detected_press_to_download");
                             getBaseSoundPack = true;
                         }
                         else
                         {
-                            downloadSoundPackButton.Text = "Updated sound pack available, press to download";
+                            downloadSoundPackButton.Text = UIText.getString("updated_sound_pack_available_press_to_download");
                         }
                         newSoundPackAvailable = true;
                         downloadSoundPackButton.Enabled = true;
                     }
                     else
                     {
-                        downloadSoundPackButton.Text = "Sound pack is up to date";
+                        downloadSoundPackButton.Text = UIText.getString("sound_pack_is_up_to_date");
                         downloadSoundPackButton.BackColor = Color.LightGray;
                     }
                     if (latestDriverNamesVersion == -1 && AudioPlayer.driverNamesVersion == -1) {
-                        downloadDriverNamesButton.Text = "No driver names detected, unable to locate update";
+                        downloadDriverNamesButton.Text = UIText.getString("no_driver_names_detected_unable_to_locate_update");
                         downloadDriverNamesButton.Enabled = false;
                         downloadDriverNamesButton.BackColor = Color.LightGray;
                     } 
@@ -130,18 +131,18 @@ namespace CrewChiefV4
                         downloadDriverNamesButton.BackColor = Color.LightGreen;
                         if (AudioPlayer.driverNamesVersion == -1)
                         {
-                            downloadDriverNamesButton.Text = "No driver names detected, press to download";
+                            downloadDriverNamesButton.Text = UIText.getString("no_driver_names_detected_press_to_download");
                             getBaseDriverNames = true;
                         }
                         else
                         {
-                            downloadDriverNamesButton.Text = "Updated driver names available, press to download";
+                            downloadDriverNamesButton.Text = UIText.getString("updated_driver_names_available_press_to_download");
                         }
                         newDriverNamesAvailable = true;
                     }
                     else
                     {
-                        downloadDriverNamesButton.Text = "Driver names are up to date";
+                        downloadDriverNamesButton.Text = UIText.getString("driver_names_are_up_to_date");
                         downloadDriverNamesButton.Enabled = false;
                         downloadDriverNamesButton.BackColor = Color.LightGray;
                     }
@@ -186,7 +187,7 @@ namespace CrewChiefV4
             set
             {
                 _IsAppRunning = value;
-                startApplicationButton.Text = _IsAppRunning ? "Stop" : "Start Application";
+                startApplicationButton.Text = _IsAppRunning ? UIText.getString("stop") : UIText.getString("start_application");
                 downloadDriverNamesButton.Enabled = !value && newDriverNamesAvailable;
                 downloadSoundPackButton.Enabled = !value && newSoundPackAvailable;
             }
@@ -433,7 +434,7 @@ namespace CrewChiefV4
                 }
                 else
                 {
-                    MessageBox.Show("Please choose a game option", "No game selected",
+                    MessageBox.Show(UIText.getString("please_choose_a_game_option"), UIText.getString("no_game_selected"),
                         MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return;
                 }
@@ -565,7 +566,7 @@ namespace CrewChiefV4
                 if (this.controllersList.SelectedIndex >= 0 && this.buttonActionSelect.SelectedIndex >= 0)
                 {
                     isAssigningButton = true;
-                    this.assignButtonToAction.Text = "Waiting for button, click to cancel";
+                    this.assignButtonToAction.Text = UIText.getString("waiting_for_button_click_to_cancel");
                     ThreadStart assignButtonWork = assignButton;
                     Thread assignButtonThread = new Thread(assignButtonWork);
                     assignButtonThread.Start();
@@ -575,7 +576,7 @@ namespace CrewChiefV4
             {
                 isAssigningButton = false;
                 controllerConfiguration.listenForAssignment = false;
-                this.assignButtonToAction.Text = "Assign";
+                this.assignButtonToAction.Text = UIText.getString("assign");
             }
         }
 
@@ -610,7 +611,7 @@ namespace CrewChiefV4
                 }
                 runListenForButtonPressesThread = controllerConfiguration.listenForButtons(voiceOption == VoiceOptionEnum.TOGGLE);
             }
-            this.assignButtonToAction.Text = "Assign";
+            this.assignButtonToAction.Text = UIText.getString("assign");
             controllerConfiguration.saveSettings();
         }
 
@@ -827,7 +828,7 @@ namespace CrewChiefV4
             {
                 if (e.Error == null && !e.Cancelled)
                 {
-                    downloadSoundPackButton.Text = "Extracting sound pack...";
+                    downloadSoundPackButton.Text = UIText.getString("extracting_sound_pack");
                     if (Directory.Exists(AudioPlayer.soundFilesPath + @"\sounds_temp"))
                     {
                         Directory.Delete(AudioPlayer.soundFilesPath + @"\sounds_temp", true);
@@ -839,7 +840,7 @@ namespace CrewChiefV4
                     UpdateHelper.ProcessFileUpdates(AudioPlayer.soundFilesPath + @"\sounds_temp");
                     UpdateHelper.MoveDirectory(AudioPlayer.soundFilesPath + @"\sounds_temp", AudioPlayer.soundFilesPath);    
                     success = true;
-                    downloadSoundPackButton.Text = "Sound pack is up to date";
+                    downloadSoundPackButton.Text = UIText.getString("sound_pack_is_up_to_date");
                 }
             }
             catch (Exception) { }
@@ -865,16 +866,16 @@ namespace CrewChiefV4
                 startApplicationButton.Enabled = !isDownloadingDriverNames;
                 if (AudioPlayer.soundPackVersion == -1)
                 {
-                    downloadSoundPackButton.Text = "No sound pack detected, press to download";
+                    downloadSoundPackButton.Text = UIText.getString("no_sound_pack_detected_press_to_download");
                 }
                 else
                 {
-                    downloadSoundPackButton.Text = "Updated sound pack available, press to download";
+                    downloadSoundPackButton.Text = UIText.getString("updated_sound_pack_available_press_to_download");
                 }
                 downloadSoundPackButton.Enabled = true;
                 if (!e.Cancelled)
                 {
-                    MessageBox.Show("Error downloading sound pack, check the readme file for instructions on how to manually download and install this.", "Unable to download sound pack",
+                    MessageBox.Show(UIText.getString("error_downloading_sound_pack"), UIText.getString("unable_to_download_sound_pack"),
                         MessageBoxButtons.OK);
                 }
             }
@@ -886,7 +887,7 @@ namespace CrewChiefV4
             {
                 if (e.Error == null && !e.Cancelled)
                 {
-                    downloadDriverNamesButton.Text = "Extracting driver names...";
+                    downloadDriverNamesButton.Text = UIText.getString("extracting_driver_names");
                     if (Directory.Exists(AudioPlayer.soundFilesPath + @"\driver_names_temp"))
                     {
                         Directory.Delete(AudioPlayer.soundFilesPath + @"\driver_names_temp", true);
@@ -894,7 +895,7 @@ namespace CrewChiefV4
                     ZipFile.ExtractToDirectory(AudioPlayer.soundFilesPath + @"\" + driverNamesTempFileName, AudioPlayer.soundFilesPath + @"\driver_names_temp", Encoding.UTF8);
                     UpdateHelper.MoveDirectory(AudioPlayer.soundFilesPath + @"\driver_names_temp", AudioPlayer.soundFilesPath);
                     success = true;
-                    downloadDriverNamesButton.Text = "Driver names are up to date";
+                    downloadDriverNamesButton.Text = UIText.getString("driver_names_are_up_to_date");
                 }
             }
             catch (Exception) { }
@@ -920,16 +921,16 @@ namespace CrewChiefV4
                 startApplicationButton.Enabled = !isDownloadingSoundPack;
                 if (AudioPlayer.soundPackVersion == -1)
                 {
-                    downloadDriverNamesButton.Text = "No driver names detected, press to download";
+                    downloadDriverNamesButton.Text = UIText.getString("no_driver_names_detected_press_to_download");
                 }
                 else
                 {
-                    downloadDriverNamesButton.Text = "Updated driver names available, press to download";
+                    downloadDriverNamesButton.Text = UIText.getString("updated_driver_names_available_press_to_download");
                 }
                 downloadDriverNamesButton.Enabled = true;
                 if (e.Error != null)
                 {
-                    MessageBox.Show("Error downloading driver names, check the readme file for instructions on how to manually download and install this.", "Unable to download driver names",
+                    MessageBox.Show(UIText.getString("error_downloading_driver_names"), UIText.getString("unable_to_download_driver_names"),
                         MessageBoxButtons.OK);
                 }
             }
@@ -937,12 +938,12 @@ namespace CrewChiefV4
 
         private void doRestart()
         {
-            String warningMessage = "The application must be restarted to load the new sounds. Click OK to restart the application.";
+            String warningMessage = UIText.getString("the_application_must_be_restarted_to_load_the_new_sounds");
             if (System.Diagnostics.Debugger.IsAttached)
             {
                 warningMessage = "The app must be restarted manually to load the new sounds";
             }
-            if (MessageBox.Show(warningMessage, "Load new sounds", MessageBoxButtons.OK) == DialogResult.OK)
+            if (MessageBox.Show(warningMessage, UIText.getString("load_new_sounds"), MessageBoxButtons.OK) == DialogResult.OK)
             {
                 if (!System.Diagnostics.Debugger.IsAttached)
                 {
@@ -955,7 +956,7 @@ namespace CrewChiefV4
         private void downloadSoundPackButtonPress(object sender, EventArgs e)
         {
             startApplicationButton.Enabled = false;
-            downloadSoundPackButton.Text = "Downloading sound pack...";
+            downloadSoundPackButton.Text = UIText.getString("downloading_sound_pack");
             downloadSoundPackButton.Enabled = false;
             startDownload(true);
 
@@ -963,7 +964,7 @@ namespace CrewChiefV4
         private void downloadDriverNamesButtonPress(object sender, EventArgs e)
         {
             startApplicationButton.Enabled = false;
-            downloadDriverNamesButton.Text = "Downloading driver names...";
+            downloadDriverNamesButton.Text = UIText.getString("downloading_driver_names");
             downloadDriverNamesButton.Enabled = false;
             startDownload(false);
         }
