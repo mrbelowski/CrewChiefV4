@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CrewChiefV4.UserInterface;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Configuration;
@@ -26,7 +27,7 @@ namespace CrewChiefV4
             int widgetCount = 0;
             foreach (SettingsProperty strProp in UserSettings.GetUserSettings().getProperties(typeof(String), null, null))
             {
-                this.flowLayoutPanel1.Controls.Add(new StringPropertyControl(strProp.Name, strProp.Name + " (text)",
+                this.flowLayoutPanel1.Controls.Add(new StringPropertyControl(strProp.Name, UIText.getString(strProp.Name) + " " + UIText.getString("text_prop_type"),
                    UserSettings.GetUserSettings().getString(strProp.Name), (String)strProp.DefaultValue,
                    UserSettings.GetUserSettings().getHelp(strProp.Name)));
                 widgetCount++;
@@ -37,7 +38,7 @@ namespace CrewChiefV4
             {
                 Boolean defaultValue;
                 Boolean.TryParse((String)boolProp.DefaultValue, out defaultValue);
-                this.flowLayoutPanel1.Controls.Add(new BooleanPropertyControl(boolProp.Name, boolProp.Name + " (boolean)",
+                this.flowLayoutPanel1.Controls.Add(new BooleanPropertyControl(boolProp.Name, UIText.getString(boolProp.Name) + " " + UIText.getString("boolean_prop_type"),
                     UserSettings.GetUserSettings().getBoolean(boolProp.Name), defaultValue,
                     UserSettings.GetUserSettings().getHelp(boolProp.Name)));
                 widgetCount++;
@@ -48,7 +49,7 @@ namespace CrewChiefV4
             {
                 int defaultValue;
                 int.TryParse((String)intProp.DefaultValue, out defaultValue);
-                this.flowLayoutPanel1.Controls.Add(new IntPropertyControl(intProp.Name, intProp.Name + " (whole number)",
+                this.flowLayoutPanel1.Controls.Add(new IntPropertyControl(intProp.Name, UIText.getString(intProp.Name) + " " + UIText.getString("integer_prop_type"),
                     UserSettings.GetUserSettings().getInt(intProp.Name), defaultValue,
                     UserSettings.GetUserSettings().getHelp(intProp.Name)));
                 widgetCount++;
@@ -59,7 +60,7 @@ namespace CrewChiefV4
             {
                 Boolean defaultValue;
                 Boolean.TryParse((String)boolProp.DefaultValue, out defaultValue);
-                this.flowLayoutPanel1.Controls.Add(new BooleanPropertyControl(boolProp.Name, boolProp.Name + " (boolean)",
+                this.flowLayoutPanel1.Controls.Add(new BooleanPropertyControl(boolProp.Name, UIText.getString(boolProp.Name) + " " + UIText.getString("boolean_prop_type"),
                     UserSettings.GetUserSettings().getBoolean(boolProp.Name), defaultValue,
                     UserSettings.GetUserSettings().getHelp(boolProp.Name))); 
                 widgetCount++;
@@ -70,7 +71,7 @@ namespace CrewChiefV4
             {
                 int defaultValue;
                 int.TryParse((String)intProp.DefaultValue, out defaultValue);
-                this.flowLayoutPanel1.Controls.Add(new IntPropertyControl(intProp.Name, intProp.Name + " (whole number)",
+                this.flowLayoutPanel1.Controls.Add(new IntPropertyControl(intProp.Name, UIText.getString(intProp.Name) + " " + UIText.getString("integer_prop_type"),
                     UserSettings.GetUserSettings().getInt(intProp.Name), defaultValue,
                     UserSettings.GetUserSettings().getHelp(intProp.Name)));
                 widgetCount++;
@@ -81,7 +82,7 @@ namespace CrewChiefV4
             {
                 float defaultValue;
                 float.TryParse((String)floatProp.DefaultValue, out defaultValue);
-                this.flowLayoutPanel1.Controls.Add(new FloatPropertyControl(floatProp.Name, floatProp.Name + " (real number)",
+                this.flowLayoutPanel1.Controls.Add(new FloatPropertyControl(floatProp.Name, UIText.getString(floatProp.Name) + " " + UIText.getString("real_number_prop_type"),
                     UserSettings.GetUserSettings().getFloat(floatProp.Name), defaultValue,
                     UserSettings.GetUserSettings().getHelp(floatProp.Name))); 
                 widgetCount++;
@@ -149,12 +150,12 @@ namespace CrewChiefV4
         {
             if (PropertiesForm.hasChanges)
             {
-                String warningMessage = "You have unsaved changes. Click 'Yes' to save these changes and restart the application. Click 'No' to discard these changes";
+                String warningMessage = UIText.getString("save_prop_changes_warning");
                 if (System.Diagnostics.Debugger.IsAttached)
                 {
                     warningMessage = "You have unsaved changes. Click 'Yes' to save these changes (you will need to manually restart the application). Click 'No' to discard these changes";
                 }
-                if (MessageBox.Show(warningMessage, "Save changes", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                if (MessageBox.Show(warningMessage, UIText.getString("save_changes"), MessageBoxButtons.YesNo) == DialogResult.Yes)
                 {
                     save();
                     if (!System.Diagnostics.Debugger.IsAttached)

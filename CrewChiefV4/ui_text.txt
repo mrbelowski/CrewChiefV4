@@ -64,3 +64,12 @@ custom_device = custom device
 assigned_to = assigned to
 button = button
 not_assigned = not assigned
+
+text_prop_type = (text)
+boolean_prop_type = (boolean)
+integer_prop_type = (integer)
+real_number_prop_type = (real number)
+
+save_prop_changes_warning = You have unsaved changes. Click 'Yes' to save these changes and restart the application. Click 'No' to discard these changes
+save_changes = Save changes
+save_and_restart = Save and restart
