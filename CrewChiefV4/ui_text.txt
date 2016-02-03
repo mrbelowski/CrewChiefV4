@@ -52,3 +52,15 @@ load_new_sounds=Load new sounds
 
 downloading_sound_pack = Downloading sound pack...
 downloading_driver_names = Downloading driver names...
+
+talk_to_crew_chief = Talk to crew chief
+toggle_race_updates_on/off = Toggle race updates on/off
+toggle_spotter_on/off = Toggle spotter on/off
+toggle_opponent_deltas_on/off_for_each_lap = Toggle opponent deltas on/off for each lap
+press_to_replay_the_last_message = Press to replay the last message
+udp_network_data_buttons = UDP network data buttons
+
+custom_device = custom device
+assigned_to = assigned to
+button = button
+not_assigned = not assigned
