@@ -37,8 +37,19 @@ namespace CrewChiefV4.UserInterface
             {
                 if (!line.StartsWith("#") && line.Contains("="))
                 {
-                    String[] split = line.Split('=');
-                    dict.Add(split[0].Trim(), split[1].Trim());
+                    try
+                    {
+                        String[] split = line.Split('=');
+                        String key = split[0].Trim();
+                        if (dict.ContainsKey(key))
+                        {
+                            dict.Remove(key);
+                        }
+                        dict.Add(split[0].Trim(), split[1].Trim());
+                    }
+                    catch (Exception e)
+                    {
+                    }
                 }
             }
             return dict;

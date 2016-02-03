@@ -1,4 +1,9 @@
-﻿checking_sound_pack_version = Checking sound pack version...
+﻿# this is a comment - any line starting with # is ignored
+
+# Blank lines will be ignored
+
+
+checking_sound_pack_version = Checking sound pack version...
 checking_driver_names_version = Checking driver names version...
 sound_pack_is_up_to_date = Sound pack is up to date
 no_sound_pack_detected_unable_to_locate_update = No sound pack detected, unable to locate update
@@ -74,6 +79,11 @@ save_prop_changes_warning = You have unsaved changes. Click 'Yes' to save these 
 save_changes = Save changes
 save_and_restart = Save and restart
 
+# to change the name of the property title in the properties screen, just use the property name like this:
+# enable_spotter = Enable spotter
+# If you uncomment this line, the property text for enable_spotter will display "Enable spotter"
+# Note that I've not (yet...) done this - I'm just using the property ID
+
 
 background_volume_help = The volume of the background sounds (0 - 1)
 update_interval_help = The time (milliseconds) between app updates
@@ -122,4 +132,4 @@ report_ambient_temp_changes_greater_than_help = Report ambient (air) temperature
 report_track_temp_changes_greater_than_help = Report track temperature if it's changed by more than this amount (in celsius)
 pause_between_messages_help = Time pause between messages (in seconds) when reading multiple messages together in a single group.
 load_sound_files_on_startup_help = Load all the sounds when the app starts up. This may make app start times quite long, but prevents the app having to load stuff while you're racing.
-pcars_character_encoding_help =  For PS4 always use UTF-8. For PC and XBox this will usually be windows-1252 (Windows Western European).
+pcars_character_encoding_help = For PS4 always use UTF-8. For PC and XBox this will usually be windows-1252 (Windows Western European).
