@@ -123,7 +123,7 @@ namespace CrewChiefV4.RaceRoom
             if (shared.Player.GameSimulationTime <= 0 || shared.slot_id < 0 ||
                 shared.ControlType == (int)RaceRoomConstant.Control.Remote || shared.ControlType == (int)RaceRoomConstant.Control.Replay)
             {
-                return null;
+                return previousGameState;
             }
 
             Boolean isCarRunning = CheckIsCarRunning(shared);

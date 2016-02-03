@@ -48,6 +48,10 @@ namespace CrewChiefV4.Events
 
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
+            if (currentGameState.PositionAndMotionData.CarSpeed < 1)
+            {
+                return;
+            }
             if (currentGameState.SessionData.Flag == FlagEnum.BLACK)
             {
                 if (currentGameState.Now > lastBlackFlagTime.Add(timeBetweenBlackFlagMessages))

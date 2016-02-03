@@ -275,7 +275,7 @@ namespace CrewChiefV4.PCars
             String playerName = StructHelper.getNameFromBytes(shared.mParticipantData[shared.mViewedParticipantIndex].mName);
             if (getPlayerByName && playerName != null && playerSteamId != null && !namesMatch(playerName, playerSteamId))
             {
-                return null;
+                return previousGameState;
             }
             
             int playerDataIndex = playerData.Item1;

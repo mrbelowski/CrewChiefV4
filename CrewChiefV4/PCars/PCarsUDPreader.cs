@@ -201,7 +201,7 @@ namespace CrewChiefV4.PCars
             totalPacketCount++;
             if (totalPacketCount > packetCountAtStartOfNextRateCheck)
             {
-                lastPacketRateEstimate = (totalPacketCount - packetCountAtStartOfCurrentRateCheck) / ((DateTime.Now.Ticks - ticksAtStartOfCurrentPacketRateCheck) / TimeSpan.TicksPerSecond);
+                lastPacketRateEstimate = (int)((float) TimeSpan.TicksPerSecond * (float) (totalPacketCount - packetCountAtStartOfCurrentRateCheck) / (float) (DateTime.Now.Ticks - ticksAtStartOfCurrentPacketRateCheck));
                 Console.WriteLine("Packet rate = " + lastPacketRateEstimate + "Hz");
                 packetCountAtStartOfCurrentRateCheck = totalPacketCount;
                 packetCountAtStartOfNextRateCheck = packetCountAtStartOfCurrentRateCheck + packetRateCheckInterval;
