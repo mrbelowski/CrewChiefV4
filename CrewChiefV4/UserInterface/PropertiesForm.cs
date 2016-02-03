@@ -29,7 +29,7 @@ namespace CrewChiefV4
             {
                 this.flowLayoutPanel1.Controls.Add(new StringPropertyControl(strProp.Name, UIText.getString(strProp.Name) + " " + UIText.getString("text_prop_type"),
                    UserSettings.GetUserSettings().getString(strProp.Name), (String)strProp.DefaultValue,
-                   UserSettings.GetUserSettings().getHelp(strProp.Name)));
+                   UIText.getString(strProp.Name + "_help")));
                 widgetCount++;
             }
             pad(widgetCount);
@@ -40,7 +40,7 @@ namespace CrewChiefV4
                 Boolean.TryParse((String)boolProp.DefaultValue, out defaultValue);
                 this.flowLayoutPanel1.Controls.Add(new BooleanPropertyControl(boolProp.Name, UIText.getString(boolProp.Name) + " " + UIText.getString("boolean_prop_type"),
                     UserSettings.GetUserSettings().getBoolean(boolProp.Name), defaultValue,
-                    UserSettings.GetUserSettings().getHelp(boolProp.Name)));
+                    UIText.getString(boolProp.Name + "_help")));
                 widgetCount++;
             }
             pad(widgetCount);
@@ -51,7 +51,7 @@ namespace CrewChiefV4
                 int.TryParse((String)intProp.DefaultValue, out defaultValue);
                 this.flowLayoutPanel1.Controls.Add(new IntPropertyControl(intProp.Name, UIText.getString(intProp.Name) + " " + UIText.getString("integer_prop_type"),
                     UserSettings.GetUserSettings().getInt(intProp.Name), defaultValue,
-                    UserSettings.GetUserSettings().getHelp(intProp.Name)));
+                    UIText.getString(intProp.Name + "_help")));
                 widgetCount++;
             }
             pad(widgetCount);
@@ -62,7 +62,7 @@ namespace CrewChiefV4
                 Boolean.TryParse((String)boolProp.DefaultValue, out defaultValue);
                 this.flowLayoutPanel1.Controls.Add(new BooleanPropertyControl(boolProp.Name, UIText.getString(boolProp.Name) + " " + UIText.getString("boolean_prop_type"),
                     UserSettings.GetUserSettings().getBoolean(boolProp.Name), defaultValue,
-                    UserSettings.GetUserSettings().getHelp(boolProp.Name))); 
+                    UIText.getString(boolProp.Name + "_help"))); 
                 widgetCount++;
             }
             pad(widgetCount);
@@ -73,7 +73,7 @@ namespace CrewChiefV4
                 int.TryParse((String)intProp.DefaultValue, out defaultValue);
                 this.flowLayoutPanel1.Controls.Add(new IntPropertyControl(intProp.Name, UIText.getString(intProp.Name) + " " + UIText.getString("integer_prop_type"),
                     UserSettings.GetUserSettings().getInt(intProp.Name), defaultValue,
-                    UserSettings.GetUserSettings().getHelp(intProp.Name)));
+                    UIText.getString(intProp.Name + "_help")));
                 widgetCount++;
             }
             pad(widgetCount);
@@ -84,7 +84,7 @@ namespace CrewChiefV4
                 float.TryParse((String)floatProp.DefaultValue, out defaultValue);
                 this.flowLayoutPanel1.Controls.Add(new FloatPropertyControl(floatProp.Name, UIText.getString(floatProp.Name) + " " + UIText.getString("real_number_prop_type"),
                     UserSettings.GetUserSettings().getFloat(floatProp.Name), defaultValue,
-                    UserSettings.GetUserSettings().getHelp(floatProp.Name))); 
+                    UIText.getString(floatProp.Name + "_help"))); 
                 widgetCount++;
             }
             pad(widgetCount);
