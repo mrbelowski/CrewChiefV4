@@ -716,7 +716,8 @@ namespace CrewChiefV4.Events
         {
             if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.WHAT_ARE_MY_SECTOR_TIMES))
             {
-                if (currentGameState.SessionData.LastSector1Time > -1 && currentGameState.SessionData.LastSector2Time > -1 && currentGameState.SessionData.LastSector3Time > -1)
+                if (currentGameState != null && 
+                    currentGameState.SessionData.LastSector1Time > -1 && currentGameState.SessionData.LastSector2Time > -1 && currentGameState.SessionData.LastSector3Time > -1)
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage("sectorTimes",
                         MessageContents(TimeSpan.FromSeconds(currentGameState.SessionData.LastSector1Time), 
@@ -724,30 +725,30 @@ namespace CrewChiefV4.Events
                 }
                 else
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, this), false);
+                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null), false);
                 }
                 
             }
             else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.WHATS_MY_LAST_SECTOR_TIME))
             {
-                if (currentGameState.SessionData.SectorNumber == 1 && currentGameState.SessionData.LastSector3Time > -1)
+                if (currentGameState != null && currentGameState.SessionData.SectorNumber == 1 && currentGameState.SessionData.LastSector3Time > -1)
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage("sector3Time",
                         MessageContents(TimeSpan.FromSeconds(currentGameState.SessionData.LastSector3Time)), 0, this), false);
                 }
-                else if (currentGameState.SessionData.SectorNumber == 2 && currentGameState.SessionData.LastSector1Time > -1)
+                else if (currentGameState != null && currentGameState.SessionData.SectorNumber == 2 && currentGameState.SessionData.LastSector1Time > -1)
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage("sector1Time",
                         MessageContents(TimeSpan.FromSeconds(currentGameState.SessionData.LastSector1Time)), 0, this), false);
                 }
-                else if (currentGameState.SessionData.SectorNumber == 3 && currentGameState.SessionData.LastSector2Time > -1)
+                else if (currentGameState != null && currentGameState.SessionData.SectorNumber == 3 && currentGameState.SessionData.LastSector2Time > -1)
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage("sector2Time",
                         MessageContents(TimeSpan.FromSeconds(currentGameState.SessionData.LastSector2Time)), 0, this), false);
                 }
                 else
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, this), false);
+                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null), false);
                 }
                 
             }
@@ -762,7 +763,7 @@ namespace CrewChiefV4.Events
                 }
                 else
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, this), false);
+                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null), false);
                     
                 }
             }
@@ -776,7 +777,7 @@ namespace CrewChiefV4.Events
                 }
                 else
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, this), false);
+                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null), false);
                     
                 }
             }
@@ -784,95 +785,102 @@ namespace CrewChiefV4.Events
             {
                 if (sessionType == SessionType.Race)
                 {
-                    float[] bestOpponentLapData = currentGameState.getTimeAndSectorsForBestOpponentLapInWindow(paceCheckLapsWindowForRace, currentGameState.carClass.carClassEnum);
-
-                    if (bestOpponentLapData[0] > -1 && lastLapRating != LastLapRating.NO_DATA)
+                    if (currentGameState == null)
                     {
-                        TimeSpan lapToCompare = TimeSpan.FromSeconds(lastLapTime - bestOpponentLapData[0]);
-                        String timeToFindFolder = null;
-                        if (lapToCompare.Seconds == 0 && lapToCompare.Milliseconds < 200)
-                        {
-                            timeToFindFolder = folderNeedToFindOneMoreTenth;
-                        }
-                        else if (lapToCompare.Seconds == 0 && lapToCompare.Milliseconds < 600)
-                        {
-                            timeToFindFolder = folderNeedToFindAFewMoreTenths;
-                        }
-                        else if ((lapToCompare.Seconds == 1 && lapToCompare.Milliseconds < 500) ||
-                            (lapToCompare.Seconds == 0 && lapToCompare.Milliseconds >= 600))
-                        {
-                            timeToFindFolder = folderNeedToFindASecond;
-                        }
-                        else if ((lapToCompare.Seconds == 1 && lapToCompare.Milliseconds >= 500) ||
-                            lapToCompare.Seconds > 1)
-                        {
-                            timeToFindFolder = folderNeedToFindMoreThanASecond;
-                        }
-                        List<MessageFragment> messages = new List<MessageFragment>();
-                        switch (lastLapRating)
-                        {
-                            case LastLapRating.BEST_OVERALL:
-                            case LastLapRating.BEST_IN_CLASS:
-                            case LastLapRating.SETTING_CURRENT_PACE:
-                                audioPlayer.playMessageImmediately(new QueuedMessage(folderSettingCurrentRacePace, 0, null), false);
-                                break;
-                            case LastLapRating.PERSONAL_BEST_CLOSE_TO_OVERALL_LEADER:
-                            case LastLapRating.PERSONAL_BEST_CLOSE_TO_CLASS_LEADER:
-                            case LastLapRating.CLOSE_TO_OVERALL_LEADER:
-                            case LastLapRating.CLOSE_TO_CLASS_LEADER:
-                            case LastLapRating.PERSONAL_BEST_STILL_SLOW:
-                            case LastLapRating.CLOSE_TO_PERSONAL_BEST:
-                            case LastLapRating.CLOSE_TO_CURRENT_PACE:
-                                if (timeToFindFolder == null || timeToFindFolder != folderNeedToFindMoreThanASecond)
-                                {
-                                    if (lastLapRating == LastLapRating.CLOSE_TO_CURRENT_PACE)
-                                    {
-                                        messages.Add(MessageFragment.Text(folderMatchingCurrentRacePace));
-                                    }
-                                    else
-                                    {
-                                        messages.Add(MessageFragment.Text(folderPaceOK));
-                                    }
-                                }
-                                if (timeToFindFolder != null)
-                                {
-                                    messages.Add(MessageFragment.Text(timeToFindFolder));
-                                }
-                                if (messages.Count > 0)
-                                {
-                                    audioPlayer.playMessageImmediately(new QueuedMessage("lapTimeRacePaceReport", messages, 0, null), false);
-                                }                                    
-                                break;
-                            case LastLapRating.MEH:
-                                messages.Add(MessageFragment.Text(folderPaceBad));
-                                if (timeToFindFolder != null)
-                                {
-                                    messages.Add(MessageFragment.Text(timeToFindFolder));
-                                }
-                                audioPlayer.playMessageImmediately(new QueuedMessage("lapTimeRacePaceReport", messages, 0, null), false);
-                                    break;
-                            default:
-                                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null), false);
-                                break;                     
-                        }
-                        SectorReportOption reportOption = SectorReportOption.COMBINED;
-                        double r = random.NextDouble();
-                        // usually report the combined sectors
-                        if (r > 0.33)
-                        {
-                            reportOption = SectorReportOption.WORST_ONLY;
-                        }
-                        List<MessageFragment> sectorDeltaMessages = getSectorDeltaMessages(reportOption, currentGameState.SessionData.LastSector1Time, bestOpponentLapData[1],
-                            currentGameState.SessionData.LastSector2Time, bestOpponentLapData[2], currentGameState.SessionData.LastSector3Time, bestOpponentLapData[3], false);
-                        if (sectorDeltaMessages.Count > 0)
-                        {
-                            audioPlayer.playMessageImmediately(new QueuedMessage("race_sector_times_report", sectorDeltaMessages, 0, null), false);
-                        }
-                        
-                    }
-                    else {
                         audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null), false);
-                        
+                    }
+                    else
+                    {
+                        float[] bestOpponentLapData = currentGameState.getTimeAndSectorsForBestOpponentLapInWindow(paceCheckLapsWindowForRace, currentGameState.carClass.carClassEnum);
+
+                        if (bestOpponentLapData[0] > -1 && lastLapRating != LastLapRating.NO_DATA)
+                        {
+                            TimeSpan lapToCompare = TimeSpan.FromSeconds(lastLapTime - bestOpponentLapData[0]);
+                            String timeToFindFolder = null;
+                            if (lapToCompare.Seconds == 0 && lapToCompare.Milliseconds < 200)
+                            {
+                                timeToFindFolder = folderNeedToFindOneMoreTenth;
+                            }
+                            else if (lapToCompare.Seconds == 0 && lapToCompare.Milliseconds < 600)
+                            {
+                                timeToFindFolder = folderNeedToFindAFewMoreTenths;
+                            }
+                            else if ((lapToCompare.Seconds == 1 && lapToCompare.Milliseconds < 500) ||
+                                (lapToCompare.Seconds == 0 && lapToCompare.Milliseconds >= 600))
+                            {
+                                timeToFindFolder = folderNeedToFindASecond;
+                            }
+                            else if ((lapToCompare.Seconds == 1 && lapToCompare.Milliseconds >= 500) ||
+                                lapToCompare.Seconds > 1)
+                            {
+                                timeToFindFolder = folderNeedToFindMoreThanASecond;
+                            }
+                            List<MessageFragment> messages = new List<MessageFragment>();
+                            switch (lastLapRating)
+                            {
+                                case LastLapRating.BEST_OVERALL:
+                                case LastLapRating.BEST_IN_CLASS:
+                                case LastLapRating.SETTING_CURRENT_PACE:
+                                    audioPlayer.playMessageImmediately(new QueuedMessage(folderSettingCurrentRacePace, 0, null), false);
+                                    break;
+                                case LastLapRating.PERSONAL_BEST_CLOSE_TO_OVERALL_LEADER:
+                                case LastLapRating.PERSONAL_BEST_CLOSE_TO_CLASS_LEADER:
+                                case LastLapRating.CLOSE_TO_OVERALL_LEADER:
+                                case LastLapRating.CLOSE_TO_CLASS_LEADER:
+                                case LastLapRating.PERSONAL_BEST_STILL_SLOW:
+                                case LastLapRating.CLOSE_TO_PERSONAL_BEST:
+                                case LastLapRating.CLOSE_TO_CURRENT_PACE:
+                                    if (timeToFindFolder == null || timeToFindFolder != folderNeedToFindMoreThanASecond)
+                                    {
+                                        if (lastLapRating == LastLapRating.CLOSE_TO_CURRENT_PACE)
+                                        {
+                                            messages.Add(MessageFragment.Text(folderMatchingCurrentRacePace));
+                                        }
+                                        else
+                                        {
+                                            messages.Add(MessageFragment.Text(folderPaceOK));
+                                        }
+                                    }
+                                    if (timeToFindFolder != null)
+                                    {
+                                        messages.Add(MessageFragment.Text(timeToFindFolder));
+                                    }
+                                    if (messages.Count > 0)
+                                    {
+                                        audioPlayer.playMessageImmediately(new QueuedMessage("lapTimeRacePaceReport", messages, 0, null), false);
+                                    }
+                                    break;
+                                case LastLapRating.MEH:
+                                    messages.Add(MessageFragment.Text(folderPaceBad));
+                                    if (timeToFindFolder != null)
+                                    {
+                                        messages.Add(MessageFragment.Text(timeToFindFolder));
+                                    }
+                                    audioPlayer.playMessageImmediately(new QueuedMessage("lapTimeRacePaceReport", messages, 0, null), false);
+                                    break;
+                                default:
+                                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null), false);
+                                    break;
+                            }
+                            SectorReportOption reportOption = SectorReportOption.COMBINED;
+                            double r = random.NextDouble();
+                            // usually report the combined sectors
+                            if (r > 0.33)
+                            {
+                                reportOption = SectorReportOption.WORST_ONLY;
+                            }
+                            List<MessageFragment> sectorDeltaMessages = getSectorDeltaMessages(reportOption, currentGameState.SessionData.LastSector1Time, bestOpponentLapData[1],
+                                currentGameState.SessionData.LastSector2Time, bestOpponentLapData[2], currentGameState.SessionData.LastSector3Time, bestOpponentLapData[3], false);
+                            if (sectorDeltaMessages.Count > 0)
+                            {
+                                audioPlayer.playMessageImmediately(new QueuedMessage("race_sector_times_report", sectorDeltaMessages, 0, null), false);
+                            }
+
+                        }
+                        else
+                        {
+                            audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null), false);
+                        }
                     }
                 }
                 else
