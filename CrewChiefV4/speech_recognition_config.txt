@@ -1,4 +1,17 @@
-﻿# This file contains options for the speech recogniser, and voice recognition phrase fragments
+﻿# this is a comment - any blank line or line starting with # is ignored
+
+# This file contains default options and mappings for the speech recogniser, ***** and will be overwritten when the app is updated *****.
+#
+# The mappings in here can be overridden by creating another file called "speech_recognition_config.txt" and placing this in 
+# [user]/AppData/local/CrewChiefV4/
+#
+# Any mappings in that file will replace the corresponding default here - note that they won't be added, they're be replaced. 
+# So if you create this file with a single line: 
+# HOWS_MY_TYRE_WEAR = tire wear
+# the existing mappings for HOWS_MY_TYRE_WEAR will be removed, so the app will only recognise this new phrase.
+# You only need to add mappings when you want to override the default - the app will gather up the defaults first,
+# and replace any which are also in the override file.
+
 
 defaultLocale = en
 

@@ -1,4 +1,11 @@
-﻿# This file contains options for the voice messages
+﻿# this is a comment - any blank line or line starting with # is ignored
+
+# This file contains default options for the voice messages, ***** and will be overwritten when the app is updated *****.
+
+# The options in here can be overridden by creating another file called "sounds_config.txt" and placing this in 
+# [user]/AppData/local/CrewChiefV4/
+#
+# Any options set in that file will replace the corresponding default here
 
 # In English we say "one hundred", in Italian we say "cento". Set this option to false to supress the "one" at the start of hundred or thousand
 prefix_hundred_and_thousand_with_one = true

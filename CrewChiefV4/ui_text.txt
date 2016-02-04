@@ -1,7 +1,10 @@
-﻿# this is a comment - any line starting with # is ignored
+﻿# this is a comment - any blank line or line starting with # is ignored
 
-# Blank lines will be ignored
-
+# This file contains default user interface text Strings, ***** and will be overwritten when the app is updated *****.
+# The text in here can be overridden by creating another file called "ui_text.txt" and placing this in 
+# [user]/AppData/local/CrewChiefV4/
+#
+# Any text set in that file will replace the corresponding default here
 
 checking_sound_pack_version = Checking sound pack version...
 checking_driver_names_version = Checking driver names version...
