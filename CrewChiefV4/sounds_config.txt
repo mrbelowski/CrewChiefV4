@@ -18,7 +18,7 @@ say_and_between_hundred_and_units = true
 say_and_between_thousand_and_units = true
 
 # the app will sometimes ommit the "hundred" and "and" sounds, so rather than saying "one hundred and twenty" it'll say "one twenty".
-# Set this to false if there's no suitable translation of this behaviour
+# Set this to false if there's no suitable translation of this behaviour.
 allow_short_hundreds = true
 
 # for numbers 1000 - 1900, the app will say "one thousand", then "eleven hundred", "twelve hundred" etc. Set this to false to force the 

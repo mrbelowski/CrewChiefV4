@@ -298,8 +298,10 @@ namespace CrewChiefV4
                 }
             }
             if (hundreds != null) {
+                Boolean saidNumberOfHundreds = false;
                 if (hundreds != "1" || prefix_hundred_and_thousand_with_one)
                 {
+                    saidNumberOfHundreds = true;
                     messages.Add(folderNameNumbersStub + hundreds);
                 }
                 // don't always use "hundred and"
@@ -322,12 +324,19 @@ namespace CrewChiefV4
                     messages.Add(folderNameHundred);
                     addedHundreds = true;
                 }
-                if (!addedHundreds && tensAndUnits != null && tensAndUnits.Count() == 1)
+                if (!addedHundreds)
                 {
-                    // need to modify the tensAndUnits here - we've skipped "hundreds" even though the number is > 99.
-                    // This is fine if the tensAndUnits > 9 (it'll be read as "One twenty five"), but if the tensAndUnits < 10
-                    // this will be read as "One two" instead of "One oh two".
-                    tensAndUnits = "0" + tensAndUnits;
+                    if (!saidNumberOfHundreds)
+                    {
+                        messages.Add(folderNameNumbersStub + hundreds);
+                    }
+                    if (tensAndUnits != null && tensAndUnits.Count() == 1)
+                    {
+                        // need to modify the tensAndUnits here - we've skipped "hundreds" even though the number is > 99.
+                        // This is fine if the tensAndUnits > 9 (it'll be read as "One twenty five"), but if the tensAndUnits < 10
+                        // this will be read as "One two" instead of "One oh two".
+                        tensAndUnits = "0" + tensAndUnits;
+                    }
                 }
             }
             if (tensAndUnits != null) {
