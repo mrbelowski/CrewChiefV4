@@ -41,7 +41,7 @@ DONT_TELL_ME_THE_GAPS = don't tell me the gaps:don't tell me the deltas:don't gi
 
 WHOS_IN_FRONT_IN_THE_RACE = who's in front in the race:who's ahead in the race:who's in front:who's ahead
 WHOS_BEHIND_IN_THE_RACE = who's behind in the race:who's behind
-WHOS_IN_FRONT_ON_TRACK = who's in front on track:who's ahead on track";
+WHOS_IN_FRONT_ON_TRACK = who's in front on track:who's ahead on track
 WHOS_BEHIND_ON_TRACK = who's behind on track
 WHOS_LEADING = who's leading:who's in the lead
 
