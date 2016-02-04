@@ -714,7 +714,7 @@ namespace CrewChiefV4.Events
 
         public override void respond(String voiceMessage)
         {
-            if (voiceMessage.Contains(SpeechRecogniser.WHAT_ARE_MY_SECTOR_TIMES))
+            if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.WHAT_ARE_MY_SECTOR_TIMES))
             {
                 if (currentGameState.SessionData.LastSector1Time > -1 && currentGameState.SessionData.LastSector2Time > -1 && currentGameState.SessionData.LastSector3Time > -1)
                 {
@@ -728,7 +728,7 @@ namespace CrewChiefV4.Events
                 }
                 
             }
-            else if (voiceMessage.Contains(SpeechRecogniser.WHATS_MY_LAST_SECTOR_TIME))
+            else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.WHATS_MY_LAST_SECTOR_TIME))
             {
                 if (currentGameState.SessionData.SectorNumber == 1 && currentGameState.SessionData.LastSector3Time > -1)
                 {
@@ -766,9 +766,7 @@ namespace CrewChiefV4.Events
                     
                 }
             }
-            else if ((voiceMessage.Contains(SpeechRecogniser.LAST_LAP_TIME) ||
-                voiceMessage.Contains(SpeechRecogniser.LAP_TIME) ||
-                voiceMessage.Contains(SpeechRecogniser.LAST_LAP)))
+            else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.WHAT_WAS_MY_LAST_LAP_TIME))
             {
                 if (lastLapTime > 0)
                 {
@@ -781,8 +779,8 @@ namespace CrewChiefV4.Events
                     audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, this), false);
                     
                 }
-            }            
-            else if (voiceMessage.Contains(SpeechRecogniser.PACE))
+            }
+            else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOWS_MY_PACE))
             {
                 if (sessionType == SessionType.Race)
                 {

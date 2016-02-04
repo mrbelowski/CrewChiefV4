@@ -566,45 +566,39 @@ namespace CrewChiefV4.Events
 
         public override void respond(string voiceMessage)
         {
-            if (voiceMessage.Contains(SpeechRecogniser.TYRE_TEMPS) || voiceMessage.Contains(SpeechRecogniser.TYRE_TEMPERATURES))
+            if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.WHAT_ARE_MY_TYRE_TEMPS))
             {
-                if (voiceMessage.Contains(SpeechRecogniser.WHAT_ARE_MY))
+                reportCurrentTyreTemps();
+            } 
+            else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOW_ARE_MY_TYRE_TEMPS))
+            { 
+                if (currentTyreTempStatus != null)
                 {
-                    reportCurrentTyreTemps();
+                    reportCurrentTyreTempStatus(true);
                 }
                 else
                 {
-                    if (currentTyreTempStatus != null)
-                    {
-                        reportCurrentTyreTempStatus(true);
-                    }
-                    else
-                    {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null), false);
+                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null), false);
                         
-                    }
                 }
             }
-            else if (voiceMessage.Contains(SpeechRecogniser.BRAKE_TEMPS) || voiceMessage.Contains(SpeechRecogniser.BRAKE_TEMPERATURES))
+            else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.WHAT_ARE_MY_BRAKE_TEMPS))
             {
-                if (voiceMessage.Contains(SpeechRecogniser.WHAT_ARE_MY))
+                reportCurrentBrakeTemps();
+            }
+            else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOW_ARE_MY_BRAKE_TEMPS))
+            {
+                if (currentBrakeTempStatus != null)
                 {
-                    reportCurrentBrakeTemps();
+                    reportCurrentBrakeTempStatus(true);
                 }
                 else
                 {
-                    if (currentBrakeTempStatus != null)
-                    {
-                        reportCurrentBrakeTempStatus(true);
-                    }
-                    else
-                    {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null), false);
+                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null), false);
                         
-                    }
-                }
+                }                
             }
-            else if (voiceMessage.Contains(SpeechRecogniser.TYRE_WEAR))
+            else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOWS_MY_TYRE_WEAR))
             {
                 if (currentTyreConditionStatus != null)
                 {

@@ -1,0 +1,16 @@
+﻿# This file contains options for the voice messages
+
+# In English we say "one hundred", in Italian we say "cento". Set this option to false to supress the "one" at the start of hundred or thousand
+prefix_hundred_and_thousand_with_one = true
+
+# In English we say "one hundred and twenty", rather than "one hundred twenty"
+say_and_between_hundred_and_units = true
+
+# the app will sometimes ommit the "hundred" and "and" sounds, so rather than saying "one hundred and twenty" it'll say "one twenty".
+# Set this to false if there's no suitable translation of this behaviour
+allow_short_hundreds = true
+
+# for numbers 1000 - 1900, the app will say "one thousand", then "eleven hundred", "twelve hundred" etc. Set this to false to force the 
+# app to always use "thousand" - i.e. instead of "eleven hundred" it'll say "one thousand one hundred". Note the app will never insert
+# an "and" between "thousand" and "hundred"
+always_use_thousands = false

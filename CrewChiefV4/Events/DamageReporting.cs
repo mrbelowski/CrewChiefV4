@@ -217,7 +217,7 @@ namespace CrewChiefV4.Events
 
         public override void respond(String voiceMessage)
         {
-            if (voiceMessage.Contains(SpeechRecogniser.AERO) || voiceMessage.Contains(SpeechRecogniser.BODY_WORK))
+            if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOWS_MY_AERO))
             {
                 if (aeroDamage == DamageLevel.NONE)
                 {
@@ -239,7 +239,7 @@ namespace CrewChiefV4.Events
                     
                 }
             }
-            if (voiceMessage.Contains(SpeechRecogniser.TRANSMISSION))
+            if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOWS_MY_TRANSMISSION))
             {
                 if (trannyDamage == DamageLevel.NONE || trannyDamage == DamageLevel.TRIVIAL)
                 {
@@ -262,7 +262,7 @@ namespace CrewChiefV4.Events
                     
                 }
             }
-            if (voiceMessage.Contains(SpeechRecogniser.ENGINE))
+            if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOWS_MY_ENGINE))
             {
                 if (engineDamage == DamageLevel.NONE || engineDamage == DamageLevel.TRIVIAL)
                 {
@@ -285,7 +285,7 @@ namespace CrewChiefV4.Events
                     
                 }
             }
-            if (voiceMessage.Contains(SpeechRecogniser.SUSPENSION))
+            if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOWS_MY_SUSPENSION))
             {
                 if (!enableSuspensionDamageMessages)
                 {
@@ -321,7 +321,7 @@ namespace CrewChiefV4.Events
                     }
                 }
             }
-            if (voiceMessage.Contains(SpeechRecogniser.BRAKES))
+            if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOWS_MY_BRAKES))
             {
                 if (!enableBrakeDamageMessages)
                 {

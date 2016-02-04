@@ -391,9 +391,7 @@ namespace CrewChiefV4.Events
         public override void respond(String voiceMessage)
         {
             Boolean haveData = false;
-            if ((voiceMessage.Contains(SpeechRecogniser.GAP_IN_FRONT) || 
-                voiceMessage.Contains(SpeechRecogniser.GAP_AHEAD)) &&
-                currentGapInFront != -1)
+            if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.WHATS_MY_GAP_IN_FRONT) && currentGapInFront != -1)
             {
                 if (isLeading && isRace)
                 {
@@ -409,7 +407,7 @@ namespace CrewChiefV4.Events
                     haveData = true;
                 }
             }
-            else if (voiceMessage.Contains(SpeechRecogniser.GAP_BEHIND) &&
+            else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.WHATS_MY_GAP_BEHIND) &&
                 currentGapBehind != -1)
             {
                 if (isLast && isRace)

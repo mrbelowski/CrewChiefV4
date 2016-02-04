@@ -176,12 +176,12 @@ namespace CrewChiefV4.Events
             }
             else
             {
-                if (voiceMessage.Contains(SpeechRecogniser.WHATS_THE_AIR_TEMP) || voiceMessage.Contains(SpeechRecogniser.WHATS_THE_AIR_TEMP))
+                if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.WHATS_THE_AIR_TEMP))
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage("airTempResponse",
                         MessageContents(folderAirTempIsNow, convertTemp(currentConditions.AmbientTemperature), getTempUnit()), 0, null), false);
                 }
-                if (voiceMessage.Contains(SpeechRecogniser.WHATS_THE_TRACK_TEMP) || voiceMessage.Contains(SpeechRecogniser.WHATS_THE_TRACK_TEMPERATURE))
+                if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.WHATS_THE_TRACK_TEMP))
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage("trackTempResponse",
                         MessageContents(folderTrackTempIsNow, convertTemp(currentConditions.TrackTemperature), getTempUnit()), 0, null), false);

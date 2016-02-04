@@ -1,5 +1,4 @@
-﻿using CrewChiefV4.UserInterface;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Configuration;
@@ -27,9 +26,9 @@ namespace CrewChiefV4
             int widgetCount = 0;
             foreach (SettingsProperty strProp in UserSettings.GetUserSettings().getProperties(typeof(String), null, null))
             {
-                this.flowLayoutPanel1.Controls.Add(new StringPropertyControl(strProp.Name, UIText.getString(strProp.Name) + " " + UIText.getString("text_prop_type"),
+                this.flowLayoutPanel1.Controls.Add(new StringPropertyControl(strProp.Name, Configuration.getUIString(strProp.Name) + " " + Configuration.getUIString("text_prop_type"),
                    UserSettings.GetUserSettings().getString(strProp.Name), (String)strProp.DefaultValue,
-                   UIText.getString(strProp.Name + "_help")));
+                   Configuration.getUIString(strProp.Name + "_help")));
                 widgetCount++;
             }
             pad(widgetCount);
@@ -38,9 +37,9 @@ namespace CrewChiefV4
             {
                 Boolean defaultValue;
                 Boolean.TryParse((String)boolProp.DefaultValue, out defaultValue);
-                this.flowLayoutPanel1.Controls.Add(new BooleanPropertyControl(boolProp.Name, UIText.getString(boolProp.Name) + " " + UIText.getString("boolean_prop_type"),
+                this.flowLayoutPanel1.Controls.Add(new BooleanPropertyControl(boolProp.Name, Configuration.getUIString(boolProp.Name) + " " + Configuration.getUIString("boolean_prop_type"),
                     UserSettings.GetUserSettings().getBoolean(boolProp.Name), defaultValue,
-                    UIText.getString(boolProp.Name + "_help")));
+                    Configuration.getUIString(boolProp.Name + "_help")));
                 widgetCount++;
             }
             pad(widgetCount);
@@ -49,9 +48,9 @@ namespace CrewChiefV4
             {
                 int defaultValue;
                 int.TryParse((String)intProp.DefaultValue, out defaultValue);
-                this.flowLayoutPanel1.Controls.Add(new IntPropertyControl(intProp.Name, UIText.getString(intProp.Name) + " " + UIText.getString("integer_prop_type"),
+                this.flowLayoutPanel1.Controls.Add(new IntPropertyControl(intProp.Name, Configuration.getUIString(intProp.Name) + " " + Configuration.getUIString("integer_prop_type"),
                     UserSettings.GetUserSettings().getInt(intProp.Name), defaultValue,
-                    UIText.getString(intProp.Name + "_help")));
+                    Configuration.getUIString(intProp.Name + "_help")));
                 widgetCount++;
             }
             pad(widgetCount);
@@ -60,9 +59,9 @@ namespace CrewChiefV4
             {
                 Boolean defaultValue;
                 Boolean.TryParse((String)boolProp.DefaultValue, out defaultValue);
-                this.flowLayoutPanel1.Controls.Add(new BooleanPropertyControl(boolProp.Name, UIText.getString(boolProp.Name) + " " + UIText.getString("boolean_prop_type"),
+                this.flowLayoutPanel1.Controls.Add(new BooleanPropertyControl(boolProp.Name, Configuration.getUIString(boolProp.Name) + " " + Configuration.getUIString("boolean_prop_type"),
                     UserSettings.GetUserSettings().getBoolean(boolProp.Name), defaultValue,
-                    UIText.getString(boolProp.Name + "_help"))); 
+                    Configuration.getUIString(boolProp.Name + "_help"))); 
                 widgetCount++;
             }
             pad(widgetCount);
@@ -71,9 +70,9 @@ namespace CrewChiefV4
             {
                 int defaultValue;
                 int.TryParse((String)intProp.DefaultValue, out defaultValue);
-                this.flowLayoutPanel1.Controls.Add(new IntPropertyControl(intProp.Name, UIText.getString(intProp.Name) + " " + UIText.getString("integer_prop_type"),
+                this.flowLayoutPanel1.Controls.Add(new IntPropertyControl(intProp.Name, Configuration.getUIString(intProp.Name) + " " + Configuration.getUIString("integer_prop_type"),
                     UserSettings.GetUserSettings().getInt(intProp.Name), defaultValue,
-                    UIText.getString(intProp.Name + "_help")));
+                    Configuration.getUIString(intProp.Name + "_help")));
                 widgetCount++;
             }
             pad(widgetCount);
@@ -82,9 +81,9 @@ namespace CrewChiefV4
             {
                 float defaultValue;
                 float.TryParse((String)floatProp.DefaultValue, out defaultValue);
-                this.flowLayoutPanel1.Controls.Add(new FloatPropertyControl(floatProp.Name, UIText.getString(floatProp.Name) + " " + UIText.getString("real_number_prop_type"),
+                this.flowLayoutPanel1.Controls.Add(new FloatPropertyControl(floatProp.Name, Configuration.getUIString(floatProp.Name) + " " + Configuration.getUIString("real_number_prop_type"),
                     UserSettings.GetUserSettings().getFloat(floatProp.Name), defaultValue,
-                    UIText.getString(floatProp.Name + "_help"))); 
+                    Configuration.getUIString(floatProp.Name + "_help"))); 
                 widgetCount++;
             }
             pad(widgetCount);
@@ -150,12 +149,12 @@ namespace CrewChiefV4
         {
             if (PropertiesForm.hasChanges)
             {
-                String warningMessage = UIText.getString("save_prop_changes_warning");
+                String warningMessage = Configuration.getUIString("save_prop_changes_warning");
                 if (System.Diagnostics.Debugger.IsAttached)
                 {
                     warningMessage = "You have unsaved changes. Click 'Yes' to save these changes (you will need to manually restart the application). Click 'No' to discard these changes";
                 }
-                if (MessageBox.Show(warningMessage, UIText.getString("save_changes"), MessageBoxButtons.YesNo) == DialogResult.Yes)
+                if (MessageBox.Show(warningMessage, Configuration.getUIString("save_changes"), MessageBoxButtons.YesNo) == DialogResult.Yes)
                 {
                     save();
                     if (!System.Diagnostics.Debugger.IsAttached)

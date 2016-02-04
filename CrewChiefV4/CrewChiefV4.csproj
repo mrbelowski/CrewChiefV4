@@ -201,7 +201,7 @@
     <Compile Include="UserInterface\Spacer.Designer.cs">
       <DependentUpon>Spacer.cs</DependentUpon>
     </Compile>
-    <Compile Include="UserInterface\UIText.cs" />
+    <Compile Include="Configuration.cs" />
     <Compile Include="UserSettings.cs" />
     <Compile Include="Utilities.cs" />
     <EmbeddedResource Include="UserInterface\FloatPropertyControl.resx">
@@ -264,6 +264,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="engineer_edited.ico" />
+    <Content Include="sounds_config.txt" />
+    <Content Include="speech_recognition_config.txt" />
     <Content Include="ui_text.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

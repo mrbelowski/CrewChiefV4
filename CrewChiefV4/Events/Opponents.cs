@@ -246,7 +246,7 @@ namespace CrewChiefV4.Events
             {
                 opponentKey = currentGameState.getOpponentKeyBehind(false);
             }
-            else if (voiceMessage.Contains(SpeechRecogniser.POSITION) || voiceMessage.Contains(SpeechRecogniser.PEA))
+            else if (voiceMessage.Contains(SpeechRecogniser.POSITION_LONG) || voiceMessage.Contains(SpeechRecogniser.POSITION_SHORT))
             {
                 int position = 0;
                 foreach (KeyValuePair<String, int> entry in SpeechRecogniser.numberToNumber)
@@ -318,7 +318,7 @@ namespace CrewChiefV4.Events
             {
                 if (voiceMessage.StartsWith(SpeechRecogniser.WHAT_TYRE_IS) || voiceMessage.StartsWith(SpeechRecogniser.WHAT_TYRES_IS))
                 {
-                    Object opponentKey = getOpponentKey(voiceMessage, " on").Item1;
+                    Object opponentKey = getOpponentKey(voiceMessage, " " + SpeechRecogniser.ON).Item1;
                     if (opponentKey != null)
                     {
                         OpponentData opponentData = currentGameState.OpponentData[opponentKey];
@@ -340,7 +340,7 @@ namespace CrewChiefV4.Events
                 {
                     if (voiceMessage.EndsWith(SpeechRecogniser.LAST_LAP))
                     {
-                        float lastLap = getOpponentLastLap(getOpponentKey(voiceMessage, "'s ").Item1);
+                        float lastLap = getOpponentLastLap(getOpponentKey(voiceMessage, SpeechRecogniser.POSSESSIVE + " ").Item1);
                         if (lastLap != -1)
                         {
                             gotData = true;
@@ -351,7 +351,7 @@ namespace CrewChiefV4.Events
                     }
                     else
                     {
-                        float bestLap = getOpponentBestLap(getOpponentKey(voiceMessage, "'s ").Item1);
+                        float bestLap = getOpponentBestLap(getOpponentKey(voiceMessage, SpeechRecogniser.POSSESSIVE + " ").Item1);
                         if (bestLap != -1)
                         {
                             gotData = true;
@@ -425,7 +425,7 @@ namespace CrewChiefV4.Events
                         }  
                     }
                 }
-                else if (voiceMessage.StartsWith(SpeechRecogniser.WHOS_BEHIND_ON_TRACK))
+                else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.WHOS_BEHIND_ON_TRACK))
                 {
                     Object opponentKey = currentGameState.getOpponentKeyBehindOnTrack();
                     if (opponentKey != null)
@@ -442,7 +442,7 @@ namespace CrewChiefV4.Events
                         }
                     }
                 }
-                else if (voiceMessage.StartsWith(SpeechRecogniser.WHOS_IN_FRONT_ON_TRACK) || voiceMessage.StartsWith(SpeechRecogniser.WHOS_AHEAD_ON_TRACK))
+                else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.WHOS_IN_FRONT_ON_TRACK))
                 {
                     Object opponentKey = currentGameState.getOpponentKeyInFrontOnTrack();
                     if (opponentKey != null)
@@ -459,7 +459,7 @@ namespace CrewChiefV4.Events
                         }
                     }
                 }
-                else if (voiceMessage.StartsWith(SpeechRecogniser.WHOS_BEHIND_IN_THE_RACE) || voiceMessage.StartsWith(SpeechRecogniser.WHOS_BEHIND))
+                else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.WHOS_BEHIND_IN_THE_RACE))
                 {
                     if (currentGameState.isLast())
                     {
@@ -482,8 +482,7 @@ namespace CrewChiefV4.Events
                         }
                     }
                 }
-                else if (voiceMessage.StartsWith(SpeechRecogniser.WHOS_IN_FRONT_IN_THE_RACE) || voiceMessage.StartsWith(SpeechRecogniser.WHOS_AHEAD_IN_THE_RACE)
-                    || voiceMessage.StartsWith(SpeechRecogniser.WHOS_IN_FRONT) || voiceMessage.StartsWith(SpeechRecogniser.WHOS_AHEAD))
+                else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.WHOS_IN_FRONT_IN_THE_RACE))
                 {
                     if (currentGameState.SessionData.Position == 1)
                     {
@@ -505,8 +504,8 @@ namespace CrewChiefV4.Events
                             }
                         }
                     }
-                }                
-                else if (voiceMessage.StartsWith(SpeechRecogniser.WHOS_LEADING) && currentGameState.SessionData.Position > 1)
+                }
+                else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.WHOS_LEADING) && currentGameState.SessionData.Position > 1)
                 {
                     OpponentData opponent = currentGameState.getOpponentAtPosition(1, false);
                     if (opponent != null)

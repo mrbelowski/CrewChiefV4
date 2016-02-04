@@ -258,7 +258,7 @@ namespace CrewChiefV4.Events
                 
                 return;
             }
-            if (voiceMessage.Contains(SpeechRecogniser.DO_I_HAVE_A_PENALTY))
+            if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.DO_I_HAVE_A_PENALTY))
             {
                 if (hasOutstandingPenalty) {
                     if (lapsCompleted - penaltyLap == 2) {
@@ -277,7 +277,7 @@ namespace CrewChiefV4.Events
                     
                 }
             }
-            else if (voiceMessage.Contains(SpeechRecogniser.HAVE_I_SERVED_MY_PENALTY))
+            else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HAVE_I_SERVED_MY_PENALTY))
             {
                 if (hasOutstandingPenalty)
                 {
@@ -297,7 +297,8 @@ namespace CrewChiefV4.Events
                         MessageContents(AudioPlayer.folderYes, folderPenaltyServed), 0, null), false);
                     
                 }
-            } else if (voiceMessage.Contains(SpeechRecogniser.DO_I_STILL_HAVE_A_PENALTY))
+            }
+            else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.DO_I_STILL_HAVE_A_PENALTY))
             {
                 if (hasOutstandingPenalty)
                 {

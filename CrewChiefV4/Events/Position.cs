@@ -415,7 +415,7 @@ namespace CrewChiefV4.Events
 
         public override void respond(String voiceMessage)
         {
-            if (voiceMessage.Contains(SpeechRecogniser.POSITION))
+            if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.WHATS_MY_POSITION))
             {
                 if (isLast)
                 {

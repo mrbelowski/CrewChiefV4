@@ -1,5 +1,4 @@
-﻿using CrewChiefV4.UserInterface;
-namespace CrewChiefV4
+﻿namespace CrewChiefV4
 {
     partial class PropertiesForm
     {
@@ -41,7 +40,7 @@ namespace CrewChiefV4
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(156, 40);
             this.button1.TabIndex = 1;
-            this.button1.Text = UIText.getString("save_and_restart");
+            this.button1.Text = Configuration.getUIString("save_and_restart");
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 

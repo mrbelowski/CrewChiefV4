@@ -1,5 +1,4 @@
 ﻿using CrewChiefV4.PCars;
-using CrewChiefV4.UserInterface;
 using SharpDX.DirectInput;
 using System;
 using System.Collections.Generic;
@@ -21,13 +20,13 @@ namespace CrewChiefV4
         public List<ButtonAssignment> buttonAssignments = new List<ButtonAssignment>();
         public List<ControllerData> controllers;
 
-        public static String CHANNEL_OPEN_FUNCTION = UIText.getString("talk_to_crew_chief");
-        public static String TOGGLE_RACE_UPDATES_FUNCTION = UIText.getString("toggle_race_updates_on/off");
-        public static String TOGGLE_SPOTTER_FUNCTION = UIText.getString("toggle_spotter_on/off");
-        public static String TOGGLE_READ_OPPONENT_DELTAS = UIText.getString("toggle_opponent_deltas_on/off_for_each_lap");
-        public static String REPEAT_LAST_MESSAGE_BUTTON = UIText.getString("press_to_replay_the_last_message");
+        public static String CHANNEL_OPEN_FUNCTION = Configuration.getUIString("talk_to_crew_chief");
+        public static String TOGGLE_RACE_UPDATES_FUNCTION = Configuration.getUIString("toggle_race_updates_on/off");
+        public static String TOGGLE_SPOTTER_FUNCTION = Configuration.getUIString("toggle_spotter_on/off");
+        public static String TOGGLE_READ_OPPONENT_DELTAS = Configuration.getUIString("toggle_opponent_deltas_on/off_for_each_lap");
+        public static String REPEAT_LAST_MESSAGE_BUTTON = Configuration.getUIString("press_to_replay_the_last_message");
 
-        private ControllerData networkGamePad = new ControllerData(UIText.getString("udp_network_data_buttons"), DeviceType.Gamepad, UDP_NETWORK_CONTROLLER_GUID);
+        private ControllerData networkGamePad = new ControllerData(Configuration.getUIString("udp_network_data_buttons"), DeviceType.Gamepad, UDP_NETWORK_CONTROLLER_GUID);
         
         // yuk...
         public Dictionary<String, int> buttonAssignmentIndexes = new Dictionary<String, int>();
@@ -62,7 +61,7 @@ namespace CrewChiefV4
         public void addCustomController(Guid guid)
         {
             var joystick = new Joystick(directInput, guid);
-            String productName = " " + UIText.getString("custom_device");
+            String productName = " " + Configuration.getUIString("custom_device");
             try
             {
                 productName = ": " + joystick.Properties.ProductName;
@@ -427,11 +426,11 @@ namespace CrewChiefV4
                 if (controller != null && buttonIndex > -1)
                 {
                     String name = controller.deviceName == null || controller.deviceName.Length == 0 ? controller.deviceType.ToString() : controller.deviceName;
-                    return action + " " + UIText.getString("assigned_to") + " " + name + ", " + UIText.getString("button") + ": " + buttonIndex;
+                    return action + " " + Configuration.getUIString("assigned_to") + " " + name + ", " + Configuration.getUIString("button") + ": " + buttonIndex;
                 }
                 else
                 {
-                    return action + " " + UIText.getString("not_assigned");
+                    return action + " " + Configuration.getUIString("not_assigned");
                 }
             }
             

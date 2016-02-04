@@ -1,0 +1,194 @@
+﻿# This file contains options for the speech recogniser, and voice recognition phrase fragments
+
+defaultLocale = en
+
+######################################################
+# Static recognition phrases - these are recognised 'as-is' with no combining of phrases or sentences.
+# Each option is separated by a colon, so if you want the app to tell you the air temp, you can ask 
+# any number of ways by creating a colon separated list for this request- e.g.
+# WHATS_THE_AIR_TEMP = ow 'ot is it:is it cowd:nice out:tell me the air temp or else
+#
+# or you can just have a single phrase:
+# WHATS_THE_AIR_TEMP = whats the air temp
+#
+######################################################
+
+HOWS_MY_TYRE_WEAR = how's my tire wear:what's my tire wear:tire wear:how are my tires
+HOWS_MY_TRANSMISSION = how's my transmission:how's my gearbox
+HOWS_MY_AERO = how's my aero:how's my bodywork
+HOWS_MY_ENGINE = how's my engine
+HOWS_MY_SUSPENSION = how's my suspension
+HOWS_MY_BRAKES = how's my brakes:how are my brakes
+HOWS_MY_FUEL = how's my fuel:how's my fuel level
+HOWS_MY_PACE = how's my pace
+HOW_ARE_MY_TYRE_TEMPS = how are my tire temps:how are my tire temperatures
+WHAT_ARE_MY_TYRE_TEMPS = what are my tire temps:what are my tire temperatures:tire temps:tire temperatures
+HOW_ARE_MY_BRAKE_TEMPS = how are my brake temps:how are my brake temperatures
+WHAT_ARE_MY_BRAKE_TEMPS = what are my brake temps:what are my brake temperatures:brake temps:brake temperatures
+HOW_ARE_MY_BRAKES = how are my brakes
+HOW_ARE_MY_ENGINE_TEMPS = how are my engine temps:how are my engine temperatures
+WHATS_MY_GAP_IN_FRONT = what's the gap ahead:what's the gap in front:what's my gap ahead:whats my gap in front:gap in front:gap ahead
+WHATS_MY_GAP_BEHIND = what's the gap behind:what's my gap behind:gap behind
+WHAT_WAS_MY_LAST_LAP_TIME = what's my last laptime:last laptime:laptime
+WHATS_MY_BEST_LAP_TIME = what's my best laptime:best laptime:best lap
+WHATS_MY_POSITION = what's my position
+WHATS_MY_FUEL_LEVEL = what's my fuel level
+
+KEEP_QUIET = keep quiet:shut up:I know what I'm doing:leave me alone
+KEEP_ME_INFORMED = keep me updated:keep me informed:keep me posted
+TELL_ME_THE_GAPS = tell me the gaps:tell me the deltas:give me the deltas:time deltas every lap
+DONT_TELL_ME_THE_GAPS = don't tell me the gaps:don't tell me the deltas:don't give me the deltas:no more deltas:no more gaps
+
+WHOS_IN_FRONT_IN_THE_RACE = who's in front in the race:who's ahead in the race:who's in front:who's ahead
+WHOS_BEHIND_IN_THE_RACE = who's behind in the race:who's behind
+WHOS_IN_FRONT_ON_TRACK = who's in front on track:who's ahead on track";
+WHOS_BEHIND_ON_TRACK = who's behind on track
+WHOS_LEADING = who's leading:who's in the lead
+
+HOW_LONGS_LEFT = how long's left:how many laps left:how many laps to go
+SPOT = spot
+DONT_SPOT = don't spot
+REPEAT_LAST_MESSAGE = repeat last message:say again
+HAVE_I_SERVED_MY_PENALTY = have I served my penalty
+DO_I_HAVE_A_PENALTY = do I have a penalty
+DO_I_STILL_HAVE_A_PENALTY = do I still have a penalty
+DO_I_HAVE_A_MANDATORY_PIT_STOP = do I have to pit:do I need to pit:do I have a mandatory pit stop:do I have a mandatory stop:do I have to make a pit stop
+WHAT_ARE_MY_SECTOR_TIMES = what are my sector times
+WHATS_MY_LAST_SECTOR_TIME = what's my last sector time
+WHATS_THE_AIR_TEMP = what's the air temp:what's the air temperature
+WHATS_THE_TRACK_TEMP = what's the track temp:what's the track temperature
+RADIO_CHECK = can you hear me
+
+
+#################################################
+# Dynamic recognition phrase fragments - these are used to build up recognition sentences for opponent information.
+# Multiple options are NOT supported here - each must be a single word or phrase. These are combined for each opponent
+# in the race, using his name and his race position. The race position is a number taken from the number mappings
+# below. For example, the app will recognise
+# "what's position 10's best lap time". This is built from the fragments here - i.e.
+# WHATS + POSITION_LONG + POSSESSIVE + numbers(10) + BEST_LAP_TIME
+#
+# The full set is...
+# WHERE_IS + (driver_name)										[reads his position and the gap to the player]
+# WHATS + (driver_name) + POSSESSIVE + LAST_LAP					[driver's last lap time]
+# WHATS + (driver_name) + POSSESSIVE + BEST_LAP					[driver's best lap time]
+# WHATS + POSITION_LONG (number) + POSSESSIVE + LAST_LAP		[driver in position (number)'s last lap time]
+# WHATS + POSITION_LONG (number) + POSSESSIVE + BEST_LAP		[driver in position (number)'s best lap time]
+# WHATS + POSITION_SHORT (number) + POSSESSIVE + LAST_LAP		[driver in P (number)'s last lap time]
+# WHATS + POSITION_SHORT (number) + POSSESSIVE + BEST_LAP		[driver in P (number)'s best lap time]
+# WHATS + THE_LEADER + POSSESSIVE + LAST_LAP					[leader's last lap time]
+# WHATS + THE_LEADER + POSSESSIVE + BEST_LAP					[leader's best lap time]
+# WHATS + THE_GUY_IN_FRONT + POSSESSIVE + LAST_LAP				[car in front's last lap time]
+# WHATS + THE_GUY_IN_FRONT + POSSESSIVE + BEST_LAP				[car in front's best lap time]
+# WHATS + THE_CAR_IN_FRONT + POSSESSIVE + LAST_LAP				[car in front's last lap time]
+# WHATS + THE_CAR_IN_FRONT + POSSESSIVE + BEST_LAP				[car in front's best lap time]
+# WHATS + THE_GUY_AHEAD + POSSESSIVE + LAST_LAP					[car in front's last lap time]
+# WHATS + THE_GUY_AHEAD + POSSESSIVE + BEST_LAP					[car in front's best lap time]
+# WHATS + THE_CAR_BEHIND + POSSESSIVE + LAST_LAP				[car behind's last lap time]
+# WHATS + THE_CAR_BEHIND + POSSESSIVE + BEST_LAP				[car behind's best lap time]
+# WHATS + THE_GUY_BEHIND + POSSESSIVE + LAST_LAP				[car behind's last lap time]
+# WHATS + THE_GUY_BEHIND + POSSESSIVE + BEST_LAP				[car behind's best lap time]
+# WHAT_TYRE_IS + (driver_name) + ON								[the tyre type being used by (driver_name) - raceroom only]
+# WHAT_TYRES_IS + (driver_name) + ON							[the tyre type being used by (driver_name) - raceroom only]
+# WHAT_TYRE_IS + THE_GUY_IN_FRONT + ON							[the tyre type being used by the car ahead - raceroom only]
+# WHAT_TYRES_IS + THE_GUY_IN_FRONT + ON							[the tyre type being used by the car ahead - raceroom only]
+# WHAT_TYRE_IS + THE_GUY_AHEAD + ON								[the tyre type being used by the car ahead - raceroom only]
+# WHAT_TYRES_IS + THE_GUY_AHEAD + ON							[the tyre type being used by the car ahead - raceroom only]
+# WHAT_TYRE_IS + THE_GUY_BEHIND + ON							[the tyre type being used by the car behind - raceroom only]
+# WHAT_TYRES_IS + THE_GUY_BEHIND + ON							[the tyre type being used by the car behind - raceroom only]
+# WHAT_TYRE_IS + POSITION_SHORT (number) + ON					[the tyre type being used by the car in P (number) - raceroom only]
+# WHAT_TYRES_IS + POSITION_SHORT (number) + ON					[the tyre type being used by the car in P (number) - raceroom only]
+# WHAT_TYRE_IS + POSITION_LONG (number) + ON					[the tyre type being used by the car in position (number) - raceroom only]
+# WHAT_TYRES_IS + POSITION_LONG (number) + ON					[the tyre type being used by the car in position (number) - raceroom only]
+# WHOS_IN + POSITION_LONG (number)								[the name of the driver in position (number)]
+# WHOS_IN + POSITION_SHORT (number)								[the name of the driver in P (number)]
+# WHERE_IS + POSITION_SHORT										[the position and gap to the driver in position (number)]
+# WHERE_IS + POSITION_LONG										[the position and gap to the driver in P (number)]
+
+#################################################
+
+POSITION_LONG = position
+POSITION_SHORT = pea
+WHERES = where's
+WHERE_IS = where is
+
+WHOS_IN = who's in
+WHATS = what's
+BEST_LAP = best lap
+BEST_LAP_TIME = best lap time
+LAST_LAP = last lap
+LAST_LAP_TIME = last lap time
+THE_LEADER = the leader
+THE_CAR_AHEAD = the car ahead
+THE_CAR_IN_FRONT = the car in front
+THE_GUY_AHEAD = the guy ahead
+THE_GUY_IN_FRONT = the guy in front
+THE_CAR_BEHIND = the car behind
+THE_GUY_BEHIND = the guy behind
+
+WHAT_TYRES_IS = what tires is
+WHAT_TYRE_IS = what tire is
+
+# this one is used for Raceroom tyre questions - "what tyres is Bob on". The "on" could be "using", or "running", or whatever, but can only be a single item (no lists)
+ON = on
+
+# 's added to a name or number to indicate possession - "what is bob's best lap", "what's position 12's last lap"
+POSSESSIVE = 's
+
+
+
+#################################################
+# numbers - these are the text strings the voice recogniser will listen for (it's not good at listening for numeric characters)
+# These are used by the dynamic phrases, and are combined with the dynamic phrase fragments above
+#################################################
+
+1 = one
+2 = two
+3 = three
+4 = four
+5 = five
+6 = six
+7 = seven
+8 = eight
+9 = nine
+10 = ten
+11 = eleven
+12 = twelve
+13 = thirteen
+14 = fourteen
+15 = fifteen
+16 = sixteen
+17 = seventeen
+18 = eighteen
+19 = nineteen
+20 = twenty
+21 = twenty-one
+22 = twenty-two
+23 = twenty-three
+24 = twenty-four
+25 = twenty-five
+26 = twenty-six
+27 = twenty-seven
+28 = twenty-eight
+29 = twenty-nine
+30 = thirty
+31 = thirty-one
+32 = thirty-two
+33 = thirty-three
+34 = thirty-fou
+35 = thirty-five
+36 = thirty-six
+37 = thirty-seven
+38 = thirty-eight
+39 = thirty-nine
+40 = fourty
+41 = fourty-one
+42 = fourty-two
+43 = fourty-three
+44 = fourty-four
+45 = fourty-five
+46 = fourty-six
+47 = fourty-seven
+48 = fourty-eight
+49 = fourty-nine
+50 = fifty

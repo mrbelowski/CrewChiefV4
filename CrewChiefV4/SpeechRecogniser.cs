@@ -21,106 +21,77 @@ namespace CrewChiefV4
 
         private static String defaultLocale = "en";
 
-        // externalise these?
-        public static String FUEL = "fuel";
-        public static String FUEL_LEVEL = "fuel level";
-        public static String TYRE_WEAR = "tyre wear";
-        public static String TYRE_TEMPS = "tyre temps";
-        public static String TYRE_TEMPERATURES = "tyre temperatures";
-        public static String BRAKE_TEMPS = "brake temps";
-        public static String BRAKE_TEMPERATURES = "brake temperatures";
-        public static String AERO = "aero";
-        public static String BODY_WORK = "body work";
-        public static String TRANSMISSION = "transmission";
-        public static String ENGINE = "engine";
-        public static String SUSPENSION = "suspension";
-        public static String BRAKES = "brakes";
-        public static String ENGINE_TEMPS = "engine temps";
-        public static String ENGINE_TEMPERATURES = "engine temperatures";
-        public static String GAP_IN_FRONT = "gap in front";
-        public static String GAP_AHEAD = "gap ahead";
-        public static String GAP_BEHIND = "gap behind";
-        public static String LAST_LAP_TIME = "last lap time";
-        public static String LAP_TIME = "lap time";
-        public static String LAST_LAP = "last lap";
-        public static String POSITION = "position";
-        public static String PEA = "pea";
-        public static String PACE = "pace";
+        public static String[] HOWS_MY_TYRE_WEAR = Configuration.getSpeechRecognitionPhrases("HOWS_MY_TYRE_WEAR");
+        public static String[] HOWS_MY_TRANSMISSION = Configuration.getSpeechRecognitionPhrases("HOWS_MY_TRANSMISSION");
+        public static String[] HOWS_MY_AERO = Configuration.getSpeechRecognitionPhrases("HOWS_MY_AERO");
+        public static String[] HOWS_MY_ENGINE = Configuration.getSpeechRecognitionPhrases("HOWS_MY_ENGINE");
+        public static String[] HOWS_MY_SUSPENSION = Configuration.getSpeechRecognitionPhrases("HOWS_MY_SUSPENSION");
+        public static String[] HOWS_MY_BRAKES = Configuration.getSpeechRecognitionPhrases("HOWS_MY_BRAKES");
+        public static String[] HOWS_MY_FUEL = Configuration.getSpeechRecognitionPhrases("HOWS_MY_FUEL");
+        public static String[] HOWS_MY_PACE = Configuration.getSpeechRecognitionPhrases("HOWS_MY_PACE");
+        public static String[] HOW_ARE_MY_TYRE_TEMPS = Configuration.getSpeechRecognitionPhrases("HOW_ARE_MY_TYRE_TEMPS");
+        public static String[] WHAT_ARE_MY_TYRE_TEMPS = Configuration.getSpeechRecognitionPhrases("WHAT_ARE_MY_TYRE_TEMPS");
+        public static String[] HOW_ARE_MY_BRAKE_TEMPS = Configuration.getSpeechRecognitionPhrases("HOW_ARE_MY_BRAKE_TEMPS");
+        public static String[] WHAT_ARE_MY_BRAKE_TEMPS = Configuration.getSpeechRecognitionPhrases("WHAT_ARE_MY_BRAKE_TEMPS");
+        public static String[] HOW_ARE_MY_BRAKES = Configuration.getSpeechRecognitionPhrases("HOW_ARE_MY_BRAKES");
+        public static String[] HOW_ARE_MY_ENGINE_TEMPS = Configuration.getSpeechRecognitionPhrases("HOW_ARE_MY_ENGINE_TEMPS");
+        public static String[] WHATS_MY_GAP_IN_FRONT = Configuration.getSpeechRecognitionPhrases("WHATS_MY_GAP_IN_FRONT");
+        public static String[] WHATS_MY_GAP_BEHIND = Configuration.getSpeechRecognitionPhrases("WHATS_MY_GAP_BEHIND");
+        public static String[] WHAT_WAS_MY_LAST_LAP_TIME = Configuration.getSpeechRecognitionPhrases("WHAT_WAS_MY_LAST_LAP_TIME");
+        public static String[] WHATS_MY_BEST_LAP_TIME = Configuration.getSpeechRecognitionPhrases("WHATS_MY_BEST_LAP_TIME");
+        public static String[] WHATS_MY_POSITION = Configuration.getSpeechRecognitionPhrases("WHATS_MY_POSITION");
+        public static String[] WHATS_MY_FUEL_LEVEL = Configuration.getSpeechRecognitionPhrases("WHATS_MY_FUEL_LEVEL");
 
-        public static String WHAT_ARE_MY = "what are my";
+        public static String[] KEEP_QUIET = Configuration.getSpeechRecognitionPhrases("KEEP_QUIET");
+        public static String[] KEEP_ME_INFORMED = Configuration.getSpeechRecognitionPhrases("KEEP_ME_INFORMED");
+        public static String[] TELL_ME_THE_GAPS = Configuration.getSpeechRecognitionPhrases("TELL_ME_THE_GAPS");
+        public static String[] DONT_TELL_ME_THE_GAPS = Configuration.getSpeechRecognitionPhrases("DONT_TELL_ME_THE_GAPS");
 
-        private static String KEEP_QUIET = "keep quiet";
-        private static String SHUT_UP = "shut up";
-        private static String I_KNOW_WHAT_IM_DOING = "I know what I'm doing";
-        private static String LEAVE_ME_ALONE = "leave me alone";
-        private static String DONT_TELL_ME_THE_GAPS = "don't tell me the gaps";
-        private static String DONT_TELL_ME_THE_DELTAS = "don't tell me the deltas";
-        private static String DONT_GIVE_ME_THE_DELTAS = "don't give me the deltas"; 
-        private static String NO_MORE_DELTAS = "no more deltas";
-        private static String NO_MORE_GAPS = "no more gaps";
+        public static String[] WHOS_IN_FRONT_IN_THE_RACE = Configuration.getSpeechRecognitionPhrases("WHOS_IN_FRONT_IN_THE_RACE");
+        public static String[] WHOS_BEHIND_IN_THE_RACE = Configuration.getSpeechRecognitionPhrases("WHOS_BEHIND_IN_THE_RACE");
+        public static String[] WHOS_IN_FRONT_ON_TRACK = Configuration.getSpeechRecognitionPhrases("WHOS_IN_FRONT_ON_TRACK");
+        public static String[] WHOS_BEHIND_ON_TRACK = Configuration.getSpeechRecognitionPhrases("WHOS_BEHIND_ON_TRACK");
+        public static String[] WHOS_LEADING = Configuration.getSpeechRecognitionPhrases("WHOS_LEADING");
 
-        private static String KEEP_ME_UPDATED = "keep me updated";
-        private static String KEEP_ME_INFORMED = "keep me informed";
-        private static String KEEP_ME_POSTED = "keep me posted";
-        private static String TELL_ME_THE_GAPS = "tell me the gaps";
-        private static String TELL_ME_THE_DELTAS = "tell me the deltas";
-        private static String GIVE_ME_THE_DELTAS = "give me the deltas";
+        public static String[] HOW_LONGS_LEFT = Configuration.getSpeechRecognitionPhrases("HOW_LONGS_LEFT");
+        public static String[] SPOT = Configuration.getSpeechRecognitionPhrases("SPOT");
+        public static String[] DONT_SPOT = Configuration.getSpeechRecognitionPhrases("DONT_SPOT");
+        public static String[] REPEAT_LAST_MESSAGE = Configuration.getSpeechRecognitionPhrases("REPEAT_LAST_MESSAGE");
+        public static String[] HAVE_I_SERVED_MY_PENALTY = Configuration.getSpeechRecognitionPhrases("HAVE_I_SERVED_MY_PENALTY");
+        public static String[] DO_I_HAVE_A_PENALTY = Configuration.getSpeechRecognitionPhrases("DO_I_HAVE_A_PENALTY");
+        public static String[] DO_I_STILL_HAVE_A_PENALTY = Configuration.getSpeechRecognitionPhrases("DO_I_STILL_HAVE_A_PENALTY");
+        public static String[] DO_I_HAVE_A_MANDATORY_PIT_STOP = Configuration.getSpeechRecognitionPhrases("DO_I_HAVE_A_MANDATORY_PIT_STOP");
+        public static String[] WHAT_ARE_MY_SECTOR_TIMES = Configuration.getSpeechRecognitionPhrases("WHAT_ARE_MY_SECTOR_TIMES");
+        public static String[] WHATS_MY_LAST_SECTOR_TIME = Configuration.getSpeechRecognitionPhrases("WHATS_MY_LAST_SECTOR_TIME");
+        public static String[] WHATS_THE_AIR_TEMP = Configuration.getSpeechRecognitionPhrases("WHATS_THE_AIR_TEMP");
+        public static String[] WHATS_THE_TRACK_TEMP = Configuration.getSpeechRecognitionPhrases("WHATS_THE_TRACK_TEMP");
+        public static String[] RADIO_CHECK = Configuration.getSpeechRecognitionPhrases("RADIO_CHECK");
 
-        private static String HOW_LONGS_LEFT = "how long's left";
-        private static String HOW_MANY_LAPS_LEFT = "how many laps left";
-        private static String HOW_MANY_LAPS_TO_GO = "how many laps to go";
 
-        private static String SPOT = "spot";
-        private static String DONT_SPOT = "don't spot";
+        public static String ON = Configuration.getSpeechRecognitionConfigOption("ON");
+        public static String POSSESSIVE = Configuration.getSpeechRecognitionConfigOption("POSSESSIVE");
+        public static String WHERE_IS = Configuration.getSpeechRecognitionConfigOption("WHERE_IS");
+        public static String WHERES = Configuration.getSpeechRecognitionConfigOption("WHERES");
+        public static String POSITION_LONG = Configuration.getSpeechRecognitionConfigOption("POSITION_LONG");
+        public static String POSITION_SHORT = Configuration.getSpeechRecognitionConfigOption("POSITION_SHORT");
 
-        public static String DO_I_STILL_HAVE_A_PENALTY = "do I still have a penalty";
-        public static String DO_I_HAVE_A_PENALTY = "do I have a penalty";
-        public static String HAVE_I_SERVED_MY_PENALTY = "have I served my penalty";
+        public static String WHOS_IN = Configuration.getSpeechRecognitionConfigOption("WHOS_IN");
+        public static String WHATS = Configuration.getSpeechRecognitionConfigOption("WHATS");
+        public static String BEST_LAP = Configuration.getSpeechRecognitionConfigOption("BEST_LAP");
+        public static String BEST_LAP_TIME = Configuration.getSpeechRecognitionConfigOption("BEST_LAP_TIME"); 
+        public static String LAST_LAP = Configuration.getSpeechRecognitionConfigOption("LAST_LAP");
+        public static String LAST_LAP_TIME = Configuration.getSpeechRecognitionConfigOption("LAST_LAP_TIME");
+        public static String THE_LEADER = Configuration.getSpeechRecognitionConfigOption("THE_LEADER");
+        public static String THE_CAR_AHEAD = Configuration.getSpeechRecognitionConfigOption("THE_CAR_AHEAD");
+        public static String THE_CAR_IN_FRONT = Configuration.getSpeechRecognitionConfigOption("THE_CAR_IN_FRONT");
+        public static String THE_GUY_AHEAD = Configuration.getSpeechRecognitionConfigOption("THE_GUY_AHEAD");
+        public static String THE_GUY_IN_FRONT = Configuration.getSpeechRecognitionConfigOption("THE_GUY_IN_FRONT");
+        public static String THE_CAR_BEHIND = Configuration.getSpeechRecognitionConfigOption("THE_CAR_BEHIND");
+        public static String THE_GUY_BEHIND = Configuration.getSpeechRecognitionConfigOption("THE_GUY_BEHIND");
 
-        public static String DO_I_HAVE_TO_PIT = "do I have to pit";
-        public static String DO_I_NEED_TO_PIT = "do I need to pit";
-        public static String DO_I_HAVE_A_MANDATORY_PIT_STOP = "do I have a mandatory pit stop";
-        public static String DO_I_HAVE_A_MANDATORY_STOP = "do I have a mandatory stop";
-        public static String DO_I_HAVE_TO_MAKE_A_PIT_STOP = "do I have to make a pit stop";
-
-        public static String WHERE_IS = "where's";
-        public static String WHOS_IN_FRONT_IN_THE_RACE = "who's in front in the race";
-        public static String WHOS_AHEAD_IN_THE_RACE = "who's ahead in the race";
-        public static String WHOS_BEHIND_IN_THE_RACE = "who's behind in the race"; 
-        public static String WHOS_IN_FRONT = "who's in front";
-        public static String WHOS_AHEAD = "who's ahead";
-        public static String WHOS_BEHIND = "who's behind"; 
-        public static String WHOS_IN_FRONT_ON_TRACK = "who's in front on track";
-        public static String WHOS_AHEAD_ON_TRACK = "who's ahead on track";
-        public static String WHOS_BEHIND_ON_TRACK = "who's behind on track";
-        public static String WHOS_IN = "who's in";
-        public static String WHOS_LEADING = "who's leading";
-        public static String WHATS = "what's";
-        public static String BEST_LAP = "best lap";
-        public static String BEST_LAP_TIME = "best lap time";
-        public static String THE_LEADER = "the leader";
-        public static String THE_CAR_AHEAD = "the car ahead";
-        public static String THE_CAR_IN_FRONT = "the car in front";
-        public static String THE_GUY_AHEAD = "the guy ahead";
-        public static String THE_GUY_IN_FRONT = "the guy in front";
-        public static String THE_CAR_BEHIND = "the car behind";
-        public static String THE_GUY_BEHIND = "the guy behind";
-
-        public static String WHAT_TYRES_IS = "what tyres is";
-        public static String WHAT_TYRE_IS = "what tyre is";
-
-        public static String REPEAT_LAST_MESSAGE = "repeat last message";
-        public static String SAY_AGAIN = "say again";
-
-        public static String WHAT_ARE_MY_SECTOR_TIMES = "what are my sector times";
-        public static String WHATS_MY_LAST_SECTOR_TIME = "what's my last sector time";
-
-        public static String WHATS_THE_AIR_TEMP = "what's the air temp"; 
-        public static String WHATS_THE_AIR_TEMPERATURE = "what's the air temperature"; 
-        public static String WHATS_THE_TRACK_TEMP = "what's the track temp"; 
-        public static String WHATS_THE_TRACK_TEMPERATURE = "what's the track temperature";
-
-        public static String RADIO_CHECK = "can you hear me";
+        public static String WHAT_TYRES_IS = Configuration.getSpeechRecognitionConfigOption("WHAT_TYRES_IS");
+        public static String WHAT_TYRE_IS = Configuration.getSpeechRecognitionConfigOption("WHAT_TYRE_IS");
+        
         
         private CrewChief crewChief;
 
@@ -134,17 +105,17 @@ namespace CrewChiefV4
         
         private System.Globalization.CultureInfo cultureInfo;
 
-        public static Dictionary<String, int> numberToNumber = new Dictionary<String, int>(){
-            {"one", 1}, {"two", 2}, {"three", 3}, {"four", 4}, {"five", 5}, {"six", 6}, {"seven", 7}, {"eight", 8}, 
-            {"nine", 9}, {"ten", 10}, {"eleven", 11}, {"twelve", 12},  {"thirteen", 13}, {"fourteen", 14}, {"fifteen", 15}, {"sixteen", 16}, 
-            {"seventeen", 17}, {"eighteen", 18}, {"nineteen", 19}, {"twenty", 20}, {"twenty-one", 21}, 
-            {"twenty-two", 22}, {"twenty-three", 23}, {"twenty-four", 24}, {"twenty-five", 25}, {"twenty-six", 26}, 
-            {"twenty-seven", 27}, {"twenty-eight", 28}, {"twenty-nine", 29}, {"thirty", 30}, {"thirty-one", 31}, 
-            {"thirty-two", 32}, {"thirty-three", 33}, {"thirty-four", 34}, {"thirty-five", 35}, {"thirty-six", 36}, 
-            {"thirty-seven", 37}, {"thirty-eight", 38}, {"thirty-nine", 39}, {"fourty", 40}, {"fourty-one", 41}, 
-            {"fourty-two", 42}, {"fourty-three", 43}, {"fourty-four", 44}, {"fourty-five", 45}, {"fourty-six", 46}, 
-            {"fourty-seven", 47}, {"fourty-eight", 48}, {"fourty-nine", 49}, {"fifty", 50}
-        };
+        public static Dictionary<String, int> numberToNumber = getNumberMappings();
+
+        private static Dictionary<String, int> getNumberMappings()
+        {
+            Dictionary<String, int> dict = new Dictionary<string, int>();
+            for (int i = 1; i <= 50; i++)
+            {
+                dict.Add(Configuration.getSpeechRecognitionConfigOption(i.ToString()), i);
+            }
+            return dict;
+        }
 
         public void Dispose()
         {
@@ -173,6 +144,26 @@ namespace CrewChiefV4
         {
             cultureInfo = new System.Globalization.CultureInfo(locale);
             this.sre = new SpeechRecognitionEngine(cultureInfo);
+        }
+
+        private void validateAndAdd(String[] speechPhrases, Choices choices)
+        {
+            if (speechPhrases != null && speechPhrases.Count() > 0)
+            {
+                Boolean valid = true;
+                foreach (String s in speechPhrases)
+                {
+                    if (s == null || s.Trim().Count() == 0)
+                    {
+                        valid = false;
+                        break;
+                    }
+                }
+                if (valid)
+                {
+                    choices.Add(speechPhrases);
+                }
+            }
         }
 
         public void initialiseSpeechEngine()
@@ -223,59 +214,52 @@ namespace CrewChiefV4
             }
             try
             {
+                Choices staticSpeechChoices = new Choices();
+                validateAndAdd(HOWS_MY_TYRE_WEAR, staticSpeechChoices);
+                validateAndAdd(HOWS_MY_TRANSMISSION, staticSpeechChoices);
+                validateAndAdd(HOWS_MY_AERO, staticSpeechChoices);
+                validateAndAdd(HOWS_MY_ENGINE, staticSpeechChoices);
+                validateAndAdd(HOWS_MY_SUSPENSION, staticSpeechChoices);
+                validateAndAdd(HOWS_MY_BRAKES, staticSpeechChoices);
+                validateAndAdd(HOWS_MY_FUEL, staticSpeechChoices);
+                validateAndAdd(HOWS_MY_PACE, staticSpeechChoices);
+                validateAndAdd(HOW_ARE_MY_TYRE_TEMPS, staticSpeechChoices);
+                validateAndAdd(WHAT_ARE_MY_TYRE_TEMPS, staticSpeechChoices);
+                validateAndAdd(HOW_ARE_MY_BRAKE_TEMPS, staticSpeechChoices);
+                validateAndAdd(WHAT_ARE_MY_BRAKE_TEMPS, staticSpeechChoices);
+                validateAndAdd(HOW_ARE_MY_BRAKES, staticSpeechChoices);
+                validateAndAdd(HOW_ARE_MY_ENGINE_TEMPS, staticSpeechChoices);
+                validateAndAdd(WHATS_MY_GAP_IN_FRONT, staticSpeechChoices);
+                validateAndAdd(WHATS_MY_GAP_BEHIND, staticSpeechChoices);
+                validateAndAdd(WHAT_WAS_MY_LAST_LAP_TIME, staticSpeechChoices);
+                validateAndAdd(WHATS_MY_BEST_LAP_TIME, staticSpeechChoices);
+                validateAndAdd(WHATS_MY_POSITION, staticSpeechChoices);
+                validateAndAdd(WHATS_MY_FUEL_LEVEL, staticSpeechChoices);
 
+                validateAndAdd(KEEP_QUIET, staticSpeechChoices);
+                validateAndAdd(KEEP_ME_INFORMED, staticSpeechChoices);
+                validateAndAdd(TELL_ME_THE_GAPS, staticSpeechChoices);
+                validateAndAdd(DONT_TELL_ME_THE_GAPS, staticSpeechChoices);
 
-                Choices info0 = new Choices();
-                info0.Add(new string[] { "how's my", "how is my" });
-                Choices info1 = new Choices();
-                info1.Add(new string[] { FUEL, TYRE_WEAR, AERO, BODY_WORK, TRANSMISSION, ENGINE, SUSPENSION, PACE, 
-                    TYRE_TEMPS, TYRE_TEMPERATURES, BRAKE_TEMPS, BRAKE_TEMPERATURES, BRAKES, ENGINE_TEMPS, ENGINE_TEMPERATURES });
-                GrammarBuilder gb1 = new GrammarBuilder();
-                gb1.Culture = cultureInfo;
-                gb1.Append(info0);
-                gb1.Append(info1);
-                Grammar g1 = new Grammar(gb1);
+                validateAndAdd(HOW_LONGS_LEFT, staticSpeechChoices);
+                validateAndAdd(SPOT, staticSpeechChoices);
+                validateAndAdd(DONT_SPOT, staticSpeechChoices);
+                validateAndAdd(REPEAT_LAST_MESSAGE, staticSpeechChoices);
+                validateAndAdd(HAVE_I_SERVED_MY_PENALTY, staticSpeechChoices);
+                validateAndAdd(DO_I_HAVE_A_PENALTY, staticSpeechChoices);
+                validateAndAdd(DO_I_STILL_HAVE_A_PENALTY, staticSpeechChoices);
+                validateAndAdd(DO_I_HAVE_A_MANDATORY_PIT_STOP, staticSpeechChoices);
+                validateAndAdd(WHAT_ARE_MY_SECTOR_TIMES, staticSpeechChoices);
+                validateAndAdd(WHATS_MY_LAST_SECTOR_TIME, staticSpeechChoices);
+                validateAndAdd(WHATS_THE_AIR_TEMP, staticSpeechChoices);
+                validateAndAdd(WHATS_THE_TRACK_TEMP, staticSpeechChoices);
+                validateAndAdd(RADIO_CHECK, staticSpeechChoices);
 
-                Choices info2 = new Choices();
-                info2.Add(new string[] { GAP_IN_FRONT, GAP_AHEAD, GAP_BEHIND, LAST_LAP, LAP_TIME, LAST_LAP_TIME, BEST_LAP, BEST_LAP_TIME, POSITION, FUEL_LEVEL });
-                GrammarBuilder gb2 = new GrammarBuilder();
-                gb2.Culture = cultureInfo;
-                gb2.Append("what's my");
-                gb2.Append(info2);
-                Grammar g2 = new Grammar(gb2);
-
-                Choices info3 = new Choices();
-                info3.Add(new string[] { TYRE_TEMPS, TYRE_TEMPERATURES, BRAKE_TEMPS, BRAKE_TEMPERATURES, BRAKES, ENGINE_TEMPS, ENGINE_TEMPERATURES });
-                GrammarBuilder gb3 = new GrammarBuilder();
-                gb3.Culture = cultureInfo;
-                gb3.Append("how are my");
-                gb3.Append(info3);
-                Grammar g3 = new Grammar(gb3);
-
-                Choices info4 = new Choices();
-                info4.Add(new string[] { KEEP_QUIET, SHUT_UP, I_KNOW_WHAT_IM_DOING, LEAVE_ME_ALONE, DONT_TELL_ME_THE_GAPS, DONT_GIVE_ME_THE_DELTAS, DONT_TELL_ME_THE_GAPS,
-                    NO_MORE_DELTAS, NO_MORE_GAPS, KEEP_ME_INFORMED, KEEP_ME_POSTED, KEEP_ME_UPDATED, TELL_ME_THE_GAPS, GIVE_ME_THE_DELTAS, TELL_ME_THE_DELTAS,
-                    HOW_LONGS_LEFT, HOW_MANY_LAPS_LEFT, HOW_MANY_LAPS_TO_GO, SPOT, DONT_SPOT, REPEAT_LAST_MESSAGE, SAY_AGAIN,HAVE_I_SERVED_MY_PENALTY, DO_I_HAVE_A_PENALTY, DO_I_STILL_HAVE_A_PENALTY,
-                    DO_I_HAVE_A_MANDATORY_PIT_STOP, DO_I_NEED_TO_PIT, DO_I_HAVE_A_MANDATORY_STOP, DO_I_HAVE_TO_MAKE_A_PIT_STOP, DO_I_HAVE_TO_PIT, WHAT_ARE_MY_SECTOR_TIMES, WHATS_MY_LAST_SECTOR_TIME,
-                    WHATS_THE_AIR_TEMP, WHATS_THE_AIR_TEMPERATURE, WHATS_THE_TRACK_TEMP, WHATS_THE_TRACK_TEMPERATURE, RADIO_CHECK});
-                GrammarBuilder gb4 = new GrammarBuilder();
-                gb4.Culture = cultureInfo;
-                gb4.Append(info4);
-                Grammar g4 = new Grammar(gb4);
-
-                Choices info5 = new Choices();
-                info5.Add(new string[] { TYRE_TEMPS, TYRE_TEMPERATURES, BRAKE_TEMPS, BRAKE_TEMPERATURES });
-                GrammarBuilder gb5 = new GrammarBuilder();
-                gb5.Culture = cultureInfo;
-                gb5.Append(WHAT_ARE_MY);
-                gb5.Append(info5);
-                Grammar g5 = new Grammar(gb5);
-
-                sre.LoadGrammar(g1);
-                sre.LoadGrammar(g2);
-                sre.LoadGrammar(g3);
-                sre.LoadGrammar(g4);
-                sre.LoadGrammar(g5);
+                GrammarBuilder staticGrammarBuilder = new GrammarBuilder();
+                staticGrammarBuilder.Culture = cultureInfo;
+                staticGrammarBuilder.Append(staticSpeechChoices);
+                Grammar staticGrammar = new Grammar(staticGrammarBuilder);
+                sre.LoadGrammar(staticGrammar);
             }
             catch (Exception e)
             {
@@ -313,10 +297,10 @@ namespace CrewChiefV4
                         Console.WriteLine("Adding " + usableName + " to speech recogniser");
                         Choices opponentChoices = new Choices();
                         opponentChoices.Add(WHERE_IS + " " + usableName);
-                        opponentChoices.Add(WHATS + " " + usableName + "'s " + LAST_LAP);
-                        opponentChoices.Add(WHATS + " " + usableName + "'s " + BEST_LAP);
-                        opponentChoices.Add(WHAT_TYRES_IS + " " + usableName + " on");
-                        opponentChoices.Add(WHAT_TYRE_IS + " " + usableName + " on");
+                        opponentChoices.Add(WHATS + " " + usableName + POSSESSIVE + " " + LAST_LAP);
+                        opponentChoices.Add(WHATS + " " + usableName + POSSESSIVE + " " + BEST_LAP);
+                        opponentChoices.Add(WHAT_TYRES_IS + " " + usableName + " " + ON);
+                        opponentChoices.Add(WHAT_TYRE_IS + " " + usableName + " " + ON);
 
                         GrammarBuilder opponentGrammarBuilder = new GrammarBuilder();
                         opponentGrammarBuilder.Culture = cultureInfo;
@@ -349,52 +333,56 @@ namespace CrewChiefV4
                 foreach (String name in names)
                 {
                     opponentChoices.Add(WHERE_IS + " " + name);
-                    opponentChoices.Add(WHATS + " " + name + "'s " + LAST_LAP);
-                    opponentChoices.Add(WHATS + " " + name + "'s " + BEST_LAP);
-                    opponentChoices.Add(WHAT_TYRES_IS + " " + name + " on");
-                    opponentChoices.Add(WHAT_TYRE_IS + " " + name + " on");
+                    opponentChoices.Add(WHATS + " " + name + POSSESSIVE + " " + LAST_LAP);
+                    opponentChoices.Add(WHATS + " " + name + POSSESSIVE + " " + BEST_LAP);
+                    opponentChoices.Add(WHAT_TYRES_IS + " " + name + " " + ON);
+                    opponentChoices.Add(WHAT_TYRE_IS + " " + name + " " + ON);
                 }
             }
             foreach (KeyValuePair<String, int> entry in numberToNumber)
             {
-                opponentChoices.Add(WHATS + " " + POSITION + " " + entry.Key + "'s " + LAST_LAP);
-                opponentChoices.Add(WHATS + " " + POSITION + " " + entry.Key + "'s " + BEST_LAP);
-                opponentChoices.Add(WHAT_TYRE_IS + " " + POSITION + " " + entry.Key + " on");
-                opponentChoices.Add(WHAT_TYRES_IS + " " + POSITION + " " + entry.Key + " on");
-                opponentChoices.Add(WHATS + " " + PEA + " " + entry.Key + "'s " + LAST_LAP);
-                opponentChoices.Add(WHATS + " " + PEA + " " + entry.Key + "'s " + BEST_LAP);
-                opponentChoices.Add(WHOS_IN + " " + PEA + " " + entry.Key);
-                opponentChoices.Add(WHOS_IN + " " + POSITION + " " + entry.Key);
-                opponentChoices.Add(WHAT_TYRE_IS + " " + PEA + " " + entry.Key + " on");
-                opponentChoices.Add(WHAT_TYRES_IS + " " + PEA + " " + entry.Key + " on");
-                opponentChoices.Add(WHERE_IS + " " + PEA + " " + entry.Key);
-                opponentChoices.Add(WHERE_IS + " " + POSITION + " " + entry.Key);
+                opponentChoices.Add(WHATS + " " + POSITION_LONG + " " + entry.Key + POSSESSIVE + " " + LAST_LAP);
+                opponentChoices.Add(WHATS + " " + POSITION_LONG + " " + entry.Key + POSSESSIVE + " " + BEST_LAP);
+                opponentChoices.Add(WHAT_TYRE_IS + " " + POSITION_LONG + " " + entry.Key + " " + ON);
+                opponentChoices.Add(WHAT_TYRES_IS + " " + POSITION_LONG + " " + entry.Key + " " + ON);
+                opponentChoices.Add(WHATS + " " + POSITION_SHORT + " " + entry.Key + POSSESSIVE + " " + LAST_LAP);
+                opponentChoices.Add(WHATS + " " + POSITION_SHORT + " " + entry.Key + POSSESSIVE + " " + BEST_LAP);
+                opponentChoices.Add(WHOS_IN + " " + POSITION_SHORT + " " + entry.Key);
+                opponentChoices.Add(WHOS_IN + " " + POSITION_LONG + " " + entry.Key);
+                opponentChoices.Add(WHAT_TYRE_IS + " " + POSITION_SHORT + " " + entry.Key + " " + ON);
+                opponentChoices.Add(WHAT_TYRES_IS + " " + POSITION_SHORT + " " + entry.Key + " " + ON);
+                opponentChoices.Add(WHERE_IS + " " + POSITION_SHORT + " " + entry.Key);
+                opponentChoices.Add(WHERE_IS + " " + POSITION_LONG + " " + entry.Key);
             }
-            opponentChoices.Add(WHATS + " " + THE_LEADER +"'s " + BEST_LAP);
-            opponentChoices.Add(WHATS + " " + THE_LEADER + "'s " + LAST_LAP);
-            opponentChoices.Add(WHATS + " " + THE_GUY_IN_FRONT + "'s " + BEST_LAP);
-            opponentChoices.Add(WHATS + " " + THE_CAR_IN_FRONT + "'s " + LAST_LAP);
-            opponentChoices.Add(WHATS + " " + THE_GUY_AHEAD + "'s " + BEST_LAP);
-            opponentChoices.Add(WHATS + " " + THE_CAR_AHEAD + "'s " + LAST_LAP);
-            opponentChoices.Add(WHATS + " " + THE_CAR_BEHIND + "'s " + BEST_LAP);
-            opponentChoices.Add(WHATS + " " + THE_GUY_BEHIND + "'s " + LAST_LAP);
-            opponentChoices.Add(WHAT_TYRE_IS + " " + THE_GUY_IN_FRONT + " on");
-            opponentChoices.Add(WHAT_TYRES_IS + " " + THE_GUY_IN_FRONT + " on");
-            opponentChoices.Add(WHAT_TYRE_IS + " " + THE_GUY_AHEAD + " on");
-            opponentChoices.Add(WHAT_TYRES_IS + " " + THE_GUY_AHEAD + " on");
-            opponentChoices.Add(WHAT_TYRE_IS + " " + THE_GUY_BEHIND + " on");
-            opponentChoices.Add(WHAT_TYRES_IS + " " + THE_GUY_BEHIND + " on");
+            opponentChoices.Add(WHATS + " " + THE_LEADER + POSSESSIVE + " " + BEST_LAP);
+            opponentChoices.Add(WHATS + " " + THE_LEADER + POSSESSIVE + " " + LAST_LAP);
 
-            opponentChoices.Add(WHOS_BEHIND_IN_THE_RACE);
-            opponentChoices.Add(WHOS_BEHIND);
-            opponentChoices.Add(WHOS_IN_FRONT_IN_THE_RACE);
-            opponentChoices.Add(WHOS_IN_FRONT);
-            opponentChoices.Add(WHOS_AHEAD_IN_THE_RACE);
-            opponentChoices.Add(WHOS_AHEAD);
-            opponentChoices.Add(WHOS_BEHIND_ON_TRACK);
-            opponentChoices.Add(WHOS_IN_FRONT_ON_TRACK);
-            opponentChoices.Add(WHOS_AHEAD_ON_TRACK);
-            opponentChoices.Add(WHOS_LEADING);
+            opponentChoices.Add(WHATS + " " + THE_GUY_IN_FRONT + POSSESSIVE + " " + BEST_LAP);
+            opponentChoices.Add(WHATS + " " + THE_GUY_IN_FRONT + POSSESSIVE + " " + LAST_LAP);
+            opponentChoices.Add(WHATS + " " + THE_CAR_IN_FRONT + POSSESSIVE + " " + BEST_LAP);
+            opponentChoices.Add(WHATS + " " + THE_CAR_IN_FRONT + POSSESSIVE + " " + LAST_LAP);
+            opponentChoices.Add(WHATS + " " + THE_GUY_AHEAD + POSSESSIVE + " " + BEST_LAP);
+            opponentChoices.Add(WHATS + " " + THE_GUY_AHEAD + POSSESSIVE + " " + LAST_LAP);
+            opponentChoices.Add(WHATS + " " + THE_CAR_AHEAD + POSSESSIVE + " " + BEST_LAP);
+            opponentChoices.Add(WHATS + " " + THE_CAR_AHEAD + POSSESSIVE + " " + LAST_LAP);
+            opponentChoices.Add(WHATS + " " + THE_CAR_BEHIND + POSSESSIVE + " " + BEST_LAP);
+            opponentChoices.Add(WHATS + " " + THE_CAR_BEHIND + POSSESSIVE + " " + LAST_LAP);
+            opponentChoices.Add(WHATS + " " + THE_GUY_BEHIND + POSSESSIVE + " " + BEST_LAP);
+            opponentChoices.Add(WHATS + " " + THE_GUY_BEHIND + POSSESSIVE + " " + LAST_LAP);
+
+            opponentChoices.Add(WHAT_TYRE_IS + " " + THE_GUY_IN_FRONT + " " + ON);
+            opponentChoices.Add(WHAT_TYRES_IS + " " + THE_GUY_IN_FRONT + " " + ON);
+            opponentChoices.Add(WHAT_TYRE_IS + " " + THE_GUY_AHEAD + " " + ON);
+            opponentChoices.Add(WHAT_TYRES_IS + " " + THE_GUY_AHEAD + " " + ON);
+            opponentChoices.Add(WHAT_TYRE_IS + " " + THE_GUY_BEHIND + " " + ON);
+            opponentChoices.Add(WHAT_TYRES_IS + " " + THE_GUY_BEHIND + " " + ON);
+
+            validateAndAdd(WHOS_IN_FRONT_IN_THE_RACE, opponentChoices);
+            validateAndAdd(WHOS_BEHIND_IN_THE_RACE, opponentChoices);
+            validateAndAdd(WHOS_IN_FRONT_ON_TRACK, opponentChoices);
+            validateAndAdd(WHOS_BEHIND_ON_TRACK, opponentChoices);
+            validateAndAdd(WHOS_LEADING, opponentChoices);
+
             GrammarBuilder opponentGrammarBuilder = new GrammarBuilder();
             opponentGrammarBuilder.Culture = cultureInfo;
             opponentGrammarBuilder.Append(opponentChoices);
@@ -402,6 +390,26 @@ namespace CrewChiefV4
             sre.LoadGrammar(newOpponentGrammar);
             opponentGrammarList.Add(newOpponentGrammar);
             driverNamesInUse.AddRange(names);
+        }
+
+        public static Boolean ResultContains(String result, String[] alternatives)
+        {
+            foreach (String alternative in alternatives)
+            {
+                if (result.ToLower() == alternative.ToLower())
+                {
+                    return true;
+                }
+            }
+            // no result with == so try contains
+            foreach (String alternative in alternatives)
+            {
+                if (result.ToLower().Contains(alternative.ToLower()))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
         
         void sre_SpeechRecognized(object sender, SpeechRecognizedEventArgs e)
@@ -422,7 +430,7 @@ namespace CrewChiefV4
                 }
                 else if (e.Result.Confidence > minimum_voice_recognition_confidence)
                 {
-                    if (e.Result.Text.Contains(REPEAT_LAST_MESSAGE) || e.Result.Text.Contains(SAY_AGAIN))
+                    if (ResultContains(e.Result.Text, REPEAT_LAST_MESSAGE))
                     {
                         crewChief.audioPlayer.repeatLastMessage();
                     }
@@ -472,112 +480,91 @@ namespace CrewChiefV4
 
         private AbstractEvent getEventForSpeech(String recognisedSpeech)
         {
-            if (recognisedSpeech.Contains(RADIO_CHECK))
+            if (ResultContains(recognisedSpeech, RADIO_CHECK))
             {
                 crewChief.respondToRadioCheck();
             }
-            else if (recognisedSpeech.Contains(DONT_SPOT))
+            else if (ResultContains(recognisedSpeech, DONT_SPOT))
             {
                 crewChief.disableSpotter();
             }
-            else if (recognisedSpeech.Contains(SPOT))
+            else if (ResultContains(recognisedSpeech, SPOT))
             {
                 crewChief.enableSpotter();
             }
-            else if (recognisedSpeech.Contains(KEEP_QUIET) ||
-                recognisedSpeech.Contains(SHUT_UP) ||
-                recognisedSpeech.Contains(I_KNOW_WHAT_IM_DOING) ||
-                recognisedSpeech.Contains(LEAVE_ME_ALONE))
+            else if (ResultContains(recognisedSpeech, KEEP_QUIET))
             {
                 crewChief.enableKeepQuietMode();
             }
-            else if (recognisedSpeech.Contains(DONT_TELL_ME_THE_GAPS) || recognisedSpeech.Contains(DONT_TELL_ME_THE_DELTAS) ||
-                recognisedSpeech.Contains(DONT_GIVE_ME_THE_DELTAS) || recognisedSpeech.Contains(NO_MORE_DELTAS) ||
-                recognisedSpeech.Contains(NO_MORE_GAPS))
+            else if (ResultContains(recognisedSpeech, DONT_TELL_ME_THE_GAPS))
             {
                 crewChief.disableDeltasMode();
             }
-            else if (recognisedSpeech.Contains(TELL_ME_THE_GAPS) || recognisedSpeech.Contains(GIVE_ME_THE_DELTAS) ||
-                recognisedSpeech.Contains(TELL_ME_THE_DELTAS))
+            else if (ResultContains(recognisedSpeech, TELL_ME_THE_GAPS))
             {
                 crewChief.enableDeltasMode();
             }
-            else if (recognisedSpeech.Contains(AERO) ||
-               recognisedSpeech.Contains(BODY_WORK) ||
-               recognisedSpeech.Contains(TRANSMISSION) ||
-               recognisedSpeech.Contains(ENGINE) ||
-               recognisedSpeech.Contains(SUSPENSION) ||
-               recognisedSpeech.Contains(BRAKES))
+            else if (ResultContains(recognisedSpeech, HOWS_MY_AERO) ||
+               ResultContains(recognisedSpeech, HOWS_MY_TRANSMISSION) ||
+               ResultContains(recognisedSpeech, HOWS_MY_ENGINE) ||
+               ResultContains(recognisedSpeech, HOWS_MY_SUSPENSION) ||
+               ResultContains(recognisedSpeech, HOWS_MY_BRAKES))
             {
                 return CrewChief.getEvent("DamageReporting");
             }
-            else if (recognisedSpeech.Contains(KEEP_ME_UPDATED) ||
-                recognisedSpeech.Contains(KEEP_ME_POSTED) ||
-                recognisedSpeech.Contains(KEEP_ME_INFORMED))
+            else if (ResultContains(recognisedSpeech, KEEP_ME_INFORMED))
             {
                 crewChief.disableKeepQuietMode();
             }
-            else if (recognisedSpeech.Contains(FUEL) || recognisedSpeech.Contains(FUEL_LEVEL))
+            else if (ResultContains(recognisedSpeech, WHATS_MY_FUEL_LEVEL) || ResultContains(recognisedSpeech, HOWS_MY_FUEL))
             {
                 return CrewChief.getEvent("Fuel");
             }
-            else if (recognisedSpeech.Contains(GAP_IN_FRONT) ||
-                recognisedSpeech.Contains(GAP_AHEAD) ||
-                recognisedSpeech.Contains(GAP_BEHIND))
+            else if (ResultContains(recognisedSpeech, WHATS_MY_GAP_IN_FRONT) ||
+                ResultContains(recognisedSpeech, WHATS_MY_GAP_BEHIND))
             {
                 return CrewChief.getEvent("Timings");
             }
-            else if (recognisedSpeech.Contains(POSITION))
+            else if (ResultContains(recognisedSpeech, WHATS_MY_POSITION))
             {
                 return CrewChief.getEvent("Position");
             }
-            else if (recognisedSpeech.Contains(LAST_LAP_TIME) ||
-                recognisedSpeech.Contains(LAP_TIME) ||
-                recognisedSpeech.Contains(LAST_LAP) || 
-                recognisedSpeech.Contains(BEST_LAP_TIME) ||
-                recognisedSpeech.Contains(BEST_LAP) ||
-                recognisedSpeech.Contains(PACE) ||
-                recognisedSpeech.Contains(WHAT_ARE_MY_SECTOR_TIMES) || 
-                recognisedSpeech.Contains(WHATS_MY_LAST_SECTOR_TIME))
+            else if (ResultContains(recognisedSpeech, WHAT_WAS_MY_LAST_LAP_TIME) ||
+                ResultContains(recognisedSpeech, WHATS_MY_BEST_LAP_TIME) ||
+                ResultContains(recognisedSpeech, HOWS_MY_PACE) ||
+                ResultContains(recognisedSpeech, WHAT_ARE_MY_SECTOR_TIMES) ||
+                ResultContains(recognisedSpeech, WHATS_MY_LAST_SECTOR_TIME))
             {
                 return CrewChief.getEvent("LapTimes");
             }
-            else if (recognisedSpeech.Contains(TYRE_TEMPS) ||
-                recognisedSpeech.Contains(TYRE_TEMPERATURES) || 
-                recognisedSpeech.Contains(TYRE_WEAR) ||
-                recognisedSpeech.Contains(BRAKE_TEMPS) ||
-                recognisedSpeech.Contains(BRAKE_TEMPERATURES))
+            else if (ResultContains(recognisedSpeech, WHAT_ARE_MY_TYRE_TEMPS) ||
+                ResultContains(recognisedSpeech, HOW_ARE_MY_TYRE_TEMPS) ||
+                ResultContains(recognisedSpeech, HOWS_MY_TYRE_WEAR) ||
+                ResultContains(recognisedSpeech, HOW_ARE_MY_BRAKE_TEMPS) ||
+                ResultContains(recognisedSpeech, WHAT_ARE_MY_BRAKE_TEMPS))
             {
                 return CrewChief.getEvent("TyreMonitor");
             }
-            else if (recognisedSpeech.Contains(HOW_LONGS_LEFT) || 
-                recognisedSpeech.Contains(HOW_MANY_LAPS_TO_GO) ||
-                recognisedSpeech.Contains(HOW_MANY_LAPS_LEFT))
+            else if (ResultContains(recognisedSpeech, HOW_LONGS_LEFT))
             {
                 return CrewChief.getEvent("RaceTime");
             }
-            else if (recognisedSpeech.Contains(DO_I_STILL_HAVE_A_PENALTY) ||
-                recognisedSpeech.Contains(DO_I_HAVE_A_PENALTY) ||
-                recognisedSpeech.Contains(HAVE_I_SERVED_MY_PENALTY))
+            else if (ResultContains(recognisedSpeech, DO_I_STILL_HAVE_A_PENALTY) ||
+                ResultContains(recognisedSpeech, DO_I_HAVE_A_PENALTY) ||
+                ResultContains(recognisedSpeech, HAVE_I_SERVED_MY_PENALTY))
             {
                 return CrewChief.getEvent("Penalties");
             }
-            else if (recognisedSpeech.Contains(DO_I_HAVE_TO_PIT) ||
-               recognisedSpeech.Contains(DO_I_HAVE_A_MANDATORY_PIT_STOP) ||
-               recognisedSpeech.Contains(DO_I_HAVE_A_MANDATORY_STOP) ||
-               recognisedSpeech.Contains(DO_I_NEED_TO_PIT) ||
-                recognisedSpeech.Contains(DO_I_HAVE_TO_MAKE_A_PIT_STOP))
+            else if (ResultContains(recognisedSpeech, DO_I_HAVE_A_MANDATORY_PIT_STOP))
             {
                 return CrewChief.getEvent("MandatoryPitStops");
             }
-            else if (recognisedSpeech.Contains(ENGINE_TEMPS) || recognisedSpeech.Contains(ENGINE_TEMPERATURES))
+            else if (ResultContains(recognisedSpeech, HOW_ARE_MY_ENGINE_TEMPS))
             {
                 return CrewChief.getEvent("EngineMonitor");
             }
-            else if (recognisedSpeech.Contains(WHATS_THE_AIR_TEMP) ||
-               recognisedSpeech.Contains(WHATS_THE_AIR_TEMPERATURE) ||
-               recognisedSpeech.Contains(WHATS_THE_TRACK_TEMP) ||
-               recognisedSpeech.Contains(WHATS_THE_TRACK_TEMPERATURE))
+            else if (ResultContains(recognisedSpeech, WHATS_THE_AIR_TEMP) ||
+               ResultContains(recognisedSpeech, WHATS_THE_TRACK_TEMP))
             {
                 return CrewChief.getEvent("ConditionsMonitor");
             }
