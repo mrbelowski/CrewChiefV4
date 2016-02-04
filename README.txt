@@ -2,7 +2,7 @@ CrewChief version 4.
 
 Changelog
 ---------
-Version 4.1.1.5: Fixes to Hot Lap (timetrial) mode in PCars; Don't trigger flags event when stationary; A couple of internal bug fixes
+Version 4.1.1.5: Major speech recognizer overhaul to allow customisation; Externalised all UI text; Added some options to number reading; Fixes to Hot Lap (timetrial) mode in PCars; Don't trigger flags event when stationary; A couple of internal bug fixes
 
 Version 4.1.1.4: Added some car classes and Bannockbrae track for PCars; Remove stale opponents in PCars; Some internal error handling
 
@@ -112,6 +112,12 @@ I've not finished implementing this but currently the app understands and respon
 "repeat last message / say again" (replays the last message)
 "What's the air temp / what's the air temperature / what's the track temp / what's the track temperature" (current air / track temps in celsius)
 "What are my [brake / tyre] [temperatures / temps]"
+
+
+
+Speech recognition customisation
+--------------------------------
+If you want to change the phrases the app listens for (e.g. instead of asking "how's my tyre wear", perhaps you want to as "how's my boots looking"), create a file called "speech_recognition_config.txt" in [user]\AppData\Local\CrewChiefV4 and use this to override the defaults found in [installDir]\speech_recognition_config.txt
 
 
 
