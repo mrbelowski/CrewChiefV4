@@ -68,7 +68,7 @@ namespace CrewChiefV4
             }
             else
             {
-                return Application.StartupPath + filename;
+                return Application.StartupPath + @"\" + filename;
             }
         }
 
