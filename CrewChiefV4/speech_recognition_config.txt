@@ -38,7 +38,6 @@ HOW_ARE_MY_TYRE_TEMPS = how are my tire temps:how are my tire temperatures
 WHAT_ARE_MY_TYRE_TEMPS = what are my tire temps:what are my tire temperatures:tire temps:tire temperatures
 HOW_ARE_MY_BRAKE_TEMPS = how are my brake temps:how are my brake temperatures
 WHAT_ARE_MY_BRAKE_TEMPS = what are my brake temps:what are my brake temperatures:brake temps:brake temperatures
-HOW_ARE_MY_BRAKES = how are my brakes
 HOW_ARE_MY_ENGINE_TEMPS = how are my engine temps:how are my engine temperatures
 WHATS_MY_GAP_IN_FRONT = what's the gap ahead:what's the gap in front:what's my gap ahead:whats my gap in front:gap in front:gap ahead
 WHATS_MY_GAP_BEHIND = what's the gap behind:what's my gap behind:gap behind
@@ -78,7 +77,7 @@ RADIO_CHECK = can you hear me
 # Multiple options are NOT supported here - each must be a single word or phrase. These are combined for each opponent
 # in the race, using his name and his race position. The race position is a number taken from the number mappings
 # below. For example, the app will recognise
-# "what's position 10's best lap time". This is built from the fragments here - i.e.
+# "what's position ten's best lap time". This is built from the fragments here - i.e.
 # WHATS + POSITION_LONG + POSSESSIVE + numbers(10) + BEST_LAP_TIME
 #
 # The full set is...
@@ -117,7 +116,11 @@ RADIO_CHECK = can you hear me
 # WHOS_IN + POSITION_SHORT (number)								[the name of the driver in P (number)]
 # WHERE_IS + POSITION_SHORT										[the position and gap to the driver in position (number)]
 # WHERE_IS + POSITION_LONG										[the position and gap to the driver in P (number)]
-
+#
+#
+# I may revisit this logic and have the opponent phrases in here with String replacements. At the moment
+# it's all configured in code.
+#
 #################################################
 
 POSITION_LONG = position

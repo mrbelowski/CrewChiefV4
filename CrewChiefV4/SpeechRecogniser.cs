@@ -33,7 +33,6 @@ namespace CrewChiefV4
         public static String[] WHAT_ARE_MY_TYRE_TEMPS = Configuration.getSpeechRecognitionPhrases("WHAT_ARE_MY_TYRE_TEMPS");
         public static String[] HOW_ARE_MY_BRAKE_TEMPS = Configuration.getSpeechRecognitionPhrases("HOW_ARE_MY_BRAKE_TEMPS");
         public static String[] WHAT_ARE_MY_BRAKE_TEMPS = Configuration.getSpeechRecognitionPhrases("WHAT_ARE_MY_BRAKE_TEMPS");
-        public static String[] HOW_ARE_MY_BRAKES = Configuration.getSpeechRecognitionPhrases("HOW_ARE_MY_BRAKES");
         public static String[] HOW_ARE_MY_ENGINE_TEMPS = Configuration.getSpeechRecognitionPhrases("HOW_ARE_MY_ENGINE_TEMPS");
         public static String[] WHATS_MY_GAP_IN_FRONT = Configuration.getSpeechRecognitionPhrases("WHATS_MY_GAP_IN_FRONT");
         public static String[] WHATS_MY_GAP_BEHIND = Configuration.getSpeechRecognitionPhrases("WHATS_MY_GAP_BEHIND");
@@ -227,7 +226,6 @@ namespace CrewChiefV4
                 validateAndAdd(WHAT_ARE_MY_TYRE_TEMPS, staticSpeechChoices);
                 validateAndAdd(HOW_ARE_MY_BRAKE_TEMPS, staticSpeechChoices);
                 validateAndAdd(WHAT_ARE_MY_BRAKE_TEMPS, staticSpeechChoices);
-                validateAndAdd(HOW_ARE_MY_BRAKES, staticSpeechChoices);
                 validateAndAdd(HOW_ARE_MY_ENGINE_TEMPS, staticSpeechChoices);
                 validateAndAdd(WHATS_MY_GAP_IN_FRONT, staticSpeechChoices);
                 validateAndAdd(WHATS_MY_GAP_BEHIND, staticSpeechChoices);
