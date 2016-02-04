@@ -13,6 +13,10 @@ prefix_hundred_and_thousand_with_one = true
 # In English we say "one hundred and twenty", rather than "one hundred twenty"
 say_and_between_hundred_and_units = true
 
+# In English if we have a number with thousands and units, but no hundreds (e.g. 1034), we insert an "and" between the thousand and units - 
+# "one thousand and thiry four"
+say_and_between_thousand_and_units = true
+
 # the app will sometimes ommit the "hundred" and "and" sounds, so rather than saying "one hundred and twenty" it'll say "one twenty".
 # Set this to false if there's no suitable translation of this behaviour
 allow_short_hundreds = true

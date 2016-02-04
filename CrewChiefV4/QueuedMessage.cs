@@ -57,6 +57,13 @@ namespace CrewChiefV4
 
     public class QueuedMessage
     {
+
+        private Boolean prefix_hundred_and_thousand_with_one = Boolean.Parse(Configuration.getSoundConfigOption("prefix_hundred_and_thousand_with_one"));
+        private Boolean say_and_between_hundred_and_units = Boolean.Parse(Configuration.getSoundConfigOption("say_and_between_hundred_and_units"));
+        private Boolean say_and_between_thousand_and_units = Boolean.Parse(Configuration.getSoundConfigOption("say_and_between_thousand_and_units"));
+        private Boolean allow_short_hundreds = Boolean.Parse(Configuration.getSoundConfigOption("allow_short_hundreds"));   // allow "one oh four", instead of "one hundred and four"
+        private Boolean always_use_thousands = Boolean.Parse(Configuration.getSoundConfigOption("always_use_thousands"));   // don't allow "thirteen hundred" etc
+
         private static String compoundMessageIdentifier = "COMPOUND_";
 
         public static String folderNameOh = "numbers/oh";
@@ -264,7 +271,8 @@ namespace CrewChiefV4
             {
                 tensAndUnits = digits[digits.Count() - 2].ToString() + digits[digits.Count() - 1].ToString();
             }
-            if (digits.Count() == 4 && digits[0] == '1' && digits[1] != '0') {
+            if (digits.Count() == 4 && digits[0] == '1' && digits[1] != '0' && !always_use_thousands) {
+                // don't allow "thirteen hundred" type messages if always_use_thousands is true
                 hundreds = digits[0].ToString() + digits[1].ToString();
             } else {
                 if (digits.Count() >= 3) {
@@ -279,21 +287,35 @@ namespace CrewChiefV4
                 }
             }
             if (thousands != null) {
-                messages.Add(folderNameNumbersStub + thousands);
-                if (hundreds == null && tensAndUnits != null) {
+                if (thousands != "1" || prefix_hundred_and_thousand_with_one)
+                {
+                    messages.Add(folderNameNumbersStub + thousands);
+                }
+                if (hundreds == null && tensAndUnits != null && say_and_between_thousand_and_units) {
                     messages.Add(folderNameThousandAnd);
                 } else {
                     messages.Add(folderNameThousand);
                 }
             }
             if (hundreds != null) {
-                messages.Add(folderNameNumbersStub + hundreds);
+                if (hundreds != "1" || prefix_hundred_and_thousand_with_one)
+                {
+                    messages.Add(folderNameNumbersStub + hundreds);
+                }
                 // don't always use "hundred and"
                 Boolean addedHundreds = false;
                 if (tensAndUnits != null) {
-                    if (hundreds.Count() == 2 || thousands != null || rand.NextDouble() > 0.6)
+                    // if there's a thousand, or we're saying something like "13 hundred", then always use the long version
+                    if (!allow_short_hundreds || hundreds.Count() == 2 || thousands != null || rand.NextDouble() > 0.6)
                     {
-                        messages.Add(folderNameHundredAnd);
+                        if (say_and_between_hundred_and_units)
+                        {
+                            messages.Add(folderNameHundredAnd);
+                        }
+                        else
+                        {
+                            messages.Add(folderNameHundred);
+                        }
                         addedHundreds = true;
                     }
                 } else {
