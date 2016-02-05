@@ -113,11 +113,11 @@ namespace CrewChiefV4.Events
             }
             else if (eventSubType == folderCutTrackInRace) 
             {
-                return !hasOutstandingPenalty && currentGameState.SessionData.SessionPhase != SessionPhase.Finished;
+                return !hasOutstandingPenalty && currentGameState.SessionData.SessionPhase != SessionPhase.Finished && !currentGameState.PitData.InPitlane;
             }
             else if(eventSubType == folderCutTrackPracticeOrQual || eventSubType == folderLapDeleted)
             {
-                return currentGameState.SessionData.SessionPhase != SessionPhase.Finished;
+                return currentGameState.SessionData.SessionPhase != SessionPhase.Finished && !currentGameState.PitData.InPitlane;
             }
             else
             {
