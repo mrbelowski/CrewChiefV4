@@ -19,6 +19,8 @@ namespace CrewChiefV4.PCars
         // don't activate the spotter unless this many seconds have elapsed (race starts are messy)
         private int timeAfterRaceStartToActivate = UserSettings.GetUserSettings().getInt("time_after_race_start_for_spotter");
 
+        private Boolean enableSpotterInTimetrial = UserSettings.GetUserSettings().getBoolean("enable_spotter_in_timetrial");
+
         // how long is a car? we use 3.5 meters by default here. Too long and we'll get 'hold your line' messages
         // when we're clearly directly behind the car
         private float carLength = UserSettings.GetUserSettings().getFloat("pcars_spotter_car_length");
@@ -103,7 +105,8 @@ namespace CrewChiefV4.PCars
                 return;
             }
 
-            if (enabled && currentState.mNumParticipants > 1 && currentState.mSessionState != (uint)eSessionState.SESSION_TIME_ATTACK)
+            if (enabled && currentState.mNumParticipants > 1 && 
+                (enableSpotterInTimetrial || currentState.mSessionState != (uint)eSessionState.SESSION_TIME_ATTACK))
             {
                 Tuple<int, pCarsAPIParticipantStruct> playerDataWithIndex = PCarsGameStateMapper.getPlayerDataStruct(currentState.mParticipantData, currentState.mViewedParticipantIndex);
                 int playerIndex = playerDataWithIndex.Item1;

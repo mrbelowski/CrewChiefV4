@@ -323,5 +323,8 @@
     <Setting Name="pcars_character_encoding" Type="System.String" Scope="User">
       <Value Profile="(Default)">windows-1252</Value>
     </Setting>
+    <Setting Name="enable_spotter_in_timetrial" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
