@@ -104,14 +104,21 @@ namespace CrewChiefV4
         private static Dictionary<String, String> LoadSpeechRecognitionConfig()
         {
             Dictionary<string, string> dict = new Dictionary<string, string>();
-            StreamReader file = new StreamReader(getDefaultFileLocation(SPEECH_RECOGNITION_CONFIG_FILENAME));
+            StreamReader file = null;
             try
             {
+                file = new StreamReader(getDefaultFileLocation(SPEECH_RECOGNITION_CONFIG_FILENAME));
                 merge(file, dict);
+            }
+            catch (Exception)
+            {
             }
             finally
             {
-                file.Close();
+                if (file != null)
+                {
+                    file.Close();
+                }
             }
             Boolean gotUserOverride = false;
             try
@@ -137,14 +144,21 @@ namespace CrewChiefV4
         private static Dictionary<String, String> LoadSoundsConfig()
         {
             Dictionary<string, string> dict = new Dictionary<string, string>();
-            StreamReader file = new StreamReader(getDefaultFileLocation(SOUNDS_CONFIG_FILENAME));
+            StreamReader file = null;
             try
             {
+                file = new StreamReader(getDefaultFileLocation(SOUNDS_CONFIG_FILENAME));
                 merge(file, dict);
+            }
+            catch (Exception)
+            {
             }
             finally
             {
-                file.Close();
+                if (file != null)
+                {
+                    file.Close();
+                }
             }
             Boolean gotUserOverride = false;
             try
@@ -170,14 +184,21 @@ namespace CrewChiefV4
         private static Dictionary<String, String> LoadUIStrings()
         {
             Dictionary<string, string> dict = new Dictionary<string, string>();
-            StreamReader file = new StreamReader(getDefaultFileLocation(UI_TEXT_FILENAME));
-            try
-            {
+            StreamReader file = null;
+            try 
+            { 
+                file = new StreamReader(getDefaultFileLocation(UI_TEXT_FILENAME));
                 merge(file, dict);
+            }
+            catch (Exception) 
+            {
             }
             finally
             {
-                file.Close();
+                if (file != null)
+                {
+                    file.Close();
+                }
             }
             Boolean gotUserOverride = false;
             try
@@ -192,7 +213,7 @@ namespace CrewChiefV4
             }
             finally
             {
-                if (gotUserOverride)
+                if (gotUserOverride && file != null)
                 {
                     file.Close();
                 }
