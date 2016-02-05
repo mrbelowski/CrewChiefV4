@@ -340,7 +340,8 @@ namespace CrewChiefV4.PCars
                 currentGameState.SessionData.SessionHasFixedTime = true;
                 sessionTimeRemaining = shared.mEventTimeRemaining;
             }
-            currentGameState.SessionData.TrackDefinition = TrackData.getTrackDefinition(shared.mTrackLocation + ":" + shared.mTrackVariation, shared.mTrackLength);
+            currentGameState.SessionData.TrackDefinition = TrackData.getTrackDefinition(StructHelper.getNameFromBytes(shared.mTrackLocation)
+                + ":" + StructHelper.getNameFromBytes(shared.mTrackVariation), shared.mTrackLength);
             // Console.WriteLine(lastSessionPhase + ", " + currentGameState.SessionData.SessionPhase + "; " + lastSessionType + ", " + currentGameState.SessionData.SessionType);
             // now check if this is a new session...
             Boolean raceRestarted = currentGameState.SessionData.SessionType == SessionType.Race &&
@@ -445,7 +446,8 @@ namespace CrewChiefV4.PCars
                         }          
                         currentGameState.SessionData.LeaderHasFinishedRace = false;
                         currentGameState.SessionData.NumCarsAtStartOfSession = shared.mNumParticipants;
-                        currentGameState.SessionData.TrackDefinition = TrackData.getTrackDefinition(shared.mTrackLocation + ":" + shared.mTrackVariation, shared.mTrackLength);
+                        currentGameState.SessionData.TrackDefinition = TrackData.getTrackDefinition(StructHelper.getNameFromBytes(shared.mTrackLocation) + ":" +
+                            StructHelper.getNameFromBytes(shared.mTrackVariation), shared.mTrackLength);
                         currentGameState.carClass = CarData.getCarClassForPCarsClassName(StructHelper.getNameFromBytes(shared.mCarClassName));
 
                         Console.WriteLine("Player is using car class " + currentGameState.carClass.carClassEnum);

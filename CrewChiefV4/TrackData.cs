@@ -69,22 +69,39 @@ namespace CrewChiefV4
             new TrackDefinition("Zhuhai:International Circuit", 3, 4293.098f, new float[] {-193.7068f, 123.679f}, new float[] {64.56277f, -71.51254f}),
             new TrackDefinition("Zolder:Grand Prix", 4, 4146.733f, new float[] {138.3811f, 132.7747f}, new float[] {682.2009f, 179.8147f}),
 
-            new TrackDefinition("Bannochbrae:Road Circuit", 4, 7251.9004f, new float[]{-175f, 16f}, new float[]{131f, 14.5f})
-
+            new TrackDefinition("Bannochbrae:Road Circuit", 4, 7251.9004f, new float[]{-175f, 16f}, new float[]{131f, 14.5f}),
+            new TrackDefinition("Rouen Les Essarts:", 4, 6499.198f, new float[]{117.25f, 25.5f}, new float[]{-84.75f, -13.5f}),
+            new TrackDefinition("Rouen Les Essarts:Short", 4, 5390.12939f, new float[]{117.25f, 25.5f}, new float[]{-84.75f, -13.5f}),
+            // this is the classic version. Which has *exactly* the same name as the non-classic version. Not cool.
+            new TrackDefinition("Silverstone:Grand Prix", 3, 4697.72656f, new float[] {-347f, -165f}, new float[] {152.75f, -1.25f}),
+            new TrackDefinition("Hockenheim:Classic", 3, 6763.425f, new float[] {-533f, -318.25f}, new float[] {-705.5f, -2f})
         };
 
         public static TrackDefinition getTrackDefinition(String trackName, float trackLength)
         {
             if (CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_32BIT || CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_64BIT || CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_NETWORK) 
             {
+                List<TrackDefinition> defsWhichMatchName = new List<TrackDefinition>();
                 foreach (TrackDefinition def in pCarsTracks)
                 {
                     if (def.name == trackName)
                     {
-                        return def;
+                        defsWhichMatchName.Add(def);
                     }
                 }
-                TrackDefinition defGuessedFromLength = getDefinitionForLength(trackLength, 2);
+                if (defsWhichMatchName.Count == 1)
+                {
+                    return defsWhichMatchName[0];
+                }
+                TrackDefinition defGuessedFromLength = null;
+                if (defsWhichMatchName.Count > 1)
+                {
+                    defGuessedFromLength = getDefinitionForLength(defsWhichMatchName, trackLength, 2);
+                }
+                else
+                {
+                    defGuessedFromLength = getDefinitionForLength(pCarsTracks, trackLength, 2);
+                }
                 if (defGuessedFromLength != null)
                 {
                     return defGuessedFromLength;
@@ -95,11 +112,11 @@ namespace CrewChiefV4
             return new TrackDefinition("unknown track - name " + nameToLog + ", length = " + trackLength, trackLength); 
         }
 
-        private static TrackDefinition getDefinitionForLength(float trackLength, int maxError)
+        private static TrackDefinition getDefinitionForLength(List<TrackDefinition> possibleDefinitions, float trackLength, int maxError)
         {
             TrackDefinition closestLengthDef = null;
             float closestLengthDifference = float.MaxValue;
-            foreach (TrackDefinition def in pCarsTracks)
+            foreach (TrackDefinition def in possibleDefinitions)
             {
                 if (def.trackLength == trackLength)
                 {
