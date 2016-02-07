@@ -2,7 +2,9 @@ CrewChief version 4.
 
 Changelog
 ---------
-Version 4.1.1.5: Major speech recognizer overhaul to allow customisation; Externalised all UI text; Added some options to number reading; Fixes to Hot Lap (timetrial) mode in PCars; Don't trigger flags event when stationary; A couple of internal bug fixes
+Version 4.1.2.1: Don't play lap time messages when we're in the pit lane;Don't complain about worsening lap times if the player has made a pass on this lap
+
+Version 4.1.2.0: Major speech recognizer overhaul to allow customisation; Externalised all UI text; Added some options to number reading; Fixes to Hot Lap (timetrial) mode in PCars; Don't trigger flags event when stationary; A couple of internal bug fixes
 
 Version 4.1.1.4: Added some car classes and Bannockbrae track for PCars; Remove stale opponents in PCars; Some internal error handling
 
