@@ -316,6 +316,7 @@ namespace CrewChiefV4.RaceRoom
                     currentGameState.SessionData.NumCarsAtStartOfSession = previousGameState.SessionData.NumCarsAtStartOfSession;
                     currentGameState.SessionData.EventIndex = previousGameState.SessionData.EventIndex;
                     currentGameState.SessionData.SessionIteration = previousGameState.SessionData.SessionIteration;
+                    currentGameState.SessionData.PositionAtStartOfCurrentLap = previousGameState.SessionData.PositionAtStartOfCurrentLap;
                     currentGameState.PitData.PitWindowStart = previousGameState.PitData.PitWindowStart;
                     currentGameState.PitData.PitWindowEnd = previousGameState.PitData.PitWindowEnd;
                     currentGameState.PitData.HasMandatoryPitStop = previousGameState.PitData.HasMandatoryPitStop;
@@ -389,6 +390,7 @@ namespace CrewChiefV4.RaceRoom
                 && currentGameState.SessionData.SessionPhase == SessionPhase.Green));
             if (currentGameState.SessionData.IsNewLap)
             {
+                currentGameState.SessionData.PositionAtStartOfCurrentLap = currentGameState.SessionData.Position;
                 currentGameState.SessionData.formattedPlayerLapTimes.Add(TimeSpan.FromSeconds(shared.LapTimePrevious).ToString(@"mm\:ss\.fff"));
                 // quick n dirty hack here - if the current car class is unknown, try and get it again
                 if (currentGameState.carClass.carClassEnum == CarData.CarClassEnum.UNKNOWN_RACE)

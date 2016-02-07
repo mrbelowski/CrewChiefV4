@@ -500,6 +500,7 @@ namespace CrewChiefV4.PCars
                     currentGameState.SessionData.TrackDefinition = previousGameState.SessionData.TrackDefinition;
                     currentGameState.SessionData.EventIndex = previousGameState.SessionData.EventIndex;
                     currentGameState.SessionData.SessionIteration = previousGameState.SessionData.SessionIteration;
+                    currentGameState.SessionData.PositionAtStartOfCurrentLap = previousGameState.SessionData.PositionAtStartOfCurrentLap;
                     currentGameState.OpponentData = previousGameState.OpponentData;
                     currentGameState.PitData.PitWindowStart = previousGameState.PitData.PitWindowStart;
                     currentGameState.PitData.PitWindowEnd = previousGameState.PitData.PitWindowEnd;
@@ -802,6 +803,7 @@ namespace CrewChiefV4.PCars
             {
                 currentGameState.SessionData.PreviousLapWasValid = previousGameState != null && previousGameState.SessionData.CurrentLapIsValid;
                 currentGameState.SessionData.formattedPlayerLapTimes.Add(TimeSpan.FromSeconds(shared.mLastLapTime).ToString(@"mm\:ss\.fff"));
+                currentGameState.SessionData.PositionAtStartOfCurrentLap = currentGameState.SessionData.Position;
             }
             else if (previousGameState != null)
             {

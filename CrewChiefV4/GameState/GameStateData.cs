@@ -177,6 +177,8 @@ namespace CrewChiefV4.GameState
 
         public Boolean LeaderHasFinishedRace = false;
 
+        public int PositionAtStartOfCurrentLap = 0;
+
         // Current position (1 = first place)
         public int Position = 0;
 

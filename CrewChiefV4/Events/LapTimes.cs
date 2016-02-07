@@ -508,8 +508,9 @@ namespace CrewChiefV4.Events
                                         {
                                             Console.WriteLine("Skipping 'worsening' laptimes message - inconsistent with lap rating");
                                         }
-                                        else
+                                        else if (currentGameState.SessionData.Position >= currentGameState.SessionData.PositionAtStartOfCurrentLap)
                                         {
+                                            // only complain about worsening laptimes if we've not overtaken anyone on this lap
                                             lastConsistencyUpdate = currentGameState.SessionData.CompletedLaps;
                                             audioPlayer.playMessage(new QueuedMessage(folderWorseningTimes, random.Next(0, 20), this));
                                         }
