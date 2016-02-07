@@ -271,8 +271,8 @@ namespace CrewChiefV4.Events
                     }
                 }
             }
-
-            if (!currentGameState.PitData.OnInLap && !previousGameState.PitData.OnOutLap)   // as this is a new lap, check whether the *previous* state was an outlap
+            
+            if (!currentGameState.PitData.OnInLap && !previousGameState.PitData.OnOutLap && !currentGameState.PitData.InPitlane)   // as this is a new lap, check whether the *previous* state was an outlap
             {
                 Boolean sectorsReportedForLap = false;                
                 if (currentGameState.SessionData.IsNewLap && 
