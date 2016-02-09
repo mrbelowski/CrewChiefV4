@@ -84,7 +84,8 @@ namespace CrewChiefV4.PCars
         public Single sWorldFastestSector2Time;	// 88
         public Single sWorldFastestSector3Time;	// 92
 
-        public ushort sJoyPad;	// 96
+        public byte sJoyPad1;	// 96
+        public byte sJoyPad2;	// 97
 
         // Flags
         public byte sHighestFlag;	// 98

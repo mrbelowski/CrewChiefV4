@@ -227,7 +227,7 @@ namespace CrewChiefV4.PCars
                     sTelemetryData telem = (sTelemetryData)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(sTelemetryData));
                     if (sequenceCheckOK || !telemIsOutOfSequence(telem))
                     {
-                        buttonsState = ConvertByteToBoolArray(telem.sDPad, telem.sJoyPad);
+                        buttonsState = ConvertBytesToBoolArray(telem.sDPad, telem.sJoyPad1, telem.sJoyPad2);
                         lastSequenceNumberForTelemPacket = sequence;
                         workingGameState = StructHelper.MergeWithExistingState(workingGameState, telem);
                         newSpotterData = workingGameState.hasNewPositionData;
@@ -358,7 +358,7 @@ namespace CrewChiefV4.PCars
             return pressedIndex;
         }
 
-        public static bool[] ConvertByteToBoolArray(byte dpad, ushort joypad)
+        public static bool[] ConvertBytesToBoolArray(byte dpad, byte joypad1, byte joypad2)
         {
             bool[] result = new bool[24];
             // check each bit in the byte. if 1 set to true, if 0 set to false
@@ -366,11 +366,14 @@ namespace CrewChiefV4.PCars
             {
                 result[i] = (dpad & (1 << i)) == 0 ? false : true;
             }
-            for (int i = 0; i < 16; i++)
+            for (int i = 0; i < 8; i++)
             {
-                result[i + 8] = (joypad & (1 << i)) == 0 ? false : true;
+                result[i + 8] = (joypad1 & (1 << i)) == 0 ? false : true;
+            } 
+            for (int i = 0; i < 8; i++)
+            {
+                result[i + 16] = (joypad2 & (1 << i)) == 0 ? false : true;
             }
-            // reverse the array?
             return result;
         }
     }

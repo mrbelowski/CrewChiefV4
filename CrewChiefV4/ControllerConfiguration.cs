@@ -270,15 +270,21 @@ namespace CrewChiefV4
         public Boolean isChannelOpen()
         {
             ButtonAssignment ba = buttonAssignments[buttonAssignmentIndexes[CHANNEL_OPEN_FUNCTION]];
-            if (ba != null && ba.buttonIndex != -1 && ba.joystick != null)
+            if (ba != null && ba.buttonIndex != -1)
             {
-                try
+                if (ba.joystick != null)
                 {
-                    return ba.joystick.GetCurrentState().Buttons[ba.buttonIndex];
-                }
-                catch (Exception e)
+                    try
+                    {
+                        return ba.joystick.GetCurrentState().Buttons[ba.buttonIndex];
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("Failed to get button state for index " + ba.buttonIndex + " message: " + e.Message);
+                    }
+                } else if (ba.controller.guid == UDP_NETWORK_CONTROLLER_GUID)
                 {
-                    Console.WriteLine("Failed to get button state for index " + ba.buttonIndex + " message: " + e.Message);
+                    return PCarsUDPreader.getButtonState(ba.buttonIndex);
                 }
             }
             return false;
