@@ -577,7 +577,7 @@ namespace CrewChiefV4.Events
                
         private ConsistencyResult checkAgainstPreviousLaps()
         {
-            if (conditionsWindow.Count() >= lapTimesWindowSize && !ConditionsAreSimilar(conditionsWindow[0], conditionsWindow[lapTimesWindowSize - 1]))
+            if (conditionsWindow.Count() >= lapTimesWindowSize && ConditionsHaveChanged(conditionsWindow[0], conditionsWindow[lapTimesWindowSize - 1]))
             {
                 return ConsistencyResult.NOT_APPLICABLE;
             }
@@ -1380,14 +1380,14 @@ namespace CrewChiefV4.Events
             ALL_SECTORS, BEST_AND_WORST, WORST_ONLY, COMBINED
         }
 
-        private Boolean ConditionsAreSimilar(Conditions.ConditionsSample sample1, Conditions.ConditionsSample sample2)
+        private Boolean ConditionsHaveChanged(Conditions.ConditionsSample sample1, Conditions.ConditionsSample sample2)
         {
             if (sample1 == null || sample2 == null)
             {
                 // hmm....
-                return true;
+                return false;
             }
-            return Math.Abs(sample1.RainDensity - sample2.RainDensity) < 0.02 && Math.Abs(sample1.TrackTemperature - sample2.TrackTemperature) < 2;
+            return Math.Abs(sample1.RainDensity - sample2.RainDensity) > 0.02 || Math.Abs(sample1.TrackTemperature - sample2.TrackTemperature) > 2;
         }
     }
 }
