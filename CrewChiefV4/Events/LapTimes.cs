@@ -1387,7 +1387,7 @@ namespace CrewChiefV4.Events
                 // hmm....
                 return false;
             }
-            return Math.Abs(sample1.RainDensity - sample2.RainDensity) > 0.02 || Math.Abs(sample1.TrackTemperature - sample2.TrackTemperature) > 2;
+            return Math.Abs(sample1.RainDensity - sample2.RainDensity) > 0.02 || Math.Abs(sample1.TrackTemperature - sample2.TrackTemperature) > 4;
         }
     }
 }

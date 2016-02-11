@@ -774,7 +774,10 @@ namespace CrewChiefV4.Audio
 
         public void purgeQueues()
         {
-            soundCache.StopAll();
+            if (soundCache != null)
+            {
+                soundCache.StopAll();
+            }
             lock (queuedClips)
             {
                 ArrayList keysToPurge = new ArrayList(queuedClips.Keys);

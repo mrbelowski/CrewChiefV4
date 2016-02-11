@@ -37,6 +37,8 @@ namespace CrewChiefV4.Audio
 
         private DateTime lastPersonalisedMessageTime = DateTime.MinValue;
 
+        public static DateTime lastSwearyMessageTime = DateTime.MinValue;
+
         public SoundCache(DirectoryInfo soundsFolder, String[] eventTypesToKeepCached, Boolean useSwearyMessages, Boolean allowCaching)
         {
             this.currentLoadedCount = 0;
@@ -236,11 +238,18 @@ namespace CrewChiefV4.Audio
         {
             foreach (SoundSet soundSet in soundSets.Values)
             {
-                soundSet.StopAll();
+                try
+                {
+                    soundSet.StopAll();
+                }
+                catch (Exception) { }
             }
             foreach (SingleSound singleSound in singleSounds.Values)
             {
-                singleSound.Stop();
+                try { 
+                    singleSound.Stop();
+                }
+                catch (Exception) { }
             }
         }
 
@@ -404,8 +413,9 @@ namespace CrewChiefV4.Audio
                 FileInfo[] soundFiles = this.soundFolder.GetFiles();
                 foreach (FileInfo soundFile in soundFiles)
                 {
-                    if (soundFile.Name.EndsWith(".wav")) {                        
-                        if (this.useSwearyMessages || !soundFile.Name.StartsWith("sweary"))
+                    if (soundFile.Name.EndsWith(".wav")) {
+                        Boolean isSweary = soundFile.Name.Contains("sweary");
+                        if (this.useSwearyMessages || !isSweary)
                         {
                             if (soundFile.Name.Contains(SoundCache.REQUIRED_PREFIX_IDENTIFIER) || soundFile.Name.Contains(SoundCache.REQUIRED_SUFFIX_IDENTIFIER) ||
                                 soundFile.Name.Contains(SoundCache.OPTIONAL_PREFIX_IDENTIFIER) || soundFile.Name.Contains(SoundCache.OPTIONAL_PREFIX_IDENTIFIER))
@@ -421,6 +431,7 @@ namespace CrewChiefV4.Audio
                                             hasPrefixOrSuffix = true;
                                             hasSounds = true;
                                             SingleSound singleSound = new SingleSound(soundFile.FullName, SoundCache.eagerLoadSoundFiles, this.keepCached, this.allowCaching);
+                                            singleSound.isSweary = isSweary;
                                             if (soundFile.Name.Contains(SoundCache.OPTIONAL_SUFFIX_IDENTIFIER) || soundFile.Name.Contains(SoundCache.REQUIRED_SUFFIX_IDENTIFIER))
                                             {
                                                 singleSound.suffixSoundSet = additionalSoundSet;
@@ -439,14 +450,18 @@ namespace CrewChiefV4.Audio
                                 if (isOptional)
                                 {
                                     hasSounds = true;
-                                    singleSoundsNoPrefixOrSuffix.Add(new SingleSound(soundFile.FullName, SoundCache.eagerLoadSoundFiles, this.keepCached, this.allowCaching));
+                                    SingleSound singleSound = new SingleSound(soundFile.FullName, SoundCache.eagerLoadSoundFiles, this.keepCached, this.allowCaching);
+                                    singleSound.isSweary = isSweary;
+                                    singleSoundsNoPrefixOrSuffix.Add(singleSound);
                                     soundsCount++;
                                 }
                             }
                             else
                             {
                                 hasSounds = true;
-                                singleSoundsNoPrefixOrSuffix.Add(new SingleSound(soundFile.FullName, SoundCache.eagerLoadSoundFiles, this.keepCached, this.allowCaching));
+                                SingleSound singleSound = new SingleSound(soundFile.FullName, SoundCache.eagerLoadSoundFiles, this.keepCached, this.allowCaching);
+                                singleSound.isSweary = isSweary;
+                                singleSoundsNoPrefixOrSuffix.Add(singleSound);
                                 soundsCount++;
                             }                         
                         }
@@ -472,8 +487,25 @@ namespace CrewChiefV4.Audio
                     prefixOrSuffixIndexes = createIndexes(singleSoundsWithPrefixOrSuffix.Count());
                     prefixOrSuffixIndexesPosition = 0;
                 }
-                SingleSound ss = singleSoundsWithPrefixOrSuffix[prefixOrSuffixIndexes[prefixOrSuffixIndexesPosition]];
-                prefixOrSuffixIndexesPosition++;
+                SingleSound ss = null;
+                while (prefixOrSuffixIndexesPosition < prefixOrSuffixIndexes.Count())
+                {
+                    ss = singleSoundsWithPrefixOrSuffix[prefixOrSuffixIndexes[prefixOrSuffixIndexesPosition]];
+                    prefixOrSuffixIndexesPosition++;
+                    if (!ss.isSweary)
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        // this is a sweary message - can we play it? do we have to play it?
+                        if (prefixOrSuffixIndexesPosition == prefixOrSuffixIndexes.Count || DateTime.Now > SoundCache.lastSwearyMessageTime + TimeSpan.FromSeconds(10))
+                        {
+                            SoundCache.lastSwearyMessageTime = DateTime.Now;
+                            break;
+                        }
+                    }
+                }
                 return ss;
             } 
             else if (singleSoundsNoPrefixOrSuffix.Count > 0)
@@ -483,8 +515,25 @@ namespace CrewChiefV4.Audio
                     indexes = createIndexes(singleSoundsNoPrefixOrSuffix.Count());
                     indexesPosition = 0;
                 }
-                SingleSound ss = singleSoundsNoPrefixOrSuffix[indexes[indexesPosition]];
-                indexesPosition++;
+                SingleSound ss = null;
+                while (indexesPosition < indexes.Count())
+                {
+                    ss = singleSoundsNoPrefixOrSuffix[indexes[indexesPosition]];
+                    indexesPosition++;
+                    if (!ss.isSweary)
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        // this is a sweary message - can we play it? do we have to play it?
+                        if (indexesPosition == indexes.Count || DateTime.Now > SoundCache.lastSwearyMessageTime + TimeSpan.FromSeconds(10))
+                        {
+                            SoundCache.lastSwearyMessageTime = DateTime.Now;
+                            break;
+                        }
+                    }
+                }
                 return ss;
             }
             else
@@ -539,6 +588,7 @@ namespace CrewChiefV4.Audio
 
     public class SingleSound
     {
+        public Boolean isSweary = false;
         public Boolean isPause = false;
         public int pauseLength = 0;
         private String fullPath;
