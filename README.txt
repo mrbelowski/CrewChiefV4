@@ -2,6 +2,8 @@ CrewChief version 4.
 
 Changelog
 ---------
+Version 4.1.3.0: Don't play wheel locking warnings if the player has a missing wheel or puncture; Don't play laptime improving / worsening messages if the conditions have significantly changed (rain or track temp); Don't play a message twice in succession if a player asks for something that the app was going to tell them anyway; Don't play good / OK start messages if the player has picked up a penalty (i.e. false start);Insert a short pause between some messages;Reduce the likelihood of multiple sweary messages being played in quick succession;Some better error trapping when the app is closed.
+
 Version 4.1.2.2: Fixed radio channel (hold) button function for PCars network data.
 
 Version 4.1.2.1: Added some car class data and pit detection points for the PCars Lotus DLC; Fixed some pit detection issues in PCars; Added option to enable spotter in hot lap (time trial) mode for PCars; Don't play lap time messages when we're in the pit lane;Don't complain about worsening lap times if the player has made a pass on this lap
