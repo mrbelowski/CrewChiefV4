@@ -109,6 +109,11 @@ namespace CrewChiefV4.Events
             return messages;
         }
 
+        public static String Pause(int length)
+        {
+            return AudioPlayer.PAUSE_ID + ":" + length;
+        }
+
         private static void addObjectToMessages(List<MessageFragment> messageFragments, Object o) {
             if (o == null)
             {

@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Media;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace CrewChiefV4.Audio
@@ -96,42 +97,59 @@ namespace CrewChiefV4.Audio
         {           
             SoundSet prefix = null;
             SoundSet suffix = null;
-            List<SingleSound> singleSoundsToPlay = new List<SingleSound>();            
+            List<SingleSound> singleSoundsToPlay = new List<SingleSound>();      
             foreach (String soundName in soundNames)
             {
-                Boolean preferPersonalised = personalisedMessageIsDue();
-                SingleSound singleSound = null;
-                if (soundSets.ContainsKey(soundName))
+                if (soundName.StartsWith(AudioPlayer.PAUSE_ID))
                 {
-                    SoundSet soundSet = soundSets[soundName];
-                    singleSound = soundSet.getSingleSound(preferPersonalised);
-                    if (!soundSet.keepCached)
+                    int pauseLength = 500;
+                    try
                     {
-                        if (dynamicLoadedSounds.Contains(soundName))
+                        String[] split = soundName.Split(':');
+                        if (split.Count() == 2)
                         {
-                            dynamicLoadedSounds.Remove(soundName);
+                            pauseLength = int.Parse(split[1]);
                         }
-                        dynamicLoadedSounds.Add(soundName);
                     }
-                } 
-                else if (singleSounds.ContainsKey(soundName))
-                {
-                    singleSound = singleSounds[soundName];
+                    catch (Exception) { }
+                    singleSoundsToPlay.Add(new SingleSound(pauseLength));
                 }
-                if (singleSound != null)
+                else
                 {
-                    // hack... we double check the prefer setting here and only play the prefix / suffix if it's true.
-                    // The list without prefixes and suffixes includes items which have optional ones, so we might want to
-                    // play a sound that can have the prefix / suffix, but not the associated prefix / suffix
-                    if (preferPersonalised && singleSound.prefixSoundSet != null)
+                    Boolean preferPersonalised = personalisedMessageIsDue();
+                    SingleSound singleSound = null;
+                    if (soundSets.ContainsKey(soundName))
                     {
-                        prefix = singleSound.prefixSoundSet;
+                        SoundSet soundSet = soundSets[soundName];
+                        singleSound = soundSet.getSingleSound(preferPersonalised);
+                        if (!soundSet.keepCached)
+                        {
+                            if (dynamicLoadedSounds.Contains(soundName))
+                            {
+                                dynamicLoadedSounds.Remove(soundName);
+                            }
+                            dynamicLoadedSounds.Add(soundName);
+                        }
                     }
-                    if (preferPersonalised && singleSound.suffixSoundSet != null)
+                    else if (singleSounds.ContainsKey(soundName))
                     {
-                        suffix = singleSound.suffixSoundSet;
+                        singleSound = singleSounds[soundName];
                     }
-                    singleSoundsToPlay.Add(singleSound);
+                    if (singleSound != null)
+                    {
+                        // hack... we double check the prefer setting here and only play the prefix / suffix if it's true.
+                        // The list without prefixes and suffixes includes items which have optional ones, so we might want to
+                        // play a sound that can have the prefix / suffix, but not the associated prefix / suffix
+                        if (preferPersonalised && singleSound.prefixSoundSet != null)
+                        {
+                            prefix = singleSound.prefixSoundSet;
+                        }
+                        if (preferPersonalised && singleSound.suffixSoundSet != null)
+                        {
+                            suffix = singleSound.suffixSoundSet;
+                        }
+                        singleSoundsToPlay.Add(singleSound);
+                    }
                 }
             }
             if (singleSounds.Count > 0)
@@ -148,9 +166,16 @@ namespace CrewChiefV4.Audio
                 }
                 foreach (SingleSound singleSound in singleSoundsToPlay)
                 {
-                    if (singleSound.Play())
+                    if (singleSound.isPause)
                     {
-                        currentLoadedCount++;
+                        Thread.Sleep(singleSound.pauseLength);
+                    }
+                    else
+                    {
+                        if (singleSound.Play())
+                        {
+                            currentLoadedCount++;
+                        }
                     }
                 }
             }
@@ -514,6 +539,8 @@ namespace CrewChiefV4.Audio
 
     public class SingleSound
     {
+        public Boolean isPause = false;
+        public int pauseLength = 0;
         private String fullPath;
         private byte[] fileBytes;
         private MemoryStream memoryStream;
@@ -524,6 +551,12 @@ namespace CrewChiefV4.Audio
 
         public SoundSet prefixSoundSet = null;
         public SoundSet suffixSoundSet = null;
+
+        public SingleSound(int pauseLength)
+        {
+            this.isPause = true;
+            this.pauseLength = pauseLength;
+        }
 
         public SingleSound(String fullPath, Boolean loadFile, Boolean loadSoundPlayer, Boolean allowCaching)
         {

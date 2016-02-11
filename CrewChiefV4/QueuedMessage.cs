@@ -188,7 +188,7 @@ namespace CrewChiefV4
                 switch (messageFragment.type)
                 {
                     case MessageFragment.FragmentType.Text:
-                        if (SoundCache.availableSounds.Contains(messageFragment.text) ||
+                        if (messageFragment.text.StartsWith(AudioPlayer.PAUSE_ID) || SoundCache.availableSounds.Contains(messageFragment.text) ||
                             SoundCache.availableDriverNames.Contains(messageFragment.text))
                         {
                             messages.Add(messageFragment.text);

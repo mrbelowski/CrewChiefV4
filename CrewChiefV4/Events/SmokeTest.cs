@@ -113,7 +113,7 @@ namespace CrewChiefV4.Events
 
             audioPlayer.playMessage(new QueuedMessage("conditionsAirAndTrackIncreasing1", MessageContents
                                (ConditionsMonitor.folderAirAndTrackTempIncreasing, 
-                               ConditionsMonitor.folderAirTempIsNow, 26,
+                               ConditionsMonitor.folderAirTempIsNow, 26, Pause(2000),
                                ConditionsMonitor.folderTrackTempIsNow, 32, ConditionsMonitor.folderCelsius), 0, this));
             audioPlayer.playMessage(new QueuedMessage("Fuel/estimate", MessageContents(
                                         Fuel.folderWeEstimate, 12, Fuel.folderMinutesRemaining), 0, this));
