@@ -371,35 +371,71 @@ namespace CrewChiefV4.Events
                         OpponentData opponent = currentGameState.OpponentData[opponentKey];
                         if (opponent.IsActive)
                         {
-                            Boolean playedMessage = false;
                             int position = opponent.Position;
                             OpponentData.OpponentDelta opponentDelta = opponent.getTimeDifferenceToPlayer(currentGameState.SessionData);
-                            if (!gotByPositionNumber)
+                            if (opponentDelta == null || (opponentDelta.lapDifference == 0 && Math.Abs(opponentDelta.time) < 0.05))
                             {
-                                audioPlayer.playMessageImmediately(new QueuedMessage("opponentPosition",
-                                    MessageContents(Position.folderStub, position), 0, null));
-                                playedMessage = true;
+                                // the delta is not usable - say the position if we didn't directly ask by position
+
+                                // TODO: we need a "right infront" or "right behind" type response here for when the delta is < 0.05 (< 1 tenth rounded)
+                                if (!gotByPositionNumber)
+                                {
+                                    audioPlayer.playMessageImmediately(new QueuedMessage("opponentPosition", MessageContents(Position.folderStub, position), 0, null));
+                                    gotData = true;
+                                }
                             }
-                            if (opponentDelta != null && (opponentDelta.lapDifference != 0 || Math.Abs(opponentDelta.time) > 0.05))
+                            else
                             {
-                                playedMessage = true;
+                                gotData = true;
                                 if (opponentDelta.lapDifference == 1)
                                 {
-                                    audioPlayer.playMessageImmediately(new QueuedMessage(Position.folderOneLapBehind, 0, null));
+                                    if (!gotByPositionNumber)
+                                    {
+                                        audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta", 
+                                            MessageContents(Position.folderStub, position, Pause(500), Position.folderOneLapBehind), 0, null));
+                                    }
+                                    else
+                                    {
+                                        audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta", MessageContents(Position.folderOneLapBehind), 0, null));
+                                    }
                                 }
                                 else if (opponentDelta.lapDifference > 1)
                                 {
-                                    audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta",
-                                        MessageContents(opponentDelta.lapDifference, Position.folderLapsBehind), 0, null));
+                                    if (!gotByPositionNumber)
+                                    {
+                                        audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta",
+                                            MessageContents(Position.folderStub, position, Pause(500), opponentDelta.lapDifference, Position.folderLapsBehind), 0, null));
+                                    }
+                                    else
+                                    {
+                                        audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta",
+                                            MessageContents(opponentDelta.lapDifference, Position.folderLapsBehind), 0, null));
+                                    }
                                 }
                                 else if (opponentDelta.lapDifference == -1)
                                 {
-                                    audioPlayer.playMessageImmediately(new QueuedMessage(Position.folderOneLapAhead, 0, null));
+                                    if (!gotByPositionNumber)
+                                    {
+                                        audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta",
+                                            MessageContents(Position.folderStub, position, Pause(500), Position.folderOneLapAhead), 0, null));
+                                    }
+                                    else
+                                    {
+                                        audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta", MessageContents(Position.folderOneLapAhead), 0, null));
+                                    }
                                 }
                                 else if (opponentDelta.lapDifference < -1)
                                 {
-                                    audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta",
-                                        MessageContents(opponentDelta.lapDifference, Position.folderLapsAhead), 0, null));
+                                    if (!gotByPositionNumber)
+                                    {
+                                        audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta",
+                                            MessageContents(Position.folderStub, position, Pause(500), Math.Abs(opponentDelta.lapDifference), Position.folderLapsAhead), 0, null));
+                                    }
+                                    else
+                                    {
+                                        audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta",
+                                            MessageContents(Math.Abs(opponentDelta.lapDifference), Position.folderLapsAhead), 0, null));
+                                    }
                                 }
                                 else
                                 {
@@ -409,14 +445,17 @@ namespace CrewChiefV4.Events
                                     {
                                         aheadOrBehind = Position.folderBehind;
                                     }
-                                    audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta",
-                                        MessageContents(delta, aheadOrBehind), 0, null));
+                                    if (!gotByPositionNumber)
+                                    {
+                                        audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta",
+                                            MessageContents(Position.folderStub, position, Pause(500), delta, aheadOrBehind), 0, null));
+                                    }
+                                    else
+                                    {
+                                        audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta",
+                                            MessageContents(delta, aheadOrBehind), 0, null));
+                                    }
                                 }
-                            }
-                            if (playedMessage)
-                            {
-                                
-                                gotData = true;
                             }
                         }
                         else
