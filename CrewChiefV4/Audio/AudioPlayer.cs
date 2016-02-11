@@ -195,7 +195,6 @@ namespace CrewChiefV4.Audio
 
         public void stopMonitor()
         {
-            Console.WriteLine("Stopping queue monitor");
             monitorRunning = false;
         }
 
@@ -288,7 +287,11 @@ namespace CrewChiefV4.Audio
         {
             if (backgroundPlayer != null && backgroundPlayerInitialised)
             {
-                backgroundPlayer.Stop();
+                try
+                {
+                    backgroundPlayer.Stop();
+                }
+                catch (Exception e) { }
                 backgroundPlayerInitialised = false;
                 backgroundPlayer = null;
             }
@@ -996,7 +999,11 @@ namespace CrewChiefV4.Audio
         {
             if (soundCache != null)
             {
-                soundCache.StopAndUnloadAll();
+                try
+                {
+                    soundCache.StopAndUnloadAll();
+                }
+                catch (Exception) { }
                 soundCache = null;
             }
         }

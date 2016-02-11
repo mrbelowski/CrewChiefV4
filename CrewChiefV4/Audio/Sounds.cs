@@ -223,14 +223,23 @@ namespace CrewChiefV4.Audio
 
         public void StopAndUnloadAll()
         {
-            StopAll();
             foreach (SoundSet soundSet in soundSets.Values)
-            {
-                soundSet.UnLoadAll();
+            {                
+                try
+                {
+                    soundSet.StopAll();
+                    soundSet.UnLoadAll();
+                }
+                catch (Exception) { }
             }
             foreach (SingleSound singleSound in singleSounds.Values)
-            {
-                singleSound.UnLoad();
+            {                
+                try
+                {
+                    singleSound.Stop();
+                    singleSound.UnLoad();
+                }
+                catch (Exception) { }
             }
         }
 
@@ -633,7 +642,11 @@ namespace CrewChiefV4.Audio
                 SoundPlayer soundPlayer = new SoundPlayer(fullPath);
                 soundPlayer.Load();
                 soundPlayer.PlaySync();
-                soundPlayer.Dispose();
+                try
+                {
+                    soundPlayer.Dispose();
+                }
+                catch (Exception) { }
             }
             else
             {

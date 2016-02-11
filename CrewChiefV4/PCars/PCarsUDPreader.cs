@@ -299,8 +299,12 @@ namespace CrewChiefV4.PCars
         {
             if (udpClient != null)
             {
-                stop();
-                udpClient.Close();
+                try
+                {
+                    stop();
+                    udpClient.Close();
+                }
+                catch (Exception) { }
             }
         }
 

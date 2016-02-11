@@ -120,7 +120,11 @@ namespace CrewChiefV4
         {
             if (sre != null)
             {
-                sre.Dispose();
+                try
+                {
+                    sre.Dispose();
+                }
+                catch (Exception) { }
                 sre = null;
             }
             initialised = false;

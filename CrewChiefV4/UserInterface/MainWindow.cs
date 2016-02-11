@@ -971,7 +971,7 @@ namespace CrewChiefV4
 
     public class ControlWriter : TextWriter
     {
-        private TextBox textbox;
+        private TextBox textbox = null;
         public ControlWriter(TextBox textbox)
         {
             this.textbox = textbox;
@@ -979,7 +979,7 @@ namespace CrewChiefV4
 
         public override void WriteLine(string value)
         {
-            if (!textbox.IsDisposed)
+            if (textbox != null && !textbox.IsDisposed)
             {
                 try
                 {

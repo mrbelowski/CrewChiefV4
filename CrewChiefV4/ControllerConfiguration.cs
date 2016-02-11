@@ -45,7 +45,11 @@ namespace CrewChiefV4
                     catch (Exception) { }
                 }
             }
-            directInput.Dispose();
+            try
+            {
+                directInput.Dispose();
+            }
+            catch (Exception) { }
         }
 
         public ControllerConfiguration()
