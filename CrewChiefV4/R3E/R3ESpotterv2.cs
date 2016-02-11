@@ -136,14 +136,14 @@ namespace CrewChiefV4.RaceRoom
         public void enableSpotter()
         {
             enabled = true;
-            audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderEnableSpotter, 0, null), false);
+            audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderEnableSpotter, 0, null));
             
         }
 
         public void disableSpotter()
         {
             enabled = false;
-            audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderDisableSpotter, 0, null), false);
+            audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderDisableSpotter, 0, null));
             
         }
     }

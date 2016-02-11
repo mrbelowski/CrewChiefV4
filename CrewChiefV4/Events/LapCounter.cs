@@ -177,7 +177,7 @@ namespace CrewChiefV4.Events
                  previousGameState.SessionData.SessionPhase == SessionPhase.Countdown))
             {
                 audioPlayer.removeQueuedMessage(folderGetReady);
-                audioPlayer.playMessageImmediately(new QueuedMessage(folderGreenGreenGreen, 0, this), false);
+                audioPlayer.playMessageImmediately(new QueuedMessage(folderGreenGreenGreen, 0, this));
                 
                 audioPlayer.disablePearlsOfWisdom = false;
             }

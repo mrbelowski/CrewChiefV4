@@ -401,7 +401,7 @@ namespace CrewChiefV4.Events
                                             currentGameState.SessionData.LastSector2Time, lapAndSectorsComparisonData[2], currentGameState.SessionData.LastSector3Time, lapAndSectorsComparisonData[3], true);
                                         if (sectorMessageFragments.Count > 0)
                                         {
-                                            audioPlayer.playMessage(new QueuedMessage("sectorsQual", sectorMessageFragments, 0, this));
+                                            audioPlayer.playMessage(new QueuedMessage("sectorDeltas", sectorMessageFragments, 0, this));
                                             sectorsReportedForLap = true;
                                         }
                                     }
@@ -477,7 +477,7 @@ namespace CrewChiefV4.Events
                                             currentGameState.SessionData.LastSector2Time, lapAndSectorsComparisonData[2], currentGameState.SessionData.LastSector3Time, lapAndSectorsComparisonData[3], false);
                                     if (sectorMessageFragments.Count > 0)
                                     {
-                                        QueuedMessage message = new QueuedMessage("sectorsRace", sectorMessageFragments, 0, this);
+                                        QueuedMessage message = new QueuedMessage("sectorDeltas", sectorMessageFragments, 0, this);
                                         message.maxPermittedQueueLengthForMessage = maxQueueLengthForRaceSectorDeltaReports;
                                         audioPlayer.playMessage(message);
                                         sectorsReportedForLap = true;
@@ -723,11 +723,11 @@ namespace CrewChiefV4.Events
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage("sectorTimes",
                         MessageContents(TimeSpan.FromSeconds(currentGameState.SessionData.LastSector1Time), 
-                        TimeSpan.FromSeconds(currentGameState.SessionData.LastSector2Time), TimeSpan.FromSeconds(currentGameState.SessionData.LastSector3Time)), 0, this), false);
+                        TimeSpan.FromSeconds(currentGameState.SessionData.LastSector2Time), TimeSpan.FromSeconds(currentGameState.SessionData.LastSector3Time)), 0, this));
                 }
                 else
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null), false);
+                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
                 }
                 
             }
@@ -736,21 +736,21 @@ namespace CrewChiefV4.Events
                 if (currentGameState != null && currentGameState.SessionData.SectorNumber == 1 && currentGameState.SessionData.LastSector3Time > -1)
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage("sector3Time",
-                        MessageContents(TimeSpan.FromSeconds(currentGameState.SessionData.LastSector3Time)), 0, this), false);
+                        MessageContents(TimeSpan.FromSeconds(currentGameState.SessionData.LastSector3Time)), 0, this));
                 }
                 else if (currentGameState != null && currentGameState.SessionData.SectorNumber == 2 && currentGameState.SessionData.LastSector1Time > -1)
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage("sector1Time",
-                        MessageContents(TimeSpan.FromSeconds(currentGameState.SessionData.LastSector1Time)), 0, this), false);
+                        MessageContents(TimeSpan.FromSeconds(currentGameState.SessionData.LastSector1Time)), 0, this));
                 }
                 else if (currentGameState != null && currentGameState.SessionData.SectorNumber == 3 && currentGameState.SessionData.LastSector2Time > -1)
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage("sector2Time",
-                        MessageContents(TimeSpan.FromSeconds(currentGameState.SessionData.LastSector2Time)), 0, this), false);
+                        MessageContents(TimeSpan.FromSeconds(currentGameState.SessionData.LastSector2Time)), 0, this));
                 }
                 else
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null), false);
+                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
                 }
                 
             }
@@ -760,12 +760,12 @@ namespace CrewChiefV4.Events
                 if (bestLapTime > 0)
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage("bestLapTime",
-                        MessageContents(TimeSpan.FromSeconds(bestLapTime)), 0, this), false);
+                        MessageContents(TimeSpan.FromSeconds(bestLapTime)), 0, this));
                     
                 }
                 else
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null), false);
+                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
                     
                 }
             }
@@ -773,13 +773,13 @@ namespace CrewChiefV4.Events
             {
                 if (lastLapTime > 0)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage("lastLapTime",
-                        MessageContents(folderLapTimeIntro, TimeSpan.FromSeconds(lastLapTime)), 0, this), false);
+                    audioPlayer.playMessageImmediately(new QueuedMessage("laptime",
+                        MessageContents(folderLapTimeIntro, TimeSpan.FromSeconds(lastLapTime)), 0, this));
                     
                 }
                 else
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null), false);
+                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
                     
                 }
             }
@@ -789,7 +789,7 @@ namespace CrewChiefV4.Events
                 {
                     if (currentGameState == null)
                     {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null), false);
+                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
                     }
                     else
                     {
@@ -823,7 +823,7 @@ namespace CrewChiefV4.Events
                                 case LastLapRating.BEST_OVERALL:
                                 case LastLapRating.BEST_IN_CLASS:
                                 case LastLapRating.SETTING_CURRENT_PACE:
-                                    audioPlayer.playMessageImmediately(new QueuedMessage(folderSettingCurrentRacePace, 0, null), false);
+                                    audioPlayer.playMessageImmediately(new QueuedMessage(folderSettingCurrentRacePace, 0, null));
                                     break;
                                 case LastLapRating.PERSONAL_BEST_CLOSE_TO_OVERALL_LEADER:
                                 case LastLapRating.PERSONAL_BEST_CLOSE_TO_CLASS_LEADER:
@@ -849,7 +849,7 @@ namespace CrewChiefV4.Events
                                     }
                                     if (messages.Count > 0)
                                     {
-                                        audioPlayer.playMessageImmediately(new QueuedMessage("lapTimeRacePaceReport", messages, 0, null), false);
+                                        audioPlayer.playMessageImmediately(new QueuedMessage("lapTimeRacePaceReport", messages, 0, null));
                                     }
                                     break;
                                 case LastLapRating.MEH:
@@ -858,10 +858,10 @@ namespace CrewChiefV4.Events
                                     {
                                         messages.Add(MessageFragment.Text(timeToFindFolder));
                                     }
-                                    audioPlayer.playMessageImmediately(new QueuedMessage("lapTimeRacePaceReport", messages, 0, null), false);
+                                    audioPlayer.playMessageImmediately(new QueuedMessage("lapTimeRacePaceReport", messages, 0, null));
                                     break;
                                 default:
-                                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null), false);
+                                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
                                     break;
                             }
                             SectorReportOption reportOption = SectorReportOption.COMBINED;
@@ -875,13 +875,13 @@ namespace CrewChiefV4.Events
                                 currentGameState.SessionData.LastSector2Time, bestOpponentLapData[2], currentGameState.SessionData.LastSector3Time, bestOpponentLapData[3], false);
                             if (sectorDeltaMessages.Count > 0)
                             {
-                                audioPlayer.playMessageImmediately(new QueuedMessage("race_sector_times_report", sectorDeltaMessages, 0, null), false);
+                                audioPlayer.playMessageImmediately(new QueuedMessage("sectorDeltas", sectorDeltaMessages, 0, null));
                             }
 
                         }
                         else
                         {
-                            audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null), false);
+                            audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
                         }
                     }
                 }
@@ -893,11 +893,11 @@ namespace CrewChiefV4.Events
                         {   
                             if (sessionType == SessionType.Qualify && currentPosition == 1)
                             {
-                                audioPlayer.playMessageImmediately(new QueuedMessage(Position.folderPole, 0, null), false);
+                                audioPlayer.playMessageImmediately(new QueuedMessage(Position.folderPole, 0, null));
                             }
                             else
                             {
-                                audioPlayer.playMessageImmediately(new QueuedMessage(folderQuickestOverall, 0, null), false);
+                                audioPlayer.playMessageImmediately(new QueuedMessage(folderQuickestOverall, 0, null));
                             }
                             TimeSpan gapBehind = deltaPlayerLastToSessionBestInClass.Negate();
                             if (gapBehind.Seconds > 0 || gapBehind.Milliseconds > 50)
@@ -912,19 +912,19 @@ namespace CrewChiefV4.Events
                             if (currentPosition > 1)
                             {
                                 // should always trigger
-                                audioPlayer.playMessageImmediately(new QueuedMessage(Position.folderStub + currentPosition, 0, null), false);
+                                audioPlayer.playMessageImmediately(new QueuedMessage(Position.folderStub + currentPosition, 0, null));
                             }
-                            audioPlayer.playMessageImmediately(new QueuedMessage(folderLessThanATenthOffThePace, 0, null), false);
+                            audioPlayer.playMessageImmediately(new QueuedMessage(folderLessThanATenthOffThePace, 0, null));
                         }
                         else
                         {
                             if (currentPosition > 1)
                             {
                                 // should always trigger
-                                audioPlayer.playMessageImmediately(new QueuedMessage(Position.folderStub + currentPosition, 0, null), false);
+                                audioPlayer.playMessageImmediately(new QueuedMessage(Position.folderStub + currentPosition, 0, null));
                             }
                             audioPlayer.playMessageImmediately(new QueuedMessage("lapTimeNotRaceGap",
-                                MessageContents(deltaPlayerLastToSessionBestInClass, folderGapOutroOffPace), 0, null), false);
+                                MessageContents(deltaPlayerLastToSessionBestInClass, folderGapOutroOffPace), 0, null));
                         }
 
                         // TODO: wrap this in a try-catch until I work out why the array indices are being screwed up in online races (yuk...)
@@ -943,7 +943,7 @@ namespace CrewChiefV4.Events
                                 currentGameState.SessionData.LastSector2Time, bestOpponentLapData[2], currentGameState.SessionData.LastSector3Time, bestOpponentLapData[3], true);
                             if (sectorDeltaMessages.Count > 0)
                             {
-                                audioPlayer.playMessageImmediately(new QueuedMessage("non-race_sector_times_report", sectorDeltaMessages, 0, null), false);
+                                audioPlayer.playMessageImmediately(new QueuedMessage("sectorDeltas", sectorDeltaMessages, 0, null));
                             }
                         }
                         catch (Exception e)
@@ -953,7 +953,7 @@ namespace CrewChiefV4.Events
                         
                     }
                     else {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null), false);
+                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
                         
                     }
                 }

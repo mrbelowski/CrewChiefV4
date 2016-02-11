@@ -276,7 +276,7 @@ namespace CrewChiefV4.Events
 
             if (currentGameState.Now > nextLockingAndSpinningCheck)
             {
-                if (enableBrakeLockWarnings)
+                if (enableBrakeLockWarnings && !hasWheelMissingOrPuncture(currentGameState))
                 {
                     checkLocking();
                 }
@@ -382,7 +382,7 @@ namespace CrewChiefV4.Events
 
             if (playImmediately)
             {
-                audioPlayer.playMessageImmediately(new QueuedMessage("tyre_temps", messageContents, 0, null), false);
+                audioPlayer.playMessageImmediately(new QueuedMessage("tyre_temps", messageContents, 0, null));
                 
             }
             else if (lastTyreTempMessage == null || !messagesHaveSameContent(lastTyreTempMessage, messageContents))
@@ -405,7 +405,7 @@ namespace CrewChiefV4.Events
 
             if (playImmediately)
             {
-                audioPlayer.playMessageImmediately(new QueuedMessage("brake_temps", messageContents, 0, null), false);
+                audioPlayer.playMessageImmediately(new QueuedMessage("brake_temps", messageContents, 0, null));
                 
             }
             else if (lastBrakeTempMessage == null || !messagesHaveSameContent(lastBrakeTempMessage, messageContents))
@@ -428,7 +428,7 @@ namespace CrewChiefV4.Events
 
             if (playImmediately)
             {
-                audioPlayer.playMessageImmediately(new QueuedMessage("tyre_condition", messageContents, 0, null), false);
+                audioPlayer.playMessageImmediately(new QueuedMessage("tyre_condition", messageContents, 0, null));
                 
             }
             else if (playEvenIfUnchanged || (lastTyreConditionMessage != null && !messagesHaveSameContent(lastTyreConditionMessage, messageContents)))
@@ -444,13 +444,13 @@ namespace CrewChiefV4.Events
             {
                 if (minutesRemainingOnTheseTyres > (timeInSession - timeElapsed) / 60)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderGoodWear, 0, null), false);
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderGoodWear, 0, null));
                     
                     return;
                 }
                 else if (minutesRemainingOnTheseTyres < 1)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderKnackeredAllRound, 0, null), false);
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderKnackeredAllRound, 0, null));
                     
                     return;
                 }
@@ -462,7 +462,7 @@ namespace CrewChiefV4.Events
                     MessageContents(folderMinutesOnCurrentTyresIntro, minutesRemainingOnTheseTyres, folderMinutesOnCurrentTyresOutro), 0, null);
                 if (immediate)
                 {
-                    audioPlayer.playMessageImmediately(queuedMessage, false);
+                    audioPlayer.playMessageImmediately(queuedMessage);
                     
                 }
                 else
@@ -472,7 +472,7 @@ namespace CrewChiefV4.Events
             }
             else if (immediate)
             {
-                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null), false);
+                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
                 
             }
         }
@@ -483,13 +483,13 @@ namespace CrewChiefV4.Events
             {
                 if (lapsRemainingOnTheseTyres > lapsInSession - completedLaps)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderGoodWear, 0, null), false);
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderGoodWear, 0, null));
                     
                     return;
                 }
                 else if (lapsRemainingOnTheseTyres < 1)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderKnackeredAllRound, 0, null), false);
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderKnackeredAllRound, 0, null));
                     
                     return;
                 }
@@ -501,7 +501,7 @@ namespace CrewChiefV4.Events
                     MessageContents(folderLapsOnCurrentTyresIntro, lapsRemainingOnTheseTyres, folderLapsOnCurrentTyresOutro), 0, null);
                 if (immediate)
                 {
-                    audioPlayer.playMessageImmediately(queuedMessage, false);
+                    audioPlayer.playMessageImmediately(queuedMessage);
                     
                 }
                 else
@@ -511,7 +511,7 @@ namespace CrewChiefV4.Events
             }
             else if (immediate)
             {
-                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null), false);
+                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
                 
             }
         }
@@ -540,12 +540,12 @@ namespace CrewChiefV4.Events
         {
             if (leftFrontTyreTemp == 0 && rightFrontTyreTemp == 0 && leftRearTyreTemp == 0 && rightRearTyreTemp == 0)
             {
-                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null), false);
+                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
             }
             else
             {
                 audioPlayer.playMessageImmediately(new QueuedMessage("tyre_temps", MessageContents(folderLeftFront, convertTemp(leftFrontTyreTemp), 
-                    folderRightFront, convertTemp(rightFrontTyreTemp), folderLeftRear, convertTemp(leftRearTyreTemp), folderRightRear, convertTemp(rightRearTyreTemp), getTempUnit()), 0, this), false);
+                    folderRightFront, convertTemp(rightFrontTyreTemp), folderLeftRear, convertTemp(leftRearTyreTemp), folderRightRear, convertTemp(rightRearTyreTemp), getTempUnit()), 0, this));
             }
             
         }
@@ -554,12 +554,12 @@ namespace CrewChiefV4.Events
         {
             if (leftFrontBrakeTemp == 0 && rightFrontBrakeTemp == 0 && leftRearBrakeTemp == 0 && rightRearBrakeTemp == 0)
             {
-                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null), false);
+                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
             }
             else
             {
                 audioPlayer.playMessageImmediately(new QueuedMessage("brake_temps", MessageContents(folderLeftFront, convertTemp(leftFrontBrakeTemp, 10), 
-                    folderRightFront, convertTemp(rightFrontBrakeTemp, 10), folderLeftRear, convertTemp(leftRearBrakeTemp, 10), folderRightRear, convertTemp(rightRearBrakeTemp, 10), getTempUnit()), 0, this), false);
+                    folderRightFront, convertTemp(rightFrontBrakeTemp, 10), folderLeftRear, convertTemp(leftRearBrakeTemp, 10), folderRightRear, convertTemp(rightRearBrakeTemp, 10), getTempUnit()), 0, this));
             }
             
         }
@@ -578,7 +578,7 @@ namespace CrewChiefV4.Events
                 }
                 else
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null), false);
+                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
                         
                 }
             }
@@ -594,7 +594,7 @@ namespace CrewChiefV4.Events
                 }
                 else
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null), false);
+                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
                         
                 }                
             }
@@ -606,7 +606,7 @@ namespace CrewChiefV4.Events
                 }
                 else
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null), false);
+                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
                     
                 }
             }
@@ -971,6 +971,13 @@ namespace CrewChiefV4.Events
                     timeRightRearIsSpinningForLap += (float)(currentTicks - previousTicks) / (float)TimeSpan.TicksPerSecond;
                 }
             }
+        }
+
+        private Boolean hasWheelMissingOrPuncture(GameStateData currentState)
+        {
+            return currentState.TyreData.LeftFrontAttached && currentState.TyreData.RightFrontAttached &&
+                    currentState.TyreData.LeftRearAttached && currentState.TyreData.RightRearAttached &&
+                    DamageReporting.getPuncture(currentState.TyreData) == CornerData.Corners.NONE;
         }
 
         private void checkLocking()

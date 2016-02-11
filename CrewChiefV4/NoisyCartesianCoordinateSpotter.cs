@@ -398,7 +398,7 @@ namespace CrewChiefV4
                             audioPlayer.removeImmediateMessages(new String[] {folderStillThere, folderCarLeft, folderCarRight, folderClearAllRound, folderClearLeft, folderClearRight});
                             QueuedMessage inTheMiddleMessage = new QueuedMessage(folderInTheMiddle, 0, null);
                             inTheMiddleMessage.expiryTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + inTheMiddleMessageExpiresAfter;
-                            audioPlayer.playMessageImmediately(inTheMiddleMessage, true, true);
+                            audioPlayer.playSpotterMessage(inTheMiddleMessage, true);
                             nextMessageType = NextMessageType.stillThere;
                             nextMessageDue = now.Add(repeatHoldFrequency);
                             reportedOverlapLeft = true;
@@ -409,7 +409,7 @@ namespace CrewChiefV4
                             audioPlayer.removeImmediateMessages(new String[] {folderStillThere, folderInTheMiddle, folderCarRight, folderClearAllRound, folderClearLeft, folderClearRight});
                             QueuedMessage carLeftMessage = new QueuedMessage(folderCarLeft, 0, null);
                             carLeftMessage.expiryTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + holdMessageExpiresAfter;
-                            audioPlayer.playMessageImmediately(carLeftMessage, true, true);
+                            audioPlayer.playSpotterMessage(carLeftMessage, true);
                             nextMessageType = NextMessageType.stillThere;
                             nextMessageDue = now.Add(repeatHoldFrequency);
                             reportedOverlapLeft = true;
@@ -418,7 +418,7 @@ namespace CrewChiefV4
                             audioPlayer.removeImmediateMessages(new String[] {folderStillThere, folderCarLeft, folderInTheMiddle, folderClearAllRound, folderClearLeft, folderClearRight});
                             QueuedMessage carRightMessage = new QueuedMessage(folderCarRight, 0, null);
                             carRightMessage.expiryTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + holdMessageExpiresAfter;
-                            audioPlayer.playMessageImmediately(carRightMessage, true, true);
+                            audioPlayer.playSpotterMessage(carRightMessage, true);
                             nextMessageType = NextMessageType.stillThere;
                             nextMessageDue = now.Add(repeatHoldFrequency);
                             reportedOverlapRight = true;
@@ -429,7 +429,7 @@ namespace CrewChiefV4
                                 QueuedMessage clearAllRoundMessage = new QueuedMessage(folderClearAllRound, 0, null);
                                 clearAllRoundMessage.expiryTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + clearAllRoundMessageExpiresAfter;
                                 audioPlayer.removeImmediateMessages(new String[] {folderCarLeft, folderStillThere, folderCarRight, folderInTheMiddle, folderClearLeft, folderClearRight});
-                                audioPlayer.playMessageImmediately(clearAllRoundMessage, false);
+                                audioPlayer.playSpotterMessage(clearAllRoundMessage, false);
                                 nextMessageType = NextMessageType.none;
                             }
                             
@@ -445,7 +445,7 @@ namespace CrewChiefV4
                                     QueuedMessage clearAllRoundMessage = new QueuedMessage(folderClearAllRound, 0, null);
                                     clearAllRoundMessage.expiryTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + clearMessageExpiresAfter;
                                     audioPlayer.removeImmediateMessages(new String[] {folderCarLeft, folderStillThere, folderCarRight, folderInTheMiddle, folderClearRight, folderClearLeft});
-                                    audioPlayer.playMessageImmediately(clearAllRoundMessage, false);
+                                    audioPlayer.playSpotterMessage(clearAllRoundMessage, false);
                                     nextMessageType = NextMessageType.none;
                                     
                                     reportedOverlapRight = false;
@@ -458,13 +458,13 @@ namespace CrewChiefV4
                                     audioPlayer.removeImmediateMessages(new String[] {folderCarLeft, folderStillThere, folderCarRight, folderInTheMiddle, folderClearRight, folderClearAllRound});
                                     if (wasInMiddle)
                                     {
-                                        audioPlayer.playMessageImmediately(clearLeftMessage, true, false);
+                                        audioPlayer.playSpotterMessage(clearLeftMessage, true);
                                         nextMessageType = NextMessageType.carRight;
                                         nextMessageDue = now.Add(repeatHoldFrequency);
                                     }
                                     else
                                     {
-                                        audioPlayer.playMessageImmediately(clearLeftMessage, false);
+                                        audioPlayer.playSpotterMessage(clearLeftMessage, false);
                                         nextMessageType = NextMessageType.none;
                                     }
                                 }
@@ -479,7 +479,7 @@ namespace CrewChiefV4
                                     QueuedMessage clearAllRoundMessage = new QueuedMessage(folderClearAllRound, 0, null);
                                     clearAllRoundMessage.expiryTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + clearMessageExpiresAfter;
                                     audioPlayer.removeImmediateMessages(new String[] {folderCarLeft, folderStillThere, folderCarRight, folderInTheMiddle, folderClearLeft, folderClearRight});
-                                    audioPlayer.playMessageImmediately(clearAllRoundMessage, false);
+                                    audioPlayer.playSpotterMessage(clearAllRoundMessage, false);
                                     nextMessageType = NextMessageType.none;
                                     
                                     reportedOverlapLeft = false;
@@ -492,13 +492,13 @@ namespace CrewChiefV4
                                     audioPlayer.removeImmediateMessages(new String[] {folderCarLeft, folderStillThere, folderCarRight, folderInTheMiddle, folderClearLeft, folderClearAllRound});                                    
                                     if (wasInMiddle)
                                     {
-                                        audioPlayer.playMessageImmediately(clearRightMessage, true, false);
+                                        audioPlayer.playSpotterMessage(clearRightMessage, true);
                                         nextMessageType = NextMessageType.carLeft;
                                         nextMessageDue = now.Add(repeatHoldFrequency);
                                     }
                                     else
                                     {
-                                        audioPlayer.playMessageImmediately(clearRightMessage, false);
+                                        audioPlayer.playSpotterMessage(clearRightMessage, false);
                                         nextMessageType = NextMessageType.none;
                                     }
                                 }
@@ -511,7 +511,7 @@ namespace CrewChiefV4
                                 QueuedMessage holdYourLineMessage = new QueuedMessage(folderStillThere, 0, null);
                                 holdYourLineMessage.expiryTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + holdMessageExpiresAfter;
                                 audioPlayer.removeImmediateMessages(new String[] {folderClearRight, folderClearLeft, folderClearAllRound});
-                                audioPlayer.playMessageImmediately(holdYourLineMessage, true, false);
+                                audioPlayer.playSpotterMessage(holdYourLineMessage, true);
                                 nextMessageType = NextMessageType.stillThere;
                                 nextMessageDue = now.Add(repeatHoldFrequency);
                             }

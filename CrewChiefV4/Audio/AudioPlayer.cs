@@ -103,6 +103,9 @@ namespace CrewChiefV4.Audio
         public static float soundPackVersion = -1;
         public static float driverNamesVersion = -1;
 
+        private String lastImmediateMessageName = null;
+        private DateTime lastImmediateMessageTime = DateTime.MinValue;
+
         private SoundCache soundCache;
 
         public AudioPlayer(CrewChief crewChief)
@@ -358,13 +361,13 @@ namespace CrewChiefV4.Audio
 
         public void enableKeepQuietMode()
         {
-            playMessageImmediately(new QueuedMessage(folderAcknowlegeEnableKeepQuiet, 0, null), false);
+            playMessageImmediately(new QueuedMessage(folderAcknowlegeEnableKeepQuiet, 0, null));
             keepQuiet = true;
         }
 
         public void disableKeepQuietMode()
         {
-            playMessageImmediately(new QueuedMessage(folderAcknowlegeDisableKeepQuiet, 0, null), false);
+            playMessageImmediately(new QueuedMessage(folderAcknowlegeDisableKeepQuiet, 0, null));
             keepQuiet = false;
         }
 
@@ -412,8 +415,10 @@ namespace CrewChiefV4.Audio
                         Boolean messageHasExpired = queuedMessage.expiryTime != 0 && queuedMessage.expiryTime < milliseconds;
                         Boolean messageIsStillValid = queuedMessage.isMessageStillValid(key, crewChief.currentGameState);
                         Boolean queueTooLongForMessage = queuedMessage.maxPermittedQueueLengthForMessage != 0 && willBePlayedCount > queuedMessage.maxPermittedQueueLengthForMessage;
+                        Boolean hasJustPlayedAsAnImmediateMessage = !isImmediateMessages && lastImmediateMessageName != null &&
+                            key == lastImmediateMessageName && DateTime.Now - lastImmediateMessageTime < TimeSpan.FromSeconds(5);
                         if ((isImmediateMessages || !keepQuiet || queuedMessage.playEvenWhenSilenced) && queuedMessage.canBePlayed &&
-                            messageIsStillValid && !keysToPlay.Contains(key) && !queueTooLongForMessage && !messageHasExpired)
+                            messageIsStillValid && !keysToPlay.Contains(key) && !queueTooLongForMessage && !messageHasExpired && !hasJustPlayedAsAnImmediateMessage)
                         {
                             // special case for 'get ready' event here - we don't want to move this to the top of the queue because 
                             // it makes it sound shit. Bit of a hack, needs a better solution
@@ -449,6 +454,10 @@ namespace CrewChiefV4.Audio
                             else if (!queuedMessage.canBePlayed)
                             {
                                 Console.WriteLine("Clip " + key + " has some missing sound files");
+                            }
+                            else if (hasJustPlayedAsAnImmediateMessage) 
+                            {
+                                Console.WriteLine("Clip " + key + " has just been played in response to a voice command, skipping");
                             }
                             soundsProcessed.Add(key);
                             willBePlayedCount--;
@@ -568,7 +577,9 @@ namespace CrewChiefV4.Audio
                         {
                             Boolean messageHasExpired = thisMessage.expiryTime != 0 && thisMessage.expiryTime < DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond; ;
                             Boolean messageIsStillValid = thisMessage.isMessageStillValid(eventName, crewChief.currentGameState);
-                            if (messageHasExpired || !messageIsStillValid)
+                            Boolean hasJustPlayedAsAnImmediateMessage = lastImmediateMessageName != null &&
+                                eventName == lastImmediateMessageName && DateTime.Now - lastImmediateMessageTime < TimeSpan.FromSeconds(5);
+                            if (messageHasExpired || !messageIsStillValid || hasJustPlayedAsAnImmediateMessage)
                             {
                                 soundsProcessed.Add(eventName);
                                 continue;
@@ -793,12 +804,7 @@ namespace CrewChiefV4.Audio
             playMessage(queuedMessage, PearlsOfWisdom.PearlType.NONE, 0);
         }
 
-        public void playMessageImmediately(QueuedMessage queuedMessage, Boolean useShortBeep)
-        {
-            playMessageImmediately(queuedMessage, false, useShortBeep);
-        }
-
-        public void playMessageImmediately(QueuedMessage queuedMessage, Boolean keepChannelOpen, Boolean useShortBeep)
+        public void playMessageImmediately(QueuedMessage queuedMessage)
         {
             if (disableImmediateMessages)
             {
@@ -815,7 +821,34 @@ namespace CrewChiefV4.Audio
                     }
                     else
                     {
-                        this.useShortBeepWhenOpeningChannel = useShortBeep;
+                        lastImmediateMessageName = queuedMessage.messageName;
+                        lastImmediateMessageTime = DateTime.Now;
+                        this.useShortBeepWhenOpeningChannel = false;
+                        this.holdChannelOpen = false;
+                        immediateClips.Add(queuedMessage.messageName, queuedMessage);
+                    }
+                }
+            }
+        }
+
+        public void playSpotterMessage(QueuedMessage queuedMessage, Boolean keepChannelOpen)
+        {
+            if (disableImmediateMessages)
+            {
+                return;
+            }
+            if (queuedMessage.canBePlayed)
+            {
+                lock (immediateClips)
+                {
+                    if (immediateClips.Contains(queuedMessage.messageName))
+                    {
+                        Console.WriteLine("Clip for event " + queuedMessage.messageName + " is already queued, ignoring");
+                        return;
+                    }
+                    else
+                    {
+                        this.useShortBeepWhenOpeningChannel = true;
                         this.holdChannelOpen = keepChannelOpen;
                         immediateClips.Add(queuedMessage.messageName, queuedMessage);
                     }
@@ -950,7 +983,7 @@ namespace CrewChiefV4.Audio
         {
             if (lastMessagePlayed != null)
             {
-                playMessageImmediately(lastMessagePlayed, false);
+                playMessageImmediately(lastMessagePlayed);
             }
         }
 

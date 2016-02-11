@@ -107,14 +107,14 @@ namespace CrewChiefV4.Events
                 {
                     case EngineStatus.ALL_CLEAR:
                         lastStatusMessage = currentEngineStatus;
-                        audioPlayer.playMessageImmediately(new QueuedMessage(folderAllClear, 0, null), false);
+                        audioPlayer.playMessageImmediately(new QueuedMessage(folderAllClear, 0, null));
                         break;
                     case EngineStatus.HOT_OIL:
                         // don't play this if the last message was about hot oil *and* water - wait for 'all clear'
                         if (lastStatusMessage != EngineStatus.HOT_OIL_AND_WATER)
                         {
                             lastStatusMessage = currentEngineStatus;
-                            audioPlayer.playMessageImmediately(new QueuedMessage(folderHotOil, 0, null), false);
+                            audioPlayer.playMessageImmediately(new QueuedMessage(folderHotOil, 0, null));
                         }
                         break;
                     case EngineStatus.HOT_WATER:
@@ -122,19 +122,19 @@ namespace CrewChiefV4.Events
                         if (lastStatusMessage != EngineStatus.HOT_OIL_AND_WATER)
                         {
                             lastStatusMessage = currentEngineStatus;
-                            audioPlayer.playMessageImmediately(new QueuedMessage(folderHotWater, 0, null), false);
+                            audioPlayer.playMessageImmediately(new QueuedMessage(folderHotWater, 0, null));
                         }
                         break;
                     case EngineStatus.HOT_OIL_AND_WATER:
                         lastStatusMessage = currentEngineStatus;
-                        audioPlayer.playMessageImmediately(new QueuedMessage(folderHotOilAndWater, 0, null), false);
+                        audioPlayer.playMessageImmediately(new QueuedMessage(folderHotOilAndWater, 0, null));
                         break;
                 }
                 
             }
             if (!gotData)
             {
-                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, this), false);
+                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, this));
                 
             }
         }

@@ -39,6 +39,11 @@ namespace CrewChiefV4.Events
 
         private String folderMissingWheel = "damage_reporting/missing_wheel";
 
+        private String folderLeftFrontPuncture = "damage_reporting/left_front_puncture";
+        private String folderRightFrontPuncture = "damage_reporting/right_front_puncture";
+        private String folderLeftRearPuncture = "damage_reporting/left_rear_puncture";
+        private String folderRightRearPuncture = "damage_reporting/right_rear_puncture";
+
         private DamageLevel engineDamage;
         private DamageLevel trannyDamage;
         private DamageLevel aeroDamage;
@@ -51,11 +56,17 @@ namespace CrewChiefV4.Events
 
         private DateTime timeWhenDamageLastChanged = DateTime.MinValue;
 
+        private DateTime nextPunctureCheck = DateTime.MinValue;
+
+        private CornerData.Corners lastReportedPunctureCorner = CornerData.Corners.NONE;
+
         private Tuple<Component, DamageLevel> damageToReportNext = null;
 
         private Dictionary<Component, DamageLevel> reportedDamagesLevels = new Dictionary<Component, DamageLevel>();
 
         private DamageLevel minDamageToReport = DamageLevel.TRIVIAL;
+
+        private static float punctureThreshold = 30f; // about 5psi
 
         private enum Component
         {
@@ -79,6 +90,7 @@ namespace CrewChiefV4.Events
             damageToReportNext = null;
             reportedDamagesLevels.Clear();
             minDamageToReport = DamageLevel.TRIVIAL;
+            nextPunctureCheck = DateTime.Now + timeToWaitForDamageToSettle;
         }
 
         private Boolean hasBeenReported(Component component, DamageLevel damageLevel)
@@ -114,8 +126,60 @@ namespace CrewChiefV4.Events
             }
         }
 
+        public static CornerData.Corners getPuncture(TyreData tyreData)
+        {
+            // quick sanity check on the data - if all the tyres are the same pressure we have no puncture
+            if (tyreData.FrontLeftPressure == tyreData.FrontRightPressure &&
+                    tyreData.FrontLeftPressure == tyreData.RearLeftPressure &&
+                    tyreData.FrontLeftPressure == tyreData.RearRightPressure)
+            {
+                return CornerData.Corners.NONE;
+            }
+            else if (tyreData.FrontLeftPressure < punctureThreshold)
+            {
+                return CornerData.Corners.FRONT_LEFT;
+            }
+            else if (tyreData.FrontRightPressure < punctureThreshold)
+            {
+                return CornerData.Corners.FRONT_RIGHT;
+            }
+            else if (tyreData.RearLeftPressure < punctureThreshold)
+            {
+                return CornerData.Corners.REAR_LEFT;
+            }
+            else if (tyreData.RearRightPressure < punctureThreshold)
+            {
+                return CornerData.Corners.REAR_RIGHT;
+            }
+            return CornerData.Corners.NONE;
+        }
+
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
+            if (currentGameState.CarDamageData.DamageEnabled && currentGameState.SessionData.SessionRunningTime > 10 && currentGameState.Now > nextPunctureCheck)
+            {
+                nextPunctureCheck = currentGameState.Now + timeToWaitForDamageToSettle;
+                CornerData.Corners puncture = getPuncture(currentGameState.TyreData);
+                if (puncture != lastReportedPunctureCorner)
+                {
+                    lastReportedPunctureCorner = puncture;
+                    switch (puncture)
+                    {
+                        case CornerData.Corners.FRONT_LEFT:
+                            audioPlayer.playMessage(new QueuedMessage(folderLeftFrontPuncture, 0, this));
+                            break;
+                        case CornerData.Corners.FRONT_RIGHT:
+                            audioPlayer.playMessage(new QueuedMessage(folderRightFrontPuncture, 0, this));
+                            break;
+                        case CornerData.Corners.REAR_LEFT:
+                            audioPlayer.playMessage(new QueuedMessage(folderLeftRearPuncture, 0, this));
+                            break;
+                        case CornerData.Corners.REAR_RIGHT:
+                            audioPlayer.playMessage(new QueuedMessage(folderRightRearPuncture, 0, this));
+                            break;
+                    }
+                }
+            }
             if (currentGameState.CarDamageData.DamageEnabled)
             {
                 aeroDamage = currentGameState.CarDamageData.OverallAeroDamage;
@@ -221,21 +285,21 @@ namespace CrewChiefV4.Events
             {
                 if (aeroDamage == DamageLevel.NONE)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderNoAeroDamage, 0, null), false);
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderNoAeroDamage, 0, null));
                     
                 }
                 else if (aeroDamage == DamageLevel.MAJOR || aeroDamage == DamageLevel.DESTROYED)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderSevereAeroDamage, 0, null), false);
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderSevereAeroDamage, 0, null));
                     
                 }
                 else if (aeroDamage == DamageLevel.MINOR)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderMinorAeroDamage, 0, null), false);
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderMinorAeroDamage, 0, null));
                 }
                 else if (aeroDamage == DamageLevel.TRIVIAL)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderJustAScratch, 0, null), false);
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderJustAScratch, 0, null));
                     
                 }
             }
@@ -243,22 +307,22 @@ namespace CrewChiefV4.Events
             {
                 if (trannyDamage == DamageLevel.NONE || trannyDamage == DamageLevel.TRIVIAL)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderNoTransmissionDamage, 0, null), false);
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderNoTransmissionDamage, 0, null));
                     
                 }
                 else if (trannyDamage == DamageLevel.DESTROYED)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderBustedTransmission, 0, null), false);
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderBustedTransmission, 0, null));
                     
                 }
                 else if (trannyDamage == DamageLevel.MAJOR)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderSevereTransmissionDamage, 0, null), false);
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderSevereTransmissionDamage, 0, null));
                     
                 }
                 else if (trannyDamage == DamageLevel.MINOR)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderMinorTransmissionDamage, 0, null), false);
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderMinorTransmissionDamage, 0, null));
                     
                 }
             }
@@ -266,22 +330,22 @@ namespace CrewChiefV4.Events
             {
                 if (engineDamage == DamageLevel.NONE || engineDamage == DamageLevel.TRIVIAL)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderNoEngineDamage, 0, null), false);
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderNoEngineDamage, 0, null));
                     
                 }
                 else if (engineDamage == DamageLevel.DESTROYED)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderBustedEngine, 0, null), false);
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderBustedEngine, 0, null));
                     
                 }
                 else if (engineDamage == DamageLevel.MAJOR)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderSevereEngineDamage, 0, null), false);
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderSevereEngineDamage, 0, null));
                     
                 }
                 else if (engineDamage == DamageLevel.MINOR)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderMinorEngineDamage, 0, null), false);
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderMinorEngineDamage, 0, null));
                     
                 }
             }
@@ -289,34 +353,34 @@ namespace CrewChiefV4.Events
             {
                 if (!enableSuspensionDamageMessages)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null), false);
+                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
                     
                 }
                 else
                 {
                     if (isMissingWheel)
                     {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(folderMissingWheel, 0, null), false);
+                        audioPlayer.playMessageImmediately(new QueuedMessage(folderMissingWheel, 0, null));
                         
                     }
                     if ((maxSuspensionDamage == DamageLevel.NONE || maxSuspensionDamage == DamageLevel.TRIVIAL) && !isMissingWheel)
                     {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(folderNoSuspensionDamage, 0, null), false);
+                        audioPlayer.playMessageImmediately(new QueuedMessage(folderNoSuspensionDamage, 0, null));
                         
                     }
                     else if (maxSuspensionDamage == DamageLevel.DESTROYED)
                     {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(folderBustedSuspension, 0, null), false);
+                        audioPlayer.playMessageImmediately(new QueuedMessage(folderBustedSuspension, 0, null));
                         
                     }
                     else if (maxSuspensionDamage == DamageLevel.MAJOR)
                     {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(folderSevereSuspensionDamage, 0, null), false);
+                        audioPlayer.playMessageImmediately(new QueuedMessage(folderSevereSuspensionDamage, 0, null));
                         
                     }
                     else if (maxSuspensionDamage == DamageLevel.MINOR && !isMissingWheel)
                     {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(folderMinorSuspensionDamage, 0, null), false);
+                        audioPlayer.playMessageImmediately(new QueuedMessage(folderMinorSuspensionDamage, 0, null));
                         
                     }
                 }
@@ -325,29 +389,29 @@ namespace CrewChiefV4.Events
             {
                 if (!enableBrakeDamageMessages)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null), false);
+                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
                     
                 }
                 else
                 {
                     if (maxBrakeDamage == DamageLevel.NONE || maxBrakeDamage == DamageLevel.TRIVIAL)
                     {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(folderNoBrakeDamage, 0, null), false);
+                        audioPlayer.playMessageImmediately(new QueuedMessage(folderNoBrakeDamage, 0, null));
                         
                     }
                     else if (maxBrakeDamage == DamageLevel.DESTROYED)
                     {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(folderBustedBrakes, 0, null), false);
+                        audioPlayer.playMessageImmediately(new QueuedMessage(folderBustedBrakes, 0, null));
                         
                     }
                     else if (maxBrakeDamage == DamageLevel.MAJOR)
                     {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(folderSevereBrakeDamage, 0, null), false);
+                        audioPlayer.playMessageImmediately(new QueuedMessage(folderSevereBrakeDamage, 0, null));
                         
                     }
                     else if (maxBrakeDamage == DamageLevel.MINOR)
                     {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(folderMinorBrakeDamage, 0, null), false);
+                        audioPlayer.playMessageImmediately(new QueuedMessage(folderMinorBrakeDamage, 0, null));
                         
                     }
                 }

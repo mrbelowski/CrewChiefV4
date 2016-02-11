@@ -228,19 +228,19 @@ namespace CrewChiefV4.Events
                 if (leaderHasFinishedRace)
                 {
                     Console.WriteLine("Playing last lap message, timeleft = " + timeLeft);
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderThisIsTheLastLap, 0, this), false);
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderThisIsTheLastLap, 0, this));
                     
                 }
                 if (timeLeft >= 120)
                 {
                     TimeSpan timeLeftTimeSpan = TimeSpan.FromSeconds(timeLeft);
                     audioPlayer.playMessageImmediately(new QueuedMessage("RaceTime/time_remaining",
-                        MessageContents(timeLeftTimeSpan.TotalMinutes, folderMinutesLeft), 0, this), false);
+                        MessageContents(timeLeftTimeSpan.TotalMinutes, folderMinutesLeft), 0, this));
                     
                 }
                 else if (timeLeft >= 60)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderOneMinuteRemaining, 0, this), false);
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderOneMinuteRemaining, 0, this));
                     
                 }
                 else if (timeLeft <= 0)
@@ -248,13 +248,13 @@ namespace CrewChiefV4.Events
                     if (addExtraLapForDTM2015 && !startedDTM2015ExtraLap)
                     {
                         Console.WriteLine("Playing DTM one more lap message, timeleft = " + timeLeft);
-                        audioPlayer.playMessageImmediately(new QueuedMessage(folderOneLapAfterThisOne, 0, this), false);
+                        audioPlayer.playMessageImmediately(new QueuedMessage(folderOneLapAfterThisOne, 0, this));
                         
                     }
                     else 
                     {
                         Console.WriteLine("Playing last lap message, timeleft = " + timeLeft);
-                        audioPlayer.playMessageImmediately(new QueuedMessage(folderThisIsTheLastLap, 0, this), false);
+                        audioPlayer.playMessageImmediately(new QueuedMessage(folderThisIsTheLastLap, 0, this));
                         
                     }                   
                 }
@@ -262,7 +262,7 @@ namespace CrewChiefV4.Events
                 {
                     // TODO: check these - if the timeLeft value contains -1 for some reason this message will be wrong
                     Console.WriteLine("Playing less than a minute message, timeleft = " + timeLeft);
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderLessThanOneMinute, 0, this), false);
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderLessThanOneMinute, 0, this));
                     
                 }
             }
@@ -271,19 +271,19 @@ namespace CrewChiefV4.Events
                 if (lapsLeft > 2)
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage("RaceTime/laps_remaining",
-                        MessageContents(lapsLeft, folderLapsLeft), 0, this), false);
+                        MessageContents(lapsLeft, folderLapsLeft), 0, this));
 
                     
                 }
                 else if (lapsLeft == 2)
                 {
                     // TODO: revised logic to this is correct for PCars - check it's OK for R3E
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderOneLapAfterThisOne, 0, this), false);
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderOneLapAfterThisOne, 0, this));
                     
                 }
                 else if (lapsLeft == 1)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderThisIsTheLastLap, 0, this), false);
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderThisIsTheLastLap, 0, this));
                     
                 }
             }     

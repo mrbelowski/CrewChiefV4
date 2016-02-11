@@ -314,7 +314,8 @@ namespace CrewChiefV4.Events
                         {
                             audioPlayer.playMessage(new QueuedMessage(folderBadStart, 0, this));
                         }
-                        else if (!isLast && (currentGameState.SessionData.Position == 1 || currentGameState.SessionData.SessionStartPosition > currentGameState.SessionData.Position + 2))
+                        else if (!isLast && (currentGameState.SessionData.Position == 1 || currentGameState.SessionData.SessionStartPosition > currentGameState.SessionData.Position + 2) &&
+                            !currentGameState.PenaltiesData.HasDriveThrough && !currentGameState.PenaltiesData.HasStopAndGo)
                         {
                             audioPlayer.playMessage(new QueuedMessage(folderGoodStart, 0, this));
                         }
@@ -322,7 +323,8 @@ namespace CrewChiefV4.Events
                         {
                             audioPlayer.playMessage(new QueuedMessage(folderTerribleStart, 0, this));
                         }
-                        else if (!isLast && rand.NextDouble() > 0.6)
+                        else if (!isLast && rand.NextDouble() > 0.6 &&
+                            !currentGameState.PenaltiesData.HasDriveThrough && !currentGameState.PenaltiesData.HasStopAndGo)
                         {
                             // only play the OK start message sometimes
                             audioPlayer.playMessage(new QueuedMessage(folderOKStart, 0, this));
@@ -419,25 +421,25 @@ namespace CrewChiefV4.Events
             {
                 if (isLast)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderLast, 0, this), false);
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderLast, 0, this));
                     
                 }
                 else if (currentPosition == 1)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderLeading, 0, this), false);
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderLeading, 0, this));
                     
                 }
                 else if (currentPosition > 0) {
                     if (currentPosition < 25) {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(folderStub + currentPosition, 0, this), false);
+                        audioPlayer.playMessageImmediately(new QueuedMessage(folderStub + currentPosition, 0, this));
                         
                     } else {
-                        audioPlayer.playMessageImmediately(new QueuedMessage("position", MessageContents(currentPosition), 0, this), false);
+                        audioPlayer.playMessageImmediately(new QueuedMessage("position", MessageContents(currentPosition), 0, this));
                         
                     }
                 }
                 else {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null), false);
+                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
                     
                 }
             }

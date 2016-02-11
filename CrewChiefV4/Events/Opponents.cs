@@ -325,12 +325,12 @@ namespace CrewChiefV4.Events
                         if (opponentData.CurrentTyres == TyreType.Option)
                         {
                             gotData = true;
-                            audioPlayer.playMessageImmediately(new QueuedMessage(MandatoryPitStops.folderMandatoryPitStopsOptionTyres, 0, null), false);
+                            audioPlayer.playMessageImmediately(new QueuedMessage(MandatoryPitStops.folderMandatoryPitStopsOptionTyres, 0, null));
                         }
                         else if (opponentData.CurrentTyres == TyreType.Prime)
                         {
                             gotData = true;
-                            audioPlayer.playMessageImmediately(new QueuedMessage(MandatoryPitStops.folderMandatoryPitStopsPrimeTyres, 0, null), false);
+                            audioPlayer.playMessageImmediately(new QueuedMessage(MandatoryPitStops.folderMandatoryPitStopsPrimeTyres, 0, null));
                         }
                     }
                 }
@@ -345,7 +345,7 @@ namespace CrewChiefV4.Events
                         {
                             gotData = true;
                             audioPlayer.playMessageImmediately(new QueuedMessage("opponentLastLap", MessageContents(
-                                TimeSpanWrapper.FromSeconds(lastLap, true)), 0, null), false);
+                                TimeSpanWrapper.FromSeconds(lastLap, true)), 0, null));
                             
                         }                       
                     }
@@ -356,7 +356,7 @@ namespace CrewChiefV4.Events
                         {
                             gotData = true;
                             audioPlayer.playMessageImmediately(new QueuedMessage("opponentBestLap", MessageContents(
-                                TimeSpanWrapper.FromSeconds(bestLap, true)), 0, null), false);
+                                TimeSpanWrapper.FromSeconds(bestLap, true)), 0, null));
                             
                         }
                     }  
@@ -377,7 +377,7 @@ namespace CrewChiefV4.Events
                             if (!gotByPositionNumber)
                             {
                                 audioPlayer.playMessageImmediately(new QueuedMessage("opponentPosition",
-                                    MessageContents(Position.folderStub, position), 0, null), false);
+                                    MessageContents(Position.folderStub, position), 0, null));
                                 playedMessage = true;
                             }
                             if (opponentDelta != null && (opponentDelta.lapDifference != 0 || Math.Abs(opponentDelta.time) > 0.05))
@@ -385,21 +385,21 @@ namespace CrewChiefV4.Events
                                 playedMessage = true;
                                 if (opponentDelta.lapDifference == 1)
                                 {
-                                    audioPlayer.playMessageImmediately(new QueuedMessage(Position.folderOneLapBehind, 0, null), false);
+                                    audioPlayer.playMessageImmediately(new QueuedMessage(Position.folderOneLapBehind, 0, null));
                                 }
                                 else if (opponentDelta.lapDifference > 1)
                                 {
                                     audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta",
-                                        MessageContents(opponentDelta.lapDifference, Position.folderLapsBehind), 0, null), false);
+                                        MessageContents(opponentDelta.lapDifference, Position.folderLapsBehind), 0, null));
                                 }
                                 else if (opponentDelta.lapDifference == -1)
                                 {
-                                    audioPlayer.playMessageImmediately(new QueuedMessage(Position.folderOneLapAhead, 0, null), false);
+                                    audioPlayer.playMessageImmediately(new QueuedMessage(Position.folderOneLapAhead, 0, null));
                                 }
                                 else if (opponentDelta.lapDifference < -1)
                                 {
                                     audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta",
-                                        MessageContents(opponentDelta.lapDifference, Position.folderLapsAhead), 0, null), false);
+                                        MessageContents(opponentDelta.lapDifference, Position.folderLapsAhead), 0, null));
                                 }
                                 else
                                 {
@@ -410,7 +410,7 @@ namespace CrewChiefV4.Events
                                         aheadOrBehind = Position.folderBehind;
                                     }
                                     audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta",
-                                        MessageContents(delta, aheadOrBehind), 0, null), false);
+                                        MessageContents(delta, aheadOrBehind), 0, null));
                                 }
                             }
                             if (playedMessage)
@@ -436,7 +436,7 @@ namespace CrewChiefV4.Events
                             MessageContents(Position.folderStub, opponent.Position, folderCantPronounceName), 0, null);
                         if (queuedMessage.canBePlayed)
                         {
-                            audioPlayer.playMessageImmediately(queuedMessage, false);
+                            audioPlayer.playMessageImmediately(queuedMessage);
                             
                             gotData = true;
                         }
@@ -453,7 +453,7 @@ namespace CrewChiefV4.Events
                             MessageContents(Position.folderStub, opponent.Position, folderCantPronounceName), 0, null);
                         if (queuedMessage.canBePlayed)
                         {
-                            audioPlayer.playMessageImmediately(queuedMessage, false);
+                            audioPlayer.playMessageImmediately(queuedMessage);
                             
                             gotData = true;
                         }
@@ -463,7 +463,7 @@ namespace CrewChiefV4.Events
                 {
                     if (currentGameState.isLast())
                     {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(Position.folderLast, 0, null), false);
+                        audioPlayer.playMessageImmediately(new QueuedMessage(Position.folderLast, 0, null));
                         
                         gotData = true;
                     } 
@@ -475,7 +475,7 @@ namespace CrewChiefV4.Events
                             QueuedMessage queuedMessage = new QueuedMessage("opponentName", MessageContents(opponent), MessageContents(folderCantPronounceName), 0, null);
                             if (queuedMessage.canBePlayed)
                             {
-                                audioPlayer.playMessageImmediately(queuedMessage, false);
+                                audioPlayer.playMessageImmediately(queuedMessage);
                                 
                                 gotData = true;
                             }
@@ -486,7 +486,7 @@ namespace CrewChiefV4.Events
                 {
                     if (currentGameState.SessionData.Position == 1)
                     {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(Position.folderLeading, 0, null), false);
+                        audioPlayer.playMessageImmediately(new QueuedMessage(Position.folderLeading, 0, null));
                         
                         gotData = true;
                     }
@@ -498,7 +498,7 @@ namespace CrewChiefV4.Events
                             QueuedMessage queuedMessage = new QueuedMessage("opponentName", MessageContents(opponent), MessageContents(folderCantPronounceName), 0, null);
                             if (queuedMessage.canBePlayed)
                             {
-                                audioPlayer.playMessageImmediately(queuedMessage, false);
+                                audioPlayer.playMessageImmediately(queuedMessage);
                                 
                                 gotData = true;
                             }
@@ -513,7 +513,7 @@ namespace CrewChiefV4.Events
                         QueuedMessage queuedMessage = new QueuedMessage("opponentName", MessageContents(opponent), MessageContents(folderCantPronounceName), 0, null);
                         if (queuedMessage.canBePlayed)
                         {
-                            audioPlayer.playMessageImmediately(queuedMessage, false);
+                            audioPlayer.playMessageImmediately(queuedMessage);
                             
                             gotData = true;
                         }
@@ -526,7 +526,7 @@ namespace CrewChiefV4.Events
                     {
                         if (opponentKey == positionIsPlayerKey)
                         {
-                            audioPlayer.playMessageImmediately(new QueuedMessage(folderWeAre, 0, null), false);
+                            audioPlayer.playMessageImmediately(new QueuedMessage(folderWeAre, 0, null));
                             
                             gotData = true;
                         }
@@ -536,7 +536,7 @@ namespace CrewChiefV4.Events
                             QueuedMessage queuedMessage = new QueuedMessage("opponentName", MessageContents(opponent), MessageContents(folderCantPronounceName), 0, null);
                             if (queuedMessage.canBePlayed)
                             {
-                                audioPlayer.playMessageImmediately(queuedMessage, false);
+                                audioPlayer.playMessageImmediately(queuedMessage);
                                 
                                 gotData = true;
                             }
@@ -546,7 +546,7 @@ namespace CrewChiefV4.Events
             }
             if (!gotData)
             {
-                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null), false);
+                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
                 
             }       
         }

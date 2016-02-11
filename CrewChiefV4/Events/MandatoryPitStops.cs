@@ -378,35 +378,35 @@ namespace CrewChiefV4.Events
         {
             if (!hasMandatoryPitStop || mandatoryStopCompleted)
             {
-                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNo, 0, null), false);
+                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNo, 0, null));
                 
             }
             else if (mandatoryStopMissed)
             {
-                audioPlayer.playMessageImmediately(new QueuedMessage(folderMandatoryPitStopsMissedStop, 0, null), false);
+                audioPlayer.playMessageImmediately(new QueuedMessage(folderMandatoryPitStopsMissedStop, 0, null));
                 
             }
             else if (mandatoryStopBoxThisLap)
             {
                 audioPlayer.playMessageImmediately(new QueuedMessage("yesBoxThisLap",
-                    MessageContents(AudioPlayer.folderYes, folderMandatoryPitStopsPitThisLap), 0, null), false);
+                    MessageContents(AudioPlayer.folderYes, folderMandatoryPitStopsPitThisLap), 0, null));
                 
             }
             else if (pitWindowOpenLap > 0)
             {
                 audioPlayer.playMessageImmediately(new QueuedMessage("yesBoxOnLap",
-                    MessageContents(folderMandatoryPitStopsYesStopOnLap, pitWindowOpenLap), 0, null), false);
+                    MessageContents(folderMandatoryPitStopsYesStopOnLap, pitWindowOpenLap), 0, null));
                 
             }
             else if (pitWindowOpenTime > 0)
             {
                 audioPlayer.playMessageImmediately(new QueuedMessage("yesBoxAfter",
-                    MessageContents(folderMandatoryPitStopsYesStopAfter, pitWindowOpenTime, folderMandatoryPitStopsMinutes), 0, null), false);
+                    MessageContents(folderMandatoryPitStopsYesStopAfter, pitWindowOpenTime, folderMandatoryPitStopsMinutes), 0, null));
                 
             }            
             else
             {
-                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null), false);
+                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
                 
             }
         }
