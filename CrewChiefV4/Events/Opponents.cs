@@ -391,8 +391,8 @@ namespace CrewChiefV4.Events
                                 {
                                     if (!gotByPositionNumber)
                                     {
-                                        audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta", 
-                                            MessageContents(Position.folderStub, position, Pause(500), Position.folderOneLapBehind), 0, null));
+                                        audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta",
+                                            MessageContents(Position.folderStub, position, Pause(200), Position.folderOneLapBehind), 0, null));
                                     }
                                     else
                                     {
@@ -404,7 +404,7 @@ namespace CrewChiefV4.Events
                                     if (!gotByPositionNumber)
                                     {
                                         audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta",
-                                            MessageContents(Position.folderStub, position, Pause(500), opponentDelta.lapDifference, Position.folderLapsBehind), 0, null));
+                                            MessageContents(Position.folderStub, position, Pause(200), opponentDelta.lapDifference, Position.folderLapsBehind), 0, null));
                                     }
                                     else
                                     {
@@ -417,7 +417,7 @@ namespace CrewChiefV4.Events
                                     if (!gotByPositionNumber)
                                     {
                                         audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta",
-                                            MessageContents(Position.folderStub, position, Pause(500), Position.folderOneLapAhead), 0, null));
+                                            MessageContents(Position.folderStub, position, Pause(200), Position.folderOneLapAhead), 0, null));
                                     }
                                     else
                                     {
@@ -429,7 +429,7 @@ namespace CrewChiefV4.Events
                                     if (!gotByPositionNumber)
                                     {
                                         audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta",
-                                            MessageContents(Position.folderStub, position, Pause(500), Math.Abs(opponentDelta.lapDifference), Position.folderLapsAhead), 0, null));
+                                            MessageContents(Position.folderStub, position, Pause(200), Math.Abs(opponentDelta.lapDifference), Position.folderLapsAhead), 0, null));
                                     }
                                     else
                                     {
@@ -448,7 +448,7 @@ namespace CrewChiefV4.Events
                                     if (!gotByPositionNumber)
                                     {
                                         audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta",
-                                            MessageContents(Position.folderStub, position, Pause(500), delta, aheadOrBehind), 0, null));
+                                            MessageContents(Position.folderStub, position, Pause(200), delta, aheadOrBehind), 0, null));
                                     }
                                     else
                                     {

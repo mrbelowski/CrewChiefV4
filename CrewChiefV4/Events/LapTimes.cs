@@ -124,7 +124,8 @@ namespace CrewChiefV4.Events
         // if the lap is within 0.5% of the previous lap it's considered consistent
         private Single consistencyLimit = 0.5f;
 
-        private List<float> lapTimesWindow;
+        private List<float> lapTimesWindow = new List<float>();
+        private List<Conditions.ConditionsSample> conditionsWindow = new List<Conditions.ConditionsSample>();
 
         private int lapTimesWindowSize = 3;
 
@@ -191,6 +192,7 @@ namespace CrewChiefV4.Events
         public override void clearState()
         {
             lapTimesWindow = new List<float>(lapTimesWindowSize);
+            conditionsWindow = new List<Conditions.ConditionsSample>();
             lastConsistencyUpdate = 0;
             lastConsistencyMessage = ConsistencyResult.NOT_APPLICABLE;
             lapIsValid = true;
@@ -288,6 +290,11 @@ namespace CrewChiefV4.Events
                     if (currentGameState.SessionData.PreviousLapWasValid)
                     {
                         lapTimesWindow.Insert(0, currentGameState.SessionData.LapTimePrevious);
+                        Conditions.ConditionsSample conditionsSample = currentGameState.Conditions.getMostRecentConditions();
+                        if (conditionsSample != null)
+                        {
+                            conditionsWindow.Insert(0, conditionsSample);
+                        }
                         if (lapIsValid)
                         {
                             Boolean playedLapTime = false;
@@ -570,6 +577,11 @@ namespace CrewChiefV4.Events
                
         private ConsistencyResult checkAgainstPreviousLaps()
         {
+            if (conditionsWindow.Count() >= lapTimesWindowSize && !ConditionsAreSimilar(conditionsWindow[0], conditionsWindow[lapTimesWindowSize - 1]))
+            {
+                return ConsistencyResult.NOT_APPLICABLE;
+            }
+
             Boolean isImproving = true;
             Boolean isWorsening = true;
             Boolean isConsistent = true;
@@ -1366,6 +1378,16 @@ namespace CrewChiefV4.Events
         private enum SectorReportOption
         {
             ALL_SECTORS, BEST_AND_WORST, WORST_ONLY, COMBINED
+        }
+
+        private Boolean ConditionsAreSimilar(Conditions.ConditionsSample sample1, Conditions.ConditionsSample sample2)
+        {
+            if (sample1 == null || sample2 == null)
+            {
+                // hmm....
+                return true;
+            }
+            return Math.Abs(sample1.RainDensity - sample2.RainDensity) < 0.02 && Math.Abs(sample1.TrackTemperature - sample2.TrackTemperature) < 2;
         }
     }
 }
