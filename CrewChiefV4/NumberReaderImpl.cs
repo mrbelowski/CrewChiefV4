@@ -3,8 +3,23 @@ using System.Collections.Generic;
 
 namespace CrewChiefV4.NumberProcessing
 {
+    /**
+     * This is the English number reader implementation. To create another implementation you must create a file called
+     * NumberReaderImpl.cs, using this as a template. The class name must be NumberReaderImpl and it must override NumberReader
+     * like this one does (the public class NumberReaderImpl : NumberReader line).
+     * 
+     * The number folders used in your class can be anything you want - these are the folders in the sound pack where you 
+     * place your number related sound files.
+     * 
+     * This class must provide implementations of the GetHoursSound, GetMinutesSound, GetSecondsSound, GetTenthsSound and GetIntegerSounds.
+     * These implementations must return a List<String> which contains the sound folders you want for the given number. This 
+     * can be an empty list of no sounds are to be read for that number (e.g. zero hours).
+     * 
+     */
     public class NumberReaderImpl : NumberReader
     {
+        // this folder contains lots of subfolders, one for each number from 0 to 99, so we can add a folder to the 
+        // list to play called "numbers/[number]" - i.e. numbers/45 or numbers/1. This is used a lot in the implementations below.
         private static String folderNumbersStub = "numbers/";
 
         private static String folderPoint = "numbers/point";
@@ -24,6 +39,9 @@ namespace CrewChiefV4.NumberProcessing
 
         private Random random = new Random();
 
+        /**
+         * Get an English sound for a whole number of hours.
+         */
         protected override List<String> GetHoursSounds(int hours, int minutes, int seconds, int tenths)
         {
             List<String> messages = new List<String>();
@@ -43,6 +61,9 @@ namespace CrewChiefV4.NumberProcessing
             return messages;
         }
 
+        /**
+         * Get an English sound for a whole number of minutes.
+         */
         protected override List<String> GetMinutesSounds(int hours, int minutes, int seconds, int tenths)
         {
             List<String> messages = new List<String>();
@@ -66,6 +87,9 @@ namespace CrewChiefV4.NumberProcessing
             return messages;
         }
 
+        /**
+         * Get an English sound for a whole number of seconds.
+         */
         protected override List<String> GetSecondsSounds(int hours, int minutes, int seconds, int tenths)
         {
             List<String> messages = new List<String>();
@@ -109,6 +133,9 @@ namespace CrewChiefV4.NumberProcessing
             return messages;
         }
 
+        /**
+         * Get an English sound for a whole number of tenths of a second.
+         */
         protected override List<String> GetTenthsSounds(int hours, int minutes, int seconds, int tenths)
         {
             List<String> messages = new List<String>();
@@ -152,8 +179,10 @@ namespace CrewChiefV4.NumberProcessing
             return messages;
         }
 
-        // only works with 5 or less digits
-        protected override List<String> ConvertIntegerToSounds(char[] digits)
+        /**
+         * Get an English sound for an Integer from 0 to 99999.
+         */
+        protected override List<String> GetIntegerSounds(char[] digits)
         {
             List<String> messages = new List<String>();
             if (digits.Length == 0 || (digits.Length == 1 && digits[0] == '0'))
