@@ -41,6 +41,7 @@ namespace CrewChiefV4
          */
         public List<String> ConvertTimeToSounds(TimeSpan timeSpan)
         {
+            Console.WriteLine("Time sound " + timeSpan.ToString());
             List<String> messageFolders = new List<String>();
             if (timeSpan != null)
             {
@@ -66,6 +67,7 @@ namespace CrewChiefV4
          */
         public List<String> GetIntegerSounds(int integer)
         {
+            Console.WriteLine("Number sound: " + integer);
             if (integer >= 0 && integer <= 99999)
             {
                 return GetIntegerSounds(integer.ToString().ToCharArray());
