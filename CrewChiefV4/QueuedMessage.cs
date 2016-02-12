@@ -102,6 +102,8 @@ namespace CrewChiefV4
         // get the message folders to use
         public Boolean canBePlayed = true;
 
+        private NumberReader numberReader = NumberReaderFactory.GetNumberReader();
+
         // used for creating a pearl of wisdom message where we need to copy the dueTime from the original
         public QueuedMessage(AbstractEvent abstractEvent)
         {
@@ -178,7 +180,6 @@ namespace CrewChiefV4
         private List<String> getMessageFolders(List<MessageFragment> messageFragments)
         {
             List<String> messages = new List<String>();
-            NumberReader numberReader = NumberReaderFactory.GetNumberReader();
             foreach (MessageFragment messageFragment in messageFragments) 
             {
                 if (messageFragment == null)

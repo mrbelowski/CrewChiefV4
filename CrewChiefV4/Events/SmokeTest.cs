@@ -88,8 +88,9 @@ namespace CrewChiefV4.Events
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
             testDriverNames();
-            
-            /* audioPlayer.playMessage(new QueuedMessage(LapCounter.folderGetReady, 0, this));
+            /* 
+            audioPlayer.playMessage(new QueuedMessage("test", MessageContents(1), 0, this));
+            audioPlayer.playMessage(new QueuedMessage(LapCounter.folderGetReady, 0, this));
             audioPlayer.playMessage(new QueuedMessage(MandatoryPitStops.folderMandatoryPitStopsPitThisLap, 0, this));
             audioPlayer.playMessage(new QueuedMessage(MandatoryPitStops.folderMandatoryPitStopsFitPrimesThisLap, 0, this));
             audioPlayer.playMessage(new QueuedMessage(Position.folderBeingOvertaken, 0, this));
