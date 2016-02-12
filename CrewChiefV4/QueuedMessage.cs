@@ -178,6 +178,7 @@ namespace CrewChiefV4
         private List<String> getMessageFolders(List<MessageFragment> messageFragments)
         {
             List<String> messages = new List<String>();
+            NumberReader numberReader = NumberReaderFactory.GetNumberReader();
             foreach (MessageFragment messageFragment in messageFragments) 
             {
                 if (messageFragment == null)
@@ -199,21 +200,30 @@ namespace CrewChiefV4
                         }                     
                         break;
                     case MessageFragment.FragmentType.Time:
-                        List<String> timeFolders = NumberReaderFactory.GetNumberReader().ConvertTimeToSounds(messageFragment.timeSpan);
-                        if (timeFolders.Count == 0)
+                        if (numberReader != null)
                         {
-                            canBePlayed = false;
-                        }
-                        else { 
-                            foreach (String timeFolder in timeFolders)
+                            List<String> timeFolders = numberReader.ConvertTimeToSounds(messageFragment.timeSpan);
+                            if (timeFolders.Count == 0)
                             {
-                                if (!SoundCache.availableSounds.Contains(timeFolder))
-                                {
-                                    canBePlayed = false;
-                                    break;
-                                }
+                                canBePlayed = false;
                             }
-                             messages.AddRange(timeFolders);
+                            else
+                            {
+                                foreach (String timeFolder in timeFolders)
+                                {
+                                    if (!SoundCache.availableSounds.Contains(timeFolder))
+                                    {
+                                        canBePlayed = false;
+                                        break;
+                                    }
+                                }
+                                messages.AddRange(timeFolders);
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine("Number reader is not available");
+                            canBePlayed = false;
                         }
                         break;                    
                     case MessageFragment.FragmentType.Opponent:
@@ -228,21 +238,33 @@ namespace CrewChiefV4
                             }
                         }                        
                         break;
-                    case MessageFragment.FragmentType.Integer:
-                        List<String> integerFolders = NumberReaderFactory.GetNumberReader().GetIntegerSounds(messageFragment.integer);
-                        if (integerFolders.Count() == 0) {
-                            canBePlayed = false;
-                            break;
-                        } else {
-                            foreach (String integerFolder in integerFolders) {
-                                if (!SoundCache.availableSounds.Contains(integerFolder))
+                    case MessageFragment.FragmentType.Integer:                        
+                        if (numberReader != null)
+                        {
+                            List<String> integerFolders = numberReader.GetIntegerSounds(messageFragment.integer);
+                            if (integerFolders.Count() == 0)
+                            {
+                                canBePlayed = false;
+                                break;
+                            }
+                            else
+                            {
+                                foreach (String integerFolder in integerFolders)
                                 {
-                                    canBePlayed = false;
-                                    break;
+                                    if (!SoundCache.availableSounds.Contains(integerFolder))
+                                    {
+                                        canBePlayed = false;
+                                        break;
+                                    }
                                 }
                             }
+                            messages.AddRange(integerFolders);
                         }
-                        messages.AddRange(integerFolders);
+                        else
+                        {
+                            Console.WriteLine("Number reader is not available");
+                            canBePlayed = false;
+                        }
                         break;
                 }
                 if (!canBePlayed)
