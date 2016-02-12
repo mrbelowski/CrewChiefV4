@@ -13,7 +13,7 @@ namespace CrewChiefV4.NumberProcessing
      * 
      * This class must provide implementations of the GetHoursSound, GetMinutesSound, GetSecondsSound, GetTenthsSound and GetIntegerSounds.
      * These implementations must return a List<String> which contains the sound folders you want for the given number. This 
-     * can be an empty list of no sounds are to be read for that number (e.g. zero hours).
+     * can be an empty list if no sounds are to be read for that number (e.g. zero hours).
      * 
      */
     public class NumberReaderImpl : NumberReader
