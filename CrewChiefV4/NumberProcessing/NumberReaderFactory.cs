@@ -29,12 +29,11 @@ namespace CrewChiefV4.NumberProcessing
         private Boolean LoadNumberReader(string code)
         {
             Microsoft.CSharp.CSharpCodeProvider provider = new CSharpCodeProvider();
-            ICodeCompiler compiler = provider.CreateCompiler();
             CompilerParameters compilerparams = new CompilerParameters();
             compilerparams.GenerateExecutable = false;
             compilerparams.GenerateInMemory = true;
             compilerparams.ReferencedAssemblies.Add(typeof(NumberReader).Assembly.Location);
-            CompilerResults results = compiler.CompileAssemblyFromSource(compilerparams, code);
+            CompilerResults results = provider.CompileAssemblyFromSource(compilerparams, code);
             if (results.Errors.HasErrors)
             {
                 StringBuilder errors = new StringBuilder("Compiler Errors :\r\n");

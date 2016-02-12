@@ -199,7 +199,6 @@ namespace CrewChiefV4
                         }                     
                         break;
                     case MessageFragment.FragmentType.Time:
-                        //List<String> timeFolders = getTimeMessageFolders(messageFragment.timeSpanWrapper.timeSpan, messageFragment.timeSpanWrapper.readSeconds);
                         List<String> timeFolders = NumberReaderFactory.GetNumberReader().ConvertTimeToSounds(messageFragment.timeSpan);
                         if (timeFolders.Count == 0)
                         {
@@ -230,7 +229,6 @@ namespace CrewChiefV4
                         }                        
                         break;
                     case MessageFragment.FragmentType.Integer:
-                        //List<String> integerFolders = getIntegerMessageFolders(messageFragment.integer);
                         List<String> integerFolders = NumberReaderFactory.GetNumberReader().GetIntegerSounds(messageFragment.integer);
                         if (integerFolders.Count() == 0) {
                             canBePlayed = false;

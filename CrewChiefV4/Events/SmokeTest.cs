@@ -87,24 +87,6 @@ namespace CrewChiefV4.Events
         }
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
-            audioPlayer.playMessage(new QueuedMessage(folderTest, 0, this));
-            /*audioPlayer.playMessage(new QueuedMessage("time", MessageContents(TimeSpan.FromSeconds(0.67)), 0, this));
-            audioPlayer.playMessage(new QueuedMessage("time2", MessageContents(TimeSpan.FromSeconds(0.67)), 0, this));
-            audioPlayer.playMessage(new QueuedMessage("time3", MessageContents(TimeSpan.FromSeconds(3600)), 0, this));
-            audioPlayer.playMessage(new QueuedMessage("time4", MessageContents(TimeSpan.FromSeconds(123)), 0, this));
-            audioPlayer.playMessage(new QueuedMessage("time5", MessageContents(TimeSpan.FromSeconds(123.11)), 0, this));
-            audioPlayer.playMessage(new QueuedMessage("time6", MessageContents(TimeSpan.FromSeconds(120)), 0, this));
-            audioPlayer.playMessage(new QueuedMessage("time7", MessageContents(TimeSpan.FromSeconds(3700)), 0, this));
-
-
-
-            audioPlayer.playMessage(new QueuedMessage("int1", MessageContents(12), 0, this));
-            audioPlayer.playMessage(new QueuedMessage("int2", MessageContents(1200), 0, this));
-            audioPlayer.playMessage(new QueuedMessage("int3", MessageContents(1201), 0, this));
-            audioPlayer.playMessage(new QueuedMessage("int4", MessageContents(5513), 0, this));
-            audioPlayer.playMessage(new QueuedMessage("int5", MessageContents(1), 0, this));
-            audioPlayer.playMessage(new QueuedMessage("int6", MessageContents(104), 0, this));*/
-
             testDriverNames();
             
             /* audioPlayer.playMessage(new QueuedMessage(LapCounter.folderGetReady, 0, this));
