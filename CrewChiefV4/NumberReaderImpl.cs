@@ -70,7 +70,7 @@ namespace CrewChiefV4.NumberProcessing
             if (minutes > 0)
             {
                 messages.Add(folderNumbersStub + minutes);
-                // only read the "minutes" part if there are no seconds or tenths, or if we've read some hours
+                // only say the "minutes" sound if there are no seconds or tenths, or if we've read some hours
                 if ((seconds == 0 && tenths == 0) || hours > 0)
                 {
                     if (minutes == 1)
@@ -185,89 +185,104 @@ namespace CrewChiefV4.NumberProcessing
         protected override List<String> GetIntegerSounds(char[] digits)
         {
             List<String> messages = new List<String>();
+            // if this is just zero, return a list with just "zero"
             if (digits.Length == 0 || (digits.Length == 1 && digits[0] == '0'))
             {
                 messages.Add(folderNumbersStub + 0);
             }
-            String tensAndUnits = null;
-            String hundreds = null;
-            String thousands = null;
-
-            if (digits.Length == 1 || (digits[digits.Length - 2] == '0' && digits[digits.Length - 1] != '0'))
-            {
-                tensAndUnits = digits[digits.Length - 1].ToString();
-            }
-            else if (digits[digits.Length - 2] != '0' || digits[digits.Length - 1] != '0')
-            {
-                tensAndUnits = digits[digits.Length - 2].ToString() + digits[digits.Length - 1].ToString();
-            }
-            if (digits.Length == 4 && digits[0] == '1' && digits[1] != '0')
-            {
-                hundreds = digits[0].ToString() + digits[1].ToString();
-            }
             else
             {
-                if (digits.Length >= 3)
+                // work out what to say for the thousands, hundreds, and tens / units
+                String tensAndUnits = null;
+                String hundreds = null;
+                String thousands = null;
+                
+                if (digits.Length == 1 || (digits[digits.Length - 2] == '0' && digits[digits.Length - 1] != '0'))
                 {
-                    if (digits[digits.Length - 3] != '0')
-                    {
-                        hundreds = digits[digits.Length - 3].ToString();
-                    }
-                    if (digits.Length == 4)
-                    {
-                        thousands = digits[0].ToString();
-                    }
-                    else if (digits.Length == 5)
-                    {
-                        thousands = digits[0].ToString() + digits[1].ToString();
-                    }
+                    // if we have just 1 digit, or we have a number that ends with 01, 02, 03, etc, then the 
+                    // number of tensAndUnits is the final character
+                    tensAndUnits = digits[digits.Length - 1].ToString();
                 }
-            }
-            if (thousands != null)
-            {
-                messages.Add(folderNumbersStub + thousands);
-                if (hundreds == null && tensAndUnits != null)
+                else if (digits[digits.Length - 2] != '0' || digits[digits.Length - 1] != '0')
                 {
-                    messages.Add(folderThousandAnd);
+                    // if we have just multiple digits, and one or both of the last 2 are non-zero
+                    tensAndUnits = digits[digits.Length - 2].ToString() + digits[digits.Length - 1].ToString();
+                }
+                if (digits.Length == 4 && digits[0] == '1' && digits[1] != '0')
+                {
+                    // the number is 1100 -> 1999. In English we say "eleven hundred", not "one thousand one hundred"
+                    // So the number of hundreds is the first and second digit
+                    hundreds = digits[0].ToString() + digits[1].ToString();
                 }
                 else
                 {
-                    messages.Add(folderThousand);
-                }
-            }
-            if (hundreds != null)
-            {
-                messages.Add(folderNumbersStub + hundreds);
-                // don't always use "hundred and"
-                Boolean addedHundreds = false;
-                if (tensAndUnits != null)
-                {
-                    // if there's a thousand, or we're saying something like "13 hundred", then always use the long version
-                    if (hundreds.Length == 2 || thousands != null || random.NextDouble() > 0.6)
+                    if (digits.Length >= 3)
                     {
-                        messages.Add(folderHundredAnd);
+                        if (digits[digits.Length - 3] != '0')
+                        {
+                            // there's a non-zero number of hundreds
+                            hundreds = digits[digits.Length - 3].ToString();
+                        }
+                        if (digits.Length == 4)
+                        {
+                            // there's a non-zero number of thousands
+                            thousands = digits[0].ToString();
+                        }
+                        else if (digits.Length == 5)
+                        {
+                            // there's a non-zero number of thousands - 10 or more
+                            thousands = digits[0].ToString() + digits[1].ToString();
+                        }
+                    }
+                }
+                if (thousands != null)
+                {
+                    messages.Add(folderNumbersStub + thousands);
+                    if (hundreds == null && tensAndUnits != null)
+                    {
+                        // if we're going to also read out a number of hundreds or tensAndUnits, we say "thousand and..."
+                        messages.Add(folderThousandAnd);
+                    }
+                    else
+                    {
+                        messages.Add(folderThousand);
+                    }
+                }
+                if (hundreds != null)
+                {
+                    messages.Add(folderNumbersStub + hundreds);
+                    // don't always use "hundred and" - it's valid to say "one hundred and twenty" or "one twenty". This implementation
+                    // will choose semi-randomly whether to use the long or short form.
+                    Boolean addedHundreds = false;
+                    if (tensAndUnits != null)
+                    {
+                        // if there's a thousand, or we're saying something like "13 hundred", then always use the long version
+                        if (hundreds.Length == 2 || thousands != null || random.NextDouble() > 0.6)
+                        {
+                            messages.Add(folderHundredAnd);
+                            addedHundreds = true;
+                        }
+                    }
+                    else
+                    {
+                        messages.Add(folderHundred);
                         addedHundreds = true;
                     }
-                }
-                else
-                {
-                    messages.Add(folderHundred);
-                    addedHundreds = true;
-                }
-                if (!addedHundreds)
-                {
-                    if (tensAndUnits != null && tensAndUnits.Length == 1)
+                    if (!addedHundreds)
                     {
-                        // need to modify the tensAndUnits here - we've skipped "hundreds" even though the number is > 99.
-                        // This is fine if the tensAndUnits > 9 (it'll be read as "One twenty five"), but if the tensAndUnits < 10
-                        // this will be read as "One two" instead of "One oh two".
-                        tensAndUnits = "0" + tensAndUnits;
+                        if (tensAndUnits != null && tensAndUnits.Length == 1)
+                        {
+                            // need to modify the tensAndUnits here - we've skipped "hundreds" even though the number is > 99.
+                            // This is fine if the tensAndUnits > 9 (it'll be read as "One twenty five"), but if the tensAndUnits < 10
+                            // this will be read as "One two" instead of "One oh two".
+                            tensAndUnits = "0" + tensAndUnits;
+                        }
                     }
                 }
-            }
-            if (tensAndUnits != null)
-            {
-                messages.Add(folderNumbersStub + tensAndUnits);
+                if (tensAndUnits != null)
+                {
+                    messages.Add(folderNumbersStub + tensAndUnits);
+                }
             }
             Console.WriteLine(String.Join(", ", messages));
             return messages;
