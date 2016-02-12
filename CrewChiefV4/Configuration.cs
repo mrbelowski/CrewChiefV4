@@ -61,7 +61,7 @@ namespace CrewChiefV4
             return new String[] {};
         }
 
-        private static String getDefaultFileLocation(String filename) {
+        public static String getDefaultFileLocation(String filename) {
             if (Debugger.IsAttached)
             {
                 return Application.StartupPath + @"\..\..\" + filename;
@@ -72,7 +72,7 @@ namespace CrewChiefV4
             }
         }
 
-        private static String getUserOverridesFileLocation(String filename)
+        public static String getUserOverridesFileLocation(String filename)
         {
             return Environment.ExpandEnvironmentVariables(@"%USERPROFILE%\AppData\Local\CrewChiefV4\" + filename);
         }

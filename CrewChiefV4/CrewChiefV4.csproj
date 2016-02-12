@@ -101,6 +101,9 @@
     <Compile Include="GameStateReaderFactory.cs" />
     <Compile Include="NameValidator.cs" />
     <Compile Include="NoisyCartesianCoordinateSpotter.cs" />
+    <Compile Include="NumberReaderImpl.cs" />
+    <Compile Include="NumberProcessing\NumberReader.cs" />
+    <Compile Include="NumberProcessing\NumberReaderFactory.cs" />
     <Compile Include="PCars\PCarsUDPreader.cs" />
     <Compile Include="PCars\PCarsSpotterv2.cs" />
     <Compile Include="PCars\PCarsUDPTelemetryDataStruct.cs" />
@@ -128,7 +131,6 @@
     <Compile Include="PCars\_eNums\_EnumGetDescription.cs" />
     <Compile Include="GameDataReadException.cs" />
     <Compile Include="R3E\R3ESpotterv2.cs" />
-    <Compile Include="TimeSpanWrapper.cs" />
     <Compile Include="TrackData.cs" />
     <Compile Include="UpdateHelper.cs" />
     <Compile Include="UserInterface\FloatPropertyControl.cs">

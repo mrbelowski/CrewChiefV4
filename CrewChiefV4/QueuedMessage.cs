@@ -5,6 +5,7 @@ using System.Text;
 using CrewChiefV4.Events;
 using CrewChiefV4.GameState;
 using CrewChiefV4.Audio;
+using CrewChiefV4.NumberProcessing;
 
 namespace CrewChiefV4
 {
@@ -16,42 +17,52 @@ namespace CrewChiefV4
         }
 
         public String text;
-        public TimeSpanWrapper timeSpanWrapper;
+        public TimeSpan timeSpan;
         public OpponentData opponent;
         public int integer;
         public FragmentType type;
 
-        private MessageFragment(String text, TimeSpanWrapper timeSpanWrapper, OpponentData opponent, FragmentType type)
+        private MessageFragment(String text)
         {
             this.text = text;
-            this.timeSpanWrapper = timeSpanWrapper;
-            this.opponent = opponent;
-            this.type = type;
+            this.type = FragmentType.Text;
         }
 
-        private MessageFragment(int integer, FragmentType type)
+        private MessageFragment(TimeSpan timeSpan)
+        {
+            this.timeSpan = timeSpan;
+            this.type = FragmentType.Time;
+        }
+
+        private MessageFragment(OpponentData opponent)
+        {
+            this.opponent = opponent;
+            this.type = FragmentType.Opponent;
+        }
+
+        private MessageFragment(int integer)
         {
             this.integer = integer;
-            this.type = type;
+            this.type = FragmentType.Integer;
         }
 
         public static MessageFragment Text(String text)
         {
-            return new MessageFragment(text, null, null, FragmentType.Text);
+            return new MessageFragment(text);
         }
-        public static MessageFragment Time(TimeSpanWrapper timeSpanWrapper)
+        public static MessageFragment Time(TimeSpan timeSpan)
         {
-            return new MessageFragment(null, timeSpanWrapper, null, FragmentType.Time);
+            return new MessageFragment(timeSpan);
         }
 
         public static MessageFragment Opponent(OpponentData opponent)
         {
-            return new MessageFragment(null, null, opponent, FragmentType.Opponent);
+            return new MessageFragment(opponent);
         }
 
         public static MessageFragment Integer(int integer)
         {
-            return new MessageFragment(integer, FragmentType.Integer);
+            return new MessageFragment(integer);
         }
     }
 
@@ -199,7 +210,8 @@ namespace CrewChiefV4
                         }                     
                         break;
                     case MessageFragment.FragmentType.Time:
-                        List<String> timeFolders = getTimeMessageFolders(messageFragment.timeSpanWrapper.timeSpan, messageFragment.timeSpanWrapper.readSeconds);
+                        //List<String> timeFolders = getTimeMessageFolders(messageFragment.timeSpanWrapper.timeSpan, messageFragment.timeSpanWrapper.readSeconds);
+                        List<String> timeFolders = NumberReaderFactory.GetNumberReader().ConvertTimeToSounds(messageFragment.timeSpan);
                         if (timeFolders.Count == 0)
                         {
                             canBePlayed = false;
@@ -229,7 +241,8 @@ namespace CrewChiefV4
                         }                        
                         break;
                     case MessageFragment.FragmentType.Integer:
-                        List<String> integerFolders = getIntegerMessageFolders(messageFragment.integer);
+                        //List<String> integerFolders = getIntegerMessageFolders(messageFragment.integer);
+                        List<String> integerFolders = NumberReaderFactory.GetNumberReader().ConvertIntegerToSounds(messageFragment.integer);
                         if (integerFolders.Count() == 0) {
                             canBePlayed = false;
                             break;

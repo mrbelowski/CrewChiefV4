@@ -122,13 +122,9 @@ namespace CrewChiefV4.Events
             else if (o.GetType() == typeof(String)) {
                 messageFragments.Add(MessageFragment.Text((String)o));
             }
-            else if (o.GetType() == typeof(TimeSpanWrapper))
-            {
-                messageFragments.Add(MessageFragment.Time((TimeSpanWrapper)o));
-            }
             else if (o.GetType() == typeof(TimeSpan))
             {
-                messageFragments.Add(MessageFragment.Time(new TimeSpanWrapper((TimeSpan)o)));
+                messageFragments.Add(MessageFragment.Time((TimeSpan)o));
             }
             else if (o.GetType() == typeof(OpponentData))
             {
@@ -209,7 +205,7 @@ namespace CrewChiefV4.Events
                         break;
                     }
                     else if (m1Fragment.type == MessageFragment.FragmentType.Time && m2Fragment.type == MessageFragment.FragmentType.Time &&
-                        m1Fragment.timeSpanWrapper.timeSpan.Equals(m2Fragment.timeSpanWrapper.timeSpan))
+                        m1Fragment.timeSpan.Equals(m2Fragment.timeSpan))
                     {
                         foundMatch = true;
                         break;

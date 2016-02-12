@@ -248,8 +248,8 @@ namespace CrewChiefV4.Events
                             sectorsSinceLastGapAheadReport = 0;
                             sectorsUntilNextGapAheadReport = adjustForMidLapPreference(currentGameState.SessionData.SectorNumber,
                                 rand.Next(gapAheadMinSectorWait, gapAheadMaxSectorWait));
-                            TimeSpanWrapper gapInFront = TimeSpanWrapper.FromMilliseconds(gapsInFront[0] * 1000, true);
-                            Boolean readGap = gapInFront.timeSpan.Seconds > 0 || gapInFront.timeSpan.Milliseconds > 50;
+                            TimeSpan gapInFront = TimeSpan.FromMilliseconds(gapsInFront[0] * 1000);
+                            Boolean readGap = gapInFront.Seconds > 0 || gapInFront.Milliseconds > 50;
                             if (readGap)
                             {
                                 if (gapInFrontStatus == GapStatus.INCREASING)
@@ -292,8 +292,8 @@ namespace CrewChiefV4.Events
                             sectorsSinceLastGapBehindReport = 0;
                             sectorsUntilNextGapBehindReport = adjustForMidLapPreference(currentGameState.SessionData.SectorNumber,
                                 rand.Next(gapBehindMinSectorWait, gapBehindMaxSectorWait));
-                            TimeSpanWrapper gapBehind = TimeSpanWrapper.FromMilliseconds(gapsBehind[0] * 1000, true);
-                            Boolean readGap = gapBehind.timeSpan.Seconds > 0 || gapBehind.timeSpan.Milliseconds > 50;
+                            TimeSpan gapBehind = TimeSpan.FromMilliseconds(gapsBehind[0] * 1000);
+                            Boolean readGap = gapBehind.Seconds > 0 || gapBehind.Milliseconds > 50;
                             if (readGap)
                             {
                                 if (gapBehindStatus == GapStatus.INCREASING)
@@ -325,7 +325,7 @@ namespace CrewChiefV4.Events
                     {                            
                         if (currentGapInFront > 0.05)
                         {
-                            TimeSpanWrapper gap = TimeSpanWrapper.FromSeconds(currentGapInFront, true);
+                            TimeSpan gap = TimeSpan.FromSeconds(currentGapInFront);
                             QueuedMessage message = new QueuedMessage("Timings/gap_ahead", MessageContents(folderTheGapTo,
                                 currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position - 1, false), folderAheadIsNow, gap),
                                 MessageContents(folderGapInFrontIsNow, gap), 0, this, new Dictionary<string,object>{ {"position", currentGameState.SessionData.Position} });
@@ -340,7 +340,7 @@ namespace CrewChiefV4.Events
                             currentGameState.SessionData.LapTimeCurrent <= currentGapBehind + CrewChief._timeInterval.TotalSeconds)
                         {
                             playedGapBehindForThisLap = true;
-                            TimeSpanWrapper gap = TimeSpanWrapper.FromSeconds(currentGapBehind, true);
+                            TimeSpan gap = TimeSpan.FromSeconds(currentGapBehind);
                             QueuedMessage message = new QueuedMessage("Timings/gap_behind", MessageContents(folderTheGapTo,
                                 currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position + 1, false), folderBehindIsNow, gap),
                                 MessageContents(folderGapBehindIsNow, gap), 0, this, new Dictionary<string, object> { { "position", currentGameState.SessionData.Position } });
@@ -402,7 +402,7 @@ namespace CrewChiefV4.Events
                 else 
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage("Timings/gap_in_front",
-                        MessageContents(TimeSpanWrapper.FromMilliseconds(currentGapInFront * 1000, true)), 0, this));
+                        MessageContents(TimeSpan.FromMilliseconds(currentGapInFront * 1000)), 0, this));
                     
                     haveData = true;
                 }
@@ -419,7 +419,7 @@ namespace CrewChiefV4.Events
                 else
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage("Timings/gap_behind",
-                        MessageContents(TimeSpanWrapper.FromMilliseconds(currentGapBehind * 1000, true)), 0, this));
+                        MessageContents(TimeSpan.FromMilliseconds(currentGapBehind * 1000)), 0, this));
                     
                     haveData = true;
                 }

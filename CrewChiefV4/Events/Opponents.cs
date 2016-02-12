@@ -345,7 +345,7 @@ namespace CrewChiefV4.Events
                         {
                             gotData = true;
                             audioPlayer.playMessageImmediately(new QueuedMessage("opponentLastLap", MessageContents(
-                                TimeSpanWrapper.FromSeconds(lastLap, true)), 0, null));
+                                TimeSpan.FromSeconds(lastLap)), 0, null));
                             
                         }                       
                     }
@@ -356,7 +356,7 @@ namespace CrewChiefV4.Events
                         {
                             gotData = true;
                             audioPlayer.playMessageImmediately(new QueuedMessage("opponentBestLap", MessageContents(
-                                TimeSpanWrapper.FromSeconds(bestLap, true)), 0, null));
+                                TimeSpan.FromSeconds(bestLap)), 0, null));
                             
                         }
                     }  
@@ -439,7 +439,7 @@ namespace CrewChiefV4.Events
                                 }
                                 else
                                 {
-                                    TimeSpanWrapper delta = TimeSpanWrapper.FromSeconds(Math.Abs(opponentDelta.time), true);
+                                    TimeSpan delta = TimeSpan.FromSeconds(Math.Abs(opponentDelta.time));
                                     String aheadOrBehind = Position.folderAhead;
                                     if (opponentDelta.time < 0)
                                     {

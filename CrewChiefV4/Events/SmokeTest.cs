@@ -70,8 +70,8 @@ namespace CrewChiefV4.Events
                     {
                         audioPlayer.playMessage(new QueuedMessage("gap_in_front" + index,
                                         MessageContents(Timings.folderTheGapTo, driverToTest, Timings.folderAheadIsIncreasing,
-                                        TimeSpanWrapper.FromSeconds((float)random.NextDouble() * 10, true)),
-                                        MessageContents(Timings.folderGapInFrontIncreasing, TimeSpanWrapper.FromSeconds((float)random.NextDouble() * 10, true)), 0, this));
+                                        TimeSpan.FromSeconds((float)random.NextDouble() * 10)),
+                                        MessageContents(Timings.folderGapInFrontIncreasing, TimeSpan.FromSeconds((float)random.NextDouble() * 10)), 0, this));
                         audioPlayer.playMessage(new QueuedMessage("leader_pitting" + index,
                             MessageContents(Opponents.folderTheLeader, driverToTest, Opponents.folderIsPitting), 0, this));
                         audioPlayer.playMessage(new QueuedMessage("new_fastest_lap" + index, MessageContents(Opponents.folderNewFastestLapFor, driverToTest,
@@ -87,7 +87,10 @@ namespace CrewChiefV4.Events
         }
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
-            audioPlayer.playMessage(new QueuedMessage(folderTest, 0, this));        
+            audioPlayer.playMessage(new QueuedMessage(folderTest, 0, this));
+            /*audioPlayer.playMessage(new QueuedMessage("time", MessageContents(TimeSpan.FromSeconds(345.67)), 0, this));
+            audioPlayer.playMessage(new QueuedMessage("int", MessageContents(1234), 0, this));  */
+
             testDriverNames();
             
             /* audioPlayer.playMessage(new QueuedMessage(LapCounter.folderGetReady, 0, this));
