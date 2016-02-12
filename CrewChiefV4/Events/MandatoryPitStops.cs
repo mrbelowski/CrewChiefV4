@@ -49,7 +49,6 @@ namespace CrewChiefV4.Events
         // for voice responses
         public static String folderMandatoryPitStopsYesStopOnLap = "mandatory_pit_stops/yes_stop_on_lap";
         public static String folderMandatoryPitStopsYesStopAfter = "mandatory_pit_stops/yes_stop_after";
-        public static String folderMandatoryPitStopsMinutes = "mandatory_pit_stops/minutes";
         public static String folderMandatoryPitStopsMissedStop = "mandatory_pit_stops/missed_stop";
 
 
@@ -401,7 +400,7 @@ namespace CrewChiefV4.Events
             else if (pitWindowOpenTime > 0)
             {
                 audioPlayer.playMessageImmediately(new QueuedMessage("yesBoxAfter",
-                    MessageContents(folderMandatoryPitStopsYesStopAfter, pitWindowOpenTime, folderMandatoryPitStopsMinutes), 0, null));
+                    MessageContents(folderMandatoryPitStopsYesStopAfter, TimeSpan.FromMinutes(pitWindowOpenTime)), 0, null));
                 
             }            
             else
