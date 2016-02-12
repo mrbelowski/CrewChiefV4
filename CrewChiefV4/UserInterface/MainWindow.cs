@@ -57,7 +57,7 @@ namespace CrewChiefV4
 
         private float latestSoundPackVersion = -1;
         private float latestDriverNamesVersion = -1;
-
+                
         private void FormMain_Load(object sender, EventArgs e)
         {
             // Some update test code - uncomment this to allow the app to process an update .zip file in the root of the sound pack
@@ -86,12 +86,35 @@ namespace CrewChiefV4
                     downloadDriverNamesButton.Text = Configuration.getUIString("checking_driver_names_version");
                     string xml = new WebClient().DownloadString(autoUpdateXMLURL);
                     XDocument doc = XDocument.Parse(xml);
-                    float.TryParse(doc.Descendants("soundpackversion").First().Value, out latestSoundPackVersion);
-                    float.TryParse(doc.Descendants("drivernamesversion").First().Value, out latestDriverNamesVersion);
-                    baseSoundPackDownloadLocation = doc.Descendants("basesoundpackurl").First().Value;
-                    baseDriverNamesDownloadLocation = doc.Descendants("basedrivernamesurl").First().Value;
-                    updateSoundPackDownloadLocation = doc.Descendants("updatesoundpackurl").First().Value;
-                    updateDriverNamesDownloadLocation = doc.Descendants("updatedrivernamesurl").First().Value;
+
+                    String languageToCheck = AudioPlayer.soundPackLanguage == null ? "en" : AudioPlayer.soundPackLanguage;
+                    Boolean gotLanguageSpecificUpdateInfo = false;
+                    foreach (XElement element in doc.Descendants("soundpack"))
+                    {
+                        XAttribute languageAttribute = element.Attribute(XName.Get("language", ""));
+                        if (languageAttribute.Value == languageToCheck)
+                        {
+                            // this is the update set for this language
+                            float.TryParse(element.Descendants("soundpackversion").First().Value, out latestSoundPackVersion);
+                            float.TryParse(element.Descendants("drivernamesversion").First().Value, out latestDriverNamesVersion);
+                            baseSoundPackDownloadLocation = element.Descendants("basesoundpackurl").First().Value;
+                            baseDriverNamesDownloadLocation = element.Descendants("basedrivernamesurl").First().Value;
+                            updateSoundPackDownloadLocation = element.Descendants("updatesoundpackurl").First().Value;
+                            updateDriverNamesDownloadLocation = element.Descendants("updatedrivernamesurl").First().Value;
+                            gotLanguageSpecificUpdateInfo = true;
+                            break;
+                        }
+                    }
+                    if (!gotLanguageSpecificUpdateInfo && AudioPlayer.soundPackLanguage == null)
+                    {
+                        float.TryParse(doc.Descendants("soundpackversion").First().Value, out latestSoundPackVersion);
+                        float.TryParse(doc.Descendants("drivernamesversion").First().Value, out latestDriverNamesVersion);
+                        baseSoundPackDownloadLocation = doc.Descendants("basesoundpackurl").First().Value;
+                        baseDriverNamesDownloadLocation = doc.Descendants("basedrivernamesurl").First().Value;
+                        updateSoundPackDownloadLocation = doc.Descendants("updatesoundpackurl").First().Value;
+                        updateDriverNamesDownloadLocation = doc.Descendants("updatedrivernamesurl").First().Value;
+                    }
+
                     if (latestSoundPackVersion == -1 && AudioPlayer.soundPackVersion == -1)
                     {
                         downloadSoundPackButton.Text = Configuration.getUIString("no_sound_pack_detected_unable_to_locate_update");
@@ -123,7 +146,7 @@ namespace CrewChiefV4
                         downloadDriverNamesButton.Text = Configuration.getUIString("no_driver_names_detected_unable_to_locate_update");
                         downloadDriverNamesButton.Enabled = false;
                         downloadDriverNamesButton.BackColor = Color.LightGray;
-                    } 
+                    }
                     else if (latestDriverNamesVersion > AudioPlayer.driverNamesVersion)
                     {
                         downloadDriverNamesButton.Enabled = true;
@@ -954,18 +977,53 @@ namespace CrewChiefV4
 
         private void downloadSoundPackButtonPress(object sender, EventArgs e)
         {
-            startApplicationButton.Enabled = false;
-            downloadSoundPackButton.Text = Configuration.getUIString("downloading_sound_pack");
-            downloadSoundPackButton.Enabled = false;
-            startDownload(true);
-
+            if (AudioPlayer.soundPackLanguage == null)
+            {
+                DialogResult dialogResult = MessageBox.Show(Configuration.getUIString("unknown_sound_pack_language_text"),
+                    Configuration.getUIString("unknown_sound_pack_language_title"), MessageBoxButtons.YesNo);
+                if (dialogResult == DialogResult.Yes)
+                {
+                    startApplicationButton.Enabled = false;
+                    downloadSoundPackButton.Text = Configuration.getUIString("downloading_sound_pack");
+                    downloadSoundPackButton.Enabled = false;
+                    startDownload(true);
+                }
+                else if (dialogResult == DialogResult.No)
+                {
+                }
+            }
+            else
+            {
+                startApplicationButton.Enabled = false;
+                downloadSoundPackButton.Text = Configuration.getUIString("downloading_sound_pack");
+                downloadSoundPackButton.Enabled = false;
+                startDownload(true);
+            }
         }
         private void downloadDriverNamesButtonPress(object sender, EventArgs e)
         {
-            startApplicationButton.Enabled = false;
-            downloadDriverNamesButton.Text = Configuration.getUIString("downloading_driver_names");
-            downloadDriverNamesButton.Enabled = false;
-            startDownload(false);
+            if (AudioPlayer.soundPackLanguage == null)
+            {
+                DialogResult dialogResult = MessageBox.Show(Configuration.getUIString("unknown_driver_names_language_text"),
+                    Configuration.getUIString("unknown_driver_names_language_title"), MessageBoxButtons.YesNo);
+                if (dialogResult == DialogResult.Yes)
+                {
+                    startApplicationButton.Enabled = false;
+                    downloadDriverNamesButton.Text = Configuration.getUIString("downloading_driver_names");
+                    downloadDriverNamesButton.Enabled = false;
+                    startDownload(false);
+                }
+                else if (dialogResult == DialogResult.No)
+                {
+                }
+            }
+            else
+            {
+                startApplicationButton.Enabled = false;
+                downloadDriverNamesButton.Text = Configuration.getUIString("downloading_driver_names");
+                downloadDriverNamesButton.Enabled = false;
+                startDownload(false);
+            }
         }
     }
 

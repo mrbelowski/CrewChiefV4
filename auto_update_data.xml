@@ -1,13 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <item>
-<title>Crew Chief 4.1.3.0, updated 11 Feb 2016</title>
+<title>Crew Chief 4.1.3.0, updated 12 Feb 2016</title>
 <version>4.1.3.0</version>
 <url>http://crewchief.isnais.de/CrewChiefV4.msi</url>
 <changelog>http://crewchief.isnais.de/change_log_for_auto_updated.html</changelog>
+
+<!--legacy sound pack stuff for 4.1.2.2 and earlier-->
 <soundpackversion>102</soundpackversion>
 <basesoundpackurl>http://crewchief.isnais.de/base_sound_pack.zip</basesoundpackurl>
 <updatesoundpackurl>http://crewchief.isnais.de/update_sound_pack.zip</updatesoundpackurl>
 <drivernamesversion>100</drivernamesversion>
 <basedrivernamesurl>http://crewchief.isnais.de/base_driver_names.zip</basedrivernamesurl>
 <updatedrivernamesurl>http://crewchief.isnais.de/update_driver_names.zip</updatedrivernamesurl>
+
+<!-- language-aware sound pack stuff for later versions-->
+<soundpack language="en">
+	<soundpackversion>103</soundpackversion>
+	<basesoundpackurl>http://crewchief.isnais.de/base_sound_pack.zip</basesoundpackurl>
+	<updatesoundpackurl>http://crewchief.isnais.de/update_sound_pack.zip</updatesoundpackurl>
+	<drivernamesversion>100</drivernamesversion>
+	<basedrivernamesurl>http://crewchief.isnais.de/base_driver_names.zip</basedrivernamesurl>
+	<updatedrivernamesurl>http://crewchief.isnais.de/update_driver_names.zip</updatedrivernamesurl>
+</soundpack>
 </item>

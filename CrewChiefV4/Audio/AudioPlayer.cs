@@ -104,6 +104,7 @@ namespace CrewChiefV4.Audio
 
         public static float soundPackVersion = -1;
         public static float driverNamesVersion = -1;
+        public static String soundPackLanguage = null;
 
         private String lastImmediateMessageName = null;
         private DateTime lastImmediateMessageTime = DateTime.MinValue;
@@ -127,6 +128,7 @@ namespace CrewChiefV4.Audio
             {
                 soundPackVersion = getSoundPackVersion(soundDirectory);
                 driverNamesVersion = getDriverNamesVersion(soundDirectory);
+                soundPackLanguage = getSoundPackLanguage(soundDirectory);
             }
             else
             {
@@ -232,6 +234,23 @@ namespace CrewChiefV4.Audio
                 }
             }
             return version;
+        }
+
+        public String getSoundPackLanguage(DirectoryInfo soundDirectory)
+        {
+            FileInfo[] filesInSoundDirectory = soundDirectory.GetFiles();
+            foreach (FileInfo fileInSoundDirectory in filesInSoundDirectory)
+            {
+                if (fileInSoundDirectory.Name == "sound_pack_language.txt")
+                {
+                    String[] lines = File.ReadAllLines(Path.Combine(soundFilesPath, fileInSoundDirectory.Name));
+                    if (lines.Length > 0)
+                    {
+                        return lines[0];
+                    }
+                }
+            }
+            return null;
         }
 
         public float getDriverNamesVersion(DirectoryInfo soundDirectory)

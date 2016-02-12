@@ -82,6 +82,12 @@ save_prop_changes_warning = You have unsaved changes. Click 'Yes' to save these 
 save_changes = Save changes
 save_and_restart = Save and restart
 
+unknown_sound_pack_language_text = The current sound pack has no language specified. Click "Yes" to proceed with the update (which will apply the default English sound pack update files and set the language to English). Click "No" to cancel.
+unknown_sound_pack_language_title = No sound pack language defined
+
+unknown_driver_names_language_text = The current sound pack has no language specified. Click "Yes" to proceed with the update (which will download the default English driver name updates). Click "No" to cancel.
+unknown_driver_names_language_title = No sound pack language defined
+
 # to change the name of the property title in the properties screen, just use the property name like this:
 # enable_spotter = Enable spotter
 # If you uncomment this line, the property text for enable_spotter will display "Enable spotter"
