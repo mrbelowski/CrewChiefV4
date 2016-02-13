@@ -92,7 +92,7 @@ namespace CrewChiefV4.Events
                 if (currentGameState.SessionData.SessionHasFixedTime)
                 {
                     possibleMessages.Add(new QueuedMessage("pit_window_time", MessageContents(MandatoryPitStops.folderMandatoryPitStopsPitWindowOpensAfter,
-                        currentGameState.PitData.PitWindowStart, MandatoryPitStops.folderMandatoryPitStopsMinutes), 0, this));
+                        TimeSpan.FromMinutes(currentGameState.PitData.PitWindowStart)), 0, this));
                 } 
                 else
                 {
