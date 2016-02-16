@@ -16,7 +16,8 @@ namespace CrewChiefV4.NumberProcessing
      * can be an empty list if no sounds are to be read for that number (e.g. zero hours).
      * 
      */
-    public class NumberReaderImpl : NumberReader
+    public class NumberReaderImpl
+        : NumberReader
     {
         // this folder contains lots of subfolders, one for each number from 0 to 99, so we can add a folder to the 
         // list to play called "numbers/[number]" - i.e. numbers/45 or numbers/1. This is used a lot in the implementations below.

@@ -101,7 +101,7 @@ namespace CrewChiefV4
             this.buttonActionSelect.FormattingEnabled = true;
             this.buttonActionSelect.Location = new System.Drawing.Point(323, 520);
             this.buttonActionSelect.Name = "buttonActionSelect";
-            this.buttonActionSelect.Size = new System.Drawing.Size(419, 95);
+            this.buttonActionSelect.Size = new System.Drawing.Size(468, 95);
             this.buttonActionSelect.TabIndex = 7;
             this.buttonActionSelect.SelectedIndexChanged += new System.EventHandler(this.buttonActionSelect_SelectedIndexChanged);
             // 
@@ -116,7 +116,7 @@ namespace CrewChiefV4
             // 
             // assignButtonToAction
             // 
-            this.assignButtonToAction.Location = new System.Drawing.Point(748, 520);
+            this.assignButtonToAction.Location = new System.Drawing.Point(797, 520);
             this.assignButtonToAction.Name = "assignButtonToAction";
             this.assignButtonToAction.Size = new System.Drawing.Size(167, 39);
             this.assignButtonToAction.TabIndex = 9;
@@ -126,7 +126,7 @@ namespace CrewChiefV4
             // 
             // deleteAssigmentButton
             // 
-            this.deleteAssigmentButton.Location = new System.Drawing.Point(748, 565);
+            this.deleteAssigmentButton.Location = new System.Drawing.Point(797, 564);
             this.deleteAssigmentButton.Name = "deleteAssigmentButton";
             this.deleteAssigmentButton.Size = new System.Drawing.Size(167, 40);
             this.deleteAssigmentButton.TabIndex = 10;
@@ -140,7 +140,7 @@ namespace CrewChiefV4
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label1.Location = new System.Drawing.Point(38, 500);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(135, 17);
+            this.label1.Size = new System.Drawing.Size(138, 17);
             this.label1.TabIndex = 11;
             this.label1.Text = Configuration.getUIString("available_controllers");
             // 
@@ -150,7 +150,7 @@ namespace CrewChiefV4
             this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label2.Location = new System.Drawing.Point(323, 501);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(114, 17);
+            this.label2.Size = new System.Drawing.Size(117, 17);
             this.label2.TabIndex = 12;
             this.label2.Text = Configuration.getUIString("available_actions");
             // 
@@ -170,9 +170,9 @@ namespace CrewChiefV4
             this.groupBox1.Controls.Add(this.toggleButton);
             this.groupBox1.Controls.Add(this.holdButton);
             this.groupBox1.Controls.Add(this.voiceDisableButton);
-            this.groupBox1.Location = new System.Drawing.Point(934, 520);
+            this.groupBox1.Location = new System.Drawing.Point(970, 520);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(200, 121);
+            this.groupBox1.Size = new System.Drawing.Size(164, 121);
             this.groupBox1.TabIndex = 15;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = Configuration.getUIString("voice_recognition_mode");
@@ -182,7 +182,7 @@ namespace CrewChiefV4
             this.alwaysOnButton.AutoSize = true;
             this.alwaysOnButton.Location = new System.Drawing.Point(7, 91);
             this.alwaysOnButton.Name = "alwaysOnButton";
-            this.alwaysOnButton.Size = new System.Drawing.Size(73, 17);
+            this.alwaysOnButton.Size = new System.Drawing.Size(75, 17);
             this.alwaysOnButton.TabIndex = 3;
             this.alwaysOnButton.TabStop = true;
             this.alwaysOnButton.Text = Configuration.getUIString("always_on");
@@ -194,7 +194,7 @@ namespace CrewChiefV4
             this.toggleButton.AutoSize = true;
             this.toggleButton.Location = new System.Drawing.Point(7, 67);
             this.toggleButton.Name = "toggleButton";
-            this.toggleButton.Size = new System.Drawing.Size(91, 17);
+            this.toggleButton.Size = new System.Drawing.Size(90, 17);
             this.toggleButton.TabIndex = 2;
             this.toggleButton.TabStop = true;
             this.toggleButton.Text = Configuration.getUIString("toggle_button");
@@ -206,7 +206,7 @@ namespace CrewChiefV4
             this.holdButton.AutoSize = true;
             this.holdButton.Location = new System.Drawing.Point(7, 44);
             this.holdButton.Name = "holdButton";
-            this.holdButton.Size = new System.Drawing.Size(80, 17);
+            this.holdButton.Size = new System.Drawing.Size(81, 17);
             this.holdButton.TabIndex = 1;
             this.holdButton.TabStop = true;
             this.holdButton.Text = Configuration.getUIString("hold_button");
@@ -218,7 +218,7 @@ namespace CrewChiefV4
             this.voiceDisableButton.AutoSize = true;
             this.voiceDisableButton.Location = new System.Drawing.Point(7, 20);
             this.voiceDisableButton.Name = "voiceDisableButton";
-            this.voiceDisableButton.Size = new System.Drawing.Size(66, 17);
+            this.voiceDisableButton.Size = new System.Drawing.Size(64, 17);
             this.voiceDisableButton.TabIndex = 0;
             this.voiceDisableButton.TabStop = true;
             this.voiceDisableButton.Text = Configuration.getUIString("disabled");
@@ -248,7 +248,7 @@ namespace CrewChiefV4
             this.label3.AutoSize = true;
             this.label3.Location = new System.Drawing.Point(367, 12);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(92, 13);
+            this.label3.Size = new System.Drawing.Size(94, 13);
             this.label3.TabIndex = 18;
             this.label3.Text = Configuration.getUIString("messages_volume");
             // 
@@ -265,7 +265,7 @@ namespace CrewChiefV4
             this.label4.AutoSize = true;
             this.label4.Location = new System.Drawing.Point(567, 11);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(102, 13);
+            this.label4.Size = new System.Drawing.Size(104, 13);
             this.label4.TabIndex = 20;
             this.label4.Text = Configuration.getUIString("background_volume");
             // 
@@ -289,7 +289,7 @@ namespace CrewChiefV4
             this.label5.AutoSize = true;
             this.label5.Location = new System.Drawing.Point(779, 9);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(35, 13);
+            this.label5.Size = new System.Drawing.Size(33, 13);
             this.label5.TabIndex = 22;
             this.label5.Text = Configuration.getUIString("game");
             // 

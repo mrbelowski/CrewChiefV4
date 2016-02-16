@@ -146,7 +146,7 @@ namespace CrewChiefV4.PCars
                         }
                         catch (Exception e)
                         {
-                            Console.WriteLine("Error reading UDP data ", e.Message);
+                            Console.WriteLine("Error reading UDP data " + e.Message);
                         }
                     }
                 }
@@ -364,6 +364,7 @@ namespace CrewChiefV4.PCars
 
         public static bool[] ConvertBytesToBoolArray(byte dpad, byte joypad1, byte joypad2)
         {
+            // Console.WriteLine(dpad + ", " + joypad1 + ", " + joypad2);
             bool[] result = new bool[24];
             // check each bit in the byte. if 1 set to true, if 0 set to false
             for (int i = 0; i < 8; i++)

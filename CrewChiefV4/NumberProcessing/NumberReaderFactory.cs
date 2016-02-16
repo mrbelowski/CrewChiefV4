@@ -12,13 +12,14 @@ namespace CrewChiefV4.NumberProcessing
 {
     class NumberReaderFactory
     {
-        private static String NUMBER_READER_IMPL_NAME = "NumberReaderImpl.cs";
+        private static String NUMBER_READER_IMPL_NAME = "NumberReaderEn.cs";
         private static NumberReaderFactory INSTANCE = new NumberReaderFactory();
         private NumberReader numberReader;
 
         private NumberReaderFactory()
         {
-            loadCode();
+            //LoadImplmentationFromSource();
+            numberReader = new NumberReaderImpl();
         }
 
         public static NumberReader GetNumberReader()
@@ -51,7 +52,7 @@ namespace CrewChiefV4.NumberProcessing
             }        
         }
 
-        private void loadCode()
+        private void LoadImplmentationFromSource()
         {
             StreamReader file = null;
             Boolean loadedOverride = false;
