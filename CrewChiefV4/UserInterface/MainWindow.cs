@@ -57,6 +57,8 @@ namespace CrewChiefV4
 
         private float latestSoundPackVersion = -1;
         private float latestDriverNamesVersion = -1;
+
+        private ControlWriter cw = null;
                 
         private void FormMain_Load(object sender, EventArgs e)
         {
@@ -275,6 +277,16 @@ namespace CrewChiefV4
 
         }
 
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            base.OnFormClosing(e);
+            lock (cw)
+            {
+                cw.textbox = null;
+                cw.Dispose();
+            }
+        } 
+
         public MainWindow()
         {
             controllerConfiguration = new ControllerConfiguration();
@@ -286,7 +298,8 @@ namespace CrewChiefV4
             this.recordSession.Visible = System.Diagnostics.Debugger.IsAttached;
             this.playbackInterval.Visible = System.Diagnostics.Debugger.IsAttached;
             CheckForIllegalCrossThreadCalls = false;
-            Console.SetOut(new ControlWriter(textBox1));
+            cw = new ControlWriter(textBox1);
+            Console.SetOut(cw);
 
             crewChief = new CrewChief();
             float messagesVolume = UserSettings.GetUserSettings().getFloat("messages_volume");
@@ -1029,21 +1042,24 @@ namespace CrewChiefV4
 
     public class ControlWriter : TextWriter
     {
-        private TextBox textbox = null;
+        public TextBox textbox = null;
         public ControlWriter(TextBox textbox)
         {
             this.textbox = textbox;
         }
 
         public override void WriteLine(string value)
-        {
+        {            
+            StringBuilder sb = new StringBuilder();
+            sb.Append(DateTime.Now.ToString("HH:mm:ss.fff")).Append(" : ").Append(value).AppendLine();
             if (textbox != null && !textbox.IsDisposed)
             {
                 try
                 {
-                    StringBuilder sb = new StringBuilder();
-                    sb.Append(DateTime.Now.ToString("HH:mm:ss.fff")).Append(" : ").Append(value).AppendLine();
-                    textbox.AppendText(sb.ToString());
+                    lock (this)
+                    {
+                        textbox.AppendText(sb.ToString());
+                    }
                 }
                 catch (Exception)
                 {
