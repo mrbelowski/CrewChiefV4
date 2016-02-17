@@ -18,6 +18,8 @@ namespace CrewChiefV4
 {
     public class CrewChief : IDisposable
     {
+        private Random random = new Random();
+
         public static Boolean loadDataFromFile = false;
 
         public SpeechRecogniser speechRecogniser;
@@ -338,8 +340,7 @@ namespace CrewChiefV4
             audioPlayer.startMonitor();
             Boolean attemptedToRunGame = false;            
 
-            int threadSleepTime = ((int)_timeInterval.Milliseconds / 10) + 1;
-            Console.WriteLine("Polling for shared data every " + _timeInterval.Milliseconds + "ms, pausing " + threadSleepTime + "ms between invocations");
+            Console.WriteLine("Polling for shared data every " + _timeInterval.Milliseconds + "ms");
             Boolean sessionFinished = false;
 
             while (running)
@@ -347,7 +348,10 @@ namespace CrewChiefV4
                 DateTime now = DateTime.Now;
                 if (now > nextRunTime)
                 {
+                    // ensure the updates don't get synchronised with the spotter / UDP receiver
+                    int updateTweak = random.Next(10) - 5;
                     nextRunTime = DateTime.Now.Add(_timeInterval);
+                    nextRunTime.Add(TimeSpan.FromSeconds(updateTweak));
                     if (!loadDataFromFile)
                     {
                         if (gameDefinition.processName == null || Utilities.IsGameRunning(gameDefinition.processName))
@@ -500,6 +504,8 @@ namespace CrewChiefV4
                 }
                 else
                 {
+                    // ensure the updates don't get synchronised with the spotter / UDP receiver
+                    int threadSleepTime = 5 + random.Next(10);
                     Thread.Sleep(threadSleepTime);
                     continue;
                 }                
