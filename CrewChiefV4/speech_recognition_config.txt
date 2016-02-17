@@ -41,8 +41,8 @@ WHAT_ARE_MY_BRAKE_TEMPS = what are my brake temps:what are my brake temperatures
 HOW_ARE_MY_ENGINE_TEMPS = how are my engine temps:how are my engine temperatures
 WHATS_MY_GAP_IN_FRONT = what's the gap ahead:what's the gap in front:what's my gap ahead:whats my gap in front:gap in front:gap ahead
 WHATS_MY_GAP_BEHIND = what's the gap behind:what's my gap behind:gap behind
-WHAT_WAS_MY_LAST_LAP_TIME = what's my last laptime:last laptime:laptime
-WHATS_MY_BEST_LAP_TIME = what's my best laptime:best laptime:best lap
+WHAT_WAS_MY_LAST_LAP_TIME = what's my last lap time:last lap time:lap time:what's my lap time
+WHATS_MY_BEST_LAP_TIME = what's my best lap time:best lap time:best lap
 WHATS_MY_POSITION = what's my position
 WHATS_MY_FUEL_LEVEL = what's my fuel level
 

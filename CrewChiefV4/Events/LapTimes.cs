@@ -25,8 +25,11 @@ namespace CrewChiefV4.Events
         // for qualifying:
         // "that was a 1:34.2, you're now 0.4 seconds off the pace"
         public static String folderLapTimeIntro = "lap_times/time_intro";
-        private String folderGapIntro = "lap_times/gap_intro";
-        private String folderGapOutroOffPace = "lap_times/gap_outro_off_pace";
+        public static String folderGapIntro = "lap_times/gap_intro";
+        // TODO: drop the "seconds... " from the start of this outro
+
+        // TODO: RE-RECORD THESE 3 SOUNDS:
+        public static String folderGapOutroOffPace = "lap_times/gap_outro_off_pace";
         // "that was a 1:34.2, you're fastest in your class"
         private String folderFastestInClass = "lap_times/fastest_in_your_class";
 

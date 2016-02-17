@@ -58,10 +58,10 @@ namespace CrewChiefV4.NumberProcessing
                     messages.Add(folderHours);
                 }
             }
-            if (messages.Count > 0)
+            /*if (messages.Count > 0)
             {
                 Console.WriteLine(String.Join(", ", messages));
-            }
+            }*/
             return messages;
         }
 
@@ -87,10 +87,10 @@ namespace CrewChiefV4.NumberProcessing
                     }
                 }
             }
-            if (messages.Count > 0)
+            /*if (messages.Count > 0)
             {
                 Console.WriteLine(String.Join(", ", messages));
-            } 
+            } */
             return messages;
         }
 
@@ -136,10 +136,10 @@ namespace CrewChiefV4.NumberProcessing
                     }
                 }
             }
-            if (messages.Count > 0)
+            /*if (messages.Count > 0)
             {
                 Console.WriteLine(String.Join(", ", messages));
-            } 
+            } */
             return messages;
         }
 
@@ -185,10 +185,10 @@ namespace CrewChiefV4.NumberProcessing
                     }
                 }
             }
-            if (messages.Count > 0)
+            /*if (messages.Count > 0)
             {
                 Console.WriteLine(String.Join(", ", messages));
-            } 
+            } */
             return messages;
         }
 
@@ -297,10 +297,10 @@ namespace CrewChiefV4.NumberProcessing
                     messages.Add(folderNumbersStub + tensAndUnits);
                 }
             }
-            if (messages.Count > 0)
+            /*if (messages.Count > 0)
             {
                 Console.WriteLine(String.Join(", ", messages));
-            } 
+            } */
             return messages;
         }
     }
