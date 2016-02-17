@@ -16,9 +16,14 @@ namespace CrewChiefV4.NumberProcessing
      * can be an empty list if no sounds are to be read for that number (e.g. zero hours).
      * 
      */
-    public class NumberReaderImpl
-        : NumberReader
+    public class NumberReaderImpl : NumberReader
     {
+        private Boolean prefix_hundred_and_thousand_with_one = Boolean.Parse(Configuration.getSoundConfigOption("prefix_hundred_and_thousand_with_one"));
+        private Boolean say_and_between_hundred_and_units = Boolean.Parse(Configuration.getSoundConfigOption("say_and_between_hundred_and_units"));
+        private Boolean say_and_between_thousand_and_units = Boolean.Parse(Configuration.getSoundConfigOption("say_and_between_thousand_and_units"));
+        private Boolean allow_short_hundreds = Boolean.Parse(Configuration.getSoundConfigOption("allow_short_hundreds"));   // allow "one oh four", instead of "one hundred and four"
+        private Boolean always_use_thousands = Boolean.Parse(Configuration.getSoundConfigOption("always_use_thousands"));   // don't allow "thirteen hundred" etc
+
         // this folder contains lots of subfolders, one for each number from 0 to 99, so we can add a folder to the 
         // list to play called "numbers/[number]" - i.e. numbers/45 or numbers/1. This is used a lot in the implementations below.
         private static String folderNumbersStub = "numbers/";
@@ -221,10 +226,12 @@ namespace CrewChiefV4.NumberProcessing
                     // if we have just multiple digits, and one or both of the last 2 are non-zero
                     tensAndUnits = digits[digits.Length - 2].ToString() + digits[digits.Length - 1].ToString();
                 }
-                if (digits.Length == 4 && digits[0] == '1' && digits[1] != '0')
+                if (digits.Length == 4 && digits[0] == '1' && digits[1] != '0' && !always_use_thousands)
                 {
                     // the number is 1100 -> 1999. In English we say "eleven hundred", not "one thousand one hundred"
                     // So the number of hundreds is the first and second digit
+
+                    // don't allow "thirteen hundred" type messages if always_use_thousands is true
                     hundreds = digits[0].ToString() + digits[1].ToString();
                 }
                 else
@@ -250,29 +257,43 @@ namespace CrewChiefV4.NumberProcessing
                 }
                 if (thousands != null)
                 {
-                    messages.Add(folderNumbersStub + thousands);
-                    if (hundreds == null && tensAndUnits != null)
+                    if (thousands != "1" || prefix_hundred_and_thousand_with_one)
+                    {
+                         messages.Add(folderNumbersStub + thousands);
+                    }
+                    if (hundreds == null && tensAndUnits != null && say_and_between_thousand_and_units) 
                     {
                         // if we're going to also read out a number of hundreds or tensAndUnits, we say "thousand and..."
-                        messages.Add(folderThousandAnd);
-                    }
-                    else
+                         messages.Add(folderThousandAnd);
+                    } else 
                     {
-                        messages.Add(folderThousand);
+                         messages.Add(folderThousand);
                     }
                 }
                 if (hundreds != null)
                 {
-                    messages.Add(folderNumbersStub + hundreds);
+                    Boolean saidNumberOfHundreds = false;
+                    if (hundreds != "1" || prefix_hundred_and_thousand_with_one)
+                    {
+                        saidNumberOfHundreds = true;
+                        messages.Add(folderNumbersStub + hundreds);
+                    }
                     // don't always use "hundred and" - it's valid to say "one hundred and twenty" or "one twenty". This implementation
                     // will choose semi-randomly whether to use the long or short form.
                     Boolean addedHundreds = false;
                     if (tensAndUnits != null)
                     {
                         // if there's a thousand, or we're saying something like "13 hundred", then always use the long version
-                        if (hundreds.Length == 2 || thousands != null || random.NextDouble() > 0.6)
+                        if (!allow_short_hundreds || hundreds.Length == 2 || thousands != null || random.NextDouble() > 0.6)
                         {
-                            messages.Add(folderHundredAnd);
+                            if (say_and_between_hundred_and_units)
+                            {
+                                messages.Add(folderHundredAnd);
+                            }
+                            else
+                            {
+                                messages.Add(folderHundred);
+                            }
                             addedHundreds = true;
                         }
                     }
@@ -283,6 +304,10 @@ namespace CrewChiefV4.NumberProcessing
                     }
                     if (!addedHundreds)
                     {
+                        if (!saidNumberOfHundreds)
+                        {
+                            messages.Add(folderNumbersStub + hundreds);
+                        }
                         if (tensAndUnits != null && tensAndUnits.Length == 1)
                         {
                             // need to modify the tensAndUnits here - we've skipped "hundreds" even though the number is > 99.
