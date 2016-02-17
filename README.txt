@@ -2,6 +2,8 @@ CrewChief version 4.
 
 Changelog
 ---------
+Version 4.1.3.2: Removed some debug code that shouldn't have made it into the release.
+
 Version 4.1.3.1: A couple of internal fixes.
 	
 Version 4.1.3.0: Added language-specific sound pack stuff; Better support for language specific number and time speech generation; Some internal bug fixing; Don't play wheel locking warnings if the player has a missing wheel or puncture; Don't play laptime improving / worsening messages if the conditions have significantly changed (rain or track temp); Don't play a message twice in succession if a player asks for something that the app was going to tell them anyway; Don't play good / OK start messages if the player has picked up a penalty (i.e. false start);Insert a short pause between some messages;Reduce the likelihood of multiple sweary messages being played in quick succession;Some better error trapping when the app is closed.

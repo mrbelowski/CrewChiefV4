@@ -88,9 +88,13 @@ namespace CrewChiefV4.Events
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
             audioPlayer.playMessage(new QueuedMessage(folderTest, 0, this));
+            /*audioPlayer.playMessage(new QueuedMessage("int", MessageContents(143), 0, this));
+            audioPlayer.playMessage(new QueuedMessage("time", MessageContents(TimeSpan.FromMinutes(32.1)), 0, this));*/
+            /*audioPlayer.playMessage(new QueuedMessage("gap test", MessageContents(LapTimes.folderGapIntro, TimeSpan.FromSeconds(3.1),
+                LapTimes.folderGapOutroOffPace), 0, this));*/
             testDriverNames();
-            /* 
             
+            /*
             audioPlayer.playMessage(new QueuedMessage(LapCounter.folderGetReady, 0, this));
             audioPlayer.playMessage(new QueuedMessage(MandatoryPitStops.folderMandatoryPitStopsPitThisLap, 0, this));
             audioPlayer.playMessage(new QueuedMessage(MandatoryPitStops.folderMandatoryPitStopsFitPrimesThisLap, 0, this));
@@ -122,7 +126,7 @@ namespace CrewChiefV4.Events
                 TimeSpan.FromSeconds(60 + (random.NextDouble() * 60))), 0, this));
 
             audioPlayer.playMessage(new QueuedMessage("yesBoxAfter", MessageContents(MandatoryPitStops.folderMandatoryPitStopsYesStopAfter,
-                10, MandatoryPitStops.folderMandatoryPitStopsMinutes), 0, null));
+                TimeSpan.FromMinutes(10)), 0, null));
             audioPlayer.playMessage(new QueuedMessage("laps_on_current_tyres", MessageContents(TyreMonitor.folderLapsOnCurrentTyresIntro,
                 5, TyreMonitor.folderLapsOnCurrentTyresOutro), 0, this));*/
 
