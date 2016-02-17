@@ -351,7 +351,7 @@ namespace CrewChiefV4
                     // ensure the updates don't get synchronised with the spotter / UDP receiver
                     int updateTweak = random.Next(10) - 5;
                     nextRunTime = DateTime.Now.Add(_timeInterval);
-                    nextRunTime.Add(TimeSpan.FromSeconds(updateTweak));
+                    nextRunTime.Add(TimeSpan.FromMilliseconds(updateTweak));
                     if (!loadDataFromFile)
                     {
                         if (gameDefinition.processName == null || Utilities.IsGameRunning(gameDefinition.processName))
