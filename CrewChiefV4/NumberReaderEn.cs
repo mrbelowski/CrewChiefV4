@@ -16,7 +16,7 @@ namespace CrewChiefV4.NumberProcessing
      * can be an empty list if no sounds are to be read for that number (e.g. zero hours).
      * 
      */
-    public class NumberReaderImpl : NumberReader
+    public class NumberReaderEn : NumberReader
     {
         private Boolean prefix_hundred_and_thousand_with_one = Boolean.Parse(Configuration.getSoundConfigOption("prefix_hundred_and_thousand_with_one"));
         private Boolean say_and_between_hundred_and_units = Boolean.Parse(Configuration.getSoundConfigOption("say_and_between_hundred_and_units"));

@@ -101,6 +101,7 @@
     <Compile Include="GameStateReaderFactory.cs" />
     <Compile Include="NameValidator.cs" />
     <Compile Include="NoisyCartesianCoordinateSpotter.cs" />
+    <Compile Include="NumberReaderIt.cs" />
     <Compile Include="NumberReaderEn.cs" />
     <Compile Include="NumberProcessing\NumberReader.cs" />
     <Compile Include="NumberProcessing\NumberReaderFactory.cs" />

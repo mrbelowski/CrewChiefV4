@@ -1,4 +1,5 @@
-﻿using Microsoft.CSharp;
+﻿using CrewChiefV4.Audio;
+using Microsoft.CSharp;
 using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
@@ -12,14 +13,22 @@ namespace CrewChiefV4.NumberProcessing
 {
     class NumberReaderFactory
     {
-        private static String NUMBER_READER_IMPL_NAME = "NumberReaderEn.cs";
+        private static String NUMBER_READER_IMPL_SOURCE_NAME = "NumberReaderOverride.cs";
         private static NumberReaderFactory INSTANCE = new NumberReaderFactory();
         private NumberReader numberReader;
 
         private NumberReaderFactory()
         {
             //LoadImplmentationFromSource();
-            numberReader = new NumberReaderImpl();
+            // select the correct implementation for the language pack
+            if (AudioPlayer.soundPackLanguage == "it")
+            {
+                numberReader = new NumberReaderIt();
+            }
+            else
+            {
+                numberReader = new NumberReaderEn();
+            }
         }
 
         public static NumberReader GetNumberReader()
@@ -47,7 +56,7 @@ namespace CrewChiefV4.NumberProcessing
             }
             else
             {
-                this.numberReader = (NumberReader) results.CompiledAssembly.CreateInstance("CrewChiefV4.NumberProcessing.NumberReaderImpl");
+                this.numberReader = (NumberReader) results.CompiledAssembly.CreateInstance("CrewChiefV4.NumberProcessing.NumberReaderOverride");
                 return true;
             }        
         }
@@ -58,7 +67,7 @@ namespace CrewChiefV4.NumberProcessing
             Boolean loadedOverride = false;
             try
             {
-                file = new StreamReader(Configuration.getUserOverridesFileLocation(NUMBER_READER_IMPL_NAME));
+                file = new StreamReader(Configuration.getUserOverridesFileLocation(NUMBER_READER_IMPL_SOURCE_NAME));
                 StringBuilder sb = new StringBuilder();
                 String line;
                 while ((line = file.ReadLine()) != null)
@@ -80,7 +89,7 @@ namespace CrewChiefV4.NumberProcessing
             {
                 try
                 {
-                    file = new StreamReader(Configuration.getDefaultFileLocation(NUMBER_READER_IMPL_NAME));
+                    file = new StreamReader(Configuration.getDefaultFileLocation(NUMBER_READER_IMPL_SOURCE_NAME));
                     StringBuilder sb = new StringBuilder();
                     String line;
                     while ((line = file.ReadLine()) != null)
