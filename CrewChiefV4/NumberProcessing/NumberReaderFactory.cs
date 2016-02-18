@@ -21,7 +21,7 @@ namespace CrewChiefV4.NumberProcessing
         {
             //LoadImplmentationFromSource();
             // select the correct implementation for the language pack
-            if (AudioPlayer.soundPackLanguage == "it")
+            if ("it" == AudioPlayer.soundPackLanguage)
             {
                 numberReader = new NumberReaderIt();
             }
