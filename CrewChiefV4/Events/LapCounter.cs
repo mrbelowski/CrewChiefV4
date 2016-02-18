@@ -184,6 +184,11 @@ namespace CrewChiefV4.Events
             if (currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.IsNewLap && currentGameState.SessionData.CompletedLaps > 0)
             {
                 // a new lap has been started in race mode
+                if (currentGameState.SessionData.CompletedLaps == currentGameState.SessionData.SessionNumberOfLaps - 2)
+                {
+                    // disable pearls for the last part of the race
+                    audioPlayer.disablePearlsOfWisdom = true;
+                }
                 int position = currentGameState.SessionData.Position;
                 if (currentGameState.SessionData.CompletedLaps == currentGameState.SessionData.SessionNumberOfLaps - 1)
                 {

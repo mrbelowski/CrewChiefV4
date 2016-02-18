@@ -867,6 +867,15 @@ namespace CrewChiefV4.PCars
             {
                 currentGameState.PitData.HasMandatoryPitStop = true;
                 currentGameState.PitData.PitWindowStart = (int) shared.mEnforcedPitStopLap;
+                // estimate the pit window close lap / time
+                if (currentGameState.SessionData.SessionHasFixedTime)
+                {
+                    currentGameState.PitData.PitWindowEnd = (int)(60 * currentGameState.SessionData.SessionRunTime) + 120;
+                }
+                else
+                {
+                    currentGameState.PitData.PitWindowEnd = currentGameState.SessionData.SessionNumberOfLaps - 1;
+                }
                 currentGameState.PitData.PitWindow = mapToPitWindow(currentGameState, shared.mPitSchedule, shared.mPitMode);
                 currentGameState.PitData.IsMakingMandatoryPitStop = (currentGameState.PitData.PitWindow == PitWindow.Open || currentGameState.PitData.PitWindow == PitWindow.StopInProgress) &&
                                                                     (currentGameState.PitData.OnInLap || currentGameState.PitData.OnOutLap);
@@ -1343,7 +1352,9 @@ namespace CrewChiefV4.PCars
             if (currentGameState.PitData.PitWindowStart > 0)
             {
                 if ((currentGameState.SessionData.SessionNumberOfLaps > 0 && currentGameState.SessionData.CompletedLaps < currentGameState.PitData.PitWindowStart - 1) ||
-                    (currentGameState.SessionData.SessionRunTime > 0 && currentGameState.SessionData.SessionRunningTime < currentGameState.PitData.PitWindowStart))
+                    (currentGameState.SessionData.SessionRunTime > 0 && currentGameState.SessionData.SessionRunningTime < currentGameState.PitData.PitWindowStart) ||
+                    (currentGameState.SessionData.SessionNumberOfLaps > 0 && currentGameState.SessionData.CompletedLaps > currentGameState.PitData.PitWindowEnd) ||
+                    (currentGameState.SessionData.SessionRunTime > 0 && currentGameState.SessionData.SessionRunningTime > currentGameState.PitData.PitWindowEnd))
                 {
                     return PitWindow.Closed;
                 }

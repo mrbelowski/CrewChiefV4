@@ -87,6 +87,8 @@ namespace CrewChiefV4.Events
         }
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
+            audioPlayer.playMessage(new QueuedMessage("sectortest1", LapTimes.getSectorDeltaMessages(LapTimes.SectorReportOption.ALL, 20.1f, 20, 33, 32.1f, 10, 10.1f, true), 0, this));
+
             audioPlayer.playMessage(new QueuedMessage(folderTest, 0, this));
             /*audioPlayer.playMessage(new QueuedMessage("int1", MessageContents(143), 0, this));
             audioPlayer.playMessage(new QueuedMessage("int2", MessageContents(1), 0, this));
