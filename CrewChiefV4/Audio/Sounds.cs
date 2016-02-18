@@ -82,9 +82,9 @@ namespace CrewChiefV4.Audio
         {
             double secondsSinceLastPersonalisedMessage = (DateTime.Now - lastPersonalisedMessageTime).TotalSeconds;
             Boolean due = false;
-            if (minSecondsBetweenPersonalisedMessages <= 0)
+            if (minSecondsBetweenPersonalisedMessages == 0)
             {
-                due = true;
+                due = false;
             }
             else if (secondsSinceLastPersonalisedMessage > minSecondsBetweenPersonalisedMessages)
             {
