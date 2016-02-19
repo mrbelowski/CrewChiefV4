@@ -25,7 +25,7 @@ namespace CrewChiefV4.Events
         private String folderLastLapLeading = "race_time/last_lap_leading";
         private String folderLastLapPodium = "race_time/last_lap_top_three";
 
-        private String folderMinutesLeft = "race_time/minutes_remaining";
+        public static String folderRemaining = "race_time/remaining";
         private String folderLapsLeft = "race_time/laps_remaining";
 
         private String folderLessThanOneMinute = "race_time/less_than_one_minute";
@@ -233,9 +233,10 @@ namespace CrewChiefV4.Events
                 }
                 if (timeLeft >= 120)
                 {
-                    TimeSpan timeLeftTimeSpan = TimeSpan.FromSeconds(timeLeft);
+                    int minutesLeft = (int)Math.Round(timeLeft / 60f);
+                    TimeSpan timeLeftTimeSpan = TimeSpan.FromMinutes(minutesLeft);
                     audioPlayer.playMessageImmediately(new QueuedMessage("RaceTime/time_remaining",
-                        MessageContents(timeLeftTimeSpan.TotalMinutes, folderMinutesLeft), 0, this));
+                        MessageContents(timeLeftTimeSpan, folderRemaining), 0, this));
                     
                 }
                 else if (timeLeft >= 60)
