@@ -382,6 +382,10 @@ namespace CrewChiefV4
                     {
                         // TODO: if the stop listening call is made but no speech was detected, say "eh?"
                         Console.WriteLine("Stopping listening...");
+                        if (crewChief.speechRecogniser.waitingForSpeech)
+                        {
+                            crewChief.youWot();
+                        }
                         crewChief.speechRecogniser.recognizeAsyncCancel();
                         channelOpen = false;
                     }

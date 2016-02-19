@@ -55,7 +55,7 @@ WHOS_IN_FRONT_IN_THE_RACE = who's in front in the race:who's ahead in the race:w
 WHOS_BEHIND_IN_THE_RACE = who's behind in the race:who's behind
 WHOS_IN_FRONT_ON_TRACK = who's in front on track:who's ahead on track
 WHOS_BEHIND_ON_TRACK = who's behind on track
-WHOS_LEADING = who's leading:who's in the lead
+WHOS_LEADING = who's leading:who's in the lead:who is leading:who is in the lead:who's the leader
 
 HOW_LONGS_LEFT = how long's left:how many laps left:how many laps to go
 SPOT = spot

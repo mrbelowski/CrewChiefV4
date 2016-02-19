@@ -200,6 +200,16 @@ namespace CrewChiefV4.Events
             lastGapToSecondWhenLeadingPracOrQual = TimeSpan.Zero;
         }
 
+        public override bool isMessageStillValid(string eventSubType, GameStateData currentGameState, Dictionary<string, object> validationData)
+        {
+            if ((eventSubType == folderImprovingTimes || eventSubType == folderConsistentTimes || eventSubType == folderWorseningTimes) &&
+                currentGameState.SessionData.SectorNumber != 1)
+            {
+                return false;
+            }
+            return true;
+        }
+
         protected override void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
             sessionType = currentGameState.SessionData.SessionType;
@@ -513,7 +523,8 @@ namespace CrewChiefV4.Events
                                         {
                                             // only complain about worsening laptimes if we've not overtaken anyone on this lap
                                             lastConsistencyUpdate = currentGameState.SessionData.CompletedLaps;
-                                            audioPlayer.playMessage(new QueuedMessage(folderWorseningTimes, random.Next(0, 20), this));
+
+                                            audioPlayer.playMessage(new QueuedMessage(folderWorseningTimes, random.Next(0, 20), this, new Dictionary<String, Object>()));
                                         }
                                     }
                                 }

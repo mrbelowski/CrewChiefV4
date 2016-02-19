@@ -106,6 +106,8 @@ namespace CrewChiefV4
 
         public static Dictionary<String, int> numberToNumber = getNumberMappings();
 
+        public Boolean waitingForSpeech = false;
+
         private static Dictionary<String, int> getNumberMappings()
         {
             Dictionary<String, int> dict = new Dictionary<string, int>();
@@ -416,6 +418,7 @@ namespace CrewChiefV4
         
         void sre_SpeechRecognized(object sender, SpeechRecognizedEventArgs e)
         {
+            waitingForSpeech = false;
             Console.WriteLine("recognised : " + e.Result.Text + " confidence = " + e.Result.Confidence);
             try
             {
@@ -453,9 +456,9 @@ namespace CrewChiefV4
             catch (Exception exception)
             {
                 Console.WriteLine("Unable to respond - error message: " + exception.Message);
-            }         
+            }
 
-            recognizeAsyncStop();
+            sre.RecognizeAsyncStop(); 
             Thread.Sleep(500);
             if (voiceOptionEnum == MainWindow.VoiceOptionEnum.ALWAYS_ON ||
                 voiceOptionEnum == MainWindow.VoiceOptionEnum.TOGGLE)
@@ -467,16 +470,13 @@ namespace CrewChiefV4
 
         public void recognizeAsync()
         {
+            waitingForSpeech = true;
             sre.RecognizeAsync(RecognizeMode.Multiple);
-        }
-
-        public void recognizeAsyncStop()
-        {
-            sre.RecognizeAsyncStop();
         }
 
         public void recognizeAsyncCancel()
         {
+            waitingForSpeech = false;
             sre.RecognizeAsyncCancel();
         }
 
