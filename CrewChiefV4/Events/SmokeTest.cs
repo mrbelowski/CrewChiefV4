@@ -90,14 +90,24 @@ namespace CrewChiefV4.Events
             //audioPlayer.playMessage(new QueuedMessage("sectortest1", LapTimes.getSectorDeltaMessages(LapTimes.SectorReportOption.ALL, 20.5f, 20, 33, 34.1f, 10, 10.1f, true), 0, this));
 
             audioPlayer.playMessage(new QueuedMessage(folderTest, 0, this));
-            for (int i = 0; i < 10; i++)
+
+            DirectoryInfo soundDirectory = new DirectoryInfo(AudioPlayer.soundFilesPath);
+            FileInfo[] filesInSoundDirectory = soundDirectory.GetFiles();
+            foreach (FileInfo fileInSoundDirectory in filesInSoundDirectory)
             {
-                audioPlayer.playMessage(new QueuedMessage("int" + i, MessageContents(random.Next(3100)), 0, this));
-            }
-            for (int i = 0; i < 10; i++)
-            {
-                audioPlayer.playMessage(new QueuedMessage("time" + i, MessageContents(TimeSpan.FromSeconds(random.Next(4000) + ((float)random.Next(9) / 10f))), 0, this));
-            }
+                if (fileInSoundDirectory.Name == "read_number_tests.txt")
+                {
+                    for (int i = 0; i < 10; i++)
+                    {
+                        audioPlayer.playMessage(new QueuedMessage("int" + i, MessageContents(random.Next(3100)), 0, this));
+                    }
+                    for (int i = 0; i < 10; i++)
+                    {
+                        audioPlayer.playMessage(new QueuedMessage("time" + i, MessageContents(TimeSpan.FromSeconds(random.Next(4000) + ((float)random.Next(9) / 10f))), 0, this));
+                    }
+                    break;
+                }
+            }            
 
             /*audioPlayer.playMessage(new QueuedMessage("gap test", MessageContents(LapTimes.folderGapIntro, TimeSpan.FromSeconds(3.1),
                 LapTimes.folderGapOutroOffPace), 0, this));*/
