@@ -922,7 +922,7 @@ namespace CrewChiefV4.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
         public bool practice_and_qual_sector_reports_at_each_sector {
             get {
                 return ((bool)(this["practice_and_qual_sector_reports_at_each_sector"]));
@@ -946,7 +946,7 @@ namespace CrewChiefV4.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool practice_and_qual_sector_reports_at_lap_end {
             get {
                 return ((bool)(this["practice_and_qual_sector_reports_at_lap_end"]));
