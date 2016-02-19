@@ -33,14 +33,15 @@ namespace CrewChiefV4.NumberProcessing
 
         private static String folderASecond = "numbers_it/a_second";
         private static String folderSeconds = "numbers_it/seconds";
+        // this is a separate set of number recordings for numbers which are to be read as seconds
+        private static String folderSecondsNumbersPrefix = "numbers_it/numbers_seconds_";
 
         private static String folderMinutesAnd = "numbers_it/minutes_and";
         private static String folderAMinuteAnd = "numbers_it/a_minute_and"; 
         private static String folderMinutes = "numbers_it/minutes";
         private static String folderAMinute = "numbers_it/a_minute";
-
-        private static String folderZeroZero = "numbers_it/zerozero";
-        private static String folderZero = "numbers_it/zero";
+        // this is a separate set of number recordings for numbers which are to be read as minutes
+        private static String folderMinutesNumbersPrefix = "numbers_it/numbers_minutes_";
 
         private static String folderAnHourAnd = "numbers_it/an_hour_and";
         private static String folderAnHour = "numbers_it/an_hour";
@@ -79,10 +80,6 @@ namespace CrewChiefV4.NumberProcessing
                     messages.Add(folderHours);
                 }
             }
-            if (messages.Count > 0)
-            {
-                Console.WriteLine(String.Join(", ", messages));
-            }
             return messages;
         }
 
@@ -102,7 +99,7 @@ namespace CrewChiefV4.NumberProcessing
                 }
                 else if (minutes > 0)
                 {
-                    messages.Add(folderNumbersStub + minutes);
+                    messages.Add(folderMinutesNumbersPrefix + minutes);
                     messages.Add(folderMinutes);
                 }
             }
@@ -110,7 +107,7 @@ namespace CrewChiefV4.NumberProcessing
             {
                 if (tenths > 0)
                 {
-                    messages.Add(folderNumbersStub + minutes);
+                    messages.Add(folderMinutesNumbersPrefix + minutes);
                 }
                 else
                 {
@@ -128,7 +125,7 @@ namespace CrewChiefV4.NumberProcessing
                     }
                     else
                     {
-                        messages.Add(folderNumbersStub + minutes);
+                        messages.Add(folderMinutesNumbersPrefix + minutes);
                         if (seconds > 0)
                         {
                             messages.Add(folderMinutesAnd);
@@ -139,10 +136,6 @@ namespace CrewChiefV4.NumberProcessing
                         }
                     }
                 }
-            }
-            if (messages.Count > 0)
-            {
-                Console.WriteLine(String.Join(", ", messages));
             }
             return messages;
         }
@@ -165,7 +158,7 @@ namespace CrewChiefV4.NumberProcessing
                     }
                     else if (seconds > 0)
                     {
-                        messages.Add(folderNumbersStub + seconds);
+                        messages.Add(folderSecondsNumbersPrefix + seconds);
                         messages.Add(folderSeconds);
                     }
                 }
@@ -174,26 +167,26 @@ namespace CrewChiefV4.NumberProcessing
                     // if we have some minutes the seconds won't include the "seconds" sound
                     if (seconds == 0)
                     {
-                        messages.Add(folderZeroZero);
+                        messages.Add(folderSecondsNumbersPrefix + "00");
                     }
                     else
                     {
+                        // do we add a zero here?
+                        String secondsFolderSuffix;
                         if (seconds < 10)
                         {
-                            messages.Add(folderZero);
+                            secondsFolderSuffix = "0" + seconds;
+                        } else {
+                            secondsFolderSuffix = seconds.ToString();
                         }
-                        messages.Add(folderNumbersStub + seconds);
+                        messages.Add(folderSecondsNumbersPrefix + secondsFolderSuffix);
                     }
                 }
                 else if (seconds > 0)
                 {
-                    messages.Add(folderNumbersStub + seconds);
+                    messages.Add(folderSecondsNumbersPrefix + seconds);
                 }
-            }
-            if (messages.Count > 0)
-            {
-                Console.WriteLine(String.Join(", ", messages));
-            }
+            }            
             return messages;
         }
 
@@ -228,10 +221,6 @@ namespace CrewChiefV4.NumberProcessing
                         messages.Add(folderAndTenthsPrefix + tenths);
                     }
                 }
-            }
-            if (messages.Count > 0)
-            {
-                Console.WriteLine(String.Join(", ", messages));
             }
             return messages;
         }
@@ -303,10 +292,6 @@ namespace CrewChiefV4.NumberProcessing
                 {
                     messages.Add(folderNumbersStub + tensAndUnits);
                 }
-            }
-            if (messages.Count > 0)
-            {
-                Console.WriteLine(String.Join(", ", messages));
             }
             return messages;
         }

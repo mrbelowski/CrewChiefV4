@@ -90,18 +90,15 @@ namespace CrewChiefV4.Events
             //audioPlayer.playMessage(new QueuedMessage("sectortest1", LapTimes.getSectorDeltaMessages(LapTimes.SectorReportOption.ALL, 20.5f, 20, 33, 34.1f, 10, 10.1f, true), 0, this));
 
             audioPlayer.playMessage(new QueuedMessage(folderTest, 0, this));
-            /*audioPlayer.playMessage(new QueuedMessage("int1", MessageContents(143), 0, this));
-            audioPlayer.playMessage(new QueuedMessage("int2", MessageContents(1), 0, this));
-            audioPlayer.playMessage(new QueuedMessage("int3", MessageContents(1000), 0, this));
-            audioPlayer.playMessage(new QueuedMessage("int4", MessageContents(2300), 0, this));
-            audioPlayer.playMessage(new QueuedMessage("int5", MessageContents(401), 0, this));
+            for (int i = 0; i < 10; i++)
+            {
+                audioPlayer.playMessage(new QueuedMessage("int" + i, MessageContents(random.Next(3100)), 0, this));
+            }
+            for (int i = 0; i < 10; i++)
+            {
+                audioPlayer.playMessage(new QueuedMessage("time" + i, MessageContents(TimeSpan.FromSeconds(random.Next(4000) + ((float)random.Next(9) / 10f))), 0, this));
+            }
 
-            audioPlayer.playMessage(new QueuedMessage("time1", MessageContents(TimeSpan.FromMinutes(32.1)), 0, this));
-            audioPlayer.playMessage(new QueuedMessage("time2", MessageContents(TimeSpan.FromSeconds(47.12)), 0, this));
-            audioPlayer.playMessage(new QueuedMessage("time3", MessageContents(TimeSpan.FromSeconds(101)), 0, this));
-            audioPlayer.playMessage(new QueuedMessage("time4", MessageContents(TimeSpan.FromSeconds(0.4)), 0, this));
-            audioPlayer.playMessage(new QueuedMessage("time5", MessageContents(TimeSpan.FromMinutes(61)), 0, this));
-            audioPlayer.playMessage(new QueuedMessage("time6", MessageContents(TimeSpan.FromSeconds(1.1)), 0, this));*/
             /*audioPlayer.playMessage(new QueuedMessage("gap test", MessageContents(LapTimes.folderGapIntro, TimeSpan.FromSeconds(3.1),
                 LapTimes.folderGapOutroOffPace), 0, this));*/
             testDriverNames();
