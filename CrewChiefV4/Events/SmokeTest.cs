@@ -105,6 +105,10 @@ namespace CrewChiefV4.Events
                     {
                         audioPlayer.playMessage(new QueuedMessage("time" + i, MessageContents(TimeSpan.FromSeconds(random.Next(4000) + ((float)random.Next(9) / 10f))), 0, this));
                     }
+                    for (int i = 0; i < 10; i++)
+                    {
+                        audioPlayer.playMessage(new QueuedMessage("time" + i, MessageContents(TimeSpan.FromSeconds(random.Next(60) + ((float)random.Next(9) / 10f))), 0, this));
+                    }
                     break;
                 }
             }            

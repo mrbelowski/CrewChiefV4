@@ -22,13 +22,15 @@ namespace CrewChiefV4.NumberProcessing
         private static String folderThousands = "numbers_it/thousands";
 
 
-        // folders for reading out times
-        private static String folderTenths = "numbers_it/tenths";
+        // folders for reading out times.
+
+        // This is combined with folderNumbersStub to produce tenths sounds for tenths > 1 - numbers_it/2_tenths -> numbers_it/9_tenths
+        private static String folderTenthsSuffix = "_tenths";
         private static String folderATenth = "numbers_it/a_tenth";
 
         // this is used for reading out the number of tenths - "and 1, "and 2", etc.
         // The name is built up with the number of tenths, so we need folders called
-        // ""numbers_it/and_1", "numbers_it/and_2", etc
+        // ""numbers_it/and_0", "numbers_it/and_1", etc
         private static String folderAndTenthsPrefix = "numbers_it/and_";
 
         private static String folderASecond = "numbers_it/a_second";
@@ -105,36 +107,14 @@ namespace CrewChiefV4.NumberProcessing
             }
             else if (minutes > 0)
             {
-                if (tenths > 0)
+                // if we have only 1 minute we say "a minute" then the rest...
+                if (minutes == 1)
+                {
+                    messages.Add(folderAMinute);
+                }
+                else if (minutes > 0)
                 {
                     messages.Add(folderMinutesNumbersPrefix + minutes);
-                }
-                else
-                {
-                    // no tenths, so we'll have the "and" here if there are some seconds
-                    if (minutes == 1)
-                    {
-                        if (seconds > 0)
-                        {
-                            messages.Add(folderAMinuteAnd);
-                        }
-                        else
-                        {
-                            messages.Add(folderAMinute);
-                        }
-                    }
-                    else
-                    {
-                        messages.Add(folderMinutesNumbersPrefix + minutes);
-                        if (seconds > 0)
-                        {
-                            messages.Add(folderMinutesAnd);
-                        }
-                        else
-                        {
-                            messages.Add(folderMinutes);
-                        }
-                    }
                 }
             }
             return messages;
@@ -149,7 +129,28 @@ namespace CrewChiefV4.NumberProcessing
             // special case here - if we're reading a time which has hours, the seconds aren't significant so ignore them
             if (hours == 0)
             {
-                if (minutes == 0 || tenths == 0) 
+                if (minutes != 0)
+                {
+                    if (seconds == 0 && tenths != 0)
+                    {
+                        // say "zero zero" so we can add the non-zero tenths
+                        messages.Add(folderSecondsNumbersPrefix + "00");
+                    }
+                    else
+                    {
+                        String secondsFolderSuffix;
+                        if (seconds < 10)
+                        {
+                            secondsFolderSuffix = "0" + seconds;
+                        }
+                        else
+                        {
+                            secondsFolderSuffix = seconds.ToString();
+                        }
+                        messages.Add(folderSecondsNumbersPrefix + secondsFolderSuffix);
+                    }
+                }
+                else
                 {
                     // if there are no minutes we'll always read the "seconds"
                     if (seconds == 1)
@@ -162,31 +163,7 @@ namespace CrewChiefV4.NumberProcessing
                         messages.Add(folderSeconds);
                     }
                 }
-                else if (tenths > 0)
-                {
-                    // if we have some minutes the seconds won't include the "seconds" sound
-                    if (seconds == 0)
-                    {
-                        messages.Add(folderSecondsNumbersPrefix + "00");
-                    }
-                    else
-                    {
-                        // do we add a zero here?
-                        String secondsFolderSuffix;
-                        if (seconds < 10)
-                        {
-                            secondsFolderSuffix = "0" + seconds;
-                        } else {
-                            secondsFolderSuffix = seconds.ToString();
-                        }
-                        messages.Add(folderSecondsNumbersPrefix + secondsFolderSuffix);
-                    }
-                }
-                else if (seconds > 0)
-                {
-                    messages.Add(folderSecondsNumbersPrefix + seconds);
-                }
-            }            
+            }
             return messages;
         }
 
@@ -209,17 +186,13 @@ namespace CrewChiefV4.NumberProcessing
                     }
                     else
                     {
-                        messages.Add(folderNumbersStub + tenths);
-                        messages.Add(folderTenths);
+                        messages.Add(folderNumbersStub + tenths + folderTenthsSuffix);
                     }
                 }
-                else
+                else if (seconds > 0 || tenths > 0)
                 {
-                    if (tenths > 0)
-                    {
-                        // we need to add the "and... " here
-                        messages.Add(folderAndTenthsPrefix + tenths);
-                    }
+                    // we need to add the "and... " here
+                    messages.Add(folderAndTenthsPrefix + tenths);
                 }
             }
             return messages;
