@@ -2,6 +2,8 @@ CrewChief version 4.
 
 Changelog
 ---------
+Version 4.1.4.0: Reworked sector delta reporting to provide actual deltas, rather than approximations; Some changes to the Italian number reader (still work in progress).
+
 Version 4.1.3.2: Removed some debug code that shouldn't have made it into the release.
 
 Version 4.1.3.1: A couple of internal fixes.
