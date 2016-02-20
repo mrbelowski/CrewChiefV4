@@ -1249,13 +1249,13 @@ namespace CrewChiefV4.RaceRoom
             if (carClassEnum == CarData.CarClassEnum.DTM_2014)
             {
                 // is the race-end check correct here? I assume DRS is disabled for the last 2 laps, but I really am just guessing...
-                overtakingAids.DrsEnabled = sessionType == SessionType.Race && lapsCompleted > 2 && (lapsInSession < 1 || lapsInSession > lapsCompleted + 2);
+                overtakingAids.DrsEnabled = sessionType == SessionType.Race && lapsCompleted > 2/* && (lapsInSession < 1 || lapsInSession > lapsCompleted + 2)*/;
                 overtakingAids.DrsRange = 2;
             }
             else if (carClassEnum == CarData.CarClassEnum.DTM_2015)
             {
                 // is the race-end check correct here? I assume DRS is disabled for the last 3 minutes, but I really am just guessing...
-                overtakingAids.DrsEnabled = sessionType == SessionType.Race && lapsCompleted > 3 && (sessionTimeRemaining < 0 || sessionTimeRemaining > 180);
+                overtakingAids.DrsEnabled = sessionType == SessionType.Race && lapsCompleted > 3/* && (sessionTimeRemaining < 0 || sessionTimeRemaining > 180)*/;
                 overtakingAids.DrsRange = 1;
             }
             overtakingAids.PushToPassActivationsRemaining = shared.push_to_pass.amount_left;
