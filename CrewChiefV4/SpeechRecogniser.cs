@@ -476,7 +476,6 @@ namespace CrewChiefV4
 
         public void recognizeAsyncCancel()
         {
-            waitingForSpeech = false;
             sre.RecognizeAsyncCancel();
         }
 

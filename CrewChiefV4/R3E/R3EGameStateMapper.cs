@@ -975,7 +975,8 @@ namespace CrewChiefV4.RaceRoom
                 currentGameState.TyreData.RightRearIsSpinning = Math.Abs(shared.wheel_speed.rear_right) > maxRotatingSpeed;
             }
             currentGameState.OvertakingAids = getOvertakingAids(shared, currentGameState.carClass.carClassEnum, currentGameState.SessionData.CompletedLaps,
-                currentGameState.SessionData.SessionNumberOfLaps, currentGameState.SessionData.SessionType);
+                currentGameState.SessionData.SessionNumberOfLaps, currentGameState.SessionData.SessionTimeRemaining,
+                currentGameState.SessionData.SessionType);
             return currentGameState;
         }
 
@@ -1239,7 +1240,8 @@ namespace CrewChiefV4.RaceRoom
             }
         }
 
-        private OvertakingAids getOvertakingAids(RaceRoomShared shared, CarData.CarClassEnum carClassEnum, int lapsCompleted, int lapsInSession, SessionType sessionType)
+        private OvertakingAids getOvertakingAids(RaceRoomShared shared, CarData.CarClassEnum carClassEnum, 
+            int lapsCompleted, int lapsInSession, float sessionTimeRemaining, SessionType sessionType)
         {
             OvertakingAids overtakingAids = new OvertakingAids();
             overtakingAids.DrsAvailable = shared.DrsAvailable == 1;
@@ -1252,8 +1254,8 @@ namespace CrewChiefV4.RaceRoom
             }
             else if (carClassEnum == CarData.CarClassEnum.DTM_2015)
             {
-                // is the race-end check correct here? I assume DRS is disabled for the last 2 laps, but I really am just guessing...
-                overtakingAids.DrsEnabled = sessionType == SessionType.Race && lapsCompleted > 3 && (lapsInSession < 1 || lapsInSession > lapsCompleted + 2);
+                // is the race-end check correct here? I assume DRS is disabled for the last 3 minutes, but I really am just guessing...
+                overtakingAids.DrsEnabled = sessionType == SessionType.Race && lapsCompleted > 3 && (sessionTimeRemaining < 0 || sessionTimeRemaining > 180);
                 overtakingAids.DrsRange = 1;
             }
             overtakingAids.PushToPassActivationsRemaining = shared.push_to_pass.amount_left;
