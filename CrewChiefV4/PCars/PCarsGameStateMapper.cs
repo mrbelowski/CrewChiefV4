@@ -57,6 +57,7 @@ namespace CrewChiefV4.PCars
         private float severeBrakeDamageThreshold = 0.6f;
         private float destroyedBrakeDamageThreshold = 0.90f;
 
+        // TODO: have separate thresholds for tin-tops and open wheelers with wings here
         private float trivialAeroDamageThreshold = 0.1f;
         private float minorAeroDamageThreshold = 0.25f;
         private float severeAeroDamageThreshold = 0.6f;

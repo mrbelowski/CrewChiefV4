@@ -1238,19 +1238,21 @@ namespace CrewChiefV4.RaceRoom
             }
         }
 
-        private OvertakingAids getOvertakingAids(RaceRoomShared shared, CarData.CarClassEnum carClassEnum, int lapsCompleted, SessionType sessionType)
+        private OvertakingAids getOvertakingAids(RaceRoomShared shared, CarData.CarClassEnum carClassEnum, int lapsCompleted, int lapsInSession, SessionType sessionType)
         {
             OvertakingAids overtakingAids = new OvertakingAids();
             overtakingAids.DrsAvailable = shared.DrsAvailable == 1;
             overtakingAids.DrsEngaged = shared.DrsEngaged == 1;
             if (carClassEnum == CarData.CarClassEnum.DTM_2014)
             {
-                overtakingAids.DrsEnabled = sessionType == SessionType.Race && lapsCompleted > 2;
+                // is the race-end check correct here? I assume DRS is disabled for the last 2 laps, but I really am just guessing...
+                overtakingAids.DrsEnabled = sessionType == SessionType.Race && lapsCompleted > 2 && (lapsInSession < 1 || lapsInSession > lapsCompleted + 2);
                 overtakingAids.DrsRange = 2;
             }
             else if (carClassEnum == CarData.CarClassEnum.DTM_2015)
             {
-                overtakingAids.DrsEnabled = sessionType == SessionType.Race && lapsCompleted > 3;
+                // is the race-end check correct here? I assume DRS is disabled for the last 2 laps, but I really am just guessing...
+                overtakingAids.DrsEnabled = sessionType == SessionType.Race && lapsCompleted > 3 && (lapsInSession < 1 || lapsInSession > lapsCompleted + 2);
                 overtakingAids.DrsRange = 1;
             }
             overtakingAids.PushToPassActivationsRemaining = shared.push_to_pass.amount_left;
