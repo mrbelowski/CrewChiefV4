@@ -974,7 +974,8 @@ namespace CrewChiefV4.RaceRoom
                 currentGameState.TyreData.LeftRearIsSpinning = Math.Abs(shared.wheel_speed.rear_left) > maxRotatingSpeed;
                 currentGameState.TyreData.RightRearIsSpinning = Math.Abs(shared.wheel_speed.rear_right) > maxRotatingSpeed;
             }
-            currentGameState.OvertakingAids = getOvertakingAids(shared, currentGameState.carClass.carClassEnum, currentGameState.SessionData.CompletedLaps, currentGameState.SessionData.SessionType);
+            currentGameState.OvertakingAids = getOvertakingAids(shared, currentGameState.carClass.carClassEnum, currentGameState.SessionData.CompletedLaps,
+                currentGameState.SessionData.SessionNumberOfLaps, currentGameState.SessionData.SessionType);
             return currentGameState;
         }
 
