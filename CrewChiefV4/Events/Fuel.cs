@@ -39,7 +39,7 @@ namespace CrewChiefV4.Events
 
         public static String folderLitresRemaining = "fuel/litres_remaining";
 
-        public static String folderLitreRemaining = "fuel/litre_remaining";
+        public static String folderOneLitreRemaining = "fuel/one_litre_remaining";
 
         public static String folderAboutToRunOut = "fuel/about_to_run_out";
 
@@ -189,7 +189,7 @@ namespace CrewChiefV4.Events
                     else if (enableFuelMessages && currentFuel <= 1 && !played1LitreWarning)
                     {
                         played1LitreWarning = true;
-                        audioPlayer.playMessage(new QueuedMessage("Fuel/level", MessageContents(1, folderLitreRemaining), 0, null));
+                        audioPlayer.playMessage(new QueuedMessage("Fuel/level", MessageContents(folderOneLitreRemaining), 0, null));
                     }
                 }
                 if (currentGameState.SessionData.IsNewLap && initialised && currentGameState.SessionData.CompletedLaps > lapsCompletedWhenFuelWasReset 
@@ -421,7 +421,11 @@ namespace CrewChiefV4.Events
                     {
                         audioPlayer.playMessageImmediately(new QueuedMessage("Fuel/level",
                                     MessageContents((int)currentFuel, folderLitresRemaining), 0, null));
-                        
+                    }
+                    else if (currentFuel > 0)
+                    {
+                        audioPlayer.playMessageImmediately(new QueuedMessage("Fuel/level",
+                                    MessageContents(folderOneLitreRemaining), 0, null));
                     }
                     else
                     {
