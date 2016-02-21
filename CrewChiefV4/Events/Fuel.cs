@@ -422,10 +422,15 @@ namespace CrewChiefV4.Events
                         audioPlayer.playMessageImmediately(new QueuedMessage("Fuel/level",
                                     MessageContents((int)currentFuel, folderLitresRemaining), 0, null));
                     }
-                    else if (currentFuel > 0)
+                    else if (currentFuel >= 1)
                     {
                         audioPlayer.playMessageImmediately(new QueuedMessage("Fuel/level",
                                     MessageContents(folderOneLitreRemaining), 0, null));
+                    }
+                    else if (currentFuel > 0)
+                    {
+                        audioPlayer.playMessageImmediately(new QueuedMessage("Fuel/level",
+                                MessageContents(folderAboutToRunOut), 0, null));
                     }
                     else
                     {
