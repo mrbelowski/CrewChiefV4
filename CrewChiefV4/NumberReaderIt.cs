@@ -15,7 +15,6 @@ namespace CrewChiefV4.NumberProcessing
 
         // these are used to build up the hundreds folder names, combining with folderNumbersStub - i.e.
         // "numbers_it/1_hundreds","numbers_it/2_hundreds", etc
-        private static String folderNumbersItPrefix = "numbers_it/";
         private static String folderHundredSuffix = "_hundreds";
 
         private static String folderThousand = "numbers_it/thousand";
@@ -30,20 +29,17 @@ namespace CrewChiefV4.NumberProcessing
 
         // this is used for reading out the number of tenths - "and 1, "and 2", etc.
         // The name is built up with the number of tenths, so we need folders called
-        // ""numbers_it/and_0", "numbers_it/and_1", etc
+        // "numbers_it/and_0", "numbers_it/and_1", etc
         private static String folderAndTenthsPrefix = "numbers_it/and_";
 
-        private static String folderASecond = "numbers_it/a_second";
-        private static String folderSeconds = "numbers_it/seconds";
-        // this is a separate set of number recordings for numbers which are to be read as seconds
+        // this is a separate set of number recordings for numbers which are to be read as seconds, but only where we'll read some tenths afterwards.
+        // These have a special inflection specific to numbers read as, e.g. "one *zero six* and 4" or "3 *twenty* and zero"
         private static String folderSecondsNumbersPrefix = "numbers_it/numbers_seconds_";
+        private static String folderSeconds = "numbers_it/seconds";
+        private static String folderASecond = "numbers_it/a_second";
 
-        private static String folderMinutesAnd = "numbers_it/minutes_and";
-        private static String folderAMinuteAnd = "numbers_it/a_minute_and"; 
         private static String folderMinutes = "numbers_it/minutes";
         private static String folderAMinute = "numbers_it/a_minute";
-        // this is a separate set of number recordings for numbers which are to be read as minutes
-        private static String folderMinutesNumbersPrefix = "numbers_it/numbers_minutes_";
 
         private static String folderAnHourAnd = "numbers_it/an_hour_and";
         private static String folderAnHour = "numbers_it/an_hour";
@@ -101,20 +97,25 @@ namespace CrewChiefV4.NumberProcessing
                 }
                 else if (minutes > 0)
                 {
-                    messages.Add(folderMinutesNumbersPrefix + minutes);
+                    messages.Add(folderNumbersStub + minutes);
                     messages.Add(folderMinutes);
                 }
             }
             else if (minutes > 0)
             {
-                // if we have only 1 minute we say "a minute" then the rest...
-                if (minutes == 1)
+                // if we have only 1 minute and no tenths or seconds, we say "a minute"
+                if (minutes == 1 && seconds == 0 && tenths == 0)
                 {
                     messages.Add(folderAMinute);
                 }
                 else if (minutes > 0)
                 {
-                    messages.Add(folderMinutesNumbersPrefix + minutes);
+                    messages.Add(folderNumbersStub + minutes);
+                    // add "minutes" if there's nothing else to read
+                    if (seconds == 0 && tenths == 0)
+                    {
+                        messages.Add(folderMinutes);
+                    }
                 }
             }
             return messages;
@@ -157,9 +158,9 @@ namespace CrewChiefV4.NumberProcessing
                     {
                         messages.Add(folderASecond);
                     }
-                    else if (seconds > 0)
+                    else if (seconds > 1)
                     {
-                        messages.Add(folderSecondsNumbersPrefix + seconds);
+                        messages.Add(folderNumbersStub + seconds);
                         messages.Add(folderSeconds);
                     }
                 }
@@ -259,7 +260,7 @@ namespace CrewChiefV4.NumberProcessing
                 }
                 if (hundreds != null)
                 {
-                    messages.Add(folderNumbersItPrefix + hundreds + folderHundredSuffix);
+                    messages.Add(folderNumbersStub + hundreds + folderHundredSuffix);
                 }
                 if (tensAndUnits != null)
                 {
