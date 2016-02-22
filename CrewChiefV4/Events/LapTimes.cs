@@ -980,10 +980,11 @@ namespace CrewChiefV4.Events
         public static List<MessageFragment> getSingleSectorDeltaMessages(SectorSet sector, float playerTime, float comparisonTime)
         {
             List<MessageFragment> messages = new List<MessageFragment>();
-            if (playerTime > 0 && comparisonTime > 0)
+            // the sector times must be > 5 seconds to be considered valid
+            if (playerTime > 5 && comparisonTime > 5)
             {
                 float delta = ((float)Math.Round((playerTime - comparisonTime) * 10)) / 10f;
-                if (delta < 0)
+                if (delta < 0.05)
                 {
                     if (sector == SectorSet.ONE) {
                         messages.Add(MessageFragment.Text(folderSector1Fast));
@@ -1070,7 +1071,8 @@ namespace CrewChiefV4.Events
             float delta1 = float.MaxValue;
             float delta2 = float.MaxValue;
             float delta3 = float.MaxValue;
-            if (playerSector1 > 0 && comparisonSector1 > 0)
+            // the sector times must be > 5 seconds to be considered valid
+            if (playerSector1 > 5 && comparisonSector1 > 5)
             {
                 if (playerSector1 < comparisonSector1)
                 {
@@ -1080,7 +1082,7 @@ namespace CrewChiefV4.Events
                 {
                     delta1 = ((float)Math.Round((playerSector1 - comparisonSector1) * 10)) / 10f;
                 }
-            } if (playerSector2 > 0 && comparisonSector2 > 0)
+            } if (playerSector2 > 5 && comparisonSector2 > 5)
             {
                 if (playerSector2 < comparisonSector2)
                 {
@@ -1091,7 +1093,7 @@ namespace CrewChiefV4.Events
                     delta2 = ((float)Math.Round((playerSector2 - comparisonSector2) * 10)) / 10f;
                 }
             }
-            if (playerSector3 > 0 && comparisonSector3 > 0)
+            if (playerSector3 > 5 && comparisonSector3 > 5)
             {
                 if (playerSector3 < comparisonSector3)
                 {
@@ -1136,7 +1138,7 @@ namespace CrewChiefV4.Events
                     reportedDelta1 = true;
                     reportedDelta2 = true;
                     reportedDelta3 = true;
-                    if (delta1 == -1)
+                    if (delta1 < 0.04)
                     {
                         messageFragments.Add(MessageFragment.Text(folderAllSectorsFast));
                     }
@@ -1163,7 +1165,7 @@ namespace CrewChiefV4.Events
                 {
                     reportedDelta1 = true;
                     reportedDelta2 = true;
-                    if (delta1 == -1)
+                    if (delta1 < 0.05)
                     {
                         messageFragments.Add(MessageFragment.Text(folderSector1and2Fast));
                     }
@@ -1191,7 +1193,7 @@ namespace CrewChiefV4.Events
             {
                 reportedDelta2 = true;
                 reportedDelta3 = true;
-                if (delta2 == -1)
+                if (delta2 < 0.05)
                 {
                     messageFragments.Add(MessageFragment.Text(folderSector2and3Fast));
                 }
@@ -1218,7 +1220,7 @@ namespace CrewChiefV4.Events
             {
                 reportedDelta1 = true;
                 reportedDelta3 = true;
-                if (delta1 == -1)
+                if (delta1 < 0.05)
                 {
                     messageFragments.Add(MessageFragment.Text(folderSector1and3Fast));
                 }
@@ -1244,7 +1246,7 @@ namespace CrewChiefV4.Events
 
             if (!reportedDelta1)
             {
-                if (delta1 == -1)
+                if (delta1 < 0.05)
                 {
                     messageFragments.Add(MessageFragment.Text(folderSector1Fast));
                 }
@@ -1269,7 +1271,7 @@ namespace CrewChiefV4.Events
             }
             if (!reportedDelta2)
             {
-                if (delta2 == -1)
+                if (delta2 < 0.05)
                 {
                     messageFragments.Add(MessageFragment.Text(folderSector2Fast));
                 }
@@ -1294,7 +1296,7 @@ namespace CrewChiefV4.Events
             }
             if (!reportedDelta3)
             {
-                if (delta3 == -1)
+                if (delta3 < 0.05)
                 {
                     messageFragments.Add(MessageFragment.Text(folderSector3Fast));
                 }
