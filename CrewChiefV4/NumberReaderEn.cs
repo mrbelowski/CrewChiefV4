@@ -151,8 +151,9 @@ namespace CrewChiefV4.NumberProcessing
         /**
          * Get an English sound for a whole number of tenths of a second.
          */
-        protected override List<String> GetTenthsSounds(int hours, int minutes, int seconds, int tenths)
+        protected override List<String> GetTenthsSounds(int hours, int minutes, int seconds, int tenths, Boolean useMoreInflection)
         {
+            // hanging inflection isn't used for English tenths sounds - it's not needed
             List<String> messages = new List<String>();
             // special case here - if we're reading a time which has hours, the tenths aren't significant so ignore them. 
             // Still read the tenths if we have > 0 minutes, because this is common for laptimes

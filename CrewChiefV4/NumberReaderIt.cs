@@ -13,6 +13,9 @@ namespace CrewChiefV4.NumberProcessing
         // list to play called "numbers/[number]" - i.e. numbers/45 or numbers/1. This is used a lot in the implementations below.
         private static String folderNumbersStub = "numbers_it/";
 
+        // the number sounds for tenths sometimes need a 'hanging inflection' - add this suffix when they do
+        private static String moreInflectionSuffix = "_more";
+
         // these are used to build up the hundreds folder names, combining with folderNumbersStub - i.e.
         // "numbers_it/1_hundreds","numbers_it/2_hundreds", etc
         private static String folderHundredSuffix = "_hundreds";
@@ -171,9 +174,10 @@ namespace CrewChiefV4.NumberProcessing
         /**
          * Get an Italian sound for a whole number of tenths of a second.
          */
-        protected override List<String> GetTenthsSounds(int hours, int minutes, int seconds, int tenths)
+        protected override List<String> GetTenthsSounds(int hours, int minutes, int seconds, int tenths, Boolean useMoreInflection)
         {
             List<String> messages = new List<String>();
+            String addonForMoreInflectionn = useMoreInflection ? moreInflectionSuffix : "";
             // special case here - if we're reading a time which has hours, the tenths aren't significant so ignore them. 
             // Still read the tenths if we have > 0 minutes, because this is common for laptimes
             if (hours == 0 && tenths < 10)
@@ -183,17 +187,17 @@ namespace CrewChiefV4.NumberProcessing
                 {                    
                     if (tenths == 1)
                     {
-                        messages.Add(folderATenth);
+                        messages.Add(folderATenth + addonForMoreInflectionn);
                     }
                     else
                     {
-                        messages.Add(folderNumbersStub + tenths + folderTenthsSuffix);
+                        messages.Add(folderNumbersStub + tenths + folderTenthsSuffix + addonForMoreInflectionn);
                     }
                 }
                 else if (seconds > 0 || tenths > 0)
                 {
                     // we need to add the "and... " here
-                    messages.Add(folderAndTenthsPrefix + tenths);
+                    messages.Add(folderAndTenthsPrefix + tenths + addonForMoreInflectionn);
                 }
             }
             return messages;

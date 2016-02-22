@@ -180,8 +180,9 @@ namespace CrewChiefV4
         private List<String> getMessageFolders(List<MessageFragment> messageFragments)
         {
             List<String> messages = new List<String>();
-            foreach (MessageFragment messageFragment in messageFragments) 
+            for (int i=0; i< messageFragments.Count; i++) 
             {
+                MessageFragment messageFragment = messageFragments[i];
                 if (messageFragment == null)
                 {
                     canBePlayed = false;
@@ -201,9 +202,12 @@ namespace CrewChiefV4
                         }                     
                         break;
                     case MessageFragment.FragmentType.Time:
+                        // if this time fragment is not the last message fragment, then some languages (Italian only at the time of writing)
+                        // require a different inflection to their tenths sounds
+                        Boolean useMoreInflection = i < messageFragments.Count - 1;
                         if (numberReader != null)
                         {
-                            List<String> timeFolders = numberReader.ConvertTimeToSounds(messageFragment.timeSpan);
+                            List<String> timeFolders = numberReader.ConvertTimeToSounds(messageFragment.timeSpan, useMoreInflection);
                             if (timeFolders.Count == 0)
                             {
                                 canBePlayed = false;

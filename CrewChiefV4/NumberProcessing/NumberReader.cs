@@ -32,14 +32,16 @@ namespace CrewChiefV4
         /**
          * Language specific implementation to speak a number of tenths, using whatever rules and words this language requires.
          * This might need to take the numbers of hours, minutes and seconds into consideration.
+         * The useMoreInflection tells the implementation to select a different tenths sound with a rising (or hanging) inflection. This
+         * is needed for Italian numbers.
          */
-        protected abstract List<String> GetTenthsSounds(int hours, int minutes, int seconds, int tenths);
+        protected abstract List<String> GetTenthsSounds(int hours, int minutes, int seconds, int tenths, Boolean useMoreInflection);
 
 
         /**
          * Convert a timeSpan to some sound files, using the current language's implementation.
          */
-        public List<String> ConvertTimeToSounds(TimeSpan timeSpan)
+        public List<String> ConvertTimeToSounds(TimeSpan timeSpan, Boolean useMoreInflection)
         {
             Console.WriteLine(new DateTime(timeSpan.Ticks).ToString("HH:mm:ss.F"));
             List<String> messageFolders = new List<String>();
@@ -57,7 +59,7 @@ namespace CrewChiefV4
                 messageFolders.AddRange(GetHoursSounds(timeSpan.Hours, timeSpan.Minutes, timeSpan.Seconds, tenths));
                 messageFolders.AddRange(GetMinutesSounds(timeSpan.Hours, timeSpan.Minutes, timeSpan.Seconds, tenths));
                 messageFolders.AddRange(GetSecondsSounds(timeSpan.Hours, timeSpan.Minutes, timeSpan.Seconds, tenths));
-                messageFolders.AddRange(GetTenthsSounds(timeSpan.Hours, timeSpan.Minutes, timeSpan.Seconds, tenths));
+                messageFolders.AddRange(GetTenthsSounds(timeSpan.Hours, timeSpan.Minutes, timeSpan.Seconds, tenths, useMoreInflection));
                 if (messageFolders.Count > 0)
                 {
                     Console.WriteLine(String.Join(", ", messageFolders));
