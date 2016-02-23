@@ -349,7 +349,6 @@ namespace CrewChiefV4
             {
                 initialiseSpeechEngine();
             }
-            runListenForButtonPressesThread = controllerConfiguration.listenForButtons(voiceOption == VoiceOptionEnum.TOGGLE);
             updateActions();
             this.assignButtonToAction.Enabled = false;
             this.deleteAssigmentButton.Enabled = false;
@@ -388,6 +387,7 @@ namespace CrewChiefV4
                             Thread.Sleep(2000);
                             if (!channelOpen && crewChief.speechRecogniser.waitingForSpeech)
                             {
+                                crewChief.speechRecogniser.waitingForSpeech = false;
                                 crewChief.youWot();
                             }
                         }).Start();                        
@@ -399,7 +399,6 @@ namespace CrewChiefV4
         private void listenForButtons()
         {
             DateTime lastButtoncheck = DateTime.Now;
-            Boolean channelOpen = false;
             if (crewChief.speechRecogniser.initialised && voiceOption == VoiceOptionEnum.TOGGLE) 
             {
                 Console.WriteLine("Running speech recognition in 'toggle button' mode");
@@ -437,23 +436,32 @@ namespace CrewChiefV4
                         crewChief.audioPlayer.repeatLastMessage();
                         nextPollWait = 1000;
                     }
-                    else if (crewChief.speechRecogniser.initialised && voiceOption == VoiceOptionEnum.TOGGLE && 
-                        controllerConfiguration.hasOutstandingClick(ControllerConfiguration.CHANNEL_OPEN_FUNCTION))
+                    else if (crewChief.speechRecogniser.initialised && voiceOption == VoiceOptionEnum.TOGGLE)
                     {
-                        crewChief.speechRecogniser.voiceOptionEnum = VoiceOptionEnum.TOGGLE;
-                        if (!channelOpen)
+                        if (controllerConfiguration.hasOutstandingClick(ControllerConfiguration.CHANNEL_OPEN_FUNCTION))
                         {
-                            Console.WriteLine("Listening...");
-                            channelOpen = true;
-                            crewChief.speechRecogniser.recognizeAsync();
+                            crewChief.speechRecogniser.voiceOptionEnum = VoiceOptionEnum.TOGGLE;
+                            if (!crewChief.speechRecogniser.waitingForSpeech)
+                            {
+                                Console.WriteLine("Listening...");
+                                crewChief.speechRecogniser.recognizeAsync();
+                            }
+                            /*else
+                            {
+                                Console.WriteLine("Finished listening...");
+                                crewChief.speechRecogniser.recognizeAsyncCancel();
+                                new Thread(() =>
+                                {
+                                    Thread.Sleep(2000);
+                                    if (crewChief.speechRecogniser.waitingForSpeech)
+                                    {
+                                        crewChief.speechRecogniser.waitingForSpeech = false;
+                                        crewChief.youWot();
+                                    }
+                                }).Start();
+                            }*/
+                            nextPollWait = 1000;
                         }
-                        else
-                        {
-                            Console.WriteLine("Finished listening...");
-                            channelOpen = false;
-                            crewChief.speechRecogniser.recognizeAsyncCancel();
-                        }
-                        nextPollWait = 1000;
                     }
                 }
                 Thread.Sleep(nextPollWait);
@@ -481,6 +489,7 @@ namespace CrewChiefV4
                         MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return;
                 }
+                this.runListenForButtonPressesThread = controllerConfiguration.listenForButtons(voiceOption == VoiceOptionEnum.TOGGLE);
                 this.assignButtonToAction.Enabled = false;
                 this.deleteAssigmentButton.Enabled = false;
                 this.groupBox1.Enabled = false;
@@ -519,10 +528,15 @@ namespace CrewChiefV4
             }
             else
             {
-                if (voiceOption == VoiceOptionEnum.ALWAYS_ON && crewChief.speechRecogniser.initialised)
+                if ((voiceOption == VoiceOptionEnum.ALWAYS_ON || voiceOption == VoiceOptionEnum.TOGGLE) && crewChief.speechRecogniser != null && crewChief.speechRecogniser.initialised)
                 {
                     Console.WriteLine("Stopping listening...");
-                    crewChief.speechRecogniser.recognizeAsyncCancel();
+                    try
+                    {                        
+                        crewChief.speechRecogniser.waitingForSpeech = false;
+                        crewChief.speechRecogniser.recognizeAsyncCancel();
+                    }
+                    catch (Exception) { }
                 }
                 this.deleteAssigmentButton.Enabled = this.buttonActionSelect.SelectedIndex > -1 &&
                     this.controllerConfiguration.buttonAssignments[this.buttonActionSelect.SelectedIndex].joystick != null;

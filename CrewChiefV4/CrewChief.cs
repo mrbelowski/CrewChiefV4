@@ -568,7 +568,7 @@ namespace CrewChiefV4
         public void stop()
         {
             running = false;
-            runSpotterThread = false;  
+            runSpotterThread = false;
         }
 
         private void displayNewSessionInfo(GameStateData currentGameState)

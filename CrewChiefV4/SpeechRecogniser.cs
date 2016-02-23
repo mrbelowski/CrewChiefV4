@@ -284,7 +284,7 @@ namespace CrewChiefV4
             }
             initialised = true;
         }
-
+        
         public void addNewOpponentName(String rawDriverName)
         {
             try
@@ -460,8 +460,7 @@ namespace CrewChiefV4
 
             sre.RecognizeAsyncStop(); 
             Thread.Sleep(500);
-            if (voiceOptionEnum == MainWindow.VoiceOptionEnum.ALWAYS_ON ||
-                voiceOptionEnum == MainWindow.VoiceOptionEnum.TOGGLE)
+            if (voiceOptionEnum == MainWindow.VoiceOptionEnum.ALWAYS_ON)
             {
                 Console.WriteLine("restarting speech recognition");
                 recognizeAsync();

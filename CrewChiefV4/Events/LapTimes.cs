@@ -734,9 +734,12 @@ namespace CrewChiefV4.Events
                 if (currentGameState != null && 
                     currentGameState.SessionData.LastSector1Time > -1 && currentGameState.SessionData.LastSector2Time > -1 && currentGameState.SessionData.LastSector3Time > -1)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage("sectorTimes",
-                        MessageContents(TimeSpan.FromSeconds(currentGameState.SessionData.LastSector1Time), 
-                        TimeSpan.FromSeconds(currentGameState.SessionData.LastSector2Time), TimeSpan.FromSeconds(currentGameState.SessionData.LastSector3Time)), 0, this));
+                    audioPlayer.playMessageImmediately(new QueuedMessage("sector1Time",
+                        MessageContents(TimeSpan.FromSeconds(currentGameState.SessionData.LastSector1Time)), 0, this));
+                    audioPlayer.playMessageImmediately(new QueuedMessage("sector2Time",
+                        MessageContents(TimeSpan.FromSeconds(currentGameState.SessionData.LastSector2Time)), 0, this));
+                    audioPlayer.playMessageImmediately(new QueuedMessage("sector3Time",
+                        MessageContents(TimeSpan.FromSeconds(currentGameState.SessionData.LastSector3Time)), 0, this));
                 }
                 else
                 {
