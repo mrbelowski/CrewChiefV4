@@ -441,11 +441,16 @@ namespace CrewChiefV4
                         if (controllerConfiguration.hasOutstandingClick(ControllerConfiguration.CHANNEL_OPEN_FUNCTION))
                         {
                             crewChief.speechRecogniser.voiceOptionEnum = VoiceOptionEnum.TOGGLE;
-                            if (!crewChief.speechRecogniser.waitingForSpeech)
+                            if (crewChief.speechRecogniser.waitingForSpeech)
                             {
-                                Console.WriteLine("Listening...");
-                                crewChief.speechRecogniser.recognizeAsync();
+                                Console.WriteLine("Cancelling...");
+                                crewChief.speechRecogniser.waitingForSpeech = false;
+                                crewChief.speechRecogniser.recognizeAsyncCancel();
                             }
+                            Console.WriteLine("Listening...");
+                            crewChief.audioPlayer.playStartListeningBeep();
+                            crewChief.speechRecogniser.recognizeAsync();
+                            
                             /*else
                             {
                                 Console.WriteLine("Finished listening...");
