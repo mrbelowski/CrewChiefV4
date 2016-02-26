@@ -136,7 +136,7 @@ namespace CrewChiefV4.Events
 
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
-            if (currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.PitData.HasMandatoryPitStop)
+            if (currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.PitData.HasMandatoryPitStop && currentGameState.SessionData.SessionPhase == SessionPhase.Green)
             {                
                 if (!pitDataInitialised)
                 {
@@ -162,13 +162,19 @@ namespace CrewChiefV4.Events
                     {
                         pitWindowOpenTime = currentGameState.PitData.PitWindowStart;
                         pitWindowClosedTime = currentGameState.PitData.PitWindowEnd;
-                        play2minOpenWarning = true;
-                        play1minOpenWarning = true;
-                        playOpenNow = true;
-                        play2minCloseWarning = true;
-                        play1minCloseWarning = true;
-                        playClosedNow = true;
-                        playPitThisLap = true;
+                        if (pitWindowOpenTime > 0)
+                        {
+                            play2minOpenWarning = pitWindowOpenTime > 2;
+                            play1minOpenWarning = pitWindowOpenTime > 1;
+                            playOpenNow = true;
+                        }
+                        if (pitWindowClosedTime > 0)
+                        {
+                            play2minCloseWarning = pitWindowClosedTime > 2;
+                            play1minCloseWarning = pitWindowClosedTime > 1;
+                            playClosedNow = true;
+                            playPitThisLap = true;
+                        }
                     }
                     else
                     {

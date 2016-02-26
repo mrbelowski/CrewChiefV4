@@ -879,7 +879,7 @@ namespace CrewChiefV4.PCars
                 // estimate the pit window close lap / time
                 if (currentGameState.SessionData.SessionHasFixedTime)
                 {
-                    currentGameState.PitData.PitWindowEnd = (int)(60 * currentGameState.SessionData.SessionRunTime) + 120;
+                    currentGameState.PitData.PitWindowEnd = (int)((currentGameState.SessionData.SessionRunTime - 120f) / 60f);
                 }
                 else
                 {
@@ -1361,14 +1361,14 @@ namespace CrewChiefV4.PCars
             if (currentGameState.PitData.PitWindowStart > 0)
             {
                 if ((currentGameState.SessionData.SessionNumberOfLaps > 0 && currentGameState.SessionData.CompletedLaps < currentGameState.PitData.PitWindowStart) ||
-                    (currentGameState.SessionData.SessionRunTime > 0 && currentGameState.SessionData.SessionRunningTime < currentGameState.PitData.PitWindowStart) ||
+                    (currentGameState.SessionData.SessionRunTime > 0 && currentGameState.SessionData.SessionRunningTime < currentGameState.PitData.PitWindowStart * 60) ||
                     (currentGameState.SessionData.SessionNumberOfLaps > 0 && currentGameState.SessionData.CompletedLaps > currentGameState.PitData.PitWindowEnd) ||
-                    (currentGameState.SessionData.SessionRunTime > 0 && currentGameState.SessionData.SessionRunningTime > currentGameState.PitData.PitWindowEnd))
+                    (currentGameState.SessionData.SessionRunTime > 0 && currentGameState.SessionData.SessionRunningTime > currentGameState.PitData.PitWindowEnd * 60))
                 {
                     return PitWindow.Closed;
                 }
                 else if ((currentGameState.SessionData.SessionNumberOfLaps > 0 && currentGameState.SessionData.CompletedLaps >= currentGameState.PitData.PitWindowStart) ||
-                    (currentGameState.SessionData.SessionRunTime > 0 && currentGameState.SessionData.SessionRunningTime >= currentGameState.PitData.PitWindowStart))
+                    (currentGameState.SessionData.SessionRunTime > 0 && currentGameState.SessionData.SessionRunningTime >= currentGameState.PitData.PitWindowStart * 60))
                 {
                     if (currentGameState.PitData.PitWindow == PitWindow.Completed ||
                         (currentGameState.PitData.PitWindow == PitWindow.StopInProgress && pitMode == (uint)ePitMode.PIT_MODE_DRIVING_OUT_OF_PITS))
