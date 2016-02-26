@@ -118,9 +118,9 @@ namespace CrewChiefV4.Events
             if (currentGameState.SessionData.SessionNumberOfLaps > 0) {
                 possibleMessages.Add(new QueuedMessage("race_distance", MessageContents(
                         currentGameState.SessionData.SessionNumberOfLaps, folderLapsMakeThemCount), 0, this));
-            } else if (currentGameState.SessionData.SessionHasFixedTime && currentGameState.SessionData.SessionRunTime > 0 && currentGameState.SessionData.SessionRunTime < 1800 &&
+            } else if (currentGameState.SessionData.SessionHasFixedTime && currentGameState.SessionData.SessionTotalRunTime > 0 && currentGameState.SessionData.SessionTotalRunTime < 1800 &&
                     currentGameState.SessionData.Position > 3) {
-                int minutes = (int)currentGameState.SessionData.SessionRunTime / 60;
+                int minutes = (int)currentGameState.SessionData.SessionTotalRunTime / 60;
                 possibleMessages.Add(new QueuedMessage("race_time", MessageContents(
                         minutes, folderMinutesYouNeedToGetOnWithIt), 0, this));
             }

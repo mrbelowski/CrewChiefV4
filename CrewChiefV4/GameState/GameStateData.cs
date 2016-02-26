@@ -141,7 +141,7 @@ namespace CrewChiefV4.GameState
         public DateTime SessionStartTime;
 
         // in minutes, 0 if this session is a fixed number of laps rather than a fixed time.
-        public float SessionRunTime = 0;
+        public float SessionTotalRunTime = 0;
 
         public int SessionNumberOfLaps = 0;
 

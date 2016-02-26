@@ -314,7 +314,7 @@ namespace CrewChiefV4.Events
 
                 completedLaps = currentGameState.SessionData.CompletedLaps;
                 lapsInSession = currentGameState.SessionData.SessionNumberOfLaps;
-                timeInSession = currentGameState.SessionData.SessionRunTime;
+                timeInSession = currentGameState.SessionData.SessionTotalRunTime;
                 timeElapsed = currentGameState.SessionData.SessionRunningTime;
                     
                 if (currentGameState.PitData.InPitlane && !currentGameState.SessionData.LeaderHasFinishedRace)

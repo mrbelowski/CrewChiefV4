@@ -227,7 +227,7 @@ namespace CrewChiefV4.RaceRoom
                         }
                         if (shared.SessionTimeRemaining > 0)
                         {
-                            currentGameState.SessionData.SessionRunTime = shared.SessionTimeRemaining;
+                            currentGameState.SessionData.SessionTotalRunTime = shared.SessionTimeRemaining;
                             currentGameState.SessionData.SessionHasFixedTime = true;
                         }
                         currentGameState.SessionData.SessionStartPosition = shared.Position;
@@ -299,7 +299,7 @@ namespace CrewChiefV4.RaceRoom
                         Console.WriteLine("PitWindowEnd " + currentGameState.PitData.PitWindowEnd);
                         Console.WriteLine("NumCarsAtStartOfSession " + currentGameState.SessionData.NumCarsAtStartOfSession);
                         Console.WriteLine("SessionNumberOfLaps " + currentGameState.SessionData.SessionNumberOfLaps);
-                        Console.WriteLine("SessionRunTime " + currentGameState.SessionData.SessionRunTime);
+                        Console.WriteLine("SessionRunTime " + currentGameState.SessionData.SessionTotalRunTime);
                         Console.WriteLine("SessionStartPosition " + currentGameState.SessionData.SessionStartPosition);
                         Console.WriteLine("SessionStartTime " + currentGameState.SessionData.SessionStartTime);
                         String trackName = currentGameState.SessionData.TrackDefinition == null ? "unknown" : currentGameState.SessionData.TrackDefinition.name;
@@ -309,7 +309,7 @@ namespace CrewChiefV4.RaceRoom
                 if (!justGoneGreen && previousGameState != null)
                 {
                     currentGameState.SessionData.SessionStartTime = previousGameState.SessionData.SessionStartTime;
-                    currentGameState.SessionData.SessionRunTime = previousGameState.SessionData.SessionRunTime;
+                    currentGameState.SessionData.SessionTotalRunTime = previousGameState.SessionData.SessionTotalRunTime;
                     currentGameState.SessionData.SessionNumberOfLaps = previousGameState.SessionData.SessionNumberOfLaps;
                     currentGameState.SessionData.SessionHasFixedTime = previousGameState.SessionData.SessionHasFixedTime;
                     currentGameState.SessionData.SessionStartPosition = previousGameState.SessionData.SessionStartPosition;
@@ -581,7 +581,7 @@ namespace CrewChiefV4.RaceRoom
                             Boolean finishedAllottedRaceTime = false;
                             if (currentGameState.carClass.carClassEnum == CarData.CarClassEnum.DTM_2015 && currentGameState.SessionData.SessionType == SessionType.Race)
                             {
-                                if (currentGameState.SessionData.SessionRunTime > 0 && currentGameState.SessionData.SessionTimeRemaining <= 0 &&
+                                if (currentGameState.SessionData.SessionTotalRunTime > 0 && currentGameState.SessionData.SessionTimeRemaining <= 0 &&
                                     previousOpponentCompletedLaps < currentOpponentLapsCompleted)
                                 {
                                     if (!currentOpponentData.HasStartedExtraLap)
@@ -594,7 +594,7 @@ namespace CrewChiefV4.RaceRoom
                                     }
                                 }
                             }
-                            else if (currentGameState.SessionData.SessionRunTime > 0 && currentGameState.SessionData.SessionTimeRemaining <= 0 &&
+                            else if (currentGameState.SessionData.SessionTotalRunTime > 0 && currentGameState.SessionData.SessionTimeRemaining <= 0 &&
                                 previousOpponentCompletedLaps < currentOpponentLapsCompleted)
                             {
                                 finishedAllottedRaceTime = true;

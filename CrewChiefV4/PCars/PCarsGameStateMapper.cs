@@ -298,7 +298,7 @@ namespace CrewChiefV4.PCars
             TrackDefinition lastSessionTrack = null;
             Boolean lastSessionHasFixedTime = false;
             int lastSessionNumberOfLaps = 0;
-            float lastSessionRunTime = 0;
+            float lastSessionTotalRunTime = 0;
             float lastSessionTimeRemaining = 0;
             if (previousGameState != null)
             {
@@ -309,7 +309,7 @@ namespace CrewChiefV4.PCars
                 lastSessionTrack = previousGameState.SessionData.TrackDefinition;
                 lastSessionLapsCompleted = previousGameState.SessionData.CompletedLaps;
                 lastSessionNumberOfLaps = previousGameState.SessionData.SessionNumberOfLaps;
-                lastSessionRunTime = previousGameState.SessionData.SessionRunTime;
+                lastSessionTotalRunTime = previousGameState.SessionData.SessionTotalRunTime;
                 lastSessionTimeRemaining = previousGameState.SessionData.SessionTimeRemaining;
                 currentGameState.carClass = previousGameState.carClass;
             }
@@ -333,7 +333,7 @@ namespace CrewChiefV4.PCars
             currentGameState.SessionData.LeaderHasFinishedRace = leaderHasFinished;
             currentGameState.SessionData.IsDisqualified = shared.mRaceState == (int)eRaceState.RACESTATE_DISQUALIFIED;
             currentGameState.SessionData.SessionPhase = mapToSessionPhase(currentGameState.SessionData.SessionType,
-                shared.mSessionState, shared.mRaceState, shared.mNumParticipants, leaderHasFinished, lastSessionPhase, lastSessionTimeRemaining, lastSessionRunTime);
+                shared.mSessionState, shared.mRaceState, shared.mNumParticipants, leaderHasFinished, lastSessionPhase, lastSessionTimeRemaining, lastSessionTotalRunTime);
             float sessionTimeRemaining = -1;
             int numberOfLapsInSession = (int)shared.mLapsInEvent;
             if (shared.mEventTimeRemaining > 0)
@@ -353,7 +353,7 @@ namespace CrewChiefV4.PCars
                 lastSessionTrack == null || lastSessionTrack.name != currentGameState.SessionData.TrackDefinition.name || 
                 lastSessionLapsCompleted > currentGameState.SessionData.CompletedLaps ||
                 (numberOfLapsInSession > 0 && lastSessionNumberOfLaps > 0 && lastSessionNumberOfLaps != numberOfLapsInSession) ||
-                (sessionTimeRemaining > 0 && sessionTimeRemaining > lastSessionRunTime))))
+                (sessionTimeRemaining > 0 && sessionTimeRemaining > lastSessionTotalRunTime))))
             {
                 Console.WriteLine("New session, trigger...");
                 if (raceRestarted)
@@ -382,9 +382,9 @@ namespace CrewChiefV4.PCars
                 {
                     Console.WriteLine("lastSessionNumberOfLaps = " + lastSessionNumberOfLaps + " numberOfLapsInSession = "+ numberOfLapsInSession);
                 }
-                else if (sessionTimeRemaining > 0 && sessionTimeRemaining > lastSessionRunTime)
+                else if (sessionTimeRemaining > 0 && sessionTimeRemaining > lastSessionTotalRunTime)
                 {
-                    Console.WriteLine("sessionTimeRemaining = " + sessionTimeRemaining + " lastSessionRunTime = " + lastSessionRunTime);
+                    Console.WriteLine("sessionTimeRemaining = " + sessionTimeRemaining + " lastSessionRunTime = " + lastSessionTotalRunTime);
                 }
                 currentGameState.SessionData.IsNewSession = true;
                 currentGameState.SessionData.SessionNumberOfLaps = numberOfLapsInSession;
@@ -393,9 +393,9 @@ namespace CrewChiefV4.PCars
                 currentGameState.SessionData.SessionStartPosition = (int)viewedParticipant.mRacePosition;
                 if (currentGameState.SessionData.SessionHasFixedTime)
                 {
-                    currentGameState.SessionData.SessionRunTime = sessionTimeRemaining;
+                    currentGameState.SessionData.SessionTotalRunTime = sessionTimeRemaining;
                     currentGameState.SessionData.SessionTimeRemaining = sessionTimeRemaining;
-                    if (currentGameState.SessionData.SessionRunTime == 0)
+                    if (currentGameState.SessionData.SessionTotalRunTime == 0)
                     {
                         Console.WriteLine("Setting session run time to 0");
                     }
@@ -434,9 +434,9 @@ namespace CrewChiefV4.PCars
                         {
                             if (currentGameState.SessionData.SessionHasFixedTime)
                             {
-                                currentGameState.SessionData.SessionRunTime = sessionTimeRemaining;
+                                currentGameState.SessionData.SessionTotalRunTime = sessionTimeRemaining;
                                 currentGameState.SessionData.SessionTimeRemaining = sessionTimeRemaining;
-                                if (currentGameState.SessionData.SessionRunTime == 0)
+                                if (currentGameState.SessionData.SessionTotalRunTime == 0)
                                 {
                                     Console.WriteLine("Setting session run time to 0");
                                 }
@@ -462,7 +462,7 @@ namespace CrewChiefV4.PCars
                             if (currentGameState.SessionData.SessionType != SessionType.Race)
                             {
                                 currentGameState.SessionData.SessionStartTime = previousGameState.SessionData.SessionStartTime;
-                                currentGameState.SessionData.SessionRunTime = previousGameState.SessionData.SessionRunTime;
+                                currentGameState.SessionData.SessionTotalRunTime = previousGameState.SessionData.SessionTotalRunTime;
                                 currentGameState.SessionData.SessionTimeRemaining = previousGameState.SessionData.SessionTimeRemaining;
                                 currentGameState.SessionData.SessionNumberOfLaps = previousGameState.SessionData.SessionNumberOfLaps;
                             }
@@ -482,7 +482,7 @@ namespace CrewChiefV4.PCars
                         Console.WriteLine("PitWindowEnd " + currentGameState.PitData.PitWindowEnd);
                         Console.WriteLine("NumCarsAtStartOfSession " + currentGameState.SessionData.NumCarsAtStartOfSession);
                         Console.WriteLine("SessionNumberOfLaps " + currentGameState.SessionData.SessionNumberOfLaps);
-                        Console.WriteLine("SessionRunTime " + currentGameState.SessionData.SessionRunTime);
+                        Console.WriteLine("SessionRunTime " + currentGameState.SessionData.SessionTotalRunTime);
                         Console.WriteLine("SessionStartPosition " + currentGameState.SessionData.SessionStartPosition);
                         Console.WriteLine("SessionStartTime " + currentGameState.SessionData.SessionStartTime);
                         String trackName = currentGameState.SessionData.TrackDefinition == null ? "unknown" : currentGameState.SessionData.TrackDefinition.name;
@@ -494,7 +494,7 @@ namespace CrewChiefV4.PCars
                 if (!justGoneGreen && previousGameState != null)
                 {
                     currentGameState.SessionData.SessionStartTime = previousGameState.SessionData.SessionStartTime;
-                    currentGameState.SessionData.SessionRunTime = previousGameState.SessionData.SessionRunTime;
+                    currentGameState.SessionData.SessionTotalRunTime = previousGameState.SessionData.SessionTotalRunTime;
                     currentGameState.SessionData.SessionNumberOfLaps = previousGameState.SessionData.SessionNumberOfLaps;
                     currentGameState.SessionData.SessionStartPosition = previousGameState.SessionData.SessionStartPosition;
                     currentGameState.SessionData.NumCarsAtStartOfSession = previousGameState.SessionData.NumCarsAtStartOfSession;
@@ -541,7 +541,7 @@ namespace CrewChiefV4.PCars
             //------------------- Variable session data ---------------------------
             if (currentGameState.SessionData.SessionHasFixedTime)
             {
-                currentGameState.SessionData.SessionRunningTime = currentGameState.SessionData.SessionRunTime - shared.mEventTimeRemaining;
+                currentGameState.SessionData.SessionRunningTime = currentGameState.SessionData.SessionTotalRunTime - shared.mEventTimeRemaining;
                 currentGameState.SessionData.SessionTimeRemaining = shared.mEventTimeRemaining;
             }
             else
@@ -675,7 +675,7 @@ namespace CrewChiefV4.PCars
 
                                     if (currentOpponentRacePosition == 1 && (currentGameState.SessionData.SessionNumberOfLaps > 0 &&
                                             currentGameState.SessionData.SessionNumberOfLaps == currentOpponentLapsCompleted) ||
-                                            (currentGameState.SessionData.SessionRunTime > 0 && currentGameState.SessionData.SessionTimeRemaining < 1 &&
+                                            (currentGameState.SessionData.SessionTotalRunTime > 0 && currentGameState.SessionData.SessionTimeRemaining < 1 &&
                                             previousOpponentCompletedLaps < currentOpponentLapsCompleted))
                                     {
                                         currentGameState.SessionData.LeaderHasFinishedRace = true;
@@ -879,7 +879,7 @@ namespace CrewChiefV4.PCars
                 // estimate the pit window close lap / time
                 if (currentGameState.SessionData.SessionHasFixedTime)
                 {
-                    currentGameState.PitData.PitWindowEnd = (int)((currentGameState.SessionData.SessionRunTime - 120f) / 60f);
+                    currentGameState.PitData.PitWindowEnd = (int)((currentGameState.SessionData.SessionTotalRunTime - 120f) / 60f);
                 }
                 else
                 {
@@ -1361,14 +1361,14 @@ namespace CrewChiefV4.PCars
             if (currentGameState.PitData.PitWindowStart > 0)
             {
                 if ((currentGameState.SessionData.SessionNumberOfLaps > 0 && currentGameState.SessionData.CompletedLaps < currentGameState.PitData.PitWindowStart) ||
-                    (currentGameState.SessionData.SessionRunTime > 0 && currentGameState.SessionData.SessionRunningTime < currentGameState.PitData.PitWindowStart * 60) ||
+                    (currentGameState.SessionData.SessionTotalRunTime > 0 && currentGameState.SessionData.SessionRunningTime < currentGameState.PitData.PitWindowStart * 60) ||
                     (currentGameState.SessionData.SessionNumberOfLaps > 0 && currentGameState.SessionData.CompletedLaps > currentGameState.PitData.PitWindowEnd) ||
-                    (currentGameState.SessionData.SessionRunTime > 0 && currentGameState.SessionData.SessionRunningTime > currentGameState.PitData.PitWindowEnd * 60))
+                    (currentGameState.SessionData.SessionTotalRunTime > 0 && currentGameState.SessionData.SessionRunningTime > currentGameState.PitData.PitWindowEnd * 60))
                 {
                     return PitWindow.Closed;
                 }
                 else if ((currentGameState.SessionData.SessionNumberOfLaps > 0 && currentGameState.SessionData.CompletedLaps >= currentGameState.PitData.PitWindowStart) ||
-                    (currentGameState.SessionData.SessionRunTime > 0 && currentGameState.SessionData.SessionRunningTime >= currentGameState.PitData.PitWindowStart * 60))
+                    (currentGameState.SessionData.SessionTotalRunTime > 0 && currentGameState.SessionData.SessionRunningTime >= currentGameState.PitData.PitWindowStart * 60))
                 {
                     if (currentGameState.PitData.PitWindow == PitWindow.Completed ||
                         (currentGameState.PitData.PitWindow == PitWindow.StopInProgress && pitMode == (uint)ePitMode.PIT_MODE_DRIVING_OUT_OF_PITS))
