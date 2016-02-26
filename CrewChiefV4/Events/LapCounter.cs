@@ -78,6 +78,12 @@ namespace CrewChiefV4.Events
         private void playPreLightsMessage(GameStateData currentGameState, int maxNumberToPlay)
         {
             playedPreLightsMessage = true;
+            if ((CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_NETWORK || CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_64BIT || 
+                CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_32BIT) && currentGameState.SessionData.SessionNumberOfLaps <= 0) 
+            {
+                // don't play pre-lights messages in PCars if the race is a fixed time, rather than number of laps
+                return;
+            }
             CrewChiefV4.GameState.Conditions.ConditionsSample currentConditions = currentGameState.Conditions.getMostRecentConditions();
             List<QueuedMessage> possibleMessages = new List<QueuedMessage>();
             if (currentConditions != null)
