@@ -153,7 +153,7 @@ namespace CrewChiefV4.PCars
 
             existingState.mEngineSpeed = udpTelemetryData.sEngineSpeed;
             existingState.mEngineTorque = udpTelemetryData.sEngineTorque;
-            existingState.mEnforcedPitStopLap = (uint) udpTelemetryData.sEnforcedPitStopLap;
+            existingState.mEnforcedPitStopLap = udpTelemetryData.sEnforcedPitStopLap;
 
             // Car Damage
             existingState.mCrashState = udpTelemetryData.sCrashState;
@@ -568,7 +568,7 @@ namespace CrewChiefV4.PCars
 
         public float mEngineTorque;
 
-        public uint mEnforcedPitStopLap;
+        public int mEnforcedPitStopLap;
 
         // TODO: front wing and rear wing 
 
