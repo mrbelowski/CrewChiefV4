@@ -2,7 +2,11 @@ CrewChief version 4.
 
 Changelog
 ---------
-Version 4.1.4.0: Fixed missing sector 3 time being read as "zero tenths off the pace".
+Version 4.1.4.3: Fixed 'box this lap' calls being made when there is no mandatory stop, when running PCars in UDP mode.
+
+Version 4.1.4.2: Fixed some speech recogniser / button handling issues - "Toggle" mode is now renamed "Press and release button" and actually works; Read the sector times response as a single message per sector, to allow interrupting and fix an issue with the Italian number reader.
+
+Version 4.1.4.1: Fixed missing sector 3 time being read as "zero tenths off the pace".
 
 Version 4.1.4.0: Reworked sector delta reporting to provide actual deltas, rather than approximations; Some changes to the Italian number reader (still work in progress); Some bug fixes.
 
