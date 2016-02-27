@@ -333,7 +333,8 @@ namespace CrewChiefV4.PCars
             currentGameState.SessionData.LeaderHasFinishedRace = leaderHasFinished;
             currentGameState.SessionData.IsDisqualified = shared.mRaceState == (int)eRaceState.RACESTATE_DISQUALIFIED;
             currentGameState.SessionData.SessionPhase = mapToSessionPhase(currentGameState.SessionData.SessionType,
-                shared.mSessionState, shared.mRaceState, shared.mNumParticipants, leaderHasFinished, lastSessionPhase, lastSessionTimeRemaining, lastSessionTotalRunTime);
+                shared.mSessionState, shared.mRaceState, shared.mNumParticipants, leaderHasFinished, lastSessionPhase, lastSessionTimeRemaining, 
+                lastSessionTotalRunTime, shared.mPitMode);
             float sessionTimeRemaining = -1;
             int numberOfLapsInSession = (int)shared.mLapsInEvent;
             if (shared.mEventTimeRemaining > 0)
@@ -1233,9 +1234,18 @@ namespace CrewChiefV4.PCars
          * When a practice session ends (while driving around) the mSessionState goes from 2 (racing) to
          * 1 (race not started) to 0 (invalid) over a few seconds. It never goes to any of the finished
          * states
+         * 
+         * 
+         * 27-02-16
+         * For timed sessions using SharedMemory, seesionTimeRemaining is Float.MaxValue in the pre-race phase, until the actual count down (lights cycle)
+         * starts. Then it is set to the correct time.
+         * 
+         * For UDP it's similar, but it appears that the initial 'sessionTimeRemaining' gets set to half the correct value, then Float.MaxValue
+         * 
+         * When we retire to the pit box, the raceState is set to RaceNotStarted
          */
         private SessionPhase mapToSessionPhase(SessionType sessionType, uint sessionState, uint raceState, int numParticipants,
-            Boolean leaderHasFinishedRace, SessionPhase previousSessionPhase, float sessionTimeRemaining, float sessionRunTime)
+            Boolean leaderHasFinishedRace, SessionPhase previousSessionPhase, float sessionTimeRemaining, float sessionRunTime, uint pitMode)
         {
             if (numParticipants < 1)
             {
@@ -1249,9 +1259,13 @@ namespace CrewChiefV4.PCars
                     {
                         return SessionPhase.Formation;
                     }
-                    else
+                    else if (pitMode != (uint) ePitMode.PIT_MODE_IN_GARAGE)
                     {
                         return SessionPhase.Countdown;
+                    }
+                    else
+                    {
+                        return previousSessionPhase;
                     }
                 }
                 else if (raceState == (uint)eRaceState.RACESTATE_RACING)

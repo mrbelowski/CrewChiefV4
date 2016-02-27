@@ -298,7 +298,7 @@ namespace CrewChiefV4
                     }
                     if (initialised)
                     {
-                        Console.WriteLine("Adding " + usableName + " to speech recogniser");
+                        Console.WriteLine("adding opponent name to speech recogniser: " + Environment.NewLine + usableName);
                         Choices opponentChoices = new Choices();
                         opponentChoices.Add(WHERE_IS + " " + usableName);
                         opponentChoices.Add(WHATS + " " + usableName + POSSESSIVE + " " + LAST_LAP);
@@ -324,8 +324,7 @@ namespace CrewChiefV4
 
         public void addOpponentSpeechRecognition(List<String> names, Boolean useNames)
         {
-            driverNamesInUse.Clear();
-            Console.WriteLine("adding opponent names to speech recogniser");
+            driverNamesInUse.Clear();            
             foreach (Grammar opponentGrammar in opponentGrammarList)
             {
                 sre.UnloadGrammar(opponentGrammar);
@@ -334,6 +333,7 @@ namespace CrewChiefV4
             Choices opponentChoices = new Choices();
             if (useNames)
             {
+                Console.WriteLine("adding opponent names to speech recogniser: " + Environment.NewLine + String.Join(Environment.NewLine, names));
                 foreach (String name in names)
                 {
                     opponentChoices.Add(WHERE_IS + " " + name);
