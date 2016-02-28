@@ -142,3 +142,4 @@ report_track_temp_changes_greater_than_help = Report track temperature if it's c
 pause_between_messages_help = Time pause between messages (in seconds) when reading multiple messages together in a single group.
 load_sound_files_on_startup_help = Load all the sounds when the app starts up. This may make app start times quite long, but prevents the app having to load stuff while you're racing.
 pcars_character_encoding_help = For PS4 always use UTF-8. For PC and XBox this will usually be windows-1252 (Windows Western European).
+enable_pcars_pit_window_messages_help = Play pit window messages in PCars. Don't use this in online racing - the game always sends an enforced pit stop lap even if this isn't enabled by the host

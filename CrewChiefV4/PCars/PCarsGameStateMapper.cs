@@ -19,6 +19,7 @@ namespace CrewChiefV4.PCars
         public static String NULL_CHAR_STAND_IN = "?";
 
         private Boolean attemptPitDetection = UserSettings.GetUserSettings().getBoolean("attempt_pcars_opponent_pit_detection");
+        private Boolean enablePCarsPitWindowStuff = UserSettings.GetUserSettings().getBoolean("enable_pcars_pit_window_messages");
         private static String userSpecifiedSteamId = UserSettings.GetUserSettings().getString("pcars_steam_id");
         private static String playerSteamId = null;
         private static Boolean getPlayerByName = true;
@@ -259,25 +260,21 @@ namespace CrewChiefV4.PCars
             if (shared.mGameState == (uint)eGameState.GAME_FRONT_END ||
                 (shared.mGameState == (uint)eGameState.GAME_INGAME_PAUSED && !System.Diagnostics.Debugger.IsAttached) ||
                 (shared.mGameState == (uint)eGameState.GAME_INGAME_PAUSED) || 
-                shared.mGameState == (uint)eGameState.GAME_VIEWING_REPLAY || shared.mGameState == (uint)eGameState.GAME_EXITED)
+                shared.mGameState == (uint)eGameState.GAME_VIEWING_REPLAY || shared.mGameState == (uint)eGameState.GAME_EXITED ||
+                shared.mNumParticipants < 1 || shared.mTrackLength <= 0)
             {
                 // don't ignore the paused game updates if we're in debug mode
                 return previousGameState;
             }
             
-            GameStateData currentGameState = new GameStateData(ticks);
-            if (shared.mNumParticipants < 1 || shared.mTrackLength <= 0)
-            {
-                // Unusable data in the block
-                // TODO: is this check sufficient?
-                return null;
-            }            
             Tuple<int, pCarsAPIParticipantStruct> playerData = getPlayerDataStruct(shared.mParticipantData, shared.mViewedParticipantIndex);
             String playerName = StructHelper.getNameFromBytes(shared.mParticipantData[shared.mViewedParticipantIndex].mName);
             if (getPlayerByName && playerName != null && playerSteamId != null && !namesMatch(playerName, playerSteamId))
             {
                 return previousGameState;
             }
+
+            GameStateData currentGameState = new GameStateData(ticks);          
             
             int playerDataIndex = playerData.Item1;
             pCarsAPIParticipantStruct viewedParticipant = playerData.Item2;
@@ -312,6 +309,12 @@ namespace CrewChiefV4.PCars
                 lastSessionTotalRunTime = previousGameState.SessionData.SessionTotalRunTime;
                 lastSessionTimeRemaining = previousGameState.SessionData.SessionTimeRemaining;
                 currentGameState.carClass = previousGameState.carClass;
+
+                currentGameState.SessionData.PlayerLapTimeSessionBest = previousGameState.SessionData.PlayerLapTimeSessionBest;
+                currentGameState.SessionData.OpponentsLapTimeSessionBestOverall = previousGameState.SessionData.OpponentsLapTimeSessionBestOverall;
+                currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass = previousGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass;
+                currentGameState.SessionData.OverallSessionBestLapTime = previousGameState.SessionData.OverallSessionBestLapTime;
+                currentGameState.SessionData.PlayerClassSessionBestLapTime = previousGameState.SessionData.PlayerClassSessionBestLapTime;
             }
 
             if (currentGameState.carClass.carClassEnum == CarData.CarClassEnum.UNKNOWN_RACE)
@@ -349,12 +352,18 @@ namespace CrewChiefV4.PCars
             Boolean raceRestarted = currentGameState.SessionData.SessionType == SessionType.Race &&
                 lastSessionPhase == SessionPhase.Green && currentGameState.SessionData.SessionPhase == SessionPhase.Countdown;
             if (raceRestarted || 
-                (currentGameState.SessionData.SessionType != SessionType.Unavailable && (lastSessionType != currentGameState.SessionData.SessionType ||
-                lastSessionHasFixedTime != currentGameState.SessionData.SessionHasFixedTime ||
-                lastSessionTrack == null || lastSessionTrack.name != currentGameState.SessionData.TrackDefinition.name || 
-                lastSessionLapsCompleted > currentGameState.SessionData.CompletedLaps ||
-                (numberOfLapsInSession > 0 && lastSessionNumberOfLaps > 0 && lastSessionNumberOfLaps != numberOfLapsInSession) ||
-                (sessionTimeRemaining > 0 && sessionTimeRemaining > lastSessionTotalRunTime))))
+                (currentGameState.SessionData.SessionType != SessionType.Unavailable && (lastSessionType != currentGameState.SessionData.SessionType ||                
+                lastSessionTrack == null || lastSessionTrack.name != currentGameState.SessionData.TrackDefinition.name ||
+                (sessionTimeRemaining > 0 && sessionTimeRemaining > lastSessionTotalRunTime)
+                /*
+                 * 27-02 - lets try without these...
+                 * Note that the time one has to stay in case we restart a qual / prac session. If we restart a race session the countdown phase should trigger the restart logic
+                 * || lastSessionHasFixedTime != currentGameState.SessionData.SessionHasFixedTime ||
+                 * lastSessionLapsCompleted > currentGameState.SessionData.CompletedLaps ||                 *
+                 * (numberOfLapsInSession > 0 && lastSessionNumberOfLaps > 0 && lastSessionNumberOfLaps != numberOfLapsInSession)
+                 *
+                 */
+                )))
             {
                 Console.WriteLine("New session, trigger...");
                 if (raceRestarted)
@@ -421,6 +430,12 @@ namespace CrewChiefV4.PCars
                         addOpponentForName(participantName, createOpponentData(participantStruct, false, opponentCarClass), currentGameState);
                     }
                 }
+
+                currentGameState.SessionData.PlayerLapTimeSessionBest = -1;
+                currentGameState.SessionData.OpponentsLapTimeSessionBestOverall = -1;
+                currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass = -1;
+                currentGameState.SessionData.OverallSessionBestLapTime = -1;
+                currentGameState.SessionData.PlayerClassSessionBestLapTime = -1;
             }
             else
             {
@@ -492,6 +507,8 @@ namespace CrewChiefV4.PCars
                 }
                 // copy persistent data from the previous game state
                 //
+
+                // TODO: this is just retarded. Clone the previousGameState and update it as required...
                 if (!justGoneGreen && previousGameState != null)
                 {
                     currentGameState.SessionData.SessionStartTime = previousGameState.SessionData.SessionStartTime;
@@ -518,12 +535,7 @@ namespace CrewChiefV4.PCars
                     // the other properties of PitData are updated each tick, and shouldn't be copied over here. Nasty...
                     currentGameState.SessionData.SessionTimesAtEndOfSectors = previousGameState.SessionData.SessionTimesAtEndOfSectors;
                     currentGameState.PenaltiesData.CutTrackWarnings = previousGameState.PenaltiesData.CutTrackWarnings;
-                    currentGameState.SessionData.formattedPlayerLapTimes = previousGameState.SessionData.formattedPlayerLapTimes;
-                    currentGameState.SessionData.PlayerLapTimeSessionBest = previousGameState.SessionData.PlayerLapTimeSessionBest;
-                    currentGameState.SessionData.OpponentsLapTimeSessionBestOverall = previousGameState.SessionData.OpponentsLapTimeSessionBestOverall;
-                    currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass = previousGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass;
-                    currentGameState.SessionData.OverallSessionBestLapTime = previousGameState.SessionData.OverallSessionBestLapTime;
-                    currentGameState.SessionData.PlayerClassSessionBestLapTime = previousGameState.SessionData.PlayerClassSessionBestLapTime;
+                    currentGameState.SessionData.formattedPlayerLapTimes = previousGameState.SessionData.formattedPlayerLapTimes;                    
                     currentGameState.SessionData.GameTimeAtLastPositionFrontChange = previousGameState.SessionData.GameTimeAtLastPositionFrontChange;
                     currentGameState.SessionData.GameTimeAtLastPositionBehindChange = previousGameState.SessionData.GameTimeAtLastPositionBehindChange;
                     currentGameState.SessionData.LastSector1Time = previousGameState.SessionData.LastSector1Time;
@@ -873,7 +885,7 @@ namespace CrewChiefV4.PCars
             {
                 Console.WriteLine("Has requested pitstop");
             }
-            if (currentGameState.SessionData.SessionType == SessionType.Race && shared.mEnforcedPitStopLap > 0)
+            if (currentGameState.SessionData.SessionType == SessionType.Race && shared.mEnforcedPitStopLap > 0 && enablePCarsPitWindowStuff)
             {
                 currentGameState.PitData.HasMandatoryPitStop = true;
                 currentGameState.PitData.PitWindowStart = (int) shared.mEnforcedPitStopLap;

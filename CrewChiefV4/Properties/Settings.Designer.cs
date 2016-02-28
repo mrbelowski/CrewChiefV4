@@ -1315,5 +1315,17 @@ namespace CrewChiefV4.Properties {
                 this["enable_spotter_in_timetrial"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool enable_pcars_pit_window_messages {
+            get {
+                return ((bool)(this["enable_pcars_pit_window_messages"]));
+            }
+            set {
+                this["enable_pcars_pit_window_messages"] = value;
+            }
+        }
     }
 }
