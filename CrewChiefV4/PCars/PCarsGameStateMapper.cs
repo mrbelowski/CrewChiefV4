@@ -351,23 +351,13 @@ namespace CrewChiefV4.PCars
             }
             currentGameState.SessionData.TrackDefinition = TrackData.getTrackDefinition(StructHelper.getNameFromBytes(shared.mTrackLocation)
                 + ":" + StructHelper.getNameFromBytes(shared.mTrackVariation), shared.mTrackLength);
-            // Console.WriteLine(lastSessionPhase + ", " + currentGameState.SessionData.SessionPhase + "; " + lastSessionType + ", " + currentGameState.SessionData.SessionType);
             // now check if this is a new session...
             Boolean raceRestarted = currentGameState.SessionData.SessionType == SessionType.Race &&
                 lastSessionPhase == SessionPhase.Green && currentGameState.SessionData.SessionPhase == SessionPhase.Countdown;
             if (raceRestarted || 
                 (currentGameState.SessionData.SessionType != SessionType.Unavailable && (lastSessionType != currentGameState.SessionData.SessionType ||                
                 lastSessionTrack == null || lastSessionTrack.name != currentGameState.SessionData.TrackDefinition.name ||
-                (currentGameState.SessionData.SessionHasFixedTime && sessionTimeRemaining > lastSessionTimeRemaining + 1)
-                /*
-                 * 27-02 - lets try without these...
-                 * Note that the time one has to stay in case we restart a qual / prac session. If we restart a race session the countdown phase should trigger the restart logic
-                 * || lastSessionHasFixedTime != currentGameState.SessionData.SessionHasFixedTime ||
-                 * lastSessionLapsCompleted > currentGameState.SessionData.CompletedLaps ||                 *
-                 * (numberOfLapsInSession > 0 && lastSessionNumberOfLaps > 0 && lastSessionNumberOfLaps != numberOfLapsInSession)
-                 *
-                 */
-                )))
+                (currentGameState.SessionData.SessionHasFixedTime && sessionTimeRemaining > lastSessionTimeRemaining + 1))))
             {
                 Console.WriteLine("New session, trigger...");
                 if (raceRestarted)
