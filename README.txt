@@ -2,6 +2,8 @@ CrewChief version 4.
 
 Changelog
 ---------
+Version 4.1.4.5: Disable PCars pit window messages by default (can be re-enabled with the enable_pcars_pit_window_messages setting) - this only works correctly in offline races; Revised some of the PCars session-end logic to reduce the likelihood of the app detecting a session restart when one hasn't actually taken place. This should also prevent the app from removing cached laptime data (which results in inaccurate 'best lap' messages).
+
 Version 4.1.4.4: More pit window logic fixes for PCars; don't play pre-lights messages in PCars when the race is a fixed time.
 
 Version 4.1.4.3: Fixed 'box this lap' calls being made when there is no mandatory stop, when running PCars in UDP mode.
