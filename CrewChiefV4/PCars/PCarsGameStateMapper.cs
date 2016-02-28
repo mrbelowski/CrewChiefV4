@@ -258,12 +258,16 @@ namespace CrewChiefV4.PCars
             long ticks = ((CrewChiefV4.PCars.PCarsSharedMemoryReader.PCarsStructWrapper)memoryMappedFileStruct).ticksWhenRead;
             // game state is 3 for paused, 5 for replay. No idea what 4 is...
             if (shared.mGameState == (uint)eGameState.GAME_FRONT_END ||
-                (shared.mGameState == (uint)eGameState.GAME_INGAME_PAUSED && !System.Diagnostics.Debugger.IsAttached) ||
-                (shared.mGameState == (uint)eGameState.GAME_INGAME_PAUSED) || 
-                shared.mGameState == (uint)eGameState.GAME_VIEWING_REPLAY || shared.mGameState == (uint)eGameState.GAME_EXITED ||
+                shared.mGameState == (uint)eGameState.GAME_INGAME_PAUSED || 
+                shared.mGameState == (uint)eGameState.GAME_VIEWING_REPLAY || 
+                shared.mGameState == (uint)eGameState.GAME_EXITED ||
                 shared.mNumParticipants < 1 || shared.mTrackLength <= 0)
             {
-                // don't ignore the paused game updates if we're in debug mode
+                if (shared.mGameState == (uint)eGameState.GAME_FRONT_END && previousGameState != null)
+                {
+                    previousGameState.SessionData.SessionType = SessionType.Unavailable;
+                    previousGameState.SessionData.SessionPhase = SessionPhase.Unavailable;
+                }
                 return previousGameState;
             }
             
@@ -354,7 +358,7 @@ namespace CrewChiefV4.PCars
             if (raceRestarted || 
                 (currentGameState.SessionData.SessionType != SessionType.Unavailable && (lastSessionType != currentGameState.SessionData.SessionType ||                
                 lastSessionTrack == null || lastSessionTrack.name != currentGameState.SessionData.TrackDefinition.name ||
-                (sessionTimeRemaining > 0 && sessionTimeRemaining > lastSessionTotalRunTime)
+                (currentGameState.SessionData.SessionHasFixedTime && sessionTimeRemaining > lastSessionTimeRemaining + 1)
                 /*
                  * 27-02 - lets try without these...
                  * Note that the time one has to stay in case we restart a qual / prac session. If we restart a race session the countdown phase should trigger the restart logic
@@ -374,27 +378,15 @@ namespace CrewChiefV4.PCars
                 {
                     Console.WriteLine("lastSessionType = " + lastSessionType + " currentGameState.SessionData.SessionType = " + currentGameState.SessionData.SessionType);
                 }
-                else if (lastSessionHasFixedTime != currentGameState.SessionData.SessionHasFixedTime) 
-                {
-                    Console.WriteLine("lastSessionHasFixedTime = " + lastSessionHasFixedTime + " currentGameState.SessionData.SessionHasFixedTime = " + currentGameState.SessionData.SessionHasFixedTime);
-                }
                 else if (lastSessionTrack != currentGameState.SessionData.TrackDefinition)
                 {
                     String lastTrackName = lastSessionTrack == null ? "unknown" : lastSessionTrack.name;
                     String currentTrackName = currentGameState.SessionData.TrackDefinition == null ? "unknown" : currentGameState.SessionData.TrackDefinition.name;
                     Console.WriteLine("lastSessionTrack = " + lastTrackName + " currentGameState.SessionData.Track = " + currentTrackName);
-                } 
-                else if (lastSessionLapsCompleted > currentGameState.SessionData.CompletedLaps)
-                {
-                    Console.WriteLine("lastSessionLapsCompleted = " + lastSessionLapsCompleted + " currentGameState.SessionData.CompletedLaps = " + currentGameState.SessionData.CompletedLaps);
                 }
-                else if (lastSessionNumberOfLaps != numberOfLapsInSession)
+                else if (currentGameState.SessionData.SessionHasFixedTime && sessionTimeRemaining > lastSessionTimeRemaining + 1)
                 {
-                    Console.WriteLine("lastSessionNumberOfLaps = " + lastSessionNumberOfLaps + " numberOfLapsInSession = "+ numberOfLapsInSession);
-                }
-                else if (sessionTimeRemaining > 0 && sessionTimeRemaining > lastSessionTotalRunTime)
-                {
-                    Console.WriteLine("sessionTimeRemaining = " + sessionTimeRemaining + " lastSessionRunTime = " + lastSessionTotalRunTime);
+                    Console.WriteLine("sessionTimeRemaining = " + sessionTimeRemaining + " lastSessionTimeRemaining = " + lastSessionTimeRemaining);
                 }
                 currentGameState.SessionData.IsNewSession = true;
                 currentGameState.SessionData.SessionNumberOfLaps = numberOfLapsInSession;
