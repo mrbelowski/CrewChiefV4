@@ -216,7 +216,7 @@ namespace CrewChiefV4
                             {
                                 foreach (String timeFolder in timeFolders)
                                 {
-                                    if (!SoundCache.availableSounds.Contains(timeFolder))
+                                    if (!timeFolder.StartsWith(AudioPlayer.PAUSE_ID) && !SoundCache.availableSounds.Contains(timeFolder))
                                     {
                                         canBePlayed = false;
                                         break;
@@ -256,7 +256,7 @@ namespace CrewChiefV4
                             {
                                 foreach (String integerFolder in integerFolders)
                                 {
-                                    if (!SoundCache.availableSounds.Contains(integerFolder))
+                                    if (!integerFolder.StartsWith(AudioPlayer.PAUSE_ID) && !SoundCache.availableSounds.Contains(integerFolder))
                                     {
                                         canBePlayed = false;
                                         break;

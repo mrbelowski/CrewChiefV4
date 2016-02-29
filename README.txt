@@ -2,6 +2,8 @@ CrewChief version 4.
 
 Changelog
 ---------
+<hVersion 4.1.5.0: Added missing position messages for positions greater than 24.
+
 Version 4.1.4.5: Disable PCars pit window messages by default (can be re-enabled with the enable_pcars_pit_window_messages setting) - this only works correctly in offline races; Revised some of the PCars session-end logic to reduce the likelihood of the app detecting a session restart when one hasn't actually taken place. This should also prevent the app from removing cached laptime data (which results in inaccurate 'best lap' messages).
 
 Version 4.1.4.4: More pit window logic fixes for PCars; don't play pre-lights messages in PCars when the race is a fixed time.
