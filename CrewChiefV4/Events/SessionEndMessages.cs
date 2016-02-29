@@ -137,16 +137,8 @@ namespace CrewChiefV4.Events
                 }
                 else
                 {
-                    if (position > 24)
-                    {
-                        audioPlayer.playMessage(new QueuedMessage(sessionEndMessageIdentifier, AbstractEvent.MessageContents(folderEndOfSession,
-                        Position.folderStub, position), 0, null));
-                    }
-                    else
-                    {
-                        audioPlayer.playMessage(new QueuedMessage(sessionEndMessageIdentifier, AbstractEvent.MessageContents(folderEndOfSession,
-                        Position.folderStub + position), 0, null));
-                    }
+                    audioPlayer.playMessage(new QueuedMessage(sessionEndMessageIdentifier, AbstractEvent.MessageContents(folderEndOfSession,
+                    Position.folderStub + position), 0, null));
                 }
             }
         }

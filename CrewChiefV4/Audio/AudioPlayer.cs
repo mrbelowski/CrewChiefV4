@@ -19,7 +19,7 @@ namespace CrewChiefV4.Audio
 
         public Boolean disablePearlsOfWisdom = false;   // used for the last 2 laps / 3 minutes of a race session only
         public Boolean mute = false;
-        public static float minimumSoundPackVersion = 104f;
+        public static float minimumSoundPackVersion = 105f;
 
         private CrewChief crewChief;
 
