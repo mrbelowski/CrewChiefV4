@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Speech.Synthesis;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -11,8 +12,10 @@ namespace CrewChiefV4.Audio
 {
     public class SoundCache
     {
+        public static String TTS_IDENTIFIER = "TTS_IDENTIFIER";
         public static Random random = new Random();
         private Boolean useAlternateBeeps = UserSettings.GetUserSettings().getBoolean("use_alternate_beeps");
+        public static Boolean useTTS = UserSettings.GetUserSettings().getBoolean("use_tts_for_missing_names");
         private double minSecondsBetweenPersonalisedMessages = (double)UserSettings.GetUserSettings().getInt("min_time_between_personalised_messages");
         public static Boolean eagerLoadSoundFiles = UserSettings.GetUserSettings().getBoolean("load_sound_files_on_startup");
         
@@ -39,8 +42,27 @@ namespace CrewChiefV4.Audio
 
         public static DateTime lastSwearyMessageTime = DateTime.MinValue;
 
+        public static SpeechSynthesizer synthesizer;
+
         public SoundCache(DirectoryInfo soundsFolder, String[] eventTypesToKeepCached, Boolean useSwearyMessages, Boolean allowCaching)
         {
+            if (useTTS)
+            {
+                if (synthesizer != null)
+                {
+                    try
+                    {
+                        synthesizer.Dispose();
+                        synthesizer = null;
+                    }
+                    catch (Exception e) { }
+                }
+                synthesizer = new SpeechSynthesizer();
+                synthesizer.SelectVoiceByHints(VoiceGender.Male, VoiceAge.Senior);
+                synthesizer.SetOutputToDefaultAudioDevice();
+                synthesizer.Volume = 100;
+                synthesizer.Rate = 1;
+            }
             this.currentLoadedCount = 0;
             this.eventTypesToKeepCached = eventTypesToKeepCached;
             this.useSwearyMessages = useSwearyMessages;
@@ -116,6 +138,10 @@ namespace CrewChiefV4.Audio
                     catch (Exception) { }
                     singleSoundsToPlay.Add(new SingleSound(pauseLength));
                 }
+                else if (soundName.StartsWith(TTS_IDENTIFIER))
+                {
+                    singleSoundsToPlay.Add(new SingleSound(soundName.Substring(TTS_IDENTIFIER.Count())));
+                }
                 else
                 {
                     Boolean preferPersonalised = personalisedMessageIsDue();
@@ -136,7 +162,7 @@ namespace CrewChiefV4.Audio
                     else if (singleSounds.ContainsKey(soundName))
                     {
                         singleSound = singleSounds[soundName];
-                    }
+                    }                    
                     if (singleSound != null)
                     {
                         // hack... we double check the prefer setting here and only play the prefix / suffix if it's true.
@@ -223,6 +249,15 @@ namespace CrewChiefV4.Audio
 
         public void StopAndUnloadAll()
         {
+            if (synthesizer != null)
+            {
+                try
+                {
+                    synthesizer.Dispose();
+                    synthesizer = null;
+                }
+                catch (Exception e) { }
+            }
             foreach (SoundSet soundSet in soundSets.Values)
             {                
                 try
@@ -597,6 +632,7 @@ namespace CrewChiefV4.Audio
 
     public class SingleSound
     {
+        public String ttsString = null;
         public Boolean isSweary = false;
         public Boolean isPause = false;
         public int pauseLength = 0;
@@ -615,6 +651,11 @@ namespace CrewChiefV4.Audio
         {
             this.isPause = true;
             this.pauseLength = pauseLength;
+        }
+
+        public SingleSound(String textToRender)
+        {
+            this.ttsString = textToRender;
         }
 
         public SingleSound(String fullPath, Boolean loadFile, Boolean loadSoundPlayer, Boolean allowCaching)
@@ -637,25 +678,34 @@ namespace CrewChiefV4.Audio
         public Boolean Play()
         {
             Boolean hadToLoadSound = false;
-            if (!allowCaching)
+            if (ttsString != null && SoundCache.synthesizer != null)
             {
-                SoundPlayer soundPlayer = new SoundPlayer(fullPath);
-                soundPlayer.Load();
-                soundPlayer.PlaySync();
-                try
-                {
-                    soundPlayer.Dispose();
-                }
-                catch (Exception) { }
+                PromptBuilder builder = new PromptBuilder();
+                builder.AppendText(ttsString);
+                SoundCache.synthesizer.Speak(builder);
             }
             else
             {
-                if (!loadedSoundPlayer)
+                if (!allowCaching)
                 {
-                    LoadSoundPlayer();
-                    hadToLoadSound = true;
+                    SoundPlayer soundPlayer = new SoundPlayer(fullPath);
+                    soundPlayer.Load();
+                    soundPlayer.PlaySync();
+                    try
+                    {
+                        soundPlayer.Dispose();
+                    }
+                    catch (Exception) { }
                 }
-                this.soundPlayer.PlaySync();
+                else
+                {
+                    if (!loadedSoundPlayer)
+                    {
+                        LoadSoundPlayer();
+                        hadToLoadSound = true;
+                    }
+                    this.soundPlayer.PlaySync();
+                }                
             }
             return hadToLoadSound;
         }

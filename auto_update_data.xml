@@ -6,7 +6,7 @@
 <changelog>http://crewchief.isnais.de/change_log_for_auto_updated.html</changelog>
 
 <!--legacy sound pack stuff for 4.1.2.2 and earlier-->
-<soundpackversion>104</soundpackversion>
+<soundpackversion>105</soundpackversion>
 <basesoundpackurl>http://crewchief.isnais.de/base_sound_pack.zip</basesoundpackurl>
 <updatesoundpackurl>http://crewchief.isnais.de/update_sound_pack.zip</updatesoundpackurl>
 <drivernamesversion>100</drivernamesversion>
@@ -15,7 +15,7 @@
 
 <!-- language-aware sound pack stuff for later versions-->
 <soundpack language="en">
-	<soundpackversion>104</soundpackversion>
+	<soundpackversion>105</soundpackversion>
 	<basesoundpackurl>http://crewchief.isnais.de/base_sound_pack.zip</basesoundpackurl>
 	<updatesoundpackurl>http://crewchief.isnais.de/update_sound_pack.zip</updatesoundpackurl>
 	<drivernamesversion>100</drivernamesversion>

@@ -1327,5 +1327,17 @@ namespace CrewChiefV4.Properties {
                 this["enable_pcars_pit_window_messages"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool use_tts_for_missing_names {
+            get {
+                return ((bool)(this["use_tts_for_missing_names"]));
+            }
+            set {
+                this["use_tts_for_missing_names"] = value;
+            }
+        }
     }
 }

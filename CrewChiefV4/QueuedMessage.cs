@@ -241,6 +241,11 @@ namespace CrewChiefV4
                                 messages.Add(usableName);
                                 canBePlayed = true;
                             }
+                            else if (usableName != null && usableName.Count() > 0 && SoundCache.useTTS)
+                            {
+                                messages.Add(SoundCache.TTS_IDENTIFIER + usableName);
+                                canBePlayed = true;
+                            }
                         }                        
                         break;
                     case MessageFragment.FragmentType.Integer:                        
