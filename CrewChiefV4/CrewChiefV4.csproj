@@ -56,7 +56,7 @@
   <ItemGroup>
     <Reference Include="AutoUpdater.NET, Version=1.3.1.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\auto_updater_source\AutoUpdater.NET\trunk\AutoUpdater.NET\bin\Debug\AutoUpdater.NET.dll</HintPath>
+      <HintPath>..\AutoUpdater.NET.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Speech, Version=11.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
