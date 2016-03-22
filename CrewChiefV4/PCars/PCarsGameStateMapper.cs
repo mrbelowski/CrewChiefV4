@@ -8,6 +8,7 @@ using CrewChiefV4.Events;
 /**
  * Maps memory mapped file to a local game-agnostic representation.
  * 
+ * 
  * Weather...
  * 
  * cloud brightness varies a *lot*. Perhaps it's for that section of track?
