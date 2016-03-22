@@ -304,7 +304,7 @@ namespace CrewChiefV4.Audio
             {
                 if (bleepFile.Name.EndsWith(".wav"))
                 {
-                    if (bleepFile.Name.StartsWith(alternate_prefix + "start"))
+                    if (bleepFile.Name.StartsWith(alternate_prefix + "start") && !singleSounds.ContainsKey("start_bleep"))
                     {
                         if (allowCaching)
                         {
@@ -313,7 +313,7 @@ namespace CrewChiefV4.Audio
                         singleSounds.Add("start_bleep", new SingleSound(bleepFile.FullName, this.allowCaching, this.allowCaching, this.allowCaching));
                         availableSounds.Add("start_bleep");
                     }
-                    else if (bleepFile.Name.StartsWith(alternate_prefix + "end"))
+                    else if (bleepFile.Name.StartsWith(alternate_prefix + "end") && !singleSounds.ContainsKey("end_bleep"))
                     {
                         if (allowCaching)
                         {
@@ -322,7 +322,7 @@ namespace CrewChiefV4.Audio
                         singleSounds.Add("end_bleep", new SingleSound(bleepFile.FullName, this.allowCaching, this.allowCaching, this.allowCaching));
                         availableSounds.Add("end_bleep");
                     }
-                    else if (bleepFile.Name.StartsWith(alternate_prefix + "short_start"))
+                    else if (bleepFile.Name.StartsWith(alternate_prefix + "short_start") && !singleSounds.ContainsKey("short_start_bleep"))
                     {
                         if (allowCaching)
                         {
@@ -331,7 +331,7 @@ namespace CrewChiefV4.Audio
                         singleSounds.Add("short_start_bleep", new SingleSound(bleepFile.FullName, this.allowCaching, this.allowCaching, this.allowCaching));
                         availableSounds.Add("short_start_bleep");
                     }
-                    else if (bleepFile.Name.StartsWith("listen_start"))
+                    else if (bleepFile.Name.StartsWith("listen_start") && !singleSounds.ContainsKey("listen_start_sound"))
                     {
                         if (allowCaching)
                         {

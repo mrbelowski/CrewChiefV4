@@ -354,8 +354,11 @@ namespace CrewChiefV4.PCars
             // now check if this is a new session...
             Boolean raceRestarted = currentGameState.SessionData.SessionType == SessionType.Race &&
                 lastSessionPhase == SessionPhase.Green && currentGameState.SessionData.SessionPhase == SessionPhase.Countdown;
-            if (raceRestarted || 
-                (currentGameState.SessionData.SessionType != SessionType.Unavailable && (lastSessionType != currentGameState.SessionData.SessionType ||                
+            if (raceRestarted ||
+                ((currentGameState.SessionData.SessionType != SessionType.Unavailable && 
+                    currentGameState.SessionData.SessionPhase != SessionPhase.Finished &&
+                    currentGameState.SessionData.SessionPhase != SessionPhase.Unavailable) &&
+                (lastSessionType != currentGameState.SessionData.SessionType ||                
                 lastSessionTrack == null || lastSessionTrack.name != currentGameState.SessionData.TrackDefinition.name ||
                 (currentGameState.SessionData.SessionHasFixedTime && sessionTimeRemaining > lastSessionTimeRemaining + 1))))
             {
