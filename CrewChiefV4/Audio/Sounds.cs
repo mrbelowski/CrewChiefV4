@@ -680,9 +680,15 @@ namespace CrewChiefV4.Audio
             Boolean hadToLoadSound = false;
             if (ttsString != null && SoundCache.synthesizer != null)
             {
-                PromptBuilder builder = new PromptBuilder();
-                builder.AppendText(ttsString);
-                SoundCache.synthesizer.Speak(builder);
+                try { 
+                    PromptBuilder builder = new PromptBuilder();
+                    builder.AppendText(ttsString);
+                    SoundCache.synthesizer.Speak(builder);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("TTS failed with sound " + ttsString + ", " + e.Message);
+                }
             }
             else
             {
