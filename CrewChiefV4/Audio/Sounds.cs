@@ -689,9 +689,7 @@ namespace CrewChiefV4.Audio
             if (ttsString != null && SoundCache.synthesizer != null)
             {
                 try { 
-                    PromptBuilder builder = new PromptBuilder();
-                    builder.AppendText(ttsString);
-                    SoundCache.synthesizer.Speak(builder);
+                    SoundCache.synthesizer.Speak(ttsString);
                 }
                 catch (Exception e)
                 {
