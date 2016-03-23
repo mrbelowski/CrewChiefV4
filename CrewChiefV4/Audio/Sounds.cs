@@ -48,21 +48,29 @@ namespace CrewChiefV4.Audio
         {
             if (useTTS)
             {
-                if (synthesizer != null)
+                try
                 {
-                    try
+                    if (synthesizer != null)
                     {
-                        synthesizer.Dispose();
-                        synthesizer = null;
+                        try
+                        {
+                            synthesizer.Dispose();
+                            synthesizer = null;
+                        }
+                        catch (Exception e) { }
                     }
-                    catch (Exception e) { }
+                    synthesizer = new SpeechSynthesizer();
+                    synthesizer.SelectVoiceByHints(VoiceGender.Male, VoiceAge.Senior);
+                    synthesizer.SetOutputToDefaultAudioDevice();
+                    synthesizer.Volume = 100;
+                    synthesizer.Rate = 1;
                 }
-                synthesizer = new SpeechSynthesizer();
-                synthesizer.SelectVoiceByHints(VoiceGender.Male, VoiceAge.Senior);
-                synthesizer.SetOutputToDefaultAudioDevice();
-                synthesizer.Volume = 100;
-                synthesizer.Rate = 1;
-            }
+                catch (Exception e) {
+                    Console.WriteLine("Unable to initialise the TTS engine, TTS will not be available. " +
+                                "Check a suitable Microsoft TTS voice pack is installed");
+                    useTTS = false;
+                }
+            } 
             this.currentLoadedCount = 0;
             this.eventTypesToKeepCached = eventTypesToKeepCached;
             this.useSwearyMessages = useSwearyMessages;
