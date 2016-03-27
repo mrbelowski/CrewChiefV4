@@ -1884,7 +1884,6 @@
 		<col def="S255">ISBuildSourcePath</col>
 		<col def="I4">ISAttributes</col>
 		<col def="S72">ISComponentSubFolder_</col>
-		<row><td>CrewChiefV4.primary_output</td><td>CrewChiefV4.Primary_output</td><td>CrewChiefV4.Primary output</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;CrewChiefV4&gt;|Built</td><td>3</td><td/></row>
 		<row><td>readme.txt</td><td>ISX_DEFAULTCOMPONENT</td><td>README.txt</td><td>0</td><td/><td/><td/><td>1</td><td>C:\projects\crewchief_c_sharp\CrewChiefV4\README.txt</td><td>1</td><td/></row>
 		<row><td>sharpdx_licence.txt</td><td>ISX_DEFAULTCOMPONENT</td><td>SHARPD~1.TXT|SharpDX_licence.txt</td><td>0</td><td/><td/><td/><td>1</td><td>C:\projects\crewchief_c_sharp\CrewChiefV4\SharpDX_licence.txt</td><td>1</td><td/></row>
 		<row><td>sounds_config.txt</td><td>ISX_DEFAULTCOMPONENT</td><td>SOUNDS~1.TXT|sounds_config.txt</td><td>0</td><td/><td/><td/><td>1</td><td>C:\projects\crewchief_c_sharp\CrewChiefV4\CrewChiefV4\sounds_config.txt</td><td>1</td><td/></row>
@@ -4383,9 +4382,9 @@ RABWAEQALQA1AAEARQB4AHAAcgBlAHMAcwA=
 		<row><td>PROGMSG_IIS_ROLLBACKVROOTS</td><td>##IDS_PROGMSG_IIS_ROLLBACKVROOTS##</td><td/></row>
 		<row><td>PROGMSG_IIS_ROLLBACKWEBSERVICEEXTENSIONS</td><td>##IDS_PROGMSG_IIS_ROLLBACKWEBSERVICEEXTENSIONS##</td><td/></row>
 		<row><td>PROGRAMFILETOLAUNCHATEND</td><td>[INSTALLDIR]CrewChiefV4.Primary output</td><td/></row>
-		<row><td>ProductCode</td><td>{B4B84334-0493-48E5-A3D6-1941D80185B1}</td><td/></row>
+		<row><td>ProductCode</td><td>{BB6C32BF-F34E-4D2D-A0FD-1942D4C8E4C6}</td><td/></row>
 		<row><td>ProductName</td><td>CrewChiefV4</td><td/></row>
-		<row><td>ProductVersion</td><td>4.1.6.0</td><td/></row>
+		<row><td>ProductVersion</td><td>4.1.6.1</td><td/></row>
 		<row><td>ProgressType0</td><td>install</td><td/></row>
 		<row><td>ProgressType1</td><td>Installing</td><td/></row>
 		<row><td>ProgressType2</td><td>installed</td><td/></row>
