@@ -289,7 +289,7 @@ namespace CrewChiefV4
         {
             try
             {                
-                String usableName = DriverNameHelper.getUsableDriverName(rawDriverName, AudioPlayer.soundFilesPath);
+                String usableName = DriverNameHelper.getUsableDriverName(rawDriverName);
                 if (usableName != null && usableName.Length > 0)
                 {
                     if (driverNamesInUse.Contains(rawDriverName))

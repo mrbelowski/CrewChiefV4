@@ -25,20 +25,9 @@ namespace CrewChiefV4
 
         private static Boolean rawNamesToUsableNamesFileRead = false;
 
-        public static String getUsableNameForRawName(String rawName)
+        public static void readRawNamesToUsableNamesFile(String soundsFolderName)
         {
-            if (usableNamesForSession.ContainsKey(rawName))
-            {
-                return usableNamesForSession[rawName];
-            }
-            else
-            {
-                return rawName;
-            }
-        }
-
-        private static void readRawNamesToUsableNamesFile(String soundsFolderName)
-        {
+            Console.WriteLine("Reading driver name mappings");
             int counter = 0;
             string line;
             try
@@ -59,6 +48,7 @@ namespace CrewChiefV4
                     counter++;
                 }
                 file.Close();
+                Console.WriteLine("Read " + counter + " driver name mappings");
             }
             catch (IOException e)
             {
@@ -88,6 +78,30 @@ namespace CrewChiefV4
                 {
                     name = name.Substring(name.LastIndexOf(']') + 1);
                 }
+                if (name.EndsWith(")") && name.Contains("("))
+                {
+                    name = name.Substring(0, name.LastIndexOf('('));
+                }
+                if (name.StartsWith("(") && name.Contains(")"))
+                {
+                    name = name.Substring(name.LastIndexOf(')') + 1);
+                }
+                if (name.EndsWith(">") && name.Contains("<"))
+                {
+                    name = name.Substring(0, name.LastIndexOf('<'));
+                }
+                if (name.StartsWith("<") && name.Contains(">"))
+                {
+                    name = name.Substring(name.LastIndexOf('>') + 1);
+                }
+                if (name.EndsWith("}") && name.Contains("{"))
+                {
+                    name = name.Substring(0, name.LastIndexOf('{'));
+                }
+                if (name.StartsWith("{") && name.Contains("}"))
+                {
+                    name = name.Substring(name.LastIndexOf('}') + 1);
+                }
                 for (int i = 0; i < 4; i++)
                 {
                     if (name.Count() > 1 && Char.IsNumber(name[name.Count() - 1]))
@@ -98,10 +112,29 @@ namespace CrewChiefV4
                     {
                         break;
                     }
-                }   
-                if (name.All(c=>Char.IsLetter(c) || c==' ' || c=='\'') && name.Length > 0) {
-                    return name.Trim();
                 }
+                Boolean allCharsValid = true;
+                String charsFromName = "";
+                for (int i = 0; i < name.Count(); i++)
+                {
+                    char ch = name[i];
+                    if (Char.IsLetter(ch) || ch == ' ' || ch == '\'')
+                    {
+                        charsFromName = charsFromName + ch;
+                    }
+                    else
+                    {
+                        allCharsValid = false;
+                    }
+                }
+                if (allCharsValid && name.Trim().Count() > 1)
+                {
+                    return name.Trim().ToLower();
+                }
+                else if (charsFromName.Trim().Count() > 1)
+                {
+                    return charsFromName.ToLower().Trim();
+                }                
             }
             catch (Exception)
             {
@@ -110,15 +143,11 @@ namespace CrewChiefV4
             return null;
         }
 
-        public static String getUsableDriverName(String rawDriverName, String soundsFolderName)
+        public static String getUsableDriverName(String rawDriverName)
         {            
             if (!usableNamesForSession.ContainsKey(rawDriverName))
             {
                 String usableDriverName = null;
-                if (!rawNamesToUsableNamesFileRead)
-                {
-                    readRawNamesToUsableNamesFile(soundsFolderName);
-                }
                 if (lowerCaseRawNameToUsableName.ContainsKey(rawDriverName.ToLower()))
                 {
                     usableDriverName = lowerCaseRawNameToUsableName[rawDriverName.ToLower()];
@@ -134,7 +163,7 @@ namespace CrewChiefV4
                         if (useLastNameWherePossible)
                         {
                             String lastName = getUnambiguousLastName(usableDriverName);
-                            if (lastName != null && lastName.Count() > 0)
+                            if (lastName != null && lastName.Count() > 1)
                             {
                                 if (lowerCaseRawNameToUsableName.ContainsKey(lastName.ToLower()))
                                 {
@@ -171,12 +200,12 @@ namespace CrewChiefV4
             }
         }
         
-        public static List<String> getUsableDriverNames(List<String> rawDriverNames, String soundsFolderName)
+        public static List<String> getUsableDriverNames(List<String> rawDriverNames)
         {
             usableNamesForSession.Clear();
             foreach (String rawDriverName in rawDriverNames)
             {
-                getUsableDriverName(rawDriverName, soundsFolderName);                
+                getUsableDriverName(rawDriverName);                
             }
             return usableNamesForSession.Values.ToList();
         }
@@ -198,7 +227,15 @@ namespace CrewChiefV4
                 String[] fullNameSplit = trimEmptyStrings(fullName.Split(' '));
                 if (fullNameSplit.Count() == 2)
                 {
-                    return fullName.Split(' ')[1];
+                    String[] split = fullName.Split(' ');
+                    if (split[1].Count() > 1)
+                    {
+                        return split[1];
+                    }
+                    else
+                    {
+                        return split[0];
+                    }
                 }
                 else if (fullNameSplit[fullNameSplit.Count() - 2].Length == 1) 
                 {

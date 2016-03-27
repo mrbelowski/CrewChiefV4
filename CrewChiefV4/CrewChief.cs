@@ -97,6 +97,7 @@ namespace CrewChiefV4
             eventsList.Add("ConditionsMonitor", new ConditionsMonitor(audioPlayer));
             eventsList.Add("OvertakingAidsMonitor", new OvertakingAidsMonitor(audioPlayer));
             sessionEndMessages = new SessionEndMessages(audioPlayer);
+            DriverNameHelper.readRawNamesToUsableNamesFile(AudioPlayer.soundFilesPath);
         }
 
         public void setGameDefinition(GameDefinition gameDefinition)
@@ -456,7 +457,7 @@ namespace CrewChiefV4
                                     }
                                     if (rawDriverNames.Count > 0)
                                     {
-                                        List<String> usableDriverNames = DriverNameHelper.getUsableDriverNames(rawDriverNames, AudioPlayer.soundFilesPath);
+                                        List<String> usableDriverNames = DriverNameHelper.getUsableDriverNames(rawDriverNames);
                                         if (speechRecogniser != null && speechRecogniser.initialised)
                                         {
                                             speechRecogniser.addOpponentSpeechRecognition(usableDriverNames, enableDriverNames);

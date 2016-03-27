@@ -235,7 +235,7 @@ namespace CrewChiefV4
                         canBePlayed = false;
                         if (messageFragment.opponent != null)
                         {
-                            String usableName = DriverNameHelper.getUsableNameForRawName(messageFragment.opponent.DriverRawName);
+                            String usableName = DriverNameHelper.getUsableDriverName(messageFragment.opponent.DriverRawName);
                             if (SoundCache.availableDriverNames.Contains(usableName))
                             {
                                 messages.Add(usableName);

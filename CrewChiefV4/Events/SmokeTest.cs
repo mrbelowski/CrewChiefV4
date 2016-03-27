@@ -62,11 +62,11 @@ namespace CrewChiefV4.Events
             if (rawDriverNames.Count > 0)
             {
                 Console.WriteLine("Playing test sounds for drivers " + String.Join(", ", rawDriverNames));
-                List<String> usableDriverNames = DriverNameHelper.getUsableDriverNames(rawDriverNames, AudioPlayer.soundFilesPath);
+                List<String> usableDriverNames = DriverNameHelper.getUsableDriverNames(rawDriverNames);
                 int index = 0;
                 foreach (OpponentData driverToTest in driversToTest)
                 {
-                    if (SoundCache.availableDriverNames.Contains(DriverNameHelper.getUsableNameForRawName(driverToTest.DriverRawName)))
+                    if (SoundCache.availableDriverNames.Contains(DriverNameHelper.getUsableDriverName(driverToTest.DriverRawName)))
                     {
                         audioPlayer.playMessage(new QueuedMessage("gap_in_front" + index,
                                         MessageContents(Timings.folderTheGapTo, driverToTest, Timings.folderAheadIsIncreasing,
@@ -92,7 +92,7 @@ namespace CrewChiefV4.Events
             audioPlayer.playMessage(new QueuedMessage(folderTest, 0, this));
             
             /*audioPlayer.playMessage(new QueuedMessage("gap_in_front",
-                                        MessageContents(Timings.folderTheGapTo, makeTempDriver("Geldof", new List<string>()), Timings.folderAheadIsIncreasing,
+                                        MessageContents(Timings.folderTheGapTo, makeTempDriver("7908jimmy6^&^", new List<string>()), Timings.folderAheadIsIncreasing,
                                         TimeSpan.FromSeconds((float)random.NextDouble() * 10)),
                                         MessageContents(Timings.folderGapInFrontIncreasing, TimeSpan.FromSeconds((float)random.NextDouble() * 10)), 0, this));
             */
