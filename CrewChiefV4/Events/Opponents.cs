@@ -125,7 +125,7 @@ namespace CrewChiefV4.Events
                         // a tenth quicker then his previous best we do...
                         if (((currentGameState.SessionData.SessionType == SessionType.Race && opponentData.CompletedLaps > 2) ||
                             (currentGameState.SessionData.SessionType != SessionType.Race && opponentData.CompletedLaps > 1)) && opponentData.LastLapTime <= currentFastestLap &&
-                            SoundCache.availableDriverNames.Contains(DriverNameHelper.getUsableNameForRawName(opponentData.DriverRawName)))
+                            SoundCache.availableDriverNames.Contains(DriverNameHelper.getUsableDriverName(opponentData.DriverRawName)))
                         {
                             audioPlayer.playMessage(new QueuedMessage("new_fastest_lap", MessageContents(folderNewFastestLapFor, opponentData,
                                         TimeSpan.FromSeconds(opponentData.LastLapTime)), 0, this));
@@ -282,7 +282,7 @@ namespace CrewChiefV4.Events
             {
                 foreach (KeyValuePair<Object, OpponentData> entry in currentGameState.OpponentData)
                 {
-                    String usableDriverName = DriverNameHelper.getUsableNameForRawName(entry.Value.DriverRawName);
+                    String usableDriverName = DriverNameHelper.getUsableDriverName(entry.Value.DriverRawName);
                     if (voiceMessage.Contains(usableDriverName))
                     {
                         opponentKey = entry.Key;

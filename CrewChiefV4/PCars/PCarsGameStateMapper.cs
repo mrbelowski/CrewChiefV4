@@ -352,10 +352,15 @@ namespace CrewChiefV4.PCars
             }
             currentGameState.SessionData.TrackDefinition = TrackData.getTrackDefinition(StructHelper.getNameFromBytes(shared.mTrackLocation)
                 + ":" + StructHelper.getNameFromBytes(shared.mTrackVariation), shared.mTrackLength);
+
             // now check if this is a new session...
-            Boolean raceRestarted = currentGameState.SessionData.SessionType == SessionType.Race &&
-                lastSessionPhase == SessionPhase.Green && currentGameState.SessionData.SessionPhase == SessionPhase.Countdown;
-            if (raceRestarted ||
+
+            Boolean sessionOfSameTypeRestarted = ((currentGameState.SessionData.SessionType == SessionType.Race && lastSessionType == SessionType.Race) ||
+                (currentGameState.SessionData.SessionType == SessionType.Practice && lastSessionType == SessionType.Practice) ||
+                (currentGameState.SessionData.SessionType == SessionType.Qualify && lastSessionType == SessionType.Qualify)) &&
+                (lastSessionPhase == SessionPhase.Green || lastSessionPhase == SessionPhase.Finished) &&
+                currentGameState.SessionData.SessionPhase == SessionPhase.Countdown;
+            if (sessionOfSameTypeRestarted ||
                 ((currentGameState.SessionData.SessionType != SessionType.Unavailable && 
                     currentGameState.SessionData.SessionPhase != SessionPhase.Finished &&
                     currentGameState.SessionData.SessionPhase != SessionPhase.Unavailable) &&
@@ -364,9 +369,9 @@ namespace CrewChiefV4.PCars
                 (currentGameState.SessionData.SessionHasFixedTime && sessionTimeRemaining > lastSessionTimeRemaining + 1))))
             {
                 Console.WriteLine("New session, trigger...");
-                if (raceRestarted)
+                if (sessionOfSameTypeRestarted)
                 {
-                    Console.WriteLine("Race restarted (green -> countdown)");
+                    Console.WriteLine("Session of same type (" + lastSessionType + ") restarted (green / finished -> countdown)");
                 }
                 if (lastSessionType != currentGameState.SessionData.SessionType) 
                 {
@@ -1017,7 +1022,10 @@ namespace CrewChiefV4.PCars
             // Tyre slip speed seems to peak at about 30 with big lock or wheelspin (in Sauber Merc). It's noisy as hell and is frequently bouncing around
             // in single figures, with the noise varying between cars.
             // tyreRPS is much cleaner but we don't know the diameter of the tyre so can't compare it (accurately) to the car's speed
-            if (shared.mSpeed > 7)
+
+            // disabled for go-karts
+            if (shared.mSpeed > 7 && currentGameState.carClass != null &&
+                currentGameState.carClass.carClassEnum != CarData.CarClassEnum.Kart_1 && currentGameState.carClass.carClassEnum != CarData.CarClassEnum.Kart_2)
             {
                 float minRotatingSpeed = 2 * (float)Math.PI * shared.mSpeed / currentGameState.carClass.maxTyreCircumference;
                 // I think the tyreRPS is actually radians per second...

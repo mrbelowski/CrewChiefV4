@@ -1,4 +1,4 @@
-﻿using Microsoft.Speech.Synthesis;
+﻿using System.Speech.Synthesis;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -60,10 +60,38 @@ namespace CrewChiefV4.Audio
                         catch (Exception e) { }
                     }
                     synthesizer = new SpeechSynthesizer();
-                    synthesizer.SelectVoiceByHints(VoiceGender.Male, VoiceAge.Senior);
+                    VoiceAge age = VoiceAge.Adult;
+                    Boolean hasMale = false;
+                    Boolean hasAdult = false;
+                    Boolean hasSenior = false;
+                    foreach (InstalledVoice voice in synthesizer.GetInstalledVoices())
+                    {
+                        if (voice.VoiceInfo.Age == VoiceAge.Adult)
+                        {
+                            hasAdult = true;
+                        }
+                        if (voice.VoiceInfo.Age == VoiceAge.Senior)
+                        {
+                            hasSenior = true;
+                        }
+                        if (voice.VoiceInfo.Gender == VoiceGender.Male)
+                        {
+                            hasMale = true;
+                        }
+                    }
+                    if (!hasMale || (!hasAdult && !hasSenior))
+                    {
+                        Console.WriteLine("No suitable TTS voice pack found - TTS will probably sound awful and isn't recommended "+
+                            "(this is a Windows 7 limitation, later versions should be able to use Microsoft's 'David' voice - this can be selected in the Control Panel)");
+                        if (synthesizer.GetInstalledVoices().Count == 1)
+                        {
+                            Console.WriteLine("Defaulting to voice " + synthesizer.GetInstalledVoices()[0].VoiceInfo.Name);
+                        }
+                    }
+                    synthesizer.SelectVoiceByHints(VoiceGender.Male, hasAdult ? VoiceAge.Adult : VoiceAge.Senior);
                     synthesizer.SetOutputToDefaultAudioDevice();
                     synthesizer.Volume = 100;
-                    synthesizer.Rate = 1;
+                    synthesizer.Rate = 0;
                 }
                 catch (Exception e) {
                     Console.WriteLine("Unable to initialise the TTS engine, TTS will not be available. " +
