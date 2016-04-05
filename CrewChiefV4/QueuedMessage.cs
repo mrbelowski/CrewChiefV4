@@ -119,7 +119,7 @@ namespace CrewChiefV4
         public QueuedMessage(String messageName, List<MessageFragment> messageFragments, int secondsDelay, AbstractEvent abstractEvent)
         {
             this.messageName = compoundMessageIdentifier + messageName;
-            this.messageFolders = getMessageFolders(messageFragments);
+            this.messageFolders = getMessageFolders(messageFragments, false);
             this.dueTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + (secondsDelay * 1000) + updateInterval;
             this.abstractEvent = abstractEvent;
         }
@@ -139,12 +139,12 @@ namespace CrewChiefV4
             int secondsDelay, AbstractEvent abstractEvent)
         {
             this.messageName = compoundMessageIdentifier + messageName;
-            this.messageFolders = getMessageFolders(messageFragments);
+            this.messageFolders = getMessageFolders(messageFragments, true);
             if (!canBePlayed)
             {
                 Console.WriteLine("Using secondary messages for event " + messageName);
                 canBePlayed = true;
-                this.messageFolders = getMessageFolders(alternateMessageFragments);
+                this.messageFolders = getMessageFolders(alternateMessageFragments, false);
                 if (!canBePlayed)
                 {
                     Console.WriteLine("Primary and secondary messages for event " +
@@ -166,7 +166,7 @@ namespace CrewChiefV4
             this.messageName = message;
             List<MessageFragment> messageFragments = new List<MessageFragment>();
             messageFragments.Add(MessageFragment.Text(message));
-            this.messageFolders = getMessageFolders(messageFragments);
+            this.messageFolders = getMessageFolders(messageFragments, false);
             this.dueTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + (secondsDelay * 1000) + updateInterval;
             this.abstractEvent = abstractEvent;
         }
@@ -177,7 +177,7 @@ namespace CrewChiefV4
                 this.abstractEvent.isMessageStillValid(eventSubType, currentGameState, validationData);
         }
 
-        private List<String> getMessageFolders(List<MessageFragment> messageFragments)
+        private List<String> getMessageFolders(List<MessageFragment> messageFragments, Boolean hasAlternative)
         {
             List<String> messages = new List<String>();
             for (int i=0; i< messageFragments.Count; i++) 
@@ -241,7 +241,7 @@ namespace CrewChiefV4
                                 messages.Add(usableName);
                                 canBePlayed = true;
                             }
-                            else if (usableName != null && usableName.Count() > 0 && SoundCache.useTTS)
+                            else if (usableName != null && usableName.Count() > 0 && SoundCache.useTTS && !hasAlternative)
                             {
                                 messages.Add(SoundCache.TTS_IDENTIFIER + usableName);
                                 canBePlayed = true;

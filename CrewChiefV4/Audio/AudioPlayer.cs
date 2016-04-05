@@ -82,7 +82,6 @@ namespace CrewChiefV4.Audio
 
         private String backgroundFilesPath;
 
-        // TODO: sort looping callback out so we don't need this...
         private int backgroundLeadout = 30;
 
         public static String dtmPitWindowOpenBackground = "dtm_pit_window_open.wav";

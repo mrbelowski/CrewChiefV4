@@ -470,9 +470,18 @@ namespace CrewChiefV4.Events
                     if (opponentKey != null)
                     {
                         OpponentData opponent = currentGameState.OpponentData[opponentKey];
-                        QueuedMessage queuedMessage = new QueuedMessage("opponentNameAndPosition", MessageContents(currentGameState.OpponentData[opponentKey],
-                            Position.folderStub + opponent.Position),
-                            MessageContents(Position.folderStub + opponent.Position, folderCantPronounceName), 0, null);
+                        QueuedMessage queuedMessage;
+                        if (SoundCache.useTTS)
+                        {
+                            queuedMessage = new QueuedMessage("opponentNameAndPosition", MessageContents(opponent,
+                                    Position.folderStub + opponent.Position), 0, null);
+                        }
+                        else
+                        {
+                            queuedMessage = new QueuedMessage("opponentNameAndPosition", MessageContents(opponent,
+                                    Position.folderStub + opponent.Position),
+                                    MessageContents(Position.folderStub + opponent.Position, folderCantPronounceName), 0, null);
+                        }
                         if (queuedMessage.canBePlayed)
                         {
                             audioPlayer.playMessageImmediately(queuedMessage);
@@ -487,9 +496,19 @@ namespace CrewChiefV4.Events
                     if (opponentKey != null)
                     {
                         OpponentData opponent = currentGameState.OpponentData[opponentKey];
-                        QueuedMessage queuedMessage = new QueuedMessage("opponentName", MessageContents(currentGameState.OpponentData[opponentKey],
-                            Position.folderStub + opponent.Position),
-                            MessageContents(Position.folderStub + opponent.Position, folderCantPronounceName), 0, null);
+                        QueuedMessage queuedMessage;
+                        if (SoundCache.useTTS)
+                        {
+                            queuedMessage = new QueuedMessage("opponentName", MessageContents(opponent,
+                                    Position.folderStub + opponent.Position), 0, null);
+                        }
+                        else
+                        {
+                            queuedMessage = new QueuedMessage("opponentName", MessageContents(opponent,
+                                    Position.folderStub + opponent.Position),
+                                    MessageContents(Position.folderStub + opponent.Position, folderCantPronounceName), 0, null);
+                        }
+                        
                         if (queuedMessage.canBePlayed)
                         {
                             audioPlayer.playMessageImmediately(queuedMessage);
@@ -511,7 +530,16 @@ namespace CrewChiefV4.Events
                         OpponentData opponent = currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position + 1, false);
                         if (opponent != null)
                         {
-                            QueuedMessage queuedMessage = new QueuedMessage("opponentName", MessageContents(opponent), MessageContents(folderCantPronounceName), 0, null);
+                            QueuedMessage queuedMessage;
+                            if (SoundCache.useTTS)
+                            {
+                                queuedMessage = new QueuedMessage("opponentName", MessageContents(opponent), 0, null);
+                            }
+                            else
+                            {
+                                queuedMessage = new QueuedMessage("opponentName", MessageContents(opponent), MessageContents(folderCantPronounceName), 0, null);
+                            }
+                        
                             if (queuedMessage.canBePlayed)
                             {
                                 audioPlayer.playMessageImmediately(queuedMessage);
@@ -534,7 +562,16 @@ namespace CrewChiefV4.Events
                         OpponentData opponent = currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position - 1, false);
                         if (opponent != null)
                         {
-                            QueuedMessage queuedMessage = new QueuedMessage("opponentName", MessageContents(opponent), MessageContents(folderCantPronounceName), 0, null);
+                            QueuedMessage queuedMessage;
+                            if (SoundCache.useTTS)
+                            {
+                                queuedMessage = new QueuedMessage("opponentName", MessageContents(opponent), 0, null);
+                            }
+                            else
+                            {
+                                queuedMessage = new QueuedMessage("opponentName", MessageContents(opponent), MessageContents(folderCantPronounceName), 0, null);
+                            }
+                        
                             if (queuedMessage.canBePlayed)
                             {
                                 audioPlayer.playMessageImmediately(queuedMessage);
@@ -549,7 +586,15 @@ namespace CrewChiefV4.Events
                     OpponentData opponent = currentGameState.getOpponentAtPosition(1, false);
                     if (opponent != null)
                     {
-                        QueuedMessage queuedMessage = new QueuedMessage("opponentName", MessageContents(opponent), MessageContents(folderCantPronounceName), 0, null);
+                        QueuedMessage queuedMessage;
+                        if (SoundCache.useTTS)
+                        {
+                            queuedMessage = new QueuedMessage("opponentName", MessageContents(opponent), 0, null);
+                        }
+                        else
+                        {
+                            queuedMessage = new QueuedMessage("opponentName", MessageContents(opponent), MessageContents(folderCantPronounceName), 0, null);
+                        }
                         if (queuedMessage.canBePlayed)
                         {
                             audioPlayer.playMessageImmediately(queuedMessage);
@@ -572,7 +617,15 @@ namespace CrewChiefV4.Events
                         else if (currentGameState.OpponentData.ContainsKey(opponentKey))
                         {
                             OpponentData opponent = currentGameState.OpponentData[opponentKey];
-                            QueuedMessage queuedMessage = new QueuedMessage("opponentName", MessageContents(opponent), MessageContents(folderCantPronounceName), 0, null);
+                            QueuedMessage queuedMessage;
+                            if (SoundCache.useTTS)
+                            {
+                                queuedMessage = new QueuedMessage("opponentName", MessageContents(opponent), 0, null);
+                            }
+                            else
+                            {
+                                queuedMessage = new QueuedMessage("opponentName", MessageContents(opponent), MessageContents(folderCantPronounceName), 0, null);
+                            }
                             if (queuedMessage.canBePlayed)
                             {
                                 audioPlayer.playMessageImmediately(queuedMessage);

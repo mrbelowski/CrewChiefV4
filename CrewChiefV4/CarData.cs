@@ -73,6 +73,10 @@ namespace CrewChiefV4
             VINTAGE_INDY_65, VINTAGE_F3_A, VINTAGE_F1_A, VINTAGE_F1_A1, VINTAGE_GT3, VINTAGE_GT, HISTORIC_TOURING_1, HISTORIC_TOURING_2, VINTAGE_F1_B, VINTAGE_F1_C, STOCK_CAR, F1, F2, F3, F4, FF, TC1, TC2, 
             AUDI_TT_CUP, CLIO_CUP, DTM, DTM_2013, V8_SUPERCAR, DTM_2014, DTM_2015, TRANS_AM, HILL_CLIMB_ICONS, FORMULA_RENAULT, MEGANE_TROPHY, NSU_TT, UNKNOWN_RACE
         }
+        // TODO: RR new classes: radical / CDP / some old P1s moved to LMP2; LMP1 classes reduced (2 members, different cars).
+        // All this should be OK, but needs to be checked; 
+        // FR4 and FR5 to add (FR3?); GTO classics to check (no enum for these yet - don't allow them to be G5, what's the ID?);
+        // 
 
         public class CarClass
         {
