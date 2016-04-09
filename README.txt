@@ -2,6 +2,8 @@ CrewChief version 4.
 
 Changelog
 ---------
+Version 4.1.6.2: Some TTS revisions; Updated RaceRoom car classes to match new patch
+
 Version 4.1.6.1: Some TTS changes so the app should use Microsoft's David voice on Windows 10 (Windows 7 users are stuck with the execrable Anna); Some gamer tag -> driver name extraction tweaks.
 
 Version 4.1.6.0: Fixed crash bug when selecting 'alternate beeps'; Some Project Cars session restart detection changes; Work in progress text-to-speech for missing driver name.
