@@ -7,6 +7,9 @@ namespace CrewChiefV4
 {
     public class TrackData
     {
+        public static float gapPointsThreshold = 10000f;
+        public static float gapPointSpacing = 1500f;
+
         public static List<TrackDefinition> pCarsTracks = new List<TrackDefinition>()
         {
             new TrackDefinition("Autodromo Nazionale Monza:Grand Prix", 3, 5782.521f, new float[] {22.20312f, -437.1672f}, new float[] {63.60915f, -1.117797f}),
@@ -150,6 +153,7 @@ namespace CrewChiefV4
         public Boolean hasPitLane;
         public float[] pitEntryPoint = new float[] { 0, 0 };
         public float[] pitExitPoint = new float[] { 0, 0 };
+        public float[] gapPoints = new float[] { };
         public float pitEntryExitPointsDiameter = 3;   // if we're within this many metres of the pit entry point, we're entering the pit
 
         public TrackDefinition(String name, float pitEntryExitPointsDiameter, float trackLength, float[] pitEntryPoint, float[] pitExitPoint)
@@ -160,6 +164,7 @@ namespace CrewChiefV4
             this.pitEntryPoint = pitEntryPoint;
             this.pitExitPoint = pitExitPoint;
             this.pitEntryExitPointsDiameter = pitEntryExitPointsDiameter;
+            setGapPoints();
         }
 
         public TrackDefinition(String name, float trackLength)
@@ -167,6 +172,36 @@ namespace CrewChiefV4
             this.name = name;
             this.trackLength = trackLength;
             this.hasPitLane = false;
+            setGapPoints();
+        }
+
+        private void setGapPoints()
+        {
+            if (trackLength > TrackData.gapPointsThreshold)
+            {
+                float totalGaps = 0;
+                List<float> gaps = new List<float>();
+                // the gapPoints are used instead of the sector / start-finish line for opponent gaps.
+                // We need to ensure our 1st gap point is near, but not on, the start-finish line (so the lap
+                // distance between previous and current game states has increased). Yes. A hack.
+                gaps.Add(100f);
+                while (totalGaps < trackLength)
+                {
+                    totalGaps += TrackData.gapPointSpacing;
+                    if (totalGaps < trackLength - 500)
+                    {
+                        // -500 because we don't want to add a gap point within 500 metres of the finish line
+                        gaps.Add(totalGaps);
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                Console.WriteLine("Track length = " + trackLength + " split into " + gaps.Count() + " gap points at " +
+                    String.Join(", ", gapPoints));
+                gapPoints = gaps.ToArray();
+            }
         }
 
         public Boolean isAtPitEntry(float x, float y)

@@ -205,8 +205,8 @@ namespace CrewChiefV4.Events
             }
             if (!currentGameState.PitData.InPitlane && enableGapMessages)
             {
-                if (isRace && !CrewChief.readOpponentDeltasForEveryLap && 
-                    currentGameState.SessionData.IsNewSector)
+                if (isRace && !CrewChief.readOpponentDeltasForEveryLap &&
+                    IsNewSectorOrGapPoint(previousGameState, currentGameState))
                 {
                     sectorsSinceLastGapAheadReport++;
                     sectorsSinceLastGapBehindReport++;
@@ -452,6 +452,30 @@ namespace CrewChiefV4.Events
                 }
             }
             return bestLap;
+        }
+
+        private Boolean IsNewSectorOrGapPoint(GameStateData previousGameState, GameStateData currentGameState)
+        {
+            if (currentGameState.SessionData.TrackDefinition.gapPoints.Count() > 0) {
+                // the current track definition has 'gapPoints', so use them
+                if (currentGameState.PositionAndMotionData.DistanceRoundTrack > 0 &&
+                    currentGameState.PositionAndMotionData.DistanceRoundTrack > previousGameState.PositionAndMotionData.DistanceRoundTrack)
+                {                    
+                    foreach (float gapPoint in currentGameState.SessionData.TrackDefinition.gapPoints)
+                    {
+                        if (currentGameState.PositionAndMotionData.DistanceRoundTrack >= gapPoint &&
+                            previousGameState.PositionAndMotionData.DistanceRoundTrack < gapPoint)
+                        {
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            }
+            else
+            {
+                return currentGameState.SessionData.IsNewSector;
+            }
         }
     }
 }
