@@ -128,7 +128,7 @@ namespace CrewChiefV4
             carClasses.Add(new CarClass(CarClassEnum.GT1X, new String[] { "GT1X" }, new int[] { 1710 }, BrakeType.Ceramic, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp));
             carClasses.Add(new CarClass(CarClassEnum.GT1, new String[] { "GT1" }, new int[] { 1687 }, BrakeType.Ceramic, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp));
             carClasses.Add(new CarClass(CarClassEnum.GT2, new String[] { "GT2" }, new int[] { 1704 }, BrakeType.Ceramic, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp));
-            carClasses.Add(new CarClass(CarClassEnum.GT3, new String[] { "GT3" }, new int[] { 1703, 2922, 3375 }, BrakeType.Iron_Race, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp));
+            carClasses.Add(new CarClass(CarClassEnum.GT3, new String[] { "GT3" }, new int[] { 1703, 2922, 3375, 4516 }, BrakeType.Iron_Race, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp));
             carClasses.Add(new CarClass(CarClassEnum.ADAC_GTM_2013, new String[] {  }, new int[] { 2922 }, BrakeType.Iron_Race, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp));
             carClasses.Add(new CarClass(CarClassEnum.ADAC_GTM_2014, new String[] {  }, new int[] { 3375 }, BrakeType.Iron_Race, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp));
             carClasses.Add(new CarClass(CarClassEnum.GT4, new String[] { "GT4" }, new int[] { 1717 }, BrakeType.Iron_Race, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp));
