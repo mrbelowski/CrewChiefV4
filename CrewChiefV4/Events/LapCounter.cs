@@ -206,14 +206,14 @@ namespace CrewChiefV4.Events
                     {
                         audioPlayer.playMessage(new QueuedMessage(folderLastLapTopThree, 0, this));
                     }
-                    else if (position >= 4)
-                    {
-                        audioPlayer.playMessage(new QueuedMessage(folderLastLap, 0, this), PearlsOfWisdom.PearlType.NEUTRAL, 0.5);
-                    }
-                    else if (position >= 10)
+                    else if (position >= currentGameState.SessionData.SessionStartPosition + 5)
                     {
                         audioPlayer.playMessage(new QueuedMessage(folderLastLap, 0, this), PearlsOfWisdom.PearlType.BAD, 0.5);
                     }
+                    else if (position >= 4)
+                    {
+                        audioPlayer.playMessage(new QueuedMessage(folderLastLap, 0, this), PearlsOfWisdom.PearlType.NEUTRAL, 0.5);
+                    }                    
                     else
                     {
                         Console.WriteLine("1 lap left but position is < 1");
@@ -229,13 +229,13 @@ namespace CrewChiefV4.Events
                     {
                         audioPlayer.playMessage(new QueuedMessage(folderTwoLeftTopThree, 0, this));
                     }
+                    else if (position >= currentGameState.SessionData.SessionStartPosition + 5)
+                    {
+                        audioPlayer.playMessage(new QueuedMessage(folderTwoLeft, 0, this), PearlsOfWisdom.PearlType.BAD, 0.5);
+                    }
                     else if (position >= 4)
                     {
                         audioPlayer.playMessage(new QueuedMessage(folderTwoLeft, 0, this), PearlsOfWisdom.PearlType.NEUTRAL, 0.5);
-                    }
-                    else if (position >= 10)
-                    {
-                        audioPlayer.playMessage(new QueuedMessage(folderTwoLeft, 0, this), PearlsOfWisdom.PearlType.BAD, 0.5);
                     }
                     else
                     {

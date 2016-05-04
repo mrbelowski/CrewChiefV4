@@ -83,7 +83,7 @@ namespace CrewChiefV4.Events
         // check fuel use every minute
         private int fuelUseSampleTime = 1;
 
-        private float currentFuel;
+        private float currentFuel = -1;
 
         private float gameTimeWhenFuelWasReset = 0;
 
@@ -116,7 +116,7 @@ namespace CrewChiefV4.Events
             playedTwoMinutesRemaining = false;
             played1LitreWarning = false;
             played2LitreWarning = false;
-            currentFuel = -1;
+            currentFuel = 0;
             fuelUseActive = false;
             gameTimeWhenFuelWasReset = 0;
             lapsCompletedWhenFuelWasReset = 0;
@@ -131,6 +131,13 @@ namespace CrewChiefV4.Events
 
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
+            // if the fuel level has increased, don't trigger
+            if (currentFuel > -1 && currentFuel < currentGameState.FuelData.FuelLeft)
+            {
+                currentFuel = currentGameState.FuelData.FuelLeft;
+                return;
+            }
+
             fuelUseActive = currentGameState.FuelData.FuelUseActive;
             currentFuel = currentGameState.FuelData.FuelLeft;
             if (fuelUseActive && ((currentGameState.SessionData.SessionType == SessionType.Race &&
@@ -320,7 +327,9 @@ namespace CrewChiefV4.Events
                         playedTwoMinutesRemaining = true;
                         playedFiveMinutesRemaining = true;
                         playedTenMinutesRemaining = true;
-                        audioPlayer.playMessage(new QueuedMessage(folderAboutToRunOut, 0, this));
+                        // TODO: Test this addition of 'box this lap'
+                        audioPlayer.playMessage(new QueuedMessage("pit_for_fuel_now", 
+                            MessageContents(folderAboutToRunOut, MandatoryPitStops.folderMandatoryPitStopsPitThisLap), 0, this));
                     } if (enableFuelMessages && estimatedFuelMinutesLeft <= 2 && estimatedFuelMinutesLeft > 1.8 && !playedTwoMinutesRemaining)
                     {
                         playedTwoMinutesRemaining = true;

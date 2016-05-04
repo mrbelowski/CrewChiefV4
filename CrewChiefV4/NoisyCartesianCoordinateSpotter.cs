@@ -248,6 +248,8 @@ namespace CrewChiefV4
             // when checking for an overlap, use the 'short' (actual) car length if we're not already overlapping on that side.
             // If we're already overlapping, use the 'long' car length - this means we don't call 'clear' till there's a small gap
 
+            // +ve alignedZCoordinate => the opponent is *behind*
+
             // we only want to check for width separation if we haven't already got an overlap
             if (Math.Abs(alignedXCoordinate) < trackZoneToConsider)
             {
@@ -265,7 +267,12 @@ namespace CrewChiefV4
                         Math.Abs(alignedXCoordinate) > carWidth && isOpponentSpeedInRange)
                     {
                         // we have a new overlap on this side, it's only valid if we're not inside the other car and the speed isn't out of range
-                        return Side.right;
+                        // Additional check here - if we only want spotter messages when we're being overtaken, then this new overlap 
+                        // must have the opponent car behind us. Note the alignedZCoordinate value is +ve if the opponent is behind
+                        if (alignedZCoordinate > 0 || !spotterOnlyWhenBeingPassed)
+                        {
+                            return Side.right;
+                        }
                     }
                 }
                 else
@@ -280,7 +287,12 @@ namespace CrewChiefV4
                     else if (((alignedZCoordinate < 0 && alignedZCoordinate * -1 < carLength) || (alignedZCoordinate > 0 && alignedZCoordinate < carLength + carBehindExtraLength)) &&
                         Math.Abs(alignedXCoordinate) > carWidth && isOpponentSpeedInRange)
                     {
-                        return Side.left;
+                        // Additional check here - if we only want spotter messages when we're being overtaken, then this new overlap 
+                        // must have the opponent car behind us
+                        if (alignedZCoordinate > 0 || !spotterOnlyWhenBeingPassed)
+                        {
+                            return Side.left;
+                        }
                     }
                 }
             }

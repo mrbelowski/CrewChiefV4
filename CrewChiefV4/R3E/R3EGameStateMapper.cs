@@ -23,21 +23,22 @@ namespace CrewChiefV4.RaceRoom
         // tyres in R3E only go down to 0.9
         private float wornOutTyreWearLevel = 0.90f;
 
+        // TODO: test these values, the sensitivity has been *doubled* here
         private float scrubbedTyreWearPercent = 2f;
-        private float minorTyreWearPercent = 10f;
-        private float majorTyreWearPercent = 40f;
-        private float wornOutTyreWearPercent = 80f;        
+        private float minorTyreWearPercent = 5f;
+        private float majorTyreWearPercent = 20f;
+        private float wornOutTyreWearPercent = 40f;        
 
         private float trivialAeroDamageThreshold = 0.99995f;
         private float trivialEngineDamageThreshold = 0.995f;
         private float trivialTransmissionDamageThreshold = 0.99f;
 
         private float minorTransmissionDamageThreshold = 0.97f;
-        private float minorEngineDamageThreshold = 0.985f;
+        private float minorEngineDamageThreshold = 0.99f;
         private float minorAeroDamageThreshold = 0.995f;
 
         private float severeTransmissionDamageThreshold = 0.4f;
-        private float severeEngineDamageThreshold = 0.5f;
+        private float severeEngineDamageThreshold = 0.6f;
         private float severeAeroDamageThreshold = 0.95f;
 
         private float destroyedTransmissionThreshold = 0.1f;
@@ -169,6 +170,7 @@ namespace CrewChiefV4.RaceRoom
                 currentGameState.PitData.IsRefuellingAllowed = true;
 
                 // reset the engine temp monitor stuff
+
                 gotBaselineEngineData = false;
                 baselineEngineDataSamples = 0;
                 baselineEngineDataOilTemp = targetEngineOilTemp;
@@ -809,7 +811,9 @@ namespace CrewChiefV4.RaceRoom
             currentGameState.EngineData.EngineRpm = Utilities.RpsToRpm(shared.EngineRps);
             currentGameState.EngineData.MaxEngineRpm = Utilities.RpsToRpm(shared.MaxEngineRps);
             currentGameState.EngineData.MinutesIntoSessionBeforeMonitoring = 5;
-
+            
+            // all this 'baseline' engine temp logic was only ever a hack and is now disabled
+            /*
             if (!gotBaselineEngineData)
             {
                 currentGameState.EngineData.EngineOilTemp = shared.EngineOilTemp;
@@ -839,7 +843,9 @@ namespace CrewChiefV4.RaceRoom
                 currentGameState.EngineData.EngineOilTemp = shared.EngineOilTemp * targetEngineOilTemp / baselineEngineDataOilTemp;
                 currentGameState.EngineData.EngineWaterTemp = shared.EngineWaterTemp * targetEngineWaterTemp / baselineEngineDataWaterTemp;
             }
-
+            */
+            currentGameState.EngineData.EngineOilTemp = shared.EngineOilTemp;
+            currentGameState.EngineData.EngineWaterTemp = shared.EngineWaterTemp;
 
             //------------------------ Fuel data -----------------------
             currentGameState.FuelData.FuelUseActive = shared.FuelUseActive == 1;

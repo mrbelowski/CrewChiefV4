@@ -111,7 +111,7 @@ namespace CrewChiefV4.Events
                     {
                         pearlType = PearlsOfWisdom.PearlType.GOOD;
                     }
-                    else if (currentGameState.SessionData.Position > 10)
+                    else if (currentGameState.SessionData.Position > currentGameState.SessionData.SessionStartPosition + 5)
                     {
                         pearlType = PearlsOfWisdom.PearlType.BAD;
                     }
