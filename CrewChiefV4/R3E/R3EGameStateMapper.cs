@@ -20,14 +20,14 @@ namespace CrewChiefV4.RaceRoom
         private List<CornerData.EnumWithThresholds> tyreWearThresholds = new List<CornerData.EnumWithThresholds>();
         private List<CornerData.EnumWithThresholds> brakeDamageThresholds = new List<CornerData.EnumWithThresholds>();
 
-        // tyres in R3E only go down to 0.9
-        private float wornOutTyreWearLevel = 0.90f;
+        // recent r3e changes to tyre wear levels / rates - the data in the block appear to 
+        // have changed recently, with about 0.5 representing 'worn out'. TODO: verify this assumption
+        private float wornOutTyreWearLevel = 0.05f;
 
-        // TODO: test these values, the sensitivity has been *doubled* here
         private float scrubbedTyreWearPercent = 2f;
-        private float minorTyreWearPercent = 5f;
-        private float majorTyreWearPercent = 20f;
-        private float wornOutTyreWearPercent = 40f;        
+        private float minorTyreWearPercent = 10f;
+        private float majorTyreWearPercent = 35f;
+        private float wornOutTyreWearPercent = 70f;        
 
         private float trivialAeroDamageThreshold = 0.99995f;
         private float trivialEngineDamageThreshold = 0.995f;
@@ -135,6 +135,7 @@ namespace CrewChiefV4.RaceRoom
             {
                 lastSessionPhase = previousGameState.SessionData.SessionPhase;
                 lastSessionRunningTime = previousGameState.SessionData.SessionRunningTime;
+                //Console.WriteLine("Raw: " + shared.CarDamage.TireRearLeft + ", calc:" + previousGameState.TyreData.RearLeftPercentWear);
             }
 
             currentGameState.SessionData.SessionType = mapToSessionType(shared);
@@ -1209,8 +1210,7 @@ namespace CrewChiefV4.RaceRoom
             {
                 return -1;
             }
-            // tyres in R3E only go down to 0.9
-            return (float) (((1 - Math.Max(wornOutTyreWearLevel, wearLevel)) / (1 - wornOutTyreWearLevel)) * 100);
+            return Math.Min(100, ((1 - wearLevel) / wornOutTyreWearLevel) * 100);
         }
 
         private Boolean CheckIsCarRunning(RaceRoomData.RaceRoomShared shared)
