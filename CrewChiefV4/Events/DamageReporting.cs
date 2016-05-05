@@ -424,7 +424,7 @@ namespace CrewChiefV4.Events
                 if (delayResponses && random.Next(10) > 3)
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderStandBy, 0, null));
-                    damageMessage.dueTime = Math.Min(4, random.Next(10));
+                    damageMessage.dueTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + (1000 * Math.Min(4, random.Next(10)));
                     audioPlayer.playMessage(damageMessage);
                 }
                 else
