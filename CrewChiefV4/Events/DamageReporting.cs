@@ -262,13 +262,29 @@ namespace CrewChiefV4.Events
                     {
                         Console.WriteLine("reporting ...");
                         Console.WriteLine(damageToReportNext.Item1 + ", " + damageToReportNext.Item2);
-                        if (reportedDamagesLevels.ContainsKey(damageToReportNext.Item1))
+
+                        // put *all* the damage levels in the 'reported' set, even though we haven't actually reported them.
+                        // This ensure we only ever play the worst damage on the car when damage has just increased
+                        // Only do this if the component damage is *less* than the one we just reported
+                        if (Component.AERO == damageToReportNext.Item1 || aeroDamage < damageToReportNext.Item2)
                         {
-                            reportedDamagesLevels[damageToReportNext.Item1] = damageToReportNext.Item2;
+                            addReportedDamage(Component.AERO, aeroDamage);
                         }
-                        else
+                        if (Component.BRAKES == damageToReportNext.Item1 || maxBrakeDamage < damageToReportNext.Item2)
                         {
-                            reportedDamagesLevels.Add(damageToReportNext.Item1, damageToReportNext.Item2);
+                            addReportedDamage(Component.BRAKES, maxBrakeDamage);
+                        }
+                        if (Component.ENGINE == damageToReportNext.Item1 || engineDamage < damageToReportNext.Item2)
+                        {
+                            addReportedDamage(Component.ENGINE, engineDamage);
+                        }
+                        if (Component.SUSPENSION == damageToReportNext.Item1 || maxSuspensionDamage < damageToReportNext.Item2)
+                        {
+                            addReportedDamage(Component.SUSPENSION, maxSuspensionDamage);
+                        }
+                        if (Component.TRANNY == damageToReportNext.Item1 || trannyDamage < damageToReportNext.Item2)
+                        {
+                            addReportedDamage(Component.TRANNY, trannyDamage);
                         }
                         if (enableDamageMessages)
                         {
@@ -276,6 +292,18 @@ namespace CrewChiefV4.Events
                         }
                     }
                 }
+            }
+        }
+
+        private void addReportedDamage(Component component, DamageLevel damageLevel)
+        {
+            if (reportedDamagesLevels.ContainsKey(component))
+            {
+                reportedDamagesLevels[component] = damageLevel;
+            }
+            else
+            {
+                reportedDamagesLevels.Add(component, damageLevel);
             }
         }
 
