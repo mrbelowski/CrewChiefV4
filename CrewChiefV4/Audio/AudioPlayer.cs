@@ -35,6 +35,7 @@ namespace CrewChiefV4.Audio
         public static String folderDeltasEnabled = "acknowledge/deltasEnabled";
         public static String folderDeltasDisabled = "acknowledge/deltasDisabled";
         public static String folderRadioCheckResponse = "acknowledge/radio_check";
+        public static String folderStandBy = "acknowledge/stand_by";
 
         public static Boolean useAlternateBeeps = UserSettings.GetUserSettings().getBoolean("use_alternate_beeps");
         public static float pauseBetweenMessages = UserSettings.GetUserSettings().getFloat("pause_between_messages");

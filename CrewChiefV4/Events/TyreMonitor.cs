@@ -10,6 +10,8 @@ namespace CrewChiefV4.Events
 {
     class TyreMonitor : AbstractEvent
     {
+        private Boolean delayResponses = UserSettings.GetUserSettings().getBoolean("enable_delayed_responses");
+
         // tyre temp messages...
         private String folderColdFrontTyres = "tyre_monitor/cold_front_tyres";
         private String folderColdRearTyres = "tyre_monitor/cold_rear_tyres";
@@ -428,8 +430,16 @@ namespace CrewChiefV4.Events
 
             if (playImmediately)
             {
-                audioPlayer.playMessageImmediately(new QueuedMessage("tyre_condition", messageContents, 0, null));
-                
+                // might be a "stand by..." response
+                if (delayResponses && random.Next(10) > 3)
+                {
+                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderStandBy, 0, null));
+                    audioPlayer.playMessage(new QueuedMessage("tyre_condition", messageContents, Math.Min(4, random.Next(10)), null));
+                }
+                else
+                {
+                    audioPlayer.playMessageImmediately(new QueuedMessage("tyre_condition", messageContents, 0, null));
+                }
             }
             else if (playEvenIfUnchanged || (lastTyreConditionMessage != null && !messagesHaveSameContent(lastTyreConditionMessage, messageContents)))
             {
@@ -606,8 +616,7 @@ namespace CrewChiefV4.Events
                 }
                 else
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
-                    
+                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));                    
                 }
             }
         }

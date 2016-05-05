@@ -9,6 +9,9 @@ namespace CrewChiefV4.Events
 {
     class DamageReporting : AbstractEvent
     {
+        private Boolean delayResponses = UserSettings.GetUserSettings().getBoolean("enable_delayed_responses");
+        private Random random = new Random();
+
         private Boolean enableDamageMessages = UserSettings.GetUserSettings().getBoolean("enable_damage_messages");
         private Boolean enableBrakeDamageMessages = UserSettings.GetUserSettings().getBoolean("enable_brake_damage_messages");
         private Boolean enableSuspensionDamageMessages = UserSettings.GetUserSettings().getBoolean("enable_suspension_damage_messages");
@@ -309,140 +312,129 @@ namespace CrewChiefV4.Events
 
         public override void respond(String voiceMessage)
         {
+            QueuedMessage damageMessage = null;
             if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOWS_MY_AERO))
             {
                 if (aeroDamage == DamageLevel.NONE)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderNoAeroDamage, 0, null));
-                    
+                    damageMessage = new QueuedMessage(folderNoAeroDamage, 0, null);                    
                 }
                 else if (aeroDamage == DamageLevel.MAJOR || aeroDamage == DamageLevel.DESTROYED)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderSevereAeroDamage, 0, null));
-                    
+                    damageMessage = new QueuedMessage(folderSevereAeroDamage, 0, null);                    
                 }
                 else if (aeroDamage == DamageLevel.MINOR)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderMinorAeroDamage, 0, null));
+                    damageMessage = new QueuedMessage(folderMinorAeroDamage, 0, null);
                 }
                 else if (aeroDamage == DamageLevel.TRIVIAL)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderJustAScratch, 0, null));
-                    
+                    damageMessage = new QueuedMessage(folderJustAScratch, 0, null);                    
                 }
             }
             if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOWS_MY_TRANSMISSION))
             {
                 if (trannyDamage == DamageLevel.NONE || trannyDamage == DamageLevel.TRIVIAL)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderNoTransmissionDamage, 0, null));
-                    
+                    damageMessage = new QueuedMessage(folderNoTransmissionDamage, 0, null);                    
                 }
                 else if (trannyDamage == DamageLevel.DESTROYED)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderBustedTransmission, 0, null));
-                    
+                    damageMessage = new QueuedMessage(folderBustedTransmission, 0, null);                    
                 }
                 else if (trannyDamage == DamageLevel.MAJOR)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderSevereTransmissionDamage, 0, null));
-                    
+                    damageMessage = new QueuedMessage(folderSevereTransmissionDamage, 0, null);                    
                 }
                 else if (trannyDamage == DamageLevel.MINOR)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderMinorTransmissionDamage, 0, null));
-                    
+                    damageMessage = new QueuedMessage(folderMinorTransmissionDamage, 0, null);                    
                 }
             }
             if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOWS_MY_ENGINE))
             {
                 if (engineDamage == DamageLevel.NONE || engineDamage == DamageLevel.TRIVIAL)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderNoEngineDamage, 0, null));
-                    
+                    damageMessage = new QueuedMessage(folderNoEngineDamage, 0, null);                    
                 }
                 else if (engineDamage == DamageLevel.DESTROYED)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderBustedEngine, 0, null));
-                    
+                    damageMessage = new QueuedMessage(folderBustedEngine, 0, null);                    
                 }
                 else if (engineDamage == DamageLevel.MAJOR)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderSevereEngineDamage, 0, null));
-                    
+                    damageMessage = new QueuedMessage(folderSevereEngineDamage, 0, null);                    
                 }
                 else if (engineDamage == DamageLevel.MINOR)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderMinorEngineDamage, 0, null));
-                    
+                    damageMessage = new QueuedMessage(folderMinorEngineDamage, 0, null);                    
                 }
             }
             if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOWS_MY_SUSPENSION))
             {
-                if (!enableSuspensionDamageMessages)
-                {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
-                    
-                }
-                else
+                if (enableSuspensionDamageMessages)
                 {
                     if (isMissingWheel)
                     {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(folderMissingWheel, 0, null));
-                        
+                        damageMessage = new QueuedMessage(folderMissingWheel, 0, null);                        
                     }
                     if ((maxSuspensionDamage == DamageLevel.NONE || maxSuspensionDamage == DamageLevel.TRIVIAL) && !isMissingWheel)
                     {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(folderNoSuspensionDamage, 0, null));
-                        
+                        damageMessage = new QueuedMessage(folderNoSuspensionDamage, 0, null);                        
                     }
                     else if (maxSuspensionDamage == DamageLevel.DESTROYED)
                     {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(folderBustedSuspension, 0, null));
-                        
+                        damageMessage = new QueuedMessage(folderBustedSuspension, 0, null);                        
                     }
                     else if (maxSuspensionDamage == DamageLevel.MAJOR)
                     {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(folderSevereSuspensionDamage, 0, null));
-                        
+                        damageMessage = new QueuedMessage(folderSevereSuspensionDamage, 0, null);                        
                     }
                     else if (maxSuspensionDamage == DamageLevel.MINOR && !isMissingWheel)
                     {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(folderMinorSuspensionDamage, 0, null));
-                        
+                        damageMessage = new QueuedMessage(folderMinorSuspensionDamage, 0, null);                        
                     }
                 }
             }
             if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOWS_MY_BRAKES))
             {
-                if (!enableBrakeDamageMessages)
-                {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
-                    
-                }
-                else
+                if (enableBrakeDamageMessages)
                 {
                     if (maxBrakeDamage == DamageLevel.NONE || maxBrakeDamage == DamageLevel.TRIVIAL)
                     {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(folderNoBrakeDamage, 0, null));
-                        
+                        damageMessage = new QueuedMessage(folderNoBrakeDamage, 0, null);                        
                     }
                     else if (maxBrakeDamage == DamageLevel.DESTROYED)
                     {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(folderBustedBrakes, 0, null));
-                        
+                        damageMessage = new QueuedMessage(folderBustedBrakes, 0, null);                        
                     }
                     else if (maxBrakeDamage == DamageLevel.MAJOR)
                     {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(folderSevereBrakeDamage, 0, null));
-                        
+                        damageMessage = new QueuedMessage(folderSevereBrakeDamage, 0, null);                        
                     }
                     else if (maxBrakeDamage == DamageLevel.MINOR)
                     {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(folderMinorBrakeDamage, 0, null));
-                        
+                        damageMessage = new QueuedMessage(folderMinorBrakeDamage, 0, null);                        
                     }
                 }
+            }
+            if (damageMessage != null)
+            {
+                // play this immediately or play "stand by", and queue it to be played in a few seconds
+                if (delayResponses && random.Next(10) > 3)
+                {
+                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderStandBy, 0, null));
+                    damageMessage.dueTime = Math.Min(4, random.Next(10));
+                    audioPlayer.playMessage(damageMessage);
+                }
+                else
+                {
+                    audioPlayer.playMessageImmediately(damageMessage);
+                }
+            }
+            else
+            {
+                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
             }
         }
 
