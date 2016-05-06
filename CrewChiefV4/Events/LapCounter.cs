@@ -198,6 +198,7 @@ namespace CrewChiefV4.Events
                 int position = currentGameState.SessionData.Position;
                 if (currentGameState.SessionData.CompletedLaps == currentGameState.SessionData.SessionNumberOfLaps - 1)
                 {
+                    Console.WriteLine("1 lap remaining, SessionHasFixedTime = " + currentGameState.SessionData.SessionHasFixedTime);
                     if (position == 1)
                     {
                         audioPlayer.playMessage(new QueuedMessage(folderLastLapLeading, 0, this));
@@ -221,6 +222,7 @@ namespace CrewChiefV4.Events
                 }
                 else if (currentGameState.SessionData.CompletedLaps == currentGameState.SessionData.SessionNumberOfLaps - 2)
                 {
+                    Console.WriteLine("2 laps remaining, SessionHasFixedTime = " + currentGameState.SessionData.SessionHasFixedTime);
                     if (position == 1)
                     {
                         audioPlayer.playMessage(new QueuedMessage(folderTwoLeftLeading, 0, this));
@@ -242,7 +244,6 @@ namespace CrewChiefV4.Events
                         Console.WriteLine("2 laps left but position is < 1");
                     }
                     // 2 laps left, so prevent any further pearls of wisdom being added
-
                 }
             }
         }
