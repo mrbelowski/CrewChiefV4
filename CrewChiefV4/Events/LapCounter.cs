@@ -144,6 +144,11 @@ namespace CrewChiefV4.Events
 
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
+            if (currentGameState.SessionData.SessionHasFixedTime && currentGameState.SessionData.SessionNumberOfLaps > 0)
+            {
+                Console.WriteLine("This session has a fixed time (" + currentGameState.SessionData.SessionTimeRemaining +
+                    " remaining but also has " + currentGameState.SessionData.SessionNumberOfLaps);
+            }
             if (!playedPreLightsMessage && currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.SessionPhase == SessionPhase.Gridwalk && 
                 (playPreLightsInRaceroom || CrewChief.gameDefinition.gameEnum != GameEnum.RACE_ROOM))
             {
