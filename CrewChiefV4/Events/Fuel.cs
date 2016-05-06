@@ -80,8 +80,8 @@ namespace CrewChiefV4.Events
 
         private Boolean fuelUseActive;
 
-        // check fuel use every minute
-        private int fuelUseSampleTime = 1;
+        // check fuel use every 90 seconds
+        private int fuelUseSampleTime = 90;
 
         private float currentFuel = -1;
 
@@ -211,7 +211,7 @@ namespace CrewChiefV4.Events
                     if (fuelUseWindow.Count > fuelUseWindowLength)
                     {
                         averageUsagePerLap = 0;
-                        for (int i = 0; i < fuelUseWindowLength - 1; i++)
+                        for (int i = 0; i < fuelUseWindowLength; i++)
                         {
                             averageUsagePerLap += (fuelUseWindow[i + 1] - fuelUseWindow[i]);
                         }
@@ -295,7 +295,7 @@ namespace CrewChiefV4.Events
                     }
                 }
                 else if (initialised && currentGameState.SessionData.SessionNumberOfLaps <= 0 && currentGameState.SessionData.SessionTotalRunTime > 0 &&
-                    currentGameState.SessionData.SessionRunningTime > gameTimeAtLastFuelWindowUpdate + (60 * fuelUseSampleTime))
+                    currentGameState.SessionData.SessionRunningTime > gameTimeAtLastFuelWindowUpdate + fuelUseSampleTime)
                 {
                     // it's x minutes since the last fuel window check
                     gameTimeAtLastFuelWindowUpdate = currentGameState.SessionData.SessionRunningTime;
@@ -307,15 +307,19 @@ namespace CrewChiefV4.Events
                     if (fuelUseWindow.Count > fuelUseWindowLength)
                     {
                         averageUsagePerMinute = 0;
-                        for (int i = 0; i < fuelUseWindowLength - 1; i++)
+                        for (int i = 0; i < fuelUseWindowLength; i++)
                         {
+                            Console.WriteLine("used " +( fuelUseWindow[i + 1] - fuelUseWindow[i] )+ " in " + fuelUseSampleTime + " seconds");
                             averageUsagePerMinute += (fuelUseWindow[i + 1] - fuelUseWindow[i]);
                         }
-                        averageUsagePerMinute = averageUsagePerMinute / (fuelUseWindowLength * fuelUseSampleTime);
+                        averageUsagePerMinute = 60 * averageUsagePerMinute / (fuelUseWindowLength * fuelUseSampleTime);
+                        Console.WriteLine("fuel use per minute (windowed calc) = " + averageUsagePerMinute + " fuel left = " + currentGameState.FuelData.FuelLeft);
+                        Console.WriteLine("start of window " + fuelUseWindow[0] + " l, end of window " + fuelUseWindow[fuelUseWindowLength] + " l");
                     }
                     else
                     {
                         averageUsagePerMinute = 60 * (initialFuelLevel - currentGameState.FuelData.FuelLeft) / (gameTimeAtLastFuelWindowUpdate - gameTimeWhenFuelWasReset);
+                        Console.WriteLine("fuel use per minute (basic calc) = " + averageUsagePerMinute + " fuel left = " + currentGameState.FuelData.FuelLeft);
                     }
                 }
                 if (initialised && currentGameState.SessionData.SessionNumberOfLaps <= 0 && currentGameState.SessionData.SessionTotalRunTime > 0 && averageUsagePerMinute > 0)
