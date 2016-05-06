@@ -27,7 +27,7 @@ namespace CrewChiefV4.RaceRoom
         private float scrubbedTyreWearPercent = 2f;
         private float minorTyreWearPercent = 10f;
         private float majorTyreWearPercent = 35f;
-        private float wornOutTyreWearPercent = 70f;        
+        private float wornOutTyreWearPercent = 60f;        
 
         private float trivialAeroDamageThreshold = 0.99995f;
         private float trivialEngineDamageThreshold = 0.995f;
