@@ -309,12 +309,10 @@ namespace CrewChiefV4.Events
                         averageUsagePerMinute = 0;
                         for (int i = 0; i < fuelUseWindowLength; i++)
                         {
-                            Console.WriteLine("used " +( fuelUseWindow[i + 1] - fuelUseWindow[i] )+ " in " + fuelUseSampleTime + " seconds");
                             averageUsagePerMinute += (fuelUseWindow[i + 1] - fuelUseWindow[i]);
                         }
                         averageUsagePerMinute = 60 * averageUsagePerMinute / (fuelUseWindowLength * fuelUseSampleTime);
                         Console.WriteLine("fuel use per minute (windowed calc) = " + averageUsagePerMinute + " fuel left = " + currentGameState.FuelData.FuelLeft);
-                        Console.WriteLine("start of window " + fuelUseWindow[0] + " l, end of window " + fuelUseWindow[fuelUseWindowLength] + " l");
                     }
                     else
                     {
