@@ -197,10 +197,10 @@ namespace CrewChiefV4
                     {
                         break;
                     }
-                }
+                }                
+                gapPoints = gaps.ToArray();
                 Console.WriteLine("Track length = " + trackLength + " split into " + gaps.Count() + " gap points at " +
                     String.Join(", ", gapPoints));
-                gapPoints = gaps.ToArray();
             }
         }
 

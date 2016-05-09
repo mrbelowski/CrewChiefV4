@@ -237,8 +237,16 @@ namespace CrewChiefV4.Events
                             if (sectorsSinceLastCloseCarAheadReport >= sectorsUntilNextCloseCarAheadReport)
                             {
                                 sectorsSinceLastCloseCarAheadReport = 0;
-                                sectorsUntilNextCloseCarAheadReport = adjustForMidLapPreference(currentGameState.SessionData.SectorNumber,
-                                    rand.Next(closeAheadMinSectorWait, closeAheadMaxSectorWait));
+                                // only prefer mid-lap gap reports if we're on a track with no ad-hoc gapPoints
+                                if (currentGameState.SessionData.TrackDefinition.gapPoints.Count() > 0)
+                                {
+                                    rand.Next(closeAheadMinSectorWait, closeAheadMaxSectorWait);
+                                } 
+                                else 
+                                {
+                                    sectorsUntilNextCloseCarAheadReport = adjustForMidLapPreference(currentGameState.SessionData.SectorNumber,
+                                        rand.Next(closeAheadMinSectorWait, closeAheadMaxSectorWait));
+                                }
                                 audioPlayer.playMessage(new QueuedMessage(folderBeingHeldUp, 0, this, new Dictionary<string, object> { { "position", currentGameState.SessionData.Position } }));
                                 gapInFrontAtLastReport = gapsInFront[0];
                             }
@@ -246,8 +254,16 @@ namespace CrewChiefV4.Events
                         else if (gapInFrontStatus != GapStatus.NONE && sectorsSinceLastGapAheadReport >= sectorsUntilNextGapAheadReport)
                         {
                             sectorsSinceLastGapAheadReport = 0;
-                            sectorsUntilNextGapAheadReport = adjustForMidLapPreference(currentGameState.SessionData.SectorNumber,
-                                rand.Next(gapAheadMinSectorWait, gapAheadMaxSectorWait));
+                            // only prefer mid-lap gap reports if we're on a track with no ad-hoc gapPoints
+                            if (currentGameState.SessionData.TrackDefinition.gapPoints.Count() > 0)
+                            {
+                                sectorsUntilNextGapAheadReport = rand.Next(gapAheadMinSectorWait, gapAheadMaxSectorWait);
+                            }
+                            else
+                            {
+                                sectorsUntilNextGapAheadReport = adjustForMidLapPreference(currentGameState.SessionData.SectorNumber,
+                                    rand.Next(gapAheadMinSectorWait, gapAheadMaxSectorWait));
+                            }
                             TimeSpan gapInFront = TimeSpan.FromMilliseconds(gapsInFront[0] * 1000);
                             Boolean readGap = gapInFront.Seconds > 0 || gapInFront.Milliseconds > 50;
                             if (readGap)
@@ -281,8 +297,16 @@ namespace CrewChiefV4.Events
                             if (sectorsSinceLastCloseCarBehindReport >= sectorsUntilNextCloseCarBehindReport)
                             {
                                 sectorsSinceLastCloseCarBehindReport = 0;
-                                sectorsUntilNextCloseCarBehindReport = adjustForMidLapPreference(currentGameState.SessionData.SectorNumber,
-                                    rand.Next(closeBehindMinSectorWait, closeBehindMaxSectorWait));
+                                // only prefer mid-lap gap reports if we're on a track with no ad-hoc gapPoints
+                                if (currentGameState.SessionData.TrackDefinition.gapPoints.Count() > 0)
+                                {
+                                    sectorsUntilNextCloseCarBehindReport = rand.Next(closeBehindMinSectorWait, closeBehindMaxSectorWait);
+                                } 
+                                else 
+                                {
+                                    sectorsUntilNextCloseCarBehindReport = adjustForMidLapPreference(currentGameState.SessionData.SectorNumber,
+                                        rand.Next(closeBehindMinSectorWait, closeBehindMaxSectorWait));
+                                }
                                 audioPlayer.playMessage(new QueuedMessage(folderBeingPressured, 0, this, new Dictionary<string, object> { { "position", currentGameState.SessionData.Position } }));
                                 gapBehindAtLastReport = gapsBehind[0];
                             }
@@ -290,8 +314,16 @@ namespace CrewChiefV4.Events
                         else if (gapBehindStatus != GapStatus.NONE && sectorsSinceLastGapBehindReport >= sectorsUntilNextGapBehindReport)
                         {
                             sectorsSinceLastGapBehindReport = 0;
-                            sectorsUntilNextGapBehindReport = adjustForMidLapPreference(currentGameState.SessionData.SectorNumber,
-                                rand.Next(gapBehindMinSectorWait, gapBehindMaxSectorWait));
+                            // only prefer mid-lap gap reports if we're on a track with no ad-hoc gapPoints
+                            if (currentGameState.SessionData.TrackDefinition.gapPoints.Count() > 0)
+                            {
+                                sectorsUntilNextGapBehindReport = rand.Next(gapBehindMinSectorWait, gapBehindMaxSectorWait);
+                            }
+                            else
+                            {
+                                sectorsUntilNextGapBehindReport = adjustForMidLapPreference(currentGameState.SessionData.SectorNumber,
+                                    rand.Next(gapBehindMinSectorWait, gapBehindMaxSectorWait));
+                            }
                             TimeSpan gapBehind = TimeSpan.FromMilliseconds(gapsBehind[0] * 1000);
                             Boolean readGap = gapBehind.Seconds > 0 || gapBehind.Milliseconds > 50;
                             if (readGap)
