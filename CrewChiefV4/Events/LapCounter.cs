@@ -209,13 +209,9 @@ namespace CrewChiefV4.Events
                     {
                         audioPlayer.playMessage(new QueuedMessage(folderLastLapTopThree, 0, this));
                     }
-                    else if (position >= currentGameState.SessionData.SessionStartPosition + 5)
+                    else if (position > 4)
                     {
-                        audioPlayer.playMessage(new QueuedMessage(folderLastLap, 0, this), PearlsOfWisdom.PearlType.BAD, 0.5);
-                    }
-                    else if (position >= 4)
-                    {
-                        audioPlayer.playMessage(new QueuedMessage(folderLastLap, 0, this), PearlsOfWisdom.PearlType.NEUTRAL, 0.5);
+                        audioPlayer.playMessage(new QueuedMessage(folderLastLap, 0, this));
                     }                    
                     else
                     {
