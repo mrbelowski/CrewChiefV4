@@ -152,7 +152,7 @@ namespace CrewChiefV4.Events
                         }
                         else
                         {
-                            audioPlayer.playMessage(new QueuedMessage(folderLastLap, 0, this), pearlType, 0.7);
+                            audioPlayer.playMessage(new QueuedMessage(folderLastLap, 0, this));
                         }
                     }
                 }
