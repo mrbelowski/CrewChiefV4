@@ -79,6 +79,15 @@ namespace CrewChiefV4.Events
                 {
                     audioPlayer.playMessage(new QueuedMessage(folderPushExitingPits, 0, this));
                 }
+                // now try and report the current brake temp status
+                try
+                {
+                    ((TyreMonitor)CrewChief.getEvent("TyreMonitor")).reportCurrentBrakeTempStatus(false);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Failed to report brake temp status on pit exit");
+                }
             }
         }
 

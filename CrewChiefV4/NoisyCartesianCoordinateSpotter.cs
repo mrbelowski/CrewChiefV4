@@ -53,8 +53,6 @@ namespace CrewChiefV4
         // say "still there" every 3 seconds
         private TimeSpan repeatHoldFrequency = TimeSpan.FromSeconds(UserSettings.GetUserSettings().getInt("spotter_hold_repeat_frequency"));
 
-        private Boolean spotterOnlyWhenBeingPassed = UserSettings.GetUserSettings().getBoolean("spotter_only_when_being_passed");
-
         private Boolean hasCarLeft;
         private Boolean hasCarRight;
 
@@ -267,12 +265,7 @@ namespace CrewChiefV4
                         Math.Abs(alignedXCoordinate) > carWidth && isOpponentSpeedInRange)
                     {
                         // we have a new overlap on this side, it's only valid if we're not inside the other car and the speed isn't out of range
-                        // Additional check here - if we only want spotter messages when we're being overtaken, then this new overlap 
-                        // must have the opponent car behind us. Note the alignedZCoordinate value is +ve if the opponent is behind
-                        if (alignedZCoordinate > 0 || !spotterOnlyWhenBeingPassed)
-                        {
-                            return Side.right;
-                        }
+                        return Side.right;
                     }
                 }
                 else
@@ -287,12 +280,7 @@ namespace CrewChiefV4
                     else if (((alignedZCoordinate < 0 && alignedZCoordinate * -1 < carLength) || (alignedZCoordinate > 0 && alignedZCoordinate < carLength + carBehindExtraLength)) &&
                         Math.Abs(alignedXCoordinate) > carWidth && isOpponentSpeedInRange)
                     {
-                        // Additional check here - if we only want spotter messages when we're being overtaken, then this new overlap 
-                        // must have the opponent car behind us
-                        if (alignedZCoordinate > 0 || !spotterOnlyWhenBeingPassed)
-                        {
-                            return Side.left;
-                        }
+                        return Side.left;
                     }
                 }
             }

@@ -398,7 +398,7 @@ namespace CrewChiefV4.Events
             lastTyreTempMessage = messageContents;
         }
 
-        private void reportCurrentBrakeTempStatus(Boolean playImmediately)
+        public void reportCurrentBrakeTempStatus(Boolean playImmediately)
         {
             List<MessageFragment> messageContents = new List<MessageFragment>();
             addBrakeTempWarningMessages(currentBrakeTempStatus.getCornersForStatus(BrakeTemp.COLD), BrakeTemp.COLD, messageContents);

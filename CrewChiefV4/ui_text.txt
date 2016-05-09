@@ -103,7 +103,6 @@ spotter_car_length_help = The length of a car, used to check if there's an overl
 time_after_race_start_for_spotter_help = Wait this many seconds after race start before enabling the spotter
 min_speed_for_spotter_help = Don't use the spotter if your speed is less than this
 max_closing_speed_for_spotter_help = Don't call 'hold your line' if the closing speed between you and the other car is greater than this
-spotter_only_when_being_passed_help = Only 'spot' for cars overtaking you
 spotter_clear_delay_help = You need to be clear for this many milliseconds before the spotter calls 'clear'
 spotter_overlap_delay_help = You need to be overlapping for this many milliseconds before the spotter calls 'hold your line'
 custom_device_guid_help = Manually set a controller GUID if the app doesn't display your controller in the devices list

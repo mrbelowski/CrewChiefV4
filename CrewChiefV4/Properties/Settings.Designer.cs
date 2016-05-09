@@ -190,18 +190,6 @@ namespace CrewChiefV4.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool spotter_only_when_being_passed {
-            get {
-                return ((bool)(this["spotter_only_when_being_passed"]));
-            }
-            set {
-                this["spotter_only_when_being_passed"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("150")]
         public int spotter_clear_delay {
             get {

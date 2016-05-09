@@ -44,9 +44,6 @@
     <Setting Name="max_closing_speed_for_spotter" Type="System.Single" Scope="User">
       <Value Profile="(Default)">12</Value>
     </Setting>
-    <Setting Name="spotter_only_when_being_passed" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
-    </Setting>
     <Setting Name="spotter_clear_delay" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">150</Value>
     </Setting>
