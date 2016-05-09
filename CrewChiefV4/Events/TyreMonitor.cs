@@ -180,6 +180,8 @@ namespace CrewChiefV4.Events
         private TimeSpan lockingAndSpinningCheckInterval = TimeSpan.FromSeconds(3);
 
         private Random random = new Random();
+
+        private Boolean lastBrakeStatusCheckOK = true;
         
         public TyreMonitor(AudioPlayer audioPlayer)
         {
@@ -228,6 +230,8 @@ namespace CrewChiefV4.Events
             rightFrontBrakeTemp = 0;
             leftRearBrakeTemp = 0;
             rightRearBrakeTemp = 0;
+
+            lastBrakeStatusCheckOK = true;
         }
 
         private Boolean isBrakeTempPeakForLap(float leftFront, float rightFront, float leftRear, float rightRear) 
@@ -402,7 +406,15 @@ namespace CrewChiefV4.Events
             addBrakeTempWarningMessages(currentBrakeTempStatus.getCornersForStatus(BrakeTemp.COOKING), BrakeTemp.COOKING, messageContents);
             if (messageContents.Count == 0)
             {
-                messageContents.Add(MessageFragment.Text(folderGoodBrakeTemps));
+                if (playImmediately || !lastBrakeStatusCheckOK)
+                {
+                    lastBrakeStatusCheckOK = true;
+                    messageContents.Add(MessageFragment.Text(folderGoodBrakeTemps));
+                }
+            }
+            else
+            {
+                lastBrakeStatusCheckOK = false;
             }
 
             if (playImmediately)

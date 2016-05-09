@@ -770,8 +770,7 @@ namespace CrewChiefV4.Events
                 }
                 
             }
-            else if (voiceMessage.Contains(SpeechRecogniser.BEST_LAP) ||
-                voiceMessage.Contains(SpeechRecogniser.BEST_LAP_TIME))
+            else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.WHATS_MY_BEST_LAP_TIME))
             {
                 if (bestLapTime > 0)
                 {
