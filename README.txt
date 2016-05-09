@@ -2,6 +2,8 @@ CrewChief version 4.
 
 Changelog
 ---------
+Version 4.2.0.0: Added ADAC 2015 RaceRoom class; PCars suspension damage threshold tweak; Damage reporting rework; Various bug fixes and minor improvements; Don't play fuel messages while being refuelled; Don't play wheel spin / locking when in the pits or when we have a puncture or missing wheel; Fixed best lap and brake damage voice commands; Added brake temp warning on pit exit when brakes aren't an optimum temp; Some voice commands now trigger a "stand by" response, then a few seconds later the actual response (optional, disabled by default - uses "enable_delayed_responses" property).
+
 Version 4.1.6.3: Added Raceroom Formula Junior class; Tweaked Raceroom engine damage thresholds.
 
 Version 4.1.6.2: Some TTS revisions; Updated RaceRoom car classes to match new patch.
