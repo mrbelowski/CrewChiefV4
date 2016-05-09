@@ -384,7 +384,7 @@ namespace CrewChiefV4.Events
                                         {
                                             // delay this a bit...
                                             audioPlayer.playMessage(new QueuedMessage("lapTimeNotRaceGap",
-                                                MessageContents(folderGapIntro, gapBehind, folderQuickerThanSecondPlace), random.Next(0, 20), this));
+                                                MessageContents(folderGapIntro, gapBehind, folderQuickerThanSecondPlace), random.Next(0, 8), this));
                                         }
                                     }
                                 }
@@ -403,7 +403,7 @@ namespace CrewChiefV4.Events
                                     {
                                         // delay this a bit...
                                         audioPlayer.playMessage(new QueuedMessage("lapTimeNotRaceGap",
-                                            MessageContents(folderGapIntro, deltaPlayerLastToSessionBestInClass, folderGapOutroOffPace), random.Next(0, 20), this));
+                                            MessageContents(folderGapIntro, deltaPlayerLastToSessionBestInClass, folderGapOutroOffPace), random.Next(0, 8), this));
                                     }
                                     if (practiceAndQualSectorReportsLapEnd && frequencyOfPracticeAndQualSectorDeltaReports > random.NextDouble() * 10)
                                     {
@@ -504,12 +504,12 @@ namespace CrewChiefV4.Events
                                     if (consistency == ConsistencyResult.CONSISTENT)
                                     {
                                         lastConsistencyUpdate = currentGameState.SessionData.CompletedLaps;
-                                        audioPlayer.playMessage(new QueuedMessage(folderConsistentTimes, random.Next(0, 20), this));
+                                        audioPlayer.playMessage(new QueuedMessage(folderConsistentTimes, random.Next(0, 8), this));
                                     }
                                     else if (consistency == ConsistencyResult.IMPROVING)
                                     {
                                         lastConsistencyUpdate = currentGameState.SessionData.CompletedLaps;
-                                        audioPlayer.playMessage(new QueuedMessage(folderImprovingTimes, random.Next(0, 20), this));
+                                        audioPlayer.playMessage(new QueuedMessage(folderImprovingTimes, random.Next(0, 8), this));
                                     }
                                     else if (consistency == ConsistencyResult.WORSENING)
                                     {
@@ -524,7 +524,7 @@ namespace CrewChiefV4.Events
                                             // only complain about worsening laptimes if we've not overtaken anyone on this lap
                                             lastConsistencyUpdate = currentGameState.SessionData.CompletedLaps;
 
-                                            audioPlayer.playMessage(new QueuedMessage(folderWorseningTimes, random.Next(0, 20), this, new Dictionary<String, Object>()));
+                                            audioPlayer.playMessage(new QueuedMessage(folderWorseningTimes, random.Next(0, 8), this, new Dictionary<String, Object>()));
                                         }
                                     }
                                 }

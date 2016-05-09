@@ -277,7 +277,8 @@ namespace CrewChiefV4.Events
             }
             if (previousGameState != null && currentGameState.Ticks > previousGameState.Ticks) 
             {
-                addLockingAndSpinningData(currentGameState.TyreData, previousGameState.Ticks, currentGameState.Ticks);
+                addLockingAndSpinningData(currentGameState.TyreData, currentGameState.PitData.InPitlane,
+                    hasWheelMissingOrPuncture(currentGameState), previousGameState.Ticks, currentGameState.Ticks);
             }
 
             if (currentGameState.Now > nextLockingAndSpinningCheck)
@@ -952,8 +953,13 @@ namespace CrewChiefV4.Events
                     break;
             }
         }
-        private void addLockingAndSpinningData(TyreData tyreData, long previousTicks, long currentTicks)
+        private void addLockingAndSpinningData(TyreData tyreData, Boolean inPitLane, Boolean hasWheelMissingOrPuncture,
+            long previousTicks, long currentTicks)
         {
+            if (hasWheelMissingOrPuncture || inPitLane)
+            {
+                return;
+            }
             if (enableBrakeLockWarnings)
             {
                 if (tyreData.LeftFrontIsLocked)

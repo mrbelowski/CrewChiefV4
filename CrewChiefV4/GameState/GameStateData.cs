@@ -360,7 +360,7 @@ namespace CrewChiefV4.GameState
                     if (thisLapTime.IsValid)
                     {
                         if (bestLapTimeAndSectorsSectors[0] == -1 ||
-                            (thisLapTime.LapTime != -1 && thisLapTime.LapTime < bestLapTimeAndSectorsSectors[0]))
+                            (thisLapTime.LapTime > 0 && thisLapTime.LapTime < bestLapTimeAndSectorsSectors[0]))
                         {
                             bestLapTimeAndSectorsSectors[0] = thisLapTime.LapTime;
                             int sectorCount = thisLapTime.SectorTimes.Count();

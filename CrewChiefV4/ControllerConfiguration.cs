@@ -284,7 +284,7 @@ namespace CrewChiefV4
                     }
                     catch (Exception e)
                     {
-                        Console.WriteLine("Failed to get button state for index " + ba.buttonIndex + " message: " + e.Message);
+                        // ignore this exception
                     }
                 } else if (ba.controller.guid == UDP_NETWORK_CONTROLLER_GUID)
                 {
