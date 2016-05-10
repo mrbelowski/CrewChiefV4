@@ -1030,9 +1030,9 @@ namespace CrewChiefV4.Events
 
         private Boolean hasWheelMissingOrPuncture(GameStateData currentState)
         {
-            return currentState.TyreData.LeftFrontAttached && currentState.TyreData.RightFrontAttached &&
+            return !(currentState.TyreData.LeftFrontAttached && currentState.TyreData.RightFrontAttached &&
                     currentState.TyreData.LeftRearAttached && currentState.TyreData.RightRearAttached &&
-                    DamageReporting.getPuncture(currentState.TyreData) == CornerData.Corners.NONE;
+                    DamageReporting.getPuncture(currentState.TyreData) == CornerData.Corners.NONE);
         }
 
         private void checkLocking()
