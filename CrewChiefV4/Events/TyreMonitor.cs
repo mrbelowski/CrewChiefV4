@@ -181,7 +181,8 @@ namespace CrewChiefV4.Events
 
         private Random random = new Random();
 
-        private Boolean lastBrakeStatusCheckOK = true;
+        private Boolean lastBrakeTempCheckOK = true;
+        private Boolean lastTyreTempCheckOK = true;
         
         public TyreMonitor(AudioPlayer audioPlayer)
         {
@@ -231,7 +232,8 @@ namespace CrewChiefV4.Events
             leftRearBrakeTemp = 0;
             rightRearBrakeTemp = 0;
 
-            lastBrakeStatusCheckOK = true;
+            lastBrakeTempCheckOK = true;
+            lastTyreTempCheckOK = true;
         }
 
         private Boolean isBrakeTempPeakForLap(float leftFront, float rightFront, float leftRear, float rightRear) 
@@ -376,15 +378,24 @@ namespace CrewChiefV4.Events
             }
         }
 
-        private void reportCurrentTyreTempStatus(Boolean playImmediately)
+        public void reportCurrentTyreTempStatus(Boolean playImmediately)
         {
             List<MessageFragment> messageContents = new List<MessageFragment>();
             addTyreTempWarningMessages(currentTyreTempStatus.getCornersForStatus(TyreTemp.COLD), TyreTemp.COLD, messageContents);
             addTyreTempWarningMessages(currentTyreTempStatus.getCornersForStatus(TyreTemp.HOT), TyreTemp.HOT, messageContents);
             addTyreTempWarningMessages(currentTyreTempStatus.getCornersForStatus(TyreTemp.COOKING), TyreTemp.COOKING, messageContents);
+
             if (messageContents.Count == 0)
             {
-                messageContents.Add(MessageFragment.Text(folderGoodTyreTemps));
+                if (playImmediately || !lastTyreTempCheckOK)
+                {
+                    lastTyreTempCheckOK = true;
+                    messageContents.Add(MessageFragment.Text(folderGoodTyreTemps));
+                }
+            }
+            else
+            {
+                lastTyreTempCheckOK = false;
             }            
 
             if (playImmediately)
@@ -407,15 +418,15 @@ namespace CrewChiefV4.Events
             addBrakeTempWarningMessages(currentBrakeTempStatus.getCornersForStatus(BrakeTemp.COOKING), BrakeTemp.COOKING, messageContents);
             if (messageContents.Count == 0)
             {
-                if (playImmediately || !lastBrakeStatusCheckOK)
+                if (playImmediately || !lastBrakeTempCheckOK)
                 {
-                    lastBrakeStatusCheckOK = true;
+                    lastBrakeTempCheckOK = true;
                     messageContents.Add(MessageFragment.Text(folderGoodBrakeTemps));
                 }
             }
             else
             {
-                lastBrakeStatusCheckOK = false;
+                lastBrakeTempCheckOK = false;
             }
 
             if (playImmediately)
@@ -436,6 +447,7 @@ namespace CrewChiefV4.Events
             addTyreConditionWarningMessages(currentTyreConditionStatus.getCornersForStatus(TyreCondition.MINOR_WEAR), TyreCondition.MINOR_WEAR, messageContents);
             addTyreConditionWarningMessages(currentTyreConditionStatus.getCornersForStatus(TyreCondition.MAJOR_WEAR), TyreCondition.MAJOR_WEAR, messageContents);
             addTyreConditionWarningMessages(currentTyreConditionStatus.getCornersForStatus(TyreCondition.WORN_OUT), TyreCondition.WORN_OUT, messageContents);
+
             if (messageContents.Count == 0)
             {
                 messageContents.Add(MessageFragment.Text(folderGoodWear));

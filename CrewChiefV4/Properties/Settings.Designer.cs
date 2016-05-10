@@ -1339,5 +1339,29 @@ namespace CrewChiefV4.Properties {
                 this["enable_delayed_responses"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool enable_pit_exit_brake_temp_warning {
+            get {
+                return ((bool)(this["enable_pit_exit_brake_temp_warning"]));
+            }
+            set {
+                this["enable_pit_exit_brake_temp_warning"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool enable_pit_exit_tyre_temp_warning {
+            get {
+                return ((bool)(this["enable_pit_exit_tyre_temp_warning"]));
+            }
+            set {
+                this["enable_pit_exit_tyre_temp_warning"] = value;
+            }
+        }
     }
 }

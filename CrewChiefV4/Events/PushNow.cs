@@ -12,6 +12,9 @@ namespace CrewChiefV4.Events
         private float maxSeparationForPitExitWarning = 300;   // metres
         private float minSeparationForPitExitWarning = 10;   // metres
 
+        private Boolean brakeTempWarningOnPitExit = UserSettings.GetUserSettings().getBoolean("enable_pit_exit_brake_temp_warning");
+        private Boolean tyreTempWarningOnPitExit = UserSettings.GetUserSettings().getBoolean("enable_pit_exit_tyre_temp_warning");
+
         // TODO: use driver names here?
         private String folderPushToImprove = "push_now/push_to_improve";
         private String folderPushToGetWin = "push_now/push_to_get_win";
@@ -79,10 +82,17 @@ namespace CrewChiefV4.Events
                 {
                     audioPlayer.playMessage(new QueuedMessage(folderPushExitingPits, 0, this));
                 }
-                // now try and report the current brake temp status
+                // now try and report the current brake and tyre temp status
                 try
                 {
-                    ((TyreMonitor)CrewChief.getEvent("TyreMonitor")).reportCurrentBrakeTempStatus(false);
+                    if (brakeTempWarningOnPitExit)
+                    {
+                        ((TyreMonitor)CrewChief.getEvent("TyreMonitor")).reportCurrentBrakeTempStatus(false);
+                    }
+                    if (tyreTempWarningOnPitExit)
+                    {
+                        ((TyreMonitor)CrewChief.getEvent("TyreMonitor")).reportCurrentTyreTempStatus(false);
+                    }
                 }
                 catch (Exception e)
                 {
