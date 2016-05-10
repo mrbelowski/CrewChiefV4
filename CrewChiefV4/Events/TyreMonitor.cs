@@ -403,16 +403,17 @@ namespace CrewChiefV4.Events
             else
             {
                 lastTyreTempCheckOK = false;
-            }            
-
-            if (playImmediately)
-            {
-                audioPlayer.playMessageImmediately(new QueuedMessage("tyre_temps", messageContents, 0, null));
-                
             }
-            else if (lastTyreTempMessage == null || !messagesHaveSameContent(lastTyreTempMessage, messageContents))
+            if (messageContents.Count > 0)
             {
-                audioPlayer.playMessage(new QueuedMessage("tyre_temps", messageContents, random.Next(0, 10), this));
+                if (playImmediately)
+                {
+                    audioPlayer.playMessageImmediately(new QueuedMessage("tyre_temps", messageContents, 0, null));
+                }
+                else if (lastTyreTempMessage == null || !messagesHaveSameContent(lastTyreTempMessage, messageContents))
+                {
+                    audioPlayer.playMessage(new QueuedMessage("tyre_temps", messageContents, random.Next(0, 10), this));
+                }
             }
             lastTyreTempMessage = messageContents;
         }
@@ -439,20 +440,26 @@ namespace CrewChiefV4.Events
                     lastBrakeTempCheckOK = true;
                     messageContents.Add(MessageFragment.Text(folderGoodBrakeTemps));
                 }
+                else
+                {
+                    return;
+                }
             }
             else
             {
                 lastBrakeTempCheckOK = false;
             }
 
-            if (playImmediately)
+            if (messageContents.Count > 0)
             {
-                audioPlayer.playMessageImmediately(new QueuedMessage("brake_temps", messageContents, 0, null));
-                
-            }
-            else if (lastBrakeTempMessage == null || !messagesHaveSameContent(lastBrakeTempMessage, messageContents))
-            {
-                audioPlayer.playMessage(new QueuedMessage("brake_temps", messageContents, random.Next(0, 10), this));
+                if (playImmediately)
+                {
+                    audioPlayer.playMessageImmediately(new QueuedMessage("brake_temps", messageContents, 0, null));
+                }
+                else if (lastBrakeTempMessage == null || !messagesHaveSameContent(lastBrakeTempMessage, messageContents))
+                {
+                    audioPlayer.playMessage(new QueuedMessage("brake_temps", messageContents, random.Next(0, 10), this));
+                }
             }
             lastBrakeTempMessage = messageContents;
         }
