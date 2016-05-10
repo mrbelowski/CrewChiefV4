@@ -67,7 +67,7 @@ namespace CrewChiefV4.Events
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
             currentConditions = currentGameState.Conditions.getMostRecentConditions();
-            if (currentConditions != null && enableTrackAndAirTempReports) 
+            if (currentConditions != null) 
             {
                 if (airTempAtLastReport == float.MinValue)
                 {
@@ -80,8 +80,10 @@ namespace CrewChiefV4.Events
                 }
                 else
                 {
-                    Boolean canReportAirChange = currentGameState.Now > lastAirTempReport.Add(AirTemperatureReportMaxFrequency);
-                    Boolean canReportTrackChange = currentGameState.Now > lastTrackTempReport.Add(TrackTemperatureReportMaxFrequency);
+                    Boolean canReportAirChange = enableTrackAndAirTempReports &&
+                        currentGameState.Now > lastAirTempReport.Add(AirTemperatureReportMaxFrequency);
+                    Boolean canReportTrackChange = enableTrackAndAirTempReports &&
+                        currentGameState.Now > lastTrackTempReport.Add(TrackTemperatureReportMaxFrequency);
                     Boolean reportedCombinedTemps = false;
                     if (canReportAirChange || canReportTrackChange)
                     {
