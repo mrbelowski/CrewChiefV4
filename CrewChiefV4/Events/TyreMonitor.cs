@@ -285,13 +285,16 @@ namespace CrewChiefV4.Events
 
             if (currentGameState.Now > nextLockingAndSpinningCheck)
             {
-                if (enableBrakeLockWarnings && !hasWheelMissingOrPuncture(currentGameState))
+                if (!hasWheelMissingOrPuncture(currentGameState) && !currentGameState.PitData.InPitlane)
                 {
-                    checkLocking();
-                }
-                if (enableWheelSpinWarnings)
-                {
-                    checkWheelSpinning();
+                    if (enableBrakeLockWarnings)
+                    {
+                        checkLocking();
+                    }
+                    if (enableWheelSpinWarnings)
+                    {
+                        checkWheelSpinning();
+                    }
                 }
                 nextLockingAndSpinningCheck = currentGameState.Now.Add(lockingAndSpinningCheckInterval);
             }
@@ -456,7 +459,7 @@ namespace CrewChiefV4.Events
             if (playImmediately)
             {
                 // might be a "stand by..." response
-                if (delayResponses && random.Next(10) > 3)
+                if (delayResponses && random.Next(10) >= 2)
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderStandBy, 0, null));
                     audioPlayer.playMessage(new QueuedMessage("tyre_condition", messageContents, Math.Min(4, random.Next(10)), null));
