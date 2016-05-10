@@ -87,7 +87,7 @@ namespace CrewChiefV4.Events
                 {
                     if (brakeTempWarningOnPitExit)
                     {
-                        ((TyreMonitor)CrewChief.getEvent("TyreMonitor")).reportCurrentBrakeTempStatus(false);
+                        ((TyreMonitor)CrewChief.getEvent("TyreMonitor")).reportBrakeTempStatus(false, false);
                     }
                     if (tyreTempWarningOnPitExit)
                     {
@@ -100,6 +100,10 @@ namespace CrewChiefV4.Events
                 }
             }
         }
+
+        private void checkTempsAfterPitExit() { 
+
+}
 
         private Boolean isOpponentApproachingPitExit(GameStateData currentGameState)
         {

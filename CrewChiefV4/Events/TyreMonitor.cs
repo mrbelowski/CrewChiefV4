@@ -141,6 +141,7 @@ namespace CrewChiefV4.Events
         private CornerData currentTyreTempStatus;
 
         private CornerData currentBrakeTempStatus;
+        private CornerData peakBrakeTempStatus;
 
         private List<MessageFragment> lastTyreTempMessage = null;
 
@@ -204,6 +205,7 @@ namespace CrewChiefV4.Events
             currentTyreConditionStatus = new CornerData();
             currentTyreTempStatus = new CornerData();
             currentBrakeTempStatus = new CornerData();
+            peakBrakeTempStatus = new CornerData();
             lastTyreTempMessage = null;
             lastBrakeTempMessage = null;
             lastTyreConditionMessage = null;
@@ -317,11 +319,13 @@ namespace CrewChiefV4.Events
 
                 currentTyreConditionStatus = currentGameState.TyreData.TyreConditionStatus;
                 currentTyreTempStatus = currentGameState.TyreData.TyreTempStatus;
+                currentBrakeTempStatus = currentGameState.TyreData.BrakeTempStatus;
+
                 if (isBrakeTempPeakForLap(currentGameState.TyreData.LeftFrontBrakeTemp, 
                     currentGameState.TyreData.RightFrontBrakeTemp, currentGameState.TyreData.LeftRearBrakeTemp,
                     currentGameState.TyreData.RightRearBrakeTemp))
                 {
-                    currentBrakeTempStatus = currentGameState.TyreData.BrakeTempStatus;
+                    peakBrakeTempStatus = currentGameState.TyreData.BrakeTempStatus;
                 }
 
                 completedLaps = currentGameState.SessionData.CompletedLaps;
@@ -373,7 +377,7 @@ namespace CrewChiefV4.Events
                     {
                         if (enableBrakeTempWarnings)
                         {
-                            reportCurrentBrakeTempStatus(false);
+                            reportBrakeTempStatus(false, true);
                         }
                     }
                     peakBrakeTempForLap = 0;
@@ -413,12 +417,21 @@ namespace CrewChiefV4.Events
             lastTyreTempMessage = messageContents;
         }
 
-        public void reportCurrentBrakeTempStatus(Boolean playImmediately)
+        public void reportBrakeTempStatus(Boolean playImmediately, Boolean peak)
         {
             List<MessageFragment> messageContents = new List<MessageFragment>();
-            addBrakeTempWarningMessages(currentBrakeTempStatus.getCornersForStatus(BrakeTemp.COLD), BrakeTemp.COLD, messageContents);
-            addBrakeTempWarningMessages(currentBrakeTempStatus.getCornersForStatus(BrakeTemp.HOT), BrakeTemp.HOT, messageContents);
-            addBrakeTempWarningMessages(currentBrakeTempStatus.getCornersForStatus(BrakeTemp.COOKING), BrakeTemp.COOKING, messageContents);
+            if (peak)
+            {
+                addBrakeTempWarningMessages(peakBrakeTempStatus.getCornersForStatus(BrakeTemp.COLD), BrakeTemp.COLD, messageContents);
+                addBrakeTempWarningMessages(peakBrakeTempStatus.getCornersForStatus(BrakeTemp.HOT), BrakeTemp.HOT, messageContents);
+                addBrakeTempWarningMessages(peakBrakeTempStatus.getCornersForStatus(BrakeTemp.COOKING), BrakeTemp.COOKING, messageContents);
+            }
+            else
+            {
+                addBrakeTempWarningMessages(currentBrakeTempStatus.getCornersForStatus(BrakeTemp.COLD), BrakeTemp.COLD, messageContents);
+                addBrakeTempWarningMessages(currentBrakeTempStatus.getCornersForStatus(BrakeTemp.HOT), BrakeTemp.HOT, messageContents);
+                addBrakeTempWarningMessages(currentBrakeTempStatus.getCornersForStatus(BrakeTemp.COOKING), BrakeTemp.COOKING, messageContents);
+            }
             if (messageContents.Count == 0)
             {
                 if (playImmediately || !lastBrakeTempCheckOK)
@@ -628,7 +641,7 @@ namespace CrewChiefV4.Events
             {
                 if (currentBrakeTempStatus != null)
                 {
-                    reportCurrentBrakeTempStatus(true);
+                    reportBrakeTempStatus(true, true);
                 }
                 else
                 {
