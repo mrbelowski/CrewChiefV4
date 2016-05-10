@@ -43,7 +43,7 @@ namespace CrewChiefV4
          */
         public List<String> ConvertTimeToSounds(TimeSpan timeSpan, Boolean useMoreInflection)
         {
-            Console.WriteLine(new DateTime(timeSpan.Ticks).ToString("HH:mm:ss.F"));
+            // Console.WriteLine(new DateTime(timeSpan.Ticks).ToString("HH:mm:ss.F"));
             List<String> messageFolders = new List<String>();
             if (timeSpan != null)
             {
@@ -60,10 +60,10 @@ namespace CrewChiefV4
                 messageFolders.AddRange(GetMinutesSounds(timeSpan.Hours, timeSpan.Minutes, timeSpan.Seconds, tenths));
                 messageFolders.AddRange(GetSecondsSounds(timeSpan.Hours, timeSpan.Minutes, timeSpan.Seconds, tenths));
                 messageFolders.AddRange(GetTenthsSounds(timeSpan.Hours, timeSpan.Minutes, timeSpan.Seconds, tenths, useMoreInflection));
-                if (messageFolders.Count > 0)
+                /*if (messageFolders.Count > 0)
                 {
                     Console.WriteLine(String.Join(", ", messageFolders));
-                }
+                }*/
             }
             return messageFolders;
         }
