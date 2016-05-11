@@ -8,7 +8,7 @@ namespace CrewChiefV4
     public class TrackData
     {
         public static float gapPointsThreshold = 10000f;
-        public static float gapPointSpacing = 1500f;
+        public static float gapPointSpacing = 1000f;
 
         public static List<TrackDefinition> pCarsTracks = new List<TrackDefinition>()
         {
