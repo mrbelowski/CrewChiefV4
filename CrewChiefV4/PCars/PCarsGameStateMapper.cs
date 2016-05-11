@@ -361,12 +361,11 @@ namespace CrewChiefV4.PCars
                 (lastSessionPhase == SessionPhase.Green || lastSessionPhase == SessionPhase.Finished) &&
                 currentGameState.SessionData.SessionPhase == SessionPhase.Countdown;
             if (sessionOfSameTypeRestarted ||
-                ((currentGameState.SessionData.SessionType != SessionType.Unavailable && 
-                    currentGameState.SessionData.SessionPhase != SessionPhase.Finished &&
-                    currentGameState.SessionData.SessionPhase != SessionPhase.Unavailable) &&
-                (lastSessionType != currentGameState.SessionData.SessionType ||                
-                lastSessionTrack == null || lastSessionTrack.name != currentGameState.SessionData.TrackDefinition.name ||
-                (currentGameState.SessionData.SessionHasFixedTime && sessionTimeRemaining > lastSessionTimeRemaining + 1))))
+                (currentGameState.SessionData.SessionType != SessionType.Unavailable && 
+                 currentGameState.SessionData.SessionPhase != SessionPhase.Finished &&
+                    (lastSessionType != currentGameState.SessionData.SessionType ||                
+                        lastSessionTrack == null || lastSessionTrack.name != currentGameState.SessionData.TrackDefinition.name ||
+                            (currentGameState.SessionData.SessionHasFixedTime && sessionTimeRemaining > lastSessionTimeRemaining + 1))))
             {
                 Console.WriteLine("New session, trigger...");
                 if (sessionOfSameTypeRestarted)
@@ -435,10 +434,14 @@ namespace CrewChiefV4.PCars
                 {
                     if (currentGameState.SessionData.SessionPhase == SessionPhase.Green)
                     {
-                        justGoneGreen = true;
-                        // just gone green, so get the session data   Player is using car class
+                        // just gone green, so get the session data.
                         if (currentGameState.SessionData.SessionType == SessionType.Race)
                         {
+                            // TODO: test me. The 'justGoneGreen' param has been moved so it only prevents
+                            // previous state being copied for race sessions. This is to work around the PCars
+                            // bug where prac and qual sessions only 'go green' after the play has completed 
+                            // his out lap
+                            justGoneGreen = true;
                             if (currentGameState.SessionData.SessionHasFixedTime)
                             {
                                 currentGameState.SessionData.SessionTotalRunTime = sessionTimeRemaining;
