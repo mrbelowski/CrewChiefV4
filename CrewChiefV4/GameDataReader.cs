@@ -24,6 +24,8 @@ namespace CrewChiefV4
 
         public abstract Object ReadGameDataFromFile(String filename);
 
+        public abstract void ResetGameDataFromFile();
+
         protected String dataFilesPath = Path.Combine(Path.GetDirectoryName(
                                             System.Reflection.Assembly.GetEntryAssembly().Location), @"..\", @"..\dataFiles\");
 

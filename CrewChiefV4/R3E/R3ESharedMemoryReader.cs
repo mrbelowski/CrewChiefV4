@@ -22,6 +22,7 @@ namespace CrewChiefV4.RaceRoom
         private List<R3EStructWrapper> dataToDump;
         private R3EStructWrapper[] dataReadFromFile = null;
         private int dataReadFromFileIndex = 0;
+        private String lastReadFileName = null;
 
         public class R3EStructWrapper
         {
@@ -41,14 +42,20 @@ namespace CrewChiefV4.RaceRoom
             }
         }
 
+        public override void ResetGameDataFromFile()
+        {
+            dataReadFromFileIndex = 0;
+        }
+
         public override Object ReadGameDataFromFile(String filename)
         {
-            if (dataReadFromFile == null)
+            if (dataReadFromFile == null || filename != lastReadFileName)
             {
                 dataReadFromFileIndex = 0;
                 dataReadFromFile = DeSerializeObject<R3EStructWrapper[]>(dataFilesPath + filename);
+                lastReadFileName = filename;
             }
-            if (dataReadFromFile.Length > dataReadFromFileIndex)
+            if (dataReadFromFile != null && dataReadFromFile.Length > dataReadFromFileIndex)
             {
                 R3EStructWrapper structWrapperData = dataReadFromFile[dataReadFromFileIndex];
                 dataReadFromFileIndex++;

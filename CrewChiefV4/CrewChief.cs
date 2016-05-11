@@ -320,6 +320,8 @@ namespace CrewChiefV4
             gameStateMapper = GameStateReaderFactory.getInstance().getGameStateMapper(gameDefinition);
             gameStateMapper.setSpeechRecogniser(speechRecogniser);
             gameDataReader = GameStateReaderFactory.getInstance().getGameStateReader(gameDefinition);
+            gameDataReader.ResetGameDataFromFile();
+
             gameDataReader.dumpToFile = System.Diagnostics.Debugger.IsAttached && dumpToFile;
             if (gameDefinition.spotterName != null)
             {

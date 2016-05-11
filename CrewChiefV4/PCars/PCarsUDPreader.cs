@@ -57,6 +57,8 @@ namespace CrewChiefV4.PCars
         private IPEndPoint broadcastAddress;
         private UdpClient udpClient;
 
+        private String lastReadFileName = null;
+
         private static Boolean[] buttonsState = new Boolean[24];
 
         public static Boolean getButtonState(int index) 
@@ -72,14 +74,20 @@ namespace CrewChiefV4.PCars
             }
         }
 
+        public override void ResetGameDataFromFile()
+        {
+            dataReadFromFileIndex = 0;
+        }
+
         public override Object ReadGameDataFromFile(String filename)
         {
-            if (dataReadFromFile == null)
+            if (dataReadFromFile == null || filename != lastReadFileName)
             {
                 dataReadFromFileIndex = 0;
                 dataReadFromFile = DeSerializeObject<CrewChiefV4.PCars.PCarsSharedMemoryReader.PCarsStructWrapper[]>(dataFilesPath + filename);
+                lastReadFileName = filename;
             }
-            if (dataReadFromFile.Length > dataReadFromFileIndex)
+            if (dataReadFromFile != null && dataReadFromFile.Length > dataReadFromFileIndex)
             {
                 CrewChiefV4.PCars.PCarsSharedMemoryReader.PCarsStructWrapper structWrapperData = dataReadFromFile[dataReadFromFileIndex];
                 dataReadFromFileIndex++;

@@ -7,8 +7,9 @@ namespace CrewChiefV4
 {
     public class TrackData
     {
-        public static float gapPointsThreshold = 10000f;
-        public static float gapPointSpacing = 1000f;
+        // any track over 3000 metres will use gap points - 4 of them for tracks around 3000 metres long
+        public static float gapPointsThreshold = 3000f;
+        public static float gapPointSpacing = 700f;
 
         public static List<TrackDefinition> pCarsTracks = new List<TrackDefinition>()
         {
@@ -181,26 +182,25 @@ namespace CrewChiefV4
             {
                 float totalGaps = 0;
                 List<float> gaps = new List<float>();
-                // the gapPoints are used instead of the sector / start-finish line for opponent gaps.
-                // We need to ensure our 1st gap point is near, but not on, the start-finish line (so the lap
-                // distance between previous and current game states has increased). Yes. A hack.
-                gaps.Add(100f);
                 while (totalGaps < trackLength)
                 {
                     totalGaps += TrackData.gapPointSpacing;
-                    if (totalGaps < trackLength - 500)
+                    if (totalGaps < trackLength - TrackData.gapPointSpacing)
                     {
-                        // -500 because we don't want to add a gap point within 500 metres of the finish line
                         gaps.Add(totalGaps);
                     }
                     else
                     {
                         break;
                     }
-                }                
+                }
+                // the gapPoints are used instead of the sector / start-finish line for opponent gaps.
+                // We need to ensure our 1st gap point is near, but not on, the start-finish line (so the lap
+                // distance between previous and current game states has increased). Yes. A hack.
+                // This final gap point is just before the start-finish line
+                gaps.Add(trackLength - 50);
+
                 gapPoints = gaps.ToArray();
-                //Console.WriteLine("Track length = " + trackLength + " split into " + gaps.Count() + " gap points at " +
-                //    String.Join(", ", gapPoints));
             }
         }
 

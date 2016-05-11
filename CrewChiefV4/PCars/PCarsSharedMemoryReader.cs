@@ -19,6 +19,7 @@ namespace CrewChiefV4.PCars
         private List<PCarsStructWrapper> dataToDump;
         private PCarsStructWrapper[] dataReadFromFile = null;
         private int dataReadFromFileIndex = 0;
+        private String lastReadFileName = null;
 
         public class PCarsStructWrapper
         {
@@ -34,14 +35,20 @@ namespace CrewChiefV4.PCars
             }
         }
 
+        public override void ResetGameDataFromFile()
+        {
+            dataReadFromFileIndex = 0;
+        }
+
         public override Object ReadGameDataFromFile(String filename)
         {
-            if (dataReadFromFile == null)
+            if (dataReadFromFile == null || filename != lastReadFileName)
             {
                 dataReadFromFileIndex = 0;
                 dataReadFromFile = DeSerializeObject<PCarsStructWrapper[]>(dataFilesPath + filename);
+                lastReadFileName = filename;
             }
-            if (dataReadFromFile.Length > dataReadFromFileIndex)
+            if (dataReadFromFile != null && dataReadFromFile.Length > dataReadFromFileIndex)
             {
                 PCarsStructWrapper structWrapperData = dataReadFromFile[dataReadFromFileIndex];
                 dataReadFromFileIndex++;
