@@ -155,7 +155,7 @@ namespace CrewChiefV4
             carClasses.Add(new CarClass(CarClassEnum.FORMULA_RENAULT, new String[] { "Forumula Renault" }, new int[] { }, BrakeType.Carbon, TyreType.Unknown_Race, maxExoticRaceSafeWaterTemp, maxExoticRaceSafeOilTemp, carMinTyreCircumference, carMaxTyreCircumference));
 
             carClasses.Add(new CarClass(CarClassEnum.F3, new String[] { "FC" }, new int[] {  }, BrakeType.Ceramic, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp));
-            carClasses.Add(new CarClass(CarClassEnum.F4, new String[] { "F4" }, new int[] {  }, BrakeType.Iron_Race, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp));
+            carClasses.Add(new CarClass(CarClassEnum.F4, new String[] { "F4" }, new int[] { 4867 }, BrakeType.Iron_Race, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp));
             carClasses.Add(new CarClass(CarClassEnum.FF, new String[] { "F5" }, new int[] { 253 }, BrakeType.Iron_Race, TyreType.Unknown_Race, maxRoadSafeWaterTemp, maxRoadSafeOilTemp));   // formula ford
 
             // here we assume the old race cars (pre-radial tyres) will race on bias ply tyres
