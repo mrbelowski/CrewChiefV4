@@ -145,3 +145,4 @@ enable_pcars_pit_window_messages_help = Play pit window messages in PCars. Don't
 use_tts_for_missing_names_help = Attempt to use text-to-speech when the app encounters a name that's not in the recorded set. On Windows 7 this will sound awful (thanks Microsoft). Windows 10's "David" voice might be a bit more bearable.
 
 enable_delayed_responses_help = Some voice commands will trigger a "stand by" response, followed some time later by the requested into
+enable_console_logging_help = Uncheck this to prevent console window messages being shown. Reduces the CPU load of the app

@@ -44,6 +44,8 @@ namespace CrewChiefV4.Audio
 
         public static SpeechSynthesizer synthesizer;
 
+        public static Boolean hasSuitableTTSVoice = true;
+
         public SoundCache(DirectoryInfo soundsFolder, String[] eventTypesToKeepCached, Boolean useSwearyMessages, Boolean allowCaching)
         {
             if (useTTS)
@@ -60,7 +62,6 @@ namespace CrewChiefV4.Audio
                         catch (Exception e) { }
                     }
                     synthesizer = new SpeechSynthesizer();
-                    VoiceAge age = VoiceAge.Adult;
                     Boolean hasMale = false;
                     Boolean hasAdult = false;
                     Boolean hasSenior = false;
@@ -79,15 +80,22 @@ namespace CrewChiefV4.Audio
                             hasMale = true;
                         }
                     }
-                    if (!hasMale || (!hasAdult && !hasSenior))
+                    if (hasMale && (hasAdult || hasSenior))
                     {
-                        Console.WriteLine("No suitable TTS voice pack found - TTS will probably sound awful and isn't recommended "+
-                            "(this is a Windows 7 limitation, later versions should be able to use Microsoft's 'David' voice - this can be selected in the Control Panel)");
+                        hasSuitableTTSVoice = true;
+                    }
+                    else
+                    {
+                        Console.WriteLine("No suitable TTS voice pack found - TTS will only be used in response to voice commands (and will probably sound awful). " +
+                            "US versions of Windows 8.1 and Windows 10 should be able to use Microsoft's 'David' voice - " +
+                            "this can be selected in the Control Panel");
+                        hasSuitableTTSVoice = false;
                         if (synthesizer.GetInstalledVoices().Count == 1)
                         {
                             Console.WriteLine("Defaulting to voice " + synthesizer.GetInstalledVoices()[0].VoiceInfo.Name);
                         }
                     }
+
                     synthesizer.SelectVoiceByHints(VoiceGender.Male, hasAdult ? VoiceAge.Adult : VoiceAge.Senior);
                     synthesizer.SetOutputToDefaultAudioDevice();
                     synthesizer.Volume = 100;
@@ -336,6 +344,7 @@ namespace CrewChiefV4.Audio
         private void prepareFX(DirectoryInfo fxSoundDirectory) {
             FileInfo[] bleepFiles = fxSoundDirectory.GetFiles();
             String alternate_prefix = useAlternateBeeps ? "alternate_" : "";
+            Console.WriteLine("Preparing sound effects");
             foreach (FileInfo bleepFile in bleepFiles)
             {
                 if (bleepFile.Name.EndsWith(".wav"))
@@ -378,10 +387,12 @@ namespace CrewChiefV4.Audio
                     }
                 }
             }
+            Console.WriteLine("Prepare sound effects completed");
         }
 
         private void prepareVoice(DirectoryInfo voiceDirectory)
         {
+            Console.WriteLine("Preparing voice messages");
             DirectoryInfo[] eventFolders = voiceDirectory.GetDirectories();
             foreach (DirectoryInfo eventFolder in eventFolders)
             {
@@ -409,10 +420,12 @@ namespace CrewChiefV4.Audio
                     Console.WriteLine("Unable to find events folder");
                 }
             }
+            Console.WriteLine("Prepare voice message completed");
         }
 
         private void prepareDriverNames(DirectoryInfo driverNamesDirectory)
         {
+            Console.WriteLine("Preparing driver names");
             FileInfo[] driverNameFiles = driverNamesDirectory.GetFiles();
             foreach (FileInfo driverNameFile in driverNameFiles)
             {
@@ -423,10 +436,12 @@ namespace CrewChiefV4.Audio
                     availableDriverNames.Add(name);
                 }
             }
+            Console.WriteLine("Prepare driver names completed");
         }
 
         private void preparePrefixesAndSuffixes(DirectoryInfo prefixesAndSuffixesDirectory)
         {
+            Console.WriteLine("Preparing personalisations");
             DirectoryInfo[] prefixesAndSuffixesFolders = prefixesAndSuffixesDirectory.GetDirectories();
             foreach (DirectoryInfo prefixesAndSuffixesFolder in prefixesAndSuffixesFolders)
             {
@@ -443,6 +458,7 @@ namespace CrewChiefV4.Audio
                     }
                 }
             }
+            Console.WriteLine("Prepare personalisations completed");
         }
     }
 

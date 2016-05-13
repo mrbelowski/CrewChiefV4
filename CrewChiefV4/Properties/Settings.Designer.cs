@@ -1363,5 +1363,17 @@ namespace CrewChiefV4.Properties {
                 this["enable_pit_exit_tyre_temp_warning"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool enable_console_logging {
+            get {
+                return ((bool)(this["enable_console_logging"]));
+            }
+            set {
+                this["enable_console_logging"] = value;
+            }
+        }
     }
 }

@@ -72,6 +72,7 @@ namespace CrewChiefV4
             // do the auto updating stuff in a separate Thread
             new Thread(() =>
             {
+                Console.WriteLine("Checking for updates");
                 Thread.CurrentThread.IsBackground = true;                
                 try
                 {
@@ -170,6 +171,7 @@ namespace CrewChiefV4
                         downloadDriverNamesButton.Enabled = false;
                         downloadDriverNamesButton.BackColor = Color.LightGray;
                     }
+                    Console.WriteLine("Check for updates completed");
                 }
                 catch (Exception error)
                 {
@@ -300,7 +302,12 @@ namespace CrewChiefV4
             CheckForIllegalCrossThreadCalls = false;
             cw = new ControlWriter(textBox1);
             Console.SetOut(cw);
-
+            Console.WriteLine("Starting app");
+            if (!UserSettings.GetUserSettings().getBoolean("enable_console_logging"))
+            {
+                Console.WriteLine("Console logging has been disabled ('enable_console_logging' property)");
+            }
+            cw.enable = UserSettings.GetUserSettings().getBoolean("enable_console_logging");
             crewChief = new CrewChief();
             float messagesVolume = UserSettings.GetUserSettings().getFloat("messages_volume");
             float backgroundVolume = UserSettings.GetUserSettings().getFloat("background_volume");
@@ -308,6 +315,7 @@ namespace CrewChiefV4
             messagesVolumeSlider.Value = (int)(messagesVolume * 10f);
             backgroundVolumeSlider.Value = (int) (backgroundVolume * 10f);
 
+            Console.WriteLine("Loading controller settings");
             getControllers();
             controllerConfiguration.loadSettings(this);
             String customDeviceGuid = UserSettings.GetUserSettings().getString("custom_device_guid");
@@ -329,6 +337,7 @@ namespace CrewChiefV4
                     Console.WriteLine("Failed to add custom device, message: " + e.Message);
                 }
             }
+            Console.WriteLine("Load controller settings complete");
             voiceOption = getVoiceOptionEnum(UserSettings.GetUserSettings().getString("VOICE_OPTION"));
             if (voiceOption == VoiceOptionEnum.DISABLED)
             {
@@ -1070,27 +1079,31 @@ namespace CrewChiefV4
     public class ControlWriter : TextWriter
     {
         public TextBox textbox = null;
+        public Boolean enable = true;
         public ControlWriter(TextBox textbox)
         {
             this.textbox = textbox;
         }
 
         public override void WriteLine(string value)
-        {            
-            StringBuilder sb = new StringBuilder();
-            sb.Append(DateTime.Now.ToString("HH:mm:ss.fff")).Append(" : ").Append(value).AppendLine();
-            if (textbox != null && !textbox.IsDisposed)
+        {
+            if (enable)
             {
-                try
+                StringBuilder sb = new StringBuilder();
+                sb.Append(DateTime.Now.ToString("HH:mm:ss.fff")).Append(" : ").Append(value).AppendLine();
+                if (textbox != null && !textbox.IsDisposed)
                 {
-                    lock (this)
+                    try
                     {
-                        textbox.AppendText(sb.ToString());
+                        lock (this)
+                        {
+                            textbox.AppendText(sb.ToString());
+                        }
                     }
-                }
-                catch (Exception)
-                {
-                    // swallow - nothing to log it to
+                    catch (Exception)
+                    {
+                        // swallow - nothing to log it to
+                    }
                 }
             }
         }
