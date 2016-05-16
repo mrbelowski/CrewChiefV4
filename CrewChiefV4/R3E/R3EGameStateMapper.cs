@@ -423,6 +423,9 @@ namespace CrewChiefV4.RaceRoom
                         }
                     }
                     currentGameState.SessionData.IsNewSector = participantStruct.track_sector != 0 && currentGameState.SessionData.SectorNumber != participantStruct.track_sector;
+                    if (currentGameState.SessionData.CurrentLapIsValid && participantStruct.current_lap_valid != 1) {
+                        currentGameState.SessionData.CurrentLapIsValid = false;
+                    }
                     if (currentGameState.SessionData.IsNewSector)
                     {
                         if (participantStruct.track_sector == 1)
@@ -432,7 +435,8 @@ namespace CrewChiefV4.RaceRoom
                                 currentGameState.SessionData.LapTimePreviousEstimateForInvalidLap = currentGameState.SessionData.SessionRunningTime - currentGameState.SessionData.SessionTimesAtEndOfSectors[3];
                             }
                             currentGameState.SessionData.SessionTimesAtEndOfSectors[3] = currentGameState.SessionData.SessionRunningTime;
-                            if (participantStruct.sector_time_previous_self.Sector3 > 0 && participantStruct.sector_time_current_self.Sector2 > 0)
+                            if (participantStruct.sector_time_previous_self.Sector3 > 0 && participantStruct.sector_time_current_self.Sector2 > 0 &&
+                                previousGameState != null && previousGameState.SessionData.CurrentLapIsValid)
                             {
                                 float sectorTime = participantStruct.sector_time_previous_self.Sector3 - participantStruct.sector_time_current_self.Sector2;
                                 currentGameState.SessionData.LastSector3Time = sectorTime;
@@ -456,7 +460,7 @@ namespace CrewChiefV4.RaceRoom
                         else if (participantStruct.track_sector == 2)
                         {
                             currentGameState.SessionData.SessionTimesAtEndOfSectors[1] = currentGameState.SessionData.SessionRunningTime;
-                            if (participantStruct.sector_time_current_self.Sector1 > 0)
+                            if (participantStruct.sector_time_current_self.Sector1 > 0 && currentGameState.SessionData.CurrentLapIsValid)
                             {
                                 currentGameState.SessionData.LastSector1Time = participantStruct.sector_time_current_self.Sector1;
                                 if (currentGameState.SessionData.PlayerBestSector1Time == -1 || currentGameState.SessionData.LastSector1Time < currentGameState.SessionData.PlayerBestSector1Time)
@@ -472,7 +476,8 @@ namespace CrewChiefV4.RaceRoom
                         else if (participantStruct.track_sector == 3)
                         {
                             currentGameState.SessionData.SessionTimesAtEndOfSectors[2] = currentGameState.SessionData.SessionRunningTime;
-                            if (participantStruct.sector_time_current_self.Sector2 > 0 && participantStruct.sector_time_current_self.Sector1 > 0)
+                            if (participantStruct.sector_time_current_self.Sector2 > 0 && participantStruct.sector_time_current_self.Sector1 > 0 &&
+                                 currentGameState.SessionData.CurrentLapIsValid)
                             {
                                 float sectorTime = participantStruct.sector_time_current_self.Sector2 - participantStruct.sector_time_current_self.Sector1;
                                 currentGameState.SessionData.LastSector2Time = sectorTime;
