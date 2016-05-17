@@ -248,7 +248,18 @@ namespace CrewChiefV4
         public void youWot()
         {
             audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderDidntUnderstand, 0, null));
-            
+        }
+
+        public void reportCurrentTime()
+        {
+            DateTime now = DateTime.Now;
+            int hour = now.Hour;
+            hour += 1;
+            if (hour > 12) {
+                hour = hour - 12;
+            }
+            audioPlayer.playMessageImmediately(new QueuedMessage("current_time", 
+                AbstractEvent.MessageContents(now.Minute, hour), 0, null));
         }
 
         private void startSpotterThread()

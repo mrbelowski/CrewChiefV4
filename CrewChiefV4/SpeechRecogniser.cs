@@ -38,6 +38,7 @@ namespace CrewChiefV4
         public static String[] WHATS_MY_GAP_BEHIND = Configuration.getSpeechRecognitionPhrases("WHATS_MY_GAP_BEHIND");
         public static String[] WHAT_WAS_MY_LAST_LAP_TIME = Configuration.getSpeechRecognitionPhrases("WHAT_WAS_MY_LAST_LAP_TIME");
         public static String[] WHATS_MY_BEST_LAP_TIME = Configuration.getSpeechRecognitionPhrases("WHATS_MY_BEST_LAP_TIME");
+        public static String[] WHATS_THE_FASTEST_LAP_TIME = Configuration.getSpeechRecognitionPhrases("WHATS_THE_FASTEST_LAP_TIME");
         public static String[] WHATS_MY_POSITION = Configuration.getSpeechRecognitionPhrases("WHATS_MY_POSITION");
         public static String[] WHATS_MY_FUEL_LEVEL = Configuration.getSpeechRecognitionPhrases("WHATS_MY_FUEL_LEVEL");
 
@@ -45,6 +46,7 @@ namespace CrewChiefV4
         public static String[] KEEP_ME_INFORMED = Configuration.getSpeechRecognitionPhrases("KEEP_ME_INFORMED");
         public static String[] TELL_ME_THE_GAPS = Configuration.getSpeechRecognitionPhrases("TELL_ME_THE_GAPS");
         public static String[] DONT_TELL_ME_THE_GAPS = Configuration.getSpeechRecognitionPhrases("DONT_TELL_ME_THE_GAPS");
+        public static String[] WHATS_THE_TIME = Configuration.getSpeechRecognitionPhrases("WHATS_THE_TIME");
 
         public static String[] WHOS_IN_FRONT_IN_THE_RACE = Configuration.getSpeechRecognitionPhrases("WHOS_IN_FRONT_IN_THE_RACE");
         public static String[] WHOS_BEHIND_IN_THE_RACE = Configuration.getSpeechRecognitionPhrases("WHOS_BEHIND_IN_THE_RACE");
@@ -244,8 +246,10 @@ namespace CrewChiefV4
                 validateAndAdd(KEEP_ME_INFORMED, staticSpeechChoices);
                 validateAndAdd(TELL_ME_THE_GAPS, staticSpeechChoices);
                 validateAndAdd(DONT_TELL_ME_THE_GAPS, staticSpeechChoices);
+                validateAndAdd(WHATS_THE_FASTEST_LAP_TIME, staticSpeechChoices);
 
                 validateAndAdd(HOW_LONGS_LEFT, staticSpeechChoices);
+                validateAndAdd(WHATS_THE_TIME, staticSpeechChoices);
                 validateAndAdd(SPOT, staticSpeechChoices);
                 validateAndAdd(DONT_SPOT, staticSpeechChoices);
                 validateAndAdd(REPEAT_LAST_MESSAGE, staticSpeechChoices);
@@ -504,6 +508,10 @@ namespace CrewChiefV4
             {
                 crewChief.enableDeltasMode();
             }
+            else if (ResultContains(recognisedSpeech, WHATS_THE_TIME))
+            {
+                crewChief.reportCurrentTime();
+            }
             else if (ResultContains(recognisedSpeech, HOWS_MY_AERO) ||
                ResultContains(recognisedSpeech, HOWS_MY_TRANSMISSION) ||
                ResultContains(recognisedSpeech, HOWS_MY_ENGINE) ||
@@ -531,6 +539,7 @@ namespace CrewChiefV4
             }
             else if (ResultContains(recognisedSpeech, WHAT_WAS_MY_LAST_LAP_TIME) ||
                 ResultContains(recognisedSpeech, WHATS_MY_BEST_LAP_TIME) ||
+                ResultContains(recognisedSpeech, WHATS_THE_FASTEST_LAP_TIME) ||
                 ResultContains(recognisedSpeech, HOWS_MY_PACE) ||
                 ResultContains(recognisedSpeech, WHAT_ARE_MY_SECTOR_TIMES) ||
                 ResultContains(recognisedSpeech, WHATS_MY_LAST_SECTOR_TIME))

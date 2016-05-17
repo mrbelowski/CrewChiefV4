@@ -152,7 +152,7 @@ namespace CrewChiefV4.Events
         private Boolean isHotLapping;
 
         private TimeSpan lastGapToSecondWhenLeadingPracOrQual;
-        
+
         public LapTimes(AudioPlayer audioPlayer)
         {
             this.audioPlayer = audioPlayer;
@@ -776,12 +776,23 @@ namespace CrewChiefV4.Events
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage("bestLapTime",
                         MessageContents(TimeSpan.FromSeconds(bestLapTime)), 0, this));
-                    
+
                 }
                 else
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
-                    
+                }
+            }
+            else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.WHATS_THE_FASTEST_LAP_TIME))
+            {
+                if (currentGameState.SessionData.PlayerClassSessionBestLapTime > 0)
+                {
+                    audioPlayer.playMessageImmediately(new QueuedMessage("sessionFastestLaptime",
+                        MessageContents(TimeSpan.FromSeconds(currentGameState.SessionData.PlayerClassSessionBestLapTime)), 0, this));
+                }
+                else
+                {
+                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
                 }
             }
             else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.WHAT_WAS_MY_LAST_LAP_TIME))

@@ -43,6 +43,7 @@ WHATS_MY_GAP_IN_FRONT = what's the gap ahead:what's the gap in front:what's my g
 WHATS_MY_GAP_BEHIND = what's the gap behind:what's my gap behind:gap behind
 WHAT_WAS_MY_LAST_LAP_TIME = what's my last lap time:last lap time:lap time:what's my lap time
 WHATS_MY_BEST_LAP_TIME = what's my best lap time:best lap time:best lap
+WHATS_THE_FASTEST_LAP_TIME = what's the fastest lap:what's the fastest lap time
 WHATS_MY_POSITION = what's my position
 WHATS_MY_FUEL_LEVEL = what's my fuel level
 
@@ -50,6 +51,7 @@ KEEP_QUIET = keep quiet:shut up:I know what I'm doing:leave me alone
 KEEP_ME_INFORMED = keep me updated:keep me informed:keep me posted
 TELL_ME_THE_GAPS = tell me the gaps:tell me the deltas:give me the deltas:time deltas every lap
 DONT_TELL_ME_THE_GAPS = don't tell me the gaps:don't tell me the deltas:don't give me the deltas:no more deltas:no more gaps
+WHATS_THE_TIME = what's the time
 
 WHOS_IN_FRONT_IN_THE_RACE = who's in front in the race:who's ahead in the race:who's in front:who's ahead
 WHOS_BEHIND_IN_THE_RACE = who's behind in the race:who's behind
