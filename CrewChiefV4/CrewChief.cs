@@ -97,7 +97,7 @@ namespace CrewChiefV4
             eventsList.Add("ConditionsMonitor", new ConditionsMonitor(audioPlayer));
             eventsList.Add("OvertakingAidsMonitor", new OvertakingAidsMonitor(audioPlayer));
             sessionEndMessages = new SessionEndMessages(audioPlayer);
-            DriverNameHelper.readRawNamesToUsableNamesFile(AudioPlayer.soundFilesPath);
+            DriverNameHelper.readRawNamesToUsableNamesFiles(AudioPlayer.soundFilesPath);
         }
 
         public void setGameDefinition(GameDefinition gameDefinition)

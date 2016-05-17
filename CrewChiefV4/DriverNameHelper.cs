@@ -25,14 +25,20 @@ namespace CrewChiefV4
 
         private static Boolean rawNamesToUsableNamesFileRead = false;
 
-        public static void readRawNamesToUsableNamesFile(String soundsFolderName)
+        public static void readRawNamesToUsableNamesFiles(String soundsFolderName)
+        {
+            readRawNamesToUsableNamesFile(soundsFolderName, @"\driver_names\names.txt");
+            readRawNamesToUsableNamesFile(soundsFolderName, @"\driver_names\additional_names.txt");
+        }
+
+        private static void readRawNamesToUsableNamesFile(String soundsFolderName, String filename)
         {
             Console.WriteLine("Reading driver name mappings");
             int counter = 0;
             string line;
             try
             {
-                StreamReader file = new StreamReader(soundsFolderName + @"\driver_names\names.txt");
+                StreamReader file = new StreamReader(soundsFolderName + filename);
                 while ((line = file.ReadLine()) != null)
                 {
                     int separatorIndex = line.LastIndexOf(":");
