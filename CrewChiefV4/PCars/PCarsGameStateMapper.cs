@@ -586,6 +586,7 @@ namespace CrewChiefV4.PCars
                 else if (currentGameState.SessionData.SectorNumber == 2)
                 {
                     currentGameState.SessionData.SessionTimesAtEndOfSectors[1] = currentGameState.SessionData.SessionRunningTime;
+                    // TODO: confirm that an invalid sector will put -1 in here...
                     currentGameState.SessionData.LastSector1Time = shared.mCurrentSector1Time;
                     if (currentGameState.SessionData.LastSector1Time > 0 &&
                         (currentGameState.SessionData.PlayerBestSector1Time == -1 || currentGameState.SessionData.LastSector1Time < currentGameState.SessionData.PlayerBestSector1Time))
