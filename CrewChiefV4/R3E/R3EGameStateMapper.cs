@@ -21,13 +21,13 @@ namespace CrewChiefV4.RaceRoom
         private List<CornerData.EnumWithThresholds> brakeDamageThresholds = new List<CornerData.EnumWithThresholds>();
 
         // recent r3e changes to tyre wear levels / rates - the data in the block appear to 
-        // have changed recently, with about 0.5 representing 'worn out'. TODO: verify this assumption
+        // have changed recently, with about 0.6 representing 'worn out'.
         private float wornOutTyreWearLevel = 0.05f;
 
         private float scrubbedTyreWearPercent = 2f;
         private float minorTyreWearPercent = 10f;
-        private float majorTyreWearPercent = 35f;
-        private float wornOutTyreWearPercent = 60f;        
+        private float majorTyreWearPercent = 37f;
+        private float wornOutTyreWearPercent = 65f;        
 
         private float trivialAeroDamageThreshold = 0.99995f;
         private float trivialEngineDamageThreshold = 0.995f;
@@ -79,7 +79,7 @@ namespace CrewChiefV4.RaceRoom
         private SpeechRecogniser speechRecogniser;
 
 
-        // TODO: now we're much stricter with the bollocks opponents data (duplicates, missing entries, stuff randomly being given the wrong
+        // now we're much stricter with the bollocks opponents data (duplicates, missing entries, stuff randomly being given the wrong
         // slot_id), can we remove this grotty delayed-position hack and all the associated crap it creates? Turns out that no, we can't. 
         // The data are broken and unreliable in multiple ways - the opponent data get jumbled up, and the data *within each opponent slot*
         // get jumbled up too. Can't criticise too strongly though, there's no shortage of shit code right here...
@@ -268,7 +268,6 @@ namespace CrewChiefV4.RaceRoom
                                     if (mapToTyreType(shared.TireType) == TyreType.Option)
                                     {
                                         currentGameState.PitData.MandatoryTyreChangeRequiredTyreType = TyreType.Prime;
-                                        // TODO: this might be a lap early...
                                         currentGameState.PitData.MaxPermittedDistanceOnCurrentTyre = ((int)Math.Floor(halfRaceDistance)) - 1;
                                     }
                                     else

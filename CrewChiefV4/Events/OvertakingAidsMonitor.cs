@@ -20,7 +20,7 @@ namespace CrewChiefV4.Events
 
         private Random random = new Random();
 
-        private Boolean hasUsedDrsOnThisLap = false;    // TODO: is this sufficient for DTM 2015? Don't they have 3 activations per lap?
+        private Boolean hasUsedDrsOnThisLap = false;    // Note that DTM 2015 experience has 3 DRS activations per lap - only moans if we've used none of them
         private Boolean drsAvailableOnThisLap = false;
         private float trackDistanceToCheckDRSGapFrontAt = -1;
 

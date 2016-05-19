@@ -20,7 +20,6 @@ namespace CrewChiefV4
             new TrackDefinition("Brands Hatch:Indy", 2.5f, 1924.475f, new float[] {-329.1295f, 165.8752f}, new float[] {-36.68332f, 355.611f}),
             new TrackDefinition("Brands Hatch:Grand Prix", 2.5f, 3890.407f, new float[] {-329.1295f, 165.8752f}, new float[] {-36.68332f, 355.611f}),
             new TrackDefinition("Brno:", 3, 5377.732f, new float[] {-194.1228f, -11.41852f}, new float[] {139.6739f, 0.06169825f}),
-            // TODO: Burriram (Chang) circuit from RaceRoom
             new TrackDefinition("Cadwell:Club Circuit", 2346.271f),
             new TrackDefinition("Cadwell:Woodland", 2, 1335.426f, new float[] {45.92422f, 72.04858f}, new float[] {-10.31487f, -40.43255f}),
             new TrackDefinition("Cadwell:Grand Prix", 2, 3453.817f, new float[] {45.92422f, 72.04858f}, new float[] {-10.31487f, -40.43255f}),
@@ -42,7 +41,6 @@ namespace CrewChiefV4
             new TrackDefinition("Le Mans:Le Circuit Bugatti", 3, 4149.839f, new float[] {-737.9395f, 1107.367f}, new float[] {-721.3452f, 1582.873f}),
             new TrackDefinition("Mazda Raceway:Laguna Seca", 2, 3593.582f, new float[] {-70.22401f, 432.3777f}, new float[] {-279.2681f, 228.165f}),
             new TrackDefinition("Nordschleife:Full", 3, 20735.4f,  new float[] {599.293f, 606.7135f}, new float[] {391.6694f, 694.4844f}),
-            // TODO: Nurburgring tracks from RR - VLN, 24h Nordschleife, Tourist
             new TrackDefinition("Nürburgring:Grand Prix", 2.5f, 5122.845f, new float[] {443.6332f, 527.8024f}, new float[] {66.84711f, 96.7378f}),
             new TrackDefinition("Nürburgring:MuellenBach", 1488.941f),
             new TrackDefinition("Nürburgring:Sprint", 2.5f, 3603.18f, new float[] {443.6332f, 527.8024f}, new float[] {66.84711f, 96.7378f}),
@@ -113,7 +111,6 @@ namespace CrewChiefV4
                     return defGuessedFromLength;
                 }
             }
-            // TODO: use the raceroom ID to map this for raceroom
             String nameToLog = trackName != null ? trackName : "null";
             return new TrackDefinition("unknown track - name " + nameToLog + ", length = " + trackLength, trackLength); 
         }

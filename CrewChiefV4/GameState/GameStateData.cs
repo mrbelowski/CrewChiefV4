@@ -694,8 +694,6 @@ namespace CrewChiefV4.GameState
         public OpponentData OpponentForCarAheadPitting = null;
         public OpponentData OpponentForCarBehindPitting = null;
 
-
-        // TODO: will this always be an Integer?
         public int PitWindowStart = 0;
 
         // The minute/lap into which you can/should pit

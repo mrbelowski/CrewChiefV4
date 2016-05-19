@@ -329,7 +329,6 @@ namespace CrewChiefV4.Events
                         playedTwoMinutesRemaining = true;
                         playedFiveMinutesRemaining = true;
                         playedTenMinutesRemaining = true;
-                        // TODO: Test this addition of 'box this lap'
                         audioPlayer.playMessage(new QueuedMessage("pit_for_fuel_now", 
                             MessageContents(folderAboutToRunOut, MandatoryPitStops.folderMandatoryPitStopsPitThisLap), 0, this));
                     } if (enableFuelMessages && estimatedFuelMinutesLeft <= 2 && estimatedFuelMinutesLeft > 1.8 && !playedTwoMinutesRemaining)

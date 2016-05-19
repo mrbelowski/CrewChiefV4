@@ -437,10 +437,6 @@ namespace CrewChiefV4.PCars
                         // just gone green, so get the session data.
                         if (currentGameState.SessionData.SessionType == SessionType.Race)
                         {
-                            // TODO: test me. The 'justGoneGreen' param has been moved so it only prevents
-                            // previous state being copied for race sessions. This is to work around the PCars
-                            // bug where prac and qual sessions only 'go green' after the play has completed 
-                            // his out lap
                             justGoneGreen = true;
                             if (currentGameState.SessionData.SessionHasFixedTime)
                             {
@@ -1239,7 +1235,6 @@ namespace CrewChiefV4.PCars
             }
         }
 
-        // TODO: this has been hacked around so much as to have become entirely bollocks. Re-write it
         /*
          * When a practice session ends (while driving around) the mSessionState goes from 2 (racing) to
          * 1 (race not started) to 0 (invalid) over a few seconds. It never goes to any of the finished

@@ -260,10 +260,8 @@ namespace CrewChiefV4.Events
                 }
                 else if (timeLeft < 60)
                 {
-                    // TODO: check these - if the timeLeft value contains -1 for some reason this message will be wrong
                     Console.WriteLine("Playing less than a minute message, timeleft = " + timeLeft);
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderLessThanOneMinute, 0, this));
-                    
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderLessThanOneMinute, 0, this));                    
                 }
             }
             else
@@ -277,9 +275,7 @@ namespace CrewChiefV4.Events
                 }
                 else if (lapsLeft == 2)
                 {
-                    // TODO: revised logic to this is correct for PCars - check it's OK for R3E
                     audioPlayer.playMessageImmediately(new QueuedMessage(folderOneLapAfterThisOne, 0, null));
-                    
                 }
                 else if (lapsLeft == 1)
                 {
