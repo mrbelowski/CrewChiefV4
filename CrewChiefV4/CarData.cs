@@ -24,9 +24,19 @@ namespace CrewChiefV4
         private static float maxColdBiasPlyTyreTempPeak = 70;
         private static float maxWarmBiasPlyTyreTempPeak = 103;
         private static float maxHotBiasPlyTyreTempPeak = 123;
+
+        private static float maxColdDtmOptionTyreTempPeak = 70;
+        private static float maxWarmDtmOptionTyreTempPeak = 110;
+        private static float maxHotDtmOptionTyreTempPeak = 127;
+
+        private static float maxColdDtmPrimeTyreTempPeak = 80;
+        private static float maxWarmDtmPrimeTyreTempPeak = 117;
+        private static float maxHotDtmPrimeTyreTempPeak = 137;
+
         
 
-        // special case for RaceRoom tyres - the game sends the core temp, not the surface temp
+        // special case for RaceRoom tyres on the new tire model 
+        // - the game sends the core temp, not the surface temp
         private static float maxColdR3ETyreTempPeak = 90;
         private static float maxWarmR3ETyreTempPeak = 100;
         private static float maxHotR3ETyreTempPeak = 105;
@@ -34,11 +44,7 @@ namespace CrewChiefV4
         private static float maxColdR3EPrimeTyreTempPeak = 87;
         private static float maxWarmR3EPrimeTyreTempPeak = 98;
         private static float maxHotR3EPrimeTyreTempPeak = 103;
-
-        private static float maxColdR3EOptionTyreTempPeak = 90;
-        private static float maxWarmR3EOptionTyreTempPeak = 102;
-        private static float maxHotR3EOptionTyreTempPeak = 107;
-
+        // no need for options here because the 2015 cars don't use 'em
 
 
 
@@ -82,6 +88,10 @@ namespace CrewChiefV4
             VINTAGE_INDY_65, VINTAGE_F3_A, VINTAGE_F1_A, VINTAGE_F1_A1, VINTAGE_GT3, VINTAGE_GT, HISTORIC_TOURING_1, HISTORIC_TOURING_2, VINTAGE_F1_B, VINTAGE_F1_C, STOCK_CAR, F1, F2, F3, F4, FF, TC1, TC2, 
             AUDI_TT_CUP, CLIO_CUP, DTM, DTM_2013, V8_SUPERCAR, DTM_2014, DTM_2015, TRANS_AM, HILL_CLIMB_ICONS, FORMULA_RENAULT, MEGANE_TROPHY, NSU_TT, UNKNOWN_RACE
         }
+
+        public static CarClassEnum[] r3eNewTyreModelClasses = new CarClassEnum[] {
+            CarClassEnum.GT3 ,CarClassEnum.GT4 ,CarClassEnum.LMP1 ,CarClassEnum.LMP2 ,CarClassEnum.GROUP5 ,CarClassEnum.GTO ,CarClassEnum.F2 ,CarClassEnum.F4 ,
+            CarClassEnum.FF ,CarClassEnum.TC1 ,CarClassEnum.AUDI_TT_CUP ,CarClassEnum.DTM_2015 ,CarClassEnum.NSU_TT};
 
         public class CarClass
         {
@@ -137,6 +147,7 @@ namespace CrewChiefV4
             carClasses.Add(new CarClass(CarClassEnum.GT1, new String[] { "GT1" }, new int[] { 1687 }, BrakeType.Ceramic, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp));
             carClasses.Add(new CarClass(CarClassEnum.GT2, new String[] { "GT2" }, new int[] { 1704 }, BrakeType.Ceramic, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp));
             carClasses.Add(new CarClass(CarClassEnum.GT3, new String[] { "GT3" }, new int[] { 1703, 2922, 3375, 4516 }, BrakeType.Iron_Race, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp));
+            // TODO: remove the GTM classes as they are now part of GT3
             carClasses.Add(new CarClass(CarClassEnum.ADAC_GTM_2013, new String[] {  }, new int[] { 2922 }, BrakeType.Iron_Race, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp));
             carClasses.Add(new CarClass(CarClassEnum.ADAC_GTM_2014, new String[] {  }, new int[] { 3375 }, BrakeType.Iron_Race, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp));
             carClasses.Add(new CarClass(CarClassEnum.GT4, new String[] { "GT4" }, new int[] { 1717 }, BrakeType.Iron_Race, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp));
@@ -224,26 +235,33 @@ namespace CrewChiefV4
             biasPlyTyreTempsThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.COOKING, maxHotBiasPlyTyreTempPeak, 10000));
             tyreTempThresholds.Add(TyreType.Bias_Ply, biasPlyTyreTempsThresholds);
 
+            List<CornerData.EnumWithThresholds> dtmOptionTyreTempsThresholds = new List<CornerData.EnumWithThresholds>();
+            dtmOptionTyreTempsThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.COLD, -10000, maxColdDtmOptionTyreTempPeak));
+            dtmOptionTyreTempsThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.WARM, maxColdDtmOptionTyreTempPeak, maxWarmDtmOptionTyreTempPeak));
+            dtmOptionTyreTempsThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.HOT, maxWarmDtmOptionTyreTempPeak, maxHotDtmOptionTyreTempPeak));
+            dtmOptionTyreTempsThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.COOKING, maxHotDtmOptionTyreTempPeak, 10000));
+            tyreTempThresholds.Add(TyreType.Option, dtmOptionTyreTempsThresholds);
+
+            List<CornerData.EnumWithThresholds> dtmPrimeTyreTempsThresholds = new List<CornerData.EnumWithThresholds>();
+            dtmPrimeTyreTempsThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.COLD, -10000, maxColdDtmPrimeTyreTempPeak));
+            dtmPrimeTyreTempsThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.WARM, maxColdDtmPrimeTyreTempPeak, maxWarmDtmPrimeTyreTempPeak));
+            dtmPrimeTyreTempsThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.HOT, maxWarmDtmPrimeTyreTempPeak, maxHotDtmPrimeTyreTempPeak));
+            dtmPrimeTyreTempsThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.COOKING, maxHotDtmPrimeTyreTempPeak, 10000));
+            tyreTempThresholds.Add(TyreType.Prime, dtmPrimeTyreTempsThresholds);
+
             List<CornerData.EnumWithThresholds> r3eTyreTempsThresholds = new List<CornerData.EnumWithThresholds>();
             r3eTyreTempsThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.COLD, -10000, maxColdR3ETyreTempPeak));
             r3eTyreTempsThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.WARM, maxColdR3ETyreTempPeak, maxWarmR3ETyreTempPeak));
             r3eTyreTempsThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.HOT, maxWarmR3ETyreTempPeak, maxHotR3ETyreTempPeak));
             r3eTyreTempsThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.COOKING, maxHotR3ETyreTempPeak, 10000));
-            tyreTempThresholds.Add(TyreType.R3E, r3eTyreTempsThresholds);
+            tyreTempThresholds.Add(TyreType.R3E_NEW, r3eTyreTempsThresholds);
 
             List<CornerData.EnumWithThresholds> r3ePrimeTyreTempsThresholds = new List<CornerData.EnumWithThresholds>();
             r3ePrimeTyreTempsThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.COLD, -10000, maxColdR3EPrimeTyreTempPeak));
             r3ePrimeTyreTempsThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.WARM, maxColdR3EPrimeTyreTempPeak, maxWarmR3EPrimeTyreTempPeak));
             r3ePrimeTyreTempsThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.HOT, maxWarmR3EPrimeTyreTempPeak, maxHotR3EPrimeTyreTempPeak));
             r3ePrimeTyreTempsThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.COOKING, maxHotR3EPrimeTyreTempPeak, 10000));
-            tyreTempThresholds.Add(TyreType.R3E_Prime, r3ePrimeTyreTempsThresholds);
-
-            List<CornerData.EnumWithThresholds> r3eOptionTyreTempsThresholds = new List<CornerData.EnumWithThresholds>();
-            r3eOptionTyreTempsThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.COLD, -10000, maxColdR3EOptionTyreTempPeak));
-            r3eOptionTyreTempsThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.WARM, maxColdR3EOptionTyreTempPeak, maxWarmR3EOptionTyreTempPeak));
-            r3eOptionTyreTempsThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.HOT, maxWarmR3EOptionTyreTempPeak, maxHotR3EOptionTyreTempPeak));
-            r3eOptionTyreTempsThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.COOKING, maxHotR3EOptionTyreTempPeak, 10000));
-            tyreTempThresholds.Add(TyreType.R3E_Option, r3eOptionTyreTempsThresholds);
+            tyreTempThresholds.Add(TyreType.R3E_NEW_Prime, r3ePrimeTyreTempsThresholds);
 
             List<CornerData.EnumWithThresholds> ironRoadBrakeTempsThresholds = new List<CornerData.EnumWithThresholds>();
             ironRoadBrakeTempsThresholds.Add(new CornerData.EnumWithThresholds(BrakeTemp.COLD, -10000, maxColdIronRoadBrakeTemp));
