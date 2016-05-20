@@ -64,6 +64,27 @@ namespace CrewChiefV4
         {
             return new MessageFragment(integer);
         }
+
+        public override String ToString()
+        {
+            if (type == FragmentType.Text)
+            {
+                return text;
+            }
+            if (type == FragmentType.Integer)
+            {
+                return integer.ToString();
+            }
+            if (type == FragmentType.Opponent && opponent != null)
+            {
+                return opponent.DriverRawName;
+            }
+            if (type == FragmentType.Time && timeSpan != null)
+            {
+                return timeSpan.ToString();
+            }
+            return "";
+        }
     }
 
     public class QueuedMessage
