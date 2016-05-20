@@ -90,7 +90,7 @@ namespace CrewChiefV4
         }
 
         public static CarClassEnum[] r3eNewTyreModelClasses = new CarClassEnum[] {
-            CarClassEnum.GT3 ,CarClassEnum.GT4 ,CarClassEnum.LMP1 ,CarClassEnum.LMP2 ,CarClassEnum.GROUP5 ,CarClassEnum.GTO ,CarClassEnum.F2 ,CarClassEnum.F4 ,
+            CarClassEnum.GT3 ,CarClassEnum.GT4 ,CarClassEnum.LMP1 ,CarClassEnum.LMP2 ,CarClassEnum.LMP3, CarClassEnum.GROUP5 ,CarClassEnum.GTO ,CarClassEnum.F2 ,CarClassEnum.F4 ,
             CarClassEnum.FF ,CarClassEnum.TC1 ,CarClassEnum.AUDI_TT_CUP ,CarClassEnum.DTM_2015 ,CarClassEnum.NSU_TT};
 
         public class CarClass
