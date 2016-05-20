@@ -183,6 +183,7 @@ namespace CrewChiefV4.RaceRoom
                     if (participantStruct.driver_info.slot_id == shared.slot_id)
                     {
                         currentGameState.SessionData.IsNewSector = previousGameState == null || participantStruct.track_sector != previousGameState.SessionData.SectorNumber;
+                        
                         currentGameState.SessionData.SectorNumber = participantStruct.track_sector;
                         currentGameState.SessionData.DriverRawName = driverName;
                         if (playerName == null)
@@ -265,20 +266,20 @@ namespace CrewChiefV4.RaceRoom
                                 if (currentGameState.carClass.carClassEnum == CarData.CarClassEnum.DTM_2014)
                                 {
                                     double halfRaceDistance = currentGameState.SessionData.SessionNumberOfLaps / 2d;
-                                    if (mapToTyreType(shared.TireType) == TyreType.Option)
+                                    if (mapToTyreType(shared.TireType) == TyreType.R3E_Option)
                                     {
-                                        currentGameState.PitData.MandatoryTyreChangeRequiredTyreType = TyreType.Prime;
+                                        currentGameState.PitData.MandatoryTyreChangeRequiredTyreType = TyreType.R3E_Prime;
                                         currentGameState.PitData.MaxPermittedDistanceOnCurrentTyre = ((int)Math.Floor(halfRaceDistance)) - 1;
                                     }
                                     else
                                     {
-                                        currentGameState.PitData.MandatoryTyreChangeRequiredTyreType = TyreType.Option;
+                                        currentGameState.PitData.MandatoryTyreChangeRequiredTyreType = TyreType.R3E_Option;
                                         currentGameState.PitData.MinPermittedDistanceOnCurrentTyre = (int)Math.Ceiling(halfRaceDistance);
                                     }
                                 }
                                 else if (currentGameState.carClass.carClassEnum == CarData.CarClassEnum.DTM_2015)
                                 {
-                                    currentGameState.PitData.MandatoryTyreChangeRequiredTyreType = TyreType.Prime;
+                                    currentGameState.PitData.MandatoryTyreChangeRequiredTyreType = TyreType.R3E_Prime;
                                     // the mandatory change must be completed by the end of the pit window
                                     currentGameState.PitData.MaxPermittedDistanceOnCurrentTyre = currentGameState.PitData.PitWindowEnd;
                                 }
@@ -422,6 +423,7 @@ namespace CrewChiefV4.RaceRoom
                         }
                     }
                     currentGameState.SessionData.IsNewSector = participantStruct.track_sector != 0 && currentGameState.SessionData.SectorNumber != participantStruct.track_sector;
+                    
                     if (currentGameState.SessionData.CurrentLapIsValid && participantStruct.current_lap_valid != 1) {
                         currentGameState.SessionData.CurrentLapIsValid = false;
                     }
@@ -1047,15 +1049,15 @@ namespace CrewChiefV4.RaceRoom
         {
             if ((int)RaceRoomConstant.TireType.DTM_Option == r3eTyreType)
             {
-                return TyreType.Option;
+                return TyreType.R3E_Option;
             } 
             else if ((int)RaceRoomConstant.TireType.Prime == r3eTyreType)
             {
-                return TyreType.Prime;
+                return TyreType.R3E_Prime;
             }
             else
             {
-                return TyreType.Unknown_Race;
+                return TyreType.R3E;
             }
         }
 

@@ -11,6 +11,7 @@ namespace CrewChiefV4.Events
     class TyreMonitor : AbstractEvent
     {
         private Boolean delayResponses = UserSettings.GetUserSettings().getBoolean("enable_delayed_responses");
+        private Boolean logTemps = UserSettings.GetUserSettings().getBoolean("log_tyre_temps");
 
         // tyre temp messages...
         private String folderColdFrontTyres = "tyre_monitor/cold_front_tyres";
@@ -248,8 +249,31 @@ namespace CrewChiefV4.Events
             return false;
         }
 
+        private void logTyreTemps(TyreData tyreData, int sectorNumber, int lapNumber)
+        {
+            // tyre temp debug code
+            Console.WriteLine("Lap "+ (lapNumber + 1) + " sector " + sectorNumber + " tyre temps, Outer, middle, inner  |------|  inner, middle, outer");
+            Console.WriteLine("Fronts:    " + Math.Round(tyreData.FrontLeft_LeftTemp, 2) + 
+                ", " + Math.Round(tyreData.FrontLeft_CenterTemp, 2) + 
+                ", " + Math.Round(tyreData.FrontLeft_RightTemp, 2) + 
+                "  |------|  " + Math.Round(tyreData.FrontRight_RightTemp, 2) + 
+                ", " + Math.Round(tyreData.FrontRight_CenterTemp, 2) + 
+                ", " + Math.Round(tyreData.FrontRight_LeftTemp, 2));
+            Console.WriteLine("Rears:    " + Math.Round(tyreData.RearLeft_LeftTemp, 2) + 
+                ", " + Math.Round(tyreData.RearLeft_CenterTemp, 2) + 
+                ", " + Math.Round(tyreData.RearLeft_RightTemp, 2) +
+                "  |------|  " + Math.Round(tyreData.RearRight_RightTemp, 2) + 
+                ", " + Math.Round(tyreData.RearRight_CenterTemp, 2) + 
+                ", " + Math.Round(tyreData.RearRight_LeftTemp, 2));
+            Console.WriteLine("-------------------------");
+        }
+
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
+            if (logTemps && currentGameState.SessionData.IsNewSector)
+            {
+                logTyreTemps(currentGameState.TyreData, currentGameState.SessionData.SectorNumber, currentGameState.SessionData.CompletedLaps);
+            }
             if (currentGameState.SessionData.IsNewLap)
             {
                 timeLeftFrontIsLockedForLap = 0;
@@ -412,6 +436,7 @@ namespace CrewChiefV4.Events
                 }
                 else if (lastTyreTempMessage == null || !messagesHaveSameContent(lastTyreTempMessage, messageContents))
                 {
+                    Console.WriteLine("Tyre temp warning, temps : "+ String.Join(", ", messageContents));
                     audioPlayer.playMessage(new QueuedMessage("tyre_temps", messageContents, random.Next(0, 10), this));
                 }
             }

@@ -325,12 +325,12 @@ namespace CrewChiefV4.Events
                     if (opponentKey != null)
                     {
                         OpponentData opponentData = currentGameState.OpponentData[opponentKey];
-                        if (opponentData.CurrentTyres == TyreType.Option)
+                        if (opponentData.CurrentTyres == TyreType.R3E_Option)
                         {
                             gotData = true;
                             audioPlayer.playMessageImmediately(new QueuedMessage(MandatoryPitStops.folderMandatoryPitStopsOptionTyres, 0, null));
                         }
-                        else if (opponentData.CurrentTyres == TyreType.Prime)
+                        else if (opponentData.CurrentTyres == TyreType.R3E_Prime)
                         {
                             gotData = true;
                             audioPlayer.playMessageImmediately(new QueuedMessage(MandatoryPitStops.folderMandatoryPitStopsPrimeTyres, 0, null));

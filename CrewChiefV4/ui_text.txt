@@ -146,3 +146,4 @@ use_tts_for_missing_names_help = Attempt to use text-to-speech when the app enco
 
 enable_delayed_responses_help = Some voice commands will trigger a "stand by" response, followed some time later by the requested into
 enable_console_logging_help = Uncheck this to prevent console window messages being shown. Reduces the CPU load of the app
+log_tyre_temps_help = Show tyre temps at the start of each sector

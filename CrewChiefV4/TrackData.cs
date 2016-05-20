@@ -110,9 +110,13 @@ namespace CrewChiefV4
                 {
                     return defGuessedFromLength;
                 }
+                String nameToLog = trackName != null ? trackName : "null";
+                return new TrackDefinition("unknown track - name " + nameToLog + ", length = " + trackLength, trackLength); 
             }
-            String nameToLog = trackName != null ? trackName : "null";
-            return new TrackDefinition("unknown track - name " + nameToLog + ", length = " + trackLength, trackLength); 
+            else
+            {
+                return new TrackDefinition("R3E track, length = " + trackLength, trackLength); 
+            }
         }
 
         private static TrackDefinition getDefinitionForLength(List<TrackDefinition> possibleDefinitions, float trackLength, int maxError)
