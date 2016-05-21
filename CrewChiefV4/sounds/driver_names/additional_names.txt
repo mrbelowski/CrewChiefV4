@@ -194,3 +194,22 @@ rothstein : Marcel_Rothstein
 brausepaul : brausepaul313
 spawn : cologne-spawn
 sandman : The-Sandman
+queso : Chips N Queso
+hef : HEF51
+raven : Raven403
+juice : BeetesJuice
+rx : RxHevnTT
+geek : geek
+jesup : ole jesup
+pest : Pest C0ntrol
+regrets : NoRegrets702
+johnson : AndrewJohnson17
+abe : AbeWoz
+mohawk : MohawkMan94
+knukken : knukken
+trooper : Storm trooper
+demon : GR4DEMON
+johnschoonsbeard : JohnSchoonsBeard
+pawlaczek : Radek Pawlaczek
+brailsford : Jim Brailsford
+lagstrum : Bailey Lagstrum
