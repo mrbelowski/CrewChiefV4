@@ -260,6 +260,7 @@ namespace CrewChiefV4.RaceRoom
                             }
                             else if (currentGameState.carClass.carClassEnum == CarData.CarClassEnum.ADAC_GTM_2014)
                             {
+                                // this doesn't do anything and the ADAC 2014 class is now deprecated
                                 currentGameState.PitData.HasMandatoryDriverChange = true;
                             }
                             if (currentGameState.PitData.HasMandatoryTyreChange && currentGameState.PitData.MandatoryTyreChangeRequiredTyreType == TyreType.Unknown_Race)
@@ -1049,6 +1050,7 @@ namespace CrewChiefV4.RaceRoom
         
         private TyreType mapToTyreType(int r3eTyreType, CarData.CarClassEnum carClass)
         {
+            // only DTM 2014 (old physics) use Option tyres
             if ((int)RaceRoomConstant.TireType.DTM_Option == r3eTyreType)
             {
                 return TyreType.Option;
@@ -1333,6 +1335,8 @@ namespace CrewChiefV4.RaceRoom
                     opponentData.AddSectorData(racePosition, sectorTime, sessionRunningTime, lapIsValid && validSpeed, false, 20, 20);
                     if (sector == 2)
                     {
+                        // crappy but necessary assumption - assume single class here. It only really matters for DTM races, which will be a single class.
+                        // The alternative is to check the opponent car class each tick (too expensive)
                         opponentData.CurrentTyres = mapToTyreType(tire_type, playerCarClass);
                     }
                 }
