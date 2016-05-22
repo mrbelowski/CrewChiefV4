@@ -38,8 +38,8 @@ namespace CrewChiefV4
         // special case for RaceRoom tyres on the new tire model 
         // - the game sends the core temp, not the surface temp
         private static float maxColdR3ENewTyreTempPeak = 90;
-        private static float maxWarmR3ENewTyreTempPeak = 100;
-        private static float maxHotR3ENewTyreTempPeak = 105;
+        private static float maxWarmR3ENewTyreTempPeak = 99;
+        private static float maxHotR3ENewTyreTempPeak = 104;
 
         private static float maxColdR3ENewPrimeTyreTempPeak = 87;
         private static float maxWarmR3ENewPrimeTyreTempPeak = 98;
