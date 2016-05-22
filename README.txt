@@ -2,6 +2,8 @@ CrewChief version 4.
 
 Changelog
 ---------
+Version 4.2.1.1: Fixed a bug in the gap-ahead logic that was triggering 'keep him under pressure' messages too often
+
 Version 4.2.1.0: Added support for secondary driver names mappings file 'additional_names.txt' so the auto-updater doesn't overwrite user-made changes to names.txt; Additional validation on R3E sector reports; Added "what's the fastest lap" and "what time is it" voice commands (reports session best lap for player class, and current [real world] time of day); A few bug fixes and minor improvements; Reworked R3E tyre temperature checking to make better use of the core temps provided by the game (for new physics model cars).
 	
 Version 4.2.0.1: Added ADAC 2015 and F4 RaceRoom class; PCars suspension damage threshold tweak; Damage reporting rework; Various bug fixes and minor improvements; Don't play fuel messages while being refuelled; Don't play wheel spin / locking when in the pits or when we have a puncture or missing wheel; Fixed best lap and brake damage voice commands; Added brake and tyre temp warning on pit exit (when temps aren't optimal) - these are optional (brake temp warning is on by default, tyre temp warning is off); Some voice commands now trigger a "stand by" response, then a few seconds later the actual response (optional, disabled by default - uses "enable_delayed_responses" property); More frequent opponent gap reports on longer tracks.

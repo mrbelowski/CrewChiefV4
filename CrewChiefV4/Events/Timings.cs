@@ -240,7 +240,7 @@ namespace CrewChiefV4.Events
                                 // only prefer mid-lap gap reports if we're on a track with no ad-hoc gapPoints
                                 if (currentGameState.SessionData.TrackDefinition.gapPoints.Count() > 0)
                                 {
-                                    rand.Next(closeAheadMinSectorWait, closeAheadMaxSectorWait);
+                                    sectorsUntilNextCloseCarAheadReport = rand.Next(closeAheadMinSectorWait, closeAheadMaxSectorWait);
                                 } 
                                 else 
                                 {

@@ -7,9 +7,9 @@ namespace CrewChiefV4
 {
     public class TrackData
     {
-        // any track over 3000 metres will use gap points - 4 of them for tracks around 3000 metres long
-        public static float gapPointsThreshold = 3000f;
-        public static float gapPointSpacing = 700f;
+        // any track over 3500 metres will use gap points
+        public static float gapPointsThreshold = 3300f;
+        public static float gapPointSpacing = 780f;
 
         public static List<TrackDefinition> pCarsTracks = new List<TrackDefinition>()
         {
