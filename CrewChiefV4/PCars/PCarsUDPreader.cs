@@ -14,9 +14,9 @@ namespace CrewChiefV4.PCars
 {
     public class PCarsUDPreader : GameDataReader
     {        
-        private int packetRateCheckInterval = 500;
-        private int packetCountAtStartOfCurrentRateCheck = 0;
-        private int packetCountAtStartOfNextRateCheck = 0;
+        private long packetRateCheckInterval = 500;
+        private long packetCountAtStartOfCurrentRateCheck = 0;
+        private long packetCountAtStartOfNextRateCheck = 0;
         private long ticksAtStartOfCurrentPacketRateCheck = 0;
         private float lastPacketRateEstimate = -1;
 
@@ -26,11 +26,11 @@ namespace CrewChiefV4.PCars
         // we only check the telem packets, not the strings...
         private int lastSequenceNumberForTelemPacket = -1;
 
-        private int telemPacketCount = 0;
-        private int totalPacketCount = 0;
+        private long telemPacketCount = 0;
+        private long totalPacketCount = 0;
 
-        private int discardedTelemCount = 0;
-        private int acceptedOutOfSequenceTelemCount = 0;
+        private long discardedTelemCount = 0;
+        private long acceptedOutOfSequenceTelemCount = 0;
 
         private float lastValidTelemCurrentLapTime = -1;
         private float lastValidTelemLapsCompleted = 0;
