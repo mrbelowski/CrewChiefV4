@@ -495,10 +495,11 @@ namespace CrewChiefV4.Events
             addTyreConditionWarningMessages(currentTyreConditionStatus.getCornersForStatus(TyreCondition.MINOR_WEAR), TyreCondition.MINOR_WEAR, messageContents);
             addTyreConditionWarningMessages(currentTyreConditionStatus.getCornersForStatus(TyreCondition.MAJOR_WEAR), TyreCondition.MAJOR_WEAR, messageContents);
             addTyreConditionWarningMessages(currentTyreConditionStatus.getCornersForStatus(TyreCondition.WORN_OUT), TyreCondition.WORN_OUT, messageContents);
-
+            Boolean wearIsGood = false;
             if (messageContents.Count == 0)
             {
                 messageContents.Add(MessageFragment.Text(folderGoodWear));
+                wearIsGood = true;
             }
 
             if (playImmediately)
@@ -514,7 +515,8 @@ namespace CrewChiefV4.Events
                     audioPlayer.playMessageImmediately(new QueuedMessage("tyre_condition", messageContents, 0, null));
                 }
             }
-            else if (playEvenIfUnchanged || (lastTyreConditionMessage != null && !messagesHaveSameContent(lastTyreConditionMessage, messageContents)))
+            else if (playEvenIfUnchanged || 
+                (lastTyreConditionMessage != null && !messagesHaveSameContent(lastTyreConditionMessage, messageContents) && !wearIsGood))
             {
                 audioPlayer.playMessage(new QueuedMessage("tyre_condition", messageContents, random.Next(0, 10), this));
             }
