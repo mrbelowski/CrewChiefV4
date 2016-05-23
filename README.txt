@@ -123,6 +123,7 @@ I've not finished implementing this but currently the app understands and respon
 "how's my [fuel / tyre wear / body work / aero / engine / transmission / suspension / pace ]"
 "how are my [tyre temps / tyre temperatures / brakes / brake temps / brake temperatures / engine temps / engine temperatures]"
 "what's my [gap in front / gap ahead / gap behind / last lap / last lap time / lap time / position / fuel level / best lap / best lap time]"
+"what's the fastest lap" (reports the fastest lap in the session for the player's car class)
 "keep quiet / I know what I'm doing / leave me alone" (switches off messages)
 "keep me informed / keep me posted / keep me updated" (switches messages back on)
 "how long's left / how many laps are left / how many laps to go"
@@ -150,6 +151,7 @@ I've not finished implementing this but currently the app understands and respon
 "repeat last message / say again" (replays the last message)
 "What's the air temp / what's the air temperature / what's the track temp / what's the track temperature" (current air / track temps in celsius)
 "What are my [brake / tyre] [temperatures / temps]"
+"What time is it / what's the time" (reports current real-world time)
 
 
 

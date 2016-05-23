@@ -1,0 +1,87 @@
+Button assignments
+
+The app allows you to assign buttons to a few actions. To do this, the game must be running. Click the menu icon in the app and select "Assign buttons". Choose an action and click the Assign button. The app is now waiting for you to press the button you want to use for this action, which will complete the assignment process. If a button is already assigned to an action, select the action and click the 'Delete assignment' button to allow you to reassign a different button.
+
+To use speech recognition, assign a control the the 'Open radion channel' action. I recommend unchecking the 'hold button while talking' checkbox. If this is selected, the app will only listen for voice commands while the button is held down. This is a little unreliable (due to the way the app receives data from the game). If this checkbox is unchecked, the app will start listening when you click the button, and carry on listening after you release it until you finish talking or the app doesn't receive a command and times out.
+
+
+Voice recognition
+
+The app has a set of voice commands it can respond to (the full list is at the end of this document). The app can use Google voice recognition or Sphinx voice recognition. These should both work well, but work in very different ways. It's worth experimenting to see which is most reliable. Both struggle to recognise commands in very noisy environments so you'll get better results if you game with headphones. The Google recogniser requires a decent internet connection (all the processing is done by Google), but the Sphinx recogniser works entirely on the device.
+
+The "Show radio button on main screen" option is useful to help test voice recognition without relying on having the game running. I recommend you enable this when setting up your voice recognition options. Pressing this button will start the app listening for voice commands - if the game isn't running, most of these commands will result in a "we don't have the data" type response. If you say "can you hear me?" the app should respond with "yes, I can hear you".
+
+There are a few other speech recognition options which should be fairly straightforward.
+
+
+
+Driver names
+
+The app has lots (over 2000) driver names built in. Some of these are AI drivers, some are online racers. An additional pack of driver names is available to download, which is regularly updated. To use these additional names place the downloaded driver_names.zip file in your device's Downloads folder (copy it across from a computer via USB, or download the file directly on your device which will by default save it in the Downloads folder).
+
+When the app detects a new driver_names.zip file in Downloads, it will offer to unpack it and make the new driver names available (in addition to the built in driver names).
+
+The additional driver names package contains uncompressed (mono 22050Hz PCM .wav) sound files, so will get quite large.
+
+
+Personalisations
+
+I've also recorded a set of sounds which the app can add to some existing messages. These enable the app to use your name when addressing you (e.g. "OK Jim, watch for the lights"). The set of these is currently quite small but I will add more. If you're lucky enough to have your firstname or nickname in this set, you can download the appropriate prefixes_and_suffixes.zip file to your device's Downloads folder (as for the driver_names.zip) and the app will offer to add the personalisations when you next start it.
+
+If you add some personalisations and decide you don't want the app to use them, there's a "Min time between personal messages" setting - change this value to 0 to disable them.
+
+
+Text to speech
+
+The app can use Google's built in text to speech engine to fill in missing driver names. This doesn't sound great but can be made acceptable with a little fiddling. By default many android devices use a female voice pack. This can be changed to English male by downloading the appropriate English (UK) Male voice pack in your device's settings (Accessibility -> Text to speech engine -> settings -> install voice data). The app will choose the default voice for English UK, so if your device allows you to set this, do so. My Lollipop phone has no default voice option so I uninstalled the English (UK) female voice after installing the male one.
+
+The app has 2 Text to Speech modes in the Preferences Text to speech settings, under the TTS frequency heading. "Only when necessary" is the recommended setting. The app will only use text to speech if you ask it for a name directly (e.g. you ask "who's in front?"). The app will then only play the TTS name in response (if TTS isn't enabled the app will say "I can't pronounce the name" or something similar). The "For any missing name" option will allow the app to combine TTS names with existing sound files. So the app will use TTS in messages about opponent instead of using something non-specific like "the guy" or "the car". For example, "[tts reads Bob] has just done a 1:43.1". This mode can sound a little distracting.
+
+There's a voice command you can give, "text to speech test", to test text to speech.
+
+
+Resetting the app to default
+
+Each setting has a 'reset to default' option, but there's no 'reset all' option (I'll add it one day). To reset the app to its default settings (usefult if you've been experimenting lost track of what you've changed), go to your devices's settings menu, then Apps, and select Crew Chief. Force-stop the app, then clear the app's cache and data.
+
+It's worth trying this if you find the app is not working for you.
+
+
+Important options
+
+Most of the options in the app can be left at default values, and don't require any additional explanation here. However, it's worth mentioning a few...
+
+ - UDP Port Number should always be 5606. Always.
+ - Character Encoding should match your game - XBox and PC users should set this to Cp1252. PS4 users should set this to UTF-8. Unfortunately there's no way for the app to set this automatically.
+ - The Use full wake lock setting is required by all the devices I've tested with. If you set this to 'false', most devices stop listening for data when the screen switches off (despite my app telling the device to keep listening). This is a long-standing Android bug.
+ - Accept packets only from this IP address is only needed if you have multiple instances of the game running on the same network
+
+Voice commands list
+
+"how's my [fuel / tyre wear / body work / aero / engine / transmission / suspension / pace ]"
+"how are my [tyre temps / tyre temperatures / brakes / brake temps / brake temperatures / engine temps / engine temperatures]"
+"what's my [gap in front / gap ahead / gap behind / last lap / last lap time / lap time / position / fuel level / best lap / best lap time]"
+"what's the fastest lap" (reports the fastest lap in the session for the player's car class)
+"keep quiet / I know what I'm doing / leave me alone" (switches off messages)
+"keep me informed / keep me posted / keep me updated" (switches messages back on)
+"how long's left / how many laps are left / how many laps to go"
+"spot / don't spot" (switches the spotter on and off - note even in "leave me alone" mode the spotter still operates unless you explicitly switch it off)
+"do I still have a penalty / do I have a penalty / have I served my penalty"
+"where's P [opponent race position]"
+"what's [opponent race position]'s last lap" (for example, "what's p 4's best lap", or "what's position 4's last lap")
+"what's [opponent race position]'s best lap"
+"what's [the car in front / the guy in front / the car ahead / the guy ahead]'s last lap"
+"what's [the car in front / the guy in front / the car ahead / the guy ahead]'s best lap"
+"what's [the car behind / the guy behind]'s last lap"
+"what's [the car behind / the guy behind]'s best lap"
+"what are my sector times"
+"what's my last sector time"
+"who's leading"
+"who's [ahead / ahead in the race / in front / in front in the race / behind / behind in the race]" (gives the name of the car in front / behind in the race or on the timing sheet for qual / practice)
+"who's [ahead on track / in front on track / behind on track]" (gives the name of the car in front / behind in on track, regardless of his race / qual position)
+"tell me the gaps / give me the gaps / tell me the deltas / give me the deltas" (switch on 'deltas' mode where the time deltas in front and behind get read out on each lap. Note that these messages will play even if you have disabled messages)
+"don't tell me the gaps / don't tell me the deltas / no more gaps / no more deltas" (switch off deltas mode)
+"repeat last message / say again" (replays the last message)
+"What's the air temp / what's the air temperature / what's the track temp / what's the track temperature" (current air / track temps in celsius)
+"What are my [brake / tyre] [temperatures / temps]"
+"What time is it / what's the time" (reports current real-world time)
