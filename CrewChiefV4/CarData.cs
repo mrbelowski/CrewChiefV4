@@ -84,7 +84,7 @@ namespace CrewChiefV4
 
         public enum CarClassEnum
         {
-            GT1X, GT1, GT2, ADAC_GTM_2014, ADAC_GTM_2013, GT3, GT4, GT5, Kart_1, Kart_2, LMP1, LMP2, LMP3, ROAD_B, ROAD_C1, ROAD_C2, ROAD_D, ROAD_SUPERCAR, GROUPC, GROUPA, GROUP4, GROUP5, GROUP6, GTO,
+            GT1X, GT1, GT2, GT3, GT4, GT5, Kart_1, Kart_2, LMP1, LMP2, LMP3, ROAD_B, ROAD_C1, ROAD_C2, ROAD_D, ROAD_SUPERCAR, GROUPC, GROUPA, GROUP4, GROUP5, GROUP6, GTO,
             VINTAGE_INDY_65, VINTAGE_F3_A, VINTAGE_F1_A, VINTAGE_F1_A1, VINTAGE_GT3, VINTAGE_GT, HISTORIC_TOURING_1, HISTORIC_TOURING_2, VINTAGE_F1_B, VINTAGE_F1_C, STOCK_CAR, F1, F2, F3, F4, FF, TC1, TC2, 
             AUDI_TT_CUP, CLIO_CUP, DTM, DTM_2013, V8_SUPERCAR, DTM_2014, DTM_2015, TRANS_AM, HILL_CLIMB_ICONS, FORMULA_RENAULT, MEGANE_TROPHY, NSU_TT, UNKNOWN_RACE
         }
@@ -148,9 +148,6 @@ namespace CrewChiefV4
             carClasses.Add(new CarClass(CarClassEnum.GT1, new String[] { "GT1" }, new int[] { 1687 }, BrakeType.Ceramic, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp));
             carClasses.Add(new CarClass(CarClassEnum.GT2, new String[] { "GT2" }, new int[] { 1704 }, BrakeType.Ceramic, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp));
             carClasses.Add(new CarClass(CarClassEnum.GT3, new String[] { "GT3" }, new int[] { 1703, 2922, 3375, 4516 }, BrakeType.Iron_Race, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp));
-            // TODO: remove the GTM classes as they are now part of GT3
-            carClasses.Add(new CarClass(CarClassEnum.ADAC_GTM_2013, new String[] {  }, new int[] { 2922 }, BrakeType.Iron_Race, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp));
-            carClasses.Add(new CarClass(CarClassEnum.ADAC_GTM_2014, new String[] {  }, new int[] { 3375 }, BrakeType.Iron_Race, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp));
             carClasses.Add(new CarClass(CarClassEnum.GT4, new String[] { "GT4" }, new int[] { 1717 }, BrakeType.Iron_Race, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp));
             carClasses.Add(new CarClass(CarClassEnum.GT5, new String[] { "GT5" }, new int[] { }, BrakeType.Iron_Race, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp));
 

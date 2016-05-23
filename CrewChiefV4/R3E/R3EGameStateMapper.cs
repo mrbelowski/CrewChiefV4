@@ -258,11 +258,6 @@ namespace CrewChiefV4.RaceRoom
                                 // iteration 1 of the DTM 2015 doesn't have a mandatory tyre change, but this means the pit window stuff won't be set, so we're (kind of) OK here...
                                 currentGameState.PitData.HasMandatoryTyreChange = true;
                             }
-                            else if (currentGameState.carClass.carClassEnum == CarData.CarClassEnum.ADAC_GTM_2014)
-                            {
-                                // this doesn't do anything and the ADAC 2014 class is now deprecated
-                                currentGameState.PitData.HasMandatoryDriverChange = true;
-                            }
                             if (currentGameState.PitData.HasMandatoryTyreChange && currentGameState.PitData.MandatoryTyreChangeRequiredTyreType == TyreType.Unknown_Race)
                             {
                                 if (currentGameState.carClass.carClassEnum == CarData.CarClassEnum.DTM_2014)
@@ -325,7 +320,6 @@ namespace CrewChiefV4.RaceRoom
                     currentGameState.PitData.PitWindowStart = previousGameState.PitData.PitWindowStart;
                     currentGameState.PitData.PitWindowEnd = previousGameState.PitData.PitWindowEnd;
                     currentGameState.PitData.HasMandatoryPitStop = previousGameState.PitData.HasMandatoryPitStop;
-                    currentGameState.PitData.HasMandatoryDriverChange = previousGameState.PitData.HasMandatoryDriverChange;
                     currentGameState.PitData.HasMandatoryTyreChange = previousGameState.PitData.HasMandatoryTyreChange;
                     currentGameState.PitData.MandatoryTyreChangeRequiredTyreType = previousGameState.PitData.MandatoryTyreChangeRequiredTyreType;
                     currentGameState.PitData.IsRefuellingAllowed = previousGameState.PitData.IsRefuellingAllowed;

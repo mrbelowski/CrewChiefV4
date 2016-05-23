@@ -514,7 +514,6 @@ namespace CrewChiefV4.PCars
                     currentGameState.PitData.PitWindowStart = previousGameState.PitData.PitWindowStart;
                     currentGameState.PitData.PitWindowEnd = previousGameState.PitData.PitWindowEnd;
                     currentGameState.PitData.HasMandatoryPitStop = previousGameState.PitData.HasMandatoryPitStop;
-                    currentGameState.PitData.HasMandatoryDriverChange = previousGameState.PitData.HasMandatoryDriverChange;
                     currentGameState.PitData.HasMandatoryTyreChange = previousGameState.PitData.HasMandatoryTyreChange;
                     currentGameState.PitData.MandatoryTyreChangeRequiredTyreType = previousGameState.PitData.MandatoryTyreChangeRequiredTyreType;
                     currentGameState.PitData.IsRefuellingAllowed = previousGameState.PitData.IsRefuellingAllowed;

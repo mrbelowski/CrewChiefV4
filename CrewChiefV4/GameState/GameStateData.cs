@@ -704,8 +704,6 @@ namespace CrewChiefV4.GameState
 
         public Boolean HasMandatoryTyreChange = false;
 
-        public Boolean HasMandatoryDriverChange = false;
-
         public TyreType MandatoryTyreChangeRequiredTyreType = TyreType.Unknown_Race;
 
         // might be a number of laps or a number of minutes. These are (currently) for DTM 2014. If we start on Options, 

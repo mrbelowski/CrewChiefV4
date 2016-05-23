@@ -88,8 +88,6 @@ namespace CrewChiefV4.Events
 
         private Boolean hasMandatoryTyreChange;
 
-        private Boolean hasMandatoryDriverChange;
-
         private Boolean hasMandatoryPitStop;
 
         private float minDistanceOnCurrentTyre;
@@ -129,7 +127,6 @@ namespace CrewChiefV4.Events
             mandatoryTyreChangeTyreType = TyreType.Unknown_Race;
             hasMandatoryPitStop = false;
             hasMandatoryTyreChange = false;
-            hasMandatoryDriverChange = false;
             minDistanceOnCurrentTyre = -1;
             maxDistanceOnCurrentTyre = -1;
         }
@@ -147,7 +144,6 @@ namespace CrewChiefV4.Events
 
                     hasMandatoryPitStop = currentGameState.PitData.HasMandatoryPitStop;
                     hasMandatoryTyreChange = currentGameState.PitData.HasMandatoryTyreChange;
-                    hasMandatoryDriverChange = currentGameState.PitData.HasMandatoryDriverChange;
                     mandatoryTyreChangeTyreType = currentGameState.PitData.MandatoryTyreChangeRequiredTyreType;
                     maxDistanceOnCurrentTyre = currentGameState.PitData.MaxPermittedDistanceOnCurrentTyre;
                     minDistanceOnCurrentTyre = currentGameState.PitData.MinPermittedDistanceOnCurrentTyre;
