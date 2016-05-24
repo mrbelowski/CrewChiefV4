@@ -166,7 +166,6 @@ namespace CrewChiefV4
             this.pitEntryPoint = pitEntryPoint;
             this.pitExitPoint = pitExitPoint;
             this.pitEntryExitPointsDiameter = pitEntryExitPointsDiameter;
-            setGapPoints();
         }
 
         public TrackDefinition(String name, float trackLength)
@@ -174,10 +173,9 @@ namespace CrewChiefV4
             this.name = name;
             this.trackLength = trackLength;
             this.hasPitLane = false;
-            setGapPoints();
         }
 
-        private void setGapPoints()
+        public void setGapPoints()
         {
             if (trackLength > TrackData.gapPointsThreshold)
             {

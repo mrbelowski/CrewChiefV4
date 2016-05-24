@@ -426,6 +426,7 @@ namespace CrewChiefV4.PCars
                 currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass = -1;
                 currentGameState.SessionData.OverallSessionBestLapTime = -1;
                 currentGameState.SessionData.PlayerClassSessionBestLapTime = -1;
+                currentGameState.SessionData.TrackDefinition.setGapPoints();
             }
             else
             {
@@ -455,6 +456,7 @@ namespace CrewChiefV4.PCars
                         currentGameState.SessionData.NumCarsAtStartOfSession = shared.mNumParticipants;
                         currentGameState.SessionData.TrackDefinition = TrackData.getTrackDefinition(StructHelper.getNameFromBytes(shared.mTrackLocation) + ":" +
                             StructHelper.getNameFromBytes(shared.mTrackVariation), shared.mTrackLength);
+                        currentGameState.SessionData.TrackDefinition.setGapPoints();
                         currentGameState.carClass = CarData.getCarClassForPCarsClassName(StructHelper.getNameFromBytes(shared.mCarClassName));
 
                         Console.WriteLine("Player is using car class " + currentGameState.carClass.carClassEnum);

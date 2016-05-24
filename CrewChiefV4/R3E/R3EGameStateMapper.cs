@@ -167,7 +167,7 @@ namespace CrewChiefV4.RaceRoom
                 currentGameState.SessionData.SessionStartTime = currentGameState.Now;
                 currentGameState.OpponentData.Clear();
                 currentGameState.SessionData.TrackDefinition = TrackData.getTrackDefinition(null, shared.track_info.length);
-
+                currentGameState.SessionData.TrackDefinition.setGapPoints();
                 currentGameState.PitData.IsRefuellingAllowed = true;
 
                 // reset the engine temp monitor stuff
