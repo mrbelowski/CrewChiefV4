@@ -27,7 +27,8 @@ namespace CrewChiefV4.PCars
         private int lastSequenceNumberForTelemPacket = -1;
 
         private long telemPacketCount = 0;
-        private long totalPacketCount = 0;
+        private long stringsPacketCount = 0;
+        private long additionalStringsPacketCount = 0;
 
         private long discardedTelemCount = 0;
         private long acceptedOutOfSequenceTelemCount = 0;
@@ -112,7 +113,8 @@ namespace CrewChiefV4.PCars
                 acceptedOutOfSequenceTelemCount = 0;
                 discardedTelemCount = 0;
                 telemPacketCount = 0;
-                totalPacketCount = 0;
+                stringsPacketCount = 0;
+                additionalStringsPacketCount = 0;
                 lastValidTelemCurrentLapTime = -1;
                 lastValidTelemLapsCompleted = 0;
 
@@ -210,15 +212,6 @@ namespace CrewChiefV4.PCars
 
         private int readFromOffset(int offset, byte[] rawData)
         {
-            totalPacketCount++;
-            if (totalPacketCount > packetCountAtStartOfNextRateCheck)
-            {
-                lastPacketRateEstimate = (int)((float) TimeSpan.TicksPerSecond * (float) (totalPacketCount - packetCountAtStartOfCurrentRateCheck) / (float) (DateTime.Now.Ticks - ticksAtStartOfCurrentPacketRateCheck));
-                Console.WriteLine("Packet rate = " + lastPacketRateEstimate + "Hz");
-                packetCountAtStartOfCurrentRateCheck = totalPacketCount;
-                packetCountAtStartOfNextRateCheck = packetCountAtStartOfCurrentRateCheck + packetRateCheckInterval;
-                ticksAtStartOfCurrentPacketRateCheck = DateTime.Now.Ticks;
-            }
             // the first 2 bytes are the version - discard it for now
             int frameTypeAndSequence = rawData[offset + 2];
             int frameType = frameTypeAndSequence & 3;
@@ -226,7 +219,6 @@ namespace CrewChiefV4.PCars
             int frameLength = 0;
             if (frameType == 0)
             {
-                telemPacketCount++;
                 frameLength = sTelemetryData_PacketSize;
                 Boolean sequenceCheckOK = isNextInSequence(sequence);
                 if (strictPacketOrdering && !sequenceCheckOK)
@@ -241,6 +233,16 @@ namespace CrewChiefV4.PCars
                         sTelemetryData telem = (sTelemetryData)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(sTelemetryData));
                         if (sequenceCheckOK || !telemIsOutOfSequence(telem))
                         {
+                            telemPacketCount++;
+                            if (telemPacketCount > packetCountAtStartOfNextRateCheck)
+                            {
+                                lastPacketRateEstimate = (int)((float)TimeSpan.TicksPerSecond * (float)(telemPacketCount - packetCountAtStartOfCurrentRateCheck) / (float)(DateTime.Now.Ticks - ticksAtStartOfCurrentPacketRateCheck));
+                                Console.WriteLine("Packet rate = " + lastPacketRateEstimate + "Hz, counts: " + telemPacketCount + ", " + stringsPacketCount + ", " + additionalStringsPacketCount + 
+                                    " oos accepted = " + acceptedOutOfSequenceTelemCount + " oos rejected = " + discardedTelemCount);
+                                packetCountAtStartOfCurrentRateCheck = telemPacketCount;
+                                packetCountAtStartOfNextRateCheck = packetCountAtStartOfCurrentRateCheck + packetRateCheckInterval;
+                                ticksAtStartOfCurrentPacketRateCheck = DateTime.Now.Ticks;
+                            }
                             buttonsState = ConvertBytesToBoolArray(telem.sDPad, telem.sJoyPad1, telem.sJoyPad2);
                             lastSequenceNumberForTelemPacket = sequence;
                             workingGameState = StructHelper.MergeWithExistingState(workingGameState, telem);
@@ -255,6 +257,7 @@ namespace CrewChiefV4.PCars
             }
             else if (frameType == 1)
             {
+                stringsPacketCount++;
                 frameLength = sParticipantInfoStrings_PacketSize;
                 handle = GCHandle.Alloc(rawData.Skip(offset).Take(frameLength).ToArray(), GCHandleType.Pinned);
                 try
@@ -269,6 +272,7 @@ namespace CrewChiefV4.PCars
             }
             else if (frameType == 2)
             {
+                additionalStringsPacketCount++;
                 frameLength = sParticipantInfoStringsAdditional_PacketSize;
                 handle = GCHandle.Alloc(rawData.Skip(offset).Take(frameLength).ToArray(), GCHandleType.Pinned);
                 try
@@ -356,7 +360,8 @@ namespace CrewChiefV4.PCars
             acceptedOutOfSequenceTelemCount = 0;
             discardedTelemCount = 0;
             telemPacketCount = 0;
-            totalPacketCount = 0;
+            stringsPacketCount = 0;
+            additionalStringsPacketCount = 0;
             lastValidTelemCurrentLapTime = -1;
             lastValidTelemLapsCompleted = 0; 
             buttonsState = new Boolean[24];
