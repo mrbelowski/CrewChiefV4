@@ -424,6 +424,7 @@ namespace CrewChiefV4
                             if (!sessionFinished && currentGameState.SessionData.SessionPhase == SessionPhase.Finished
                                 && previousGameState != null)
                             {
+                                Console.WriteLine("Session finished");
                                 audioPlayer.purgeQueues();
                                 if (displaySessionLapTimes)
                                 {
@@ -444,6 +445,7 @@ namespace CrewChiefV4
                             float prevTime = previousGameState == null ? 0 : previousGameState.SessionData.SessionRunningTime;
                             if (currentGameState.SessionData.IsNewSession)
                             {
+                                Console.WriteLine("New session");
                                 audioPlayer.disablePearlsOfWisdom = false;
                                 displayNewSessionInfo(currentGameState);
                                 sessionFinished = false;

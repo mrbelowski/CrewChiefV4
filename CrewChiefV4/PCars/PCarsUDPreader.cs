@@ -14,7 +14,7 @@ namespace CrewChiefV4.PCars
 {
     public class PCarsUDPreader : GameDataReader
     {        
-        private long packetRateCheckInterval = 500;
+        private long packetRateCheckInterval = 1000;
         private long packetCountAtStartOfCurrentRateCheck = 0;
         private long packetCountAtStartOfNextRateCheck = 0;
         private long ticksAtStartOfCurrentPacketRateCheck = 0;
@@ -30,6 +30,7 @@ namespace CrewChiefV4.PCars
         private long stringsPacketCount = 0;
         private long additionalStringsPacketCount = 0;
 
+        private long inSequenceTelemCount = 0;
         private long discardedTelemCount = 0;
         private long acceptedOutOfSequenceTelemCount = 0;
 
@@ -112,6 +113,7 @@ namespace CrewChiefV4.PCars
                 previousGameState.mVersion = 5;
                 acceptedOutOfSequenceTelemCount = 0;
                 discardedTelemCount = 0;
+                inSequenceTelemCount = 0;
                 telemPacketCount = 0;
                 stringsPacketCount = 0;
                 additionalStringsPacketCount = 0;
@@ -219,8 +221,22 @@ namespace CrewChiefV4.PCars
             int frameLength = 0;
             if (frameType == 0)
             {
+                telemPacketCount++;
+                if (telemPacketCount > packetCountAtStartOfNextRateCheck)
+                {
+                    lastPacketRateEstimate = (int)((float)TimeSpan.TicksPerSecond * (float)(telemPacketCount - packetCountAtStartOfCurrentRateCheck) / (float)(DateTime.Now.Ticks - ticksAtStartOfCurrentPacketRateCheck));
+                    Console.WriteLine("Packet rate = " + lastPacketRateEstimate + "Hz, totals: type0 = " + telemPacketCount + " type1 = " + stringsPacketCount + " type2 = " + additionalStringsPacketCount +
+                        " in sequence = " + inSequenceTelemCount + " oos accepted = " + acceptedOutOfSequenceTelemCount + " oos rejected = " + discardedTelemCount);
+                    packetCountAtStartOfCurrentRateCheck = telemPacketCount;
+                    packetCountAtStartOfNextRateCheck = packetCountAtStartOfCurrentRateCheck + packetRateCheckInterval;
+                    ticksAtStartOfCurrentPacketRateCheck = DateTime.Now.Ticks;
+                }
                 frameLength = sTelemetryData_PacketSize;
                 Boolean sequenceCheckOK = isNextInSequence(sequence);
+                if (sequenceCheckOK)
+                {
+                    inSequenceTelemCount++;
+                }
                 if (strictPacketOrdering && !sequenceCheckOK)
                 {
                     discardedTelemCount++;
@@ -233,16 +249,6 @@ namespace CrewChiefV4.PCars
                         sTelemetryData telem = (sTelemetryData)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(sTelemetryData));
                         if (sequenceCheckOK || !telemIsOutOfSequence(telem))
                         {
-                            telemPacketCount++;
-                            if (telemPacketCount > packetCountAtStartOfNextRateCheck)
-                            {
-                                lastPacketRateEstimate = (int)((float)TimeSpan.TicksPerSecond * (float)(telemPacketCount - packetCountAtStartOfCurrentRateCheck) / (float)(DateTime.Now.Ticks - ticksAtStartOfCurrentPacketRateCheck));
-                                Console.WriteLine("Packet rate = " + lastPacketRateEstimate + "Hz, counts: " + telemPacketCount + ", " + stringsPacketCount + ", " + additionalStringsPacketCount + 
-                                    " oos accepted = " + acceptedOutOfSequenceTelemCount + " oos rejected = " + discardedTelemCount);
-                                packetCountAtStartOfCurrentRateCheck = telemPacketCount;
-                                packetCountAtStartOfNextRateCheck = packetCountAtStartOfCurrentRateCheck + packetRateCheckInterval;
-                                ticksAtStartOfCurrentPacketRateCheck = DateTime.Now.Ticks;
-                            }
                             buttonsState = ConvertBytesToBoolArray(telem.sDPad, telem.sJoyPad1, telem.sJoyPad2);
                             lastSequenceNumberForTelemPacket = sequence;
                             workingGameState = StructHelper.MergeWithExistingState(workingGameState, telem);
@@ -284,6 +290,10 @@ namespace CrewChiefV4.PCars
                 {
                     handle.Free();
                 }
+            }
+            else
+            {
+                Console.WriteLine("Unrecognised frame type " + frameType + " from byte " + rawData[offset + 2]);
             }
             return frameLength + offset;
         }
@@ -358,6 +368,7 @@ namespace CrewChiefV4.PCars
                 " telem packets, accepted " + acceptedOutOfSequenceTelemCount + " out-of-sequence packets, discarded " + discardedTelemCount + " packets");
             this.initialised = false;
             acceptedOutOfSequenceTelemCount = 0;
+            inSequenceTelemCount = 0;
             discardedTelemCount = 0;
             telemPacketCount = 0;
             stringsPacketCount = 0;
