@@ -2,6 +2,8 @@ CrewChief version 4.
 
 Changelog
 ---------
+Version 4.2.1.2: Added more logging around UDP packet reception and processing; Fixed a couple of memory leaks; Don't play 'no tyre wear' after changing tyres
+
 Version 4.2.1.1: Fixed a bug in the gap-ahead logic that was triggering 'keep him under pressure' messages too often
 
 Version 4.2.1.0: Added support for secondary driver names mappings file 'additional_names.txt' so the auto-updater doesn't overwrite user-made changes to names.txt; Additional validation on R3E sector reports; Added "what's the fastest lap" and "what time is it" voice commands (reports session best lap for player class, and current [real world] time of day); A few bug fixes and minor improvements; Reworked R3E tyre temperature checking to make better use of the core temps provided by the game (for new physics model cars).
