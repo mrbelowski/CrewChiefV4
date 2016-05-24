@@ -61,6 +61,8 @@ namespace CrewChiefV4.PCars
 
         private static Boolean[] buttonsState = new Boolean[24];
 
+        private AsyncCallback socketCallback;
+
         public static Boolean getButtonState(int index) 
         {
             return buttonsState[index];
@@ -103,6 +105,7 @@ namespace CrewChiefV4.PCars
         {
             if (!this.initialised)
             {
+                socketCallback = new AsyncCallback(ReceiveCallback);
                 workingGameState.mVersion = 5;
                 currentGameState.mVersion = 5;
                 previousGameState.mVersion = 5;
@@ -160,7 +163,8 @@ namespace CrewChiefV4.PCars
                 }
                 if (running)
                 {
-                    socket.BeginReceive(this.receivedDataBuffer, 0, this.receivedDataBuffer.Length, SocketFlags.None, new AsyncCallback(ReceiveCallback), socket);
+                    // socket.BeginReceive(this.receivedDataBuffer, 0, this.receivedDataBuffer.Length, SocketFlags.None, new AsyncCallback(ReceiveCallback), socket);
+                    socket.BeginReceive(this.receivedDataBuffer, 0, this.receivedDataBuffer.Length, SocketFlags.None, socketCallback, socket);
                 }
             }
             catch (Exception e)
@@ -232,13 +236,19 @@ namespace CrewChiefV4.PCars
                 else
                 {
                     handle = GCHandle.Alloc(rawData.Skip(offset).Take(frameLength).ToArray(), GCHandleType.Pinned);
-                    sTelemetryData telem = (sTelemetryData)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(sTelemetryData));
-                    if (sequenceCheckOK || !telemIsOutOfSequence(telem))
+                    try
                     {
-                        buttonsState = ConvertBytesToBoolArray(telem.sDPad, telem.sJoyPad1, telem.sJoyPad2);
-                        lastSequenceNumberForTelemPacket = sequence;
-                        workingGameState = StructHelper.MergeWithExistingState(workingGameState, telem);
-                        newSpotterData = workingGameState.hasNewPositionData;
+                        sTelemetryData telem = (sTelemetryData)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(sTelemetryData));
+                        if (sequenceCheckOK || !telemIsOutOfSequence(telem))
+                        {
+                            buttonsState = ConvertBytesToBoolArray(telem.sDPad, telem.sJoyPad1, telem.sJoyPad2);
+                            lastSequenceNumberForTelemPacket = sequence;
+                            workingGameState = StructHelper.MergeWithExistingState(workingGameState, telem);
+                            newSpotterData = workingGameState.hasNewPositionData;
+                        }
+                    }
+                    finally
+                    {
                         handle.Free();
                     }
                 }    
@@ -247,17 +257,29 @@ namespace CrewChiefV4.PCars
             {
                 frameLength = sParticipantInfoStrings_PacketSize;
                 handle = GCHandle.Alloc(rawData.Skip(offset).Take(frameLength).ToArray(), GCHandleType.Pinned);
-                sParticipantInfoStrings strings = (sParticipantInfoStrings)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(sParticipantInfoStrings));
-                workingGameState = StructHelper.MergeWithExistingState(workingGameState, strings);
-                handle.Free();
+                try
+                {
+                    sParticipantInfoStrings strings = (sParticipantInfoStrings)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(sParticipantInfoStrings));
+                    workingGameState = StructHelper.MergeWithExistingState(workingGameState, strings);
+                }
+                finally
+                {
+                    handle.Free();
+                }
             }
             else if (frameType == 2)
             {
                 frameLength = sParticipantInfoStringsAdditional_PacketSize;
                 handle = GCHandle.Alloc(rawData.Skip(offset).Take(frameLength).ToArray(), GCHandleType.Pinned);
-                sParticipantInfoStringsAdditional additional = (sParticipantInfoStringsAdditional)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(sParticipantInfoStringsAdditional));
-                workingGameState = StructHelper.MergeWithExistingState(workingGameState, additional);
-                handle.Free();
+                try
+                {
+                    sParticipantInfoStringsAdditional additional = (sParticipantInfoStringsAdditional)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(sParticipantInfoStringsAdditional));
+                    workingGameState = StructHelper.MergeWithExistingState(workingGameState, additional);
+                }
+                finally
+                {
+                    handle.Free();
+                }
             }
             return frameLength + offset;
         }
