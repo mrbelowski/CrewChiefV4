@@ -39,7 +39,6 @@ namespace CrewChiefV4.PCars
 
         private Boolean newSpotterData = true;
         private Boolean running = false;
-        private GCHandle handle;
         private Boolean initialised = false;
         private List<CrewChiefV4.PCars.PCarsSharedMemoryReader.PCarsStructWrapper> dataToDump;
         private CrewChiefV4.PCars.PCarsSharedMemoryReader.PCarsStructWrapper[] dataReadFromFile = null;
@@ -243,7 +242,7 @@ namespace CrewChiefV4.PCars
                 }
                 else
                 {
-                    handle = GCHandle.Alloc(rawData.Skip(offset).Take(frameLength).ToArray(), GCHandleType.Pinned);
+                    GCHandle handle = GCHandle.Alloc(rawData.Skip(offset).Take(frameLength).ToArray(), GCHandleType.Pinned);
                     try
                     {
                         sTelemetryData telem = (sTelemetryData)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(sTelemetryData));
@@ -265,7 +264,7 @@ namespace CrewChiefV4.PCars
             {
                 stringsPacketCount++;
                 frameLength = sParticipantInfoStrings_PacketSize;
-                handle = GCHandle.Alloc(rawData.Skip(offset).Take(frameLength).ToArray(), GCHandleType.Pinned);
+                GCHandle handle = GCHandle.Alloc(rawData.Skip(offset).Take(frameLength).ToArray(), GCHandleType.Pinned);
                 try
                 {
                     sParticipantInfoStrings strings = (sParticipantInfoStrings)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(sParticipantInfoStrings));
@@ -280,7 +279,7 @@ namespace CrewChiefV4.PCars
             {
                 additionalStringsPacketCount++;
                 frameLength = sParticipantInfoStringsAdditional_PacketSize;
-                handle = GCHandle.Alloc(rawData.Skip(offset).Take(frameLength).ToArray(), GCHandleType.Pinned);
+                GCHandle handle = GCHandle.Alloc(rawData.Skip(offset).Take(frameLength).ToArray(), GCHandleType.Pinned);
                 try
                 {
                     sParticipantInfoStringsAdditional additional = (sParticipantInfoStringsAdditional)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(sParticipantInfoStringsAdditional));
