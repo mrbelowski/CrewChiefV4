@@ -642,6 +642,12 @@ namespace CrewChiefV4.Audio
                         }
                         else
                         {
+                            if (thisMessage.messageName != AudioPlayer.folderDidntUnderstand &&
+                                thisMessage.messageName != AudioPlayer.folderStandBy)
+                            {
+                                // only cache the last message for repeat if it's an actual message
+                                lastMessagePlayed = thisMessage;
+                            }
                             lastMessagePlayed = thisMessage;
                             if (!mute)
                             {
