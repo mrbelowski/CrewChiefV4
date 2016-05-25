@@ -1202,7 +1202,7 @@ namespace CrewChiefV4.Events
                     }
                 }
             }
-            else if (delta2 == delta3)
+            else if (nearlyEqual(delta2, delta3))
             {
                 reportedDelta2 = true;
                 reportedDelta3 = true;
@@ -1229,7 +1229,7 @@ namespace CrewChiefV4.Events
                     messageFragments.Add(MessageFragment.Text(folderOffThePace));
                 }
             }
-            else if (delta1 == delta3)
+            else if (nearlyEqual(delta1, delta3))
             {
                 reportedDelta1 = true;
                 reportedDelta3 = true;
