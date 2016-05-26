@@ -2,6 +2,8 @@ CrewChief version 4.
 
 Changelog
 ---------
+Version 4.2.1.3: Don't repeat "stand by" or "didn't understand" messages when responding to a "repeat please" voice command; Fixed 'what time is is' vocie command (thanks Gongo)
+
 Version 4.2.1.2: Added more logging around UDP packet reception and processing; Fixed a couple of memory leaks; Don't play 'no tyre wear' after changing tyres
 
 Version 4.2.1.1: Fixed a bug in the gap-ahead logic that was triggering 'keep him under pressure' messages too often
