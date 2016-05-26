@@ -254,12 +254,15 @@ namespace CrewChiefV4
         {
             DateTime now = DateTime.Now;
             int hour = now.Hour;
-            hour += 1;
+            if (hour == 0)
+            {
+                hour = 24;
+            }
             if (hour > 12) {
                 hour = hour - 12;
             }
             audioPlayer.playMessageImmediately(new QueuedMessage("current_time", 
-                AbstractEvent.MessageContents(now.Minute, hour), 0, null));
+                AbstractEvent.MessageContents(hour, now.Minute), 0, null));
         }
 
         private void startSpotterThread()
