@@ -94,15 +94,15 @@ namespace CrewChiefV4.Events
         public Timings(AudioPlayer audioPlayer)
         {
             this.audioPlayer = audioPlayer;
-            closeAheadMinSectorWait = 10 - gapAheadReportFrequency;
-            closeAheadMaxSectorWait = closeAheadMinSectorWait + 2;
-            gapAheadMinSectorWait = 10 - gapAheadReportFrequency;
-            gapAheadMaxSectorWait = gapAheadMinSectorWait + 2;
+            closeAheadMinSectorWait = 13 - gapAheadReportFrequency;
+            closeAheadMaxSectorWait = closeAheadMinSectorWait + 5;
+            gapAheadMinSectorWait = 13 - gapAheadReportFrequency;
+            gapAheadMaxSectorWait = gapAheadMinSectorWait + 5;
 
-            closeBehindMinSectorWait = 10 - gapBehindReportFrequency;
-            closeBehindMaxSectorWait = closeBehindMinSectorWait + 2;
-            gapBehindMinSectorWait = 10 - gapBehindReportFrequency;
-            gapBehindMaxSectorWait = gapBehindMinSectorWait + 2;
+            closeBehindMinSectorWait = 13 - gapBehindReportFrequency;
+            closeBehindMaxSectorWait = closeBehindMinSectorWait + 5;
+            gapBehindMinSectorWait = 13 - gapBehindReportFrequency;
+            gapBehindMaxSectorWait = gapBehindMinSectorWait + 5;
         }
 
         public override void clearState()

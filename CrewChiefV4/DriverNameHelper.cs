@@ -27,8 +27,8 @@ namespace CrewChiefV4
 
         public static void readRawNamesToUsableNamesFiles(String soundsFolderName)
         {
-            readRawNamesToUsableNamesFile(soundsFolderName, @"\driver_names\names.txt");
             readRawNamesToUsableNamesFile(soundsFolderName, @"\driver_names\additional_names.txt");
+            readRawNamesToUsableNamesFile(soundsFolderName, @"\driver_names\names.txt");
         }
 
         private static void readRawNamesToUsableNamesFile(String soundsFolderName, String filename)
