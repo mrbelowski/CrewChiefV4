@@ -2,6 +2,8 @@ CrewChief version 4.
 
 Changelog
 ---------
+Version 4.2.1.5: Fixed Raceroom WTCC 2014 tyre heating thresholds
+
 Version 4.2.1.4: Fixed Raceroom BMW M1 tyre heating thresholds;A few internal tweaks and fixes
 
 Version 4.2.1.3: Don't repeat "stand by" or "didn't understand" messages when responding to a "repeat please" voice command; Fixed 'what time is is' voice command (thanks Gongo)
