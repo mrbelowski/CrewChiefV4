@@ -366,8 +366,12 @@ namespace CrewChiefV4.Events
                                 pearlType = PearlsOfWisdom.PearlType.GOOD;
                                 pearlLikelihood = 0.8f;
                             }
-                            else if (!isLast && previousPosition < currentGameState.SessionData.Position && currentGameState.SessionData.Position > 5)
+                            else if (!isLast && previousPosition < currentGameState.SessionData.Position && 
+                                currentGameState.SessionData.Position > 5 && !previousGameState.PitData.OnOutLap &&
+                                !currentGameState.PitData.OnOutLap && !currentGameState.PitData.InPitlane)
                             {
+                                // don't play bad-pearl if the lap just completed was an out lap or are in the pit
+
                                 // note that we don't play a pearl for being last - there's a special set of 
                                 // insults reserved for this
                                 pearlType = PearlsOfWisdom.PearlType.BAD;

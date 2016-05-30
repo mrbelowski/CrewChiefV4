@@ -111,8 +111,10 @@ namespace CrewChiefV4.Events
                     {
                         pearlType = PearlsOfWisdom.PearlType.GOOD;
                     }
-                    else if (currentGameState.SessionData.Position > currentGameState.SessionData.SessionStartPosition + 5)
+                    else if (currentGameState.SessionData.Position > currentGameState.SessionData.SessionStartPosition + 5 &&
+                        !currentGameState.PitData.OnOutLap && !currentGameState.PitData.InPitlane)
                     {
+                        // don't play bad-pearl if we're on an out lap or are pitting
                         pearlType = PearlsOfWisdom.PearlType.BAD;
                     }
                 }
