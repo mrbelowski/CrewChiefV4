@@ -105,7 +105,7 @@ namespace CrewChiefV4.Events
                     OpponentData opponentData = entry.Value;
 
                     if (opponentData.IsNewLap && opponentData.LastLapTime > 0 && opponentData.OpponentLapData.Count > 1 &&
-                        opponentData.LastLapValid && opponentData.CurrentBestLapTime != -1)
+                        opponentData.LastLapValid && opponentData.CurrentBestLapTime > 0)
                     {
                         float currentFastestLap;
                         if (currentGameState.SessionData.PlayerLapTimeSessionBest == -1)

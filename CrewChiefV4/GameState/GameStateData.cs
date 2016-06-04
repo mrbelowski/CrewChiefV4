@@ -438,7 +438,7 @@ namespace CrewChiefV4.GameState
             OpponentLapData.Add(thisLapData);
         }
 
-        public void CompleteLapWithEstimatedLapTime(int position, float gameTimeAtLapEnd, float worldRecordLapTime,
+        public void CompleteLapWithEstimatedLapTime(int position, float gameTimeAtLapEnd, float worldRecordLapTime, float worldRecordS1Time, float worldRecordS2Time, float worldRecordS3Time, 
             Boolean lapIsValid, Boolean isRaining, float trackTemp, float airTemp, Boolean sessionLengthIsTime, float sessionTimeRemaining)
         {
             AddSectorData(position, -1, gameTimeAtLapEnd, lapIsValid, isRaining, trackTemp, airTemp);
@@ -449,7 +449,8 @@ namespace CrewChiefV4.GameState
                 {
                     float estimatedLapTime = lapData.SectorTimes.Sum();
                     LastLapValid = lapData.IsValid;
-                    if (estimatedLapTime > worldRecordLapTime - 0.1)
+                    if (lapData.SectorTimes[0] > worldRecordS1Time - 0.1 && lapData.SectorTimes[1] > worldRecordS2Time - 0.1 && lapData.SectorTimes[2] > worldRecordS2Time - 0.1 && 
+                        estimatedLapTime > worldRecordLapTime - 0.1 && estimatedLapTime > 0)
                     {
                         lapData.LapTime = estimatedLapTime;
                         LastLapTime = estimatedLapTime;
@@ -463,6 +464,7 @@ namespace CrewChiefV4.GameState
                     {
                         LastLapValid = false;
                         LastLapTime = -1;
+                        lapData.IsValid = false;
                     }
                 }
             }
