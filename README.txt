@@ -2,6 +2,8 @@ CrewChief version 4.
 
 Changelog
 ---------
+Version 4.2.1.6: Fixed PCars practice and qual session data being cleared when pitting (should fix a lot of the inaccuracies in these sessions); Pause messages after a "stand by" response
+
 Version 4.2.1.5: Fixed Raceroom WTCC 2014 tyre heating thresholds
 
 Version 4.2.1.4: Fixed Raceroom BMW M1 tyre heating thresholds;A few internal tweaks and fixes
