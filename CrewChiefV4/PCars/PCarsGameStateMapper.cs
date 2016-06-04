@@ -359,7 +359,10 @@ namespace CrewChiefV4.PCars
                 (currentGameState.SessionData.SessionType == SessionType.Practice && lastSessionType == SessionType.Practice) ||
                 (currentGameState.SessionData.SessionType == SessionType.Qualify && lastSessionType == SessionType.Qualify)) &&
                 (lastSessionPhase == SessionPhase.Green || lastSessionPhase == SessionPhase.Finished) &&
-                currentGameState.SessionData.SessionPhase == SessionPhase.Countdown;
+                currentGameState.SessionData.SessionPhase == SessionPhase.Countdown &&
+                (currentGameState.SessionData.SessionType == SessionType.Race ||
+                    currentGameState.SessionData.SessionHasFixedTime && sessionTimeRemaining > lastSessionTimeRemaining + 1);
+
             if (sessionOfSameTypeRestarted ||
                 (currentGameState.SessionData.SessionType != SessionType.Unavailable && 
                  currentGameState.SessionData.SessionPhase != SessionPhase.Finished &&
