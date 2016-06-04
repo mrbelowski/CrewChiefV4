@@ -109,6 +109,8 @@ namespace CrewChiefV4.Audio
         private String lastImmediateMessageName = null;
         private DateTime lastImmediateMessageTime = DateTime.MinValue;
 
+        private DateTime unpauseTime = DateTime.MinValue;
+
         private SoundCache soundCache;
 
         public AudioPlayer(CrewChief crewChief)
@@ -351,8 +353,11 @@ namespace CrewChiefV4.Audio
                     nextQueueCheck = nextQueueCheck.Add(queueMonitorInterval);
                     try
                     {
-                        playQueueContents(queuedClips, false);
-                        allowPearlsOnNextPlay = true;
+                        if (DateTime.Now > unpauseTime)
+                        {
+                            playQueueContents(queuedClips, false);
+                            allowPearlsOnNextPlay = true;
+                        }
                     }
                     catch (Exception e)
                     {
@@ -1030,6 +1035,15 @@ namespace CrewChiefV4.Audio
                 }
                 catch (Exception) { }
                 soundCache = null;
+            }
+        }
+
+        public void pauseQueue(int seconds)
+        {
+            // only pause if it's not already paused
+            if (unpauseTime < DateTime.Now)
+            {
+                unpauseTime = DateTime.Now + TimeSpan.FromSeconds(seconds);
             }
         }
     }
