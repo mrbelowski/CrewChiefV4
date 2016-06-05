@@ -1159,13 +1159,17 @@ namespace CrewChiefV4.PCars
             {
                 if (opponentData.CurrentSectorNumber == 3 && sector == 1)
                 {
-                    // use -1 for provided lap time and let the AddSectorData method calculate it from the game time
                     if (opponentData.OpponentLapData.Count > 0)
                     {
                         // lastSectorTime values are -123 at the start of the session
-                        if (CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_NETWORK && lastSectorTime > 0) 
+                        if (CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_NETWORK) 
                         {
-                            // use the last sector time
+                            // use the last sector time, or -1 if it's that magic -123 number (and mark the lap as invalid)
+                            if (lastSectorTime < 0)
+                            {
+                                lastSectorTime = -1;
+                                validSpeed = false;
+                            }
                             opponentData.CompleteLapWithLastSectorTime(racePosition, lastSectorTime, sessionRunningTime, 
                                 validSpeed, isRaining, trackTemp, airTemp, sessionLengthIsTime, sessionTimeRemaining);
                         }
@@ -1182,9 +1186,14 @@ namespace CrewChiefV4.PCars
                 else if (opponentData.CurrentSectorNumber == 1 && sector == 2 || opponentData.CurrentSectorNumber == 2 && sector == 3)
                 {
                     // lastSectorTime values are -123 at the start of the session
-                    if (CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_NETWORK && lastSectorTime > 0) 
+                    if (CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_NETWORK) 
                     {
-                        // use the last sector time
+                        // use the last sector time, or -1 if it's that magic -123 number (and mark the lap as invalid)
+                        if (lastSectorTime < 0)
+                        {
+                            lastSectorTime = -1;
+                            validSpeed = false;
+                        }
                         opponentData.AddSectorData(racePosition, lastSectorTime, sessionRunningTime, validSpeed, isRaining, trackTemp, airTemp);
                     }
                     else
