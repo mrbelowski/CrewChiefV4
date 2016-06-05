@@ -215,8 +215,8 @@ namespace CrewChiefV4.PCars
                     }
                     existingPartInfo.mWorldPosition = newWorldPositions;
 
-                    // TODO: LastSectorTime is now in the UDP data, but there's no slot for this in the participants struct
-                    // existingPartInfo.mLastSectorTime = newPartInfo.sLastSectorTime;
+                    // LastSectorTime is now in the UDP data, but there's no slot for this in the participants struct
+                    // so bung it in a separate array at the end
                     existingState.mLastSectorData[i] = newPartInfo.sLastSectorTime;
                 }
                 else

@@ -1161,7 +1161,8 @@ namespace CrewChiefV4.PCars
                     // use -1 for provided lap time and let the AddSectorData method calculate it from the game time
                     if (opponentData.OpponentLapData.Count > 0)
                     {
-                        if (CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_NETWORK) 
+                        // TODO: still not sure why these lastSectorTime values are always -123 :(
+                        if (CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_NETWORK && lastSectorTime > 0) 
                         {
                             // use the last sector time
                             opponentData.CompleteLapWithLastSectorTime(racePosition, lastSectorTime, sessionRunningTime, 
@@ -1179,7 +1180,8 @@ namespace CrewChiefV4.PCars
                 }
                 else if (opponentData.CurrentSectorNumber == 1 && sector == 2 || opponentData.CurrentSectorNumber == 2 && sector == 3)
                 {
-                    if (CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_NETWORK) 
+                    // TODO: still not sure why these lastSectorTime values are always -123 :(
+                    if (CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_NETWORK && lastSectorTime > 0) 
                     {
                         // use the last sector time
                         opponentData.AddSectorData(racePosition, lastSectorTime, sessionRunningTime, validSpeed, isRaining, trackTemp, airTemp);
