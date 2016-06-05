@@ -216,9 +216,7 @@ namespace CrewChiefV4.PCars
         public byte sLapsCompleted;	// 9
         public byte sCurrentLap;	// 10
         public byte sSector;	// 11
-        public byte padding1;   // 12
-        public byte padding2;   //13
-        public Single sLastSectorTime;	// 14
+        public float sLastSectorTime;	// 12
         // 16
     };
 }
