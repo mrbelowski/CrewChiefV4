@@ -2,6 +2,8 @@ CrewChief version 4.
 
 Changelog
 ---------
+Version 4.2.1.7: Use lastSectorTime data for opponent cars when in PCars UDP (network data) mode. This makes the opponent lap time reports accurate as the app doesn't have to time them itself (this data isn't available in PCars shared memory data)
+
 Version 4.2.1.6: Fixed PCars practice and qual session data being cleared when pitting (should fix a lot of the inaccuracies in these sessions); Pause messages after a "stand by" response
 
 Version 4.2.1.5: Fixed Raceroom WTCC 2014 tyre heating thresholds
