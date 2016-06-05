@@ -750,7 +750,8 @@ namespace CrewChiefV4.PCars
                                             previousOpponentSpeed, shared.mWorldFastestLapTime, shared.mWorldFastestSector1Time, shared.mWorldFastestSector2Time, shared.mWorldFastestSector3Time, 
                                             participantStruct.mCurrentLapDistance, shared.mRainDensity == 1,
                                             shared.mAmbientTemperature, shared.mTrackTemperature, opponentCarClass,
-                                            currentGameState.SessionData.SessionHasFixedTime, currentGameState.SessionData.SessionTimeRemaining, shared.mLastSectorData[i]);
+                                            currentGameState.SessionData.SessionHasFixedTime, currentGameState.SessionData.SessionTimeRemaining,
+                                            shared.mLastSectorData == null ? -1 : shared.mLastSectorData[i]);
                                     if (currentOpponentData.IsNewLap && currentOpponentData.CurrentBestLapTime > 0)
                                     {
                                         if (currentGameState.SessionData.OpponentsLapTimeSessionBestOverall == -1 ||
@@ -1161,7 +1162,7 @@ namespace CrewChiefV4.PCars
                     // use -1 for provided lap time and let the AddSectorData method calculate it from the game time
                     if (opponentData.OpponentLapData.Count > 0)
                     {
-                        // TODO: still not sure why these lastSectorTime values are always -123 :(
+                        // lastSectorTime values are -123 at the start of the session
                         if (CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_NETWORK && lastSectorTime > 0) 
                         {
                             // use the last sector time
@@ -1180,7 +1181,7 @@ namespace CrewChiefV4.PCars
                 }
                 else if (opponentData.CurrentSectorNumber == 1 && sector == 2 || opponentData.CurrentSectorNumber == 2 && sector == 3)
                 {
-                    // TODO: still not sure why these lastSectorTime values are always -123 :(
+                    // lastSectorTime values are -123 at the start of the session
                     if (CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_NETWORK && lastSectorTime > 0) 
                     {
                         // use the last sector time
