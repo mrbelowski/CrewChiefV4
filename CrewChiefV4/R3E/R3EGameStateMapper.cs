@@ -1326,7 +1326,7 @@ namespace CrewChiefV4.RaceRoom
                 }
                 else if (opponentData.CurrentSectorNumber == 1 && sector == 2 || opponentData.CurrentSectorNumber == 2 && sector == 3)
                 {
-                    opponentData.AddSectorData(racePosition, sectorTime, sessionRunningTime, lapIsValid && validSpeed, false, 20, 20);
+                    opponentData.AddCumulativeSectorData(racePosition, sectorTime, sessionRunningTime, lapIsValid && validSpeed, false, 20, 20);
                     if (sector == 2)
                     {
                         // crappy but necessary assumption - assume single class here. It only really matters for DTM races, which will be a single class.

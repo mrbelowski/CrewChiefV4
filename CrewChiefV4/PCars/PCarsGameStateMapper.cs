@@ -750,7 +750,7 @@ namespace CrewChiefV4.PCars
                                             previousOpponentSpeed, shared.mWorldFastestLapTime, shared.mWorldFastestSector1Time, shared.mWorldFastestSector2Time, shared.mWorldFastestSector3Time, 
                                             participantStruct.mCurrentLapDistance, shared.mRainDensity == 1,
                                             shared.mAmbientTemperature, shared.mTrackTemperature, opponentCarClass,
-                                            currentGameState.SessionData.SessionHasFixedTime, currentGameState.SessionData.SessionTimeRemaining);
+                                            currentGameState.SessionData.SessionHasFixedTime, currentGameState.SessionData.SessionTimeRemaining, shared.mLastSectorData[i]);
                                     if (currentOpponentData.IsNewLap && currentOpponentData.CurrentBestLapTime > 0)
                                     {
                                         if (currentGameState.SessionData.OpponentsLapTimeSessionBestOverall == -1 ||
@@ -1105,7 +1105,7 @@ namespace CrewChiefV4.PCars
             float sessionRunningTime, float secondsSinceLastUpdate, float[] currentWorldPosition, float[] previousWorldPosition,
             float previousSpeed, float worldRecordLapTime, float worldRecordS1Time, float worldRecordS2Time, float worldRecordS3Time, 
             float distanceRoundTrack, Boolean isRaining, float trackTemp, float airTemp, CarData.CarClass carClass,
-            Boolean sessionLengthIsTime, float sessionTimeRemaining)
+            Boolean sessionLengthIsTime, float sessionTimeRemaining, float lastSectorTime)
         {
             if (opponentData.DriverRawName.StartsWith(NULL_CHAR_STAND_IN) && name != null && name.Trim().Length > 0 && !name.StartsWith(NULL_CHAR_STAND_IN))
             {
@@ -1161,15 +1161,34 @@ namespace CrewChiefV4.PCars
                     // use -1 for provided lap time and let the AddSectorData method calculate it from the game time
                     if (opponentData.OpponentLapData.Count > 0)
                     {
-                        opponentData.CompleteLapWithEstimatedLapTime(racePosition, sessionRunningTime, worldRecordLapTime, worldRecordS1Time, worldRecordS2Time, worldRecordS3Time,
-                            validSpeed, isRaining, trackTemp, airTemp, sessionLengthIsTime, sessionTimeRemaining);
+                        if (CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_NETWORK) 
+                        {
+                            // use the last sector time
+                            opponentData.CompleteLapWithLastSectorTime(racePosition, lastSectorTime, sessionRunningTime, 
+                                validSpeed, isRaining, trackTemp, airTemp, sessionLengthIsTime, sessionTimeRemaining);
+                        }
+                        else
+                        {
+                            // use the inbuilt timing
+                            opponentData.CompleteLapWithEstimatedLapTime(racePosition, sessionRunningTime, worldRecordLapTime, worldRecordS1Time, worldRecordS2Time, worldRecordS3Time,
+                                validSpeed, isRaining, trackTemp, airTemp, sessionLengthIsTime, sessionTimeRemaining);
+                        }
                     }
                     opponentData.StartNewLap(completedLaps + 1, racePosition, isInPits, sessionRunningTime, isRaining, trackTemp, airTemp);
                     opponentData.IsNewLap = true;
                 }
                 else if (opponentData.CurrentSectorNumber == 1 && sector == 2 || opponentData.CurrentSectorNumber == 2 && sector == 3)
                 {
-                    opponentData.AddSectorData(racePosition, -1, sessionRunningTime, validSpeed, isRaining, trackTemp, airTemp);
+                    if (CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_NETWORK) 
+                    {
+                        // use the last sector time
+                        opponentData.AddSectorData(racePosition, lastSectorTime, sessionRunningTime, validSpeed, isRaining, trackTemp, airTemp);
+                    }
+                    else
+                    {
+                        // use the inbuilt timing
+                        opponentData.AddCumulativeSectorData(racePosition, -1, sessionRunningTime, validSpeed, isRaining, trackTemp, airTemp);
+                    }
                 }
                 opponentData.CurrentSectorNumber = sector;
             }

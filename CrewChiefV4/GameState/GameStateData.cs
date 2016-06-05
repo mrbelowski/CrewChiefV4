@@ -441,7 +441,7 @@ namespace CrewChiefV4.GameState
         public void CompleteLapWithEstimatedLapTime(int position, float gameTimeAtLapEnd, float worldRecordLapTime, float worldRecordS1Time, float worldRecordS2Time, float worldRecordS3Time, 
             Boolean lapIsValid, Boolean isRaining, float trackTemp, float airTemp, Boolean sessionLengthIsTime, float sessionTimeRemaining)
         {
-            AddSectorData(position, -1, gameTimeAtLapEnd, lapIsValid, isRaining, trackTemp, airTemp);
+            AddCumulativeSectorData(position, -1, gameTimeAtLapEnd, lapIsValid, isRaining, trackTemp, airTemp);
             if (OpponentLapData.Count > 0)
             {
                 LapData lapData = OpponentLapData[OpponentLapData.Count - 1];
@@ -474,13 +474,48 @@ namespace CrewChiefV4.GameState
             }
         }
 
+        public void CompleteLapWithLastSectorTime(int position, float lastSectorTime, float gameTimeAtLapEnd, 
+            Boolean lapIsValid, Boolean isRaining, float trackTemp, float airTemp, Boolean sessionLengthIsTime, float sessionTimeRemaining)
+        {
+            AddSectorData(position, lastSectorTime, gameTimeAtLapEnd, lapIsValid, isRaining, trackTemp, airTemp);
+            if (OpponentLapData.Count > 0)
+            {
+                LapData lapData = OpponentLapData[OpponentLapData.Count - 1];
+                if (lapData.SectorTimes.Count > 2)
+                {
+                    float lapTime = lapData.SectorTimes.Sum();
+                    LastLapValid = lapData.IsValid;
+                    if (LastLapValid)
+                    {
+                        lapData.LapTime = lapTime;
+                        LastLapTime = lapTime;
+                        if (lapData.IsValid && (CurrentBestLapTime == -1 || CurrentBestLapTime > lapData.LapTime))
+                        {
+                            PreviousBestLapTime = CurrentBestLapTime;
+                            CurrentBestLapTime = lapData.LapTime;
+                        }
+                    }
+                    else
+                    {
+                        LastLapValid = false;
+                        LastLapTime = -1;
+                        lapData.IsValid = false;
+                    }
+                }
+            }
+            if (sessionLengthIsTime && sessionTimeRemaining > 0 && CurrentBestLapTime > 0 && sessionTimeRemaining < CurrentBestLapTime - 5)
+            {
+                isProbablyLastLap = true;
+            }
+        }
+
         public void CompleteLapWithProvidedLapTime(int position, float gameTimeAtLapEnd, float providedLapTime,
             Boolean lapIsValid, Boolean isRaining, float trackTemp, float airTemp, Boolean sessionLengthIsTime, float sessionTimeRemaining)
         {            
             if (OpponentLapData.Count > 0)
             {                
                 LapData lapData = OpponentLapData[OpponentLapData.Count - 1];
-                AddSectorData(position, providedLapTime, gameTimeAtLapEnd, lapIsValid, isRaining, trackTemp, airTemp);
+                AddCumulativeSectorData(position, providedLapTime, gameTimeAtLapEnd, lapIsValid, isRaining, trackTemp, airTemp);
                 lapData.LapTime = providedLapTime;
                 LastLapTime = providedLapTime;
                 if (lapData.IsValid && (CurrentBestLapTime == -1 || CurrentBestLapTime > lapData.LapTime))
@@ -496,7 +531,7 @@ namespace CrewChiefV4.GameState
             }
         }
 
-        public void AddSectorData(int position, float cumulativeSectorTime, float gameTimeAtSectorEnd, Boolean lapIsValid, Boolean isRaining, float trackTemp, float airTemp)
+        public void AddCumulativeSectorData(int position, float cumulativeSectorTime, float gameTimeAtSectorEnd, Boolean lapIsValid, Boolean isRaining, float trackTemp, float airTemp)
         {
             if (OpponentLapData.Count > 0)
             {
@@ -511,6 +546,42 @@ namespace CrewChiefV4.GameState
                 {
                     sectorNumber++;
                     thisSectorTime = thisSectorTime - sectorTime;
+                }
+                lapData.SectorTimes.Add(thisSectorTime);
+                if (lapIsValid && thisSectorTime > 0)
+                {
+                    if (sectorNumber == 1 && (bestSector1Time == -1 || thisSectorTime < bestSector1Time))
+                    {
+                        bestSector1Time = thisSectorTime;
+                    }
+                    if (sectorNumber == 2 && (bestSector2Time == -1 || thisSectorTime < bestSector2Time))
+                    {
+                        bestSector2Time = thisSectorTime;
+                    }
+                    if (sectorNumber == 3 && (bestSector3Time == -1 || thisSectorTime < bestSector3Time))
+                    {
+                        bestSector3Time = thisSectorTime;
+                    }
+                }
+                lapData.SectorPositions.Add(position);
+                lapData.GameTimeAtSectorEnd.Add(gameTimeAtSectorEnd);
+                if (lapData.IsValid && !lapIsValid)
+                {
+                    lapData.IsValid = false;
+                }
+                lapData.Conditions.Add(new LapConditions(isRaining, trackTemp, airTemp));
+            }
+        }
+
+        public void AddSectorData(int position, float thisSectorTime, float gameTimeAtSectorEnd, Boolean lapIsValid, Boolean isRaining, float trackTemp, float airTemp)
+        {
+            if (OpponentLapData.Count > 0)
+            {
+                LapData lapData = OpponentLapData[OpponentLapData.Count - 1];
+                int sectorNumber = 1;
+                foreach (float sectorTime in lapData.SectorTimes)
+                {
+                    sectorNumber++;
                 }
                 lapData.SectorTimes.Add(thisSectorTime);
                 if (lapIsValid && thisSectorTime > 0)
