@@ -1165,7 +1165,7 @@ namespace CrewChiefV4.PCars
                         if (CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_NETWORK) 
                         {
                             // use the last sector time, or -1 if it's that magic -123 number (and mark the lap as invalid)
-                            if (lastSectorTime < 0)
+                            if (lastSectorTime <= 0)
                             {
                                 lastSectorTime = -1;
                                 validSpeed = false;
@@ -1189,7 +1189,7 @@ namespace CrewChiefV4.PCars
                     if (CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_NETWORK) 
                     {
                         // use the last sector time, or -1 if it's that magic -123 number (and mark the lap as invalid)
-                        if (lastSectorTime < 0)
+                        if (lastSectorTime <= 0)
                         {
                             lastSectorTime = -1;
                             validSpeed = false;
