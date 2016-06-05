@@ -751,7 +751,7 @@ namespace CrewChiefV4.PCars
                                             participantStruct.mCurrentLapDistance, shared.mRainDensity == 1,
                                             shared.mAmbientTemperature, shared.mTrackTemperature, opponentCarClass,
                                             currentGameState.SessionData.SessionHasFixedTime, currentGameState.SessionData.SessionTimeRemaining,
-                                            shared.mLastSectorData == null ? -1 : shared.mLastSectorData[i]);
+                                            shared.mLastSectorData == null ? -1 : shared.mLastSectorData[i], shared.mLapInvalidatedData == null ? false : shared.mLapInvalidatedData[i]);
                                     if (currentOpponentData.IsNewLap && currentOpponentData.CurrentBestLapTime > 0)
                                     {
                                         if (currentGameState.SessionData.OpponentsLapTimeSessionBestOverall == -1 ||
@@ -1106,7 +1106,7 @@ namespace CrewChiefV4.PCars
             float sessionRunningTime, float secondsSinceLastUpdate, float[] currentWorldPosition, float[] previousWorldPosition,
             float previousSpeed, float worldRecordLapTime, float worldRecordS1Time, float worldRecordS2Time, float worldRecordS3Time, 
             float distanceRoundTrack, Boolean isRaining, float trackTemp, float airTemp, CarData.CarClass carClass,
-            Boolean sessionLengthIsTime, float sessionTimeRemaining, float lastSectorTime)
+            Boolean sessionLengthIsTime, float sessionTimeRemaining, float lastSectorTime, Boolean lapInvalidated)
         {
             if (opponentData.DriverRawName.StartsWith(NULL_CHAR_STAND_IN) && name != null && name.Trim().Length > 0 && !name.StartsWith(NULL_CHAR_STAND_IN))
             {
@@ -1118,7 +1118,6 @@ namespace CrewChiefV4.PCars
             }
             opponentData.DistanceRoundTrack = distanceRoundTrack;
             float speed;
-            Boolean validSpeed = true;
             if (secondsSinceLastUpdate == 0)
             {
                 speed = opponentData.Speed;
@@ -1130,7 +1129,10 @@ namespace CrewChiefV4.PCars
             if (speed > 500)
             {
                 // faster than 500m/s (1000+mph) suggests the player has quit to the pit. Might need to reassess this as the data are quite noisy
-                validSpeed = false;
+                if (CrewChief.gameDefinition.gameEnum != GameEnum.PCARS_NETWORK)
+                {
+                    lapInvalidated = true;
+                }
                 speed = opponentData.Speed;
             }
             if (opponentSpeedsWindow.ContainsKey(opponentData.DriverRawName)) {
@@ -1168,16 +1170,16 @@ namespace CrewChiefV4.PCars
                             if (lastSectorTime <= 0)
                             {
                                 lastSectorTime = -1;
-                                validSpeed = false;
+                                lapInvalidated = true;
                             }
                             opponentData.CompleteLapWithLastSectorTime(racePosition, lastSectorTime, sessionRunningTime, 
-                                validSpeed, isRaining, trackTemp, airTemp, sessionLengthIsTime, sessionTimeRemaining);
+                                !lapInvalidated, isRaining, trackTemp, airTemp, sessionLengthIsTime, sessionTimeRemaining);
                         }
                         else
                         {
                             // use the inbuilt timing
                             opponentData.CompleteLapWithEstimatedLapTime(racePosition, sessionRunningTime, worldRecordLapTime, worldRecordS1Time, worldRecordS2Time, worldRecordS3Time,
-                                validSpeed, isRaining, trackTemp, airTemp, sessionLengthIsTime, sessionTimeRemaining);
+                                !lapInvalidated, isRaining, trackTemp, airTemp, sessionLengthIsTime, sessionTimeRemaining);
                         }
                     }
                     opponentData.StartNewLap(completedLaps + 1, racePosition, isInPits, sessionRunningTime, isRaining, trackTemp, airTemp);
@@ -1192,14 +1194,14 @@ namespace CrewChiefV4.PCars
                         if (lastSectorTime <= 0)
                         {
                             lastSectorTime = -1;
-                            validSpeed = false;
+                            lapInvalidated = true;
                         }
-                        opponentData.AddSectorData(racePosition, lastSectorTime, sessionRunningTime, validSpeed, isRaining, trackTemp, airTemp);
+                        opponentData.AddSectorData(racePosition, lastSectorTime, sessionRunningTime, !lapInvalidated, isRaining, trackTemp, airTemp);
                     }
                     else
                     {
                         // use the inbuilt timing
-                        opponentData.AddCumulativeSectorData(racePosition, -1, sessionRunningTime, validSpeed, isRaining, trackTemp, airTemp);
+                        opponentData.AddCumulativeSectorData(racePosition, -1, sessionRunningTime, !lapInvalidated, isRaining, trackTemp, airTemp);
                     }
                 }
                 opponentData.CurrentSectorNumber = sector;
