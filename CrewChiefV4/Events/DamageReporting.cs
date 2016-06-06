@@ -412,7 +412,9 @@ namespace CrewChiefV4.Events
                 if (delayResponses && random.Next(10) >= 2 && SoundCache.availableSounds.Contains(AudioPlayer.folderStandBy))
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderStandBy, 0, null));
-                    damageMessage.dueTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + (1000 * Math.Min(4, random.Next(10)));
+                    int secondsDelay = Math.Min(6, random.Next(11));
+                    audioPlayer.pauseQueue(secondsDelay);
+                    damageMessage.dueTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + (1000 * secondsDelay);
                     audioPlayer.playMessage(damageMessage);
                 }
                 else

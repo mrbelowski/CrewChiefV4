@@ -362,7 +362,7 @@ namespace CrewChiefV4.Events
 
         public override void respond(String voiceMessage)
         {
-            if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOWS_MY_FUEL))
+            if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.WHATS_MY_FUEL_LEVEL))
             {
                 if (!fuelUseActive)
                 {
@@ -381,7 +381,7 @@ namespace CrewChiefV4.Events
                     
                 }
             }
-            else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.WHATS_MY_FUEL_LEVEL)) 
+            else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOWS_MY_FUEL)) 
             {
                 Boolean haveData = false;
                 if (initialised && currentFuel > -1)

@@ -173,6 +173,16 @@ namespace CrewChiefV4.PCars
             {
                 existingState.mParticipantData = new pCarsAPIParticipantStruct[56];
             }
+
+            if (existingState.mLastSectorData == null)
+            {
+                existingState.mLastSectorData = new float[56];
+            }
+
+            if (existingState.mLapInvalidatedData == null)
+            {
+                existingState.mLapInvalidatedData = new Boolean[56];
+            }
             for (int i = 0; i < udpTelemetryData.sParticipantInfo.Count(); i++) 
             {
                 sParticipantInfo newPartInfo = udpTelemetryData.sParticipantInfo[i];
@@ -210,8 +220,10 @@ namespace CrewChiefV4.PCars
                     }
                     existingPartInfo.mWorldPosition = newWorldPositions;
 
-                    // TODO: LastSectorTime is now in the UDP data, but there's no slot for this in the participants struct
-                    // existingPartInfo.mLastSectorTime = newPartInfo.sLastSectorTime;
+                    // LastSectorTime is now in the UDP data, but there's no slot for this in the participants struct
+                    // so bung it in a separate array at the end
+                    existingState.mLastSectorData[i] = newPartInfo.sLastSectorTime;
+                    existingState.mLapInvalidatedData[i] = lapInvalidated;
                 }
                 else
                 {
@@ -577,5 +589,9 @@ namespace CrewChiefV4.PCars
         public Boolean[] isSameClassAsPlayer;
 
         public Boolean hasOpponentClassData;
+
+        public float[] mLastSectorData;
+
+        public Boolean[] mLapInvalidatedData;
     }
 }
