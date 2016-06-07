@@ -120,7 +120,7 @@ namespace CrewChiefV4.Events
         private List<float> lapTimesWindow = new List<float>();
         private List<Conditions.ConditionsSample> conditionsWindow = new List<Conditions.ConditionsSample>();
 
-        private int lapTimesWindowSize = 3;
+        private int lapTimesWindowSize = 5;
 
         private ConsistencyResult lastConsistencyMessage;
 
