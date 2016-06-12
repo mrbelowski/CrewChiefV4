@@ -317,6 +317,7 @@ Crystal Quark:Crystal
 LastPlaceLarry:Larry
 Liamkirkham:Liam
 DJ'Ballistic':Dee jay
+DJ 'BallistiX':Dee jay
 Chevchenco:Chev
 ALavadinho:Andre
 Efigueiredo:Efi
