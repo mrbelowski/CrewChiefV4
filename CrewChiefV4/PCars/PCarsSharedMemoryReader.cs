@@ -12,7 +12,6 @@ namespace CrewChiefV4.PCars
     public class PCarsSharedMemoryReader : GameDataReader
     {
         private MemoryMappedFile memoryMappedFile;
-        private GCHandle handle;
         private int sharedmemorysize;
         private byte[] sharedMemoryReadBuffer;
         private Boolean initialised = false;
@@ -105,10 +104,15 @@ namespace CrewChiefV4.PCars
                     {
                         BinaryReader _SharedMemoryStream = new BinaryReader(sharedMemoryStreamView);
                         sharedMemoryReadBuffer = _SharedMemoryStream.ReadBytes(sharedmemorysize);
-                        handle = GCHandle.Alloc(sharedMemoryReadBuffer, GCHandleType.Pinned);
-                        _pcarsapistruct = (pCarsAPIStruct)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(pCarsAPIStruct));
-                        //Console.WriteLine(_pcarsapistruct.mSpeed);
-                        handle.Free();
+                        GCHandle handle = GCHandle.Alloc(sharedMemoryReadBuffer, GCHandleType.Pinned);
+                        try
+                        {
+                            _pcarsapistruct = (pCarsAPIStruct)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(pCarsAPIStruct));
+                        }
+                        finally
+                        {
+                            handle.Free();
+                        }
                     }
                     PCarsStructWrapper structWrapper = new PCarsStructWrapper();
                     structWrapper.ticksWhenRead = DateTime.Now.Ticks;
