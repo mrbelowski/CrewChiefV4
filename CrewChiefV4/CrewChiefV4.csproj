@@ -133,6 +133,10 @@
     <Compile Include="PCars\_eNums\_EnumGetDescription.cs" />
     <Compile Include="GameDataReadException.cs" />
     <Compile Include="R3E\R3ESpotterv2.cs" />
+    <Compile Include="RF1\RF1Data.cs" />
+    <Compile Include="RF1\RF1GameStateMapper.cs" />
+    <Compile Include="RF1\RF1SharedMemoryReader.cs" />
+    <Compile Include="RF1\RF1Spotter.cs" />
     <Compile Include="TrackData.cs" />
     <Compile Include="UpdateHelper.cs" />
     <Compile Include="UserInterface\FloatPropertyControl.cs">

@@ -459,7 +459,11 @@ I Am Reginald:reginald
 iceman153:iceman
 *QGR*guiguiLALEE:gigi
 dj ballistic:ballistic
+DJ 'BallistiX':ballistic
 Mu11man:mullman
+lencc:len
+lencc33:len
+lennc:len
 lennc33:len
 Noisen:noisen
 bluetorch.hu:bluetorch

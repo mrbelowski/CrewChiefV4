@@ -1,36 +1,44 @@
-﻿using System;
+﻿using CrewChiefV4.rFactor1;
+using CrewChiefV4.rFactor1.rFactor1Data;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.MemoryMappedFiles;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading.Tasks;
+using System.Xml;
+using System.Xml.Serialization;
 
-namespace CrewChiefV4.PCars
+namespace CrewChiefV4.rFactor1
 {
-    public class PCarsSharedMemoryReader : GameDataReader
+    public class RF1SharedMemoryReader : GameDataReader
     {
         private MemoryMappedFile memoryMappedFile;
+        private GCHandle handle;
         private int sharedmemorysize;
         private byte[] sharedMemoryReadBuffer;
         private Boolean initialised = false;
-        private List<PCarsStructWrapper> dataToDump;
-        private PCarsStructWrapper[] dataReadFromFile = null;
+        private List<RF1StructWrapper> dataToDump;
+        private RF1StructWrapper[] dataReadFromFile = null;
         private int dataReadFromFileIndex = 0;
         private String lastReadFileName = null;
 
-        public class PCarsStructWrapper
+        public class RF1StructWrapper
         {
             public long ticksWhenRead;
-            public pCarsAPIStruct data;
+            public rfShared data;
         }
 
         public override void DumpRawGameData()
         {
             if (dumpToFile && dataToDump != null && dataToDump.Count > 0 && filenameToDump != null)
             {
-                SerializeObject(dataToDump.ToArray<PCarsStructWrapper>(), filenameToDump);
+                foreach (RF1StructWrapper wrapper in dataToDump)
+                {
+                    wrapper.data.vehicle = getPopulatedVehicleInfoArray(wrapper.data.vehicle);
+                }
+                SerializeObject(dataToDump.ToArray<RF1StructWrapper>(), filenameToDump);
             }
         }
 
@@ -44,12 +52,12 @@ namespace CrewChiefV4.PCars
             if (dataReadFromFile == null || filename != lastReadFileName)
             {
                 dataReadFromFileIndex = 0;
-                dataReadFromFile = DeSerializeObject<PCarsStructWrapper[]>(dataFilesPath + filename);
+                dataReadFromFile = DeSerializeObject<RF1StructWrapper[]>(dataFilesPath + filename);
                 lastReadFileName = filename;
             }
             if (dataReadFromFile != null && dataReadFromFile.Length > dataReadFromFileIndex)
             {
-                PCarsStructWrapper structWrapperData = dataReadFromFile[dataReadFromFileIndex];
+                RF1StructWrapper structWrapperData = dataReadFromFile[dataReadFromFileIndex];
                 dataReadFromFileIndex++;
                 return structWrapperData;
             }
@@ -63,7 +71,7 @@ namespace CrewChiefV4.PCars
         {
             if (dumpToFile)
             {
-                dataToDump = new List<PCarsStructWrapper>();
+                dataToDump = new List<RF1StructWrapper>();
             }
             lock (this)
             {
@@ -71,11 +79,11 @@ namespace CrewChiefV4.PCars
                 {
                     try
                     {
-                        memoryMappedFile = MemoryMappedFile.OpenExisting("$pcars$");
-                        sharedmemorysize = Marshal.SizeOf(typeof(pCarsAPIStruct));
+                        memoryMappedFile = MemoryMappedFile.OpenExisting(rFactor1Constant.SharedMemoryName);
+                        sharedmemorysize = Marshal.SizeOf(typeof(rfShared));
                         sharedMemoryReadBuffer = new byte[sharedmemorysize];
                         initialised = true;
-                        Console.WriteLine("Initialised pcars shared memory");
+                        Console.WriteLine("Initialised rFactor 1 shared memory");
                     }
                     catch (Exception)
                     {
@@ -83,14 +91,14 @@ namespace CrewChiefV4.PCars
                     }
                 }
                 return initialised;
-            }            
+            }
         }
 
         public override Object ReadGameData(Boolean forSpotter)
         {
             lock (this)
             {
-                pCarsAPIStruct _pcarsapistruct = new pCarsAPIStruct();
+                rfShared _rf1apistruct = new rfShared();
                 if (!initialised)
                 {
                     if (!InitialiseInternal())
@@ -104,21 +112,14 @@ namespace CrewChiefV4.PCars
                     {
                         BinaryReader _SharedMemoryStream = new BinaryReader(sharedMemoryStreamView);
                         sharedMemoryReadBuffer = _SharedMemoryStream.ReadBytes(sharedmemorysize);
-                        GCHandle handle = GCHandle.Alloc(sharedMemoryReadBuffer, GCHandleType.Pinned);
-                        try
-                        {
-                            _pcarsapistruct = (pCarsAPIStruct)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(pCarsAPIStruct));
-                        }
-                        finally
-                        {
-                            handle.Free();
-                        }
+                        handle = GCHandle.Alloc(sharedMemoryReadBuffer, GCHandleType.Pinned);
+                        _rf1apistruct = (rfShared)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(rfShared));
+                        handle.Free();
                     }
-                    PCarsStructWrapper structWrapper = new PCarsStructWrapper();
+                    RF1StructWrapper structWrapper = new RF1StructWrapper();
                     structWrapper.ticksWhenRead = DateTime.Now.Ticks;
-                    structWrapper.data = _pcarsapistruct;
-                    if (!forSpotter && dumpToFile && dataToDump != null && _pcarsapistruct.mTrackLocation != null &&
-                        _pcarsapistruct.mTrackLocation.Length > 0)
+                    structWrapper.data = _rf1apistruct;
+                    if (!forSpotter && dumpToFile && dataToDump != null)
                     {
                         dataToDump.Add(structWrapper);
                     }
@@ -128,7 +129,24 @@ namespace CrewChiefV4.PCars
                 {
                     throw new GameDataReadException(ex.Message, ex);
                 }
-            }            
+            }
+        }
+
+        private rfVehicleInfo[] getPopulatedVehicleInfoArray(rfVehicleInfo[] raw)
+        {
+            List<rfVehicleInfo> populated = new List<rfVehicleInfo>();
+            foreach (rfVehicleInfo rawData in raw)
+            {
+                if (rawData.place > 0)
+                {
+                    populated.Add(rawData);
+                }
+            }
+            if (populated.Count == 0)
+            {
+                populated.Add(raw[0]);
+            }
+            return populated.ToArray();
         }
 
         public override void Dispose()
