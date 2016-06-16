@@ -354,7 +354,7 @@ namespace CrewChiefV4.GameState
                     lapsToCheck = OpponentLapData.Count;
                 }
                 // count-2 because we're not interested in the current lap
-                for (int i = OpponentLapData.Count - 2; i >= OpponentLapData.Count - lapsToCheck && i >= 0; i--)
+                for (int i = OpponentLapData.Count - 2; i >= OpponentLapData.Count - lapsToCheck - 1 && i >= 0; i--)
                 {
                     LapData thisLapTime = OpponentLapData[i];
                     if (thisLapTime.IsValid)

@@ -15,7 +15,6 @@ namespace CrewChiefV4.RaceRoom
     public class R3ESharedMemoryReader : GameDataReader
     {
         private MemoryMappedFile memoryMappedFile;
-        private GCHandle handle;
         private int sharedmemorysize;
         private byte[] sharedMemoryReadBuffer;
         private Boolean initialised = false;
@@ -112,9 +111,15 @@ namespace CrewChiefV4.RaceRoom
                     {
                         BinaryReader _SharedMemoryStream = new BinaryReader(sharedMemoryStreamView);
                         sharedMemoryReadBuffer = _SharedMemoryStream.ReadBytes(sharedmemorysize);
-                        handle = GCHandle.Alloc(sharedMemoryReadBuffer, GCHandleType.Pinned);
-                        _raceroomapistruct = (RaceRoomShared)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(RaceRoomShared));
-                        handle.Free();
+                        GCHandle handle = GCHandle.Alloc(sharedMemoryReadBuffer, GCHandleType.Pinned);
+                        try
+                        {
+                            _raceroomapistruct = (RaceRoomShared)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(RaceRoomShared));
+                        }
+                        finally
+                        {
+                            handle.Free();
+                        }
                     }
                     R3EStructWrapper structWrapper = new R3EStructWrapper();
                     structWrapper.ticksWhenRead = DateTime.Now.Ticks;
