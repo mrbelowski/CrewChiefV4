@@ -113,9 +113,18 @@ namespace CrewChiefV4
                 String nameToLog = trackName != null ? trackName : "null";
                 return new TrackDefinition("unknown track - name " + nameToLog + ", length = " + trackLength, trackLength); 
             }
-            else
+            else if (CrewChief.gameDefinition.gameEnum == GameEnum.RACE_ROOM)
             {
                 return new TrackDefinition("R3E track, length = " + trackLength, trackLength); 
+            }
+            else if (CrewChief.gameDefinition.gameEnum == GameEnum.RF1)
+            {
+                return new TrackDefinition(trackName, trackLength);
+            }
+            else
+            {
+                String nameToLog = trackName != null ? trackName : "null";
+                return new TrackDefinition("unknown track - name " + nameToLog + ", length = " + trackLength, trackLength); 
             }
         }
 
