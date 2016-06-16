@@ -60,7 +60,7 @@ namespace CrewChiefV4.rFactor1
         {
             foreach (rfVehicleInfo vehicle in shared.vehicle)
             {
-                if (vehicle.isPlayer)
+                if ((int)vehicle.isPlayer == 1)
                 {
                     return vehicle;
                 }
@@ -78,7 +78,7 @@ namespace CrewChiefV4.rFactor1
             rfShared lastState = ((CrewChiefV4.rFactor1.RF1SharedMemoryReader.RF1StructWrapper)lastStateObj).data;
             rfShared currentState = ((CrewChiefV4.rFactor1.RF1SharedMemoryReader.RF1StructWrapper)currentStateObj).data;
             
-            if (!enabled || currentState.currentET < timeAfterRaceStartToActivate || !currentState.inRealtime || 
+            if (!enabled || currentState.currentET < timeAfterRaceStartToActivate || (int)currentState.inRealtime != 1|| 
                 (currentState.numVehicles <= 2))
             {
                 return;
@@ -106,7 +106,7 @@ namespace CrewChiefV4.rFactor1
             }
             float[] currentPlayerPosition = new float[] { currentPlayerData.pos.x, currentPlayerData.pos.z };
 
-            if (!currentPlayerData.inPits && currentPlayerData.control == (int)rFactor1Constant.rfControl.player)
+            if ((int)currentPlayerData.inPits == 0 && currentPlayerData.control == (int)rFactor1Constant.rfControl.player)
             {
                 List<float[]> currentOpponentPositions = new List<float[]>();
                 float[] playerVelocityData = new float[3];
@@ -116,7 +116,7 @@ namespace CrewChiefV4.rFactor1
 
                 foreach (rfVehicleInfo vehicle in currentState.vehicle)
                 {
-                    if (vehicle.isPlayer || vehicle.inPits)
+                    if ((int)vehicle.isPlayer == 1 || (int)vehicle.inPits == 1)
                     {
                         continue;
                     }

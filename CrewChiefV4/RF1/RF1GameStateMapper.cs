@@ -85,7 +85,7 @@ namespace CrewChiefV4.rFactor1
             GameStateData currentGameState = new GameStateData(wrapper.ticksWhenRead);
             rFactor1Data.rfShared shared = wrapper.data;
 
-            if (shared.currentET <= 0 || !shared.inRealtime)
+            if (shared.currentET <= 0 || (int)shared.inRealtime == 0)
             {
                 return previousGameState;
             }
@@ -104,7 +104,7 @@ namespace CrewChiefV4.rFactor1
 
             foreach (rFactor1Data.rfVehicleInfo vehicle in shared.vehicle)
             {
-                if (vehicle.isPlayer)
+                if ((int)vehicle.isPlayer == 1)
                 {
                     player = vehicle;
                     break;
@@ -147,7 +147,7 @@ namespace CrewChiefV4.rFactor1
                 {
                     rfVehicleInfo participantStruct = shared.vehicle[i];
                     String driverName = getNameFromBytes(participantStruct.driverName).ToLower();
-                    if (participantStruct.isPlayer)
+                    if ((int)participantStruct.isPlayer == 1)
                     {
                         currentGameState.SessionData.IsNewSector = previousGameState == null || participantStruct.sector != previousGameState.SessionData.SectorNumber;
                         
@@ -158,7 +158,7 @@ namespace CrewChiefV4.rFactor1
                             NameValidator.validateName(driverName);
                             playerName = driverName;
                         }
-                        currentGameState.PitData.InPitlane = participantStruct.inPits;
+                        currentGameState.PitData.InPitlane = (int)participantStruct.inPits == 1;
                         currentGameState.PositionAndMotionData.DistanceRoundTrack = participantStruct.lapDist;
                         currentGameState.carClass = CarData.getDefaultCarClass();
                         Console.WriteLine("Player is using car class " + currentGameState.carClass.carClassEnum + " (class ID " + getNameFromBytes(participantStruct.vehicleClass) + ")");
@@ -281,7 +281,20 @@ namespace CrewChiefV4.rFactor1
             }
 
             //------------------------ Session data -----------------------
-            currentGameState.SessionData.Flag = shared.sectorFlag[player.sector] > (int)rFactor1Constant.rfYellowFlagState.noFlag ? FlagEnum.YELLOW : shared.gamePhase == (int)rFactor1Constant.rfGamePhase.fullCourseYellow ? FlagEnum.DOUBLE_YELLOW : shared.yellowFlagState == (int)rFactor1Constant.rfYellowFlagState.lastLap ? FlagEnum.WHITE : FlagEnum.UNKNOWN;
+            FlagEnum Flag = FlagEnum.UNKNOWN;
+            if ((int)shared.sectorFlag[(int)player.sector] > (int)rFactor1Constant.rfYellowFlagState.noFlag)
+            {
+                Flag = FlagEnum.YELLOW;
+            }
+            else if ((int)shared.gamePhase == (int)rFactor1Constant.rfGamePhase.fullCourseYellow)
+            {
+                Flag = FlagEnum.DOUBLE_YELLOW;
+            }
+            else if ((int)shared.yellowFlagState == (int)rFactor1Constant.rfYellowFlagState.lastLap)
+            {
+                Flag = FlagEnum.WHITE;
+            }
+            currentGameState.SessionData.Flag = Flag;
             currentGameState.SessionData.SessionTimeRemaining = shared.endET;
             currentGameState.SessionData.CompletedLaps = (int)shared.lapNumber;     
             
@@ -343,7 +356,7 @@ namespace CrewChiefV4.rFactor1
 
             foreach (rfVehicleInfo participantStruct in shared.vehicle)
             {
-                if (participantStruct.isPlayer)
+                if ((int)participantStruct.isPlayer == 1)
                 {
                     currentGameState.SessionData.IsNewSector = currentGameState.SessionData.SectorNumber != (participantStruct.sector == 0 ? 3 : participantStruct.sector);
                     
@@ -418,7 +431,7 @@ namespace CrewChiefV4.rFactor1
 
                     }
                     currentGameState.SessionData.SectorNumber = participantStruct.sector == 0 ? 3 : participantStruct.sector;
-                    currentGameState.PitData.InPitlane = participantStruct.inPits;
+                    currentGameState.PitData.InPitlane = (int)participantStruct.inPits == 1;
                     currentGameState.PositionAndMotionData.DistanceRoundTrack = participantStruct.lapDist;
                     if (currentGameState.PitData.InPitlane)
                     {
@@ -449,7 +462,7 @@ namespace CrewChiefV4.rFactor1
 
             foreach (rfVehicleInfo participantStruct in shared.vehicle)
             {
-                if (!participantStruct.isPlayer)
+                if ((int)participantStruct.isPlayer == 0)
                 {
                     String driverName = getNameFromBytes(participantStruct.driverName).ToLower();
                     if (driverName.Length == 0 || driverName == currentGameState.SessionData.DriverRawName || opponentDriverNamesProcessedThisUpdate.Contains(driverName) || participantStruct.place < 1) 
@@ -525,8 +538,8 @@ namespace CrewChiefV4.rFactor1
                             {
                                 currentGameState.SessionData.HasLeadChanged = true;
                             }
-                            Boolean isEnteringPits = participantStruct.inPits && currentOpponentSector == 3;
-                            Boolean isLeavingPits = participantStruct.inPits && currentOpponentSector == 1;
+                            Boolean isEnteringPits = (int)participantStruct.inPits == 1 && currentOpponentSector == 3;
+                            Boolean isLeavingPits = (int)participantStruct.inPits == 1 && currentOpponentSector == 1;
 
                             if (isEnteringPits && !previousOpponentIsEnteringPits)
                             {
@@ -992,6 +1005,7 @@ namespace CrewChiefV4.rFactor1
 
         public SessionType mapToSessionType(Object memoryMappedFileStruct)
         {
+            // TODO: Detect Race session start (rFactor doesn't export session type)
             return SessionType.Practice;
         }
 
