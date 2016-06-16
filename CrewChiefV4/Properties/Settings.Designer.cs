@@ -1381,10 +1381,10 @@ namespace CrewChiefV4.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("4.0")]
-        public string rf1_spotter_car_length {
+        [global::System.Configuration.DefaultSettingValueAttribute("4.5")]
+        public float rf1_spotter_car_length {
             get {
-                return ((string)(this["rf1_spotter_car_length"]));
+                return ((float)(this["rf1_spotter_car_length"]));
             }
             set {
                 this["rf1_spotter_car_length"] = value;

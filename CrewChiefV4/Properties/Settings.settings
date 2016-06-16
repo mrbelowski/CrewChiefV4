@@ -341,8 +341,8 @@
     <Setting Name="enable_console_logging" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="rf1_spotter_car_length" Type="System.String" Scope="User">
-      <Value Profile="(Default)">4.0</Value>
+    <Setting Name="rf1_spotter_car_length" Type="System.Single" Scope="User">
+      <Value Profile="(Default)">4.5</Value>
     </Setting>
     <Setting Name="rf1_launch_params" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
