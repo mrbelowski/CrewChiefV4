@@ -1,6 +1,7 @@
 ﻿using CrewChiefV4.GameState;
 using CrewChiefV4.PCars;
 using CrewChiefV4.RaceRoom;
+using CrewChiefV4.rFactor1;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,9 +16,11 @@ namespace CrewChiefV4
         private PCarsUDPreader pcarsUDPreader;
         private PCarsSharedMemoryReader pcarsSharedMemoryReader;
         private R3ESharedMemoryReader r3eSharedMemoryReader;
+        private RF1SharedMemoryReader rf1SharedMemoryReader;
 
         private PCarsGameStateMapper pcarsGameStateMapper;
         private R3EGameStateMapper r3eGameStateMapper;
+        private RF1GameStateMapper rf1GameStateMapper;
 
         public static GameStateReaderFactory getInstance()
         {
@@ -49,6 +52,12 @@ namespace CrewChiefV4
                             r3eSharedMemoryReader = new R3ESharedMemoryReader();
                         }
                         return r3eSharedMemoryReader;
+                    case GameEnum.RF1:
+                        if (rf1SharedMemoryReader == null)
+                        {
+                            rf1SharedMemoryReader = new RF1SharedMemoryReader();
+                        }
+                        return rf1SharedMemoryReader;
                 }
             }
             return null;
@@ -74,6 +83,12 @@ namespace CrewChiefV4
                             r3eGameStateMapper = new R3EGameStateMapper();
                         }
                         return r3eGameStateMapper;
+                    case GameEnum.RF1:
+                        if (rf1GameStateMapper == null)
+                        {
+                            rf1GameStateMapper = new RF1GameStateMapper();
+                        }
+                        return rf1GameStateMapper;
                 }
             }
             return null;

@@ -23,6 +23,7 @@ pcars_64_bit = Project Cars (64 bit)
 pcars_32_bit = Project Cars (32 bit)
 race_room = Race Room
 pcars_udp = Project Cars (network data)
+rfactor1 = rFactor
 
 please_choose_a_game_option = Please choose a game option
 no_game_selected = No game selected
@@ -112,6 +113,9 @@ max_safe_water_temp_over_baseline_help = Baseline water temp is taken after a fe
 r3e_launch_params_help = This is used to tell Steam what app to run - raceroom's Steam app ID is 211500. If you're using a non-Steam version of RaceRoom this can be empty
 r3e_launch_exe_help = This is the program used to start RaceRoom. For most users this should be the full path to their steam.exe (e.g. C:/program files/steam/steam.exe). Use forward slashes to separate paths. If you have a non-steam version of RaceRoom use the full path to the RaceRoom exe
 launch_raceroom_help = If this is true the application will attempt to launch RaceRoom when CrewChief starts (when you click 'Start application' or the app auto starts CrewChief if you set run_immediately to true)
+rf1_launch_params_help = This is used to tell Steam what app to run - rFactor's Steam app ID is 339790. If you're using a non-Steam version of rFactor this can be empty
+rf1_launch_exe_help = This is the program used to start rFactor. For most users this should be the full path to their steam.exe (e.g. C:/program files/steam/steam.exe). Use forward slashes to separate paths. If you have a non-steam version of rFactor use the full path to the rFactor exe
+launch_rfactor1_help = If this is true the application will attempt to launch rFactor when CrewChief starts (when you click 'Start application' or the app auto starts CrewChief if you set run_immediately to true)
 run_immediately_help = If this is true the application will start running CrewChief as soon as you start it up, using whatever options you previously set
 pcars_steam_id_help = PCars sometimes sends the participant data in the wrong order. If this value is set, the app will use it to try and work around this issue, preventing the app 'seeing' the wrong data for the player
 cumulative_lap_lockup_warning_threshold_help = If the player has locked wheels for more than this many seconds over the course of a lap, play a warning

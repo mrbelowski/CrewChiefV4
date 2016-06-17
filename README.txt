@@ -2,6 +2,8 @@ CrewChief version 4.
 
 Changelog
 ---------
+Version 4.3.0.0: Initial (beta) support for rFactor 1/Automobilista/Stock Car Extreme. Download 'rFactorSharedMemoryMap.dll' from https://github.com/dallongo/rFactorSharedMemoryMap/releases/latest and place it in the sim's Plugin folder, then select 'rFactor' in Crew Chief.
+
 Version 4.2.1.8: Include more laps in the opponent vs player laptime comparisons during race sessions
 
 Version 4.2.1.7: Use lastSectorTime data for opponent cars when in PCars UDP (network data) mode. This makes the opponent lap time reports accurate as the app doesn't have to time them itself (this data isn't available in PCars shared memory data)
