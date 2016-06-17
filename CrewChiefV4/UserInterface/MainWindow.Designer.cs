@@ -281,7 +281,7 @@ namespace CrewChiefV4
             Configuration.getUIString("rfactor1")});
             this.gameDefinitionList.Location = new System.Drawing.Point(782, 28);
             this.gameDefinitionList.Name = "gameDefinitionList";
-            this.gameDefinitionList.Size = new System.Drawing.Size(203, 56);
+            this.gameDefinitionList.Size = new System.Drawing.Size(203, 80);
             this.gameDefinitionList.TabIndex = 21;
             this.gameDefinitionList.SelectedValueChanged += new System.EventHandler(this.updateSelectedGameDefinition);
             // 
