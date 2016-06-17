@@ -20,28 +20,10 @@ namespace CrewChiefV4.rFactor1
         private List<CornerData.EnumWithThresholds> tyreWearThresholds = new List<CornerData.EnumWithThresholds>();
         private List<CornerData.EnumWithThresholds> brakeDamageThresholds = new List<CornerData.EnumWithThresholds>();
 
-        private float wornOutTyreWearLevel = 0.05f;
-
-        private float scrubbedTyreWearPercent = 2f;
-        private float minorTyreWearPercent = 10f;
-        private float majorTyreWearPercent = 37f;
-        private float wornOutTyreWearPercent = 65f;        
-
-        private float trivialAeroDamageThreshold = 0.99995f;
-        private float trivialEngineDamageThreshold = 0.995f;
-        private float trivialTransmissionDamageThreshold = 0.99f;
-
-        private float minorTransmissionDamageThreshold = 0.97f;
-        private float minorEngineDamageThreshold = 0.99f;
-        private float minorAeroDamageThreshold = 0.995f;
-
-        private float severeTransmissionDamageThreshold = 0.4f;
-        private float severeEngineDamageThreshold = 0.6f;
-        private float severeAeroDamageThreshold = 0.95f;
-
-        private float destroyedTransmissionThreshold = 0.1f;
-        private float destroyedEngineThreshold = 0.1f;
-        private float destroyedAeroThreshold = 0.8f;
+        private float scrubbedTyreWearPercent = 5f;
+        private float minorTyreWearPercent = 30f;
+        private float majorTyreWearPercent = 60f;
+        private float wornOutTyreWearPercent = 85f;        
 
         private List<CornerData.EnumWithThresholds> brakeTempThresholdsForPlayersCar = null;
 
@@ -85,7 +67,7 @@ namespace CrewChiefV4.rFactor1
             GameStateData currentGameState = new GameStateData(wrapper.ticksWhenRead);
             rFactor1Data.rfShared shared = wrapper.data;
 
-            if (shared.currentET <= 0 || (int)shared.inRealtime == 0)
+            if (shared.currentET <= 0 || shared.inRealtime == 0)
             {
                 return previousGameState;
             }
@@ -104,7 +86,7 @@ namespace CrewChiefV4.rFactor1
 
             foreach (rFactor1Data.rfVehicleInfo vehicle in shared.vehicle)
             {
-                if ((int)vehicle.isPlayer == 1)
+                if (vehicle.isPlayer == 1)
                 {
                     player = vehicle;
                     break;
@@ -112,13 +94,14 @@ namespace CrewChiefV4.rFactor1
             }
 
             currentGameState.SessionData.SessionType = mapToSessionType(shared);
-            currentGameState.SessionData.SessionRunningTime = (float)shared.currentET;
+            currentGameState.SessionData.SessionRunningTime = shared.currentET;
             currentGameState.ControlData.ControlType = mapToControlType(player.control); // TODO: the rest of the control data
-            currentGameState.SessionData.NumCarsAtStartOfSession = (int)shared.numVehicles;
+            currentGameState.SessionData.NumCarsAtStartOfSession = shared.numVehicles;
+            currentGameState.SessionData.IsDisqualified = player.finishStatus == (int)rFactor1Constant.rfFinishStatus.dq;
             int previousLapsCompleted = previousGameState == null ? 0 : previousGameState.SessionData.CompletedLaps;
             currentGameState.SessionData.SessionPhase = mapToSessionPhase(lastSessionPhase, currentGameState.SessionData.SessionType, lastSessionRunningTime,
                 currentGameState.SessionData.SessionRunningTime, shared.gamePhase, currentGameState.ControlData.ControlType,
-                previousLapsCompleted, (int)shared.lapNumber, isCarRunning);
+                previousLapsCompleted, shared.lapNumber, isCarRunning);
 
             List<String> opponentDriverNamesProcessedThisUpdate = new List<String>();
 
@@ -135,19 +118,18 @@ namespace CrewChiefV4.rFactor1
                 Console.WriteLine("rawSessionPhase = " + shared.gamePhase);
                 Console.WriteLine("currentSessionRunningTime = " + currentGameState.SessionData.SessionRunningTime);
 
-                // currentGameState.SessionData.EventIndex = shared.EventIndex;
-                // currentGameState.SessionData.SessionIteration = shared.SessionIteration;
+                currentGameState.SessionData.EventIndex = shared.session;
                 currentGameState.SessionData.SessionStartTime = currentGameState.Now;
                 currentGameState.OpponentData.Clear();
                 currentGameState.SessionData.TrackDefinition = TrackData.getTrackDefinition(getNameFromBytes(shared.trackName), shared.lapDist);
                 currentGameState.SessionData.TrackDefinition.setGapPoints();
                 currentGameState.PitData.IsRefuellingAllowed = true;
 
-                for (int i = 0; i < shared.vehicle.Length; i++)
+                for (int i = 0; i < shared.numVehicles; i++)
                 {
                     rfVehicleInfo participantStruct = shared.vehicle[i];
                     String driverName = getNameFromBytes(participantStruct.driverName).ToLower();
-                    if ((int)participantStruct.isPlayer == 1)
+                    if (participantStruct.isPlayer == 1)
                     {
                         currentGameState.SessionData.IsNewSector = previousGameState == null || participantStruct.sector != previousGameState.SessionData.SectorNumber;
                         
@@ -158,7 +140,7 @@ namespace CrewChiefV4.rFactor1
                             NameValidator.validateName(driverName);
                             playerName = driverName;
                         }
-                        currentGameState.PitData.InPitlane = (int)participantStruct.inPits == 1;
+                        currentGameState.PitData.InPitlane = participantStruct.inPits == 1;
                         currentGameState.PositionAndMotionData.DistanceRoundTrack = participantStruct.lapDist;
                         currentGameState.carClass = CarData.getDefaultCarClass();
                         Console.WriteLine("Player is using car class " + currentGameState.carClass.carClassEnum + " (class ID " + getNameFromBytes(participantStruct.vehicleClass) + ")");
@@ -194,7 +176,7 @@ namespace CrewChiefV4.rFactor1
                         // just gone green, so get the session data
                         if (shared.maxLaps > 0)
                         {
-                            currentGameState.SessionData.SessionNumberOfLaps = (int)shared.maxLaps;
+                            currentGameState.SessionData.SessionNumberOfLaps = shared.maxLaps;
                             currentGameState.SessionData.SessionHasFixedTime = false;
                         }
                         if (shared.endET > 0)
@@ -203,7 +185,7 @@ namespace CrewChiefV4.rFactor1
                             currentGameState.SessionData.SessionHasFixedTime = true;
                         }
                         currentGameState.SessionData.SessionStartPosition = player.place;
-                        currentGameState.SessionData.NumCarsAtStartOfSession = (int)shared.numVehicles;
+                        currentGameState.SessionData.NumCarsAtStartOfSession = shared.numVehicles;
                         currentGameState.SessionData.SessionStartTime = currentGameState.Now;
                         currentGameState.carClass = CarData.getDefaultCarClass();
                         Console.WriteLine("Player is using car class " + currentGameState.carClass.carClassEnum);
@@ -282,27 +264,27 @@ namespace CrewChiefV4.rFactor1
 
             //------------------------ Session data -----------------------
             FlagEnum Flag = FlagEnum.UNKNOWN;
-            if ((int)shared.sectorFlag[(int)player.sector] > (int)rFactor1Constant.rfYellowFlagState.noFlag)
+            if (shared.sectorFlag[player.sector] > (int)rFactor1Constant.rfYellowFlagState.noFlag)
             {
                 Flag = FlagEnum.YELLOW;
             }
-            else if ((int)shared.gamePhase == (int)rFactor1Constant.rfGamePhase.fullCourseYellow)
+            else if (shared.gamePhase == (int)rFactor1Constant.rfGamePhase.fullCourseYellow)
             {
                 Flag = FlagEnum.DOUBLE_YELLOW;
             }
-            else if ((int)shared.yellowFlagState == (int)rFactor1Constant.rfYellowFlagState.lastLap)
+            else if (shared.yellowFlagState == (int)rFactor1Constant.rfYellowFlagState.lastLap)
             {
                 Flag = FlagEnum.WHITE;
             }
             currentGameState.SessionData.Flag = Flag;
-            currentGameState.SessionData.SessionTimeRemaining = shared.endET;
-            currentGameState.SessionData.CompletedLaps = (int)shared.lapNumber;     
+            currentGameState.SessionData.SessionTimeRemaining = shared.endET - shared.currentET;
+            currentGameState.SessionData.CompletedLaps = player.totalLaps;     
             
-            currentGameState.SessionData.LapTimeCurrent = shared.currentET - shared.lapStartET;
-            currentGameState.SessionData.CurrentLapIsValid = currentGameState.SessionData.LapTimeCurrent != -1;
+            currentGameState.SessionData.LapTimeCurrent = shared.currentET - player.lapStartET;
+            currentGameState.SessionData.CurrentLapIsValid = player.numPenalties <= (previousGameState == null ? 0 : previousGameState.PenaltiesData.NumPenalties);
             currentGameState.SessionData.LapTimePrevious = player.lastLapTime;
             currentGameState.SessionData.PreviousLapWasValid = player.lastLapTime > 0;
-            currentGameState.SessionData.NumCars = (int)shared.numVehicles;
+            currentGameState.SessionData.NumCars = shared.numVehicles;
             
             currentGameState.SessionData.Position = getRacePosition(currentGameState.SessionData.DriverRawName, currentGameState.SessionData.Position, player.place, currentGameState.Now);
             currentGameState.SessionData.UnFilteredPosition = player.place;
@@ -311,8 +293,9 @@ namespace CrewChiefV4.rFactor1
             float TimeDeltaBehind = 0;
             float SessionFastestLapTimeFromGame = -1;
             float SessionFastestLapTimeFromGamePlayerClass = -1;
-            foreach (rFactor1Data.rfVehicleInfo vehicle in shared.vehicle)
+            for (int i = 0; i < shared.numVehicles; i++)
             {
+                rfVehicleInfo vehicle = shared.vehicle[i];
                 if (vehicle.place == player.place + 1)
                 {
                     TimeDeltaBehind = vehicle.timeBehindNext * -1;
@@ -340,7 +323,7 @@ namespace CrewChiefV4.rFactor1
             // TODO: calculate the actual session best sector times from the bollocks in the block (cumulative deltas between the last player sector time and the session best)
 
             currentGameState.SessionData.IsNewLap = previousGameState != null && previousGameState.SessionData.IsNewLap == false &&
-                (shared.lapNumber == previousGameState.SessionData.CompletedLaps + 1 ||
+                (player.totalLaps == previousGameState.SessionData.CompletedLaps + 1 ||
                 ((lastSessionPhase == SessionPhase.Countdown || lastSessionPhase == SessionPhase.Formation || lastSessionPhase == SessionPhase.Garage)
                 && currentGameState.SessionData.SessionPhase == SessionPhase.Green));
             if (currentGameState.SessionData.IsNewLap)
@@ -354,15 +337,13 @@ namespace CrewChiefV4.rFactor1
                 currentGameState.SessionData.SectorNumber = previousGameState.SessionData.SectorNumber;
             }
 
-            foreach (rfVehicleInfo participantStruct in shared.vehicle)
+            for (int i = 0; i < shared.numVehicles; i++)
             {
-                if ((int)participantStruct.isPlayer == 1)
+                rfVehicleInfo participantStruct = shared.vehicle[i];
+                if (participantStruct.isPlayer == 1)
                 {
                     currentGameState.SessionData.IsNewSector = currentGameState.SessionData.SectorNumber != (participantStruct.sector == 0 ? 3 : participantStruct.sector);
                     
-                    //if (currentGameState.SessionData.CurrentLapIsValid && participantStruct.current_lap_valid != 1) {
-                    //    currentGameState.SessionData.CurrentLapIsValid = false;
-                    //}
                     if (currentGameState.SessionData.IsNewSector)
                     {
                         if (participantStruct.sector == 1)
@@ -431,7 +412,7 @@ namespace CrewChiefV4.rFactor1
 
                     }
                     currentGameState.SessionData.SectorNumber = participantStruct.sector == 0 ? 3 : participantStruct.sector;
-                    currentGameState.PitData.InPitlane = (int)participantStruct.inPits == 1;
+                    currentGameState.PitData.InPitlane = participantStruct.inPits == 1;
                     currentGameState.PositionAndMotionData.DistanceRoundTrack = participantStruct.lapDist;
                     if (currentGameState.PitData.InPitlane)
                     {
@@ -456,13 +437,8 @@ namespace CrewChiefV4.rFactor1
                     {
                         currentGameState.PitData.IsAtPitExit = true;
                     }
-                    break;
                 }
-            }
-
-            foreach (rfVehicleInfo participantStruct in shared.vehicle)
-            {
-                if ((int)participantStruct.isPlayer == 0)
+                else if (participantStruct.isPlayer == 0)
                 {
                     String driverName = getNameFromBytes(participantStruct.driverName).ToLower();
                     if (driverName.Length == 0 || driverName == currentGameState.SessionData.DriverRawName || opponentDriverNamesProcessedThisUpdate.Contains(driverName) || participantStruct.place < 1) 
@@ -514,7 +490,7 @@ namespace CrewChiefV4.rFactor1
 
                             int currentOpponentRacePosition = getRacePosition(driverName, previousOpponentPosition, participantStruct.place, currentGameState.Now);
                             //int currentOpponentRacePosition = participantStruct.place;
-                            int currentOpponentLapsCompleted = (int)participantStruct.totalLaps;
+                            int currentOpponentLapsCompleted = participantStruct.totalLaps;
                             int currentOpponentSector = participantStruct.sector;
                             if (currentOpponentSector == 0)
                             {
@@ -538,8 +514,8 @@ namespace CrewChiefV4.rFactor1
                             {
                                 currentGameState.SessionData.HasLeadChanged = true;
                             }
-                            Boolean isEnteringPits = (int)participantStruct.inPits == 1 && currentOpponentSector == 3;
-                            Boolean isLeavingPits = (int)participantStruct.inPits == 1 && currentOpponentSector == 1;
+                            Boolean isEnteringPits = participantStruct.inPits == 1 && currentOpponentSector == 3;
+                            Boolean isLeavingPits = participantStruct.inPits == 1 && currentOpponentSector == 1;
 
                             if (isEnteringPits && !previousOpponentIsEnteringPits)
                             {
@@ -659,73 +635,44 @@ namespace CrewChiefV4.rFactor1
             }
                         
             //------------------------ Car damage data -----------------------
-            currentGameState.CarDamageData.DamageEnabled = false;
-            //if (currentGameState.CarDamageData.DamageEnabled)
-            //{
-            //    if (shared.CarDamage.Aerodynamics < destroyedAeroThreshold)
-            //    {
-            //        currentGameState.CarDamageData.OverallAeroDamage = DamageLevel.DESTROYED;
-            //    }
-            //    else if (shared.CarDamage.Aerodynamics < severeAeroDamageThreshold)
-            //    {
-            //        currentGameState.CarDamageData.OverallAeroDamage = DamageLevel.MAJOR;
-            //    }
-            //    else if (shared.CarDamage.Aerodynamics < minorAeroDamageThreshold)
-            //    {
-            //        currentGameState.CarDamageData.OverallAeroDamage = DamageLevel.MINOR;
-            //    }
-            //    else if (shared.CarDamage.Aerodynamics < trivialAeroDamageThreshold)
-            //    {
-            //        currentGameState.CarDamageData.OverallAeroDamage = DamageLevel.TRIVIAL;
-            //    }
-            //    else
-            //    {
-            //        currentGameState.CarDamageData.OverallAeroDamage = DamageLevel.NONE;
-            //    }
-            //    if (shared.CarDamage.Engine < destroyedEngineThreshold)
-            //    {
-            //        currentGameState.CarDamageData.OverallEngineDamage = DamageLevel.DESTROYED;
-            //    }
-            //    else if (shared.CarDamage.Engine < severeEngineDamageThreshold)
-            //    {
-            //        currentGameState.CarDamageData.OverallEngineDamage = DamageLevel.MAJOR;
-            //    }
-            //    else if (shared.CarDamage.Engine < minorEngineDamageThreshold)
-            //    {
-            //        currentGameState.CarDamageData.OverallEngineDamage = DamageLevel.MINOR;
-            //    }
-            //    else if (shared.CarDamage.Engine < trivialEngineDamageThreshold)
-            //    {
-            //        currentGameState.CarDamageData.OverallEngineDamage = DamageLevel.TRIVIAL;
-            //    }
-            //    else
-            //    {
-            //        currentGameState.CarDamageData.OverallEngineDamage = DamageLevel.NONE;
-            //    }
-            //    if (shared.CarDamage.Transmission < destroyedTransmissionThreshold)
-            //    {
-            //        currentGameState.CarDamageData.OverallTransmissionDamage = DamageLevel.DESTROYED;
-            //    }
-            //    else if (shared.CarDamage.Transmission < severeTransmissionDamageThreshold)
-            //    {
-            //        currentGameState.CarDamageData.OverallTransmissionDamage = DamageLevel.MAJOR;
-            //    }
-            //    else if (shared.CarDamage.Transmission < minorTransmissionDamageThreshold)
-            //    {
-            //        currentGameState.CarDamageData.OverallTransmissionDamage = DamageLevel.MINOR;
-            //    }
-            //    else if (shared.CarDamage.Transmission < trivialTransmissionDamageThreshold)
-            //    {
-            //        currentGameState.CarDamageData.OverallTransmissionDamage = DamageLevel.TRIVIAL;
-            //    }
-            //    else
-            //    {
-            //        currentGameState.CarDamageData.OverallTransmissionDamage = DamageLevel.NONE;
-            //    }
-            //}
+            //FIXME: this is a highly simplified way of looking at damage
+            currentGameState.CarDamageData.DamageEnabled = true;
+            int majorDent = 0;
+            int minorDent = 0;
+            foreach (byte dent in shared.dentSeverity)
+            {
+                if (dent == 2)
+                {
+                    majorDent++;
+                }
+                else if (dent == 1)
+                {
+                    minorDent++;
+                }
+            }
+            if (minorDent >= 6 || majorDent >= 3)
+            {
+                currentGameState.CarDamageData.OverallAeroDamage = DamageLevel.DESTROYED;
+            }
+            else if ((minorDent >= 4 || majorDent >= 2) || (majorDent >= 1 && majorDent >= 3))
+            {
+                currentGameState.CarDamageData.OverallAeroDamage = DamageLevel.MAJOR;
+            }
+            else if (minorDent >= 2 || majorDent >= 1)
+            {
+                currentGameState.CarDamageData.OverallAeroDamage = DamageLevel.MINOR;
+            }
+            else if (minorDent == 1)
+            {
+                currentGameState.CarDamageData.OverallAeroDamage = DamageLevel.TRIVIAL;
+            }
+            else
+            {
+                currentGameState.CarDamageData.OverallAeroDamage = DamageLevel.NONE;
+            }
+
             
             //------------------------ Engine data -----------------------            
-            //currentGameState.EngineData.EngineOilPressure = shared.EngineOilPressure;
             currentGameState.EngineData.EngineRpm = shared.engineRPM;
             currentGameState.EngineData.MaxEngineRpm = shared.engineMaxRPM;
             currentGameState.EngineData.MinutesIntoSessionBeforeMonitoring = 5;
@@ -733,20 +680,19 @@ namespace CrewChiefV4.rFactor1
             currentGameState.EngineData.EngineOilTemp = shared.engineOilTemp;
             currentGameState.EngineData.EngineWaterTemp = shared.engineWaterTemp;
 
+            //HACK: there's probably a cleaner way to do this...
+            if (shared.overheating == 1)
+            {
+                currentGameState.EngineData.EngineWaterTemp += 50;
+                currentGameState.EngineData.EngineOilTemp += 50;
+            }
+
             //------------------------ Fuel data -----------------------
             currentGameState.FuelData.FuelUseActive = true;
-            //currentGameState.FuelData.FuelPressure = shared.FuelPressure;
-            //currentGameState.FuelData.FuelCapacity = shared.FuelCapacity;
             currentGameState.FuelData.FuelLeft = shared.fuel;
 
 
             //------------------------ Penalties data -----------------------
-            //currentGameState.PenaltiesData.CutTrackWarnings = shared.CutTrackWarnings;
-            //currentGameState.PenaltiesData.HasDriveThrough = shared.Penalties.DriveThrough > 0;
-            //currentGameState.PenaltiesData.HasSlowDown = shared.Penalties.SlowDown > 0;
-            //currentGameState.PenaltiesData.HasPitStop = shared.Penalties.PitStop > 0;
-            //currentGameState.PenaltiesData.HasStopAndGo = shared.Penalties.StopAndGo > 0;
-            //currentGameState.PenaltiesData.HasTimeDeduction = shared.Penalties.TimeDeduction > 0; ;
             currentGameState.PenaltiesData.NumPenalties = player.numPenalties;
 
 
@@ -760,7 +706,7 @@ namespace CrewChiefV4.rFactor1
 
 
             //------------------------ Transmission data -----------------------
-            currentGameState.TransmissionData.Gear = (int)shared.gear;
+            currentGameState.TransmissionData.Gear = shared.gear;
 
 
             //------------------------ Tyre data -----------------------
@@ -1005,7 +951,15 @@ namespace CrewChiefV4.rFactor1
 
         public SessionType mapToSessionType(Object memoryMappedFileStruct)
         {
-            // TODO: Detect Race session start (rFactor doesn't export session type)
+            rFactor1Data.rfShared shared = (rFactor1Data.rfShared)memoryMappedFileStruct;
+            if ((shared.numVehicles > 1 && shared.maxLaps < 200))
+            {
+                if (shared.startLight > 0 || shared.numRedLights > 0)
+                {
+                    return SessionType.Race;
+                }
+                return SessionType.Qualify;
+            }
             return SessionType.Practice;
         }
 
@@ -1039,7 +993,7 @@ namespace CrewChiefV4.rFactor1
             {
                 return 0;
             }
-            return Math.Min(100, ((1 - wearLevel) / wornOutTyreWearLevel) * 100);
+            return (1 - wearLevel) * 100;
         }
 
         private Boolean CheckIsCarRunning(rFactor1Data.rfShared shared)
