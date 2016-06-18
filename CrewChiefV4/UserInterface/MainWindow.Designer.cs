@@ -274,10 +274,12 @@ namespace CrewChiefV4
             this.gameDefinitionList.AllowDrop = true;
             this.gameDefinitionList.FormattingEnabled = true;
             this.gameDefinitionList.Items.AddRange(new object[] {
+            Configuration.getUIString("automobilista"),
             Configuration.getUIString("pcars_64_bit"),
             Configuration.getUIString("pcars_32_bit"),
             Configuration.getUIString("race_room"),
             Configuration.getUIString("pcars_udp"),
+            Configuration.getUIString("gamestockcar"),
             Configuration.getUIString("rfactor1")});
             this.gameDefinitionList.Location = new System.Drawing.Point(782, 28);
             this.gameDefinitionList.Name = "gameDefinitionList";
@@ -451,4 +453,3 @@ namespace CrewChiefV4
 
     }
 }
-

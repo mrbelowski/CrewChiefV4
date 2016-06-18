@@ -20,12 +20,17 @@ namespace CrewChiefV4
             "r3e_launch_exe", "r3e_launch_params", "launch_raceroom");
         public static GameDefinition pCarsNetwork = new GameDefinition(GameEnum.PCARS_NETWORK, Configuration.getUIString("pcars_udp"), null, "CrewChiefV4.PCars.PCarsSpotterv2",
             null, null, null);
-        public static GameDefinition rFactor1 = new GameDefinition(GameEnum.RF1, Configuration.getUIString("rfactor1"), null, "CrewChiefV4.rFactor1.RF1Spotter",
+        public static GameDefinition rFactor1 = new GameDefinition(GameEnum.RF1, Configuration.getUIString("rfactor1"), "rFactor", "CrewChiefV4.rFactor1.RF1Spotter",
             "rf1_launch_exe", "rf1_launch_params", "launch_rfactor1");
+        public static GameDefinition gameStockCar = new GameDefinition(GameEnum.RF1, Configuration.getUIString("gamestockcar"), "GSC", "CrewChiefV4.rFactor1.RF1Spotter",
+            "gsc_launch_exe", "gsc_launch_params", "launch_gsc");
+        public static GameDefinition automobilista = new GameDefinition(GameEnum.RF1, Configuration.getUIString("automobilista"), "AMS", "CrewChiefV4.rFactor1.RF1Spotter",
+            "ams_launch_exe", "ams_launch_params", "launch_ams");
 
         public static List<GameDefinition> getAllGameDefinitions()
         {
             List<GameDefinition> definitions = new List<GameDefinition>();
+            definitions.Add(automobilista); definitions.Add(gameStockCar);
             definitions.Add(pCars64Bit); definitions.Add(pCars32Bit); definitions.Add(raceRoom); definitions.Add(pCarsNetwork); definitions.Add(rFactor1);
             return definitions;
         }

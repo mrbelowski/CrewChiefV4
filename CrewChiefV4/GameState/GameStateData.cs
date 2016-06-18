@@ -392,7 +392,8 @@ namespace CrewChiefV4.GameState
         public Boolean isExitingPits()
         {
             LapData currentLap = getCurrentLapData();
-            return currentLap != null && currentLap.OutLap;
+            // hack for rFactor, DistanceRoundTrack is negative when leaving pit lane
+            return (currentLap != null && currentLap.OutLap) || DistanceRoundTrack < 0;
         }
 
         public float getLastLapTime()
