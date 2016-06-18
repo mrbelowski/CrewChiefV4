@@ -117,7 +117,7 @@ namespace CrewChiefV4.rFactor1
                 for (int i = 0; i < currentState.numVehicles; i++)
                 {
                     rfVehicleInfo vehicle = currentState.vehicle[i];
-                    if (vehicle.isPlayer == 1 || vehicle.inPits == 1)
+                    if (vehicle.isPlayer == 1 || vehicle.inPits == 1 || vehicle.lapDist < 0)
                     {
                         continue;
                     }

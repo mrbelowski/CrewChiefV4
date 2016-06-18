@@ -264,7 +264,11 @@ namespace CrewChiefV4.rFactor1
 
             //------------------------ Session data -----------------------
             FlagEnum Flag = FlagEnum.UNKNOWN;
-            if (shared.sectorFlag[player.sector] > (int)rFactor1Constant.rfYellowFlagState.noFlag)
+            if (currentGameState.SessionData.IsDisqualified && previousGameState != null && !previousGameState.SessionData.IsDisqualified)
+            {
+                Flag = FlagEnum.BLACK;
+            }
+            else if (shared.sectorFlag[player.sector] > (int)rFactor1Constant.rfYellowFlagState.noFlag)
             {
                 Flag = FlagEnum.YELLOW;
             }
@@ -281,7 +285,7 @@ namespace CrewChiefV4.rFactor1
             currentGameState.SessionData.CompletedLaps = player.totalLaps;     
             
             currentGameState.SessionData.LapTimeCurrent = shared.currentET - player.lapStartET;
-            currentGameState.SessionData.CurrentLapIsValid = player.numPenalties <= (previousGameState == null ? 0 : previousGameState.PenaltiesData.NumPenalties);
+            currentGameState.SessionData.CurrentLapIsValid = (player.numPenalties <= (previousGameState == null ? 0 : previousGameState.PenaltiesData.NumPenalties) && !currentGameState.SessionData.IsDisqualified);
             currentGameState.SessionData.LapTimePrevious = player.lastLapTime;
             currentGameState.SessionData.PreviousLapWasValid = player.lastLapTime > 0;
             currentGameState.SessionData.NumCars = shared.numVehicles;
@@ -585,8 +589,8 @@ namespace CrewChiefV4.rFactor1
 
                             Boolean isInSector1OnOutlap = currentOpponentData.CurrentSectorNumber == 1 &&
                                 (currentOpponentData.getCurrentLapData() != null && currentOpponentData.getCurrentLapData().OutLap);
-                            if (currentGameState.SessionData.SessionType == SessionType.Race && currentOpponentData.Position == participantStruct.place &&
-                                !isEnteringPits && !isLeavingPits && currentGameState.PositionAndMotionData.DistanceRoundTrack != 0 &&
+                            if (currentOpponentData.Position == participantStruct.place && participantStruct.totalLaps >= player.totalLaps && 
+                                !isEnteringPits && !isLeavingPits && participantStruct.inPits == 0 && participantStruct.lapDist > 0 && 
                                 currentOpponentData.Position + 1 < player.place && !isInSector1OnOutlap && 
                                 isBehindWithinDistance(shared.lapDist, 8, 80, currentGameState.PositionAndMotionData.DistanceRoundTrack, participantStruct.lapDist))
                             {
@@ -713,9 +717,23 @@ namespace CrewChiefV4.rFactor1
             currentGameState.TyreData.HasMatchedTyreTypes = true;
             currentGameState.TyreData.TireWearActive = true;
             TyreType tyreType = TyreType.Unknown_Race;
-            currentGameState.TyreData.FrontLeft_CenterTemp = shared.wheel[(int)rFactor1Constant.rfWheelIndex.frontLeft].temperature[1];
+            currentGameState.TyreData.LeftFrontAttached = shared.wheel[(int)rFactor1Constant.rfWheelIndex.frontLeft].detached == 0;
             currentGameState.TyreData.FrontLeft_LeftTemp = shared.wheel[(int)rFactor1Constant.rfWheelIndex.frontLeft].temperature[0];
+            currentGameState.TyreData.FrontLeft_CenterTemp = shared.wheel[(int)rFactor1Constant.rfWheelIndex.frontLeft].temperature[1];
             currentGameState.TyreData.FrontLeft_RightTemp = shared.wheel[(int)rFactor1Constant.rfWheelIndex.frontLeft].temperature[2];
+            //expected Celsius but Automobilista reports in Kelvin
+            if (currentGameState.TyreData.FrontLeft_LeftTemp > 273)
+            {
+                currentGameState.TyreData.FrontLeft_LeftTemp -= 273;
+            }
+            if (currentGameState.TyreData.FrontLeft_CenterTemp > 273)
+            {
+                currentGameState.TyreData.FrontLeft_CenterTemp -= 273;
+            }
+            if (currentGameState.TyreData.FrontLeft_RightTemp > 273)
+            {
+                currentGameState.TyreData.FrontLeft_RightTemp -= 273;
+            }
             float frontLeftTemp = (currentGameState.TyreData.FrontLeft_CenterTemp + currentGameState.TyreData.FrontLeft_LeftTemp + currentGameState.TyreData.FrontLeft_RightTemp) / 3;
             currentGameState.TyreData.FrontLeftTyreType = tyreType;
             currentGameState.TyreData.FrontLeftPressure = shared.wheel[(int)rFactor1Constant.rfWheelIndex.frontLeft].pressure;
@@ -729,9 +747,23 @@ namespace CrewChiefV4.rFactor1
                 currentGameState.TyreData.PeakFrontLeftTemperatureForLap = frontLeftTemp;
             }
 
-            currentGameState.TyreData.FrontRight_CenterTemp = shared.wheel[(int)rFactor1Constant.rfWheelIndex.frontRight].temperature[1];
+            currentGameState.TyreData.RightFrontAttached = shared.wheel[(int)rFactor1Constant.rfWheelIndex.frontRight].detached == 0;
             currentGameState.TyreData.FrontRight_LeftTemp = shared.wheel[(int)rFactor1Constant.rfWheelIndex.frontRight].temperature[0];
+            currentGameState.TyreData.FrontRight_CenterTemp = shared.wheel[(int)rFactor1Constant.rfWheelIndex.frontRight].temperature[1];
             currentGameState.TyreData.FrontRight_RightTemp = shared.wheel[(int)rFactor1Constant.rfWheelIndex.frontRight].temperature[2];
+            //expected Celsius but Automobilista reports in Kelvin
+            if (currentGameState.TyreData.FrontRight_LeftTemp > 273)
+            {
+                currentGameState.TyreData.FrontRight_LeftTemp -= 273;
+            }
+            if (currentGameState.TyreData.FrontRight_CenterTemp > 273)
+            {
+                currentGameState.TyreData.FrontRight_CenterTemp -= 273;
+            }
+            if (currentGameState.TyreData.FrontRight_RightTemp > 273)
+            {
+                currentGameState.TyreData.FrontRight_RightTemp -= 273;
+            }
             float frontRightTemp = (currentGameState.TyreData.FrontRight_CenterTemp + currentGameState.TyreData.FrontRight_LeftTemp + currentGameState.TyreData.FrontRight_RightTemp) / 3;
             currentGameState.TyreData.FrontRightTyreType = tyreType;
             currentGameState.TyreData.FrontRightPressure = shared.wheel[(int)rFactor1Constant.rfWheelIndex.frontRight].pressure;
@@ -745,9 +777,23 @@ namespace CrewChiefV4.rFactor1
                 currentGameState.TyreData.PeakFrontRightTemperatureForLap = frontRightTemp;
             }
 
-            currentGameState.TyreData.RearLeft_CenterTemp = shared.wheel[(int)rFactor1Constant.rfWheelIndex.rearLeft].temperature[1];
+            currentGameState.TyreData.LeftRearAttached = shared.wheel[(int)rFactor1Constant.rfWheelIndex.rearLeft].detached == 0;
             currentGameState.TyreData.RearLeft_LeftTemp = shared.wheel[(int)rFactor1Constant.rfWheelIndex.rearLeft].temperature[0];
+            currentGameState.TyreData.RearLeft_CenterTemp = shared.wheel[(int)rFactor1Constant.rfWheelIndex.rearLeft].temperature[1];
             currentGameState.TyreData.RearLeft_RightTemp = shared.wheel[(int)rFactor1Constant.rfWheelIndex.rearLeft].temperature[2];
+            //expected Celsius but Automobilista reports in Kelvin
+            if (currentGameState.TyreData.RearLeft_LeftTemp > 273)
+            {
+                currentGameState.TyreData.RearLeft_LeftTemp -= 273;
+            }
+            if (currentGameState.TyreData.RearLeft_CenterTemp > 273)
+            {
+                currentGameState.TyreData.RearLeft_CenterTemp -= 273;
+            }
+            if (currentGameState.TyreData.RearLeft_RightTemp > 273)
+            {
+                currentGameState.TyreData.RearLeft_RightTemp -= 273;
+            }
             float rearLeftTemp = (currentGameState.TyreData.RearLeft_CenterTemp + currentGameState.TyreData.RearLeft_LeftTemp + currentGameState.TyreData.RearLeft_RightTemp) / 3;
             currentGameState.TyreData.RearLeftTyreType = tyreType;
             currentGameState.TyreData.RearLeftPressure = shared.wheel[(int)rFactor1Constant.rfWheelIndex.rearLeft].pressure;
@@ -761,9 +807,23 @@ namespace CrewChiefV4.rFactor1
                 currentGameState.TyreData.PeakRearLeftTemperatureForLap = rearLeftTemp;
             }
 
-            currentGameState.TyreData.RearRight_CenterTemp = shared.wheel[(int)rFactor1Constant.rfWheelIndex.rearRight].temperature[1];
+            currentGameState.TyreData.RightRearAttached = shared.wheel[(int)rFactor1Constant.rfWheelIndex.rearRight].detached == 0;
             currentGameState.TyreData.RearRight_LeftTemp = shared.wheel[(int)rFactor1Constant.rfWheelIndex.rearRight].temperature[0];
+            currentGameState.TyreData.RearRight_CenterTemp = shared.wheel[(int)rFactor1Constant.rfWheelIndex.rearRight].temperature[1];
             currentGameState.TyreData.RearRight_RightTemp = shared.wheel[(int)rFactor1Constant.rfWheelIndex.rearRight].temperature[2];
+            //expected Celsius but Automobilista reports in Kelvin
+            if (currentGameState.TyreData.RearRight_LeftTemp > 273)
+            {
+                currentGameState.TyreData.RearRight_LeftTemp -= 273;
+            }
+            if (currentGameState.TyreData.RearRight_CenterTemp > 273)
+            {
+                currentGameState.TyreData.RearRight_CenterTemp -= 273;
+            }
+            if (currentGameState.TyreData.RearRight_RightTemp > 273)
+            {
+                currentGameState.TyreData.RearRight_RightTemp -= 273;
+            }
             float rearRightTemp = (currentGameState.TyreData.RearRight_CenterTemp + currentGameState.TyreData.RearRight_LeftTemp + currentGameState.TyreData.RearRight_RightTemp) / 3;
             currentGameState.TyreData.RearRightTyreType = tyreType;
             currentGameState.TyreData.RearRightPressure = shared.wheel[(int)rFactor1Constant.rfWheelIndex.rearRight].pressure;
@@ -810,6 +870,13 @@ namespace CrewChiefV4.rFactor1
                 currentGameState.TyreData.LeftRearIsSpinning = Math.Abs(shared.wheel[(int)rFactor1Constant.rfWheelIndex.rearLeft].rotation) > maxRotatingSpeed;
                 currentGameState.TyreData.RightRearIsSpinning = Math.Abs(shared.wheel[(int)rFactor1Constant.rfWheelIndex.rearRight].rotation) > maxRotatingSpeed;
             }
+
+            if (currentGameState.Conditions.timeOfMostRecentSample.Add(ConditionsMonitor.ConditionsSampleFrequency) < currentGameState.Now)
+            {
+                currentGameState.Conditions.addSample(currentGameState.Now, currentGameState.SessionData.CompletedLaps, currentGameState.SessionData.SectorNumber,
+                    shared.ambientTemp, shared.trackTemp, 0, (float)Math.Sqrt((double)(shared.wind.x * shared.wind.x + shared.wind.y * shared.wind.y + shared.wind.z * shared.wind.z)), 0, 0, 0);
+            }
+            
             return currentGameState;
         }
 
