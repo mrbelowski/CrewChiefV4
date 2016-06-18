@@ -17,15 +17,15 @@ namespace CrewChiefV4
         public static GameDefinition pCars32Bit = new GameDefinition(GameEnum.PCARS_32BIT, Configuration.getUIString("pcars_32_bit"), "pCARS",
             "CrewChiefV4.PCars.PCarsSpotterv2", "pcars32_launch_exe", "pcars32_launch_params", "launch_pcars");
         public static GameDefinition raceRoom = new GameDefinition(GameEnum.RACE_ROOM, Configuration.getUIString("race_room"), "RRRE", "CrewChiefV4.RaceRoom.R3ESpotterv2",
-            "steam_exe", "r3e_steam_id", "launch_raceroom");
+            "r3e_launch_exe", "r3e_launch_params", "launch_raceroom");
         public static GameDefinition pCarsNetwork = new GameDefinition(GameEnum.PCARS_NETWORK, Configuration.getUIString("pcars_udp"), null, "CrewChiefV4.PCars.PCarsSpotterv2",
             null, null, null);
         public static GameDefinition rFactor1 = new GameDefinition(GameEnum.RF1, Configuration.getUIString("rfactor1"), "rFactor", "CrewChiefV4.rFactor1.RF1Spotter",
-            "steam_exe", "rf1_steam_id", "launch_rfactor1");
+            "rf1_launch_exe", "rf1_launch_params", "launch_rfactor1");
         public static GameDefinition gameStockCar = new GameDefinition(GameEnum.RF1, Configuration.getUIString("gamestockcar"), "GSC", "CrewChiefV4.rFactor1.RF1Spotter",
-            "steam_exe", "gsc_steam_id", "launch_gsc");
+            "gsc_launch_exe", "gsc_launch_params", "launch_gsc");
         public static GameDefinition automobilista = new GameDefinition(GameEnum.RF1, Configuration.getUIString("automobilista"), "AMS", "CrewChiefV4.rFactor1.RF1Spotter",
-            "steam_exe", "ams_steam_id", "launch_ams");
+            "ams_launch_exe", "ams_launch_params", "launch_ams");
 
         public static List<GameDefinition> getAllGameDefinitions()
         {

@@ -385,19 +385,19 @@ namespace CrewChiefV4.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("-applaunch 211500")]
-        public string r3e_steam_id {
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string r3e_launch_params {
             get {
-                return ((string)(this["r3e_steam_id"]));
+                return ((string)(this["r3e_launch_params"]));
             }
             set {
-                this["r3e_steam_id"] = value;
+                this["r3e_launch_params"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool launch_raceroom {
             get {
                 return ((bool)(this["launch_raceroom"]));
@@ -1382,30 +1382,30 @@ namespace CrewChiefV4.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("-applaunch 339790")]
-        public string rf1_steam_id {
+        public string rf1_launch_params {
             get {
-                return ((string)(this["rf1_steam_id"]));
+                return ((string)(this["rf1_launch_params"]));
             }
             set {
-                this["rf1_steam_id"] = value;
+                this["rf1_launch_params"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("C:/Program Files (x86)/Steam/Steam.exe")]
-        public string steam_exe {
+        public string rf1_launch_exe {
             get {
-                return ((string)(this["steam_exe"]));
+                return ((string)(this["rf1_launch_exe"]));
             }
             set {
-                this["steam_exe"] = value;
+                this["rf1_launch_exe"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool launch_rfactor1 {
             get {
                 return ((bool)(this["launch_rfactor1"]));
@@ -1417,7 +1417,7 @@ namespace CrewChiefV4.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool launch_gsc {
             get {
                 return ((bool)(this["launch_gsc"]));
@@ -1429,7 +1429,7 @@ namespace CrewChiefV4.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool launch_ams {
             get {
                 return ((bool)(this["launch_ams"]));
@@ -1442,24 +1442,61 @@ namespace CrewChiefV4.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("-applaunch 273840")]
-        public string gsc_steam_id {
+        public string gsc_launch_params {
             get {
-                return ((string)(this["gsc_steam_id"]));
+                return ((string)(this["gsc_launch_params"]));
             }
             set {
-                this["gsc_steam_id"] = value;
+                this["gsc_launch_params"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("-applaunch 431600")]
-        public string ams_steam_id {
+        public string ams_launch_params {
             get {
-                return ((string)(this["ams_steam_id"]));
+                return ((string)(this["ams_launch_params"]));
             }
             set {
-                this["ams_steam_id"] = value;
+                this["ams_launch_params"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("C:/Program Files (x86)/Steam/Steam.exe")]
+        public string gsc_launch_exe {
+            get {
+                return ((string)(this["gsc_launch_exe"]));
+            }
+            set {
+                this["gsc_launch_exe"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("C:/Program Files (x86)/Steam/Steam.exe")]
+        public string ams_launch_exe {
+            get {
+                return ((string)(this["ams_launch_exe"]));
+            }
+            set {
+                this["ams_launch_exe"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("C:/Program Files (x86)/Steam/steamapps/common/raceroom racing experience/Game/RRR" +
+            "E.exe")]
+        public string r3e_launch_exe {
+            get {
+                return ((string)(this["r3e_launch_exe"]));
+            }
+            set {
+                this["r3e_launch_exe"] = value;
             }
         }
     }
