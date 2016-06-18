@@ -93,7 +93,7 @@
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="r3e_launch_params" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">-applaunch 211500</Value>
     </Setting>
     <Setting Name="launch_raceroom" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
@@ -129,10 +129,10 @@
       <Value Profile="(Default)">50</Value>
     </Setting>
     <Setting Name="pcars64_launch_exe" Type="System.String" Scope="User">
-      <Value Profile="(Default)">c:/games/steam/steamapps/common/pCars/pCARS.exe</Value>
+      <Value Profile="(Default)">C:/Program Files (x86)/steam/steamapps/common/pCars/pCARS.exe</Value>
     </Setting>
     <Setting Name="pcars32_launch_exe" Type="System.String" Scope="User">
-      <Value Profile="(Default)">c:/games/steam/steamapps/common/pCars/pCARS.exe</Value>
+      <Value Profile="(Default)">C:/Program Files (x86)/steam/steamapps/common/pCars/pCARS.exe</Value>
     </Setting>
     <Setting Name="pcars64_launch_params" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
@@ -369,7 +369,7 @@
       <Value Profile="(Default)">C:/Program Files (x86)/Steam/Steam.exe</Value>
     </Setting>
     <Setting Name="r3e_launch_exe" Type="System.String" Scope="User">
-      <Value Profile="(Default)">C:/Program Files (x86)/Steam/steamapps/common/raceroom racing experience/Game/RRRE.exe</Value>
+      <Value Profile="(Default)">C:/Program Files (x86)/Steam/Steam.exe</Value>
     </Setting>
   </Settings>
 </SettingsFile>
