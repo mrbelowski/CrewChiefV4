@@ -92,14 +92,11 @@
     <Setting Name="custom_device_guid" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="r3e_launch_params" Type="System.String" Scope="User">
+    <Setting Name="r3e_steam_id" Type="System.String" Scope="User">
       <Value Profile="(Default)">-applaunch 211500</Value>
     </Setting>
-    <Setting Name="r3e_launch_exe" Type="System.String" Scope="User">
-      <Value Profile="(Default)">c:/games/steam/steam.exe</Value>
-    </Setting>
     <Setting Name="launch_raceroom" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
+      <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="run_immediately" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
@@ -344,14 +341,26 @@
     <Setting Name="rf1_spotter_car_length" Type="System.Single" Scope="User">
       <Value Profile="(Default)">4.5</Value>
     </Setting>
-    <Setting Name="rf1_launch_params" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
+    <Setting Name="rf1_steam_id" Type="System.String" Scope="User">
+      <Value Profile="(Default)">-applaunch 339790</Value>
     </Setting>
-    <Setting Name="rf1_launch_exe" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
+    <Setting Name="steam_exe" Type="System.String" Scope="User">
+      <Value Profile="(Default)">C:/Program Files (x86)/Steam/Steam.exe</Value>
     </Setting>
-    <Setting Name="launch_rfactor1" Type="System.String" Scope="User">
-      <Value Profile="(Default)">False</Value>
+    <Setting Name="launch_rfactor1" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="launch_gsc" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="launch_ams" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="gsc_steam_id" Type="System.String" Scope="User">
+      <Value Profile="(Default)">-applaunch 273840</Value>
+    </Setting>
+    <Setting Name="ams_steam_id" Type="System.String" Scope="User">
+      <Value Profile="(Default)">-applaunch 431600</Value>
     </Setting>
   </Settings>
 </SettingsFile>
