@@ -26,11 +26,15 @@ namespace CrewChiefV4
             "gsc_launch_exe", "gsc_launch_params", "launch_gsc");
         public static GameDefinition automobilista = new GameDefinition(GameEnum.RF1, Configuration.getUIString("automobilista"), "AMS", "CrewChiefV4.rFactor1.RF1Spotter",
             "ams_launch_exe", "ams_launch_params", "launch_ams");
+        public static GameDefinition marcas = new GameDefinition(GameEnum.RF1, Configuration.getUIString("marcas"), "MARCAS", "CrewChiefV4.rFactor1.RF1Spotter",
+            "marcas_launch_exe", "marcas_launch_params", "launch_marcas");
+        public static GameDefinition ftruck = new GameDefinition(GameEnum.RF1, Configuration.getUIString("ftruck"), "FTRUCK", "CrewChiefV4.rFactor1.RF1Spotter",
+            "ftruck_launch_exe", "ftruck_launch_params", "launch_ftruck");
 
         public static List<GameDefinition> getAllGameDefinitions()
         {
             List<GameDefinition> definitions = new List<GameDefinition>();
-            definitions.Add(automobilista); definitions.Add(gameStockCar);
+            definitions.Add(automobilista); definitions.Add(gameStockCar); definitions.Add(marcas); definitions.Add(ftruck);
             definitions.Add(pCars64Bit); definitions.Add(pCars32Bit); definitions.Add(raceRoom); definitions.Add(pCarsNetwork); definitions.Add(rFactor1);
             return definitions;
         }
