@@ -95,13 +95,11 @@ namespace CrewChiefV4.rFactor1
 
             currentGameState.SessionData.SessionType = mapToSessionType(shared);
             currentGameState.SessionData.SessionRunningTime = shared.currentET;
-            currentGameState.ControlData.ControlType = mapToControlType(player.control); // TODO: the rest of the control data
+            currentGameState.ControlData.ControlType = mapToControlType((rFactor1Constant.rfControl)player.control);
             currentGameState.SessionData.NumCarsAtStartOfSession = shared.numVehicles;
             currentGameState.SessionData.IsDisqualified = player.finishStatus == (int)rFactor1Constant.rfFinishStatus.dq;
             int previousLapsCompleted = previousGameState == null ? 0 : previousGameState.SessionData.CompletedLaps;
-            currentGameState.SessionData.SessionPhase = mapToSessionPhase(lastSessionPhase, currentGameState.SessionData.SessionType, lastSessionRunningTime,
-                currentGameState.SessionData.SessionRunningTime, shared.gamePhase, currentGameState.ControlData.ControlType,
-                previousLapsCompleted, shared.lapNumber, isCarRunning);
+            currentGameState.SessionData.SessionPhase = mapToSessionPhase((rFactor1Constant.rfGamePhase)shared.gamePhase);
 
             List<String> opponentDriverNamesProcessedThisUpdate = new List<String>();
 
@@ -174,11 +172,13 @@ namespace CrewChiefV4.rFactor1
                     {
                         justGoneGreen = true;
                         // just gone green, so get the session data
-                        if (shared.maxLaps > 0)
+                        // maxLaps == 2^32 - 1 means no lap limit
+                        if (shared.maxLaps > 0 && shared.maxLaps < 1000)
                         {
                             currentGameState.SessionData.SessionNumberOfLaps = shared.maxLaps;
                             currentGameState.SessionData.SessionHasFixedTime = false;
                         }
+                        // endET < 0 means no time limit
                         if (shared.endET > 0)
                         {
                             currentGameState.SessionData.SessionTotalRunTime = shared.endET;
@@ -279,6 +279,10 @@ namespace CrewChiefV4.rFactor1
             else if (shared.yellowFlagState == (int)rFactor1Constant.rfYellowFlagState.lastLap)
             {
                 Flag = FlagEnum.WHITE;
+            }
+            else if (shared.gamePhase == (int)rFactor1Constant.rfYellowFlagState.noFlag && previousGameState != null && previousGameState.SessionData.Flag == FlagEnum.DOUBLE_YELLOW)
+            {
+                Flag = FlagEnum.GREEN;
             }
             currentGameState.SessionData.Flag = Flag;
             currentGameState.SessionData.SessionTimeRemaining = shared.endET - shared.currentET;
@@ -639,42 +643,74 @@ namespace CrewChiefV4.rFactor1
             }
                         
             //------------------------ Car damage data -----------------------
-            //FIXME: this is a highly simplified way of looking at damage
+            // not 100% on this mapping but it should be reasonably good until proven otherwise
             currentGameState.CarDamageData.DamageEnabled = true;
-            int majorDent = 0;
-            int minorDent = 0;
-            foreach (byte dent in shared.dentSeverity)
+            int bodyDamage = 0;
+            int engineDamage = 0;
+            int transmissionDamage = 0;
+            for (int i = 0; i < shared.dentSeverity.Length; i++)
             {
-                if (dent == 2)
+                int dent = shared.dentSeverity[i];
+                switch (i)
                 {
-                    majorDent++;
+                    case 3:
+                        transmissionDamage = dent;
+                        break;
+                    case 4:
+                        engineDamage = dent;
+                        break;
+                    default:
+                        bodyDamage += dent;
+                        break;
                 }
-                else if (dent == 1)
-                {
-                    minorDent++;
-                }
             }
-            if (minorDent >= 6 || majorDent >= 3)
+            switch (bodyDamage)
             {
-                currentGameState.CarDamageData.OverallAeroDamage = DamageLevel.DESTROYED;
+                // there's suspension damage included in these bytes but I'm not sure which ones
+                case 0:
+                    currentGameState.CarDamageData.OverallAeroDamage = DamageLevel.NONE;
+                    break;
+                case 1:
+                    currentGameState.CarDamageData.OverallAeroDamage = DamageLevel.TRIVIAL;
+                    break;
+                case 2:
+                    currentGameState.CarDamageData.OverallAeroDamage = DamageLevel.MINOR;
+                    break;
+                case 3:
+                case 4:
+                case 5:
+                    currentGameState.CarDamageData.OverallAeroDamage = DamageLevel.MAJOR;
+                    break;
+                default:
+                    currentGameState.CarDamageData.OverallAeroDamage = DamageLevel.DESTROYED;
+                    break;
             }
-            else if ((minorDent >= 4 || majorDent >= 2) || (majorDent >= 1 && majorDent >= 3))
+            switch (engineDamage)
             {
-                currentGameState.CarDamageData.OverallAeroDamage = DamageLevel.MAJOR;
+                // there is no "TRIVIAL" engine damage as even at the first level there's a chance of the engine seizing
+                case 1:
+                    currentGameState.CarDamageData.OverallEngineDamage = DamageLevel.MAJOR;
+                    break;
+                case 2:
+                    currentGameState.CarDamageData.OverallEngineDamage = DamageLevel.DESTROYED;
+                    break;
+                default:
+                    currentGameState.CarDamageData.OverallEngineDamage = DamageLevel.NONE;
+                    break;
             }
-            else if (minorDent >= 2 || majorDent >= 1)
+            switch (transmissionDamage)
             {
-                currentGameState.CarDamageData.OverallAeroDamage = DamageLevel.MINOR;
+                // it seems that even at the first level the transmission is already toast
+                case 1:
+                    currentGameState.CarDamageData.OverallTransmissionDamage = DamageLevel.MAJOR;
+                    break;
+                case 2:
+                    currentGameState.CarDamageData.OverallTransmissionDamage = DamageLevel.DESTROYED;
+                    break;
+                default:
+                    currentGameState.CarDamageData.OverallTransmissionDamage = DamageLevel.NONE;
+                    break;
             }
-            else if (minorDent == 1)
-            {
-                currentGameState.CarDamageData.OverallAeroDamage = DamageLevel.TRIVIAL;
-            }
-            else
-            {
-                currentGameState.CarDamageData.OverallAeroDamage = DamageLevel.NONE;
-            }
-
             
             //------------------------ Engine data -----------------------            
             currentGameState.EngineData.EngineRpm = shared.engineRPM;
@@ -701,7 +737,7 @@ namespace CrewChiefV4.rFactor1
 
 
             //------------------------ Pit stop data -----------------------            
-            currentGameState.PitData.PitWindow = mapToPitWindow(shared.yellowFlagState);
+            currentGameState.PitData.PitWindow = mapToPitWindow((rFactor1Constant.rfYellowFlagState)shared.yellowFlagState);
             currentGameState.PitData.IsMakingMandatoryPitStop = (currentGameState.PitData.PitWindow == PitWindow.Open || currentGameState.PitData.PitWindow == PitWindow.StopInProgress) &&
                (currentGameState.PitData.OnInLap || currentGameState.PitData.OnOutLap);
 
@@ -931,126 +967,89 @@ namespace CrewChiefV4.rFactor1
             }
         }
         
-        private PitWindow mapToPitWindow(int pitWindow)
+        private PitWindow mapToPitWindow(rFactor1Constant.rfYellowFlagState pitWindow)
         {
-            if ((int)rFactor1Constant.rfYellowFlagState.pitClosed == pitWindow)
+            switch (pitWindow)
             {
-                return PitWindow.Closed;
-            }
-            else if ((int)rFactor1Constant.rfYellowFlagState.pitOpen == pitWindow || (int)rFactor1Constant.rfYellowFlagState.pitLeadLap == pitWindow)
-            {
-                return PitWindow.Open;
-            }
-            else
-            {
-                return PitWindow.Unavailable;
+                case rFactor1Constant.rfYellowFlagState.pitClosed:
+                    return PitWindow.Closed;
+                case rFactor1Constant.rfYellowFlagState.pitOpen:
+                case rFactor1Constant.rfYellowFlagState.pitLeadLap:
+                    return PitWindow.Open;
+                default:
+                    return PitWindow.Unavailable;
             }
         }
 
-        /**
-         * Gets the current session phase. If the transition is valid this is returned, otherwise the
-         * previous phase is returned
-         */
-        private SessionPhase mapToSessionPhase(SessionPhase lastSessionPhase, SessionType currentSessionType, float lastSessionRunningTime, float thisSessionRunningTime, 
-            int sessionPhase, ControlType controlType, int previousLapsCompleted, int currentLapsCompleted, Boolean isCarRunning)
+        private SessionPhase mapToSessionPhase(rFactor1Constant.rfGamePhase sessionPhase)
         {
-
-            /* prac and qual sessions go chequered after the allotted time. They never go 'finished'. If we complete a lap
-             * during this period we can detect the session end and trigger the finish message. Otherwise we just can't detect
-             * this period end - hence the 'isCarRunning' hack...
-            */
-            if ((int)rFactor1Constant.rfGamePhase.sessionStopped == sessionPhase)
+            switch (sessionPhase)
             {
-                if (lastSessionPhase == SessionPhase.Green)
-                {
-                    // only allow a transition to checkered if the last state was green
-                    Console.WriteLine("checkered - completed " + currentLapsCompleted + " laps, session running time = " + thisSessionRunningTime);
-                    return SessionPhase.Checkered;
-                }
-                else if (SessionPhase.Checkered == lastSessionPhase)
-                {
-                    if (previousLapsCompleted != currentLapsCompleted || controlType == ControlType.AI ||
-                        ((currentSessionType == SessionType.Qualify || currentSessionType == SessionType.Practice) && !isCarRunning))
-                    {
-                        Console.WriteLine("finished - completed " + currentLapsCompleted + " laps (was " + previousLapsCompleted + "), session running time = " +
-                            thisSessionRunningTime + " control type = " + controlType);
-                        return SessionPhase.Finished;
-                    }
-                }
-            }
-            else if ((int)rFactor1Constant.rfGamePhase.countdown == sessionPhase)
-            {
-                // don't allow a transition to Countdown if the game time has increased
-                if (lastSessionRunningTime < thisSessionRunningTime)
-                {
+                case rFactor1Constant.rfGamePhase.countdown:
                     return SessionPhase.Countdown;
-                }
-            }
-            else if ((int)rFactor1Constant.rfGamePhase.formation == sessionPhase)
-            {
-                return SessionPhase.Formation;
-            }
-            else if ((int)rFactor1Constant.rfGamePhase.garage == sessionPhase)
-            {
-                return SessionPhase.Garage;
-            }
-            else if ((int)rFactor1Constant.rfGamePhase.greenFlag == sessionPhase)
-            {
-                if (controlType == ControlType.AI && thisSessionRunningTime < 30)
-                {
+                // warmUp never happens, but just in case
+                case rFactor1Constant.rfGamePhase.warmUp:
+                case rFactor1Constant.rfGamePhase.formation:
                     return SessionPhase.Formation;
-                }
-                else
-                {
+                case rFactor1Constant.rfGamePhase.garage:
+                    return SessionPhase.Garage;
+                case rFactor1Constant.rfGamePhase.gridWalk:
+                    return SessionPhase.Gridwalk;
+                // sessions never go to sessionStopped, they always go straight from greenFlag to sessionOver
+                case rFactor1Constant.rfGamePhase.sessionStopped:
+                case rFactor1Constant.rfGamePhase.sessionOver:
+                    return SessionPhase.Finished;
+                // fullCourseYellow will count as greenFlag since we'll call it out in the Flags separately anyway
+                case rFactor1Constant.rfGamePhase.fullCourseYellow:
+                case rFactor1Constant.rfGamePhase.greenFlag:
                     return SessionPhase.Green;
-                }
+                default:
+                    return SessionPhase.Unavailable;
             }
-            else if ((int)rFactor1Constant.rfGamePhase.gridWalk == sessionPhase)
-            {
-                return SessionPhase.Gridwalk;
-            }
-            else if ((int)rFactor1Constant.rfGamePhase.sessionOver == sessionPhase)
-            {
-                return SessionPhase.Finished;
-            }
-            return lastSessionPhase;
         }
 
         public SessionType mapToSessionType(Object memoryMappedFileStruct)
         {
             rFactor1Data.rfShared shared = (rFactor1Data.rfShared)memoryMappedFileStruct;
-            if ((shared.numVehicles > 1 && shared.maxLaps < 200))
+            switch (shared.session)
             {
-                if (shared.startLight > 0 || shared.numRedLights > 0)
-                {
+                // up to four possible practice sessions
+                // test day and pre-race warm-up sessions are 'Practice' as well since 'HotLap' seems to suppress flag info
+                case 1:
+                case 2:
+                case 3:
+                case 4:
+                case 0:
+                case 9:
+                    return SessionType.Practice;
+                // up to four possible qualifying sessions
+                case 5:
+                case 6:
+                case 7:
+                case 8:
+                    return SessionType.Qualify;
+                // only one race session
+                case 10:
                     return SessionType.Race;
-                }
-                return SessionType.Qualify;
+                default:
+                    return SessionType.Unavailable;
             }
-            return SessionType.Practice;
         }
 
-        private ControlType mapToControlType(int controlType)
+        private ControlType mapToControlType(rFactor1Constant.rfControl controlType)
         {
-            if ((int)rFactor1Constant.rfControl.ai == controlType)
+            switch (controlType)
             {
-                return ControlType.AI;
-            }
-            else if ((int)rFactor1Constant.rfControl.player == controlType)
-            {
-                return ControlType.Player;
-            }
-            else if ((int)rFactor1Constant.rfControl.remote == controlType)
-            {
-                return ControlType.Remote;
-            }
-            else if ((int)rFactor1Constant.rfControl.replay == controlType)
-            {
-                return ControlType.Replay;
-            }
-            else
-            {
-                return ControlType.Unavailable;
+                case rFactor1Constant.rfControl.ai:
+                    return ControlType.AI;
+                case rFactor1Constant.rfControl.player:
+                    return ControlType.Player;
+                case rFactor1Constant.rfControl.remote:
+                    return ControlType.Remote;
+                case rFactor1Constant.rfControl.replay:
+                    return ControlType.Replay;
+                default:
+                    return ControlType.Unavailable;
             }
         }
 
