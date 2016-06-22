@@ -706,19 +706,25 @@ namespace CrewChiefV4.rFactor1
                 Console.WriteLine("SessionStartPosition " + currentGameState.SessionData.SessionStartPosition);
                 Console.WriteLine("SessionStartTime " + currentGameState.SessionData.SessionStartTime);
                 Console.WriteLine("TrackName " + currentGameState.SessionData.TrackDefinition.name);
-                Console.WriteLine("Player is using car class " + currentGameState.carClass.carClassEnum + " (class ID " + currentGameState.carClass.rF1ClassName + ")");
+                Console.WriteLine("Player is using car class " + currentGameState.carClass.carClassEnum + 
+                    " (class ID " + currentGameState.carClass.rF1ClassName + ")" + 
+                    " at position " + currentGameState.SessionData.Position.ToString());
             }
             if (previousGameState != null && previousGameState.SessionData.SessionPhase != currentGameState.SessionData.SessionPhase)
             {
-                Console.WriteLine("SessionPhase changed from " + previousGameState.SessionData.SessionPhase + " to " + currentGameState.SessionData.SessionPhase);
+                Console.WriteLine("SessionPhase changed from " + previousGameState.SessionData.SessionPhase + 
+                    " to " + currentGameState.SessionData.SessionPhase);
+                if (currentGameState.SessionData.SessionPhase == SessionPhase.Checkered || 
+                    currentGameState.SessionData.SessionPhase == SessionPhase.Finished)
+                {
+                    Console.WriteLine("Checkered - completed " + currentGameState.SessionData.CompletedLaps + 
+                        " laps, session running time = " + currentGameState.SessionData.SessionRunningTime);
+                }
             }
-            if (currentGameState.SessionData.LeaderHasFinishedRace)
+            if (previousGameState != null && !previousGameState.SessionData.LeaderHasFinishedRace && currentGameState.SessionData.LeaderHasFinishedRace)
             {
-                Console.WriteLine("Leader has finished race, player has done " + currentGameState.SessionData.CompletedLaps + " laps, session time = " + currentGameState.SessionData.SessionRunningTime);
-            }
-            if (currentGameState.SessionData.SessionPhase == SessionPhase.Finished)
-            {
-                Console.WriteLine("Checkered - completed " + currentGameState.SessionData.CompletedLaps + " laps, session running time = " + currentGameState.SessionData.SessionRunningTime);
+                Console.WriteLine("Leader has finished race, player has done " + currentGameState.SessionData.CompletedLaps + 
+                    " laps, session time = " + currentGameState.SessionData.SessionRunningTime);
             }
 
             return currentGameState;
