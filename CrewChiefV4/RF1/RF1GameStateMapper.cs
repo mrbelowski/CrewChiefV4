@@ -653,7 +653,8 @@ namespace CrewChiefV4.rFactor1
             }
             foreach (OpponentData opponent in currentGameState.OpponentData.Values)
             {
-                if (currentGameState.SessionData.CompletedLaps < 1 || 
+                if (currentGameState.SessionData.SessionType != SessionType.Race || 
+                    currentGameState.SessionData.CompletedLaps < 1 || 
                     currentGameState.PositionAndMotionData.DistanceRoundTrack < 0)
                 {
                     break;
