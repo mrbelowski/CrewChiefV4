@@ -31,6 +31,8 @@ namespace CrewChiefV4.rFactor1
 
         // if we're running only against AI, force the pit window to open
         private Boolean isOfflineSession = true;
+        // keep track of opponents processed this time
+        private List<String> opponentKeysProcessed = new List<String>();
 
         public RF1GameStateMapper()
         {
@@ -129,7 +131,14 @@ namespace CrewChiefV4.rFactor1
                 currentGameState.SessionData.TrackDefinition.name != previousGameState.SessionData.TrackDefinition.name ||
                 currentGameState.SessionData.TrackDefinition.trackLength != previousGameState.SessionData.TrackDefinition.trackLength ||
                 currentGameState.SessionData.SessionNumberOfLaps != previousGameState.SessionData.SessionNumberOfLaps ||
-                currentGameState.SessionData.SessionTotalRunTime != previousGameState.SessionData.SessionTotalRunTime; 
+                currentGameState.SessionData.SessionTotalRunTime != previousGameState.SessionData.SessionTotalRunTime || 
+                ((previousGameState.SessionData.SessionPhase == SessionPhase.Checkered || 
+                previousGameState.SessionData.SessionPhase == SessionPhase.Finished || 
+                previousGameState.SessionData.SessionPhase == SessionPhase.Green) && 
+                (currentGameState.SessionData.SessionPhase == SessionPhase.Garage || 
+                currentGameState.SessionData.SessionPhase == SessionPhase.Gridwalk ||
+                currentGameState.SessionData.SessionPhase == SessionPhase.Formation ||
+                currentGameState.SessionData.SessionPhase == SessionPhase.Countdown)); 
             currentGameState.SessionData.SessionPhase = mapToSessionPhase((rFactor1Constant.rfGamePhase)shared.gamePhase);
             currentGameState.SessionData.SessionStartTime = currentGameState.SessionData.IsNewSession ? currentGameState.Now : previousGameState.SessionData.SessionStartTime;
             currentGameState.SessionData.SessionHasFixedTime = currentGameState.SessionData.SessionTotalRunTime > 0;
@@ -461,6 +470,7 @@ namespace CrewChiefV4.rFactor1
             // --------------------------------
             // opponent data
             isOfflineSession = true;
+            opponentKeysProcessed.Clear();
             for (int i = 0; i < shared.vehicle.Length; i++)
             {
                 rFactor1Data.rfVehicleInfo vehicle = shared.vehicle[i];
@@ -484,16 +494,20 @@ namespace CrewChiefV4.rFactor1
                     default:
                         break;
                 }
-                String opponentKey = getNameFromBytes(vehicle.driverName).ToLower();
-                OpponentData opponentPrevious = previousGameState != null && previousGameState.OpponentData.ContainsKey(opponentKey) ? previousGameState.OpponentData[opponentKey] : null;
+                String opponentKey = getNameFromBytes(vehicle.vehicleClass).ToLower() + vehicle.place.ToString();
+                OpponentData opponentPrevious = getOpponentDataForVehicleInfo(vehicle, previousGameState, currentGameState.SessionData.SessionRunningTime);
                 OpponentData opponent = new OpponentData();
                 opponent.DriverRawName = getNameFromBytes(vehicle.driverName).ToLower();
                 opponent.DriverNameSet = opponent.DriverRawName.Length > 0;
                 opponent.CarClass = CarData.getCarClassForRF1ClassName(getNameFromBytes(vehicle.vehicleClass));
+                opponent.Position = vehicle.place;
                 if (opponent.DriverNameSet && opponentPrevious == null && CrewChief.enableDriverNames)
                 {
                     speechRecogniser.addNewOpponentName(opponent.DriverRawName);
-                    Console.WriteLine("New driver " + opponent.DriverRawName + " is using car class " + opponent.CarClass.carClassEnum + " (class ID " + opponent.CarClass.rF1ClassName + ")");
+                    Console.WriteLine("New driver " + opponent.DriverRawName + 
+                        " is using car class " + opponent.CarClass.carClassEnum + 
+                        " (class ID " + opponent.CarClass.rF1ClassName + ")" + 
+                        " at position " + opponent.Position.ToString());
                 }
                 if (opponentPrevious != null)
                 {
@@ -502,7 +516,6 @@ namespace CrewChiefV4.rFactor1
                         opponent.OpponentLapData.Add(old);
                     }
                 }
-                opponent.Position = vehicle.place;
                 opponent.UnFilteredPosition = opponent.Position;
                 opponent.SessionTimeAtLastPositionChange = opponentPrevious != null && opponentPrevious.Position != opponent.Position ? currentGameState.SessionData.SessionRunningTime : -1;
                 opponent.CompletedLaps = vehicle.totalLaps;
@@ -590,14 +603,10 @@ namespace CrewChiefV4.rFactor1
                 {
                     currentGameState.SessionData.PlayerClassSessionBestLapTime = opponent.CurrentBestLapTime;
                 }
-                // add generic duplicates...
+                // shouldn't have duplicates, but just in case
                 if (!currentGameState.OpponentData.ContainsKey(opponentKey))
                 {
                     currentGameState.OpponentData.Add(opponentKey, opponent);
-                }
-                else if (!currentGameState.OpponentData.ContainsKey(opponent.CarClass.rF1ClassName + opponent.Position.ToString()))
-                {
-                    currentGameState.OpponentData.Add(opponent.CarClass.rF1ClassName + opponent.Position.ToString(), opponent);
                 }
             }
             if (previousGameState != null)
@@ -759,6 +768,44 @@ namespace CrewChiefV4.rFactor1
                 default:
                     return SessionPhase.Unavailable;
             }
+        }
+
+        // finds OpponentData for given vehicle based on driver name, vehicle class, and world position
+        private OpponentData getOpponentDataForVehicleInfo(rfVehicleInfo vehicle, GameStateData previousGameState, float sessionRunningTime)
+        {
+            OpponentData opponentPrevious = null;
+            float timeDelta = sessionRunningTime - previousGameState.SessionData.SessionRunningTime;
+            if (previousGameState != null && timeDelta >= 0)
+            {
+                String driverName = getNameFromBytes(vehicle.driverName);
+                float[] worldPos = { vehicle.pos.x, vehicle.pos.z };
+                float minDistDiff = -1;
+                String opponentKey = null;
+                foreach (OpponentData o in previousGameState.OpponentData.Values)
+                {
+                    opponentKey = o.CarClass.rF1ClassName + o.Position.ToString();
+                    if (o.DriverRawName != driverName || 
+                        o.CarClass.rF1ClassName != getNameFromBytes(vehicle.vehicleClass) || 
+                        opponentKeysProcessed.Contains(opponentKey))
+                    {
+                        continue;
+                    }
+                    // distance from predicted position
+                    float targetDist = o.Speed * timeDelta;
+                    float dist = (float)Math.Abs(Math.Sqrt((double)((o.WorldPosition[0] - worldPos[0]) * (o.WorldPosition[0] - worldPos[0]) + 
+                        (o.WorldPosition[1] - worldPos[1]) * (o.WorldPosition[1] - worldPos[1]))) - targetDist);
+                    if (minDistDiff < 0 || dist < minDistDiff)
+                    {
+                        minDistDiff = dist;
+                        opponentPrevious = o;
+                    }
+                }
+                if (opponentPrevious != null)
+                {
+                    opponentKeysProcessed.Add(opponentKey);
+                }
+            }
+            return opponentPrevious;
         }
 
         public SessionType mapToSessionType(Object memoryMappedFileStruct)
