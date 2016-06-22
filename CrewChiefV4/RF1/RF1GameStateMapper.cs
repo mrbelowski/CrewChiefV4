@@ -179,6 +179,13 @@ namespace CrewChiefV4.rFactor1
                         break;
                 }
             }
+            if (previousGameState != null)
+            {
+                foreach (String lt in previousGameState.SessionData.formattedPlayerLapTimes)
+                {
+                    currentGameState.SessionData.formattedPlayerLapTimes.Add(lt);
+                }
+            }
             if (currentGameState.SessionData.IsNewLap && currentGameState.SessionData.LapTimePrevious > 0)
             {
                 currentGameState.SessionData.formattedPlayerLapTimes.Add(TimeSpan.FromSeconds(currentGameState.SessionData.LapTimePrevious).ToString(@"mm\:ss\.fff"));
