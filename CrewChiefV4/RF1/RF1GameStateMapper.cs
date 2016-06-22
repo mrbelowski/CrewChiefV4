@@ -33,6 +33,9 @@ namespace CrewChiefV4.rFactor1
         private Boolean isOfflineSession = true;
         // keep track of opponents processed this time
         private List<String> opponentKeysProcessed = new List<String>();
+        // detect when approaching racing surface after being off track
+        private float distanceOffTrack = 0;
+        private Boolean isApproachingTrack = false;
 
         public RF1GameStateMapper()
         {
@@ -687,7 +690,11 @@ namespace CrewChiefV4.rFactor1
             // --------------------------------
             // penalties data
             currentGameState.PenaltiesData.NumPenalties = player.numPenalties;
-            currentGameState.PenaltiesData.IsOffRacingSurface = !currentGameState.PitData.InPitlane && Math.Abs(player.pathLateral) - Math.Abs(player.trackEdge) >= 2;
+            float lateralDistDiff = (float)(Math.Abs(player.pathLateral) - Math.Abs(player.trackEdge));
+            currentGameState.PenaltiesData.IsOffRacingSurface = !currentGameState.PitData.InPitlane && lateralDistDiff >= 2;
+            float offTrackDistanceDelta = lateralDistDiff - distanceOffTrack;
+            distanceOffTrack = currentGameState.PenaltiesData.IsOffRacingSurface ? lateralDistDiff : 0;
+            isApproachingTrack = offTrackDistanceDelta < 0 && currentGameState.PenaltiesData.IsOffRacingSurface && lateralDistDiff < 3;
 
             // --------------------------------
             // console output
