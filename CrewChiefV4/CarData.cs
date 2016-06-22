@@ -105,6 +105,8 @@ namespace CrewChiefV4
             public float maxSafeOilTemp;
             public float minTyreCircumference;
             public float maxTyreCircumference;
+            // add rFactor class name
+            public String rF1ClassName;
 
             public CarClass(CarClassEnum carClassEnum, String[] pCarsClassNames, int[] raceroomClassIds, BrakeType brakeType, TyreType defaultTyreType, float maxSafeWaterTemp,
                 float maxSafeOilTemp, float minTyreCircumference, float maxTyreCircumference)
@@ -339,6 +341,14 @@ namespace CrewChiefV4
                 }
             }
             return getDefaultCarClass();
+        }
+
+        // returns default car class with rFactor vehicle class name
+        public static CarClass getCarClassForRF1ClassName(String rF1ClassName)
+        {
+            CarClass rFactorClass = getDefaultCarClass();
+            rFactorClass.rF1ClassName = rF1ClassName;
+            return rFactorClass;
         }
 
         public static CarClass getDefaultCarClass()
