@@ -452,23 +452,8 @@ namespace CrewChiefV4.rFactor1
             }
 
             // --------------------------------
-            // pit data
-            currentGameState.PitData.IsRefuellingAllowed = true;
-            currentGameState.PitData.HasMandatoryPitStop = shared.scheduledStops > 0 && player.numPitstops < shared.scheduledStops && currentGameState.SessionData.SessionType == SessionType.Race;
-            currentGameState.PitData.PitWindowStart = currentGameState.PitData.HasMandatoryPitStop ? 1 : 0;
-            currentGameState.PitData.PitWindowEnd = !currentGameState.PitData.HasMandatoryPitStop ? 0 : 
-                currentGameState.SessionData.SessionHasFixedTime ? (int)(currentGameState.SessionData.SessionTotalRunTime/60/(shared.scheduledStops + 1)) * (player.numPitstops + 1) + 1 : 
-                (int)(currentGameState.SessionData.SessionNumberOfLaps/(shared.scheduledStops + 1)) * (player.numPitstops + 1) + 1;
-            currentGameState.PitData.InPitlane = player.inPits == 1;
-            currentGameState.PitData.IsAtPitExit = previousGameState != null && previousGameState.PitData.InPitlane && !currentGameState.PitData.InPitlane;
-            currentGameState.PitData.OnOutLap = (previousGameState == null && currentGameState.PitData.InPitlane) ||
-                (previousGameState != null && previousGameState.PitData.OnOutLap && currentGameState.SessionData.SectorNumber == 1);
-            currentGameState.PitData.OnInLap = previousGameState != null && !previousGameState.PitData.InPitlane && currentGameState.PitData.InPitlane;
-            currentGameState.PitData.IsMakingMandatoryPitStop = currentGameState.PitData.HasMandatoryPitStop && currentGameState.PitData.OnInLap && currentGameState.SessionData.CompletedLaps > 0;
-            currentGameState.PitData.PitWindow = currentGameState.PitData.IsMakingMandatoryPitStop ? PitWindow.StopInProgress : mapToPitWindow((rFactor1Constant.rfYellowFlagState)shared.yellowFlagState);
-
-            // --------------------------------
             // opponent data
+            isOfflineSession = true;
             for (int i = 0; i < shared.vehicle.Length; i++)
             {
                 rFactor1Data.rfVehicleInfo vehicle = shared.vehicle[i];
@@ -619,6 +604,22 @@ namespace CrewChiefV4.rFactor1
                 currentGameState.SessionData.GameTimeAtLastPositionBehindChange = !currentGameState.SessionData.IsRacingSameCarBehind ? 
                     currentGameState.SessionData.SessionRunningTime : previousGameState.SessionData.GameTimeAtLastPositionBehindChange;
             }
+
+            // --------------------------------
+            // pit data
+            currentGameState.PitData.IsRefuellingAllowed = true;
+            currentGameState.PitData.HasMandatoryPitStop = shared.scheduledStops > 0 && player.numPitstops < shared.scheduledStops && currentGameState.SessionData.SessionType == SessionType.Race;
+            currentGameState.PitData.PitWindowStart = currentGameState.PitData.HasMandatoryPitStop ? 1 : 0;
+            currentGameState.PitData.PitWindowEnd = !currentGameState.PitData.HasMandatoryPitStop ? 0 :
+                currentGameState.SessionData.SessionHasFixedTime ? (int)(currentGameState.SessionData.SessionTotalRunTime / 60 / (shared.scheduledStops + 1)) * (player.numPitstops + 1) + 1 :
+                (int)(currentGameState.SessionData.SessionNumberOfLaps / (shared.scheduledStops + 1)) * (player.numPitstops + 1) + 1;
+            currentGameState.PitData.InPitlane = player.inPits == 1;
+            currentGameState.PitData.IsAtPitExit = previousGameState != null && previousGameState.PitData.InPitlane && !currentGameState.PitData.InPitlane;
+            currentGameState.PitData.OnOutLap = (previousGameState == null && currentGameState.PitData.InPitlane) ||
+                (previousGameState != null && previousGameState.PitData.OnOutLap && currentGameState.SessionData.SectorNumber == 1);
+            currentGameState.PitData.OnInLap = previousGameState != null && !previousGameState.PitData.InPitlane && currentGameState.PitData.InPitlane;
+            currentGameState.PitData.IsMakingMandatoryPitStop = currentGameState.PitData.HasMandatoryPitStop && currentGameState.PitData.OnInLap && currentGameState.SessionData.CompletedLaps > 0;
+            currentGameState.PitData.PitWindow = currentGameState.PitData.IsMakingMandatoryPitStop ? PitWindow.StopInProgress : mapToPitWindow((rFactor1Constant.rfYellowFlagState)shared.yellowFlagState);
 
             // --------------------------------
             // flags data
