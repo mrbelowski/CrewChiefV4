@@ -44,6 +44,9 @@ namespace CrewChiefV4.rFactor1
             tyreWearThresholds.Add(new CornerData.EnumWithThresholds(TyreCondition.MINOR_WEAR, minorTyreWearPercent, majorTyreWearPercent));
             tyreWearThresholds.Add(new CornerData.EnumWithThresholds(TyreCondition.MAJOR_WEAR, majorTyreWearPercent, wornOutTyreWearPercent));
             tyreWearThresholds.Add(new CornerData.EnumWithThresholds(TyreCondition.WORN_OUT, wornOutTyreWearPercent, 10000));
+
+            suspensionDamageThresholds.Add(new CornerData.EnumWithThresholds(DamageLevel.NONE, 0, 1));
+            suspensionDamageThresholds.Add(new CornerData.EnumWithThresholds(DamageLevel.DESTROYED, 1, 2));
         }
 
         public void versionCheck(Object memoryMappedFileStruct)
@@ -462,6 +465,11 @@ namespace CrewChiefV4.rFactor1
                 currentGameState.TyreData.LeftRearIsSpinning = Math.Abs(shared.wheel[(int)rFactor1Constant.rfWheelIndex.rearLeft].rotation) > maxRotatingSpeed;
                 currentGameState.TyreData.RightRearIsSpinning = Math.Abs(shared.wheel[(int)rFactor1Constant.rfWheelIndex.rearRight].rotation) > maxRotatingSpeed;
             }
+            currentGameState.CarDamageData.SuspensionDamageStatus = CornerData.getCornerData(suspensionDamageThresholds,
+                !currentGameState.TyreData.LeftFrontAttached ? 1 : 0,
+                !currentGameState.TyreData.RightFrontAttached ? 1 : 0,
+                !currentGameState.TyreData.LeftRearAttached ? 1 : 0,
+                !currentGameState.TyreData.RightRearAttached ? 1 : 0);
 
             // --------------------------------
             // track conditions
