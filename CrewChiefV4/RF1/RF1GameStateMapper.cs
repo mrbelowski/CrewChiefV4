@@ -133,8 +133,9 @@ namespace CrewChiefV4.rFactor1
                 currentGameState.SessionData.DriverRawName != previousGameState.SessionData.DriverRawName || 
                 currentGameState.SessionData.TrackDefinition.name != previousGameState.SessionData.TrackDefinition.name ||
                 currentGameState.SessionData.TrackDefinition.trackLength != previousGameState.SessionData.TrackDefinition.trackLength ||
-                currentGameState.SessionData.SessionNumberOfLaps != previousGameState.SessionData.SessionNumberOfLaps ||
-                currentGameState.SessionData.SessionTotalRunTime != previousGameState.SessionData.SessionTotalRunTime || 
+                // these sometimes change in the beginning or end of session!
+                //currentGameState.SessionData.SessionNumberOfLaps != previousGameState.SessionData.SessionNumberOfLaps ||
+                //currentGameState.SessionData.SessionTotalRunTime != previousGameState.SessionData.SessionTotalRunTime || 
                 ((previousGameState.SessionData.SessionPhase == SessionPhase.Checkered || 
                 previousGameState.SessionData.SessionPhase == SessionPhase.Finished || 
                 previousGameState.SessionData.SessionPhase == SessionPhase.Green) && 
@@ -497,7 +498,7 @@ namespace CrewChiefV4.rFactor1
                     default:
                         break;
                 }
-                String opponentKey = getNameFromBytes(vehicle.vehicleClass).ToLower() + vehicle.place.ToString();
+                String opponentKey = getNameFromBytes(vehicle.vehicleClass) + vehicle.place.ToString();
                 OpponentData opponentPrevious = getOpponentDataForVehicleInfo(vehicle, previousGameState, currentGameState.SessionData.SessionRunningTime);
                 OpponentData opponent = new OpponentData();
                 opponent.DriverRawName = getNameFromBytes(vehicle.driverName).ToLower();
@@ -616,8 +617,14 @@ namespace CrewChiefV4.rFactor1
             {
                 currentGameState.SessionData.HasLeadChanged = !currentGameState.SessionData.HasLeadChanged && previousGameState.SessionData.Position > 1 && currentGameState.SessionData.Position == 1 ?
                     true : currentGameState.SessionData.HasLeadChanged;
-                currentGameState.SessionData.IsRacingSameCarInFront = previousGameState.OpponentData[previousGameState.getOpponentKeyInFrontOnTrack()].DriverRawName == currentGameState.OpponentData[currentGameState.getOpponentKeyInFrontOnTrack()].DriverRawName;
-                currentGameState.SessionData.IsRacingSameCarBehind = previousGameState.OpponentData[previousGameState.getOpponentKeyBehindOnTrack()].DriverRawName == currentGameState.OpponentData[currentGameState.getOpponentKeyBehindOnTrack()].DriverRawName;
+                OpponentData oPrev = null;
+                OpponentData oCurr = null;
+                oPrev = previousGameState.getOpponentAtPosition(previousGameState.SessionData.Position - 1, true);
+                oCurr = currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position - 1, true);
+                currentGameState.SessionData.IsRacingSameCarInFront = !((oPrev == null && oCurr != null) || (oPrev != null && oCurr == null) || (oPrev != null && oCurr != null && oPrev.DriverRawName != oCurr.DriverRawName));
+                oPrev = previousGameState.getOpponentAtPosition(previousGameState.SessionData.Position + 1, true);
+                oCurr = currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position + 1, true);
+                currentGameState.SessionData.IsRacingSameCarBehind = !((oPrev == null && oCurr != null) || (oPrev != null && oCurr == null) || (oPrev != null && oCurr != null && oPrev.DriverRawName != oCurr.DriverRawName));
                 currentGameState.SessionData.GameTimeAtLastPositionFrontChange = !currentGameState.SessionData.IsRacingSameCarInFront ? 
                     currentGameState.SessionData.SessionRunningTime : previousGameState.SessionData.GameTimeAtLastPositionFrontChange;
                 currentGameState.SessionData.GameTimeAtLastPositionBehindChange = !currentGameState.SessionData.IsRacingSameCarBehind ? 
@@ -787,17 +794,16 @@ namespace CrewChiefV4.rFactor1
         private OpponentData getOpponentDataForVehicleInfo(rfVehicleInfo vehicle, GameStateData previousGameState, float sessionRunningTime)
         {
             OpponentData opponentPrevious = null;
-            float timeDelta = sessionRunningTime - previousGameState.SessionData.SessionRunningTime;
+            float timeDelta = previousGameState != null ? sessionRunningTime - previousGameState.SessionData.SessionRunningTime : -1;
             if (previousGameState != null && timeDelta >= 0)
             {
-                String driverName = getNameFromBytes(vehicle.driverName);
                 float[] worldPos = { vehicle.pos.x, vehicle.pos.z };
                 float minDistDiff = -1;
                 String opponentKey = null;
                 foreach (OpponentData o in previousGameState.OpponentData.Values)
                 {
                     opponentKey = o.CarClass.rF1ClassName + o.Position.ToString();
-                    if (o.DriverRawName != driverName || 
+                    if (o.DriverRawName != getNameFromBytes(vehicle.driverName).ToLower() || 
                         o.CarClass.rF1ClassName != getNameFromBytes(vehicle.vehicleClass) || 
                         opponentKeysProcessed.Contains(opponentKey))
                     {
@@ -815,7 +821,7 @@ namespace CrewChiefV4.rFactor1
                 }
                 if (opponentPrevious != null)
                 {
-                    opponentKeysProcessed.Add(opponentKey);
+                    opponentKeysProcessed.Add(opponentPrevious.CarClass.rF1ClassName + opponentPrevious.Position.ToString());
                 }
             }
             return opponentPrevious;
