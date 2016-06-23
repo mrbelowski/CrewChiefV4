@@ -597,7 +597,7 @@ namespace CrewChiefV4.rFactor1
                 // session best lap times
                 if (opponent.Position == currentGameState.SessionData.Position + 1)
                 {
-                    currentGameState.SessionData.TimeDeltaBehind = -vehicle.timeBehindNext;
+                    currentGameState.SessionData.TimeDeltaBehind = vehicle.timeBehindNext;
                 }
                 if (opponent.CurrentBestLapTime > 0 && (opponent.CurrentBestLapTime < currentGameState.SessionData.OpponentsLapTimeSessionBestOverall || 
                     currentGameState.SessionData.OpponentsLapTimeSessionBestOverall < 0))
