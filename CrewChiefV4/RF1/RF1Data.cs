@@ -155,9 +155,9 @@ namespace CrewChiefV4.rFactor1
         [StructLayout(LayoutKind.Sequential, CharSet=CharSet.Ansi, Size = 39647, Pack = 1)]
         public struct rfShared
         {
-            public Single deltaTime;
-            public Int32 lapNumber;
-            public Single lapStartET;
+            public float deltaTime;
+            public int lapNumber;
+            public float lapStartET;
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 64)]
             public byte[] vehicleName;
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 64)]
@@ -173,40 +173,40 @@ namespace CrewChiefV4.rFactor1
             public rfVec3 localRot;
             public rfVec3 localRotAccel;
 
-            public Single speed;
+            public float speed;
 
-            public Int32 gear;
-            public Single engineRPM;
-            public Single engineWaterTemp;
-            public Single engineOilTemp;
-            public Single clutchRPM;
+            public int gear;
+            public float engineRPM;
+            public float engineWaterTemp;
+            public float engineOilTemp;
+            public float clutchRPM;
 
-            public Single unfilteredThrottle;
-            public Single unfilteredBrake;
-            public Single unfilteredSteering;
-            public Single unfilteredClutch;
+            public float unfilteredThrottle;
+            public float unfilteredBrake;
+            public float unfilteredSteering;
+            public float unfilteredClutch;
 
-            public Single steeringArmForce;
-            public Single fuel;
-            public Single engineMaxRPM;
+            public float steeringArmForce;
+            public float fuel;
+            public float engineMaxRPM;
             public byte scheduledStops;
             public byte overheating;
             public byte detached;
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 8)]
             public byte[] dentSeverity;
-            public Single lastImpactET;
-            public Single lastImpactMagnitude;
+            public float lastImpactET;
+            public float lastImpactMagnitude;
             public rfVec3 lastImpactPos;
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 4)]
             public rfWheel[] wheel;
 
-            public Int32 session;
-            public Single currentET;
-            public Single endET;
-            public Int32 maxLaps;
-            public Single lapDist;
+            public int session;
+            public float currentET;
+            public float endET;
+            public int maxLaps;
+            public float lapDist;
 
-            public Int32 numVehicles;
+            public int numVehicles;
 
             public byte gamePhase;
 
@@ -221,8 +221,8 @@ namespace CrewChiefV4.rFactor1
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 64)]
             public byte[] plrFileName;
 
-            public Single ambientTemp;
-            public Single trackTemp;
+            public float ambientTemp;
+            public float trackTemp;
             public rfVec3 wind;
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 128)]
             public rfVehicleInfo[] vehicle;

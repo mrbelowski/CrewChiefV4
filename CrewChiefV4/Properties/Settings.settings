@@ -95,9 +95,6 @@
     <Setting Name="r3e_launch_params" Type="System.String" Scope="User">
       <Value Profile="(Default)">-applaunch 211500</Value>
     </Setting>
-    <Setting Name="r3e_launch_exe" Type="System.String" Scope="User">
-      <Value Profile="(Default)">c:/games/steam/steam.exe</Value>
-    </Setting>
     <Setting Name="launch_raceroom" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
@@ -132,10 +129,10 @@
       <Value Profile="(Default)">50</Value>
     </Setting>
     <Setting Name="pcars64_launch_exe" Type="System.String" Scope="User">
-      <Value Profile="(Default)">c:/games/steam/steamapps/common/pCars/pCARS.exe</Value>
+      <Value Profile="(Default)">C:/Program Files (x86)/steam/steamapps/common/pCars/pCARS.exe</Value>
     </Setting>
     <Setting Name="pcars32_launch_exe" Type="System.String" Scope="User">
-      <Value Profile="(Default)">c:/games/steam/steamapps/common/pCars/pCARS.exe</Value>
+      <Value Profile="(Default)">C:/Program Files (x86)/steam/steamapps/common/pCars/pCARS.exe</Value>
     </Setting>
     <Setting Name="pcars64_launch_params" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
@@ -345,12 +342,51 @@
       <Value Profile="(Default)">4.5</Value>
     </Setting>
     <Setting Name="rf1_launch_params" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">-applaunch 339790</Value>
     </Setting>
     <Setting Name="rf1_launch_exe" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">C:/Program Files (x86)/Steam/Steam.exe</Value>
     </Setting>
-    <Setting Name="launch_rfactor1" Type="System.String" Scope="User">
+    <Setting Name="launch_rfactor1" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="launch_gsc" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="launch_ams" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="gsc_launch_params" Type="System.String" Scope="User">
+      <Value Profile="(Default)">-applaunch 273840</Value>
+    </Setting>
+    <Setting Name="ams_launch_params" Type="System.String" Scope="User">
+      <Value Profile="(Default)">-applaunch 431600</Value>
+    </Setting>
+    <Setting Name="gsc_launch_exe" Type="System.String" Scope="User">
+      <Value Profile="(Default)">C:/Program Files (x86)/Steam/Steam.exe</Value>
+    </Setting>
+    <Setting Name="ams_launch_exe" Type="System.String" Scope="User">
+      <Value Profile="(Default)">C:/Program Files (x86)/Steam/Steam.exe</Value>
+    </Setting>
+    <Setting Name="r3e_launch_exe" Type="System.String" Scope="User">
+      <Value Profile="(Default)">C:/Program Files (x86)/Steam/Steam.exe</Value>
+    </Setting>
+    <Setting Name="marcas_launch_exe" Type="System.String" Scope="User">
+      <Value Profile="(Default)">C:/Program Files (x86)/Steam/Steam.exe</Value>
+    </Setting>
+    <Setting Name="marcas_launch_params" Type="System.String" Scope="User">
+      <Value Profile="(Default)">-applaunch 359800</Value>
+    </Setting>
+    <Setting Name="ftruck_launch_exe" Type="System.String" Scope="User">
+      <Value Profile="(Default)">C:/Program Files (x86)/Steam/Steam.exe</Value>
+    </Setting>
+    <Setting Name="ftruck_launch_params" Type="System.String" Scope="User">
+      <Value Profile="(Default)">-applaunch 273750</Value>
+    </Setting>
+    <Setting Name="launch_marcas" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="launch_ftruck" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
   </Settings>

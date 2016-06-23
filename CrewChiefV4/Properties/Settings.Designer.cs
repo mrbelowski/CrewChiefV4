@@ -397,18 +397,6 @@ namespace CrewChiefV4.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("c:/games/steam/steam.exe")]
-        public string r3e_launch_exe {
-            get {
-                return ((string)(this["r3e_launch_exe"]));
-            }
-            set {
-                this["r3e_launch_exe"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool launch_raceroom {
             get {
@@ -541,7 +529,7 @@ namespace CrewChiefV4.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("c:/games/steam/steamapps/common/pCars/pCARS.exe")]
+        [global::System.Configuration.DefaultSettingValueAttribute("C:/Program Files (x86)/steam/steamapps/common/pCars/pCARS.exe")]
         public string pcars64_launch_exe {
             get {
                 return ((string)(this["pcars64_launch_exe"]));
@@ -553,7 +541,7 @@ namespace CrewChiefV4.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("c:/games/steam/steamapps/common/pCars/pCARS.exe")]
+        [global::System.Configuration.DefaultSettingValueAttribute("C:/Program Files (x86)/steam/steamapps/common/pCars/pCARS.exe")]
         public string pcars32_launch_exe {
             get {
                 return ((string)(this["pcars32_launch_exe"]));
@@ -1393,7 +1381,7 @@ namespace CrewChiefV4.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        [global::System.Configuration.DefaultSettingValueAttribute("-applaunch 339790")]
         public string rf1_launch_params {
             get {
                 return ((string)(this["rf1_launch_params"]));
@@ -1405,7 +1393,7 @@ namespace CrewChiefV4.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        [global::System.Configuration.DefaultSettingValueAttribute("C:/Program Files (x86)/Steam/Steam.exe")]
         public string rf1_launch_exe {
             get {
                 return ((string)(this["rf1_launch_exe"]));
@@ -1418,12 +1406,168 @@ namespace CrewChiefV4.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public string launch_rfactor1 {
+        public bool launch_rfactor1 {
             get {
-                return ((string)(this["launch_rfactor1"]));
+                return ((bool)(this["launch_rfactor1"]));
             }
             set {
                 this["launch_rfactor1"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool launch_gsc {
+            get {
+                return ((bool)(this["launch_gsc"]));
+            }
+            set {
+                this["launch_gsc"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool launch_ams {
+            get {
+                return ((bool)(this["launch_ams"]));
+            }
+            set {
+                this["launch_ams"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-applaunch 273840")]
+        public string gsc_launch_params {
+            get {
+                return ((string)(this["gsc_launch_params"]));
+            }
+            set {
+                this["gsc_launch_params"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-applaunch 431600")]
+        public string ams_launch_params {
+            get {
+                return ((string)(this["ams_launch_params"]));
+            }
+            set {
+                this["ams_launch_params"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("C:/Program Files (x86)/Steam/Steam.exe")]
+        public string gsc_launch_exe {
+            get {
+                return ((string)(this["gsc_launch_exe"]));
+            }
+            set {
+                this["gsc_launch_exe"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("C:/Program Files (x86)/Steam/Steam.exe")]
+        public string ams_launch_exe {
+            get {
+                return ((string)(this["ams_launch_exe"]));
+            }
+            set {
+                this["ams_launch_exe"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("C:/Program Files (x86)/Steam/Steam.exe")]
+        public string r3e_launch_exe {
+            get {
+                return ((string)(this["r3e_launch_exe"]));
+            }
+            set {
+                this["r3e_launch_exe"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("C:/Program Files (x86)/Steam/Steam.exe")]
+        public string marcas_launch_exe {
+            get {
+                return ((string)(this["marcas_launch_exe"]));
+            }
+            set {
+                this["marcas_launch_exe"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-applaunch 359800")]
+        public string marcas_launch_params {
+            get {
+                return ((string)(this["marcas_launch_params"]));
+            }
+            set {
+                this["marcas_launch_params"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("C:/Program Files (x86)/Steam/Steam.exe")]
+        public string ftruck_launch_exe {
+            get {
+                return ((string)(this["ftruck_launch_exe"]));
+            }
+            set {
+                this["ftruck_launch_exe"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-applaunch 273750")]
+        public string ftruck_launch_params {
+            get {
+                return ((string)(this["ftruck_launch_params"]));
+            }
+            set {
+                this["ftruck_launch_params"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool launch_marcas {
+            get {
+                return ((bool)(this["launch_marcas"]));
+            }
+            set {
+                this["launch_marcas"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool launch_ftruck {
+            get {
+                return ((bool)(this["launch_ftruck"]));
+            }
+            set {
+                this["launch_ftruck"] = value;
             }
         }
     }

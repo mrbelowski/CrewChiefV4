@@ -60,7 +60,7 @@ namespace CrewChiefV4.rFactor1
         {
             foreach (rfVehicleInfo vehicle in shared.vehicle)
             {
-                if ((int)vehicle.isPlayer == 1)
+                if (vehicle.isPlayer == 1)
                 {
                     return vehicle;
                 }
@@ -78,7 +78,7 @@ namespace CrewChiefV4.rFactor1
             rfShared lastState = ((CrewChiefV4.rFactor1.RF1SharedMemoryReader.RF1StructWrapper)lastStateObj).data;
             rfShared currentState = ((CrewChiefV4.rFactor1.RF1SharedMemoryReader.RF1StructWrapper)currentStateObj).data;
             
-            if (!enabled || currentState.currentET < timeAfterRaceStartToActivate || (int)currentState.inRealtime != 1|| 
+            if (!enabled || currentState.currentET < timeAfterRaceStartToActivate || currentState.inRealtime == 0 || 
                 (currentState.numVehicles <= 2))
             {
                 return;
@@ -106,7 +106,7 @@ namespace CrewChiefV4.rFactor1
             }
             float[] currentPlayerPosition = new float[] { currentPlayerData.pos.x, currentPlayerData.pos.z };
 
-            if ((int)currentPlayerData.inPits == 0 && currentPlayerData.control == (int)rFactor1Constant.rfControl.player)
+            if (currentPlayerData.inPits == 0 && currentPlayerData.control == (int)rFactor1Constant.rfControl.player)
             {
                 List<float[]> currentOpponentPositions = new List<float[]>();
                 float[] playerVelocityData = new float[3];
@@ -114,20 +114,20 @@ namespace CrewChiefV4.rFactor1
                 playerVelocityData[1] = (currentPlayerData.pos.x - previousPlayerData.pos.x) / timeDiffSeconds;
                 playerVelocityData[2] = (currentPlayerData.pos.z - previousPlayerData.pos.z) / timeDiffSeconds;
 
-                foreach (rfVehicleInfo vehicle in currentState.vehicle)
+                for (int i = 0; i < currentState.numVehicles; i++)
                 {
-                    if ((int)vehicle.isPlayer == 1 || (int)vehicle.inPits == 1)
+                    rfVehicleInfo vehicle = currentState.vehicle[i];
+                    if (vehicle.isPlayer == 1 || vehicle.inPits == 1 || vehicle.lapDist < 0)
                     {
                         continue;
                     }
                     currentOpponentPositions.Add(new float[] { vehicle.pos.x, vehicle.pos.z });
                 }
-                float playerRotation = (float)(Math.Atan2((double)(-currentState.oriX.z), Math.Sqrt((double)(currentState.oriX.z * currentState.oriX.z + currentState.oriZ.z * currentState.oriZ.z))));                
+                float playerRotation = (float)(Math.Atan2((double)(currentState.oriZ.x), (double)(currentState.oriZ.z)));                
                 if (playerRotation < 0)
                 {
                     playerRotation = (float)(2 * Math.PI) + playerRotation;
                 }
-                playerRotation = (float)(2 * Math.PI) - playerRotation;
                 internalSpotter.triggerInternal(playerRotation, currentPlayerPosition, playerVelocityData, currentOpponentPositions);
             }
         }
