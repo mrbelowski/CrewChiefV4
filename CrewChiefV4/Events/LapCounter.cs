@@ -155,7 +155,10 @@ namespace CrewChiefV4.Events
 
             // R3E's gridWalk phase isn't useable here - the data during this phase are bollocks
             if (!playedGetReady && currentGameState.SessionData.SessionType == SessionType.Race && (currentGameState.SessionData.SessionPhase == SessionPhase.Countdown ||
-                (currentGameState.SessionData.SessionPhase == SessionPhase.Formation && CrewChief.gameDefinition.gameEnum == GameEnum.RACE_ROOM)))
+                (currentGameState.SessionData.SessionPhase == SessionPhase.Formation && CrewChief.gameDefinition.gameEnum == GameEnum.RACE_ROOM) ||
+                // play 'get ready' message when entering sector 3 of formation lap in Automobilista
+                (currentGameState.SessionData.SessionPhase == SessionPhase.Formation && CrewChief.gameDefinition.gameEnum == GameEnum.RF1 &&
+                currentGameState.SessionData.SectorNumber == 3)))
             {
                 // If we've not yet played the pre-lights messages, just play one of them here, but not for RaceRoom as the lights will already have started
                 if (!playedPreLightsMessage && CrewChief.gameDefinition.gameEnum != GameEnum.RACE_ROOM)

@@ -106,7 +106,9 @@ namespace CrewChiefV4.rFactor1
             }
             float[] currentPlayerPosition = new float[] { currentPlayerData.pos.x, currentPlayerData.pos.z };
 
-            if (currentPlayerData.inPits == 0 && currentPlayerData.control == (int)rFactor1Constant.rfControl.player)
+            if (currentPlayerData.inPits == 0 && currentPlayerData.control == (int)rFactor1Constant.rfControl.player && 
+                // turn off spotter for formation lap before going green
+                !(currentState.gamePhase == (int)rFactor1Constant.rfGamePhase.formation))
             {
                 List<float[]> currentOpponentPositions = new List<float[]>();
                 float[] playerVelocityData = new float[3];
