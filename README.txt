@@ -2,6 +2,8 @@ CrewChief version 4.
 
 Changelog
 ---------
+Version 4.3.0.3: Fixed 'leader is pitting' message for rF1; Improved opponent state tracking for rF1 (allows for duplicate AI in grids); Adjusted scheduled pit stop notifications to be offline/single player only for rF1; Adjusted 'pit now' message for scheduled stops to play before passing pit entrance for rF1; Fixed 'green green green' messages after formation lap for rF1; Disabled spotter during formation lap for rF1; Added 'get ready' message during final sector of formation lap for rF1; Fixed incorrect brake temperatures for rF1; Improved multi-class race support for rF1; Added penalty notifications; Fixed 'the next guy is' message spamming for rF1; Fixed 'the gap behind is reeling you in' message for rF1
+
 Version 4.3.0.2: Fixed opponent lap timing and sector gap reporting for rF1; Fixed blue flag behavior for rF1; Adjusted damage reporting for rF1; Fix session type and session phase detection for rF1; Improve pit window mapping for rF1; Add green flag and off-track detection for rF1; Scheduled pit stop detection for rF1;
 
 Version 4.3.0.1: Fixed tire temp warnings for rF1; Fixed pit exit traffic notifications for rF1; Added black flag notification for rF1; Adjusted blue flag behavior for rF1; Adjusted invalid lap detection for rF1; Added ambient temps, track temps, and wind info for rF1; Added detached wheel info for rF1; Fixed auto-launch for rF1; Added separate menu items for Automobilista, Stock Car Extreme, Copa Petrobras de Marcas and Formula Truck; Adjusted auto-launch options for R3E.
