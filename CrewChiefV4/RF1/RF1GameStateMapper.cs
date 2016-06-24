@@ -70,8 +70,8 @@ namespace CrewChiefV4.rFactor1
             {
                 return null;
             }
-            // game is paused or other window has take focus
-            if (shared.inRealtime == 0 || shared.deltaTime >= 0.56)
+            // game is paused or other window has taken focus
+            if (shared.deltaTime >= 0.56)
             {
                 return previousGameState;
             }
@@ -82,7 +82,7 @@ namespace CrewChiefV4.rFactor1
             // get session leader scoring info (usually index 1 if not player)
             rFactor1Data.rfVehicleInfo player = new rfVehicleInfo();
             rFactor1Data.rfVehicleInfo leader = new rfVehicleInfo();
-            for (int i = 0; i < shared.vehicle.Length; i++)
+            for (int i = 0; i < shared.numVehicles; i++)
             {
                 rFactor1Data.rfVehicleInfo vehicle = shared.vehicle[i];
                 switch (mapToControlType((rFactor1Constant.rfControl)vehicle.control))
@@ -132,7 +132,7 @@ namespace CrewChiefV4.rFactor1
             // if previous state is null or any of the above change, this is a new session
             currentGameState.SessionData.IsNewSession = previousGameState == null ||
                 currentGameState.SessionData.SessionType != previousGameState.SessionData.SessionType ||
-                currentGameState.carClass.rF1ClassName != previousGameState.carClass.rF1ClassName ||
+                currentGameState.carClass != previousGameState.carClass ||
                 currentGameState.SessionData.DriverRawName != previousGameState.SessionData.DriverRawName || 
                 currentGameState.SessionData.TrackDefinition.name != previousGameState.SessionData.TrackDefinition.name ||
                 currentGameState.SessionData.TrackDefinition.trackLength != previousGameState.SessionData.TrackDefinition.trackLength ||
@@ -473,8 +473,7 @@ namespace CrewChiefV4.rFactor1
                 {
                     speechRecogniser.addNewOpponentName(opponent.DriverRawName);
                     Console.WriteLine("New driver " + opponent.DriverRawName + 
-                        " is using car class " + opponent.CarClass.carClassEnum + 
-                        " (class ID " + opponent.CarClass.rF1ClassName + ")" + 
+                        " is using car class " + opponent.CarClass.rF1ClassName + 
                         " at position " + opponent.Position.ToString());
                 }
                 if (opponentPrevious != null)
@@ -567,11 +566,11 @@ namespace CrewChiefV4.rFactor1
                 {
                     currentGameState.SessionData.OverallSessionBestLapTime = opponent.CurrentBestLapTime;
                 }
-                if (opponent.CurrentBestLapTime > 0 && (opponent.CurrentBestLapTime < currentGameState.SessionData.PlayerClassSessionBestLapTime ||
-                    currentGameState.SessionData.PlayerClassSessionBestLapTime < 0) && 
-                    opponent.CarClass.rF1ClassName == currentGameState.carClass.rF1ClassName)
+                if (opponent.CurrentBestLapTime > 0 && (opponent.CurrentBestLapTime < currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass ||
+                    currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass < 0) && 
+                    opponent.CarClass == currentGameState.carClass)
                 {
-                    currentGameState.SessionData.PlayerClassSessionBestLapTime = opponent.CurrentBestLapTime;
+                    currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass = opponent.CurrentBestLapTime;
                 }
                 // shouldn't have duplicates, but just in case
                 if (!currentGameState.OpponentData.ContainsKey(opponentKey))
@@ -583,13 +582,19 @@ namespace CrewChiefV4.rFactor1
             {
                 currentGameState.SessionData.HasLeadChanged = !currentGameState.SessionData.HasLeadChanged && previousGameState.SessionData.Position > 1 && currentGameState.SessionData.Position == 1 ?
                     true : currentGameState.SessionData.HasLeadChanged;
+                String oPrevKey = null;
+                String oCurrKey = null;
                 OpponentData oPrev = null;
                 OpponentData oCurr = null;
-                oPrev = previousGameState.getOpponentAtPosition(previousGameState.SessionData.Position - 1, true);
-                oCurr = currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position - 1, true);
+                oPrevKey = (String)previousGameState.getOpponentKeyInFrontOnTrack();
+                oCurrKey = (String)currentGameState.getOpponentKeyInFrontOnTrack();
+                oPrev = oPrevKey != null ? previousGameState.OpponentData[oPrevKey] : null;
+                oCurr = oCurrKey != null ? currentGameState.OpponentData[oCurrKey] : null;
                 currentGameState.SessionData.IsRacingSameCarInFront = !((oPrev == null && oCurr != null) || (oPrev != null && oCurr == null) || (oPrev != null && oCurr != null && oPrev.DriverRawName != oCurr.DriverRawName));
-                oPrev = previousGameState.getOpponentAtPosition(previousGameState.SessionData.Position + 1, true);
-                oCurr = currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position + 1, true);
+                oPrevKey = (String)previousGameState.getOpponentKeyBehindOnTrack();
+                oCurrKey = (String)currentGameState.getOpponentKeyBehindOnTrack();
+                oPrev = oPrevKey != null ? previousGameState.OpponentData[oPrevKey] : null;
+                oCurr = oCurrKey != null ? currentGameState.OpponentData[oCurrKey] : null;
                 currentGameState.SessionData.IsRacingSameCarBehind = !((oPrev == null && oCurr != null) || (oPrev != null && oCurr == null) || (oPrev != null && oCurr != null && oPrev.DriverRawName != oCurr.DriverRawName));
                 currentGameState.SessionData.GameTimeAtLastPositionFrontChange = !currentGameState.SessionData.IsRacingSameCarInFront ? 
                     currentGameState.SessionData.SessionRunningTime : previousGameState.SessionData.GameTimeAtLastPositionFrontChange;
@@ -600,17 +605,16 @@ namespace CrewChiefV4.rFactor1
             // --------------------------------
             // pit data
             currentGameState.PitData.IsRefuellingAllowed = true;
-            currentGameState.PitData.HasMandatoryPitStop = shared.scheduledStops > 0 && player.numPitstops < shared.scheduledStops && currentGameState.SessionData.SessionType == SessionType.Race;
-            currentGameState.PitData.PitWindowStart = currentGameState.PitData.HasMandatoryPitStop ? 1 : 0;
+            currentGameState.PitData.HasMandatoryPitStop = isOfflineSession && shared.scheduledStops > 0 && player.numPitstops < shared.scheduledStops && currentGameState.SessionData.SessionType == SessionType.Race;
+            currentGameState.PitData.PitWindowStart = isOfflineSession && currentGameState.PitData.HasMandatoryPitStop ? 1 : 0;
             currentGameState.PitData.PitWindowEnd = !currentGameState.PitData.HasMandatoryPitStop ? 0 :
                 currentGameState.SessionData.SessionHasFixedTime ? (int)(currentGameState.SessionData.SessionTotalRunTime / 60 / (shared.scheduledStops + 1)) * (player.numPitstops + 1) + 1 :
                 (int)(currentGameState.SessionData.SessionNumberOfLaps / (shared.scheduledStops + 1)) * (player.numPitstops + 1) + 1;
             currentGameState.PitData.InPitlane = player.inPits == 1;
             currentGameState.PitData.IsAtPitExit = previousGameState != null && previousGameState.PitData.InPitlane && !currentGameState.PitData.InPitlane;
-            currentGameState.PitData.OnOutLap = (previousGameState == null && currentGameState.PitData.InPitlane) ||
-                (previousGameState != null && previousGameState.PitData.OnOutLap && currentGameState.SessionData.SectorNumber == 1);
-            currentGameState.PitData.OnInLap = previousGameState != null && !previousGameState.PitData.InPitlane && currentGameState.PitData.InPitlane;
-            currentGameState.PitData.IsMakingMandatoryPitStop = currentGameState.PitData.HasMandatoryPitStop && currentGameState.PitData.OnInLap && currentGameState.SessionData.CompletedLaps > 0;
+            currentGameState.PitData.OnOutLap = currentGameState.PitData.InPitlane && currentGameState.SessionData.SectorNumber == 1;
+            currentGameState.PitData.OnInLap = currentGameState.PitData.InPitlane && currentGameState.SessionData.SectorNumber == 3;
+            currentGameState.PitData.IsMakingMandatoryPitStop = currentGameState.PitData.HasMandatoryPitStop && currentGameState.PitData.OnInLap && currentGameState.SessionData.CompletedLaps > currentGameState.PitData.PitWindowStart;
             currentGameState.PitData.PitWindow = currentGameState.PitData.IsMakingMandatoryPitStop ? PitWindow.StopInProgress : mapToPitWindow((rFactor1Constant.rfYellowFlagState)shared.yellowFlagState);
 
             // --------------------------------
@@ -686,8 +690,7 @@ namespace CrewChiefV4.rFactor1
                 Console.WriteLine("SessionStartPosition " + currentGameState.SessionData.SessionStartPosition);
                 Console.WriteLine("SessionStartTime " + currentGameState.SessionData.SessionStartTime);
                 Console.WriteLine("TrackName " + currentGameState.SessionData.TrackDefinition.name);
-                Console.WriteLine("Player is using car class " + currentGameState.carClass.carClassEnum + 
-                    " (class ID " + currentGameState.carClass.rF1ClassName + ")" + 
+                Console.WriteLine("Player is using car class " + currentGameState.carClass.rF1ClassName + 
                     " at position " + currentGameState.SessionData.Position.ToString());
             }
             if (previousGameState != null && previousGameState.SessionData.SessionPhase != currentGameState.SessionData.SessionPhase)
@@ -765,12 +768,11 @@ namespace CrewChiefV4.rFactor1
             {
                 float[] worldPos = { vehicle.pos.x, vehicle.pos.z };
                 float minDistDiff = -1;
-                String opponentKey = null;
                 foreach (OpponentData o in previousGameState.OpponentData.Values)
                 {
-                    opponentKey = o.CarClass.rF1ClassName + o.Position.ToString();
+                    String opponentKey = o.CarClass.rF1ClassName + o.Position.ToString();
                     if (o.DriverRawName != getNameFromBytes(vehicle.driverName).ToLower() || 
-                        o.CarClass.rF1ClassName != getNameFromBytes(vehicle.vehicleClass) || 
+                        o.CarClass != CarData.getCarClassForRF1ClassName(getNameFromBytes(vehicle.vehicleClass)) || 
                         opponentKeysProcessed.Contains(opponentKey))
                     {
                         continue;
@@ -799,11 +801,11 @@ namespace CrewChiefV4.rFactor1
             switch (shared.session)
             {
                 // up to four possible practice sessions
-                // test day and pre-race warm-up sessions are 'Practice' as well since 'HotLap' seems to suppress flag info
                 case 1:
                 case 2:
                 case 3:
                 case 4:
+                // test day and pre-race warm-up sessions are 'Practice' as well since 'HotLap' seems to suppress flag info
                 case 0:
                 case 9:
                     return SessionType.Practice;
@@ -813,8 +815,11 @@ namespace CrewChiefV4.rFactor1
                 case 7:
                 case 8:
                     return SessionType.Qualify;
-                // only one race session
+                // up to four possible race sessions
                 case 10:
+                case 11:
+                case 12:
+                case 13:
                     return SessionType.Race;
                 default:
                     return SessionType.Unavailable;
