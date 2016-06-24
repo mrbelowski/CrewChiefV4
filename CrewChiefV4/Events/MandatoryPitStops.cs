@@ -359,7 +359,9 @@ namespace CrewChiefV4.Events
                     if (playBoxNowMessage && currentGameState.SessionData.SectorNumber == 2 && currentGameState.carClass.rF1ClassName.Length > 0)
                     {
                         playBoxNowMessage = false;
-                        audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsPitNow, 15, this));
+                        // pit entry is right at sector 3 timing line, play message part way through sector 2 to give us time to pit
+                        int messageDelay = currentGameState.SessionData.PlayerBestSector2Time > 0 ? (int)(currentGameState.SessionData.PlayerBestSector2Time * 0.7) : 15;
+                        audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsPitNow, messageDelay, this));
                     }
 
                     if (playBoxNowMessage && currentGameState.SessionData.SectorNumber == 3)
