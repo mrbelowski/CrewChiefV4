@@ -821,6 +821,9 @@ namespace CrewChiefV4.rFactor1
                 case 12:
                 case 13:
                     return SessionType.Race;
+                // Reiza Time Trial Mode
+                case 14:
+                    return SessionType.HotLap;
                 default:
                     return SessionType.Unavailable;
             }
