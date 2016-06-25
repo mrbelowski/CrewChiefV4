@@ -240,7 +240,7 @@ namespace CrewChiefV4.Events
             }
             // can't read penalty type in Automobilista
             else if (currentGameState.SessionData.SessionType == SessionType.Race && previousGameState != null &&
-                currentGameState.PenaltiesData.NumPenalties > 0)
+                currentGameState.PenaltiesData.NumPenalties > 0 && CrewChief.gameDefinition.gameEnum == GameEnum.RF1)
             {
                 if (currentGameState.PenaltiesData.NumPenalties > previousGameState.PenaltiesData.NumPenalties)
                 {
@@ -288,7 +288,8 @@ namespace CrewChiefV4.Events
                 ((previousGameState.PenaltiesData.HasStopAndGo && !currentGameState.PenaltiesData.HasStopAndGo) ||
                 (previousGameState.PenaltiesData.HasDriveThrough && !currentGameState.PenaltiesData.HasDriveThrough) ||
                 // can't read penalty type in Automobilista
-                previousGameState.PenaltiesData.NumPenalties > currentGameState.PenaltiesData.NumPenalties))
+                (previousGameState.PenaltiesData.NumPenalties > currentGameState.PenaltiesData.NumPenalties && 
+                CrewChief.gameDefinition.gameEnum == GameEnum.RF1)))
             {
                 audioPlayer.playMessage(new QueuedMessage(folderPenaltyServed, 0, null));
             }            
