@@ -355,6 +355,16 @@ namespace CrewChiefV4.Events
                         audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsPitWindowCloses2min, 0, this));
                     }
 
+                    // for Automobilista, sector update lag time means sometimes we miss the pit entrance before this message plays
+                    if (playBoxNowMessage && currentGameState.SessionData.SectorNumber == 2 && 
+                        CrewChief.gameDefinition.gameEnum == GameEnum.RF1)
+                    {
+                        playBoxNowMessage = false;
+                        // pit entry is right at sector 3 timing line, play message part way through sector 2 to give us time to pit
+                        int messageDelay = currentGameState.SessionData.PlayerBestSector2Time > 0 ? (int)(currentGameState.SessionData.PlayerBestSector2Time * 0.7) : 15;
+                        audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsPitNow, messageDelay, this));
+                    }
+
                     if (playBoxNowMessage && currentGameState.SessionData.SectorNumber == 3)
                     {
                         playBoxNowMessage = false;

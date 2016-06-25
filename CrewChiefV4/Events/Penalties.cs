@@ -237,14 +237,59 @@ namespace CrewChiefV4.Events
                     }
                     clearPenaltyState();
                 }
-            }                     
+            }
+            // can't read penalty type in Automobilista
+            else if (currentGameState.SessionData.SessionType == SessionType.Race && previousGameState != null &&
+                currentGameState.PenaltiesData.NumPenalties > 0 && CrewChief.gameDefinition.gameEnum == GameEnum.RF1)
+            {
+                if (currentGameState.PenaltiesData.NumPenalties > previousGameState.PenaltiesData.NumPenalties)
+                {
+                    lapsCompleted = currentGameState.SessionData.CompletedLaps;
+                    // this is a new penalty
+                    audioPlayer.playMessage(new QueuedMessage(folderYouHavePenalty, 0, this));
+                    // queue a '3 laps to serve penalty' message - this might not get played
+                    audioPlayer.playMessage(new QueuedMessage(folderThreeLapsToServe, 20, this));
+                    // we don't already have a penalty
+                    if (penaltyLap == -1 || !hasOutstandingPenalty)
+                    {
+                        penaltyLap = currentGameState.SessionData.CompletedLaps;
+                    }
+                    hasOutstandingPenalty = true;
+                    hasHadAPenalty = true;
+                }
+                else if (currentGameState.PitData.InPitlane && currentGameState.PitData.OnOutLap && !playedNotServedPenalty &&
+                    currentGameState.PenaltiesData.NumPenalties > 0)
+                {
+                    // we've exited the pits but there's still an outstanding penalty
+                    audioPlayer.playMessage(new QueuedMessage(folderPenaltyNotServed, 3, this));
+                    playedNotServedPenalty = true;
+                }
+                else if (currentGameState.SessionData.IsNewLap && currentGameState.PenaltiesData.NumPenalties > 0)
+                {
+                    // TODO: variable number of laps to serve penalty...
+
+                    lapsCompleted = currentGameState.SessionData.CompletedLaps;
+                    if (lapsCompleted - penaltyLap >= 2 && !currentGameState.PitData.InPitlane)
+                    {
+                        // run out of laps, an not in the pitlane
+                        audioPlayer.playMessage(new QueuedMessage(folderYouStillHavePenalty, 5, this));
+                    }
+                    else if (lapsCompleted - penaltyLap == 1)
+                    {
+                        audioPlayer.playMessage(new QueuedMessage(folderTwoLapsToServe, pitstopDelay, this));
+                    }
+                }
+            }
             else
             {
                 clearPenaltyState();
             }
             if (currentGameState.SessionData.SessionType == SessionType.Race && previousGameState != null && 
                 ((previousGameState.PenaltiesData.HasStopAndGo && !currentGameState.PenaltiesData.HasStopAndGo) ||
-                (previousGameState.PenaltiesData.HasDriveThrough && !currentGameState.PenaltiesData.HasDriveThrough)))
+                (previousGameState.PenaltiesData.HasDriveThrough && !currentGameState.PenaltiesData.HasDriveThrough) ||
+                // can't read penalty type in Automobilista
+                (previousGameState.PenaltiesData.NumPenalties > currentGameState.PenaltiesData.NumPenalties && 
+                CrewChief.gameDefinition.gameEnum == GameEnum.RF1)))
             {
                 audioPlayer.playMessage(new QueuedMessage(folderPenaltyServed, 0, null));
             }            
