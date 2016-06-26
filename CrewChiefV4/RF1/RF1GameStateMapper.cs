@@ -119,7 +119,13 @@ namespace CrewChiefV4.rFactor1
                 playerName = driverName;
             }
             // these things should remain constant during a session
+            currentGameState.SessionData.EventIndex = shared.session;
+            currentGameState.SessionData.SessionIteration = 
+                shared.session >= 1 && shared.session <= 4 ? shared.session - 1 :
+                shared.session >= 5 && shared.session <= 8 ? shared.session - 5 :
+                shared.session >= 10 && shared.session <= 13 ? shared.session - 10 : 0;
             currentGameState.SessionData.SessionType = mapToSessionType(shared);
+            currentGameState.SessionData.SessionPhase = mapToSessionPhase((rFactor1Constant.rfGamePhase)shared.gamePhase);
             currentGameState.carClass = CarData.getCarClassForRF1ClassName(getNameFromBytes(player.vehicleClass));
             brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(currentGameState.carClass);
             currentGameState.SessionData.DriverRawName = getNameFromBytes(player.driverName).ToLower();
@@ -139,6 +145,8 @@ namespace CrewChiefV4.rFactor1
                 // these sometimes change in the beginning or end of session!
                 //currentGameState.SessionData.SessionNumberOfLaps != previousGameState.SessionData.SessionNumberOfLaps ||
                 //currentGameState.SessionData.SessionTotalRunTime != previousGameState.SessionData.SessionTotalRunTime || 
+                currentGameState.SessionData.EventIndex != previousGameState.SessionData.EventIndex || 
+                currentGameState.SessionData.SessionIteration != previousGameState.SessionData.SessionIteration || 
                 ((previousGameState.SessionData.SessionPhase == SessionPhase.Checkered || 
                 previousGameState.SessionData.SessionPhase == SessionPhase.Finished || 
                 previousGameState.SessionData.SessionPhase == SessionPhase.Green) && 
@@ -146,7 +154,6 @@ namespace CrewChiefV4.rFactor1
                 currentGameState.SessionData.SessionPhase == SessionPhase.Gridwalk ||
                 currentGameState.SessionData.SessionPhase == SessionPhase.Formation ||
                 currentGameState.SessionData.SessionPhase == SessionPhase.Countdown)); 
-            currentGameState.SessionData.SessionPhase = mapToSessionPhase((rFactor1Constant.rfGamePhase)shared.gamePhase);
             currentGameState.SessionData.SessionStartTime = currentGameState.SessionData.IsNewSession ? currentGameState.Now : previousGameState.SessionData.SessionStartTime;
             currentGameState.SessionData.SessionHasFixedTime = currentGameState.SessionData.SessionTotalRunTime > 0;
             currentGameState.SessionData.SessionRunningTime = shared.currentET;
@@ -678,6 +685,7 @@ namespace CrewChiefV4.rFactor1
             if (currentGameState.SessionData.IsNewSession)
             {
                 Console.WriteLine("New session, trigger data:");
+                Console.WriteLine("EventIndex " + currentGameState.SessionData.EventIndex);
                 Console.WriteLine("SessionType " + currentGameState.SessionData.SessionType);
                 Console.WriteLine("SessionPhase " + currentGameState.SessionData.SessionPhase);
                 Console.WriteLine("SessionIteration " + currentGameState.SessionData.SessionIteration);
