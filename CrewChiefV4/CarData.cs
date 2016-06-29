@@ -346,8 +346,17 @@ namespace CrewChiefV4
         // returns default car class with rFactor vehicle class name
         public static CarClass getCarClassForRF1ClassName(String rF1ClassName)
         {
-            CarClass rFactorClass = getDefaultCarClass();
+            foreach (CarClass carClass in carClasses)
+            {
+                if (carClass.rF1ClassName == rF1ClassName)
+                {
+                    return carClass;
+                }
+            }
+            // create one if it doesn't exist
+            CarClass rFactorClass = new CarClass(CarClassEnum.UNKNOWN_RACE, new String[] { "" }, new int[] { -1 }, BrakeType.Iron_Race, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp);
             rFactorClass.rF1ClassName = rF1ClassName;
+            carClasses.Add(rFactorClass);
             return rFactorClass;
         }
 
