@@ -68,6 +68,10 @@ namespace CrewChiefV4.rFactor1
             // no session data
             if (shared.numVehicles == 0)
             {
+                isOfflineSession = true;
+                distanceOffTrack = 0;
+                isApproachingTrack = false;
+                previousGameState = null;
                 return null;
             }
             // game is paused or other window has taken focus
@@ -236,8 +240,15 @@ namespace CrewChiefV4.rFactor1
 
             // --------------------------------
             // fuel data
-            currentGameState.FuelData.FuelUseActive = true;
-            currentGameState.FuelData.FuelLeft = shared.fuel;
+            // don't read fuel data until session is green and 60 seconds have passed since joining session
+            if ((currentGameState.SessionData.SessionPhase == SessionPhase.Green || 
+                currentGameState.SessionData.SessionPhase == SessionPhase.Finished || 
+                currentGameState.SessionData.SessionPhase == SessionPhase.Checkered) && 
+                currentGameState.Now.CompareTo(currentGameState.SessionData.SessionStartTime.AddSeconds(60)) >= 0)
+            {
+                currentGameState.FuelData.FuelUseActive = true;
+                currentGameState.FuelData.FuelLeft = shared.fuel;
+            }
 
             // --------------------------------
             // damage
@@ -635,17 +646,21 @@ namespace CrewChiefV4.rFactor1
             {
                 Flag = FlagEnum.YELLOW;
             }
-            else if (shared.gamePhase == (int)rFactor1Constant.rfGamePhase.fullCourseYellow)
+            else if (currentGameState.SessionData.SessionType == SessionType.Race ||
+                currentGameState.SessionData.SessionType == SessionType.Qualify)
             {
-                Flag = FlagEnum.DOUBLE_YELLOW;
-            }
-            else if (shared.yellowFlagState == (int)rFactor1Constant.rfYellowFlagState.lastLap || currentGameState.SessionData.LeaderHasFinishedRace)
-            {
-                Flag = FlagEnum.WHITE;
-            }
-            else if (shared.gamePhase == (int)rFactor1Constant.rfYellowFlagState.noFlag && previousGameState != null && previousGameState.SessionData.Flag == FlagEnum.DOUBLE_YELLOW)
-            {
-                Flag = FlagEnum.GREEN;
+                if (shared.gamePhase == (int)rFactor1Constant.rfGamePhase.fullCourseYellow)
+                {
+                    Flag = FlagEnum.DOUBLE_YELLOW;
+                }
+                else if (shared.yellowFlagState == (int)rFactor1Constant.rfYellowFlagState.lastLap || currentGameState.SessionData.LeaderHasFinishedRace)
+                {
+                    Flag = FlagEnum.WHITE;
+                }
+                else if (shared.gamePhase == (int)rFactor1Constant.rfYellowFlagState.noFlag && previousGameState != null && previousGameState.SessionData.Flag == FlagEnum.DOUBLE_YELLOW)
+                {
+                    Flag = FlagEnum.GREEN;
+                }
             }
             foreach (OpponentData opponent in currentGameState.OpponentData.Values)
             {
@@ -679,6 +694,16 @@ namespace CrewChiefV4.rFactor1
             float offTrackDistanceDelta = lateralDistDiff - distanceOffTrack;
             distanceOffTrack = currentGameState.PenaltiesData.IsOffRacingSurface ? lateralDistDiff : 0;
             isApproachingTrack = offTrackDistanceDelta < 0 && currentGameState.PenaltiesData.IsOffRacingSurface && lateralDistDiff < 3;
+            // primitive cut track detection for Reiza Time Trial Mode
+            if (currentGameState.SessionData.SessionType == SessionType.HotLap)
+            {
+                if ((previousGameState != null && !previousGameState.SessionData.CurrentLapIsValid &&
+                    previousGameState.SessionData.CompletedLaps == currentGameState.SessionData.CompletedLaps) || 
+                    currentGameState.PenaltiesData.IsOffRacingSurface)
+                {
+                    currentGameState.SessionData.CurrentLapIsValid = false;
+                }
+            }
 
             // --------------------------------
             // console output
