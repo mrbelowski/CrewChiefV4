@@ -177,9 +177,9 @@ namespace CrewChiefV4.rFactor1
             currentGameState.SessionData.CompletedLaps = player.totalLaps;
             currentGameState.SessionData.LapTimeCurrent = currentGameState.SessionData.SessionRunningTime - player.lapStartET;
             currentGameState.SessionData.LapTimePrevious = player.lastLapTime > 0 ? player.lastLapTime : -1;
-            currentGameState.SessionData.LastSector1Time = player.lastSector1 > 0 ? player.lastSector1 : -1;
-            currentGameState.SessionData.LastSector2Time = player.lastSector2 > 0 && player.lastSector1 > 0 ? player.lastSector2 - player.lastSector1 : -1;
-            currentGameState.SessionData.LastSector3Time = player.lastLapTime > 0 && player.lastSector2 > 0 ? player.lastLapTime - player.lastSector2 : -1;
+            currentGameState.SessionData.LastSector1Time = player.curSector1 > 0 ? player.curSector1 : -1;
+            currentGameState.SessionData.LastSector2Time = player.curSector2 > 0 && player.curSector1 > 0 ? player.curSector2 - player.curSector1 : -1;
+            currentGameState.SessionData.LastSector3Time = player.lastLapTime > 0 && player.curSector2 > 0 ? player.lastLapTime - player.curSector2 : -1;
             currentGameState.SessionData.PlayerBestSector1Time = player.bestSector1 > 0 ? player.bestSector1 : -1;
             currentGameState.SessionData.PlayerBestSector2Time = player.bestSector2 > 0 && player.bestSector1 > 0 ? player.bestSector2 - player.bestSector1 : -1;
             currentGameState.SessionData.PlayerBestSector3Time = player.bestLapTime > 0 && player.bestSector2 > 0 ? player.bestLapTime - player.bestSector2 : -1;
@@ -197,10 +197,10 @@ namespace CrewChiefV4.rFactor1
                         currentGameState.SessionData.SessionTimesAtEndOfSectors[3] = player.lapStartET > 0 ? player.lapStartET : -1;
                         break;
                     case 2:
-                        currentGameState.SessionData.SessionTimesAtEndOfSectors[1] = player.lapStartET > 0 && player.lastSector1 > 0 ? player.lapStartET + player.lastSector1 : -1;
+                        currentGameState.SessionData.SessionTimesAtEndOfSectors[1] = player.lapStartET > 0 && player.curSector1 > 0 ? player.lapStartET + player.curSector1 : -1;
                         break;
                     case 3:
-                        currentGameState.SessionData.SessionTimesAtEndOfSectors[2] = player.lapStartET > 0 && player.lastSector2 > 0 ? player.lapStartET + player.lastSector2 : -1;
+                        currentGameState.SessionData.SessionTimesAtEndOfSectors[2] = player.lapStartET > 0 && player.curSector2 > 0 ? player.lapStartET + player.curSector2 : -1;
                         break;
                     default:
                         break;
