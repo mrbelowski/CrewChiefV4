@@ -36,6 +36,8 @@ namespace CrewChiefV4.rFactor1
         // detect when approaching racing surface after being off track
         private float distanceOffTrack = 0;
         private Boolean isApproachingTrack = false;
+        // dynamically calculated wheel circumferences
+        private float[] wheelCircumference = new float[] { 0, 0 };
 
         public RF1GameStateMapper()
         {
@@ -71,6 +73,7 @@ namespace CrewChiefV4.rFactor1
                 isOfflineSession = true;
                 distanceOffTrack = 0;
                 isApproachingTrack = false;
+                wheelCircumference = new float[] { 0, 0 };
                 previousGameState = null;
                 return null;
             }
@@ -400,19 +403,36 @@ namespace CrewChiefV4.rFactor1
                 currentGameState.TyreData.PeakFrontLeftTemperatureForLap, currentGameState.TyreData.PeakFrontRightTemperatureForLap,
                 currentGameState.TyreData.PeakRearLeftTemperatureForLap, currentGameState.TyreData.PeakRearRightTemperatureForLap);
             // some simple locking / spinning checks
-            if (currentGameState.PositionAndMotionData.CarSpeed > 7)
+            if ((currentGameState.SessionData.IsNewSession || 
+                wheelCircumference[0] == 0 || wheelCircumference[1] == 0) && 
+                currentGameState.PositionAndMotionData.CarSpeed > 7)
             {
-                float minRotatingSpeed = 2 * (float)Math.PI * currentGameState.PositionAndMotionData.CarSpeed / currentGameState.carClass.maxTyreCircumference;
-                currentGameState.TyreData.LeftFrontIsLocked = Math.Abs(shared.wheel[(int)rFactor1Constant.rfWheelIndex.frontLeft].rotation) < minRotatingSpeed;
-                currentGameState.TyreData.RightFrontIsLocked = Math.Abs(shared.wheel[(int)rFactor1Constant.rfWheelIndex.frontRight].rotation) < minRotatingSpeed;
-                currentGameState.TyreData.LeftRearIsLocked = Math.Abs(shared.wheel[(int)rFactor1Constant.rfWheelIndex.rearLeft].rotation) < minRotatingSpeed;
-                currentGameState.TyreData.RightRearIsLocked = Math.Abs(shared.wheel[(int)rFactor1Constant.rfWheelIndex.rearRight].rotation) < minRotatingSpeed;
+                // calculate wheel circumference (assume left/right symmetry) at 25+ km/h
+                // front
+                wheelCircumference[0] = (2 * (float)Math.PI * currentGameState.PositionAndMotionData.CarSpeed / Math.Abs(shared.wheel[0].rotation) + 
+                    2 * (float)Math.PI * currentGameState.PositionAndMotionData.CarSpeed / Math.Abs(shared.wheel[1].rotation)) / 2;
+                // rear
+                wheelCircumference[1] = (2 * (float)Math.PI * currentGameState.PositionAndMotionData.CarSpeed / Math.Abs(shared.wheel[2].rotation) + 
+                    2 * (float)Math.PI * currentGameState.PositionAndMotionData.CarSpeed / Math.Abs(shared.wheel[3].rotation)) / 2;
+            }
+            if (currentGameState.PositionAndMotionData.CarSpeed > 7 && 
+                wheelCircumference[0] > 0 && wheelCircumference[1] > 0)
+            {
+                float[] rotatingSpeed = new float[] { 
+                    2 * (float)Math.PI * currentGameState.PositionAndMotionData.CarSpeed / wheelCircumference[0], 
+                    2 * (float)Math.PI * currentGameState.PositionAndMotionData.CarSpeed / wheelCircumference[1] };
+                float minRotFactor = 0.75f;
+                float maxRotFactor = 1.25f;
 
-                float maxRotatingSpeed = 2 * (float)Math.PI * currentGameState.PositionAndMotionData.CarSpeed / currentGameState.carClass.minTyreCircumference;
-                currentGameState.TyreData.LeftFrontIsSpinning = Math.Abs(shared.wheel[(int)rFactor1Constant.rfWheelIndex.frontLeft].rotation) > maxRotatingSpeed;
-                currentGameState.TyreData.RightFrontIsSpinning = Math.Abs(shared.wheel[(int)rFactor1Constant.rfWheelIndex.frontRight].rotation) > maxRotatingSpeed;
-                currentGameState.TyreData.LeftRearIsSpinning = Math.Abs(shared.wheel[(int)rFactor1Constant.rfWheelIndex.rearLeft].rotation) > maxRotatingSpeed;
-                currentGameState.TyreData.RightRearIsSpinning = Math.Abs(shared.wheel[(int)rFactor1Constant.rfWheelIndex.rearRight].rotation) > maxRotatingSpeed;
+                currentGameState.TyreData.LeftFrontIsLocked = Math.Abs(shared.wheel[(int)rFactor1Constant.rfWheelIndex.frontLeft].rotation) < minRotFactor * rotatingSpeed[0];
+                currentGameState.TyreData.RightFrontIsLocked = Math.Abs(shared.wheel[(int)rFactor1Constant.rfWheelIndex.frontRight].rotation) < minRotFactor * rotatingSpeed[0];
+                currentGameState.TyreData.LeftRearIsLocked = Math.Abs(shared.wheel[(int)rFactor1Constant.rfWheelIndex.rearLeft].rotation) < minRotFactor * rotatingSpeed[1];
+                currentGameState.TyreData.RightRearIsLocked = Math.Abs(shared.wheel[(int)rFactor1Constant.rfWheelIndex.rearRight].rotation) < minRotFactor * rotatingSpeed[1];
+
+                currentGameState.TyreData.LeftFrontIsSpinning = Math.Abs(shared.wheel[(int)rFactor1Constant.rfWheelIndex.frontLeft].rotation) > maxRotFactor * rotatingSpeed[0];
+                currentGameState.TyreData.RightFrontIsSpinning = Math.Abs(shared.wheel[(int)rFactor1Constant.rfWheelIndex.frontRight].rotation) > maxRotFactor * rotatingSpeed[0];
+                currentGameState.TyreData.LeftRearIsSpinning = Math.Abs(shared.wheel[(int)rFactor1Constant.rfWheelIndex.rearLeft].rotation) > maxRotFactor * rotatingSpeed[1];
+                currentGameState.TyreData.RightRearIsSpinning = Math.Abs(shared.wheel[(int)rFactor1Constant.rfWheelIndex.rearRight].rotation) > maxRotFactor * rotatingSpeed[1];
             }
             // use detached wheel status for suspension damage
             currentGameState.CarDamageData.SuspensionDamageStatus = CornerData.getCornerData(suspensionDamageThresholds,
