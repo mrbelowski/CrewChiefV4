@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -197,10 +197,10 @@ namespace CrewChiefV4.rFactor1
                         currentGameState.SessionData.SessionTimesAtEndOfSectors[3] = player.lapStartET > 0 ? player.lapStartET : -1;
                         break;
                     case 2:
-                        currentGameState.SessionData.SessionTimesAtEndOfSectors[1] = player.lapStartET + player.lastSector1 > 0 ? player.lapStartET + player.lastSector1 : -1;
+                        currentGameState.SessionData.SessionTimesAtEndOfSectors[1] = player.lapStartET > 0 && player.lastSector1 > 0 ? player.lapStartET + player.lastSector1 : -1;
                         break;
                     case 3:
-                        currentGameState.SessionData.SessionTimesAtEndOfSectors[2] = player.lapStartET + player.lastSector2 > 0 ? player.lapStartET + player.lastSector2 : -1;
+                        currentGameState.SessionData.SessionTimesAtEndOfSectors[2] = player.lapStartET > 0 && player.lastSector2 > 0 ? player.lapStartET + player.lastSector2 : -1;
                         break;
                     default:
                         break;
@@ -237,18 +237,6 @@ namespace CrewChiefV4.rFactor1
             // --------------------------------
             // transmission data
             currentGameState.TransmissionData.Gear = shared.gear;
-
-            // --------------------------------
-            // fuel data
-            // don't read fuel data until session is green and 60 seconds have passed since joining session
-            if ((currentGameState.SessionData.SessionPhase == SessionPhase.Green || 
-                currentGameState.SessionData.SessionPhase == SessionPhase.Finished || 
-                currentGameState.SessionData.SessionPhase == SessionPhase.Checkered) && 
-                currentGameState.Now.CompareTo(currentGameState.SessionData.SessionStartTime.AddSeconds(60)) >= 0)
-            {
-                currentGameState.FuelData.FuelUseActive = true;
-                currentGameState.FuelData.FuelLeft = shared.fuel;
-            }
 
             // --------------------------------
             // damage
@@ -634,6 +622,21 @@ namespace CrewChiefV4.rFactor1
             currentGameState.PitData.OnInLap = currentGameState.PitData.InPitlane && currentGameState.SessionData.SectorNumber == 3;
             currentGameState.PitData.IsMakingMandatoryPitStop = currentGameState.PitData.HasMandatoryPitStop && currentGameState.PitData.OnInLap && currentGameState.SessionData.CompletedLaps > currentGameState.PitData.PitWindowStart;
             currentGameState.PitData.PitWindow = currentGameState.PitData.IsMakingMandatoryPitStop ? PitWindow.StopInProgress : mapToPitWindow((rFactor1Constant.rfYellowFlagState)shared.yellowFlagState);
+
+            // --------------------------------
+            // fuel data
+            // don't read fuel data until session is green and 60 seconds have passed since joining race session
+            // don't read fuel data for non-race session until out of pit lane and more than one lap completed
+            if ((currentGameState.SessionData.SessionType == SessionType.Race &&
+                (currentGameState.SessionData.SessionPhase == SessionPhase.Green ||
+                currentGameState.SessionData.SessionPhase == SessionPhase.Finished ||
+                currentGameState.SessionData.SessionPhase == SessionPhase.Checkered) &&
+                currentGameState.Now.CompareTo(currentGameState.SessionData.SessionStartTime.AddSeconds(60)) >= 0) ||
+                (!currentGameState.PitData.InPitlane && currentGameState.SessionData.CompletedLaps > 1))
+            {
+                currentGameState.FuelData.FuelUseActive = true;
+                currentGameState.FuelData.FuelLeft = shared.fuel;
+            }
 
             // --------------------------------
             // flags data
