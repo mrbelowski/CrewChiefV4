@@ -241,72 +241,75 @@ namespace CrewChiefV4.rFactor1
             // --------------------------------
             // damage
             // not 100% certain on this mapping but it should be reasonably close
-            currentGameState.CarDamageData.DamageEnabled = true;
-            int bodyDamage = 0;
-            int engineDamage = 0;
-            int transmissionDamage = 0;
-            for (int i = 0; i < shared.dentSeverity.Length; i++)
+            if (currentGameState.SessionData.SessionType != SessionType.HotLap)
             {
-                int dent = shared.dentSeverity[i];
-                switch (i)
+                currentGameState.CarDamageData.DamageEnabled = true;
+                int bodyDamage = 0;
+                int engineDamage = 0;
+                int transmissionDamage = 0;
+                for (int i = 0; i < shared.dentSeverity.Length; i++)
                 {
-                    case 3:
-                        transmissionDamage = dent;
+                    int dent = shared.dentSeverity[i];
+                    switch (i)
+                    {
+                        case 3:
+                            transmissionDamage = dent;
+                            break;
+                        case 4:
+                            engineDamage = dent;
+                            break;
+                        default:
+                            bodyDamage += dent;
+                            break;
+                    }
+                }
+                switch (bodyDamage)
+                {
+                    // there's suspension damage included in these bytes but I'm not sure which ones
+                    case 0:
+                        currentGameState.CarDamageData.OverallAeroDamage = DamageLevel.NONE;
                         break;
+                    case 1:
+                        currentGameState.CarDamageData.OverallAeroDamage = DamageLevel.TRIVIAL;
+                        break;
+                    case 2:
+                        currentGameState.CarDamageData.OverallAeroDamage = DamageLevel.MINOR;
+                        break;
+                    case 3:
                     case 4:
-                        engineDamage = dent;
+                    case 5:
+                        currentGameState.CarDamageData.OverallAeroDamage = DamageLevel.MAJOR;
                         break;
                     default:
-                        bodyDamage += dent;
+                        currentGameState.CarDamageData.OverallAeroDamage = DamageLevel.DESTROYED;
                         break;
                 }
-            }
-            switch (bodyDamage)
-            {
-                // there's suspension damage included in these bytes but I'm not sure which ones
-                case 0:
-                    currentGameState.CarDamageData.OverallAeroDamage = DamageLevel.NONE;
-                    break;
-                case 1:
-                    currentGameState.CarDamageData.OverallAeroDamage = DamageLevel.TRIVIAL;
-                    break;
-                case 2:
-                    currentGameState.CarDamageData.OverallAeroDamage = DamageLevel.MINOR;
-                    break;
-                case 3:
-                case 4:
-                case 5:
-                    currentGameState.CarDamageData.OverallAeroDamage = DamageLevel.MAJOR;
-                    break;
-                default:
-                    currentGameState.CarDamageData.OverallAeroDamage = DamageLevel.DESTROYED;
-                    break;
-            }
-            switch (engineDamage)
-            {
-                // there is no "TRIVIAL" engine damage as even at the first level there's a chance of the engine seizing
-                case 1:
-                    currentGameState.CarDamageData.OverallEngineDamage = DamageLevel.MAJOR;
-                    break;
-                case 2:
-                    currentGameState.CarDamageData.OverallEngineDamage = DamageLevel.DESTROYED;
-                    break;
-                default:
-                    currentGameState.CarDamageData.OverallEngineDamage = DamageLevel.NONE;
-                    break;
-            }
-            switch (transmissionDamage)
-            {
-                // it seems that even at the first level the transmission is already toast
-                case 1:
-                    currentGameState.CarDamageData.OverallTransmissionDamage = DamageLevel.MAJOR;
-                    break;
-                case 2:
-                    currentGameState.CarDamageData.OverallTransmissionDamage = DamageLevel.DESTROYED;
-                    break;
-                default:
-                    currentGameState.CarDamageData.OverallTransmissionDamage = DamageLevel.NONE;
-                    break;
+                switch (engineDamage)
+                {
+                    // there is no "TRIVIAL" engine damage as even at the first level there's a chance of the engine seizing
+                    case 1:
+                        currentGameState.CarDamageData.OverallEngineDamage = DamageLevel.MAJOR;
+                        break;
+                    case 2:
+                        currentGameState.CarDamageData.OverallEngineDamage = DamageLevel.DESTROYED;
+                        break;
+                    default:
+                        currentGameState.CarDamageData.OverallEngineDamage = DamageLevel.NONE;
+                        break;
+                }
+                switch (transmissionDamage)
+                {
+                    // it seems that even at the first level the transmission is already toast
+                    case 1:
+                        currentGameState.CarDamageData.OverallTransmissionDamage = DamageLevel.MAJOR;
+                        break;
+                    case 2:
+                        currentGameState.CarDamageData.OverallTransmissionDamage = DamageLevel.DESTROYED;
+                        break;
+                    default:
+                        currentGameState.CarDamageData.OverallTransmissionDamage = DamageLevel.NONE;
+                        break;
+                }
             }
 
             // --------------------------------
@@ -625,13 +628,12 @@ namespace CrewChiefV4.rFactor1
 
             // --------------------------------
             // fuel data
-            // don't read fuel data until session is green and 60 seconds have passed since joining race session
+            // don't read fuel data until race session is green
             // don't read fuel data for non-race session until out of pit lane and more than one lap completed
             if ((currentGameState.SessionData.SessionType == SessionType.Race &&
                 (currentGameState.SessionData.SessionPhase == SessionPhase.Green ||
                 currentGameState.SessionData.SessionPhase == SessionPhase.Finished ||
-                currentGameState.SessionData.SessionPhase == SessionPhase.Checkered) &&
-                currentGameState.Now.CompareTo(currentGameState.SessionData.SessionStartTime.AddSeconds(60)) >= 0) ||
+                currentGameState.SessionData.SessionPhase == SessionPhase.Checkered)) ||
                 (!currentGameState.PitData.InPitlane && currentGameState.SessionData.CompletedLaps > 1))
             {
                 currentGameState.FuelData.FuelUseActive = true;
