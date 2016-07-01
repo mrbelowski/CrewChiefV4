@@ -248,23 +248,9 @@ namespace CrewChiefV4.rFactor1
             {
                 currentGameState.CarDamageData.DamageEnabled = true;
                 int bodyDamage = 0;
-                int engineDamage = 0;
-                int transmissionDamage = 0;
-                for (int i = 0; i < shared.dentSeverity.Length; i++)
+                foreach (int dent in shared.dentSeverity)
                 {
-                    int dent = shared.dentSeverity[i];
-                    switch (i)
-                    {
-                        case 3:
-                            transmissionDamage = dent;
-                            break;
-                        case 4:
-                            engineDamage = dent;
-                            break;
-                        default:
-                            bodyDamage += dent;
-                            break;
-                    }
+                    bodyDamage += dent;
                 }
                 switch (bodyDamage)
                 {
@@ -276,41 +262,15 @@ namespace CrewChiefV4.rFactor1
                         currentGameState.CarDamageData.OverallAeroDamage = DamageLevel.TRIVIAL;
                         break;
                     case 2:
+                    case 3:
                         currentGameState.CarDamageData.OverallAeroDamage = DamageLevel.MINOR;
                         break;
-                    case 3:
                     case 4:
                     case 5:
                         currentGameState.CarDamageData.OverallAeroDamage = DamageLevel.MAJOR;
                         break;
                     default:
                         currentGameState.CarDamageData.OverallAeroDamage = DamageLevel.DESTROYED;
-                        break;
-                }
-                switch (engineDamage)
-                {
-                    // there is no "TRIVIAL" engine damage as even at the first level there's a chance of the engine seizing
-                    case 1:
-                        currentGameState.CarDamageData.OverallEngineDamage = DamageLevel.MAJOR;
-                        break;
-                    case 2:
-                        currentGameState.CarDamageData.OverallEngineDamage = DamageLevel.DESTROYED;
-                        break;
-                    default:
-                        currentGameState.CarDamageData.OverallEngineDamage = DamageLevel.NONE;
-                        break;
-                }
-                switch (transmissionDamage)
-                {
-                    // it seems that even at the first level the transmission is already toast
-                    case 1:
-                        currentGameState.CarDamageData.OverallTransmissionDamage = DamageLevel.MAJOR;
-                        break;
-                    case 2:
-                        currentGameState.CarDamageData.OverallTransmissionDamage = DamageLevel.DESTROYED;
-                        break;
-                    default:
-                        currentGameState.CarDamageData.OverallTransmissionDamage = DamageLevel.NONE;
                         break;
                 }
             }
@@ -405,9 +365,10 @@ namespace CrewChiefV4.rFactor1
             // some simple locking / spinning checks
             if ((currentGameState.SessionData.IsNewSession || 
                 wheelCircumference[0] == 0 || wheelCircumference[1] == 0) && 
-                currentGameState.PositionAndMotionData.CarSpeed > 7)
+                currentGameState.PositionAndMotionData.CarSpeed > 14 && 
+                Math.Abs(shared.unfilteredSteering) <= 0.05)
             {
-                // calculate wheel circumference (assume left/right symmetry) at 25+ km/h
+                // calculate wheel circumference (assume left/right symmetry) at 50+ km/h with (mostly) straight steering
                 // front
                 wheelCircumference[0] = (2 * (float)Math.PI * currentGameState.PositionAndMotionData.CarSpeed / Math.Abs(shared.wheel[0].rotation) + 
                     2 * (float)Math.PI * currentGameState.PositionAndMotionData.CarSpeed / Math.Abs(shared.wheel[1].rotation)) / 2;
@@ -421,8 +382,8 @@ namespace CrewChiefV4.rFactor1
                 float[] rotatingSpeed = new float[] { 
                     2 * (float)Math.PI * currentGameState.PositionAndMotionData.CarSpeed / wheelCircumference[0], 
                     2 * (float)Math.PI * currentGameState.PositionAndMotionData.CarSpeed / wheelCircumference[1] };
-                float minRotFactor = 0.75f;
-                float maxRotFactor = 1.25f;
+                float minRotFactor = 0.5f;
+                float maxRotFactor = 1.3f;
 
                 currentGameState.TyreData.LeftFrontIsLocked = Math.Abs(shared.wheel[(int)rFactor1Constant.rfWheelIndex.frontLeft].rotation) < minRotFactor * rotatingSpeed[0];
                 currentGameState.TyreData.RightFrontIsLocked = Math.Abs(shared.wheel[(int)rFactor1Constant.rfWheelIndex.frontRight].rotation) < minRotFactor * rotatingSpeed[0];
@@ -728,6 +689,15 @@ namespace CrewChiefV4.rFactor1
                 {
                     currentGameState.SessionData.CurrentLapIsValid = false;
                 }
+            }
+            if ((((currentGameState.SessionData.SectorNumber == 2 && currentGameState.SessionData.LastSector1Time < 0) || 
+                (currentGameState.SessionData.SectorNumber == 3 && currentGameState.SessionData.LastSector2Time < 0)) && 
+                !currentGameState.PitData.OnOutLap && !currentGameState.PitData.OnInLap &&
+                (currentGameState.SessionData.SessionType == SessionType.Race || currentGameState.SessionData.SessionType == SessionType.Qualify)) || 
+                (previousGameState != null && previousGameState.SessionData.CompletedLaps == currentGameState.SessionData.CompletedLaps && 
+                !previousGameState.SessionData.CurrentLapIsValid))
+            {
+                currentGameState.SessionData.CurrentLapIsValid = false;
             }
 
             // --------------------------------
