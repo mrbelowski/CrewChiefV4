@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -36,6 +36,8 @@ namespace CrewChiefV4.rFactor1
         // detect when approaching racing surface after being off track
         private float distanceOffTrack = 0;
         private Boolean isApproachingTrack = false;
+        // dynamically calculated wheel circumferences
+        private float[] wheelCircumference = new float[] { 0, 0 };
 
         public RF1GameStateMapper()
         {
@@ -68,6 +70,11 @@ namespace CrewChiefV4.rFactor1
             // no session data
             if (shared.numVehicles == 0)
             {
+                isOfflineSession = true;
+                distanceOffTrack = 0;
+                isApproachingTrack = false;
+                wheelCircumference = new float[] { 0, 0 };
+                previousGameState = null;
                 return null;
             }
             // game is paused or other window has taken focus
@@ -119,7 +126,13 @@ namespace CrewChiefV4.rFactor1
                 playerName = driverName;
             }
             // these things should remain constant during a session
+            currentGameState.SessionData.EventIndex = shared.session;
+            currentGameState.SessionData.SessionIteration = 
+                shared.session >= 1 && shared.session <= 4 ? shared.session - 1 :
+                shared.session >= 5 && shared.session <= 8 ? shared.session - 5 :
+                shared.session >= 10 && shared.session <= 13 ? shared.session - 10 : 0;
             currentGameState.SessionData.SessionType = mapToSessionType(shared);
+            currentGameState.SessionData.SessionPhase = mapToSessionPhase((rFactor1Constant.rfGamePhase)shared.gamePhase);
             currentGameState.carClass = CarData.getCarClassForRF1ClassName(getNameFromBytes(player.vehicleClass));
             brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(currentGameState.carClass);
             currentGameState.SessionData.DriverRawName = getNameFromBytes(player.driverName).ToLower();
@@ -139,6 +152,8 @@ namespace CrewChiefV4.rFactor1
                 // these sometimes change in the beginning or end of session!
                 //currentGameState.SessionData.SessionNumberOfLaps != previousGameState.SessionData.SessionNumberOfLaps ||
                 //currentGameState.SessionData.SessionTotalRunTime != previousGameState.SessionData.SessionTotalRunTime || 
+                currentGameState.SessionData.EventIndex != previousGameState.SessionData.EventIndex || 
+                currentGameState.SessionData.SessionIteration != previousGameState.SessionData.SessionIteration || 
                 ((previousGameState.SessionData.SessionPhase == SessionPhase.Checkered || 
                 previousGameState.SessionData.SessionPhase == SessionPhase.Finished || 
                 previousGameState.SessionData.SessionPhase == SessionPhase.Green) && 
@@ -146,7 +161,6 @@ namespace CrewChiefV4.rFactor1
                 currentGameState.SessionData.SessionPhase == SessionPhase.Gridwalk ||
                 currentGameState.SessionData.SessionPhase == SessionPhase.Formation ||
                 currentGameState.SessionData.SessionPhase == SessionPhase.Countdown)); 
-            currentGameState.SessionData.SessionPhase = mapToSessionPhase((rFactor1Constant.rfGamePhase)shared.gamePhase);
             currentGameState.SessionData.SessionStartTime = currentGameState.SessionData.IsNewSession ? currentGameState.Now : previousGameState.SessionData.SessionStartTime;
             currentGameState.SessionData.SessionHasFixedTime = currentGameState.SessionData.SessionTotalRunTime > 0;
             currentGameState.SessionData.SessionRunningTime = shared.currentET;
@@ -166,9 +180,9 @@ namespace CrewChiefV4.rFactor1
             currentGameState.SessionData.CompletedLaps = player.totalLaps;
             currentGameState.SessionData.LapTimeCurrent = currentGameState.SessionData.SessionRunningTime - player.lapStartET;
             currentGameState.SessionData.LapTimePrevious = player.lastLapTime > 0 ? player.lastLapTime : -1;
-            currentGameState.SessionData.LastSector1Time = player.lastSector1 > 0 ? player.lastSector1 : -1;
-            currentGameState.SessionData.LastSector2Time = player.lastSector2 > 0 && player.lastSector1 > 0 ? player.lastSector2 - player.lastSector1 : -1;
-            currentGameState.SessionData.LastSector3Time = player.lastLapTime > 0 && player.lastSector2 > 0 ? player.lastLapTime - player.lastSector2 : -1;
+            currentGameState.SessionData.LastSector1Time = player.curSector1 > 0 ? player.curSector1 : -1;
+            currentGameState.SessionData.LastSector2Time = player.curSector2 > 0 && player.curSector1 > 0 ? player.curSector2 - player.curSector1 : -1;
+            currentGameState.SessionData.LastSector3Time = player.lastLapTime > 0 && player.curSector2 > 0 ? player.lastLapTime - player.curSector2 : -1;
             currentGameState.SessionData.PlayerBestSector1Time = player.bestSector1 > 0 ? player.bestSector1 : -1;
             currentGameState.SessionData.PlayerBestSector2Time = player.bestSector2 > 0 && player.bestSector1 > 0 ? player.bestSector2 - player.bestSector1 : -1;
             currentGameState.SessionData.PlayerBestSector3Time = player.bestLapTime > 0 && player.bestSector2 > 0 ? player.bestLapTime - player.bestSector2 : -1;
@@ -186,10 +200,10 @@ namespace CrewChiefV4.rFactor1
                         currentGameState.SessionData.SessionTimesAtEndOfSectors[3] = player.lapStartET > 0 ? player.lapStartET : -1;
                         break;
                     case 2:
-                        currentGameState.SessionData.SessionTimesAtEndOfSectors[1] = player.lapStartET + player.lastSector1 > 0 ? player.lapStartET + player.lastSector1 : -1;
+                        currentGameState.SessionData.SessionTimesAtEndOfSectors[1] = player.lapStartET > 0 && player.curSector1 > 0 ? player.lapStartET + player.curSector1 : -1;
                         break;
                     case 3:
-                        currentGameState.SessionData.SessionTimesAtEndOfSectors[2] = player.lapStartET + player.lastSector2 > 0 ? player.lapStartET + player.lastSector2 : -1;
+                        currentGameState.SessionData.SessionTimesAtEndOfSectors[2] = player.lapStartET > 0 && player.curSector2 > 0 ? player.lapStartET + player.curSector2 : -1;
                         break;
                     default:
                         break;
@@ -228,79 +242,37 @@ namespace CrewChiefV4.rFactor1
             currentGameState.TransmissionData.Gear = shared.gear;
 
             // --------------------------------
-            // fuel data
-            currentGameState.FuelData.FuelUseActive = true;
-            currentGameState.FuelData.FuelLeft = shared.fuel;
-
-            // --------------------------------
             // damage
             // not 100% certain on this mapping but it should be reasonably close
-            currentGameState.CarDamageData.DamageEnabled = true;
-            int bodyDamage = 0;
-            int engineDamage = 0;
-            int transmissionDamage = 0;
-            for (int i = 0; i < shared.dentSeverity.Length; i++)
+            if (currentGameState.SessionData.SessionType != SessionType.HotLap)
             {
-                int dent = shared.dentSeverity[i];
-                switch (i)
+                currentGameState.CarDamageData.DamageEnabled = true;
+                int bodyDamage = 0;
+                foreach (int dent in shared.dentSeverity)
                 {
+                    bodyDamage += dent;
+                }
+                switch (bodyDamage)
+                {
+                    // there's suspension damage included in these bytes but I'm not sure which ones
+                    case 0:
+                        currentGameState.CarDamageData.OverallAeroDamage = DamageLevel.NONE;
+                        break;
+                    case 1:
+                        currentGameState.CarDamageData.OverallAeroDamage = DamageLevel.TRIVIAL;
+                        break;
+                    case 2:
                     case 3:
-                        transmissionDamage = dent;
+                        currentGameState.CarDamageData.OverallAeroDamage = DamageLevel.MINOR;
                         break;
                     case 4:
-                        engineDamage = dent;
+                    case 5:
+                        currentGameState.CarDamageData.OverallAeroDamage = DamageLevel.MAJOR;
                         break;
                     default:
-                        bodyDamage += dent;
+                        currentGameState.CarDamageData.OverallAeroDamage = DamageLevel.DESTROYED;
                         break;
                 }
-            }
-            switch (bodyDamage)
-            {
-                // there's suspension damage included in these bytes but I'm not sure which ones
-                case 0:
-                    currentGameState.CarDamageData.OverallAeroDamage = DamageLevel.NONE;
-                    break;
-                case 1:
-                    currentGameState.CarDamageData.OverallAeroDamage = DamageLevel.TRIVIAL;
-                    break;
-                case 2:
-                    currentGameState.CarDamageData.OverallAeroDamage = DamageLevel.MINOR;
-                    break;
-                case 3:
-                case 4:
-                case 5:
-                    currentGameState.CarDamageData.OverallAeroDamage = DamageLevel.MAJOR;
-                    break;
-                default:
-                    currentGameState.CarDamageData.OverallAeroDamage = DamageLevel.DESTROYED;
-                    break;
-            }
-            switch (engineDamage)
-            {
-                // there is no "TRIVIAL" engine damage as even at the first level there's a chance of the engine seizing
-                case 1:
-                    currentGameState.CarDamageData.OverallEngineDamage = DamageLevel.MAJOR;
-                    break;
-                case 2:
-                    currentGameState.CarDamageData.OverallEngineDamage = DamageLevel.DESTROYED;
-                    break;
-                default:
-                    currentGameState.CarDamageData.OverallEngineDamage = DamageLevel.NONE;
-                    break;
-            }
-            switch (transmissionDamage)
-            {
-                // it seems that even at the first level the transmission is already toast
-                case 1:
-                    currentGameState.CarDamageData.OverallTransmissionDamage = DamageLevel.MAJOR;
-                    break;
-                case 2:
-                    currentGameState.CarDamageData.OverallTransmissionDamage = DamageLevel.DESTROYED;
-                    break;
-                default:
-                    currentGameState.CarDamageData.OverallTransmissionDamage = DamageLevel.NONE;
-                    break;
             }
 
             // --------------------------------
@@ -391,19 +363,37 @@ namespace CrewChiefV4.rFactor1
                 currentGameState.TyreData.PeakFrontLeftTemperatureForLap, currentGameState.TyreData.PeakFrontRightTemperatureForLap,
                 currentGameState.TyreData.PeakRearLeftTemperatureForLap, currentGameState.TyreData.PeakRearRightTemperatureForLap);
             // some simple locking / spinning checks
-            if (currentGameState.PositionAndMotionData.CarSpeed > 7)
+            if ((currentGameState.SessionData.IsNewSession || 
+                wheelCircumference[0] == 0 || wheelCircumference[1] == 0) && 
+                currentGameState.PositionAndMotionData.CarSpeed > 14 && 
+                Math.Abs(shared.unfilteredSteering) <= 0.05)
             {
-                float minRotatingSpeed = 2 * (float)Math.PI * currentGameState.PositionAndMotionData.CarSpeed / currentGameState.carClass.maxTyreCircumference;
-                currentGameState.TyreData.LeftFrontIsLocked = Math.Abs(shared.wheel[(int)rFactor1Constant.rfWheelIndex.frontLeft].rotation) < minRotatingSpeed;
-                currentGameState.TyreData.RightFrontIsLocked = Math.Abs(shared.wheel[(int)rFactor1Constant.rfWheelIndex.frontRight].rotation) < minRotatingSpeed;
-                currentGameState.TyreData.LeftRearIsLocked = Math.Abs(shared.wheel[(int)rFactor1Constant.rfWheelIndex.rearLeft].rotation) < minRotatingSpeed;
-                currentGameState.TyreData.RightRearIsLocked = Math.Abs(shared.wheel[(int)rFactor1Constant.rfWheelIndex.rearRight].rotation) < minRotatingSpeed;
+                // calculate wheel circumference (assume left/right symmetry) at 50+ km/h with (mostly) straight steering
+                // front
+                wheelCircumference[0] = (2 * (float)Math.PI * currentGameState.PositionAndMotionData.CarSpeed / Math.Abs(shared.wheel[0].rotation) + 
+                    2 * (float)Math.PI * currentGameState.PositionAndMotionData.CarSpeed / Math.Abs(shared.wheel[1].rotation)) / 2;
+                // rear
+                wheelCircumference[1] = (2 * (float)Math.PI * currentGameState.PositionAndMotionData.CarSpeed / Math.Abs(shared.wheel[2].rotation) + 
+                    2 * (float)Math.PI * currentGameState.PositionAndMotionData.CarSpeed / Math.Abs(shared.wheel[3].rotation)) / 2;
+            }
+            if (currentGameState.PositionAndMotionData.CarSpeed > 7 && 
+                wheelCircumference[0] > 0 && wheelCircumference[1] > 0)
+            {
+                float[] rotatingSpeed = new float[] { 
+                    2 * (float)Math.PI * currentGameState.PositionAndMotionData.CarSpeed / wheelCircumference[0], 
+                    2 * (float)Math.PI * currentGameState.PositionAndMotionData.CarSpeed / wheelCircumference[1] };
+                float minRotFactor = 0.5f;
+                float maxRotFactor = 1.3f;
 
-                float maxRotatingSpeed = 2 * (float)Math.PI * currentGameState.PositionAndMotionData.CarSpeed / currentGameState.carClass.minTyreCircumference;
-                currentGameState.TyreData.LeftFrontIsSpinning = Math.Abs(shared.wheel[(int)rFactor1Constant.rfWheelIndex.frontLeft].rotation) > maxRotatingSpeed;
-                currentGameState.TyreData.RightFrontIsSpinning = Math.Abs(shared.wheel[(int)rFactor1Constant.rfWheelIndex.frontRight].rotation) > maxRotatingSpeed;
-                currentGameState.TyreData.LeftRearIsSpinning = Math.Abs(shared.wheel[(int)rFactor1Constant.rfWheelIndex.rearLeft].rotation) > maxRotatingSpeed;
-                currentGameState.TyreData.RightRearIsSpinning = Math.Abs(shared.wheel[(int)rFactor1Constant.rfWheelIndex.rearRight].rotation) > maxRotatingSpeed;
+                currentGameState.TyreData.LeftFrontIsLocked = Math.Abs(shared.wheel[(int)rFactor1Constant.rfWheelIndex.frontLeft].rotation) < minRotFactor * rotatingSpeed[0];
+                currentGameState.TyreData.RightFrontIsLocked = Math.Abs(shared.wheel[(int)rFactor1Constant.rfWheelIndex.frontRight].rotation) < minRotFactor * rotatingSpeed[0];
+                currentGameState.TyreData.LeftRearIsLocked = Math.Abs(shared.wheel[(int)rFactor1Constant.rfWheelIndex.rearLeft].rotation) < minRotFactor * rotatingSpeed[1];
+                currentGameState.TyreData.RightRearIsLocked = Math.Abs(shared.wheel[(int)rFactor1Constant.rfWheelIndex.rearRight].rotation) < minRotFactor * rotatingSpeed[1];
+
+                currentGameState.TyreData.LeftFrontIsSpinning = Math.Abs(shared.wheel[(int)rFactor1Constant.rfWheelIndex.frontLeft].rotation) > maxRotFactor * rotatingSpeed[0];
+                currentGameState.TyreData.RightFrontIsSpinning = Math.Abs(shared.wheel[(int)rFactor1Constant.rfWheelIndex.frontRight].rotation) > maxRotFactor * rotatingSpeed[0];
+                currentGameState.TyreData.LeftRearIsSpinning = Math.Abs(shared.wheel[(int)rFactor1Constant.rfWheelIndex.rearLeft].rotation) > maxRotFactor * rotatingSpeed[1];
+                currentGameState.TyreData.RightRearIsSpinning = Math.Abs(shared.wheel[(int)rFactor1Constant.rfWheelIndex.rearRight].rotation) > maxRotFactor * rotatingSpeed[1];
             }
             // use detached wheel status for suspension damage
             currentGameState.CarDamageData.SuspensionDamageStatus = CornerData.getCornerData(suspensionDamageThresholds,
@@ -618,6 +608,20 @@ namespace CrewChiefV4.rFactor1
             currentGameState.PitData.PitWindow = currentGameState.PitData.IsMakingMandatoryPitStop ? PitWindow.StopInProgress : mapToPitWindow((rFactor1Constant.rfYellowFlagState)shared.yellowFlagState);
 
             // --------------------------------
+            // fuel data
+            // don't read fuel data until race session is green
+            // don't read fuel data for non-race session until out of pit lane and more than one lap completed
+            if ((currentGameState.SessionData.SessionType == SessionType.Race &&
+                (currentGameState.SessionData.SessionPhase == SessionPhase.Green ||
+                currentGameState.SessionData.SessionPhase == SessionPhase.Finished ||
+                currentGameState.SessionData.SessionPhase == SessionPhase.Checkered)) ||
+                (!currentGameState.PitData.InPitlane && currentGameState.SessionData.CompletedLaps > 1))
+            {
+                currentGameState.FuelData.FuelUseActive = true;
+                currentGameState.FuelData.FuelLeft = shared.fuel;
+            }
+
+            // --------------------------------
             // flags data
             FlagEnum Flag = FlagEnum.UNKNOWN;
             if (currentGameState.SessionData.IsDisqualified && previousGameState != null && !previousGameState.SessionData.IsDisqualified)
@@ -628,17 +632,21 @@ namespace CrewChiefV4.rFactor1
             {
                 Flag = FlagEnum.YELLOW;
             }
-            else if (shared.gamePhase == (int)rFactor1Constant.rfGamePhase.fullCourseYellow)
+            else if (currentGameState.SessionData.SessionType == SessionType.Race ||
+                currentGameState.SessionData.SessionType == SessionType.Qualify)
             {
-                Flag = FlagEnum.DOUBLE_YELLOW;
-            }
-            else if (shared.yellowFlagState == (int)rFactor1Constant.rfYellowFlagState.lastLap || currentGameState.SessionData.LeaderHasFinishedRace)
-            {
-                Flag = FlagEnum.WHITE;
-            }
-            else if (shared.gamePhase == (int)rFactor1Constant.rfYellowFlagState.noFlag && previousGameState != null && previousGameState.SessionData.Flag == FlagEnum.DOUBLE_YELLOW)
-            {
-                Flag = FlagEnum.GREEN;
+                if (shared.gamePhase == (int)rFactor1Constant.rfGamePhase.fullCourseYellow)
+                {
+                    Flag = FlagEnum.DOUBLE_YELLOW;
+                }
+                else if (shared.yellowFlagState == (int)rFactor1Constant.rfYellowFlagState.lastLap || currentGameState.SessionData.LeaderHasFinishedRace)
+                {
+                    Flag = FlagEnum.WHITE;
+                }
+                else if (shared.gamePhase == (int)rFactor1Constant.rfYellowFlagState.noFlag && previousGameState != null && previousGameState.SessionData.Flag == FlagEnum.DOUBLE_YELLOW)
+                {
+                    Flag = FlagEnum.GREEN;
+                }
             }
             foreach (OpponentData opponent in currentGameState.OpponentData.Values)
             {
@@ -672,12 +680,32 @@ namespace CrewChiefV4.rFactor1
             float offTrackDistanceDelta = lateralDistDiff - distanceOffTrack;
             distanceOffTrack = currentGameState.PenaltiesData.IsOffRacingSurface ? lateralDistDiff : 0;
             isApproachingTrack = offTrackDistanceDelta < 0 && currentGameState.PenaltiesData.IsOffRacingSurface && lateralDistDiff < 3;
+            // primitive cut track detection for Reiza Time Trial Mode
+            if (currentGameState.SessionData.SessionType == SessionType.HotLap)
+            {
+                if ((previousGameState != null && !previousGameState.SessionData.CurrentLapIsValid &&
+                    previousGameState.SessionData.CompletedLaps == currentGameState.SessionData.CompletedLaps) || 
+                    currentGameState.PenaltiesData.IsOffRacingSurface)
+                {
+                    currentGameState.SessionData.CurrentLapIsValid = false;
+                }
+            }
+            if ((((currentGameState.SessionData.SectorNumber == 2 && currentGameState.SessionData.LastSector1Time < 0) || 
+                (currentGameState.SessionData.SectorNumber == 3 && currentGameState.SessionData.LastSector2Time < 0)) && 
+                !currentGameState.PitData.OnOutLap && !currentGameState.PitData.OnInLap &&
+                (currentGameState.SessionData.SessionType == SessionType.Race || currentGameState.SessionData.SessionType == SessionType.Qualify)) || 
+                (previousGameState != null && previousGameState.SessionData.CompletedLaps == currentGameState.SessionData.CompletedLaps && 
+                !previousGameState.SessionData.CurrentLapIsValid))
+            {
+                currentGameState.SessionData.CurrentLapIsValid = false;
+            }
 
             // --------------------------------
             // console output
             if (currentGameState.SessionData.IsNewSession)
             {
                 Console.WriteLine("New session, trigger data:");
+                Console.WriteLine("EventIndex " + currentGameState.SessionData.EventIndex);
                 Console.WriteLine("SessionType " + currentGameState.SessionData.SessionType);
                 Console.WriteLine("SessionPhase " + currentGameState.SessionData.SessionPhase);
                 Console.WriteLine("SessionIteration " + currentGameState.SessionData.SessionIteration);
