@@ -85,6 +85,10 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ACS\ACSData.cs" />
+    <Compile Include="ACS\ACSGameStateMapper.cs" />
+    <Compile Include="ACS\ACSSharedMemoryReader.cs" />
+    <Compile Include="ACS\ACSSpotter.cs" />
     <Compile Include="Audio\Sounds.cs" />
     <Compile Include="CarData.cs" />
     <Compile Include="DriverNameHelper.cs" />
@@ -137,6 +141,7 @@
     <Compile Include="RF1\RF1GameStateMapper.cs" />
     <Compile Include="RF1\RF1SharedMemoryReader.cs" />
     <Compile Include="RF1\RF1Spotter.cs" />
+    <Compile Include="Settings.cs" />
     <Compile Include="TrackData.cs" />
     <Compile Include="UpdateHelper.cs" />
     <Compile Include="UserInterface\FloatPropertyControl.cs">
