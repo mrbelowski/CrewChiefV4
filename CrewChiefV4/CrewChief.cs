@@ -419,19 +419,21 @@ namespace CrewChiefV4
                         {
                             Console.WriteLine("Error mapping game data: " + e.StackTrace);
                         }
-
-                        if (!spotterIsRunning)
+                        //Assetto Corsa testing
+                        if (gameDefinition.gameEnum == GameEnum.ASSETTO)
                         {
-                            Console.WriteLine("********** starting spotter***********");
-                            spotter.clearState();
-                            startSpotterThread();
+                            if (!spotterIsRunning)
+                            {
+                                Console.WriteLine("********** starting spotter***********");
+                                spotter.clearState();
+                                startSpotterThread();
+                            }
+                            previousGameState = currentGameState;
+                            currentGameState = nextGameState;
+                            // if we're paused or viewing another car, the mapper will just return the previous game state so we don't lose all the
+                            // persistent state information. If this is the case, don't process any stuff
                         }
-                        previousGameState = currentGameState;
-                        currentGameState = nextGameState;
-                        /*
-                        // if we're paused or viewing another car, the mapper will just return the previous game state so we don't lose all the
-                        // persistent state information. If this is the case, don't process any stuff
-                        if (nextGameState != null && nextGameState != currentGameState) 
+                        else if (nextGameState != null && nextGameState != currentGameState)
                         {
                             previousGameState = currentGameState;
                             currentGameState = nextGameState;
@@ -529,7 +531,7 @@ namespace CrewChiefV4
                             {
                                 spotter.pause();
                             }
-                        }*/
+                        }
                     }
                 }
                 else
