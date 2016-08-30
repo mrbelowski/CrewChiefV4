@@ -92,7 +92,7 @@ namespace CrewChiefV4
             this.startApplicationButton.Name = "startApplicationButton";
             this.startApplicationButton.Size = new System.Drawing.Size(137, 41);
             this.startApplicationButton.TabIndex = 5;
-            this.startApplicationButton.Text = Configuration.getUIString("start_application");
+            this.startApplicationButton.Text = "start_application";
             this.startApplicationButton.UseVisualStyleBackColor = true;
             this.startApplicationButton.Click += new System.EventHandler(this.startApplicationButton_Click);
             // 
@@ -120,7 +120,7 @@ namespace CrewChiefV4
             this.assignButtonToAction.Name = "assignButtonToAction";
             this.assignButtonToAction.Size = new System.Drawing.Size(167, 39);
             this.assignButtonToAction.TabIndex = 9;
-            this.assignButtonToAction.Text = Configuration.getUIString("assign_control");
+            this.assignButtonToAction.Text = "assign_control";
             this.assignButtonToAction.UseVisualStyleBackColor = true;
             this.assignButtonToAction.Click += new System.EventHandler(this.assignButtonToActionClick);
             // 
@@ -130,7 +130,7 @@ namespace CrewChiefV4
             this.deleteAssigmentButton.Name = "deleteAssigmentButton";
             this.deleteAssigmentButton.Size = new System.Drawing.Size(167, 40);
             this.deleteAssigmentButton.TabIndex = 10;
-            this.deleteAssigmentButton.Text = Configuration.getUIString("delete_assignment");
+            this.deleteAssigmentButton.Text = "delete_assignment";
             this.deleteAssigmentButton.UseVisualStyleBackColor = true;
             this.deleteAssigmentButton.Click += new System.EventHandler(this.deleteAssignmentButtonClicked);
             // 
@@ -142,7 +142,7 @@ namespace CrewChiefV4
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(138, 17);
             this.label1.TabIndex = 11;
-            this.label1.Text = Configuration.getUIString("available_controllers");
+            this.label1.Text = "available_controllers";
             // 
             // label2
             // 
@@ -152,7 +152,7 @@ namespace CrewChiefV4
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(117, 17);
             this.label2.TabIndex = 12;
-            this.label2.Text = Configuration.getUIString("available_actions");
+            this.label2.Text = "available_actions";
             // 
             // button1
             // 
@@ -160,7 +160,7 @@ namespace CrewChiefV4
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(143, 41);
             this.button1.TabIndex = 14;
-            this.button1.Text = Configuration.getUIString("properties");
+            this.button1.Text = "properties";
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.editPropertiesButtonClicked);
             // 
@@ -175,7 +175,7 @@ namespace CrewChiefV4
             this.groupBox1.Size = new System.Drawing.Size(164, 121);
             this.groupBox1.TabIndex = 15;
             this.groupBox1.TabStop = false;
-            this.groupBox1.Text = Configuration.getUIString("voice_recognition_mode");
+            this.groupBox1.Text = "voice_recognition_mode";
             // 
             // alwaysOnButton
             // 
@@ -185,7 +185,7 @@ namespace CrewChiefV4
             this.alwaysOnButton.Size = new System.Drawing.Size(75, 17);
             this.alwaysOnButton.TabIndex = 3;
             this.alwaysOnButton.TabStop = true;
-            this.alwaysOnButton.Text = Configuration.getUIString("always_on");
+            this.alwaysOnButton.Text = "always_on";
             this.alwaysOnButton.UseVisualStyleBackColor = true;
             this.alwaysOnButton.CheckedChanged += new System.EventHandler(this.alwaysOnButton_CheckedChanged);
             // 
@@ -197,7 +197,7 @@ namespace CrewChiefV4
             this.toggleButton.Size = new System.Drawing.Size(90, 17);
             this.toggleButton.TabIndex = 2;
             this.toggleButton.TabStop = true;
-            this.toggleButton.Text = Configuration.getUIString("toggle_button");
+            this.toggleButton.Text = "toggle_button";
             this.toggleButton.UseVisualStyleBackColor = true;
             this.toggleButton.CheckedChanged += new System.EventHandler(this.toggleButton_CheckedChanged);
             // 
@@ -209,7 +209,7 @@ namespace CrewChiefV4
             this.holdButton.Size = new System.Drawing.Size(81, 17);
             this.holdButton.TabIndex = 1;
             this.holdButton.TabStop = true;
-            this.holdButton.Text = Configuration.getUIString("hold_button");
+            this.holdButton.Text = "hold_button";
             this.holdButton.UseVisualStyleBackColor = true;
             this.holdButton.CheckedChanged += new System.EventHandler(this.holdButton_CheckedChanged);
             // 
@@ -221,7 +221,7 @@ namespace CrewChiefV4
             this.voiceDisableButton.Size = new System.Drawing.Size(64, 17);
             this.voiceDisableButton.TabIndex = 0;
             this.voiceDisableButton.TabStop = true;
-            this.voiceDisableButton.Text = Configuration.getUIString("disabled");
+            this.voiceDisableButton.Text = "disabled";
             this.voiceDisableButton.UseVisualStyleBackColor = true;
             this.voiceDisableButton.CheckedChanged += new System.EventHandler(this.voiceDisableButton_CheckedChanged);
             // 
@@ -231,7 +231,7 @@ namespace CrewChiefV4
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(137, 41);
             this.button2.TabIndex = 16;
-            this.button2.Text = Configuration.getUIString("clear_console");
+            this.button2.Text = "clear_console";
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Click += new System.EventHandler(this.clearConsole);
             // 
@@ -250,7 +250,7 @@ namespace CrewChiefV4
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(94, 13);
             this.label3.TabIndex = 18;
-            this.label3.Text = Configuration.getUIString("messages_volume");
+            this.label3.Text = "messages_volume";
             // 
             // backgroundVolumeSlider
             // 
@@ -267,25 +267,26 @@ namespace CrewChiefV4
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(104, 13);
             this.label4.TabIndex = 20;
-            this.label4.Text = Configuration.getUIString("background_volume");
+            this.label4.Text = "background_volume";
             // 
             // gameDefinitionList
             // 
             this.gameDefinitionList.AllowDrop = true;
             this.gameDefinitionList.FormattingEnabled = true;
             this.gameDefinitionList.Items.AddRange(new object[] {
-            Configuration.getUIString("automobilista"),
-            Configuration.getUIString("pcars_64_bit"),
-            Configuration.getUIString("pcars_32_bit"),
-            Configuration.getUIString("race_room"),
-            Configuration.getUIString("pcars_udp"),
-            Configuration.getUIString("gamestockcar"),
-            Configuration.getUIString("marcas"),
-            Configuration.getUIString("ftruck"),
-            Configuration.getUIString("rfactor1")});
+            "Automobilista",
+            "Project Cars (64 bit)",
+            "Project Cars (32 bit)",
+            "Race Room",
+            "Project Cars (network data)",
+            "Stock Car Extreme",
+            "Copa Petrobras de Marcas",
+            "Formula Truck",
+            "rFactor",
+            "Assetto Corsa"});
             this.gameDefinitionList.Location = new System.Drawing.Point(782, 28);
             this.gameDefinitionList.Name = "gameDefinitionList";
-            this.gameDefinitionList.Size = new System.Drawing.Size(203, 130);
+            this.gameDefinitionList.Size = new System.Drawing.Size(203, 121);
             this.gameDefinitionList.TabIndex = 21;
             this.gameDefinitionList.SelectedValueChanged += new System.EventHandler(this.updateSelectedGameDefinition);
             // 
@@ -296,7 +297,7 @@ namespace CrewChiefV4
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(33, 13);
             this.label5.TabIndex = 22;
-            this.label5.Text = Configuration.getUIString("game");
+            this.label5.Text = "game";
             // 
             // filenameTextbox
             // 
@@ -338,7 +339,7 @@ namespace CrewChiefV4
             this.app_version.Name = "app_version";
             this.app_version.Size = new System.Drawing.Size(65, 13);
             this.app_version.TabIndex = 27;
-            this.app_version.Text = Configuration.getUIString("app_version");
+            this.app_version.Text = "app_version";
             // 
             // soundPackProgressBar
             // 
@@ -354,7 +355,7 @@ namespace CrewChiefV4
             this.downloadSoundPackButton.Name = "downloadSoundPackButton";
             this.downloadSoundPackButton.Size = new System.Drawing.Size(217, 37);
             this.downloadSoundPackButton.TabIndex = 29;
-            this.downloadSoundPackButton.Text = Configuration.getUIString("sound_pack_is_up_to_date");
+            this.downloadSoundPackButton.Text = "sound_pack_is_up_to_date";
             this.downloadSoundPackButton.UseVisualStyleBackColor = true;
             this.downloadSoundPackButton.Click += new System.EventHandler(this.downloadSoundPackButtonPress);
             // 
@@ -365,7 +366,7 @@ namespace CrewChiefV4
             this.downloadDriverNamesButton.Name = "downloadDriverNamesButton";
             this.downloadDriverNamesButton.Size = new System.Drawing.Size(232, 37);
             this.downloadDriverNamesButton.TabIndex = 30;
-            this.downloadDriverNamesButton.Text = Configuration.getUIString("driver_names_are_up_to_date");
+            this.downloadDriverNamesButton.Text = "driver_names_are_up_to_date";
             this.downloadDriverNamesButton.UseVisualStyleBackColor = true;
             this.downloadDriverNamesButton.Click += new System.EventHandler(this.downloadDriverNamesButtonPress);
             // 

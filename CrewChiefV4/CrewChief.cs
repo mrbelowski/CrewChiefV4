@@ -21,7 +21,7 @@ namespace CrewChiefV4
         private Random random = new Random();
 
         public static Boolean loadDataFromFile = false;
-
+        
         public SpeechRecogniser speechRecogniser;
 
         public static GameDefinition gameDefinition;
@@ -359,7 +359,7 @@ namespace CrewChiefV4
 
             Console.WriteLine("Polling for shared data every " + _timeInterval.Milliseconds + "ms");
             Boolean sessionFinished = false;
-
+            
             while (running)
             {
                 DateTime now = DateTime.Now;
@@ -406,8 +406,10 @@ namespace CrewChiefV4
                         {
                             rawGameData = gameDataReader.ReadGameData(false);
                         }
-                        gameStateMapper.versionCheck(rawGameData);
 
+                        gameStateMapper.versionCheck(rawGameData);
+                
+                            
                         GameStateData nextGameState = null;
                         try
                         {
@@ -417,7 +419,16 @@ namespace CrewChiefV4
                         {
                             Console.WriteLine("Error mapping game data: " + e.StackTrace);
                         }
-                        
+
+                        if (!spotterIsRunning)
+                        {
+                            Console.WriteLine("********** starting spotter***********");
+                            spotter.clearState();
+                            startSpotterThread();
+                        }
+                        previousGameState = currentGameState;
+                        currentGameState = nextGameState;
+                        /*
                         // if we're paused or viewing another car, the mapper will just return the previous game state so we don't lose all the
                         // persistent state information. If this is the case, don't process any stuff
                         if (nextGameState != null && nextGameState != currentGameState) 
@@ -518,7 +529,7 @@ namespace CrewChiefV4
                             {
                                 spotter.pause();
                             }
-                        }
+                        }*/
                     }
                 }
                 else

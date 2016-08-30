@@ -10,7 +10,6 @@ namespace CrewChiefV4
 {
     public abstract class GameDataReader
     {
-        protected String filenameToDump;
         
         public Boolean dumpToFile = false;        
 
@@ -26,8 +25,11 @@ namespace CrewChiefV4
 
         public abstract void ResetGameDataFromFile();
 
-        protected String dataFilesPath = Path.Combine(Path.GetDirectoryName(
-                                            System.Reflection.Assembly.GetEntryAssembly().Location), @"..\", @"..\dataFiles\");
+
+        public static String dataFilesPath = Path.Combine(Path.GetDirectoryName(
+                                    System.Reflection.Assembly.GetEntryAssembly().Location), @"dataFiles\");
+
+        public String filenameToDump = dataFilesPath + "recording_" + DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss") + ".xml";
 
         public Boolean Initialise()
         {
