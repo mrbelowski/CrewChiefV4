@@ -146,7 +146,6 @@
     <Compile Include="RF1\RF1GameStateMapper.cs" />
     <Compile Include="RF1\RF1SharedMemoryReader.cs" />
     <Compile Include="RF1\RF1Spotter.cs" />
-    <Compile Include="Settings.cs" />
     <Compile Include="TrackData.cs" />
     <Compile Include="UpdateHelper.cs" />
     <Compile Include="UserInterface\FloatPropertyControl.cs">

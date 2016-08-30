@@ -419,11 +419,15 @@ namespace CrewChiefV4
                         }
                         if (gameDefinition.gameEnum == GameEnum.ASSETTO)
                         {
-                            if (!spotterIsRunning)
+                            if (spotter != null && spotterEnabled && !spotterIsRunning && !loadDataFromFile)
                             {
                                 Console.WriteLine("********** starting spotter***********");
                                 spotter.clearState();
                                 startSpotterThread();
+                            }
+                            else if (spotterIsRunning && !spotterEnabled)
+                            {
+                                runSpotterThread = false;
                             }
                             previousGameState = currentGameState;
                             currentGameState = nextGameState;
