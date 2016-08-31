@@ -249,7 +249,6 @@ class SPageFileCrewChief(ctypes.Structure):
     _pack_ = 4
     _fields_ = [
         ('packetId', c_int32),
-        ('isCountdown', c_int32),
         ('numVehicles', c_int32),
         ('focusVehicle', c_int32),
         ('vehicleInfo', acsVehicleInfo * 64 ),

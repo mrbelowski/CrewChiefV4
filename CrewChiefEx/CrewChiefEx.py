@@ -35,13 +35,11 @@ driverName = ""
 l_lapcount=0
 l_driver=0
 l_drivers=0
-l_flag=0
-
 lapcount=0
 state = ''
 def splineToDistanceRoundTrack(tracklen, splinepos):
 
-    return (splinepos  * tracklen) / 1
+    return (splinepos * tracklen) / 1
 
 
 def updateSharedMemory():
@@ -52,15 +50,6 @@ def updateSharedMemory():
     sharedmem.numVehicles = ac.getCarsCount()
     sharedmem.focusVehicle = ac.getFocusedCar()
     tracklenght = siminfo.static.trackSPlineLength
-    
-    sessionTimeValue = siminfo.graphics.sessionTimeLeft
-    ValueSeconds = (sessionTimeValue / 1000) % 60
-    ValueMinutes = (sessionTimeValue // 1000) // 60
-    iscountdown = 0
-    if int(ValueMinutes) == 30 and ValueSeconds < 9.999:
-        iscountdown = 1
-    sharedmem.isCountdown = iscountdown
-     
     for carId in carIds:
         #first we'll check wether there is a car for this id; as soon it returns -1
         #it's over
@@ -100,14 +89,12 @@ def updateSharedMemory():
             sharedmem.vehicleInfo[carId].carRealTimeLeaderboardPosition = ac.getCarRealTimeLeaderboardPosition(carId)
             sharedmem.vehicleInfo[carId].distanceRoundTrack = splineToDistanceRoundTrack(tracklenght, ac.getCarState(carId, acsys.CS.NormalizedSplinePosition) )
 
-
-
 def acMain(ac_version):
-  global appWindow,l_lapcount,l_driver,l_drivers,l_flag
+  global appWindow,l_lapcount,l_driver,l_drivers
   appWindow = ac.newApp("CrewChiefEx")
   ac.setTitle(appWindow, "CrewChiefEx")
 
-  ac.setSize(appWindow, 400, 200)
+  ac.setSize(appWindow, 200, 200)
 
   ac.log("Hello, Assetto Corsa application world!")
   ac.console("Hello, Assetto Corsa console!")
@@ -115,51 +102,39 @@ def acMain(ac_version):
   l_lapcount = ac.addLabel(appWindow, "Driver:");
   l_driver = ac.addLabel(appWindow, "Car:");
   l_drivers = ac.addLabel(appWindow, "Cars Connected:");
-  l_flag = ac.addLabel(appWindow, "flag:");
   ac.setPosition(l_lapcount, 3, 30)
   ac.setPosition(l_driver, 3, 42)
   ac.setPosition(l_drivers, 3, 54)
-  ac.setPosition(l_flag, 3, 66)
 
   return "CrewChiefEx"
 
 def acUpdate(deltaT):
     global siminfo
-    global l_lapcount, lapcount,l_driver,l_drivers,maxSlotId,l_flag
+    global l_lapcount, lapcount,l_driver,l_drivers,maxSlotId
     updateSharedMemory()
     siminfo.update()
-    #sharedmem = siminfo.getsharedmem()
+    sharedmem = siminfo.getsharedmem()
     
-    #currentDriver = "Driver: " + sharedmem.vehicleInfo[0].driverName
-    #carModel = "Car: " + sharedmem.vehicleInfo[0].carModel
-    #sessiontype = siminfo.graphics.session
-    #sessiontimeLeft = format(siminfo.graphics.sessionTimeLeft)
-    #splits = ac.getLastSplits(0)
+    currentDriver = "Driver: " + sharedmem.vehicleInfo[0].driverName
+    carModel = "Car: " + sharedmem.vehicleInfo[0].carModel
+    sessiontype = siminfo.graphics.session
+    sessiontimeLeft = format(siminfo.graphics.sessionTimeLeft)
+    splits = ac.getLastSplits(0)
     
-    #connected = "Cars Connected: " + format(sharedmem.numVehicles)
+    connected = "Cars Connected: " + format(sharedmem.numVehicles)
     #connected = ""
     #splits = []
     #splits = siminfo.graphics.split
     #split=0
-    #sessionTimeValue = siminfo.graphics.sessionTimeLeft
-
-    #lastLapValueSeconds = (sessionTimeValue / 1000) % 60
-    #lastLapValueMinutes = (sessionTimeValue // 1000) // 60
-
-    #iscountdown = 0
-    #if int(lastLapValueMinutes) == 30 and lastLapValueSeconds < 9.999:
-    #    iscountdown = 1
-
-    #timeleft = "time left:" + format(int(lastLapValueMinutes)) + "{:.0f}" + format(lastLapValueSeconds)
-    #for split in splits:
-    #    connected += "splits: " + format(split) + " "
-    #connected = format(splineToDistanceRoundTrack(siminfo.static.trackSPlineLength, ac.getCarState(0, acsys.CS.NormalizedSplinePosition)) )  
+    
+    for split in splits:
+        connected += "splits: " + format(split) + " "
+    connected = format(splineToDistanceRoundTrack(siminfo.static.trackSPlineLength, ac.getCarState(0, acsys.CS.NormalizedSplinePosition))  )  
     #connected = "session: " + format(sessiontype)
-    #flag = "flag:" + format(siminfo.graphics.flag)
-    #ac.setText(l_lapcount, currentDriver )
-    #ac.setText(l_driver, carModel )  
-    #ac.setText(l_drivers, timeleft )
-    #ac.setText(l_flag, flag )
+    
+    ac.setText(l_lapcount, currentDriver )
+    ac.setText(l_driver, carModel )  
+    ac.setText(l_drivers, connected )
     
     
 
