@@ -91,7 +91,7 @@ namespace CrewChiefV4.assetto
                 return previousGameState;
             }
             AC_STATUS status = shared.acsGraphic.status;
-            if (status == AC_STATUS.AC_OFF || status == AC_STATUS.AC_PAUSE || status == AC_STATUS.AC_REPLAY)
+            if (status == AC_STATUS.AC_OFF || status == AC_STATUS.AC_REPLAY || status == AC_STATUS.AC_PAUSE )
                 return previousGameState;
 
             
@@ -159,7 +159,7 @@ namespace CrewChiefV4.assetto
             AC_FLAG_TYPE currentFlag = shared.acsGraphic.flag;
             currentGameState.SessionData.IsDisqualified = currentFlag == AC_FLAG_TYPE.AC_BLACK_FLAG;
             
-            currentGameState.SessionData.SessionPhase = mapToSessionPhase(currentGameState.SessionData.SessionType, currentFlag, shared.acsChief.isCountdown, lastSessionPhase, shared.acsGraphic.sessionTimeLeft , lastSessionTotalRunTime);
+            currentGameState.SessionData.SessionPhase = mapToSessionPhase(currentGameState.SessionData.SessionType, currentFlag,status, shared.acsChief.isCountdown, lastSessionPhase, shared.acsGraphic.sessionTimeLeft , lastSessionTotalRunTime);
             float sessionTimeRemaining = -1;
             int numberOfLapsInSession = (int)shared.acsGraphic.numberOfLaps;
             if (numberOfLapsInSession == 0)
@@ -184,7 +184,7 @@ namespace CrewChiefV4.assetto
                  currentGameState.SessionData.SessionPhase != SessionPhase.Finished &&
                     (lastSessionType != currentGameState.SessionData.SessionType ||
                         lastSessionTrack == null || lastSessionTrack.name != currentGameState.SessionData.TrackDefinition.name ||
-                            (currentGameState.SessionData.SessionHasFixedTime && sessionTimeRemaining > lastSessionTimeRemaining + 1))))
+                            (currentGameState.SessionData.SessionHasFixedTime && sessionTimeRemaining > lastSessionTimeRemaining + 1))) && status != AC_STATUS.AC_PAUSE)
             
             
             
@@ -372,9 +372,11 @@ namespace CrewChiefV4.assetto
             return currentGameState;
         }
 
-        private SessionPhase mapToSessionPhase(SessionType sessionType,  AC_FLAG_TYPE flag,int isCountdown, 
+        private SessionPhase mapToSessionPhase(SessionType sessionType,  AC_FLAG_TYPE flag, AC_STATUS status, int isCountdown, 
             SessionPhase previousSessionPhase, float sessionTimeRemaining, float sessionRunTime)
         {
+            if(status == AC_STATUS.AC_PAUSE)
+                return previousSessionPhase;
             if (sessionType == SessionType.Race)
             {
                 if ( isCountdown == 1)
