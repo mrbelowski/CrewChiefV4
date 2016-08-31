@@ -2,6 +2,8 @@ CrewChief version 4.
 
 Changelog
 ---------
+Version 4.4.0.0: Work in progress for next release to include Assetto Corsa support. This is currently in development - if you're building Crew Chief from source, don't expect this to work yet :)
+
 Version 4.3.0.4: Fixed incorrect sector gap reports for rF1; Fixed session variables not resetting at start of new session for rF1; Disabled erroneous damage reporting in Hot Lap sessions for rF1; Fixed erroneous fuel warning messages in non-race sessions for rF1; Fixed erroneous flags in non-race sessions for rF1; Added basic invalid lap detection for rF1; Improved wheel spin/lock detection for rF1;
 
 Version 4.3.0.3: Fixed 'leader is pitting' message for rF1; Improved opponent state tracking for rF1 (allows for duplicate AI in grids); Adjusted scheduled pit stop notifications to be offline/single player only for rF1; Adjusted 'pit now' message for scheduled stops to play before passing pit entrance for rF1; Fixed 'green green green' messages after formation lap for rF1; Disabled spotter during formation lap for rF1; Added 'get ready' message during final sector of formation lap for rF1; Fixed incorrect brake temperatures for rF1; Improved multi-class race support for rF1; Added penalty notifications; Fixed 'the next guy is' message spamming for rF1; Fixed 'the gap behind is reeling you in' message for rF1
