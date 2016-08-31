@@ -22,7 +22,7 @@ namespace CrewChiefV4.assetto
         private float carLength = 3.5f;// UserSettings.GetUserSettings().getFloat("asc_spotter_car_length");
 
         // don't activate the spotter unless this many seconds have elapsed (race starts are messy)
-        private int timeAfterRaceStartToActivate = 60;// UserSettings.GetUserSettings().getInt("time_after_race_start_for_spotter");
+        private int timeAfterRaceStartToActivate = UserSettings.GetUserSettings().getInt("time_after_race_start_for_spotter");
 
         private Boolean enabled;
 

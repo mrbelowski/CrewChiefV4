@@ -417,24 +417,9 @@ namespace CrewChiefV4
                         {
                             Console.WriteLine("Error mapping game data: " + e.StackTrace);
                         }
-                        if (gameDefinition.gameEnum == GameEnum.ASSETTO)
-                        {
-                            if (spotter != null && spotterEnabled && !spotterIsRunning && !loadDataFromFile)
-                            {
-                                Console.WriteLine("********** starting spotter***********");
-                                spotter.clearState();
-                                startSpotterThread();
-                            }
-                            else if (spotterIsRunning && !spotterEnabled)
-                            {
-                                runSpotterThread = false;
-                            }
-                            previousGameState = currentGameState;
-                            currentGameState = nextGameState;
-                        }
                         // if we're paused or viewing another car, the mapper will just return the previous game state so we don't lose all the
                         // persistent state information. If this is the case, don't process any stuff
-                        else if (nextGameState != null && nextGameState != currentGameState) 
+                        if (nextGameState != null && nextGameState != currentGameState) 
                         {
                             previousGameState = currentGameState;
                             currentGameState = nextGameState;
