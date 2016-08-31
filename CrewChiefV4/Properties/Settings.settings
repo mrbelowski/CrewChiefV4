@@ -389,5 +389,14 @@
     <Setting Name="launch_ftruck" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
+    <Setting Name="acs_launch_exe" Type="System.String" Scope="User">
+      <Value Profile="(Default)">C:/Program Files (x86)/Steam/Steam.exe</Value>
+    </Setting>
+    <Setting Name="acs_launch_params" Type="System.String" Scope="User">
+      <Value Profile="(Default)">-applaunch 244210</Value>
+    </Setting>
+    <Setting Name="launch_acs" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

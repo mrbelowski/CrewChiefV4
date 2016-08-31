@@ -251,6 +251,12 @@ namespace CrewChiefV4
                         setFromCommandLine = true;
                         break;
                     }
+                    else if (arg.Equals(GameDefinition.assetto.gameEnum.ToString()))
+                    {
+                        this.gameDefinitionList.Text = GameDefinition.assetto.friendlyName;
+                        setFromCommandLine = true;
+                        break;
+                    }
                 }
             }
             if (!setFromCommandLine)

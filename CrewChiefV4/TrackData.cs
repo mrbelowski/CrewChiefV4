@@ -121,6 +121,10 @@ namespace CrewChiefV4
             {
                 return new TrackDefinition(trackName, trackLength);
             }
+            else if (CrewChief.gameDefinition.gameEnum == GameEnum.ASSETTO)
+            {
+                return new TrackDefinition(trackName, trackLength);
+            }
             else
             {
                 String nameToLog = trackName != null ? trackName : "null";
