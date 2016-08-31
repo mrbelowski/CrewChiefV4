@@ -276,6 +276,7 @@ namespace CrewChiefV4.assetto
         public struct SPageFileCrewChief
         {
             public int packetId;
+            public int isCountdown;
             public int numVehicles;
             public int focusVehicle;
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 64)]
