@@ -94,14 +94,15 @@ namespace CrewChiefV4.assetto
             if (status == AC_STATUS.AC_OFF || status == AC_STATUS.AC_REPLAY || status == AC_STATUS.AC_PAUSE )
                 return previousGameState;
 
-            
+            acsVehicleInfo playerVehicle = shared.acsChief.vehicle[0];
+
             playerName = shared.acsStatic.playerName;
             NameValidator.validateName(playerName);
             currentGameState.SessionData.CompletedLaps = (int)shared.acsGraphic.completedLaps;
-            currentGameState.SessionData.SectorNumber = (int)shared.acsGraphic.currentSectorIndex;
-            currentGameState.SessionData.Position = (int)shared.acsChief.vehicle[0].carLeaderboardPosition;
-            currentGameState.SessionData.UnFilteredPosition = (int)shared.acsChief.vehicle[0].carRealTimeLeaderboardPosition;
-            currentGameState.SessionData.IsNewSector = previousGameState == null || shared.acsGraphic.currentSectorIndex != previousGameState.SessionData.SectorNumber;
+            currentGameState.SessionData.SectorNumber = (int)shared.acsGraphic.currentSectorIndex+1;
+            currentGameState.SessionData.Position = (int)playerVehicle.carLeaderboardPosition;
+            currentGameState.SessionData.UnFilteredPosition = (int)playerVehicle.carRealTimeLeaderboardPosition;
+            currentGameState.SessionData.IsNewSector = previousGameState == null || shared.acsGraphic.currentSectorIndex+1 != previousGameState.SessionData.SectorNumber;
 
 
             SessionPhase lastSessionPhase = SessionPhase.Unavailable;
@@ -368,8 +369,74 @@ namespace CrewChiefV4.assetto
                 {
                     currentGameState.SessionData.SessionRunningTime = (float)(currentGameState.Now - currentGameState.SessionData.SessionStartTime).TotalSeconds;
                 }
+                if (currentGameState.SessionData.IsNewSector)
+                {
+
+                    TimeSpan ts = TimeSpan.FromMilliseconds(shared.acsGraphic.lastSectorTime);
+                    TimeSpan ts1 = TimeSpan.FromMilliseconds(shared.acsGraphic.iLastTime );
+         
+                    //Console.WriteLine((float)ts.TotalSeconds.ToString());
+                    Console.WriteLine("lastlap:{0:D2}m:{1:D2}s:{2:D3}ms",  ts1.Minutes, ts1.Seconds, ts1.Milliseconds);
+                    float sectortime = (float)ts.TotalHours + (float)ts.TotalMinutes + (float)ts.TotalSeconds + (float)ts.TotalMilliseconds;
+                    //string answer = string.Format("{1:D2}m:{2:D2}s:{3:D3}ms", t.Minutes,t.Seconds,t.Milliseconds);
+                    if (currentGameState.SessionData.SectorNumber == 1)
+                    {
+                        
+                        Console.WriteLine("sector3 time:{0:D2}m:{1:D2}s:{2:D3}ms", ts.Minutes, ts.Seconds, ts.Milliseconds);
+                        currentGameState.SessionData.LapTimePreviousEstimateForInvalidLap = currentGameState.SessionData.SessionRunningTime - currentGameState.SessionData.SessionTimesAtEndOfSectors[3];
+                        currentGameState.SessionData.SessionTimesAtEndOfSectors[3] = currentGameState.SessionData.SessionRunningTime;
+
+
+                        currentGameState.SessionData.LastSector3Time = sectortime;
+                        
+                        if (currentGameState.SessionData.LastSector3Time > 0 &&
+                            (currentGameState.SessionData.PlayerBestSector3Time == -1 || currentGameState.SessionData.LastSector3Time < currentGameState.SessionData.PlayerBestSector3Time))
+                        {
+                            currentGameState.SessionData.PlayerBestSector3Time = currentGameState.SessionData.LastSector3Time;
+                        }
+                        if (shared.acsGraphic.iLastTime > 0 &&
+                            (currentGameState.SessionData.PlayerLapTimeSessionBest == -1 || shared.acsGraphic.iLastTime <= currentGameState.SessionData.PlayerLapTimeSessionBest))
+                        {
+                            currentGameState.SessionData.PlayerBestLapSector1Time = currentGameState.SessionData.LastSector1Time;
+                            currentGameState.SessionData.PlayerBestLapSector2Time = currentGameState.SessionData.LastSector2Time;
+                            currentGameState.SessionData.PlayerBestLapSector3Time = currentGameState.SessionData.LastSector3Time;
+                        }
+                    }
+                    else if (currentGameState.SessionData.SectorNumber == 2)
+                    {
+                        
+                        Console.WriteLine("sector2 time:{0:D2}m:{1:D2}s:{2:D3}ms", ts.Minutes, ts.Seconds, ts.Milliseconds);
+                        currentGameState.SessionData.SessionTimesAtEndOfSectors[1] = currentGameState.SessionData.SessionRunningTime;
+                        // TODO: confirm that an invalid sector will put -1 in here...
+                        currentGameState.SessionData.LastSector1Time = sectortime;
+                        if (currentGameState.SessionData.LastSector1Time > 0 &&
+                            (currentGameState.SessionData.PlayerBestSector1Time == -1 || currentGameState.SessionData.LastSector1Time < currentGameState.SessionData.PlayerBestSector1Time))
+                        {
+                            currentGameState.SessionData.PlayerBestSector1Time = currentGameState.SessionData.LastSector1Time;
+                        }
+                    }
+                    if (currentGameState.SessionData.SectorNumber == 3)
+                    {
+                        
+                        Console.WriteLine("sector1 time:{0:D2}m:{1:D2}s:{2:D3}ms", ts.Minutes, ts.Seconds, ts.Milliseconds);
+                        currentGameState.SessionData.SessionTimesAtEndOfSectors[2] = currentGameState.SessionData.SessionRunningTime;
+
+                        currentGameState.SessionData.LastSector2Time = sectortime;
+                        if (currentGameState.SessionData.LastSector2Time > 0 &&
+                            (currentGameState.SessionData.PlayerBestSector2Time == -1 || currentGameState.SessionData.LastSector2Time < currentGameState.SessionData.PlayerBestSector2Time))
+                        {
+                            currentGameState.SessionData.PlayerBestSector2Time = currentGameState.SessionData.LastSector2Time;
+                        }
+                    }
+                }
+
+
             }
             return currentGameState;
+
+
+
+
         }
 
         private SessionPhase mapToSessionPhase(SessionType sessionType,  AC_FLAG_TYPE flag, AC_STATUS status, int isCountdown, 
