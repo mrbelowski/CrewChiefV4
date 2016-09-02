@@ -77,8 +77,19 @@ namespace CrewChiefV4.assetto
             this.speechRecogniser = speechRecogniser;
         }
 
+        public static OpponentData getOpponentForName(GameStateData gameState, String nameToFind)
+        {
+            if (gameState.OpponentData == null || gameState.OpponentData.Count == 0 || nameToFind == null || nameToFind.Length == 0)
+            {
+                return null;
+            }
 
-
+            if (gameState.OpponentData.ContainsKey(nameToFind))
+            {
+                return gameState.OpponentData[nameToFind];
+            }
+            return null;
+        }
 
         public GameStateData mapToGameStateData(Object memoryMappedFileStruct, GameStateData previousGameState)
         {
@@ -165,7 +176,7 @@ namespace CrewChiefV4.assetto
                 currentGameState.SessionData.SessionHasFixedTime = true;
                 sessionTimeRemaining = shared.acsGraphic.sessionTimeLeft / 1000; ;
             }
-
+            List<String> opponentDriverNamesProcessedThisUpdate = new List<String>();
             currentGameState.SessionData.TrackDefinition = TrackData.getTrackDefinition(shared.acsStatic.track
                 + ":" + shared.acsStatic.trackConfiguration, shared.acsStatic.trackSPlineLength);
 
@@ -224,7 +235,9 @@ namespace CrewChiefV4.assetto
                 currentGameState.SessionData.DriverRawName = playerName;
                 currentGameState.PitData.IsRefuellingAllowed = true;
 
-                currentGameState.carClass = CarData.getCarClassForPCarsClassName(shared.acsStatic.carModel);
+
+                //add carclasses for assetto corsa.
+                currentGameState.carClass = CarData.getDefaultCarClass();
 
                 Console.WriteLine("Player is using car class " + currentGameState.carClass.carClassEnum);
                 brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(currentGameState.carClass);
@@ -270,13 +283,13 @@ namespace CrewChiefV4.assetto
                             }
                             currentGameState.SessionData.SessionStartTime = currentGameState.Now;
                             currentGameState.SessionData.SessionNumberOfLaps = numberOfLapsInSession;
-                            currentGameState.SessionData.SessionStartPosition = (int)shared.acsChief.vehicle[0].carRealTimeLeaderboardPosition;
+                            currentGameState.SessionData.SessionStartPosition = shared.acsGraphic.position;
                         }
                         currentGameState.SessionData.LeaderHasFinishedRace = false;
                         currentGameState.SessionData.NumCarsAtStartOfSession = shared.acsChief.numVehicles;
                         currentGameState.SessionData.TrackDefinition = TrackData.getTrackDefinition(shared.acsStatic.track + ":" + shared.acsStatic.trackConfiguration, shared.acsStatic.trackSPlineLength);
                         currentGameState.SessionData.TrackDefinition.setGapPoints();
-                        currentGameState.carClass = CarData.getCarClassForPCarsClassName(shared.acsStatic.carModel);
+                        currentGameState.carClass = CarData.getDefaultCarClass();
 
                         Console.WriteLine("Player is using car class " + currentGameState.carClass.carClassEnum);
                         brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(currentGameState.carClass);
@@ -387,8 +400,8 @@ namespace CrewChiefV4.assetto
                         {
                             currentGameState.SessionData.PlayerBestSector3Time = currentGameState.SessionData.LastSector3Time;
                         }
-                        if (shared.acsGraphic.iLastTime > 0 &&
-                            (currentGameState.SessionData.PlayerLapTimeSessionBest == -1 || shared.acsGraphic.iLastTime <= currentGameState.SessionData.PlayerLapTimeSessionBest))
+                        if (mapToFloatTime(shared.acsGraphic.iLastTime) > 0 &&
+                            (currentGameState.SessionData.PlayerLapTimeSessionBest == -1 || mapToFloatTime(shared.acsGraphic.iLastTime) <= currentGameState.SessionData.PlayerLapTimeSessionBest))
                         {
                             currentGameState.SessionData.PlayerBestLapSector1Time = currentGameState.SessionData.LastSector1Time;
                             currentGameState.SessionData.PlayerBestLapSector2Time = currentGameState.SessionData.LastSector2Time;
@@ -431,11 +444,7 @@ namespace CrewChiefV4.assetto
                     ((lastSessionPhase == SessionPhase.Countdown || lastSessionPhase == SessionPhase.Formation || lastSessionPhase == SessionPhase.Garage)
                     && currentGameState.SessionData.SessionPhase == SessionPhase.Green));
 
-                /*currentGameState.SessionData.IsNewLap = previousGameState == null || currentGameState.SessionData.CompletedLaps == previousGameState.SessionData.CompletedLaps + 1 ||
-                    ((shared.acsGraphic.session == AC_SESSION_TYPE.AC_PRACTICE || shared.acsGraphic.session == AC_SESSION_TYPE.AC_QUALIFY ||
-                    shared.acsGraphic.session == AC_SESSION_TYPE.AC_HOTLAP || shared.acsGraphic.session == AC_SESSION_TYPE.AC_TIME_ATTACK)
-                    && previousGameState.SessionData.LapTimeCurrent == -1 && shared.acsGraphic.iCurrentTime > 0);*/
-
+      
                 currentGameState.SessionData.IsRacingSameCarBehind = previousGameState != null && previousGameState.getOpponentKeyBehind(false) == currentGameState.getOpponentKeyBehind(false);
                 currentGameState.SessionData.IsRacingSameCarInFront = previousGameState != null && previousGameState.getOpponentKeyInFront(false) == currentGameState.getOpponentKeyInFront(false);
                 if (!currentGameState.SessionData.IsRacingSameCarInFront)
@@ -449,6 +458,106 @@ namespace CrewChiefV4.assetto
 
 
                 currentGameState.SessionData.LapTimeCurrent = mapToFloatTime(shared.acsGraphic.iCurrentTime);
+
+                List<String> namesInRawData = new List<String>();
+                for (int i = 1; i <= shared.acsChief.numVehicles; i++)
+                {
+                    acsVehicleInfo participantStruct = shared.acsChief.vehicle[i];
+                    CarData.CarClass opponentCarClass = CarData.getDefaultCarClass();
+                    String participantName = participantStruct.driverName.ToLower();
+                    namesInRawData.Add(participantName);
+                    OpponentData currentOpponentData = getOpponentForName(currentGameState, participantName);
+                    if (participantName != null && participantName.Length > 0)
+                    {
+                        if (currentOpponentData != null)
+                        {
+                            if (participantStruct.isConnected == 1)
+                            {
+                                if (previousGameState != null)
+                                {
+                                    int previousOpponentSectorNumber = 1;
+                                    int previousOpponentCompletedLaps = 0;
+                                    int previousOpponentPosition = 0;
+                                    Boolean previousOpponentIsEnteringPits = false;
+                                    Boolean previousOpponentIsExitingPits = false;
+
+                                    float[] previousOpponentWorldPosition = new float[] { 0, 0, 0 };
+                                    float previousOpponentSpeed = 0;
+
+                                    OpponentData previousOpponentData = getOpponentForName(previousGameState, participantName);
+                                    if (previousOpponentData != null)
+                                    {
+                                        previousOpponentSectorNumber = previousOpponentData.CurrentSectorNumber;
+                                        previousOpponentCompletedLaps = previousOpponentData.CompletedLaps;
+                                        previousOpponentPosition = previousOpponentData.Position;
+                                        previousOpponentIsEnteringPits = previousOpponentData.isEnteringPits();
+                                        previousOpponentIsExitingPits = previousOpponentData.isExitingPits();
+                                        previousOpponentWorldPosition = previousOpponentData.WorldPosition;
+                                        previousOpponentSpeed = previousOpponentData.Speed;
+                                    }
+
+                                    int currentOpponentRacePosition = (int)participantStruct.carRealTimeLeaderboardPosition+1;
+                                    int currentOpponentLapsCompleted = (int)participantStruct.lapCount;
+
+                                    float currentOpponentLapDistance = participantStruct.distanceRoundTrack;
+
+                                    if (currentOpponentRacePosition == 1 && (currentGameState.SessionData.SessionNumberOfLaps > 0 &&
+                                            currentGameState.SessionData.SessionNumberOfLaps == currentOpponentLapsCompleted) ||
+                                            (currentGameState.SessionData.SessionTotalRunTime > 0 && currentGameState.SessionData.SessionTimeRemaining < 1 &&
+                                            previousOpponentCompletedLaps < currentOpponentLapsCompleted))
+                                    {
+                                        currentGameState.SessionData.LeaderHasFinishedRace = true;
+                                    }
+                                    if (currentOpponentRacePosition == 1 && previousOpponentPosition > 1)
+                                    {
+                                        currentGameState.SessionData.HasLeadChanged = true;
+                                    }
+                                    float secondsSinceLastUpdate = (float)new TimeSpan(currentGameState.Ticks - previousGameState.Ticks).TotalSeconds;
+
+                                }
+                            }
+                            else
+                            {
+                                currentOpponentData.IsActive = false;
+                            }
+                        }
+                        else
+                        {
+                            if ( participantName != null && participantName.Length > 0)
+                            {
+                                addOpponentForName(participantName, createOpponentData(participantStruct, true, opponentCarClass), currentGameState);
+                            }
+                        }
+                    }
+
+                }
+
+                if (namesInRawData.Count() == shared.acsChief.numVehicles - 1)
+                {
+                    List<String> keysToRemove = new List<String>();
+                    // purge any opponents that aren't in the current data
+                    foreach (String opponentName in currentGameState.OpponentData.Keys)
+                    {
+                        Boolean matched = false;
+                        foreach (String nameInRawData in namesInRawData)
+                        {
+                            if (nameInRawData.CompareTo(opponentName) == 0)
+                            {
+                                matched = true;
+                                break;
+                            }
+                        }
+                        if (!matched || !currentGameState.OpponentData[opponentName].IsActive)
+                        {
+                            keysToRemove.Add(opponentName);
+                        }
+                    }
+                    foreach (String keyToRemove in keysToRemove)
+                    {
+                        currentGameState.OpponentData.Remove(keyToRemove);
+                    }
+                }
+
 
                 //more to come here 
                 currentGameState.SessionData.LapTimePrevious = mapToFloatTime(shared.acsGraphic.iLastTime);

@@ -248,7 +248,7 @@ namespace CrewChiefV4.assetto
             public float speedMPH;
             public float speedKMH;
             public float bestLapMS;
-            public float lapCount;
+            public int lapCount;
             public int currentLapInvalid;
             public int currentLapTimeMS;
             public int lastLapTimeMS;
@@ -268,7 +268,7 @@ namespace CrewChiefV4.assetto
             public int currentSector2T;
             public int currentSector3T;
             public float distanceRoundTrack;
-
+            public int isConnected;
         }
 
         [StructLayout(LayoutKind.Sequential, Pack = 4, CharSet = CharSet.Unicode)]
@@ -279,6 +279,11 @@ namespace CrewChiefV4.assetto
             public int isCountdown;
             public int numVehicles;
             public int focusVehicle;
+            [MarshalAsAttribute(UnmanagedType.ByValTStr, SizeConst = 33)]
+            public String serverIp;
+            public int ServerSlotsCount;
+            [MarshalAsAttribute(UnmanagedType.ByValTStr, SizeConst = 512)]
+            public String serverName;
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 64)]
             public acsVehicleInfo[] vehicle;
             
