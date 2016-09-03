@@ -222,7 +222,7 @@ class acsVehicleInfo(ctypes.Structure):
         ('speedMPH', c_float),
         ('speedKMH', c_float),
         ('bestLapMS', c_float),
-        ('lapCount', c_float),
+        ('lapCount', c_int32),
         ('currentLapInvalid', c_int32),
         ('currentLapTimeMS', c_float),
         ('lastLapTimeMS', c_float),
@@ -242,6 +242,7 @@ class acsVehicleInfo(ctypes.Structure):
         ('currentSector2T', c_int32  ),
         ('currentSector3T', c_int32  ),
         ('distanceRoundTrack', c_float  ),
+        ('isConnected', c_int32  ),
         
         
     ]    
@@ -252,6 +253,9 @@ class SPageFileCrewChief(ctypes.Structure):
         ('isCountdown', c_int32),
         ('numVehicles', c_int32),
         ('focusVehicle', c_int32),
+        ('serverIp', c_wchar * 33),
+        ('ServerSlotsCount', c_int32),
+        ('serverName', c_wchar * 512),
         ('vehicleInfo', acsVehicleInfo * 64 ),
     ]
 

@@ -47,8 +47,7 @@ def splineToDistanceRoundTrack(tracklen, splinepos):
 def updateSharedMemory():
     global siminfo,maxSlotId,state
     sharedmem = siminfo.getsharedmem()
-    #now we'll build the slots, so we later know every single (possible) car
-    carIds = range(0, ac.getCarsCount(), 1)
+
     sharedmem.numVehicles = ac.getCarsCount()
     sharedmem.focusVehicle = ac.getFocusedCar()
     tracklenght = siminfo.static.trackSPlineLength
@@ -60,7 +59,9 @@ def updateSharedMemory():
     if int(ValueMinutes) == 30 and ValueSeconds < 9.999:
         iscountdown = 1
     sharedmem.isCountdown = iscountdown
-     
+
+    #now we'll build the slots, so we later know every single (possible) car
+    carIds = range(0, ac.getCarsCount(), 1) 
     for carId in carIds:
         #first we'll check wether there is a car for this id; as soon it returns -1
         #it's over
@@ -76,7 +77,6 @@ def updateSharedMemory():
                 sharedmem.vehicleInfo[carId].lastSector2T = split[1]
             if len(splits) >= 3:
                 sharedmem.vehicleInfo[carId].lastSector3T = split[2]
-
 
             sharedmem.vehicleInfo[carId].carId = carId
             sharedmem.vehicleInfo[carId].driverName = ac.getDriverName(carId)
@@ -99,7 +99,7 @@ def updateSharedMemory():
             sharedmem.vehicleInfo[carId].carLeaderboardPosition = ac.getCarLeaderboardPosition(carId)
             sharedmem.vehicleInfo[carId].carRealTimeLeaderboardPosition = ac.getCarRealTimeLeaderboardPosition(carId)
             sharedmem.vehicleInfo[carId].distanceRoundTrack = splineToDistanceRoundTrack(tracklenght, ac.getCarState(carId, acsys.CS.NormalizedSplinePosition) )
-
+            sharedmem.vehicleInfo[carId].isConnected = ac.isConnected(carId)
 
 
 def acMain(ac_version):
@@ -128,14 +128,26 @@ def acUpdate(deltaT):
     global l_lapcount, lapcount,l_driver,l_drivers,maxSlotId,l_flag
     updateSharedMemory()
     siminfo.update()
-    #sharedmem = siminfo.getsharedmem()
-    
+    sharedmem = siminfo.getsharedmem()
+    currentSplits = []
+	
+    #currentSplits = ac.getCurrentSplits(0)
+    #cursplit = range(0, len(currentSplits), 1)
+	#if len(currentSplits) >= 1:
+	#	sharedmem.vehicleInfo[carId].currentSector1T = cursplit[0]
+    #if len(currentSplits) >= 2:
+	#	sharedmem.vehicleInfo[carId].currentSector2T = cursplit[1]
+    #if len(currentSplits) >= 3:
+	#	sharedmem.vehicleInfo[carId].currentSector3T = cursplit[2]
     #currentDriver = "Driver: " + sharedmem.vehicleInfo[0].driverName
     #carModel = "Car: " + sharedmem.vehicleInfo[0].carModel
     #sessiontype = siminfo.graphics.session
     #sessiontimeLeft = format(siminfo.graphics.sessionTimeLeft)
     #splits = ac.getLastSplits(0)
-    
+    #servername = ac.getServerName()
+    #currentLapInvalid = sharedmem.vehicleInfo[0].currentLapInvalid;
+    #connected = ""
+    #connected = "Valid lap: " + format(currentLapInvalid)
     #connected = "Cars Connected: " + format(sharedmem.numVehicles)
     #connected = ""
     #splits = []
@@ -156,10 +168,11 @@ def acUpdate(deltaT):
     #connected = format(splineToDistanceRoundTrack(siminfo.static.trackSPlineLength, ac.getCarState(0, acsys.CS.NormalizedSplinePosition)) )  
     #connected = "session: " + format(sessiontype)
     #flag = "flag:" + format(siminfo.graphics.flag)
+    
     #ac.setText(l_lapcount, currentDriver )
-    #ac.setText(l_driver, carModel )  
-    #ac.setText(l_drivers, timeleft )
-    #ac.setText(l_flag, flag )
+    #ac.setText(l_driver, connected )  
+    #ac.setText(l_drivers, currentLapInvalid )
+    #ac.setText(l_flag, timeleft )
     
     
 
