@@ -2,7 +2,7 @@ CrewChief version 4.
 
 Changelog
 ---------
-Version 4.4.0.0: Work in progress for next release to include Assetto Corsa support. This is currently in development - if you're building Crew Chief from source, don't expect this to work yet :)
+Version 4.4.0.0: First cut of Assetto Corsa support courtesy of Sparten - this is a work-in-progress; added blue flag max trigger distance (increase this to make the blue flag warnings play when the lapping car is further away). 
 
 Version 4.3.0.4: Fixed incorrect sector gap reports for rF1; Fixed session variables not resetting at start of new session for rF1; Disabled erroneous damage reporting in Hot Lap sessions for rF1; Fixed erroneous fuel warning messages in non-race sessions for rF1; Fixed erroneous flags in non-race sessions for rF1; Added basic invalid lap detection for rF1; Improved wheel spin/lock detection for rF1;
 
