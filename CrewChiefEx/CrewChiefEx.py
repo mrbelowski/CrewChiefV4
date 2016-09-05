@@ -148,5 +148,3 @@ def acUpdate(deltaT):
 
 
 
-
-

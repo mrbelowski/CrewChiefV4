@@ -78,6 +78,9 @@ namespace CrewChiefV4.RaceRoom
 
         private SpeechRecogniser speechRecogniser;
 
+        // blue flag zone
+        private int blueFlagDetectionDistance = UserSettings.GetUserSettings().getInt("r3e_blue_flag_detection_distance");
+
 
         // now we're much stricter with the bollocks opponents data (duplicates, missing entries, stuff randomly being given the wrong
         // slot_id), can we remove this grotty delayed-position hack and all the associated crap it creates? Turns out that no, we can't. 
@@ -688,7 +691,8 @@ namespace CrewChiefV4.RaceRoom
                             if (currentGameState.SessionData.SessionType == SessionType.Race && currentOpponentData.Position == participantStruct.place &&
                                 !isEnteringPits && !isLeavingPits && currentGameState.PositionAndMotionData.DistanceRoundTrack != 0 &&
                                 currentOpponentData.Position + 1 < shared.Position && !isInSector1OnOutlap && 
-                                isBehindWithinDistance(shared.track_info.length, 8, 80, currentGameState.PositionAndMotionData.DistanceRoundTrack, participantStruct.lap_distance))
+                                isBehindWithinDistance(shared.track_info.length, 8, blueFlagDetectionDistance, currentGameState.PositionAndMotionData.DistanceRoundTrack, 
+                                participantStruct.lap_distance))
                             {
                                 currentGameState.SessionData.Flag = FlagEnum.BLUE;
                             }
