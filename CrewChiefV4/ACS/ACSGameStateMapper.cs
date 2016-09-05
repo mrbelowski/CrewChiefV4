@@ -620,7 +620,7 @@ namespace CrewChiefV4.assetto
 
                 }
 
-                if (namesInRawData.Count() == shared.acsChief.numVehicles - 1)
+                if (namesInRawData.Count() == shared.acsChief.numVehicles)
                 {
                     List<String> keysToRemove = new List<String>();
                     // purge any opponents that aren't in the current data
