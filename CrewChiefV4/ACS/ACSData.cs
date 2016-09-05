@@ -247,7 +247,7 @@ namespace CrewChiefV4.assetto
             public float speedMS;
             public float speedMPH;
             public float speedKMH;
-            public float bestLapMS;
+            public int bestLapMS;
             public int lapCount;
             public int currentLapInvalid;
             public int currentLapTimeMS;
@@ -269,6 +269,7 @@ namespace CrewChiefV4.assetto
             public int currentSector3T;
             public float distanceRoundTrack;
             public int isConnected;
+            
         }
 
         [StructLayout(LayoutKind.Sequential, Pack = 4, CharSet = CharSet.Unicode)]

@@ -41,17 +41,20 @@ lapcount=0
 state = ''
 def splineToDistanceRoundTrack(tracklen, splinepos):
 
-    return (splinepos  * tracklen) / 1
+    return (splinepos * tracklen) / 1
 
 
 def updateSharedMemory():
     global siminfo,maxSlotId,state
     sharedmem = siminfo.getsharedmem()
+    siminfo.update()
+
 
     sharedmem.numVehicles = ac.getCarsCount()
     sharedmem.focusVehicle = ac.getFocusedCar()
     tracklenght = siminfo.static.trackSPlineLength
     
+    #small hack to detect if session is in countdown fase, if sessiontimeleft = 30m and 10 sec
     sessionTimeValue = siminfo.graphics.sessionTimeLeft
     ValueSeconds = (sessionTimeValue / 1000) % 60
     ValueMinutes = (sessionTimeValue // 1000) // 60
@@ -100,7 +103,7 @@ def updateSharedMemory():
             sharedmem.vehicleInfo[carId].carRealTimeLeaderboardPosition = ac.getCarRealTimeLeaderboardPosition(carId)
             sharedmem.vehicleInfo[carId].distanceRoundTrack = splineToDistanceRoundTrack(tracklenght, ac.getCarState(carId, acsys.CS.NormalizedSplinePosition) )
             sharedmem.vehicleInfo[carId].isConnected = ac.isConnected(carId)
-
+            
 
 def acMain(ac_version):
   global appWindow,l_lapcount,l_driver,l_drivers,l_flag
@@ -127,56 +130,21 @@ def acUpdate(deltaT):
     global siminfo
     global l_lapcount, lapcount,l_driver,l_drivers,maxSlotId,l_flag
     updateSharedMemory()
-    siminfo.update()
-    sharedmem = siminfo.getsharedmem()
-    currentSplits = []
-	
-    #currentSplits = ac.getCurrentSplits(0)
-    #cursplit = range(0, len(currentSplits), 1)
-	#if len(currentSplits) >= 1:
-	#	sharedmem.vehicleInfo[carId].currentSector1T = cursplit[0]
-    #if len(currentSplits) >= 2:
-	#	sharedmem.vehicleInfo[carId].currentSector2T = cursplit[1]
-    #if len(currentSplits) >= 3:
-	#	sharedmem.vehicleInfo[carId].currentSector3T = cursplit[2]
-    #currentDriver = "Driver: " + sharedmem.vehicleInfo[0].driverName
-    #carModel = "Car: " + sharedmem.vehicleInfo[0].carModel
-    #sessiontype = siminfo.graphics.session
-    #sessiontimeLeft = format(siminfo.graphics.sessionTimeLeft)
-    #splits = ac.getLastSplits(0)
-    #servername = ac.getServerName()
-    #currentLapInvalid = sharedmem.vehicleInfo[0].currentLapInvalid;
-    #connected = ""
-    #connected = "Valid lap: " + format(currentLapInvalid)
-    #connected = "Cars Connected: " + format(sharedmem.numVehicles)
-    #connected = ""
-    #splits = []
-    #splits = siminfo.graphics.split
-    #split=0
-    #sessionTimeValue = siminfo.graphics.sessionTimeLeft
-
-    #lastLapValueSeconds = (sessionTimeValue / 1000) % 60
-    #lastLapValueMinutes = (sessionTimeValue // 1000) // 60
-
-    #iscountdown = 0
-    #if int(lastLapValueMinutes) == 30 and lastLapValueSeconds < 9.999:
-    #    iscountdown = 1
-
-    #timeleft = "time left:" + format(int(lastLapValueMinutes)) + "{:.0f}" + format(lastLapValueSeconds)
-    #for split in splits:
-    #    connected += "splits: " + format(split) + " "
-    #connected = format(splineToDistanceRoundTrack(siminfo.static.trackSPlineLength, ac.getCarState(0, acsys.CS.NormalizedSplinePosition)) )  
-    #connected = "session: " + format(sessiontype)
-    #flag = "flag:" + format(siminfo.graphics.flag)
     
+
+    #sharedmem = siminfo.getsharedmem()
+    #currentSplits = []
+    #LapTime = ac.getCarState(2, acsys.CS.LapTime);
+
+    #sessionTimeValue = siminfo.graphics.iCurrentTime
     #ac.setText(l_lapcount, currentDriver )
     #ac.setText(l_driver, connected )  
-    #ac.setText(l_drivers, currentLapInvalid )
-    #ac.setText(l_flag, timeleft )
+    #ac.setText(l_drivers, format( sessionTimeValue ) )
+    #ac.setText(l_flag, " {} -> {}".format(LapTime, type(LapTime) ))
+
     
     
-
-
+    
 
 
 
