@@ -286,7 +286,7 @@ namespace CrewChiefV4
             Configuration.getUIString("assetto")});
             this.gameDefinitionList.Location = new System.Drawing.Point(782, 28);
             this.gameDefinitionList.Name = "gameDefinitionList";
-            this.gameDefinitionList.Size = new System.Drawing.Size(203, 130);
+            this.gameDefinitionList.Size = new System.Drawing.Size(203, 145);
             this.gameDefinitionList.TabIndex = 21;
             this.gameDefinitionList.SelectedValueChanged += new System.EventHandler(this.updateSelectedGameDefinition);
             // 

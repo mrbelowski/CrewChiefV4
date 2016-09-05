@@ -169,4 +169,4 @@ enable_delayed_responses_help = Some voice commands will trigger a "stand by" re
 enable_console_logging_help = Uncheck this to prevent console window messages being shown. Reduces the CPU load of the app
 log_tyre_temps_help = Show tyre temps at the start of each sector
 
-r3e_blue_flag_detection_distance = Max distance (metres) for R3E blue flag trigger
+r3e_blue_flag_detection_distance_help = Max distance (metres) for R3E blue flag trigger
