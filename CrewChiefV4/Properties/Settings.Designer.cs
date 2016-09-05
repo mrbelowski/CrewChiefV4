@@ -1606,5 +1606,17 @@ namespace CrewChiefV4.Properties {
                 this["launch_acs"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("80")]
+        public int r3e_blue_flag_detection_distance {
+            get {
+                return ((int)(this["r3e_blue_flag_detection_distance"]));
+            }
+            set {
+                this["r3e_blue_flag_detection_distance"] = value;
+            }
+        }
     }
 }
