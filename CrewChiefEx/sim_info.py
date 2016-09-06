@@ -1,17 +1,26 @@
 """
 Assetto Corsa shared memory for Python applications
+
 _ctypes.pyd must be somewhere in sys.path, because AC doesn't include all Python binaries.
+
 Usage. Let's say you have following folder structure::
+
     some_app
         DLLs
             _ctypes.pyd
         some_app.py
+
 some_app.py::
+
     import os
     import sys
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'DLLs'))
+
     from sim_info import info
+
     print(info.graphics.tyreCompound, info.physics.rpms, info.static.playerNick)
+
+
 Do whatever you want with this code!
 WBR, Rombik :)
 """
