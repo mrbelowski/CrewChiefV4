@@ -2,7 +2,9 @@ CrewChief version 4.
 
 Changelog
 ---------
-Version 4.4.0.0: First cut of Assetto Corsa support courtesy of Sparten - this is a work-in-progress; added blue flag max trigger distance (increase this to make the blue flag warnings play when the lapping car is further away). 
+Version 4.4.0.1: Added missing Python plugin for Assetto Corsa. Copy the CrewChiefEx folder from Crew Chief's installation location to /Steam/steamapps/common/assettocorsa/apps/python and activate the plugin in-game.
+
+Version 4.4.0.0: First cut of Assetto Corsa support courtesy of Sparten - this is a work-in-progress. Copy the CrewChiefEx folder to /Steam/steamapps/common/assettocorsa/apps/python and activate the plugin in-game; added blue flag max trigger distance (increase this to make the blue flag warnings play when the lapping car is further away). 
 
 Version 4.3.0.4: Fixed incorrect sector gap reports for rF1; Fixed session variables not resetting at start of new session for rF1; Disabled erroneous damage reporting in Hot Lap sessions for rF1; Fixed erroneous fuel warning messages in non-race sessions for rF1; Fixed erroneous flags in non-race sessions for rF1; Added basic invalid lap detection for rF1; Improved wheel spin/lock detection for rF1;
 
