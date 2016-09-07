@@ -1618,5 +1618,17 @@ namespace CrewChiefV4.Properties {
                 this["r3e_blue_flag_detection_distance"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("4.5")]
+        public float asc_spotter_car_length {
+            get {
+                return ((float)(this["asc_spotter_car_length"]));
+            }
+            set {
+                this["asc_spotter_car_length"] = value;
+            }
+        }
     }
 }

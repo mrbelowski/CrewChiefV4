@@ -19,7 +19,7 @@ namespace CrewChiefV4.assetto
 
         // how long is a car? we use 3.5 meters by default here. Too long and we'll get 'hold your line' messages
         // when we're clearly directly behind the car
-        private float carLength = 3.5f;// UserSettings.GetUserSettings().getFloat("asc_spotter_car_length");
+        private float carLength =  UserSettings.GetUserSettings().getFloat("asc_spotter_car_length");
 
         // don't activate the spotter unless this many seconds have elapsed (race starts are messy)
         private int timeAfterRaceStartToActivate = UserSettings.GetUserSettings().getInt("time_after_race_start_for_spotter");

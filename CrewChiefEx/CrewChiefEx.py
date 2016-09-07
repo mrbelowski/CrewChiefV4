@@ -4,7 +4,7 @@ import acsys
 import sys
 import math, os.path
 import platform
-import mmap
+
 # import libraries
 if platform.architecture()[0] == "64bit":
     sysdir=os.path.dirname(__file__)+'/stdlib64'
@@ -14,53 +14,43 @@ sys.path.insert(0, sysdir)
 os.environ['PATH'] = os.environ['PATH'] + ";."
 
 
-
-try:
-  import configparser
-except ImportError as e:
-  ac.log("{}".format(e))
-
-
 from sim_info import SimInfo
 from sim_info import SPageFileCrewChief
 from sim_info import acsVehicleInfo
 
-maxcars = 64
-drivers = []
-player = 0
-maxSlotId = 0
 siminfo = SimInfo()
-driverName = ""
 
-l_lapcount=0
-l_driver=0
-l_drivers=0
-l_flag=0
+timer = 0
 
-lapcount=0
-state = ''
 def splineToDistanceRoundTrack(tracklen, splinepos):
 
-    return (splinepos * tracklen) / 1
+    return (splinepos * tracklen)
 
 
 def updateSharedMemory():
-    global siminfo,maxSlotId,state
+    global siminfo
     sharedmem = siminfo.getsharedmem()
     siminfo.update()
-
-
+    iscountdown = 0
     sharedmem.numVehicles = ac.getCarsCount()
     sharedmem.focusVehicle = ac.getFocusedCar()
     tracklenght = siminfo.static.trackSPlineLength
-    
-    #small hack to detect if session is in countdown fase, if sessiontimeleft = 30m and 10 sec
+    sharedmem.serverName = ac.getServerName()
+
+    #small hack to detect if session is in countdown fase
+    isOnline = len(ac.getServerName())
     sessionTimeValue = siminfo.graphics.sessionTimeLeft
     ValueSeconds = (sessionTimeValue / 1000) % 60
     ValueMinutes = (sessionTimeValue // 1000) // 60
-    iscountdown = 0
-    if int(ValueMinutes) == 30 and ValueSeconds < 9.999:
+    sessiontype = siminfo.graphics.session
+   
+    if isOnline > 0:
+        if sessiontype == 2 or sessiontype == 5 or sessiontype == 6: 
+            if ValueMinutes >= 0.0 and ValueSeconds >= 0.1:
+                iscountdown = 1
+    elif int(ValueMinutes) == 30 and ValueSeconds < 9.999:
         iscountdown = 1
+    
     sharedmem.isCountdown = iscountdown
 
     #now we'll build the slots, so we later know every single (possible) car
@@ -72,15 +62,6 @@ def updateSharedMemory():
         if sharedmem.vehicleInfo[carId].carModel == '-1':
             break
         else:
-            splits = ac.getLastSplits(carId)
-            split = range(0, len(splits), 1)
-            if len(splits) >= 1:
-                sharedmem.vehicleInfo[carId].lastSector1T = split[0]
-            if len(splits) >= 2:
-                sharedmem.vehicleInfo[carId].lastSector2T = split[1]
-            if len(splits) >= 3:
-                sharedmem.vehicleInfo[carId].lastSector3T = split[2]
-
             sharedmem.vehicleInfo[carId].carId = carId
             sharedmem.vehicleInfo[carId].driverName = ac.getDriverName(carId)
             sharedmem.vehicleInfo[carId].carModel = ac.getCarName(carId)
@@ -103,48 +84,24 @@ def updateSharedMemory():
             sharedmem.vehicleInfo[carId].carRealTimeLeaderboardPosition = ac.getCarRealTimeLeaderboardPosition(carId)
             sharedmem.vehicleInfo[carId].distanceRoundTrack = splineToDistanceRoundTrack(tracklenght, ac.getCarState(carId, acsys.CS.NormalizedSplinePosition) )
             sharedmem.vehicleInfo[carId].isConnected = ac.isConnected(carId)
+
             
 
 def acMain(ac_version):
-  global appWindow,l_lapcount,l_driver,l_drivers,l_flag
+  global appWindow
   appWindow = ac.newApp("CrewChiefEx")
   ac.setTitle(appWindow, "CrewChiefEx")
 
-  ac.setSize(appWindow, 400, 200)
+  ac.setSize(appWindow, 300, 40)
 
-  ac.log("Hello, Assetto Corsa application world!")
-  ac.console("Hello, Assetto Corsa console!")
-
-  l_lapcount = ac.addLabel(appWindow, "Driver:");
-  l_driver = ac.addLabel(appWindow, "Car:");
-  l_drivers = ac.addLabel(appWindow, "Cars Connected:");
-  l_flag = ac.addLabel(appWindow, "flag:");
-  ac.setPosition(l_lapcount, 3, 30)
-  ac.setPosition(l_driver, 3, 42)
-  ac.setPosition(l_drivers, 3, 54)
-  ac.setPosition(l_flag, 3, 66)
+  ac.log("CrewChief Was Here! damage report ?")
+  ac.console("CrewChief Was Here! damage report ?")
 
   return "CrewChiefEx"
 
 def acUpdate(deltaT):
-    global siminfo
-    global l_lapcount, lapcount,l_driver,l_drivers,maxSlotId,l_flag
-    updateSharedMemory()
-    
-
-    #sharedmem = siminfo.getsharedmem()
-    #currentSplits = []
-    #LapTime = ac.getCarState(2, acsys.CS.LapTime);
-
-    #sessionTimeValue = siminfo.graphics.iCurrentTime
-    #ac.setText(l_lapcount, currentDriver )
-    #ac.setText(l_driver, connected )  
-    #ac.setText(l_drivers, format( sessionTimeValue ) )
-    #ac.setText(l_flag, " {} -> {}".format(LapTime, type(LapTime) ))
-
-    
-    
-    
-
-
-
+    global timer
+    timer += deltaT
+    if timer > 0.05:
+        updateSharedMemory()
+        timer = 0
