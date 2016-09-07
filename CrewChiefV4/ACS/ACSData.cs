@@ -261,12 +261,6 @@ namespace CrewChiefV4.assetto
             public int isCarInPit;
             public int carLeaderboardPosition;
             public int carRealTimeLeaderboardPosition;
-            public int lastSector1T;
-            public int lastSector2T;
-            public int lastSector3T;
-            public int currentSector1T;
-            public int currentSector2T;
-            public int currentSector3T;
             public float distanceRoundTrack;
             public int isConnected;
             
@@ -280,6 +274,7 @@ namespace CrewChiefV4.assetto
             public int isCountdown;
             public int numVehicles;
             public int focusVehicle;
+            public int IsOnline;
             [MarshalAsAttribute(UnmanagedType.ByValTStr, SizeConst = 33)]
             public String serverIp;
             public int ServerSlotsCount;
