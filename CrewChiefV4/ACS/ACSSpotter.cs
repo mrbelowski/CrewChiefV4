@@ -58,7 +58,11 @@ namespace CrewChiefV4.assetto
         {
             paused = false;
         }
-
+        public float mapToFloatTime(int time)
+        {
+            TimeSpan ts = TimeSpan.FromTicks(time);
+            return (float)ts.TotalMilliseconds * 10;
+        }
         public void trigger(Object lastStateObj, Object currentStateObj)
         {
 
@@ -68,7 +72,8 @@ namespace CrewChiefV4.assetto
             }
             AssettoCorsaShared lastState = ((ACSSharedMemoryReader.ACSStructWrapper)lastStateObj).data;
             AssettoCorsaShared currentState = ((ACSSharedMemoryReader.ACSStructWrapper)currentStateObj).data;
-            if (!enabled || currentState.acsChief.numVehicles <= 1 || currentState.acsGraphic.distanceTraveled <= 0.0f || currentState.acsGraphic.iCurrentTime < timeAfterRaceStartToActivate)
+
+            if (!enabled || currentState.acsChief.numVehicles <= 1 || mapToFloatTime(currentState.acsChief.vehicle[0].currentLapTimeMS) < timeAfterRaceStartToActivate)
             { 
                return;  
             }
@@ -84,18 +89,16 @@ namespace CrewChiefV4.assetto
                 previousTime = now;
                 if (timeDiffSeconds <= 0)
                 {
-                    Console.WriteLine("wtf");
                     return;
                 }
             }
             catch (Exception)
             {
-                Console.WriteLine("wtf Exception");
                 return;
             }
             float[] currentPlayerPosition = new float[] { currentPlayerData.worldPosition.x, currentPlayerData.worldPosition.z };
 
-            if (currentState.acsGraphic.isInPitLane == 0 || currentState.acsGraphic.isInPit == 0)
+            if (currentPlayerData.isCarInPitline == 0 || currentPlayerData.isCarInPit == 0)
             {
                 List<float[]> currentOpponentPositions = new List<float[]>();
                 float[] playerVelocityData = new float[3];
@@ -106,7 +109,7 @@ namespace CrewChiefV4.assetto
                 for (int i = 0; i < currentState.acsChief.numVehicles; i++)
                 {
                     acsVehicleInfo vehicle = currentState.acsChief.vehicle[i];
-                    if (vehicle.carId == 0 || vehicle.isCarInPit == 1 || vehicle.isCarInPitline == 1 )
+                    if (vehicle.carId == 0 || vehicle.isCarInPit == 1 || vehicle.isCarInPitline == 1 || vehicle.isConnected != 1)
                     {
                         continue;
                     }

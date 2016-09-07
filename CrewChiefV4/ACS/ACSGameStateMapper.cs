@@ -158,7 +158,7 @@ namespace CrewChiefV4.assetto
             playerName = shared.acsStatic.playerName;
             NameValidator.validateName(playerName);
             currentGameState.SessionData.CompletedLaps = (int)shared.acsGraphic.completedLaps;
-            currentGameState.SessionData.Position = (int)playerVehicle.carLeaderboardPosition;
+            currentGameState.SessionData.Position = (int)playerVehicle.carRealTimeLeaderboardPosition+1;
             currentGameState.SessionData.UnFilteredPosition = (int)playerVehicle.carRealTimeLeaderboardPosition + 1;
 
             currentGameState.SessionData.IsNewSector = previousGameState == null || currentGameState.SessionData.SectorNumber != previousGameState.SessionData.SectorNumber;

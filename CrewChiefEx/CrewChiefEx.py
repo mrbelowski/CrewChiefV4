@@ -21,6 +21,8 @@ from sim_info import acsVehicleInfo
 siminfo = SimInfo()
 
 timer = 0
+isOnline = -1
+trackLenght = 0
 
 def splineToDistanceRoundTrack(tracklen, splinepos):
 
@@ -28,17 +30,15 @@ def splineToDistanceRoundTrack(tracklen, splinepos):
 
 
 def updateSharedMemory():
-    global siminfo
+    global siminfo,isOnline,trackLenght
     sharedmem = siminfo.getsharedmem()
     siminfo.update()
-    iscountdown = 0
+    isCountDown = 0
     sharedmem.numVehicles = ac.getCarsCount()
     sharedmem.focusVehicle = ac.getFocusedCar()
-    tracklenght = siminfo.static.trackSPlineLength
-    sharedmem.serverName = ac.getServerName()
-
+    trackLenght = siminfo.static.trackSPlineLength
     #small hack to detect if session is in countdown fase
-    isOnline = len(ac.getServerName())
+    
     sessionTimeValue = siminfo.graphics.sessionTimeLeft
     ValueSeconds = (sessionTimeValue / 1000) % 60
     ValueMinutes = (sessionTimeValue // 1000) // 60
@@ -47,11 +47,11 @@ def updateSharedMemory():
     if isOnline > 0:
         if sessiontype == 2 or sessiontype == 5 or sessiontype == 6: 
             if ValueMinutes >= 0.0 and ValueSeconds >= 0.1:
-                iscountdown = 1
+                isCountDown = 1
     elif int(ValueMinutes) == 30 and ValueSeconds < 9.999:
-        iscountdown = 1
+        isCountDown = 1
     
-    sharedmem.isCountdown = iscountdown
+    sharedmem.isCountdown = isCountDown
 
     #now we'll build the slots, so we later know every single (possible) car
     carIds = range(0, ac.getCarsCount(), 1) 
@@ -82,13 +82,16 @@ def updateSharedMemory():
             sharedmem.vehicleInfo[carId].isCarInPit = ac.isCarInPit(carId)
             sharedmem.vehicleInfo[carId].carLeaderboardPosition = ac.getCarLeaderboardPosition(carId)
             sharedmem.vehicleInfo[carId].carRealTimeLeaderboardPosition = ac.getCarRealTimeLeaderboardPosition(carId)
-            sharedmem.vehicleInfo[carId].distanceRoundTrack = splineToDistanceRoundTrack(tracklenght, ac.getCarState(carId, acsys.CS.NormalizedSplinePosition) )
+            sharedmem.vehicleInfo[carId].distanceRoundTrack = splineToDistanceRoundTrack(trackLenght, ac.getCarState(carId, acsys.CS.NormalizedSplinePosition) )
             sharedmem.vehicleInfo[carId].isConnected = ac.isConnected(carId)
 
             
 
 def acMain(ac_version):
-  global appWindow
+  global appWindow,siminfo,isOnline
+
+  serverName = ""
+
   appWindow = ac.newApp("CrewChiefEx")
   ac.setTitle(appWindow, "CrewChiefEx")
 
@@ -96,7 +99,11 @@ def acMain(ac_version):
 
   ac.log("CrewChief Was Here! damage report ?")
   ac.console("CrewChief Was Here! damage report ?")
-
+  sharedmem = siminfo.getsharedmem()
+  serverName = ac.getServerName()
+  isOnline = len(serverName)
+  sharedmem.serverName = serverName
+  sharedmem.isOnline = isOnline
   return "CrewChiefEx"
 
 def acUpdate(deltaT):

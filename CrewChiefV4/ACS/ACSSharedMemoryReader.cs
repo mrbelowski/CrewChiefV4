@@ -144,6 +144,25 @@ namespace CrewChiefV4.assetto
                 }
                 try
                 {
+                    if(!forSpotter)
+                    {
+                        using (var sharedMemoryStreamView = memoryMappedGraphicFile.CreateViewStream())
+                        {
+                            BinaryReader _SharedMemoryStream = new BinaryReader(sharedMemoryStreamView);
+                            sharedMemoryGraphicReadBuffer = _SharedMemoryStream.ReadBytes(sharedmemoryGraphicsize);
+                            handleGraphic = GCHandle.Alloc(sharedMemoryGraphicReadBuffer, GCHandleType.Pinned);
+                            acsShared.acsGraphic = (SPageFileGraphic)Marshal.PtrToStructure(handleGraphic.AddrOfPinnedObject(), typeof(SPageFileGraphic));
+                            handleGraphic.Free();
+                        }
+                        using (var sharedMemoryStreamView = memoryMappedStaticFile.CreateViewStream())
+                        {
+                            BinaryReader _SharedMemoryStream = new BinaryReader(sharedMemoryStreamView);
+                            sharedMemoryStaticReadBuffer = _SharedMemoryStream.ReadBytes(sharedmemoryStaticsize);
+                            handleStatic = GCHandle.Alloc(sharedMemoryStaticReadBuffer, GCHandleType.Pinned);
+                            acsShared.acsStatic = (SPageFileStatic)Marshal.PtrToStructure(handleStatic.AddrOfPinnedObject(), typeof(SPageFileStatic));
+                            handleStatic.Free();
+                        }
+                    }
 
                     using (var sharedMemoryStreamView = memoryMappedPhysicsFile.CreateViewStream())
                     {
@@ -153,23 +172,6 @@ namespace CrewChiefV4.assetto
                         acsShared.acsPhysics = (SPageFilePhysics)Marshal.PtrToStructure(handlePhysics.AddrOfPinnedObject(), typeof(SPageFilePhysics));
                         handlePhysics.Free();
                     }
-                    using (var sharedMemoryStreamView = memoryMappedGraphicFile.CreateViewStream())
-                    {
-                        BinaryReader _SharedMemoryStream = new BinaryReader(sharedMemoryStreamView);
-                        sharedMemoryGraphicReadBuffer = _SharedMemoryStream.ReadBytes(sharedmemoryGraphicsize);
-                        handleGraphic = GCHandle.Alloc(sharedMemoryGraphicReadBuffer, GCHandleType.Pinned);
-                        acsShared.acsGraphic = (SPageFileGraphic)Marshal.PtrToStructure(handleGraphic.AddrOfPinnedObject(), typeof(SPageFileGraphic));
-                        handleGraphic.Free();
-                    }
-                    using (var sharedMemoryStreamView = memoryMappedStaticFile.CreateViewStream())
-                    {
-                        BinaryReader _SharedMemoryStream = new BinaryReader(sharedMemoryStreamView);
-                        sharedMemoryStaticReadBuffer = _SharedMemoryStream.ReadBytes(sharedmemoryStaticsize);
-                        handleStatic = GCHandle.Alloc(sharedMemoryStaticReadBuffer, GCHandleType.Pinned);
-                        acsShared.acsStatic = (SPageFileStatic)Marshal.PtrToStructure(handleStatic.AddrOfPinnedObject(), typeof(SPageFileStatic));
-                        handleStatic.Free();
-                    }
-
                     using (var sharedMemoryStreamView = memoryMappedCrewChiefFile.CreateViewStream())
                     {
                         BinaryReader _SharedMemoryStream = new BinaryReader(sharedMemoryStreamView);
@@ -178,6 +180,7 @@ namespace CrewChiefV4.assetto
                         acsShared.acsChief = (SPageFileCrewChief)Marshal.PtrToStructure(handleCrewChief.AddrOfPinnedObject(), typeof(SPageFileCrewChief));
                         handleCrewChief.Free();
                     }
+
                     ACSStructWrapper structWrapper = new ACSStructWrapper();
                     structWrapper.ticksWhenRead = DateTime.Now.Ticks;
                     structWrapper.data = acsShared;
@@ -186,13 +189,6 @@ namespace CrewChiefV4.assetto
                     {
                         dataToDump.Add(structWrapper);
                     }
-                    //Console.WriteLine(acsShared.acsStatic.smVersion);
-                    //Console.WriteLine(acsShared.acsChief.vehicle[0].driverName);
-
-                    //Console.WriteLine(acsShared.acsChief.vehicle[0].speedMS.ToString("C2"));
-                    
-                    //Console.WriteLine(_acsapiCrewChiefstruct.packetId.ToString("D"));
-
 
                     return structWrapper;
                 }
