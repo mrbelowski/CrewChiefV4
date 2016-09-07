@@ -146,14 +146,6 @@ namespace CrewChiefV4.assetto
                 {
                     if(!forSpotter)
                     {
-                        using (var sharedMemoryStreamView = memoryMappedPhysicsFile.CreateViewStream())
-                        {
-                            BinaryReader _SharedMemoryStream = new BinaryReader(sharedMemoryStreamView);
-                            sharedMemoryPhysicsReadBuffer = _SharedMemoryStream.ReadBytes(sharedmemoryPhysicssize);
-                            handlePhysics = GCHandle.Alloc(sharedMemoryPhysicsReadBuffer, GCHandleType.Pinned);
-                            acsShared.acsPhysics = (SPageFilePhysics)Marshal.PtrToStructure(handlePhysics.AddrOfPinnedObject(), typeof(SPageFilePhysics));
-                            handlePhysics.Free();
-                        }
                         using (var sharedMemoryStreamView = memoryMappedGraphicFile.CreateViewStream())
                         {
                             BinaryReader _SharedMemoryStream = new BinaryReader(sharedMemoryStreamView);
@@ -171,6 +163,15 @@ namespace CrewChiefV4.assetto
                             handleStatic.Free();
                         }
                     }
+
+                    using (var sharedMemoryStreamView = memoryMappedPhysicsFile.CreateViewStream())
+                    {
+                        BinaryReader _SharedMemoryStream = new BinaryReader(sharedMemoryStreamView);
+                        sharedMemoryPhysicsReadBuffer = _SharedMemoryStream.ReadBytes(sharedmemoryPhysicssize);
+                        handlePhysics = GCHandle.Alloc(sharedMemoryPhysicsReadBuffer, GCHandleType.Pinned);
+                        acsShared.acsPhysics = (SPageFilePhysics)Marshal.PtrToStructure(handlePhysics.AddrOfPinnedObject(), typeof(SPageFilePhysics));
+                        handlePhysics.Free();
+                    }
                     using (var sharedMemoryStreamView = memoryMappedCrewChiefFile.CreateViewStream())
                     {
                         BinaryReader _SharedMemoryStream = new BinaryReader(sharedMemoryStreamView);
@@ -179,6 +180,7 @@ namespace CrewChiefV4.assetto
                         acsShared.acsChief = (SPageFileCrewChief)Marshal.PtrToStructure(handleCrewChief.AddrOfPinnedObject(), typeof(SPageFileCrewChief));
                         handleCrewChief.Free();
                     }
+
                     ACSStructWrapper structWrapper = new ACSStructWrapper();
                     structWrapper.ticksWhenRead = DateTime.Now.Ticks;
                     structWrapper.data = acsShared;
