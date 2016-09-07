@@ -401,5 +401,8 @@
     <Setting Name="r3e_blue_flag_detection_distance" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">80</Value>
     </Setting>
+    <Setting Name="asc_spotter_car_length" Type="System.Single" Scope="User">
+      <Value Profile="(Default)">4.5</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
