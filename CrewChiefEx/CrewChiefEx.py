@@ -81,15 +81,6 @@ def updateSharedMemory():
         if sharedmem.vehicleInfo[carId].carModel == '-1':
             break
         else:
-            splits = ac.getLastSplits(carId)
-            split = range(0, len(splits), 1)
-            if len(splits) >= 1:
-                sharedmem.vehicleInfo[carId].lastSector1T = split[0]
-            if len(splits) >= 2:
-                sharedmem.vehicleInfo[carId].lastSector2T = split[1]
-            if len(splits) >= 3:
-                sharedmem.vehicleInfo[carId].lastSector3T = split[2]
-
             sharedmem.vehicleInfo[carId].carId = carId
             sharedmem.vehicleInfo[carId].driverName = ac.getDriverName(carId)
             sharedmem.vehicleInfo[carId].carModel = ac.getCarName(carId)
@@ -141,39 +132,38 @@ def acUpdate(deltaT):
     global l_lapcount, lapcount,l_driver,l_drivers,maxSlotId,l_flag, timer1
     
     timer1 += deltaT
-    
-    if timer1 > 0.050:
+    if timer1 > 0.05:
         updateSharedMemory()
         timer1 = 0
     
-    sharedmem = siminfo.getsharedmem()
+    #sharedmem = siminfo.getsharedmem()
     
-    sessionTimeValue = siminfo.graphics.sessionTimeLeft
-    ValueSeconds = (sessionTimeValue / 1000) % 60
-    ValueMinutes = (sessionTimeValue // 1000) // 60
+    #sessionTimeValue = siminfo.graphics.sessionTimeLeft
+    #ValueSeconds = (sessionTimeValue / 1000) % 60
+    #ValueMinutes = (sessionTimeValue // 1000) // 60
 
-    isOnline = len(ac.getServerName())
-    iscountdown = 0
-    sessiontype = siminfo.graphics.session
-
-
-    if isOnline > 0:
-        if sessiontype == 2 or sessiontype == 5 or sessiontype == 6: 
-            if ValueMinutes >= 0.0 and ValueSeconds >= 0.1:
-                iscountdown = 1
-    elif int(ValueMinutes) == 30 and ValueSeconds < 9.999:
-        iscountdown = 1
+    #isOnline = len(ac.getServerName())
+    #iscountdown = 0
+    #sessiontype = siminfo.graphics.session
 
 
-    ac.setText(l_lapcount,"servername {}".format( ac.getServerName() ))
+    #if isOnline > 0:
+    #    if sessiontype == 2 or sessiontype == 5 or sessiontype == 6: 
+    #        if ValueMinutes >= 0.0 and ValueSeconds >= 0.1:
+    #            iscountdown = 1
+    #elif int(ValueMinutes) == 30 and ValueSeconds < 9.999:
+    #    iscountdown = 1
 
-    tracklenght = siminfo.static.trackSPlineLength
-    distance = splineToDistanceRoundTrack(tracklenght, ac.getCarState(0, acsys.CS.NormalizedSplinePosition) )
-    ac.setText(l_driver, "timeleft {:.0f}:{:05.2f}".format(ValueMinutes, ValueSeconds) )  
-    ac.setText(l_drivers, "currentSectorIndex {}".format( siminfo.graphics.currentSectorIndex ) )
-    ac.setText(l_flag, "countDown {}".format( iscountdown ))
 
-    
+    #ac.setText(l_lapcount,"servername {}".format( ac.getServerName() ))
+
+    #tracklenght = siminfo.static.trackSPlineLength
+    #distance = splineToDistanceRoundTrack(tracklenght, ac.getCarState(0, acsys.CS.NormalizedSplinePosition) )
+    #ac.setText(l_driver, "timeleft {:.0f}:{:05.2f}".format(ValueMinutes, ValueSeconds) )  
+    #ac.setText(l_drivers, "currentSectorIndex {}".format( siminfo.graphics.currentSectorIndex ) )
+    #ac.setText(l_flag, "countDown {}".format( iscountdown ))
+
+        
     
     
 
