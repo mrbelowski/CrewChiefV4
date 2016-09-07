@@ -460,9 +460,7 @@ namespace CrewChiefV4.assetto
                         currentGameState.SessionData.SessionTimesAtEndOfSectors[3] = currentGameState.SessionData.SessionRunningTime;
 
                         currentGameState.SessionData.LastSector3Time = sectortime;
-                        TimeSpan span = TimeSpan.FromSeconds(currentGameState.SessionData.LastSector3Time);
-                        Console.WriteLine("sector3 time:{0:D2}m:{1:D2}s:{2:D3}ms", span.Minutes, span.Seconds, span.Milliseconds);
-
+ 
                         if (currentGameState.SessionData.LastSector3Time > 0 &&
                             (currentGameState.SessionData.PlayerBestSector3Time == -1 || currentGameState.SessionData.LastSector3Time < currentGameState.SessionData.PlayerBestSector3Time))
                         {
@@ -480,13 +478,7 @@ namespace CrewChiefV4.assetto
                     {
 
                         currentGameState.SessionData.SessionTimesAtEndOfSectors[1] = currentGameState.SessionData.SessionRunningTime;
-                        //if (isOnline)
-                        //{
-                        //    sectortime = addPlayerLapdata(sectortime, currentGameState.SessionData.SessionRunningTime);
-                        //}
                         currentGameState.SessionData.LastSector1Time = sectortime;
-                        TimeSpan span = TimeSpan.FromSeconds(currentGameState.SessionData.LastSector1Time);
-                        Console.WriteLine("sector1 time:{0:D2}m:{1:D2}s:{2:D3}ms", span.Minutes, span.Seconds, span.Milliseconds);
 
                         if (currentGameState.SessionData.LastSector1Time > 0 &&
                             (currentGameState.SessionData.PlayerBestSector1Time == -1 || currentGameState.SessionData.LastSector1Time < currentGameState.SessionData.PlayerBestSector1Time))
@@ -499,14 +491,7 @@ namespace CrewChiefV4.assetto
 
 
                         currentGameState.SessionData.SessionTimesAtEndOfSectors[2] = currentGameState.SessionData.SessionRunningTime;
-                        /*if (isOnline)
-                        {
-                            sectortime = addPlayerLapdata(sectortime, currentGameState.SessionData.SessionRunningTime);
-                        }*/
                         currentGameState.SessionData.LastSector2Time = sectortime;
-                        TimeSpan span = TimeSpan.FromSeconds(currentGameState.SessionData.LastSector2Time);
-                        Console.WriteLine("sector2 time:{0:D2}m:{1:D2}s:{2:D3}ms", span.Minutes, span.Seconds, span.Milliseconds);
-
 
                         if (currentGameState.SessionData.LastSector2Time > 0 &&
                             (currentGameState.SessionData.PlayerBestSector2Time == -1 || currentGameState.SessionData.LastSector2Time < currentGameState.SessionData.PlayerBestSector2Time))
@@ -520,7 +505,7 @@ namespace CrewChiefV4.assetto
 
                 currentGameState.SessionData.Flag = mapToFlagEnum(currentFlag);
                 currentGameState.SessionData.NumCars = shared.acsChief.numVehicles;
-                currentGameState.SessionData.CurrentLapIsValid = playerVehicle.currentLapInvalid != 1;
+                currentGameState.SessionData.CurrentLapIsValid = shared.acsPhysics.numberOfTyresOut < 3;
 
                 currentGameState.SessionData.IsNewLap = previousGameState != null && previousGameState.SessionData.IsNewLap == false &&
                     (shared.acsGraphic.completedLaps == previousGameState.SessionData.CompletedLaps + 1 ||
@@ -764,6 +749,54 @@ namespace CrewChiefV4.assetto
                         }
                     }
                 }
+            }
+
+            //engine data
+            currentGameState.EngineData.EngineRpm = shared.acsPhysics.rpms;
+            currentGameState.EngineData.MaxEngineRpm = shared.acsStatic.maxRpm;
+            currentGameState.EngineData.MinutesIntoSessionBeforeMonitoring = 2;
+
+            currentGameState.FuelData.FuelCapacity = shared.acsStatic.maxFuel;
+            currentGameState.FuelData.FuelLeft = shared.acsPhysics.fuel;
+            currentGameState.FuelData.FuelUseActive = shared.acsStatic.aidFuelRate > 0;
+
+            //currentGameState.TyreData.HasMatchedTyreTypes = true;
+            //currentGameState.TyreData.TireWearActive = shared.acsStatic.aidTireRate > 0;
+
+            currentGameState.PositionAndMotionData.CarSpeed = playerVehicle.speedMS;
+            
+            currentGameState.PitData.InPitlane = shared.acsGraphic.isInPitLane == 1;
+
+            if (currentGameState.PitData.InPitlane)
+            {
+                if (currentGameState.SessionData.SectorNumber == numberOfSectorsOnTrack)
+                {
+                    currentGameState.PitData.OnInLap = true;
+                    currentGameState.PitData.OnOutLap = false;
+                }
+                else if (currentGameState.SessionData.SectorNumber == 1)
+                {
+                    currentGameState.PitData.OnInLap = false;
+                    currentGameState.PitData.OnOutLap = true;
+                }
+            }
+            else if (currentGameState.SessionData.IsNewLap)
+            {
+                // starting a new lap while not in the pitlane so clear the in / out lap flags
+                currentGameState.PitData.OnInLap = false;
+                currentGameState.PitData.OnOutLap = false;
+            }
+            if (previousGameState != null && currentGameState.PitData.OnOutLap && previousGameState.PitData.InPitlane && !currentGameState.PitData.InPitlane)
+            {
+                currentGameState.PitData.IsAtPitExit = true;
+            }
+
+
+            currentGameState.PenaltiesData.IsOffRacingSurface = shared.acsPhysics.numberOfTyresOut > 2;
+            if (!currentGameState.PitData.OnOutLap && previousGameState != null && previousGameState.SessionData.CurrentLapIsValid && !currentGameState.SessionData.CurrentLapIsValid &&
+                !(shared.acsGraphic.session == AC_SESSION_TYPE.AC_RACE && shared.acsChief.isCountdown == 1))
+            {
+                currentGameState.PenaltiesData.CutTrackWarnings = previousGameState.PenaltiesData.CutTrackWarnings + 1;
             }
 
             if (currentGameState.Conditions.timeOfMostRecentSample.Add(ConditionsMonitor.ConditionsSampleFrequency) < currentGameState.Now)
