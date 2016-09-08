@@ -158,8 +158,18 @@ namespace CrewChiefV4.assetto
             playerName = shared.acsStatic.playerName;
             NameValidator.validateName(playerName);
             currentGameState.SessionData.CompletedLaps = (int)shared.acsGraphic.completedLaps;
-            currentGameState.SessionData.Position = (int)playerVehicle.carRealTimeLeaderboardPosition+1;
-            currentGameState.SessionData.UnFilteredPosition = (int)playerVehicle.carRealTimeLeaderboardPosition + 1;
+            
+            if(shared.acsGraphic.session == AC_SESSION_TYPE.AC_PRACTICE || shared.acsGraphic.session == AC_SESSION_TYPE.AC_QUALIFY)
+            {
+                currentGameState.SessionData.Position = shared.acsGraphic.position;
+                currentGameState.SessionData.UnFilteredPosition = currentGameState.SessionData.Position;
+            }
+            else
+            {
+                currentGameState.SessionData.Position = playerVehicle.carRealTimeLeaderboardPosition + 1;
+                currentGameState.SessionData.UnFilteredPosition = currentGameState.SessionData.Position;
+            }
+
 
             currentGameState.SessionData.IsNewSector = previousGameState == null || currentGameState.SessionData.SectorNumber != previousGameState.SessionData.SectorNumber;
             SessionPhase lastSessionPhase = SessionPhase.Unavailable;
@@ -208,7 +218,9 @@ namespace CrewChiefV4.assetto
 
             Boolean leaderHasFinished = previousGameState != null && previousGameState.SessionData.LeaderHasFinishedRace;
             currentGameState.SessionData.LeaderHasFinishedRace = leaderHasFinished;
+            
             AC_FLAG_TYPE currentFlag = shared.acsGraphic.flag;
+            
             currentGameState.SessionData.IsDisqualified = currentFlag == AC_FLAG_TYPE.AC_BLACK_FLAG;
             bool isInPits = shared.acsGraphic.isInPit == 1;
             int lapsCompleated = shared.acsGraphic.completedLaps;
@@ -555,7 +567,7 @@ namespace CrewChiefV4.assetto
 
                                     float[] previousOpponentWorldPosition = new float[] { 0, 0, 0 };
                                     float previousOpponentSpeed = 0;
-
+                                    int currentOpponentRacePosition = 0;
                                     OpponentData previousOpponentData = getOpponentForName(previousGameState, participantName);
 
                                     if (previousOpponentData != null)
@@ -569,8 +581,14 @@ namespace CrewChiefV4.assetto
                                         previousOpponentSpeed = previousOpponentData.Speed;
                                         currentOpponentSector = getOpponantSector(participantStruct.distanceRoundTrack);
                                     }
-
-                                    int currentOpponentRacePosition = (int)participantStruct.carRealTimeLeaderboardPosition + 1;
+                                    if (shared.acsGraphic.session == AC_SESSION_TYPE.AC_PRACTICE || shared.acsGraphic.session == AC_SESSION_TYPE.AC_QUALIFY)
+                                    {
+                                        currentOpponentRacePosition = (int)participantStruct.carLeaderboardPosition;
+                                    }
+                                    else
+                                    {
+                                        currentOpponentRacePosition = (int)participantStruct.carRealTimeLeaderboardPosition + 1;
+                                    }
                                     int currentOpponentLapsCompleted = (int)participantStruct.lapCount;
 
                                     if (currentOpponentSector == 0)
@@ -625,8 +643,7 @@ namespace CrewChiefV4.assetto
 
                                     float secondsSinceLastUpdate = (float)new TimeSpan(currentGameState.Ticks - previousGameState.Ticks).TotalSeconds;
 
-                                    upateOpponentData(currentOpponentData, currentOpponentRacePosition,
-                                        participantStruct.carRealTimeLeaderboardPosition + 1, currentOpponentLapsCompleted,
+                                    upateOpponentData(currentOpponentData, currentOpponentRacePosition, currentOpponentLapsCompleted,
                                         currentOpponentSector, sectorTime, mapToFloatTime(participantStruct.currentLapTimeMS), mapToFloatTime(participantStruct.lastLapTimeMS),
                                         isEnteringPits || isLeavingPits, participantStruct.currentLapInvalid == 0,
                                         currentGameState.SessionData.SessionRunningTime, secondsSinceLastUpdate,
@@ -867,7 +884,7 @@ namespace CrewChiefV4.assetto
             return PitWindow.Unavailable;
         }
 
-        private void upateOpponentData(OpponentData opponentData, int racePosition, int unfilteredRacePosition, int completedLaps, int sector, float sectorTime,
+        private void upateOpponentData(OpponentData opponentData, int racePosition, int completedLaps, int sector, float sectorTime,
             float completedLapTime, float lastLapTime, Boolean isInPits, Boolean lapIsValid, float sessionRunningTime, float secondsSinceLastUpdate, float[] currentWorldPosition,
             float[] previousWorldPosition, float distanceRoundTrack, int tire_type, int carClassId, Boolean sessionLengthIsTime, float sessionTimeRemaining,
         CarData.CarClassEnum playerCarClass, int trackNumberOfSectors, float airTemperature, float trackTempreture)
@@ -888,7 +905,7 @@ namespace CrewChiefV4.assetto
                 opponentData.SessionTimeAtLastPositionChange = sessionRunningTime;
             }
             opponentData.Position = racePosition;
-            opponentData.UnFilteredPosition = unfilteredRacePosition;
+            opponentData.UnFilteredPosition = racePosition;
             opponentData.WorldPosition = currentWorldPosition;
             opponentData.IsNewLap = false;
 
@@ -932,7 +949,7 @@ namespace CrewChiefV4.assetto
             {
                 speechRecogniser.addNewOpponentName(opponentData.DriverRawName);
             }
-            opponentData.Position = (int)participantStruct.carRealTimeLeaderboardPosition + 1;
+            opponentData.Position = (int)participantStruct.carLeaderboardPosition;
             opponentData.UnFilteredPosition = opponentData.Position;
             opponentData.CompletedLaps = (int)participantStruct.lapCount;
             opponentData.CurrentSectorNumber = 0;
