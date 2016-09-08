@@ -2,6 +2,8 @@ CrewChief version 4.
 
 Changelog
 ---------
+Version 4.4.0.3: More Assetto Corsa additions (no changes to the CrewChiefEx python app in this revision).
+
 Version 4.4.0.2: More Assetto Corsa additions and fixes including some performance improvements. IMPORTANT: remember to update the CrewChiefEx Python app from this new release (copy the CrewChiefEx folder from the app's install location to .../Steam/steamapps/common/assettocorsa/apps/python/). Note that sector times in multi-player are not yet accurate, and that player needs to drive 1 lap in single-player before sector gaps have been recorded.
 
 Version 4.4.0.1: Added missing Python plugin for Assetto Corsa. Copy the CrewChiefEx folder from Crew Chief's installation location to /Steam/steamapps/common/assettocorsa/apps/python and activate the plugin in-game.
