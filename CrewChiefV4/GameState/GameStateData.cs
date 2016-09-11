@@ -623,7 +623,7 @@ namespace CrewChiefV4.GameState
             }
         }
 
-        public OpponentDelta getTimeDifferenceToPlayer(SessionData playerSessionData)
+        public OpponentDelta getTimeDifferenceToPlayer(SessionData playerSessionData, Boolean forAssettoCorsa = false)
         {
 
             int lastSectorPlayerCompleted = playerSessionData.SectorNumber == 1 ? 3 : playerSessionData.SectorNumber - 1;
@@ -638,11 +638,11 @@ namespace CrewChiefV4.GameState
                 return null;
             }
             float timeDifference;
-            if (Position == playerSessionData.Position + 1) 
+            if (Position == playerSessionData.Position + 1 && !forAssettoCorsa) 
             {
                 timeDifference = -1 * playerSessionData.TimeDeltaBehind;
             }
-            else if (Position == playerSessionData.Position - 1)
+            else if (Position == playerSessionData.Position - 1 && !forAssettoCorsa)
             {
                 timeDifference = playerSessionData.TimeDeltaFront;
             }

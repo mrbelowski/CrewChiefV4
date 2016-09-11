@@ -170,7 +170,8 @@ namespace CrewChiefV4
         public float[] pitExitPoint = new float[] { 0, 0 };
         public float[] gapPoints = new float[] { };
         public float pitEntryExitPointsDiameter = 3;   // if we're within this many metres of the pit entry point, we're entering the pit
-
+        public int sectorsOnTrack = 3;
+        public float[] sectorPoints = new float[] { 0, 0 };
         public TrackDefinition(String name, float pitEntryExitPointsDiameter, float trackLength, float[] pitEntryPoint, float[] pitExitPoint)
         {
             this.name = name;
@@ -186,6 +187,15 @@ namespace CrewChiefV4
             this.name = name;
             this.trackLength = trackLength;
             this.hasPitLane = false;
+        }
+
+        public TrackDefinition(String name, float trackLength, int sectorsOnTrack, float[] sectorPoints)
+        {
+            this.name = name;
+            this.trackLength = trackLength;
+            this.hasPitLane = true;
+            this.sectorsOnTrack = sectorsOnTrack;
+            this.sectorPoints = sectorPoints;
         }
 
         public void setGapPoints()
@@ -214,6 +224,17 @@ namespace CrewChiefV4
 
                 gapPoints = gaps.ToArray();
             }
+        }
+
+        void setSectorPointsForUnknownTracks()
+        {
+            if (sectorsOnTrack == 0)
+            {
+                sectorsOnTrack = 1;
+            }
+            float sectorSpacing = trackLength / sectorsOnTrack;
+            sectorPoints[0] = sectorSpacing;
+            sectorPoints[1] = sectorSpacing * 2;
         }
 
         public Boolean isAtPitEntry(float x, float y)
