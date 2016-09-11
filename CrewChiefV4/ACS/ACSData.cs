@@ -122,6 +122,7 @@ namespace CrewChiefV4.assetto
             public int drsEnabled;
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
             public float[] brakeTemp;
+            public float clutch;
            
         }
         [StructLayout(LayoutKind.Sequential, Pack = 4, CharSet = CharSet.Unicode)]
