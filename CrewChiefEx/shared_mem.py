@@ -29,8 +29,7 @@ import os
 import struct
 import functools
 import ctypes
-from ctypes import c_int32, c_float, c_wchar
-
+from ctypes import *
 # additional ac. py calls possible
 # isAcLive, getCurrentSplits(carid)
 AC_STATUS = c_int32
@@ -255,7 +254,7 @@ class SPageFileCrewChief(ctypes.Structure):
     ]
 
 
-class SimInfo:
+class CrewChiefShared:
     def __init__(self):
         self._acpmf_physics = mmap.mmap(0, ctypes.sizeof(SPageFilePhysics), "acpmf_physics")
         self._acpmf_graphics = mmap.mmap(0, ctypes.sizeof(SPageFileGraphic), "acpmf_graphics")
@@ -284,7 +283,7 @@ class SimInfo:
         return self.crewchief
         
 
-info = SimInfo()
+info = CrewChiefShared()
 
 def demo():
     import time
@@ -298,7 +297,7 @@ def demo():
 
 
 def do_test():
-    for struct in info.static, info.graphics, info.physics:
+    for struct in info.static, info.graphics, info.physics, info.crewchief:
         print(struct.__class__.__name__)
         for field, type_spec in struct._fields_:
             value = getattr(struct, field)
