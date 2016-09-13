@@ -4,7 +4,7 @@ import acsys
 import sys
 import math, os.path
 import platform
-
+import pickle, threading
 # import libraries
 if platform.architecture()[0] == "64bit":
     sysdir=os.path.dirname(__file__)+'/stdlib64'
@@ -13,36 +13,38 @@ else:
 sys.path.insert(0, sysdir)
 os.environ['PATH'] = os.environ['PATH'] + ";."
 
+import ctypes
+from ctypes import *
+from shared_mem import CrewChiefShared
+from shared_mem import SPageFileCrewChief
+from shared_mem import acsVehicleInfo
 
-from sim_info import SimInfo
-from sim_info import SPageFileCrewChief
-from sim_info import acsVehicleInfo
-
-siminfo = SimInfo()
+sharedMem = CrewChiefShared()
 
 timer = 0
 isOnline = -1
 trackLenght = 0
-
+logIt = False
+driveNameAndPosLabel = ""
 def splineToDistanceRoundTrack(tracklen, splinepos):
 
     return (splinepos * tracklen)
 
 
 def updateSharedMemory():
-    global siminfo,isOnline,trackLenght
-    sharedmem = siminfo.getsharedmem()
-    siminfo.update()
+    global sharedMem,isOnline,trackLenght
+    sharedmem = sharedMem.getsharedmem()
+    sharedMem.update()
     isCountDown = 0
     sharedmem.numVehicles = ac.getCarsCount()
     sharedmem.focusVehicle = ac.getFocusedCar()
-    trackLenght = siminfo.static.trackSPlineLength
+    trackLenght = sharedMem.static.trackSPlineLength
     #small hack to detect if session is in countdown fase
     
-    sessionTimeValue = siminfo.graphics.sessionTimeLeft
+    sessionTimeValue = sharedMem.graphics.sessionTimeLeft
     ValueSeconds = (sessionTimeValue / 1000) % 60
     ValueMinutes = (sessionTimeValue // 1000) // 60
-    sessiontype = siminfo.graphics.session
+    sessiontype = sharedMem.graphics.session
    
     if isOnline > 0:
         if sessiontype == 2 or sessiontype == 5 or sessiontype == 6: 
@@ -81,30 +83,31 @@ def updateSharedMemory():
             sharedmem.vehicleInfo[carId].isCarInPitline = ac.isCarInPitline(carId)
             sharedmem.vehicleInfo[carId].isCarInPit = ac.isCarInPit(carId)
             sharedmem.vehicleInfo[carId].carLeaderboardPosition = ac.getCarLeaderboardPosition(carId)
-            sharedmem.vehicleInfo[carId].carRealTimeLeaderboardPosition = ac.getCarRealTimeLeaderboardPosition(carId)
+            sharedmem.vehicleInfo[carId].carRealTimeLeaderboardPosition = ac.getCarRealTimeLeaderboardPosition(carId)+1
             sharedmem.vehicleInfo[carId].distanceRoundTrack = splineToDistanceRoundTrack(trackLenght, ac.getCarState(carId, acsys.CS.NormalizedSplinePosition) )
             sharedmem.vehicleInfo[carId].isConnected = ac.isConnected(carId)
 
             
 
 def acMain(ac_version):
-  global appWindow,siminfo,isOnline
-
+  global appWindow,sharedMem,isOnline
   serverName = ""
-
   appWindow = ac.newApp("CrewChiefEx")
   ac.setTitle(appWindow, "CrewChiefEx")
-
   ac.setSize(appWindow, 300, 40)
 
   ac.log("CrewChief Was Here! damage report ?")
   ac.console("CrewChief Was Here! damage report ?")
-  sharedmem = siminfo.getsharedmem()
+
+  sharedmem = sharedMem.getsharedmem()
   serverName = ac.getServerName()
   isOnline = len(serverName)
   sharedmem.serverName = serverName
   sharedmem.isOnline = isOnline
+
   return "CrewChiefEx"
+
+
 
 def acUpdate(deltaT):
     global timer
@@ -112,3 +115,4 @@ def acUpdate(deltaT):
     if timer > 0.05:
         updateSharedMemory()
         timer = 0
+
