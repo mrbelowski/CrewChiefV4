@@ -343,9 +343,9 @@
 		<col def="S0">ISDotNetInstallerArgsRollback</col>
 		<row><td>CrewChiefV4.Primary_output</td><td>{E3B09293-F596-47FA-A2B7-A1877CE005A6}</td><td>INSTALLDIR</td><td>2</td><td/><td>CrewChiefV4.primary_output</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>ISX_DEFAULTCOMPONENT</td><td>{12984750-B4AB-4871-999A-6845E4545202}</td><td>INSTALLDIR</td><td>2</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>ISX_DEFAULTCOMPONENT1</td><td>{3ED2FB00-92B2-461A-B9B3-01FFDF5903A9}</td><td>CREWCHIEFEX</td><td>2</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>ISX_DEFAULTCOMPONENT2</td><td>{48C1BF0B-6DE7-445C-8659-DE2CF0A914C9}</td><td>STDLIB</td><td>2</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>ISX_DEFAULTCOMPONENT3</td><td>{03278AA6-9435-49B8-A67A-89186AD8EC81}</td><td>STDLIB64</td><td>2</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>ISX_DEFAULTCOMPONENT1</td><td>{1F99AE4B-6E2F-4A61-91F5-EB5899E06D88}</td><td>CREWCHIEFEX</td><td>2</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>ISX_DEFAULTCOMPONENT2</td><td>{D3D0AF88-6121-46F9-8447-6956638E93E4}</td><td>STDLIB</td><td>2</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>ISX_DEFAULTCOMPONENT3</td><td>{48D217B1-79A5-4937-ADB8-70FD64222A56}</td><td>STDLIB64</td><td>2</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 	</table>
 
 	<table name="Condition">
@@ -1898,8 +1898,8 @@
 		<row><td>_ctypes.pyd1</td><td>ISX_DEFAULTCOMPONENT3</td><td>_ctypes.pyd</td><td>0</td><td/><td/><td/><td>1</td><td>C:\projects\crewchief_c_sharp\CrewChiefV4\CrewChiefEx\stdlib64\_ctypes.pyd</td><td>1</td><td/></row>
 		<row><td>crewchiefex.py</td><td>ISX_DEFAULTCOMPONENT1</td><td>CREWCH~1.PY|CrewChiefEx.py</td><td>0</td><td/><td/><td/><td>1</td><td>C:\projects\crewchief_c_sharp\CrewChiefV4\CrewChiefEx\CrewChiefEx.py</td><td>1</td><td/></row>
 		<row><td>readme.txt</td><td>ISX_DEFAULTCOMPONENT</td><td>README.txt</td><td>0</td><td/><td/><td/><td>1</td><td>C:\projects\crewchief_c_sharp\CrewChiefV4\README.txt</td><td>1</td><td/></row>
+		<row><td>shared_mem.py</td><td>ISX_DEFAULTCOMPONENT1</td><td>SHARED~1.PY|shared_mem.py</td><td>0</td><td/><td/><td/><td>1</td><td>C:\projects\crewchief_c_sharp\CrewChiefV4\CrewChiefEx\shared_mem.py</td><td>1</td><td/></row>
 		<row><td>sharpdx_licence.txt</td><td>ISX_DEFAULTCOMPONENT</td><td>SHARPD~1.TXT|SharpDX_licence.txt</td><td>0</td><td/><td/><td/><td>1</td><td>C:\projects\crewchief_c_sharp\CrewChiefV4\SharpDX_licence.txt</td><td>1</td><td/></row>
-		<row><td>sim_info.py</td><td>ISX_DEFAULTCOMPONENT1</td><td>sim_info.py</td><td>0</td><td/><td/><td/><td>1</td><td>C:\projects\crewchief_c_sharp\CrewChiefV4\CrewChiefEx\sim_info.py</td><td>1</td><td/></row>
 		<row><td>sounds_config.txt</td><td>ISX_DEFAULTCOMPONENT</td><td>SOUNDS~1.TXT|sounds_config.txt</td><td>0</td><td/><td/><td/><td>1</td><td>C:\projects\crewchief_c_sharp\CrewChiefV4\CrewChiefV4\sounds_config.txt</td><td>1</td><td/></row>
 		<row><td>speech_recognition_config.tx</td><td>ISX_DEFAULTCOMPONENT</td><td>SPEECH~1.TXT|speech_recognition_config.txt</td><td>0</td><td/><td/><td/><td>1</td><td>C:\projects\crewchief_c_sharp\CrewChiefV4\CrewChiefV4\speech_recognition_config.txt</td><td>1</td><td/></row>
 		<row><td>ui_text.txt</td><td>ISX_DEFAULTCOMPONENT</td><td>ui_text.txt</td><td>0</td><td/><td/><td/><td>1</td><td>C:\projects\crewchief_c_sharp\CrewChiefV4\CrewChiefV4\ui_text.txt</td><td>1</td><td/></row>
@@ -2048,9 +2048,9 @@
 		<col def="S0">Miscellaneous</col>
 		<row><td>CrewChiefV4.Primary_output</td><td/><td/><td>_1BE3BD1C_4227_4FE6_BB02_03E27B339B9B_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>ISX_DEFAULTCOMPONENT</td><td/><td/><td>_39277B58_FECF_4923_974B_A82625C8FD8E_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>ISX_DEFAULTCOMPONENT1</td><td/><td/><td>_45E5D8FE_48EC_4D94_AF01_E641CF48720A_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>ISX_DEFAULTCOMPONENT2</td><td/><td/><td>_278D89FC_1518_4D85_AA22_BE7649C74859_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>ISX_DEFAULTCOMPONENT3</td><td/><td/><td>_FEA34880_E19F_4167_934A_78A15D666E1E_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>ISX_DEFAULTCOMPONENT1</td><td/><td/><td>_68AB6137_27BC_4E21_920C_2313E135EB7B_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>ISX_DEFAULTCOMPONENT2</td><td/><td/><td>_EB48EFE1_E7E4_4186_939E_69F3D49AF063_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>ISX_DEFAULTCOMPONENT3</td><td/><td/><td>_9D879C33_F53B_4136_97E6_950314D8C7E4_FILTER</td><td/><td/><td/><td/></row>
 	</table>
 
 	<table name="ISCustomActionReference">
@@ -4399,9 +4399,9 @@ RABWAEQALQA1AAEARQB4AHAAcgBlAHMAcwA=
 		<row><td>PROGMSG_IIS_ROLLBACKVROOTS</td><td>##IDS_PROGMSG_IIS_ROLLBACKVROOTS##</td><td/></row>
 		<row><td>PROGMSG_IIS_ROLLBACKWEBSERVICEEXTENSIONS</td><td>##IDS_PROGMSG_IIS_ROLLBACKWEBSERVICEEXTENSIONS##</td><td/></row>
 		<row><td>PROGRAMFILETOLAUNCHATEND</td><td>[INSTALLDIR]CrewChiefV4.Primary output</td><td/></row>
-		<row><td>ProductCode</td><td>{E4E42F22-0A66-4666-B33A-22708EDB6A87}</td><td/></row>
+		<row><td>ProductCode</td><td>{0F768C2E-0352-4D48-BE87-7F1F4719C973}</td><td/></row>
 		<row><td>ProductName</td><td>CrewChiefV4</td><td/></row>
-		<row><td>ProductVersion</td><td>4.4.0.3</td><td/></row>
+		<row><td>ProductVersion</td><td>4.4.0.4</td><td/></row>
 		<row><td>ProgressType0</td><td>install</td><td/></row>
 		<row><td>ProgressType1</td><td>Installing</td><td/></row>
 		<row><td>ProgressType2</td><td>installed</td><td/></row>
