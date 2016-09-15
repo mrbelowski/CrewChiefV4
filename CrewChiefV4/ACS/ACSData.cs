@@ -227,7 +227,7 @@ namespace CrewChiefV4.assetto
             
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 4, CharSet = CharSet.Unicode)]
+        [StructLayout(LayoutKind.Sequential, Pack = 4, CharSet = CharSet.Ansi)]
         [Serializable]
         public struct acsVec3
         {
@@ -235,52 +235,39 @@ namespace CrewChiefV4.assetto
             public float y;
             public float z;
         }
-
-        [StructLayout(LayoutKind.Sequential, Pack = 4, CharSet = CharSet.Unicode)]
+        [StructLayout(LayoutKind.Sequential, Pack = 4, CharSet = CharSet.Ansi)]
         [Serializable]
         public struct acsVehicleInfo
         {
             public int carId;
-            [MarshalAsAttribute(UnmanagedType.ByValTStr, SizeConst = 33)]
-            public String driverName;
-            [MarshalAsAttribute(UnmanagedType.ByValTStr, SizeConst = 33)]
-            public String carModel;
+            [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 64)]
+            public byte[] driverName;
+            [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 64)]
+            public byte[] carModel;
             public float speedMS;
-            public float speedMPH;
-            public float speedKMH;
             public int bestLapMS;
             public int lapCount;
             public int currentLapInvalid;
             public int currentLapTimeMS;
             public int lastLapTimeMS;
-            public acsVec3 localAngularVelocity;
-            public acsVec3 localVelocity;
-            public acsVec3 speedTotal;
-            public acsVec3 velocity;
             public acsVec3 worldPosition;
             public int isCarInPitline;
             public int isCarInPit;
             public int carLeaderboardPosition;
             public int carRealTimeLeaderboardPosition;
-            public float distanceRoundTrack;
+            public float spLineLength;
             public int isConnected;
             
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 4, CharSet = CharSet.Unicode)]
+        [StructLayout(LayoutKind.Sequential, Pack = 4, CharSet = CharSet.Ansi)]
         [Serializable]
         public struct SPageFileCrewChief
         {
-            public int packetId;
-            public int isCountdown;
             public int numVehicles;
             public int focusVehicle;
-            public int IsOnline;
-            [MarshalAsAttribute(UnmanagedType.ByValTStr, SizeConst = 33)]
-            public String serverIp;
-            public int ServerSlotsCount;
-            [MarshalAsAttribute(UnmanagedType.ByValTStr, SizeConst = 512)]
-            public String serverName;
+            [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 512)]
+            public byte[] serverName;
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 64)]
             public acsVehicleInfo[] vehicle;
             
