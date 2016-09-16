@@ -9,10 +9,8 @@ namespace CrewChiefV4.assetto
         public const string SharedMemoryNameGraphic = "Local\\acpmf_graphics"; // Local\\acpmf_graphics
         public const string SharedMemoryNameStatic = "Local\\acpmf_static"; // Local\\acpmf_static
         public const string SharedMemoryNameCrewChief= "Local\\acpmf_crewchief"; // Local\\acpmf_static
-
-
-
     }
+
     namespace assettoData
     {
         public enum AC_STATUS
@@ -22,7 +20,6 @@ namespace CrewChiefV4.assetto
             AC_LIVE = 2,
             AC_PAUSE = 3
         }
-
 
         public enum AC_SESSION_TYPE
         {
@@ -36,8 +33,6 @@ namespace CrewChiefV4.assetto
             AC_DRAG = 6,
         }
 
-
-
         public enum AC_FLAG_TYPE
         {
             AC_NO_FLAG = 0,
@@ -48,6 +43,7 @@ namespace CrewChiefV4.assetto
             AC_CHECKERED_FLAG = 5,
             AC_PENALTY_FLAG = 6,
         }
+
         [StructLayout(LayoutKind.Sequential, Pack = 4, CharSet = CharSet.Unicode)]
         [Serializable]
         public struct SPageFilePhysics
@@ -125,6 +121,7 @@ namespace CrewChiefV4.assetto
             public float clutch;
            
         }
+
         [StructLayout(LayoutKind.Sequential, Pack = 4, CharSet = CharSet.Unicode)]
         [Serializable]
         public struct SPageFileGraphic
@@ -166,6 +163,7 @@ namespace CrewChiefV4.assetto
 
             public float surfaceGrip;
         }
+
         [StructLayout(LayoutKind.Sequential, Pack = 4, CharSet = CharSet.Unicode)]
         [Serializable]
         public struct SPageFileStatic
@@ -235,6 +233,7 @@ namespace CrewChiefV4.assetto
             public float y;
             public float z;
         }
+
         [StructLayout(LayoutKind.Sequential, Pack = 4, CharSet = CharSet.Ansi)]
         [Serializable]
         public struct acsVehicleInfo
@@ -272,6 +271,7 @@ namespace CrewChiefV4.assetto
             public acsVehicleInfo[] vehicle;
             
         }
+
         public class AssettoCorsaShared
         {
             public SPageFilePhysics acsPhysics;

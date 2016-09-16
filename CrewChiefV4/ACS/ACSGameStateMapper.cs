@@ -15,7 +15,6 @@ namespace CrewChiefV4.assetto
     public class ACSGameStateMapper : GameStateMapper
     {
         public static String playerName = null;
-        private TimeSpan minimumSessionParticipationTime = TimeSpan.FromSeconds(6);
         public static Boolean versionChecked = false;
 
         private List<CornerData.EnumWithThresholds> tyreWearThresholds = new List<CornerData.EnumWithThresholds>();
@@ -36,10 +35,6 @@ namespace CrewChiefV4.assetto
 
         private static string expectedVersion = "1.7";
         
-        private static bool gotSectorGaps = false;
-        static float sector1Start = 0.0f;
-        static float sector2Start = 0.0f;
-        static float sector3Start = 0.0f;
 
         private SpeechRecogniser speechRecogniser;
         
@@ -133,24 +128,8 @@ namespace CrewChiefV4.assetto
             Boolean isOnline = getNameFromBytes( shared.acsChief.serverName ).Length > 0;
             Boolean isSinglePlayerPracticeSession = shared.acsChief.numVehicles == 1 && !isOnline && shared.acsGraphic.session == AC_SESSION_TYPE.AC_PRACTICE;
             float distanceRoundTrack = spLineLengthToDistanceRoundTrack(playerVehicle.spLineLength, shared.acsStatic.trackSPlineLength);
-            if (isOnline)
-            {
-                if (!gotSectorGaps)
-                {
-                    // Yep yet another hack AC dont supply sector info in multiplayer so base sectores on tracklength
-                    
-                    Console.WriteLine("Setting sector points");
-                    float sectorDiv = shared.acsStatic.trackSPlineLength / shared.acsStatic.sectorCount;
-                    sector2Start = sectorDiv;
-                    sector3Start = sectorDiv * 2;
-                    gotSectorGaps = true;
-                }
-                currentGameState.SessionData.SectorNumber = getOnlineSector(distanceRoundTrack);
-            }
-            else
-            {
-                currentGameState.SessionData.SectorNumber = (int)shared.acsGraphic.currentSectorIndex + 1;
-            }
+
+            
 
             playerName = getNameFromBytes(playerVehicle.driverName);
             NameValidator.validateName(playerName);
@@ -179,7 +158,7 @@ namespace CrewChiefV4.assetto
                 }
             }
 
-            currentGameState.SessionData.IsNewSector = previousGameState == null || currentGameState.SessionData.SectorNumber != previousGameState.SessionData.SectorNumber;
+            
             SessionPhase lastSessionPhase = SessionPhase.Unavailable;
             SessionType lastSessionType = SessionType.Unavailable;
             float lastSessionRunningTime = 0;
@@ -248,9 +227,9 @@ namespace CrewChiefV4.assetto
                 currentGameState.SessionData.SessionHasFixedTime = true;
                 sessionTimeRemaining = isSinglePlayerPracticeSession ? (float)TimeSpan.FromHours(1).TotalSeconds - lastSessionRunningTime : gameSessionTimeLeft;
             }
+
             Boolean isCountDown = false;
-            TimeSpan countDown = TimeSpan.FromSeconds(gameSessionTimeLeft);
-                
+            TimeSpan countDown = TimeSpan.FromSeconds(gameSessionTimeLeft);                
             if (isOnline && (sessionType == AC_SESSION_TYPE.AC_RACE || sessionType == AC_SESSION_TYPE.AC_DRIFT || sessionType == AC_SESSION_TYPE.AC_DRAG))
             {
                 isCountDown = countDown.TotalMilliseconds >= 0.01;
@@ -264,7 +243,10 @@ namespace CrewChiefV4.assetto
             currentGameState.SessionData.SessionPhase = mapToSessionPhase(currentGameState.SessionData.SessionType, currentFlag, status, isCountDown, lastSessionPhase, sessionTimeRemaining, lastSessionTotalRunTime, isInPits, lapsCompleated, raceFinished);
             
             currentGameState.SessionData.TrackDefinition = TrackData.getTrackDefinition(shared.acsStatic.track
-                + ":" + shared.acsStatic.trackConfiguration, shared.acsStatic.trackSPlineLength);
+                + ":" + shared.acsStatic.trackConfiguration, shared.acsStatic.trackSPlineLength,shared.acsStatic.sectorCount);
+
+            
+
 
             Boolean sessionOfSameTypeRestarted = ((currentGameState.SessionData.SessionType == SessionType.Race && lastSessionType == SessionType.Race) ||
                 (currentGameState.SessionData.SessionType == SessionType.Practice && lastSessionType == SessionType.Practice) ||
@@ -297,7 +279,7 @@ namespace CrewChiefV4.assetto
                     String lastTrackName = lastSessionTrack == null ? "unknown" : lastSessionTrack.name;
                     String currentTrackName = currentGameState.SessionData.TrackDefinition == null ? "unknown" : currentGameState.SessionData.TrackDefinition.name;
                     Console.WriteLine("lastSessionTrack = " + lastTrackName + " currentGameState.SessionData.Track = " + currentTrackName);
-                    gotSectorGaps = false;
+
                 }
                 else if (currentGameState.SessionData.SessionHasFixedTime && sessionTimeRemaining > lastSessionTimeRemaining + 1)
                 {
@@ -329,13 +311,13 @@ namespace CrewChiefV4.assetto
                 // no tyre data in the block so get the default tyre types for this car
                 //defaultTyreTypeForPlayersCar = CarData.getDefaultTyreType(currentGameState.carClass);
 
-                for (int i = 0; i < shared.acsChief.numVehicles; i++)
+                for (int i = 1; i < shared.acsChief.numVehicles; i++)
                 {
                     acsVehicleInfo participantStruct = shared.acsChief.vehicle[i];
                     if (participantStruct.isConnected == 1)
                     {
                         String participantName = getNameFromBytes(participantStruct.driverName).ToLower();
-                        if (i != 0 && participantName != null && participantName.Length > 0)
+                        if (participantName != null && participantName.Length > 0)
                         {
                             CarData.CarClass opponentCarClass = CarData.getDefaultCarClass();
                             addOpponentForName(participantName, createOpponentData(participantStruct, false, opponentCarClass, shared.acsStatic.trackSPlineLength), currentGameState);
@@ -376,7 +358,8 @@ namespace CrewChiefV4.assetto
                         }
                         currentGameState.SessionData.LeaderHasFinishedRace = false;
                         currentGameState.SessionData.NumCarsAtStartOfSession = shared.acsChief.numVehicles;
-                        currentGameState.SessionData.TrackDefinition = TrackData.getTrackDefinition(shared.acsStatic.track + ":" + shared.acsStatic.trackConfiguration, shared.acsStatic.trackSPlineLength);
+                        currentGameState.SessionData.TrackDefinition = TrackData.getTrackDefinition(shared.acsStatic.track + ":" + shared.acsStatic.trackConfiguration, shared.acsStatic.trackSPlineLength,shared.acsStatic.sectorCount);
+                        Console.WriteLine("trackLen:" + shared.acsStatic.trackSPlineLength);
                         currentGameState.SessionData.TrackDefinition.setGapPoints();
                        
                         currentGameState.carClass = CarData.getDefaultCarClass();
@@ -468,30 +451,26 @@ namespace CrewChiefV4.assetto
                     currentGameState.SessionData.SessionRunningTime = (float)(currentGameState.Now - currentGameState.SessionData.SessionStartTime).TotalSeconds;
                 }
 
+                currentGameState.SessionData.IsNewSector = previousGameState == null || currentGameState.SessionData.SectorNumber != previousGameState.SessionData.SectorNumber;
+                currentGameState.SessionData.SectorNumber = getCurrentSector(currentGameState.SessionData.TrackDefinition, distanceRoundTrack);
+                
                 if (currentGameState.SessionData.IsNewSector && playerLapData.Count > 0)
                 {
 
-                    if (!gotSectorGaps)
-                    {
-                        recordSectorGaps(distanceRoundTrack, currentGameState.SessionData.SectorNumber, shared.acsStatic.sectorCount);
-                    }
                     float sectorTimeToUse = -1;
-                    float lastLapTime = mapToFloatTime(shared.acsGraphic.iLastTime);
-                    if (isOnline)
+                    float lastLapTime = mapToFloatTime(shared.acsGraphic.iLastTime);                    
+                    if (currentGameState.SessionData.SectorNumber == 1)
                     {
-                        sectorTimeToUse = mapToFloatTime(shared.acsGraphic.iCurrentTime);
-                        if (currentGameState.SessionData.SectorNumber == 1)
-                        {
-                            sectorTimeToUse = lastLapTime;
-                        }
-                        sectorTimeToUse = addPlayerLapdata(sectorTimeToUse, currentGameState.SessionData.SessionRunningTime);
+                        sectorTimeToUse = lastLapTime;
                     }
                     else
                     {
-                        sectorTimeToUse = mapToFloatTime(shared.acsGraphic.lastSectorTime);
+                        sectorTimeToUse = mapToFloatTime(shared.acsGraphic.iCurrentTime);
                     }
-
-                    if (currentGameState.SessionData.SectorNumber == 1 && playerVehicle.lapCount > 0)
+                    
+                    sectorTimeToUse = addPlayerLapdata(sectorTimeToUse, currentGameState.SessionData.SessionRunningTime);
+                   
+                    if (currentGameState.SessionData.SectorNumber == 1 && playerLapData.Count > 0)
                     {
                         currentGameState.SessionData.LapTimePreviousEstimateForInvalidLap = currentGameState.SessionData.SessionRunningTime - currentGameState.SessionData.SessionTimesAtEndOfSectors[numberOfSectorsOnTrack];
                         currentGameState.SessionData.SessionTimesAtEndOfSectors[numberOfSectorsOnTrack] = currentGameState.SessionData.SessionRunningTime;
@@ -563,8 +542,6 @@ namespace CrewChiefV4.assetto
                     }
                 }
 
-
-
                 currentGameState.SessionData.Flag = mapToFlagEnum(currentFlag);
                 currentGameState.SessionData.NumCars = shared.acsChief.numVehicles;
 
@@ -629,7 +606,7 @@ namespace CrewChiefV4.assetto
    
                                     }
                                     float currentOpponentLapDistance = spLineLengthToDistanceRoundTrack(shared.acsStatic.trackSPlineLength, participantStruct.spLineLength);
-                                    currentOpponentSector = getOnlineSector(currentOpponentLapDistance);
+                                    currentOpponentSector = getCurrentSector(currentGameState.SessionData.TrackDefinition, currentOpponentLapDistance);
                                     if (shared.acsGraphic.session == AC_SESSION_TYPE.AC_PRACTICE || shared.acsGraphic.session == AC_SESSION_TYPE.AC_QUALIFY)
                                     {
                                         currentOpponentRacePosition = participantStruct.carLeaderboardPosition;
@@ -1184,46 +1161,18 @@ namespace CrewChiefV4.assetto
                 return difference < maxDistance && difference > minDistance;
             }
         }
-        //Assetto Corsa does not supply current sector information for other then the local player and only offline
-        //So record them based on how far around track players lapdistans is when a sector changes.
-        //its not ideal as sectors dont get updated before player has compleated sector 2 on first lap
-        private void recordSectorGaps(float sectorStart, int sector, int numberOfTrackSectors)
+
+        private int getCurrentSector(TrackDefinition trackDef, float distanceRoundtrack)
         {
-            if (sector == 2)
-            {
-                sector2Start = sectorStart;
-            }
-            if (sector == 3)
-            {
-                sector3Start = sectorStart;
-            }
-            if (numberOfTrackSectors == 2 && sector2Start != 0.0f)
-            {
-                gotSectorGaps = true;
-            }
-            if (numberOfTrackSectors == 3 && sector2Start != 0.0f && sector3Start != 0.0f)
-            {
-                gotSectorGaps = true;
-            }
-            Console.WriteLine("sector1:{0:F2} sector2:{1:F2} sector3:{2:F3} gotSectorGaps:{3:D}", sector1Start, sector2Start, sector3Start, gotSectorGaps);
-        }
-        
-        private int getOnlineSector(float distanceRoundtrack)
-        {
-            if (!gotSectorGaps)
-            {
-                return 0;
-            }
-            if (distanceRoundtrack >= sector1Start && distanceRoundtrack < sector2Start)
+            if (distanceRoundtrack >= 0 && distanceRoundtrack < trackDef.sectorPoints[0])
             {
                 return 1;
             }
-            if (distanceRoundtrack >= sector2Start && distanceRoundtrack < sector3Start)
+            if (distanceRoundtrack >= trackDef.sectorPoints[0] && distanceRoundtrack < trackDef.sectorPoints[1])
             {
                 return 2;
             }
             return 3;
-
         }
         
         public static String getNameFromBytes(byte[] name)
