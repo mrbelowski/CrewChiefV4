@@ -2,6 +2,8 @@ CrewChief version 4.
 
 Changelog
 ---------
+Version 4.4.0.5: More Assetto Corsa additions. IMPORTANT: remember to update the CrewChiefEx Python app from this new release (copy the CrewChiefEx folder from the app's install location to .../Steam/steamapps/common/assettocorsa/apps/python/).
+
 Version 4.4.0.4: More Assetto Corsa additions. IMPORTANT: remember to update the CrewChiefEx Python app from this new release (copy the CrewChiefEx folder from the app's install location to .../Steam/steamapps/common/assettocorsa/apps/python/).
 
 Version 4.4.0.3: More Assetto Corsa additions (no changes to the CrewChiefEx python app in this revision).
