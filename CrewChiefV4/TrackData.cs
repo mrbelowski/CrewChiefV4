@@ -81,9 +81,58 @@ namespace CrewChiefV4
             new TrackDefinition("Hockenheim:Classic", 3, 6763.425f, new float[] {-533f, -318.25f}, new float[] {-705.5f, -2f})
         };
 
+        public static List<TrackDefinition> assettoTracks = new List<TrackDefinition>()
+        {
+            new TrackDefinition("spa:", 6946.062f, 3, new float[] {2265f, 5036f}),
+            new TrackDefinition("ks_barcelona:layout_gp", 4591.887f, 3, new float[] {1643f, 3383f}),
+            new TrackDefinition("ks_barcelona:layout_moto", 4683.986f, 3, new float[] {1643f, 3376f}),
+            new TrackDefinition("acu_bathurst:", 6215.709f, 3, new float[] {2233f, 4262}),
+            new TrackDefinition("ks_black_cat_county:layout_int", 4683.986f, 3, new float[] {1594f, 3781f}),
+            new TrackDefinition("ks_black_cat_county:layout_long", 11176.96f, 3, new float[] {3618f, 7162f}),
+            new TrackDefinition("ks_black_cat_county:layout_short", 6453.315f, 3, new float[] {2778f, 4813f}),
+            new TrackDefinition("ks_brands_hatch:gp", 3887.807f, 3, new float[] {1082f, 2196f}),
+            new TrackDefinition("ks_brands_hatch:indy", 1915.786f, 2, new float[] {1083f, 0f}),
+            new TrackDefinition("circuit_de_la_sarthe:24hours", 13613.44f, 3, new float[] {4535f, 9090f}),
+            new TrackDefinition("circuit_de_la_sarthe:nochicane", 13565.71f, 3, new float[] {4515f, 9036f}),
+            new TrackDefinition("doningtonpark:gp", 3904.841f, 3, new float[] {1276f, 2402f}),
+            new TrackDefinition("doningtonpark:national", 3126.198f, 3, new float[] {1274f, 2402f}),
+            new TrackDefinition("imola:", 4864.107f, 3, new float[] {1533f, 3291f}),
+            new TrackDefinition("magione:", 2455.794f, 2, new float[] {1291f, 0f}),
+            new TrackDefinition("monza:", 5758.661f, 3, new float[] {2122f, 3879f}),
+            new TrackDefinition("ks_monza66:full", 10019.83f, 3, new float[] {3213f, 5310f}),
+            new TrackDefinition("ks_monza66:junior", 2395.745f, 3, new float[] {742f, 1532f}),
+            new TrackDefinition("ks_monza66:road", 5758.69f, 3, new float[] {1989f, 3843f}),
+            new TrackDefinition("mugello:", 5197.331f, 3, new float[] {1299f, 2889f}),
+            new TrackDefinition("ks_nordschleife:endurance", 25358.28f, 3, new float[] {9690f, 16469f}),
+            new TrackDefinition("ks_nordschleife:endurance_cup", 24315.77f, 3, new float[] {8659f, 15435f}),
+            new TrackDefinition("ks_nordschleife:nordschleife", 20801.37f, 3, new float[] {5424f, 12200f}),
+            new TrackDefinition("ks_nurburgring:layout_gp_a", 5077.904f, 3, new float[] {1454f, 3274f}),
+            new TrackDefinition("ks_nurburgring:layout_sprint_a", 3566.685f, 2, new float[] {1609f, 0f}),
+            new TrackDefinition("ks_nurburgring:layout_sprint_b", 3559.989f, 2, new float[] {1611f, 0f}),
+            new TrackDefinition("ks_red_bull_ring:layout_gp", 4286.527f, 3, new float[] {1100f, 2701f}),
+            new TrackDefinition("ks_red_bull_ring:layout_national", 2317.448f, 2, new float[] {1206f, 0f}),
+            new TrackDefinition("ks_silverstone:gp", 5803.997f, 3, new float[] {1502f, 4152}),
+            new TrackDefinition("ks_silverstone:international", 2941.82f, 2, new float[] {1290f, 0f}),
+            new TrackDefinition("ks_silverstone:national", 2600.262f, 2, new float[] {1422f, 0f}),
+            new TrackDefinition("tor_poznanl:laser", 4029.902f, 3, new float[] {1563f, 2919f}),
+            new TrackDefinition("trento-bondone:", 17183.77f, 1, new float[] {0f, 0f}),
+            new TrackDefinition("ks_vallelunga:classic_circuit", 3180.26f, 3, new float[] {1235f, 2197f}),
+            new TrackDefinition("ks_vallelunga:club_circuit", 1720.172f, 2, new float[] {734f, 0f}),
+            new TrackDefinition("ks_vallelunga:extended_circuit", 4030.934f, 3, new float[] {1749f, 3044f}),
+            new TrackDefinition("TrackName vir:full course", 5221.266f, 3, new float[] {1608f, 3777f}),
+            new TrackDefinition("vir:grand east course", 6383.806f, 3, new float[] {2152f, 4229f}),
+            new TrackDefinition("vir:grand west course", 6564.385f, 3, new float[] {3061f, 4877f}),
+            new TrackDefinition("vir:north course", 3614.832f, 3, new float[] {1599f, 2371f}),
+            new TrackDefinition("vir:patriot course", 1535.824f, 2, new float[] {837f, 0f}),
+            new TrackDefinition("vir:patriot reverse course", 1543.93f, 2, new float[] {704f, 3376f}),
+            new TrackDefinition("vir:south course", 2586.035f, 2, new float[] {1370f, 0f}),
+            new TrackDefinition("ks_zandvoort:", 4189.691f, 2, new float[] {1986f, 0f})
+            
+        };
+
         public static TrackDefinition getTrackDefinition(String trackName, float trackLength)
         {
-            if (CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_32BIT || CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_64BIT || CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_NETWORK) 
+            if (CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_32BIT || CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_64BIT || CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_NETWORK)
             {
                 List<TrackDefinition> defsWhichMatchName = new List<TrackDefinition>();
                 foreach (TrackDefinition def in pCarsTracks)
@@ -111,27 +160,36 @@ namespace CrewChiefV4
                     return defGuessedFromLength;
                 }
                 String nameToLog = trackName != null ? trackName : "null";
-                return new TrackDefinition("unknown track - name " + nameToLog + ", length = " + trackLength, trackLength); 
+                return new TrackDefinition("unknown track - name " + nameToLog + ", length = " + trackLength, trackLength);
             }
             else if (CrewChief.gameDefinition.gameEnum == GameEnum.RACE_ROOM)
             {
-                return new TrackDefinition("R3E track, length = " + trackLength, trackLength); 
+                return new TrackDefinition("R3E track, length = " + trackLength, trackLength);
             }
             else if (CrewChief.gameDefinition.gameEnum == GameEnum.RF1)
-            {
-                return new TrackDefinition(trackName, trackLength);
-            }
-            else if (CrewChief.gameDefinition.gameEnum == GameEnum.ASSETTO)
             {
                 return new TrackDefinition(trackName, trackLength);
             }
             else
             {
                 String nameToLog = trackName != null ? trackName : "null";
-                return new TrackDefinition("unknown track - name " + nameToLog + ", length = " + trackLength, trackLength); 
+                return new TrackDefinition("unknown track - name " + nameToLog + ", length = " + trackLength, trackLength);
             }
         }
-
+        public static TrackDefinition getTrackDefinition(String trackName, float trackLength, int sectorsOnTrack)
+        {
+            List<TrackDefinition> defsWhichMatchName = new List<TrackDefinition>();
+            foreach (TrackDefinition def in assettoTracks)
+            {
+                if (def.name.Equals(trackName))
+                {
+                    return def;
+                }
+            }
+            TrackDefinition unknownTrackDef = new TrackDefinition(trackName, trackLength, sectorsOnTrack, new float[] { 0f, 0f });
+            unknownTrackDef.unknownTrack = true;
+            return unknownTrackDef;
+        }
         private static TrackDefinition getDefinitionForLength(List<TrackDefinition> possibleDefinitions, float trackLength, int maxError)
         {
             TrackDefinition closestLengthDef = null;
@@ -172,6 +230,7 @@ namespace CrewChiefV4
         public float pitEntryExitPointsDiameter = 3;   // if we're within this many metres of the pit entry point, we're entering the pit
         public int sectorsOnTrack = 3;
         public float[] sectorPoints = new float[] { 0, 0 };
+        public Boolean unknownTrack = false;
         public TrackDefinition(String name, float pitEntryExitPointsDiameter, float trackLength, float[] pitEntryPoint, float[] pitExitPoint)
         {
             this.name = name;
@@ -226,7 +285,7 @@ namespace CrewChiefV4
             }
         }
 
-        void setSectorPointsForUnknownTracks()
+        public void setSectorPointsForUnknownTracks()
         {
             if (sectorsOnTrack == 0)
             {
