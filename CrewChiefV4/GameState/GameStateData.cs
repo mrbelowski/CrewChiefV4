@@ -88,7 +88,7 @@ namespace CrewChiefV4.GameState
         public Single EngineOilPressure = 0;
 
         public int MinutesIntoSessionBeforeMonitoring = 0;
-        
+
     }
 
     public class FuelData
@@ -122,7 +122,7 @@ namespace CrewChiefV4.GameState
         public CornerData BrakeDamageStatus = new CornerData();
     }
 
-    public class SessionData    
+    public class SessionData
     {
         public List<String> formattedPlayerLapTimes = new List<String>();
 
@@ -148,7 +148,7 @@ namespace CrewChiefV4.GameState
         public int SessionStartPosition = 0;
 
         public int NumCarsAtStartOfSession = 0;
-        
+
         // race number in ongoing championship (zero indexed)
         public int EventIndex = 0;
 
@@ -166,7 +166,7 @@ namespace CrewChiefV4.GameState
 
         // How many laps the player has completed. If this value is 6, the player is on his 7th lap.
         public int CompletedLaps = 0;
-        
+
         // Unit: Seconds (-1.0 = none)
         public Single LapTimePrevious = -1;
 
@@ -250,8 +250,8 @@ namespace CrewChiefV4.GameState
 
         public SessionData()
         {
-            SessionTimesAtEndOfSectors.Add(1, -1); 
-            SessionTimesAtEndOfSectors.Add(2, -1); 
+            SessionTimesAtEndOfSectors.Add(1, -1);
+            SessionTimesAtEndOfSectors.Add(2, -1);
             SessionTimesAtEndOfSectors.Add(3, -1);
         }
     }
@@ -282,11 +282,11 @@ namespace CrewChiefV4.GameState
         public int UnFilteredPosition = 0;
 
         public float SessionTimeAtLastPositionChange = -1;
-        
+
         public int CompletedLaps = 0;
 
         public int CurrentSectorNumber = 0;
-               
+
         public float Speed = 0;
 
         public float[] WorldPosition;
@@ -308,7 +308,7 @@ namespace CrewChiefV4.GameState
         public float LastLapTime = -1;
 
         public Boolean LastLapValid = true;
-        
+
         public List<LapData> OpponentLapData = new List<LapData>();
 
         public CarData.CarClass CarClass = CarData.getDefaultCarClass();
@@ -346,7 +346,7 @@ namespace CrewChiefV4.GameState
 
         public float[] getTimeAndSectorsForBestLapInWindow(int lapsToCheck)
         {
-            float[] bestLapTimeAndSectorsSectors = new float[] {-1, -1, -1, -1};
+            float[] bestLapTimeAndSectorsSectors = new float[] { -1, -1, -1, -1 };
             if (OpponentLapData.Count > 1)
             {
                 if (lapsToCheck == -1)
@@ -408,16 +408,16 @@ namespace CrewChiefV4.GameState
             }
         }
 
-        public float getGameTimeWhenSectorWasLastCompleted(int sectorNumber) 
+        public float getGameTimeWhenSectorWasLastCompleted(int sectorNumber)
         {
-            if (OpponentLapData.Count > 0) 
+            if (OpponentLapData.Count > 0)
             {
-                if (OpponentLapData[OpponentLapData.Count - 1].GameTimeAtSectorEnd.Count > sectorNumber) 
+                if (OpponentLapData[OpponentLapData.Count - 1].GameTimeAtSectorEnd.Count > sectorNumber)
                 {
                     return OpponentLapData[OpponentLapData.Count - 1].GameTimeAtSectorEnd[sectorNumber];
                 }
             }
-            if (OpponentLapData.Count > 1) 
+            if (OpponentLapData.Count > 1)
             {
                 if (OpponentLapData[OpponentLapData.Count - 2].GameTimeAtSectorEnd.Count > sectorNumber)
                 {
@@ -438,7 +438,7 @@ namespace CrewChiefV4.GameState
             OpponentLapData.Add(thisLapData);
         }
 
-        public void CompleteLapWithEstimatedLapTime(int position, float gameTimeAtLapEnd, float worldRecordLapTime, float worldRecordS1Time, float worldRecordS2Time, float worldRecordS3Time, 
+        public void CompleteLapWithEstimatedLapTime(int position, float gameTimeAtLapEnd, float worldRecordLapTime, float worldRecordS1Time, float worldRecordS2Time, float worldRecordS3Time,
             Boolean lapIsValid, Boolean isRaining, float trackTemp, float airTemp, Boolean sessionLengthIsTime, float sessionTimeRemaining)
         {
             AddCumulativeSectorData(position, -1, gameTimeAtLapEnd, lapIsValid, isRaining, trackTemp, airTemp);
@@ -449,7 +449,7 @@ namespace CrewChiefV4.GameState
                 {
                     float estimatedLapTime = lapData.SectorTimes.Sum();
                     LastLapValid = lapData.IsValid;
-                    if (lapData.SectorTimes[0] > worldRecordS1Time - 0.1 && lapData.SectorTimes[1] > worldRecordS2Time - 0.1 && lapData.SectorTimes[2] > worldRecordS2Time - 0.1 && 
+                    if (lapData.SectorTimes[0] > worldRecordS1Time - 0.1 && lapData.SectorTimes[1] > worldRecordS2Time - 0.1 && lapData.SectorTimes[2] > worldRecordS2Time - 0.1 &&
                         estimatedLapTime > worldRecordLapTime - 0.1 && estimatedLapTime > 0)
                     {
                         lapData.LapTime = estimatedLapTime;
@@ -474,7 +474,7 @@ namespace CrewChiefV4.GameState
             }
         }
 
-        public void CompleteLapWithLastSectorTime(int position, float lastSectorTime, float gameTimeAtLapEnd, 
+        public void CompleteLapWithLastSectorTime(int position, float lastSectorTime, float gameTimeAtLapEnd,
             Boolean lapIsValid, Boolean isRaining, float trackTemp, float airTemp, Boolean sessionLengthIsTime, float sessionTimeRemaining)
         {
             AddSectorData(position, lastSectorTime, gameTimeAtLapEnd, lapIsValid, isRaining, trackTemp, airTemp);
@@ -511,9 +511,9 @@ namespace CrewChiefV4.GameState
 
         public void CompleteLapWithProvidedLapTime(int position, float gameTimeAtLapEnd, float providedLapTime,
             Boolean lapIsValid, Boolean isRaining, float trackTemp, float airTemp, Boolean sessionLengthIsTime, float sessionTimeRemaining)
-        {            
+        {
             if (OpponentLapData.Count > 0)
-            {                
+            {
                 LapData lapData = OpponentLapData[OpponentLapData.Count - 1];
                 AddCumulativeSectorData(position, providedLapTime, gameTimeAtLapEnd, lapIsValid, isRaining, trackTemp, airTemp);
                 lapData.LapTime = providedLapTime;
@@ -623,12 +623,12 @@ namespace CrewChiefV4.GameState
             }
         }
 
-        public OpponentDelta getTimeDifferenceToPlayer(SessionData playerSessionData, Boolean forAssettoCorsa = false)
+        public OpponentDelta getTimeDifferenceToPlayer(SessionData playerSessionData)
         {
 
             int lastSectorPlayerCompleted = playerSessionData.SectorNumber == 1 ? 3 : playerSessionData.SectorNumber - 1;
             float playerLapTimeToUse = playerSessionData.LapTimePrevious;
-            if (playerLapTimeToUse == 0 || playerLapTimeToUse == -1) 
+            if (playerLapTimeToUse == 0 || playerLapTimeToUse == -1)
             {
                 playerLapTimeToUse = playerSessionData.LapTimePreviousEstimateForInvalidLap;
             }
@@ -638,23 +638,23 @@ namespace CrewChiefV4.GameState
                 return null;
             }
             float timeDifference;
-            if (Position == playerSessionData.Position + 1 && !forAssettoCorsa) 
+            if (Position == playerSessionData.Position + 1)
             {
                 timeDifference = -1 * playerSessionData.TimeDeltaBehind;
             }
-            else if (Position == playerSessionData.Position - 1 && !forAssettoCorsa)
+            else if (Position == playerSessionData.Position - 1)
             {
                 timeDifference = playerSessionData.TimeDeltaFront;
             }
-            else 
+            else
             {
                 timeDifference = playerSessionData.SessionTimesAtEndOfSectors[lastSectorPlayerCompleted] - getGameTimeWhenSectorWasLastCompleted(lastSectorPlayerCompleted - 1);
             }
             // if the player is ahead, the time difference is negative
 
-            if (((playerSessionData.CompletedLaps == CompletedLaps + 1 && timeDifference < 0 && CurrentSectorNumber < playerSessionData.SectorNumber) || 
+            if (((playerSessionData.CompletedLaps == CompletedLaps + 1 && timeDifference < 0 && CurrentSectorNumber < playerSessionData.SectorNumber) ||
                 playerSessionData.CompletedLaps > CompletedLaps + 1 ||
-                (playerSessionData.CompletedLaps == CompletedLaps - 1 && timeDifference > 0 && CurrentSectorNumber >= playerSessionData.SectorNumber) || 
+                (playerSessionData.CompletedLaps == CompletedLaps - 1 && timeDifference > 0 && CurrentSectorNumber >= playerSessionData.SectorNumber) ||
                 playerSessionData.CompletedLaps < CompletedLaps - 1))
             {
                 // there's more than a lap difference
@@ -669,8 +669,8 @@ namespace CrewChiefV4.GameState
             {
                 // the player has completed 1 less lap but is ahead on track
                 return new OpponentDelta(playerLapTimeToUse - timeDifference, 0);
-            } 
-            else 
+            }
+            else
             {
                 return new OpponentDelta(timeDifference, 0);
             }
@@ -936,10 +936,10 @@ namespace CrewChiefV4.GameState
     public class OvertakingAids
     {
         public Boolean PushToPassAvailable = false;
-	    public Boolean PushToPassEngaged = false;
-	    public int PushToPassActivationsRemaining = 0;
-	    public Single PushToPassEngagedTimeLeft = 0;
-	    public Single PushToPassWaitTimeLeft = 0;
+        public Boolean PushToPassEngaged = false;
+        public int PushToPassActivationsRemaining = 0;
+        public Single PushToPassEngagedTimeLeft = 0;
+        public Single PushToPassWaitTimeLeft = 0;
 
         public Boolean DrsEnabled = false;
         public Boolean DrsAvailable = false;
@@ -992,7 +992,7 @@ namespace CrewChiefV4.GameState
         {
             return SessionData.UnFilteredPosition == SessionData.NumCars;
         }
-        
+
         public List<String> getRawDriverNames()
         {
             List<String> rawDriverNames = new List<String>();
@@ -1000,14 +1000,14 @@ namespace CrewChiefV4.GameState
             {
                 if (!rawDriverNames.Contains(entry.Value.DriverRawName))
                 {
-                    rawDriverNames.Add(entry.Value.DriverRawName);                
+                    rawDriverNames.Add(entry.Value.DriverRawName);
                 }
             }
             rawDriverNames.Sort();
             return rawDriverNames;
         }
 
-        public OpponentData getOpponentAtPosition(int position, Boolean useUnfilteredPosition) 
+        public OpponentData getOpponentAtPosition(int position, Boolean useUnfilteredPosition)
         {
             Object opponentKey = getOpponentKeyAtPosition(position, useUnfilteredPosition);
             if (opponentKey != null && OpponentData.ContainsKey(opponentKey))
@@ -1131,12 +1131,12 @@ namespace CrewChiefV4.GameState
                         {
                             return entry.Key;
                         }
-                    }                    
+                    }
                 }
             }
             return null;
         }
-        
+
         public void display()
         {
             Console.WriteLine("Laps completed = " + SessionData.CompletedLaps);
@@ -1150,15 +1150,15 @@ namespace CrewChiefV4.GameState
             Console.WriteLine("got " + OpponentData.Count + " opponents");
             foreach (KeyValuePair<Object, OpponentData> opponent in OpponentData)
             {
-                Console.WriteLine("last laptime " + opponent.Value.getLastLapTime() + " completed laps " + opponent.Value.CompletedLaps + 
-                    " ID " + opponent.Key + " name " + opponent.Value.DriverRawName + " active " + opponent.Value.IsActive + 
+                Console.WriteLine("last laptime " + opponent.Value.getLastLapTime() + " completed laps " + opponent.Value.CompletedLaps +
+                    " ID " + opponent.Key + " name " + opponent.Value.DriverRawName + " active " + opponent.Value.IsActive +
                     " approx speed " + opponent.Value.Speed + " position " + opponent.Value.Position);
             }
         }
 
         public float[] getTimeAndSectorsForBestOpponentLapInWindow(int lapsToCheck, CarData.CarClassEnum carClassToCheck)
         {
-            float[] bestLapWithSectors =  new float[] { -1, -1, -1, -1 };
+            float[] bestLapWithSectors = new float[] { -1, -1, -1, -1 };
             foreach (KeyValuePair<Object, OpponentData> entry in OpponentData)
             {
                 if (entry.Value.CarClass.carClassEnum == carClassToCheck)
@@ -1173,7 +1173,7 @@ namespace CrewChiefV4.GameState
 
             // special case for practice and qual - if we're looking for all the laps in the session, we might want to use the data sent by the game
             // because the play may have joined mid-session. In these cases there might be an historical lap (before the player joined) that's actually faster.
-            if (lapsToCheck == -1 && SessionData.SessionFastestLapTimeFromGamePlayerClass > 0 && 
+            if (lapsToCheck == -1 && SessionData.SessionFastestLapTimeFromGamePlayerClass > 0 &&
                 (SessionData.PlayerLapTimeSessionBest == -1 || SessionData.PlayerLapTimeSessionBest > SessionData.SessionFastestLapTimeFromGamePlayerClass))
             {
                 // the player isn't the fastest in his class. This means that the game-sent best lap data will be an opponent lap
