@@ -132,7 +132,7 @@ namespace CrewChiefV4
 
         public static TrackDefinition getTrackDefinition(String trackName, float trackLength)
         {
-            if (CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_32BIT || CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_64BIT || CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_NETWORK) 
+            if (CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_32BIT || CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_64BIT || CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_NETWORK)
             {
                 List<TrackDefinition> defsWhichMatchName = new List<TrackDefinition>();
                 foreach (TrackDefinition def in pCarsTracks)
@@ -160,11 +160,11 @@ namespace CrewChiefV4
                     return defGuessedFromLength;
                 }
                 String nameToLog = trackName != null ? trackName : "null";
-                return new TrackDefinition("unknown track - name " + nameToLog + ", length = " + trackLength, trackLength); 
+                return new TrackDefinition("unknown track - name " + nameToLog + ", length = " + trackLength, trackLength);
             }
             else if (CrewChief.gameDefinition.gameEnum == GameEnum.RACE_ROOM)
             {
-                return new TrackDefinition("R3E track, length = " + trackLength, trackLength); 
+                return new TrackDefinition("R3E track, length = " + trackLength, trackLength);
             }
             else if (CrewChief.gameDefinition.gameEnum == GameEnum.RF1)
             {
@@ -173,7 +173,7 @@ namespace CrewChiefV4
             else
             {
                 String nameToLog = trackName != null ? trackName : "null";
-                return new TrackDefinition("unknown track - name " + nameToLog + ", length = " + trackLength, trackLength); 
+                return new TrackDefinition("unknown track - name " + nameToLog + ", length = " + trackLength, trackLength);
             }
         }
         public static TrackDefinition getTrackDefinition(String trackName, float trackLength, int sectorsOnTrack)
@@ -186,8 +186,8 @@ namespace CrewChiefV4
                     return def;
                 }
             }
-            TrackDefinition unknownTrackDef = new TrackDefinition(trackName, trackLength, sectorsOnTrack, new float[] {0f, 0f});
-            unknownTrackDef.setSectorPointsForUnknownTracks();
+            TrackDefinition unknownTrackDef = new TrackDefinition(trackName, trackLength, sectorsOnTrack, new float[] { 0f, 0f });
+            unknownTrackDef.unknownTrack = true;
             return unknownTrackDef;
         }
         private static TrackDefinition getDefinitionForLength(List<TrackDefinition> possibleDefinitions, float trackLength, int maxError)
@@ -215,17 +215,6 @@ namespace CrewChiefV4
             }
             return closestLengthDef;
         }
-        private static TrackDefinition getDefinitionForName(List<TrackDefinition> possibleDefinitions, String trackName)
-        {
-            foreach (TrackDefinition def in possibleDefinitions)
-            {
-                if (def.name.Equals(trackName))
-                {
-                    return def;
-                }
-            }
-            return null;
-        }
     }
 
     // *very* flakey approach here... the car must be inside a circle for one tick to trigger.
@@ -241,6 +230,7 @@ namespace CrewChiefV4
         public float pitEntryExitPointsDiameter = 3;   // if we're within this many metres of the pit entry point, we're entering the pit
         public int sectorsOnTrack = 3;
         public float[] sectorPoints = new float[] { 0, 0 };
+        public Boolean unknownTrack = false;
         public TrackDefinition(String name, float pitEntryExitPointsDiameter, float trackLength, float[] pitEntryPoint, float[] pitExitPoint)
         {
             this.name = name;
