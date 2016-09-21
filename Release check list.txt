@@ -3,7 +3,7 @@ Update the Assembly Information Assembly Version in CrewChiefV4 -> project -> pr
 Go to General Information in Organize Your Setup (in the build project in Solution Explorer)
 
 Update the Product Version to match the Assembly Version
-CAREFULLY change Product Code in Organize Setup -> General Info -> product code, generate a new GUID (on right of UI). DO NOT CHANGE THE UPGRADE CODE GUID
+CAREFULLY change Product Code in Organize Setup -> General Info -> product code, generate a new GUID (on right of UI). DO NOT CHANGE THE UPGRADE CODE GUID - IT MUST ALWAYS BE 731ED4D4-F49C-4844-8C4F-FDE17802FDA8
 
 Ensure the build type is 'SingleImage' (white box in top tool bar), then clean / build to create a .msi with all the goodies packaged into it.
 
