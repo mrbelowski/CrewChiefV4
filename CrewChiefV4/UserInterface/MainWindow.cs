@@ -229,30 +229,35 @@ namespace CrewChiefV4
                 {
                     if (arg.Equals(GameDefinition.raceRoom.gameEnum.ToString()))
                     {
+                        Console.WriteLine("Set Raceroom mode from command line");
                         this.gameDefinitionList.Text = GameDefinition.raceRoom.friendlyName;
                         setFromCommandLine = true;
                         break;
                     }
                     else if (arg.Equals(GameDefinition.pCars32Bit.gameEnum.ToString()))
                     {
+                        Console.WriteLine("Set PCars 32bit mode from command line");
                         this.gameDefinitionList.Text = GameDefinition.pCars32Bit.friendlyName;
                         setFromCommandLine = true;
                         break;
                     }
                     else if (arg.Equals(GameDefinition.pCars64Bit.gameEnum.ToString()))
                     {
+                        Console.WriteLine("Set PCars 64bit mode from command line");
                         this.gameDefinitionList.Text = GameDefinition.pCars64Bit.friendlyName;
                         setFromCommandLine = true;
                         break;
                     }
                     else if (arg.Equals(GameDefinition.pCarsNetwork.gameEnum.ToString()))
                     {
+                        Console.WriteLine("Set PCars network mode from command line");
                         this.gameDefinitionList.Text = GameDefinition.pCarsNetwork.friendlyName;
                         setFromCommandLine = true;
                         break;
                     }
                     else if (arg.Equals(GameDefinition.assetto.gameEnum.ToString()))
                     {
+                        Console.WriteLine("Set Assetto Corsa mode from command line");
                         this.gameDefinitionList.Text = GameDefinition.assetto.friendlyName;
                         setFromCommandLine = true;
                         break;
@@ -269,6 +274,7 @@ namespace CrewChiefV4
                         GameDefinition gameDefinition = GameDefinition.getGameDefinitionForEnumName(lastDef);
                         if (gameDefinition != null)
                         {
+                            Console.WriteLine("Set "+ gameDefinition.friendlyName + " mode from previous launch");
                             this.gameDefinitionList.Text = gameDefinition.friendlyName;
                         }
                     }
@@ -297,18 +303,19 @@ namespace CrewChiefV4
 
         public MainWindow()
         {
-            controllerConfiguration = new ControllerConfiguration();
             InitializeComponent();
+            CheckForIllegalCrossThreadCalls = false;
+            cw = new ControlWriter(textBox1);
+            Console.SetOut(cw);
+            Console.WriteLine("Starting app");
+            controllerConfiguration = new ControllerConfiguration();            
             setSelectedGameType();
             this.app_version.Text = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
             this.filenameLabel.Visible = System.Diagnostics.Debugger.IsAttached;
             this.filenameTextbox.Visible = System.Diagnostics.Debugger.IsAttached;
             this.recordSession.Visible = System.Diagnostics.Debugger.IsAttached;
             this.playbackInterval.Visible = System.Diagnostics.Debugger.IsAttached;
-            CheckForIllegalCrossThreadCalls = false;
-            cw = new ControlWriter(textBox1);
-            Console.SetOut(cw);
-            Console.WriteLine("Starting app");
+            
             if (!UserSettings.GetUserSettings().getBoolean("enable_console_logging"))
             {
                 Console.WriteLine("Console logging has been disabled ('enable_console_logging' property)");
