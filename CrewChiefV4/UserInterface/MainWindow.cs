@@ -262,6 +262,42 @@ namespace CrewChiefV4
                         setFromCommandLine = true;
                         break;
                     }
+                    // special cases for RF1 versions
+                    else if (arg.Equals("AMS"))
+                    {
+                        Console.WriteLine("Set Autombilista mode from command line");
+                        this.gameDefinitionList.Text = GameDefinition.automobilista.friendlyName;
+                        setFromCommandLine = true;
+                        break;
+                    }
+                    else if (arg.Equals("FTRUCK"))
+                    {
+                        Console.WriteLine("Set FTruck mode from command line");
+                        this.gameDefinitionList.Text = GameDefinition.ftruck.friendlyName;
+                        setFromCommandLine = true;
+                        break;
+                    }
+                    else if (arg.Equals("RF1"))
+                    {
+                        Console.WriteLine("Set RF1 mode from command line");
+                        this.gameDefinitionList.Text = GameDefinition.rFactor1.friendlyName;
+                        setFromCommandLine = true;
+                        break;
+                    }
+                    else if (arg.Equals("MARCAS"))
+                    {
+                        Console.WriteLine("Set Copa de Marcas mode from command line");
+                        this.gameDefinitionList.Text = GameDefinition.marcas.friendlyName;
+                        setFromCommandLine = true;
+                        break;
+                    }
+                    else if (arg.Equals("GSC"))
+                    {
+                        Console.WriteLine("Set GSC mode from command line");
+                        this.gameDefinitionList.Text = GameDefinition.gameStockCar.friendlyName;
+                        setFromCommandLine = true;
+                        break;
+                    }
                 }
             }
             if (!setFromCommandLine)

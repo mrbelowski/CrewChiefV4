@@ -2,7 +2,7 @@ CrewChief version 4.
 
 Changelog
 ---------
-Version 4.4.0.6: Minor Assetto Corsa fix in Python module. IMPORTANT: remember to update the CrewChiefEx Python app from this new release (copy the CrewChiefEx folder from the app's install location to .../Steam/steamapps/common/assettocorsa/apps/python/).
+Version 4.4.1.0: Added missing AMS / RF1 / GSC command line parameter game selection; Final version of Assetto Corsa Python module. IMPORTANT: remember to update the CrewChiefEx Python app from this new release (copy the CrewChiefEx folder from the app's install location to .../Steam/steamapps/common/assettocorsa/apps/python/).
 
 Version 4.4.0.5: More Assetto Corsa additions. IMPORTANT: remember to update the CrewChiefEx Python app from this new release (copy the CrewChiefEx folder from the app's install location to .../Steam/steamapps/common/assettocorsa/apps/python/).
 
