@@ -11,10 +11,7 @@ else:
 sys.path.insert(0, sysdir)
 os.environ['PATH'] = os.environ['PATH'] + ";."
 
-
 from shared_mem import CrewChiefShared
-from shared_mem import SPageFileCrewChief
-from shared_mem import acsVehicleInfo
 
 sharedMem = CrewChiefShared()
 
@@ -47,7 +44,7 @@ def updateSharedMemory():
             sharedmem.vehicleInfo[carId].isCarInPitline = ac.isCarInPitline(carId)
             sharedmem.vehicleInfo[carId].isCarInPit = ac.isCarInPit(carId)
             sharedmem.vehicleInfo[carId].carLeaderboardPosition = ac.getCarLeaderboardPosition(carId)
-            sharedmem.vehicleInfo[carId].carRealTimeLeaderboardPosition = ac.getCarRealTimeLeaderboardPosition(carId)+1
+            sharedmem.vehicleInfo[carId].carRealTimeLeaderboardPosition = ac.getCarRealTimeLeaderboardPosition(carId)
             sharedmem.vehicleInfo[carId].spLineLength=  ac.getCarState(carId, acsys.CS.NormalizedSplinePosition) 
             sharedmem.vehicleInfo[carId].isConnected = ac.isConnected(carId)
 
