@@ -99,7 +99,7 @@ namespace CrewChiefV4
                         }
                         return rf1GameStateMapper;
                     case GameEnum.ASSETTO:
-                        if (rf1GameStateMapper == null)
+                        if (ascGameStateMapper == null)
                         {
                             ascGameStateMapper = new ACSGameStateMapper();
                         }
