@@ -1630,5 +1630,17 @@ namespace CrewChiefV4.Properties {
                 this["asc_spotter_car_length"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool enable_acs_log_sectors_for_unknown_tracks {
+            get {
+                return ((bool)(this["enable_acs_log_sectors_for_unknown_tracks"]));
+            }
+            set {
+                this["enable_acs_log_sectors_for_unknown_tracks"] = value;
+            }
+        }
     }
 }

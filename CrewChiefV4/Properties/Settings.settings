@@ -404,5 +404,8 @@
     <Setting Name="asc_spotter_car_length" Type="System.Single" Scope="User">
       <Value Profile="(Default)">4.5</Value>
     </Setting>
+    <Setting Name="enable_acs_log_sectors_for_unknown_tracks" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
