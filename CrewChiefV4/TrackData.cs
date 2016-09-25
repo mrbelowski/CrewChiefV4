@@ -126,7 +126,9 @@ namespace CrewChiefV4
             new TrackDefinition("vir:patriot course", 1535.824f, 2, new float[] {837f, 0f}),
             new TrackDefinition("vir:patriot reverse course", 1543.93f, 2, new float[] {704f, 3376f}),
             new TrackDefinition("vir:south course", 2586.035f, 2, new float[] {1370f, 0f}),
-            new TrackDefinition("ks_zandvoort:", 4189.691f, 2, new float[] {1986f, 0f})
+            new TrackDefinition("ks_zandvoort:", 4189.691f, 2, new float[] {1986f, 0f}),
+            new TrackDefinition("paul_ricard:gt_24h", 5776.583f, 3, new float[] {2971.514f, 4184.762f}),
+            new TrackDefinition("paul_ricard:wtcc", 3804.753f, 3, new float[] {759.0595f, 2207.232f})
             
         };
 
