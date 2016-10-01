@@ -653,11 +653,7 @@ namespace CrewChiefV4.Events
 
         public override void respond(string voiceMessage)
         {
-            if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.WHAT_ARE_MY_TYRE_TEMPS))
-            {
-                reportCurrentTyreTemps();
-            } 
-            else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOW_ARE_MY_TYRE_TEMPS))
+            if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOW_ARE_MY_TYRE_TEMPS))
             { 
                 if (currentTyreTempStatus != null)
                 {
@@ -669,9 +665,9 @@ namespace CrewChiefV4.Events
                         
                 }
             }
-            else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.WHAT_ARE_MY_BRAKE_TEMPS))
+            else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.WHAT_ARE_MY_TYRE_TEMPS))
             {
-                reportCurrentBrakeTemps();
+                reportCurrentTyreTemps();
             }
             else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOW_ARE_MY_BRAKE_TEMPS))
             {
@@ -682,9 +678,13 @@ namespace CrewChiefV4.Events
                 else
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
-                        
-                }                
+
+                }
             }
+            else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.WHAT_ARE_MY_BRAKE_TEMPS))
+            {
+                reportCurrentBrakeTemps();
+            }            
             else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOWS_MY_TYRE_WEAR))
             {
                 if (currentTyreConditionStatus != null)
