@@ -17,23 +17,25 @@ namespace CrewChiefV4.assetto
         public static String playerName = null;
         public static Boolean versionChecked = false;
 
-        private List<CornerData.EnumWithThresholds> tyreWearThresholds = new List<CornerData.EnumWithThresholds>();
-        private static Dictionary<string,List<CornerData.EnumWithThresholds>> tyreWearThresholdsForAC = new Dictionary<string,List<CornerData.EnumWithThresholds>>();
-        private static Dictionary<string, List<CornerData.EnumWithThresholds>> tyreTempThresholdsForAC = new Dictionary<string, List<CornerData.EnumWithThresholds>>();
+        private class AcTyres
+        {
+            public List<CornerData.EnumWithThresholds> tyreWearThresholdsForAC = new List<CornerData.EnumWithThresholds>();
+            public List<CornerData.EnumWithThresholds> tyreTempThresholdsForAC = new List<CornerData.EnumWithThresholds>();
+            public float tyreWearMinimumValue;
 
-        //
+            public AcTyres(List<CornerData.EnumWithThresholds> tyreWearThresholds,List<CornerData.EnumWithThresholds> tyreTempThresholds, float tyreWearMinimum)
+            {
+                tyreWearThresholdsForAC = tyreWearThresholds;
+                tyreTempThresholdsForAC = tyreTempThresholds;
+                tyreWearMinimumValue = tyreWearMinimum;
+            }
+        }
+        private static Dictionary<string, AcTyres> acTyres = new Dictionary<string, AcTyres>();
+        
         private Boolean logUnknownTrackSectors = UserSettings.GetUserSettings().getBoolean("enable_acs_log_sectors_for_unknown_tracks");
-        private static Dictionary<string, float> tyreWearMinimumValue = new Dictionary<string, float>();
-
+        
         // these are set when we start a new session, from the car name / class
         private TyreType defaultTyreTypeForPlayersCar = TyreType.Unknown_Race;
-        private float wornOutTyreWearLevel = 88f;
-
-        // tyrewear values still needs a bit of fine tuning!
-        private float scrubbedTyreWearPercent = 4f;
-        private float minorTyreWearPercent = 20f;
-        private float majorTyreWearPercent = 40f;
-        private float wornOutTyreWearPercent = 80f;
 
         private float[] loggedSectorStart = new float[] { -1f, -1f };
         
@@ -141,91 +143,641 @@ namespace CrewChiefV4.assetto
             return thisSectorTime;
         }
 
-        private static float maxColdRoadTyreTempPeak = 65;
-        private static float maxWarmRoadTyreTempPeak = 106;
-        private static float maxHotRoadTyreTempPeak = 120;
-
         public ACSGameStateMapper()
         {
-            tyreWearThresholds.Add(new CornerData.EnumWithThresholds(TyreCondition.NEW, -10000, scrubbedTyreWearPercent));
-            tyreWearThresholds.Add(new CornerData.EnumWithThresholds(TyreCondition.SCRUBBED, scrubbedTyreWearPercent, minorTyreWearPercent));
-            tyreWearThresholds.Add(new CornerData.EnumWithThresholds(TyreCondition.MINOR_WEAR, minorTyreWearPercent, majorTyreWearPercent));
-            tyreWearThresholds.Add(new CornerData.EnumWithThresholds(TyreCondition.MAJOR_WEAR, majorTyreWearPercent, wornOutTyreWearPercent));
-            tyreWearThresholds.Add(new CornerData.EnumWithThresholds(TyreCondition.WORN_OUT, wornOutTyreWearPercent, 10000));
-
             //GTE Classes
+            
+            List<CornerData.EnumWithThresholds> tyreWearThresholdsSlickSuperSoft = new List<CornerData.EnumWithThresholds>();
+            tyreWearThresholdsSlickSuperSoft.Add(new CornerData.EnumWithThresholds(TyreCondition.NEW, -10000f, 0.000f));
+            tyreWearThresholdsSlickSuperSoft.Add(new CornerData.EnumWithThresholds(TyreCondition.SCRUBBED, 0.000f, 3.685061f));
+            tyreWearThresholdsSlickSuperSoft.Add(new CornerData.EnumWithThresholds(TyreCondition.MINOR_WEAR, 3.685061f, 7.407379f));
+            tyreWearThresholdsSlickSuperSoft.Add(new CornerData.EnumWithThresholds(TyreCondition.MAJOR_WEAR, 7.407379f, 72.5275f));
+            tyreWearThresholdsSlickSuperSoft.Add(new CornerData.EnumWithThresholds(TyreCondition.WORN_OUT, 72.5275f, 1000f));
+            
+            List<CornerData.EnumWithThresholds> tyreTempsThresholdsSlickSuperSoft = new List<CornerData.EnumWithThresholds>();
+            tyreTempsThresholdsSlickSuperSoft.Add(new CornerData.EnumWithThresholds(TyreTemp.COLD, -10000f, 50f));
+            tyreTempsThresholdsSlickSuperSoft.Add(new CornerData.EnumWithThresholds(TyreTemp.WARM, 50f, 80f));
+            tyreTempsThresholdsSlickSuperSoft.Add(new CornerData.EnumWithThresholds(TyreTemp.HOT, 80f, 140f));
+            tyreTempsThresholdsSlickSuperSoft.Add(new CornerData.EnumWithThresholds(TyreTemp.COOKING, 140f, 10000f));
+            acTyres.Add("Slick SuperSoft (SS)", new AcTyres(tyreWearThresholdsSlickSuperSoft, tyreTempsThresholdsSlickSuperSoft, 88f));
+
+            
             List<CornerData.EnumWithThresholds> tyreWearThresholdsSlickSoft = new List<CornerData.EnumWithThresholds>();
-            tyreWearThresholdsSlickSoft.Add(new CornerData.EnumWithThresholds(TyreCondition.NEW, -10000f, 3.6f));
-            tyreWearThresholdsSlickSoft.Add(new CornerData.EnumWithThresholds(TyreCondition.SCRUBBED, 3.6f, 15f));
-            tyreWearThresholdsSlickSoft.Add(new CornerData.EnumWithThresholds(TyreCondition.MINOR_WEAR, 15f, 30f));
-            tyreWearThresholdsSlickSoft.Add(new CornerData.EnumWithThresholds(TyreCondition.MAJOR_WEAR, 30f, 81f));
-            tyreWearThresholdsSlickSoft.Add(new CornerData.EnumWithThresholds(TyreCondition.WORN_OUT, 81f, 1000f));
-            tyreWearThresholdsForAC.Add("Slick Soft (S)", tyreWearThresholdsSlickSoft);
-            tyreWearMinimumValue.Add("Slick Soft (S)", 88f);
+            tyreWearThresholdsSlickSoft.Add(new CornerData.EnumWithThresholds(TyreCondition.NEW, -10000f, 0.000f));
+            tyreWearThresholdsSlickSoft.Add(new CornerData.EnumWithThresholds(TyreCondition.SCRUBBED, 0.000f, 3.685061f));
+            tyreWearThresholdsSlickSoft.Add(new CornerData.EnumWithThresholds(TyreCondition.MINOR_WEAR, 3.685061f, 14.96601f));
+            tyreWearThresholdsSlickSoft.Add(new CornerData.EnumWithThresholds(TyreCondition.MAJOR_WEAR, 14.96601f, 46.8085f));
+            tyreWearThresholdsSlickSoft.Add(new CornerData.EnumWithThresholds(TyreCondition.WORN_OUT, 46.8085f, 1000f));
 
             List<CornerData.EnumWithThresholds> tyreTempsThresholdsSoftSlick = new List<CornerData.EnumWithThresholds>();
-            tyreTempsThresholdsSoftSlick.Add(new CornerData.EnumWithThresholds(TyreTemp.COLD, -10000, 60));
-            tyreTempsThresholdsSoftSlick.Add(new CornerData.EnumWithThresholds(TyreTemp.WARM, 60, 100));
-            tyreTempsThresholdsSoftSlick.Add(new CornerData.EnumWithThresholds(TyreTemp.HOT, 100, 180));
-            tyreTempsThresholdsSoftSlick.Add(new CornerData.EnumWithThresholds(TyreTemp.COOKING, 180, 10000));
-            tyreTempThresholdsForAC.Add("Slick Soft (S)", tyreTempsThresholdsSoftSlick);
+            tyreTempsThresholdsSoftSlick.Add(new CornerData.EnumWithThresholds(TyreTemp.COLD, -10000f, 70f));
+            tyreTempsThresholdsSoftSlick.Add(new CornerData.EnumWithThresholds(TyreTemp.WARM, 70f, 85f));
+            tyreTempsThresholdsSoftSlick.Add(new CornerData.EnumWithThresholds(TyreTemp.HOT, 85f, 100f));
+            tyreTempsThresholdsSoftSlick.Add(new CornerData.EnumWithThresholds(TyreTemp.COOKING, 100f, 10000f));
+            acTyres.Add("Slick Soft (S)", new AcTyres(tyreWearThresholdsSlickSoft, tyreTempsThresholdsSoftSlick, 88f));
 
             
             List<CornerData.EnumWithThresholds> tyreWearThresholdsSlickMedium = new List<CornerData.EnumWithThresholds>();
-            tyreWearThresholdsSlickMedium.Add(new CornerData.EnumWithThresholds(TyreCondition.NEW, -10000f, 7.4f));
-            tyreWearThresholdsSlickMedium.Add(new CornerData.EnumWithThresholds(TyreCondition.SCRUBBED, 7.4f, 15f));
-            tyreWearThresholdsSlickMedium.Add(new CornerData.EnumWithThresholds(TyreCondition.MINOR_WEAR, 15f, 22f));
-            tyreWearThresholdsSlickMedium.Add(new CornerData.EnumWithThresholds(TyreCondition.MAJOR_WEAR, 22f, 30f));
-            tyreWearThresholdsSlickMedium.Add(new CornerData.EnumWithThresholds(TyreCondition.WORN_OUT, 30f, 1000f));
-            tyreWearThresholdsForAC.Add("Slick Medium (M)", tyreWearThresholdsSlickMedium);
-            tyreWearMinimumValue.Add("Slick Medium (M)", 88f);
+            tyreWearThresholdsSlickMedium.Add(new CornerData.EnumWithThresholds(TyreCondition.NEW, -10000f, 0.000f));
+            tyreWearThresholdsSlickMedium.Add(new CornerData.EnumWithThresholds(TyreCondition.SCRUBBED, 0.000f, 3.685061f));
+            tyreWearThresholdsSlickMedium.Add(new CornerData.EnumWithThresholds(TyreCondition.MINOR_WEAR, 3.685061f, 14.96601f));
+            tyreWearThresholdsSlickMedium.Add(new CornerData.EnumWithThresholds(TyreCondition.MAJOR_WEAR, 14.96601f, 30.55553f));
+            tyreWearThresholdsSlickMedium.Add(new CornerData.EnumWithThresholds(TyreCondition.WORN_OUT, 30.55553f, 1000f));
 
             List<CornerData.EnumWithThresholds> tyreTempsThresholdsMediumSlick = new List<CornerData.EnumWithThresholds>();
-            tyreTempsThresholdsMediumSlick.Add(new CornerData.EnumWithThresholds(TyreTemp.COLD, -10000, 60));
-            tyreTempsThresholdsMediumSlick.Add(new CornerData.EnumWithThresholds(TyreTemp.WARM, 60, 140));
-            tyreTempsThresholdsMediumSlick.Add(new CornerData.EnumWithThresholds(TyreTemp.HOT, 140, 180));
-            tyreTempsThresholdsMediumSlick.Add(new CornerData.EnumWithThresholds(TyreTemp.COOKING, 180, 10000));
-            tyreTempThresholdsForAC.Add("Slick Medium (M)", tyreTempsThresholdsMediumSlick);
+            tyreTempsThresholdsMediumSlick.Add(new CornerData.EnumWithThresholds(TyreTemp.COLD, -10000f, 90f));
+            tyreTempsThresholdsMediumSlick.Add(new CornerData.EnumWithThresholds(TyreTemp.WARM, 90f, 115f));
+            tyreTempsThresholdsMediumSlick.Add(new CornerData.EnumWithThresholds(TyreTemp.HOT, 115f, 140f));
+            tyreTempsThresholdsMediumSlick.Add(new CornerData.EnumWithThresholds(TyreTemp.COOKING, 140f, 10000f));
+            acTyres.Add("Slick Medium (M)", new AcTyres(tyreWearThresholdsSlickMedium, tyreTempsThresholdsMediumSlick, 88f));
 
 
             List<CornerData.EnumWithThresholds> tyreWearThresholdsSlickHard = new List<CornerData.EnumWithThresholds>();
-            tyreWearThresholdsSlickHard.Add(new CornerData.EnumWithThresholds(TyreCondition.NEW, -10000f, 3.6f));
-            tyreWearThresholdsSlickHard.Add(new CornerData.EnumWithThresholds(TyreCondition.SCRUBBED, 3.6f, 15f));
-            tyreWearThresholdsSlickHard.Add(new CornerData.EnumWithThresholds(TyreCondition.MINOR_WEAR, 15f, 22f));
-            tyreWearThresholdsSlickHard.Add(new CornerData.EnumWithThresholds(TyreCondition.MAJOR_WEAR, 22f, 30f));
-            tyreWearThresholdsSlickHard.Add(new CornerData.EnumWithThresholds(TyreCondition.WORN_OUT, 30f, 1000f));
-            tyreWearThresholdsForAC.Add("Slick Hard (H)", tyreWearThresholdsSlickHard);
-            tyreWearMinimumValue.Add("Slick Hard (H)", 88f);
+            tyreWearThresholdsSlickHard.Add(new CornerData.EnumWithThresholds(TyreCondition.NEW, -10000f, 0.000f));
+            tyreWearThresholdsSlickHard.Add(new CornerData.EnumWithThresholds(TyreCondition.SCRUBBED, 0.000f, 14.96601f));
+            tyreWearThresholdsSlickHard.Add(new CornerData.EnumWithThresholds(TyreCondition.MINOR_WEAR, 14.96601f, 22.68041f));
+            tyreWearThresholdsSlickHard.Add(new CornerData.EnumWithThresholds(TyreCondition.MAJOR_WEAR, 22.68041f, 30.55553f));
+            tyreWearThresholdsSlickHard.Add(new CornerData.EnumWithThresholds(TyreCondition.WORN_OUT, 30.55553f, 1000f));
 
             List<CornerData.EnumWithThresholds> tyreTempsThresholdsHardSlick = new List<CornerData.EnumWithThresholds>();
-            tyreTempsThresholdsHardSlick.Add(new CornerData.EnumWithThresholds(TyreTemp.COLD, -10000, 60));
-            tyreTempsThresholdsHardSlick.Add(new CornerData.EnumWithThresholds(TyreTemp.WARM, 60, 110));
-            tyreTempsThresholdsHardSlick.Add(new CornerData.EnumWithThresholds(TyreTemp.HOT, 110, 180));
-            tyreTempsThresholdsHardSlick.Add(new CornerData.EnumWithThresholds(TyreTemp.COOKING, 180, 10000));
-            tyreTempThresholdsForAC.Add("Slick Hard (H)", tyreTempsThresholdsHardSlick);
+            tyreTempsThresholdsHardSlick.Add(new CornerData.EnumWithThresholds(TyreTemp.COLD, -10000f, 75f));
+            tyreTempsThresholdsHardSlick.Add(new CornerData.EnumWithThresholds(TyreTemp.WARM, 75f, 100f));
+            tyreTempsThresholdsHardSlick.Add(new CornerData.EnumWithThresholds(TyreTemp.HOT, 100f, 180f));
+            tyreTempsThresholdsHardSlick.Add(new CornerData.EnumWithThresholds(TyreTemp.COOKING, 180f, 10000f));
+            acTyres.Add("Slick Hard (H)", new AcTyres(tyreWearThresholdsSlickHard, tyreTempsThresholdsHardSlick, 88f));
 
+
+            List<CornerData.EnumWithThresholds> tyreWearThresholdsSlickSuperHard = new List<CornerData.EnumWithThresholds>();
+            tyreWearThresholdsSlickSuperHard.Add(new CornerData.EnumWithThresholds(TyreCondition.NEW, -10000f, 0.000f));
+            tyreWearThresholdsSlickSuperHard.Add(new CornerData.EnumWithThresholds(TyreCondition.SCRUBBED, 0.000f, 1.469612f));
+            tyreWearThresholdsSlickSuperHard.Add(new CornerData.EnumWithThresholds(TyreCondition.MINOR_WEAR, 1.469612f, 22.68041f));
+            tyreWearThresholdsSlickSuperHard.Add(new CornerData.EnumWithThresholds(TyreCondition.MAJOR_WEAR, 22.68041f, 30.55553f));
+            tyreWearThresholdsSlickSuperHard.Add(new CornerData.EnumWithThresholds(TyreCondition.WORN_OUT, 30.55553f, 1000f));
+
+            List<CornerData.EnumWithThresholds> tyreTempsThresholdsSlickSuperHard = new List<CornerData.EnumWithThresholds>();
+            tyreTempsThresholdsSlickSuperHard.Add(new CornerData.EnumWithThresholds(TyreTemp.COLD, -10000f, 85f));
+            tyreTempsThresholdsSlickSuperHard.Add(new CornerData.EnumWithThresholds(TyreTemp.WARM, 85f, 110f));
+            tyreTempsThresholdsSlickSuperHard.Add(new CornerData.EnumWithThresholds(TyreTemp.HOT, 110f, 160f));
+            tyreTempsThresholdsSlickSuperHard.Add(new CornerData.EnumWithThresholds(TyreTemp.COOKING, 160f, 10000f));
+            acTyres.Add("Slick SuperHard (SH)", new AcTyres(tyreWearThresholdsSlickSuperHard, tyreTempsThresholdsSlickSuperHard, 88f));
 
             //Some Car(s) :D
             List<CornerData.EnumWithThresholds> tyreWearThresholdsBFGoodrich = new List<CornerData.EnumWithThresholds>();
-            tyreWearThresholdsBFGoodrich.Add(new CornerData.EnumWithThresholds(TyreCondition.NEW, -10000f, 3.6f));
-            tyreWearThresholdsBFGoodrich.Add(new CornerData.EnumWithThresholds(TyreCondition.SCRUBBED, 3.6f, 22f));
-            tyreWearThresholdsBFGoodrich.Add(new CornerData.EnumWithThresholds(TyreCondition.MINOR_WEAR, 22f, 30f));
-            tyreWearThresholdsBFGoodrich.Add(new CornerData.EnumWithThresholds(TyreCondition.MAJOR_WEAR, 30f, 40f));
-            tyreWearThresholdsBFGoodrich.Add(new CornerData.EnumWithThresholds(TyreCondition.WORN_OUT, 40f, 1000f));
-            tyreWearThresholdsForAC.Add("BFGoodrich (g) Slicks (S)", tyreWearThresholdsSlickHard);
-            tyreWearMinimumValue.Add("BFGoodrich (g) Slicks (S)", 88f);
+            tyreWearThresholdsBFGoodrich.Add(new CornerData.EnumWithThresholds(TyreCondition.NEW, -10000f, 0.000f));
+            tyreWearThresholdsBFGoodrich.Add(new CornerData.EnumWithThresholds(TyreCondition.SCRUBBED, 0.000f, 3.685061f));
+            tyreWearThresholdsBFGoodrich.Add(new CornerData.EnumWithThresholds(TyreCondition.MINOR_WEAR, 3.685061f, 30.55553f));
+            tyreWearThresholdsBFGoodrich.Add(new CornerData.EnumWithThresholds(TyreCondition.MAJOR_WEAR, 30.55553f, 46.8085f));
+            tyreWearThresholdsBFGoodrich.Add(new CornerData.EnumWithThresholds(TyreCondition.WORN_OUT, 46.8085f, 1000f));
 
             List<CornerData.EnumWithThresholds> tyreTempsThresholdsBFGoodrich = new List<CornerData.EnumWithThresholds>();
-            tyreTempsThresholdsBFGoodrich.Add(new CornerData.EnumWithThresholds(TyreTemp.COLD, -10000, 59));
-            tyreTempsThresholdsBFGoodrich.Add(new CornerData.EnumWithThresholds(TyreTemp.WARM, 59, 110));
-            tyreTempsThresholdsBFGoodrich.Add(new CornerData.EnumWithThresholds(TyreTemp.HOT, 110, 160));
-            tyreTempsThresholdsBFGoodrich.Add(new CornerData.EnumWithThresholds(TyreTemp.COOKING, 160, 10000));
-            tyreTempThresholdsForAC.Add("BFGoodrich (g) Slicks (S)", tyreTempsThresholdsHardSlick);
+            tyreTempsThresholdsBFGoodrich.Add(new CornerData.EnumWithThresholds(TyreTemp.COLD, -10000f, 59f));
+            tyreTempsThresholdsBFGoodrich.Add(new CornerData.EnumWithThresholds(TyreTemp.WARM, 59f, 110f));
+            tyreTempsThresholdsBFGoodrich.Add(new CornerData.EnumWithThresholds(TyreTemp.HOT, 110f, 160f));
+            tyreTempsThresholdsBFGoodrich.Add(new CornerData.EnumWithThresholds(TyreTemp.COOKING, 160f, 10000f));
+            acTyres.Add("BFGoodrich (g) Slicks (S)", new AcTyres(tyreWearThresholdsBFGoodrich, tyreTempsThresholdsBFGoodrich, 88f));
+            
+            
+            List<CornerData.EnumWithThresholds> tyreWearThresholdsCinturato = new List<CornerData.EnumWithThresholds>();
+            tyreWearThresholdsCinturato.Add(new CornerData.EnumWithThresholds(TyreCondition.NEW, -10000f, 0.000f));
+            tyreWearThresholdsCinturato.Add(new CornerData.EnumWithThresholds(TyreCondition.SCRUBBED, 0.000f, 12.06036f));
+            tyreWearThresholdsCinturato.Add(new CornerData.EnumWithThresholds(TyreCondition.MINOR_WEAR, 12.06036f, 24.2424f));
+            tyreWearThresholdsCinturato.Add(new CornerData.EnumWithThresholds(TyreCondition.MAJOR_WEAR, 24.2424f, 48.97957f));
+            tyreWearThresholdsCinturato.Add(new CornerData.EnumWithThresholds(TyreCondition.WORN_OUT, 48.97957f, 1000f));
 
 
+            List<CornerData.EnumWithThresholds> tyreTempsThresholdsCinturato = new List<CornerData.EnumWithThresholds>();
+            tyreTempsThresholdsCinturato.Add(new CornerData.EnumWithThresholds(TyreTemp.COLD, -10000f, 75f));
+            tyreTempsThresholdsCinturato.Add(new CornerData.EnumWithThresholds(TyreTemp.WARM, 75f, 85f));
+            tyreTempsThresholdsCinturato.Add(new CornerData.EnumWithThresholds(TyreTemp.HOT, 85f, 160f));
+            tyreTempsThresholdsCinturato.Add(new CornerData.EnumWithThresholds(TyreTemp.COOKING, 160f, 10000f));
+            acTyres.Add("Cinturato (V)", new AcTyres(tyreWearThresholdsCinturato, tyreTempsThresholdsCinturato, 96f));
+            
+            
+            List<CornerData.EnumWithThresholds> tyreWearThresholdsECO = new List<CornerData.EnumWithThresholds>();
+            tyreWearThresholdsECO.Add(new CornerData.EnumWithThresholds(TyreCondition.NEW, -10000f, 0.000f));
+            tyreWearThresholdsECO.Add(new CornerData.EnumWithThresholds(TyreCondition.SCRUBBED, 0.000f, 2.01004f));
+            tyreWearThresholdsECO.Add(new CornerData.EnumWithThresholds(TyreCondition.MINOR_WEAR, 2.01004f, 8.163261f));
+            tyreWearThresholdsECO.Add(new CornerData.EnumWithThresholds(TyreCondition.MAJOR_WEAR, 8.163261f, 44.44443f));
+            tyreWearThresholdsECO.Add(new CornerData.EnumWithThresholds(TyreCondition.WORN_OUT, 44.44443f, 1000f));
 
-        
-        
+            List<CornerData.EnumWithThresholds> tyreTempsThresholdsECO = new List<CornerData.EnumWithThresholds>();
+            tyreTempsThresholdsECO.Add(new CornerData.EnumWithThresholds(TyreTemp.COLD, -10000f, 75f));
+            tyreTempsThresholdsECO.Add(new CornerData.EnumWithThresholds(TyreTemp.WARM, 75f, 85f));
+            tyreTempsThresholdsECO.Add(new CornerData.EnumWithThresholds(TyreTemp.HOT, 85f, 140f));
+            tyreTempsThresholdsECO.Add(new CornerData.EnumWithThresholds(TyreTemp.COOKING, 140f, 10000f));
+            acTyres.Add("ECO (E)", new AcTyres(tyreWearThresholdsECO, tyreTempsThresholdsECO, 80f));
+
+
+            List<CornerData.EnumWithThresholds> tyreWearThresholdsGP54 = new List<CornerData.EnumWithThresholds>();
+            tyreWearThresholdsGP54.Add(new CornerData.EnumWithThresholds(TyreCondition.NEW, -10000f, -1.0f));
+            tyreWearThresholdsGP54.Add(new CornerData.EnumWithThresholds(TyreCondition.SCRUBBED, -1.0f, 0.0f));
+            tyreWearThresholdsGP54.Add(new CornerData.EnumWithThresholds(TyreCondition.MINOR_WEAR, 0.0f, 1.0f));
+            tyreWearThresholdsGP54.Add(new CornerData.EnumWithThresholds(TyreCondition.MAJOR_WEAR, 1.0f, 49.49493f));
+            tyreWearThresholdsGP54.Add(new CornerData.EnumWithThresholds(TyreCondition.WORN_OUT, 49.49493f, 1000f));
+
+            List<CornerData.EnumWithThresholds> tyreTempsThresholdsGP54 = new List<CornerData.EnumWithThresholds>();
+            tyreTempsThresholdsGP54.Add(new CornerData.EnumWithThresholds(TyreTemp.COLD, -10000f, 40f));
+            tyreTempsThresholdsGP54.Add(new CornerData.EnumWithThresholds(TyreTemp.WARM, 40f, 90f));
+            tyreTempsThresholdsGP54.Add(new CornerData.EnumWithThresholds(TyreTemp.HOT, 90f, 110f));
+            tyreTempsThresholdsGP54.Add(new CornerData.EnumWithThresholds(TyreTemp.COOKING, 110f, 10000f));
+            acTyres.Add("GP54 (V)", new AcTyres(tyreWearThresholdsGP54, tyreTempsThresholdsGP54, 98f));
+
+            
+            List<CornerData.EnumWithThresholds> tyreWearThresholdsGP57 = new List<CornerData.EnumWithThresholds>();
+            tyreWearThresholdsGP57.Add(new CornerData.EnumWithThresholds(TyreCondition.NEW, -10000f, -1.0f));
+            tyreWearThresholdsGP57.Add(new CornerData.EnumWithThresholds(TyreCondition.SCRUBBED, -1.0f, 0.0f));
+            tyreWearThresholdsGP57.Add(new CornerData.EnumWithThresholds(TyreCondition.MINOR_WEAR, 0.0f, 1.0f));
+            tyreWearThresholdsGP57.Add(new CornerData.EnumWithThresholds(TyreCondition.MAJOR_WEAR, 1.0f, 49.49493f));
+            tyreWearThresholdsGP57.Add(new CornerData.EnumWithThresholds(TyreCondition.WORN_OUT, 49.49493f, 1000f));
+
+            List<CornerData.EnumWithThresholds> tyreTempsThresholdsGP57 = new List<CornerData.EnumWithThresholds>();
+            tyreTempsThresholdsGP57.Add(new CornerData.EnumWithThresholds(TyreTemp.COLD, -10000f, 40f));
+            tyreTempsThresholdsGP57.Add(new CornerData.EnumWithThresholds(TyreTemp.WARM, 40f, 90f));
+            tyreTempsThresholdsGP57.Add(new CornerData.EnumWithThresholds(TyreTemp.HOT, 90f, 110f));
+            tyreTempsThresholdsGP57.Add(new CornerData.EnumWithThresholds(TyreTemp.COOKING, 110f, 10000f));
+            acTyres.Add("GP57 (V)", new AcTyres(tyreWearThresholdsGP57, tyreTempsThresholdsGP57, 98f));
+
+
+            List<CornerData.EnumWithThresholds> tyreWearThresholdsGP63 = new List<CornerData.EnumWithThresholds>();
+            tyreWearThresholdsGP63.Add(new CornerData.EnumWithThresholds(TyreCondition.NEW, -10000f, -1.0f));
+            tyreWearThresholdsGP63.Add(new CornerData.EnumWithThresholds(TyreCondition.SCRUBBED, -1.0f, 0.0f));
+            tyreWearThresholdsGP63.Add(new CornerData.EnumWithThresholds(TyreCondition.MINOR_WEAR, 0.0f, 1.0f));
+            tyreWearThresholdsGP63.Add(new CornerData.EnumWithThresholds(TyreCondition.MAJOR_WEAR, 1.0f, 49.49493f));
+            tyreWearThresholdsGP63.Add(new CornerData.EnumWithThresholds(TyreCondition.WORN_OUT, 49.49493f, 1000f));
+
+
+            List<CornerData.EnumWithThresholds> tyreTempsThresholdsGP63 = new List<CornerData.EnumWithThresholds>();
+            tyreTempsThresholdsGP63.Add(new CornerData.EnumWithThresholds(TyreTemp.COLD, -10000f, 40f));
+            tyreTempsThresholdsGP63.Add(new CornerData.EnumWithThresholds(TyreTemp.WARM, 40f, 90f));
+            tyreTempsThresholdsGP63.Add(new CornerData.EnumWithThresholds(TyreTemp.HOT, 90f, 110f));
+            tyreTempsThresholdsGP63.Add(new CornerData.EnumWithThresholds(TyreTemp.COOKING, 110f, 10000f));
+            acTyres.Add("GP63 (V)", new AcTyres(tyreWearThresholdsGP63, tyreTempsThresholdsGP63, 98f));
+            
+            List<CornerData.EnumWithThresholds> tyreWearThresholdsGP67 = new List<CornerData.EnumWithThresholds>();
+            tyreWearThresholdsGP67.Add(new CornerData.EnumWithThresholds(TyreCondition.NEW, -10000f, -1.0f));
+            tyreWearThresholdsGP67.Add(new CornerData.EnumWithThresholds(TyreCondition.SCRUBBED, -1.0f, 0.0f));
+            tyreWearThresholdsGP67.Add(new CornerData.EnumWithThresholds(TyreCondition.MINOR_WEAR, 0.0f, 1.0f));
+            tyreWearThresholdsGP67.Add(new CornerData.EnumWithThresholds(TyreCondition.MAJOR_WEAR, 1.0f, 49.49493f));
+            tyreWearThresholdsGP67.Add(new CornerData.EnumWithThresholds(TyreCondition.WORN_OUT, 49.49493f, 1000f));
+
+            List<CornerData.EnumWithThresholds> tyreTempsThresholdsGP67 = new List<CornerData.EnumWithThresholds>();
+            tyreTempsThresholdsGP67.Add(new CornerData.EnumWithThresholds(TyreTemp.COLD, -10000f, 40f));
+            tyreTempsThresholdsGP67.Add(new CornerData.EnumWithThresholds(TyreTemp.WARM, 40f, 90f));
+            tyreTempsThresholdsGP67.Add(new CornerData.EnumWithThresholds(TyreTemp.HOT, 90f, 110f));
+            tyreTempsThresholdsGP67.Add(new CornerData.EnumWithThresholds(TyreTemp.COOKING, 110f, 10000f));
+            acTyres.Add("GP67 (V)", new AcTyres(tyreWearThresholdsGP67, tyreTempsThresholdsGP67, 98f));
+
+
+            List<CornerData.EnumWithThresholds> tyreWearThresholdsSoftGP70 = new List<CornerData.EnumWithThresholds>();
+            tyreWearThresholdsSoftGP70.Add(new CornerData.EnumWithThresholds(TyreCondition.NEW, -10000f, 0.000f));
+            tyreWearThresholdsSoftGP70.Add(new CornerData.EnumWithThresholds(TyreCondition.SCRUBBED, 0.000f, 4.522629f));
+            tyreWearThresholdsSoftGP70.Add(new CornerData.EnumWithThresholds(TyreCondition.MINOR_WEAR, 4.522629f, 18.36731f));
+            tyreWearThresholdsSoftGP70.Add(new CornerData.EnumWithThresholds(TyreCondition.MAJOR_WEAR, 18.36731f, 27.83508f));
+            tyreWearThresholdsSoftGP70.Add(new CornerData.EnumWithThresholds(TyreCondition.WORN_OUT, 27.83508f, 1000f));
+
+            List<CornerData.EnumWithThresholds> tyreTempsThresholdsSoftGP70 = new List<CornerData.EnumWithThresholds>();
+            tyreTempsThresholdsSoftGP70.Add(new CornerData.EnumWithThresholds(TyreTemp.COLD, -10000f, 75f));
+            tyreTempsThresholdsSoftGP70.Add(new CornerData.EnumWithThresholds(TyreTemp.WARM, 75f, 90f));
+            tyreTempsThresholdsSoftGP70.Add(new CornerData.EnumWithThresholds(TyreTemp.HOT, 90f, 140f));
+            tyreTempsThresholdsSoftGP70.Add(new CornerData.EnumWithThresholds(TyreTemp.COOKING, 140f, 10000f));
+            acTyres.Add("Soft GP70 (S)", new AcTyres(tyreWearThresholdsSoftGP70, tyreTempsThresholdsSoftGP70, 90f));
+
+            List<CornerData.EnumWithThresholds> tyreWearThresholdsGP70H = new List<CornerData.EnumWithThresholds>();
+            tyreWearThresholdsGP70H.Add(new CornerData.EnumWithThresholds(TyreCondition.NEW, -10000f, -1.0f));
+            tyreWearThresholdsGP70H.Add(new CornerData.EnumWithThresholds(TyreCondition.SCRUBBED, -1.0f, 0.0f));
+            tyreWearThresholdsGP70H.Add(new CornerData.EnumWithThresholds(TyreCondition.MINOR_WEAR, 0.0f, 19.19189f));
+            tyreWearThresholdsGP70H.Add(new CornerData.EnumWithThresholds(TyreCondition.MAJOR_WEAR, 19.19189f, 38.77548f));
+            tyreWearThresholdsGP70H.Add(new CornerData.EnumWithThresholds(TyreCondition.WORN_OUT, 38.77548f, 1000f));
+
+            List<CornerData.EnumWithThresholds> tyreTempsThresholdsGP70H = new List<CornerData.EnumWithThresholds>();
+            tyreTempsThresholdsGP70H.Add(new CornerData.EnumWithThresholds(TyreTemp.COLD, -10000f, 75f));
+            tyreTempsThresholdsGP70H.Add(new CornerData.EnumWithThresholds(TyreTemp.WARM, 75f, 90f));
+            tyreTempsThresholdsGP70H.Add(new CornerData.EnumWithThresholds(TyreTemp.HOT, 90f, 140f));
+            tyreTempsThresholdsGP70H.Add(new CornerData.EnumWithThresholds(TyreTemp.COOKING, 140f, 10000f));
+            acTyres.Add("Hard GP70 (H)", new AcTyres(tyreWearThresholdsSoftGP70, tyreTempsThresholdsSoftGP70, 95f));
+
+            List<CornerData.EnumWithThresholds> tyreWearThresholdsGP86H = new List<CornerData.EnumWithThresholds>();
+            tyreWearThresholdsGP86H.Add(new CornerData.EnumWithThresholds(TyreCondition.NEW, -10000f, -1.0f));
+            tyreWearThresholdsGP86H.Add(new CornerData.EnumWithThresholds(TyreCondition.SCRUBBED, -1.0f, 0.0f));
+            tyreWearThresholdsGP86H.Add(new CornerData.EnumWithThresholds(TyreCondition.MINOR_WEAR, 0.0f, 23.85788f));
+            tyreWearThresholdsGP86H.Add(new CornerData.EnumWithThresholds(TyreCondition.MAJOR_WEAR, 23.85788f, 48.45365f));
+            tyreWearThresholdsGP86H.Add(new CornerData.EnumWithThresholds(TyreCondition.WORN_OUT, 48.45365f, 1000f));
+
+            List<CornerData.EnumWithThresholds> tyreTempsThresholdsGP86H = new List<CornerData.EnumWithThresholds>();
+            tyreTempsThresholdsGP86H.Add(new CornerData.EnumWithThresholds(TyreTemp.COLD, -10000f, 75f));
+            tyreTempsThresholdsGP86H.Add(new CornerData.EnumWithThresholds(TyreTemp.WARM, 75f, 100f));
+            tyreTempsThresholdsGP86H.Add(new CornerData.EnumWithThresholds(TyreTemp.HOT, 100f, 140f));
+            tyreTempsThresholdsGP86H.Add(new CornerData.EnumWithThresholds(TyreTemp.COOKING, 140f, 10000f));
+            acTyres.Add("Hard GP86 (H)", new AcTyres(tyreWearThresholdsGP86H, tyreTempsThresholdsGP86H, 94f));
+
+            List<CornerData.EnumWithThresholds> tyreWearThresholdsSoftGP86 = new List<CornerData.EnumWithThresholds>();
+            tyreWearThresholdsSoftGP86.Add(new CornerData.EnumWithThresholds(TyreCondition.NEW, -10000f, -1.0f));
+            tyreWearThresholdsSoftGP86.Add(new CornerData.EnumWithThresholds(TyreCondition.SCRUBBED, -1.0f, 0.0f));
+            tyreWearThresholdsSoftGP86.Add(new CornerData.EnumWithThresholds(TyreCondition.MINOR_WEAR, 0.0f, 15.82489f));
+            tyreWearThresholdsSoftGP86.Add(new CornerData.EnumWithThresholds(TyreCondition.MAJOR_WEAR, 15.82489f, 48.45365f));
+            tyreWearThresholdsSoftGP86.Add(new CornerData.EnumWithThresholds(TyreCondition.WORN_OUT, 48.45365f, 1000f));
+
+            List<CornerData.EnumWithThresholds> tyreTempsThresholdsSoftGP86 = new List<CornerData.EnumWithThresholds>();
+            tyreTempsThresholdsSoftGP86.Add(new CornerData.EnumWithThresholds(TyreTemp.COLD, -10000f, 75f));
+            tyreTempsThresholdsSoftGP86.Add(new CornerData.EnumWithThresholds(TyreTemp.WARM, 75f, 100f));
+            tyreTempsThresholdsSoftGP86.Add(new CornerData.EnumWithThresholds(TyreTemp.HOT, 100f, 140f));
+            tyreTempsThresholdsSoftGP86.Add(new CornerData.EnumWithThresholds(TyreTemp.COOKING, 140f, 10000f));
+            acTyres.Add("Soft GP86 (S)", new AcTyres(tyreWearThresholdsSoftGP86, tyreTempsThresholdsSoftGP86, 94f));
+
+            
+            List<CornerData.EnumWithThresholds> tyreWearThresholdsHardSlicks90 = new List<CornerData.EnumWithThresholds>();
+            tyreWearThresholdsHardSlicks90.Add(new CornerData.EnumWithThresholds(TyreCondition.NEW, -10000f, 0.000f));
+            tyreWearThresholdsHardSlicks90.Add(new CornerData.EnumWithThresholds(TyreCondition.SCRUBBED, 0.000f, 4.522629f));
+            tyreWearThresholdsHardSlicks90.Add(new CornerData.EnumWithThresholds(TyreCondition.MINOR_WEAR, 4.522629f, 13.7056f));
+            tyreWearThresholdsHardSlicks90.Add(new CornerData.EnumWithThresholds(TyreCondition.MAJOR_WEAR, 13.7056f, 23.07693f));
+            tyreWearThresholdsHardSlicks90.Add(new CornerData.EnumWithThresholds(TyreCondition.WORN_OUT, 23.07693f, 1000f));
+
+
+            List<CornerData.EnumWithThresholds> tyreTempsThresholdsHardSlicks90 = new List<CornerData.EnumWithThresholds>();
+            tyreTempsThresholdsHardSlicks90.Add(new CornerData.EnumWithThresholds(TyreTemp.COLD, -10000f, 75f));
+            tyreTempsThresholdsHardSlicks90.Add(new CornerData.EnumWithThresholds(TyreTemp.WARM, 75f, 95f));
+            tyreTempsThresholdsHardSlicks90.Add(new CornerData.EnumWithThresholds(TyreTemp.HOT, 95f, 115f));
+            tyreTempsThresholdsHardSlicks90.Add(new CornerData.EnumWithThresholds(TyreTemp.COOKING, 115f, 10000f));
+            acTyres.Add("Hard Slicks 90s (H)", new AcTyres(tyreWearThresholdsHardSlicks90, tyreTempsThresholdsHardSlicks90, 90f));
+            
+            //
+            List<CornerData.EnumWithThresholds> tyreWearThresholdsHypercarCup = new List<CornerData.EnumWithThresholds>();
+            tyreWearThresholdsHypercarCup.Add(new CornerData.EnumWithThresholds(TyreCondition.NEW, -10000f, 0.000f));
+            tyreWearThresholdsHypercarCup.Add(new CornerData.EnumWithThresholds(TyreCondition.SCRUBBED, 0.000f, 12.06036f));
+            tyreWearThresholdsHypercarCup.Add(new CornerData.EnumWithThresholds(TyreCondition.MINOR_WEAR, 12.06036f, 36.54823f));
+            tyreWearThresholdsHypercarCup.Add(new CornerData.EnumWithThresholds(TyreCondition.MAJOR_WEAR, 36.54823f, 74.22676f));
+            tyreWearThresholdsHypercarCup.Add(new CornerData.EnumWithThresholds(TyreCondition.WORN_OUT, 74.22676f, 1000f));
+
+            List<CornerData.EnumWithThresholds> tyreTempsThresholdsHypercarCup = new List<CornerData.EnumWithThresholds>();
+            tyreTempsThresholdsHypercarCup.Add(new CornerData.EnumWithThresholds(TyreTemp.COLD, -10000f, 75f));
+            tyreTempsThresholdsHypercarCup.Add(new CornerData.EnumWithThresholds(TyreTemp.WARM, 75f, 95f));
+            tyreTempsThresholdsHypercarCup.Add(new CornerData.EnumWithThresholds(TyreTemp.HOT, 95f, 105f));
+            tyreTempsThresholdsHypercarCup.Add(new CornerData.EnumWithThresholds(TyreTemp.COOKING, 105f, 10000f));
+            acTyres.Add("Hypercar Cup (HC)", new AcTyres(tyreWearThresholdsHypercarCup, tyreTempsThresholdsHypercarCup, 96f));
+
+            
+            List<CornerData.EnumWithThresholds> tyreWearThresholdsHypercarRoad = new List<CornerData.EnumWithThresholds>();
+            tyreWearThresholdsHypercarRoad.Add(new CornerData.EnumWithThresholds(TyreCondition.NEW, -10000f, 0.000f));
+            tyreWearThresholdsHypercarRoad.Add(new CornerData.EnumWithThresholds(TyreCondition.SCRUBBED, 0.000f, 1.172536f));
+            tyreWearThresholdsHypercarRoad.Add(new CornerData.EnumWithThresholds(TyreCondition.MINOR_WEAR, 1.172536f, 3.553289f));
+            tyreWearThresholdsHypercarRoad.Add(new CornerData.EnumWithThresholds(TyreCondition.MAJOR_WEAR, 3.553289f, 4.761912f));
+            tyreWearThresholdsHypercarRoad.Add(new CornerData.EnumWithThresholds(TyreCondition.WORN_OUT, 4.761912f, 1000f));
+
+            List<CornerData.EnumWithThresholds> tyreTempsThresholdsHypercarRoad = new List<CornerData.EnumWithThresholds>();
+            tyreTempsThresholdsHypercarRoad.Add(new CornerData.EnumWithThresholds(TyreTemp.COLD, -10000f, 75f));
+            tyreTempsThresholdsHypercarRoad.Add(new CornerData.EnumWithThresholds(TyreTemp.WARM, 75f, 100f));
+            tyreTempsThresholdsHypercarRoad.Add(new CornerData.EnumWithThresholds(TyreTemp.HOT, 100f, 140f));
+            tyreTempsThresholdsHypercarRoad.Add(new CornerData.EnumWithThresholds(TyreTemp.COOKING, 140f, 10000f));
+            acTyres.Add("Hypercar road (HR)", new AcTyres(tyreWearThresholdsHypercarRoad, tyreTempsThresholdsHypercarRoad, 70f));
+
+            
+            List<CornerData.EnumWithThresholds> tyreWearThresholdsHypercarTrofeo = new List<CornerData.EnumWithThresholds>();
+            tyreWearThresholdsHypercarTrofeo.Add(new CornerData.EnumWithThresholds(TyreCondition.NEW, -10000f, 0.000f));
+            tyreWearThresholdsHypercarTrofeo.Add(new CornerData.EnumWithThresholds(TyreCondition.SCRUBBED, 0.000f, 14.96601f));
+            tyreWearThresholdsHypercarTrofeo.Add(new CornerData.EnumWithThresholds(TyreCondition.MINOR_WEAR, 14.96601f, 22.68041f));
+            tyreWearThresholdsHypercarTrofeo.Add(new CornerData.EnumWithThresholds(TyreCondition.MAJOR_WEAR, 22.68041f, 30.55553f));
+            tyreWearThresholdsHypercarTrofeo.Add(new CornerData.EnumWithThresholds(TyreCondition.WORN_OUT, 30.55553f, 1000f));
+
+
+            List<CornerData.EnumWithThresholds> tyreTempsThresholdsHypercarTrofeo = new List<CornerData.EnumWithThresholds>();
+            tyreTempsThresholdsHypercarTrofeo.Add(new CornerData.EnumWithThresholds(TyreTemp.COLD, -10000f, 75f));
+            tyreTempsThresholdsHypercarTrofeo.Add(new CornerData.EnumWithThresholds(TyreTemp.WARM, 75f, 100f));
+            tyreTempsThresholdsHypercarTrofeo.Add(new CornerData.EnumWithThresholds(TyreTemp.HOT, 100f, 140f));
+            tyreTempsThresholdsHypercarTrofeo.Add(new CornerData.EnumWithThresholds(TyreTemp.COOKING, 140f, 10000f));
+            acTyres.Add("Hypercar Trofeo (I)", new AcTyres(tyreWearThresholdsHypercarTrofeo, tyreTempsThresholdsHypercarTrofeo, 88f));
+
+           
+            List<CornerData.EnumWithThresholds> tyreWearThresholdsTrofeoHSlicks = new List<CornerData.EnumWithThresholds>();
+            tyreWearThresholdsTrofeoHSlicks.Add(new CornerData.EnumWithThresholds(TyreCondition.NEW, -10000f, 0.000f));
+            tyreWearThresholdsTrofeoHSlicks.Add(new CornerData.EnumWithThresholds(TyreCondition.SCRUBBED, 0.000f, 14.96601f));
+            tyreWearThresholdsTrofeoHSlicks.Add(new CornerData.EnumWithThresholds(TyreCondition.MINOR_WEAR, 14.96601f, 22.68041f));
+            tyreWearThresholdsTrofeoHSlicks.Add(new CornerData.EnumWithThresholds(TyreCondition.MAJOR_WEAR, 22.68041f, 30.55553f));
+            tyreWearThresholdsTrofeoHSlicks.Add(new CornerData.EnumWithThresholds(TyreCondition.WORN_OUT, 30.55553f, 1000f));
+
+            List<CornerData.EnumWithThresholds> tyreTempsThresholdsTrofeoHSlicks = new List<CornerData.EnumWithThresholds>();
+            tyreTempsThresholdsTrofeoHSlicks.Add(new CornerData.EnumWithThresholds(TyreTemp.COLD, -10000f, 75f));
+            tyreTempsThresholdsTrofeoHSlicks.Add(new CornerData.EnumWithThresholds(TyreTemp.WARM, 75f, 100f));
+            tyreTempsThresholdsTrofeoHSlicks.Add(new CornerData.EnumWithThresholds(TyreTemp.HOT, 100f, 140f));
+            tyreTempsThresholdsTrofeoHSlicks.Add(new CornerData.EnumWithThresholds(TyreTemp.COOKING, 140f, 10000f));
+            acTyres.Add("Trofeo H Slicks (H)", new AcTyres(tyreWearThresholdsTrofeoHSlicks, tyreTempsThresholdsTrofeoHSlicks, 88f));
+
+
+            List<CornerData.EnumWithThresholds> tyreWearThresholdsTrofeoMSlicks = new List<CornerData.EnumWithThresholds>();
+            tyreWearThresholdsTrofeoMSlicks.Add(new CornerData.EnumWithThresholds(TyreCondition.NEW, -10000f, 0.000f));
+            tyreWearThresholdsTrofeoMSlicks.Add(new CornerData.EnumWithThresholds(TyreCondition.SCRUBBED, 0.000f, 4.522629f));
+            tyreWearThresholdsTrofeoMSlicks.Add(new CornerData.EnumWithThresholds(TyreCondition.MINOR_WEAR, 4.522629f, 18.36731f));
+            tyreWearThresholdsTrofeoMSlicks.Add(new CornerData.EnumWithThresholds(TyreCondition.MAJOR_WEAR, 18.36731f, 27.83508f));
+            tyreWearThresholdsTrofeoMSlicks.Add(new CornerData.EnumWithThresholds(TyreCondition.WORN_OUT, 27.83508f, 1000f));
+
+
+            List<CornerData.EnumWithThresholds> tyreTempsThresholdsTrofeoMSlicks = new List<CornerData.EnumWithThresholds>();
+            tyreTempsThresholdsTrofeoMSlicks.Add(new CornerData.EnumWithThresholds(TyreTemp.COLD, -10000f, 75f));
+            tyreTempsThresholdsTrofeoMSlicks.Add(new CornerData.EnumWithThresholds(TyreTemp.WARM, 75f, 90f));
+            tyreTempsThresholdsTrofeoMSlicks.Add(new CornerData.EnumWithThresholds(TyreTemp.HOT, 90f, 120f));
+            tyreTempsThresholdsTrofeoMSlicks.Add(new CornerData.EnumWithThresholds(TyreTemp.COOKING, 120f, 10000f));
+            acTyres.Add("Trofeo M Slicks (M)", new AcTyres(tyreWearThresholdsTrofeoMSlicks, tyreTempsThresholdsTrofeoMSlicks, 90f));
+
+
+            List<CornerData.EnumWithThresholds> tyreWearThresholdsMediumGP86 = new List<CornerData.EnumWithThresholds>();
+            tyreWearThresholdsMediumGP86.Add(new CornerData.EnumWithThresholds(TyreCondition.NEW, -10000f, 0.000f));
+            tyreWearThresholdsMediumGP86.Add(new CornerData.EnumWithThresholds(TyreCondition.SCRUBBED, 0.000f, 23.85788f));
+            tyreWearThresholdsMediumGP86.Add(new CornerData.EnumWithThresholds(TyreCondition.MINOR_WEAR, 23.85788f, 31.97276f));
+            tyreWearThresholdsMediumGP86.Add(new CornerData.EnumWithThresholds(TyreCondition.MAJOR_WEAR, 31.97276f, 48.45365f));
+            tyreWearThresholdsMediumGP86.Add(new CornerData.EnumWithThresholds(TyreCondition.WORN_OUT, 48.45365f, 1000f));
+
+            List<CornerData.EnumWithThresholds> tyreTempsThresholdsMediumGP86 = new List<CornerData.EnumWithThresholds>();
+            tyreTempsThresholdsMediumGP86.Add(new CornerData.EnumWithThresholds(TyreTemp.COLD, -10000f, 75f));
+            tyreTempsThresholdsMediumGP86.Add(new CornerData.EnumWithThresholds(TyreTemp.WARM, 75f, 100f));
+            tyreTempsThresholdsMediumGP86.Add(new CornerData.EnumWithThresholds(TyreTemp.HOT, 100f, 140f));
+            tyreTempsThresholdsMediumGP86.Add(new CornerData.EnumWithThresholds(TyreTemp.COOKING, 140f, 10000f));
+            acTyres.Add("Medium GP86 (M)", new AcTyres(tyreWearThresholdsMediumGP86, tyreTempsThresholdsMediumGP86, 94f));
+
+            
+            List<CornerData.EnumWithThresholds> tyreWearThresholdsSoftSlicks90s = new List<CornerData.EnumWithThresholds>();
+            tyreWearThresholdsSoftSlicks90s.Add(new CornerData.EnumWithThresholds(TyreCondition.NEW, -10000f, 0.000f));
+            tyreWearThresholdsSoftSlicks90s.Add(new CornerData.EnumWithThresholds(TyreCondition.SCRUBBED, 0.000f, 2.01004f));
+            tyreWearThresholdsSoftSlicks90s.Add(new CornerData.EnumWithThresholds(TyreCondition.MINOR_WEAR, 2.01004f, 8.163261f));
+            tyreWearThresholdsSoftSlicks90s.Add(new CornerData.EnumWithThresholds(TyreCondition.MAJOR_WEAR, 8.163261f, 34.7826f));
+            tyreWearThresholdsSoftSlicks90s.Add(new CornerData.EnumWithThresholds(TyreCondition.WORN_OUT, 34.7826f, 1000f));
+
+            List<CornerData.EnumWithThresholds> tyreTempsThresholdsSoftSlicks90s = new List<CornerData.EnumWithThresholds>();
+            tyreTempsThresholdsSoftSlicks90s.Add(new CornerData.EnumWithThresholds(TyreTemp.COLD, -10000f, 65f));
+            tyreTempsThresholdsSoftSlicks90s.Add(new CornerData.EnumWithThresholds(TyreTemp.WARM, 65f, 80f));
+            tyreTempsThresholdsSoftSlicks90s.Add(new CornerData.EnumWithThresholds(TyreTemp.HOT, 80f, 100f));
+            tyreTempsThresholdsSoftSlicks90s.Add(new CornerData.EnumWithThresholds(TyreTemp.COOKING, 100f, 10000f));
+            acTyres.Add("Soft Slicks 90s (S)", new AcTyres(tyreWearThresholdsSoftSlicks90s, tyreTempsThresholdsSoftSlicks90s, 80f));
+
+
+            List<CornerData.EnumWithThresholds> tyreWearThresholdsMediumSlicks90s = new List<CornerData.EnumWithThresholds>();
+            tyreWearThresholdsMediumSlicks90s.Add(new CornerData.EnumWithThresholds(TyreCondition.NEW, -10000f, 0.000f));
+            tyreWearThresholdsMediumSlicks90s.Add(new CornerData.EnumWithThresholds(TyreCondition.SCRUBBED, 0.000f, 3.685061f));
+            tyreWearThresholdsMediumSlicks90s.Add(new CornerData.EnumWithThresholds(TyreCondition.MINOR_WEAR, 3.685061f, 22.68041f));
+            tyreWearThresholdsMediumSlicks90s.Add(new CornerData.EnumWithThresholds(TyreCondition.MAJOR_WEAR, 22.68041f, 38.59647f));
+            tyreWearThresholdsMediumSlicks90s.Add(new CornerData.EnumWithThresholds(TyreCondition.WORN_OUT, 38.59647f, 1000f));
+
+            List<CornerData.EnumWithThresholds> tyreTempsThresholdsMediumSlicks90s = new List<CornerData.EnumWithThresholds>();
+            tyreTempsThresholdsMediumSlicks90s.Add(new CornerData.EnumWithThresholds(TyreTemp.COLD, -10000f, 70f));
+            tyreTempsThresholdsMediumSlicks90s.Add(new CornerData.EnumWithThresholds(TyreTemp.WARM, 70f, 90f));
+            tyreTempsThresholdsMediumSlicks90s.Add(new CornerData.EnumWithThresholds(TyreTemp.HOT, 90f, 105f));
+            tyreTempsThresholdsMediumSlicks90s.Add(new CornerData.EnumWithThresholds(TyreTemp.COOKING, 105f, 10000f));
+            acTyres.Add("Medium Slicks 90s (M)", new AcTyres(tyreWearThresholdsMediumSlicks90s, tyreTempsThresholdsMediumSlicks90s, 88f));
+
+
+            List<CornerData.EnumWithThresholds> tyreWearThresholdsPirelliCinturato = new List<CornerData.EnumWithThresholds>();
+            tyreWearThresholdsPirelliCinturato.Add(new CornerData.EnumWithThresholds(TyreCondition.NEW, -10000f, 0.000f));
+            tyreWearThresholdsPirelliCinturato.Add(new CornerData.EnumWithThresholds(TyreCondition.SCRUBBED, 0.000f, 7.407379f));
+            tyreWearThresholdsPirelliCinturato.Add(new CornerData.EnumWithThresholds(TyreCondition.MINOR_WEAR, 7.407379f, 11.16753f));
+            tyreWearThresholdsPirelliCinturato.Add(new CornerData.EnumWithThresholds(TyreCondition.MAJOR_WEAR, 11.16753f, 30.55553f));
+            tyreWearThresholdsPirelliCinturato.Add(new CornerData.EnumWithThresholds(TyreCondition.WORN_OUT, 30.55553f, 1000f));
+
+            List<CornerData.EnumWithThresholds> tyreTempsThresholdsPirelliCinturato = new List<CornerData.EnumWithThresholds>();
+            tyreTempsThresholdsPirelliCinturato.Add(new CornerData.EnumWithThresholds(TyreTemp.COLD, -10000f, 60f));
+            tyreTempsThresholdsPirelliCinturato.Add(new CornerData.EnumWithThresholds(TyreTemp.WARM, 60f, 80f));
+            tyreTempsThresholdsPirelliCinturato.Add(new CornerData.EnumWithThresholds(TyreTemp.HOT, 80f, 95f));
+            tyreTempsThresholdsPirelliCinturato.Add(new CornerData.EnumWithThresholds(TyreTemp.COOKING, 95f, 10000f));
+            acTyres.Add("Pirelli Cinturato (V)", new AcTyres(tyreWearThresholdsPirelliCinturato, tyreTempsThresholdsPirelliCinturato, 88f));
+
+
+            List<CornerData.EnumWithThresholds> tyreWearThresholdsQualifyingGP86 = new List<CornerData.EnumWithThresholds>();
+            tyreWearThresholdsQualifyingGP86.Add(new CornerData.EnumWithThresholds(TyreCondition.NEW, -10000f, 0.000f));
+            tyreWearThresholdsQualifyingGP86.Add(new CornerData.EnumWithThresholds(TyreCondition.SCRUBBED, 0.000f, 1.172536f));
+            tyreWearThresholdsQualifyingGP86.Add(new CornerData.EnumWithThresholds(TyreCondition.MINOR_WEAR, 1.172536f, 4.761912f));
+            tyreWearThresholdsQualifyingGP86.Add(new CornerData.EnumWithThresholds(TyreCondition.MAJOR_WEAR, 4.761912f, 41.17648f));
+            tyreWearThresholdsQualifyingGP86.Add(new CornerData.EnumWithThresholds(TyreCondition.WORN_OUT, 41.17648f, 1000f));
+
+            List<CornerData.EnumWithThresholds> tyreTempsThresholdsQualifyingGP86 = new List<CornerData.EnumWithThresholds>();
+            tyreTempsThresholdsQualifyingGP86.Add(new CornerData.EnumWithThresholds(TyreTemp.COLD, -10000f, 70f));
+            tyreTempsThresholdsQualifyingGP86.Add(new CornerData.EnumWithThresholds(TyreTemp.WARM, 75f, 170f));
+            tyreTempsThresholdsQualifyingGP86.Add(new CornerData.EnumWithThresholds(TyreTemp.HOT, 170f, 200f));
+            tyreTempsThresholdsQualifyingGP86.Add(new CornerData.EnumWithThresholds(TyreTemp.COOKING, 200f, 10000f));
+            acTyres.Add("Qualifying GP86 (Q)", new AcTyres(tyreWearThresholdsQualifyingGP86, tyreTempsThresholdsQualifyingGP86, 70f));
+
+
+            List<CornerData.EnumWithThresholds> tyreWearThresholdsSemislick = new List<CornerData.EnumWithThresholds>();
+            tyreWearThresholdsSemislick.Add(new CornerData.EnumWithThresholds(TyreCondition.NEW, -10000f, 0.000f));
+            tyreWearThresholdsSemislick.Add(new CornerData.EnumWithThresholds(TyreCondition.SCRUBBED, 0.000f, 1.172536f));
+            tyreWearThresholdsSemislick.Add(new CornerData.EnumWithThresholds(TyreCondition.MINOR_WEAR, 1.172536f, 3.553289f));
+            tyreWearThresholdsSemislick.Add(new CornerData.EnumWithThresholds(TyreCondition.MAJOR_WEAR, 3.553289f, 4.761912f));
+            tyreWearThresholdsSemislick.Add(new CornerData.EnumWithThresholds(TyreCondition.WORN_OUT, 4.761912f, 1000f));
+
+            List<CornerData.EnumWithThresholds> tyreTempsThresholdsSemislick = new List<CornerData.EnumWithThresholds>();
+            tyreTempsThresholdsSemislick.Add(new CornerData.EnumWithThresholds(TyreTemp.COLD, -10000f, 75f));
+            tyreTempsThresholdsSemislick.Add(new CornerData.EnumWithThresholds(TyreTemp.WARM, 75f, 95f));
+            tyreTempsThresholdsSemislick.Add(new CornerData.EnumWithThresholds(TyreTemp.HOT, 95f, 140f));
+            tyreTempsThresholdsSemislick.Add(new CornerData.EnumWithThresholds(TyreTemp.COOKING, 140f, 10000f));
+            acTyres.Add("Semislick (SM)", new AcTyres(tyreWearThresholdsSemislick, tyreTempsThresholdsSemislick, 70f));
+
+
+            List<CornerData.EnumWithThresholds> tyreWearThresholdsSemislicks = new List<CornerData.EnumWithThresholds>();
+            tyreWearThresholdsSemislicks.Add(new CornerData.EnumWithThresholds(TyreCondition.NEW, -10000f, 0.000f));
+            tyreWearThresholdsSemislicks.Add(new CornerData.EnumWithThresholds(TyreCondition.SCRUBBED, 0.000f, 1.172536f));
+            tyreWearThresholdsSemislicks.Add(new CornerData.EnumWithThresholds(TyreCondition.MINOR_WEAR, 1.172536f, 3.553289f));
+            tyreWearThresholdsSemislicks.Add(new CornerData.EnumWithThresholds(TyreCondition.MAJOR_WEAR, 3.553289f, 4.761912f));
+            tyreWearThresholdsSemislicks.Add(new CornerData.EnumWithThresholds(TyreCondition.WORN_OUT, 4.761912f, 1000f));
+
+            List<CornerData.EnumWithThresholds> tyreTempsThresholdsSemislicks = new List<CornerData.EnumWithThresholds>();
+            tyreTempsThresholdsSemislicks.Add(new CornerData.EnumWithThresholds(TyreTemp.COLD, -10000f, 75f));
+            tyreTempsThresholdsSemislicks.Add(new CornerData.EnumWithThresholds(TyreTemp.WARM, 75f, 95f));
+            tyreTempsThresholdsSemislicks.Add(new CornerData.EnumWithThresholds(TyreTemp.HOT, 95f, 140f));
+            tyreTempsThresholdsSemislicks.Add(new CornerData.EnumWithThresholds(TyreTemp.COOKING, 140f, 10000f));
+            acTyres.Add("Semislicks (SM)", new AcTyres(tyreWearThresholdsSemislicks, tyreTempsThresholdsSemislicks, 70f));
+
+
+            List<CornerData.EnumWithThresholds> tyreWearThresholdsSlicks70 = new List<CornerData.EnumWithThresholds>();
+            tyreWearThresholdsSlicks70.Add(new CornerData.EnumWithThresholds(TyreCondition.NEW, -10000f, 0.000f));
+            tyreWearThresholdsSlicks70.Add(new CornerData.EnumWithThresholds(TyreCondition.SCRUBBED, 0.000f, 12.06036f));
+            tyreWearThresholdsSlicks70.Add(new CornerData.EnumWithThresholds(TyreCondition.MINOR_WEAR, 12.06036f, 36.54823f));
+            tyreWearThresholdsSlicks70.Add(new CornerData.EnumWithThresholds(TyreCondition.MAJOR_WEAR, 36.54823f, 48.97957f));
+            tyreWearThresholdsSlicks70.Add(new CornerData.EnumWithThresholds(TyreCondition.WORN_OUT, 48.97957f, 1000f));
+
+            List<CornerData.EnumWithThresholds> tyreTempsThresholdsSlicks70 = new List<CornerData.EnumWithThresholds>();
+            tyreTempsThresholdsSlicks70.Add(new CornerData.EnumWithThresholds(TyreTemp.COLD, -10000f, 75f));
+            tyreTempsThresholdsSlicks70.Add(new CornerData.EnumWithThresholds(TyreTemp.WARM, 75f, 85f));
+            tyreTempsThresholdsSlicks70.Add(new CornerData.EnumWithThresholds(TyreTemp.HOT, 85f, 140f));
+            tyreTempsThresholdsSlicks70.Add(new CornerData.EnumWithThresholds(TyreTemp.COOKING, 140f, 10000f));
+            acTyres.Add("Slicks 70s (S)", new AcTyres(tyreWearThresholdsSlicks70, tyreTempsThresholdsSlicks70, 96f));
+
+
+            List<CornerData.EnumWithThresholds> tyreWearThresholdsSlicksSoftDTM90s = new List<CornerData.EnumWithThresholds>();
+            tyreWearThresholdsSlicksSoftDTM90s.Add(new CornerData.EnumWithThresholds(TyreCondition.NEW, -10000f, 0.000f));
+            tyreWearThresholdsSlicksSoftDTM90s.Add(new CornerData.EnumWithThresholds(TyreCondition.SCRUBBED, 0.000f, 2.01004f));
+            tyreWearThresholdsSlicksSoftDTM90s.Add(new CornerData.EnumWithThresholds(TyreCondition.MINOR_WEAR, 2.01004f, 8.163261f));
+            tyreWearThresholdsSlicksSoftDTM90s.Add(new CornerData.EnumWithThresholds(TyreCondition.MAJOR_WEAR, 8.163261f, 34.7826f));
+            tyreWearThresholdsSlicksSoftDTM90s.Add(new CornerData.EnumWithThresholds(TyreCondition.WORN_OUT, 34.7826f, 1000f));
+
+            List<CornerData.EnumWithThresholds> tyreTempsThresholdsSlicksSoftDTM90s = new List<CornerData.EnumWithThresholds>();
+            tyreTempsThresholdsSlicksSoftDTM90s.Add(new CornerData.EnumWithThresholds(TyreTemp.COLD, -10000f, 65f));
+            tyreTempsThresholdsSlicksSoftDTM90s.Add(new CornerData.EnumWithThresholds(TyreTemp.WARM, 65f, 80f));
+            tyreTempsThresholdsSlicksSoftDTM90s.Add(new CornerData.EnumWithThresholds(TyreTemp.HOT, 80f, 100f));
+            tyreTempsThresholdsSlicksSoftDTM90s.Add(new CornerData.EnumWithThresholds(TyreTemp.COOKING, 100f, 10000f));
+            acTyres.Add("Slicks Soft DTM90s (S)", new AcTyres(tyreWearThresholdsSlicksSoftDTM90s, tyreTempsThresholdsSlicksSoftDTM90s, 80f));
+
+
+            List<CornerData.EnumWithThresholds> tyreWearThresholdsSlicksHardDTM90s = new List<CornerData.EnumWithThresholds>();
+            tyreWearThresholdsSlicksHardDTM90s.Add(new CornerData.EnumWithThresholds(TyreCondition.NEW, -10000f, 0.000f));
+            tyreWearThresholdsSlicksHardDTM90s.Add(new CornerData.EnumWithThresholds(TyreCondition.SCRUBBED, 0.000f, 4.522629f));
+            tyreWearThresholdsSlicksHardDTM90s.Add(new CornerData.EnumWithThresholds(TyreCondition.MINOR_WEAR, 4.522629f, 13.7056f));
+            tyreWearThresholdsSlicksHardDTM90s.Add(new CornerData.EnumWithThresholds(TyreCondition.MAJOR_WEAR, 13.7056f, 23.07693f));
+            tyreWearThresholdsSlicksHardDTM90s.Add(new CornerData.EnumWithThresholds(TyreCondition.WORN_OUT, 23.07693f, 1000f));
+
+            List<CornerData.EnumWithThresholds> tyreTempsThresholdsSlicksHardDTM90s = new List<CornerData.EnumWithThresholds>();
+            tyreTempsThresholdsSlicksHardDTM90s.Add(new CornerData.EnumWithThresholds(TyreTemp.COLD, -10000f, 60f));
+            tyreTempsThresholdsSlicksHardDTM90s.Add(new CornerData.EnumWithThresholds(TyreTemp.WARM, 60f, 90f));
+            tyreTempsThresholdsSlicksHardDTM90s.Add(new CornerData.EnumWithThresholds(TyreTemp.HOT, 90f, 115f));
+            tyreTempsThresholdsSlicksHardDTM90s.Add(new CornerData.EnumWithThresholds(TyreTemp.COOKING, 115f, 10000f));
+            acTyres.Add("Slicks Hard DTM90s (H)", new AcTyres(tyreWearThresholdsSlicksHardDTM90s, tyreTempsThresholdsSlicksHardDTM90s, 90f));
+
+
+            List<CornerData.EnumWithThresholds> tyreWearThresholdsSlicksMedium = new List<CornerData.EnumWithThresholds>();
+            tyreWearThresholdsSlicksMedium.Add(new CornerData.EnumWithThresholds(TyreCondition.NEW, -10000f, 0.000f));
+            tyreWearThresholdsSlicksMedium.Add(new CornerData.EnumWithThresholds(TyreCondition.SCRUBBED, 0.000f, 3.685061f));
+            tyreWearThresholdsSlicksMedium.Add(new CornerData.EnumWithThresholds(TyreCondition.MINOR_WEAR, 3.685061f, 7.407379f));
+            tyreWearThresholdsSlicksMedium.Add(new CornerData.EnumWithThresholds(TyreCondition.MAJOR_WEAR, 7.407379f, 30.55553f));
+            tyreWearThresholdsSlicksMedium.Add(new CornerData.EnumWithThresholds(TyreCondition.WORN_OUT, 30.55553f, 1000f));
+
+            List<CornerData.EnumWithThresholds> tyreTempsThresholdsSlicksMedium = new List<CornerData.EnumWithThresholds>();
+            tyreTempsThresholdsSlicksMedium.Add(new CornerData.EnumWithThresholds(TyreTemp.COLD, -10000f, 60f));
+            tyreTempsThresholdsSlicksMedium.Add(new CornerData.EnumWithThresholds(TyreTemp.WARM, 60f, 100f));
+            tyreTempsThresholdsSlicksMedium.Add(new CornerData.EnumWithThresholds(TyreTemp.HOT, 100f, 110f));
+            tyreTempsThresholdsSlicksMedium.Add(new CornerData.EnumWithThresholds(TyreTemp.COOKING, 110f, 10000f));
+            acTyres.Add("Slicks Medium (M)", new AcTyres(tyreWearThresholdsSlicksMedium, tyreTempsThresholdsSlicksMedium, 88f));
+
+            
+            List<CornerData.EnumWithThresholds> tyreWearThresholdsSlicksHard = new List<CornerData.EnumWithThresholds>();
+            tyreWearThresholdsSlicksHard.Add(new CornerData.EnumWithThresholds(TyreCondition.NEW, -10000f, 0.000f));
+            tyreWearThresholdsSlicksHard.Add(new CornerData.EnumWithThresholds(TyreCondition.SCRUBBED, 0.000f, 14.96601f));
+            tyreWearThresholdsSlicksHard.Add(new CornerData.EnumWithThresholds(TyreCondition.MINOR_WEAR, 14.96601f, 22.68041f));
+            tyreWearThresholdsSlicksHard.Add(new CornerData.EnumWithThresholds(TyreCondition.MAJOR_WEAR, 22.68041f, 30.55553f));
+            tyreWearThresholdsSlicksHard.Add(new CornerData.EnumWithThresholds(TyreCondition.WORN_OUT, 30.55553f, 1000f));
+
+            List<CornerData.EnumWithThresholds> tyreTempsThresholdsSlicksHard = new List<CornerData.EnumWithThresholds>();
+            tyreTempsThresholdsSlicksHard.Add(new CornerData.EnumWithThresholds(TyreTemp.COLD, -10000f, 70f));
+            tyreTempsThresholdsSlicksHard.Add(new CornerData.EnumWithThresholds(TyreTemp.WARM, 70f, 120f));
+            tyreTempsThresholdsSlicksHard.Add(new CornerData.EnumWithThresholds(TyreTemp.HOT, 120f, 140f));
+            tyreTempsThresholdsSlicksHard.Add(new CornerData.EnumWithThresholds(TyreTemp.COOKING, 140f, 10000f));
+            acTyres.Add("Slicks Hard (H)", new AcTyres(tyreWearThresholdsSlicksHard, tyreTempsThresholdsSlicksHard, 88f));
+
+
+            List<CornerData.EnumWithThresholds> tyreWearThresholdsSlicksSoft = new List<CornerData.EnumWithThresholds>();
+            tyreWearThresholdsSlicksSoft.Add(new CornerData.EnumWithThresholds(TyreCondition.NEW, -10000f, 0.000f));
+            tyreWearThresholdsSlicksSoft.Add(new CornerData.EnumWithThresholds(TyreCondition.SCRUBBED, 0.000f, 14.96601f));
+            tyreWearThresholdsSlicksSoft.Add(new CornerData.EnumWithThresholds(TyreCondition.MINOR_WEAR, 14.96601f, 46.8085f));
+            tyreWearThresholdsSlicksSoft.Add(new CornerData.EnumWithThresholds(TyreCondition.MAJOR_WEAR, 46.8085f, 81.48149f));
+            tyreWearThresholdsSlicksSoft.Add(new CornerData.EnumWithThresholds(TyreCondition.WORN_OUT, 81.48149f, 1000f));
+
+
+            List<CornerData.EnumWithThresholds> tyreTempsThresholdsSlicksSoft = new List<CornerData.EnumWithThresholds>();
+            tyreTempsThresholdsSlicksSoft.Add(new CornerData.EnumWithThresholds(TyreTemp.COLD, -10000f, 50f));
+            tyreTempsThresholdsSlicksSoft.Add(new CornerData.EnumWithThresholds(TyreTemp.WARM, 50f, 90f));
+            tyreTempsThresholdsSlicksSoft.Add(new CornerData.EnumWithThresholds(TyreTemp.HOT, 90f, 105f));
+            tyreTempsThresholdsSlicksSoft.Add(new CornerData.EnumWithThresholds(TyreTemp.COOKING, 105f, 10000f));
+            acTyres.Add("Slicks Soft (S)", new AcTyres(tyreWearThresholdsSlicksSoft, tyreTempsThresholdsSlicksSoft, 88f));
+
+
+            List<CornerData.EnumWithThresholds> tyreWearThresholdsSlicks = new List<CornerData.EnumWithThresholds>();
+            tyreWearThresholdsSlicks.Add(new CornerData.EnumWithThresholds(TyreCondition.NEW, -10000f, 0.000f));
+            tyreWearThresholdsSlicks.Add(new CornerData.EnumWithThresholds(TyreCondition.SCRUBBED, 0.000f, 14.96601f));
+            tyreWearThresholdsSlicks.Add(new CornerData.EnumWithThresholds(TyreCondition.MINOR_WEAR, 14.96601f, 22.68041f));
+            tyreWearThresholdsSlicks.Add(new CornerData.EnumWithThresholds(TyreCondition.MAJOR_WEAR, 22.68041f, 30.55553f));
+            tyreWearThresholdsSlicks.Add(new CornerData.EnumWithThresholds(TyreCondition.WORN_OUT, 30.55553f, 1000f));
+
+            List<CornerData.EnumWithThresholds> tyreTempsThresholdsSlicks = new List<CornerData.EnumWithThresholds>();
+            tyreTempsThresholdsSlicks.Add(new CornerData.EnumWithThresholds(TyreTemp.COLD, -10000f, 75f));
+            tyreTempsThresholdsSlicks.Add(new CornerData.EnumWithThresholds(TyreTemp.WARM, 75f, 100f));
+            tyreTempsThresholdsSlicks.Add(new CornerData.EnumWithThresholds(TyreTemp.HOT, 100f, 140f));
+            tyreTempsThresholdsSlicks.Add(new CornerData.EnumWithThresholds(TyreTemp.COOKING, 140f, 10000f));
+            acTyres.Add("Slicks (H)", new AcTyres(tyreWearThresholdsSlicks, tyreTempsThresholdsSlicks, 88f));
+
+
+            List<CornerData.EnumWithThresholds> tyreWearThresholdsStreet90s = new List<CornerData.EnumWithThresholds>();
+            tyreWearThresholdsStreet90s.Add(new CornerData.EnumWithThresholds(TyreCondition.NEW, -10000f, 0.000f));
+            tyreWearThresholdsStreet90s.Add(new CornerData.EnumWithThresholds(TyreCondition.SCRUBBED, 0.000f, 11.16753f));
+            tyreWearThresholdsStreet90s.Add(new CornerData.EnumWithThresholds(TyreCondition.MINOR_WEAR, 11.16753f, 30.55553f));
+            tyreWearThresholdsStreet90s.Add(new CornerData.EnumWithThresholds(TyreCondition.MAJOR_WEAR, 30.55553f, 55.19714f));
+            tyreWearThresholdsStreet90s.Add(new CornerData.EnumWithThresholds(TyreCondition.WORN_OUT, 55.19714f, 1000f));
+
+            List<CornerData.EnumWithThresholds> tyreTempsThresholdsStreet90s = new List<CornerData.EnumWithThresholds>();
+            tyreTempsThresholdsStreet90s.Add(new CornerData.EnumWithThresholds(TyreTemp.COLD, -10000f, 75f));
+            tyreTempsThresholdsStreet90s.Add(new CornerData.EnumWithThresholds(TyreTemp.WARM, 75f, 80f));
+            tyreTempsThresholdsStreet90s.Add(new CornerData.EnumWithThresholds(TyreTemp.HOT, 80f, 95f));
+            tyreTempsThresholdsStreet90s.Add(new CornerData.EnumWithThresholds(TyreTemp.COOKING, 95f, 10000f));
+            acTyres.Add("Street 90s (SV)", new AcTyres(tyreWearThresholdsStreet90s, tyreTempsThresholdsStreet90s, 88f));
+
+
+            List<CornerData.EnumWithThresholds> tyreWearThresholdsStreet90SSV = new List<CornerData.EnumWithThresholds>();
+            tyreWearThresholdsStreet90SSV.Add(new CornerData.EnumWithThresholds(TyreCondition.NEW, -10000f, 0.000f));
+            tyreWearThresholdsStreet90SSV.Add(new CornerData.EnumWithThresholds(TyreCondition.SCRUBBED, 0.000f, 7.407379f));
+            tyreWearThresholdsStreet90SSV.Add(new CornerData.EnumWithThresholds(TyreCondition.MINOR_WEAR, 7.407379f, 30.55553f));
+            tyreWearThresholdsStreet90SSV.Add(new CornerData.EnumWithThresholds(TyreCondition.MAJOR_WEAR, 30.55553f, 55.19714f));
+            tyreWearThresholdsStreet90SSV.Add(new CornerData.EnumWithThresholds(TyreCondition.WORN_OUT, 55.19714f, 1000f));
+
+            List<CornerData.EnumWithThresholds> tyreTempsThresholdsStreet90SSV = new List<CornerData.EnumWithThresholds>();
+            tyreTempsThresholdsStreet90SSV.Add(new CornerData.EnumWithThresholds(TyreTemp.COLD, -10000f, 75f));
+            tyreTempsThresholdsStreet90SSV.Add(new CornerData.EnumWithThresholds(TyreTemp.WARM, 75f, 80f));
+            tyreTempsThresholdsStreet90SSV.Add(new CornerData.EnumWithThresholds(TyreTemp.HOT, 80f, 95f));
+            tyreTempsThresholdsStreet90SSV.Add(new CornerData.EnumWithThresholds(TyreTemp.COOKING, 95f, 10000f));
+            acTyres.Add("Street90S (SV)", new AcTyres(tyreWearThresholdsStreet90SSV, tyreTempsThresholdsStreet90SSV, 88f));
+
+
+            List<CornerData.EnumWithThresholds> tyreWearThresholdsStreetvintage = new List<CornerData.EnumWithThresholds>();
+            tyreWearThresholdsStreetvintage.Add(new CornerData.EnumWithThresholds(TyreCondition.NEW, -10000f, 0.000f));
+            tyreWearThresholdsStreetvintage.Add(new CornerData.EnumWithThresholds(TyreCondition.SCRUBBED, 0.000f, 11.16753f));
+            tyreWearThresholdsStreetvintage.Add(new CornerData.EnumWithThresholds(TyreCondition.MINOR_WEAR, 11.16753f, 30.55553f));
+            tyreWearThresholdsStreetvintage.Add(new CornerData.EnumWithThresholds(TyreCondition.MAJOR_WEAR, 30.55553f, 55.19714f));
+            tyreWearThresholdsStreetvintage.Add(new CornerData.EnumWithThresholds(TyreCondition.WORN_OUT, 55.19714f, 1000f));
+
+            List<CornerData.EnumWithThresholds> tyreTempsThresholdsStreetvintage = new List<CornerData.EnumWithThresholds>();
+            tyreTempsThresholdsStreetvintage.Add(new CornerData.EnumWithThresholds(TyreTemp.COLD, -10000f, 75f));
+            tyreTempsThresholdsStreetvintage.Add(new CornerData.EnumWithThresholds(TyreTemp.WARM, 75f, 80f));
+            tyreTempsThresholdsStreetvintage.Add(new CornerData.EnumWithThresholds(TyreTemp.HOT, 80f, 95f));
+            tyreTempsThresholdsStreetvintage.Add(new CornerData.EnumWithThresholds(TyreTemp.COOKING, 95f, 10000f));
+            acTyres.Add("Street vintage (SV)", new AcTyres(tyreWearThresholdsStreetvintage, tyreTempsThresholdsStreetvintage, 88f));
+
+
+            List<CornerData.EnumWithThresholds> tyreWearThresholdsStreet = new List<CornerData.EnumWithThresholds>();
+            tyreWearThresholdsStreet.Add(new CornerData.EnumWithThresholds(TyreCondition.NEW, -10000f, 0.000f));
+            tyreWearThresholdsStreet.Add(new CornerData.EnumWithThresholds(TyreCondition.SCRUBBED, 0.000f, 2.01004f));
+            tyreWearThresholdsStreet.Add(new CornerData.EnumWithThresholds(TyreCondition.MINOR_WEAR, 2.01004f, 6.091385f));
+            tyreWearThresholdsStreet.Add(new CornerData.EnumWithThresholds(TyreCondition.MAJOR_WEAR, 6.091385f, 21.05263f));
+            tyreWearThresholdsStreet.Add(new CornerData.EnumWithThresholds(TyreCondition.WORN_OUT, 21.05263f, 1000f));
+
+            List<CornerData.EnumWithThresholds> tyreTempsThresholdsStreet = new List<CornerData.EnumWithThresholds>();
+            tyreTempsThresholdsStreet.Add(new CornerData.EnumWithThresholds(TyreTemp.COLD, -10000f, 75f));
+            tyreTempsThresholdsStreet.Add(new CornerData.EnumWithThresholds(TyreTemp.WARM, 75f, 85f));
+            tyreTempsThresholdsStreet.Add(new CornerData.EnumWithThresholds(TyreTemp.HOT, 85f, 110f));
+            tyreTempsThresholdsStreet.Add(new CornerData.EnumWithThresholds(TyreTemp.COOKING, 110f, 10000f));
+            acTyres.Add("Street (ST)", new AcTyres(tyreWearThresholdsStreet, tyreTempsThresholdsStreet, 80f));
+
+
+            List<CornerData.EnumWithThresholds> tyreWearThresholdsVintage60s = new List<CornerData.EnumWithThresholds>();
+            tyreWearThresholdsVintage60s.Add(new CornerData.EnumWithThresholds(TyreCondition.NEW, -10000f, 0.000f));
+            tyreWearThresholdsVintage60s.Add(new CornerData.EnumWithThresholds(TyreCondition.SCRUBBED, 0.000f, 9.090881f));
+            tyreWearThresholdsVintage60s.Add(new CornerData.EnumWithThresholds(TyreCondition.MINOR_WEAR, 9.090881f, 18.36731f));
+            tyreWearThresholdsVintage60s.Add(new CornerData.EnumWithThresholds(TyreCondition.MAJOR_WEAR, 18.36731f, 18.46731f));
+            tyreWearThresholdsVintage60s.Add(new CornerData.EnumWithThresholds(TyreCondition.WORN_OUT, 18.46731f, 1000f));
+
+            List<CornerData.EnumWithThresholds> tyreTempsThresholdsVintage60s = new List<CornerData.EnumWithThresholds>();
+            tyreTempsThresholdsVintage60s.Add(new CornerData.EnumWithThresholds(TyreTemp.COLD, -10000f, 40f));
+            tyreTempsThresholdsVintage60s.Add(new CornerData.EnumWithThresholds(TyreTemp.WARM, 40f, 80f));
+            tyreTempsThresholdsVintage60s.Add(new CornerData.EnumWithThresholds(TyreTemp.HOT, 80f, 110f));
+            tyreTempsThresholdsVintage60s.Add(new CornerData.EnumWithThresholds(TyreTemp.COOKING, 110f, 10000f));
+            acTyres.Add("Vintage 60s (V)", new AcTyres(tyreWearThresholdsVintage60s, tyreTempsThresholdsVintage60s, 90f));
+
+            
+            List<CornerData.EnumWithThresholds> tyreWearThresholdsVintage = new List<CornerData.EnumWithThresholds>();
+            tyreWearThresholdsVintage.Add(new CornerData.EnumWithThresholds(TyreCondition.NEW, -10000f, 0.000f));
+            tyreWearThresholdsVintage.Add(new CornerData.EnumWithThresholds(TyreCondition.SCRUBBED, 0.000f, 19.19189f));
+            tyreWearThresholdsVintage.Add(new CornerData.EnumWithThresholds(TyreCondition.MINOR_WEAR, 19.19189f, 38.77548f));
+            tyreWearThresholdsVintage.Add(new CornerData.EnumWithThresholds(TyreCondition.MAJOR_WEAR, 38.77548f, 39.77548f));
+            tyreWearThresholdsVintage.Add(new CornerData.EnumWithThresholds(TyreCondition.WORN_OUT, 38.77548f, 1000f));
+
+            List<CornerData.EnumWithThresholds> tyreTempsThresholdsVintage = new List<CornerData.EnumWithThresholds>();
+            tyreTempsThresholdsVintage.Add(new CornerData.EnumWithThresholds(TyreTemp.COLD, -10000f, 40f));
+            tyreTempsThresholdsVintage.Add(new CornerData.EnumWithThresholds(TyreTemp.WARM, 40f, 80f));
+            tyreTempsThresholdsVintage.Add(new CornerData.EnumWithThresholds(TyreTemp.HOT, 80f, 110f));
+            tyreTempsThresholdsVintage.Add(new CornerData.EnumWithThresholds(TyreTemp.COOKING, 110f, 10000f));
+            acTyres.Add("Vintage (V)", new AcTyres(tyreWearThresholdsVintage, tyreTempsThresholdsVintage, 95f));
+      
         }
 
         public void versionCheck(Object memoryMappedFileStruct)
@@ -321,7 +873,7 @@ namespace CrewChiefV4.assetto
                 currentGameState.SessionData.CurrentLapIsValid = previousGameState.SessionData.CurrentLapIsValid;
             }
 
-
+            
             if (currentGameState.carClass.carClassEnum == CarData.CarClassEnum.UNKNOWN_RACE)
             {
                 CarData.CarClass newClass = CarData.getDefaultCarClass();
@@ -467,11 +1019,19 @@ namespace CrewChiefV4.assetto
                 currentGameState.carClass = CarData.getDefaultCarClass();
 
                 Console.WriteLine("Player is using car class " + currentGameState.carClass.carClassEnum);
-                Console.WriteLine("Player is using Tyre Type " + shared.acsGraphic.tyreCompound);
 
+
+                if (acTyres.Count > 0 && !acTyres.ContainsKey(shared.acsGraphic.tyreCompound))
+                {
+                    Console.WriteLine("Tyre information is disabled. Player is using unknown Tyre Type " + shared.acsGraphic.tyreCompound);                    
+                }
+                else
+                {
+                    Console.WriteLine("Player is using Tyre Type " + shared.acsGraphic.tyreCompound);
+                }
                 brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(currentGameState.carClass);
                 // no tyre data in the block so get the default tyre types for this car
-                //defaultTyreTypeForPlayersCar = CarData.getDefaultTyreType(currentGameState.carClass);
+                defaultTyreTypeForPlayersCar = CarData.getDefaultTyreType(currentGameState.carClass);
 
                 for (int i = 0; i < shared.acsChief.numVehicles; i++)
                 {
@@ -938,7 +1498,6 @@ namespace CrewChiefV4.assetto
                                     opponentsSplits[participantName].setSplitPoints(shared.acsStatic.trackSPlineLength);
                                     opponentsSplits[participantName].setNextSplitPoint(0, 100);
                                 }
-                                //setOpponentGapPoints(participantName, currentGameState.SessionData.TrackDefinition.trackLength);
                             }
                         }
                     }
@@ -1075,83 +1634,91 @@ namespace CrewChiefV4.assetto
             //tyre data
             currentGameState.TyreData.HasMatchedTyreTypes = true;
             currentGameState.TyreData.TireWearActive = shared.acsStatic.aidTireRate > 0;
-
-            //Front Left
-            currentGameState.TyreData.FrontLeft_CenterTemp = shared.acsPhysics.tyreCoreTemperature[0];
-            currentGameState.TyreData.FrontLeft_LeftTemp = shared.acsPhysics.tyreCoreTemperature[0];
-            currentGameState.TyreData.FrontLeft_RightTemp = shared.acsPhysics.tyreCoreTemperature[0];
-            currentGameState.TyreData.FrontLeftPressure = -1; 
-            currentGameState.TyreData.FrontLeftTyreType = defaultTyreTypeForPlayersCar;
-            currentGameState.TyreData.FrontLeftPercentWear = getTyreWearPercentage(shared.acsPhysics.tyreWear[0]);
-            if (currentGameState.SessionData.IsNewLap)
-            {
-                currentGameState.TyreData.PeakFrontLeftTemperatureForLap = currentGameState.TyreData.FrontLeft_CenterTemp;
-            }
-            else if (previousGameState == null || currentGameState.TyreData.FrontLeft_CenterTemp > previousGameState.TyreData.PeakFrontLeftTemperatureForLap)
-            {
-                currentGameState.TyreData.PeakFrontLeftTemperatureForLap = currentGameState.TyreData.FrontLeft_CenterTemp;
-            }
-            //Front Right
-            currentGameState.TyreData.FrontRight_CenterTemp = shared.acsPhysics.tyreCoreTemperature[1];
-            currentGameState.TyreData.FrontRight_LeftTemp = shared.acsPhysics.tyreCoreTemperature[1];
-            currentGameState.TyreData.FrontRight_RightTemp = shared.acsPhysics.tyreCoreTemperature[1];
-            currentGameState.TyreData.FrontRightPressure = -1; 
-            currentGameState.TyreData.FrontRightTyreType = defaultTyreTypeForPlayersCar;
-            currentGameState.TyreData.FrontRightPercentWear = getTyreWearPercentage(shared.acsPhysics.tyreWear[1]);
-            if (currentGameState.SessionData.IsNewLap)
-            {
-                currentGameState.TyreData.PeakFrontRightTemperatureForLap = currentGameState.TyreData.FrontRight_CenterTemp;
-            }
-            else if (previousGameState == null || currentGameState.TyreData.FrontRight_CenterTemp > previousGameState.TyreData.PeakFrontRightTemperatureForLap)
-            {
-                currentGameState.TyreData.PeakFrontRightTemperatureForLap = currentGameState.TyreData.FrontRight_CenterTemp;
-            }
-
-            //Rear Left
-            currentGameState.TyreData.RearLeft_CenterTemp = shared.acsPhysics.tyreCoreTemperature[2];
-            currentGameState.TyreData.RearLeft_LeftTemp = shared.acsPhysics.tyreCoreTemperature[2];
-            currentGameState.TyreData.RearLeft_RightTemp = shared.acsPhysics.tyreCoreTemperature[2];
-            currentGameState.TyreData.RearLeftPressure = -1; 
-            currentGameState.TyreData.RearLeftTyreType = defaultTyreTypeForPlayersCar;
-            currentGameState.TyreData.RearLeftPercentWear = getTyreWearPercentage(shared.acsPhysics.tyreWear[2]);
-            if (currentGameState.SessionData.IsNewLap)
-            {
-                currentGameState.TyreData.PeakRearLeftTemperatureForLap = currentGameState.TyreData.RearLeft_CenterTemp;
-            }
-            else if (previousGameState == null || currentGameState.TyreData.RearLeft_CenterTemp > previousGameState.TyreData.PeakRearLeftTemperatureForLap)
-            {
-                currentGameState.TyreData.PeakRearLeftTemperatureForLap = currentGameState.TyreData.RearLeft_CenterTemp;
-            }
-            //Rear Right
-            currentGameState.TyreData.RearRight_CenterTemp = shared.acsPhysics.tyreCoreTemperature[3];
-            currentGameState.TyreData.RearRight_LeftTemp = shared.acsPhysics.tyreCoreTemperature[3];
-            currentGameState.TyreData.RearRight_RightTemp = shared.acsPhysics.tyreCoreTemperature[3];
-            currentGameState.TyreData.RearRightTyreType = defaultTyreTypeForPlayersCar;
-            currentGameState.TyreData.RearRightPressure = -1; 
-            currentGameState.TyreData.RearRightPercentWear = getTyreWearPercentage(shared.acsPhysics.tyreWear[3]);
-            if (currentGameState.SessionData.IsNewLap)
-            {
-                currentGameState.TyreData.PeakRearRightTemperatureForLap = currentGameState.TyreData.RearRight_CenterTemp;
-            }
-            else if (previousGameState == null || currentGameState.TyreData.RearRight_CenterTemp > previousGameState.TyreData.PeakRearRightTemperatureForLap)
-            {
-                currentGameState.TyreData.PeakRearRightTemperatureForLap = currentGameState.TyreData.RearRight_CenterTemp;
-            }
-
+            
             String currentTyreCompound = shared.acsGraphic.tyreCompound;
-
-            if (currentTyreCompound != null && currentTyreCompound.Length > 0)
+            Boolean currentTyreValid = currentTyreCompound != null && currentTyreCompound.Length > 0 &&
+                acTyres.Count > 0 && acTyres.ContainsKey(currentTyreCompound);
+            if (currentTyreValid)
             {
-                if (tyreWearThresholdsForAC.Count == 0 || !tyreWearThresholdsForAC.ContainsKey(currentTyreCompound))
-                {
-                    currentTyreCompound = "Slick Medium (M)";
-                }
-                currentGameState.TyreData.TyreConditionStatus = CornerData.getCornerData(tyreWearThresholdsForAC[currentTyreCompound], currentGameState.TyreData.FrontLeftPercentWear,
-                    currentGameState.TyreData.FrontRightPercentWear, currentGameState.TyreData.RearLeftPercentWear, currentGameState.TyreData.RearRightPercentWear);
 
-                currentGameState.TyreData.TyreTempStatus = CornerData.getCornerData(tyreTempThresholdsForAC[currentTyreCompound],
+                float currentTyreWearMinimumValue = acTyres[currentTyreCompound].tyreWearMinimumValue;
+                //Front Left
+                currentGameState.TyreData.FrontLeft_CenterTemp = shared.acsPhysics.tyreCoreTemperature[0];
+                currentGameState.TyreData.FrontLeft_LeftTemp = shared.acsPhysics.tyreCoreTemperature[0];
+                currentGameState.TyreData.FrontLeft_RightTemp = shared.acsPhysics.tyreCoreTemperature[0];
+                currentGameState.TyreData.FrontLeftPressure = shared.acsPhysics.wheelsPressure[0];
+                currentGameState.TyreData.FrontLeftTyreType = defaultTyreTypeForPlayersCar;
+                currentGameState.TyreData.FrontLeftPercentWear = getTyreWearPercentage(shared.acsPhysics.tyreWear[0], currentTyreWearMinimumValue);
+                if (currentGameState.SessionData.IsNewLap)
+                {
+                    currentGameState.TyreData.PeakFrontLeftTemperatureForLap = currentGameState.TyreData.FrontLeft_CenterTemp;
+                }
+                else if (previousGameState == null || currentGameState.TyreData.FrontLeft_CenterTemp > previousGameState.TyreData.PeakFrontLeftTemperatureForLap)
+                {
+                    currentGameState.TyreData.PeakFrontLeftTemperatureForLap = currentGameState.TyreData.FrontLeft_CenterTemp;
+                }
+                //Front Right
+                currentGameState.TyreData.FrontRight_CenterTemp = shared.acsPhysics.tyreCoreTemperature[1];
+                currentGameState.TyreData.FrontRight_LeftTemp = shared.acsPhysics.tyreCoreTemperature[1];
+                currentGameState.TyreData.FrontRight_RightTemp = shared.acsPhysics.tyreCoreTemperature[1];
+                currentGameState.TyreData.FrontRightPressure = shared.acsPhysics.wheelsPressure[1];
+                currentGameState.TyreData.FrontRightTyreType = defaultTyreTypeForPlayersCar;
+                currentGameState.TyreData.FrontRightPercentWear = getTyreWearPercentage(shared.acsPhysics.tyreWear[0], currentTyreWearMinimumValue);
+                if (currentGameState.SessionData.IsNewLap)
+                {
+                    currentGameState.TyreData.PeakFrontRightTemperatureForLap = currentGameState.TyreData.FrontRight_CenterTemp;
+                }
+                else if (previousGameState == null || currentGameState.TyreData.FrontRight_CenterTemp > previousGameState.TyreData.PeakFrontRightTemperatureForLap)
+                {
+                    currentGameState.TyreData.PeakFrontRightTemperatureForLap = currentGameState.TyreData.FrontRight_CenterTemp;
+                }
+
+                //Rear Left
+                currentGameState.TyreData.RearLeft_CenterTemp = shared.acsPhysics.tyreCoreTemperature[2];
+                currentGameState.TyreData.RearLeft_LeftTemp = shared.acsPhysics.tyreCoreTemperature[2];
+                currentGameState.TyreData.RearLeft_RightTemp = shared.acsPhysics.tyreCoreTemperature[2];
+                currentGameState.TyreData.RearLeftPressure = shared.acsPhysics.wheelsPressure[2];
+                currentGameState.TyreData.RearLeftTyreType = defaultTyreTypeForPlayersCar;
+                currentGameState.TyreData.RearLeftPercentWear = getTyreWearPercentage(shared.acsPhysics.tyreWear[0], currentTyreWearMinimumValue);
+                if (currentGameState.SessionData.IsNewLap)
+                {
+                    currentGameState.TyreData.PeakRearLeftTemperatureForLap = currentGameState.TyreData.RearLeft_CenterTemp;
+                }
+                else if (previousGameState == null || currentGameState.TyreData.RearLeft_CenterTemp > previousGameState.TyreData.PeakRearLeftTemperatureForLap)
+                {
+                    currentGameState.TyreData.PeakRearLeftTemperatureForLap = currentGameState.TyreData.RearLeft_CenterTemp;
+                }
+                //Rear Right
+                currentGameState.TyreData.RearRight_CenterTemp = shared.acsPhysics.tyreCoreTemperature[3];
+                currentGameState.TyreData.RearRight_LeftTemp = shared.acsPhysics.tyreCoreTemperature[3];
+                currentGameState.TyreData.RearRight_RightTemp = shared.acsPhysics.tyreCoreTemperature[3];
+                currentGameState.TyreData.RearRightTyreType = defaultTyreTypeForPlayersCar;
+                currentGameState.TyreData.RearRightPressure = shared.acsPhysics.wheelsPressure[3];
+                currentGameState.TyreData.RearRightPercentWear = getTyreWearPercentage(shared.acsPhysics.tyreWear[0], currentTyreWearMinimumValue);
+                if (currentGameState.SessionData.IsNewLap)
+                {
+                    currentGameState.TyreData.PeakRearRightTemperatureForLap = currentGameState.TyreData.RearRight_CenterTemp;
+                }
+                else if (previousGameState == null || currentGameState.TyreData.RearRight_CenterTemp > previousGameState.TyreData.PeakRearRightTemperatureForLap)
+                {
+                    currentGameState.TyreData.PeakRearRightTemperatureForLap = currentGameState.TyreData.RearRight_CenterTemp;
+                }
+
+                if (!currentGameState.PitData.OnOutLap)
+                {
+                    currentGameState.TyreData.TyreConditionStatus = CornerData.getCornerData(acTyres[currentTyreCompound].tyreWearThresholdsForAC, 
+                        currentGameState.TyreData.FrontLeftPercentWear, currentGameState.TyreData.FrontRightPercentWear, 
+                        currentGameState.TyreData.RearLeftPercentWear, currentGameState.TyreData.RearRightPercentWear);
+                }
+                else
+                {
+                    currentGameState.TyreData.TyreConditionStatus = CornerData.getCornerData(acTyres[currentTyreCompound].tyreWearThresholdsForAC, -1f, -1f, -1f, -1f);
+                }
+
+                currentGameState.TyreData.TyreTempStatus = CornerData.getCornerData(acTyres[currentTyreCompound].tyreTempThresholdsForAC,
                     currentGameState.TyreData.PeakFrontLeftTemperatureForLap, currentGameState.TyreData.PeakFrontRightTemperatureForLap,
-                       currentGameState.TyreData.PeakRearLeftTemperatureForLap, currentGameState.TyreData.PeakRearRightTemperatureForLap);
+                        currentGameState.TyreData.PeakRearLeftTemperatureForLap, currentGameState.TyreData.PeakRearRightTemperatureForLap);
+                
             }
 
             //penalty data
@@ -1275,11 +1842,11 @@ namespace CrewChiefV4.assetto
             opponentData.Position = racePosition;
             opponentData.UnFilteredPosition = racePosition;
             opponentData.WorldPosition = currentWorldPosition;
+            opponentData.CarClass = CarData.getDefaultCarClass();
             opponentData.IsNewLap = false;
 
             if (opponentData.CurrentSectorNumber != sector)
             {
-                opponentData.CarClass = CarData.getDefaultCarClass();
                 if (opponentData.CurrentSectorNumber == trackNumberOfSectors && sector == 1)
                 {
                     if (opponentData.OpponentLapData.Count > 0)
@@ -1380,20 +1947,19 @@ namespace CrewChiefV4.assetto
             }
             return FlagEnum.UNKNOWN;
         }
-        //AC provides tyrewear data in the range from 100-88, start value is 99.5, from where it starts by going up to 100, and then it
-        //drop to 88 over time/wear. Qual hint maby :)
+
         private float mapToPercentage(float level, float minimumIn, float maximumIn, float minimumOut, float maximumOut)
         {
             return (level - minimumIn) * (maximumOut - minimumOut) / (maximumIn - minimumIn) + minimumOut;
         }
 
-        private float getTyreWearPercentage(float wearLevel)
+        private float getTyreWearPercentage(float wearLevel, float minimumLevel)
         {
             if (wearLevel == -1)
             {
                 return -1;
             }
-            return Math.Min(100, mapToPercentage((wornOutTyreWearLevel / wearLevel) * 100, wornOutTyreWearLevel, 100, 0, 100));
+            return Math.Min(100, mapToPercentage((minimumLevel / wearLevel) * 100, minimumLevel, 100, 0, 100));
         }
 
         public SessionType mapToSessionType(Object memoryMappedFileStruct)
@@ -1476,7 +2042,7 @@ namespace CrewChiefV4.assetto
             }
             if (trackDef.sectorsOnTrack == 2 && loggedSectorStart[0] != -1)
             {
-                Console.WriteLine("new TrackDefinition(" + trackDef.name + ", " + trackDef.trackLength + ", " + trackDef.sectorsOnTrack + ", new float[] {" + loggedSectorStart[0] + "f, " + 0 + "f})");
+                Console.WriteLine("new TrackDefinition(\"" + trackDef.name + "\", " + trackDef.trackLength + ", " + trackDef.sectorsOnTrack + ", new float[] {" + loggedSectorStart[0] + "f, " + 0 + "f})");
             }
             else if (trackDef.sectorsOnTrack == 3 && loggedSectorStart[0] != -1 && loggedSectorStart[1] != -1)
             {
