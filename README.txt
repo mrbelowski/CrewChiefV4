@@ -2,6 +2,8 @@ CrewChief version 4.
 
 Changelog
 ---------
+Version 4.4.1.3: Added more tyres for Assetto Corsa; some Italian translation support fixes.
+
 Version 4.4.1.2: "How are my tyre temps" and "How are my brake temps" now give the status (hold / good / cold) rather than the actual temps.
 
 Version 4.4.1.1: Fixed AC spotter being disabled at the start of each lap; Fixed crash when selecting AC as the game type if the previous game type was AMS; Started wiring up AC tyre wear / temp data (just GT3 class so far).
