@@ -34,6 +34,9 @@ namespace CrewChiefV4.Events
         private String folderBadStart = "position/bad_start";
         private String folderTerribleStart = "position/terrible_start";
 
+        // optional intro for driver position message (not used in English)
+        public static String folderDriverPositionIntro = "position/driver_position_intro";
+
         private int currentPosition;
 
         private int previousPosition;
@@ -390,13 +393,29 @@ namespace CrewChiefV4.Events
                             }
                             else if (currentGameState.SessionData.SessionType == SessionType.Practice)
                             {
-                                audioPlayer.playMessage(new QueuedMessage(folderStub + 1, 0, this, validationData), pearlType, pearlLikelihood);
+                                if (SoundCache.availableSounds.Contains(folderDriverPositionIntro))
+                                {
+                                    audioPlayer.playMessage(new QueuedMessage("position", MessageContents(folderDriverPositionIntro, folderStub + 1), 0,
+                                        this, validationData), pearlType, pearlLikelihood);
+                                }
+                                else
+                                {
+                                    audioPlayer.playMessage(new QueuedMessage(folderStub + 1, 0, this, validationData), pearlType, pearlLikelihood);
+                                }
                             }
                             // no p1 for pole - this is in the laptime tracker (yuk)
                         }
                         else if (!isLast)
                         {
-                            audioPlayer.playMessage(new QueuedMessage(folderStub + currentGameState.SessionData.Position, 0, this), pearlType, pearlLikelihood);
+                            if (SoundCache.availableSounds.Contains(folderDriverPositionIntro))
+                            {
+                                audioPlayer.playMessage(new QueuedMessage("position", MessageContents(folderDriverPositionIntro, folderStub + currentGameState.SessionData.Position),
+                                    0, this), pearlType, pearlLikelihood);
+                            }
+                            else
+                            {
+                                audioPlayer.playMessage(new QueuedMessage(folderStub + currentGameState.SessionData.Position, 0, this), pearlType, pearlLikelihood);
+                            }
                         }
                         else if (isLast)
                         {
@@ -424,26 +443,26 @@ namespace CrewChiefV4.Events
             {
                 if (isLast)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderLast, 0, this));
-                    
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderLast, 0, this));                    
                 }
                 else if (currentPosition == 1)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderLeading, 0, this));
-                    
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderLeading, 0, this));                    
                 }
-                else if (currentPosition > 0) {
-                    if (currentPosition < 25) {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(folderStub + currentPosition, 0, this));
-                        
-                    } else {
-                        audioPlayer.playMessageImmediately(new QueuedMessage("position", MessageContents(currentPosition), 0, this));
-                        
+                else if (currentPosition > 0)
+                {
+                    if (SoundCache.availableSounds.Contains(folderDriverPositionIntro))
+                    {
+                        audioPlayer.playMessageImmediately(new QueuedMessage("position", MessageContents(folderDriverPositionIntro, folderStub + currentPosition), 0, this));
                     }
+                    else
+                    {
+                        audioPlayer.playMessageImmediately(new QueuedMessage(folderStub + currentPosition, 0, this));
+                    }    
                 }
-                else {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
-                    
+                else 
+                {
+                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));                    
                 }
             }
         }

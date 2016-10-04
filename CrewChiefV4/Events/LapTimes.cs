@@ -366,7 +366,14 @@ namespace CrewChiefV4.Events
                                         }
                                         else if (currentGameState.SessionData.SessionType == SessionType.Practice)
                                         {
-                                            audioPlayer.playMessage(new QueuedMessage(Position.folderStub + 1, 0, this));
+                                            if (SoundCache.availableSounds.Contains(Position.folderDriverPositionIntro))
+                                            {
+                                                audioPlayer.playMessage(new QueuedMessage("position", MessageContents(Position.folderDriverPositionIntro, Position.folderStub + 1), 0, this));
+                                            }
+                                            else
+                                            {
+                                                audioPlayer.playMessage(new QueuedMessage(Position.folderStub + 1, 0, this));
+                                            }
                                         }
                                     }
                                     if (deltaPlayerLastToSessionBestInClass < lastGapToSecondWhenLeadingPracOrQual)
@@ -938,7 +945,14 @@ namespace CrewChiefV4.Events
                             if (currentPosition > 1)
                             {
                                 // should always trigger
-                                audioPlayer.playMessageImmediately(new QueuedMessage(Position.folderStub + currentPosition, 0, null));
+                                if (SoundCache.availableSounds.Contains(Position.folderDriverPositionIntro))
+                                {
+                                    audioPlayer.playMessageImmediately(new QueuedMessage("position", MessageContents(Position.folderDriverPositionIntro, Position.folderStub + currentPosition), 0, null));
+                                }
+                                else
+                                {
+                                    audioPlayer.playMessageImmediately(new QueuedMessage(Position.folderStub + currentPosition, 0, null));
+                                }
                             }
                             audioPlayer.playMessageImmediately(new QueuedMessage(folderLessThanATenthOffThePace, 0, null));
                         }
@@ -947,7 +961,14 @@ namespace CrewChiefV4.Events
                             if (currentPosition > 1)
                             {
                                 // should always trigger
-                                audioPlayer.playMessageImmediately(new QueuedMessage(Position.folderStub + currentPosition, 0, null));
+                                if (SoundCache.availableSounds.Contains(Position.folderDriverPositionIntro))
+                                {
+                                    audioPlayer.playMessageImmediately(new QueuedMessage("position", MessageContents(Position.folderDriverPositionIntro, Position.folderStub + currentPosition), 0, null));
+                                }
+                                else
+                                {
+                                    audioPlayer.playMessageImmediately(new QueuedMessage(Position.folderStub + currentPosition, 0, null));
+                                }
                             }
                             audioPlayer.playMessageImmediately(new QueuedMessage("lapTimeNotRaceGap",
                                 MessageContents(deltaPlayerLastToSessionBestInClass, folderGapOutroOffPace), 0, null));
