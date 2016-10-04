@@ -2,7 +2,7 @@ CrewChief version 4.
 
 Changelog
 ---------
-Version 4.4.1.3: Added more tyres for Assetto Corsa; some Italian translation support fixes.
+Version 4.4.1.3: Added more tyres for Assetto Corsa; fixed missing 'standby' response delay; reduced pre-lights message queue length; some Italian translation support fixes.
 
 Version 4.4.1.2: "How are my tyre temps" and "How are my brake temps" now give the status (hold / good / cold) rather than the actual temps.
 
