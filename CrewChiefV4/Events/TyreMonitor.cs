@@ -508,7 +508,7 @@ namespace CrewChiefV4.Events
                 if (delayResponses && random.Next(10) >= 2)
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderStandBy, 0, null));
-                    int secondsDelay = Math.Min(6, random.Next(11));
+                    int secondsDelay = Math.Max(5, random.Next(11));
                     audioPlayer.pauseQueue(secondsDelay);
                     audioPlayer.playMessage(new QueuedMessage("tyre_condition", messageContents, secondsDelay, null));
                 }

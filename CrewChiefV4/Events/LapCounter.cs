@@ -155,7 +155,7 @@ namespace CrewChiefV4.Events
             if (!playedPreLightsMessage && currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.SessionPhase == SessionPhase.Gridwalk && 
                 (playPreLightsInRaceroom || CrewChief.gameDefinition.gameEnum != GameEnum.RACE_ROOM))
             {
-                playPreLightsMessage(currentGameState, 3);
+                playPreLightsMessage(currentGameState, 2);
                 playedPreLightsMessage = true;
                 purgePreLightsMessages = true;
             }
