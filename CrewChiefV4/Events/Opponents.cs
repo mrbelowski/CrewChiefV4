@@ -33,6 +33,9 @@ namespace CrewChiefV4.Events
 
         public static String folderWeAre = "opponents/we_are";
 
+        // optional intro for opponent position (not used in English)
+        public static String folderOpponentPositionIntro = "position/opponent_position_intro";
+
         private int frequencyOfOpponentRaceLapTimes = UserSettings.GetUserSettings().getInt("frequency_of_opponent_race_lap_times");
         private int frequencyOfOpponentPracticeAndQualLapTimes = UserSettings.GetUserSettings().getInt("frequency_of_opponent_practice_and_qual_lap_times");
         private float minImprovementBeforeReadingOpponentRaceTime;
@@ -383,7 +386,14 @@ namespace CrewChiefV4.Events
                                 // TODO: we need a "right infront" or "right behind" type response here for when the delta is < 0.05 (< 1 tenth rounded)
                                 if (!gotByPositionNumber)
                                 {
-                                    audioPlayer.playMessageImmediately(new QueuedMessage("opponentPosition", MessageContents(Position.folderStub + position), 0, null));
+                                    if (SoundCache.availableSounds.Contains(folderOpponentPositionIntro))
+                                    { 
+                                        audioPlayer.playMessageImmediately(new QueuedMessage("opponentPosition", MessageContents(folderOpponentPositionIntro, Position.folderStub + position), 0, null));
+                                    }
+                                    else
+                                    {
+                                        audioPlayer.playMessageImmediately(new QueuedMessage("opponentPosition", MessageContents(Position.folderStub + position), 0, null));
+                                    }
                                     gotData = true;
                                 }
                             }
@@ -394,8 +404,16 @@ namespace CrewChiefV4.Events
                                 {
                                     if (!gotByPositionNumber)
                                     {
-                                        audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta",
-                                            MessageContents(Position.folderStub + position, Pause(200), Position.folderOneLapBehind), 0, null));
+                                        if (SoundCache.availableSounds.Contains(folderOpponentPositionIntro))
+                                        {
+                                            audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta",
+                                                MessageContents(folderOpponentPositionIntro, Position.folderStub + position, Pause(200), Position.folderOneLapBehind), 0, null));
+                                        }
+                                        else
+                                        {
+                                            audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta",
+                                               MessageContents(Position.folderStub + position, Pause(200), Position.folderOneLapBehind), 0, null));
+                                        }
                                     }
                                     else
                                     {
@@ -406,8 +424,16 @@ namespace CrewChiefV4.Events
                                 {
                                     if (!gotByPositionNumber)
                                     {
-                                        audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta",
-                                            MessageContents(Position.folderStub + position, Pause(200), opponentDelta.lapDifference, Position.folderLapsBehind), 0, null));
+                                        if (SoundCache.availableSounds.Contains(folderOpponentPositionIntro))
+                                        {
+                                            audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta",
+                                                MessageContents(folderOpponentPositionIntro, Position.folderStub + position, Pause(200), opponentDelta.lapDifference, Position.folderLapsBehind), 0, null));
+                                        } 
+                                        else
+                                        {
+                                            audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta",
+                                               MessageContents(Position.folderStub + position, Pause(200), opponentDelta.lapDifference, Position.folderLapsBehind), 0, null));
+                                        }
                                     }
                                     else
                                     {
@@ -419,8 +445,16 @@ namespace CrewChiefV4.Events
                                 {
                                     if (!gotByPositionNumber)
                                     {
-                                        audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta",
-                                            MessageContents(Position.folderStub + position, Pause(200), Position.folderOneLapAhead), 0, null));
+                                        if (SoundCache.availableSounds.Contains(folderOpponentPositionIntro))
+                                        {
+                                            audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta",
+                                                MessageContents(folderOpponentPositionIntro, Position.folderStub + position, Pause(200), Position.folderOneLapAhead), 0, null));
+                                        }
+                                        else
+                                        {
+                                            audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta",
+                                                MessageContents(Position.folderStub + position, Pause(200), Position.folderOneLapAhead), 0, null));
+                                        }
                                     }
                                     else
                                     {
@@ -431,8 +465,16 @@ namespace CrewChiefV4.Events
                                 {
                                     if (!gotByPositionNumber)
                                     {
-                                        audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta",
-                                            MessageContents(Position.folderStub + position, Pause(200), Math.Abs(opponentDelta.lapDifference), Position.folderLapsAhead), 0, null));
+                                        if (SoundCache.availableSounds.Contains(folderOpponentPositionIntro))
+                                        {
+                                            audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta",
+                                                MessageContents(folderOpponentPositionIntro, Position.folderStub + position, Pause(200), Math.Abs(opponentDelta.lapDifference), Position.folderLapsAhead), 0, null));
+                                        }
+                                        else
+                                        {
+                                            audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta",
+                                                MessageContents(Position.folderStub + position, Pause(200), Math.Abs(opponentDelta.lapDifference), Position.folderLapsAhead), 0, null));
+                                        }
                                     }
                                     else
                                     {
@@ -450,8 +492,16 @@ namespace CrewChiefV4.Events
                                     }
                                     if (!gotByPositionNumber)
                                     {
-                                        audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta",
-                                            MessageContents(Position.folderStub + position, Pause(200), delta, aheadOrBehind), 0, null));
+                                        if (SoundCache.availableSounds.Contains(folderOpponentPositionIntro))
+                                        {
+                                            audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta",
+                                                MessageContents(folderOpponentPositionIntro, Position.folderStub + position, Pause(200), delta, aheadOrBehind), 0, null));
+                                        }
+                                        else
+                                        {
+                                            audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta",
+                                               MessageContents(Position.folderStub + position, Pause(200), delta, aheadOrBehind), 0, null));
+                                        }
                                     }
                                     else
                                     {
@@ -487,8 +537,7 @@ namespace CrewChiefV4.Events
                         }
                         if (queuedMessage.canBePlayed)
                         {
-                            audioPlayer.playMessageImmediately(queuedMessage);
-                            
+                            audioPlayer.playMessageImmediately(queuedMessage);                            
                             gotData = true;
                         }
                     }

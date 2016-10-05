@@ -113,7 +113,15 @@ namespace CrewChiefV4.Events
             else
             {
                 Console.WriteLine("pre-start message for P " + currentGameState.SessionData.Position);
-                possibleMessages.Add(new QueuedMessage(Position.folderStub + currentGameState.SessionData.Position, 0, this));
+                if (SoundCache.availableSounds.Contains(Position.folderDriverPositionIntro))
+                {
+                    possibleMessages.Add(new QueuedMessage("position", MessageContents(Position.folderDriverPositionIntro, 
+                        Position.folderStub + currentGameState.SessionData.Position), 0, this));
+                }
+                else 
+                {
+                    possibleMessages.Add(new QueuedMessage(Position.folderStub + currentGameState.SessionData.Position, 0, this));
+                }
             }
             if (currentGameState.SessionData.SessionNumberOfLaps > 0) {
                 possibleMessages.Add(new QueuedMessage("race_distance", MessageContents(
@@ -147,7 +155,7 @@ namespace CrewChiefV4.Events
             if (!playedPreLightsMessage && currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.SessionPhase == SessionPhase.Gridwalk && 
                 (playPreLightsInRaceroom || CrewChief.gameDefinition.gameEnum != GameEnum.RACE_ROOM))
             {
-                playPreLightsMessage(currentGameState, 3);
+                playPreLightsMessage(currentGameState, 2);
                 playedPreLightsMessage = true;
                 purgePreLightsMessages = true;
             }
