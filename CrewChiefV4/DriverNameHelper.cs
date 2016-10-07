@@ -46,9 +46,18 @@ namespace CrewChiefV4
                     {
                         String lowerCaseRawName = line.Substring(0, separatorIndex).ToLower();
                         String usableName = line.Substring(separatorIndex + 1).Trim().ToLower();
-                        if (usableName != null && usableName.Length > 0 && !lowerCaseRawNameToUsableName.ContainsKey(lowerCaseRawName))
+                        if (usableName != null && usableName.Length > 0) 
                         {
-                            lowerCaseRawNameToUsableName.Add(lowerCaseRawName, usableName);
+                            if (lowerCaseRawNameToUsableName.ContainsKey(lowerCaseRawName))
+                            {
+                                // replace the existing mapping - last one wins
+                                lowerCaseRawNameToUsableName[lowerCaseRawName] = usableName;
+                            } 
+                            else
+                            {
+                                // add a new mapping
+                                lowerCaseRawNameToUsableName.Add(lowerCaseRawName, usableName);
+                            }
                         }
                     }
                     counter++;
