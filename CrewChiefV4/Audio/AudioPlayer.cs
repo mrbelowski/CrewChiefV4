@@ -672,6 +672,10 @@ namespace CrewChiefV4.Audio
                         }
                         playedEventCount++;
                     }
+                    else
+                    {
+                        Console.WriteLine("Event " + eventName + " is no longer in the queue");
+                    }
                 }
                 else
                 {
@@ -808,16 +812,12 @@ namespace CrewChiefV4.Audio
         public int purgeQueues()
         {
             int purged = 0;
-            if (soundCache != null)
-            {
-                soundCache.StopAll();
-            }
             lock (queuedClips)
             {
                 ArrayList keysToPurge = new ArrayList(queuedClips.Keys);
                 foreach (String keyStr in keysToPurge)
                 {
-                    if (!keyStr.Contains(SessionEndMessages.sessionEndMessageIdentifier))
+                    if (!keyStr.Contains(SessionEndMessages.sessionEndMessageIdentifier) && queuedClips.Contains(keyStr))
                     {
                         queuedClips.Remove(keyStr);
                         purged++;
