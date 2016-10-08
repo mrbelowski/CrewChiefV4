@@ -58,9 +58,9 @@ namespace CrewChiefV4.RaceRoom
 
         private DriverData getDriverData(RaceRoomShared shared, int slot_id)
         {
-            foreach (DriverData driverData in shared.all_drivers_data)
+            foreach (DriverData driverData in shared.DriverData)
             {
-                if (driverData.driver_info.slot_id == slot_id)
+                if (driverData.DriverInfo.SlotId == slot_id)
                 {
                     return driverData;
                 }
@@ -91,8 +91,8 @@ namespace CrewChiefV4.RaceRoom
             float timeDiffSeconds;
             try
             {
-                currentPlayerData = getDriverData(currentState, currentState.slot_id);
-                previousPlayerData = getDriverData(lastState, currentState.slot_id);
+                currentPlayerData = getDriverData(currentState, currentState.VehicleInfo.SlotId);
+                previousPlayerData = getDriverData(lastState, currentState.VehicleInfo.SlotId);
                 timeDiffSeconds = ((float)(now - previousTime).TotalMilliseconds) / 1000f;
                 previousTime = now;
                 if (timeDiffSeconds <= 0)
@@ -105,23 +105,23 @@ namespace CrewChiefV4.RaceRoom
             {
                 return;
             }
-            float[] currentPlayerPosition = new float[] { currentPlayerData.position.X, currentPlayerData.position.Z };
+            float[] currentPlayerPosition = new float[] { currentPlayerData.Position.X, currentPlayerData.Position.Z };
 
-            if (currentPlayerData.in_pitlane == 0)
+            if (currentPlayerData.InPitlane == 0)
             {
                 List<float[]> currentOpponentPositions = new List<float[]>();
                 float[] playerVelocityData = new float[3];
                 playerVelocityData[0] = currentState.CarSpeed;
-                playerVelocityData[1] = (currentPlayerData.position.X - previousPlayerData.position.X) / timeDiffSeconds;
-                playerVelocityData[2] = (currentPlayerData.position.Z - previousPlayerData.position.Z) / timeDiffSeconds;
+                playerVelocityData[1] = (currentPlayerData.Position.X - previousPlayerData.Position.X) / timeDiffSeconds;
+                playerVelocityData[2] = (currentPlayerData.Position.Z - previousPlayerData.Position.Z) / timeDiffSeconds;
 
-                foreach (DriverData driverData in currentState.all_drivers_data)
+                foreach (DriverData driverData in currentState.DriverData)
                 {
-                    if (driverData.driver_info.slot_id == currentState.slot_id || driverData.driver_info.slot_id == -1 || driverData.in_pitlane == 1)
+                    if (driverData.DriverInfo.SlotId == currentState.VehicleInfo.SlotId || driverData.DriverInfo.SlotId == -1 || driverData.InPitlane == 1)
                     {
                         continue;
                     }
-                    currentOpponentPositions.Add(new float[] { driverData.position.X, driverData.position.Z });
+                    currentOpponentPositions.Add(new float[] { driverData.Position.X, driverData.Position.Z });
                 }
                 float playerRotation = currentState.CarOrientation.Yaw;                
                 if (playerRotation < 0)
