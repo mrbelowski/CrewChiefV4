@@ -2,6 +2,7 @@ CrewChief version 4.
 
 Changelog
 ---------
+Version 4.4.2.0: Reworked pre-lights message logic (optional) - app will play race session messages while you're on the grid until the throttle / brake / clutch is pressed, then it'll play the 'get ready' message. This can be enabled by selecting 'play_pre_lights_messages_until_cancelled' option on the Properties screen; Some driver name mapping fixes.
 Version 4.4.1.3: Added more tyres for Assetto Corsa; fixed missing 'standby' response delay; reduced pre-lights message queue length; some Italian translation support fixes.
 
 Version 4.4.1.2: "How are my tyre temps" and "How are my brake temps" now give the status (hold / good / cold) rather than the actual temps.
