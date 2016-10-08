@@ -35,7 +35,7 @@ namespace CrewChiefV4.RaceRoom
             {
                 foreach (R3EStructWrapper wrapper in dataToDump)
                 {
-                    wrapper.data.all_drivers_data = getPopulatedDriverDataArray(wrapper.data.all_drivers_data);
+                    wrapper.data.DriverData = getPopulatedDriverDataArray(wrapper.data.DriverData);
                 }
                 SerializeObject(dataToDump.ToArray<R3EStructWrapper>(), filenameToDump);
             }
@@ -142,7 +142,7 @@ namespace CrewChiefV4.RaceRoom
             List<DriverData> populated = new List<DriverData>();
             foreach (DriverData rawData in raw)
             {
-                if (rawData.place > 0)
+                if (rawData.Place > 0)
                 {
                     populated.Add(rawData);
                 }
