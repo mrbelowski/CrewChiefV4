@@ -122,7 +122,7 @@ namespace CrewChiefV4.Events
                 }
                 else
                 {
-                    possibleMessages.Add(new QueuedMessage(Position.folderPole, 0, this));
+                    possibleMessages.Add(new QueuedMessage("position", MessageContents(Pause(200), Position.folderPole), 0, this));
                 }                
             }
             else
@@ -135,7 +135,7 @@ namespace CrewChiefV4.Events
                 }
                 else 
                 {
-                    possibleMessages.Add(new QueuedMessage(Position.folderStub + currentGameState.SessionData.Position, 0, this));
+                    possibleMessages.Add(new QueuedMessage("position", MessageContents(Pause(200), Position.folderStub + currentGameState.SessionData.Position), 0, this));
                 }
             }
             if (currentGameState.SessionData.SessionNumberOfLaps > 0) {
@@ -202,7 +202,7 @@ namespace CrewChiefV4.Events
                     }
                     else
                     {
-                        if (playedPreLightsMessage)
+                        if (playedPreLightsMessage && !purgePreLightsMessages)
                         {
                             // we've started playing the pre-lights messages. As soon as the play makes a control input purge this queue
                             purgePreLightsMessages = previousGameState != null &&
