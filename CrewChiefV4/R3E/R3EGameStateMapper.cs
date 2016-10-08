@@ -173,6 +173,12 @@ namespace CrewChiefV4.RaceRoom
                 currentGameState.SessionData.TrackDefinition.setGapPoints();
                 currentGameState.PitData.IsRefuellingAllowed = true;
 
+                if (shared.SessionTimeRemaining > 0)
+                {
+                    currentGameState.SessionData.SessionTotalRunTime = shared.SessionTimeRemaining;
+                    currentGameState.SessionData.SessionHasFixedTime = true;
+                }
+
                 // reset the engine temp monitor stuff
 
                 gotBaselineEngineData = false;

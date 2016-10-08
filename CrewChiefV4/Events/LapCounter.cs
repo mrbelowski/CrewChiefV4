@@ -43,6 +43,8 @@ namespace CrewChiefV4.Events
 
         private DateTime lastFinishMessageTime = DateTime.MinValue;
 
+        private Boolean playPreRaceMessagesUntilCancelled = UserSettings.GetUserSettings().getBoolean("play_pre_lights_messages_until_cancelled");
+
         private Boolean enableGreenLightMessages = UserSettings.GetUserSettings().getBoolean("enable_green_light_messages");
 
         private static Boolean useFahrenheit = UserSettings.GetUserSettings().getBoolean("use_fahrenheit");
@@ -79,7 +81,8 @@ namespace CrewChiefV4.Events
         {
             playedPreLightsMessage = true;
             if ((CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_NETWORK || CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_64BIT || 
-                CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_32BIT) && currentGameState.SessionData.SessionNumberOfLaps <= 0) 
+                CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_32BIT) && currentGameState.SessionData.SessionNumberOfLaps <= 0 && 
+                !playPreRaceMessagesUntilCancelled) 
             {
                 // don't play pre-lights messages in PCars if the race is a fixed time, rather than number of laps
                 return;
@@ -88,8 +91,10 @@ namespace CrewChiefV4.Events
             List<QueuedMessage> possibleMessages = new List<QueuedMessage>();
             if (currentConditions != null)
             {
+                Console.WriteLine("pre-start message for track temp");
                 possibleMessages.Add(new QueuedMessage("trackTemp", MessageContents(ConditionsMonitor.folderTrackTempIs,
                     convertTemp(currentConditions.TrackTemperature), getTempUnit()), 0, null));
+                Console.WriteLine("pre-start message for air temp");
                 possibleMessages.Add(new QueuedMessage("air_temp", MessageContents(ConditionsMonitor.folderAirTempIs,
                     convertTemp(currentConditions.AmbientTemperature), getTempUnit()), 0, null));
             }
@@ -97,18 +102,28 @@ namespace CrewChiefV4.Events
             {
                 if (currentGameState.SessionData.SessionHasFixedTime)
                 {
+                    Console.WriteLine("pre-start message for mandatory stop time");
                     possibleMessages.Add(new QueuedMessage("pit_window_time", MessageContents(MandatoryPitStops.folderMandatoryPitStopsPitWindowOpensAfter,
                         TimeSpan.FromMinutes(currentGameState.PitData.PitWindowStart)), 0, this));
                 } 
                 else
                 {
+                    Console.WriteLine("pre-start message for mandatory stop lap");
                     possibleMessages.Add(new QueuedMessage("pit_window_lap", MessageContents(MandatoryPitStops.folderMandatoryPitStopsPitWindowOpensOnLap,
                         currentGameState.PitData.PitWindowStart), 0, this));
                 }
             }
             if (currentGameState.SessionData.Position == 1)
             {
-                possibleMessages.Add(new QueuedMessage(Position.folderPole, 0, this));
+                Console.WriteLine("pre-start message for pole");
+                if (SoundCache.availableSounds.Contains(Position.folderDriverPositionIntro))
+                {
+                    possibleMessages.Add(new QueuedMessage("position", MessageContents(Position.folderDriverPositionIntro, Position.folderPole), 0, this));                    
+                }
+                else
+                {
+                    possibleMessages.Add(new QueuedMessage(Position.folderPole, 0, this));
+                }                
             }
             else
             {
@@ -124,13 +139,31 @@ namespace CrewChiefV4.Events
                 }
             }
             if (currentGameState.SessionData.SessionNumberOfLaps > 0) {
-                possibleMessages.Add(new QueuedMessage("race_distance", MessageContents(
-                        currentGameState.SessionData.SessionNumberOfLaps, folderLapsMakeThemCount), 0, this));
-            } else if (currentGameState.SessionData.SessionHasFixedTime && currentGameState.SessionData.SessionTotalRunTime > 0 && currentGameState.SessionData.SessionTotalRunTime < 1800 &&
-                    currentGameState.SessionData.Position > 3) {
+                // check how long the race is
+                if (currentGameState.SessionData.Position > 3 && currentGameState.SessionData.TrackDefinition.trackLength * currentGameState.SessionData.SessionNumberOfLaps < 20000)
+                {
+                    // anything less than 20000 metres worth of racing (e.g. 10 laps of Brands Indy) should have a 'make them count'
+                    Console.WriteLine("pre-start message for race laps + get on with it");
+                    possibleMessages.Add(new QueuedMessage("race_distance", MessageContents(currentGameState.SessionData.SessionNumberOfLaps, folderLapsMakeThemCount), 0, this));
+                }
+                else
+                {
+                    Console.WriteLine("pre-start message for race laps");
+                    possibleMessages.Add(new QueuedMessage("race_distance", MessageContents(currentGameState.SessionData.SessionNumberOfLaps), 0, this));
+                }
+            } else if (currentGameState.SessionData.SessionHasFixedTime && currentGameState.SessionData.SessionTotalRunTime > 0 && currentGameState.SessionData.SessionTotalRunTime < 1800) 
+            {
                 int minutes = (int)currentGameState.SessionData.SessionTotalRunTime / 60;
-                possibleMessages.Add(new QueuedMessage("race_time", MessageContents(
-                        minutes, folderMinutesYouNeedToGetOnWithIt), 0, this));
+                if (currentGameState.SessionData.Position > 3 && minutes < 20)
+                {
+                    Console.WriteLine("pre-start message for race time + get on with it");                   
+                    possibleMessages.Add(new QueuedMessage("race_time", MessageContents(minutes, folderMinutesYouNeedToGetOnWithIt), 0, this));
+                }
+                else
+                {
+                    Console.WriteLine("pre-start message for race time");
+                    possibleMessages.Add(new QueuedMessage("race_time", MessageContents(minutes), 0, this));
+                }
             }
             // now pick a random selection
             if (possibleMessages.Count > 0)
@@ -151,51 +184,99 @@ namespace CrewChiefV4.Events
         }
 
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
-        {            
-            if (!playedPreLightsMessage && currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.SessionPhase == SessionPhase.Gridwalk && 
-                (playPreLightsInRaceroom || CrewChief.gameDefinition.gameEnum != GameEnum.RACE_ROOM))
-            {
-                playPreLightsMessage(currentGameState, 2);
-                playedPreLightsMessage = true;
-                purgePreLightsMessages = true;
+        {
+            // nasty... 2 separate code paths here - one for the existing pre-lights logic which is a ball of spaghetti I don't fancy unpicking, 
+            // one for the 'cancel on control input' version
+            if (playPreRaceMessagesUntilCancelled)
+            {               
+               if (!playedGetReady)
+               {                   
+                    // in the pre-lights phase
+                    if (purgePreLightsMessages)
+                    {
+                        // empty the queue and play 'get ready'
+                        int purgedCount = audioPlayer.purgeQueues();
+                        Console.WriteLine("Purging pre-lights messages, removed = " + purgedCount + " messages");
+                        audioPlayer.playMessage(new QueuedMessage(folderGetReady, 0, this));
+                        playedGetReady = true;
+                    }
+                    else
+                    {
+                        if (playedPreLightsMessage)
+                        {
+                            // we've started playing the pre-lights messages. As soon as the play makes a control input purge this queue
+                            purgePreLightsMessages = previousGameState != null &&
+                                currentGameState.EngineData.EngineRpm > 100 && previousGameState.EngineData.EngineRpm > 100 &&
+                                ((currentGameState.ControlData.ThrottlePedal > 0 && previousGameState.ControlData.ThrottlePedal > 0) ||
+                                    (currentGameState.ControlData.BrakePedal > 0 && previousGameState.ControlData.BrakePedal > 0) ||
+                                    (currentGameState.ControlData.ClutchPedal > 0 && previousGameState.ControlData.ClutchPedal > 0));
+                        }
+                        else
+                        {
+                            // Play these only for race sessions. Some game-specific rules here:
+                            //      Allow messages for countdown phase for any game
+                            //      Allow messages for gridwalk phase for any game *except* Raceroom (which treats gridwalk as its own session with different data to the race session)
+                            //      Allow messages for formation phase for Raceroom
+                            //      Allow messages for formation phase for RF1 (AMS) only when we enter sector 3 of the formation lap.
+                            if (currentGameState.SessionData.SessionType == SessionType.Race &&
+                                    (currentGameState.SessionData.SessionPhase == SessionPhase.Countdown ||
+                                    (currentGameState.SessionData.SessionPhase == SessionPhase.Gridwalk && CrewChief.gameDefinition.gameEnum != GameEnum.RACE_ROOM) ||
+                                    (currentGameState.SessionData.SessionPhase == SessionPhase.Formation && CrewChief.gameDefinition.gameEnum == GameEnum.RACE_ROOM) ||
+                                    (currentGameState.SessionData.SessionPhase == SessionPhase.Formation && CrewChief.gameDefinition.gameEnum == GameEnum.RF1 && currentGameState.SessionData.SectorNumber == 3)))
+                            {
+                                Console.WriteLine("Queuing pre-lights messages");
+                                playPreLightsMessage(currentGameState, 10); // queue as many messages as we have here, in any order
+                            }
+                        }                        
+                    }
+                }
             }
-            // TODO: in R3E online there's a GridWalk phase before the Countdown. In PCars they're combined. Add some messages to this phase.
-
-            // R3E's gridWalk phase isn't useable here - the data during this phase are bollocks
-            if (!playedGetReady && currentGameState.SessionData.SessionType == SessionType.Race && (currentGameState.SessionData.SessionPhase == SessionPhase.Countdown ||
-                (currentGameState.SessionData.SessionPhase == SessionPhase.Formation && CrewChief.gameDefinition.gameEnum == GameEnum.RACE_ROOM) ||
-                // play 'get ready' message when entering sector 3 of formation lap in Automobilista
-                (currentGameState.SessionData.SessionPhase == SessionPhase.Formation && CrewChief.gameDefinition.gameEnum == GameEnum.RF1 &&
-                currentGameState.SessionData.SectorNumber == 3)))
+            else
             {
-                // If we've not yet played the pre-lights messages, just play one of them here, but not for RaceRoom as the lights will already have started
-                if (!playedPreLightsMessage && CrewChief.gameDefinition.gameEnum != GameEnum.RACE_ROOM)
+                if (!playedPreLightsMessage && currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.SessionPhase == SessionPhase.Gridwalk &&
+                    (playPreLightsInRaceroom || CrewChief.gameDefinition.gameEnum != GameEnum.RACE_ROOM))
                 {
-                    playedPreLightsMessage = true;
                     playPreLightsMessage(currentGameState, 2);
-                    purgePreLightsMessages = false;
+                    purgePreLightsMessages = true;
                 }
-                if (purgePreLightsMessages)
+                // TODO: in R3E online there's a GridWalk phase before the Countdown. In PCars they're combined. Add some messages to this phase.
+
+                // R3E's gridWalk phase isn't useable here - the data during this phase are bollocks
+                if (!playedGetReady && currentGameState.SessionData.SessionType == SessionType.Race && (currentGameState.SessionData.SessionPhase == SessionPhase.Countdown ||
+                    (currentGameState.SessionData.SessionPhase == SessionPhase.Formation && CrewChief.gameDefinition.gameEnum == GameEnum.RACE_ROOM) ||
+                    // play 'get ready' message when entering sector 3 of formation lap in Automobilista
+                    (currentGameState.SessionData.SessionPhase == SessionPhase.Formation && CrewChief.gameDefinition.gameEnum == GameEnum.RF1 &&
+                    currentGameState.SessionData.SectorNumber == 3)))
                 {
-                    audioPlayer.purgeQueues();
+                    // If we've not yet played the pre-lights messages, just play one of them here, but not for RaceRoom as the lights will already have started
+                    if (!playedPreLightsMessage && CrewChief.gameDefinition.gameEnum != GameEnum.RACE_ROOM)
+                    {
+                        playPreLightsMessage(currentGameState, 2);
+                        purgePreLightsMessages = false;
+                    }
+                    if (purgePreLightsMessages)
+                    {
+                        audioPlayer.purgeQueues();
+                    }
+                    audioPlayer.playMessage(new QueuedMessage(folderGetReady, 0, this));
+                    playedGetReady = true;
                 }
-                audioPlayer.playMessage(new QueuedMessage(folderGetReady, 0, this));
-                playedGetReady = true;
             }
-            /*if (!playedGreenGreenGreen && previousGameState != null && currentGameState.SessionData.SessionType == SessionType.Race &&
-                (currentGameState.SessionData.SessionPhase == SessionPhase.Green &&
-                    (previousGameState.SessionData.SessionPhase == SessionPhase.Formation ||
-                     previousGameState.SessionData.SessionPhase == SessionPhase.Countdown)))
-            {*/
             if (previousGameState != null && enableGreenLightMessages && 
                 currentGameState.SessionData.SessionType == SessionType.Race &&
                 currentGameState.SessionData.SessionPhase == SessionPhase.Green && 
                 (previousGameState.SessionData.SessionPhase == SessionPhase.Formation ||
                  previousGameState.SessionData.SessionPhase == SessionPhase.Countdown))
             {
-                audioPlayer.removeQueuedMessage(folderGetReady);
+                // ensure we don't play 'get ready' or any pre-lights messages again
+                playedPreLightsMessage = true;
+                playedGetReady = true;
+                int purgeCount = audioPlayer.purgeQueues();
+                if (purgeCount > 0)
+                {
+                    Console.WriteLine("Purged " + purgeCount + " outstanding messages at green light");
+                }
                 audioPlayer.playMessageImmediately(new QueuedMessage(folderGreenGreenGreen, 0, this));
-                
                 audioPlayer.disablePearlsOfWisdom = false;
             }
             // looks like belt n braces but there's a bug in R3E DTM 2015 race 1 which has a number of laps and a time remaining
