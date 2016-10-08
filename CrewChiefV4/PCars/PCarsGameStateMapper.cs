@@ -543,8 +543,14 @@ namespace CrewChiefV4.PCars
                     currentGameState.SessionData.PlayerBestLapSector3Time = previousGameState.SessionData.PlayerBestLapSector3Time;
                     currentGameState.Conditions = previousGameState.Conditions;
                 }                
-            }            
-            
+            }
+
+            currentGameState.EngineData.EngineRpm = shared.mRPM;
+            currentGameState.ControlData.ThrottlePedal = shared.mThrottle;
+            currentGameState.ControlData.ClutchPedal = shared.mClutch;
+            currentGameState.TransmissionData.Gear = shared.mGear;
+            currentGameState.ControlData.BrakeBias = shared.mBrake;
+
             //------------------- Variable session data ---------------------------
             if (currentGameState.SessionData.SessionHasFixedTime)
             {

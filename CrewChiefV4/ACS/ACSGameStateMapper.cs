@@ -1177,6 +1177,12 @@ namespace CrewChiefV4.assetto
                     currentGameState.Conditions = previousGameState.Conditions;
                 }
                 //------------------- Variable session data ---------------------------
+
+                currentGameState.TransmissionData.Gear = shared.acsPhysics.gear;
+                currentGameState.ControlData.BrakePedal = shared.acsPhysics.brake;
+                currentGameState.ControlData.ThrottlePedal = shared.acsPhysics.gas;
+                currentGameState.ControlData.ClutchPedal = shared.acsPhysics.clutch;
+
                 if (currentGameState.SessionData.SessionHasFixedTime)
                 {
                     currentGameState.SessionData.SessionRunningTime = currentGameState.SessionData.SessionTotalRunTime - sessionTimeRemaining;
