@@ -355,6 +355,11 @@ namespace CrewChiefV4.RaceRoom
                 }
             }
 
+            currentGameState.ControlData.ThrottlePedal = shared.ThrottlePedal;
+            currentGameState.ControlData.ClutchPedal = shared.ClutchPedal;
+            currentGameState.ControlData.BrakePedal = shared.BrakePedal;
+            currentGameState.TransmissionData.Gear = shared.Gear;
+
             //------------------------ Session data -----------------------
             currentGameState.SessionData.Flag = FlagEnum.UNKNOWN;
             currentGameState.SessionData.SessionTimeRemaining = shared.SessionTimeRemaining;
