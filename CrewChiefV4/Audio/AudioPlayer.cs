@@ -805,8 +805,9 @@ namespace CrewChiefV4.Audio
             }
         }
 
-        public void purgeQueues()
+        public int purgeQueues()
         {
+            int purged = 0;
             if (soundCache != null)
             {
                 soundCache.StopAll();
@@ -819,6 +820,7 @@ namespace CrewChiefV4.Audio
                     if (!keyStr.Contains(SessionEndMessages.sessionEndMessageIdentifier))
                     {
                         queuedClips.Remove(keyStr);
+                        purged++;
                     }
                     else
                     {
@@ -830,6 +832,7 @@ namespace CrewChiefV4.Audio
             {
                 immediateClips.Clear();
             }
+            return purged;
         }
 
         public Boolean isChannelOpen()
