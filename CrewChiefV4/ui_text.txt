@@ -170,3 +170,5 @@ enable_console_logging_help = Uncheck this to prevent console window messages be
 log_tyre_temps_help = Show tyre temps at the start of each sector
 
 r3e_blue_flag_detection_distance_help = Max distance (metres) for R3E blue flag trigger
+
+play_pre_lights_messages_until_cancelled_help = Play pre-race info messages until a control input is detected
