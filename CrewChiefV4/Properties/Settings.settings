@@ -407,5 +407,8 @@
     <Setting Name="enable_acs_log_sectors_for_unknown_tracks" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
+    <Setting Name="play_pre_lights_messages_until_cancelled" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
