@@ -545,7 +545,6 @@ namespace CrewChiefV4.PCars
                 }                
             }
 
-            currentGameState.EngineData.EngineRpm = shared.mRPM;
             currentGameState.ControlData.ThrottlePedal = shared.mThrottle;
             currentGameState.ControlData.ClutchPedal = shared.mClutch;
             currentGameState.TransmissionData.Gear = shared.mGear;
