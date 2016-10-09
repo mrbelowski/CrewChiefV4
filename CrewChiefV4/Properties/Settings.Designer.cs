@@ -1642,5 +1642,17 @@ namespace CrewChiefV4.Properties {
                 this["enable_acs_log_sectors_for_unknown_tracks"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool play_pre_lights_messages_until_cancelled {
+            get {
+                return ((bool)(this["play_pre_lights_messages_until_cancelled"]));
+            }
+            set {
+                this["play_pre_lights_messages_until_cancelled"] = value;
+            }
+        }
     }
 }

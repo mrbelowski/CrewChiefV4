@@ -672,6 +672,10 @@ namespace CrewChiefV4.Audio
                         }
                         playedEventCount++;
                     }
+                    else
+                    {
+                        Console.WriteLine("Event " + eventName + " is no longer in the queue");
+                    }
                 }
                 else
                 {
@@ -805,20 +809,18 @@ namespace CrewChiefV4.Audio
             }
         }
 
-        public void purgeQueues()
+        public int purgeQueues()
         {
-            if (soundCache != null)
-            {
-                soundCache.StopAll();
-            }
+            int purged = 0;
             lock (queuedClips)
             {
                 ArrayList keysToPurge = new ArrayList(queuedClips.Keys);
                 foreach (String keyStr in keysToPurge)
                 {
-                    if (!keyStr.Contains(SessionEndMessages.sessionEndMessageIdentifier))
+                    if (!keyStr.Contains(SessionEndMessages.sessionEndMessageIdentifier) && queuedClips.Contains(keyStr))
                     {
                         queuedClips.Remove(keyStr);
+                        purged++;
                     }
                     else
                     {
@@ -830,6 +832,7 @@ namespace CrewChiefV4.Audio
             {
                 immediateClips.Clear();
             }
+            return purged;
         }
 
         public Boolean isChannelOpen()

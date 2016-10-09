@@ -193,3 +193,8 @@ ModelManifest.xml
 /CrewChiefV4/sounds_3.0.zip
 /CrewChiefV4/sounds_lo_fi
 *.zip
+/CrewChiefV4_no_sound_files/CrewChiefV4_setup_project.isl.bak
+/Speech recognition 32bit
+/Speech recognition 64bit/MSSpeech_SR_en-GB_TELE.msi
+/Speech recognition 64bit/MSSpeech_SR_en-US_TELE.msi
+/Speech recognition 64bit/SpeechPlatformRuntime.msi

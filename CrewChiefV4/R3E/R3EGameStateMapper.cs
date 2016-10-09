@@ -173,6 +173,12 @@ namespace CrewChiefV4.RaceRoom
                 currentGameState.SessionData.TrackDefinition.setGapPoints();
                 currentGameState.PitData.IsRefuellingAllowed = true;
 
+                if (shared.SessionTimeRemaining > 0)
+                {
+                    currentGameState.SessionData.SessionTotalRunTime = shared.SessionTimeRemaining;
+                    currentGameState.SessionData.SessionHasFixedTime = true;
+                }
+
                 // reset the engine temp monitor stuff
 
                 gotBaselineEngineData = false;
@@ -354,6 +360,11 @@ namespace CrewChiefV4.RaceRoom
                     currentGameState.SessionData.PlayerBestLapSector3Time = previousGameState.SessionData.PlayerBestLapSector3Time;
                 }
             }
+
+            currentGameState.ControlData.ThrottlePedal = shared.ThrottlePedal;
+            currentGameState.ControlData.ClutchPedal = shared.ClutchPedal;
+            currentGameState.ControlData.BrakePedal = shared.BrakePedal;
+            currentGameState.TransmissionData.Gear = shared.Gear;
 
             //------------------------ Session data -----------------------
             currentGameState.SessionData.Flag = FlagEnum.UNKNOWN;

@@ -241,6 +241,11 @@ namespace CrewChiefV4.rFactor1
             // transmission data
             currentGameState.TransmissionData.Gear = shared.gear;
 
+            // controls
+            currentGameState.ControlData.BrakePedal = shared.unfilteredBrake;
+            currentGameState.ControlData.ThrottlePedal = shared.unfilteredThrottle;
+            currentGameState.ControlData.ClutchPedal = shared.unfilteredClutch;
+
             // --------------------------------
             // damage
             // not 100% certain on this mapping but it should be reasonably close
