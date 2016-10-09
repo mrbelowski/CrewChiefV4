@@ -149,7 +149,9 @@ namespace CrewChiefV4.Events
                 else
                 {
                     Console.WriteLine("pre-start message for race laps");
-                    possibleMessages.Add(new QueuedMessage("race_distance", MessageContents(currentGameState.SessionData.SessionNumberOfLaps), 0, this));
+
+                    // TODO: need to add a "laps..." message here otherwise it just plays the number. Add the "make them count" message until this is available
+                    possibleMessages.Add(new QueuedMessage("race_distance", MessageContents(currentGameState.SessionData.SessionNumberOfLaps, folderLapsMakeThemCount), 0, this));
                 }
             } else if (currentGameState.SessionData.SessionHasFixedTime && currentGameState.SessionData.SessionTotalRunTime > 0 && currentGameState.SessionData.SessionTotalRunTime < 1800) 
             {
@@ -205,11 +207,12 @@ namespace CrewChiefV4.Events
                         if (playedPreLightsMessage && !purgePreLightsMessages)
                         {
                             // we've started playing the pre-lights messages. As soon as the play makes a control input purge this queue
+                            // some games hold the brake at '1' automatically on the grid, so this can't be used
                             purgePreLightsMessages = previousGameState != null &&
                                 currentGameState.EngineData.EngineRpm > 100 && previousGameState.EngineData.EngineRpm > 100 &&
-                                ((currentGameState.ControlData.ThrottlePedal > 0 && previousGameState.ControlData.ThrottlePedal > 0) ||
-                                    (currentGameState.ControlData.BrakePedal > 0 && previousGameState.ControlData.BrakePedal > 0) ||
-                                    (currentGameState.ControlData.ClutchPedal > 0 && previousGameState.ControlData.ClutchPedal > 0));
+                                ((currentGameState.ControlData.ThrottlePedal > 0.2 && previousGameState.ControlData.ThrottlePedal > 0.2) ||
+                                    // (currentGameState.ControlData.BrakePedal > 0.2 && previousGameState.ControlData.BrakePedal > 0.2) ||
+                                    (currentGameState.ControlData.ClutchPedal > 0.2 && previousGameState.ControlData.ClutchPedal > 0.2));
                         }
                         else
                         {
