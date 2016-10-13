@@ -2,6 +2,8 @@ CrewChief version 4.
 
 Changelog
 ---------
+Version 4.4.3.1: Only cancel pre-lights messages on throttle application.
+
 Version 4.4.3.0: Changes to support R3E beta phase.
 
 Version 4.4.2.1: Fixed some issues with pre-lights messages
