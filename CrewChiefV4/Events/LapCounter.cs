@@ -210,9 +210,7 @@ namespace CrewChiefV4.Events
                             // some games hold the brake at '1' automatically on the grid, so this can't be used
                             purgePreLightsMessages = previousGameState != null &&
                                 currentGameState.EngineData.EngineRpm > 100 && previousGameState.EngineData.EngineRpm > 100 &&
-                                ((currentGameState.ControlData.ThrottlePedal > 0.2 && previousGameState.ControlData.ThrottlePedal > 0.2) ||
-                                    // (currentGameState.ControlData.BrakePedal > 0.2 && previousGameState.ControlData.BrakePedal > 0.2) ||
-                                    (currentGameState.ControlData.ClutchPedal > 0.2 && previousGameState.ControlData.ClutchPedal > 0.2));
+                                currentGameState.ControlData.ThrottlePedal > 0.2 && previousGameState.ControlData.ThrottlePedal > 0.2;
                         }
                         else
                         {
