@@ -2,6 +2,10 @@ CrewChief version 4.
 
 Changelog
 ---------
+Version 4.4.3.1: Only cancel pre-lights messages on throttle application.
+
+Version 4.4.3.0: Changes to support R3E beta phase.
+
 Version 4.4.2.1: Fixed some issues with pre-lights messages
 
 Version 4.4.2.0: Reworked pre-lights message logic (optional) - app will play race session messages while you're on the grid until the throttle / brake / clutch is pressed, then it'll play the 'get ready' message. This can be enabled by selecting 'play_pre_lights_messages_until_cancelled' option on the Properties screen; Some driver name mapping fixes.
