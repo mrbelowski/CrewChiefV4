@@ -770,7 +770,7 @@ ned:Ned
 orangewig:Orangewig
 chibigeese:Chibigeese
 kwakaman:Kwaka
-xen-tran:Xentran
+xen tran:Xentran
 kl1ck kl1ck:click
 xxx r00tl3ss:Rootless
 witcher wolf:Wolf
@@ -779,3 +779,50 @@ reini overtheclock:reini
 serious moose:Moose
 david nexon:Nexon
 tobias kunz:Kunz
+jesse hampton:Hampton
+finus04:Finus
+django mattuschek:Mattuschek
+stefan kosubek:Kosubek
+patrick schwanz:Schwanz
+thrill:thrill
+dietmar blaskowski:Blaskowski
+kera:Kera
+sir bratwurst:Bratwurst
+jm-performances:JM
+kev:kev
+v. parginos:parginos
+grobi0815:grobi
+runkillcapture:Capture
+keuschnitzel:keuschnitzel
+corbs:Corbs
+simp:simp
+armin flohr:Flohr
+helmut lütz:Lütz
+hans paffrath:Paffrath
+adrian louchart:Louchart
+max bischoff:Bischoff
+hannes röbbert:Röbbert
+leon welsch:Welsch
+iroxo:Iroxo
+gounzy:Gounzy
+nono-reg:nonoreg
+derek lundie:Lundie
+rolandksp:RolandK
+piotrek blaszczak:Blaszczak
+crowhop:crowhop
+atticus williams:Williams
+r. schmidt:Schmidt
+mike hawky:Hawky
+kinge71:Kingy
+mesopelagic:Mesopelagic
+droid:Droid
+tubbie:Tubbie
+saffie blackflag:Saffie
+christoph spiller:Spiller
+ivan sanchez:Ivan Sanchez
+j. pardo:Pardo
+rummy:Rummy
+f. ozanne:Ozanne
+ricardo edelmann:Edelmann
+baddogcbr929:baddog
+andy blade:blade
