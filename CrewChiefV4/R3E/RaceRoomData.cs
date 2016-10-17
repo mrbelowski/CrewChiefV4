@@ -60,6 +60,18 @@ namespace CrewChiefV4.RaceRoom
             Completed = 4
         }
 
+        public enum PitStopStatus
+        {
+             // No mandatory pitstops
+             Unavailable = -1,
+ 
+             // Mandatory pitstop not served yet
+             Unserved = 0,
+ 
+             // Mandatory pitstop served
+             Served = 1,
+        };
+
         public enum FinishStatus
         {
             // N/A
@@ -333,6 +345,7 @@ namespace CrewChiefV4.RaceRoom
             public Sectors<Single> SectorTimeBestSelf;
             public Single TimeDeltaFront;
             public Single TimeDeltaBehind;
+            public Int32 PitStopStatus;
             public Int32 InPitlane;
             public Int32 NumPitstops;
             public CutTrackPenalties Penalties;
