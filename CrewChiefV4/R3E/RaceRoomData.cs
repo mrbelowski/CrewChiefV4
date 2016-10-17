@@ -101,20 +101,7 @@ namespace CrewChiefV4.RaceRoom
             Unavailable = -1,
             DTM_Option = 0,
             Prime = 1
-        }        
-
-        // TODO: is this still used?
-        public enum PitStopStatus
-        {
-            // No mandatory pitstops
-            R3E_PITSTOP_STATUS_UNAVAILABLE = -1,
-
-            // Mandatory pitstop not served yet
-            R3E_PITSTOP_STATUS_UNSERVED = 0,
-
-            // Mandatory pitstop served
-            R3E_PITSTOP_STATUS_SERVED = 1
-        }
+        }     
 
     }
 
