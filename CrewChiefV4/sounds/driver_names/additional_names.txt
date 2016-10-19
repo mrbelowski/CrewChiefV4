@@ -850,6 +850,7 @@ gorgiev : Gorgiev
 johnston : Johnston
 kabis : Kabis
 oberg : Oberg
+öberg : Oberg
 vercetty : Vercetty
 yakubu : Yakubu
 ambrosiewicz : Ambrosiewicz
@@ -861,3 +862,17 @@ tronier : Tronier
 bailey : Bailey
 whitby : Whitby
 emilio collavino : Collavino
+rift racer : rift
+tam-esox : esocks
+tam-ronster : ronster
+michael hartmann : hartmann
+steve o'connor : O'Connor
+k.soze : soze
+m.le piloteur : piloteur
+pinky : Pinky
+g murphy : Murphy
+matthias stahl : Stahli
+schnecke : Schnecke
+saleen : Saleen
+jolahiti : jolahiti
+bmwfreak : Freak
