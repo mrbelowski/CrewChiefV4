@@ -255,10 +255,17 @@ namespace CrewChiefV4
                         setFromCommandLine = true;
                         break;
                     }
-                    else if (arg.Equals(GameDefinition.assetto.gameEnum.ToString()))
+                    else if (arg.Equals(GameDefinition.assetto64Bit.gameEnum.ToString()))
                     {
                         Console.WriteLine("Set Assetto Corsa mode from command line");
-                        this.gameDefinitionList.Text = GameDefinition.assetto.friendlyName;
+                        this.gameDefinitionList.Text = GameDefinition.assetto64Bit.friendlyName;
+                        setFromCommandLine = true;
+                        break;
+                    }
+                    else if (arg.Equals(GameDefinition.assetto32Bit.gameEnum.ToString()))
+                    {
+                        Console.WriteLine("Set Assetto Corsa mode from command line");
+                        this.gameDefinitionList.Text = GameDefinition.assetto32Bit.friendlyName;
                         setFromCommandLine = true;
                         break;
                     }

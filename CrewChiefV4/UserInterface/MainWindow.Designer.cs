@@ -283,7 +283,8 @@ namespace CrewChiefV4
             Configuration.getUIString("marcas"),
             Configuration.getUIString("ftruck"),
             Configuration.getUIString("rfactor1"),
-            Configuration.getUIString("assetto")});
+            Configuration.getUIString("assetto_64_bit"),
+            Configuration.getUIString("assetto_32_bit")});
             this.gameDefinitionList.Location = new System.Drawing.Point(782, 28);
             this.gameDefinitionList.Name = "gameDefinitionList";
             this.gameDefinitionList.Size = new System.Drawing.Size(203, 145);
