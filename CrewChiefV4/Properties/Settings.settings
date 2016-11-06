@@ -410,5 +410,8 @@
     <Setting Name="play_pre_lights_messages_until_cancelled" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
+    <Setting Name="disable_acs_yellow_flag_warnings" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
