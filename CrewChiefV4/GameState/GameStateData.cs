@@ -132,6 +132,8 @@ namespace CrewChiefV4.GameState
 
         public FlagEnum Flag = FlagEnum.GREEN;
 
+        public DateTime YellowFlagStartTime = DateTime.Now;
+
         public Boolean IsNewSession = false;
 
         public Boolean SessionHasFixedTime = false;
@@ -319,6 +321,8 @@ namespace CrewChiefV4.GameState
         public TyreType CurrentTyres = TyreType.Unknown_Race;
 
         public Boolean isProbablyLastLap = false;
+
+        public int IsReallyDisconnectedCounter = 0;
 
         public LapData getCurrentLapData()
         {
