@@ -1536,7 +1536,7 @@ namespace CrewChiefV4.assetto
                     StartNewLap(currentGameState.SessionData.CompletedLaps + 1, currentGameState.SessionData.SessionRunningTime);
                     currentGameState.SessionData.Position = playerVehicle.carLeaderboardPosition;
                     currentGameState.SessionData.UnFilteredPosition = playerVehicle.carLeaderboardPosition;
-                    currentGameState.displayOpponentData();
+                    // currentGameState.displayOpponentData();
                 }
                 else if (previousGameState != null)
                 {

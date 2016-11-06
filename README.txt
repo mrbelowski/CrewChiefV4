@@ -2,6 +2,7 @@ CrewChief version 4.
 
 Changelog
 ---------
+Version 4.4.2.2: Removed some debug calls
 
 Version 4.4.2.2: Only cancel pre-lights messages on throttle application; Added option to disable yellow flags in Assetto Corsa, and made them a little less frequent; Some Assetto Corsa opponent position fixes
 
