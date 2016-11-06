@@ -2,11 +2,9 @@ CrewChief version 4.
 
 Changelog
 ---------
-Version 4.4.3.2: Struct fix for missing pit stop status
+Version 4.4.3.3: R3E patch update
 
-Version 4.4.3.1: Only cancel pre-lights messages on throttle application; struct fix for missing pit stop status
-
-Version 4.4.3.0: Changes to support R3E beta phase.
+Version 4.4.2.2: Only cancel pre-lights messages on throttle application; Added option to disable yellow flags in Assetto Corsa, and made them a little less frequent; Some Assetto Corsa opponent position fixes
 
 Version 4.4.2.1: Fixed some issues with pre-lights messages
 
