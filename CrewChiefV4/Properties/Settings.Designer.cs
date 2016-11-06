@@ -1654,5 +1654,17 @@ namespace CrewChiefV4.Properties {
                 this["play_pre_lights_messages_until_cancelled"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool disable_acs_yellow_flag_warnings {
+            get {
+                return ((bool)(this["disable_acs_yellow_flag_warnings"]));
+            }
+            set {
+                this["disable_acs_yellow_flag_warnings"] = value;
+            }
+        }
     }
 }
