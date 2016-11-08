@@ -73,6 +73,7 @@ namespace CrewChiefV4
             catch (Exception)
             {
             }
+            joystick.Dispose();
             controllers.Add(new ControllerData(productName, DeviceType.Joystick, guid));
         }
 
@@ -314,6 +315,7 @@ namespace CrewChiefV4
                         {
 
                         }
+                        joystick.Dispose();
                         controllers.Add(new ControllerData(productName, deviceType, joystickGuid));
                     }
                 }
