@@ -2,7 +2,9 @@ CrewChief version 4.
 
 Changelog
 ---------
-Version 4.4.2.2: Removed some debug calls
+Version 4.4.2.4: Fixed controllers initialisation bug which should fix very slow (2-3 minutes) startup time for some users - thanks Tako.
+
+Version 4.4.2.3: Removed some debug calls
 
 Version 4.4.2.2: Only cancel pre-lights messages on throttle application; Added option to disable yellow flags in Assetto Corsa, and made them a little less frequent; Some Assetto Corsa opponent position fixes
 
