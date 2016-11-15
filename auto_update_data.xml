@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <item>
+<<<<<<< HEAD
 <title>Crew Chief 4.4.3.2, updated 15 Nov 2016</title>
 <version>4.4.3.2</version>
+=======
+<title>Crew Chief 4.4.2.4, updated 08 Nov 2016</title>
+<version>4.4.2.4</version>
+>>>>>>> master
 <url>http://crewchief.isnais.de/CrewChiefV4.msi</url>
 <changelog>http://crewchief.isnais.de/change_log_for_auto_updated.html</changelog>
 
