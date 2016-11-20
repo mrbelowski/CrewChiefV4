@@ -73,7 +73,7 @@ namespace CrewChiefV4
             catch (Exception)
             {
             }
-            joystick.Dispose();
+            asyncDispose(DeviceType.ControlDevice, joystick);
             controllers.Add(new ControllerData(productName, DeviceType.Joystick, guid));
         }
 
@@ -305,18 +305,25 @@ namespace CrewChiefV4
                     Guid joystickGuid = deviceInstance.InstanceGuid;
                     if (joystickGuid != Guid.Empty) 
                     {
-                        var joystick = new Joystick(directInput, joystickGuid);
-                        String productName = "";
                         try
                         {
-                            productName = ": " + joystick.Properties.ProductName;
+                            var joystick = new Joystick(directInput, joystickGuid);
+                            String productName = "";
+                            try
+                            {
+                                productName = ": " + joystick.Properties.ProductName;
+                            }
+                            catch (Exception)
+                            {
+                                // ignore - some devices don't have a product name
+                            }
+                            asyncDispose(deviceType, joystick);
+                            controllers.Add(new ControllerData(productName, deviceType, joystickGuid));
                         }
-                        catch (Exception)
+                        catch (Exception e)
                         {
-
-                        }
-                        joystick.Dispose();
-                        controllers.Add(new ControllerData(productName, deviceType, joystickGuid));
+                            Console.WriteLine("failed to get device info: " + e.Message);
+                        }                        
                     }
                 }
             }
@@ -405,6 +412,25 @@ namespace CrewChiefV4
                     ba.buttonIndex = -1;
                 }
             }
+        }
+
+        private void asyncDispose(DeviceType deviceType, Joystick joystick)
+        {
+            new Thread(() =>
+            {                
+                DateTime now = DateTime.Now;
+                Thread.CurrentThread.IsBackground = true;
+                String name = joystick.Information.InstanceName;
+                try
+                {                    
+                    joystick.Dispose();
+                    //Console.WriteLine("Disposed of temporary " + deviceType + " object " + name + " after " + (DateTime.Now - now).TotalSeconds + " seconds");
+                }
+                catch (Exception e) { 
+                    //log and swallow 
+                    Console.WriteLine("Failed to dispose of temporary " + deviceType + " object " + name + "after " + (DateTime.Now - now).TotalSeconds + " seconds: " + e.Message);
+                }
+            }).Start();
         }
 
         public class ControllerData
