@@ -2,6 +2,11 @@ CrewChief version 4.
 
 Changelog
 ---------
+
+Version 4.4.3.4: Some controller cleanup tweaks
+
+Version 4.4.3.3: R3E patch update
+
 Version 4.4.2.4: Fixed controllers initialisation bug which should fix very slow (2-3 minutes) startup time for some users - thanks Tako.
 
 Version 4.4.2.3: Removed some debug calls
