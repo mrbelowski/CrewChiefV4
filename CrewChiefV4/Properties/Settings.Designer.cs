@@ -1666,5 +1666,53 @@ namespace CrewChiefV4.Properties {
                 this["disable_acs_yellow_flag_warnings"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool launch_rfactor2 {
+            get {
+                return ((bool)(this["launch_rfactor2"]));
+            }
+            set {
+                this["launch_rfactor2"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string rf2_launch_exe {
+            get {
+                return ((string)(this["rf2_launch_exe"]));
+            }
+            set {
+                this["rf2_launch_exe"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string rf2_launch_params {
+            get {
+                return ((string)(this["rf2_launch_params"]));
+            }
+            set {
+                this["rf2_launch_params"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("4.5")]
+        public float rf2_spotter_car_length {
+            get {
+                return ((float)(this["rf2_spotter_car_length"]));
+            }
+            set {
+                this["rf2_spotter_car_length"] = value;
+            }
+        }
     }
 }
