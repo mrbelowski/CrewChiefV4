@@ -305,6 +305,13 @@ namespace CrewChiefV4
                         setFromCommandLine = true;
                         break;
                     }
+                    else if (arg.Equals("RF2"))
+                    {
+                        Console.WriteLine("Set RF2 mode from command line");
+                        this.gameDefinitionList.Text = GameDefinition.rfactor2.friendlyName;
+                        setFromCommandLine = true;
+                        break;
+                    }
                 }
             }
             if (!setFromCommandLine)
