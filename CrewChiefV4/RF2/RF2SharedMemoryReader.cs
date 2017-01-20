@@ -27,7 +27,7 @@ namespace CrewChiefV4.rFactor2
         public class RF2StructWrapper
         {
             public long ticksWhenRead;
-            public rf2Shared data;
+            public rF2State data;
         }
 
         public override void DumpRawGameData()
