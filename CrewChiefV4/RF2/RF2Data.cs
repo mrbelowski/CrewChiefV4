@@ -1,9 +1,4 @@
-﻿/*
-rF2 internal state mapping structures. 
-
-Author: The Iron Wolf (vleonavicius@hotmail.com)
-*/
-using System;
+﻿using System;
 using System.Runtime.InteropServices;
 
 namespace CrewChiefV4.rFactor2
@@ -386,7 +381,7 @@ namespace CrewChiefV4.rFactor2
             byte[] mExpansionTelem;                    // for future use (note that the slot ID has been moved to mID above)
 
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 4)]
-            internal rF2Wheel[] mWheel;            // wheel info (front left, front right, rear left, rear right)
+            internal rF2Wheel[] mWheels;            // wheel info (front left, front right, rear left, rear right)
 
             internal int mSession;                  // current session (0=testday 1-4=practice 5-8=qual 9=warmup 10-13=race)
             internal double mCurrentET;             // current time
