@@ -6,6 +6,7 @@ using CrewChiefV4.rFactor2.rFactor2Data;
 using System.Threading;
 using CrewChiefV4.Events;
 using CrewChiefV4.Audio;
+//using static CrewChiefV4.rFactor2.rFactor2Constants;
 
 namespace CrewChiefV4.rFactor2
 {
@@ -56,11 +57,12 @@ namespace CrewChiefV4.rFactor2
             paused = false;
         }
 
-        private rf2VehicleInfo getVehicleInfo(rf2Shared shared)
+        private rF2VehScoringInfo getVehicleInfo(rF2State shared)
         {
-            foreach (rf2VehicleInfo vehicle in shared.vehicle)
+            foreach (var vehicle in shared.mVehicles)
             {
-                if (vehicle.isPlayer == 1)
+                // TOOD: CHECK this out
+                if (vehicle.mIsPlayer == 1)
                 {
                     return vehicle;
                 }
@@ -75,18 +77,18 @@ namespace CrewChiefV4.rFactor2
                 return;
             }
 
-            rf2Shared lastState = ((CrewChiefV4.rFactor2.RF2SharedMemoryReader.RF2StructWrapper)lastStateObj).data;
-            rf2Shared currentState = ((CrewChiefV4.rFactor2.RF2SharedMemoryReader.RF2StructWrapper)currentStateObj).data;
+            rF2State lastState = ((CrewChiefV4.rFactor2.RF2SharedMemoryReader.RF2StructWrapper)lastStateObj).state;
+            rF2State currentState = ((CrewChiefV4.rFactor2.RF2SharedMemoryReader.RF2StructWrapper)currentStateObj).state;
             
-            if (!enabled || currentState.currentET < timeAfterRaceStartToActivate || currentState.inRealtime == 0 || 
-                (currentState.numVehicles <= 2))
+            if (!enabled || currentState.mCurrentET < timeAfterRaceStartToActivate || currentState.mInRealtime == 0 || 
+                (currentState.mNumVehicles <= 2))
             {
                 return;
             }
 
             DateTime now = DateTime.Now;
-            rf2VehicleInfo currentPlayerData;
-            rf2VehicleInfo previousPlayerData;
+            rF2VehScoringInfo currentPlayerData;
+            rF2VehScoringInfo previousPlayerData;
             float timeDiffSeconds;
             try
             {
@@ -104,28 +106,29 @@ namespace CrewChiefV4.rFactor2
             {
                 return;
             }
-            float[] currentPlayerPosition = new float[] { currentPlayerData.pos.x, currentPlayerData.pos.z };
+            // TODO: rf2 is in doubles.
+            float[] currentPlayerPosition = new float[] { (float) currentPlayerData.mPos.x, (float) currentPlayerData.mPos.z };
 
-            if (currentPlayerData.inPits == 0 && currentPlayerData.control == (int)rFactor2Constant.rf2Control.player && 
+            if (currentPlayerData.mInPits == 0 && currentPlayerData.mControl == (int)rFactor2Constants.rF2Control.Player && 
                 // turn off spotter for formation lap before going green
-                !(currentState.gamePhase == (int)rFactor2Constant.rf2GamePhase.formation))
+                !(currentState.mGamePhase == (int)rFactor2Constants.rF2GamePhase.Formation))
             {
                 List<float[]> currentOpponentPositions = new List<float[]>();
                 float[] playerVelocityData = new float[3];
-                playerVelocityData[0] = currentState.speed;
-                playerVelocityData[1] = (currentPlayerData.pos.x - previousPlayerData.pos.x) / timeDiffSeconds;
-                playerVelocityData[2] = (currentPlayerData.pos.z - previousPlayerData.pos.z) / timeDiffSeconds;
+                playerVelocityData[0] = (float)currentState.mSpeed;
+                playerVelocityData[1] = ((float)currentPlayerData.mPos.x - (float)previousPlayerData.mPos.x) / timeDiffSeconds;
+                playerVelocityData[2] = ((float)currentPlayerData.mPos.z - (float)previousPlayerData.mPos.z) / timeDiffSeconds;
 
-                for (int i = 0; i < currentState.numVehicles; i++)
+                for (int i = 0; i < currentState.mNumVehicles; ++i)
                 {
-                    rf2VehicleInfo vehicle = currentState.vehicle[i];
-                    if (vehicle.isPlayer == 1 || vehicle.inPits == 1 || vehicle.lapDist < 0)
+                    var vehicle = currentState.mVehicles[i];
+                    if (vehicle.mIsPlayer == 1 || vehicle.mInPits == 1 || vehicle.mLapDist < 0)
                     {
                         continue;
                     }
-                    currentOpponentPositions.Add(new float[] { vehicle.pos.x, vehicle.pos.z });
+                    currentOpponentPositions.Add(new float[] { (float)vehicle.mPos.x, (float)vehicle.mPos.z });
                 }
-                float playerRotation = (float)(Math.Atan2((double)(currentState.oriZ.x), (double)(currentState.oriZ.z)));                
+                float playerRotation = (float)(Math.Atan2((double)(currentState.mOri[rFactor2Constants.RowZ].x), (double)(currentState.mOri[rFactor2Constants.RowZ].z)));                
                 if (playerRotation < 0)
                 {
                     playerRotation = (float)(2 * Math.PI) + playerRotation;

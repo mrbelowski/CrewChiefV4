@@ -65,10 +65,10 @@ namespace CrewChiefV4.rFactor2
         {
             CrewChiefV4.rFactor2.RF2SharedMemoryReader.RF2StructWrapper wrapper = (CrewChiefV4.rFactor2.RF2SharedMemoryReader.RF2StructWrapper)memoryMappedFileStruct;
             GameStateData currentGameState = new GameStateData(wrapper.ticksWhenRead);
-            rFactor2Data.rf2Shared shared = wrapper.data;
+            rFactor2Data.rF2State shared = wrapper.state;
 
             // no session data
-            if (shared.numVehicles == 0)
+            if (shared.mNumVehicles == 0)
             {
                 isOfflineSession = true;
                 distanceOffTrack = 0;
@@ -78,7 +78,7 @@ namespace CrewChiefV4.rFactor2
                 return null;
             }
             // game is paused or other window has taken focus
-            if (shared.deltaTime >= 0.56)
+            if (shared.mDeltaTime >= 0.56)
             {
                 return previousGameState;
             }
@@ -87,21 +87,21 @@ namespace CrewChiefV4.rFactor2
             // session data
             // get player scoring info (usually index 0)
             // get session leader scoring info (usually index 1 if not player)
-            rFactor2Data.rf2VehicleInfo player = new rf2VehicleInfo();
-            rFactor2Data.rf2VehicleInfo leader = new rf2VehicleInfo();
-            for (int i = 0; i < shared.numVehicles; i++)
+            rFactor2Data.rF2VehScoringInfo player = new rF2VehScoringInfo();
+            rFactor2Data.rF2VehScoringInfo leader = new rF2VehScoringInfo();
+            for (int i = 0; i < shared.mNumVehicles; i++)
             {
-                rFactor2Data.rf2VehicleInfo vehicle = shared.vehicle[i];
-                switch (mapToControlType((rFactor2Constant.rf2Control)vehicle.control))
+                rFactor2Data.rF2VehScoringInfo vehicle = shared.mVehicles[i];
+                switch (mapToControlType((rFactor2Constants.rF2Control)vehicle.mControl))
                 { 
                     case ControlType.AI:
                     case ControlType.Player:
                     case ControlType.Remote:
-                        if (vehicle.isPlayer == 1)
+                        if (vehicle.mIsPlayer == 1)
                         {
                             player = vehicle;
                         }
-                        if (vehicle.place == 1)
+                        if (vehicle.mPlace == 1)
                         {
                             leader = vehicle;
                         }
@@ -109,39 +109,41 @@ namespace CrewChiefV4.rFactor2
                     default:
                         continue;
                 }
-                if (player.isPlayer == 1 && leader.place == 1)
+                if (player.mIsPlayer == 1 && leader.mPlace == 1)
                 {
                     break;
                 }
             }
             // can't find the player or session leader vehicle info (replay)
-            if (player.isPlayer != 1 || leader.place != 1)
+            if (player.mIsPlayer != 1 || leader.mPlace != 1)
             {
                 return previousGameState;
             }
             if (playerName == null)
             {
-                String driverName = getNameFromBytes(player.driverName).ToLower();
+
+                // TODO:Don't think rF2 is UTF 8
+                var driverName = getNameFromBytes(player.mDriverName).ToLower();
                 NameValidator.validateName(driverName);
                 playerName = driverName;
             }
             // these things should remain constant during a session
-            currentGameState.SessionData.EventIndex = shared.session;
+            currentGameState.SessionData.EventIndex = shared.mSession;
             currentGameState.SessionData.SessionIteration = 
-                shared.session >= 1 && shared.session <= 4 ? shared.session - 1 :
-                shared.session >= 5 && shared.session <= 8 ? shared.session - 5 :
-                shared.session >= 10 && shared.session <= 13 ? shared.session - 10 : 0;
+                shared.mSession >= 1 && shared.mSession <= 4 ? shared.mSession - 1 :
+                shared.mSession >= 5 && shared.mSession <= 8 ? shared.mSession - 5 :
+                shared.mSession >= 10 && shared.mSession <= 13 ? shared.mSession - 10 : 0;
             currentGameState.SessionData.SessionType = mapToSessionType(shared);
-            currentGameState.SessionData.SessionPhase = mapToSessionPhase((rFactor2Constant.rf2GamePhase)shared.gamePhase);
-            currentGameState.carClass = CarData.getCarClassForRF1ClassName(getNameFromBytes(player.vehicleClass));
+            currentGameState.SessionData.SessionPhase = mapToSessionPhase((rFactor2Constants.rF2GamePhase)shared.mGamePhase);
+            currentGameState.carClass = CarData.getCarClassForRF1ClassName(getNameFromBytes(player.mVehicleClass));
             brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(currentGameState.carClass);
-            currentGameState.SessionData.DriverRawName = getNameFromBytes(player.driverName).ToLower();
-            currentGameState.SessionData.TrackDefinition = new TrackDefinition(getNameFromBytes(shared.trackName), shared.lapDist);
+            currentGameState.SessionData.DriverRawName = getNameFromBytes(player.mDriverName).ToLower();
+            currentGameState.SessionData.TrackDefinition = new TrackDefinition(getNameFromBytes(shared.mTrackName), (float)shared.mLapDist);
             currentGameState.SessionData.TrackDefinition.setGapPoints();
-            currentGameState.SessionData.SessionNumberOfLaps = shared.maxLaps > 0 && shared.maxLaps < 1000 ? shared.maxLaps : 0;
+            currentGameState.SessionData.SessionNumberOfLaps = shared.mMaxLaps > 0 && shared.mMaxLaps < 1000 ? shared.mMaxLaps : 0;
             // default to 60:30 if both session time and number of laps undefined (test day)
             float defaultSessionTotalRunTime = 3630;
-            currentGameState.SessionData.SessionTotalRunTime = shared.endET > 0 ? shared.endET : currentGameState.SessionData.SessionNumberOfLaps > 0 ? 0 : defaultSessionTotalRunTime;
+            currentGameState.SessionData.SessionTotalRunTime = (float)shared.mEndET > 0 ? (float)shared.mEndET : currentGameState.SessionData.SessionNumberOfLaps > 0 ? 0 : defaultSessionTotalRunTime;
             // if previous state is null or any of the above change, this is a new session
             currentGameState.SessionData.IsNewSession = previousGameState == null ||
                 currentGameState.SessionData.SessionType != previousGameState.SessionData.SessionType ||
@@ -163,47 +165,47 @@ namespace CrewChiefV4.rFactor2
                 currentGameState.SessionData.SessionPhase == SessionPhase.Countdown)); 
             currentGameState.SessionData.SessionStartTime = currentGameState.SessionData.IsNewSession ? currentGameState.Now : previousGameState.SessionData.SessionStartTime;
             currentGameState.SessionData.SessionHasFixedTime = currentGameState.SessionData.SessionTotalRunTime > 0;
-            currentGameState.SessionData.SessionRunningTime = shared.currentET;
+            currentGameState.SessionData.SessionRunningTime = (float)shared.mCurrentET;
             currentGameState.SessionData.SessionTimeRemaining = currentGameState.SessionData.SessionHasFixedTime ? currentGameState.SessionData.SessionTotalRunTime - currentGameState.SessionData.SessionRunningTime : 0;
             // hack for test day sessions running longer than allotted time
-            currentGameState.SessionData.SessionTimeRemaining = currentGameState.SessionData.SessionTimeRemaining < 0 && shared.session == 0 ? defaultSessionTotalRunTime : currentGameState.SessionData.SessionTimeRemaining;
-            currentGameState.SessionData.NumCars = shared.numVehicles;
+            currentGameState.SessionData.SessionTimeRemaining = currentGameState.SessionData.SessionTimeRemaining < 0 && shared.mSession == 0 ? defaultSessionTotalRunTime : currentGameState.SessionData.SessionTimeRemaining;
+            currentGameState.SessionData.NumCars = shared.mNumVehicles;
             currentGameState.SessionData.NumCarsAtStartOfSession = currentGameState.SessionData.IsNewSession ? currentGameState.SessionData.NumCars : previousGameState.SessionData.NumCarsAtStartOfSession;
-            currentGameState.SessionData.Position = player.place;
+            currentGameState.SessionData.Position = player.mPlace;
             currentGameState.SessionData.UnFilteredPosition = currentGameState.SessionData.Position;
             currentGameState.SessionData.SessionStartPosition = currentGameState.SessionData.IsNewSession ? currentGameState.SessionData.Position : previousGameState.SessionData.SessionStartPosition;
-            currentGameState.SessionData.SectorNumber = player.sector == 0 ? 3 : player.sector;
+            currentGameState.SessionData.SectorNumber = player.mSector == 0 ? 3 : player.mSector;
             currentGameState.SessionData.IsNewSector = currentGameState.SessionData.IsNewSession || currentGameState.SessionData.SectorNumber != previousGameState.SessionData.SectorNumber;
             currentGameState.SessionData.IsNewLap = currentGameState.SessionData.IsNewSession || (currentGameState.SessionData.IsNewSector && currentGameState.SessionData.SectorNumber == 1);
             currentGameState.SessionData.PositionAtStartOfCurrentLap = currentGameState.SessionData.IsNewLap ? currentGameState.SessionData.Position : previousGameState.SessionData.PositionAtStartOfCurrentLap;
-            currentGameState.SessionData.IsDisqualified = (rFactor2Constant.rf2FinishStatus)player.finishStatus == rFactor2Constant.rf2FinishStatus.dq;
-            currentGameState.SessionData.CompletedLaps = player.totalLaps;
-            currentGameState.SessionData.LapTimeCurrent = currentGameState.SessionData.SessionRunningTime - player.lapStartET;
-            currentGameState.SessionData.LapTimePrevious = player.lastLapTime > 0 ? player.lastLapTime : -1;
-            currentGameState.SessionData.LastSector1Time = player.curSector1 > 0 ? player.curSector1 : -1;
-            currentGameState.SessionData.LastSector2Time = player.curSector2 > 0 && player.curSector1 > 0 ? player.curSector2 - player.curSector1 : -1;
-            currentGameState.SessionData.LastSector3Time = player.lastLapTime > 0 && player.curSector2 > 0 ? player.lastLapTime - player.curSector2 : -1;
-            currentGameState.SessionData.PlayerBestSector1Time = player.bestSector1 > 0 ? player.bestSector1 : -1;
-            currentGameState.SessionData.PlayerBestSector2Time = player.bestSector2 > 0 && player.bestSector1 > 0 ? player.bestSector2 - player.bestSector1 : -1;
-            currentGameState.SessionData.PlayerBestSector3Time = player.bestLapTime > 0 && player.bestSector2 > 0 ? player.bestLapTime - player.bestSector2 : -1;
+            currentGameState.SessionData.IsDisqualified = (rFactor2Constants.rF2FinishStatus)player.mFinishStatus == rFactor2Constants.rF2FinishStatus.Dq;
+            currentGameState.SessionData.CompletedLaps = player.mTotalLaps;
+            currentGameState.SessionData.LapTimeCurrent = currentGameState.SessionData.SessionRunningTime - (float)player.mLapStartET;
+            currentGameState.SessionData.LapTimePrevious = player.mLastLapTime > 0 ? (float)player.mLastLapTime : -1;
+            currentGameState.SessionData.LastSector1Time = player.mCurSector1 > 0 ? (float)player.mCurSector1 : -1;
+            currentGameState.SessionData.LastSector2Time = player.mCurSector2 > 0 && player.mCurSector1 > 0 ? (float)(player.mCurSector2 - player.mCurSector1) : -1;
+            currentGameState.SessionData.LastSector3Time = player.mLastLapTime > 0 && player.mCurSector2 > 0 ? (float)(player.mLastLapTime - player.mCurSector2) : -1;
+            currentGameState.SessionData.PlayerBestSector1Time = player.mBestSector1 > 0 ? (float)player.mBestSector1 : -1;
+            currentGameState.SessionData.PlayerBestSector2Time = player.mBestSector2 > 0 && player.mBestSector1 > 0 ? (float)(player.mBestSector2 - player.mBestSector1) : -1;
+            currentGameState.SessionData.PlayerBestSector3Time = player.mBestLapTime > 0 && player.mBestSector2 > 0 ? (float)(player.mBestLapTime - player.mBestSector2) : -1;
             currentGameState.SessionData.PlayerBestLapSector1Time = currentGameState.SessionData.PlayerBestSector1Time;
             currentGameState.SessionData.PlayerBestLapSector2Time = currentGameState.SessionData.PlayerBestSector2Time;
             currentGameState.SessionData.PlayerBestLapSector3Time = currentGameState.SessionData.PlayerBestSector3Time;
-            currentGameState.SessionData.PlayerLapTimeSessionBest = player.bestLapTime > 0 ? player.bestLapTime : -1;
+            currentGameState.SessionData.PlayerLapTimeSessionBest = player.mBestLapTime > 0 ? (float)player.mBestLapTime : -1;
             currentGameState.SessionData.SessionTimesAtEndOfSectors = previousGameState != null ? previousGameState.SessionData.SessionTimesAtEndOfSectors : new SessionData().SessionTimesAtEndOfSectors;
             if (currentGameState.SessionData.IsNewSector && !currentGameState.SessionData.IsNewSession)
             {
-                // there's a slight delay due to scoring updating every 500 ms, so we can't use SessionRunningTime here
+                // there's a slight delay due to scoring updating every 200 ms, so we can't use SessionRunningTime here
                 switch(currentGameState.SessionData.SectorNumber)
                 {
                     case 1:
-                        currentGameState.SessionData.SessionTimesAtEndOfSectors[3] = player.lapStartET > 0 ? player.lapStartET : -1;
+                        currentGameState.SessionData.SessionTimesAtEndOfSectors[3] = player.mLapStartET > 0 ? (float)player.mLapStartET : -1;
                         break;
                     case 2:
-                        currentGameState.SessionData.SessionTimesAtEndOfSectors[1] = player.lapStartET > 0 && player.curSector1 > 0 ? player.lapStartET + player.curSector1 : -1;
+                        currentGameState.SessionData.SessionTimesAtEndOfSectors[1] = player.mLapStartET > 0 && player.mCurSector1 > 0 ? (float)(player.mLapStartET + player.mCurSector1) : -1;
                         break;
                     case 3:
-                        currentGameState.SessionData.SessionTimesAtEndOfSectors[2] = player.lapStartET > 0 && player.curSector2 > 0 ? player.lapStartET + player.curSector2 : -1;
+                        currentGameState.SessionData.SessionTimesAtEndOfSectors[2] = player.mLapStartET > 0 && player.mCurSector2 > 0 ? (float)(player.mLapStartET + player.mCurSector2) : -1;
                         break;
                     default:
                         break;
@@ -220,18 +222,18 @@ namespace CrewChiefV4.rFactor2
             {
                 currentGameState.SessionData.formattedPlayerLapTimes.Add(TimeSpan.FromSeconds(currentGameState.SessionData.LapTimePrevious).ToString(@"mm\:ss\.fff"));
             }
-            currentGameState.SessionData.LeaderHasFinishedRace = leader.finishStatus == (int)rFactor2Constant.rf2FinishStatus.finished;
-            currentGameState.SessionData.TimeDeltaFront = player.timeBehindNext;
+            currentGameState.SessionData.LeaderHasFinishedRace = leader.mFinishStatus == (int)rFactor2Constants.rF2FinishStatus.Finished;
+            currentGameState.SessionData.TimeDeltaFront = (float)player.mTimeBehindNext;
 
             // --------------------------------
             // engine data
-            currentGameState.EngineData.EngineRpm = shared.engineRPM;
-            currentGameState.EngineData.MaxEngineRpm = shared.engineMaxRPM;
+            currentGameState.EngineData.EngineRpm = (float)shared.mEngineRPM;
+            currentGameState.EngineData.MaxEngineRpm = (float)shared.mEngineMaxRPM;
             currentGameState.EngineData.MinutesIntoSessionBeforeMonitoring = 5;
-            currentGameState.EngineData.EngineOilTemp = shared.engineOilTemp;
-            currentGameState.EngineData.EngineWaterTemp = shared.engineWaterTemp;
+            currentGameState.EngineData.EngineOilTemp = (float)shared.mEngineOilTemp;
+            currentGameState.EngineData.EngineWaterTemp = (float)shared.mEngineWaterTemp;
             //HACK: there's probably a cleaner way to do this...
-            if (shared.overheating == 1)
+            if (shared.mOverheating == 1)
             {
                 currentGameState.EngineData.EngineWaterTemp += 50;
                 currentGameState.EngineData.EngineOilTemp += 50;
@@ -239,12 +241,12 @@ namespace CrewChiefV4.rFactor2
 
             // --------------------------------
             // transmission data
-            currentGameState.TransmissionData.Gear = shared.gear;
+            currentGameState.TransmissionData.Gear = shared.mGear;
 
             // controls
-            currentGameState.ControlData.BrakePedal = shared.unfilteredBrake;
-            currentGameState.ControlData.ThrottlePedal = shared.unfilteredThrottle;
-            currentGameState.ControlData.ClutchPedal = shared.unfilteredClutch;
+            currentGameState.ControlData.BrakePedal = (float)shared.mUnfilteredBrake;
+            currentGameState.ControlData.ThrottlePedal = (float)shared.mUnfilteredThrottle;
+            currentGameState.ControlData.ClutchPedal = (float)shared.mUnfilteredClutch;
 
             // --------------------------------
             // damage
@@ -253,7 +255,7 @@ namespace CrewChiefV4.rFactor2
             {
                 currentGameState.CarDamageData.DamageEnabled = true;
                 int bodyDamage = 0;
-                foreach (int dent in shared.dentSeverity)
+                foreach (int dent in shared.mDentSeverity)
                 {
                     bodyDamage += dent;
                 }
@@ -282,25 +284,25 @@ namespace CrewChiefV4.rFactor2
 
             // --------------------------------
             // control data
-            currentGameState.ControlData.ControlType = mapToControlType((rFactor2Constant.rf2Control)player.control);
+            currentGameState.ControlData.ControlType = mapToControlType((rFactor2Constants.rF2Control)player.mControl);
 
             // --------------------------------
             // motion data
-            currentGameState.PositionAndMotionData.CarSpeed = shared.speed;
-            currentGameState.PositionAndMotionData.DistanceRoundTrack = player.lapDist;
+            currentGameState.PositionAndMotionData.CarSpeed = (float)shared.mSpeed;
+            currentGameState.PositionAndMotionData.DistanceRoundTrack = (float)player.mLapDist;
 
             // --------------------------------
             // tire data
             // Automobilista reports in Kelvin
             currentGameState.TyreData.TireWearActive = true;
-            currentGameState.TyreData.LeftFrontAttached = shared.wheel[(int)rFactor2Constant.rf2WheelIndex.frontLeft].detached == 0;
-            currentGameState.TyreData.FrontLeft_LeftTemp = shared.wheel[(int)rFactor2Constant.rf2WheelIndex.frontLeft].temperature[0] - 273;
-            currentGameState.TyreData.FrontLeft_CenterTemp = shared.wheel[(int)rFactor2Constant.rf2WheelIndex.frontLeft].temperature[1] - 273;
-            currentGameState.TyreData.FrontLeft_RightTemp = shared.wheel[(int)rFactor2Constant.rf2WheelIndex.frontLeft].temperature[2] - 273;
+            currentGameState.TyreData.LeftFrontAttached = shared.mWheels[(int)rFactor2Constants.rF2WheelIndex.FrontLeft].mDetached == 0;
+            currentGameState.TyreData.FrontLeft_LeftTemp = (float)shared.mWheels[(int)rFactor2Constants.rF2WheelIndex.FrontLeft].mTemperature[0] - 273;
+            currentGameState.TyreData.FrontLeft_CenterTemp = (float)shared.mWheels[(int)rFactor2Constants.rF2WheelIndex.FrontLeft].mTemperature[1] - 273;
+            currentGameState.TyreData.FrontLeft_RightTemp = (float)shared.mWheels[(int)rFactor2Constants.rF2WheelIndex.FrontLeft].mTemperature[2] - 273;
 
             float frontLeftTemp = (currentGameState.TyreData.FrontLeft_CenterTemp + currentGameState.TyreData.FrontLeft_LeftTemp + currentGameState.TyreData.FrontLeft_RightTemp) / 3;
-            currentGameState.TyreData.FrontLeftPressure = shared.wheel[(int)rFactor2Constant.rf2WheelIndex.frontLeft].pressure;
-            currentGameState.TyreData.FrontLeftPercentWear = (1 - shared.wheel[(int)rFactor2Constant.rf2WheelIndex.frontLeft].wear) * 100;
+            currentGameState.TyreData.FrontLeftPressure = (float)shared.mWheels[(int)rFactor2Constants.rF2WheelIndex.FrontLeft].mPressure;
+            currentGameState.TyreData.FrontLeftPercentWear = (float)(1 - shared.mWheels[(int)rFactor2Constants.rF2WheelIndex.FrontLeft].mWear) * 100;
             if (currentGameState.SessionData.IsNewLap)
             {
                 currentGameState.TyreData.PeakFrontLeftTemperatureForLap = frontLeftTemp;
@@ -310,14 +312,14 @@ namespace CrewChiefV4.rFactor2
                 currentGameState.TyreData.PeakFrontLeftTemperatureForLap = frontLeftTemp;
             }
 
-            currentGameState.TyreData.RightFrontAttached = shared.wheel[(int)rFactor2Constant.rf2WheelIndex.frontRight].detached == 0;
-            currentGameState.TyreData.FrontRight_LeftTemp = shared.wheel[(int)rFactor2Constant.rf2WheelIndex.frontRight].temperature[0] - 273;
-            currentGameState.TyreData.FrontRight_CenterTemp = shared.wheel[(int)rFactor2Constant.rf2WheelIndex.frontRight].temperature[1] - 273;
-            currentGameState.TyreData.FrontRight_RightTemp = shared.wheel[(int)rFactor2Constant.rf2WheelIndex.frontRight].temperature[2] - 273;
+            currentGameState.TyreData.RightFrontAttached = shared.mWheels[(int)rFactor2Constants.rF2WheelIndex.FrontRight].mDetached == 0;
+            currentGameState.TyreData.FrontRight_LeftTemp = (float)shared.mWheels[(int)rFactor2Constants.rF2WheelIndex.FrontRight].mTemperature[0] - 273;
+            currentGameState.TyreData.FrontRight_CenterTemp = (float)shared.mWheels[(int)rFactor2Constants.rF2WheelIndex.FrontRight].mTemperature[1] - 273;
+            currentGameState.TyreData.FrontRight_RightTemp = (float)shared.mWheels[(int)rFactor2Constants.rF2WheelIndex.FrontRight].mTemperature[2] - 273;
 
             float frontRightTemp = (currentGameState.TyreData.FrontRight_CenterTemp + currentGameState.TyreData.FrontRight_LeftTemp + currentGameState.TyreData.FrontRight_RightTemp) / 3;
-            currentGameState.TyreData.FrontRightPressure = shared.wheel[(int)rFactor2Constant.rf2WheelIndex.frontRight].pressure;
-            currentGameState.TyreData.FrontRightPercentWear = (1 - shared.wheel[(int)rFactor2Constant.rf2WheelIndex.frontRight].wear) * 100;
+            currentGameState.TyreData.FrontRightPressure = (float)shared.mWheels[(int)rFactor2Constants.rF2WheelIndex.FrontRight].mPressure;
+            currentGameState.TyreData.FrontRightPercentWear = (float)(1 - shared.mWheels[(int)rFactor2Constants.rF2WheelIndex.FrontRight].mWear) * 100;
             if (currentGameState.SessionData.IsNewLap)
             {
                 currentGameState.TyreData.PeakFrontRightTemperatureForLap = frontRightTemp;
@@ -327,14 +329,14 @@ namespace CrewChiefV4.rFactor2
                 currentGameState.TyreData.PeakFrontRightTemperatureForLap = frontRightTemp;
             }
 
-            currentGameState.TyreData.LeftRearAttached = shared.wheel[(int)rFactor2Constant.rf2WheelIndex.rearLeft].detached == 0;
-            currentGameState.TyreData.RearLeft_LeftTemp = shared.wheel[(int)rFactor2Constant.rf2WheelIndex.rearLeft].temperature[0] - 273;
-            currentGameState.TyreData.RearLeft_CenterTemp = shared.wheel[(int)rFactor2Constant.rf2WheelIndex.rearLeft].temperature[1] - 273;
-            currentGameState.TyreData.RearLeft_RightTemp = shared.wheel[(int)rFactor2Constant.rf2WheelIndex.rearLeft].temperature[2] - 273;
+            currentGameState.TyreData.LeftRearAttached = shared.mWheels[(int)rFactor2Constants.rF2WheelIndex.RearLeft].mDetached == 0;
+            currentGameState.TyreData.RearLeft_LeftTemp = (float)shared.mWheels[(int)rFactor2Constants.rF2WheelIndex.RearLeft].mTemperature[0] - 273;
+            currentGameState.TyreData.RearLeft_CenterTemp = (float)shared.mWheels[(int)rFactor2Constants.rF2WheelIndex.RearLeft].mTemperature[1] - 273;
+            currentGameState.TyreData.RearLeft_RightTemp = (float)shared.mWheels[(int)rFactor2Constants.rF2WheelIndex.RearLeft].mTemperature[2] - 273;
 
             float rearLeftTemp = (currentGameState.TyreData.RearLeft_CenterTemp + currentGameState.TyreData.RearLeft_LeftTemp + currentGameState.TyreData.RearLeft_RightTemp) / 3;
-            currentGameState.TyreData.RearLeftPressure = shared.wheel[(int)rFactor2Constant.rf2WheelIndex.rearLeft].pressure;
-            currentGameState.TyreData.RearLeftPercentWear = (1 - shared.wheel[(int)rFactor2Constant.rf2WheelIndex.rearLeft].wear) * 100;
+            currentGameState.TyreData.RearLeftPressure = (float)shared.mWheels[(int)rFactor2Constants.rF2WheelIndex.RearLeft].mPressure;
+            currentGameState.TyreData.RearLeftPercentWear = (float)(1 - shared.mWheels[(int)rFactor2Constants.rF2WheelIndex.RearLeft].mWear) * 100;
             if (currentGameState.SessionData.IsNewLap)
             {
                 currentGameState.TyreData.PeakRearLeftTemperatureForLap = rearLeftTemp;
@@ -344,14 +346,14 @@ namespace CrewChiefV4.rFactor2
                 currentGameState.TyreData.PeakRearLeftTemperatureForLap = rearLeftTemp;
             }
 
-            currentGameState.TyreData.RightRearAttached = shared.wheel[(int)rFactor2Constant.rf2WheelIndex.rearRight].detached == 0;
-            currentGameState.TyreData.RearRight_LeftTemp = shared.wheel[(int)rFactor2Constant.rf2WheelIndex.rearRight].temperature[0] - 273;
-            currentGameState.TyreData.RearRight_CenterTemp = shared.wheel[(int)rFactor2Constant.rf2WheelIndex.rearRight].temperature[1] - 273;
-            currentGameState.TyreData.RearRight_RightTemp = shared.wheel[(int)rFactor2Constant.rf2WheelIndex.rearRight].temperature[2] - 273;
+            currentGameState.TyreData.RightRearAttached = shared.mWheels[(int)rFactor2Constants.rF2WheelIndex.RearRight].mDetached == 0;
+            currentGameState.TyreData.RearRight_LeftTemp = (float)shared.mWheels[(int)rFactor2Constants.rF2WheelIndex.RearRight].mTemperature[0] - 273;
+            currentGameState.TyreData.RearRight_CenterTemp = (float)shared.mWheels[(int)rFactor2Constants.rF2WheelIndex.RearRight].mTemperature[1] - 273;
+            currentGameState.TyreData.RearRight_RightTemp = (float)shared.mWheels[(int)rFactor2Constants.rF2WheelIndex.RearRight].mTemperature[2] - 273;
 
             float rearRightTemp = (currentGameState.TyreData.RearRight_CenterTemp + currentGameState.TyreData.RearRight_LeftTemp + currentGameState.TyreData.RearRight_RightTemp) / 3;
-            currentGameState.TyreData.RearRightPressure = shared.wheel[(int)rFactor2Constant.rf2WheelIndex.rearRight].pressure;
-            currentGameState.TyreData.RearRightPercentWear = (1 - shared.wheel[(int)rFactor2Constant.rf2WheelIndex.rearRight].wear) * 100;
+            currentGameState.TyreData.RearRightPressure = (float)shared.mWheels[(int)rFactor2Constants.rF2WheelIndex.RearRight].mPressure;
+            currentGameState.TyreData.RearRightPercentWear = (float)(1 - shared.mWheels[(int)rFactor2Constants.rF2WheelIndex.RearRight].mWear) * 100;
             if (currentGameState.SessionData.IsNewLap)
             {
                 currentGameState.TyreData.PeakRearRightTemperatureForLap = rearRightTemp;
@@ -371,15 +373,15 @@ namespace CrewChiefV4.rFactor2
             if ((currentGameState.SessionData.IsNewSession || 
                 wheelCircumference[0] == 0 || wheelCircumference[1] == 0) && 
                 currentGameState.PositionAndMotionData.CarSpeed > 14 && 
-                Math.Abs(shared.unfilteredSteering) <= 0.05)
+                Math.Abs(shared.mUnfilteredSteering) <= 0.05)
             {
                 // calculate wheel circumference (assume left/right symmetry) at 50+ km/h with (mostly) straight steering
                 // front
-                wheelCircumference[0] = (2 * (float)Math.PI * currentGameState.PositionAndMotionData.CarSpeed / Math.Abs(shared.wheel[0].rotation) + 
-                    2 * (float)Math.PI * currentGameState.PositionAndMotionData.CarSpeed / Math.Abs(shared.wheel[1].rotation)) / 2;
+                wheelCircumference[0] = (float)(2 * (float)Math.PI * currentGameState.PositionAndMotionData.CarSpeed / Math.Abs(shared.mWheels[0].mRotation) + 
+                    2 * (float)Math.PI * currentGameState.PositionAndMotionData.CarSpeed / Math.Abs(shared.mWheels[1].mRotation)) / 2;
                 // rear
-                wheelCircumference[1] = (2 * (float)Math.PI * currentGameState.PositionAndMotionData.CarSpeed / Math.Abs(shared.wheel[2].rotation) + 
-                    2 * (float)Math.PI * currentGameState.PositionAndMotionData.CarSpeed / Math.Abs(shared.wheel[3].rotation)) / 2;
+                wheelCircumference[1] = (float)(2 * (float)Math.PI * currentGameState.PositionAndMotionData.CarSpeed / Math.Abs(shared.mWheels[2].mRotation) + 
+                    2 * (float)Math.PI * currentGameState.PositionAndMotionData.CarSpeed / Math.Abs(shared.mWheels[3].mRotation)) / 2;
             }
             if (currentGameState.PositionAndMotionData.CarSpeed > 7 && 
                 wheelCircumference[0] > 0 && wheelCircumference[1] > 0)
@@ -390,15 +392,15 @@ namespace CrewChiefV4.rFactor2
                 float minRotFactor = 0.5f;
                 float maxRotFactor = 1.3f;
 
-                currentGameState.TyreData.LeftFrontIsLocked = Math.Abs(shared.wheel[(int)rFactor2Constant.rf2WheelIndex.frontLeft].rotation) < minRotFactor * rotatingSpeed[0];
-                currentGameState.TyreData.RightFrontIsLocked = Math.Abs(shared.wheel[(int)rFactor2Constant.rf2WheelIndex.frontRight].rotation) < minRotFactor * rotatingSpeed[0];
-                currentGameState.TyreData.LeftRearIsLocked = Math.Abs(shared.wheel[(int)rFactor2Constant.rf2WheelIndex.rearLeft].rotation) < minRotFactor * rotatingSpeed[1];
-                currentGameState.TyreData.RightRearIsLocked = Math.Abs(shared.wheel[(int)rFactor2Constant.rf2WheelIndex.rearRight].rotation) < minRotFactor * rotatingSpeed[1];
+                currentGameState.TyreData.LeftFrontIsLocked = Math.Abs(shared.mWheels[(int)rFactor2Constants.rF2WheelIndex.FrontLeft].mRotation) < minRotFactor * rotatingSpeed[0];
+                currentGameState.TyreData.RightFrontIsLocked = Math.Abs(shared.mWheels[(int)rFactor2Constants.rF2WheelIndex.FrontRight].mRotation) < minRotFactor * rotatingSpeed[0];
+                currentGameState.TyreData.LeftRearIsLocked = Math.Abs(shared.mWheels[(int)rFactor2Constants.rF2WheelIndex.RearLeft].mRotation) < minRotFactor * rotatingSpeed[1];
+                currentGameState.TyreData.RightRearIsLocked = Math.Abs(shared.mWheels[(int)rFactor2Constants.rF2WheelIndex.RearRight].mRotation) < minRotFactor * rotatingSpeed[1];
 
-                currentGameState.TyreData.LeftFrontIsSpinning = Math.Abs(shared.wheel[(int)rFactor2Constant.rf2WheelIndex.frontLeft].rotation) > maxRotFactor * rotatingSpeed[0];
-                currentGameState.TyreData.RightFrontIsSpinning = Math.Abs(shared.wheel[(int)rFactor2Constant.rf2WheelIndex.frontRight].rotation) > maxRotFactor * rotatingSpeed[0];
-                currentGameState.TyreData.LeftRearIsSpinning = Math.Abs(shared.wheel[(int)rFactor2Constant.rf2WheelIndex.rearLeft].rotation) > maxRotFactor * rotatingSpeed[1];
-                currentGameState.TyreData.RightRearIsSpinning = Math.Abs(shared.wheel[(int)rFactor2Constant.rf2WheelIndex.rearRight].rotation) > maxRotFactor * rotatingSpeed[1];
+                currentGameState.TyreData.LeftFrontIsSpinning = Math.Abs(shared.mWheels[(int)rFactor2Constants.rF2WheelIndex.FrontLeft].mRotation) > maxRotFactor * rotatingSpeed[0];
+                currentGameState.TyreData.RightFrontIsSpinning = Math.Abs(shared.mWheels[(int)rFactor2Constants.rF2WheelIndex.FrontRight].mRotation) > maxRotFactor * rotatingSpeed[0];
+                currentGameState.TyreData.LeftRearIsSpinning = Math.Abs(shared.mWheels[(int)rFactor2Constants.rF2WheelIndex.RearLeft].mRotation) > maxRotFactor * rotatingSpeed[1];
+                currentGameState.TyreData.RightRearIsSpinning = Math.Abs(shared.mWheels[(int)rFactor2Constants.rF2WheelIndex.RearRight].mRotation) > maxRotFactor * rotatingSpeed[1];
             }
             // use detached wheel status for suspension damage
             currentGameState.CarDamageData.SuspensionDamageStatus = CornerData.getCornerData(suspensionDamageThresholds,
@@ -410,10 +412,10 @@ namespace CrewChiefV4.rFactor2
             // --------------------------------
             // brake data
             // Automobilista reports in Kelvin
-            currentGameState.TyreData.LeftFrontBrakeTemp = shared.wheel[(int)rFactor2Constant.rf2WheelIndex.frontLeft].brakeTemp - 273;
-            currentGameState.TyreData.RightFrontBrakeTemp = shared.wheel[(int)rFactor2Constant.rf2WheelIndex.frontRight].brakeTemp - 273;
-            currentGameState.TyreData.LeftRearBrakeTemp = shared.wheel[(int)rFactor2Constant.rf2WheelIndex.rearLeft].brakeTemp - 273;
-            currentGameState.TyreData.RightRearBrakeTemp = shared.wheel[(int)rFactor2Constant.rf2WheelIndex.rearRight].brakeTemp - 273;
+            currentGameState.TyreData.LeftFrontBrakeTemp = (float)shared.mWheels[(int)rFactor2Constants.rF2WheelIndex.FrontLeft].mBrakeTemp - 273;
+            currentGameState.TyreData.RightFrontBrakeTemp = (float)shared.mWheels[(int)rFactor2Constants.rF2WheelIndex.FrontRight].mBrakeTemp - 273;
+            currentGameState.TyreData.LeftRearBrakeTemp = (float)shared.mWheels[(int)rFactor2Constants.rF2WheelIndex.RearLeft].mBrakeTemp - 273;
+            currentGameState.TyreData.RightRearBrakeTemp = (float)shared.mWheels[(int)rFactor2Constants.rF2WheelIndex.RearRight].mBrakeTemp - 273;
 
             if (brakeTempThresholdsForPlayersCar != null)
             {
@@ -427,17 +429,17 @@ namespace CrewChiefV4.rFactor2
             if (currentGameState.Conditions.timeOfMostRecentSample.Add(ConditionsMonitor.ConditionsSampleFrequency) < currentGameState.Now)
             {
                 currentGameState.Conditions.addSample(currentGameState.Now, currentGameState.SessionData.CompletedLaps, currentGameState.SessionData.SectorNumber,
-                    shared.ambientTemp, shared.trackTemp, 0, (float)Math.Sqrt((double)(shared.wind.x * shared.wind.x + shared.wind.y * shared.wind.y + shared.wind.z * shared.wind.z)), 0, 0, 0);
+                    (float)shared.mAmbientTemp, (float)shared.mTrackTemp, 0, (float)Math.Sqrt((double)(shared.mWind.x * shared.mWind.x + shared.mWind.y * shared.mWind.y + shared.mWind.z * shared.mWind.z)), 0, 0, 0);
             }
 
             // --------------------------------
             // opponent data
             isOfflineSession = true;
             opponentKeysProcessed.Clear();
-            for (int i = 0; i < shared.vehicle.Length; i++)
+            for (int i = 0; i < shared.mVehicles.Length; i++)
             {
-                rFactor2Data.rf2VehicleInfo vehicle = shared.vehicle[i];
-                if (vehicle.isPlayer == 1)
+                rFactor2Data.rF2VehScoringInfo vehicle = shared.mVehicles[i];
+                if (vehicle.mIsPlayer == 1)
                 {
                     currentGameState.SessionData.OverallSessionBestLapTime = currentGameState.SessionData.PlayerLapTimeSessionBest > 0 ?
                         currentGameState.SessionData.PlayerLapTimeSessionBest : -1;
@@ -445,7 +447,7 @@ namespace CrewChiefV4.rFactor2
                         currentGameState.SessionData.PlayerLapTimeSessionBest : -1;
                     continue;
                 }
-                switch (mapToControlType((rFactor2Constant.rf2Control)vehicle.control))
+                switch (mapToControlType((rFactor2Constants.rF2Control)vehicle.mControl))
                 {
                     case ControlType.Player:
                     case ControlType.Replay:
@@ -457,13 +459,13 @@ namespace CrewChiefV4.rFactor2
                     default:
                         break;
                 }
-                String opponentKey = getNameFromBytes(vehicle.vehicleClass) + vehicle.place.ToString();
+                String opponentKey = getNameFromBytes(vehicle.mVehicleClass) + vehicle.mPlace.ToString();
                 OpponentData opponentPrevious = getOpponentDataForVehicleInfo(vehicle, previousGameState, currentGameState.SessionData.SessionRunningTime);
                 OpponentData opponent = new OpponentData();
-                opponent.DriverRawName = getNameFromBytes(vehicle.driverName).ToLower();
+                opponent.DriverRawName = getNameFromBytes(vehicle.mDriverName).ToLower();
                 opponent.DriverNameSet = opponent.DriverRawName.Length > 0;
-                opponent.CarClass = CarData.getCarClassForRF1ClassName(getNameFromBytes(vehicle.vehicleClass));
-                opponent.Position = vehicle.place;
+                opponent.CarClass = CarData.getCarClassForRF1ClassName(getNameFromBytes(vehicle.mVehicleClass));
+                opponent.Position = vehicle.mPlace;
                 if (opponent.DriverNameSet && opponentPrevious == null && CrewChief.enableDriverNames)
                 {
                     speechRecogniser.addNewOpponentName(opponent.DriverRawName);
@@ -480,31 +482,31 @@ namespace CrewChiefV4.rFactor2
                 }
                 opponent.UnFilteredPosition = opponent.Position;
                 opponent.SessionTimeAtLastPositionChange = opponentPrevious != null && opponentPrevious.Position != opponent.Position ? currentGameState.SessionData.SessionRunningTime : -1;
-                opponent.CompletedLaps = vehicle.totalLaps;
-                opponent.CurrentSectorNumber = vehicle.sector == 0 ? 3 : vehicle.sector;
+                opponent.CompletedLaps = vehicle.mTotalLaps;
+                opponent.CurrentSectorNumber = vehicle.mSector == 0 ? 3 : vehicle.mSector;
                 Boolean isNewSector = currentGameState.SessionData.IsNewSession || (opponentPrevious != null && opponentPrevious.CurrentSectorNumber != opponent.CurrentSectorNumber);
                 opponent.IsNewLap = currentGameState.SessionData.IsNewSession || (isNewSector && opponent.CurrentSectorNumber == 1);
-                opponent.Speed = vehicle.speed;
-                opponent.DistanceRoundTrack = vehicle.lapDist;
-                opponent.WorldPosition = new float[] { vehicle.pos.x, vehicle.pos.z };
-                opponent.CurrentBestLapTime = vehicle.bestLapTime > 0 ? vehicle.bestLapTime : -1;
+                opponent.Speed = (float)vehicle.mSpeed;
+                opponent.DistanceRoundTrack = (float)vehicle.mLapDist;
+                opponent.WorldPosition = new float[] { (float)vehicle.mPos.x, (float)vehicle.mPos.z };
+                opponent.CurrentBestLapTime = vehicle.mBestLapTime > 0 ? (float)vehicle.mBestLapTime : -1;
                 opponent.PreviousBestLapTime = opponentPrevious != null && opponentPrevious.CurrentBestLapTime > 0 && 
                     opponentPrevious.CurrentBestLapTime > opponent.CurrentBestLapTime ? opponentPrevious.CurrentBestLapTime : -1;
-                opponent.bestSector1Time = vehicle.bestSector1 > 0 ? vehicle.bestSector1 : -1;
-                opponent.bestSector2Time = vehicle.bestSector2 > 0 && vehicle.bestSector1 > 0 ? vehicle.bestSector2 - vehicle.bestSector1 : -1;
-                opponent.bestSector3Time = vehicle.bestLapTime > 0 && vehicle.bestSector2 > 0 ? vehicle.bestLapTime - vehicle.bestSector2 : -1;
-                opponent.LastLapTime = vehicle.lastLapTime > 0 ? vehicle.lastLapTime : -1;
+                opponent.bestSector1Time = vehicle.mBestSector1 > 0 ? (float)vehicle.mBestSector1 : -1;
+                opponent.bestSector2Time = vehicle.mBestSector2 > 0 && vehicle.mBestSector1 > 0 ? (float)(vehicle.mBestSector2 - vehicle.mBestSector1) : -1;
+                opponent.bestSector3Time = vehicle.mBestLapTime > 0 && vehicle.mBestSector2 > 0 ?  (float)(vehicle.mBestLapTime - vehicle.mBestSector2) : -1;
+                opponent.LastLapTime = vehicle.mLastLapTime > 0 ? (float)vehicle.mLastLapTime : -1;
                 float lastSectorTime = -1;
                 switch (opponent.CurrentSectorNumber)
                 {
                     case 1:
-                        lastSectorTime = vehicle.lastLapTime > 0 ? vehicle.lastLapTime : -1;
+                        lastSectorTime = vehicle.mLastLapTime > 0 ? (float)vehicle.mLastLapTime : -1;
                         break;
                     case 2:
-                        lastSectorTime = vehicle.lastSector1 > 0 ? vehicle.lastSector1 : -1;
+                        lastSectorTime = vehicle.mLastSector1 > 0 ? (float)vehicle.mLastSector1 : -1;
                         break;
                     case 3:
-                        lastSectorTime = vehicle.lastSector2 > 0 ? vehicle.lastSector2 : -1;
+                        lastSectorTime = vehicle.mLastSector2 > 0 ? (float)vehicle.mLastSector2 : -1;
                         break;
                     default:
                         break;
@@ -513,15 +515,15 @@ namespace CrewChiefV4.rFactor2
                 {
                     if (lastSectorTime > 0)
                     {
-                        opponent.CompleteLapWithProvidedLapTime(opponent.Position, vehicle.lapStartET, lastSectorTime, true, false, shared.trackTemp, shared.ambientTemp, currentGameState.SessionData.SessionHasFixedTime, currentGameState.SessionData.SessionTimeRemaining);
+                        opponent.CompleteLapWithProvidedLapTime(opponent.Position, (float)vehicle.mLapStartET, lastSectorTime, true, false, (float)shared.mTrackTemp, (float)shared.mAmbientTemp, currentGameState.SessionData.SessionHasFixedTime, currentGameState.SessionData.SessionTimeRemaining);
                     }
-                    opponent.StartNewLap(opponent.CompletedLaps + 1, opponent.Position, vehicle.inPits == 1 || opponent.DistanceRoundTrack < 0, vehicle.lapStartET, false, shared.trackTemp, shared.ambientTemp);
+                    opponent.StartNewLap(opponent.CompletedLaps + 1, opponent.Position, vehicle.mInPits == 1 || opponent.DistanceRoundTrack < 0, (float)vehicle.mLapStartET, false, (float)shared.mTrackTemp, (float)shared.mAmbientTemp);
                 }
                 else if (isNewSector && lastSectorTime > 0)
                 {
-                    opponent.AddCumulativeSectorData(opponent.Position, lastSectorTime, vehicle.lapStartET + lastSectorTime, true, false, shared.trackTemp, shared.ambientTemp);
+                    opponent.AddCumulativeSectorData(opponent.Position, lastSectorTime, (float)vehicle.mLapStartET + lastSectorTime, true, false, (float)shared.mTrackTemp, (float)shared.mAmbientTemp);
                 }
-                if (vehicle.inPits == 1 && opponent.CurrentSectorNumber == 3 && opponentPrevious != null && !opponentPrevious.isEnteringPits())
+                if (vehicle.mInPits == 1 && opponent.CurrentSectorNumber == 3 && opponentPrevious != null && !opponentPrevious.isEnteringPits())
                 {
                     opponent.setInLap();
                     LapData currentLapData = opponent.getCurrentLapData();
@@ -549,7 +551,7 @@ namespace CrewChiefV4.rFactor2
                 // session best lap times
                 if (opponent.Position == currentGameState.SessionData.Position + 1)
                 {
-                    currentGameState.SessionData.TimeDeltaBehind = vehicle.timeBehindNext;
+                    currentGameState.SessionData.TimeDeltaBehind = (float)vehicle.mTimeBehindNext;
                 }
                 if (opponent.CurrentBestLapTime > 0 && (opponent.CurrentBestLapTime < currentGameState.SessionData.OpponentsLapTimeSessionBestOverall || 
                     currentGameState.SessionData.OpponentsLapTimeSessionBestOverall < 0))
@@ -600,17 +602,17 @@ namespace CrewChiefV4.rFactor2
             // --------------------------------
             // pit data
             currentGameState.PitData.IsRefuellingAllowed = true;
-            currentGameState.PitData.HasMandatoryPitStop = isOfflineSession && shared.scheduledStops > 0 && player.numPitstops < shared.scheduledStops && currentGameState.SessionData.SessionType == SessionType.Race;
+            currentGameState.PitData.HasMandatoryPitStop = isOfflineSession && shared.mScheduledStops > 0 && player.mNumPitstops < shared.mScheduledStops && currentGameState.SessionData.SessionType == SessionType.Race;
             currentGameState.PitData.PitWindowStart = isOfflineSession && currentGameState.PitData.HasMandatoryPitStop ? 1 : 0;
             currentGameState.PitData.PitWindowEnd = !currentGameState.PitData.HasMandatoryPitStop ? 0 :
-                currentGameState.SessionData.SessionHasFixedTime ? (int)(currentGameState.SessionData.SessionTotalRunTime / 60 / (shared.scheduledStops + 1)) * (player.numPitstops + 1) + 1 :
-                (int)(currentGameState.SessionData.SessionNumberOfLaps / (shared.scheduledStops + 1)) * (player.numPitstops + 1) + 1;
-            currentGameState.PitData.InPitlane = player.inPits == 1;
+                currentGameState.SessionData.SessionHasFixedTime ? (int)(currentGameState.SessionData.SessionTotalRunTime / 60 / (shared.mScheduledStops + 1)) * (player.mNumPitstops + 1) + 1 :
+                (int)(currentGameState.SessionData.SessionNumberOfLaps / (shared.mScheduledStops + 1)) * (player.mNumPitstops + 1) + 1;
+            currentGameState.PitData.InPitlane = player.mInPits == 1;
             currentGameState.PitData.IsAtPitExit = previousGameState != null && previousGameState.PitData.InPitlane && !currentGameState.PitData.InPitlane;
             currentGameState.PitData.OnOutLap = currentGameState.PitData.InPitlane && currentGameState.SessionData.SectorNumber == 1;
             currentGameState.PitData.OnInLap = currentGameState.PitData.InPitlane && currentGameState.SessionData.SectorNumber == 3;
             currentGameState.PitData.IsMakingMandatoryPitStop = currentGameState.PitData.HasMandatoryPitStop && currentGameState.PitData.OnInLap && currentGameState.SessionData.CompletedLaps > currentGameState.PitData.PitWindowStart;
-            currentGameState.PitData.PitWindow = currentGameState.PitData.IsMakingMandatoryPitStop ? PitWindow.StopInProgress : mapToPitWindow((rFactor2Constant.rf2YellowFlagState)shared.yellowFlagState);
+            currentGameState.PitData.PitWindow = currentGameState.PitData.IsMakingMandatoryPitStop ? PitWindow.StopInProgress : mapToPitWindow((rFactor2Constants.rF2YellowFlagState)shared.mYellowFlagState);
 
             // --------------------------------
             // fuel data
@@ -623,7 +625,7 @@ namespace CrewChiefV4.rFactor2
                 (!currentGameState.PitData.InPitlane && currentGameState.SessionData.CompletedLaps > 1))
             {
                 currentGameState.FuelData.FuelUseActive = true;
-                currentGameState.FuelData.FuelLeft = shared.fuel;
+                currentGameState.FuelData.FuelLeft = (float)shared.mFuel;
             }
 
             // --------------------------------
@@ -633,22 +635,23 @@ namespace CrewChiefV4.rFactor2
             {
                 Flag = FlagEnum.BLACK;
             }
-            else if (shared.sectorFlag[player.sector] > (int)rFactor2Constant.rf2YellowFlagState.noFlag)
+            else if (shared.mSectorFlag[player.mSector] > (int)rFactor2Constants.rF2YellowFlagState.NoFlag)
             {
                 Flag = FlagEnum.YELLOW;
             }
             else if (currentGameState.SessionData.SessionType == SessionType.Race ||
                 currentGameState.SessionData.SessionType == SessionType.Qualify)
             {
-                if (shared.gamePhase == (int)rFactor2Constant.rf2GamePhase.fullCourseYellow)
+                if (shared.mGamePhase == (int)rFactor2Constants.rF2GamePhase.FullCourseYellow)
                 {
+                    // TODO:Revisit
                     Flag = FlagEnum.DOUBLE_YELLOW;
                 }
-                else if (shared.yellowFlagState == (int)rFactor2Constant.rf2YellowFlagState.lastLap || currentGameState.SessionData.LeaderHasFinishedRace)
+                else if (shared.mYellowFlagState == (int)rFactor2Constants.rF2YellowFlagState.LastLap || currentGameState.SessionData.LeaderHasFinishedRace)
                 {
                     Flag = FlagEnum.WHITE;
                 }
-                else if (shared.gamePhase == (int)rFactor2Constant.rf2YellowFlagState.noFlag && previousGameState != null && previousGameState.SessionData.Flag == FlagEnum.DOUBLE_YELLOW)
+                else if (shared.mGamePhase == (int)rFactor2Constants.rF2YellowFlagState.NoFlag && previousGameState != null && previousGameState.SessionData.Flag == FlagEnum.DOUBLE_YELLOW)
                 {
                     Flag = FlagEnum.GREEN;
                 }
@@ -679,8 +682,8 @@ namespace CrewChiefV4.rFactor2
 
             // --------------------------------
             // penalties data
-            currentGameState.PenaltiesData.NumPenalties = player.numPenalties;
-            float lateralDistDiff = (float)(Math.Abs(player.pathLateral) - Math.Abs(player.trackEdge));
+            currentGameState.PenaltiesData.NumPenalties = player.mNumPenalties;
+            float lateralDistDiff = (float)(Math.Abs(player.mPathLateral) - Math.Abs(player.mTrackEdge));
             currentGameState.PenaltiesData.IsOffRacingSurface = !currentGameState.PitData.InPitlane && lateralDistDiff >= 2;
             float offTrackDistanceDelta = lateralDistDiff - distanceOffTrack;
             distanceOffTrack = currentGameState.PenaltiesData.IsOffRacingSurface ? lateralDistDiff : 0;
@@ -746,7 +749,7 @@ namespace CrewChiefV4.rFactor2
             return currentGameState;
         }
         
-        private PitWindow mapToPitWindow(rFactor2Constant.rf2YellowFlagState pitWindow)
+        private PitWindow mapToPitWindow(rFactor2Constants.rF2YellowFlagState pitWindow)
         {
             // it seems that the pit window is only truly open on multiplayer races?
             if (isOfflineSession)
@@ -755,37 +758,37 @@ namespace CrewChiefV4.rFactor2
             }
             switch (pitWindow)
             {
-                case rFactor2Constant.rf2YellowFlagState.pitClosed:
+                case rFactor2Constants.rF2YellowFlagState.PitClosed:
                     return PitWindow.Closed;
-                case rFactor2Constant.rf2YellowFlagState.pitOpen:
-                case rFactor2Constant.rf2YellowFlagState.pitLeadLap:
+                case rFactor2Constants.rF2YellowFlagState.PitOpen:
+                case rFactor2Constants.rF2YellowFlagState.PitLeadLap:
                     return PitWindow.Open;
                 default:
                     return PitWindow.Unavailable;
             }
         }
 
-        private SessionPhase mapToSessionPhase(rFactor2Constant.rf2GamePhase sessionPhase)
+        private SessionPhase mapToSessionPhase(rFactor2Constants.rF2GamePhase sessionPhase)
         {
             switch (sessionPhase)
             {
-                case rFactor2Constant.rf2GamePhase.countdown:
+                case rFactor2Constants.rF2GamePhase.Countdown:
                     return SessionPhase.Countdown;
                 // warmUp never happens, but just in case
-                case rFactor2Constant.rf2GamePhase.warmUp:
-                case rFactor2Constant.rf2GamePhase.formation:
+                case rFactor2Constants.rF2GamePhase.WarmUp:
+                case rFactor2Constants.rF2GamePhase.Formation:
                     return SessionPhase.Formation;
-                case rFactor2Constant.rf2GamePhase.garage:
+                case rFactor2Constants.rF2GamePhase.Garage:
                     return SessionPhase.Garage;
-                case rFactor2Constant.rf2GamePhase.gridWalk:
+                case rFactor2Constants.rF2GamePhase.GridWalk:
                     return SessionPhase.Gridwalk;
                 // sessions never go to sessionStopped, they always go straight from greenFlag to sessionOver
-                case rFactor2Constant.rf2GamePhase.sessionStopped:
-                case rFactor2Constant.rf2GamePhase.sessionOver:
+                case rFactor2Constants.rF2GamePhase.SessionStopped:
+                case rFactor2Constants.rF2GamePhase.SessionOver:
                     return SessionPhase.Finished;
                 // fullCourseYellow will count as greenFlag since we'll call it out in the Flags separately anyway
-                case rFactor2Constant.rf2GamePhase.fullCourseYellow:
-                case rFactor2Constant.rf2GamePhase.greenFlag:
+                case rFactor2Constants.rF2GamePhase.FullCourseYellow:
+                case rFactor2Constants.rF2GamePhase.GreenFlag:
                     return SessionPhase.Green;
                 default:
                     return SessionPhase.Unavailable;
@@ -793,19 +796,19 @@ namespace CrewChiefV4.rFactor2
         }
 
         // finds OpponentData for given vehicle based on driver name, vehicle class, and world position
-        private OpponentData getOpponentDataForVehicleInfo(rf2VehicleInfo vehicle, GameStateData previousGameState, float sessionRunningTime)
+        private OpponentData getOpponentDataForVehicleInfo(rF2VehScoringInfo vehicle, GameStateData previousGameState, float sessionRunningTime)
         {
             OpponentData opponentPrevious = null;
             float timeDelta = previousGameState != null ? sessionRunningTime - previousGameState.SessionData.SessionRunningTime : -1;
             if (previousGameState != null && timeDelta >= 0)
             {
-                float[] worldPos = { vehicle.pos.x, vehicle.pos.z };
+                float[] worldPos = { (float)vehicle.mPos.x, (float)vehicle.mPos.z };
                 float minDistDiff = -1;
                 foreach (OpponentData o in previousGameState.OpponentData.Values)
                 {
                     String opponentKey = o.CarClass.rF1ClassName + o.Position.ToString();
-                    if (o.DriverRawName != getNameFromBytes(vehicle.driverName).ToLower() || 
-                        o.CarClass != CarData.getCarClassForRF1ClassName(getNameFromBytes(vehicle.vehicleClass)) || 
+                    if (o.DriverRawName != getNameFromBytes(vehicle.mDriverName).ToLower() || 
+                        o.CarClass != CarData.getCarClassForRF1ClassName(getNameFromBytes(vehicle.mVehicleClass)) || 
                         opponentKeysProcessed.Contains(opponentKey))
                     {
                         continue;
@@ -830,8 +833,8 @@ namespace CrewChiefV4.rFactor2
 
         public SessionType mapToSessionType(Object memoryMappedFileStruct)
         {
-            rFactor2Data.rf2Shared shared = (rFactor2Data.rf2Shared)memoryMappedFileStruct;
-            switch (shared.session)
+            rFactor2Data.rF2State shared = (rFactor2Data.rF2State)memoryMappedFileStruct;
+            switch (shared.mSession)
             {
                 // up to four possible practice sessions
                 case 1:
@@ -862,17 +865,17 @@ namespace CrewChiefV4.rFactor2
             }
         }
 
-        private ControlType mapToControlType(rFactor2Constant.rf2Control controlType)
+        private ControlType mapToControlType(rFactor2Constants.rF2Control controlType)
         {
             switch (controlType)
             {
-                case rFactor2Constant.rf2Control.ai:
+                case rFactor2Constants.rF2Control.AI:
                     return ControlType.AI;
-                case rFactor2Constant.rf2Control.player:
+                case rFactor2Constants.rF2Control.Player:
                     return ControlType.Player;
-                case rFactor2Constant.rf2Control.remote:
+                case rFactor2Constants.rF2Control.Remote:
                     return ControlType.Remote;
-                case rFactor2Constant.rf2Control.replay:
+                case rFactor2Constants.rF2Control.Replay:
                     return ControlType.Replay;
                 default:
                     return ControlType.Unavailable;
