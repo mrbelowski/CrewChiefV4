@@ -22,14 +22,14 @@ namespace CrewChiefV4.rFactor2
         MemoryMappedFile memoryMappedFile1 = null;
         MemoryMappedFile memoryMappedFile2 = null;
 
-        rF2State currrF2State;
+//        rF2State currrF2State;
 
 
         //private MemoryMappedFile memoryMappedFile;
         //private GCHandle handle;
         //private int sharedmemorysize;
         private byte[] sharedMemoryReadBuffer;
-        private bool initialized = false;
+        private bool initialised = false;
         private List<RF2StructWrapper> dataToDump;
         private RF2StructWrapper[] dataReadFromFile = null;
         private int dataReadFromFileIndex = 0;
@@ -47,7 +47,7 @@ namespace CrewChiefV4.rFactor2
             {
                 foreach (var wrapper in this.dataToDump)
                 {
-                    // TODO: wtf is going on here?
+                    // TODO: Why is this done this way, seems pretty wasteful.
                     wrapper.state.mVehicles = getPopulatedVehicleInfoArray(wrapper.state.mVehicles);
                 }
                 SerializeObject(this.dataToDump.ToArray<RF2StructWrapper>(), filenameToDump);
@@ -87,31 +87,27 @@ namespace CrewChiefV4.rFactor2
             }
             lock (this)
             {
-                if (!this.initialized)
+                if (!this.initialised)
                 {
-                    /*try
-                    {
-                        this.memoryMappedFile = MemoryMappedFile.OpenExisting(rFactor2Constant.SharedMemoryName);
-                        sharedmemorysize = Marshal.SizeOf(typeof(rf2Shared));
-                        sharedMemoryReadBuffer = new byte[sharedmemorysize];
-                        initialised = true;
-                        Console.WriteLine("Initialised rFactor 1 shared memory");
-                    }*/
                     try
                     {
                         this.fileAccessMutex = Mutex.OpenExisting(rFactor2Constants.MM_FILE_ACCESS_MUTEX);
                         this.memoryMappedFile1 = MemoryMappedFile.OpenExisting(rFactor2Constants.MM_FILE_NAME1);
                         this.memoryMappedFile2 = MemoryMappedFile.OpenExisting(rFactor2Constants.MM_FILE_NAME2);
-                        // NOTE: Make sure that SHARED_MEMORY_SIZE_BYTES matches the structure size in the plugin (plugin debug mode prints that).
+                        // NOTE: Make sure that SHARED_MEMORY_SIZE_BYTES matches
+                        // the structure size in the plugin (plugin debug mode prints that).
                         this.sharedMemoryReadBuffer = new byte[this.SHARED_MEMORY_SIZE_BYTES];
-                        this.initialized = true;
+                        this.initialised = true;
+
+                        Console.WriteLine("Initialized rFactor 2 Shared Memory");
                     }
                     catch (Exception)
                     {
-                        initialized = false;
+                        initialised = false;
+                        this.Disconnect();
                     }
                 }
-                return initialized;
+                return initialised;
             }
         }
 
@@ -119,38 +115,14 @@ namespace CrewChiefV4.rFactor2
         {
             lock (this)
             {
-                //rf2Shared _rf2apistruct = new rf2Shared();
-                if (!initialized)
+                var rF2StateMarshalled = new rF2State();
+                if (!initialised)
                 {
-                    if (!InitialiseInternal())
+                    if (!this.InitialiseInternal())
                     {
                         throw new GameDataReadException("Failed to initialise shared memory");
                     }
                 }
-                /*
-                try
-                {
-                    using (var sharedMemoryStreamView = this.memoryMappedFile.CreateViewStream())
-                    {
-                        BinaryReader _SharedMemoryStream = new BinaryReader(sharedMemoryStreamView);
-                        sharedMemoryReadBuffer = _SharedMemoryStream.ReadBytes(sharedmemorysize);
-                        this.handle = GCHandle.Alloc(sharedMemoryReadBuffer, GCHandleType.Pinned);
-                        _rf2apistruct = (rf2Shared)Marshal.PtrToStructure(this.handle.AddrOfPinnedObject(), typeof(rf2Shared));
-                        this.handle.Free();
-                    }
-                    RF2StructWrapper structWrapper = new RF2StructWrapper();
-                    structWrapper.ticksWhenRead = DateTime.Now.Ticks;
-                    structWrapper.state = _rf2apistruct;
-                    if (!forSpotter && dumpToFile && this.dataToDump != null)
-                    {
-                        this.dataToDump.Add(structWrapper);
-                    }
-                    return structWrapper;
-                }
-                catch (Exception ex)
-                {
-                    throw new GameDataReadException(ex.Message, ex);
-                }*/
                 try 
                 {
                     if (this.fileAccessMutex.WaitOne(5000))
@@ -194,13 +166,12 @@ namespace CrewChiefV4.rFactor2
 
                         // Marshal rF2State
                         var handle = GCHandle.Alloc(this.sharedMemoryReadBuffer, GCHandleType.Pinned);
-                        this.currrF2State = (rF2State)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(rF2State));
+                        rF2StateMarshalled = (rF2State)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(rF2State));
                         handle.Free();
 
                         RF2StructWrapper structWrapper = new RF2StructWrapper();
                         structWrapper.ticksWhenRead = DateTime.Now.Ticks;
-                        // TODO: WTF, why do we copy here??????????
-                        structWrapper.state = this.currrF2State;
+                        structWrapper.state = rF2StateMarshalled;
                         if (!forSpotter && dumpToFile && this.dataToDump != null)
                         {
                             this.dataToDump.Add(structWrapper);
@@ -209,17 +180,14 @@ namespace CrewChiefV4.rFactor2
                     }
                     else
                     {
-                        // TODO investigate.
-                        // Return old version if we timed out, really this should be disconnect.
-                        RF2StructWrapper structWrapper = new RF2StructWrapper();
-                        structWrapper.ticksWhenRead = DateTime.Now.Ticks;
-                        // TODO: WTF, why do we copy here??????????
-                        structWrapper.state = this.currrF2State;
-                        return structWrapper;
+                        Console.WriteLine("Timed out waiting on rFactor 2 Shared Memory mutex.");
+                        return null;
                     }
                 }
                 catch (Exception ex)
                 {
+                    Console.WriteLine("rFactor 2 Shared Memory connection failed.");
+                    this.Disconnect();
                     throw new GameDataReadException(ex.Message, ex);
                 }
             }
@@ -244,6 +212,7 @@ namespace CrewChiefV4.rFactor2
 
         private void Disconnect()
         {
+            this.initialised = false;
             if (this.memoryMappedFile1 != null)
                 this.memoryMappedFile1.Dispose();
 
@@ -256,10 +225,7 @@ namespace CrewChiefV4.rFactor2
             this.memoryMappedFile1 = null;
             this.memoryMappedFile2 = null;
             this.sharedMemoryReadBuffer = null;
-//            this.connected = false;
             this.fileAccessMutex = null;
-
-//            this.EnableControls(false);
         }
 
 
