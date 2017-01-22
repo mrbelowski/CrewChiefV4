@@ -627,7 +627,7 @@ namespace CrewChiefV4.rFactor2
             }
 
             var sectorIndex = (player.mSector == 0 ? 3 : player.mSector) - 1;
-            ///previousGameState.SessionData.SectorNumber
+        
             // TODO: this whole code is messed up for rF2, rework
             // --------------------------------
             // flags data
@@ -637,14 +637,12 @@ namespace CrewChiefV4.rFactor2
                 && !previousGameState.SessionData.IsDisqualified)
             {
                 Flag = FlagEnum.BLACK;
-                //Console.WriteLine("Black flag.");
             }
             else if (shared.mGamePhase == (int)rFactor2Constants.rF2GamePhase.GreenFlag 
                 && shared.mSectorFlag[sectorIndex] == (int)rFactor2Constants.rF2YellowFlagState.Pending)
             {
                 // TODO: we need message per sector as well.
                 Flag = FlagEnum.YELLOW;
-                //Console.WriteLine("Yellow flag sector {0}", player.mSector);
             }
             else if (currentGameState.SessionData.SessionType == SessionType.Race ||
                 currentGameState.SessionData.SessionType == SessionType.Qualify)
@@ -652,23 +650,20 @@ namespace CrewChiefV4.rFactor2
                 if (shared.mGamePhase == (int)rFactor2Constants.rF2GamePhase.FullCourseYellow
                     && shared.mYellowFlagState != (int)rFactor2Constants.rF2YellowFlagState.LastLap)
                 {
-                    // TODO:Revisit
+                    // TODO: Play various SC phase events.
                     Flag = FlagEnum.DOUBLE_YELLOW;
-                    //Console.WriteLine("Double yellow");
                 }
                 else if ((shared.mGamePhase == (int)rFactor2Constants.rF2GamePhase.FullCourseYellow
                     && shared.mYellowFlagState == (int)rFactor2Constants.rF2YellowFlagState.LastLap)
                     || currentGameState.SessionData.LeaderHasFinishedRace)
                 {
                     Flag = FlagEnum.WHITE;
-                    //Console.WriteLine("White flag");
                 }
                 else if (shared.mGamePhase == (int)rFactor2Constants.rF2GamePhase.GreenFlag
                     && previousGameState != null
                     && (previousGameState.SessionData.Flag == FlagEnum.DOUBLE_YELLOW || previousGameState.SessionData.Flag == FlagEnum.WHITE))
                 {
                     Flag = FlagEnum.GREEN;
-                    //Console.WriteLine("Green resume.");
                 }
             }
             foreach (OpponentData opponent in currentGameState.OpponentData.Values)
