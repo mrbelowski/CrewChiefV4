@@ -106,7 +106,7 @@ namespace CrewChiefV4.rFactor2
             {
                 return;
             }
-            // TODO: rf2 is in doubles.
+
             float[] currentPlayerPosition = new float[] { (float) currentPlayerData.mPos.x, (float) currentPlayerData.mPos.z };
 
             if (currentPlayerData.mInPits == 0 && currentPlayerData.mControl == (int)rFactor2Constants.rF2Control.Player && 

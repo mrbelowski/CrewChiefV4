@@ -121,8 +121,6 @@ namespace CrewChiefV4.rFactor2
             }
             if (playerName == null)
             {
-
-                // TODO:Don't think rF2 is UTF 8
                 var driverName = getNameFromBytes(player.mDriverName).ToLower();
                 NameValidator.validateName(driverName);
                 playerName = driverName;
@@ -628,32 +626,49 @@ namespace CrewChiefV4.rFactor2
                 currentGameState.FuelData.FuelLeft = (float)shared.mFuel;
             }
 
+            var sectorIndex = (player.mSector == 0 ? 3 : player.mSector) - 1;
+            ///previousGameState.SessionData.SectorNumber
+            // TODO: this whole code is messed up for rF2, rework
             // --------------------------------
             // flags data
             FlagEnum Flag = FlagEnum.UNKNOWN;
-            if (currentGameState.SessionData.IsDisqualified && previousGameState != null && !previousGameState.SessionData.IsDisqualified)
+            if (currentGameState.SessionData.IsDisqualified
+                && previousGameState != null 
+                && !previousGameState.SessionData.IsDisqualified)
             {
                 Flag = FlagEnum.BLACK;
+                //Console.WriteLine("Black flag.");
             }
-            else if (shared.mSectorFlag[player.mSector] > (int)rFactor2Constants.rF2YellowFlagState.NoFlag)
+            else if (shared.mGamePhase == (int)rFactor2Constants.rF2GamePhase.GreenFlag 
+                && shared.mSectorFlag[sectorIndex] == (int)rFactor2Constants.rF2YellowFlagState.Pending)
             {
+                // TODO: we need message per sector as well.
                 Flag = FlagEnum.YELLOW;
+                //Console.WriteLine("Yellow flag sector {0}", player.mSector);
             }
             else if (currentGameState.SessionData.SessionType == SessionType.Race ||
                 currentGameState.SessionData.SessionType == SessionType.Qualify)
             {
-                if (shared.mGamePhase == (int)rFactor2Constants.rF2GamePhase.FullCourseYellow)
+                if (shared.mGamePhase == (int)rFactor2Constants.rF2GamePhase.FullCourseYellow
+                    && shared.mYellowFlagState != (int)rFactor2Constants.rF2YellowFlagState.LastLap)
                 {
                     // TODO:Revisit
                     Flag = FlagEnum.DOUBLE_YELLOW;
+                    //Console.WriteLine("Double yellow");
                 }
-                else if (shared.mYellowFlagState == (int)rFactor2Constants.rF2YellowFlagState.LastLap || currentGameState.SessionData.LeaderHasFinishedRace)
+                else if ((shared.mGamePhase == (int)rFactor2Constants.rF2GamePhase.FullCourseYellow
+                    && shared.mYellowFlagState == (int)rFactor2Constants.rF2YellowFlagState.LastLap)
+                    || currentGameState.SessionData.LeaderHasFinishedRace)
                 {
                     Flag = FlagEnum.WHITE;
+                    //Console.WriteLine("White flag");
                 }
-                else if (shared.mGamePhase == (int)rFactor2Constants.rF2YellowFlagState.NoFlag && previousGameState != null && previousGameState.SessionData.Flag == FlagEnum.DOUBLE_YELLOW)
+                else if (shared.mGamePhase == (int)rFactor2Constants.rF2GamePhase.GreenFlag
+                    && previousGameState != null
+                    && (previousGameState.SessionData.Flag == FlagEnum.DOUBLE_YELLOW || previousGameState.SessionData.Flag == FlagEnum.WHITE))
                 {
                     Flag = FlagEnum.GREEN;
+                    //Console.WriteLine("Green resume.");
                 }
             }
             foreach (OpponentData opponent in currentGameState.OpponentData.Values)
@@ -786,6 +801,7 @@ namespace CrewChiefV4.rFactor2
                 case rFactor2Constants.rF2GamePhase.SessionStopped:
                 case rFactor2Constants.rF2GamePhase.SessionOver:
                     return SessionPhase.Finished;
+                    // TODO: revisit.
                 // fullCourseYellow will count as greenFlag since we'll call it out in the Flags separately anyway
                 case rFactor2Constants.rF2GamePhase.FullCourseYellow:
                 case rFactor2Constants.rF2GamePhase.GreenFlag:
