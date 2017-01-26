@@ -348,6 +348,8 @@ namespace CrewChiefV4.rFactor2
             internal double mLastImpactET;          // time of last impact
             internal double mLastImpactMagnitude;   // magnitude of last impact
             internal rF2Vec3 mLastImpactPos;        // location of last impact
+            internal double mMaxImpactMagnitude;    // Max impact magnitude.  Tracked on every telemetry call, and reset on visit to pits or Session restart.
+            internal double mAccumulatedImpactMagnitude;  // Accumulated impact magnitude.  Tracked on every telemetry call, and reset on visit to pits or Session restart.
 
             // Expanded
             internal double mEngineTorque;          // current engine torque (including additive torque) (used to be mEngineTq, but there's little reason to abbreviate it)
@@ -433,6 +435,8 @@ namespace CrewChiefV4.rFactor2
             internal rF2Vec3 mWind;                   // wind speed
             internal double mMinPathWetness;          // minimum wetness on main path 0.0-1.0
             internal double mMaxPathWetness;          // maximum wetness on main path 0.0-1.0
+
+            internal byte mInvulnerable;              // Indicates invulnerability 0 (off), 1 (on)
 
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 256)]
             byte[] mExpansionScoring;                 // Future use.
