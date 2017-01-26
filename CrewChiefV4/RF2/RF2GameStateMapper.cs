@@ -268,6 +268,10 @@ namespace CrewChiefV4.rFactor2
             {    
                 currentGameState.CarDamageData.DamageEnabled = true;
 
+                const double MINOR_DAMAGE_THRESHOLD = 2000.0;
+                const double MAJOR_DAMAGE_THRESHOLD = 10000.0;
+                const double ACCUMULATED_THRESHOLD_FACTOR = 1.5;
+
                 bool anyWheelDetached = false;
                 bool anyWheelFlat = false;
                 foreach (var wheel in rf2state.mWheels)
@@ -281,32 +285,28 @@ namespace CrewChiefV4.rFactor2
                     // Things are sad if we have both part and wheel detached.
                     currentGameState.CarDamageData.OverallAeroDamage = DamageLevel.DESTROYED;
                 }
-                else if (rf2state.mDetached == 1 || anyWheelDetached)
+                else if (rf2state.mDetached == 1 
+                    || anyWheelDetached
+                    || rf2state.mMaxImpactMagnitude > MAJOR_DAMAGE_THRESHOLD
+                    || rf2state.mAccumulatedImpactMagnitude > MINOR_DAMAGE_THRESHOLD * ACCUMULATED_THRESHOLD_FACTOR)
                 {
                     // If there are parts detached, consider damage major, and pit stop is necessary.
                     currentGameState.CarDamageData.OverallAeroDamage = DamageLevel.MAJOR;
                 } 
-                else if (anyWheelFlat)
+                else if (anyWheelFlat  // Can tire get flat without Aero damage?
+                    || rf2state.mMaxImpactMagnitude > MINOR_DAMAGE_THRESHOLD
+                    || rf2state.mAccumulatedImpactMagnitude > MINOR_DAMAGE_THRESHOLD * ACCUMULATED_THRESHOLD_FACTOR)
                 {
                     // Flat wheel, who cares?
                     currentGameState.CarDamageData.OverallAeroDamage = DamageLevel.MINOR;
                 }
-                // If none of the heavy cases are true, use accumulated impact.
-                else if (rf2state.mMaxImpactMagnitude == 0.0)
-                {
-                    currentGameState.CarDamageData.OverallAeroDamage = DamageLevel.NONE;
-                }
-                else if (rf2state.mMaxImpactMagnitude < 500.0 || rf2state.mAccumulatedImpactMagnitude < 2000.0)
+                else if (rf2state.mMaxImpactMagnitude > 0.0)
                 {
                     currentGameState.CarDamageData.OverallAeroDamage = DamageLevel.TRIVIAL;
                 }
-                else if (rf2state.mMaxImpactMagnitude < 1000.0 || rf2state.mAccumulatedImpactMagnitude < 5000.0)
-                {
-                    currentGameState.CarDamageData.OverallAeroDamage = DamageLevel.MINOR;
-                }
                 else
                 {
-                    currentGameState.CarDamageData.OverallAeroDamage = DamageLevel.MAJOR;
+                    currentGameState.CarDamageData.OverallAeroDamage = DamageLevel.NONE;
                 }
             }
 
@@ -325,9 +325,9 @@ namespace CrewChiefV4.rFactor2
             currentGameState.TyreData.TireWearActive = true;
             // TODO: no way to communicate flat tire ATM.
             currentGameState.TyreData.LeftFrontAttached = rf2state.mWheels[(int)rFactor2Constants.rF2WheelIndex.FrontLeft].mDetached == 0;
-            currentGameState.TyreData.FrontLeft_LeftTemp = (float)rf2state.mWheels[(int)rFactor2Constants.rF2WheelIndex.FrontLeft].mTemperature[0] - 273;
-            currentGameState.TyreData.FrontLeft_CenterTemp = (float)rf2state.mWheels[(int)rFactor2Constants.rF2WheelIndex.FrontLeft].mTemperature[1] - 273;
-            currentGameState.TyreData.FrontLeft_RightTemp = (float)rf2state.mWheels[(int)rFactor2Constants.rF2WheelIndex.FrontLeft].mTemperature[2] - 273;
+            currentGameState.TyreData.FrontLeft_LeftTemp = (float)rf2state.mWheels[(int)rFactor2Constants.rF2WheelIndex.FrontLeft].mTemperature[0] - 273.15f;
+            currentGameState.TyreData.FrontLeft_CenterTemp = (float)rf2state.mWheels[(int)rFactor2Constants.rF2WheelIndex.FrontLeft].mTemperature[1] - 273.15f;
+            currentGameState.TyreData.FrontLeft_RightTemp = (float)rf2state.mWheels[(int)rFactor2Constants.rF2WheelIndex.FrontLeft].mTemperature[2] - 273.15f;
 
             float frontLeftTemp = (currentGameState.TyreData.FrontLeft_CenterTemp + currentGameState.TyreData.FrontLeft_LeftTemp + currentGameState.TyreData.FrontLeft_RightTemp) / 3;
             currentGameState.TyreData.FrontLeftPressure = (float)rf2state.mWheels[(int)rFactor2Constants.rF2WheelIndex.FrontLeft].mPressure;
@@ -342,9 +342,9 @@ namespace CrewChiefV4.rFactor2
             }
 
             currentGameState.TyreData.RightFrontAttached = rf2state.mWheels[(int)rFactor2Constants.rF2WheelIndex.FrontRight].mDetached == 0;
-            currentGameState.TyreData.FrontRight_LeftTemp = (float)rf2state.mWheels[(int)rFactor2Constants.rF2WheelIndex.FrontRight].mTemperature[0] - 273;
-            currentGameState.TyreData.FrontRight_CenterTemp = (float)rf2state.mWheels[(int)rFactor2Constants.rF2WheelIndex.FrontRight].mTemperature[1] - 273;
-            currentGameState.TyreData.FrontRight_RightTemp = (float)rf2state.mWheels[(int)rFactor2Constants.rF2WheelIndex.FrontRight].mTemperature[2] - 273;
+            currentGameState.TyreData.FrontRight_LeftTemp = (float)rf2state.mWheels[(int)rFactor2Constants.rF2WheelIndex.FrontRight].mTemperature[0] - 273.15f;
+            currentGameState.TyreData.FrontRight_CenterTemp = (float)rf2state.mWheels[(int)rFactor2Constants.rF2WheelIndex.FrontRight].mTemperature[1] - 273.15f;
+            currentGameState.TyreData.FrontRight_RightTemp = (float)rf2state.mWheels[(int)rFactor2Constants.rF2WheelIndex.FrontRight].mTemperature[2] - 273.15f;
 
             float frontRightTemp = (currentGameState.TyreData.FrontRight_CenterTemp + currentGameState.TyreData.FrontRight_LeftTemp + currentGameState.TyreData.FrontRight_RightTemp) / 3;
             currentGameState.TyreData.FrontRightPressure = (float)rf2state.mWheels[(int)rFactor2Constants.rF2WheelIndex.FrontRight].mPressure;
@@ -359,9 +359,9 @@ namespace CrewChiefV4.rFactor2
             }
 
             currentGameState.TyreData.LeftRearAttached = rf2state.mWheels[(int)rFactor2Constants.rF2WheelIndex.RearLeft].mDetached == 0;
-            currentGameState.TyreData.RearLeft_LeftTemp = (float)rf2state.mWheels[(int)rFactor2Constants.rF2WheelIndex.RearLeft].mTemperature[0] - 273;
-            currentGameState.TyreData.RearLeft_CenterTemp = (float)rf2state.mWheels[(int)rFactor2Constants.rF2WheelIndex.RearLeft].mTemperature[1] - 273;
-            currentGameState.TyreData.RearLeft_RightTemp = (float)rf2state.mWheels[(int)rFactor2Constants.rF2WheelIndex.RearLeft].mTemperature[2] - 273;
+            currentGameState.TyreData.RearLeft_LeftTemp = (float)rf2state.mWheels[(int)rFactor2Constants.rF2WheelIndex.RearLeft].mTemperature[0] - 273.15f;
+            currentGameState.TyreData.RearLeft_CenterTemp = (float)rf2state.mWheels[(int)rFactor2Constants.rF2WheelIndex.RearLeft].mTemperature[1] - 273.15f;
+            currentGameState.TyreData.RearLeft_RightTemp = (float)rf2state.mWheels[(int)rFactor2Constants.rF2WheelIndex.RearLeft].mTemperature[2] - 273.15f;
 
             float rearLeftTemp = (currentGameState.TyreData.RearLeft_CenterTemp + currentGameState.TyreData.RearLeft_LeftTemp + currentGameState.TyreData.RearLeft_RightTemp) / 3;
             currentGameState.TyreData.RearLeftPressure = (float)rf2state.mWheels[(int)rFactor2Constants.rF2WheelIndex.RearLeft].mPressure;
@@ -376,9 +376,9 @@ namespace CrewChiefV4.rFactor2
             }
 
             currentGameState.TyreData.RightRearAttached = rf2state.mWheels[(int)rFactor2Constants.rF2WheelIndex.RearRight].mDetached == 0;
-            currentGameState.TyreData.RearRight_LeftTemp = (float)rf2state.mWheels[(int)rFactor2Constants.rF2WheelIndex.RearRight].mTemperature[0] - 273;
-            currentGameState.TyreData.RearRight_CenterTemp = (float)rf2state.mWheels[(int)rFactor2Constants.rF2WheelIndex.RearRight].mTemperature[1] - 273;
-            currentGameState.TyreData.RearRight_RightTemp = (float)rf2state.mWheels[(int)rFactor2Constants.rF2WheelIndex.RearRight].mTemperature[2] - 273;
+            currentGameState.TyreData.RearRight_LeftTemp = (float)rf2state.mWheels[(int)rFactor2Constants.rF2WheelIndex.RearRight].mTemperature[0] - 273.15f;
+            currentGameState.TyreData.RearRight_CenterTemp = (float)rf2state.mWheels[(int)rFactor2Constants.rF2WheelIndex.RearRight].mTemperature[1] - 273.15f;
+            currentGameState.TyreData.RearRight_RightTemp = (float)rf2state.mWheels[(int)rFactor2Constants.rF2WheelIndex.RearRight].mTemperature[2] - 273.15f;
 
             float rearRightTemp = (currentGameState.TyreData.RearRight_CenterTemp + currentGameState.TyreData.RearRight_LeftTemp + currentGameState.TyreData.RearRight_RightTemp) / 3;
             currentGameState.TyreData.RearRightPressure = (float)rf2state.mWheels[(int)rFactor2Constants.rF2WheelIndex.RearRight].mPressure;
@@ -441,10 +441,10 @@ namespace CrewChiefV4.rFactor2
             // --------------------------------
             // brake data
             // Automobilista reports in Kelvin
-            currentGameState.TyreData.LeftFrontBrakeTemp = (float)rf2state.mWheels[(int)rFactor2Constants.rF2WheelIndex.FrontLeft].mBrakeTemp - 273;
-            currentGameState.TyreData.RightFrontBrakeTemp = (float)rf2state.mWheels[(int)rFactor2Constants.rF2WheelIndex.FrontRight].mBrakeTemp - 273;
-            currentGameState.TyreData.LeftRearBrakeTemp = (float)rf2state.mWheels[(int)rFactor2Constants.rF2WheelIndex.RearLeft].mBrakeTemp - 273;
-            currentGameState.TyreData.RightRearBrakeTemp = (float)rf2state.mWheels[(int)rFactor2Constants.rF2WheelIndex.RearRight].mBrakeTemp - 273;
+            currentGameState.TyreData.LeftFrontBrakeTemp = (float)rf2state.mWheels[(int)rFactor2Constants.rF2WheelIndex.FrontLeft].mBrakeTemp - 273.15f;
+            currentGameState.TyreData.RightFrontBrakeTemp = (float)rf2state.mWheels[(int)rFactor2Constants.rF2WheelIndex.FrontRight].mBrakeTemp - 273.15f;
+            currentGameState.TyreData.LeftRearBrakeTemp = (float)rf2state.mWheels[(int)rFactor2Constants.rF2WheelIndex.RearLeft].mBrakeTemp - 273.15f;
+            currentGameState.TyreData.RightRearBrakeTemp = (float)rf2state.mWheels[(int)rFactor2Constants.rF2WheelIndex.RearRight].mBrakeTemp - 273.15f;
 
             if (brakeTempThresholdsForPlayersCar != null)
             {
