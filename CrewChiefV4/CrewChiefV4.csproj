@@ -292,9 +292,6 @@
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\SharpDX.2.6.3\build\SharpDX.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\SharpDX.2.6.3\build\SharpDX.targets'))" />
   </Target>
-  <PropertyGroup>
-    <PostBuildEvent>copy "E:\mod\Repos\CrewChiefV4\CrewChiefV4\bin\Debug\CrewChiefV4.exe" "C:\Program Files (x86)\Britton IT Ltd\CrewChiefV4"\.</PostBuildEvent>
-  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
