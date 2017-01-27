@@ -1107,3 +1107,35 @@ appel:Appel
 wellington:Wellington
 scaniello:Scaniello
 kis tibor:Tibor
+csőke dezső:Dezső
+pinczés ádám:Ádám
+nagy lászló:László
+kesjár andrás:András
+mándity istván:István
+molnár dániel:Dániel
+nándori márk:Márk
+varga dávid:Dávid
+komlósi péter:Péter
+kenéz sándor:Sándor
+füredi zoltán:Zoltán
+tassi attila:Attila
+rosner bence:Bence
+blum balázs:Balázs
+amrein roland:Roland
+tullner attila:Attila
+jäger tamás:Tamás
+mézes gyula:Gyula
+nagy balázs:Balázs
+vas gergő:Gergő
+eszeny andrás ervin:Ervin
+varga péter:Péter
+horváth róbert:Róbert
+apjok imre:Imre
+kiss dániel:Dániel
+viski gábor albert:Albert
+nagy gábor:Gábor
+füredi zoltán:Zoltán
+szűcs máté:Máté
+lengyel ákos:Ákos
+bartha lászló:László
+malm balázs:Balázs
