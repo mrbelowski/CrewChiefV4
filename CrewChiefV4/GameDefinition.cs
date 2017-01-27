@@ -8,7 +8,7 @@ namespace CrewChiefV4
 {
     public enum GameEnum
     {
-        RACE_ROOM, PCARS_64BIT, PCARS_32BIT, PCARS_NETWORK, RF1, ASSETTO_64BIT, ASSETTO_32BIT
+        RACE_ROOM, PCARS_64BIT, PCARS_32BIT, PCARS_NETWORK, RF1, ASSETTO_64BIT, ASSETTO_32BIT, RF2_64BIT
     }
     public class GameDefinition
     {
@@ -34,6 +34,8 @@ namespace CrewChiefV4
             "acs_launch_exe", "acs_launch_params", "launch_acs");
         public static GameDefinition assetto32Bit = new GameDefinition(GameEnum.ASSETTO_32BIT, Configuration.getUIString("assetto_32_bit"), "acs_x86", "CrewChiefV4.assetto.ACSSpotter",
             "acs_launch_exe", "acs_launch_params", "launch_acs");
+        public static GameDefinition rfactor2_64bit = new GameDefinition(GameEnum.RF2_64BIT, Configuration.getUIString("rfactor2_64_bit"), "rFactor2", "CrewChiefV4.rFactor2.RF2Spotter",
+            "rf2_launch_exe", "rf2_launch_params", "launch_rfactor2");
 
 
 
@@ -43,7 +45,7 @@ namespace CrewChiefV4
             List<GameDefinition> definitions = new List<GameDefinition>();
             definitions.Add(automobilista); definitions.Add(gameStockCar); definitions.Add(marcas); definitions.Add(ftruck);
             definitions.Add(pCars64Bit); definitions.Add(pCars32Bit); definitions.Add(raceRoom); definitions.Add(pCarsNetwork); definitions.Add(rFactor1);
-            definitions.Add(assetto64Bit); definitions.Add(assetto32Bit);
+            definitions.Add(assetto64Bit); definitions.Add(assetto32Bit); definitions.Add(rfactor2_64bit);
             return definitions;
         }
 
