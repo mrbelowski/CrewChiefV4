@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using CrewChiefV4.rFactor2;
 
 namespace CrewChiefV4
 {
@@ -18,11 +19,13 @@ namespace CrewChiefV4
         private PCarsSharedMemoryReader pcarsSharedMemoryReader;
         private R3ESharedMemoryReader r3eSharedMemoryReader;
         private RF1SharedMemoryReader rf1SharedMemoryReader;
+        private RF2SharedMemoryReader rf2SharedMemoryReader;
         private ACSSharedMemoryReader ascSharedMemoryReader;
 
         private PCarsGameStateMapper pcarsGameStateMapper;
         private R3EGameStateMapper r3eGameStateMapper;
         private RF1GameStateMapper rf1GameStateMapper;
+        private RF2GameStateMapper rf2GameStateMapper;
         private ACSGameStateMapper ascGameStateMapper;
 
         public static GameStateReaderFactory getInstance()
@@ -68,6 +71,12 @@ namespace CrewChiefV4
                             ascSharedMemoryReader = new ACSSharedMemoryReader();
                         }
                         return ascSharedMemoryReader;
+                    case GameEnum.RF2_64BIT:
+                        if (rf2SharedMemoryReader == null)
+                        {
+                            rf2SharedMemoryReader = new RF2SharedMemoryReader();
+                        }
+                        return rf2SharedMemoryReader;
                 }
             }
             return null;
@@ -106,6 +115,12 @@ namespace CrewChiefV4
                             ascGameStateMapper = new ACSGameStateMapper();
                         }
                         return ascGameStateMapper;
+                    case GameEnum.RF2_64BIT:
+                        if (rf2GameStateMapper == null)
+                        {
+                            rf2GameStateMapper = new RF2GameStateMapper();
+                        }
+                        return rf2GameStateMapper;
                 }
             }
             return null;

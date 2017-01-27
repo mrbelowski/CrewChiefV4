@@ -142,6 +142,10 @@
     <Compile Include="PCars\_eNums\_EnumGetDescription.cs" />
     <Compile Include="GameDataReadException.cs" />
     <Compile Include="R3E\R3ESpotterv2.cs" />
+    <Compile Include="RF2\RF2Data.cs" />
+    <Compile Include="RF2\RF2GameStateMapper.cs" />
+    <Compile Include="RF2\RF2SharedMemoryReader.cs" />
+    <Compile Include="RF2\RF2Spotter.cs" />
     <Compile Include="RF1\RF1Data.cs" />
     <Compile Include="RF1\RF1GameStateMapper.cs" />
     <Compile Include="RF1\RF1SharedMemoryReader.cs" />
@@ -288,6 +292,9 @@
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\SharpDX.2.6.3\build\SharpDX.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\SharpDX.2.6.3\build\SharpDX.targets'))" />
   </Target>
+  <PropertyGroup>
+    <PostBuildEvent>copy "E:\mod\Repos\CrewChiefV4\CrewChiefV4\bin\Debug\CrewChiefV4.exe" "C:\Program Files (x86)\Britton IT Ltd\CrewChiefV4"\.</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

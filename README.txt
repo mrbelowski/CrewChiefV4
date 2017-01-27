@@ -3,6 +3,8 @@ CrewChief version 4.
 Changelog
 ---------
 
+Version 4.5.0.0: WIP RF2 stuff
+
 Version 4.4.3.4: Some controller cleanup tweaks
 
 Version 4.4.3.3: R3E patch update
