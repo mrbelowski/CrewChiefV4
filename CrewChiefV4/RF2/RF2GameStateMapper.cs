@@ -5,6 +5,7 @@ using System.Text;
 using CrewChiefV4.GameState;
 using CrewChiefV4.Events;
 using CrewChiefV4.rFactor2.rFactor2Data;
+using System.Diagnostics;
 
 /**
  * Maps memory mapped file to a local game-agnostic representation.
@@ -55,9 +56,52 @@ namespace CrewChiefV4.rFactor2
             this.suspensionDamageThresholds.Add(new CornerData.EnumWithThresholds(DamageLevel.DESTROYED, 1, 2));
         }
 
+        int[] minimumSupportedVersionParts = new int[] { 1, 0, 0, 0 };
         public void versionCheck(Object memoryMappedFileStruct)
         {
-            // no version number in rFactor shared data so this is a no-op
+            var wrapper = (CrewChiefV4.rFactor2.RF2SharedMemoryReader.RF2StructWrapper)memoryMappedFileStruct;
+            var versionStr = getNameFromBytes(wrapper.state.mVersion);
+
+            var versionParts = versionStr.Split('.');
+            if (versionParts.Length != 4)
+            {
+                var msg = "Corrupt rF2 Shared Memory version string: " + versionStr;
+                Console.WriteLine(msg);
+                return;
+                //throw new GameDataReadException(msg);
+            }
+
+            int smVer = 0;
+            int minVer = 0;
+            int partFactor = 1;
+            for (int i = 3; i >= 0; --i)
+            {
+                int versionPart = 0;
+                if (!int.TryParse(versionParts[i], out versionPart))
+                {
+                    var msg = "Corrupt rF2 Shared Memory version string: " + versionStr;
+                    Console.WriteLine(msg);
+                    return;
+                    //throw new GameDataReadException(msg);
+                }
+
+                smVer += (versionPart * partFactor);
+                minVer += (this.minimumSupportedVersionParts[i] * partFactor);
+                partFactor *= 100;
+
+            }
+
+            if (smVer < minVer)
+            {
+                var minVerStr = string.Join(".", this.minimumSupportedVersionParts);
+                var msg = "Unsupported rF2 Shared Memory version: " 
+                    + versionStr 
+                    + "  Minimum supported version is: " 
+                    + minVerStr
+                    + "  Please update rFactor2SharedMemoryMapPlugin64.dll";
+                Console.WriteLine(msg);
+                // throw new GameDataReadException("Unsupported rF2 Shared Memory version: " + versionStr + "  Minimum supported version is: " + minVerStr);
+            }
         }
 
         public void setSpeechRecogniser(SpeechRecogniser speechRecogniser)
@@ -733,23 +777,28 @@ namespace CrewChiefV4.rFactor2
                 cgs.FuelData.FuelLeft = (float)rf2state.mFuel;
             }
 
-            var sectorIndex = (player.mSector == 0 ? 3 : player.mSector) - 1;
+            var currSectorIdx = (player.mSector == 0 ? 3 : player.mSector) - 1;
+            var nextSectorIdx = currSectorIdx == 2 ? 0 : currSectorIdx + 1;
+            Debug.Assert(currSectorIdx >= 0 && currSectorIdx <= 2);
+            Debug.Assert(nextSectorIdx >= 0 && nextSectorIdx <= 2);
         
             // TODO: this whole code is messed up for rF2, rework
             // --------------------------------
             // flags data
-            FlagEnum Flag = FlagEnum.UNKNOWN;
+            var currFlag = FlagEnum.UNKNOWN;
             if (csd.IsDisqualified
                 && pgs != null 
                 && !psd.IsDisqualified)
             {
-                Flag = FlagEnum.BLACK;
+                currFlag = FlagEnum.BLACK;
             }
             else if (rf2state.mGamePhase == (int)rFactor2Constants.rF2GamePhase.GreenFlag 
-                && rf2state.mSectorFlag[sectorIndex] == (int)rFactor2Constants.rF2YellowFlagState.Pending)
+                && (rf2state.mSectorFlag[currSectorIdx] == (int)rFactor2Constants.rF2YellowFlagState.Pending
+                    || rf2state.mSectorFlag[nextSectorIdx] == (int)rFactor2Constants.rF2YellowFlagState.Pending))
             {
                 // TODO: we need message per sector as well.
-                Flag = FlagEnum.YELLOW;
+                // We could announce sector number if flag is in the next sector.
+                currFlag = FlagEnum.YELLOW;
             }
             else if (csd.SessionType == SessionType.Race ||
                 csd.SessionType == SessionType.Qualify)
@@ -758,19 +807,19 @@ namespace CrewChiefV4.rFactor2
                     && rf2state.mYellowFlagState != (int)rFactor2Constants.rF2YellowFlagState.LastLap)
                 {
                     // TODO: Play various SC phase events.
-                    Flag = FlagEnum.DOUBLE_YELLOW;
+                    currFlag = FlagEnum.DOUBLE_YELLOW;
                 }
                 else if ((rf2state.mGamePhase == (int)rFactor2Constants.rF2GamePhase.FullCourseYellow
                     && rf2state.mYellowFlagState == (int)rFactor2Constants.rF2YellowFlagState.LastLap)
                     || csd.LeaderHasFinishedRace)
                 {
-                    Flag = FlagEnum.WHITE;
+                    currFlag = FlagEnum.WHITE;
                 }
                 else if (rf2state.mGamePhase == (int)rFactor2Constants.rF2GamePhase.GreenFlag
                     && pgs != null
                     && (psd.Flag == FlagEnum.DOUBLE_YELLOW || psd.Flag == FlagEnum.WHITE))
                 {
-                    Flag = FlagEnum.GREEN;
+                    currFlag = FlagEnum.GREEN;
                 }
             }
 
@@ -792,11 +841,11 @@ namespace CrewChiefV4.rFactor2
                     cgs.PositionAndMotionData.DistanceRoundTrack, opponent.DistanceRoundTrack) && 
                     opponent.Speed >= cgs.PositionAndMotionData.CarSpeed)
                 {
-                    Flag = FlagEnum.BLUE;
+                    currFlag = FlagEnum.BLUE;
                     break;
                 }
             }
-            csd.Flag = Flag;
+            csd.Flag = currFlag;
 
             // --------------------------------
             // penalties data
