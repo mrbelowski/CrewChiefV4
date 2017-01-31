@@ -56,16 +56,20 @@ namespace CrewChiefV4.rFactor2
             this.suspensionDamageThresholds.Add(new CornerData.EnumWithThresholds(DamageLevel.DESTROYED, 1, 2));
         }
 
-        int[] minimumSupportedVersionParts = new int[] { 1, 0, 0, 0 };
+        private int[] minimumSupportedVersionParts = new int[] { 1, 0, 0, 0 };
+        private bool pluginSupported = false;
         public void versionCheck(Object memoryMappedFileStruct)
         {
+            if (this.pluginSupported)
+                return;
+
             var wrapper = (CrewChiefV4.rFactor2.RF2SharedMemoryReader.RF2StructWrapper)memoryMappedFileStruct;
             var versionStr = getNameFromBytes(wrapper.state.mVersion);
 
             var versionParts = versionStr.Split('.');
             if (versionParts.Length != 4)
             {
-                var msg = "Corrupt rF2 Shared Memory version string: " + versionStr;
+                var msg = "Corrupt rFactor 2 Shared Memory version string: " + versionStr;
                 Console.WriteLine(msg);
                 return;
                 //throw new GameDataReadException(msg);
@@ -79,7 +83,7 @@ namespace CrewChiefV4.rFactor2
                 int versionPart = 0;
                 if (!int.TryParse(versionParts[i], out versionPart))
                 {
-                    var msg = "Corrupt rF2 Shared Memory version string: " + versionStr;
+                    var msg = "Corrupt rFactor 2 Shared Memory version string: " + versionStr;
                     Console.WriteLine(msg);
                     return;
                     //throw new GameDataReadException(msg);
@@ -94,13 +98,20 @@ namespace CrewChiefV4.rFactor2
             if (smVer < minVer)
             {
                 var minVerStr = string.Join(".", this.minimumSupportedVersionParts);
-                var msg = "Unsupported rF2 Shared Memory version: " 
+                var msg = "Unsupported rFactor 2 Shared Memory version: " 
                     + versionStr 
                     + "  Minimum supported version is: " 
                     + minVerStr
                     + "  Please update rFactor2SharedMemoryMapPlugin64.dll";
                 Console.WriteLine(msg);
                 // throw new GameDataReadException("Unsupported rF2 Shared Memory version: " + versionStr + "  Minimum supported version is: " + minVerStr);
+            }
+            else
+            {
+                this.pluginSupported = true;
+
+                var msg = "rFactor 2 Shared Memory version: " + versionStr;
+                Console.WriteLine(msg);
             }
         }
 
@@ -778,9 +789,9 @@ namespace CrewChiefV4.rFactor2
             }
 
             var currSectorIdx = (player.mSector == 0 ? 3 : player.mSector) - 1;
-            var nextSectorIdx = currSectorIdx == 2 ? 0 : currSectorIdx + 1;
+            //var nextSectorIdx = currSectorIdx == 2 ? 0 : currSectorIdx + 1;
             Debug.Assert(currSectorIdx >= 0 && currSectorIdx <= 2);
-            Debug.Assert(nextSectorIdx >= 0 && nextSectorIdx <= 2);
+            //Debug.Assert(nextSectorIdx >= 0 && nextSectorIdx <= 2);
         
             // TODO: this whole code is messed up for rF2, rework
             // --------------------------------
@@ -793,8 +804,8 @@ namespace CrewChiefV4.rFactor2
                 currFlag = FlagEnum.BLACK;
             }
             else if (rf2state.mGamePhase == (int)rFactor2Constants.rF2GamePhase.GreenFlag 
-                && (rf2state.mSectorFlag[currSectorIdx] == (int)rFactor2Constants.rF2YellowFlagState.Pending
-                    || rf2state.mSectorFlag[nextSectorIdx] == (int)rFactor2Constants.rF2YellowFlagState.Pending))
+                && rf2state.mSectorFlag[currSectorIdx] == (int)rFactor2Constants.rF2YellowFlagState.Pending
+                    /*|| rf2state.mSectorFlag[nextSectorIdx] == (int)rFactor2Constants.rF2YellowFlagState.Pending)*/)  // TODO: announce in next sector once event is available.
             {
                 // TODO: we need message per sector as well.
                 // We could announce sector number if flag is in the next sector.
