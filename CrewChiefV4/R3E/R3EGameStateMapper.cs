@@ -262,7 +262,9 @@ namespace CrewChiefV4.RaceRoom
                         currentGameState.PitData.HasMandatoryPitStop = currentGameState.PitData.PitWindowStart > 0 && currentGameState.PitData.PitWindowEnd > 0;                         
                         if (currentGameState.PitData.HasMandatoryPitStop)
                         {
-                            if (currentGameState.carClass.carClassEnum == CarData.CarClassEnum.DTM_2014 || currentGameState.carClass.carClassEnum == CarData.CarClassEnum.DTM_2015)
+                            // TODO: mandatory pitstop for DTM stuff has changed since the removal of the Experiences
+                            if (currentGameState.carClass.carClassEnum == CarData.CarClassEnum.DTM_2014 ||
+                                currentGameState.carClass.carClassEnum == CarData.CarClassEnum.DTM_2015 || currentGameState.carClass.carClassEnum == CarData.CarClassEnum.DTM_2016)
                             {
                                 // iteration 1 of the DTM 2015 doesn't have a mandatory tyre change, but this means the pit window stuff won't be set, so we're (kind of) OK here...
                                 currentGameState.PitData.HasMandatoryTyreChange = true;
@@ -283,7 +285,7 @@ namespace CrewChiefV4.RaceRoom
                                         currentGameState.PitData.MinPermittedDistanceOnCurrentTyre = (int)Math.Ceiling(halfRaceDistance);
                                     }
                                 }
-                                else if (currentGameState.carClass.carClassEnum == CarData.CarClassEnum.DTM_2015)
+                                else if (currentGameState.carClass.carClassEnum == CarData.CarClassEnum.DTM_2015 || currentGameState.carClass.carClassEnum == CarData.CarClassEnum.DTM_2016)
                                 {
                                     currentGameState.PitData.MandatoryTyreChangeRequiredTyreType = TyreType.R3E_NEW_Prime;
                                     // the mandatory change must be completed by the end of the pit window
@@ -1288,7 +1290,7 @@ namespace CrewChiefV4.RaceRoom
                 overtakingAids.DrsEnabled = sessionType == SessionType.Race && lapsCompleted > 2/* && (lapsInSession < 1 || lapsInSession > lapsCompleted + 2)*/;
                 overtakingAids.DrsRange = 2;
             }
-            else if (carClassEnum == CarData.CarClassEnum.DTM_2015)
+            else if (carClassEnum == CarData.CarClassEnum.DTM_2015 || carClassEnum == CarData.CarClassEnum.DTM_2016)
             {
                 // is the race-end check correct here? I assume DRS is disabled for the last 3 minutes, but I really am just guessing...
                 overtakingAids.DrsEnabled = sessionType == SessionType.Race && lapsCompleted > 3/* && (sessionTimeRemaining < 0 || sessionTimeRemaining > 180)*/;
