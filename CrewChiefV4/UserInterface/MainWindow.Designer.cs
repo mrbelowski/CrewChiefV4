@@ -273,6 +273,7 @@ namespace CrewChiefV4
             // 
             this.gameDefinitionList.AllowDrop = true;
             this.gameDefinitionList.FormattingEnabled = true;
+            // TODO: How about changing this to alphabetic order?
             this.gameDefinitionList.Items.AddRange(new object[] {
             Configuration.getUIString("automobilista"),
             Configuration.getUIString("pcars_64_bit"),
@@ -283,11 +284,13 @@ namespace CrewChiefV4
             Configuration.getUIString("marcas"),
             Configuration.getUIString("ftruck"),
             Configuration.getUIString("rfactor1"),
+            Configuration.getUIString("rfactor2_64_bit"),
             Configuration.getUIString("assetto_64_bit"),
             Configuration.getUIString("assetto_32_bit")});
             this.gameDefinitionList.Location = new System.Drawing.Point(782, 28);
             this.gameDefinitionList.Name = "gameDefinitionList";
-            this.gameDefinitionList.Size = new System.Drawing.Size(203, 145);
+            this.gameDefinitionList.MinimumSize = new System.Drawing.Size(203, 135);
+            this.gameDefinitionList.MaximumSize = new System.Drawing.Size(203, 135);
             this.gameDefinitionList.TabIndex = 21;
             this.gameDefinitionList.SelectedValueChanged += new System.EventHandler(this.updateSelectedGameDefinition);
             // 

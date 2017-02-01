@@ -30,6 +30,7 @@ marcas = Copa Petrobras de Marcas
 ftruck = Formula Truck
 assetto_64_bit = Assetto Corsa (64 bit)
 assetto_32_bit = Assetto Corsa (32 bit)
+rfactor2_64_bit = rFactor 2 (64 bit)
 
 please_choose_a_game_option = Please choose a game option
 no_game_selected = No game selected
