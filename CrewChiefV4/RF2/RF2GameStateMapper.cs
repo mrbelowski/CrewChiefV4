@@ -280,7 +280,7 @@ namespace CrewChiefV4.rFactor2
                 {
                     const double MINOR_DAMAGE_THRESHOLD = 1500.0;
                     const double MAJOR_DAMAGE_THRESHOLD = 4000.0;
-                    const double ACCUMULATED_THRESHOLD_FACTOR = 2.5;
+                    const double ACCUMULATED_THRESHOLD_FACTOR = 4.0;
 
                     bool anyWheelDetached = false;
                     foreach (var wheel in rf2state.mWheels)
@@ -301,7 +301,7 @@ namespace CrewChiefV4.rFactor2
                         cgs.CarDamageData.OverallAeroDamage = DamageLevel.MAJOR;
                     }
                     else if (rf2state.mMaxImpactMagnitude > MINOR_DAMAGE_THRESHOLD
-                        || rf2state.mAccumulatedImpactMagnitude > MINOR_DAMAGE_THRESHOLD * ACCUMULATED_THRESHOLD_FACTOR)
+                        || rf2state.mAccumulatedImpactMagnitude > MINOR_DAMAGE_THRESHOLD * ACCUMULATED_THRESHOLD_FACTOR)  // Also consider accumulated damage, if user grinds car against the wall, max won't be high, but car is still damaged.
                     {
                         cgs.CarDamageData.OverallAeroDamage = DamageLevel.MINOR;
                     }
