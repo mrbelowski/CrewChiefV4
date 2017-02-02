@@ -3,7 +3,7 @@ CrewChief version 4.
 Changelog
 ---------
 
-Version 4.5.0.0: WIP RF2 stuff
+Version 4.5.0.0: First cut of RF2 support, thanks to The Iron Wolf; Updated some Raceroom car classes
 
 Version 4.4.3.4: Some controller cleanup tweaks
 

@@ -22,12 +22,6 @@ namespace CrewChiefV4.rFactor2
         MemoryMappedFile memoryMappedFile1 = null;
         MemoryMappedFile memoryMappedFile2 = null;
 
-//        rF2State currrF2State;
-
-
-        //private MemoryMappedFile memoryMappedFile;
-        //private GCHandle handle;
-        //private int sharedmemorysize;
         private byte[] sharedMemoryReadBuffer;
         private bool initialised = false;
         private List<RF2StructWrapper> dataToDump;

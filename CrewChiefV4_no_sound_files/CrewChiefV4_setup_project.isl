@@ -2361,7 +2361,7 @@
 		<row><td>SystemFolder</td><td/><td/><td>1</td></row>
 		<row><td>WindowsFolder</td><td/><td/><td>1</td></row>
 	</table>
-	
+
 	<table name="ISPowerShellWrap">
 		<col key="yes" def="s72">Action_</col>
 		<col key="yes" def="s72">Name</col>
@@ -2374,7 +2374,7 @@
 		<col def="I4">GeneratePackageCode</col>
 		<row><td>Express</td><td/><td>1</td></row>
 	</table>
-	
+
 	<table name="ISProductConfigurationInstance">
 		<col key="yes" def="s72">ISProductConfiguration_</col>
 		<col key="yes" def="i2">InstanceId</col>
@@ -4399,7 +4399,7 @@ RABWAEQALQA1AAEARQB4AHAAcgBlAHMAcwA=
 		<row><td>PROGMSG_IIS_ROLLBACKVROOTS</td><td>##IDS_PROGMSG_IIS_ROLLBACKVROOTS##</td><td/></row>
 		<row><td>PROGMSG_IIS_ROLLBACKWEBSERVICEEXTENSIONS</td><td>##IDS_PROGMSG_IIS_ROLLBACKWEBSERVICEEXTENSIONS##</td><td/></row>
 		<row><td>PROGRAMFILETOLAUNCHATEND</td><td>[INSTALLDIR]CrewChiefV4.Primary output</td><td/></row>
-		<row><td>ProductCode</td><td>{3C2A97A6-D6EC-4173-8FAC-7CE71369A643}</td><td/></row>
+		<row><td>ProductCode</td><td>{999A49C1-A6E0-4C19-B61A-A9B69E2B429E}</td><td/></row>
 		<row><td>ProductName</td><td>CrewChiefV4</td><td/></row>
 		<row><td>ProductVersion</td><td>4.5.0.0</td><td/></row>
 		<row><td>ProgressType0</td><td>install</td><td/></row>
