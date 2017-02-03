@@ -44,6 +44,8 @@ namespace CrewChiefV4.rFactor2
         // dynamically calculated wheel circumferences
         private float[] wheelCircumference = new float[] { 0, 0 };
 
+        private Dictionary<string, string> carClassMap = new Dictionary<string, string>();
+
         public RF2GameStateMapper()
         {
             this.tyreWearThresholds.Add(new CornerData.EnumWithThresholds(TyreCondition.NEW, -10000, scrubbedTyreWearPercent));
@@ -199,7 +201,7 @@ namespace CrewChiefV4.rFactor2
                 rf2state.mSession >= 10 && rf2state.mSession <= 13 ? rf2state.mSession - 10 : 0;
             csd.SessionType = mapToSessionType(rf2state);
             csd.SessionPhase = mapToSessionPhase((rFactor2Constants.rF2GamePhase)rf2state.mGamePhase);
-            cgs.carClass = CarData.getCarClassForRF1ClassName(getNameFromBytes(player.mVehicleClass));
+            cgs.carClass = CarData.getCarClassForRF1ClassName(getSafeCarClassName(getNameFromBytes(player.mVehicleClass)));
             brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(cgs.carClass);
             csd.DriverRawName = getNameFromBytes(player.mDriverName).ToLower();
             csd.TrackDefinition = new TrackDefinition(getNameFromBytes(rf2state.mTrackName), (float)rf2state.mLapDist);
@@ -469,22 +471,23 @@ namespace CrewChiefV4.rFactor2
                 cgs.TyreData.PeakRearLeftTemperatureForLap, cgs.TyreData.PeakRearRightTemperatureForLap);
 
             // some simple locking / spinning checks
-            if ((csd.IsNewSession || 
-                wheelCircumference[0] == 0 || wheelCircumference[1] == 0) && 
-                cgs.PositionAndMotionData.CarSpeed > 14.0f && 
-                Math.Abs(rf2state.mUnfilteredSteering) <= 0.05)
+            if ((csd.IsNewSession
+                    || wheelCircumference[0] == 0 
+                    || wheelCircumference[1] == 0)
+                && cgs.PositionAndMotionData.CarSpeed > 14.0f
+                && Math.Abs(rf2state.mUnfilteredSteering) <= 0.05)
             {
                 // calculate wheel circumference (assume left/right symmetry) at 50+ km/h with (mostly) straight steering
                 // front
-                wheelCircumference[0] = (float)(2 * (float)Math.PI * cgs.PositionAndMotionData.CarSpeed / Math.Abs(rf2state.mWheels[0].mRotation) + 
-                    2 * (float)Math.PI * cgs.PositionAndMotionData.CarSpeed / Math.Abs(rf2state.mWheels[1].mRotation)) / 2;
+                wheelCircumference[0] = (float)(2.0f * (float)Math.PI * cgs.PositionAndMotionData.CarSpeed / Math.Abs(rf2state.mWheels[0].mRotation) + 
+                    2.0f * (float)Math.PI * cgs.PositionAndMotionData.CarSpeed / Math.Abs(rf2state.mWheels[1].mRotation)) / 2.0f;
                 // rear
-                wheelCircumference[1] = (float)(2 * (float)Math.PI * cgs.PositionAndMotionData.CarSpeed / Math.Abs(rf2state.mWheels[2].mRotation) + 
-                    2 * (float)Math.PI * cgs.PositionAndMotionData.CarSpeed / Math.Abs(rf2state.mWheels[3].mRotation)) / 2;
+                wheelCircumference[1] = (float)(2.0f * (float)Math.PI * cgs.PositionAndMotionData.CarSpeed / Math.Abs(rf2state.mWheels[2].mRotation) + 
+                    2.0f * (float)Math.PI * cgs.PositionAndMotionData.CarSpeed / Math.Abs(rf2state.mWheels[3].mRotation)) / 2.0f;
             }
             
             if (cgs.PositionAndMotionData.CarSpeed > 7.0f && 
-                wheelCircumference[0] > 0 && wheelCircumference[1] > 0)
+                wheelCircumference[0] > 0.0f && wheelCircumference[1] > 0.0f)
             {
                 float[] rotatingSpeed = new float[] { 
                     2 * (float)Math.PI * cgs.PositionAndMotionData.CarSpeed / wheelCircumference[0], 
@@ -563,12 +566,12 @@ namespace CrewChiefV4.rFactor2
                     default:
                         break;
                 }
-                var opponentKey = getNameFromBytes(vehicle.mVehicleClass) + vehicle.mPlace.ToString();
+                var opponentKey = getSafeCarClassName(getNameFromBytes(vehicle.mVehicleClass)) + vehicle.mPlace.ToString();
                 var opponentPrevious = getOpponentDataForVehicleInfo(vehicle, pgs, csd.SessionRunningTime);
                 var opponent = new OpponentData();
                 opponent.DriverRawName = getNameFromBytes(vehicle.mDriverName).ToLower();
                 opponent.DriverNameSet = opponent.DriverRawName.Length > 0;
-                opponent.CarClass = CarData.getCarClassForRF1ClassName(getNameFromBytes(vehicle.mVehicleClass));
+                opponent.CarClass = CarData.getCarClassForRF1ClassName(getSafeCarClassName(getNameFromBytes(vehicle.mVehicleClass)));
                 opponent.Position = vehicle.mPlace;
                 
                 if (opponent.DriverNameSet && opponentPrevious == null && CrewChief.enableDriverNames)
@@ -988,7 +991,7 @@ namespace CrewChiefV4.rFactor2
                 {
                     var opponentKey = o.CarClass.rF1ClassName + o.Position.ToString();
                     if (o.DriverRawName != getNameFromBytes(vehicle.mDriverName).ToLower() || 
-                        o.CarClass != CarData.getCarClassForRF1ClassName(getNameFromBytes(vehicle.mVehicleClass)) || 
+                        o.CarClass != CarData.getCarClassForRF1ClassName(getSafeCarClassName(getNameFromBytes(vehicle.mVehicleClass))) || 
                         opponentKeysProcessed.Contains(opponentKey))
                     {
                         continue;
@@ -1082,6 +1085,48 @@ namespace CrewChiefV4.rFactor2
         public static String getNameFromBytes(byte[] name)
         {
             return Encoding.UTF8.GetString(name).TrimEnd('\0').Trim();
-        } 
+        }
+
+
+        List<string> mappedSeries = new List<string>()
+        {
+            "GT1",
+            "GT2",
+            "GT3",
+            "GT4",
+            "GTE",
+            "GTC",
+            "GTLM",
+            "GTC",
+            "DTM",
+        };
+
+        //
+        // Since class name in rF2 often, but not always, hehe, includes maker name, I need to try to guess
+        // what series this class belongs, so that time comparison is not stuck within one brand, but rather
+        // is done within class, as intended.
+        //
+        // TODO: Current implementation ofgetCarClassForRF1ClassName uses same parameters
+        // for all series.  This might need rework in the future.
+        //
+        private string getSafeCarClassName(string rf2ClassName)
+        {
+            string safeClassName = null;
+            if (this.carClassMap.TryGetValue(rf2ClassName, out safeClassName))
+                return safeClassName;
+
+            foreach (var series in this.mappedSeries)
+            {
+                if (rf2ClassName.Contains(series))
+                {
+                    this.carClassMap.Add(rf2ClassName, series);
+                    return series;
+                }
+            }
+
+            // If not mapped, just add itself.
+            this.carClassMap.Add(rf2ClassName, rf2ClassName);
+            return rf2ClassName;
+        }
     }
 }
