@@ -41,14 +41,24 @@ namespace CrewChiefV4.Events
         private String[] folderDoubleYellowFlagSectors = new String[] { "flags/double_yellow_flag_sector_1", "flags/double_yellow_flag_sector_2", "flags/double_yellow_flag_sector_3" };
         private String[] folderGreenFlagSectors = new String[] { "flags/green_flag_sector_1", "flags/green_flag_sector_2", "flags/green_flag_sector_3" };
 
+        private String folderLocalYellow = "flags/local_yellow_flag";
+        private String folderLocalYellowClear = "flags/local_yellow_clear";
+        private String folderLocalYellowAhead = "flags/local_yellow_ahead";
+
         // for new (RF2 and R3E) impl
         private FlagEnum[] lastSectorFlagsAnnounced = new FlagEnum[] { FlagEnum.GREEN, FlagEnum.GREEN, FlagEnum.GREEN };
         private DateTime[] lastSectorFlagsAnnouncedTime = new DateTime[] { DateTime.MinValue, DateTime.MinValue, DateTime.MinValue };
         private FullCourseYellowPhase lastFCYAnnounced = FullCourseYellowPhase.RACING;
         private DateTime lastFCYAccounedTime = DateTime.MinValue;
 
-        private TimeSpan fcyPitStatusReminderMinTime = TimeSpan.FromSeconds(30);
+        // do we need this?
+        private DateTime lastLocalYellowAnnouncedTime = DateTime.MinValue;
+        private Boolean isUnderLocalYellow = false;
+        private Boolean hasWarnedOfUpcomingIncident = false;
 
+        private TimeSpan fcyPitStatusReminderMinTime = TimeSpan.FromSeconds(30);
+        private float distanceToWarnOfLocalYellow = 500;    // metres
+        
         public FlagsMonitor(AudioPlayer audioPlayer)
         {
             this.audioPlayer = audioPlayer;
@@ -74,22 +84,54 @@ namespace CrewChiefV4.Events
             lastSectorFlagsAnnounced = new FlagEnum[] { FlagEnum.GREEN, FlagEnum.GREEN, FlagEnum.GREEN };
             lastSectorFlagsAnnouncedTime = new DateTime[] { DateTime.MinValue, DateTime.MinValue, DateTime.MinValue };
             lastFCYAnnounced = FullCourseYellowPhase.RACING;
-            DateTime lastFCYAccounedTime = DateTime.MinValue;
+            lastFCYAccounedTime = DateTime.MinValue;
+            lastLocalYellowAnnouncedTime = DateTime.MinValue;
+            isUnderLocalYellow = false;
+            hasWarnedOfUpcomingIncident = false;
         }
 
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
             if (CrewChief.gameDefinition.gameEnum == GameEnum.RACE_ROOM || CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT)
             {
-                newFlagImplementation(previousGameState, currentGameState);
+                newYellowFlagImplementation(previousGameState, currentGameState);
             }
             else
             {
-                oldFlagImplementation(previousGameState, currentGameState);
-            }            
+                oldYellowFlagImplementation(previousGameState, currentGameState);
+            }
+            //  now other flags
+            if (currentGameState.PositionAndMotionData.CarSpeed < 1)
+            {
+                return;
+            }
+            if (currentGameState.SessionData.Flag == FlagEnum.BLACK)
+            {
+                if (currentGameState.Now > lastBlackFlagTime.Add(timeBetweenBlackFlagMessages))
+                {
+                    lastBlackFlagTime = currentGameState.Now;
+                    audioPlayer.playMessage(new QueuedMessage(folderBlackFlag, 0, this));
+                }
+            }
+            else if (!currentGameState.PitData.InPitlane && currentGameState.SessionData.Flag == FlagEnum.BLUE)
+            {
+                if (currentGameState.Now > lastBlueFlagTime.Add(timeBetweenBlueFlagMessages))
+                {
+                    lastBlueFlagTime = currentGameState.Now;
+                    audioPlayer.playMessage(new QueuedMessage(folderBlueFlag, 0, this));
+                }
+            }
+            else if (currentGameState.SessionData.Flag == FlagEnum.WHITE)
+            {
+                if (currentGameState.Now > lastWhiteFlagTime.Add(timeBetweenWhiteFlagMessages))
+                {
+                    lastWhiteFlagTime = currentGameState.Now;
+                    audioPlayer.playMessage(new QueuedMessage(folderWhiteFlag, 0, this));
+                }
+            }
         }
 
-        private void newFlagImplementation(GameStateData previousGameState, GameStateData currentGameState)
+        private void newYellowFlagImplementation(GameStateData previousGameState, GameStateData currentGameState)
         {
             if (previousGameState != null)
             {
@@ -135,6 +177,7 @@ namespace CrewChiefV4.Events
                 }
                 else
                 {
+                    // sector yellows
                     for (int i = 0; i < 3; i++)
                     {
                         if (currentGameState.FlagData.sectorFlags[i] != lastSectorFlagsAnnounced[i])
@@ -159,7 +202,37 @@ namespace CrewChiefV4.Events
                                 audioPlayer.playMessageImmediately(new QueuedMessage(folderGreenFlagSectors[i], 0, null));
                             }
                         }
-                    }                        
+                    }   
+                    
+                    // local yellows (planned R3E implementation)
+                    if (!isUnderLocalYellow && currentGameState.FlagData.isLocalYellow)
+                    {
+                        audioPlayer.playMessageImmediately(new QueuedMessage(folderLocalYellow, 0, null));
+                        isUnderLocalYellow = true;
+                        lastLocalYellowAnnouncedTime = DateTime.Now;
+                        // we might not have warned of an incident ahead - no point in warning about it now we've actually reached it
+                        hasWarnedOfUpcomingIncident = true;
+                    }
+                    else if (isUnderLocalYellow && !currentGameState.FlagData.isLocalYellow)
+                    {
+                        audioPlayer.playMessageImmediately(new QueuedMessage(folderLocalYellowClear, 0, null));
+                        isUnderLocalYellow = false;
+                        lastLocalYellowAnnouncedTime = DateTime.Now;
+                        // we've passed the incident so allow warnings of other incidents approaching
+                        hasWarnedOfUpcomingIncident = false;
+                    } else if (!isUnderLocalYellow && !hasWarnedOfUpcomingIncident &&
+                        previousGameState.FlagData.distanceToNearestIncident > distanceToWarnOfLocalYellow && currentGameState.FlagData.distanceToNearestIncident > distanceToWarnOfLocalYellow)
+                    {
+                        hasWarnedOfUpcomingIncident = true;
+                        audioPlayer.playMessageImmediately(new QueuedMessage(folderLocalYellowAhead, 0, null));
+                    }
+                    else if (currentGameState.FlagData.sectorFlags[0] == FlagEnum.GREEN && currentGameState.FlagData.sectorFlags[1] == FlagEnum.GREEN &&
+                            currentGameState.FlagData.sectorFlags[1] == FlagEnum.GREEN)
+                    {
+                        // if all the sectors are clear the local and warning booleans. This ensures we don't sit waiting for a 'clear' that never comes.
+                        isUnderLocalYellow = false;
+                        hasWarnedOfUpcomingIncident = false;
+                    }
                 } 
             }
         }
@@ -176,27 +249,11 @@ namespace CrewChiefV4.Events
         /**
          * Used by all other games, legacy code.
          */
-        private void oldFlagImplementation(GameStateData previousGameState, GameStateData currentGameState)
+        private void oldYellowFlagImplementation(GameStateData previousGameState, GameStateData currentGameState)
         {            
             if (currentGameState.PositionAndMotionData.CarSpeed < 1)
             {
                 return;
-            }
-            if (currentGameState.SessionData.Flag == FlagEnum.BLACK)
-            {
-                if (currentGameState.Now > lastBlackFlagTime.Add(timeBetweenBlackFlagMessages))
-                {
-                    lastBlackFlagTime = currentGameState.Now;
-                    audioPlayer.playMessage(new QueuedMessage(folderBlackFlag, 0, this));
-                }
-            }
-            else if (!currentGameState.PitData.InPitlane && currentGameState.SessionData.Flag == FlagEnum.BLUE)
-            {
-                if (currentGameState.Now > lastBlueFlagTime.Add(timeBetweenBlueFlagMessages))
-                {
-                    lastBlueFlagTime = currentGameState.Now;
-                    audioPlayer.playMessage(new QueuedMessage(folderBlueFlag, 0, this));
-                }
             }
             else if (!currentGameState.PitData.InPitlane && currentGameState.SessionData.Flag == FlagEnum.YELLOW)
             {
@@ -204,14 +261,6 @@ namespace CrewChiefV4.Events
                 {
                     lastYellowFlagTime = currentGameState.Now;
                     audioPlayer.playMessage(new QueuedMessage(folderYellowFlag, 0, this));
-                }
-            }
-            else if (currentGameState.SessionData.Flag == FlagEnum.WHITE)
-            {
-                if (currentGameState.Now > lastWhiteFlagTime.Add(timeBetweenWhiteFlagMessages))
-                {
-                    lastWhiteFlagTime = currentGameState.Now;
-                    audioPlayer.playMessage(new QueuedMessage(folderWhiteFlag, 0, this));
                 }
             }
             else if (!currentGameState.PitData.InPitlane && currentGameState.SessionData.Flag == FlagEnum.DOUBLE_YELLOW)

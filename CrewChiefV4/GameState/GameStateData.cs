@@ -69,7 +69,7 @@ namespace CrewChiefV4.GameState
         // holds newer (RF2 & Raceroom) flag data. This is game dependent - only RF2 and R3E will use this.
         public FlagEnum[] sectorFlags = new FlagEnum[] { FlagEnum.GREEN, FlagEnum.GREEN, FlagEnum.GREEN };
         public Boolean isFullCourseYellow; // FCY rules apply, no other announcements
-        public Boolean isLocalYellow;  // local yellw - no overtaking, slow down
+        public Boolean isLocalYellow;  // local yellow - no overtaking, slow down
         // note that for RaceRoom we might have to calculate this. < 0 means we've passed the incident.
         public float distanceToNearestIncident = -1;
         public FullCourseYellowPhase fcyPhase = FullCourseYellowPhase.RACING;
