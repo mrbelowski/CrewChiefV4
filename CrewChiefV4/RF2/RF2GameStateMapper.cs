@@ -135,14 +135,13 @@ namespace CrewChiefV4.rFactor2
                 this.isApproachingTrack = false;
                 this.wheelCircumference = new float[] { 0, 0 };
                 pgs = null;
+
                 return null;
             }
             
             // game is paused or other window has taken focus
             if (rf2state.mDeltaTime > 0.23)
-            {
                 return pgs;
-            }
 
             // --------------------------------
             // session data
@@ -159,28 +158,22 @@ namespace CrewChiefV4.rFactor2
                     case ControlType.Player:
                     case ControlType.Remote:
                         if (vehicle.mIsPlayer == 1)
-                        {
                             player = vehicle;
-                        }
+
                         if (vehicle.mPlace == 1)
-                        {
                             leader = vehicle;
-                        }
                         break;
                     default:
                         continue;
                 }
+
                 if (player.mIsPlayer == 1 && leader.mPlace == 1)
-                {
                     break;
-                }
             }
             
             // can't find the player or session leader vehicle info (replay)
             if (player.mIsPlayer != 1 || leader.mPlace != 1)
-            {
                 return pgs;
-            }
             
             if (RF2GameStateMapper.playerName == null)
             {
@@ -193,10 +186,12 @@ namespace CrewChiefV4.rFactor2
             var csd = cgs.SessionData;
             var psd = pgs != null ? pgs.SessionData : null;
             csd.EventIndex = rf2state.mSession;
-            csd.SessionIteration = 
-                rf2state.mSession >= 1 && rf2state.mSession <= 4 ? rf2state.mSession - 1 :
+
+            csd.SessionIteration
+                = rf2state.mSession >= 1 && rf2state.mSession <= 4 ? rf2state.mSession - 1 :
                 rf2state.mSession >= 5 && rf2state.mSession <= 8 ? rf2state.mSession - 5 :
                 rf2state.mSession >= 10 && rf2state.mSession <= 13 ? rf2state.mSession - 10 : 0;
+
             csd.SessionType = mapToSessionType(rf2state);
             csd.SessionPhase = mapToSessionPhase((rFactor2Constants.rF2GamePhase)rf2state.mGamePhase);
             cgs.carClass = CarData.getCarClassForRF1ClassName(getSafeCarClassName(getNameFromBytes(player.mVehicleClass)));
@@ -207,8 +202,11 @@ namespace CrewChiefV4.rFactor2
             csd.SessionNumberOfLaps = rf2state.mMaxLaps > 0 && rf2state.mMaxLaps < 1000 ? rf2state.mMaxLaps : 0;
             
             // default to 60:30 if both session time and number of laps undefined (test day)
-            float defaultSessionTotalRunTime = 3630;
-            csd.SessionTotalRunTime = (float)rf2state.mEndET > 0 ? (float)rf2state.mEndET : csd.SessionNumberOfLaps > 0 ? 0 : defaultSessionTotalRunTime;
+            float defaultSessionTotalRunTime = 3630.0f;
+            csd.SessionTotalRunTime
+                = (float)rf2state.mEndET > 0.0f
+                    ? (float)rf2state.mEndET
+                    : csd.SessionNumberOfLaps > 0.0f ? 0.0f : defaultSessionTotalRunTime;
 
             // if previous state is null or any of the above change, this is a new session
             csd.IsNewSession = pgs == null ||
@@ -231,12 +229,12 @@ namespace CrewChiefV4.rFactor2
                 csd.SessionPhase == SessionPhase.Countdown)); 
             
             csd.SessionStartTime = csd.IsNewSession ? cgs.Now : psd.SessionStartTime;
-            csd.SessionHasFixedTime = csd.SessionTotalRunTime > 0;
+            csd.SessionHasFixedTime = csd.SessionTotalRunTime > 0.0f;
             csd.SessionRunningTime = (float)rf2state.mCurrentET;
-            csd.SessionTimeRemaining = csd.SessionHasFixedTime ? csd.SessionTotalRunTime - csd.SessionRunningTime : 0;
+            csd.SessionTimeRemaining = csd.SessionHasFixedTime ? csd.SessionTotalRunTime - csd.SessionRunningTime : 0.0f;
             
             // hack for test day sessions running longer than allotted time
-            csd.SessionTimeRemaining = csd.SessionTimeRemaining < 0 && rf2state.mSession == 0 ? defaultSessionTotalRunTime : csd.SessionTimeRemaining;
+            csd.SessionTimeRemaining = csd.SessionTimeRemaining < 0.0f && rf2state.mSession == 0.0f ? defaultSessionTotalRunTime : csd.SessionTimeRemaining;
 
             csd.NumCars = rf2state.mNumVehicles;
             csd.NumCarsAtStartOfSession = csd.IsNewSession ? csd.NumCars : psd.NumCarsAtStartOfSession;
@@ -251,17 +249,17 @@ namespace CrewChiefV4.rFactor2
             csd.IsDisqualified = (rFactor2Constants.rF2FinishStatus)player.mFinishStatus == rFactor2Constants.rF2FinishStatus.Dq;
             csd.CompletedLaps = player.mTotalLaps;
             csd.LapTimeCurrent = csd.SessionRunningTime - (float)player.mLapStartET;
-            csd.LapTimePrevious = player.mLastLapTime > 0 ? (float)player.mLastLapTime : -1;
-            csd.LastSector1Time = player.mCurSector1 > 0 ? (float)player.mCurSector1 : -1;
-            csd.LastSector2Time = player.mCurSector2 > 0 && player.mCurSector1 > 0 ? (float)(player.mCurSector2 - player.mCurSector1) : -1;
-            csd.LastSector3Time = player.mLastLapTime > 0 && player.mCurSector2 > 0 ? (float)(player.mLastLapTime - player.mCurSector2) : -1;
-            csd.PlayerBestSector1Time = player.mBestSector1 > 0 ? (float)player.mBestSector1 : -1;
-            csd.PlayerBestSector2Time = player.mBestSector2 > 0 && player.mBestSector1 > 0 ? (float)(player.mBestSector2 - player.mBestSector1) : -1;
-            csd.PlayerBestSector3Time = player.mBestLapTime > 0 && player.mBestSector2 > 0 ? (float)(player.mBestLapTime - player.mBestSector2) : -1;
+            csd.LapTimePrevious = player.mLastLapTime > 0.0f ? (float)player.mLastLapTime : -1.0f;
+            csd.LastSector1Time = player.mCurSector1 > 0.0f ? (float)player.mCurSector1 : -1.0f;
+            csd.LastSector2Time = player.mCurSector2 > 0.0f && player.mCurSector1 > 0.0f ? (float)(player.mCurSector2 - player.mCurSector1) : -1.0f;
+            csd.LastSector3Time = player.mLastLapTime > 0.0f && player.mCurSector2 > 0.0f ? (float)(player.mLastLapTime - player.mCurSector2) : -1.0f;
+            csd.PlayerBestSector1Time = player.mBestSector1 > 0.0f ? (float)player.mBestSector1 : -1.0f;
+            csd.PlayerBestSector2Time = player.mBestSector2 > 0.0f && player.mBestSector1 > 0.0f ? (float)(player.mBestSector2 - player.mBestSector1) : -1.0f;
+            csd.PlayerBestSector3Time = player.mBestLapTime > 0.0f && player.mBestSector2 > 0.0f ? (float)(player.mBestLapTime - player.mBestSector2) : -1.0f;
             csd.PlayerBestLapSector1Time = csd.PlayerBestSector1Time;
             csd.PlayerBestLapSector2Time = csd.PlayerBestSector2Time;
             csd.PlayerBestLapSector3Time = csd.PlayerBestSector3Time;
-            csd.PlayerLapTimeSessionBest = player.mBestLapTime > 0 ? (float)player.mBestLapTime : -1;
+            csd.PlayerLapTimeSessionBest = player.mBestLapTime > 0.0f ? (float)player.mBestLapTime : -1.0f;
             csd.SessionTimesAtEndOfSectors = pgs != null ? psd.SessionTimesAtEndOfSectors : new SessionData().SessionTimesAtEndOfSectors;
             
             if (csd.IsNewSector && !csd.IsNewSession)
