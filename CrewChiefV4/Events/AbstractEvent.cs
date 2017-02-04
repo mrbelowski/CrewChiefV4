@@ -182,7 +182,7 @@ namespace CrewChiefV4.Events
             // common checks here?
             triggerInternal(previousGameState, currentGameState);
         }
-
+        
         public Boolean messagesHaveSameContent(List<MessageFragment> messages1, List<MessageFragment> messages2)
         {
             if (messages1 == null && messages2 == null) 

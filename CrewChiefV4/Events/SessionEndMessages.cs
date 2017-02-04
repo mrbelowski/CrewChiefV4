@@ -65,7 +65,8 @@ namespace CrewChiefV4.Events
             {
                 if (sessionRunningTime > 60)
                 {
-                    if (lastSessionPhase == SessionPhase.Green || lastSessionPhase == SessionPhase.Finished || lastSessionPhase == SessionPhase.Checkered)
+                    if (lastSessionPhase == SessionPhase.Green || lastSessionPhase == SessionPhase.FullCourseYellow || 
+                        lastSessionPhase == SessionPhase.Finished || lastSessionPhase == SessionPhase.Checkered)
                     {
                         playFinishMessage(sessionType, startPosition, finishPosition, numCars, false);
                     }

@@ -488,7 +488,14 @@ namespace CrewChiefV4
                             {
                                 if (spotter != null)
                                 {
-                                    spotter.unpause();
+                                    if (currentGameState.FlagData.isFullCourseYellow)
+                                    {
+                                        spotter.pause();
+                                    }
+                                    else
+                                    {
+                                        spotter.unpause();
+                                    }
                                 }
                                 if (currentGameState.SessionData.IsNewLap)
                                 {

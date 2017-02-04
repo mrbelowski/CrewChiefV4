@@ -525,7 +525,7 @@ namespace CrewChiefV4.Events
             lastTyreConditionMessage = messageContents;
         }
 
-        private void playEstimatedTypeLifeMinutes(int minutesRemainingOnTheseTyres, Boolean immediate)
+        private void playEstimatedTyreLifeMinutes(int minutesRemainingOnTheseTyres, Boolean immediate)
         {
             if (immediate)
             {
@@ -546,11 +546,10 @@ namespace CrewChiefV4.Events
                         minutesRemainingOnTheseTyres <= (timeInSession - timeElapsed) / 60)
             {
                 QueuedMessage queuedMessage = new QueuedMessage("minutes_on_current_tyres",
-                    MessageContents(folderMinutesOnCurrentTyresIntro, minutesRemainingOnTheseTyres, folderMinutesOnCurrentTyresOutro), 0, null);
+                    MessageContents(folderMinutesOnCurrentTyresIntro, minutesRemainingOnTheseTyres, folderMinutesOnCurrentTyresOutro), 0, immediate ? null : this);
                 if (immediate)
                 {
-                    audioPlayer.playMessageImmediately(queuedMessage);
-                    
+                    audioPlayer.playMessageImmediately(queuedMessage);                    
                 }
                 else
                 {
@@ -585,7 +584,7 @@ namespace CrewChiefV4.Events
                         lapsRemainingOnTheseTyres <= lapsInSession - completedLaps)
             {
                 QueuedMessage queuedMessage = new QueuedMessage("laps_on_current_tyres",
-                    MessageContents(folderLapsOnCurrentTyresIntro, lapsRemainingOnTheseTyres, folderLapsOnCurrentTyresOutro), 0, null);
+                    MessageContents(folderLapsOnCurrentTyresIntro, lapsRemainingOnTheseTyres, folderLapsOnCurrentTyresOutro), 0, immediate ? null : this);
                 if (immediate)
                 {
                     audioPlayer.playMessageImmediately(queuedMessage);
@@ -618,7 +617,7 @@ namespace CrewChiefV4.Events
                 else
                 {
                     int minutesRemainingOnTheseTyres = (int)Math.Round((timeElapsed / (maxWearPercent / 100)) - timeElapsed - 1);
-                    playEstimatedTypeLifeMinutes(minutesRemainingOnTheseTyres, immediate);
+                    playEstimatedTyreLifeMinutes(minutesRemainingOnTheseTyres, immediate);
                 }
             }
         }

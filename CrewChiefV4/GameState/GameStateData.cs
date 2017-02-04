@@ -15,7 +15,7 @@ namespace CrewChiefV4.GameState
     }
     public enum SessionPhase
     {
-        Unavailable, Garage, Gridwalk, Formation, Countdown, Green, Checkered, Finished
+        Unavailable, Garage, Gridwalk, Formation, Countdown, Green, FullCourseYellow, Checkered, Finished
     }
     public enum ControlType
     {
@@ -59,6 +59,21 @@ namespace CrewChiefV4.GameState
         GREEN, YELLOW, DOUBLE_YELLOW, BLUE, WHITE, BLACK, CHEQUERED, UNKNOWN
     }
 
+    public enum FullCourseYellowPhase
+    {
+        PENDING, PITS_CLOSED, PITS_OPEN_LEAD_LAP_VEHICLES, PITS_OPEN, LAST_LAP_NEXT, LAST_LAP_CURRENT, RACING
+    }
+
+    public class FlagData
+    {
+        // holds newer (RF2 & Raceroom) flag data. This is game dependent - only RF2 and R3E will use this.
+        public FlagEnum[] sectorFlags = new FlagEnum[] { FlagEnum.GREEN, FlagEnum.GREEN, FlagEnum.GREEN };
+        public Boolean isFullCourseYellow; // FCY rules apply, no other announcements
+        public Boolean isLocalYellow;  // local yellw - no overtaking, slow down
+        // note that for RaceRoom we might have to calculate this. < 0 means we've passed the incident.
+        public float distanceToNearestIncident = -1;
+        public FullCourseYellowPhase fcyPhase = FullCourseYellowPhase.RACING;
+    }
 
     public class TransmissionData
     {
@@ -984,6 +999,8 @@ namespace CrewChiefV4.GameState
         public Conditions Conditions = new Conditions();
 
         public OvertakingAids OvertakingAids = new OvertakingAids();
+
+        public FlagData FlagData = new FlagData();
 
         public GameStateData(long ticks)
         {

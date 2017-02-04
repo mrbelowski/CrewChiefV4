@@ -202,12 +202,20 @@ namespace CrewChiefV4.Events
 
         public override bool isMessageStillValid(string eventSubType, GameStateData currentGameState, Dictionary<string, object> validationData)
         {
-            if ((eventSubType == folderImprovingTimes || eventSubType == folderConsistentTimes || eventSubType == folderWorseningTimes) &&
-                currentGameState.SessionData.SectorNumber != 1)
+            // TODO: unfuck me
+            if (base.isMessageStillValid(eventSubType, currentGameState, validationData))
+            {
+                if ((eventSubType == folderImprovingTimes || eventSubType == folderConsistentTimes || eventSubType == folderWorseningTimes) &&
+                    currentGameState.SessionData.SectorNumber != 1)
+                {
+                    return false;
+                }
+                return true;
+            }
+            else
             {
                 return false;
             }
-            return true;
         }
 
         protected override void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)

@@ -141,10 +141,12 @@ namespace CrewChiefV4.Events
             fuelUseActive = currentGameState.FuelData.FuelUseActive;
             currentFuel = currentGameState.FuelData.FuelLeft;
             if (fuelUseActive && ((currentGameState.SessionData.SessionType == SessionType.Race &&
-                (currentGameState.SessionData.SessionPhase == SessionPhase.Green || currentGameState.SessionData.SessionPhase == SessionPhase.Checkered)) ||
+                ((currentGameState.SessionData.SessionPhase == SessionPhase.Green || currentGameState.SessionData.SessionPhase == SessionPhase.FullCourseYellow) || 
+                    currentGameState.SessionData.SessionPhase == SessionPhase.Checkered)) ||
                  ((currentGameState.SessionData.SessionType == SessionType.Qualify || currentGameState.SessionData.SessionType == SessionType.Practice || 
-                    currentGameState.SessionData.SessionType == SessionType.HotLap) && 
-                    (currentGameState.SessionData.SessionPhase == SessionPhase.Green || currentGameState.SessionData.SessionPhase == SessionPhase.Countdown) &&
+                    currentGameState.SessionData.SessionType == SessionType.HotLap) &&
+                    ((currentGameState.SessionData.SessionPhase == SessionPhase.Green || currentGameState.SessionData.SessionPhase == SessionPhase.FullCourseYellow) || 
+                        currentGameState.SessionData.SessionPhase == SessionPhase.Countdown) &&
                     currentGameState.SessionData.LapTimeCurrent > 0)))
             {               
                 // To get the initial fuel, wait for 15 seconds
@@ -191,12 +193,12 @@ namespace CrewChiefV4.Events
                     if (enableFuelMessages && currentFuel <= 2 && !played2LitreWarning)
                     {
                         played2LitreWarning = true;
-                        audioPlayer.playMessage(new QueuedMessage("Fuel/level", MessageContents(2, folderLitresRemaining), 0, null));
+                        audioPlayer.playMessage(new QueuedMessage("Fuel/level", MessageContents(2, folderLitresRemaining), 0, this));
                     }
                     else if (enableFuelMessages && currentFuel <= 1 && !played1LitreWarning)
                     {
                         played1LitreWarning = true;
-                        audioPlayer.playMessage(new QueuedMessage("Fuel/level", MessageContents(folderOneLitreRemaining), 0, null));
+                        audioPlayer.playMessage(new QueuedMessage("Fuel/level", MessageContents(folderOneLitreRemaining), 0, this));
                     }
                 }
                 if (currentGameState.SessionData.IsNewLap && initialised && currentGameState.SessionData.CompletedLaps > lapsCompletedWhenFuelWasReset 
