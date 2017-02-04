@@ -16,6 +16,8 @@ namespace CrewChiefV4.rFactor2
     {
         public static String playerName = null;
 
+        private SpeechRecogniser speechRecogniser;
+
         private List<CornerData.EnumWithThresholds> suspensionDamageThresholds = new List<CornerData.EnumWithThresholds>();
         private List<CornerData.EnumWithThresholds> tyreWearThresholds = new List<CornerData.EnumWithThresholds>();
 
@@ -26,8 +28,6 @@ namespace CrewChiefV4.rFactor2
 
         private List<CornerData.EnumWithThresholds> brakeTempThresholdsForPlayersCar = null;
 
-        private SpeechRecogniser speechRecogniser;
-
         // if we're running only against AI, force the pit window to open
         private Boolean isOfflineSession = true;
         
@@ -36,13 +36,14 @@ namespace CrewChiefV4.rFactor2
         
         // detect when approaching racing surface after being off track
         private float distanceOffTrack = 0.0f;
-        
         private Boolean isApproachingTrack = false;
-        
+
         // dynamically calculated wheel circumferences
         private float[] wheelCircumference = new float[] { 0.0f, 0.0f };
 
+        // Session classes tracing.
         private Dictionary<string, string> carClassMap = new Dictionary<string, string>();
+        bool isMultiClassSession = false;
 
         public RF2GameStateMapper()
         {
@@ -231,14 +232,27 @@ namespace CrewChiefV4.rFactor2
             if (csd.IsNewSession)
             {
                 this.repopulateClassMap(ref rf2state);
-                var sb = new StringBuilder();
-                foreach (var cls in this.carClassMap)
-                    sb.Append(cls.Value + " ");
+                var classesStr = this.getCarClassesString();
 
-                var msg = this.isMulticlassSession() 
-                    ? "New Mutli-Class Session: " + sb.ToString() 
-                    : "New Single-Class Session: " + sb.ToString();
+                var msg = this.getIsMultiClassSession()
+                    ? "New Mutli-Class Session: " + classesStr.ToString()
+                    : "New Single-Class Session: " + classesStr.ToString();
 
+                this.isMultiClassSession = this.getIsMultiClassSession();
+                Console.WriteLine(msg);
+            }
+            else if (this.isMultiClassSession != this.getIsMultiClassSession())
+            {
+                // Consider: There might be an earlier spot to check for this (multiplayer
+                // new veh joined or something).
+                var classesStr = this.getCarClassesString();
+
+                // Consider: might cause bugs if all cars retired besides one.
+                var msg = this.getIsMultiClassSession()
+                    ? "Session changed to Mutli-Class: " + classesStr.ToString()
+                    : "Session to Single-Class: " + classesStr.ToString();
+
+                this.isMultiClassSession = this.getIsMultiClassSession();
                 Console.WriteLine(msg);
             }
 
@@ -555,10 +569,20 @@ namespace CrewChiefV4.rFactor2
                 var vehicle = rf2state.mVehicles[i];
                 if (vehicle.mIsPlayer == 1)
                 {
-                    csd.OverallSessionBestLapTime = csd.PlayerLapTimeSessionBest > 0.0f ?
-                        csd.PlayerLapTimeSessionBest : -1.0f;
-                    csd.PlayerClassSessionBestLapTime = csd.PlayerLapTimeSessionBest > 0.0f ?
-                        csd.PlayerLapTimeSessionBest : -1.0f;
+                    if (this.isMultiClassSession)
+                    {
+                        csd.PlayerClassSessionBestLapTime = csd.PlayerLapTimeSessionBest > 0.0f ?
+                            csd.PlayerLapTimeSessionBest : -1.0f;
+
+                        csd.OverallSessionBestLapTime = -1.0f;
+                    }
+                    else
+                    {
+                        csd.OverallSessionBestLapTime = csd.PlayerLapTimeSessionBest > 0.0f ?
+                            csd.PlayerLapTimeSessionBest : -1.0f;
+
+                        csd.PlayerClassSessionBestLapTime = -1.0f;
+                    }
                     continue;
                 }
 
@@ -598,7 +622,10 @@ namespace CrewChiefV4.rFactor2
                 }
 
                 opponent.UnFilteredPosition = opponent.Position;
-                opponent.SessionTimeAtLastPositionChange = opponentPrevious != null && opponentPrevious.Position != opponent.Position ? csd.SessionRunningTime : -1;
+                opponent.SessionTimeAtLastPositionChange 
+                    = opponentPrevious != null && opponentPrevious.Position != opponent.Position 
+                            ? csd.SessionRunningTime : -1.0f;
+
                 opponent.CompletedLaps = vehicle.mTotalLaps;
                 opponent.CurrentSectorNumber = vehicle.mSector == 0 ? 3 : vehicle.mSector;
 
@@ -607,25 +634,25 @@ namespace CrewChiefV4.rFactor2
                 opponent.Speed = (float)vehicle.mSpeed;
                 opponent.DistanceRoundTrack = (float)vehicle.mLapDist;
                 opponent.WorldPosition = new float[] { (float)vehicle.mPos.x, (float)vehicle.mPos.z };
-                opponent.CurrentBestLapTime = vehicle.mBestLapTime > 0 ? (float)vehicle.mBestLapTime : -1.0f;
+                opponent.CurrentBestLapTime = vehicle.mBestLapTime > 0.0f ? (float)vehicle.mBestLapTime : -1.0f;
                 opponent.PreviousBestLapTime = opponentPrevious != null && opponentPrevious.CurrentBestLapTime > 0.0f && 
                     opponentPrevious.CurrentBestLapTime > opponent.CurrentBestLapTime ? opponentPrevious.CurrentBestLapTime : -1.0f;
                 opponent.bestSector1Time = vehicle.mBestSector1 > 0 ? (float)vehicle.mBestSector1 : -1.0f;
                 opponent.bestSector2Time = vehicle.mBestSector2 > 0 && vehicle.mBestSector1 > 0.0f ? (float)(vehicle.mBestSector2 - vehicle.mBestSector1) : -1.0f;
                 opponent.bestSector3Time = vehicle.mBestLapTime > 0 && vehicle.mBestSector2 > 0.0f ?  (float)(vehicle.mBestLapTime - vehicle.mBestSector2) : -1.0f;
-                opponent.LastLapTime = vehicle.mLastLapTime > 0 ? (float)vehicle.mLastLapTime : -1;
+                opponent.LastLapTime = vehicle.mLastLapTime > 0 ? (float)vehicle.mLastLapTime : -1.0f;
                 
                 float lastSectorTime = -1.0f;
                 switch (opponent.CurrentSectorNumber)
                 {
                     case 1:
-                        lastSectorTime = vehicle.mLastLapTime > 0 ? (float)vehicle.mLastLapTime : -1;
+                        lastSectorTime = vehicle.mLastLapTime > 0.0f ? (float)vehicle.mLastLapTime : -1.0f;
                         break;
                     case 2:
-                        lastSectorTime = vehicle.mLastSector1 > 0 ? (float)vehicle.mLastSector1 : -1;
+                        lastSectorTime = vehicle.mLastSector1 > 0.0f ? (float)vehicle.mLastSector1 : -1.0f;
                         break;
                     case 3:
-                        lastSectorTime = vehicle.mLastSector2 > 0 ? (float)vehicle.mLastSector2 : -1;
+                        lastSectorTime = vehicle.mLastSector2 > 0.0f ? (float)vehicle.mLastSector2 : -1.0f;
                         break;
                     default:
                         break;
@@ -716,19 +743,28 @@ namespace CrewChiefV4.rFactor2
                     csd.OpponentsLapTimeSessionBestOverall = opponent.CurrentBestLapTime;
                 }
 
-                if (opponent.CurrentBestLapTime > 0.0f
-                    && (opponent.CurrentBestLapTime < csd.OverallSessionBestLapTime 
-                        || csd.OverallSessionBestLapTime < 0.0f))
+                if (this.isMultiClassSession)
                 {
-                    csd.OverallSessionBestLapTime = opponent.CurrentBestLapTime;
-                }
+                    if (opponent.CurrentBestLapTime > 0.0f
+                        && (opponent.CurrentBestLapTime < csd.OpponentsLapTimeSessionBestPlayerClass
+                            || csd.OpponentsLapTimeSessionBestPlayerClass < 0.0f)
+                        && opponent.CarClass == cgs.carClass)
+                    {
+                        csd.OpponentsLapTimeSessionBestPlayerClass = opponent.CurrentBestLapTime;
+                    }
 
-                if (opponent.CurrentBestLapTime > 0.0f
-                    && (opponent.CurrentBestLapTime < csd.OpponentsLapTimeSessionBestPlayerClass 
-                        || csd.OpponentsLapTimeSessionBestPlayerClass < 0.0f)
-                    && opponent.CarClass == cgs.carClass)
+                    csd.OverallSessionBestLapTime = -1.0f;
+                }
+                else
                 {
-                    csd.OpponentsLapTimeSessionBestPlayerClass = opponent.CurrentBestLapTime;
+                    if (opponent.CurrentBestLapTime > 0.0f
+                        && (opponent.CurrentBestLapTime < csd.OverallSessionBestLapTime
+                            || csd.OverallSessionBestLapTime < 0.0f))
+                    {
+                        csd.OverallSessionBestLapTime = opponent.CurrentBestLapTime;
+                    }
+
+                    csd.OpponentsLapTimeSessionBestPlayerClass = -1.0f;
                 }
 
                 // shouldn't have duplicates, but just in case
@@ -937,7 +973,7 @@ namespace CrewChiefV4.rFactor2
 
             return cgs;
         }
-        
+
         private PitWindow mapToPitWindow(rFactor2Constants.rF2YellowFlagState pitWindow)
         {
             // it seems that the pit window is only truly open on multiplayer races?
@@ -1135,13 +1171,22 @@ namespace CrewChiefV4.rFactor2
         private void repopulateClassMap(ref rF2State state)
         {
             this.carClassMap.Clear();
-            foreach (var v in state.mVehicles)
-                this.getSafeCarClassName(RF2GameStateMapper.getStringFromBytes(v.mVehicleClass));
+            for (int i = 0; i < state.mNumVehicles; ++i)
+                this.getSafeCarClassName(RF2GameStateMapper.getStringFromBytes(state.mVehicles[i].mVehicleClass));
         }
 
-        private bool isMulticlassSession()
+        private bool getIsMultiClassSession()
         {
-            return this.carClassMap.Count > 1;
+            return this.carClassMap.Values.Distinct().Count() > 1;
+        }
+
+        private string getCarClassesString()
+        {
+            var sb = new StringBuilder();
+            foreach (var cls in this.carClassMap.Values.Distinct().ToList())
+                sb.Append(cls + " ");
+
+            return sb.ToString();
         }
     }
 }
