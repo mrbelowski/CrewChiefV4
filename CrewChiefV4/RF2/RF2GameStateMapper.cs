@@ -64,7 +64,7 @@ namespace CrewChiefV4.rFactor2
                 return;
 
             var wrapper = (CrewChiefV4.rFactor2.RF2SharedMemoryReader.RF2StructWrapper)memoryMappedFileStruct;
-            var versionStr = getNameFromBytes(wrapper.state.mVersion);
+            var versionStr = getStringFromBytes(wrapper.state.mVersion);
 
             var versionParts = versionStr.Split('.');
             if (versionParts.Length != 4)
@@ -177,7 +177,7 @@ namespace CrewChiefV4.rFactor2
             
             if (RF2GameStateMapper.playerName == null)
             {
-                var driverName = getNameFromBytes(player.mDriverName).ToLower();
+                var driverName = getStringFromBytes(player.mDriverName).ToLower();
                 NameValidator.validateName(driverName);
                 RF2GameStateMapper.playerName = driverName;
             }
@@ -194,10 +194,10 @@ namespace CrewChiefV4.rFactor2
 
             csd.SessionType = mapToSessionType(rf2state);
             csd.SessionPhase = mapToSessionPhase((rFactor2Constants.rF2GamePhase)rf2state.mGamePhase);
-            cgs.carClass = CarData.getCarClassForRF1ClassName(getSafeCarClassName(getNameFromBytes(player.mVehicleClass)));
+            cgs.carClass = CarData.getCarClassForRF1ClassName(getSafeCarClassName(getStringFromBytes(player.mVehicleClass)));
             this.brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(cgs.carClass);
-            csd.DriverRawName = getNameFromBytes(player.mDriverName).ToLower();
-            csd.TrackDefinition = new TrackDefinition(getNameFromBytes(rf2state.mTrackName), (float)rf2state.mLapDist);
+            csd.DriverRawName = getStringFromBytes(player.mDriverName).ToLower();
+            csd.TrackDefinition = new TrackDefinition(getStringFromBytes(rf2state.mTrackName), (float)rf2state.mLapDist);
             csd.TrackDefinition.setGapPoints();
             csd.SessionNumberOfLaps = rf2state.mMaxLaps > 0 && rf2state.mMaxLaps < 1000 ? rf2state.mMaxLaps : 0;
             
@@ -226,8 +226,22 @@ namespace CrewChiefV4.rFactor2
                 (csd.SessionPhase == SessionPhase.Garage || 
                 csd.SessionPhase == SessionPhase.Gridwalk ||
                 csd.SessionPhase == SessionPhase.Formation ||
-                csd.SessionPhase == SessionPhase.Countdown)); 
-            
+                csd.SessionPhase == SessionPhase.Countdown));
+
+            if (csd.IsNewSession)
+            {
+                this.repopulateClassMap(ref rf2state);
+                var sb = new StringBuilder();
+                foreach (var cls in this.carClassMap)
+                    sb.Append(cls.Value + " ");
+
+                var msg = this.isMulticlassSession() 
+                    ? "New Mutli-Class Session: " + sb.ToString() 
+                    : "New Single-Class Session: " + sb.ToString();
+
+                Console.WriteLine(msg);
+            }
+
             csd.SessionStartTime = csd.IsNewSession ? cgs.Now : psd.SessionStartTime;
             csd.SessionHasFixedTime = csd.SessionTotalRunTime > 0.0f;
             csd.SessionRunningTime = (float)rf2state.mCurrentET;
@@ -561,12 +575,12 @@ namespace CrewChiefV4.rFactor2
                         break;
                 }
 
-                var opponentKey = getSafeCarClassName(getNameFromBytes(vehicle.mVehicleClass)) + vehicle.mPlace.ToString();
+                var opponentKey = getSafeCarClassName(getStringFromBytes(vehicle.mVehicleClass)) + vehicle.mPlace.ToString();
                 var opponentPrevious = getOpponentDataForVehicleInfo(vehicle, pgs, csd.SessionRunningTime);
                 var opponent = new OpponentData();
-                opponent.DriverRawName = getNameFromBytes(vehicle.mDriverName).ToLower();
+                opponent.DriverRawName = getStringFromBytes(vehicle.mDriverName).ToLower();
                 opponent.DriverNameSet = opponent.DriverRawName.Length > 0;
-                opponent.CarClass = CarData.getCarClassForRF1ClassName(getSafeCarClassName(getNameFromBytes(vehicle.mVehicleClass)));
+                opponent.CarClass = CarData.getCarClassForRF1ClassName(getSafeCarClassName(getStringFromBytes(vehicle.mVehicleClass)));
                 opponent.Position = vehicle.mPlace;
                 
                 if (opponent.DriverNameSet && opponentPrevious == null && CrewChief.enableDriverNames)
@@ -983,8 +997,8 @@ namespace CrewChiefV4.rFactor2
                 foreach (var o in previousGameState.OpponentData.Values)
                 {
                     var opponentKey = o.CarClass.rF1ClassName + o.Position.ToString();
-                    if (o.DriverRawName != getNameFromBytes(vehicle.mDriverName).ToLower() || 
-                        o.CarClass != CarData.getCarClassForRF1ClassName(getSafeCarClassName(getNameFromBytes(vehicle.mVehicleClass))) || 
+                    if (o.DriverRawName != getStringFromBytes(vehicle.mDriverName).ToLower() || 
+                        o.CarClass != CarData.getCarClassForRF1ClassName(getSafeCarClassName(getStringFromBytes(vehicle.mVehicleClass))) || 
                         this.opponentKeysProcessed.Contains(opponentKey))
                     {
                         continue;
@@ -1071,7 +1085,7 @@ namespace CrewChiefV4.rFactor2
             }
         }
 
-        public static String getNameFromBytes(byte[] name)
+        public static String getStringFromBytes(byte[] name)
         {
             return Encoding.UTF8.GetString(name).TrimEnd('\0').Trim();
         }
@@ -1116,6 +1130,18 @@ namespace CrewChiefV4.rFactor2
             // If not mapped, just add itself.
             this.carClassMap.Add(rf2ClassName, rf2ClassName);
             return rf2ClassName;
+        }
+
+        private void repopulateClassMap(ref rF2State state)
+        {
+            this.carClassMap.Clear();
+            foreach (var v in state.mVehicles)
+                this.getSafeCarClassName(RF2GameStateMapper.getStringFromBytes(v.mVehicleClass));
+        }
+
+        private bool isMulticlassSession()
+        {
+            return this.carClassMap.Count > 1;
         }
     }
 }
