@@ -9,6 +9,13 @@ namespace CrewChiefV4.Events
 {
     class EngineMonitor : AbstractEvent
     {
+
+        // allow engine status messages during caution periods
+        public override List<SessionPhase> applicableSessionPhases
+        {
+            get { return new List<SessionPhase> { SessionPhase.Green, SessionPhase.Checkered, SessionPhase.FullCourseYellow }; }
+        }
+
         private String folderAllClear = "engine_monitor/all_clear";
         private String folderHotWater = "engine_monitor/hot_water";
         private String folderHotOil = "engine_monitor/hot_oil";

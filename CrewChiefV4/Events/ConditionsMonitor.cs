@@ -9,6 +9,13 @@ namespace CrewChiefV4.Events
 {
     class ConditionsMonitor : AbstractEvent
     {
+        // allow condition messages during caution periods
+        public override List<SessionPhase> applicableSessionPhases
+        {
+            get { return new List<SessionPhase> { SessionPhase.Green, SessionPhase.Checkered, SessionPhase.FullCourseYellow }; }
+
+        }
+
         private Boolean enableTrackAndAirTempReports = UserSettings.GetUserSettings().getBoolean("enable_track_and_air_temp_reports");
 
         public static TimeSpan ConditionsSampleFrequency = TimeSpan.FromSeconds(10);

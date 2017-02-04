@@ -957,7 +957,7 @@ namespace CrewChiefV4.assetto
             Boolean sessionOfSameTypeRestarted = ((currentGameState.SessionData.SessionType == SessionType.Race && lastSessionType == SessionType.Race) ||
                 (currentGameState.SessionData.SessionType == SessionType.Practice && lastSessionType == SessionType.Practice) ||
                 (currentGameState.SessionData.SessionType == SessionType.Qualify && lastSessionType == SessionType.Qualify)) &&
-                (lastSessionPhase == SessionPhase.Green || lastSessionPhase == SessionPhase.Finished) &&
+                ((lastSessionPhase == SessionPhase.Green || lastSessionPhase == SessionPhase.FullCourseYellow) || lastSessionPhase == SessionPhase.Finished) &&
                 currentGameState.SessionData.SessionPhase == SessionPhase.Countdown &&
                 (currentGameState.SessionData.SessionType == SessionType.Race ||
                     currentGameState.SessionData.SessionHasFixedTime && sessionTimeRemaining > lastSessionTimeRemaining + 1);
@@ -1070,7 +1070,7 @@ namespace CrewChiefV4.assetto
                 Boolean justGoneGreen = false;
                 if (lastSessionPhase != currentGameState.SessionData.SessionPhase)
                 {
-                    if (currentGameState.SessionData.SessionPhase == SessionPhase.Green)
+                    if (currentGameState.SessionData.SessionPhase == SessionPhase.Green || currentGameState.SessionData.SessionPhase == SessionPhase.FullCourseYellow)
                     {
                         // just gone green, so get the session data.
                         if (currentGameState.SessionData.SessionType == SessionType.Race)
@@ -1310,7 +1310,7 @@ namespace CrewChiefV4.assetto
 
                 currentGameState.SessionData.IsNewLap = previousGameState != null && previousGameState.SessionData.IsNewLap == false &&
                     (shared.acsGraphic.completedLaps == previousGameState.SessionData.CompletedLaps + 1 || ((lastSessionPhase == SessionPhase.Countdown)
-                    && currentGameState.SessionData.SessionPhase == SessionPhase.Green));
+                    && (currentGameState.SessionData.SessionPhase == SessionPhase.Green || currentGameState.SessionData.SessionPhase == SessionPhase.FullCourseYellow)));
 
                 currentGameState.SessionData.IsRacingSameCarBehind = previousGameState != null && previousGameState.getOpponentKeyBehind(false) == currentGameState.getOpponentKeyBehind(false);
                 currentGameState.SessionData.IsRacingSameCarInFront = previousGameState != null && previousGameState.getOpponentKeyInFront(false) == currentGameState.getOpponentKeyInFront(false);
