@@ -200,7 +200,17 @@ namespace CrewChiefV4.rFactor2
             csd.SessionType = mapToSessionType(rf2state);
             csd.SessionPhase = mapToSessionPhase((rFactor2Constants.rF2GamePhase)rf2state.mGamePhase);
             cgs.FlagData.isFullCourseYellow = csd.SessionPhase == SessionPhase.FullCourseYellow;
-
+            if (cgs.FlagData.isFullCourseYellow && pgs != null && !pgs.FlagData.isFullCourseYellow)
+            {
+                // transitioned from racing to yellow, so set the FCY status to pending
+                cgs.FlagData.fcyPhase = FullCourseYellowPhase.PENDING;
+            }
+            else if (pgs != null && pgs.FlagData.isFullCourseYellow && !cgs.FlagData.isFullCourseYellow)
+            {
+                // transitioned from yellow to racing, so set the FCY status to racing
+                cgs.FlagData.fcyPhase = FullCourseYellowPhase.RACING;
+            }
+            
             cgs.carClass = CarData.getCarClassForRF1ClassName(getNameFromBytes(player.mVehicleClass));
             brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(cgs.carClass);
             csd.DriverRawName = getNameFromBytes(player.mDriverName).ToLower();
