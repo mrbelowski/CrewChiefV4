@@ -225,7 +225,7 @@ namespace CrewChiefV4.rFactor2
             // if previous state is null or any of the above change, this is a new session
             csd.IsNewSession = pgs == null ||
                 csd.SessionType != psd.SessionType ||
-                cgs.carClass != pgs.carClass ||
+                cgs.carClass.rFClassName != pgs.carClass.rFClassName ||
                 csd.DriverRawName != psd.DriverRawName || 
                 csd.TrackDefinition.name != psd.TrackDefinition.name ||
                 csd.TrackDefinition.trackLength != psd.TrackDefinition.trackLength ||
@@ -292,9 +292,29 @@ namespace CrewChiefV4.rFactor2
             csd.CompletedLaps = player.mTotalLaps;
             csd.LapTimeCurrent = csd.SessionRunningTime - (float)player.mLapStartET;
             csd.LapTimePrevious = player.mLastLapTime > 0.0f ? (float)player.mLastLapTime : -1.0f;
-            csd.LastSector1Time = player.mCurSector1 > 0.0f ? (float)player.mCurSector1 : -1.0f;
-            csd.LastSector2Time = player.mCurSector2 > 0.0f && player.mCurSector1 > 0.0f ? (float)(player.mCurSector2 - player.mCurSector1) : -1.0f;
-            csd.LastSector3Time = player.mLastLapTime > 0.0f && player.mCurSector2 > 0.0f ? (float)(player.mLastLapTime - player.mCurSector2) : -1.0f;
+
+            if (csd.IsNewSession)
+                csd.LastSector1Time = csd.LastSector2Time = csd.LastSector3Time = -1.0f;
+            else
+            {
+                csd.LastSector1Time = player.mCurSector1 > 0.0f
+                    ? (float)player.mCurSector1
+                    : psd.LastSector1Time;
+
+                csd.LastSector2Time = player.mCurSector2 > 0.0f && player.mCurSector1 > 0.0f
+                    ? (float)(player.mCurSector2 - player.mCurSector1)
+                    : psd.LastSector2Time;
+
+                csd.LastSector3Time = player.mLastLapTime > 0.0f && player.mCurSector2 > 0.0f
+                    ? (float)(player.mLastLapTime - player.mCurSector2)
+                    : psd.LastSector3Time;
+            }
+
+             /*
+         csd.LastSector1Time = player.mCurSector1 > 0.0f ? (float)player.mCurSector1 : -1.0f;
+         csd.LastSector2Time = player.mCurSector2 > 0.0f && player.mCurSector1 > 0.0f ? (float)(player.mCurSector2 - player.mCurSector1) : -1.0f;
+         csd.LastSector3Time = player.mLastLapTime > 0.0f && player.mCurSector2 > 0.0f ? (float)(player.mLastLapTime - player.mCurSector2) : -1.0f;*/
+
             csd.PlayerBestSector1Time = player.mBestSector1 > 0.0f ? (float)player.mBestSector1 : -1.0f;
             csd.PlayerBestSector2Time = player.mBestSector2 > 0.0f && player.mBestSector1 > 0.0f ? (float)(player.mBestSector2 - player.mBestSector1) : -1.0f;
             csd.PlayerBestSector3Time = player.mBestLapTime > 0.0f && player.mBestSector2 > 0.0f ? (float)(player.mBestLapTime - player.mBestSector2) : -1.0f;
@@ -311,19 +331,19 @@ namespace CrewChiefV4.rFactor2
                 {
                     case 1:
                         csd.SessionTimesAtEndOfSectors[3]
-                            = player.mLapStartET > 0 ? (float)player.mLapStartET : -1;
+                            = player.mLapStartET > 0.0f ? (float)player.mLapStartET : -1.0f;
                         break;
                     case 2:
                         csd.SessionTimesAtEndOfSectors[1]
-                            = player.mLapStartET > 0 && player.mCurSector1 > 0 
+                            = player.mLapStartET > 0.0f && player.mCurSector1 > 0.0f 
                                 ? (float)(player.mLapStartET + player.mCurSector1)
-                                : -1;
+                                : -1.0f;
                         break;
                     case 3:
                         csd.SessionTimesAtEndOfSectors[2]
-                            = player.mLapStartET > 0 && player.mCurSector2 > 0 
+                            = player.mLapStartET > 0 && player.mCurSector2 > 0.0f 
                                 ? (float)(player.mLapStartET + player.mCurSector2)
-                                : -1;
+                                : -1.0f;
                         break;
                     default:
                         break;
@@ -583,7 +603,13 @@ namespace CrewChiefV4.rFactor2
                 var vehicle = rf2state.mVehicles[i];
                 if (vehicle.mIsPlayer == 1)
                 {
-                    if (this.isMultiClassSession)
+                    csd.OverallSessionBestLapTime = csd.PlayerLapTimeSessionBest > 0.0f ?
+                        csd.PlayerLapTimeSessionBest : -1.0f;
+
+                    csd.PlayerClassSessionBestLapTime = csd.PlayerLapTimeSessionBest > 0.0f ?
+                        csd.PlayerLapTimeSessionBest : -1.0f;
+
+/*                    if (this.isMultiClassSession)
                     {
                         csd.PlayerClassSessionBestLapTime = csd.PlayerLapTimeSessionBest > 0.0f ?
                             csd.PlayerLapTimeSessionBest : -1.0f;
@@ -596,7 +622,7 @@ namespace CrewChiefV4.rFactor2
                             csd.PlayerLapTimeSessionBest : -1.0f;
 
                         csd.PlayerClassSessionBestLapTime = -1.0f;
-                    }
+                    }*/
                     continue;
                 }
 
@@ -757,28 +783,22 @@ namespace CrewChiefV4.rFactor2
                     csd.OpponentsLapTimeSessionBestOverall = opponent.CurrentBestLapTime;
                 }
 
-                if (this.isMultiClassSession)
+                if (opponent.CurrentBestLapTime > 0.0f
+                    && (opponent.CurrentBestLapTime < csd.OpponentsLapTimeSessionBestPlayerClass
+                        || csd.OpponentsLapTimeSessionBestPlayerClass < 0.0f)
+                    && opponent.CarClass.rFClassName == cgs.carClass.rFClassName)
                 {
-                    if (opponent.CurrentBestLapTime > 0.0f
-                        && (opponent.CurrentBestLapTime < csd.OpponentsLapTimeSessionBestPlayerClass
-                            || csd.OpponentsLapTimeSessionBestPlayerClass < 0.0f)
-                        && opponent.CarClass == cgs.carClass)
-                    {
-                        csd.OpponentsLapTimeSessionBestPlayerClass = opponent.CurrentBestLapTime;
-                    }
+                    csd.OpponentsLapTimeSessionBestPlayerClass = opponent.CurrentBestLapTime;
 
-                    csd.OverallSessionBestLapTime = -1.0f;
+                    if (csd.OpponentsLapTimeSessionBestPlayerClass < csd.PlayerClassSessionBestLapTime)
+                        csd.PlayerClassSessionBestLapTime = csd.OpponentsLapTimeSessionBestPlayerClass;
                 }
-                else
-                {
-                    if (opponent.CurrentBestLapTime > 0.0f
-                        && (opponent.CurrentBestLapTime < csd.OverallSessionBestLapTime
-                            || csd.OverallSessionBestLapTime < 0.0f))
-                    {
-                        csd.OverallSessionBestLapTime = opponent.CurrentBestLapTime;
-                    }
 
-                    csd.OpponentsLapTimeSessionBestPlayerClass = -1.0f;
+                if (opponent.CurrentBestLapTime > 0.0f
+                    && (opponent.CurrentBestLapTime < csd.OverallSessionBestLapTime
+                        || csd.OverallSessionBestLapTime < 0.0f))
+                {
+                    csd.OverallSessionBestLapTime = opponent.CurrentBestLapTime;
                 }
 
                 // shouldn't have duplicates, but just in case
@@ -1052,7 +1072,7 @@ namespace CrewChiefV4.rFactor2
                 {
                     var opponentKey = o.CarClass.rFClassName + o.Position.ToString();
                     if (o.DriverRawName != getStringFromBytes(vehicle.mDriverName).ToLower() || 
-                        o.CarClass != CarData.getCarClassForRF2ClassName(getSafeCarClassName(getStringFromBytes(vehicle.mVehicleClass))) || 
+                        o.CarClass.rFClassName != CarData.getCarClassForRF2ClassName(getSafeCarClassName(getStringFromBytes(vehicle.mVehicleClass))).rFClassName || 
                         this.opponentKeysProcessed.Contains(opponentKey))
                     {
                         continue;
