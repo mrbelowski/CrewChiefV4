@@ -108,7 +108,7 @@ namespace CrewChiefV4
             public float minTyreCircumference;
             public float maxTyreCircumference;
             // add rFactor class name
-            public String rF1ClassName;
+            public String rFClassName;
 
             public CarClass(CarClassEnum carClassEnum, String[] pCarsClassNames, int[] raceroomClassIds, BrakeType brakeType, TyreType defaultTyreType, float maxSafeWaterTemp,
                 float maxSafeOilTemp, float minTyreCircumference, float maxTyreCircumference)
@@ -354,15 +354,46 @@ namespace CrewChiefV4
         {
             foreach (CarClass carClass in carClasses)
             {
-                if (carClass.rF1ClassName == rF1ClassName)
+                if (carClass.rFClassName == rF1ClassName)
                 {
                     return carClass;
                 }
             }
             // create one if it doesn't exist
             CarClass rFactorClass = new CarClass(CarClassEnum.UNKNOWN_RACE, new String[] { "" }, new int[] { -1 }, BrakeType.Iron_Race, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp);
-            rFactorClass.rF1ClassName = rF1ClassName;
+            rFactorClass.rFClassName = rF1ClassName;
             carClasses.Add(rFactorClass);
+            return rFactorClass;
+        }
+
+        private static Dictionary<string, CarClass> mapRF2Classes = new Dictionary<string, CarClass>();
+        public static CarClass getCarClassForRF2ClassName(String rFClassName)
+        {
+            CarClass knownCarClass = null;
+            if (mapRF2Classes.TryGetValue(rFClassName, out knownCarClass))
+                return knownCarClass;
+
+            // Try finding a suitable enum value for rF2 Class.
+            CarClassEnum carClassID = CarClassEnum.UNKNOWN_RACE;
+            if (!Enum.TryParse<CarClassEnum>(rFClassName, out carClassID))
+            {
+                carClassID = CarClassEnum.UNKNOWN_RACE;
+                // Create one if it doesn't exist
+                CarClass newRFactorClass = new CarClass(carClassID, new String[] { "" }, new int[] { -1 }, BrakeType.Iron_Race, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp);
+                newRFactorClass.rFClassName = rFClassName;
+
+                carClasses.Add(newRFactorClass);
+                mapRF2Classes.Add(rFClassName, newRFactorClass);
+
+                return newRFactorClass;
+            }
+
+            CarClass rFactorClass = CarData.getCarClassFromEnum(carClassID);
+            rFactorClass.rFClassName = rFClassName;
+
+            // Register one of built in classes as rF2 class.
+            mapRF2Classes.Add(rFClassName, rFactorClass);
+
             return rFactorClass;
         }
 
