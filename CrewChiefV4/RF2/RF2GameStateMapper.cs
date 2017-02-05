@@ -196,7 +196,7 @@ namespace CrewChiefV4.rFactor2
             csd.SessionType = mapToSessionType(rf2state);
             csd.SessionPhase = mapToSessionPhase((rFactor2Constants.rF2GamePhase)rf2state.mGamePhase);
             cgs.FlagData.isFullCourseYellow = csd.SessionPhase == SessionPhase.FullCourseYellow;
-            cgs.carClass = CarData.getCarClassForRF1ClassName(getSafeCarClassName(getStringFromBytes(player.mVehicleClass)));
+            cgs.carClass = CarData.getCarClassForRF2ClassName(getSafeCarClassName(getStringFromBytes(player.mVehicleClass)));
             this.brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(cgs.carClass);
             csd.DriverRawName = getStringFromBytes(player.mDriverName).ToLower();
             csd.TrackDefinition = new TrackDefinition(getStringFromBytes(rf2state.mTrackName), (float)rf2state.mLapDist);
@@ -618,14 +618,14 @@ namespace CrewChiefV4.rFactor2
                 var opponent = new OpponentData();
                 opponent.DriverRawName = getStringFromBytes(vehicle.mDriverName).ToLower();
                 opponent.DriverNameSet = opponent.DriverRawName.Length > 0;
-                opponent.CarClass = CarData.getCarClassForRF1ClassName(getSafeCarClassName(getStringFromBytes(vehicle.mVehicleClass)));
+                opponent.CarClass = CarData.getCarClassForRF2ClassName(getSafeCarClassName(getStringFromBytes(vehicle.mVehicleClass)));
                 opponent.Position = vehicle.mPlace;
                 
                 if (opponent.DriverNameSet && opponentPrevious == null && CrewChief.enableDriverNames)
                 {
                     this.speechRecogniser.addNewOpponentName(opponent.DriverRawName);
                     Console.WriteLine("New driver " + opponent.DriverRawName + 
-                        " is using car class " + opponent.CarClass.rF1ClassName + 
+                        " is using car class " + opponent.CarClass.rFClassName + 
                         " at position " + opponent.Position.ToString());
                 }
 
@@ -965,7 +965,7 @@ namespace CrewChiefV4.rFactor2
                 Console.WriteLine("SessionStartPosition " + csd.SessionStartPosition);
                 Console.WriteLine("SessionStartTime " + csd.SessionStartTime);
                 Console.WriteLine("TrackName " + csd.TrackDefinition.name);
-                Console.WriteLine("Player is using car class " + cgs.carClass.rF1ClassName + 
+                Console.WriteLine("Player is using car class " + cgs.carClass.rFClassName + 
                     " at position " + csd.Position.ToString());
             }
             if (pgs != null && psd.SessionPhase != csd.SessionPhase)
@@ -1050,9 +1050,9 @@ namespace CrewChiefV4.rFactor2
                 float minDistDiff = -1.0f;
                 foreach (var o in previousGameState.OpponentData.Values)
                 {
-                    var opponentKey = o.CarClass.rF1ClassName + o.Position.ToString();
+                    var opponentKey = o.CarClass.rFClassName + o.Position.ToString();
                     if (o.DriverRawName != getStringFromBytes(vehicle.mDriverName).ToLower() || 
-                        o.CarClass != CarData.getCarClassForRF1ClassName(getSafeCarClassName(getStringFromBytes(vehicle.mVehicleClass))) || 
+                        o.CarClass != CarData.getCarClassForRF2ClassName(getSafeCarClassName(getStringFromBytes(vehicle.mVehicleClass))) || 
                         this.opponentKeysProcessed.Contains(opponentKey))
                     {
                         continue;
@@ -1071,7 +1071,7 @@ namespace CrewChiefV4.rFactor2
 
                 if (opponentPrevious != null)
                 {
-                    this.opponentKeysProcessed.Add(opponentPrevious.CarClass.rF1ClassName + opponentPrevious.Position.ToString());
+                    this.opponentKeysProcessed.Add(opponentPrevious.CarClass.rFClassName + opponentPrevious.Position.ToString());
                 }
             }
             return opponentPrevious;
@@ -1162,9 +1162,6 @@ namespace CrewChiefV4.rFactor2
         // Since class name in rF2 often, but not always, hehe, includes maker name, I need to try to guess
         // what series this class belongs, so that time comparison is not stuck within one brand, but rather
         // is done within class, as intended.
-        //
-        // TODO: Current implementation ofgetCarClassForRF1ClassName uses same parameters
-        // for all series.  This might need rework in the future.
         //
         private string getSafeCarClassName(string rf2ClassName)
         {
