@@ -14,13 +14,12 @@ namespace CrewChiefV4.rFactor2
 {
     public class RF2GameStateMapper : GameStateMapper
     {
-        public static String playerName = null;
-
         private SpeechRecogniser speechRecogniser;
+
+        public static String playerName = null;
 
         private List<CornerData.EnumWithThresholds> suspensionDamageThresholds = new List<CornerData.EnumWithThresholds>();
         private List<CornerData.EnumWithThresholds> tyreWearThresholds = new List<CornerData.EnumWithThresholds>();
-        private List<CornerData.EnumWithThresholds> brakeDamageThresholds = new List<CornerData.EnumWithThresholds>();
 
         private float scrubbedTyreWearPercent = 5.0f;
         private float minorTyreWearPercent = 30.0f;
@@ -28,8 +27,6 @@ namespace CrewChiefV4.rFactor2
         private float wornOutTyreWearPercent = 85.0f;
 
         private List<CornerData.EnumWithThresholds> brakeTempThresholdsForPlayersCar = null;
-
-        private SpeechRecogniser speechRecogniser;
 
         // if we're running only against AI, force the pit window to open
         private Boolean isOfflineSession = true;
@@ -199,6 +196,11 @@ namespace CrewChiefV4.rFactor2
             csd.SessionType = mapToSessionType(rf2state);
             csd.SessionPhase = mapToSessionPhase((rFactor2Constants.rF2GamePhase)rf2state.mGamePhase);
             cgs.FlagData.isFullCourseYellow = csd.SessionPhase == SessionPhase.FullCourseYellow;
+            cgs.carClass = CarData.getCarClassForRF1ClassName(getSafeCarClassName(getStringFromBytes(player.mVehicleClass)));
+            this.brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(cgs.carClass);
+            csd.DriverRawName = getStringFromBytes(player.mDriverName).ToLower();
+            csd.TrackDefinition = new TrackDefinition(getStringFromBytes(rf2state.mTrackName), (float)rf2state.mLapDist);
+
             if (cgs.FlagData.isFullCourseYellow && pgs != null && !pgs.FlagData.isFullCourseYellow)
             {
                 // transitioned from racing to yellow, so set the FCY status to pending
@@ -209,11 +211,7 @@ namespace CrewChiefV4.rFactor2
                 // transitioned from yellow to racing, so set the FCY status to racing
                 cgs.FlagData.fcyPhase = FullCourseYellowPhase.RACING;
             }
-            
-            cgs.carClass = CarData.getCarClassForRF1ClassName(getNameFromBytes(player.mVehicleClass));
-            brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(cgs.carClass);
-            csd.DriverRawName = getNameFromBytes(player.mDriverName).ToLower();
-            csd.TrackDefinition = new TrackDefinition(getNameFromBytes(rf2state.mTrackName), (float)rf2state.mLapDist);
+
             csd.TrackDefinition.setGapPoints();
             csd.SessionNumberOfLaps = rf2state.mMaxLaps > 0 && rf2state.mMaxLaps < 1000 ? rf2state.mMaxLaps : 0;
             
