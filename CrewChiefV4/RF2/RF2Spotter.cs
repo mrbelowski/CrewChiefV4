@@ -39,10 +39,10 @@ namespace CrewChiefV4.rFactor2
         public RF2Spotter(AudioPlayer audioPlayer, Boolean initialEnabledState)
         {
             this.audioPlayer = audioPlayer;
-            this.enabled = this.initialEnabledState;
+            this.enabled = initialEnabledState;
             this.initialEnabledState = initialEnabledState;
             this.internalSpotter = new NoisyCartesianCoordinateSpotter(
-                this.audioPlayer, this.initialEnabledState, this.carLength, carWidth);
+                audioPlayer, initialEnabledState, carLength, carWidth);
         }
 
         public void clearState()
@@ -62,8 +62,9 @@ namespace CrewChiefV4.rFactor2
 
         private rF2VehScoringInfo getVehicleInfo(rF2State shared)
         {
-            foreach (var vehicle in shared.mVehicles)
+            for (int i = 0; i < shared.mNumVehicles; ++i)
             {
+                var vehicle = shared.mVehicles[i];
                 // TOOD: CHECK this out
                 if (vehicle.mIsPlayer == 1)
                 {
