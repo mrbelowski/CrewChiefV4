@@ -56,8 +56,8 @@ namespace CrewChiefV4.Events
         private Boolean isUnderLocalYellow = false;
         private Boolean hasWarnedOfUpcomingIncident = false;
 
-        private TimeSpan fcyPitStatusReminderMinTime = TimeSpan.FromSeconds(30);
-        private float distanceToWarnOfLocalYellow = 500;    // metres
+        private TimeSpan fcyPitStatusReminderMinTime = TimeSpan.FromSeconds(UserSettings.GetUserSettings().getInt("time_between_caution_period_status_reminders"));
+        private float distanceToWarnOfLocalYellow = 500;    // metres - externalise? Is this sufficient? Make it speed-dependent?
         
         public FlagsMonitor(AudioPlayer audioPlayer)
         {

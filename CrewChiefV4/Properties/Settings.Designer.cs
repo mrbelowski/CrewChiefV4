@@ -1714,5 +1714,17 @@ namespace CrewChiefV4.Properties {
                 this["rf2_spotter_car_length"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("60")]
+        public int time_between_caution_period_status_reminders {
+            get {
+                return ((int)(this["time_between_caution_period_status_reminders"]));
+            }
+            set {
+                this["time_between_caution_period_status_reminders"] = value;
+            }
+        }
     }
 }
