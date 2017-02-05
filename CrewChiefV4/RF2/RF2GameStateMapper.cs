@@ -511,8 +511,8 @@ namespace CrewChiefV4.rFactor2
                 this.wheelCircumference[0] > 0.0f && this.wheelCircumference[1] > 0.0f)
             {
                 float[] rotatingSpeed = new float[] { 
-                    2 * (float)Math.PI * cgs.PositionAndMotionData.CarSpeed / this.wheelCircumference[0], 
-                    2 * (float)Math.PI * cgs.PositionAndMotionData.CarSpeed / this.wheelCircumference[1] };
+                    2.0f * (float)Math.PI * cgs.PositionAndMotionData.CarSpeed / this.wheelCircumference[0], 
+                    2.0f * (float)Math.PI * cgs.PositionAndMotionData.CarSpeed / this.wheelCircumference[1] };
                 float minRotFactor = 0.5f;
                 float maxRotFactor = 1.3f;
 
