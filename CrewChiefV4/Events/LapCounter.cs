@@ -72,11 +72,6 @@ namespace CrewChiefV4.Events
             purgePreLightsMessages = false;
         }
 
-        public override bool isMessageStillValid(String eventSubType, GameStateData currentGameState, Dictionary<String, Object> validationData)
-        {
-            return applicableSessionPhases.Contains(currentGameState.SessionData.SessionPhase);
-        }
-
         private void playPreLightsMessage(GameStateData currentGameState, int maxNumberToPlay)
         {
             playedPreLightsMessage = true;
@@ -93,10 +88,10 @@ namespace CrewChiefV4.Events
             {
                 Console.WriteLine("pre-start message for track temp");
                 possibleMessages.Add(new QueuedMessage("trackTemp", MessageContents(ConditionsMonitor.folderTrackTempIs,
-                    convertTemp(currentConditions.TrackTemperature), getTempUnit()), 0, null));
+                    convertTemp(currentConditions.TrackTemperature), getTempUnit()), 0, this));
                 Console.WriteLine("pre-start message for air temp");
                 possibleMessages.Add(new QueuedMessage("air_temp", MessageContents(ConditionsMonitor.folderAirTempIs,
-                    convertTemp(currentConditions.AmbientTemperature), getTempUnit()), 0, null));
+                    convertTemp(currentConditions.AmbientTemperature), getTempUnit()), 0, this));
             }
             if (currentGameState.PitData.HasMandatoryPitStop)
             {
