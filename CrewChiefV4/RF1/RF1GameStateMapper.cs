@@ -481,7 +481,7 @@ namespace CrewChiefV4.rFactor1
                 {
                     speechRecogniser.addNewOpponentName(opponent.DriverRawName);
                     Console.WriteLine("New driver " + opponent.DriverRawName + 
-                        " is using car class " + opponent.CarClass.rF1ClassName + 
+                        " is using car class " + opponent.CarClass.rFClassName + 
                         " at position " + opponent.Position.ToString());
                 }
                 if (opponentPrevious != null)
@@ -737,7 +737,7 @@ namespace CrewChiefV4.rFactor1
                 Console.WriteLine("SessionStartPosition " + currentGameState.SessionData.SessionStartPosition);
                 Console.WriteLine("SessionStartTime " + currentGameState.SessionData.SessionStartTime);
                 Console.WriteLine("TrackName " + currentGameState.SessionData.TrackDefinition.name);
-                Console.WriteLine("Player is using car class " + currentGameState.carClass.rF1ClassName + 
+                Console.WriteLine("Player is using car class " + currentGameState.carClass.rFClassName + 
                     " at position " + currentGameState.SessionData.Position.ToString());
             }
             if (previousGameState != null && previousGameState.SessionData.SessionPhase != currentGameState.SessionData.SessionPhase)
@@ -820,7 +820,7 @@ namespace CrewChiefV4.rFactor1
                 float minDistDiff = -1;
                 foreach (OpponentData o in previousGameState.OpponentData.Values)
                 {
-                    String opponentKey = o.CarClass.rF1ClassName + o.Position.ToString();
+                    String opponentKey = o.CarClass.rFClassName + o.Position.ToString();
                     if (o.DriverRawName != getNameFromBytes(vehicle.driverName).ToLower() || 
                         o.CarClass != CarData.getCarClassForRF1ClassName(getNameFromBytes(vehicle.vehicleClass)) || 
                         opponentKeysProcessed.Contains(opponentKey))
@@ -839,7 +839,7 @@ namespace CrewChiefV4.rFactor1
                 }
                 if (opponentPrevious != null)
                 {
-                    opponentKeysProcessed.Add(opponentPrevious.CarClass.rF1ClassName + opponentPrevious.Position.ToString());
+                    opponentKeysProcessed.Add(opponentPrevious.CarClass.rFClassName + opponentPrevious.Position.ToString());
                 }
             }
             return opponentPrevious;
