@@ -153,7 +153,7 @@ namespace CrewChiefV4.RaceRoom
             List<String> opponentDriverNamesProcessedThisUpdate = new List<String>();
 
             if ((lastSessionPhase != currentGameState.SessionData.SessionPhase && (lastSessionPhase == SessionPhase.Unavailable || lastSessionPhase == SessionPhase.Finished)) ||
-                ((lastSessionPhase == SessionPhase.Checkered || lastSessionPhase == SessionPhase.Finished || lastSessionPhase == SessionPhase.Green) && 
+                ((lastSessionPhase == SessionPhase.Checkered || lastSessionPhase == SessionPhase.Finished || lastSessionPhase == SessionPhase.Green || lastSessionPhase == SessionPhase.FullCourseYellow) && 
                     currentGameState.SessionData.SessionPhase == SessionPhase.Countdown) ||
                 lastSessionRunningTime > currentGameState.SessionData.SessionRunningTime)
             {                
@@ -402,7 +402,7 @@ namespace CrewChiefV4.RaceRoom
             currentGameState.SessionData.IsNewLap = previousGameState != null && previousGameState.SessionData.IsNewLap == false &&
                 (shared.CompletedLaps == previousGameState.SessionData.CompletedLaps + 1 ||
                 ((lastSessionPhase == SessionPhase.Countdown || lastSessionPhase == SessionPhase.Formation || lastSessionPhase == SessionPhase.Garage)
-                && currentGameState.SessionData.SessionPhase == SessionPhase.Green));
+                && (currentGameState.SessionData.SessionPhase == SessionPhase.Green || currentGameState.SessionData.SessionPhase == SessionPhase.FullCourseYellow)));
             if (currentGameState.SessionData.IsNewLap)
             {
                 currentGameState.SessionData.PositionAtStartOfCurrentLap = currentGameState.SessionData.Position;
@@ -742,7 +742,7 @@ namespace CrewChiefV4.RaceRoom
             // TODO: lap time previous for invalid laps (is this still needed?)
 
             if (shared.SessionType == (int)RaceRoomConstant.Session.Race && shared.SessionPhase == (int)RaceRoomConstant.SessionPhase.Checkered &&
-                previousGameState != null && previousGameState.SessionData.SessionPhase == SessionPhase.Green)
+                previousGameState != null && (previousGameState.SessionData.SessionPhase == SessionPhase.Green || previousGameState.SessionData.SessionPhase == SessionPhase.Green))
             {
                 Console.WriteLine("Leader has finished race, player has done "+ shared.CompletedLaps + " laps, session time = " + shared.Player.GameSimulationTime);
                 currentGameState.SessionData.LeaderHasFinishedRace = true;
@@ -1129,7 +1129,7 @@ namespace CrewChiefV4.RaceRoom
             */
             if ((int)RaceRoomConstant.SessionPhase.Checkered == r3eSessionPhase)
             {
-                if (lastSessionPhase == SessionPhase.Green)
+                if (lastSessionPhase == SessionPhase.Green || lastSessionPhase == SessionPhase.FullCourseYellow)
                 {
                     // only allow a transition to checkered if the last state was green
                     Console.WriteLine("checkered - completed " + currentLapsCompleted + " laps, session running time = " + thisSessionRunningTime);

@@ -171,11 +171,18 @@ namespace CrewChiefV4.Events
 
         public override bool isMessageStillValid(string eventSubType, GameStateData currentGameState, Dictionary<string, object> validationData)
         {
-            if (validationData != null && validationData.ContainsKey("position") && (int)validationData["position"] != currentGameState.SessionData.Position)
+            if (base.isMessageStillValid(eventSubType, currentGameState, validationData))
+            {
+                if (validationData != null && validationData.ContainsKey("position") && (int)validationData["position"] != currentGameState.SessionData.Position)
+                {
+                    return false;
+                }
+                return true;
+            }
+            else
             {
                 return false;
             }
-            return true;
         }
 
         protected override void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)

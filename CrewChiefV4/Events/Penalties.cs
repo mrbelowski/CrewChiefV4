@@ -104,24 +104,31 @@ namespace CrewChiefV4.Events
 
         public override bool isMessageStillValid(String eventSubType, GameStateData currentGameState, Dictionary<String, Object> validationData)
         {
-            // when a new penalty is given we queue a 'three laps left to serve' message for 20 seconds in the future.
-            // If, 20 seconds later, the player has started a new lap, this message is no longer valid so shouldn't be played
-            if (eventSubType == folderThreeLapsToServe)
+            if (base.isMessageStillValid(eventSubType, currentGameState, validationData))
             {
-                Console.WriteLine("checking penalty validity, pen lap = " + penaltyLap + ", completed =" + lapsCompleted);
-                return hasOutstandingPenalty && lapsCompleted == penaltyLap && currentGameState.SessionData.SessionPhase != SessionPhase.Finished;
-            }
-            else if (eventSubType == folderCutTrackInRace) 
-            {
-                return !hasOutstandingPenalty && currentGameState.SessionData.SessionPhase != SessionPhase.Finished && !currentGameState.PitData.InPitlane;
-            }
-            else if(eventSubType == folderCutTrackPracticeOrQual || eventSubType == folderLapDeleted)
-            {
-                return currentGameState.SessionData.SessionPhase != SessionPhase.Finished && !currentGameState.PitData.InPitlane;
+                // when a new penalty is given we queue a 'three laps left to serve' message for 20 seconds in the future.
+                // If, 20 seconds later, the player has started a new lap, this message is no longer valid so shouldn't be played
+                if (eventSubType == folderThreeLapsToServe)
+                {
+                    Console.WriteLine("checking penalty validity, pen lap = " + penaltyLap + ", completed =" + lapsCompleted);
+                    return hasOutstandingPenalty && lapsCompleted == penaltyLap && currentGameState.SessionData.SessionPhase != SessionPhase.Finished;
+                }
+                else if (eventSubType == folderCutTrackInRace)
+                {
+                    return !hasOutstandingPenalty && currentGameState.SessionData.SessionPhase != SessionPhase.Finished && !currentGameState.PitData.InPitlane;
+                }
+                else if (eventSubType == folderCutTrackPracticeOrQual || eventSubType == folderLapDeleted)
+                {
+                    return currentGameState.SessionData.SessionPhase != SessionPhase.Finished && !currentGameState.PitData.InPitlane;
+                }
+                else
+                {
+                    return hasOutstandingPenalty && currentGameState.SessionData.SessionPhase != SessionPhase.Finished;
+                }
             }
             else
             {
-                return hasOutstandingPenalty && currentGameState.SessionData.SessionPhase != SessionPhase.Finished;
+                return false;
             }
         }
 
@@ -291,7 +298,7 @@ namespace CrewChiefV4.Events
                 (previousGameState.PenaltiesData.NumPenalties > currentGameState.PenaltiesData.NumPenalties && 
                 CrewChief.gameDefinition.gameEnum == GameEnum.RF1)))
             {
-                audioPlayer.playMessage(new QueuedMessage(folderPenaltyServed, 0, null));
+                audioPlayer.playMessage(new QueuedMessage(folderPenaltyServed, 0, this));
             }            
         }
 

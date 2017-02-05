@@ -20,6 +20,7 @@ namespace CrewChiefV4.rFactor2
 
         private List<CornerData.EnumWithThresholds> suspensionDamageThresholds = new List<CornerData.EnumWithThresholds>();
         private List<CornerData.EnumWithThresholds> tyreWearThresholds = new List<CornerData.EnumWithThresholds>();
+        private List<CornerData.EnumWithThresholds> brakeDamageThresholds = new List<CornerData.EnumWithThresholds>();
 
         private float scrubbedTyreWearPercent = 5.0f;
         private float minorTyreWearPercent = 30.0f;
@@ -27,6 +28,8 @@ namespace CrewChiefV4.rFactor2
         private float wornOutTyreWearPercent = 85.0f;
 
         private List<CornerData.EnumWithThresholds> brakeTempThresholdsForPlayersCar = null;
+
+        private SpeechRecogniser speechRecogniser;
 
         // if we're running only against AI, force the pit window to open
         private Boolean isOfflineSession = true;
@@ -195,10 +198,22 @@ namespace CrewChiefV4.rFactor2
 
             csd.SessionType = mapToSessionType(rf2state);
             csd.SessionPhase = mapToSessionPhase((rFactor2Constants.rF2GamePhase)rf2state.mGamePhase);
-            cgs.carClass = CarData.getCarClassForRF1ClassName(getSafeCarClassName(getStringFromBytes(player.mVehicleClass)));
-            this.brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(cgs.carClass);
-            csd.DriverRawName = getStringFromBytes(player.mDriverName).ToLower();
-            csd.TrackDefinition = new TrackDefinition(getStringFromBytes(rf2state.mTrackName), (float)rf2state.mLapDist);
+            cgs.FlagData.isFullCourseYellow = csd.SessionPhase == SessionPhase.FullCourseYellow;
+            if (cgs.FlagData.isFullCourseYellow && pgs != null && !pgs.FlagData.isFullCourseYellow)
+            {
+                // transitioned from racing to yellow, so set the FCY status to pending
+                cgs.FlagData.fcyPhase = FullCourseYellowPhase.PENDING;
+            }
+            else if (pgs != null && pgs.FlagData.isFullCourseYellow && !cgs.FlagData.isFullCourseYellow)
+            {
+                // transitioned from yellow to racing, so set the FCY status to racing
+                cgs.FlagData.fcyPhase = FullCourseYellowPhase.RACING;
+            }
+            
+            cgs.carClass = CarData.getCarClassForRF1ClassName(getNameFromBytes(player.mVehicleClass));
+            brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(cgs.carClass);
+            csd.DriverRawName = getNameFromBytes(player.mDriverName).ToLower();
+            csd.TrackDefinition = new TrackDefinition(getNameFromBytes(rf2state.mTrackName), (float)rf2state.mLapDist);
             csd.TrackDefinition.setGapPoints();
             csd.SessionNumberOfLaps = rf2state.mMaxLaps > 0 && rf2state.mMaxLaps < 1000 ? rf2state.mMaxLaps : 0;
             
@@ -222,8 +237,9 @@ namespace CrewChiefV4.rFactor2
                 csd.EventIndex != psd.EventIndex || 
                 csd.SessionIteration != psd.SessionIteration || 
                 ((psd.SessionPhase == SessionPhase.Checkered || 
-                psd.SessionPhase == SessionPhase.Finished || 
-                psd.SessionPhase == SessionPhase.Green) && 
+                psd.SessionPhase == SessionPhase.Finished ||
+                psd.SessionPhase == SessionPhase.Green || 
+                psd.SessionPhase == SessionPhase.FullCourseYellow) && 
                 (csd.SessionPhase == SessionPhase.Garage || 
                 csd.SessionPhase == SessionPhase.Gridwalk ||
                 csd.SessionPhase == SessionPhase.Formation ||
@@ -831,7 +847,7 @@ namespace CrewChiefV4.rFactor2
             // don't read fuel data until race session is green
             // don't read fuel data for non-race session until out of pit lane and more than one lap completed
             if ((csd.SessionType == SessionType.Race
-                 && (csd.SessionPhase == SessionPhase.Green
+                 && (csd.SessionPhase == SessionPhase.Green || csd.SessionPhase == SessionPhase.FullCourseYellow
                      || csd.SessionPhase == SessionPhase.Finished
                      || csd.SessionPhase == SessionPhase.Checkered))
                  || (!cgs.PitData.InPitlane && csd.CompletedLaps > 1))
@@ -995,6 +1011,7 @@ namespace CrewChiefV4.rFactor2
 
         private SessionPhase mapToSessionPhase(rFactor2Constants.rF2GamePhase sessionPhase)
         {
+            // TODO: FullCourseYellow is a separate session phase and is needed to suppress some messages during caution periods
             switch (sessionPhase)
             {
                 case rFactor2Constants.rF2GamePhase.Countdown:
@@ -1011,8 +1028,11 @@ namespace CrewChiefV4.rFactor2
                 case rFactor2Constants.rF2GamePhase.SessionStopped:
                 case rFactor2Constants.rF2GamePhase.SessionOver:
                     return SessionPhase.Finished;
+                    // TODO: revisit.
                 // fullCourseYellow will count as greenFlag since we'll call it out in the Flags separately anyway
                 case rFactor2Constants.rF2GamePhase.FullCourseYellow:
+                    // TODO: CHECK ME!!
+                    return SessionPhase.FullCourseYellow;
                 case rFactor2Constants.rF2GamePhase.GreenFlag:
                     return SessionPhase.Green;
                 default:
