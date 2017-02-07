@@ -293,27 +293,30 @@ namespace CrewChiefV4.rFactor2
             csd.LapTimeCurrent = csd.SessionRunningTime - (float)player.mLapStartET;
             csd.LapTimePrevious = player.mLastLapTime > 0.0f ? (float)player.mLastLapTime : -1.0f;
 
+            // Last (most current) per-sector times:
             if (csd.IsNewSession)
                 csd.LastSector1Time = csd.LastSector2Time = csd.LastSector3Time = -1.0f;
             else
             {
-                csd.LastSector1Time = player.mCurSector1 > 0.0f
-                    ? (float)player.mCurSector1
-                    : psd.LastSector1Time;
+                // Note: this logic misses invalid sector handling.
+                var lastS1Time = player.mLastSector1 > 0.0 ? player.mLastSector1 : -1.0;
+                var lastS2Time = player.mLastSector1 > 0.0 && player.mLastSector2 > 0.0
+                    ? player.mLastSector2 - player.mLastSector1 : -1.0;
+                var lastS3Time = player.mLastSector2 > 0.0 && player.mLastLapTime > 0.0
+                    ? player.mLastLapTime - player.mLastSector2 : -1.0;
 
-                csd.LastSector2Time = player.mCurSector2 > 0.0f && player.mCurSector1 > 0.0f
-                    ? (float)(player.mCurSector2 - player.mCurSector1)
-                    : psd.LastSector2Time;
+                csd.LastSector1Time = (float)lastS1Time;
+                csd.LastSector2Time = (float)lastS2Time;
+                csd.LastSector3Time = (float)lastS3Time;
 
-                csd.LastSector3Time = player.mLastLapTime > 0.0f && player.mCurSector2 > 0.0f
-                    ? (float)(player.mLastLapTime - player.mCurSector2)
-                    : psd.LastSector3Time;
+                // Check if we have more current values for S1 and S2.
+                // S3 always equals to lastS3Time.
+                if (player.mCurSector1 > 0.0)
+                    csd.LastSector1Time = (float)player.mCurSector1;
+
+                if (player.mCurSector1 > 0.0 && player.mCurSector2 > 0.0)
+                    csd.LastSector2Time = (float)(player.mCurSector2 - player.mCurSector1);
             }
-
-             /*
-         csd.LastSector1Time = player.mCurSector1 > 0.0f ? (float)player.mCurSector1 : -1.0f;
-         csd.LastSector2Time = player.mCurSector2 > 0.0f && player.mCurSector1 > 0.0f ? (float)(player.mCurSector2 - player.mCurSector1) : -1.0f;
-         csd.LastSector3Time = player.mLastLapTime > 0.0f && player.mCurSector2 > 0.0f ? (float)(player.mLastLapTime - player.mCurSector2) : -1.0f;*/
 
             csd.PlayerBestSector1Time = player.mBestSector1 > 0.0f ? (float)player.mBestSector1 : -1.0f;
             csd.PlayerBestSector2Time = player.mBestSector2 > 0.0f && player.mBestSector1 > 0.0f ? (float)(player.mBestSector2 - player.mBestSector1) : -1.0f;
