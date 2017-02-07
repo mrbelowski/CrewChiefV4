@@ -133,6 +133,18 @@ namespace CrewChiefV4.rFactor1
                 shared.session >= 10 && shared.session <= 13 ? shared.session - 10 : 0;
             currentGameState.SessionData.SessionType = mapToSessionType(shared);
             currentGameState.SessionData.SessionPhase = mapToSessionPhase((rFactor1Constant.rfGamePhase)shared.gamePhase);
+            currentGameState.FlagData.isFullCourseYellow = currentGameState.SessionData.SessionPhase == SessionPhase.FullCourseYellow;
+            if (currentGameState.FlagData.isFullCourseYellow && previousGameState != null && !previousGameState.FlagData.isFullCourseYellow)
+            {
+                // transitioned from racing to yellow, so set the FCY status to pending
+                currentGameState.FlagData.fcyPhase = FullCourseYellowPhase.PENDING;
+            }
+            else if (previousGameState != null && previousGameState.FlagData.isFullCourseYellow && !currentGameState.FlagData.isFullCourseYellow)
+            {
+                // transitioned from yellow to racing, so set the FCY status to racing
+                currentGameState.FlagData.fcyPhase = FullCourseYellowPhase.RACING;
+            }
+
             currentGameState.carClass = CarData.getCarClassForRF1ClassName(getNameFromBytes(player.vehicleClass));
             brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(currentGameState.carClass);
             currentGameState.SessionData.DriverRawName = getNameFromBytes(player.driverName).ToLower();
@@ -156,7 +168,8 @@ namespace CrewChiefV4.rFactor1
                 currentGameState.SessionData.SessionIteration != previousGameState.SessionData.SessionIteration || 
                 ((previousGameState.SessionData.SessionPhase == SessionPhase.Checkered || 
                 previousGameState.SessionData.SessionPhase == SessionPhase.Finished || 
-                previousGameState.SessionData.SessionPhase == SessionPhase.Green) && 
+                previousGameState.SessionData.SessionPhase == SessionPhase.Green ||
+                previousGameState.SessionData.SessionPhase == SessionPhase.FullCourseYellow) && 
                 (currentGameState.SessionData.SessionPhase == SessionPhase.Garage || 
                 currentGameState.SessionData.SessionPhase == SessionPhase.Gridwalk ||
                 currentGameState.SessionData.SessionPhase == SessionPhase.Formation ||
@@ -468,7 +481,7 @@ namespace CrewChiefV4.rFactor1
                 {
                     speechRecogniser.addNewOpponentName(opponent.DriverRawName);
                     Console.WriteLine("New driver " + opponent.DriverRawName + 
-                        " is using car class " + opponent.CarClass.rF1ClassName + 
+                        " is using car class " + opponent.CarClass.rFClassName + 
                         " at position " + opponent.Position.ToString());
                 }
                 if (opponentPrevious != null)
@@ -618,6 +631,7 @@ namespace CrewChiefV4.rFactor1
             // don't read fuel data for non-race session until out of pit lane and more than one lap completed
             if ((currentGameState.SessionData.SessionType == SessionType.Race &&
                 (currentGameState.SessionData.SessionPhase == SessionPhase.Green ||
+                currentGameState.SessionData.SessionPhase == SessionPhase.FullCourseYellow || 
                 currentGameState.SessionData.SessionPhase == SessionPhase.Finished ||
                 currentGameState.SessionData.SessionPhase == SessionPhase.Checkered)) ||
                 (!currentGameState.PitData.InPitlane && currentGameState.SessionData.CompletedLaps > 1))
@@ -723,7 +737,7 @@ namespace CrewChiefV4.rFactor1
                 Console.WriteLine("SessionStartPosition " + currentGameState.SessionData.SessionStartPosition);
                 Console.WriteLine("SessionStartTime " + currentGameState.SessionData.SessionStartTime);
                 Console.WriteLine("TrackName " + currentGameState.SessionData.TrackDefinition.name);
-                Console.WriteLine("Player is using car class " + currentGameState.carClass.rF1ClassName + 
+                Console.WriteLine("Player is using car class " + currentGameState.carClass.rFClassName + 
                     " at position " + currentGameState.SessionData.Position.ToString());
             }
             if (previousGameState != null && previousGameState.SessionData.SessionPhase != currentGameState.SessionData.SessionPhase)
@@ -784,7 +798,10 @@ namespace CrewChiefV4.rFactor1
                 case rFactor1Constant.rfGamePhase.sessionOver:
                     return SessionPhase.Finished;
                 // fullCourseYellow will count as greenFlag since we'll call it out in the Flags separately anyway
+
+                    // TODO: can we map to FullCourseYellow here?
                 case rFactor1Constant.rfGamePhase.fullCourseYellow:
+                    return SessionPhase.FullCourseYellow;
                 case rFactor1Constant.rfGamePhase.greenFlag:
                     return SessionPhase.Green;
                 default:
@@ -803,7 +820,7 @@ namespace CrewChiefV4.rFactor1
                 float minDistDiff = -1;
                 foreach (OpponentData o in previousGameState.OpponentData.Values)
                 {
-                    String opponentKey = o.CarClass.rF1ClassName + o.Position.ToString();
+                    String opponentKey = o.CarClass.rFClassName + o.Position.ToString();
                     if (o.DriverRawName != getNameFromBytes(vehicle.driverName).ToLower() || 
                         o.CarClass != CarData.getCarClassForRF1ClassName(getNameFromBytes(vehicle.vehicleClass)) || 
                         opponentKeysProcessed.Contains(opponentKey))
@@ -822,7 +839,7 @@ namespace CrewChiefV4.rFactor1
                 }
                 if (opponentPrevious != null)
                 {
-                    opponentKeysProcessed.Add(opponentPrevious.CarClass.rF1ClassName + opponentPrevious.Position.ToString());
+                    opponentKeysProcessed.Add(opponentPrevious.CarClass.rFClassName + opponentPrevious.Position.ToString());
                 }
             }
             return opponentPrevious;

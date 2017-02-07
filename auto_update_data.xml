@@ -15,7 +15,7 @@
 
 <!-- language-aware sound pack stuff for later versions-->
 <soundpack language="en">
-	<soundpackversion>106</soundpackversion>
+	<soundpackversion>107</soundpackversion>
 	<basesoundpackurl>http://crewchief.isnais.de/base_sound_pack.zip</basesoundpackurl>
 	<updatesoundpackurl>http://crewchief.isnais.de/update_sound_pack.zip</updatesoundpackurl>
 	<drivernamesversion>112</drivernamesversion>

@@ -3,7 +3,7 @@ CrewChief version 4.
 Changelog
 ---------
 
-Version 4.5.0.0: First cut of RF2 support, thanks to The Iron Wolf; Updated some Raceroom car classes
+Version 4.5.0.0: First cut of RF2 support, thanks to The Iron Wolf. This needs an additional .dll plugin for RF2 - see https://forum.studio-397.com/index.php?threads/crew-chief-v4-5-with-rfactor-2-support.54421/ Updated some Raceroom car classes
 
 Version 4.4.3.4: Some controller cleanup tweaks
 

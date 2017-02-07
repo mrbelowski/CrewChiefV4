@@ -72,21 +72,29 @@ namespace CrewChiefV4.Events
 
         public override bool isMessageStillValid(string eventSubType, GameStateData currentGameState, Dictionary<String, Object> validationData)
         {
-            if (validationData != null && validationData.ContainsKey(validationDriverAheadKey)) {
-                String expectedOpponentName = (String)validationData[validationDriverAheadKey];
-                OpponentData opponentInFront = currentGameState.SessionData.Position > 1 ? currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position - 1, false) : null;
-                String actualOpponentName = opponentInFront == null ? null : opponentInFront.DriverRawName;
-                if (actualOpponentName != expectedOpponentName)
+            if (base.isMessageStillValid(eventSubType, currentGameState, validationData))
+            {
+                if (validationData != null && validationData.ContainsKey(validationDriverAheadKey))
                 {
-                    if (actualOpponentName != null && expectedOpponentName != null)
+                    String expectedOpponentName = (String)validationData[validationDriverAheadKey];
+                    OpponentData opponentInFront = currentGameState.SessionData.Position > 1 ? currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position - 1, false) : null;
+                    String actualOpponentName = opponentInFront == null ? null : opponentInFront.DriverRawName;
+                    if (actualOpponentName != expectedOpponentName)
                     {
-                        Console.WriteLine("new car in front message for opponent " + expectedOpponentName +
-                            " no longer valid - driver in front is now " + actualOpponentName);
+                        if (actualOpponentName != null && expectedOpponentName != null)
+                        {
+                            Console.WriteLine("new car in front message for opponent " + expectedOpponentName +
+                                " no longer valid - driver in front is now " + actualOpponentName);
+                        }
+                        return false;
                     }
-                    return false;
                 }
+                return true;
             }
-            return true;
+            else
+            {
+                return false;
+            }
         }
 
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)

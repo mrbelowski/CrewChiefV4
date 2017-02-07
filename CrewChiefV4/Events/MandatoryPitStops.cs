@@ -133,7 +133,8 @@ namespace CrewChiefV4.Events
 
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
-            if (currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.PitData.HasMandatoryPitStop && currentGameState.SessionData.SessionPhase == SessionPhase.Green)
+            if (currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.PitData.HasMandatoryPitStop &&
+                (currentGameState.SessionData.SessionPhase == SessionPhase.Green || currentGameState.SessionData.SessionPhase == SessionPhase.FullCourseYellow))
             {                
                 if (!pitDataInitialised)
                 {

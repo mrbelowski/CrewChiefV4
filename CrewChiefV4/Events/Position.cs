@@ -133,16 +133,22 @@ namespace CrewChiefV4.Events
 
         public override bool isMessageStillValid(string eventSubType, GameStateData currentGameState, Dictionary<String, Object> validationData)
         {
-            Boolean isStillInThisPosition = true;
-            if (validationData != null)
+            if (base.isMessageStillValid(eventSubType, currentGameState, validationData))
             {
-                if (validationData.ContainsKey(positionValidationKey) && (int)validationData[positionValidationKey] != currentGameState.SessionData.Position)
+                Boolean isStillInThisPosition = true;
+                if (validationData != null)
                 {
-                    isStillInThisPosition = false;
+                    if (validationData.ContainsKey(positionValidationKey) && (int)validationData[positionValidationKey] != currentGameState.SessionData.Position)
+                    {
+                        isStillInThisPosition = false;
+                    }
                 }
+                return !currentGameState.PitData.InPitlane && isStillInThisPosition;
             }
-            return isApplicableForCurrentSessionAndPhase(currentGameState.SessionData.SessionType, currentGameState.SessionData.SessionPhase) &&
-                !currentGameState.PitData.InPitlane && isStillInThisPosition;
+            else
+            {
+                return false;
+            }
         }
 
         private Boolean isPassMessageCandidate(List<float> gapsList, int samplesToCheck, float minAverageGap)
@@ -153,7 +159,7 @@ namespace CrewChiefV4.Events
 
         private void checkForNewOvertakes(GameStateData previousGameState, GameStateData currentGameState)
         {
-            if (currentGameState.SessionData.SessionPhase == SessionPhase.Green &&
+            if ((currentGameState.SessionData.SessionPhase == SessionPhase.Green || currentGameState.SessionData.SessionPhase == SessionPhase.FullCourseYellow) &&
                 currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.CompletedLaps > 0)
             {                
                 if (currentGameState.Now > lastPassCheck.Add(passCheckInterval))
@@ -300,8 +306,8 @@ namespace CrewChiefV4.Events
             if (previousPosition == 0)
             {
                 previousPosition = currentPosition;
-            }            
-            if (currentGameState.SessionData.SessionPhase == SessionPhase.Green)
+            }
+            if (currentGameState.SessionData.SessionPhase == SessionPhase.Green || currentGameState.SessionData.SessionPhase == SessionPhase.FullCourseYellow)
             {
                 if (currentGameState.SessionData.SessionType == SessionType.Race &&
                     enableRaceStartMessages && !playedRaceStartMessage &&
@@ -457,7 +463,7 @@ namespace CrewChiefV4.Events
                     }
                     else
                     {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(folderStub + currentPosition, 0, this));
+                        audioPlayer.playMessageImmediately(new QueuedMessage(folderStub + currentPosition, 0, null));
                     }    
                 }
                 else 
