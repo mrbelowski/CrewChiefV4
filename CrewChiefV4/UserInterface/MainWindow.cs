@@ -193,6 +193,7 @@ namespace CrewChiefV4
         {
             float volFloat = (float) messagesVolumeSlider.Value / 10;
             setMessagesVolume(volFloat);
+            currentVolume = volFloat;
             UserSettings.GetUserSettings().setProperty("messages_volume", volFloat);
             UserSettings.GetUserSettings().saveUserSettings();
         }
@@ -527,7 +528,7 @@ namespace CrewChiefV4
                             Console.WriteLine("Increasing volume");
                             updateMessagesVolume(currentVolume + 0.1f);
                         }
-                        nextPollWait = 1000;
+                        nextPollWait = 200;
                     }
                     else if (controllerConfiguration.hasOutstandingClick(ControllerConfiguration.VOLUME_DOWN))
                     {
@@ -540,7 +541,7 @@ namespace CrewChiefV4
                             Console.WriteLine("Decreasing volume");
                             updateMessagesVolume(currentVolume - 0.1f);
                         }
-                        nextPollWait = 1000;
+                        nextPollWait = 200;
                     }
                     else if (crewChief.speechRecogniser.initialised && voiceOption == VoiceOptionEnum.TOGGLE)
                     {
