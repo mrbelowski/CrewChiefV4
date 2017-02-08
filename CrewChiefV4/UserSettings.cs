@@ -16,12 +16,17 @@ namespace CrewChiefV4
             // Copy user settings from previous application version if necessary
             if (Properties.Settings.Default.UpdateSettings)
             {
-                Properties.Settings.Default.Upgrade();
                 Properties.Settings.Default.UpdateSettings = false;
-                Properties.Settings.Default.Save();
-            }
-            
-
+                try
+                {
+                    Properties.Settings.Default.Upgrade();
+                    Properties.Settings.Default.Save();
+                }
+                catch
+                {
+                    Console.WriteLine("Unable to upgrade properties from previous version, settings will be reset to default");
+                }
+            }            
         }
 
         public List<SettingsProperty> getProperties(Type requiredType, String nameMustStartWith, String nameMustNotStartWith)
