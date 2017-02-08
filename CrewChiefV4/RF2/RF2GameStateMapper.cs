@@ -273,6 +273,8 @@ namespace CrewChiefV4.rFactor2
             csd.SessionStartTime = csd.IsNewSession ? cgs.Now : psd.SessionStartTime;
             csd.SessionHasFixedTime = csd.SessionTotalRunTime > 0.0f;
             csd.SessionRunningTime = (float)rf2state.mCurrentET;
+            //csd.SessionRunningTime = (float)rf2state.mElapsedTime;
+            //csd.SessionRunningTime = (float)(cgs.Now - csd.SessionStartTime).TotalSeconds;
             csd.SessionTimeRemaining = csd.SessionHasFixedTime ? csd.SessionTotalRunTime - csd.SessionRunningTime : 0.0f;
             
             // hack for test day sessions running longer than allotted time
@@ -294,29 +296,24 @@ namespace CrewChiefV4.rFactor2
             csd.LapTimePrevious = player.mLastLapTime > 0.0f ? (float)player.mLastLapTime : -1.0f;
 
             // Last (most current) per-sector times:
-            if (csd.IsNewSession)
-                csd.LastSector1Time = csd.LastSector2Time = csd.LastSector3Time = -1.0f;
-            else
-            {
-                // Note: this logic misses invalid sector handling.
-                var lastS1Time = player.mLastSector1 > 0.0 ? player.mLastSector1 : -1.0;
-                var lastS2Time = player.mLastSector1 > 0.0 && player.mLastSector2 > 0.0
-                    ? player.mLastSector2 - player.mLastSector1 : -1.0;
-                var lastS3Time = player.mLastSector2 > 0.0 && player.mLastLapTime > 0.0
-                    ? player.mLastLapTime - player.mLastSector2 : -1.0;
+            // Note: this logic still misses invalid sector handling.
+            var lastS1Time = player.mLastSector1 > 0.0 ? player.mLastSector1 : -1.0;
+            var lastS2Time = player.mLastSector1 > 0.0 && player.mLastSector2 > 0.0
+                ? player.mLastSector2 - player.mLastSector1 : -1.0;
+            var lastS3Time = player.mLastSector2 > 0.0 && player.mLastLapTime > 0.0
+                ? player.mLastLapTime - player.mLastSector2 : -1.0;
 
-                csd.LastSector1Time = (float)lastS1Time;
-                csd.LastSector2Time = (float)lastS2Time;
-                csd.LastSector3Time = (float)lastS3Time;
+            csd.LastSector1Time = (float)lastS1Time;
+            csd.LastSector2Time = (float)lastS2Time;
+            csd.LastSector3Time = (float)lastS3Time;
 
-                // Check if we have more current values for S1 and S2.
-                // S3 always equals to lastS3Time.
-                if (player.mCurSector1 > 0.0)
-                    csd.LastSector1Time = (float)player.mCurSector1;
+            // Check if we have more current values for S1 and S2.
+            // S3 always equals to lastS3Time.
+            if (player.mCurSector1 > 0.0)
+                csd.LastSector1Time = (float)player.mCurSector1;
 
-                if (player.mCurSector1 > 0.0 && player.mCurSector2 > 0.0)
-                    csd.LastSector2Time = (float)(player.mCurSector2 - player.mCurSector1);
-            }
+            if (player.mCurSector1 > 0.0 && player.mCurSector2 > 0.0)
+                csd.LastSector2Time = (float)(player.mCurSector2 - player.mCurSector1);
 
             csd.PlayerBestSector1Time = player.mBestSector1 > 0.0f ? (float)player.mBestSector1 : -1.0f;
             csd.PlayerBestSector2Time = player.mBestSector2 > 0.0f && player.mBestSector1 > 0.0f ? (float)(player.mBestSector2 - player.mBestSector1) : -1.0f;
@@ -476,15 +473,12 @@ namespace CrewChiefV4.rFactor2
             var frontRightTemp = (cgs.TyreData.FrontRight_CenterTemp + cgs.TyreData.FrontRight_LeftTemp + cgs.TyreData.FrontRight_RightTemp) / 3.0f;
             cgs.TyreData.FrontRightPressure = wheelFrontRight.mFlat == 0 ? (float)wheelFrontRight.mPressure : 0.0f;
             cgs.TyreData.FrontRightPercentWear = (float)(1.0f - wheelFrontRight.mWear) * 100.0f;
-            if (csd.IsNewLap)
-            {
-                cgs.TyreData.PeakFrontRightTemperatureForLap = frontRightTemp;
-            }
-            else if (pgs == null || frontRightTemp > pgs.TyreData.PeakFrontRightTemperatureForLap)
-            {
-                cgs.TyreData.PeakFrontRightTemperatureForLap = frontRightTemp;
-            }
 
+            if (csd.IsNewLap)
+                cgs.TyreData.PeakFrontRightTemperatureForLap = frontRightTemp;
+            else if (pgs == null || frontRightTemp > pgs.TyreData.PeakFrontRightTemperatureForLap)
+                cgs.TyreData.PeakFrontRightTemperatureForLap = frontRightTemp;
+            
             var wheelRearLeft = rf2state.mWheels[(int)rFactor2Constants.rF2WheelIndex.RearLeft];
             cgs.TyreData.LeftRearAttached = wheelRearLeft.mDetached == 0;
             cgs.TyreData.RearLeft_LeftTemp = (float)wheelRearLeft.mTemperature[0] - 273.15f;
@@ -494,14 +488,11 @@ namespace CrewChiefV4.rFactor2
             var rearLeftTemp = (cgs.TyreData.RearLeft_CenterTemp + cgs.TyreData.RearLeft_LeftTemp + cgs.TyreData.RearLeft_RightTemp) / 3.0f;
             cgs.TyreData.RearLeftPressure = wheelRearLeft.mFlat == 0 ? (float)wheelRearLeft.mPressure : 0.0f;
             cgs.TyreData.RearLeftPercentWear = (float)(1.0f - wheelRearLeft.mWear) * 100.0f;
+
             if (csd.IsNewLap)
-            {
                 cgs.TyreData.PeakRearLeftTemperatureForLap = rearLeftTemp;
-            }
             else if (pgs == null || rearLeftTemp > pgs.TyreData.PeakRearLeftTemperatureForLap)
-            {
                 cgs.TyreData.PeakRearLeftTemperatureForLap = rearLeftTemp;
-            }
 
             var wheelRearRight = rf2state.mWheels[(int)rFactor2Constants.rF2WheelIndex.RearRight];
             cgs.TyreData.RightRearAttached = wheelRearRight.mDetached == 0;
@@ -512,14 +503,11 @@ namespace CrewChiefV4.rFactor2
             var rearRightTemp = (cgs.TyreData.RearRight_CenterTemp + cgs.TyreData.RearRight_LeftTemp + cgs.TyreData.RearRight_RightTemp) / 3.0f;
             cgs.TyreData.RearRightPressure = wheelRearRight.mFlat == 0 ? (float)wheelRearRight.mPressure : 0.0f;
             cgs.TyreData.RearRightPercentWear = (float)(1.0f - wheelRearRight.mWear) * 100.0f;
+
             if (csd.IsNewLap)
-            {
                 cgs.TyreData.PeakRearRightTemperatureForLap = rearRightTemp;
-            }
             else if (pgs == null || rearRightTemp > pgs.TyreData.PeakRearRightTemperatureForLap)
-            {
                 cgs.TyreData.PeakRearRightTemperatureForLap = rearRightTemp;
-            }
 
             cgs.TyreData.TyreConditionStatus = CornerData.getCornerData(this.tyreWearThresholds, cgs.TyreData.FrontLeftPercentWear,
                 cgs.TyreData.FrontRightPercentWear, cgs.TyreData.RearLeftPercentWear, cgs.TyreData.RearRightPercentWear);
@@ -612,20 +600,6 @@ namespace CrewChiefV4.rFactor2
                     csd.PlayerClassSessionBestLapTime = csd.PlayerLapTimeSessionBest > 0.0f ?
                         csd.PlayerLapTimeSessionBest : -1.0f;
 
-/*                    if (this.isMultiClassSession)
-                    {
-                        csd.PlayerClassSessionBestLapTime = csd.PlayerLapTimeSessionBest > 0.0f ?
-                            csd.PlayerLapTimeSessionBest : -1.0f;
-
-                        csd.OverallSessionBestLapTime = -1.0f;
-                    }
-                    else
-                    {
-                        csd.OverallSessionBestLapTime = csd.PlayerLapTimeSessionBest > 0.0f ?
-                            csd.PlayerLapTimeSessionBest : -1.0f;
-
-                        csd.PlayerClassSessionBestLapTime = -1.0f;
-                    }*/
                     continue;
                 }
 
@@ -701,16 +675,20 @@ namespace CrewChiefV4.rFactor2
                         break;
                 }
 
+                bool lapValid = true;
+                if (vehicle.mCountLapFlag != 2)
+                    lapValid = false;
+
                 if (opponent.IsNewLap)
                 {
                     if (lastSectorTime > 0.0f)
                     {
                         opponent.CompleteLapWithProvidedLapTime(
                             opponent.Position,
-                            (float)vehicle.mLapStartET,
-                            lastSectorTime,
-                            true,
-                            false,
+                            csd.SessionRunningTime,
+                            opponent.LastLapTime,
+                            lapValid,  // TODO: revisit
+                            false, // TODO: revisit
                             (float)rf2state.mTrackTemp,
                             (float)rf2state.mAmbientTemp,
                             csd.SessionHasFixedTime,
@@ -719,8 +697,8 @@ namespace CrewChiefV4.rFactor2
                     opponent.StartNewLap(
                         opponent.CompletedLaps + 1,
                         opponent.Position,
-                        vehicle.mInPits == 1 || opponent.DistanceRoundTrack < 0,
-                        (float)vehicle.mLapStartET, 
+                        vehicle.mInPits == 1 || opponent.DistanceRoundTrack < 0.0f,
+                        csd.SessionRunningTime,
                         false, 
                         (float)rf2state.mTrackTemp,
                         (float)rf2state.mAmbientTemp);
@@ -730,8 +708,8 @@ namespace CrewChiefV4.rFactor2
                     opponent.AddCumulativeSectorData(
                         opponent.Position,
                         lastSectorTime,
-                        (float)vehicle.mLapStartET + lastSectorTime,
-                        true,
+                        csd.SessionRunningTime,
+                        lapValid,
                         false,
                         (float)rf2state.mTrackTemp,
                         (float)rf2state.mAmbientTemp);
@@ -813,14 +791,11 @@ namespace CrewChiefV4.rFactor2
             {
                 csd.HasLeadChanged = !csd.HasLeadChanged && psd.Position > 1 && csd.Position == 1 ?
                     true : csd.HasLeadChanged;
-                String oPrevKey = null;
-                String oCurrKey = null;
-                OpponentData oPrev = null;
-                OpponentData oCurr = null;
-                oPrevKey = (String)pgs.getOpponentKeyInFrontOnTrack();
-                oCurrKey = (String)cgs.getOpponentKeyInFrontOnTrack();
-                oPrev = oPrevKey != null ? pgs.OpponentData[oPrevKey] : null;
-                oCurr = oCurrKey != null ? cgs.OpponentData[oCurrKey] : null;
+
+                var oPrevKey = (String)pgs.getOpponentKeyInFrontOnTrack();
+                var oCurrKey = (String)cgs.getOpponentKeyInFrontOnTrack();
+                var oPrev = oPrevKey != null ? pgs.OpponentData[oPrevKey] : null;
+                var oCurr = oCurrKey != null ? cgs.OpponentData[oCurrKey] : null;
 
                 csd.IsRacingSameCarInFront = !((oPrev == null && oCurr != null) 
                                                 || (oPrev != null && oCurr == null) 
@@ -839,6 +814,7 @@ namespace CrewChiefV4.rFactor2
 
                 csd.GameTimeAtLastPositionFrontChange = !csd.IsRacingSameCarInFront ? 
                     csd.SessionRunningTime : psd.GameTimeAtLastPositionFrontChange;
+
                 csd.GameTimeAtLastPositionBehindChange = !csd.IsRacingSameCarBehind ? 
                     csd.SessionRunningTime : psd.GameTimeAtLastPositionBehindChange;
             }
@@ -959,14 +935,16 @@ namespace CrewChiefV4.rFactor2
             this.distanceOffTrack = cgs.PenaltiesData.IsOffRacingSurface ? lateralDistDiff : 0;
             this.isApproachingTrack = offTrackDistanceDelta < 0 && cgs.PenaltiesData.IsOffRacingSurface && lateralDistDiff < 3;
 
-            if ((((csd.SectorNumber == 2 && csd.LastSector1Time < 0) || 
-                (csd.SectorNumber == 3 && csd.LastSector2Time < 0)) && 
-                !cgs.PitData.OnOutLap && !cgs.PitData.OnInLap &&
-                (csd.SessionType == SessionType.Race || csd.SessionType == SessionType.Qualify)) || 
-                (pgs != null && psd.CompletedLaps == csd.CompletedLaps && 
-                !psd.CurrentLapIsValid))
+            // TODO: Apply something similar to opponents.
+            if (((csd.SectorNumber == 2 && csd.LastSector1Time < 0
+                    || csd.SectorNumber == 3 && csd.LastSector2Time < 0) 
+                && !cgs.PitData.OnOutLap && !cgs.PitData.OnInLap
+                && (csd.SessionType == SessionType.Race || csd.SessionType == SessionType.Qualify))
+                ||  (pgs != null 
+                     && psd.CompletedLaps == csd.CompletedLaps 
+                     && !psd.CurrentLapIsValid)
+                || player.mCountLapFlag != 2)
             {
-                // TODO: rF2 has direct flag for this, use it.
                 csd.CurrentLapIsValid = false;
             }
 
