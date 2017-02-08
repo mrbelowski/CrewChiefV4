@@ -10,7 +10,7 @@ namespace CrewChiefV4
     class UserSettings
     {
         private String[] reservedNameStarts = new String[] { "CHANNEL_", "TOGGLE_", "VOICE_OPTION", "background_volume", 
-            "messages_volume", "last_game_definition", "REPEAT_LAST_MESSAGE_BUTTON", "UpdateSettings"};
+            "messages_volume", "last_game_definition", "REPEAT_LAST_MESSAGE_BUTTON", "UpdateSettings", "volume_up", "volume_down"};
         private UserSettings()
         {
             // Copy user settings from previous application version if necessary
