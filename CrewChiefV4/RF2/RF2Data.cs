@@ -114,6 +114,31 @@ namespace CrewChiefV4.rFactor2
             RearLeft = 2,
             RearRight = 3
         }
+
+        // 0=none, 1=request, 2=entering, 3=stopped, 4=exiting
+        internal enum rF2PitState
+        {
+            None = 0,
+            Request = 1,
+            Entering = 2,
+            Stopped = 3,
+            Exiting = 4
+        }
+
+        // primary flag being shown to vehicle (currently only 0=green or 6=blue)
+        internal enum rF2PrimaryFlag
+        {
+            Green = 0,
+            Blue = 6
+        }
+
+        // 0 = do not count lap or time, 1 = count lap but not time, 2 = count lap and time
+        internal enum rF2CountLapFlag
+        {
+            DoNotCountLap = 0,
+            CountLapButNotTime = 1,
+            CountLapAndTime = 2,
+        }
     }
 
     namespace rFactor2Data
