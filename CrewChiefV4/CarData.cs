@@ -379,7 +379,8 @@ namespace CrewChiefV4
             {
                 carClassID = CarClassEnum.UNKNOWN_RACE;
                 // Create one if it doesn't exist
-                CarClass newRFactorClass = new CarClass(carClassID, new String[] { "" }, new int[] { -1 }, BrakeType.Iron_Race, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp);
+                CarClass newRFactorClass = new CarClass(carClassID, new String[] { "" }, new int[] { -1 }, BrakeType.Iron_Race, TyreType.Unknown_Race, 
+                    maxRaceSafeWaterTemp, maxRaceSafeOilTemp, carMinTyreCircumference, carMaxTyreCircumference);
                 newRFactorClass.rFClassName = rFClassName;
 
                 carClasses.Add(newRFactorClass);
