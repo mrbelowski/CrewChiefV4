@@ -59,6 +59,8 @@ namespace CrewChiefV4
         private float latestDriverNamesVersion = -1;
 
         private ControlWriter cw = null;
+
+        private float currentVolume = -1;
                 
         private void FormMain_Load(object sender, EventArgs e)
         {
@@ -178,12 +180,20 @@ namespace CrewChiefV4
                     Console.WriteLine("Unable to get auto update details: " + error.Message);
                 }
             }).Start();
-        }            
+        }
+
+        public void updateMessagesVolume(float messagesVolume)
+        {
+            currentVolume = messagesVolume;
+            setMessagesVolume(messagesVolume);
+            messagesVolumeSlider.Value = (int)(messagesVolume * 10f);
+        }
                 
         private void messagesVolumeSlider_Scroll(object sender, EventArgs e)
         {
             float volFloat = (float) messagesVolumeSlider.Value / 10;
             setMessagesVolume(volFloat);
+            currentVolume = volFloat;
             UserSettings.GetUserSettings().setProperty("messages_volume", volFloat);
             UserSettings.GetUserSettings().saveUserSettings();
         }
@@ -374,8 +384,7 @@ namespace CrewChiefV4
             crewChief = new CrewChief();
             float messagesVolume = UserSettings.GetUserSettings().getFloat("messages_volume");
             float backgroundVolume = UserSettings.GetUserSettings().getFloat("background_volume");
-            setMessagesVolume(messagesVolume);
-            messagesVolumeSlider.Value = (int)(messagesVolume * 10f);
+            updateMessagesVolume(messagesVolume);
             backgroundVolumeSlider.Value = (int) (backgroundVolume * 10f);
 
             Console.WriteLine("Loading controller settings");
@@ -507,6 +516,32 @@ namespace CrewChiefV4
                         Console.WriteLine("Repeating last message");
                         crewChief.audioPlayer.repeatLastMessage();
                         nextPollWait = 1000;
+                    }
+                    else if (controllerConfiguration.hasOutstandingClick(ControllerConfiguration.VOLUME_UP))
+                    {
+                        if (currentVolume == -1)
+                        {
+                            Console.WriteLine("Initial volume not set, ignoring");
+                        } else if (currentVolume >= 1) {
+                            Console.WriteLine("Volume at max");
+                        } else {
+                            Console.WriteLine("Increasing volume");
+                            updateMessagesVolume(currentVolume + 0.1f);
+                        }
+                        nextPollWait = 200;
+                    }
+                    else if (controllerConfiguration.hasOutstandingClick(ControllerConfiguration.VOLUME_DOWN))
+                    {
+                        if (currentVolume == -1)
+                        {
+                            Console.WriteLine("Initial volume not set, ignoring");
+                        } else if (currentVolume <= 0) {
+                            Console.WriteLine("Volume at min");
+                        } else {
+                            Console.WriteLine("Decreasing volume");
+                            updateMessagesVolume(currentVolume - 0.1f);
+                        }
+                        nextPollWait = 200;
                     }
                     else if (crewChief.speechRecogniser.initialised && voiceOption == VoiceOptionEnum.TOGGLE)
                     {
