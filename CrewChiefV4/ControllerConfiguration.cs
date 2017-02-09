@@ -25,6 +25,8 @@ namespace CrewChiefV4
         public static String TOGGLE_SPOTTER_FUNCTION = Configuration.getUIString("toggle_spotter_on/off");
         public static String TOGGLE_READ_OPPONENT_DELTAS = Configuration.getUIString("toggle_opponent_deltas_on/off_for_each_lap");
         public static String REPEAT_LAST_MESSAGE_BUTTON = Configuration.getUIString("press_to_replay_the_last_message");
+        public static String VOLUME_UP = Configuration.getUIString("volume_up");
+        public static String VOLUME_DOWN = Configuration.getUIString("volume_down");        
 
         private ControllerData networkGamePad = new ControllerData(Configuration.getUIString("udp_network_data_buttons"), DeviceType.Gamepad, UDP_NETWORK_CONTROLLER_GUID);
         
@@ -59,6 +61,8 @@ namespace CrewChiefV4
             addButtonAssignment(TOGGLE_SPOTTER_FUNCTION);
             addButtonAssignment(TOGGLE_READ_OPPONENT_DELTAS);
             addButtonAssignment(REPEAT_LAST_MESSAGE_BUTTON);
+            addButtonAssignment(VOLUME_UP);
+            addButtonAssignment(VOLUME_DOWN);
             controllers = getControllers();
         }
 
@@ -83,6 +87,8 @@ namespace CrewChiefV4
             pollForButtonClicks(buttonAssignments[buttonAssignmentIndexes[TOGGLE_SPOTTER_FUNCTION]]);
             pollForButtonClicks(buttonAssignments[buttonAssignmentIndexes[TOGGLE_READ_OPPONENT_DELTAS]]);
             pollForButtonClicks(buttonAssignments[buttonAssignmentIndexes[REPEAT_LAST_MESSAGE_BUTTON]]);
+            pollForButtonClicks(buttonAssignments[buttonAssignmentIndexes[VOLUME_UP]]);
+            pollForButtonClicks(buttonAssignments[buttonAssignmentIndexes[VOLUME_DOWN]]);
             if (channelOpenIsToggle) 
             {
                 pollForButtonClicks(buttonAssignments[buttonAssignmentIndexes[CHANNEL_OPEN_FUNCTION]]);
@@ -188,6 +194,14 @@ namespace CrewChiefV4
                 {
                     actionId = "REPEAT_LAST_MESSAGE_BUTTON";
                 }
+                else if (buttonAssignment.action == VOLUME_UP)
+                {
+                    actionId = "VOLUME_UP";
+                }
+                else if (buttonAssignment.action == VOLUME_DOWN)
+                {
+                    actionId = "VOLUME_DOWN";
+                }
 
                 if (buttonAssignment.controller != null && (buttonAssignment.joystick != null || buttonAssignment.controller.guid == UDP_NETWORK_CONTROLLER_GUID) && buttonAssignment.buttonIndex != -1)
                 {
@@ -238,6 +252,20 @@ namespace CrewChiefV4
             if (repeatLastMessageButtonIndex != -1 && repeatLastMessageDeviceGuid.Length > 0)
             {
                 loadAssignment(parent, REPEAT_LAST_MESSAGE_BUTTON, repeatLastMessageButtonIndex, repeatLastMessageDeviceGuid);
+            }
+
+            int volumeUpButtonIndex = UserSettings.GetUserSettings().getInt("VOLUME_UP_button_index");
+            String volumeUpDeviceGuid = UserSettings.GetUserSettings().getString("VOLUME_UP_device_guid");
+            if (volumeUpButtonIndex != -1 && volumeUpDeviceGuid.Length > 0)
+            {
+                loadAssignment(parent, VOLUME_UP, volumeUpButtonIndex, volumeUpDeviceGuid);
+            }
+
+            int volumeDownButtonIndex = UserSettings.GetUserSettings().getInt("VOLUME_DOWN_button_index");
+            String volumeDownDeviceGuid = UserSettings.GetUserSettings().getString("VOLUME_DOWN_device_guid");
+            if (volumeDownButtonIndex != -1 && volumeDownDeviceGuid.Length > 0)
+            {
+                loadAssignment(parent, VOLUME_DOWN, volumeDownButtonIndex, volumeDownDeviceGuid);
             }
         }
 
