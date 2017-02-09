@@ -1718,12 +1718,12 @@ namespace CrewChiefV4.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool rf2_enable_blue_on_slower {
+        public bool enable_rf2_blue_on_slower {
             get {
-                return ((bool)(this["rf2_enable_blue_on_slower"]));
+                return ((bool)(this["enable_rf2_blue_on_slower"]));
             }
             set {
-                this["rf2_enable_blue_on_slower"] = value;
+                this["enable_rf2_blue_on_slower"] = value;
             }
         }
         

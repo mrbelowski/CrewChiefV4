@@ -425,7 +425,7 @@
     <Setting Name="rf2_spotter_car_length" Type="System.Single" Scope="User">
       <Value Profile="(Default)">4.5</Value>
     </Setting>
-    <Setting Name="rf2_enable_blue_on_slower" Type="System.Boolean" Scope="User">
+    <Setting Name="enable_rf2_blue_on_slower" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="time_between_caution_period_status_reminders" Type="System.Int32" Scope="User">

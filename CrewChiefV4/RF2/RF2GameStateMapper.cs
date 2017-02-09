@@ -889,7 +889,7 @@ namespace CrewChiefV4.rFactor2
             {
                 currFlag = FlagEnum.BLUE;
             }
-            else if (UserSettings.GetUserSettings().getBoolean("rf2_enable_blue_on_slower"))
+            else if (UserSettings.GetUserSettings().getBoolean("enable_rf2_blue_on_slower"))
             {
                 foreach (var opponent in cgs.OpponentData.Values)
                 {
