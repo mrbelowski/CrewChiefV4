@@ -520,62 +520,21 @@ namespace CrewChiefV4.rFactor2
                 cgs.TyreData.PeakFrontLeftTemperatureForLap, cgs.TyreData.PeakFrontRightTemperatureForLap,
                 cgs.TyreData.PeakRearLeftTemperatureForLap, cgs.TyreData.PeakRearRightTemperatureForLap);
 
-            // for locking / spinning check - the tolerance values are built into these tyre diameter values
-            float carMinTyreCircumference = 0.4f * (float)Math.PI;  // 0.4m diameter
-            float carMaxTyreCircumference = 1.2f * (float)Math.PI;
             // some simple locking / spinning checks
             if (cgs.PositionAndMotionData.CarSpeed > 7.0f)
             {
-                float minRotatingSpeed = 2.0f * (float)Math.PI * cgs.PositionAndMotionData.CarSpeed / carMaxTyreCircumference;
+                float minRotatingSpeed = 2.0f * (float)Math.PI * cgs.PositionAndMotionData.CarSpeed / cgs.carClass.maxTyreCircumference;
                 cgs.TyreData.LeftFrontIsLocked = Math.Abs(wheelFrontLeft.mRotation) < minRotatingSpeed;
                 cgs.TyreData.RightFrontIsLocked = Math.Abs(wheelFrontRight.mRotation) < minRotatingSpeed;
                 cgs.TyreData.LeftRearIsLocked = Math.Abs(wheelRearLeft.mRotation) < minRotatingSpeed;
                 cgs.TyreData.RightRearIsLocked = Math.Abs(wheelRearRight.mRotation) < minRotatingSpeed;
                 
-                float maxRotatingSpeed = 2.0f * (float)Math.PI * cgs.PositionAndMotionData.CarSpeed / carMinTyreCircumference;
+                float maxRotatingSpeed = 2.0f * (float)Math.PI * cgs.PositionAndMotionData.CarSpeed / cgs.carClass.minTyreCircumference;
                 cgs.TyreData.LeftFrontIsSpinning = Math.Abs(wheelFrontLeft.mRotation) > maxRotatingSpeed;
                 cgs.TyreData.RightFrontIsSpinning = Math.Abs(wheelFrontRight.mRotation) > maxRotatingSpeed;
                 cgs.TyreData.LeftRearIsSpinning = Math.Abs(wheelRearLeft.mRotation) > maxRotatingSpeed;
                 cgs.TyreData.RightRearIsSpinning = Math.Abs(wheelRearRight.mRotation) > maxRotatingSpeed;
             }
-
-            /*
-            // some simple locking / spinning checks
-            if ((csd.IsNewSession
-                    || this.wheelCircumference[0] == 0
-                    || this.wheelCircumference[1] == 0)
-                && cgs.PositionAndMotionData.CarSpeed > 14.0f
-                && Math.Abs(rf2state.mUnfilteredSteering) <= 0.05)
-            {
-                // calculate wheel circumference (assume left/right symmetry) at 50+ km/h with (mostly) straight steering
-                // front
-                this.wheelCircumference[0] = (float)(2.0f * (float)Math.PI * cgs.PositionAndMotionData.CarSpeed / Math.Abs(rf2state.mWheels[0].mRotation) +
-                    2.0f * (float)Math.PI * cgs.PositionAndMotionData.CarSpeed / Math.Abs(rf2state.mWheels[1].mRotation)) / 2.0f;
-                // rear
-                this.wheelCircumference[1] = (float)(2.0f * (float)Math.PI * cgs.PositionAndMotionData.CarSpeed / Math.Abs(rf2state.mWheels[2].mRotation) +
-                    2.0f * (float)Math.PI * cgs.PositionAndMotionData.CarSpeed / Math.Abs(rf2state.mWheels[3].mRotation)) / 2.0f;
-            }
-
-            if (cgs.PositionAndMotionData.CarSpeed > 7.0f &&
-                this.wheelCircumference[0] > 0.0f && this.wheelCircumference[1] > 0.0f)
-            {
-                float[] rotatingSpeed = new float[] {
-                    2.0f * (float)Math.PI * cgs.PositionAndMotionData.CarSpeed / this.wheelCircumference[0],
-                    2.0f * (float)Math.PI * cgs.PositionAndMotionData.CarSpeed / this.wheelCircumference[1] };
-                float minRotFactor = 0.5f;
-                float maxRotFactor = 1.3f;
-
-                cgs.TyreData.LeftFrontIsLocked = Math.Abs(wheelFrontLeft.mRotation) < minRotFactor * rotatingSpeed[0];
-                cgs.TyreData.RightFrontIsLocked = Math.Abs(wheelFrontRight.mRotation) < minRotFactor * rotatingSpeed[0];
-                cgs.TyreData.LeftRearIsLocked = Math.Abs(wheelRearLeft.mRotation) < minRotFactor * rotatingSpeed[1];
-                cgs.TyreData.RightRearIsLocked = Math.Abs(wheelRearRight.mRotation) < minRotFactor * rotatingSpeed[1];
-
-                cgs.TyreData.LeftFrontIsSpinning = Math.Abs(wheelFrontLeft.mRotation) > maxRotFactor * rotatingSpeed[0];
-                cgs.TyreData.RightFrontIsSpinning = Math.Abs(wheelFrontRight.mRotation) > maxRotFactor * rotatingSpeed[0];
-                cgs.TyreData.LeftRearIsSpinning = Math.Abs(wheelRearLeft.mRotation) > maxRotFactor * rotatingSpeed[1];
-                cgs.TyreData.RightRearIsSpinning = Math.Abs(wheelRearRight.mRotation) > maxRotFactor * rotatingSpeed[1];
-            }
-            */
 
             // use detached wheel status for suspension damage
             cgs.CarDamageData.SuspensionDamageStatus = CornerData.getCornerData(this.suspensionDamageThresholds,
