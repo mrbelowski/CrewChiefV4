@@ -38,9 +38,6 @@ namespace CrewChiefV4.rFactor2
         private float distanceOffTrack = 0.0f;
         private Boolean isApproachingTrack = false;
 
-        // dynamically calculated wheel circumferences
-        private float[] wheelCircumference = new float[] { 0.0f, 0.0f };
-
         // Session classes tracing.
         private Dictionary<string, string> carClassMap = new Dictionary<string, string>();
         bool isMultiClassSession = false;
@@ -134,10 +131,16 @@ namespace CrewChiefV4.rFactor2
                 this.isOfflineSession = true;
                 this.distanceOffTrack = 0;
                 this.isApproachingTrack = false;
-                this.wheelCircumference = new float[] { 0, 0 };
-                pgs = null;
 
-                return null;
+                if (pgs != null)
+                {
+                    // In rF2 user can quit practice session and we will never know
+                    // about it.  Mark previous game state with Unavailable flags.
+                    pgs.SessionData.SessionType = SessionType.Unavailable;
+                    pgs.SessionData.SessionPhase = SessionPhase.Unavailable;
+                }
+
+                return pgs;
             }
 
             // game is paused or other window has taken focus
@@ -222,26 +225,30 @@ namespace CrewChiefV4.rFactor2
                     ? (float)rf2state.mEndET
                     : csd.SessionNumberOfLaps > 0.0f ? 0.0f : defaultSessionTotalRunTime;
 
-            // if previous state is null or any of the above change, this is a new session
-            csd.IsNewSession = pgs == null ||
-                csd.SessionType != psd.SessionType ||
-                cgs.carClass.rFClassName != pgs.carClass.rFClassName ||
-                csd.DriverRawName != psd.DriverRawName ||
-                csd.TrackDefinition.name != psd.TrackDefinition.name ||
-                csd.TrackDefinition.trackLength != psd.TrackDefinition.trackLength ||
-                // these sometimes change in the beginning or end of session!
-                //currSessionData.SessionNumberOfLaps != prevSessionData.SessionNumberOfLaps ||
-                //currSessionData.SessionTotalRunTime != prevSessionData.SessionTotalRunTime || 
-                csd.EventIndex != psd.EventIndex ||
-                csd.SessionIteration != psd.SessionIteration ||
-                ((psd.SessionPhase == SessionPhase.Checkered ||
-                psd.SessionPhase == SessionPhase.Finished ||
-                psd.SessionPhase == SessionPhase.Green ||
-                psd.SessionPhase == SessionPhase.FullCourseYellow) &&
-                (csd.SessionPhase == SessionPhase.Garage ||
-                csd.SessionPhase == SessionPhase.Gridwalk ||
-                csd.SessionPhase == SessionPhase.Formation ||
-                csd.SessionPhase == SessionPhase.Countdown));
+            // If any difference between current and previous states suggests it is a new session
+            if (pgs == null
+                || csd.SessionType != psd.SessionType
+                || cgs.carClass.rFClassName != pgs.carClass.rFClassName
+                || csd.DriverRawName != psd.DriverRawName
+                || csd.TrackDefinition.name != psd.TrackDefinition.name  // TODO: this is empty sometimes, investigate 
+                || csd.TrackDefinition.trackLength != psd.TrackDefinition.trackLength
+                || csd.EventIndex != psd.EventIndex
+                || csd.SessionIteration != psd.SessionIteration)
+            {
+                csd.IsNewSession = true;
+            }
+            // Else, if any difference between current and previous phases suggests it is a new session
+            else if ((psd.SessionPhase == SessionPhase.Checkered
+                        || psd.SessionPhase == SessionPhase.Finished
+                        || psd.SessionPhase == SessionPhase.Green
+                        || psd.SessionPhase == SessionPhase.FullCourseYellow)
+                    && (csd.SessionPhase == SessionPhase.Garage
+                        || csd.SessionPhase == SessionPhase.Gridwalk
+                        || csd.SessionPhase == SessionPhase.Formation
+                        || csd.SessionPhase == SessionPhase.Countdown))
+            {
+                csd.IsNewSession = true;
+            }
 
             if (csd.IsNewSession)
             {
@@ -827,6 +834,15 @@ namespace CrewChiefV4.rFactor2
             cgs.PitData.InPitlane = player.mInPits == 1;
             cgs.PitData.IsAtPitExit = pgs != null && pgs.PitData.InPitlane && !cgs.PitData.InPitlane;
             cgs.PitData.OnOutLap = cgs.PitData.InPitlane && csd.SectorNumber == 1;
+
+            if (pgs != null 
+                && csd.CompletedLaps == psd.CompletedLaps
+                && pgs.PitData.OnOutLap)
+            {
+                // If current lap is pit out lap, keep it that way till lap completes.
+                cgs.PitData.OnOutLap = true;
+            }
+
             cgs.PitData.OnInLap = cgs.PitData.InPitlane && csd.SectorNumber == 3;
             cgs.PitData.IsMakingMandatoryPitStop = cgs.PitData.HasMandatoryPitStop && cgs.PitData.OnInLap && csd.CompletedLaps > cgs.PitData.PitWindowStart;
             cgs.PitData.PitWindow = cgs.PitData.IsMakingMandatoryPitStop ? PitWindow.StopInProgress : mapToPitWindow((rFactor2Constants.rF2YellowFlagState)rf2state.mYellowFlagState);
@@ -929,14 +945,27 @@ namespace CrewChiefV4.rFactor2
             this.isApproachingTrack = offTrackDistanceDelta < 0 && cgs.PenaltiesData.IsOffRacingSurface && lateralDistDiff < 3;
 
             // TODO: Apply something similar to opponents.
-            if (((csd.SectorNumber == 2 && csd.LastSector1Time < 0
-                    || csd.SectorNumber == 3 && csd.LastSector2Time < 0) 
+            // First, verify if previous sector has invalid time.
+            if (((csd.SectorNumber == 2 && csd.LastSector1Time < 0.0f
+                    || csd.SectorNumber == 3 && csd.LastSector2Time < 0.0f)
+                // And, this is not an out/in lap
                 && !cgs.PitData.OnOutLap && !cgs.PitData.OnInLap
-                && (csd.SessionType == SessionType.Race || csd.SessionType == SessionType.Qualify))
-                ||  (pgs != null 
-                     && psd.CompletedLaps == csd.CompletedLaps 
+                // And it's Race or Qualification
+                && (csd.SessionType == SessionType.Race || csd.SessionType == SessionType.Qualify)))
+            {
+                csd.CurrentLapIsValid = false;
+            }
+            // If current lap was marked as invalid, keep it that way.
+            else if (pgs != null
+                     && psd.CompletedLaps == csd.CompletedLaps  // Same lap
                      && !psd.CurrentLapIsValid)
-                || player.mCountLapFlag != (byte)rFactor2Constants.rF2CountLapFlag.CountLapAndTime)
+            {
+                csd.CurrentLapIsValid = false;
+            }
+            // rF2 lap time or whole lap won't count
+            else if (player.mCountLapFlag != (byte)rFactor2Constants.rF2CountLapFlag.CountLapAndTime
+                // And, this is not an out/in lap
+                && !cgs.PitData.OnOutLap && !cgs.PitData.OnInLap)
             {
                 csd.CurrentLapIsValid = false;
             }
