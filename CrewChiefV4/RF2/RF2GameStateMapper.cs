@@ -851,23 +851,39 @@ namespace CrewChiefV4.rFactor2
 
             // Below is wrong, game goes into green state immediately after pending. 
             cgs.FlagData.isFullCourseYellow = csd.SessionPhase == SessionPhase.FullCourseYellow;
-            if (cgs.FlagData.isFullCourseYellow && pgs != null && !pgs.FlagData.isFullCourseYellow)
+            if (cgs.FlagData.isFullCourseYellow)
             {
-                // transitioned from racing to yellow, so set the FCY status to pending
-                cgs.FlagData.fcyPhase = FullCourseYellowPhase.PENDING;
+                if (rf2state.mYellowFlagState == (sbyte)rFactor2Constants.rF2YellowFlagState.Pending)
+                    cgs.FlagData.fcyPhase = FullCourseYellowPhase.PENDING;
+                //else if (rf2state.mYellowFlagState == (sbyte)rFactor2Constants.rF2YellowFlagState.PitClosed)
+                //    cgs.FlagData.fcyPhase = FullCourseYellowPhase.PITS_CLOSED;
+                // At default ruleset, both open and close sub states result in "Pits open" visible in the UI.
+                else if (rf2state.mYellowFlagState == (sbyte)rFactor2Constants.rF2YellowFlagState.PitOpen
+                    || rf2state.mYellowFlagState == (sbyte)rFactor2Constants.rF2YellowFlagState.PitClosed)
+                    cgs.FlagData.fcyPhase = FullCourseYellowPhase.PITS_OPEN;
+                else if (rf2state.mYellowFlagState == (sbyte)rFactor2Constants.rF2YellowFlagState.PitLeadLap)
+                    cgs.FlagData.fcyPhase = FullCourseYellowPhase.PITS_OPEN_LEAD_LAP_VEHICLES;
+                else if (rf2state.mYellowFlagState == (sbyte)rFactor2Constants.rF2YellowFlagState.LastLap)
+                {
+                    // This needs more sophisticated logic.
+                    cgs.FlagData.fcyPhase = FullCourseYellowPhase.LAST_LAP_NEXT;
+                }
+                // Never triggers.
+                else if (rf2state.mYellowFlagState == (sbyte)rFactor2Constants.rF2YellowFlagState.Resume)
+                    cgs.FlagData.fcyPhase = FullCourseYellowPhase.RACING;
             }
-            else if (pgs != null && pgs.FlagData.isFullCourseYellow && csd.SessionPhase == SessionPhase.Green)
+            /*else if (pgs != null && pgs.FlagData.isFullCourseYellow && csd.SessionPhase == SessionPhase.Green)
             {
                 // transitioned from yellow to racing, so set the FCY status to racing
                 cgs.FlagData.fcyPhase = FullCourseYellowPhase.RACING;
-            }
+            }*/
 
             var currSectorIdx = (player.mSector == 0 ? 3 : player.mSector) - 1;
             var nextSectorIdx = currSectorIdx == 2 ? 0 : currSectorIdx + 1;
             Debug.Assert(currSectorIdx >= 0 && currSectorIdx <= 2);
             Debug.Assert(nextSectorIdx >= 0 && nextSectorIdx <= 2);
 
-            if (rf2state.mGamePhase == (int)rFactor2Constants.rF2GamePhase.GreenFlag)
+            if (csd.SessionPhase == SessionPhase.Green)
             {
                 for (int i = 0; i < 3; ++i)
                 {
@@ -876,7 +892,7 @@ namespace CrewChiefV4.rFactor2
                         cgs.FlagData.sectorFlags[i] = FlagEnum.YELLOW;
                 }
             }
-            else if (rf2state.mGamePhase == (int)rFactor2Constants.rF2GamePhase.FullCourseYellow)
+            else if (cgs.FlagData.isFullCourseYellow)
             {
                 for (int i = 0; i < 3; ++i)
                     cgs.FlagData.sectorFlags[i] = FlagEnum.UNKNOWN;
