@@ -325,10 +325,10 @@ namespace CrewChiefV4.PCars
             if (currentGameState.carClass.carClassEnum == CarData.CarClassEnum.UNKNOWN_RACE)
             {
                 CarData.CarClass newClass = CarData.getCarClassForPCarsClassName(StructHelper.getNameFromBytes(shared.mCarClassName));
-                if (newClass.carClassEnum != currentGameState.carClass.carClassEnum)
+                if (newClass.getClassIdentifier() != currentGameState.carClass.getClassIdentifier())
                 {
                     currentGameState.carClass = newClass;
-                    Console.WriteLine("Player is using car class " + currentGameState.carClass.carClassEnum);
+                    Console.WriteLine("Player is using car class " + currentGameState.carClass.getClassIdentifier());
                     brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(currentGameState.carClass);
                     // no tyre data in the block so get the default tyre types for this car
                     defaultTyreTypeForPlayersCar = CarData.getDefaultTyreType(currentGameState.carClass);
@@ -408,8 +408,8 @@ namespace CrewChiefV4.PCars
                 currentGameState.PitData.IsRefuellingAllowed = true;
                 
                 currentGameState.carClass = CarData.getCarClassForPCarsClassName(StructHelper.getNameFromBytes(shared.mCarClassName));
-                
-                Console.WriteLine("Player is using car class " + currentGameState.carClass.carClassEnum);
+
+                Console.WriteLine("Player is using car class " + currentGameState.carClass.getClassIdentifier());
                 brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(currentGameState.carClass);
                 // no tyre data in the block so get the default tyre types for this car
                 defaultTyreTypeForPlayersCar = CarData.getDefaultTyreType(currentGameState.carClass);
@@ -419,7 +419,7 @@ namespace CrewChiefV4.PCars
                     String participantName = StructHelper.getNameFromBytes(participantStruct.mName).ToLower();
                     if (i != playerDataIndex && participantStruct.mIsActive && participantName != null && participantName.Length > 0)
                     {
-                        CarData.CarClass opponentCarClass = !shared.hasOpponentClassData || shared.isSameClassAsPlayer[i] ? currentGameState.carClass : CarData.getDefaultCarClass();
+                        CarData.CarClass opponentCarClass = !shared.hasOpponentClassData || shared.isSameClassAsPlayer[i] ? currentGameState.carClass : CarData.DEFAULT_PCARS_OPPONENT_CLASS;
                         addOpponentForName(participantName, createOpponentData(participantStruct, false, opponentCarClass), currentGameState);
                     }
                 }
@@ -462,7 +462,7 @@ namespace CrewChiefV4.PCars
                         currentGameState.SessionData.TrackDefinition.setGapPoints();
                         currentGameState.carClass = CarData.getCarClassForPCarsClassName(StructHelper.getNameFromBytes(shared.mCarClassName));
 
-                        Console.WriteLine("Player is using car class " + currentGameState.carClass.carClassEnum);
+                        Console.WriteLine("Player is using car class " + currentGameState.carClass.getClassIdentifier());
                         brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(currentGameState.carClass);
                         // no tyre data in the block so get the default tyre types for this car
                         defaultTyreTypeForPlayersCar = CarData.getDefaultTyreType(currentGameState.carClass);
@@ -643,7 +643,7 @@ namespace CrewChiefV4.PCars
                 if (i != playerDataIndex)
                 {
                     pCarsAPIParticipantStruct participantStruct = shared.mParticipantData[i];
-                    CarData.CarClass opponentCarClass = !shared.hasOpponentClassData || shared.isSameClassAsPlayer[i] ? currentGameState.carClass : CarData.getDefaultCarClass();
+                    CarData.CarClass opponentCarClass = !shared.hasOpponentClassData || shared.isSameClassAsPlayer[i] ? currentGameState.carClass : CarData.DEFAULT_PCARS_OPPONENT_CLASS;
                     String participantName = StructHelper.getNameFromBytes(participantStruct.mName).ToLower();
 
                     if (participantName != null && participantName.Length > 0)
@@ -769,7 +769,7 @@ namespace CrewChiefV4.PCars
                                                 currentGameState.SessionData.OverallSessionBestLapTime = currentOpponentData.CurrentBestLapTime;
                                             }
                                         }
-                                        if (currentOpponentData.CarClass.carClassEnum == currentGameState.carClass.carClassEnum)
+                                        if (currentOpponentData.CarClass.getClassIdentifier() == currentGameState.carClass.getClassIdentifier())
                                         {
                                             if (currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass == -1 ||
                                                 currentOpponentData.CurrentBestLapTime < currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass)

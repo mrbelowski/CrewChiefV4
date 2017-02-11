@@ -556,22 +556,7 @@ namespace CrewChiefV4
                             }
                             Console.WriteLine("Listening...");
                             crewChief.audioPlayer.playStartListeningBeep();
-                            crewChief.speechRecogniser.recognizeAsync();
-                            
-                            /*else
-                            {
-                                Console.WriteLine("Finished listening...");
-                                crewChief.speechRecogniser.recognizeAsyncCancel();
-                                new Thread(() =>
-                                {
-                                    Thread.Sleep(2000);
-                                    if (crewChief.speechRecogniser.waitingForSpeech)
-                                    {
-                                        crewChief.speechRecogniser.waitingForSpeech = false;
-                                        crewChief.youWot();
-                                    }
-                                }).Start();
-                            }*/
+                            crewChief.speechRecogniser.recognizeAsync();                            
                             nextPollWait = 1000;
                         }
                     }
@@ -601,6 +586,7 @@ namespace CrewChiefV4
                         MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return;
                 }
+                CarData.loadCarClassData();
                 this.runListenForButtonPressesThread = controllerConfiguration.listenForButtons(voiceOption == VoiceOptionEnum.TOGGLE);
                 this.assignButtonToAction.Enabled = false;
                 this.deleteAssigmentButton.Enabled = false;

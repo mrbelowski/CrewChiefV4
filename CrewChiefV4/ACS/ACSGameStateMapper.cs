@@ -873,15 +873,14 @@ namespace CrewChiefV4.assetto
                 currentGameState.SessionData.PlayerClassSessionBestLapTime = previousGameState.SessionData.PlayerClassSessionBestLapTime;
                 currentGameState.SessionData.CurrentLapIsValid = previousGameState.SessionData.CurrentLapIsValid;
             }
-
             
             if (currentGameState.carClass.carClassEnum == CarData.CarClassEnum.UNKNOWN_RACE)
             {
-                CarData.CarClass newClass = CarData.getDefaultCarClass();
-                if (newClass.carClassEnum != currentGameState.carClass.carClassEnum)
+                CarData.CarClass newClass = CarData.getCarClassForACClassName(shared.acsStatic.carModel);
+                if (newClass.getClassIdentifier() != currentGameState.carClass.getClassIdentifier())
                 {
                     currentGameState.carClass = newClass;
-                    Console.WriteLine("Player is using car class " + currentGameState.carClass.carClassEnum);
+                    Console.WriteLine("Player is using car class " + currentGameState.carClass.getClassIdentifier());
                     brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(currentGameState.carClass);
                     // no tyre data in the block so get the default tyre types for this car
                     defaultTyreTypeForPlayersCar = CarData.getDefaultTyreType(currentGameState.carClass);
@@ -1017,10 +1016,9 @@ namespace CrewChiefV4.assetto
                 currentGameState.PitData.IsRefuellingAllowed = true;
 
                 //add carclasses for assetto corsa.
-                currentGameState.carClass = CarData.getDefaultCarClass();
+                currentGameState.carClass = CarData.getCarClassForACClassName(shared.acsStatic.carModel);
 
-                Console.WriteLine("Player is using car class " + currentGameState.carClass.carClassEnum);
-
+                Console.WriteLine("Player is using car class " + currentGameState.carClass.getClassIdentifier());
 
                 if (acTyres.Count > 0 && !acTyres.ContainsKey(shared.acsGraphic.tyreCompound))
                 {
@@ -1042,7 +1040,7 @@ namespace CrewChiefV4.assetto
                         String participantName = getNameFromBytes(participantStruct.driverName).ToLower();
                         if (i != 0  && participantName != null && participantName.Length > 0)
                         {
-                            CarData.CarClass opponentCarClass = CarData.getDefaultCarClass();
+                            CarData.CarClass opponentCarClass = CarData.getCarClassForACClassName(getNameFromBytes(participantStruct.carModel));
                             addOpponentForName(participantName, createOpponentData(participantStruct, false, opponentCarClass, shared.acsStatic.trackSPlineLength), currentGameState);
                             if (!opponentsSplits.ContainsKey(participantName))
                             {
@@ -1099,8 +1097,8 @@ namespace CrewChiefV4.assetto
                         currentGameState.SessionData.TrackDefinition.setGapPoints();
                         playerSplits.setSplitPoints(shared.acsStatic.trackSPlineLength);
 
-                        currentGameState.carClass = CarData.getDefaultCarClass();
-                        Console.WriteLine("Player is using car class " + currentGameState.carClass.carClassEnum);
+                        currentGameState.carClass = CarData.getCarClassForACClassName(shared.acsStatic.carModel);
+                        Console.WriteLine("Player is using car class " + currentGameState.carClass.getClassIdentifier());
                         brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(currentGameState.carClass);
                         // no tyre data in the block so get the default tyre types for this car
                         defaultTyreTypeForPlayersCar = CarData.getDefaultTyreType(currentGameState.carClass);
@@ -1326,7 +1324,6 @@ namespace CrewChiefV4.assetto
                 {
                     acsVehicleInfo participantStruct = shared.acsChief.vehicle[i];
 
-                    CarData.CarClass opponentCarClass = CarData.getDefaultCarClass();
                     String participantName = getNameFromBytes(participantStruct.driverName).ToLower();
                     OpponentData currentOpponentData = getOpponentForName(currentGameState, participantName);
 
@@ -1449,9 +1446,9 @@ namespace CrewChiefV4.assetto
                                         isEnteringPits || isLeavingPits, participantStruct.currentLapInvalid == 0,
                                         currentGameState.SessionData.SessionRunningTime, secondsSinceLastUpdate,
                                         new float[] { participantStruct.worldPosition.x, participantStruct.worldPosition.z }, previousOpponentWorldPosition,
-                                        currentOpponentLapDistance, 0, 0,
+                                        currentOpponentLapDistance, 
                                         currentGameState.SessionData.SessionHasFixedTime, currentGameState.SessionData.SessionTimeRemaining,
-                                        currentGameState.carClass.carClassEnum, numberOfSectorsOnTrack, shared.acsPhysics.airTemp, shared.acsPhysics.roadTemp
+                                        numberOfSectorsOnTrack, shared.acsPhysics.airTemp, shared.acsPhysics.roadTemp
                                         );
 
                                     if (currentOpponentData.IsNewLap)
@@ -1468,7 +1465,7 @@ namespace CrewChiefV4.assetto
                                                     currentGameState.SessionData.OverallSessionBestLapTime = currentOpponentData.CurrentBestLapTime;
                                                 }
                                             }
-                                            if (currentOpponentData.CarClass.carClassEnum == currentGameState.carClass.carClassEnum)
+                                            if (currentOpponentData.CarClass.getClassIdentifier() == currentGameState.carClass.getClassIdentifier())
                                             {
                                                 if (currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass == -1 ||
                                                     currentOpponentData.CurrentBestLapTime < currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass)
@@ -1505,7 +1502,8 @@ namespace CrewChiefV4.assetto
                         {
                             if (participantStruct.isConnected == 1 && participantName != null && participantName.Length > 0)
                             {
-                                addOpponentForName(participantName, createOpponentData(participantStruct, true, opponentCarClass, shared.acsStatic.trackSPlineLength), currentGameState);
+                                addOpponentForName(participantName, createOpponentData(participantStruct, true, CarData.getCarClassForACClassName(getNameFromBytes(participantStruct.carModel)), 
+                                    shared.acsStatic.trackSPlineLength), currentGameState);
                                 if (!opponentsSplits.ContainsKey(participantName))
                                 {
                                     opponentsSplits.Add(participantName, new splitTimes());
@@ -1806,8 +1804,8 @@ namespace CrewChiefV4.assetto
 
         private void upateOpponentData(OpponentData opponentData, int racePosition, int leaderBoardPosition, int completedLaps, int sector,
             float completedLapTime, float lastLapTime, Boolean isInPits, Boolean lapIsValid, float sessionRunningTime, float secondsSinceLastUpdate, float[] currentWorldPosition,
-            float[] previousWorldPosition, float distanceRoundTrack, int tire_type, int carClassId, Boolean sessionLengthIsTime, float sessionTimeRemaining,
-        CarData.CarClassEnum playerCarClass, int trackNumberOfSectors, float airTemperature, float trackTempreture)
+            float[] previousWorldPosition, float distanceRoundTrack, Boolean sessionLengthIsTime, float sessionTimeRemaining,
+            int trackNumberOfSectors, float airTemperature, float trackTempreture)
         {
             opponentData.DistanceRoundTrack = distanceRoundTrack;
             float speed;
@@ -1827,7 +1825,6 @@ namespace CrewChiefV4.assetto
             opponentData.Position = racePosition;
             opponentData.UnFilteredPosition = racePosition;
             opponentData.WorldPosition = currentWorldPosition;
-            opponentData.CarClass = CarData.getDefaultCarClass();
             opponentData.IsNewLap = false;
 
             if (opponentData.CurrentSectorNumber != sector)
@@ -1842,7 +1839,7 @@ namespace CrewChiefV4.assetto
 
                     opponentData.StartNewLap(completedLaps + 1, leaderBoardPosition, isInPits, sessionRunningTime, false, trackTempreture, airTemperature);
                     opponentData.IsNewLap = true;
-
+                    // recheck the car class here?
                 }
                 else if (opponentData.CurrentSectorNumber == 1 && sector == 2 || opponentData.CurrentSectorNumber == 2 && sector == 3)
                 {
@@ -1877,7 +1874,7 @@ namespace CrewChiefV4.assetto
             opponentData.CarClass = carClass;
             opponentData.IsActive = true;
             String nameToLog = opponentData.DriverRawName == null ? "unknown" : opponentData.DriverRawName;
-            Console.WriteLine("New driver " + nameToLog + " is using car class " + opponentData.CarClass.carClassEnum);
+            Console.WriteLine("New driver " + nameToLog + " is using car class " + opponentData.CarClass.getClassIdentifier());
             return opponentData;
         }
 
@@ -2041,7 +2038,13 @@ namespace CrewChiefV4.assetto
 
         public static String getNameFromBytes(byte[] name)
         {
-            return Encoding.UTF8.GetString(name).TrimEnd('\0').Trim();
+            String s = Encoding.UTF8.GetString(name).TrimEnd('\0').Trim();
+            int pos = s.IndexOf('\0');
+            if (pos >= 0)
+            {
+                s = s.Substring(0, pos);
+            }
+            return s;
         }
 
         private float spLineLengthToDistanceRoundTrack(float trackLength, float spLine)
