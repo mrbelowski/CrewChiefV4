@@ -213,7 +213,7 @@ namespace CrewChiefV4.rFactor2
             // If any difference between current and previous states suggests it is a new session
             if (pgs == null
                 || csd.SessionType != psd.SessionType
-                || cgs.carClass != pgs.carClass
+                || cgs.carClass.getClassIdentifier() != pgs.carClass.getClassIdentifier()
                 || csd.DriverRawName != psd.DriverRawName
                 || csd.TrackDefinition.name != psd.TrackDefinition.name  // TODO: this is empty sometimes, investigate 
                 || csd.TrackDefinition.trackLength != psd.TrackDefinition.trackLength

@@ -25,8 +25,6 @@ namespace CrewChiefV4
             public CarClassEnum carClassEnum { get; set; }
             public List<int> raceroomClassIds { get; set; }            
             public List<string> pCarsClassNames { get; set; }
-            public List<string> amsClassNames { get; set; }
-            public List<string> gscClassNames { get; set; }
             public List<string> rf1ClassNames { get; set; }
             public List<string> rf2ClassNames { get; set; }
             public List<string> acClassNames { get; set; }
@@ -43,8 +41,6 @@ namespace CrewChiefV4
             public String placeholderClassId = "";
 
             public List<Regex> pCarsClassNamesRegexs = new List<Regex>();
-            public List<Regex> amsClassNamesRegexs = new List<Regex>();
-            public List<Regex> gscClassNamesRegexs = new List<Regex>();
             public List<Regex> rf1ClassNamesRegexs = new List<Regex>();
             public List<Regex> rf2ClassNamesRegexs = new List<Regex>();
             public List<Regex> acClassNamesRegexs = new List<Regex>();
@@ -55,8 +51,6 @@ namespace CrewChiefV4
                 this.carClassEnum = CarClassEnum.UNKNOWN_RACE;
                 this.raceroomClassIds = new List<int>();
                 this.pCarsClassNames = new List<string>();
-                this.amsClassNames = new List<string>();
-                this.gscClassNames = new List<string>();
                 this.rf1ClassNames = new List<string>();
                 this.rf2ClassNames = new List<string>();
                 this.acClassNames = new List<string>();
@@ -109,13 +103,6 @@ namespace CrewChiefV4
                     if (className.Contains("*") || className.Contains("?"))
                     {
                         pCarsClassNamesRegexs.Add(wildcardToRegex(className));
-                    }
-                }
-                foreach (String className in amsClassNames)
-                {
-                    if (className.Contains("*") || className.Contains("?"))
-                    {
-                        amsClassNamesRegexs.Add(wildcardToRegex(className));
                     }
                 }
             }
@@ -581,48 +568,6 @@ namespace CrewChiefV4
                 newCarClass.acClassNames.Add(acClassName);
                 newCarClass.placeholderClassId = acClassName;
                 CAR_CLASSES.carClasses.Add(newCarClass);
-                return newCarClass;
-            }
-        }
-        
-        public static CarClass getCarClassForAMSClassName(String amsClassName)
-        {
-            foreach (CarClass carClass in CAR_CLASSES.carClasses)
-            {
-                foreach (String className in carClass.amsClassNames)
-                {
-                    if (className == amsClassName)
-                    {
-                        return carClass;
-                    }
-                }
-            }
-            foreach (CarClass carClass in CAR_CLASSES.carClasses)
-            {
-                foreach (Regex regex in carClass.amsClassNamesRegexs)
-                {
-                    if (regex.IsMatch(amsClassName))
-                    {
-                        // store the match so we don't have to keep checking the regex
-                        carClass.amsClassNames.Add(amsClassName);
-                        return carClass;
-                    }
-                }
-            }
-            CarClassEnum carClassID = CarClassEnum.UNKNOWN_RACE;
-            if (Enum.TryParse<CarClassEnum>(amsClassName, out carClassID))
-            {
-                CarClass existingClass = CarData.getCarClassFromEnum(carClassID);
-                existingClass.amsClassNames.Add(amsClassName);
-                return existingClass;
-            }
-            else
-            {
-                // create one if it doesn't exist
-                CarClass newCarClass = new CarClass();
-                newCarClass.amsClassNames.Add(amsClassName);
-                CAR_CLASSES.carClasses.Add(newCarClass);
-                newCarClass.placeholderClassId = amsClassName;
                 return newCarClass;
             }
         }
