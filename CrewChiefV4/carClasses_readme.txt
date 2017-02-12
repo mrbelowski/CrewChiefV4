@@ -6,8 +6,7 @@ This is still WIP, but the format is pretty straightforward. A car class will in
 	"carClassEnum": this is the built in car class group. If this doesn't match, the app will assign this to UNKNOWN_RACE car group, with the params you specify
 	"pCarsClassNames": this is an array of pCars classnames. * or ? denote wildcards. The app searches for classes which have full matches before considering wildcards
 	"rf2ClassNames": as above, for rFactor2
-	"rf1ClassNames": as above, for rFactor1
-	"amsClassNames": as above, for Automobilista
+	"rf1ClassNames": as above, for rFactor1, AMS, GSC, FTruck, and other RF1 based games (the Reiza games)
 	"acClassNames": as above, for Assetto Corsa
 	"raceroomClassIds": this is an array of integers or R3E class IDs	
 	"brakeType": can be "Carbon", "Ceramic", "Iron_Race" or "Iron_Road"

@@ -157,7 +157,7 @@ namespace CrewChiefV4.rFactor1
             // if previous state is null or any of the above change, this is a new session
             currentGameState.SessionData.IsNewSession = previousGameState == null ||
                 currentGameState.SessionData.SessionType != previousGameState.SessionData.SessionType ||
-                currentGameState.carClass != previousGameState.carClass ||
+                currentGameState.carClass.getClassIdentifier() != previousGameState.carClass.getClassIdentifier() ||
                 currentGameState.SessionData.DriverRawName != previousGameState.SessionData.DriverRawName || 
                 currentGameState.SessionData.TrackDefinition.name != previousGameState.SessionData.TrackDefinition.name ||
                 currentGameState.SessionData.TrackDefinition.trackLength != previousGameState.SessionData.TrackDefinition.trackLength ||
@@ -820,8 +820,7 @@ namespace CrewChiefV4.rFactor1
                 float minDistDiff = -1;
                 foreach (OpponentData o in previousGameState.OpponentData.Values)
                 {
-                    // this will use the Array object ref in the map, which is probably OK
-                    String opponentKey = o.CarClass.rf1ClassNames + o.Position.ToString();
+                    String opponentKey = o.CarClass.getClassIdentifier() + o.Position.ToString();
                     if (o.DriverRawName != getNameFromBytes(vehicle.driverName).ToLower() || 
                         o.CarClass != CarData.getCarClassForRF1ClassName(getNameFromBytes(vehicle.vehicleClass)) || 
                         opponentKeysProcessed.Contains(opponentKey))
