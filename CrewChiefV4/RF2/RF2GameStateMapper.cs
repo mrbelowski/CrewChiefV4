@@ -505,27 +505,7 @@ namespace CrewChiefV4.rFactor2
                 cgs.TyreData.PeakFrontLeftTemperatureForLap, cgs.TyreData.PeakFrontRightTemperatureForLap,
                 cgs.TyreData.PeakRearLeftTemperatureForLap, cgs.TyreData.PeakRearRightTemperatureForLap);
 
-                    // for locking / spinning check - the tolerance values are built into these tyre diameter values
-            float carMinTyreCircumference = 0.4f * (float)Math.PI;  // 0.4m diameter
-            float carMaxTyreCircumference = 1.2f * (float)Math.PI;
             // some simple locking / spinning checks
-            if (cgs.PositionAndMotionData.CarSpeed > 7.0f)
-            {
-                float minRotatingSpeed = 2 * (float)Math.PI * cgs.PositionAndMotionData.CarSpeed / carMaxTyreCircumference;
-                cgs.TyreData.LeftFrontIsLocked = Math.Abs(wheelFrontLeft.mRotation) < minRotatingSpeed;
-                cgs.TyreData.RightFrontIsLocked = Math.Abs(wheelFrontRight.mRotation) < minRotatingSpeed;
-                cgs.TyreData.LeftRearIsLocked = Math.Abs(wheelRearLeft.mRotation) < minRotatingSpeed;
-                cgs.TyreData.RightRearIsLocked = Math.Abs(wheelRearRight.mRotation) < minRotatingSpeed;
-
-                float maxRotatingSpeed = 2 * (float)Math.PI * cgs.PositionAndMotionData.CarSpeed / carMinTyreCircumference;
-                cgs.TyreData.LeftFrontIsSpinning = Math.Abs(wheelFrontLeft.mRotation) > maxRotatingSpeed;
-                cgs.TyreData.RightFrontIsSpinning = Math.Abs(wheelFrontRight.mRotation) > maxRotatingSpeed;
-                cgs.TyreData.LeftRearIsSpinning = Math.Abs(wheelRearLeft.mRotation) > maxRotatingSpeed;
-                cgs.TyreData.RightRearIsSpinning = Math.Abs(wheelRearRight.mRotation) > maxRotatingSpeed;
-            }
-            /*
-
-            
             if ((csd.IsNewSession
                     || this.wheelCircumference[0] == 0 
                     || this.wheelCircumference[1] == 0)
@@ -560,7 +540,7 @@ namespace CrewChiefV4.rFactor2
                 cgs.TyreData.LeftRearIsSpinning = Math.Abs(wheelRearLeft.mRotation) > maxRotFactor * rotatingSpeed[1];
                 cgs.TyreData.RightRearIsSpinning = Math.Abs(wheelRearRight.mRotation) > maxRotFactor * rotatingSpeed[1];
             }
-            */
+            
             // use detached wheel status for suspension damage
             cgs.CarDamageData.SuspensionDamageStatus = CornerData.getCornerData(this.suspensionDamageThresholds,
                 !cgs.TyreData.LeftFrontAttached ? 1 : 0,
