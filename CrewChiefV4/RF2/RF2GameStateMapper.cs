@@ -38,9 +38,6 @@ namespace CrewChiefV4.rFactor2
         private float distanceOffTrack = 0.0f;
         private Boolean isApproachingTrack = false;
 
-        // Session classes tracing.
-        private Dictionary<string, string> carClassMap = new Dictionary<string, string>();
-        bool isMultiClassSession = false;
 
         public RF2GameStateMapper()
         {
@@ -198,7 +195,7 @@ namespace CrewChiefV4.rFactor2
 
             csd.SessionType = mapToSessionType(rf2state);
             csd.SessionPhase = mapToSessionPhase((rFactor2Constants.rF2GamePhase)rf2state.mGamePhase, csd.SessionType, ref player, ref leader);
-            cgs.carClass = CarData.getCarClassForRF2ClassName(getSafeCarClassName(getStringFromBytes(player.mVehicleClass)));
+            cgs.carClass = CarData.getCarClassForRF2ClassName(getStringFromBytes(player.mVehicleClass));
             this.brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(cgs.carClass);
             csd.DriverRawName = getStringFromBytes(player.mDriverName).ToLower();
             csd.TrackDefinition = new TrackDefinition(getStringFromBytes(rf2state.mTrackName), (float)rf2state.mLapDist);
@@ -216,7 +213,7 @@ namespace CrewChiefV4.rFactor2
             // If any difference between current and previous states suggests it is a new session
             if (pgs == null
                 || csd.SessionType != psd.SessionType
-                || cgs.carClass.rFClassName != pgs.carClass.rFClassName
+                || cgs.carClass.getClassIdentifier() != pgs.carClass.getClassIdentifier()
                 || csd.DriverRawName != psd.DriverRawName
                 || csd.TrackDefinition.name != psd.TrackDefinition.name  // TODO: this is empty sometimes, investigate 
                 || csd.TrackDefinition.trackLength != psd.TrackDefinition.trackLength
@@ -236,36 +233,6 @@ namespace CrewChiefV4.rFactor2
                         || csd.SessionPhase == SessionPhase.Countdown))
             {
                 csd.IsNewSession = true;
-            }
-
-            if (csd.IsNewSession)
-            {
-                // Hack to improve rF2 restart.
-                pgs = null;
-
-                this.repopulateClassMap(ref rf2state);
-                var classesStr = this.getCarClassesString();
-
-                var msg = this.getIsMultiClassSession()
-                    ? "New Mutli-Class Session: " + classesStr.ToString()
-                    : "New Single-Class Session: " + classesStr.ToString();
-
-                this.isMultiClassSession = this.getIsMultiClassSession();
-                Console.WriteLine(msg);
-            }
-            else if (this.isMultiClassSession != this.getIsMultiClassSession())
-            {
-                // Consider: There might be an earlier spot to check for this (multiplayer
-                // new veh joined or something).
-                var classesStr = this.getCarClassesString();
-
-                // Consider: might cause bugs if all cars retired besides one.
-                var msg = this.getIsMultiClassSession()
-                    ? "Session changed to Mutli-Class: " + classesStr.ToString()
-                    : "Session to Single-Class: " + classesStr.ToString();
-
-                this.isMultiClassSession = this.getIsMultiClassSession();
-                Console.WriteLine(msg);
             }
 
             csd.SessionStartTime = csd.IsNewSession ? cgs.Now : psd.SessionStartTime;
@@ -595,19 +562,19 @@ namespace CrewChiefV4.rFactor2
                         break;
                 }
 
-                var opponentKey = getSafeCarClassName(getStringFromBytes(vehicle.mVehicleClass)) + vehicle.mPlace.ToString();
                 var opponentPrevious = getOpponentDataForVehicleInfo(vehicle, pgs, csd.SessionRunningTime);
                 var opponent = new OpponentData();
+                opponent.CarClass = CarData.getCarClassForRF2ClassName(getStringFromBytes(vehicle.mVehicleClass));
+                var opponentKey = opponent.CarClass.getClassIdentifier() + vehicle.mPlace.ToString();
                 opponent.DriverRawName = getStringFromBytes(vehicle.mDriverName).ToLower();
                 opponent.DriverNameSet = opponent.DriverRawName.Length > 0;
-                opponent.CarClass = CarData.getCarClassForRF2ClassName(getSafeCarClassName(getStringFromBytes(vehicle.mVehicleClass)));
                 opponent.Position = vehicle.mPlace;
 
                 if (opponent.DriverNameSet && opponentPrevious == null && CrewChief.enableDriverNames)
                 {
                     this.speechRecogniser.addNewOpponentName(opponent.DriverRawName);
                     Console.WriteLine("New driver " + opponent.DriverRawName +
-                        " is using car class " + opponent.CarClass.rFClassName +
+                        " is using car class " + opponent.CarClass.getClassIdentifier() +
                         " at position " + opponent.Position.ToString());
                 }
 
@@ -754,7 +721,7 @@ namespace CrewChiefV4.rFactor2
                 if (opponent.CurrentBestLapTime > 0.0f
                     && (opponent.CurrentBestLapTime < csd.OpponentsLapTimeSessionBestPlayerClass
                         || csd.OpponentsLapTimeSessionBestPlayerClass < 0.0f)
-                    && opponent.CarClass.rFClassName == cgs.carClass.rFClassName)
+                    && opponent.CarClass.getClassIdentifier() == cgs.carClass.getClassIdentifier())
                 {
                     csd.OpponentsLapTimeSessionBestPlayerClass = opponent.CurrentBestLapTime;
 
@@ -1025,7 +992,7 @@ namespace CrewChiefV4.rFactor2
                 Console.WriteLine("SessionStartPosition " + csd.SessionStartPosition);
                 Console.WriteLine("SessionStartTime " + csd.SessionStartTime);
                 Console.WriteLine("TrackName " + csd.TrackDefinition.name);
-                Console.WriteLine("Player is using car class " + cgs.carClass.rFClassName + 
+                Console.WriteLine("Player is using car class " + cgs.carClass.getClassIdentifier() + 
                     " at position " + csd.Position.ToString());
             }
             if (pgs != null && psd.SessionPhase != csd.SessionPhase)
@@ -1121,9 +1088,9 @@ namespace CrewChiefV4.rFactor2
                 float minDistDiff = -1.0f;
                 foreach (var o in previousGameState.OpponentData.Values)
                 {
-                    var opponentKey = o.CarClass.rFClassName + o.Position.ToString();
+                    var opponentKey = o.CarClass.getClassIdentifier() + o.Position.ToString();
                     if (o.DriverRawName != getStringFromBytes(vehicle.mDriverName).ToLower() || 
-                        o.CarClass.rFClassName != CarData.getCarClassForRF2ClassName(getSafeCarClassName(getStringFromBytes(vehicle.mVehicleClass))).rFClassName || 
+                        o.CarClass != CarData.getCarClassForRF2ClassName(getStringFromBytes(vehicle.mVehicleClass)) || 
                         this.opponentKeysProcessed.Contains(opponentKey))
                     {
                         continue;
@@ -1142,7 +1109,7 @@ namespace CrewChiefV4.rFactor2
 
                 if (opponentPrevious != null)
                 {
-                    this.opponentKeysProcessed.Add(opponentPrevious.CarClass.rFClassName + opponentPrevious.Position.ToString());
+                    this.opponentKeysProcessed.Add(opponentPrevious.CarClass.getClassIdentifier() + opponentPrevious.Position.ToString());
                 }
             }
             return opponentPrevious;
@@ -1212,67 +1179,10 @@ namespace CrewChiefV4.rFactor2
 
         public static String getStringFromBytes(byte[] name)
         {
-            return Encoding.UTF8.GetString(name).TrimEnd('\0').Trim();
-        }
-
-
-        List<string> mappedSeries = new List<string>()
-        {
-            "GT1",
-            "GT2",
-            "GT3",
-            "GT4",
-            "GTE",
-            "GTC",
-            "GTLM",
-            "GTC",
-            "DTM",
-        };
-
-        //
-        // Since class name in rF2 often, but not always, hehe, includes maker name, I need to try to guess
-        // what series this class belongs, so that time comparison is not stuck within one brand, but rather
-        // is done within class, as intended.
-        //
-        private string getSafeCarClassName(string rf2ClassName)
-        {
-            string safeClassName = null;
-            if (this.carClassMap.TryGetValue(rf2ClassName, out safeClassName))
-                return safeClassName;
-
-            foreach (var series in this.mappedSeries)
-            {
-                if (rf2ClassName.Contains(series))
-                {
-                    this.carClassMap.Add(rf2ClassName, series);
-                    return series;
-                }
-            }
-
-            // If not mapped, just add itself.
-            this.carClassMap.Add(rf2ClassName, rf2ClassName);
-            return rf2ClassName;
-        }
-
-        private void repopulateClassMap(ref rF2State state)
-        {
-            this.carClassMap.Clear();
-            for (int i = 0; i < state.mNumVehicles; ++i)
-                this.getSafeCarClassName(RF2GameStateMapper.getStringFromBytes(state.mVehicles[i].mVehicleClass));
-        }
-
-        private bool getIsMultiClassSession()
-        {
-            return this.carClassMap.Values.Distinct().Count() > 1;
-        }
-
-        private string getCarClassesString()
-        {
-            var sb = new StringBuilder();
-            foreach (var cls in this.carClassMap.Values.Distinct().ToList())
-                sb.Append(cls + " ");
-
-            return sb.ToString();
+            // TODO: encoding appears to be platform default...
+            // return Encoding.UTF8.GetString(name).TrimEnd('\0').Trim();
+            // return Encoding.GetEncoding("iso-8859-1").GetString(name).TrimEnd('\0').Trim();
+            return Encoding.Default.GetString(name).TrimEnd('\0').Trim();
         }
     }
 }
