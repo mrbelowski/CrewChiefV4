@@ -865,8 +865,12 @@ namespace CrewChiefV4.rFactor2
                     cgs.FlagData.fcyPhase = FullCourseYellowPhase.PITS_OPEN_LEAD_LAP_VEHICLES;
                 else if (rf2state.mYellowFlagState == (sbyte)rFactor2Constants.rF2YellowFlagState.LastLap)
                 {
-                    // This needs more sophisticated logic.
-                    cgs.FlagData.fcyPhase = FullCourseYellowPhase.LAST_LAP_NEXT;
+                    // TODO: This needs more sophisticated logic.
+                    if (pgs != null && pgs.FlagData.fcyPhase != FullCourseYellowPhase.LAST_LAP_CURRENT)
+                        cgs.FlagData.fcyPhase = FullCourseYellowPhase.LAST_LAP_NEXT;
+                    else if (pgs != null && csd.CompletedLaps != psd.CompletedLaps && pgs.FlagData.fcyPhase == FullCourseYellowPhase.LAST_LAP_NEXT)
+                        cgs.FlagData.fcyPhase = FullCourseYellowPhase.LAST_LAP_CURRENT;
+
                 }
                 // Never triggers.
                 else if (rf2state.mYellowFlagState == (sbyte)rFactor2Constants.rF2YellowFlagState.Resume)
