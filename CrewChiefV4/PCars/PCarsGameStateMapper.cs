@@ -324,7 +324,7 @@ namespace CrewChiefV4.PCars
 
             if (currentGameState.carClass.carClassEnum == CarData.CarClassEnum.UNKNOWN_RACE)
             {
-                CarData.CarClass newClass = CarData.getCarClassForPCarsClassName(StructHelper.getNameFromBytes(shared.mCarClassName));
+                CarData.CarClass newClass = CarData.getCarClassForClassName(StructHelper.getNameFromBytes(shared.mCarClassName));
                 if (newClass.getClassIdentifier() != currentGameState.carClass.getClassIdentifier())
                 {
                     currentGameState.carClass = newClass;
@@ -406,8 +406,8 @@ namespace CrewChiefV4.PCars
                 }
                 currentGameState.SessionData.DriverRawName = playerName;
                 currentGameState.PitData.IsRefuellingAllowed = true;
-                
-                currentGameState.carClass = CarData.getCarClassForPCarsClassName(StructHelper.getNameFromBytes(shared.mCarClassName));
+
+                currentGameState.carClass = CarData.getCarClassForClassName(StructHelper.getNameFromBytes(shared.mCarClassName));
 
                 Console.WriteLine("Player is using car class " + currentGameState.carClass.getClassIdentifier());
                 brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(currentGameState.carClass);
@@ -460,7 +460,7 @@ namespace CrewChiefV4.PCars
                         currentGameState.SessionData.TrackDefinition = TrackData.getTrackDefinition(StructHelper.getNameFromBytes(shared.mTrackLocation) + ":" +
                             StructHelper.getNameFromBytes(shared.mTrackVariation), shared.mTrackLength);
                         currentGameState.SessionData.TrackDefinition.setGapPoints();
-                        currentGameState.carClass = CarData.getCarClassForPCarsClassName(StructHelper.getNameFromBytes(shared.mCarClassName));
+                        currentGameState.carClass = CarData.getCarClassForClassName(StructHelper.getNameFromBytes(shared.mCarClassName));
 
                         Console.WriteLine("Player is using car class " + currentGameState.carClass.getClassIdentifier());
                         brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(currentGameState.carClass);

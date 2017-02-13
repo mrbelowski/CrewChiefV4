@@ -145,7 +145,7 @@ namespace CrewChiefV4.rFactor1
                 currentGameState.FlagData.fcyPhase = FullCourseYellowPhase.RACING;
             }
 
-            currentGameState.carClass = CarData.getCarClassForRF1ClassName(getNameFromBytes(player.vehicleClass));
+            currentGameState.carClass = CarData.getCarClassForClassName(getNameFromBytes(player.vehicleClass));
             brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(currentGameState.carClass);
             currentGameState.SessionData.DriverRawName = getNameFromBytes(player.driverName).ToLower();
             currentGameState.SessionData.TrackDefinition = new TrackDefinition(getNameFromBytes(shared.trackName), shared.lapDist);
@@ -475,7 +475,7 @@ namespace CrewChiefV4.rFactor1
                 OpponentData opponent = new OpponentData();
                 opponent.DriverRawName = getNameFromBytes(vehicle.driverName).ToLower();
                 opponent.DriverNameSet = opponent.DriverRawName.Length > 0;
-                opponent.CarClass = CarData.getCarClassForRF1ClassName(getNameFromBytes(vehicle.vehicleClass));
+                opponent.CarClass = CarData.getCarClassForClassName(getNameFromBytes(vehicle.vehicleClass));
                 opponent.Position = vehicle.place;
                 if (opponent.DriverNameSet && opponentPrevious == null && CrewChief.enableDriverNames)
                 {
@@ -821,8 +821,8 @@ namespace CrewChiefV4.rFactor1
                 foreach (OpponentData o in previousGameState.OpponentData.Values)
                 {
                     String opponentKey = o.CarClass.getClassIdentifier() + o.Position.ToString();
-                    if (o.DriverRawName != getNameFromBytes(vehicle.driverName).ToLower() || 
-                        o.CarClass != CarData.getCarClassForRF1ClassName(getNameFromBytes(vehicle.vehicleClass)) || 
+                    if (o.DriverRawName != getNameFromBytes(vehicle.driverName).ToLower() ||
+                        o.CarClass != CarData.getCarClassForClassName(getNameFromBytes(vehicle.vehicleClass)) || 
                         opponentKeysProcessed.Contains(opponentKey))
                     {
                         continue;
