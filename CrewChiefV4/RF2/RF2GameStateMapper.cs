@@ -195,7 +195,7 @@ namespace CrewChiefV4.rFactor2
 
             csd.SessionType = mapToSessionType(rf2state);
             csd.SessionPhase = mapToSessionPhase((rFactor2Constants.rF2GamePhase)rf2state.mGamePhase, csd.SessionType, ref player, ref leader);
-            cgs.carClass = CarData.getCarClassForRF2ClassName(getStringFromBytes(player.mVehicleClass));
+            cgs.carClass = CarData.getCarClassForClassName(getStringFromBytes(player.mVehicleClass));
             this.brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(cgs.carClass);
             csd.DriverRawName = getStringFromBytes(player.mDriverName).ToLower();
             csd.TrackDefinition = new TrackDefinition(getStringFromBytes(rf2state.mTrackName), (float)rf2state.mLapDist);
@@ -568,7 +568,7 @@ namespace CrewChiefV4.rFactor2
 
                 var opponentPrevious = getOpponentDataForVehicleInfo(vehicle, pgs, csd.SessionRunningTime);
                 var opponent = new OpponentData();
-                opponent.CarClass = CarData.getCarClassForRF2ClassName(getStringFromBytes(vehicle.mVehicleClass));
+                opponent.CarClass = CarData.getCarClassForClassName(getStringFromBytes(vehicle.mVehicleClass));
                 var opponentKey = opponent.CarClass.getClassIdentifier() + vehicle.mPlace.ToString();
                 opponent.DriverRawName = getStringFromBytes(vehicle.mDriverName).ToLower();
                 opponent.DriverNameSet = opponent.DriverRawName.Length > 0;
@@ -1093,8 +1093,8 @@ namespace CrewChiefV4.rFactor2
                 foreach (var o in previousGameState.OpponentData.Values)
                 {
                     var opponentKey = o.CarClass.getClassIdentifier() + o.Position.ToString();
-                    if (o.DriverRawName != getStringFromBytes(vehicle.mDriverName).ToLower() || 
-                        o.CarClass != CarData.getCarClassForRF2ClassName(getStringFromBytes(vehicle.mVehicleClass)) || 
+                    if (o.DriverRawName != getStringFromBytes(vehicle.mDriverName).ToLower() ||
+                        o.CarClass != CarData.getCarClassForClassName(getStringFromBytes(vehicle.mVehicleClass)) || 
                         this.opponentKeysProcessed.Contains(opponentKey))
                     {
                         continue;

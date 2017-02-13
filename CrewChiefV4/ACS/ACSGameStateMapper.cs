@@ -876,7 +876,7 @@ namespace CrewChiefV4.assetto
             
             if (currentGameState.carClass.carClassEnum == CarData.CarClassEnum.UNKNOWN_RACE)
             {
-                CarData.CarClass newClass = CarData.getCarClassForACClassName(shared.acsStatic.carModel);
+                CarData.CarClass newClass = CarData.getCarClassForClassName(shared.acsStatic.carModel);
                 if (newClass.getClassIdentifier() != currentGameState.carClass.getClassIdentifier())
                 {
                     currentGameState.carClass = newClass;
@@ -1016,7 +1016,7 @@ namespace CrewChiefV4.assetto
                 currentGameState.PitData.IsRefuellingAllowed = true;
 
                 //add carclasses for assetto corsa.
-                currentGameState.carClass = CarData.getCarClassForACClassName(shared.acsStatic.carModel);
+                currentGameState.carClass = CarData.getCarClassForClassName(shared.acsStatic.carModel);
 
                 Console.WriteLine("Player is using car class " + currentGameState.carClass.getClassIdentifier());
 
@@ -1040,7 +1040,7 @@ namespace CrewChiefV4.assetto
                         String participantName = getNameFromBytes(participantStruct.driverName).ToLower();
                         if (i != 0  && participantName != null && participantName.Length > 0)
                         {
-                            CarData.CarClass opponentCarClass = CarData.getCarClassForACClassName(getNameFromBytes(participantStruct.carModel));
+                            CarData.CarClass opponentCarClass = CarData.getCarClassForClassName(getNameFromBytes(participantStruct.carModel));
                             addOpponentForName(participantName, createOpponentData(participantStruct, false, opponentCarClass, shared.acsStatic.trackSPlineLength), currentGameState);
                             if (!opponentsSplits.ContainsKey(participantName))
                             {
@@ -1097,7 +1097,7 @@ namespace CrewChiefV4.assetto
                         currentGameState.SessionData.TrackDefinition.setGapPoints();
                         playerSplits.setSplitPoints(shared.acsStatic.trackSPlineLength);
 
-                        currentGameState.carClass = CarData.getCarClassForACClassName(shared.acsStatic.carModel);
+                        currentGameState.carClass = CarData.getCarClassForClassName(shared.acsStatic.carModel);
                         Console.WriteLine("Player is using car class " + currentGameState.carClass.getClassIdentifier());
                         brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(currentGameState.carClass);
                         // no tyre data in the block so get the default tyre types for this car
@@ -1502,7 +1502,7 @@ namespace CrewChiefV4.assetto
                         {
                             if (participantStruct.isConnected == 1 && participantName != null && participantName.Length > 0)
                             {
-                                addOpponentForName(participantName, createOpponentData(participantStruct, true, CarData.getCarClassForACClassName(getNameFromBytes(participantStruct.carModel)), 
+                                addOpponentForName(participantName, createOpponentData(participantStruct, true, CarData.getCarClassForClassName(getNameFromBytes(participantStruct.carModel)), 
                                     shared.acsStatic.trackSPlineLength), currentGameState);
                                 if (!opponentsSplits.ContainsKey(participantName))
                                 {
