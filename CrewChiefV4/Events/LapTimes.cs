@@ -276,11 +276,11 @@ namespace CrewChiefV4.Events
                 {
                     if (currentGameState.SessionData.SessionType == SessionType.Race)
                     {
-                        lapAndSectorsComparisonData = currentGameState.getTimeAndSectorsForBestOpponentLapInWindow(paceCheckLapsWindowForRace, currentGameState.carClass.carClassEnum);
+                        lapAndSectorsComparisonData = currentGameState.getTimeAndSectorsForBestOpponentLapInWindow(paceCheckLapsWindowForRace, currentGameState.carClass.getClassIdentifier());
                     }
                     else if (currentGameState.SessionData.SessionType == SessionType.Qualify || currentGameState.SessionData.SessionType == SessionType.Practice)
                     {
-                        lapAndSectorsComparisonData = currentGameState.getTimeAndSectorsForBestOpponentLapInWindow(-1, currentGameState.carClass.carClassEnum);
+                        lapAndSectorsComparisonData = currentGameState.getTimeAndSectorsForBestOpponentLapInWindow(-1, currentGameState.carClass.getClassIdentifier());
                     }
                 }
             }
@@ -834,7 +834,7 @@ namespace CrewChiefV4.Events
                     }
                     else
                     {
-                        float[] bestOpponentLapData = currentGameState.getTimeAndSectorsForBestOpponentLapInWindow(paceCheckLapsWindowForRace, currentGameState.carClass.carClassEnum);
+                        float[] bestOpponentLapData = currentGameState.getTimeAndSectorsForBestOpponentLapInWindow(paceCheckLapsWindowForRace, currentGameState.carClass.getClassIdentifier());
 
                         if (bestOpponentLapData[0] > -1 && lastLapRating != LastLapRating.NO_DATA)
                         {
@@ -986,7 +986,7 @@ namespace CrewChiefV4.Events
                         try
                         {
 
-                            float[] bestOpponentLapData = currentGameState.getTimeAndSectorsForBestOpponentLapInWindow(-1, currentGameState.carClass.carClassEnum);
+                            float[] bestOpponentLapData = currentGameState.getTimeAndSectorsForBestOpponentLapInWindow(-1, currentGameState.carClass.getClassIdentifier());
                             List<MessageFragment> sectorDeltaMessages = getSectorDeltaMessages(SectorReportOption.ALL, currentGameState.SessionData.LastSector1Time, bestOpponentLapData[1],
                                 currentGameState.SessionData.LastSector2Time, bestOpponentLapData[2], currentGameState.SessionData.LastSector3Time, bestOpponentLapData[3], true);
                             if (sectorDeltaMessages.Count > 0)

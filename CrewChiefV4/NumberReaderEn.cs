@@ -43,7 +43,10 @@ namespace CrewChiefV4.NumberProcessing
         private static String folderHours = "numbers/hours";
         private static String folderHour = "numbers/hour";
 
-        private Random random = new Random();
+        protected override String getLocale()
+        {
+            return "en";
+        }
 
         /**
          * Get an English sound for a whole number of hours.
@@ -196,6 +199,22 @@ namespace CrewChiefV4.NumberProcessing
                 Console.WriteLine(String.Join(", ", messages));
             } */
             return messages;
+        }
+
+        /**
+         * 
+         */
+        protected override String GetSecondsWithTenths(int seconds, int tenths)
+        {
+             // sometimes include "seconds" if it's less than 10
+            if (seconds < 10 && random.NextDouble() <= 0.5)
+            {
+                return folderNumbersStub + seconds + "point" + tenths + "seconds";
+            }
+            else
+            {
+                return folderNumbersStub + seconds + "point" + tenths;
+            }
         }
 
         /**

@@ -157,7 +157,7 @@ namespace CrewChiefV4.rFactor1
             // if previous state is null or any of the above change, this is a new session
             currentGameState.SessionData.IsNewSession = previousGameState == null ||
                 currentGameState.SessionData.SessionType != previousGameState.SessionData.SessionType ||
-                currentGameState.carClass != previousGameState.carClass ||
+                currentGameState.carClass.getClassIdentifier() != previousGameState.carClass.getClassIdentifier() ||
                 currentGameState.SessionData.DriverRawName != previousGameState.SessionData.DriverRawName || 
                 currentGameState.SessionData.TrackDefinition.name != previousGameState.SessionData.TrackDefinition.name ||
                 currentGameState.SessionData.TrackDefinition.trackLength != previousGameState.SessionData.TrackDefinition.trackLength ||
@@ -481,7 +481,7 @@ namespace CrewChiefV4.rFactor1
                 {
                     speechRecogniser.addNewOpponentName(opponent.DriverRawName);
                     Console.WriteLine("New driver " + opponent.DriverRawName + 
-                        " is using car class " + opponent.CarClass.rFClassName + 
+                        " is using car class " + opponent.CarClass + 
                         " at position " + opponent.Position.ToString());
                 }
                 if (opponentPrevious != null)
@@ -737,7 +737,7 @@ namespace CrewChiefV4.rFactor1
                 Console.WriteLine("SessionStartPosition " + currentGameState.SessionData.SessionStartPosition);
                 Console.WriteLine("SessionStartTime " + currentGameState.SessionData.SessionStartTime);
                 Console.WriteLine("TrackName " + currentGameState.SessionData.TrackDefinition.name);
-                Console.WriteLine("Player is using car class " + currentGameState.carClass.rFClassName + 
+                Console.WriteLine("Player is using car class " + currentGameState.carClass + 
                     " at position " + currentGameState.SessionData.Position.ToString());
             }
             if (previousGameState != null && previousGameState.SessionData.SessionPhase != currentGameState.SessionData.SessionPhase)
@@ -820,7 +820,7 @@ namespace CrewChiefV4.rFactor1
                 float minDistDiff = -1;
                 foreach (OpponentData o in previousGameState.OpponentData.Values)
                 {
-                    String opponentKey = o.CarClass.rFClassName + o.Position.ToString();
+                    String opponentKey = o.CarClass.getClassIdentifier() + o.Position.ToString();
                     if (o.DriverRawName != getNameFromBytes(vehicle.driverName).ToLower() || 
                         o.CarClass != CarData.getCarClassForRF1ClassName(getNameFromBytes(vehicle.vehicleClass)) || 
                         opponentKeysProcessed.Contains(opponentKey))
@@ -839,7 +839,7 @@ namespace CrewChiefV4.rFactor1
                 }
                 if (opponentPrevious != null)
                 {
-                    opponentKeysProcessed.Add(opponentPrevious.CarClass.rFClassName + opponentPrevious.Position.ToString());
+                    opponentKeysProcessed.Add(opponentPrevious.CarClass.rf1ClassNames + opponentPrevious.Position.ToString());
                 }
             }
             return opponentPrevious;
