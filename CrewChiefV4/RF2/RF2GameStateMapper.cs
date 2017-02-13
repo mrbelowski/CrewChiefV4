@@ -235,6 +235,10 @@ namespace CrewChiefV4.rFactor2
                 csd.IsNewSession = true;
             }
 
+            // Do not use previous game state if this is the new session.
+            if (csd.IsNewSession)
+                pgs = null;
+
             csd.SessionStartTime = csd.IsNewSession ? cgs.Now : psd.SessionStartTime;
             csd.SessionHasFixedTime = csd.SessionTotalRunTime > 0.0f;
 
