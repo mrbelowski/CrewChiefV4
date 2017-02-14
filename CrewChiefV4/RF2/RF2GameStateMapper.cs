@@ -790,6 +790,8 @@ namespace CrewChiefV4.rFactor2
             cgs.PitData.PitWindowEnd = !cgs.PitData.HasMandatoryPitStop ? 0 :
                 csd.SessionHasFixedTime ? (int)(csd.SessionTotalRunTime / 60 / (rf2state.mScheduledStops + 1)) * (player.mNumPitstops + 1) + 1 :
                 (int)(csd.SessionNumberOfLaps / (rf2state.mScheduledStops + 1)) * (player.mNumPitstops + 1) + 1;
+
+            // TODO: mInGarageStall is true even though mInPits isn't.
             cgs.PitData.InPitlane = player.mInPits == 1;
             cgs.PitData.IsAtPitExit = pgs != null && pgs.PitData.InPitlane && !cgs.PitData.InPitlane;
             cgs.PitData.OnOutLap = cgs.PitData.InPitlane && csd.SectorNumber == 1;
@@ -820,9 +822,17 @@ namespace CrewChiefV4.rFactor2
                 cgs.FuelData.FuelLeft = (float)rf2state.mFuel;
             }
 
-            // Below is wrong, game goes into green state immediately after pending. 
-            cgs.FlagData.isFullCourseYellow = csd.SessionPhase == SessionPhase.FullCourseYellow;
-            if (cgs.FlagData.isFullCourseYellow)
+            // --------------------------------
+            // flags data
+            cgs.FlagData.isFullCourseYellow = csd.SessionPhase == SessionPhase.FullCourseYellow
+                || rf2state.mYellowFlagState == (sbyte)rFactor2Constants.rF2YellowFlagState.Resume;
+
+            if (rf2state.mYellowFlagState == (sbyte)rFactor2Constants.rF2YellowFlagState.Resume)
+            {
+                // Special case for resume after FCY.  rF2 no longer has FCY set, but still has Resume sub phase set.
+                cgs.FlagData.fcyPhase = FullCourseYellowPhase.RACING;
+            }
+            else if (cgs.FlagData.isFullCourseYellow)
             {
                 if (rf2state.mYellowFlagState == (sbyte)rFactor2Constants.rF2YellowFlagState.Pending)
                     cgs.FlagData.fcyPhase = FullCourseYellowPhase.PENDING;
@@ -836,77 +846,44 @@ namespace CrewChiefV4.rFactor2
                     cgs.FlagData.fcyPhase = FullCourseYellowPhase.PITS_OPEN_LEAD_LAP_VEHICLES;
                 else if (rf2state.mYellowFlagState == (sbyte)rFactor2Constants.rF2YellowFlagState.LastLap)
                 {
-                    // TODO: This needs more sophisticated logic.
-                    if (pgs != null && pgs.FlagData.fcyPhase != FullCourseYellowPhase.LAST_LAP_CURRENT)
-                        cgs.FlagData.fcyPhase = FullCourseYellowPhase.LAST_LAP_NEXT;
-                    else if (pgs != null && csd.CompletedLaps != psd.CompletedLaps && pgs.FlagData.fcyPhase == FullCourseYellowPhase.LAST_LAP_NEXT)
-                        cgs.FlagData.fcyPhase = FullCourseYellowPhase.LAST_LAP_CURRENT;
+                    if (pgs != null)
+                    {
+                        if (pgs.FlagData.fcyPhase != FullCourseYellowPhase.LAST_LAP_NEXT && pgs.FlagData.fcyPhase != FullCourseYellowPhase.LAST_LAP_CURRENT)
+                            // Initial last lap phase
+                            cgs.FlagData.fcyPhase = FullCourseYellowPhase.LAST_LAP_NEXT;
+                        else if (csd.CompletedLaps != psd.CompletedLaps && pgs.FlagData.fcyPhase == FullCourseYellowPhase.LAST_LAP_NEXT)
+                            // Once we reach the end of current lap, and this lap is next last lap, switch to last lap current phase.
+                            cgs.FlagData.fcyPhase = FullCourseYellowPhase.LAST_LAP_CURRENT;
+                        else
+                            // Keep previous FCY last lap phase.
+                            cgs.FlagData.fcyPhase = pgs.FlagData.fcyPhase;
 
+                    }
                 }
-                // Never triggers.
-                else if (rf2state.mYellowFlagState == (sbyte)rFactor2Constants.rF2YellowFlagState.Resume)
-                    cgs.FlagData.fcyPhase = FullCourseYellowPhase.RACING;
             }
-            /*else if (pgs != null && pgs.FlagData.isFullCourseYellow && csd.SessionPhase == SessionPhase.Green)
-            {
-                // transitioned from yellow to racing, so set the FCY status to racing
-                cgs.FlagData.fcyPhase = FullCourseYellowPhase.RACING;
-            }*/
-
-            var currSectorIdx = (player.mSector == 0 ? 3 : player.mSector) - 1;
-            var nextSectorIdx = currSectorIdx == 2 ? 0 : currSectorIdx + 1;
-            Debug.Assert(currSectorIdx >= 0 && currSectorIdx <= 2);
-            Debug.Assert(nextSectorIdx >= 0 && nextSectorIdx <= 2);
 
             if (csd.SessionPhase == SessionPhase.Green)
             {
                 for (int i = 0; i < 3; ++i)
                 {
-                    // I don't want to hear Green again once Yellow goes away.
+                    // Mark Yellow sectors.
                     if (rf2state.mSectorFlag[i] == (int)rFactor2Constants.rF2YellowFlagState.Pending)
                         cgs.FlagData.sectorFlags[i] = FlagEnum.YELLOW;
                 }
             }
+            // TODO: remove
             else if (cgs.FlagData.isFullCourseYellow)
             {
                 for (int i = 0; i < 3; ++i)
-                    cgs.FlagData.sectorFlags[i] = FlagEnum.UNKNOWN;
+                    cgs.FlagData.sectorFlags[i] = FlagEnum.GREEN;
             }
 
-            // TODO: this whole code is messed up for rF2, rework
-            // --------------------------------
-            // flags data
             var currFlag = FlagEnum.UNKNOWN;
             if (csd.IsDisqualified
                 && pgs != null
                 && !psd.IsDisqualified)
             {
                 currFlag = FlagEnum.BLACK;
-            }
-/*            else if (rf2state.mGamePhase == (int)rFactor2Constants.rF2GamePhase.GreenFlag
-                && rf2state.mSectorFlag[currSectorIdx] == (int)rFactor2Constants.rF2YellowFlagState.Pending
-                    || rf2state.mSectorFlag[nextSectorIdx] == (int)rFactor2Constants.rF2YellowFlagState.Pending)  // TODO: announce in next sector once event is available.
-            {
-                // TODO: we need message per sector as well.
-                // We could announce sector number if flag is in the next sector.
-                csd.
-                currFlag = FlagEnum.YELLOW;
-            }*/
-            else if (csd.SessionType == SessionType.Race ||
-                csd.SessionType == SessionType.Qualify)
-            {
-                if (rf2state.mGamePhase == (int)rFactor2Constants.rF2GamePhase.FullCourseYellow
-                    && rf2state.mYellowFlagState != (int)rFactor2Constants.rF2YellowFlagState.LastLap)
-                {
-                    // TODO: Play various SC phase events.
-                    currFlag = FlagEnum.DOUBLE_YELLOW;
-                }
-                else if (rf2state.mGamePhase == (int)rFactor2Constants.rF2GamePhase.GreenFlag
-                    && pgs != null
-                    && psd.Flag == FlagEnum.DOUBLE_YELLOW)
-                {
-                    currFlag = FlagEnum.GREEN;
-                }
             }
 
             if (player.mFlag == (byte)rFactor2Constants.rF2PrimaryFlag.Blue)
