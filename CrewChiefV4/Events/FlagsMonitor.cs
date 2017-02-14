@@ -52,6 +52,7 @@ namespace CrewChiefV4.Events
         private DateTime lastFCYAccounedTime = DateTime.MinValue;
         private TimeSpan timeBetweenYellowAndClearFlagMessages = TimeSpan.FromSeconds(10);
         private TimeSpan timeBetweenNewYellowFlagMessages = TimeSpan.FromSeconds(5);
+        private Random random = new Random();
 
         // do we need this?
         private DateTime lastLocalYellowAnnouncedTime = DateTime.MinValue;
@@ -214,6 +215,7 @@ namespace CrewChiefV4.Events
                             //      - Not in pits
                             //      - Enough time ellapsed since last announcement
                             //      - Yellow is in current or next sector (relative to player's sector).
+                            //      - For current sector, sometimes announce yellow without sector number.
                             // * Only announce Clear message if
                             //      - Not in pits
                             //      - Enough time passed since Yellow was announced
@@ -233,7 +235,15 @@ namespace CrewChiefV4.Events
                                             lastSectorFlagsAnnounced[i] = sectorFlag;
                                             lastSectorFlagsAnnouncedTime[i] = DateTime.Now;
 
-                                            audioPlayer.playMessageImmediately(new QueuedMessage(folderYellowFlagSectors[i], 0, null));
+                                            if (isCurrentSector(currentGameState, i) && 4 > random.NextDouble() * 10)
+                                            {
+                                                // If in current, sometimes announce without sector number.
+                                                audioPlayer.playMessage(new QueuedMessage(folderYellowFlag, 0, this));
+                                            }
+                                            else
+                                            {
+                                                audioPlayer.playMessageImmediately(new QueuedMessage(folderYellowFlagSectors[i], 0, null));
+                                            }
                                         }
                                     }
                                     else if (sectorFlag == FlagEnum.GREEN)
@@ -307,19 +317,27 @@ namespace CrewChiefV4.Events
         {
             if (base.isMessageStillValid(eventSubType, currentGameState, validationData))
             {
-                if (!currentGameState.PitData.InPitlane && currentGameState.SessionData.SessionPhase != SessionPhase.FullCourseYellow)
+                for (int i = 0; i < 3; ++i)
                 {
-                    for (int i = 0; i < 3; ++i)
+                    // If i'th sector has Clear message pending
+                    if (eventSubType == folderGreenFlagSectors[i])
                     {
-                        if (eventSubType == folderGreenFlagSectors[i] && // If i'th sector has Clear message pending
-                            (currentGameState.FlagData.sectorFlags[i] != FlagEnum.GREEN ||  // But flag is no longer Green
-                            currentGameState.SessionData.SectorNumber != i + 1)) // Or we left the sector
-                            return false; // Drop this message
-                    }
+                        // If in pits or FCY, drop this message.
+                        if (currentGameState.PitData.InPitlane || currentGameState.SessionData.SessionPhase == SessionPhase.FullCourseYellow)
+                        {
+                            return false;
+                        }
 
-                    // Still valid
-                    return true;
+                        if (currentGameState.FlagData.sectorFlags[i] != FlagEnum.GREEN ||  //ut flag is no longer Green
+                            currentGameState.SessionData.SectorNumber != i + 1) // Or we left the sector
+                        {
+                            return false;
+                        }
+                    }
                 }
+
+                // Still valid
+                return true;
             }
 
             return false;
