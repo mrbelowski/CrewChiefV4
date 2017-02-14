@@ -791,8 +791,8 @@ namespace CrewChiefV4.rFactor2
                 csd.SessionHasFixedTime ? (int)(csd.SessionTotalRunTime / 60 / (rf2state.mScheduledStops + 1)) * (player.mNumPitstops + 1) + 1 :
                 (int)(csd.SessionNumberOfLaps / (rf2state.mScheduledStops + 1)) * (player.mNumPitstops + 1) + 1;
 
-            // TODO: mInGarageStall is true even though mInPits isn't.
-            cgs.PitData.InPitlane = player.mInPits == 1;
+            // mInGarageStall also means retired or before race start, but for now use it here.
+            cgs.PitData.InPitlane = player.mInPits == 1 || player.mInGarageStall == 1;
             cgs.PitData.IsAtPitExit = pgs != null && pgs.PitData.InPitlane && !cgs.PitData.InPitlane;
             cgs.PitData.OnOutLap = cgs.PitData.InPitlane && csd.SectorNumber == 1;
 
@@ -871,13 +871,7 @@ namespace CrewChiefV4.rFactor2
                         cgs.FlagData.sectorFlags[i] = FlagEnum.YELLOW;
                 }
             }
-            // TODO: remove
-            else if (cgs.FlagData.isFullCourseYellow)
-            {
-                for (int i = 0; i < 3; ++i)
-                    cgs.FlagData.sectorFlags[i] = FlagEnum.GREEN;
-            }
-
+            
             var currFlag = FlagEnum.UNKNOWN;
             if (csd.IsDisqualified
                 && pgs != null
