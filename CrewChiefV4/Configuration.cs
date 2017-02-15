@@ -120,22 +120,21 @@ namespace CrewChiefV4
                     file.Close();
                 }
             }
-            Boolean gotUserOverride = false;
+            StreamReader overridesFile = null;
             try
             {
-                file = new StreamReader(getUserOverridesFileLocation(SPEECH_RECOGNITION_CONFIG_FILENAME));
-                gotUserOverride = true;
-                merge(file, dict);
+                overridesFile = new StreamReader(getUserOverridesFileLocation(SPEECH_RECOGNITION_CONFIG_FILENAME));
+                merge(overridesFile, dict);
             }
-            catch (Exception e)
+            catch (Exception)
             {
 
             }
             finally
             {
-                if (gotUserOverride)
+                if (overridesFile != null)
                 {
-                    file.Close();
+                    overridesFile.Close();
                 }
             }
             return dict;
@@ -160,22 +159,21 @@ namespace CrewChiefV4
                     file.Close();
                 }
             }
-            Boolean gotUserOverride = false;
+            StreamReader overridesFile = null;
             try
             {
-                file = new StreamReader(getUserOverridesFileLocation(SOUNDS_CONFIG_FILENAME));
-                gotUserOverride = true;
-                merge(file, dict);
+                overridesFile = new StreamReader(getUserOverridesFileLocation(SOUNDS_CONFIG_FILENAME));
+                merge(overridesFile, dict);
             }
-            catch (Exception e)
+            catch (Exception)
             {
 
             }
             finally
             {
-                if (gotUserOverride)
+                if (overridesFile != null)
                 {
-                    file.Close();
+                    overridesFile.Close();
                 }
             }
             return dict;
@@ -200,22 +198,21 @@ namespace CrewChiefV4
                     file.Close();
                 }
             }
-            Boolean gotUserOverride = false;
+            StreamReader overridesFile = null;
             try
             {
-                file = new StreamReader(getUserOverridesFileLocation(UI_TEXT_FILENAME));
-                gotUserOverride = true;
-                merge(file, dict);
+                overridesFile = new StreamReader(getUserOverridesFileLocation(UI_TEXT_FILENAME));
+                merge(overridesFile, dict);
             }
-            catch (Exception e)
+            catch (Exception)
             {
 
             }
             finally
             {
-                if (gotUserOverride && file != null)
+                if (overridesFile != null)
                 {
-                    file.Close();
+                    overridesFile.Close();
                 }
             }
             return dict;
