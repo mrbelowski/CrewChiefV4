@@ -394,16 +394,22 @@ namespace CrewChiefV4.Events
                                 pearlType = PearlsOfWisdom.PearlType.NEUTRAL;
                             }
                         }
-                        DelayedMessageEvent delayedMessageEvent = new DelayedMessageEvent("getDelayedPositionMessages", new Object[] { 
+                        // read the position message. This is may be part of a long message queue so it can be a few seconds before it triggers.
+                        // Because of this, we use a delayed message event - when the message reaches the top of the queue it uses the latest 
+                        // position, rather than the position when it was inserted into the queue.
+
+                        // For RF2 use a non-zero delay here because the position data isn't always updated in a timely fashion at the start of a new lap.
+                        int delaySeconds = CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT ? 3 : 0;
+                        DelayedMessageEvent delayedMessageEvent = new DelayedMessageEvent("getPositionMessages", new Object[] { 
                             currentPosition }, this);
-                        audioPlayer.playMessage(new QueuedMessage("position", delayedMessageEvent, 3, null), pearlType, pearlLikelihood);
+                        audioPlayer.playMessage(new QueuedMessage("position", delayedMessageEvent, delaySeconds, null), pearlType, pearlLikelihood);                       
                         lapNumberAtLastMessage = currentGameState.SessionData.CompletedLaps;
                     }
                 }
             }
         }
 
-        public List<MessageFragment> getDelayedPositionMessages(int positionWhenQueued)
+        public List<MessageFragment> getPositionMessages(int positionWhenQueued)
         {
             // the position might have changed between queueing this messasge and processing it, so update the
             // previousPosition here. We should probably do the same with the lapNumberAtLastMessage, but this won't
