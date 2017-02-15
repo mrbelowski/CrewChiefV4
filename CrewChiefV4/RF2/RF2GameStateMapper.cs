@@ -296,7 +296,7 @@ namespace CrewChiefV4.rFactor2
             if (csd.IsNewSector && !csd.IsNewSession)
             {
                 // there's a slight delay due to scoring updating every 200 ms, so we can't use SessionRunningTime here
-                // TODO: Revisit, we might get higher precision by using mElapsedTime, which is refreshed every 32ms.
+                // TODO: validate if time changes a bit after IsNewSector.
                 switch (csd.SectorNumber)
                 {
                     case 1:
