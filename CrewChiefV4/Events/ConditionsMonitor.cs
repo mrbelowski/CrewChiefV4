@@ -13,7 +13,17 @@ namespace CrewChiefV4.Events
         public override List<SessionPhase> applicableSessionPhases
         {
             get { return new List<SessionPhase> { SessionPhase.Green, SessionPhase.Checkered, SessionPhase.FullCourseYellow }; }
+        }
 
+        private static float drizzleMin = 0.02f;
+        private static float drizzleMax = 0.1f;
+        private static float lightRainMax = 0.25f;
+        private static float midRainMax = 0.5f;
+        private static float heavyRainMax = 0.75f;
+
+        private enum RainLevel
+        {
+            NONE, LIGHT, DRIZZLE, MID, HEAVY, STORM
         }
 
         private Boolean enableTrackAndAirTempReports = UserSettings.GetUserSettings().getBoolean("enable_track_and_air_temp_reports");
@@ -48,7 +58,22 @@ namespace CrewChiefV4.Events
         public static String folderTrackTempDecreasing = "conditions/track_temp_decreasing_its_now";
         public static String folderCelsius = "conditions/celsius";
         public static String folderFahrenheit = "conditions/fahrenheit";
+
+        // this is for PCars, where the 'rain' flag is boolean
         public static String folderSeeingSomeRain = "conditions/seeing_some_rain";
+        
+        // these are for RF2 where the rain varies from 0 (dry), 0.5 (rain) to 1.0 (storm).
+        public static String folderDrizzleIncreasing = "conditions/drizzle_increasing";
+        public static String folderRainLightIncreasing = "conditions/light_rain_increasing";
+        public static String folderRainMidIncreasing = "conditions/mid_rain_increasing";
+        public static String folderRainHeavyIncreasing = "conditions/heavy_rain_increasing";
+        public static String folderRainMax = "conditions/maximum_rain"; // "completely pissing it down"
+        public static String folderRainHeavyDecreasing = "conditions/heavy_rain_decreasing";
+        public static String folderRainMidDecreasing = "conditions/mid_rain_decreasing";
+        public static String folderRainLightDecreasing = "conditions/light_rain_decreasing";
+        public static String folderDrizzleDecreasing = "conditions/drizzle_decreasing";
+
+        // this is used for RF2 and PCars
         public static String folderStoppedRaining = "conditions/stopped_raining";
 
         private static Boolean useFahrenheit = UserSettings.GetUserSettings().getBoolean("use_fahrenheit");
@@ -159,21 +184,86 @@ namespace CrewChiefV4.Events
                     }
                     if (currentGameState.Now > lastRainReport.Add(RainReportMaxFrequency))
                     {
-                        // TODO: the implementation is coupled to the PCars mRainDensity value, which is 0 or 1
-                        if (currentConditions.RainDensity == 0 && rainAtLastReport == 1)
+                        // for PCars mRainDensity value is 0 or 1
+                        if (CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_32BIT ||
+                            CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_64BIT ||
+                            CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_NETWORK)
                         {
-                            rainAtLastReport = currentConditions.RainDensity;
-                            lastRainReport = currentGameState.Now;
-                            audioPlayer.playMessage(new QueuedMessage(folderStoppedRaining, 0, this));
+                            if (currentConditions.RainDensity == 0 && rainAtLastReport == 1)
+                            {
+                                rainAtLastReport = currentConditions.RainDensity;
+                                lastRainReport = currentGameState.Now;
+                                audioPlayer.playMessage(new QueuedMessage(folderStoppedRaining, 0, this));
+                            }
+                            else if (currentConditions.RainDensity == 1 && rainAtLastReport == 0)
+                            {
+                                rainAtLastReport = currentConditions.RainDensity;
+                                lastRainReport = currentGameState.Now;
+                                audioPlayer.playMessage(new QueuedMessage(folderSeeingSomeRain, 0, this));
+                            }
                         }
-                        else if (currentConditions.RainDensity == 1 && rainAtLastReport == 0)
+                        else if (CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT)
                         {
-                            rainAtLastReport = currentConditions.RainDensity;
-                            lastRainReport = currentGameState.Now;
-                            audioPlayer.playMessage(new QueuedMessage(folderSeeingSomeRain, 0, this));
+                            RainLevel currentRainLevel = getRainLevel(currentConditions.RainDensity);
+                            RainLevel lastReportedRainLevel = getRainLevel(rainAtLastReport);                            
+                            if (currentRainLevel != lastReportedRainLevel)
+                            {
+                                Boolean increasing = currentConditions.RainDensity > rainAtLastReport;
+                                switch (currentRainLevel)
+                                {
+                                    case RainLevel.DRIZZLE:
+                                        audioPlayer.playMessage(new QueuedMessage(folderDrizzleIncreasing, 0, this));
+                                        break;
+                                    case RainLevel.LIGHT:
+                                        audioPlayer.playMessage(new QueuedMessage(increasing ? folderRainLightIncreasing : folderRainLightDecreasing, 0, this));
+                                        break;
+                                    case RainLevel.MID:
+                                        audioPlayer.playMessage(new QueuedMessage(increasing ? folderRainMidIncreasing : folderRainMidDecreasing, 0, this));
+                                        break;
+                                    case RainLevel.HEAVY:
+                                        audioPlayer.playMessage(new QueuedMessage(increasing ? folderRainHeavyIncreasing : folderRainHeavyDecreasing, 0, this));
+                                        break;
+                                    case RainLevel.STORM:
+                                        audioPlayer.playMessage(new QueuedMessage(folderRainMax, 0, this));
+                                        break;
+                                    case RainLevel.NONE:
+                                        audioPlayer.playMessage(new QueuedMessage(folderStoppedRaining, 0, this));
+                                        break;
+                                }
+                                lastRainReport = currentGameState.Now;
+                                rainAtLastReport = currentConditions.RainDensity;
+                            }
                         }
                     }
                 }
+            }
+        }
+
+        private RainLevel getRainLevel(float amount)
+        {
+            if (amount > drizzleMin && amount <= drizzleMax)
+            {
+                return RainLevel.DRIZZLE;
+            }
+            else if (amount > drizzleMax && amount <= lightRainMax)
+            {
+                return RainLevel.LIGHT;
+            }
+            else if (amount > lightRainMax && amount <= midRainMax)
+            {
+                return RainLevel.MID;
+            }
+            else if (amount > midRainMax && amount <= heavyRainMax)
+            {
+                return RainLevel.HEAVY;
+            }
+            else if (amount > heavyRainMax)
+            {
+                return RainLevel.STORM;
+            }
+            else
+            {
+                return RainLevel.NONE;
             }
         }
 
