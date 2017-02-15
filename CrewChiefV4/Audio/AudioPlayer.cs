@@ -656,6 +656,10 @@ namespace CrewChiefV4.Audio
                             lastMessagePlayed = thisMessage;
                             if (!mute)
                             {
+                                if (thisMessage.delayMessageResolution)
+                                {
+                                    thisMessage.resolveDelayedContents();
+                                }
                                 soundCache.Play(thisMessage.messageFolders);
                                 timeOfLastMessageEnd = DateTime.Now;
                             }
