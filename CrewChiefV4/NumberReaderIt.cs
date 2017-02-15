@@ -215,6 +215,14 @@ namespace CrewChiefV4.NumberProcessing
         }
 
         /**
+         * Not implemented for Italian number reader.
+         * */
+        protected override List<String> GetMinutesAndSecondsWithTenths(int minutes, int seconds, int tenths)
+        {
+            return null;
+        }
+
+        /**
          * Get an Italian sound for an Integer from 0 to 99999.
          */
         protected override List<String> GetIntegerSounds(char[] digits)

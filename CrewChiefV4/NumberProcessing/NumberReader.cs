@@ -45,6 +45,13 @@ namespace CrewChiefV4
          */
         protected abstract String GetSecondsWithTenths(int seconds, int tenths);
 
+        /**
+         * Separate recordings for when we just want a number of seconds with tenths with 1 or 2 minutes. 
+         * This is (currently) only applicable to English numbers.
+         *
+         */
+        protected abstract List<String> GetMinutesAndSecondsWithTenths(int minutes, int seconds, int tenths);
+
         protected abstract String getLocale();
 
         protected Random random = new Random();
@@ -67,21 +74,28 @@ namespace CrewChiefV4
                 int tenths = (int)Math.Round((float)timeSpan.Milliseconds / 100f);
 
                 // now call the language-specific implementations
-                messageFolders.AddRange(GetHoursSounds(timeSpan.Hours, timeSpan.Minutes, timeSpan.Seconds, tenths));
-                messageFolders.AddRange(GetMinutesSounds(timeSpan.Hours, timeSpan.Minutes, timeSpan.Seconds, tenths));
+                Boolean useNewENMinutes = getLocale() == "en" && timeSpan.Hours == 0 && 
+                    (timeSpan.Minutes == 1 || timeSpan.Minutes == 2) && timeSpan.Seconds >= 1 && timeSpan.Seconds <= 59;
+                Boolean useNewENSeconds = getLocale() == "en" && timeSpan.Hours == 0 &&
+                    ((timeSpan.Minutes == 0 && (timeSpan.Seconds >= 1 || tenths > 0) && timeSpan.Seconds <= 59) ||
+                    (timeSpan.Seconds >= 10 && timeSpan.Seconds <= 59 && random.NextDouble() > 0.5));
 
-                // special case for English here
-                if (getLocale() == "en" && 
-                    ((timeSpan.Minutes == 0 && timeSpan.Seconds >= 1 && timeSpan.Seconds <= 59) ||
-                    (timeSpan.Seconds >= 10 && timeSpan.Seconds <= 59 && random.NextDouble() > 0.5)))
+                if (useNewENSeconds)
                 {
                     messageFolders.Add(GetSecondsWithTenths(timeSpan.Seconds, tenths));
                 }
+                else if (useNewENMinutes)
+                {
+                    messageFolders.AddRange(GetMinutesAndSecondsWithTenths(timeSpan.Minutes, timeSpan.Seconds, tenths));
+                }
                 else
                 {
+                    messageFolders.AddRange(GetHoursSounds(timeSpan.Hours, timeSpan.Minutes, timeSpan.Seconds, tenths));
+                    messageFolders.AddRange(GetMinutesSounds(timeSpan.Hours, timeSpan.Minutes, timeSpan.Seconds, tenths));
                     messageFolders.AddRange(GetSecondsSounds(timeSpan.Hours, timeSpan.Minutes, timeSpan.Seconds, tenths));
                     messageFolders.AddRange(GetTenthsSounds(timeSpan.Hours, timeSpan.Minutes, timeSpan.Seconds, tenths, useMoreInflection));
                 }
+
                 /*if (messageFolders.Count > 0)
                 {
                     Console.WriteLine(String.Join(", ", messageFolders));
