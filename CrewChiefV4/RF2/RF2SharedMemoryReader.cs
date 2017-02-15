@@ -29,10 +29,10 @@ namespace CrewChiefV4.rFactor2
         private int dataReadFromFileIndex = 0;
         private string lastReadFileName = null;
 
-        internal class RF2StructWrapper
+        public class RF2StructWrapper
         {
-            internal long ticksWhenRead;
-            internal rF2State state;
+            public long ticksWhenRead;
+            public rF2State state;
         }
 
         public override void DumpRawGameData()
