@@ -615,15 +615,15 @@ namespace CrewChiefV4.RaceRoom
             // Driver Info
             //////////////////////////////////////////////////////////////////////////
 
-            /* for internal test build, probably will hold yellow flag data and driver standards warnings
-            public Int32 UnknownInt1;
+            // for internal test build, probably will hold yellow flag data and driver standards warnings
+            /*public Int32 UnknownInt1;
             public Int32 UnknownInt2;
             public Int32 UnknownInt3;
             public Int32 UnknownInt4;
             public Int32 UnknownInt5;
             public Int32 UnknownInt6;
-            public Single UnknownFloat1;
-              */
+            public Single UnknownFloat1;*/
+            
 
             // Number of cars (including the player) in the race
             public Int32 NumCars;

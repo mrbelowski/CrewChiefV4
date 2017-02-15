@@ -41,6 +41,8 @@ namespace CrewChiefV4.Events
 
         private int previousPosition;
 
+        private SessionType sessionType;
+
         private int lapNumberAtLastMessage;
 
         private Random rand = new Random();
@@ -115,6 +117,8 @@ namespace CrewChiefV4.Events
 
         public override void clearState()
         {
+            currentPosition = 0;
+            sessionType = SessionType.Unavailable;
             previousPosition = 0;
             lapNumberAtLastMessage = 0;
             numberOfLapsInLastPlace = 0;
@@ -302,6 +306,7 @@ namespace CrewChiefV4.Events
             }
             checkCompletedOvertake(currentGameState);
             currentPosition = currentGameState.SessionData.Position;
+            sessionType = currentGameState.SessionData.SessionType;
             isLast = currentGameState.isLast();
             if (previousPosition == 0)
             {
@@ -363,8 +368,6 @@ namespace CrewChiefV4.Events
                     if (currentGameState.SessionData.CompletedLaps > lapNumberAtLastMessage + 3
                             || previousPosition != currentGameState.SessionData.Position)
                     {
-                        Dictionary<String, Object> validationData = new Dictionary<String, Object>();
-                        validationData.Add(positionValidationKey, currentGameState.SessionData.Position);
                         PearlsOfWisdom.PearlType pearlType = PearlsOfWisdom.PearlType.NONE;
                         float pearlLikelihood = 0.2f;
                         if (currentGameState.SessionData.SessionType == SessionType.Race)
@@ -391,55 +394,49 @@ namespace CrewChiefV4.Events
                                 pearlType = PearlsOfWisdom.PearlType.NEUTRAL;
                             }
                         }
-                        if (currentGameState.SessionData.Position == 1)
-                        {
-                            if (currentGameState.SessionData.SessionType == SessionType.Race)
-                            {
-                                audioPlayer.playMessage(new QueuedMessage(folderLeading, 0, this, validationData), pearlType, pearlLikelihood);
-                            }
-                            else if (currentGameState.SessionData.SessionType == SessionType.Practice)
-                            {
-                                if (SoundCache.availableSounds.Contains(folderDriverPositionIntro))
-                                {
-                                    audioPlayer.playMessage(new QueuedMessage("position", MessageContents(folderDriverPositionIntro, folderStub + 1), 0,
-                                        this, validationData), pearlType, pearlLikelihood);
-                                }
-                                else
-                                {
-                                    audioPlayer.playMessage(new QueuedMessage(folderStub + 1, 0, this, validationData), pearlType, pearlLikelihood);
-                                }
-                            }
-                            // no p1 for pole - this is in the laptime tracker (yuk)
-                        }
-                        else if (!isLast)
-                        {
-                            if (SoundCache.availableSounds.Contains(folderDriverPositionIntro))
-                            {
-                                audioPlayer.playMessage(new QueuedMessage("position", MessageContents(folderDriverPositionIntro, folderStub + currentGameState.SessionData.Position),
-                                    0, this), pearlType, pearlLikelihood);
-                            }
-                            else
-                            {
-                                audioPlayer.playMessage(new QueuedMessage(folderStub + currentGameState.SessionData.Position, 0, this), pearlType, pearlLikelihood);
-                            }
-                        }
-                        else if (isLast)
-                        {
-                            if (numberOfLapsInLastPlace > 3)
-                            {
-                                audioPlayer.suspendPearlsOfWisdom();
-                                audioPlayer.playMessage(new QueuedMessage(folderConsistentlyLast, 0, this, validationData));
-                            }
-                            else
-                            {
-                                audioPlayer.suspendPearlsOfWisdom();
-                                audioPlayer.playMessage(new QueuedMessage(folderLast, 0, this, validationData));
-                            }
-                        }
-                        previousPosition = currentGameState.SessionData.Position;
+                        DelayedMessageEvent delayedMessageEvent = new DelayedMessageEvent("getDelayedPositionMessages", new Object[] { 
+                            currentPosition }, this);
+                        audioPlayer.playMessage(new QueuedMessage("position", delayedMessageEvent, 3, null), pearlType, pearlLikelihood);                       
                         lapNumberAtLastMessage = currentGameState.SessionData.CompletedLaps;
                     }
                 }
+            }
+        }
+
+        public List<MessageFragment> getDelayedPositionMessages(int positionWhenQueued)
+        {
+            // the position might have changed between queueing this messasge and processing it, so update the
+            // previousPosition here. We should probably do the same with the lapNumberAtLastMessage, but this won't
+            // change quickly enough for it to be a problem
+            previousPosition = currentPosition;
+            // if the position has changed since we queued this message, prevent the pearls playing as they may be out of date
+            // We also don't berate the player for being crap in message *and* any associated pearl                
+            if (isLast || positionWhenQueued != this.currentPosition)
+            {
+                audioPlayer.suspendPearlsOfWisdom();
+            }
+            if (this.currentPosition == 1 && this.sessionType == SessionType.Race)
+            {
+                return MessageContents(folderLeading);
+            }
+            else if (this.isLast)
+            {
+                if (this.numberOfLapsInLastPlace > 3)
+                {
+                    return MessageContents(folderConsistentlyLast);
+                }
+                else
+                {
+                    return MessageContents(folderLast);
+                }
+            }
+            else if (SoundCache.availableSounds.Contains(folderDriverPositionIntro))
+            {
+                return MessageContents(folderDriverPositionIntro, folderStub + this.currentPosition);
+            }
+            else
+            {
+                return MessageContents(folderStub + this.currentPosition);
             }
         }
 

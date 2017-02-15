@@ -134,7 +134,7 @@ namespace CrewChiefV4.Events
                 o.GetType() == typeof(short) || o.GetType() == typeof(long) || o.GetType() == typeof(decimal) || o.GetType() == typeof(uint))
             {
                 messageFragments.Add(MessageFragment.Integer(Convert.ToInt32(o)));
-            } 
+            }
         }
 
         public virtual List<SessionType> applicableSessionTypes 
@@ -199,18 +199,18 @@ namespace CrewChiefV4.Events
                 Boolean foundMatch = false;
                 foreach (MessageFragment m2Fragment in messages2)
                 {
-                    if (m1Fragment.type == MessageFragment.FragmentType.Text && m2Fragment.type == MessageFragment.FragmentType.Text && m1Fragment.text.Equals(m2Fragment.text))
+                    if (m1Fragment.type == FragmentType.Text && m2Fragment.type == FragmentType.Text && m1Fragment.text.Equals(m2Fragment.text))
                     {
                         foundMatch = true;
                         break;
                     }
-                    else if (m1Fragment.type == MessageFragment.FragmentType.Time && m2Fragment.type == MessageFragment.FragmentType.Time &&
+                    else if (m1Fragment.type == FragmentType.Time && m2Fragment.type == FragmentType.Time &&
                         m1Fragment.timeSpan.Equals(m2Fragment.timeSpan))
                     {
                         foundMatch = true;
                         break;
                     }
-                    else if (m1Fragment.type == MessageFragment.FragmentType.Opponent && m2Fragment.type == MessageFragment.FragmentType.Opponent &&
+                    else if (m1Fragment.type == FragmentType.Opponent && m2Fragment.type == FragmentType.Opponent &&
                         ((m1Fragment.opponent == null && m2Fragment.opponent == null) ||
                             (m1Fragment.opponent != null && m2Fragment.opponent != null && m1Fragment.opponent.DriverRawName.Equals(m2Fragment.opponent.DriverRawName))))
                     {
