@@ -89,6 +89,11 @@ namespace CrewChiefV4.Events
         {
             //audioPlayer.playMessage(new QueuedMessage("sectortest1", LapTimes.getSectorDeltaMessages(LapTimes.SectorReportOption.ALL, 20.5f, 20, 33, 34.1f, 10, 10.1f, true), 0, this));
 
+            /*for (int i = 0; i < 20; i++)
+            {
+                audioPlayer.playMessage(new QueuedMessage("timingtest" +i, MessageContents(TimeSpan.FromSeconds(random.Next(300) + ((float)random.Next(9) / 10f))), 0, this));
+            }*/
+
             audioPlayer.playMessage(new QueuedMessage(folderTest, 0, this));
             
             /*audioPlayer.playMessage(new QueuedMessage("gap_in_front",
