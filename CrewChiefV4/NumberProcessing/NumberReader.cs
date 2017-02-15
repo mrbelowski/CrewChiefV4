@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CrewChiefV4.Audio;
+using System;
 using System.Collections.Generic;
 namespace CrewChiefV4
 {
@@ -74,9 +75,9 @@ namespace CrewChiefV4
                 int tenths = (int)Math.Round((float)timeSpan.Milliseconds / 100f);
 
                 // now call the language-specific implementations
-                Boolean useNewENMinutes = getLocale() == "en" && timeSpan.Hours == 0 && 
+                Boolean useNewENMinutes = AudioPlayer.soundPackVersion > 106 && getLocale() == "en" && timeSpan.Hours == 0 && 
                     (timeSpan.Minutes == 1 || timeSpan.Minutes == 2) && timeSpan.Seconds >= 1 && timeSpan.Seconds <= 59;
-                Boolean useNewENSeconds = getLocale() == "en" && timeSpan.Hours == 0 &&
+                Boolean useNewENSeconds = AudioPlayer.soundPackVersion > 106 && getLocale() == "en" && timeSpan.Hours == 0 &&
                     ((timeSpan.Minutes == 0 && (timeSpan.Seconds >= 1 || tenths > 0) && timeSpan.Seconds <= 59) ||
                     (timeSpan.Seconds >= 10 && timeSpan.Seconds <= 59 && random.NextDouble() > 0.5));
 
