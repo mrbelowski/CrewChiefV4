@@ -396,7 +396,7 @@ namespace CrewChiefV4.Events
                         }
                         DelayedMessageEvent delayedMessageEvent = new DelayedMessageEvent("getDelayedPositionMessages", new Object[] { 
                             currentPosition }, this);
-                        audioPlayer.playMessage(new QueuedMessage("position", delayedMessageEvent, 3, null), pearlType, pearlLikelihood);                       
+                        audioPlayer.playMessage(new QueuedMessage("position", delayedMessageEvent, 3, null), pearlType, pearlLikelihood);
                         lapNumberAtLastMessage = currentGameState.SessionData.CompletedLaps;
                     }
                 }
@@ -410,7 +410,7 @@ namespace CrewChiefV4.Events
             // change quickly enough for it to be a problem
             previousPosition = currentPosition;
             // if the position has changed since we queued this message, prevent the pearls playing as they may be out of date
-            // We also don't berate the player for being crap in message *and* any associated pearl                
+            // We also don't berate the player for being crap in message *and* any associated pearl
             if (isLast || positionWhenQueued != this.currentPosition)
             {
                 audioPlayer.suspendPearlsOfWisdom();
@@ -446,7 +446,7 @@ namespace CrewChiefV4.Events
             {
                 if (isLast)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderLast, 0, this));                    
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderLast, 0, this));
                 }
                 else if (currentPosition == 1)
                 {
