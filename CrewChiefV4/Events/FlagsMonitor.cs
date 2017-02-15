@@ -328,8 +328,8 @@ namespace CrewChiefV4.Events
                             return false;
                         }
 
-                        if (currentGameState.FlagData.sectorFlags[i] != FlagEnum.GREEN ||  //ut flag is no longer Green
-                            currentGameState.SessionData.SectorNumber != i + 1) // Or we left the sector
+                        if (currentGameState.FlagData.sectorFlags[i] != FlagEnum.GREEN ||  // If flag is no longer Green
+                            (!isCurrentSector(currentGameState, i) && !isNextSector(currentGameState, i)))  // Or sector is nor current nor next
                         {
                             return false;
                         }
