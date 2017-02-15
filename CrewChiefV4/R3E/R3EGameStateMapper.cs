@@ -21,8 +21,9 @@ namespace CrewChiefV4.RaceRoom
         private List<CornerData.EnumWithThresholds> brakeDamageThresholds = new List<CornerData.EnumWithThresholds>();
 
         // recent r3e changes to tyre wear levels / rates - the data in the block appear to 
-        // have changed recently, with about 0.6 representing 'worn out'.
-        private float wornOutTyreWearLevel = 0.05f;
+        // have changed recently, with about 0.94 representing 'worn out' - these start at (or close to) 1
+        // and drop, so 0.06 worth of wear means "worn out". 
+        private float wornOutTyreWearLevel = 0.94f;
 
         private float scrubbedTyreWearPercent = 2f;
         private float minorTyreWearPercent = 10f;
@@ -131,7 +132,6 @@ namespace CrewChiefV4.RaceRoom
             }
 
             Boolean isCarRunning = CheckIsCarRunning(shared);
-
             SessionPhase lastSessionPhase = SessionPhase.Unavailable;
             float lastSessionRunningTime = 0;
             if (previousGameState != null)
@@ -1242,7 +1242,7 @@ namespace CrewChiefV4.RaceRoom
             {
                 return -1;
             }
-            return Math.Min(100, ((1 - wearLevel) / wornOutTyreWearLevel) * 100);
+            return Math.Min(100, 100 * (wearLevel - wornOutTyreWearLevel) / (1 - wornOutTyreWearLevel));
         }
 
         private Boolean CheckIsCarRunning(RaceRoomData.RaceRoomShared shared)
