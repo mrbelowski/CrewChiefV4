@@ -529,7 +529,8 @@ namespace CrewChiefV4.rFactor2
             if (cgs.Conditions.timeOfMostRecentSample.Add(ConditionsMonitor.ConditionsSampleFrequency) < cgs.Now)
             {
                 cgs.Conditions.addSample(cgs.Now, csd.CompletedLaps, csd.SectorNumber,
-                    (float)rf2state.mAmbientTemp, (float)rf2state.mTrackTemp, 0, (float)Math.Sqrt((double)(rf2state.mWind.x * rf2state.mWind.x + rf2state.mWind.y * rf2state.mWind.y + rf2state.mWind.z * rf2state.mWind.z)), 0, 0, 0);
+                    (float)rf2state.mAmbientTemp, (float)rf2state.mTrackTemp, (float)rf2state.mRaining, 
+                    (float)Math.Sqrt((double)(rf2state.mWind.x * rf2state.mWind.x + rf2state.mWind.y * rf2state.mWind.y + rf2state.mWind.z * rf2state.mWind.z)), 0, 0, 0);
             }
 
             // --------------------------------
