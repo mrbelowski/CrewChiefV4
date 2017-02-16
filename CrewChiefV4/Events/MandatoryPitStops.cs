@@ -46,6 +46,9 @@ namespace CrewChiefV4.Events
 
         private String folderMandatoryPitStopsPitNow = "mandatory_pit_stops/pit_now";
 
+        private String folderEngageLimiter = "mandatory_pit_stops/engage_limiter";
+        private String folderDisengageLimiter = "mandatory_pit_stops/disengage_limiter";
+
         // for voice responses
         public static String folderMandatoryPitStopsYesStopOnLap = "mandatory_pit_stops/yes_stop_on_lap";
         public static String folderMandatoryPitStopsYesStopAfter = "mandatory_pit_stops/yes_stop_after";
@@ -95,6 +98,10 @@ namespace CrewChiefV4.Events
         private float maxDistanceOnCurrentTyre;
 
         private Random random = new Random();
+
+        private DateTime timeOfLastLimiterWarning = DateTime.MinValue;
+
+        private DateTime timeOfDisengageCheck = DateTime.MaxValue;
         
         public MandatoryPitStops(AudioPlayer audioPlayer)
         {
@@ -108,6 +115,8 @@ namespace CrewChiefV4.Events
 
         public override void clearState()
         {
+            timeOfLastLimiterWarning = DateTime.MinValue;
+            timeOfDisengageCheck = DateTime.MaxValue;
             pitWindowOpenLap = 0;
             pitWindowClosedLap = 0;
             pitWindowOpenTime = 0;
@@ -132,7 +141,34 @@ namespace CrewChiefV4.Events
         }
 
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
-        {
+        {            
+            if (currentGameState.PitData.limiterStatus != -1 && DateTime.Now > timeOfLastLimiterWarning + TimeSpan.FromSeconds(30))
+            {
+                if (currentGameState.SessionData.SectorNumber == 1 && 
+                    DateTime.Now > timeOfDisengageCheck && !currentGameState.PitData.InPitlane && currentGameState.PitData.limiterStatus == 1)
+                {
+                    // in S1 but have exited pits, and we're expecting the limit to have been turned off
+                    timeOfDisengageCheck = DateTime.MaxValue;
+                    timeOfLastLimiterWarning = DateTime.Now;
+                    audioPlayer.playMessage(new QueuedMessage(folderDisengageLimiter, 0, this));
+                }
+                else if (previousGameState != null)
+                {
+                    if (currentGameState.SessionData.SectorNumber == 3 &&
+                        !previousGameState.PitData.InPitlane && currentGameState.PitData.InPitlane && currentGameState.PitData.limiterStatus == 0)
+                    {
+                        // just entered the pit lane with no limiter active
+                        audioPlayer.playMessage(new QueuedMessage(folderEngageLimiter, 0, this));
+                        timeOfLastLimiterWarning = DateTime.Now;
+                    }
+                    else if (currentGameState.SessionData.SectorNumber == 1 &&
+                        previousGameState.PitData.InPitlane && !currentGameState.PitData.InPitlane && currentGameState.PitData.limiterStatus == 1)
+                    {
+                        // just left the pitlane with the limiter active - wait 2 seconds then warn
+                        timeOfDisengageCheck = DateTime.Now + TimeSpan.FromSeconds(2);
+                    }
+                }
+            }
             if (currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.PitData.HasMandatoryPitStop &&
                 (currentGameState.SessionData.SessionPhase == SessionPhase.Green || currentGameState.SessionData.SessionPhase == SessionPhase.FullCourseYellow))
             {                
