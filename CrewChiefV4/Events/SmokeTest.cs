@@ -89,10 +89,20 @@ namespace CrewChiefV4.Events
         {
             //audioPlayer.playMessage(new QueuedMessage("sectortest1", LapTimes.getSectorDeltaMessages(LapTimes.SectorReportOption.ALL, 20.5f, 20, 33, 34.1f, 10, 10.1f, true), 0, this));
 
-            /*for (int i = 0; i < 20; i++)
+            /*for (int i = 0; i < 5; i++)
             {
                 audioPlayer.playMessage(new QueuedMessage("timingtest" +i, MessageContents(TimeSpan.FromSeconds(random.Next(300) + ((float)random.Next(9) / 10f))), 0, this));
-            }*/
+            }
+            */
+            /*audioPlayer.playMessage(new QueuedMessage(ConditionsMonitor.folderDrizzleIncreasing, 0, this));
+            audioPlayer.playMessage(new QueuedMessage(ConditionsMonitor.folderRainLightIncreasing, 0, this));
+            audioPlayer.playMessage(new QueuedMessage(ConditionsMonitor.folderRainMidIncreasing, 0, this));
+            audioPlayer.playMessage(new QueuedMessage(ConditionsMonitor.folderRainHeavyIncreasing, 0, this));
+            audioPlayer.playMessage(new QueuedMessage(ConditionsMonitor.folderRainMax, 0, this));
+            audioPlayer.playMessage(new QueuedMessage(ConditionsMonitor.folderRainHeavyDecreasing, 0, this));
+            audioPlayer.playMessage(new QueuedMessage(ConditionsMonitor.folderRainMidDecreasing, 0, this));
+            audioPlayer.playMessage(new QueuedMessage(ConditionsMonitor.folderRainLightDecreasing, 0, this));
+            audioPlayer.playMessage(new QueuedMessage(ConditionsMonitor.folderDrizzleDecreasing, 0, this));*/
 
             audioPlayer.playMessage(new QueuedMessage(folderTest, 0, this));
             
