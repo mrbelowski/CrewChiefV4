@@ -797,6 +797,12 @@ namespace CrewChiefV4.rFactor2
             cgs.PitData.IsAtPitExit = pgs != null && pgs.PitData.InPitlane && !cgs.PitData.InPitlane;
             cgs.PitData.OnOutLap = cgs.PitData.InPitlane && csd.SectorNumber == 1;
 
+            if (rf2state.mSpeedLimiterAvailable == 0) {
+                cgs.PitData.limiterStatus = -1;
+            } else {
+                cgs.PitData.limiterStatus = rf2state.mSpeedLimiter > 0 ? 1 : 0;
+            }
+
             if (pgs != null 
                 && csd.CompletedLaps == psd.CompletedLaps
                 && pgs.PitData.OnOutLap)
