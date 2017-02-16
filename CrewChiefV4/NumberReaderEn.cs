@@ -239,7 +239,7 @@ namespace CrewChiefV4.NumberProcessing
 					messages.Add(folderNumbersStub + minutes + paddedSeconds);					
 					if (tenths > 0)
                     {
-						messages.Add(folderPoint + tenths + "seconds");
+						messages.Add(folderPoint + tenths);
 					}
 				}
 			}
