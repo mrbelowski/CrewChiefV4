@@ -76,10 +76,9 @@ namespace CrewChiefV4
 
                 // now call the language-specific implementations
                 Boolean useNewENMinutes = AudioPlayer.soundPackVersion > 106 && getLocale() == "en" && timeSpan.Hours == 0 && 
-                    (timeSpan.Minutes == 1 || timeSpan.Minutes == 2) && timeSpan.Seconds >= 1 && timeSpan.Seconds <= 59;
-                Boolean useNewENSeconds = AudioPlayer.soundPackVersion > 106 && getLocale() == "en" && timeSpan.Hours == 0 &&
-                    ((timeSpan.Minutes == 0 && (timeSpan.Seconds >= 1 || tenths > 0) && timeSpan.Seconds <= 59) ||
-                    (timeSpan.Seconds >= 10 && timeSpan.Seconds <= 59 && random.NextDouble() > 0.5));
+                    timeSpan.Minutes > 0 && timeSpan.Minutes < 3 && timeSpan.Seconds > 0 && timeSpan.Seconds < 60;
+                Boolean useNewENSeconds = AudioPlayer.soundPackVersion > 106 && getLocale() == "en" && timeSpan.Hours == 0 && 
+                    timeSpan.Minutes == 0 && (timeSpan.Seconds > 0 || tenths > 0) && timeSpan.Seconds < 60;
 
                 if (useNewENSeconds)
                 {
