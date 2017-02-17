@@ -16,7 +16,9 @@ namespace CrewChiefV4.assetto
     {
         public static String playerName = null;
         public static Boolean versionChecked = false;
+        public static double lastCountDown = 10000.0;
 
+        
         private class AcTyres
         {
             public List<CornerData.EnumWithThresholds> tyreWearThresholdsForAC = new List<CornerData.EnumWithThresholds>();
@@ -898,10 +900,11 @@ namespace CrewChiefV4.assetto
             float gameSessionTimeLeft = 0.0f;
             if (!Double.IsInfinity(shared.acsGraphic.sessionTimeLeft))
             {
-                gameSessionTimeLeft = shared.acsGraphic.sessionTimeLeft / 1000f;
+                gameSessionTimeLeft = shared.acsGraphic.sessionTimeLeft / 1000f; 
             }
+            
             float sessionTimeRemaining = -1;
-            if (numberOfLapsInSession == 0)
+            if (numberOfLapsInSession == 0 || shared.acsStatic.isTimedRace == 1)
             {
                 currentGameState.SessionData.SessionHasFixedTime = true;
                 sessionTimeRemaining = isSinglePlayerPracticeSession ? (float)TimeSpan.FromHours(1).TotalSeconds - lastSessionRunningTime : gameSessionTimeLeft;
@@ -909,14 +912,19 @@ namespace CrewChiefV4.assetto
 
             Boolean isCountDown = false;
             TimeSpan countDown = TimeSpan.FromSeconds(gameSessionTimeLeft);
-            if (isOnline && (sessionType == AC_SESSION_TYPE.AC_RACE || sessionType == AC_SESSION_TYPE.AC_DRIFT || sessionType == AC_SESSION_TYPE.AC_DRAG))
+            
+            if (sessionType == AC_SESSION_TYPE.AC_RACE || sessionType == AC_SESSION_TYPE.AC_DRIFT || sessionType == AC_SESSION_TYPE.AC_DRAG)
             {
-                isCountDown = countDown.TotalMilliseconds >= 0.01;
+                if(shared.acsStatic.isTimedRace == 1)
+                {
+                    isCountDown = playerVehicle.currentLapTimeMS <= 0 && playerVehicle.lapCount <= 0;
+                }
+                else
+                {
+                    isCountDown = countDown.TotalMilliseconds >= 0.25;
+                }
             }
-            else
-            {
-                isCountDown = Math.Round(countDown.TotalMinutes) == 30 && countDown.Seconds < 10;
-            }
+
 
             int realTimeLeaderBoardValid = isCarRealTimeLeaderBoardValid(shared.acsChief.vehicle, shared.acsChief.numVehicles);
             AC_FLAG_TYPE currentFlag = shared.acsGraphic.flag;
@@ -1755,7 +1763,8 @@ namespace CrewChiefV4.assetto
                 {
                     return SessionPhase.Countdown;
                 }
-                else if (flag == AC_FLAG_TYPE.AC_CHECKERED_FLAG && raceIsFinished)
+                else if ((flag == AC_FLAG_TYPE.AC_CHECKERED_FLAG && raceIsFinished ) 
+                    || (flag == AC_FLAG_TYPE.AC_CHECKERED_FLAG && sessionTimeRemaining <= 0))
                 {
                     return SessionPhase.Finished;
                 }
@@ -1767,7 +1776,6 @@ namespace CrewChiefV4.assetto
                 {
                     return SessionPhase.Green;
                 }
-
                 return previousSessionPhase;
 
             }
