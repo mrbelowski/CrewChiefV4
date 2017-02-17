@@ -119,6 +119,21 @@ namespace CrewChiefV4.assetto
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
             public float[] brakeTemp;
             public float clutch;
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
+            public float[] tyreTempI;
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
+            public float[] tyreTempM;
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
+            public float[] tyreTempO;
+            public int isAIControlled;
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
+            public acsVec3[] tyreContactPoint;
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
+            public acsVec3[] tyreContactNormal;
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
+            public acsVec3[] tyreContactHeading;
+            float brakeBias;
+            public acsVec3 localVelocity;
            
         }
 
@@ -222,6 +237,9 @@ namespace CrewChiefV4.assetto
             public float trackSPlineLength;
             [MarshalAsAttribute(UnmanagedType.ByValTStr, SizeConst = 33)]
             public  String trackConfiguration;
+            public float ersMaxJ;
+            public int isTimedRace;
+            public int hasExtraLap;
             
         }
 
