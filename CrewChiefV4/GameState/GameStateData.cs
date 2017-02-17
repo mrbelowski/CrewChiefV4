@@ -803,6 +803,9 @@ namespace CrewChiefV4.GameState
         // MinPermittedDistanceOnCurrentTyre will be half race distance (rounded up)
         public int MaxPermittedDistanceOnCurrentTyre = -1;
         public int MinPermittedDistanceOnCurrentTyre = -1;
+
+        // -1 == n/a; 0 = inactive; 1 = active
+        public int limiterStatus = -1;
     }
 
     public class PenatiesData
