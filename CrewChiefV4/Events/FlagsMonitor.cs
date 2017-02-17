@@ -50,7 +50,8 @@ namespace CrewChiefV4.Events
         private DateTime[] lastSectorFlagsAnnouncedTime = new DateTime[] { DateTime.MinValue, DateTime.MinValue, DateTime.MinValue };
         private FullCourseYellowPhase lastFCYAnnounced = FullCourseYellowPhase.RACING;
         private DateTime lastFCYAccounedTime = DateTime.MinValue;
-        private TimeSpan timeBetweenYellowAndClearFlagMessages = TimeSpan.FromSeconds(10);
+        private TimeSpan timeBetweenYellowAndClearFlagMessages = TimeSpan.FromSeconds(3);
+        private int secondsToPreValidateYellowClearMessages = 5;
         private TimeSpan timeBetweenNewYellowFlagMessages = TimeSpan.FromSeconds(5);
         private Random random = new Random();
 
@@ -255,7 +256,7 @@ namespace CrewChiefV4.Events
                                             lastSectorFlagsAnnouncedTime[i] = DateTime.Now;
 
                                             // Queue delayed message for flag is clear.
-                                            audioPlayer.playMessageImmediately(new QueuedMessage(folderGreenFlagSectors[i], 5, this));
+                                            audioPlayer.playMessageImmediately(new QueuedMessage(folderGreenFlagSectors[i], secondsToPreValidateYellowClearMessages, this));
                                         }
                                     }
                                 }
