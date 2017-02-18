@@ -123,6 +123,29 @@
             "minTyreCircumference": 0.78,
             "maxTyreCircumference": 1.26
         },
+		{
+            "carClassEnum": "LMP1",
+            "raceroomClassIds": [ 1714  ],
+            "pCarsClassNames": [ "LMP1" ],
+			"rf2ClassNames": [ "LMP1" ],
+            "brakeType": "Carbon",
+            "maxSafeWaterTemp": 105,
+            "maxSafeOilTemp": 140
+        },
+        {
+            "carClassEnum": "LMP2",
+            "raceroomClassIds": [ 1923 ],
+            "pCarsClassNames": [ "LMP2" ],
+			"rf2ClassNames": [ "LMP2" ],
+            "brakeType": "Ceramic"
+        },
+		{
+            "carClassEnum": "LMP3",
+            "raceroomClassIds": [ 252  ],
+            "pCarsClassNames": [ "LMP3" ],
+			"rf2ClassNames": [ "LMP3" ],
+            "brakeType": "Ceramic"
+        },
         {
             "carClassEnum": "GROUPC",
             "pCarsClassNames": [ "Group C1" ],
