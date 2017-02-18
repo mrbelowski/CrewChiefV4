@@ -234,15 +234,20 @@ namespace CrewChiefV4.RaceRoom
                     {
                         justGoneGreen = true;
                         // just gone green, so get the session data
-                        if (shared.NumberOfLaps > 0)
-                        {
-                            currentGameState.SessionData.SessionNumberOfLaps = shared.NumberOfLaps;
-                            currentGameState.SessionData.SessionHasFixedTime = false;
-                        }
                         if (shared.SessionTimeRemaining > 0)
                         {
                             currentGameState.SessionData.SessionTotalRunTime = shared.SessionTimeRemaining;
+                            // TODO: confirm that this is enough to catch cases where we have a fixed time + extra lap
+                            if (shared.NumberOfLaps > 0)
+                            {
+                                currentGameState.SessionData.HasExtraLap = true;
+                            }
                             currentGameState.SessionData.SessionHasFixedTime = true;
+                        }
+                        else if (shared.NumberOfLaps > 0)
+                        {
+                            currentGameState.SessionData.SessionNumberOfLaps = shared.NumberOfLaps;
+                            currentGameState.SessionData.SessionHasFixedTime = false;
                         }
                         currentGameState.SessionData.SessionStartPosition = shared.Position;
                         currentGameState.SessionData.NumCarsAtStartOfSession = shared.NumCars;
@@ -600,7 +605,8 @@ namespace CrewChiefV4.RaceRoom
 
                             Boolean finishedAllottedRaceLaps = currentGameState.SessionData.SessionNumberOfLaps > 0 && currentGameState.SessionData.SessionNumberOfLaps == currentOpponentLapsCompleted;
                             Boolean finishedAllottedRaceTime = false;
-                            if (currentGameState.carClass.carClassEnum == CarData.CarClassEnum.DTM_2015 && currentGameState.SessionData.SessionType == SessionType.Race)
+                            if (currentGameState.SessionData.HasExtraLap && 
+                                currentGameState.SessionData.SessionType == SessionType.Race)
                             {
                                 if (currentGameState.SessionData.SessionTotalRunTime > 0 && currentGameState.SessionData.SessionTimeRemaining <= 0 &&
                                     previousOpponentCompletedLaps < currentOpponentLapsCompleted)
