@@ -1015,6 +1015,7 @@ namespace CrewChiefV4.assetto
                 {
                     currentGameState.SessionData.SessionTotalRunTime = sessionTimeRemaining;
                     currentGameState.SessionData.SessionTimeRemaining = sessionTimeRemaining;
+                    currentGameState.SessionData.HasExtraLap = shared.acsStatic.hasExtraLap == 1;
                     if (currentGameState.SessionData.SessionTotalRunTime == 0)
                     {
                         Console.WriteLine("Setting session run time to 0");
