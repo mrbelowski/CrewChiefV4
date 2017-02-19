@@ -45,9 +45,9 @@ namespace CrewChiefV4.Events
         private int lapsLeft;
         private float timeLeft;
 
-        private Boolean addExtraLapForDTM2015;
+        private Boolean addExtraLap;
 
-        private Boolean startedDTM2015ExtraLap;
+        private Boolean startedExtraLap;
 
         private Boolean leaderHasFinishedRace;
 
@@ -68,13 +68,14 @@ namespace CrewChiefV4.Events
             timeLeft = 0;
             sessionLengthIsTime = false;
             leaderHasFinishedRace = false;
-            addExtraLapForDTM2015 = false;
-            startedDTM2015ExtraLap = false;
+            addExtraLap = false;
+            startedExtraLap = false;
         }
         
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
-            addExtraLapForDTM2015 = currentGameState.carClass.carClassEnum == CarData.CarClassEnum.DTM_2015;
+            // store this in a local var so it's available for vocie command responses
+            addExtraLap = currentGameState.SessionData.HasExtraLap;
             leaderHasFinishedRace = currentGameState.SessionData.LeaderHasFinishedRace;
             timeLeft = currentGameState.SessionData.SessionTimeRemaining;
             if (currentGameState.SessionData.SessionNumberOfLaps > 0)
@@ -88,9 +89,9 @@ namespace CrewChiefV4.Events
             }
             if (sessionLengthIsTime)
             {
-                if (addExtraLapForDTM2015 && gotHalfTime && timeLeft <= 0 && currentGameState.SessionData.IsNewLap)
+                if (addExtraLap && gotHalfTime && timeLeft <= 0 && currentGameState.SessionData.IsNewLap)
                 {
-                    startedDTM2015ExtraLap = true;
+                    startedExtraLap = true;
                 }
                 if (!gotHalfTime)
                 {
@@ -133,8 +134,8 @@ namespace CrewChiefV4.Events
                         OpponentData leader = currentGameState.getOpponentAtPosition(1, true);
                         timeWillBeZeroAtEndOfLeadersLap = leader != null && leader.isProbablyLastLap;
                     }
-                    if ((addExtraLapForDTM2015 && timeLeft <= 0) ||
-                        (!addExtraLapForDTM2015 && timeWillBeZeroAtEndOfLeadersLap)) {
+                    if ((addExtraLap && timeLeft <= 0) ||
+                        (!addExtraLap && timeWillBeZeroAtEndOfLeadersLap)) {
                         playedLastLap = true;
                         played2mins = true;
                         played5mins = true;
@@ -247,9 +248,9 @@ namespace CrewChiefV4.Events
                 }
                 else if (timeLeft <= 0)
                 {
-                    if (addExtraLapForDTM2015 && !startedDTM2015ExtraLap)
+                    if (addExtraLap && !startedExtraLap)
                     {
-                        Console.WriteLine("Playing DTM one more lap message, timeleft = " + timeLeft);
+                        Console.WriteLine("Playing extra lap one more lap message, timeleft = " + timeLeft);
                         audioPlayer.playMessageImmediately(new QueuedMessage(folderOneLapAfterThisOne, 0, null));
                         
                     }
