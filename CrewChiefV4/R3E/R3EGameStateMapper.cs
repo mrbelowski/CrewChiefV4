@@ -328,6 +328,7 @@ namespace CrewChiefV4.RaceRoom
                     currentGameState.SessionData.SessionTotalRunTime = previousGameState.SessionData.SessionTotalRunTime;
                     currentGameState.SessionData.SessionNumberOfLaps = previousGameState.SessionData.SessionNumberOfLaps;
                     currentGameState.SessionData.SessionHasFixedTime = previousGameState.SessionData.SessionHasFixedTime;
+                    currentGameState.SessionData.HasExtraLap = previousGameState.SessionData.HasExtraLap;
                     currentGameState.SessionData.SessionStartPosition = previousGameState.SessionData.SessionStartPosition;
                     currentGameState.SessionData.NumCarsAtStartOfSession = previousGameState.SessionData.NumCarsAtStartOfSession;
                     currentGameState.SessionData.EventIndex = previousGameState.SessionData.EventIndex;
