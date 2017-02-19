@@ -264,7 +264,7 @@ namespace CrewChiefV4.GameState
         // data sent by the game, rather than derived (useful for mid-session joining)
         public float SessionFastestLapTimeFromGame = -1;
         public float SessionFastestLapTimeFromGamePlayerClass = -1;
-        public Boolean SessionHasExtraLap = false;
+
         public SessionData()
         {
             SessionTimesAtEndOfSectors.Add(1, -1);
