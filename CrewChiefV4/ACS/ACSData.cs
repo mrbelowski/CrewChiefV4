@@ -135,7 +135,6 @@ namespace CrewChiefV4.assetto
             public acsVec3[] tyreContactHeading;
             float brakeBias;
             public acsVec3 localVelocity;
-         
         }
 
         [StructLayout(LayoutKind.Sequential, Pack = 4, CharSet = CharSet.Unicode)]
