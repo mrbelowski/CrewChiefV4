@@ -1153,6 +1153,7 @@ namespace CrewChiefV4.assetto
                     currentGameState.SessionData.SessionStartTime = previousGameState.SessionData.SessionStartTime;
                     currentGameState.SessionData.SessionTotalRunTime = previousGameState.SessionData.SessionTotalRunTime;
                     currentGameState.SessionData.SessionNumberOfLaps = previousGameState.SessionData.SessionNumberOfLaps;
+                    currentGameState.SessionData.HasExtraLap = previousGameState.SessionData.HasExtraLap;
                     currentGameState.SessionData.SessionStartPosition = previousGameState.SessionData.SessionStartPosition;
                     currentGameState.SessionData.NumCarsAtStartOfSession = previousGameState.SessionData.NumCarsAtStartOfSession;
                     currentGameState.SessionData.TrackDefinition = previousGameState.SessionData.TrackDefinition;
