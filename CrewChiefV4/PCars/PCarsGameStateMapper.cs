@@ -82,6 +82,7 @@ namespace CrewChiefV4.PCars
         private SpeechRecogniser speechRecogniser;
 
         private Dictionary<String, float> waitingForCarsToFinish = new Dictionary<String, float>();
+        private DateTime nextDebugCheckeredToFinishMessageTime = DateTime.MinValue;
 
         public PCarsGameStateMapper()
         {
@@ -509,7 +510,7 @@ namespace CrewChiefV4.PCars
                 // TODO: this is just retarded. Clone the previousGameState and update it as required...
                 if (!justGoneGreen && previousGameState != null)
                 {
-                    Console.WriteLine("regular update, session type = " + currentGameState.SessionData.SessionType + " phase = " + currentGameState.SessionData.SessionPhase);
+                    //Console.WriteLine("regular update, session type = " + currentGameState.SessionData.SessionType + " phase = " + currentGameState.SessionData.SessionPhase);
                     currentGameState.SessionData.SessionStartTime = previousGameState.SessionData.SessionStartTime;
                     currentGameState.SessionData.SessionTotalRunTime = previousGameState.SessionData.SessionTotalRunTime;
                     currentGameState.SessionData.SessionNumberOfLaps = previousGameState.SessionData.SessionNumberOfLaps;
@@ -557,7 +558,7 @@ namespace CrewChiefV4.PCars
             //------------------- Variable session data ---------------------------
             if (currentGameState.SessionData.SessionHasFixedTime)
             {
-                Console.WriteLine("Setting session running time 1, total run time = " + currentGameState.SessionData.SessionTotalRunTime + " event time remaining  " + shared.mEventTimeRemaining);
+                //Console.WriteLine("Setting session running time 1, total run time = " + currentGameState.SessionData.SessionTotalRunTime + " event time remaining  " + shared.mEventTimeRemaining);
                 currentGameState.SessionData.SessionRunningTime = currentGameState.SessionData.SessionTotalRunTime - shared.mEventTimeRemaining;
                 currentGameState.SessionData.SessionTimeRemaining = shared.mEventTimeRemaining;
             }
@@ -1355,11 +1356,12 @@ namespace CrewChiefV4.PCars
                     if (previousSessionPhase == SessionPhase.Green)
                     {
                         waitingForCarsToFinish.Clear();
+                        nextDebugCheckeredToFinishMessageTime = DateTime.MinValue;
                     }
-                    if (playerSpeed < 0.1)
+                    if (playerSpeed < 1)
                     {
                         // the player isn't driving, so check the opponents
-                        Boolean hasActiveOpponent = false;
+                        int waitingForCount = 0;
                         if (opponentData != null)
                         {
                             foreach (OpponentData opponent in opponentData.Values)
@@ -1380,14 +1382,19 @@ namespace CrewChiefV4.PCars
                                 }
                                 if (running) 
                                 {
-                                    hasActiveOpponent = true;                                    
+                                    waitingForCount++;                                    
                                 }
                             }
                         }
-                        if (!hasActiveOpponent)
+                        if (waitingForCount == 0)
                         {
                             Console.WriteLine("looks like session is finished - no activity in checkered phase");
                             currentPhase = SessionPhase.Finished;
+                        }
+                        else if (DateTime.Now > nextDebugCheckeredToFinishMessageTime)
+                        {
+                            Console.WriteLine("Session has finished but there are " + waitingForCount + " cars still out on track");
+                            nextDebugCheckeredToFinishMessageTime.Add(TimeSpan.FromSeconds(10));
                         }
                     }
                     return currentPhase;

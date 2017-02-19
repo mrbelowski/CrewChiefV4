@@ -484,7 +484,9 @@ namespace CrewChiefV4
                             }
                             else if (!sessionFinished && previousGameState != null &&
                                         (currentGameState.SessionData.SessionRunningTime > previousGameState.SessionData.SessionRunningTime || 
-                                        (previousGameState != null && previousGameState.SessionData.SessionPhase != currentGameState.SessionData.SessionPhase)))
+                                        (previousGameState.SessionData.SessionPhase != currentGameState.SessionData.SessionPhase)) ||
+                                        ((gameDefinition.gameEnum == GameEnum.PCARS_32BIT || gameDefinition.gameEnum == GameEnum.PCARS_64BIT || gameDefinition.gameEnum == GameEnum.PCARS_NETWORK) &&
+                                            currentGameState.SessionData.SessionHasFixedTime && currentGameState.SessionData.SessionTotalRunTime == float.MaxValue))
                             {
                                 if (spotter != null)
                                 {
