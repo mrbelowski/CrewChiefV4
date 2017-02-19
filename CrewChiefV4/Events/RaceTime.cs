@@ -171,7 +171,7 @@ namespace CrewChiefV4.Events
                     // disable pearls for the last part of the race
                     audioPlayer.disablePearlsOfWisdom = true;
                 }
-                Console.WriteLine("Session time left = " + timeLeft + " SessionRunningTime = " + currentGameState.SessionData.SessionRunningTime);
+                // Console.WriteLine("Session time left = " + timeLeft + " SessionRunningTime = " + currentGameState.SessionData.SessionRunningTime);
                 if (!currentGameState.SessionData.HasExtraLap && 
                     currentGameState.SessionData.SessionRunningTime >= 0 && !played0mins && timeLeft <= 0.2)
                 {
