@@ -74,7 +74,7 @@ namespace CrewChiefV4.Events
         
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
-            addExtraLapForDTM2015 = currentGameState.carClass.carClassEnum == CarData.CarClassEnum.DTM_2015;
+            addExtraLapForDTM2015 = currentGameState.carClass.carClassEnum == CarData.CarClassEnum.DTM_2015 || currentGameState.SessionData.SessionHasExtraLap;
             leaderHasFinishedRace = currentGameState.SessionData.LeaderHasFinishedRace;
             timeLeft = currentGameState.SessionData.SessionTimeRemaining;
             if (currentGameState.SessionData.SessionNumberOfLaps > 0)

@@ -16,9 +16,7 @@ namespace CrewChiefV4.assetto
     {
         public static String playerName = null;
         public static Boolean versionChecked = false;
-        public static double lastCountDown = 10000.0;
 
-        
         private class AcTyres
         {
             public List<CornerData.EnumWithThresholds> tyreWearThresholdsForAC = new List<CornerData.EnumWithThresholds>();
@@ -896,6 +894,7 @@ namespace CrewChiefV4.assetto
             currentGameState.SessionData.LeaderHasFinishedRace = leaderHasFinished;
             
             int numberOfLapsInSession = (int)shared.acsGraphic.numberOfLaps;
+            Boolean isTimedRace = (sessionType == AC_SESSION_TYPE.AC_RACE && shared.acsStatic.isTimedRace == 1) || (sessionType == AC_SESSION_TYPE.AC_RACE && shared.acsGraphic.numberOfLaps == 0);
 
             float gameSessionTimeLeft = 0.0f;
             if (!Double.IsInfinity(shared.acsGraphic.sessionTimeLeft))
@@ -915,7 +914,7 @@ namespace CrewChiefV4.assetto
             
             if (sessionType == AC_SESSION_TYPE.AC_RACE || sessionType == AC_SESSION_TYPE.AC_DRIFT || sessionType == AC_SESSION_TYPE.AC_DRAG)
             {
-                if(shared.acsStatic.isTimedRace == 1)
+                if (isTimedRace)
                 {
                     isCountDown = playerVehicle.currentLapTimeMS <= 0 && playerVehicle.lapCount <= 0;
                 }
@@ -924,7 +923,7 @@ namespace CrewChiefV4.assetto
                     isCountDown = countDown.TotalMilliseconds >= 0.25;
                 }
             }
-
+            currentGameState.SessionData.SessionHasExtraLap = shared.acsStatic.hasExtraLap == 1;
 
             int realTimeLeaderBoardValid = isCarRealTimeLeaderBoardValid(shared.acsChief.vehicle, shared.acsChief.numVehicles);
             AC_FLAG_TYPE currentFlag = shared.acsGraphic.flag;
@@ -1387,13 +1386,41 @@ namespace CrewChiefV4.assetto
                                     }
                                     int currentOpponentLapsCompleted = participantStruct.lapCount;
 
-                                    if (currentOpponentRacePosition == 1 && (currentGameState.SessionData.SessionNumberOfLaps > 0 &&
+                                    Boolean finishedAllottedRaceLaps = currentGameState.SessionData.SessionNumberOfLaps > 0 && currentGameState.SessionData.SessionNumberOfLaps == currentOpponentLapsCompleted;
+                                    Boolean finishedAllottedRaceTime = false;
+                                    if (isTimedRace)
+                                    {
+                                        if (currentGameState.SessionData.SessionTotalRunTime > 0 && currentGameState.SessionData.SessionTimeRemaining <= 0 &&
+                                            previousOpponentCompletedLaps < currentOpponentLapsCompleted)
+                                        {
+                                            if (!currentOpponentData.HasStartedExtraLap)
+                                            {
+                                                currentOpponentData.HasStartedExtraLap = true;
+                                            }
+                                            else
+                                            {
+                                                finishedAllottedRaceTime = true;
+                                            }
+                                        }
+                                    }
+                                    else if (currentGameState.SessionData.SessionTotalRunTime > 0 && currentGameState.SessionData.SessionTimeRemaining <= 0 &&
+                                        previousOpponentCompletedLaps < currentOpponentLapsCompleted)
+                                    {
+                                        finishedAllottedRaceTime = true;
+                                    }
+                                    if (currentOpponentRacePosition == 1 && (finishedAllottedRaceTime || finishedAllottedRaceLaps))
+                                    {
+                                        currentGameState.SessionData.LeaderHasFinishedRace = true;
+                                    }
+
+                                    /*if (currentOpponentRacePosition == 1 && (currentGameState.SessionData.SessionNumberOfLaps > 0 &&
                                             currentGameState.SessionData.SessionNumberOfLaps == currentOpponentLapsCompleted) ||
                                             (currentGameState.SessionData.SessionTotalRunTime > 0 && currentGameState.SessionData.SessionTimeRemaining < 1 &&
                                             previousOpponentCompletedLaps < currentOpponentLapsCompleted))
                                     {
                                         currentGameState.SessionData.LeaderHasFinishedRace = true;
-                                    }
+                                    }*/
+
                                     if (currentOpponentRacePosition == 1 && previousOpponentPosition > 1)
                                     {
                                         currentGameState.SessionData.HasLeadChanged = true;
