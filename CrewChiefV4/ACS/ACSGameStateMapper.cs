@@ -18,7 +18,6 @@ namespace CrewChiefV4.assetto
         public static Boolean versionChecked = false;
         public static double lastCountDown = 10000.0;
 
-
         private class AcTyres
         {
             public List<CornerData.EnumWithThresholds> tyreWearThresholdsForAC = new List<CornerData.EnumWithThresholds>();
@@ -899,9 +898,9 @@ namespace CrewChiefV4.assetto
             float gameSessionTimeLeft = 0.0f;
             if (!Double.IsInfinity(shared.acsGraphic.sessionTimeLeft))
             {
-                gameSessionTimeLeft = shared.acsGraphic.sessionTimeLeft / 1000f;
+                gameSessionTimeLeft = shared.acsGraphic.sessionTimeLeft / 1000f; 
             }
-        
+
             float sessionTimeRemaining = -1;
             if (numberOfLapsInSession == 0 || shared.acsStatic.isTimedRace == 1)
             {
@@ -912,11 +911,10 @@ namespace CrewChiefV4.assetto
             Boolean isCountDown = false;
             TimeSpan countDown = TimeSpan.FromSeconds(gameSessionTimeLeft);
 
-            
             if (sessionType == AC_SESSION_TYPE.AC_RACE || sessionType == AC_SESSION_TYPE.AC_DRIFT || sessionType == AC_SESSION_TYPE.AC_DRAG)
             {
                 //Make sure to check for both numberOfLapsInSession and isTimedRace as latter sometimes tells lies!
-				if (shared.acsStatic.isTimedRace == 1 || numberOfLapsInSession == 0)
+                if (shared.acsStatic.isTimedRace == 1 || numberOfLapsInSession == 0)
                 {
                     isCountDown = playerVehicle.currentLapTimeMS <= 0 && playerVehicle.lapCount <= 0;
                 }
@@ -1809,7 +1807,6 @@ namespace CrewChiefV4.assetto
                 {
                     return SessionPhase.Green;
                 }
-
                 return previousSessionPhase;
 
             }
