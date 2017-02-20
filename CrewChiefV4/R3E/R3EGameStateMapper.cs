@@ -26,9 +26,9 @@ namespace CrewChiefV4.RaceRoom
         private float wornOutTyreWearLevel = 0.94f;
 
         private float scrubbedTyreWearPercent = 2f;
-        private float minorTyreWearPercent = 10f;
-        private float majorTyreWearPercent = 37f;
-        private float wornOutTyreWearPercent = 65f;        
+        private float minorTyreWearPercent = 20f;
+        private float majorTyreWearPercent = 50f;
+        private float wornOutTyreWearPercent = 80f;        
 
         private float trivialAeroDamageThreshold = 0.99995f;
         private float trivialEngineDamageThreshold = 0.995f;
@@ -1250,7 +1250,7 @@ namespace CrewChiefV4.RaceRoom
             {
                 return -1;
             }
-            return Math.Min(100, 100 * (wearLevel - wornOutTyreWearLevel) / (1 - wornOutTyreWearLevel));
+            return Math.Min(100, ((1 - wearLevel) / (1 - wornOutTyreWearLevel)) * 100);
         }
 
         private Boolean CheckIsCarRunning(RaceRoomData.RaceRoomShared shared)
