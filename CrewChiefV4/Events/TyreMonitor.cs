@@ -185,7 +185,7 @@ namespace CrewChiefV4.Events
 
         private Boolean lastBrakeTempCheckOK = true;
         private Boolean lastTyreTempCheckOK = true;
-        
+
         public TyreMonitor(AudioPlayer audioPlayer)
         {
             this.audioPlayer = audioPlayer;
@@ -616,7 +616,7 @@ namespace CrewChiefV4.Events
                 }
                 else
                 {
-                    int minutesRemainingOnTheseTyres = (int)Math.Round((timeElapsed / (maxWearPercent / 100)) - timeElapsed - 1);
+                    int minutesRemainingOnTheseTyres = (int)Math.Round(((timeElapsed / (maxWearPercent / 100)) - timeElapsed) / 60) - 1;
                     playEstimatedTyreLifeMinutes(minutesRemainingOnTheseTyres, immediate);
                 }
             }

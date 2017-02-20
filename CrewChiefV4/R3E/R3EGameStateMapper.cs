@@ -27,8 +27,8 @@ namespace CrewChiefV4.RaceRoom
 
         private float scrubbedTyreWearPercent = 2f;
         private float minorTyreWearPercent = 20f;
-        private float majorTyreWearPercent = 50f;
-        private float wornOutTyreWearPercent = 80f;        
+        private float majorTyreWearPercent = 45f;
+        private float wornOutTyreWearPercent = 70f;        
 
         private float trivialAeroDamageThreshold = 0.99995f;
         private float trivialEngineDamageThreshold = 0.995f;
@@ -279,14 +279,14 @@ namespace CrewChiefV4.RaceRoom
                                 if (currentGameState.carClass.carClassEnum == CarData.CarClassEnum.DTM_2014)
                                 {
                                     double halfRaceDistance = currentGameState.SessionData.SessionNumberOfLaps / 2d;
-                                    if (mapToTyreType(shared.TireType, currentGameState.carClass.carClassEnum) == TyreType.Option)
+                                    if (mapToTyreType(shared.TireType, currentGameState.carClass.carClassEnum) == TyreType.R3E_NEW_Option)
                                     {
-                                        currentGameState.PitData.MandatoryTyreChangeRequiredTyreType = TyreType.Prime;
+                                        currentGameState.PitData.MandatoryTyreChangeRequiredTyreType = TyreType.R3E_NEW_Prime;
                                         currentGameState.PitData.MaxPermittedDistanceOnCurrentTyre = ((int)Math.Floor(halfRaceDistance)) - 1;
                                     }
                                     else
                                     {
-                                        currentGameState.PitData.MandatoryTyreChangeRequiredTyreType = TyreType.Option;
+                                        currentGameState.PitData.MandatoryTyreChangeRequiredTyreType = TyreType.R3E_NEW_Option;
                                         currentGameState.PitData.MinPermittedDistanceOnCurrentTyre = (int)Math.Ceiling(halfRaceDistance);
                                     }
                                 }
@@ -1069,21 +1069,13 @@ namespace CrewChiefV4.RaceRoom
         
         private TyreType mapToTyreType(int r3eTyreType, CarData.CarClassEnum carClass)
         {
-            // only DTM 2014 (old physics) use Option tyres
             if ((int)RaceRoomConstant.TireType.DTM_Option == r3eTyreType)
             {
-                return TyreType.Option;
+                return TyreType.R3E_NEW_Option;
             }
             else if ((int)RaceRoomConstant.TireType.Prime == r3eTyreType)
             {
-                if (carClass == CarData.CarClassEnum.DTM_2015)
-                {
-                    return TyreType.R3E_NEW_Prime;
-                }
-                else
-                {
-                    return TyreType.Prime;
-                }
+                return TyreType.R3E_NEW_Prime;
             }
             else if (CarData.r3eNewTyreModelClasses.Contains(carClass))
             {
