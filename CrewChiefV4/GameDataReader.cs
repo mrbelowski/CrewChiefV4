@@ -54,7 +54,6 @@ namespace CrewChiefV4
                     stream.Position = 0;
                     xmlDocument.Load(stream);
                     xmlDocument.Save(fileName);
-                    stream.Close();
                 }
             }
             catch (Exception ex)
@@ -85,10 +84,7 @@ namespace CrewChiefV4
                     using (XmlReader reader = new XmlTextReader(read))
                     {
                         objectOut = (T)serializer.Deserialize(reader);
-                        reader.Close();
                     }
-
-                    read.Close();
                 }
             }
             catch (Exception ex)

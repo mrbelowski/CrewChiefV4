@@ -59,9 +59,11 @@ namespace CrewChiefV4
         private float latestDriverNamesVersion = -1;
 
         private ControlWriter cw = null;
+
+        private float currentVolume = -1;
                 
         private void FormMain_Load(object sender, EventArgs e)
-        {
+        {            
             // Some update test code - uncomment this to allow the app to process an update .zip file in the root of the sound pack
             /*
             ZipFile.ExtractToDirectory(AudioPlayer.soundFilesPath + @"\" + soundPackTempFileName, AudioPlayer.soundFilesPath + @"\sounds_temp");
@@ -178,12 +180,20 @@ namespace CrewChiefV4
                     Console.WriteLine("Unable to get auto update details: " + error.Message);
                 }
             }).Start();
-        }            
+        }
+
+        public void updateMessagesVolume(float messagesVolume)
+        {
+            currentVolume = messagesVolume;
+            setMessagesVolume(messagesVolume);
+            messagesVolumeSlider.Value = (int)(messagesVolume * 10f);
+        }
                 
         private void messagesVolumeSlider_Scroll(object sender, EventArgs e)
         {
             float volFloat = (float) messagesVolumeSlider.Value / 10;
             setMessagesVolume(volFloat);
+            currentVolume = volFloat;
             UserSettings.GetUserSettings().setProperty("messages_volume", volFloat);
             UserSettings.GetUserSettings().saveUserSettings();
         }
@@ -374,8 +384,7 @@ namespace CrewChiefV4
             crewChief = new CrewChief();
             float messagesVolume = UserSettings.GetUserSettings().getFloat("messages_volume");
             float backgroundVolume = UserSettings.GetUserSettings().getFloat("background_volume");
-            setMessagesVolume(messagesVolume);
-            messagesVolumeSlider.Value = (int)(messagesVolume * 10f);
+            updateMessagesVolume(messagesVolume);
             backgroundVolumeSlider.Value = (int) (backgroundVolume * 10f);
 
             Console.WriteLine("Loading controller settings");
@@ -508,6 +517,32 @@ namespace CrewChiefV4
                         crewChief.audioPlayer.repeatLastMessage();
                         nextPollWait = 1000;
                     }
+                    else if (controllerConfiguration.hasOutstandingClick(ControllerConfiguration.VOLUME_UP))
+                    {
+                        if (currentVolume == -1)
+                        {
+                            Console.WriteLine("Initial volume not set, ignoring");
+                        } else if (currentVolume >= 1) {
+                            Console.WriteLine("Volume at max");
+                        } else {
+                            Console.WriteLine("Increasing volume");
+                            updateMessagesVolume(currentVolume + 0.1f);
+                        }
+                        nextPollWait = 200;
+                    }
+                    else if (controllerConfiguration.hasOutstandingClick(ControllerConfiguration.VOLUME_DOWN))
+                    {
+                        if (currentVolume == -1)
+                        {
+                            Console.WriteLine("Initial volume not set, ignoring");
+                        } else if (currentVolume <= 0) {
+                            Console.WriteLine("Volume at min");
+                        } else {
+                            Console.WriteLine("Decreasing volume");
+                            updateMessagesVolume(currentVolume - 0.1f);
+                        }
+                        nextPollWait = 200;
+                    }
                     else if (crewChief.speechRecogniser.initialised && voiceOption == VoiceOptionEnum.TOGGLE)
                     {
                         if (controllerConfiguration.hasOutstandingClick(ControllerConfiguration.CHANNEL_OPEN_FUNCTION))
@@ -521,22 +556,7 @@ namespace CrewChiefV4
                             }
                             Console.WriteLine("Listening...");
                             crewChief.audioPlayer.playStartListeningBeep();
-                            crewChief.speechRecogniser.recognizeAsync();
-                            
-                            /*else
-                            {
-                                Console.WriteLine("Finished listening...");
-                                crewChief.speechRecogniser.recognizeAsyncCancel();
-                                new Thread(() =>
-                                {
-                                    Thread.Sleep(2000);
-                                    if (crewChief.speechRecogniser.waitingForSpeech)
-                                    {
-                                        crewChief.speechRecogniser.waitingForSpeech = false;
-                                        crewChief.youWot();
-                                    }
-                                }).Start();
-                            }*/
+                            crewChief.speechRecogniser.recognizeAsync();                            
                             nextPollWait = 1000;
                         }
                     }
@@ -566,6 +586,7 @@ namespace CrewChiefV4
                         MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return;
                 }
+                CarData.loadCarClassData();
                 this.runListenForButtonPressesThread = controllerConfiguration.listenForButtons(voiceOption == VoiceOptionEnum.TOGGLE);
                 this.assignButtonToAction.Enabled = false;
                 this.deleteAssigmentButton.Enabled = false;

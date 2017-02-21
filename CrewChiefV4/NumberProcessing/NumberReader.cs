@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CrewChiefV4.Audio;
+using System;
 using System.Collections.Generic;
 namespace CrewChiefV4
 {
@@ -37,6 +38,24 @@ namespace CrewChiefV4
          */
         protected abstract List<String> GetTenthsSounds(int hours, int minutes, int seconds, int tenths, Boolean useMoreInflection);
 
+        /**
+         * Separate recordings for when we just want a number of seconds with tenths. This is only used when we have no minutes part,
+         * or we have a minutes part *and* the number of seconds is 10 or more (because these sounds have no "zero.." or "oh.." part.
+         * This is (currently) only applicable to English numbers.
+         *
+         */
+        protected abstract String GetSecondsWithTenths(int seconds, int tenths);
+
+        /**
+         * Separate recordings for when we just want a number of seconds with tenths with 1 or 2 minutes. 
+         * This is (currently) only applicable to English numbers.
+         *
+         */
+        protected abstract List<String> GetMinutesAndSecondsWithTenths(int minutes, int seconds, int tenths);
+
+        protected abstract String getLocale();
+
+        protected Random random = new Random();
 
         /**
          * Convert a timeSpan to some sound files, using the current language's implementation.
@@ -56,10 +75,27 @@ namespace CrewChiefV4
                 int tenths = (int)Math.Round((float)timeSpan.Milliseconds / 100f);
 
                 // now call the language-specific implementations
-                messageFolders.AddRange(GetHoursSounds(timeSpan.Hours, timeSpan.Minutes, timeSpan.Seconds, tenths));
-                messageFolders.AddRange(GetMinutesSounds(timeSpan.Hours, timeSpan.Minutes, timeSpan.Seconds, tenths));
-                messageFolders.AddRange(GetSecondsSounds(timeSpan.Hours, timeSpan.Minutes, timeSpan.Seconds, tenths));
-                messageFolders.AddRange(GetTenthsSounds(timeSpan.Hours, timeSpan.Minutes, timeSpan.Seconds, tenths, useMoreInflection));
+                Boolean useNewENMinutes = AudioPlayer.soundPackVersion > 106 && getLocale() == "en" && timeSpan.Hours == 0 && 
+                    timeSpan.Minutes > 0 && timeSpan.Minutes < 3 && timeSpan.Seconds > 0 && timeSpan.Seconds < 60;
+                Boolean useNewENSeconds = AudioPlayer.soundPackVersion > 106 && getLocale() == "en" && timeSpan.Hours == 0 && 
+                    timeSpan.Minutes == 0 && (timeSpan.Seconds > 0 || tenths > 0) && timeSpan.Seconds < 60;
+
+                if (useNewENSeconds)
+                {
+                    messageFolders.Add(GetSecondsWithTenths(timeSpan.Seconds, tenths));
+                }
+                else if (useNewENMinutes)
+                {
+                    messageFolders.AddRange(GetMinutesAndSecondsWithTenths(timeSpan.Minutes, timeSpan.Seconds, tenths));
+                }
+                else
+                {
+                    messageFolders.AddRange(GetHoursSounds(timeSpan.Hours, timeSpan.Minutes, timeSpan.Seconds, tenths));
+                    messageFolders.AddRange(GetMinutesSounds(timeSpan.Hours, timeSpan.Minutes, timeSpan.Seconds, tenths));
+                    messageFolders.AddRange(GetSecondsSounds(timeSpan.Hours, timeSpan.Minutes, timeSpan.Seconds, tenths));
+                    messageFolders.AddRange(GetTenthsSounds(timeSpan.Hours, timeSpan.Minutes, timeSpan.Seconds, tenths, useMoreInflection));
+                }
+
                 /*if (messageFolders.Count > 0)
                 {
                     Console.WriteLine(String.Join(", ", messageFolders));

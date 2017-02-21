@@ -1,10 +1,14 @@
 ﻿using CrewChiefV4.Events;
 using CrewChiefV4.GameState;
 using CrewChiefV4.PCars;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace CrewChiefV4
 {
@@ -12,7 +16,6 @@ namespace CrewChiefV4
     {
         // some temperatures - maybe externalise these
         // These are the peaks. If the tyre exceeds these temps even for one tick over a lap, we'll warn about it. This is why they look so high
-
         private static float maxColdRoadTyreTempPeak = 65;
         private static float maxWarmRoadTyreTempPeak = 106;
         private static float maxHotRoadTyreTempPeak = 120;
@@ -24,29 +27,20 @@ namespace CrewChiefV4
         private static float maxColdBiasPlyTyreTempPeak = 70;
         private static float maxWarmBiasPlyTyreTempPeak = 103;
         private static float maxHotBiasPlyTyreTempPeak = 123;
-
-        private static float maxColdDtmOptionTyreTempPeak = 70;
-        private static float maxWarmDtmOptionTyreTempPeak = 110;
-        private static float maxHotDtmOptionTyreTempPeak = 127;
-
-        private static float maxColdDtmPrimeTyreTempPeak = 80;
-        private static float maxWarmDtmPrimeTyreTempPeak = 117;
-        private static float maxHotDtmPrimeTyreTempPeak = 137;
-
         
-
         // special case for RaceRoom tyres on the new tire model 
         // - the game sends the core temp, not the surface temp
         private static float maxColdR3ENewTyreTempPeak = 90;
         private static float maxWarmR3ENewTyreTempPeak = 99;
         private static float maxHotR3ENewTyreTempPeak = 104;
 
-        private static float maxColdR3ENewPrimeTyreTempPeak = 87;
+        private static float maxColdR3ENewPrimeTyreTempPeak = 88;
         private static float maxWarmR3ENewPrimeTyreTempPeak = 98;
         private static float maxHotR3ENewPrimeTyreTempPeak = 103;
-        // no need for options here because the 2015 cars don't use 'em
 
-
+        private static float maxColdR3ENewOptionTyreTempPeak = 75;
+        private static float maxWarmR3ENewOptionTyreTempPeak = 95;
+        private static float maxHotR3ENewOptionTyreTempPeak = 100;
 
         private static float maxColdIronRoadBrakeTemp = 80;
         private static float maxWarmIronRoadBrakeTemp = 500;
@@ -63,30 +57,12 @@ namespace CrewChiefV4
         private static float maxColdCarbonBrakeTemp = 400;
         private static float maxWarmCarbonBrakeTemp = 1200;
         private static float maxHotCarbonBrakeTemp = 1500;
-        
-        private static float maxRoadSafeWaterTemp = 96;
-        private static float maxRoadSafeOilTemp = 115;
-
-        private static float maxRaceSafeWaterTemp = 105;
-        private static float maxRaceSafeOilTemp = 125;
-
-        // for F1, GP2, LMP1 and DTM
-        private static float maxExoticRaceSafeWaterTemp = 105;
-        private static float maxExoticRaceSafeOilTemp = 140;
-
-        // for locking / spinning check - the tolerance values are built into these tyre diameter values
-        private static float carMinTyreCircumference = 0.4f * (float)Math.PI;  // 0.4m diameter
-        private static float carMaxTyreCircumference = 1.2f * (float)Math.PI;
-
-        // for locking / spinning check - the tolerance values are built into these tyre diameter values
-        private static float kartMinTyreCircumference = 0.25f * (float)Math.PI;  // 0.15m diameter
-        private static float kartMaxTyreCircumference = 0.4f * (float)Math.PI;
 
         public enum CarClassEnum
         {
-            GT1X, GT1, GT2, GT3, GT4, GT5, Kart_1, Kart_2, LMP1, LMP2, LMP3, ROAD_B, ROAD_C1, ROAD_C2, ROAD_D, ROAD_SUPERCAR, GROUPC, GROUPA, GROUP4, GROUP5, GROUP6, GTO,
+            GT1X, GT1, GTE, GT2, GTC, GTLM, GT3, GT4, GT5, Kart_1, Kart_2, LMP1, LMP2, LMP3, ROAD_B, ROAD_C1, ROAD_C2, ROAD_D, ROAD_SUPERCAR, GROUPC, GROUPA, GROUP4, GROUP5, GROUP6, GTO,
             VINTAGE_INDY_65, VINTAGE_F3_A, VINTAGE_F1_A, VINTAGE_F1_A1, VINTAGE_GT3, VINTAGE_GT, HISTORIC_TOURING_1, HISTORIC_TOURING_2, VINTAGE_F1_B, VINTAGE_F1_C, STOCK_CAR,
-            F1, F2, F3, F4, FF, TC1, TC2, TC1_2014, AUDI_TT_CUP, AUDI_TT_VLN, CLIO_CUP, DTM, DTM_2013, V8_SUPERCAR, DTM_2014, DTM_2015, DTM_2016, TRANS_AM, HILL_CLIMB_ICONS, FORMULA_RENAULT, 
+            F1, F2, F3, F4, FF, TC1, TC2, TC1_2014, AUDI_TT_CUP, AUDI_TT_VLN, CLIO_CUP, DTM, DTM_2013, V8_SUPERCAR, DTM_2014, DTM_2015, DTM_2016, TRANS_AM, HILL_CLIMB_ICONS, FORMULA_RENAULT,
             MEGANE_TROPHY, NSU_TT, KTM_RR, INDYCAR, UNKNOWN_RACE
         }
 
@@ -96,131 +72,11 @@ namespace CrewChiefV4
             CarClassEnum.FF, CarClassEnum.TC1, CarClassEnum.AUDI_TT_CUP, CarClassEnum.DTM_2013, CarClassEnum.DTM_2014, CarClassEnum.DTM_2015, CarClassEnum.DTM_2016, CarClassEnum.NSU_TT,
             CarClassEnum.F3, CarClassEnum.AUDI_TT_VLN, CarClassEnum.KTM_RR, CarClassEnum.FF, CarClassEnum.FF, CarClassEnum.FF};
 
-        public class CarClass
-        {
-            public CarClassEnum carClassEnum;
-            public String[] pCarsClassNames;
-            public int[] raceroomClassIds;
-            public BrakeType brakeType;
-            public TyreType defaultTyreType;
-            public float maxSafeWaterTemp;
-            public float maxSafeOilTemp;
-            public float minTyreCircumference;
-            public float maxTyreCircumference;
-            // add rFactor class name
-            public String rFClassName;
-
-            public CarClass(CarClassEnum carClassEnum, String[] pCarsClassNames, int[] raceroomClassIds, BrakeType brakeType, TyreType defaultTyreType, float maxSafeWaterTemp,
-                float maxSafeOilTemp, float minTyreCircumference, float maxTyreCircumference)
-            {
-                this.carClassEnum = carClassEnum;
-                this.pCarsClassNames = pCarsClassNames;
-                this.raceroomClassIds = raceroomClassIds;
-                this.brakeType = brakeType;
-                this.defaultTyreType = defaultTyreType;
-                this.maxSafeOilTemp = maxSafeOilTemp;
-                this.maxSafeWaterTemp = maxSafeWaterTemp;
-                this.minTyreCircumference = minTyreCircumference;
-                this.maxTyreCircumference = maxTyreCircumference;
-            }
-
-            public CarClass(CarClassEnum carClassEnum, String[] pCarsClassNames, int[] raceroomClassIds, BrakeType brakeType, TyreType defaultTyreType, float maxSafeWaterTemp,
-               float maxSafeOilTemp)
-            {
-                this.carClassEnum = carClassEnum;
-                this.pCarsClassNames = pCarsClassNames;
-                this.raceroomClassIds = raceroomClassIds;
-                this.brakeType = brakeType;
-                this.defaultTyreType = defaultTyreType;
-                this.maxSafeOilTemp = maxSafeOilTemp;
-                this.maxSafeWaterTemp = maxSafeWaterTemp;
-                this.minTyreCircumference = carMinTyreCircumference;
-                this.maxTyreCircumference = carMaxTyreCircumference;
-            }
-        }
-
-        private static List<CarClass> carClasses = new List<CarClass>();
-
         public static Dictionary<TyreType, List<CornerData.EnumWithThresholds>> tyreTempThresholds = new Dictionary<TyreType, List<CornerData.EnumWithThresholds>>();
         public static Dictionary<BrakeType, List<CornerData.EnumWithThresholds>> brakeTempThresholds = new Dictionary<BrakeType, List<CornerData.EnumWithThresholds>>();
-        
-        static CarData() 
+
+        static CarData()
         {
-            carClasses.Add(new CarClass(CarClassEnum.UNKNOWN_RACE, new String[] { "" }, new int[] { -1 }, BrakeType.Iron_Race, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp));
-
-            carClasses.Add(new CarClass(CarClassEnum.GT1X, new String[] { "GT1X" }, new int[] { 1710 }, BrakeType.Ceramic, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp));
-            carClasses.Add(new CarClass(CarClassEnum.GT1, new String[] { "GT1" }, new int[] { 1687 }, BrakeType.Ceramic, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp));
-            carClasses.Add(new CarClass(CarClassEnum.GT2, new String[] { "GT2" }, new int[] { 1704 }, BrakeType.Ceramic, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp));
-            carClasses.Add(new CarClass(CarClassEnum.GT3, new String[] { "GT3" }, new int[] { 1703, 2922, 3375, 4516 }, BrakeType.Iron_Race, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp));
-            carClasses.Add(new CarClass(CarClassEnum.GT4, new String[] { "GT4" }, new int[] { 1717 }, BrakeType.Iron_Race, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp));
-            carClasses.Add(new CarClass(CarClassEnum.GT5, new String[] { "GT5" }, new int[] { }, BrakeType.Iron_Race, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp));
-
-            carClasses.Add(new CarClass(CarClassEnum.Kart_1, new String[] { "Kart2" }, new int[] { }, BrakeType.Iron_Road, TyreType.Unknown_Race, maxRoadSafeWaterTemp, maxRoadSafeOilTemp,
-                kartMinTyreCircumference, kartMaxTyreCircumference));
-            carClasses.Add(new CarClass(CarClassEnum.Kart_2, new String[] { "Kart1" }, new int[] { }, BrakeType.Iron_Road, TyreType.Unknown_Race, maxRoadSafeWaterTemp, maxRoadSafeOilTemp,
-                kartMinTyreCircumference, kartMaxTyreCircumference));
-
-            carClasses.Add(new CarClass(CarClassEnum.LMP1, new String[] { "LMP1" }, new int[] { 1714 }, BrakeType.Carbon, TyreType.Unknown_Race, maxExoticRaceSafeWaterTemp, maxExoticRaceSafeOilTemp));
-            carClasses.Add(new CarClass(CarClassEnum.LMP2, new String[] { "LMP2" }, new int[] { 1923 }, BrakeType.Ceramic, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp));
-            carClasses.Add(new CarClass(CarClassEnum.LMP3, new String[] { "LMP3" }, new int[] {  }, BrakeType.Ceramic, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp));
-
-            carClasses.Add(new CarClass(CarClassEnum.GROUPC, new String[] { "Group C1" }, new int[] { }, BrakeType.Ceramic, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp));
-            carClasses.Add(new CarClass(CarClassEnum.GROUP6, new String[] { "Group 6" }, new int[] { }, BrakeType.Iron_Race, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp));
-            carClasses.Add(new CarClass(CarClassEnum.GROUP5, new String[] { "Group 5" }, new int[] { 1708 }, BrakeType.Iron_Race, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp));
-            carClasses.Add(new CarClass(CarClassEnum.GTO, new String[] { "GTO" }, new int[] {  1713 }, BrakeType.Iron_Race, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp));
-            carClasses.Add(new CarClass(CarClassEnum.GROUP4, new String[] { "Group 4" }, new int[] { 2378 }, BrakeType.Iron_Race, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp));
-            carClasses.Add(new CarClass(CarClassEnum.GROUPA, new String[] { "Group A" }, new int[] { 1712, 3499 }, BrakeType.Iron_Race, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp)); // just for reference...
-
-            carClasses.Add(new CarClass(CarClassEnum.INDYCAR, new String[] { }, new int[] { 5383 }, BrakeType.Carbon, TyreType.Unknown_Race, maxExoticRaceSafeWaterTemp, maxExoticRaceSafeOilTemp));
-            carClasses.Add(new CarClass(CarClassEnum.F1, new String[] { "FA" }, new int[] { }, BrakeType.Carbon, TyreType.Unknown_Race, maxExoticRaceSafeWaterTemp, maxExoticRaceSafeOilTemp));
-            carClasses.Add(new CarClass(CarClassEnum.F2, new String[] { "FB" }, new int[] { 4597 }, BrakeType.Carbon, TyreType.Unknown_Race, maxExoticRaceSafeWaterTemp, maxExoticRaceSafeOilTemp));
-            carClasses.Add(new CarClass(CarClassEnum.FORMULA_RENAULT, new String[] { "Forumula Renault" }, new int[] { }, BrakeType.Carbon, TyreType.Unknown_Race, maxExoticRaceSafeWaterTemp, maxExoticRaceSafeOilTemp, carMinTyreCircumference, carMaxTyreCircumference));
-
-            carClasses.Add(new CarClass(CarClassEnum.F3, new String[] { "FC" }, new int[] { 5652 }, BrakeType.Ceramic, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp));
-            carClasses.Add(new CarClass(CarClassEnum.F4, new String[] { "F4" }, new int[] { 4867 }, BrakeType.Iron_Race, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp));
-            carClasses.Add(new CarClass(CarClassEnum.FF, new String[] { "F5" }, new int[] { 253 }, BrakeType.Iron_Race, TyreType.Unknown_Race, maxRoadSafeWaterTemp, maxRoadSafeOilTemp));   // formula ford
-
-            // here we assume the old race cars (pre-radial tyres) will race on bias ply tyres
-            carClasses.Add(new CarClass(CarClassEnum.VINTAGE_F1_C, new String[] { "Vintage F1 C" }, new int[] { }, BrakeType.Iron_Race, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp, carMinTyreCircumference, carMaxTyreCircumference));
-            carClasses.Add(new CarClass(CarClassEnum.VINTAGE_F1_B, new String[] { "Vintage F1 B" }, new int[] { }, BrakeType.Iron_Race, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp, carMinTyreCircumference, carMaxTyreCircumference));
-            carClasses.Add(new CarClass(CarClassEnum.VINTAGE_F1_A, new String[] { "Vintage F1 A" }, new int[] { }, BrakeType.Iron_Race, TyreType.Bias_Ply, maxRaceSafeWaterTemp, maxRaceSafeOilTemp, carMinTyreCircumference, carMaxTyreCircumference));
-            carClasses.Add(new CarClass(CarClassEnum.VINTAGE_F1_A1, new String[] { "Vintage F1 A1" }, new int[] { }, BrakeType.Iron_Race, TyreType.Bias_Ply, maxRaceSafeWaterTemp, maxRaceSafeOilTemp, carMinTyreCircumference, carMaxTyreCircumference));
-            carClasses.Add(new CarClass(CarClassEnum.VINTAGE_F3_A, new String[] { "Vintage F3 A" }, new int[] { }, BrakeType.Iron_Race, TyreType.Bias_Ply, maxRaceSafeWaterTemp, maxRaceSafeOilTemp, carMinTyreCircumference, carMaxTyreCircumference));
-            carClasses.Add(new CarClass(CarClassEnum.VINTAGE_INDY_65, new String[] { "Vintage Indy 65" }, new int[] { }, BrakeType.Iron_Race, TyreType.Bias_Ply, maxRaceSafeWaterTemp, maxRaceSafeOilTemp, carMinTyreCircumference, carMaxTyreCircumference));
-            carClasses.Add(new CarClass(CarClassEnum.VINTAGE_GT3, new String[] { "Vintage GT3" }, new int[] { }, BrakeType.Iron_Race, TyreType.Bias_Ply, maxRaceSafeWaterTemp, maxRaceSafeOilTemp, carMinTyreCircumference, carMaxTyreCircumference));
-            carClasses.Add(new CarClass(CarClassEnum.VINTAGE_GT, new String[] { "Vintage GT" }, new int[] { }, BrakeType.Iron_Race, TyreType.Bias_Ply, maxRaceSafeWaterTemp, maxRaceSafeOilTemp, carMinTyreCircumference, carMaxTyreCircumference));
-            carClasses.Add(new CarClass(CarClassEnum.HISTORIC_TOURING_1, new String[] { "Historic Touring 1" }, new int[] { }, BrakeType.Iron_Race, TyreType.Bias_Ply, maxRaceSafeWaterTemp, maxRaceSafeOilTemp, carMinTyreCircumference, carMaxTyreCircumference));
-            carClasses.Add(new CarClass(CarClassEnum.HISTORIC_TOURING_2, new String[] { "Historic Touring 2" }, new int[] { }, BrakeType.Iron_Race, TyreType.Bias_Ply, maxRaceSafeWaterTemp, maxRaceSafeOilTemp, carMinTyreCircumference, carMaxTyreCircumference));
-
-            carClasses.Add(new CarClass(CarClassEnum.STOCK_CAR, new String[] { "Vintage Stockcar" }, new int[] { }, BrakeType.Iron_Race, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp));
-            carClasses.Add(new CarClass(CarClassEnum.TRANS_AM, new String[] { "Trans-Am" }, new int[] { 1707, 1706 }, BrakeType.Iron_Race, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp));
-
-            carClasses.Add(new CarClass(CarClassEnum.DTM, new String[] { "TC3" }, new int[] { }, BrakeType.Carbon, TyreType.Unknown_Race, maxExoticRaceSafeWaterTemp, maxExoticRaceSafeOilTemp)); // modern DTM
-            carClasses.Add(new CarClass(CarClassEnum.DTM_2013, new String[] { }, new int[] { 1921 }, BrakeType.Carbon, TyreType.Unknown_Race, maxExoticRaceSafeWaterTemp, maxExoticRaceSafeOilTemp)); // modern DTM
-            carClasses.Add(new CarClass(CarClassEnum.DTM_2014, new String[] { }, new int[] { 3086 }, BrakeType.Carbon, TyreType.Unknown_Race, maxExoticRaceSafeWaterTemp, maxExoticRaceSafeOilTemp)); // modern DTM
-            carClasses.Add(new CarClass(CarClassEnum.DTM_2015, new String[] { }, new int[] { 4260 }, BrakeType.Carbon, TyreType.Unknown_Race, maxExoticRaceSafeWaterTemp, maxExoticRaceSafeOilTemp)); // modern DTM
-            carClasses.Add(new CarClass(CarClassEnum.DTM_2016, new String[] { }, new int[] { 5262 }, BrakeType.Carbon, TyreType.Unknown_Race, maxExoticRaceSafeWaterTemp, maxExoticRaceSafeOilTemp)); // modern DTM
-            carClasses.Add(new CarClass(CarClassEnum.CLIO_CUP, new String[] { "TC1" }, new int[] { }, BrakeType.Iron_Race, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp)); // clios
-            carClasses.Add(new CarClass(CarClassEnum.MEGANE_TROPHY, new String[] { "Megane Trophy" }, new int[] { }, BrakeType.Iron_Race, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp)); // clios
-            carClasses.Add(new CarClass(CarClassEnum.TC1, new String[] { "WTCC_2014" }, new int[] { 4517 }, BrakeType.Iron_Race, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp)); // clios
-            carClasses.Add(new CarClass(CarClassEnum.TC1_2014, new String[] { "WTCC_2014" }, new int[] { 3905 }, BrakeType.Iron_Race, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp)); // clios
-            carClasses.Add(new CarClass(CarClassEnum.TC2, new String[] { "BTCC, WTCC_2013", "TC2" }, new int[] { 1922 }, BrakeType.Iron_Race, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp)); // clios
-            carClasses.Add(new CarClass(CarClassEnum.AUDI_TT_CUP, new String[] { "Audi TT Cup" }, new int[] { 4680, 5726 }, BrakeType.Iron_Race, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp, carMinTyreCircumference, carMaxTyreCircumference));
-            carClasses.Add(new CarClass(CarClassEnum.AUDI_TT_VLN, new String[] { "Audi TT VLN" }, new int[] { 5234 }, BrakeType.Ceramic, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp, carMinTyreCircumference, carMaxTyreCircumference));
-            carClasses.Add(new CarClass(CarClassEnum.V8_SUPERCAR, new String[] { "V8 Supercars" }, new int[] { }, BrakeType.Iron_Race, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp, carMinTyreCircumference, carMaxTyreCircumference));
-
-            carClasses.Add(new CarClass(CarClassEnum.ROAD_D, new String[] { "Road D" }, new int[] { }, BrakeType.Iron_Road, TyreType.Road, maxRoadSafeWaterTemp, maxRoadSafeOilTemp));
-            carClasses.Add(new CarClass(CarClassEnum.ROAD_C2, new String[] { "Road C2"}, new int[] { }, BrakeType.Iron_Road, TyreType.Road, maxRoadSafeWaterTemp, maxRoadSafeOilTemp));
-            carClasses.Add(new CarClass(CarClassEnum.ROAD_C1, new String[] { "Road C1" }, new int[] { }, BrakeType.Iron_Road, TyreType.Road, maxRoadSafeWaterTemp, maxRoadSafeOilTemp));
-            carClasses.Add(new CarClass(CarClassEnum.ROAD_B, new String[] { "Road B" }, new int[] { }, BrakeType.Iron_Road, TyreType.Road, maxRoadSafeWaterTemp, maxRoadSafeOilTemp));
-            carClasses.Add(new CarClass(CarClassEnum.ROAD_SUPERCAR, new String[] { "Road A" }, new int[] { }, BrakeType.Ceramic, TyreType.Road, maxRoadSafeWaterTemp, maxRoadSafeOilTemp));
-
-            carClasses.Add(new CarClass(CarClassEnum.HILL_CLIMB_ICONS, new String[] { }, new int[] { 1685 }, BrakeType.Ceramic, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp));
-
-            carClasses.Add(new CarClass(CarClassEnum.NSU_TT, new String[] { }, new int[] { 4813 }, BrakeType.Iron_Road, TyreType.Unknown_Race, maxRoadSafeWaterTemp, maxRoadSafeOilTemp));
-            carClasses.Add(new CarClass(CarClassEnum.KTM_RR, new String[] {  }, new int[] { 5385 }, BrakeType.Iron_Race, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp, carMinTyreCircumference, carMaxTyreCircumference));
-
-            
             List<CornerData.EnumWithThresholds> roadTyreTempsThresholds = new List<CornerData.EnumWithThresholds>();
             roadTyreTempsThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.COLD, -10000, maxColdRoadTyreTempPeak));
             roadTyreTempsThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.WARM, maxColdRoadTyreTempPeak, maxWarmRoadTyreTempPeak));
@@ -242,20 +98,6 @@ namespace CrewChiefV4
             biasPlyTyreTempsThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.COOKING, maxHotBiasPlyTyreTempPeak, 10000));
             tyreTempThresholds.Add(TyreType.Bias_Ply, biasPlyTyreTempsThresholds);
 
-            List<CornerData.EnumWithThresholds> dtmOptionTyreTempsThresholds = new List<CornerData.EnumWithThresholds>();
-            dtmOptionTyreTempsThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.COLD, -10000, maxColdDtmOptionTyreTempPeak));
-            dtmOptionTyreTempsThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.WARM, maxColdDtmOptionTyreTempPeak, maxWarmDtmOptionTyreTempPeak));
-            dtmOptionTyreTempsThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.HOT, maxWarmDtmOptionTyreTempPeak, maxHotDtmOptionTyreTempPeak));
-            dtmOptionTyreTempsThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.COOKING, maxHotDtmOptionTyreTempPeak, 10000));
-            tyreTempThresholds.Add(TyreType.Option, dtmOptionTyreTempsThresholds);
-
-            List<CornerData.EnumWithThresholds> dtmPrimeTyreTempsThresholds = new List<CornerData.EnumWithThresholds>();
-            dtmPrimeTyreTempsThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.COLD, -10000, maxColdDtmPrimeTyreTempPeak));
-            dtmPrimeTyreTempsThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.WARM, maxColdDtmPrimeTyreTempPeak, maxWarmDtmPrimeTyreTempPeak));
-            dtmPrimeTyreTempsThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.HOT, maxWarmDtmPrimeTyreTempPeak, maxHotDtmPrimeTyreTempPeak));
-            dtmPrimeTyreTempsThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.COOKING, maxHotDtmPrimeTyreTempPeak, 10000));
-            tyreTempThresholds.Add(TyreType.Prime, dtmPrimeTyreTempsThresholds);
-
             List<CornerData.EnumWithThresholds> r3eNewTyreTempsThresholds = new List<CornerData.EnumWithThresholds>();
             r3eNewTyreTempsThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.COLD, -10000, maxColdR3ENewTyreTempPeak));
             r3eNewTyreTempsThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.WARM, maxColdR3ENewTyreTempPeak, maxWarmR3ENewTyreTempPeak));
@@ -269,6 +111,13 @@ namespace CrewChiefV4
             r3eNewPrimeTyreTempsThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.HOT, maxWarmR3ENewPrimeTyreTempPeak, maxHotR3ENewPrimeTyreTempPeak));
             r3eNewPrimeTyreTempsThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.COOKING, maxHotR3ENewPrimeTyreTempPeak, 10000));
             tyreTempThresholds.Add(TyreType.R3E_NEW_Prime, r3eNewPrimeTyreTempsThresholds);
+
+            List<CornerData.EnumWithThresholds> r3eNewOptionTyreTempsThresholds = new List<CornerData.EnumWithThresholds>();
+            r3eNewOptionTyreTempsThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.COLD, -10000, maxColdR3ENewOptionTyreTempPeak));
+            r3eNewOptionTyreTempsThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.WARM, maxColdR3ENewOptionTyreTempPeak, maxWarmR3ENewOptionTyreTempPeak));
+            r3eNewOptionTyreTempsThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.HOT, maxWarmR3ENewOptionTyreTempPeak, maxHotR3ENewOptionTyreTempPeak));
+            r3eNewOptionTyreTempsThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.COOKING, maxHotR3ENewOptionTyreTempPeak, 10000));
+            tyreTempThresholds.Add(TyreType.R3E_NEW_Option, r3eNewOptionTyreTempsThresholds);
 
             List<CornerData.EnumWithThresholds> ironRoadBrakeTempsThresholds = new List<CornerData.EnumWithThresholds>();
             ironRoadBrakeTempsThresholds.Add(new CornerData.EnumWithThresholds(BrakeTemp.COLD, -10000, maxColdIronRoadBrakeTemp));
@@ -299,107 +148,386 @@ namespace CrewChiefV4
             brakeTempThresholds.Add(BrakeType.Carbon, carbonBrakeTempsThresholds);
         }
 
-        public static CarClass getCarClassForPCarsClassName(String carClassName)
+
+
+        private static CarClasses CAR_CLASSES;
+
+        // used for PCars only, where we only know if the opponent is the same class as us or not
+        public static CarClass DEFAULT_PCARS_OPPONENT_CLASS = new CarClass();
+
+        private static Dictionary<string, CarClass> nameToCarClass;
+        private static Dictionary<int, CarClass> intToCarClass;
+
+        public class CarClass
         {
-            if (carClassName != null && carClassName.Count() > 1)
+            [JsonConverter(typeof(StringEnumConverter))]
+            public CarClassEnum carClassEnum { get; set; }
+            public List<int> raceroomClassIds { get; set; }
+            public List<string> pCarsClassNames { get; set; }
+            public List<string> rf1ClassNames { get; set; }
+            public List<string> rf2ClassNames { get; set; }
+            public List<string> acClassNames { get; set; }
+
+            [JsonConverter(typeof(StringEnumConverter))]
+            public BrakeType brakeType { get; set; }
+            [JsonConverter(typeof(StringEnumConverter))]
+            public TyreType defaultTyreType { get; set; }
+            public float maxSafeWaterTemp { get; set; }
+            public float maxSafeOilTemp { get; set; }
+            public float minTyreCircumference { get; set; }
+            public float maxTyreCircumference { get; set; }
+
+            public String placeholderClassId = "";
+
+            public List<Regex> pCarsClassNamesRegexs = new List<Regex>();
+            public List<Regex> rf1ClassNamesRegexs = new List<Regex>();
+            public List<Regex> rf2ClassNamesRegexs = new List<Regex>();
+            public List<Regex> acClassNamesRegexs = new List<Regex>();
+
+            public CarClass()
             {
-                Boolean skipFirstChar = false;
-                if (carClassName.StartsWith(PCarsGameStateMapper.NULL_CHAR_STAND_IN)) {
-                    carClassName = carClassName.Substring(1);
-                    skipFirstChar = true;
-                }
-                foreach (CarClass carClass in carClasses)
+                // initialise with default values
+                this.carClassEnum = CarClassEnum.UNKNOWN_RACE;
+                this.raceroomClassIds = new List<int>();
+                this.pCarsClassNames = new List<string>();
+                this.rf1ClassNames = new List<string>();
+                this.rf2ClassNames = new List<string>();
+                this.acClassNames = new List<string>();
+                this.brakeType = BrakeType.Iron_Race;
+                this.defaultTyreType = TyreType.Unknown_Race;
+                this.maxSafeWaterTemp = 105;
+                this.maxSafeOilTemp = 125;
+                this.minTyreCircumference = 0.4f * (float)Math.PI;
+                this.maxTyreCircumference = 1.2f * (float)Math.PI;
+            }
+
+            public String getClassIdentifier()
+            {
+                if (this.carClassEnum == CarClassEnum.UNKNOWN_RACE)
                 {
-                    foreach (String className in carClass.pCarsClassNames) {
-                        if ((!skipFirstChar && className.Equals(carClassName)) || (skipFirstChar && className.Substring(1).Equals(carClassName))) {
-                            return carClass;
+                    // this class has been generated from an unrecognised ID, so return the
+                    // ID we used to generate this new class.
+                    return placeholderClassId;
+                }
+                else
+                {
+                    return this.carClassEnum.ToString();
+                }
+            }
+
+            public void setupRegexs()
+            {
+                setupRegexs(rf1ClassNames, rf1ClassNamesRegexs);
+                setupRegexs(rf2ClassNames, rf2ClassNamesRegexs);
+                setupRegexs(acClassNames, acClassNamesRegexs);
+                setupRegexsForPCars(pCarsClassNames, pCarsClassNamesRegexs);
+            }
+
+            /**
+             * Create regexs for classnames with wildcards.
+             */
+            private void setupRegexs(List<string> classNames, List<Regex> regexs)
+            {
+                foreach (String className in classNames)
+                {
+                    if (className.Count() > 0)
+                    {
+                        if (className.Contains("*") || className.Contains("?"))
+                        {
+                            String regexStr = wildcardToRegex(className);
+                            regexs.Add(new Regex(regexStr, RegexOptions.IgnoreCase));                            
                         }
                     }
                 }
             }
-            return getDefaultCarClass();
+
+            /**
+             * Separate method for Pcars which adds a copy of each classname with the null-standin char as the first char - 
+             * i.e. "GT3" has another class called "?T3" for when PCars deems the first character of the classname unimportant.
+             * Note that we also do this for regexs but only if they don't already start with a wildcard.
+             * 
+             */
+            private void setupRegexsForPCars(List<string> classNames, List<Regex> regexs)
+            {
+                List<String> classesWithNullStandinChar = new List<string>();
+                foreach (String className in classNames)
+                {
+                    if (className.Count() > 0)
+                    {
+                        if (className.Contains("*") || className.Contains("?"))
+                        {
+                            String regexStr = wildcardToRegex(className);
+                            regexs.Add(new Regex(regexStr, RegexOptions.IgnoreCase));
+                            if (!className.StartsWith("*") && !className.StartsWith("?"))
+                            {
+                                // sometimes PCars sends null instead of the proper first char of the String. We replace this with "?", 
+                                // so assemble another regex here who's first 2 characters are replaced with the literal "^?", but only
+                                // if this regex doesn't start with a wildcard
+                                regexs.Add(new Regex("^\\" + PCarsGameStateMapper.NULL_CHAR_STAND_IN + regexStr.Substring(2), RegexOptions.IgnoreCase));
+                            }
+                        }
+                        // sometimes PCars sends null instead of the proper first char of the String. We replace this with "?", 
+                        // add another class name here who's first character is replaced with "?"
+                        classesWithNullStandinChar.Add(PCarsGameStateMapper.NULL_CHAR_STAND_IN + className.Substring(1));
+                    }
+                }
+                classNames.AddRange(classesWithNullStandinChar);
+            }
+
+            private String wildcardToRegex(string pattern)
+            {
+                return "^" + Regex.Escape(pattern).Replace("\\*", ".*").Replace("\\?", ".") + "$";
+            }
         }
 
-        public static CarClass getCarClassForRaceRoomId(int carClassId)
+        public class CarClasses
         {
-            if (carClassId != -1)
+            public List<CarClass> carClasses { get; set; }
+            public CarClasses()
             {
-                foreach (CarClass carClass in carClasses)
-                {
-                    if (carClass.raceroomClassIds.Contains(carClassId))
-                    {
-                        return carClass;
-                    }
+                this.carClasses = new List<CarClass>();
+            }
+        }
 
+        public static void loadCarClassData()
+        {
+            CarClasses defaultCarClassData = getCarClassDataFromFile(getDefaultCarClassFileLocation());
+            CarClasses userCarClassData = getCarClassDataFromFile(getUserCarClassFileLocation());
+            mergeCarClassData(defaultCarClassData, userCarClassData);
+            foreach (CarClass carClass in userCarClassData.carClasses)
+            {
+                carClass.setupRegexs();
+            }
+            CAR_CLASSES = userCarClassData;
+
+            // reset session scoped cache of class name / ID to CarClass Dictionary.
+            nameToCarClass = new Dictionary<string, CarClass>();
+            intToCarClass = new Dictionary<int, CarClass>();
+        }
+
+        private static void mergeCarClassData(CarClasses defaultCarClassData, CarClasses userCarClassData)
+        {
+            int userCarClassesCount = 0;
+            List<CarClass> classesToAddFromDefault = new List<CarClass>();
+            foreach (CarClass defaultCarClass in defaultCarClassData.carClasses)
+            {
+                Boolean isInUserCarClasses = false;
+                foreach (CarClass userCarClass in userCarClassData.carClasses)
+                {
+                    if (userCarClass.carClassEnum == defaultCarClass.carClassEnum)
+                    {
+                        isInUserCarClasses = true;
+                        userCarClassesCount++;
+                        break;
+                    }
+                }
+                if (!isInUserCarClasses)
+                {
+                    classesToAddFromDefault.Add(defaultCarClass);
                 }
             }
-            CarClass defaultClass = getDefaultCarClass();
-            return defaultClass;
+            userCarClassData.carClasses.AddRange(classesToAddFromDefault);
+            Console.WriteLine("Loaded " + defaultCarClassData.carClasses.Count + " default car class definitions and " +
+                userCarClassesCount + " user defined car class definitions");
         }
 
-        public static CarClass getCarClassFromEnum(CarClassEnum carClassEnum) 
+        private static CarClasses getCarClassDataFromFile(String filename)
         {
-            foreach (CarClass carClass in carClasses)
+            if (filename != null)
+            {
+                try
+                {
+                    return JsonConvert.DeserializeObject<CarClasses>(getFileContents(filename));
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Error pasing " + filename + ": " + e.Message);
+                }
+            }
+            return new CarClasses();
+        }
+
+        private static String getFileContents(String fullFilePath)
+        {
+            StringBuilder jsonString = new StringBuilder();
+            StreamReader file = null;
+            try
+            {
+                file = new StreamReader(fullFilePath);
+                String line;
+                while ((line = file.ReadLine()) != null)
+                {
+                    if (!line.Trim().StartsWith("#"))
+                    {
+                        jsonString.AppendLine(line);
+                    }
+                }
+                return jsonString.ToString();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error reading file " + fullFilePath + ": " + e.Message);
+            }
+            finally
+            {
+                if (file != null)
+                {
+                    file.Close();
+                }
+            }
+            return null;
+        }
+
+        private static String getDefaultCarClassFileLocation()
+        {
+            String path = Configuration.getDefaultFileLocation("carClassData.json");
+            if (File.Exists(path))
+            {
+                return path;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        private static String getUserCarClassFileLocation()
+        {
+            String path = System.IO.Path.Combine(Environment.GetFolderPath(
+                Environment.SpecialFolder.MyDocuments), "CrewChiefV4", "carClassData.json");
+
+            if (File.Exists(path))
+            {
+                return path;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public static CarClass getCarClassFromEnum(CarClassEnum carClassEnum)
+        {
+            foreach (CarClass carClass in CAR_CLASSES.carClasses)
             {
                 if (carClass.carClassEnum == carClassEnum)
                 {
                     return carClass;
                 }
             }
-            return getDefaultCarClass();
+            return new CarClass();
         }
 
-        // returns default car class with rFactor vehicle class name
-        public static CarClass getCarClassForRF1ClassName(String rF1ClassName)
+        public static CarClass getCarClassForRaceRoomId(int carClassId)
         {
-            foreach (CarClass carClass in carClasses)
+            // first check if it's in the cache
+            if (intToCarClass.ContainsKey(carClassId))
             {
-                if (carClass.rFClassName == rF1ClassName)
+                return intToCarClass[carClassId];
+            }
+            foreach (CarClass carClass in CAR_CLASSES.carClasses)
+            {
+                if (carClass.raceroomClassIds.Contains(carClassId))
                 {
+                    intToCarClass.Add(carClassId, carClass);
                     return carClass;
                 }
             }
+
             // create one if it doesn't exist
-            CarClass rFactorClass = new CarClass(CarClassEnum.UNKNOWN_RACE, new String[] { "" }, new int[] { -1 }, BrakeType.Iron_Race, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp);
-            rFactorClass.rFClassName = rF1ClassName;
-            carClasses.Add(rFactorClass);
-            return rFactorClass;
+            CarClass newCarClass = new CarClass();
+            intToCarClass.Add(carClassId, newCarClass);
+            newCarClass.placeholderClassId = carClassId.ToString();
+            return newCarClass;
         }
 
-        private static Dictionary<string, CarClass> mapRF2Classes = new Dictionary<string, CarClass>();
-        public static CarClass getCarClassForRF2ClassName(String rFClassName)
+        public static CarClass getCarClassForClassName(String className)
         {
-            CarClass knownCarClass = null;
-            if (mapRF2Classes.TryGetValue(rFClassName, out knownCarClass))
-                return knownCarClass;
-
-            // Try finding a suitable enum value for rF2 Class.
-            CarClassEnum carClassID = CarClassEnum.UNKNOWN_RACE;
-            if (!Enum.TryParse<CarClassEnum>(rFClassName, out carClassID))
+            if (className == null)
             {
-                carClassID = CarClassEnum.UNKNOWN_RACE;
-                // Create one if it doesn't exist
-                CarClass newRFactorClass = new CarClass(carClassID, new String[] { "" }, new int[] { -1 }, BrakeType.Iron_Race, TyreType.Unknown_Race, maxRaceSafeWaterTemp, maxRaceSafeOilTemp);
-                newRFactorClass.rFClassName = rFClassName;
-
-                carClasses.Add(newRFactorClass);
-                mapRF2Classes.Add(rFClassName, newRFactorClass);
-
-                return newRFactorClass;
+                // should we return null here? Throw an IllegalArgumentException?
+                Console.WriteLine("Null car class name");
+                return new CarClass();
             }
-
-            CarClass rFactorClass = CarData.getCarClassFromEnum(carClassID);
-            rFactorClass.rFClassName = rFClassName;
-
-            // Register one of built in classes as rF2 class.
-            mapRF2Classes.Add(rFClassName, rFactorClass);
-
-            return rFactorClass;
-        }
-
-        public static CarClass getDefaultCarClass()
-        {
-            return carClasses[0];
+            else
+            {
+                // first check if it's in the cache
+                if (nameToCarClass.ContainsKey(className))
+                {
+                    return nameToCarClass[className];
+                }
+                else
+                {
+                    String classNamesPropName = null;
+                    String regexsPropName = null;
+                    switch (CrewChief.gameDefinition.gameEnum)
+                    {
+                        case GameEnum.PCARS_64BIT:
+                        case GameEnum.PCARS_32BIT:
+                        case GameEnum.PCARS_NETWORK:
+                            classNamesPropName = "pCarsClassNames";
+                            regexsPropName = "pCarsClassNamesRegexs";
+                            break;
+                        case GameEnum.RF1:
+                            classNamesPropName = "rf1ClassNames";
+                            regexsPropName = "rf1ClassNamesRegexs";
+                            break;
+                        case GameEnum.ASSETTO_64BIT:
+                        case GameEnum.ASSETTO_32BIT:
+                            classNamesPropName = "acClassNames";
+                            regexsPropName = "acClassNamesRegexs";
+                            break;
+                        case GameEnum.RF2_64BIT:
+                            classNamesPropName = "rf2ClassNames";
+                            regexsPropName = "rf2ClassNamesRegexs";
+                            break;
+                        default:
+                            // err....
+                            return new CarClass();
+                            break;
+                    }
+                    foreach (CarClass carClass in CAR_CLASSES.carClasses)
+                    {
+                        List<String> classNames = (List<String>) carClass.GetType().GetProperty(classNamesPropName).GetValue(carClass, null);
+                        foreach (String thisClassName in classNames)
+                        {
+                            if (thisClassName == className)
+                            {
+                                nameToCarClass.Add(className, carClass);
+                                return carClass;
+                            }
+                        }
+                    }
+                    foreach (CarClass carClass in CAR_CLASSES.carClasses)
+                    {
+                        List<Regex> regexs = (List<Regex>) carClass.GetType().GetField(regexsPropName).GetValue(carClass);
+                        foreach (Regex regex in regexs)
+                        {
+                            if (regex.IsMatch(className))
+                            {
+                                nameToCarClass.Add(className, carClass);
+                                return carClass;
+                            }
+                        }
+                    }
+                    // no match, try matching on the enum directly
+                    CarClassEnum carClassID = CarClassEnum.UNKNOWN_RACE;
+                    if (Enum.TryParse<CarClassEnum>(className, out carClassID))
+                    {
+                        CarClass existingClass = CarData.getCarClassFromEnum(carClassID);
+                        nameToCarClass.Add(className, existingClass);
+                        return existingClass;
+                    }
+                    else
+                    {
+                        // no match - we really don't know what this class is, so create one
+                        CarClass newCarClass = new CarClass();
+                        newCarClass.placeholderClassId = className;
+                        nameToCarClass.Add(className, newCarClass);
+                        return newCarClass;
+                    }
+                }
+            }
         }
 
         public static List<CornerData.EnumWithThresholds> getBrakeTempThresholds(CarClass carClass)

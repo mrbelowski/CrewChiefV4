@@ -9,13 +9,26 @@ using CrewChiefV4.NumberProcessing;
 
 namespace CrewChiefV4
 {
-    public class MessageFragment
+    public enum FragmentType
     {
-        public enum FragmentType
-        {
-            Text, Time, Opponent, Integer
-        }
+        Text, Time, Opponent, Integer, Delayed
+    }
 
+    public class DelayedMessageEvent
+    {
+        public String methodName;
+        public Object[] methodParams;
+        public AbstractEvent abstractEvent;
+        public DelayedMessageEvent(String methodName, Object[] methodParams, AbstractEvent abstractEvent)
+        {
+            this.methodName = methodName;
+            this.methodParams = methodParams;
+            this.abstractEvent = abstractEvent;
+        }
+    }
+
+    public class MessageFragment
+    {        
         public String text;
         public TimeSpan timeSpan;
         public OpponentData opponent;
@@ -105,6 +118,9 @@ namespace CrewChiefV4
         public List<String> messageFolders;
         public Boolean playEvenWhenSilenced;
 
+        private DelayedMessageEvent delayedMessageEvent;
+        public Boolean delayMessageResolution = false;
+
         private Random rand = new Random();
 
         // some snapshot of pertentent data at the point of creation, 
@@ -192,10 +208,26 @@ namespace CrewChiefV4
             this.abstractEvent = abstractEvent;
         }
 
+        public QueuedMessage(String messageName, DelayedMessageEvent delayedMessageEvent, int secondsDelay, AbstractEvent abstractEvent)
+        {
+            this.messageName = compoundMessageIdentifier + messageName;
+            this.delayedMessageEvent = delayedMessageEvent;
+            this.delayMessageResolution = true;
+            this.dueTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + (secondsDelay * 1000) + updateInterval;
+            this.delayMessageResolution = true;
+            this.abstractEvent = abstractEvent;
+        }
+
         public Boolean isMessageStillValid(String eventSubType, GameStateData currentGameState)
         {
             return this.abstractEvent == null || 
                 this.abstractEvent.isMessageStillValid(eventSubType, currentGameState, validationData);
+        }
+
+        public void resolveDelayedContents()
+        {
+            this.messageFolders = getMessageFolders((List<MessageFragment>) delayedMessageEvent.abstractEvent.GetType().GetMethod(delayedMessageEvent.methodName).
+                Invoke(delayedMessageEvent.abstractEvent, delayedMessageEvent.methodParams), false);
         }
 
         private List<String> getMessageFolders(List<MessageFragment> messageFragments, Boolean hasAlternative)
@@ -211,7 +243,7 @@ namespace CrewChiefV4
                 }
                 switch (messageFragment.type)
                 {
-                    case MessageFragment.FragmentType.Text:
+                    case FragmentType.Text:
                         if (messageFragment.text.StartsWith(AudioPlayer.PAUSE_ID) || SoundCache.availableSounds.Contains(messageFragment.text) ||
                             SoundCache.availableDriverNames.Contains(messageFragment.text))
                         {
@@ -222,7 +254,7 @@ namespace CrewChiefV4
                             canBePlayed = false;
                         }                     
                         break;
-                    case MessageFragment.FragmentType.Time:
+                    case FragmentType.Time:
                         // if this time fragment is not the last message fragment, then some languages (Italian only at the time of writing)
                         // require a different inflection to their tenths sounds
                         Boolean useMoreInflection = i < messageFragments.Count - 1;
@@ -252,7 +284,7 @@ namespace CrewChiefV4
                             canBePlayed = false;
                         }
                         break;                    
-                    case MessageFragment.FragmentType.Opponent:
+                    case FragmentType.Opponent:
                         canBePlayed = false;
                         if (messageFragment.opponent != null)
                         {
@@ -269,7 +301,7 @@ namespace CrewChiefV4
                             }
                         }                        
                         break;
-                    case MessageFragment.FragmentType.Integer:                        
+                    case FragmentType.Integer:                        
                         if (numberReader != null)
                         {
                             List<String> integerFolders = numberReader.GetIntegerSounds(messageFragment.integer);

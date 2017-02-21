@@ -119,6 +119,7 @@ namespace CrewChiefV4.assetto
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
             public float[] brakeTemp;
             public float clutch;
+
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
             public float[] tyreTempI;
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
@@ -134,7 +135,6 @@ namespace CrewChiefV4.assetto
             public acsVec3[] tyreContactHeading;
             float brakeBias;
             public acsVec3 localVelocity;
-           
         }
 
         [StructLayout(LayoutKind.Sequential, Pack = 4, CharSet = CharSet.Unicode)]

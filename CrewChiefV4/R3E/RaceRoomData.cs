@@ -221,6 +221,31 @@ namespace CrewChiefV4.RaceRoom
         }
 
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
+        public struct FlagsExtended
+        {
+            // Whether green flag is currently active
+            // -1 = no data
+            //  0 = not active
+            //  1 = active
+            public Int32 green;
+
+            // Whether checkered flag is currently active
+            // -1 = no data
+            //  0 = not active
+            //  1 = active
+            public Int32 checkered;
+
+            // Whether black and white flag is currently active and reason
+            // -1 = no data
+            //  0 = not active
+            //  1 = blue flag 1st warning
+            //  2 = blue flag 2nd warning
+            //  3 = wrong way
+            //  4 = cutting track
+            public Int32 black_and_white;
+        }
+
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         public struct CarDamage
         {
             // ...
@@ -614,6 +639,15 @@ namespace CrewChiefV4.RaceRoom
             //////////////////////////////////////////////////////////////////////////
             // Driver Info
             //////////////////////////////////////////////////////////////////////////
+
+            // not (yet) implemented:
+            /*
+            public FlagsExtended FlagsExtended;
+            public Int32 UnknownInt1;
+            public Int32 UnknownInt2;
+            public Int32 UnknownInt3;
+            public Single UnknownFloat;
+            */
 
             // Number of cars (including the player) in the race
             public Int32 NumCars;

@@ -87,26 +87,27 @@ namespace CrewChiefV4.NumberProcessing
             }
             if (!loadedOverride)
             {
+                StreamReader overrideFile = null;
                 try
                 {
-                    file = new StreamReader(Configuration.getDefaultFileLocation(NUMBER_READER_IMPL_SOURCE_NAME));
+                    overrideFile = new StreamReader(Configuration.getDefaultFileLocation(NUMBER_READER_IMPL_SOURCE_NAME));
                     StringBuilder sb = new StringBuilder();
                     String line;
-                    while ((line = file.ReadLine()) != null)
+                    while ((line = overrideFile.ReadLine()) != null)
                     {
                         sb.AppendLine(line);
                     }
                     LoadNumberReader(sb.ToString());
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
 
                 }
                 finally
                 {
-                    if (file != null)
+                    if (overrideFile != null)
                     {
-                        file.Close();
+                        overrideFile.Close();
                     }
                 }
             }

@@ -1717,6 +1717,18 @@ namespace CrewChiefV4.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool enable_rf2_blue_on_slower {
+            get {
+                return ((bool)(this["enable_rf2_blue_on_slower"]));
+            }
+            set {
+                this["enable_rf2_blue_on_slower"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("60")]
         public int time_between_caution_period_status_reminders {
             get {
@@ -1724,6 +1736,78 @@ namespace CrewChiefV4.Properties {
             }
             set {
                 this["time_between_caution_period_status_reminders"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string VOLUME_UP_device_guid {
+            get {
+                return ((string)(this["VOLUME_UP_device_guid"]));
+            }
+            set {
+                this["VOLUME_UP_device_guid"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string VOLUME_UP_device_type {
+            get {
+                return ((string)(this["VOLUME_UP_device_type"]));
+            }
+            set {
+                this["VOLUME_UP_device_type"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-1")]
+        public int VOLUME_UP_button_index {
+            get {
+                return ((int)(this["VOLUME_UP_button_index"]));
+            }
+            set {
+                this["VOLUME_UP_button_index"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string VOLUME_DOWN_device_guid {
+            get {
+                return ((string)(this["VOLUME_DOWN_device_guid"]));
+            }
+            set {
+                this["VOLUME_DOWN_device_guid"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string VOLUME_DOWN_device_type {
+            get {
+                return ((string)(this["VOLUME_DOWN_device_type"]));
+            }
+            set {
+                this["VOLUME_DOWN_device_type"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-1")]
+        public int VOLUME_DOWN_button_index {
+            get {
+                return ((int)(this["VOLUME_DOWN_button_index"]));
+            }
+            set {
+                this["VOLUME_DOWN_button_index"] = value;
             }
         }
     }

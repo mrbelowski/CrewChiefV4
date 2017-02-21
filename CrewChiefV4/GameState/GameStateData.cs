@@ -28,7 +28,7 @@ namespace CrewChiefV4.GameState
     public enum TyreType
     {
         // separate enum for compound & weather, and prime / option?
-        Hard, Medium, Soft, Wet, Intermediate, Road, Bias_Ply, Unknown_Race, Option, Prime, R3E_NEW, R3E_NEW_Prime
+        Hard, Medium, Soft, Wet, Intermediate, Road, Bias_Ply, Unknown_Race, R3E_NEW, R3E_NEW_Prime, R3E_NEW_Option
     }
 
     public enum BrakeType
@@ -331,7 +331,7 @@ namespace CrewChiefV4.GameState
 
         public List<LapData> OpponentLapData = new List<LapData>();
 
-        public CarData.CarClass CarClass = CarData.getDefaultCarClass();
+        public CarData.CarClass CarClass = new CarData.CarClass();
 
         // for DTM 2015
         public Boolean HasStartedExtraLap = false;
@@ -806,6 +806,9 @@ namespace CrewChiefV4.GameState
         // MinPermittedDistanceOnCurrentTyre will be half race distance (rounded up)
         public int MaxPermittedDistanceOnCurrentTyre = -1;
         public int MinPermittedDistanceOnCurrentTyre = -1;
+
+        // -1 == n/a; 0 = inactive; 1 = active
+        public int limiterStatus = -1;
     }
 
     public class PenatiesData
@@ -975,7 +978,7 @@ namespace CrewChiefV4.GameState
 
         public DateTime Now;
 
-        public CarData.CarClass carClass = CarData.getDefaultCarClass();
+        public CarData.CarClass carClass = new CarData.CarClass();
 
         public EngineData EngineData = new EngineData();
 
@@ -1180,12 +1183,12 @@ namespace CrewChiefV4.GameState
             }
         }
 
-        public float[] getTimeAndSectorsForBestOpponentLapInWindow(int lapsToCheck, CarData.CarClassEnum carClassToCheck)
+        public float[] getTimeAndSectorsForBestOpponentLapInWindow(int lapsToCheck, String carClassToCheck)
         {
             float[] bestLapWithSectors = new float[] { -1, -1, -1, -1 };
             foreach (KeyValuePair<Object, OpponentData> entry in OpponentData)
             {
-                if (entry.Value.CarClass.carClassEnum == carClassToCheck)
+                if (entry.Value.CarClass.getClassIdentifier() == carClassToCheck)
                 {
                     float[] thisOpponentsBest = entry.Value.getTimeAndSectorsForBestLapInWindow(lapsToCheck);
                     if (bestLapWithSectors[0] == -1 || (thisOpponentsBest[0] > 0 && thisOpponentsBest[0] < bestLapWithSectors[0]))
