@@ -616,7 +616,7 @@ namespace CrewChiefV4.Events
                 }
                 else
                 {
-                    int minutesRemainingOnTheseTyres = (int)Math.Round(((timeElapsed / (maxWearPercent / 100)) - timeElapsed) / 60) - 1;
+                    int minutesRemainingOnTheseTyres = (int)Math.Floor(((timeElapsed / (maxWearPercent / 100)) - timeElapsed) / 60);
                     playEstimatedTyreLifeMinutes(minutesRemainingOnTheseTyres, immediate);
                 }
             }
