@@ -15,6 +15,7 @@ namespace CrewChiefV4.Events
         private String folder5minsLeading = "race_time/five_minutes_left_leading";
         private String folder5minsPodium = "race_time/five_minutes_left_podium";
         private String folder2mins = "race_time/two_minutes_left";
+        private String folder0mins = "race_time/zero_minutes_left";
         // TODO: 2 minutes remaining messages
         //TODO: separate messages depending on the gap
         private String folder10mins = "race_time/ten_minutes_left";
@@ -36,7 +37,7 @@ namespace CrewChiefV4.Events
 
         private String folderOneLapAfterThisOne = "race_time/one_more_lap_after_this_one";
 
-        private Boolean played2mins, played5mins, played10mins, played15mins, played20mins, playedHalfWayHome, playedLastLap;
+        private Boolean played0mins, played2mins, played5mins, played10mins, played15mins, played20mins, playedHalfWayHome, playedLastLap;
 
         private float halfTime;
 
@@ -53,6 +54,12 @@ namespace CrewChiefV4.Events
 
         private Boolean sessionLengthIsTime;
 
+        // allow condition messages during caution periods
+        public override List<SessionPhase> applicableSessionPhases
+        {
+            get { return new List<SessionPhase> { SessionPhase.Green, SessionPhase.Checkered, SessionPhase.FullCourseYellow }; }
+        }
+
         public RaceTime(AudioPlayer audioPlayer)
         {
             this.audioPlayer = audioPlayer;
@@ -60,7 +67,7 @@ namespace CrewChiefV4.Events
 
         public override void clearState()
         {
-            played2mins = false; played5mins = false; played10mins = false; played15mins = false;
+            played0mins = false; played2mins = false; played5mins = false; played10mins = false; played15mins = false;
             played20mins = false; playedHalfWayHome = false; playedLastLap = false;
             halfTime = 0;
             gotHalfTime = false;
@@ -164,6 +171,20 @@ namespace CrewChiefV4.Events
                     // disable pearls for the last part of the race
                     audioPlayer.disablePearlsOfWisdom = true;
                 }
+                // Console.WriteLine("Session time left = " + timeLeft + " SessionRunningTime = " + currentGameState.SessionData.SessionRunningTime);
+                if (!currentGameState.SessionData.HasExtraLap && 
+                    currentGameState.SessionData.SessionRunningTime >= 0 && !played0mins && timeLeft <= 0.2)
+                {
+                    played0mins = true;
+                    played2mins = true;
+                    played5mins = true;
+                    played10mins = true;
+                    played15mins = true;
+                    played20mins = true;
+                    playedHalfWayHome = true;
+                    audioPlayer.suspendPearlsOfWisdom();
+                    audioPlayer.playMessage(new QueuedMessage(folder0mins, 0, this));
+                } 
                 if (currentGameState.SessionData.SessionRunningTime > 60 && !played2mins && timeLeft / 60 < 2 && timeLeft / 60 > 1.9)
                 {
                     played2mins = true;

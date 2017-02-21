@@ -75,6 +75,8 @@ toggle_spotter_on/off = Toggle spotter on/off
 toggle_opponent_deltas_on/off_for_each_lap = Toggle opponent deltas on/off for each lap
 press_to_replay_the_last_message = Press to replay the last message
 udp_network_data_buttons = UDP network data buttons
+volume_up = Increase messages volume
+volume_down = Decrease messages volume
 
 custom_device = custom device
 assigned_to = assigned to

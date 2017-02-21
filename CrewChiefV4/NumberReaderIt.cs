@@ -49,7 +49,10 @@ namespace CrewChiefV4.NumberProcessing
         private static String folderHoursAnd = "numbers_it/hours_and";
         private static String folderHours = "numbers_it/hours";
 
-        private Random random = new Random();
+        protected override String getLocale()
+        {
+            return "it";
+        }
 
         /**
          * Get an Italian sound for a whole number of hours.
@@ -201,6 +204,22 @@ namespace CrewChiefV4.NumberProcessing
                 }
             }
             return messages;
+        }
+
+        /**
+         * Not implemented for Italian number reader.
+         * */
+        protected override String GetSecondsWithTenths(int seconds, int tenths)
+        {
+            return null;
+        }
+
+        /**
+         * Not implemented for Italian number reader.
+         * */
+        protected override List<String> GetMinutesAndSecondsWithTenths(int minutes, int seconds, int tenths)
+        {
+            return null;
         }
 
         /**

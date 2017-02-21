@@ -43,7 +43,10 @@ namespace CrewChiefV4.NumberProcessing
         private static String folderHours = "numbers/hours";
         private static String folderHour = "numbers/hour";
 
-        private Random random = new Random();
+        protected override String getLocale()
+        {
+            return "en";
+        }
 
         /**
          * Get an English sound for a whole number of hours.
@@ -195,6 +198,51 @@ namespace CrewChiefV4.NumberProcessing
             {
                 Console.WriteLine(String.Join(", ", messages));
             } */
+            return messages;
+        }
+
+        /**
+         * 
+         */
+        protected override String GetSecondsWithTenths(int seconds, int tenths)
+        {
+             // sometimes include "seconds" if it's less than 10
+            if (seconds > 0 && seconds < 10 && random.NextDouble() <= 0.5)
+            {
+                return folderNumbersStub + seconds + "point" + tenths + "seconds";
+            }
+            else
+            {
+                return folderNumbersStub + seconds + "point" + tenths;
+            }
+        }
+
+        /**
+         * 
+         */
+        protected override List<String> GetMinutesAndSecondsWithTenths(int minutes, int seconds, int tenths)
+        {
+            List<String> messages = new List<String>();
+			// assume minutes is always 1 or 2
+			if (minutes < 1 || minutes > 2) 
+            {
+				Console.WriteLine("Invalid minutes arg " + minutes + " to GetMinutesAndSecondsWithTenths");
+			} 
+            else 
+            {
+				if (seconds < 1 || seconds > 59)
+                {
+					Console.WriteLine("Invalid seconds arg " + minutes + " to GetMinutesAndSecondsWithTenths");
+				} else 
+				{
+                    String paddedSeconds = seconds < 10 ? "_0" + seconds : "_" + seconds;
+					messages.Add(folderNumbersStub + minutes + paddedSeconds);					
+					if (tenths > 0)
+                    {
+						messages.Add(folderPoint + tenths);
+					}
+				}
+			}
             return messages;
         }
 
