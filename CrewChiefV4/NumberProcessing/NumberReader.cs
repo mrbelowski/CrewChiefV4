@@ -1,4 +1,5 @@
 ﻿using CrewChiefV4.Audio;
+using CrewChiefV4.Events;
 using System;
 using System.Collections.Generic;
 namespace CrewChiefV4
@@ -82,10 +83,12 @@ namespace CrewChiefV4
 
                 if (useNewENSeconds)
                 {
+                    messageFolders.Add(AbstractEvent.Pause(50));
                     messageFolders.Add(GetSecondsWithTenths(timeSpan.Seconds, tenths));
                 }
                 else if (useNewENMinutes)
                 {
+                    messageFolders.Add(AbstractEvent.Pause(50));
                     messageFolders.AddRange(GetMinutesAndSecondsWithTenths(timeSpan.Minutes, timeSpan.Seconds, tenths));
                 }
                 else
