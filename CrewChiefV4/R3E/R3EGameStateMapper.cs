@@ -23,7 +23,7 @@ namespace CrewChiefV4.RaceRoom
         // recent r3e changes to tyre wear levels / rates - the data in the block appear to 
         // have changed recently, with about 0.94 representing 'worn out' - these start at (or close to) 1
         // and drop, so 0.06 worth of wear means "worn out". 
-        private float wornOutTyreWearLevel = 0.94f;
+        private float wornOutTyreWearLevel = 0f;
 
         private float scrubbedTyreWearPercent = 2f;
         private float minorTyreWearPercent = 20f;

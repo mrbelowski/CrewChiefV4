@@ -641,13 +641,13 @@ namespace CrewChiefV4.RaceRoom
             //////////////////////////////////////////////////////////////////////////
 
             // not (yet) implemented:
-            /*
+            
             public FlagsExtended FlagsExtended;
             public Int32 UnknownInt1;
             public Int32 UnknownInt2;
             public Int32 UnknownInt3;
             public Single UnknownFloat;
-            */
+            
 
             // Number of cars (including the player) in the race
             public Int32 NumCars;
