@@ -237,10 +237,7 @@ namespace CrewChiefV4.NumberProcessing
 				{
                     String paddedSeconds = seconds < 10 ? "_0" + seconds : "_" + seconds;
 					messages.Add(folderNumbersStub + minutes + paddedSeconds);					
-					if (tenths > 0)
-                    {
-						messages.Add(folderPoint + tenths);
-					}
+					messages.Add(folderPoint + tenths);
 				}
 			}
             return messages;
