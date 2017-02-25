@@ -49,6 +49,7 @@ namespace CrewChiefV4
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.button1 = new System.Windows.Forms.Button();
+            this.scanControllersButton = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.alwaysOnButton = new System.Windows.Forms.RadioButton();
             this.toggleButton = new System.Windows.Forms.RadioButton();
@@ -110,7 +111,7 @@ namespace CrewChiefV4
             this.controllersList.FormattingEnabled = true;
             this.controllersList.Location = new System.Drawing.Point(41, 520);
             this.controllersList.Name = "controllersList";
-            this.controllersList.Size = new System.Drawing.Size(248, 95);
+            this.controllersList.Size = new System.Drawing.Size(248, 85);
             this.controllersList.TabIndex = 8;
             this.controllersList.SelectedIndexChanged += new System.EventHandler(this.controllersList_SelectedIndexChanged);
             // 
@@ -143,6 +144,14 @@ namespace CrewChiefV4
             this.label1.Size = new System.Drawing.Size(138, 17);
             this.label1.TabIndex = 11;
             this.label1.Text = Configuration.getUIString("available_controllers");
+
+            this.scanControllersButton.Location = new System.Drawing.Point(38, 610);
+            this.scanControllersButton.Name = "scan_controllers_button";
+            this.scanControllersButton.Size = new System.Drawing.Size(143, 30);
+            this.scanControllersButton.TabIndex = 99;
+            this.scanControllersButton.Text = Configuration.getUIString("scan_controllers");
+            this.scanControllersButton.UseVisualStyleBackColor = true;
+            this.scanControllersButton.Click += new System.EventHandler(this.scanControllersButtonClicked);
             // 
             // label2
             // 
@@ -404,6 +413,7 @@ namespace CrewChiefV4
             this.Controls.Add(this.button2);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.button1);
+            this.Controls.Add(this.scanControllersButton);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.deleteAssigmentButton);
@@ -436,6 +446,7 @@ namespace CrewChiefV4
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button scanControllersButton;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.RadioButton alwaysOnButton;
         private System.Windows.Forms.RadioButton toggleButton;
