@@ -63,7 +63,7 @@ namespace CrewChiefV4
             addButtonAssignment(REPEAT_LAST_MESSAGE_BUTTON);
             addButtonAssignment(VOLUME_UP);
             addButtonAssignment(VOLUME_DOWN);
-            controllers = getControllers();
+            controllers = loadControllers();
         }
 
         public void addCustomController(Guid guid)
@@ -322,10 +322,15 @@ namespace CrewChiefV4
             }
             return false;
         }
-        
-        private List<ControllerData> getControllers()
+
+        public List<ControllerData> loadControllers()
         {
-            List<ControllerData> controllers = new List<ControllerData>();
+            return ControllerData.parse(UserSettings.GetUserSettings().getString(ControllerData.PROPERTY_CONTAINER));
+        }
+        
+        public List<ControllerData> scanControllers()
+        {
+            List<ControllerData> controllers = new List<ControllerData>(); 
             foreach (DeviceType deviceType in supportedDeviceTypes)
             {
                 foreach (var deviceInstance in directInput.GetDevices(deviceType, DeviceEnumerationFlags.AllDevices))
@@ -355,6 +360,9 @@ namespace CrewChiefV4
                     }
                 }
             }
+            String propVal = ControllerData.createPropValue(controllers);
+            UserSettings.GetUserSettings().setProperty(ControllerData.PROPERTY_CONTAINER, propVal);
+            UserSettings.GetUserSettings().saveUserSettings();
             return controllers;
         }
 
@@ -463,9 +471,54 @@ namespace CrewChiefV4
 
         public class ControllerData
         {
+            public static String PROPERTY_CONTAINER = "CONTROLLER_DATA";
+
+            public static String definitionSeparator = "CC_CD_SEPARATOR";
+            public static String elementSeparator = "CC_CE_SEPARATOR";
+
             public String deviceName;
             public DeviceType deviceType;
             public Guid guid;
+
+            public static List<ControllerData> parse(String propValue)
+            {
+                List<ControllerData> definitionsList = new List<ControllerData>();
+
+                if (propValue != null && propValue.Length > 0)
+                {
+                    String[] definitions = propValue.Split(new string[] { definitionSeparator }, StringSplitOptions.None);
+                    foreach (String definition in definitions)
+                    {
+                        if (definition != null && definition.Length > 0)
+                        {
+                            try
+                            {
+                                String[] elements = definition.Split(new string[] { elementSeparator }, StringSplitOptions.None);
+                                if (elements.Length == 3)
+                                {
+                                    definitionsList.Add(new ControllerData(elements[0], (DeviceType)System.Enum.Parse(typeof(DeviceType), elements[1]), new Guid(elements[2])));
+                                }
+                            }
+                            catch (Exception)
+                            {
+
+                            }
+                        }
+                    }
+                }
+                return definitionsList;
+            }
+
+            public static String createPropValue(List<ControllerData> definitions)
+            {
+                StringBuilder propVal = new StringBuilder();
+                foreach (ControllerData def in definitions)
+                {
+                    propVal.Append(def.deviceName).Append(elementSeparator).Append(def.deviceType.ToString()).Append(elementSeparator).
+                            Append(def.guid.ToString()).Append(definitionSeparator);
+                }
+                return propVal.ToString();
+            }
 
             public ControllerData(String deviceName, DeviceType deviceType, Guid guid)
             {

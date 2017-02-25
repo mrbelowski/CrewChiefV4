@@ -35,6 +35,8 @@ rfactor2_64_bit = rFactor 2 (64 bit)
 please_choose_a_game_option = Please choose a game option
 no_game_selected = No game selected
 
+scan_controllers = Scan for controllers
+
 waiting_for_button_click_to_cancel = Waiting for button, click to cancel
 assign = Assign
 assign_control = Assign control

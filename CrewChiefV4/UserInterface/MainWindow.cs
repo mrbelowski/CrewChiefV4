@@ -788,6 +788,16 @@ namespace CrewChiefV4
             form.ShowDialog(this);
         }
 
+        private void scanControllersButtonClicked(object sender, EventArgs e)
+        {
+            controllerConfiguration.controllers = this.controllerConfiguration.scanControllers();
+            this.controllersList.Items.Clear();
+            foreach (ControllerConfiguration.ControllerData configData in controllerConfiguration.controllers)
+            {
+                this.controllersList.Items.Add(configData.deviceType.ToString() + " " + configData.deviceName);
+            }
+        }
+
         private void voiceDisableButton_CheckedChanged(object sender, EventArgs e)
         {
             if (((RadioButton)sender).Checked)

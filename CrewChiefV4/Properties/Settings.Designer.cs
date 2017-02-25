@@ -1810,5 +1810,17 @@ namespace CrewChiefV4.Properties {
                 this["VOLUME_DOWN_button_index"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string CONTROLLER_DATA {
+            get {
+                return ((string)(this["CONTROLLER_DATA"]));
+            }
+            set {
+                this["CONTROLLER_DATA"] = value;
+            }
+        }
     }
 }
