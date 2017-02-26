@@ -1,6 +1,6 @@
 CrewChief version 4.6
 
-Written by Jim Britton (main app, voice acting, Raceroom and PCars support), Dan Allongo (Automobilista and rFactor1 support), Morten Roslev (Assetto Corsa support) and Vytautas Leonavičius (rFactor2 support).
+Written by Jim Britton (main app, voice acting, Raceroom and PCars implementations), Morten Roslev (Assetto Corsa implementation), Vytautas Leonavičius (rFactor2 implementation) and Dan Allongo (Automobilista and rFactor1 implementation). The application is the result of lots of lots of hard work and input from the guys above as well as some great advice and support from the community and the guys at Sector3 and SMS.
 
 The source code for Crew Chief is available here: https://github.com/mrbelowski/CrewChiefV4
 
