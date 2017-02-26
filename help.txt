@@ -1,0 +1,34 @@
+Getting started
+---------------
+
+When you first start Crew Chief the app will be installed with no sounds. The UI should have 2 big buttons, highlighted in green. Pressing these will download the sound pack (voice messages) and optional (but highly recommended) driver names. Press them both and when they're both complete, you'll be prompted to restart the application.
+
+For Raceroom and Project Cars, Crew Chief is self contained and needs no other software and almost no configuration. For rFactor1 based games, rFactor2 and Assetto Corsa there are a couple of extra steps required.
+
+
+Raceroom:
+
+To use Crew Chief with Raceroom simple select Raceroom from Crew Chief's Game menu and click the Start button
+
+Project Cars:
+
+Project cars can be run in 3 modes - 32 bit, 64 bit or Network. I recommend trying Nework first (the app will have access to more accurate information). In Project Cars' Gameplay menu, set UDP to 2 or 3. Select Project Cars (network data) from Crew Chief's Game menu and click the Start button. For some users this might not work due to the way the game sends data in this mode. If it doesn't work for you try selecting Project Cars (64 bit) or Project Cars (32 bit) from the Game menu, depending on which version of the game you're running (for most users this will be 64 bit). Be aware that in these modes the app has to time opponent laps itself, so the opponent laptime reporting will not be as accurate as it is for Network mode.
+
+Automobilista / RF1 / Game Stock Car Extreme / Formula Truck / Copa Petrobras de Marcas:
+
+Crew Chief isn't being actively developed for these games. Many Automobilista users have switched to the game's excellent built-in race engineer / spotter, but Crew Chief does still work. You need Dan Allongo's plugin for these games - this is here: https://github.com/dallongo/rFactorSharedMemoryMap/releases/latest
+
+Put the rFactorSharedMemoryMap.dll from this download in the Automobilista / RF1 / Game Stock Car Extreme / Formula Truck / Copa Petrobras de Marcas 'Plugins' folder (usually something like C:\Program Files (x86)\Steam\steamapps\common\Automobilista\Plugins). Once you've done this just select the game from Crew Chief's Game menu and press the Start button.
+
+rFactor 2:
+
+You need Vytautas Leonavicius' plugin for rFactor 2 - this is here: http://www.mediafire.com/file/ayibrrcp14hb0gq/rf2smmp_1.0.0.0.zip [TODO: THIS IS THE OLD VERSION]
+
+Put the rFactor2SharedMemoryMapPlugin64.dll from this download in the rFactor2 'Plugins' folder (usually something like C:\Program Files (x86)\Steam\steamapps\common\rFactor2\Bin64\Plugins). You need to enable this plugin from the game's Options->Plugins UI. Don't forget to switch off the built in spotter too. Once you've done this just select the game from Crew Chief's Game menu and press the Start button.
+
+Assetto Corsa:
+
+You need Morten Roslev's Python plugin for Assetto Corsa. This is in Crew Chief's installation folder. Copy the folder called 'CrewChiefEx' folder from your Crew Chief installation (usually C:\Program Files (x86)\Britton IT Ltd\CrewChiefV4\) to the Asstto Corsa python folder (usually something like C:\Program Files (x86)\Steam\steamapps\common\assettocorsa\apps\python). You might need to enable this plugin in the Assetto Corsa UI. Once you've done this just select the game from Crew Chief's Game menu and press the Start button.
+
+
+
