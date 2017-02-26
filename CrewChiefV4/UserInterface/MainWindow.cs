@@ -17,6 +17,7 @@ using System.Net;
 using System.Xml.Linq;
 using System.IO.Compression;
 using CrewChiefV4.Audio;
+using CrewChiefV4.UserInterface;
 
 namespace CrewChiefV4
 {
@@ -785,6 +786,18 @@ namespace CrewChiefV4
         private void editPropertiesButtonClicked(object sender, EventArgs e)
         {
             var form = new PropertiesForm(this);
+            form.ShowDialog(this);
+        }
+
+        private void helpButtonClicked(object sender, EventArgs e)
+        {
+            var form = new ShowHelp(this);
+            form.ShowDialog(this);
+        }
+
+        private void aboutButtonClicked(object sender, EventArgs e)
+        {
+            var form = new ShowAbout(this);
             form.ShowDialog(this);
         }
 
