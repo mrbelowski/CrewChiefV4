@@ -283,12 +283,19 @@ namespace CrewChiefV4
                     buttonAssignments[buttonAssignmentIndexes[functionName]].buttonIndex = buttonIndex;
                     if (controller.guid != UDP_NETWORK_CONTROLLER_GUID)
                     {
-                        var joystick = new Joystick(directInput, controller.guid);
-                        // Acquire the joystick
-                        joystick.SetCooperativeLevel(parent, (CooperativeLevel.NonExclusive | CooperativeLevel.Background));
-                        joystick.Properties.BufferSize = 128;
-                        joystick.Acquire();
-                        buttonAssignments[buttonAssignmentIndexes[functionName]].joystick = joystick;
+                        try
+                        {
+                            var joystick = new Joystick(directInput, controller.guid);
+                            // Acquire the joystick
+                            joystick.SetCooperativeLevel(parent, (CooperativeLevel.NonExclusive | CooperativeLevel.Background));
+                            joystick.Properties.BufferSize = 128;
+                            joystick.Acquire();
+                            buttonAssignments[buttonAssignmentIndexes[functionName]].joystick = joystick;
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine("Controller " + controller.deviceName + " is not available: " + e.Message);
+                        }
                     }
                 }
             }

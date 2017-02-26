@@ -201,10 +201,9 @@ namespace CrewChiefV4.Events
                     {
                         if (playedPreLightsMessage && !purgePreLightsMessages)
                         {
-                            // we've started playing the pre-lights messages. As soon as the play makes a control input purge this queue
-                            // some games hold the brake at '1' automatically on the grid, so this can't be used
+                            // we've started playing the pre-lights messages. As soon as the play makes a throttle input purge this queue.
+                            // Some games hold the brake at '1' automatically on the grid, so this can't be used
                             purgePreLightsMessages = previousGameState != null &&
-                                currentGameState.EngineData.EngineRpm > 100 && previousGameState.EngineData.EngineRpm > 100 &&
                                 currentGameState.ControlData.ThrottlePedal > 0.2 && previousGameState.ControlData.ThrottlePedal > 0.2;
                         }
                         else
@@ -218,7 +217,8 @@ namespace CrewChiefV4.Events
                                     (currentGameState.SessionData.SessionPhase == SessionPhase.Countdown ||
                                     (currentGameState.SessionData.SessionPhase == SessionPhase.Gridwalk && CrewChief.gameDefinition.gameEnum != GameEnum.RACE_ROOM) ||
                                     (currentGameState.SessionData.SessionPhase == SessionPhase.Formation && CrewChief.gameDefinition.gameEnum == GameEnum.RACE_ROOM) ||
-                                    (currentGameState.SessionData.SessionPhase == SessionPhase.Formation && CrewChief.gameDefinition.gameEnum == GameEnum.RF1 && currentGameState.SessionData.SectorNumber == 3)))
+                                    (currentGameState.SessionData.SessionPhase == SessionPhase.Formation && CrewChief.gameDefinition.gameEnum == GameEnum.RF1 && 
+                                    currentGameState.SessionData.SectorNumber == 3)))
                             {
                                 Console.WriteLine("Queuing pre-lights messages");
                                 playPreLightsMessage(currentGameState, 10); // queue as many messages as we have here, in any order
@@ -229,10 +229,13 @@ namespace CrewChiefV4.Events
             }
             else
             {
+                int preLightsMessageCount = CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_32BIT ||
+                                            CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_64BIT ||
+                                            CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_NETWORK ? 1 : 2;
                 if (!playedPreLightsMessage && currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.SessionPhase == SessionPhase.Gridwalk &&
                     (playPreLightsInRaceroom || CrewChief.gameDefinition.gameEnum != GameEnum.RACE_ROOM))
                 {
-                    playPreLightsMessage(currentGameState, 2);
+                    playPreLightsMessage(currentGameState, preLightsMessageCount);
                     purgePreLightsMessages = true;
                 }
                 // TODO: in R3E online there's a GridWalk phase before the Countdown. In PCars they're combined. Add some messages to this phase.
@@ -247,7 +250,7 @@ namespace CrewChiefV4.Events
                     // If we've not yet played the pre-lights messages, just play one of them here, but not for RaceRoom as the lights will already have started
                     if (!playedPreLightsMessage && CrewChief.gameDefinition.gameEnum != GameEnum.RACE_ROOM)
                     {
-                        playPreLightsMessage(currentGameState, 2);
+                        playPreLightsMessage(currentGameState, preLightsMessageCount);
                         purgePreLightsMessages = false;
                     }
                     if (purgePreLightsMessages)
