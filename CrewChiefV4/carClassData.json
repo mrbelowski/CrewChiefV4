@@ -38,7 +38,7 @@
 # VINTAGE_F1_C, STOCK_CAR, F1, F2, F3, F4, FF, TC1, TC2, TC1_2014, AUDI_TT_CUP,
 # AUDI_TT_VLN, CLIO_CUP, DTM, DTM_2013, V8_SUPERCAR, DTM_2014, DTM_2015, DTM_2016,
 # TRANS_AM, HILL_CLIMB_ICONS, FORMULA_RENAULT, MEGANE_TROPHY, NSU_TT, KTM_RR,
-# INDYCAR, UNKNOWN_RACE
+# INDYCAR, HYPER_CAR, HYPER_CAR_RACE, UNKNOWN_RACE
 #
 # 
 # Car classes can skip an entry if they're using the default - e.g. most cars
@@ -74,7 +74,7 @@
             "raceroomClassIds": [ 1704 ],
             "pCarsClassNames": [ "GT2" ],
             "rf2ClassNames": [ "*GT2*" ],
-            "acClassNames": [ "p4-5_2011", "*GT2*" ],
+            "acClassNames": [ "p4-5_2011", "ks_corvette_c7r", "*GT2*" ],
             "brakeType": "Ceramic"
         },
         {
@@ -105,7 +105,7 @@
             "raceroomClassIds": [ 1717 ],
             "pCarsClassNames": [ "GT4" ],
             "rf2ClassNames": [ "*GT4*" ],
-            "acClassNames": [ "*GT4*" ]
+            "acClassNames": [ "*GT4*" ,"ks_bmw_m235i_racing" ,"lotus_evora_gx"]
         },
         {
             "carClassEnum": "GT5",
@@ -128,6 +128,7 @@
             "raceroomClassIds": [ 1714  ],
             "pCarsClassNames": [ "LMP1" ],
 			"rf2ClassNames": [ "LMP1" ],
+            "acClassNames": [ "ks_porsche_919_hybrid_2015" ,"ks_porsche_919_hybrid_2016" ],
             "brakeType": "Carbon",
             "maxSafeWaterTemp": 105,
             "maxSafeOilTemp": 140
@@ -144,12 +145,14 @@
             "raceroomClassIds": [ 252  ],
             "pCarsClassNames": [ "LMP3" ],
 			"rf2ClassNames": [ "LMP3" ],
+            "acClassNames": [ "ks_praga_r1" ],
             "brakeType": "Ceramic"
         },
         {
             "carClassEnum": "GROUPC",
             "pCarsClassNames": [ "Group C1" ],
             "rf2ClassNames": [ "Mazda_787B" ],
+            "acClassNames": [ "mazda_787b" ],
             "brakeType": "Ceramic"
         },
         {
@@ -189,6 +192,7 @@
             "raceroomClassIds": [ 5824 ],
             "pCarsClassNames": [ "FA" ],
             "rf2ClassNames": [ "Formula ISI 2012"],
+            "acClassNames": [ "ks_ferrari_f138" ,"ferrari_f2002", "ks_ferrari_sf15t" ],
             "brakeType": "Carbon",
             "maxSafeWaterTemp": 105,
             "maxSafeOilTemp": 140
@@ -206,6 +210,7 @@
             "carClassEnum": "FORMULA_RENAULT",
             "pCarsClassNames": [ "Forumula Renault" ],
             "rf2ClassNames": [ "FR3.5*" ],
+            "acClassNames": [ "vsfr-formularenault35_2014_hdf", "vsfr-formularenault35_2014_ldf", "vsfr-formularenault35_2014_mdf" ],
             "brakeType": "Carbon",
             "maxSafeWaterTemp": 105,
             "maxSafeOilTemp": 140
@@ -214,6 +219,7 @@
             "carClassEnum": "F3",
             "raceroomClassIds": [ 5652 ],
             "pCarsClassNames": [ "FC" ],
+            "acClassNames": [ "dallara_f312" ],
             "brakeType": "Ceramic"
         },
         {
@@ -237,6 +243,7 @@
         {
             "carClassEnum": "VINTAGE_F1_A",
             "pCarsClassNames": [ "Vintage F1 A" ],
+            "acClassNames": [ "dallara_f312" ],
             "defaultTyreType": "Bias_Ply"
         },
         {
@@ -408,6 +415,18 @@
             "raceroomClassIds": [ 5385 ],
             "maxSafeWaterTemp": 96,
             "maxSafeOilTemp": 115
+        },
+        {
+            "carClassEnum": "HYPER_CAR",
+            "acClassNames": [ "ks_porsche_918_spyder", "pagani_huayra", "ks_mclaren_p1",
+            "ks_lamborghini_aventador_sv", "ks_lamborghini_gallardo_sl_s3", "koenigsegg_one",
+            "koenigsegg_one_nr", "koenigsegg_one_p", "koenigsegg_one_t", "ferrari_laferrari" ],
+            "brakeType": "Carbon"
+        },
+        {
+            "carClassEnum": "HYPER_CAR_RACE",
+            "acClassNames": [ "ferrari_599xxevo", "pagani_zonda_r", "ks_ferrari_fxx_k" ],
+            "brakeType": "Carbon"
         }
     ]
 }
