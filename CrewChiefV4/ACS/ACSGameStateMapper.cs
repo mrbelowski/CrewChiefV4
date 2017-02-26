@@ -1187,11 +1187,6 @@ namespace CrewChiefV4.assetto
                 }
                 //------------------- Variable session data ---------------------------
 
-                currentGameState.TransmissionData.Gear = shared.acsPhysics.gear - 1;
-                currentGameState.ControlData.BrakePedal = shared.acsPhysics.brake;
-                currentGameState.ControlData.ThrottlePedal = shared.acsPhysics.gas;
-                currentGameState.ControlData.ClutchPedal = shared.acsPhysics.clutch;
-
                 if (currentGameState.SessionData.SessionHasFixedTime)
                 {
                     currentGameState.SessionData.SessionRunningTime = currentGameState.SessionData.SessionTotalRunTime - sessionTimeRemaining;
@@ -1566,7 +1561,7 @@ namespace CrewChiefV4.assetto
                     currentGameState.SessionData.CurrentLapIsValid = shared.acsPhysics.numberOfTyresOut < 3;
                 }
 
-                if (currentGameState.SessionData.IsNewLap)
+                if (currentGameState.SessionData.IsNewLap && currentGameState.SessionData.LapTimePrevious > 0)
                 {
                     currentGameState.SessionData.PreviousLapWasValid = previousGameState != null && previousGameState.SessionData.CurrentLapIsValid;
                     currentGameState.SessionData.formattedPlayerLapTimes.Add(TimeSpan.FromSeconds(currentGameState.SessionData.LapTimePrevious).ToString(@"mm\:ss\.fff"));
