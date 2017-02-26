@@ -805,6 +805,10 @@ namespace CrewChiefV4
         {
             controllerConfiguration.controllers = this.controllerConfiguration.scanControllers();
             this.controllersList.Items.Clear();
+            if (this.gameDefinitionList.Text.Equals(GameDefinition.pCarsNetwork.friendlyName))
+            {
+                controllerConfiguration.addNetworkControllerToList();
+            }
             foreach (ControllerConfiguration.ControllerData configData in controllerConfiguration.controllers)
             {
                 this.controllersList.Items.Add(configData.deviceType.ToString() + " " + configData.deviceName);
