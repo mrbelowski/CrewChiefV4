@@ -346,6 +346,7 @@
 		<row><td>ISX_DEFAULTCOMPONENT1</td><td>{1F99AE4B-6E2F-4A61-91F5-EB5899E06D88}</td><td>CREWCHIEFEX</td><td>2</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>ISX_DEFAULTCOMPONENT2</td><td>{D3D0AF88-6121-46F9-8447-6956638E93E4}</td><td>STDLIB</td><td>2</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>ISX_DEFAULTCOMPONENT3</td><td>{48D217B1-79A5-4937-ADB8-70FD64222A56}</td><td>STDLIB64</td><td>2</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>rFactor2SharedMemoryMapPlugin64.dll</td><td>{A0F38F4D-37DD-47BD-8EEE-0EDA48AE51DC}</td><td>INSTALLDIR</td><td>2</td><td/><td>rfactor2sharedmemorymapplugi</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 	</table>
 
 	<table name="Condition">
@@ -1879,6 +1880,7 @@
 		<row><td>AlwaysInstall</td><td>ISX_DEFAULTCOMPONENT1</td></row>
 		<row><td>AlwaysInstall</td><td>ISX_DEFAULTCOMPONENT2</td></row>
 		<row><td>AlwaysInstall</td><td>ISX_DEFAULTCOMPONENT3</td></row>
+		<row><td>AlwaysInstall</td><td>rFactor2SharedMemoryMapPlugin64.dll</td></row>
 	</table>
 
 	<table name="File">
@@ -1901,6 +1903,7 @@
 		<row><td>help.txt</td><td>ISX_DEFAULTCOMPONENT</td><td>help.txt</td><td>0</td><td/><td/><td/><td>1</td><td>C:\projects\crewchief_c_sharp\CrewChiefV4\help.txt</td><td>1</td><td/></row>
 		<row><td>newtonsoft_json_licence.txt</td><td>ISX_DEFAULTCOMPONENT</td><td>NEWTON~1.TXT|Newtonsoft_Json_licence.txt</td><td>0</td><td/><td/><td/><td>1</td><td>C:\projects\crewchief_c_sharp\CrewChiefV4\Newtonsoft_Json_licence.txt</td><td>1</td><td/></row>
 		<row><td>readme.txt</td><td>ISX_DEFAULTCOMPONENT</td><td>README.txt</td><td>0</td><td/><td/><td/><td>1</td><td>C:\projects\crewchief_c_sharp\CrewChiefV4\README.txt</td><td>1</td><td/></row>
+		<row><td>rfactor2sharedmemorymapplugi</td><td>rFactor2SharedMemoryMapPlugin64.dll</td><td>RFACTO~1.DLL|rFactor2SharedMemoryMapPlugin64.dll</td><td>0</td><td/><td/><td/><td>1</td><td>C:\projects\crewchief_c_sharp\CrewChiefV4\rFactor2SharedMemoryMapPlugin64.dll</td><td>1</td><td/></row>
 		<row><td>shared_mem.py</td><td>ISX_DEFAULTCOMPONENT1</td><td>SHARED~1.PY|shared_mem.py</td><td>0</td><td/><td/><td/><td>1</td><td>C:\projects\crewchief_c_sharp\CrewChiefV4\CrewChiefEx\shared_mem.py</td><td>1</td><td/></row>
 		<row><td>sharpdx_licence.txt</td><td>ISX_DEFAULTCOMPONENT</td><td>SHARPD~1.TXT|SharpDX_licence.txt</td><td>0</td><td/><td/><td/><td>1</td><td>C:\projects\crewchief_c_sharp\CrewChiefV4\SharpDX_licence.txt</td><td>1</td><td/></row>
 		<row><td>sounds_config.txt</td><td>ISX_DEFAULTCOMPONENT</td><td>SOUNDS~1.TXT|sounds_config.txt</td><td>0</td><td/><td/><td/><td>1</td><td>C:\projects\crewchief_c_sharp\CrewChiefV4\CrewChiefV4\sounds_config.txt</td><td>1</td><td/></row>
@@ -2054,6 +2057,7 @@
 		<row><td>ISX_DEFAULTCOMPONENT1</td><td/><td/><td>_68AB6137_27BC_4E21_920C_2313E135EB7B_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>ISX_DEFAULTCOMPONENT2</td><td/><td/><td>_EB48EFE1_E7E4_4186_939E_69F3D49AF063_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>ISX_DEFAULTCOMPONENT3</td><td/><td/><td>_9D879C33_F53B_4136_97E6_950314D8C7E4_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>rFactor2SharedMemoryMapPlugin64.dll</td><td/><td/><td>_1C51616E_9B7A_4298_9582_2B566CAFD1B2_FILTER</td><td/><td/><td/><td/></row>
 	</table>
 
 	<table name="ISCustomActionReference">
@@ -4402,9 +4406,9 @@ RABWAEQALQA1AAEARQB4AHAAcgBlAHMAcwA=
 		<row><td>PROGMSG_IIS_ROLLBACKVROOTS</td><td>##IDS_PROGMSG_IIS_ROLLBACKVROOTS##</td><td/></row>
 		<row><td>PROGMSG_IIS_ROLLBACKWEBSERVICEEXTENSIONS</td><td>##IDS_PROGMSG_IIS_ROLLBACKWEBSERVICEEXTENSIONS##</td><td/></row>
 		<row><td>PROGRAMFILETOLAUNCHATEND</td><td>[INSTALLDIR]CrewChiefV4.Primary output</td><td/></row>
-		<row><td>ProductCode</td><td>{7795A18F-5AE4-4D04-B574-71BC6616D68E}</td><td/></row>
+		<row><td>ProductCode</td><td>{8BA43FE2-8927-4A61-BACC-7B84616E6006}</td><td/></row>
 		<row><td>ProductName</td><td>CrewChiefV4</td><td/></row>
-		<row><td>ProductVersion</td><td>4.6.0.4</td><td/></row>
+		<row><td>ProductVersion</td><td>4.6.0.5</td><td/></row>
 		<row><td>ProgressType0</td><td>install</td><td/></row>
 		<row><td>ProgressType1</td><td>Installing</td><td/></row>
 		<row><td>ProgressType2</td><td>installed</td><td/></row>
