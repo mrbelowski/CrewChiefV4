@@ -48,8 +48,8 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(857, 508);
             this.Controls.Add(this.textBox1);
-            this.Name = "Readme";
-            this.Text = "Readme";
+            this.Name = "About Crew Chief";
+            this.Text = "About Crew Chief";
             this.ResumeLayout(false);
             this.PerformLayout();
 
