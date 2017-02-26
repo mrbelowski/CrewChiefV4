@@ -6,28 +6,28 @@
 #
 # The valid params are:
 # {
-#  "carClassEnum": this is the built-in car class group (see complete list below). If this doesn't match, the app will assign this to UNKNOWN_RACE car group, with the params you specify
-#  "pCarsClassNames": this is a comma (,) separated array of pCars classnames. * or ? denote wildcards. The app searches for classes which have full matches before considering wildcards
-#  "rf2ClassNames": as above, for rFactor2
-#  "rf1ClassNames": as above, for rFactor1, AMS, GSC, FTruck, and other RF1 based games (the Reiza games)
-#  "acClassNames": as above, for Assetto Corsa
-#  "raceroomClassIds": this is an array of integers or R3E class IDs  
-#  "brakeType": can be "Carbon", "Ceramic", "Iron_Race" or "Iron_Road"
-#  "defaultTyreType": can be "Road", "Bias_Ply", "Unknown_Race", and various others that the app doesn't really use (still to be worked on...)
-#  "maxSafeWaterTemp": water temp above this (celsius) will trigger a warning
-#  "maxSafeOilTemp": oil temp above this (celsius) will trigger a warning
-#  "minTyreCircumference": used to override default tyre size settings, used when calculating wheel locking and spinning. Only karts should need to override this
-#  "maxTyreCircumference": used to override default tyre size settings, used when calculating wheel locking and spinning. Only karts should need to override this
+#    "carClassEnum": this is the built-in car class group (see complete list below). If this doesn't match, the app will assign this to UNKNOWN_RACE car group, with the params you specify
+#    "pCarsClassNames": this is a comma (,) separated array of pCars classnames. * or ? denote wildcards. The app searches for classes which have full matches before considering wildcards
+#    "rf2ClassNames": as above, for rFactor2
+#    "rf1ClassNames": as above, for rFactor1, AMS, GSC, FTruck, and other RF1 based games (the Reiza games)
+#    "acClassNames": as above, for Assetto Corsa
+#    "raceroomClassIds": this is an array of integers or R3E class IDs  
+#    "brakeType": can be "Carbon", "Ceramic", "Iron_Race" or "Iron_Road"
+#    "defaultTyreType": can be "Road", "Bias_Ply", "Unknown_Race", and various others that the app doesn't really use (still to be worked on...)
+#    "maxSafeWaterTemp": water temp above this (celsius) will trigger a warning
+#    "maxSafeOilTemp": oil temp above this (celsius) will trigger a warning
+#    "minTyreCircumference": used to override default tyre size settings, used when calculating wheel locking and spinning. Only karts should need to override this
+#    "maxTyreCircumference": used to override default tyre size settings, used when calculating wheel locking and spinning. Only karts should need to override this
 # }
 #
 # The default values are:
 # {
-#  "brakeType": "Iron_Race"
-#  "defaultTyreType": "Unknown_Race"
-#  "maxSafeWaterTemp": 105
-#  "maxSafeOilTemp": 125
-#  "minTyreCircumference": 0.4 * pi (40cm diameter wheel)
-#  "maxTyreCircumference": 1.2 * pi (120cm diameter wheel) 
+#    "brakeType": "Iron_Race"
+#    "defaultTyreType": "Unknown_Race"
+#    "maxSafeWaterTemp": 105
+#    "maxSafeOilTemp": 125
+#    "minTyreCircumference": 0.4 * pi (40cm diameter wheel)
+#    "maxTyreCircumference": 1.2 * pi (120cm diameter wheel) 
 # }
 #
 # Crew Chief built-in car classes are:
