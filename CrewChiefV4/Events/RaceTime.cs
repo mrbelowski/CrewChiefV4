@@ -183,7 +183,8 @@ namespace CrewChiefV4.Events
                     played20mins = true;
                     playedHalfWayHome = true;
                     audioPlayer.suspendPearlsOfWisdom();
-                    audioPlayer.playMessage(new QueuedMessage(folder0mins, 0, this));
+                    audioPlayer.playMessage(new QueuedMessage("session_complete", 
+                        MessageContents(folder0mins, Position.folderStub + currentGameState.SessionData.Position), 0, this));
                 } 
                 if (currentGameState.SessionData.SessionRunningTime > 60 && !played2mins && timeLeft / 60 < 2 && timeLeft / 60 > 1.9)
                 {

@@ -49,6 +49,8 @@ namespace CrewChiefV4
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.button1 = new System.Windows.Forms.Button();
+            this.aboutButton = new System.Windows.Forms.Button();
+            this.helpButton = new System.Windows.Forms.Button();
             this.scanControllersButton = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.alwaysOnButton = new System.Windows.Forms.RadioButton();
@@ -172,6 +174,29 @@ namespace CrewChiefV4
             this.button1.Text = Configuration.getUIString("properties");
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.editPropertiesButtonClicked);
+
+            // 
+            // help button
+            // 
+            this.helpButton.Location = new System.Drawing.Point(991, 70);
+            this.helpButton.Name = "help";
+            this.helpButton.Size = new System.Drawing.Size(143, 41);
+            this.helpButton.TabIndex = 97;
+            this.helpButton.Text = Configuration.getUIString("help");
+            this.helpButton.UseVisualStyleBackColor = true;
+            this.helpButton.Click += new System.EventHandler(this.helpButtonClicked);
+            
+            // 
+            // about button
+            // 
+            this.aboutButton.Location = new System.Drawing.Point(991, 112);
+            this.aboutButton.Name = "about";
+            this.aboutButton.Size = new System.Drawing.Size(143, 41);
+            this.aboutButton.TabIndex = 98;
+            this.aboutButton.Text = Configuration.getUIString("about");
+            this.aboutButton.UseVisualStyleBackColor = true;
+            this.aboutButton.Click += new System.EventHandler(this.aboutButtonClicked);
+            
             // 
             // groupBox1
             // 
@@ -413,6 +438,8 @@ namespace CrewChiefV4
             this.Controls.Add(this.button2);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.button1);
+            this.Controls.Add(this.helpButton);
+            this.Controls.Add(this.aboutButton);
             this.Controls.Add(this.scanControllersButton);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
@@ -446,6 +473,8 @@ namespace CrewChiefV4
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button helpButton;
+        private System.Windows.Forms.Button aboutButton;
         private System.Windows.Forms.Button scanControllersButton;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.RadioButton alwaysOnButton;

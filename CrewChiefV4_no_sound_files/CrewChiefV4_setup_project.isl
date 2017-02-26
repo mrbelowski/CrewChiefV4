@@ -1898,6 +1898,7 @@
 		<row><td>_ctypes.pyd1</td><td>ISX_DEFAULTCOMPONENT3</td><td>_ctypes.pyd</td><td>0</td><td/><td/><td/><td>1</td><td>C:\projects\crewchief_c_sharp\CrewChiefV4\CrewChiefEx\stdlib64\_ctypes.pyd</td><td>1</td><td/></row>
 		<row><td>carclassdata.json</td><td>ISX_DEFAULTCOMPONENT</td><td>CARCLA~1.JSO|carClassData.json</td><td>0</td><td/><td/><td/><td>1</td><td>C:\projects\crewchief_c_sharp\CrewChiefV4\CrewChiefV4\carClassData.json</td><td>1</td><td/></row>
 		<row><td>crewchiefex.py</td><td>ISX_DEFAULTCOMPONENT1</td><td>CREWCH~1.PY|CrewChiefEx.py</td><td>0</td><td/><td/><td/><td>1</td><td>C:\projects\crewchief_c_sharp\CrewChiefV4\CrewChiefEx\CrewChiefEx.py</td><td>1</td><td/></row>
+		<row><td>help.txt</td><td>ISX_DEFAULTCOMPONENT</td><td>help.txt</td><td>0</td><td/><td/><td/><td>1</td><td>C:\projects\crewchief_c_sharp\CrewChiefV4\help.txt</td><td>1</td><td/></row>
 		<row><td>newtonsoft_json_licence.txt</td><td>ISX_DEFAULTCOMPONENT</td><td>NEWTON~1.TXT|Newtonsoft_Json_licence.txt</td><td>0</td><td/><td/><td/><td>1</td><td>C:\projects\crewchief_c_sharp\CrewChiefV4\Newtonsoft_Json_licence.txt</td><td>1</td><td/></row>
 		<row><td>readme.txt</td><td>ISX_DEFAULTCOMPONENT</td><td>README.txt</td><td>0</td><td/><td/><td/><td>1</td><td>C:\projects\crewchief_c_sharp\CrewChiefV4\README.txt</td><td>1</td><td/></row>
 		<row><td>shared_mem.py</td><td>ISX_DEFAULTCOMPONENT1</td><td>SHARED~1.PY|shared_mem.py</td><td>0</td><td/><td/><td/><td>1</td><td>C:\projects\crewchief_c_sharp\CrewChiefV4\CrewChiefEx\shared_mem.py</td><td>1</td><td/></row>
@@ -4401,9 +4402,9 @@ RABWAEQALQA1AAEARQB4AHAAcgBlAHMAcwA=
 		<row><td>PROGMSG_IIS_ROLLBACKVROOTS</td><td>##IDS_PROGMSG_IIS_ROLLBACKVROOTS##</td><td/></row>
 		<row><td>PROGMSG_IIS_ROLLBACKWEBSERVICEEXTENSIONS</td><td>##IDS_PROGMSG_IIS_ROLLBACKWEBSERVICEEXTENSIONS##</td><td/></row>
 		<row><td>PROGRAMFILETOLAUNCHATEND</td><td>[INSTALLDIR]CrewChiefV4.Primary output</td><td/></row>
-		<row><td>ProductCode</td><td>{341E2C1C-A6DE-4B5D-94DA-663ED5B14F0E}</td><td/></row>
+		<row><td>ProductCode</td><td>{7795A18F-5AE4-4D04-B574-71BC6616D68E}</td><td/></row>
 		<row><td>ProductName</td><td>CrewChiefV4</td><td/></row>
-		<row><td>ProductVersion</td><td>4.6.0.3</td><td/></row>
+		<row><td>ProductVersion</td><td>4.6.0.4</td><td/></row>
 		<row><td>ProgressType0</td><td>install</td><td/></row>
 		<row><td>ProgressType1</td><td>Installing</td><td/></row>
 		<row><td>ProgressType2</td><td>installed</td><td/></row>
