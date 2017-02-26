@@ -197,6 +197,18 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Events\Timings.cs" />
     <Compile Include="Events\TyreMonitor.cs" />
+    <Compile Include="UserInterface\ShowHelp.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UserInterface\ShowHelp.Designer.cs">
+      <DependentUpon>ShowHelp.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UserInterface\ShowAbout.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UserInterface\ShowAbout.Designer.cs">
+      <DependentUpon>ShowAbout.cs</DependentUpon>
+    </Compile>
     <Compile Include="UserInterface\StringPropertyControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -236,6 +248,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="UserInterface\MainWindow.resx">
       <DependentUpon>MainWindow.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UserInterface\ShowHelp.resx">
+      <DependentUpon>ShowHelp.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UserInterface\ShowAbout.resx">
+      <DependentUpon>ShowAbout.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UserInterface\Spacer.resx">
       <DependentUpon>Spacer.cs</DependentUpon>

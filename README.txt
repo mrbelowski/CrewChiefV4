@@ -1,7 +1,15 @@
-CrewChief version 4.
+CrewChief version 4.6
+
+Written by Jim Britton (main app, voice acting, Raceroom and PCars implementations), Morten Roslev (Assetto Corsa implementation), Vytautas Leonavičius (rFactor2 implementation) and Dan Allongo (Automobilista and rFactor1 implementation). The application is the result of lots of lots of hard work and input from the guys above as well as some great advice and support from the community and the guys at Sector3 and SMS.
+
+The source code for Crew Chief is available here: https://github.com/mrbelowski/CrewChiefV4
+
+For support and discussions about Crew Chief we have our very own forum here: http://thecrewchief.org/
 
 Changelog
 ---------
+
+Version 4.6.0.4: Major overhaul of time reading (English sound pack - users of the Italian sound pack are unaffected); added RF2 caution period and yellow flag events; scan for controllers only on request (press the "Scan for controllers" button to update the app's list of controllers) - this also improves the app's startup time; fixed Assetto Corsa missing race start after 1.12 patch; added chequered flag message for timed sessions (still some issues here with PCars); reworked PCars session end detection; added controller bindings for message volume up / down; added some simple help text (much much more needs to be added to this); externalised car class definitions (first version - lots more work to do here); lots of bug fixes
 
 Version 4.5.0.0: First cut of RF2 support, thanks to The Iron Wolf. This needs an additional .dll plugin for RF2 - see https://forum.studio-397.com/index.php?threads/crew-chief-v4-5-with-rfactor-2-support.54421/ Updated some Raceroom car classes
 

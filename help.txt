@@ -1,0 +1,98 @@
+Getting started
+-----------------------
+
+Crew Chief requires the .Net framework, version 4.6. This is included in Windows 10 but Windows 7 and Window 8 users will need to install it.
+
+When you first start Crew Chief the app will be installed with no sounds. The UI should have 2 big buttons, highlighted in green. Pressing these will download the sound pack (voice messages) and optional (but highly recommended) driver names. Press them both and when they're both complete, you'll be prompted to restart the application.
+
+For Raceroom and Project Cars, Crew Chief is self contained and needs no other software and almost no configuration. For rFactor1 based games, rFactor2 and Assetto Corsa there are a couple of extra steps required. 
+
+For voice recognition (entirely optional but quite handy and very cool) see below. 
+
+
+Raceroom:
+
+To use Crew Chief with Raceroom simple select Raceroom from Crew Chief's Game menu and click the Start button
+
+Project Cars:
+
+Project cars can be run in 3 modes - 32 bit, 64 bit or Network. I recommend trying Nework first (the app will have access to more accurate information). In Project Cars' Gameplay menu, set UDP to 2 or 3. Select Project Cars (network data) from Crew Chief's Game menu and click the Start button. For some users this might not work due to the way the game sends data in this mode. If it doesn't work for you try selecting Project Cars (64 bit) or Project Cars (32 bit) from the Game menu, depending on which version of the game you're running (for most users this will be 64 bit). Be aware that in these modes the app has to time opponent laps itself, so the opponent laptime reporting will not be as accurate as it is for Network mode.
+
+Automobilista / RF1 / Game Stock Car Extreme / Formula Truck / Copa Petrobras de Marcas:
+
+Crew Chief isn't being actively developed for these games. Many Automobilista users have switched to the game's excellent built-in race engineer / spotter, but Crew Chief does still work. You need Dan Allongo's plugin for these games - this is here: https://github.com/dallongo/rFactorSharedMemoryMap/releases/latest
+
+Put the rFactorSharedMemoryMap.dll from this download in the Automobilista / RF1 / Game Stock Car Extreme / Formula Truck / Copa Petrobras de Marcas 'Plugins' folder (usually something like C:\Program Files (x86)\Steam\steamapps\common\Automobilista\Plugins). Once you've done this just select the game from Crew Chief's Game menu and press the Start button.
+
+rFactor 2:
+
+You need Vytautas Leonavicius' plugin for rFactor 2 - this is here: http://www.mediafire.com/file/ayibrrcp14hb0gq/rf2smmp_1.0.0.0.zip [TODO: THIS IS THE OLD VERSION]
+
+Put the rFactor2SharedMemoryMapPlugin64.dll from this download in the rFactor2 'Plugins' folder (usually something like C:\Program Files (x86)\Steam\steamapps\common\rFactor2\Bin64\Plugins). You need to enable this plugin from the game's Options->Plugins UI. Don't forget to switch off the built in spotter too. Once you've done this just select the game from Crew Chief's Game menu and press the Start button.
+
+Assetto Corsa:
+
+You need Morten Roslev's Python plugin for Assetto Corsa. This is in Crew Chief's installation folder. Copy the folder called 'CrewChiefEx' folder from your Crew Chief installation (usually C:\Program Files (x86)\Britton IT Ltd\CrewChiefV4\) to the Asstto Corsa python folder (usually something like C:\Program Files (x86)\Steam\steamapps\common\assettocorsa\apps\python). You might need to enable this plugin in the Assetto Corsa UI. Once you've done this just select the game from Crew Chief's Game menu and press the Start button.
+
+
+
+Properties
+-------------------
+The app includes a rather rudamentary preferences screen accessed by the "Properties" button. Many many aspects of that app's behaviour can be customised here but it's important to note that you don't have to make any changes to these properties to get the app to work correctly - the defaults are sensisble settings and the app doesn't need any configuration (except for swearing - see below).
+
+
+
+Swearing
+-----------------
+Because swearing is cool and I'm a 12 year old stuck in a middle-aged body, this has its own help section. Swearing is disabled by default so once you've got the app working you'll want to enable it because swearing is cool. Look for a checkbox in the Properties screen called "use_sweary_messages" (near the bottom) and tick it. The app will swear where appropriate - it's not like listening to an Eddie Murphy gig and doesn't happen very often but it does help add a bit of personality to the messages.
+
+
+
+Voice Recognition
+-------------------------
+You'll need to install the Microsoft Speech Recognition runtime which is here: https://www.microsoft.com/en-gb/download/details.aspx?id=27225
+From this page click 'Download' and select the right version - for most users this will be x64_SpeechPlatformRuntime\SpeechPlatformRuntime.msi
+Once you've installed this, you'll also need to install a language pack - https://www.microsoft.com/en-gb/download/details.aspx?id=27224 
+Again, from this page click 'Download' and select the right version - for most users this will be MSSpeech_SR_en-US_TELE.msi (US users) or MSSpeech_SR_en-GB_TELE.msi (UK users).
+
+This is not the same as the voice recognition technology built into Windows - it isn't installed with Windows by default.
+
+Crew Chief will use the "Default" recording device for voice recognition - this can be selected in the "Recording devices" section of the Window Sounds control panel. 
+
+Voice recognition can be configured to be always-on (it listens continuously and responds when it recognises a command) or in response to a button press. To assign a button to a activate voice recognition, press the 'Scan for controllers' button at the bottom of Crew Chief UI. This will populate the 'Available controllers' list. Then select the controller you want to use from this list and select the 'Talk to crew chief' item from the 'Available actions' list. Then click the 'Assign control' button and press the wheel / controller / keyboard button you want to use for this action. By default you have to hold this button down while you talk - this can be changed by selecting a different 'Voice recognition mode'.
+
+If you want to test voice recognition, set it all up and press the Start button in Crew Chief, then press your voice recognition button and ask "Can you head me?". If the app can understand you it'll respond with "Yes, I can hear you".
+
+The app understands lots of command including:
+
+"how's my [fuel / tyre wear / body work / aero / engine / transmission / suspension / pace ]"
+"how are my [tyre temps / tyre temperatures / brakes / brake temps / brake temperatures / engine temps / engine temperatures]" (gives a good / bad type response)
+"What are my [brake temps / tyre temps]" (gives the actual temps)
+"what's my [gap in front / gap ahead / gap behind / last lap / last lap time / lap time / position / fuel level / best lap / best lap time]"
+"what's the fastest lap" (reports the fastest lap in the session for the player's car class)
+"keep quiet / I know what I'm doing / leave me alone" (switches off messages)
+"keep me informed / keep me posted / keep me updated" (switches messages back on)
+"how long's left / how many laps are left / how many laps to go"
+"spot / don't spot" (switches the spotter on and off - note even in "leave me alone" mode the spotter still operates unless you explicitly switch it off)
+"do I still have a penalty / do I have a penalty / have I served my penalty"
+"do I have to pit / do I need to pit / do I have a mandatory pit stop / do I have a mandatory stop / do I have to make a pit stop"
+"where's [opponent driver last name]"
+"what's [opponent driver last name]'s last lap"
+"what's [opponent driver last name]'s best lap"
+"what's [opponent race position]'s last lap" (for example, "what's p 4's best lap", or "what's position 4's last lap")
+"what's [opponent race position]'s best lap"
+"what's [the car in front / the guy in front / the car ahead / the guy ahead]'s last lap"
+"what's [the car in front / the guy in front / the car ahead / the guy ahead]'s best lap"
+"what's [the car behind / the guy behind]'s last lap"
+"what's [the car behind / the guy behind]'s best lap"
+"what tyre(s) is [opponent driver last name / opponent race position] on" (DTM 2014 only - reports "options" or "primes")
+"what are my sector times"
+"what's my last sector time"
+"who's leading" (this one only works if you have the driver name recording for the lead car)
+"who's [ahead / ahead in the race / in front / in front in the race / behind / behind in the race]" (gives the name of the car in front / behind in the race or on the timing sheet for qual / practice. This one only works if you have the driver name recording for that driver)
+"who's [ahead on track / in front on track / behind on track]" (gives the name of the car in front / behind in on track, regardless of his race / qual position. This one only works if you have the driver name recording for that driver)
+"tell me the gaps / give me the gaps / tell me the deltas / give me the deltas" (switch on 'deltas' mode where the time deltas in front and behind get read out on each lap. Note that these messages will play even if you have disabled messages)
+"don't tell me the gaps / don't tell me the deltas / no more gaps / no more deltas" (switch off deltas mode)
+"repeat last message / say again" (replays the last message)
+"What are my [brake / tyre] [temperatures / temps]"
+"What time is it / what's the time" (reports current real-world time)

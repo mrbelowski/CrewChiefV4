@@ -17,6 +17,7 @@ using System.Net;
 using System.Xml.Linq;
 using System.IO.Compression;
 using CrewChiefV4.Audio;
+using CrewChiefV4.UserInterface;
 
 namespace CrewChiefV4
 {
@@ -788,10 +789,26 @@ namespace CrewChiefV4
             form.ShowDialog(this);
         }
 
+        private void helpButtonClicked(object sender, EventArgs e)
+        {
+            var form = new ShowHelp(this);
+            form.ShowDialog(this);
+        }
+
+        private void aboutButtonClicked(object sender, EventArgs e)
+        {
+            var form = new ShowAbout(this);
+            form.ShowDialog(this);
+        }
+
         private void scanControllersButtonClicked(object sender, EventArgs e)
         {
             controllerConfiguration.controllers = this.controllerConfiguration.scanControllers();
             this.controllersList.Items.Clear();
+            if (this.gameDefinitionList.Text.Equals(GameDefinition.pCarsNetwork.friendlyName))
+            {
+                controllerConfiguration.addNetworkControllerToList();
+            }
             foreach (ControllerConfiguration.ControllerData configData in controllerConfiguration.controllers)
             {
                 this.controllersList.Items.Add(configData.deviceType.ToString() + " " + configData.deviceName);
