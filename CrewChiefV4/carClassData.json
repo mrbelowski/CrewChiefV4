@@ -243,7 +243,6 @@
         {
             "carClassEnum": "VINTAGE_F1_A",
             "pCarsClassNames": [ "Vintage F1 A" ],
-            "acClassNames": [ "dallara_f312" ],
             "defaultTyreType": "Bias_Ply"
         },
         {
