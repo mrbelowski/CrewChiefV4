@@ -6,28 +6,28 @@
 #
 # The valid params are:
 # {
-#	"carClassEnum": this is the built-in car class group (see complete list below). If this doesn't match, the app will assign this to UNKNOWN_RACE car group, with the params you specify
-#	"pCarsClassNames": this is a comma (,) separated array of pCars classnames. * or ? denote wildcards. The app searches for classes which have full matches before considering wildcards
-#	"rf2ClassNames": as above, for rFactor2
-#	"rf1ClassNames": as above, for rFactor1, AMS, GSC, FTruck, and other RF1 based games (the Reiza games)
-#	"acClassNames": as above, for Assetto Corsa
-#	"raceroomClassIds": this is an array of integers or R3E class IDs	
-#	"brakeType": can be "Carbon", "Ceramic", "Iron_Race" or "Iron_Road"
-#	"defaultTyreType": can be "Road", "Bias_Ply", "Unknown_Race", and various others that the app doesn't really use (still to be worked on...)
-#	"maxSafeWaterTemp": water temp above this (celsius) will trigger a warning
-#	"maxSafeOilTemp": oil temp above this (celsius) will trigger a warning
-#	"minTyreCircumference": used to override default tyre size settings, used when calculating wheel locking and spinning. Only karts should need to override this
-#	"maxTyreCircumference": used to override default tyre size settings, used when calculating wheel locking and spinning. Only karts should need to override this
+#    "carClassEnum": this is the built-in car class group (see complete list below). If this doesn't match, the app will assign this to UNKNOWN_RACE car group, with the params you specify
+#    "pCarsClassNames": this is a comma (,) separated array of pCars classnames. * or ? denote wildcards. The app searches for classes which have full matches before considering wildcards
+#    "rf2ClassNames": as above, for rFactor2
+#    "rf1ClassNames": as above, for rFactor1, AMS, GSC, FTruck, and other RF1 based games (the Reiza games)
+#    "acClassNames": as above, for Assetto Corsa
+#    "raceroomClassIds": this is an array of integers or R3E class IDs  
+#    "brakeType": can be "Carbon", "Ceramic", "Iron_Race" or "Iron_Road"
+#    "defaultTyreType": can be "Road", "Bias_Ply", "Unknown_Race", and various others that the app doesn't really use (still to be worked on...)
+#    "maxSafeWaterTemp": water temp above this (celsius) will trigger a warning
+#    "maxSafeOilTemp": oil temp above this (celsius) will trigger a warning
+#    "minTyreCircumference": used to override default tyre size settings, used when calculating wheel locking and spinning. Only karts should need to override this
+#    "maxTyreCircumference": used to override default tyre size settings, used when calculating wheel locking and spinning. Only karts should need to override this
 # }
 #
 # The default values are:
 # {
-#	"brakeType": "Iron_Race"
-#	"defaultTyreType": "Unknown_Race"
-#	"maxSafeWaterTemp": 105
-#	"maxSafeOilTemp": 125
-#	"minTyreCircumference": 0.4 * pi (40cm diameter wheel)
-#	"maxTyreCircumference": 1.2 * pi (120cm diameter wheel) 
+#    "brakeType": "Iron_Race"
+#    "defaultTyreType": "Unknown_Race"
+#    "maxSafeWaterTemp": 105
+#    "maxSafeOilTemp": 125
+#    "minTyreCircumference": 0.4 * pi (40cm diameter wheel)
+#    "maxTyreCircumference": 1.2 * pi (120cm diameter wheel) 
 # }
 #
 # Crew Chief built-in car classes are:
@@ -114,20 +114,22 @@
         {
             "carClassEnum": "Kart_1",
             "pCarsClassNames": [ "Kart1" ],
+            "rf2ClassNames": [ "Kart Junior" ],
             "minTyreCircumference": 0.78,
             "maxTyreCircumference": 1.26
         },
         {
             "carClassEnum": "Kart_2",
             "pCarsClassNames": [ "Kart2" ],
+            "rf2ClassNames": [ "Kart F1" ],
             "minTyreCircumference": 0.78,
             "maxTyreCircumference": 1.26
         },
-		{
+        {
             "carClassEnum": "LMP1",
             "raceroomClassIds": [ 1714  ],
             "pCarsClassNames": [ "LMP1" ],
-			"rf2ClassNames": [ "LMP1" ],
+            "rf2ClassNames": [ "LMP1" ],
             "acClassNames": [ "ks_porsche_919_hybrid_2015" ,"ks_porsche_919_hybrid_2016" ],
             "brakeType": "Carbon",
             "maxSafeWaterTemp": 105,
@@ -137,14 +139,14 @@
             "carClassEnum": "LMP2",
             "raceroomClassIds": [ 1923 ],
             "pCarsClassNames": [ "LMP2" ],
-			"rf2ClassNames": [ "LMP2" ],
+            "rf2ClassNames": [ "LMP2" ],
             "brakeType": "Ceramic"
         },
-		{
+        {
             "carClassEnum": "LMP3",
             "raceroomClassIds": [ 252  ],
             "pCarsClassNames": [ "LMP3" ],
-			"rf2ClassNames": [ "LMP3" ],
+            "rf2ClassNames": [ "LMP3" ],
             "acClassNames": [ "ks_praga_r1" ],
             "brakeType": "Ceramic"
         },
@@ -243,7 +245,6 @@
         {
             "carClassEnum": "VINTAGE_F1_A",
             "pCarsClassNames": [ "Vintage F1 A" ],
-            "acClassNames": [ "dallara_f312" ],
             "defaultTyreType": "Bias_Ply"
         },
         {
@@ -293,7 +294,7 @@
         {
             "carClassEnum": "DTM",
             "pCarsClassNames": [ "TC3" ],
-            "rf2ClassNames": [ "*DTM*" ],
+            "rf2ClassNames": [ "Abt Sportsline", "DHL Paket", "EURONICS Mercedes AMG", "Junge Sterne", "Mercedes AMG DTM-Team", "Mercedes AMG", "STIHL Mercedes AMG", "THOMAS SABO Mercedes AMG", "THOMAS SABO", "TV Spielfilm", "Team ABT", "Team Abt Sportsline", "Team Abt", "Team MTEK", "Team Phoenix", "Team RBM", "Team RMG", "Team Rosberg", "Team Schnitzer", "stern Mercedes AMG", "stern" ],
             "brakeType": "Carbon",
             "maxSafeWaterTemp": 105,
             "maxSafeOilTemp": 140
