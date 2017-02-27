@@ -27,6 +27,7 @@ namespace CrewChiefV4
         static void Main()
         {
             String[] commandLineArgs = Environment.GetCommandLineArgs();
+            Boolean allowMultipleInst = false;
             if (commandLineArgs != null)
             {
                 foreach (String commandLineArg in commandLineArgs)
@@ -44,6 +45,17 @@ namespace CrewChiefV4
                             Console.WriteLine("Failed to set process affinity");
                         }
                     }
+                    if(commandLineArg.Equals("multi"))
+                    {
+                        allowMultipleInst = true;
+                    }
+                }
+                if(!allowMultipleInst)
+                {
+                    if (System.Diagnostics.Process.GetProcessesByName(System.IO.Path.GetFileNameWithoutExtension(System.Reflection.Assembly.GetEntryAssembly().Location)).Count() > 1)
+                    {
+                        System.Diagnostics.Process.GetCurrentProcess().Kill();
+                    }                        
                 }
             }            
             Application.EnableVisualStyles();
