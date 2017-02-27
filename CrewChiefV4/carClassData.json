@@ -294,14 +294,7 @@
         {
             "carClassEnum": "DTM",
             "pCarsClassNames": [ "TC3" ],
-            "rf2ClassNames": [ "*DTM*" ],
-            "brakeType": "Carbon",
-            "maxSafeWaterTemp": 105,
-            "maxSafeOilTemp": 140
-        },
-        {
-            "carClassEnum": "DTM_2012",
-            "rf2ClassNames": [ "Mercedes AMG", "Abt Sportsline", "DHL Paket", "Junge Sterne", "THOMAS SABO", "TV Spielfilm", "Team ABT", "Team Phoenix", "Team RBM", "Team RMG", "Team Rosberg", "Team Schnitzer", "stern" ],
+            "rf2ClassNames": [ "Abt Sportsline", "DHL Paket", "EURONICS Mercedes AMG", "Junge Sterne", "Mercedes AMG DTM-Team", "Mercedes AMG", "STIHL Mercedes AMG", "THOMAS SABO Mercedes AMG", "THOMAS SABO", "TV Spielfilm", "Team ABT", "Team Abt Sportsline", "Team Abt", "Team MTEK", "Team Phoenix", "Team RBM", "Team RMG", "Team Rosberg", "Team Schnitzer", "stern Mercedes AMG", "stern" ],
             "brakeType": "Carbon",
             "maxSafeWaterTemp": 105,
             "maxSafeOilTemp": 140
@@ -309,7 +302,6 @@
         {
             "carClassEnum": "DTM_2013",
             "raceroomClassIds": [ 1921 ],
-            "rf2ClassNames": [ "EURONICS Mercedes AMG", "Mercedes AMG DTM-Team", "Mercedes AMG", "STIHL Mercedes AMG", "THOMAS SABO Mercedes AMG", "Team Abt Sportsline", "Team Abt", "Team MTEK", "Team Phoenix", "Team RBM", "Team RMG", "Team Rosberg", "Team Schnitzer", "stern Mercedes AMG" ],
             "brakeType": "Carbon",
             "maxSafeWaterTemp": 105,
             "maxSafeOilTemp": 140
