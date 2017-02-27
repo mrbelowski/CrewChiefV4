@@ -52,10 +52,18 @@ namespace CrewChiefV4
                 }
                 if(!allowMultipleInst)
                 {
-                    if (System.Diagnostics.Process.GetProcessesByName(System.IO.Path.GetFileNameWithoutExtension(System.Reflection.Assembly.GetEntryAssembly().Location)).Count() > 1)
+                    try
                     {
-                        System.Diagnostics.Process.GetCurrentProcess().Kill();
-                    }                        
+                        if (System.Diagnostics.Process.GetProcessesByName(System.IO.Path.GetFileNameWithoutExtension(System.Reflection.Assembly.GetEntryAssembly().Location)).Count() > 1)
+                        {
+                            System.Diagnostics.Process.GetCurrentProcess().Kill();
+                        } 
+                    }
+                    catch (Exception)
+                    {
+                        //ignore
+                    }
+                       
                 }
             }            
             Application.EnableVisualStyles();
