@@ -428,6 +428,9 @@
     <Setting Name="enable_rf2_blue_on_slower" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
+    <Setting Name="enable_rf2_white_on_last_lap" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
     <Setting Name="time_between_caution_period_status_reminders" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">60</Value>
     </Setting>

@@ -7,7 +7,9 @@ When you first start Crew Chief the app will be installed with no sounds. The UI
 
 For Raceroom and Project Cars, Crew Chief is self contained and needs no other software and almost no configuration. For rFactor1 based games, rFactor2 and Assetto Corsa there are a couple of extra steps required. 
 
-For voice recognition (entirely optional but quite handy and very cool) see below. 
+For voice recognition (entirely optional but quite handy and very cool) see below.
+
+If you're stuck or just want to catch up on what's going on with the app, there's a Crew Chief forum here: http://thecrewchief.org
 
 
 Raceroom:
@@ -26,9 +28,7 @@ Put the rFactorSharedMemoryMap.dll from this download in the Automobilista / RF1
 
 rFactor 2:
 
-You need Vytautas Leonavicius' plugin for rFactor 2 - this is here: http://www.mediafire.com/file/ayibrrcp14hb0gq/rf2smmp_1.0.0.0.zip [TODO: THIS IS THE OLD VERSION]
-
-Put the rFactor2SharedMemoryMapPlugin64.dll from this download in the rFactor2 'Plugins' folder (usually something like C:\Program Files (x86)\Steam\steamapps\common\rFactor2\Bin64\Plugins). You need to enable this plugin from the game's Options->Plugins UI. Don't forget to switch off the built in spotter too. Once you've done this just select the game from Crew Chief's Game menu and press the Start button.
+You need Vytautas Leonavicius' plugin for rFactor 2. This is in Crew Chief's installation folder. Copy the rFactor2SharedMemoryMapPlugin64.dll from your Crew Chief installation (usually C:\Program Files (x86)\Britton IT Ltd\CrewChiefV4\) to the rFactor2 'Plugins' folder (usually something like C:\Program Files (x86)\Steam\steamapps\common\rFactor2\Bin64\Plugins). You need to enable this plugin from the game's Options->Plugins UI. Don't forget to switch off the built in spotter too. Once you've done this just select the game from Crew Chief's Game menu and press the Start button.
 
 Assetto Corsa:
 
