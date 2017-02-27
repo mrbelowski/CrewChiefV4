@@ -51,7 +51,7 @@ namespace CrewChiefV4.rFactor2
             this.suspensionDamageThresholds.Add(new CornerData.EnumWithThresholds(DamageLevel.DESTROYED, 1.0f, 2.0f));
         }
 
-        private int[] minimumSupportedVersionParts = new int[] { 1, 0, 0, 0 };
+        private int[] minimumSupportedVersionParts = new int[] { 1, 0, 0, 1 };
         private bool pluginSupported = false;
         public void versionCheck(Object memoryMappedFileStruct)
         {
@@ -880,11 +880,16 @@ namespace CrewChiefV4.rFactor2
             }
             
             var currFlag = FlagEnum.UNKNOWN;
-            if (csd.IsDisqualified
-                && pgs != null
-                && !psd.IsDisqualified)
+
+            if (UserSettings.GetUserSettings().getBoolean("enable_rf2_white_on_last_lap"))
             {
-                currFlag = FlagEnum.BLACK;
+                // TODO: Re-work when NASCAR rules are implemented.
+                if ((csd.SessionType == SessionType.Race || csd.SessionType == SessionType.Qualify)
+                    && csd.SessionPhase == SessionPhase.Green
+                    && csd.LeaderHasFinishedRace)
+                {
+                    currFlag = FlagEnum.WHITE;
+                }
             }
 
             if (player.mFlag == (byte)rFactor2Constants.rF2PrimaryFlag.Blue)
@@ -910,13 +915,20 @@ namespace CrewChiefV4.rFactor2
                     }
 
                     if (isBehindWithinDistance(csd.TrackDefinition.trackLength, 8.0f, 40.0f,
-                        cgs.PositionAndMotionData.DistanceRoundTrack, opponent.DistanceRoundTrack) &&
-                        opponent.Speed >= cgs.PositionAndMotionData.CarSpeed)
+                            cgs.PositionAndMotionData.DistanceRoundTrack, opponent.DistanceRoundTrack)
+                        && opponent.Speed >= cgs.PositionAndMotionData.CarSpeed)
                     {
                         currFlag = FlagEnum.BLUE;
                         break;
                     }
                 }
+            }
+
+            if (csd.IsDisqualified
+                && pgs != null
+                && !psd.IsDisqualified)
+            {
+                currFlag = FlagEnum.BLACK;
             }
 
             csd.Flag = currFlag;
