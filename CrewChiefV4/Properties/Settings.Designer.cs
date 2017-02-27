@@ -1729,6 +1729,18 @@ namespace CrewChiefV4.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool enable_rf2_white_on_last_lap {
+            get {
+                return ((bool)(this["enable_rf2_white_on_last_lap"]));
+            }
+            set {
+                this["enable_rf2_white_on_last_lap"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("60")]
         public int time_between_caution_period_status_reminders {
             get {
