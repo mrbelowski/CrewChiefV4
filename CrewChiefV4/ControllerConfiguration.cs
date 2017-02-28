@@ -12,6 +12,7 @@ namespace CrewChiefV4
     {
         private static Guid UDP_NETWORK_CONTROLLER_GUID = new Guid("2bbfed03-a04f-4408-91cf-e0aa6b20b8ff");
 
+        private MainWindow mainWindow;
         public Boolean listenForAssignment = false;
         DirectInput directInput = new DirectInput();
         DeviceType[] supportedDeviceTypes = new DeviceType[] {DeviceType.Driving, DeviceType.Joystick, DeviceType.Gamepad, 
@@ -35,6 +36,7 @@ namespace CrewChiefV4
 
         public void Dispose()
         {
+            mainWindow = null;
             foreach (ButtonAssignment ba in buttonAssignments)
             {
                 if (ba.joystick != null)
@@ -54,8 +56,9 @@ namespace CrewChiefV4
             catch (Exception) { }
         }
 
-        public ControllerConfiguration()
+        public ControllerConfiguration(MainWindow mainWindow)
         {
+            this.mainWindow = mainWindow;
             addButtonAssignment(CHANNEL_OPEN_FUNCTION);
             addButtonAssignment(TOGGLE_RACE_UPDATES_FUNCTION);
             addButtonAssignment(TOGGLE_SPOTTER_FUNCTION);
@@ -275,6 +278,7 @@ namespace CrewChiefV4
             {
                 addNetworkControllerToList();
             }
+            List<ControllerData> missingControllers = new List<ControllerData>();
             foreach (ControllerData controller in this.controllers)
             {                
                 if (controller.guid.ToString() == deviceGuid)
@@ -294,10 +298,23 @@ namespace CrewChiefV4
                         }
                         catch (Exception e)
                         {
+                            missingControllers.Add(controller);
                             Console.WriteLine("Controller " + controller.deviceName + " is not available: " + e.Message);
                         }
                     }
                 }
+            }
+            Boolean removedMissingController = false;
+            foreach (ControllerData controllerData in missingControllers) {
+                if (missingControllers.Contains(controllerData))
+                {
+                    removedMissingController = true;
+                    this.controllers.Remove(controllerData);
+                }
+            }
+            if (removedMissingController)
+            {
+                this.mainWindow.getControllers();
             }
         }
 

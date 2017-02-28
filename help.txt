@@ -36,6 +36,13 @@ You need Morten Roslev's Python plugin for Assetto Corsa. This is in Crew Chief'
 
 
 
+Startup issues
+------------------
+If the app refuses to start, or starts then closes itself, try deleting the app's configuration files. To do this go to C:\Users\[user name]\AppData\Local\Britton_IT_Ltd\ and delete all the subfolders in there. This will reset all the app's settings to default. Note that the 'AppData' folder is hidden by default on Windows - you may need to change the View settings in the File Explorer Options from Windows Control Panel - look for a setting called "Show hidden files and folders".
+
+There may also be an error logged in the Windows Event logs - look for .Net errors in the Application Logs section.
+
+
 Properties
 -------------------
 The app includes a rather rudamentary preferences screen accessed by the "Properties" button. Many many aspects of that app's behaviour can be customised here but it's important to note that you don't have to make any changes to these properties to get the app to work correctly - the defaults are sensisble settings and the app doesn't need any configuration (except for swearing - see below).
