@@ -369,7 +369,7 @@ namespace CrewChiefV4
             cw = new ControlWriter(textBox1);
             Console.SetOut(cw);
             Console.WriteLine("Starting app");
-            controllerConfiguration = new ControllerConfiguration();            
+            controllerConfiguration = new ControllerConfiguration(this);            
             setSelectedGameType();
             this.app_version.Text = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
             this.filenameLabel.Visible = System.Diagnostics.Debugger.IsAttached;
@@ -698,7 +698,7 @@ namespace CrewChiefV4
             this.assignButtonToAction.Enabled = this.buttonActionSelect.SelectedIndex > -1 && this.controllersList.SelectedIndex > -1 && !crewChief.running;
         }
 
-        private void getControllers() {
+        public void getControllers() {
             this.controllersList.Items.Clear();
             foreach (ControllerConfiguration.ControllerData configData in controllerConfiguration.controllers)
             {

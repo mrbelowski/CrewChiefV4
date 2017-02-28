@@ -50,8 +50,8 @@ namespace CrewChiefV4.Events
         private DateTime[] lastSectorFlagsAnnouncedTime = new DateTime[] { DateTime.MinValue, DateTime.MinValue, DateTime.MinValue };
         private FullCourseYellowPhase lastFCYAnnounced = FullCourseYellowPhase.RACING;
         private DateTime lastFCYAccounedTime = DateTime.MinValue;
-        private TimeSpan timeBetweenYellowAndClearFlagMessages = TimeSpan.FromSeconds(3);
-        private int secondsToPreValidateYellowClearMessages = 5;
+        private TimeSpan timeBetweenYellowAndClearFlagMessages = TimeSpan.FromSeconds(5);
+        private int secondsToPreValidateYellowClearMessages = 8;
         private TimeSpan timeBetweenNewYellowFlagMessages = TimeSpan.FromSeconds(5);
         private Random random = new Random();
 
