@@ -411,7 +411,7 @@ namespace CrewChiefV4.rFactor2
             public rF2Wheel[] mWheels;            // wheel info (front left, front right, rear left, rear right)
 
             public int mSession;                  // current session (0=testday 1-4=practice 5-8=qual 9=warmup 10-13=race)
-            public double mCurrentET;             // current time
+            public double mCurrentET;             // current time (at last ScoringUpdate)
             public double mEndET;                 // ending time
             public int mMaxLaps;                  // maximum laps
             public double mLapDist;               // distance around track
@@ -446,7 +446,11 @@ namespace CrewChiefV4.rFactor2
             public sbyte[] mSectorFlag;             // whether there are any local yellows at the moment in each sector (not sure if sector 0 is first or last, so test)
             public byte mStartLight;                // start light frame (number depends on track)
             public byte mNumRedLights;              // number of red lights in start sequence
-            public byte mInRealtime;                // in realtime as opposed to at the monitor
+
+            // MM_NEW
+            public byte mInRealtimeSU;              // in realtime as opposed to at the monitor (reported via ScoringUpdate).
+            public byte mInRealtimeFC;              // in realtime as opposed to at the monitor (reported via EnterRealtime/ExitRealtime).
+
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 32)]
             public byte[] mPlayerName;              // player name (including possible multiplayer override)
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 64)]

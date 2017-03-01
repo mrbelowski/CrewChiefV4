@@ -51,7 +51,7 @@ namespace CrewChiefV4.rFactor2
             this.suspensionDamageThresholds.Add(new CornerData.EnumWithThresholds(DamageLevel.DESTROYED, 1.0f, 2.0f));
         }
 
-        private int[] minimumSupportedVersionParts = new int[] { 1, 0, 0, 1 };
+        private int[] minimumSupportedVersionParts = new int[] { 1, 1, 0, 0 };
         private bool pluginSupported = false;
         public void versionCheck(Object memoryMappedFileStruct)
         {
