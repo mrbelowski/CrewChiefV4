@@ -62,6 +62,8 @@ namespace CrewChiefV4.Events
 
         private TimeSpan fcyPitStatusReminderMinTime = TimeSpan.FromSeconds(UserSettings.GetUserSettings().getInt("time_between_caution_period_status_reminders"));
         private float distanceToWarnOfLocalYellow = 500;    // metres - externalise? Is this sufficient? Make it speed-dependent?
+
+        private Boolean useRF2FlagsForAMS = UserSettings.GetUserSettings().getBoolean("use_rf2_flags_for_ams");
         
         public FlagsMonitor(AudioPlayer audioPlayer)
         {
@@ -97,7 +99,7 @@ namespace CrewChiefV4.Events
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
             if (CrewChief.gameDefinition.gameEnum == GameEnum.RACE_ROOM || CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT ||
-                CrewChief.gameDefinition.gameEnum == GameEnum.RF1)
+                (CrewChief.gameDefinition.gameEnum == GameEnum.RF1 && useRF2FlagsForAMS))
             {
                 newYellowFlagImplementation(previousGameState, currentGameState);
             }
