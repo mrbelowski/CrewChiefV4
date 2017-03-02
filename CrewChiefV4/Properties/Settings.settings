@@ -455,5 +455,8 @@
     <Setting Name="CONTROLLER_DATA" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="enable_ams_pit_schedule_messages" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

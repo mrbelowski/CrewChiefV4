@@ -1834,5 +1834,17 @@ namespace CrewChiefV4.Properties {
                 this["CONTROLLER_DATA"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool enable_ams_pit_schedule_messages {
+            get {
+                return ((bool)(this["enable_ams_pit_schedule_messages"]));
+            }
+            set {
+                this["enable_ams_pit_schedule_messages"] = value;
+            }
+        }
     }
 }
