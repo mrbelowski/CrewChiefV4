@@ -712,6 +712,7 @@ namespace CrewChiefV4.rFactor1
             else if (currentGameState.SessionData.SessionType == SessionType.Race ||
                 currentGameState.SessionData.SessionType == SessionType.Qualify)
             {
+                // TODO: port RF2 FCY stuff to AMS
                 if (shared.gamePhase == (int)rFactor1Constant.rfGamePhase.fullCourseYellow)
                 {
                     Flag = FlagEnum.DOUBLE_YELLOW;
