@@ -809,6 +809,9 @@ namespace CrewChiefV4.GameState
 
         // -1 == n/a; 0 = inactive; 1 = active
         public int limiterStatus = -1;
+
+        // RF1 hack for mandatory pit stop windows, which are used to trigger 'box now' messages
+        public Boolean ResetEvents;
     }
 
     public class PenatiesData

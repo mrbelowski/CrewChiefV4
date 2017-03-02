@@ -23,7 +23,9 @@ namespace CrewChiefV4.rFactor1
         private float scrubbedTyreWearPercent = 5f;
         private float minorTyreWearPercent = 30f;
         private float majorTyreWearPercent = 60f;
-        private float wornOutTyreWearPercent = 85f;        
+        private float wornOutTyreWearPercent = 85f;
+
+        private Boolean enablePitWindowHack = UserSettings.GetUserSettings().getBoolean("enable_ams_pit_schedule_messages");
 
         private List<CornerData.EnumWithThresholds> brakeTempThresholdsForPlayersCar = null;
 
@@ -613,12 +615,27 @@ namespace CrewChiefV4.rFactor1
             // --------------------------------
             // pit data
             currentGameState.PitData.IsRefuellingAllowed = true;
-            currentGameState.PitData.HasMandatoryPitStop = isOfflineSession && shared.scheduledStops > 0 && player.numPitstops < shared.scheduledStops && currentGameState.SessionData.SessionType == SessionType.Race;
-            currentGameState.PitData.PitWindowStart = isOfflineSession && currentGameState.PitData.HasMandatoryPitStop ? 1 : 0;
-            currentGameState.PitData.PitWindowEnd = !currentGameState.PitData.HasMandatoryPitStop ? 0 :
-                currentGameState.SessionData.SessionHasFixedTime ? (int)(currentGameState.SessionData.SessionTotalRunTime / 60 / (shared.scheduledStops + 1)) * (player.numPitstops + 1) + 1 :
-                (int)(currentGameState.SessionData.SessionNumberOfLaps / (shared.scheduledStops + 1)) * (player.numPitstops + 1) + 1;
-            currentGameState.PitData.InPitlane = player.inPits == 1;
+
+            // JB: this code estimates pit calls based on the number of scheduled stops in offline races, splitting the session into equal stints.
+            // In order for this to work correctly, the MandatoryPitStop event needs to be structured differently - for multiple scheduled stops
+            // the window end lap / time changes throughout the race, but the MandatoryPitStop event won't see these changes so will only call the 1st 'box now'
+
+            if (enablePitWindowHack)
+            {
+                currentGameState.PitData.HasMandatoryPitStop = isOfflineSession && shared.scheduledStops > 0 && player.numPitstops < shared.scheduledStops &&
+                    currentGameState.SessionData.SessionType == SessionType.Race;
+                currentGameState.PitData.PitWindowStart = isOfflineSession && currentGameState.PitData.HasMandatoryPitStop ? 1 : 0;
+                currentGameState.PitData.PitWindowEnd = !currentGameState.PitData.HasMandatoryPitStop ? 0 :
+                    currentGameState.SessionData.SessionHasFixedTime ? (int)(((currentGameState.SessionData.SessionTotalRunTime / 60) / (shared.scheduledStops + 1)) * (player.numPitstops + 1)) + 1 :
+                    (int)((currentGameState.SessionData.SessionNumberOfLaps / (shared.scheduledStops + 1)) * (player.numPitstops + 1)) + 1;
+                currentGameState.PitData.InPitlane = player.inPits == 1;
+
+                // force the MandatoryPit event to be re-initialsed if the window end has been recalculated.
+                currentGameState.PitData.ResetEvents = currentGameState.PitData.HasMandatoryPitStop && 
+                    previousGameState != null && currentGameState.PitData.PitWindowEnd > previousGameState.PitData.PitWindowEnd;
+            }
+
+             
             currentGameState.PitData.IsAtPitExit = previousGameState != null && previousGameState.PitData.InPitlane && !currentGameState.PitData.InPitlane;
             currentGameState.PitData.OnOutLap = currentGameState.PitData.InPitlane && currentGameState.SessionData.SectorNumber == 1;
             currentGameState.PitData.OnInLap = currentGameState.PitData.InPitlane && currentGameState.SessionData.SectorNumber == 3;

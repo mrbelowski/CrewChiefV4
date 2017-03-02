@@ -181,3 +181,5 @@ r3e_blue_flag_detection_distance_help = Max distance (metres) for R3E blue flag 
 
 play_pre_lights_messages_until_cancelled_help = Play pre-race info messages until a control input is detected
 time_between_caution_period_status_reminders_help = Time between caution period status reminders (seconds)
+
+enable_ams_pit_schedule_messages_help = Play 'box now' messages when using offline scheduled pit stops
