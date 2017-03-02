@@ -96,7 +96,8 @@ namespace CrewChiefV4.Events
 
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
-            if (CrewChief.gameDefinition.gameEnum == GameEnum.RACE_ROOM || CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT)
+            if (CrewChief.gameDefinition.gameEnum == GameEnum.RACE_ROOM || CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT ||
+                CrewChief.gameDefinition.gameEnum == GameEnum.RF1)
             {
                 newYellowFlagImplementation(previousGameState, currentGameState);
             }

@@ -135,18 +135,57 @@ namespace CrewChiefV4.rFactor1
                 shared.session >= 10 && shared.session <= 13 ? shared.session - 10 : 0;
             currentGameState.SessionData.SessionType = mapToSessionType(shared);
             currentGameState.SessionData.SessionPhase = mapToSessionPhase((rFactor1Constant.rfGamePhase)shared.gamePhase);
-            currentGameState.FlagData.isFullCourseYellow = currentGameState.SessionData.SessionPhase == SessionPhase.FullCourseYellow;
-            if (currentGameState.FlagData.isFullCourseYellow && previousGameState != null && !previousGameState.FlagData.isFullCourseYellow)
+
+            // --------------------------------
+            // flags data
+            currentGameState.FlagData.isFullCourseYellow = currentGameState.SessionData.SessionPhase == SessionPhase.FullCourseYellow
+                || shared.yellowFlagState == (sbyte)rFactor1Constant.rfYellowFlagState.resume;
+
+            if (shared.yellowFlagState == (sbyte)rFactor1Constant.rfYellowFlagState.resume)
             {
-                // transitioned from racing to yellow, so set the FCY status to pending
-                currentGameState.FlagData.fcyPhase = FullCourseYellowPhase.PENDING;
-            }
-            else if (previousGameState != null && previousGameState.FlagData.isFullCourseYellow && !currentGameState.FlagData.isFullCourseYellow)
-            {
-                // transitioned from yellow to racing, so set the FCY status to racing
+                // Special case for resume after FCY.  rF2 no longer has FCY set, but still has Resume sub phase set.
                 currentGameState.FlagData.fcyPhase = FullCourseYellowPhase.RACING;
             }
+            else if (currentGameState.FlagData.isFullCourseYellow)
+            {
+                if (shared.yellowFlagState == (sbyte)rFactor1Constant.rfYellowFlagState.pending)
+                    currentGameState.FlagData.fcyPhase = FullCourseYellowPhase.PENDING;
+                //else if (rf2state.mYellowFlagState == (sbyte)rFactor2Constants.rF2YellowFlagState.PitClosed)
+                //    cgs.FlagData.fcyPhase = FullCourseYellowPhase.PITS_CLOSED;
+                // At default ruleset, both open and close sub states result in "Pits open" visible in the UI.
+                else if (shared.yellowFlagState == (sbyte)rFactor1Constant.rfYellowFlagState.pitOpen
+                    || shared.yellowFlagState == (sbyte)rFactor1Constant.rfYellowFlagState.pitClosed)
+                    currentGameState.FlagData.fcyPhase = FullCourseYellowPhase.PITS_OPEN;
+                else if (shared.yellowFlagState == (sbyte)rFactor1Constant.rfYellowFlagState.pitLeadLap)
+                    currentGameState.FlagData.fcyPhase = FullCourseYellowPhase.PITS_OPEN_LEAD_LAP_VEHICLES;
+                else if (shared.yellowFlagState == (sbyte)rFactor1Constant.rfYellowFlagState.lastLap)
+                {
+                    if (previousGameState != null)
+                    {
+                        if (previousGameState.FlagData.fcyPhase != FullCourseYellowPhase.LAST_LAP_NEXT && previousGameState.FlagData.fcyPhase != FullCourseYellowPhase.LAST_LAP_CURRENT)
+                            // Initial last lap phase
+                            currentGameState.FlagData.fcyPhase = FullCourseYellowPhase.LAST_LAP_NEXT;
+                        else if (currentGameState.SessionData.CompletedLaps != previousGameState.SessionData.CompletedLaps && 
+                            previousGameState.FlagData.fcyPhase == FullCourseYellowPhase.LAST_LAP_NEXT)
+                            // Once we reach the end of current lap, and this lap is next last lap, switch to last lap current phase.
+                            currentGameState.FlagData.fcyPhase = FullCourseYellowPhase.LAST_LAP_CURRENT;
+                        else
+                            // Keep previous FCY last lap phase.
+                            currentGameState.FlagData.fcyPhase = previousGameState.FlagData.fcyPhase;
+                    }
+                }
+            }
 
+            if (currentGameState.SessionData.SessionPhase == SessionPhase.Green)
+            {
+                for (int i = 0; i < 3; ++i)
+                {
+                    // Mark Yellow sectors.
+                    if (shared.sectorFlag[i] == (sbyte)rFactor1Constant.rfYellowFlagState.pending)
+                        currentGameState.FlagData.sectorFlags[i] = FlagEnum.YELLOW;
+                }
+            }
+            
             currentGameState.carClass = CarData.getCarClassForClassName(getNameFromBytes(player.vehicleClass));
             brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(currentGameState.carClass);
             currentGameState.SessionData.DriverRawName = getNameFromBytes(player.driverName).ToLower();
@@ -641,7 +680,8 @@ namespace CrewChiefV4.rFactor1
                 (previousGameState != null && previousGameState.PitData.OnOutLap && !currentGameState.SessionData.IsNewLap);
             currentGameState.PitData.OnInLap = currentGameState.PitData.InPitlane && currentGameState.SessionData.SectorNumber == 3;
             currentGameState.PitData.IsMakingMandatoryPitStop = currentGameState.PitData.HasMandatoryPitStop && currentGameState.PitData.OnInLap && currentGameState.SessionData.CompletedLaps > currentGameState.PitData.PitWindowStart;
-            currentGameState.PitData.PitWindow = currentGameState.PitData.IsMakingMandatoryPitStop ? PitWindow.StopInProgress : mapToPitWindow((rFactor1Constant.rfYellowFlagState)shared.yellowFlagState);
+            currentGameState.PitData.PitWindow = currentGameState.PitData.IsMakingMandatoryPitStop ? PitWindow.StopInProgress : 
+                mapToPitWindow((rFactor1Constant.rfYellowFlagState)shared.yellowFlagState);
 
             // --------------------------------
             // fuel data
