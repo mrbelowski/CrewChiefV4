@@ -38,19 +38,6 @@ namespace CrewChiefV4.rFactor2
         private float distanceOffTrack = 0.0f;
         private Boolean isApproachingTrack = false;
 
-        // only Laps and Time are implemented currently.
-        /*private enum FinishCriteria
-        {
-            Unknown,
-            Laps,
-            Time,
-            LapsAndTime,
-            PercentTrackLaps,
-            PercentTrackTime,
-            PercentTrackDefault,
-        }*/
-
-
         public RF2GameStateMapper()
         {
             this.tyreWearThresholds.Add(new CornerData.EnumWithThresholds(TyreCondition.NEW, -10000.0f, this.scrubbedTyreWearPercent));
@@ -206,7 +193,7 @@ namespace CrewChiefV4.rFactor2
                 rf2state.mSession >= 10 && rf2state.mSession <= 13 ? rf2state.mSession - 10 : 0;
 
             csd.SessionType = mapToSessionType(rf2state);
-            csd.SessionPhase = mapToSessionPhase((rFactor2Constants.rF2GamePhase)rf2state.mGamePhase, csd.SessionType, ref player, ref leader);
+            csd.SessionPhase = mapToSessionPhase((rFactor2Constants.rF2GamePhase)rf2state.mGamePhase, csd.SessionType, ref player);
             cgs.carClass = CarData.getCarClassForClassName(getStringFromBytes(player.mVehicleClass));
             this.brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(cgs.carClass);
             csd.DriverRawName = getStringFromBytes(player.mDriverName).ToLower();
@@ -259,10 +246,6 @@ namespace CrewChiefV4.rFactor2
 
             // hack for test day sessions running longer than allotted time
             csd.SessionTimeRemaining = csd.SessionTimeRemaining < 0.0f && rf2state.mSession == 0 ? defaultSessionTotalRunTime : csd.SessionTimeRemaining;
-
-            //var finishCriteria = csd.SessionHasFixedTime ? FinishCriteria.Time : FinishCriteria.Laps;
-            //if (this.isCheckeredPhase(csd.SessionPhase, csd.SessionType, finishCriteria, csd.SessionTimeRemaining, ref player, ref leader))
-            //    csd.SessionPhase = SessionPhase.Checkered;
 
             csd.NumCars = rf2state.mNumVehicles;
             csd.NumCarsAtStartOfSession = csd.IsNewSession ? csd.NumCars : psd.NumCarsAtStartOfSession;
@@ -1043,11 +1026,11 @@ namespace CrewChiefV4.rFactor2
             }
         }
 
+
         private SessionPhase mapToSessionPhase(
             rFactor2Constants.rF2GamePhase sessionPhase,
             SessionType sessionType,
-            ref rF2VehScoringInfo player,
-            ref rF2VehScoringInfo leader)
+            ref rF2VehScoringInfo player)
         {
             switch (sessionPhase)
             {
@@ -1065,8 +1048,7 @@ namespace CrewChiefV4.rFactor2
                 case rFactor2Constants.rF2GamePhase.SessionStopped:
                 case rFactor2Constants.rF2GamePhase.SessionOver:
                     if (sessionType == SessionType.Race
-                        && player.mFinishStatus == (sbyte)rFactor2Constants.rF2FinishStatus.None
-                        && leader.mFinishStatus == (sbyte)rFactor2Constants.rF2FinishStatus.Finished)
+                        && player.mFinishStatus == (sbyte)rFactor2Constants.rF2FinishStatus.None)
                     {
                         return SessionPhase.Checkered;
                     }
@@ -1083,36 +1065,6 @@ namespace CrewChiefV4.rFactor2
                     return SessionPhase.Unavailable;
             }
         }
-
-        /*private bool isCheckeredPhase(
-            SessionPhase currSessionPhase,
-            SessionType sessionType,
-            FinishCriteria finishCriteria,
-            float sessionTimeRemaining,
-            ref rF2VehScoringInfo player,
-            ref rF2VehScoringInfo leader)
-        {
-            if (finishCriteria == FinishCriteria.Laps)
-            {
-                if (sessionType == SessionType.Race
-                    && player.mFinishStatus == (sbyte)rFactor2Constants.rF2FinishStatus.None
-                    && leader.mFinishStatus == (sbyte)rFactor2Constants.rF2FinishStatus.Finished)
-                {
-                    return true;
-                }
-            }
-            else if (finishCriteria == FinishCriteria.Time
-                && sessionTimeRemaining <= 0.0f)
-            {
-                if (sessionType == SessionType.Race
-                    && player.mFinishStatus == (sbyte)rFactor2Constants.rF2FinishStatus.None)
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }*/
 
 
         // finds OpponentData for given vehicle based on driver name, vehicle class, and world position
