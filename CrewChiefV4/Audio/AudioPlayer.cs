@@ -114,6 +114,8 @@ namespace CrewChiefV4.Audio
 
         private SoundCache soundCache;
 
+        public String[] personalisationsArray = new String[] { "non selected" };
+
         public AudioPlayer(CrewChief crewChief)
         {
             this.crewChief = crewChief;
@@ -132,10 +134,24 @@ namespace CrewChiefV4.Audio
                 soundPackVersion = getSoundPackVersion(soundDirectory);
                 driverNamesVersion = getDriverNamesVersion(soundDirectory);
                 soundPackLanguage = getSoundPackLanguage(soundDirectory);
+                personalisationsVersion = getPersonalisationsVersion(soundDirectory);
             }
             else
             {
                 soundDirectory.Create();
+            }
+
+            // populate the personalisations list
+            DirectoryInfo personalisationsDirectory = new DirectoryInfo(soundFilesPath + @"\personalisations");
+            if (personalisationsDirectory.Exists)
+            {
+                List<String> personalisationsList = new List<string>();
+                personalisationsList.Add("non selected");
+                foreach (DirectoryInfo folderInPersonalisationsDirectory in personalisationsDirectory.GetDirectories())
+                {
+                    personalisationsList.Add(folderInPersonalisationsDirectory.Name);
+                }
+                personalisationsArray = personalisationsList.ToArray();
             }
         }
 
@@ -161,7 +177,9 @@ namespace CrewChiefV4.Audio
             }
             else
             {
-                Console.WriteLine("Minimum sound pack version = " + minimumSoundPackVersion + " using sound pack version " + soundPackVersion + " and driver names version " + driverNamesVersion);
+                Console.WriteLine("Minimum sound pack version = " + minimumSoundPackVersion +
+                    " using sound pack version " + soundPackVersion + ", driver names version " + driverNamesVersion + 
+                    " and personalisations version " + personalisationsVersion);
             }
             if (this.soundCache == null)
             {
@@ -269,6 +287,37 @@ namespace CrewChiefV4.Audio
                     foreach (FileInfo fileInDriverNameDirectory in filesInDriverNamesDirectory)
                     {
                         if (fileInDriverNameDirectory.Name == "driver_names_version_info.txt")
+                        {
+                            String[] lines = File.ReadAllLines(Path.Combine(Path.Combine(soundFilesPath, folderInSoundDirectory.Name), fileInDriverNameDirectory.Name));
+                            foreach (String line in lines)
+                            {
+                                if (float.TryParse(line, out version))
+                                {
+                                    return version;
+                                }
+                            }
+                            break;
+                        }
+                    }
+                    break;
+                }
+            }
+            return version;
+        }
+
+        public float getPersonalisationsVersion(DirectoryInfo soundDirectory)
+        {
+            DirectoryInfo[] directories = soundDirectory.GetDirectories();
+            float version = -1;
+
+            foreach (DirectoryInfo folderInSoundDirectory in directories)
+            {
+                if (folderInSoundDirectory.Name == "personalisations")
+                {
+                    FileInfo[] filesInDriverNamesDirectory = folderInSoundDirectory.GetFiles();
+                    foreach (FileInfo fileInDriverNameDirectory in filesInDriverNamesDirectory)
+                    {
+                        if (fileInDriverNameDirectory.Name == "personalisations_version_info.txt")
                         {
                             String[] lines = File.ReadAllLines(Path.Combine(Path.Combine(soundFilesPath, folderInSoundDirectory.Name), fileInDriverNameDirectory.Name));
                             foreach (String line in lines)

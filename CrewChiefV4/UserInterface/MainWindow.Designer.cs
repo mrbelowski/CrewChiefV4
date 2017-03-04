@@ -449,14 +449,13 @@ namespace CrewChiefV4
             this.personalisationsProgressBar.Size = new System.Drawing.Size(220, 23);
             this.personalisationsProgressBar.TabIndex = 31;
 
-            this.personalisationBox.Items.AddRange(this.personalisationsArray);
             this.personalisationBox.Location = new System.Drawing.Point(991, 28);
             this.personalisationBox.IntegralHeight = false;
             this.personalisationBox.MaxDropDownItems = 5;
             this.personalisationBox.DropDownStyle = ComboBoxStyle.DropDownList;
             this.personalisationBox.Name = "personalisationBox";
-            this.personalisationBox.Size = new System.Drawing.Size(142, 200);
-            this.personalisationBox.TabIndex = 0;
+            this.personalisationBox.Size = new System.Drawing.Size(142, 400);
+            this.personalisationBox.TabIndex = 94;
 
             // Associate the event-handling method with the 
             // SelectedIndexChanged event.
