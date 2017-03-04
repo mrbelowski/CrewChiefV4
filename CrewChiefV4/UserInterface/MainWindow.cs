@@ -434,7 +434,13 @@ namespace CrewChiefV4
             cw.enable = UserSettings.GetUserSettings().getBoolean("enable_console_logging");
             crewChief = new CrewChief();
             this.personalisationBox.Items.AddRange(this.crewChief.audioPlayer.personalisationsArray);
-            if (crewChief.audioPlayer.selectedPersonalisation != AudioPlayer.NO_PERSONALISATION_SELECTED)
+            if (crewChief.audioPlayer.selectedPersonalisation == null || crewChief.audioPlayer.selectedPersonalisation.Length == 0 ||
+                crewChief.audioPlayer.selectedPersonalisation.Equals(AudioPlayer.NO_PERSONALISATION_SELECTED) ||
+                !this.crewChief.audioPlayer.personalisationsArray.Contains(crewChief.audioPlayer.selectedPersonalisation))
+            {
+                this.personalisationBox.Text = AudioPlayer.NO_PERSONALISATION_SELECTED;
+            } 
+            else 
             {
                 this.personalisationBox.Text = crewChief.audioPlayer.selectedPersonalisation;
             }

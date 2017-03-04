@@ -117,9 +117,15 @@ namespace CrewChiefV4.Audio
                 {
                     prepareFX(soundFolder);
                 }
-                else if (soundFolder.Name == "personalisations" && selectedPersonalisation != AudioPlayer.NO_PERSONALISATION_SELECTED)
-                {
-                    preparePrefixesAndSuffixes(soundFolder, selectedPersonalisation);
+                else if (soundFolder.Name == "personalisations") {
+                    if (selectedPersonalisation != AudioPlayer.NO_PERSONALISATION_SELECTED)
+                    {
+                        preparePrefixesAndSuffixes(soundFolder, selectedPersonalisation);
+                    }
+                    else
+                    {
+                        Console.WriteLine("No name has been selected for personalised messages");
+                    }
                 }
                 else if (soundFolder.Name == "voice")
                 {

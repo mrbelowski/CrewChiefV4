@@ -198,4 +198,4 @@ time_between_caution_period_status_reminders_help = Time between caution period 
 enable_ams_pit_schedule_messages_help = Play 'box now' messages when using offline scheduled pit stops
 
 personalisations_are_up_to_date = Personalisations up to date
-personalisation_label = My name
+personalisation_label = My name (requires restart)
