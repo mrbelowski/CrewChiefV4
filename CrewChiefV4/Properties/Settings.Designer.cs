@@ -1846,17 +1846,5 @@ namespace CrewChiefV4.Properties {
                 this["enable_ams_pit_schedule_messages"] = value;
             }
         }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool use_rf2_flags_for_ams {
-            get {
-                return ((bool)(this["use_rf2_flags_for_ams"]));
-            }
-            set {
-                this["use_rf2_flags_for_ams"] = value;
-            }
-        }
     }
 }

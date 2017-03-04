@@ -458,8 +458,5 @@
     <Setting Name="enable_ams_pit_schedule_messages" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="use_rf2_flags_for_ams" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
-    </Setting>
   </Settings>
 </SettingsFile>
