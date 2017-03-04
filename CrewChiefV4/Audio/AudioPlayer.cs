@@ -114,7 +114,7 @@ namespace CrewChiefV4.Audio
 
         private SoundCache soundCache;
 
-        public static String NO_PERSONALISATION_SELECTED = "(disabled)";
+        public static String NO_PERSONALISATION_SELECTED = "(non selected)";
         public String[] personalisationsArray = new String[] { NO_PERSONALISATION_SELECTED };
 
         public String selectedPersonalisation = NO_PERSONALISATION_SELECTED;
