@@ -104,6 +104,7 @@ namespace CrewChiefV4.Audio
 
         public static float soundPackVersion = -1;
         public static float driverNamesVersion = -1;
+        public static float personalisationsVersion = -1;
         public static String soundPackLanguage = null;
 
         private String lastImmediateMessageName = null;
