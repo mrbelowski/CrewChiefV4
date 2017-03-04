@@ -212,7 +212,7 @@ namespace CrewChiefV4.Events
                                 }
                             }
                         }
-                        else if (CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT)
+                        else if (CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT || CrewChief.gameDefinition.gameEnum == GameEnum.RF1)
                         {
                             // rF2 Yellow Flags:
                             // * Only announce Yellow if
