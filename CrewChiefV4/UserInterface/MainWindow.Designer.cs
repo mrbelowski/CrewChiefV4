@@ -456,7 +456,7 @@ namespace CrewChiefV4
             this.personalisationBox.Name = "personalisationBox";
             this.personalisationBox.Size = new System.Drawing.Size(142, 400);
             this.personalisationBox.TabIndex = 94;
-
+            
             // Associate the event-handling method with the 
             // SelectedIndexChanged event.
             this.personalisationBox.SelectedIndexChanged += new System.EventHandler(this.personalisationBox_SelectedIndexChanged);
