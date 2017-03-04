@@ -114,7 +114,10 @@ namespace CrewChiefV4.Audio
 
         private SoundCache soundCache;
 
-        public String[] personalisationsArray = new String[] { "non selected" };
+        public static String NO_PERSONALISATION_SELECTED = "(disabled)";
+        public String[] personalisationsArray = new String[] { NO_PERSONALISATION_SELECTED };
+
+        public String selectedPersonalisation = NO_PERSONALISATION_SELECTED;
 
         public AudioPlayer(CrewChief crewChief)
         {
@@ -146,12 +149,17 @@ namespace CrewChiefV4.Audio
             if (personalisationsDirectory.Exists)
             {
                 List<String> personalisationsList = new List<string>();
-                personalisationsList.Add("non selected");
+                personalisationsList.Add(NO_PERSONALISATION_SELECTED);
                 foreach (DirectoryInfo folderInPersonalisationsDirectory in personalisationsDirectory.GetDirectories())
                 {
                     personalisationsList.Add(folderInPersonalisationsDirectory.Name);
                 }
                 personalisationsArray = personalisationsList.ToArray();
+            }
+            String savedPersonalisation = UserSettings.GetUserSettings().getString("PERSONALISATION_NAME");
+            if (savedPersonalisation != null && savedPersonalisation.Length > 0)
+            {
+                selectedPersonalisation = savedPersonalisation;
             }
         }
 
@@ -184,7 +192,7 @@ namespace CrewChiefV4.Audio
             if (this.soundCache == null)
             {
                 soundCache = new SoundCache(new DirectoryInfo(soundFilesPath),
-                    new String[] { "numbers", "pearls_of_wisdom", "spotter", "acknowledge"  }, sweary, allowCaching);
+                    new String[] { "numbers", "pearls_of_wisdom", "spotter", "acknowledge"  }, sweary, allowCaching, selectedPersonalisation);
             }
             initialised = true;
         }

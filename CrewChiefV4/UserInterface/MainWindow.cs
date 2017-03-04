@@ -203,7 +203,7 @@ namespace CrewChiefV4
                         downloadPersonalisationsButton.Enabled = false;
                         downloadPersonalisationsButton.BackColor = Color.LightGray;
                     }
-                    else if (latestDriverNamesVersion > AudioPlayer.personalisationsVersion)
+                    else if (latestPersonalisationsVersion > AudioPlayer.personalisationsVersion)
                     {
                         downloadPersonalisationsButton.Enabled = true;
                         downloadPersonalisationsButton.BackColor = Color.LightGreen;
@@ -434,6 +434,13 @@ namespace CrewChiefV4
             cw.enable = UserSettings.GetUserSettings().getBoolean("enable_console_logging");
             crewChief = new CrewChief();
             this.personalisationBox.Items.AddRange(this.crewChief.audioPlayer.personalisationsArray);
+            if (crewChief.audioPlayer.selectedPersonalisation != AudioPlayer.NO_PERSONALISATION_SELECTED)
+            {
+                this.personalisationBox.Text = crewChief.audioPlayer.selectedPersonalisation;
+            }
+            // only register the value changed listener after loading the saved value
+            this.personalisationBox.SelectedValueChanged += new System.EventHandler(this.personalisationSelected);
+
             float messagesVolume = UserSettings.GetUserSettings().getFloat("messages_volume");
             float backgroundVolume = UserSettings.GetUserSettings().getFloat("background_volume");
             updateMessagesVolume(messagesVolume);
@@ -936,6 +943,13 @@ namespace CrewChiefV4
                     Console.WriteLine("Unable to initialise speech engine, message = " + ex.Message);
                 }                
             }
+        }
+
+        private void personalisationSelected(object sender, EventArgs e)
+        {
+            UserSettings.GetUserSettings().setProperty("PERSONALISATION_NAME", this.personalisationBox.Text);
+            UserSettings.GetUserSettings().saveUserSettings();
+            doRestart();
         }
             
         private VoiceOptionEnum getVoiceOptionEnum(String enumStr)
