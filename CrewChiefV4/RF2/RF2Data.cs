@@ -448,8 +448,8 @@ namespace CrewChiefV4.rFactor2
             public byte mNumRedLights;              // number of red lights in start sequence
 
             // MM_NEW
-            public byte mInRealtimeSU;              // in realtime as opposed to at the monitor (reported via ScoringUpdate).
-            public byte mInRealtimeFC;              // in realtime as opposed to at the monitor (reported via EnterRealtime/ExitRealtime).
+            public byte mInRealtimeSU;              // in realtime as opposed to at the monitor (reported via ScoringUpdate)
+            public byte mInRealtimeFC;              // in realtime as opposed to at the monitor (reported via last EnterRealtime/ExitRealtime call)
 
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 32)]
             public byte[] mPlayerName;              // player name (including possible multiplayer override)
