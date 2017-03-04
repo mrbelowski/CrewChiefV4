@@ -44,7 +44,6 @@ namespace CrewChiefV4
         private Boolean newSoundPackAvailable = false;
         private Boolean newDriverNamesAvailable = false;
         private Boolean newPersonalisationsAvailable = false;
-        private String[] personalisationsArray = new String[] { "non selected" };
 
         private ControllerConfiguration controllerConfiguration;
         
@@ -105,30 +104,44 @@ namespace CrewChiefV4
 
                     String languageToCheck = AudioPlayer.soundPackLanguage == null ? "en" : AudioPlayer.soundPackLanguage;
                     Boolean gotLanguageSpecificUpdateInfo = false;
-                    foreach (XElement element in doc.Descendants("soundpack"))
+                    try
                     {
-                        XAttribute languageAttribute = element.Attribute(XName.Get("language", ""));
-                        if (languageAttribute.Value == languageToCheck)
+                        foreach (XElement element in doc.Descendants("soundpack"))
                         {
-                            // this is the update set for this language
-                            float.TryParse(element.Descendants("soundpackversion").First().Value, out latestSoundPackVersion);
-                            float.TryParse(element.Descendants("drivernamesversion").First().Value, out latestDriverNamesVersion);
-                            baseSoundPackDownloadLocation = element.Descendants("basesoundpackurl").First().Value;
-                            baseDriverNamesDownloadLocation = element.Descendants("basedrivernamesurl").First().Value;
-                            updateSoundPackDownloadLocation = element.Descendants("updatesoundpackurl").First().Value;
-                            updateDriverNamesDownloadLocation = element.Descendants("updatedrivernamesurl").First().Value;
-                            gotLanguageSpecificUpdateInfo = true;
-                            break;
+                            XAttribute languageAttribute = element.Attribute(XName.Get("language", ""));
+                            if (languageAttribute.Value == languageToCheck)
+                            {
+                                // this is the update set for this language
+                                float.TryParse(element.Descendants("soundpackversion").First().Value, out latestSoundPackVersion);
+                                float.TryParse(element.Descendants("drivernamesversion").First().Value, out latestDriverNamesVersion);
+                                float.TryParse(element.Descendants("personalisationsversion").First().Value, out latestPersonalisationsVersion);
+                                baseSoundPackDownloadLocation = element.Descendants("basesoundpackurl").First().Value;
+                                baseDriverNamesDownloadLocation = element.Descendants("basedrivernamesurl").First().Value;
+                                basePersonalisationsDownloadLocation = element.Descendants("basepersonalisationsurl").First().Value;
+                                updateSoundPackDownloadLocation = element.Descendants("updatesoundpackurl").First().Value;
+                                updateDriverNamesDownloadLocation = element.Descendants("updatedrivernamesurl").First().Value;
+                                updatePersonalisationsDownloadLocation = element.Descendants("updatepersonalisationsurl").First().Value;
+                                gotLanguageSpecificUpdateInfo = true;
+                                break;
+                            }
+                        }
+                        if (!gotLanguageSpecificUpdateInfo && AudioPlayer.soundPackLanguage == null)
+                        {
+                            float.TryParse(doc.Descendants("soundpackversion").First().Value, out latestSoundPackVersion);
+                            float.TryParse(doc.Descendants("drivernamesversion").First().Value, out latestDriverNamesVersion);
+                            float.TryParse(doc.Descendants("personalisationsversion").First().Value, out latestPersonalisationsVersion);
+                            baseSoundPackDownloadLocation = doc.Descendants("basesoundpackurl").First().Value;
+                            baseDriverNamesDownloadLocation = doc.Descendants("basedrivernamesurl").First().Value;
+                            basePersonalisationsDownloadLocation = doc.Descendants("basepersonalisationsurl").First().Value;
+                            updateSoundPackDownloadLocation = doc.Descendants("updatesoundpackurl").First().Value;
+                            updateDriverNamesDownloadLocation = doc.Descendants("updatedrivernamesurl").First().Value;
+                            updatePersonalisationsDownloadLocation = doc.Descendants("updatepersonalisationsurl").First().Value;
                         }
                     }
-                    if (!gotLanguageSpecificUpdateInfo && AudioPlayer.soundPackLanguage == null)
+                    catch (Exception e2)
                     {
-                        float.TryParse(doc.Descendants("soundpackversion").First().Value, out latestSoundPackVersion);
-                        float.TryParse(doc.Descendants("drivernamesversion").First().Value, out latestDriverNamesVersion);
-                        baseSoundPackDownloadLocation = doc.Descendants("basesoundpackurl").First().Value;
-                        baseDriverNamesDownloadLocation = doc.Descendants("basedrivernamesurl").First().Value;
-                        updateSoundPackDownloadLocation = doc.Descendants("updatesoundpackurl").First().Value;
-                        updateDriverNamesDownloadLocation = doc.Descendants("updatedrivernamesurl").First().Value;
+                        // can't parse the auto update XML
+                        Console.WriteLine("Unable to process auto-update data", e2.Message);
                     }
 
                     if (latestSoundPackVersion == -1 && AudioPlayer.soundPackVersion == -1)
@@ -420,6 +433,7 @@ namespace CrewChiefV4
             }
             cw.enable = UserSettings.GetUserSettings().getBoolean("enable_console_logging");
             crewChief = new CrewChief();
+            this.personalisationBox.Items.AddRange(this.crewChief.audioPlayer.personalisationsArray);
             float messagesVolume = UserSettings.GetUserSettings().getFloat("messages_volume");
             float backgroundVolume = UserSettings.GetUserSettings().getFloat("background_volume");
             updateMessagesVolume(messagesVolume);
@@ -1203,7 +1217,7 @@ namespace CrewChiefV4
                         Directory.Delete(AudioPlayer.soundFilesPath + @"\personalisations_temp", true);
                     }
                     ZipFile.ExtractToDirectory(AudioPlayer.soundFilesPath + @"\" + personalisationsTempFileName, AudioPlayer.soundFilesPath + @"\personalisations_temp", Encoding.UTF8);
-                    UpdateHelper.MoveDirectory(AudioPlayer.soundFilesPath + @"\personalisations_temp", AudioPlayer.soundFilesPath);
+                    UpdateHelper.MoveDirectory(AudioPlayer.soundFilesPath + @"\personalisations_temp", AudioPlayer.soundFilesPath + @"\personalisations");
                     success = true;
                     downloadPersonalisationsButton.Text = Configuration.getUIString("personalisations_are_up_to_date");
                 }
