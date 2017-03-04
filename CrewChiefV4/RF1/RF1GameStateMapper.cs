@@ -150,11 +150,9 @@ namespace CrewChiefV4.rFactor1
             {
                 if (shared.yellowFlagState == (sbyte)rFactor1Constant.rfYellowFlagState.pending)
                     currentGameState.FlagData.fcyPhase = FullCourseYellowPhase.PENDING;
-                //else if (rf2state.mYellowFlagState == (sbyte)rFactor2Constants.rF2YellowFlagState.PitClosed)
-                //    cgs.FlagData.fcyPhase = FullCourseYellowPhase.PITS_CLOSED;
-                // At default ruleset, both open and close sub states result in "Pits open" visible in the UI.
-                else if (shared.yellowFlagState == (sbyte)rFactor1Constant.rfYellowFlagState.pitOpen
-                    || shared.yellowFlagState == (sbyte)rFactor1Constant.rfYellowFlagState.pitClosed)
+                else if (shared.yellowFlagState == (sbyte)rFactor1Constant.rfYellowFlagState.pitClosed)
+                    currentGameState.FlagData.fcyPhase = FullCourseYellowPhase.PITS_CLOSED;
+                else if (shared.yellowFlagState == (sbyte)rFactor1Constant.rfYellowFlagState.pitOpen)
                     currentGameState.FlagData.fcyPhase = FullCourseYellowPhase.PITS_OPEN;
                 else if (shared.yellowFlagState == (sbyte)rFactor1Constant.rfYellowFlagState.pitLeadLap)
                     currentGameState.FlagData.fcyPhase = FullCourseYellowPhase.PITS_OPEN_LEAD_LAP_VEHICLES;
@@ -181,7 +179,8 @@ namespace CrewChiefV4.rFactor1
                 for (int i = 0; i < 3; ++i)
                 {
                     // Mark Yellow sectors.
-                    if (shared.sectorFlag[i] == (sbyte)rFactor1Constant.rfYellowFlagState.pending)
+                    // RF1 uses 2 as the yellow sector indicator
+                    if (shared.sectorFlag[i] == (sbyte)rFactor1Constant.rfYellowFlagState.pitClosed)
                         currentGameState.FlagData.sectorFlags[i] = FlagEnum.YELLOW;
                 }
             }
