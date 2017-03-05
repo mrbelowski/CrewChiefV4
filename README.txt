@@ -9,6 +9,8 @@ For support and discussions about Crew Chief we have our very own forum here: ht
 Changelog
 ---------
 
+Version 4.6.1.3: Fixed broken personalisations (oops)
+
 Version 4.6.1.2: Fixed broken settings preventing changes to any setting from being saved
 
 Version 4.6.1.1: Integrated personalisations - the app will ask you to download a new "Personalisations" sound pack. When this is complete the "My name" drop down box (top right) has a long list of names the app can use when addressing you. This replaces the old method of manually unpacking a prefixes_and_suffixes folder to the app's sounds; Work-around for Assetto Corsa sometimes giving out of date position information; Disable multi-class code for RF1 based games because the vehicle type data from Automobilista is too vague (things like "Ford" and "Peugeot"); Ported RF2 full course yellow and sector-specific yellow flag announcements to Automobilista; Removed irrelvant pit window messages from RF1 based sims - in offline sessions, if a pit schedule is defined the app will call "box now" in accordance with this schedule (assuming equal stint lengths) - this can be disabled with enable_ams_pit_schedule_messages property;Fixed cut track warnings playing on out laps in Automobilista
