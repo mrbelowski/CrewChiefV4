@@ -953,9 +953,12 @@ namespace CrewChiefV4
 
         private void personalisationSelected(object sender, EventArgs e)
         {
-            UserSettings.GetUserSettings().setProperty("PERSONALISATION_NAME", this.personalisationBox.Text);
-            UserSettings.GetUserSettings().saveUserSettings();
-            doRestart();
+            if (!UserSettings.GetUserSettings().getString("PERSONALISATION_NAME").Equals(this.personalisationBox.Text))
+            {
+                UserSettings.GetUserSettings().setProperty("PERSONALISATION_NAME", this.personalisationBox.Text);
+                UserSettings.GetUserSettings().saveUserSettings();
+                doRestart();
+            }
         }
             
         private VoiceOptionEnum getVoiceOptionEnum(String enumStr)
@@ -1287,11 +1290,19 @@ namespace CrewChiefV4
             {
                 warningMessage = "The app must be restarted manually to load the new sounds";
             }
-            if (MessageBox.Show(warningMessage, Configuration.getUIString("load_new_sounds"), MessageBoxButtons.OK) == DialogResult.OK)
+            if (MessageBox.Show(warningMessage, Configuration.getUIString("load_new_sounds"),
+                System.Diagnostics.Debugger.IsAttached ? MessageBoxButtons.OK : MessageBoxButtons.OKCancel) == DialogResult.OK)
             {
                 if (!System.Diagnostics.Debugger.IsAttached)
                 {
-                    System.Diagnostics.Process.Start(Application.ExecutablePath, String.Join(" ", Environment.GetCommandLineArgs())); // to start new instance of application
+                    // have to add "multi" to the start args so the app can restart
+                    List<String> startArgs = new List<string>();
+                    startArgs.AddRange(Environment.GetCommandLineArgs());
+                    if (!startArgs.Contains("multi"))
+                    {
+                        startArgs.Add("multi");
+                    }
+                    System.Diagnostics.Process.Start(Application.ExecutablePath, String.Join(" ", startArgs.ToArray())); // to start new instance of application
                     this.Close(); //to turn off current app
                 }
             }   
