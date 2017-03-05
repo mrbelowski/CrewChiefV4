@@ -1837,7 +1837,7 @@ namespace CrewChiefV4.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
         public bool enable_ams_pit_schedule_messages {
             get {
                 return ((bool)(this["enable_ams_pit_schedule_messages"]));
@@ -1856,6 +1856,18 @@ namespace CrewChiefV4.Properties {
             }
             set {
                 this["PERSONALISATION_NAME"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string app_version {
+            get {
+                return ((string)(this["app_version"]));
+            }
+            set {
+                this["app_version"] = value;
             }
         }
     }
