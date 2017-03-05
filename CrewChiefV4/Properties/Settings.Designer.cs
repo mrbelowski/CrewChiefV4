@@ -1858,5 +1858,17 @@ namespace CrewChiefV4.Properties {
                 this["PERSONALISATION_NAME"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string app_version {
+            get {
+                return ((string)(this["app_version"]));
+            }
+            set {
+                this["app_version"] = value;
+            }
+        }
     }
 }

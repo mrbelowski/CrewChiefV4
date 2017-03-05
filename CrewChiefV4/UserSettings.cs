@@ -11,22 +11,23 @@ namespace CrewChiefV4
     {
         private String[] reservedNameStarts = new String[] { "CHANNEL_", "TOGGLE_", "VOICE_OPTION", "background_volume", 
             "messages_volume", "last_game_definition", "REPEAT_LAST_MESSAGE_BUTTON", "UpdateSettings", "VOLUME_UP", "VOLUME_DOWN", 
-            ControllerConfiguration.ControllerData.PROPERTY_CONTAINER, "PERSONALISATION_NAME"};
+            ControllerConfiguration.ControllerData.PROPERTY_CONTAINER, "PERSONALISATION_NAME", "app_version"};
         private UserSettings()
         {
             // Copy user settings from previous application version if necessary
-            if (Properties.Settings.Default.UpdateSettings)
+            String savedAppVersion = getString("app_version");
+            if (savedAppVersion == null || !savedAppVersion.Equals(System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString()))
             {
-                Properties.Settings.Default.UpdateSettings = false;
                 try
                 {
                     Properties.Settings.Default.Upgrade();
-                    Properties.Settings.Default.Save();
                 }
                 catch
                 {
                     Console.WriteLine("Unable to upgrade properties from previous version, settings will be reset to default");
                 }
+                setProperty("app_version", System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString());
+                Properties.Settings.Default.Save();
             }            
         }
 
