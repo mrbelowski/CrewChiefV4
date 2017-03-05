@@ -456,7 +456,7 @@
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="enable_ams_pit_schedule_messages" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
+      <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="PERSONALISATION_NAME" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
