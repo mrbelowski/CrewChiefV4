@@ -10,22 +10,24 @@ namespace CrewChiefV4
     class UserSettings
     {
         private String[] reservedNameStarts = new String[] { "CHANNEL_", "TOGGLE_", "VOICE_OPTION", "background_volume", 
-            "messages_volume", "last_game_definition", "REPEAT_LAST_MESSAGE_BUTTON", "UpdateSettings", "VOLUME_UP", "VOLUME_UP", ControllerConfiguration.ControllerData.PROPERTY_CONTAINER};
+            "messages_volume", "last_game_definition", "REPEAT_LAST_MESSAGE_BUTTON", "UpdateSettings", "VOLUME_UP", "VOLUME_DOWN", 
+            ControllerConfiguration.ControllerData.PROPERTY_CONTAINER, "PERSONALISATION_NAME", "app_version"};
         private UserSettings()
         {
             // Copy user settings from previous application version if necessary
-            if (Properties.Settings.Default.UpdateSettings)
+            String savedAppVersion = getString("app_version");
+            if (savedAppVersion == null || !savedAppVersion.Equals(System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString()))
             {
-                Properties.Settings.Default.UpdateSettings = false;
                 try
                 {
                     Properties.Settings.Default.Upgrade();
-                    Properties.Settings.Default.Save();
                 }
                 catch
                 {
                     Console.WriteLine("Unable to upgrade properties from previous version, settings will be reset to default");
                 }
+                setProperty("app_version", System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString());
+                Properties.Settings.Default.Save();
             }            
         }
 
@@ -65,22 +67,54 @@ namespace CrewChiefV4
 
         public String getString(String name)
         {
-            return (String)Properties.Settings.Default[name];
+            try
+            {
+                return (String)Properties.Settings.Default[name];
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("PROPERTY " + name + " NOT FOUND");
+            }
+            return "";
         }
 
         public float getFloat(String name)
         {
-            return (float) Properties.Settings.Default[name];
+            try
+            {
+                return (float)Properties.Settings.Default[name];
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("PROPERTY " + name + " NOT FOUND");
+            }
+            return 0f;
         }
 
         public Boolean getBoolean(String name)
         {
-            return (Boolean)Properties.Settings.Default[name];
+            try
+            {
+                return (Boolean)Properties.Settings.Default[name];
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("PROPERTY " + name + " NOT FOUND");
+            }
+            return false;
         }
 
         public int getInt(String name)
         {
-            return (int)Properties.Settings.Default[name];
+            try
+            {
+                return (int)Properties.Settings.Default[name];
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("PROPERTY " + name + " NOT FOUND");
+            }
+            return 0;
         }
 
         public void setProperty(String name, Object value)

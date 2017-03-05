@@ -46,7 +46,7 @@ namespace CrewChiefV4.Audio
 
         public static Boolean hasSuitableTTSVoice = true;
 
-        public SoundCache(DirectoryInfo soundsFolder, String[] eventTypesToKeepCached, Boolean useSwearyMessages, Boolean allowCaching)
+        public SoundCache(DirectoryInfo soundsFolder, String[] eventTypesToKeepCached, Boolean useSwearyMessages, Boolean allowCaching, String selectedPersonalisation)
         {
             if (useTTS)
             {
@@ -117,9 +117,15 @@ namespace CrewChiefV4.Audio
                 {
                     prepareFX(soundFolder);
                 }
-                else if (soundFolder.Name == "prefixes_and_suffixes")
-                {
-                    preparePrefixesAndSuffixes(soundFolder);
+                else if (soundFolder.Name == "personalisations") {
+                    if (selectedPersonalisation != AudioPlayer.NO_PERSONALISATION_SELECTED)
+                    {
+                        preparePrefixesAndSuffixes(soundFolder, selectedPersonalisation);
+                    }
+                    else
+                    {
+                        Console.WriteLine("No name has been selected for personalised messages");
+                    }
                 }
                 else if (soundFolder.Name == "voice")
                 {
@@ -439,23 +445,34 @@ namespace CrewChiefV4.Audio
             Console.WriteLine("Prepare driver names completed");
         }
 
-        private void preparePrefixesAndSuffixes(DirectoryInfo prefixesAndSuffixesDirectory)
+        private void preparePrefixesAndSuffixes(DirectoryInfo personalisationsDirectory, String selectedPersonalisation)
         {
-            Console.WriteLine("Preparing personalisations");
-            DirectoryInfo[] prefixesAndSuffixesFolders = prefixesAndSuffixesDirectory.GetDirectories();
-            foreach (DirectoryInfo prefixesAndSuffixesFolder in prefixesAndSuffixesFolders)
+            Console.WriteLine("Preparing personalisations for selected name " + selectedPersonalisation);
+            DirectoryInfo[] namesFolders = personalisationsDirectory.GetDirectories();
+            foreach (DirectoryInfo namesFolder in namesFolders)
             {
-                Boolean alwaysKeepCached = this.allowCaching && this.eventTypesToKeepCached.Contains(prefixesAndSuffixesFolder.Name);
-                
-                SoundSet soundSet = new SoundSet(prefixesAndSuffixesFolder, this.useSwearyMessages, alwaysKeepCached, this.allowCaching);
-                if (soundSet.hasSounds)
+                if (namesFolder.Name.Equals(selectedPersonalisation, StringComparison.InvariantCultureIgnoreCase))
                 {
-                    availablePrefixesAndSuffixes.Add(prefixesAndSuffixesFolder.Name);
-                    soundSets.Add(prefixesAndSuffixesFolder.Name, soundSet);
-                    if (alwaysKeepCached)
+                    DirectoryInfo[] prefixesAndSuffixesFolders = namesFolder.GetDirectories();
+                    if (prefixesAndSuffixesFolders.Length == 1)
                     {
-                        currentLoadedCount += soundSet.soundsCount;
+                        foreach (DirectoryInfo prefixesAndSuffixesFolder in prefixesAndSuffixesFolders[0].GetDirectories())
+                        {
+                            Boolean alwaysKeepCached = this.allowCaching && this.eventTypesToKeepCached.Contains(prefixesAndSuffixesFolder.Name);
+
+                            SoundSet soundSet = new SoundSet(prefixesAndSuffixesFolder, this.useSwearyMessages, alwaysKeepCached, this.allowCaching);
+                            if (soundSet.hasSounds)
+                            {
+                                availablePrefixesAndSuffixes.Add(prefixesAndSuffixesFolder.Name);
+                                soundSets.Add(prefixesAndSuffixesFolder.Name, soundSet);
+                                if (alwaysKeepCached)
+                                {
+                                    currentLoadedCount += soundSet.soundsCount;
+                                }
+                            }
+                        }
                     }
+                    break;
                 }
             }
             Console.WriteLine("Prepare personalisations completed");
