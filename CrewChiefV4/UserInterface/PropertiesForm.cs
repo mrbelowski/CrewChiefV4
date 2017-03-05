@@ -127,7 +127,14 @@ namespace CrewChiefV4
             save();
             if (!System.Diagnostics.Debugger.IsAttached)
             {
-                System.Diagnostics.Process.Start(Application.ExecutablePath, String.Join(" ", Environment.GetCommandLineArgs())); // to start new instance of application
+                // have to add "multi" to the start args so the app can restart
+                List<String> startArgs = new List<string>();
+                startArgs.AddRange(Environment.GetCommandLineArgs());
+                if (!startArgs.Contains("multi"))
+                {
+                    startArgs.Add("multi");
+                }
+                System.Diagnostics.Process.Start(Application.ExecutablePath, String.Join(" ", startArgs.ToArray())); // to start new instance of application
                 parent.Close(); //to turn off current app
             }
         }
@@ -159,7 +166,14 @@ namespace CrewChiefV4
                     save();
                     if (!System.Diagnostics.Debugger.IsAttached)
                     {
-                        System.Diagnostics.Process.Start(Application.ExecutablePath, String.Join(" ", Environment.GetCommandLineArgs())); // to start new instance of application
+                        // have to add "multi" to the start args so the app can restart
+                        List<String> startArgs = new List<string>();
+                        startArgs.AddRange(Environment.GetCommandLineArgs());
+                        if (!startArgs.Contains("multi"))
+                        {
+                            startArgs.Add("multi");
+                        }
+                        System.Diagnostics.Process.Start(Application.ExecutablePath, String.Join(" ", startArgs.ToArray())); // to start new instance of application
                         parent.Close(); //to turn off current app
                     }
                 }

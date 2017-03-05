@@ -9,6 +9,12 @@ For support and discussions about Crew Chief we have our very own forum here: ht
 Changelog
 ---------
 
+Version 4.6.1.3: Fixed broken personalisations (oops)
+
+Version 4.6.1.2: Fixed broken settings preventing changes to any setting from being saved
+
+Version 4.6.1.1: Integrated personalisations - the app will ask you to download a new "Personalisations" sound pack. When this is complete the "My name" drop down box (top right) has a long list of names the app can use when addressing you. This replaces the old method of manually unpacking a prefixes_and_suffixes folder to the app's sounds; Work-around for Assetto Corsa sometimes giving out of date position information; Disable multi-class code for RF1 based games because the vehicle type data from Automobilista is too vague (things like "Ford" and "Peugeot"); Ported RF2 full course yellow and sector-specific yellow flag announcements to Automobilista; Removed irrelvant pit window messages from RF1 based sims - in offline sessions, if a pit schedule is defined the app will call "box now" in accordance with this schedule (assuming equal stint lengths) - this can be disabled with enable_ams_pit_schedule_messages property;Fixed cut track warnings playing on out laps in Automobilista
+
 Version 4.6.0.5: Major overhaul of time reading (English sound pack - users of the Italian sound pack are unaffected); added RF2 caution period and yellow flag events; scan for controllers only on request (press the "Scan for controllers" button to update the app's list of controllers) - this also improves the app's startup time; fixed Assetto Corsa missing race start after 1.12 patch; added chequered flag message for timed sessions (still some issues here with PCars); reworked PCars session end detection; added controller bindings for message volume up / down; added some simple help text (much much more needs to be added to this); externalised car class definitions (first version - lots more work to do here); lots of bug fixes
 
 Version 4.5.0.0: First cut of RF2 support, thanks to The Iron Wolf. This needs an additional .dll plugin for RF2 - see https://forum.studio-397.com/index.php?threads/crew-chief-v4-5-with-rfactor-2-support.54421/ Updated some Raceroom car classes

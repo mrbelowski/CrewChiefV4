@@ -309,7 +309,7 @@
       <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="min_time_between_personalised_messages" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">30</Value>
+      <Value Profile="(Default)">60</Value>
     </Setting>
     <Setting Name="load_sound_files_on_startup" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
@@ -453,6 +453,15 @@
       <Value Profile="(Default)">-1</Value>
     </Setting>
     <Setting Name="CONTROLLER_DATA" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="enable_ams_pit_schedule_messages" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="PERSONALISATION_NAME" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="app_version" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
   </Settings>

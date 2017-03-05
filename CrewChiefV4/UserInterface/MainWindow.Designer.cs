@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows.Forms;
 namespace CrewChiefV4
 {
     partial class MainWindow
@@ -64,6 +65,7 @@ namespace CrewChiefV4
             this.label4 = new System.Windows.Forms.Label();
             this.gameDefinitionList = new System.Windows.Forms.ListBox();
             this.label5 = new System.Windows.Forms.Label();
+            this.personalisationLabel = new System.Windows.Forms.Label();
             this.filenameTextbox = new System.Windows.Forms.TextBox();
             this.filenameLabel = new System.Windows.Forms.Label();
             this.recordSession = new System.Windows.Forms.CheckBox();
@@ -72,7 +74,10 @@ namespace CrewChiefV4
             this.soundPackProgressBar = new System.Windows.Forms.ProgressBar();
             this.downloadSoundPackButton = new System.Windows.Forms.Button();
             this.downloadDriverNamesButton = new System.Windows.Forms.Button();
+            this.downloadPersonalisationsButton = new System.Windows.Forms.Button();
             this.driverNamesProgressBar = new System.Windows.Forms.ProgressBar();
+            this.personalisationsProgressBar = new System.Windows.Forms.ProgressBar();
+            this.personalisationBox = new System.Windows.Forms.ComboBox();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.messagesVolumeSlider)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.backgroundVolumeSlider)).BeginInit();
@@ -80,13 +85,13 @@ namespace CrewChiefV4
             // 
             // textBox1
             // 
-            this.textBox1.Location = new System.Drawing.Point(41, 165);
+            this.textBox1.Location = new System.Drawing.Point(41, 190);
             this.textBox1.MaxLength = 99999999;
             this.textBox1.Multiline = true;
             this.textBox1.Name = "textBox1";
             this.textBox1.ReadOnly = true;
             this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.textBox1.Size = new System.Drawing.Size(1093, 332);
+            this.textBox1.Size = new System.Drawing.Size(1093, 300);
             this.textBox1.TabIndex = 1;
             // 
             // startApplicationButton
@@ -167,7 +172,7 @@ namespace CrewChiefV4
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(991, 28);
+            this.button1.Location = new System.Drawing.Point(991, 58);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(143, 41);
             this.button1.TabIndex = 14;
@@ -178,7 +183,7 @@ namespace CrewChiefV4
             // 
             // help button
             // 
-            this.helpButton.Location = new System.Drawing.Point(991, 70);
+            this.helpButton.Location = new System.Drawing.Point(991, 100);
             this.helpButton.Name = "help";
             this.helpButton.Size = new System.Drawing.Size(143, 41);
             this.helpButton.TabIndex = 97;
@@ -189,7 +194,7 @@ namespace CrewChiefV4
             // 
             // about button
             // 
-            this.aboutButton.Location = new System.Drawing.Point(991, 112);
+            this.aboutButton.Location = new System.Drawing.Point(991, 142);
             this.aboutButton.Name = "about";
             this.aboutButton.Size = new System.Drawing.Size(143, 41);
             this.aboutButton.TabIndex = 98;
@@ -323,8 +328,8 @@ namespace CrewChiefV4
             Configuration.getUIString("assetto_32_bit")});
             this.gameDefinitionList.Location = new System.Drawing.Point(782, 28);
             this.gameDefinitionList.Name = "gameDefinitionList";
-            this.gameDefinitionList.MinimumSize = new System.Drawing.Size(203, 135);
-            this.gameDefinitionList.MaximumSize = new System.Drawing.Size(203, 135);
+            this.gameDefinitionList.MinimumSize = new System.Drawing.Size(203, 160);
+            this.gameDefinitionList.MaximumSize = new System.Drawing.Size(203, 160);
             this.gameDefinitionList.TabIndex = 21;
             this.gameDefinitionList.SelectedValueChanged += new System.EventHandler(this.updateSelectedGameDefinition);
             // 
@@ -336,6 +341,17 @@ namespace CrewChiefV4
             this.label5.Size = new System.Drawing.Size(33, 13);
             this.label5.TabIndex = 22;
             this.label5.Text = Configuration.getUIString("game");
+
+            // 
+            // label5
+            // 
+            this.personalisationLabel.AutoSize = true;
+            this.personalisationLabel.Location = new System.Drawing.Point(991, 9);
+            this.personalisationLabel.Name = "personalisationLabel";
+            this.personalisationLabel.Size = new System.Drawing.Size(33, 13);
+            this.personalisationLabel.TabIndex = 22;
+            this.personalisationLabel.Text = Configuration.getUIString("personalisation_label");
+
             // 
             // filenameTextbox
             // 
@@ -381,17 +397,17 @@ namespace CrewChiefV4
             // 
             // soundPackProgressBar
             // 
-            this.soundPackProgressBar.Location = new System.Drawing.Point(39, 136);
+            this.soundPackProgressBar.Location = new System.Drawing.Point(39, 156);
             this.soundPackProgressBar.Name = "soundPackProgressBar";
-            this.soundPackProgressBar.Size = new System.Drawing.Size(219, 23);
+            this.soundPackProgressBar.Size = new System.Drawing.Size(220, 23);
             this.soundPackProgressBar.TabIndex = 28;
             // 
             // downloadSoundPackButton
             // 
             this.downloadSoundPackButton.Enabled = false;
-            this.downloadSoundPackButton.Location = new System.Drawing.Point(41, 93);
+            this.downloadSoundPackButton.Location = new System.Drawing.Point(39, 103);
             this.downloadSoundPackButton.Name = "downloadSoundPackButton";
-            this.downloadSoundPackButton.Size = new System.Drawing.Size(217, 37);
+            this.downloadSoundPackButton.Size = new System.Drawing.Size(220, 37);
             this.downloadSoundPackButton.TabIndex = 29;
             this.downloadSoundPackButton.Text = Configuration.getUIString("sound_pack_is_up_to_date");
             this.downloadSoundPackButton.UseVisualStyleBackColor = true;
@@ -400,9 +416,9 @@ namespace CrewChiefV4
             // downloadDriverNamesButton
             // 
             this.downloadDriverNamesButton.Enabled = false;
-            this.downloadDriverNamesButton.Location = new System.Drawing.Point(314, 93);
+            this.downloadDriverNamesButton.Location = new System.Drawing.Point(295, 103);
             this.downloadDriverNamesButton.Name = "downloadDriverNamesButton";
-            this.downloadDriverNamesButton.Size = new System.Drawing.Size(232, 37);
+            this.downloadDriverNamesButton.Size = new System.Drawing.Size(220, 37);
             this.downloadDriverNamesButton.TabIndex = 30;
             this.downloadDriverNamesButton.Text = Configuration.getUIString("driver_names_are_up_to_date");
             this.downloadDriverNamesButton.UseVisualStyleBackColor = true;
@@ -410,10 +426,40 @@ namespace CrewChiefV4
             // 
             // driverNamesProgressBar
             // 
-            this.driverNamesProgressBar.Location = new System.Drawing.Point(314, 136);
+            this.driverNamesProgressBar.Location = new System.Drawing.Point(295, 156);
             this.driverNamesProgressBar.Name = "driverNamesProgressBar";
-            this.driverNamesProgressBar.Size = new System.Drawing.Size(232, 23);
+            this.driverNamesProgressBar.Size = new System.Drawing.Size(220, 23);
             this.driverNamesProgressBar.TabIndex = 31;
+            // 
+            // downloadPersonalisationsButton
+            // 
+            this.downloadPersonalisationsButton.Enabled = false;
+            this.downloadPersonalisationsButton.Location = new System.Drawing.Point(550, 103);
+            this.downloadPersonalisationsButton.Name = "downloadPersonalisationsButton";
+            this.downloadPersonalisationsButton.Size = new System.Drawing.Size(220, 37);
+            this.downloadPersonalisationsButton.TabIndex = 95;
+            this.downloadPersonalisationsButton.Text = Configuration.getUIString("personalisations_are_up_to_date");
+            this.downloadPersonalisationsButton.UseVisualStyleBackColor = true;
+            this.downloadPersonalisationsButton.Click += new System.EventHandler(this.downloadPersonalisationsButtonPress);
+            // 
+            // personalisationsProgressBar
+            // 
+            this.personalisationsProgressBar.Location = new System.Drawing.Point(550, 156);
+            this.personalisationsProgressBar.Name = "personalisationsProgressBar";
+            this.personalisationsProgressBar.Size = new System.Drawing.Size(220, 23);
+            this.personalisationsProgressBar.TabIndex = 31;
+
+            this.personalisationBox.Location = new System.Drawing.Point(991, 28);
+            this.personalisationBox.IntegralHeight = false;
+            this.personalisationBox.MaxDropDownItems = 5;
+            this.personalisationBox.DropDownStyle = ComboBoxStyle.DropDownList;
+            this.personalisationBox.Name = "personalisationBox";
+            this.personalisationBox.Size = new System.Drawing.Size(142, 400);
+            this.personalisationBox.TabIndex = 94;
+            
+            // Associate the event-handling method with the 
+            // SelectedIndexChanged event.
+            this.personalisationBox.SelectedIndexChanged += new System.EventHandler(this.personalisationBox_SelectedIndexChanged);
             // 
             // MainWindow
             // 
@@ -422,8 +468,10 @@ namespace CrewChiefV4
             this.ClientSize = new System.Drawing.Size(1146, 692);
             this.Controls.Add(this.driverNamesProgressBar);
             this.Controls.Add(this.downloadDriverNamesButton);
-            this.Controls.Add(this.downloadSoundPackButton);
+            this.Controls.Add(this.downloadSoundPackButton); 
+            this.Controls.Add(this.downloadPersonalisationsButton);
             this.Controls.Add(this.soundPackProgressBar);
+            this.Controls.Add(this.personalisationsProgressBar);
             this.Controls.Add(this.app_version);
             this.Controls.Add(this.playbackInterval);
             this.Controls.Add(this.recordSession);
@@ -449,6 +497,8 @@ namespace CrewChiefV4
             this.Controls.Add(this.buttonActionSelect);
             this.Controls.Add(this.startApplicationButton);
             this.Controls.Add(this.textBox1);
+            this.Controls.Add(this.personalisationBox);
+            this.Controls.Add(this.personalisationLabel);
             this.Name = "MainWindow";
             this.Text = "Crew Chief V4";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.stopApp);
@@ -488,6 +538,7 @@ namespace CrewChiefV4
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.ListBox gameDefinitionList;
         private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Label personalisationLabel;
         private System.Windows.Forms.TextBox filenameTextbox;
         private System.Windows.Forms.Label filenameLabel;
         private System.Windows.Forms.CheckBox recordSession;
@@ -496,7 +547,9 @@ namespace CrewChiefV4
         private System.Windows.Forms.ProgressBar soundPackProgressBar;
         private System.Windows.Forms.Button downloadSoundPackButton;
         private System.Windows.Forms.Button downloadDriverNamesButton;
+        private System.Windows.Forms.Button downloadPersonalisationsButton;
         private System.Windows.Forms.ProgressBar driverNamesProgressBar;
-
+        private System.Windows.Forms.ProgressBar personalisationsProgressBar;
+        private System.Windows.Forms.ComboBox personalisationBox;
     }
 }

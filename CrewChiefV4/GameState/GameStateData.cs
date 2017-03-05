@@ -809,6 +809,9 @@ namespace CrewChiefV4.GameState
 
         // -1 == n/a; 0 = inactive; 1 = active
         public int limiterStatus = -1;
+
+        // RF1 hack for mandatory pit stop windows, which are used to trigger 'box now' messages
+        public Boolean ResetEvents;
     }
 
     public class PenatiesData
@@ -1188,7 +1191,7 @@ namespace CrewChiefV4.GameState
             float[] bestLapWithSectors = new float[] { -1, -1, -1, -1 };
             foreach (KeyValuePair<Object, OpponentData> entry in OpponentData)
             {
-                if (entry.Value.CarClass.getClassIdentifier() == carClassToCheck)
+                if (entry.Value.CarClass.getClassIdentifier() == carClassToCheck || CrewChief.gameDefinition.gameEnum == GameEnum.RF1)
                 {
                     float[] thisOpponentsBest = entry.Value.getTimeAndSectorsForBestLapInWindow(lapsToCheck);
                     if (bestLapWithSectors[0] == -1 || (thisOpponentsBest[0] > 0 && thisOpponentsBest[0] < bestLapWithSectors[0]))

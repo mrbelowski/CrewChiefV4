@@ -16,19 +16,23 @@ Raceroom:
 
 To use Crew Chief with Raceroom simple select Raceroom from Crew Chief's Game menu and click the Start button
 
+
 Project Cars:
 
 Project cars can be run in 3 modes - 32 bit, 64 bit or Network. I recommend trying Nework first (the app will have access to more accurate information). In Project Cars' Gameplay menu, set UDP to 2 or 3. Select Project Cars (network data) from Crew Chief's Game menu and click the Start button. For some users this might not work due to the way the game sends data in this mode. If it doesn't work for you try selecting Project Cars (64 bit) or Project Cars (32 bit) from the Game menu, depending on which version of the game you're running (for most users this will be 64 bit). Be aware that in these modes the app has to time opponent laps itself, so the opponent laptime reporting will not be as accurate as it is for Network mode.
 
+
 Automobilista / RF1 / Game Stock Car Extreme / Formula Truck / Copa Petrobras de Marcas:
 
-Crew Chief isn't being actively developed for these games. Many Automobilista users have switched to the game's excellent built-in race engineer / spotter, but Crew Chief does still work. You need Dan Allongo's plugin for these games - this is here: https://github.com/dallongo/rFactorSharedMemoryMap/releases/latest
+You need Dan Allongo's plugin for these games - this is here: https://github.com/dallongo/rFactorSharedMemoryMap/releases/latest
 
 Put the rFactorSharedMemoryMap.dll from this download in the Automobilista / RF1 / Game Stock Car Extreme / Formula Truck / Copa Petrobras de Marcas 'Plugins' folder (usually something like C:\Program Files (x86)\Steam\steamapps\common\Automobilista\Plugins). Once you've done this just select the game from Crew Chief's Game menu and press the Start button.
+
 
 rFactor 2:
 
 You need Vytautas Leonavicius' plugin for rFactor 2. This is in Crew Chief's installation folder. Copy the rFactor2SharedMemoryMapPlugin64.dll from your Crew Chief installation (usually C:\Program Files (x86)\Britton IT Ltd\CrewChiefV4\) to the rFactor2 'Plugins' folder (usually something like C:\Program Files (x86)\Steam\steamapps\common\rFactor2\Bin64\Plugins). You need to enable this plugin from the game's Options->Plugins UI. Don't forget to switch off the built in spotter too. Once you've done this just select the game from Crew Chief's Game menu and press the Start button.
+
 
 Assetto Corsa:
 
@@ -43,6 +47,7 @@ If the app refuses to start, or starts then closes itself, try deleting the app'
 There may also be an error logged in the Windows Event logs - look for .Net errors in the Application Logs section.
 
 
+
 Properties
 -------------------
 The app includes a rather rudamentary preferences screen accessed by the "Properties" button. Many many aspects of that app's behaviour can be customised here but it's important to note that you don't have to make any changes to these properties to get the app to work correctly - the defaults are sensisble settings and the app doesn't need any configuration (except for swearing - see below).
@@ -52,6 +57,12 @@ The app includes a rather rudamentary preferences screen accessed by the "Proper
 Swearing
 -----------------
 Because swearing is cool and I'm a 12 year old stuck in a middle-aged body, this has its own help section. Swearing is disabled by default so once you've got the app working you'll want to enable it because swearing is cool. Look for a checkbox in the Properties screen called "use_sweary_messages" (near the bottom) and tick it. The app will swear where appropriate - it's not like listening to an Eddie Murphy gig and doesn't happen very often but it does help add a bit of personality to the messages.
+
+
+
+Personalisations
+------------------------
+The "My name" dropdown menu in the top right of the main UI allows you to select from a list of names which the app will use to address you, from time to time. These are incorporated into existing messages so for example, rather than just saying "box now" the app will say "box now, please Jim". There are lots of variations and they sound quite good, if you are lucky enough to have a first name that's in this list. How often you hear these personalised messages is controlled by the "min_time_between_personalised_messages" property. The old default value (30s) is a bit low - 60s sounds better. The Personalisations come in the form of a mini-sound pack which is downloaded and managed by the app (they used to require lots of manual faffing) - if new personalisations are available the "Download personalisations" button will he highlighted in green. Swapping between personalisations requires an app restart.
 
 
 

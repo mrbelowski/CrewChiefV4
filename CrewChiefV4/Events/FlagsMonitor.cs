@@ -96,7 +96,8 @@ namespace CrewChiefV4.Events
 
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
-            if (CrewChief.gameDefinition.gameEnum == GameEnum.RACE_ROOM || CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT)
+            if (CrewChief.gameDefinition.gameEnum == GameEnum.RACE_ROOM || CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT ||
+                (CrewChief.gameDefinition.gameEnum == GameEnum.RF1))
             {
                 newYellowFlagImplementation(previousGameState, currentGameState);
             }
@@ -183,123 +184,98 @@ namespace CrewChiefV4.Events
                 {
                     // sector yellows
                     for (int i = 0; i < 3; i++)
-                    {
-                        if (CrewChief.gameDefinition.gameEnum == GameEnum.RACE_ROOM)
+                    {                        
+                        //  Yellow Flags:
+                        // * Only announce Yellow if
+                        //      - Not in pits
+                        //      - Enough time ellapsed since last announcement
+                        //      - Yellow is in current or next sector (relative to player's sector).
+                        //      - For current sector, sometimes announce yellow without sector number.
+                        // * Only announce Clear message if
+                        //      - Not in pits
+                        //      - Enough time passed since Yellow was announced
+                        //      - Yellow went away in or next sector (relative to player's sector).
+                        //      - Announce delayed message and drop it if sector or sector flag changes
+                        if (!currentGameState.PitData.InPitlane &&
+                            (isCurrentSector(currentGameState, i) || isNextSector(currentGameState, i)))
                         {
-                            if (currentGameState.FlagData.sectorFlags[i] != lastSectorFlagsAnnounced[i])
+                            FlagEnum sectorFlag = currentGameState.FlagData.sectorFlags[i];
+                            if (sectorFlag != lastSectorFlagsAnnounced[i])
                             {
-                                // change of flag status in sector i
-                                lastSectorFlagsAnnounced[i] = currentGameState.FlagData.sectorFlags[i];
-                                lastSectorFlagsAnnouncedTime[i] = DateTime.Now;
-
-                                if (currentGameState.FlagData.sectorFlags[i] == FlagEnum.YELLOW)
+                                if (sectorFlag == FlagEnum.YELLOW || sectorFlag == FlagEnum.DOUBLE_YELLOW)
                                 {
-                                    // don't allow any other message to override this one:
-                                    audioPlayer.playMessageImmediately(new QueuedMessage(folderYellowFlagSectors[i], 0, null));
-                                }
-                                else if (currentGameState.FlagData.sectorFlags[i] == FlagEnum.DOUBLE_YELLOW)
-                                {
-                                    // don't allow any other message to override this one:
-                                    audioPlayer.playMessageImmediately(new QueuedMessage(folderDoubleYellowFlagSectors[i], 0, null));
-                                }
-                                else if (currentGameState.FlagData.sectorFlags[i] == FlagEnum.GREEN)
-                                {
-                                    // don't allow any other message to override this one:
-                                    audioPlayer.playMessageImmediately(new QueuedMessage(folderGreenFlagSectors[i], 0, null));
-                                }
-                            }
-                        }
-                        else if (CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT)
-                        {
-                            // rF2 Yellow Flags:
-                            // * Only announce Yellow if
-                            //      - Not in pits
-                            //      - Enough time ellapsed since last announcement
-                            //      - Yellow is in current or next sector (relative to player's sector).
-                            //      - For current sector, sometimes announce yellow without sector number.
-                            // * Only announce Clear message if
-                            //      - Not in pits
-                            //      - Enough time passed since Yellow was announced
-                            //      - Yellow went away in or next sector (relative to player's sector).
-                            //      - Announce delayed message and drop it if sector or sector flag changes
-                            if (!currentGameState.PitData.InPitlane &&
-                                (isCurrentSector(currentGameState, i) || isNextSector(currentGameState, i)))
-                            {
-                                FlagEnum sectorFlag = currentGameState.FlagData.sectorFlags[i];
-                                if (sectorFlag != lastSectorFlagsAnnounced[i])
-                                {
-                                    if (sectorFlag == FlagEnum.YELLOW)
+                                    // Sector i changed to yellow
+                                    if (currentGameState.Now > lastSectorFlagsAnnouncedTime[i].Add(timeBetweenNewYellowFlagMessages))
                                     {
-                                        // Sector i changed to yellow
-                                        if (currentGameState.Now > lastSectorFlagsAnnouncedTime[i].Add(timeBetweenNewYellowFlagMessages))
-                                        {
-                                            lastSectorFlagsAnnounced[i] = sectorFlag;
-                                            lastSectorFlagsAnnouncedTime[i] = DateTime.Now;
+                                        lastSectorFlagsAnnounced[i] = sectorFlag;
+                                        lastSectorFlagsAnnouncedTime[i] = DateTime.Now;
 
-                                            if (isCurrentSector(currentGameState, i) && 4 > random.NextDouble() * 10)
-                                            {
-                                                // If in current, sometimes announce without sector number.
-                                                audioPlayer.playMessage(new QueuedMessage(folderYellowFlag, 0, this));
-                                            }
-                                            else
-                                            {
-                                                audioPlayer.playMessageImmediately(new QueuedMessage(folderYellowFlagSectors[i], 0, null));
-                                            }
+                                        if (isCurrentSector(currentGameState, i) && 4 > random.NextDouble() * 10)
+                                        {
+                                            // If in current, sometimes announce without sector number.
+                                            audioPlayer.playMessage(new QueuedMessage(sectorFlag == FlagEnum.YELLOW ? 
+                                                folderYellowFlag : folderDoubleYellowFlag, 0, this));
                                         }
-                                    }
-                                    else if (sectorFlag == FlagEnum.GREEN)
-                                    {
-                                        // Sector i changed to green.  Check time since last announcement.
-                                        if (currentGameState.Now > lastSectorFlagsAnnouncedTime[i].Add(timeBetweenYellowAndClearFlagMessages))
+                                        else
                                         {
-                                            lastSectorFlagsAnnounced[i] = sectorFlag;
-                                            lastSectorFlagsAnnouncedTime[i] = DateTime.Now;
-
-                                            // Queue delayed message for flag is clear.
-                                            audioPlayer.playMessageImmediately(new QueuedMessage(folderGreenFlagSectors[i], secondsToPreValidateYellowClearMessages, this));
+                                            audioPlayer.playMessageImmediately(new QueuedMessage(sectorFlag == FlagEnum.YELLOW ?
+                                                folderYellowFlagSectors[i] : folderDoubleYellowFlagSectors[i], 0, null));
                                         }
                                     }
                                 }
-                            }
-                            else
-                            {
-                                // Clear previous sector state
-                                lastSectorFlagsAnnounced[i] = FlagEnum.GREEN;
-                                lastSectorFlagsAnnouncedTime[i] = DateTime.MinValue;
+                                else if (sectorFlag == FlagEnum.GREEN)
+                                {
+                                    // Sector i changed to green.  Check time since last announcement.
+                                    if (currentGameState.Now > lastSectorFlagsAnnouncedTime[i].Add(timeBetweenYellowAndClearFlagMessages))
+                                    {
+                                        lastSectorFlagsAnnounced[i] = sectorFlag;
+                                        lastSectorFlagsAnnouncedTime[i] = DateTime.Now;
+
+                                        // Queue delayed message for flag is clear.
+                                        audioPlayer.playMessageImmediately(new QueuedMessage(folderGreenFlagSectors[i], secondsToPreValidateYellowClearMessages, this));
+                                    }
+                                }
                             }
                         }
-                    }   
+                        else
+                        {
+                            // Clear previous sector state
+                            lastSectorFlagsAnnounced[i] = FlagEnum.GREEN;
+                            lastSectorFlagsAnnouncedTime[i] = DateTime.MinValue;
+                        }
+                    }
+                }   
                     
-                    // local yellows (planned R3E implementation)
-                    if (!isUnderLocalYellow && currentGameState.FlagData.isLocalYellow)
-                    {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(folderLocalYellow, 0, null));
-                        isUnderLocalYellow = true;
-                        lastLocalYellowAnnouncedTime = DateTime.Now;
-                        // we might not have warned of an incident ahead - no point in warning about it now we've actually reached it
-                        hasWarnedOfUpcomingIncident = true;
-                    }
-                    else if (isUnderLocalYellow && !currentGameState.FlagData.isLocalYellow)
-                    {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(folderLocalYellowClear, 0, null));
-                        isUnderLocalYellow = false;
-                        lastLocalYellowAnnouncedTime = DateTime.Now;
-                        // we've passed the incident so allow warnings of other incidents approaching
-                        hasWarnedOfUpcomingIncident = false;
-                    } else if (!isUnderLocalYellow && !hasWarnedOfUpcomingIncident &&
-                        previousGameState.FlagData.distanceToNearestIncident > distanceToWarnOfLocalYellow && currentGameState.FlagData.distanceToNearestIncident > distanceToWarnOfLocalYellow)
-                    {
-                        hasWarnedOfUpcomingIncident = true;
-                        audioPlayer.playMessageImmediately(new QueuedMessage(folderLocalYellowAhead, 0, null));
-                    }
-                    else if (currentGameState.FlagData.sectorFlags[0] == FlagEnum.GREEN && currentGameState.FlagData.sectorFlags[1] == FlagEnum.GREEN &&
-                            currentGameState.FlagData.sectorFlags[1] == FlagEnum.GREEN)
-                    {
-                        // if all the sectors are clear the local and warning booleans. This ensures we don't sit waiting for a 'clear' that never comes.
-                        isUnderLocalYellow = false;
-                        hasWarnedOfUpcomingIncident = false;
-                    }
-                } 
+                // local yellows (planned R3E implementation)
+                if (!isUnderLocalYellow && currentGameState.FlagData.isLocalYellow)
+                {
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderLocalYellow, 0, null));
+                    isUnderLocalYellow = true;
+                    lastLocalYellowAnnouncedTime = DateTime.Now;
+                    // we might not have warned of an incident ahead - no point in warning about it now we've actually reached it
+                    hasWarnedOfUpcomingIncident = true;
+                }
+                else if (isUnderLocalYellow && !currentGameState.FlagData.isLocalYellow)
+                {
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderLocalYellowClear, 0, null));
+                    isUnderLocalYellow = false;
+                    lastLocalYellowAnnouncedTime = DateTime.Now;
+                    // we've passed the incident so allow warnings of other incidents approaching
+                    hasWarnedOfUpcomingIncident = false;
+                } else if (!isUnderLocalYellow && !hasWarnedOfUpcomingIncident &&
+                    previousGameState.FlagData.distanceToNearestIncident > distanceToWarnOfLocalYellow && currentGameState.FlagData.distanceToNearestIncident > distanceToWarnOfLocalYellow)
+                {
+                    hasWarnedOfUpcomingIncident = true;
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderLocalYellowAhead, 0, null));
+                }
+                else if (currentGameState.FlagData.sectorFlags[0] == FlagEnum.GREEN && currentGameState.FlagData.sectorFlags[1] == FlagEnum.GREEN &&
+                        currentGameState.FlagData.sectorFlags[1] == FlagEnum.GREEN)
+                {
+                    // if all the sectors are clear the local and warning booleans. This ensures we don't sit waiting for a 'clear' that never comes.
+                    isUnderLocalYellow = false;
+                    hasWarnedOfUpcomingIncident = false;
+                }
+                
             }
         }
 
@@ -372,7 +348,9 @@ namespace CrewChiefV4.Events
             }
             else if (!currentGameState.PitData.InPitlane && currentGameState.SessionData.Flag == FlagEnum.DOUBLE_YELLOW)
             {
-                if (currentGameState.Now > lastYellowFlagTime.Add(timeBetweenYellowFlagMessages))
+                if (currentGameState.Now > lastYellowFlagTime.Add(timeBetweenYellowFlagMessages) && 
+                    // AMS specific hack until RF2 FCY stuff is ported - don't spam the double yellow during caution periods, just report it once per lap
+                    (CrewChief.gameDefinition.gameEnum != GameEnum.RF1 || currentGameState.SessionData.IsNewLap))
                 {
                     lastYellowFlagTime = currentGameState.Now;
                     audioPlayer.playMessage(new QueuedMessage(folderDoubleYellowFlag, 0, this));

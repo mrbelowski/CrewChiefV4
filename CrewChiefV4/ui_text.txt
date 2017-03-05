@@ -8,6 +8,7 @@
 
 checking_sound_pack_version = Checking sound pack version...
 checking_driver_names_version = Checking driver names version...
+checking_personalisations_version = Checking personalisations version...
 sound_pack_is_up_to_date = Sound pack is up to date
 no_sound_pack_detected_unable_to_locate_update = No sound pack detected, unable to locate update
 no_sound_pack_detected_press_to_download = No sound pack detected, press to download
@@ -16,6 +17,10 @@ no_driver_names_detected_unable_to_locate_update = No driver names detected, una
 no_driver_names_detected_press_to_download = No driver names detected, press to download
 updated_driver_names_available_press_to_download = Updated driver names available, press to download
 driver_names_are_up_to_date = Driver names are up to date
+no_personalisations_detected_unable_to_locate_update = No personalisations detected, unable to locate update
+no_personalisations_detected_press_to_download = No personalisations detected, press to download
+updated_personalisations_available_press_to_download = Updated personalisations available, press to download
+personalisations_are_up_to_date = Personalisations are up to date
 stop = Stop
 start_application = Start application
 
@@ -64,6 +69,10 @@ error_downloading_sound_pack = Error downloading sound pack, check the readme fi
 unable_to_download_sound_pack = Unable to download sound pack
 extracting_driver_names = Extracting driver names...
 
+error_downloading_personalisations = Error personalisations names, check the readme file for instructions on how to manually download and install this.
+unable_to_download_personalisations = Unable to download personalisations
+extracting_personalisations = Extracting personalisations...
+
 error_downloading_driver_names = Error downloading driver names, check the readme file for instructions on how to manually download and install this.
 unable_to_download_driver_names = Unable to download driver names
 the_application_must_be_restarted_to_load_the_new_sounds = The application must be restarted to load the new sounds. Click OK to restart the application.
@@ -72,6 +81,7 @@ load_new_sounds=Load new sounds
 
 downloading_sound_pack = Downloading sound pack...
 downloading_driver_names = Downloading driver names...
+downloading_personalisations = Downloading personalisations...
 
 talk_to_crew_chief = Talk to crew chief
 toggle_race_updates_on/off = Toggle race updates on/off
@@ -101,6 +111,9 @@ unknown_sound_pack_language_title = No sound pack language defined
 
 unknown_driver_names_language_text = The current sound pack has no language specified. Click "Yes" to proceed with the update (which will download the default English driver name updates). Click "No" to cancel.
 unknown_driver_names_language_title = No sound pack language defined
+
+unknown_personalisations_language_text = The current sound pack has no language specified. Click "Yes" to proceed with the update (which will download the default English personalisations). Click "No" to cancel.
+unknown_personalisations_language_title = No sound pack language defined
 
 # to change the name of the property title in the properties screen, just use the property name like this:
 # enable_spotter = Enable spotter
@@ -181,3 +194,8 @@ r3e_blue_flag_detection_distance_help = Max distance (metres) for R3E blue flag 
 
 play_pre_lights_messages_until_cancelled_help = Play pre-race info messages until a control input is detected
 time_between_caution_period_status_reminders_help = Time between caution period status reminders (seconds)
+
+enable_ams_pit_schedule_messages_help = Play 'box now' messages when using offline scheduled pit stops
+
+personalisations_are_up_to_date = Personalisations are up to date
+personalisation_label = My name (requires restart)
