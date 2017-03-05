@@ -454,18 +454,21 @@ namespace CrewChiefV4.Audio
                 if (namesFolder.Name.Equals(selectedPersonalisation, StringComparison.InvariantCultureIgnoreCase))
                 {
                     DirectoryInfo[] prefixesAndSuffixesFolders = namesFolder.GetDirectories();
-                    foreach (DirectoryInfo prefixesAndSuffixesFolder in prefixesAndSuffixesFolders)
+                    if (prefixesAndSuffixesFolders.Length == 1)
                     {
-                        Boolean alwaysKeepCached = this.allowCaching && this.eventTypesToKeepCached.Contains(prefixesAndSuffixesFolder.Name);
-
-                        SoundSet soundSet = new SoundSet(prefixesAndSuffixesFolder, this.useSwearyMessages, alwaysKeepCached, this.allowCaching);
-                        if (soundSet.hasSounds)
+                        foreach (DirectoryInfo prefixesAndSuffixesFolder in prefixesAndSuffixesFolders[0].GetDirectories())
                         {
-                            availablePrefixesAndSuffixes.Add(prefixesAndSuffixesFolder.Name);
-                            soundSets.Add(prefixesAndSuffixesFolder.Name, soundSet);
-                            if (alwaysKeepCached)
+                            Boolean alwaysKeepCached = this.allowCaching && this.eventTypesToKeepCached.Contains(prefixesAndSuffixesFolder.Name);
+
+                            SoundSet soundSet = new SoundSet(prefixesAndSuffixesFolder, this.useSwearyMessages, alwaysKeepCached, this.allowCaching);
+                            if (soundSet.hasSounds)
                             {
-                                currentLoadedCount += soundSet.soundsCount;
+                                availablePrefixesAndSuffixes.Add(prefixesAndSuffixesFolder.Name);
+                                soundSets.Add(prefixesAndSuffixesFolder.Name, soundSet);
+                                if (alwaysKeepCached)
+                                {
+                                    currentLoadedCount += soundSet.soundsCount;
+                                }
                             }
                         }
                     }
