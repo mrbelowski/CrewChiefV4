@@ -401,7 +401,9 @@ namespace CrewChiefV4.Events
                         // position, rather than the position when it was inserted into the queue.
 
                         // For RF2 use a non-zero delay here because the position data isn't always updated in a timely fashion at the start of a new lap.
-                        int delaySeconds = CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT ? 1 : 0;
+                        int delaySeconds = CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT ||
+                            CrewChief.gameDefinition.gameEnum == GameEnum.ASSETTO_32BIT ||
+                            CrewChief.gameDefinition.gameEnum == GameEnum.ASSETTO_64BIT ? 1 : 0;
                         DelayedMessageEvent delayedMessageEvent = new DelayedMessageEvent("getPositionMessages", new Object[] { 
                             currentPosition }, this);
                         audioPlayer.playMessage(new QueuedMessage("position", delayedMessageEvent, delaySeconds, null), pearlType, pearlLikelihood);
