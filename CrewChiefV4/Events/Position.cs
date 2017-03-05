@@ -186,7 +186,8 @@ namespace CrewChiefV4.Events
                             currentOpponentBehindKey == opponentAheadKey && isPassMessageCandidate(gapsAhead, passCheckSamplesToCheck, minAverageGapForPassMessage))
                         {
                             OpponentData carWeJustPassed = currentGameState.OpponentData[currentOpponentBehindKey];
-                            if (carWeJustPassed.CompletedLaps == currentGameState.SessionData.CompletedLaps && carWeJustPassed.CarClass == currentGameState.carClass)
+                            if (carWeJustPassed.CompletedLaps == currentGameState.SessionData.CompletedLaps && 
+                                (carWeJustPassed.CarClass == currentGameState.carClass || CrewChief.gameDefinition.gameEnum == GameEnum.RF1))
                             {
                                 timeWhenWeMadeAPass = currentGameState.Now;
                                 opponentKeyForCarWeJustPassed = currentOpponentBehindKey;
@@ -200,7 +201,8 @@ namespace CrewChiefV4.Events
                         {
                             // TODO: check if we need to do a pit check here - don't think so
                             OpponentData carThatJustPassedUs = currentGameState.OpponentData[currentOpponentAheadKey];
-                            if (carThatJustPassedUs.CompletedLaps == currentGameState.SessionData.CompletedLaps && carThatJustPassedUs.CarClass == currentGameState.carClass)
+                            if (carThatJustPassedUs.CompletedLaps == currentGameState.SessionData.CompletedLaps &&
+                                (carThatJustPassedUs.CarClass == currentGameState.carClass || CrewChief.gameDefinition.gameEnum == GameEnum.RF1))
                             {
                                 timeWhenWeWerePassed = currentGameState.Now;
                                 opponentKeyForCarThatJustPassedUs = currentOpponentAheadKey;

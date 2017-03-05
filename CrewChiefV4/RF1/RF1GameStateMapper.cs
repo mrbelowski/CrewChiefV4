@@ -23,7 +23,9 @@ namespace CrewChiefV4.rFactor1
         private float scrubbedTyreWearPercent = 5f;
         private float minorTyreWearPercent = 30f;
         private float majorTyreWearPercent = 60f;
-        private float wornOutTyreWearPercent = 85f;        
+        private float wornOutTyreWearPercent = 85f;
+
+        private Boolean enablePitWindowHack = UserSettings.GetUserSettings().getBoolean("enable_ams_pit_schedule_messages");
 
         private List<CornerData.EnumWithThresholds> brakeTempThresholdsForPlayersCar = null;
 
@@ -133,18 +135,64 @@ namespace CrewChiefV4.rFactor1
                 shared.session >= 10 && shared.session <= 13 ? shared.session - 10 : 0;
             currentGameState.SessionData.SessionType = mapToSessionType(shared);
             currentGameState.SessionData.SessionPhase = mapToSessionPhase((rFactor1Constant.rfGamePhase)shared.gamePhase);
-            currentGameState.FlagData.isFullCourseYellow = currentGameState.SessionData.SessionPhase == SessionPhase.FullCourseYellow;
-            if (currentGameState.FlagData.isFullCourseYellow && previousGameState != null && !previousGameState.FlagData.isFullCourseYellow)
+
+            // --------------------------------
+            // flags data
+            currentGameState.FlagData.isFullCourseYellow = currentGameState.SessionData.SessionPhase == SessionPhase.FullCourseYellow
+                || shared.yellowFlagState == (sbyte)rFactor1Constant.rfYellowFlagState.resume;
+
+            if (shared.yellowFlagState == (sbyte)rFactor1Constant.rfYellowFlagState.resume)
             {
-                // transitioned from racing to yellow, so set the FCY status to pending
-                currentGameState.FlagData.fcyPhase = FullCourseYellowPhase.PENDING;
-            }
-            else if (previousGameState != null && previousGameState.FlagData.isFullCourseYellow && !currentGameState.FlagData.isFullCourseYellow)
-            {
-                // transitioned from yellow to racing, so set the FCY status to racing
+                // Special case for resume after FCY.  rF2 no longer has FCY set, but still has Resume sub phase set.
                 currentGameState.FlagData.fcyPhase = FullCourseYellowPhase.RACING;
             }
+            else if (currentGameState.FlagData.isFullCourseYellow)
+            {
+                if (shared.yellowFlagState == (sbyte)rFactor1Constant.rfYellowFlagState.pending)
+                    currentGameState.FlagData.fcyPhase = FullCourseYellowPhase.PENDING;
+                else if (shared.yellowFlagState == (sbyte)rFactor1Constant.rfYellowFlagState.pitClosed)
+                    currentGameState.FlagData.fcyPhase = FullCourseYellowPhase.PITS_CLOSED;
+                else if (shared.yellowFlagState == (sbyte)rFactor1Constant.rfYellowFlagState.pitOpen)
+                    currentGameState.FlagData.fcyPhase = FullCourseYellowPhase.PITS_OPEN;
+                else if (shared.yellowFlagState == (sbyte)rFactor1Constant.rfYellowFlagState.pitLeadLap)
+                    currentGameState.FlagData.fcyPhase = FullCourseYellowPhase.PITS_OPEN_LEAD_LAP_VEHICLES;
+                else if (shared.yellowFlagState == (sbyte)rFactor1Constant.rfYellowFlagState.lastLap)
+                {
+                    if (previousGameState != null)
+                    {
+                        if (previousGameState.FlagData.fcyPhase != FullCourseYellowPhase.LAST_LAP_NEXT && previousGameState.FlagData.fcyPhase != FullCourseYellowPhase.LAST_LAP_CURRENT)
+                            // Initial last lap phase
+                            currentGameState.FlagData.fcyPhase = FullCourseYellowPhase.LAST_LAP_NEXT;
+                        else if (currentGameState.SessionData.CompletedLaps != previousGameState.SessionData.CompletedLaps && 
+                            previousGameState.FlagData.fcyPhase == FullCourseYellowPhase.LAST_LAP_NEXT)
+                            // Once we reach the end of current lap, and this lap is next last lap, switch to last lap current phase.
+                            currentGameState.FlagData.fcyPhase = FullCourseYellowPhase.LAST_LAP_CURRENT;
+                        else
+                            // Keep previous FCY last lap phase.
+                            currentGameState.FlagData.fcyPhase = previousGameState.FlagData.fcyPhase;
+                    }
+                }
+            }
 
+            if (currentGameState.SessionData.SessionPhase == SessionPhase.Green)
+            {
+                // Mark Yellow sectors.
+                // RF1 uses 2 as the yellow sector indicator, but the plugin sends the sector *after* the sector
+                // where in incident actually is
+                if (shared.sectorFlag[0] == (sbyte)rFactor1Constant.rfYellowFlagState.pitClosed)
+                {
+                    currentGameState.FlagData.sectorFlags[2] = FlagEnum.YELLOW;
+                }
+                if (shared.sectorFlag[1] == (sbyte)rFactor1Constant.rfYellowFlagState.pitClosed)
+                {
+                    currentGameState.FlagData.sectorFlags[0] = FlagEnum.YELLOW;
+                }
+                if (shared.sectorFlag[2] == (sbyte)rFactor1Constant.rfYellowFlagState.pitClosed)
+                {
+                    currentGameState.FlagData.sectorFlags[1] = FlagEnum.YELLOW;
+                }
+            }
+            
             currentGameState.carClass = CarData.getCarClassForClassName(getNameFromBytes(player.vehicleClass));
             brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(currentGameState.carClass);
             currentGameState.SessionData.DriverRawName = getNameFromBytes(player.driverName).ToLower();
@@ -481,7 +529,7 @@ namespace CrewChiefV4.rFactor1
                 {
                     speechRecogniser.addNewOpponentName(opponent.DriverRawName);
                     Console.WriteLine("New driver " + opponent.DriverRawName + 
-                        " is using car class " + opponent.CarClass + 
+                        " is using car class " + opponent.CarClass.getClassIdentifier() + 
                         " at position " + opponent.Position.ToString());
                 }
                 if (opponentPrevious != null)
@@ -575,8 +623,8 @@ namespace CrewChiefV4.rFactor1
                     currentGameState.SessionData.OverallSessionBestLapTime = opponent.CurrentBestLapTime;
                 }
                 if (opponent.CurrentBestLapTime > 0 && (opponent.CurrentBestLapTime < currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass ||
-                    currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass < 0) && 
-                    opponent.CarClass == currentGameState.carClass)
+                    currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass < 0) /*&& JB: switch off all multi-class tracking for RF1 because the vehicle data is shit
+                    opponent.CarClass == currentGameState.carClass*/)
                 {
                     currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass = opponent.CurrentBestLapTime;
                 }
@@ -613,17 +661,34 @@ namespace CrewChiefV4.rFactor1
             // --------------------------------
             // pit data
             currentGameState.PitData.IsRefuellingAllowed = true;
-            currentGameState.PitData.HasMandatoryPitStop = isOfflineSession && shared.scheduledStops > 0 && player.numPitstops < shared.scheduledStops && currentGameState.SessionData.SessionType == SessionType.Race;
-            currentGameState.PitData.PitWindowStart = isOfflineSession && currentGameState.PitData.HasMandatoryPitStop ? 1 : 0;
-            currentGameState.PitData.PitWindowEnd = !currentGameState.PitData.HasMandatoryPitStop ? 0 :
-                currentGameState.SessionData.SessionHasFixedTime ? (int)(currentGameState.SessionData.SessionTotalRunTime / 60 / (shared.scheduledStops + 1)) * (player.numPitstops + 1) + 1 :
-                (int)(currentGameState.SessionData.SessionNumberOfLaps / (shared.scheduledStops + 1)) * (player.numPitstops + 1) + 1;
-            currentGameState.PitData.InPitlane = player.inPits == 1;
+
+            // JB: this code estimates pit calls based on the number of scheduled stops in offline races, splitting the session into equal stints.
+            // In order for this to work correctly, the MandatoryPitStop event needs to be structured differently - for multiple scheduled stops
+            // the window end lap / time changes throughout the race, but the MandatoryPitStop event won't see these changes so will only call the 1st 'box now'
+
+            if (enablePitWindowHack)
+            {
+                currentGameState.PitData.HasMandatoryPitStop = isOfflineSession && shared.scheduledStops > 0 && player.numPitstops < shared.scheduledStops &&
+                    currentGameState.SessionData.SessionType == SessionType.Race;
+                currentGameState.PitData.PitWindowStart = isOfflineSession && currentGameState.PitData.HasMandatoryPitStop ? 1 : 0;
+                currentGameState.PitData.PitWindowEnd = !currentGameState.PitData.HasMandatoryPitStop ? 0 :
+                    currentGameState.SessionData.SessionHasFixedTime ? (int)(((currentGameState.SessionData.SessionTotalRunTime / 60) / (shared.scheduledStops + 1)) * (player.numPitstops + 1)) + 1 :
+                    (int)((currentGameState.SessionData.SessionNumberOfLaps / (shared.scheduledStops + 1)) * (player.numPitstops + 1)) + 1;
+                currentGameState.PitData.InPitlane = player.inPits == 1;
+
+                // force the MandatoryPit event to be re-initialsed if the window end has been recalculated.
+                currentGameState.PitData.ResetEvents = currentGameState.PitData.HasMandatoryPitStop && 
+                    previousGameState != null && currentGameState.PitData.PitWindowEnd > previousGameState.PitData.PitWindowEnd;
+            }
+
+             
             currentGameState.PitData.IsAtPitExit = previousGameState != null && previousGameState.PitData.InPitlane && !currentGameState.PitData.InPitlane;
-            currentGameState.PitData.OnOutLap = currentGameState.PitData.InPitlane && currentGameState.SessionData.SectorNumber == 1;
+            currentGameState.PitData.OnOutLap = (currentGameState.PitData.InPitlane && currentGameState.SessionData.SectorNumber == 1) ||
+                (previousGameState != null && previousGameState.PitData.OnOutLap && !currentGameState.SessionData.IsNewLap);
             currentGameState.PitData.OnInLap = currentGameState.PitData.InPitlane && currentGameState.SessionData.SectorNumber == 3;
             currentGameState.PitData.IsMakingMandatoryPitStop = currentGameState.PitData.HasMandatoryPitStop && currentGameState.PitData.OnInLap && currentGameState.SessionData.CompletedLaps > currentGameState.PitData.PitWindowStart;
-            currentGameState.PitData.PitWindow = currentGameState.PitData.IsMakingMandatoryPitStop ? PitWindow.StopInProgress : mapToPitWindow((rFactor1Constant.rfYellowFlagState)shared.yellowFlagState);
+            currentGameState.PitData.PitWindow = currentGameState.PitData.IsMakingMandatoryPitStop ? PitWindow.StopInProgress : 
+                mapToPitWindow((rFactor1Constant.rfYellowFlagState)shared.yellowFlagState);
 
             // --------------------------------
             // fuel data
@@ -737,7 +802,7 @@ namespace CrewChiefV4.rFactor1
                 Console.WriteLine("SessionStartPosition " + currentGameState.SessionData.SessionStartPosition);
                 Console.WriteLine("SessionStartTime " + currentGameState.SessionData.SessionStartTime);
                 Console.WriteLine("TrackName " + currentGameState.SessionData.TrackDefinition.name);
-                Console.WriteLine("Player is using car class " + currentGameState.carClass + 
+                Console.WriteLine("Player is using car class " + currentGameState.carClass.getClassIdentifier() + 
                     " at position " + currentGameState.SessionData.Position.ToString());
             }
             if (previousGameState != null && previousGameState.SessionData.SessionPhase != currentGameState.SessionData.SessionPhase)
