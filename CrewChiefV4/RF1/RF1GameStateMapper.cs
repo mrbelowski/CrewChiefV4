@@ -181,15 +181,15 @@ namespace CrewChiefV4.rFactor1
                 // where in incident actually is
                 if (shared.sectorFlag[0] == (sbyte)rFactor1Constant.rfYellowFlagState.pitClosed)
                 {
-                    currentGameState.FlagData.sectorFlags[2] = FlagEnum.YELLOW;
+                    currentGameState.FlagData.sectorFlags[0] = FlagEnum.YELLOW;
                 }
                 if (shared.sectorFlag[1] == (sbyte)rFactor1Constant.rfYellowFlagState.pitClosed)
                 {
-                    currentGameState.FlagData.sectorFlags[0] = FlagEnum.YELLOW;
+                    currentGameState.FlagData.sectorFlags[1] = FlagEnum.YELLOW;
                 }
                 if (shared.sectorFlag[2] == (sbyte)rFactor1Constant.rfYellowFlagState.pitClosed)
                 {
-                    currentGameState.FlagData.sectorFlags[1] = FlagEnum.YELLOW;
+                    currentGameState.FlagData.sectorFlags[2] = FlagEnum.YELLOW;
                 }
             }
             
