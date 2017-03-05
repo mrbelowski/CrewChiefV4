@@ -362,10 +362,6 @@
             "carClassEnum": "V8_SUPERCAR",
             "pCarsClassNames": [ "V8 Supercars" ]
         },
-		{
-            "carClassEnum": "STOCK_CAR_V8",
-            "rf1ClassNames": [ "Peugeot", "Chevrolet" ]
-        },
         {
             "carClassEnum": "ROAD_D",
             "pCarsClassNames": [ "Road D" ],

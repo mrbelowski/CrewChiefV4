@@ -529,7 +529,7 @@ namespace CrewChiefV4.rFactor1
                 {
                     speechRecogniser.addNewOpponentName(opponent.DriverRawName);
                     Console.WriteLine("New driver " + opponent.DriverRawName + 
-                        " is using car class " + opponent.CarClass + 
+                        " is using car class " + opponent.CarClass.getClassIdentifier() + 
                         " at position " + opponent.Position.ToString());
                 }
                 if (opponentPrevious != null)
@@ -623,8 +623,8 @@ namespace CrewChiefV4.rFactor1
                     currentGameState.SessionData.OverallSessionBestLapTime = opponent.CurrentBestLapTime;
                 }
                 if (opponent.CurrentBestLapTime > 0 && (opponent.CurrentBestLapTime < currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass ||
-                    currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass < 0) && 
-                    opponent.CarClass == currentGameState.carClass)
+                    currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass < 0) /*&& JB: switch off all multi-class tracking for RF1 because the vehicle data is shit
+                    opponent.CarClass == currentGameState.carClass*/)
                 {
                     currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass = opponent.CurrentBestLapTime;
                 }
@@ -802,7 +802,7 @@ namespace CrewChiefV4.rFactor1
                 Console.WriteLine("SessionStartPosition " + currentGameState.SessionData.SessionStartPosition);
                 Console.WriteLine("SessionStartTime " + currentGameState.SessionData.SessionStartTime);
                 Console.WriteLine("TrackName " + currentGameState.SessionData.TrackDefinition.name);
-                Console.WriteLine("Player is using car class " + currentGameState.carClass + 
+                Console.WriteLine("Player is using car class " + currentGameState.carClass.getClassIdentifier() + 
                     " at position " + currentGameState.SessionData.Position.ToString());
             }
             if (previousGameState != null && previousGameState.SessionData.SessionPhase != currentGameState.SessionData.SessionPhase)
