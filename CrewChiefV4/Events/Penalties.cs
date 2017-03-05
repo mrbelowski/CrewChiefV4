@@ -226,7 +226,7 @@ namespace CrewChiefV4.Events
                     clearPenaltyState();
                 }
             }
-            else if (currentGameState.PositionAndMotionData.CarSpeed > 1 && playCutTrackWarnings &&
+            else if (currentGameState.PositionAndMotionData.CarSpeed > 1 && playCutTrackWarnings && 
                 currentGameState.PenaltiesData.CutTrackWarnings > cutTrackWarningsCount)
             {
                 cutTrackWarningsCount = currentGameState.PenaltiesData.CutTrackWarnings;
@@ -234,13 +234,17 @@ namespace CrewChiefV4.Events
                     lastCutTrackWarningTime.Add(cutTrackWarningFrequency) < currentGameState.Now)
                 {
                     lastCutTrackWarningTime = currentGameState.Now;
-                    if (currentGameState.SessionData.SessionType == SessionType.Race)
+                    // don't warn on the first lap of the session
+                    if (currentGameState.SessionData.CompletedLaps > 0)
                     {
-                        audioPlayer.playMessage(new QueuedMessage(folderCutTrackInRace, 2, this));
-                    }
-                    else
-                    {
-                        audioPlayer.playMessage(new QueuedMessage(folderCutTrackPracticeOrQual, 2, this));
+                        if (currentGameState.SessionData.SessionType == SessionType.Race)
+                        {
+                            audioPlayer.playMessage(new QueuedMessage(folderCutTrackInRace, 2, this));
+                        }
+                        else
+                        {
+                            audioPlayer.playMessage(new QueuedMessage(folderCutTrackPracticeOrQual, 2, this));
+                        }
                     }
                     clearPenaltyState();
                 }

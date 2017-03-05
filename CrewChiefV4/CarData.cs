@@ -484,7 +484,6 @@ namespace CrewChiefV4
                         default:
                             // err....
                             return new CarClass();
-                            break;
                     }
                     foreach (CarClass carClass in CAR_CLASSES.carClasses)
                     {

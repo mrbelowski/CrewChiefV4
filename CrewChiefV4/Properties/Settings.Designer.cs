@@ -1249,7 +1249,7 @@ namespace CrewChiefV4.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("30")]
+        [global::System.Configuration.DefaultSettingValueAttribute("60")]
         public int min_time_between_personalised_messages {
             get {
                 return ((int)(this["min_time_between_personalised_messages"]));
@@ -1832,6 +1832,30 @@ namespace CrewChiefV4.Properties {
             }
             set {
                 this["CONTROLLER_DATA"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool enable_ams_pit_schedule_messages {
+            get {
+                return ((bool)(this["enable_ams_pit_schedule_messages"]));
+            }
+            set {
+                this["enable_ams_pit_schedule_messages"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string PERSONALISATION_NAME {
+            get {
+                return ((string)(this["PERSONALISATION_NAME"]));
+            }
+            set {
+                this["PERSONALISATION_NAME"] = value;
             }
         }
     }

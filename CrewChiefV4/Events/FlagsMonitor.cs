@@ -96,7 +96,8 @@ namespace CrewChiefV4.Events
 
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
-            if (CrewChief.gameDefinition.gameEnum == GameEnum.RACE_ROOM || CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT)
+            if (CrewChief.gameDefinition.gameEnum == GameEnum.RACE_ROOM || CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT ||
+                (CrewChief.gameDefinition.gameEnum == GameEnum.RF1))
             {
                 newYellowFlagImplementation(previousGameState, currentGameState);
             }
@@ -209,7 +210,7 @@ namespace CrewChiefV4.Events
                                 }
                             }
                         }
-                        else if (CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT)
+                        else if (CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT || CrewChief.gameDefinition.gameEnum == GameEnum.RF1)
                         {
                             // rF2 Yellow Flags:
                             // * Only announce Yellow if
@@ -372,7 +373,9 @@ namespace CrewChiefV4.Events
             }
             else if (!currentGameState.PitData.InPitlane && currentGameState.SessionData.Flag == FlagEnum.DOUBLE_YELLOW)
             {
-                if (currentGameState.Now > lastYellowFlagTime.Add(timeBetweenYellowFlagMessages))
+                if (currentGameState.Now > lastYellowFlagTime.Add(timeBetweenYellowFlagMessages) && 
+                    // AMS specific hack until RF2 FCY stuff is ported - don't spam the double yellow during caution periods, just report it once per lap
+                    (CrewChief.gameDefinition.gameEnum != GameEnum.RF1 || currentGameState.SessionData.IsNewLap))
                 {
                     lastYellowFlagTime = currentGameState.Now;
                     audioPlayer.playMessage(new QueuedMessage(folderDoubleYellowFlag, 0, this));

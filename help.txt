@@ -22,7 +22,7 @@ Project cars can be run in 3 modes - 32 bit, 64 bit or Network. I recommend tryi
 
 Automobilista / RF1 / Game Stock Car Extreme / Formula Truck / Copa Petrobras de Marcas:
 
-Crew Chief isn't being actively developed for these games. Many Automobilista users have switched to the game's excellent built-in race engineer / spotter, but Crew Chief does still work. You need Dan Allongo's plugin for these games - this is here: https://github.com/dallongo/rFactorSharedMemoryMap/releases/latest
+You need Dan Allongo's plugin for these games - this is here: https://github.com/dallongo/rFactorSharedMemoryMap/releases/latest
 
 Put the rFactorSharedMemoryMap.dll from this download in the Automobilista / RF1 / Game Stock Car Extreme / Formula Truck / Copa Petrobras de Marcas 'Plugins' folder (usually something like C:\Program Files (x86)\Steam\steamapps\common\Automobilista\Plugins). Once you've done this just select the game from Crew Chief's Game menu and press the Start button.
 
@@ -53,6 +53,11 @@ Swearing
 -----------------
 Because swearing is cool and I'm a 12 year old stuck in a middle-aged body, this has its own help section. Swearing is disabled by default so once you've got the app working you'll want to enable it because swearing is cool. Look for a checkbox in the Properties screen called "use_sweary_messages" (near the bottom) and tick it. The app will swear where appropriate - it's not like listening to an Eddie Murphy gig and doesn't happen very often but it does help add a bit of personality to the messages.
 
+
+
+Personalisations
+------------------------
+The "My name" dropdown menu in the top right of the main UI allows you to select from a list of names which the app will use to address you, from time to time. These are incorporated into existing messages so for example, rather than just saying "box now" the app will say "box now, please Jim". There are lots of variations and they sound quite good, if you are lucky enough to have a first name that's in this list. How often you hear these personalised messages is controlled by the "min_time_between_personalised_messages" property. The old default value (30s) is a bit low - 60s sounds better.
 
 
 Voice Recognition
