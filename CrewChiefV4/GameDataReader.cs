@@ -55,6 +55,7 @@ namespace CrewChiefV4
                     xmlDocument.Load(stream);
                     xmlDocument.Save(fileName);
                 }
+                Console.WriteLine("Done writing session data log to: " + fileName);
             }
             catch (Exception ex)
             {
