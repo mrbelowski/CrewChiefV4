@@ -564,7 +564,6 @@ namespace CrewChiefV4.PCars
             }
             else
             {
-                Console.WriteLine("Setting session running time 1, now = " + currentGameState.Now + " SessionStartTime  " + currentGameState.SessionData.SessionStartTime);
                 currentGameState.SessionData.SessionRunningTime = (float)(currentGameState.Now - currentGameState.SessionData.SessionStartTime).TotalSeconds;
             }
             if (currentGameState.SessionData.IsNewSector)

@@ -9,6 +9,8 @@ For support and discussions about Crew Chief we have our very own forum here: ht
 Changelog
 ---------
 
+Version 4.6.1.4: Fixed PCars timed sessions
+
 Version 4.6.1.3: Fixed broken personalisations (oops)
 
 Version 4.6.1.2: Fixed broken settings preventing changes to any setting from being saved
