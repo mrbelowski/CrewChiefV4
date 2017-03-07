@@ -22,12 +22,12 @@ namespace CrewChiefV4
                 {
                     Properties.Settings.Default.Upgrade();
                 }
-                catch
+                catch (Exception e)
                 {
-                    Console.WriteLine("Unable to upgrade properties from previous version, settings will be reset to default");
+                    Console.WriteLine("Unable to upgrade properties from previous version, settings will be reset to default ", e.Message);
                 }
                 setProperty("app_version", System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString());
-                Properties.Settings.Default.Save();
+                Properties.Settings.Default.Save();                
             }            
         }
 

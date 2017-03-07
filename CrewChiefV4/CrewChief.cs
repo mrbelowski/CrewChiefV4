@@ -482,6 +482,7 @@ namespace CrewChiefV4
                                     }
                                 }                                
                             }
+                            // TODO: for AC free practice sessions, the SessionRunningTime is set to 1 hour in the mapper and stays there so this block never triggers
                             else if (!sessionFinished && previousGameState != null &&
                                         (currentGameState.SessionData.SessionRunningTime > previousGameState.SessionData.SessionRunningTime || 
                                         (previousGameState.SessionData.SessionPhase != currentGameState.SessionData.SessionPhase)) ||
