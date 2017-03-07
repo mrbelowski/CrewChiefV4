@@ -1870,5 +1870,17 @@ namespace CrewChiefV4.Properties {
                 this["app_version"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public int acs_practice_time {
+            get {
+                return ((int)(this["acs_practice_time"]));
+            }
+            set {
+                this["acs_practice_time"] = value;
+            }
+        }
     }
 }
