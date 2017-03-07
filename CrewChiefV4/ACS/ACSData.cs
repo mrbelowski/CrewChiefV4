@@ -43,7 +43,13 @@ namespace CrewChiefV4.assetto
             AC_CHECKERED_FLAG = 5,
             AC_PENALTY_FLAG = 6,
         }
-
+        public enum AC_WHEELS
+        {
+            FL = 0,
+            FR = 1,
+            RL = 2,
+            RR = 3,
+        }
         [StructLayout(LayoutKind.Sequential, Pack = 4, CharSet = CharSet.Unicode)]
         [Serializable]
         public struct SPageFilePhysics
@@ -285,6 +291,8 @@ namespace CrewChiefV4.assetto
             public int focusVehicle;
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 512)]
             public byte[] serverName;
+            //[MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 512)]
+            //public byte[] acInstallPath;
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 64)]
             public acsVehicleInfo[] vehicle;
             
