@@ -492,12 +492,16 @@ namespace CrewChiefV4.rFactor2
                 cgs.TyreData.RightFrontIsLocked = Math.Abs(wheelFrontRight.mRotation) < minRotatingSpeed;
                 cgs.TyreData.LeftRearIsLocked = Math.Abs(wheelRearLeft.mRotation) < minRotatingSpeed;
                 cgs.TyreData.RightRearIsLocked = Math.Abs(wheelRearRight.mRotation) < minRotatingSpeed;
-                
+
                 float maxRotatingSpeed = 2.0f * (float)Math.PI * cgs.PositionAndMotionData.CarSpeed / cgs.carClass.minTyreCircumference;
                 cgs.TyreData.LeftFrontIsSpinning = Math.Abs(wheelFrontLeft.mRotation) > maxRotatingSpeed;
                 cgs.TyreData.RightFrontIsSpinning = Math.Abs(wheelFrontRight.mRotation) > maxRotatingSpeed;
                 cgs.TyreData.LeftRearIsSpinning = Math.Abs(wheelRearLeft.mRotation) > maxRotatingSpeed;
                 cgs.TyreData.RightRearIsSpinning = Math.Abs(wheelRearRight.mRotation) > maxRotatingSpeed;
+#if DEBUG
+                RF2GameStateMapper.writeSpinningLockingDebugMsg(cgs, wheelFrontLeft.mRotation, wheelFrontRight.mRotation,
+                    wheelRearLeft.mRotation, wheelRearRight.mRotation, minRotatingSpeed, maxRotatingSpeed);
+#endif
             }
 
             // use detached wheel status for suspension damage
@@ -1007,6 +1011,45 @@ namespace CrewChiefV4.rFactor2
             return cgs;
         }
 
+
+#if DEBUG
+        // NOTE: This can be made generic for all sims, but I am not sure if anyone needs this but me
+        private static void writeDebugMsg(string msg)
+        {
+            Console.WriteLine("DEBUG_MSG: " +  msg);
+        }
+
+        private static void writeSpinningLockingDebugMsg(GameStateData cgs, double frontLeftRotation, double frontRightRotation, 
+            double rearLeftRotation, double rearRightRotation, float minRotatingSpeed, float maxRotatingSpeed)
+        {
+            var sb = new StringBuilder();
+            if (cgs.TyreData.LeftFrontIsLocked)
+                sb.Append($"\nLeft Front is locked.  minRotatingSpeed: {minRotatingSpeed:N3}  mRotation: {frontLeftRotation:N3}");
+            if (cgs.TyreData.RightFrontIsLocked)
+                sb.Append($"\nRight Front is locked.  minRotatingSpeed: {minRotatingSpeed:N3}  mRotation: {frontRightRotation:N3}");
+            if (cgs.TyreData.LeftRearIsLocked)
+                sb.Append($"\nLeft Rear is locked.  minRotatingSpeed: {minRotatingSpeed:N3}  mRotation: {rearLeftRotation:N3}");
+            if (cgs.TyreData.RightRearIsLocked)
+                sb.Append($"\nRight Rear is locked.  minRotatingSpeed: {minRotatingSpeed:N3}  mRotation: {rearRightRotation:N3}");
+            if (cgs.TyreData.LeftFrontIsSpinning)
+                sb.Append($"\nLeft Front is spinning.  maxRotatingSpeed: {maxRotatingSpeed:N3}  mRotation: {frontLeftRotation:N3}");
+            if (cgs.TyreData.RightFrontIsSpinning)
+                sb.Append($"\nRight Front is spinning.  maxRotatingSpeed: {maxRotatingSpeed:N3}  mRotation: {frontRightRotation:N3}");
+            if (cgs.TyreData.LeftRearIsSpinning)
+                sb.Append($"\nLeft Rear is spinning.  maxRotatingSpeed: {maxRotatingSpeed:N3}  mRotation: {rearLeftRotation:N3}");
+            if (cgs.TyreData.RightRearIsSpinning)
+                sb.Append($"\nRight Rear is spinning.  maxRotatingSpeed: {maxRotatingSpeed:N3}  mRotation: {rearRightRotation:N3}");
+
+            var msg = sb.ToString();
+            if (!string.IsNullOrWhiteSpace(msg))
+            {
+                var lines = msg.Split('\n');
+                foreach (var line in lines)
+                    RF2GameStateMapper.writeDebugMsg(line);
+            }
+        }
+#endif
+
         private PitWindow mapToPitWindow(rFactor2Constants.rF2YellowFlagState pitWindow)
         {
             // it seems that the pit window is only truly open on multiplayer races?
@@ -1170,10 +1213,12 @@ namespace CrewChiefV4.rFactor2
 
         public static String getStringFromBytes(byte[] name)
         {
-            // TODO: encoding appears to be platform default...
-            // return Encoding.UTF8.GetString(name).TrimEnd('\0').Trim();
-            // return Encoding.GetEncoding("iso-8859-1").GetString(name).TrimEnd('\0').Trim();
-            return Encoding.Default.GetString(name).TrimEnd('\0').Trim();
+            var str = Encoding.Default.GetString(name);
+            var eosChar = str.IndexOf('\0');
+            if (eosChar != -1)
+              str = str.Substring(0, eosChar);
+
+            return str;
         }
     }
 }
