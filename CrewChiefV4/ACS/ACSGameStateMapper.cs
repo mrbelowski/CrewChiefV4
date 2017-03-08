@@ -907,7 +907,7 @@ namespace CrewChiefV4.assetto
             if (numberOfLapsInSession == 0 || shared.acsStatic.isTimedRace == 1)
             {
                 currentGameState.SessionData.SessionHasFixedTime = true;
-                sessionTimeRemaining = isSinglePlayerPracticeSession ? (float)TimeSpan.FromHours(singleplayerPracticTime).TotalSeconds - Math.Abs(gameSessionTimeLeft) : gameSessionTimeLeft;
+                sessionTimeRemaining = isSinglePlayerPracticeSession ? (float)TimeSpan.FromMinutes(singleplayerPracticTime).TotalSeconds - Math.Abs(gameSessionTimeLeft) : gameSessionTimeLeft;
             }
 
             Boolean isCountDown = false;
@@ -1199,7 +1199,7 @@ namespace CrewChiefV4.assetto
                     currentGameState.SessionData.SessionRunningTime = (float)(currentGameState.Now - currentGameState.SessionData.SessionStartTime).TotalSeconds;
                 }
 
-                if (logUnknownTrackSectors && !isOnline)
+                if (logUnknownTrackSectors && !isOnline && !isSinglePlayerPracticeSession)
                 {
                     currentGameState.SessionData.SectorNumber = shared.acsGraphic.currentSectorIndex + 1;
                 }
