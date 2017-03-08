@@ -37,7 +37,7 @@ namespace CrewChiefV4.assetto
 
         private Boolean disableYellowFlag = UserSettings.GetUserSettings().getBoolean("disable_acs_yellow_flag_warnings");
 
-        private int singleplayerPracticTime = UserSettings.GetUserSettings().getInt("acs_practice_time");
+        private int singleplayerPracticTime = UserSettings.GetUserSettings().getInt("acs_practice_time_minuts");
         // these are set when we start a new session, from the car name / class
         private TyreType defaultTyreTypeForPlayersCar = TyreType.Unknown_Race;
 
