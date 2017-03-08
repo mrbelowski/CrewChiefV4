@@ -1873,13 +1873,13 @@ namespace CrewChiefV4.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1")]
-        public int acs_practice_time {
+        [global::System.Configuration.DefaultSettingValueAttribute("60")]
+        public int acs_practice_time_minuts {
             get {
-                return ((int)(this["acs_practice_time"]));
+                return ((int)(this["acs_practice_time_minuts"]));
             }
             set {
-                this["acs_practice_time"] = value;
+                this["acs_practice_time_minuts"] = value;
             }
         }
     }
