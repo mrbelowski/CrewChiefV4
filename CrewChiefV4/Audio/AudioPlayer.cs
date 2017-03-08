@@ -123,15 +123,40 @@ namespace CrewChiefV4.Audio
         {
             this.crewChief = crewChief;
             String soundPackLocationOverride = UserSettings.GetUserSettings().getString("override_default_sound_pack_location");
+            String defaultSoundFilesPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\CrewChiefV4\sounds";
+            DirectoryInfo defaultSoundDirectory = new DirectoryInfo(defaultSoundFilesPath);
+            DirectoryInfo overrideSoundDirectory = null;
+            DirectoryInfo soundDirectory = null;
+            Boolean useOverride = false;
             if (soundPackLocationOverride != null && soundPackLocationOverride.Length > 0)
             {
+                try
+                {
+                    overrideSoundDirectory = new DirectoryInfo(soundPackLocationOverride);
+                    if (overrideSoundDirectory.Exists)
+                    {
+                        useOverride = true;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Specified sound pack override folder " + soundPackLocationOverride + " doesn't exist, using default");
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Unable to set override sound folder ", e.Message);
+                }
+            }
+            if (useOverride && overrideSoundDirectory != null)
+            {
                 soundFilesPath = soundPackLocationOverride;
+                soundDirectory = overrideSoundDirectory;
             }
             else
             {
-                soundFilesPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\CrewChiefV4\sounds";
+                soundFilesPath = defaultSoundFilesPath;
+                soundDirectory = defaultSoundDirectory;
             }
-            DirectoryInfo soundDirectory = new DirectoryInfo(soundFilesPath);
             if (soundDirectory.Exists) 
             {
                 soundPackVersion = getSoundPackVersion(soundDirectory);
