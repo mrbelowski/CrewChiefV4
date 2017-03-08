@@ -266,6 +266,7 @@
     <EmbeddedResource Include="UserInterface\BooleanPropertyControl.resx">
       <DependentUpon>BooleanPropertyControl.cs</DependentUpon>
     </EmbeddedResource>
+    <None Include="carClassData.json" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
