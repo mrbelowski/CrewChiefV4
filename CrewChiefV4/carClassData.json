@@ -6,7 +6,7 @@
 #
 # The valid params are:
 # {
-#    "carClassEnum": this is the built-in car class group (see complete list below). If this doesn't match, the app will assign this to UNKNOWN_RACE car group, with the params you specify
+#    "carClassEnum": this is the built-in car class group (see complete list below). It must match on of these built in types.
 #    "pCarsClassNames": this is a comma (,) separated array of pCars classnames. * or ? denote wildcards. The app searches for classes which have full matches before considering wildcards
 #    "rf2ClassNames": as above, for rFactor2
 #    "rf1ClassNames": as above, for rFactor1, AMS, GSC, FTruck, and other RF1 based games (the Reiza games)
