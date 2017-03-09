@@ -415,7 +415,7 @@ namespace CrewChiefV4.Events
                         // this guy is in the same sector as the yellow but has only travelled 10m in 5 seconds, so he's probably involved - add him to the list
                         // if we have sound files for him:
                         NamePositionPair namePositionPair = new NamePositionPair(opponent.DriverRawName, opponent.Position, canReadName(opponent.DriverRawName), incidentCandidate.opponentDataKey);
-                        if (namePositionPair.canReadName || namePositionPair.position <= folderPositionHasGoneOff.Length - 1)
+                        if (namePositionPair.canReadName || namePositionPair.position <= folderPositionHasGoneOff.Length)
                         {
                             driversToReport.Add(namePositionPair);
                         }
