@@ -36,6 +36,8 @@ namespace CrewChiefV4.assetto
         private Boolean logUnknownTrackSectors = UserSettings.GetUserSettings().getBoolean("enable_acs_log_sectors_for_unknown_tracks");
 
         private Boolean disableYellowFlag = UserSettings.GetUserSettings().getBoolean("disable_acs_yellow_flag_warnings");
+
+        private int singleplayerPracticTime = UserSettings.GetUserSettings().getInt("acs_practice_time_minuts");
         // these are set when we start a new session, from the car name / class
         private TyreType defaultTyreTypeForPlayersCar = TyreType.Unknown_Race;
 
@@ -905,7 +907,7 @@ namespace CrewChiefV4.assetto
             if (numberOfLapsInSession == 0 || shared.acsStatic.isTimedRace == 1)
             {
                 currentGameState.SessionData.SessionHasFixedTime = true;
-                sessionTimeRemaining = isSinglePlayerPracticeSession ? (float)TimeSpan.FromHours(1).TotalSeconds - lastSessionRunningTime : gameSessionTimeLeft;
+                sessionTimeRemaining = isSinglePlayerPracticeSession ? (float)TimeSpan.FromMinutes(singleplayerPracticTime).TotalSeconds - Math.Abs(gameSessionTimeLeft) : gameSessionTimeLeft;
             }
 
             Boolean isCountDown = false;
@@ -1197,7 +1199,7 @@ namespace CrewChiefV4.assetto
                     currentGameState.SessionData.SessionRunningTime = (float)(currentGameState.Now - currentGameState.SessionData.SessionStartTime).TotalSeconds;
                 }
 
-                if (logUnknownTrackSectors && !isOnline)
+                if (logUnknownTrackSectors && !isOnline && !isSinglePlayerPracticeSession)
                 {
                     currentGameState.SessionData.SectorNumber = shared.acsGraphic.currentSectorIndex + 1;
                 }
@@ -1662,9 +1664,9 @@ namespace CrewChiefV4.assetto
 
                 float currentTyreWearMinimumValue = acTyres[currentTyreCompound].tyreWearMinimumValue;
                 //Front Left
-                currentGameState.TyreData.FrontLeft_CenterTemp = shared.acsPhysics.tyreCoreTemperature[0];
-                currentGameState.TyreData.FrontLeft_LeftTemp = shared.acsPhysics.tyreCoreTemperature[0];
-                currentGameState.TyreData.FrontLeft_RightTemp = shared.acsPhysics.tyreCoreTemperature[0];
+                currentGameState.TyreData.FrontLeft_CenterTemp = shared.acsPhysics.tyreTempM[0];
+                currentGameState.TyreData.FrontLeft_LeftTemp = shared.acsPhysics.tyreTempO[0];
+                currentGameState.TyreData.FrontLeft_RightTemp = shared.acsPhysics.tyreTempI[0];
                 currentGameState.TyreData.FrontLeftPressure = shared.acsPhysics.wheelsPressure[0];
                 currentGameState.TyreData.FrontLeftTyreType = defaultTyreTypeForPlayersCar;
                 currentGameState.TyreData.FrontLeftPercentWear = getTyreWearPercentage(shared.acsPhysics.tyreWear[0], currentTyreWearMinimumValue);
@@ -1677,9 +1679,9 @@ namespace CrewChiefV4.assetto
                     currentGameState.TyreData.PeakFrontLeftTemperatureForLap = currentGameState.TyreData.FrontLeft_CenterTemp;
                 }
                 //Front Right
-                currentGameState.TyreData.FrontRight_CenterTemp = shared.acsPhysics.tyreCoreTemperature[1];
-                currentGameState.TyreData.FrontRight_LeftTemp = shared.acsPhysics.tyreCoreTemperature[1];
-                currentGameState.TyreData.FrontRight_RightTemp = shared.acsPhysics.tyreCoreTemperature[1];
+                currentGameState.TyreData.FrontRight_CenterTemp = shared.acsPhysics.tyreTempM[1];
+                currentGameState.TyreData.FrontRight_LeftTemp = shared.acsPhysics.tyreTempI[1];
+                currentGameState.TyreData.FrontRight_RightTemp = shared.acsPhysics.tyreTempO[1];
                 currentGameState.TyreData.FrontRightPressure = shared.acsPhysics.wheelsPressure[1];
                 currentGameState.TyreData.FrontRightTyreType = defaultTyreTypeForPlayersCar;
                 currentGameState.TyreData.FrontRightPercentWear = getTyreWearPercentage(shared.acsPhysics.tyreWear[0], currentTyreWearMinimumValue);
@@ -1693,9 +1695,9 @@ namespace CrewChiefV4.assetto
                 }
 
                 //Rear Left
-                currentGameState.TyreData.RearLeft_CenterTemp = shared.acsPhysics.tyreCoreTemperature[2];
-                currentGameState.TyreData.RearLeft_LeftTemp = shared.acsPhysics.tyreCoreTemperature[2];
-                currentGameState.TyreData.RearLeft_RightTemp = shared.acsPhysics.tyreCoreTemperature[2];
+                currentGameState.TyreData.RearLeft_CenterTemp = shared.acsPhysics.tyreTempM[2];
+                currentGameState.TyreData.RearLeft_LeftTemp = shared.acsPhysics.tyreTempO[2];
+                currentGameState.TyreData.RearLeft_RightTemp = shared.acsPhysics.tyreTempI[2];
                 currentGameState.TyreData.RearLeftPressure = shared.acsPhysics.wheelsPressure[2];
                 currentGameState.TyreData.RearLeftTyreType = defaultTyreTypeForPlayersCar;
                 currentGameState.TyreData.RearLeftPercentWear = getTyreWearPercentage(shared.acsPhysics.tyreWear[0], currentTyreWearMinimumValue);
@@ -1708,9 +1710,9 @@ namespace CrewChiefV4.assetto
                     currentGameState.TyreData.PeakRearLeftTemperatureForLap = currentGameState.TyreData.RearLeft_CenterTemp;
                 }
                 //Rear Right
-                currentGameState.TyreData.RearRight_CenterTemp = shared.acsPhysics.tyreCoreTemperature[3];
-                currentGameState.TyreData.RearRight_LeftTemp = shared.acsPhysics.tyreCoreTemperature[3];
-                currentGameState.TyreData.RearRight_RightTemp = shared.acsPhysics.tyreCoreTemperature[3];
+                currentGameState.TyreData.RearRight_CenterTemp = shared.acsPhysics.tyreTempM[3];
+                currentGameState.TyreData.RearRight_LeftTemp = shared.acsPhysics.tyreTempI[3];
+                currentGameState.TyreData.RearRight_RightTemp = shared.acsPhysics.tyreTempO[3];
                 currentGameState.TyreData.RearRightTyreType = defaultTyreTypeForPlayersCar;
                 currentGameState.TyreData.RearRightPressure = shared.acsPhysics.wheelsPressure[3];
                 currentGameState.TyreData.RearRightPercentWear = getTyreWearPercentage(shared.acsPhysics.tyreWear[0], currentTyreWearMinimumValue);
