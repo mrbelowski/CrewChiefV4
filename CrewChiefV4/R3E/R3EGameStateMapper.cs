@@ -392,6 +392,18 @@ namespace CrewChiefV4.RaceRoom
             } else if (shared.sector3Yellow == 2) {
                 currentGameState.FlagData.sectorFlags[2] = FlagEnum.DOUBLE_YELLOW;
             }
+            if (shared.closestYellowLapDistance > 0)
+            {
+                if (shared.closestYellowLapDistance > shared.LapDistance)
+                {
+                    currentGameState.FlagData.distanceToNearestIncident = shared.closestYellowLapDistance - shared.LapDistance;
+                }
+                else
+                {
+                    currentGameState.FlagData.distanceToNearestIncident = shared.LayoutLength - shared.LapDistance + shared.closestYellowLapDistance;
+                }
+            }
+            currentGameState.FlagData.distanceToNearestIncident = Math.Abs(shared.LapDistance - shared.closestYellowLapDistance);
 
             currentGameState.SessionData.SessionTimeRemaining = shared.SessionTimeRemaining;
             currentGameState.SessionData.CompletedLaps = shared.CompletedLaps;     
