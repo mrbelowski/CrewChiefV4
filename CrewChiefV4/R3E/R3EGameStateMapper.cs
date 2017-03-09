@@ -376,6 +376,23 @@ namespace CrewChiefV4.RaceRoom
 
             //------------------------ Session data -----------------------
             currentGameState.SessionData.Flag = FlagEnum.UNKNOWN;
+            // Mark Yellow sectors.
+            if (shared.sector1Yellow == 1) {
+                currentGameState.FlagData.sectorFlags[0] = FlagEnum.YELLOW;
+            } else if (shared.sector1Yellow == 2) {
+                currentGameState.FlagData.sectorFlags[0] = FlagEnum.DOUBLE_YELLOW;
+            }
+            if (shared.sector2Yellow == 1) {
+                currentGameState.FlagData.sectorFlags[1] = FlagEnum.YELLOW;
+            } else if (shared.sector2Yellow == 2) {
+                currentGameState.FlagData.sectorFlags[1] = FlagEnum.DOUBLE_YELLOW;
+            }
+            if (shared.sector3Yellow == 1) {
+                currentGameState.FlagData.sectorFlags[2] = FlagEnum.YELLOW;
+            } else if (shared.sector3Yellow == 2) {
+                currentGameState.FlagData.sectorFlags[2] = FlagEnum.DOUBLE_YELLOW;
+            }
+
             currentGameState.SessionData.SessionTimeRemaining = shared.SessionTimeRemaining;
             currentGameState.SessionData.CompletedLaps = shared.CompletedLaps;     
             
