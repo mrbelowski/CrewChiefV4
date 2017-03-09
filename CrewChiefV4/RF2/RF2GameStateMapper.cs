@@ -1022,31 +1022,22 @@ namespace CrewChiefV4.rFactor2
         private static void writeSpinningLockingDebugMsg(GameStateData cgs, double frontLeftRotation, double frontRightRotation, 
             double rearLeftRotation, double rearRightRotation, float minRotatingSpeed, float maxRotatingSpeed)
         {
-            var sb = new StringBuilder();
             if (cgs.TyreData.LeftFrontIsLocked)
-                sb.Append($"\nLeft Front is locked.  minRotatingSpeed: {minRotatingSpeed:N3}  mRotation: {frontLeftRotation:N3}");
+                RF2GameStateMapper.writeDebugMsg($"Left Front is locked.  minRotatingSpeed: {minRotatingSpeed:N3}  mRotation: {frontLeftRotation:N3}");
             if (cgs.TyreData.RightFrontIsLocked)
-                sb.Append($"\nRight Front is locked.  minRotatingSpeed: {minRotatingSpeed:N3}  mRotation: {frontRightRotation:N3}");
+                RF2GameStateMapper.writeDebugMsg($"Right Front is locked.  minRotatingSpeed: {minRotatingSpeed:N3}  mRotation: {frontRightRotation:N3}");
             if (cgs.TyreData.LeftRearIsLocked)
-                sb.Append($"\nLeft Rear is locked.  minRotatingSpeed: {minRotatingSpeed:N3}  mRotation: {rearLeftRotation:N3}");
+                RF2GameStateMapper.writeDebugMsg($"Left Rear is locked.  minRotatingSpeed: {minRotatingSpeed:N3}  mRotation: {rearLeftRotation:N3}");
             if (cgs.TyreData.RightRearIsLocked)
-                sb.Append($"\nRight Rear is locked.  minRotatingSpeed: {minRotatingSpeed:N3}  mRotation: {rearRightRotation:N3}");
+                RF2GameStateMapper.writeDebugMsg($"Right Rear is locked.  minRotatingSpeed: {minRotatingSpeed:N3}  mRotation: {rearRightRotation:N3}");
             if (cgs.TyreData.LeftFrontIsSpinning)
-                sb.Append($"\nLeft Front is spinning.  maxRotatingSpeed: {maxRotatingSpeed:N3}  mRotation: {frontLeftRotation:N3}");
+                RF2GameStateMapper.writeDebugMsg($"Left Front is spinning.  maxRotatingSpeed: {maxRotatingSpeed:N3}  mRotation: {frontLeftRotation:N3}");
             if (cgs.TyreData.RightFrontIsSpinning)
-                sb.Append($"\nRight Front is spinning.  maxRotatingSpeed: {maxRotatingSpeed:N3}  mRotation: {frontRightRotation:N3}");
+                RF2GameStateMapper.writeDebugMsg($"Right Front is spinning.  maxRotatingSpeed: {maxRotatingSpeed:N3}  mRotation: {frontRightRotation:N3}");
             if (cgs.TyreData.LeftRearIsSpinning)
-                sb.Append($"\nLeft Rear is spinning.  maxRotatingSpeed: {maxRotatingSpeed:N3}  mRotation: {rearLeftRotation:N3}");
+                RF2GameStateMapper.writeDebugMsg($"Left Rear is spinning.  maxRotatingSpeed: {maxRotatingSpeed:N3}  mRotation: {rearLeftRotation:N3}");
             if (cgs.TyreData.RightRearIsSpinning)
-                sb.Append($"\nRight Rear is spinning.  maxRotatingSpeed: {maxRotatingSpeed:N3}  mRotation: {rearRightRotation:N3}");
-
-            var msg = sb.ToString();
-            if (!string.IsNullOrWhiteSpace(msg))
-            {
-                var lines = msg.Split('\n');
-                foreach (var line in lines)
-                    RF2GameStateMapper.writeDebugMsg(line);
-            }
+                RF2GameStateMapper.writeDebugMsg($"Right Rear is spinning.  maxRotatingSpeed: {maxRotatingSpeed:N3}  mRotation: {rearRightRotation:N3}");
         }
 #endif
 
