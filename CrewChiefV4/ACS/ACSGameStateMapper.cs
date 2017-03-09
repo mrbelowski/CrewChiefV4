@@ -1864,6 +1864,7 @@ namespace CrewChiefV4.assetto
             opponentData.UnFilteredPosition = racePosition;
             opponentData.WorldPosition = currentWorldPosition;
             opponentData.IsNewLap = false;
+            opponentData.InPits = isInPits;
 
             if (opponentData.CurrentSectorNumber != sector)
             {

@@ -376,6 +376,35 @@ namespace CrewChiefV4.RaceRoom
 
             //------------------------ Session data -----------------------
             currentGameState.SessionData.Flag = FlagEnum.UNKNOWN;
+            // Mark Yellow sectors.
+            if (shared.sector1Yellow == 1) {
+                currentGameState.FlagData.sectorFlags[0] = FlagEnum.YELLOW;
+            } else if (shared.sector1Yellow == 2) {
+                currentGameState.FlagData.sectorFlags[0] = FlagEnum.DOUBLE_YELLOW;
+            }
+            if (shared.sector2Yellow == 1) {
+                currentGameState.FlagData.sectorFlags[1] = FlagEnum.YELLOW;
+            } else if (shared.sector2Yellow == 2) {
+                currentGameState.FlagData.sectorFlags[1] = FlagEnum.DOUBLE_YELLOW;
+            }
+            if (shared.sector3Yellow == 1) {
+                currentGameState.FlagData.sectorFlags[2] = FlagEnum.YELLOW;
+            } else if (shared.sector3Yellow == 2) {
+                currentGameState.FlagData.sectorFlags[2] = FlagEnum.DOUBLE_YELLOW;
+            }
+            if (shared.closestYellowLapDistance > 0)
+            {
+                if (shared.closestYellowLapDistance > shared.LapDistance)
+                {
+                    currentGameState.FlagData.distanceToNearestIncident = shared.closestYellowLapDistance - shared.LapDistance;
+                }
+                else
+                {
+                    currentGameState.FlagData.distanceToNearestIncident = shared.LayoutLength - shared.LapDistance + shared.closestYellowLapDistance;
+                }
+            }
+            currentGameState.FlagData.distanceToNearestIncident = Math.Abs(shared.LapDistance - shared.closestYellowLapDistance);
+
             currentGameState.SessionData.SessionTimeRemaining = shared.SessionTimeRemaining;
             currentGameState.SessionData.CompletedLaps = shared.CompletedLaps;     
             
@@ -1327,7 +1356,8 @@ namespace CrewChiefV4.RaceRoom
             opponentData.Position = racePosition;
             opponentData.UnFilteredPosition = unfilteredRacePosition;
             opponentData.WorldPosition = currentWorldPosition;
-            opponentData.IsNewLap = false;            
+            opponentData.IsNewLap = false;
+            opponentData.InPits = isInPits;
             if (opponentData.CurrentSectorNumber != sector)
             {
                 opponentData.CarClass = CarData.getCarClassForRaceRoomId(carClassId);
