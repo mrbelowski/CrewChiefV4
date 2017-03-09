@@ -45,6 +45,11 @@ namespace CrewChiefV4.Events
         private String folderLocalYellowClear = "flags/local_yellow_clear";
         private String folderLocalYellowAhead = "flags/local_yellow_ahead";
 
+        private String[] folderPositionHasGoneOff = new String[] { "flags/position1_has_gone_off", "flags/position2_has_gone_off", "flags/position3_has_gone_off", 
+                                                                   "flags/position4_has_gone_off", "flags/position5_has_gone_off", "flags/position6_has_gone_off", };
+        private String folderNameHasGoneOffIntro = "flags/name_has_gone_off_intro";
+        private String folderNameHasGoneOffOutro = "flags/name_has_gone_off_outro";
+
         // for new (RF2 and R3E) impl
         private FlagEnum[] lastSectorFlagsAnnounced = new FlagEnum[] { FlagEnum.GREEN, FlagEnum.GREEN, FlagEnum.GREEN };
         private DateTime[] lastSectorFlagsAnnouncedTime = new DateTime[] { DateTime.MinValue, DateTime.MinValue, DateTime.MinValue };
@@ -60,8 +65,12 @@ namespace CrewChiefV4.Events
         private Boolean isUnderLocalYellow = false;
         private Boolean hasWarnedOfUpcomingIncident = false;
 
+        private DateTime nextIncidentDriversCheck = DateTime.MaxValue;
+
         private TimeSpan fcyPitStatusReminderMinTime = TimeSpan.FromSeconds(UserSettings.GetUserSettings().getInt("time_between_caution_period_status_reminders"));
         private float distanceToWarnOfLocalYellow = 500;    // metres - externalise? Is this sufficient? Make it speed-dependent?
+
+        List<IncidentCandidate> incidentCandidates = new List<IncidentCandidate>();
         
         public FlagsMonitor(AudioPlayer audioPlayer)
         {
@@ -87,11 +96,13 @@ namespace CrewChiefV4.Events
 
             lastSectorFlagsAnnounced = new FlagEnum[] { FlagEnum.GREEN, FlagEnum.GREEN, FlagEnum.GREEN };
             lastSectorFlagsAnnouncedTime = new DateTime[] { DateTime.MinValue, DateTime.MinValue, DateTime.MinValue };
+            nextIncidentDriversCheck = DateTime.MaxValue;
             lastFCYAnnounced = FullCourseYellowPhase.RACING;
             lastFCYAccounedTime = DateTime.MinValue;
             lastLocalYellowAnnouncedTime = DateTime.MinValue;
             isUnderLocalYellow = false;
             hasWarnedOfUpcomingIncident = false;
+            incidentCandidates.Clear();
         }
 
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
@@ -221,6 +232,10 @@ namespace CrewChiefV4.Events
                                             audioPlayer.playMessageImmediately(new QueuedMessage(sectorFlag == FlagEnum.YELLOW ?
                                                 folderYellowFlagSectors[i] : folderDoubleYellowFlagSectors[i], 0, null));
                                         }
+
+                                        // start working out who's gone off
+                                        findInitialIncidentCandidateKeys(i + 1, currentGameState.OpponentData);
+                                        nextIncidentDriversCheck = DateTime.Now + TimeSpan.FromSeconds(3);
                                     }
                                 }
                                 else if (sectorFlag == FlagEnum.GREEN)
@@ -234,6 +249,18 @@ namespace CrewChiefV4.Events
                                         // Queue delayed message for flag is clear.
                                         audioPlayer.playMessageImmediately(new QueuedMessage(folderGreenFlagSectors[i], secondsToPreValidateYellowClearMessages, this));
                                     }
+                                }
+                            }
+                            else
+                            {
+                                // we've announced this, so see if we can add more information
+                                if (DateTime.Now > nextIncidentDriversCheck)
+                                {
+                                    if (incidentCandidates.Count > 0)
+                                    {
+                                        reportYellowFlagDriver(i + 1, currentGameState.OpponentData, currentGameState.SessionData.Position);
+                                    }
+                                    nextIncidentDriversCheck = DateTime.MaxValue;
                                 }
                             }
                         }
@@ -357,5 +384,119 @@ namespace CrewChiefV4.Events
                 }
             }
         }
+
+        void findInitialIncidentCandidateKeys(int flagSector, Dictionary<Object, OpponentData> opponents)
+        {
+            incidentCandidates.Clear();
+            foreach (KeyValuePair<Object, OpponentData> entry in opponents)
+            {
+                Object opponentKey = entry.Key;
+                OpponentData opponentData = entry.Value;                
+                if (opponentData.CurrentSectorNumber == flagSector && !opponentData.InPits)
+                {
+                    LapData lapData = opponentData.getCurrentLapData();
+                    incidentCandidates.Add(new IncidentCandidate(opponentKey, opponentData.DistanceRoundTrack, 
+                        lapData == null || lapData.IsValid));
+                }
+            }
+        }
+
+        void reportYellowFlagDriver(int flagSector, Dictionary<Object, OpponentData> opponents, int currentRacePosition)
+        {
+            List<NamePositionPair> driversToReport = new List<NamePositionPair>();
+            foreach (IncidentCandidate incidentCandidate in incidentCandidates)
+            {
+                if (opponents.ContainsKey(incidentCandidate.opponentDataKey))
+                {
+                    OpponentData opponent = opponents[incidentCandidate.opponentDataKey];
+                    if (opponent.CurrentSectorNumber == flagSector && 
+                        Math.Abs(opponent.DistanceRoundTrack - incidentCandidate.distanceRoundTrackAtStartOfIncident) < 10)
+                    {
+                        // this guy is in the same sector as the yellow but has only travelled 10m in 5 seconds, so he's probably involved - add him to the list
+                        // if we have sound files for him:
+                        NamePositionPair namePositionPair = new NamePositionPair(opponent.DriverRawName, opponent.Position, canReadName(opponent.DriverRawName), incidentCandidate.opponentDataKey);
+                        if (namePositionPair.canReadName || namePositionPair.position <= folderPositionHasGoneOff.Length - 1)
+                        {
+                            driversToReport.Add(namePositionPair);
+                        }
+                    }
+                }
+            }
+            incidentCandidates.Clear();
+            // now we have a list of possible drivers who we think are involved in the incident and we can read out, so select one to read
+            foreach (NamePositionPair namePositionPair in driversToReport)
+            {
+                if (namePositionPair.position < currentRacePosition && currentRacePosition - namePositionPair.position < 4 && namePositionPair.canReadName)
+                {
+                    // best match - he's in front (within 3 places) and we have his name
+                    audioPlayer.playMessage(new QueuedMessage("incident_driver", MessageContents(
+                        folderNameHasGoneOffIntro, opponents[namePositionPair.opponentKey], folderNameHasGoneOffOutro), 0, this));
+                    return;
+                }
+            }
+            foreach (NamePositionPair namePositionPair in driversToReport)
+            {
+                if (namePositionPair.position < currentRacePosition && namePositionPair.canReadName)
+                {
+                    // decent match - he's ahead and we have a name
+                    audioPlayer.playMessage(new QueuedMessage("incident_driver", MessageContents(
+                        folderNameHasGoneOffIntro, opponents[namePositionPair.opponentKey], folderNameHasGoneOffOutro), 0, this));
+                    return;
+                }
+            }
+            foreach (NamePositionPair namePositionPair in driversToReport)
+            {
+                if (namePositionPair.position < currentRacePosition && currentRacePosition - namePositionPair.position < 4)
+                {
+                    // hmm... no name, but he's close in front
+                    audioPlayer.playMessage(new QueuedMessage("incident_driver", MessageContents(
+                        folderPositionHasGoneOff[namePositionPair.position - 1]), 0, this));
+                    return;
+                }
+            }
+            foreach (NamePositionPair namePositionPair in driversToReport)
+            {
+                if (namePositionPair.canReadName)
+                {
+                    // meh, at least we have a name
+                    audioPlayer.playMessage(new QueuedMessage("incident_driver", MessageContents(
+                        folderNameHasGoneOffIntro, opponents[namePositionPair.opponentKey], folderNameHasGoneOffOutro), 0, this));
+                    return;
+                }
+            }
+        }
+
+        private Boolean canReadName(String rawName)
+        {
+            return SoundCache.hasSuitableTTSVoice || SoundCache.availableDriverNames.Contains(DriverNameHelper.getUsableDriverName(rawName));
+        }
     }
+
+    class NamePositionPair
+    {
+        public String name;
+        public int position;
+        public Boolean canReadName;
+        public Object opponentKey;
+        public NamePositionPair(String name, int position, Boolean canReadName, Object opponentKey)
+        {
+            this.name = name;
+            this.position = position;
+            this.canReadName = canReadName;
+            this.opponentKey = opponentKey;
+        }
+    }
+
+    class IncidentCandidate
+    {
+        public Object opponentDataKey;
+        public float distanceRoundTrackAtStartOfIncident;
+        public Boolean lapValidAtStartOfIncident;
+        public IncidentCandidate(Object opponentDataKey, float distanceRoundTrackAtStartOfIncident, Boolean lapValidAtStartOfIncident)
+        {
+            this.opponentDataKey = opponentDataKey;
+            this.distanceRoundTrackAtStartOfIncident = distanceRoundTrackAtStartOfIncident;
+            this.lapValidAtStartOfIncident = lapValidAtStartOfIncident;
+        }
+    } 
 }

@@ -342,6 +342,9 @@ namespace CrewChiefV4.GameState
 
         public int IsReallyDisconnectedCounter = 0;
 
+        // be careful with this one, not all games actually set it...
+        public Boolean InPits = false;
+
         public LapData getCurrentLapData()
         {
             if (OpponentLapData.Count > 0)

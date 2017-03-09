@@ -559,6 +559,7 @@ namespace CrewChiefV4.rFactor1
                 opponent.bestSector2Time = vehicle.bestSector2 > 0 && vehicle.bestSector1 > 0 ? vehicle.bestSector2 - vehicle.bestSector1 : -1;
                 opponent.bestSector3Time = vehicle.bestLapTime > 0 && vehicle.bestSector2 > 0 ? vehicle.bestLapTime - vehicle.bestSector2 : -1;
                 opponent.LastLapTime = vehicle.lastLapTime > 0 ? vehicle.lastLapTime : -1;
+                opponent.InPits = vehicle.inPits == 1;
                 float lastSectorTime = -1;
                 switch (opponent.CurrentSectorNumber)
                 {

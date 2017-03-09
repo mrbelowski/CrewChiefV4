@@ -1327,7 +1327,8 @@ namespace CrewChiefV4.RaceRoom
             opponentData.Position = racePosition;
             opponentData.UnFilteredPosition = unfilteredRacePosition;
             opponentData.WorldPosition = currentWorldPosition;
-            opponentData.IsNewLap = false;            
+            opponentData.IsNewLap = false;
+            opponentData.InPits = isInPits;
             if (opponentData.CurrentSectorNumber != sector)
             {
                 opponentData.CarClass = CarData.getCarClassForRaceRoomId(carClassId);
