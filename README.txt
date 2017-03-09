@@ -9,7 +9,7 @@ For support and discussions about Crew Chief we have our very own forum here: ht
 Changelog
 ---------
 
-Version 4.6.1.5: Fixed AMS multi-class support and added some AMS car classes; don't play 'chequered flag' message in race sessions; fixed messages not playing in unlimited timed sessions; some bug fixes
+Version 4.6.1.5: Fixed AMS multi-class support and added some AMS car classes; Corrected AMS session end logic - should prevent session end messages playing until you complete your lap; Reworked AMS opponent lap time handlingdon't play 'chequered flag' message in race sessions; fixed messages not playing in unlimited timed sessions; some bug fixes
 
 Version 4.6.1.4: Fixed PCars timed sessions
 
