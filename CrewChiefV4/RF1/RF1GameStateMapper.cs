@@ -90,7 +90,7 @@ namespace CrewChiefV4.rFactor1
             // get player scoring info (usually index 0)
             // get session leader scoring info (usually index 1 if not player)
             rFactor1Data.rfVehicleInfo player = new rfVehicleInfo();
-            rFactor1Data.rfVehicleInfo leader = new rfVehicleInfo();
+            rFactor1Data.rfVehicleInfo leader = new rfVehicleInfo();            
             for (int i = 0; i < shared.numVehicles; i++)
             {
                 rFactor1Data.rfVehicleInfo vehicle = shared.vehicle[i];
@@ -134,7 +134,10 @@ namespace CrewChiefV4.rFactor1
                 shared.session >= 5 && shared.session <= 8 ? shared.session - 5 :
                 shared.session >= 10 && shared.session <= 13 ? shared.session - 10 : 0;
             currentGameState.SessionData.SessionType = mapToSessionType(shared);
-            currentGameState.SessionData.SessionPhase = mapToSessionPhase((rFactor1Constant.rfGamePhase)shared.gamePhase);
+            Boolean startedNewLap = previousGameState != null && (previousGameState != null && player.sector != previousGameState.SessionData.SectorNumber);
+            SessionPhase previousSessionPhase = previousGameState != null ? previousGameState.SessionData.SessionPhase : SessionPhase.Unavailable;
+            Boolean isInPits = player.inPits == 1;
+            currentGameState.SessionData.SessionPhase = mapToSessionPhase((rFactor1Constant.rfGamePhase)shared.gamePhase, previousSessionPhase, startedNewLap, isInPits);
 
             // --------------------------------
             // flags data
@@ -571,17 +574,18 @@ namespace CrewChiefV4.rFactor1
                     default:
                         break;
                 }
+                // on the first flying lap the lastSectorTime values for sectors 1 and 2 will all be zero, so we miss the first laptime unless we assume the first flying lap
+                // is valid and use the game timer to derive the lap time :(
                 if (opponent.IsNewLap)
                 {
-                    if (lastSectorTime > 0)
-                    {
-                        opponent.CompleteLapWithProvidedLapTime(opponent.Position, vehicle.lapStartET, lastSectorTime, true, false, shared.trackTemp, shared.ambientTemp, currentGameState.SessionData.SessionHasFixedTime, currentGameState.SessionData.SessionTimeRemaining);
-                    }
-                    opponent.StartNewLap(opponent.CompletedLaps + 1, opponent.Position, vehicle.inPits == 1 || opponent.DistanceRoundTrack < 0, vehicle.lapStartET, false, shared.trackTemp, shared.ambientTemp);
+                    opponent.CompleteLapWithProvidedLapTime(opponent.Position, currentGameState.SessionData.SessionRunningTime,
+                            lastSectorTime, lastSectorTime > 0, false, shared.trackTemp, shared.ambientTemp, currentGameState.SessionData.SessionHasFixedTime, currentGameState.SessionData.SessionTimeRemaining);
+                    opponent.StartNewLap(opponent.CompletedLaps + 1, opponent.Position, vehicle.inPits == 1 || opponent.DistanceRoundTrack < 0, currentGameState.SessionData.SessionRunningTime, false, shared.trackTemp, shared.ambientTemp);
                 }
-                else if (isNewSector && lastSectorTime > 0)
+                else if (isNewSector)
                 {
-                    opponent.AddCumulativeSectorData(opponent.Position, lastSectorTime, vehicle.lapStartET + lastSectorTime, true, false, shared.trackTemp, shared.ambientTemp);
+                    opponent.AddCumulativeSectorData(opponent.Position, lastSectorTime, currentGameState.SessionData.SessionRunningTime,
+                        lastSectorTime > 0 || (opponent.CurrentSectorNumber >= 2 && vehicle.totalLaps == 1), false, shared.trackTemp, shared.ambientTemp);
                 }
                 if (vehicle.inPits == 1 && opponent.CurrentSectorNumber == 3 && opponentPrevious != null && !opponentPrevious.isEnteringPits())
                 {
@@ -845,7 +849,8 @@ namespace CrewChiefV4.rFactor1
             }
         }
 
-        private SessionPhase mapToSessionPhase(rFactor1Constant.rfGamePhase sessionPhase)
+        private SessionPhase mapToSessionPhase(rFactor1Constant.rfGamePhase sessionPhase, SessionPhase previousSessionPhase, 
+            Boolean startedNewLap, Boolean isInPit)
         {
             switch (sessionPhase)
             {
@@ -862,7 +867,14 @@ namespace CrewChiefV4.rFactor1
                 // sessions never go to sessionStopped, they always go straight from greenFlag to sessionOver
                 case rFactor1Constant.rfGamePhase.sessionStopped:
                 case rFactor1Constant.rfGamePhase.sessionOver:
-                    return SessionPhase.Finished;
+                    if (isInPit || startedNewLap || previousSessionPhase == SessionPhase.Finished)
+                    {
+                        return SessionPhase.Finished;
+                    }
+                    else
+                    {
+                        return SessionPhase.Checkered;
+                    }
                 // fullCourseYellow will count as greenFlag since we'll call it out in the Flags separately anyway
 
                     // TODO: can we map to FullCourseYellow here?
