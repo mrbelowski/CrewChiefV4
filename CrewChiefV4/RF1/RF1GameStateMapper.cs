@@ -173,9 +173,9 @@ namespace CrewChiefV4.rFactor1
                     }
                 }
             }
-
             if (currentGameState.SessionData.SessionPhase == SessionPhase.Green)
             {
+                //Console.WriteLine(shared.sectorFlag[0] + " : " + shared.sectorFlag[1] + " : " + shared.sectorFlag[2]);
                 // Mark Yellow sectors.
                 // RF1 uses 2 as the yellow sector indicator, but the plugin sends the sector *after* the sector
                 // where in incident actually is
@@ -192,8 +192,8 @@ namespace CrewChiefV4.rFactor1
                     currentGameState.FlagData.sectorFlags[1] = FlagEnum.YELLOW;
                 }
             }
-            
-            currentGameState.carClass = CarData.getCarClassForClassName(getNameFromBytes(player.vehicleClass));
+
+            currentGameState.carClass = getCarClass(shared.vehicleName);
             brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(currentGameState.carClass);
             currentGameState.SessionData.DriverRawName = getNameFromBytes(player.driverName).ToLower();
             currentGameState.SessionData.TrackDefinition = new TrackDefinition(getNameFromBytes(shared.trackName), shared.lapDist);
@@ -291,12 +291,13 @@ namespace CrewChiefV4.rFactor1
             currentGameState.EngineData.MinutesIntoSessionBeforeMonitoring = 5;
             currentGameState.EngineData.EngineOilTemp = shared.engineOilTemp;
             currentGameState.EngineData.EngineWaterTemp = shared.engineWaterTemp;
-            //HACK: there's probably a cleaner way to do this...
-            if (shared.overheating == 1)
-            {
-                currentGameState.EngineData.EngineWaterTemp += 50;
-                currentGameState.EngineData.EngineOilTemp += 50;
-            }
+            //HACK: there's probably a cleaner way to do this...            
+            // JB: apparently CC is too sensitive to engine temperatures, so disable this for now.
+            // if (shared.overheating == 1)
+            // {
+            //     currentGameState.EngineData.EngineWaterTemp += 50;
+            //     currentGameState.EngineData.EngineOilTemp += 50;
+            // }
 
             // --------------------------------
             // transmission data
@@ -523,7 +524,7 @@ namespace CrewChiefV4.rFactor1
                 OpponentData opponent = new OpponentData();
                 opponent.DriverRawName = getNameFromBytes(vehicle.driverName).ToLower();
                 opponent.DriverNameSet = opponent.DriverRawName.Length > 0;
-                opponent.CarClass = CarData.getCarClassForClassName(getNameFromBytes(vehicle.vehicleClass));
+                opponent.CarClass = getCarClass(vehicle.vehicleName);
                 opponent.Position = vehicle.place;
                 if (opponent.DriverNameSet && opponentPrevious == null && CrewChief.enableDriverNames)
                 {
@@ -887,7 +888,7 @@ namespace CrewChiefV4.rFactor1
                 {
                     String opponentKey = o.CarClass.getClassIdentifier() + o.Position.ToString();
                     if (o.DriverRawName != getNameFromBytes(vehicle.driverName).ToLower() ||
-                        o.CarClass != CarData.getCarClassForClassName(getNameFromBytes(vehicle.vehicleClass)) || 
+                        o.CarClass != getCarClass(vehicle.vehicleName) || 
                         opponentKeysProcessed.Contains(opponentKey))
                     {
                         continue;
@@ -978,6 +979,27 @@ namespace CrewChiefV4.rFactor1
         public static String getNameFromBytes(byte[] name)
         {
             return Encoding.UTF8.GetString(name).TrimEnd('\0').Trim();
-        } 
+        }
+
+        /**
+         * For AMS, vehicleName has the form classname: driver name #number
+         */
+        public CarData.CarClass getCarClass(byte[] vehicleName)
+        {
+            if (vehicleName.Length > 0)
+            {
+                String vehicleNameStr = getNameFromBytes(vehicleName);
+                int splitChar = vehicleNameStr.IndexOf(':');
+                if (splitChar > 0)
+                {
+                    return CarData.getCarClassForClassName(vehicleNameStr.Substring(0, splitChar));
+                }
+                else
+                {
+                    return CarData.getCarClassForClassName(vehicleNameStr);
+                }
+            }
+            return null;
+        }
     }
 }
