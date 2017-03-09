@@ -513,6 +513,10 @@ namespace CrewChiefV4
             {
                 textBox1.SelectAll();
             }
+            else if (e.KeyCode == Keys.Escape)
+            {
+                textBox1.DeselectAll();
+            }
         }
 
         private void listenForChannelOpen()
