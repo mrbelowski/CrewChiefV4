@@ -188,8 +188,9 @@ namespace CrewChiefV4.Events
                     {
                         Console.WriteLine("Skipping session end messages for unlimited session");
                     }
-                    else
+                    else if (currentGameState.SessionData.SessionType != SessionType.Race) 
                     {
+                        // don't play the chequered flag message in race sessions
                         audioPlayer.playMessage(new QueuedMessage("session_complete",
                             MessageContents(folder0mins, Position.folderStub + currentGameState.SessionData.Position), 0, this));
                     }
