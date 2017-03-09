@@ -93,7 +93,7 @@ namespace CrewChiefV4.Events
                 possibleMessages.Add(new QueuedMessage("air_temp", MessageContents(ConditionsMonitor.folderAirTempIs,
                     convertTemp(currentConditions.AmbientTemperature), getTempUnit()), 0, this));
             }
-            if (currentGameState.PitData.HasMandatoryPitStop)
+            if (currentGameState.PitData.HasMandatoryPitStop && CrewChief.gameDefinition.gameEnum != GameEnum.RF1)
             {
                 if (currentGameState.SessionData.SessionHasFixedTime)
                 {

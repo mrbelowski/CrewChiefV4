@@ -63,7 +63,7 @@ namespace CrewChiefV4
             GT1X, GT1, GTE, GT2, GTC, GTLM, GT3, GT4, GT5, Kart_1, Kart_2, KART_JUNIOR, KART_F1, LMP1, LMP2, LMP3, ROAD_B, ROAD_C1, ROAD_C2, ROAD_D, ROAD_SUPERCAR, GROUPC, GROUPA, GROUP4, GROUP5, GROUP6, GTO,
             VINTAGE_INDY_65, VINTAGE_F3_A, VINTAGE_F1_A, VINTAGE_F1_A1, VINTAGE_GT3, VINTAGE_GT, HISTORIC_TOURING_1, HISTORIC_TOURING_2, VINTAGE_F1_B, VINTAGE_F1_C, STOCK_CAR,
             F1, F2, F3, F4, FF, TC1, TC2, TC1_2014, AUDI_TT_CUP, AUDI_TT_VLN, CLIO_CUP, DTM, DTM_2013, V8_SUPERCAR, DTM_2014, DTM_2015, DTM_2016, TRANS_AM, HILL_CLIMB_ICONS, FORMULA_RENAULT,
-            MEGANE_TROPHY, NSU_TT, KTM_RR, INDYCAR, HYPER_CAR, HYPER_CAR_RACE, UNKNOWN_RACE
+            MEGANE_TROPHY, NSU_TT, KTM_RR, INDYCAR, HYPER_CAR, HYPER_CAR_RACE, UNKNOWN_RACE, STOCK_V8, BOXER_CUP, USER_CREATED
         }
 
         // use different thresholds for newer R3E car classes:
@@ -148,7 +148,25 @@ namespace CrewChiefV4
             brakeTempThresholds.Add(BrakeType.Carbon, carbonBrakeTempsThresholds);
         }
 
-
+        public class CarClassEnumConverter : Newtonsoft.Json.Converters.StringEnumConverter
+        {
+            public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+            {
+                var className = (string)reader.Value;
+                CarClassEnum carClassID = CarClassEnum.UNKNOWN_RACE;
+                if (Enum.TryParse<CarClassEnum>(className, out carClassID))
+                {
+                    return carClassID;
+                }
+                else
+                {
+                    // no match - we really don't know what this class is, so create one
+                    Console.WriteLine("Car class enum for " + className + " not found");
+                    userCarClassIds.Add(className);
+                    return CarClassEnum.USER_CREATED;
+                }
+            }
+        }
 
         private static CarClasses CAR_CLASSES;
 
@@ -157,10 +175,11 @@ namespace CrewChiefV4
 
         private static Dictionary<string, CarClass> nameToCarClass;
         private static Dictionary<int, CarClass> intToCarClass;
+        private static List<String> userCarClassIds = new List<string>();
 
         public class CarClass
         {
-            [JsonConverter(typeof(StringEnumConverter))]
+            [JsonConverter(typeof(CarClassEnumConverter))]
             public CarClassEnum carClassEnum { get; set; }
             public List<int> raceroomClassIds { get; set; }
             public List<string> pCarsClassNames { get; set; }
@@ -203,7 +222,7 @@ namespace CrewChiefV4
 
             public String getClassIdentifier()
             {
-                if (this.carClassEnum == CarClassEnum.UNKNOWN_RACE)
+                if (this.carClassEnum == CarClassEnum.UNKNOWN_RACE || this.carClassEnum == CarClassEnum.USER_CREATED)
                 {
                     // this class has been generated from an unrecognised ID, so return the
                     // ID we used to generate this new class.
@@ -291,9 +310,10 @@ namespace CrewChiefV4
 
         public static void loadCarClassData()
         {
+            userCarClassIds = new List<string>();
             CarClasses defaultCarClassData = getCarClassDataFromFile(getDefaultCarClassFileLocation());
             CarClasses userCarClassData = getCarClassDataFromFile(getUserCarClassFileLocation());
-            mergeCarClassData(defaultCarClassData, userCarClassData);
+            mergeCarClassData(defaultCarClassData, userCarClassData);            
             foreach (CarClass carClass in userCarClassData.carClasses)
             {
                 carClass.setupRegexs();
@@ -312,6 +332,7 @@ namespace CrewChiefV4
             foreach (CarClass defaultCarClass in defaultCarClassData.carClasses)
             {
                 Boolean isInUserCarClasses = false;
+                int userCarClassIndex = 0;
                 foreach (CarClass userCarClass in userCarClassData.carClasses)
                 {
                     if (userCarClass.carClassEnum == defaultCarClass.carClassEnum)
@@ -319,6 +340,13 @@ namespace CrewChiefV4
                         isInUserCarClasses = true;
                         userCarClassesCount++;
                         break;
+                    }
+                    else if (userCarClass.carClassEnum == CarClassEnum.USER_CREATED && userCarClass.placeholderClassId.Length == 0 && 
+                        userCarClassIds.Count > userCarClassIndex)
+                    {
+                        userCarClass.placeholderClassId = userCarClassIds[userCarClassIndex];
+                        Console.WriteLine("Adding a user defined class with ID " + userCarClass.placeholderClassId);
+                        userCarClassIndex++;
                     }
                 }
                 if (!isInUserCarClasses)

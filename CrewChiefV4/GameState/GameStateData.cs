@@ -342,6 +342,9 @@ namespace CrewChiefV4.GameState
 
         public int IsReallyDisconnectedCounter = 0;
 
+        // be careful with this one, not all games actually set it...
+        public Boolean InPits = false;
+
         public LapData getCurrentLapData()
         {
             if (OpponentLapData.Count > 0)
@@ -1191,7 +1194,7 @@ namespace CrewChiefV4.GameState
             float[] bestLapWithSectors = new float[] { -1, -1, -1, -1 };
             foreach (KeyValuePair<Object, OpponentData> entry in OpponentData)
             {
-                if (entry.Value.CarClass.getClassIdentifier() == carClassToCheck || CrewChief.gameDefinition.gameEnum == GameEnum.RF1)
+                if (entry.Value.CarClass.getClassIdentifier() == carClassToCheck)
                 {
                     float[] thisOpponentsBest = entry.Value.getTimeAndSectorsForBestLapInWindow(lapsToCheck);
                     if (bestLapWithSectors[0] == -1 || (thisOpponentsBest[0] > 0 && thisOpponentsBest[0] < bestLapWithSectors[0]))
