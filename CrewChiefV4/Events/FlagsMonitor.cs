@@ -80,6 +80,8 @@ namespace CrewChiefV4.Events
         private float distanceToWarnOfLocalYellow = 500;    // metres - externalise? Is this sufficient? Make it speed-dependent?
 
         List<IncidentCandidate> incidentCandidates = new List<IncidentCandidate>();
+
+        private int positionAtStartOfIncident = int.MaxValue;
         
         public FlagsMonitor(AudioPlayer audioPlayer)
         {
@@ -111,6 +113,7 @@ namespace CrewChiefV4.Events
             lastLocalYellowAnnouncedTime = DateTime.MinValue;
             isUnderLocalYellow = false;
             hasWarnedOfUpcomingIncident = false;
+            positionAtStartOfIncident = int.MaxValue;
             incidentCandidates.Clear();
         }
 
@@ -244,6 +247,7 @@ namespace CrewChiefV4.Events
 
                                         // start working out who's gone off
                                         findInitialIncidentCandidateKeys(i + 1, currentGameState.OpponentData);
+                                        positionAtStartOfIncident = currentGameState.SessionData.Position;
                                         nextIncidentDriversCheck = DateTime.Now + TimeSpan.FromSeconds(3);
                                     }
                                 }
@@ -267,9 +271,10 @@ namespace CrewChiefV4.Events
                                 {
                                     if (incidentCandidates.Count > 0)
                                     {
-                                        reportYellowFlagDriver(i + 1, currentGameState.OpponentData, currentGameState.SessionData.Position, currentGameState.SessionData.TrackDefinition);
+                                        reportYellowFlagDriver(i + 1, currentGameState.OpponentData, currentGameState.SessionData.TrackDefinition);
                                     }
                                     nextIncidentDriversCheck = DateTime.MaxValue;
+                                    positionAtStartOfIncident = int.MaxValue;
                                 }
                             }
                         }
@@ -410,7 +415,7 @@ namespace CrewChiefV4.Events
             }
         }
 
-        void reportYellowFlagDriver(int flagSector, Dictionary<Object, OpponentData> opponents, int currentRacePosition, TrackDefinition currentTrack)
+        void reportYellowFlagDriver(int flagSector, Dictionary<Object, OpponentData> opponents, TrackDefinition currentTrack)
         {
             List<NamePositionPair> driversToReport = new List<NamePositionPair>();
             foreach (IncidentCandidate incidentCandidate in incidentCandidates)
@@ -437,9 +442,9 @@ namespace CrewChiefV4.Events
             // now we have a list of possible drivers who we think are involved in the incident and we can read out, so select one to read
             foreach (NamePositionPair namePositionPair in driversToReport)
             {
-                if (namePositionPair.position < currentRacePosition && currentRacePosition - namePositionPair.position < 4 && namePositionPair.canReadName)
+                if (Math.Abs(positionAtStartOfIncident - namePositionPair.position) < 4 && namePositionPair.canReadName)
                 {
-                    // best match - he's in front (within 3 places) and we have his name 
+                    // best match - he's within 3 places and we have his name 
 
                     // TODO: refactor this copy-paste horseshit:
                     String landmark = TrackData.getLandmarkForLapDistance(currentTrack, namePositionPair.distanceRoundTrack);
@@ -458,7 +463,7 @@ namespace CrewChiefV4.Events
             }
             foreach (NamePositionPair namePositionPair in driversToReport)
             {
-                if (namePositionPair.position < currentRacePosition && namePositionPair.canReadName)
+                if (namePositionPair.position < positionAtStartOfIncident && namePositionPair.canReadName)
                 {
                     // decent match - he's ahead and we have a name
 
@@ -479,7 +484,7 @@ namespace CrewChiefV4.Events
             }
             foreach (NamePositionPair namePositionPair in driversToReport)
             {
-                if (namePositionPair.position < currentRacePosition && currentRacePosition - namePositionPair.position < 6)
+                if (namePositionPair.position < positionAtStartOfIncident && positionAtStartOfIncident - namePositionPair.position < 6)
                 {
                     // hmm... no name, but he's close in front
 

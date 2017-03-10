@@ -1073,6 +1073,12 @@ namespace CrewChiefV4.rFactor2
             }
         }
 
+
+        // JB: TODO - why is this needed? Don't we have a unique key for an opponent? RF1 has vehicleName 
+        // which is of the form classname: driver name #number (e.g. "F309: Jim Britton #14") - can't we just
+        // rely on this for our opponent keys?
+
+
         // finds OpponentData for given vehicle based on driver name, vehicle class, and world position
         private OpponentData getOpponentDataForVehicleInfo(rF2VehScoringInfo vehicle, GameStateData previousGameState, float sessionRunningTime)
         {
