@@ -72,6 +72,9 @@ namespace CrewChiefV4.Events
         private DateTime nextIncidentDriversCheck = DateTime.MaxValue;
 
         private TimeSpan fcyPitStatusReminderMinTime = TimeSpan.FromSeconds(UserSettings.GetUserSettings().getInt("time_between_caution_period_status_reminders"));
+
+        private Boolean reportYellowsInAllSectors = UserSettings.GetUserSettings().getBoolean("report_yellows_in_all_sectors");
+
         private float distanceToWarnOfLocalYellow = 500;    // metres - externalise? Is this sufficient? Make it speed-dependent?
 
         List<IncidentCandidate> incidentCandidates = new List<IncidentCandidate>();
@@ -212,7 +215,7 @@ namespace CrewChiefV4.Events
                         //      - Yellow went away in or next sector (relative to player's sector).
                         //      - Announce delayed message and drop it if sector or sector flag changes
                         if (!currentGameState.PitData.InPitlane &&
-                            (isCurrentSector(currentGameState, i) || isNextSector(currentGameState, i)))
+                            (reportYellowsInAllSectors || isCurrentSector(currentGameState, i) || isNextSector(currentGameState, i)))
                         {
                             FlagEnum sectorFlag = currentGameState.FlagData.sectorFlags[i];
                             if (sectorFlag != lastSectorFlagsAnnounced[i])
