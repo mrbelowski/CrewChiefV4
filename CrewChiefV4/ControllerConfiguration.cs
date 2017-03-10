@@ -27,7 +27,8 @@ namespace CrewChiefV4
         public static String TOGGLE_READ_OPPONENT_DELTAS = Configuration.getUIString("toggle_opponent_deltas_on/off_for_each_lap");
         public static String REPEAT_LAST_MESSAGE_BUTTON = Configuration.getUIString("press_to_replay_the_last_message");
         public static String VOLUME_UP = Configuration.getUIString("volume_up");
-        public static String VOLUME_DOWN = Configuration.getUIString("volume_down");        
+        public static String VOLUME_DOWN = Configuration.getUIString("volume_down");
+        public static String PRINT_TRACK_DATA = Configuration.getUIString("print_track_data");        
 
         private ControllerData networkGamePad = new ControllerData(Configuration.getUIString("udp_network_data_buttons"), DeviceType.Gamepad, UDP_NETWORK_CONTROLLER_GUID);
         
@@ -66,6 +67,7 @@ namespace CrewChiefV4
             addButtonAssignment(REPEAT_LAST_MESSAGE_BUTTON);
             addButtonAssignment(VOLUME_UP);
             addButtonAssignment(VOLUME_DOWN);
+            addButtonAssignment(PRINT_TRACK_DATA);
             controllers = loadControllers();
         }
 
@@ -92,10 +94,8 @@ namespace CrewChiefV4
             pollForButtonClicks(buttonAssignments[buttonAssignmentIndexes[REPEAT_LAST_MESSAGE_BUTTON]]);
             pollForButtonClicks(buttonAssignments[buttonAssignmentIndexes[VOLUME_UP]]);
             pollForButtonClicks(buttonAssignments[buttonAssignmentIndexes[VOLUME_DOWN]]);
-            if (channelOpenIsToggle) 
-            {
-                pollForButtonClicks(buttonAssignments[buttonAssignmentIndexes[CHANNEL_OPEN_FUNCTION]]);
-            }
+            pollForButtonClicks(buttonAssignments[buttonAssignmentIndexes[PRINT_TRACK_DATA]]);  
+            pollForButtonClicks(buttonAssignments[buttonAssignmentIndexes[CHANNEL_OPEN_FUNCTION]]);
         }
 
         private void pollForButtonClicks(ButtonAssignment ba)
@@ -205,6 +205,10 @@ namespace CrewChiefV4
                 {
                     actionId = "VOLUME_DOWN";
                 }
+                else if (buttonAssignment.action == PRINT_TRACK_DATA)
+                {
+                    actionId = "PRINT_TRACK_DATA";
+                }
 
                 if (buttonAssignment.controller != null && (buttonAssignment.joystick != null || buttonAssignment.controller.guid == UDP_NETWORK_CONTROLLER_GUID) && buttonAssignment.buttonIndex != -1)
                 {
@@ -269,6 +273,13 @@ namespace CrewChiefV4
             if (volumeDownButtonIndex != -1 && volumeDownDeviceGuid.Length > 0)
             {
                 loadAssignment(parent, VOLUME_DOWN, volumeDownButtonIndex, volumeDownDeviceGuid);
+            }
+
+            int printTrackDataButtonIndex = UserSettings.GetUserSettings().getInt("PRINT_TRACK_DATA_button_index");
+            String printTrackDataDeviceGuid = UserSettings.GetUserSettings().getString("PRINT_TRACK_DATA_device_guid");
+            if (printTrackDataButtonIndex != -1 && printTrackDataDeviceGuid.Length > 0)
+            {
+                loadAssignment(parent, PRINT_TRACK_DATA, printTrackDataButtonIndex, printTrackDataDeviceGuid);
             }
         }
 
