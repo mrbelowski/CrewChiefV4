@@ -880,6 +880,7 @@ namespace CrewChiefV4.assetto
             if (currentGameState.carClass.carClassEnum == CarData.CarClassEnum.UNKNOWN_RACE)
             {
                 CarData.CarClass newClass = CarData.getCarClassForClassName(shared.acsStatic.carModel);
+                CarData.CLASS_ID = shared.acsStatic.carModel;
                 if (newClass.getClassIdentifier() != currentGameState.carClass.getClassIdentifier())
                 {
                     currentGameState.carClass = newClass;
@@ -1028,6 +1029,7 @@ namespace CrewChiefV4.assetto
 
                 //add carclasses for assetto corsa.
                 currentGameState.carClass = CarData.getCarClassForClassName(shared.acsStatic.carModel);
+                CarData.CLASS_ID = shared.acsStatic.carModel;
 
                 Console.WriteLine("Player is using car class " + currentGameState.carClass.getClassIdentifier());
 
@@ -1109,6 +1111,7 @@ namespace CrewChiefV4.assetto
                         playerSplits.setSplitPoints(shared.acsStatic.trackSPlineLength);
 
                         currentGameState.carClass = CarData.getCarClassForClassName(shared.acsStatic.carModel);
+                        CarData.CLASS_ID = shared.acsStatic.carModel;
                         Console.WriteLine("Player is using car class " + currentGameState.carClass.getClassIdentifier());
                         brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(currentGameState.carClass);
                         // no tyre data in the block so get the default tyre types for this car

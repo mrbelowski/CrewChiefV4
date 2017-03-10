@@ -194,7 +194,9 @@ namespace CrewChiefV4.rFactor2
 
             csd.SessionType = mapToSessionType(rf2state);
             csd.SessionPhase = mapToSessionPhase((rFactor2Constants.rF2GamePhase)rf2state.mGamePhase, csd.SessionType, ref player);
-            cgs.carClass = CarData.getCarClassForClassName(getStringFromBytes(player.mVehicleClass));
+            var carClassId = getStringFromBytes(player.mVehicleClass);
+            cgs.carClass = CarData.getCarClassForClassName(carClassId);
+            CarData.CLASS_ID = carClassId;
             this.brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(cgs.carClass);
             csd.DriverRawName = getStringFromBytes(player.mDriverName).ToLower();
             csd.TrackDefinition = new TrackDefinition(getStringFromBytes(rf2state.mTrackName), (float)rf2state.mLapDist);

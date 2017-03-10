@@ -1882,5 +1882,65 @@ namespace CrewChiefV4.Properties {
                 this["acs_practice_time_minuts"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool report_yellows_in_all_sectors {
+            get {
+                return ((bool)(this["report_yellows_in_all_sectors"]));
+            }
+            set {
+                this["report_yellows_in_all_sectors"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string PRINT_TRACK_DATA_device_guid {
+            get {
+                return ((string)(this["PRINT_TRACK_DATA_device_guid"]));
+            }
+            set {
+                this["PRINT_TRACK_DATA_device_guid"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string PRINT_TRACK_DATA_device_type {
+            get {
+                return ((string)(this["PRINT_TRACK_DATA_device_type"]));
+            }
+            set {
+                this["PRINT_TRACK_DATA_device_type"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-1")]
+        public int PRINT_TRACK_DATA_button_index {
+            get {
+                return ((int)(this["PRINT_TRACK_DATA_button_index"]));
+            }
+            set {
+                this["PRINT_TRACK_DATA_button_index"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("10")]
+        public int max_distance_moved_for_yellow_announcement {
+            get {
+                return ((int)(this["max_distance_moved_for_yellow_announcement"]));
+            }
+            set {
+                this["max_distance_moved_for_yellow_announcement"] = value;
+            }
+        }
     }
 }

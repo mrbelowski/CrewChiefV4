@@ -47,8 +47,14 @@ namespace CrewChiefV4.Events
 
         private String[] folderPositionHasGoneOff = new String[] { "flags/position1_has_gone_off", "flags/position2_has_gone_off", "flags/position3_has_gone_off", 
                                                                    "flags/position4_has_gone_off", "flags/position5_has_gone_off", "flags/position6_has_gone_off", };
+        private String[] folderPositionHasGoneOffIn = new String[] { "flags/position1_has_gone_off_in", "flags/position2_has_gone_off_in", "flags/position3_has_gone_off_in", 
+                                                                   "flags/position4_has_gone_off_in", "flags/position5_has_gone_off_in", "flags/position6_has_gone_off_in", };
         private String folderNameHasGoneOffIntro = "flags/name_has_gone_off_intro";
         private String folderNameHasGoneOffOutro = "flags/name_has_gone_off_outro";
+        //  used when we know the corner name:
+        private String folderNameHasGoneOffInOutro = "flags/name_has_gone_off_in_outro";
+
+        private int maxDistanceMovedForYellowAnnouncement = UserSettings.GetUserSettings().getInt("max_distance_moved_for_yellow_announcement");
 
         // for new (RF2 and R3E) impl
         private FlagEnum[] lastSectorFlagsAnnounced = new FlagEnum[] { FlagEnum.GREEN, FlagEnum.GREEN, FlagEnum.GREEN };
@@ -68,6 +74,9 @@ namespace CrewChiefV4.Events
         private DateTime nextIncidentDriversCheck = DateTime.MaxValue;
 
         private TimeSpan fcyPitStatusReminderMinTime = TimeSpan.FromSeconds(UserSettings.GetUserSettings().getInt("time_between_caution_period_status_reminders"));
+
+        private Boolean reportYellowsInAllSectors = UserSettings.GetUserSettings().getBoolean("report_yellows_in_all_sectors");
+
         private float distanceToWarnOfLocalYellow = 500;    // metres - externalise? Is this sufficient? Make it speed-dependent?
 
         List<IncidentCandidate> incidentCandidates = new List<IncidentCandidate>();
@@ -208,7 +217,7 @@ namespace CrewChiefV4.Events
                         //      - Yellow went away in or next sector (relative to player's sector).
                         //      - Announce delayed message and drop it if sector or sector flag changes
                         if (!currentGameState.PitData.InPitlane &&
-                            (isCurrentSector(currentGameState, i) || isNextSector(currentGameState, i)))
+                            (reportYellowsInAllSectors || isCurrentSector(currentGameState, i) || isNextSector(currentGameState, i)))
                         {
                             FlagEnum sectorFlag = currentGameState.FlagData.sectorFlags[i];
                             if (sectorFlag != lastSectorFlagsAnnounced[i])
@@ -258,7 +267,7 @@ namespace CrewChiefV4.Events
                                 {
                                     if (incidentCandidates.Count > 0)
                                     {
-                                        reportYellowFlagDriver(i + 1, currentGameState.OpponentData, currentGameState.SessionData.Position);
+                                        reportYellowFlagDriver(i + 1, currentGameState.OpponentData, currentGameState.SessionData.Position, currentGameState.SessionData.TrackDefinition);
                                     }
                                     nextIncidentDriversCheck = DateTime.MaxValue;
                                 }
@@ -401,7 +410,7 @@ namespace CrewChiefV4.Events
             }
         }
 
-        void reportYellowFlagDriver(int flagSector, Dictionary<Object, OpponentData> opponents, int currentRacePosition)
+        void reportYellowFlagDriver(int flagSector, Dictionary<Object, OpponentData> opponents, int currentRacePosition, TrackDefinition currentTrack)
         {
             List<NamePositionPair> driversToReport = new List<NamePositionPair>();
             foreach (IncidentCandidate incidentCandidate in incidentCandidates)
@@ -409,12 +418,13 @@ namespace CrewChiefV4.Events
                 if (opponents.ContainsKey(incidentCandidate.opponentDataKey))
                 {
                     OpponentData opponent = opponents[incidentCandidate.opponentDataKey];
-                    if (opponent.CurrentSectorNumber == flagSector && 
-                        Math.Abs(opponent.DistanceRoundTrack - incidentCandidate.distanceRoundTrackAtStartOfIncident) < 10)
+                    if (opponent.CurrentSectorNumber == flagSector &&
+                        Math.Abs(opponent.DistanceRoundTrack - incidentCandidate.distanceRoundTrackAtStartOfIncident) < maxDistanceMovedForYellowAnnouncement)
                     {
                         // this guy is in the same sector as the yellow but has only travelled 10m in 5 seconds, so he's probably involved - add him to the list
                         // if we have sound files for him:
-                        NamePositionPair namePositionPair = new NamePositionPair(opponent.DriverRawName, opponent.Position, canReadName(opponent.DriverRawName), incidentCandidate.opponentDataKey);
+                        NamePositionPair namePositionPair = new NamePositionPair(opponent.DriverRawName, opponent.Position, opponent.DistanceRoundTrack,
+                            canReadName(opponent.DriverRawName), incidentCandidate.opponentDataKey);
                         if (namePositionPair.canReadName || namePositionPair.position <= folderPositionHasGoneOff.Length)
                         {
                             driversToReport.Add(namePositionPair);
@@ -428,9 +438,20 @@ namespace CrewChiefV4.Events
             {
                 if (namePositionPair.position < currentRacePosition && currentRacePosition - namePositionPair.position < 4 && namePositionPair.canReadName)
                 {
-                    // best match - he's in front (within 3 places) and we have his name
-                    audioPlayer.playMessage(new QueuedMessage("incident_driver", MessageContents(
-                        folderNameHasGoneOffIntro, opponents[namePositionPair.opponentKey], folderNameHasGoneOffOutro), 0, this));
+                    // best match - he's in front (within 3 places) and we have his name 
+
+                    // TODO: refactor this copy-paste horseshit:
+                    String landmark = TrackData.getLandmarkForLapDistance(currentTrack, namePositionPair.distanceRoundTrack);
+                    if (landmark != null)
+                    {
+                        audioPlayer.playMessage(new QueuedMessage("incident_driver", MessageContents(
+                            folderNameHasGoneOffIntro, opponents[namePositionPair.opponentKey], folderNameHasGoneOffInOutro, "corners/" + landmark), 0, this));
+                    }
+                    else
+                    {
+                        audioPlayer.playMessage(new QueuedMessage("incident_driver", MessageContents(
+                            folderNameHasGoneOffIntro, opponents[namePositionPair.opponentKey], folderNameHasGoneOffOutro), 0, this));
+                    }
                     return;
                 }
             }
@@ -439,18 +460,40 @@ namespace CrewChiefV4.Events
                 if (namePositionPair.position < currentRacePosition && namePositionPair.canReadName)
                 {
                     // decent match - he's ahead and we have a name
-                    audioPlayer.playMessage(new QueuedMessage("incident_driver", MessageContents(
-                        folderNameHasGoneOffIntro, opponents[namePositionPair.opponentKey], folderNameHasGoneOffOutro), 0, this));
+
+                    // TODO: refactor this copy-paste horseshit:
+                    String landmark = TrackData.getLandmarkForLapDistance(currentTrack, namePositionPair.distanceRoundTrack);
+                    if (landmark != null)
+                    {
+                        audioPlayer.playMessage(new QueuedMessage("incident_driver", MessageContents(
+                            folderNameHasGoneOffIntro, opponents[namePositionPair.opponentKey], folderNameHasGoneOffInOutro, "corners/" + landmark), 0, this));
+                    }
+                    else
+                    {
+                        audioPlayer.playMessage(new QueuedMessage("incident_driver", MessageContents(
+                            folderNameHasGoneOffIntro, opponents[namePositionPair.opponentKey], folderNameHasGoneOffOutro), 0, this));
+                    }
                     return;
                 }
             }
             foreach (NamePositionPair namePositionPair in driversToReport)
             {
-                if (namePositionPair.position < currentRacePosition && currentRacePosition - namePositionPair.position < 4)
+                if (namePositionPair.position < currentRacePosition && currentRacePosition - namePositionPair.position < 6)
                 {
                     // hmm... no name, but he's close in front
-                    audioPlayer.playMessage(new QueuedMessage("incident_driver", MessageContents(
-                        folderPositionHasGoneOff[namePositionPair.position - 1]), 0, this));
+
+                    // TODO: refactor this copy-paste horseshit:
+                    String landmark = TrackData.getLandmarkForLapDistance(currentTrack, namePositionPair.distanceRoundTrack);
+                    if (landmark != null)
+                    {
+                        audioPlayer.playMessage(new QueuedMessage("incident_driver", MessageContents(
+                            folderPositionHasGoneOffIn[namePositionPair.position - 1], "corners/" + landmark), 0, this));
+                    }
+                    else
+                    {
+                        audioPlayer.playMessage(new QueuedMessage("incident_driver", MessageContents(
+                            folderPositionHasGoneOff[namePositionPair.position - 1]), 0, this));
+                    }
                     return;
                 }
             }
@@ -459,8 +502,19 @@ namespace CrewChiefV4.Events
                 if (namePositionPair.canReadName)
                 {
                     // meh, at least we have a name
-                    audioPlayer.playMessage(new QueuedMessage("incident_driver", MessageContents(
-                        folderNameHasGoneOffIntro, opponents[namePositionPair.opponentKey], folderNameHasGoneOffOutro), 0, this));
+
+                    // TODO: refactor this copy-paste horseshit:
+                    String landmark = TrackData.getLandmarkForLapDistance(currentTrack, namePositionPair.distanceRoundTrack);
+                    if (landmark != null)
+                    {
+                        audioPlayer.playMessage(new QueuedMessage("incident_driver", MessageContents(
+                            folderNameHasGoneOffIntro, opponents[namePositionPair.opponentKey], folderNameHasGoneOffInOutro, "corners/" + landmark), 0, this));
+                    }
+                    else
+                    {
+                        audioPlayer.playMessage(new QueuedMessage("incident_driver", MessageContents(
+                            folderNameHasGoneOffIntro, opponents[namePositionPair.opponentKey], folderNameHasGoneOffOutro), 0, this));
+                    }
                     return;
                 }
             }
@@ -476,12 +530,15 @@ namespace CrewChiefV4.Events
     {
         public String name;
         public int position;
+        public float distanceRoundTrack;
         public Boolean canReadName;
         public Object opponentKey;
-        public NamePositionPair(String name, int position, Boolean canReadName, Object opponentKey)
+
+        public NamePositionPair(String name, int position, float distanceRoundTrack, Boolean canReadName, Object opponentKey)
         {
             this.name = name;
             this.position = position;
+            this.distanceRoundTrack = distanceRoundTrack;
             this.canReadName = canReadName;
             this.opponentKey = opponentKey;
         }

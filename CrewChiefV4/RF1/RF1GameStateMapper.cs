@@ -196,7 +196,7 @@ namespace CrewChiefV4.rFactor1
                 }
             }
 
-            currentGameState.carClass = getCarClass(shared.vehicleName);
+            currentGameState.carClass = getCarClass(shared.vehicleName, true);
             brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(currentGameState.carClass);
             currentGameState.SessionData.DriverRawName = getNameFromBytes(player.driverName).ToLower();
             currentGameState.SessionData.TrackDefinition = new TrackDefinition(getNameFromBytes(shared.trackName), shared.lapDist);
@@ -527,7 +527,7 @@ namespace CrewChiefV4.rFactor1
                 OpponentData opponent = new OpponentData();
                 opponent.DriverRawName = getNameFromBytes(vehicle.driverName).ToLower();
                 opponent.DriverNameSet = opponent.DriverRawName.Length > 0;
-                opponent.CarClass = getCarClass(vehicle.vehicleName);
+                opponent.CarClass = getCarClass(vehicle.vehicleName, false);
                 opponent.Position = vehicle.place;
                 if (opponent.DriverNameSet && opponentPrevious == null && CrewChief.enableDriverNames)
                 {
@@ -901,7 +901,7 @@ namespace CrewChiefV4.rFactor1
                 {
                     String opponentKey = o.CarClass.getClassIdentifier() + o.Position.ToString();
                     if (o.DriverRawName != getNameFromBytes(vehicle.driverName).ToLower() ||
-                        o.CarClass != getCarClass(vehicle.vehicleName) || 
+                        o.CarClass != getCarClass(vehicle.vehicleName, false) || 
                         opponentKeysProcessed.Contains(opponentKey))
                     {
                         continue;
@@ -997,7 +997,7 @@ namespace CrewChiefV4.rFactor1
         /**
          * For AMS, vehicleName has the form classname: driver name #number
          */
-        public CarData.CarClass getCarClass(byte[] vehicleName)
+        public CarData.CarClass getCarClass(byte[] vehicleName, Boolean forPlayer)
         {
             if (vehicleName.Length > 0)
             {
@@ -1005,10 +1005,19 @@ namespace CrewChiefV4.rFactor1
                 int splitChar = vehicleNameStr.IndexOf(':');
                 if (splitChar > 0)
                 {
-                    return CarData.getCarClassForClassName(vehicleNameStr.Substring(0, splitChar));
+                    vehicleNameStr = vehicleNameStr.Substring(0, splitChar);
+                    if (forPlayer)
+                    {
+                        CarData.CLASS_ID = vehicleNameStr;
+                    }
+                    return CarData.getCarClassForClassName(vehicleNameStr);
                 }
                 else
                 {
+                    if (forPlayer)
+                    {
+                        CarData.CLASS_ID = vehicleNameStr;
+                    }
                     return CarData.getCarClassForClassName(vehicleNameStr);
                 }
             }
