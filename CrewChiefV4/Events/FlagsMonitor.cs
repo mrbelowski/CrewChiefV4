@@ -54,6 +54,8 @@ namespace CrewChiefV4.Events
         //  used when we know the corner name:
         private String folderNameHasGoneOffInOutro = "flags/name_has_gone_off_in_outro";
 
+        private int maxDistanceMovedForYellowAnnouncement = UserSettings.GetUserSettings().getInt("max_distance_moved_for_yellow_annoucement");
+
         // for new (RF2 and R3E) impl
         private FlagEnum[] lastSectorFlagsAnnounced = new FlagEnum[] { FlagEnum.GREEN, FlagEnum.GREEN, FlagEnum.GREEN };
         private DateTime[] lastSectorFlagsAnnouncedTime = new DateTime[] { DateTime.MinValue, DateTime.MinValue, DateTime.MinValue };
@@ -416,8 +418,8 @@ namespace CrewChiefV4.Events
                 if (opponents.ContainsKey(incidentCandidate.opponentDataKey))
                 {
                     OpponentData opponent = opponents[incidentCandidate.opponentDataKey];
-                    if (opponent.CurrentSectorNumber == flagSector && 
-                        Math.Abs(opponent.DistanceRoundTrack - incidentCandidate.distanceRoundTrackAtStartOfIncident) < 10)
+                    if (opponent.CurrentSectorNumber == flagSector &&
+                        Math.Abs(opponent.DistanceRoundTrack - incidentCandidate.distanceRoundTrackAtStartOfIncident) < maxDistanceMovedForYellowAnnouncement)
                     {
                         // this guy is in the same sector as the yellow but has only travelled 10m in 5 seconds, so he's probably involved - add him to the list
                         // if we have sound files for him:
@@ -476,7 +478,7 @@ namespace CrewChiefV4.Events
             }
             foreach (NamePositionPair namePositionPair in driversToReport)
             {
-                if (namePositionPair.position < currentRacePosition && currentRacePosition - namePositionPair.position < 4)
+                if (namePositionPair.position < currentRacePosition && currentRacePosition - namePositionPair.position < 6)
                 {
                     // hmm... no name, but he's close in front
 

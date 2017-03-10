@@ -1930,5 +1930,17 @@ namespace CrewChiefV4.Properties {
                 this["PRINT_TRACK_DATA_button_index"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("10")]
+        public int max_distance_moved_for_yellow_annoucement {
+            get {
+                return ((int)(this["max_distance_moved_for_yellow_annoucement"]));
+            }
+            set {
+                this["max_distance_moved_for_yellow_annoucement"] = value;
+            }
+        }
     }
 }
