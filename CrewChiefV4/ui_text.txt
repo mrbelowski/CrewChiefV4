@@ -187,6 +187,7 @@ pcars_character_encoding_help = For PS4 always use UTF-8. For PC and XBox this w
 enable_pcars_pit_window_messages_help = Play pit window messages in PCars. Don't use this in online racing - the game always sends an enforced pit stop lap even if this isn't enabled by the host
 use_tts_for_missing_names_help = Attempt to use text-to-speech when the app encounters a name that's not in the recorded set. On Windows 7 this will sound awful (thanks Microsoft). Windows 10's "David" voice might be a bit more bearable.
 report_yellows_in_all_sectors_help = If this is disabled the app will report yellow flags only in the current and next sector
+max_distance_moved_for_yellow_annoucement_help = Cars which have moved less than this many metres in 3 seconds may be reported as having crashed
 
 enable_delayed_responses_help = Some voice commands will trigger a "stand by" response, followed some time later by the requested into
 enable_console_logging_help = Uncheck this to prevent console window messages being shown. Reduces the CPU load of the app
