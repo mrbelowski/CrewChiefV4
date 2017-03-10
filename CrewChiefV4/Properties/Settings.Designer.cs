@@ -1934,12 +1934,12 @@ namespace CrewChiefV4.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("10")]
-        public int max_distance_moved_for_yellow_annoucement {
+        public int max_distance_moved_for_yellow_announcement {
             get {
-                return ((int)(this["max_distance_moved_for_yellow_annoucement"]));
+                return ((int)(this["max_distance_moved_for_yellow_announcement"]));
             }
             set {
-                this["max_distance_moved_for_yellow_annoucement"] = value;
+                this["max_distance_moved_for_yellow_announcement"] = value;
             }
         }
     }

@@ -54,7 +54,7 @@ namespace CrewChiefV4.Events
         //  used when we know the corner name:
         private String folderNameHasGoneOffInOutro = "flags/name_has_gone_off_in_outro";
 
-        private int maxDistanceMovedForYellowAnnouncement = UserSettings.GetUserSettings().getInt("max_distance_moved_for_yellow_annoucement");
+        private int maxDistanceMovedForYellowAnnouncement = UserSettings.GetUserSettings().getInt("max_distance_moved_for_yellow_announcement");
 
         // for new (RF2 and R3E) impl
         private FlagEnum[] lastSectorFlagsAnnounced = new FlagEnum[] { FlagEnum.GREEN, FlagEnum.GREEN, FlagEnum.GREEN };
