@@ -529,8 +529,8 @@ namespace CrewChiefV4.rFactor1
                     default:
                         break;
                 }
-                String opponentKey = getNameFromBytes(vehicle.vehicleClass) + vehicle.place.ToString();
-                OpponentData opponentPrevious = getOpponentDataForVehicleInfo(vehicle, previousGameState, currentGameState.SessionData.SessionRunningTime);
+                String opponentKey = getNameFromBytes(vehicle.vehicleName);
+                OpponentData opponentPrevious = previousGameState != null && previousGameState.OpponentData.ContainsKey(opponentKey) ? previousGameState.OpponentData[opponentKey] : null;
                 OpponentData opponent = new OpponentData();
                 opponent.DriverRawName = getNameFromBytes(vehicle.driverName).ToLower();
                 opponent.DriverNameSet = opponent.DriverRawName.Length > 0;
@@ -893,42 +893,6 @@ namespace CrewChiefV4.rFactor1
                 default:
                     return SessionPhase.Unavailable;
             }
-        }
-
-        // finds OpponentData for given vehicle based on driver name, vehicle class, and world position
-        private OpponentData getOpponentDataForVehicleInfo(rfVehicleInfo vehicle, GameStateData previousGameState, float sessionRunningTime)
-        {
-            OpponentData opponentPrevious = null;
-            float timeDelta = previousGameState != null ? sessionRunningTime - previousGameState.SessionData.SessionRunningTime : -1;
-            if (previousGameState != null && timeDelta >= 0)
-            {
-                float[] worldPos = { vehicle.pos.x, vehicle.pos.z };
-                float minDistDiff = -1;
-                foreach (OpponentData o in previousGameState.OpponentData.Values)
-                {
-                    String opponentKey = o.CarClass.getClassIdentifier() + o.Position.ToString();
-                    if (o.DriverRawName != getNameFromBytes(vehicle.driverName).ToLower() ||
-                        o.CarClass != getCarClass(vehicle.vehicleName, false) || 
-                        opponentKeysProcessed.Contains(opponentKey))
-                    {
-                        continue;
-                    }
-                    // distance from predicted position
-                    float targetDist = o.Speed * timeDelta;
-                    float dist = (float)Math.Abs(Math.Sqrt((double)((o.WorldPosition[0] - worldPos[0]) * (o.WorldPosition[0] - worldPos[0]) + 
-                        (o.WorldPosition[1] - worldPos[1]) * (o.WorldPosition[1] - worldPos[1]))) - targetDist);
-                    if (minDistDiff < 0 || dist < minDistDiff)
-                    {
-                        minDistDiff = dist;
-                        opponentPrevious = o;
-                    }
-                }
-                if (opponentPrevious != null)
-                {
-                    opponentKeysProcessed.Add(opponentPrevious.CarClass.rf1ClassNames + opponentPrevious.Position.ToString());
-                }
-            }
-            return opponentPrevious;
         }
 
         public SessionType mapToSessionType(Object memoryMappedFileStruct)
