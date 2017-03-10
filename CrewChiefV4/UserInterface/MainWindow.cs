@@ -1254,7 +1254,10 @@ namespace CrewChiefV4
                     downloadPersonalisationsButton.Text = Configuration.getUIString("personalisations_are_up_to_date");
                 }
             }
-            catch (Exception) { }
+            catch (Exception e2) 
+            {
+                Console.WriteLine("Error extracting, " + e2.Message);
+            }
             finally
             {
                 if (success)
