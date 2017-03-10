@@ -65,6 +65,34 @@
 					"distanceRoundLapEnd": 1530,
 				}
 			]
+		},
+		{
+			"rf1TrackName": "Silverstone -- National Layout",
+			"rf2TrackName": "Silverstone -- National Layout",
+			"pcarsTrackName": "Silverstone:National",
+			"raceroomLayoutId": 2345,
+			"trackLandmarks": [
+				{
+					"landmarkName": "copse",
+					"distanceRoundLapStart": 180,
+					"distanceRoundLapEnd": 360,
+				},
+				{
+					"landmarkName": "beckets",
+					"distanceRoundLapStart": 730,
+					"distanceRoundLapEnd": 1020,
+				},
+				{
+					"landmarkName": "brooklands",
+					"distanceRoundLapStart": 1680,
+					"distanceRoundLapEnd": 1830
+				},
+				{
+					"landmarkName": "luffield",
+					"distanceRoundLapStart": 1890,
+					"distanceRoundLapEnd": 2060,
+				}
+			]
 		}
 	]
 }
