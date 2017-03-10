@@ -134,8 +134,15 @@ namespace CrewChiefV4.rFactor1
                 shared.session >= 5 && shared.session <= 8 ? shared.session - 5 :
                 shared.session >= 10 && shared.session <= 13 ? shared.session - 10 : 0;
             currentGameState.SessionData.SessionType = mapToSessionType(shared);
-            Boolean startedNewLap = previousGameState != null && (previousGameState != null && player.sector != previousGameState.SessionData.SectorNumber);
-            SessionPhase previousSessionPhase = previousGameState != null ? previousGameState.SessionData.SessionPhase : SessionPhase.Unavailable;
+
+            Boolean startedNewLap = false;
+            SessionPhase previousSessionPhase = SessionPhase.Unavailable;
+            if (previousGameState != null) 
+            {
+                int previousSectorNumber = player.sector == 0 ? 3 : player.sector;
+                startedNewLap = player.sector == 1 && previousSectorNumber == 3;
+                previousSessionPhase = previousGameState.SessionData.SessionPhase;
+            }            
             Boolean isInPits = player.inPits == 1;
             currentGameState.SessionData.SessionPhase = mapToSessionPhase((rFactor1Constant.rfGamePhase)shared.gamePhase, previousSessionPhase, startedNewLap, isInPits);
 
