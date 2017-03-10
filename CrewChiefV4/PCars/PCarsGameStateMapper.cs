@@ -361,7 +361,7 @@ namespace CrewChiefV4.PCars
                 lastSessionRunningTime, shared.mPitMode, previousGameState == null ? null : previousGameState.OpponentData, shared.mSpeed);
                         
             currentGameState.SessionData.TrackDefinition = TrackData.getTrackDefinition(StructHelper.getNameFromBytes(shared.mTrackLocation)
-                + ":" + StructHelper.getNameFromBytes(shared.mTrackVariation), shared.mTrackLength);
+                + ":" + StructHelper.getNameFromBytes(shared.mTrackVariation), -1, shared.mTrackLength);
 
             // now check if this is a new session...
 
@@ -462,7 +462,7 @@ namespace CrewChiefV4.PCars
                         currentGameState.SessionData.LeaderHasFinishedRace = false;
                         currentGameState.SessionData.NumCarsAtStartOfSession = shared.mNumParticipants;
                         currentGameState.SessionData.TrackDefinition = TrackData.getTrackDefinition(StructHelper.getNameFromBytes(shared.mTrackLocation) + ":" +
-                            StructHelper.getNameFromBytes(shared.mTrackVariation), shared.mTrackLength);
+                            StructHelper.getNameFromBytes(shared.mTrackVariation), -1, shared.mTrackLength);
                         currentGameState.SessionData.TrackDefinition.setGapPoints();
                         currentGameState.carClass = CarData.getCarClassForClassName(StructHelper.getNameFromBytes(shared.mCarClassName));
 

@@ -1,0 +1,70 @@
+{
+    "TrackLandmarksData": [
+		{
+			"rf1TrackName": "Bathurst",
+			"rf2TrackName": "Bathurst",
+			"pcarsTrackName": "Bathurst:",
+			"raceroomLayoutId": 1846,
+			"trackLandmarks": [
+				{
+					"landmarkName": "griffins_bend",
+					"distanceRoundLapStart": 1290,
+					"distanceRoundLapEnd": 1480,				
+				},
+				{
+					"landmarkName": "the_cutting",
+					"distanceRoundLapStart": 1720,
+					"distanceRoundLapEnd": 1910,
+				},
+				{
+					"landmarkName": "the_dipper",
+					"distanceRoundLapStart": 3240,
+					"distanceRoundLapEnd": 3420,
+				},
+				{
+					"landmarkName": "forrests_elbow",
+					"distanceRoundLapStart": 3700,
+					"distanceRoundLapEnd": 3800,
+				},
+				{
+					"landmarkName": "the_chase",
+					"distanceRoundLapStart": 5060,
+					"distanceRoundLapEnd": 5500,
+				}
+			]
+		},
+		{
+			"rf1TrackName": "Brands Indy",
+			"rf2TrackName": "Brands Hatch Indy",
+			"pcarsTrackName": "Brands Hatch:Indy",
+			"raceroomLayoutId": 2345,
+			"trackLandmarks": [
+				{
+					"landmarkName": "paddock_hill",
+					"distanceRoundLapStart": 270,
+					"distanceRoundLapEnd": 440,
+				},
+				{
+					"landmarkName": "druids",
+					"distanceRoundLapStart": 590,
+					"distanceRoundLapEnd": 690,
+				},
+				{
+					"landmarkName": "clark",
+					"distanceRoundLapStart": 850,
+					"distanceRoundLapEnd": 930
+				},
+				{
+					"landmarkName": "surtees",
+					"distanceRoundLapStart": 1230,
+					"distanceRoundLapEnd": 1300,
+				},
+				{
+					"landmarkName": "clearways",
+					"distanceRoundLapStart": 1350,
+					"distanceRoundLapEnd": 1530,
+				}
+			]
+		}
+	]
+}
