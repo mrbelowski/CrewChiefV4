@@ -652,6 +652,7 @@ namespace CrewChiefV4
                     return;
                 }
                 CarData.loadCarClassData();
+                TrackData.loadTrackLandmarksData();
                 this.runListenForButtonPressesThread = controllerConfiguration.listenForButtons(voiceOption == VoiceOptionEnum.TOGGLE);
                 this.assignButtonToAction.Enabled = false;
                 this.deleteAssigmentButton.Enabled = false;

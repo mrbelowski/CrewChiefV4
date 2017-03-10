@@ -1,15 +1,148 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 
 namespace CrewChiefV4
 {
+    public class TrackLandmark
+    {
+        public String landmarkName { get; set; }
+        public float distanceRoundLapStart { get; set; }
+        public float distanceRoundLapEnd { get; set; }
+    }
+
+    public class TrackLandmarksForTrack
+    {
+        public String rf1TrackName { get; set; }
+        public String rf2TrackName { get; set; }
+        public String pcarsTrackName { get; set; }
+        public String acTrackName { get; set; }
+        public int raceroomLayoutId { get; set; }
+        public List<TrackLandmark> trackLandmarks { get; set; }
+        public TrackLandmarksForTrack()
+        {
+            this.trackLandmarks = new List<TrackLandmark>();
+            this.raceroomLayoutId = -1;
+        }
+    }
+    public class TrackLandmarksData
+    {
+        public List<TrackLandmarksForTrack> trackLandmarksData { get; set; }
+        public TrackLandmarksData()
+        {
+            this.trackLandmarksData = new List<TrackLandmarksForTrack>();
+        }
+
+        public List<TrackLandmark> getTrackLandmarksForTrackName(String trackName)
+        {
+            foreach (TrackLandmarksForTrack trackLandmarksForTrack in trackLandmarksData)
+            {
+                switch (CrewChief.gameDefinition.gameEnum)
+                {
+                    case GameEnum.ASSETTO_32BIT:
+                    case GameEnum.ASSETTO_64BIT:
+                        if (trackLandmarksForTrack.acTrackName.Equals(trackName))
+                        {
+                            return trackLandmarksForTrack.trackLandmarks;
+                        }
+                        break;
+                    case GameEnum.PCARS_32BIT:
+                    case GameEnum.PCARS_64BIT:
+                    case GameEnum.PCARS_NETWORK:
+                        if (trackLandmarksForTrack.pcarsTrackName.Equals(trackName))
+                        {
+                            return trackLandmarksForTrack.trackLandmarks;
+                        }
+                        break;
+                    case GameEnum.RF1:
+                        if (trackLandmarksForTrack.rf1TrackName.Equals(trackName))
+                        {
+                            return trackLandmarksForTrack.trackLandmarks;
+                        }
+                        break;
+                    case GameEnum.RF2_64BIT:
+                        if (trackLandmarksForTrack.rf2TrackName.Equals(trackName))
+                        {
+                            return trackLandmarksForTrack.trackLandmarks;
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+            return new List<TrackLandmark>();
+        }
+
+        public List<TrackLandmark> getTrackLandmarksForTrackLayoutId(int raceroomLayoutId)
+        {
+            foreach (TrackLandmarksForTrack trackLandmarksForTrack in trackLandmarksData)
+            {
+                if (trackLandmarksForTrack.raceroomLayoutId == raceroomLayoutId)
+                {
+                    return trackLandmarksForTrack.trackLandmarks;
+                }
+            }
+            return new List<TrackLandmark>();
+        }
+
+        public static TrackLandmarksData getTrackLandmarksDataFromFile(String filename)
+        {
+            if (filename != null)
+            {
+                try
+                {
+                    return JsonConvert.DeserializeObject<TrackLandmarksData>(getFileContents(filename));
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Error pasing " + filename + ": " + e.Message);
+                }
+            }
+            return new TrackLandmarksData();
+        }
+
+        private static String getFileContents(String fullFilePath)
+        {
+            StringBuilder jsonString = new StringBuilder();
+            StreamReader file = null;
+            try
+            {
+                file = new StreamReader(fullFilePath);
+                String line;
+                while ((line = file.ReadLine()) != null)
+                {
+                    if (!line.Trim().StartsWith("#"))
+                    {
+                        jsonString.AppendLine(line);
+                    }
+                }
+                return jsonString.ToString();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error reading file " + fullFilePath + ": " + e.Message);
+            }
+            finally
+            {
+                if (file != null)
+                {
+                    file.Close();
+                }
+            }
+            return null;
+        }
+    }
+
     public class TrackData
     {
         // any track over 3500 metres will use gap points
         public static float gapPointsThreshold = 3300f;
         public static float gapPointSpacing = 780f;
+
+        public static TrackLandmarksData TRACK_LANDMARKS_DATA;
 
         public static List<TrackDefinition> pCarsTracks = new List<TrackDefinition>()
         {
@@ -132,7 +265,49 @@ namespace CrewChiefV4
             
         };
 
-        public static TrackDefinition getTrackDefinition(String trackName, float trackLength)
+        public static void loadTrackLandmarksData()
+        {
+            TRACK_LANDMARKS_DATA = TrackLandmarksData.getTrackLandmarksDataFromFile(getDefaultTrackLandmarksFileLocation());
+        }
+
+        public static String getLandmarkForLapDistance(TrackDefinition currentTrack, float lapDistance)
+        {
+            if (currentTrack != null && lapDistance > 0) 
+            {
+                List<TrackLandmark> landmarks;
+                if (CrewChief.gameDefinition.gameEnum == GameEnum.RACE_ROOM)
+                {
+                    landmarks = TRACK_LANDMARKS_DATA.getTrackLandmarksForTrackLayoutId(currentTrack.id);
+                }
+                else 
+                {
+                    landmarks = TRACK_LANDMARKS_DATA.getTrackLandmarksForTrackName(currentTrack.name);
+                }
+                foreach (TrackLandmark trackLandmark in landmarks)
+                {
+                    if (lapDistance > trackLandmark.distanceRoundLapStart && lapDistance < trackLandmark.distanceRoundLapEnd)
+                    {
+                        return trackLandmark.landmarkName;
+                    }
+                }                
+            }
+            return null;
+        }
+
+        private static String getDefaultTrackLandmarksFileLocation()
+        {
+            String path = Configuration.getDefaultFileLocation("trackLandmarksData.json");
+            if (File.Exists(path))
+            {
+                return path;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public static TrackDefinition getTrackDefinition(String trackName, int trackId, float trackLength)
         {
             if (CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_32BIT || CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_64BIT || CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_NETWORK)
             {
@@ -166,16 +341,15 @@ namespace CrewChiefV4
             }
             else if (CrewChief.gameDefinition.gameEnum == GameEnum.RACE_ROOM)
             {
-                return new TrackDefinition("R3E track, length = " + trackLength, trackLength);
+                return new TrackDefinition(trackName, trackId, trackLength);
             }
-            else if (CrewChief.gameDefinition.gameEnum == GameEnum.RF1)
+            else if (trackName != null)
             {
                 return new TrackDefinition(trackName, trackLength);
             }
             else
             {
-                String nameToLog = trackName != null ? trackName : "null";
-                return new TrackDefinition("unknown track - name " + nameToLog + ", length = " + trackLength, trackLength);
+                return new TrackDefinition("unknown track , length = " + trackLength, trackLength);
             }
         }
         public static TrackDefinition getTrackDefinition(String trackName, float trackLength, int sectorsOnTrack)
@@ -223,6 +397,7 @@ namespace CrewChiefV4
     // All kinds of issues with this.
     public class TrackDefinition
     {
+        public int id;
         public String name;
         public float trackLength;
         public Boolean hasPitLane;
@@ -233,6 +408,8 @@ namespace CrewChiefV4
         public int sectorsOnTrack = 3;
         public float[] sectorPoints = new float[] { 0, 0 };
         public Boolean unknownTrack = false;
+        public List<TrackLandmark> trackLandmarks = new List<TrackLandmark>();
+
         public TrackDefinition(String name, float pitEntryExitPointsDiameter, float trackLength, float[] pitEntryPoint, float[] pitExitPoint)
         {
             this.name = name;
@@ -246,6 +423,14 @@ namespace CrewChiefV4
         public TrackDefinition(String name, float trackLength)
         {
             this.name = name;
+            this.trackLength = trackLength;
+            this.hasPitLane = false;
+        }
+
+        public TrackDefinition(String name, int id, float trackLength)
+        {
+            this.name = name;
+            this.id = id;
             this.trackLength = trackLength;
             this.hasPitLane = false;
         }
@@ -308,6 +493,11 @@ namespace CrewChiefV4
         {
             return hasPitLane && Math.Abs(pitExitPoint[0] - x) < pitEntryExitPointsDiameter &&
                 Math.Abs(pitExitPoint[1] - y) < pitEntryExitPointsDiameter;
+        }
+
+        public void setTrackLandmarks(List<TrackLandmark> trackLandmarks)
+        {
+            this.trackLandmarks = trackLandmarks;
         }
     }
 }
