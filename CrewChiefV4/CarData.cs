@@ -176,6 +176,8 @@ namespace CrewChiefV4
         private static Dictionary<string, CarClass> nameToCarClass;
         private static Dictionary<int, CarClass> intToCarClass;
         private static List<String> userCarClassIds = new List<string>();
+        public static int RACEROOM_CLASS_ID = -1;
+        public static String CLASS_ID = "";
 
         public class CarClass
         {
