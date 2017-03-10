@@ -44,7 +44,7 @@ namespace CrewChiefV4.Audio
 
         public static SpeechSynthesizer synthesizer;
 
-        public static Boolean hasSuitableTTSVoice = true;
+        public static Boolean hasSuitableTTSVoice = false;
 
         public SoundCache(DirectoryInfo soundsFolder, String[] eventTypesToKeepCached, Boolean useSwearyMessages, Boolean allowCaching, String selectedPersonalisation)
         {
@@ -106,7 +106,7 @@ namespace CrewChiefV4.Audio
                                 "Check a suitable Microsoft TTS voice pack is installed");
                     useTTS = false;
                 }
-            } 
+            }
             this.currentLoadedCount = 0;
             this.eventTypesToKeepCached = eventTypesToKeepCached;
             this.useSwearyMessages = useSwearyMessages;

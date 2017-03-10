@@ -6,7 +6,7 @@
 #
 # The valid params are:
 # {
-#    "carClassEnum": this is the built-in car class group (see complete list below). If this doesn't match, the app will assign this to UNKNOWN_RACE car group, with the params you specify
+#    "carClassEnum": this is the built-in car class group (see complete list below). It must match on of these built in types.
 #    "pCarsClassNames": this is a comma (,) separated array of pCars classnames. * or ? denote wildcards. The app searches for classes which have full matches before considering wildcards
 #    "rf2ClassNames": as above, for rFactor2
 #    "rf1ClassNames": as above, for rFactor1, AMS, GSC, FTruck, and other RF1 based games (the Reiza games)
@@ -38,7 +38,7 @@
 # VINTAGE_F1_C, STOCK_CAR, F1, F2, F3, F4, FF, TC1, TC2, TC1_2014, AUDI_TT_CUP,
 # AUDI_TT_VLN, CLIO_CUP, DTM, DTM_2013, V8_SUPERCAR, DTM_2014, DTM_2015, DTM_2016,
 # TRANS_AM, HILL_CLIMB_ICONS, FORMULA_RENAULT, MEGANE_TROPHY, NSU_TT, KTM_RR,
-# INDYCAR, HYPER_CAR, HYPER_CAR_RACE, UNKNOWN_RACE
+# INDYCAR, HYPER_CAR, HYPER_CAR_RACE, STOCK_V8, BOXER_CUP, UNKNOWN_RACE
 #
 # 
 # Car classes can skip an entry if they're using the default - e.g. most cars
@@ -347,7 +347,8 @@
         {
             "carClassEnum": "TC2",
             "raceroomClassIds": [ 1922 ],
-            "pCarsClassNames": [ "TC2" ]
+            "pCarsClassNames": [ "TC2" ],
+            "rf1ClassNames":  [ "Marcas" ]
         },
         {
             "carClassEnum": "AUDI_TT_CUP",
@@ -367,7 +368,7 @@
             "pCarsClassNames": [ "Road D" ],
             "defaultTyreType": "Road",
             "brakeType": "Iron_Road",
-            "maxSafeWaterTemp": 96,
+            "maxSafeWaterTemp": 102,
             "maxSafeOilTemp": 115
         },
         {
@@ -375,7 +376,7 @@
             "pCarsClassNames": [ "Road C2" ],
             "defaultTyreType": "Road",
             "brakeType": "Iron_Road",
-            "maxSafeWaterTemp": 96,
+            "maxSafeWaterTemp": 102,
             "maxSafeOilTemp": 115
         },
         {
@@ -383,7 +384,7 @@
             "pCarsClassNames": [ "Road C1" ],
             "defaultTyreType": "Road",
             "brakeType": "Iron_Road",
-            "maxSafeWaterTemp": 96,
+            "maxSafeWaterTemp": 105,
             "maxSafeOilTemp": 115
         },
         {
@@ -391,7 +392,7 @@
             "pCarsClassNames": [ "Road B" ],
             "defaultTyreType": "Road",
             "brakeType": "Iron_Road",
-            "maxSafeWaterTemp": 96,
+            "maxSafeWaterTemp": 102,
             "maxSafeOilTemp": 115
         },
         {
@@ -408,13 +409,13 @@
         {
             "carClassEnum": "NSU_TT",
             "raceroomClassIds": [ 4813 ],
-            "maxSafeWaterTemp": 96,
+            "maxSafeWaterTemp": 1020,
             "maxSafeOilTemp": 115
         },
         {
             "carClassEnum": "KTM_RR",
             "raceroomClassIds": [ 5385 ],
-            "maxSafeWaterTemp": 96,
+            "maxSafeWaterTemp": 102,
             "maxSafeOilTemp": 115
         },
         {
@@ -428,6 +429,18 @@
             "carClassEnum": "HYPER_CAR_RACE",
             "acClassNames": [ "ferrari_599xxevo", "pagani_zonda_r", "ks_ferrari_fxx_k" ],
             "brakeType": "Carbon"
+        },
+        {
+            "carClassEnum": "BOXER_CUP",
+            "rf1ClassNames": [ "BoxerCup" ],
+            "maxSafeWaterTemp": 120,
+            "maxSafeOilTemp": 125
+        },
+        {
+            "carClassEnum": "STOCK_V8",
+            "rf1ClassNames": [ "SupV8" ],
+            "maxSafeWaterTemp": 120,
+            "maxSafeOilTemp": 125
         }
     ]
 }

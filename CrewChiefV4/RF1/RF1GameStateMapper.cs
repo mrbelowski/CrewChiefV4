@@ -90,7 +90,7 @@ namespace CrewChiefV4.rFactor1
             // get player scoring info (usually index 0)
             // get session leader scoring info (usually index 1 if not player)
             rFactor1Data.rfVehicleInfo player = new rfVehicleInfo();
-            rFactor1Data.rfVehicleInfo leader = new rfVehicleInfo();
+            rFactor1Data.rfVehicleInfo leader = new rfVehicleInfo();            
             for (int i = 0; i < shared.numVehicles; i++)
             {
                 rFactor1Data.rfVehicleInfo vehicle = shared.vehicle[i];
@@ -134,7 +134,10 @@ namespace CrewChiefV4.rFactor1
                 shared.session >= 5 && shared.session <= 8 ? shared.session - 5 :
                 shared.session >= 10 && shared.session <= 13 ? shared.session - 10 : 0;
             currentGameState.SessionData.SessionType = mapToSessionType(shared);
-            currentGameState.SessionData.SessionPhase = mapToSessionPhase((rFactor1Constant.rfGamePhase)shared.gamePhase);
+            Boolean startedNewLap = previousGameState != null && (previousGameState != null && player.sector != previousGameState.SessionData.SectorNumber);
+            SessionPhase previousSessionPhase = previousGameState != null ? previousGameState.SessionData.SessionPhase : SessionPhase.Unavailable;
+            Boolean isInPits = player.inPits == 1;
+            currentGameState.SessionData.SessionPhase = mapToSessionPhase((rFactor1Constant.rfGamePhase)shared.gamePhase, previousSessionPhase, startedNewLap, isInPits);
 
             // --------------------------------
             // flags data
@@ -173,9 +176,9 @@ namespace CrewChiefV4.rFactor1
                     }
                 }
             }
-
             if (currentGameState.SessionData.SessionPhase == SessionPhase.Green)
             {
+                //Console.WriteLine(shared.sectorFlag[0] + " : " + shared.sectorFlag[1] + " : " + shared.sectorFlag[2]);
                 // Mark Yellow sectors.
                 // RF1 uses 2 as the yellow sector indicator, but the plugin sends the sector *after* the sector
                 // where in incident actually is
@@ -192,8 +195,8 @@ namespace CrewChiefV4.rFactor1
                     currentGameState.FlagData.sectorFlags[1] = FlagEnum.YELLOW;
                 }
             }
-            
-            currentGameState.carClass = CarData.getCarClassForClassName(getNameFromBytes(player.vehicleClass));
+
+            currentGameState.carClass = getCarClass(shared.vehicleName);
             brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(currentGameState.carClass);
             currentGameState.SessionData.DriverRawName = getNameFromBytes(player.driverName).ToLower();
             currentGameState.SessionData.TrackDefinition = new TrackDefinition(getNameFromBytes(shared.trackName), shared.lapDist);
@@ -291,12 +294,13 @@ namespace CrewChiefV4.rFactor1
             currentGameState.EngineData.MinutesIntoSessionBeforeMonitoring = 5;
             currentGameState.EngineData.EngineOilTemp = shared.engineOilTemp;
             currentGameState.EngineData.EngineWaterTemp = shared.engineWaterTemp;
-            //HACK: there's probably a cleaner way to do this...
-            if (shared.overheating == 1)
-            {
-                currentGameState.EngineData.EngineWaterTemp += 50;
-                currentGameState.EngineData.EngineOilTemp += 50;
-            }
+            //HACK: there's probably a cleaner way to do this...            
+            // JB: apparently CC is too sensitive to engine temperatures, so disable this for now.
+            // if (shared.overheating == 1)
+            // {
+            //     currentGameState.EngineData.EngineWaterTemp += 50;
+            //     currentGameState.EngineData.EngineOilTemp += 50;
+            // }
 
             // --------------------------------
             // transmission data
@@ -523,7 +527,7 @@ namespace CrewChiefV4.rFactor1
                 OpponentData opponent = new OpponentData();
                 opponent.DriverRawName = getNameFromBytes(vehicle.driverName).ToLower();
                 opponent.DriverNameSet = opponent.DriverRawName.Length > 0;
-                opponent.CarClass = CarData.getCarClassForClassName(getNameFromBytes(vehicle.vehicleClass));
+                opponent.CarClass = getCarClass(vehicle.vehicleName);
                 opponent.Position = vehicle.place;
                 if (opponent.DriverNameSet && opponentPrevious == null && CrewChief.enableDriverNames)
                 {
@@ -555,6 +559,7 @@ namespace CrewChiefV4.rFactor1
                 opponent.bestSector2Time = vehicle.bestSector2 > 0 && vehicle.bestSector1 > 0 ? vehicle.bestSector2 - vehicle.bestSector1 : -1;
                 opponent.bestSector3Time = vehicle.bestLapTime > 0 && vehicle.bestSector2 > 0 ? vehicle.bestLapTime - vehicle.bestSector2 : -1;
                 opponent.LastLapTime = vehicle.lastLapTime > 0 ? vehicle.lastLapTime : -1;
+                opponent.InPits = vehicle.inPits == 1;
                 float lastSectorTime = -1;
                 switch (opponent.CurrentSectorNumber)
                 {
@@ -570,17 +575,18 @@ namespace CrewChiefV4.rFactor1
                     default:
                         break;
                 }
+                // on the first flying lap the lastSectorTime values for sectors 1 and 2 will all be zero, so we miss the first laptime unless we assume the first flying lap
+                // is valid and use the game timer to derive the lap time :(
                 if (opponent.IsNewLap)
                 {
-                    if (lastSectorTime > 0)
-                    {
-                        opponent.CompleteLapWithProvidedLapTime(opponent.Position, vehicle.lapStartET, lastSectorTime, true, false, shared.trackTemp, shared.ambientTemp, currentGameState.SessionData.SessionHasFixedTime, currentGameState.SessionData.SessionTimeRemaining);
-                    }
-                    opponent.StartNewLap(opponent.CompletedLaps + 1, opponent.Position, vehicle.inPits == 1 || opponent.DistanceRoundTrack < 0, vehicle.lapStartET, false, shared.trackTemp, shared.ambientTemp);
+                    opponent.CompleteLapWithProvidedLapTime(opponent.Position, currentGameState.SessionData.SessionRunningTime,
+                            lastSectorTime, lastSectorTime > 0, false, shared.trackTemp, shared.ambientTemp, currentGameState.SessionData.SessionHasFixedTime, currentGameState.SessionData.SessionTimeRemaining);
+                    opponent.StartNewLap(opponent.CompletedLaps + 1, opponent.Position, vehicle.inPits == 1 || opponent.DistanceRoundTrack < 0, currentGameState.SessionData.SessionRunningTime, false, shared.trackTemp, shared.ambientTemp);
                 }
-                else if (isNewSector && lastSectorTime > 0)
+                else if (isNewSector)
                 {
-                    opponent.AddCumulativeSectorData(opponent.Position, lastSectorTime, vehicle.lapStartET + lastSectorTime, true, false, shared.trackTemp, shared.ambientTemp);
+                    opponent.AddCumulativeSectorData(opponent.Position, lastSectorTime, currentGameState.SessionData.SessionRunningTime,
+                        lastSectorTime > 0 || (opponent.CurrentSectorNumber >= 2 && vehicle.totalLaps == 1), false, shared.trackTemp, shared.ambientTemp);
                 }
                 if (vehicle.inPits == 1 && opponent.CurrentSectorNumber == 3 && opponentPrevious != null && !opponentPrevious.isEnteringPits())
                 {
@@ -844,7 +850,8 @@ namespace CrewChiefV4.rFactor1
             }
         }
 
-        private SessionPhase mapToSessionPhase(rFactor1Constant.rfGamePhase sessionPhase)
+        private SessionPhase mapToSessionPhase(rFactor1Constant.rfGamePhase sessionPhase, SessionPhase previousSessionPhase, 
+            Boolean startedNewLap, Boolean isInPit)
         {
             switch (sessionPhase)
             {
@@ -861,7 +868,14 @@ namespace CrewChiefV4.rFactor1
                 // sessions never go to sessionStopped, they always go straight from greenFlag to sessionOver
                 case rFactor1Constant.rfGamePhase.sessionStopped:
                 case rFactor1Constant.rfGamePhase.sessionOver:
-                    return SessionPhase.Finished;
+                    if (isInPit || startedNewLap || previousSessionPhase == SessionPhase.Finished)
+                    {
+                        return SessionPhase.Finished;
+                    }
+                    else
+                    {
+                        return SessionPhase.Checkered;
+                    }
                 // fullCourseYellow will count as greenFlag since we'll call it out in the Flags separately anyway
 
                     // TODO: can we map to FullCourseYellow here?
@@ -887,7 +901,7 @@ namespace CrewChiefV4.rFactor1
                 {
                     String opponentKey = o.CarClass.getClassIdentifier() + o.Position.ToString();
                     if (o.DriverRawName != getNameFromBytes(vehicle.driverName).ToLower() ||
-                        o.CarClass != CarData.getCarClassForClassName(getNameFromBytes(vehicle.vehicleClass)) || 
+                        o.CarClass != getCarClass(vehicle.vehicleName) || 
                         opponentKeysProcessed.Contains(opponentKey))
                     {
                         continue;
@@ -978,6 +992,27 @@ namespace CrewChiefV4.rFactor1
         public static String getNameFromBytes(byte[] name)
         {
             return Encoding.UTF8.GetString(name).TrimEnd('\0').Trim();
-        } 
+        }
+
+        /**
+         * For AMS, vehicleName has the form classname: driver name #number
+         */
+        public CarData.CarClass getCarClass(byte[] vehicleName)
+        {
+            if (vehicleName.Length > 0)
+            {
+                String vehicleNameStr = getNameFromBytes(vehicleName);
+                int splitChar = vehicleNameStr.IndexOf(':');
+                if (splitChar > 0)
+                {
+                    return CarData.getCarClassForClassName(vehicleNameStr.Substring(0, splitChar));
+                }
+                else
+                {
+                    return CarData.getCarClassForClassName(vehicleNameStr);
+                }
+            }
+            return null;
+        }
     }
 }
