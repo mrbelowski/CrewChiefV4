@@ -139,8 +139,8 @@ namespace CrewChiefV4.rFactor1
             SessionPhase previousSessionPhase = SessionPhase.Unavailable;
             if (previousGameState != null) 
             {
-                int previousSectorNumber = player.sector == 0 ? 3 : player.sector;
-                startedNewLap = player.sector == 1 && previousSectorNumber == 3;
+                // player.sectorNumber might go to 0 at session-end
+                startedNewLap = previousGameState.SessionData.SectorNumber == 3 && player.sector <= 1;
                 previousSessionPhase = previousGameState.SessionData.SessionPhase;
             }            
             Boolean isInPits = player.inPits == 1;
