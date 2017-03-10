@@ -582,6 +582,28 @@ namespace CrewChiefV4
                         crewChief.audioPlayer.repeatLastMessage();
                         nextPollWait = 1000;
                     }
+                    else if (controllerConfiguration.hasOutstandingClick(ControllerConfiguration.PRINT_TRACK_DATA))
+                    {
+                        if (crewChief.currentGameState != null && crewChief.currentGameState.SessionData != null && 
+                            crewChief.currentGameState.SessionData.TrackDefinition != null)
+                        {
+                            if (CrewChief.gameDefinition.gameEnum == GameEnum.RACE_ROOM) 
+                            {
+                                Console.WriteLine("raceroomLayoutId: " + crewChief.currentGameState.SessionData.TrackDefinition.id + ", distanceRoundLap = " +
+                                    crewChief.currentGameState.PositionAndMotionData.DistanceRoundTrack + ", player's car ID: " + CarData.RACEROOM_CLASS_ID);
+                            }
+                            else
+                            {
+                                Console.WriteLine("TrackName: " + crewChief.currentGameState.SessionData.TrackDefinition.name + ", distanceRoundLap = " +
+                                    crewChief.currentGameState.PositionAndMotionData.DistanceRoundTrack + ", player's car ID: " + CarData.CLASS_ID);
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine("No track data available");
+                        }
+                        nextPollWait = 1000;
+                    }
                     else if (controllerConfiguration.hasOutstandingClick(ControllerConfiguration.VOLUME_UP))
                     {
                         if (currentVolume == -1)

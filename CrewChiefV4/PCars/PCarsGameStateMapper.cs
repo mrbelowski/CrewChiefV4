@@ -327,7 +327,9 @@ namespace CrewChiefV4.PCars
 
             if (currentGameState.carClass.carClassEnum == CarData.CarClassEnum.UNKNOWN_RACE)
             {
-                CarData.CarClass newClass = CarData.getCarClassForClassName(StructHelper.getNameFromBytes(shared.mCarClassName));
+                String carClassId = StructHelper.getNameFromBytes(shared.mCarClassName);
+                CarData.CarClass newClass = CarData.getCarClassForClassName(carClassId);
+                CarData.CLASS_ID = carClassId;
                 if (newClass.getClassIdentifier() != currentGameState.carClass.getClassIdentifier())
                 {
                     currentGameState.carClass = newClass;
@@ -414,7 +416,9 @@ namespace CrewChiefV4.PCars
                 currentGameState.SessionData.DriverRawName = playerName;
                 currentGameState.PitData.IsRefuellingAllowed = true;
 
-                currentGameState.carClass = CarData.getCarClassForClassName(StructHelper.getNameFromBytes(shared.mCarClassName));
+                String carClassId = StructHelper.getNameFromBytes(shared.mCarClassName);
+                currentGameState.carClass = CarData.getCarClassForClassName(carClassId);
+                CarData.CLASS_ID = carClassId;
 
                 Console.WriteLine("Player is using car class " + currentGameState.carClass.getClassIdentifier());
                 brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(currentGameState.carClass);
@@ -464,7 +468,10 @@ namespace CrewChiefV4.PCars
                         currentGameState.SessionData.TrackDefinition = TrackData.getTrackDefinition(StructHelper.getNameFromBytes(shared.mTrackLocation) + ":" +
                             StructHelper.getNameFromBytes(shared.mTrackVariation), -1, shared.mTrackLength);
                         currentGameState.SessionData.TrackDefinition.setGapPoints();
-                        currentGameState.carClass = CarData.getCarClassForClassName(StructHelper.getNameFromBytes(shared.mCarClassName));
+
+                        String carClassId = StructHelper.getNameFromBytes(shared.mCarClassName);
+                        currentGameState.carClass = CarData.getCarClassForClassName(carClassId);
+                        CarData.CLASS_ID = carClassId;
 
                         Console.WriteLine("Player is using car class " + currentGameState.carClass.getClassIdentifier());
                         brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(currentGameState.carClass);
