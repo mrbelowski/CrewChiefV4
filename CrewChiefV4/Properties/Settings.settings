@@ -467,5 +467,8 @@
     <Setting Name="acs_practice_time_minuts" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">60</Value>
     </Setting>
+    <Setting Name="report_yellows_in_all_sectors" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

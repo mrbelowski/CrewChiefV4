@@ -1882,5 +1882,17 @@ namespace CrewChiefV4.Properties {
                 this["acs_practice_time_minuts"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool report_yellows_in_all_sectors {
+            get {
+                return ((bool)(this["report_yellows_in_all_sectors"]));
+            }
+            set {
+                this["report_yellows_in_all_sectors"] = value;
+            }
+        }
     }
 }
