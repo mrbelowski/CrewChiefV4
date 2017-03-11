@@ -141,6 +141,178 @@
 					"distanceRoundLapEnd": 3940
 				}
 			]
+		},
+		{
+			"rf1TrackName": "HockenheimRing DTM",
+			"rf2TrackName": "HockenheimRing DTM",
+			"trackLandmarks": [
+				{
+					"landmarkName": "nord_kurve",
+					"distanceRoundLapStart": 200,
+					"distanceRoundLapEnd": 350
+				},
+				{
+					"landmarkName": "turn2",
+					"distanceRoundLapStart": 750,
+					"distanceRoundLapEnd": 860
+				},
+				{
+					"landmarkName": "turn3",
+					"distanceRoundLapStart": 860,
+					"distanceRoundLapEnd": 930
+				},
+				{
+					"landmarkName": "turn4",
+					"distanceRoundLapStart": 930,
+					"distanceRoundLapEnd": 1050
+				},
+				{
+					"landmarkName": "parabolika",
+					"distanceRoundLapStart": 1050,
+					"distanceRoundLapEnd": 1900
+				},
+				{
+					"landmarkName": "hairpin",
+					"distanceRoundLapStart": 2000,
+					"distanceRoundLapEnd": 2150
+				},
+				{
+					"landmarkName": "turn7",
+					"distanceRoundLapStart": 2400,
+					"distanceRoundLapEnd": 2650
+				},
+				{
+					"landmarkName": "mercedes",
+					"distanceRoundLapStart": 2750,
+					"distanceRoundLapEnd": 2850
+				},
+				{
+					"landmarkName": "turn9",
+					"distanceRoundLapStart": 2850,
+					"distanceRoundLapEnd": 2950
+				},
+				{
+					"landmarkName": "turn10",
+					"distanceRoundLapStart": 2950,
+					"distanceRoundLapEnd": 3150
+				},
+				{
+					"landmarkName": "mobil_1",
+					"distanceRoundLapStart": 3350,
+					"distanceRoundLapEnd": 3570
+				},
+				{
+					"landmarkName": "sachs",
+					"distanceRoundLapStart": 3700,
+					"distanceRoundLapEnd": 3860
+				},
+				{
+					"landmarkName": "turn13",
+					"distanceRoundLapStart": 3900,
+					"distanceRoundLapEnd": 4010
+				},
+				{
+					"landmarkName": "turn14",
+					"distanceRoundLapStart": 4010,
+					"distanceRoundLapEnd": 4080
+				},
+				{
+					"landmarkName": "turn15",
+					"distanceRoundLapStart": 4090,
+					"distanceRoundLapEnd": 4210
+				},
+				{
+					"landmarkName": "sud_kurve",
+					"distanceRoundLapStart": 4230,
+					"distanceRoundLapEnd": 4400
+				},
+			]
+		},
+		{
+			"rf1TrackName": "HockenheimRing GP",
+			"rf2TrackName": "HockenheimRing GP",
+			"trackLandmarks": [
+				{
+					"landmarkName": "nord_kurve",
+					"distanceRoundLapStart": 200,
+					"distanceRoundLapEnd": 350
+				},
+				{
+					"landmarkName": "turn2",
+					"distanceRoundLapStart": 750,
+					"distanceRoundLapEnd": 860
+				},
+				{
+					"landmarkName": "turn3",
+					"distanceRoundLapStart": 860,
+					"distanceRoundLapEnd": 930
+				},
+				{
+					"landmarkName": "turn4",
+					"distanceRoundLapStart": 930,
+					"distanceRoundLapEnd": 1050
+				},
+				{
+					"landmarkName": "parabolika",
+					"distanceRoundLapStart": 1050,
+					"distanceRoundLapEnd": 1900
+				},
+				{
+					"landmarkName": "hairpin",
+					"distanceRoundLapStart": 2000,
+					"distanceRoundLapEnd": 2150
+				},
+				{
+					"landmarkName": "turn7",
+					"distanceRoundLapStart": 2400,
+					"distanceRoundLapEnd": 2650
+				},
+				{
+					"landmarkName": "mercedes",
+					"distanceRoundLapStart": 2750,
+					"distanceRoundLapEnd": 2850
+				},
+				{
+					"landmarkName": "turn9",
+					"distanceRoundLapStart": 2850,
+					"distanceRoundLapEnd": 2950
+				},
+				{
+					"landmarkName": "turn10",
+					"distanceRoundLapStart": 2950,
+					"distanceRoundLapEnd": 3150
+				},
+				{
+					"landmarkName": "mobil_1",
+					"distanceRoundLapStart": 3350,
+					"distanceRoundLapEnd": 3570
+				},
+				{
+					"landmarkName": "sachs",
+					"distanceRoundLapStart": 3700,
+					"distanceRoundLapEnd": 3860
+				},
+				{
+					"landmarkName": "turn13",
+					"distanceRoundLapStart": 3900,
+					"distanceRoundLapEnd": 4010
+				},
+				{
+					"landmarkName": "turn14",
+					"distanceRoundLapStart": 4010,
+					"distanceRoundLapEnd": 4080
+				},
+				{
+					"landmarkName": "turn15",
+					"distanceRoundLapStart": 4090,
+					"distanceRoundLapEnd": 4210
+				},
+				{
+					"landmarkName": "sud_kurve",
+					"distanceRoundLapStart": 4230,
+					"distanceRoundLapEnd": 4400
+				},
+			]
 		}
 	]
 }
