@@ -86,7 +86,7 @@ namespace CrewChiefV4.rFactor2
             
             if (!this.enabled 
                 || currentState.mCurrentET < this.timeAfterRaceStartToActivate
-                || currentState.mInRealtime == 0
+                || currentState.mInRealtimeFC == 0
                 || currentState.mNumVehicles <= 2)
                 return;
 
