@@ -38,7 +38,6 @@ namespace CrewChiefV4.rFactor2
         private float distanceOffTrack = 0.0f;
         private Boolean isApproachingTrack = false;
 
-
         public RF2GameStateMapper()
         {
             this.tyreWearThresholds.Add(new CornerData.EnumWithThresholds(TyreCondition.NEW, -10000.0f, this.scrubbedTyreWearPercent));
@@ -51,7 +50,7 @@ namespace CrewChiefV4.rFactor2
             this.suspensionDamageThresholds.Add(new CornerData.EnumWithThresholds(DamageLevel.DESTROYED, 1.0f, 2.0f));
         }
 
-        private int[] minimumSupportedVersionParts = new int[] { 1, 0, 0, 1 };
+        private int[] minimumSupportedVersionParts = new int[] { 1, 1, 0, 1 };
         private bool pluginSupported = false;
         public void versionCheck(Object memoryMappedFileStruct)
         {
@@ -194,8 +193,8 @@ namespace CrewChiefV4.rFactor2
                 rf2state.mSession >= 10 && rf2state.mSession <= 13 ? rf2state.mSession - 10 : 0;
 
             csd.SessionType = mapToSessionType(rf2state);
-            csd.SessionPhase = mapToSessionPhase((rFactor2Constants.rF2GamePhase)rf2state.mGamePhase, csd.SessionType, ref player, ref leader);
-            String carClassId = getStringFromBytes(player.mVehicleClass);
+            csd.SessionPhase = mapToSessionPhase((rFactor2Constants.rF2GamePhase)rf2state.mGamePhase, csd.SessionType, ref player);
+            var carClassId = getStringFromBytes(player.mVehicleClass);
             cgs.carClass = CarData.getCarClassForClassName(carClassId);
             CarData.CLASS_ID = carClassId;
             this.brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(cgs.carClass);
@@ -210,7 +209,7 @@ namespace CrewChiefV4.rFactor2
             csd.SessionTotalRunTime
                 = (float)rf2state.mEndET > 0.0f
                     ? (float)rf2state.mEndET
-                    : csd.SessionNumberOfLaps > 0.0f ? 0.0f : defaultSessionTotalRunTime;
+                    : csd.SessionNumberOfLaps > 0 ? 0.0f : defaultSessionTotalRunTime;
 
             // If any difference between current and previous states suggests it is a new session
             if (pgs == null
@@ -244,12 +243,11 @@ namespace CrewChiefV4.rFactor2
             csd.SessionStartTime = csd.IsNewSession ? cgs.Now : psd.SessionStartTime;
             csd.SessionHasFixedTime = csd.SessionTotalRunTime > 0.0f;
 
-            // TODO: figure out which approach leads to highest precision, mElapsedTime, mCurrentET or using cgs.Now.
             csd.SessionRunningTime = (float)rf2state.mElapsedTime;
             csd.SessionTimeRemaining = csd.SessionHasFixedTime ? csd.SessionTotalRunTime - csd.SessionRunningTime : 0.0f;
 
             // hack for test day sessions running longer than allotted time
-            csd.SessionTimeRemaining = csd.SessionTimeRemaining < 0.0f && rf2state.mSession == 0.0f ? defaultSessionTotalRunTime : csd.SessionTimeRemaining;
+            csd.SessionTimeRemaining = csd.SessionTimeRemaining < 0.0f && rf2state.mSession == 0 ? defaultSessionTotalRunTime : csd.SessionTimeRemaining;
 
             csd.NumCars = rf2state.mNumVehicles;
             csd.NumCarsAtStartOfSession = csd.IsNewSession ? csd.NumCars : psd.NumCarsAtStartOfSession;
@@ -496,12 +494,16 @@ namespace CrewChiefV4.rFactor2
                 cgs.TyreData.RightFrontIsLocked = Math.Abs(wheelFrontRight.mRotation) < minRotatingSpeed;
                 cgs.TyreData.LeftRearIsLocked = Math.Abs(wheelRearLeft.mRotation) < minRotatingSpeed;
                 cgs.TyreData.RightRearIsLocked = Math.Abs(wheelRearRight.mRotation) < minRotatingSpeed;
-                
+
                 float maxRotatingSpeed = 2.0f * (float)Math.PI * cgs.PositionAndMotionData.CarSpeed / cgs.carClass.minTyreCircumference;
                 cgs.TyreData.LeftFrontIsSpinning = Math.Abs(wheelFrontLeft.mRotation) > maxRotatingSpeed;
                 cgs.TyreData.RightFrontIsSpinning = Math.Abs(wheelFrontRight.mRotation) > maxRotatingSpeed;
                 cgs.TyreData.LeftRearIsSpinning = Math.Abs(wheelRearLeft.mRotation) > maxRotatingSpeed;
                 cgs.TyreData.RightRearIsSpinning = Math.Abs(wheelRearRight.mRotation) > maxRotatingSpeed;
+#if DEBUG
+                RF2GameStateMapper.writeSpinningLockingDebugMsg(cgs, wheelFrontLeft.mRotation, wheelFrontRight.mRotation,
+                    wheelRearLeft.mRotation, wheelRearRight.mRotation, minRotatingSpeed, maxRotatingSpeed);
+#endif
             }
 
             // use detached wheel status for suspension damage
@@ -1012,6 +1014,36 @@ namespace CrewChiefV4.rFactor2
             return cgs;
         }
 
+
+#if DEBUG
+        // NOTE: This can be made generic for all sims, but I am not sure if anyone needs this but me
+        private static void writeDebugMsg(string msg)
+        {
+            Console.WriteLine("DEBUG_MSG: " +  msg);
+        }
+
+        private static void writeSpinningLockingDebugMsg(GameStateData cgs, double frontLeftRotation, double frontRightRotation, 
+            double rearLeftRotation, double rearRightRotation, float minRotatingSpeed, float maxRotatingSpeed)
+        {
+            if (cgs.TyreData.LeftFrontIsLocked)
+                RF2GameStateMapper.writeDebugMsg($"Left Front is locked.  minRotatingSpeed: {minRotatingSpeed:N3}  mRotation: {frontLeftRotation:N3}");
+            if (cgs.TyreData.RightFrontIsLocked)
+                RF2GameStateMapper.writeDebugMsg($"Right Front is locked.  minRotatingSpeed: {minRotatingSpeed:N3}  mRotation: {frontRightRotation:N3}");
+            if (cgs.TyreData.LeftRearIsLocked)
+                RF2GameStateMapper.writeDebugMsg($"Left Rear is locked.  minRotatingSpeed: {minRotatingSpeed:N3}  mRotation: {rearLeftRotation:N3}");
+            if (cgs.TyreData.RightRearIsLocked)
+                RF2GameStateMapper.writeDebugMsg($"Right Rear is locked.  minRotatingSpeed: {minRotatingSpeed:N3}  mRotation: {rearRightRotation:N3}");
+            if (cgs.TyreData.LeftFrontIsSpinning)
+                RF2GameStateMapper.writeDebugMsg($"Left Front is spinning.  maxRotatingSpeed: {maxRotatingSpeed:N3}  mRotation: {frontLeftRotation:N3}");
+            if (cgs.TyreData.RightFrontIsSpinning)
+                RF2GameStateMapper.writeDebugMsg($"Right Front is spinning.  maxRotatingSpeed: {maxRotatingSpeed:N3}  mRotation: {frontRightRotation:N3}");
+            if (cgs.TyreData.LeftRearIsSpinning)
+                RF2GameStateMapper.writeDebugMsg($"Left Rear is spinning.  maxRotatingSpeed: {maxRotatingSpeed:N3}  mRotation: {rearLeftRotation:N3}");
+            if (cgs.TyreData.RightRearIsSpinning)
+                RF2GameStateMapper.writeDebugMsg($"Right Rear is spinning.  maxRotatingSpeed: {maxRotatingSpeed:N3}  mRotation: {rearRightRotation:N3}");
+        }
+#endif
+
         private PitWindow mapToPitWindow(rFactor2Constants.rF2YellowFlagState pitWindow)
         {
             // it seems that the pit window is only truly open on multiplayer races?
@@ -1031,20 +1063,12 @@ namespace CrewChiefV4.rFactor2
             }
         }
 
+
         private SessionPhase mapToSessionPhase(
             rFactor2Constants.rF2GamePhase sessionPhase,
             SessionType sessionType,
-            ref rF2VehScoringInfo player,
-            ref rF2VehScoringInfo leader)
+            ref rF2VehScoringInfo player)
         {
-            if (sessionType == SessionType.Race
-                && player.mFinishStatus == (sbyte)rFactor2Constants.rF2FinishStatus.None
-                && leader.mFinishStatus == (sbyte)rFactor2Constants.rF2FinishStatus.Finished)
-            {
-                return SessionPhase.Checkered;
-            }
-
-            // TODO: FullCourseYellow is a separate session phase and is needed to suppress some messages during caution periods
             switch (sessionPhase)
             {
                 case rFactor2Constants.rF2GamePhase.Countdown:
@@ -1060,11 +1084,17 @@ namespace CrewChiefV4.rFactor2
                 // sessions never go to sessionStopped, they always go straight from greenFlag to sessionOver
                 case rFactor2Constants.rF2GamePhase.SessionStopped:
                 case rFactor2Constants.rF2GamePhase.SessionOver:
-                    return SessionPhase.Finished;
-                    // TODO: revisit.
+                    if (sessionType == SessionType.Race
+                        && player.mFinishStatus == (sbyte)rFactor2Constants.rF2FinishStatus.None)
+                    {
+                        return SessionPhase.Checkered;
+                    }
+                    else
+                    {
+                        return SessionPhase.Finished;
+                    }
                 // fullCourseYellow will count as greenFlag since we'll call it out in the Flags separately anyway
                 case rFactor2Constants.rF2GamePhase.FullCourseYellow:
-                    // TODO: CHECK ME!!
                     return SessionPhase.FullCourseYellow;
                 case rFactor2Constants.rF2GamePhase.GreenFlag:
                     return SessionPhase.Green;
@@ -1077,7 +1107,6 @@ namespace CrewChiefV4.rFactor2
         // JB: TODO - why is this needed? Don't we have a unique key for an opponent? RF1 has vehicleName 
         // which is of the form classname: driver name #number (e.g. "F309: Jim Britton #14") - can't we just
         // rely on this for our opponent keys?
-
 
         // finds OpponentData for given vehicle based on driver name, vehicle class, and world position
         private OpponentData getOpponentDataForVehicleInfo(rF2VehScoringInfo vehicle, GameStateData previousGameState, float sessionRunningTime)
@@ -1182,10 +1211,12 @@ namespace CrewChiefV4.rFactor2
 
         public static String getStringFromBytes(byte[] name)
         {
-            // TODO: encoding appears to be platform default...
-            // return Encoding.UTF8.GetString(name).TrimEnd('\0').Trim();
-            // return Encoding.GetEncoding("iso-8859-1").GetString(name).TrimEnd('\0').Trim();
-            return Encoding.Default.GetString(name).TrimEnd('\0').Trim();
+            var str = Encoding.Default.GetString(name);
+            var eosChar = str.IndexOf('\0');
+            if (eosChar != -1)
+              str = str.Substring(0, eosChar);
+
+            return str;
         }
     }
 }

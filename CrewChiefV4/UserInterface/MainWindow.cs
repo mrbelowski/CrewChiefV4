@@ -417,6 +417,7 @@ namespace CrewChiefV4
             InitializeComponent();
             CheckForIllegalCrossThreadCalls = false;
             cw = new ControlWriter(textBox1);
+            textBox1.KeyDown += TextBox1_KeyDown;
             Console.SetOut(cw);
             Console.WriteLine("Starting app");
             controllerConfiguration = new ControllerConfiguration(this);            
@@ -503,6 +504,18 @@ namespace CrewChiefV4
                 GameDefinition.getGameDefinitionForFriendlyName(gameDefinitionList.Text) != null)
             {
                 doStartAppStuff();
+            }
+        }
+
+        private void TextBox1_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Control && e.KeyCode == Keys.A)
+            {
+                textBox1.SelectAll();
+            }
+            else if (e.KeyCode == Keys.Escape)
+            {
+                textBox1.DeselectAll();
             }
         }
 

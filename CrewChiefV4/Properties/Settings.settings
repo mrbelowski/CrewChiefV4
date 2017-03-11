@@ -417,10 +417,10 @@
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="rf2_launch_exe" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">C:/Program Files (x86)/Steam/Steam.exe</Value>
     </Setting>
     <Setting Name="rf2_launch_params" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">-applaunch 365960</Value>
     </Setting>
     <Setting Name="rf2_spotter_car_length" Type="System.Single" Scope="User">
       <Value Profile="(Default)">4.5</Value>

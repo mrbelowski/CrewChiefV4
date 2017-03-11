@@ -16,8 +16,8 @@
 #    "defaultTyreType": can be "Road", "Bias_Ply", "Unknown_Race", and various others that the app doesn't really use (still to be worked on...)
 #    "maxSafeWaterTemp": water temp above this (celsius) will trigger a warning
 #    "maxSafeOilTemp": oil temp above this (celsius) will trigger a warning
-#    "minTyreCircumference": used to override default tyre size settings, used when calculating wheel locking and spinning. Only karts should need to override this
-#    "maxTyreCircumference": used to override default tyre size settings, used when calculating wheel locking and spinning. Only karts should need to override this
+#    "minTyreCircumference": used to override default tyre size settings, used when calculating wheel locking and spinning. Only karts should need to override this.  Decrease this value if your class gets too many "wheel spinning" messages.
+#    "maxTyreCircumference": used to override default tyre size settings, used when calculating wheel locking and spinning. Only karts should need to override this.  Increase this value if your class gets too many "locking wheel" spinning messages.
 # }
 #
 # The default values are:
@@ -31,9 +31,9 @@
 # }
 #
 # Crew Chief built-in car classes are:
-# GT1X, GT1, GTE, GT2, GTC, GTLM, GT3, GT4, GT5, Kart_1, Kart_2, LMP1, LMP2, LMP3,
-# ROAD_B, ROAD_C1, ROAD_C2, ROAD_D, ROAD_SUPERCAR, GROUPC, GROUPA, GROUP4, GROUP5,
-# GROUP6, GTO, VINTAGE_INDY_65, VINTAGE_F3_A, VINTAGE_F1_A, VINTAGE_F1_A1,
+# GT1X, GT1, GTE, GT2, GTC, GTLM, GT3, GT4, GT5, Kart_1, Kart_2, KART_JUNIOR, KART_F1,
+# LMP1, LMP2, LMP3, ROAD_B, ROAD_C1, ROAD_C2, ROAD_D, ROAD_SUPERCAR, GROUPC, GROUPA, 
+# GROUP4, GROUP5, GROUP6, GTO, VINTAGE_INDY_65, VINTAGE_F3_A, VINTAGE_F1_A, VINTAGE_F1_A1,
 # VINTAGE_GT3, VINTAGE_GT, HISTORIC_TOURING_1, HISTORIC_TOURING_2, VINTAGE_F1_B,
 # VINTAGE_F1_C, STOCK_CAR, F1, F2, F3, F4, FF, TC1, TC2, TC1_2014, AUDI_TT_CUP,
 # AUDI_TT_VLN, CLIO_CUP, DTM, DTM_2013, V8_SUPERCAR, DTM_2014, DTM_2015, DTM_2016,
@@ -114,16 +114,26 @@
         {
             "carClassEnum": "Kart_1",
             "pCarsClassNames": [ "Kart1" ],
-            "rf2ClassNames": [ "Kart Junior" ],
             "minTyreCircumference": 0.78,
             "maxTyreCircumference": 1.26
         },
         {
             "carClassEnum": "Kart_2",
             "pCarsClassNames": [ "Kart2" ],
-            "rf2ClassNames": [ "Kart F1" ],
             "minTyreCircumference": 0.78,
             "maxTyreCircumference": 1.26
+        },
+        {
+            "carClassEnum": "KART_JUNIOR",
+            "rf2ClassNames": [ "Kart Junior" ],
+            "minTyreCircumference": 0.72,
+            "maxTyreCircumference": 1.22
+        },
+        {
+            "carClassEnum": "KART_F1",
+            "rf2ClassNames": [ "Kart F1" ],
+            "minTyreCircumference": 0.72,
+            "maxTyreCircumference": 1.22
         },
         {
             "carClassEnum": "LMP1",
