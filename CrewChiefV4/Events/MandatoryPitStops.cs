@@ -147,7 +147,8 @@ namespace CrewChiefV4.Events
         {
             // AMS (RF1) uses the pit window calculations to make 'box now' calls for scheduled stops, but we don't want 
             // the pit window opening / closing warnings.
-            if (CrewChief.gameDefinition.gameEnum == GameEnum.RF1)
+            // Try also using same approach with rF2.
+            if (CrewChief.gameDefinition.gameEnum == GameEnum.RF1 || CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT)
             {
                 enableWindowWarnings = false;
             }
@@ -436,6 +437,7 @@ namespace CrewChiefV4.Events
                     }
 
                     // for Automobilista, sector update lag time means sometimes we miss the pit entrance before this message plays
+                    // TODO: Verify for rF2.
                     if (playBoxNowMessage && currentGameState.SessionData.SectorNumber == 2 && 
                         CrewChief.gameDefinition.gameEnum == GameEnum.RF1)
                     {
