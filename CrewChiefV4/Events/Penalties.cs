@@ -299,7 +299,7 @@ namespace CrewChiefV4.Events
             if (currentGameState.SessionData.SessionType == SessionType.Race && previousGameState != null && 
                 ((previousGameState.PenaltiesData.HasStopAndGo && !currentGameState.PenaltiesData.HasStopAndGo) ||
                 (previousGameState.PenaltiesData.HasDriveThrough && !currentGameState.PenaltiesData.HasDriveThrough) ||
-                // can't read penalty type in Automobilista (and presumably rF2).
+                // can't read penalty type in Automobilista (and presumably in rF2).
                 (previousGameState.PenaltiesData.NumPenalties > currentGameState.PenaltiesData.NumPenalties &&
                 (CrewChief.gameDefinition.gameEnum == GameEnum.RF1 || CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT))))
             {
