@@ -533,7 +533,7 @@ namespace CrewChiefV4.rFactor2
             if (cgs.Conditions.timeOfMostRecentSample.Add(ConditionsMonitor.ConditionsSampleFrequency) < cgs.Now)
             {
                 cgs.Conditions.addSample(cgs.Now, csd.CompletedLaps, csd.SectorNumber,
-                    (float)rf2state.mAmbientTemp, (float)rf2state.mTrackTemp, (float)rf2state.mRaining, 
+                    (float)rf2state.mAmbientTemp, (float)rf2state.mTrackTemp, (float)rf2state.mRaining,
                     (float)Math.Sqrt((double)(rf2state.mWind.x * rf2state.mWind.x + rf2state.mWind.y * rf2state.mWind.y + rf2state.mWind.z * rf2state.mWind.z)), 0, 0, 0);
             }
 
@@ -574,7 +574,12 @@ namespace CrewChiefV4.rFactor2
                 var opponentPrevious = getOpponentDataForVehicleInfo(vehicle, pgs, csd.SessionRunningTime);
                 var opponent = new OpponentData();
                 opponent.CarClass = CarData.getCarClassForClassName(getStringFromBytes(vehicle.mVehicleClass));
-                var opponentKey = opponent.CarClass.getClassIdentifier() + vehicle.mPlace.ToString();
+                opponent.DriverRawName = getStringFromBytes(vehicle.mDriverName).ToLower();
+                var opponentKey = $"{vehicle.mID}:{opponent.CarClass.getClassIdentifier()}:{opponent.DriverRawName}:{RF2GameStateMapper.getStringFromBytes(vehicle.mVehicleName)}";
+                opponent.VehicleIdRaw = opponentKey;
+                // We want VehicleIdRaw to be constant during the session
+                Debug.Assert(opponentPrevious == null || (String) opponentPrevious.VehicleIdRaw == (String) opponent.VehicleIdRaw);
+
                 opponent.DriverRawName = getStringFromBytes(vehicle.mDriverName).ToLower();
                 opponent.DriverNameSet = opponent.DriverRawName.Length > 0;
                 opponent.Position = vehicle.mPlace;
@@ -1104,11 +1109,6 @@ namespace CrewChiefV4.rFactor2
             }
         }
 
-
-        // JB: TODO - why is this needed? Don't we have a unique key for an opponent? RF1 has vehicleName 
-        // which is of the form classname: driver name #number (e.g. "F309: Jim Britton #14") - can't we just
-        // rely on this for our opponent keys?
-
         // finds OpponentData for given vehicle based on driver name, vehicle class, and world position
         private OpponentData getOpponentDataForVehicleInfo(rF2VehScoringInfo vehicle, GameStateData previousGameState, float sessionRunningTime)
         {
@@ -1121,7 +1121,7 @@ namespace CrewChiefV4.rFactor2
                 float minDistDiff = -1.0f;
                 foreach (var o in previousGameState.OpponentData.Values)
                 {
-                    var opponentKey = o.CarClass.getClassIdentifier() + o.Position.ToString();
+                    var opponentKey = (String)o.VehicleIdRaw;
                     if (o.DriverRawName != getStringFromBytes(vehicle.mDriverName).ToLower() ||
                         o.CarClass != CarData.getCarClassForClassName(getStringFromBytes(vehicle.mVehicleClass)) || 
                         this.opponentKeysProcessed.Contains(opponentKey))
@@ -1141,9 +1141,7 @@ namespace CrewChiefV4.rFactor2
                 }
 
                 if (opponentPrevious != null)
-                {
-                    this.opponentKeysProcessed.Add(opponentPrevious.CarClass.getClassIdentifier() + opponentPrevious.Position.ToString());
-                }
+                    this.opponentKeysProcessed.Add((String) opponentPrevious.VehicleIdRaw);
             }
             return opponentPrevious;
         }
