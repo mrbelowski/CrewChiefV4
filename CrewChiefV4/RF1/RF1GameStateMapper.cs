@@ -203,7 +203,7 @@ namespace CrewChiefV4.rFactor1
                 }
             }
 
-            currentGameState.carClass = getCarClass(shared.vehicleName, true);
+            currentGameState.carClass = getCarClass(getNameFromBytes(shared.vehicleName), true);
             brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(currentGameState.carClass);
             currentGameState.SessionData.DriverRawName = getNameFromBytes(player.driverName).ToLower();
             currentGameState.SessionData.TrackDefinition = new TrackDefinition(getNameFromBytes(shared.trackName), shared.lapDist);
@@ -529,12 +529,15 @@ namespace CrewChiefV4.rFactor1
                     default:
                         break;
                 }
-                String opponentKey = getNameFromBytes(vehicle.vehicleName);
-                OpponentData opponentPrevious = previousGameState != null && previousGameState.OpponentData.ContainsKey(opponentKey) ? previousGameState.OpponentData[opponentKey] : null;
+                String vehicleName = getNameFromBytes(vehicle.vehicleName);
+                String vehicleClass = getNameFromBytes(vehicle.vehicleClass);
+                String vehicleIdRaw = vehicleName + ":" + vehicleClass;
+                OpponentData opponentPrevious = getOpponentDataForVehicleInfo(vehicle, previousGameState, currentGameState.SessionData.SessionRunningTime);
                 OpponentData opponent = new OpponentData();
+                opponent.VehicleIdRaw = vehicleIdRaw;
                 opponent.DriverRawName = getNameFromBytes(vehicle.driverName).ToLower();
                 opponent.DriverNameSet = opponent.DriverRawName.Length > 0;
-                opponent.CarClass = getCarClass(vehicle.vehicleName, false);
+                opponent.CarClass = getCarClass(vehicleName, false);
                 opponent.Position = vehicle.place;
                 if (opponent.DriverNameSet && opponentPrevious == null && CrewChief.enableDriverNames)
                 {
@@ -642,9 +645,9 @@ namespace CrewChiefV4.rFactor1
                     currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass = opponent.CurrentBestLapTime;
                 }
                 // shouldn't have duplicates, but just in case
-                if (!currentGameState.OpponentData.ContainsKey(opponentKey))
+                if (!currentGameState.OpponentData.ContainsKey(vehicleIdRaw))
                 {
-                    currentGameState.OpponentData.Add(opponentKey, opponent);
+                    currentGameState.OpponentData.Add(vehicleIdRaw, opponent);
                 }
             }
             if (previousGameState != null)
@@ -960,6 +963,42 @@ namespace CrewChiefV4.rFactor1
             }
         }
 
+        // finds OpponentData for given vehicle based on driver name, vehicle class, and world position
+        private OpponentData getOpponentDataForVehicleInfo(rfVehicleInfo vehicle, GameStateData previousGameState, float sessionRunningTime)
+        {
+            OpponentData opponentPrevious = null;
+            float timeDelta = previousGameState != null ? sessionRunningTime - previousGameState.SessionData.SessionRunningTime : -1;
+            if (previousGameState != null && timeDelta >= 0)
+            {
+                float[] worldPos = { vehicle.pos.x, vehicle.pos.z };
+                float minDistDiff = -1;
+                foreach (OpponentData o in previousGameState.OpponentData.Values)
+                {
+                    String opponentKey = (String) o.VehicleIdRaw;
+                    if (o.DriverRawName != getNameFromBytes(vehicle.driverName).ToLower() ||
+                        o.CarClass != getCarClass(getNameFromBytes(vehicle.vehicleName), false) ||
+                        opponentKeysProcessed.Contains(opponentKey))
+                    {
+                        continue;
+                    }
+                    // distance from predicted position
+                    float targetDist = o.Speed * timeDelta;
+                    float dist = (float)Math.Abs(Math.Sqrt((double)((o.WorldPosition[0] - worldPos[0]) * (o.WorldPosition[0] - worldPos[0]) +
+                        (o.WorldPosition[1] - worldPos[1]) * (o.WorldPosition[1] - worldPos[1]))) - targetDist);
+                    if (minDistDiff < 0 || dist < minDistDiff)
+                    {
+                        minDistDiff = dist;
+                        opponentPrevious = o;
+                    }
+                }
+                if (opponentPrevious != null)
+                {
+                    opponentKeysProcessed.Add((String) opponentPrevious.VehicleIdRaw);
+                }
+            }
+            return opponentPrevious;
+        }
+
         public static String getNameFromBytes(byte[] name)
         {
             return Encoding.UTF8.GetString(name).TrimEnd('\0').Trim();
@@ -968,28 +1007,27 @@ namespace CrewChiefV4.rFactor1
         /**
          * For AMS, vehicleName has the form classname: driver name #number
          */
-        public CarData.CarClass getCarClass(byte[] vehicleName, Boolean forPlayer)
+        public CarData.CarClass getCarClass(String vehicleName, Boolean forPlayer)
         {
             if (vehicleName.Length > 0)
             {
-                String vehicleNameStr = getNameFromBytes(vehicleName);
-                int splitChar = vehicleNameStr.IndexOf(':');
+                int splitChar = vehicleName.IndexOf(':');
                 if (splitChar > 0)
                 {
-                    vehicleNameStr = vehicleNameStr.Substring(0, splitChar);
+                    vehicleName = vehicleName.Substring(0, splitChar);
                     if (forPlayer)
                     {
-                        CarData.CLASS_ID = vehicleNameStr;
+                        CarData.CLASS_ID = vehicleName;
                     }
-                    return CarData.getCarClassForClassName(vehicleNameStr);
+                    return CarData.getCarClassForClassName(vehicleName);
                 }
                 else
                 {
                     if (forPlayer)
                     {
-                        CarData.CLASS_ID = vehicleNameStr;
+                        CarData.CLASS_ID = vehicleName;
                     }
-                    return CarData.getCarClassForClassName(vehicleNameStr);
+                    return CarData.getCarClassForClassName(vehicleName);
                 }
             }
             return null;
