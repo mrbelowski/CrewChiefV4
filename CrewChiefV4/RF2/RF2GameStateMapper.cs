@@ -802,7 +802,8 @@ namespace CrewChiefV4.rFactor2
             cgs.PitData.IsAtPitExit = pgs != null && pgs.PitData.InPitlane && !cgs.PitData.InPitlane;
             cgs.PitData.OnOutLap = cgs.PitData.InPitlane && csd.SectorNumber == 1;
 
-            if (rf2state.mSpeedLimiterAvailable == 0) {
+            if (rf2state.mInRealtimeFC == 0  // Mark pit limiter as unavailable if in Monitor (not real time).
+                || rf2state.mSpeedLimiterAvailable == 0) {
                 cgs.PitData.limiterStatus = -1;
             } else {
                 cgs.PitData.limiterStatus = rf2state.mSpeedLimiter > 0 ? 1 : 0;

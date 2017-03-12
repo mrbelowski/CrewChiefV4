@@ -93,7 +93,7 @@ namespace CrewChiefV4.Events
                 possibleMessages.Add(new QueuedMessage("air_temp", MessageContents(ConditionsMonitor.folderAirTempIs,
                     convertTemp(currentConditions.AmbientTemperature), getTempUnit()), 0, this));
             }
-            if (currentGameState.PitData.HasMandatoryPitStop && CrewChief.gameDefinition.gameEnum != GameEnum.RF1)
+            if (currentGameState.PitData.HasMandatoryPitStop && CrewChief.gameDefinition.gameEnum != GameEnum.RF1 && CrewChief.gameDefinition.gameEnum != GameEnum.RF2_64BIT)
             {
                 if (currentGameState.SessionData.SessionHasFixedTime)
                 {
@@ -212,12 +212,12 @@ namespace CrewChiefV4.Events
                             //      Allow messages for countdown phase for any game
                             //      Allow messages for gridwalk phase for any game *except* Raceroom (which treats gridwalk as its own session with different data to the race session)
                             //      Allow messages for formation phase for Raceroom
-                            //      Allow messages for formation phase for RF1 (AMS) only when we enter sector 3 of the formation lap.
+                            //      Allow messages for formation phase for RF1 (AMS) and rF2 only when we enter sector 3 of the formation lap.
                             if (currentGameState.SessionData.SessionType == SessionType.Race &&
                                     (currentGameState.SessionData.SessionPhase == SessionPhase.Countdown ||
                                     (currentGameState.SessionData.SessionPhase == SessionPhase.Gridwalk && CrewChief.gameDefinition.gameEnum != GameEnum.RACE_ROOM) ||
                                     (currentGameState.SessionData.SessionPhase == SessionPhase.Formation && CrewChief.gameDefinition.gameEnum == GameEnum.RACE_ROOM) ||
-                                    (currentGameState.SessionData.SessionPhase == SessionPhase.Formation && CrewChief.gameDefinition.gameEnum == GameEnum.RF1 && 
+                                    (currentGameState.SessionData.SessionPhase == SessionPhase.Formation && (CrewChief.gameDefinition.gameEnum == GameEnum.RF1 || CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT) && 
                                     currentGameState.SessionData.SectorNumber == 3)))
                             {
                                 Console.WriteLine("Queuing pre-lights messages");
@@ -243,8 +243,8 @@ namespace CrewChiefV4.Events
                 // R3E's gridWalk phase isn't useable here - the data during this phase are bollocks
                 if (!playedGetReady && currentGameState.SessionData.SessionType == SessionType.Race && (currentGameState.SessionData.SessionPhase == SessionPhase.Countdown ||
                     (currentGameState.SessionData.SessionPhase == SessionPhase.Formation && CrewChief.gameDefinition.gameEnum == GameEnum.RACE_ROOM) ||
-                    // play 'get ready' message when entering sector 3 of formation lap in Automobilista
-                    (currentGameState.SessionData.SessionPhase == SessionPhase.Formation && CrewChief.gameDefinition.gameEnum == GameEnum.RF1 &&
+                    // play 'get ready' message when entering sector 3 of formation lap in Automobilista and RF2
+                    (currentGameState.SessionData.SessionPhase == SessionPhase.Formation && (CrewChief.gameDefinition.gameEnum == GameEnum.RF1 || CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT) &&
                     currentGameState.SessionData.SectorNumber == 3)))
                 {
                     // If we've not yet played the pre-lights messages, just play one of them here, but not for RaceRoom as the lights will already have started
