@@ -51,7 +51,7 @@ namespace CrewChiefV4.rFactor2
         }
 
         private int[] minimumSupportedVersionParts = new int[] { 1, 1, 0, 1 };
-        private bool pluginSupported = true;
+        private bool pluginSupported = false;
         public void versionCheck(Object memoryMappedFileStruct)
         {
             if (this.pluginSupported)
