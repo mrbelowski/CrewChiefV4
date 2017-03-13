@@ -558,7 +558,14 @@ namespace CrewChiefV4.rFactor1
                 {
                     if (!isOfflineSession)
                     {
-                        // there shouldn't be duplicate driver names in online sessions
+                        // there shouldn't be duplicate driver names in online sessions. This is probably a temporary glitch in the shared memory data - 
+                        // don't panic and drop the existing opponentData for this key - just copy it across to the current state. This prevents us losing
+                        // the historical data and repeatedly re-adding this name to the SpeechRecogniser (which is expensive)
+                        if (previousGameState != null && previousGameState.OpponentData.ContainsKey(driverName) &&
+                            !currentGameState.OpponentData.ContainsKey(driverName))
+                        {
+                            currentGameState.OpponentData.Add(driverName, previousGameState.OpponentData[driverName]);
+                        }
                         continue;
                     }
                     else
