@@ -227,6 +227,8 @@ namespace CrewChiefV4.GameState
 
         public Single PlayerClassSessionBestLapTime = -1;
 
+        public Single PlayerLapTimeSessionBestPrevious = -1;
+
         // ...
         public Single TimeDeltaFront = 0;
 
@@ -267,6 +269,93 @@ namespace CrewChiefV4.GameState
         // data sent by the game, rather than derived (useful for mid-session joining)
         public float SessionFastestLapTimeFromGame = -1;
         public float SessionFastestLapTimeFromGamePlayerClass = -1;
+
+        // Player lap times with sector information
+        public List<LapData> PlayerLapData = new List<LapData>();
+
+        public void playerStartNewLap(int lapNumber, int position, Boolean inPits, float gameTimeAtStart, Boolean isRaining, float trackTemp, float airTemp)
+        {
+            LapData thisLapData = new LapData();
+            thisLapData.Conditions.Add(new LapConditions(isRaining, trackTemp, airTemp));
+            thisLapData.GameTimeAtLapStart = gameTimeAtStart;
+            thisLapData.OutLap = inPits;
+            thisLapData.PositionAtStart = position;
+            thisLapData.LapNumber = lapNumber;
+            PlayerLapData.Add(thisLapData);
+        }
+
+        public void playerCompleteLapWithProvidedLapTime(int position, float gameTimeAtLapEnd, float providedLapTime,
+            Boolean lapIsValid, Boolean isRaining, float trackTemp, float airTemp, Boolean sessionLengthIsTime, float sessionTimeRemaining)
+        {
+            if (PlayerLapData.Count > 0)
+            {
+                LapData lapData = PlayerLapData[PlayerLapData.Count - 1];
+                playerAddCumulativeSectorData(position, providedLapTime, gameTimeAtLapEnd, lapIsValid, isRaining, trackTemp, airTemp);
+                lapData.LapTime = providedLapTime;
+
+                // Verify: LapTimePreviousm,  PlayerLapTimeSessionBest, PlayerBestLapSector1Time
+                LapTimePrevious = providedLapTime;
+                if (lapData.IsValid && (PlayerLapTimeSessionBest == -1 || PlayerLapTimeSessionBest > lapData.LapTime))
+                {
+                    PlayerLapTimeSessionBestPrevious = PlayerLapTimeSessionBest;
+                    PlayerLapTimeSessionBest = lapData.LapTime;
+
+                    PlayerBestLapSector1Time = lapData.SectorTimes[0];
+                    PlayerBestLapSector2Time = lapData.SectorTimes[1];
+                    PlayerBestLapSector3Time = lapData.SectorTimes[3];
+                }
+                PreviousLapWasValid = lapData.IsValid;
+            }
+
+            // Not sure we need this for player.
+            /*if (sessionLengthIsTime && sessionTimeRemaining > 0 && CurrentBestLapTime > 0 && sessionTimeRemaining < CurrentBestLapTime - 5)
+            {
+                isProbablyLastLap = true;
+            }*/
+        }
+
+        public void playerAddCumulativeSectorData(int position, float cumulativeSectorTime, float gameTimeAtSectorEnd, Boolean lapIsValid, Boolean isRaining, float trackTemp, float airTemp)
+        {
+            if (PlayerLapData.Count > 0)
+            {
+                LapData lapData = PlayerLapData[PlayerLapData.Count - 1];
+                if (cumulativeSectorTime <= 0)
+                {
+                    cumulativeSectorTime = gameTimeAtSectorEnd - lapData.GameTimeAtLapStart;
+                }
+                float thisSectorTime = cumulativeSectorTime;
+                int sectorNumber = 1;
+                foreach (float sectorTime in lapData.SectorTimes)
+                {
+                    sectorNumber++;
+                    thisSectorTime = thisSectorTime - sectorTime;
+                }
+                lapData.SectorTimes.Add(thisSectorTime);
+                if (lapIsValid && thisSectorTime > 0)
+                {
+                    // Possibly track Best sector times here.
+                    if (sectorNumber == 1 && (PlayerBestSector1Time == -1 || thisSectorTime < PlayerBestSector1Time))
+                    {
+                        PlayerBestSector1Time = thisSectorTime;
+                    }
+                    if (sectorNumber == 2 && (PlayerBestSector2Time == -1 || thisSectorTime < PlayerBestSector2Time))
+                    {
+                        PlayerBestSector2Time = thisSectorTime;
+                    }
+                    if (sectorNumber == 3 && (PlayerBestSector3Time == -1 || thisSectorTime < PlayerBestSector3Time))
+                    {
+                        PlayerBestSector3Time = thisSectorTime;
+                    }
+                }
+                lapData.SectorPositions.Add(position);
+                lapData.GameTimeAtSectorEnd.Add(gameTimeAtSectorEnd);
+                if (lapData.IsValid && !lapIsValid)
+                {
+                    lapData.IsValid = false;
+                }
+                lapData.Conditions.Add(new LapConditions(isRaining, trackTemp, airTemp));
+            }
+        }
 
         public SessionData()
         {
