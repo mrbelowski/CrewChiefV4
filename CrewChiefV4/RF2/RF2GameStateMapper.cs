@@ -544,6 +544,7 @@ namespace CrewChiefV4.rFactor2
 
             // first check for duplicates and online session:
             Dictionary<string, int> driverNameCounts = new Dictionary<string, int>();
+            Dictionary<string, int> duplicatesCreated = new Dictionary<string, int>();
             for (int i = 0; i < rf2state.mNumVehicles; ++i)
             {
                 var vehicle = rf2state.mVehicles[i];
@@ -553,7 +554,7 @@ namespace CrewChiefV4.rFactor2
                 }
                 if (driverNameCounts.ContainsKey(driverName))
                 {
-                    driverNameCounts[driverName] = driverNameCounts[driverName]++;
+                    driverNameCounts[driverName] += 1;
                 }
                 else
                 {
@@ -610,6 +611,17 @@ namespace CrewChiefV4.rFactor2
                     {
                         // offline we can have any number of duplicates :(
                         opponentKey = getOpponentKeyForVehicleInfo(vehicle, pgs, csd.SessionRunningTime, driverName, duplicatesCount);
+                        if (opponentKey == null)
+                        {
+                            // there's no previous opponent data record for this driver so create one
+                            if (duplicatesCreated.ContainsKey(driverName))
+                            {
+                                duplicatesCreated[driverName] += 1;
+                            } else {
+                                duplicatesCreated.Add(driverName, 1);
+                            }
+                            opponentKey = driverName + "_duplicate_" + duplicatesCreated[driverName];
+                        }
                     }
                 }
                 else
