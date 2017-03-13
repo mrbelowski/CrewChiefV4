@@ -566,6 +566,7 @@ namespace CrewChiefV4.rFactor1
                         {
                             currentGameState.OpponentData.Add(driverName, previousGameState.OpponentData[driverName]);
                         }
+                        opponentKeysProcessed.Add(driverName);
                         continue;
                     }
                     else

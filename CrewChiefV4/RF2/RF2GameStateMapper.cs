@@ -603,6 +603,7 @@ namespace CrewChiefV4.rFactor2
                         {
                             cgs.OpponentData.Add(driverName, pgs.OpponentData[driverName]);
                         }
+                        opponentKeysProcessed.Add(driverName);
                         continue;
                     }
                     else
