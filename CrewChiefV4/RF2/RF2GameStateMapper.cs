@@ -51,7 +51,7 @@ namespace CrewChiefV4.rFactor2
         }
 
         private int[] minimumSupportedVersionParts = new int[] { 1, 1, 0, 1 };
-        private bool pluginSupported = false;
+        private bool pluginSupported = true;
         public void versionCheck(Object memoryMappedFileStruct)
         {
             if (this.pluginSupported)
@@ -542,8 +542,25 @@ namespace CrewChiefV4.rFactor2
             this.isOfflineSession = true;
             this.opponentKeysProcessed.Clear();
 
-            // NOTE: AMS/rF1 implementation scanned all vehicles, we only scan active (beyound comes trash).
-            // See if it causes problems.
+            // first check for duplicates and online session:
+            Dictionary<string, int> driverNameCounts = new Dictionary<string, int>();
+            for (int i = 0; i < rf2state.mNumVehicles; ++i)
+            {
+                var vehicle = rf2state.mVehicles[i];
+                String driverName = getStringFromBytes(vehicle.mDriverName).ToLower();
+                if (isOfflineSession && (rFactor2Constants.rF2Control)vehicle.mControl == rFactor2Constants.rF2Control.Remote) {
+                    isOfflineSession = false;
+                }
+                if (driverNameCounts.ContainsKey(driverName))
+                {
+                    driverNameCounts[driverName] = driverNameCounts[driverName]++;
+                }
+                else
+                {
+                    driverNameCounts.Add(driverName, 1);
+                }
+            }
+
             for (int i = 0; i < rf2state.mNumVehicles; ++i)
             {
                 var vehicle = rf2state.mVehicles[i];
@@ -557,7 +574,7 @@ namespace CrewChiefV4.rFactor2
 
                     continue;
                 }
-
+                
                 switch (mapToControlType((rFactor2Constants.rF2Control)vehicle.mControl))
                 {
                     case ControlType.Player:
@@ -570,17 +587,33 @@ namespace CrewChiefV4.rFactor2
                     default:
                         break;
                 }
+                String driverName = getStringFromBytes(vehicle.mDriverName).ToLower();
+                OpponentData opponentPrevious;
+                int duplicatesCount = driverNameCounts[driverName];
+                String opponentKey;
+                if (duplicatesCount > 1)
+                {
+                    if (!isOfflineSession)
+                    {
+                        // there shouldn't be duplicate driver names in online sessions
+                        continue;
+                    }
+                    else
+                    {
+                        // offline we can have any number of duplicates :(
+                        opponentKey = getOpponentKeyForVehicleInfo(vehicle, pgs, csd.SessionRunningTime, driverName, duplicatesCount);
+                    }
+                }
+                else
+                {
+                    opponentKey = driverName;
+                }
+                opponentPrevious = previousGameState == null || opponentKey == null ? null : previousGameState.OpponentData[opponentKey];
+                OpponentData opponent = new OpponentData();
+                opponent.DriverRawName = driverName;
+                opponent.CarClass = CarData.getCarClassForClassName(getStringFromBytes(vehicle.mVehicleClass));                
 
-                var opponentPrevious = getOpponentDataForVehicleInfo(vehicle, pgs, csd.SessionRunningTime);
-                var opponent = new OpponentData();
-                opponent.CarClass = CarData.getCarClassForClassName(getStringFromBytes(vehicle.mVehicleClass));
-                opponent.DriverRawName = getStringFromBytes(vehicle.mDriverName).ToLower();
-                var opponentKey = $"{vehicle.mID}:{opponent.CarClass.getClassIdentifier()}:{opponent.DriverRawName}:{RF2GameStateMapper.getStringFromBytes(vehicle.mVehicleName)}";
-                opponent.VehicleIdRaw = opponentKey;
-                // We want VehicleIdRaw to be constant during the session
-                Debug.Assert(opponentPrevious == null || (String) opponentPrevious.VehicleIdRaw == (String) opponent.VehicleIdRaw);
-
-                opponent.DriverRawName = getStringFromBytes(vehicle.mDriverName).ToLower();
+                opponent.DriverRawName = driverName;
                 opponent.DriverNameSet = opponent.DriverRawName.Length > 0;
                 opponent.Position = vehicle.mPlace;
 
@@ -1109,41 +1142,52 @@ namespace CrewChiefV4.rFactor2
             }
         }
 
-        // finds OpponentData for given vehicle based on driver name, vehicle class, and world position
-        private OpponentData getOpponentDataForVehicleInfo(rF2VehScoringInfo vehicle, GameStateData previousGameState, float sessionRunningTime)
+        // finds OpponentData key for given vehicle based on driver name, vehicle class, and world position
+        private String getOpponentKeyForVehicleInfo(rF2VehScoringInfo vehicle, GameStateData previousGameState, float sessionRunningTime, String driverName, int duplicatesCount)
         {
-            OpponentData opponentPrevious = null;
-            var prevSessionData = previousGameState != null ? previousGameState.SessionData : null;
-            float timeDelta = previousGameState != null ? sessionRunningTime - prevSessionData.SessionRunningTime : -1.0f;
-            if (previousGameState != null && timeDelta >= 0.0f)
+            if (previousGameState == null)
             {
-                float[] worldPos = { (float)vehicle.mPos.x, (float)vehicle.mPos.z };
-                float minDistDiff = -1.0f;
-                foreach (var o in previousGameState.OpponentData.Values)
+                return null;
+            }
+            List<string> possibleKeys = new List<string>();
+            for (int i = 1; i <= duplicatesCount; i++)
+            {
+                possibleKeys.Add(driverName + "_duplicate_ " + i);
+            }
+            float[] worldPos = { (float)vehicle.mPos.x, (float)vehicle.mPos.z };
+            float minDistDiff = -1.0f;
+            float timeDelta = sessionRunningTime - previousGameState.SessionData.SessionRunningTime;
+            String bestKey = null;
+            if (timeDelta >= 0.0f)
+            {
+                foreach (String possibleKey in possibleKeys)
                 {
-                    var opponentKey = (String)o.VehicleIdRaw;
-                    if (o.DriverRawName != getStringFromBytes(vehicle.mDriverName).ToLower() ||
-                        o.CarClass != CarData.getCarClassForClassName(getStringFromBytes(vehicle.mVehicleClass)) || 
-                        this.opponentKeysProcessed.Contains(opponentKey))
+                    if (previousGameState.OpponentData.ContainsKey(possibleKey))
                     {
-                        continue;
-                    }
-
-                    // distance from predicted position
-                    float targetDist = o.Speed * timeDelta;
-                    float dist = (float)Math.Abs(Math.Sqrt((double)((o.WorldPosition[0] - worldPos[0]) * (o.WorldPosition[0] - worldPos[0]) + 
-                        (o.WorldPosition[1] - worldPos[1]) * (o.WorldPosition[1] - worldPos[1]))) - targetDist);
-                    if (minDistDiff < 0.0f || dist < minDistDiff)
-                    {
-                        minDistDiff = dist;
-                        opponentPrevious = o;
+                        OpponentData o = previousGameState.OpponentData[possibleKey];
+                        if (o.DriverRawName != getStringFromBytes(vehicle.mDriverName).ToLower() ||
+                            o.CarClass != CarData.getCarClassForClassName(getStringFromBytes(vehicle.mVehicleClass)) ||
+                            opponentKeysProcessed.Contains(possibleKey))
+                        {
+                            continue;
+                        }
+                        // distance from predicted position
+                        float targetDist = o.Speed * timeDelta;
+                        float dist = (float)Math.Abs(Math.Sqrt((double)((o.WorldPosition[0] - worldPos[0]) * (o.WorldPosition[0] - worldPos[0]) +
+                            (o.WorldPosition[1] - worldPos[1]) * (o.WorldPosition[1] - worldPos[1]))) - targetDist);
+                        if (minDistDiff < 0.0f || dist < minDistDiff)
+                        {
+                            minDistDiff = dist;
+                            bestKey = possibleKey;
+                        }
                     }
                 }
-
-                if (opponentPrevious != null)
-                    this.opponentKeysProcessed.Add((String) opponentPrevious.VehicleIdRaw);
             }
-            return opponentPrevious;
+            if (bestKey != null)
+            {
+                opponentKeysProcessed.Add(bestKey);
+            }
+            return bestKey;
         }
 
         public SessionType mapToSessionType(Object memoryMappedFileStruct)

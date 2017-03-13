@@ -506,6 +506,27 @@ namespace CrewChiefV4.rFactor1
             // opponent data
             isOfflineSession = true;
             opponentKeysProcessed.Clear();
+
+            // first check for duplicates and online session:
+            Dictionary<string, int> driverNameCounts = new Dictionary<string, int>();
+            for (int i = 0; i < shared.numVehicles; ++i)
+            {
+                var vehicle = shared.vehicle[i];
+                String driverName = getNameFromBytes(vehicle.driverName).ToLower();
+                if (isOfflineSession && (rFactor1Constant.rfControl)vehicle.control == rFactor1Constant.rfControl.remote)
+                {
+                    isOfflineSession = false;
+                }
+                if (driverNameCounts.ContainsKey(driverName))
+                {
+                    driverNameCounts[driverName] = driverNameCounts[driverName]++;
+                }
+                else
+                {
+                    driverNameCounts.Add(driverName, 1);
+                }
+            }
+
             for (int i = 0; i < shared.vehicle.Length; i++)
             {
                 rFactor1Data.rfVehicleInfo vehicle = shared.vehicle[i];
@@ -529,15 +550,32 @@ namespace CrewChiefV4.rFactor1
                     default:
                         break;
                 }
-                String vehicleName = getNameFromBytes(vehicle.vehicleName);
-                String vehicleClass = getNameFromBytes(vehicle.vehicleClass);
-                String vehicleIdRaw = vehicleName + ":" + vehicleClass;
-                OpponentData opponentPrevious = getOpponentDataForVehicleInfo(vehicle, previousGameState, currentGameState.SessionData.SessionRunningTime);
+                String driverName = getNameFromBytes(vehicle.driverName).ToLower();
+                OpponentData opponentPrevious;
+                int duplicatesCount = driverNameCounts[driverName];
+                String opponentKey;
+                if (duplicatesCount > 1)
+                {
+                    if (!isOfflineSession)
+                    {
+                        // there shouldn't be duplicate driver names in online sessions
+                        continue;
+                    }
+                    else
+                    {
+                        // offline we can have any number of duplicates :(
+                        opponentKey = getOpponentKeyForVehicleInfo(vehicle, previousGameState, currentGameState.SessionData.SessionRunningTime, driverName, duplicatesCount);
+                    }
+                }
+                else
+                {
+                    opponentKey = driverName;                    
+                }
+                opponentPrevious = previousGameState == null || opponentKey == null ? null : previousGameState.OpponentData[opponentKey];
                 OpponentData opponent = new OpponentData();
-                opponent.VehicleIdRaw = vehicleIdRaw;
-                opponent.DriverRawName = getNameFromBytes(vehicle.driverName).ToLower();
+                opponent.DriverRawName = driverName;
                 opponent.DriverNameSet = opponent.DriverRawName.Length > 0;
-                opponent.CarClass = getCarClass(vehicleName, false);
+                opponent.CarClass = getCarClass(getNameFromBytes(vehicle.vehicleName), false);
                 opponent.Position = vehicle.place;
                 if (opponent.DriverNameSet && opponentPrevious == null && CrewChief.enableDriverNames)
                 {
@@ -639,15 +677,14 @@ namespace CrewChiefV4.rFactor1
                     currentGameState.SessionData.OverallSessionBestLapTime = opponent.CurrentBestLapTime;
                 }
                 if (opponent.CurrentBestLapTime > 0 && (opponent.CurrentBestLapTime < currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass ||
-                    currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass < 0) /*&& JB: switch off all multi-class tracking for RF1 because the vehicle data is shit
-                    opponent.CarClass == currentGameState.carClass*/)
+                    currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass < 0) && opponent.CarClass == currentGameState.carClass)
                 {
                     currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass = opponent.CurrentBestLapTime;
                 }
                 // shouldn't have duplicates, but just in case
-                if (!currentGameState.OpponentData.ContainsKey(vehicleIdRaw))
+                if (!currentGameState.OpponentData.ContainsKey(opponentKey))
                 {
-                    currentGameState.OpponentData.Add(vehicleIdRaw, opponent);
+                    currentGameState.OpponentData.Add(opponentKey, opponent);
                 }
             }
             if (previousGameState != null)
@@ -963,21 +1000,30 @@ namespace CrewChiefV4.rFactor1
             }
         }
 
-        // finds OpponentData for given vehicle based on driver name, vehicle class, and world position
-        private OpponentData getOpponentDataForVehicleInfo(rfVehicleInfo vehicle, GameStateData previousGameState, float sessionRunningTime)
+        // finds OpponentData key for given vehicle based on driver name, vehicle class, and world position
+        private String getOpponentKeyForVehicleInfo(rfVehicleInfo vehicle, GameStateData previousGameState, float sessionRunningTime, String driverName, int duplicatesCount)
         {
-            OpponentData opponentPrevious = null;
-            float timeDelta = previousGameState != null ? sessionRunningTime - previousGameState.SessionData.SessionRunningTime : -1;
-            if (previousGameState != null && timeDelta >= 0)
+            if (previousGameState == null)
             {
-                float[] worldPos = { vehicle.pos.x, vehicle.pos.z };
-                float minDistDiff = -1;
-                foreach (OpponentData o in previousGameState.OpponentData.Values)
+                return null;
+            }
+            List<string> possibleKeys = new List<string>();
+            for (int i = 1; i <= duplicatesCount; i++)
+            {
+                possibleKeys.Add(driverName + "_duplicate_ " + i);
+            }
+            float[] worldPos = { vehicle.pos.x, vehicle.pos.z };
+            float minDistDiff = -1;
+            float timeDelta = sessionRunningTime - previousGameState.SessionData.SessionRunningTime;
+            String bestKey = null;
+            foreach (String possibleKey in possibleKeys)
+            {
+                if (previousGameState.OpponentData.ContainsKey(possibleKey))
                 {
-                    String opponentKey = (String) o.VehicleIdRaw;
+                    OpponentData o = previousGameState.OpponentData[possibleKey];
                     if (o.DriverRawName != getNameFromBytes(vehicle.driverName).ToLower() ||
                         o.CarClass != getCarClass(getNameFromBytes(vehicle.vehicleName), false) ||
-                        opponentKeysProcessed.Contains(opponentKey))
+                        opponentKeysProcessed.Contains(possibleKey))
                     {
                         continue;
                     }
@@ -988,15 +1034,15 @@ namespace CrewChiefV4.rFactor1
                     if (minDistDiff < 0 || dist < minDistDiff)
                     {
                         minDistDiff = dist;
-                        opponentPrevious = o;
+                        bestKey = possibleKey;
                     }
                 }
-                if (opponentPrevious != null)
-                {
-                    opponentKeysProcessed.Add((String) opponentPrevious.VehicleIdRaw);
-                }
             }
-            return opponentPrevious;
+            if (bestKey != null)
+            {
+                opponentKeysProcessed.Add(bestKey);
+            }
+            return bestKey;
         }
 
         public static String getNameFromBytes(byte[] name)
