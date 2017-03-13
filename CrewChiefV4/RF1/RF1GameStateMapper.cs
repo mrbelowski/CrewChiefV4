@@ -710,20 +710,12 @@ namespace CrewChiefV4.rFactor1
             {
                 currentGameState.SessionData.HasLeadChanged = !currentGameState.SessionData.HasLeadChanged && previousGameState.SessionData.Position > 1 && currentGameState.SessionData.Position == 1 ?
                     true : currentGameState.SessionData.HasLeadChanged;
-                String oPrevKey = null;
-                String oCurrKey = null;
-                OpponentData oPrev = null;
-                OpponentData oCurr = null;
-                oPrevKey = (String)previousGameState.getOpponentKeyInFrontOnTrack();
-                oCurrKey = (String)currentGameState.getOpponentKeyInFrontOnTrack();
-                oPrev = oPrevKey != null ? previousGameState.OpponentData[oPrevKey] : null;
-                oCurr = oCurrKey != null ? currentGameState.OpponentData[oCurrKey] : null;
-                currentGameState.SessionData.IsRacingSameCarInFront = !((oPrev == null && oCurr != null) || (oPrev != null && oCurr == null) || (oPrev != null && oCurr != null && oPrev.DriverRawName != oCurr.DriverRawName));
+                String oPrevKey = (String)previousGameState.getOpponentKeyInFrontOnTrack();
+                String oCurrKey = (String)currentGameState.getOpponentKeyInFrontOnTrack();
+                currentGameState.SessionData.IsRacingSameCarInFront = String.Equals(oPrevKey, oCurrKey);
                 oPrevKey = (String)previousGameState.getOpponentKeyBehindOnTrack();
                 oCurrKey = (String)currentGameState.getOpponentKeyBehindOnTrack();
-                oPrev = oPrevKey != null ? previousGameState.OpponentData[oPrevKey] : null;
-                oCurr = oCurrKey != null ? currentGameState.OpponentData[oCurrKey] : null;
-                currentGameState.SessionData.IsRacingSameCarBehind = !((oPrev == null && oCurr != null) || (oPrev != null && oCurr == null) || (oPrev != null && oCurr != null && oPrev.DriverRawName != oCurr.DriverRawName));
+                currentGameState.SessionData.IsRacingSameCarBehind = String.Equals(oPrevKey, oCurrKey);
                 currentGameState.SessionData.GameTimeAtLastPositionFrontChange = !currentGameState.SessionData.IsRacingSameCarInFront ? 
                     currentGameState.SessionData.SessionRunningTime : previousGameState.SessionData.GameTimeAtLastPositionFrontChange;
                 currentGameState.SessionData.GameTimeAtLastPositionBehindChange = !currentGameState.SessionData.IsRacingSameCarBehind ? 

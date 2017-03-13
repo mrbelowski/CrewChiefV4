@@ -814,25 +814,13 @@ namespace CrewChiefV4.rFactor2
                 csd.HasLeadChanged = !csd.HasLeadChanged && psd.Position > 1 && csd.Position == 1 ?
                     true : csd.HasLeadChanged;
 
-                var oPrevKey = (String)pgs.getOpponentKeyInFrontOnTrack();
-                var oCurrKey = (String)cgs.getOpponentKeyInFrontOnTrack();
-                var oPrev = oPrevKey != null ? pgs.OpponentData[oPrevKey] : null;
-                var oCurr = oCurrKey != null ? cgs.OpponentData[oCurrKey] : null;
-
-                csd.IsRacingSameCarInFront = !((oPrev == null && oCurr != null)
-                                                || (oPrev != null && oCurr == null)
-                                                || (oPrev != null && oCurr != null
-                                                    && oPrev.DriverRawName != oCurr.DriverRawName));
+                String oPrevKey = (String)pgs.getOpponentKeyInFrontOnTrack();
+                String oCurrKey = (String)cgs.getOpponentKeyInFrontOnTrack();
+                csd.IsRacingSameCarInFront = String.Equals(oPrevKey, oCurrKey);
 
                 oPrevKey = (String)pgs.getOpponentKeyBehindOnTrack();
                 oCurrKey = (String)cgs.getOpponentKeyBehindOnTrack();
-                oPrev = oPrevKey != null ? pgs.OpponentData[oPrevKey] : null;
-                oCurr = oCurrKey != null ? cgs.OpponentData[oCurrKey] : null;
-
-                csd.IsRacingSameCarBehind = !((oPrev == null && oCurr != null)
-                                               || (oPrev != null && oCurr == null)
-                                               || (oPrev != null && oCurr != null
-                                                   && oPrev.DriverRawName != oCurr.DriverRawName));
+                csd.IsRacingSameCarBehind = String.Equals(oPrevKey, oCurrKey);
 
                 csd.GameTimeAtLastPositionFrontChange = !csd.IsRacingSameCarInFront ?
                     csd.SessionRunningTime : psd.GameTimeAtLastPositionFrontChange;
