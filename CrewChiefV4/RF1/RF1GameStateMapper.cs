@@ -590,7 +590,7 @@ namespace CrewChiefV4.rFactor1
                 {
                     opponentKey = driverName;                    
                 }
-                opponentPrevious = previousGameState == null || opponentKey == null ? null : previousGameState.OpponentData[opponentKey];
+                opponentPrevious = previousGameState == null || opponentKey == null || !previousGameState.OpponentData.ContainsKey(opponentKey) ? null : previousGameState.OpponentData[opponentKey];
                 OpponentData opponent = new OpponentData();
                 opponent.DriverRawName = driverName;
                 opponent.DriverNameSet = opponent.DriverRawName.Length > 0;

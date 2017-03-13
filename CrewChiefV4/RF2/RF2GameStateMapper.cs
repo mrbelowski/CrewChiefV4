@@ -628,7 +628,7 @@ namespace CrewChiefV4.rFactor2
                 {
                     opponentKey = driverName;
                 }
-                opponentPrevious = previousGameState == null || opponentKey == null ? null : previousGameState.OpponentData[opponentKey];
+                opponentPrevious = pgs == null || opponentKey == null || !pgs.OpponentData.ContainsKey(opponentKey) ? null : previousGameState.OpponentData[opponentKey];
                 OpponentData opponent = new OpponentData();
                 opponent.DriverRawName = driverName;
                 opponent.CarClass = CarData.getCarClassForClassName(getStringFromBytes(vehicle.mVehicleClass));                
