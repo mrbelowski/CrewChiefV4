@@ -528,7 +528,7 @@ namespace CrewChiefV4.rFactor1
                 }
             }
 
-            for (int i = 0; i < shared.vehicle.Length; i++)
+            for (int i = 0; i < shared.numVehicles; i++)
             {
                 rFactor1Data.rfVehicleInfo vehicle = shared.vehicle[i];
                 if (vehicle.isPlayer == 1)
