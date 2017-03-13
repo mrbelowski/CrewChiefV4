@@ -811,22 +811,11 @@ namespace CrewChiefV4.rFactor2
 
             if (pgs != null)
             {
-                csd.HasLeadChanged = !csd.HasLeadChanged && psd.Position > 1 && csd.Position == 1 ?
-                    true : csd.HasLeadChanged;
-
-                String oPrevKey = (String)pgs.getOpponentKeyInFrontOnTrack();
-                String oCurrKey = (String)cgs.getOpponentKeyInFrontOnTrack();
-                csd.IsRacingSameCarInFront = String.Equals(oPrevKey, oCurrKey);
-
-                oPrevKey = (String)pgs.getOpponentKeyBehindOnTrack();
-                oCurrKey = (String)cgs.getOpponentKeyBehindOnTrack();
-                csd.IsRacingSameCarBehind = String.Equals(oPrevKey, oCurrKey);
-
-                csd.GameTimeAtLastPositionFrontChange = !csd.IsRacingSameCarInFront ?
-                    csd.SessionRunningTime : psd.GameTimeAtLastPositionFrontChange;
-
-                csd.GameTimeAtLastPositionBehindChange = !csd.IsRacingSameCarBehind ?
-                    csd.SessionRunningTime : psd.GameTimeAtLastPositionBehindChange;
+                csd.HasLeadChanged = !csd.HasLeadChanged && psd.Position > 1 && csd.Position == 1 ? true : csd.HasLeadChanged;
+                csd.IsRacingSameCarInFront = String.Equals(pgs.getOpponentKeyInFront(false), cgs.getOpponentKeyInFront(false));
+                csd.IsRacingSameCarBehind = String.Equals(pgs.getOpponentKeyBehind(false), cgs.getOpponentKeyBehind(false));
+                csd.GameTimeAtLastPositionFrontChange = !csd.IsRacingSameCarInFront ? csd.SessionRunningTime : psd.GameTimeAtLastPositionFrontChange;
+                csd.GameTimeAtLastPositionBehindChange = !csd.IsRacingSameCarBehind ? csd.SessionRunningTime : psd.GameTimeAtLastPositionBehindChange;
             }
 
             // --------------------------------
