@@ -260,37 +260,16 @@ namespace CrewChiefV4.rFactor2
             csd.PositionAtStartOfCurrentLap = csd.IsNewLap ? csd.Position : psd.PositionAtStartOfCurrentLap;
             // TODO: See if Black Flag handling needed here.
             csd.IsDisqualified = (rFactor2Constants.rF2FinishStatus)player.mFinishStatus == rFactor2Constants.rF2FinishStatus.Dq;
-            csd.CompletedLaps = player.mTotalLaps;
-            csd.LapTimeCurrent = csd.SessionRunningTime - (float)player.mLapStartET;
-            csd.LapTimePrevious = player.mLastLapTime > 0.0f ? (float)player.mLastLapTime : -1.0f;
-
-            // Last (most current) per-sector times:
-            // Note: this logic still misses invalid sector handling.
-            var lastS1Time = player.mLastSector1 > 0.0 ? player.mLastSector1 : -1.0;
-            var lastS2Time = player.mLastSector1 > 0.0 && player.mLastSector2 > 0.0
-                ? player.mLastSector2 - player.mLastSector1 : -1.0;
-            var lastS3Time = player.mLastSector2 > 0.0 && player.mLastLapTime > 0.0
-                ? player.mLastLapTime - player.mLastSector2 : -1.0;
-
-            csd.LastSector1Time = (float)lastS1Time;
-            csd.LastSector2Time = (float)lastS2Time;
-            csd.LastSector3Time = (float)lastS3Time;
-
-            // Check if we have more current values for S1 and S2.
-            // S3 always equals to lastS3Time.
-            if (player.mCurSector1 > 0.0)
-                csd.LastSector1Time = (float)player.mCurSector1;
-
-            if (player.mCurSector1 > 0.0 && player.mCurSector2 > 0.0)
-                csd.LastSector2Time = (float)(player.mCurSector2 - player.mCurSector1);
-
-            csd.PlayerBestSector1Time = player.mBestSector1 > 0.0f ? (float)player.mBestSector1 : -1.0f;
+            /*csd.PlayerBestSector1Time = player.mBestSector1 > 0.0f ? (float)player.mBestSector1 : -1.0f;
             csd.PlayerBestSector2Time = player.mBestSector2 > 0.0f && player.mBestSector1 > 0.0f ? (float)(player.mBestSector2 - player.mBestSector1) : -1.0f;
-            csd.PlayerBestSector3Time = player.mBestLapTime > 0.0f && player.mBestSector2 > 0.0f ? (float)(player.mBestLapTime - player.mBestSector2) : -1.0f;
-            csd.PlayerBestLapSector1Time = csd.PlayerBestSector1Time;
-            csd.PlayerBestLapSector2Time = csd.PlayerBestSector2Time;
-            csd.PlayerBestLapSector3Time = csd.PlayerBestSector3Time;
-            csd.PlayerLapTimeSessionBest = player.mBestLapTime > 0.0f ? (float)player.mBestLapTime : -1.0f;
+            // TODO: This is incorrect.  We need to store player's lap data to figure this out.
+            csd.PlayerBestSector3Time = player.mBestLapTime > 0.0f && player.mBestSector2 > 0.0f ? (float)(player.mBestLapTime - player.mBestSector2) : -1.0f;*/
+
+            // TODO: make suse this is reasonably close to what we calculate during lap tracking
+            // csd.PlayerLapTimeSessionBest = player.mBestLapTime > 0.0f ? (float)player.mBestLapTime : -1.0f;
+
+            this.trackPlayerTimingData(ref rf2state, cgs, csd, psd, ref player);
+
             csd.SessionTimesAtEndOfSectors = pgs != null ? psd.SessionTimesAtEndOfSectors : new SessionData().SessionTimesAtEndOfSectors;
 
             if (csd.IsNewSector && !csd.IsNewSession)
@@ -578,7 +557,7 @@ namespace CrewChiefV4.rFactor2
                 var opponentKey = $"{vehicle.mID}:{opponent.CarClass.getClassIdentifier()}:{opponent.DriverRawName}:{RF2GameStateMapper.getStringFromBytes(vehicle.mVehicleName)}";
                 opponent.VehicleIdRaw = opponentKey;
                 // We want VehicleIdRaw to be constant during the session
-                Debug.Assert(opponentPrevious == null || (String) opponentPrevious.VehicleIdRaw == (String) opponent.VehicleIdRaw);
+                Debug.Assert(opponentPrevious == null || (String)opponentPrevious.VehicleIdRaw == (String)opponent.VehicleIdRaw);
 
                 opponent.DriverRawName = getStringFromBytes(vehicle.mDriverName).ToLower();
                 opponent.DriverNameSet = opponent.DriverRawName.Length > 0;
@@ -808,13 +787,16 @@ namespace CrewChiefV4.rFactor2
             cgs.PitData.OnOutLap = cgs.PitData.InPitlane && csd.SectorNumber == 1;
 
             if (rf2state.mInRealtimeFC == 0  // Mark pit limiter as unavailable if in Monitor (not real time).
-                || rf2state.mSpeedLimiterAvailable == 0) {
+                || rf2state.mSpeedLimiterAvailable == 0)
+            {
                 cgs.PitData.limiterStatus = -1;
-            } else {
+            }
+            else
+            {
                 cgs.PitData.limiterStatus = rf2state.mSpeedLimiter > 0 ? 1 : 0;
             }
 
-            if (pgs != null 
+            if (pgs != null
                 && csd.CompletedLaps == psd.CompletedLaps
                 && pgs.PitData.OnOutLap)
             {
@@ -889,7 +871,7 @@ namespace CrewChiefV4.rFactor2
                         cgs.FlagData.sectorFlags[i] = FlagEnum.YELLOW;
                 }
             }
-            
+
             var currFlag = FlagEnum.UNKNOWN;
 
             if (UserSettings.GetUserSettings().getBoolean("enable_rf2_white_on_last_lap"))
@@ -997,29 +979,141 @@ namespace CrewChiefV4.rFactor2
                 Console.WriteLine("SessionStartPosition " + csd.SessionStartPosition);
                 Console.WriteLine("SessionStartTime " + csd.SessionStartTime);
                 Console.WriteLine("TrackName " + csd.TrackDefinition.name);
-                Console.WriteLine("Player is using car class " + cgs.carClass.getClassIdentifier() + 
+                Console.WriteLine("Player is using car class " + cgs.carClass.getClassIdentifier() +
                     " at position " + csd.Position.ToString());
             }
             if (pgs != null && psd.SessionPhase != csd.SessionPhase)
             {
-                Console.WriteLine("SessionPhase changed from " + psd.SessionPhase + 
+                Console.WriteLine("SessionPhase changed from " + psd.SessionPhase +
                     " to " + csd.SessionPhase);
-                if (csd.SessionPhase == SessionPhase.Checkered || 
+                if (csd.SessionPhase == SessionPhase.Checkered ||
                     csd.SessionPhase == SessionPhase.Finished)
                 {
-                    Console.WriteLine("Checkered - completed " + csd.CompletedLaps + 
+                    Console.WriteLine("Checkered - completed " + csd.CompletedLaps +
                         " laps, session running time = " + csd.SessionRunningTime);
                 }
             }
             if (pgs != null && !psd.LeaderHasFinishedRace && csd.LeaderHasFinishedRace)
             {
-                Console.WriteLine("Leader has finished race, player has done " + csd.CompletedLaps + 
+                Console.WriteLine("Leader has finished race, player has done " + csd.CompletedLaps +
                     " laps, session time = " + csd.SessionRunningTime);
             }
 
             return cgs;
         }
 
+        private void trackPlayerTimingData(
+            ref rF2State rf2state,
+            GameStateData currentGameState,
+            SessionData currentSessionData,
+            SessionData previousSessionData,
+            ref rF2VehScoringInfo player)
+        {
+            var csd = currentSessionData;
+            var psd = previousSessionData;
+
+            csd.CompletedLaps = player.mTotalLaps;
+            csd.LapTimeCurrent = csd.SessionRunningTime - (float)player.mLapStartET;
+            csd.LapTimePrevious = player.mLastLapTime > 0.0f ? (float)player.mLastLapTime : -1.0f;
+
+            // Last (most current) per-sector times:
+            // Note: this logic still misses invalid sector handling.
+            var lastS1Time = player.mLastSector1 > 0.0 ? player.mLastSector1 : -1.0;
+            var lastS2Time = player.mLastSector1 > 0.0 && player.mLastSector2 > 0.0
+                ? player.mLastSector2 - player.mLastSector1 : -1.0;
+            var lastS3Time = player.mLastSector2 > 0.0 && player.mLastLapTime > 0.0
+                ? player.mLastLapTime - player.mLastSector2 : -1.0;
+
+            csd.LastSector1Time = (float)lastS1Time;
+            csd.LastSector2Time = (float)lastS2Time;
+            csd.LastSector3Time = (float)lastS3Time;
+
+            // Check if we have more current values for S1 and S2.
+            // S3 always equals to lastS3Time.
+            if (player.mCurSector1 > 0.0)
+                csd.LastSector1Time = (float)player.mCurSector1;
+
+            if (player.mCurSector1 > 0.0 && player.mCurSector2 > 0.0)
+                csd.LastSector2Time = (float)(player.mCurSector2 - player.mCurSector1);
+
+
+            // Below values change on sector/lap change, otherwise stay the same between updates.
+            // Preserve current values.
+            csd.PlayerBestSector1Time = psd != null ? psd.PlayerBestSector1Time : -1.0f;
+            csd.PlayerBestSector2Time = psd != null ? psd.PlayerBestSector2Time : -1.0f;
+            csd.PlayerBestSector3Time = psd != null ? psd.PlayerBestSector3Time : -1.0f;
+
+            csd.PlayerBestLapSector1Time = psd != null ? csd.PlayerBestLapSector1Time : -1.0f;
+            csd.PlayerBestLapSector2Time = psd != null ? csd.PlayerBestLapSector2Time : -1.0f;
+            csd.PlayerBestLapSector3Time = psd != null ? csd.PlayerBestLapSector3Time : -1.0f;
+
+            csd.PlayerLapTimeSessionBest = psd != null ? psd.PlayerLapTimeSessionBest : -1.0f;
+            csd.PlayerLapTimeSessionBestPrevious = psd != null ? psd.PlayerLapTimeSessionBestPrevious : -1.0f;
+
+            // Check if update is needed.
+            if (!csd.IsNewLap && !csd.IsNewSector)
+                return;
+
+            float lastSectorTime = -1.0f;
+            switch (csd.SectorNumber)
+            {
+                case 1:
+                    lastSectorTime = player.mLastLapTime > 0.0f ? (float)player.mLastLapTime : -1.0f;
+                    break;
+                case 2:
+                    lastSectorTime = player.mLastSector1 > 0.0f ? (float)player.mLastSector1 : -1.0f;
+
+                    if (player.mCurSector1 > 0.0)
+                        lastSectorTime = (float)player.mCurSector1;
+
+                    break;
+                case 3:
+                    lastSectorTime = player.mLastSector2 > 0.0f ? (float)player.mLastSector2 : -1.0f;
+
+                    if (player.mCurSector2 > 0.0)
+                        lastSectorTime = (float)player.mCurSector2;
+
+                    break;
+                default:
+                    break;
+            }
+
+            if (csd.IsNewLap)
+            {
+                if (csd.LastSector3Time > 0.0f)
+                {
+                    csd.playerCompleteLapWithProvidedLapTime(
+                        csd.Position,
+                        csd.SessionRunningTime,
+                        csd.LapTimePrevious,
+                        true,  // TODO: revisit
+                        false, // TODO: revisit
+                        (float)rf2state.mTrackTemp,
+                        (float)rf2state.mAmbientTemp,
+                        csd.SessionHasFixedTime,
+                        csd.SessionTimeRemaining);
+                }
+                csd.playerStartNewLap(
+                    csd.CompletedLaps + 1,
+                    csd.Position,
+                    player.mInPits == 1 || currentGameState.PositionAndMotionData.DistanceRoundTrack < 0.0f,  // VERIFY SET.
+                    csd.SessionRunningTime,
+                    false,
+                    (float)rf2state.mTrackTemp,
+                    (float)rf2state.mAmbientTemp);
+            }
+            else if (csd.IsNewSector && lastSectorTime > 0.0f)
+            {
+                csd.playerAddCumulativeSectorData(
+                    csd.Position,
+                    lastSectorTime,
+                    csd.SessionRunningTime,
+                    true,  // Revisit
+                    false,
+                    (float)rf2state.mTrackTemp,
+                    (float)rf2state.mAmbientTemp);
+            }
+        }
 
 #if DEBUG
         // NOTE: This can be made generic for all sims, but I am not sure if anyone needs this but me

@@ -281,6 +281,15 @@ namespace CrewChiefV4.Events
                     else if (currentGameState.SessionData.SessionType == SessionType.Qualify || currentGameState.SessionData.SessionType == SessionType.Practice)
                     {
                         lapAndSectorsComparisonData = currentGameState.getTimeAndSectorsForBestOpponentLapInWindow(-1, currentGameState.carClass.getClassIdentifier());
+
+                        if (currentGameState.SessionData.IsNewLap)
+                        {
+                            //currentGameState.SessionData.laptime
+                        }
+                        else
+                        {
+
+                        }
                     }
                 }
             }
