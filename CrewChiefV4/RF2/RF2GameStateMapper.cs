@@ -602,27 +602,21 @@ namespace CrewChiefV4.rFactor2
                 opponent.InPits = vehicle.mInPits == 1;
 
                 float lastSectorTime = -1.0f;
-                switch (opponent.CurrentSectorNumber)
+                if (opponent.CurrentSectorNumber == 1)
+                    lastSectorTime = vehicle.mLastLapTime > 0.0f ? (float)vehicle.mLastLapTime : -1.0f;
+                else if (opponent.CurrentSectorNumber == 2)
                 {
-                    case 1:
-                        lastSectorTime = vehicle.mLastLapTime > 0.0f ? (float)vehicle.mLastLapTime : -1.0f;
-                        break;
-                    case 2:
-                        lastSectorTime = vehicle.mLastSector1 > 0.0f ? (float)vehicle.mLastSector1 : -1.0f;
+                    lastSectorTime = vehicle.mLastSector1 > 0.0f ? (float)vehicle.mLastSector1 : -1.0f;
 
-                        if (vehicle.mCurSector1 > 0.0)
-                            lastSectorTime = (float)vehicle.mCurSector1;
+                    if (vehicle.mCurSector1 > 0.0)
+                        lastSectorTime = (float)vehicle.mCurSector1;
+                }
+                else if (opponent.CurrentSectorNumber == 3)
+                {
+                    lastSectorTime = vehicle.mLastSector2 > 0.0f ? (float)vehicle.mLastSector2 : -1.0f;
 
-                        break;
-                    case 3:
-                        lastSectorTime = vehicle.mLastSector2 > 0.0f ? (float)vehicle.mLastSector2 : -1.0f;
-
-                        if (vehicle.mCurSector2 > 0.0)
-                            lastSectorTime = (float)vehicle.mCurSector2;
-
-                        break;
-                    default:
-                        break;
+                    if (vehicle.mCurSector2 > 0.0)
+                        lastSectorTime = (float)vehicle.mCurSector2;
                 }
 
                 bool lapValid = true;
@@ -1077,27 +1071,21 @@ namespace CrewChiefV4.rFactor2
                 return;
 
             float lastSectorTime = -1.0f;
-            switch (csd.SectorNumber)
+            if (csd.SectorNumber == 1)
+                lastSectorTime = player.mLastLapTime > 0.0f ? (float)player.mLastLapTime : -1.0f;
+            else if (csd.SectorNumber == 2)
             {
-                case 1:
-                    lastSectorTime = player.mLastLapTime > 0.0f ? (float)player.mLastLapTime : -1.0f;
-                    break;
-                case 2:
-                    lastSectorTime = player.mLastSector1 > 0.0f ? (float)player.mLastSector1 : -1.0f;
+                lastSectorTime = player.mLastSector1 > 0.0f ? (float)player.mLastSector1 : -1.0f;
 
-                    if (player.mCurSector1 > 0.0)
-                        lastSectorTime = (float)player.mCurSector1;
+                if (player.mCurSector1 > 0.0)
+                    lastSectorTime = (float)player.mCurSector1;
+            }
+            else if (csd.SectorNumber == 3)
+            { 
+                lastSectorTime = player.mLastSector2 > 0.0f ? (float)player.mLastSector2 : -1.0f;
 
-                    break;
-                case 3:
-                    lastSectorTime = player.mLastSector2 > 0.0f ? (float)player.mLastSector2 : -1.0f;
-
-                    if (player.mCurSector2 > 0.0)
-                        lastSectorTime = (float)player.mCurSector2;
-
-                    break;
-                default:
-                    break;
+                if (player.mCurSector2 > 0.0)
+                    lastSectorTime = (float)player.mCurSector2;
             }
 
             if (csd.IsNewLap)
