@@ -12,6 +12,7 @@ namespace CrewChiefV4
         public String landmarkName { get; set; }
         public float distanceRoundLapStart { get; set; }
         public float distanceRoundLapEnd { get; set; }
+        public Boolean isCommonOvertakingSpot { get; set; }
     }
 
     public class TrackLandmarksForTrack
