@@ -250,8 +250,9 @@ namespace CrewChiefV4.Events
                 }
             }
             // can't read penalty type in Automobilista
+            // Assume this applies to rF2 as well for now
             else if (currentGameState.SessionData.SessionType == SessionType.Race && previousGameState != null &&
-                currentGameState.PenaltiesData.NumPenalties > 0 && CrewChief.gameDefinition.gameEnum == GameEnum.RF1)
+                currentGameState.PenaltiesData.NumPenalties > 0 && (CrewChief.gameDefinition.gameEnum == GameEnum.RF1 || CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT))
             {
                 if (currentGameState.PenaltiesData.NumPenalties > previousGameState.PenaltiesData.NumPenalties)
                 {
@@ -298,9 +299,9 @@ namespace CrewChiefV4.Events
             if (currentGameState.SessionData.SessionType == SessionType.Race && previousGameState != null && 
                 ((previousGameState.PenaltiesData.HasStopAndGo && !currentGameState.PenaltiesData.HasStopAndGo) ||
                 (previousGameState.PenaltiesData.HasDriveThrough && !currentGameState.PenaltiesData.HasDriveThrough) ||
-                // can't read penalty type in Automobilista
-                (previousGameState.PenaltiesData.NumPenalties > currentGameState.PenaltiesData.NumPenalties && 
-                CrewChief.gameDefinition.gameEnum == GameEnum.RF1)))
+                // can't read penalty type in Automobilista (and presumably in rF2).
+                (previousGameState.PenaltiesData.NumPenalties > currentGameState.PenaltiesData.NumPenalties &&
+                (CrewChief.gameDefinition.gameEnum == GameEnum.RF1 || CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT))))
             {
                 audioPlayer.playMessage(new QueuedMessage(folderPenaltyServed, 0, this));
             }            
