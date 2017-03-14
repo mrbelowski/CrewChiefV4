@@ -384,11 +384,6 @@ namespace CrewChiefV4.GameState
         // the name read directly from the game data - might be a 'handle' with all kinds of random crap in it
         public String DriverRawName = null;
 
-        // the vehicle identifier as sent from the game. Currently:
-        // - In RF1 consists of vehicleName + ":" + vehicleClass
-        // - In rF2 consists of mID:CarClass.ID:mDriverName(raw):mVehicleClass
-        public Object VehicleIdRaw = null;
-
         public Boolean DriverNameSet = false;
 
         public int Position = 0;

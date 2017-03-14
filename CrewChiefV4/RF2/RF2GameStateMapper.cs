@@ -523,8 +523,26 @@ namespace CrewChiefV4.rFactor2
             this.isOfflineSession = true;
             this.opponentKeysProcessed.Clear();
 
-            // NOTE: AMS/rF1 implementation scanned all vehicles, we only scan active (beyound comes trash).
-            // See if it causes problems.
+            // first check for duplicates and online session:
+            Dictionary<string, int> driverNameCounts = new Dictionary<string, int>();
+            Dictionary<string, int> duplicatesCreated = new Dictionary<string, int>();
+            for (int i = 0; i < rf2state.mNumVehicles; ++i)
+            {
+                var vehicle = rf2state.mVehicles[i];
+                String driverName = getStringFromBytes(vehicle.mDriverName).ToLower();
+                if (isOfflineSession && (rFactor2Constants.rF2Control)vehicle.mControl == rFactor2Constants.rF2Control.Remote) {
+                    isOfflineSession = false;
+                }
+                if (driverNameCounts.ContainsKey(driverName))
+                {
+                    driverNameCounts[driverName] += 1;
+                }
+                else
+                {
+                    driverNameCounts.Add(driverName, 1);
+                }
+            }
+
             for (int i = 0; i < rf2state.mNumVehicles; ++i)
             {
                 var vehicle = rf2state.mVehicles[i];
@@ -538,7 +556,7 @@ namespace CrewChiefV4.rFactor2
 
                     continue;
                 }
-
+                
                 switch (mapToControlType((rFactor2Constants.rF2Control)vehicle.mControl))
                 {
                     case ControlType.Player:
@@ -551,17 +569,52 @@ namespace CrewChiefV4.rFactor2
                     default:
                         break;
                 }
+                String driverName = getStringFromBytes(vehicle.mDriverName).ToLower();
+                OpponentData opponentPrevious;
+                int duplicatesCount = driverNameCounts[driverName];
+                String opponentKey;
+                if (duplicatesCount > 1)
+                {
+                    if (!isOfflineSession)
+                    {
+                        // there shouldn't be duplicate driver names in online sessions. This is probably a temporary glitch in the shared memory data - 
+                        // don't panic and drop the existing opponentData for this key - just copy it across to the current state. This prevents us losing
+                        // the historical data and repeatedly re-adding this name to the SpeechRecogniser (which is expensive)
+                        if (pgs != null && pgs.OpponentData.ContainsKey(driverName) && 
+                            !cgs.OpponentData.ContainsKey(driverName))
+                        {
+                            cgs.OpponentData.Add(driverName, pgs.OpponentData[driverName]);
+                        }
+                        opponentKeysProcessed.Add(driverName);
+                        continue;
+                    }
+                    else
+                    {
+                        // offline we can have any number of duplicates :(
+                        opponentKey = getOpponentKeyForVehicleInfo(vehicle, pgs, csd.SessionRunningTime, driverName, duplicatesCount);
+                        if (opponentKey == null)
+                        {
+                            // there's no previous opponent data record for this driver so create one
+                            if (duplicatesCreated.ContainsKey(driverName))
+                            {
+                                duplicatesCreated[driverName] += 1;
+                            } else {
+                                duplicatesCreated.Add(driverName, 1);
+                            }
+                            opponentKey = driverName + "_duplicate_" + duplicatesCreated[driverName];
+                        }
+                    }
+                }
+                else
+                {
+                    opponentKey = driverName;
+                }
+                opponentPrevious = pgs == null || opponentKey == null || !pgs.OpponentData.ContainsKey(opponentKey) ? null : previousGameState.OpponentData[opponentKey];
+                OpponentData opponent = new OpponentData();
+                opponent.DriverRawName = driverName;
+                opponent.CarClass = CarData.getCarClassForClassName(getStringFromBytes(vehicle.mVehicleClass));                
 
-                var opponentPrevious = getOpponentDataForVehicleInfo(vehicle, pgs, csd.SessionRunningTime);
-                var opponent = new OpponentData();
-                opponent.CarClass = CarData.getCarClassForClassName(getStringFromBytes(vehicle.mVehicleClass));
-                opponent.DriverRawName = getStringFromBytes(vehicle.mDriverName).ToLower();
-                var opponentKey = $"{vehicle.mID}:{opponent.CarClass.getClassIdentifier()}:{opponent.DriverRawName}:{RF2GameStateMapper.getStringFromBytes(vehicle.mVehicleName)}";
-                opponent.VehicleIdRaw = opponentKey;
-                // We want VehicleIdRaw to be constant during the session
-                Debug.Assert(opponentPrevious == null || (String)opponentPrevious.VehicleIdRaw == (String)opponent.VehicleIdRaw);
-
-                opponent.DriverRawName = getStringFromBytes(vehicle.mDriverName).ToLower();
+                opponent.DriverRawName = driverName;
                 opponent.DriverNameSet = opponent.DriverRawName.Length > 0;
                 opponent.Position = vehicle.mPlace;
 
@@ -733,34 +786,11 @@ namespace CrewChiefV4.rFactor2
 
             if (pgs != null)
             {
-                csd.HasLeadChanged = !csd.HasLeadChanged && psd.Position > 1 && csd.Position == 1 ?
-                    true : csd.HasLeadChanged;
-
-                var oPrevKey = (String)pgs.getOpponentKeyInFrontOnTrack();
-                var oCurrKey = (String)cgs.getOpponentKeyInFrontOnTrack();
-                var oPrev = oPrevKey != null ? pgs.OpponentData[oPrevKey] : null;
-                var oCurr = oCurrKey != null ? cgs.OpponentData[oCurrKey] : null;
-
-                csd.IsRacingSameCarInFront = !((oPrev == null && oCurr != null)
-                                                || (oPrev != null && oCurr == null)
-                                                || (oPrev != null && oCurr != null
-                                                    && oPrev.DriverRawName != oCurr.DriverRawName));
-
-                oPrevKey = (String)pgs.getOpponentKeyBehindOnTrack();
-                oCurrKey = (String)cgs.getOpponentKeyBehindOnTrack();
-                oPrev = oPrevKey != null ? pgs.OpponentData[oPrevKey] : null;
-                oCurr = oCurrKey != null ? cgs.OpponentData[oCurrKey] : null;
-
-                csd.IsRacingSameCarBehind = !((oPrev == null && oCurr != null)
-                                               || (oPrev != null && oCurr == null)
-                                               || (oPrev != null && oCurr != null
-                                                   && oPrev.DriverRawName != oCurr.DriverRawName));
-
-                csd.GameTimeAtLastPositionFrontChange = !csd.IsRacingSameCarInFront ?
-                    csd.SessionRunningTime : psd.GameTimeAtLastPositionFrontChange;
-
-                csd.GameTimeAtLastPositionBehindChange = !csd.IsRacingSameCarBehind ?
-                    csd.SessionRunningTime : psd.GameTimeAtLastPositionBehindChange;
+                csd.HasLeadChanged = !csd.HasLeadChanged && psd.Position > 1 && csd.Position == 1 ? true : csd.HasLeadChanged;
+                csd.IsRacingSameCarInFront = String.Equals(pgs.getOpponentKeyInFront(false), cgs.getOpponentKeyInFront(false));
+                csd.IsRacingSameCarBehind = String.Equals(pgs.getOpponentKeyBehind(false), cgs.getOpponentKeyBehind(false));
+                csd.GameTimeAtLastPositionFrontChange = !csd.IsRacingSameCarInFront ? csd.SessionRunningTime : psd.GameTimeAtLastPositionFrontChange;
+                csd.GameTimeAtLastPositionBehindChange = !csd.IsRacingSameCarBehind ? csd.SessionRunningTime : psd.GameTimeAtLastPositionBehindChange;
             }
 
             // --------------------------------
@@ -1213,41 +1243,52 @@ namespace CrewChiefV4.rFactor2
             }
         }
 
-        // finds OpponentData for given vehicle based on driver name, vehicle class, and world position
-        private OpponentData getOpponentDataForVehicleInfo(rF2VehScoringInfo vehicle, GameStateData previousGameState, float sessionRunningTime)
+        // finds OpponentData key for given vehicle based on driver name, vehicle class, and world position
+        private String getOpponentKeyForVehicleInfo(rF2VehScoringInfo vehicle, GameStateData previousGameState, float sessionRunningTime, String driverName, int duplicatesCount)
         {
-            OpponentData opponentPrevious = null;
-            var prevSessionData = previousGameState != null ? previousGameState.SessionData : null;
-            float timeDelta = previousGameState != null ? sessionRunningTime - prevSessionData.SessionRunningTime : -1.0f;
-            if (previousGameState != null && timeDelta >= 0.0f)
+            if (previousGameState == null)
             {
-                float[] worldPos = { (float)vehicle.mPos.x, (float)vehicle.mPos.z };
-                float minDistDiff = -1.0f;
-                foreach (var o in previousGameState.OpponentData.Values)
+                return null;
+            }
+            List<string> possibleKeys = new List<string>();
+            for (int i = 1; i <= duplicatesCount; i++)
+            {
+                possibleKeys.Add(driverName + "_duplicate_ " + i);
+            }
+            float[] worldPos = { (float)vehicle.mPos.x, (float)vehicle.mPos.z };
+            float minDistDiff = -1.0f;
+            float timeDelta = sessionRunningTime - previousGameState.SessionData.SessionRunningTime;
+            String bestKey = null;
+            if (timeDelta >= 0.0f)
+            {
+                foreach (String possibleKey in possibleKeys)
                 {
-                    var opponentKey = (String)o.VehicleIdRaw;
-                    if (o.DriverRawName != getStringFromBytes(vehicle.mDriverName).ToLower() ||
-                        o.CarClass != CarData.getCarClassForClassName(getStringFromBytes(vehicle.mVehicleClass)) || 
-                        this.opponentKeysProcessed.Contains(opponentKey))
+                    if (previousGameState.OpponentData.ContainsKey(possibleKey))
                     {
-                        continue;
-                    }
-
-                    // distance from predicted position
-                    float targetDist = o.Speed * timeDelta;
-                    float dist = (float)Math.Abs(Math.Sqrt((double)((o.WorldPosition[0] - worldPos[0]) * (o.WorldPosition[0] - worldPos[0]) + 
-                        (o.WorldPosition[1] - worldPos[1]) * (o.WorldPosition[1] - worldPos[1]))) - targetDist);
-                    if (minDistDiff < 0.0f || dist < minDistDiff)
-                    {
-                        minDistDiff = dist;
-                        opponentPrevious = o;
+                        OpponentData o = previousGameState.OpponentData[possibleKey];
+                        if (o.DriverRawName != getStringFromBytes(vehicle.mDriverName).ToLower() ||
+                            o.CarClass != CarData.getCarClassForClassName(getStringFromBytes(vehicle.mVehicleClass)) ||
+                            opponentKeysProcessed.Contains(possibleKey))
+                        {
+                            continue;
+                        }
+                        // distance from predicted position
+                        float targetDist = o.Speed * timeDelta;
+                        float dist = (float)Math.Abs(Math.Sqrt((double)((o.WorldPosition[0] - worldPos[0]) * (o.WorldPosition[0] - worldPos[0]) +
+                            (o.WorldPosition[1] - worldPos[1]) * (o.WorldPosition[1] - worldPos[1]))) - targetDist);
+                        if (minDistDiff < 0.0f || dist < minDistDiff)
+                        {
+                            minDistDiff = dist;
+                            bestKey = possibleKey;
+                        }
                     }
                 }
-
-                if (opponentPrevious != null)
-                    this.opponentKeysProcessed.Add((String) opponentPrevious.VehicleIdRaw);
             }
-            return opponentPrevious;
+            if (bestKey != null)
+            {
+                opponentKeysProcessed.Add(bestKey);
+            }
+            return bestKey;
         }
 
         public SessionType mapToSessionType(Object memoryMappedFileStruct)
