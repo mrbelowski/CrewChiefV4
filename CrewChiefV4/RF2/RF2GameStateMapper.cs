@@ -1015,8 +1015,22 @@ namespace CrewChiefV4.rFactor2
             var psd = previousSessionData;
 
             // Clear all the timings one new session.
-            if (csd.IsNewSession || psd == null)
+            if (csd.IsNewSession)
+            {
+                // For new session, kick off the initial lap.
+                csd.playerStartNewLap(
+                    csd.CompletedLaps + 1,
+                    csd.Position,
+                    player.mInPits == 1 || currentGameState.PositionAndMotionData.DistanceRoundTrack < 0.0f,
+                    csd.SessionRunningTime,
+                    false,
+                    (float)rf2state.mTrackTemp,
+                    (float)rf2state.mAmbientTemp);
+
                 return;
+            }
+
+            Debug.Assert(psd != null);
 
             csd.CompletedLaps = player.mTotalLaps;
             csd.LapTimeCurrent = csd.SessionRunningTime - (float)player.mLapStartET;
@@ -1104,7 +1118,7 @@ namespace CrewChiefV4.rFactor2
                csd.playerStartNewLap(
                     csd.CompletedLaps + 1,
                     csd.Position,
-                    player.mInPits == 1 || currentGameState.PositionAndMotionData.DistanceRoundTrack < 0.0f,  // VERIFY SET.
+                    player.mInPits == 1 || currentGameState.PositionAndMotionData.DistanceRoundTrack < 0.0f,
                     csd.SessionRunningTime,
                     false,
                     (float)rf2state.mTrackTemp,
