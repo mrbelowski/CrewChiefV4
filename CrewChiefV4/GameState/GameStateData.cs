@@ -719,10 +719,12 @@ namespace CrewChiefV4.GameState
 
     public class TrackLandmarksTiming
     {
-        // the timing difference can be as much as 0.2 seconds out, depending on exactly when the timing happens to take place
-        // (the player can be up to 0.1 second late finishing the sector, the opponent can be 0.1 second late starting it, 
-        // so the max possible error here is 2 ticks)
-        private static float MAX_ERROR = (float) CrewChief._timeInterval.TotalMilliseconds * 2;
+        // the timing difference will have errors in it, depending on how accurate the vehicle speed data is
+
+        // don't count time differences shorter than these - no point in being told to defend into a corner when
+        // the other guys is only 0.01 seconds faster through that corner
+        private static float minSignificantTimeAbsoluteDifference = 0.2f;    // is this a good value?
+        private static float minSignificantTimeRealiveDifference = 0.1f;    // is this a good value?
 
         // value object for a single set of timings for 1 landmark
         private class TrackLandmarksTimingData
@@ -799,16 +801,13 @@ namespace CrewChiefV4.GameState
                     float otherBest = otherVehicleTrackLandMarksTiming.getBestTime(landmarkName);
                     if (myBest != -1 && otherBest != -1 && myBest < otherBest)
                     {
-                        float timeDiff = otherBest - myBest;
-                        if (timeDiff > MAX_ERROR)
+                        float diff = relative ? (otherBest - myBest) / myBest : otherBest - myBest;
+                        if ((relative && diff > minSignificantTimeRealiveDifference && diff > bestDifference) || 
+                            (!relative && diff > minSignificantTimeAbsoluteDifference && diff > bestDifference))
                         {
-                            float diff = relative ? timeDiff / myBest : otherBest - myBest;
-                            if (diff > bestDifference)
-                            {
-                                bestDifference = diff;
-                                bestDifferenceLandmark = landmarkName;
-                            }
-                        }
+                            bestDifference = diff;
+                            bestDifferenceLandmark = landmarkName;
+                        }                        
                     }
                 }
             }
@@ -831,15 +830,12 @@ namespace CrewChiefV4.GameState
                     float otherBest = otherVehicleTrackLandMarksTiming.getBestTime(landmarkName);
                     if (myBest != -1 && otherBest != -1 && myBest > otherBest)
                     {
-                        float timeDiff = myBest - otherBest;
-                        if (timeDiff > MAX_ERROR)
+                        float diff = relative ? (myBest - otherBest) / myBest : myBest - otherBest;
+                        if ((relative && diff > minSignificantTimeRealiveDifference && diff > worstDifference) || 
+                            (!relative && diff > minSignificantTimeAbsoluteDifference && diff > worstDifference))
                         {
-                            float diff = relative ? timeDiff / myBest : myBest - otherBest;
-                            if (diff > worstDifference)
-                            {
-                                worstDifference = diff;
-                                worstDifferenceLandmark = landmarkName;
-                            }
+                            worstDifference = diff;
+                            worstDifferenceLandmark = landmarkName;                           
                         }
                     }
                 }
@@ -848,9 +844,9 @@ namespace CrewChiefV4.GameState
         }
 
         // called for every opponent and the player for each tick
-        // TODO: consider including current speed in this calculation to reduce the max error. Note that the speed data can be *very* noisy for some
+        // TODO: does including current speed in this calculation really reduce the max error? The speed data can be noisy for some
         // games so this might cause more problems than it solves.
-        public void updateLandmarkTiming(List<TrackLandmark> trackLandmarks, float gameTime, float previousDistanceRoundTrack, float currentDistanceRoundTrack) 
+        public void updateLandmarkTiming(List<TrackLandmark> trackLandmarks, float gameTime, float previousDistanceRoundTrack, float currentDistanceRoundTrack, float speed) 
         {
 		    if (trackLandmarks == null || trackLandmarks.Count == 0) {
 			    return;
@@ -863,8 +859,10 @@ namespace CrewChiefV4.GameState
                         if (currentDistanceRoundTrack - 20 < trackLandmark.distanceRoundLapStart && currentDistanceRoundTrack + 20 > trackLandmark.distanceRoundLapStart)
                         {
                             // only start the timing process if we're near the landmark start point
+                            // adjust the landmarkStartTime a bit to accommodate position errors
+                            float error = speed > 0 && speed < 120 ? (currentDistanceRoundTrack - trackLandmark.distanceRoundLapStart) / speed : 0;
                             landmarkNameStart = trackLandmark.landmarkName;
-                            landmarkStartTime = gameTime;
+                            landmarkStartTime = gameTime - error;
                         }
 					    break;
 				    }		
@@ -879,7 +877,9 @@ namespace CrewChiefV4.GameState
                             currentDistanceRoundTrack - 20 < trackLandmark.distanceRoundLapEnd && currentDistanceRoundTrack + 20 > trackLandmark.distanceRoundLapEnd)
                         {
                             // only save the timing if we're near the landmark end point
-                            addTime(landmarkNameStart, gameTime - landmarkStartTime, trackLandmark.isCommonOvertakingSpot);
+                            // adjust the landmarkEndTime a bit to accommodate position errors
+                            float error = speed > 0 && speed < 120 ? (currentDistanceRoundTrack - trackLandmark.distanceRoundLapEnd) / speed : 0;
+                            addTime(landmarkNameStart, (gameTime - error) - landmarkStartTime, trackLandmark.isCommonOvertakingSpot);
                         }
 					    landmarkNameStart = null;
 					    landmarkStartTime = -1;

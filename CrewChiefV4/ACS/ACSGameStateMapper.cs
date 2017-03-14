@@ -1324,7 +1324,7 @@ namespace CrewChiefV4.assetto
                 if (previousGameState != null)
                 {
                     currentGameState.SessionData.trackLandmarksTiming.updateLandmarkTiming(currentGameState.SessionData.TrackDefinition.trackLandmarks,
-                        currentGameState.SessionData.SessionRunningTime, previousGameState.PositionAndMotionData.DistanceRoundTrack, distanceRoundTrack);
+                        currentGameState.SessionData.SessionRunningTime, previousGameState.PositionAndMotionData.DistanceRoundTrack, distanceRoundTrack, shared.acsPhysics.speedKmh);
                     if (currentGameState.SessionData.IsNewLap)
                     {
                         currentGameState.SessionData.trackLandmarksTiming.cancelWaitingForLandmarkEnd();
@@ -1488,7 +1488,7 @@ namespace CrewChiefV4.assetto
 
                                     if (opponentsSplits.ContainsKey(participantName))
                                     {
-                                        opponentsSplits[participantName].setNextSplitPoint(currentOpponentLapDistance, participantStruct.speedMS);
+                                        opponentsSplits[participantName].setNextSplitPoint(currentOpponentLapDistance, playerVehicle.speedMS);
                                     }
 
                                     float secondsSinceLastUpdate = (float)new TimeSpan(currentGameState.Ticks - previousGameState.Ticks).TotalSeconds;
@@ -1507,7 +1507,7 @@ namespace CrewChiefV4.assetto
                                     {
                                         currentOpponentData.trackLandmarksTiming = previousOpponentData.trackLandmarksTiming;
                                         currentOpponentData.trackLandmarksTiming.updateLandmarkTiming(currentGameState.SessionData.TrackDefinition.trackLandmarks,
-                                            currentGameState.SessionData.SessionRunningTime, previousDistanceRoundTrack, currentOpponentData.DistanceRoundTrack);
+                                            currentGameState.SessionData.SessionRunningTime, previousDistanceRoundTrack, currentOpponentData.DistanceRoundTrack, currentOpponentData.Speed);
                                     }
                                     if (justGoneGreen)
                                     {

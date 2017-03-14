@@ -446,7 +446,8 @@ namespace CrewChiefV4.RaceRoom
             if (previousGameState != null)
             {
                 currentGameState.SessionData.trackLandmarksTiming.updateLandmarkTiming(currentGameState.SessionData.TrackDefinition.trackLandmarks,
-                    currentGameState.SessionData.SessionRunningTime, previousGameState.PositionAndMotionData.DistanceRoundTrack, currentGameState.PositionAndMotionData.DistanceRoundTrack);
+                    currentGameState.SessionData.SessionRunningTime, previousGameState.PositionAndMotionData.DistanceRoundTrack, 
+                    currentGameState.PositionAndMotionData.DistanceRoundTrack, shared.CarSpeed);
             }
 
             if (currentGameState.SessionData.IsNewLap)
@@ -722,7 +723,7 @@ namespace CrewChiefV4.RaceRoom
                             {
                                 currentOpponentData.trackLandmarksTiming = previousOpponentData.trackLandmarksTiming;
                                 currentOpponentData.trackLandmarksTiming.updateLandmarkTiming(currentGameState.SessionData.TrackDefinition.trackLandmarks,
-                                    currentGameState.SessionData.SessionRunningTime, previousDistanceRoundTrack, currentOpponentData.DistanceRoundTrack);
+                                    currentGameState.SessionData.SessionRunningTime, previousDistanceRoundTrack, currentOpponentData.DistanceRoundTrack, currentOpponentData.Speed);
                             }
                             if (justGoneGreen)
                             {
