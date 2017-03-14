@@ -302,7 +302,7 @@ namespace CrewChiefV4.GameState
 
                     PlayerBestLapSector1Time = lapData.SectorTimes[0];
                     PlayerBestLapSector2Time = lapData.SectorTimes[1];
-                    PlayerBestLapSector3Time = lapData.SectorTimes[3];
+                    PlayerBestLapSector3Time = lapData.SectorTimes[2];
                 }
                 PreviousLapWasValid = lapData.IsValid;
             }

@@ -30,10 +30,10 @@ namespace CrewChiefV4.rFactor2
 
         // if we're running only against AI, force the pit window to open
         private Boolean isOfflineSession = true;
-        
+
         // keep track of opponents processed this time
         private List<String> opponentKeysProcessed = new List<String>();
-        
+
         // detect when approaching racing surface after being off track
         private float distanceOffTrack = 0.0f;
         private Boolean isApproachingTrack = false;
@@ -92,9 +92,9 @@ namespace CrewChiefV4.rFactor2
             if (smVer < minVer)
             {
                 var minVerStr = string.Join(".", this.minimumSupportedVersionParts);
-                var msg = "Unsupported rFactor 2 Shared Memory version: " 
-                    + versionStr 
-                    + "  Minimum supported version is: " 
+                var msg = "Unsupported rFactor 2 Shared Memory version: "
+                    + versionStr
+                    + "  Minimum supported version is: "
                     + minVerStr
                     + "  Please update rFactor2SharedMemoryMapPlugin64.dll";
                 Console.WriteLine(msg);
@@ -268,6 +268,13 @@ namespace CrewChiefV4.rFactor2
             // TODO: make suse this is reasonably close to what we calculate during lap tracking
             // csd.PlayerLapTimeSessionBest = player.mBestLapTime > 0.0f ? (float)player.mBestLapTime : -1.0f;
 
+            ////////////////////////////////////
+            // motion data
+            cgs.PositionAndMotionData.CarSpeed = (float)rf2state.mSpeed;
+            cgs.PositionAndMotionData.DistanceRoundTrack = (float)player.mLapDist;
+
+            ////////////////////////////////////
+            // Timings
             this.trackPlayerTimingData(ref rf2state, cgs, csd, psd, ref player);
 
             csd.SessionTimesAtEndOfSectors = pgs != null ? psd.SessionTimesAtEndOfSectors : new SessionData().SessionTimesAtEndOfSectors;
@@ -385,11 +392,6 @@ namespace CrewChiefV4.rFactor2
             // --------------------------------
             // control data
             cgs.ControlData.ControlType = mapToControlType((rFactor2Constants.rF2Control)player.mControl);
-
-            // --------------------------------
-            // motion data
-            cgs.PositionAndMotionData.CarSpeed = (float)rf2state.mSpeed;
-            cgs.PositionAndMotionData.DistanceRoundTrack = (float)player.mLapDist;
 
             // --------------------------------
             // tire data
@@ -1012,6 +1014,10 @@ namespace CrewChiefV4.rFactor2
             var csd = currentSessionData;
             var psd = previousSessionData;
 
+            // Clear all the timings one new session.
+            if (csd.IsNewSession || psd == null)
+                return;
+
             csd.CompletedLaps = player.mTotalLaps;
             csd.LapTimeCurrent = csd.SessionRunningTime - (float)player.mLapStartET;
             csd.LapTimePrevious = player.mLastLapTime > 0.0f ? (float)player.mLastLapTime : -1.0f;
@@ -1036,19 +1042,21 @@ namespace CrewChiefV4.rFactor2
             if (player.mCurSector1 > 0.0 && player.mCurSector2 > 0.0)
                 csd.LastSector2Time = (float)(player.mCurSector2 - player.mCurSector1);
 
-
             // Below values change on sector/lap change, otherwise stay the same between updates.
             // Preserve current values.
-            csd.PlayerBestSector1Time = psd != null ? psd.PlayerBestSector1Time : -1.0f;
-            csd.PlayerBestSector2Time = psd != null ? psd.PlayerBestSector2Time : -1.0f;
-            csd.PlayerBestSector3Time = psd != null ? psd.PlayerBestSector3Time : -1.0f;
+            csd.PlayerBestSector1Time = psd.PlayerBestSector1Time;
+            csd.PlayerBestSector2Time = psd.PlayerBestSector2Time;
+            csd.PlayerBestSector3Time = psd.PlayerBestSector3Time;
 
-            csd.PlayerBestLapSector1Time = psd != null ? csd.PlayerBestLapSector1Time : -1.0f;
-            csd.PlayerBestLapSector2Time = psd != null ? csd.PlayerBestLapSector2Time : -1.0f;
-            csd.PlayerBestLapSector3Time = psd != null ? csd.PlayerBestLapSector3Time : -1.0f;
+            csd.PlayerBestLapSector1Time = psd.PlayerBestLapSector1Time;
+            csd.PlayerBestLapSector2Time = psd.PlayerBestLapSector2Time;
+            csd.PlayerBestLapSector3Time = psd.PlayerBestLapSector3Time;
 
-            csd.PlayerLapTimeSessionBest = psd != null ? psd.PlayerLapTimeSessionBest : -1.0f;
-            csd.PlayerLapTimeSessionBestPrevious = psd != null ? psd.PlayerLapTimeSessionBestPrevious : -1.0f;
+            csd.PlayerLapTimeSessionBest = psd.PlayerLapTimeSessionBest;
+            csd.PlayerLapTimeSessionBestPrevious = psd.PlayerLapTimeSessionBestPrevious;
+
+            foreach (var ld in psd.PlayerLapData)
+                csd.PlayerLapData.Add(ld);
 
             // Check if update is needed.
             if (!csd.IsNewLap && !csd.IsNewSector)
@@ -1080,7 +1088,7 @@ namespace CrewChiefV4.rFactor2
 
             if (csd.IsNewLap)
             {
-                if (csd.LastSector3Time > 0.0f)
+                if (lastSectorTime > 0.0f)
                 {
                     csd.playerCompleteLapWithProvidedLapTime(
                         csd.Position,
@@ -1093,7 +1101,7 @@ namespace CrewChiefV4.rFactor2
                         csd.SessionHasFixedTime,
                         csd.SessionTimeRemaining);
                 }
-                csd.playerStartNewLap(
+               csd.playerStartNewLap(
                     csd.CompletedLaps + 1,
                     csd.Position,
                     player.mInPits == 1 || currentGameState.PositionAndMotionData.DistanceRoundTrack < 0.0f,  // VERIFY SET.
