@@ -9,27 +9,32 @@
 				{
 					"landmarkName": "griffins_bend",
 					"distanceRoundLapStart": 1290,
-					"distanceRoundLapEnd": 1480				
+					"distanceRoundLapEnd": 1480,
+					"isCommonOvertakingSpot": true					
 				},
 				{
 					"landmarkName": "the_cutting",
 					"distanceRoundLapStart": 1720,
-					"distanceRoundLapEnd": 1910
+					"distanceRoundLapEnd": 1910,
+					"isCommonOvertakingSpot": true
 				},
 				{
 					"landmarkName": "the_dipper",
 					"distanceRoundLapStart": 3240,
-					"distanceRoundLapEnd": 3420
+					"distanceRoundLapEnd": 3420,
+					"isCommonOvertakingSpot": false
 				},
 				{
 					"landmarkName": "forrests_elbow",
 					"distanceRoundLapStart": 3700,
-					"distanceRoundLapEnd": 3800
+					"distanceRoundLapEnd": 3800,
+					"isCommonOvertakingSpot": true
 				},
 				{
 					"landmarkName": "the_chase",
 					"distanceRoundLapStart": 5060,
-					"distanceRoundLapEnd": 5500
+					"distanceRoundLapEnd": 5500,
+					"isCommonOvertakingSpot": true
 				}
 			]
 		},
@@ -42,27 +47,32 @@
 				{
 					"landmarkName": "paddock_hill",
 					"distanceRoundLapStart": 270,
-					"distanceRoundLapEnd": 440
+					"distanceRoundLapEnd": 440,
+					"isCommonOvertakingSpot": false
 				},
 				{
 					"landmarkName": "druids",
 					"distanceRoundLapStart": 590,
-					"distanceRoundLapEnd": 690
+					"distanceRoundLapEnd": 690,
+					"isCommonOvertakingSpot": true
 				},
 				{
-					"landmarkName": "clark",
+					"landmarkName": "graham_hill_bend",
 					"distanceRoundLapStart": 850,
-					"distanceRoundLapEnd": 930
+					"distanceRoundLapEnd": 930,
+					"isCommonOvertakingSpot": true
 				},
 				{
 					"landmarkName": "surtees",
 					"distanceRoundLapStart": 1230,
-					"distanceRoundLapEnd": 1300
+					"distanceRoundLapEnd": 1300,
+					"isCommonOvertakingSpot": false
 				},
 				{
 					"landmarkName": "clearways",
 					"distanceRoundLapStart": 1350,
-					"distanceRoundLapEnd": 1530
+					"distanceRoundLapEnd": 1530,
+					"isCommonOvertakingSpot": false
 				}
 			]
 		},
