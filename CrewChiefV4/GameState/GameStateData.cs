@@ -1058,8 +1058,8 @@ namespace CrewChiefV4.GameState
             Object opponentKeyClosestInFront = null;
             Object opponentKeyFurthestBehind = null;
             float closestDistanceFront = SessionData.TrackDefinition.trackLength;
-            float furthestDistanceBehind = 0;
-            foreach (KeyValuePair<Object, OpponentData> opponent in OpponentData)
+            float furthestDistanceBehind = 0.0f;
+            foreach (var opponent in OpponentData)
             {
                 if (opponent.Value.Speed > 0.5 && !opponent.Value.isEnteringPits())
                 {
@@ -1078,13 +1078,9 @@ namespace CrewChiefV4.GameState
                 }
             }
             if (opponentKeyClosestInFront != null)
-            {
                 return opponentKeyClosestInFront;
-            }
             else
-            {
                 return opponentKeyFurthestBehind;
-            }
         }
 
         public Object getOpponentKeyBehindOnTrack()
@@ -1092,8 +1088,8 @@ namespace CrewChiefV4.GameState
             Object opponentKeyClosestBehind = null;
             Object opponentKeyFurthestInFront = null;
             float closestDistanceBehind = SessionData.TrackDefinition.trackLength;
-            float furthestDistanceInFront = 0;
-            foreach (KeyValuePair<Object, OpponentData> opponent in OpponentData)
+            float furthestDistanceInFront = 0.0f;
+            foreach (var opponent in OpponentData)
             {
                 if (opponent.Value.Speed > 0.5 && !opponent.Value.isEnteringPits())
                 {
@@ -1112,13 +1108,9 @@ namespace CrewChiefV4.GameState
                 }
             }
             if (opponentKeyClosestBehind != null)
-            {
                 return opponentKeyClosestBehind;
-            }
             else
-            {
                 return opponentKeyFurthestInFront;
-            }
         }
 
         public Object getOpponentKeyInFront(Boolean useUnfilteredPosition)

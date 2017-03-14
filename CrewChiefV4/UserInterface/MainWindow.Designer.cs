@@ -109,7 +109,7 @@ namespace CrewChiefV4
             this.buttonActionSelect.FormattingEnabled = true;
             this.buttonActionSelect.Location = new System.Drawing.Point(323, 520);
             this.buttonActionSelect.Name = "buttonActionSelect";
-            this.buttonActionSelect.Size = new System.Drawing.Size(468, 95);
+            this.buttonActionSelect.Size = new System.Drawing.Size(468, 115);
             this.buttonActionSelect.TabIndex = 7;
             this.buttonActionSelect.SelectedIndexChanged += new System.EventHandler(this.buttonActionSelect_SelectedIndexChanged);
             // 

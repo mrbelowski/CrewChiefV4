@@ -417,6 +417,7 @@ namespace CrewChiefV4
             InitializeComponent();
             CheckForIllegalCrossThreadCalls = false;
             cw = new ControlWriter(textBox1);
+            textBox1.KeyDown += TextBox1_KeyDown;
             Console.SetOut(cw);
             Console.WriteLine("Starting app");
             controllerConfiguration = new ControllerConfiguration(this);            
@@ -506,6 +507,18 @@ namespace CrewChiefV4
             }
         }
 
+        private void TextBox1_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Control && e.KeyCode == Keys.A)
+            {
+                textBox1.SelectAll();
+            }
+            else if (e.KeyCode == Keys.Escape)
+            {
+                textBox1.DeselectAll();
+            }
+        }
+
         private void listenForChannelOpen()
         {
             Boolean channelOpen = false;
@@ -582,6 +595,28 @@ namespace CrewChiefV4
                         crewChief.audioPlayer.repeatLastMessage();
                         nextPollWait = 1000;
                     }
+                    else if (controllerConfiguration.hasOutstandingClick(ControllerConfiguration.PRINT_TRACK_DATA))
+                    {
+                        if (crewChief.currentGameState != null && crewChief.currentGameState.SessionData != null && 
+                            crewChief.currentGameState.SessionData.TrackDefinition != null)
+                        {
+                            if (CrewChief.gameDefinition.gameEnum == GameEnum.RACE_ROOM) 
+                            {
+                                Console.WriteLine("raceroomLayoutId: " + crewChief.currentGameState.SessionData.TrackDefinition.id + ", distanceRoundLap = " +
+                                    crewChief.currentGameState.PositionAndMotionData.DistanceRoundTrack + ", player's car ID: " + CarData.RACEROOM_CLASS_ID);
+                            }
+                            else
+                            {
+                                Console.WriteLine("TrackName: " + crewChief.currentGameState.SessionData.TrackDefinition.name + ", distanceRoundLap = " +
+                                    crewChief.currentGameState.PositionAndMotionData.DistanceRoundTrack + ", player's car ID: " + CarData.CLASS_ID);
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine("No track data available");
+                        }
+                        nextPollWait = 1000;
+                    }
                     else if (controllerConfiguration.hasOutstandingClick(ControllerConfiguration.VOLUME_UP))
                     {
                         if (currentVolume == -1)
@@ -652,6 +687,7 @@ namespace CrewChiefV4
                     return;
                 }
                 CarData.loadCarClassData();
+                TrackData.loadTrackLandmarksData();
                 this.runListenForButtonPressesThread = controllerConfiguration.listenForButtons(voiceOption == VoiceOptionEnum.TOGGLE);
                 this.assignButtonToAction.Enabled = false;
                 this.deleteAssigmentButton.Enabled = false;
@@ -1254,7 +1290,10 @@ namespace CrewChiefV4
                     downloadPersonalisationsButton.Text = Configuration.getUIString("personalisations_are_up_to_date");
                 }
             }
-            catch (Exception) { }
+            catch (Exception e2) 
+            {
+                Console.WriteLine("Error extracting, " + e2.Message);
+            }
             finally
             {
                 if (success)
