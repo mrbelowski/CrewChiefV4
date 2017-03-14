@@ -707,7 +707,7 @@ namespace CrewChiefV4.rFactor1
                 {
                     opponent.trackLandmarksTiming = opponentPrevious.trackLandmarksTiming;
                     opponent.trackLandmarksTiming.updateLandmarkTiming(currentGameState.SessionData.TrackDefinition.trackLandmarks,
-                        currentGameState.SessionData.SessionRunningTime, previousDistanceRoundTrack, opponent.DistanceRoundTrack);
+                        currentGameState.SessionData.SessionRunningTime, previousDistanceRoundTrack, opponent.DistanceRoundTrack, opponent.Speed);
                 }
                 if (opponent.IsNewLap)
                 {
@@ -732,7 +732,8 @@ namespace CrewChiefV4.rFactor1
                     currentGameState.SessionData.SessionRunningTime : previousGameState.SessionData.GameTimeAtLastPositionBehindChange;
                 currentGameState.SessionData.trackLandmarksTiming = previousGameState.SessionData.trackLandmarksTiming;
                 currentGameState.SessionData.trackLandmarksTiming.updateLandmarkTiming(currentGameState.SessionData.TrackDefinition.trackLandmarks,
-                                    currentGameState.SessionData.SessionRunningTime, previousGameState.PositionAndMotionData.DistanceRoundTrack, currentGameState.PositionAndMotionData.DistanceRoundTrack);
+                                    currentGameState.SessionData.SessionRunningTime, previousGameState.PositionAndMotionData.DistanceRoundTrack, 
+                                    currentGameState.PositionAndMotionData.DistanceRoundTrack, shared.speed);
                 if (currentGameState.SessionData.IsNewLap)
                 {
                     currentGameState.SessionData.trackLandmarksTiming.cancelWaitingForLandmarkEnd();
