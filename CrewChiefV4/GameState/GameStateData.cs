@@ -1,6 +1,7 @@
 ﻿using CrewChiefV4.Events;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
@@ -275,6 +276,13 @@ namespace CrewChiefV4.GameState
         // Player lap times with sector information
         public List<LapData> PlayerLapData = new List<LapData>();
 
+        public SessionData()
+        {
+            SessionTimesAtEndOfSectors.Add(1, -1);
+            SessionTimesAtEndOfSectors.Add(2, -1);
+            SessionTimesAtEndOfSectors.Add(3, -1);
+        }
+
         public void playerStartNewLap(int lapNumber, int position, Boolean inPits, float gameTimeAtStart, Boolean isRaining, float trackTemp, float airTemp)
         {
             LapData thisLapData = new LapData();
@@ -302,18 +310,21 @@ namespace CrewChiefV4.GameState
                     PlayerLapTimeSessionBestPrevious = PlayerLapTimeSessionBest;
                     PlayerLapTimeSessionBest = lapData.LapTime;
 
-                    PlayerBestLapSector1Time = lapData.SectorTimes[0];
-                    PlayerBestLapSector2Time = lapData.SectorTimes[1];
-                    PlayerBestLapSector3Time = lapData.SectorTimes[2];
+                    if (lapData.SectorTimes.Count > 0)
+                        PlayerBestLapSector1Time = lapData.SectorTimes[0];
+                    if (lapData.SectorTimes.Count > 1)
+                        PlayerBestLapSector2Time = lapData.SectorTimes[1];
+                    if (lapData.SectorTimes.Count > 2)
+                        PlayerBestLapSector3Time = lapData.SectorTimes[2];
                 }
                 PreviousLapWasValid = lapData.IsValid;
             }
 
             // Not sure we need this for player.
-            /*if (sessionLengthIsTime && sessionTimeRemaining > 0 && CurrentBestLapTime > 0 && sessionTimeRemaining < CurrentBestLapTime - 5)
-            {
-                isProbablyLastLap = true;
-            }*/
+            //if (sessionLengthIsTime && sessionTimeRemaining > 0 && CurrentBestLapTime > 0 && sessionTimeRemaining < CurrentBestLapTime - 5)
+            //{
+            //  isProbablyLastLap = true;
+            //}
         }
 
         public void playerAddCumulativeSectorData(int position, float cumulativeSectorTime, float gameTimeAtSectorEnd, Boolean lapIsValid, Boolean isRaining, float trackTemp, float airTemp)
@@ -335,7 +346,6 @@ namespace CrewChiefV4.GameState
                 lapData.SectorTimes.Add(thisSectorTime);
                 if (lapIsValid && thisSectorTime > 0)
                 {
-                    // Possibly track Best sector times here.
                     if (sectorNumber == 1 && (PlayerBestSector1Time == -1 || thisSectorTime < PlayerBestSector1Time))
                     {
                         PlayerBestSector1Time = thisSectorTime;
@@ -359,11 +369,41 @@ namespace CrewChiefV4.GameState
             }
         }
 
-        public SessionData()
+        public float[] getPlayerTimeAndSectorsForBestLap(bool ignoreLast)
         {
-            SessionTimesAtEndOfSectors.Add(1, -1);
-            SessionTimesAtEndOfSectors.Add(2, -1);
-            SessionTimesAtEndOfSectors.Add(3, -1);
+            float[] bestLapTimeAndSectorsSectors = new float[] { -1, -1, -1, -1 };
+            // Count-1 because we're not interested in the current lap
+            int lapsToCheck = PlayerLapData.Count - 1;
+            if (ignoreLast)
+            {
+                --lapsToCheck;
+            }
+            for (int i = 0; i < lapsToCheck; ++i)
+            {
+                LapData thisLapTime = PlayerLapData[i];
+                if (thisLapTime.IsValid)
+                {
+                    if (bestLapTimeAndSectorsSectors[0] == -1 ||
+                        (thisLapTime.LapTime > 0 && thisLapTime.LapTime < bestLapTimeAndSectorsSectors[0]))
+                    {
+                        bestLapTimeAndSectorsSectors[0] = thisLapTime.LapTime;
+                        int sectorCount = thisLapTime.SectorTimes.Count();
+                        if (sectorCount > 0)
+                        {
+                            bestLapTimeAndSectorsSectors[1] = thisLapTime.SectorTimes[0];
+                        }
+                        if (sectorCount > 1)
+                        {
+                            bestLapTimeAndSectorsSectors[2] = thisLapTime.SectorTimes[1];
+                        }
+                        if (sectorCount > 2)
+                        {
+                            bestLapTimeAndSectorsSectors[3] = thisLapTime.SectorTimes[2];
+                        }
+                    }
+                }
+            }
+            return bestLapTimeAndSectorsSectors;
         }
     }
 
