@@ -407,7 +407,6 @@ namespace CrewChiefV4.RaceRoom
                     currentGameState.FlagData.distanceToNearestIncident = shared.LayoutLength - shared.LapDistance + shared.closestYellowLapDistance;
                 }
             }
-            currentGameState.FlagData.distanceToNearestIncident = Math.Abs(shared.LapDistance - shared.closestYellowLapDistance);
 
             currentGameState.SessionData.SessionTimeRemaining = shared.SessionTimeRemaining;
             currentGameState.SessionData.CompletedLaps = shared.CompletedLaps;     
@@ -447,7 +446,7 @@ namespace CrewChiefV4.RaceRoom
             {
                 currentGameState.SessionData.trackLandmarksTiming.updateLandmarkTiming(currentGameState.SessionData.TrackDefinition.trackLandmarks,
                     currentGameState.SessionData.SessionRunningTime, previousGameState.PositionAndMotionData.DistanceRoundTrack, 
-                    currentGameState.PositionAndMotionData.DistanceRoundTrack, shared.CarSpeed);
+                    shared.LapDistance, shared.CarSpeed);
             }
 
             if (currentGameState.SessionData.IsNewLap)

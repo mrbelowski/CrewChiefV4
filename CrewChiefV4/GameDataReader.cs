@@ -46,6 +46,7 @@ namespace CrewChiefV4
 
             try
             {
+                Console.WriteLine("About to dump game data - this may take a while");
                 XmlDocument xmlDocument = new XmlDocument();
                 XmlSerializer serializer = new XmlSerializer(serializableObject.GetType());
                 using (MemoryStream stream = new MemoryStream())
