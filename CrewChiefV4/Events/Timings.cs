@@ -273,7 +273,7 @@ namespace CrewChiefV4.Events
                                     {
                                         // either we're faster on entry or faster through
                                         String attackFolder = landmarkAndDeltaType.deltaType == TrackLandmarksTiming.DeltaType.Time ? folderHeIsSlowerThroughCorner : folderHeIsSlowerEnteringCorner;
-                                        audioPlayer.playMessage(new QueuedMessage("Timings/corner_to_attack_in", MessageContents(attackFolder, "corners/" + landmarkAndDeltaType.landmarkName), 0, this));
+                                        audioPlayer.playMessage(new QueuedMessage("Timings/corner_to_attack_in", MessageContents(Pause(200), attackFolder, "corners/" + landmarkAndDeltaType.landmarkName), 0, this));
                                         trackLandmarkDriverNamesUsed.Add(opponent.DriverRawName);
                                     }
                                 }
@@ -317,7 +317,7 @@ namespace CrewChiefV4.Events
                                         {
                                             // either we're faster on entry or faster through
                                             String attackFolder = landmarkAndDeltaType.deltaType == TrackLandmarksTiming.DeltaType.Time ? folderHeIsSlowerThroughCorner : folderHeIsSlowerEnteringCorner;
-                                            audioPlayer.playMessage(new QueuedMessage("Timings/corner_to_attack_in", MessageContents(attackFolder, "corners/" + landmarkAndDeltaType.landmarkName), 0, this));
+                                            audioPlayer.playMessage(new QueuedMessage("Timings/corner_to_attack_in", MessageContents(Pause(200), attackFolder, "corners/" + landmarkAndDeltaType.landmarkName), 0, this));
                                             trackLandmarkDriverNamesUsed.Add(opponent.DriverRawName);
                                         }
                                     }
@@ -359,7 +359,7 @@ namespace CrewChiefV4.Events
                                     {
                                         // either we're slower on entry or slower through
                                         String defendFolder = landmarkAndDeltaType.deltaType == TrackLandmarksTiming.DeltaType.Time ? folderHeIsFasterThroughCorner : folderHeIsFasterEnteringCorner;
-                                        audioPlayer.playMessage(new QueuedMessage("Timings/corner_to_defend_in", MessageContents(defendFolder, "corners/" + landmarkAndDeltaType.landmarkName), 0, this));
+                                        audioPlayer.playMessage(new QueuedMessage("Timings/corner_to_defend_in", MessageContents(Pause(200), defendFolder, "corners/" + landmarkAndDeltaType.landmarkName), 0, this));
                                         trackLandmarkDriverNamesUsed.Add(opponent.DriverRawName);
                                     }
                                 }
@@ -404,7 +404,7 @@ namespace CrewChiefV4.Events
                                         {
                                             // either we're slower on entry or slower through
                                             String defendFolder = landmarkAndDeltaType.deltaType == TrackLandmarksTiming.DeltaType.Time ? folderHeIsFasterThroughCorner : folderHeIsFasterEnteringCorner;
-                                            audioPlayer.playMessage(new QueuedMessage("Timings/corner_to_defend_in", MessageContents(defendFolder, "corners/" + landmarkAndDeltaType.landmarkName), 0, this));
+                                            audioPlayer.playMessage(new QueuedMessage("Timings/corner_to_defend_in", MessageContents(Pause(200), defendFolder, "corners/" + landmarkAndDeltaType.landmarkName), 0, this));
                                             trackLandmarkDriverNamesUsed.Add(opponent.DriverRawName);
                                         }
                                     }
