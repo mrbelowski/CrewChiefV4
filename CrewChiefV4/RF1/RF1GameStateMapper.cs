@@ -140,7 +140,8 @@ namespace CrewChiefV4.rFactor1
             if (previousGameState != null) 
             {
                 // player.sectorNumber might go to 0 at session-end
-                startedNewLap = previousGameState.SessionData.SectorNumber == 3 && player.sector <= 1;
+                // startedNewLap = previousGameState.SessionData.SectorNumber == 3 && player.sector <= 1;
+                startedNewLap = previousGameState.SessionData.CompletedLaps < shared.lapNumber;
                 previousSessionPhase = previousGameState.SessionData.SessionPhase;
             }            
             Boolean isInPits = player.inPits == 1;
