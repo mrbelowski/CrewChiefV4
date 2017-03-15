@@ -371,7 +371,7 @@ namespace CrewChiefV4.rFactor2
                 csd.formattedPlayerLapTimes.Add(TimeSpan.FromSeconds(csd.LapTimePrevious).ToString(@"mm\:ss\.fff"));
 
             csd.LeaderHasFinishedRace = leader.mFinishStatus == (int)rFactor2Constants.rF2FinishStatus.Finished;
-            csd.TimeDeltaFront = (float)player.mTimeBehindNext;
+            csd.TimeDeltaFront = (float)Math.Abs(player.mTimeBehindNext);
 
             // --------------------------------
             // engine data
@@ -776,7 +776,7 @@ namespace CrewChiefV4.rFactor2
 
                 // session best lap times
                 if (opponent.Position == csd.Position + 1)
-                    csd.TimeDeltaBehind = (float)vehicle.mTimeBehindNext;
+                    csd.TimeDeltaBehind = (float)Math.Abs(vehicle.mTimeBehindNext);
 
                 if (opponent.CurrentBestLapTime > 0.0f
                     && (opponent.CurrentBestLapTime < csd.OpponentsLapTimeSessionBestOverall
