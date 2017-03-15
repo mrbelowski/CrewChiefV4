@@ -904,7 +904,7 @@ namespace CrewChiefV4.GameState
                     // or other - mine if we want sections where he's faster (more positive => worse)
                     float relativeStartSpeedDelta = whereImFaster ? (myBestTimeAndSpeeds[1] - otherBestTimeAndSpeeds[1]) / myBestTimeAndSpeeds[1] :
                                                             (otherBestTimeAndSpeeds[1] - myBestTimeAndSpeeds[1]) / myBestTimeAndSpeeds[1];
-                    Console.WriteLine(landmarkName + " entry diff = " + relativeStartSpeedDelta + " through diff = " + relativeTimeDelta);
+                    // Console.WriteLine(landmarkName + " entry diff = " + relativeStartSpeedDelta + " through diff = " + relativeTimeDelta);
                     if (relativeTimeDelta >= minSignificantRelativeTimeDifference && relativeTimeDelta > biggestTimeDifference)
                     {
                         // this is the biggest (so far) relative time difference
