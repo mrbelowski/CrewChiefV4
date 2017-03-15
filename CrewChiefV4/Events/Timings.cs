@@ -14,8 +14,10 @@ namespace CrewChiefV4.Events
         public static String folderGapInFrontDecreasing = "timings/gap_in_front_decreasing";
         public static String folderGapInFrontIsNow = "timings/gap_in_front_is_now";
 
-        public static String folderHeIsSlowerInCorner = "timings/he_is_slower_in_corner";
-        public static String folderHeIsFasterInCorner = "timings/he_is_faster_in_corner";
+        public static String folderHeIsSlowerThroughCorner = "timings/he_is_slower_through_corner";
+        public static String folderHeIsFasterThroughCorner = "timings/he_is_faster_through_corner"; 
+        public static String folderHeIsSlowerEnteringCorner = "timings/he_is_slower_entering_corner";
+        public static String folderHeIsFasterEnteringCorner = "timings/he_is_faster_entering_corner";
 
         public static String folderGapBehindIncreasing = "timings/gap_behind_increasing";
         public static String folderGapBehindDecreasing = "timings/gap_behind_decreasing";
@@ -94,7 +96,8 @@ namespace CrewChiefV4.Events
         private int gapBehindMinSectorWait;
         private int gapBehindMaxSectorWait;
 
-        private List<String> trackLandmarkDriverNamesUsed = new List<string>();
+        // don't play the same warning for the same guy more than once
+        private List<String> trackLandmarkDriverNamesUsed = new List<String>();
 
         public Timings(AudioPlayer audioPlayer)
         {
@@ -120,7 +123,7 @@ namespace CrewChiefV4.Events
             sectorsSinceLastGapBehindReport = 0;
             sectorsSinceLastCloseCarAheadReport = 0;
             sectorsSinceLastCloseCarBehindReport = 0;
-            trackLandmarkDriverNamesUsed = new List<string>();
+            trackLandmarkDriverNamesUsed.Clear(); 
             if (gapAheadReportFrequency == 0)
             {
                 sectorsUntilNextGapAheadReport = int.MaxValue;
@@ -264,10 +267,13 @@ namespace CrewChiefV4.Events
                                 OpponentData opponent = currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position - 1, false);
                                 if (!trackLandmarkDriverNamesUsed.Contains(opponent.DriverRawName))
                                 {
-                                    String cornerToAttackIn = currentGameState.SessionData.trackLandmarksTiming.getLandmarkWhereIAmFaster(opponent.trackLandmarksTiming, true, false);
-                                    if (cornerToAttackIn != null)
+                                    CrewChiefV4.GameState.TrackLandmarksTiming.LandmarkAndDeltaType landmarkAndDeltaType =
+                                                currentGameState.SessionData.trackLandmarksTiming.getLandmarkWhereIAmFaster(opponent.trackLandmarksTiming, true);
+                                    if (landmarkAndDeltaType.landmarkName != null)
                                     {
-                                        audioPlayer.playMessage(new QueuedMessage("Timings/corner_to_attack_in", MessageContents(folderHeIsSlowerInCorner, "corners/" + cornerToAttackIn), 0, this));
+                                        // either we're faster on entry or faster through
+                                        String attackFolder = landmarkAndDeltaType.deltaType == TrackLandmarksTiming.DeltaType.Time ? folderHeIsSlowerThroughCorner : folderHeIsSlowerEnteringCorner;
+                                        audioPlayer.playMessage(new QueuedMessage("Timings/corner_to_attack_in", MessageContents(attackFolder, "corners/" + landmarkAndDeltaType.landmarkName), 0, this));
                                         trackLandmarkDriverNamesUsed.Add(opponent.DriverRawName);
                                     }
                                 }
@@ -305,10 +311,13 @@ namespace CrewChiefV4.Events
                                         MessageContents(folderGapInFrontDecreasing, gapInFront), 0, this, new Dictionary<string, object> { { "position", currentGameState.SessionData.Position } }));
                                     if (!trackLandmarkDriverNamesUsed.Contains(opponent.DriverRawName))
                                     {
-                                        String cornerToAttackIn = currentGameState.SessionData.trackLandmarksTiming.getLandmarkWhereIAmFaster(opponent.trackLandmarksTiming, true, false);
-                                        if (cornerToAttackIn != null)
+                                        CrewChiefV4.GameState.TrackLandmarksTiming.LandmarkAndDeltaType landmarkAndDeltaType = 
+                                            currentGameState.SessionData.trackLandmarksTiming.getLandmarkWhereIAmFaster(opponent.trackLandmarksTiming, true);
+                                        if (landmarkAndDeltaType.landmarkName != null)
                                         {
-                                            audioPlayer.playMessage(new QueuedMessage("Timings/corner_to_attack_in", MessageContents(folderHeIsSlowerInCorner, "corners/" + cornerToAttackIn), 0, this));
+                                            // either we're faster on entry or faster through
+                                            String attackFolder = landmarkAndDeltaType.deltaType == TrackLandmarksTiming.DeltaType.Time ? folderHeIsSlowerThroughCorner : folderHeIsSlowerEnteringCorner;
+                                            audioPlayer.playMessage(new QueuedMessage("Timings/corner_to_attack_in", MessageContents(attackFolder, "corners/" + landmarkAndDeltaType.landmarkName), 0, this));
                                             trackLandmarkDriverNamesUsed.Add(opponent.DriverRawName);
                                         }
                                     }
@@ -344,10 +353,13 @@ namespace CrewChiefV4.Events
                                 OpponentData opponent = currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position + 1, false);
                                 if (!trackLandmarkDriverNamesUsed.Contains(opponent.DriverRawName))
                                 {
-                                    String cornerToDefendIn = currentGameState.SessionData.trackLandmarksTiming.getLandmarkWhereIAmSlower(opponent.trackLandmarksTiming, true, false);
-                                    if (cornerToDefendIn != null)
+                                    CrewChiefV4.GameState.TrackLandmarksTiming.LandmarkAndDeltaType landmarkAndDeltaType =
+                                            currentGameState.SessionData.trackLandmarksTiming.getLandmarkWhereIAmSlower(opponent.trackLandmarksTiming, true);
+                                    if (landmarkAndDeltaType.landmarkName != null)
                                     {
-                                        audioPlayer.playMessage(new QueuedMessage("Timings/corner_to_defend_in", MessageContents(folderHeIsFasterInCorner, "corners/" + cornerToDefendIn), 0, this));
+                                        // either we're slower on entry or slower through
+                                        String defendFolder = landmarkAndDeltaType.deltaType == TrackLandmarksTiming.DeltaType.Time ? folderHeIsFasterThroughCorner : folderHeIsFasterEnteringCorner;
+                                        audioPlayer.playMessage(new QueuedMessage("Timings/corner_to_defend_in", MessageContents(defendFolder, "corners/" + landmarkAndDeltaType.landmarkName), 0, this));
                                         trackLandmarkDriverNamesUsed.Add(opponent.DriverRawName);
                                     }
                                 }
@@ -386,10 +398,13 @@ namespace CrewChiefV4.Events
                                     
                                     if (!trackLandmarkDriverNamesUsed.Contains(opponent.DriverRawName))
                                     {
-                                        String cornerToDefendIn = currentGameState.SessionData.trackLandmarksTiming.getLandmarkWhereIAmSlower(opponent.trackLandmarksTiming, true, false);
-                                        if (cornerToDefendIn != null)
+                                        CrewChiefV4.GameState.TrackLandmarksTiming.LandmarkAndDeltaType landmarkAndDeltaType =
+                                            currentGameState.SessionData.trackLandmarksTiming.getLandmarkWhereIAmSlower(opponent.trackLandmarksTiming, true);
+                                        if (landmarkAndDeltaType.landmarkName != null)
                                         {
-                                            audioPlayer.playMessage(new QueuedMessage("Timings/corner_to_defend_in", MessageContents(folderHeIsFasterInCorner, "corners/" + cornerToDefendIn), 0, this));
+                                            // either we're slower on entry or slower through
+                                            String defendFolder = landmarkAndDeltaType.deltaType == TrackLandmarksTiming.DeltaType.Time ? folderHeIsFasterThroughCorner : folderHeIsFasterEnteringCorner;
+                                            audioPlayer.playMessage(new QueuedMessage("Timings/corner_to_defend_in", MessageContents(defendFolder, "corners/" + landmarkAndDeltaType.landmarkName), 0, this));
                                             trackLandmarkDriverNamesUsed.Add(opponent.DriverRawName);
                                         }
                                     }

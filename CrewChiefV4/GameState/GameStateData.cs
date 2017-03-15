@@ -719,27 +719,93 @@ namespace CrewChiefV4.GameState
 
     public class TrackLandmarksTiming
     {
-        // the timing difference will have errors in it, depending on how accurate the vehicle speed data is
-
-        // don't count time differences shorter than these - no point in being told to defend into a corner when
-        // the other guys is only 0.01 seconds faster through that corner
-        private static float minSignificantTimeAbsoluteDifference = 0.2f;    // is this a good value?
-        private static float minSignificantTimeRealiveDifference = 0.1f;    // is this a good value?
-
         // value object for a single set of timings for 1 landmark
         private class TrackLandmarksTimingData
         {
-            public List<float> times = new List<float>();
+            // [time, startSpeed, endSpeed]
+            public List<float[]> timesAndSpeeds = new List<float[]>();
             public Boolean isCommonOvertakingSpot;
             public TrackLandmarksTimingData(Boolean isCommonOvertakingSpot)
             {
                 this.isCommonOvertakingSpot = isCommonOvertakingSpot;
             }
-            public void addTime(float time)
+            public void addTimeAndSpeeds(float time, float startSpeed, float endSpeed)
             {
-                times.Insert(0, time);
+                timesAndSpeeds.Insert(0, new float[] { time, startSpeed, endSpeed });
             }
         }
+
+        public enum DeltaType
+        {
+            EntrySpeed, Time
+        }
+        public class LandmarkAndDeltaType
+        {
+            public DeltaType deltaType;
+            public String landmarkName;
+            public LandmarkAndDeltaType(DeltaType deltaType, String landmarkName)
+            {
+                this.deltaType = deltaType;
+                this.landmarkName = landmarkName;
+            }
+        }
+
+        // value object for the biggest difference (speed or time)
+        private class LandmarkDeltaContainer
+        {
+            public float biggestTimeDifference = -1;
+            public float biggestStartSpeedDifference = -1;
+            public String biggestTimeDifferenceLandmark = null;
+            public String biggestStartSpeedDifferenceLandmark = null;
+            public LandmarkDeltaContainer(float biggestTimeDifference, String biggestTimeDifferenceLandmark, float biggestStartSpeedDifference, String biggestStartSpeedDifferenceLandmark)
+            {
+                this.biggestTimeDifference = biggestTimeDifference;
+                this.biggestTimeDifferenceLandmark = biggestTimeDifferenceLandmark;
+                this.biggestStartSpeedDifference = biggestStartSpeedDifference;
+                this.biggestStartSpeedDifferenceLandmark = biggestStartSpeedDifferenceLandmark;
+            }
+
+            public LandmarkAndDeltaType selectLandmark()
+            {
+                if (biggestTimeDifferenceLandmark != null && biggestStartSpeedDifferenceLandmark != null)
+                {
+                    // which to choose?? If the entry speed delta > 5m/s choose that
+                    if (biggestStartSpeedDifference > 5)
+                    {
+                        Console.WriteLine("Biggest speed delta into " + biggestStartSpeedDifferenceLandmark);
+                        return new LandmarkAndDeltaType(DeltaType.EntrySpeed, biggestStartSpeedDifferenceLandmark);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Biggest time delta through " + biggestTimeDifferenceLandmark);
+                        return new LandmarkAndDeltaType(DeltaType.Time, biggestTimeDifferenceLandmark);
+                    }
+                }
+                else if (biggestStartSpeedDifferenceLandmark != null)
+                {
+                    Console.WriteLine("Biggest speed delta into " + biggestStartSpeedDifferenceLandmark);
+                    return new LandmarkAndDeltaType(DeltaType.EntrySpeed, biggestStartSpeedDifferenceLandmark);
+                }
+                else
+                {
+                    if (biggestTimeDifferenceLandmark != null)
+                    {
+                        Console.WriteLine("Biggest time delta through " + biggestTimeDifferenceLandmark);
+                    }
+                    return new LandmarkAndDeltaType(DeltaType.Time, biggestTimeDifferenceLandmark);
+                }
+            }
+        }
+        
+        
+        // the timing difference will have errors in it, depending on how accurate the vehicle speed data is
+
+        // don't count time differences shorter than these - no point in being told to defend into a corner when
+        // the other guys is only 0.01 seconds faster through that corner
+        private static float minSignificantTimeAbsoluteDifference = 0.2f;    // is this a good value?
+        private static float minSignificantAbsoluteStartSpeedDifference = 3f;   // is this a good value?
+
+        
 
         private Dictionary<string, TrackLandmarksTimingData> sessionData = new Dictionary<string, TrackLandmarksTimingData>();
 
@@ -747,8 +813,9 @@ namespace CrewChiefV4.GameState
         // we hit the end of this named landmark.
         private String landmarkNameStart = null;
         private float landmarkStartTime = -1;
+        private float landmarkStartSpeed = -1;
 
-        private void addTime(String landmarkName, float time, Boolean isCommonOvertakingSpot)
+        private void addTimeAndSpeeds(String landmarkName, float time, float startSpeed, float endSpeed, Boolean isCommonOvertakingSpot)
         {
             if (time > 0)
             {
@@ -756,139 +823,101 @@ namespace CrewChiefV4.GameState
                 {
                     sessionData.Add(landmarkName, new TrackLandmarksTimingData(isCommonOvertakingSpot));
                 }
-                sessionData[landmarkName].addTime(time);
+                sessionData[landmarkName].addTimeAndSpeeds(time, startSpeed, endSpeed);
             }
         }
-        public float getBestTime(String landmarkName)
+        public float[] getBestTimeAndSpeeds(String landmarkName)
         {
-            return getBestTime(landmarkName, 5, 2);
+            return getBestTimeAndSpeeds(landmarkName, 5, 2);
         }
-        public float getBestTime(String landmarkName, int lapsToCheck, int minTimesRequired)
+
+        // returns [timeInSection, entrySpeed, exitSpeed] for the quickest time through that section
+        public float[] getBestTimeAndSpeeds(String landmarkName, int lapsToCheck, int minTimesRequired)
         {
             if (!sessionData.ContainsKey(landmarkName))
             {
-                return -1f;
+                return new float[] {- 1f, -1f, 1f };
             }
-            float bestTime = float.MaxValue;
+            float[] bestTimeAndSpeeds = new float[] { float.MaxValue, -1f, 1f };
             TrackLandmarksTimingData trackLandmarksTimingData = sessionData[landmarkName];
-            if (trackLandmarksTimingData.times.Count < minTimesRequired)
+            if (trackLandmarksTimingData.timesAndSpeeds.Count < minTimesRequired)
             {
-                return -1f;
+                return new float[] { -1f, -1f, 1f };
             }
             for (int i = 0; i < lapsToCheck; i++)
             {
-                if (trackLandmarksTimingData.times.Count > i && trackLandmarksTimingData.times[i] < bestTime)
+                if (trackLandmarksTimingData.timesAndSpeeds.Count > i && trackLandmarksTimingData.timesAndSpeeds[i][0] < bestTimeAndSpeeds[0])
                 {
-                    bestTime = trackLandmarksTimingData.times[i];
+                    bestTimeAndSpeeds = trackLandmarksTimingData.timesAndSpeeds[i];
                 }
             }
-            return bestTime;
+            return bestTimeAndSpeeds;
         }
 
-        // get the landmark name where the delta time-to-complete is biggest (with us being faster)
-        // If relative is true, this is the relative rather than numerically biggest difference
-        public String getLandmarkWhereIAmFaster(TrackLandmarksTiming otherVehicleTrackLandMarksTiming, Boolean preferCommonOvertakingSpots, Boolean relative)
+        // get the landmark name where I'm either much faster through the section or
+        // am about as fast but have significantly higher entry speed
+        public LandmarkAndDeltaType getLandmarkWhereIAmFaster(TrackLandmarksTiming otherVehicleTrackLandMarksTiming, Boolean preferCommonOvertakingSpots)
         {
-            float bestDifference = -1;
-            String bestDifferenceLandmark = null;
+            LandmarkDeltaContainer deltasForCommonOvertakingSpots = getLandmarksWithBiggestDeltas(otherVehicleTrackLandMarksTiming, true, preferCommonOvertakingSpots);
+            if (deltasForCommonOvertakingSpots.biggestStartSpeedDifferenceLandmark == null && deltasForCommonOvertakingSpots.biggestTimeDifferenceLandmark == null && preferCommonOvertakingSpots)
+            {
+                // no hits for common overtaking spots so try again
+                deltasForCommonOvertakingSpots = getLandmarksWithBiggestDeltas(otherVehicleTrackLandMarksTiming, true, false);
+            }
+            // this can contain 2 different results (one for the biggest entry speed difference, one for the biggest absolute time difference)
+            return deltasForCommonOvertakingSpots.selectLandmark();
+        }
+
+        // get the landmark name where I'm either much faster through the section or
+        // am about as fast but have significantly higher entry speed
+        public LandmarkAndDeltaType getLandmarkWhereIAmSlower(TrackLandmarksTiming otherVehicleTrackLandMarksTiming, Boolean preferCommonOvertakingSpots)
+        {
+            LandmarkDeltaContainer deltasForCommonOvertakingSpots = getLandmarksWithBiggestDeltas(otherVehicleTrackLandMarksTiming, false, preferCommonOvertakingSpots);
+            if (deltasForCommonOvertakingSpots.biggestStartSpeedDifferenceLandmark == null && deltasForCommonOvertakingSpots.biggestTimeDifferenceLandmark == null && preferCommonOvertakingSpots)
+            {
+                // no hits for common overtaking spots so try again
+                deltasForCommonOvertakingSpots = getLandmarksWithBiggestDeltas(otherVehicleTrackLandMarksTiming, false, false);
+            }
+            // this can contain 2 different results (one for the biggest entry speed difference, one for the biggest absolute time difference)
+            return deltasForCommonOvertakingSpots.selectLandmark();
+        }
+
+        private LandmarkDeltaContainer getLandmarksWithBiggestDeltas(TrackLandmarksTiming otherVehicleTrackLandMarksTiming, Boolean whereImFaster, Boolean preferCommonOvertakingSpots)
+        {
+            float biggestTimeDifference = -1;
+            float biggestStartSpeedDifference = -1;
+            String biggestTimeDifferenceLandmark = null;
+            String biggestSpeedDifferenceLandmark = null;
             foreach (KeyValuePair<string, TrackLandmarksTimingData> entry in this.sessionData)
             {
                 String landmarkName = entry.Key;
                 TrackLandmarksTimingData thisTiming = entry.Value;
                 if (!preferCommonOvertakingSpots || thisTiming.isCommonOvertakingSpot)
                 {
-                    float myBest = getBestTime(landmarkName);
-                    float otherBest = otherVehicleTrackLandMarksTiming.getBestTime(landmarkName);
-                    if (myBest != -1 && otherBest != -1 && myBest < otherBest)
-                    {
-                        float diff = relative ? (otherBest - myBest) / myBest : otherBest - myBest;
-                        if ((relative && diff > minSignificantTimeRealiveDifference && diff > bestDifference) || 
-                            (!relative && diff > minSignificantTimeAbsoluteDifference && diff > bestDifference))
-                        {
-                            bestDifference = diff;
-                            bestDifferenceLandmark = landmarkName;
-                        }                        
-                    }
-                }
-            }
-            if (bestDifferenceLandmark == null && preferCommonOvertakingSpots) 
-            {
-                // no suitable matches, so warn about less likely overtaking spots
-                foreach (KeyValuePair<string, TrackLandmarksTimingData> entry in this.sessionData)
-                {
-                    String landmarkName = entry.Key;
-                    TrackLandmarksTimingData thisTiming = entry.Value;
-                    if (!thisTiming.isCommonOvertakingSpot)
-                    {
-                        float myBest = getBestTime(landmarkName);
-                        float otherBest = otherVehicleTrackLandMarksTiming.getBestTime(landmarkName);
-                        if (myBest != -1 && otherBest != -1 && myBest < otherBest)
-                        {
-                            float diff = relative ? (otherBest - myBest) / myBest : otherBest - myBest;
-                            if ((relative && diff > minSignificantTimeRealiveDifference && diff > bestDifference) ||
-                                (!relative && diff > minSignificantTimeAbsoluteDifference && diff > bestDifference))
-                            {
-                                bestDifference = diff;
-                                bestDifferenceLandmark = landmarkName;
-                            }
-                        }
-                    }
-                }
-            }
-            return bestDifferenceLandmark;
-        }
+                    float[] myBestTimeAndSpeeds = getBestTimeAndSpeeds(landmarkName);
+                    float[] otherBestTimeAndSpeeds = otherVehicleTrackLandMarksTiming.getBestTimeAndSpeeds(landmarkName);
+                    // for times, other - mine if we want sections where I'm faster (more positive => better), 
+                    // or mine - other if we want sections where he's faster (more positive => worse)
+                    float timeDelta = whereImFaster ? otherBestTimeAndSpeeds[0] - myBestTimeAndSpeeds[0] : myBestTimeAndSpeeds[0] - otherBestTimeAndSpeeds[0];
+                    // for speeds, mine - other if we want sections where I'm faster (more positive => better),
+                    // or other - mine if we want sections where he's faster (more positive => worse)
+                    float startSpeedDelta = whereImFaster ? myBestTimeAndSpeeds[1] - otherBestTimeAndSpeeds[1] : otherBestTimeAndSpeeds[1] - myBestTimeAndSpeeds[1];
 
-        // get the landmark name where the delta time-to-complete is biggest (with us being slower)
-        // If relative is true, this is the relative rather than numerically biggest difference
-        public String getLandmarkWhereIAmSlower(TrackLandmarksTiming otherVehicleTrackLandMarksTiming, Boolean preferCommonOvertakingSpots, Boolean relative)
-        {
-            float worstDifference = -1;
-            String worstDifferenceLandmark = null;
-            foreach (KeyValuePair<string, TrackLandmarksTimingData> entry in sessionData)
-            {
-                String landmarkName = entry.Key;
-                TrackLandmarksTimingData thisTiming = entry.Value;
-                if (!preferCommonOvertakingSpots || thisTiming.isCommonOvertakingSpot)
-                {
-                    float myBest = getBestTime(landmarkName);
-                    float otherBest = otherVehicleTrackLandMarksTiming.getBestTime(landmarkName);
-                    if (myBest != -1 && otherBest != -1 && myBest > otherBest)
+                    if (timeDelta >= minSignificantTimeAbsoluteDifference && timeDelta > biggestTimeDifference)
                     {
-                        float diff = relative ? (myBest - otherBest) / myBest : myBest - otherBest;
-                        if ((relative && diff > minSignificantTimeRealiveDifference && diff > worstDifference) || 
-                            (!relative && diff > minSignificantTimeAbsoluteDifference && diff > worstDifference))
-                        {
-                            worstDifference = diff;
-                            worstDifferenceLandmark = landmarkName;                           
-                        }
+                        // this is the biggest (so far) absolute time difference
+                        biggestTimeDifference = timeDelta;
+                        biggestTimeDifferenceLandmark = landmarkName;
+                    }
+                    if (Math.Abs(timeDelta) < minSignificantTimeAbsoluteDifference &&
+                        startSpeedDelta > minSignificantAbsoluteStartSpeedDifference && startSpeedDelta > biggestStartSpeedDifference)
+                    {
+                        biggestStartSpeedDifference = startSpeedDelta;
+                        biggestSpeedDifferenceLandmark = landmarkName;
                     }
                 }
             }
-            if (worstDifferenceLandmark == null && preferCommonOvertakingSpots)
-            {
-                // no suitable matches, so warn about less likely overtaking spots
-                foreach (KeyValuePair<string, TrackLandmarksTimingData> entry in sessionData)
-                {
-                    String landmarkName = entry.Key;
-                    TrackLandmarksTimingData thisTiming = entry.Value;
-                    if (!thisTiming.isCommonOvertakingSpot)
-                    {
-                        float myBest = getBestTime(landmarkName);
-                        float otherBest = otherVehicleTrackLandMarksTiming.getBestTime(landmarkName);
-                        if (myBest != -1 && otherBest != -1 && myBest > otherBest)
-                        {
-                            float diff = relative ? (myBest - otherBest) / myBest : myBest - otherBest;
-                            if ((relative && diff > minSignificantTimeRealiveDifference && diff > worstDifference) ||
-                                (!relative && diff > minSignificantTimeAbsoluteDifference && diff > worstDifference))
-                            {
-                                worstDifference = diff;
-                                worstDifferenceLandmark = landmarkName;
-                            }
-                        }
-                    }
-                }
-            }
-            return worstDifferenceLandmark;
+            return new LandmarkDeltaContainer(biggestTimeDifference, biggestTimeDifferenceLandmark, biggestStartSpeedDifference, biggestSpeedDifferenceLandmark);
         }
 
         // called for every opponent and the player for each tick
@@ -911,6 +940,7 @@ namespace CrewChiefV4.GameState
                             float error = speed > 0 && speed < 120 ? (currentDistanceRoundTrack - trackLandmark.distanceRoundLapStart) / speed : 0;
                             landmarkNameStart = trackLandmark.landmarkName;
                             landmarkStartTime = gameTime - error;
+                            landmarkStartSpeed = speed;
                         }
 					    break;
 				    }		
@@ -927,7 +957,7 @@ namespace CrewChiefV4.GameState
                             // only save the timing if we're near the landmark end point
                             // adjust the landmarkEndTime a bit to accommodate position errors
                             float error = speed > 0 && speed < 120 ? (currentDistanceRoundTrack - trackLandmark.distanceRoundLapEnd) / speed : 0;
-                            addTime(landmarkNameStart, (gameTime - error) - landmarkStartTime, trackLandmark.isCommonOvertakingSpot);
+                            addTimeAndSpeeds(landmarkNameStart, (gameTime - error) - landmarkStartTime, landmarkStartSpeed, speed, trackLandmark.isCommonOvertakingSpot);
                         }
 					    landmarkNameStart = null;
 					    landmarkStartTime = -1;
@@ -943,6 +973,7 @@ namespace CrewChiefV4.GameState
         {
             landmarkNameStart = null;
             landmarkStartTime = -1;
+            landmarkStartSpeed = -1;
         }
     }
 
