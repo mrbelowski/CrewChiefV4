@@ -203,8 +203,9 @@ namespace CrewChiefV4.rFactor2
             this.brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(cgs.carClass);
             csd.DriverRawName = getStringFromBytes(player.mDriverName).ToLower();
             csd.TrackDefinition = new TrackDefinition(getStringFromBytes(rf2state.mTrackName), (float)rf2state.mLapDist);
-
             csd.TrackDefinition.setGapPoints();
+            csd.TrackDefinition.trackLandmarks = TrackData.TRACK_LANDMARKS_DATA.getTrackLandmarksForTrackName(csd.TrackDefinition.name);
+
             csd.SessionNumberOfLaps = rf2state.mMaxLaps > 0 && rf2state.mMaxLaps < 1000 ? rf2state.mMaxLaps : 0;
 
             // default to 60:30 if both session time and number of laps undefined (test day)
@@ -687,6 +688,7 @@ namespace CrewChiefV4.rFactor2
                 opponent.CurrentBestLapTime = vehicle.mBestLapTime > 0.0f ? (float)vehicle.mBestLapTime : -1.0f;
                 opponent.PreviousBestLapTime = opponentPrevious != null && opponentPrevious.CurrentBestLapTime > 0.0f &&
                     opponentPrevious.CurrentBestLapTime > opponent.CurrentBestLapTime ? opponentPrevious.CurrentBestLapTime : -1.0f;
+                float previousDistanceRoundTrack = opponentPrevious != null ? opponentPrevious.DistanceRoundTrack : 0;
                 opponent.bestSector1Time = vehicle.mBestSector1 > 0 ? (float)vehicle.mBestSector1 : -1.0f;
                 opponent.bestSector2Time = vehicle.mBestSector2 > 0 && vehicle.mBestSector1 > 0.0f ? (float)(vehicle.mBestSector2 - vehicle.mBestSector1) : -1.0f;
                 opponent.bestSector3Time = vehicle.mBestLapTime > 0 && vehicle.mBestSector2 > 0.0f ? (float)(vehicle.mBestLapTime - vehicle.mBestSector2) : -1.0f;
@@ -818,6 +820,17 @@ namespace CrewChiefV4.rFactor2
                     csd.OverallSessionBestLapTime = opponent.CurrentBestLapTime;
                 }
 
+                if (opponentPrevious != null)
+                {
+                    opponent.trackLandmarksTiming = opponentPrevious.trackLandmarksTiming;
+                    opponent.trackLandmarksTiming.updateLandmarkTiming(csd.TrackDefinition.trackLandmarks,
+                        csd.SessionRunningTime, previousDistanceRoundTrack, opponent.DistanceRoundTrack, opponent.Speed);
+                }
+                if (opponent.IsNewLap)
+                {
+                    opponent.trackLandmarksTiming.cancelWaitingForLandmarkEnd();
+                }
+
                 // shouldn't have duplicates, but just in case
                 if (!cgs.OpponentData.ContainsKey(opponentKey))
                     cgs.OpponentData.Add(opponentKey, opponent);
@@ -830,6 +843,14 @@ namespace CrewChiefV4.rFactor2
                 csd.IsRacingSameCarBehind = String.Equals(pgs.getOpponentKeyBehind(false), cgs.getOpponentKeyBehind(false));
                 csd.GameTimeAtLastPositionFrontChange = !csd.IsRacingSameCarInFront ? csd.SessionRunningTime : psd.GameTimeAtLastPositionFrontChange;
                 csd.GameTimeAtLastPositionBehindChange = !csd.IsRacingSameCarBehind ? csd.SessionRunningTime : psd.GameTimeAtLastPositionBehindChange;
+
+                csd.trackLandmarksTiming = previousGameState.SessionData.trackLandmarksTiming;
+                csd.trackLandmarksTiming.updateLandmarkTiming(csd.TrackDefinition.trackLandmarks,
+                                    csd.SessionRunningTime, previousGameState.PositionAndMotionData.DistanceRoundTrack, cgs.PositionAndMotionData.DistanceRoundTrack, (float) rf2state.mSpeed);
+                if (csd.IsNewLap)
+                {
+                    csd.trackLandmarksTiming.cancelWaitingForLandmarkEnd();
+                }
             }
 
             // --------------------------------
