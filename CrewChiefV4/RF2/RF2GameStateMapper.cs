@@ -31,6 +31,10 @@ namespace CrewChiefV4.rFactor2
         // At which point we consider that it is raining
         private const double minRainThreshold = 0.1;
 
+        // Pit stop prediction constants.
+        private const int minMinutesBetweenPredictedStops = 10;
+        private const int minLapsBetweenPredictedStops = 5;
+
         // if we're running only against AI, force the pit window to open
         private Boolean isOfflineSession = true;
 
@@ -283,9 +287,34 @@ namespace CrewChiefV4.rFactor2
             // Pit Data
             cgs.PitData.IsRefuellingAllowed = true;
 
-            // No manadatory pit stops in rF2 yet.
-            cgs.PitData.HasMandatoryPitStop = false;
-            cgs.PitData.PitWindowStart = cgs.PitData.PitWindowEnd = 0;
+            if (UserSettings.GetUserSettings().getBoolean("enable_rf2_pit_stop_prediction"))
+            {
+                cgs.PitData.HasMandatoryPitStop = this.isOfflineSession
+                    && rf2state.mScheduledStops > 0
+                    && player.mNumPitstops < rf2state.mScheduledStops
+                    && csd.SessionType == SessionType.Race;
+
+                cgs.PitData.PitWindowStart = this.isOfflineSession && cgs.PitData.HasMandatoryPitStop ? 1 : 0;
+
+                var pitWindowEndLapOrTime = 0;
+                if (cgs.PitData.HasMandatoryPitStop)
+                {
+                    if (csd.SessionHasFixedTime)
+                    {
+                        var minutesBetweenStops = (int)(csd.SessionTotalRunTime / 60 / (rf2state.mScheduledStops + 1));
+                        if (minutesBetweenStops > RF2GameStateMapper.minMinutesBetweenPredictedStops)
+                            pitWindowEndLapOrTime = minutesBetweenStops * (player.mNumPitstops + 1) + 1;
+                    }
+                    else
+                    {
+                        var lapsBetweenStops = (int)(csd.SessionNumberOfLaps / (rf2state.mScheduledStops + 1));
+                        if (lapsBetweenStops > RF2GameStateMapper.minLapsBetweenPredictedStops)
+                            pitWindowEndLapOrTime = lapsBetweenStops * (player.mNumPitstops + 1) + 1;
+                    }
+                }
+
+                cgs.PitData.PitWindowEnd = pitWindowEndLapOrTime;
+            }
 
             // mInGarageStall also means retired or before race start, but for now use it here.
             cgs.PitData.InPitlane = player.mInPits == 1 || player.mInGarageStall == 1;
