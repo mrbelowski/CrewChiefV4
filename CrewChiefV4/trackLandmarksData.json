@@ -317,7 +317,7 @@
         },
         {
             "acTrackNames": [ "spa:" ],
-            "pcarsTrackName":  "Circuit de Spa-Francorchamps:",
+            "pcarsTrackName": "Circuit de Spa-Francorchamps:",
             "raceroomLayoutId": 3870,
             "trackLandmarks": [
                 {
@@ -360,6 +360,102 @@
                     "landmarkName": "the_chicane",
                     "distanceRoundLapStart": 6600,
                     "distanceRoundLapEnd": 6800,
+                    "isCommonOvertakingSpot": true
+                }
+            ]
+        },
+        {
+            "acTrackNames": [ "doningtonpark:national" ],
+            "pcarsTrackName": "Donington Park:National",
+            "trackLandmarks": [
+                {
+                    "landmarkName": "redgate",
+                    "distanceRoundLapStart": 300,
+                    "distanceRoundLapEnd": 400,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "the_craner_curves",
+                    "distanceRoundLapStart": 640,
+                    "distanceRoundLapEnd": 850,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "the_old_hairpin",
+                    "distanceRoundLapStart": 1080,
+                    "distanceRoundLapEnd": 1150,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "mcleans",
+                    "distanceRoundLapStart": 1710,
+                    "distanceRoundLapEnd": 1800,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "coppice",
+                    "distanceRoundLapStart": 2040,
+                    "distanceRoundLapEnd": 2160,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "the_chicane",
+                    "distanceRoundLapStart": 2800,
+                    "distanceRoundLapEnd": 2900,
+                    "isCommonOvertakingSpot": true
+                }
+            ]
+        },
+        {
+            "acTrackNames": [ "doningtonpark:gp" ],
+            "pcarsTrackName":  "Donington Park:Grand Prix",
+            "trackLandmarks": [
+                {
+                    "landmarkName": "redgate",
+                    "distanceRoundLapStart": 300,
+                    "distanceRoundLapEnd": 400,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "the_craner_curves",
+                    "distanceRoundLapStart": 640,
+                    "distanceRoundLapEnd": 850,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "the_old_hairpin",
+                    "distanceRoundLapStart": 1080,
+                    "distanceRoundLapEnd": 1150,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "mcleans",
+                    "distanceRoundLapStart": 1710,
+                    "distanceRoundLapEnd": 1800,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "coppice",
+                    "distanceRoundLapStart": 2040,
+                    "distanceRoundLapEnd": 2160,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "the_chicane",
+                    "distanceRoundLapStart": 2800,
+                    "distanceRoundLapEnd": 2900,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "melbourne_haipin",
+                    "distanceRoundLapStart": 3340,
+                    "distanceRoundLapEnd": 3410,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "goddards",
+                    "distanceRoundLapStart": 3710,
+                    "distanceRoundLapEnd": 3800,
                     "isCommonOvertakingSpot": true
                 }
             ]
