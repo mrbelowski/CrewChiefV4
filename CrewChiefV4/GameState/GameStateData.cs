@@ -901,25 +901,25 @@ namespace CrewChiefV4.GameState
                     // which to choose?? If the entry speed delta > 5m/s choose that
                     if (biggestStartSpeedDifference > 5)
                     {
-                        Console.WriteLine("Biggest speed delta into " + biggestStartSpeedDifferenceLandmark);
+                        Console.WriteLine("Biggest speed delta into " + biggestStartSpeedDifferenceLandmark + ": " + biggestStartSpeedDifference * 100 + "% difference");
                         return new LandmarkAndDeltaType(DeltaType.EntrySpeed, biggestStartSpeedDifferenceLandmark);
                     }
                     else
                     {
-                        Console.WriteLine("Biggest time delta through " + biggestTimeDifferenceLandmark);
+                        Console.WriteLine("Biggest time delta through " + biggestTimeDifferenceLandmark + ": " + biggestTimeDifference * 100 + "% difference");
                         return new LandmarkAndDeltaType(DeltaType.Time, biggestTimeDifferenceLandmark);
                     }
                 }
                 else if (biggestStartSpeedDifferenceLandmark != null)
                 {
-                    Console.WriteLine("Biggest speed delta into " + biggestStartSpeedDifferenceLandmark);
+                    Console.WriteLine("Biggest speed delta into " + biggestStartSpeedDifferenceLandmark + ": " + biggestStartSpeedDifference * 100 + "% difference");
                     return new LandmarkAndDeltaType(DeltaType.EntrySpeed, biggestStartSpeedDifferenceLandmark);
                 }
                 else
                 {
                     if (biggestTimeDifferenceLandmark != null)
                     {
-                        Console.WriteLine("Biggest time delta through " + biggestTimeDifferenceLandmark);
+                        Console.WriteLine("Biggest time delta through " + biggestTimeDifferenceLandmark + ": " + biggestTimeDifference * 100 + "% difference");
                     }
                     return new LandmarkAndDeltaType(DeltaType.Time, biggestTimeDifferenceLandmark);
                 }
@@ -1033,7 +1033,7 @@ namespace CrewChiefV4.GameState
                     // or other - mine if we want sections where he's faster (more positive => worse)
                     float relativeStartSpeedDelta = whereImFaster ? (myBestTimeAndSpeeds[1] - otherBestTimeAndSpeeds[1]) / myBestTimeAndSpeeds[1] :
                                                             (otherBestTimeAndSpeeds[1] - myBestTimeAndSpeeds[1]) / myBestTimeAndSpeeds[1];
-
+                    // Console.WriteLine(landmarkName + " entry diff = " + relativeStartSpeedDelta + " through diff = " + relativeTimeDelta);
                     if (relativeTimeDelta >= minSignificantRelativeTimeDifference && relativeTimeDelta > biggestTimeDifference)
                     {
                         // this is the biggest (so far) relative time difference
@@ -1041,10 +1041,10 @@ namespace CrewChiefV4.GameState
                         biggestTimeDifferenceLandmark = landmarkName;
                     }
 
-                    // additional check here - compare the entry speeds but only if the total speed through this section isn't completely bollocks
-                    // So we check the relativeTimeDelta is greater than -1 * the min - the relative time delta can be negative here but not by too much
+                    // additional check here - compare the entry speeds but only if the total speed through this section is no worse than our opponent
+                    // - there's no point in barrelling in and ballsing up the exit
                     if (relativeStartSpeedDelta > minSignificantRelativeStartSpeedDifference && relativeStartSpeedDelta > biggestStartSpeedDifference &&
-                        relativeTimeDelta >= -1 * minSignificantRelativeTimeDifference)
+                        relativeTimeDelta > 0)
                     {
                         // this is the biggest (so far) relative speed difference
                         biggestStartSpeedDifference = relativeStartSpeedDelta;
