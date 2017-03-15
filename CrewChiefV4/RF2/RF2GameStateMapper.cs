@@ -28,6 +28,9 @@ namespace CrewChiefV4.rFactor2
 
         private List<CornerData.EnumWithThresholds> brakeTempThresholdsForPlayersCar = null;
 
+        // At which point we consider that it is raining
+        private const double minRainThreshold = 0.1;
+
         // if we're running only against AI, force the pit window to open
         private Boolean isOfflineSession = true;
 
@@ -267,15 +270,66 @@ namespace CrewChiefV4.rFactor2
 
             // TODO: make suse this is reasonably close to what we calculate during lap tracking
             // csd.PlayerLapTimeSessionBest = player.mBestLapTime > 0.0f ? (float)player.mBestLapTime : -1.0f;
+            csd.CompletedLaps = player.mTotalLaps;
 
             ////////////////////////////////////
             // motion data
             cgs.PositionAndMotionData.CarSpeed = (float)rf2state.mSpeed;
             cgs.PositionAndMotionData.DistanceRoundTrack = (float)player.mLapDist;
 
+            // Is online session?
+            this.isOfflineSession = true;
+            for (int i = 0; i < rf2state.mNumVehicles; ++i)
+            {
+                if ((rFactor2Constants.rF2Control)rf2state.mVehicles[i].mControl == rFactor2Constants.rF2Control.Remote)
+                    this.isOfflineSession = false;
+            }
+
+            ///////////////////////////////////
+            // Pit Data
+            cgs.PitData.IsRefuellingAllowed = true;
+
+            cgs.PitData.HasMandatoryPitStop = this.isOfflineSession
+                && rf2state.mScheduledStops > 0
+                && player.mNumPitstops < rf2state.mScheduledStops
+                && csd.SessionType == SessionType.Race;
+
+            cgs.PitData.PitWindowStart = this.isOfflineSession && cgs.PitData.HasMandatoryPitStop ? 1 : 0;
+            cgs.PitData.PitWindowEnd = !cgs.PitData.HasMandatoryPitStop ? 0 :
+                csd.SessionHasFixedTime ? (int)(csd.SessionTotalRunTime / 60 / (rf2state.mScheduledStops + 1)) * (player.mNumPitstops + 1) + 1 :
+                (int)(csd.SessionNumberOfLaps / (rf2state.mScheduledStops + 1)) * (player.mNumPitstops + 1) + 1;
+
+            // mInGarageStall also means retired or before race start, but for now use it here.
+            cgs.PitData.InPitlane = player.mInPits == 1 || player.mInGarageStall == 1;
+            cgs.PitData.IsAtPitExit = pgs != null && pgs.PitData.InPitlane && !cgs.PitData.InPitlane;
+            cgs.PitData.OnOutLap = cgs.PitData.InPitlane && csd.SectorNumber == 1;
+
+            if (rf2state.mInRealtimeFC == 0  // Mark pit limiter as unavailable if in Monitor (not real time).
+                || rf2state.mSpeedLimiterAvailable == 0)
+                cgs.PitData.limiterStatus = -1;
+            else
+                cgs.PitData.limiterStatus = rf2state.mSpeedLimiter > 0 ? 1 : 0;
+
+            if (pgs != null
+                && csd.CompletedLaps == psd.CompletedLaps
+                && pgs.PitData.OnOutLap)
+            {
+                // If current lap is pit out lap, keep it that way till lap completes.
+                cgs.PitData.OnOutLap = true;
+            }
+
+            cgs.PitData.OnInLap = cgs.PitData.InPitlane && csd.SectorNumber == 3;
+
+            cgs.PitData.IsMakingMandatoryPitStop = cgs.PitData.HasMandatoryPitStop 
+                && cgs.PitData.OnInLap 
+                && csd.CompletedLaps > cgs.PitData.PitWindowStart;
+
+            cgs.PitData.PitWindow = cgs.PitData.IsMakingMandatoryPitStop 
+                ? PitWindow.StopInProgress : mapToPitWindow((rFactor2Constants.rF2YellowFlagState)rf2state.mYellowFlagState);
+
             ////////////////////////////////////
             // Timings
-            this.trackPlayerTimingData(ref rf2state, cgs, csd, psd, ref player);
+            this.processPlayerTimingData(ref rf2state, cgs, csd, psd, ref player);
 
             csd.SessionTimesAtEndOfSectors = pgs != null ? psd.SessionTimesAtEndOfSectors : new SessionData().SessionTimesAtEndOfSectors;
 
@@ -520,27 +574,20 @@ namespace CrewChiefV4.rFactor2
 
             // --------------------------------
             // opponent data
-            this.isOfflineSession = true;
             this.opponentKeysProcessed.Clear();
 
-            // first check for duplicates and online session:
+            // first check for duplicates:
             Dictionary<string, int> driverNameCounts = new Dictionary<string, int>();
             Dictionary<string, int> duplicatesCreated = new Dictionary<string, int>();
             for (int i = 0; i < rf2state.mNumVehicles; ++i)
             {
                 var vehicle = rf2state.mVehicles[i];
-                String driverName = getStringFromBytes(vehicle.mDriverName).ToLower();
-                if (isOfflineSession && (rFactor2Constants.rF2Control)vehicle.mControl == rFactor2Constants.rF2Control.Remote) {
-                    isOfflineSession = false;
-                }
+                var driverName = getStringFromBytes(vehicle.mDriverName).ToLower();
+
                 if (driverNameCounts.ContainsKey(driverName))
-                {
                     driverNameCounts[driverName] += 1;
-                }
                 else
-                {
                     driverNameCounts.Add(driverName, 1);
-                }
             }
 
             for (int i = 0; i < rf2state.mNumVehicles; ++i)
@@ -556,20 +603,12 @@ namespace CrewChiefV4.rFactor2
 
                     continue;
                 }
-                
-                switch (mapToControlType((rFactor2Constants.rF2Control)vehicle.mControl))
-                {
-                    case ControlType.Player:
-                    case ControlType.Replay:
-                    case ControlType.Unavailable:
-                        continue;
-                    case ControlType.Remote:
-                        this.isOfflineSession = false;
-                        break;
-                    default:
-                        break;
-                }
-                String driverName = getStringFromBytes(vehicle.mDriverName).ToLower();
+
+                var ct = this.mapToControlType((rFactor2Constants.rF2Control)vehicle.mControl);
+                if (ct == ControlType.Player || ct == ControlType.Replay || ct == ControlType.Unavailable)
+                    continue;
+
+                var driverName = getStringFromBytes(vehicle.mDriverName).ToLower();
                 OpponentData opponentPrevious;
                 int duplicatesCount = driverNameCounts[driverName];
                 String opponentKey;
@@ -685,7 +724,7 @@ namespace CrewChiefV4.rFactor2
                             csd.SessionRunningTime,
                             opponent.LastLapTime,
                             lapValid,  // TODO: revisit
-                            false, // TODO: revisit
+                            rf2state.mRaining > minRainThreshold,
                             (float)rf2state.mTrackTemp,
                             (float)rf2state.mAmbientTemp,
                             csd.SessionHasFixedTime,
@@ -696,7 +735,7 @@ namespace CrewChiefV4.rFactor2
                         opponent.Position,
                         vehicle.mInPits == 1 || opponent.DistanceRoundTrack < 0.0f,
                         csd.SessionRunningTime,
-                        false,
+                        rf2state.mRaining > minRainThreshold,
                         (float)rf2state.mTrackTemp,
                         (float)rf2state.mAmbientTemp);
                 }
@@ -707,7 +746,7 @@ namespace CrewChiefV4.rFactor2
                         lastSectorTime,
                         csd.SessionRunningTime,
                         lapValid,
-                        false,
+                        rf2state.mRaining > minRainThreshold,
                         (float)rf2state.mTrackTemp,
                         (float)rf2state.mAmbientTemp);
                 }
@@ -792,47 +831,6 @@ namespace CrewChiefV4.rFactor2
                 csd.GameTimeAtLastPositionFrontChange = !csd.IsRacingSameCarInFront ? csd.SessionRunningTime : psd.GameTimeAtLastPositionFrontChange;
                 csd.GameTimeAtLastPositionBehindChange = !csd.IsRacingSameCarBehind ? csd.SessionRunningTime : psd.GameTimeAtLastPositionBehindChange;
             }
-
-            // --------------------------------
-            // pit data
-            cgs.PitData.IsRefuellingAllowed = true;
-
-            cgs.PitData.HasMandatoryPitStop = this.isOfflineSession
-                && rf2state.mScheduledStops > 0
-                && player.mNumPitstops < rf2state.mScheduledStops
-                && csd.SessionType == SessionType.Race;
-
-            cgs.PitData.PitWindowStart = this.isOfflineSession && cgs.PitData.HasMandatoryPitStop ? 1 : 0;
-            cgs.PitData.PitWindowEnd = !cgs.PitData.HasMandatoryPitStop ? 0 :
-                csd.SessionHasFixedTime ? (int)(csd.SessionTotalRunTime / 60 / (rf2state.mScheduledStops + 1)) * (player.mNumPitstops + 1) + 1 :
-                (int)(csd.SessionNumberOfLaps / (rf2state.mScheduledStops + 1)) * (player.mNumPitstops + 1) + 1;
-
-            // mInGarageStall also means retired or before race start, but for now use it here.
-            cgs.PitData.InPitlane = player.mInPits == 1 || player.mInGarageStall == 1;
-            cgs.PitData.IsAtPitExit = pgs != null && pgs.PitData.InPitlane && !cgs.PitData.InPitlane;
-            cgs.PitData.OnOutLap = cgs.PitData.InPitlane && csd.SectorNumber == 1;
-
-            if (rf2state.mInRealtimeFC == 0  // Mark pit limiter as unavailable if in Monitor (not real time).
-                || rf2state.mSpeedLimiterAvailable == 0)
-            {
-                cgs.PitData.limiterStatus = -1;
-            }
-            else
-            {
-                cgs.PitData.limiterStatus = rf2state.mSpeedLimiter > 0 ? 1 : 0;
-            }
-
-            if (pgs != null
-                && csd.CompletedLaps == psd.CompletedLaps
-                && pgs.PitData.OnOutLap)
-            {
-                // If current lap is pit out lap, keep it that way till lap completes.
-                cgs.PitData.OnOutLap = true;
-            }
-
-            cgs.PitData.OnInLap = cgs.PitData.InPitlane && csd.SectorNumber == 3;
-            cgs.PitData.IsMakingMandatoryPitStop = cgs.PitData.HasMandatoryPitStop && cgs.PitData.OnInLap && csd.CompletedLaps > cgs.PitData.PitWindowStart;
-            cgs.PitData.PitWindow = cgs.PitData.IsMakingMandatoryPitStop ? PitWindow.StopInProgress : mapToPitWindow((rFactor2Constants.rF2YellowFlagState)rf2state.mYellowFlagState);
 
             // --------------------------------
             // fuel data
@@ -961,32 +959,6 @@ namespace CrewChiefV4.rFactor2
             this.distanceOffTrack = cgs.PenaltiesData.IsOffRacingSurface ? lateralDistDiff : 0;
             this.isApproachingTrack = offTrackDistanceDelta < 0 && cgs.PenaltiesData.IsOffRacingSurface && lateralDistDiff < 3;
 
-            // TODO: Apply something similar to opponents.
-            // First, verify if previous sector has invalid time.
-            if (((csd.SectorNumber == 2 && csd.LastSector1Time < 0.0f
-                    || csd.SectorNumber == 3 && csd.LastSector2Time < 0.0f)
-                // And, this is not an out/in lap
-                && !cgs.PitData.OnOutLap && !cgs.PitData.OnInLap
-                // And it's Race or Qualification
-                && (csd.SessionType == SessionType.Race || csd.SessionType == SessionType.Qualify)))
-            {
-                csd.CurrentLapIsValid = false;
-            }
-            // If current lap was marked as invalid, keep it that way.
-            else if (pgs != null
-                     && psd.CompletedLaps == csd.CompletedLaps  // Same lap
-                     && !psd.CurrentLapIsValid)
-            {
-                csd.CurrentLapIsValid = false;
-            }
-            // rF2 lap time or whole lap won't count
-            else if (player.mCountLapFlag != (byte)rFactor2Constants.rF2CountLapFlag.CountLapAndTime
-                // And, this is not an out/in lap
-                && !cgs.PitData.OnOutLap && !cgs.PitData.OnInLap)
-            {
-                csd.CurrentLapIsValid = false;
-            }
-
             // --------------------------------
             // console output
             if (csd.IsNewSession)
@@ -1028,7 +1000,7 @@ namespace CrewChiefV4.rFactor2
             return cgs;
         }
 
-        private void trackPlayerTimingData(
+        private void processPlayerTimingData(
             ref rF2State rf2state,
             GameStateData currentGameState,
             SessionData currentSessionData,
@@ -1036,27 +1008,15 @@ namespace CrewChiefV4.rFactor2
             ref rF2VehScoringInfo player)
         {
             var csd = currentSessionData;
+            var cgs = currentGameState;
             var psd = previousSessionData;
 
             // Clear all the timings one new session.
             if (csd.IsNewSession)
-            {
-                // For new session, kick off the initial lap.
-                csd.playerStartNewLap(
-                    csd.CompletedLaps + 1,
-                    csd.Position,
-                    player.mInPits == 1 || currentGameState.PositionAndMotionData.DistanceRoundTrack < 0.0f,
-                    csd.SessionRunningTime,
-                    false,
-                    (float)rf2state.mTrackTemp,
-                    (float)rf2state.mAmbientTemp);
-
                 return;
-            }
 
             Debug.Assert(psd != null);
 
-            csd.CompletedLaps = player.mTotalLaps;
             csd.LapTimeCurrent = csd.SessionRunningTime - (float)player.mLapStartET;
             csd.LapTimePrevious = player.mLastLapTime > 0.0f ? (float)player.mLastLapTime : -1.0f;
 
@@ -1096,7 +1056,33 @@ namespace CrewChiefV4.rFactor2
             foreach (var ld in psd.PlayerLapData)
                 csd.PlayerLapData.Add(ld);
 
-            // Check if update is needed.
+            // Verify lap is valid
+            // TODO: Apply something similar to opponents.
+            // First, verify if previous sector has invalid time.
+            if (((csd.SectorNumber == 2 && csd.LastSector1Time < 0.0f
+                    || csd.SectorNumber == 3 && csd.LastSector2Time < 0.0f)
+                // And, this is not an out/in lap
+                && !cgs.PitData.OnOutLap && !cgs.PitData.OnInLap
+                // And it's Race or Qualification
+                && (csd.SessionType == SessionType.Race || csd.SessionType == SessionType.Qualify)))
+            {
+                csd.CurrentLapIsValid = false;
+            }
+            // If current lap was marked as invalid, keep it that way.
+            else if (psd.CompletedLaps == csd.CompletedLaps  // Same lap
+                     && !psd.CurrentLapIsValid)
+            {
+                csd.CurrentLapIsValid = false;
+            }
+            // rF2 lap time or whole lap won't count
+            else if (player.mCountLapFlag != (byte)rFactor2Constants.rF2CountLapFlag.CountLapAndTime
+                // And, this is not an out/in lap
+                && !cgs.PitData.OnOutLap && !cgs.PitData.OnInLap)
+            {
+                csd.CurrentLapIsValid = false;
+            }
+
+            // Check if timing update is needed.
             if (!csd.IsNewLap && !csd.IsNewSector)
                 return;
 
@@ -1126,19 +1112,20 @@ namespace CrewChiefV4.rFactor2
                         csd.Position,
                         csd.SessionRunningTime,
                         csd.LapTimePrevious,
-                        true,  // TODO: revisit
-                        false, // TODO: revisit
+                        csd.CurrentLapIsValid,
+                        rf2state.mRaining > minRainThreshold,
                         (float)rf2state.mTrackTemp,
                         (float)rf2state.mAmbientTemp,
                         csd.SessionHasFixedTime,
                         csd.SessionTimeRemaining);
                 }
-               csd.playerStartNewLap(
+
+                csd.playerStartNewLap(
                     csd.CompletedLaps + 1,
                     csd.Position,
                     player.mInPits == 1 || currentGameState.PositionAndMotionData.DistanceRoundTrack < 0.0f,
                     csd.SessionRunningTime,
-                    false,
+                    rf2state.mRaining > minRainThreshold,
                     (float)rf2state.mTrackTemp,
                     (float)rf2state.mAmbientTemp);
             }
@@ -1148,8 +1135,8 @@ namespace CrewChiefV4.rFactor2
                     csd.Position,
                     lastSectorTime,
                     csd.SessionRunningTime,
-                    true,  // Revisit
-                    false,
+                    csd.CurrentLapIsValid,
+                    rf2state.mRaining > minRainThreshold,
                     (float)rf2state.mTrackTemp,
                     (float)rf2state.mAmbientTemp);
             }
