@@ -314,6 +314,55 @@
                     "isCommonOvertakingSpot": true
                 }
             ]
+        },
+        {
+            "acTrackNames": [ "spa:" ],
+            "pcarsTrackName":  "Circuit de Spa-Francorchamps:",
+            "raceroomLayoutId": 3870,
+            "trackLandmarks": [
+                {
+                    "landmarkName": "la_source",
+                    "distanceRoundLapStart": 260,
+                    "distanceRoundLapEnd": 350,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "eau_rouge",
+                    "distanceRoundLapStart": 950,
+                    "distanceRoundLapEnd": 1100,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "les_combes",
+                    "distanceRoundLapStart": 2270,
+                    "distanceRoundLapEnd": 2700,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "pouhon",
+                    "distanceRoundLapStart": 3700,
+                    "distanceRoundLapEnd": 4200,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "stavlot",
+                    "distanceRoundLapStart": 4900,
+                    "distanceRoundLapEnd": 5000,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "blanchimont",
+                    "distanceRoundLapStart": 5760,
+                    "distanceRoundLapEnd": 6200,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "the_chicane",
+                    "distanceRoundLapStart": 6600,
+                    "distanceRoundLapEnd": 6800,
+                    "isCommonOvertakingSpot": true
+                }
+            ]
         }
     ]
 }
