@@ -330,7 +330,7 @@ namespace CrewChiefV4.rFactor2
 
             ////////////////////////////////////
             // Timings
-            this.processPlayerTimingData(ref rf2state, cgs, csd, psd, ref player);
+            this.processPlayerTimingData(ref rf2state, cgs, pgs, ref player);
 
             csd.SessionTimesAtEndOfSectors = pgs != null ? psd.SessionTimesAtEndOfSectors : new SessionData().SessionTimesAtEndOfSectors;
 
@@ -695,23 +695,7 @@ namespace CrewChiefV4.rFactor2
                 opponent.LastLapTime = vehicle.mLastLapTime > 0 ? (float)vehicle.mLastLapTime : -1.0f;
                 opponent.InPits = vehicle.mInPits == 1;
 
-                float lastSectorTime = -1.0f;
-                if (opponent.CurrentSectorNumber == 1)
-                    lastSectorTime = vehicle.mLastLapTime > 0.0f ? (float)vehicle.mLastLapTime : -1.0f;
-                else if (opponent.CurrentSectorNumber == 2)
-                {
-                    lastSectorTime = vehicle.mLastSector1 > 0.0f ? (float)vehicle.mLastSector1 : -1.0f;
-
-                    if (vehicle.mCurSector1 > 0.0)
-                        lastSectorTime = (float)vehicle.mCurSector1;
-                }
-                else if (opponent.CurrentSectorNumber == 3)
-                {
-                    lastSectorTime = vehicle.mLastSector2 > 0.0f ? (float)vehicle.mLastSector2 : -1.0f;
-
-                    if (vehicle.mCurSector2 > 0.0)
-                        lastSectorTime = (float)vehicle.mCurSector2;
-                }
+                var lastSectorTime = this.getLastSectorTime(ref vehicle, opponent.CurrentSectorNumber);
 
                 bool lapValid = true;
                 if (vehicle.mCountLapFlag != 2)
@@ -782,6 +766,7 @@ namespace CrewChiefV4.rFactor2
                         cgs.PitData.OpponentForCarBehindPitting = opponent;
                     }
                 }
+
                 if (opponentPrevious != null
                     && opponentPrevious.Position > 1
                     && opponent.Position == 1)
@@ -791,9 +776,7 @@ namespace CrewChiefV4.rFactor2
 
                 // session best lap times
                 if (opponent.Position == csd.Position + 1)
-                {
                     csd.TimeDeltaBehind = (float)vehicle.mTimeBehindNext;
-                }
 
                 if (opponent.CurrentBestLapTime > 0.0f
                     && (opponent.CurrentBestLapTime < csd.OpponentsLapTimeSessionBestOverall
@@ -826,10 +809,9 @@ namespace CrewChiefV4.rFactor2
                     opponent.trackLandmarksTiming.updateLandmarkTiming(csd.TrackDefinition.trackLandmarks,
                         csd.SessionRunningTime, previousDistanceRoundTrack, opponent.DistanceRoundTrack, opponent.Speed);
                 }
+
                 if (opponent.IsNewLap)
-                {
                     opponent.trackLandmarksTiming.cancelWaitingForLandmarkEnd();
-                }
 
                 // shouldn't have duplicates, but just in case
                 if (!cgs.OpponentData.ContainsKey(opponentKey))
@@ -1024,13 +1006,12 @@ namespace CrewChiefV4.rFactor2
         private void processPlayerTimingData(
             ref rF2State rf2state,
             GameStateData currentGameState,
-            SessionData currentSessionData,
-            SessionData previousSessionData,
+            GameStateData previousGameState,
             ref rF2VehScoringInfo player)
         {
-            var csd = currentSessionData;
             var cgs = currentGameState;
-            var psd = previousSessionData;
+            var csd = cgs.SessionData;
+            var psd = previousGameState != null ? previousGameState.SessionData : null;
 
             // Clear all the timings one new session.
             if (csd.IsNewSession)
@@ -1038,6 +1019,8 @@ namespace CrewChiefV4.rFactor2
 
             Debug.Assert(psd != null);
 
+            /////////////////////////////////////
+            // Current lap timings
             csd.LapTimeCurrent = csd.SessionRunningTime - (float)player.mLapStartET;
             csd.LapTimePrevious = player.mLastLapTime > 0.0f ? (float)player.mLastLapTime : -1.0f;
 
@@ -1061,8 +1044,9 @@ namespace CrewChiefV4.rFactor2
             if (player.mCurSector1 > 0.0 && player.mCurSector2 > 0.0)
                 csd.LastSector2Time = (float)(player.mCurSector2 - player.mCurSector1);
 
-            // Below values change on sector/lap change, otherwise stay the same between updates.
+            /////////////////////////////////////////
             // Preserve current values.
+            // Below values change on sector/lap change, otherwise stay the same between updates.
             csd.PlayerBestSector1Time = psd.PlayerBestSector1Time;
             csd.PlayerBestSector2Time = psd.PlayerBestSector2Time;
             csd.PlayerBestSector3Time = psd.PlayerBestSector3Time;
@@ -1107,23 +1091,9 @@ namespace CrewChiefV4.rFactor2
             if (!csd.IsNewLap && !csd.IsNewSector)
                 return;
 
-            float lastSectorTime = -1.0f;
-            if (csd.SectorNumber == 1)
-                lastSectorTime = player.mLastLapTime > 0.0f ? (float)player.mLastLapTime : -1.0f;
-            else if (csd.SectorNumber == 2)
-            {
-                lastSectorTime = player.mLastSector1 > 0.0f ? (float)player.mLastSector1 : -1.0f;
-
-                if (player.mCurSector1 > 0.0)
-                    lastSectorTime = (float)player.mCurSector1;
-            }
-            else if (csd.SectorNumber == 3)
-            { 
-                lastSectorTime = player.mLastSector2 > 0.0f ? (float)player.mLastSector2 : -1.0f;
-
-                if (player.mCurSector2 > 0.0)
-                    lastSectorTime = (float)player.mCurSector2;
-            }
+            /////////////////////////////////////////
+            // Update Sector/Lap timings.
+            var lastSectorTime = this.getLastSectorTime(ref player, csd.SectorNumber);
 
             if (csd.IsNewLap)
             {
@@ -1161,6 +1131,29 @@ namespace CrewChiefV4.rFactor2
                     (float)rf2state.mTrackTemp,
                     (float)rf2state.mAmbientTemp);
             }
+        }
+
+        private float getLastSectorTime(ref rF2VehScoringInfo vehicle, int currSector)
+        {
+            var lastSectorTime = -1.0f;
+            if (currSector == 1)
+                lastSectorTime = vehicle.mLastLapTime > 0.0f ? (float)vehicle.mLastLapTime : -1.0f;
+            else if (currSector == 2)
+            {
+                lastSectorTime = vehicle.mLastSector1 > 0.0f ? (float)vehicle.mLastSector1 : -1.0f;
+
+                if (vehicle.mCurSector1 > 0.0)
+                    lastSectorTime = (float)vehicle.mCurSector1;
+            }
+            else if (currSector == 3)
+            {
+                lastSectorTime = vehicle.mLastSector2 > 0.0f ? (float)vehicle.mLastSector2 : -1.0f;
+
+                if (vehicle.mCurSector2 > 0.0)
+                    lastSectorTime = (float)vehicle.mCurSector2;
+            }
+
+            return lastSectorTime;
         }
 
 #if DEBUG
