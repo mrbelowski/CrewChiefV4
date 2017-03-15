@@ -408,7 +408,7 @@
         },
         {
             "acTrackNames": [ "doningtonpark:gp" ],
-            "pcarsTrackName":  "Donington Park:Grand Prix",
+            "pcarsTrackName": "Donington Park:Grand Prix",
             "trackLandmarks": [
                 {
                     "landmarkName": "redgate",
@@ -441,7 +441,7 @@
                     "isCommonOvertakingSpot": true
                 },
                 {
-                    "landmarkName": "the_chicane",
+                    "landmarkName": "the_esses",
                     "distanceRoundLapStart": 2800,
                     "distanceRoundLapEnd": 2900,
                     "isCommonOvertakingSpot": true
@@ -456,6 +456,60 @@
                     "landmarkName": "goddards",
                     "distanceRoundLapStart": 3710,
                     "distanceRoundLapEnd": 3800,
+                    "isCommonOvertakingSpot": true
+                }
+            ]
+        },
+        {
+            "acTrackNames": [ "imola:" ],
+            "pcarsTrackName":  "Imola:Grand Prix",
+            "trackLandmarks": [
+                {
+                    "landmarkName": "tamburello",
+                    "distanceRoundLapStart": 600,
+                    "distanceRoundLapEnd": 900,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "villeneuve",
+                    "distanceRoundLapStart": 1220,
+                    "distanceRoundLapEnd": 1480,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "tosa",
+                    "distanceRoundLapStart": 1630,
+                    "distanceRoundLapEnd": 1770,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "piratella",
+                    "distanceRoundLapStart": 2230,
+                    "distanceRoundLapEnd": 2500,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "acque_minerali",
+                    "distanceRoundLapStart": 2650,
+                    "distanceRoundLapEnd": 2960,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "the_chicane",
+                    "distanceRoundLapStart": 3290,
+                    "distanceRoundLapEnd": 3430,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "rivazza_1",
+                    "distanceRoundLapStart": 4040,
+                    "distanceRoundLapEnd": 4150,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "rivazza_2",
+                    "distanceRoundLapStart": 4190,
+                    "distanceRoundLapEnd": 4300,
                     "isCommonOvertakingSpot": true
                 }
             ]
