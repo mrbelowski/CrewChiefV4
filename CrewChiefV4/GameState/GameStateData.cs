@@ -891,8 +891,8 @@ namespace CrewChiefV4.GameState
 
         // don't count time differences shorter than these - no point in being told to defend into a corner when
         // the other guys is only 0.01 seconds faster through that corner
-        private static float minSignificantTimeAbsoluteDifference = 0.2f;    // is this a good value?
-        private static float minSignificantAbsoluteStartSpeedDifference = 3f;   // is this a good value?
+        private static float minSignificantRelativeTimeDifference = 0.1f;    // 10% - is this a good value?
+        private static float minSignificantRelativeStartSpeedDifference = 0.1f;   // 10% - is this a good value?
 
         
 
@@ -953,7 +953,7 @@ namespace CrewChiefV4.GameState
                 // no hits for common overtaking spots so try again
                 deltasForCommonOvertakingSpots = getLandmarksWithBiggestDeltas(otherVehicleTrackLandMarksTiming, true, false);
             }
-            // this can contain 2 different results (one for the biggest entry speed difference, one for the biggest absolute time difference)
+            // this can contain 2 different results (one for the biggest entry speed difference, one for the biggest relative time difference)
             return deltasForCommonOvertakingSpots.selectLandmark();
         }
 
@@ -967,7 +967,7 @@ namespace CrewChiefV4.GameState
                 // no hits for common overtaking spots so try again
                 deltasForCommonOvertakingSpots = getLandmarksWithBiggestDeltas(otherVehicleTrackLandMarksTiming, false, false);
             }
-            // this can contain 2 different results (one for the biggest entry speed difference, one for the biggest absolute time difference)
+            // this can contain 2 different results (one for the biggest entry speed difference, one for the biggest relative time difference)
             return deltasForCommonOvertakingSpots.selectLandmark();
         }
 
@@ -987,23 +987,27 @@ namespace CrewChiefV4.GameState
                     float[] otherBestTimeAndSpeeds = otherVehicleTrackLandMarksTiming.getBestTimeAndSpeeds(landmarkName);
                     // for times, other - mine if we want sections where I'm faster (more positive => better), 
                     // or mine - other if we want sections where he's faster (more positive => worse)
-                    float timeDelta = whereImFaster ? otherBestTimeAndSpeeds[0] - myBestTimeAndSpeeds[0] : myBestTimeAndSpeeds[0] - otherBestTimeAndSpeeds[0];
+                    float relativeTimeDelta = whereImFaster ? (otherBestTimeAndSpeeds[0] - myBestTimeAndSpeeds[0]) / myBestTimeAndSpeeds[0] :
+                                                      (myBestTimeAndSpeeds[0] - otherBestTimeAndSpeeds[0]) / myBestTimeAndSpeeds[0];
                     // for speeds, mine - other if we want sections where I'm faster (more positive => better),
                     // or other - mine if we want sections where he's faster (more positive => worse)
-                    float startSpeedDelta = whereImFaster ? myBestTimeAndSpeeds[1] - otherBestTimeAndSpeeds[1] : otherBestTimeAndSpeeds[1] - myBestTimeAndSpeeds[1];
+                    float relativeStartSpeedDelta = whereImFaster ? (myBestTimeAndSpeeds[1] - otherBestTimeAndSpeeds[1]) / myBestTimeAndSpeeds[1] :
+                                                            (otherBestTimeAndSpeeds[1] - myBestTimeAndSpeeds[1]) / myBestTimeAndSpeeds[1];
 
-                    if (timeDelta >= minSignificantTimeAbsoluteDifference && timeDelta > biggestTimeDifference)
+                    if (relativeTimeDelta >= minSignificantRelativeTimeDifference && relativeTimeDelta > biggestTimeDifference)
                     {
-                        // this is the biggest (so far) absolute time difference
-                        biggestTimeDifference = timeDelta;
+                        // this is the biggest (so far) relative time difference
+                        biggestTimeDifference = relativeTimeDelta;
                         biggestTimeDifferenceLandmark = landmarkName;
                     }
 
-                    // if the time difference is small compare the entry speeds
-                    if (Math.Abs(timeDelta) < minSignificantTimeAbsoluteDifference &&
-                        startSpeedDelta > minSignificantAbsoluteStartSpeedDifference && startSpeedDelta > biggestStartSpeedDifference)
+                    // additional check here - compare the entry speeds but only if the total speed through this section isn't completely bollocks
+                    // So we check the relativeTimeDelta is greater than -1 * the min - the relative time delta can be negative here but not by too much
+                    if (relativeStartSpeedDelta > minSignificantRelativeStartSpeedDifference && relativeStartSpeedDelta > biggestStartSpeedDifference &&
+                        relativeTimeDelta >= -1 * minSignificantRelativeTimeDifference)
                     {
-                        biggestStartSpeedDifference = startSpeedDelta;
+                        // this is the biggest (so far) relative speed difference
+                        biggestStartSpeedDifference = relativeStartSpeedDelta;
                         biggestSpeedDifferenceLandmark = landmarkName;
                     }
                 }

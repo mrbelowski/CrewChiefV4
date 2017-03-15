@@ -232,13 +232,21 @@ namespace CrewChiefV4.Events
                     GapStatus gapBehindStatus = GapStatus.NONE;
                     if (currentGameState.SessionData.Position != 1)
                     {
-                        gapsInFront.Insert(0, currentGameState.SessionData.TimeDeltaFront);
-                        gapInFrontStatus = getGapStatus(gapsInFront, gapInFrontAtLastReport);
+                        // AMS / RF1 hack - sometimes the gap data is stale, so don't put the exact same gap in the list
+                        if (gapsInFront.Count == 0 || gapsInFront[0] != currentGameState.SessionData.TimeDeltaFront)
+                        {
+                            gapsInFront.Insert(0, currentGameState.SessionData.TimeDeltaFront);
+                            gapInFrontStatus = getGapStatus(gapsInFront, gapInFrontAtLastReport);
+                        }
                     }
                     if (!isLast)
                     {
-                        gapsBehind.Insert(0, currentGameState.SessionData.TimeDeltaBehind);
-                        gapBehindStatus = getGapStatus(gapsBehind, gapBehindAtLastReport);
+                        // AMS / RF1 hack - sometimes the gap data is stale, so don't put the exact same gap in the list
+                        if (gapsBehind.Count == 0 || gapsBehind[0] != currentGameState.SessionData.TimeDeltaBehind)
+                        {
+                            gapsBehind.Insert(0, currentGameState.SessionData.TimeDeltaBehind);
+                            gapBehindStatus = getGapStatus(gapsBehind, gapBehindAtLastReport);
+                        }
                     }
 
                     // Play which ever is the smaller gap, but we're not interested if the gap is < 0.5 or > 20 seconds or hasn't changed:
