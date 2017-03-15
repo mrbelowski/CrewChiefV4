@@ -3,7 +3,8 @@
 		{
 			"rf1TrackName": "Bathurst Mount Panorama",
 			"rf2TrackName": "Bathurst",
-			"pcarsTrackName": "Bathurst:",
+            "pcarsTrackName": "Bathurst:",
+            "acTrackName": "acu_bathurst:",
 			"raceroomLayoutId": 1846,
 			"trackLandmarks": [
 				{
@@ -38,11 +39,50 @@
 				}
 			]
 		},
-		{
-			"rf1TrackName": "Brands Indy",
-			"rf2TrackName": "Brands Hatch Indy",
-			"pcarsTrackName": "Brands Hatch:Indy",
-			"raceroomLayoutId": 2520,
+        {
+            "rf1TrackName": "Brands Indy",
+            "rf2TrackName": "Brands Hatch Indy",
+            "pcarsTrackName": "Brands Hatch:Indy",
+            "acTrackName": "ks_brands_hatch:indy",
+            "raceroomLayoutId": 2520,
+            "trackLandmarks": [
+                {
+                    "landmarkName": "paddock_hill",
+                    "distanceRoundLapStart": 270,
+                    "distanceRoundLapEnd": 440,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "druids",
+                    "distanceRoundLapStart": 590,
+                    "distanceRoundLapEnd": 690,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "graham_hill_bend",
+                    "distanceRoundLapStart": 850,
+                    "distanceRoundLapEnd": 930,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "surtees",
+                    "distanceRoundLapStart": 1230,
+                    "distanceRoundLapEnd": 1300,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "clearways",
+                    "distanceRoundLapStart": 1350,
+                    "distanceRoundLapEnd": 1530,
+                    "isCommonOvertakingSpot": false
+                }
+            ]
+        },
+        {
+			"rf1TrackName": "Brands GP",
+			"rf2TrackName": "Brands Hatch GP",
+            "pcarsTrackName": "Brands Hatch:Grand Prix",
+            "acTrackName": "ks_brands_hatch:gp",
 			"trackLandmarks": [
 				{
 					"landmarkName": "paddock_hill",
@@ -69,9 +109,21 @@
 					"isCommonOvertakingSpot": false
 				},
 				{
+					"landmarkName": "westfield",
+					"distanceRoundLapStart": 2320,
+					"distanceRoundLapEnd": 2480,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "stirlings",
+					"distanceRoundLapStart": 2925,
+					"distanceRoundLapEnd": 3050,
+					"isCommonOvertakingSpot": true
+				},
+				{
 					"landmarkName": "clearways",
-					"distanceRoundLapStart": 1350,
-					"distanceRoundLapEnd": 1530,
+					"distanceRoundLapStart": 3230,
+					"distanceRoundLapEnd": 3430,
 					"isCommonOvertakingSpot": false
 				}
 			]
@@ -110,7 +162,8 @@
 		},
 		{
 			"rf1TrackName": "Spielberg Grand Prix Circuit",
-			"rf2TrackName": "Spielberg Grand Prix Circuit",
+            "rf2TrackName": "Spielberg Grand Prix Circuit",
+            "acTrackName": "ks_red_bull_ring:layout_gp",
 			"raceroomLayoutId": 2556,
 			"trackLandmarks": [
 				{
@@ -193,7 +246,7 @@
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "hairpin",
+					"landmarkName": "the_hairpin",
 					"distanceRoundLapStart": 2000,
 					"distanceRoundLapEnd": 2150,
 					"isCommonOvertakingSpot": true
@@ -262,7 +315,9 @@
 		},
 		{
 			"rf1TrackName": "HockenheimRing GP",
-			"rf2TrackName": "HockenheimRing GP",
+            "rf2TrackName": "HockenheimRing GP",
+            "pcarsTrackName": "Hockenheim:Grand Prix",
+            "raceroomLayoutId": 1693,
 			"trackLandmarks": [
 				{
 					"landmarkName": "nord_kurve",
@@ -289,7 +344,7 @@
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "hairpin",
+					"landmarkName": "the_hairpin",
 					"distanceRoundLapStart": 2000,
 					"distanceRoundLapEnd": 2150,
 					"isCommonOvertakingSpot": true
