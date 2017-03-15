@@ -45,11 +45,14 @@ namespace CrewChiefV4
                 {
                     case GameEnum.ASSETTO_32BIT:
                     case GameEnum.ASSETTO_64BIT:
-                        foreach (String acTrackName in trackLandmarksForTrack.acTrackNames)
+                        if (trackLandmarksForTrack.acTrackNames != null)
                         {
-                            if (acTrackName.Equals(trackName))
+                            foreach (String acTrackName in trackLandmarksForTrack.acTrackNames)
                             {
-                                return trackLandmarksForTrack.trackLandmarks;
+                                if (acTrackName.Equals(trackName))
+                                {
+                                    return trackLandmarksForTrack.trackLandmarks;
+                                }
                             }
                         }
                         break;
@@ -62,20 +65,26 @@ namespace CrewChiefV4
                         }
                         break;
                     case GameEnum.RF1:
-                        foreach (String rf1TrackName in trackLandmarksForTrack.rf1TrackNames)
+                        if (trackLandmarksForTrack.rf1TrackNames != null)
                         {
-                            if (rf1TrackName.Equals(trackName))
+                            foreach (String rf1TrackName in trackLandmarksForTrack.rf1TrackNames)
                             {
-                                return trackLandmarksForTrack.trackLandmarks;
+                                if (rf1TrackName.Equals(trackName))
+                                {
+                                    return trackLandmarksForTrack.trackLandmarks;
+                                }
                             }
                         }
                         break;
                     case GameEnum.RF2_64BIT:
-                        foreach (String rf2TrackName in trackLandmarksForTrack.rf2TrackNames)
+                        if (trackLandmarksForTrack.rf2TrackNames != null)
                         {
-                            if (rf2TrackName.Equals(trackName))
+                            foreach (String rf2TrackName in trackLandmarksForTrack.rf2TrackNames)
                             {
-                                return trackLandmarksForTrack.trackLandmarks;
+                                if (rf2TrackName.Equals(trackName))
+                                {
+                                    return trackLandmarksForTrack.trackLandmarks;
+                                }
                             }
                         }
                         break;
