@@ -17,10 +17,10 @@ namespace CrewChiefV4
 
     public class TrackLandmarksForTrack
     {
-        public String rf1TrackName { get; set; }
-        public String rf2TrackName { get; set; }
+        public String[] rf1TrackNames { get; set; }
+        public String[] rf2TrackNames { get; set; }        
+        public String[] acTrackNames { get; set; }
         public String pcarsTrackName { get; set; }
-        public String acTrackName { get; set; }
         public int raceroomLayoutId { get; set; }
         public List<TrackLandmark> trackLandmarks { get; set; }
         public TrackLandmarksForTrack()
@@ -45,9 +45,15 @@ namespace CrewChiefV4
                 {
                     case GameEnum.ASSETTO_32BIT:
                     case GameEnum.ASSETTO_64BIT:
-                        if (trackLandmarksForTrack.acTrackName.Equals(trackName))
+                        if (trackLandmarksForTrack.acTrackNames != null)
                         {
-                            return trackLandmarksForTrack.trackLandmarks;
+                            foreach (String acTrackName in trackLandmarksForTrack.acTrackNames)
+                            {
+                                if (acTrackName.Equals(trackName))
+                                {
+                                    return trackLandmarksForTrack.trackLandmarks;
+                                }
+                            }
                         }
                         break;
                     case GameEnum.PCARS_32BIT:
@@ -59,15 +65,27 @@ namespace CrewChiefV4
                         }
                         break;
                     case GameEnum.RF1:
-                        if (trackLandmarksForTrack.rf1TrackName.Equals(trackName))
+                        if (trackLandmarksForTrack.rf1TrackNames != null)
                         {
-                            return trackLandmarksForTrack.trackLandmarks;
+                            foreach (String rf1TrackName in trackLandmarksForTrack.rf1TrackNames)
+                            {
+                                if (rf1TrackName.Equals(trackName))
+                                {
+                                    return trackLandmarksForTrack.trackLandmarks;
+                                }
+                            }
                         }
                         break;
                     case GameEnum.RF2_64BIT:
-                        if (trackLandmarksForTrack.rf2TrackName.Equals(trackName))
+                        if (trackLandmarksForTrack.rf2TrackNames != null)
                         {
-                            return trackLandmarksForTrack.trackLandmarks;
+                            foreach (String rf2TrackName in trackLandmarksForTrack.rf2TrackNames)
+                            {
+                                if (rf2TrackName.Equals(trackName))
+                                {
+                                    return trackLandmarksForTrack.trackLandmarks;
+                                }
+                            }
                         }
                         break;
                     default:
