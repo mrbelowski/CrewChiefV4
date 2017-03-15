@@ -14,6 +14,9 @@ namespace CrewChiefV4.Events
         public static String folderGapInFrontDecreasing = "timings/gap_in_front_decreasing";
         public static String folderGapInFrontIsNow = "timings/gap_in_front_is_now";
 
+        public static String folderHeIsSlowerInCorner = "timings/he_is_slower_in_corner";
+        public static String folderHeIsFasterInCorner = "timings/he_is_faster_in_corner";
+
         public static String folderGapBehindIncreasing = "timings/gap_behind_increasing";
         public static String folderGapBehindDecreasing = "timings/gap_behind_decreasing";
         public static String folderGapBehindIsNow = "timings/gap_behind_is_now";
@@ -91,6 +94,8 @@ namespace CrewChiefV4.Events
         private int gapBehindMinSectorWait;
         private int gapBehindMaxSectorWait;
 
+        private List<String> trackLandmarkDriverNamesUsed = new List<string>();
+
         public Timings(AudioPlayer audioPlayer)
         {
             this.audioPlayer = audioPlayer;
@@ -115,6 +120,7 @@ namespace CrewChiefV4.Events
             sectorsSinceLastGapBehindReport = 0;
             sectorsSinceLastCloseCarAheadReport = 0;
             sectorsSinceLastCloseCarBehindReport = 0;
+            trackLandmarkDriverNamesUsed = new List<string>();
             if (gapAheadReportFrequency == 0)
             {
                 sectorsUntilNextGapAheadReport = int.MaxValue;
@@ -255,6 +261,16 @@ namespace CrewChiefV4.Events
                                         rand.Next(closeAheadMinSectorWait, closeAheadMaxSectorWait));
                                 }
                                 audioPlayer.playMessage(new QueuedMessage(folderBeingHeldUp, 0, this, new Dictionary<string, object> { { "position", currentGameState.SessionData.Position } }));
+                                OpponentData opponent = currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position - 1, false);
+                                if (!trackLandmarkDriverNamesUsed.Contains(opponent.DriverRawName))
+                                {
+                                    String cornerToAttackIn = currentGameState.SessionData.trackLandmarksTiming.getLandmarkWhereIAmFaster(opponent.trackLandmarksTiming, true, false);
+                                    if (cornerToAttackIn != null)
+                                    {
+                                        audioPlayer.playMessage(new QueuedMessage("Timings/corner_to_attack_in", MessageContents(folderHeIsSlowerInCorner, "corners/" + cornerToAttackIn), 0, this));
+                                        trackLandmarkDriverNamesUsed.Add(opponent.DriverRawName);
+                                    }
+                                }
                                 gapInFrontAtLastReport = gapsInFront[0];
                             }
                         }
@@ -283,9 +299,19 @@ namespace CrewChiefV4.Events
                                 }
                                 else if (gapInFrontStatus == GapStatus.DECREASING)
                                 {
+                                    OpponentData opponent = currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position - 1, false);
                                     audioPlayer.playMessage(new QueuedMessage("Timings/gap_in_front",
-                                        MessageContents(folderYoureReeling, currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position - 1, false),
-                                        folderInTheGapIsNow, gapInFront), MessageContents(folderGapInFrontDecreasing, gapInFront), 0, this, new Dictionary<string, object> { { "position", currentGameState.SessionData.Position } }));
+                                        MessageContents(folderYoureReeling, opponent, folderInTheGapIsNow, gapInFront), 
+                                        MessageContents(folderGapInFrontDecreasing, gapInFront), 0, this, new Dictionary<string, object> { { "position", currentGameState.SessionData.Position } }));
+                                    if (!trackLandmarkDriverNamesUsed.Contains(opponent.DriverRawName))
+                                    {
+                                        String cornerToAttackIn = currentGameState.SessionData.trackLandmarksTiming.getLandmarkWhereIAmFaster(opponent.trackLandmarksTiming, true, false);
+                                        if (cornerToAttackIn != null)
+                                        {
+                                            audioPlayer.playMessage(new QueuedMessage("Timings/corner_to_attack_in", MessageContents(folderHeIsSlowerInCorner, "corners/" + cornerToAttackIn), 0, this));
+                                            trackLandmarkDriverNamesUsed.Add(opponent.DriverRawName);
+                                        }
+                                    }
                                 }
                                 else if (gapInFrontStatus == GapStatus.OTHER)
                                 {
@@ -315,6 +341,16 @@ namespace CrewChiefV4.Events
                                         rand.Next(closeBehindMinSectorWait, closeBehindMaxSectorWait));
                                 }
                                 audioPlayer.playMessage(new QueuedMessage(folderBeingPressured, 0, this, new Dictionary<string, object> { { "position", currentGameState.SessionData.Position } }));
+                                OpponentData opponent = currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position + 1, false);
+                                if (!trackLandmarkDriverNamesUsed.Contains(opponent.DriverRawName))
+                                {
+                                    String cornerToDefendIn = currentGameState.SessionData.trackLandmarksTiming.getLandmarkWhereIAmSlower(opponent.trackLandmarksTiming, true, false);
+                                    if (cornerToDefendIn != null)
+                                    {
+                                        audioPlayer.playMessage(new QueuedMessage("Timings/corner_to_defend_in", MessageContents(folderHeIsFasterInCorner, "corners/" + cornerToDefendIn), 0, this));
+                                        trackLandmarkDriverNamesUsed.Add(opponent.DriverRawName);
+                                    }
+                                }
                                 gapBehindAtLastReport = gapsBehind[0];
                             }
                         }
@@ -343,9 +379,20 @@ namespace CrewChiefV4.Events
                                 }
                                 else if (gapBehindStatus == GapStatus.DECREASING)
                                 {
+                                    OpponentData opponent = currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position + 1, false);
                                     audioPlayer.playMessage(new QueuedMessage("Timings/gap_behind",
-                                        MessageContents(currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position + 1, false), folderIsReelingYouIn, gapBehind),
-                                        MessageContents(folderGapBehindDecreasing, gapBehind), 0, this, new Dictionary<string, object> { { "position", currentGameState.SessionData.Position } }));
+                                        MessageContents(opponent, folderIsReelingYouIn, gapBehind), MessageContents(folderGapBehindDecreasing, gapBehind), 
+                                        0, this, new Dictionary<string, object> { { "position", currentGameState.SessionData.Position } }));
+                                    
+                                    if (!trackLandmarkDriverNamesUsed.Contains(opponent.DriverRawName))
+                                    {
+                                        String cornerToDefendIn = currentGameState.SessionData.trackLandmarksTiming.getLandmarkWhereIAmSlower(opponent.trackLandmarksTiming, true, false);
+                                        if (cornerToDefendIn != null)
+                                        {
+                                            audioPlayer.playMessage(new QueuedMessage("Timings/corner_to_defend_in", MessageContents(folderHeIsFasterInCorner, "corners/" + cornerToDefendIn), 0, this));
+                                            trackLandmarkDriverNamesUsed.Add(opponent.DriverRawName);
+                                        }
+                                    }
                                 }
                                 else if (gapBehindStatus == GapStatus.OTHER)
                                 {

@@ -152,7 +152,7 @@ namespace CrewChiefV4.RaceRoom
                 previousLapsCompleted, shared.CompletedLaps, isCarRunning);
 
             List<String> opponentDriverNamesProcessedThisUpdate = new List<String>();
-
+            Boolean justGoneGreen = false;
             if ((lastSessionPhase != currentGameState.SessionData.SessionPhase && (lastSessionPhase == SessionPhase.Unavailable || lastSessionPhase == SessionPhase.Finished)) ||
                 ((lastSessionPhase == SessionPhase.Checkered || lastSessionPhase == SessionPhase.Finished || lastSessionPhase == SessionPhase.Green || lastSessionPhase == SessionPhase.FullCourseYellow) && 
                     currentGameState.SessionData.SessionPhase == SessionPhase.Countdown) ||
@@ -171,6 +171,7 @@ namespace CrewChiefV4.RaceRoom
                 currentGameState.SessionData.SessionStartTime = currentGameState.Now;
                 currentGameState.OpponentData.Clear();
                 currentGameState.SessionData.TrackDefinition = TrackData.getTrackDefinition(getNameFromBytes(shared.TrackName), shared.LayoutId, shared.LayoutLength);
+                currentGameState.SessionData.TrackDefinition.trackLandmarks = TrackData.TRACK_LANDMARKS_DATA.getTrackLandmarksForTrackLayoutId(shared.LayoutId);
                 currentGameState.SessionData.TrackDefinition.setGapPoints();
                 currentGameState.PitData.IsRefuellingAllowed = true;
 
@@ -227,8 +228,7 @@ namespace CrewChiefV4.RaceRoom
                 }
             }
             else
-            {
-                Boolean justGoneGreen = false;
+            {                
                 if (lastSessionPhase != currentGameState.SessionData.SessionPhase)
                 {
                     Console.WriteLine("New session phase, was " + lastSessionPhase + " now " + currentGameState.SessionData.SessionPhase);
@@ -369,6 +369,7 @@ namespace CrewChiefV4.RaceRoom
                     currentGameState.SessionData.PlayerBestLapSector1Time = previousGameState.SessionData.PlayerBestLapSector1Time;
                     currentGameState.SessionData.PlayerBestLapSector2Time = previousGameState.SessionData.PlayerBestLapSector2Time;
                     currentGameState.SessionData.PlayerBestLapSector3Time = previousGameState.SessionData.PlayerBestLapSector3Time;
+                    currentGameState.SessionData.trackLandmarksTiming = previousGameState.SessionData.trackLandmarksTiming;
                 }
             }
 
@@ -441,6 +442,14 @@ namespace CrewChiefV4.RaceRoom
                 (shared.CompletedLaps == previousGameState.SessionData.CompletedLaps + 1 ||
                 ((lastSessionPhase == SessionPhase.Countdown || lastSessionPhase == SessionPhase.Formation || lastSessionPhase == SessionPhase.Garage)
                 && (currentGameState.SessionData.SessionPhase == SessionPhase.Green || currentGameState.SessionData.SessionPhase == SessionPhase.FullCourseYellow)));
+
+            if (previousGameState != null)
+            {
+                currentGameState.SessionData.trackLandmarksTiming.updateLandmarkTiming(currentGameState.SessionData.TrackDefinition.trackLandmarks,
+                    currentGameState.SessionData.SessionRunningTime, previousGameState.PositionAndMotionData.DistanceRoundTrack, 
+                    currentGameState.PositionAndMotionData.DistanceRoundTrack, shared.CarSpeed);
+            }
+
             if (currentGameState.SessionData.IsNewLap)
             {
                 currentGameState.SessionData.PositionAtStartOfCurrentLap = currentGameState.SessionData.Position;
@@ -451,6 +460,7 @@ namespace CrewChiefV4.RaceRoom
                     currentGameState.carClass = CarData.getCarClassForRaceRoomId(shared.VehicleInfo.ClassId);
                     brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(currentGameState.carClass);                    
                 }
+                currentGameState.SessionData.trackLandmarksTiming.cancelWaitingForLandmarkEnd();
             }
             if (previousGameState != null && !currentGameState.SessionData.IsNewSession)
             {
@@ -597,6 +607,7 @@ namespace CrewChiefV4.RaceRoom
                             Boolean previousOpponentIsExitingPits = false;
                             float[] previousOpponentWorldPosition = new float[] { 0, 0, 0 };
                             float previousOpponentSpeed = 0;
+                            float previousDistanceRoundTrack = 0;
                             if (previousGameState.OpponentData.ContainsKey(driverName))
                             {
                                 previousOpponentData = previousGameState.OpponentData[driverName];
@@ -608,6 +619,7 @@ namespace CrewChiefV4.RaceRoom
                                 previousOpponentWorldPosition = previousOpponentData.WorldPosition;
                                 previousOpponentSpeed = previousOpponentData.Speed;
                                 newOpponentLap = previousOpponentData.CurrentSectorNumber == 3 && participantStruct.TrackSector == 1;
+                                previousDistanceRoundTrack = previousOpponentData.DistanceRoundTrack;
                             }
 
                             OpponentData currentOpponentData = currentGameState.OpponentData[driverName];
@@ -706,8 +718,20 @@ namespace CrewChiefV4.RaceRoom
                                     participantStruct.LapDistance, participantStruct.TireType, participantStruct.DriverInfo.ClassId,
                                     currentGameState.SessionData.SessionHasFixedTime, currentGameState.SessionData.SessionTimeRemaining, 
                                     currentGameState.carClass.carClassEnum);
+
+                            if (previousOpponentData != null)
+                            {
+                                currentOpponentData.trackLandmarksTiming = previousOpponentData.trackLandmarksTiming;
+                                currentOpponentData.trackLandmarksTiming.updateLandmarkTiming(currentGameState.SessionData.TrackDefinition.trackLandmarks,
+                                    currentGameState.SessionData.SessionRunningTime, previousDistanceRoundTrack, currentOpponentData.DistanceRoundTrack, currentOpponentData.Speed);
+                            }
+                            if (justGoneGreen)
+                            {
+                                currentOpponentData.trackLandmarksTiming = new TrackLandmarksTiming();
+                            }
                             if (newOpponentLap)
                             {
+                                currentOpponentData.trackLandmarksTiming.cancelWaitingForLandmarkEnd();
                                 if (currentOpponentData.CurrentBestLapTime > 0)
                                 {
                                     if (currentGameState.SessionData.OpponentsLapTimeSessionBestOverall == -1 ||
