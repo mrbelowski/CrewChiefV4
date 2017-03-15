@@ -909,6 +909,8 @@ namespace CrewChiefV4.GameState
                         biggestTimeDifference = timeDelta;
                         biggestTimeDifferenceLandmark = landmarkName;
                     }
+
+                    // if the time difference is small compare the entry speeds
                     if (Math.Abs(timeDelta) < minSignificantTimeAbsoluteDifference &&
                         startSpeedDelta > minSignificantAbsoluteStartSpeedDifference && startSpeedDelta > biggestStartSpeedDifference)
                     {
@@ -967,7 +969,7 @@ namespace CrewChiefV4.GameState
 		    }
 	    }
 
-        // call this at the start of every lap so we don't end up waiting for ever (of for 1lap + landmark time).
+        // call this at the start of every lap so we don't end up waiting for ever (or for 1lap + landmark time).
         // Note that this means no landmarks can include the start line, but this is probably OK.
         public void cancelWaitingForLandmarkEnd()
         {
