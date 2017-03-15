@@ -264,13 +264,6 @@ namespace CrewChiefV4.rFactor2
             csd.PositionAtStartOfCurrentLap = csd.IsNewLap ? csd.Position : psd.PositionAtStartOfCurrentLap;
             // TODO: See if Black Flag handling needed here.
             csd.IsDisqualified = (rFactor2Constants.rF2FinishStatus)player.mFinishStatus == rFactor2Constants.rF2FinishStatus.Dq;
-            /*csd.PlayerBestSector1Time = player.mBestSector1 > 0.0f ? (float)player.mBestSector1 : -1.0f;
-            csd.PlayerBestSector2Time = player.mBestSector2 > 0.0f && player.mBestSector1 > 0.0f ? (float)(player.mBestSector2 - player.mBestSector1) : -1.0f;
-            // TODO: This is incorrect.  We need to store player's lap data to figure this out.
-            csd.PlayerBestSector3Time = player.mBestLapTime > 0.0f && player.mBestSector2 > 0.0f ? (float)(player.mBestLapTime - player.mBestSector2) : -1.0f;*/
-
-            // TODO: make suse this is reasonably close to what we calculate during lap tracking
-            // csd.PlayerLapTimeSessionBest = player.mBestLapTime > 0.0f ? (float)player.mBestLapTime : -1.0f;
             csd.CompletedLaps = player.mTotalLaps;
 
             ////////////////////////////////////
@@ -290,15 +283,9 @@ namespace CrewChiefV4.rFactor2
             // Pit Data
             cgs.PitData.IsRefuellingAllowed = true;
 
-            cgs.PitData.HasMandatoryPitStop = this.isOfflineSession
-                && rf2state.mScheduledStops > 0
-                && player.mNumPitstops < rf2state.mScheduledStops
-                && csd.SessionType == SessionType.Race;
-
-            cgs.PitData.PitWindowStart = this.isOfflineSession && cgs.PitData.HasMandatoryPitStop ? 1 : 0;
-            cgs.PitData.PitWindowEnd = !cgs.PitData.HasMandatoryPitStop ? 0 :
-                csd.SessionHasFixedTime ? (int)(csd.SessionTotalRunTime / 60 / (rf2state.mScheduledStops + 1)) * (player.mNumPitstops + 1) + 1 :
-                (int)(csd.SessionNumberOfLaps / (rf2state.mScheduledStops + 1)) * (player.mNumPitstops + 1) + 1;
+            // No manadatory pit stops in rF2 yet.
+            cgs.PitData.HasMandatoryPitStop = false;
+            cgs.PitData.PitWindowStart = cgs.PitData.PitWindowEnd = 0;
 
             // mInGarageStall also means retired or before race start, but for now use it here.
             cgs.PitData.InPitlane = player.mInPits == 1 || player.mInGarageStall == 1;
