@@ -283,6 +283,26 @@ namespace CrewChiefV4.GameState
             SessionTimesAtEndOfSectors.Add(3, -1);
         }
 
+        public void restorePlayerTimings(SessionData restoreTo)
+        {
+            restoreTo.PlayerBestSector1Time = PlayerBestSector1Time;
+            restoreTo.PlayerBestSector2Time = PlayerBestSector2Time;
+            restoreTo.PlayerBestSector3Time = PlayerBestSector3Time;
+
+            restoreTo.PlayerBestLapSector1Time = PlayerBestLapSector1Time;
+            restoreTo.PlayerBestLapSector2Time = PlayerBestLapSector2Time;
+            restoreTo.PlayerBestLapSector3Time = PlayerBestLapSector3Time;
+
+            restoreTo.PlayerLapTimeSessionBest = PlayerLapTimeSessionBest;
+            restoreTo.PlayerLapTimeSessionBestPrevious = PlayerLapTimeSessionBestPrevious;
+
+            restoreTo.PreviousLapWasValid = PreviousLapWasValid;
+            restoreTo.LapTimePrevious = LapTimePrevious;
+
+            foreach (var ld in PlayerLapData)
+                restoreTo.PlayerLapData.Add(ld);
+        }
+
         public void playerStartNewLap(int lapNumber, int position, Boolean inPits, float gameTimeAtStart, Boolean isRaining, float trackTemp, float airTemp)
         {
             LapData thisLapData = new LapData();

@@ -274,22 +274,11 @@ namespace CrewChiefV4.rFactor1
             if (player.curSector1 > 0.0 && player.curSector2 > 0.0)
                 currentGameState.SessionData.LastSector2Time = (float)(player.curSector2 - player.curSector1);
 
-            // Preserve current timing values.
-            // Below values change on sector/lap change, otherwise stay the same between updates.
             if (previousGameState != null && !currentGameState.SessionData.IsNewSession)
             {
-                currentGameState.SessionData.PlayerBestSector1Time = previousGameState.SessionData.PlayerBestSector1Time;
-                currentGameState.SessionData.PlayerBestSector2Time = previousGameState.SessionData.PlayerBestSector2Time;
-                currentGameState.SessionData.PlayerBestSector3Time = previousGameState.SessionData.PlayerBestSector3Time;
-                currentGameState.SessionData.PlayerBestLapSector1Time = previousGameState.SessionData.PlayerBestLapSector1Time;
-                currentGameState.SessionData.PlayerBestLapSector2Time = previousGameState.SessionData.PlayerBestLapSector2Time;
-                currentGameState.SessionData.PlayerBestLapSector3Time = previousGameState.SessionData.PlayerBestLapSector3Time;
-                currentGameState.SessionData.PlayerLapTimeSessionBest = previousGameState.SessionData.PlayerLapTimeSessionBest;
-                currentGameState.SessionData.PlayerLapTimeSessionBestPrevious = previousGameState.SessionData.PlayerLapTimeSessionBestPrevious;
-                foreach (var ld in previousGameState.SessionData.PlayerLapData)
-                {
-                    currentGameState.SessionData.PlayerLapData.Add(ld);
-                }
+                // Preserve current timing values.
+                // Those values change on sector/lap change, otherwise stay the same between updates.
+                previousGameState.SessionData.restorePlayerTimings(currentGameState.SessionData);
             }
             float lastSectorTime = -1;
             switch (currentGameState.SessionData.SectorNumber)
