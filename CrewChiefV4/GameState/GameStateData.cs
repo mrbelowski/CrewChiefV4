@@ -497,6 +497,8 @@ namespace CrewChiefV4.GameState
 
         public TrackLandmarksTiming trackLandmarksTiming = new TrackLandmarksTiming();
 
+        public String stoppedInLandmark = null;
+
         public LapData getCurrentLapData()
         {
             if (OpponentLapData.Count > 0)
@@ -962,6 +964,8 @@ namespace CrewChiefV4.GameState
         private String landmarkNameStart = null;
         private float landmarkStartTime = -1;
         private float landmarkStartSpeed = -1;
+        private int landmarkStoppedCount = 0;
+        private Boolean inLandmark = false;
 
         private void addTimeAndSpeeds(String landmarkName, float time, float startSpeed, float endSpeed, Boolean isCommonOvertakingSpot)
         {
@@ -1077,10 +1081,12 @@ namespace CrewChiefV4.GameState
         // called for every opponent and the player for each tick
         // TODO: does including current speed in this calculation really reduce the max error? The speed data can be noisy for some
         // games so this might cause more problems than it solves.
-        public void updateLandmarkTiming(List<TrackLandmark> trackLandmarks, float gameTime, float previousDistanceRoundTrack, float currentDistanceRoundTrack, float speed) 
+        //
+        // returns null or a landmark name this car is stopped in
+        public String updateLandmarkTiming(List<TrackLandmark> trackLandmarks, float gameTime, float previousDistanceRoundTrack, float currentDistanceRoundTrack, float speed) 
         {
 		    if (trackLandmarks == null || trackLandmarks.Count == 0) {
-			    return;
+			    return null;
 		    }
 		    if (landmarkNameStart == null) {
 			    // looking for landmark start only
@@ -1095,13 +1101,22 @@ namespace CrewChiefV4.GameState
                             landmarkNameStart = trackLandmark.landmarkName;
                             landmarkStartTime = gameTime - error;
                             landmarkStartSpeed = speed;
+                            landmarkStoppedCount = 0;
+                            inLandmark = true;
                         }
 					    break;
 				    }		
 			    }
 		    } else {
 			    // looking for landmark end only
-			    foreach (TrackLandmark trackLandmark in trackLandmarks) {
+			    foreach (TrackLandmark trackLandmark in trackLandmarks) 
+                {
+                    // if this car is very slow, increment the stopped counter
+                    if (currentDistanceRoundTrack > trackLandmark.distanceRoundLapStart && currentDistanceRoundTrack < trackLandmark.distanceRoundLapEnd &&
+                        speed < 5)
+                    {
+                        landmarkStoppedCount++;
+                    }
                     if (previousDistanceRoundTrack < trackLandmark.distanceRoundLapEnd && currentDistanceRoundTrack >= trackLandmark.distanceRoundLapEnd) 
 				    {
                         // reached the end of a landmark section, update the timing if it's the landmark we're expecting and we're actually close to the endpoint
@@ -1115,10 +1130,20 @@ namespace CrewChiefV4.GameState
                         }
 					    landmarkNameStart = null;
 					    landmarkStartTime = -1;
+                        inLandmark = false;
 					    break;
 				    }		
 			    }
 		    }
+            if (inLandmark && landmarkStoppedCount >= 10)
+            {
+                // slow for more than 1 second - this assumes 1 tick is 100ms, which isn't necessarily valid but it's close enough...
+                return landmarkNameStart;
+            }
+            else
+            {
+                return null;
+            }
 	    }
 
         // call this at the start of every lap so we don't end up waiting for ever (or for 1lap + landmark time).

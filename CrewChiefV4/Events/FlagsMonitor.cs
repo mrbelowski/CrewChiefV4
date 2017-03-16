@@ -54,6 +54,9 @@ namespace CrewChiefV4.Events
         //  used when we know the corner name:
         private String folderNameHasGoneOffInOutro = "flags/name_has_gone_off_in_outro";
 
+        private String folderIncidentInCornerIntro = "flags/incident_in_corner_intro";
+        private String folderIncidentInCornerDriverIntro = "flags/incident_in_corner_with_driver_intro";
+
         private int maxDistanceMovedForYellowAnnouncement = UserSettings.GetUserSettings().getInt("max_distance_moved_for_yellow_announcement");
 
         // for new (RF2 and R3E) impl
@@ -82,6 +85,10 @@ namespace CrewChiefV4.Events
         List<IncidentCandidate> incidentCandidates = new List<IncidentCandidate>();
 
         private int positionAtStartOfIncident = int.MaxValue;
+
+        private Dictionary<string, DateTime> incidentWarnings = new Dictionary<string, DateTime>();
+
+        private TimeSpan incidentRepeatFrequency = TimeSpan.FromSeconds(30);
         
         public FlagsMonitor(AudioPlayer audioPlayer)
         {
@@ -115,12 +122,12 @@ namespace CrewChiefV4.Events
             hasWarnedOfUpcomingIncident = false;
             positionAtStartOfIncident = int.MaxValue;
             incidentCandidates.Clear();
+            incidentWarnings.Clear();
         }
 
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
-            if (CrewChief.gameDefinition.gameEnum == GameEnum.RACE_ROOM || CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT ||
-                (CrewChief.gameDefinition.gameEnum == GameEnum.RF1))
+            if (CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT || CrewChief.gameDefinition.gameEnum == GameEnum.RF1)
             {
                 newYellowFlagImplementation(previousGameState, currentGameState);
             }
@@ -395,6 +402,42 @@ namespace CrewChiefV4.Events
                 {
                     lastYellowFlagTime = currentGameState.Now;
                     audioPlayer.playMessage(new QueuedMessage(folderDoubleYellowFlag, 0, this));
+                }
+            }
+            // now check for stopped cars
+            if (currentGameState.SessionData.SessionType == SessionType.Race)
+            {
+                foreach (OpponentData opponent in currentGameState.OpponentData.Values)
+                {
+                    String landmark = opponent.stoppedInLandmark;
+                    if (landmark != null)
+                    {
+                        Boolean canPlay = false;
+                        if (!incidentWarnings.ContainsKey(landmark))
+                        {
+                            canPlay = true;
+                            incidentWarnings.Add(landmark, DateTime.Now);
+                        }
+                        else if (incidentWarnings[landmark] + incidentRepeatFrequency < DateTime.Now)
+                        {
+                            canPlay = true;
+                            incidentWarnings[landmark] = DateTime.Now;
+                        }
+                        if (canPlay)
+                        {
+                             if (canReadName(opponent.DriverRawName))
+                             {
+                                Console.WriteLine("incident in " + landmark + " for driver " + opponent.DriverRawName);                           
+                                audioPlayer.playMessage(new QueuedMessage("incident_corner_with_driver", MessageContents(folderIncidentInCornerIntro, "corners/" + landmark,
+                                    folderIncidentInCornerDriverIntro, opponent), 0, this));
+                            }
+                            else
+                             {
+                                Console.WriteLine("incident in " + landmark);                           
+                                audioPlayer.playMessage(new QueuedMessage("incident_corner", MessageContents(folderIncidentInCornerIntro, "corners/" + landmark), 0, this));
+                            }
+                        }
+                    }
                 }
             }
         }
