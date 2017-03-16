@@ -1506,8 +1506,9 @@ namespace CrewChiefV4.assetto
                                     if (previousOpponentData != null)
                                     {
                                         currentOpponentData.trackLandmarksTiming = previousOpponentData.trackLandmarksTiming;
-                                        currentOpponentData.trackLandmarksTiming.updateLandmarkTiming(currentGameState.SessionData.TrackDefinition.trackLandmarks,
-                                            currentGameState.SessionData.SessionRunningTime, previousDistanceRoundTrack, currentOpponentData.DistanceRoundTrack, currentOpponentData.Speed);
+                                        currentOpponentData.stoppedInLandmark = currentOpponentData.trackLandmarksTiming.updateLandmarkTiming(
+                                            currentGameState.SessionData.TrackDefinition.trackLandmarks, currentGameState.SessionData.SessionRunningTime, 
+                                            previousDistanceRoundTrack, currentOpponentData.DistanceRoundTrack, currentOpponentData.Speed);
                                     }
                                     if (justGoneGreen)
                                     {
