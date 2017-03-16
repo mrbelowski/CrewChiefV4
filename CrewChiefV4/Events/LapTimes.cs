@@ -281,6 +281,22 @@ namespace CrewChiefV4.Events
                     else if (currentGameState.SessionData.SessionType == SessionType.Qualify || currentGameState.SessionData.SessionType == SessionType.Practice)
                     {
                         lapAndSectorsComparisonData = currentGameState.getTimeAndSectorsForBestOpponentLapInWindow(-1, currentGameState.carClass.getClassIdentifier());
+                        float[] playerBestLapAndSectors = new float[] { -1, -1, -1, -1 };
+                        if (currentGameState.SessionData.IsNewLap)
+                        {
+                            // If this is a new lap, then the just completed lap became last lap.  We do not want to use it as a comparison,
+                            // we need previous player best time.
+                            playerBestLapAndSectors = currentGameState.SessionData.getPlayerTimeAndSectorsForBestLap(true /*ignoreLast*/);
+                        }
+                        else
+                        {
+                            playerBestLapAndSectors = currentGameState.SessionData.getPlayerTimeAndSectorsForBestLap(false /*ignoreLast*/);
+                        }
+                        if (playerBestLapAndSectors[0] > 0.0 && playerBestLapAndSectors[0] < lapAndSectorsComparisonData[0])
+                        {
+                            // Use player's best lap as comparison data.
+                            lapAndSectorsComparisonData = playerBestLapAndSectors;
+                        }
                     }
                 }
             }

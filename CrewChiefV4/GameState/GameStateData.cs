@@ -1,6 +1,7 @@
 ﻿using CrewChiefV4.Events;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
@@ -227,6 +228,8 @@ namespace CrewChiefV4.GameState
 
         public Single PlayerClassSessionBestLapTime = -1;
 
+        public Single PlayerLapTimeSessionBestPrevious = -1;
+
         // ...
         public Single TimeDeltaFront = 0;
 
@@ -270,11 +273,156 @@ namespace CrewChiefV4.GameState
 
         public TrackLandmarksTiming trackLandmarksTiming = new TrackLandmarksTiming();
 
+        // Player lap times with sector information
+        public List<LapData> PlayerLapData = new List<LapData>();
+
         public SessionData()
         {
             SessionTimesAtEndOfSectors.Add(1, -1);
             SessionTimesAtEndOfSectors.Add(2, -1);
             SessionTimesAtEndOfSectors.Add(3, -1);
+        }
+
+        public void restorePlayerTimings(SessionData restoreTo)
+        {
+            restoreTo.PlayerBestSector1Time = PlayerBestSector1Time;
+            restoreTo.PlayerBestSector2Time = PlayerBestSector2Time;
+            restoreTo.PlayerBestSector3Time = PlayerBestSector3Time;
+
+            restoreTo.PlayerBestLapSector1Time = PlayerBestLapSector1Time;
+            restoreTo.PlayerBestLapSector2Time = PlayerBestLapSector2Time;
+            restoreTo.PlayerBestLapSector3Time = PlayerBestLapSector3Time;
+
+            restoreTo.PlayerLapTimeSessionBest = PlayerLapTimeSessionBest;
+            restoreTo.PlayerLapTimeSessionBestPrevious = PlayerLapTimeSessionBestPrevious;
+
+            restoreTo.PreviousLapWasValid = PreviousLapWasValid;
+            restoreTo.LapTimePrevious = LapTimePrevious;
+
+            foreach (var ld in PlayerLapData)
+                restoreTo.PlayerLapData.Add(ld);
+        }
+
+        public void playerStartNewLap(int lapNumber, int position, Boolean inPits, float gameTimeAtStart, Boolean isRaining, float trackTemp, float airTemp)
+        {
+            LapData thisLapData = new LapData();
+            thisLapData.Conditions.Add(new LapConditions(isRaining, trackTemp, airTemp));
+            thisLapData.GameTimeAtLapStart = gameTimeAtStart;
+            thisLapData.OutLap = inPits;
+            thisLapData.PositionAtStart = position;
+            thisLapData.LapNumber = lapNumber;
+            PlayerLapData.Add(thisLapData);
+        }
+
+        public void playerCompleteLapWithProvidedLapTime(int position, float gameTimeAtLapEnd, float providedLapTime,
+            Boolean lapIsValid, Boolean isRaining, float trackTemp, float airTemp, Boolean sessionLengthIsTime, float sessionTimeRemaining)
+        {
+            if (PlayerLapData.Count > 0)
+            {
+                LapData lapData = PlayerLapData[PlayerLapData.Count - 1];
+                playerAddCumulativeSectorData(position, providedLapTime, gameTimeAtLapEnd, lapIsValid, isRaining, trackTemp, airTemp);
+                lapData.LapTime = providedLapTime;
+
+                LapTimePrevious = providedLapTime;
+                if (lapData.IsValid && (PlayerLapTimeSessionBest == -1 || PlayerLapTimeSessionBest > lapData.LapTime))
+                {
+                    PlayerLapTimeSessionBestPrevious = PlayerLapTimeSessionBest;
+                    PlayerLapTimeSessionBest = lapData.LapTime;
+
+                    if (lapData.SectorTimes.Count > 0)
+                        PlayerBestLapSector1Time = lapData.SectorTimes[0];
+                    if (lapData.SectorTimes.Count > 1)
+                        PlayerBestLapSector2Time = lapData.SectorTimes[1];
+                    if (lapData.SectorTimes.Count > 2)
+                        PlayerBestLapSector3Time = lapData.SectorTimes[2];
+                }
+                PreviousLapWasValid = lapData.IsValid;
+            }
+
+            // Not sure we need this for player.
+            //if (sessionLengthIsTime && sessionTimeRemaining > 0 && CurrentBestLapTime > 0 && sessionTimeRemaining < CurrentBestLapTime - 5)
+            //{
+            //  isProbablyLastLap = true;
+            //}
+        }
+
+        public void playerAddCumulativeSectorData(int position, float cumulativeSectorTime, float gameTimeAtSectorEnd, Boolean lapIsValid, Boolean isRaining, float trackTemp, float airTemp)
+        {
+            if (PlayerLapData.Count > 0)
+            {
+                LapData lapData = PlayerLapData[PlayerLapData.Count - 1];
+                if (cumulativeSectorTime <= 0)
+                {
+                    cumulativeSectorTime = gameTimeAtSectorEnd - lapData.GameTimeAtLapStart;
+                }
+                float thisSectorTime = cumulativeSectorTime;
+                int sectorNumber = 1;
+                foreach (float sectorTime in lapData.SectorTimes)
+                {
+                    sectorNumber++;
+                    thisSectorTime = thisSectorTime - sectorTime;
+                }
+                lapData.SectorTimes.Add(thisSectorTime);
+                if (lapIsValid && thisSectorTime > 0)
+                {
+                    if (sectorNumber == 1 && (PlayerBestSector1Time == -1 || thisSectorTime < PlayerBestSector1Time))
+                    {
+                        PlayerBestSector1Time = thisSectorTime;
+                    }
+                    if (sectorNumber == 2 && (PlayerBestSector2Time == -1 || thisSectorTime < PlayerBestSector2Time))
+                    {
+                        PlayerBestSector2Time = thisSectorTime;
+                    }
+                    if (sectorNumber == 3 && (PlayerBestSector3Time == -1 || thisSectorTime < PlayerBestSector3Time))
+                    {
+                        PlayerBestSector3Time = thisSectorTime;
+                    }
+                }
+                lapData.SectorPositions.Add(position);
+                lapData.GameTimeAtSectorEnd.Add(gameTimeAtSectorEnd);
+                if (lapData.IsValid && !lapIsValid)
+                {
+                    lapData.IsValid = false;
+                }
+                lapData.Conditions.Add(new LapConditions(isRaining, trackTemp, airTemp));
+            }
+        }
+
+        public float[] getPlayerTimeAndSectorsForBestLap(bool ignoreLast)
+        {
+            float[] bestLapTimeAndSectorsSectors = new float[] { -1, -1, -1, -1 };
+            // Count-1 because we're not interested in the current lap
+            int lapsToCheck = PlayerLapData.Count - 1;
+            if (ignoreLast)
+            {
+                --lapsToCheck;
+            }
+            for (int i = 0; i < lapsToCheck; ++i)
+            {
+                LapData thisLapTime = PlayerLapData[i];
+                if (thisLapTime.IsValid)
+                {
+                    if (bestLapTimeAndSectorsSectors[0] == -1 ||
+                        (thisLapTime.LapTime > 0 && thisLapTime.LapTime < bestLapTimeAndSectorsSectors[0]))
+                    {
+                        bestLapTimeAndSectorsSectors[0] = thisLapTime.LapTime;
+                        int sectorCount = thisLapTime.SectorTimes.Count();
+                        if (sectorCount > 0)
+                        {
+                            bestLapTimeAndSectorsSectors[1] = thisLapTime.SectorTimes[0];
+                        }
+                        if (sectorCount > 1)
+                        {
+                            bestLapTimeAndSectorsSectors[2] = thisLapTime.SectorTimes[1];
+                        }
+                        if (sectorCount > 2)
+                        {
+                            bestLapTimeAndSectorsSectors[3] = thisLapTime.SectorTimes[2];
+                        }
+                    }
+                }
+            }
+            return bestLapTimeAndSectorsSectors;
         }
     }
 
@@ -348,6 +496,8 @@ namespace CrewChiefV4.GameState
         public Boolean InPits = false;
 
         public TrackLandmarksTiming trackLandmarksTiming = new TrackLandmarksTiming();
+
+        public String stoppedInLandmark = null;
 
         public LapData getCurrentLapData()
         {
@@ -814,6 +964,8 @@ namespace CrewChiefV4.GameState
         private String landmarkNameStart = null;
         private float landmarkStartTime = -1;
         private float landmarkStartSpeed = -1;
+        private int landmarkStoppedCount = 0;
+        private Boolean inLandmark = false;
 
         private void addTimeAndSpeeds(String landmarkName, float time, float startSpeed, float endSpeed, Boolean isCommonOvertakingSpot)
         {
@@ -929,10 +1081,12 @@ namespace CrewChiefV4.GameState
         // called for every opponent and the player for each tick
         // TODO: does including current speed in this calculation really reduce the max error? The speed data can be noisy for some
         // games so this might cause more problems than it solves.
-        public void updateLandmarkTiming(List<TrackLandmark> trackLandmarks, float gameTime, float previousDistanceRoundTrack, float currentDistanceRoundTrack, float speed) 
+        //
+        // returns null or a landmark name this car is stopped in
+        public String updateLandmarkTiming(List<TrackLandmark> trackLandmarks, float gameTime, float previousDistanceRoundTrack, float currentDistanceRoundTrack, float speed) 
         {
 		    if (trackLandmarks == null || trackLandmarks.Count == 0) {
-			    return;
+			    return null;
 		    }
 		    if (landmarkNameStart == null) {
 			    // looking for landmark start only
@@ -947,13 +1101,22 @@ namespace CrewChiefV4.GameState
                             landmarkNameStart = trackLandmark.landmarkName;
                             landmarkStartTime = gameTime - error;
                             landmarkStartSpeed = speed;
+                            landmarkStoppedCount = 0;
+                            inLandmark = true;
                         }
 					    break;
 				    }		
 			    }
 		    } else {
 			    // looking for landmark end only
-			    foreach (TrackLandmark trackLandmark in trackLandmarks) {
+			    foreach (TrackLandmark trackLandmark in trackLandmarks) 
+                {
+                    // if this car is very slow, increment the stopped counter
+                    if (currentDistanceRoundTrack > trackLandmark.distanceRoundLapStart && currentDistanceRoundTrack < trackLandmark.distanceRoundLapEnd &&
+                        speed < 5)
+                    {
+                        landmarkStoppedCount++;
+                    }
                     if (previousDistanceRoundTrack < trackLandmark.distanceRoundLapEnd && currentDistanceRoundTrack >= trackLandmark.distanceRoundLapEnd) 
 				    {
                         // reached the end of a landmark section, update the timing if it's the landmark we're expecting and we're actually close to the endpoint
@@ -967,10 +1130,20 @@ namespace CrewChiefV4.GameState
                         }
 					    landmarkNameStart = null;
 					    landmarkStartTime = -1;
+                        inLandmark = false;
 					    break;
 				    }		
 			    }
 		    }
+            if (inLandmark && landmarkStoppedCount >= 10)
+            {
+                // slow for more than 1 second - this assumes 1 tick is 100ms, which isn't necessarily valid but it's close enough...
+                return landmarkNameStart;
+            }
+            else
+            {
+                return null;
+            }
 	    }
 
         // call this at the start of every lap so we don't end up waiting for ever (or for 1lap + landmark time).
