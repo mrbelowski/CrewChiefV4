@@ -1074,6 +1074,9 @@ namespace CrewChiefV4.rFactor2
             csd.PlayerLapTimeSessionBest = psd.PlayerLapTimeSessionBest;
             csd.PlayerLapTimeSessionBestPrevious = psd.PlayerLapTimeSessionBestPrevious;
 
+            //  TODO: PreviousLapWasValid = lapData.IsValid; ?
+            // TODO: LapTimePrevious = providedLapTime;??
+
             foreach (var ld in psd.PlayerLapData)
                 csd.PlayerLapData.Add(ld);
 

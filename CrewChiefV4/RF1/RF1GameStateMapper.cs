@@ -247,22 +247,84 @@ namespace CrewChiefV4.rFactor1
             currentGameState.SessionData.SessionStartPosition = currentGameState.SessionData.IsNewSession ? currentGameState.SessionData.Position : previousGameState.SessionData.SessionStartPosition;
             currentGameState.SessionData.SectorNumber = player.sector == 0 ? 3 : player.sector;
             currentGameState.SessionData.IsNewSector = currentGameState.SessionData.IsNewSession || currentGameState.SessionData.SectorNumber != previousGameState.SessionData.SectorNumber;
-            currentGameState.SessionData.IsNewLap = currentGameState.SessionData.IsNewSession || (previousGameState != null && shared.lapNumber > previousGameState.SessionData.CompletedLaps + 1);
+            currentGameState.SessionData.IsNewLap = currentGameState.SessionData.IsNewSession || (currentGameState.SessionData.IsNewSector && currentGameState.SessionData.SectorNumber == 1);
             currentGameState.SessionData.PositionAtStartOfCurrentLap = currentGameState.SessionData.IsNewLap ? currentGameState.SessionData.Position : previousGameState.SessionData.PositionAtStartOfCurrentLap;
             currentGameState.SessionData.IsDisqualified = (rFactor1Constant.rfFinishStatus)player.finishStatus == rFactor1Constant.rfFinishStatus.dq;
             currentGameState.SessionData.CompletedLaps = shared.lapNumber == 0 ? 0 : shared.lapNumber - 1;
             currentGameState.SessionData.LapTimeCurrent = currentGameState.SessionData.SessionRunningTime - player.lapStartET;
             currentGameState.SessionData.LapTimePrevious = player.lastLapTime > 0 ? player.lastLapTime : -1;
-            currentGameState.SessionData.LastSector1Time = player.curSector1 > 0 ? player.curSector1 : -1;
-            currentGameState.SessionData.LastSector2Time = player.curSector2 > 0 && player.curSector1 > 0 ? player.curSector2 - player.curSector1 : -1;
-            currentGameState.SessionData.LastSector3Time = player.lastLapTime > 0 && player.curSector2 > 0 ? player.lastLapTime - player.curSector2 : -1;
-            currentGameState.SessionData.PlayerBestSector1Time = player.bestSector1 > 0 ? player.bestSector1 : -1;
-            currentGameState.SessionData.PlayerBestSector2Time = player.bestSector2 > 0 && player.bestSector1 > 0 ? player.bestSector2 - player.bestSector1 : -1;
-            currentGameState.SessionData.PlayerBestSector3Time = player.bestLapTime > 0 && player.bestSector2 > 0 ? player.bestLapTime - player.bestSector2 : -1;
-            currentGameState.SessionData.PlayerBestLapSector1Time = currentGameState.SessionData.PlayerBestSector1Time;
-            currentGameState.SessionData.PlayerBestLapSector2Time = currentGameState.SessionData.PlayerBestSector2Time;
-            currentGameState.SessionData.PlayerBestLapSector3Time = currentGameState.SessionData.PlayerBestSector3Time;
-            currentGameState.SessionData.PlayerLapTimeSessionBest = player.bestLapTime > 0 ? player.bestLapTime : -1;
+
+            // Last (most current) per-sector times:
+            // Note: this logic still misses invalid sector handling.
+            var lastS1Time = player.lastSector1 > 0.0 ? player.lastSector1 : -1.0;
+            var lastS2Time = player.lastSector1 > 0.0 && player.lastSector2 > 0.0
+                ? player.lastSector2 - player.lastSector1 : -1.0;
+            var lastS3Time = player.lastSector2 > 0.0 && player.lastLapTime > 0.0
+                ? player.lastLapTime - player.lastSector2 : -1.0;
+
+            currentGameState.SessionData.LastSector1Time = (float)lastS1Time;
+            currentGameState.SessionData.LastSector2Time = (float)lastS2Time;
+            currentGameState.SessionData.LastSector3Time = (float)lastS3Time;
+
+            // Check if we have more current values for S1 and S2.
+            // S3 always equals to lastS3Time.
+            if (player.curSector1 > 0.0)
+                currentGameState.SessionData.LastSector1Time = (float)player.curSector1;
+
+            if (player.curSector1 > 0.0 && player.curSector2 > 0.0)
+                currentGameState.SessionData.LastSector2Time = (float)(player.curSector2 - player.curSector1);
+
+            // Preserve current timing values.
+            // Below values change on sector/lap change, otherwise stay the same between updates.
+            if (previousGameState != null && !currentGameState.SessionData.IsNewSession)
+            {
+                currentGameState.SessionData.PlayerBestSector1Time = previousGameState.SessionData.PlayerBestSector1Time;
+                currentGameState.SessionData.PlayerBestSector2Time = previousGameState.SessionData.PlayerBestSector2Time;
+                currentGameState.SessionData.PlayerBestSector3Time = previousGameState.SessionData.PlayerBestSector3Time;
+                currentGameState.SessionData.PlayerBestLapSector1Time = previousGameState.SessionData.PlayerBestLapSector1Time;
+                currentGameState.SessionData.PlayerBestLapSector2Time = previousGameState.SessionData.PlayerBestLapSector2Time;
+                currentGameState.SessionData.PlayerBestLapSector3Time = previousGameState.SessionData.PlayerBestLapSector3Time;
+                currentGameState.SessionData.PlayerLapTimeSessionBest = previousGameState.SessionData.PlayerLapTimeSessionBest;
+                currentGameState.SessionData.PlayerLapTimeSessionBestPrevious = previousGameState.SessionData.PlayerLapTimeSessionBestPrevious;
+                foreach (var ld in previousGameState.SessionData.PlayerLapData)
+                {
+                    currentGameState.SessionData.PlayerLapData.Add(ld);
+                }
+            }
+            float lastSectorTime = -1;
+            switch (currentGameState.SessionData.SectorNumber)
+            {
+                case 1:
+                    lastSectorTime = player.lastLapTime > 0 ? player.lastLapTime : -1;
+                    break;
+                case 2:
+                    lastSectorTime = player.lastSector1 > 0 ? player.lastSector1 : -1;
+
+                    if (player.curSector1 > 0.0)
+                        lastSectorTime = (float)player.curSector1;
+
+                    break;
+                case 3:
+                    lastSectorTime = player.lastSector2 > 0 ? player.lastSector2 : -1;
+
+                    if (player.curSector2 > 0.0)
+                        lastSectorTime = (float)player.curSector2;
+
+                    break;
+                default:
+                    break;
+            }
+            if (currentGameState.SessionData.IsNewLap)
+            {
+                currentGameState.SessionData.playerCompleteLapWithProvidedLapTime(currentGameState.SessionData.Position, currentGameState.SessionData.SessionRunningTime,
+                        lastSectorTime, lastSectorTime > 0, false, shared.trackTemp, shared.ambientTemp, currentGameState.SessionData.SessionHasFixedTime, currentGameState.SessionData.SessionTimeRemaining);
+                currentGameState.SessionData.playerStartNewLap(currentGameState.SessionData.CompletedLaps + 1, currentGameState.SessionData.Position, player.inPits == 1 || currentGameState.PositionAndMotionData.DistanceRoundTrack < 0, currentGameState.SessionData.SessionRunningTime, false, shared.trackTemp, shared.ambientTemp);
+            }
+            else if (currentGameState.SessionData.IsNewSector)
+            {
+                currentGameState.SessionData.playerAddCumulativeSectorData(currentGameState.SessionData.Position, lastSectorTime, currentGameState.SessionData.SessionRunningTime,
+                    lastSectorTime > 0 || (currentGameState.SessionData.SectorNumber >= 2 && player.totalLaps == 1), false, shared.trackTemp, shared.ambientTemp);
+            }
             currentGameState.SessionData.SessionTimesAtEndOfSectors = previousGameState != null ? previousGameState.SessionData.SessionTimesAtEndOfSectors : new SessionData().SessionTimesAtEndOfSectors;
             if (currentGameState.SessionData.IsNewSector && !currentGameState.SessionData.IsNewSession)
             {
@@ -630,7 +692,7 @@ namespace CrewChiefV4.rFactor1
                 opponent.bestSector3Time = vehicle.bestLapTime > 0 && vehicle.bestSector2 > 0 ? vehicle.bestLapTime - vehicle.bestSector2 : -1;
                 opponent.LastLapTime = vehicle.lastLapTime > 0 ? vehicle.lastLapTime : -1;
                 opponent.InPits = vehicle.inPits == 1;
-                float lastSectorTime = -1;
+                lastSectorTime = -1;
                 switch (opponent.CurrentSectorNumber)
                 {
                     case 1:
