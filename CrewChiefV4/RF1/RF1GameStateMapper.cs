@@ -682,16 +682,24 @@ namespace CrewChiefV4.rFactor1
                 opponent.LastLapTime = vehicle.lastLapTime > 0 ? vehicle.lastLapTime : -1;
                 opponent.InPits = vehicle.inPits == 1;
                 lastSectorTime = -1;
-                switch (opponent.CurrentSectorNumber)
+                switch (currentGameState.SessionData.SectorNumber)
                 {
                     case 1:
                         lastSectorTime = vehicle.lastLapTime > 0 ? vehicle.lastLapTime : -1;
                         break;
                     case 2:
                         lastSectorTime = vehicle.lastSector1 > 0 ? vehicle.lastSector1 : -1;
+
+                        if (vehicle.curSector1 > 0.0)
+                            lastSectorTime = (float)vehicle.curSector1;
+
                         break;
                     case 3:
                         lastSectorTime = vehicle.lastSector2 > 0 ? vehicle.lastSector2 : -1;
+
+                        if (vehicle.curSector2 > 0.0)
+                            lastSectorTime = (float)vehicle.curSector2;
+
                         break;
                     default:
                         break;
