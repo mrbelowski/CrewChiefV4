@@ -303,7 +303,6 @@ namespace CrewChiefV4.GameState
                 playerAddCumulativeSectorData(position, providedLapTime, gameTimeAtLapEnd, lapIsValid, isRaining, trackTemp, airTemp);
                 lapData.LapTime = providedLapTime;
 
-                // Verify: LapTimePreviousm,  PlayerLapTimeSessionBest, PlayerBestLapSector1Time
                 LapTimePrevious = providedLapTime;
                 if (lapData.IsValid && (PlayerLapTimeSessionBest == -1 || PlayerLapTimeSessionBest > lapData.LapTime))
                 {
