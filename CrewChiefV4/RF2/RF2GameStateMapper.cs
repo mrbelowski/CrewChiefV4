@@ -346,6 +346,13 @@ namespace CrewChiefV4.rFactor2
 
             ////////////////////////////////////
             // Timings
+            if (psd != null && !csd.IsNewSession)
+            {
+                // Preserve current values.
+                // Those values change on sector/lap change, otherwise stay the same between updates.
+                psd.restorePlayerTimings(csd);
+            }
+
             this.processPlayerTimingData(ref rf2state, cgs, pgs, ref player);
 
             csd.SessionTimesAtEndOfSectors = pgs != null ? psd.SessionTimesAtEndOfSectors : new SessionData().SessionTimesAtEndOfSectors;
@@ -1059,26 +1066,6 @@ namespace CrewChiefV4.rFactor2
 
             if (player.mCurSector1 > 0.0 && player.mCurSector2 > 0.0)
                 csd.LastSector2Time = (float)(player.mCurSector2 - player.mCurSector1);
-
-            /////////////////////////////////////////
-            // Preserve current values.
-            // Below values change on sector/lap change, otherwise stay the same between updates.
-            csd.PlayerBestSector1Time = psd.PlayerBestSector1Time;
-            csd.PlayerBestSector2Time = psd.PlayerBestSector2Time;
-            csd.PlayerBestSector3Time = psd.PlayerBestSector3Time;
-
-            csd.PlayerBestLapSector1Time = psd.PlayerBestLapSector1Time;
-            csd.PlayerBestLapSector2Time = psd.PlayerBestLapSector2Time;
-            csd.PlayerBestLapSector3Time = psd.PlayerBestLapSector3Time;
-
-            csd.PlayerLapTimeSessionBest = psd.PlayerLapTimeSessionBest;
-            csd.PlayerLapTimeSessionBestPrevious = psd.PlayerLapTimeSessionBestPrevious;
-
-            //  TODO: PreviousLapWasValid = lapData.IsValid; ?
-            // TODO: LapTimePrevious = providedLapTime;??
-
-            foreach (var ld in psd.PlayerLapData)
-                csd.PlayerLapData.Add(ld);
 
             // Verify lap is valid
             // TODO: Apply something similar to opponents.
