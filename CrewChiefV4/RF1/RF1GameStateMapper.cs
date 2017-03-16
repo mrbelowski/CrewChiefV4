@@ -233,7 +233,12 @@ namespace CrewChiefV4.rFactor1
                 (currentGameState.SessionData.SessionPhase == SessionPhase.Garage || 
                 currentGameState.SessionData.SessionPhase == SessionPhase.Gridwalk ||
                 currentGameState.SessionData.SessionPhase == SessionPhase.Formation ||
-                currentGameState.SessionData.SessionPhase == SessionPhase.Countdown)); 
+                currentGameState.SessionData.SessionPhase == SessionPhase.Countdown));
+
+            // Do not use previous game state if this is the new session.
+            if (currentGameState.SessionData.IsNewSession)
+                previousGameState = null;
+
             currentGameState.SessionData.SessionStartTime = currentGameState.SessionData.IsNewSession ? currentGameState.Now : previousGameState.SessionData.SessionStartTime;
             currentGameState.SessionData.SessionHasFixedTime = currentGameState.SessionData.SessionTotalRunTime > 0;
             currentGameState.SessionData.SessionRunningTime = shared.currentET;
@@ -307,7 +312,7 @@ namespace CrewChiefV4.rFactor1
             {
                 currentGameState.SessionData.playerCompleteLapWithProvidedLapTime(currentGameState.SessionData.Position, currentGameState.SessionData.SessionRunningTime,
                         lastSectorTime, lastSectorTime > 0, false, shared.trackTemp, shared.ambientTemp, currentGameState.SessionData.SessionHasFixedTime, currentGameState.SessionData.SessionTimeRemaining);
-                currentGameState.SessionData.playerStartNewLap(currentGameState.SessionData.CompletedLaps + 1, currentGameState.SessionData.Position, player.inPits == 1 || currentGameState.PositionAndMotionData.DistanceRoundTrack < 0, currentGameState.SessionData.SessionRunningTime, false, shared.trackTemp, shared.ambientTemp);
+                currentGameState.SessionData.playerStartNewLap(currentGameState.SessionData.CompletedLaps + 1, currentGameState.SessionData.Position, player.inPits == 1 || player.lapDist < 0, currentGameState.SessionData.SessionRunningTime, false, shared.trackTemp, shared.ambientTemp);
             }
             else if (currentGameState.SessionData.IsNewSector)
             {
@@ -682,7 +687,7 @@ namespace CrewChiefV4.rFactor1
                 opponent.LastLapTime = vehicle.lastLapTime > 0 ? vehicle.lastLapTime : -1;
                 opponent.InPits = vehicle.inPits == 1;
                 lastSectorTime = -1;
-                switch (currentGameState.SessionData.SectorNumber)
+                switch (opponent.CurrentSectorNumber)
                 {
                     case 1:
                         lastSectorTime = vehicle.lastLapTime > 0 ? vehicle.lastLapTime : -1;

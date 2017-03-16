@@ -643,8 +643,8 @@ namespace CrewChiefV4.rFactor2
                         // there shouldn't be duplicate driver names in online sessions. This is probably a temporary glitch in the shared memory data - 
                         // don't panic and drop the existing opponentData for this key - just copy it across to the current state. This prevents us losing
                         // the historical data and repeatedly re-adding this name to the SpeechRecogniser (which is expensive)
-                        if (pgs != null && pgs.OpponentData.ContainsKey(driverName) && 
-                            !cgs.OpponentData.ContainsKey(driverName))
+                        if (pgs != null && pgs.OpponentData.ContainsKey(driverName)
+                            && !cgs.OpponentData.ContainsKey(driverName))
                         {
                             cgs.OpponentData.Add(driverName, pgs.OpponentData[driverName]);
                         }
@@ -659,11 +659,10 @@ namespace CrewChiefV4.rFactor2
                         {
                             // there's no previous opponent data record for this driver so create one
                             if (duplicatesCreated.ContainsKey(driverName))
-                            {
                                 duplicatesCreated[driverName] += 1;
-                            } else {
+                            else
                                 duplicatesCreated.Add(driverName, 1);
-                            }
+
                             opponentKey = driverName + "_duplicate_" + duplicatesCreated[driverName];
                         }
                     }
@@ -673,9 +672,9 @@ namespace CrewChiefV4.rFactor2
                     opponentKey = driverName;
                 }
                 opponentPrevious = pgs == null || opponentKey == null || !pgs.OpponentData.ContainsKey(opponentKey) ? null : previousGameState.OpponentData[opponentKey];
-                OpponentData opponent = new OpponentData();
+                var opponent = new OpponentData();
                 opponent.DriverRawName = driverName;
-                opponent.CarClass = CarData.getCarClassForClassName(getStringFromBytes(vehicle.mVehicleClass));                
+                opponent.CarClass = CarData.getCarClassForClassName(getStringFromBytes(vehicle.mVehicleClass)); 
 
                 opponent.DriverRawName = driverName;
                 opponent.DriverNameSet = opponent.DriverRawName.Length > 0;
@@ -851,11 +850,10 @@ namespace CrewChiefV4.rFactor2
 
                 csd.trackLandmarksTiming = previousGameState.SessionData.trackLandmarksTiming;
                 csd.trackLandmarksTiming.updateLandmarkTiming(csd.TrackDefinition.trackLandmarks,
-                                    csd.SessionRunningTime, previousGameState.PositionAndMotionData.DistanceRoundTrack, cgs.PositionAndMotionData.DistanceRoundTrack, (float) rf2state.mSpeed);
+                    csd.SessionRunningTime, previousGameState.PositionAndMotionData.DistanceRoundTrack, cgs.PositionAndMotionData.DistanceRoundTrack, (float) rf2state.mSpeed);
+
                 if (csd.IsNewLap)
-                {
                     csd.trackLandmarksTiming.cancelWaitingForLandmarkEnd();
-                }
             }
 
             // --------------------------------
