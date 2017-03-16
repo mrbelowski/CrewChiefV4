@@ -1324,7 +1324,7 @@ namespace CrewChiefV4.assetto
                 if (previousGameState != null)
                 {
                     currentGameState.SessionData.trackLandmarksTiming.updateLandmarkTiming(currentGameState.SessionData.TrackDefinition.trackLandmarks,
-                        currentGameState.SessionData.SessionRunningTime, previousGameState.PositionAndMotionData.DistanceRoundTrack, distanceRoundTrack, shared.acsPhysics.speedKmh);
+                        currentGameState.SessionData.SessionRunningTime, previousGameState.PositionAndMotionData.DistanceRoundTrack, distanceRoundTrack, playerVehicle.speedMS);
                     if (currentGameState.SessionData.IsNewLap)
                     {
                         currentGameState.SessionData.trackLandmarksTiming.cancelWaitingForLandmarkEnd();
@@ -1488,7 +1488,7 @@ namespace CrewChiefV4.assetto
 
                                     if (opponentsSplits.ContainsKey(participantName))
                                     {
-                                        opponentsSplits[participantName].setNextSplitPoint(currentOpponentLapDistance, playerVehicle.speedMS);
+                                        opponentsSplits[participantName].setNextSplitPoint(currentOpponentLapDistance, participantStruct.speedMS);
                                     }
 
                                     float secondsSinceLastUpdate = (float)new TimeSpan(currentGameState.Ticks - previousGameState.Ticks).TotalSeconds;
