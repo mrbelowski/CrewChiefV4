@@ -318,6 +318,7 @@
         {
             "acTrackNames": [ "spa:" ],
             "pcarsTrackName": "Circuit de Spa-Francorchamps:",
+            "rf2TrackNames": [ "RaceRfactor Spa 2013" ],
             "raceroomLayoutId": 3870,
             "trackLandmarks": [
                 {

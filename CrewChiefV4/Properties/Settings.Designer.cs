@@ -1741,6 +1741,18 @@ namespace CrewChiefV4.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool enable_rf2_pit_stop_prediction {
+            get {
+                return ((bool)(this["enable_rf2_pit_stop_prediction"]));
+            }
+            set {
+                this["enable_rf2_pit_stop_prediction"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("60")]
         public int time_between_caution_period_status_reminders {
             get {
