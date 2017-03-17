@@ -1323,8 +1323,9 @@ namespace CrewChiefV4.assetto
 
                 if (previousGameState != null)
                 {
-                    currentGameState.SessionData.trackLandmarksTiming.updateLandmarkTiming(currentGameState.SessionData.TrackDefinition.trackLandmarks,
+                    String stoppedInLandmark = currentGameState.SessionData.trackLandmarksTiming.updateLandmarkTiming(currentGameState.SessionData.TrackDefinition.trackLandmarks,
                         currentGameState.SessionData.SessionRunningTime, previousGameState.PositionAndMotionData.DistanceRoundTrack, distanceRoundTrack, playerVehicle.speedMS);
+                    currentGameState.SessionData.stoppedInLandmark = shared.acsGraphic.isInPitLane == 1 ? null : stoppedInLandmark;
                     if (currentGameState.SessionData.IsNewLap)
                     {
                         currentGameState.SessionData.trackLandmarksTiming.cancelWaitingForLandmarkEnd();
@@ -1506,9 +1507,10 @@ namespace CrewChiefV4.assetto
                                     if (previousOpponentData != null)
                                     {
                                         currentOpponentData.trackLandmarksTiming = previousOpponentData.trackLandmarksTiming;
-                                        currentOpponentData.stoppedInLandmark = currentOpponentData.trackLandmarksTiming.updateLandmarkTiming(
+                                        String stoppedInLandmark = currentOpponentData.trackLandmarksTiming.updateLandmarkTiming(
                                             currentGameState.SessionData.TrackDefinition.trackLandmarks, currentGameState.SessionData.SessionRunningTime, 
                                             previousDistanceRoundTrack, currentOpponentData.DistanceRoundTrack, currentOpponentData.Speed);
+                                        currentOpponentData.stoppedInLandmark = participantStruct.isCarInPitline == 1 ? null : stoppedInLandmark;
                                     }
                                     if (justGoneGreen)
                                     {

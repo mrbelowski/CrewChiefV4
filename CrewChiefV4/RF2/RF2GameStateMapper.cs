@@ -828,8 +828,9 @@ namespace CrewChiefV4.rFactor2
                 if (opponentPrevious != null)
                 {
                     opponent.trackLandmarksTiming = opponentPrevious.trackLandmarksTiming;
-                    opponent.trackLandmarksTiming.updateLandmarkTiming(csd.TrackDefinition.trackLandmarks,
+                    String stoppedInLandmark = opponent.trackLandmarksTiming.updateLandmarkTiming(csd.TrackDefinition.trackLandmarks,
                         csd.SessionRunningTime, previousDistanceRoundTrack, opponent.DistanceRoundTrack, opponent.Speed);
+                    opponent.stoppedInLandmark = opponent.InPits ? null : stoppedInLandmark;
                 }
 
                 if (opponent.IsNewLap)
@@ -849,9 +850,9 @@ namespace CrewChiefV4.rFactor2
                 csd.GameTimeAtLastPositionBehindChange = !csd.IsRacingSameCarBehind ? csd.SessionRunningTime : psd.GameTimeAtLastPositionBehindChange;
 
                 csd.trackLandmarksTiming = previousGameState.SessionData.trackLandmarksTiming;
-                csd.trackLandmarksTiming.updateLandmarkTiming(csd.TrackDefinition.trackLandmarks,
+                String stoppedInLandmark = csd.trackLandmarksTiming.updateLandmarkTiming(csd.TrackDefinition.trackLandmarks,
                     csd.SessionRunningTime, previousGameState.PositionAndMotionData.DistanceRoundTrack, cgs.PositionAndMotionData.DistanceRoundTrack, (float) rf2state.mSpeed);
-
+                cgs.SessionData.stoppedInLandmark = cgs.PitData.InPitlane ? null : stoppedInLandmark;
                 if (csd.IsNewLap)
                     csd.trackLandmarksTiming.cancelWaitingForLandmarkEnd();
             }
