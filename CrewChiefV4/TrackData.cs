@@ -59,7 +59,7 @@ namespace CrewChiefV4
                     case GameEnum.PCARS_32BIT:
                     case GameEnum.PCARS_64BIT:
                     case GameEnum.PCARS_NETWORK:
-                        if (trackLandmarksForTrack.pcarsTrackName.Equals(trackName))
+                        if (String.Equals(trackLandmarksForTrack.pcarsTrackName,trackName))
                         {
                             return trackLandmarksForTrack.trackLandmarks;
                         }
