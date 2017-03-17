@@ -276,6 +276,8 @@ namespace CrewChiefV4.GameState
         // Player lap times with sector information
         public List<LapData> PlayerLapData = new List<LapData>();
 
+        public String stoppedInLandmark = null;
+
         public SessionData()
         {
             SessionTimesAtEndOfSectors.Add(1, -1);

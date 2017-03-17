@@ -771,8 +771,9 @@ namespace CrewChiefV4.rFactor1
                 if (opponentPrevious != null)
                 {
                     opponent.trackLandmarksTiming = opponentPrevious.trackLandmarksTiming;
-                    opponent.trackLandmarksTiming.updateLandmarkTiming(currentGameState.SessionData.TrackDefinition.trackLandmarks,
+                    String stoppedInLandmark = opponent.trackLandmarksTiming.updateLandmarkTiming(currentGameState.SessionData.TrackDefinition.trackLandmarks,
                         currentGameState.SessionData.SessionRunningTime, previousDistanceRoundTrack, opponent.DistanceRoundTrack, opponent.Speed);
+                    opponent.stoppedInLandmark = opponent.InPits ? null : stoppedInLandmark;
                 }
                 if (opponent.IsNewLap)
                 {
@@ -785,6 +786,7 @@ namespace CrewChiefV4.rFactor1
                     currentGameState.OpponentData.Add(opponentKey, opponent);
                 }
             }
+            currentGameState.PitData.InPitlane = player.inPits == 1;
             if (previousGameState != null)
             {
                 currentGameState.SessionData.HasLeadChanged = !currentGameState.SessionData.HasLeadChanged && previousGameState.SessionData.Position > 1 && currentGameState.SessionData.Position == 1 ?
@@ -796,9 +798,10 @@ namespace CrewChiefV4.rFactor1
                 currentGameState.SessionData.GameTimeAtLastPositionBehindChange = !currentGameState.SessionData.IsRacingSameCarBehind ? 
                     currentGameState.SessionData.SessionRunningTime : previousGameState.SessionData.GameTimeAtLastPositionBehindChange;
                 currentGameState.SessionData.trackLandmarksTiming = previousGameState.SessionData.trackLandmarksTiming;
-                currentGameState.SessionData.trackLandmarksTiming.updateLandmarkTiming(currentGameState.SessionData.TrackDefinition.trackLandmarks,
+                String stoppedInLandmark = currentGameState.SessionData.trackLandmarksTiming.updateLandmarkTiming(currentGameState.SessionData.TrackDefinition.trackLandmarks,
                                     currentGameState.SessionData.SessionRunningTime, previousGameState.PositionAndMotionData.DistanceRoundTrack, 
                                     currentGameState.PositionAndMotionData.DistanceRoundTrack, shared.speed);
+                currentGameState.SessionData.stoppedInLandmark = currentGameState.PitData.InPitlane ? null : stoppedInLandmark;
                 if (currentGameState.SessionData.IsNewLap)
                 {
                     currentGameState.SessionData.trackLandmarksTiming.cancelWaitingForLandmarkEnd();
@@ -821,7 +824,6 @@ namespace CrewChiefV4.rFactor1
                 currentGameState.PitData.PitWindowEnd = !currentGameState.PitData.HasMandatoryPitStop ? 0 :
                     currentGameState.SessionData.SessionHasFixedTime ? (int)(((currentGameState.SessionData.SessionTotalRunTime / 60) / (shared.scheduledStops + 1)) * (player.numPitstops + 1)) + 1 :
                     (int)((currentGameState.SessionData.SessionNumberOfLaps / (shared.scheduledStops + 1)) * (player.numPitstops + 1)) + 1;
-                currentGameState.PitData.InPitlane = player.inPits == 1;
 
                 // force the MandatoryPit event to be re-initialsed if the window end has been recalculated.
                 currentGameState.PitData.ResetEvents = currentGameState.PitData.HasMandatoryPitStop && 
