@@ -463,7 +463,7 @@
         },
         {
             "acTrackNames": [ "imola:" ],
-            "pcarsTrackName":  "Imola:Grand Prix",
+            "pcarsTrackName": "Imola:Grand Prix",
             "trackLandmarks": [
                 {
                     "landmarkName": "tamburello",
@@ -511,6 +511,42 @@
                     "landmarkName": "rivazza_2",
                     "distanceRoundLapStart": 4190,
                     "distanceRoundLapEnd": 4300,
+                    "isCommonOvertakingSpot": true
+                }
+            ]
+        },
+        {
+            "acTrackNames": [ "ks_zandvoort:" ],
+            "raceroomLayoutId": 1678,
+            "trackLandmarks": [
+                {
+                    "landmarkName": "tarzanbocht",
+                    "distanceRoundLapStart": 300,
+                    "distanceRoundLapEnd": 540,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "hugenholtz",
+                    "distanceRoundLapStart": 860,
+                    "distanceRoundLapEnd": 1030,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "turn8",
+                    "distanceRoundLapStart": 2040,
+                    "distanceRoundLapEnd": 2240,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "the_chicane",
+                    "distanceRoundLapStart": 3100,
+                    "distanceRoundLapEnd": 3350,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "turn13",
+                    "distanceRoundLapStart": 3550,
+                    "distanceRoundLapEnd": 3710,
                     "isCommonOvertakingSpot": true
                 }
             ]
