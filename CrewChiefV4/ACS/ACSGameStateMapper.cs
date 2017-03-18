@@ -1498,8 +1498,7 @@ namespace CrewChiefV4.assetto
                                         currentOpponentSector, mapToFloatTime(participantStruct.currentLapTimeMS), mapToFloatTime(participantStruct.lastLapTimeMS),
                                         isEnteringPits || isLeavingPits, participantStruct.currentLapInvalid == 0,
                                         currentGameState.SessionData.SessionRunningTime, secondsSinceLastUpdate,
-                                        new float[] { participantStruct.worldPosition.x, participantStruct.worldPosition.z }, previousOpponentWorldPosition,
-                                        currentOpponentLapDistance, 
+                                        new float[] { participantStruct.worldPosition.x, participantStruct.worldPosition.z }, participantStruct.speedMS, currentOpponentLapDistance, 
                                         currentGameState.SessionData.SessionHasFixedTime, currentGameState.SessionData.SessionTimeRemaining,
                                         numberOfSectorsOnTrack, shared.acsPhysics.airTemp, shared.acsPhysics.roadTemp
                                         );
@@ -1869,14 +1868,12 @@ namespace CrewChiefV4.assetto
         }
 
         private void upateOpponentData(OpponentData opponentData, int racePosition, int leaderBoardPosition, int completedLaps, int sector,
-            float completedLapTime, float lastLapTime, Boolean isInPits, Boolean lapIsValid, float sessionRunningTime, float secondsSinceLastUpdate, float[] currentWorldPosition,
-            float[] previousWorldPosition, float distanceRoundTrack, Boolean sessionLengthIsTime, float sessionTimeRemaining,
+            float completedLapTime, float lastLapTime, Boolean isInPits, Boolean lapIsValid, float sessionRunningTime, float secondsSinceLastUpdate, 
+            float[] currentWorldPosition, float speed, float distanceRoundTrack, Boolean sessionLengthIsTime, float sessionTimeRemaining,
             int trackNumberOfSectors, float airTemperature, float trackTempreture)
         {
             opponentData.DistanceRoundTrack = distanceRoundTrack;
-            float speed;
             Boolean validSpeed = true;
-            speed = (float)Math.Sqrt(Math.Pow(currentWorldPosition[0] - previousWorldPosition[0], 2) + Math.Pow(currentWorldPosition[1] - previousWorldPosition[1], 2)) / secondsSinceLastUpdate;
             if (speed > 500)
             {
                 // faster than 500m/s (1000+mph) suggests the player has quit to the pit. Might need to reassess this as the data are quite noisy
