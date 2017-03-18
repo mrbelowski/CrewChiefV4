@@ -13,6 +13,16 @@ namespace CrewChiefV4
         public float distanceRoundLapStart { get; set; }
         public float distanceRoundLapEnd { get; set; }
         public Boolean isCommonOvertakingSpot { get; set; }
+        public float midPoint = -1;
+
+        public float getMidPoint()
+        {
+            if (midPoint == -1)
+            {
+                midPoint = distanceRoundLapStart + ((distanceRoundLapEnd - distanceRoundLapStart) / 2);
+            }
+            return midPoint;
+        }
     }
 
     public class TrackLandmarksForTrack

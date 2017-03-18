@@ -969,6 +969,9 @@ namespace CrewChiefV4.GameState
         private int landmarkStoppedCount = 0;
         private Boolean inLandmark = false;
 
+        // quick n dirty tracking of when we're at the mid-point of a landmark - maybe the apex. This is only non-null for a single tick.
+        public String atMidPointOfLandmark = null;
+
         private void addTimeAndSpeeds(String landmarkName, float time, float startSpeed, float endSpeed, Boolean isCommonOvertakingSpot)
         {
             if (time > 0)
@@ -1090,6 +1093,8 @@ namespace CrewChiefV4.GameState
 		    if (trackLandmarks == null || trackLandmarks.Count == 0) {
 			    return null;
 		    }
+            // yuk...
+            atMidPointOfLandmark = null;
 		    if (landmarkNameStart == null) {
 			    // looking for landmark start only
 			    foreach (TrackLandmark trackLandmark in trackLandmarks) {
@@ -1117,12 +1122,16 @@ namespace CrewChiefV4.GameState
                     if (currentDistanceRoundTrack > trackLandmark.distanceRoundLapStart && currentDistanceRoundTrack < trackLandmark.distanceRoundLapEnd &&
                         speed < 5)
                     {
-                        landmarkStoppedCount++;
+                        landmarkStoppedCount++;                        
                     }
-                    if (previousDistanceRoundTrack < trackLandmark.distanceRoundLapEnd && currentDistanceRoundTrack >= trackLandmark.distanceRoundLapEnd) 
-				    {
+                    if (previousDistanceRoundTrack < trackLandmark.getMidPoint() && currentDistanceRoundTrack >= trackLandmark.getMidPoint())
+                    {
+                        atMidPointOfLandmark = trackLandmark.landmarkName;
+                    }
+                    if (previousDistanceRoundTrack < trackLandmark.distanceRoundLapEnd && currentDistanceRoundTrack >= trackLandmark.distanceRoundLapEnd)
+                    {
                         // reached the end of a landmark section, update the timing if it's the landmark we're expecting and we're actually close to the endpoint
-                        if (trackLandmark.landmarkName.Equals(landmarkNameStart) && 
+                        if (trackLandmark.landmarkName.Equals(landmarkNameStart) &&
                             currentDistanceRoundTrack - 20 < trackLandmark.distanceRoundLapEnd && currentDistanceRoundTrack + 20 > trackLandmark.distanceRoundLapEnd)
                         {
                             // only save the timing if we're near the landmark end point
@@ -1130,11 +1139,11 @@ namespace CrewChiefV4.GameState
                             float error = speed > 0 && speed < 120 ? (currentDistanceRoundTrack - trackLandmark.distanceRoundLapEnd) / speed : 0;
                             addTimeAndSpeeds(landmarkNameStart, (gameTime - error) - landmarkStartTime, landmarkStartSpeed, speed, trackLandmark.isCommonOvertakingSpot);
                         }
-					    landmarkNameStart = null;
-					    landmarkStartTime = -1;
+                        landmarkNameStart = null;
+                        landmarkStartTime = -1;
                         inLandmark = false;
-					    break;
-				    }		
+                        break;
+                    }	
 			    }
 		    }
             if (inLandmark && landmarkStoppedCount >= 10)
