@@ -371,38 +371,38 @@
             "trackLandmarks": [
                 {
                     "landmarkName": "redgate",
-                    "distanceRoundLapStart": 300,
-                    "distanceRoundLapEnd": 400,
+                    "distanceRoundLapStart": 320,
+                    "distanceRoundLapEnd": 440,
                     "isCommonOvertakingSpot": true
                 },
                 {
                     "landmarkName": "the_craner_curves",
-                    "distanceRoundLapStart": 640,
-                    "distanceRoundLapEnd": 850,
+                    "distanceRoundLapStart": 720,
+                    "distanceRoundLapEnd": 960,
                     "isCommonOvertakingSpot": false
                 },
                 {
                     "landmarkName": "the_old_hairpin",
-                    "distanceRoundLapStart": 1080,
-                    "distanceRoundLapEnd": 1150,
+                    "distanceRoundLapStart": 1060,
+                    "distanceRoundLapEnd": 1180,
                     "isCommonOvertakingSpot": true
                 },
                 {
                     "landmarkName": "mcleans",
-                    "distanceRoundLapStart": 1710,
+                    "distanceRoundLapStart": 1690,
                     "distanceRoundLapEnd": 1800,
                     "isCommonOvertakingSpot": true
                 },
                 {
                     "landmarkName": "coppice",
-                    "distanceRoundLapStart": 2040,
-                    "distanceRoundLapEnd": 2160,
+                    "distanceRoundLapStart": 2010,
+                    "distanceRoundLapEnd": 2240,
                     "isCommonOvertakingSpot": true
                 },
                 {
                     "landmarkName": "the_chicane",
-                    "distanceRoundLapStart": 2800,
-                    "distanceRoundLapEnd": 2900,
+                    "distanceRoundLapStart": 2770,
+                    "distanceRoundLapEnd": 2870,
                     "isCommonOvertakingSpot": true
                 }
             ]
@@ -413,50 +413,50 @@
             "trackLandmarks": [
                 {
                     "landmarkName": "redgate",
-                    "distanceRoundLapStart": 300,
-                    "distanceRoundLapEnd": 400,
+                    "distanceRoundLapStart": 320,
+                    "distanceRoundLapEnd": 440,
                     "isCommonOvertakingSpot": true
                 },
                 {
                     "landmarkName": "the_craner_curves",
-                    "distanceRoundLapStart": 640,
-                    "distanceRoundLapEnd": 850,
+                    "distanceRoundLapStart": 720,
+                    "distanceRoundLapEnd": 960,
                     "isCommonOvertakingSpot": false
                 },
                 {
                     "landmarkName": "the_old_hairpin",
-                    "distanceRoundLapStart": 1080,
-                    "distanceRoundLapEnd": 1150,
+                    "distanceRoundLapStart": 1060,
+                    "distanceRoundLapEnd": 1180,
                     "isCommonOvertakingSpot": true
                 },
                 {
                     "landmarkName": "mcleans",
-                    "distanceRoundLapStart": 1710,
+                    "distanceRoundLapStart": 1690,
                     "distanceRoundLapEnd": 1800,
                     "isCommonOvertakingSpot": true
                 },
                 {
                     "landmarkName": "coppice",
-                    "distanceRoundLapStart": 2040,
-                    "distanceRoundLapEnd": 2160,
+                    "distanceRoundLapStart": 2010,
+                    "distanceRoundLapEnd": 2240,
                     "isCommonOvertakingSpot": true
                 },
                 {
                     "landmarkName": "the_esses",
-                    "distanceRoundLapStart": 2800,
-                    "distanceRoundLapEnd": 2900,
+                    "distanceRoundLapStart": 2770,
+                    "distanceRoundLapEnd": 2870,
                     "isCommonOvertakingSpot": true
                 },
                 {
                     "landmarkName": "melbourne_haipin",
-                    "distanceRoundLapStart": 3340,
-                    "distanceRoundLapEnd": 3410,
+                    "distanceRoundLapStart": 3240,
+                    "distanceRoundLapEnd": 3330,
                     "isCommonOvertakingSpot": true
                 },
                 {
                     "landmarkName": "goddards",
-                    "distanceRoundLapStart": 3710,
-                    "distanceRoundLapEnd": 3800,
+                    "distanceRoundLapStart": 3610,
+                    "distanceRoundLapEnd": 3730,
                     "isCommonOvertakingSpot": true
                 }
             ]
