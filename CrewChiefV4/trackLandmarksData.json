@@ -522,7 +522,7 @@
                 {
                     "landmarkName": "tarzanbocht",
                     "distanceRoundLapStart": 370,
-                    "distanceRoundLapEnd": 510
+                    "distanceRoundLapEnd": 510,
                     "isCommonOvertakingSpot": true
                 },
                 {
@@ -572,7 +572,7 @@
                     "distanceRoundLapStart": 3480,
                     "distanceRoundLapEnd": 3590,
                     "isCommonOvertakingSpot": true
-                }
+                },
                 {
                     "landmarkName": "turn13",
                     "distanceRoundLapStart": 3720,
