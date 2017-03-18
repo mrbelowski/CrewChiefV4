@@ -185,6 +185,7 @@ namespace CrewChiefV4.Events
         private List<Boolean> rightFrontLockedList = new List<Boolean>();
         private List<Boolean> leftRearLockedList = new List<Boolean>();
         private List<Boolean> rightRearLockedList = new List<Boolean>();
+        private String currentCornerName = null;
 
         private DateTime nextCornerSpecificSpinningCheck = DateTime.MaxValue;
         private float leftFrontExitStartWheelSpinTime = 0;
@@ -284,6 +285,7 @@ namespace CrewChiefV4.Events
             leftRearExitStartWheelSpinTime = 0;
             rightRearExitStartWheelSpinTime = 0;
 
+            currentCornerName = null;
             enableCornerSpecificLockingAndSpinningChecks = false;
         }
 
@@ -359,6 +361,7 @@ namespace CrewChiefV4.Events
                 rightFrontLockedList.Clear();
                 leftRearLockedList.Clear();
                 rightRearLockedList.Clear();
+                currentCornerName = null;
 
                 // corner specific locking and spinning checks only for cars and where we have data
                 enableCornerSpecificLockingAndSpinningChecks = currentGameState.SessionData.TrackDefinition.trackLandmarks != null &&
@@ -397,6 +400,7 @@ namespace CrewChiefV4.Events
                 if (currentGameState.SessionData.trackLandmarksTiming.atMidPointOfLandmark != null)
                 {
                     // we've just hit an apex (midpoint) so count back the locked wheel ticks
+                    currentCornerName = currentGameState.SessionData.trackLandmarksTiming.atMidPointOfLandmark;
                     if (!playedCumulativeLockingMessage)
                     {
                         WheelsLockedEnum cornerLocking = getCornerEntryLocking(lockedTicksThreshold);
@@ -445,32 +449,32 @@ namespace CrewChiefV4.Events
                         if (leftFrontCornerSpecificWheelSpinTime > cornerExitSpinningThreshold && rightFrontCornerSpecificWheelSpinTime > cornerExitSpinningThreshold)
                         {
                             audioPlayer.playMessage(new QueuedMessage("corner_spinning",
-                                MessageContents(folderSpinningFrontsForCornerWarning, "corners/" + currentGameState.SessionData.trackLandmarksTiming.atMidPointOfLandmark), 0, this));
+                                MessageContents(folderSpinningFrontsForCornerWarning, "corners/" + currentCornerName), 0, this));
                         }
                         else if (leftRearCornerSpecificWheelSpinTime > cornerExitSpinningThreshold && rightRearCornerSpecificWheelSpinTime > cornerExitSpinningThreshold)
                         {
                             audioPlayer.playMessage(new QueuedMessage("corner_spinning",
-                                MessageContents(folderSpinningRearsForCornerWarning, "corners/" + currentGameState.SessionData.trackLandmarksTiming.atMidPointOfLandmark), 0, this));
+                                MessageContents(folderSpinningRearsForCornerWarning, "corners/" + currentCornerName), 0, this));
                         }
                         else if (leftFrontCornerSpecificWheelSpinTime > cornerExitSpinningThreshold)
                         {
                             audioPlayer.playMessage(new QueuedMessage("corner_spinning",
-                                MessageContents(folderSpinningLeftFrontForCornerWarning, "corners/" + currentGameState.SessionData.trackLandmarksTiming.atMidPointOfLandmark), 0, this));
+                                MessageContents(folderSpinningLeftFrontForCornerWarning, "corners/" + currentCornerName), 0, this));
                         }
                         else if (rightFrontCornerSpecificWheelSpinTime > cornerExitSpinningThreshold)
                         {
                             audioPlayer.playMessage(new QueuedMessage("corner_spinning",
-                                MessageContents(folderSpinningRightFrontForCornerWarning, "corners/" + currentGameState.SessionData.trackLandmarksTiming.atMidPointOfLandmark), 0, this));
+                                MessageContents(folderSpinningRightFrontForCornerWarning, "corners/" + currentCornerName), 0, this));
                         }
                         else if (leftRearCornerSpecificWheelSpinTime > cornerExitSpinningThreshold)
                         {
                             audioPlayer.playMessage(new QueuedMessage("corner_spinning",
-                                MessageContents(folderSpinningLeftRearForCornerWarning, "corners/" + currentGameState.SessionData.trackLandmarksTiming.atMidPointOfLandmark), 0, this));
+                                MessageContents(folderSpinningLeftRearForCornerWarning, "corners/" + currentCornerName), 0, this));
                         }
                         else if (rightRearCornerSpecificWheelSpinTime > cornerExitSpinningThreshold)
                         {
                             audioPlayer.playMessage(new QueuedMessage("corner_spinning",
-                                MessageContents(folderSpinningRightRearForCornerWarning, "corners/" + currentGameState.SessionData.trackLandmarksTiming.atMidPointOfLandmark), 0, this));
+                                MessageContents(folderSpinningRightRearForCornerWarning, "corners/" + currentCornerName), 0, this));
                         }
                     }
                 }
