@@ -526,15 +526,39 @@
                     "isCommonOvertakingSpot": true
                 },
                 {
+                    "landmarkName": "turn2",
+                    "distanceRoundLapStart": 750,
+                    "distanceRoundLapEnd": 820,
+                    "isCommonOvertakingSpot": false
+                },
+                {
                     "landmarkName": "hugenholtz",
                     "distanceRoundLapStart": 860,
                     "distanceRoundLapEnd": 1030,
                     "isCommonOvertakingSpot": true
                 },
                 {
+                    "landmarkName": "turn7",
+                    "distanceRoundLapStart": 1680,
+                    "distanceRoundLapEnd": 1970,
+                    "isCommonOvertakingSpot": false
+                },
+                {
                     "landmarkName": "turn8",
                     "distanceRoundLapStart": 2040,
                     "distanceRoundLapEnd": 2240,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "turn9",
+                    "distanceRoundLapStart": 2260,
+                    "distanceRoundLapEnd": 2490,
+                    "isCommonOvertakingSpot": true
+                },
+				{
+                    "landmarkName": "turn10",
+                    "distanceRoundLapStart": 2550,
+                    "distanceRoundLapEnd": 2720,
                     "isCommonOvertakingSpot": true
                 },
                 {
@@ -544,10 +568,16 @@
                     "isCommonOvertakingSpot": true
                 },
                 {
-                    "landmarkName": "turn13",
+                    "landmarkName": "turn12",
                     "distanceRoundLapStart": 3550,
                     "distanceRoundLapEnd": 3710,
                     "isCommonOvertakingSpot": true
+                }
+                {
+                    "landmarkName": "turn13",
+                    "distanceRoundLapStart": 3780,
+                    "distanceRoundLapEnd": 4050,
+                    "isCommonOvertakingSpot": false
                 }
             ]
         }
