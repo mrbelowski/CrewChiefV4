@@ -580,6 +580,138 @@
                     "isCommonOvertakingSpot": false
                 }
             ]
+        },
+        {
+			"pcarsTrackName": "Mazda Raceway:Laguna Seca",
+            "raceroomLayoutId": 1856,
+            "trackLandmarks": [
+				{
+                    "landmarkName": "turn1",
+                    "distanceRoundLapStart": 160,
+                    "distanceRoundLapEnd": 260,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "the_hairpin",
+                    "distanceRoundLapStart": 410,
+                    "distanceRoundLapEnd": 560,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "turn3",
+                    "distanceRoundLapStart": 730,
+                    "distanceRoundLapEnd": 850,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "turn4",
+                    "distanceRoundLapStart": 1000,
+                    "distanceRoundLapEnd": 1130,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "turn5",
+                    "distanceRoundLapStart": 1480,
+                    "distanceRoundLapEnd": 1640,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "turn6",
+                    "distanceRoundLapStart": 1910,
+                    "distanceRoundLapEnd": 2000,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "the_corkscrew",
+                    "distanceRoundLapStart": 2420,
+                    "distanceRoundLapEnd": 2530,
+                    "isCommonOvertakingSpot": true
+                },
+				{
+                    "landmarkName": "turn9",
+                    "distanceRoundLapStart": 2640,
+                    "distanceRoundLapEnd": 2820,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "turn10",
+                    "distanceRoundLapStart": 2930,
+                    "distanceRoundLapEnd": 3030,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "turn11",
+                    "distanceRoundLapStart": 3230,
+                    "distanceRoundLapEnd": 3310,
+                    "isCommonOvertakingSpot": true
+                }
+            ]
+        },
+        {
+			"acTrackNames": [ "suzuka:" ],
+            "raceroomLayoutId": 1841,
+            "trackLandmarks": [
+				{
+                    "landmarkName": "turn1",
+                    "distanceRoundLapStart": 350,
+                    "distanceRoundLapEnd": 440,
+                    "isCommonOvertakingSpot": true
+                },
+				{
+                    "landmarkName": "turn2",
+                    "distanceRoundLapStart": 480,
+                    "distanceRoundLapEnd": 630,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "the_esses",
+                    "distanceRoundLapStart": 780,
+                    "distanceRoundLapEnd": 1330,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "degner_1",
+                    "distanceRoundLapStart": 1950,
+                    "distanceRoundLapEnd": 2030,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "degner_2",
+                    "distanceRoundLapStart": 2120,
+                    "distanceRoundLapEnd": 2200,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "the_hairpin",
+                    "distanceRoundLapStart": 2580,
+                    "distanceRoundLapEnd": 2680,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "turn13",
+                    "distanceRoundLapStart": 3450,
+                    "distanceRoundLapEnd": 3580,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "spoon_curve",
+                    "distanceRoundLapStart": 3630,
+                    "distanceRoundLapEnd": 3790,
+                    "isCommonOvertakingSpot": false
+                },
+				{
+                    "landmarkName": "130R",
+                    "distanceRoundLapStart": 4600,
+                    "distanceRoundLapEnd": 4830,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "the_chicane",
+                    "distanceRoundLapStart": 5070,
+                    "distanceRoundLapEnd": 5190,
+                    "isCommonOvertakingSpot": true
+                }
+            ]
         }
     ]
 }
