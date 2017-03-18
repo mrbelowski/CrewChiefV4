@@ -921,8 +921,8 @@ namespace CrewChiefV4.GameState
             {
                 if (biggestTimeDifferenceLandmark != null && biggestStartSpeedDifferenceLandmark != null)
                 {
-                    // which to choose?? If the entry speed delta > 5m/s choose that
-                    if (biggestStartSpeedDifference > 5)
+                    // which to choose?? If the entry speed delta > minSignificantRelativeTimeDifference
+                    if (biggestStartSpeedDifference > minSignificantRelativeTimeDifference)
                     {
                         Console.WriteLine("Biggest speed delta into " + biggestStartSpeedDifferenceLandmark + ": " + biggestStartSpeedDifference * 100 + "% difference");
                         return new LandmarkAndDeltaType(DeltaType.EntrySpeed, biggestStartSpeedDifferenceLandmark);
