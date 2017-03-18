@@ -178,14 +178,20 @@ namespace CrewChiefV4.Events
         private int tickMillis = UserSettings.GetUserSettings().getInt("update_interval");
         // number of ticks a wheel has to be locked before a warning - default to 5 (0.5s) but recalulate based on tick length
         private int lockedTicksThreshold = 5;
+        private float cornerEntryLockThreshold = 0.25f;  // lockups > 0.25 seconds are reported
         // check 3 seconds worth of historical ticks - again, default but recalulated
         private int ticksToCheckForLocking = 30;
-        private float cornerExitSpinningThreshold = 0.5f;
+        private float cornerExitSpinningThreshold = 0.3f; // wheelspin > 0.3 seconds are reported
         private List<Boolean> leftFrontLockedList = new List<Boolean>();
         private List<Boolean> rightFrontLockedList = new List<Boolean>();
         private List<Boolean> leftRearLockedList = new List<Boolean>();
         private List<Boolean> rightRearLockedList = new List<Boolean>();
         private String currentCornerName = null;
+        private TimeSpan cornerLockWarningMaxFrequency = TimeSpan.FromSeconds(120); 
+        private TimeSpan cornerSpinningWarningMaxFrequency = TimeSpan.FromSeconds(120);
+
+        private Dictionary<String, DateTime> cornerLockWarningsPlayed = new Dictionary<string, DateTime>();
+        private Dictionary<String, DateTime> cornerSpinningWarningsPlayed = new Dictionary<string, DateTime>();
 
         private DateTime nextCornerSpecificSpinningCheck = DateTime.MaxValue;
         private float leftFrontExitStartWheelSpinTime = 0;
@@ -273,7 +279,7 @@ namespace CrewChiefV4.Events
             lastTyreTempCheckOK = true;
 
             // want to check locking for 0.5 seconds
-            lockedTicksThreshold = tickMillis == 0 ? 5 : (int)Math.Ceiling(0.5f / ((float)tickMillis / 1000f));
+            lockedTicksThreshold = tickMillis == 0 ? 5 : (int)Math.Ceiling(cornerEntryLockThreshold / ((float)tickMillis / 1000f));
             ticksToCheckForLocking = tickMillis == 0 ? 30 : (int)Math.Ceiling(3.0f / ((float)tickMillis / 1000f));
             leftFrontLockedList.Clear();
             rightFrontLockedList.Clear();
@@ -284,6 +290,8 @@ namespace CrewChiefV4.Events
             rightFrontExitStartWheelSpinTime = 0;
             leftRearExitStartWheelSpinTime = 0;
             rightRearExitStartWheelSpinTime = 0;
+            cornerLockWarningsPlayed.Clear();
+            cornerSpinningWarningsPlayed.Clear();
 
             currentCornerName = null;
             enableCornerSpecificLockingAndSpinningChecks = false;
@@ -401,28 +409,40 @@ namespace CrewChiefV4.Events
                 {
                     // we've just hit an apex (midpoint) so count back the locked wheel ticks
                     currentCornerName = currentGameState.SessionData.trackLandmarksTiming.atMidPointOfLandmark;
+                    // only moan about locking if we've not just moaned about it for the lap
                     if (!playedCumulativeLockingMessage)
                     {
                         WheelsLockedEnum cornerLocking = getCornerEntryLocking(lockedTicksThreshold);
-                        switch (cornerLocking) {
-                            case WheelsLockedEnum.FRONTS:
-                                audioPlayer.playMessage(new QueuedMessage("corner_locking",
-                                    MessageContents(folderLockingFrontsForCornerWarning, "corners/" + currentGameState.SessionData.trackLandmarksTiming.atMidPointOfLandmark), 0, this));
-                                break;
-                            case WheelsLockedEnum.LEFT_FRONT:
-                                audioPlayer.playMessage(new QueuedMessage("corner_locking",
-                                    MessageContents(folderLockingLeftFrontForCornerWarning, "corners/" + currentGameState.SessionData.trackLandmarksTiming.atMidPointOfLandmark), 0, this));
-                                break;
-                            case WheelsLockedEnum.RIGHT_FRONT:
-                                audioPlayer.playMessage(new QueuedMessage("corner_locking",
-                                    MessageContents(folderLockingRightFrontForCornerWarning, "corners/" + currentGameState.SessionData.trackLandmarksTiming.atMidPointOfLandmark), 0, this));
-                                break;
-                            case WheelsLockedEnum.REARS:
-                                audioPlayer.playMessage(new QueuedMessage("corner_locking",
-                                    MessageContents(folderLockingRearsForCornerWarning, "corners/" + currentGameState.SessionData.trackLandmarksTiming.atMidPointOfLandmark), 0, this));
-                                break;
-                            default:
-                                break;
+                        if (cornerLocking != WheelsLockedEnum.NONE) {
+                            // if we moaned about this corner recently, don't moan again
+                            DateTime timeLastWarnedAboutThisCorner = cornerLockWarningsPlayed.ContainsKey(currentCornerName) ? cornerLockWarningsPlayed[currentCornerName] : DateTime.MinValue;
+                            if (currentGameState.Now > timeLastWarnedAboutThisCorner + cornerLockWarningMaxFrequency)
+                            {
+                                // not moaned about this for a while, so moan away
+                                cornerLockWarningsPlayed[currentCornerName] = currentGameState.Now;
+                                Console.WriteLine("Locking " + cornerLocking + " into " + currentGameState.SessionData.trackLandmarksTiming.atMidPointOfLandmark);
+                                switch (cornerLocking)
+                                {
+                                    case WheelsLockedEnum.FRONTS:
+                                        audioPlayer.playMessage(new QueuedMessage("corner_locking",
+                                            MessageContents(folderLockingFrontsForCornerWarning, "corners/" + currentGameState.SessionData.trackLandmarksTiming.atMidPointOfLandmark), 0, this));
+                                        break;
+                                    case WheelsLockedEnum.LEFT_FRONT:
+                                        audioPlayer.playMessage(new QueuedMessage("corner_locking",
+                                            MessageContents(folderLockingLeftFrontForCornerWarning, "corners/" + currentGameState.SessionData.trackLandmarksTiming.atMidPointOfLandmark), 0, this));
+                                        break;
+                                    case WheelsLockedEnum.RIGHT_FRONT:
+                                        audioPlayer.playMessage(new QueuedMessage("corner_locking",
+                                            MessageContents(folderLockingRightFrontForCornerWarning, "corners/" + currentGameState.SessionData.trackLandmarksTiming.atMidPointOfLandmark), 0, this));
+                                        break;
+                                    case WheelsLockedEnum.REARS:
+                                        audioPlayer.playMessage(new QueuedMessage("corner_locking",
+                                            MessageContents(folderLockingRearsForCornerWarning, "corners/" + currentGameState.SessionData.trackLandmarksTiming.atMidPointOfLandmark), 0, this));
+                                        break;
+                                    default:
+                                        break;
+                                }
+                            }
                         }
                     }                    
                     leftFrontLockedList.Clear();
@@ -439,42 +459,59 @@ namespace CrewChiefV4.Events
                 }
                 else if (currentGameState.Now > nextCornerSpecificSpinningCheck)
                 {
+                    // now moan about wheelspin
                     nextCornerSpecificSpinningCheck = DateTime.MaxValue;
-                    if (!playedCumulativeSpinningMessage)
+                    if (!playedCumulativeSpinningMessage && currentCornerName != null)
                     {
-                        float leftFrontCornerSpecificWheelSpinTime = timeLeftFrontIsSpinningForLap - leftFrontExitStartWheelSpinTime;
-                        float rightFrontCornerSpecificWheelSpinTime = timeRightFrontIsSpinningForLap - rightFrontExitStartWheelSpinTime;
-                        float leftRearCornerSpecificWheelSpinTime = timeLeftRearIsSpinningForLap - leftRearExitStartWheelSpinTime;
-                        float rightRearCornerSpecificWheelSpinTime = timeRightRearIsSpinningForLap - rightRearExitStartWheelSpinTime;
-                        if (leftFrontCornerSpecificWheelSpinTime > cornerExitSpinningThreshold && rightFrontCornerSpecificWheelSpinTime > cornerExitSpinningThreshold)
+                        DateTime timeLastWarnedAboutThisCorner = cornerSpinningWarningsPlayed.ContainsKey(currentCornerName) ? cornerSpinningWarningsPlayed[currentCornerName] : DateTime.MinValue;
+                        if (currentGameState.Now > timeLastWarnedAboutThisCorner + cornerSpinningWarningMaxFrequency)
                         {
-                            audioPlayer.playMessage(new QueuedMessage("corner_spinning",
-                                MessageContents(folderSpinningFrontsForCornerWarning, "corners/" + currentCornerName), 0, this));
-                        }
-                        else if (leftRearCornerSpecificWheelSpinTime > cornerExitSpinningThreshold && rightRearCornerSpecificWheelSpinTime > cornerExitSpinningThreshold)
-                        {
-                            audioPlayer.playMessage(new QueuedMessage("corner_spinning",
-                                MessageContents(folderSpinningRearsForCornerWarning, "corners/" + currentCornerName), 0, this));
-                        }
-                        else if (leftFrontCornerSpecificWheelSpinTime > cornerExitSpinningThreshold)
-                        {
-                            audioPlayer.playMessage(new QueuedMessage("corner_spinning",
-                                MessageContents(folderSpinningLeftFrontForCornerWarning, "corners/" + currentCornerName), 0, this));
-                        }
-                        else if (rightFrontCornerSpecificWheelSpinTime > cornerExitSpinningThreshold)
-                        {
-                            audioPlayer.playMessage(new QueuedMessage("corner_spinning",
-                                MessageContents(folderSpinningRightFrontForCornerWarning, "corners/" + currentCornerName), 0, this));
-                        }
-                        else if (leftRearCornerSpecificWheelSpinTime > cornerExitSpinningThreshold)
-                        {
-                            audioPlayer.playMessage(new QueuedMessage("corner_spinning",
-                                MessageContents(folderSpinningLeftRearForCornerWarning, "corners/" + currentCornerName), 0, this));
-                        }
-                        else if (rightRearCornerSpecificWheelSpinTime > cornerExitSpinningThreshold)
-                        {
-                            audioPlayer.playMessage(new QueuedMessage("corner_spinning",
-                                MessageContents(folderSpinningRightRearForCornerWarning, "corners/" + currentCornerName), 0, this));
+                            float leftFrontCornerSpecificWheelSpinTime = timeLeftFrontIsSpinningForLap - leftFrontExitStartWheelSpinTime;
+                            float rightFrontCornerSpecificWheelSpinTime = timeRightFrontIsSpinningForLap - rightFrontExitStartWheelSpinTime;
+                            float leftRearCornerSpecificWheelSpinTime = timeLeftRearIsSpinningForLap - leftRearExitStartWheelSpinTime;
+                            float rightRearCornerSpecificWheelSpinTime = timeRightRearIsSpinningForLap - rightRearExitStartWheelSpinTime;
+                            if (leftFrontCornerSpecificWheelSpinTime > cornerExitSpinningThreshold && rightFrontCornerSpecificWheelSpinTime > cornerExitSpinningThreshold)
+                            {
+                                Console.WriteLine("Spinning fronts out of " + currentCornerName);
+                                audioPlayer.playMessage(new QueuedMessage("corner_spinning",
+                                    MessageContents(folderSpinningFrontsForCornerWarning, "corners/" + currentCornerName), 0, this));
+                                cornerSpinningWarningsPlayed[currentCornerName] = currentGameState.Now;
+                            }
+                            else if (leftRearCornerSpecificWheelSpinTime > cornerExitSpinningThreshold && rightRearCornerSpecificWheelSpinTime > cornerExitSpinningThreshold)
+                            {
+                                Console.WriteLine("Spinning rears out of " + currentCornerName);
+                                audioPlayer.playMessage(new QueuedMessage("corner_spinning",
+                                    MessageContents(folderSpinningRearsForCornerWarning, "corners/" + currentCornerName), 0, this));
+                                cornerSpinningWarningsPlayed[currentCornerName] = currentGameState.Now;
+                            }
+                            else if (leftFrontCornerSpecificWheelSpinTime > cornerExitSpinningThreshold)
+                            {
+                                Console.WriteLine("Spinning left front out of " + currentCornerName);
+                                audioPlayer.playMessage(new QueuedMessage("corner_spinning",
+                                    MessageContents(folderSpinningLeftFrontForCornerWarning, "corners/" + currentCornerName), 0, this));
+                                cornerSpinningWarningsPlayed[currentCornerName] = currentGameState.Now;
+                            }
+                            else if (rightFrontCornerSpecificWheelSpinTime > cornerExitSpinningThreshold)
+                            {
+                                Console.WriteLine("Spinning right front out of " + currentCornerName);
+                                audioPlayer.playMessage(new QueuedMessage("corner_spinning",
+                                    MessageContents(folderSpinningRightFrontForCornerWarning, "corners/" + currentCornerName), 0, this));
+                                cornerSpinningWarningsPlayed[currentCornerName] = currentGameState.Now;
+                            }
+                            else if (leftRearCornerSpecificWheelSpinTime > cornerExitSpinningThreshold)
+                            {
+                                Console.WriteLine("Spinning left rear out of " + currentCornerName);
+                                audioPlayer.playMessage(new QueuedMessage("corner_spinning",
+                                    MessageContents(folderSpinningLeftRearForCornerWarning, "corners/" + currentCornerName), 0, this));
+                                cornerSpinningWarningsPlayed[currentCornerName] = currentGameState.Now;
+                            }
+                            else if (rightRearCornerSpecificWheelSpinTime > cornerExitSpinningThreshold)
+                            {
+                                Console.WriteLine("Spinning right rear out of " + currentCornerName);
+                                audioPlayer.playMessage(new QueuedMessage("corner_spinning",
+                                    MessageContents(folderSpinningRightRearForCornerWarning, "corners/" + currentCornerName), 0, this));
+                                cornerSpinningWarningsPlayed[currentCornerName] = currentGameState.Now;
+                            }
                         }
                     }
                 }

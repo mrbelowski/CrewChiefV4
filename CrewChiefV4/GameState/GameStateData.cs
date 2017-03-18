@@ -954,7 +954,7 @@ namespace CrewChiefV4.GameState
 
         // don't count time differences shorter than these - no point in being told to defend into a corner when
         // the other guys is only 0.01 seconds faster through that corner
-        private static float minSignificantRelativeTimeDifference = 0.08f;    // 8% - is this a good value?
+        private static float minSignificantRelativeTimeDifference = 0.06f;    // 6% - is this a good value?
         private static float minSignificantRelativeStartSpeedDifference = 0.08f;   // 8% - is this a good value?
 
         
