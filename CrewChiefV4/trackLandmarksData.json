@@ -323,43 +323,43 @@
             "trackLandmarks": [
                 {
                     "landmarkName": "la_source",
-                    "distanceRoundLapStart": 260,
-                    "distanceRoundLapEnd": 350,
+                    "distanceRoundLapStart": 360,
+                    "distanceRoundLapEnd": 430,
                     "isCommonOvertakingSpot": true
                 },
                 {
                     "landmarkName": "eau_rouge",
-                    "distanceRoundLapStart": 950,
-                    "distanceRoundLapEnd": 1100,
+                    "distanceRoundLapStart": 1000,
+                    "distanceRoundLapEnd": 1230,
                     "isCommonOvertakingSpot": false
                 },
                 {
                     "landmarkName": "les_combes",
-                    "distanceRoundLapStart": 2270,
-                    "distanceRoundLapEnd": 2700,
+                    "distanceRoundLapStart": 2370,
+                    "distanceRoundLapEnd": 2530,
                     "isCommonOvertakingSpot": true
                 },
                 {
                     "landmarkName": "pouhon",
                     "distanceRoundLapStart": 3700,
-                    "distanceRoundLapEnd": 4200,
+                    "distanceRoundLapEnd": 4140,
                     "isCommonOvertakingSpot": false
                 },
                 {
                     "landmarkName": "stavlot",
-                    "distanceRoundLapStart": 4900,
-                    "distanceRoundLapEnd": 5000,
+                    "distanceRoundLapStart": 4850,
+                    "distanceRoundLapEnd": 5240,
                     "isCommonOvertakingSpot": true
                 },
                 {
                     "landmarkName": "blanchimont",
-                    "distanceRoundLapStart": 5760,
-                    "distanceRoundLapEnd": 6200,
+                    "distanceRoundLapStart": 6070,
+                    "distanceRoundLapEnd": 6230,
                     "isCommonOvertakingSpot": false
                 },
                 {
                     "landmarkName": "the_chicane",
-                    "distanceRoundLapStart": 6600,
+                    "distanceRoundLapStart": 6670,
                     "distanceRoundLapEnd": 6800,
                     "isCommonOvertakingSpot": true
                 }
@@ -521,62 +521,62 @@
             "trackLandmarks": [
                 {
                     "landmarkName": "tarzanbocht",
-                    "distanceRoundLapStart": 300,
-                    "distanceRoundLapEnd": 540,
+                    "distanceRoundLapStart": 370,
+                    "distanceRoundLapEnd": 510
                     "isCommonOvertakingSpot": true
                 },
                 {
                     "landmarkName": "turn2",
-                    "distanceRoundLapStart": 750,
-                    "distanceRoundLapEnd": 820,
+                    "distanceRoundLapStart": 720,
+                    "distanceRoundLapEnd": 780,
                     "isCommonOvertakingSpot": false
                 },
                 {
                     "landmarkName": "hugenholtz",
                     "distanceRoundLapStart": 860,
-                    "distanceRoundLapEnd": 1030,
+                    "distanceRoundLapEnd": 970,
                     "isCommonOvertakingSpot": true
                 },
                 {
                     "landmarkName": "turn7",
-                    "distanceRoundLapStart": 1680,
+                    "distanceRoundLapStart": 1660,
                     "distanceRoundLapEnd": 1970,
                     "isCommonOvertakingSpot": false
                 },
                 {
                     "landmarkName": "turn8",
                     "distanceRoundLapStart": 2040,
-                    "distanceRoundLapEnd": 2240,
+                    "distanceRoundLapEnd": 2150,
                     "isCommonOvertakingSpot": false
                 },
                 {
                     "landmarkName": "turn9",
-                    "distanceRoundLapStart": 2260,
-                    "distanceRoundLapEnd": 2490,
+                    "distanceRoundLapStart": 2280,
+                    "distanceRoundLapEnd": 2390,
                     "isCommonOvertakingSpot": true
                 },
 				{
                     "landmarkName": "turn10",
-                    "distanceRoundLapStart": 2550,
-                    "distanceRoundLapEnd": 2720,
+                    "distanceRoundLapStart": 2520,
+                    "distanceRoundLapEnd": 2650,
                     "isCommonOvertakingSpot": true
                 },
                 {
                     "landmarkName": "the_chicane",
                     "distanceRoundLapStart": 3100,
-                    "distanceRoundLapEnd": 3350,
+                    "distanceRoundLapEnd": 3250,
                     "isCommonOvertakingSpot": true
                 },
                 {
                     "landmarkName": "turn12",
-                    "distanceRoundLapStart": 3550,
-                    "distanceRoundLapEnd": 3710,
+                    "distanceRoundLapStart": 3480,
+                    "distanceRoundLapEnd": 3590,
                     "isCommonOvertakingSpot": true
                 }
                 {
                     "landmarkName": "turn13",
-                    "distanceRoundLapStart": 3780,
-                    "distanceRoundLapEnd": 4050,
+                    "distanceRoundLapStart": 3720,
+                    "distanceRoundLapEnd": 3940,
                     "isCommonOvertakingSpot": false
                 }
             ]
