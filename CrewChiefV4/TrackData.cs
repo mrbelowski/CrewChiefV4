@@ -61,6 +61,7 @@ namespace CrewChiefV4
                             {
                                 if (String.Equals(acTrackName, trackName, StringComparison.OrdinalIgnoreCase))
                                 {
+                                    Console.WriteLine(trackLandmarksForTrack.trackLandmarks.Count + " landmarks defined for this track");
                                     return trackLandmarksForTrack.trackLandmarks;
                                 }
                             }
@@ -71,6 +72,7 @@ namespace CrewChiefV4
                     case GameEnum.PCARS_NETWORK:
                         if (String.Equals(trackLandmarksForTrack.pcarsTrackName, trackName, StringComparison.OrdinalIgnoreCase))
                         {
+                            Console.WriteLine(trackLandmarksForTrack.trackLandmarks.Count + " landmarks defined for this track");
                             return trackLandmarksForTrack.trackLandmarks;
                         }
                         break;
@@ -81,6 +83,7 @@ namespace CrewChiefV4
                             {
                                 if (String.Equals(rf1TrackName, trackName, StringComparison.OrdinalIgnoreCase))
                                 {
+                                    Console.WriteLine(trackLandmarksForTrack.trackLandmarks.Count + " landmarks defined for this track");
                                     return trackLandmarksForTrack.trackLandmarks;
                                 }
                             }
@@ -93,6 +96,7 @@ namespace CrewChiefV4
                             {
                                 if (String.Equals(rf2TrackName, trackName, StringComparison.OrdinalIgnoreCase))
                                 {
+                                    Console.WriteLine(trackLandmarksForTrack.trackLandmarks.Count + " landmarks defined for this track");
                                     return trackLandmarksForTrack.trackLandmarks;
                                 }
                             }
@@ -102,6 +106,7 @@ namespace CrewChiefV4
                         break;
                 }
             }
+            Console.WriteLine("No landmarks defined for this track");
             return new List<TrackLandmark>();
         }
 

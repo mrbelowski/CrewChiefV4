@@ -1070,7 +1070,7 @@ namespace CrewChiefV4.assetto
                 currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass = -1;
                 currentGameState.SessionData.OverallSessionBestLapTime = -1;
                 currentGameState.SessionData.PlayerClassSessionBestLapTime = -1;
-
+                currentGameState.SessionData.TrackDefinition.trackLandmarks = TrackData.TRACK_LANDMARKS_DATA.getTrackLandmarksForTrackName(currentGameState.SessionData.TrackDefinition.name);
                 currentGameState.SessionData.TrackDefinition.setGapPoints();
 
                 playerSplits.setSplitPoints(shared.acsStatic.trackSPlineLength);
