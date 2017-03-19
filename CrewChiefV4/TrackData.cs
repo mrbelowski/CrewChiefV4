@@ -59,7 +59,7 @@ namespace CrewChiefV4
                         {
                             foreach (String acTrackName in trackLandmarksForTrack.acTrackNames)
                             {
-                                if (acTrackName.Equals(trackName))
+                                if (String.Equals(acTrackName, trackName, StringComparison.OrdinalIgnoreCase))
                                 {
                                     return trackLandmarksForTrack.trackLandmarks;
                                 }
@@ -69,7 +69,7 @@ namespace CrewChiefV4
                     case GameEnum.PCARS_32BIT:
                     case GameEnum.PCARS_64BIT:
                     case GameEnum.PCARS_NETWORK:
-                        if (String.Equals(trackLandmarksForTrack.pcarsTrackName,trackName))
+                        if (String.Equals(trackLandmarksForTrack.pcarsTrackName, trackName, StringComparison.OrdinalIgnoreCase))
                         {
                             return trackLandmarksForTrack.trackLandmarks;
                         }
@@ -79,7 +79,7 @@ namespace CrewChiefV4
                         {
                             foreach (String rf1TrackName in trackLandmarksForTrack.rf1TrackNames)
                             {
-                                if (rf1TrackName.Equals(trackName))
+                                if (String.Equals(rf1TrackName, trackName, StringComparison.OrdinalIgnoreCase))
                                 {
                                     return trackLandmarksForTrack.trackLandmarks;
                                 }
@@ -91,7 +91,7 @@ namespace CrewChiefV4
                         {
                             foreach (String rf2TrackName in trackLandmarksForTrack.rf2TrackNames)
                             {
-                                if (rf2TrackName.Equals(trackName))
+                                if (String.Equals(rf2TrackName, trackName, StringComparison.OrdinalIgnoreCase))
                                 {
                                     return trackLandmarksForTrack.trackLandmarks;
                                 }
