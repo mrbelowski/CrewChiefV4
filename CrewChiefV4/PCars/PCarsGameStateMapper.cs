@@ -364,8 +364,6 @@ namespace CrewChiefV4.PCars
                         
             currentGameState.SessionData.TrackDefinition = TrackData.getTrackDefinition(StructHelper.getNameFromBytes(shared.mTrackLocation)
                 + ":" + StructHelper.getNameFromBytes(shared.mTrackVariation), -1, shared.mTrackLength);
-            currentGameState.SessionData.TrackDefinition.trackLandmarks = TrackData.TRACK_LANDMARKS_DATA.getTrackLandmarksForTrackName(currentGameState.SessionData.TrackDefinition.name);
-
 
             // now check if this is a new session...
 
@@ -442,6 +440,7 @@ namespace CrewChiefV4.PCars
                 currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass = -1;
                 currentGameState.SessionData.OverallSessionBestLapTime = -1;
                 currentGameState.SessionData.PlayerClassSessionBestLapTime = -1;
+                currentGameState.SessionData.TrackDefinition.trackLandmarks = TrackData.TRACK_LANDMARKS_DATA.getTrackLandmarksForTrackName(currentGameState.SessionData.TrackDefinition.name);
                 currentGameState.SessionData.TrackDefinition.setGapPoints();
             }
             else
@@ -468,6 +467,7 @@ namespace CrewChiefV4.PCars
                         currentGameState.SessionData.NumCarsAtStartOfSession = shared.mNumParticipants;
                         currentGameState.SessionData.TrackDefinition = TrackData.getTrackDefinition(StructHelper.getNameFromBytes(shared.mTrackLocation) + ":" +
                             StructHelper.getNameFromBytes(shared.mTrackVariation), -1, shared.mTrackLength);
+                        currentGameState.SessionData.TrackDefinition.trackLandmarks = TrackData.TRACK_LANDMARKS_DATA.getTrackLandmarksForTrackName(currentGameState.SessionData.TrackDefinition.name);
                         currentGameState.SessionData.TrackDefinition.setGapPoints();
 
                         String carClassId = StructHelper.getNameFromBytes(shared.mCarClassName);

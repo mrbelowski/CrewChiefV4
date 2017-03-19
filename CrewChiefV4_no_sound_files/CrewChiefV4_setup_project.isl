@@ -1908,7 +1908,7 @@
 		<row><td>sharpdx_licence.txt</td><td>ISX_DEFAULTCOMPONENT</td><td>SHARPD~1.TXT|SharpDX_licence.txt</td><td>0</td><td/><td/><td/><td>1</td><td>C:\projects\crewchief_c_sharp\CrewChiefV4\SharpDX_licence.txt</td><td>1</td><td/></row>
 		<row><td>sounds_config.txt</td><td>ISX_DEFAULTCOMPONENT</td><td>SOUNDS~1.TXT|sounds_config.txt</td><td>0</td><td/><td/><td/><td>1</td><td>C:\projects\crewchief_c_sharp\CrewChiefV4\CrewChiefV4\sounds_config.txt</td><td>1</td><td/></row>
 		<row><td>speech_recognition_config.tx</td><td>ISX_DEFAULTCOMPONENT</td><td>SPEECH~1.TXT|speech_recognition_config.txt</td><td>0</td><td/><td/><td/><td>1</td><td>C:\projects\crewchief_c_sharp\CrewChiefV4\CrewChiefV4\speech_recognition_config.txt</td><td>1</td><td/></row>
-		<row><td>trackdata.cs</td><td>ISX_DEFAULTCOMPONENT</td><td>TRACKD~1.CS|TrackData.cs</td><td>0</td><td/><td/><td/><td>1</td><td>C:\projects\crewchief_c_sharp\CrewChiefV4\CrewChiefV4\TrackData.cs</td><td>1</td><td/></row>
+		<row><td>tracklandmarksdata.json</td><td>ISX_DEFAULTCOMPONENT</td><td>TRACKL~1.JSO|trackLandmarksData.json</td><td>0</td><td/><td/><td/><td>1</td><td>C:\projects\crewchief_c_sharp\CrewChiefV4\CrewChiefV4\trackLandmarksData.json</td><td>1</td><td/></row>
 		<row><td>ui_text.txt</td><td>ISX_DEFAULTCOMPONENT</td><td>ui_text.txt</td><td>0</td><td/><td/><td/><td>1</td><td>C:\projects\crewchief_c_sharp\CrewChiefV4\CrewChiefV4\ui_text.txt</td><td>1</td><td/></row>
 	</table>
 
@@ -4407,7 +4407,7 @@ RABWAEQALQA1AAEARQB4AHAAcgBlAHMAcwA=
 		<row><td>PROGMSG_IIS_ROLLBACKVROOTS</td><td>##IDS_PROGMSG_IIS_ROLLBACKVROOTS##</td><td/></row>
 		<row><td>PROGMSG_IIS_ROLLBACKWEBSERVICEEXTENSIONS</td><td>##IDS_PROGMSG_IIS_ROLLBACKWEBSERVICEEXTENSIONS##</td><td/></row>
 		<row><td>PROGRAMFILETOLAUNCHATEND</td><td>[INSTALLDIR]CrewChiefV4.Primary output</td><td/></row>
-		<row><td>ProductCode</td><td>{C9A25280-4995-4A73-9E40-2C48C002A23E}</td><td/></row>
+		<row><td>ProductCode</td><td>{EB4D0D2A-C446-4B61-A47D-403A68C4FDD1}</td><td/></row>
 		<row><td>ProductName</td><td>CrewChiefV4</td><td/></row>
 		<row><td>ProductVersion</td><td>4.6.2.8</td><td/></row>
 		<row><td>ProgressType0</td><td>install</td><td/></row>

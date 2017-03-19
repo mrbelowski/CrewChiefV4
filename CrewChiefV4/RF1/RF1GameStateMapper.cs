@@ -208,6 +208,11 @@ namespace CrewChiefV4.rFactor1
             brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(currentGameState.carClass);
             currentGameState.SessionData.DriverRawName = getNameFromBytes(player.driverName).ToLower();
             currentGameState.SessionData.TrackDefinition = new TrackDefinition(getNameFromBytes(shared.trackName), shared.lapDist);
+            if (previousGameState == null || previousGameState.SessionData.TrackDefinition.name != currentGameState.SessionData.TrackDefinition.name)
+            {
+                currentGameState.SessionData.TrackDefinition.trackLandmarks = TrackData.TRACK_LANDMARKS_DATA.getTrackLandmarksForTrackName(currentGameState.SessionData.TrackDefinition.name);
+                currentGameState.SessionData.TrackDefinition.setGapPoints();
+            }
             currentGameState.SessionData.TrackDefinition.trackLandmarks = TrackData.TRACK_LANDMARKS_DATA.getTrackLandmarksForTrackName(currentGameState.SessionData.TrackDefinition.name);
             currentGameState.SessionData.TrackDefinition.setGapPoints();
             currentGameState.SessionData.SessionNumberOfLaps = shared.maxLaps > 0 && shared.maxLaps < 1000 ? shared.maxLaps : 0;
