@@ -8,7 +8,7 @@ For support and discussions about Crew Chief we have our very own forum here: ht
 
 Changelog
 ---------
-Version 4.6.2.7: (readme still todo) - Added corner names to some calls on some tracks; bugfixes and awesomerisations; Added better reporting of yellow flags for AMS, RF2 and R3E (R3E support coming soon) - the app will sometimes tell you who's involved in the incident and what corner the incident is in; added simple incident reporting for known corners in R3E, AC and PCars; some WIP addons for corner-specific brake locking and wheel spinning warnings
+Version 4.6.2.8: (readme still todo) - Added corner names to some calls on some tracks; bugfixes and awesomerisations; Added better reporting of yellow flags for AMS, RF2 and R3E (R3E support coming soon) - the app will sometimes tell you who's involved in the incident and what corner the incident is in; added simple incident reporting for known corners in R3E, AC and PCars; some WIP addons for corner-specific brake locking and wheel spinning warnings
 
 Version 4.6.1.5: Fixed AMS multi-class support and added some AMS car classes; Corrected AMS session end logic - should prevent session end messages playing until you complete your lap; Reworked AMS opponent lap time handlingdon't play 'chequered flag' message in race sessions; fixed messages not playing in unlimited timed sessions; some bug fixes
 
