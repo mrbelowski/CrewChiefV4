@@ -116,6 +116,7 @@ namespace CrewChiefV4
             {
                 if (trackLandmarksForTrack.raceroomLayoutId == raceroomLayoutId)
                 {
+                    Console.WriteLine(trackLandmarksForTrack.trackLandmarks.Count + " landmarks defined for this track");
                     return trackLandmarksForTrack.trackLandmarks;
                 }
             }
