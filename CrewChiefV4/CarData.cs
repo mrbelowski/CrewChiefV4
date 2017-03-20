@@ -218,7 +218,7 @@ namespace CrewChiefV4
                 this.defaultTyreType = TyreType.Unknown_Race;
                 this.maxSafeWaterTemp = 105;
                 this.maxSafeOilTemp = 125;
-                this.minTyreCircumference = 0.4f * (float)Math.PI;
+                this.minTyreCircumference = 0.5f * (float)Math.PI;
                 this.maxTyreCircumference = 1.2f * (float)Math.PI;
             }
 

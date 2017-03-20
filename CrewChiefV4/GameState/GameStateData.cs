@@ -276,6 +276,8 @@ namespace CrewChiefV4.GameState
         // Player lap times with sector information
         public List<LapData> PlayerLapData = new List<LapData>();
 
+        public String stoppedInLandmark = null;
+
         public SessionData()
         {
             SessionTimesAtEndOfSectors.Add(1, -1);
@@ -919,8 +921,8 @@ namespace CrewChiefV4.GameState
             {
                 if (biggestTimeDifferenceLandmark != null && biggestStartSpeedDifferenceLandmark != null)
                 {
-                    // which to choose?? If the entry speed delta > 5m/s choose that
-                    if (biggestStartSpeedDifference > 5)
+                    // which to choose?? If the entry speed delta > minSignificantRelativeTimeDiffOvertakingSpot
+                    if (biggestStartSpeedDifference > minSignificantRelativeTimeDiffOvertakingSpot)
                     {
                         Console.WriteLine("Biggest speed delta into " + biggestStartSpeedDifferenceLandmark + ": " + biggestStartSpeedDifference * 100 + "% difference");
                         return new LandmarkAndDeltaType(DeltaType.EntrySpeed, biggestStartSpeedDifferenceLandmark);
@@ -952,10 +954,12 @@ namespace CrewChiefV4.GameState
 
         // don't count time differences shorter than these - no point in being told to defend into a corner when
         // the other guys is only 0.01 seconds faster through that corner
-        private static float minSignificantRelativeTimeDifference = 0.1f;    // 10% - is this a good value?
-        private static float minSignificantRelativeStartSpeedDifference = 0.1f;   // 10% - is this a good value?
-
-        
+        // These are used when we're checking time / speed difference at common overtaking spots
+        private static float minSignificantRelativeTimeDiffOvertakingSpot = 0.05f;    // 5% - is this a good value?
+        private static float minSignificantRelativeStartSpeedDiffOvertakingSpot = 0.07f;   // 7% - is this a good value? 
+        // these are used when we're checking time / speed difference at places where overtaking is rare, so need to be bigger 
+        private static float minSignificantRelativeTimeDiff = 0.08f;    // 8% - is this a good value?
+        private static float minSignificantRelativeStartSpeedDiff = 0.1f;   // 10% - is this a good value? 
 
         private Dictionary<string, TrackLandmarksTimingData> sessionData = new Dictionary<string, TrackLandmarksTimingData>();
 
@@ -966,6 +970,9 @@ namespace CrewChiefV4.GameState
         private float landmarkStartSpeed = -1;
         private int landmarkStoppedCount = 0;
         private Boolean inLandmark = false;
+
+        // quick n dirty tracking of when we're at the mid-point of a landmark - maybe the apex. This is only non-null for a single tick.
+        public String atMidPointOfLandmark = null;
 
         private void addTimeAndSpeeds(String landmarkName, float time, float startSpeed, float endSpeed, Boolean isCommonOvertakingSpot)
         {
@@ -1046,6 +1053,9 @@ namespace CrewChiefV4.GameState
                 TrackLandmarksTimingData thisTiming = entry.Value;
                 if (!preferCommonOvertakingSpots || thisTiming.isCommonOvertakingSpot)
                 {
+                    float minSignificantRelativeTimeDiffToUse = thisTiming.isCommonOvertakingSpot ? minSignificantRelativeTimeDiffOvertakingSpot : minSignificantRelativeTimeDiff;
+                    float minSignificantRelativeStartSpeedDiffToUse = thisTiming.isCommonOvertakingSpot ? minSignificantRelativeStartSpeedDiffOvertakingSpot : minSignificantRelativeStartSpeedDiff;
+
                     float[] myBestTimeAndSpeeds = getBestTimeAndSpeeds(landmarkName);
                     float[] otherBestTimeAndSpeeds = otherVehicleTrackLandMarksTiming.getBestTimeAndSpeeds(landmarkName);
                     // for times, other - mine if we want sections where I'm faster (more positive => better), 
@@ -1057,7 +1067,7 @@ namespace CrewChiefV4.GameState
                     float relativeStartSpeedDelta = whereImFaster ? (myBestTimeAndSpeeds[1] - otherBestTimeAndSpeeds[1]) / myBestTimeAndSpeeds[1] :
                                                             (otherBestTimeAndSpeeds[1] - myBestTimeAndSpeeds[1]) / myBestTimeAndSpeeds[1];
                     // Console.WriteLine(landmarkName + " entry diff = " + relativeStartSpeedDelta + " through diff = " + relativeTimeDelta);
-                    if (relativeTimeDelta >= minSignificantRelativeTimeDifference && relativeTimeDelta > biggestTimeDifference)
+                    if (relativeTimeDelta >= minSignificantRelativeTimeDiffToUse && relativeTimeDelta > biggestTimeDifference)
                     {
                         // this is the biggest (so far) relative time difference
                         biggestTimeDifference = relativeTimeDelta;
@@ -1066,7 +1076,7 @@ namespace CrewChiefV4.GameState
 
                     // additional check here - compare the entry speeds but only if the total speed through this section is no worse than our opponent
                     // - there's no point in barrelling in and ballsing up the exit
-                    if (relativeStartSpeedDelta > minSignificantRelativeStartSpeedDifference && relativeStartSpeedDelta > biggestStartSpeedDifference &&
+                    if (relativeStartSpeedDelta > minSignificantRelativeStartSpeedDiffToUse && relativeStartSpeedDelta > biggestStartSpeedDifference &&
                         relativeTimeDelta > 0)
                     {
                         // this is the biggest (so far) relative speed difference
@@ -1088,6 +1098,8 @@ namespace CrewChiefV4.GameState
 		    if (trackLandmarks == null || trackLandmarks.Count == 0) {
 			    return null;
 		    }
+            // yuk...
+            atMidPointOfLandmark = null;
 		    if (landmarkNameStart == null) {
 			    // looking for landmark start only
 			    foreach (TrackLandmark trackLandmark in trackLandmarks) {
@@ -1115,12 +1127,16 @@ namespace CrewChiefV4.GameState
                     if (currentDistanceRoundTrack > trackLandmark.distanceRoundLapStart && currentDistanceRoundTrack < trackLandmark.distanceRoundLapEnd &&
                         speed < 5)
                     {
-                        landmarkStoppedCount++;
+                        landmarkStoppedCount++;                        
                     }
-                    if (previousDistanceRoundTrack < trackLandmark.distanceRoundLapEnd && currentDistanceRoundTrack >= trackLandmark.distanceRoundLapEnd) 
-				    {
+                    if (previousDistanceRoundTrack < trackLandmark.getMidPoint() && currentDistanceRoundTrack >= trackLandmark.getMidPoint())
+                    {
+                        atMidPointOfLandmark = trackLandmark.landmarkName;
+                    }
+                    if (previousDistanceRoundTrack < trackLandmark.distanceRoundLapEnd && currentDistanceRoundTrack >= trackLandmark.distanceRoundLapEnd)
+                    {
                         // reached the end of a landmark section, update the timing if it's the landmark we're expecting and we're actually close to the endpoint
-                        if (trackLandmark.landmarkName.Equals(landmarkNameStart) && 
+                        if (trackLandmark.landmarkName.Equals(landmarkNameStart) &&
                             currentDistanceRoundTrack - 20 < trackLandmark.distanceRoundLapEnd && currentDistanceRoundTrack + 20 > trackLandmark.distanceRoundLapEnd)
                         {
                             // only save the timing if we're near the landmark end point
@@ -1128,11 +1144,11 @@ namespace CrewChiefV4.GameState
                             float error = speed > 0 && speed < 120 ? (currentDistanceRoundTrack - trackLandmark.distanceRoundLapEnd) / speed : 0;
                             addTimeAndSpeeds(landmarkNameStart, (gameTime - error) - landmarkStartTime, landmarkStartSpeed, speed, trackLandmark.isCommonOvertakingSpot);
                         }
-					    landmarkNameStart = null;
-					    landmarkStartTime = -1;
+                        landmarkNameStart = null;
+                        landmarkStartTime = -1;
                         inLandmark = false;
-					    break;
-				    }		
+                        break;
+                    }	
 			    }
 		    }
             if (inLandmark && landmarkStoppedCount >= 10)

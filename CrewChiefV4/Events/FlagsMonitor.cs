@@ -410,7 +410,7 @@ namespace CrewChiefV4.Events
                 foreach (OpponentData opponent in currentGameState.OpponentData.Values)
                 {
                     String landmark = opponent.stoppedInLandmark;
-                    if (landmark != null)
+                    if (landmark != null && !landmark.Equals(currentGameState.SessionData.stoppedInLandmark))
                     {
                         Boolean canPlay = false;
                         if (!incidentWarnings.ContainsKey(landmark))

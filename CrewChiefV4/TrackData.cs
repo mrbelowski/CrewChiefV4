@@ -13,6 +13,16 @@ namespace CrewChiefV4
         public float distanceRoundLapStart { get; set; }
         public float distanceRoundLapEnd { get; set; }
         public Boolean isCommonOvertakingSpot { get; set; }
+        public float midPoint = -1;
+
+        public float getMidPoint()
+        {
+            if (midPoint == -1)
+            {
+                midPoint = distanceRoundLapStart + ((distanceRoundLapEnd - distanceRoundLapStart) / 2);
+            }
+            return midPoint;
+        }
     }
 
     public class TrackLandmarksForTrack
@@ -49,8 +59,9 @@ namespace CrewChiefV4
                         {
                             foreach (String acTrackName in trackLandmarksForTrack.acTrackNames)
                             {
-                                if (acTrackName.Equals(trackName))
+                                if (String.Equals(acTrackName, trackName, StringComparison.OrdinalIgnoreCase))
                                 {
+                                    Console.WriteLine(trackLandmarksForTrack.trackLandmarks.Count + " landmarks defined for this track");
                                     return trackLandmarksForTrack.trackLandmarks;
                                 }
                             }
@@ -59,8 +70,9 @@ namespace CrewChiefV4
                     case GameEnum.PCARS_32BIT:
                     case GameEnum.PCARS_64BIT:
                     case GameEnum.PCARS_NETWORK:
-                        if (trackLandmarksForTrack.pcarsTrackName.Equals(trackName))
+                        if (String.Equals(trackLandmarksForTrack.pcarsTrackName, trackName, StringComparison.OrdinalIgnoreCase))
                         {
+                            Console.WriteLine(trackLandmarksForTrack.trackLandmarks.Count + " landmarks defined for this track");
                             return trackLandmarksForTrack.trackLandmarks;
                         }
                         break;
@@ -69,8 +81,9 @@ namespace CrewChiefV4
                         {
                             foreach (String rf1TrackName in trackLandmarksForTrack.rf1TrackNames)
                             {
-                                if (rf1TrackName.Equals(trackName))
+                                if (String.Equals(rf1TrackName, trackName, StringComparison.OrdinalIgnoreCase))
                                 {
+                                    Console.WriteLine(trackLandmarksForTrack.trackLandmarks.Count + " landmarks defined for this track");
                                     return trackLandmarksForTrack.trackLandmarks;
                                 }
                             }
@@ -81,8 +94,9 @@ namespace CrewChiefV4
                         {
                             foreach (String rf2TrackName in trackLandmarksForTrack.rf2TrackNames)
                             {
-                                if (rf2TrackName.Equals(trackName))
+                                if (String.Equals(rf2TrackName, trackName, StringComparison.OrdinalIgnoreCase))
                                 {
+                                    Console.WriteLine(trackLandmarksForTrack.trackLandmarks.Count + " landmarks defined for this track");
                                     return trackLandmarksForTrack.trackLandmarks;
                                 }
                             }
@@ -92,6 +106,7 @@ namespace CrewChiefV4
                         break;
                 }
             }
+            Console.WriteLine("No landmarks defined for this track");
             return new List<TrackLandmark>();
         }
 
@@ -101,6 +116,7 @@ namespace CrewChiefV4
             {
                 if (trackLandmarksForTrack.raceroomLayoutId == raceroomLayoutId)
                 {
+                    Console.WriteLine(trackLandmarksForTrack.trackLandmarks.Count + " landmarks defined for this track");
                     return trackLandmarksForTrack.trackLandmarks;
                 }
             }

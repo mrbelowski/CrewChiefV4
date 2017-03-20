@@ -364,8 +364,6 @@ namespace CrewChiefV4.PCars
                         
             currentGameState.SessionData.TrackDefinition = TrackData.getTrackDefinition(StructHelper.getNameFromBytes(shared.mTrackLocation)
                 + ":" + StructHelper.getNameFromBytes(shared.mTrackVariation), -1, shared.mTrackLength);
-            currentGameState.SessionData.TrackDefinition.trackLandmarks = TrackData.TRACK_LANDMARKS_DATA.getTrackLandmarksForTrackName(currentGameState.SessionData.TrackDefinition.name);
-
 
             // now check if this is a new session...
 
@@ -442,6 +440,7 @@ namespace CrewChiefV4.PCars
                 currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass = -1;
                 currentGameState.SessionData.OverallSessionBestLapTime = -1;
                 currentGameState.SessionData.PlayerClassSessionBestLapTime = -1;
+                currentGameState.SessionData.TrackDefinition.trackLandmarks = TrackData.TRACK_LANDMARKS_DATA.getTrackLandmarksForTrackName(currentGameState.SessionData.TrackDefinition.name);
                 currentGameState.SessionData.TrackDefinition.setGapPoints();
             }
             else
@@ -468,6 +467,7 @@ namespace CrewChiefV4.PCars
                         currentGameState.SessionData.NumCarsAtStartOfSession = shared.mNumParticipants;
                         currentGameState.SessionData.TrackDefinition = TrackData.getTrackDefinition(StructHelper.getNameFromBytes(shared.mTrackLocation) + ":" +
                             StructHelper.getNameFromBytes(shared.mTrackVariation), -1, shared.mTrackLength);
+                        currentGameState.SessionData.TrackDefinition.trackLandmarks = TrackData.TRACK_LANDMARKS_DATA.getTrackLandmarksForTrackName(currentGameState.SessionData.TrackDefinition.name);
                         currentGameState.SessionData.TrackDefinition.setGapPoints();
 
                         String carClassId = StructHelper.getNameFromBytes(shared.mCarClassName);
@@ -634,11 +634,17 @@ namespace CrewChiefV4.PCars
                 shared.mSessionState == (int)eSessionState.SESSION_TEST || shared.mSessionState == (int)eSessionState.SESSION_TIME_ATTACK) 
                 && previousGameState.SessionData.LapTimeCurrent == -1 && shared.mCurrentTime > 0);
 
+            currentGameState.PitData.InPitlane = shared.mPitMode == (int)ePitMode.PIT_MODE_DRIVING_INTO_PITS ||
+                shared.mPitMode == (int)ePitMode.PIT_MODE_IN_PIT ||
+                shared.mPitMode == (int)ePitMode.PIT_MODE_DRIVING_OUT_OF_PITS ||
+                shared.mPitMode == (int)ePitMode.PIT_MODE_IN_GARAGE;
+
             if (previousGameState != null)
             {
-                currentGameState.SessionData.trackLandmarksTiming.updateLandmarkTiming(currentGameState.SessionData.TrackDefinition.trackLandmarks,
+                String stoppedInLandmark = currentGameState.SessionData.trackLandmarksTiming.updateLandmarkTiming(currentGameState.SessionData.TrackDefinition.trackLandmarks,
                     currentGameState.SessionData.SessionRunningTime, previousGameState.PositionAndMotionData.DistanceRoundTrack, 
                     currentGameState.PositionAndMotionData.DistanceRoundTrack, shared.mSpeed);
+                currentGameState.SessionData.stoppedInLandmark = currentGameState.PitData.InPitlane ? null : stoppedInLandmark;
                 if (currentGameState.SessionData.IsNewLap)
                 {
                     currentGameState.SessionData.trackLandmarksTiming.cancelWaitingForLandmarkEnd();
@@ -789,9 +795,10 @@ namespace CrewChiefV4.PCars
                                     if (previousOpponentData != null)
                                     {
                                         currentOpponentData.trackLandmarksTiming = previousOpponentData.trackLandmarksTiming;
-                                        currentOpponentData.stoppedInLandmark = currentOpponentData.trackLandmarksTiming.updateLandmarkTiming(
+                                        String stoppedInLandmark = currentOpponentData.trackLandmarksTiming.updateLandmarkTiming(
                                             currentGameState.SessionData.TrackDefinition.trackLandmarks, currentGameState.SessionData.SessionRunningTime,
                                             previousDistanceRoundTrack, currentOpponentData.DistanceRoundTrack, currentOpponentData.Speed);
+                                        currentOpponentData.stoppedInLandmark = currentOpponentData.InPits ? null : stoppedInLandmark;
                                     }
                                     if (justGoneGreen)
                                     {
@@ -897,11 +904,6 @@ namespace CrewChiefV4.PCars
                     }
                 }
             }
-
-            currentGameState.PitData.InPitlane = shared.mPitMode == (int)ePitMode.PIT_MODE_DRIVING_INTO_PITS ||
-                shared.mPitMode == (int)ePitMode.PIT_MODE_IN_PIT ||
-                shared.mPitMode == (int)ePitMode.PIT_MODE_DRIVING_OUT_OF_PITS ||
-                shared.mPitMode == (int)ePitMode.PIT_MODE_IN_GARAGE;
 
             if (currentGameState.PitData.InPitlane)
             {
