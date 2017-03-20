@@ -80,7 +80,7 @@
         {
             "carClassEnum": "GTE",
             "pCarsClassNames": [ "*GTE*" ],
-            "rf2ClassNames": [ "*GTE*" ],
+            "rf2ClassNames": [ "*GTE*", "URD_EGT_Darche", "URD_EGT_AM", "URD_EGT_Bayro", "URD_EGT_Ferruccio", "URD_EGT_Venom", "URD_EGT_C7R" ],
             "acClassNames": [ "ks_lamborghini_huracan_st", "ks_glickenhaus_scg003", "*GTE*" ],
             "brakeType": "Ceramic"
         },
