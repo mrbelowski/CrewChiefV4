@@ -220,10 +220,12 @@ namespace CrewChiefV4.Events
             if (!currentGameState.SessionData.IsRacingSameCarInFront)
             {
                 gapsInFront.Clear();
+                gapInFrontAtLastReport = -1;
             }
             if (!currentGameState.SessionData.IsRacingSameCarBehind)
             {
                 gapsBehind.Clear();
+                gapBehindAtLastReport = -1;
             }
             if (!currentGameState.PitData.InPitlane && enableGapMessages)
             {
