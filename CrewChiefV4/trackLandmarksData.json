@@ -3,9 +3,78 @@
         {
             "rf1TrackNames": [ "Bathurst Mount Panorama" ],
             "rf2TrackNames": [ "Bathurst" ],            
-            "acTrackNames": [ "acu_bathurst:" ],
             "pcarsTrackName": "Bathurst:",
             "raceroomLayoutId": 1846,
+            "trackLandmarks": [
+                {
+                    "landmarkName": "hell_corner",
+                    "distanceRoundLapStart": 210,
+                    "distanceRoundLapEnd": 310,
+                    "isCommonOvertakingSpot": true
+                },
+				{
+                    "landmarkName": "griffins_bend",
+                    "distanceRoundLapStart": 1300,
+                    "distanceRoundLapEnd": 1490,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "the_cutting",
+                    "distanceRoundLapStart": 1710,
+                    "distanceRoundLapEnd": 1910,
+                    "isCommonOvertakingSpot": true
+                },
+				{
+                    "landmarkName": "quarry",
+                    "distanceRoundLapStart": 2110,
+                    "distanceRoundLapEnd": 2230,
+                    "isCommonOvertakingSpot": fals
+                },
+				{
+                    "landmarkName": "mcphillamy_park",
+                    "distanceRoundLapStart": 2750,
+                    "distanceRoundLapEnd": 2950,
+                    "isCommonOvertakingSpot": false
+                },
+				{
+                    "landmarkName": "skyline",
+                    "distanceRoundLapStart": 3100,
+                    "distanceRoundLapEnd": 3160,
+                    "isCommonOvertakingSpot": true
+                },
+				{
+                    "landmarkName": "the_esses",
+                    "distanceRoundLapStart": 3230,
+                    "distanceRoundLapEnd": 3310,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "the_dipper",
+                    "distanceRoundLapStart": 3360,
+                    "distanceRoundLapEnd": 3450,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "forrests_elbow",
+                    "distanceRoundLapStart": 3690,
+                    "distanceRoundLapEnd": 3800,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "the_chase",
+                    "distanceRoundLapStart": 5030,
+                    "distanceRoundLapEnd": 5510,
+                    "isCommonOvertakingSpot": true
+                },
+				{
+                    "landmarkName": "murrays_corner",
+                    "distanceRoundLapStart": 5880,
+                    "distanceRoundLapEnd": 5970,
+                    "isCommonOvertakingSpot": true
+                }
+            ]
+        },{
+            "acTrackNames": [ "acu_bathurst:" ],
             "trackLandmarks": [
                 {
                     "landmarkName": "hell_corner",
@@ -29,13 +98,13 @@
                     "landmarkName": "quarry",
                     "distanceRoundLapStart": 2250,
                     "distanceRoundLapEnd": 2420,
-                    "isCommonOvertakingSpot": true
+                    "isCommonOvertakingSpot": false
                 },
 				{
                     "landmarkName": "mcphillamy_park",
                     "distanceRoundLapStart": 2900,
                     "distanceRoundLapEnd": 3100,
-                    "isCommonOvertakingSpot": true
+                    "isCommonOvertakingSpot": false
                 },
 				{
                     "landmarkName": "skyline",
@@ -47,7 +116,7 @@
                     "landmarkName": "the_esses",
                     "distanceRoundLapStart": 3280,
                     "distanceRoundLapEnd": 3380,
-                    "isCommonOvertakingSpot": true
+                    "isCommonOvertakingSpot": false
                 },
                 {
                     "landmarkName": "the_dipper",
