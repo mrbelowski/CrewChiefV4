@@ -208,7 +208,11 @@ namespace CrewChiefV4.rFactor1
             brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(currentGameState.carClass);
             currentGameState.SessionData.DriverRawName = getNameFromBytes(player.driverName).ToLower();
             currentGameState.SessionData.TrackDefinition = new TrackDefinition(getNameFromBytes(shared.trackName), shared.lapDist);
-            currentGameState.SessionData.TrackDefinition.trackLandmarks = TrackData.TRACK_LANDMARKS_DATA.getTrackLandmarksForTrackName(currentGameState.SessionData.TrackDefinition.name);
+            if (previousGameState == null || previousGameState.SessionData.TrackDefinition.name != currentGameState.SessionData.TrackDefinition.name)
+            {
+                currentGameState.SessionData.TrackDefinition.trackLandmarks = TrackData.TRACK_LANDMARKS_DATA.getTrackLandmarksForTrackName(currentGameState.SessionData.TrackDefinition.name);
+                currentGameState.SessionData.TrackDefinition.setGapPoints();
+            }
             currentGameState.SessionData.TrackDefinition.setGapPoints();
             currentGameState.SessionData.SessionNumberOfLaps = shared.maxLaps > 0 && shared.maxLaps < 1000 ? shared.maxLaps : 0;
             // default to 60:30 if both session time and number of laps undefined (test day)
@@ -255,7 +259,7 @@ namespace CrewChiefV4.rFactor1
             currentGameState.SessionData.IsNewLap = currentGameState.SessionData.IsNewSession || (currentGameState.SessionData.IsNewSector && currentGameState.SessionData.SectorNumber == 1);
             currentGameState.SessionData.PositionAtStartOfCurrentLap = currentGameState.SessionData.IsNewLap ? currentGameState.SessionData.Position : previousGameState.SessionData.PositionAtStartOfCurrentLap;
             currentGameState.SessionData.IsDisqualified = (rFactor1Constant.rfFinishStatus)player.finishStatus == rFactor1Constant.rfFinishStatus.dq;
-            currentGameState.SessionData.CompletedLaps = shared.lapNumber == 0 ? 0 : shared.lapNumber - 1;
+            currentGameState.SessionData.CompletedLaps = shared.lapNumber < 0 ? 0 : shared.lapNumber;
             currentGameState.SessionData.LapTimeCurrent = currentGameState.SessionData.SessionRunningTime - player.lapStartET;
             currentGameState.SessionData.LapTimePrevious = player.lastLapTime > 0 ? player.lastLapTime : -1;
 
@@ -498,38 +502,21 @@ namespace CrewChiefV4.rFactor1
                 currentGameState.TyreData.PeakFrontLeftTemperatureForLap, currentGameState.TyreData.PeakFrontRightTemperatureForLap,
                 currentGameState.TyreData.PeakRearLeftTemperatureForLap, currentGameState.TyreData.PeakRearRightTemperatureForLap);
             // some simple locking / spinning checks
-            if ((currentGameState.SessionData.IsNewSession || 
-                wheelCircumference[0] == 0 || wheelCircumference[1] == 0) && 
-                currentGameState.PositionAndMotionData.CarSpeed > 14 && 
-                Math.Abs(shared.unfilteredSteering) <= 0.05)
+            if (currentGameState.PositionAndMotionData.CarSpeed > 7.0f)
             {
-                // calculate wheel circumference (assume left/right symmetry) at 50+ km/h with (mostly) straight steering
-                // front
-                wheelCircumference[0] = (2 * (float)Math.PI * currentGameState.PositionAndMotionData.CarSpeed / Math.Abs(shared.wheel[0].rotation) + 
-                    2 * (float)Math.PI * currentGameState.PositionAndMotionData.CarSpeed / Math.Abs(shared.wheel[1].rotation)) / 2;
-                // rear
-                wheelCircumference[1] = (2 * (float)Math.PI * currentGameState.PositionAndMotionData.CarSpeed / Math.Abs(shared.wheel[2].rotation) + 
-                    2 * (float)Math.PI * currentGameState.PositionAndMotionData.CarSpeed / Math.Abs(shared.wheel[3].rotation)) / 2;
-            }
-            if (currentGameState.PositionAndMotionData.CarSpeed > 7 && 
-                wheelCircumference[0] > 0 && wheelCircumference[1] > 0)
-            {
-                float[] rotatingSpeed = new float[] { 
-                    2 * (float)Math.PI * currentGameState.PositionAndMotionData.CarSpeed / wheelCircumference[0], 
-                    2 * (float)Math.PI * currentGameState.PositionAndMotionData.CarSpeed / wheelCircumference[1] };
-                float minRotFactor = 0.5f;
-                float maxRotFactor = 1.3f;
+                float minRotatingSpeed = 2.0f * (float)Math.PI * currentGameState.PositionAndMotionData.CarSpeed / currentGameState.carClass.maxTyreCircumference;
+                currentGameState.TyreData.LeftFrontIsLocked = Math.Abs(shared.wheel[0].rotation) < minRotatingSpeed;
+                currentGameState.TyreData.RightFrontIsLocked = Math.Abs(shared.wheel[1].rotation) < minRotatingSpeed;
+                currentGameState.TyreData.LeftRearIsLocked = Math.Abs(shared.wheel[2].rotation) < minRotatingSpeed;
+                currentGameState.TyreData.RightRearIsLocked = Math.Abs(shared.wheel[3].rotation) < minRotatingSpeed;
 
-                currentGameState.TyreData.LeftFrontIsLocked = Math.Abs(shared.wheel[(int)rFactor1Constant.rfWheelIndex.frontLeft].rotation) < minRotFactor * rotatingSpeed[0];
-                currentGameState.TyreData.RightFrontIsLocked = Math.Abs(shared.wheel[(int)rFactor1Constant.rfWheelIndex.frontRight].rotation) < minRotFactor * rotatingSpeed[0];
-                currentGameState.TyreData.LeftRearIsLocked = Math.Abs(shared.wheel[(int)rFactor1Constant.rfWheelIndex.rearLeft].rotation) < minRotFactor * rotatingSpeed[1];
-                currentGameState.TyreData.RightRearIsLocked = Math.Abs(shared.wheel[(int)rFactor1Constant.rfWheelIndex.rearRight].rotation) < minRotFactor * rotatingSpeed[1];
-
-                currentGameState.TyreData.LeftFrontIsSpinning = Math.Abs(shared.wheel[(int)rFactor1Constant.rfWheelIndex.frontLeft].rotation) > maxRotFactor * rotatingSpeed[0];
-                currentGameState.TyreData.RightFrontIsSpinning = Math.Abs(shared.wheel[(int)rFactor1Constant.rfWheelIndex.frontRight].rotation) > maxRotFactor * rotatingSpeed[0];
-                currentGameState.TyreData.LeftRearIsSpinning = Math.Abs(shared.wheel[(int)rFactor1Constant.rfWheelIndex.rearLeft].rotation) > maxRotFactor * rotatingSpeed[1];
-                currentGameState.TyreData.RightRearIsSpinning = Math.Abs(shared.wheel[(int)rFactor1Constant.rfWheelIndex.rearRight].rotation) > maxRotFactor * rotatingSpeed[1];
+                float maxRotatingSpeed = 2.0f * (float)Math.PI * currentGameState.PositionAndMotionData.CarSpeed / currentGameState.carClass.minTyreCircumference;
+                currentGameState.TyreData.LeftFrontIsSpinning = Math.Abs(shared.wheel[0].rotation) > maxRotatingSpeed;
+                currentGameState.TyreData.RightFrontIsSpinning = Math.Abs(shared.wheel[1].rotation) > maxRotatingSpeed;
+                currentGameState.TyreData.LeftRearIsSpinning = Math.Abs(shared.wheel[2].rotation) > maxRotatingSpeed;
+                currentGameState.TyreData.RightRearIsSpinning = Math.Abs(shared.wheel[3].rotation) > maxRotatingSpeed;
             }
+
             // use detached wheel status for suspension damage
             currentGameState.CarDamageData.SuspensionDamageStatus = CornerData.getCornerData(suspensionDamageThresholds,
                 !currentGameState.TyreData.LeftFrontAttached ? 1 : 0,
@@ -771,8 +758,9 @@ namespace CrewChiefV4.rFactor1
                 if (opponentPrevious != null)
                 {
                     opponent.trackLandmarksTiming = opponentPrevious.trackLandmarksTiming;
-                    opponent.trackLandmarksTiming.updateLandmarkTiming(currentGameState.SessionData.TrackDefinition.trackLandmarks,
+                    String stoppedInLandmark = opponent.trackLandmarksTiming.updateLandmarkTiming(currentGameState.SessionData.TrackDefinition.trackLandmarks,
                         currentGameState.SessionData.SessionRunningTime, previousDistanceRoundTrack, opponent.DistanceRoundTrack, opponent.Speed);
+                    opponent.stoppedInLandmark = opponent.InPits ? null : stoppedInLandmark;
                 }
                 if (opponent.IsNewLap)
                 {
@@ -785,6 +773,7 @@ namespace CrewChiefV4.rFactor1
                     currentGameState.OpponentData.Add(opponentKey, opponent);
                 }
             }
+            currentGameState.PitData.InPitlane = player.inPits == 1;
             if (previousGameState != null)
             {
                 currentGameState.SessionData.HasLeadChanged = !currentGameState.SessionData.HasLeadChanged && previousGameState.SessionData.Position > 1 && currentGameState.SessionData.Position == 1 ?
@@ -796,9 +785,10 @@ namespace CrewChiefV4.rFactor1
                 currentGameState.SessionData.GameTimeAtLastPositionBehindChange = !currentGameState.SessionData.IsRacingSameCarBehind ? 
                     currentGameState.SessionData.SessionRunningTime : previousGameState.SessionData.GameTimeAtLastPositionBehindChange;
                 currentGameState.SessionData.trackLandmarksTiming = previousGameState.SessionData.trackLandmarksTiming;
-                currentGameState.SessionData.trackLandmarksTiming.updateLandmarkTiming(currentGameState.SessionData.TrackDefinition.trackLandmarks,
+                String stoppedInLandmark = currentGameState.SessionData.trackLandmarksTiming.updateLandmarkTiming(currentGameState.SessionData.TrackDefinition.trackLandmarks,
                                     currentGameState.SessionData.SessionRunningTime, previousGameState.PositionAndMotionData.DistanceRoundTrack, 
                                     currentGameState.PositionAndMotionData.DistanceRoundTrack, shared.speed);
+                currentGameState.SessionData.stoppedInLandmark = currentGameState.PitData.InPitlane ? null : stoppedInLandmark;
                 if (currentGameState.SessionData.IsNewLap)
                 {
                     currentGameState.SessionData.trackLandmarksTiming.cancelWaitingForLandmarkEnd();
@@ -821,7 +811,6 @@ namespace CrewChiefV4.rFactor1
                 currentGameState.PitData.PitWindowEnd = !currentGameState.PitData.HasMandatoryPitStop ? 0 :
                     currentGameState.SessionData.SessionHasFixedTime ? (int)(((currentGameState.SessionData.SessionTotalRunTime / 60) / (shared.scheduledStops + 1)) * (player.numPitstops + 1)) + 1 :
                     (int)((currentGameState.SessionData.SessionNumberOfLaps / (shared.scheduledStops + 1)) * (player.numPitstops + 1)) + 1;
-                currentGameState.PitData.InPitlane = player.inPits == 1;
 
                 // force the MandatoryPit event to be re-initialsed if the window end has been recalculated.
                 currentGameState.PitData.ResetEvents = currentGameState.PitData.HasMandatoryPitStop && 

@@ -66,6 +66,7 @@ namespace CrewChiefV4
 
         protected T DeSerializeObject<T>(string fileName)
         {
+            Console.WriteLine("About to load recorded game data from file " + fileName + " - this may take a while");
             if (string.IsNullOrEmpty(fileName)) { return default(T); }
 
             T objectOut = default(T);
@@ -88,6 +89,7 @@ namespace CrewChiefV4
                         objectOut = (T)serializer.Deserialize(reader);
                     }
                 }
+                Console.WriteLine("Done reading session data from: " + fileName);
             }
             catch (Exception ex)
             {
