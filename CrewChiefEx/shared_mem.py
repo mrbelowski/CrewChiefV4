@@ -39,6 +39,9 @@ class acsVehicleInfo(ctypes.Structure):
         ('carRealTimeLeaderboardPosition', c_int32),
         ('spLineLength', c_float),
         ('isConnected', c_int32),
+        ('suspensionDamage', c_float * 4),
+        ('engineLifeLeft', c_float),
+        ('tyreInflation', c_float * 4),
     ]
       
 class SPageFileCrewChief(ctypes.Structure):
@@ -48,6 +51,8 @@ class SPageFileCrewChief(ctypes.Structure):
         ('focusVehicle', c_int32),
         ('serverName', c_char * 512),
         ('vehicleInfo', acsVehicleInfo * 64),
+        ('acInstallPath', c_char * 512),
+        ('isInternalMemoryModuleLoaded', c_int32),		
     ]
 
 class CrewChiefShared:
