@@ -440,7 +440,6 @@
         },
         {
             "acTrackNames": [ "spa:" ],
-            "pcarsTrackName": "Circuit de Spa-Francorchamps:",
             "rf2TrackNames": [ "RaceRfactor Spa 2013" ],
             "raceroomLayoutId": 3870,
             "trackLandmarks": [
@@ -484,6 +483,53 @@
                     "landmarkName": "the_chicane",
                     "distanceRoundLapStart": 6670,
                     "distanceRoundLapEnd": 6800,
+                    "isCommonOvertakingSpot": true
+                }
+            ]
+        },
+		{
+            "pcarsTrackName": "Circuit de Spa-Francorchamps:",
+            "trackLandmarks": [
+                {
+                    "landmarkName": "la_source",
+                    "distanceRoundLapStart": 6510,
+                    "distanceRoundLapEnd": 6590,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "eau_rouge",
+                    "distanceRoundLapStart": 190,
+                    "distanceRoundLapEnd": 390,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "les_combes",
+                    "distanceRoundLapStart": 1530,
+                    "distanceRoundLapEnd": 1710,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "pouhon",
+                    "distanceRoundLapStart": 2910,
+                    "distanceRoundLapEnd": 3310,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "stavlot",
+                    "distanceRoundLapStart": 4050,
+                    "distanceRoundLapEnd": 4400,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "blanchimont",
+                    "distanceRoundLapStart": 5280,
+                    "distanceRoundLapEnd": 5440,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "the_chicane",
+                    "distanceRoundLapStart": 5880,
+                    "distanceRoundLapEnd": 6010,
                     "isCommonOvertakingSpot": true
                 }
             ]
@@ -1088,6 +1134,7 @@
         {
             "rf1TrackNames": [ "Road America 2016" ],
             "rf2TrackNames": [ "Road America 2016" ],
+			"pcarsTrackName": "Road America:",
             "trackLandmarks": [
                 {
                     "landmarkName": "turn1",
