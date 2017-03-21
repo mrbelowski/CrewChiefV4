@@ -849,26 +849,6 @@ namespace CrewChiefV4.rFactor1
             {
                 Flag = FlagEnum.BLACK;
             }
-            else if (shared.sectorFlag[player.sector] > (int)rFactor1Constant.rfYellowFlagState.noFlag)
-            {
-                Flag = FlagEnum.YELLOW;
-            }
-            else if (currentGameState.SessionData.SessionType == SessionType.Race ||
-                currentGameState.SessionData.SessionType == SessionType.Qualify)
-            {
-                if (shared.gamePhase == (int)rFactor1Constant.rfGamePhase.fullCourseYellow)
-                {
-                    Flag = FlagEnum.DOUBLE_YELLOW;
-                }
-                else if (shared.yellowFlagState == (int)rFactor1Constant.rfYellowFlagState.lastLap || currentGameState.SessionData.LeaderHasFinishedRace)
-                {
-                    Flag = FlagEnum.WHITE;
-                }
-                else if (shared.gamePhase == (int)rFactor1Constant.rfYellowFlagState.noFlag && previousGameState != null && previousGameState.SessionData.Flag == FlagEnum.DOUBLE_YELLOW)
-                {
-                    Flag = FlagEnum.GREEN;
-                }
-            }
             foreach (OpponentData opponent in currentGameState.OpponentData.Values)
             {
                 if (currentGameState.SessionData.SessionType != SessionType.Race || 
