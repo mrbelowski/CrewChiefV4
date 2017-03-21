@@ -28,7 +28,7 @@
                     "landmarkName": "quarry",
                     "distanceRoundLapStart": 2110,
                     "distanceRoundLapEnd": 2230,
-                    "isCommonOvertakingSpot": fals
+                    "isCommonOvertakingSpot": false
                 },
 				{
                     "landmarkName": "mcphillamy_park",
