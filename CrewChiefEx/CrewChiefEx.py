@@ -3,33 +3,73 @@ import acsys
 import sys
 import os.path
 import platform
+import configparser
+
 # import libraries
 if platform.architecture()[0] == "64bit":
     sysdir=os.path.dirname(__file__)+'/stdlib64'
 else:
     sysdir=os.path.dirname(__file__)+'/stdlib'
+
 sys.path.insert(0, sysdir)
 os.environ['PATH'] = os.environ['PATH'] + ";."
+
+import ctypes
+from ctypes import *
 
 from shared_mem import CrewChiefShared
 
 sharedMem = CrewChiefShared()
 
 timer = 0
+lib = None
+libInit = 0
+loadMemoryModule = 0
+configPath = "apps/python/CrewChiefEx/config.txt"
+
+config = configparser.ConfigParser()
+config.read(configPath)
+
+try:
+  loadMemoryModule = config.getint("CrewChief", "LoadMemoryModule")
+except:
+  config.set("CrewChief", "LoadMemoryModule", str(0))
+  loadMemoryModule = 0
+
+if platform.architecture()[0] == "64bit" and loadMemoryModule == 1:
+    lib = ctypes.WinDLL(sysdir + '/ACInternalMemoryReader.dll')
+    
+
+if lib != None:
+    funcInit = lib['Init']
+    funcInit.restype = ctypes.c_int32
+    libInit = funcInit()
+
+if libInit == 1:
+    funcGetSuspensionDamage = lib['GetSuspensionDamage']
+    funcGetSuspensionDamage.restype = ctypes.c_float
+    funcGetSuspensionDamage.argtypes = [ctypes.c_int32,ctypes.c_int32]
+
+    funcGetEngineLifeLeft = lib['GetEngineLifeLeft']
+    funcGetEngineLifeLeft.restype = ctypes.c_float
+    funcGetEngineLifeLeft.argtypes = [ctypes.c_int32]
+
+    funcGetTyreInflation = lib['GetTyreInflation']
+    funcGetTyreInflation.restype = ctypes.c_float
+    funcGetTyreInflation.argtypes = [ctypes.c_int32, ctypes.c_int32]
 
 def updateSharedMemory():
     global sharedMem
     sharedmem = sharedMem.getsharedmem()
     sharedmem.numVehicles = ac.getCarsCount()
     sharedmem.focusVehicle = ac.getFocusedCar()
-
     #now we'll build the slots, so we later know every single (possible) car
     carIds = range(0, ac.getCarsCount(), 1)
     for carId in carIds:
         #first we'll check wether there is a car for this id; as soon it returns -1
         #it's over
         if str(ac.getCarName(carId)) == '-1':
-            break
+            break 			
         else:
             sharedmem.vehicleInfo[carId].carId = carId
             sharedmem.vehicleInfo[carId].driverName = ac.getDriverName(carId).encode('utf-8')
@@ -45,10 +85,18 @@ def updateSharedMemory():
             sharedmem.vehicleInfo[carId].isCarInPit = ac.isCarInPit(carId)
             sharedmem.vehicleInfo[carId].carLeaderboardPosition = ac.getCarLeaderboardPosition(carId)
             sharedmem.vehicleInfo[carId].carRealTimeLeaderboardPosition = ac.getCarRealTimeLeaderboardPosition(carId)
-            sharedmem.vehicleInfo[carId].spLineLength=  ac.getCarState(carId, acsys.CS.NormalizedSplinePosition) 
+            sharedmem.vehicleInfo[carId].spLineLength = ac.getCarState(carId, acsys.CS.NormalizedSplinePosition) 
             sharedmem.vehicleInfo[carId].isConnected = ac.isConnected(carId)
-
-            
+            if libInit == 1 and carId == 0:
+                sharedmem.vehicleInfo[carId].suspensionDamage[0] = funcGetSuspensionDamage(carId,0)
+                sharedmem.vehicleInfo[carId].suspensionDamage[1] = funcGetSuspensionDamage(carId,1)
+                sharedmem.vehicleInfo[carId].suspensionDamage[2] = funcGetSuspensionDamage(carId,2)
+                sharedmem.vehicleInfo[carId].suspensionDamage[3] = funcGetSuspensionDamage(carId,3)
+                sharedmem.vehicleInfo[carId].engineLifeLeft = funcGetEngineLifeLeft(carId)
+                sharedmem.vehicleInfo[carId].tyreInflation[0] = funcGetTyreInflation(carId,0)
+                sharedmem.vehicleInfo[carId].tyreInflation[1] = funcGetTyreInflation(carId,1)
+                sharedmem.vehicleInfo[carId].tyreInflation[2] = funcGetTyreInflation(carId,2)
+                sharedmem.vehicleInfo[carId].tyreInflation[3] = funcGetTyreInflation(carId,3)
 
 def acMain(ac_version):
   global appWindow,sharedMem
@@ -63,14 +111,16 @@ def acMain(ac_version):
 
   sharedmem = sharedMem.getsharedmem()
   sharedmem.serverName = ac.getServerName().encode('utf-8')
-
+  sharedmem.acInstallPath = os.path.abspath(os.curdir).encode('utf-8')
+  sharedmem.isInternalMemoryModuleLoaded = libInit
+  
   return "CrewChiefEx"
 
-
 def acUpdate(deltaT):
-    global timer
-    timer += deltaT
-    if timer > 0.05:
-        updateSharedMemory()
-        timer = 0
+  global timer
+  timer += deltaT
+  if timer > 0.025:
+      updateSharedMemory()
+      timer = 0
+
 

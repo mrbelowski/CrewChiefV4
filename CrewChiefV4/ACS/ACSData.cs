@@ -280,7 +280,11 @@ namespace CrewChiefV4.assetto
             public int carRealTimeLeaderboardPosition;
             public float spLineLength;
             public int isConnected;
-            
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
+            public float[] suspensionDamage;
+            public float engineLifeLeft;
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
+            public float[] tyreInflation;           
         }
 
         [StructLayout(LayoutKind.Sequential, Pack = 4, CharSet = CharSet.Ansi)]
@@ -291,11 +295,11 @@ namespace CrewChiefV4.assetto
             public int focusVehicle;
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 512)]
             public byte[] serverName;
-            //[MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 512)]
-            //public byte[] acInstallPath;
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 64)]
             public acsVehicleInfo[] vehicle;
-            
+            [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 512)]
+            public byte[] acInstallPath;
+            public int isInternalMemoryModuleLoaded;
         }
 
         public class AssettoCorsaShared
