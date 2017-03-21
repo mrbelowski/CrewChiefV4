@@ -12,7 +12,7 @@
                     "distanceRoundLapEnd": 310,
                     "isCommonOvertakingSpot": true
                 },
-				{
+                {
                     "landmarkName": "griffins_bend",
                     "distanceRoundLapStart": 1300,
                     "distanceRoundLapEnd": 1490,
@@ -24,25 +24,25 @@
                     "distanceRoundLapEnd": 1910,
                     "isCommonOvertakingSpot": true
                 },
-				{
+                {
                     "landmarkName": "quarry",
                     "distanceRoundLapStart": 2110,
                     "distanceRoundLapEnd": 2230,
                     "isCommonOvertakingSpot": false
                 },
-				{
+                {
                     "landmarkName": "mcphillamy_park",
                     "distanceRoundLapStart": 2750,
                     "distanceRoundLapEnd": 2950,
                     "isCommonOvertakingSpot": false
                 },
-				{
+                {
                     "landmarkName": "skyline",
                     "distanceRoundLapStart": 3100,
                     "distanceRoundLapEnd": 3160,
                     "isCommonOvertakingSpot": true
                 },
-				{
+                {
                     "landmarkName": "the_esses",
                     "distanceRoundLapStart": 3230,
                     "distanceRoundLapEnd": 3310,
@@ -66,7 +66,7 @@
                     "distanceRoundLapEnd": 5510,
                     "isCommonOvertakingSpot": true
                 },
-				{
+                {
                     "landmarkName": "murrays_corner",
                     "distanceRoundLapStart": 5880,
                     "distanceRoundLapEnd": 5970,
@@ -82,7 +82,7 @@
                     "distanceRoundLapEnd": 450,
                     "isCommonOvertakingSpot": true
                 },
-				{
+                {
                     "landmarkName": "griffins_bend",
                     "distanceRoundLapStart": 1290,
                     "distanceRoundLapEnd": 1480,
@@ -94,25 +94,25 @@
                     "distanceRoundLapEnd": 1910,
                     "isCommonOvertakingSpot": true
                 },
-				{
+                {
                     "landmarkName": "quarry",
                     "distanceRoundLapStart": 2250,
                     "distanceRoundLapEnd": 2420,
                     "isCommonOvertakingSpot": false
                 },
-				{
+                {
                     "landmarkName": "mcphillamy_park",
                     "distanceRoundLapStart": 2900,
                     "distanceRoundLapEnd": 3100,
                     "isCommonOvertakingSpot": false
                 },
-				{
+                {
                     "landmarkName": "skyline",
                     "distanceRoundLapStart": 3280,
                     "distanceRoundLapEnd": 3360,
                     "isCommonOvertakingSpot": true
                 },
-				{
+                {
                     "landmarkName": "the_esses",
                     "distanceRoundLapStart": 3280,
                     "distanceRoundLapEnd": 3380,
@@ -136,7 +136,7 @@
                     "distanceRoundLapEnd": 5670,
                     "isCommonOvertakingSpot": true
                 },
-				{
+                {
                     "landmarkName": "murrays_corner",
                     "distanceRoundLapStart": 6060,
                     "distanceRoundLapEnd": 6140,
@@ -1009,6 +1009,150 @@
                     "landmarkName": "ickxbocht",
                     "distanceRoundLapStart": 3580,
                     "distanceRoundLapEnd": 3700,
+                    "isCommonOvertakingSpot": true
+                }
+            ]
+        },
+        {
+            "rf1TrackNames": [ "Road America" ],
+            "rf2TrackNames": [ "Road America" ],
+            "trackLandmarks": [
+                {
+                    "landmarkName": "turn1",
+                    "distanceRoundLapStart": 569,
+                    "distanceRoundLapEnd": 779,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "turn3",
+                    "distanceRoundLapStart": 1031,
+                    "distanceRoundLapEnd": 1229,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "turn5",
+                    "distanceRoundLapStart": 2212,
+                    "distanceRoundLapEnd": 2327,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "turn6",
+                    "distanceRoundLapStart": 2514,
+                    "distanceRoundLapEnd": 2644,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "turn7",
+                    "distanceRoundLapStart": 2765,
+                    "distanceRoundLapEnd": 2895,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "turn8",
+                    "distanceRoundLapStart": 3129,
+                    "distanceRoundLapEnd": 3251,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "the_carousel",
+                    "distanceRoundLapStart": 3327,
+                    "distanceRoundLapEnd": 3829,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "the_kink",
+                    "distanceRoundLapStart": 4041,
+                    "distanceRoundLapEnd": 4275,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "canada_corner",
+                    "distanceRoundLapStart": 4890,
+                    "distanceRoundLapEnd": 5046,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "bill_mitchell_bend",
+                    "distanceRoundLapStart": 5181,
+                    "distanceRoundLapEnd": 5404,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "turn14",
+                    "distanceRoundLapStart": 5503,
+                    "distanceRoundLapEnd": 5568,
+                    "isCommonOvertakingSpot": true
+                }
+            ]
+        },
+        {
+            "rf1TrackNames": [ "Road America 2016" ],
+            "rf2TrackNames": [ "Road America 2016" ],
+            "trackLandmarks": [
+                {
+                    "landmarkName": "turn1",
+                    "distanceRoundLapStart": 568,
+                    "distanceRoundLapEnd": 758,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "turn3",
+                    "distanceRoundLapStart": 1055,
+                    "distanceRoundLapEnd": 1224,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "turn5",
+                    "distanceRoundLapStart": 2257,
+                    "distanceRoundLapEnd": 2379,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "turn6",
+                    "distanceRoundLapStart": 2540,
+                    "distanceRoundLapEnd": 2686,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "turn7",
+                    "distanceRoundLapStart": 2774,
+                    "distanceRoundLapEnd": 2939,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "turn8",
+                    "distanceRoundLapStart": 3199,
+                    "distanceRoundLapEnd": 3343,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "the_carousel",
+                    "distanceRoundLapStart": 3327,
+                    "distanceRoundLapEnd": 3930,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "the_kink",
+                    "distanceRoundLapStart": 4163,
+                    "distanceRoundLapEnd": 4411,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "canada_corner",
+                    "distanceRoundLapStart": 5044,
+                    "distanceRoundLapEnd": 5189,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "bill_mitchell_bend",
+                    "distanceRoundLapStart": 5367,
+                    "distanceRoundLapEnd": 5563,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "turn14",
+                    "distanceRoundLapStart": 5676,
+                    "distanceRoundLapEnd": 5862,
                     "isCommonOvertakingSpot": true
                 }
             ]
