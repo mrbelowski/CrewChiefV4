@@ -1084,6 +1084,78 @@
                     "isCommonOvertakingSpot": true
                 }
             ]
+        },
+        {
+            "rf1TrackNames": [ "Road America 2016" ],
+            "rf2TrackNames": [ "Road America 2016" ],
+            "trackLandmarks": [
+                {
+                    "landmarkName": "turn1",
+                    "distanceRoundLapStart": 568,
+                    "distanceRoundLapEnd": 758,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "turn3",
+                    "distanceRoundLapStart": 1055,
+                    "distanceRoundLapEnd": 1224,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "turn5",
+                    "distanceRoundLapStart": 2257,
+                    "distanceRoundLapEnd": 2379,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "turn6",
+                    "distanceRoundLapStart": 2540,
+                    "distanceRoundLapEnd": 2686,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "turn7",
+                    "distanceRoundLapStart": 2774,
+                    "distanceRoundLapEnd": 2939,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "turn8",
+                    "distanceRoundLapStart": 3199,
+                    "distanceRoundLapEnd": 3343,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "the_carousel",
+                    "distanceRoundLapStart": 3327,
+                    "distanceRoundLapEnd": 3930,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "the_kink",
+                    "distanceRoundLapStart": 4163,
+                    "distanceRoundLapEnd": 4411,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "canada_corner",
+                    "distanceRoundLapStart": 5044,
+                    "distanceRoundLapEnd": 5189,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "bill_mitchell_bend",
+                    "distanceRoundLapStart": 5367,
+                    "distanceRoundLapEnd": 5563,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "turn14",
+                    "distanceRoundLapStart": 5676,
+                    "distanceRoundLapEnd": 5862,
+                    "isCommonOvertakingSpot": true
+                }
+            ]
         }
     ]
 }
