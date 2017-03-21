@@ -146,9 +146,37 @@ namespace CrewChiefV4.assetto
 
             return thisSectorTime;
         }
+        private List<CornerData.EnumWithThresholds> suspensionDamageThresholds = new List<CornerData.EnumWithThresholds>();
+
+        private float trivialSuspensionDamageThreshold = 0.01f;
+        private float minorSuspensionDamageThreshold = 0.05f;
+        private float severeSuspensionDamageThreshold = 0.15f;
+        private float destroyedSuspensionDamageThreshold = 0.60f;
+
+        private float trivialEngineDamageThreshold = 900.0f;
+        private float minorEngineDamageThreshold = 600.0f;
+        private float severeEngineDamageThreshold = 350.0f;
+        private float destroyedEngineDamageThreshold = 25.0f;
+
+        private float trivialAeroDamageThreshold = 0.1f;
+        private float minorAeroDamageThreshold = 0.25f;
+        private float severeAeroDamageThreshold = 0.6f;
+        private float destroyedAeroDamageThreshold = 0.90f;
 
         public ACSGameStateMapper()
         {
+
+            CornerData.EnumWithThresholds suspensionDamageNone = new CornerData.EnumWithThresholds(DamageLevel.NONE, -10000, trivialSuspensionDamageThreshold);
+            CornerData.EnumWithThresholds suspensionDamageTrivial = new CornerData.EnumWithThresholds(DamageLevel.TRIVIAL, trivialSuspensionDamageThreshold, minorSuspensionDamageThreshold);
+            CornerData.EnumWithThresholds suspensionDamageMinor = new CornerData.EnumWithThresholds(DamageLevel.MINOR, trivialSuspensionDamageThreshold, severeSuspensionDamageThreshold);
+            CornerData.EnumWithThresholds suspensionDamageMajor = new CornerData.EnumWithThresholds(DamageLevel.MAJOR, severeSuspensionDamageThreshold, destroyedSuspensionDamageThreshold);
+            CornerData.EnumWithThresholds suspensionDamageDestroyed = new CornerData.EnumWithThresholds(DamageLevel.DESTROYED, destroyedSuspensionDamageThreshold, 10000);
+            suspensionDamageThresholds.Add(suspensionDamageNone);
+            suspensionDamageThresholds.Add(suspensionDamageTrivial);
+            suspensionDamageThresholds.Add(suspensionDamageMinor);
+            suspensionDamageThresholds.Add(suspensionDamageMajor);
+            suspensionDamageThresholds.Add(suspensionDamageDestroyed);
+
             //GTE Classes
             
             List<CornerData.EnumWithThresholds> tyreWearThresholdsSlickSuperSoft = new List<CornerData.EnumWithThresholds>();
@@ -1678,14 +1706,39 @@ namespace CrewChiefV4.assetto
             {
                 currentGameState.PitData.IsAtPitExit = true;
             }
+            //damage data
+            if(shared.acsChief.isInternalMemoryModuleLoaded == 1)
+            {
+                currentGameState.CarDamageData.DamageEnabled = true;
+                currentGameState.CarDamageData.SuspensionDamageStatus = CornerData.getCornerData(suspensionDamageThresholds,
+                    playerVehicle.suspensionDamage[0], playerVehicle.suspensionDamage[1], playerVehicle.suspensionDamage[2], playerVehicle.suspensionDamage[3]);
+
+                currentGameState.CarDamageData.OverallEngineDamage = mapToEngineDamageLevel(playerVehicle.engineLifeLeft);
+                                
+                currentGameState.CarDamageData.OverallAeroDamage = DamageLevel.UNKNOWN;
+            }
+            else
+            {
+                currentGameState.CarDamageData.DamageEnabled = false;
+                playerVehicle.tyreInflation[0] = 1;
+                playerVehicle.tyreInflation[1] = 1;
+                playerVehicle.tyreInflation[2] = 1;
+                playerVehicle.tyreInflation[3] = 1;                 
+            }
 
             //tyre data
             currentGameState.TyreData.HasMatchedTyreTypes = true;
             currentGameState.TyreData.TireWearActive = shared.acsStatic.aidTireRate > 0;
-            
+
+            currentGameState.TyreData.FrontLeftPressure = playerVehicle.tyreInflation[0] == 1.0f ? shared.acsPhysics.wheelsPressure[0] * 6.894f : 0.0f;
+            currentGameState.TyreData.FrontRightPressure = playerVehicle.tyreInflation[1] == 1.0f ? shared.acsPhysics.wheelsPressure[1] * 6.894f : 0.0f;
+            currentGameState.TyreData.RearLeftPressure = playerVehicle.tyreInflation[2] == 1.0f ? shared.acsPhysics.wheelsPressure[2] * 6.894f : 0.0f;
+            currentGameState.TyreData.RearRightPressure = playerVehicle.tyreInflation[3] == 1.0f ? shared.acsPhysics.wheelsPressure[3] * 6.894f : 0.0f;
+
             String currentTyreCompound = shared.acsGraphic.tyreCompound;
             Boolean currentTyreValid = currentTyreCompound != null && currentTyreCompound.Length > 0 &&
                 acTyres.Count > 0 && acTyres.ContainsKey(currentTyreCompound);
+            
             if (currentTyreValid)
             {
 
@@ -1694,7 +1747,6 @@ namespace CrewChiefV4.assetto
                 currentGameState.TyreData.FrontLeft_CenterTemp = shared.acsPhysics.tyreTempM[0];
                 currentGameState.TyreData.FrontLeft_LeftTemp = shared.acsPhysics.tyreTempO[0];
                 currentGameState.TyreData.FrontLeft_RightTemp = shared.acsPhysics.tyreTempI[0];
-                currentGameState.TyreData.FrontLeftPressure = shared.acsPhysics.wheelsPressure[0];
                 currentGameState.TyreData.FrontLeftTyreType = defaultTyreTypeForPlayersCar;
                 currentGameState.TyreData.FrontLeftPercentWear = getTyreWearPercentage(shared.acsPhysics.tyreWear[0], currentTyreWearMinimumValue);
                 if (currentGameState.SessionData.IsNewLap)
@@ -1709,8 +1761,7 @@ namespace CrewChiefV4.assetto
                 currentGameState.TyreData.FrontRight_CenterTemp = shared.acsPhysics.tyreTempM[1];
                 currentGameState.TyreData.FrontRight_LeftTemp = shared.acsPhysics.tyreTempI[1];
                 currentGameState.TyreData.FrontRight_RightTemp = shared.acsPhysics.tyreTempO[1];
-                currentGameState.TyreData.FrontRightPressure = shared.acsPhysics.wheelsPressure[1];
-                currentGameState.TyreData.FrontRightTyreType = defaultTyreTypeForPlayersCar;
+                                currentGameState.TyreData.FrontRightTyreType = defaultTyreTypeForPlayersCar;
                 currentGameState.TyreData.FrontRightPercentWear = getTyreWearPercentage(shared.acsPhysics.tyreWear[0], currentTyreWearMinimumValue);
                 if (currentGameState.SessionData.IsNewLap)
                 {
@@ -1725,7 +1776,6 @@ namespace CrewChiefV4.assetto
                 currentGameState.TyreData.RearLeft_CenterTemp = shared.acsPhysics.tyreTempM[2];
                 currentGameState.TyreData.RearLeft_LeftTemp = shared.acsPhysics.tyreTempO[2];
                 currentGameState.TyreData.RearLeft_RightTemp = shared.acsPhysics.tyreTempI[2];
-                currentGameState.TyreData.RearLeftPressure = shared.acsPhysics.wheelsPressure[2];
                 currentGameState.TyreData.RearLeftTyreType = defaultTyreTypeForPlayersCar;
                 currentGameState.TyreData.RearLeftPercentWear = getTyreWearPercentage(shared.acsPhysics.tyreWear[0], currentTyreWearMinimumValue);
                 if (currentGameState.SessionData.IsNewLap)
@@ -1741,7 +1791,6 @@ namespace CrewChiefV4.assetto
                 currentGameState.TyreData.RearRight_LeftTemp = shared.acsPhysics.tyreTempI[3];
                 currentGameState.TyreData.RearRight_RightTemp = shared.acsPhysics.tyreTempO[3];
                 currentGameState.TyreData.RearRightTyreType = defaultTyreTypeForPlayersCar;
-                currentGameState.TyreData.RearRightPressure = shared.acsPhysics.wheelsPressure[3];
                 currentGameState.TyreData.RearRightPercentWear = getTyreWearPercentage(shared.acsPhysics.tyreWear[0], currentTyreWearMinimumValue);
                 if (currentGameState.SessionData.IsNewLap)
                 {
@@ -1754,8 +1803,8 @@ namespace CrewChiefV4.assetto
 
                 if (!currentGameState.PitData.OnOutLap)
                 {
-                    currentGameState.TyreData.TyreConditionStatus = CornerData.getCornerData(acTyres[currentTyreCompound].tyreWearThresholdsForAC, 
-                        currentGameState.TyreData.FrontLeftPercentWear, currentGameState.TyreData.FrontRightPercentWear, 
+                    currentGameState.TyreData.TyreConditionStatus = CornerData.getCornerData(acTyres[currentTyreCompound].tyreWearThresholdsForAC,
+                        currentGameState.TyreData.FrontLeftPercentWear, currentGameState.TyreData.FrontRightPercentWear,
                         currentGameState.TyreData.RearLeftPercentWear, currentGameState.TyreData.RearRightPercentWear);
                 }
                 else
@@ -1766,7 +1815,7 @@ namespace CrewChiefV4.assetto
                 currentGameState.TyreData.TyreTempStatus = CornerData.getCornerData(acTyres[currentTyreCompound].tyreTempThresholdsForAC,
                     currentGameState.TyreData.PeakFrontLeftTemperatureForLap, currentGameState.TyreData.PeakFrontRightTemperatureForLap,
                         currentGameState.TyreData.PeakRearLeftTemperatureForLap, currentGameState.TyreData.PeakRearRightTemperatureForLap);
-                
+
             }
 
             //penalty data
@@ -2052,6 +2101,54 @@ namespace CrewChiefV4.assetto
             return ControlType.Player;
         }
 
+        private DamageLevel mapToEngineDamageLevel(float engineDamage)
+        {
+            if(engineDamage >= 1000.0)
+            {
+                return DamageLevel.NONE;
+            }
+            else if (engineDamage <= destroyedEngineDamageThreshold)
+            {
+                return DamageLevel.DESTROYED;
+            }
+            else if (engineDamage <= severeEngineDamageThreshold)
+            {
+                return DamageLevel.MAJOR;
+            }
+            else if (engineDamage <= minorEngineDamageThreshold)
+            {
+                return DamageLevel.MINOR;
+            }
+            else if (engineDamage <= trivialEngineDamageThreshold)
+            {
+                return DamageLevel.TRIVIAL;
+            }
+            return DamageLevel.NONE;
+        }
+
+        private DamageLevel mapToAeroDamageLevel(float aeroDamage)
+        {
+            if (aeroDamage >= destroyedAeroDamageThreshold)
+            {
+                return DamageLevel.DESTROYED;
+            }
+            else if (aeroDamage >= severeAeroDamageThreshold)
+            {
+                return DamageLevel.MAJOR;
+            }
+            else if (aeroDamage >= minorAeroDamageThreshold)
+            {
+                return DamageLevel.MINOR;
+            }
+            else if (aeroDamage >= trivialAeroDamageThreshold)
+            {
+                return DamageLevel.TRIVIAL;
+            }
+            else
+            {
+                return DamageLevel.NONE;
+            }
+        }
         public Boolean isBehindWithinDistance(float trackLength, float minDistance, float maxDistance, float playerTrackDistance, float opponentTrackDistance)
         {
             float difference = playerTrackDistance - opponentTrackDistance;
