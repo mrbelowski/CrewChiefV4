@@ -136,16 +136,19 @@ namespace CrewChiefV4.rFactor1
             currentGameState.SessionData.SessionType = mapToSessionType(shared);
 
             Boolean startedNewLap = false;
+            Boolean finishedLap = false;
             SessionPhase previousSessionPhase = SessionPhase.Unavailable;
             if (previousGameState != null) 
             {
                 // player.sectorNumber might go to 0 at session-end
-                // startedNewLap = previousGameState.SessionData.SectorNumber == 3 && player.sector <= 1;
-                startedNewLap = shared.lapNumber > previousGameState.SessionData.CompletedLaps + 1;
+                finishedLap = previousGameState.SessionData.SectorNumber == 0 ||
+                              (previousGameState.SessionData.SectorNumber == 3 && player.sector <= 1);
+                startedNewLap = shared.lapNumber > previousGameState.SessionData.CompletedLaps;
                 previousSessionPhase = previousGameState.SessionData.SessionPhase;
             }            
             Boolean isInPits = player.inPits == 1;
-            currentGameState.SessionData.SessionPhase = mapToSessionPhase((rFactor1Constant.rfGamePhase)shared.gamePhase, previousSessionPhase, startedNewLap, isInPits);
+            currentGameState.SessionData.SessionPhase = mapToSessionPhase((rFactor1Constant.rfGamePhase)shared.gamePhase,
+                    previousSessionPhase, finishedLap || startedNewLap, isInPits);
 
             // --------------------------------
             // flags data
@@ -849,26 +852,6 @@ namespace CrewChiefV4.rFactor1
             {
                 Flag = FlagEnum.BLACK;
             }
-            else if (shared.sectorFlag[player.sector] > (int)rFactor1Constant.rfYellowFlagState.noFlag)
-            {
-                Flag = FlagEnum.YELLOW;
-            }
-            else if (currentGameState.SessionData.SessionType == SessionType.Race ||
-                currentGameState.SessionData.SessionType == SessionType.Qualify)
-            {
-                if (shared.gamePhase == (int)rFactor1Constant.rfGamePhase.fullCourseYellow)
-                {
-                    Flag = FlagEnum.DOUBLE_YELLOW;
-                }
-                else if (shared.yellowFlagState == (int)rFactor1Constant.rfYellowFlagState.lastLap || currentGameState.SessionData.LeaderHasFinishedRace)
-                {
-                    Flag = FlagEnum.WHITE;
-                }
-                else if (shared.gamePhase == (int)rFactor1Constant.rfYellowFlagState.noFlag && previousGameState != null && previousGameState.SessionData.Flag == FlagEnum.DOUBLE_YELLOW)
-                {
-                    Flag = FlagEnum.GREEN;
-                }
-            }
             foreach (OpponentData opponent in currentGameState.OpponentData.Values)
             {
                 if (currentGameState.SessionData.SessionType != SessionType.Race || 
@@ -982,7 +965,7 @@ namespace CrewChiefV4.rFactor1
         }
 
         private SessionPhase mapToSessionPhase(rFactor1Constant.rfGamePhase sessionPhase, SessionPhase previousSessionPhase, 
-            Boolean startedNewLap, Boolean isInPit)
+            Boolean finishedLap, Boolean isInPit)
         {
             switch (sessionPhase)
             {
@@ -999,7 +982,7 @@ namespace CrewChiefV4.rFactor1
                 // sessions never go to sessionStopped, they always go straight from greenFlag to sessionOver
                 case rFactor1Constant.rfGamePhase.sessionStopped:
                 case rFactor1Constant.rfGamePhase.sessionOver:
-                    if (isInPit || startedNewLap || previousSessionPhase == SessionPhase.Finished)
+                    if (isInPit || finishedLap || previousSessionPhase == SessionPhase.Finished)
                     {
                         return SessionPhase.Finished;
                     }
