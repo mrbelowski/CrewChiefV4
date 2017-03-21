@@ -412,29 +412,45 @@ namespace CrewChiefV4.Events
                     String landmark = opponent.stoppedInLandmark;
                     if (landmark != null && !landmark.Equals(currentGameState.SessionData.stoppedInLandmark))
                     {
-                        Boolean canPlay = false;
-                        if (!incidentWarnings.ContainsKey(landmark))
+                        if (!incidentWarnings.ContainsKey(landmark) || incidentWarnings[landmark] + incidentRepeatFrequency < DateTime.Now)
                         {
-                            canPlay = true;
-                            incidentWarnings.Add(landmark, DateTime.Now);
-                        }
-                        else if (incidentWarnings[landmark] + incidentRepeatFrequency < DateTime.Now)
-                        {
-                            canPlay = true;
-                            incidentWarnings[landmark] = DateTime.Now;
-                        }
-                        if (canPlay)
-                        {
-                             if (canReadName(opponent.DriverRawName))
-                             {
-                                Console.WriteLine("incident in " + landmark + " for driver " + opponent.DriverRawName);                           
-                                audioPlayer.playMessage(new QueuedMessage("incident_corner_with_driver", MessageContents(folderIncidentInCornerIntro, "corners/" + landmark,
-                                    folderIncidentInCornerDriverIntro, opponent), 0, this));
+                            Boolean canPlay;
+                            Boolean canReadDriverName = canReadName(opponent.DriverRawName);
+                            Boolean canReadDriverPosition = opponent.Position <= 6;
+                            // first check if we have this driver name (or can read the position) and we're fighting with him, 
+                            // otherwise check if this car is < 1000 metres away
+                            if (Math.Abs(currentGameState.SessionData.Position - opponent.Position) <= 2 && (canReadDriverName || canReadDriverPosition))
+                            {
+                                canPlay = true;
+                            }
+                            else if (opponent.DistanceRoundTrack > currentGameState.PositionAndMotionData.DistanceRoundTrack)
+                            {
+                                canPlay = opponent.DistanceRoundTrack - currentGameState.PositionAndMotionData.DistanceRoundTrack < 1000;
                             }
                             else
-                             {
-                                Console.WriteLine("incident in " + landmark);                           
-                                audioPlayer.playMessage(new QueuedMessage("incident_corner", MessageContents(folderIncidentInCornerIntro, "corners/" + landmark), 0, this));
+                            {
+                                canPlay = opponent.DistanceRoundTrack -
+                                    (currentGameState.PositionAndMotionData.DistanceRoundTrack - currentGameState.SessionData.TrackDefinition.trackLength) < 1000;
+                            }
+                            if (canPlay)
+                            {
+                                incidentWarnings[landmark] = DateTime.Now;
+                                if (canReadDriverName)
+                                {
+                                    Console.WriteLine("incident in " + landmark + " for driver " + opponent.DriverRawName);
+                                    audioPlayer.playMessage(new QueuedMessage("incident_corner_with_driver", MessageContents(folderIncidentInCornerIntro, "corners/" + landmark,
+                                        folderIncidentInCornerDriverIntro, opponent), 0, this));
+                                }
+                                else if (canReadDriverPosition)
+                                {
+                                    audioPlayer.playMessage(new QueuedMessage("incident_corner_with_driver", MessageContents(
+                                        folderPositionHasGoneOffIn[opponent.Position - 1], "corners/" + landmark), 0, this));
+                                }
+                                else
+                                {
+                                    Console.WriteLine("incident in " + landmark);
+                                    audioPlayer.playMessage(new QueuedMessage("incident_corner", MessageContents(folderIncidentInCornerIntro, "corners/" + landmark), 0, this));
+                                }
                             }
                         }
                     }
