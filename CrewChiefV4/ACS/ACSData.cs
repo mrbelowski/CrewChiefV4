@@ -300,6 +300,8 @@ namespace CrewChiefV4.assetto
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 512)]
             public byte[] acInstallPath;
             public int isInternalMemoryModuleLoaded;
+            [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 32)]
+            public byte[] pluginVersion;
         }
 
         public class AssettoCorsaShared

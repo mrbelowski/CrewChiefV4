@@ -45,7 +45,7 @@ namespace CrewChiefV4.assetto
         
         private List<CornerData.EnumWithThresholds> brakeTempThresholdsForPlayersCar = null;
         private static string expectedVersion = "1.7";
-
+        private static string expectedPluginVersion = "1.0.0";
         class splitTimes
         {
             private float currentSplitPoint = 0;
@@ -158,10 +158,10 @@ namespace CrewChiefV4.assetto
         private float severeEngineDamageThreshold = 350.0f;
         private float destroyedEngineDamageThreshold = 25.0f;
 
-        private float trivialAeroDamageThreshold = 0.1f;
-        private float minorAeroDamageThreshold = 0.25f;
-        private float severeAeroDamageThreshold = 0.6f;
-        private float destroyedAeroDamageThreshold = 0.90f;
+        private float trivialAeroDamageThreshold = 40.0f;
+        private float minorAeroDamageThreshold = 100.0f;
+        private float severeAeroDamageThreshold = 200.0f;
+        private float destroyedAeroDamageThreshold = 400.0f;
 
         public ACSGameStateMapper()
         {
@@ -817,12 +817,19 @@ namespace CrewChiefV4.assetto
 
             AssettoCorsaShared shared = ((ACSSharedMemoryReader.ACSStructWrapper)memoryMappedFileStruct).data;
             String currentVersion = shared.acsStatic.smVersion;
-            if (currentVersion.Length != 0 && versionChecked == false)
+            String currentPluginVersion = getNameFromBytes(shared.acsChief.pluginVersion);
+            if (currentVersion.Length != 0 && currentPluginVersion.Length != 0 && versionChecked == false)
             {
                 Console.WriteLine(shared.acsStatic.smVersion);
                 if (!currentVersion.Equals(expectedVersion, StringComparison.Ordinal))
                 {
                     throw new GameDataReadException("Expected shared data version " + expectedVersion + " but got version " + currentVersion);
+                }
+
+                if (!currentPluginVersion.Equals(expectedPluginVersion, StringComparison.Ordinal))
+                {
+                    Console.WriteLine(currentPluginVersion);
+                    throw new GameDataReadException("Expected python plugin version " + expectedPluginVersion + " but got version " + currentPluginVersion);
                 }
                 versionChecked = true;
             }
@@ -1714,8 +1721,11 @@ namespace CrewChiefV4.assetto
                     playerVehicle.suspensionDamage[0], playerVehicle.suspensionDamage[1], playerVehicle.suspensionDamage[2], playerVehicle.suspensionDamage[3]);
 
                 currentGameState.CarDamageData.OverallEngineDamage = mapToEngineDamageLevel(playerVehicle.engineLifeLeft);
-                                
-                currentGameState.CarDamageData.OverallAeroDamage = DamageLevel.UNKNOWN;
+
+                currentGameState.CarDamageData.OverallAeroDamage = mapToAeroDamageLevel(shared.acsPhysics.carDamage[0] +
+                    shared.acsPhysics.carDamage[1] +
+                    shared.acsPhysics.carDamage[2] +
+                    shared.acsPhysics.carDamage[3]);
             }
             else
             {
@@ -2126,8 +2136,10 @@ namespace CrewChiefV4.assetto
             return DamageLevel.NONE;
         }
 
-        private DamageLevel mapToAeroDamageLevel(float aeroDamage)
+        private DamageLevel mapToAeroDamageLevel( float aeroDamage)
         {
+
+
             if (aeroDamage >= destroyedAeroDamageThreshold)
             {
                 return DamageLevel.DESTROYED;
@@ -2148,6 +2160,7 @@ namespace CrewChiefV4.assetto
             {
                 return DamageLevel.NONE;
             }
+
         }
         public Boolean isBehindWithinDistance(float trackLength, float minDistance, float maxDistance, float playerTrackDistance, float opponentTrackDistance)
         {
