@@ -1720,11 +1720,19 @@ namespace CrewChiefV4.assetto
                 currentGameState.PitData.IsAtPitExit = true;
             }
             
-            if(previousGameState != null)
+            if (previousGameState != null)
             {
-                currentGameState.PitData.PitWindow = mapToPitWindow(playerVehicle.lapCount, shared.acsGraphic.isInPit, 
+                int lapsOrMinutes;
+                if (currentGameState.SessionData.SessionHasFixedTime) {
+                    lapsOrMinutes = (int)Math.Floor(currentGameState.SessionData.SessionRunningTime / 60f);
+                }
+                else
+                {
+                    lapsOrMinutes = playerVehicle.lapCount;
+                }
+                currentGameState.PitData.PitWindow = mapToPitWindow(lapsOrMinutes, shared.acsGraphic.isInPit, 
                     currentGameState.PitData.PitWindowStart, currentGameState.PitData.PitWindowEnd, 
-                    previousGameState.PitData.PitWindow,currentGameState.PitData.IsAtPitExit);
+                    previousGameState.PitData.PitWindow, currentGameState.PitData.IsAtPitExit);
 
             }
             else
@@ -2158,9 +2166,9 @@ namespace CrewChiefV4.assetto
             return DamageLevel.NONE;
         }
 
-        private PitWindow mapToPitWindow(int lapCount, int isInPits, int pitWindowStart, int pitWindowEnd, PitWindow previousPitWindow, Boolean isAtPitExit)
+        private PitWindow mapToPitWindow(int lapsOrMinutes, int isInPits, int pitWindowStart, int pitWindowEnd, PitWindow previousPitWindow, Boolean isAtPitExit)
         {
-            if (lapCount < pitWindowStart && lapCount > pitWindowEnd )
+            if (lapsOrMinutes < pitWindowStart && lapsOrMinutes > pitWindowEnd)
             {
                 return PitWindow.Closed;
             }
@@ -2168,11 +2176,11 @@ namespace CrewChiefV4.assetto
             {
                 return PitWindow.Completed;
             }
-            else if (lapCount >= pitWindowStart && lapCount <= pitWindowEnd)
+            else if (lapsOrMinutes >= pitWindowStart && lapsOrMinutes <= pitWindowEnd)
             {
                 return PitWindow.Open;
             }
-            else if (isInPits == 1 && lapCount >= pitWindowStart && lapCount <= pitWindowEnd)
+            else if (isInPits == 1 && lapsOrMinutes >= pitWindowStart && lapsOrMinutes <= pitWindowEnd)
             {
                 return PitWindow.StopInProgress;
             }
