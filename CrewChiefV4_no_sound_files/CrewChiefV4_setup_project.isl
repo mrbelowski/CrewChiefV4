@@ -341,11 +341,12 @@
 		<col def="S0">ISDotNetInstallerArgsCommit</col>
 		<col def="S0">ISDotNetInstallerArgsUninstall</col>
 		<col def="S0">ISDotNetInstallerArgsRollback</col>
+		<row><td>ACInternalMemoryReader.dll</td><td>{AFA0BDD0-C45F-4BAD-86E2-EB25CF2F1FEB}</td><td>STDLIB64</td><td>2</td><td/><td>acinternalmemoryreader.dll</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>CrewChiefV4.Primary_output</td><td>{E3B09293-F596-47FA-A2B7-A1877CE005A6}</td><td>INSTALLDIR</td><td>2</td><td/><td>CrewChiefV4.primary_output</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>ISX_DEFAULTCOMPONENT</td><td>{12984750-B4AB-4871-999A-6845E4545202}</td><td>INSTALLDIR</td><td>2</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>ISX_DEFAULTCOMPONENT1</td><td>{1F99AE4B-6E2F-4A61-91F5-EB5899E06D88}</td><td>CREWCHIEFEX</td><td>2</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>ISX_DEFAULTCOMPONENT2</td><td>{D3D0AF88-6121-46F9-8447-6956638E93E4}</td><td>STDLIB</td><td>2</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>ISX_DEFAULTCOMPONENT3</td><td>{48D217B1-79A5-4937-ADB8-70FD64222A56}</td><td>STDLIB64</td><td>2</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>ISX_DEFAULTCOMPONENT1</td><td>{16975FDF-AEAB-499E-9117-32DFFABE8264}</td><td>CREWCHIEFEX</td><td>2</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>ISX_DEFAULTCOMPONENT2</td><td>{85F885DC-6ABD-4108-BB95-779E9FBEF6BF}</td><td>STDLIB</td><td>2</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>ISX_DEFAULTCOMPONENT3</td><td>{4CD54ABC-B804-422D-A256-5C3054E0F881}</td><td>STDLIB64</td><td>2</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>rFactor2SharedMemoryMapPlugin64.dll</td><td>{A0F38F4D-37DD-47BD-8EEE-0EDA48AE51DC}</td><td>INSTALLDIR</td><td>2</td><td/><td>rfactor2sharedmemorymapplugi</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 	</table>
 
@@ -1875,6 +1876,7 @@
 	<table name="FeatureComponents">
 		<col key="yes" def="s38">Feature_</col>
 		<col key="yes" def="s72">Component_</col>
+		<row><td>AlwaysInstall</td><td>ACInternalMemoryReader.dll</td></row>
 		<row><td>AlwaysInstall</td><td>CrewChiefV4.Primary_output</td></row>
 		<row><td>AlwaysInstall</td><td>ISX_DEFAULTCOMPONENT</td></row>
 		<row><td>AlwaysInstall</td><td>ISX_DEFAULTCOMPONENT1</td></row>
@@ -1898,7 +1900,9 @@
 		<row><td>CrewChiefV4.primary_output</td><td>CrewChiefV4.Primary_output</td><td>CrewChiefV4.Primary output</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;CrewChiefV4&gt;|Built</td><td>3</td><td/></row>
 		<row><td>_ctypes.pyd</td><td>ISX_DEFAULTCOMPONENT2</td><td>_ctypes.pyd</td><td>0</td><td/><td/><td/><td>1</td><td>C:\projects\crewchief_c_sharp\CrewChiefV4\CrewChiefEx\stdlib\_ctypes.pyd</td><td>1</td><td/></row>
 		<row><td>_ctypes.pyd1</td><td>ISX_DEFAULTCOMPONENT3</td><td>_ctypes.pyd</td><td>0</td><td/><td/><td/><td>1</td><td>C:\projects\crewchief_c_sharp\CrewChiefV4\CrewChiefEx\stdlib64\_ctypes.pyd</td><td>1</td><td/></row>
+		<row><td>acinternalmemoryreader.dll</td><td>ACInternalMemoryReader.dll</td><td>ACINTE~1.DLL|ACInternalMemoryReader.dll</td><td>0</td><td/><td/><td/><td>1</td><td>C:\projects\crewchief_c_sharp\CrewChiefV4\CrewChiefEx\stdlib64\ACInternalMemoryReader.dll</td><td>1</td><td/></row>
 		<row><td>carclassdata.json</td><td>ISX_DEFAULTCOMPONENT</td><td>CARCLA~1.JSO|carClassData.json</td><td>0</td><td/><td/><td/><td>1</td><td>C:\projects\crewchief_c_sharp\CrewChiefV4\CrewChiefV4\carClassData.json</td><td>1</td><td/></row>
+		<row><td>config.txt</td><td>ISX_DEFAULTCOMPONENT1</td><td>config.txt</td><td>0</td><td/><td/><td/><td>1</td><td>C:\projects\crewchief_c_sharp\CrewChiefV4\CrewChiefEx\config.txt</td><td>1</td><td/></row>
 		<row><td>crewchiefex.py</td><td>ISX_DEFAULTCOMPONENT1</td><td>CREWCH~1.PY|CrewChiefEx.py</td><td>0</td><td/><td/><td/><td>1</td><td>C:\projects\crewchief_c_sharp\CrewChiefV4\CrewChiefEx\CrewChiefEx.py</td><td>1</td><td/></row>
 		<row><td>help.txt</td><td>ISX_DEFAULTCOMPONENT</td><td>help.txt</td><td>0</td><td/><td/><td/><td>1</td><td>C:\projects\crewchief_c_sharp\CrewChiefV4\help.txt</td><td>1</td><td/></row>
 		<row><td>newtonsoft_json_licence.txt</td><td>ISX_DEFAULTCOMPONENT</td><td>NEWTON~1.TXT|Newtonsoft_Json_licence.txt</td><td>0</td><td/><td/><td/><td>1</td><td>C:\projects\crewchief_c_sharp\CrewChiefV4\Newtonsoft_Json_licence.txt</td><td>1</td><td/></row>
@@ -2053,11 +2057,12 @@
 		<col def="S0">FTPLocation</col>
 		<col def="S0">HTTPLocation</col>
 		<col def="S0">Miscellaneous</col>
+		<row><td>ACInternalMemoryReader.dll</td><td/><td/><td>_B588B1AF_D5F6_430F_B399_B8AD8DA15FE3_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>CrewChiefV4.Primary_output</td><td/><td/><td>_1BE3BD1C_4227_4FE6_BB02_03E27B339B9B_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>ISX_DEFAULTCOMPONENT</td><td/><td/><td>_39277B58_FECF_4923_974B_A82625C8FD8E_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>ISX_DEFAULTCOMPONENT1</td><td/><td/><td>_68AB6137_27BC_4E21_920C_2313E135EB7B_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>ISX_DEFAULTCOMPONENT2</td><td/><td/><td>_EB48EFE1_E7E4_4186_939E_69F3D49AF063_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>ISX_DEFAULTCOMPONENT3</td><td/><td/><td>_9D879C33_F53B_4136_97E6_950314D8C7E4_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>ISX_DEFAULTCOMPONENT1</td><td/><td/><td>_BBDCE08C_7F42_47ED_AD9F_8F76263C54EC_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>ISX_DEFAULTCOMPONENT2</td><td/><td/><td>_48B8F9DD_F212_4EC0_AA8C_A2DBB6EB43A2_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>ISX_DEFAULTCOMPONENT3</td><td/><td/><td>_22ABFC6A_D743_4373_BF0A_47715310AC65_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>rFactor2SharedMemoryMapPlugin64.dll</td><td/><td/><td>_1C51616E_9B7A_4298_9582_2B566CAFD1B2_FILTER</td><td/><td/><td/><td/></row>
 	</table>
 
