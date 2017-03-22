@@ -52,7 +52,8 @@ class SPageFileCrewChief(ctypes.Structure):
         ('serverName', c_char * 512),
         ('vehicleInfo', acsVehicleInfo * 64),
         ('acInstallPath', c_char * 512),
-        ('isInternalMemoryModuleLoaded', c_int32),		
+        ('isInternalMemoryModuleLoaded', c_int32),
+        ('pluginVersion', c_char * 32)		
     ]
 
 class CrewChiefShared:
