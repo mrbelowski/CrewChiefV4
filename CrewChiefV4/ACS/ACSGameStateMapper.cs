@@ -820,15 +820,15 @@ namespace CrewChiefV4.assetto
             String currentPluginVersion = getNameFromBytes(shared.acsChief.pluginVersion);
             if (currentVersion.Length != 0 && currentPluginVersion.Length != 0 && versionChecked == false)
             {
-                Console.WriteLine(shared.acsStatic.smVersion);
+                Console.WriteLine("Shared Memory Version: " + shared.acsStatic.smVersion);
                 if (!currentVersion.Equals(expectedVersion, StringComparison.Ordinal))
                 {
                     throw new GameDataReadException("Expected shared data version " + expectedVersion + " but got version " + currentVersion);
                 }
-
+                Console.WriteLine("Plugin Version: " + currentPluginVersion);
                 if (!currentPluginVersion.Equals(expectedPluginVersion, StringComparison.Ordinal))
                 {
-                    Console.WriteLine(currentPluginVersion);
+                    
                     throw new GameDataReadException("Expected python plugin version " + expectedPluginVersion + " but got version " + currentPluginVersion);
                 }
                 versionChecked = true;
