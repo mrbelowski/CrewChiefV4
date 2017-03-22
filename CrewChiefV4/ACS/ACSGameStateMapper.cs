@@ -825,10 +825,10 @@ namespace CrewChiefV4.assetto
                 {
                     throw new GameDataReadException("Expected shared data version " + expectedVersion + " but got version " + currentVersion);
                 }
-                Console.WriteLine(currentPluginVersion);
+
                 if (!currentPluginVersion.Equals(expectedPluginVersion, StringComparison.Ordinal))
                 {
-                    
+                    Console.WriteLine(currentPluginVersion);
                     throw new GameDataReadException("Expected python plugin version " + expectedPluginVersion + " but got version " + currentPluginVersion);
                 }
                 versionChecked = true;
