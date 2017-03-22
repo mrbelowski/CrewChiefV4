@@ -255,7 +255,7 @@ namespace CrewChiefV4.Events
                                         // start working out who's gone off
                                         findInitialIncidentCandidateKeys(i + 1, currentGameState.OpponentData);
                                         positionAtStartOfIncident = currentGameState.SessionData.Position;
-                                        nextIncidentDriversCheck = DateTime.Now + TimeSpan.FromSeconds(3);
+                                        nextIncidentDriversCheck = DateTime.Now + TimeSpan.FromSeconds(2);
                                     }
                                 }
                                 else if (sectorFlag == FlagEnum.GREEN)
@@ -484,9 +484,9 @@ namespace CrewChiefV4.Events
                     OpponentData opponent = opponents[incidentCandidate.opponentDataKey];
                     if (opponent.CurrentSectorNumber == flagSector &&
                         (Math.Abs(opponent.DistanceRoundTrack - incidentCandidate.distanceRoundTrackAtStartOfIncident) < maxDistanceMovedForYellowAnnouncement) ||
-                        opponent.Position > incidentCandidate.positionAtStartOfIncident + 5)
+                        opponent.Position > incidentCandidate.positionAtStartOfIncident + 3)
                     {
-                        // this guy is in the same sector as the yellow but has only travelled 10m in 5 seconds or has lost a load of places,
+                        // this guy is in the same sector as the yellow but has only travelled 10m in 2 seconds or has lost a load of places,
                         // so he's probably involved - add him to the list if we have sound files for him:
                         NamePositionPair namePositionPair = new NamePositionPair(opponent.DriverRawName, incidentCandidate.positionAtStartOfIncident, opponent.DistanceRoundTrack,
                             canReadName(opponent.DriverRawName), incidentCandidate.opponentDataKey);
