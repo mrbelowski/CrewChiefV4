@@ -45,7 +45,7 @@ namespace CrewChiefV4.assetto
         
         private List<CornerData.EnumWithThresholds> brakeTempThresholdsForPlayersCar = null;
         private static string expectedVersion = "1.7";
-
+        private static string expectedPluginVersion = "1.0.0";
         class splitTimes
         {
             private float currentSplitPoint = 0;
@@ -817,12 +817,18 @@ namespace CrewChiefV4.assetto
 
             AssettoCorsaShared shared = ((ACSSharedMemoryReader.ACSStructWrapper)memoryMappedFileStruct).data;
             String currentVersion = shared.acsStatic.smVersion;
-            if (currentVersion.Length != 0 && versionChecked == false)
+            String currentPluginVersion = getNameFromBytes(shared.acsChief.pluginVersion);
+            if (currentVersion.Length != 0 && currentPluginVersion.Length != 0 && versionChecked == false)
             {
                 Console.WriteLine(shared.acsStatic.smVersion);
                 if (!currentVersion.Equals(expectedVersion, StringComparison.Ordinal))
                 {
                     throw new GameDataReadException("Expected shared data version " + expectedVersion + " but got version " + currentVersion);
+                }
+
+                if (!currentPluginVersion.Equals(expectedPluginVersion, StringComparison.Ordinal))
+                {
+                    throw new GameDataReadException("Expected python plugin version " + expectedPluginVersion + " but got version " + currentPluginVersion);
                 }
                 versionChecked = true;
             }

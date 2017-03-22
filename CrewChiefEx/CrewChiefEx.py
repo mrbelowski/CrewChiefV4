@@ -21,6 +21,8 @@ from shared_mem import CrewChiefShared
 
 sharedMem = CrewChiefShared()
 
+pluginVersion = "1.0.0"
+
 timer = 0
 lib = None
 libInit = 0
@@ -113,7 +115,7 @@ def acMain(ac_version):
   sharedmem.serverName = ac.getServerName().encode('utf-8')
   sharedmem.acInstallPath = os.path.abspath(os.curdir).encode('utf-8')
   sharedmem.isInternalMemoryModuleLoaded = libInit
-  
+  sharedmem.pluginVersion = pluginVersion.encode('utf-8')
   return "CrewChiefEx"
 
 def acUpdate(deltaT):
