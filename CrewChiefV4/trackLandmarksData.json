@@ -1204,6 +1204,54 @@
                     "isCommonOvertakingSpot": false
                 }
             ]
+        },
+        {
+            "rf1TrackNames": [ "VIR Full Course" ],
+            "rf2TrackNames": [ "VIR Full Course" ],
+            "trackLandmarks": [
+                {
+                    "landmarkName": "horseshoe",
+                    "distanceRoundLapStart": 340,
+                    "distanceRoundLapEnd": 605,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "nascar_bend",
+                    "distanceRoundLapStart": 813,
+                    "distanceRoundLapEnd": 929,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "left_hook",
+                    "distanceRoundLapStart": 997,
+                    "distanceRoundLapEnd": 1099,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "south_bend",
+                    "distanceRoundLapStart": 2364,
+                    "distanceRoundLapEnd": 2525,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "oak_tree",
+                    "distanceRoundLapStart": 2701,
+                    "distanceRoundLapEnd": 2857,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "roller_coaster",
+                    "distanceRoundLapStart": 4014,
+                    "distanceRoundLapEnd": 4351,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "hog_pen",
+                    "distanceRoundLapStart": 4499,
+                    "distanceRoundLapEnd": 4720,
+                    "isCommonOvertakingSpot": true
+                }
+            ]
         }
     ]
 }
