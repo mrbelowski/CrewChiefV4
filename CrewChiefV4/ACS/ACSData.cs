@@ -183,7 +183,6 @@ namespace CrewChiefV4.assetto
             public int isInPitLane;
 
             public float surfaceGrip;
-            public int MandatoryPitDone; 
         }
 
         [StructLayout(LayoutKind.Sequential, Pack = 4, CharSet = CharSet.Unicode)]
@@ -247,11 +246,6 @@ namespace CrewChiefV4.assetto
             public float ersMaxJ;
             public int isTimedRace;
             public int hasExtraLap;
-            [MarshalAsAttribute(UnmanagedType.ByValTStr, SizeConst = 33)]
-            public String carSkin;
-            public int reversedGridPositions;
-            public int PitWindowStart;
-            public int PitWindowEnd;
             
         }
 
