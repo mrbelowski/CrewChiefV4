@@ -1121,20 +1121,20 @@
                     "landmarkName": "bill_mitchell_bend",
                     "distanceRoundLapStart": 5181,
                     "distanceRoundLapEnd": 5404,
-                    "isCommonOvertakingSpot": true
+                    "isCommonOvertakingSpot": false
                 },
                 {
                     "landmarkName": "turn14",
                     "distanceRoundLapStart": 5503,
                     "distanceRoundLapEnd": 5568,
-                    "isCommonOvertakingSpot": true
+                    "isCommonOvertakingSpot": false
                 }
             ]
         },
         {
             "rf1TrackNames": [ "Road America 2016" ],
             "rf2TrackNames": [ "Road America 2016" ],
-			"pcarsTrackName": "Road America:",
+            "pcarsTrackName": "Road America:",
             "trackLandmarks": [
                 {
                     "landmarkName": "turn1",
@@ -1194,13 +1194,13 @@
                     "landmarkName": "bill_mitchell_bend",
                     "distanceRoundLapStart": 5367,
                     "distanceRoundLapEnd": 5563,
-                    "isCommonOvertakingSpot": true
+                    "isCommonOvertakingSpot": false
                 },
                 {
                     "landmarkName": "turn14",
                     "distanceRoundLapStart": 5676,
                     "distanceRoundLapEnd": 5862,
-                    "isCommonOvertakingSpot": true
+                    "isCommonOvertakingSpot": false
                 }
             ]
         }
