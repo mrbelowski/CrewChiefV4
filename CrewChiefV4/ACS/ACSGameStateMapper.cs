@@ -828,6 +828,7 @@ namespace CrewChiefV4.assetto
 
                 if (!currentPluginVersion.Equals(expectedPluginVersion, StringComparison.Ordinal))
                 {
+                    Console.WriteLine(currentPluginVersion);
                     throw new GameDataReadException("Expected python plugin version " + expectedPluginVersion + " but got version " + currentPluginVersion);
                 }
                 versionChecked = true;
