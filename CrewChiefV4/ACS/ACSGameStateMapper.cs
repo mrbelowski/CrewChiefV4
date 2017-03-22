@@ -1719,8 +1719,8 @@ namespace CrewChiefV4.assetto
             {
                 currentGameState.PitData.IsAtPitExit = true;
             }
-            
-            if (previousGameState != null)
+
+            if (previousGameState != null && currentGameState.PitData.HasMandatoryPitStop)
             {
                 int lapsOrMinutes;
                 if (currentGameState.SessionData.SessionHasFixedTime) {
@@ -1733,7 +1733,6 @@ namespace CrewChiefV4.assetto
                 currentGameState.PitData.PitWindow = mapToPitWindow(lapsOrMinutes, shared.acsGraphic.isInPit, 
                     currentGameState.PitData.PitWindowStart, currentGameState.PitData.PitWindowEnd, 
                     previousGameState.PitData.PitWindow, currentGameState.PitData.IsAtPitExit);
-
             }
             else
             {
