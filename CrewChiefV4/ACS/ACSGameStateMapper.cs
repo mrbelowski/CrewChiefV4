@@ -1151,6 +1151,12 @@ namespace CrewChiefV4.assetto
                         brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(currentGameState.carClass);
                         // no tyre data in the block so get the default tyre types for this car
                         defaultTyreTypeForPlayersCar = CarData.getDefaultTyreType(currentGameState.carClass);
+
+                        currentGameState.PitData.PitWindowStart = shared.acsStatic.PitWindowStart;
+                        currentGameState.PitData.PitWindowEnd = shared.acsStatic.PitWindowEnd;
+                        currentGameState.PitData.HasMandatoryPitStop = currentGameState.PitData.PitWindowStart > 0 && currentGameState.PitData.PitWindowEnd > 0;                         
+  
+
                         if (previousGameState != null)
                         {
                             currentGameState.OpponentData = previousGameState.OpponentData;
@@ -1686,7 +1692,7 @@ namespace CrewChiefV4.assetto
             currentGameState.PositionAndMotionData.CarSpeed = playerVehicle.speedMS;
             currentGameState.PositionAndMotionData.DistanceRoundTrack = distanceRoundTrack;
 
-            //pit data
+            //------------------------ Pit stop data -----------------------
             currentGameState.PitData.InPitlane = shared.acsGraphic.isInPitLane == 1;
 
             if (currentGameState.PitData.InPitlane)
@@ -1713,6 +1719,22 @@ namespace CrewChiefV4.assetto
             {
                 currentGameState.PitData.IsAtPitExit = true;
             }
+            
+            if(previousGameState != null)
+            {
+                currentGameState.PitData.PitWindow = mapToPitWindow(playerVehicle.lapCount, shared.acsGraphic.isInPit, 
+                    currentGameState.PitData.PitWindowStart, currentGameState.PitData.PitWindowEnd, 
+                    previousGameState.PitData.PitWindow,currentGameState.PitData.IsAtPitExit);
+
+            }
+            else
+            {
+                currentGameState.PitData.PitWindow = PitWindow.Unavailable;
+            }
+
+            currentGameState.PitData.IsMakingMandatoryPitStop = (currentGameState.PitData.PitWindow == PitWindow.StopInProgress);
+
+
             //damage data
             if(shared.acsChief.isInternalMemoryModuleLoaded == 1)
             {
@@ -2136,9 +2158,32 @@ namespace CrewChiefV4.assetto
             return DamageLevel.NONE;
         }
 
+        private PitWindow mapToPitWindow(int lapCount, int isInPits, int pitWindowStart, int pitWindowEnd, PitWindow previousPitWindow, Boolean isAtPitExit)
+        {
+            if (lapCount < pitWindowStart && lapCount > pitWindowEnd )
+            {
+                return PitWindow.Closed;
+            }
+            if (previousPitWindow == PitWindow.Completed || (previousPitWindow == PitWindow.StopInProgress && isAtPitExit))
+            {
+                return PitWindow.Completed;
+            }
+            else if (lapCount >= pitWindowStart && lapCount <= pitWindowEnd)
+            {
+                return PitWindow.Open;
+            }
+            else if (isInPits == 1 && lapCount >= pitWindowStart && lapCount <= pitWindowEnd)
+            {
+                return PitWindow.StopInProgress;
+            }
+            else
+            {
+                return PitWindow.Unavailable;
+            }
+        }
+
         private DamageLevel mapToAeroDamageLevel( float aeroDamage)
         {
-
 
             if (aeroDamage >= destroyedAeroDamageThreshold)
             {
