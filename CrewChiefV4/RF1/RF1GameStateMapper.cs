@@ -1151,7 +1151,7 @@ namespace CrewChiefV4.rFactor1
                     return CarData.getCarClassForClassName(vehicleName);
                 }
             }
-            return null;
+            return CarData.getCarClassForClassName(vehicleName);
         }
     }
 }

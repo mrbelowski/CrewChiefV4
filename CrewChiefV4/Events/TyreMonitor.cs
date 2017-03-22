@@ -403,7 +403,11 @@ namespace CrewChiefV4.Events
                 nextLockingAndSpinningCheck = currentGameState.Now.Add(lockingAndSpinningCheckInterval);
             }
             // corner-specific locking and spinning checks
-            if (enableCornerSpecificLockingAndSpinningChecks) 
+            // skip these for race sector1 lap1 where wheelspin and locking are expected
+            if (enableCornerSpecificLockingAndSpinningChecks &&
+                    (currentGameState.SessionData.SessionType != SessionType.Race ||
+                     currentGameState.SessionData.CompletedLaps > 0 || 
+                     currentGameState.SessionData.SectorNumber != 1)) 
             {
                 if (currentGameState.SessionData.trackLandmarksTiming.atMidPointOfLandmark != null)
                 {
@@ -1493,11 +1497,6 @@ namespace CrewChiefV4.Events
             // note that we don't have separate values for left and right rear locking because it's common for FWD cars to cock 
             // a wheel on turn-in so we only care of both rears are locking
             NONE, FRONTS, LEFT_FRONT, RIGHT_FRONT, REARS
-        }
-
-        private enum WheelsSpinningEnum
-        {
-            NONE, FRONTS, LEFT_FRONT, RIGHT_FRONT, REARS, LEFT_REAR, RIGHT_REAR
         }
     }
 }
