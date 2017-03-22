@@ -1,7 +1,7 @@
 {
     "TrackLandmarksData": [
         {
-            "rf1TrackNames": [ "Bathurst Mount Panorama" ],
+            "rf1TrackNames": [ "Bathurst Mount Panorama", "Bathurst 2010 - MAX Detail" ],
             "rf2TrackNames": [ "Bathurst" ],            
             "pcarsTrackName": "Bathurst:",
             "raceroomLayoutId": 1846,
@@ -145,7 +145,7 @@
             ]
         },
         {
-            "rf1TrackNames": [ "Brands Indy" ],
+            "rf1TrackNames": [ "Brands Indy", "Brands Hatch Indy" ],
             "rf2TrackNames": [ "Brands Hatch Indy", "Brands" ],
             "acTrackNames": [ "ks_brands_hatch:indy" ],
             "pcarsTrackName": "Brands Hatch:Indy",
@@ -184,7 +184,7 @@
             ]
         },
         {
-            "rf1TrackNames": [ "Brands GP" ],
+            "rf1TrackNames": [ "Brands GP", "Brands Hatch Grand Prix" ],
             "rf2TrackNames": [ "Brands Hatch GP" ],
             "acTrackNames": [ "ks_brands_hatch:gp" ],
             "pcarsTrackName": "Brands Hatch:Grand Prix",
@@ -631,6 +631,7 @@
             ]
         },
         {
+			"rf1TrackNames": [ "Imola 2016" ],
             "acTrackNames": [ "imola:" ],
             "pcarsTrackName": "Imola:Grand Prix",
             "trackLandmarks": [

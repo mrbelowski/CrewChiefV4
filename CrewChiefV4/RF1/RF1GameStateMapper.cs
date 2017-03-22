@@ -148,7 +148,7 @@ namespace CrewChiefV4.rFactor1
             }            
             Boolean isInPits = player.inPits == 1;
             currentGameState.SessionData.SessionPhase = mapToSessionPhase((rFactor1Constant.rfGamePhase)shared.gamePhase,
-                    previousSessionPhase, finishedLap || startedNewLap, isInPits);
+                    previousSessionPhase, /*finishedLap ||*/ startedNewLap, isInPits);
 
             // --------------------------------
             // flags data
@@ -213,9 +213,17 @@ namespace CrewChiefV4.rFactor1
             currentGameState.SessionData.TrackDefinition = new TrackDefinition(getNameFromBytes(shared.trackName), shared.lapDist);
             if (previousGameState == null || previousGameState.SessionData.TrackDefinition.name != currentGameState.SessionData.TrackDefinition.name)
             {
+                // new game or new track
                 currentGameState.SessionData.TrackDefinition.trackLandmarks = TrackData.TRACK_LANDMARKS_DATA.getTrackLandmarksForTrackName(currentGameState.SessionData.TrackDefinition.name);
                 currentGameState.SessionData.TrackDefinition.setGapPoints();
             }
+            else if (previousGameState != null)
+            {
+                // copy from previous gamestate
+                currentGameState.SessionData.TrackDefinition.trackLandmarks = previousGameState.SessionData.TrackDefinition.trackLandmarks;
+                currentGameState.SessionData.TrackDefinition.gapPoints = previousGameState.SessionData.TrackDefinition.gapPoints;
+            }
+            
             currentGameState.SessionData.TrackDefinition.setGapPoints();
             currentGameState.SessionData.SessionNumberOfLaps = shared.maxLaps > 0 && shared.maxLaps < 1000 ? shared.maxLaps : 0;
             // default to 60:30 if both session time and number of laps undefined (test day)
