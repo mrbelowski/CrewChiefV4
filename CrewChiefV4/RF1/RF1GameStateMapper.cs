@@ -521,7 +521,8 @@ namespace CrewChiefV4.rFactor1
                 currentGameState.TyreData.LeftRearIsLocked = Math.Abs(shared.wheel[2].rotation) < minRotatingSpeed;
                 currentGameState.TyreData.RightRearIsLocked = Math.Abs(shared.wheel[3].rotation) < minRotatingSpeed;
 
-                float maxRotatingSpeed = 2.0f * (float)Math.PI * currentGameState.PositionAndMotionData.CarSpeed / currentGameState.carClass.minTyreCircumference;
+                // TODO: fix this properly - increase the maxRotatingSpeed from 2*pi to 3*pi just to hide the problem
+                float maxRotatingSpeed = 3 * (float)Math.PI * currentGameState.PositionAndMotionData.CarSpeed / currentGameState.carClass.minTyreCircumference;
                 currentGameState.TyreData.LeftFrontIsSpinning = Math.Abs(shared.wheel[0].rotation) > maxRotatingSpeed;
                 currentGameState.TyreData.RightFrontIsSpinning = Math.Abs(shared.wheel[1].rotation) > maxRotatingSpeed;
                 currentGameState.TyreData.LeftRearIsSpinning = Math.Abs(shared.wheel[2].rotation) > maxRotatingSpeed;
