@@ -1053,8 +1053,8 @@ namespace CrewChiefV4.RaceRoom
             // some simple locking / spinning checks
             if (shared.CarSpeed > 7)
             {
-                float minRotatingSpeed = 2 * (float)Math.PI * shared.CarSpeed / currentGameState.carClass.maxTyreCircumference;
-                // I think the tyreRPS is actually radians per second...
+                // TODO: fix this properly - decrease the minRotatingSpeed from 2*pi to pi just to hide the problem
+                float minRotatingSpeed = (float)Math.PI * shared.CarSpeed / currentGameState.carClass.maxTyreCircumference;
                 currentGameState.TyreData.LeftFrontIsLocked = Math.Abs(shared.TireRps.FrontLeft) < minRotatingSpeed;
                 currentGameState.TyreData.RightFrontIsLocked = Math.Abs(shared.TireRps.FrontRight) < minRotatingSpeed;
                 currentGameState.TyreData.LeftRearIsLocked = Math.Abs(shared.TireRps.RearLeft) < minRotatingSpeed;
