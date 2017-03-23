@@ -1741,7 +1741,6 @@ namespace CrewChiefV4.assetto
 
             currentGameState.PitData.IsMakingMandatoryPitStop = (currentGameState.PitData.PitWindow == PitWindow.StopInProgress);
 
-
             //damage data
             if(shared.acsChief.isInternalMemoryModuleLoaded == 1)
             {
@@ -2165,12 +2164,10 @@ namespace CrewChiefV4.assetto
             return DamageLevel.NONE;
         }
 
+
         private PitWindow mapToPitWindow(int lapsOrMinutes, int isInPits, int pitWindowStart, int pitWindowEnd, PitWindow previousPitWindow, Boolean isAtPitExit)
         {
-            if (lapsOrMinutes < pitWindowStart && lapsOrMinutes > pitWindowEnd)
-            {
-                return PitWindow.Closed;
-            }
+
             if (previousPitWindow == PitWindow.Completed || (previousPitWindow == PitWindow.StopInProgress && isAtPitExit))
             {
                 return PitWindow.Completed;
