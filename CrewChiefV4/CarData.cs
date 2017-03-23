@@ -58,6 +58,9 @@ namespace CrewChiefV4
         private static float maxWarmCarbonBrakeTemp = 1200;
         private static float maxHotCarbonBrakeTemp = 1500;
 
+        private static float defaultSpotterVehicleWidth = 1.8f;
+        private static float defaultSpotterVehicleLength = 4.5f;
+
         public enum CarClassEnum
         {
             GT1X, GT1, GTE, GT2, GTC, GTLM, GT3, GT4, GT5, Kart_1, Kart_2, KART_JUNIOR, KART_F1, LMP1, LMP2, LMP3, ROAD_B, ROAD_C1, ROAD_C2, ROAD_D, ROAD_SUPERCAR, GROUPC, GROUPA, GROUP4, GROUP5, GROUP6, GTO,
@@ -146,6 +149,8 @@ namespace CrewChiefV4
             carbonBrakeTempsThresholds.Add(new CornerData.EnumWithThresholds(BrakeTemp.HOT, maxWarmCarbonBrakeTemp, maxHotCarbonBrakeTemp));
             carbonBrakeTempsThresholds.Add(new CornerData.EnumWithThresholds(BrakeTemp.COOKING, maxHotCarbonBrakeTemp, 10000));
             brakeTempThresholds.Add(BrakeType.Carbon, carbonBrakeTempsThresholds);
+
+            defaultSpotterVehicleLength = 1.0f;
         }
 
         public class CarClassEnumConverter : Newtonsoft.Json.Converters.StringEnumConverter
@@ -191,12 +196,18 @@ namespace CrewChiefV4
 
             [JsonConverter(typeof(StringEnumConverter))]
             public BrakeType brakeType { get; set; }
+            public float overrideMaxColdBrakeTemp { get; set; }
+            public float overrideMaxWarmBrakeTemp { get; set; }
+            public float overrideMaxHotBrakeTemp { get; set; }
+
             [JsonConverter(typeof(StringEnumConverter))]
             public TyreType defaultTyreType { get; set; }
             public float maxSafeWaterTemp { get; set; }
             public float maxSafeOilTemp { get; set; }
             public float minTyreCircumference { get; set; }
             public float maxTyreCircumference { get; set; }
+            public float spotterVehicleWidth { get; set; }
+            public float spotterVehicleLength { get; set; }
 
             public String placeholderClassId = "";
 
@@ -220,6 +231,11 @@ namespace CrewChiefV4
                 this.maxSafeOilTemp = 125;
                 this.minTyreCircumference = 0.5f * (float)Math.PI;
                 this.maxTyreCircumference = 1.2f * (float)Math.PI;
+                this.overrideMaxColdBrakeTemp = 1.0f;
+                this.overrideMaxWarmBrakeTemp = 1.0f;
+                this.overrideMaxHotBrakeTemp = 1.0f;
+                this.spotterVehicleWidth = CarData.defaultSpotterVehicleWidth;
+                this.spotterVehicleLength = CarData.defaultSpotterVehicleLength;
             }
 
             public String getClassIdentifier()
@@ -561,6 +577,7 @@ namespace CrewChiefV4
 
         public static List<CornerData.EnumWithThresholds> getBrakeTempThresholds(CarClass carClass)
         {
+            // TODO: override here. Clone the list, and set it of override max vars are set.
             return brakeTempThresholds[carClass.brakeType];
         }
 
