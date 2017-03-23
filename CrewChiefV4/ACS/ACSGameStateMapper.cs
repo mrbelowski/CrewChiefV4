@@ -2167,7 +2167,10 @@ namespace CrewChiefV4.assetto
 
         private PitWindow mapToPitWindow(int lapsOrMinutes, int isInPits, int pitWindowStart, int pitWindowEnd, PitWindow previousPitWindow, Boolean isAtPitExit)
         {
-
+            if (lapsOrMinutes < pitWindowStart && lapsOrMinutes > pitWindowEnd)
+            {
+                return PitWindow.Closed;
+            }
             if (previousPitWindow == PitWindow.Completed || (previousPitWindow == PitWindow.StopInProgress && isAtPitExit))
             {
                 return PitWindow.Completed;
