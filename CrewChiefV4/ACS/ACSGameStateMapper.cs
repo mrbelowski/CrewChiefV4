@@ -1152,11 +1152,9 @@ namespace CrewChiefV4.assetto
                         // no tyre data in the block so get the default tyre types for this car
                         defaultTyreTypeForPlayersCar = CarData.getDefaultTyreType(currentGameState.carClass);
 
-                        currentGameState.PitData.PitWindowStart = shared.acsStatic.PitWindowStart;
-                        currentGameState.PitData.PitWindowEnd = shared.acsStatic.PitWindowEnd;
+                        currentGameState.PitData.PitWindowStart = shared.acsStatic.PitWindowStart-1;
+                        currentGameState.PitData.PitWindowEnd = shared.acsStatic.PitWindowEnd-1;
                         currentGameState.PitData.HasMandatoryPitStop = currentGameState.PitData.PitWindowStart > 0 && currentGameState.PitData.PitWindowEnd > 0;
-
-
                         if (previousGameState != null)
                         {
                             currentGameState.OpponentData = previousGameState.OpponentData;
@@ -1720,7 +1718,7 @@ namespace CrewChiefV4.assetto
                 currentGameState.PitData.IsAtPitExit = true;
             }
 
-            if (previousGameState != null && currentGameState.PitData.HasMandatoryPitStop)
+            if (currentGameState.PitData.HasMandatoryPitStop)
             {
                 int lapsOrMinutes;
                 if (currentGameState.SessionData.SessionHasFixedTime)
@@ -1731,9 +1729,8 @@ namespace CrewChiefV4.assetto
                 {
                     lapsOrMinutes = playerVehicle.lapCount;
                 }
-                currentGameState.PitData.PitWindow = mapToPitWindow(lapsOrMinutes, shared.acsGraphic.isInPit,
-                    currentGameState.PitData.PitWindowStart, currentGameState.PitData.PitWindowEnd,
-                    previousGameState.PitData.PitWindow, currentGameState.PitData.IsAtPitExit);
+                currentGameState.PitData.PitWindow = mapToPitWindow(lapsOrMinutes, currentGameState.PitData.InPitlane,
+                    currentGameState.PitData.PitWindowStart, currentGameState.PitData.PitWindowEnd, shared.acsGraphic.MandatoryPitDone == 1);
             }
             else
             {
@@ -1951,11 +1948,6 @@ namespace CrewChiefV4.assetto
             return SessionPhase.Unavailable;
         }
 
-        private PitWindow mapToPitWindow(int pitWindow)
-        {
-            return PitWindow.Unavailable;
-        }
-
         private void upateOpponentData(OpponentData opponentData, int racePosition, int leaderBoardPosition, int completedLaps, int sector,
             float completedLapTime, float lastLapTime, Boolean isInPits, Boolean lapIsValid, float sessionRunningTime, float secondsSinceLastUpdate,
             float[] currentWorldPosition, float speed, float distanceRoundTrack, Boolean sessionLengthIsTime, float sessionTimeRemaining,
@@ -2166,13 +2158,13 @@ namespace CrewChiefV4.assetto
             return DamageLevel.NONE;
         }
 
-        private PitWindow mapToPitWindow(int lapsOrMinutes, int isInPits, int pitWindowStart, int pitWindowEnd, PitWindow previousPitWindow, Boolean isAtPitExit)
+        private PitWindow mapToPitWindow(int lapsOrMinutes, Boolean isInPits, int pitWindowStart, int pitWindowEnd, Boolean mandatoryPitDone)
         {
             if (lapsOrMinutes < pitWindowStart && lapsOrMinutes > pitWindowEnd)
             {
                 return PitWindow.Closed;
             }
-            if (previousPitWindow == PitWindow.Completed || (previousPitWindow == PitWindow.StopInProgress && isAtPitExit))
+            if (mandatoryPitDone)
             {
                 return PitWindow.Completed;
             }
@@ -2180,7 +2172,7 @@ namespace CrewChiefV4.assetto
             {
                 return PitWindow.Open;
             }
-            else if (isInPits == 1 && lapsOrMinutes >= pitWindowStart && lapsOrMinutes <= pitWindowEnd)
+            else if (isInPits && lapsOrMinutes >= pitWindowStart && lapsOrMinutes <= pitWindowEnd)
             {
                 return PitWindow.StopInProgress;
             }
