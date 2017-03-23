@@ -1875,7 +1875,8 @@ namespace CrewChiefV4.assetto
                 currentGameState.TyreData.LeftRearIsLocked = Math.Abs(shared.acsPhysics.wheelAngularSpeed[2]) < minRotatingSpeed;
                 currentGameState.TyreData.RightRearIsLocked = Math.Abs(shared.acsPhysics.wheelAngularSpeed[3]) < minRotatingSpeed;
 
-                float maxRotatingSpeed = 2 * (float)Math.PI * playerVehicle.speedMS / currentGameState.carClass.minTyreCircumference;
+                // TODO: fix this properly - increase the maxRotatingSpeed from 2*pi to 3*pi just to hide the problem
+                float maxRotatingSpeed = 3 * (float)Math.PI * playerVehicle.speedMS / currentGameState.carClass.minTyreCircumference;
                 currentGameState.TyreData.LeftFrontIsSpinning = Math.Abs(shared.acsPhysics.wheelAngularSpeed[0]) > maxRotatingSpeed;
                 currentGameState.TyreData.RightFrontIsSpinning = Math.Abs(shared.acsPhysics.wheelAngularSpeed[1]) > maxRotatingSpeed;
                 currentGameState.TyreData.LeftRearIsSpinning = Math.Abs(shared.acsPhysics.wheelAngularSpeed[2]) > maxRotatingSpeed;
