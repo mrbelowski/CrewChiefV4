@@ -94,20 +94,20 @@ namespace CrewChiefV4
                         }
                         dict.Add(split[0].Trim(), split[1].Trim());
                     }
-                    catch (Exception e)
+                    catch (Exception)
                     {
                     }
                 }
             }
         }
 
-        private static Dictionary<String, String> LoadSpeechRecognitionConfig()
+        private static Dictionary<string, string> LoadConfigHelper(string configFileName)
         {
             Dictionary<string, string> dict = new Dictionary<string, string>();
             StreamReader file = null;
             try
             {
-                file = new StreamReader(getDefaultFileLocation(SPEECH_RECOGNITION_CONFIG_FILENAME));
+                file = new StreamReader(getDefaultFileLocation(configFileName));
                 merge(file, dict);
             }
             catch (Exception)
@@ -123,8 +123,12 @@ namespace CrewChiefV4
             StreamReader overridesFile = null;
             try
             {
-                overridesFile = new StreamReader(getUserOverridesFileLocation(SPEECH_RECOGNITION_CONFIG_FILENAME));
-                merge(overridesFile, dict);
+                var overrideFileName = getUserOverridesFileLocation(configFileName);
+                if (File.Exists(overrideFileName))
+                {
+                    overridesFile = new StreamReader(overrideFileName);
+                    merge(overridesFile, dict);
+                }
             }
             catch (Exception)
             {
@@ -138,84 +142,21 @@ namespace CrewChiefV4
                 }
             }
             return dict;
+        }
+
+        private static Dictionary<String, String> LoadSpeechRecognitionConfig()
+        {
+            return LoadConfigHelper(SPEECH_RECOGNITION_CONFIG_FILENAME);
         }
 
         private static Dictionary<String, String> LoadSoundsConfig()
         {
-            Dictionary<string, string> dict = new Dictionary<string, string>();
-            StreamReader file = null;
-            try
-            {
-                file = new StreamReader(getDefaultFileLocation(SOUNDS_CONFIG_FILENAME));
-                merge(file, dict);
-            }
-            catch (Exception)
-            {
-            }
-            finally
-            {
-                if (file != null)
-                {
-                    file.Close();
-                }
-            }
-            StreamReader overridesFile = null;
-            try
-            {
-                overridesFile = new StreamReader(getUserOverridesFileLocation(SOUNDS_CONFIG_FILENAME));
-                merge(overridesFile, dict);
-            }
-            catch (Exception)
-            {
-
-            }
-            finally
-            {
-                if (overridesFile != null)
-                {
-                    overridesFile.Close();
-                }
-            }
-            return dict;
+            return LoadConfigHelper(SOUNDS_CONFIG_FILENAME);
         }
 
         private static Dictionary<String, String> LoadUIStrings()
         {
-            Dictionary<string, string> dict = new Dictionary<string, string>();
-            StreamReader file = null;
-            try 
-            { 
-                file = new StreamReader(getDefaultFileLocation(UI_TEXT_FILENAME));
-                merge(file, dict);
-            }
-            catch (Exception) 
-            {
-            }
-            finally
-            {
-                if (file != null)
-                {
-                    file.Close();
-                }
-            }
-            StreamReader overridesFile = null;
-            try
-            {
-                overridesFile = new StreamReader(getUserOverridesFileLocation(UI_TEXT_FILENAME));
-                merge(overridesFile, dict);
-            }
-            catch (Exception)
-            {
-
-            }
-            finally
-            {
-                if (overridesFile != null)
-                {
-                    overridesFile.Close();
-                }
-            }
-            return dict;
+            return LoadConfigHelper(UI_TEXT_FILENAME);
         }
     }
 }
