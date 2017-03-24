@@ -491,80 +491,92 @@
             "trackLandmarks": [
                 {
                     "landmarkName": "la_source",
-                    "distanceRoundLapStart": 300,
-                    "distanceRoundLapEnd": 500,
+                    "distanceRoundLapStart": 290,
+                    "distanceRoundLapEnd": 430,
                     "isCommonOvertakingSpot": true
                 },
                 {
                     "landmarkName": "eau_rouge",
                     "distanceRoundLapStart": 1000,
-                    "distanceRoundLapEnd": 1415,
+                    "distanceRoundLapEnd": 1250,
                     "isCommonOvertakingSpot": false
                 },
                 {
-                    "landmarkName": "kemmel_straight",
-                    "distanceRoundLapStart": 1420,
-                    "distanceRoundLapEnd": 2220,
+                    "landmarkName": "radillion",
+                    "distanceRoundLapStart": 1255,
+                    "distanceRoundLapEnd": 1370,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "kemmel",
+                    "distanceRoundLapStart": 1580,
+                    "distanceRoundLapEnd": 1710,
                     "isCommonOvertakingSpot": true
                 },
                 {
                     "landmarkName": "les_combes",
                     "distanceRoundLapStart": 2300,
-                    "distanceRoundLapEnd": 2800,
+                    "distanceRoundLapEnd": 2540,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "turn9",
+                    "distanceRoundLapStart": 2600,
+                    "distanceRoundLapEnd": 2700,
                     "isCommonOvertakingSpot": true
                 },
                 {
                     "landmarkName": "bruxelles",
-                    "distanceRoundLapStart": 2900,
-                    "distanceRoundLapEnd": 3200,
+                    "distanceRoundLapStart": 2940,
+                    "distanceRoundLapEnd": 3150,
                     "isCommonOvertakingSpot": true
                 },
                 {
                     "landmarkName": "turn11",
-                    "distanceRoundLapStart": 3210,
-                    "distanceRoundLapEnd": 3450,
+                    "distanceRoundLapStart": 3230,
+                    "distanceRoundLapEnd": 3367,
                     "isCommonOvertakingSpot": true
                 },
                 {
                     "landmarkName": "pouhon",
-                    "distanceRoundLapStart": 3640,
-                    "distanceRoundLapEnd": 4250,
-                    "isCommonOvertakingSpot": true
+                    "distanceRoundLapStart": 3700,
+                    "distanceRoundLapEnd": 4140,
+                    "isCommonOvertakingSpot": false
                 },
                 {
                     "landmarkName": "turn13",
-                    "distanceRoundLapStart": 4410,
-                    "distanceRoundLapEnd": 4550,
+                    "distanceRoundLapStart": 4425,
+                    "distanceRoundLapEnd": 4560,
                     "isCommonOvertakingSpot": false
                 },
                 {
                     "landmarkName": "campus",
-                    "distanceRoundLapStart": 4570,
-                    "distanceRoundLapEnd": 4780,
+                    "distanceRoundLapStart": 4588,
+                    "distanceRoundLapEnd": 4730,
                     "isCommonOvertakingSpot": false
                 },
                 {
                     "landmarkName": "stavlot",
-                    "distanceRoundLapStart": 4850,
-                    "distanceRoundLapEnd": 5040,
+                    "distanceRoundLapStart": 4870,
+                    "distanceRoundLapEnd": 5000,
                     "isCommonOvertakingSpot": true
                 },
                 {
                     "landmarkName": "courbe_paul_frere",
-                    "distanceRoundLapStart": 5050,
-                    "distanceRoundLapEnd": 5666,
+                    "distanceRoundLapStart": 5084,
+                    "distanceRoundLapEnd": 5260,
                     "isCommonOvertakingSpot": true
                 },
                 {
                     "landmarkName": "blanchimont",
-                    "distanceRoundLapStart": 5700,
-                    "distanceRoundLapEnd": 6390,
+                    "distanceRoundLapStart": 6100,
+                    "distanceRoundLapEnd": 6240,
                     "isCommonOvertakingSpot": false
                 },
                 {
                     "landmarkName": "the_chicane",
-                    "distanceRoundLapStart": 6640,
-                    "distanceRoundLapEnd": 6900,
+                    "distanceRoundLapStart": 6670,
+                    "distanceRoundLapEnd": 6830,
                     "isCommonOvertakingSpot": true
                 }
             ]
