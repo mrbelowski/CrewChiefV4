@@ -440,7 +440,6 @@
         },
         {
             "acTrackNames": [ "spa:" ],
-            "rf2TrackNames": [ "RaceRfactor Spa 2013" ],
             "raceroomLayoutId": 3870,
             "trackLandmarks": [
                 {
@@ -487,7 +486,90 @@
                 }
             ]
         },
-		{
+        {
+            "rf2TrackNames": [ "RaceRfactor Spa 2013" ],
+            "trackLandmarks": [
+                {
+                    "landmarkName": "la_source",
+                    "distanceRoundLapStart": 300,
+                    "distanceRoundLapEnd": 500,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "eau_rouge",
+                    "distanceRoundLapStart": 1000,
+                    "distanceRoundLapEnd": 1415,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "kemmel_straight",
+                    "distanceRoundLapStart": 1420,
+                    "distanceRoundLapEnd": 2220,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "les_combes",
+                    "distanceRoundLapStart": 2300,
+                    "distanceRoundLapEnd": 2800,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "bruxelles",
+                    "distanceRoundLapStart": 2900,
+                    "distanceRoundLapEnd": 3200,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "turn11",
+                    "distanceRoundLapStart": 3210,
+                    "distanceRoundLapEnd": 3450,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "pouhon",
+                    "distanceRoundLapStart": 3640,
+                    "distanceRoundLapEnd": 4250,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "turn13",
+                    "distanceRoundLapStart": 4410,
+                    "distanceRoundLapEnd": 4550,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "campus",
+                    "distanceRoundLapStart": 4570,
+                    "distanceRoundLapEnd": 4780,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "stavlot",
+                    "distanceRoundLapStart": 4850,
+                    "distanceRoundLapEnd": 5040,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "courbe_paul_frere",
+                    "distanceRoundLapStart": 5050,
+                    "distanceRoundLapEnd": 5666,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "blanchimont",
+                    "distanceRoundLapStart": 5700,
+                    "distanceRoundLapEnd": 6390,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "the_chicane",
+                    "distanceRoundLapStart": 6640,
+                    "distanceRoundLapEnd": 6900,
+                    "isCommonOvertakingSpot": true
+                }
+            ]
+        },
+        {
             "pcarsTrackName": "Circuit de Spa-Francorchamps:",
             "trackLandmarks": [
                 {
@@ -631,7 +713,7 @@
             ]
         },
         {
-			"rf1TrackNames": [ "Imola 2016" ],
+            "rf1TrackNames": [ "Imola 2016" ],
             "acTrackNames": [ "imola:" ],
             "pcarsTrackName": "Imola:Grand Prix",
             "trackLandmarks": [
