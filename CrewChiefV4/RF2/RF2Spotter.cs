@@ -65,7 +65,6 @@ namespace CrewChiefV4.rFactor2
             for (int i = 0; i < shared.mNumVehicles; ++i)
             {
                 var vehicle = shared.mVehicles[i];
-                // TOOD: CHECK this out
                 if (vehicle.mIsPlayer == 1)
                 {
                     return vehicle;
@@ -87,6 +86,7 @@ namespace CrewChiefV4.rFactor2
             if (!this.enabled 
                 || currentState.mCurrentET < this.timeAfterRaceStartToActivate
                 || currentState.mInRealtimeFC == 0
+                || lastState.mInRealtimeFC == 0
                 || currentState.mNumVehicles <= 2)
                 return;
 
@@ -103,7 +103,6 @@ namespace CrewChiefV4.rFactor2
 
                 if (timeDiffSeconds <= 0.0f)
                 {
-                    // WTF?
                     // In pits probably.
                     return;
                 }
