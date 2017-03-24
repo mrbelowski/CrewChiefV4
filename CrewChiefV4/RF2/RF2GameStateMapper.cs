@@ -322,6 +322,10 @@ namespace CrewChiefV4.rFactor2
                         if (lapsBetweenStops > RF2GameStateMapper.minLapsBetweenPredictedStops)
                             pitWindowEndLapOrTime = lapsBetweenStops * (player.mNumPitstops + 1) + 1;
                     }
+
+                    // Force the MandatoryPit event to be re-initialsed if the window end has been recalculated.
+                    // VL: Blind port from AMS.
+                    cgs.PitData.ResetEvents = pgs != null && pitWindowEndLapOrTime > pgs.PitData.PitWindowEnd;
                 }
 
                 cgs.PitData.PitWindowEnd = pitWindowEndLapOrTime;
