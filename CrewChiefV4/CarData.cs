@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -150,7 +151,8 @@ namespace CrewChiefV4
             carbonBrakeTempsThresholds.Add(new CornerData.EnumWithThresholds(BrakeTemp.COOKING, maxHotCarbonBrakeTemp, 10000));
             brakeTempThresholds.Add(BrakeType.Carbon, carbonBrakeTempsThresholds);
 
-            defaultSpotterVehicleLength = 1.0f;
+            var overridablePrefsValues = getOverridablePreferencesValues();
+            defaultSpotterVehicleLength = overridablePrefsValues.spotterVehicleLength;
         }
 
         public class CarClassEnumConverter : Newtonsoft.Json.Converters.StringEnumConverter
@@ -202,6 +204,10 @@ namespace CrewChiefV4
 
             [JsonConverter(typeof(StringEnumConverter))]
             public TyreType defaultTyreType { get; set; }
+            public float overrideMaxColdTyreTemp { get; set; }
+            public float overrideMaxWarmTyreTemp { get; set; }
+            public float overrideMaxHotTyreTemp { get; set; }
+
             public float maxSafeWaterTemp { get; set; }
             public float maxSafeOilTemp { get; set; }
             public float minTyreCircumference { get; set; }
@@ -226,14 +232,17 @@ namespace CrewChiefV4
                 this.rf2ClassNames = new List<string>();
                 this.acClassNames = new List<string>();
                 this.brakeType = BrakeType.Iron_Race;
+                this.overrideMaxColdBrakeTemp = -1;
+                this.overrideMaxWarmBrakeTemp = -1;
+                this.overrideMaxHotBrakeTemp = -1;
                 this.defaultTyreType = TyreType.Unknown_Race;
+                this.overrideMaxColdTyreTemp = -1;
+                this.overrideMaxWarmTyreTemp = -1;
+                this.overrideMaxHotTyreTemp = -1;
                 this.maxSafeWaterTemp = 105;
                 this.maxSafeOilTemp = 125;
                 this.minTyreCircumference = 0.5f * (float)Math.PI;
                 this.maxTyreCircumference = 1.2f * (float)Math.PI;
-                this.overrideMaxColdBrakeTemp = 1.0f;
-                this.overrideMaxWarmBrakeTemp = 1.0f;
-                this.overrideMaxHotBrakeTemp = 1.0f;
                 this.spotterVehicleWidth = CarData.defaultSpotterVehicleWidth;
                 this.spotterVehicleLength = CarData.defaultSpotterVehicleLength;
             }
@@ -452,6 +461,43 @@ namespace CrewChiefV4
             }
         }
 
+        class OverridablePreferences
+        {
+            internal float spotterVehicleLength = -1;
+        }
+
+        private static OverridablePreferences getOverridablePreferencesValues()
+        {
+            var overridableOptions = new OverridablePreferences() { spotterVehicleLength = 4.5f };
+            var settings = UserSettings.GetUserSettings();
+            switch (CrewChief.gameDefinition.gameEnum)
+            {
+                case GameEnum.PCARS_64BIT:
+                case GameEnum.PCARS_32BIT:
+                case GameEnum.PCARS_NETWORK:
+                    overridableOptions.spotterVehicleLength = settings.getFloat("pcars_spotter_car_length");
+                    break;
+                case GameEnum.RF1:
+                    overridableOptions.spotterVehicleLength = settings.getFloat("rf1_spotter_car_length");
+                    break;
+                case GameEnum.ASSETTO_64BIT:
+                case GameEnum.ASSETTO_32BIT:
+                    overridableOptions.spotterVehicleLength = settings.getFloat("acs_spotter_car_length");
+                    break;
+                case GameEnum.RF2_64BIT:
+                    overridableOptions.spotterVehicleLength = settings.getFloat("rf2_spotter_car_length");
+                    break;
+                case GameEnum.RACE_ROOM:
+                    overridableOptions.spotterVehicleLength = settings.getFloat("r3e_spotter_car_length");
+                    break;
+                default:
+                    Debug.Assert(false, "Please fix this.");
+                    overridableOptions.spotterVehicleLength = 4.5f;
+                    break;
+            }
+            return overridableOptions;
+        }
+
         public static CarClass getCarClassFromEnum(CarClassEnum carClassEnum)
         {
             foreach (CarClass carClass in CAR_CLASSES.carClasses)
@@ -583,6 +629,8 @@ namespace CrewChiefV4
 
         public static TyreType getDefaultTyreType(CarClass carClass)
         {
+            // TODO: apply override here.
+            // RF1/RF2 needs fixing to use this helper
             return carClass.defaultTyreType;
         }
     }
