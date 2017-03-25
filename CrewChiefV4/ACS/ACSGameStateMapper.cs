@@ -1363,7 +1363,8 @@ namespace CrewChiefV4.assetto
                 if (previousGameState != null)
                 {
                     String stoppedInLandmark = currentGameState.SessionData.trackLandmarksTiming.updateLandmarkTiming(currentGameState.SessionData.TrackDefinition.trackLandmarks,
-                        currentGameState.SessionData.SessionRunningTime, previousGameState.PositionAndMotionData.DistanceRoundTrack, distanceRoundTrack, playerVehicle.speedMS);
+                        currentGameState.SessionData.SessionRunningTime, previousGameState.PositionAndMotionData.DistanceRoundTrack, distanceRoundTrack, playerVehicle.speedMS,
+                        currentGameState.SessionData.TrackDefinition.trackLength);
                     currentGameState.SessionData.stoppedInLandmark = shared.acsGraphic.isInPitLane == 1 ? null : stoppedInLandmark;
                     if (currentGameState.SessionData.IsNewLap)
                     {
@@ -1547,7 +1548,7 @@ namespace CrewChiefV4.assetto
                                         currentOpponentData.trackLandmarksTiming = previousOpponentData.trackLandmarksTiming;
                                         String stoppedInLandmark = currentOpponentData.trackLandmarksTiming.updateLandmarkTiming(
                                             currentGameState.SessionData.TrackDefinition.trackLandmarks, currentGameState.SessionData.SessionRunningTime,
-                                            previousDistanceRoundTrack, currentOpponentData.DistanceRoundTrack, currentOpponentData.Speed);
+                                            previousDistanceRoundTrack, currentOpponentData.DistanceRoundTrack, currentOpponentData.Speed, currentGameState.SessionData.TrackDefinition.trackLength);
                                         currentOpponentData.stoppedInLandmark = participantStruct.isCarInPitline == 1 ? null : stoppedInLandmark;
                                     }
                                     if (justGoneGreen)

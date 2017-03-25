@@ -553,7 +553,7 @@ namespace CrewChiefV4.RaceRoom
                     {
                         String stoppedInLandmark = currentGameState.SessionData.trackLandmarksTiming.updateLandmarkTiming(currentGameState.SessionData.TrackDefinition.trackLandmarks,
                             currentGameState.SessionData.SessionRunningTime, previousGameState.PositionAndMotionData.DistanceRoundTrack,
-                            participantStruct.LapDistance, shared.CarSpeed);
+                            participantStruct.LapDistance, shared.CarSpeed, currentGameState.SessionData.TrackDefinition.trackLength);
                         currentGameState.SessionData.stoppedInLandmark = participantStruct.InPitlane == 1 ? null : stoppedInLandmark;
                     }
                     if (currentGameState.PitData.InPitlane)
@@ -723,7 +723,7 @@ namespace CrewChiefV4.RaceRoom
                                 currentOpponentData.trackLandmarksTiming = previousOpponentData.trackLandmarksTiming;
                                 String stoppedInLandmark = currentOpponentData.trackLandmarksTiming.updateLandmarkTiming(
                                     currentGameState.SessionData.TrackDefinition.trackLandmarks, currentGameState.SessionData.SessionRunningTime, 
-                                    previousDistanceRoundTrack, currentOpponentData.DistanceRoundTrack, currentOpponentData.Speed);
+                                    previousDistanceRoundTrack, currentOpponentData.DistanceRoundTrack, currentOpponentData.Speed, currentGameState.SessionData.TrackDefinition.trackLength);
                                 currentOpponentData.stoppedInLandmark = currentOpponentData.InPits ? null : stoppedInLandmark;
                             }
                             if (justGoneGreen)

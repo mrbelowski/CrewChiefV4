@@ -555,7 +555,7 @@ namespace CrewChiefV4.Events
                             }
                             else if (opponent.Position <= folderPositionHasGoneOff.Length && positionToRead == -1)
                             {
-                                positionToRead = opponent.Position + 1;
+                                positionToRead = opponent.Position;
                             }
                         }
                         if (opponentNamesToRead.Count > 0)
@@ -582,7 +582,7 @@ namespace CrewChiefV4.Events
                         else if (positionToRead != -1)
                         {
                             audioPlayer.playMessage(new QueuedMessage("incident_corner_with_driver", MessageContents(
-                                        folderPositionHasGoneOffIn[positionToRead], "corners/" + waitingForCrashedDriverInCorner), 0, this));
+                                        folderPositionHasGoneOffIn[positionToRead - 1], "corners/" + waitingForCrashedDriverInCorner), 0, this));
                         }
                         else
                         {
