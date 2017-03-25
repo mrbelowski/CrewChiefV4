@@ -2,7 +2,7 @@
     "TrackLandmarksData": [
         {
             "rf1TrackNames": [ "Bathurst Mount Panorama", "Bathurst 2010 - MAX Detail" ],
-            "rf2TrackNames": [ "Bathurst" ],            
+            "rf2TrackNames": [ "Bathurst" ],
             "pcarsTrackName": "Bathurst:",
             "raceroomLayoutId": 1846,
             "trackLandmarks": [
@@ -440,7 +440,6 @@
         },
         {
             "acTrackNames": [ "spa:" ],
-            "rf2TrackNames": [ "RaceRfactor Spa 2013" ],
             "raceroomLayoutId": 3870,
             "trackLandmarks": [
                 {
@@ -487,7 +486,102 @@
                 }
             ]
         },
-		{
+        {
+            "rf2TrackNames": [ "RaceRfactor Spa 2013" ],
+            "trackLandmarks": [
+                {
+                    "landmarkName": "la_source",
+                    "distanceRoundLapStart": 290,
+                    "distanceRoundLapEnd": 430,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "eau_rouge",
+                    "distanceRoundLapStart": 1000,
+                    "distanceRoundLapEnd": 1250,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "radillion",
+                    "distanceRoundLapStart": 1255,
+                    "distanceRoundLapEnd": 1370,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "kemmel",
+                    "distanceRoundLapStart": 1580,
+                    "distanceRoundLapEnd": 1710,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "les_combes",
+                    "distanceRoundLapStart": 2300,
+                    "distanceRoundLapEnd": 2540,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "turn9",
+                    "distanceRoundLapStart": 2600,
+                    "distanceRoundLapEnd": 2700,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "bruxelles",
+                    "distanceRoundLapStart": 2940,
+                    "distanceRoundLapEnd": 3150,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "turn11",
+                    "distanceRoundLapStart": 3230,
+                    "distanceRoundLapEnd": 3367,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "pouhon",
+                    "distanceRoundLapStart": 3700,
+                    "distanceRoundLapEnd": 4140,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "turn13",
+                    "distanceRoundLapStart": 4425,
+                    "distanceRoundLapEnd": 4560,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "campus",
+                    "distanceRoundLapStart": 4588,
+                    "distanceRoundLapEnd": 4730,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "stavlot",
+                    "distanceRoundLapStart": 4870,
+                    "distanceRoundLapEnd": 5000,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "courbe_paul_frere",
+                    "distanceRoundLapStart": 5084,
+                    "distanceRoundLapEnd": 5260,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "blanchimont",
+                    "distanceRoundLapStart": 6100,
+                    "distanceRoundLapEnd": 6240,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "the_chicane",
+                    "distanceRoundLapStart": 6670,
+                    "distanceRoundLapEnd": 6830,
+                    "isCommonOvertakingSpot": true
+                }
+            ]
+        },
+        {
             "pcarsTrackName": "Circuit de Spa-Francorchamps:",
             "trackLandmarks": [
                 {
@@ -631,7 +725,7 @@
             ]
         },
         {
-			"rf1TrackNames": [ "Imola 2016" ],
+            "rf1TrackNames": [ "Imola 2016" ],
             "acTrackNames": [ "imola:" ],
             "pcarsTrackName": "Imola:Grand Prix",
             "trackLandmarks": [
@@ -1206,8 +1300,8 @@
             ]
         },
         {
-            "rf1TrackNames": [ "VIR Full Course" ],
-            "rf2TrackNames": [ "VIR Full Course" ],
+            "rf1TrackNames": [ "VIR Grand Course" ],
+            "rf2TrackNames": [ "VIR Grand Course" ],
             "trackLandmarks": [
                 {
                     "landmarkName": "horseshoe",
@@ -1240,6 +1334,66 @@
                     "isCommonOvertakingSpot": true
                 },
                 {
+                    "landmarkName": "the_bitch",
+                    "distanceRoundLapStart": 3707,
+                    "distanceRoundLapEnd": 3863,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "spiral",
+                    "distanceRoundLapStart": 4200,
+                    "distanceRoundLapEnd": 4433,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "roller_coaster",
+                    "distanceRoundLapStart": 5481,
+                    "distanceRoundLapEnd": 5659,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "hog_pen",
+                    "distanceRoundLapStart": 5896,
+                    "distanceRoundLapEnd": 6083,
+                    "isCommonOvertakingSpot": true
+                }
+            ]
+        },
+        {
+            "rf1TrackNames": [ "VIR North Course" ],
+            "rf2TrackNames": [ "VIR North Course" ],
+            "trackLandmarks": [
+                {
+                    "landmarkName": "horseshoe",
+                    "distanceRoundLapStart": 340,
+                    "distanceRoundLapEnd": 605,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "nascar_bend",
+                    "distanceRoundLapStart": 813,
+                    "distanceRoundLapEnd": 929,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "left_hook",
+                    "distanceRoundLapStart": 997,
+                    "distanceRoundLapEnd": 1099,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "south_bend",
+                    "distanceRoundLapStart": 2364,
+                    "distanceRoundLapEnd": 2525,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "uphill",
+                    "distanceRoundLapStart": 1770,
+                    "distanceRoundLapEnd": 1907,
+                    "isCommonOvertakingSpot": false
+                },
+                {
                     "landmarkName": "roller_coaster",
                     "distanceRoundLapStart": 4014,
                     "distanceRoundLapEnd": 4351,
@@ -1249,6 +1403,198 @@
                     "landmarkName": "hog_pen",
                     "distanceRoundLapStart": 4499,
                     "distanceRoundLapEnd": 4720,
+                    "isCommonOvertakingSpot": true
+                }
+            ]
+        },
+        {
+            "rf1TrackNames": [ "VIR Patriot Course" ],
+            "rf2TrackNames": [ "VIR Patriot Course" ],
+            "trackLandmarks": [
+                {
+                    "landmarkName": "western_esses",
+                    "distanceRoundLapStart": 282,
+                    "distanceRoundLapEnd": 482,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "spiral",
+                    "distanceRoundLapStart": 853,
+                    "distanceRoundLapEnd": 1076,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "eastern_esses",
+                    "distanceRoundLapStart": 1306,
+                    "distanceRoundLapEnd": 1550,
+                    "isCommonOvertakingSpot": false
+                }
+            ]
+        },
+        {
+            "rf1TrackNames": [ "VIR South Course" ],
+            "rf2TrackNames": [ "VIR South Course" ],
+            "trackLandmarks": [
+                {
+                    "landmarkName": "the_bitch",
+                    "distanceRoundLapStart": 639,
+                    "distanceRoundLapEnd": 782,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "spiral",
+                    "distanceRoundLapStart": 1113,
+                    "distanceRoundLapEnd": 1345,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "fish_hook",
+                    "distanceRoundLapStart": 1497,
+                    "distanceRoundLapEnd": 1639,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "south_bend",
+                    "distanceRoundLapStart": 1893,
+                    "distanceRoundLapEnd": 2019,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "oak_tree",
+                    "distanceRoundLapStart": 2219,
+                    "distanceRoundLapEnd": 2375,
+                    "isCommonOvertakingSpot": true
+                }
+            ]
+        },
+        {
+            "rf1TrackNames": [ "Mid-Ohio With Chicane" ],
+            "rf2TrackNames": [ "Mid-Ohio With Chicane" ],
+            "trackLandmarks": [
+                {
+                    "landmarkName": "turn1",
+                    "distanceRoundLapStart": 219,
+                    "distanceRoundLapEnd": 413,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "chicane",
+                    "distanceRoundLapStart": 606,
+                    "distanceRoundLapEnd": 898,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "keyhole",
+                    "distanceRoundLapStart": 903,
+                    "distanceRoundLapEnd": 1074,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "turn4",
+                    "distanceRoundLapStart": 1928,
+                    "distanceRoundLapEnd": 2037,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "madness",
+                    "distanceRoundLapStart": 2076,
+                    "distanceRoundLapEnd": 2195,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "the_esses",
+                    "distanceRoundLapStart": 2250,
+                    "distanceRoundLapEnd": 2382,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "thunder_valley",
+                    "distanceRoundLapStart": 2430,
+                    "distanceRoundLapEnd": 3000,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "turn11",
+                    "distanceRoundLapStart": 3046,
+                    "distanceRoundLapEnd": 3162,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "the_carousel",
+                    "distanceRoundLapStart": 3254,
+                    "distanceRoundLapEnd": 3420,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "turn13",
+                    "distanceRoundLapStart": 3448,
+                    "distanceRoundLapEnd": 3516,
+                    "isCommonOvertakingSpot": true
+                }
+            ]
+        },
+        {
+            "rf1TrackNames": [ "Mid-Ohio No Chicane", "Mid-Ohio Miller 200" ],
+            "rf2TrackNames": [ "Mid-Ohio No Chicane", "Mid-Ohio Miller 200" ],
+            "trackLandmarks": [
+                {
+                    "landmarkName": "turn1",
+                    "distanceRoundLapStart": 239,
+                    "distanceRoundLapEnd": 431,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "keyhole",
+                    "distanceRoundLapStart": 903,
+                    "distanceRoundLapEnd": 1074,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "turn4",
+                    "distanceRoundLapStart": 1907,
+                    "distanceRoundLapEnd": 2015,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "madness",
+                    "distanceRoundLapStart": 2018,
+                    "distanceRoundLapEnd": 2050,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "the_esses",
+                    "distanceRoundLapStart": 2222,
+                    "distanceRoundLapEnd": 2562,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "turn8",
+                    "distanceRoundLapStart": 2612,
+                    "distanceRoundLapEnd": 2711,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "thunder_valley",
+                    "distanceRoundLapStart": 2760,
+                    "distanceRoundLapEnd": 3000,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "turn11",
+                    "distanceRoundLapStart": 3023,
+                    "distanceRoundLapEnd": 3142,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "the_carousel",
+                    "distanceRoundLapStart": 3208,
+                    "distanceRoundLapEnd": 3393,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "turn13",
+                    "distanceRoundLapStart": 3450,
+                    "distanceRoundLapEnd": 3495,
                     "isCommonOvertakingSpot": true
                 }
             ]
