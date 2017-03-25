@@ -703,13 +703,17 @@ namespace CrewChiefV4.Events
 						messageContents.AddRange(MessageContents(folderNameHasGoneOffOutro));
 					}
 				}
-			} else if (landmark != null) {
+			} else if (landmark != null && position <= folderPositionHasGoneOffIn.Length) {
 				messageContents.AddRange(MessageContents(folderPositionHasGoneOffIn[position - 1]));
 				messageContents.AddRange(MessageContents("corners/" + landmark));
-			} else {
+            }
+            else if (position <= folderPositionHasGoneOffIn.Length) {
 				messageContents.AddRange(MessageContents(folderPositionHasGoneOff[position - 1]));
-			}	
-		    audioPlayer.playMessage(new QueuedMessage("incident_drivers", messageContents, 0, this));
+			}
+            if (messageContents.Count > 0)
+            {
+                audioPlayer.playMessage(new QueuedMessage("incident_drivers", messageContents, 0, this));
+            }
 		}
 
         Boolean checkForAndReportPileup(TrackDefinition currentTrack)
