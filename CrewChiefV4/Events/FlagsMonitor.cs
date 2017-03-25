@@ -639,78 +639,80 @@ namespace CrewChiefV4.Events
 			return involvedDrivers;
 		}
 
-		void reportYellowFlagDrivers(Dictionary<Object, OpponentData> opponents, TrackDefinition currentTrack)
-		{
-			if (driversInvolvedInCurrentIncident.Count == 0 || checkForAndReportPileup(currentTrack)) {
-				return;
+        void reportYellowFlagDrivers(Dictionary<Object, OpponentData> opponents, TrackDefinition currentTrack)
+        {
+            if (driversInvolvedInCurrentIncident.Count == 0 || checkForAndReportPileup(currentTrack)) {
+                return;
             }
 
             // no pileup so read name / positions / corners as appropriate
-			// there may be many of these, so we need to sort the list then pick the top few
-			driversInvolvedInCurrentIncident.Sort(new NamePositionPairComparer(positionAtStartOfIncident));
-			// get the landmark and other data off the first item
-			String landmark = TrackData.getLandmarkForLapDistance(currentTrack, driversInvolvedInCurrentIncident[0].distanceRoundTrack);
-			float distanceRoundTrackOfFirstLandmark = driversInvolvedInCurrentIncident[0].distanceRoundTrack;			
-			List<OpponentData> opponentsToRead = new List<OpponentData>();
-			opponentsToRead.Add(opponents[driversInvolvedInCurrentIncident[0].opponentKey]);
-			// if the first item is a position (we have no name for him), don't process the others
-			Boolean namesMode = driversInvolvedInCurrentIncident[0].canReadName;
+            // there may be many of these, so we need to sort the list then pick the top few
+            driversInvolvedInCurrentIncident.Sort(new NamePositionPairComparer(positionAtStartOfIncident));
+            // get the landmark and other data off the first item
+            String landmark = TrackData.getLandmarkForLapDistance(currentTrack, driversInvolvedInCurrentIncident[0].distanceRoundTrack);
+            float distanceRoundTrackOfFirstLandmark = driversInvolvedInCurrentIncident[0].distanceRoundTrack;
+            List<OpponentData> opponentsToRead = new List<OpponentData>();
+            opponentsToRead.Add(opponents[driversInvolvedInCurrentIncident[0].opponentKey]);
+            // if the first item is a position (we have no name for him), don't process the others
+            Boolean namesMode = driversInvolvedInCurrentIncident[0].canReadName;
             int position = driversInvolvedInCurrentIncident[0].position;
-			if (namesMode) {
-				for (int i=1; i<driversInvolvedInCurrentIncident.Count; i++)
-				{
-					if (opponentsToRead.Count == maxDriversToReportAsInvolvedInIncident) {
-						break;
-					}
-					if (driversInvolvedInCurrentIncident[i].canReadName)
-					{
-						opponentsToRead.Add(opponents[driversInvolvedInCurrentIncident[i].opponentKey]);				
-						String thisLandmark = TrackData.getLandmarkForLapDistance(currentTrack, driversInvolvedInCurrentIncident[i].distanceRoundTrack);
-						if (landmark == null) {
-							thisLandmark = landmark;
-							distanceRoundTrackOfFirstLandmark = driversInvolvedInCurrentIncident[i].distanceRoundTrack;
-						} else if (landmark != thisLandmark || Math.Abs(distanceRoundTrackOfFirstLandmark - driversInvolvedInCurrentIncident[i].distanceRoundTrack) > 300) {
-							// oh dear... this driver is in a completely different part of the track :(
-							landmark = null;
-							break;
-						}
-					} 				
-				}
-			}
-			// now we have the opponents to read and the landmark - either all the drivers are in it (or close) or we won't use it
-			List<MessageFragment> messageContents = new List<MessageFragment>();
-			if (namesMode) {
-				messageContents.AddRange(MessageContents(folderNameHasGoneOffIntro));
-				int andIndex = opponentsToRead.Count > 1 ? opponentsToRead.Count - 1 : -1;                
-				for (int i=0; i<opponentsToRead.Count; i++) {
-					if (i == andIndex) {
-						messageContents.AddRange(MessageContents(folderAnd));
-					}
-					messageContents.AddRange(MessageContents(opponentsToRead[i]));
-				} 
+            if (namesMode) {
+                for (int i = 1; i < driversInvolvedInCurrentIncident.Count; i++)
+                {
+                    if (opponentsToRead.Count == maxDriversToReportAsInvolvedInIncident) {
+                        break;
+                    }
+                    if (driversInvolvedInCurrentIncident[i].canReadName)
+                    {
+                        opponentsToRead.Add(opponents[driversInvolvedInCurrentIncident[i].opponentKey]);
+                        String thisLandmark = TrackData.getLandmarkForLapDistance(currentTrack, driversInvolvedInCurrentIncident[i].distanceRoundTrack);
+                        if (landmark == null) {
+                            thisLandmark = landmark;
+                            distanceRoundTrackOfFirstLandmark = driversInvolvedInCurrentIncident[i].distanceRoundTrack;
+                        } else if (landmark != thisLandmark || Math.Abs(distanceRoundTrackOfFirstLandmark - driversInvolvedInCurrentIncident[i].distanceRoundTrack) > 300) {
+                            // oh dear... this driver is in a completely different part of the track :(
+                            landmark = null;
+                            break;
+                        }
+                    }
+                }
+            }
+            // now we have the opponents to read and the landmark - either all the drivers are in it (or close) or we won't use it
+            List<MessageFragment> messageContents = new List<MessageFragment>();
+            if (namesMode) {
+                messageContents.AddRange(MessageContents(folderNameHasGoneOffIntro));
+                int andIndex = opponentsToRead.Count > 1 ? opponentsToRead.Count - 1 : -1;
+                for (int i = 0; i < opponentsToRead.Count; i++) {
+                    if (i == andIndex) {
+                        messageContents.AddRange(MessageContents(folderAnd));
+                    }
+                    messageContents.AddRange(MessageContents(opponentsToRead[i]));
+                }
                 if (andIndex != -1) {
-					if (landmark != null) {
-						messageContents.AddRange(MessageContents(folderNamesHaveGoneOffInOutro));
-						messageContents.AddRange(MessageContents("corners/" + landmark));
-					} else {
-						messageContents.AddRange(MessageContents(folderNamesHaveGoneOffOutro));
-					}
-				} else {
-					if (landmark != null) {
-						messageContents.AddRange(MessageContents(folderNameHasGoneOffInOutro));
-						messageContents.AddRange(MessageContents("corners/" + landmark));
-					} else {
-						messageContents.AddRange(MessageContents(folderNameHasGoneOffOutro));
-					}
-				}
-			} else if (landmark != null) {
-				messageContents.AddRange(MessageContents(folderPositionHasGoneOffIn[position - 1]));
-				messageContents.AddRange(MessageContents("corners/" + landmark));
-			} else {
-				messageContents.AddRange(MessageContents(folderPositionHasGoneOff[position - 1]));
-			}	
-		    audioPlayer.playMessage(new QueuedMessage("incident_drivers", messageContents, 0, this));
-		}
+                    if (landmark != null) {
+                        messageContents.AddRange(MessageContents(folderNamesHaveGoneOffInOutro));
+                        messageContents.AddRange(MessageContents("corners/" + landmark));
+                    } else {
+                        messageContents.AddRange(MessageContents(folderNamesHaveGoneOffOutro));
+                    }
+                } else {
+                    if (landmark != null) {
+                        messageContents.AddRange(MessageContents(folderNameHasGoneOffInOutro));
+                        messageContents.AddRange(MessageContents("corners/" + landmark));
+                    } else {
+                        messageContents.AddRange(MessageContents(folderNameHasGoneOffOutro));
+                    }
+                }
+                audioPlayer.playMessage(new QueuedMessage("incident_drivers", messageContents, 0, this));
+            } else if (landmark != null && position <= folderPositionHasGoneOffIn.Length) {
+                messageContents.AddRange(MessageContents(folderPositionHasGoneOffIn[position - 1]));
+                messageContents.AddRange(MessageContents("corners/" + landmark));
+                audioPlayer.playMessage(new QueuedMessage("incident_drivers", messageContents, 0, this));
+            } else if (position <= folderPositionHasGoneOff.Length) {
+                messageContents.AddRange(MessageContents(folderPositionHasGoneOff[position - 1]));
+                audioPlayer.playMessage(new QueuedMessage("incident_drivers", messageContents, 0, this));
+           }
+        }
 
         Boolean checkForAndReportPileup(TrackDefinition currentTrack)
         {
