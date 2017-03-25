@@ -1598,6 +1598,72 @@
                     "isCommonOvertakingSpot": true
                 }
             ]
+        },
+        {
+            "rf1TrackNames": [ "Barber Motorsports Park 2015" ],
+            "rf2TrackNames": [ "Barber Motorsports Park 2015" ],
+            "trackLandmarks": [
+                {
+                    "landmarkName": "turn1",
+                    "distanceRoundLapStart": 71,
+                    "distanceRoundLapEnd": 225,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "alabama_carousel",
+                    "distanceRoundLapStart": 297,
+                    "distanceRoundLapEnd": 552,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "turn4",
+                    "distanceRoundLapStart": 614,
+                    "distanceRoundLapEnd": 740,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "hairpin",
+                    "distanceRoundLapStart": 952,
+                    "distanceRoundLapEnd": 1115,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "museum",
+                    "distanceRoundLapStart": 1607,
+                    "distanceRoundLapEnd": 1801,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "chicane_one",
+                    "distanceRoundLapStart": 2083,
+                    "distanceRoundLapEnd": 2310,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "chicane_two",
+                    "distanceRoundLapStart": 2576,
+                    "distanceRoundLapEnd": 2685,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "tunnel",
+                    "distanceRoundLapStart": 2723,
+                    "distanceRoundLapEnd": 2845,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "turn14",
+                    "distanceRoundLapStart": 3100,
+                    "distanceRoundLapEnd": 3242,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "turn15",
+                    "distanceRoundLapStart": 3272,
+                    "distanceRoundLapEnd": 3415,
+                    "isCommonOvertakingSpot": true
+                }
+            ]
         }
     ]
 }
