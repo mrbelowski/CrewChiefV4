@@ -21,7 +21,7 @@ namespace CrewChiefV4
         public static GameDefinition pCarsNetwork = new GameDefinition(GameEnum.PCARS_NETWORK, "pcars_udp", null, "CrewChiefV4.PCars.PCarsSpotterv2",
             null, null, null);
         public static GameDefinition rFactor1 = new GameDefinition(GameEnum.RF1, "rfactor1", "rFactor", "CrewChiefV4.rFactor1.RF1Spotter",
-            "rf1_launch_exe", "rf1_launch_params", "launch_rfactor1");
+            "rf1_launch_exe", "rf1_launch_params", "launch_rfactor1", "rFactor");
         public static GameDefinition gameStockCar = new GameDefinition(GameEnum.RF1, "gamestockcar", "GSC", "CrewChiefV4.rFactor1.RF1Spotter",
             "gsc_launch_exe", "gsc_launch_params", "launch_gsc");
         public static GameDefinition automobilista = new GameDefinition(GameEnum.RF1, "automobilista", "AMS", "CrewChiefV4.rFactor1.RF1Spotter",
