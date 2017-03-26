@@ -175,6 +175,10 @@ namespace CrewChiefV4
                 {
                     gameInstallPath = UserSettings.GetUserSettings().getString("ams_install_path");
                 }
+                if (gameDefinition.gameInstallDirectory.Equals("rFactor"))
+                {
+                    gameInstallPath = UserSettings.GetUserSettings().getString("rf1_install_path");
+                }
             }
             //try to get the install folder from steam common install folders.
             if (!Directory.Exists(gameInstallPath))
@@ -242,6 +246,10 @@ namespace CrewChiefV4
                     if (gameDefinition.gameInstallDirectory.Equals("Automobilista"))
                     {
                         UserSettings.GetUserSettings().setProperty("ams_install_path", gameInstallPath);
+                    }
+                    if (gameDefinition.gameInstallDirectory.Equals("rFactor"))
+                    {
+                        UserSettings.GetUserSettings().setProperty("rf1_install_path", gameInstallPath);
                     }
                 }
                 UserSettings.GetUserSettings().saveUserSettings();
