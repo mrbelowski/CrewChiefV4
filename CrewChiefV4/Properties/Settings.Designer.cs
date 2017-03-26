@@ -1978,5 +1978,17 @@ namespace CrewChiefV4.Properties {
                 this["rf2_install_path"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string ams_install_path {
+            get {
+                return ((string)(this["ams_install_path"]));
+            }
+            set {
+                this["ams_install_path"] = value;
+            }
+        }
     }
 }

@@ -25,7 +25,7 @@ namespace CrewChiefV4
         public static GameDefinition gameStockCar = new GameDefinition(GameEnum.RF1, "gamestockcar", "GSC", "CrewChiefV4.rFactor1.RF1Spotter",
             "gsc_launch_exe", "gsc_launch_params", "launch_gsc");
         public static GameDefinition automobilista = new GameDefinition(GameEnum.RF1, "automobilista", "AMS", "CrewChiefV4.rFactor1.RF1Spotter",
-            "ams_launch_exe", "ams_launch_params", "launch_ams");
+            "ams_launch_exe", "ams_launch_params", "launch_ams", "Automobilista");
         public static GameDefinition marcas = new GameDefinition(GameEnum.RF1, "marcas", "MARCAS", "CrewChiefV4.rFactor1.RF1Spotter",
             "marcas_launch_exe", "marcas_launch_params", "launch_marcas");
         public static GameDefinition ftruck = new GameDefinition(GameEnum.RF1, "ftruck", "FTRUCK", "CrewChiefV4.rFactor1.RF1Spotter",
