@@ -84,6 +84,10 @@ namespace CrewChiefV4.PCars
         private Dictionary<String, float> waitingForCarsToFinish = new Dictionary<String, float>();
         private DateTime nextDebugCheckeredToFinishMessageTime = DateTime.MinValue;
 
+        Dictionary<String, DateTime> lastActiveTimeForOpponents = new Dictionary<string, DateTime>();
+        DateTime nextOpponentCleanupTime = DateTime.MinValue;
+        TimeSpan opponentCleanupInterval = TimeSpan.FromSeconds(2);
+
         public PCarsGameStateMapper()
         {
             CornerData.EnumWithThresholds suspensionDamageNone = new CornerData.EnumWithThresholds(DamageLevel.NONE, -10000, trivialSuspensionDamageThreshold);
@@ -442,6 +446,9 @@ namespace CrewChiefV4.PCars
                 currentGameState.SessionData.PlayerClassSessionBestLapTime = -1;
                 currentGameState.SessionData.TrackDefinition.trackLandmarks = TrackData.TRACK_LANDMARKS_DATA.getTrackLandmarksForTrackName(currentGameState.SessionData.TrackDefinition.name);
                 currentGameState.SessionData.TrackDefinition.setGapPoints();
+
+                lastActiveTimeForOpponents.Clear();
+                nextOpponentCleanupTime = nextOpponentCleanupTime = currentGameState.Now + opponentCleanupInterval;
             }
             else
             {
@@ -469,6 +476,9 @@ namespace CrewChiefV4.PCars
                             StructHelper.getNameFromBytes(shared.mTrackVariation), -1, shared.mTrackLength);
                         currentGameState.SessionData.TrackDefinition.trackLandmarks = TrackData.TRACK_LANDMARKS_DATA.getTrackLandmarksForTrackName(currentGameState.SessionData.TrackDefinition.name);
                         currentGameState.SessionData.TrackDefinition.setGapPoints();
+
+                        lastActiveTimeForOpponents.Clear();
+                        nextOpponentCleanupTime = currentGameState.Now + opponentCleanupInterval;
 
                         String carClassId = StructHelper.getNameFromBytes(shared.mCarClassName);
                         currentGameState.carClass = CarData.getCarClassForClassName(carClassId);
@@ -675,6 +685,11 @@ namespace CrewChiefV4.PCars
                 if (i != playerDataIndex)
                 {
                     pCarsAPIParticipantStruct participantStruct = shared.mParticipantData[i];
+                    if (participantStruct.mName[0] == 0)
+                    {
+                        // first character of name is null - this means the game regards this driver as inactive or missing for this update
+                        continue;
+                    }
                     CarData.CarClass opponentCarClass = !shared.hasOpponentClassData || shared.isSameClassAsPlayer[i] ? currentGameState.carClass : CarData.DEFAULT_PCARS_OPPONENT_CLASS;
                     String participantName = StructHelper.getNameFromBytes(participantStruct.mName).ToLower();
 
@@ -686,6 +701,7 @@ namespace CrewChiefV4.PCars
                         {
                             if (participantStruct.mIsActive)
                             {
+                                lastActiveTimeForOpponents[participantName] = currentGameState.Now;
                                 if (previousGameState != null)
                                 {
                                     int previousOpponentSectorNumber = 1;
@@ -845,6 +861,7 @@ namespace CrewChiefV4.PCars
                         {
                             if (participantStruct.mIsActive && participantName != null && participantName.Length > 0)
                             {
+                                lastActiveTimeForOpponents[participantName] = currentGameState.Now;
                                 addOpponentForName(participantName, createOpponentData(participantStruct, true, opponentCarClass), currentGameState);
                             }
                         }
@@ -852,24 +869,21 @@ namespace CrewChiefV4.PCars
                 }
             }
 
-            if (namesInRawData.Count() == shared.mNumParticipants - 1) {
-                List<String> keysToRemove = new List<String>();
-                // purge any opponents that aren't in the current data
-                foreach (String opponentName in currentGameState.OpponentData.Keys) {
-                    Boolean matched = false;
-                    foreach (String nameInRawData in namesInRawData) {
-                        if (namesMatch(nameInRawData, opponentName)) {
-                            matched = true;
-                            break;
-                        }
-                    }
-                    if (!matched || !currentGameState.OpponentData[opponentName].IsActive)
+            if (currentGameState.Now > nextOpponentCleanupTime)
+            {
+                nextOpponentCleanupTime = currentGameState.Now + opponentCleanupInterval;
+                DateTime oldestAllowedUpdate = currentGameState.Now - opponentCleanupInterval;
+                List<String> inactiveOpponents = new List<string>();
+                foreach (String opponentName in currentGameState.OpponentData.Keys)
+                {
+                    if (!lastActiveTimeForOpponents.ContainsKey(opponentName) || lastActiveTimeForOpponents[opponentName] < oldestAllowedUpdate)
                     {
-                        keysToRemove.Add(opponentName);
+                        inactiveOpponents.Add(opponentName);
                     }
                 }
-                foreach (String keyToRemove in keysToRemove) {
-                    currentGameState.OpponentData.Remove(keyToRemove);
+                foreach (String inactiveOpponent in inactiveOpponents)
+                {
+                    currentGameState.OpponentData.Remove(inactiveOpponent);
                 }
             }
 
