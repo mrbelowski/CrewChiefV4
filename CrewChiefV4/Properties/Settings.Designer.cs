@@ -1954,5 +1954,29 @@ namespace CrewChiefV4.Properties {
                 this["max_distance_moved_for_yellow_announcement"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string acs_install_path {
+            get {
+                return ((string)(this["acs_install_path"]));
+            }
+            set {
+                this["acs_install_path"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string rf2_install_path {
+            get {
+                return ((string)(this["rf2_install_path"]));
+            }
+            set {
+                this["rf2_install_path"] = value;
+            }
+        }
     }
 }

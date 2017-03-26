@@ -117,6 +117,7 @@
     <Compile Include="PCars\PCarsUDPreader.cs" />
     <Compile Include="PCars\PCarsSpotterv2.cs" />
     <Compile Include="PCars\PCarsUDPTelemetryDataStruct.cs" />
+    <Compile Include="PluginInstaller.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
