@@ -1096,17 +1096,18 @@ namespace CrewChiefV4.GameState
         // games so this might cause more problems than it solves.
         //
         // returns null or a landmark name this car is stopped in
-        public String updateLandmarkTiming(List<TrackLandmark> trackLandmarks, float gameTime, float previousDistanceRoundTrack, float currentDistanceRoundTrack, 
-            float speed, float trackLength) 
+        public String updateLandmarkTiming(TrackDefinition trackDefinition, float gameTime, float previousDistanceRoundTrack, float currentDistanceRoundTrack, float speed) 
         {
-		    if (trackLandmarks == null || trackLandmarks.Count == 0) {
+            if (trackDefinition == null || trackDefinition.trackLandmarks == null || trackDefinition.trackLandmarks.Count == 0)
+            {
 			    return null;
 		    }
             // yuk...
             atMidPointOfLandmark = null;
 		    if (landmarkNameStart == null) {
 			    // looking for landmark start only
-			    foreach (TrackLandmark trackLandmark in trackLandmarks) {
+                foreach (TrackLandmark trackLandmark in trackDefinition.trackLandmarks)
+                {
 				    if (previousDistanceRoundTrack < trackLandmark.distanceRoundLapStart && currentDistanceRoundTrack >= trackLandmark.distanceRoundLapStart) 
 				    {
                         if (currentDistanceRoundTrack - 20 < trackLandmark.distanceRoundLapStart && currentDistanceRoundTrack + 20 > trackLandmark.distanceRoundLapStart)
@@ -1126,7 +1127,7 @@ namespace CrewChiefV4.GameState
 			    }
 		    } else {
 			    // looking for landmark end only
-			    foreach (TrackLandmark trackLandmark in trackLandmarks) 
+                foreach (TrackLandmark trackLandmark in trackDefinition.trackLandmarks) 
                 {
                     if (trackLandmark.landmarkName == landmarkNameStart) 
                     {
@@ -1177,10 +1178,10 @@ namespace CrewChiefV4.GameState
             if (landmarkNameStart == null)
             {
                 // again, we're waiting to enter a landmark zone - perhaps we've just left a zone so still check for stopped cars         
-                foreach (TrackLandmark trackLandmark in trackLandmarks) 
+                foreach (TrackLandmark trackLandmark in trackDefinition.trackLandmarks) 
                 {
-				    if (currentDistanceRoundTrack > Math.Max(0, trackLandmark.distanceRoundLapStart - 100) && 
-                        currentDistanceRoundTrack < Math.Min(trackLength, trackLandmark.distanceRoundLapEnd))
+				    if (currentDistanceRoundTrack > Math.Max(0, trackLandmark.distanceRoundLapStart - 100) &&
+                        currentDistanceRoundTrack < Math.Min(trackDefinition.trackLength, trackLandmark.distanceRoundLapEnd))
 				    {
                         if (nearLandmarkName != trackLandmark.landmarkName)
                         {
