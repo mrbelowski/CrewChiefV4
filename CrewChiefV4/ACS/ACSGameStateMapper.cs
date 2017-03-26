@@ -1536,7 +1536,7 @@ namespace CrewChiefV4.assetto
 
                                     upateOpponentData(currentOpponentData, currentOpponentRacePosition, participantStruct.carLeaderboardPosition, currentOpponentLapsCompleted,
                                         currentOpponentSector, mapToFloatTime(participantStruct.currentLapTimeMS), mapToFloatTime(participantStruct.lastLapTimeMS),
-                                        isEnteringPits || isLeavingPits, participantStruct.currentLapInvalid == 0,
+                                        participantStruct.isCarInPitline == 1, participantStruct.currentLapInvalid == 0,
                                         currentGameState.SessionData.SessionRunningTime, secondsSinceLastUpdate,
                                         new float[] { participantStruct.worldPosition.x, participantStruct.worldPosition.z }, participantStruct.speedMS, currentOpponentLapDistance,
                                         currentGameState.SessionData.SessionHasFixedTime, currentGameState.SessionData.SessionTimeRemaining,
