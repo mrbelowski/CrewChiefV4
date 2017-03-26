@@ -184,7 +184,7 @@ namespace CrewChiefV4.Events
                     playedHalfWayHome = true;
                     audioPlayer.suspendPearlsOfWisdom();
                     // PCars hack - don't play this if it's an unlimited session - no lap limit and no time limit
-                    if (currentGameState.SessionData.SessionHasFixedTime && currentGameState.SessionData.SessionNumberOfLaps <= 0)
+                    if (!currentGameState.SessionData.SessionHasFixedTime && currentGameState.SessionData.SessionNumberOfLaps <= 0)
                     {
                         Console.WriteLine("Skipping session end messages for unlimited session");
                     }
