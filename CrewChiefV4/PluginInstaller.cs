@@ -86,7 +86,7 @@ namespace CrewChiefV4
             if (messageBoxPresented == false)
             {
                 messageBoxPresented = true;
-                if (DialogResult.OK == MessageBox.Show("Crew Chief needs additional files to be installed for the selected game. Click OK to install or Cancel to Return", "Plugin Needed",
+                if (DialogResult.OK == MessageBox.Show(Configuration.getUIString("install_plugin_popup_text"), Configuration.getUIString("install_plugin_popup_title"),
                     MessageBoxButtons.OKCancel, MessageBoxIcon.Information))
                 {
                     messageBoxResult = true;
@@ -194,7 +194,8 @@ namespace CrewChiefV4
                 {
                     FolderBrowserDialog dialog = new FolderBrowserDialog();
                     dialog.ShowNewFolderButton = false;
-                    dialog.Description = "Please select " + gameDefinition.gameInstallDirectory + " installation directory";
+                    dialog.Description = Configuration.getUIString("install_plugin_select_directory_start") + " " +
+                        gameDefinition.gameInstallDirectory + " " + Configuration.getUIString("install_plugin_select_directory_end");
                     DialogResult result = dialog.ShowDialog();
                     if (result == DialogResult.OK && dialog.SelectedPath.Length > 0)
                     {
