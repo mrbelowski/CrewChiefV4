@@ -879,6 +879,7 @@ namespace CrewChiefV4.PCars
                     if (!lastActiveTimeForOpponents.ContainsKey(opponentName) || lastActiveTimeForOpponents[opponentName] < oldestAllowedUpdate)
                     {
                         inactiveOpponents.Add(opponentName);
+                        Console.WriteLine("Opponent " + opponentName + " has been inactive for " + opponentCleanupInterval + ", removing him");
                     }
                 }
                 foreach (String inactiveOpponent in inactiveOpponents)
