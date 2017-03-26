@@ -128,9 +128,6 @@ namespace CrewChiefV4.Events
         private static String folderLockingFrontsForCornerWarning = "tyre_monitor/locking_fronts_corner_warning";
         private static String folderLockingRearsForCornerWarning = "tyre_monitor/locking_rears_corner_warning";
 
-
-        // todo: warn on single lockups
-
         private int lapsIntoSessionBeforeTempMessage = 2;        
 
         // check at start of which sector (1=s/f line)
@@ -429,19 +426,19 @@ namespace CrewChiefV4.Events
                                 {
                                     case WheelsLockedEnum.FRONTS:
                                         audioPlayer.playMessage(new QueuedMessage("corner_locking",
-                                            MessageContents(folderLockingFrontsForCornerWarning, "corners/" + currentGameState.SessionData.trackLandmarksTiming.atMidPointOfLandmark), 0, this));
+                                            MessageContents(folderLockingFrontsForCornerWarning, "corners/" + currentGameState.SessionData.trackLandmarksTiming.atMidPointOfLandmark), random.Next(4, 8), this));
                                         break;
                                     case WheelsLockedEnum.LEFT_FRONT:
                                         audioPlayer.playMessage(new QueuedMessage("corner_locking",
-                                            MessageContents(folderLockingLeftFrontForCornerWarning, "corners/" + currentGameState.SessionData.trackLandmarksTiming.atMidPointOfLandmark), 0, this));
+                                            MessageContents(folderLockingLeftFrontForCornerWarning, "corners/" + currentGameState.SessionData.trackLandmarksTiming.atMidPointOfLandmark), random.Next(4, 8), this));
                                         break;
                                     case WheelsLockedEnum.RIGHT_FRONT:
                                         audioPlayer.playMessage(new QueuedMessage("corner_locking",
-                                            MessageContents(folderLockingRightFrontForCornerWarning, "corners/" + currentGameState.SessionData.trackLandmarksTiming.atMidPointOfLandmark), 0, this));
+                                            MessageContents(folderLockingRightFrontForCornerWarning, "corners/" + currentGameState.SessionData.trackLandmarksTiming.atMidPointOfLandmark), random.Next(4, 8), this));
                                         break;
                                     case WheelsLockedEnum.REARS:
                                         audioPlayer.playMessage(new QueuedMessage("corner_locking",
-                                            MessageContents(folderLockingRearsForCornerWarning, "corners/" + currentGameState.SessionData.trackLandmarksTiming.atMidPointOfLandmark), 0, this));
+                                            MessageContents(folderLockingRearsForCornerWarning, "corners/" + currentGameState.SessionData.trackLandmarksTiming.atMidPointOfLandmark), random.Next(4, 8), this));
                                         break;
                                     default:
                                         break;
@@ -478,42 +475,42 @@ namespace CrewChiefV4.Events
                             {
                                 Console.WriteLine("Spinning fronts out of " + currentCornerName);
                                 audioPlayer.playMessage(new QueuedMessage("corner_spinning",
-                                    MessageContents(folderSpinningFrontsForCornerWarning, "corners/" + currentCornerName), 0, this));
+                                    MessageContents(folderSpinningFrontsForCornerWarning, "corners/" + currentCornerName), random.Next(4, 8), this));
                                 cornerSpinningWarningsPlayed[currentCornerName] = currentGameState.Now;
                             }
                             else if (leftRearCornerSpecificWheelSpinTime > cornerExitSpinningThreshold && rightRearCornerSpecificWheelSpinTime > cornerExitSpinningThreshold)
                             {
                                 Console.WriteLine("Spinning rears out of " + currentCornerName);
                                 audioPlayer.playMessage(new QueuedMessage("corner_spinning",
-                                    MessageContents(folderSpinningRearsForCornerWarning, "corners/" + currentCornerName), 0, this));
+                                    MessageContents(folderSpinningRearsForCornerWarning, "corners/" + currentCornerName), random.Next(4, 8), this));
                                 cornerSpinningWarningsPlayed[currentCornerName] = currentGameState.Now;
                             }
                             else if (leftFrontCornerSpecificWheelSpinTime > cornerExitSpinningThreshold)
                             {
                                 Console.WriteLine("Spinning left front out of " + currentCornerName);
                                 audioPlayer.playMessage(new QueuedMessage("corner_spinning",
-                                    MessageContents(folderSpinningLeftFrontForCornerWarning, "corners/" + currentCornerName), 0, this));
+                                    MessageContents(folderSpinningLeftFrontForCornerWarning, "corners/" + currentCornerName), random.Next(4, 8), this));
                                 cornerSpinningWarningsPlayed[currentCornerName] = currentGameState.Now;
                             }
                             else if (rightFrontCornerSpecificWheelSpinTime > cornerExitSpinningThreshold)
                             {
                                 Console.WriteLine("Spinning right front out of " + currentCornerName);
                                 audioPlayer.playMessage(new QueuedMessage("corner_spinning",
-                                    MessageContents(folderSpinningRightFrontForCornerWarning, "corners/" + currentCornerName), 0, this));
+                                    MessageContents(folderSpinningRightFrontForCornerWarning, "corners/" + currentCornerName), random.Next(4, 8), this));
                                 cornerSpinningWarningsPlayed[currentCornerName] = currentGameState.Now;
                             }
                             else if (leftRearCornerSpecificWheelSpinTime > cornerExitSpinningThreshold)
                             {
                                 Console.WriteLine("Spinning left rear out of " + currentCornerName);
                                 audioPlayer.playMessage(new QueuedMessage("corner_spinning",
-                                    MessageContents(folderSpinningLeftRearForCornerWarning, "corners/" + currentCornerName), 0, this));
+                                    MessageContents(folderSpinningLeftRearForCornerWarning, "corners/" + currentCornerName), random.Next(4, 8), this));
                                 cornerSpinningWarningsPlayed[currentCornerName] = currentGameState.Now;
                             }
                             else if (rightRearCornerSpecificWheelSpinTime > cornerExitSpinningThreshold)
                             {
                                 Console.WriteLine("Spinning right rear out of " + currentCornerName);
                                 audioPlayer.playMessage(new QueuedMessage("corner_spinning",
-                                    MessageContents(folderSpinningRightRearForCornerWarning, "corners/" + currentCornerName), 0, this));
+                                    MessageContents(folderSpinningRightRearForCornerWarning, "corners/" + currentCornerName), random.Next(4, 8), this));
                                 cornerSpinningWarningsPlayed[currentCornerName] = currentGameState.Now;
                             }
                         }

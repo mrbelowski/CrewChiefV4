@@ -202,3 +202,8 @@ enable_ams_pit_schedule_messages_help = Play 'box now' messages when using offli
 
 personalisations_are_up_to_date = Personalisations are up to date
 personalisation_label = My name (requires restart)
+
+install_plugin_popup_text = Crew Chief needs additional files to be installed for the selected game. Click OK to install or Cancel to Return
+install_plugin_popup_title = Plugin Needed
+install_plugin_select_directory_start = Please select 
+install_plugin_select_directory_end = installation directory

@@ -45,7 +45,7 @@ namespace CrewChiefV4.Events
         private String folderLocalYellowClear = "flags/local_yellow_clear";
         private String folderLocalYellowAhead = "flags/local_yellow_ahead";
 
-        private String[] folderPositionHasGoneOff = new String[] { "flags/position1_has_gone_off", "flags/position2_has_gone_off", "flags/position3_has_gone_off", 
+        public static String[] folderPositionHasGoneOff = new String[] { "flags/position1_has_gone_off", "flags/position2_has_gone_off", "flags/position3_has_gone_off", 
                                                                    "flags/position4_has_gone_off", "flags/position5_has_gone_off", "flags/position6_has_gone_off", };
         private String[] folderPositionHasGoneOffIn = new String[] { "flags/position1_has_gone_off_in", "flags/position2_has_gone_off_in", "flags/position3_has_gone_off_in", 
                                                                    "flags/position4_has_gone_off_in", "flags/position5_has_gone_off_in", "flags/position6_has_gone_off_in", };
@@ -53,6 +53,12 @@ namespace CrewChiefV4.Events
         private String folderNameHasGoneOffOutro = "flags/name_has_gone_off_outro";
         //  used when we know the corner name:
         private String folderNameHasGoneOffInOutro = "flags/name_has_gone_off_in_outro";
+
+        private String folderNamesHaveGoneOffOutro = "flags/names_have_gone_off_outro";
+        private String folderNamesHaveGoneOffInOutro = "flags/names_have_gone_off_in_outro";
+        private String folderAnd = "flags/and";
+        // TODO: Record sweary versions of this when the kids are out
+        private String folderPileupInCornerIntro = "flags/pileup_in_corner_intro";
 
         private String folderIncidentInCornerIntro = "flags/incident_in_corner_intro";
         private String folderIncidentInCornerDriverIntro = "flags/incident_in_corner_with_driver_intro";
@@ -89,7 +95,25 @@ namespace CrewChiefV4.Events
         private Dictionary<string, DateTime> incidentWarnings = new Dictionary<string, DateTime>();
 
         private TimeSpan incidentRepeatFrequency = TimeSpan.FromSeconds(30);
-        
+
+        private int getInvolvedInIncidentAttempts = 0;
+
+        private int maxFCYGetInvolvedInIncidentAttempts = 5;
+
+        private int maxLocalYellowGetInvolvedInIncidentAttempts = 2;
+
+        private int maxDriversToReportAsInvolvedInIncident = 3;
+
+        private int pileupDriverCount = 4;
+
+        int waitingForCrashedDriverInSector = -1;
+
+        private List<NamePositionPair> driversInvolvedInCurrentIncident = new List<NamePositionPair>();
+
+        private String waitingForCrashedDriverInCorner = null;
+        private List<OpponentData> driversCrashedInCorner = new List<OpponentData>();
+        private DateTime waitingForCrashedDriverInCornerFinishTime = DateTime.MaxValue;
+
         public FlagsMonitor(AudioPlayer audioPlayer)
         {
             this.audioPlayer = audioPlayer;
@@ -123,6 +147,13 @@ namespace CrewChiefV4.Events
             positionAtStartOfIncident = int.MaxValue;
             incidentCandidates.Clear();
             incidentWarnings.Clear();
+            getInvolvedInIncidentAttempts = 0;
+            driversInvolvedInCurrentIncident.Clear();
+            waitingForCrashedDriverInSector = -1;
+
+            waitingForCrashedDriverInCorner = null;
+            driversCrashedInCorner.Clear();
+            waitingForCrashedDriverInCornerFinishTime = DateTime.MaxValue;
         }
 
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
@@ -171,15 +202,21 @@ namespace CrewChiefV4.Events
             if (previousGameState != null)
             {
                 Boolean startedSector3 = previousGameState.SessionData.SectorNumber == 2 && currentGameState.SessionData.SectorNumber == 3;
-                if (announceFCYPhase(previousGameState.FlagData.fcyPhase, currentGameState.FlagData.fcyPhase, startedSector3))
+                if (announceFCYPhase(previousGameState.FlagData.fcyPhase, currentGameState.FlagData.fcyPhase, currentGameState.Now, startedSector3))
                 {
                     lastFCYAnnounced = currentGameState.FlagData.fcyPhase;
-                    lastFCYAccounedTime = DateTime.Now;
+                    lastFCYAccounedTime = currentGameState.Now;
                     switch (currentGameState.FlagData.fcyPhase)
                     {
                         case FullCourseYellowPhase.PENDING:
                             // don't allow any other message to override this one:
                             audioPlayer.playMessageImmediately(new QueuedMessage(folderFCYellowStart, 0, null));
+                            // start working out who's gone off
+                            findInitialIncidentCandidateKeys(-1, currentGameState.OpponentData);
+                            positionAtStartOfIncident = currentGameState.SessionData.Position;
+                            nextIncidentDriversCheck = currentGameState.Now + TimeSpan.FromSeconds(2);
+                            getInvolvedInIncidentAttempts = 0;
+                            driversInvolvedInCurrentIncident.Clear();
                             break;
                         case FullCourseYellowPhase.PITS_CLOSED:
                             audioPlayer.playMessage(new QueuedMessage(folderFCYellowPitsClosed, 0, this));
@@ -210,11 +247,31 @@ namespace CrewChiefV4.Events
                     // don't allow any other message to override this one:
                     audioPlayer.playMessageImmediately(new QueuedMessage(folderFCYellowPrepareForGreen, 0, null));
                 }
+                else if (currentGameState.FlagData.fcyPhase == FullCourseYellowPhase.PENDING && currentGameState.Now > nextIncidentDriversCheck)
+                {
+                    if (getInvolvedInIncidentAttempts >= maxFCYGetInvolvedInIncidentAttempts)
+                    {
+                        // we've collected as many involved drivers as we're going to get, so report them
+                        reportYellowFlagDrivers(currentGameState.OpponentData, currentGameState.SessionData.TrackDefinition);
+                        nextIncidentDriversCheck = DateTime.MaxValue;
+                        positionAtStartOfIncident = int.MaxValue;
+                        incidentCandidates.Clear();
+                        getInvolvedInIncidentAttempts = 0;
+                        driversInvolvedInCurrentIncident.Clear();
+                    }
+                    else
+                    {
+                        // get more involved drivers and schedule the next check
+                        nextIncidentDriversCheck = currentGameState.Now + TimeSpan.FromSeconds(2);
+                        driversInvolvedInCurrentIncident.AddRange(getInvolvedIncidentCandidates(-1, currentGameState.OpponentData));
+                    }
+                    getInvolvedInIncidentAttempts++;
+                }
                 else
                 {
                     // sector yellows
                     for (int i = 0; i < 3; i++)
-                    {                        
+                    {
                         //  Yellow Flags:
                         // * Only announce Yellow if
                         //      - Not in pits
@@ -226,6 +283,30 @@ namespace CrewChiefV4.Events
                         //      - Enough time passed since Yellow was announced
                         //      - Yellow went away in or next sector (relative to player's sector).
                         //      - Announce delayed message and drop it if sector or sector flag changes
+
+                        // we've announced this, so see if we can add more information
+                        if (i == waitingForCrashedDriverInSector && currentGameState.Now > nextIncidentDriversCheck)
+                        {
+                            if (getInvolvedInIncidentAttempts >= maxLocalYellowGetInvolvedInIncidentAttempts)
+                            {
+                                // we've collected as many involved drivers as we're going to get, so report them
+                                reportYellowFlagDrivers(currentGameState.OpponentData, currentGameState.SessionData.TrackDefinition);
+                                nextIncidentDriversCheck = DateTime.MaxValue;
+                                positionAtStartOfIncident = int.MaxValue;
+                                incidentCandidates.Clear();
+                                getInvolvedInIncidentAttempts = 0;
+                                driversInvolvedInCurrentIncident.Clear();
+                                waitingForCrashedDriverInSector = -1;
+                            }
+                            else
+                            {
+                                // get more involved drivers and schedule the next check
+                                nextIncidentDriversCheck = currentGameState.Now + TimeSpan.FromSeconds(2);
+                                driversInvolvedInCurrentIncident.AddRange(getInvolvedIncidentCandidates(waitingForCrashedDriverInSector + 1, currentGameState.OpponentData));
+                            }
+                            getInvolvedInIncidentAttempts++;
+                        }
+
                         if (!currentGameState.PitData.InPitlane &&
                             (reportYellowsInAllSectors || isCurrentSector(currentGameState, i) || isNextSector(currentGameState, i)))
                         {
@@ -238,12 +319,12 @@ namespace CrewChiefV4.Events
                                     if (currentGameState.Now > lastSectorFlagsAnnouncedTime[i].Add(timeBetweenNewYellowFlagMessages))
                                     {
                                         lastSectorFlagsAnnounced[i] = sectorFlag;
-                                        lastSectorFlagsAnnouncedTime[i] = DateTime.Now;
+                                        lastSectorFlagsAnnouncedTime[i] = currentGameState.Now;
 
                                         if (isCurrentSector(currentGameState, i) && 4 > random.NextDouble() * 10)
                                         {
                                             // If in current, sometimes announce without sector number.
-                                            audioPlayer.playMessage(new QueuedMessage(sectorFlag == FlagEnum.YELLOW ? 
+                                            audioPlayer.playMessage(new QueuedMessage(sectorFlag == FlagEnum.YELLOW ?
                                                 folderYellowFlag : folderDoubleYellowFlag, 0, this));
                                         }
                                         else
@@ -255,7 +336,10 @@ namespace CrewChiefV4.Events
                                         // start working out who's gone off
                                         findInitialIncidentCandidateKeys(i + 1, currentGameState.OpponentData);
                                         positionAtStartOfIncident = currentGameState.SessionData.Position;
-                                        nextIncidentDriversCheck = DateTime.Now + TimeSpan.FromSeconds(2);
+                                        nextIncidentDriversCheck = currentGameState.Now + TimeSpan.FromSeconds(2);
+                                        getInvolvedInIncidentAttempts = 0;
+                                        driversInvolvedInCurrentIncident.Clear();
+                                        waitingForCrashedDriverInSector = i;
                                     }
                                 }
                                 else if (sectorFlag == FlagEnum.GREEN)
@@ -264,24 +348,11 @@ namespace CrewChiefV4.Events
                                     if (currentGameState.Now > lastSectorFlagsAnnouncedTime[i].Add(timeBetweenYellowAndClearFlagMessages))
                                     {
                                         lastSectorFlagsAnnounced[i] = sectorFlag;
-                                        lastSectorFlagsAnnouncedTime[i] = DateTime.Now;
+                                        lastSectorFlagsAnnouncedTime[i] = currentGameState.Now;
 
                                         // Queue delayed message for flag is clear.
                                         audioPlayer.playMessageImmediately(new QueuedMessage(folderGreenFlagSectors[i], secondsToPreValidateYellowClearMessages, this));
                                     }
-                                }
-                            }
-                            else
-                            {
-                                // we've announced this, so see if we can add more information
-                                if (DateTime.Now > nextIncidentDriversCheck)
-                                {
-                                    if (incidentCandidates.Count > 0)
-                                    {
-                                        reportYellowFlagDriver(i + 1, currentGameState.OpponentData, currentGameState.SessionData.TrackDefinition);
-                                    }
-                                    nextIncidentDriversCheck = DateTime.MaxValue;
-                                    positionAtStartOfIncident = int.MaxValue;
                                 }
                             }
                         }
@@ -292,14 +363,14 @@ namespace CrewChiefV4.Events
                             lastSectorFlagsAnnouncedTime[i] = DateTime.MinValue;
                         }
                     }
-                }   
-                    
+                }
+
                 // local yellows (planned R3E implementation)
                 if (!isUnderLocalYellow && currentGameState.FlagData.isLocalYellow)
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage(folderLocalYellow, 0, null));
                     isUnderLocalYellow = true;
-                    lastLocalYellowAnnouncedTime = DateTime.Now;
+                    lastLocalYellowAnnouncedTime = currentGameState.Now;
                     // we might not have warned of an incident ahead - no point in warning about it now we've actually reached it
                     hasWarnedOfUpcomingIncident = true;
                 }
@@ -307,11 +378,12 @@ namespace CrewChiefV4.Events
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage(folderLocalYellowClear, 0, null));
                     isUnderLocalYellow = false;
-                    lastLocalYellowAnnouncedTime = DateTime.Now;
+                    lastLocalYellowAnnouncedTime = currentGameState.Now;
                     // we've passed the incident so allow warnings of other incidents approaching
                     hasWarnedOfUpcomingIncident = false;
-                } else if (!isUnderLocalYellow && !hasWarnedOfUpcomingIncident &&
-                    previousGameState.FlagData.distanceToNearestIncident > distanceToWarnOfLocalYellow && currentGameState.FlagData.distanceToNearestIncident < distanceToWarnOfLocalYellow)
+                }
+                else if (!isUnderLocalYellow && !hasWarnedOfUpcomingIncident &&
+                  previousGameState.FlagData.distanceToNearestIncident > distanceToWarnOfLocalYellow && currentGameState.FlagData.distanceToNearestIncident < distanceToWarnOfLocalYellow)
                 {
                     hasWarnedOfUpcomingIncident = true;
                     audioPlayer.playMessageImmediately(new QueuedMessage(folderLocalYellowAhead, 0, null));
@@ -323,7 +395,7 @@ namespace CrewChiefV4.Events
                     isUnderLocalYellow = false;
                     hasWarnedOfUpcomingIncident = false;
                 }
-                
+
             }
         }
 
@@ -368,20 +440,20 @@ namespace CrewChiefV4.Events
             return false;
         }
 
-        private Boolean announceFCYPhase(FullCourseYellowPhase previousPhase, FullCourseYellowPhase currentPhase, Boolean startedSector3)
+        private Boolean announceFCYPhase(FullCourseYellowPhase previousPhase, FullCourseYellowPhase currentPhase, DateTime now, Boolean startedSector3)
         {
             // reminder announcements for pit status at the start of sector 3, if we've not announce it for a while
             return (previousPhase != currentPhase && currentPhase != lastFCYAnnounced) ||
                 ((currentPhase == FullCourseYellowPhase.PITS_CLOSED ||
-                 currentPhase == FullCourseYellowPhase.PITS_OPEN_LEAD_LAP_VEHICLES || 
-                 currentPhase == FullCourseYellowPhase.PITS_OPEN) && DateTime.Now > lastFCYAccounedTime + fcyPitStatusReminderMinTime && startedSector3);            
+                 currentPhase == FullCourseYellowPhase.PITS_OPEN_LEAD_LAP_VEHICLES ||
+                 currentPhase == FullCourseYellowPhase.PITS_OPEN) && now > lastFCYAccounedTime + fcyPitStatusReminderMinTime && startedSector3);
         }
 
         /**
          * Used by all other games, legacy code.
          */
         private void oldYellowFlagImplementation(GameStateData previousGameState, GameStateData currentGameState)
-        {            
+        {
             if (currentGameState.PositionAndMotionData.CarSpeed < 1)
             {
                 return;
@@ -396,7 +468,7 @@ namespace CrewChiefV4.Events
             }
             else if (!currentGameState.PitData.InPitlane && currentGameState.SessionData.Flag == FlagEnum.DOUBLE_YELLOW)
             {
-                if (currentGameState.Now > lastYellowFlagTime.Add(timeBetweenYellowFlagMessages) && 
+                if (currentGameState.Now > lastYellowFlagTime.Add(timeBetweenYellowFlagMessages) &&
                     // AMS specific hack until RF2 FCY stuff is ported - don't spam the double yellow during caution periods, just report it once per lap
                     (CrewChief.gameDefinition.gameEnum != GameEnum.RF1 || currentGameState.SessionData.IsNewLap))
                 {
@@ -407,53 +479,110 @@ namespace CrewChiefV4.Events
             // now check for stopped cars
             if (currentGameState.SessionData.SessionType == SessionType.Race)
             {
-                foreach (OpponentData opponent in currentGameState.OpponentData.Values)
+                if (waitingForCrashedDriverInCorner == null)
                 {
-                    String landmark = opponent.stoppedInLandmark;
-                    if (landmark != null && !landmark.Equals(currentGameState.SessionData.stoppedInLandmark))
+                    // get the first stopped car and his corner
+                    foreach (OpponentData opponent in currentGameState.OpponentData.Values)
                     {
-                        if (!incidentWarnings.ContainsKey(landmark) || incidentWarnings[landmark] + incidentRepeatFrequency < DateTime.Now)
+                        String landmark = opponent.stoppedInLandmark;
+                        if (landmark != null && !landmark.Equals(currentGameState.SessionData.stoppedInLandmark))
                         {
-                            Boolean canPlay;
-                            Boolean canReadDriverName = canReadName(opponent.DriverRawName);
-                            Boolean canReadDriverPosition = opponent.Position <= 6;
-                            // first check if we have this driver name (or can read the position) and we're fighting with him, 
-                            // otherwise check if this car is < 1000 metres away
-                            if (Math.Abs(currentGameState.SessionData.Position - opponent.Position) <= 2 && (canReadDriverName || canReadDriverPosition))
+                            // is this car in an interesting part of the track?
+                            Boolean isApproaching;
+                            if (opponent.DistanceRoundTrack > currentGameState.PositionAndMotionData.DistanceRoundTrack)
                             {
-                                canPlay = true;
-                            }
-                            else if (opponent.DistanceRoundTrack > currentGameState.PositionAndMotionData.DistanceRoundTrack)
-                            {
-                                canPlay = opponent.DistanceRoundTrack - currentGameState.PositionAndMotionData.DistanceRoundTrack < 1000;
+                                isApproaching = opponent.DistanceRoundTrack - currentGameState.PositionAndMotionData.DistanceRoundTrack < 1000;
                             }
                             else
                             {
-                                canPlay = opponent.DistanceRoundTrack -
+                                isApproaching = opponent.DistanceRoundTrack -
                                     (currentGameState.PositionAndMotionData.DistanceRoundTrack - currentGameState.SessionData.TrackDefinition.trackLength) < 1000;
                             }
-                            if (canPlay)
+                            // are we fighting with him and can we call him by name?
+                            Boolean isInteresting = Math.Abs(currentGameState.SessionData.Position - opponent.Position) <= 2 &&
+                                (canReadName(opponent.DriverRawName) || opponent.Position <= folderPositionHasGoneOff.Length);
+                            if ((isApproaching || isInteresting) &&
+                                (!incidentWarnings.ContainsKey(landmark) || incidentWarnings[landmark] + incidentRepeatFrequency < currentGameState.Now))
                             {
-                                incidentWarnings[landmark] = DateTime.Now;
-                                if (canReadDriverName)
-                                {
-                                    Console.WriteLine("incident in " + landmark + " for driver " + opponent.DriverRawName);
-                                    audioPlayer.playMessage(new QueuedMessage("incident_corner_with_driver", MessageContents(folderIncidentInCornerIntro, "corners/" + landmark,
-                                        folderIncidentInCornerDriverIntro, opponent), 0, this));
-                                }
-                                else if (canReadDriverPosition)
-                                {
-                                    audioPlayer.playMessage(new QueuedMessage("incident_corner_with_driver", MessageContents(
-                                        folderPositionHasGoneOffIn[opponent.Position - 1], "corners/" + landmark), 0, this));
-                                }
-                                else
-                                {
-                                    Console.WriteLine("incident in " + landmark);
-                                    audioPlayer.playMessage(new QueuedMessage("incident_corner", MessageContents(folderIncidentInCornerIntro, "corners/" + landmark), 0, this));
-                                }
+                                waitingForCrashedDriverInCorner = landmark;
+                                driversCrashedInCorner.Add(opponent);
+                                waitingForCrashedDriverInCornerFinishTime = currentGameState.Now + TimeSpan.FromSeconds(4);
+                                break;
                             }
                         }
                     }
+                }
+                else if (currentGameState.Now < waitingForCrashedDriverInCornerFinishTime)
+                {
+                    // get more stopped cars
+                    foreach (OpponentData opponent in currentGameState.OpponentData.Values)
+                    {
+                        String landmark = opponent.stoppedInLandmark;
+                        if (landmark == waitingForCrashedDriverInCorner && !driversCrashedInCorner.Contains(opponent))
+                        {
+                            driversCrashedInCorner.Add(opponent);
+                        }
+                    }
+                }
+                else
+                {
+                    // finished waiting, get the results and play 'em
+                    incidentWarnings[waitingForCrashedDriverInCorner] = currentGameState.Now;
+                    if (driversCrashedInCorner.Count >= pileupDriverCount)
+                    {
+                        // report pileup
+                        audioPlayer.playMessage(new QueuedMessage("pileup_in_corner", MessageContents(folderPileupInCornerIntro, "corners/" +
+                            waitingForCrashedDriverInCorner), 0, this));
+                    }
+                    else
+                    {
+                        List<OpponentData> opponentNamesToRead = new List<OpponentData>();
+                        int positionToRead = -1;
+                        foreach (OpponentData opponent in driversCrashedInCorner)
+                        {
+                            if (canReadName(opponent.DriverRawName))
+                            {
+                                opponentNamesToRead.Add(opponent);
+                            }
+                            else if (opponent.Position <= folderPositionHasGoneOff.Length && positionToRead == -1)
+                            {
+                                positionToRead = opponent.Position;
+                            }
+                        }
+                        if (opponentNamesToRead.Count > 0)
+                        {
+                            // one or more names to read
+                            List<MessageFragment> messageContents = new List<MessageFragment>();
+                            messageContents.AddRange(MessageContents(folderIncidentInCornerIntro));
+                            messageContents.AddRange(MessageContents("corners/" + waitingForCrashedDriverInCorner));
+                            messageContents.AddRange(MessageContents(folderIncidentInCornerDriverIntro));
+                            int andIndex = opponentNamesToRead.Count > 1 ? opponentNamesToRead.Count - 1 : -1;
+                            List<String> namesToDebug = new List<string>();
+                            for (int i = 0; i < opponentNamesToRead.Count; i++)
+                            {
+                                if (i == andIndex)
+                                {
+                                    messageContents.AddRange(MessageContents(folderAnd));
+                                }
+                                namesToDebug.Add(opponentNamesToRead[i].DriverRawName);
+                                messageContents.AddRange(MessageContents(opponentNamesToRead[i]));
+                            }
+                            Console.WriteLine("incident in " + waitingForCrashedDriverInCorner + " for drivers " + String.Join(",", namesToDebug));
+                            audioPlayer.playMessage(new QueuedMessage("incident_corner_with_driver", messageContents, 0, this));
+                        }
+                        else if (positionToRead != -1)
+                        {
+                            audioPlayer.playMessage(new QueuedMessage("incident_corner_with_driver", MessageContents(
+                                        folderPositionHasGoneOffIn[positionToRead - 1], "corners/" + waitingForCrashedDriverInCorner), 0, this));
+                        }
+                        else
+                        {
+                            Console.WriteLine("incident in " + waitingForCrashedDriverInCorner);
+                            audioPlayer.playMessage(new QueuedMessage("incident_corner", MessageContents(folderIncidentInCornerIntro, "corners/" + waitingForCrashedDriverInCorner), 0, this));
+                        }
+                    }
+                    waitingForCrashedDriverInCorner = null;
+                    driversCrashedInCorner.Clear();
                 }
             }
         }
@@ -464,8 +593,8 @@ namespace CrewChiefV4.Events
             foreach (KeyValuePair<Object, OpponentData> entry in opponents)
             {
                 Object opponentKey = entry.Key;
-                OpponentData opponentData = entry.Value;                
-                if (opponentData.CurrentSectorNumber == flagSector && !opponentData.InPits)
+                OpponentData opponentData = entry.Value;
+                if ((flagSector == -1 || opponentData.CurrentSectorNumber == flagSector) && !opponentData.InPits)
                 {
                     LapData lapData = opponentData.getCurrentLapData();
                     incidentCandidates.Add(new IncidentCandidate(opponentKey, opponentData.DistanceRoundTrack, opponentData.Position,
@@ -474,116 +603,167 @@ namespace CrewChiefV4.Events
             }
         }
 
-        void reportYellowFlagDriver(int flagSector, Dictionary<Object, OpponentData> opponents, TrackDefinition currentTrack)
+        // get incident candidates who are involved - they've lost lots of position or haven't really moved since the last check
+        List<NamePositionPair> getInvolvedIncidentCandidates(int flagSector, Dictionary<Object, OpponentData> opponents)
         {
-            List<NamePositionPair> driversToReport = new List<NamePositionPair>();
+            List<NamePositionPair> involvedDrivers = new List<NamePositionPair>();
+            List<IncidentCandidate> remainingIncidentCandidates = new List<IncidentCandidate>();
             foreach (IncidentCandidate incidentCandidate in incidentCandidates)
             {
                 if (opponents.ContainsKey(incidentCandidate.opponentDataKey))
                 {
                     OpponentData opponent = opponents[incidentCandidate.opponentDataKey];
-                    if (opponent.CurrentSectorNumber == flagSector &&
-                        (Math.Abs(opponent.DistanceRoundTrack - incidentCandidate.distanceRoundTrackAtStartOfIncident) < maxDistanceMovedForYellowAnnouncement) ||
-                        opponent.Position > incidentCandidate.positionAtStartOfIncident + 3)
+                    if (flagSector == -1 || opponent.CurrentSectorNumber == flagSector)
                     {
-                        // this guy is in the same sector as the yellow but has only travelled 10m in 2 seconds or has lost a load of places,
-                        // so he's probably involved - add him to the list if we have sound files for him:
-                        NamePositionPair namePositionPair = new NamePositionPair(opponent.DriverRawName, incidentCandidate.positionAtStartOfIncident, opponent.DistanceRoundTrack,
-                            canReadName(opponent.DriverRawName), incidentCandidate.opponentDataKey);
-                        if (namePositionPair.canReadName || namePositionPair.position <= folderPositionHasGoneOff.Length)
+                        if ((Math.Abs(opponent.DistanceRoundTrack - incidentCandidate.distanceRoundTrackAtStartOfIncident) < maxDistanceMovedForYellowAnnouncement) ||
+                                opponent.Position > incidentCandidate.positionAtStartOfIncident + 3)
                         {
-                            driversToReport.Add(namePositionPair);
+                            // this guy is in the same sector as the yellow but has only travelled 10m in 2 seconds or has lost a load of places so he's probably involved
+                            involvedDrivers.Add(new NamePositionPair(opponent.DriverRawName, incidentCandidate.positionAtStartOfIncident, opponent.DistanceRoundTrack,
+                                canReadName(opponent.DriverRawName), incidentCandidate.opponentDataKey));
+                        }
+                        else
+                        {
+                            // update incident candidate element to reflect the current state ready for the next check
+                            incidentCandidate.positionAtLastCheck = opponent.Position;
+                            incidentCandidate.distanceRoundTrackAtLastCheck = opponent.DistanceRoundTrack;
+                            remainingIncidentCandidates.Add(incidentCandidate);
                         }
                     }
                 }
             }
-            incidentCandidates.Clear();
-            // now we have a list of possible drivers who we think are involved in the incident and we can read out, so select one to read
-            foreach (NamePositionPair namePositionPair in driversToReport)
-            {
-                if (Math.Abs(positionAtStartOfIncident - namePositionPair.position) < 4 && namePositionPair.canReadName)
-                {
-                    // best match - he's within 3 places and we have his name 
+            incidentCandidates = remainingIncidentCandidates;
+            return involvedDrivers;
+        }
 
-                    // TODO: refactor this copy-paste horseshit:
-                    String landmark = TrackData.getLandmarkForLapDistance(currentTrack, namePositionPair.distanceRoundTrack);
-                    if (landmark != null)
+        void reportYellowFlagDrivers(Dictionary<Object, OpponentData> opponents, TrackDefinition currentTrack)
+        {
+            if (driversInvolvedInCurrentIncident.Count == 0 || checkForAndReportPileup(currentTrack))
+            {
+                return;
+            }
+
+            // no pileup so read name / positions / corners as appropriate
+            // there may be many of these, so we need to sort the list then pick the top few
+            driversInvolvedInCurrentIncident.Sort(new NamePositionPairComparer(positionAtStartOfIncident));
+            // get the landmark and other data off the first item
+            String landmark = TrackData.getLandmarkForLapDistance(currentTrack, driversInvolvedInCurrentIncident[0].distanceRoundTrack);
+            float distanceRoundTrackOfFirstLandmark = driversInvolvedInCurrentIncident[0].distanceRoundTrack;
+            List<OpponentData> opponentsToRead = new List<OpponentData>();
+            opponentsToRead.Add(opponents[driversInvolvedInCurrentIncident[0].opponentKey]);
+            // if the first item is a position (we have no name for him), don't process the others
+            Boolean namesMode = driversInvolvedInCurrentIncident[0].canReadName;
+            int position = driversInvolvedInCurrentIncident[0].position;
+            if (namesMode)
+            {
+                for (int i = 1; i < driversInvolvedInCurrentIncident.Count; i++)
+                {
+                    if (opponentsToRead.Count == maxDriversToReportAsInvolvedInIncident)
                     {
-                        audioPlayer.playMessage(new QueuedMessage("incident_driver", MessageContents(
-                            folderNameHasGoneOffIntro, opponents[namePositionPair.opponentKey], folderNameHasGoneOffInOutro, "corners/" + landmark), 0, this));
+                        break;
                     }
-                    else
+                    if (driversInvolvedInCurrentIncident[i].canReadName)
                     {
-                        audioPlayer.playMessage(new QueuedMessage("incident_driver", MessageContents(
-                            folderNameHasGoneOffIntro, opponents[namePositionPair.opponentKey], folderNameHasGoneOffOutro), 0, this));
+                        opponentsToRead.Add(opponents[driversInvolvedInCurrentIncident[i].opponentKey]);
+                        String thisLandmark = TrackData.getLandmarkForLapDistance(currentTrack, driversInvolvedInCurrentIncident[i].distanceRoundTrack);
+                        if (landmark == null)
+                        {
+                            thisLandmark = landmark;
+                            distanceRoundTrackOfFirstLandmark = driversInvolvedInCurrentIncident[i].distanceRoundTrack;
+                        }
+                        else if (landmark != thisLandmark || Math.Abs(distanceRoundTrackOfFirstLandmark - driversInvolvedInCurrentIncident[i].distanceRoundTrack) > 300)
+                        {
+                            // oh dear... this driver is in a completely different part of the track :(
+                            landmark = null;
+                            break;
+                        }
                     }
-                    return;
                 }
             }
-            foreach (NamePositionPair namePositionPair in driversToReport)
+            // now we have the opponents to read and the landmark - either all the drivers are in it (or close) or we won't use it
+            List<MessageFragment> messageContents = new List<MessageFragment>();
+            if (namesMode)
             {
-                if (namePositionPair.position < positionAtStartOfIncident && namePositionPair.canReadName)
+                messageContents.AddRange(MessageContents(folderNameHasGoneOffIntro));
+                int andIndex = opponentsToRead.Count > 1 ? opponentsToRead.Count - 1 : -1;
+                for (int i = 0; i < opponentsToRead.Count; i++)
                 {
-                    // decent match - he's ahead and we have a name
-
-                    // TODO: refactor this copy-paste horseshit:
-                    String landmark = TrackData.getLandmarkForLapDistance(currentTrack, namePositionPair.distanceRoundTrack);
+                    if (i == andIndex)
+                    {
+                        messageContents.AddRange(MessageContents(folderAnd));
+                    }
+                    messageContents.AddRange(MessageContents(opponentsToRead[i]));
+                }
+                if (andIndex != -1)
+                {
                     if (landmark != null)
                     {
-                        audioPlayer.playMessage(new QueuedMessage("incident_driver", MessageContents(
-                            folderNameHasGoneOffIntro, opponents[namePositionPair.opponentKey], folderNameHasGoneOffInOutro, "corners/" + landmark), 0, this));
+                        messageContents.AddRange(MessageContents(folderNamesHaveGoneOffInOutro));
+                        messageContents.AddRange(MessageContents("corners/" + landmark));
                     }
                     else
                     {
-                        audioPlayer.playMessage(new QueuedMessage("incident_driver", MessageContents(
-                            folderNameHasGoneOffIntro, opponents[namePositionPair.opponentKey], folderNameHasGoneOffOutro), 0, this));
+                        messageContents.AddRange(MessageContents(folderNamesHaveGoneOffOutro));
                     }
-                    return;
+                }
+                else
+                {
+                    if (landmark != null)
+                    {
+                        messageContents.AddRange(MessageContents(folderNameHasGoneOffInOutro));
+                        messageContents.AddRange(MessageContents("corners/" + landmark));
+                    }
+                    else
+                    {
+                        messageContents.AddRange(MessageContents(folderNameHasGoneOffOutro));
+                    }
                 }
             }
-            foreach (NamePositionPair namePositionPair in driversToReport)
+            else if (landmark != null && position <= folderPositionHasGoneOffIn.Length)
             {
-                if (namePositionPair.position < positionAtStartOfIncident && positionAtStartOfIncident - namePositionPair.position < 6)
-                {
-                    // hmm... no name, but he's close in front
-
-                    // TODO: refactor this copy-paste horseshit:
-                    String landmark = TrackData.getLandmarkForLapDistance(currentTrack, namePositionPair.distanceRoundTrack);
-                    if (landmark != null)
-                    {
-                        audioPlayer.playMessage(new QueuedMessage("incident_driver", MessageContents(
-                            folderPositionHasGoneOffIn[namePositionPair.position - 1], "corners/" + landmark), 0, this));
-                    }
-                    else
-                    {
-                        audioPlayer.playMessage(new QueuedMessage("incident_driver", MessageContents(
-                            folderPositionHasGoneOff[namePositionPair.position - 1]), 0, this));
-                    }
-                    return;
-                }
+                messageContents.AddRange(MessageContents(folderPositionHasGoneOffIn[position - 1]));
+                messageContents.AddRange(MessageContents("corners/" + landmark));
             }
-            foreach (NamePositionPair namePositionPair in driversToReport)
+            else if (position <= folderPositionHasGoneOffIn.Length)
             {
-                if (namePositionPair.canReadName)
-                {
-                    // meh, at least we have a name
-
-                    // TODO: refactor this copy-paste horseshit:
-                    String landmark = TrackData.getLandmarkForLapDistance(currentTrack, namePositionPair.distanceRoundTrack);
-                    if (landmark != null)
-                    {
-                        audioPlayer.playMessage(new QueuedMessage("incident_driver", MessageContents(
-                            folderNameHasGoneOffIntro, opponents[namePositionPair.opponentKey], folderNameHasGoneOffInOutro, "corners/" + landmark), 0, this));
-                    }
-                    else
-                    {
-                        audioPlayer.playMessage(new QueuedMessage("incident_driver", MessageContents(
-                            folderNameHasGoneOffIntro, opponents[namePositionPair.opponentKey], folderNameHasGoneOffOutro), 0, this));
-                    }
-                    return;
-                }
+                messageContents.AddRange(MessageContents(folderPositionHasGoneOff[position - 1]));
+            }
+            if (messageContents.Count > 0)
+            {
+                audioPlayer.playMessage(new QueuedMessage("incident_drivers", messageContents, 0, this));
             }
         }
+
+        Boolean checkForAndReportPileup(TrackDefinition currentTrack)
+        {
+            if (driversInvolvedInCurrentIncident.Count >= pileupDriverCount)
+            {
+                Dictionary<String, int> crashedInLandmarkCounts = new Dictionary<string, int>();
+                foreach (NamePositionPair driver in driversInvolvedInCurrentIncident)
+                {
+                    String crashLandmark = TrackData.getLandmarkForLapDistance(currentTrack, driver.distanceRoundTrack);
+                    if (crashedInLandmarkCounts.ContainsKey(crashLandmark))
+                    {
+                        crashedInLandmarkCounts[crashLandmark]++;
+                    }
+                    else
+                    {
+                        crashedInLandmarkCounts.Add(crashLandmark, 1);
+                    }
+                }
+                // now see if any exceed the limit
+                foreach (String crashedInLandmarkKey in crashedInLandmarkCounts.Keys)
+                {
+                    if (crashedInLandmarkCounts[crashedInLandmarkKey] >= pileupDriverCount)
+                    {
+                        // report the pileup
+                        audioPlayer.playMessage(new QueuedMessage("pileup_in_corner", MessageContents(folderPileupInCornerIntro, "corners/" + crashedInLandmarkKey), 0, this));
+                        return true;
+                    }
+                }
+            } return false;
+        }
+
 
         private Boolean canReadName(String rawName)
         {
@@ -609,18 +789,73 @@ namespace CrewChiefV4.Events
         }
     }
 
+    class NamePositionPairComparer : IComparer<NamePositionPair>
+    {
+        private int playerPosition;
+
+        public NamePositionPairComparer(int playerPosition)
+        {
+            this.playerPosition = playerPosition;
+        }
+        public int Compare(NamePositionPair a, NamePositionPair b)
+        {
+            if (a.canReadName == b.canReadName)
+            {
+                // can (or can't) read both names, return the one closest but preferably in front
+                if (a.position > playerPosition && b.position > playerPosition)
+                {
+                    return a.position > b.position ? 1 : -1;
+                }
+                else if (a.position < playerPosition && b.position < playerPosition)
+                {
+                    return a.position < b.position ? 1 : -1;
+                }
+                else if (a.position < playerPosition && b.position > playerPosition)
+                {
+                    return 1;
+                }
+                else if (a.position > playerPosition && b.position < playerPosition)
+                {
+                    return -1;
+                }
+                else
+                {
+                    return Math.Abs(a.position - playerPosition) < Math.Abs(b.position - playerPosition) ? 1 : -1;
+                }
+            }
+            else
+            {
+                // we have one name
+                if (a.canReadName)
+                {
+                    // can't read b's name but he still might be in a more interesting position
+                    return b.position <= FlagsMonitor.folderPositionHasGoneOff.Length && b.position < playerPosition && a.position > playerPosition ? -1 : 1;
+                }
+                else
+                {
+                    // can't read a's name but he still might be in a more interesting position
+                    return a.position <= FlagsMonitor.folderPositionHasGoneOff.Length && a.position < playerPosition && b.position > playerPosition ? 1 : -1;
+                }
+            }
+        }
+    }
+
     class IncidentCandidate
     {
         public Object opponentDataKey;
         public float distanceRoundTrackAtStartOfIncident;
+        public float distanceRoundTrackAtLastCheck;
         public Boolean lapValidAtStartOfIncident;
         public int positionAtStartOfIncident;
+        public int positionAtLastCheck;
         public IncidentCandidate(Object opponentDataKey, float distanceRoundTrackAtStartOfIncident, int positionAtStartOfIncident, Boolean lapValidAtStartOfIncident)
         {
             this.opponentDataKey = opponentDataKey;
             this.distanceRoundTrackAtStartOfIncident = distanceRoundTrackAtStartOfIncident;
             this.positionAtStartOfIncident = positionAtStartOfIncident;
             this.lapValidAtStartOfIncident = lapValidAtStartOfIncident;
+            this.positionAtLastCheck = positionAtStartOfIncident;
+            this.distanceRoundTrackAtLastCheck = distanceRoundTrackAtStartOfIncident;
         }
-    } 
+    }
 }

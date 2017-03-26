@@ -971,6 +971,9 @@ namespace CrewChiefV4.GameState
         private int landmarkStoppedCount = 0;
         private Boolean inLandmark = false;
 
+        // wonder if this'll work...
+        private String nearLandmarkName = null;
+
         // quick n dirty tracking of when we're at the mid-point of a landmark - maybe the apex. This is only non-null for a single tick.
         public String atMidPointOfLandmark = null;
 
@@ -1093,7 +1096,8 @@ namespace CrewChiefV4.GameState
         // games so this might cause more problems than it solves.
         //
         // returns null or a landmark name this car is stopped in
-        public String updateLandmarkTiming(List<TrackLandmark> trackLandmarks, float gameTime, float previousDistanceRoundTrack, float currentDistanceRoundTrack, float speed) 
+        public String updateLandmarkTiming(List<TrackLandmark> trackLandmarks, float gameTime, float previousDistanceRoundTrack, float currentDistanceRoundTrack, 
+            float speed, float trackLength) 
         {
 		    if (trackLandmarks == null || trackLandmarks.Count == 0) {
 			    return null;
@@ -1113,7 +1117,8 @@ namespace CrewChiefV4.GameState
                             landmarkNameStart = trackLandmark.landmarkName;
                             landmarkStartTime = gameTime - error;
                             landmarkStartSpeed = speed;
-                            landmarkStoppedCount = 0;
+                            // don't reset the stopped count while in the landmark - do this in the proximity check below
+                            // landmarkStoppedCount = 0;
                             inLandmark = true;
                         }
 					    break;
@@ -1151,10 +1156,41 @@ namespace CrewChiefV4.GameState
                     }	
 			    }
 		    }
-            if (inLandmark && landmarkStoppedCount >= 10)
+            Boolean nearLandmark = false;
+            // now some landmark proximity stuff
+            if (landmarkNameStart == null)
             {
-                // slow for more than 1 second - this assumes 1 tick is 100ms, which isn't necessarily valid but it's close enough...
-                return landmarkNameStart;
+                // again, we're waiting to enter a landmark zone - perhaps we've just left a zone so still check for stopped cars         
+                foreach (TrackLandmark trackLandmark in trackLandmarks) 
+                {
+				    if (currentDistanceRoundTrack > Math.Max(0, trackLandmark.distanceRoundLapStart - 100) && 
+                        currentDistanceRoundTrack < Math.Min(trackLength, trackLandmark.distanceRoundLapEnd))
+				    {
+                        if (nearLandmarkName != trackLandmark.landmarkName)
+                        {
+                            landmarkStoppedCount = 0;
+                        }
+                        nearLandmarkName = trackLandmark.landmarkName;
+                        nearLandmark = true;
+                        // if this car is very slow, increment the stopped counter
+                        if (speed < 5)
+                        {
+                            landmarkStoppedCount++;
+                        }
+                        break;
+                    }
+                }
+                if (!nearLandmark)
+                {
+                    landmarkStoppedCount = 0;
+                    nearLandmarkName = null;
+                }
+            }
+
+            if (landmarkStoppedCount >= 10)
+            {
+                // slow for more than 1 second - this assumes 1 tick is 100ms, which isn't necessarily valid but it's close enough. 
+                return landmarkNameStart == null ? nearLandmarkName : landmarkNameStart;
             }
             else
             {

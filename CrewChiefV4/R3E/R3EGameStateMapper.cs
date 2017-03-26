@@ -89,6 +89,11 @@ namespace CrewChiefV4.RaceRoom
         // get jumbled up too. Can't criticise too strongly though, there's no shortage of shit code right here...
         private Dictionary<String, PendingRacePositionChange> PendingRacePositionChanges = new Dictionary<String, PendingRacePositionChange>();
         private TimeSpan PositionChangeLag = TimeSpan.FromMilliseconds(1000);
+
+        Dictionary<String, DateTime> lastActiveTimeForOpponents = new Dictionary<string, DateTime>();
+        DateTime nextOpponentCleanupTime = DateTime.MinValue;
+        TimeSpan opponentCleanupInterval = TimeSpan.FromSeconds(2);
+
         class PendingRacePositionChange
         {
             public int newPosition;
@@ -175,6 +180,9 @@ namespace CrewChiefV4.RaceRoom
                 currentGameState.SessionData.TrackDefinition.setGapPoints();
                 currentGameState.PitData.IsRefuellingAllowed = true;
 
+                lastActiveTimeForOpponents.Clear();
+                nextOpponentCleanupTime = currentGameState.Now + opponentCleanupInterval;
+
                 if (shared.SessionTimeRemaining > 0)
                 {
                     currentGameState.SessionData.SessionTotalRunTime = shared.SessionTimeRemaining;
@@ -251,6 +259,10 @@ namespace CrewChiefV4.RaceRoom
                             currentGameState.SessionData.SessionNumberOfLaps = shared.NumberOfLaps;
                             currentGameState.SessionData.SessionHasFixedTime = false;
                         }
+
+                        lastActiveTimeForOpponents.Clear();
+                        nextOpponentCleanupTime = currentGameState.Now + opponentCleanupInterval;
+
                         currentGameState.SessionData.SessionStartPosition = shared.Position;
                         currentGameState.SessionData.NumCarsAtStartOfSession = shared.NumCars;
                         currentGameState.SessionData.SessionStartTime = currentGameState.Now;
@@ -553,7 +565,7 @@ namespace CrewChiefV4.RaceRoom
                     {
                         String stoppedInLandmark = currentGameState.SessionData.trackLandmarksTiming.updateLandmarkTiming(currentGameState.SessionData.TrackDefinition.trackLandmarks,
                             currentGameState.SessionData.SessionRunningTime, previousGameState.PositionAndMotionData.DistanceRoundTrack,
-                            participantStruct.LapDistance, shared.CarSpeed);
+                            participantStruct.LapDistance, shared.CarSpeed, currentGameState.SessionData.TrackDefinition.trackLength);
                         currentGameState.SessionData.stoppedInLandmark = participantStruct.InPitlane == 1 ? null : stoppedInLandmark;
                     }
                     if (currentGameState.PitData.InPitlane)
@@ -592,6 +604,7 @@ namespace CrewChiefV4.RaceRoom
                     {
                         continue;
                     }
+                    lastActiveTimeForOpponents[driverName] = currentGameState.Now;
                     if (currentGameState.OpponentData.ContainsKey(driverName))
                     {
                         opponentDriverNamesProcessedThisUpdate.Add(driverName);
@@ -723,7 +736,7 @@ namespace CrewChiefV4.RaceRoom
                                 currentOpponentData.trackLandmarksTiming = previousOpponentData.trackLandmarksTiming;
                                 String stoppedInLandmark = currentOpponentData.trackLandmarksTiming.updateLandmarkTiming(
                                     currentGameState.SessionData.TrackDefinition.trackLandmarks, currentGameState.SessionData.SessionRunningTime, 
-                                    previousDistanceRoundTrack, currentOpponentData.DistanceRoundTrack, currentOpponentData.Speed);
+                                    previousDistanceRoundTrack, currentOpponentData.DistanceRoundTrack, currentOpponentData.Speed, currentGameState.SessionData.TrackDefinition.trackLength);
                                 currentOpponentData.stoppedInLandmark = currentOpponentData.InPits ? null : stoppedInLandmark;
                             }
                             if (justGoneGreen)
@@ -780,6 +793,25 @@ namespace CrewChiefV4.RaceRoom
                         opponentDriverNamesProcessedThisUpdate.Add(driverName);
                         currentGameState.OpponentData.Add(driverName, createOpponentData(participantStruct, driverName, true, currentGameState.carClass.carClassEnum));
                     }
+                }
+            }
+
+            if (currentGameState.Now > nextOpponentCleanupTime)
+            {
+                nextOpponentCleanupTime = currentGameState.Now + opponentCleanupInterval;
+                DateTime oldestAllowedUpdate = currentGameState.Now - opponentCleanupInterval;
+                List<String> inactiveOpponents = new List<string>();
+                foreach (String opponentName in currentGameState.OpponentData.Keys)
+                {
+                    if (!lastActiveTimeForOpponents.ContainsKey(opponentName) || lastActiveTimeForOpponents[opponentName] < oldestAllowedUpdate)
+                    {
+                        inactiveOpponents.Add(opponentName);
+                        Console.WriteLine("Opponent " + opponentName + " has been inactive for " + opponentCleanupInterval + ", removing him");
+                    }
+                }
+                foreach (String inactiveOpponent in inactiveOpponents)
+                {
+                    currentGameState.OpponentData.Remove(inactiveOpponent);
                 }
             }
 
