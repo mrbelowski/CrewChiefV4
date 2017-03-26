@@ -241,7 +241,7 @@ namespace CrewChiefV4
                 {
                     if (gameDefinition.gameInstallDirectory.Equals("Automobilista"))
                     {
-                        UserSettings.GetUserSettings().setProperty("acs_install_path", gameInstallPath);
+                        UserSettings.GetUserSettings().setProperty("ams_install_path", gameInstallPath);
                     }
                 }
                 UserSettings.GetUserSettings().saveUserSettings();
