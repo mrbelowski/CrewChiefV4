@@ -307,24 +307,25 @@ namespace CrewChiefV4
 
         public static String getLandmarkForLapDistance(TrackDefinition currentTrack, float lapDistance)
         {
-            if (currentTrack != null && lapDistance > 0) 
+            if (currentTrack != null && lapDistance > 0 && currentTrack.trackLandmarks != null) 
             {
-                List<TrackLandmark> landmarks;
-                if (CrewChief.gameDefinition.gameEnum == GameEnum.RACE_ROOM)
-                {
-                    landmarks = TRACK_LANDMARKS_DATA.getTrackLandmarksForTrackLayoutId(currentTrack.id);
-                }
-                else 
-                {
-                    landmarks = TRACK_LANDMARKS_DATA.getTrackLandmarksForTrackName(currentTrack.name);
-                }
-                foreach (TrackLandmark trackLandmark in landmarks)
+                foreach (TrackLandmark trackLandmark in currentTrack.trackLandmarks)
                 {
                     if (lapDistance > trackLandmark.distanceRoundLapStart && lapDistance < trackLandmark.distanceRoundLapEnd)
                     {
                         return trackLandmark.landmarkName;
                     }
+                } 
+                // check again with more generous limits
+                foreach (TrackLandmark trackLandmark in currentTrack.trackLandmarks)
+                {
+                    if (lapDistance > (Math.Max(0, trackLandmark.distanceRoundLapStart - 100)) && 
+                        lapDistance < Math.Min(currentTrack.trackLength, trackLandmark.distanceRoundLapEnd + 100))
+                    {
+                        return trackLandmark.landmarkName;
+                    }
                 }                
+             
             }
             return null;
         }

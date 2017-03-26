@@ -8,7 +8,9 @@ For support and discussions about Crew Chief we have our very own forum here: ht
 
 Changelog
 ---------
-Version 4.6.3.2: Temporary hack to reduce wheel locking sensitivity - hopefully will prevent false-positives while I work out a better algorithm;
+Version 4.6.3.3: Added installer for game specific plugins (AC, AMS / RF1 and RF2) - the app now offers to copy the required plugin files to the games' install directory if they're missing or out of date; extended incident reporting logic and sounds to allow for multiple involved drivers to be reported (if we have the driver name sounds) or 'pileup' warning if 4 or more drivers are stopped in the same corner; added more corner landmarks; opponent tracking fixes for PCars
+
+Version 4.6.3.2: Temporary hack to reduce wheel locking sensitivity - hopefully will prevent false-positives while I work out a better algorithm
 
 Version 4.6.3.1: Temporary hack to reduce wheel spin sensitivity - hopefully will prevent false-positives while I work out a better algorithm; fixed Assetto Corsa pit window calls being 1 lap out
 
