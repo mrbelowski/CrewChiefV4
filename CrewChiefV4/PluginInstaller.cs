@@ -240,6 +240,42 @@ namespace CrewChiefV4
                 else if (gameDefinition.gameEnum == GameEnum.ASSETTO_32BIT || gameDefinition.gameEnum == GameEnum.ASSETTO_64BIT)
                 {
                     UserSettings.GetUserSettings().setProperty("acs_install_path", gameInstallPath);
+                    string pythonConfigPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), @"Assetto Corsa\cfg", @"python.ini");
+                    try
+                    {
+                        if (File.Exists(pythonConfigPath))
+                        {
+                            bool found = false;
+                            string []lines = File.ReadAllLines(pythonConfigPath);
+                            for (int i = 0; i < lines.Length; i++ )
+                            {
+                                if (lines[i].Equals("[CREWCHIEFEX]"))
+                                {
+                                    if (lines.Length >= i + 1)
+                                    {
+                                        if (lines[i + 1].Equals("ACTIVE=0"))
+                                        {
+                                            lines[i + 1] = "ACTIVE=1";
+                                        }
+                                        found = true;
+                                        break;
+                                    }
+                                }    
+                            }
+                            if (!found)
+                            {
+                                List<string> lineList = new List<string>(lines);
+                                lineList.Add("[CREWCHIEFEX]");
+                                lineList.Add("ACTIVE=1");
+                                lines = lineList.ToArray();
+                            } 
+                            File.WriteAllLines(pythonConfigPath, lines);
+                        }
+                    }
+                    catch
+                    {
+                        //ignore or messagebox telleing the user to manualy enable?
+                    }     
                 }
                 else if (gameDefinition.gameEnum == GameEnum.RF1)
                 {
