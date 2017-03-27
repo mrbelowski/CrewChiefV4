@@ -42,10 +42,7 @@ Assetto Corsa:
 
 You need Morten Roslev's Python plugin for Assetto Corsa. The app will check if this plugin is installed in the correct game folder. If it isn't, the app will offer to install it for you when you start the app with Assetto Corsa selected. In most cases all you need do is click the "OK" button in the popup.
 
-If this process fails for any reason, copy the rFactor2SharedMemoryMapPlugin64.dll from the app's plugins folder - usually C:\Program Files (x86)\Britton IT Ltd\CrewChiefV4\plugins\rFactor 2\Bin64\Plugins\rFactor2SharedMemoryMapPlugin64.dll to the rFactor2 'Plugins' folder (usually something like C:\Program Files (x86)\Steam\steamapps\common\rFactor2\Bin64\Plugins). You need to enable this plugin from the game's Options->Plugins UI. 
-
-
-This is in Crew Chief's installation folder. Copy the folder called 'CrewChiefEx' from the app's plugins folder - usually C:\Program Files (x86)\Britton IT Ltd\CrewChiefV4\plugins\assettocorsa\apps\python\CrewChiefEx to the Asstto Corsa python folder (usually something like C:\Program Files (x86)\Steam\steamapps\common\assettocorsa\apps\python). You might need to enable this plugin in the Assetto Corsa UI. Once you've done this just select the game from Crew Chief's Game menu and press the Start button.
+If this process fails for any reason, copy the folder called 'CrewChiefEx' from the app's plugins folder - usually C:\Program Files (x86)\Britton IT Ltd\CrewChiefV4\plugins\assettocorsa\apps\python\CrewChiefEx to the Asstto Corsa python folder (usually something like C:\Program Files (x86)\Steam\steamapps\common\assettocorsa\apps\python). You might need to enable this plugin in the Assetto Corsa UI. Once you've done this just select the game from Crew Chief's Game menu and press the Start button.
 
 
 
