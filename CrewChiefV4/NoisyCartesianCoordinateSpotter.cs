@@ -104,6 +104,11 @@ namespace CrewChiefV4
         public NoisyCartesianCoordinateSpotter(AudioPlayer audioPlayer, Boolean initialEnabledState, float carLength, float carWidth)
         {
             this.audioPlayer = audioPlayer;
+            this.setCarDimensions(carLength, carWidth);
+        }
+
+        internal void setCarDimensions(float carLength, float carWidth)
+        {
             this.carLength = carLength;
             this.longCarLength = carLength + gapNeededForClear;
             this.carWidth = carWidth;

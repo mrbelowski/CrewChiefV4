@@ -111,6 +111,11 @@ namespace CrewChiefV4.PCars
                 Tuple<int, pCarsAPIParticipantStruct> playerDataWithIndex = PCarsGameStateMapper.getPlayerDataStruct(currentState.mParticipantData, currentState.mViewedParticipantIndex);
                 int playerIndex = playerDataWithIndex.Item1;
                 pCarsAPIParticipantStruct playerData = playerDataWithIndex.Item2;
+                // Retrieve and use user overridable spotter car length/width.
+                String carClassId = StructHelper.getNameFromBytes(currentState.mCarClassName);
+                CarData.CarClass carClass = CarData.getCarClassForClassName(carClassId);
+                var preferences = carClass.getPreferences();
+                this.internalSpotter.setCarDimensions(preferences.spotterVehicleLength, preferences.spotterVehicleWidth);
                 float[] currentPlayerPosition = new float[] { playerData.mWorldPosition[0], playerData.mWorldPosition[2] };
 
                 if (currentState.mPitMode == (uint)ePitMode.PIT_MODE_NONE)

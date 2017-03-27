@@ -16,12 +16,12 @@ namespace CrewChiefV4.rFactor2
     {
         // how long is a car? we use 3.5 meters by default here. Too long and we'll get 'hold your line' messages
         // when we're clearly directly behind the car
+        // Note: both below variables can be overrided in car class.
         private readonly float carLength = UserSettings.GetUserSettings().getFloat("rf2_spotter_car_length");
+        private readonly float carWidth = 1.8f;
 
         // don't activate the spotter unless this many seconds have elapsed (race starts are messy)
         private readonly int timeAfterRaceStartToActivate = UserSettings.GetUserSettings().getInt("time_after_race_start_for_spotter");
-
-        private readonly float carWidth = 1.8f;
 
         private NoisyCartesianCoordinateSpotter internalSpotter;
 
@@ -111,6 +111,12 @@ namespace CrewChiefV4.rFactor2
             {
                 return;
             }
+
+            // Retrieve and use user overridable spotter car length/width.
+            var carClassId = RF2GameStateMapper.getStringFromBytes(currentPlayerData.mVehicleClass);
+            var carClass = CarData.getCarClassForClassName(carClassId);
+            var preferences = carClass.getPreferences();
+            this.internalSpotter.setCarDimensions(preferences.spotterVehicleLength, preferences.spotterVehicleWidth);
 
             var currentPlayerPosition = new float[] { (float) currentPlayerData.mPos.x, (float) currentPlayerData.mPos.z };
 
