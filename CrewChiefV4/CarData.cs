@@ -28,7 +28,7 @@ namespace CrewChiefV4
         private static float maxColdBiasPlyTyreTempPeak = 70;
         private static float maxWarmBiasPlyTyreTempPeak = 103;
         private static float maxHotBiasPlyTyreTempPeak = 123;
-        
+
         // special case for RaceRoom tyres on the new tire model 
         // - the game sends the core temp, not the surface temp
         private static float maxColdR3ENewTyreTempPeak = 90;
@@ -76,8 +76,14 @@ namespace CrewChiefV4
             CarClassEnum.FF, CarClassEnum.TC1, CarClassEnum.AUDI_TT_CUP, CarClassEnum.DTM_2013, CarClassEnum.DTM_2014, CarClassEnum.DTM_2015, CarClassEnum.DTM_2016, CarClassEnum.NSU_TT,
             CarClassEnum.F3, CarClassEnum.AUDI_TT_VLN, CarClassEnum.KTM_RR, CarClassEnum.FF, CarClassEnum.FF, CarClassEnum.FF};
 
-        public static Dictionary<TyreType, List<CornerData.EnumWithThresholds>> tyreTempThresholds = new Dictionary<TyreType, List<CornerData.EnumWithThresholds>>();
-        public static Dictionary<BrakeType, List<CornerData.EnumWithThresholds>> brakeTempThresholds = new Dictionary<BrakeType, List<CornerData.EnumWithThresholds>>();
+        private static Dictionary<TyreType, List<CornerData.EnumWithThresholds>> tyreTempThresholds = new Dictionary<TyreType, List<CornerData.EnumWithThresholds>>();
+        private static Dictionary<BrakeType, List<CornerData.EnumWithThresholds>> brakeTempThresholds = new Dictionary<BrakeType, List<CornerData.EnumWithThresholds>>();
+
+        public class Preferences
+        {
+            public float spotterVehicleLength = -1;
+            public float spotterVehicleWidth = -1;
+        }
 
         static CarData()
         {
@@ -151,8 +157,9 @@ namespace CrewChiefV4
             carbonBrakeTempsThresholds.Add(new CornerData.EnumWithThresholds(BrakeTemp.COOKING, maxHotCarbonBrakeTemp, 10000));
             brakeTempThresholds.Add(BrakeType.Carbon, carbonBrakeTempsThresholds);
 
-            var overridablePrefsValues = getOverridablePreferencesValues();
-            defaultSpotterVehicleLength = overridablePrefsValues.spotterVehicleLength;
+            var overridablePrefsDefaults = getOverridablePreferencesDefaults();
+            defaultSpotterVehicleLength = overridablePrefsDefaults.spotterVehicleLength;
+            defaultSpotterVehicleWidth = overridablePrefsDefaults.spotterVehicleWidth;
         }
 
         public class CarClassEnumConverter : Newtonsoft.Json.Converters.StringEnumConverter
@@ -198,15 +205,15 @@ namespace CrewChiefV4
 
             [JsonConverter(typeof(StringEnumConverter))]
             public BrakeType brakeType { get; set; }
-            public float overrideMaxColdBrakeTemp { get; set; }
-            public float overrideMaxWarmBrakeTemp { get; set; }
-            public float overrideMaxHotBrakeTemp { get; set; }
+            public float maxColdBrakeTemp { get; set; }
+            public float maxWarmBrakeTemp { get; set; }
+            public float maxHotBrakeTemp { get; set; }
 
             [JsonConverter(typeof(StringEnumConverter))]
             public TyreType defaultTyreType { get; set; }
-            public float overrideMaxColdTyreTemp { get; set; }
-            public float overrideMaxWarmTyreTemp { get; set; }
-            public float overrideMaxHotTyreTemp { get; set; }
+            public float maxColdTyreTemp { get; set; }
+            public float maxWarmTyreTemp { get; set; }
+            public float maxHotTyreTemp { get; set; }
 
             public float maxSafeWaterTemp { get; set; }
             public float maxSafeOilTemp { get; set; }
@@ -232,13 +239,13 @@ namespace CrewChiefV4
                 this.rf2ClassNames = new List<string>();
                 this.acClassNames = new List<string>();
                 this.brakeType = BrakeType.Iron_Race;
-                this.overrideMaxColdBrakeTemp = -1;
-                this.overrideMaxWarmBrakeTemp = -1;
-                this.overrideMaxHotBrakeTemp = -1;
+                this.maxColdBrakeTemp = -1;
+                this.maxWarmBrakeTemp = -1;
+                this.maxHotBrakeTemp = -1;
                 this.defaultTyreType = TyreType.Unknown_Race;
-                this.overrideMaxColdTyreTemp = -1;
-                this.overrideMaxWarmTyreTemp = -1;
-                this.overrideMaxHotTyreTemp = -1;
+                this.maxColdTyreTemp = -1;
+                this.maxWarmTyreTemp = -1;
+                this.maxHotTyreTemp = -1;
                 this.maxSafeWaterTemp = 105;
                 this.maxSafeOilTemp = 125;
                 this.minTyreCircumference = 0.5f * (float)Math.PI;
@@ -281,7 +288,7 @@ namespace CrewChiefV4
                         if (className.Contains("*") || className.Contains("?"))
                         {
                             String regexStr = wildcardToRegex(className);
-                            regexs.Add(new Regex(regexStr, RegexOptions.IgnoreCase));                            
+                            regexs.Add(new Regex(regexStr, RegexOptions.IgnoreCase));
                         }
                     }
                 }
@@ -324,6 +331,11 @@ namespace CrewChiefV4
             {
                 return "^" + Regex.Escape(pattern).Replace("\\*", ".*").Replace("\\?", ".") + "$";
             }
+
+            public Preferences getPreferences()
+            {
+                return new Preferences() { spotterVehicleLength = this.spotterVehicleLength, spotterVehicleWidth = this.spotterVehicleWidth };
+            }
         }
 
         public class CarClasses
@@ -340,7 +352,7 @@ namespace CrewChiefV4
             userCarClassIds = new List<string>();
             CarClasses defaultCarClassData = getCarClassDataFromFile(getDefaultCarClassFileLocation());
             CarClasses userCarClassData = getCarClassDataFromFile(getUserCarClassFileLocation());
-            mergeCarClassData(defaultCarClassData, userCarClassData);            
+            mergeCarClassData(defaultCarClassData, userCarClassData);
             foreach (CarClass carClass in userCarClassData.carClasses)
             {
                 carClass.setupRegexs();
@@ -368,7 +380,7 @@ namespace CrewChiefV4
                         userCarClassesCount++;
                         break;
                     }
-                    else if (userCarClass.carClassEnum == CarClassEnum.USER_CREATED && userCarClass.placeholderClassId.Length == 0 && 
+                    else if (userCarClass.carClassEnum == CarClassEnum.USER_CREATED && userCarClass.placeholderClassId.Length == 0 &&
                         userCarClassIds.Count > userCarClassIndex)
                     {
                         userCarClass.placeholderClassId = userCarClassIds[userCarClassIndex];
@@ -461,14 +473,9 @@ namespace CrewChiefV4
             }
         }
 
-        class OverridablePreferences
+        private static Preferences getOverridablePreferencesDefaults()
         {
-            internal float spotterVehicleLength = -1;
-        }
-
-        private static OverridablePreferences getOverridablePreferencesValues()
-        {
-            var overridableOptions = new OverridablePreferences() { spotterVehicleLength = 4.5f };
+            var overridableOptions = new Preferences() { spotterVehicleLength = 4.5f, spotterVehicleWidth = 1.8f };
             var settings = UserSettings.GetUserSettings();
             switch (CrewChief.gameDefinition.gameEnum)
             {
@@ -579,7 +586,7 @@ namespace CrewChiefV4
                     }
                     foreach (CarClass carClass in CAR_CLASSES.carClasses)
                     {
-                        List<String> classNames = (List<String>) carClass.GetType().GetProperty(classNamesPropName).GetValue(carClass, null);
+                        List<String> classNames = (List<String>)carClass.GetType().GetProperty(classNamesPropName).GetValue(carClass, null);
                         foreach (String thisClassName in classNames)
                         {
                             if (thisClassName == className)
@@ -591,7 +598,7 @@ namespace CrewChiefV4
                     }
                     foreach (CarClass carClass in CAR_CLASSES.carClasses)
                     {
-                        List<Regex> regexs = (List<Regex>) carClass.GetType().GetField(regexsPropName).GetValue(carClass);
+                        List<Regex> regexs = (List<Regex>)carClass.GetType().GetField(regexsPropName).GetValue(carClass);
                         foreach (Regex regex in regexs)
                         {
                             if (regex.IsMatch(className))
@@ -623,15 +630,83 @@ namespace CrewChiefV4
 
         public static List<CornerData.EnumWithThresholds> getBrakeTempThresholds(CarClass carClass)
         {
-            // TODO: override here. Clone the list, and set it of override max vars are set.
-            return brakeTempThresholds[carClass.brakeType];
+            var predefinedBrakeThresholds = brakeTempThresholds[carClass.brakeType];
+            // Copy predefined thresholds to avoid overriding defaults.
+            var btt = new List<CornerData.EnumWithThresholds>();
+            foreach (var threshold in predefinedBrakeThresholds)
+            {
+                btt.Add(new CornerData.EnumWithThresholds(threshold.e, threshold.lowerThreshold, threshold.upperThreshold));
+            }
+            // Apply overrides from .json, if user provided them.
+            if (btt.Count == 4) // COLD, WARM, HOT, COOKING thresholds
+            {
+                // Should we validate thresholds to see if they make any sense?
+                if (carClass.maxColdBrakeTemp > 0)
+                {
+                    Debug.Assert((BrakeTemp)btt[0].e == BrakeTemp.COLD);
+                    btt[0].upperThreshold = carClass.maxColdBrakeTemp;
+                    Debug.Assert((BrakeTemp)btt[1].e == BrakeTemp.WARM);
+                    btt[1].lowerThreshold = carClass.maxColdBrakeTemp;
+                }
+                if (carClass.maxWarmBrakeTemp > 0)
+                {
+                    Debug.Assert((BrakeTemp)btt[1].e == BrakeTemp.WARM);
+                    btt[1].upperThreshold = carClass.maxWarmBrakeTemp;
+                    Debug.Assert((BrakeTemp)btt[2].e == BrakeTemp.HOT);
+                    btt[2].lowerThreshold = carClass.maxWarmBrakeTemp;
+                }
+                if (carClass.maxHotBrakeTemp > 0)
+                {
+                    Debug.Assert((BrakeTemp)btt[2].e == BrakeTemp.HOT);
+                    btt[2].upperThreshold = carClass.maxHotBrakeTemp;
+                    Debug.Assert((BrakeTemp)btt[3].e == BrakeTemp.COOKING);
+                    btt[3].lowerThreshold = carClass.maxHotBrakeTemp;
+                }
+            }
+            return btt;
         }
 
         public static TyreType getDefaultTyreType(CarClass carClass)
         {
-            // TODO: apply override here.
-            // RF1/RF2 needs fixing to use this helper
             return carClass.defaultTyreType;
+        }
+
+        public static List<CornerData.EnumWithThresholds> getTyreTempThresholds(CarClass carClass)
+        {
+            var predefinedTyreThresholds = tyreTempThresholds[carClass.defaultTyreType];
+            // Copy predefined thresholds to avoid overriding defaults.
+            var ttt = new List<CornerData.EnumWithThresholds>();
+            foreach (var threshold in predefinedTyreThresholds)
+            {
+                ttt.Add(new CornerData.EnumWithThresholds(threshold.e, threshold.lowerThreshold, threshold.upperThreshold));
+            }
+            // Apply overrides from .json, if user provided them.
+            if (ttt.Count == 4) // COLD, WARM, HOT, COOKING thresholds
+            {
+                // Should we validate thresholds to see if they make any sense?
+                if (carClass.maxColdTyreTemp > 0)
+                {
+                    Debug.Assert((TyreTemp)ttt[0].e == TyreTemp.COLD);
+                    ttt[0].upperThreshold = carClass.maxColdTyreTemp;
+                    Debug.Assert((TyreTemp)ttt[1].e == TyreTemp.WARM);
+                    ttt[1].lowerThreshold = carClass.maxColdTyreTemp;
+                }
+                if (carClass.maxWarmTyreTemp > 0)
+                {
+                    Debug.Assert((TyreTemp)ttt[1].e == TyreTemp.WARM);
+                    ttt[1].upperThreshold = carClass.maxWarmTyreTemp;
+                    Debug.Assert((TyreTemp)ttt[2].e == TyreTemp.HOT);
+                    ttt[2].lowerThreshold = carClass.maxWarmTyreTemp;
+                }
+                if (carClass.maxHotTyreTemp > 0)
+                {
+                    Debug.Assert((TyreTemp)ttt[2].e == TyreTemp.HOT);
+                    ttt[2].upperThreshold = carClass.maxHotTyreTemp;
+                    Debug.Assert((TyreTemp)ttt[3].e == TyreTemp.COOKING);
+                    ttt[3].lowerThreshold = carClass.maxHotTyreTemp;
+                }
+            }
+            return ttt;
         }
     }
 }

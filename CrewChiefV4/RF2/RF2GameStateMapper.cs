@@ -555,7 +555,8 @@ namespace CrewChiefV4.rFactor2
             cgs.TyreData.TyreConditionStatus = CornerData.getCornerData(this.tyreWearThresholds, cgs.TyreData.FrontLeftPercentWear,
                 cgs.TyreData.FrontRightPercentWear, cgs.TyreData.RearLeftPercentWear, cgs.TyreData.RearRightPercentWear);
 
-            cgs.TyreData.TyreTempStatus = CornerData.getCornerData(CarData.tyreTempThresholds[cgs.carClass.defaultTyreType],
+            var tyreTempThresholds = CarData.getTyreTempThresholds(cgs.carClass);
+            cgs.TyreData.TyreTempStatus = CornerData.getCornerData(tyreTempThresholds,
                 cgs.TyreData.PeakFrontLeftTemperatureForLap, cgs.TyreData.PeakFrontRightTemperatureForLap,
                 cgs.TyreData.PeakRearLeftTemperatureForLap, cgs.TyreData.PeakRearRightTemperatureForLap);
 
