@@ -251,12 +251,15 @@ namespace CrewChiefV4
                             {
                                 if (lines[i].Equals("[CREWCHIEFEX]"))
                                 {
-                                    if(lines[i + 1].Equals("ACTIVE=0"))
+                                    if (lines.Length >= i + 1)
                                     {
-                                        lines[i + 1] = "ACTIVE=1";
+                                        if (lines[i + 1].Equals("ACTIVE=0"))
+                                        {
+                                            lines[i + 1] = "ACTIVE=1";
+                                        }
+                                        found = true;
+                                        break;
                                     }
-                                    found = true;
-                                    break;
                                 }    
                             }
                             if (!found)
