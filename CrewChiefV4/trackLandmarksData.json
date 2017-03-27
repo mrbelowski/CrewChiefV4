@@ -285,6 +285,60 @@
             ]
         },
         {
+            "acTrackNames": [ "ks_silverstone:stowe_long" ],
+            "raceroomLayoutId": 6055,
+            "trackLandmarks": [
+                {
+                    "landmarkName": "the_first_chicane",
+                    "distanceRoundLapStart": 100,
+                    "distanceRoundLapEnd": 220,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "turn3",
+                    "distanceRoundLapStart": 260,
+                    "distanceRoundLapEnd": 340,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "the_hairpin",
+                    "distanceRoundLapStart": 360,
+                    "distanceRoundLapEnd": 460,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "turn4",
+                    "distanceRoundLapStart": 950,
+                    "distanceRoundLapEnd": 1070,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "turn5",
+                    "distanceRoundLapStart": 1130,
+                    "distanceRoundLapEnd": 1180,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "turn6",
+                    "distanceRoundLapStart": 1200,
+                    "distanceRoundLapEnd": 1260,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "turn7",
+                    "distanceRoundLapStart": 1310,
+                    "distanceRoundLapEnd": 1350,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "turn8",
+                    "distanceRoundLapStart": 1390,
+                    "distanceRoundLapEnd": 1560,
+                    "isCommonOvertakingSpot": true
+                }
+            ]
+        },
+        {
             "rf1TrackNames": [ "Spielberg Grand Prix Circuit" ],
             "rf2TrackNames": [ "RaceRfactor Austria 2014", "Red Bull Ring GP" ],
             "acTrackNames": [ "ks_red_bull_ring:layout_gp", "spielberg:circuit_full" ],
