@@ -1096,7 +1096,7 @@ namespace CrewChiefV4.GameState
         // games so this might cause more problems than it solves.
         //
         // returns null or a landmark name this car is stopped in
-	// TODO: Reformat me    
+        // TODO: Reformat me    
         public String updateLandmarkTiming(TrackDefinition trackDefinition, float gameTime, float previousDistanceRoundTrack, float currentDistanceRoundTrack, float speed) 
         {
             if (trackDefinition == null || trackDefinition.trackLandmarks == null || trackDefinition.trackLandmarks.Count == 0)
@@ -1106,7 +1106,7 @@ namespace CrewChiefV4.GameState
             // yuk...
             atMidPointOfLandmark = null;
             if (landmarkNameStart == null) 
-	    {
+            {
                 // looking for landmark start only
                 foreach (TrackLandmark trackLandmark in trackDefinition.trackLandmarks)
                 {
@@ -1120,8 +1120,8 @@ namespace CrewChiefV4.GameState
                             landmarkStartTime = gameTime - error;
                             landmarkStartSpeed = speed;                            
                         }
-			landmarkNameStart = trackLandmark.landmarkName;
-			inLandmark = true;
+                        landmarkNameStart = trackLandmark.landmarkName;
+                        inLandmark = true;
                         // don't reset the landmarkStoppedCount when we enter the landmark - do this in the proximity check below
                         break;
                     }		
@@ -1172,6 +1172,10 @@ namespace CrewChiefV4.GameState
                             landmarkStartTime = -1;
                             landmarkStartSpeed = -1;
                             inLandmark = false;
+                            // we've left the landmark but haven't crossed the end trigger. We could be anywhere - even in the pit (for PCars). We
+                            // don't want the stopped count for this section to carry over as we might reappear in the middle of a different
+                            // section, so zero the counter
+                            landmarkStoppedCount = 0;
                         }
                         break;
                     }
