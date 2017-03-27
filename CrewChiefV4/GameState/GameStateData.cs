@@ -1096,17 +1096,18 @@ namespace CrewChiefV4.GameState
         // games so this might cause more problems than it solves.
         //
         // returns null or a landmark name this car is stopped in
-        public String updateLandmarkTiming(List<TrackLandmark> trackLandmarks, float gameTime, float previousDistanceRoundTrack, float currentDistanceRoundTrack, 
-            float speed, float trackLength) 
+        public String updateLandmarkTiming(TrackDefinition trackDefinition, float gameTime, float previousDistanceRoundTrack, float currentDistanceRoundTrack, float speed) 
         {
-		    if (trackLandmarks == null || trackLandmarks.Count == 0) {
+            if (trackDefinition == null || trackDefinition.trackLandmarks == null || trackDefinition.trackLandmarks.Count == 0)
+            {
 			    return null;
 		    }
             // yuk...
             atMidPointOfLandmark = null;
 		    if (landmarkNameStart == null) {
 			    // looking for landmark start only
-			    foreach (TrackLandmark trackLandmark in trackLandmarks) {
+                foreach (TrackLandmark trackLandmark in trackDefinition.trackLandmarks)
+                {
 				    if (previousDistanceRoundTrack < trackLandmark.distanceRoundLapStart && currentDistanceRoundTrack >= trackLandmark.distanceRoundLapStart) 
 				    {
                         if (currentDistanceRoundTrack - 20 < trackLandmark.distanceRoundLapStart && currentDistanceRoundTrack + 20 > trackLandmark.distanceRoundLapStart)
@@ -1126,34 +1127,50 @@ namespace CrewChiefV4.GameState
 			    }
 		    } else {
 			    // looking for landmark end only
-			    foreach (TrackLandmark trackLandmark in trackLandmarks) 
+                foreach (TrackLandmark trackLandmark in trackDefinition.trackLandmarks) 
                 {
-                    // if this car is very slow, increment the stopped counter
-                    if (currentDistanceRoundTrack > trackLandmark.distanceRoundLapStart && currentDistanceRoundTrack < trackLandmark.distanceRoundLapEnd &&
-                        speed < 5)
+                    if (trackLandmark.landmarkName == landmarkNameStart) 
                     {
-                        landmarkStoppedCount++;                        
-                    }
-                    if (previousDistanceRoundTrack < trackLandmark.getMidPoint() && currentDistanceRoundTrack >= trackLandmark.getMidPoint())
-                    {
-                        atMidPointOfLandmark = trackLandmark.landmarkName;
-                    }
-                    if (previousDistanceRoundTrack < trackLandmark.distanceRoundLapEnd && currentDistanceRoundTrack >= trackLandmark.distanceRoundLapEnd)
-                    {
-                        // reached the end of a landmark section, update the timing if it's the landmark we're expecting and we're actually close to the endpoint
-                        if (trackLandmark.landmarkName.Equals(landmarkNameStart) &&
-                            currentDistanceRoundTrack - 20 < trackLandmark.distanceRoundLapEnd && currentDistanceRoundTrack + 20 > trackLandmark.distanceRoundLapEnd)
+                        if (currentDistanceRoundTrack >= trackLandmark.distanceRoundLapStart && currentDistanceRoundTrack < trackLandmark.distanceRoundLapEnd)
                         {
-                            // only save the timing if we're near the landmark end point
-                            // adjust the landmarkEndTime a bit to accommodate position errors
-                            float error = speed > 0 && speed < 120 ? (currentDistanceRoundTrack - trackLandmark.distanceRoundLapEnd) / speed : 0;
-                            addTimeAndSpeeds(landmarkNameStart, (gameTime - error) - landmarkStartTime, landmarkStartSpeed, speed, trackLandmark.isCommonOvertakingSpot);
+                            // we're in the landmark zone somewhere
+                            // if this car is very slow, increment the stopped counter
+                            if (speed < 5)
+                            {
+                                landmarkStoppedCount++;
+                            }
+                            if (previousDistanceRoundTrack < trackLandmark.getMidPoint() && currentDistanceRoundTrack >= trackLandmark.getMidPoint())
+                            {
+                                atMidPointOfLandmark = trackLandmark.landmarkName;
+                            }
                         }
-                        landmarkNameStart = null;
-                        landmarkStartTime = -1;
-                        inLandmark = false;
+                        else if (previousDistanceRoundTrack < trackLandmark.distanceRoundLapEnd && currentDistanceRoundTrack >= trackLandmark.distanceRoundLapEnd)
+                        {
+                            // we've reached the end of a landmark section
+                            // update the timing if it's the landmark we're expecting and we're actually close to the endpoint
+                            if (trackLandmark.landmarkName.Equals(landmarkNameStart) &&
+                                currentDistanceRoundTrack - 20 < trackLandmark.distanceRoundLapEnd && currentDistanceRoundTrack + 20 > trackLandmark.distanceRoundLapEnd)
+                            {
+                                // only save the timing if we're near the landmark end point
+                                // adjust the landmarkEndTime a bit to accommodate position errors
+                                float error = speed > 0 && speed < 120 ? (currentDistanceRoundTrack - trackLandmark.distanceRoundLapEnd) / speed : 0;
+                                addTimeAndSpeeds(landmarkNameStart, (gameTime - error) - landmarkStartTime, landmarkStartSpeed, speed, trackLandmark.isCommonOvertakingSpot);
+                            }
+                            landmarkNameStart = null;
+                            landmarkStartTime = -1;
+                            inLandmark = false;
+                        }
+                        else
+                        {
+                            // er... we're not in the landmark at all but we never reached the end, so stop looking for the end
+                            // This should only happen when we quit to the pits but some games send some seriously weird data from time to time
+                            landmarkNameStart = null;
+                            landmarkStartTime = -1;
+                            landmarkStoppedCount = 0;
+                            inLandmark = false;
+                        }
                         break;
-                    }	
+                    }
 			    }
 		    }
             Boolean nearLandmark = false;
@@ -1161,10 +1178,10 @@ namespace CrewChiefV4.GameState
             if (landmarkNameStart == null)
             {
                 // again, we're waiting to enter a landmark zone - perhaps we've just left a zone so still check for stopped cars         
-                foreach (TrackLandmark trackLandmark in trackLandmarks) 
+                foreach (TrackLandmark trackLandmark in trackDefinition.trackLandmarks) 
                 {
-				    if (currentDistanceRoundTrack > Math.Max(0, trackLandmark.distanceRoundLapStart - 100) && 
-                        currentDistanceRoundTrack < Math.Min(trackLength, trackLandmark.distanceRoundLapEnd))
+				    if (currentDistanceRoundTrack > Math.Max(0, trackLandmark.distanceRoundLapStart - 100) &&
+                        currentDistanceRoundTrack < Math.Min(trackDefinition.trackLength, trackLandmark.distanceRoundLapEnd))
 				    {
                         if (nearLandmarkName != trackLandmark.landmarkName)
                         {

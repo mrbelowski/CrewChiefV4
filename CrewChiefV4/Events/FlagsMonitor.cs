@@ -54,20 +54,11 @@ namespace CrewChiefV4.Events
         //  used when we know the corner name:
         private String folderNameHasGoneOffInOutro = "flags/name_has_gone_off_in_outro";
 
-
-
-
-        // TODO: Record me:
         private String folderNamesHaveGoneOffOutro = "flags/names_have_gone_off_outro";
-        // TODO: Record me:
         private String folderNamesHaveGoneOffInOutro = "flags/names_have_gone_off_in_outro";
-        // TODO: Record me:
         private String folderAnd = "flags/and";
-        // TODO: Record me (with plenty of sweary versions):
+        // TODO: Record sweary versions of this when the kids are out
         private String folderPileupInCornerIntro = "flags/pileup_in_corner_intro";
-
-
-
 
         private String folderIncidentInCornerIntro = "flags/incident_in_corner_intro";
         private String folderIncidentInCornerDriverIntro = "flags/incident_in_corner_with_driver_intro";

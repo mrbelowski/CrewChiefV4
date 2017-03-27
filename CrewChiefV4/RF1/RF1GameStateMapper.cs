@@ -771,8 +771,8 @@ namespace CrewChiefV4.rFactor1
                 if (opponentPrevious != null)
                 {
                     opponent.trackLandmarksTiming = opponentPrevious.trackLandmarksTiming;
-                    String stoppedInLandmark = opponent.trackLandmarksTiming.updateLandmarkTiming(currentGameState.SessionData.TrackDefinition.trackLandmarks,
-                        currentGameState.SessionData.SessionRunningTime, previousDistanceRoundTrack, opponent.DistanceRoundTrack, opponent.Speed, currentGameState.SessionData.TrackDefinition.trackLength);
+                    String stoppedInLandmark = opponent.trackLandmarksTiming.updateLandmarkTiming(currentGameState.SessionData.TrackDefinition,
+                        currentGameState.SessionData.SessionRunningTime, previousDistanceRoundTrack, opponent.DistanceRoundTrack, opponent.Speed);
                     opponent.stoppedInLandmark = opponent.InPits ? null : stoppedInLandmark;
                 }
                 if (opponent.IsNewLap)
@@ -798,9 +798,9 @@ namespace CrewChiefV4.rFactor1
                 currentGameState.SessionData.GameTimeAtLastPositionBehindChange = !currentGameState.SessionData.IsRacingSameCarBehind ? 
                     currentGameState.SessionData.SessionRunningTime : previousGameState.SessionData.GameTimeAtLastPositionBehindChange;
                 currentGameState.SessionData.trackLandmarksTiming = previousGameState.SessionData.trackLandmarksTiming;
-                String stoppedInLandmark = currentGameState.SessionData.trackLandmarksTiming.updateLandmarkTiming(currentGameState.SessionData.TrackDefinition.trackLandmarks,
+                String stoppedInLandmark = currentGameState.SessionData.trackLandmarksTiming.updateLandmarkTiming(currentGameState.SessionData.TrackDefinition,
                                     currentGameState.SessionData.SessionRunningTime, previousGameState.PositionAndMotionData.DistanceRoundTrack,
-                                    currentGameState.PositionAndMotionData.DistanceRoundTrack, shared.speed, currentGameState.SessionData.TrackDefinition.trackLength);
+                                    currentGameState.PositionAndMotionData.DistanceRoundTrack, shared.speed);
                 currentGameState.SessionData.stoppedInLandmark = currentGameState.PitData.InPitlane ? null : stoppedInLandmark;
                 if (currentGameState.SessionData.IsNewLap)
                 {

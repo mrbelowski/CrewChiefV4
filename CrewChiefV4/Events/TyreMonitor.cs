@@ -128,9 +128,6 @@ namespace CrewChiefV4.Events
         private static String folderLockingFrontsForCornerWarning = "tyre_monitor/locking_fronts_corner_warning";
         private static String folderLockingRearsForCornerWarning = "tyre_monitor/locking_rears_corner_warning";
 
-
-        // todo: warn on single lockups
-
         private int lapsIntoSessionBeforeTempMessage = 2;        
 
         // check at start of which sector (1=s/f line)
