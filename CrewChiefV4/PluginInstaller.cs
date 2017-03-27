@@ -168,6 +168,18 @@ namespace CrewChiefV4
             {
                 gameInstallPath = UserSettings.GetUserSettings().getString("acs_install_path");
             }
+            else if (gameDefinition.gameEnum == GameEnum.RF1) 
+            {
+                //special case here, will figure something clever out so we dont need to have Dan's dll included in every plugin folder.
+                if (gameDefinition.gameInstallDirectory.Equals("Automobilista"))
+                {
+                    gameInstallPath = UserSettings.GetUserSettings().getString("ams_install_path");
+                }
+                if (gameDefinition.gameInstallDirectory.Equals("rFactor"))
+                {
+                    gameInstallPath = UserSettings.GetUserSettings().getString("rf1_install_path");
+                }
+            }
             //try to get the install folder from steam common install folders.
             if (!Directory.Exists(gameInstallPath))
             {
@@ -228,6 +240,53 @@ namespace CrewChiefV4
                 else if (gameDefinition.gameEnum == GameEnum.ASSETTO_32BIT || gameDefinition.gameEnum == GameEnum.ASSETTO_64BIT)
                 {
                     UserSettings.GetUserSettings().setProperty("acs_install_path", gameInstallPath);
+                    string pythonConfigPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), @"Assetto Corsa\cfg", @"python.ini");
+                    try
+                    {
+                        if (File.Exists(pythonConfigPath))
+                        {
+                            bool found = false;
+                            string []lines = File.ReadAllLines(pythonConfigPath);
+                            for (int i = 0; i < lines.Length; i++ )
+                            {
+                                if (lines[i].Equals("[CREWCHIEFEX]"))
+                                {
+                                    if (lines.Length >= i + 1)
+                                    {
+                                        if (lines[i + 1].Equals("ACTIVE=0"))
+                                        {
+                                            lines[i + 1] = "ACTIVE=1";
+                                        }
+                                        found = true;
+                                        break;
+                                    }
+                                }    
+                            }
+                            if (!found)
+                            {
+                                List<string> lineList = new List<string>(lines);
+                                lineList.Add("[CREWCHIEFEX]");
+                                lineList.Add("ACTIVE=1");
+                                lines = lineList.ToArray();
+                            } 
+                            File.WriteAllLines(pythonConfigPath, lines);
+                        }
+                    }
+                    catch
+                    {
+                        //ignore or messagebox telleing the user to manualy enable?
+                    }     
+                }
+                else if (gameDefinition.gameEnum == GameEnum.RF1)
+                {
+                    if (gameDefinition.gameInstallDirectory.Equals("Automobilista"))
+                    {
+                        UserSettings.GetUserSettings().setProperty("ams_install_path", gameInstallPath);
+                    }
+                    if (gameDefinition.gameInstallDirectory.Equals("rFactor"))
+                    {
+                        UserSettings.GetUserSettings().setProperty("rf1_install_path", gameInstallPath);
+                    }
                 }
                 UserSettings.GetUserSettings().saveUserSettings();
                 installOrUpdatePlugin(Path.Combine(Configuration.getDefaultFileLocation("plugins"), gameDefinition.gameInstallDirectory), gameInstallPath);
