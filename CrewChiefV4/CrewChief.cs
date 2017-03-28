@@ -304,7 +304,7 @@ namespace CrewChiefV4
                     {
                         try
                         {
-                            spotter.trigger(lastSpotterState, currentSpotterState);
+                            spotter.trigger(lastSpotterState, currentSpotterState, currentGameState);
                         }
                         catch (Exception e)
                         {
