@@ -74,6 +74,7 @@ namespace CrewChiefV4.GameState
         // note that for RaceRoom we might have to calculate this. < 0 means we've passed the incident.
         public float distanceToNearestIncident = -1;
         public FullCourseYellowPhase fcyPhase = FullCourseYellowPhase.RACING;
+        public int lapCountWhenLastWentGreen = -1;
     }
 
     public class TransmissionData
@@ -1150,8 +1151,7 @@ namespace CrewChiefV4.GameState
                             // we've reached the end of a landmark section
                             // update the timing if it's the landmark we're expecting, we're actually close to the endpoint and
                             // we collected some proper data when we entered the landmark
-                            if (trackLandmark.landmarkName.Equals(landmarkNameStart) &&
-                                currentDistanceRoundTrack - 20 < trackLandmark.distanceRoundLapEnd && currentDistanceRoundTrack + 20 > trackLandmark.distanceRoundLapEnd && 
+                            if (currentDistanceRoundTrack - 20 < trackLandmark.distanceRoundLapEnd && currentDistanceRoundTrack + 20 > trackLandmark.distanceRoundLapEnd && 
                                 landmarkStartTime != -1)
                             {
                                 // only save the timing if we're near the landmark end point
