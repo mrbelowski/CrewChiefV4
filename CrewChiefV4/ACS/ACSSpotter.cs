@@ -6,8 +6,7 @@ using CrewChiefV4.assetto.assettoData;
 using System.Threading;
 using CrewChiefV4.Events;
 using CrewChiefV4.Audio;
-
-
+using CrewChiefV4.GameState;
 
 namespace CrewChiefV4.assetto
 {
@@ -33,6 +32,8 @@ namespace CrewChiefV4.assetto
         private AudioPlayer audioPlayer;
 
         private DateTime previousTime = DateTime.Now;
+
+        private string currentPlayerCarClassID = "#not_set#";
 
         public ACSSpotter(AudioPlayer audioPlayer, Boolean initialEnabledState)
         {
@@ -63,7 +64,7 @@ namespace CrewChiefV4.assetto
             TimeSpan ts = TimeSpan.FromTicks(time);
             return (float)ts.TotalMilliseconds * 10;
         }
-        public void trigger(Object lastStateObj, Object currentStateObj)
+        public void trigger(Object lastStateObj, Object currentStateObj, GameStateData currentGameState)
         {
 
             if (paused)
@@ -98,10 +99,17 @@ namespace CrewChiefV4.assetto
             {
                 return;
             }
-            // Retrieve and use user overridable spotter car length/width.
-            CarData.CarClass carClass = CarData.getCarClassForClassName(currentState.acsStatic.carModel);
-            var preferences = carClass.getPreferences();
-            this.internalSpotter.setCarDimensions(preferences.spotterVehicleLength, preferences.spotterVehicleWidth);
+            if (currentGameState != null)
+            {
+                var carClass = currentGameState.carClass;
+                if (carClass != null && currentPlayerCarClassID != carClass.getClassIdentifier())
+                {
+                    // Retrieve and use user overridable spotter car length/width.
+                    currentPlayerCarClassID = carClass.getClassIdentifier();
+                    var preferences = carClass.getPreferences();
+                    this.internalSpotter.setCarDimensions(preferences.spotterVehicleLength, preferences.spotterVehicleWidth);
+                }
+            }
             float[] currentPlayerPosition = new float[] { currentPlayerData.worldPosition.x, currentPlayerData.worldPosition.z };
 
             if (currentPlayerData.isCarInPitline == 0 || currentPlayerData.isCarInPit == 0)

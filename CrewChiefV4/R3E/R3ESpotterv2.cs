@@ -6,6 +6,7 @@ using CrewChiefV4.RaceRoom.RaceRoomData;
 using System.Threading;
 using CrewChiefV4.Events;
 using CrewChiefV4.Audio;
+using CrewChiefV4.GameState;
 
 namespace CrewChiefV4.RaceRoom
 {
@@ -31,6 +32,8 @@ namespace CrewChiefV4.RaceRoom
         private float carWidth = 1.8f;
 
         private DateTime previousTime = DateTime.Now;
+
+        private string currentPlayerCarClassID = "#not_set#";
 
         public R3ESpotterv2(AudioPlayer audioPlayer, Boolean initialEnabledState)
         {
@@ -68,7 +71,7 @@ namespace CrewChiefV4.RaceRoom
             throw new Exception("no driver data for slotID " + slot_id);
         }
 
-        public void trigger(Object lastStateObj, Object currentStateObj)
+        public void trigger(Object lastStateObj, Object currentStateObj, GameStateData currentGameState)
         {
             if (paused)
             {
@@ -105,10 +108,17 @@ namespace CrewChiefV4.RaceRoom
             {
                 return;
             }
-            // Retrieve and use user overridable spotter car length/width.
-            CarData.CarClass carClass = CarData.getCarClassForRaceRoomId(currentPlayerData.DriverInfo.ClassId);
-            var preferences = carClass.getPreferences();
-            this.internalSpotter.setCarDimensions(preferences.spotterVehicleLength, preferences.spotterVehicleWidth);
+            if (currentGameState != null)
+            {
+                var carClass = currentGameState.carClass;
+                if (carClass != null && currentPlayerCarClassID != carClass.getClassIdentifier())
+                {
+                    // Retrieve and use user overridable spotter car length/width.
+                    currentPlayerCarClassID = carClass.getClassIdentifier();
+                    var preferences = carClass.getPreferences();
+                    this.internalSpotter.setCarDimensions(preferences.spotterVehicleLength, preferences.spotterVehicleWidth);
+                }
+            }
             float[] currentPlayerPosition = new float[] { currentPlayerData.Position.X, currentPlayerData.Position.Z };
 
             if (currentPlayerData.InPitlane == 0)
