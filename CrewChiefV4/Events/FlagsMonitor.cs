@@ -201,8 +201,9 @@ namespace CrewChiefV4.Events
         {
             if (previousGameState != null)
             {
-                Boolean startedSector3 = previousGameState.SessionData.SectorNumber == 2 && currentGameState.SessionData.SectorNumber == 3;
-                if (announceFCYPhase(previousGameState.FlagData.fcyPhase, currentGameState.FlagData.fcyPhase, currentGameState.Now, startedSector3))
+                Boolean playerStartedSector3 = previousGameState.SessionData.SectorNumber == 2 && currentGameState.SessionData.SectorNumber == 3;
+                Boolean leaderStartedSector3 = previousGameState.SessionData.LeaderSectorNumber == 2 && currentGameState.SessionData.LeaderSectorNumber == 3;
+                if (announceFCYPhase(previousGameState.FlagData.fcyPhase, currentGameState.FlagData.fcyPhase, currentGameState.Now, playerStartedSector3))
                 {
                     lastFCYAnnounced = currentGameState.FlagData.fcyPhase;
                     lastFCYAccounedTime = currentGameState.Now;
@@ -241,7 +242,7 @@ namespace CrewChiefV4.Events
                             break;
                     }
                 }
-                else if (currentGameState.FlagData.fcyPhase == FullCourseYellowPhase.LAST_LAP_CURRENT && startedSector3)
+                else if (currentGameState.FlagData.fcyPhase == FullCourseYellowPhase.LAST_LAP_CURRENT && leaderStartedSector3)
                 {
                     // last sector, safety car coming in
                     // don't allow any other message to override this one:

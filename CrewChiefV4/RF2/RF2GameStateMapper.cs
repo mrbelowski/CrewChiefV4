@@ -408,6 +408,7 @@ namespace CrewChiefV4.rFactor2
                 csd.formattedPlayerLapTimes.Add(TimeSpan.FromSeconds(csd.LapTimePrevious).ToString(@"mm\:ss\.fff"));
 
             csd.LeaderHasFinishedRace = leader.mFinishStatus == (int)rFactor2Constants.rF2FinishStatus.Finished;
+            csd.LeaderSectorNumber = leader.mSector == 0 ? 3 : leader.mSector;
             csd.TimeDeltaFront = (float)Math.Abs(player.mTimeBehindNext);
 
             // --------------------------------
