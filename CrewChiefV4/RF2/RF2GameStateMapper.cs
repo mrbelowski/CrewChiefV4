@@ -897,6 +897,7 @@ namespace CrewChiefV4.rFactor2
             {
                 // Special case for resume after FCY.  rF2 no longer has FCY set, but still has Resume sub phase set.
                 cgs.FlagData.fcyPhase = FullCourseYellowPhase.RACING;
+                cgs.FlagData.lapCountWhenLastWentGreen = cgs.SessionData.CompletedLaps;
             }
             else if (cgs.FlagData.isFullCourseYellow)
             {

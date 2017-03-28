@@ -227,6 +227,10 @@ namespace CrewChiefV4.Events
                 gapsBehind.Clear();
                 gapBehindAtLastReport = -1;
             }
+            if (previousGameState != null && previousGameState.SessionData.CompletedLaps <= currentGameState.FlagData.lapCountWhenLastWentGreen)
+            {
+                return;
+            }
             if (!currentGameState.PitData.InPitlane && enableGapMessages)
             {
                 if (isRace && !CrewChief.readOpponentDeltasForEveryLap &&
