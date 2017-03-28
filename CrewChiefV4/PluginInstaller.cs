@@ -6,18 +6,45 @@ using Microsoft.Win32;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.Windows.Forms;
+using Newtonsoft.Json;
+using System.Runtime.InteropServices;
 
 
 namespace CrewChiefV4
 {
     class PluginInstaller
     {
+        //decided to import instead of "hacking" the ini
+        [DllImport("kernel32", CharSet = CharSet.Unicode)]
+        private static extern int GetPrivateProfileString(string section, string key,
+            string defaultValue, StringBuilder value, int size, string filePath);
+
+        [DllImport("kernel32", CharSet = CharSet.Unicode, SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static extern bool WritePrivateProfileString(string section, string key,
+            string value, string filePath);
+
         Boolean messageBoxPresented;
         Boolean messageBoxResult;
+        private readonly String rf2PluginFileName = "rFactor2SharedMemoryMapPlugin64.dll";
+
         public PluginInstaller()
         {
             messageBoxPresented = false;
             messageBoxResult = false;
+        }
+
+        public static string ReadValue(string section, string key, string filePath, string defaultValue = "")
+        {
+            var value = new StringBuilder(512);
+            GetPrivateProfileString(section, key, defaultValue, value, value.Capacity, filePath);
+            return value.ToString();
+        }
+
+        public static bool WriteValue(string section, string key, string value, string filePath)
+        {
+            bool result = WritePrivateProfileString(section, key, value, filePath);
+            return result;
         }
 
         private string checkMD5(string filename)
@@ -80,8 +107,8 @@ namespace CrewChiefV4
             }
             return folders;
         }
-        
-        private Boolean presentMessagebox()
+
+        private Boolean presentInstallMessagebox()
         {
             if (messageBoxPresented == false)
             {
@@ -90,17 +117,19 @@ namespace CrewChiefV4
                     MessageBoxButtons.OKCancel, MessageBoxIcon.Information))
                 {
                     messageBoxResult = true;
-                    return true;
-                }
-                else
-                {
-                    messageBoxResult = false;
-                    return false;
                 }
             }
             return messageBoxResult;
         }
-
+        private Boolean presentEnableMessagebox()
+        {
+            if (DialogResult.OK == MessageBox.Show(Configuration.getUIString("install_plugin_popup_enable_text"), Configuration.getUIString("install_plugin_popup_enable_title"),
+                MessageBoxButtons.OKCancel, MessageBoxIcon.Information))
+            {
+                return true;
+            }
+            return false;
+        }
         //I stole this from the internetz(http://stackoverflow.com/questions/3201598/how-do-i-create-a-file-and-any-folders-if-the-folders-dont-exist)
         private bool installOrUpdatePlugin(string source, string destination)
         {
@@ -135,14 +164,22 @@ namespace CrewChiefV4
                         {
                             if (!checkMD5(element).Equals(checkMD5(destinationFile)))
                             {
-                                File.Copy(element, destinationFile, true);
-                                Console.WriteLine("Updated plugin file: " + destinationFile);
+                                //ask the user if they want to update the plugin
+                                if (presentInstallMessagebox())
+                                {
+                                    File.Copy(element, destinationFile, true);
+                                    Console.WriteLine("Updated plugin file: " + destinationFile);    
+                                }
+
                             }
                         }
                         else
                         {
-                            File.Copy(element, destinationFile, true);
-                            Console.WriteLine("Installed plugin file: " + destinationFile);
+                            if (presentInstallMessagebox())
+                            {
+                                File.Copy(element, destinationFile, true);
+                                Console.WriteLine("Installed plugin file: " + destinationFile);
+                            }
                         }
                     }
                 }
@@ -168,7 +205,7 @@ namespace CrewChiefV4
             {
                 gameInstallPath = UserSettings.GetUserSettings().getString("acs_install_path");
             }
-            else if (gameDefinition.gameEnum == GameEnum.RF1) 
+            else if (gameDefinition.gameEnum == GameEnum.RF1)
             {
                 //special case here, will figure something clever out so we dont need to have Dan's dll included in every plugin folder.
                 if (gameDefinition.gameInstallDirectory.Equals("Automobilista"))
@@ -184,9 +221,9 @@ namespace CrewChiefV4
             if (!Directory.Exists(gameInstallPath))
             {
                 //Present a messagebox to the user asking if they want to install plugins
-                if (presentMessagebox())
+                if (presentInstallMessagebox())
                 {
-                    List<string> steamLibs = getSteamLibraryFolders(); 
+                    List<string> steamLibs = getSteamLibraryFolders();
                     foreach (string lib in steamLibs)
                     {
                         string commonPath = Path.Combine(lib, @"steamapps\common\" + gameDefinition.gameInstallDirectory);
@@ -202,7 +239,7 @@ namespace CrewChiefV4
             if (!Directory.Exists(gameInstallPath))
             {
                 //Present a messagebox to the user asking if they want to install plugins
-                if (presentMessagebox())
+                if (presentInstallMessagebox())
                 {
                     FolderBrowserDialog dialog = new FolderBrowserDialog();
                     dialog.ShowNewFolderButton = false;
@@ -230,52 +267,67 @@ namespace CrewChiefV4
                     }
                 }
             }
-            //we have a gameInstallPath so we can go on with installation/updating assuming
+            //we have a gameInstallPath so we can go on with installation/updating assuming that the user wants to enable the plugin.
             if (Directory.Exists(gameInstallPath))
             {
+                installOrUpdatePlugin(Path.Combine(Configuration.getDefaultFileLocation("plugins"), gameDefinition.gameInstallDirectory), gameInstallPath);
                 if (gameDefinition.gameEnum == GameEnum.RF2_64BIT)
                 {
                     UserSettings.GetUserSettings().setProperty("rf2_install_path", gameInstallPath);
+                    
+                    try
+                    {
+                        string configPath = Path.Combine(gameInstallPath, @"UserData\player\CustomPluginVariables.JSON");
+                        if (File.Exists(configPath))
+                        {
+                            string json = File.ReadAllText(configPath);
+                            Dictionary<string, Dictionary<string, int>> plugins = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, int>>>(json);
+                            if (plugins.ContainsKey(rf2PluginFileName))
+                            {
+                                //the whitespace is intended, this is how the game writes it.
+                                if(plugins[rf2PluginFileName][" Enabled"] == 0)
+                                {
+                                    if(presentEnableMessagebox())
+                                    {
+                                        plugins[rf2PluginFileName][" Enabled"] = 1;
+                                        json = JsonConvert.SerializeObject(plugins, Formatting.Indented);
+                                        File.WriteAllText(configPath, json);
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                if (presentEnableMessagebox())
+                                {
+                                    plugins.Add(rf2PluginFileName, new Dictionary<string, int>() { { " Enabled", 1 } });
+                                    json = JsonConvert.SerializeObject(plugins, Formatting.Indented);
+                                    File.WriteAllText(configPath, json);
+                                }
+                            }
+
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("Failed to enable plugin" + e.Message);
+                    }
                 }
                 else if (gameDefinition.gameEnum == GameEnum.ASSETTO_32BIT || gameDefinition.gameEnum == GameEnum.ASSETTO_64BIT)
                 {
                     UserSettings.GetUserSettings().setProperty("acs_install_path", gameInstallPath);
                     string pythonConfigPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), @"Assetto Corsa\cfg", @"python.ini");
-                    try
+                    if (File.Exists(pythonConfigPath))
                     {
-                        if (File.Exists(pythonConfigPath))
+                        string valueActive = ReadValue("CREWCHIEFEX", "ACTIVE", pythonConfigPath, "0");
+                        if (!valueActive.Equals("1"))
                         {
-                            bool found = false;
-                            string []lines = File.ReadAllLines(pythonConfigPath);
-                            for (int i = 0; i < lines.Length; i++ )
+                            if (presentEnableMessagebox())
                             {
-                                if (lines[i].Equals("[CREWCHIEFEX]"))
-                                {
-                                    if (lines.Length >= i + 1)
-                                    {
-                                        if (lines[i + 1].Equals("ACTIVE=0"))
-                                        {
-                                            lines[i + 1] = "ACTIVE=1";
-                                        }
-                                        found = true;
-                                        break;
-                                    }
-                                }    
+                                WriteValue("CREWCHIEFEX", "ACTIVE", "1", pythonConfigPath);
                             }
-                            if (!found)
-                            {
-                                List<string> lineList = new List<string>(lines);
-                                lineList.Add("[CREWCHIEFEX]");
-                                lineList.Add("ACTIVE=1");
-                                lines = lineList.ToArray();
-                            } 
-                            File.WriteAllLines(pythonConfigPath, lines);
+                            
                         }
                     }
-                    catch
-                    {
-                        //ignore or messagebox telleing the user to manualy enable?
-                    }     
                 }
                 else if (gameDefinition.gameEnum == GameEnum.RF1)
                 {
@@ -289,7 +341,7 @@ namespace CrewChiefV4
                     }
                 }
                 UserSettings.GetUserSettings().saveUserSettings();
-                installOrUpdatePlugin(Path.Combine(Configuration.getDefaultFileLocation("plugins"), gameDefinition.gameInstallDirectory), gameInstallPath);
+                
             }
         }
     }
