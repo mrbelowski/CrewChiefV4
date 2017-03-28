@@ -5,6 +5,7 @@ using System.Text;
 using CrewChiefV4.GameState;
 using CrewChiefV4.Events;
 using CrewChiefV4.RaceRoom.RaceRoomData;
+using System.Diagnostics;
 
 /**
  * Maps memory mapped file to a local game-agnostic representation.
@@ -421,8 +422,8 @@ namespace CrewChiefV4.RaceRoom
             }
 
             currentGameState.SessionData.SessionTimeRemaining = shared.SessionTimeRemaining;
-            currentGameState.SessionData.CompletedLaps = shared.CompletedLaps;     
-            
+            currentGameState.SessionData.CompletedLaps = shared.CompletedLaps;
+
             currentGameState.SessionData.LapTimeCurrent = shared.LapTimeCurrentSelf;
             currentGameState.SessionData.CurrentLapIsValid = currentGameState.SessionData.LapTimeCurrent != -1;
             currentGameState.SessionData.LapTimePrevious = shared.LapTimePreviousSelf;
@@ -1067,7 +1068,8 @@ namespace CrewChiefV4.RaceRoom
             currentGameState.TyreData.TyreConditionStatus = CornerData.getCornerData(tyreWearThresholds, currentGameState.TyreData.FrontLeftPercentWear,
                 currentGameState.TyreData.FrontRightPercentWear, currentGameState.TyreData.RearLeftPercentWear, currentGameState.TyreData.RearRightPercentWear);
 
-            currentGameState.TyreData.TyreTempStatus = CornerData.getCornerData(CarData.tyreTempThresholds[tyreType],
+            var tyreTempThresholds = CarData.getTyreTempThresholds(currentGameState.carClass);
+            currentGameState.TyreData.TyreTempStatus = CornerData.getCornerData(tyreTempThresholds,
                 currentGameState.TyreData.PeakFrontLeftTemperatureForLap, currentGameState.TyreData.PeakFrontRightTemperatureForLap,
                 currentGameState.TyreData.PeakRearLeftTemperatureForLap, currentGameState.TyreData.PeakRearRightTemperatureForLap);
 
