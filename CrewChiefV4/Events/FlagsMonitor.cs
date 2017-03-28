@@ -247,7 +247,9 @@ namespace CrewChiefV4.Events
                     // don't allow any other message to override this one:
                     audioPlayer.playMessageImmediately(new QueuedMessage(folderFCYellowPrepareForGreen, 0, null));
                 }
-                else if (currentGameState.FlagData.fcyPhase == FullCourseYellowPhase.PENDING && currentGameState.Now > nextIncidentDriversCheck)
+                else if ((currentGameState.FlagData.fcyPhase == FullCourseYellowPhase.PENDING ||
+                              currentGameState.FlagData.fcyPhase == FullCourseYellowPhase.PITS_CLOSED) && 
+                          currentGameState.Now > nextIncidentDriversCheck)
                 {
                     if (getInvolvedInIncidentAttempts >= maxFCYGetInvolvedInIncidentAttempts)
                     {
