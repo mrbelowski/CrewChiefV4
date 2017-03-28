@@ -509,7 +509,8 @@ namespace CrewChiefV4.rFactor1
             currentGameState.TyreData.TyreConditionStatus = CornerData.getCornerData(tyreWearThresholds, currentGameState.TyreData.FrontLeftPercentWear,
                 currentGameState.TyreData.FrontRightPercentWear, currentGameState.TyreData.RearLeftPercentWear, currentGameState.TyreData.RearRightPercentWear);
 
-            currentGameState.TyreData.TyreTempStatus = CornerData.getCornerData(CarData.tyreTempThresholds[currentGameState.carClass.defaultTyreType],
+            var tyreTempThresholds = CarData.getTyreTempThresholds(currentGameState.carClass);
+            currentGameState.TyreData.TyreTempStatus = CornerData.getCornerData(tyreTempThresholds,
                 currentGameState.TyreData.PeakFrontLeftTemperatureForLap, currentGameState.TyreData.PeakFrontRightTemperatureForLap,
                 currentGameState.TyreData.PeakRearLeftTemperatureForLap, currentGameState.TyreData.PeakRearRightTemperatureForLap);
             // some simple locking / spinning checks

@@ -6,6 +6,7 @@ using CrewChiefV4.rFactor2.rFactor2Data;
 using System.Threading;
 using CrewChiefV4.Events;
 using CrewChiefV4.Audio;
+using CrewChiefV4.GameState;
 
 // When team moves to VS2015 or newer.
 //using static CrewChiefV4.rFactor2.rFactor2Constants;
@@ -16,25 +17,23 @@ namespace CrewChiefV4.rFactor2
     {
         // how long is a car? we use 3.5 meters by default here. Too long and we'll get 'hold your line' messages
         // when we're clearly directly behind the car
+        // Note: both below variables can be overrided in car class.
         private readonly float carLength = UserSettings.GetUserSettings().getFloat("rf2_spotter_car_length");
+        private readonly float carWidth = 1.8f;
 
         // don't activate the spotter unless this many seconds have elapsed (race starts are messy)
         private readonly int timeAfterRaceStartToActivate = UserSettings.GetUserSettings().getInt("time_after_race_start_for_spotter");
 
-        private readonly float carWidth = 1.8f;
-
         private NoisyCartesianCoordinateSpotter internalSpotter;
 
         private Boolean paused = false;
-        
-
         private Boolean enabled;
-
         private Boolean initialEnabledState;
 
         private AudioPlayer audioPlayer;
 
         private DateTime previousTime = DateTime.Now;
+        private string currentPlayerCarClassID = "#not_set#";
 
         public RF2Spotter(AudioPlayer audioPlayer, Boolean initialEnabledState)
         {
@@ -65,7 +64,6 @@ namespace CrewChiefV4.rFactor2
             for (int i = 0; i < shared.mNumVehicles; ++i)
             {
                 var vehicle = shared.mVehicles[i];
-                // TOOD: CHECK this out
                 if (vehicle.mIsPlayer == 1)
                 {
                     return vehicle;
@@ -74,7 +72,7 @@ namespace CrewChiefV4.rFactor2
             throw new Exception("no vehicle for player!");
         }
 
-        public void trigger(Object lastStateObj, Object currentStateObj)
+        public void trigger(Object lastStateObj, Object currentStateObj, GameStateData currentGameState)
         {
             if (this.paused)
             {
@@ -87,6 +85,7 @@ namespace CrewChiefV4.rFactor2
             if (!this.enabled 
                 || currentState.mCurrentET < this.timeAfterRaceStartToActivate
                 || currentState.mInRealtimeFC == 0
+                || lastState.mInRealtimeFC == 0
                 || currentState.mNumVehicles <= 2)
                 return;
 
@@ -103,7 +102,6 @@ namespace CrewChiefV4.rFactor2
 
                 if (timeDiffSeconds <= 0.0f)
                 {
-                    // WTF?
                     // In pits probably.
                     return;
                 }
@@ -111,6 +109,18 @@ namespace CrewChiefV4.rFactor2
             catch (Exception)
             {
                 return;
+            }
+
+            if (currentGameState != null)
+            {
+                var carClass = currentGameState.carClass;
+                if (carClass != null && currentPlayerCarClassID != carClass.getClassIdentifier())
+                {
+                    // Retrieve and use user overridable spotter car length/width.
+                    currentPlayerCarClassID = carClass.getClassIdentifier();
+                    var preferences = carClass.getPreferences();
+                    this.internalSpotter.setCarDimensions(preferences.spotterVehicleLength, preferences.spotterVehicleWidth);
+                }
             }
 
             var currentPlayerPosition = new float[] { (float) currentPlayerData.mPos.x, (float) currentPlayerData.mPos.z };
