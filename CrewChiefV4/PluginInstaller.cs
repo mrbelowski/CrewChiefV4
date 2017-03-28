@@ -108,7 +108,7 @@ namespace CrewChiefV4
             return folders;
         }
 
-        private Boolean presentMessagebox()
+        private Boolean presentInstallMessagebox()
         {
             if (messageBoxPresented == false)
             {
@@ -117,17 +117,19 @@ namespace CrewChiefV4
                     MessageBoxButtons.OKCancel, MessageBoxIcon.Information))
                 {
                     messageBoxResult = true;
-                    return true;
-                }
-                else
-                {
-                    messageBoxResult = false;
-                    return false;
                 }
             }
             return messageBoxResult;
         }
-
+        private Boolean presentEnableMessagebox()
+        {
+            if (DialogResult.OK == MessageBox.Show(Configuration.getUIString("install_plugin_popup_enable_text"), Configuration.getUIString("install_plugin_popup_enable_title"),
+                MessageBoxButtons.OKCancel, MessageBoxIcon.Information))
+            {
+                return true;
+            }
+            return false;
+        }
         //I stole this from the internetz(http://stackoverflow.com/questions/3201598/how-do-i-create-a-file-and-any-folders-if-the-folders-dont-exist)
         private bool installOrUpdatePlugin(string source, string destination)
         {
@@ -162,14 +164,22 @@ namespace CrewChiefV4
                         {
                             if (!checkMD5(element).Equals(checkMD5(destinationFile)))
                             {
-                                File.Copy(element, destinationFile, true);
-                                Console.WriteLine("Updated plugin file: " + destinationFile);
+                                //ask the user if they want to update the plugin
+                                if (presentInstallMessagebox())
+                                {
+                                    File.Copy(element, destinationFile, true);
+                                    Console.WriteLine("Updated plugin file: " + destinationFile);    
+                                }
+
                             }
                         }
                         else
                         {
-                            File.Copy(element, destinationFile, true);
-                            Console.WriteLine("Installed plugin file: " + destinationFile);
+                            if (presentInstallMessagebox())
+                            {
+                                File.Copy(element, destinationFile, true);
+                                Console.WriteLine("Installed plugin file: " + destinationFile);
+                            }
                         }
                     }
                 }
@@ -211,7 +221,7 @@ namespace CrewChiefV4
             if (!Directory.Exists(gameInstallPath))
             {
                 //Present a messagebox to the user asking if they want to install plugins
-                if (presentMessagebox())
+                if (presentInstallMessagebox())
                 {
                     List<string> steamLibs = getSteamLibraryFolders();
                     foreach (string lib in steamLibs)
@@ -229,7 +239,7 @@ namespace CrewChiefV4
             if (!Directory.Exists(gameInstallPath))
             {
                 //Present a messagebox to the user asking if they want to install plugins
-                if (presentMessagebox())
+                if (presentInstallMessagebox())
                 {
                     FolderBrowserDialog dialog = new FolderBrowserDialog();
                     dialog.ShowNewFolderButton = false;
@@ -260,9 +270,11 @@ namespace CrewChiefV4
             //we have a gameInstallPath so we can go on with installation/updating assuming that the user wants to enable the plugin.
             if (Directory.Exists(gameInstallPath))
             {
+                installOrUpdatePlugin(Path.Combine(Configuration.getDefaultFileLocation("plugins"), gameDefinition.gameInstallDirectory), gameInstallPath);
                 if (gameDefinition.gameEnum == GameEnum.RF2_64BIT)
                 {
                     UserSettings.GetUserSettings().setProperty("rf2_install_path", gameInstallPath);
+                    
                     try
                     {
                         string configPath = Path.Combine(gameInstallPath, @"UserData\player\CustomPluginVariables.JSON");
@@ -273,14 +285,26 @@ namespace CrewChiefV4
                             if (plugins.ContainsKey(rf2PluginFileName))
                             {
                                 //the whitespace is intended, this is how the game writes it.
-                                plugins[rf2PluginFileName][" Enabled"] = 1;
+                                if(plugins[rf2PluginFileName][" Enabled"] == 0)
+                                {
+                                    if(presentEnableMessagebox())
+                                    {
+                                        plugins[rf2PluginFileName][" Enabled"] = 1;
+                                        json = JsonConvert.SerializeObject(plugins, Formatting.Indented);
+                                        File.WriteAllText(configPath, json);
+                                    }
+                                }
                             }
                             else
                             {
-                                plugins.Add(rf2PluginFileName, new Dictionary<string, int>() { { " Enabled", 1 } });
+                                if (presentEnableMessagebox())
+                                {
+                                    plugins.Add(rf2PluginFileName, new Dictionary<string, int>() { { " Enabled", 1 } });
+                                    json = JsonConvert.SerializeObject(plugins, Formatting.Indented);
+                                    File.WriteAllText(configPath, json);
+                                }
                             }
-                            json = JsonConvert.SerializeObject(plugins, Formatting.Indented);
-                            File.WriteAllText(configPath, json);
+
                         }
                     }
                     catch (Exception e)
@@ -297,7 +321,11 @@ namespace CrewChiefV4
                         string valueActive = ReadValue("CREWCHIEFEX", "ACTIVE", pythonConfigPath, "0");
                         if (!valueActive.Equals("1"))
                         {
-                            WriteValue("CREWCHIEFEX", "ACTIVE", "1", pythonConfigPath);
+                            if (presentEnableMessagebox())
+                            {
+                                WriteValue("CREWCHIEFEX", "ACTIVE", "1", pythonConfigPath);
+                            }
+                            
                         }
                     }
                 }
@@ -313,7 +341,7 @@ namespace CrewChiefV4
                     }
                 }
                 UserSettings.GetUserSettings().saveUserSettings();
-                installOrUpdatePlugin(Path.Combine(Configuration.getDefaultFileLocation("plugins"), gameDefinition.gameInstallDirectory), gameInstallPath);
+                
             }
         }
     }
