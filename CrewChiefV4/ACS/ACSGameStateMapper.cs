@@ -1773,6 +1773,66 @@ namespace CrewChiefV4.assetto
             currentGameState.TyreData.RearRightPressure = playerVehicle.tyreInflation[3] == 1.0f ? shared.acsPhysics.wheelsPressure[3] * 6.894f : 0.0f;
 
             String currentTyreCompound = shared.acsGraphic.tyreCompound;
+
+            List<CornerData.EnumWithThresholds> tyreTempThresholds = getTyreTempThresholds(currentGameState.carClass, currentTyreCompound);
+            currentGameState.TyreData.TyreTempStatus = CornerData.getCornerData(tyreTempThresholds, currentGameState.TyreData.PeakFrontLeftTemperatureForLap,
+                    currentGameState.TyreData.PeakFrontRightTemperatureForLap, currentGameState.TyreData.PeakRearLeftTemperatureForLap,
+                    currentGameState.TyreData.PeakRearRightTemperatureForLap);
+
+            //Front Left
+            currentGameState.TyreData.FrontLeft_CenterTemp = shared.acsPhysics.tyreTempM[0];
+            currentGameState.TyreData.FrontLeft_LeftTemp = shared.acsPhysics.tyreTempO[0];
+            currentGameState.TyreData.FrontLeft_RightTemp = shared.acsPhysics.tyreTempI[0];
+            currentGameState.TyreData.FrontLeftTyreType = defaultTyreTypeForPlayersCar;
+            if (currentGameState.SessionData.IsNewLap)
+            {
+                currentGameState.TyreData.PeakFrontLeftTemperatureForLap = currentGameState.TyreData.FrontLeft_CenterTemp;
+            }
+            else if (previousGameState == null || currentGameState.TyreData.FrontLeft_CenterTemp > previousGameState.TyreData.PeakFrontLeftTemperatureForLap)
+            {
+                currentGameState.TyreData.PeakFrontLeftTemperatureForLap = currentGameState.TyreData.FrontLeft_CenterTemp;
+            }
+            //Front Right
+            currentGameState.TyreData.FrontRight_CenterTemp = shared.acsPhysics.tyreTempM[1];
+            currentGameState.TyreData.FrontRight_LeftTemp = shared.acsPhysics.tyreTempI[1];
+            currentGameState.TyreData.FrontRight_RightTemp = shared.acsPhysics.tyreTempO[1];
+            currentGameState.TyreData.FrontRightTyreType = defaultTyreTypeForPlayersCar;
+            if (currentGameState.SessionData.IsNewLap)
+            {
+                currentGameState.TyreData.PeakFrontRightTemperatureForLap = currentGameState.TyreData.FrontRight_CenterTemp;
+            }
+            else if (previousGameState == null || currentGameState.TyreData.FrontRight_CenterTemp > previousGameState.TyreData.PeakFrontRightTemperatureForLap)
+            {
+                currentGameState.TyreData.PeakFrontRightTemperatureForLap = currentGameState.TyreData.FrontRight_CenterTemp;
+            }
+            //Rear Left
+            currentGameState.TyreData.RearLeft_CenterTemp = shared.acsPhysics.tyreTempM[2];
+            currentGameState.TyreData.RearLeft_LeftTemp = shared.acsPhysics.tyreTempO[2];
+            currentGameState.TyreData.RearLeft_RightTemp = shared.acsPhysics.tyreTempI[2];
+            currentGameState.TyreData.RearLeftTyreType = defaultTyreTypeForPlayersCar;
+            if (currentGameState.SessionData.IsNewLap)
+            {
+                currentGameState.TyreData.PeakRearLeftTemperatureForLap = currentGameState.TyreData.RearLeft_CenterTemp;
+            }
+            else if (previousGameState == null || currentGameState.TyreData.RearLeft_CenterTemp > previousGameState.TyreData.PeakRearLeftTemperatureForLap)
+            {
+                currentGameState.TyreData.PeakRearLeftTemperatureForLap = currentGameState.TyreData.RearLeft_CenterTemp;
+            }
+            //Rear Right
+            currentGameState.TyreData.RearRight_CenterTemp = shared.acsPhysics.tyreTempM[3];
+            currentGameState.TyreData.RearRight_LeftTemp = shared.acsPhysics.tyreTempI[3];
+            currentGameState.TyreData.RearRight_RightTemp = shared.acsPhysics.tyreTempO[3];
+            currentGameState.TyreData.RearRightTyreType = defaultTyreTypeForPlayersCar;
+            if (currentGameState.SessionData.IsNewLap)
+            {
+                currentGameState.TyreData.PeakRearRightTemperatureForLap = currentGameState.TyreData.RearRight_CenterTemp;
+            }
+            else if (previousGameState == null || currentGameState.TyreData.RearRight_CenterTemp > previousGameState.TyreData.PeakRearRightTemperatureForLap)
+            {
+                currentGameState.TyreData.PeakRearRightTemperatureForLap = currentGameState.TyreData.RearRight_CenterTemp;
+            }
+
+            
             Boolean currentTyreValid = currentTyreCompound != null && currentTyreCompound.Length > 0 &&
                 acTyres.Count > 0 && acTyres.ContainsKey(currentTyreCompound);
 
@@ -1780,64 +1840,10 @@ namespace CrewChiefV4.assetto
             {
 
                 float currentTyreWearMinimumValue = acTyres[currentTyreCompound].tyreWearMinimumValue;
-                //Front Left
-                currentGameState.TyreData.FrontLeft_CenterTemp = shared.acsPhysics.tyreTempM[0];
-                currentGameState.TyreData.FrontLeft_LeftTemp = shared.acsPhysics.tyreTempO[0];
-                currentGameState.TyreData.FrontLeft_RightTemp = shared.acsPhysics.tyreTempI[0];
-                currentGameState.TyreData.FrontLeftTyreType = defaultTyreTypeForPlayersCar;
                 currentGameState.TyreData.FrontLeftPercentWear = getTyreWearPercentage(shared.acsPhysics.tyreWear[0], currentTyreWearMinimumValue);
-                if (currentGameState.SessionData.IsNewLap)
-                {
-                    currentGameState.TyreData.PeakFrontLeftTemperatureForLap = currentGameState.TyreData.FrontLeft_CenterTemp;
-                }
-                else if (previousGameState == null || currentGameState.TyreData.FrontLeft_CenterTemp > previousGameState.TyreData.PeakFrontLeftTemperatureForLap)
-                {
-                    currentGameState.TyreData.PeakFrontLeftTemperatureForLap = currentGameState.TyreData.FrontLeft_CenterTemp;
-                }
-                //Front Right
-                currentGameState.TyreData.FrontRight_CenterTemp = shared.acsPhysics.tyreTempM[1];
-                currentGameState.TyreData.FrontRight_LeftTemp = shared.acsPhysics.tyreTempI[1];
-                currentGameState.TyreData.FrontRight_RightTemp = shared.acsPhysics.tyreTempO[1];
-                currentGameState.TyreData.FrontRightTyreType = defaultTyreTypeForPlayersCar;
                 currentGameState.TyreData.FrontRightPercentWear = getTyreWearPercentage(shared.acsPhysics.tyreWear[0], currentTyreWearMinimumValue);
-                if (currentGameState.SessionData.IsNewLap)
-                {
-                    currentGameState.TyreData.PeakFrontRightTemperatureForLap = currentGameState.TyreData.FrontRight_CenterTemp;
-                }
-                else if (previousGameState == null || currentGameState.TyreData.FrontRight_CenterTemp > previousGameState.TyreData.PeakFrontRightTemperatureForLap)
-                {
-                    currentGameState.TyreData.PeakFrontRightTemperatureForLap = currentGameState.TyreData.FrontRight_CenterTemp;
-                }
-
-                //Rear Left
-                currentGameState.TyreData.RearLeft_CenterTemp = shared.acsPhysics.tyreTempM[2];
-                currentGameState.TyreData.RearLeft_LeftTemp = shared.acsPhysics.tyreTempO[2];
-                currentGameState.TyreData.RearLeft_RightTemp = shared.acsPhysics.tyreTempI[2];
-                currentGameState.TyreData.RearLeftTyreType = defaultTyreTypeForPlayersCar;
                 currentGameState.TyreData.RearLeftPercentWear = getTyreWearPercentage(shared.acsPhysics.tyreWear[0], currentTyreWearMinimumValue);
-                if (currentGameState.SessionData.IsNewLap)
-                {
-                    currentGameState.TyreData.PeakRearLeftTemperatureForLap = currentGameState.TyreData.RearLeft_CenterTemp;
-                }
-                else if (previousGameState == null || currentGameState.TyreData.RearLeft_CenterTemp > previousGameState.TyreData.PeakRearLeftTemperatureForLap)
-                {
-                    currentGameState.TyreData.PeakRearLeftTemperatureForLap = currentGameState.TyreData.RearLeft_CenterTemp;
-                }
-                //Rear Right
-                currentGameState.TyreData.RearRight_CenterTemp = shared.acsPhysics.tyreTempM[3];
-                currentGameState.TyreData.RearRight_LeftTemp = shared.acsPhysics.tyreTempI[3];
-                currentGameState.TyreData.RearRight_RightTemp = shared.acsPhysics.tyreTempO[3];
-                currentGameState.TyreData.RearRightTyreType = defaultTyreTypeForPlayersCar;
                 currentGameState.TyreData.RearRightPercentWear = getTyreWearPercentage(shared.acsPhysics.tyreWear[0], currentTyreWearMinimumValue);
-                if (currentGameState.SessionData.IsNewLap)
-                {
-                    currentGameState.TyreData.PeakRearRightTemperatureForLap = currentGameState.TyreData.RearRight_CenterTemp;
-                }
-                else if (previousGameState == null || currentGameState.TyreData.RearRight_CenterTemp > previousGameState.TyreData.PeakRearRightTemperatureForLap)
-                {
-                    currentGameState.TyreData.PeakRearRightTemperatureForLap = currentGameState.TyreData.RearRight_CenterTemp;
-                }
-
                 if (!currentGameState.PitData.OnOutLap)
                 {
                     currentGameState.TyreData.TyreConditionStatus = CornerData.getCornerData(acTyres[currentTyreCompound].tyreWearThresholdsForAC,
@@ -1848,17 +1854,8 @@ namespace CrewChiefV4.assetto
                 {
                     currentGameState.TyreData.TyreConditionStatus = CornerData.getCornerData(acTyres[currentTyreCompound].tyreWearThresholdsForAC, -1f, -1f, -1f, -1f);
                 }
-
-                List<CornerData.EnumWithThresholds> tyreTempThresholds = getTyreTempThresholds(currentGameState.carClass, currentTyreCompound);
-                currentGameState.TyreData.TyreTempStatus = CornerData.getCornerData(tyreTempThresholds, currentGameState.TyreData.PeakFrontLeftTemperatureForLap,
-                        currentGameState.TyreData.PeakFrontRightTemperatureForLap, currentGameState.TyreData.PeakRearLeftTemperatureForLap,
-                        currentGameState.TyreData.PeakRearRightTemperatureForLap);
-
             }
 
-            //penalty data
-            //if (shared.acsStatic.penaltiesEnabled == 1)
-            //{
             currentGameState.PenaltiesData.IsOffRacingSurface = shared.acsPhysics.numberOfTyresOut > 2;
             if (!currentGameState.PitData.OnOutLap && previousGameState != null && !previousGameState.PenaltiesData.IsOffRacingSurface && currentGameState.PenaltiesData.IsOffRacingSurface &&
                 !(shared.acsGraphic.session == AC_SESSION_TYPE.AC_RACE && isCountDown))
@@ -1866,7 +1863,6 @@ namespace CrewChiefV4.assetto
                 currentGameState.PenaltiesData.CutTrackWarnings = previousGameState.PenaltiesData.CutTrackWarnings + 1;
             }
 
-            //}
 
             if (playerVehicle.speedMS > 7 && currentGameState.carClass != null)
             {
@@ -1897,7 +1893,13 @@ namespace CrewChiefV4.assetto
 
         private List<CornerData.EnumWithThresholds> getTyreTempThresholds(CarData.CarClass carClass, string currentTyreCompound)
         {
-            List<CornerData.EnumWithThresholds> tyreTempThresholdsBuiltIn = acTyres[currentTyreCompound].tyreTempThresholdsForAC;
+
+            List<CornerData.EnumWithThresholds> tyreTempThresholdsBuiltIn = new List<CornerData.EnumWithThresholds>();
+            if (acTyres.ContainsKey(currentTyreCompound))
+            {
+                tyreTempThresholdsBuiltIn = acTyres[currentTyreCompound].tyreTempThresholdsForAC;
+            }
+
             List<CornerData.EnumWithThresholds> tyreTempThresholds = new List<CornerData.EnumWithThresholds>();
             foreach (CornerData.EnumWithThresholds threshold in tyreTempThresholdsBuiltIn)
             {
@@ -1921,6 +1923,13 @@ namespace CrewChiefV4.assetto
                     tyreTempThresholds[2].upperThreshold = carClass.maxHotTyreTemp;
                     tyreTempThresholds[3].lowerThreshold = carClass.maxHotTyreTemp;
                 }
+            }
+            else
+            {
+                tyreTempThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.COLD, -10000f, carClass.maxColdTyreTemp));
+                tyreTempThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.WARM, carClass.maxColdTyreTemp, carClass.maxWarmTyreTemp));
+                tyreTempThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.HOT, carClass.maxWarmTyreTemp, carClass.maxHotTyreTemp));
+                tyreTempThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.COOKING, carClass.maxHotTyreTemp, 10000f));
             }
             return tyreTempThresholds;
         }
