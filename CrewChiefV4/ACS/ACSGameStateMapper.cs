@@ -1250,6 +1250,10 @@ namespace CrewChiefV4.assetto
                 {
                     currentGameState.SessionData.SectorNumber = getCurrentSector(currentGameState.SessionData.TrackDefinition, distanceRoundTrack);
                 }
+                if (currentGameState.SessionData.Position == 1)
+                {
+                    currentGameState.SessionData.LeaderSectorNumber = currentGameState.SessionData.SectorNumber;
+                }
                 currentGameState.SessionData.IsNewSector = previousGameState == null || currentGameState.SessionData.SectorNumber != previousGameState.SessionData.SectorNumber;
                 currentGameState.SessionData.LapTimeCurrent = mapToFloatTime(shared.acsGraphic.iCurrentTime);
 
@@ -1475,6 +1479,11 @@ namespace CrewChiefV4.assetto
                                         currentGameState.SessionData.LeaderHasFinishedRace = true;
                                     }
 
+                                    if (currentOpponentRacePosition == 1)
+                                    {
+                                        currentGameState.SessionData.LeaderSectorNumber = currentOpponentSector;
+                                    }
+                                        
                                     if (currentOpponentRacePosition == 1 && previousOpponentPosition > 1)
                                     {
                                         currentGameState.SessionData.HasLeadChanged = true;
