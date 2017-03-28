@@ -1849,9 +1849,10 @@ namespace CrewChiefV4.assetto
                     currentGameState.TyreData.TyreConditionStatus = CornerData.getCornerData(acTyres[currentTyreCompound].tyreWearThresholdsForAC, -1f, -1f, -1f, -1f);
                 }
 
-                currentGameState.TyreData.TyreTempStatus = CornerData.getCornerData(acTyres[currentTyreCompound].tyreTempThresholdsForAC,
-                    currentGameState.TyreData.PeakFrontLeftTemperatureForLap, currentGameState.TyreData.PeakFrontRightTemperatureForLap,
-                        currentGameState.TyreData.PeakRearLeftTemperatureForLap, currentGameState.TyreData.PeakRearRightTemperatureForLap);
+                List<CornerData.EnumWithThresholds> tyreTempThresholds = getTyreTempThresholds(currentGameState.carClass, currentTyreCompound);
+                currentGameState.TyreData.TyreTempStatus = CornerData.getCornerData(tyreTempThresholds, currentGameState.TyreData.PeakFrontLeftTemperatureForLap,
+                        currentGameState.TyreData.PeakFrontRightTemperatureForLap, currentGameState.TyreData.PeakRearLeftTemperatureForLap,
+                        currentGameState.TyreData.PeakRearRightTemperatureForLap);
 
             }
 
@@ -1892,6 +1893,36 @@ namespace CrewChiefV4.assetto
             }
 
             return currentGameState;
+        }
+
+        private List<CornerData.EnumWithThresholds> getTyreTempThresholds(CarData.CarClass carClass, string currentTyreCompound)
+        {
+            List<CornerData.EnumWithThresholds> tyreTempThresholdsBuiltIn = acTyres[currentTyreCompound].tyreTempThresholdsForAC;
+            List<CornerData.EnumWithThresholds> tyreTempThresholds = new List<CornerData.EnumWithThresholds>();
+            foreach (CornerData.EnumWithThresholds threshold in tyreTempThresholdsBuiltIn)
+            {
+                tyreTempThresholds.Add(new CornerData.EnumWithThresholds(threshold.e, threshold.lowerThreshold, threshold.upperThreshold));
+            }
+            // Apply overrides from .json, if user provided them.
+            if (tyreTempThresholds.Count == 4) // COLD, WARM, HOT, COOKING thresholds
+            {
+                if (carClass.maxColdTyreTemp > 0)
+                {
+                    tyreTempThresholds[0].upperThreshold = carClass.maxColdTyreTemp;
+                    tyreTempThresholds[1].lowerThreshold = carClass.maxColdTyreTemp;
+                }
+                if (carClass.maxWarmTyreTemp > 0)
+                {
+                    tyreTempThresholds[1].upperThreshold = carClass.maxWarmTyreTemp;
+                    tyreTempThresholds[2].lowerThreshold = carClass.maxWarmTyreTemp;
+                }
+                if (carClass.maxHotTyreTemp > 0)
+                {
+                    tyreTempThresholds[2].upperThreshold = carClass.maxHotTyreTemp;
+                    tyreTempThresholds[3].lowerThreshold = carClass.maxHotTyreTemp;
+                }
+            }
+            return tyreTempThresholds;
         }
 
         private SessionPhase mapToSessionPhase(SessionType sessionType, AC_FLAG_TYPE flag, AC_STATUS status, Boolean isCountdown,

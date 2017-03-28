@@ -6,8 +6,7 @@ using CrewChiefV4.assetto.assettoData;
 using System.Threading;
 using CrewChiefV4.Events;
 using CrewChiefV4.Audio;
-
-
+using CrewChiefV4.GameState;
 
 namespace CrewChiefV4.assetto
 {
@@ -21,6 +20,8 @@ namespace CrewChiefV4.assetto
         // when we're clearly directly behind the car
         private float carLength =  UserSettings.GetUserSettings().getFloat("asc_spotter_car_length");
 
+        private float carWidth = 1.8f;
+
         // don't activate the spotter unless this many seconds have elapsed (race starts are messy)
         private int timeAfterRaceStartToActivate = UserSettings.GetUserSettings().getInt("time_after_race_start_for_spotter");
 
@@ -30,9 +31,9 @@ namespace CrewChiefV4.assetto
 
         private AudioPlayer audioPlayer;
 
-        private float carWidth = 1.8f;
-
         private DateTime previousTime = DateTime.Now;
+
+        private string currentPlayerCarClassID = "#not_set#";
 
         public ACSSpotter(AudioPlayer audioPlayer, Boolean initialEnabledState)
         {
@@ -63,7 +64,7 @@ namespace CrewChiefV4.assetto
             TimeSpan ts = TimeSpan.FromTicks(time);
             return (float)ts.TotalMilliseconds * 10;
         }
-        public void trigger(Object lastStateObj, Object currentStateObj)
+        public void trigger(Object lastStateObj, Object currentStateObj, GameStateData currentGameState)
         {
 
             if (paused)
@@ -97,6 +98,17 @@ namespace CrewChiefV4.assetto
             catch (Exception)
             {
                 return;
+            }
+            if (currentGameState != null)
+            {
+                var carClass = currentGameState.carClass;
+                if (carClass != null && currentPlayerCarClassID != carClass.getClassIdentifier())
+                {
+                    // Retrieve and use user overridable spotter car length/width.
+                    currentPlayerCarClassID = carClass.getClassIdentifier();
+                    var preferences = carClass.getPreferences();
+                    this.internalSpotter.setCarDimensions(preferences.spotterVehicleLength, preferences.spotterVehicleWidth);
+                }
             }
             float[] currentPlayerPosition = new float[] { currentPlayerData.worldPosition.x, currentPlayerData.worldPosition.z };
 
