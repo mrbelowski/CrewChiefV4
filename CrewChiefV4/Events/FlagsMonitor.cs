@@ -247,7 +247,9 @@ namespace CrewChiefV4.Events
                     // don't allow any other message to override this one:
                     audioPlayer.playMessageImmediately(new QueuedMessage(folderFCYellowPrepareForGreen, 0, null));
                 }
-                else if (currentGameState.FlagData.fcyPhase == FullCourseYellowPhase.PENDING && currentGameState.Now > nextIncidentDriversCheck)
+                else if ((currentGameState.FlagData.fcyPhase == FullCourseYellowPhase.PENDING ||
+                              currentGameState.FlagData.fcyPhase == FullCourseYellowPhase.PITS_CLOSED) && 
+                          currentGameState.Now > nextIncidentDriversCheck)
                 {
                     if (getInvolvedInIncidentAttempts >= maxFCYGetInvolvedInIncidentAttempts)
                     {
@@ -648,7 +650,7 @@ namespace CrewChiefV4.Events
             driversInvolvedInCurrentIncident.Sort(new NamePositionPairComparer(positionAtStartOfIncident));
             // get the landmark and other data off the first item
             String landmark = TrackData.getLandmarkForLapDistance(currentTrack, driversInvolvedInCurrentIncident[0].distanceRoundTrack);
-            float distanceRoundTrackOfFirstLandmark = driversInvolvedInCurrentIncident[0].distanceRoundTrack;
+            float distanceRoundTrackOfFirstDriver = driversInvolvedInCurrentIncident[0].distanceRoundTrack;
             List<OpponentData> opponentsToRead = new List<OpponentData>();
             opponentsToRead.Add(opponents[driversInvolvedInCurrentIncident[0].opponentKey]);
             // if the first item is a position (we have no name for him), don't process the others
@@ -663,24 +665,20 @@ namespace CrewChiefV4.Events
                         break;
                     }
                     if (driversInvolvedInCurrentIncident[i].canReadName)
-                    {
-                        opponentsToRead.Add(opponents[driversInvolvedInCurrentIncident[i].opponentKey]);
+                    {                        
                         String thisLandmark = TrackData.getLandmarkForLapDistance(currentTrack, driversInvolvedInCurrentIncident[i].distanceRoundTrack);
-                        if (landmark == null)
+                        if (landmark == thisLandmark || Math.Abs(distanceRoundTrackOfFirstDriver - driversInvolvedInCurrentIncident[i].distanceRoundTrack) < 300)
                         {
-                            thisLandmark = landmark;
-                            distanceRoundTrackOfFirstLandmark = driversInvolvedInCurrentIncident[i].distanceRoundTrack;
-                        }
-                        else if (landmark != thisLandmark || Math.Abs(distanceRoundTrackOfFirstLandmark - driversInvolvedInCurrentIncident[i].distanceRoundTrack) > 300)
-                        {
-                            // oh dear... this driver is in a completely different part of the track :(
-                            landmark = null;
-                            break;
+                            opponentsToRead.Add(opponents[driversInvolvedInCurrentIncident[i].opponentKey]);
+                            if (landmark == null)
+                            {
+                                landmark = thisLandmark;
+                            }
                         }
                     }
                 }
             }
-            // now we have the opponents to read and the landmark - either all the drivers are in it (or close) or we won't use it
+            // now we have the opponents to read and the landmark - all the drivers in the list are in or close to the landmark
             List<MessageFragment> messageContents = new List<MessageFragment>();
             if (namesMode)
             {
@@ -761,7 +759,8 @@ namespace CrewChiefV4.Events
                         return true;
                     }
                 }
-            } return false;
+            }
+            return false;
         }
 
 
