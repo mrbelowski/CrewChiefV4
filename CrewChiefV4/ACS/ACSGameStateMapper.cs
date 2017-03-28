@@ -1772,12 +1772,7 @@ namespace CrewChiefV4.assetto
             currentGameState.TyreData.RearLeftPressure = playerVehicle.tyreInflation[2] == 1.0f ? shared.acsPhysics.wheelsPressure[2] * 6.894f : 0.0f;
             currentGameState.TyreData.RearRightPressure = playerVehicle.tyreInflation[3] == 1.0f ? shared.acsPhysics.wheelsPressure[3] * 6.894f : 0.0f;
 
-            String currentTyreCompound = shared.acsGraphic.tyreCompound;
 
-            List<CornerData.EnumWithThresholds> tyreTempThresholds = getTyreTempThresholds(currentGameState.carClass, currentTyreCompound);
-            currentGameState.TyreData.TyreTempStatus = CornerData.getCornerData(tyreTempThresholds, currentGameState.TyreData.PeakFrontLeftTemperatureForLap,
-                    currentGameState.TyreData.PeakFrontRightTemperatureForLap, currentGameState.TyreData.PeakRearLeftTemperatureForLap,
-                    currentGameState.TyreData.PeakRearRightTemperatureForLap);
 
             //Front Left
             currentGameState.TyreData.FrontLeft_CenterTemp = shared.acsPhysics.tyreTempM[0];
@@ -1832,6 +1827,12 @@ namespace CrewChiefV4.assetto
                 currentGameState.TyreData.PeakRearRightTemperatureForLap = currentGameState.TyreData.RearRight_CenterTemp;
             }
 
+            String currentTyreCompound = shared.acsGraphic.tyreCompound;
+
+            List<CornerData.EnumWithThresholds> tyreTempThresholds = getTyreTempThresholds(currentGameState.carClass, currentTyreCompound);
+            currentGameState.TyreData.TyreTempStatus = CornerData.getCornerData(tyreTempThresholds, currentGameState.TyreData.PeakFrontLeftTemperatureForLap,
+                    currentGameState.TyreData.PeakFrontRightTemperatureForLap, currentGameState.TyreData.PeakRearLeftTemperatureForLap,
+                    currentGameState.TyreData.PeakRearRightTemperatureForLap);
             
             Boolean currentTyreValid = currentTyreCompound != null && currentTyreCompound.Length > 0 &&
                 acTyres.Count > 0 && acTyres.ContainsKey(currentTyreCompound);
