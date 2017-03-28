@@ -6,6 +6,7 @@ using CrewChiefV4.rFactor2.rFactor2Data;
 using System.Threading;
 using CrewChiefV4.Events;
 using CrewChiefV4.Audio;
+using CrewChiefV4.GameState;
 
 // When team moves to VS2015 or newer.
 //using static CrewChiefV4.rFactor2.rFactor2Constants;
@@ -26,15 +27,13 @@ namespace CrewChiefV4.rFactor2
         private NoisyCartesianCoordinateSpotter internalSpotter;
 
         private Boolean paused = false;
-        
-
         private Boolean enabled;
-
         private Boolean initialEnabledState;
 
         private AudioPlayer audioPlayer;
 
         private DateTime previousTime = DateTime.Now;
+        private string currentPlayerCarClassID = "#not_set#";
 
         public RF2Spotter(AudioPlayer audioPlayer, Boolean initialEnabledState)
         {
@@ -73,7 +72,7 @@ namespace CrewChiefV4.rFactor2
             throw new Exception("no vehicle for player!");
         }
 
-        public void trigger(Object lastStateObj, Object currentStateObj)
+        public void trigger(Object lastStateObj, Object currentStateObj, GameStateData currentGameState)
         {
             if (this.paused)
             {
@@ -112,11 +111,17 @@ namespace CrewChiefV4.rFactor2
                 return;
             }
 
-            // Retrieve and use user overridable spotter car length/width.
-            var carClassId = RF2GameStateMapper.getStringFromBytes(currentPlayerData.mVehicleClass);
-            var carClass = CarData.getCarClassForClassName(carClassId);
-            var preferences = carClass.getPreferences();
-            this.internalSpotter.setCarDimensions(preferences.spotterVehicleLength, preferences.spotterVehicleWidth);
+            if (currentGameState != null)
+            {
+                var carClass = currentGameState.carClass;
+                if (carClass != null && currentPlayerCarClassID != carClass.getClassIdentifier())
+                {
+                    // Retrieve and use user overridable spotter car length/width.
+                    currentPlayerCarClassID = carClass.getClassIdentifier();
+                    var preferences = carClass.getPreferences();
+                    this.internalSpotter.setCarDimensions(preferences.spotterVehicleLength, preferences.spotterVehicleWidth);
+                }
+            }
 
             var currentPlayerPosition = new float[] { (float) currentPlayerData.mPos.x, (float) currentPlayerData.mPos.z };
 

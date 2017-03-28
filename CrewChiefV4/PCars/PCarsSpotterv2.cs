@@ -6,7 +6,7 @@ using CrewChiefV4.RaceRoom.RaceRoomData;
 using System.Threading;
 using CrewChiefV4.Events;
 using CrewChiefV4.Audio;
-
+using CrewChiefV4.GameState;
 
 namespace CrewChiefV4.PCars
 {
@@ -36,8 +36,11 @@ namespace CrewChiefV4.PCars
         private Dictionary<String, List<float>> previousOpponentSpeeds = new Dictionary<String, List<float>>();
 
         private float carWidth = 1.8f;
-        
+
+        // User set class preferences will override this, might need special handling.
         private float udpCarWidth = 1.5f;
+
+        private string currentPlayerCarClassID = "#not_set#";
 
         public PCarsSpotterv2(AudioPlayer audioPlayer, Boolean initialEnabledState)
         {
@@ -70,10 +73,10 @@ namespace CrewChiefV4.PCars
             paused = false;
         }
 
-        public void trigger(Object lastStateObj, Object currentStateObj)
+        public void trigger(Object lastStateObj, Object currentStateObj, GameStateData currentGameState)
         {
             if (paused)
-            {                
+            {
                 return;
             }
             CrewChiefV4.PCars.PCarsSharedMemoryReader.PCarsStructWrapper currentWrapper = (CrewChiefV4.PCars.PCarsSharedMemoryReader.PCarsStructWrapper)currentStateObj;
@@ -111,11 +114,17 @@ namespace CrewChiefV4.PCars
                 Tuple<int, pCarsAPIParticipantStruct> playerDataWithIndex = PCarsGameStateMapper.getPlayerDataStruct(currentState.mParticipantData, currentState.mViewedParticipantIndex);
                 int playerIndex = playerDataWithIndex.Item1;
                 pCarsAPIParticipantStruct playerData = playerDataWithIndex.Item2;
-                // Retrieve and use user overridable spotter car length/width.
-                String carClassId = StructHelper.getNameFromBytes(currentState.mCarClassName);
-                CarData.CarClass carClass = CarData.getCarClassForClassName(carClassId);
-                var preferences = carClass.getPreferences();
-                this.internalSpotter.setCarDimensions(preferences.spotterVehicleLength, preferences.spotterVehicleWidth);
+                if (currentGameState != null)
+                {
+                    var carClass = currentGameState.carClass;
+                    if (carClass != null && currentPlayerCarClassID != carClass.getClassIdentifier())
+                    {
+                        // Retrieve and use user overridable spotter car length/width.
+                        currentPlayerCarClassID = carClass.getClassIdentifier();
+                        var preferences = carClass.getPreferences();
+                        this.internalSpotter.setCarDimensions(preferences.spotterVehicleLength, preferences.spotterVehicleWidth);
+                    }
+                }
                 float[] currentPlayerPosition = new float[] { playerData.mWorldPosition[0], playerData.mWorldPosition[2] };
 
                 if (currentState.mPitMode == (uint)ePitMode.PIT_MODE_NONE)

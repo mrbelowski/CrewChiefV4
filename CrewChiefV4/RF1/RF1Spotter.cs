@@ -6,6 +6,7 @@ using CrewChiefV4.rFactor1.rFactor1Data;
 using System.Threading;
 using CrewChiefV4.Events;
 using CrewChiefV4.Audio;
+using CrewChiefV4.GameState;
 
 namespace CrewChiefV4.rFactor1
 {
@@ -31,6 +32,8 @@ namespace CrewChiefV4.rFactor1
         private float carWidth = 1.8f;
 
         private DateTime previousTime = DateTime.Now;
+
+        private string currentPlayerCarClassID = "#not_set#";
 
         public RF1Spotter(AudioPlayer audioPlayer, Boolean initialEnabledState)
         {
@@ -68,7 +71,7 @@ namespace CrewChiefV4.rFactor1
             throw new Exception("no vehicle for player!");
         }
 
-        public void trigger(Object lastStateObj, Object currentStateObj)
+        public void trigger(Object lastStateObj, Object currentStateObj, GameStateData currentGameState)
         {
             if (paused)
             {
@@ -105,12 +108,17 @@ namespace CrewChiefV4.rFactor1
                 return;
             }
 
-            // Retrieve and use user overridable spotter car length/width.
-            var carClassId = RF1GameStateMapper.getNameFromBytes(currentPlayerData.vehicleClass);
-            var carClass = CarData.getCarClassForClassName(carClassId);
-            var preferences = carClass.getPreferences();
-            this.internalSpotter.setCarDimensions(preferences.spotterVehicleLength, preferences.spotterVehicleWidth);
-
+            if (currentGameState != null)
+            {
+                var carClass = currentGameState.carClass;
+                if (carClass != null && currentPlayerCarClassID != carClass.getClassIdentifier())
+                {
+                    // Retrieve and use user overridable spotter car length/width.
+                    currentPlayerCarClassID = carClass.getClassIdentifier();
+                    var preferences = carClass.getPreferences();
+                    this.internalSpotter.setCarDimensions(preferences.spotterVehicleLength, preferences.spotterVehicleWidth);
+                }
+            }
             float[] currentPlayerPosition = new float[] { currentPlayerData.pos.x, currentPlayerData.pos.z };
 
             if (currentPlayerData.inPits == 0 && currentPlayerData.control == (int)rFactor1Constant.rfControl.player && 

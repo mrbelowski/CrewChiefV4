@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CrewChiefV4.GameState;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,7 +10,7 @@ namespace CrewChiefV4.Events
     {
         void clearState();
 
-        void trigger(Object lastState, Object currentState);
+        void trigger(Object lastState, Object currentState, GameStateData currentGameState);
 
         void enableSpotter();
 
