@@ -414,14 +414,6 @@ namespace CrewChiefV4.RaceRoom
             if (shared.closestYellowLapDistance > 0)
             {
                 currentGameState.FlagData.distanceToNearestIncident = shared.closestYellowLapDistance;
-            } 
-            else if (shared.closestYellowLapDistance < 0) 
-            {
-                currentGameState.FlagData.distanceToNearestIncident = shared.LayoutLength + shared.closestYellowLapDistance;
-            }
-            else 
-            {
-                currentGameState.FlagData.distanceToNearestIncident = -1;
             }
 
             currentGameState.SessionData.SessionTimeRemaining = shared.SessionTimeRemaining;
