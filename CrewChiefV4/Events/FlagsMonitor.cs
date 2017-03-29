@@ -590,12 +590,12 @@ namespace CrewChiefV4.Events
             }
         }
 
-        void findInitialIncidentCandidateKeys(int flagSector, Dictionary<Object, OpponentData> opponents)
+        void findInitialIncidentCandidateKeys(int flagSector, Dictionary<String, OpponentData> opponents)
         {
             incidentCandidates.Clear();
-            foreach (KeyValuePair<Object, OpponentData> entry in opponents)
+            foreach (KeyValuePair<String, OpponentData> entry in opponents)
             {
-                Object opponentKey = entry.Key;
+                String opponentKey = entry.Key;
                 OpponentData opponentData = entry.Value;
                 if ((flagSector == -1 || opponentData.CurrentSectorNumber == flagSector) && !opponentData.InPits)
                 {
@@ -607,7 +607,7 @@ namespace CrewChiefV4.Events
         }
 
         // get incident candidates who are involved - they've lost lots of position or haven't really moved since the last check
-        List<NamePositionPair> getInvolvedIncidentCandidates(int flagSector, Dictionary<Object, OpponentData> opponents)
+        List<NamePositionPair> getInvolvedIncidentCandidates(int flagSector, Dictionary<String, OpponentData> opponents)
         {
             List<NamePositionPair> involvedDrivers = new List<NamePositionPair>();
             List<IncidentCandidate> remainingIncidentCandidates = new List<IncidentCandidate>();
@@ -639,7 +639,7 @@ namespace CrewChiefV4.Events
             return involvedDrivers;
         }
 
-        void reportYellowFlagDrivers(Dictionary<Object, OpponentData> opponents, TrackDefinition currentTrack)
+        void reportYellowFlagDrivers(Dictionary<String, OpponentData> opponents, TrackDefinition currentTrack)
         {
             if (driversInvolvedInCurrentIncident.Count == 0 || checkForAndReportPileup(currentTrack))
             {
@@ -777,9 +777,9 @@ namespace CrewChiefV4.Events
         public int position;
         public float distanceRoundTrack;
         public Boolean canReadName;
-        public Object opponentKey;
+        public String opponentKey;
 
-        public NamePositionPair(String name, int position, float distanceRoundTrack, Boolean canReadName, Object opponentKey)
+        public NamePositionPair(String name, int position, float distanceRoundTrack, Boolean canReadName, String opponentKey)
         {
             this.name = name;
             this.position = position;
@@ -842,13 +842,13 @@ namespace CrewChiefV4.Events
 
     class IncidentCandidate
     {
-        public Object opponentDataKey;
+        public String opponentDataKey;
         public float distanceRoundTrackAtStartOfIncident;
         public float distanceRoundTrackAtLastCheck;
         public Boolean lapValidAtStartOfIncident;
         public int positionAtStartOfIncident;
         public int positionAtLastCheck;
-        public IncidentCandidate(Object opponentDataKey, float distanceRoundTrackAtStartOfIncident, int positionAtStartOfIncident, Boolean lapValidAtStartOfIncident)
+        public IncidentCandidate(String opponentDataKey, float distanceRoundTrackAtStartOfIncident, int positionAtStartOfIncident, Boolean lapValidAtStartOfIncident)
         {
             this.opponentDataKey = opponentDataKey;
             this.distanceRoundTrackAtStartOfIncident = distanceRoundTrackAtStartOfIncident;
