@@ -88,10 +88,10 @@ namespace CrewChiefV4.RaceRoom
         // slot_id), can we remove this grotty delayed-position hack and all the associated crap it creates? Turns out that no, we can't. 
         // The data are broken and unreliable in multiple ways - the opponent data get jumbled up, and the data *within each opponent slot*
         // get jumbled up too. Can't criticise too strongly though, there's no shortage of shit code right here...
-        private Dictionary<String, PendingRacePositionChange> PendingRacePositionChanges = new Dictionary<String, PendingRacePositionChange>();
+        private Dictionary<string, PendingRacePositionChange> PendingRacePositionChanges = new Dictionary<string, PendingRacePositionChange>();
         private TimeSpan PositionChangeLag = TimeSpan.FromMilliseconds(1000);
 
-        Dictionary<String, DateTime> lastActiveTimeForOpponents = new Dictionary<string, DateTime>();
+        Dictionary<string, DateTime> lastActiveTimeForOpponents = new Dictionary<string, DateTime>();
         DateTime nextOpponentCleanupTime = DateTime.MinValue;
         TimeSpan opponentCleanupInterval = TimeSpan.FromSeconds(2);
 
@@ -809,8 +809,8 @@ namespace CrewChiefV4.RaceRoom
             {
                 nextOpponentCleanupTime = currentGameState.Now + opponentCleanupInterval;
                 DateTime oldestAllowedUpdate = currentGameState.Now - opponentCleanupInterval;
-                List<String> inactiveOpponents = new List<string>();
-                foreach (String opponentName in currentGameState.OpponentData.Keys)
+                List<string> inactiveOpponents = new List<string>();
+                foreach (string opponentName in currentGameState.OpponentData.Keys)
                 {
                     if (!lastActiveTimeForOpponents.ContainsKey(opponentName) || lastActiveTimeForOpponents[opponentName] < oldestAllowedUpdate)
                     {
