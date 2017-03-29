@@ -766,7 +766,8 @@ namespace CrewChiefV4.rFactor1
                     currentGameState.SessionData.OverallSessionBestLapTime = opponent.CurrentBestLapTime;
                 }
                 if (opponent.CurrentBestLapTime > 0 && (opponent.CurrentBestLapTime < currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass ||
-                    currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass < 0) && opponent.CarClass == currentGameState.carClass)
+                    currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass < 0) && 
+                    opponent.CarClass.getClassIdentifier() == currentGameState.carClass.getClassIdentifier())
                 {
                     currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass = opponent.CurrentBestLapTime;
                 }
