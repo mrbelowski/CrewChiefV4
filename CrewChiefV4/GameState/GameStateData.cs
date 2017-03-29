@@ -137,6 +137,8 @@ namespace CrewChiefV4.GameState
         public CornerData SuspensionDamageStatus = new CornerData();
 
         public CornerData BrakeDamageStatus = new CornerData();
+
+        public float LastImpactTime = -1.0f;
     }
 
     public class SessionData

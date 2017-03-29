@@ -399,6 +399,7 @@ namespace CrewChiefV4.rFactor1
             if (currentGameState.SessionData.SessionType != SessionType.HotLap)
             {
                 currentGameState.CarDamageData.DamageEnabled = true;
+                currentGameState.CarDamageData.LastImpactTime = shared.lastImpactET;
                 int bodyDamage = 0;
                 foreach (int dent in shared.dentSeverity)
                 {
