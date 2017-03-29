@@ -2083,7 +2083,7 @@ namespace CrewChiefV4.assetto
             }
             if (gameState.OpponentData == null)
             {
-                gameState.OpponentData = new Dictionary<Object, OpponentData>();
+                gameState.OpponentData = new Dictionary<String, OpponentData>();
             }
             if (gameState.OpponentData.ContainsKey(name))
             {
