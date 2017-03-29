@@ -386,14 +386,13 @@ namespace CrewChiefV4.Events
                     // we've passed the incident so allow warnings of other incidents approaching
                     hasWarnedOfUpcomingIncident = false;
                 }
-                else if (!isUnderLocalYellow && !hasWarnedOfUpcomingIncident &&
-                    previousGameState.FlagData.distanceToNearestIncident > minDistanceToWarnOfLocalYellow && currentGameState.FlagData.distanceToNearestIncident < maxDistanceToWarnOfLocalYellow)
+                else if (!isUnderLocalYellow && !hasWarnedOfUpcomingIncident && !shouldWarnOfUpComingYellow(previousGameState) && shouldWarnOfUpComingYellow(currentGameState))
                 {
                     hasWarnedOfUpcomingIncident = true;
                     audioPlayer.playMessageImmediately(new QueuedMessage(folderLocalYellowAhead, 0, null));
                 }
                 else if (currentGameState.FlagData.sectorFlags[0] == FlagEnum.GREEN && currentGameState.FlagData.sectorFlags[1] == FlagEnum.GREEN &&
-                        currentGameState.FlagData.sectorFlags[1] == FlagEnum.GREEN)
+                        currentGameState.FlagData.sectorFlags[2] == FlagEnum.GREEN)
                 {
                     // if all the sectors are clear the local and warning booleans. This ensures we don't sit waiting for a 'clear' that never comes.
                     isUnderLocalYellow = false;
@@ -401,6 +400,12 @@ namespace CrewChiefV4.Events
                 }
 
             }
+        }
+
+        private Boolean shouldWarnOfUpComingYellow(GameStateData gameState)
+        {
+            return gameState != null && gameState.FlagData.distanceToNearestIncident > minDistanceToWarnOfLocalYellow && 
+                    gameState.FlagData.distanceToNearestIncident < maxDistanceToWarnOfLocalYellow;
         }
 
         private bool isCurrentSector(GameStateData currentGameState, int sectorIndex)
