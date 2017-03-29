@@ -86,7 +86,8 @@ namespace CrewChiefV4.Events
 
         private Boolean reportYellowsInAllSectors = UserSettings.GetUserSettings().getBoolean("report_yellows_in_all_sectors");
 
-        private float distanceToWarnOfLocalYellow = 500;    // metres - externalise? Is this sufficient? Make it speed-dependent?
+        private float maxDistanceToWarnOfLocalYellow = 300;    // metres - externalise? Is this sufficient? Make it speed-dependent?
+        private float minDistanceToWarnOfLocalYellow = 50;    // metres - externalise? Is this sufficient? Make it speed-dependent?
 
         List<IncidentCandidate> incidentCandidates = new List<IncidentCandidate>();
 
@@ -158,7 +159,7 @@ namespace CrewChiefV4.Events
 
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
-            if (CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT || CrewChief.gameDefinition.gameEnum == GameEnum.RF1)
+            if (CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT || CrewChief.gameDefinition.gameEnum == GameEnum.RF1/* || CrewChief.gameDefinition.gameEnum == GameEnum.RACE_ROOM*/)
             {
                 newYellowFlagImplementation(previousGameState, currentGameState);
             }
@@ -386,7 +387,7 @@ namespace CrewChiefV4.Events
                     hasWarnedOfUpcomingIncident = false;
                 }
                 else if (!isUnderLocalYellow && !hasWarnedOfUpcomingIncident &&
-                  previousGameState.FlagData.distanceToNearestIncident > distanceToWarnOfLocalYellow && currentGameState.FlagData.distanceToNearestIncident < distanceToWarnOfLocalYellow)
+                    previousGameState.FlagData.distanceToNearestIncident > minDistanceToWarnOfLocalYellow && currentGameState.FlagData.distanceToNearestIncident < maxDistanceToWarnOfLocalYellow)
                 {
                     hasWarnedOfUpcomingIncident = true;
                     audioPlayer.playMessageImmediately(new QueuedMessage(folderLocalYellowAhead, 0, null));
