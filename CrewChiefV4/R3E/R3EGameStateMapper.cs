@@ -472,6 +472,10 @@ namespace CrewChiefV4.RaceRoom
                 currentGameState.OpponentData = previousGameState.OpponentData;
                 currentGameState.SessionData.SectorNumber = previousGameState.SessionData.SectorNumber;
             }
+            if (currentGameState.SessionData.Position == 1)
+            {
+                currentGameState.SessionData.LeaderSectorNumber = currentGameState.SessionData.SectorNumber;
+            }
 
             foreach (DriverData participantStruct in shared.DriverData)
             {
@@ -688,6 +692,10 @@ namespace CrewChiefV4.RaceRoom
                             if (currentOpponentRacePosition == 1 && (finishedAllottedRaceTime || finishedAllottedRaceLaps))
                             {
                                 currentGameState.SessionData.LeaderHasFinishedRace = true;
+                            }
+                            if (currentGameState.SessionData.Position == 1)
+                            {
+                                currentGameState.SessionData.LeaderSectorNumber = currentOpponentSector;
                             }
                             if (currentOpponentRacePosition == 1 && previousOpponentPosition > 1)
                             {

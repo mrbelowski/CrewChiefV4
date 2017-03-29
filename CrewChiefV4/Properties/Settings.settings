@@ -401,9 +401,6 @@
     <Setting Name="r3e_blue_flag_detection_distance" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">80</Value>
     </Setting>
-    <Setting Name="asc_spotter_car_length" Type="System.Single" Scope="User">
-      <Value Profile="(Default)">4.5</Value>
-    </Setting>
     <Setting Name="enable_acs_log_sectors_for_unknown_tracks" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
@@ -496,6 +493,9 @@
     </Setting>
     <Setting Name="rf1_install_path" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="acs_spotter_car_length" Type="System.Single" Scope="User">
+      <Value Profile="(Default)">4.5</Value>
     </Setting>
   </Settings>
 </SettingsFile>

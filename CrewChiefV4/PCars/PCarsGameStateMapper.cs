@@ -295,6 +295,10 @@ namespace CrewChiefV4.PCars
             currentGameState.SessionData.CompletedLaps = (int)viewedParticipant.mLapsCompleted;
             currentGameState.SessionData.SectorNumber = (int)viewedParticipant.mCurrentSector;
             currentGameState.SessionData.Position = (int)viewedParticipant.mRacePosition;
+            if (currentGameState.SessionData.Position == 1)
+            {
+                currentGameState.SessionData.LeaderSectorNumber = currentGameState.SessionData.SectorNumber;
+            }
             currentGameState.SessionData.UnFilteredPosition = (int)viewedParticipant.mRacePosition;
             currentGameState.SessionData.IsNewSector = previousGameState == null || viewedParticipant.mCurrentSector != previousGameState.SessionData.SectorNumber;
             // When in the pit lane, mCurrentLapDistance gets set to 0 when crossing the start line and *remains at 0* until some distance into the lap (about 300 metres)
@@ -743,6 +747,10 @@ namespace CrewChiefV4.PCars
                                             previousOpponentCompletedLaps < currentOpponentLapsCompleted))
                                     {
                                         currentGameState.SessionData.LeaderHasFinishedRace = true;
+                                    }
+                                    if (currentOpponentRacePosition == 1)
+                                    {
+                                        currentGameState.SessionData.LeaderSectorNumber = currentOpponentSector;
                                     }
                                     if (currentOpponentRacePosition == 1 && previousOpponentPosition > 1)
                                     {
