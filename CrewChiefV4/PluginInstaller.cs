@@ -245,7 +245,7 @@ namespace CrewChiefV4
                     dialog.ShowNewFolderButton = false;
                     dialog.Description = Configuration.getUIString("install_plugin_select_directory_start") + " " +
                         gameDefinition.gameInstallDirectory + " " + Configuration.getUIString("install_plugin_select_directory_end");
-                    dialog.SelectedPath = @"F:\SteamLibrary\steamapps\common\rFactor 21";
+
                     DialogResult result = dialog.ShowDialog();
 
                     if (result == DialogResult.OK && dialog.SelectedPath.Length > 0)
