@@ -497,5 +497,8 @@
     <Setting Name="rf1_install_path" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="acs_spotter_car_length" Type="System.Single" Scope="User">
+      <Value Profile="(Default)">4.5</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
