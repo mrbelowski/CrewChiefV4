@@ -112,7 +112,7 @@ namespace CrewChiefV4.assetto
             }
         }
 
-        private Dictionary<String, splitTimes> opponentsSplits = new Dictionary<String, splitTimes>();
+        private Dictionary<string, splitTimes> opponentsSplits = new Dictionary<string, splitTimes>();
 
         private static splitTimes playerSplits = new splitTimes();
 
@@ -2073,7 +2073,7 @@ namespace CrewChiefV4.assetto
             }
             if (gameState.OpponentData == null)
             {
-                gameState.OpponentData = new Dictionary<Object, OpponentData>();
+                gameState.OpponentData = new Dictionary<string, OpponentData>();
             }
             if (gameState.OpponentData.ContainsKey(name))
             {
