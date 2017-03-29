@@ -287,7 +287,7 @@ namespace CrewChiefV4
             new TrackDefinition("ks_vallelunga:classic_circuit", 3180.26f, 3, new float[] {1235f, 2197f}),
             new TrackDefinition("ks_vallelunga:club_circuit", 1720.172f, 2, new float[] {734f, 0f}),
             new TrackDefinition("ks_vallelunga:extended_circuit", 4030.934f, 3, new float[] {1749f, 3044f}),
-            new TrackDefinition("TrackName vir:full course", 5221.266f, 3, new float[] {1608f, 3777f}),
+            new TrackDefinition("vir:full course", 5221.266f, 3, new float[] {1608f, 3777f}),
             new TrackDefinition("vir:grand east course", 6383.806f, 3, new float[] {2152f, 4229f}),
             new TrackDefinition("vir:grand west course", 6564.385f, 3, new float[] {3061f, 4877f}),
             new TrackDefinition("vir:north course", 3614.832f, 3, new float[] {1599f, 2371f}),
