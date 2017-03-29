@@ -214,7 +214,7 @@ namespace CrewChiefV4.PCars
             }
             if (gameState.OpponentData == null)
             {
-                gameState.OpponentData = new Dictionary<String, OpponentData>();
+                gameState.OpponentData = new Dictionary<Object, OpponentData>();
             }
             if (gameState.OpponentData.ContainsKey(name))
             {
@@ -1365,7 +1365,7 @@ namespace CrewChiefV4.PCars
          * When we retire to the pit box, the raceState is set to RaceNotStarted
          */
         private SessionPhase mapToSessionPhase(SessionType sessionType, uint sessionState, uint raceState, int numParticipants, Boolean leaderHasFinishedRace, 
-            SessionPhase previousSessionPhase, float sessionTimeRemaining, float sessionRunTime, uint pitMode, Dictionary<String, OpponentData> opponentData, float playerSpeed)
+            SessionPhase previousSessionPhase, float sessionTimeRemaining, float sessionRunTime, uint pitMode, Dictionary<object, OpponentData> opponentData, float playerSpeed)
         {
             if (numParticipants < 1)
             {

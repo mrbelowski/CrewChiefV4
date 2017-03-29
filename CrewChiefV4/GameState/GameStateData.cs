@@ -1528,7 +1528,7 @@ namespace CrewChiefV4.GameState
 
         public PositionAndMotionData PositionAndMotionData = new PositionAndMotionData();
 
-        public Dictionary<String, OpponentData> OpponentData = new Dictionary<String, OpponentData>();
+        public Dictionary<Object, OpponentData> OpponentData = new Dictionary<Object, OpponentData>();
 
         public Conditions Conditions = new Conditions();
 
@@ -1551,7 +1551,7 @@ namespace CrewChiefV4.GameState
         public List<String> getRawDriverNames()
         {
             List<String> rawDriverNames = new List<String>();
-            foreach (KeyValuePair<String, OpponentData> entry in OpponentData)
+            foreach (KeyValuePair<Object, OpponentData> entry in OpponentData)
             {
                 if (!rawDriverNames.Contains(entry.Value.DriverRawName))
                 {
@@ -1564,7 +1564,7 @@ namespace CrewChiefV4.GameState
 
         public OpponentData getOpponentAtPosition(int position, Boolean useUnfilteredPosition)
         {
-            String opponentKey = getOpponentKeyAtPosition(position, useUnfilteredPosition);
+            Object opponentKey = getOpponentKeyAtPosition(position, useUnfilteredPosition);
             if (opponentKey != null && OpponentData.ContainsKey(opponentKey))
             {
                 return OpponentData[opponentKey];
@@ -1575,10 +1575,10 @@ namespace CrewChiefV4.GameState
             }
         }
 
-        public String getOpponentKeyInFrontOnTrack()
+        public Object getOpponentKeyInFrontOnTrack()
         {
-            String opponentKeyClosestInFront = null;
-            String opponentKeyFurthestBehind = null;
+            Object opponentKeyClosestInFront = null;
+            Object opponentKeyFurthestBehind = null;
             float closestDistanceFront = SessionData.TrackDefinition.trackLength;
             float furthestDistanceBehind = 0.0f;
             foreach (var opponent in OpponentData)
@@ -1605,10 +1605,10 @@ namespace CrewChiefV4.GameState
                 return opponentKeyFurthestBehind;
         }
 
-        public String getOpponentKeyBehindOnTrack()
+        public Object getOpponentKeyBehindOnTrack()
         {
-            String opponentKeyClosestBehind = null;
-            String opponentKeyFurthestInFront = null;
+            Object opponentKeyClosestBehind = null;
+            Object opponentKeyFurthestInFront = null;
             float closestDistanceBehind = SessionData.TrackDefinition.trackLength;
             float furthestDistanceInFront = 0.0f;
             foreach (var opponent in OpponentData)
@@ -1635,7 +1635,7 @@ namespace CrewChiefV4.GameState
                 return opponentKeyFurthestInFront;
         }
 
-        public String getOpponentKeyInFront(Boolean useUnfilteredPosition)
+        public Object getOpponentKeyInFront(Boolean useUnfilteredPosition)
         {
             if (SessionData.Position > 1)
             {
@@ -1647,7 +1647,7 @@ namespace CrewChiefV4.GameState
             }
         }
 
-        public String getOpponentKeyBehind(Boolean useUnfilteredPosition)
+        public Object getOpponentKeyBehind(Boolean useUnfilteredPosition)
         {
             if (SessionData.Position < SessionData.NumCars)
             {
@@ -1659,11 +1659,11 @@ namespace CrewChiefV4.GameState
             }
         }
 
-        public String getOpponentKeyAtPosition(int position, Boolean useUnfilteredPosition)
+        public Object getOpponentKeyAtPosition(int position, Boolean useUnfilteredPosition)
         {
             if (OpponentData.Count != 0)
             {
-                foreach (KeyValuePair<String, OpponentData> entry in OpponentData)
+                foreach (KeyValuePair<Object, OpponentData> entry in OpponentData)
                 {
                     if (useUnfilteredPosition)
                     {
@@ -1695,7 +1695,7 @@ namespace CrewChiefV4.GameState
         public void displayOpponentData()
         {
             Console.WriteLine("got " + OpponentData.Count + " opponents");
-            foreach (KeyValuePair<String, OpponentData> opponent in OpponentData)
+            foreach (KeyValuePair<Object, OpponentData> opponent in OpponentData)
             {
                 Console.WriteLine("last laptime " + opponent.Value.getLastLapTime() + " completed laps " + opponent.Value.CompletedLaps +
                     " ID " + opponent.Key + " name " + opponent.Value.DriverRawName + " active " + opponent.Value.IsActive +
@@ -1706,7 +1706,7 @@ namespace CrewChiefV4.GameState
         public float[] getTimeAndSectorsForBestOpponentLapInWindow(int lapsToCheck, String carClassToCheck)
         {
             float[] bestLapWithSectors = new float[] { -1, -1, -1, -1 };
-            foreach (KeyValuePair<String, OpponentData> entry in OpponentData)
+            foreach (KeyValuePair<Object, OpponentData> entry in OpponentData)
             {
                 if (entry.Value.CarClass.getClassIdentifier() == carClassToCheck)
                 {
