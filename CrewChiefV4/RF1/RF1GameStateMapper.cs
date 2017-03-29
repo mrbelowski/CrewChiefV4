@@ -615,7 +615,7 @@ namespace CrewChiefV4.rFactor1
                 String driverName = getNameFromBytes(vehicle.driverName).ToLower();
                 OpponentData opponentPrevious;
                 int duplicatesCount = driverNameCounts[driverName];
-                String opponentKey;
+                string opponentKey;
                 if (duplicatesCount > 1)
                 {
                     if (!isOfflineSession)
