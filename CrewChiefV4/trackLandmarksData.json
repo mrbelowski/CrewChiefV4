@@ -1611,6 +1611,7 @@
         {
             "rf1TrackNames": [ "Mid-Ohio With Chicane" ],
             "rf2TrackNames": [ "Mid-Ohio With Chicane" ],
+            "raceroomLayoutId": 1676,
             "trackLandmarks": [
                 {
                     "landmarkName": "turn1",
@@ -1677,6 +1678,7 @@
         {
             "rf1TrackNames": [ "Mid-Ohio No Chicane", "Mid-Ohio Miller 200" ],
             "rf2TrackNames": [ "Mid-Ohio No Chicane", "Mid-Ohio Miller 200" ],
+            "raceroomLayoutId": 1674,
             "trackLandmarks": [
                 {
                     "landmarkName": "turn1",
