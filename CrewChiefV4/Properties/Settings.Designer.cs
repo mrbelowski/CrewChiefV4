@@ -1621,18 +1621,6 @@ namespace CrewChiefV4.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("4.5")]
-        public float asc_spotter_car_length {
-            get {
-                return ((float)(this["asc_spotter_car_length"]));
-            }
-            set {
-                this["asc_spotter_car_length"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool enable_acs_log_sectors_for_unknown_tracks {
             get {
