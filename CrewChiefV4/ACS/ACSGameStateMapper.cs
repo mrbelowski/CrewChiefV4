@@ -31,6 +31,7 @@ namespace CrewChiefV4.assetto
                 tyreWearMinimumValue = tyreWearMinimum;
             }
         }
+        List<CornerData.EnumWithThresholds> tyreTempThresholds = new List<CornerData.EnumWithThresholds>();
         private static Dictionary<string, AcTyres> acTyres = new Dictionary<string, AcTyres>();
 
         private Boolean logUnknownTrackSectors = UserSettings.GetUserSettings().getBoolean("enable_acs_log_sectors_for_unknown_tracks");
@@ -1076,6 +1077,8 @@ namespace CrewChiefV4.assetto
                 {
                     Console.WriteLine("Player is using Tyre Type " + shared.acsGraphic.tyreCompound);
                 }
+                currentGameState.TyreData.TyreTypeName = shared.acsGraphic.tyreCompound;
+                tyreTempThresholds = getTyreTempThresholds(currentGameState.carClass, currentGameState.TyreData.TyreTypeName);
                 brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(currentGameState.carClass);
                 // no tyre data in the block so get the default tyre types for this car
                 defaultTyreTypeForPlayersCar = CarData.getDefaultTyreType(currentGameState.carClass);
@@ -1151,6 +1154,9 @@ namespace CrewChiefV4.assetto
                         brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(currentGameState.carClass);
                         // no tyre data in the block so get the default tyre types for this car
                         defaultTyreTypeForPlayersCar = CarData.getDefaultTyreType(currentGameState.carClass);
+                        
+                        currentGameState.TyreData.TyreTypeName = shared.acsGraphic.tyreCompound;
+                        tyreTempThresholds = getTyreTempThresholds(currentGameState.carClass, currentGameState.TyreData.TyreTypeName);
 
                         currentGameState.PitData.PitWindowStart = shared.acsStatic.PitWindowStart-1;
                         currentGameState.PitData.PitWindowEnd = shared.acsStatic.PitWindowEnd-1;
@@ -1229,6 +1235,7 @@ namespace CrewChiefV4.assetto
                     currentGameState.SessionData.PlayerBestLapSector3Time = previousGameState.SessionData.PlayerBestLapSector3Time;
                     currentGameState.Conditions = previousGameState.Conditions;
                     currentGameState.SessionData.trackLandmarksTiming = previousGameState.SessionData.trackLandmarksTiming;
+                    currentGameState.TyreData.TyreTypeName = previousGameState.TyreData.TyreTypeName;
                 }
                 //------------------- Variable session data ---------------------------
 
@@ -1781,8 +1788,12 @@ namespace CrewChiefV4.assetto
             currentGameState.TyreData.RearLeftPressure = playerVehicle.tyreInflation[2] == 1.0f ? shared.acsPhysics.wheelsPressure[2] * 6.894f : 0.0f;
             currentGameState.TyreData.RearRightPressure = playerVehicle.tyreInflation[3] == 1.0f ? shared.acsPhysics.wheelsPressure[3] * 6.894f : 0.0f;
 
-
-
+            String currentTyreCompound = shared.acsGraphic.tyreCompound;
+            if (previousGameState != null && !previousGameState.TyreData.TyreTypeName.Equals(currentTyreCompound))
+            {
+                tyreTempThresholds = getTyreTempThresholds(currentGameState.carClass, currentTyreCompound);
+                currentGameState.TyreData.TyreTypeName = currentTyreCompound;
+            }
             //Front Left
             currentGameState.TyreData.FrontLeft_CenterTemp = shared.acsPhysics.tyreTempM[0];
             currentGameState.TyreData.FrontLeft_LeftTemp = shared.acsPhysics.tyreTempO[0];
@@ -1836,9 +1847,6 @@ namespace CrewChiefV4.assetto
                 currentGameState.TyreData.PeakRearRightTemperatureForLap = currentGameState.TyreData.RearRight_CenterTemp;
             }
 
-            String currentTyreCompound = shared.acsGraphic.tyreCompound;
-
-            List<CornerData.EnumWithThresholds> tyreTempThresholds = getTyreTempThresholds(currentGameState.carClass, currentTyreCompound);
             currentGameState.TyreData.TyreTempStatus = CornerData.getCornerData(tyreTempThresholds, currentGameState.TyreData.PeakFrontLeftTemperatureForLap,
                     currentGameState.TyreData.PeakFrontRightTemperatureForLap, currentGameState.TyreData.PeakRearLeftTemperatureForLap,
                     currentGameState.TyreData.PeakRearRightTemperatureForLap);
@@ -1903,36 +1911,18 @@ namespace CrewChiefV4.assetto
 
         private List<CornerData.EnumWithThresholds> getTyreTempThresholds(CarData.CarClass carClass, string currentTyreCompound)
         {
-
-            List<CornerData.EnumWithThresholds> tyreTempThresholdsBuiltIn = new List<CornerData.EnumWithThresholds>();
-            if (acTyres.ContainsKey(currentTyreCompound))
-            {
-                tyreTempThresholdsBuiltIn = acTyres[currentTyreCompound].tyreTempThresholdsForAC;
-            }
-
             List<CornerData.EnumWithThresholds> tyreTempThresholds = new List<CornerData.EnumWithThresholds>();
-            foreach (CornerData.EnumWithThresholds threshold in tyreTempThresholdsBuiltIn)
+            if(carClass.acTyreTypeData.ContainsKey(currentTyreCompound))
             {
-                tyreTempThresholds.Add(new CornerData.EnumWithThresholds(threshold.e, threshold.lowerThreshold, threshold.upperThreshold));
+                CarData.TyreTypeData tyreTypeData = carClass.acTyreTypeData[currentTyreCompound];
+                tyreTempThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.COLD, -10000f, tyreTypeData.maxColdTyreTemp));
+                tyreTempThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.WARM, tyreTypeData.maxColdTyreTemp, tyreTypeData.maxWarmTyreTemp));
+                tyreTempThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.HOT, tyreTypeData.maxWarmTyreTemp, tyreTypeData.maxHotTyreTemp));
+                tyreTempThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.COOKING, tyreTypeData.maxHotTyreTemp, 10000f));
             }
-            // Apply overrides from .json, if user provided them.
-            if (tyreTempThresholds.Count == 4) // COLD, WARM, HOT, COOKING thresholds
+            else if (acTyres.ContainsKey(currentTyreCompound))
             {
-                if (carClass.maxColdTyreTemp > 0)
-                {
-                    tyreTempThresholds[0].upperThreshold = carClass.maxColdTyreTemp;
-                    tyreTempThresholds[1].lowerThreshold = carClass.maxColdTyreTemp;
-                }
-                if (carClass.maxWarmTyreTemp > 0)
-                {
-                    tyreTempThresholds[1].upperThreshold = carClass.maxWarmTyreTemp;
-                    tyreTempThresholds[2].lowerThreshold = carClass.maxWarmTyreTemp;
-                }
-                if (carClass.maxHotTyreTemp > 0)
-                {
-                    tyreTempThresholds[2].upperThreshold = carClass.maxHotTyreTemp;
-                    tyreTempThresholds[3].lowerThreshold = carClass.maxHotTyreTemp;
-                }
+                tyreTempThresholds = acTyres[currentTyreCompound].tyreTempThresholdsForAC;
             }
             else
             {

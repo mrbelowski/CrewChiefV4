@@ -1377,6 +1377,7 @@ namespace CrewChiefV4.GameState
         public TyreType FrontRightTyreType = TyreType.Unknown_Race;
         public TyreType RearLeftTyreType = TyreType.Unknown_Race;
         public TyreType RearRightTyreType = TyreType.Unknown_Race;
+        public String TyreTypeName = "";
 
         public Single FrontLeft_LeftTemp = 0;
         public Single FrontLeft_CenterTemp = 0;
