@@ -163,7 +163,7 @@ namespace CrewChiefV4.Events
 
         private void checkForNewOvertakes(GameStateData previousGameState, GameStateData currentGameState)
         {
-            if ((currentGameState.SessionData.SessionPhase == SessionPhase.Green || currentGameState.SessionData.SessionPhase == SessionPhase.FullCourseYellow) &&
+            if (currentGameState.SessionData.SessionPhase == SessionPhase.Green &&
                 currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.CompletedLaps > 0)
             {                
                 if (currentGameState.Now > lastPassCheck.Add(passCheckInterval))
@@ -187,7 +187,7 @@ namespace CrewChiefV4.Events
                         {
                             OpponentData carWeJustPassed = currentGameState.OpponentData[currentOpponentBehindKey];
                             if (carWeJustPassed.CompletedLaps == currentGameState.SessionData.CompletedLaps && 
-                                carWeJustPassed.CarClass == currentGameState.carClass)
+                                carWeJustPassed.CarClass.getClassIdentifier() == currentGameState.carClass.getClassIdentifier())
                             {
                                 timeWhenWeMadeAPass = currentGameState.Now;
                                 opponentKeyForCarWeJustPassed = currentOpponentBehindKey;
@@ -202,7 +202,7 @@ namespace CrewChiefV4.Events
                             // TODO: check if we need to do a pit check here - don't think so
                             OpponentData carThatJustPassedUs = currentGameState.OpponentData[currentOpponentAheadKey];
                             if (carThatJustPassedUs.CompletedLaps == currentGameState.SessionData.CompletedLaps &&
-                                carThatJustPassedUs.CarClass == currentGameState.carClass)
+                                carThatJustPassedUs.CarClass.getClassIdentifier() == currentGameState.carClass.getClassIdentifier())
                             {
                                 timeWhenWeWerePassed = currentGameState.Now;
                                 opponentKeyForCarThatJustPassedUs = currentOpponentAheadKey;
