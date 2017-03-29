@@ -341,23 +341,26 @@
 		<col def="S0">ISDotNetInstallerArgsCommit</col>
 		<col def="S0">ISDotNetInstallerArgsUninstall</col>
 		<col def="S0">ISDotNetInstallerArgsRollback</col>
-		<row><td>ACInternalMemoryReader.dll</td><td>{A820CC43-844B-416C-B818-D1071CFE766F}</td><td>STDLIB64</td><td>2</td><td/><td>acinternalmemoryreader.dll</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>ACInternalMemoryReader.dll</td><td>{1AA1F849-CE38-40CA-B78F-6FC20F96ADC4}</td><td>STDLIB64</td><td>2</td><td/><td>acinternalmemoryreader.dll</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>CrewChiefV4.Primary_output</td><td>{E3B09293-F596-47FA-A2B7-A1877CE005A6}</td><td>INSTALLDIR</td><td>2</td><td/><td>CrewChiefV4.primary_output</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>ISX_DEFAULTCOMPONENT</td><td>{12984750-B4AB-4871-999A-6845E4545202}</td><td>INSTALLDIR</td><td>2</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>ISX_DEFAULTCOMPONENT1</td><td>{0D73F1C4-6E43-4552-AF16-B9F6E87A3B9A}</td><td>PLUGINS</td><td>2</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>ISX_DEFAULTCOMPONENT10</td><td>{11959ECE-9863-41B9-A843-C14D60433FF7}</td><td>PLUGINS1</td><td>2</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>ISX_DEFAULTCOMPONENT11</td><td>{2E296C2B-3B07-45B6-A0FF-EAB95C7F2839}</td><td>RFACTOR1</td><td>2</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>ISX_DEFAULTCOMPONENT12</td><td>{D6FB3F7C-E863-4C64-A6D9-512212F85F9A}</td><td>PLUGINS2</td><td>2</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>ISX_DEFAULTCOMPONENT2</td><td>{F8D4EF85-0A10-4266-96CC-0EA74CE27A6B}</td><td>ASSETTOCORSA</td><td>2</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>ISX_DEFAULTCOMPONENT3</td><td>{8950513E-ED02-4807-8640-44B3A081446F}</td><td>APPS</td><td>2</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>ISX_DEFAULTCOMPONENT4</td><td>{98633DC0-69B2-4FB0-A069-FC544D0A37BA}</td><td>PYTHON</td><td>2</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>ISX_DEFAULTCOMPONENT5</td><td>{A3770075-FB6A-4669-B6EA-FC28997C2776}</td><td>CREWCHIEFEX</td><td>2</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>ISX_DEFAULTCOMPONENT6</td><td>{BB68D33D-B5EC-43A6-B485-DC89E477F48D}</td><td>STDLIB</td><td>2</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>ISX_DEFAULTCOMPONENT7</td><td>{87B97DF0-E93B-4281-A4C6-2784050AD79B}</td><td>STDLIB64</td><td>2</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>ISX_DEFAULTCOMPONENT8</td><td>{F5D48630-9C9A-4A03-A526-4002CE58ECE1}</td><td>RFACTOR_2</td><td>2</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>ISX_DEFAULTCOMPONENT9</td><td>{0DC22940-BF1D-49D4-979F-E3FB0FCCFE2C}</td><td>BIN64</td><td>2</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>rFactor2SharedMemoryMapPlugin64.dll1</td><td>{EC737747-13BA-485B-B20C-295F2A53AC79}</td><td>PLUGINS1</td><td>2</td><td/><td>rfactor2sharedmemorymapplugi1</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>rFactorSharedMemoryMap.dll</td><td>{40C31161-0859-4A83-A7CF-54B550863CD4}</td><td>PLUGINS2</td><td>2</td><td/><td>rfactorsharedmemorymap.dll</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>ISX_DEFAULTCOMPONENT1</td><td>{1FE0B6F4-5BC1-44E0-BE11-303BEE7E5E5E}</td><td>PLUGINS</td><td>2</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>ISX_DEFAULTCOMPONENT10</td><td>{D390992F-D7DD-471C-A683-18967EFEEA0F}</td><td>RFACTOR</td><td>2</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>ISX_DEFAULTCOMPONENT11</td><td>{2BC46E52-BEFC-402E-810E-4F4DA2CC350C}</td><td>PLUGINS2</td><td>2</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>ISX_DEFAULTCOMPONENT12</td><td>{F19DE0E4-E06C-4E82-82C7-DD014BC7953B}</td><td>RFACTOR_2</td><td>2</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>ISX_DEFAULTCOMPONENT13</td><td>{701B2269-BFB2-4589-B167-81C142C96B19}</td><td>BIN64</td><td>2</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>ISX_DEFAULTCOMPONENT14</td><td>{8D4FBC07-5FF8-493A-91CB-960932AF2A2F}</td><td>PLUGINS3</td><td>2</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>ISX_DEFAULTCOMPONENT2</td><td>{2177AE80-9C23-40CC-BC37-B244B5B30150}</td><td>ASSETTOCORSA</td><td>2</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>ISX_DEFAULTCOMPONENT3</td><td>{B9408B37-80BB-4B26-A496-61C4D2C1B058}</td><td>APPS</td><td>2</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>ISX_DEFAULTCOMPONENT4</td><td>{5ABE05A9-7A49-4A15-8DAC-B7DF0997EFCE}</td><td>PYTHON</td><td>2</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>ISX_DEFAULTCOMPONENT5</td><td>{32D1BB4C-8B81-4DE3-B2C4-905DA4CD8330}</td><td>CREWCHIEFEX</td><td>2</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>ISX_DEFAULTCOMPONENT6</td><td>{526B8079-53A3-4234-A035-F59FDB3FEB34}</td><td>STDLIB</td><td>2</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>ISX_DEFAULTCOMPONENT7</td><td>{C580325E-8AB4-4E56-994B-1D1DB842985C}</td><td>STDLIB64</td><td>2</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>ISX_DEFAULTCOMPONENT8</td><td>{204537E6-D949-4BA8-BCD4-79BEA8690134}</td><td>AUTOMOBILISTA</td><td>2</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>ISX_DEFAULTCOMPONENT9</td><td>{CABEB1A9-4BC7-4C29-BE5C-5283372C4E74}</td><td>PLUGINS1</td><td>2</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>rFactor2SharedMemoryMapPlugin64.dll</td><td>{10E50F8A-62AC-4FD4-ADB7-70F709EEFC28}</td><td>PLUGINS3</td><td>2</td><td/><td>rfactor2sharedmemorymapplugi</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>rFactorSharedMemoryMap.dll</td><td>{E463AEC6-C29F-4564-A5FE-456E31C7F4AA}</td><td>PLUGINS1</td><td>2</td><td/><td>rfactorsharedmemorymap.dll</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>rFactorSharedMemoryMap.dll1</td><td>{C837C548-0B38-4398-9040-4E5EF22EF15A}</td><td>PLUGINS2</td><td>2</td><td/><td>rfactorsharedmemorymap.dll1</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 	</table>
 
 	<table name="Condition">
@@ -1069,13 +1072,15 @@
 		<col key="yes" def="s72">Component_</col>
 		<row><td>APPS</td><td>ISX_DEFAULTCOMPONENT3</td></row>
 		<row><td>ASSETTOCORSA</td><td>ISX_DEFAULTCOMPONENT2</td></row>
-		<row><td>BIN64</td><td>ISX_DEFAULTCOMPONENT9</td></row>
+		<row><td>AUTOMOBILISTA</td><td>ISX_DEFAULTCOMPONENT8</td></row>
+		<row><td>BIN64</td><td>ISX_DEFAULTCOMPONENT13</td></row>
 		<row><td>PLUGINS</td><td>ISX_DEFAULTCOMPONENT1</td></row>
-		<row><td>PLUGINS1</td><td>ISX_DEFAULTCOMPONENT10</td></row>
-		<row><td>PLUGINS2</td><td>ISX_DEFAULTCOMPONENT12</td></row>
+		<row><td>PLUGINS1</td><td>ISX_DEFAULTCOMPONENT9</td></row>
+		<row><td>PLUGINS2</td><td>ISX_DEFAULTCOMPONENT11</td></row>
+		<row><td>PLUGINS3</td><td>ISX_DEFAULTCOMPONENT14</td></row>
 		<row><td>PYTHON</td><td>ISX_DEFAULTCOMPONENT4</td></row>
-		<row><td>RFACTOR1</td><td>ISX_DEFAULTCOMPONENT11</td></row>
-		<row><td>RFACTOR_2</td><td>ISX_DEFAULTCOMPONENT8</td></row>
+		<row><td>RFACTOR</td><td>ISX_DEFAULTCOMPONENT10</td></row>
+		<row><td>RFACTOR_2</td><td>ISX_DEFAULTCOMPONENT12</td></row>
 	</table>
 
 	<table name="CustomAction">
@@ -1159,6 +1164,7 @@
 		<row><td>ALLUSERSPROFILE</td><td>TARGETDIR</td><td>.:ALLUSE~1|All Users</td><td/><td>0</td><td/></row>
 		<row><td>APPS</td><td>ASSETTOCORSA</td><td>apps</td><td/><td>0</td><td/></row>
 		<row><td>ASSETTOCORSA</td><td>PLUGINS</td><td>ASSETT~1|assettocorsa</td><td/><td>0</td><td/></row>
+		<row><td>AUTOMOBILISTA</td><td>PLUGINS</td><td>AUTOMO~1|Automobilista</td><td/><td>0</td><td/></row>
 		<row><td>AdminToolsFolder</td><td>TARGETDIR</td><td>.:Admint~1|AdminTools</td><td/><td>0</td><td/></row>
 		<row><td>AppDataFolder</td><td>TARGETDIR</td><td>.:APPLIC~1|Application Data</td><td/><td>0</td><td/></row>
 		<row><td>BIN64</td><td>RFACTOR_2</td><td>Bin64</td><td/><td>0</td><td/></row>
@@ -1187,8 +1193,9 @@
 		<row><td>MyPicturesFolder</td><td>TARGETDIR</td><td>.:MyPict~1|MyPictures</td><td/><td>0</td><td/></row>
 		<row><td>NetHoodFolder</td><td>TARGETDIR</td><td>.:NetHood</td><td/><td>0</td><td/></row>
 		<row><td>PLUGINS</td><td>INSTALLDIR</td><td>plugins</td><td/><td>0</td><td/></row>
-		<row><td>PLUGINS1</td><td>BIN64</td><td>Plugins</td><td/><td>0</td><td/></row>
-		<row><td>PLUGINS2</td><td>RFACTOR1</td><td>Plugins</td><td/><td>0</td><td/></row>
+		<row><td>PLUGINS1</td><td>AUTOMOBILISTA</td><td>Plugins</td><td/><td>0</td><td/></row>
+		<row><td>PLUGINS2</td><td>RFACTOR</td><td>Plugins</td><td/><td>0</td><td/></row>
+		<row><td>PLUGINS3</td><td>BIN64</td><td>Plugins</td><td/><td>0</td><td/></row>
 		<row><td>PYTHON</td><td>APPS</td><td>python</td><td/><td>0</td><td/></row>
 		<row><td>PersonalFolder</td><td>TARGETDIR</td><td>.:Personal</td><td/><td>0</td><td/></row>
 		<row><td>PrimaryVolumePath</td><td>TARGETDIR</td><td>.:Primar~1|PrimaryVolumePath</td><td/><td>0</td><td/></row>
@@ -1196,7 +1203,7 @@
 		<row><td>ProgramFiles64Folder</td><td>TARGETDIR</td><td>.:Prog64~1|Program Files 64</td><td/><td>0</td><td/></row>
 		<row><td>ProgramFilesFolder</td><td>TARGETDIR</td><td>.:PROGRA~1|program files</td><td/><td>0</td><td/></row>
 		<row><td>ProgramMenuFolder</td><td>TARGETDIR</td><td>.:Programs</td><td/><td>3</td><td/></row>
-		<row><td>RFACTOR1</td><td>PLUGINS</td><td>rfactor1</td><td/><td>0</td><td/></row>
+		<row><td>RFACTOR</td><td>PLUGINS</td><td>rFactor</td><td/><td>0</td><td/></row>
 		<row><td>RFACTOR_2</td><td>PLUGINS</td><td>RFACTO~1|rFactor 2</td><td/><td>0</td><td/></row>
 		<row><td>RecentFolder</td><td>TARGETDIR</td><td>.:Recent</td><td/><td>0</td><td/></row>
 		<row><td>STDLIB</td><td>CREWCHIEFEX</td><td>stdlib</td><td/><td>0</td><td/></row>
@@ -1911,6 +1918,8 @@
 		<row><td>AlwaysInstall</td><td>ISX_DEFAULTCOMPONENT10</td></row>
 		<row><td>AlwaysInstall</td><td>ISX_DEFAULTCOMPONENT11</td></row>
 		<row><td>AlwaysInstall</td><td>ISX_DEFAULTCOMPONENT12</td></row>
+		<row><td>AlwaysInstall</td><td>ISX_DEFAULTCOMPONENT13</td></row>
+		<row><td>AlwaysInstall</td><td>ISX_DEFAULTCOMPONENT14</td></row>
 		<row><td>AlwaysInstall</td><td>ISX_DEFAULTCOMPONENT2</td></row>
 		<row><td>AlwaysInstall</td><td>ISX_DEFAULTCOMPONENT3</td></row>
 		<row><td>AlwaysInstall</td><td>ISX_DEFAULTCOMPONENT4</td></row>
@@ -1919,8 +1928,9 @@
 		<row><td>AlwaysInstall</td><td>ISX_DEFAULTCOMPONENT7</td></row>
 		<row><td>AlwaysInstall</td><td>ISX_DEFAULTCOMPONENT8</td></row>
 		<row><td>AlwaysInstall</td><td>ISX_DEFAULTCOMPONENT9</td></row>
-		<row><td>AlwaysInstall</td><td>rFactor2SharedMemoryMapPlugin64.dll1</td></row>
+		<row><td>AlwaysInstall</td><td>rFactor2SharedMemoryMapPlugin64.dll</td></row>
 		<row><td>AlwaysInstall</td><td>rFactorSharedMemoryMap.dll</td></row>
+		<row><td>AlwaysInstall</td><td>rFactorSharedMemoryMap.dll1</td></row>
 	</table>
 
 	<table name="File">
@@ -1945,8 +1955,9 @@
 		<row><td>help.txt</td><td>ISX_DEFAULTCOMPONENT</td><td>help.txt</td><td>0</td><td/><td/><td/><td>1</td><td>C:\projects\crewchief_c_sharp\CrewChiefV4\help.txt</td><td>1</td><td/></row>
 		<row><td>newtonsoft_json_licence.txt</td><td>ISX_DEFAULTCOMPONENT</td><td>NEWTON~1.TXT|Newtonsoft_Json_licence.txt</td><td>0</td><td/><td/><td/><td>1</td><td>C:\projects\crewchief_c_sharp\CrewChiefV4\Newtonsoft_Json_licence.txt</td><td>1</td><td/></row>
 		<row><td>readme.txt</td><td>ISX_DEFAULTCOMPONENT</td><td>README.txt</td><td>0</td><td/><td/><td/><td>1</td><td>C:\projects\crewchief_c_sharp\CrewChiefV4\README.txt</td><td>1</td><td/></row>
-		<row><td>rfactor2sharedmemorymapplugi1</td><td>rFactor2SharedMemoryMapPlugin64.dll1</td><td>RFACTO~1.DLL|rFactor2SharedMemoryMapPlugin64.dll</td><td>0</td><td/><td/><td/><td>1</td><td>C:\projects\crewchief_c_sharp\CrewChiefV4\CrewChiefV4\plugins\rFactor 2\Bin64\Plugins\rFactor2SharedMemoryMapPlugin64.dll</td><td>1</td><td/></row>
-		<row><td>rfactorsharedmemorymap.dll</td><td>rFactorSharedMemoryMap.dll</td><td>RFACTO~1.DLL|rFactorSharedMemoryMap.dll</td><td>0</td><td/><td/><td/><td>1</td><td>C:\projects\crewchief_c_sharp\CrewChiefV4\CrewChiefV4\plugins\rfactor1\Plugins\rFactorSharedMemoryMap.dll</td><td>1</td><td/></row>
+		<row><td>rfactor2sharedmemorymapplugi</td><td>rFactor2SharedMemoryMapPlugin64.dll</td><td>RFACTO~1.DLL|rFactor2SharedMemoryMapPlugin64.dll</td><td>0</td><td/><td/><td/><td>1</td><td>C:\projects\crewchief_c_sharp\CrewChiefV4\CrewChiefV4\plugins\rFactor 2\Bin64\Plugins\rFactor2SharedMemoryMapPlugin64.dll</td><td>1</td><td/></row>
+		<row><td>rfactorsharedmemorymap.dll</td><td>rFactorSharedMemoryMap.dll</td><td>RFACTO~1.DLL|rFactorSharedMemoryMap.dll</td><td>0</td><td/><td/><td/><td>1</td><td>C:\projects\crewchief_c_sharp\CrewChiefV4\CrewChiefV4\plugins\Automobilista\Plugins\rFactorSharedMemoryMap.dll</td><td>1</td><td/></row>
+		<row><td>rfactorsharedmemorymap.dll1</td><td>rFactorSharedMemoryMap.dll1</td><td>RFACTO~1.DLL|rFactorSharedMemoryMap.dll</td><td>0</td><td/><td/><td/><td>1</td><td>C:\projects\crewchief_c_sharp\CrewChiefV4\CrewChiefV4\plugins\rFactor\Plugins\rFactorSharedMemoryMap.dll</td><td>1</td><td/></row>
 		<row><td>shared_mem.py</td><td>ISX_DEFAULTCOMPONENT5</td><td>SHARED~1.PY|shared_mem.py</td><td>0</td><td/><td/><td/><td>1</td><td>C:\projects\crewchief_c_sharp\CrewChiefV4\CrewChiefV4\plugins\assettocorsa\apps\python\CrewChiefEx\shared_mem.py</td><td>1</td><td/></row>
 		<row><td>sharpdx_licence.txt</td><td>ISX_DEFAULTCOMPONENT</td><td>SHARPD~1.TXT|SharpDX_licence.txt</td><td>0</td><td/><td/><td/><td>1</td><td>C:\projects\crewchief_c_sharp\CrewChiefV4\SharpDX_licence.txt</td><td>1</td><td/></row>
 		<row><td>sounds_config.txt</td><td>ISX_DEFAULTCOMPONENT</td><td>SOUNDS~1.TXT|sounds_config.txt</td><td>0</td><td/><td/><td/><td>1</td><td>C:\projects\crewchief_c_sharp\CrewChiefV4\CrewChiefV4\sounds_config.txt</td><td>1</td><td/></row>
@@ -2096,23 +2107,26 @@
 		<col def="S0">FTPLocation</col>
 		<col def="S0">HTTPLocation</col>
 		<col def="S0">Miscellaneous</col>
-		<row><td>ACInternalMemoryReader.dll</td><td/><td/><td>_742659B1_6506_4D96_89E6_E562A752B775_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>ACInternalMemoryReader.dll</td><td/><td/><td>_58ABD0CA_5103_46FF_92B4_A497758F2790_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>CrewChiefV4.Primary_output</td><td/><td/><td>_1BE3BD1C_4227_4FE6_BB02_03E27B339B9B_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>ISX_DEFAULTCOMPONENT</td><td/><td/><td>_39277B58_FECF_4923_974B_A82625C8FD8E_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>ISX_DEFAULTCOMPONENT1</td><td/><td/><td>_EA7851B9_EA9C_4E00_AE11_50820CA7BFCC_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>ISX_DEFAULTCOMPONENT10</td><td/><td/><td>_C6FAFC8E_E211_4A03_B11A_222ADE9D8E22_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>ISX_DEFAULTCOMPONENT11</td><td/><td/><td>_0E546E7D_9172_416B_B5E7_65E904250F6F_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>ISX_DEFAULTCOMPONENT12</td><td/><td/><td>_C6FF1105_8197_4769_A6F8_45AF60430F98_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>ISX_DEFAULTCOMPONENT2</td><td/><td/><td>_918701ED_E544_46AE_A3F2_4602733C05D8_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>ISX_DEFAULTCOMPONENT3</td><td/><td/><td>_7BC19523_DB88_4B0B_AAD9_3B53CF6AE187_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>ISX_DEFAULTCOMPONENT4</td><td/><td/><td>_BD6CC4A2_8A6D_477C_BF6E_DBF14EFBFDF5_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>ISX_DEFAULTCOMPONENT5</td><td/><td/><td>_EF48D54C_3FAB_4F73_A1F1_74E548B0D830_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>ISX_DEFAULTCOMPONENT6</td><td/><td/><td>_407135F2_4570_4EBC_9211_9D41C0A19717_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>ISX_DEFAULTCOMPONENT7</td><td/><td/><td>_586E8957_68FC_4EDD_A2F7_1903FB1962D1_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>ISX_DEFAULTCOMPONENT8</td><td/><td/><td>_7B3FD0A7_E35A_4299_9387_5729B1733279_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>ISX_DEFAULTCOMPONENT9</td><td/><td/><td>_76020C53_1843_4FA8_AB66_31AD3B0B6055_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>rFactor2SharedMemoryMapPlugin64.dll1</td><td/><td/><td>_33ED28D3_8734_4EE6_B45F_02307CA7C8CD_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>rFactorSharedMemoryMap.dll</td><td/><td/><td>_5D9655C2_0025_4C55_A3D8_6B4CD5EDC1A6_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>ISX_DEFAULTCOMPONENT1</td><td/><td/><td>_17079E2E_65A0_4D11_8179_7C0F2FD00F6E_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>ISX_DEFAULTCOMPONENT10</td><td/><td/><td>_A3DCD022_A275_4A59_9D54_2D16411227F9_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>ISX_DEFAULTCOMPONENT11</td><td/><td/><td>_7FAB1842_D76D_41E0_903A_C363610FD442_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>ISX_DEFAULTCOMPONENT12</td><td/><td/><td>_C0AD99E0_BF03_4F03_87D0_1E08F8151BEB_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>ISX_DEFAULTCOMPONENT13</td><td/><td/><td>_23FF2393_CE35_44C9_9F85_7C8679B0FEB5_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>ISX_DEFAULTCOMPONENT14</td><td/><td/><td>_1EEB8F77_6C87_4AFB_8044_F3301D170B17_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>ISX_DEFAULTCOMPONENT2</td><td/><td/><td>_9976BCA5_69FE_4C22_BF55_F271771CE4BA_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>ISX_DEFAULTCOMPONENT3</td><td/><td/><td>_4644B56F_A1E5_44FC_AC5A_BD1B458EF6AD_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>ISX_DEFAULTCOMPONENT4</td><td/><td/><td>_8A98B207_53D5_4104_A09B_B3782DFAFE54_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>ISX_DEFAULTCOMPONENT5</td><td/><td/><td>_D7495093_726D_4E0A_958E_275B590C6B63_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>ISX_DEFAULTCOMPONENT6</td><td/><td/><td>_9636CEB3_0954_41AC_B2B9_274794CD57B0_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>ISX_DEFAULTCOMPONENT7</td><td/><td/><td>_36D7119C_54A0_4CE1_A815_8BE9E097CB07_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>ISX_DEFAULTCOMPONENT8</td><td/><td/><td>_C453C67B_376A_4CD6_9C9F_95F04D44B9D6_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>ISX_DEFAULTCOMPONENT9</td><td/><td/><td>_9D17FFC5_1105_4DDA_9E2A_BD06825BE428_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>rFactor2SharedMemoryMapPlugin64.dll</td><td/><td/><td>_76A25F20_BD45_4C6B_B73F_1E3B2921B15D_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>rFactorSharedMemoryMap.dll</td><td/><td/><td>_5E1BD7CD_BBF9_424F_B0D9_F3330C342E7A_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>rFactorSharedMemoryMap.dll1</td><td/><td/><td>_72E018E2_3F2A_48BF_A0E8_A5AB3F536B9F_FILTER</td><td/><td/><td/><td/></row>
 	</table>
 
 	<table name="ISCustomActionReference">
@@ -4461,7 +4475,7 @@ RABWAEQALQA1AAEARQB4AHAAcgBlAHMAcwA=
 		<row><td>PROGMSG_IIS_ROLLBACKVROOTS</td><td>##IDS_PROGMSG_IIS_ROLLBACKVROOTS##</td><td/></row>
 		<row><td>PROGMSG_IIS_ROLLBACKWEBSERVICEEXTENSIONS</td><td>##IDS_PROGMSG_IIS_ROLLBACKWEBSERVICEEXTENSIONS##</td><td/></row>
 		<row><td>PROGRAMFILETOLAUNCHATEND</td><td>[INSTALLDIR]CrewChiefV4.Primary output</td><td/></row>
-		<row><td>ProductCode</td><td>{9580F6A3-C7D3-4D2B-878F-8D015F77F6CF}</td><td/></row>
+		<row><td>ProductCode</td><td>{45E2BC8D-B5C2-4222-BD3D-0BBEAA361320}</td><td/></row>
 		<row><td>ProductName</td><td>CrewChiefV4</td><td/></row>
 		<row><td>ProductVersion</td><td>4.6.3.3</td><td/></row>
 		<row><td>ProgressType0</td><td>install</td><td/></row>

@@ -408,6 +408,7 @@ namespace CrewChiefV4.rFactor2
                 csd.formattedPlayerLapTimes.Add(TimeSpan.FromSeconds(csd.LapTimePrevious).ToString(@"mm\:ss\.fff"));
 
             csd.LeaderHasFinishedRace = leader.mFinishStatus == (int)rFactor2Constants.rF2FinishStatus.Finished;
+            csd.LeaderSectorNumber = leader.mSector == 0 ? 3 : leader.mSector;
             csd.TimeDeltaFront = (float)Math.Abs(player.mTimeBehindNext);
 
             // --------------------------------
@@ -897,6 +898,7 @@ namespace CrewChiefV4.rFactor2
             {
                 // Special case for resume after FCY.  rF2 no longer has FCY set, but still has Resume sub phase set.
                 cgs.FlagData.fcyPhase = FullCourseYellowPhase.RACING;
+                cgs.FlagData.lapCountWhenLastWentGreen = cgs.SessionData.CompletedLaps;
             }
             else if (cgs.FlagData.isFullCourseYellow)
             {

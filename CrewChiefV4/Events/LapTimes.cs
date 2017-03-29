@@ -260,7 +260,10 @@ namespace CrewChiefV4.Events
                     }
                 }
             }
-
+            if (previousGameState != null && previousGameState.SessionData.CompletedLaps <= currentGameState.FlagData.lapCountWhenLastWentGreen)
+            {
+                return;
+            }
             float[] lapAndSectorsComparisonData = new float[] { -1, -1, -1, -1 };
             if (currentGameState.SessionData.IsNewSector)
             {

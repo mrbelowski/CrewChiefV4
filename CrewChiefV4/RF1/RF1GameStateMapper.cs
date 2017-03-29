@@ -159,6 +159,7 @@ namespace CrewChiefV4.rFactor1
             {
                 // Special case for resume after FCY.  rF2 no longer has FCY set, but still has Resume sub phase set.
                 currentGameState.FlagData.fcyPhase = FullCourseYellowPhase.RACING;
+                currentGameState.FlagData.lapCountWhenLastWentGreen = shared.lapNumber;
             }
             else if (currentGameState.FlagData.isFullCourseYellow)
             {
@@ -365,6 +366,7 @@ namespace CrewChiefV4.rFactor1
                 currentGameState.SessionData.formattedPlayerLapTimes.Add(TimeSpan.FromSeconds(currentGameState.SessionData.LapTimePrevious).ToString(@"mm\:ss\.fff"));
             }
             currentGameState.SessionData.LeaderHasFinishedRace = leader.finishStatus == (int)rFactor1Constant.rfFinishStatus.finished;
+            currentGameState.SessionData.LeaderSectorNumber = leader.sector == 0 ? 3 : leader.sector;
             currentGameState.SessionData.TimeDeltaFront = Math.Abs(player.timeBehindNext);
 
             // --------------------------------

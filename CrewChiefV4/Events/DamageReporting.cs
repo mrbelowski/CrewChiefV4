@@ -482,17 +482,20 @@ namespace CrewChiefV4.Events
         {
             if (isMissingWheel || damageToReportNext.Item2 > DamageLevel.MINOR)
             {
-                // missing wheel or major damage, so don't play any cut track warnings that might be queued
-                audioPlayer.removeQueuedMessage(Penalties.folderCutTrackInRace);
-                audioPlayer.removeQueuedMessage(Penalties.folderCutTrackPracticeOrQual);
-                audioPlayer.removeQueuedMessage(Penalties.folderLapDeleted);
+                // missing wheel or major damage, so don't play other messages that might be queued - note this won't interrupt an
+                // already playing message
+                audioPlayer.purgeQueues();
+                // if the damage is race-ending switch off pearls-of-wisdom for the remainder of the session
+                if (damageToReportNext.Item2 == DamageLevel.DESTROYED)
+                {
+                    audioPlayer.disablePearlsOfWisdom = true;
+                }
             }
             if (damageToReportNext.Item1 == Component.ENGINE)
             {
                 if (damageToReportNext.Item2 == DamageLevel.DESTROYED)
                 {
-                    audioPlayer.playMessage(new QueuedMessage(folderBustedEngine, 0, this));
-                    audioPlayer.disablePearlsOfWisdom = true;
+                    audioPlayer.playMessage(new QueuedMessage(folderBustedEngine, 0, this));                    
                 }
                 else if (damageToReportNext.Item2 == DamageLevel.MAJOR)
                 {
@@ -508,7 +511,6 @@ namespace CrewChiefV4.Events
                 if (damageToReportNext.Item2 == DamageLevel.DESTROYED)
                 {
                     audioPlayer.playMessage(new QueuedMessage(folderBustedTransmission, 0, this));
-                    audioPlayer.disablePearlsOfWisdom = true;
                 }
                 else if (damageToReportNext.Item2 == DamageLevel.MAJOR)
                 {
@@ -524,7 +526,6 @@ namespace CrewChiefV4.Events
                 if (damageToReportNext.Item2 == DamageLevel.DESTROYED)
                 {
                     audioPlayer.playMessage(new QueuedMessage(folderBustedSuspension, 0, this));
-                    audioPlayer.disablePearlsOfWisdom = true;
                 }
                 else if (damageToReportNext.Item2 == DamageLevel.MAJOR || isMissingWheel)
                 {
@@ -544,7 +545,6 @@ namespace CrewChiefV4.Events
                 if (damageToReportNext.Item2 == DamageLevel.DESTROYED)
                 {
                     audioPlayer.playMessage(new QueuedMessage(folderBustedBrakes, 0, this));
-                    audioPlayer.disablePearlsOfWisdom = true;
                 }
                 else if (damageToReportNext.Item2 == DamageLevel.MAJOR)
                 {
@@ -560,7 +560,6 @@ namespace CrewChiefV4.Events
                 if (damageToReportNext.Item2 == DamageLevel.DESTROYED)
                 {
                     audioPlayer.playMessage(new QueuedMessage(folderSevereAeroDamage, 0, this));
-                    audioPlayer.disablePearlsOfWisdom = true;
                 }
                 else if (damageToReportNext.Item2 == DamageLevel.MAJOR)
                 {

@@ -1500,6 +1500,7 @@
         {
             "rf1TrackNames": [ "VIR North Course" ],
             "rf2TrackNames": [ "VIR North Course" ],
+            "acTrackNames": [ "vir:north course" ],
             "trackLandmarks": [
                 {
                     "landmarkName": "horseshoe",
@@ -1548,6 +1549,7 @@
         {
             "rf1TrackNames": [ "VIR Patriot Course" ],
             "rf2TrackNames": [ "VIR Patriot Course" ],
+            "acTrackNames": [ "vir:patriot course" ],
             "trackLandmarks": [
                 {
                     "landmarkName": "western_esses",
@@ -1572,6 +1574,7 @@
         {
             "rf1TrackNames": [ "VIR South Course" ],
             "rf2TrackNames": [ "VIR South Course" ],
+            "acTrackNames": [ "vir:south course" ],
             "trackLandmarks": [
                 {
                     "landmarkName": "the_bitch",
@@ -1608,6 +1611,7 @@
         {
             "rf1TrackNames": [ "Mid-Ohio With Chicane" ],
             "rf2TrackNames": [ "Mid-Ohio With Chicane" ],
+            "raceroomLayoutId": 1676,
             "trackLandmarks": [
                 {
                     "landmarkName": "turn1",
@@ -1674,6 +1678,7 @@
         {
             "rf1TrackNames": [ "Mid-Ohio No Chicane", "Mid-Ohio Miller 200" ],
             "rf2TrackNames": [ "Mid-Ohio No Chicane", "Mid-Ohio Miller 200" ],
+            "raceroomLayoutId": 1674,
             "trackLandmarks": [
                 {
                     "landmarkName": "turn1",
@@ -1799,6 +1804,184 @@
                     "landmarkName": "turn15",
                     "distanceRoundLapStart": 3272,
                     "distanceRoundLapEnd": 3415,
+                    "isCommonOvertakingSpot": true
+                }
+            ]
+        },
+		{
+            "raceroomLayoutId": 3683,
+            "trackLandmarks": [
+                {
+                    "landmarkName": "turn1",
+                    "distanceRoundLapStart": 200,
+                    "distanceRoundLapEnd": 270,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "turn2",
+                    "distanceRoundLapStart": 380,
+                    "distanceRoundLapEnd": 510,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "turn3",
+                    "distanceRoundLapStart": 620,
+                    "distanceRoundLapEnd": 840,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "turn4",
+                    "distanceRoundLapStart": 920,
+                    "distanceRoundLapEnd": 1040,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "turn5",
+                    "distanceRoundLapStart": 1080,
+                    "distanceRoundLapEnd": 1120,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "turn6",
+                    "distanceRoundLapStart": 1260,
+                    "distanceRoundLapEnd": 1381,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "turn7",
+                    "distanceRoundLapStart": 1700,
+                    "distanceRoundLapEnd": 1780,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "turn8",
+                    "distanceRoundLapStart": 1870,
+                    "distanceRoundLapEnd": 1950,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "turn9",
+                    "distanceRoundLapStart": 1980,
+                    "distanceRoundLapEnd": 2090,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "turn10",
+                    "distanceRoundLapStart": 2150,
+                    "distanceRoundLapEnd": 2250,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "turn11",
+                    "distanceRoundLapStart": 2380,
+                    "distanceRoundLapEnd": 2480,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "turn12",
+                    "distanceRoundLapStart": 2520,
+                    "distanceRoundLapEnd": 2650,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "turn13",
+                    "distanceRoundLapStart": 3610,
+                    "distanceRoundLapEnd": 3700,
+                    "isCommonOvertakingSpot": true
+                }
+            ]
+        },
+		{
+            "raceroomLayoutId": 3383,
+            "trackLandmarks": [
+                {
+                    "landmarkName": "turn1",
+                    "distanceRoundLapStart": 200,
+                    "distanceRoundLapEnd": 270,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "turn2",
+                    "distanceRoundLapStart": 380,
+                    "distanceRoundLapEnd": 510,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "turn3",
+                    "distanceRoundLapStart": 620,
+                    "distanceRoundLapEnd": 840,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "turn4",
+                    "distanceRoundLapStart": 920,
+                    "distanceRoundLapEnd": 1040,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "turn5",
+                    "distanceRoundLapStart": 1080,
+                    "distanceRoundLapEnd": 1120,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "turn6",
+                    "distanceRoundLapStart": 1260,
+                    "distanceRoundLapEnd": 1381,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "turn7",
+                    "distanceRoundLapStart": 1560,
+                    "distanceRoundLapEnd": 1610,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "turn8",
+                    "distanceRoundLapStart": 1640,
+                    "distanceRoundLapEnd": 1690,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "turn9",
+                    "distanceRoundLapStart": 1720,
+                    "distanceRoundLapEnd": 1800,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "turn10",
+                    "distanceRoundLapStart": 1900,
+                    "distanceRoundLapEnd": 1960,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "turn11",
+                    "distanceRoundLapStart": 2010,
+                    "distanceRoundLapEnd": 2110,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "turn12",
+                    "distanceRoundLapStart": 2180,
+                    "distanceRoundLapEnd": 2260,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "turn13",
+                    "distanceRoundLapStart": 2410,
+                    "distanceRoundLapEnd": 2500,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "turn14",
+                    "distanceRoundLapStart": 2550,
+                    "distanceRoundLapEnd": 2680,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "turn15",
+                    "distanceRoundLapStart": 3650,
+                    "distanceRoundLapEnd": 3740,
                     "isCommonOvertakingSpot": true
                 }
             ]
