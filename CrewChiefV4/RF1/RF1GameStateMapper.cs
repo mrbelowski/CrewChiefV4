@@ -615,7 +615,7 @@ namespace CrewChiefV4.rFactor1
                 String driverName = getNameFromBytes(vehicle.driverName).ToLower();
                 OpponentData opponentPrevious;
                 int duplicatesCount = driverNameCounts[driverName];
-                String opponentKey;
+                string opponentKey;
                 if (duplicatesCount > 1)
                 {
                     if (!isOfflineSession)
@@ -766,7 +766,8 @@ namespace CrewChiefV4.rFactor1
                     currentGameState.SessionData.OverallSessionBestLapTime = opponent.CurrentBestLapTime;
                 }
                 if (opponent.CurrentBestLapTime > 0 && (opponent.CurrentBestLapTime < currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass ||
-                    currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass < 0) && opponent.CarClass == currentGameState.carClass)
+                    currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass < 0) && 
+                    opponent.CarClass.getClassIdentifier() == currentGameState.carClass.getClassIdentifier())
                 {
                     currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass = opponent.CurrentBestLapTime;
                 }

@@ -82,12 +82,12 @@ namespace CrewChiefV4.Events
         private DateTime timeWhenWeMadeAPass;
         private DateTime timeWhenWeWerePassed;
 
-        private Object opponentAheadKey = null;
-        private Object opponentBehindKey = null;
+        private string opponentAheadKey = null;
+        private string opponentBehindKey = null;
 
-        private Object opponentKeyForCarWeJustPassed;
+        private string opponentKeyForCarWeJustPassed;
 
-        private Object opponentKeyForCarThatJustPassedUs;
+        private string opponentKeyForCarThatJustPassedUs;
                 
         public Position(AudioPlayer audioPlayer)
         {
@@ -177,8 +177,8 @@ namespace CrewChiefV4.Events
                     {
                         gapsBehind.Add(currentGameState.SessionData.TimeDeltaBehind);
                     }
-                    Object currentOpponentAheadKey = currentGameState.getOpponentKeyInFront(true);
-                    Object currentOpponentBehindKey = currentGameState.getOpponentKeyBehind(true);
+                    string currentOpponentAheadKey = currentGameState.getOpponentKeyInFront(true);
+                    string currentOpponentBehindKey = currentGameState.getOpponentKeyBehind(true);
                     // seems like belt and braces, but as Raceroom names aren't unique we need to double check a pass actually happened here:
                     if (frequencyOfOvertakingMessages > 0 && currentOpponentAheadKey != opponentAheadKey)
                     {
