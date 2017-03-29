@@ -47,7 +47,7 @@ namespace CrewChiefV4.Events
 
         private DateTime nextCarAheadChangeMessage = DateTime.MinValue;
 
-        private String positionIsPlayerKey = "";
+        private Object positionIsPlayerKey = new Object();
 
         private Random random = new Random();
 
@@ -110,9 +110,9 @@ namespace CrewChiefV4.Events
             }
             if (currentGameState.SessionData.SessionType != SessionType.Race || frequencyOfOpponentRaceLapTimes > 0)
             {
-                foreach (KeyValuePair<String, OpponentData> entry in currentGameState.OpponentData)
+                foreach (KeyValuePair<Object, OpponentData> entry in currentGameState.OpponentData)
                 {
-                    String opponentKey = entry.Key;
+                    Object opponentKey = entry.Key;
                     OpponentData opponentData = entry.Value;
 
                     if (opponentData.IsNewLap && opponentData.LastLapTime > 0 && opponentData.OpponentLapData.Count > 1 &&
@@ -235,9 +235,9 @@ namespace CrewChiefV4.Events
             }
         }
 
-        private Tuple<String, Boolean> getOpponentKey(String voiceMessage, String expectedNumberSuffix)
+        private Tuple<Object, Boolean> getOpponentKey(String voiceMessage, String expectedNumberSuffix)
         {
-            String opponentKey = null;
+            Object opponentKey = null;
             Boolean gotByPositionNumber = false;
             if (voiceMessage.Contains(SpeechRecogniser.THE_LEADER))
             {
@@ -294,7 +294,7 @@ namespace CrewChiefV4.Events
             }
             else
             {
-                foreach (KeyValuePair<String, OpponentData> entry in currentGameState.OpponentData)
+                foreach (KeyValuePair<Object, OpponentData> entry in currentGameState.OpponentData)
                 {
                     String usableDriverName = DriverNameHelper.getUsableDriverName(entry.Value.DriverRawName);
                     if (voiceMessage.Contains(usableDriverName))
@@ -304,10 +304,10 @@ namespace CrewChiefV4.Events
                     }
                 }
             }
-            return new Tuple<string, bool>(opponentKey, gotByPositionNumber);
+            return new Tuple<object, bool>(opponentKey, gotByPositionNumber);
         }
 
-        private float getOpponentLastLap(String opponentKey)
+        private float getOpponentLastLap(Object opponentKey)
         {
             if (opponentKey != null && currentGameState.OpponentData.ContainsKey(opponentKey))
             {
@@ -316,7 +316,7 @@ namespace CrewChiefV4.Events
             return -1;
         }
 
-        private float getOpponentBestLap(String opponentKey)
+        private float getOpponentBestLap(Object opponentKey)
         {
             if (opponentKey != null && currentGameState.OpponentData.ContainsKey(opponentKey))
             {
@@ -332,7 +332,7 @@ namespace CrewChiefV4.Events
             {
                 if (voiceMessage.StartsWith(SpeechRecogniser.WHAT_TYRE_IS) || voiceMessage.StartsWith(SpeechRecogniser.WHAT_TYRES_IS))
                 {
-                    String opponentKey = getOpponentKey(voiceMessage, " " + SpeechRecogniser.ON).Item1;
+                    Object opponentKey = getOpponentKey(voiceMessage, " " + SpeechRecogniser.ON).Item1;
                     if (opponentKey != null)
                     {
                         OpponentData opponentData = currentGameState.OpponentData[opponentKey];
@@ -377,8 +377,8 @@ namespace CrewChiefV4.Events
                 } 
                 else if (voiceMessage.StartsWith(SpeechRecogniser.WHERE_IS))
                 {
-                    Tuple<String, Boolean> response = getOpponentKey(voiceMessage, "");
-                    string opponentKey = response.Item1;
+                    Tuple<Object, Boolean> response = getOpponentKey(voiceMessage, "");
+                    object opponentKey = response.Item1;
                     Boolean gotByPositionNumber = response.Item2;
                     if (opponentKey != null && currentGameState.OpponentData.ContainsKey(opponentKey))
                     {
@@ -527,7 +527,7 @@ namespace CrewChiefV4.Events
                 }
                 else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.WHOS_BEHIND_ON_TRACK))
                 {
-                    String opponentKey = currentGameState.getOpponentKeyBehindOnTrack();
+                    Object opponentKey = currentGameState.getOpponentKeyBehindOnTrack();
                     if (opponentKey != null)
                     {
                         OpponentData opponent = currentGameState.OpponentData[opponentKey];
@@ -552,7 +552,7 @@ namespace CrewChiefV4.Events
                 }
                 else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.WHOS_IN_FRONT_ON_TRACK))
                 {
-                    String opponentKey = currentGameState.getOpponentKeyInFrontOnTrack();
+                    Object opponentKey = currentGameState.getOpponentKeyInFrontOnTrack();
                     if (opponentKey != null)
                     {
                         OpponentData opponent = currentGameState.OpponentData[opponentKey];
@@ -665,8 +665,7 @@ namespace CrewChiefV4.Events
                 }
                 else if (voiceMessage.StartsWith(SpeechRecogniser.WHOS_IN))
                 {
-                    Tuple<String, Boolean> opponentKeyTuple = getOpponentKey(voiceMessage, "");
-                    String opponentKey = opponentKeyTuple.Item1;
+                    Object opponentKey = getOpponentKey(voiceMessage, "");
                     if (opponentKey != null)
                     {
                         if (opponentKey == positionIsPlayerKey)

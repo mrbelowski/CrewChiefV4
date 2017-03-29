@@ -92,7 +92,7 @@ namespace CrewChiefV4.Events
                     currentGameState.SessionData.LapTimeCurrent < currentGameState.SessionData.TimeDeltaBehind + 1 &&
                     currentGameState.OvertakingAids.DrsAvailable)
                 {
-                    String opponentBehindKey = currentGameState.getOpponentKeyBehind(false);
+                    Object opponentBehindKey = currentGameState.getOpponentKeyBehind(false);
                     playedOpponentHasDRSOnThisLap = true;
                     if (random.NextDouble() >= 0.4 && opponentBehindKey != null && !currentGameState.OpponentData[opponentBehindKey].isEnteringPits() &&
                         !currentGameState.OpponentData[opponentBehindKey].isExitingPits()) { 

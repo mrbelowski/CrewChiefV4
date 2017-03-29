@@ -128,7 +128,7 @@ namespace CrewChiefV4.Events
                 startCheckPointIsInSector1 = false;
                 distanceStartCheckPoint = currentGameState.SessionData.TrackDefinition.trackLength + distanceStartCheckPoint;
             }
-            foreach (KeyValuePair<String, OpponentData> opponent in currentGameState.OpponentData)
+            foreach (KeyValuePair<Object, OpponentData> opponent in currentGameState.OpponentData)
             {
                 if ((opponent.Value.OpponentLapData.Count > 0 || !startCheckPointIsInSector1) && opponent.Value.Speed > 0 && 
                     !opponent.Value.isEnteringPits() && !opponent.Value.isExitingPits() &&
