@@ -437,6 +437,7 @@ namespace CrewChiefV4.rFactor2
             // --------------------------------
             // damage
             cgs.CarDamageData.DamageEnabled = true;
+            cgs.CarDamageData.LastImpactTime = (float)rf2state.mLastImpactET;
 
             if (rf2state.mInvulnerable == 0)
             {
