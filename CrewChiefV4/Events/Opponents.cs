@@ -185,7 +185,7 @@ namespace CrewChiefV4.Events
                         && currentGameState.SessionData.CompletedLaps > 0)
                     {
                         OpponentData opponentData = currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position - 1, false);
-                        if (opponentData != null && !opponentData.isEnteringPits() &&
+                        if (opponentData != null && !opponentData.isEnteringPits() && !opponentData.InPits &&
                             (SoundCache.hasSuitableTTSVoice || SoundCache.availableDriverNames.Contains(DriverNameHelper.getUsableDriverName(opponentData.DriverRawName))))
                         {
                             audioPlayer.playMessage(new QueuedMessage("new_car_ahead", MessageContents(folderNextCarIs, opponentData),
