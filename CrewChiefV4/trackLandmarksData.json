@@ -1500,6 +1500,7 @@
         {
             "rf1TrackNames": [ "VIR North Course" ],
             "rf2TrackNames": [ "VIR North Course" ],
+            "acTrackNames": [ "vir:north course" ],
             "trackLandmarks": [
                 {
                     "landmarkName": "horseshoe",
@@ -1548,6 +1549,7 @@
         {
             "rf1TrackNames": [ "VIR Patriot Course" ],
             "rf2TrackNames": [ "VIR Patriot Course" ],
+            "acTrackNames": [ "vir:patriot course" ],
             "trackLandmarks": [
                 {
                     "landmarkName": "western_esses",
@@ -1572,6 +1574,7 @@
         {
             "rf1TrackNames": [ "VIR South Course" ],
             "rf2TrackNames": [ "VIR South Course" ],
+            "acTrackNames": [ "vir:south course" ],
             "trackLandmarks": [
                 {
                     "landmarkName": "the_bitch",
