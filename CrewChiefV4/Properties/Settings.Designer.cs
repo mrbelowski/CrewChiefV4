@@ -2002,5 +2002,17 @@ namespace CrewChiefV4.Properties {
                 this["rf1_install_path"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("4.5")]
+        public float acs_spotter_car_length {
+            get {
+                return ((float)(this["acs_spotter_car_length"]));
+            }
+            set {
+                this["acs_spotter_car_length"] = value;
+            }
+        }
     }
 }
