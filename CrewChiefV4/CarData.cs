@@ -193,6 +193,13 @@ namespace CrewChiefV4
         public static int RACEROOM_CLASS_ID = -1;
         public static String CLASS_ID = "";
 
+        public class TyreTypeData
+        {
+            public float maxColdTyreTemp { get; set; }
+            public float maxWarmTyreTemp { get; set; }
+            public float maxHotTyreTemp { get; set; }
+        }
+
         public class CarClass
         {
             [JsonConverter(typeof(CarClassEnumConverter))]
@@ -211,6 +218,7 @@ namespace CrewChiefV4
 
             [JsonConverter(typeof(StringEnumConverter))]
             public TyreType defaultTyreType { get; set; }
+            public Dictionary<string, TyreTypeData> acTyreTypeData { get; set; }
             public float maxColdTyreTemp { get; set; }
             public float maxWarmTyreTemp { get; set; }
             public float maxHotTyreTemp { get; set; }
@@ -243,6 +251,7 @@ namespace CrewChiefV4
                 this.maxWarmBrakeTemp = -1;
                 this.maxHotBrakeTemp = -1;
                 this.defaultTyreType = TyreType.Unknown_Race;
+                this.acTyreTypeData = new Dictionary<string, TyreTypeData>();
                 this.maxColdTyreTemp = -1;
                 this.maxWarmTyreTemp = -1;
                 this.maxHotTyreTemp = -1;
