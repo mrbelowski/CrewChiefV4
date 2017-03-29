@@ -245,13 +245,21 @@ namespace CrewChiefV4
                     dialog.ShowNewFolderButton = false;
                     dialog.Description = Configuration.getUIString("install_plugin_select_directory_start") + " " +
                         gameDefinition.gameInstallDirectory + " " + Configuration.getUIString("install_plugin_select_directory_end");
+
                     DialogResult result = dialog.ShowDialog();
+
                     if (result == DialogResult.OK && dialog.SelectedPath.Length > 0)
                     {
-                        //check that the users actualy selected the correct folder by comparing with expected install folder.
-                        //im unsure if we should use this check as it does prevent user from having installed in costum folder,
-                        //like "rf2" instead of default folder name "rFactor 2"
-                        if (Path.GetFileName(dialog.SelectedPath).Equals(gameDefinition.gameInstallDirectory))
+                        
+                        //This should now take care of checking against the main .exe instead of the folder name, special case for rFactor 2 as its has the file installed in ..\Bin64
+                        if(gameDefinition.gameEnum == GameEnum.RF2_64BIT)                                                
+                        {
+                            if (File.Exists(Path.Combine(dialog.SelectedPath, @"Bin64", gameDefinition.processName + ".exe")))
+                            {
+                                gameInstallPath = dialog.SelectedPath;
+                            }
+                        }
+                        else if(File.Exists(Path.Combine(dialog.SelectedPath, gameDefinition.processName + ".exe")))
                         {
                             gameInstallPath = dialog.SelectedPath;
                         }

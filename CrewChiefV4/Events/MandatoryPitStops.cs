@@ -152,14 +152,14 @@ namespace CrewChiefV4.Events
             {
                 enableWindowWarnings = false;
             }
-            if (currentGameState.PitData.limiterStatus != -1 && DateTime.Now > timeOfLastLimiterWarning + TimeSpan.FromSeconds(30))
+            if (currentGameState.PitData.limiterStatus != -1 && currentGameState.Now > timeOfLastLimiterWarning + TimeSpan.FromSeconds(30))
             {
                 if (currentGameState.SessionData.SectorNumber == 1 && 
-                    DateTime.Now > timeOfDisengageCheck && !currentGameState.PitData.InPitlane && currentGameState.PitData.limiterStatus == 1)
+                    currentGameState.Now > timeOfDisengageCheck && !currentGameState.PitData.InPitlane && currentGameState.PitData.limiterStatus == 1)
                 {
                     // in S1 but have exited pits, and we're expecting the limit to have been turned off
                     timeOfDisengageCheck = DateTime.MaxValue;
-                    timeOfLastLimiterWarning = DateTime.Now;
+                    timeOfLastLimiterWarning = currentGameState.Now;
                     audioPlayer.playMessage(new QueuedMessage(folderDisengageLimiter, 0, this));
                 }
                 else if (previousGameState != null)
@@ -169,13 +169,13 @@ namespace CrewChiefV4.Events
                     {
                         // just entered the pit lane with no limiter active
                         audioPlayer.playMessage(new QueuedMessage(folderEngageLimiter, 0, this));
-                        timeOfLastLimiterWarning = DateTime.Now;
+                        timeOfLastLimiterWarning = currentGameState.Now;
                     }
                     else if (currentGameState.SessionData.SectorNumber == 1 &&
                         previousGameState.PitData.InPitlane && !currentGameState.PitData.InPitlane && currentGameState.PitData.limiterStatus == 1)
                     {
                         // just left the pitlane with the limiter active - wait 2 seconds then warn
-                        timeOfDisengageCheck = DateTime.Now + TimeSpan.FromSeconds(2);
+                        timeOfDisengageCheck = currentGameState.Now + TimeSpan.FromSeconds(2);
                     }
                 }
             }

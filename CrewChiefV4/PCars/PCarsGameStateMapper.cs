@@ -76,16 +76,16 @@ namespace CrewChiefV4.PCars
 
         private TimeSpan minimumSessionParticipationTime = TimeSpan.FromSeconds(6);
 
-        private Dictionary<String, List<float>> opponentSpeedsWindow = new Dictionary<string, List<float>>();
+        private Dictionary<string, List<float>> opponentSpeedsWindow = new Dictionary<string, List<float>>();
 
         private int opponentSpeedsToAverage = 20;
 
         private SpeechRecogniser speechRecogniser;
 
-        private Dictionary<String, float> waitingForCarsToFinish = new Dictionary<String, float>();
+        private Dictionary<string, float> waitingForCarsToFinish = new Dictionary<string, float>();
         private DateTime nextDebugCheckeredToFinishMessageTime = DateTime.MinValue;
 
-        Dictionary<String, DateTime> lastActiveTimeForOpponents = new Dictionary<string, DateTime>();
+        Dictionary<string, DateTime> lastActiveTimeForOpponents = new Dictionary<string, DateTime>();
         DateTime nextOpponentCleanupTime = DateTime.MinValue;
         TimeSpan opponentCleanupInterval = TimeSpan.FromSeconds(2);
 
@@ -214,7 +214,7 @@ namespace CrewChiefV4.PCars
             }
             if (gameState.OpponentData == null)
             {
-                gameState.OpponentData = new Dictionary<Object, OpponentData>();
+                gameState.OpponentData = new Dictionary<string, OpponentData>();
             }
             if (gameState.OpponentData.ContainsKey(name))
             {
@@ -368,8 +368,8 @@ namespace CrewChiefV4.PCars
             }
 
             currentGameState.SessionData.SessionPhase = mapToSessionPhase(currentGameState.SessionData.SessionType,
-                shared.mSessionState, shared.mRaceState, shared.mNumParticipants, leaderHasFinished, lastSessionPhase, lastSessionTimeRemaining, 
-                lastSessionRunningTime, shared.mPitMode, previousGameState == null ? null : previousGameState.OpponentData, shared.mSpeed);
+                shared.mSessionState, shared.mRaceState, shared.mNumParticipants, leaderHasFinished, lastSessionPhase, lastSessionTimeRemaining,
+                lastSessionRunningTime, shared.mPitMode, previousGameState == null ? null : previousGameState.OpponentData, shared.mSpeed, currentGameState.Now);
                         
             currentGameState.SessionData.TrackDefinition = TrackData.getTrackDefinition(StructHelper.getNameFromBytes(shared.mTrackLocation)
                 + ":" + StructHelper.getNameFromBytes(shared.mTrackVariation), -1, shared.mTrackLength);
@@ -883,7 +883,7 @@ namespace CrewChiefV4.PCars
                 nextOpponentCleanupTime = currentGameState.Now + opponentCleanupInterval;
                 DateTime oldestAllowedUpdate = currentGameState.Now - opponentCleanupInterval;
                 List<String> inactiveOpponents = new List<string>();
-                foreach (String opponentName in currentGameState.OpponentData.Keys)
+                foreach (string opponentName in currentGameState.OpponentData.Keys)
                 {
                     if (!lastActiveTimeForOpponents.ContainsKey(opponentName) || lastActiveTimeForOpponents[opponentName] < oldestAllowedUpdate)
                     {
@@ -1365,7 +1365,7 @@ namespace CrewChiefV4.PCars
          * When we retire to the pit box, the raceState is set to RaceNotStarted
          */
         private SessionPhase mapToSessionPhase(SessionType sessionType, uint sessionState, uint raceState, int numParticipants, Boolean leaderHasFinishedRace, 
-            SessionPhase previousSessionPhase, float sessionTimeRemaining, float sessionRunTime, uint pitMode, Dictionary<object, OpponentData> opponentData, float playerSpeed)
+            SessionPhase previousSessionPhase, float sessionTimeRemaining, float sessionRunTime, uint pitMode, Dictionary<string, OpponentData> opponentData, float playerSpeed, DateTime now)
         {
             if (numParticipants < 1)
             {
@@ -1456,7 +1456,7 @@ namespace CrewChiefV4.PCars
                             Console.WriteLine("looks like session is finished - no activity in checkered phase");
                             currentPhase = SessionPhase.Finished;
                         }
-                        else if (DateTime.Now > nextDebugCheckeredToFinishMessageTime)
+                        else if (now > nextDebugCheckeredToFinishMessageTime)
                         {
                             Console.WriteLine("Session has finished but there are " + waitingForCount + " cars still out on track");
                             nextDebugCheckeredToFinishMessageTime.Add(TimeSpan.FromSeconds(10));
