@@ -246,6 +246,28 @@ namespace CrewChiefV4.RaceRoom
         }
 
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
+        public struct FlagsExtended2
+        {            
+            // Whether whie flag is currently active (European style slow car on track, NOT US style last lap)
+            // -1 = no data
+            //  0 = not active
+            //  1 = active
+            public Int32 white;
+
+            // Whether yellow flag was caused by current slot
+            // -1 = no data
+            //  0 = not guilty
+            //  1 = caused it
+            public Int32 yellowCausedIt;
+
+            // Whether the car in the current slot is allowed to overtake the car in front under yellow
+            // -1 = no data
+            //  0 = not allowed
+            //  1 = allowed
+            public Int32 yellowOvertake;
+        }
+
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         public struct CarDamage
         {
             // ...
@@ -647,7 +669,10 @@ namespace CrewChiefV4.RaceRoom
             public Int32 sector2Yellow;
             public Int32 sector3Yellow;
             public Single closestYellowLapDistance;
-            
+
+            // TODO: 
+            // planned next R3E release:
+            // public FlagsExtended2 FlagsExtended2;
 
             // Number of cars (including the player) in the race
             public Int32 NumCars;

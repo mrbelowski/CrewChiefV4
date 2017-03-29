@@ -368,8 +368,8 @@ namespace CrewChiefV4.PCars
             }
 
             currentGameState.SessionData.SessionPhase = mapToSessionPhase(currentGameState.SessionData.SessionType,
-                shared.mSessionState, shared.mRaceState, shared.mNumParticipants, leaderHasFinished, lastSessionPhase, lastSessionTimeRemaining, 
-                lastSessionRunningTime, shared.mPitMode, previousGameState == null ? null : previousGameState.OpponentData, shared.mSpeed);
+                shared.mSessionState, shared.mRaceState, shared.mNumParticipants, leaderHasFinished, lastSessionPhase, lastSessionTimeRemaining,
+                lastSessionRunningTime, shared.mPitMode, previousGameState == null ? null : previousGameState.OpponentData, shared.mSpeed, currentGameState.Now);
                         
             currentGameState.SessionData.TrackDefinition = TrackData.getTrackDefinition(StructHelper.getNameFromBytes(shared.mTrackLocation)
                 + ":" + StructHelper.getNameFromBytes(shared.mTrackVariation), -1, shared.mTrackLength);
@@ -1365,7 +1365,7 @@ namespace CrewChiefV4.PCars
          * When we retire to the pit box, the raceState is set to RaceNotStarted
          */
         private SessionPhase mapToSessionPhase(SessionType sessionType, uint sessionState, uint raceState, int numParticipants, Boolean leaderHasFinishedRace, 
-            SessionPhase previousSessionPhase, float sessionTimeRemaining, float sessionRunTime, uint pitMode, Dictionary<object, OpponentData> opponentData, float playerSpeed)
+            SessionPhase previousSessionPhase, float sessionTimeRemaining, float sessionRunTime, uint pitMode, Dictionary<object, OpponentData> opponentData, float playerSpeed, DateTime now)
         {
             if (numParticipants < 1)
             {
@@ -1456,7 +1456,7 @@ namespace CrewChiefV4.PCars
                             Console.WriteLine("looks like session is finished - no activity in checkered phase");
                             currentPhase = SessionPhase.Finished;
                         }
-                        else if (DateTime.Now > nextDebugCheckeredToFinishMessageTime)
+                        else if (now > nextDebugCheckeredToFinishMessageTime)
                         {
                             Console.WriteLine("Session has finished but there are " + waitingForCount + " cars still out on track");
                             nextDebugCheckeredToFinishMessageTime.Add(TimeSpan.FromSeconds(10));
