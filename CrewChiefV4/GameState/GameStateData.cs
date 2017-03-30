@@ -1706,12 +1706,12 @@ namespace CrewChiefV4.GameState
             }
         }
 
-        public float[] getTimeAndSectorsForBestOpponentLapInWindow(int lapsToCheck, String carClassToCheck)
+        public float[] getTimeAndSectorsForBestOpponentLapInWindow(int lapsToCheck, CarData.CarClass carClassToCheck)
         {
             float[] bestLapWithSectors = new float[] { -1, -1, -1, -1 };
             foreach (KeyValuePair<string, OpponentData> entry in OpponentData)
             {
-                if (entry.Value.CarClass.getClassIdentifier() == carClassToCheck)
+                if (CarData.IsCarClassEqual(entry.Value.CarClass, carClassToCheck))
                 {
                     float[] thisOpponentsBest = entry.Value.getTimeAndSectorsForBestLapInWindow(lapsToCheck);
                     if (bestLapWithSectors[0] == -1 || (thisOpponentsBest[0] > 0 && thisOpponentsBest[0] < bestLapWithSectors[0]))

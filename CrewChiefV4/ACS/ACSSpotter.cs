@@ -102,7 +102,7 @@ namespace CrewChiefV4.assetto
             if (currentGameState != null)
             {
                 var carClass = currentGameState.carClass;
-                if (carClass != null && currentPlayerCarClassID != carClass.getClassIdentifier())
+                if (carClass != null && !String.Equals(currentPlayerCarClassID, carClass.getClassIdentifier()))
                 {
                     // Retrieve and use user overridable spotter car length/width.
                     currentPlayerCarClassID = carClass.getClassIdentifier();
