@@ -1990,55 +1990,61 @@
             "rf2TrackNames": [ "Mazda Raceway Laguna Seca:" ],
             "trackLandmarks": [
                 {
-                    "landmarkName": "Andretti Hairpin",
+                    "landmarkName": "turn1",
+                    "distanceRoundLapStart": 160,
+                    "distanceRoundLapEnd": 260,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "the_andretti_hairpin",
                     "distanceRoundLapStart": 401,
                     "distanceRoundLapEnd": 582,
                     "isCommonOvertakingSpot": true
                 },
                 {
-                    "landmarkName": "Turn 3",
+                    "landmarkName": "turn3",
                     "distanceRoundLapStart": 729,
                     "distanceRoundLapEnd": 858,
                     "isCommonOvertakingSpot": true
                 },
                 {
-                    "landmarkName": "Turn 4",
+                    "landmarkName": "turn4",
                     "distanceRoundLapStart": 1000,
                     "distanceRoundLapEnd": 1124,
                     "isCommonOvertakingSpot": false
                 },
                 {
-                    "landmarkName": "Turn 5",
+                    "landmarkName": "turn5",
                     "distanceRoundLapStart": 1480,
                     "distanceRoundLapEnd": 1658,
                     "isCommonOvertakingSpot": true
                 },
                 {
-                    "landmarkName": "Turn 6",
+                    "landmarkName": "turn6",
                     "distanceRoundLapStart": 1924,
                     "distanceRoundLapEnd": 1995,
                     "isCommonOvertakingSpot": false
                 },
                 {
-                    "landmarkName": "The Corkscrew",
+                    "landmarkName": "the_corkscrew",
                     "distanceRoundLapStart": 2441,
                     "distanceRoundLapEnd": 2570,
                     "isCommonOvertakingSpot": true
                 },
                 {
-                    "landmarkName": "Rainey Curve",
+                    "landmarkName": "rainey_curve",
                     "distanceRoundLapStart": 2621,
                     "distanceRoundLapEnd": 2814,
                     "isCommonOvertakingSpot": false
                 },
                 {
-                    "landmarkName": "Turn 10",
+                    "landmarkName": "turn10",
                     "distanceRoundLapStart": 2957,
                     "distanceRoundLapEnd": 3079,
                     "isCommonOvertakingSpot": false
                 },
                 {
-                    "landmarkName": "Turn 11",
+                    "landmarkName": "turn11",
                     "distanceRoundLapStart": 3259,
                     "distanceRoundLapEnd": 3332,
                     "isCommonOvertakingSpot": true
