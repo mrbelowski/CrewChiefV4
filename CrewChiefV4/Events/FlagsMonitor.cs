@@ -86,7 +86,8 @@ namespace CrewChiefV4.Events
 
         private Boolean reportYellowsInAllSectors = UserSettings.GetUserSettings().getBoolean("report_yellows_in_all_sectors");
 
-        private float distanceToWarnOfLocalYellow = 500;    // metres - externalise? Is this sufficient? Make it speed-dependent?
+        private float maxDistanceToWarnOfLocalYellow = 300;    // metres - externalise? Is this sufficient? Make it speed-dependent?
+        private float minDistanceToWarnOfLocalYellow = 50;    // metres - externalise? Is this sufficient? Make it speed-dependent?
 
         List<IncidentCandidate> incidentCandidates = new List<IncidentCandidate>();
 
@@ -158,7 +159,7 @@ namespace CrewChiefV4.Events
 
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
-            if (CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT || CrewChief.gameDefinition.gameEnum == GameEnum.RF1)
+            if (CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT || CrewChief.gameDefinition.gameEnum == GameEnum.RF1/* || CrewChief.gameDefinition.gameEnum == GameEnum.RACE_ROOM*/)
             {
                 newYellowFlagImplementation(previousGameState, currentGameState);
             }
@@ -385,14 +386,13 @@ namespace CrewChiefV4.Events
                     // we've passed the incident so allow warnings of other incidents approaching
                     hasWarnedOfUpcomingIncident = false;
                 }
-                else if (!isUnderLocalYellow && !hasWarnedOfUpcomingIncident &&
-                  previousGameState.FlagData.distanceToNearestIncident > distanceToWarnOfLocalYellow && currentGameState.FlagData.distanceToNearestIncident < distanceToWarnOfLocalYellow)
+                else if (!isUnderLocalYellow && !hasWarnedOfUpcomingIncident && !shouldWarnOfUpComingYellow(previousGameState) && shouldWarnOfUpComingYellow(currentGameState))
                 {
                     hasWarnedOfUpcomingIncident = true;
                     audioPlayer.playMessageImmediately(new QueuedMessage(folderLocalYellowAhead, 0, null));
                 }
                 else if (currentGameState.FlagData.sectorFlags[0] == FlagEnum.GREEN && currentGameState.FlagData.sectorFlags[1] == FlagEnum.GREEN &&
-                        currentGameState.FlagData.sectorFlags[1] == FlagEnum.GREEN)
+                        currentGameState.FlagData.sectorFlags[2] == FlagEnum.GREEN)
                 {
                     // if all the sectors are clear the local and warning booleans. This ensures we don't sit waiting for a 'clear' that never comes.
                     isUnderLocalYellow = false;
@@ -400,6 +400,12 @@ namespace CrewChiefV4.Events
                 }
 
             }
+        }
+
+        private Boolean shouldWarnOfUpComingYellow(GameStateData gameState)
+        {
+            return gameState != null && gameState.FlagData.distanceToNearestIncident > minDistanceToWarnOfLocalYellow && 
+                    gameState.FlagData.distanceToNearestIncident < maxDistanceToWarnOfLocalYellow;
         }
 
         private bool isCurrentSector(GameStateData currentGameState, int sectorIndex)
