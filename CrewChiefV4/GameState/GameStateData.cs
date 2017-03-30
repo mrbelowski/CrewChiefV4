@@ -960,11 +960,11 @@ namespace CrewChiefV4.GameState
         // don't count time differences shorter than these - no point in being told to defend into a corner when
         // the other guys is only 0.01 seconds faster through that corner
         // These are used when we're checking time / speed difference at common overtaking spots
-        private static float minSignificantRelativeTimeDiffOvertakingSpot = 0.05f;    // 5% - is this a good value?
-        private static float minSignificantRelativeStartSpeedDiffOvertakingSpot = 0.07f;   // 7% - is this a good value? 
+        private static float minSignificantRelativeTimeDiffOvertakingSpot = 0.07f;    // 7% - is this a good value?
+        private static float minSignificantRelativeStartSpeedDiffOvertakingSpot = 0.1f;   // 10% - is this a good value? 
         // these are used when we're checking time / speed difference at places where overtaking is rare, so need to be bigger 
-        private static float minSignificantRelativeTimeDiff = 0.08f;    // 8% - is this a good value?
-        private static float minSignificantRelativeStartSpeedDiff = 0.1f;   // 10% - is this a good value? 
+        private static float minSignificantRelativeTimeDiff = 0.10f;    // 10% - is this a good value?
+        private static float minSignificantRelativeStartSpeedDiff = 0.13f;   // 13% - is this a good value? 
 
         private Dictionary<string, TrackLandmarksTimingData> sessionData = new Dictionary<string, TrackLandmarksTimingData>();
 
@@ -1101,7 +1101,6 @@ namespace CrewChiefV4.GameState
         // games so this might cause more problems than it solves.
         //
         // returns null or a landmark name this car is stopped in
-        // TODO: Reformat me    
         public String updateLandmarkTiming(TrackDefinition trackDefinition, float gameTime, float previousDistanceRoundTrack, float currentDistanceRoundTrack, float speed) 
         {
             if (trackDefinition == null || trackDefinition.trackLandmarks == null || trackDefinition.trackLandmarks.Count == 0)
