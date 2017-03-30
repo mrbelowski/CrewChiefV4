@@ -88,6 +88,11 @@ namespace CrewChiefV4.Events
                         }
                         return false;
                     }
+                    else if (opponentInFront != null && (opponentInFront.InPits || opponentInFront.isEnteringPits()))
+                    {
+                        Console.WriteLine("new car in front message for opponent " + expectedOpponentName +
+                            " no longer valid - driver is " + (opponentInFront.InPits ? "in pits" : "is entering the pits"));
+                    }
                 }
                 return true;
             }
