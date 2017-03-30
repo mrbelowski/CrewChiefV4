@@ -1987,7 +1987,7 @@
             ]
         },
         {
-            "rf2TrackNames": [ "Mazda Raceway Laguna Seca:" ],
+            "rf2TrackNames": [ "Mazda Raceway Laguna Seca" ],
             "trackLandmarks": [
                 {
                     "landmarkName": "turn1",

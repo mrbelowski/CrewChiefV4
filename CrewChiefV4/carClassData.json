@@ -16,6 +16,7 @@
 #    "maxColdBrakeTemp": used to override cold brake temperature (celsius) upper threshold.  Specifies max temperature at which brakes are still considered cold.  If not specified, comes from the built in brakeType.
 #    "maxWarmBrakeTemp": used to override warm (ok) brake temperature (celsius) upper threshold.  Specifies max temperature at which brakes are still considered warm/ok.  Above that value, brakes are overheating.  If not specified, comes from the built in brakeType.
 #    "maxHotBrakeTemp":  used to override hot brake temperature (celsius) upper threshold.  Specifies max temperature at which brake are still considered hot.  Above that value, brakes are "cooking".  If not specified, comes from the built in brakeType.
+#    "acTyreTypeData": used for Assetto Corsa specific tyre thresholds.  (See  "GT4" class below).
 #    "defaultTyreType": can be "Road", "Bias_Ply", "Unknown_Race", and various others that the app doesn't really use (still to be worked on...)
 #    "maxColdTyreTemp": used to override cold tyre temperature (celsius) upper threshold.  Specifies max temperature at which tyre is still considered cold.  If not specified, comes from the built in defaultTyreType.
 #    "maxWarmTyreTemp": used to override warm (ok) tyre temperature (celsius) upper threshold.  Specifies max temperature at which tyre is still considered warm/ok.  Above that value, tyres are overheating.  If not specified, comes from the built in defaultTyreType.

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Windows.Forms;
+﻿using System.Windows.Forms;
 namespace CrewChiefV4
 {
     partial class MainWindow
@@ -41,6 +40,7 @@ namespace CrewChiefV4
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainWindow));
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.startApplicationButton = new System.Windows.Forms.Button();
             this.buttonActionSelect = new System.Windows.Forms.ListBox();
@@ -488,6 +488,7 @@ namespace CrewChiefV4
             this.Controls.Add(this.personalisationLabel);
             this.Name = "MainWindow";
             this.Text = "Crew Chief V4";
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.stopApp);
             this.Load += new System.EventHandler(this.FormMain_Load);
             this.groupBox1.ResumeLayout(false);
