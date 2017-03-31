@@ -128,17 +128,18 @@
             "acClassNames": [ "*GT4*" ,"ks_bmw_m235i_racing" ,"lotus_evora_gx"],
             "acTyreTypeData" : 
             {  
-                 "Trofeo M Slicks (M)" :
-                {    
-                    "maxColdTyreTemp": 75,
-                    "maxWarmTyreTemp": 100,
-                    "maxHotTyreTemp": 140
-                },
-                "Trofeo H Slicks (H)" :
+                "Trofeo M Slicks (M)" :
                 {    
                     "maxColdTyreTemp": 75,
                     "maxWarmTyreTemp": 90,
                     "maxHotTyreTemp": 120
+                },
+                "Trofeo H Slicks (H)" :
+                {    
+                    "maxColdTyreTemp": 75,
+                    "maxWarmTyreTemp": 100,
+                    "maxHotTyreTemp": 140
+
                 },
             }, 
         },
