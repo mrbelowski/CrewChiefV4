@@ -139,9 +139,8 @@
                     "maxColdTyreTemp": 75,
                     "maxWarmTyreTemp": 100,
                     "maxHotTyreTemp": 140
-
-                },
-            }, 
+                }
+            } 
         },
         {
             "carClassEnum": "GT5",
