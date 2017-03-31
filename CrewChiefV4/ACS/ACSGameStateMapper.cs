@@ -1929,7 +1929,9 @@ namespace CrewChiefV4.assetto
             else
             {
                 tyreTempThresholds = CarData.getTyreTempThresholds(carClass);
-                Console.WriteLine("Using temperature thresholds for TyreType: " + carClass.defaultTyreType.ToString() + " maxColdTyreTemp: " + carClass.maxColdTyreTemp + " maxWarmTyreTemp: " + carClass.maxWarmTyreTemp + " maxHotTyreTemp: " + carClass.maxHotTyreTemp);
+                Console.WriteLine("Using temperature thresholds for TyreType: " + carClass.defaultTyreType.ToString() +
+                    " maxColdTyreTemp: " + tyreTempThresholds[0].upperThreshold + " maxWarmTyreTemp: " + tyreTempThresholds[1].upperThreshold +
+                    " maxHotTyreTemp: " + tyreTempThresholds[2].upperThreshold);
             }
             return tyreTempThresholds;
         }
