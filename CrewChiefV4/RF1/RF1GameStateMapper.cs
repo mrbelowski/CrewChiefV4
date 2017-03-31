@@ -233,7 +233,7 @@ namespace CrewChiefV4.rFactor1
             // if previous state is null or any of the above change, this is a new session
             currentGameState.SessionData.IsNewSession = previousGameState == null ||
                 currentGameState.SessionData.SessionType != previousGameState.SessionData.SessionType ||
-                currentGameState.carClass.getClassIdentifier() != previousGameState.carClass.getClassIdentifier() ||
+                !String.Equals(currentGameState.carClass.getClassIdentifier(), previousGameState.carClass.getClassIdentifier()) ||
                 currentGameState.SessionData.DriverRawName != previousGameState.SessionData.DriverRawName || 
                 currentGameState.SessionData.TrackDefinition.name != previousGameState.SessionData.TrackDefinition.name ||
                 currentGameState.SessionData.TrackDefinition.trackLength != previousGameState.SessionData.TrackDefinition.trackLength ||
@@ -399,6 +399,7 @@ namespace CrewChiefV4.rFactor1
             if (currentGameState.SessionData.SessionType != SessionType.HotLap)
             {
                 currentGameState.CarDamageData.DamageEnabled = true;
+                currentGameState.CarDamageData.LastImpactTime = shared.lastImpactET;
                 int bodyDamage = 0;
                 foreach (int dent in shared.dentSeverity)
                 {
@@ -767,7 +768,7 @@ namespace CrewChiefV4.rFactor1
                 }
                 if (opponent.CurrentBestLapTime > 0 && (opponent.CurrentBestLapTime < currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass ||
                     currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass < 0) && 
-                    opponent.CarClass.getClassIdentifier() == currentGameState.carClass.getClassIdentifier())
+                    CarData.IsCarClassEqual(opponent.CarClass, currentGameState.carClass))
                 {
                     currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass = opponent.CurrentBestLapTime;
                 }

@@ -409,16 +409,11 @@ namespace CrewChiefV4.RaceRoom
             } else if (shared.sector3Yellow == 2) {
                 currentGameState.FlagData.sectorFlags[2] = FlagEnum.DOUBLE_YELLOW;
             }
+
+            // closestYellowLapDistance is the distance roundn the lap from the player to the incident
             if (shared.closestYellowLapDistance > 0)
             {
-                if (shared.closestYellowLapDistance > shared.LapDistance)
-                {
-                    currentGameState.FlagData.distanceToNearestIncident = shared.closestYellowLapDistance - shared.LapDistance;
-                }
-                else
-                {
-                    currentGameState.FlagData.distanceToNearestIncident = shared.LayoutLength - shared.LapDistance + shared.closestYellowLapDistance;
-                }
+                currentGameState.FlagData.distanceToNearestIncident = shared.closestYellowLapDistance;
             }
 
             currentGameState.SessionData.SessionTimeRemaining = shared.SessionTimeRemaining;
@@ -767,7 +762,7 @@ namespace CrewChiefV4.RaceRoom
                                             currentGameState.SessionData.OverallSessionBestLapTime = currentOpponentData.CurrentBestLapTime;
                                         }
                                     }
-                                    if (currentOpponentData.CarClass.getClassIdentifier() == currentGameState.carClass.getClassIdentifier())
+                                    if (CarData.IsCarClassEqual(currentOpponentData.CarClass, currentGameState.carClass))
                                     {
                                         if (currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass == -1 ||
                                             currentOpponentData.CurrentBestLapTime < currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass)

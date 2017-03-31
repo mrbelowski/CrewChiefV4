@@ -233,7 +233,7 @@ namespace CrewChiefV4.rFactor2
             // If any difference between current and previous states suggests it is a new session
             if (pgs == null
                 || csd.SessionType != psd.SessionType
-                || cgs.carClass.getClassIdentifier() != pgs.carClass.getClassIdentifier()
+                || !String.Equals(cgs.carClass.getClassIdentifier(), pgs.carClass.getClassIdentifier())
                 || csd.DriverRawName != psd.DriverRawName
                 || csd.TrackDefinition.name != psd.TrackDefinition.name  // TODO: this is empty sometimes, investigate 
                 || csd.TrackDefinition.trackLength != psd.TrackDefinition.trackLength
@@ -437,6 +437,7 @@ namespace CrewChiefV4.rFactor2
             // --------------------------------
             // damage
             cgs.CarDamageData.DamageEnabled = true;
+            cgs.CarDamageData.LastImpactTime = (float)rf2state.mLastImpactET;
 
             if (rf2state.mInvulnerable == 0)
             {
@@ -828,7 +829,7 @@ namespace CrewChiefV4.rFactor2
                 if (opponent.CurrentBestLapTime > 0.0f
                     && (opponent.CurrentBestLapTime < csd.OpponentsLapTimeSessionBestPlayerClass
                         || csd.OpponentsLapTimeSessionBestPlayerClass < 0.0f)
-                    && opponent.CarClass.getClassIdentifier() == cgs.carClass.getClassIdentifier())
+                    && CarData.IsCarClassEqual(opponent.CarClass, cgs.carClass))
                 {
                     csd.OpponentsLapTimeSessionBestPlayerClass = opponent.CurrentBestLapTime;
 

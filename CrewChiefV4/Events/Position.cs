@@ -82,6 +82,9 @@ namespace CrewChiefV4.Events
         private DateTime timeWhenWeMadeAPass;
         private DateTime timeWhenWeWerePassed;
 
+        private const int secondsToCheckForDamageOnPass = 30;
+        private bool lastOvertakeWasClean = true;
+
         private string opponentAheadKey = null;
         private string opponentBehindKey = null;
 
@@ -186,11 +189,16 @@ namespace CrewChiefV4.Events
                             currentOpponentBehindKey == opponentAheadKey && isPassMessageCandidate(gapsAhead, passCheckSamplesToCheck, minAverageGapForPassMessage))
                         {
                             OpponentData carWeJustPassed = currentGameState.OpponentData[currentOpponentBehindKey];
-                            if (carWeJustPassed.CompletedLaps == currentGameState.SessionData.CompletedLaps && 
-                                carWeJustPassed.CarClass.getClassIdentifier() == currentGameState.carClass.getClassIdentifier())
+                            if (carWeJustPassed.CompletedLaps == currentGameState.SessionData.CompletedLaps &&
+                                CarData.IsCarClassEqual(carWeJustPassed.CarClass, currentGameState.carClass))
                             {
                                 timeWhenWeMadeAPass = currentGameState.Now;
                                 opponentKeyForCarWeJustPassed = currentOpponentBehindKey;
+                                lastOvertakeWasClean = true;
+                                if (currentGameState.CarDamageData.LastImpactTime > 0 && (currentGameState.SessionData.SessionRunningTime - currentGameState.CarDamageData.LastImpactTime) < secondsToCheckForDamageOnPass)
+                                {
+                                    lastOvertakeWasClean = false;
+                                }
                             }
                         }
                         gapsAhead.Clear();
@@ -202,7 +210,7 @@ namespace CrewChiefV4.Events
                             // TODO: check if we need to do a pit check here - don't think so
                             OpponentData carThatJustPassedUs = currentGameState.OpponentData[currentOpponentAheadKey];
                             if (carThatJustPassedUs.CompletedLaps == currentGameState.SessionData.CompletedLaps &&
-                                carThatJustPassedUs.CarClass.getClassIdentifier() == currentGameState.carClass.getClassIdentifier())
+                                CarData.IsCarClassEqual(carThatJustPassedUs.CarClass, currentGameState.carClass))
                             {
                                 timeWhenWeWerePassed = currentGameState.Now;
                                 opponentKeyForCarThatJustPassedUs = currentOpponentAheadKey;
@@ -220,7 +228,7 @@ namespace CrewChiefV4.Events
         {
             if (opponentKeyForCarWeJustPassed != null)
             {                
-                if (currentGameState.Now < timeWhenWeMadeAPass.Add(maxTimeToWaitBeforeReportingPass))
+                if (currentGameState.Now < timeWhenWeMadeAPass.Add(maxTimeToWaitBeforeReportingPass) && lastOvertakeWasClean)
                 {
                     Boolean reported = false;
                     OpponentData carWeJustPassed = currentGameState.OpponentData[opponentKeyForCarWeJustPassed];               

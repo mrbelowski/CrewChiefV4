@@ -339,7 +339,7 @@ namespace CrewChiefV4.PCars
                 String carClassId = StructHelper.getNameFromBytes(shared.mCarClassName);
                 CarData.CarClass newClass = CarData.getCarClassForClassName(carClassId);
                 CarData.CLASS_ID = carClassId;
-                if (newClass.getClassIdentifier() != currentGameState.carClass.getClassIdentifier())
+                if (!String.Equals(newClass.getClassIdentifier(), currentGameState.carClass.getClassIdentifier()))
                 {
                     currentGameState.carClass = newClass;
                     Console.WriteLine("Player is using car class " + currentGameState.carClass.getClassIdentifier());
@@ -845,7 +845,7 @@ namespace CrewChiefV4.PCars
                                                 currentGameState.SessionData.OverallSessionBestLapTime = currentOpponentData.CurrentBestLapTime;
                                             }
                                         }
-                                        if (currentOpponentData.CarClass.getClassIdentifier() == currentGameState.carClass.getClassIdentifier())
+                                        if (CarData.IsCarClassEqual(currentOpponentData.CarClass, currentGameState.carClass))
                                         {
                                             if (currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass == -1 ||
                                                 currentOpponentData.CurrentBestLapTime < currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass)
