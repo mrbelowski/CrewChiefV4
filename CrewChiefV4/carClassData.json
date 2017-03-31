@@ -27,7 +27,16 @@
 #    "maxTyreCircumference": used to override default tyre size settings, used when calculating wheel locking and spinning. Only karts should need to override this.  Increase this value if your class gets too many "locking wheel" spinning messages.
 #    "spotterVehicleLength": specifies vehicle length (meters) for spotter to use in calculations.  Defaults to spotter_*_vehicle_length preference value (4.5 by default).
 #    "spotterVehicleWidth": specifies vehicle width (meters) for spotter to use in calculations.
-# }
+#    "acTyreTypeData" : 
+#    {  
+#        "Trofeo M Slicks (M)" : name of the specific tyre you want to override the buildin values for.
+#        {    
+#            "maxColdTyreTemp": used to override cold tyre temperature (celsius) upper threshold.  Specifies max temperature at which tyre is still considered cold.  If not specified, comes from the built in defaultTyreType Or from buildin Assetto Corsa tyres.
+#            "maxWarmTyreTemp": used to override warm (ok) tyre temperature (celsius) upper threshold.  Specifies max temperature at which tyre is still considered warm/ok.  Above that value, tyres are overheating.  If not specified, comes from the built in defaultTyreType. Or from buildin Assetto Corsa tyres.
+#            "maxHotTyreTemp": used to override hot tyre temperature (celsius) upper threshold.  Specifies max temperature at which tyre is still considered hot.  Above that value, tyres are "cooking".  If not specified, comes from the built in defaultTyreType. Or from buildin Assetto Corsa tyres.
+#        },
+#    },
+#}
 #
 # The default values are:
 # {
@@ -119,17 +128,18 @@
             "acClassNames": [ "*GT4*" ,"ks_bmw_m235i_racing" ,"lotus_evora_gx"],
             "acTyreTypeData" : 
             {  
-                 "Trofeo M Slicks (M)" :
-                {    
-                    "maxColdTyreTemp": 75,
-                    "maxWarmTyreTemp": 100,
-                    "maxHotTyreTemp": 140
-                },
-                "Trofeo H Slicks (H)" :
+                "Trofeo M Slicks (M)" :
                 {    
                     "maxColdTyreTemp": 75,
                     "maxWarmTyreTemp": 90,
                     "maxHotTyreTemp": 120
+                },
+                "Trofeo H Slicks (H)" :
+                {    
+                    "maxColdTyreTemp": 75,
+                    "maxWarmTyreTemp": 100,
+                    "maxHotTyreTemp": 140
+
                 },
             }, 
         },

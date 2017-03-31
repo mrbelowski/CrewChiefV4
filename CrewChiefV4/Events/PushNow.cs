@@ -131,7 +131,7 @@ namespace CrewChiefV4.Events
             foreach (KeyValuePair<string, OpponentData> opponent in currentGameState.OpponentData)
             {
                 if ((opponent.Value.OpponentLapData.Count > 0 || !startCheckPointIsInSector1) && opponent.Value.Speed > 0 && 
-                    !opponent.Value.isEnteringPits() && !opponent.Value.isExitingPits() &&
+                    !opponent.Value.isEnteringPits() && !opponent.Value.isExitingPits() && !opponent.Value.InPits &&
                     ((startCheckPointIsInSector1 && opponent.Value.DistanceRoundTrack > distanceStartCheckPoint && opponent.Value.DistanceRoundTrack < distanceEndCheckPoint) ||
                      (!startCheckPointIsInSector1 && (opponent.Value.DistanceRoundTrack > distanceStartCheckPoint || opponent.Value.DistanceRoundTrack < distanceEndCheckPoint))))
                 {
