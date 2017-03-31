@@ -265,6 +265,12 @@ namespace CrewChiefV4.RaceRoom
             //  0 = not allowed
             //  1 = allowed
             public Int32 yellowOvertake;
+
+            // Whether you have gained positions illegaly under yellow flag to give back
+            // -1 = no data
+            //  0 = no positions gained
+            //  n = number of positions gained
+            public Int32 yellowPositionsGained;
         }
 
         [StructLayout(LayoutKind.Sequential, Pack = 1)]

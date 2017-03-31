@@ -101,6 +101,8 @@ namespace CrewChiefV4.Events
 
         private int maxFCYGetInvolvedInIncidentAttempts = 5;
 
+        private TimeSpan incidentDriversCheckInterval = TimeSpan.FromSeconds(1.5);
+
         private int maxLocalYellowGetInvolvedInIncidentAttempts = 2;
 
         private int maxDriversToReportAsInvolvedInIncident = 3;
@@ -216,7 +218,7 @@ namespace CrewChiefV4.Events
                             // start working out who's gone off
                             findInitialIncidentCandidateKeys(-1, currentGameState.OpponentData);
                             positionAtStartOfIncident = currentGameState.SessionData.Position;
-                            nextIncidentDriversCheck = currentGameState.Now + TimeSpan.FromSeconds(2);
+                            nextIncidentDriversCheck = currentGameState.Now + incidentDriversCheckInterval;
                             getInvolvedInIncidentAttempts = 0;
                             driversInvolvedInCurrentIncident.Clear();
                             break;
@@ -266,7 +268,7 @@ namespace CrewChiefV4.Events
                     else
                     {
                         // get more involved drivers and schedule the next check
-                        nextIncidentDriversCheck = currentGameState.Now + TimeSpan.FromSeconds(2);
+                        nextIncidentDriversCheck = currentGameState.Now + incidentDriversCheckInterval;
                         driversInvolvedInCurrentIncident.AddRange(getInvolvedIncidentCandidates(-1, currentGameState.OpponentData));
                     }
                     getInvolvedInIncidentAttempts++;
@@ -305,7 +307,7 @@ namespace CrewChiefV4.Events
                             else
                             {
                                 // get more involved drivers and schedule the next check
-                                nextIncidentDriversCheck = currentGameState.Now + TimeSpan.FromSeconds(2);
+                                nextIncidentDriversCheck = currentGameState.Now + incidentDriversCheckInterval;
                                 driversInvolvedInCurrentIncident.AddRange(getInvolvedIncidentCandidates(waitingForCrashedDriverInSector + 1, currentGameState.OpponentData));
                             }
                             getInvolvedInIncidentAttempts++;
@@ -340,7 +342,7 @@ namespace CrewChiefV4.Events
                                         // start working out who's gone off
                                         findInitialIncidentCandidateKeys(i + 1, currentGameState.OpponentData);
                                         positionAtStartOfIncident = currentGameState.SessionData.Position;
-                                        nextIncidentDriversCheck = currentGameState.Now + TimeSpan.FromSeconds(2);
+                                        nextIncidentDriversCheck = currentGameState.Now + incidentDriversCheckInterval;
                                         getInvolvedInIncidentAttempts = 0;
                                         driversInvolvedInCurrentIncident.Clear();
                                         waitingForCrashedDriverInSector = i;

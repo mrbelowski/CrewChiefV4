@@ -190,7 +190,7 @@ namespace CrewChiefV4.Events
                         {
                             OpponentData carWeJustPassed = currentGameState.OpponentData[currentOpponentBehindKey];
                             if (carWeJustPassed.CompletedLaps == currentGameState.SessionData.CompletedLaps &&
-                                carWeJustPassed.CarClass.getClassIdentifier() == currentGameState.carClass.getClassIdentifier())
+                                CarData.IsCarClassEqual(carWeJustPassed.CarClass, currentGameState.carClass))
                             {
                                 timeWhenWeMadeAPass = currentGameState.Now;
                                 opponentKeyForCarWeJustPassed = currentOpponentBehindKey;
@@ -210,7 +210,7 @@ namespace CrewChiefV4.Events
                             // TODO: check if we need to do a pit check here - don't think so
                             OpponentData carThatJustPassedUs = currentGameState.OpponentData[currentOpponentAheadKey];
                             if (carThatJustPassedUs.CompletedLaps == currentGameState.SessionData.CompletedLaps &&
-                                carThatJustPassedUs.CarClass.getClassIdentifier() == currentGameState.carClass.getClassIdentifier())
+                                CarData.IsCarClassEqual(carThatJustPassedUs.CarClass, currentGameState.carClass))
                             {
                                 timeWhenWeWerePassed = currentGameState.Now;
                                 opponentKeyForCarThatJustPassedUs = currentOpponentAheadKey;
