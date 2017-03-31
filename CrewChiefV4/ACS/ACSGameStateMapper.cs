@@ -1919,17 +1919,17 @@ namespace CrewChiefV4.assetto
                 tyreTempThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.WARM, tyreTypeData.maxColdTyreTemp, tyreTypeData.maxWarmTyreTemp));
                 tyreTempThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.HOT, tyreTypeData.maxWarmTyreTemp, tyreTypeData.maxHotTyreTemp));
                 tyreTempThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.COOKING, tyreTypeData.maxHotTyreTemp, 10000f));
+                Console.WriteLine("Using user defined temperature thresholds for TyreType: " + currentTyreCompound);
             }
             else if (acTyres.ContainsKey(currentTyreCompound))
             {
                 tyreTempThresholds = acTyres[currentTyreCompound].tyreTempThresholdsForAC;
+                Console.WriteLine("Using buildin defined temperature thresholds for TyreType: " + currentTyreCompound);
             }
             else
             {
-                tyreTempThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.COLD, -10000f, carClass.maxColdTyreTemp));
-                tyreTempThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.WARM, carClass.maxColdTyreTemp, carClass.maxWarmTyreTemp));
-                tyreTempThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.HOT, carClass.maxWarmTyreTemp, carClass.maxHotTyreTemp));
-                tyreTempThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.COOKING, carClass.maxHotTyreTemp, 10000f));
+                tyreTempThresholds = CarData.getTyreTempThresholds(carClass);
+                Console.WriteLine("Using temperature thresholds for TyreType: " + carClass.defaultTyreType.ToString() + " maxColdTyreTemp: " + carClass.maxColdTyreTemp + " maxWarmTyreTemp: " + carClass.maxWarmTyreTemp + " maxHotTyreTemp: " + carClass.maxHotTyreTemp);
             }
             return tyreTempThresholds;
         }
