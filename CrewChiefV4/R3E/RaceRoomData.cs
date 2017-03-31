@@ -265,6 +265,12 @@ namespace CrewChiefV4.RaceRoom
             //  0 = not allowed
             //  1 = allowed
             public Int32 yellowOvertake;
+
+            // Whether you have gained positions illegaly under yellow flag to give back
+            // -1 = no data
+            //  0 = no positions gained
+            //  n = number of positions gained
+            public Int32 yellowPositionsGained;
         }
 
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -672,7 +678,7 @@ namespace CrewChiefV4.RaceRoom
 
             // TODO: 
             // planned next R3E release:
-            // public FlagsExtended2 FlagsExtended2;
+            //public FlagsExtended2 FlagsExtended2;
 
             // Number of cars (including the player) in the race
             public Int32 NumCars;

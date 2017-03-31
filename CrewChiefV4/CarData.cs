@@ -79,6 +79,8 @@ namespace CrewChiefV4
         private static Dictionary<TyreType, List<CornerData.EnumWithThresholds>> tyreTempThresholds = new Dictionary<TyreType, List<CornerData.EnumWithThresholds>>();
         private static Dictionary<BrakeType, List<CornerData.EnumWithThresholds>> brakeTempThresholds = new Dictionary<BrakeType, List<CornerData.EnumWithThresholds>>();
 
+        private static List<List<CarClassEnum>> groupedClasses = new List<List<CarClassEnum>>();
+
         public class Preferences
         {
             public float spotterVehicleLength = -1;
@@ -87,6 +89,13 @@ namespace CrewChiefV4
 
         static CarData()
         {
+            List<CarClassEnum> r3eDTMClasses = new List<CarClassEnum>();
+            r3eDTMClasses.Add(CarClassEnum.DTM_2013); r3eDTMClasses.Add(CarClassEnum.DTM_2014); r3eDTMClasses.Add(CarClassEnum.DTM_2015); r3eDTMClasses.Add(CarClassEnum.DTM_2016);
+            groupedClasses.Add(r3eDTMClasses);
+
+            List<CarClassEnum> r3eTC1Classes = new List<CarClassEnum>();
+            r3eTC1Classes.Add(CarClassEnum.TC1); r3eTC1Classes.Add(CarClassEnum.TC1_2014);
+            groupedClasses.Add(r3eTC1Classes);		
             List<CornerData.EnumWithThresholds> roadTyreTempsThresholds = new List<CornerData.EnumWithThresholds>();
             roadTyreTempsThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.COLD, -10000, maxColdRoadTyreTempPeak));
             roadTyreTempsThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.WARM, maxColdRoadTyreTempPeak, maxWarmRoadTyreTempPeak));
@@ -354,6 +363,34 @@ namespace CrewChiefV4
             {
                 this.carClasses = new List<CarClass>();
             }
+        }
+
+        public static Boolean IsCarClassEqual(CarClass class1, CarClass class2) 
+        {
+            if (class1 == class2)
+            {
+                return true;
+            }
+            if (class1 == null && class2 != null) 
+            {
+                return false;
+            }
+            if (class2 == null && class1 != null)
+            {
+                return false;
+            }
+            if (String.Equals(class1.getClassIdentifier(), class2.getClassIdentifier()))
+            {
+                return true;
+            }
+            foreach (List<CarClassEnum> groupedClass in groupedClasses) 
+            {
+                if (groupedClass.Contains(class1.carClassEnum) && groupedClass.Contains(class2.carClassEnum))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         public static void loadCarClassData()
