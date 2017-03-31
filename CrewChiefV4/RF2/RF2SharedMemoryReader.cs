@@ -37,14 +37,12 @@ namespace CrewChiefV4.rFactor2
 
         public override void DumpRawGameData()
         {
-            if (dumpToFile && this.dataToDump != null && this.dataToDump.Count > 0 && filenameToDump != null)
+            if (this.dumpToFile && this.dataToDump != null && this.dataToDump.Count > 0 && this.filenameToDump != null)
             {
                 foreach (var wrapper in this.dataToDump)
-                {
-                    // TODO: Why is this done this way, seems pretty wasteful.
                     wrapper.state.mVehicles = getPopulatedVehicleInfoArray(wrapper.state.mVehicles);
-                }
-                SerializeObject(this.dataToDump.ToArray<RF2StructWrapper>(), filenameToDump);
+
+                SerializeObject(this.dataToDump.ToArray<RF2StructWrapper>(), this.filenameToDump);
             }
         }
 
