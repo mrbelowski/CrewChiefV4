@@ -1490,8 +1490,11 @@ namespace CrewChiefV4.assetto
                                     {
                                         currentGameState.SessionData.LeaderSectorNumber = currentOpponentSector;
                                     }
-                                        
-                                    if (currentOpponentRacePosition == 1 && previousOpponentPosition > 1)
+                                    // lets try this, not sure if its going to work but its, but doing a few tests i didnt get lead change messages
+                                    //when leader crossed the line witch was the usual case caused by the way ac updates timings when crossing the line. 
+                                    OpponentData stupidAcTimingsOpponent = currentGameState.getOpponentAtPosition(2, false);
+                                    if (currentOpponentRacePosition == 1 && previousOpponentPosition > 1 && stupidAcTimingsOpponent != null 
+                                        && stupidAcTimingsOpponent.CompletedLaps == currentOpponentLapsCompleted)
                                     {
                                         currentGameState.SessionData.HasLeadChanged = true;
                                     }
