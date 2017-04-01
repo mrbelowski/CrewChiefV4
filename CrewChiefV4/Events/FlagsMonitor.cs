@@ -749,7 +749,7 @@ namespace CrewChiefV4.Events
                 foreach (NamePositionPair driver in driversInvolvedInCurrentIncident)
                 {
                     String crashLandmark = TrackData.getLandmarkForLapDistance(currentTrack, driver.distanceRoundTrack);
-                    if (crashedInLandmarkCounts.ContainsKey(crashLandmark))
+                    if (crashLandmark != null && crashedInLandmarkCounts.ContainsKey(crashLandmark))
                     {
                         crashedInLandmarkCounts[crashLandmark]++;
                     }
