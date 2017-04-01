@@ -8,6 +8,8 @@ For support and discussions about Crew Chief we have our very own forum here: ht
 
 Changelog
 ---------
+Version 4.6.4.2: Delay lead change messages slightly and validate before playing; fixed potential error when working out where a pileup has occurred 
+
 Version 4.6.4.1: Fix crash bug in PCars with UDP data
 
 Version 4.6.4.0: Added installer for game specific plugins (AC, AMS / RF1 and RF2) - the app now offers to copy the required plugin files to the games' install directory if they're missing or out of date; extended incident reporting logic and sounds to allow for multiple involved drivers to be reported (if we have the driver name sounds) or 'pileup' warning if 4 or more drivers are stopped in the same corner; added more corner landmarks; opponent tracking fixes for PCars; loads and loads of bugfixes and improvements
