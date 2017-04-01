@@ -690,7 +690,7 @@ namespace CrewChiefV4.PCars
                 if (i != playerDataIndex)
                 {
                     pCarsAPIParticipantStruct participantStruct = shared.mParticipantData[i];
-                    if (participantStruct.mName[0] == 0)
+                    if (participantStruct.mName == null || participantStruct.mName[0] == 0)
                     {
                         // first character of name is null - this means the game regards this driver as inactive or missing for this update
                         continue;
