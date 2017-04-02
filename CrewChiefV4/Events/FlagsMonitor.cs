@@ -216,19 +216,23 @@ namespace CrewChiefV4.Events
                 }
             }
             if (currentGameState.Now > nextIllegalPassWarning && currentGameState.FlagData.numCarsPassedIllegally != illegalPassCarsCountAtLastAnnouncement)
-            {
-                processIllegalOvertakes(currentGameState);
+            {                
+                processIllegalOvertakes(previousGameState, currentGameState);
+                illegalPassCarsCountAtLastAnnouncement = currentGameState.FlagData.numCarsPassedIllegally;
             }
         }
 
-        private void processIllegalOvertakes(GameStateData currentGameState)
+        private void processIllegalOvertakes(GameStateData previousGameState, GameStateData currentGameState)
         {
             // some uncertainty here - once a penalty has been applied, does the numCarsPassedIllegally reset or remain non-zero?
-            if (currentGameState.PenaltiesData.NumPenalties > 0)
+            if (illegalPassCarsCountAtLastAnnouncement > 0 && previousGameState.PenaltiesData.NumPenalties > currentGameState.PenaltiesData.NumPenalties)
             {
                 Console.WriteLine("numCarsPassedIllegally has changed from " + illegalPassCarsCountAtLastAnnouncement +
-                    " to  " + currentGameState.FlagData.numCarsPassedIllegally + " and penalty count is " + currentGameState.PenaltiesData.NumPenalties);
+                    " to  " + currentGameState.FlagData.numCarsPassedIllegally + " and penalty count has increased");
                 hasAlreadyWarnedAboutIllegalPass = false;
+                // TODO: really struggling to actually get penalised for passing under yellow, so I'm guessing here. 
+                // If we have a new penalty delay the next check for a while
+                nextIllegalPassWarning = currentGameState.Now + TimeSpan.FromSeconds(30);
             }
             else
             {
@@ -267,8 +271,12 @@ namespace CrewChiefV4.Events
                 }
                 else
                 {
-                    // don't allow any other message to override this one:
-                    audioPlayer.playMessageImmediately(new QueuedMessage("give_positions_back_completed", MessageContents(folderGivePositionsBackCompleted), 0, null));
+                    // more guesswork :(
+                    if (currentGameState.PenaltiesData.NumPenalties == 0)
+                    {
+                        // don't allow any other message to override this one:
+                        audioPlayer.playMessageImmediately(new QueuedMessage("give_positions_back_completed", MessageContents(folderGivePositionsBackCompleted), 0, null));
+                    }
                     hasAlreadyWarnedAboutIllegalPass = false;
                 }
             }
