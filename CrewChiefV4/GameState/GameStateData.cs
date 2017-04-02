@@ -1188,11 +1188,13 @@ namespace CrewChiefV4.GameState
             // now some landmark proximity stuff
             if (landmarkNameStart == null)
             {
-                // again, we're waiting to enter a landmark zone - perhaps we've just left a zone so still check for stopped cars         
+                // again, we're waiting to enter a landmark zone - perhaps we've just left a zone so still check for stopped cars       
+  
+                // TODO: refactor this - there's already a method in TrackData to get a landmark for a given track distance, with a 100 metre 'near' zone
                 foreach (TrackLandmark trackLandmark in trackDefinition.trackLandmarks) 
                 {
                     if (currentDistanceRoundTrack > Math.Max(0, trackLandmark.distanceRoundLapStart - 100) &&
-                        currentDistanceRoundTrack < Math.Min(trackDefinition.trackLength, trackLandmark.distanceRoundLapEnd))
+                        currentDistanceRoundTrack < Math.Min(trackDefinition.trackLength, trackLandmark.distanceRoundLapEnd + 100))
                     {
                         if (nearLandmarkName != trackLandmark.landmarkName)
                         {
