@@ -693,8 +693,7 @@ namespace CrewChiefV4
                 this.deleteAssigmentButton.Enabled = false;
                 this.groupBox1.Enabled = false;
                 this.button1.Enabled = false;
-                this.helpButton.Enabled = false;
-                this.aboutButton.Enabled = false;
+                this.scanControllersButton.Enabled = false;
                 this.personalisationBox.Enabled = false;
                 ThreadStart crewChiefWork = runApp;
                 Thread crewChiefThread = new Thread(crewChiefWork);
@@ -747,8 +746,7 @@ namespace CrewChiefV4
                 Console.WriteLine("Application stopped");
                 this.button1.Enabled = true;
                 this.groupBox1.Enabled = true;
-                this.helpButton.Enabled = true;
-                this.aboutButton.Enabled = true;
+                this.scanControllersButton.Enabled = true;
                 this.personalisationBox.Enabled = true;
             }
         }
@@ -781,8 +779,7 @@ namespace CrewChiefV4
                 this.assignButtonToAction.Enabled = this.buttonActionSelect.SelectedIndex > -1 && this.controllersList.SelectedIndex > -1;
                 stopApp();
                 this.button1.Enabled = true;
-                this.helpButton.Enabled = true;
-                this.aboutButton.Enabled = true;
+                this.scanControllersButton.Enabled = true;
                 this.personalisationBox.Enabled = true;
                 IsAppRunning = false;
             }
