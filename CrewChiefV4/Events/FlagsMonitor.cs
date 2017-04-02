@@ -24,7 +24,7 @@ namespace CrewChiefV4.Events
         private DateTime lastBlueFlagTime = DateTime.MinValue;
 
         private TimeSpan timeBetweenYellowFlagMessages = TimeSpan.FromSeconds(30);
-        private TimeSpan timeBetweenBlueFlagMessages = TimeSpan.FromSeconds(10);
+        private TimeSpan timeBetweenBlueFlagMessages = TimeSpan.FromSeconds(20);
         private TimeSpan timeBetweenBlackFlagMessages = TimeSpan.FromSeconds(20);
         private TimeSpan timeBetweenWhiteFlagMessages = TimeSpan.FromSeconds(20);
 
