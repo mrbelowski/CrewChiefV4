@@ -997,7 +997,7 @@ namespace CrewChiefV4.GameState
         }
         public float[] getBestTimeAndSpeeds(String landmarkName)
         {
-            return getBestTimeAndSpeeds(landmarkName, 5, 2);
+            return getBestTimeAndSpeeds(landmarkName, 5, 3);
         }
 
         // returns [timeInSection, entrySpeed, exitSpeed] for the quickest time through that section
@@ -1105,8 +1105,10 @@ namespace CrewChiefV4.GameState
         // returns null or a landmark name this car is stopped in
         public String updateLandmarkTiming(TrackDefinition trackDefinition, float gameTime, float previousDistanceRoundTrack, float currentDistanceRoundTrack, float speed) 
         {
-            if (trackDefinition == null || trackDefinition.trackLandmarks == null || trackDefinition.trackLandmarks.Count == 0)
+            if (trackDefinition == null || trackDefinition.trackLandmarks == null || trackDefinition.trackLandmarks.Count == 0 ||
+                gameTime < 30)
             {
+                // don't collect data if the session has been running < 30 seconds
                 return null;
             }
             // yuk...
