@@ -1448,14 +1448,6 @@ namespace CrewChiefV4.assetto
                                     }
                                     int currentOpponentLapsCompleted = participantStruct.lapCount;
 
-                                    /*if (currentOpponentRacePosition == 1 && (currentGameState.SessionData.SessionNumberOfLaps > 0 &&
-                                            currentGameState.SessionData.SessionNumberOfLaps == currentOpponentLapsCompleted) ||
-                                            (currentGameState.SessionData.SessionTotalRunTime > 0 && currentGameState.SessionData.SessionTimeRemaining < 1 &&
-                                            previousOpponentCompletedLaps < currentOpponentLapsCompleted))
-                                    {
-                                        currentGameState.SessionData.LeaderHasFinishedRace = true;
-                                    }*/
-
                                     //Using same approach here as in R3E
                                     Boolean finishedAllottedRaceLaps = currentGameState.SessionData.SessionNumberOfLaps > 0 && currentGameState.SessionData.SessionNumberOfLaps == currentOpponentLapsCompleted;
                                     Boolean finishedAllottedRaceTime = false;
@@ -1490,11 +1482,7 @@ namespace CrewChiefV4.assetto
                                     {
                                         currentGameState.SessionData.LeaderSectorNumber = currentOpponentSector;
                                     }
-                                    // lets try this, not sure if its going to work, but doing a few tests i didnt get lead change messages
-                                    //when leader crossed the line witch was the usual case caused by the way ac updates timings when crossing the line. 
-                                    OpponentData stupidAcTimingsOpponent = currentGameState.getOpponentAtPosition(2, false);
-                                    if (currentOpponentRacePosition == 1 && previousOpponentPosition > 1 && stupidAcTimingsOpponent != null
-                                        && stupidAcTimingsOpponent.CompletedLaps == currentOpponentLapsCompleted)
+                                    if (currentOpponentRacePosition == 1 && previousOpponentPosition > 1)
                                     {
                                         currentGameState.SessionData.HasLeadChanged = true;
                                     }
