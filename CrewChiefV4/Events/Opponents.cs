@@ -12,6 +12,8 @@ namespace CrewChiefV4.Events
     class Opponents : AbstractEvent
     {
         private static String validationDriverAheadKey = "validationDriverAheadKey";
+        private static String validationNewLeaderKey = "validationNewLeaderKey";
+
         public static String folderLeaderIsPitting = "opponents/the_leader_is_pitting";
         public static String folderCarAheadIsPitting = "opponents/the_car_ahead_is_pitting";
         public static String folderCarBehindIsPitting = "opponents/the_car_behind_is_pitting";
@@ -74,24 +76,48 @@ namespace CrewChiefV4.Events
         {
             if (base.isMessageStillValid(eventSubType, currentGameState, validationData))
             {
-                if (validationData != null && validationData.ContainsKey(validationDriverAheadKey))
+                if (validationData != null)
                 {
-                    String expectedOpponentName = (String)validationData[validationDriverAheadKey];
-                    OpponentData opponentInFront = currentGameState.SessionData.Position > 1 ? currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position - 1, false) : null;
-                    String actualOpponentName = opponentInFront == null ? null : opponentInFront.DriverRawName;
-                    if (actualOpponentName != expectedOpponentName)
+                    if (validationData.ContainsKey(validationDriverAheadKey))
                     {
-                        if (actualOpponentName != null && expectedOpponentName != null)
+                        String expectedOpponentName = (String)validationData[validationDriverAheadKey];
+                        OpponentData opponentInFront = currentGameState.SessionData.Position > 1 ? currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position - 1, false) : null;
+                        String actualOpponentName = opponentInFront == null ? null : opponentInFront.DriverRawName;
+                        if (actualOpponentName != expectedOpponentName)
+                        {
+                            if (actualOpponentName != null && expectedOpponentName != null)
+                            {
+                                Console.WriteLine("new car in front message for opponent " + expectedOpponentName +
+                                    " no longer valid - driver in front is now " + actualOpponentName);
+                            }
+                            return false;
+                        }
+                        else if (opponentInFront != null && (opponentInFront.InPits || opponentInFront.isEnteringPits()))
                         {
                             Console.WriteLine("new car in front message for opponent " + expectedOpponentName +
-                                " no longer valid - driver in front is now " + actualOpponentName);
+                                " no longer valid - driver is " + (opponentInFront.InPits ? "in pits" : "is entering the pits"));
                         }
-                        return false;
                     }
-                    else if (opponentInFront != null && (opponentInFront.InPits || opponentInFront.isEnteringPits()))
+                    else if (validationData.ContainsKey(validationNewLeaderKey))
                     {
-                        Console.WriteLine("new car in front message for opponent " + expectedOpponentName +
-                            " no longer valid - driver is " + (opponentInFront.InPits ? "in pits" : "is entering the pits"));
+                        String expectedLeaderName = (String)validationData[validationNewLeaderKey];
+                        if (currentGameState.SessionData.Position == 1)
+                        {
+                            Console.WriteLine("new leader message for opponent " + expectedLeaderName +
+                                    " no longer valid - player is now leader");
+                            return false;
+                        }                        
+                        OpponentData actualLeader = currentGameState.getOpponentAtPosition(1, false);
+                        String actualLeaderName = actualLeader == null ? null : actualLeader.DriverRawName;
+                        if (actualLeaderName != expectedLeaderName)
+                        {
+                            if (actualLeaderName != null && expectedLeaderName != null)
+                            {
+                                Console.WriteLine("new leader message for opponent " + expectedLeaderName +
+                                    " no longer valid - leader is now " + actualLeaderName);
+                            }
+                            return false;
+                        }
                     }
                 }
                 return true;
@@ -211,7 +237,8 @@ namespace CrewChiefV4.Events
                             (SoundCache.hasSuitableTTSVoice || SoundCache.availableDriverNames.Contains(DriverNameHelper.getUsableDriverName(name))))
                         {
                             Console.WriteLine("Lead change, current leader is " + name + " laps completed = " + currentGameState.SessionData.CompletedLaps);
-                            audioPlayer.playMessage(new QueuedMessage("new_leader", MessageContents(currentGameState.getOpponentAtPosition(1, false), folderIsNowLeading), 0, this));
+                            audioPlayer.playMessage(new QueuedMessage("new_leader", MessageContents(leader, folderIsNowLeading), 2, this,
+                                new Dictionary<string, object> { { validationNewLeaderKey, name } }));
                             nextLeadChangeMessage = currentGameState.Now.Add(TimeSpan.FromSeconds(30));
                         }
                     }                    
