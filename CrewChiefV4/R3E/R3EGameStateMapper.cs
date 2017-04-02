@@ -80,10 +80,6 @@ namespace CrewChiefV4.RaceRoom
 
         private SpeechRecogniser speechRecogniser;
 
-        // blue flag zone
-        private int blueFlagDetectionDistance = UserSettings.GetUserSettings().getInt("r3e_blue_flag_detection_distance");
-
-
         // now we're much stricter with the bollocks opponents data (duplicates, missing entries, stuff randomly being given the wrong
         // slot_id), can we remove this grotty delayed-position hack and all the associated crap it creates? Turns out that no, we can't. 
         // The data are broken and unreliable in multiple ways - the opponent data get jumbled up, and the data *within each opponent slot*
@@ -155,7 +151,7 @@ namespace CrewChiefV4.RaceRoom
             int previousLapsCompleted = previousGameState == null ? 0 : previousGameState.SessionData.CompletedLaps;
             currentGameState.SessionData.SessionPhase = mapToSessionPhase(lastSessionPhase, currentGameState.SessionData.SessionType, lastSessionRunningTime,
                 currentGameState.SessionData.SessionRunningTime, shared.SessionPhase, currentGameState.ControlData.ControlType,
-                previousLapsCompleted, shared.CompletedLaps, isCarRunning);
+                previousLapsCompleted, shared.CompletedLaps, isCarRunning, shared.FlagsExtended.checkered == 1);
 
             List<String> opponentDriverNamesProcessedThisUpdate = new List<String>();
             Boolean justGoneGreen = false;
@@ -410,10 +406,35 @@ namespace CrewChiefV4.RaceRoom
                 currentGameState.FlagData.sectorFlags[2] = FlagEnum.DOUBLE_YELLOW;
             }
 
+            currentGameState.FlagData.isLocalYellow = shared.Flags.Yellow == 1;
+            if (shared.FlagsExtended2.white == 1)
+            {
+                currentGameState.SessionData.Flag = FlagEnum.WHITE;
+            }
+            else if (shared.Flags.Black == 1)
+            {
+                currentGameState.SessionData.Flag = FlagEnum.BLACK;
+            }
+
+            currentGameState.FlagData.numCarsPassedIllegally = shared.FlagsExtended2.yellowPositionsGained;
+            if (shared.FlagsExtended2.yellowOvertake == 1)
+            {
+                currentGameState.FlagData.canOvertakeCarInFront = PassAllowedUnderYellow.YES;
+            }
+            else if (shared.FlagsExtended2.yellowOvertake == 0)
+            {
+                currentGameState.FlagData.canOvertakeCarInFront = PassAllowedUnderYellow.NO;
+            }
+
             // closestYellowLapDistance is the distance roundn the lap from the player to the incident
             if (shared.closestYellowLapDistance > 0)
             {
                 currentGameState.FlagData.distanceToNearestIncident = shared.closestYellowLapDistance;
+            }
+
+            if (shared.Flags.Blue == 1)
+            {
+                currentGameState.SessionData.Flag = FlagEnum.BLUE;
             }
 
             currentGameState.SessionData.SessionTimeRemaining = shared.SessionTimeRemaining;
@@ -776,19 +797,6 @@ namespace CrewChiefV4.RaceRoom
                                         }
                                     }
                                 }
-                            }
-                            // TODO: fix this properly - hack to work around issue with lagging position updates - 
-                            // only allow a blue flag if the 'settled' position and the latest position agree
-
-                            Boolean isInSector1OnOutlap = currentOpponentData.CurrentSectorNumber == 1 &&
-                                (currentOpponentData.getCurrentLapData() != null && currentOpponentData.getCurrentLapData().OutLap);
-                            if (currentGameState.SessionData.SessionType == SessionType.Race && currentOpponentData.Position == participantStruct.Place &&
-                                !isEnteringPits && !isLeavingPits && currentGameState.PositionAndMotionData.DistanceRoundTrack != 0 &&
-                                currentOpponentData.Position + 1 < shared.Position && !isInSector1OnOutlap && 
-                                isBehindWithinDistance(shared.LayoutLength, 8, blueFlagDetectionDistance, currentGameState.PositionAndMotionData.DistanceRoundTrack, 
-                                participantStruct.LapDistance))
-                            {
-                                currentGameState.SessionData.Flag = FlagEnum.BLUE;
                             }
                         }
                     }
@@ -1215,14 +1223,14 @@ namespace CrewChiefV4.RaceRoom
          * previous phase is returned
          */
         private SessionPhase mapToSessionPhase(SessionPhase lastSessionPhase, SessionType currentSessionType, float lastSessionRunningTime, float thisSessionRunningTime, 
-            int r3eSessionPhase, ControlType controlType, int previousLapsCompleted, int currentLapsCompleted, Boolean isCarRunning)
+            int r3eSessionPhase, ControlType controlType, int previousLapsCompleted, int currentLapsCompleted, Boolean isCarRunning, Boolean gameSaysIsChequered)
         {
 
             /* prac and qual sessions go chequered after the allotted time. They never go 'finished'. If we complete a lap
              * during this period we can detect the session end and trigger the finish message. Otherwise we just can't detect
              * this period end - hence the 'isCarRunning' hack...
             */
-            if ((int)RaceRoomConstant.SessionPhase.Checkered == r3eSessionPhase)
+            if ((int)RaceRoomConstant.SessionPhase.Checkered == r3eSessionPhase || gameSaysIsChequered)
             {
                 if (lastSessionPhase == SessionPhase.Green || lastSessionPhase == SessionPhase.FullCourseYellow)
                 {

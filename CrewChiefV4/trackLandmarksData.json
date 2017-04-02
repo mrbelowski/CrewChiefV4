@@ -898,7 +898,7 @@
                     "isCommonOvertakingSpot": false
                 },
                 {
-                    "landmarkName": "the_chicane",
+                    "landmarkName": "varianti_alta",
                     "distanceRoundLapStart": 3300,
                     "distanceRoundLapEnd": 3380,
                     "isCommonOvertakingSpot": true
@@ -995,7 +995,7 @@
                     "isCommonOvertakingSpot": false
                 },
                 {
-                    "landmarkName": "the_hairpin",
+                    "landmarkName": "the_andretti_hairpin",
                     "distanceRoundLapStart": 410,
                     "distanceRoundLapEnd": 560,
                     "isCommonOvertakingSpot": true
@@ -1031,7 +1031,7 @@
                     "isCommonOvertakingSpot": true
                 },
                 {
-                    "landmarkName": "turn9",
+                    "landmarkName": "rainey_curve",
                     "distanceRoundLapStart": 2640,
                     "distanceRoundLapEnd": 2820,
                     "isCommonOvertakingSpot": false
@@ -1135,7 +1135,7 @@
                     "isCommonOvertakingSpot": false
                 },
                 {
-                    "landmarkName": "the_second_chicane",
+                    "landmarkName": "della_roggia",
                     "distanceRoundLapStart": 1800,
                     "distanceRoundLapEnd": 1910,
                     "isCommonOvertakingSpot": true
