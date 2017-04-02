@@ -63,6 +63,10 @@ namespace CrewChiefV4.Events
         private String folderIncidentInCornerIntro = "flags/incident_in_corner_intro";
         private String folderIncidentInCornerDriverIntro = "flags/incident_in_corner_with_driver_intro";
 
+        private String folderGivePositionsBackIntro = "flags/give_positions_back_intro";
+        private String folderGivePositionsBackOutro = "flags/give_positions_back_outro";
+        private String folderGivePositionsBackCompleted = "flags/give_positions_back_completed";
+
         private int maxDistanceMovedForYellowAnnouncement = UserSettings.GetUserSettings().getInt("max_distance_moved_for_yellow_announcement");
 
         // for new (RF2 and R3E) impl
@@ -117,6 +121,10 @@ namespace CrewChiefV4.Events
         private List<OpponentData> driversCrashedInCorner = new List<OpponentData>();
         private DateTime waitingForCrashedDriverInCornerFinishTime = DateTime.MaxValue;
 
+        private DateTime nextIllegalPassWarning = DateTime.MinValue;
+        private TimeSpan illegalPassRepeatInterval = TimeSpan.FromSeconds(7);
+        private int illegalPassCarsCountAtLastAnnouncement = 0;
+
         public FlagsMonitor(AudioPlayer audioPlayer)
         {
             this.audioPlayer = audioPlayer;
@@ -157,11 +165,14 @@ namespace CrewChiefV4.Events
             waitingForCrashedDriverInCorner = null;
             driversCrashedInCorner.Clear();
             waitingForCrashedDriverInCornerFinishTime = DateTime.MaxValue;
+
+            nextIllegalPassWarning = DateTime.MinValue;
+            illegalPassCarsCountAtLastAnnouncement = 0;
         }
 
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
-            if (CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT || CrewChief.gameDefinition.gameEnum == GameEnum.RF1/* || CrewChief.gameDefinition.gameEnum == GameEnum.RACE_ROOM*/)
+            if (CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT || CrewChief.gameDefinition.gameEnum == GameEnum.RF1 || CrewChief.gameDefinition.gameEnum == GameEnum.RACE_ROOM)
             {
                 newYellowFlagImplementation(previousGameState, currentGameState);
             }
@@ -196,6 +207,30 @@ namespace CrewChiefV4.Events
                 {
                     lastWhiteFlagTime = currentGameState.Now;
                     audioPlayer.playMessage(new QueuedMessage(folderWhiteFlag, 0, this));
+                }
+            }
+            if (currentGameState.Now > nextIllegalPassWarning && currentGameState.FlagData.numCarsPassedIllegally != illegalPassCarsCountAtLastAnnouncement)
+            {
+                // some uncertainty here - once a penalty has been applied, does the numCarsPassedIllegally reset or remain non-zero?
+                if (currentGameState.PenaltiesData.NumPenalties > 0)
+                {
+                    Console.WriteLine("numCarsPassedIllegally has changed from " + illegalPassCarsCountAtLastAnnouncement +
+                        " to  " + currentGameState.FlagData.numCarsPassedIllegally + " and penalty count is " + currentGameState.PenaltiesData.NumPenalties);
+                }
+                else
+                {
+                    nextIllegalPassWarning = currentGameState.Now + illegalPassRepeatInterval;
+                    if (currentGameState.FlagData.numCarsPassedIllegally > 0)
+                    {
+                        // don't allow any other message to override this one:
+                        audioPlayer.playMessageImmediately(new QueuedMessage("give_positions_back", MessageContents(folderGivePositionsBackIntro,
+                            currentGameState.FlagData.numCarsPassedIllegally, folderGivePositionsBackOutro), 0, null));
+                    }
+                    else
+                    {
+                        // don't allow any other message to override this one:
+                        audioPlayer.playMessageImmediately(new QueuedMessage("give_positions_back_completed", MessageContents(folderGivePositionsBackCompleted), 0, null));
+                    }
                 }
             }
         }

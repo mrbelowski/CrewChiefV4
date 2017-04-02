@@ -678,7 +678,7 @@ namespace CrewChiefV4.RaceRoom
 
             // TODO: 
             // planned next R3E release:
-            //public FlagsExtended2 FlagsExtended2;
+            public FlagsExtended2 FlagsExtended2;
 
             // Number of cars (including the player) in the race
             public Int32 NumCars;

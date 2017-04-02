@@ -32,8 +32,9 @@ namespace CrewChiefV4.Events
         private TimeSpan AirTemperatureReportMaxFrequency = TimeSpan.FromSeconds(UserSettings.GetUserSettings().getInt("ambient_temp_check_interval_seconds"));
         private TimeSpan TrackTemperatureReportMaxFrequency = TimeSpan.FromSeconds(UserSettings.GetUserSettings().getInt("track_temp_check_interval_seconds"));
 
-        // is this acceptable? It means we report rain changes as quickly as possible but it might be noisy...
-        private TimeSpan RainReportMaxFrequency = ConditionsSampleFrequency;
+        // don't report rain changes more that 2 minutes apart for RF2
+        private TimeSpan RainReportMaxFrequencyRF2 = TimeSpan.FromSeconds(120);
+        private TimeSpan RainReportMaxFrequencyPCars = TimeSpan.FromSeconds(10);
 
         private float minTrackTempDeltaToReport = UserSettings.GetUserSettings().getFloat("report_ambient_temp_changes_greater_than");
         private float minAirTempDeltaToReport = UserSettings.GetUserSettings().getFloat("report_track_temp_changes_greater_than");
@@ -182,7 +183,7 @@ namespace CrewChiefV4.Events
                                 (folderTrackTempDecreasing, convertTemp(currentConditions.TrackTemperature), getTempUnit()), 0, this));
                         }
                     }
-                    if (currentGameState.Now > lastRainReport.Add(RainReportMaxFrequency))
+                    if (currentGameState.Now > lastRainReport.Add(CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT ? RainReportMaxFrequencyRF2 : RainReportMaxFrequencyPCars))
                     {
                         // for PCars mRainDensity value is 0 or 1
                         if (CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_32BIT ||

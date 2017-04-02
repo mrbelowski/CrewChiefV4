@@ -80,10 +80,6 @@ namespace CrewChiefV4.RaceRoom
 
         private SpeechRecogniser speechRecogniser;
 
-        // blue flag zone
-        private int blueFlagDetectionDistance = UserSettings.GetUserSettings().getInt("r3e_blue_flag_detection_distance");
-
-
         // now we're much stricter with the bollocks opponents data (duplicates, missing entries, stuff randomly being given the wrong
         // slot_id), can we remove this grotty delayed-position hack and all the associated crap it creates? Turns out that no, we can't. 
         // The data are broken and unreliable in multiple ways - the opponent data get jumbled up, and the data *within each opponent slot*
@@ -410,10 +406,17 @@ namespace CrewChiefV4.RaceRoom
                 currentGameState.FlagData.sectorFlags[2] = FlagEnum.DOUBLE_YELLOW;
             }
 
+            currentGameState.FlagData.numCarsPassedIllegally = shared.FlagsExtended2.yellowPositionsGained;
+
             // closestYellowLapDistance is the distance roundn the lap from the player to the incident
             if (shared.closestYellowLapDistance > 0)
             {
                 currentGameState.FlagData.distanceToNearestIncident = shared.closestYellowLapDistance;
+            }
+
+            if (shared.Flags.Blue == 1)
+            {
+                currentGameState.SessionData.Flag = FlagEnum.BLUE;
             }
 
             currentGameState.SessionData.SessionTimeRemaining = shared.SessionTimeRemaining;
@@ -776,19 +779,6 @@ namespace CrewChiefV4.RaceRoom
                                         }
                                     }
                                 }
-                            }
-                            // TODO: fix this properly - hack to work around issue with lagging position updates - 
-                            // only allow a blue flag if the 'settled' position and the latest position agree
-
-                            Boolean isInSector1OnOutlap = currentOpponentData.CurrentSectorNumber == 1 &&
-                                (currentOpponentData.getCurrentLapData() != null && currentOpponentData.getCurrentLapData().OutLap);
-                            if (currentGameState.SessionData.SessionType == SessionType.Race && currentOpponentData.Position == participantStruct.Place &&
-                                !isEnteringPits && !isLeavingPits && currentGameState.PositionAndMotionData.DistanceRoundTrack != 0 &&
-                                currentOpponentData.Position + 1 < shared.Position && !isInSector1OnOutlap && 
-                                isBehindWithinDistance(shared.LayoutLength, 8, blueFlagDetectionDistance, currentGameState.PositionAndMotionData.DistanceRoundTrack, 
-                                participantStruct.LapDistance))
-                            {
-                                currentGameState.SessionData.Flag = FlagEnum.BLUE;
                             }
                         }
                     }

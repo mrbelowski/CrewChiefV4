@@ -64,7 +64,7 @@ namespace CrewChiefV4.GameState
     {
         PENDING, PITS_CLOSED, PITS_OPEN_LEAD_LAP_VEHICLES, PITS_OPEN, LAST_LAP_NEXT, LAST_LAP_CURRENT, RACING
     }
-
+    
     public class FlagData
     {
         // holds newer (RF2 & Raceroom) flag data. This is game dependent - only RF2 and R3E will use this.
@@ -75,6 +75,8 @@ namespace CrewChiefV4.GameState
         public float distanceToNearestIncident = -1;
         public FullCourseYellowPhase fcyPhase = FullCourseYellowPhase.RACING;
         public int lapCountWhenLastWentGreen = -1;
+        // cars passed under yellow - need to give back this many places to avoid penalty (only implemented for R3E)
+        public int numCarsPassedIllegally = 0;
     }
 
     public class TransmissionData
@@ -1362,6 +1364,7 @@ namespace CrewChiefV4.GameState
         public int CutTrackWarnings = 0;
 
         public Boolean IsOffRacingSurface = false;
+
     }
 
     public class TyreData
