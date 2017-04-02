@@ -417,13 +417,14 @@ namespace CrewChiefV4.Events
                                         lastSectorFlagsAnnounced[i] = sectorFlag;
                                         lastSectorFlagsAnnouncedTime[i] = currentGameState.Now;
 
-                                        if (isCurrentSector(currentGameState, i) && 4 > random.NextDouble() * 10)
+                                        // don't call sector yellow if we've in a local yellow
+                                        if (isCurrentSector(currentGameState, i) && 4 > random.NextDouble() * 10 && !currentGameState.FlagData.isLocalYellow)
                                         {
                                             // If in current, sometimes announce without sector number.
                                             audioPlayer.playMessage(new QueuedMessage(sectorFlag == FlagEnum.YELLOW ?
                                                 folderYellowFlag : folderDoubleYellowFlag, 0, this));
                                         }
-                                        else
+                                        else if (!currentGameState.FlagData.isLocalYellow)
                                         {
                                             audioPlayer.playMessageImmediately(new QueuedMessage(sectorFlag == FlagEnum.YELLOW ?
                                                 folderYellowFlagSectors[i] : folderDoubleYellowFlagSectors[i], 0, null));
