@@ -64,6 +64,11 @@ namespace CrewChiefV4.GameState
     {
         PENDING, PITS_CLOSED, PITS_OPEN_LEAD_LAP_VEHICLES, PITS_OPEN, LAST_LAP_NEXT, LAST_LAP_CURRENT, RACING
     }
+
+    public enum PassAllowedUnderYellow
+    {
+        YES, NO, NO_DATA
+    }
     
     public class FlagData
     {
@@ -77,6 +82,7 @@ namespace CrewChiefV4.GameState
         public int lapCountWhenLastWentGreen = -1;
         // cars passed under yellow - need to give back this many places to avoid penalty (only implemented for R3E)
         public int numCarsPassedIllegally = 0;
+        public PassAllowedUnderYellow canOvertakeCarInFront = PassAllowedUnderYellow.NO_DATA;
     }
 
     public class TransmissionData

@@ -70,7 +70,10 @@ namespace CrewChiefV4.Events
         private String folderGivePositionsBackFirstWarningOutro = "flags/give_positions_back_first_warning_outro";
         private String folderGivePositionsBackNextWarningOutro = "flags/give_positions_back_next_warning_outro";
         private String folderGivePositionsBackCompleted = "flags/give_positions_back_completed";
-        
+
+        private String folderNoOvertaking = "flags/no_overtaking";
+        private String folderClearToOvertake = "flags/clear_to_overtake";
+
         private int maxDistanceMovedForYellowAnnouncement = UserSettings.GetUserSettings().getInt("max_distance_moved_for_yellow_announcement");
 
         // for new (RF2 and R3E) impl
@@ -130,6 +133,8 @@ namespace CrewChiefV4.Events
         private int illegalPassCarsCountAtLastAnnouncement = 0;
         private Boolean hasAlreadyWarnedAboutIllegalPass = false;
 
+        private PassAllowedUnderYellow lastReportedOvertakeAllowed = PassAllowedUnderYellow.NO_DATA;
+
         public FlagsMonitor(AudioPlayer audioPlayer)
         {
             this.audioPlayer = audioPlayer;
@@ -174,6 +179,8 @@ namespace CrewChiefV4.Events
             nextIllegalPassWarning = DateTime.MinValue;
             illegalPassCarsCountAtLastAnnouncement = 0;
             hasAlreadyWarnedAboutIllegalPass = false;
+
+            lastReportedOvertakeAllowed = PassAllowedUnderYellow.NO_DATA;
         }
 
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
@@ -470,6 +477,7 @@ namespace CrewChiefV4.Events
                     lastLocalYellowAnnouncedTime = currentGameState.Now;
                     // we've passed the incident so allow warnings of other incidents approaching
                     hasWarnedOfUpcomingIncident = false;
+                    lastReportedOvertakeAllowed = PassAllowedUnderYellow.NO_DATA;
                 }
                 else if (!isUnderLocalYellow && !hasWarnedOfUpcomingIncident && !shouldWarnOfUpComingYellow(previousGameState) && shouldWarnOfUpComingYellow(currentGameState))
                 {
@@ -482,8 +490,24 @@ namespace CrewChiefV4.Events
                     // if all the sectors are clear the local and warning booleans. This ensures we don't sit waiting for a 'clear' that never comes.
                     isUnderLocalYellow = false;
                     hasWarnedOfUpcomingIncident = false;
+                    lastReportedOvertakeAllowed = PassAllowedUnderYellow.NO_DATA;
                 }
 
+                if (isUnderLocalYellow)
+                {
+                    if (currentGameState.FlagData.canOvertakeCarInFront == PassAllowedUnderYellow.YES
+                        && lastReportedOvertakeAllowed != PassAllowedUnderYellow.YES)
+                    {
+                        audioPlayer.playMessageImmediately(new QueuedMessage(folderClearToOvertake, 0, this));
+                        lastReportedOvertakeAllowed = PassAllowedUnderYellow.YES;
+                    }
+                    else if (currentGameState.FlagData.canOvertakeCarInFront == PassAllowedUnderYellow.NO
+                        && lastReportedOvertakeAllowed != PassAllowedUnderYellow.NO)
+                    {
+                        audioPlayer.playMessageImmediately(new QueuedMessage(folderNoOvertaking, 0, this));
+                        lastReportedOvertakeAllowed = PassAllowedUnderYellow.NO;
+                    }
+                }
             }
         }
 
