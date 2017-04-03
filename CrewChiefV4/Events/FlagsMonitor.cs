@@ -76,6 +76,8 @@ namespace CrewChiefV4.Events
 
         private int maxDistanceMovedForYellowAnnouncement = UserSettings.GetUserSettings().getInt("max_distance_moved_for_yellow_announcement");
 
+        private Boolean reportAllowedOvertakesUnderYellow = UserSettings.GetUserSettings().getBoolean("report_allowed_overtakes_under_yellow");
+
         // for new (RF2 and R3E) impl
         private FlagEnum[] lastSectorFlagsAnnounced = new FlagEnum[] { FlagEnum.GREEN, FlagEnum.GREEN, FlagEnum.GREEN };
         private DateTime[] lastSectorFlagsAnnouncedTime = new DateTime[] { DateTime.MinValue, DateTime.MinValue, DateTime.MinValue };
@@ -494,7 +496,7 @@ namespace CrewChiefV4.Events
                     lastReportedOvertakeAllowed = PassAllowedUnderYellow.NO_DATA;
                 }
 
-                if (isUnderLocalYellow)
+                if (isUnderLocalYellow && reportAllowedOvertakesUnderYellow)
                 {
                     if (currentGameState.FlagData.canOvertakeCarInFront == PassAllowedUnderYellow.YES
                         && lastReportedOvertakeAllowed != PassAllowedUnderYellow.YES)
