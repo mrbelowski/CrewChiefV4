@@ -24,7 +24,7 @@ namespace CrewChiefV4.Events
         private DateTime lastBlueFlagTime = DateTime.MinValue;
 
         private TimeSpan timeBetweenYellowFlagMessages = TimeSpan.FromSeconds(30);
-        private TimeSpan timeBetweenBlueFlagMessages = TimeSpan.FromSeconds(10);
+        private TimeSpan timeBetweenBlueFlagMessages = TimeSpan.FromSeconds(20);
         private TimeSpan timeBetweenBlackFlagMessages = TimeSpan.FromSeconds(20);
         private TimeSpan timeBetweenWhiteFlagMessages = TimeSpan.FromSeconds(20);
 
@@ -62,6 +62,17 @@ namespace CrewChiefV4.Events
 
         private String folderIncidentInCornerIntro = "flags/incident_in_corner_intro";
         private String folderIncidentInCornerDriverIntro = "flags/incident_in_corner_with_driver_intro";
+
+        private String folderGivePositionsBackFirstWarningIntro = "flags/give_positions_back_first_warning_intro";
+        private String folderGivePositionsBackNextWarningIntro = "flags/give_positions_back_next_warning_intro";
+        private String folderGiveOnePositionBackFirstWarning = "flags/give_one_position_back_first_warning";
+        private String folderGiveOnePositionsBackNextWarning = "flags/give_one_position_back_next_warning";
+        private String folderGivePositionsBackFirstWarningOutro = "flags/give_positions_back_first_warning_outro";
+        private String folderGivePositionsBackNextWarningOutro = "flags/give_positions_back_next_warning_outro";
+        private String folderGivePositionsBackCompleted = "flags/give_positions_back_completed";
+
+        private String folderNoOvertaking = "flags/no_overtaking";
+        private String folderClearToOvertake = "flags/clear_to_overtake";
 
         private int maxDistanceMovedForYellowAnnouncement = UserSettings.GetUserSettings().getInt("max_distance_moved_for_yellow_announcement");
 
@@ -117,6 +128,13 @@ namespace CrewChiefV4.Events
         private List<OpponentData> driversCrashedInCorner = new List<OpponentData>();
         private DateTime waitingForCrashedDriverInCornerFinishTime = DateTime.MaxValue;
 
+        private DateTime nextIllegalPassWarning = DateTime.MinValue;
+        private TimeSpan illegalPassRepeatInterval = TimeSpan.FromSeconds(7);
+        private int illegalPassCarsCountAtLastAnnouncement = 0;
+        private Boolean hasAlreadyWarnedAboutIllegalPass = false;
+
+        private PassAllowedUnderYellow lastReportedOvertakeAllowed = PassAllowedUnderYellow.NO_DATA;
+
         public FlagsMonitor(AudioPlayer audioPlayer)
         {
             this.audioPlayer = audioPlayer;
@@ -157,11 +175,17 @@ namespace CrewChiefV4.Events
             waitingForCrashedDriverInCorner = null;
             driversCrashedInCorner.Clear();
             waitingForCrashedDriverInCornerFinishTime = DateTime.MaxValue;
+
+            nextIllegalPassWarning = DateTime.MinValue;
+            illegalPassCarsCountAtLastAnnouncement = 0;
+            hasAlreadyWarnedAboutIllegalPass = false;
+
+            lastReportedOvertakeAllowed = PassAllowedUnderYellow.NO_DATA;
         }
 
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
-            if (CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT || CrewChief.gameDefinition.gameEnum == GameEnum.RF1/* || CrewChief.gameDefinition.gameEnum == GameEnum.RACE_ROOM*/)
+            if (CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT || CrewChief.gameDefinition.gameEnum == GameEnum.RF1 || CrewChief.gameDefinition.gameEnum == GameEnum.RACE_ROOM)
             {
                 newYellowFlagImplementation(previousGameState, currentGameState);
             }
@@ -196,6 +220,71 @@ namespace CrewChiefV4.Events
                 {
                     lastWhiteFlagTime = currentGameState.Now;
                     audioPlayer.playMessage(new QueuedMessage(folderWhiteFlag, 0, this));
+                }
+            }
+            if (currentGameState.Now > nextIllegalPassWarning && currentGameState.FlagData.numCarsPassedIllegally != illegalPassCarsCountAtLastAnnouncement)
+            {                
+                processIllegalOvertakes(previousGameState, currentGameState);
+                illegalPassCarsCountAtLastAnnouncement = currentGameState.FlagData.numCarsPassedIllegally;
+            }
+        }
+
+        private void processIllegalOvertakes(GameStateData previousGameState, GameStateData currentGameState)
+        {
+            // some uncertainty here - once a penalty has been applied, does the numCarsPassedIllegally reset or remain non-zero?
+            if (illegalPassCarsCountAtLastAnnouncement > 0 && previousGameState.PenaltiesData.NumPenalties > currentGameState.PenaltiesData.NumPenalties)
+            {
+                Console.WriteLine("numCarsPassedIllegally has changed from " + illegalPassCarsCountAtLastAnnouncement +
+                    " to  " + currentGameState.FlagData.numCarsPassedIllegally + " and penalty count has increased");
+                hasAlreadyWarnedAboutIllegalPass = false;
+                // TODO: really struggling to actually get penalised for passing under yellow, so I'm guessing here. 
+                // If we have a new penalty delay the next check for a while
+                nextIllegalPassWarning = currentGameState.Now + TimeSpan.FromSeconds(30);
+            }
+            else
+            {
+                nextIllegalPassWarning = currentGameState.Now + illegalPassRepeatInterval;
+                if (currentGameState.FlagData.numCarsPassedIllegally > 0)
+                {
+                    if (hasAlreadyWarnedAboutIllegalPass)
+                    {
+                        if (currentGameState.FlagData.numCarsPassedIllegally == 1)
+                        {
+                            // don't allow any other message to override this one:
+                            audioPlayer.playMessageImmediately(new QueuedMessage("give_position_back_repeat", MessageContents(folderGiveOnePositionsBackNextWarning), 0, null));
+                        }
+                        else
+                        {
+                            // don't allow any other message to override this one:
+                            audioPlayer.playMessageImmediately(new QueuedMessage("give_positions_back_repeat", MessageContents(folderGivePositionsBackNextWarningIntro,
+                                currentGameState.FlagData.numCarsPassedIllegally, folderGivePositionsBackNextWarningOutro), 0, null));
+                        }
+                    }
+                    else
+                    {
+                        hasAlreadyWarnedAboutIllegalPass = true;
+                        if (currentGameState.FlagData.numCarsPassedIllegally == 1)
+                        {
+                            // don't allow any other message to override this one:
+                            audioPlayer.playMessageImmediately(new QueuedMessage("give_position_back", MessageContents(folderGiveOnePositionBackFirstWarning), 0, null));
+                        }
+                        else
+                        {
+                            // don't allow any other message to override this one:
+                            audioPlayer.playMessageImmediately(new QueuedMessage("give_positions_back", MessageContents(folderGivePositionsBackFirstWarningIntro,
+                                currentGameState.FlagData.numCarsPassedIllegally, folderGivePositionsBackFirstWarningOutro), 0, null));
+                        }
+                    }
+                }
+                else
+                {
+                    // more guesswork :(
+                    if (currentGameState.PenaltiesData.NumPenalties == 0)
+                    {
+                        // don't allow any other message to override this one:
+                        audioPlayer.playMessageImmediately(new QueuedMessage("give_positions_back_completed", MessageContents(folderGivePositionsBackCompleted), 0, null));
+                    }
+                    hasAlreadyWarnedAboutIllegalPass = false;
                 }
             }
         }
@@ -324,16 +413,18 @@ namespace CrewChiefV4.Events
                                     // Sector i changed to yellow
                                     if (currentGameState.Now > lastSectorFlagsAnnouncedTime[i].Add(timeBetweenNewYellowFlagMessages))
                                     {
+                                        hasAlreadyWarnedAboutIllegalPass = false;
                                         lastSectorFlagsAnnounced[i] = sectorFlag;
                                         lastSectorFlagsAnnouncedTime[i] = currentGameState.Now;
 
-                                        if (isCurrentSector(currentGameState, i) && 4 > random.NextDouble() * 10)
+                                        // don't call sector yellow if we've in a local yellow
+                                        if (isCurrentSector(currentGameState, i) && 4 > random.NextDouble() * 10 && !currentGameState.FlagData.isLocalYellow)
                                         {
                                             // If in current, sometimes announce without sector number.
                                             audioPlayer.playMessage(new QueuedMessage(sectorFlag == FlagEnum.YELLOW ?
                                                 folderYellowFlag : folderDoubleYellowFlag, 0, this));
                                         }
-                                        else
+                                        else if (!currentGameState.FlagData.isLocalYellow)
                                         {
                                             audioPlayer.playMessageImmediately(new QueuedMessage(sectorFlag == FlagEnum.YELLOW ?
                                                 folderYellowFlagSectors[i] : folderDoubleYellowFlagSectors[i], 0, null));
@@ -387,6 +478,7 @@ namespace CrewChiefV4.Events
                     lastLocalYellowAnnouncedTime = currentGameState.Now;
                     // we've passed the incident so allow warnings of other incidents approaching
                     hasWarnedOfUpcomingIncident = false;
+                    lastReportedOvertakeAllowed = PassAllowedUnderYellow.NO_DATA;
                 }
                 else if (!isUnderLocalYellow && !hasWarnedOfUpcomingIncident && !shouldWarnOfUpComingYellow(previousGameState) && shouldWarnOfUpComingYellow(currentGameState))
                 {
@@ -399,8 +491,24 @@ namespace CrewChiefV4.Events
                     // if all the sectors are clear the local and warning booleans. This ensures we don't sit waiting for a 'clear' that never comes.
                     isUnderLocalYellow = false;
                     hasWarnedOfUpcomingIncident = false;
+                    lastReportedOvertakeAllowed = PassAllowedUnderYellow.NO_DATA;
                 }
 
+                if (isUnderLocalYellow)
+                {
+                    if (currentGameState.FlagData.canOvertakeCarInFront == PassAllowedUnderYellow.YES
+                        && lastReportedOvertakeAllowed != PassAllowedUnderYellow.YES)
+                    {
+                        audioPlayer.playMessageImmediately(new QueuedMessage(folderClearToOvertake, 0, this));
+                        lastReportedOvertakeAllowed = PassAllowedUnderYellow.YES;
+                    }
+                    else if (currentGameState.FlagData.canOvertakeCarInFront == PassAllowedUnderYellow.NO
+                        && lastReportedOvertakeAllowed != PassAllowedUnderYellow.NO)
+                    {
+                        audioPlayer.playMessageImmediately(new QueuedMessage(folderNoOvertaking, 0, this));
+                        lastReportedOvertakeAllowed = PassAllowedUnderYellow.NO;
+                    }
+                }
             }
         }
 
