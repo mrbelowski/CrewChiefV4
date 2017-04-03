@@ -61,7 +61,7 @@ namespace CrewChiefV4
 
         private VoiceOptionEnum voiceOption;
 
-        private static String autoUpdateXMLURL = "https://drive.google.com/uc?export=download&id=0B4KQS820QNFbWWFjaDAzRldMNUE";
+        private static String autoUpdateXMLURL = "http://thecrewchief.org/downloads.php?do=downloadxml";
 
         private float latestSoundPackVersion = -1;
         private float latestDriverNamesVersion = -1;
