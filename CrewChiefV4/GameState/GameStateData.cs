@@ -65,6 +65,11 @@ namespace CrewChiefV4.GameState
         PENDING, PITS_CLOSED, PITS_OPEN_LEAD_LAP_VEHICLES, PITS_OPEN, LAST_LAP_NEXT, LAST_LAP_CURRENT, RACING
     }
 
+    public enum PassAllowedUnderYellow
+    {
+        YES, NO, NO_DATA
+    }
+    
     public class FlagData
     {
         // holds newer (RF2 & Raceroom) flag data. This is game dependent - only RF2 and R3E will use this.
@@ -75,6 +80,9 @@ namespace CrewChiefV4.GameState
         public float distanceToNearestIncident = -1;
         public FullCourseYellowPhase fcyPhase = FullCourseYellowPhase.RACING;
         public int lapCountWhenLastWentGreen = -1;
+        // cars passed under yellow - need to give back this many places to avoid penalty (only implemented for R3E)
+        public int numCarsPassedIllegally = 0;
+        public PassAllowedUnderYellow canOvertakeCarInFront = PassAllowedUnderYellow.NO_DATA;
     }
 
     public class TransmissionData
@@ -995,7 +1003,7 @@ namespace CrewChiefV4.GameState
         }
         public float[] getBestTimeAndSpeeds(String landmarkName)
         {
-            return getBestTimeAndSpeeds(landmarkName, 5, 2);
+            return getBestTimeAndSpeeds(landmarkName, 5, 3);
         }
 
         // returns [timeInSection, entrySpeed, exitSpeed] for the quickest time through that section
@@ -1103,8 +1111,10 @@ namespace CrewChiefV4.GameState
         // returns null or a landmark name this car is stopped in
         public String updateLandmarkTiming(TrackDefinition trackDefinition, float gameTime, float previousDistanceRoundTrack, float currentDistanceRoundTrack, float speed) 
         {
-            if (trackDefinition == null || trackDefinition.trackLandmarks == null || trackDefinition.trackLandmarks.Count == 0)
+            if (trackDefinition == null || trackDefinition.trackLandmarks == null || trackDefinition.trackLandmarks.Count == 0 ||
+                gameTime < 30)
             {
+                // don't collect data if the session has been running < 30 seconds
                 return null;
             }
             // yuk...
@@ -1362,6 +1372,7 @@ namespace CrewChiefV4.GameState
         public int CutTrackWarnings = 0;
 
         public Boolean IsOffRacingSurface = false;
+
     }
 
     public class TyreData
