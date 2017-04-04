@@ -180,7 +180,7 @@ namespace CrewChiefV4.RaceRoom
                 lastActiveTimeForOpponents.Clear();
                 nextOpponentCleanupTime = currentGameState.Now + opponentCleanupInterval;
 
-                if (shared.SessionTimeRemaining > 0)
+                if (shared.sessionLengthFormat == 0 || shared.sessionLengthFormat == 2 || shared.SessionTimeRemaining > 0)
                 {
                     currentGameState.SessionData.SessionTotalRunTime = shared.SessionTimeRemaining;
                     currentGameState.SessionData.SessionHasFixedTime = true;
@@ -241,11 +241,10 @@ namespace CrewChiefV4.RaceRoom
                     {
                         justGoneGreen = true;
                         // just gone green, so get the session data
-                        if (shared.SessionTimeRemaining > 0)
+                        if (shared.sessionLengthFormat == 0 || shared.sessionLengthFormat == 2 || shared.SessionTimeRemaining > 0)
                         {
                             currentGameState.SessionData.SessionTotalRunTime = shared.SessionTimeRemaining;
-                            // TODO: confirm that this is enough to catch cases where we have a fixed time + extra lap
-                            if (shared.NumberOfLaps > 0)
+                            if (shared.sessionLengthFormat == 2) 
                             {
                                 currentGameState.SessionData.HasExtraLap = true;
                             }
@@ -407,7 +406,7 @@ namespace CrewChiefV4.RaceRoom
             }
 
             currentGameState.FlagData.isLocalYellow = shared.Flags.Yellow == 1;
-            if (shared.FlagsExtended2.white == 1)
+            if (shared.FlagsExtended2.white == 1 && !currentGameState.FlagData.isLocalYellow)
             {
                 currentGameState.SessionData.Flag = FlagEnum.WHITE;
             }
