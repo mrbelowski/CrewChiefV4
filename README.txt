@@ -8,6 +8,8 @@ For support and discussions about Crew Chief we have our very own forum here: ht
 
 Changelog
 ---------
+Version 4.6.4.5: Some Raceroom flag calling tweaks
+
 Version 4.6.4.4: Initial support for Raceroom yellow flag implementation and revised shared memory layout; a few minor bug fixes
 
 Version 4.6.4.2: Delay lead change messages slightly and validate before playing; fixed potential error when working out where a pileup has occurred 

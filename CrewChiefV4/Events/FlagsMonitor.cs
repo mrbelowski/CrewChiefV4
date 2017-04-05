@@ -450,7 +450,11 @@ namespace CrewChiefV4.Events
                                         lastSectorFlagsAnnouncedTime[i] = currentGameState.Now;
 
                                         // Queue delayed message for flag is clear.
-                                        audioPlayer.playMessageImmediately(new QueuedMessage(folderGreenFlagSectors[i], secondsToPreValidateYellowClearMessages, this));
+                                        if (!previousGameState.FlagData.isLocalYellow)
+                                        {
+                                            // if the previousGameState was local yellow we'll call 'clear' - don't also call the sector clear
+                                            audioPlayer.playMessageImmediately(new QueuedMessage(folderGreenFlagSectors[i], secondsToPreValidateYellowClearMessages, this));
+                                        }
                                     }
                                 }
                             }
@@ -465,7 +469,8 @@ namespace CrewChiefV4.Events
                 }
 
                 // local yellows (planned R3E implementation)
-                if (!isUnderLocalYellow && currentGameState.FlagData.isLocalYellow)
+                // note the 'allSectorsAreGreen' check - we can be under local yellow with no yellow sectors in the hairpin at Macau
+                if (!isUnderLocalYellow && currentGameState.FlagData.isLocalYellow && !allSectorsAreGreen(currentGameState.FlagData))
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage(folderLocalYellow, 0, null));
                     isUnderLocalYellow = true;
@@ -487,8 +492,7 @@ namespace CrewChiefV4.Events
                     hasWarnedOfUpcomingIncident = true;
                     audioPlayer.playMessageImmediately(new QueuedMessage(folderLocalYellowAhead, 0, null));
                 }
-                else if (currentGameState.FlagData.sectorFlags[0] == FlagEnum.GREEN && currentGameState.FlagData.sectorFlags[1] == FlagEnum.GREEN &&
-                        currentGameState.FlagData.sectorFlags[2] == FlagEnum.GREEN)
+                else if (allSectorsAreGreen(currentGameState.FlagData))
                 {
                     // if all the sectors are clear the local and warning booleans. This ensures we don't sit waiting for a 'clear' that never comes.
                     isUnderLocalYellow = false;
@@ -512,6 +516,12 @@ namespace CrewChiefV4.Events
                     }
                 }
             }
+        }
+
+        private Boolean allSectorsAreGreen(FlagData flagData)
+        {
+            return flagData.sectorFlags[0] == FlagEnum.GREEN && flagData.sectorFlags[1] == FlagEnum.GREEN &&
+                        flagData.sectorFlags[2] == FlagEnum.GREEN;
         }
 
         private Boolean shouldWarnOfUpComingYellow(GameStateData gameState)
