@@ -943,9 +943,8 @@ namespace CrewChiefV4.rFactor2
 
             var currFlag = FlagEnum.UNKNOWN;
 
-            if (UserSettings.GetUserSettings().getBoolean("enable_rf2_white_on_last_lap"))
+            if (cgs.carClass.getPreferences().enableStockCarsMode)
             {
-                // TODO: Re-work when NASCAR rules are implemented.
                 if ((csd.SessionType == SessionType.Race || csd.SessionType == SessionType.Qualify)
                     && csd.SessionPhase == SessionPhase.Green
                     && csd.LeaderHasFinishedRace)

@@ -1201,6 +1201,18 @@ namespace CrewChiefV4.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool enable_stockcars_mode {
+            get {
+                return ((bool)(this["enable_stockcars_mode"]));
+            }
+            set {
+                this["enable_stockcars_mode"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True")]
         public bool UpdateSettings {
             get {
@@ -1712,18 +1724,6 @@ namespace CrewChiefV4.Properties {
             }
             set {
                 this["enable_rf2_blue_on_slower"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool enable_rf2_white_on_last_lap {
-            get {
-                return ((bool)(this["enable_rf2_white_on_last_lap"]));
-            }
-            set {
-                this["enable_rf2_white_on_last_lap"] = value;
             }
         }
         

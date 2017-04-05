@@ -211,3 +211,7 @@ install_plugin_popup_enable_text = Crew Chief can automatically enable the plugi
 install_plugin_popup_enable_title = Enable Plugin
 
 report_allowed_overtakes_under_yellow_help = Play can-overtake and no-overtaking messages during yellow flags (R3E only)
+
+enable_rf2_blue_on_slower_help = Play 'Blue Flag' messages if car behind seems to be faster.  Useful in multi-class races
+enable_rf2_pit_stop_prediction_help = Play 'box now' messages when using offline scheduled pit stops
+enable_stockcars_mode_help = Uses Stock Cars wording for FCY phase, and enables White flag on last lap
