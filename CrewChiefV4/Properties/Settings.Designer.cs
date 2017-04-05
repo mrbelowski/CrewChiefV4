@@ -2005,7 +2005,7 @@ namespace CrewChiefV4.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool report_allowed_overtakes_under_yellow {
             get {
                 return ((bool)(this["report_allowed_overtakes_under_yellow"]));
