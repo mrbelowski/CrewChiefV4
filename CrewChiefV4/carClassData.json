@@ -390,7 +390,7 @@
         },
         {
             "carClassEnum": "TC1",
-            "raceroomClassIds": [ 4517 ]
+            "raceroomClassIds": [ 4517, 6036 ]
         },
         {
             "carClassEnum": "TC1_2014",
