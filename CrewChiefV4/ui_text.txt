@@ -209,3 +209,5 @@ install_plugin_select_directory_start = Please select
 install_plugin_select_directory_end = installation directory
 install_plugin_popup_enable_text = Crew Chief can automatically enable the plugin for you, if you select Cancel you will have to enable it manually in the game ui. Click OK to enable or Cancle to Return
 install_plugin_popup_enable_title = Enable Plugin
+
+report_allowed_overtakes_under_yellow_help = Play can-overtake and no-overtaking messages during yellow flags (R3E only)

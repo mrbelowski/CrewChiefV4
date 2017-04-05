@@ -680,6 +680,13 @@ namespace CrewChiefV4.RaceRoom
             // planned next R3E release:
             public FlagsExtended2 FlagsExtended2;
 
+            //
+            // -1: unavailable
+            //  0: time based
+            //  1: lap based
+            //  2: time based + extra lap
+            public Int32 sessionLengthFormat;
+
             // Number of cars (including the player) in the race
             public Int32 NumCars;
 
