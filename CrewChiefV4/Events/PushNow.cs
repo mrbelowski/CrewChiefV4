@@ -53,12 +53,12 @@ namespace CrewChiefV4.Events
             Boolean checkPushToHold = currentGameState.SessionData.SessionRunningTime - currentGameState.SessionData.GameTimeAtLastPositionBehindChange < minTimeToBeInThisPosition;
             if (currentGameState.SessionData.SessionType == SessionType.Race && !currentGameState.PitData.InPitlane)
             {
-                if ((checkPushToGain || checkPushToHold) && !playedNearEndTimePush && currentGameState.SessionData.SessionNumberOfLaps <= 0 &&
+                if ((checkPushToGain || checkPushToHold) && !playedNearEndTimePush && currentGameState.SessionData.SessionHasFixedTime &&
                         currentGameState.SessionData.SessionTimeRemaining < 4 * 60 && currentGameState.SessionData.SessionTimeRemaining > 2 * 60)
                 {
                     // estimate the number of remaining laps - be optimistic...
                     int numLapsLeft = (int)Math.Ceiling((double)currentGameState.SessionData.SessionTimeRemaining / (double)currentGameState.SessionData.PlayerLapTimeSessionBest);
-                    if (currentGameState.carClass.carClassEnum == CarData.CarClassEnum.DTM_2015)
+                    if (currentGameState.SessionData.HasExtraLap)
                     {
                         numLapsLeft = numLapsLeft + 1;
                     }

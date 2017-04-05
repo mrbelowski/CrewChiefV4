@@ -47,14 +47,10 @@ namespace CrewChiefV4
             try
             {
                 Console.WriteLine("About to dump game data - this may take a while");
-                XmlDocument xmlDocument = new XmlDocument();
                 XmlSerializer serializer = new XmlSerializer(serializableObject.GetType());
-                using (MemoryStream stream = new MemoryStream())
+                using (FileStream fileStream = new FileStream(fileName, FileMode.Create))
                 {
-                    serializer.Serialize(stream, serializableObject);
-                    stream.Position = 0;
-                    xmlDocument.Load(stream);
-                    xmlDocument.Save(fileName);
+                    serializer.Serialize(fileStream, serializableObject);
                 }
                 Console.WriteLine("Done writing session data log to: " + fileName);
             }
@@ -73,18 +69,12 @@ namespace CrewChiefV4
 
             try
             {
-                string attributeXml = string.Empty;
-
-                XmlDocument xmlDocument = new XmlDocument();
-                xmlDocument.Load(fileName);
-                string xmlString = xmlDocument.OuterXml;
-
-                using (StringReader read = new StringReader(xmlString))
+                using (FileStream fileStream = new FileStream(fileName, FileMode.Open))
                 {
                     Type outType = typeof(T);
 
                     XmlSerializer serializer = new XmlSerializer(outType);
-                    using (XmlReader reader = new XmlTextReader(read))
+                    using (XmlReader reader = new XmlTextReader(fileStream))
                     {
                         objectOut = (T)serializer.Deserialize(reader);
                     }

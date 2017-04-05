@@ -498,7 +498,6 @@ namespace CrewChiefV4.GameState
 
         public CarData.CarClass CarClass = new CarData.CarClass();
 
-        // for DTM 2015
         public Boolean HasStartedExtraLap = false;
 
         public TyreType CurrentTyres = TyreType.Unknown_Race;

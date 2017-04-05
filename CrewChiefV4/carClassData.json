@@ -57,8 +57,8 @@
 # VINTAGE_F1_C, STOCK_CAR, F1, F2, F3, F4, FF, TC1, TC2, TC1_2014, AUDI_TT_CUP,
 # AUDI_TT_VLN, CLIO_CUP, DTM, DTM_2013, V8_SUPERCAR, DTM_2014, DTM_2015, DTM_2016,
 # TRANS_AM, HILL_CLIMB_ICONS, FORMULA_RENAULT, MEGANE_TROPHY, NSU_TT, KTM_RR,
-# INDYCAR, HYPER_CAR, HYPER_CAR_RACE, STOCK_V8, BOXER_CUP, UNKNOWN_RACE
-#
+# INDYCAR, HYPER_CAR, HYPER_CAR_RACE, STOCK_V8, BOXER_CUP, NASCAR_2016, ISI_STOCKCAR_2015,
+# UNKNOWN_RACE, USER_CREATED
 # 
 # Car classes can skip an entry if they're using the default - e.g. most cars
 # skip defaultTyreType so they use Unknown_Race - this is only overridden in
@@ -390,7 +390,7 @@
         },
         {
             "carClassEnum": "TC1",
-            "raceroomClassIds": [ 4517 ]
+            "raceroomClassIds": [ 4517, 6036 ]
         },
         {
             "carClassEnum": "TC1_2014",
@@ -495,6 +495,14 @@
             "rf1ClassNames": [ "SupV8" ],
             "maxSafeWaterTemp": 120,
             "maxSafeOilTemp": 125
+        },
+        {
+            "carClassEnum": "NASCAR_2016",
+            "rf2ClassNames": [ "2016 Ford Fusion", "2016 Chevrolet SS", "2016 Toyota Camry" ]
+        },
+        {
+            "carClassEnum": "ISI_STOCKCAR_2015",
+            "rf2ClassNames": [ "2015 Titan StockCar", "2015 Centennial StockCar", "2015 Edgar GT StockCar" ]
         }
     ]
 }
