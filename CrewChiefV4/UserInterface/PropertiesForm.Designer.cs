@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainWindow));
             this.button1 = new System.Windows.Forms.Button();
             this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
             this.panel1 = new System.Windows.Forms.Panel();
@@ -74,6 +75,7 @@
             this.Controls.Add(this.flowLayoutPanel1);
             this.Name = "PropertiesForm";
             this.Text = "properties_form";
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.properties_FormClosing);
             this.panel1.ResumeLayout(false);
             this.ResumeLayout(false);
