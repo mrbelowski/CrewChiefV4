@@ -503,7 +503,7 @@
         },
         {
             "carClassEnum": "ISI_STOCKCAR_2015",
-            "rf2ClassNames": [ "2015 Titan StockCar", "2015 Centennial StockCar", "2015 Edgar GT StockCar" ],
+            "rf2ClassNames": [ "2015 Titan StockCar", "2015 Centennial StockCar", "2015 Edgar GT StockCar", "StockCar" ],
             "enableStockCarsMode": true
         }
     ]
