@@ -373,8 +373,7 @@ namespace CrewChiefV4.rFactor2
 
             if (csd.IsNewSector && !csd.IsNewSession)
             {
-                // there's a slight delay due to scoring updating every 200 ms, so we can't use SessionRunningTime here
-                // TODO: validate if time changes a bit after IsNewSector.
+                // There's a slight delay due to scoring updating every 200 ms, so we can't use SessionRunningTime here.
                 switch (csd.SectorNumber)
                 {
                     case 1:
@@ -943,21 +942,22 @@ namespace CrewChiefV4.rFactor2
 
             var currFlag = FlagEnum.UNKNOWN;
 
-            if (cgs.carClass.getPreferences().enableStockCarsMode)
+            if (cgs.carClass.getPreferences().enableStockCarsMode
+                && !cgs.FlagData.isFullCourseYellow)  // Don't announce White flag under FCY.
             {
+                // Only works correctly if race is not timed.
                 if ((csd.SessionType == SessionType.Race || csd.SessionType == SessionType.Qualify)
                     && csd.SessionPhase == SessionPhase.Green
-                    && csd.LeaderHasFinishedRace)
+                    && (player.mTotalLaps == csd.SessionNumberOfLaps - 1) || csd.LeaderHasFinishedRace)
                 {
                     currFlag = FlagEnum.WHITE;
                 }
             }
 
             if (player.mFlag == (byte)rFactor2Constants.rF2PrimaryFlag.Blue)
-            {
                 currFlag = FlagEnum.BLUE;
-            }
-            else if (UserSettings.GetUserSettings().getBoolean("enable_rf2_blue_on_slower"))
+            else if (UserSettings.GetUserSettings().getBoolean("enable_rf2_blue_on_slower")
+                && !cgs.FlagData.isFullCourseYellow)  // Don't announce blue on slower under FCY.
             {
                 foreach (var opponent in cgs.OpponentData.Values)
                 {
