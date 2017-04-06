@@ -498,7 +498,7 @@
       <Value Profile="(Default)">4.5</Value>
     </Setting>
     <Setting Name="report_allowed_overtakes_under_yellow" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
+      <Value Profile="(Default)">False</Value>
     </Setting>
   </Settings>
 </SettingsFile>
