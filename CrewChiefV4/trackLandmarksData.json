@@ -2050,6 +2050,96 @@
                     "isCommonOvertakingSpot": true
                 }
             ]
+        },
+        {
+            "pcarsTrackName": "Nürburgring:Grand Prix",
+            "raceroomLayoutId": 1691
+            "trackLandmarks": [
+                {
+                    "landmarkName": "turn1",
+                    "distanceRoundLapStart": 600,
+                    "distanceRoundLapEnd": 690,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "turn2",
+                    "distanceRoundLapStart": 750,
+                    "distanceRoundLapEnd": 920,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "turn3",
+                    "distanceRoundLapStart": 1030,
+                    "distanceRoundLapEnd": 1130,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "turn4",
+                    "distanceRoundLapStart": 1160,
+                    "distanceRoundLapEnd": 1260,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "turn5",
+                    "distanceRoundLapStart": 1610,
+                    "distanceRoundLapEnd": 1740,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "turn6",
+                    "distanceRoundLapStart": 1800,
+                    "distanceRoundLapEnd": 1920,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "turn7",
+                    "distanceRoundLapStart": 2370,
+                    "distanceRoundLapEnd": 2540,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "turn8",
+                    "distanceRoundLapStart": 2770,
+                    "distanceRoundLapEnd": 2890,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "turn9",
+                    "distanceRoundLapStart": 2930,
+                    "distanceRoundLapEnd": 3040,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "turn10",
+                    "distanceRoundLapStart": 3360,
+                    "distanceRoundLapEnd": 3460,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "turn11",
+                    "distanceRoundLapStart": 3540,
+                    "distanceRoundLapEnd": 3710,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "turn12",
+                    "distanceRoundLapStart": 3960,
+                    "distanceRoundLapEnd": 4120,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "the_chicane",
+                    "distanceRoundLapStart": 4470,
+                    "distanceRoundLapEnd": 4580,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "turn15",
+                    "distanceRoundLapStart": 4750,
+                    "distanceRoundLapEnd": 4930,
+                    "isCommonOvertakingSpot": false
+                }
+            ]
         }
     ]
 }
