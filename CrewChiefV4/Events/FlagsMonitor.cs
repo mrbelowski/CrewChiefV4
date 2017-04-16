@@ -191,6 +191,12 @@ namespace CrewChiefV4.Events
 
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
+            if (currentGameState.PitData.InPitlane || currentGameState.SessionData.SessionRunningTime < 10)
+            {
+                // don't process if we're in the pits or just started a session
+                return;
+            }
+
             if (CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT || CrewChief.gameDefinition.gameEnum == GameEnum.RF1 || CrewChief.gameDefinition.gameEnum == GameEnum.RACE_ROOM)
             {
                 newYellowFlagImplementation(previousGameState, currentGameState);
