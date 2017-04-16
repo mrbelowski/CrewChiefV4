@@ -90,6 +90,8 @@ namespace CrewChiefV4.Events
 
         // do we need this?
         private DateTime lastLocalYellowAnnouncedTime = DateTime.MinValue;
+        private DateTime lastLocalYellowClearAnnouncedTime = DateTime.MinValue;
+        private DateTime lastOvertakeAllowedReportTime = DateTime.MinValue;
         private Boolean isUnderLocalYellow = false;
         private Boolean hasWarnedOfUpcomingIncident = false;
 
@@ -165,6 +167,8 @@ namespace CrewChiefV4.Events
             lastFCYAnnounced = FullCourseYellowPhase.RACING;
             lastFCYAccounedTime = DateTime.MinValue;
             lastLocalYellowAnnouncedTime = DateTime.MinValue;
+            lastLocalYellowClearAnnouncedTime = DateTime.MinValue;
+            lastOvertakeAllowedReportTime = DateTime.MinValue;
             isUnderLocalYellow = false;
             hasWarnedOfUpcomingIncident = false;
             positionAtStartOfIncident = int.MaxValue;
@@ -450,7 +454,7 @@ namespace CrewChiefV4.Events
                                         lastSectorFlagsAnnouncedTime[i] = currentGameState.Now;
 
                                         // Queue delayed message for flag is clear.
-                                        if (!previousGameState.FlagData.isLocalYellow)
+                                        if (!previousGameState.FlagData.isLocalYellow && lastLocalYellowClearAnnouncedTime.Add(TimeSpan.FromSeconds(2)) < currentGameState.Now)
                                         {
                                             // if the previousGameState was local yellow we'll call 'clear' - don't also call the sector clear
                                             audioPlayer.playMessageImmediately(new QueuedMessage(folderGreenFlagSectors[i], secondsToPreValidateYellowClearMessages, this));
@@ -472,17 +476,23 @@ namespace CrewChiefV4.Events
                 // note the 'allSectorsAreGreen' check - we can be under local yellow with no yellow sectors in the hairpin at Macau
                 if (!isUnderLocalYellow && currentGameState.FlagData.isLocalYellow && !allSectorsAreGreen(currentGameState.FlagData))
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderLocalYellow, 0, null));
-                    isUnderLocalYellow = true;
-                    lastLocalYellowAnnouncedTime = currentGameState.Now;
+                    if (lastLocalYellowAnnouncedTime.Add(TimeSpan.FromSeconds(6)) < currentGameState.Now)
+                    {
+                        audioPlayer.playMessageImmediately(new QueuedMessage(folderLocalYellow, 0, null));
+                        lastLocalYellowAnnouncedTime = currentGameState.Now;
+                    }
+                    isUnderLocalYellow = true;                   
                     // we might not have warned of an incident ahead - no point in warning about it now we've actually reached it
                     hasWarnedOfUpcomingIncident = true;
                 }
                 else if (isUnderLocalYellow && !currentGameState.FlagData.isLocalYellow)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderLocalYellowClear, 0, null));
-                    isUnderLocalYellow = false;
-                    lastLocalYellowAnnouncedTime = currentGameState.Now;
+                    if (lastLocalYellowClearAnnouncedTime.Add(TimeSpan.FromSeconds(6)) < currentGameState.Now)
+                    {
+                        audioPlayer.playMessageImmediately(new QueuedMessage(folderLocalYellowClear, 0, null));
+                        lastLocalYellowClearAnnouncedTime = currentGameState.Now;
+                    }                
+                    isUnderLocalYellow = false;                    
                     // we've passed the incident so allow warnings of other incidents approaching
                     hasWarnedOfUpcomingIncident = false;
                     lastReportedOvertakeAllowed = PassAllowedUnderYellow.NO_DATA;
@@ -503,16 +513,18 @@ namespace CrewChiefV4.Events
                 if (isUnderLocalYellow && reportAllowedOvertakesUnderYellow)
                 {
                     if (currentGameState.FlagData.canOvertakeCarInFront == PassAllowedUnderYellow.YES
-                        && lastReportedOvertakeAllowed != PassAllowedUnderYellow.YES)
+                        && lastReportedOvertakeAllowed == PassAllowedUnderYellow.NO && lastOvertakeAllowedReportTime.Add(TimeSpan.FromSeconds(3)) < currentGameState.Now)
                     {
                         audioPlayer.playMessageImmediately(new QueuedMessage(folderClearToOvertake, 0, this));
                         lastReportedOvertakeAllowed = PassAllowedUnderYellow.YES;
+                        lastOvertakeAllowedReportTime = currentGameState.Now;
                     }
                     else if (currentGameState.FlagData.canOvertakeCarInFront == PassAllowedUnderYellow.NO
-                        && lastReportedOvertakeAllowed != PassAllowedUnderYellow.NO)
+                        && lastReportedOvertakeAllowed == PassAllowedUnderYellow.YES && lastOvertakeAllowedReportTime.Add(TimeSpan.FromSeconds(3)) < currentGameState.Now)
                     {
                         audioPlayer.playMessageImmediately(new QueuedMessage(folderNoOvertaking, 0, this));
                         lastReportedOvertakeAllowed = PassAllowedUnderYellow.NO;
+                        lastOvertakeAllowedReportTime = currentGameState.Now;                                               
                     }
                 }
             }
