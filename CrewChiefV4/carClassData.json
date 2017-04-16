@@ -498,11 +498,13 @@
         },
         {
             "carClassEnum": "NASCAR_2016",
-            "rf2ClassNames": [ "2016 Ford Fusion", "2016 Chevrolet SS", "2016 Toyota Camry" ]
+            "rf2ClassNames": [ "2016 Ford Fusion", "2016 Chevrolet SS", "2016 Toyota Camry" ],
+            "enableStockCarsMode": true
         },
         {
             "carClassEnum": "ISI_STOCKCAR_2015",
-            "rf2ClassNames": [ "2015 Titan StockCar", "2015 Centennial StockCar", "2015 Edgar GT StockCar" ]
+            "rf2ClassNames": [ "2015 Titan StockCar", "2015 Centennial StockCar", "2015 Edgar GT StockCar", "StockCar" ],
+            "enableStockCarsMode": true
         }
     ]
 }

@@ -62,6 +62,8 @@ namespace CrewChiefV4
         private static float defaultSpotterVehicleWidth = 1.8f;
         private static float defaultSpotterVehicleLength = 4.5f;
 
+        private static bool defaultEnableStockCarsMode = false;
+
         public enum CarClassEnum
         {
             GT1X, GT1, GTE, GT2, GTC, GTLM, GT3, GT4, GT5, Kart_1, Kart_2, KART_JUNIOR, KART_F1, LMP1, LMP2, LMP3, ROAD_B, ROAD_C1, ROAD_C2, ROAD_D, ROAD_SUPERCAR, GROUPC, GROUPA, GROUP4, GROUP5, GROUP6, GTO,
@@ -85,6 +87,7 @@ namespace CrewChiefV4
         {
             public float spotterVehicleLength = -1;
             public float spotterVehicleWidth = -1;
+            public bool enableStockCarsMode = false;
         }
 
         static CarData()
@@ -169,6 +172,7 @@ namespace CrewChiefV4
             var overridablePrefsDefaults = getOverridablePreferencesDefaults();
             defaultSpotterVehicleLength = overridablePrefsDefaults.spotterVehicleLength;
             defaultSpotterVehicleWidth = overridablePrefsDefaults.spotterVehicleWidth;
+            defaultEnableStockCarsMode = overridablePrefsDefaults.enableStockCarsMode;
         }
 
         public class CarClassEnumConverter : Newtonsoft.Json.Converters.StringEnumConverter
@@ -239,6 +243,8 @@ namespace CrewChiefV4
             public float spotterVehicleWidth { get; set; }
             public float spotterVehicleLength { get; set; }
 
+            public bool enableStockCarsMode { get; set; }
+
             public String placeholderClassId = "";
 
             public List<Regex> pCarsClassNamesRegexs = new List<Regex>();
@@ -270,6 +276,7 @@ namespace CrewChiefV4
                 this.maxTyreCircumference = 1.2f * (float)Math.PI;
                 this.spotterVehicleWidth = CarData.defaultSpotterVehicleWidth;
                 this.spotterVehicleLength = CarData.defaultSpotterVehicleLength;
+                this.enableStockCarsMode = CarData.defaultEnableStockCarsMode;
             }
 
             public String getClassIdentifier()
@@ -352,7 +359,11 @@ namespace CrewChiefV4
 
             public Preferences getPreferences()
             {
-                return new Preferences() { spotterVehicleLength = this.spotterVehicleLength, spotterVehicleWidth = this.spotterVehicleWidth };
+                return new Preferences() {
+                    spotterVehicleLength = this.spotterVehicleLength,
+                    spotterVehicleWidth = this.spotterVehicleWidth,
+                    enableStockCarsMode = this.enableStockCarsMode
+                };
             }
         }
 
@@ -521,8 +532,11 @@ namespace CrewChiefV4
 
         private static Preferences getOverridablePreferencesDefaults()
         {
-            var overridableOptions = new Preferences() { spotterVehicleLength = 4.5f, spotterVehicleWidth = 1.8f };
+            var overridableOptions = new Preferences() { spotterVehicleLength = 4.5f, spotterVehicleWidth = 1.8f, enableStockCarsMode = false };
             var settings = UserSettings.GetUserSettings();
+            // Global overridable options:
+            overridableOptions.enableStockCarsMode = settings.getBoolean("enable_stockcars_mode");
+            // Per-game overridable options:
             switch (CrewChief.gameDefinition.gameEnum)
             {
                 case GameEnum.PCARS_64BIT:
