@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainWindow));
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
@@ -50,6 +51,7 @@
             this.Controls.Add(this.textBox1);
             this.Name = "About Crew Chief";
             this.Text = "About Crew Chief";
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.ResumeLayout(false);
             this.PerformLayout();
 
