@@ -296,6 +296,9 @@
     <Setting Name="enable_push_to_pass_messages" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
+    <Setting Name="enable_stockcars_mode" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
     <Setting Name="UpdateSettings" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
@@ -423,9 +426,6 @@
       <Value Profile="(Default)">4.5</Value>
     </Setting>
     <Setting Name="enable_rf2_blue_on_slower" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
-    </Setting>
-    <Setting Name="enable_rf2_white_on_last_lap" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="enable_rf2_pit_stop_prediction" Type="System.Boolean" Scope="User">

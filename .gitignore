@@ -198,3 +198,6 @@ ModelManifest.xml
 /Speech recognition 64bit/MSSpeech_SR_en-GB_TELE.msi
 /Speech recognition 64bit/MSSpeech_SR_en-US_TELE.msi
 /Speech recognition 64bit/SpeechPlatformRuntime.msi
+
+# SQL journal temp files
+.vs/

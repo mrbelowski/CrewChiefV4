@@ -8,6 +8,8 @@ For support and discussions about Crew Chief we have our very own forum here: ht
 
 Changelog
 ---------
+Version 4.6.4.6: Some more Raceroom flag calling tweaks - should be less noisy but may miss rapidly changing flag situations; Added RF2 'stock car' mode (sound recordings to follow);Added R3E Nurburgring GP corner data
+
 Version 4.6.4.5: Some Raceroom flag calling tweaks
 
 Version 4.6.4.4: Initial support for Raceroom yellow flag implementation and revised shared memory layout; a few minor bug fixes
