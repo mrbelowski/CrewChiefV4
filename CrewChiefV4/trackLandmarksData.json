@@ -2054,6 +2054,7 @@
         {
             "pcarsTrackName": "Nürburgring:Grand Prix",
             "raceroomLayoutId": 1691,
+            "rf2TrackNames": [ "Nuerburg GP" ],
             "trackLandmarks": [
                 {
                     "landmarkName": "turn1",
