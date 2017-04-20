@@ -132,7 +132,9 @@ namespace CrewChiefV4.Events
         private List<OpponentData> driversCrashedInCorner = new List<OpponentData>();
         private DateTime waitingForCrashedDriverInCornerFinishTime = DateTime.MaxValue;
 
-        private DateTime nextIllegalPassWarning = DateTime.MinValue;
+        // this will be initialised to something sensible once a yellow has been shown - if no yellow is ever 
+        // shown we never want to check for illegal passes
+        private DateTime nextIllegalPassWarning = DateTime.MaxValue;
         private TimeSpan illegalPassRepeatInterval = TimeSpan.FromSeconds(7);
         private int illegalPassCarsCountAtLastAnnouncement = 0;
         private Boolean hasAlreadyWarnedAboutIllegalPass = false;
@@ -182,7 +184,7 @@ namespace CrewChiefV4.Events
             driversCrashedInCorner.Clear();
             waitingForCrashedDriverInCornerFinishTime = DateTime.MaxValue;
 
-            nextIllegalPassWarning = DateTime.MinValue;
+            nextIllegalPassWarning = DateTime.MaxValue;
             illegalPassCarsCountAtLastAnnouncement = 0;
             hasAlreadyWarnedAboutIllegalPass = false;
 
@@ -488,7 +490,8 @@ namespace CrewChiefV4.Events
                         audioPlayer.playMessageImmediately(new QueuedMessage(folderLocalYellow, 0, null));
                         lastLocalYellowAnnouncedTime = currentGameState.Now;
                     }
-                    isUnderLocalYellow = true;                   
+                    isUnderLocalYellow = true;
+                    nextIllegalPassWarning = currentGameState.Now;
                     // we might not have warned of an incident ahead - no point in warning about it now we've actually reached it
                     hasWarnedOfUpcomingIncident = true;
                 }
