@@ -234,7 +234,8 @@ namespace CrewChiefV4.Events
                     audioPlayer.playMessage(new QueuedMessage(folderWhiteFlag, 0, this));
                 }
             }
-            if (currentGameState.Now > nextIllegalPassWarning && currentGameState.FlagData.numCarsPassedIllegally != illegalPassCarsCountAtLastAnnouncement)
+            if (currentGameState.FlagData.numCarsPassedIllegally >= 0 
+                && currentGameState.Now > nextIllegalPassWarning && currentGameState.FlagData.numCarsPassedIllegally != illegalPassCarsCountAtLastAnnouncement)
             {                
                 processIllegalOvertakes(previousGameState, currentGameState);
                 illegalPassCarsCountAtLastAnnouncement = currentGameState.FlagData.numCarsPassedIllegally;
