@@ -2141,6 +2141,90 @@
                     "isCommonOvertakingSpot": false
                 }
             ]
+        },
+        {
+            "pcarsTrackName": "Hungaroring:Grand Prix",
+            "raceroomLayoutId": 1866,
+            "trackLandmarks": [
+                {
+                    "landmarkName": "turn1",
+                    "distanceRoundLapStart": 550,
+                    "distanceRoundLapEnd": 650,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "turn2",
+                    "distanceRoundLapStart": 1030,
+                    "distanceRoundLapEnd": 1200,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "turn3",
+                    "distanceRoundLapStart": 1260,
+                    "distanceRoundLapEnd": 1350,
+                    "isCommonOvertakingSpot": false
+                }
+                {
+                    "landmarkName": "turn4",
+                    "distanceRoundLapStart": 1730,
+                    "distanceRoundLapEnd": 1820,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "turn5",
+                    "distanceRoundLapStart": 1940,
+                    "distanceRoundLapEnd": 2100,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "the_chicane",
+                    "distanceRoundLapStart": 2310,
+                    "distanceRoundLapEnd": 2420,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "turn8",
+                    "distanceRoundLapStart": 2530,
+                    "distanceRoundLapEnd": 2590,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "turn9",
+                    "distanceRoundLapStart": 2650,
+                    "distanceRoundLapEnd": 2750,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "turn10",
+                    "distanceRoundLapStart": 2860,
+                    "distanceRoundLapEnd": 2950,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "turn11",
+                    "distanceRoundLapStart": 3020,
+                    "distanceRoundLapEnd": 3140,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "turn12",
+                    "distanceRoundLapStart": 3460,
+                    "distanceRoundLapEnd": 3540,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "turn14",
+                    "distanceRoundLapStart": 3680,
+                    "distanceRoundLapEnd": 3830,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "turn15",
+                    "distanceRoundLapStart": 3950,
+                    "distanceRoundLapEnd": 4170,
+                    "isCommonOvertakingSpot": false
+                }
+            ]
         }
     ]
 }
