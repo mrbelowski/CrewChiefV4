@@ -542,13 +542,15 @@ namespace CrewChiefV4.Events
                     waitingToWarnOfIncident = true;
                     incidentAheadTriggerTime = currentGameState.Now;
                 }
-                else if (waitingToWarnOfIncident && incidentAheadTriggerTime + localYellowChangeSettingTime < currentGameState.Now &&
-                    !isUnderLocalYellow && !hasWarnedOfUpcomingIncident && shouldWarnOfUpComingYellow(currentGameState))
+                else if (waitingToWarnOfIncident && incidentAheadTriggerTime + localYellowChangeSettingTime < currentGameState.Now)
                 {
                     incidentAheadTriggerTime = DateTime.MaxValue;
-                    hasWarnedOfUpcomingIncident = true;
                     waitingToWarnOfIncident = false;
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderLocalYellowAhead, 0, null));
+                    if (!isUnderLocalYellow && !hasWarnedOfUpcomingIncident && shouldWarnOfUpComingYellow(currentGameState))
+                    {                        
+                        hasWarnedOfUpcomingIncident = true;                        
+                        audioPlayer.playMessageImmediately(new QueuedMessage(folderLocalYellowAhead, 0, null));
+                    }
                 }
                 else if (allSectorsAreGreen(currentGameState.FlagData))
                 {
