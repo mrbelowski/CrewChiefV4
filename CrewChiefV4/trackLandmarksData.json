@@ -2145,6 +2145,7 @@
         {
             "pcarsTrackName": "Hungaroring:Grand Prix",
             "raceroomLayoutId": 1866,
+            "rf2TrackNames": "RaceRfactor Hungaroring 2013",
             "trackLandmarks": [
                 {
                     "landmarkName": "turn1",
@@ -2163,7 +2164,7 @@
                     "distanceRoundLapStart": 1260,
                     "distanceRoundLapEnd": 1350,
                     "isCommonOvertakingSpot": false
-                }
+                },
                 {
                     "landmarkName": "turn4",
                     "distanceRoundLapStart": 1730,
