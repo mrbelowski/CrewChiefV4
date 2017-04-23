@@ -545,6 +545,7 @@ namespace CrewChiefV4.Events
                 else if (!isUnderLocalYellow && !hasWarnedOfUpcomingIncident && !shouldWarnOfUpComingYellow(previousGameState) && shouldWarnOfUpComingYellow(currentGameState) && 
                     !waitingToWarnOfIncident)
                 {
+                    // we're not under yellow but there's an incident up ahead
                     waitingToWarnOfIncident = true;
                     incidentAheadTriggerTime = currentGameState.Now;
                 }
