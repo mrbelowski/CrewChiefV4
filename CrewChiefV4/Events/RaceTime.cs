@@ -120,7 +120,9 @@ namespace CrewChiefV4.Events
                         pearlType = PearlsOfWisdom.PearlType.GOOD;
                     }
                     else if (currentGameState.SessionData.Position > currentGameState.SessionData.SessionStartPosition + 5 &&
-                        !currentGameState.PitData.OnOutLap && !currentGameState.PitData.InPitlane)
+                        !currentGameState.PitData.OnOutLap && !currentGameState.PitData.InPitlane &&
+                        // yuk... AC SessionStartPosition is suspect so don't allow "you're shit" messages based on it.
+                        CrewChief.gameDefinition.gameEnum != GameEnum.ASSETTO_32BIT && CrewChief.gameDefinition.gameEnum != GameEnum.ASSETTO_64BIT)
                     {
                         // don't play bad-pearl if we're on an out lap or are pitting
                         pearlType = PearlsOfWisdom.PearlType.BAD;
