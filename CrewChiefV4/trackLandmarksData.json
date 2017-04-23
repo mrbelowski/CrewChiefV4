@@ -2145,6 +2145,7 @@
         {
             "pcarsTrackName": "Hungaroring:Grand Prix",
             "raceroomLayoutId": 1866,
+            "rf2TrackNames": "RaceRfactor Hungaroring 2013",
             "trackLandmarks": [
                 {
                     "landmarkName": "turn1",
