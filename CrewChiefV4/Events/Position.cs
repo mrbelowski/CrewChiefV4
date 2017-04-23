@@ -380,7 +380,7 @@ namespace CrewChiefV4.Events
                     {
                         PearlsOfWisdom.PearlType pearlType = PearlsOfWisdom.PearlType.NONE;
                         float pearlLikelihood = 0.2f;
-                        if (currentGameState.SessionData.SessionType == SessionType.Race)
+                        if (currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.Position > 0)
                         {
                             if (!isLast && (previousPosition > currentGameState.SessionData.Position + 5 ||
                                 (previousPosition > currentGameState.SessionData.Position && currentGameState.SessionData.Position <= 5)))
