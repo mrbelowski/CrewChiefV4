@@ -1501,7 +1501,8 @@ namespace CrewChiefV4.RaceRoom
 
         public static String getNameFromBytes(byte[] name)
         {
-            return Encoding.UTF8.GetString(name).TrimEnd('\0').Trim();
+            int count = Array.IndexOf(name, (byte) 0);
+            return Encoding.UTF8.GetString(name, 0, count);
         } 
     }
 }

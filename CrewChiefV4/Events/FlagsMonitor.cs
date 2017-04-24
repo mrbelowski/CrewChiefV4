@@ -139,10 +139,12 @@ namespace CrewChiefV4.Events
         private int illegalPassCarsCountAtLastAnnouncement = 0;
         private Boolean hasAlreadyWarnedAboutIllegalPass = false;
 
-        private DateTime localYellowStartTime = DateTime.MaxValue;
-        private DateTime localYellowEndTime = DateTime.MaxValue;
-        private TimeSpan localYellowChangeSettingTime = TimeSpan.FromSeconds(2);
-        private DateTime incidentAheadTriggerTime = DateTime.MaxValue;
+        private DateTime localYellowStartSettledTime = DateTime.MinValue;
+        private DateTime localYellowEndSettledTime = DateTime.MinValue;
+        private TimeSpan localYellowChangeSettlingTime = TimeSpan.FromSeconds(2);
+        private Boolean waitingForNewLocalYellowFlagToSettle = false;
+        private Boolean waitingForNewLocalGreenFlagToSettle = false;
+        private DateTime incidentAheadSettledTime = DateTime.MinValue;
         private Boolean waitingToWarnOfIncident = false;
         
         private PassAllowedUnderYellow lastReportedOvertakeAllowed = PassAllowedUnderYellow.NO_DATA;
@@ -196,10 +198,12 @@ namespace CrewChiefV4.Events
 
             lastReportedOvertakeAllowed = PassAllowedUnderYellow.NO_DATA;
 
-            localYellowStartTime = DateTime.MaxValue;
-            localYellowEndTime = DateTime.MaxValue;
-            incidentAheadTriggerTime = DateTime.MaxValue;
+            localYellowStartSettledTime = DateTime.MinValue;
+            localYellowEndSettledTime = DateTime.MinValue;
+            incidentAheadSettledTime = DateTime.MinValue;
             waitingToWarnOfIncident = false;
+            waitingForNewLocalYellowFlagToSettle = false;
+            waitingForNewLocalGreenFlagToSettle = false;
         }
 
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
@@ -474,7 +478,7 @@ namespace CrewChiefV4.Events
                                         lastSectorFlagsAnnouncedTime[i] = currentGameState.Now;
 
                                         // Queue delayed message for flag is clear.
-                                        if (lastLocalYellowClearAnnouncedTime.Add(localYellowChangeSettingTime) < currentGameState.Now)
+                                        if (lastLocalYellowClearAnnouncedTime.Add(localYellowChangeSettlingTime) < currentGameState.Now)
                                         {
                                             // if the previousGameState was local yellow we'll have already called 'clear' - don't also call the sector clear
                                             audioPlayer.playMessageImmediately(new QueuedMessage(folderGreenFlagSectors[i], secondsToPreValidateYellowClearMessages, this));
@@ -496,10 +500,16 @@ namespace CrewChiefV4.Events
                 // note the 'allSectorsAreGreen' check - we can be under local yellow with no yellow sectors in the hairpin at Macau
                 if (!isUnderLocalYellow && currentGameState.FlagData.isLocalYellow && !allSectorsAreGreen(currentGameState.FlagData))
                 {
-                    // transition from green to local yellow
-                    if (localYellowStartTime + localYellowChangeSettingTime < currentGameState.Now)
+                    // transition from green to local yellow - stop waiting for green to settle:
+                    waitingForNewLocalGreenFlagToSettle = false;
+                    if (!waitingForNewLocalYellowFlagToSettle)
                     {
-                        // has been local yellow long enough to announce
+                        waitingForNewLocalYellowFlagToSettle = true;
+                        localYellowStartSettledTime = currentGameState.Now + localYellowChangeSettlingTime;
+                    }
+                    else if (currentGameState.Now > localYellowStartSettledTime)
+                    {
+                        // been yellow for a while, so call it
                         if (lastLocalYellowAnnouncedTime.Add(TimeSpan.FromSeconds(6)) < currentGameState.Now)
                         {
                             audioPlayer.playMessageImmediately(new QueuedMessage(folderLocalYellow, 0, null));
@@ -511,17 +521,17 @@ namespace CrewChiefV4.Events
                         hasWarnedOfUpcomingIncident = true;
                         waitingToWarnOfIncident = false;
                     }
-                    else
-                    {
-                        // wait a while before calling
-                        localYellowStartTime = currentGameState.Now;
-                        localYellowEndTime = DateTime.MaxValue;
-                    }
                 }
                 else if (isUnderLocalYellow && !currentGameState.FlagData.isLocalYellow)
                 {
-                    // transition from local yellow to green
-                    if (localYellowEndTime + localYellowChangeSettingTime < currentGameState.Now)
+                    // transition from local yellow to green - stop waiting for yellow to settle:
+                    waitingForNewLocalYellowFlagToSettle = false;
+                    if (!waitingForNewLocalGreenFlagToSettle)
+                    {
+                        waitingForNewLocalGreenFlagToSettle = true;
+                        localYellowEndSettledTime = currentGameState.Now + localYellowChangeSettlingTime;
+                    }
+                    else if (currentGameState.Now > localYellowEndSettledTime) 
                     {
                         // has been green long enough to announce
                         if (lastLocalYellowClearAnnouncedTime.Add(TimeSpan.FromSeconds(6)) < currentGameState.Now)
@@ -535,28 +545,29 @@ namespace CrewChiefV4.Events
                         waitingToWarnOfIncident = false;
                         lastReportedOvertakeAllowed = PassAllowedUnderYellow.NO_DATA;
                     }
-                    else
+                }
+                else if (!isUnderLocalYellow && !hasWarnedOfUpcomingIncident) 
+                {
+                    if (waitingToWarnOfIncident)
                     {
-                        // wait a while before announcing
-                        localYellowEndTime = currentGameState.Now;
-                        localYellowStartTime = DateTime.MaxValue;
+                        if (shouldWarnOfUpComingYellow(currentGameState))
+                        {
+                            if (currentGameState.Now > incidentAheadSettledTime)
+                            {
+                                waitingToWarnOfIncident = false;
+                                hasWarnedOfUpcomingIncident = true;
+                                audioPlayer.playMessageImmediately(new QueuedMessage(folderLocalYellowAhead, 0, null));
+                            }
+                        } 
+                        else 
+                        {
+                            waitingToWarnOfIncident = false;
+                        }
                     }
-                }
-                else if (!isUnderLocalYellow && !hasWarnedOfUpcomingIncident && !shouldWarnOfUpComingYellow(previousGameState) && shouldWarnOfUpComingYellow(currentGameState) && 
-                    !waitingToWarnOfIncident)
-                {
-                    // we're not under yellow but there's an incident up ahead
-                    waitingToWarnOfIncident = true;
-                    incidentAheadTriggerTime = currentGameState.Now;
-                }
-                else if (waitingToWarnOfIncident && incidentAheadTriggerTime + localYellowChangeSettingTime < currentGameState.Now)
-                {
-                    incidentAheadTriggerTime = DateTime.MaxValue;
-                    waitingToWarnOfIncident = false;
-                    if (!isUnderLocalYellow && !hasWarnedOfUpcomingIncident && shouldWarnOfUpComingYellow(currentGameState))
-                    {                        
-                        hasWarnedOfUpcomingIncident = true;                        
-                        audioPlayer.playMessageImmediately(new QueuedMessage(folderLocalYellowAhead, 0, null));
+                    else if (shouldWarnOfUpComingYellow(currentGameState))
+                    {
+                        waitingToWarnOfIncident = true;
+                        incidentAheadSettledTime = currentGameState.Now + localYellowChangeSettlingTime;
                     }
                 }
                 else if (allSectorsAreGreen(currentGameState.FlagData))
