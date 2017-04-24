@@ -476,7 +476,7 @@ namespace CrewChiefV4.Events
                                         // Queue delayed message for flag is clear.
                                         if (lastLocalYellowClearAnnouncedTime.Add(localYellowChangeSettingTime) < currentGameState.Now)
                                         {
-                                            // if the previousGameState was local yellow we'll call 'clear' - don't also call the sector clear
+                                            // if the previousGameState was local yellow we'll have already called 'clear' - don't also call the sector clear
                                             audioPlayer.playMessageImmediately(new QueuedMessage(folderGreenFlagSectors[i], secondsToPreValidateYellowClearMessages, this));
                                         }
                                     }
@@ -496,8 +496,10 @@ namespace CrewChiefV4.Events
                 // note the 'allSectorsAreGreen' check - we can be under local yellow with no yellow sectors in the hairpin at Macau
                 if (!isUnderLocalYellow && currentGameState.FlagData.isLocalYellow && !allSectorsAreGreen(currentGameState.FlagData))
                 {
+                    // transition from green to local yellow
                     if (localYellowStartTime + localYellowChangeSettingTime < currentGameState.Now)
                     {
+                        // has been local yellow long enough to announce
                         if (lastLocalYellowAnnouncedTime.Add(TimeSpan.FromSeconds(6)) < currentGameState.Now)
                         {
                             audioPlayer.playMessageImmediately(new QueuedMessage(folderLocalYellow, 0, null));
@@ -511,14 +513,17 @@ namespace CrewChiefV4.Events
                     }
                     else
                     {
+                        // wait a while before calling
                         localYellowStartTime = currentGameState.Now;
                         localYellowEndTime = DateTime.MaxValue;
                     }
                 }
                 else if (isUnderLocalYellow && !currentGameState.FlagData.isLocalYellow)
                 {
+                    // transition from local yellow to green
                     if (localYellowEndTime + localYellowChangeSettingTime < currentGameState.Now)
                     {
+                        // has been green long enough to announce
                         if (lastLocalYellowClearAnnouncedTime.Add(TimeSpan.FromSeconds(6)) < currentGameState.Now)
                         {
                             audioPlayer.playMessageImmediately(new QueuedMessage(folderLocalYellowClear, 0, null));
@@ -532,6 +537,7 @@ namespace CrewChiefV4.Events
                     }
                     else
                     {
+                        // wait a while before announcing
                         localYellowEndTime = currentGameState.Now;
                         localYellowStartTime = DateTime.MaxValue;
                     }
@@ -539,16 +545,19 @@ namespace CrewChiefV4.Events
                 else if (!isUnderLocalYellow && !hasWarnedOfUpcomingIncident && !shouldWarnOfUpComingYellow(previousGameState) && shouldWarnOfUpComingYellow(currentGameState) && 
                     !waitingToWarnOfIncident)
                 {
+                    // we're not under yellow but there's an incident up ahead
                     waitingToWarnOfIncident = true;
                     incidentAheadTriggerTime = currentGameState.Now;
                 }
-                else if (waitingToWarnOfIncident && incidentAheadTriggerTime + localYellowChangeSettingTime < currentGameState.Now &&
-                    !isUnderLocalYellow && !hasWarnedOfUpcomingIncident && shouldWarnOfUpComingYellow(currentGameState))
+                else if (waitingToWarnOfIncident && incidentAheadTriggerTime + localYellowChangeSettingTime < currentGameState.Now)
                 {
                     incidentAheadTriggerTime = DateTime.MaxValue;
-                    hasWarnedOfUpcomingIncident = true;
                     waitingToWarnOfIncident = false;
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderLocalYellowAhead, 0, null));
+                    if (!isUnderLocalYellow && !hasWarnedOfUpcomingIncident && shouldWarnOfUpComingYellow(currentGameState))
+                    {                        
+                        hasWarnedOfUpcomingIncident = true;                        
+                        audioPlayer.playMessageImmediately(new QueuedMessage(folderLocalYellowAhead, 0, null));
+                    }
                 }
                 else if (allSectorsAreGreen(currentGameState.FlagData))
                 {
