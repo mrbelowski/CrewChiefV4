@@ -406,7 +406,7 @@ namespace CrewChiefV4.GameState
                 }
                 lapData.SectorTimes[sectorNumberJustCompleted - 1] = thisSectorTime;
                 lapData.SectorPositions[sectorNumberJustCompleted - 1] = position;
-                lapData.GameTimeAtSectorEnd.Add(gameTimeAtSectorEnd);
+                lapData.GameTimeAtSectorEnd[sectorNumberJustCompleted - 1] = gameTimeAtSectorEnd;
                 if (lapData.IsValid && !lapIsValid)
                 {
                     lapData.IsValid = false;
@@ -784,7 +784,7 @@ namespace CrewChiefV4.GameState
                 }
                 lapData.SectorTimes[sectorNumberJustCompleted - 1] = thisSectorTime;
                 lapData.SectorPositions[sectorNumberJustCompleted - 1] = position;
-                lapData.GameTimeAtSectorEnd.Add(gameTimeAtSectorEnd);
+                lapData.GameTimeAtSectorEnd[sectorNumberJustCompleted - 1] = gameTimeAtSectorEnd;
                 if (lapData.IsValid && !lapIsValid)
                 {
                     lapData.IsValid = false;
@@ -820,7 +820,7 @@ namespace CrewChiefV4.GameState
                 }
                 lapData.SectorTimes[sectorNumberJustCompleted - 1] = thisSectorTime;
                 lapData.SectorPositions[sectorNumberJustCompleted - 1] = position;
-                lapData.GameTimeAtSectorEnd.Add(gameTimeAtSectorEnd);
+                lapData.GameTimeAtSectorEnd[sectorNumberJustCompleted - 1] = gameTimeAtSectorEnd;
                 if (lapData.IsValid && !lapIsValid)
                 {
                     lapData.IsValid = false;
