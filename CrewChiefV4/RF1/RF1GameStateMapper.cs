@@ -732,7 +732,7 @@ namespace CrewChiefV4.rFactor1
                 {
                     opponent.setInLap();
                     LapData currentLapData = opponent.getCurrentLapData();
-                    int sector3Position = currentLapData != null ? currentLapData.SectorPositions[2] : opponent.Position;
+                    int sector3Position = currentLapData != null && currentLapData.SectorPositions[2] > 0 ? currentLapData.SectorPositions[2] : opponent.Position;
                     if (sector3Position == 1)
                     {
                         currentGameState.PitData.LeaderIsPitting = true;

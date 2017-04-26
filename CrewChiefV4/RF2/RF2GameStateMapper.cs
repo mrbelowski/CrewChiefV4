@@ -786,7 +786,7 @@ namespace CrewChiefV4.rFactor2
                 {
                     opponent.setInLap();
                     var currentLapData = opponent.getCurrentLapData();
-                    int sector3Position = currentLapData != null 
+                    int sector3Position = currentLapData != null && currentLapData.SectorPositions[2] > 0
                                             ? currentLapData.SectorPositions[2]
                                             : opponent.Position;
 
