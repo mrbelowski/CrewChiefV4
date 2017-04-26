@@ -128,7 +128,7 @@ namespace CrewChiefV4.assetto
             playerLapData.Add(thisLapData);
         }
 
-        public float addPlayerLapdata(int sectorNumber, float cumulativeSectorTime, float gameTimeAtSectorEnd, int position)
+        public float addPlayerLapdata(int sectorNumberJustCompleted, float cumulativeSectorTime, float gameTimeAtSectorEnd, int position)
         {
             LapData lapData = playerLapData[playerLapData.Count - 1];
             if (cumulativeSectorTime <= 0)
@@ -136,21 +136,21 @@ namespace CrewChiefV4.assetto
                 cumulativeSectorTime = gameTimeAtSectorEnd - lapData.GameTimeAtLapStart;
             }
             float thisSectorTime = 0; ;
-            if (sectorNumber == 1)
+            if (sectorNumberJustCompleted == 1)
             {
                 thisSectorTime = cumulativeSectorTime;
             }
-            else if (sectorNumber == 2)
+            else if (sectorNumberJustCompleted == 2)
             {
                 thisSectorTime = cumulativeSectorTime - lapData.SectorTimes[0];
             }
-            else if (sectorNumber == 3)
+            else if (sectorNumberJustCompleted == 3)
             {
                 thisSectorTime = cumulativeSectorTime - lapData.SectorTimes[1] - lapData.SectorTimes[0];
             }
-            lapData.SectorTimes[sectorNumber - 1] = thisSectorTime;
-            lapData.SectorPositions[sectorNumber - 1] = position;
-            lapData.GameTimeAtSectorEnd.Add(gameTimeAtSectorEnd);
+            lapData.SectorTimes[sectorNumberJustCompleted - 1] = thisSectorTime;
+            lapData.SectorPositions[sectorNumberJustCompleted - 1] = position;
+            lapData.GameTimeAtSectorEnd[sectorNumberJustCompleted - 1] = gameTimeAtSectorEnd;
 
             return thisSectorTime;
         }
