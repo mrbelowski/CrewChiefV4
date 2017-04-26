@@ -678,7 +678,7 @@ namespace CrewChiefV4.rFactor1
                 opponent.CompletedLaps = vehicle.totalLaps;
                 opponent.CurrentSectorNumber = vehicle.sector == 0 ? 3 : vehicle.sector;
                 Boolean isNewSector = currentGameState.SessionData.IsNewSession || (opponentPrevious != null && opponentPrevious.CurrentSectorNumber != opponent.CurrentSectorNumber);
-                opponent.IsNewLap = currentGameState.SessionData.IsNewSession || (isNewSector && opponent.CurrentSectorNumber == 1);
+                opponent.IsNewLap = currentGameState.SessionData.IsNewSession || (isNewSector && opponent.CurrentSectorNumber == 1 && opponent.CompletedLaps > 0);
                 opponent.Speed = vehicle.speed;
                 opponent.DistanceRoundTrack = vehicle.lapDist;
                 opponent.WorldPosition = new float[] { vehicle.pos.x, vehicle.pos.z };

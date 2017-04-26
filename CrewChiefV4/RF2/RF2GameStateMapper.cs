@@ -721,7 +721,7 @@ namespace CrewChiefV4.rFactor2
                 opponent.CurrentSectorNumber = vehicle.mSector == 0 ? 3 : vehicle.mSector;
 
                 var isNewSector = csd.IsNewSession || (opponentPrevious != null && opponentPrevious.CurrentSectorNumber != opponent.CurrentSectorNumber);
-                opponent.IsNewLap = csd.IsNewSession || (isNewSector && opponent.CurrentSectorNumber == 1);
+                opponent.IsNewLap = csd.IsNewSession || (isNewSector && opponent.CurrentSectorNumber == 1 && opponent.CompletedLaps > 0);
                 opponent.Speed = (float)vehicle.mSpeed;
                 opponent.DistanceRoundTrack = (float)vehicle.mLapDist;
                 opponent.WorldPosition = new float[] { (float)vehicle.mPos.x, (float)vehicle.mPos.z };
