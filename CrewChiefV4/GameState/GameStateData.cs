@@ -810,6 +810,9 @@ namespace CrewChiefV4.GameState
             {
                 LapData lapData = OpponentLapData[OpponentLapData.Count - 1];
                 lapData.SectorTimes[sectorNumberJustCompleted - 1] = thisSectorTime;
+
+                // fragile code here. If the lap is invalid PCars network mode sends -1 (-123 actually but never mind). If the data is just missing (we had no sectorX time info) 
+                // then we'll have 0. So looking for sectorTime[x] == 0 is different from looking for -1
                 if ((sectorNumberJustCompleted == 2 && lapData.SectorTimes[0] == 0) || (sectorNumberJustCompleted == 3 && lapData.SectorTimes[1] == 0))
                 {
                     lapData.hasMissingSectors = true;
