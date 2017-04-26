@@ -723,7 +723,7 @@ namespace CrewChiefV4.RaceRoom
                             {
                                 int opponentPositionAtSector3 = currentOpponentData.Position;
                                 LapData currentLapData = currentOpponentData.getCurrentLapData();
-                                if (currentLapData != null && currentLapData.SectorPositions.Count > 2)
+                                if (currentLapData != null)
                                 {
                                     opponentPositionAtSector3 = currentLapData.SectorPositions[2];
                                 }
@@ -1446,7 +1446,7 @@ namespace CrewChiefV4.RaceRoom
                 }
                 else if (opponentData.CurrentSectorNumber == 1 && sector == 2 || opponentData.CurrentSectorNumber == 2 && sector == 3)
                 {
-                    opponentData.AddCumulativeSectorData(racePosition, sectorTime, sessionRunningTime, lapIsValid && validSpeed, false, 20, 20);
+                    opponentData.AddCumulativeSectorData(opponentData.CurrentSectorNumber, racePosition, sectorTime, sessionRunningTime, lapIsValid && validSpeed, false, 20, 20);
                     if (sector == 2)
                     {
                         // crappy but necessary assumption - assume single class here. It only really matters for DTM races, which will be a single class.

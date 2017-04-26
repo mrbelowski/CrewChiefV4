@@ -768,6 +768,7 @@ namespace CrewChiefV4.rFactor2
                 else if (isNewSector && lastSectorTime > 0.0f)
                 {
                     opponent.AddCumulativeSectorData(
+                        opponentPrevious.CurrentSectorNumber,
                         opponent.Position,
                         lastSectorTime,
                         csd.SessionRunningTime,
@@ -784,7 +785,7 @@ namespace CrewChiefV4.rFactor2
                 {
                     opponent.setInLap();
                     var currentLapData = opponent.getCurrentLapData();
-                    int sector3Position = currentLapData != null && currentLapData.SectorPositions.Count > 2
+                    int sector3Position = currentLapData != null 
                                             ? currentLapData.SectorPositions[2]
                                             : opponent.Position;
 
@@ -1147,6 +1148,7 @@ namespace CrewChiefV4.rFactor2
             else if (csd.IsNewSector && lastSectorTime > 0.0f)
             {
                 csd.playerAddCumulativeSectorData(
+                    psd.SectorNumber,
                     csd.Position,
                     lastSectorTime,
                     csd.SessionRunningTime,

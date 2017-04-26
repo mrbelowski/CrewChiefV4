@@ -1272,12 +1272,12 @@ namespace CrewChiefV4.PCars
                             lastSectorTime = -1;
                             lapInvalidated = true;
                         }
-                        opponentData.AddSectorData(racePosition, lastSectorTime, sessionRunningTime, !lapInvalidated, isRaining, trackTemp, airTemp);
+                        opponentData.AddSectorData(opponentData.CurrentSectorNumber, racePosition, lastSectorTime, sessionRunningTime, !lapInvalidated, isRaining, trackTemp, airTemp);
                     }
                     else
                     {
                         // use the inbuilt timing
-                        opponentData.AddCumulativeSectorData(racePosition, -1, sessionRunningTime, !lapInvalidated, isRaining, trackTemp, airTemp);
+                        opponentData.AddCumulativeSectorData(opponentData.CurrentSectorNumber, racePosition, -1, sessionRunningTime, !lapInvalidated, isRaining, trackTemp, airTemp);
                     }
                 }
                 opponentData.CurrentSectorNumber = sector;

@@ -128,21 +128,27 @@ namespace CrewChiefV4.assetto
             playerLapData.Add(thisLapData);
         }
 
-        public float addPlayerLapdata(float cumulativeSectorTime, float gameTimeAtSectorEnd)
+        public float addPlayerLapdata(int sectorNumber, float cumulativeSectorTime, float gameTimeAtSectorEnd)
         {
             LapData lapData = playerLapData[playerLapData.Count - 1];
             if (cumulativeSectorTime <= 0)
             {
                 cumulativeSectorTime = gameTimeAtSectorEnd - lapData.GameTimeAtLapStart;
             }
-            float thisSectorTime = cumulativeSectorTime;
-            int sectorNumber = 1;
-            foreach (float sectorTime in lapData.SectorTimes)
+            float thisSectorTime = 0; ;
+            if (sectorNumber == 1)
             {
-                sectorNumber++;
-                thisSectorTime = thisSectorTime - sectorTime;
+                thisSectorTime = cumulativeSectorTime;
             }
-            lapData.SectorTimes.Add(thisSectorTime);
+            else if (sectorNumber == 2)
+            {
+                thisSectorTime = cumulativeSectorTime - lapData.SectorTimes[0];
+            }
+            else if (sectorNumber == 3)
+            {
+                thisSectorTime = cumulativeSectorTime - lapData.SectorTimes[1] - lapData.SectorTimes[0];
+            }
+            lapData.SectorTimes[sectorNumber - 1] = thisSectorTime;
             lapData.GameTimeAtSectorEnd.Add(gameTimeAtSectorEnd);
 
             return thisSectorTime;
@@ -1294,7 +1300,7 @@ namespace CrewChiefV4.assetto
                         sectorTimeToUse = currentGameState.SessionData.LapTimeCurrent;
                     }
 
-                    sectorTimeToUse = addPlayerLapdata(sectorTimeToUse, currentGameState.SessionData.SessionRunningTime);
+                    sectorTimeToUse = addPlayerLapdata(previousGameState.SessionData.SectorNumber, sectorTimeToUse, currentGameState.SessionData.SessionRunningTime);
 
                     if (currentGameState.SessionData.SectorNumber == 1 && shared.acsGraphic.numberOfLaps > 0)
                     {
@@ -1503,7 +1509,7 @@ namespace CrewChiefV4.assetto
                                         int opponentPositionAtLastSector = currentOpponentData.Position;
                                         LapData currentLapData = currentOpponentData.getCurrentLapData();
 
-                                        if (currentLapData != null && currentLapData.SectorPositions.Count > numberOfSectorsOnTrack - 1)
+                                        if (currentLapData != null)
                                         {
                                             opponentPositionAtLastSector = currentLapData.SectorPositions[numberOfSectorsOnTrack];
                                         }
@@ -2031,7 +2037,8 @@ namespace CrewChiefV4.assetto
                 }
                 else if (opponentData.CurrentSectorNumber == 1 && sector == 2 || opponentData.CurrentSectorNumber == 2 && sector == 3)
                 {
-                    opponentData.AddCumulativeSectorData(racePosition, completedLapTime, sessionRunningTime, lapIsValid && validSpeed, false, trackTempreture, airTemperature);
+                    opponentData.AddCumulativeSectorData(opponentData.CurrentSectorNumber, racePosition, completedLapTime, sessionRunningTime,
+                        lapIsValid && validSpeed, false, trackTempreture, airTemperature);
                 }
                 opponentData.CurrentSectorNumber = sector;
             }

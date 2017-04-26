@@ -332,8 +332,9 @@ namespace CrewChiefV4.rFactor1
             }
             else if (currentGameState.SessionData.IsNewSector)
             {
-                currentGameState.SessionData.playerAddCumulativeSectorData(currentGameState.SessionData.Position, lastSectorTime, currentGameState.SessionData.SessionRunningTime,
-                    lastSectorTime > 0 || (currentGameState.SessionData.SectorNumber >= 2 && player.totalLaps == 1), false, shared.trackTemp, shared.ambientTemp);
+                currentGameState.SessionData.playerAddCumulativeSectorData(previousGameState.SessionData.SectorNumber, currentGameState.SessionData.Position, lastSectorTime,
+                    currentGameState.SessionData.SessionRunningTime,  lastSectorTime > 0 || (currentGameState.SessionData.SectorNumber >= 2 && player.totalLaps == 1), 
+                    false, shared.trackTemp, shared.ambientTemp);
             }
             currentGameState.SessionData.SessionTimesAtEndOfSectors = previousGameState != null ? previousGameState.SessionData.SessionTimesAtEndOfSectors : new SessionData().SessionTimesAtEndOfSectors;
             if (currentGameState.SessionData.IsNewSector && !currentGameState.SessionData.IsNewSession)
@@ -723,14 +724,14 @@ namespace CrewChiefV4.rFactor1
                 }
                 else if (isNewSector)
                 {
-                    opponent.AddCumulativeSectorData(opponent.Position, lastSectorTime, currentGameState.SessionData.SessionRunningTime,
+                    opponent.AddCumulativeSectorData(opponentPrevious.CurrentSectorNumber, opponent.Position, lastSectorTime, currentGameState.SessionData.SessionRunningTime,
                         lastSectorTime > 0 || (opponent.CurrentSectorNumber >= 2 && vehicle.totalLaps == 1), false, shared.trackTemp, shared.ambientTemp);
                 }
                 if (vehicle.inPits == 1 && opponent.CurrentSectorNumber == 3 && opponentPrevious != null && !opponentPrevious.isEnteringPits())
                 {
                     opponent.setInLap();
                     LapData currentLapData = opponent.getCurrentLapData();
-                    int sector3Position = currentLapData != null && currentLapData.SectorPositions.Count > 2 ? currentLapData.SectorPositions[2] : opponent.Position;
+                    int sector3Position = currentLapData != null ? currentLapData.SectorPositions[2] : opponent.Position;
                     if (sector3Position == 1)
                     {
                         currentGameState.PitData.LeaderIsPitting = true;
