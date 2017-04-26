@@ -603,12 +603,12 @@ namespace CrewChiefV4
                             if (CrewChief.gameDefinition.gameEnum == GameEnum.RACE_ROOM) 
                             {
                                 Console.WriteLine("raceroomLayoutId: " + crewChief.currentGameState.SessionData.TrackDefinition.id + ", distanceRoundLap = " +
-                                    crewChief.currentGameState.PositionAndMotionData.DistanceRoundTrack + ", player's car ID: " + crewChief.currentGameState.carClass.getClassIdentifier());
+                                    crewChief.currentGameState.PositionAndMotionData.DistanceRoundTrack + ", player's car ID: " + CarData.RACEROOM_CLASS_ID);
                             }
                             else
                             {
                                 Console.WriteLine("TrackName: " + crewChief.currentGameState.SessionData.TrackDefinition.name + ", distanceRoundLap = " +
-                                    crewChief.currentGameState.PositionAndMotionData.DistanceRoundTrack + ", player's car ID: " + crewChief.currentGameState.carClass.getClassIdentifier());
+                                    crewChief.currentGameState.PositionAndMotionData.DistanceRoundTrack + ", player's car ID: " + CarData.CLASS_ID);
                             }
                         }
                         else
