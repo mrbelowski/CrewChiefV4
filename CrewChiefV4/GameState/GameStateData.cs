@@ -649,7 +649,7 @@ namespace CrewChiefV4.GameState
                     float estimatedLapTime = lapData.SectorTimes.Sum();
                     LastLapValid = lapData.IsValid;
                     // pcars-specific sanity checks
-                    if (lapData.SectorTimes[0] > worldRecordS1Time - 0.1 && lapData.SectorTimes[1] > worldRecordS2Time - 0.1 && lapData.SectorTimes[2] > worldRecordS2Time - 0.1 &&
+                    if (lapData.SectorTimes[0] > worldRecordS1Time - 0.1 && lapData.SectorTimes[1] > worldRecordS2Time - 0.1 && lapData.SectorTimes[2] > worldRecordS3Time - 0.1 &&
                         estimatedLapTime > worldRecordLapTime - 0.1 && estimatedLapTime > 0)
                     {
                         lapData.LapTime = estimatedLapTime;
