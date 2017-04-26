@@ -330,14 +330,14 @@ namespace CrewChiefV4.GameState
         }
 
         public void playerCompleteLapWithProvidedLapTime(int position, float gameTimeAtLapEnd, float providedLapTime,
-            Boolean lapIsValid, Boolean isRaining, float trackTemp, float airTemp, Boolean sessionLengthIsTime, float sessionTimeRemaining)
+            Boolean lapIsValid, Boolean isRaining, float trackTemp, float airTemp, Boolean sessionLengthIsTime, float sessionTimeRemaining, int numberOfSectors)
         {
             if (PlayerLapData.Count > 0)
             {
                 LapData lapData = PlayerLapData[PlayerLapData.Count - 1];
                 if (PlayerLapData.Count == 1 || !lapData.hasMissingSectors)
                 {
-                    playerAddCumulativeSectorData(3, position, providedLapTime, gameTimeAtLapEnd, lapIsValid, isRaining, trackTemp, airTemp);
+                    playerAddCumulativeSectorData(numberOfSectors, position, providedLapTime, gameTimeAtLapEnd, lapIsValid, isRaining, trackTemp, airTemp);
                     lapData.LapTime = providedLapTime;
 
                     LapTimePrevious = providedLapTime;
@@ -632,6 +632,7 @@ namespace CrewChiefV4.GameState
         public void CompleteLapWithEstimatedLapTime(int position, float gameTimeAtLapEnd, float worldRecordLapTime, float worldRecordS1Time, float worldRecordS2Time, float worldRecordS3Time,
             Boolean lapIsValid, Boolean isRaining, float trackTemp, float airTemp, Boolean sessionLengthIsTime, float sessionTimeRemaining)
         {
+            // only used by PCars where all tracks have 3 sectors
             AddCumulativeSectorData(3, position, -1, gameTimeAtLapEnd, lapIsValid, isRaining, trackTemp, airTemp);
             if (OpponentLapData.Count > 0)
             {
@@ -670,9 +671,9 @@ namespace CrewChiefV4.GameState
         }
 
         public void CompleteLapWithLastSectorTime(int position, float lastSectorTime, float gameTimeAtLapEnd,
-            Boolean lapIsValid, Boolean isRaining, float trackTemp, float airTemp, Boolean sessionLengthIsTime, float sessionTimeRemaining)
+            Boolean lapIsValid, Boolean isRaining, float trackTemp, float airTemp, Boolean sessionLengthIsTime, float sessionTimeRemaining, int numberOfSectors)
         {
-            AddSectorData(3, position, lastSectorTime, gameTimeAtLapEnd, lapIsValid, isRaining, trackTemp, airTemp);
+            AddSectorData(numberOfSectors, position, lastSectorTime, gameTimeAtLapEnd, lapIsValid, isRaining, trackTemp, airTemp);
             if (OpponentLapData.Count > 0)
             {
                 LapData lapData = OpponentLapData[OpponentLapData.Count - 1];
@@ -709,13 +710,13 @@ namespace CrewChiefV4.GameState
         }
 
         public void CompleteLapWithProvidedLapTime(int position, float gameTimeAtLapEnd, float providedLapTime,
-            Boolean lapIsValid, Boolean isRaining, float trackTemp, float airTemp, Boolean sessionLengthIsTime, float sessionTimeRemaining)
+            Boolean lapIsValid, Boolean isRaining, float trackTemp, float airTemp, Boolean sessionLengthIsTime, float sessionTimeRemaining, int numberOfSectors)
         {
             if (OpponentLapData.Count > 0)
             {                
                 LapData lapData = OpponentLapData[OpponentLapData.Count - 1];
                 if (OpponentLapData.Count == 1 || !lapData.hasMissingSectors) {
-                    AddCumulativeSectorData(3, position, providedLapTime, gameTimeAtLapEnd, lapIsValid, isRaining, trackTemp, airTemp);
+                    AddCumulativeSectorData(numberOfSectors, position, providedLapTime, gameTimeAtLapEnd, lapIsValid, isRaining, trackTemp, airTemp);
                     lapData.LapTime = providedLapTime;
                     LastLapTime = providedLapTime;
                     if (lapData.IsValid && (CurrentBestLapTime == -1 || CurrentBestLapTime > lapData.LapTime))

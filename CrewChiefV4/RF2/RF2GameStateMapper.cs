@@ -754,7 +754,8 @@ namespace CrewChiefV4.rFactor2
                             (float)rf2state.mTrackTemp,
                             (float)rf2state.mAmbientTemp,
                             csd.SessionHasFixedTime,
-                            csd.SessionTimeRemaining);
+                            csd.SessionTimeRemaining,
+                            3);
                     }
                     opponent.StartNewLap(
                         opponent.CompletedLaps + 1,
@@ -1133,7 +1134,8 @@ namespace CrewChiefV4.rFactor2
                         (float)rf2state.mTrackTemp,
                         (float)rf2state.mAmbientTemp,
                         csd.SessionHasFixedTime,
-                        csd.SessionTimeRemaining);
+                        csd.SessionTimeRemaining,
+                        3);
                 }
 
                 csd.playerStartNewLap(

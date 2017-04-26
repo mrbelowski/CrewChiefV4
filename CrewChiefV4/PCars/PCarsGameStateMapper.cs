@@ -1249,7 +1249,7 @@ namespace CrewChiefV4.PCars
                                 lapInvalidated = true;
                             }
                             opponentData.CompleteLapWithLastSectorTime(racePosition, lastSectorTime, sessionRunningTime, 
-                                !lapInvalidated, isRaining, trackTemp, airTemp, sessionLengthIsTime, sessionTimeRemaining);
+                                !lapInvalidated, isRaining, trackTemp, airTemp, sessionLengthIsTime, sessionTimeRemaining, 3);
                         }
                         else
                         {
