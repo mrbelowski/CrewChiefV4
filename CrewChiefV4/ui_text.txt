@@ -215,3 +215,5 @@ report_allowed_overtakes_under_yellow_help = Play can-overtake and no-overtaking
 enable_rf2_blue_on_slower_help = Play 'Blue Flag' messages if car behind seems to be faster.  Useful in multi-class races
 enable_rf2_pit_stop_prediction_help = Play 'box now' messages when using offline scheduled pit stops
 enable_stockcars_mode_help = Uses Stock Cars wording for FCY phase, and enables White flag on last lap
+
+enable_simple_incident_detection_help = Watch for and report very slow cars as incidents (PCars and AC only)
