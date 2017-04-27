@@ -319,8 +319,8 @@ namespace CrewChiefV4
                 // check again with more generous limits
                 foreach (TrackLandmark trackLandmark in currentTrack.trackLandmarks)
                 {
-                    if (lapDistance > (Math.Max(0, trackLandmark.distanceRoundLapStart - 100)) && 
-                        lapDistance < Math.Min(currentTrack.trackLength, trackLandmark.distanceRoundLapEnd + 100))
+                    if (lapDistance > (Math.Max(0, trackLandmark.distanceRoundLapStart - 70)) && 
+                        lapDistance < Math.Min(currentTrack.trackLength, trackLandmark.distanceRoundLapEnd + 70))
                     {
                         return trackLandmark.landmarkName;
                     }
