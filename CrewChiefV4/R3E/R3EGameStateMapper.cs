@@ -723,7 +723,7 @@ namespace CrewChiefV4.RaceRoom
                             {
                                 int opponentPositionAtSector3 = currentOpponentData.Position;
                                 LapData currentLapData = currentOpponentData.getCurrentLapData();
-                                if (currentLapData != null && currentLapData.SectorPositions.Count > 2)
+                                if (currentLapData != null)
                                 {
                                     opponentPositionAtSector3 = currentLapData.SectorPositions[2];
                                 }
@@ -1438,39 +1438,15 @@ namespace CrewChiefV4.RaceRoom
                 {
                     if (opponentData.OpponentLapData.Count > 0)
                     {
-                        // Pay attention...
-                        // raceroom doesn't clear the participantStruct.SectorTimePreviousSelf.Sector value when a driver quits to pit.
-                        // This means that, when he exits the pits and comes round to start another flying lap, the participantStruct.SectorTimePreviousSelf.Sector
-                        // value will remain at whatever it was when he completed his previous flying lap. Even though we might have no sector data for this
-                        // out-lap. This really fcks things up because we end up with 2 copies of the best lap, but with a some of sector data missing from one.
-                        // So...
-                        // When the last proper laptime is completed we'll have already added another OpponentLapData element, ready to hold the next lap. This
-                        // OpponentLapData element needs to be deleted IF the next provided laptime is the same as the laptime in the OpponentLapData element before 
-                        // this one (length - 2), and this OpponentLapData element doesn't have all the sector data. I think...
-                        Boolean canCompleteLap = true;
-                        if (opponentData.OpponentLapData.Count > 1)
-                        {
-                            LapData previousMinusOneLapData = opponentData.OpponentLapData[opponentData.OpponentLapData.Count - 2];
-                            LapData previousLapData = opponentData.OpponentLapData[opponentData.OpponentLapData.Count - 1];
-                            if (completedLapTime != -1 && previousMinusOneLapData.LapTime == completedLapTime && previousLapData.SectorTimes.Count < 2)
-                            {
-                                Console.WriteLine("deleting an unfinished opponent lap for car in position " + racePosition);
-                                opponentData.OpponentLapData.Remove(previousLapData);
-                                canCompleteLap = false;
-                            }
-                        }
-                        if (canCompleteLap)
-                        {
-                            opponentData.CompleteLapWithProvidedLapTime(racePosition, sessionRunningTime, completedLapTime,
-                                lapIsValid && validSpeed, false, 20, 20, sessionLengthIsTime, sessionTimeRemaining);
-                        }
+                        opponentData.CompleteLapWithProvidedLapTime(racePosition, sessionRunningTime, completedLapTime,
+                            lapIsValid && validSpeed, false, 20, 20, sessionLengthIsTime, sessionTimeRemaining, 3);
                     }
                     opponentData.StartNewLap(completedLaps + 1, racePosition, isInPits, sessionRunningTime, false, 20, 20);
                     opponentData.IsNewLap = true;
                 }
                 else if (opponentData.CurrentSectorNumber == 1 && sector == 2 || opponentData.CurrentSectorNumber == 2 && sector == 3)
                 {
-                    opponentData.AddCumulativeSectorData(racePosition, sectorTime, sessionRunningTime, lapIsValid && validSpeed, false, 20, 20);
+                    opponentData.AddCumulativeSectorData(opponentData.CurrentSectorNumber, racePosition, sectorTime, sessionRunningTime, lapIsValid && validSpeed, false, 20, 20);
                     if (sector == 2)
                     {
                         // crappy but necessary assumption - assume single class here. It only really matters for DTM races, which will be a single class.
