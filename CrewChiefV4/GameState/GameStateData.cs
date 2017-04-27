@@ -1267,9 +1267,9 @@ namespace CrewChiefV4.GameState
                 }
             }
 
-            if (landmarkStoppedCount >= 10)
+            if (landmarkStoppedCount >= 20)
             {
-                // slow for more than 1 second - this assumes 1 tick is 100ms, which isn't necessarily valid but it's close enough. 
+                // slow for more than 2 seconds - this assumes 1 tick is 100ms, which isn't necessarily valid but it's close enough. 
                 return landmarkNameStart == null ? nearLandmarkName : landmarkNameStart;
             }
             else
