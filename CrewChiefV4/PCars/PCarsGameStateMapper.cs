@@ -697,8 +697,9 @@ namespace CrewChiefV4.PCars
                     }
                     CarData.CarClass opponentCarClass = !shared.hasOpponentClassData || shared.isSameClassAsPlayer[i] ? currentGameState.carClass : CarData.DEFAULT_PCARS_OPPONENT_CLASS;
                     String participantName = StructHelper.getNameFromBytes(participantStruct.mName).ToLower();
-
-                    if (participantName != null && participantName.Length > 0)
+                    // awesomely, the driver can appear twice (or more?) in the array. Can't be sure which of the copies is the dead one so assume the first is the one to use.
+                    // This may be wrong but the PCars data is such a fucking shambles I honestly can't be arsed with it any more.
+                    if (participantName != null && participantName.Length > 0 && !namesInRawData.Contains(participantName))
                     {
                         namesInRawData.Add(participantName);
                         OpponentData currentOpponentData = getOpponentForName(currentGameState, participantName);
@@ -1249,7 +1250,7 @@ namespace CrewChiefV4.PCars
                                 lapInvalidated = true;
                             }
                             opponentData.CompleteLapWithLastSectorTime(racePosition, lastSectorTime, sessionRunningTime, 
-                                !lapInvalidated, isRaining, trackTemp, airTemp, sessionLengthIsTime, sessionTimeRemaining);
+                                !lapInvalidated, isRaining, trackTemp, airTemp, sessionLengthIsTime, sessionTimeRemaining, 3);
                         }
                         else
                         {
@@ -1272,12 +1273,12 @@ namespace CrewChiefV4.PCars
                             lastSectorTime = -1;
                             lapInvalidated = true;
                         }
-                        opponentData.AddSectorData(racePosition, lastSectorTime, sessionRunningTime, !lapInvalidated, isRaining, trackTemp, airTemp);
+                        opponentData.AddSectorData(opponentData.CurrentSectorNumber, racePosition, lastSectorTime, sessionRunningTime, !lapInvalidated, isRaining, trackTemp, airTemp);
                     }
                     else
                     {
                         // use the inbuilt timing
-                        opponentData.AddCumulativeSectorData(racePosition, -1, sessionRunningTime, !lapInvalidated, isRaining, trackTemp, airTemp);
+                        opponentData.AddCumulativeSectorData(opponentData.CurrentSectorNumber, racePosition, -1, sessionRunningTime, !lapInvalidated, isRaining, trackTemp, airTemp);
                     }
                 }
                 opponentData.CurrentSectorNumber = sector;

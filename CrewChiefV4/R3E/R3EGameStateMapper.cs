@@ -723,7 +723,7 @@ namespace CrewChiefV4.RaceRoom
                             {
                                 int opponentPositionAtSector3 = currentOpponentData.Position;
                                 LapData currentLapData = currentOpponentData.getCurrentLapData();
-                                if (currentLapData != null && currentLapData.SectorPositions.Count > 2)
+                                if (currentLapData != null)
                                 {
                                     opponentPositionAtSector3 = currentLapData.SectorPositions[2];
                                 }
@@ -1439,14 +1439,14 @@ namespace CrewChiefV4.RaceRoom
                     if (opponentData.OpponentLapData.Count > 0)
                     {
                         opponentData.CompleteLapWithProvidedLapTime(racePosition, sessionRunningTime, completedLapTime,
-                            lapIsValid && validSpeed, false, 20, 20, sessionLengthIsTime, sessionTimeRemaining);
+                            lapIsValid && validSpeed, false, 20, 20, sessionLengthIsTime, sessionTimeRemaining, 3);
                     }
                     opponentData.StartNewLap(completedLaps + 1, racePosition, isInPits, sessionRunningTime, false, 20, 20);
                     opponentData.IsNewLap = true;
                 }
                 else if (opponentData.CurrentSectorNumber == 1 && sector == 2 || opponentData.CurrentSectorNumber == 2 && sector == 3)
                 {
-                    opponentData.AddCumulativeSectorData(racePosition, sectorTime, sessionRunningTime, lapIsValid && validSpeed, false, 20, 20);
+                    opponentData.AddCumulativeSectorData(opponentData.CurrentSectorNumber, racePosition, sectorTime, sessionRunningTime, lapIsValid && validSpeed, false, 20, 20);
                     if (sector == 2)
                     {
                         // crappy but necessary assumption - assume single class here. It only really matters for DTM races, which will be a single class.
@@ -1501,7 +1501,8 @@ namespace CrewChiefV4.RaceRoom
 
         public static String getNameFromBytes(byte[] name)
         {
-            return Encoding.UTF8.GetString(name).TrimEnd('\0').Trim();
+            int count = Array.IndexOf(name, (byte) 0);
+            return Encoding.UTF8.GetString(name, 0, count);
         } 
     }
 }
