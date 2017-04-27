@@ -690,6 +690,8 @@ namespace CrewChiefV4.Events
                 }
             }
             // now check for stopped cars
+            // TODO: add an option to disable this from the Properties screen. I think it should also be possible to 
+            // dynamically disable and enable this through a button assignment and a voice command
             if (currentGameState.SessionData.SessionType == SessionType.Race)
             {
                 if (waitingForCrashedDriverInCorner == null)
