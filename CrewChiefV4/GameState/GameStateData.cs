@@ -1155,9 +1155,9 @@ namespace CrewChiefV4.GameState
                 gameTime < 30 || 
                 ((CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_32BIT || 
                   CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_64BIT || 
-                  CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_NETWORK) && currentDistanceRoundTrack == 0))
+                  CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_NETWORK) && (currentDistanceRoundTrack == 0 || speed == 0)))
             {
-                // don't collect data if the session has been running < 30 seconds or we're PCars and the distanceRoundTrack is zero
+                // don't collect data if the session has been running < 30 seconds or we're PCars and the distanceRoundTrack or speed is exactly zero
                 return null;
             }
             // yuk...
