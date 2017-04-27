@@ -1511,7 +1511,7 @@ namespace CrewChiefV4.assetto
 
                                         if (currentLapData != null)
                                         {
-                                            opponentPositionAtLastSector = currentLapData.SectorPositions[numberOfSectorsOnTrack];
+                                            opponentPositionAtLastSector = currentLapData.SectorPositions[numberOfSectorsOnTrack - 1];
                                         }
                                         if (opponentPositionAtLastSector == 1)
                                         {
