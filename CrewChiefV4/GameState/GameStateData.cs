@@ -1152,9 +1152,12 @@ namespace CrewChiefV4.GameState
         public String updateLandmarkTiming(TrackDefinition trackDefinition, float gameTime, float previousDistanceRoundTrack, float currentDistanceRoundTrack, float speed) 
         {
             if (trackDefinition == null || trackDefinition.trackLandmarks == null || trackDefinition.trackLandmarks.Count == 0 ||
-                gameTime < 30)
+                gameTime < 30 || 
+                ((CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_32BIT || 
+                  CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_64BIT || 
+                  CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_NETWORK) && currentDistanceRoundTrack == 0))
             {
-                // don't collect data if the session has been running < 30 seconds
+                // don't collect data if the session has been running < 30 seconds or we're PCars and the distanceRoundTrack is zero
                 return null;
             }
             // yuk...
@@ -1240,11 +1243,11 @@ namespace CrewChiefV4.GameState
             {
                 // again, we're waiting to enter a landmark zone - perhaps we've just left a zone so still check for stopped cars       
   
-                // TODO: refactor this - there's already a method in TrackData to get a landmark for a given track distance, with a 100 metre 'near' zone
+                // TODO: refactor this - there's already a method in TrackData to get a landmark for a given track distance, with a 70 metre 'near' zone
                 foreach (TrackLandmark trackLandmark in trackDefinition.trackLandmarks) 
                 {
-                    if (currentDistanceRoundTrack > Math.Max(0, trackLandmark.distanceRoundLapStart - 100) &&
-                        currentDistanceRoundTrack < Math.Min(trackDefinition.trackLength, trackLandmark.distanceRoundLapEnd + 100))
+                    if (currentDistanceRoundTrack > Math.Max(0, trackLandmark.distanceRoundLapStart - 70) &&
+                        currentDistanceRoundTrack < Math.Min(trackDefinition.trackLength, trackLandmark.distanceRoundLapEnd + 70))
                     {
                         if (nearLandmarkName != trackLandmark.landmarkName)
                         {
