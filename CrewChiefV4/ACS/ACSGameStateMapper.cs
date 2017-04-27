@@ -2027,8 +2027,18 @@ namespace CrewChiefV4.assetto
                 {
                     if (opponentData.OpponentLapData.Count > 0)
                     {
-                        opponentData.CompleteLapWithProvidedLapTime(leaderBoardPosition, sessionRunningTime, lastLapTime,
-                            lapIsValid && validSpeed, false, trackTempreture, airTemperature, sessionLengthIsTime, sessionTimeRemaining, trackNumberOfSectors);
+                        // special case here: if there's only 1 lap in the list, and it's marked as an in-lap, we don't have a laptime, remove it.
+                        // This is because we might have created a new LapData entry to hold a partially completed in-lap if we join mid-session, but
+                        // this also results in each opponent having a spurious 'emtpy' LapData element.
+                        if (opponentData.OpponentLapData.Count == 1 && opponentData.OpponentLapData[0].InLap && lastLapTime == 0)
+                        {
+                            opponentData.OpponentLapData.Clear();
+                        }
+                        else
+                        {
+                            opponentData.CompleteLapWithProvidedLapTime(leaderBoardPosition, sessionRunningTime, lastLapTime,
+                                lapIsValid && validSpeed, false, trackTempreture, airTemperature, sessionLengthIsTime, sessionTimeRemaining, trackNumberOfSectors);
+                        }
                     }
 
                     opponentData.StartNewLap(completedLaps + 1, leaderBoardPosition, isInPits, sessionRunningTime, false, trackTempreture, airTemperature);
