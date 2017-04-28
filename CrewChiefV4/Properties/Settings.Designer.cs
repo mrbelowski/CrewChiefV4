@@ -2014,5 +2014,17 @@ namespace CrewChiefV4.Properties {
                 this["report_allowed_overtakes_under_yellow"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool enable_simple_incident_detection {
+            get {
+                return ((bool)(this["enable_simple_incident_detection"]));
+            }
+            set {
+                this["enable_simple_incident_detection"] = value;
+            }
+        }
     }
 }
