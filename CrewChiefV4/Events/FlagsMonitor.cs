@@ -100,6 +100,7 @@ namespace CrewChiefV4.Events
         private TimeSpan fcyPitStatusReminderMinTime = TimeSpan.FromSeconds(UserSettings.GetUserSettings().getInt("time_between_caution_period_status_reminders"));
 
         private Boolean reportYellowsInAllSectors = UserSettings.GetUserSettings().getBoolean("report_yellows_in_all_sectors");
+        private Boolean enableSimpleIncidentDetection = UserSettings.GetUserSettings().getBoolean("enable_simple_incident_detection");
 
         private float maxDistanceToWarnOfLocalYellow = 300;    // metres - externalise? Is this sufficient? Make it speed-dependent?
         private float minDistanceToWarnOfLocalYellow = 50;    // metres - externalise? Is this sufficient? Make it speed-dependent?
@@ -690,9 +691,8 @@ namespace CrewChiefV4.Events
                 }
             }
             // now check for stopped cars
-            // TODO: add an option to disable this from the Properties screen. I think it should also be possible to 
-            // dynamically disable and enable this through a button assignment and a voice command
-            if (currentGameState.SessionData.SessionType == SessionType.Race)
+            // TODO: I think it should also be possible to dynamically disable and enable this through a button assignment and a voice command
+            if (currentGameState.SessionData.SessionType == SessionType.Race && enableSimpleIncidentDetection)
             {
                 if (waitingForCrashedDriverInCorner == null)
                 {
