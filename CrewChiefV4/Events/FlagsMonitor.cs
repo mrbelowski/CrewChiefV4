@@ -142,7 +142,7 @@ namespace CrewChiefV4.Events
 
         private DateTime localYellowStartSettledTime = DateTime.MinValue;
         private DateTime localYellowEndSettledTime = DateTime.MinValue;
-        private TimeSpan localYellowChangeSettlingTime = TimeSpan.FromSeconds(2);
+        private TimeSpan localYellowChangeSettlingTime = TimeSpan.FromSeconds(3);
         private Boolean waitingForNewLocalYellowFlagToSettle = false;
         private Boolean waitingForNewLocalGreenFlagToSettle = false;
         private DateTime incidentAheadSettledTime = DateTime.MinValue;
@@ -478,8 +478,8 @@ namespace CrewChiefV4.Events
                                         lastSectorFlagsAnnounced[i] = sectorFlag;
                                         lastSectorFlagsAnnouncedTime[i] = currentGameState.Now;
 
-                                        // Queue delayed message for flag is clear.
-                                        if (lastLocalYellowClearAnnouncedTime.Add(localYellowChangeSettlingTime) < currentGameState.Now)
+                                        // Queue delayed message for flag is clear - don't do this if we're under local yellow
+                                        if (!isUnderLocalYellow && lastLocalYellowClearAnnouncedTime.Add(localYellowChangeSettlingTime) < currentGameState.Now)
                                         {
                                             // if the previousGameState was local yellow we'll have already called 'clear' - don't also call the sector clear
                                             audioPlayer.playMessageImmediately(new QueuedMessage(folderGreenFlagSectors[i], secondsToPreValidateYellowClearMessages, this));
@@ -515,7 +515,10 @@ namespace CrewChiefV4.Events
                         {
                             audioPlayer.playMessageImmediately(new QueuedMessage(folderLocalYellow, 0, null));
                             lastLocalYellowAnnouncedTime = currentGameState.Now;
+                            lastSectorFlagsAnnouncedTime[currentGameState.SessionData.SectorNumber - 1] = currentGameState.Now;
                         }
+                        // ensure the last announced state us updated, even if we don't actually read the transition
+                        lastSectorFlagsAnnounced[currentGameState.SessionData.SectorNumber - 1] = FlagEnum.YELLOW;
                         isUnderLocalYellow = true;
                         nextIllegalPassWarning = currentGameState.Now;
                         // we might not have warned of an incident ahead - no point in warning about it now we've actually reached it
@@ -538,14 +541,26 @@ namespace CrewChiefV4.Events
                         if (lastLocalYellowClearAnnouncedTime.Add(TimeSpan.FromSeconds(6)) < currentGameState.Now)
                         {
                             audioPlayer.playMessageImmediately(new QueuedMessage(folderLocalYellowClear, 0, null));
-                            lastLocalYellowClearAnnouncedTime = currentGameState.Now;
+                            lastLocalYellowClearAnnouncedTime = currentGameState.Now;                            
+                            lastSectorFlagsAnnouncedTime[currentGameState.SessionData.SectorNumber - 1] = currentGameState.Now;
                         }
+                        // ensure the last announced state us updated, even if we don't actually read the transition
+                        lastSectorFlagsAnnounced[currentGameState.SessionData.SectorNumber - 1] = FlagEnum.GREEN;
                         isUnderLocalYellow = false;
                         // we've passed the incident so allow warnings of other incidents approaching
                         hasWarnedOfUpcomingIncident = false;
                         waitingToWarnOfIncident = false;
                         lastReportedOvertakeAllowed = PassAllowedUnderYellow.NO_DATA;
                     }
+                }
+                else if (allSectorsAreGreen(currentGameState.FlagData))
+                {
+                    // if all the sectors are clear the local and warning booleans. This ensures we don't sit waiting for a 'clear' that never comes.
+                    isUnderLocalYellow = false;
+                    hasWarnedOfUpcomingIncident = false;
+                    waitingToWarnOfIncident = false;
+                    lastReportedOvertakeAllowed = PassAllowedUnderYellow.NO_DATA;
+                    waitingForNewLocalYellowFlagToSettle = false;
                 }
                 else if (!isUnderLocalYellow && !hasWarnedOfUpcomingIncident) 
                 {
@@ -570,14 +585,6 @@ namespace CrewChiefV4.Events
                         waitingToWarnOfIncident = true;
                         incidentAheadSettledTime = currentGameState.Now + localYellowChangeSettlingTime;
                     }
-                }
-                else if (allSectorsAreGreen(currentGameState.FlagData))
-                {
-                    // if all the sectors are clear the local and warning booleans. This ensures we don't sit waiting for a 'clear' that never comes.
-                    isUnderLocalYellow = false;
-                    hasWarnedOfUpcomingIncident = false;
-                    waitingToWarnOfIncident = false;
-                    lastReportedOvertakeAllowed = PassAllowedUnderYellow.NO_DATA;
                 }
 
                 if (isUnderLocalYellow && reportAllowedOvertakesUnderYellow)
