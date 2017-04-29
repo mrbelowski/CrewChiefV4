@@ -142,7 +142,7 @@ namespace CrewChiefV4.Events
 
         private DateTime localYellowStartSettledTime = DateTime.MinValue;
         private DateTime localYellowEndSettledTime = DateTime.MinValue;
-        private TimeSpan localYellowChangeSettlingTime = TimeSpan.FromSeconds(3);
+        private TimeSpan localYellowChangeSettlingTime = TimeSpan.FromSeconds(2);
         private Boolean waitingForNewLocalYellowFlagToSettle = false;
         private Boolean waitingForNewLocalGreenFlagToSettle = false;
         private DateTime incidentAheadSettledTime = DateTime.MinValue;
