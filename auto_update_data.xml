@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- this is the fall-back auto_update_data.xml. The app will check this one only if the primary check doesn't work.
+Note that the filename has to remain 'auto_update_data.xml' so legacy installs (which have no concept of the primary / 
+secondary update sources) can still be updated. All downloads from this source will be pulled from the isnais ftp server. -->
 <item>
 <title>Crew Chief 4.6.4.8, updated 28 April 2017</title>
 <version>4.6.4.8</version>
