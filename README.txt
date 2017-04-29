@@ -8,6 +8,8 @@ For support and discussions about Crew Chief we have our very own forum here: ht
 
 Changelog
 ---------
+Version 4.6.4.8: Skip 'dead' opponent data copies coming from PCars (should fix a few issues with inaccurate opponent data); Added R3E Hungaroring corner data; Made opponent incident detection less sensitive and added an option to disable it (enable_simple_incident_detection); Reworked opponent lap and sector handling to fix incorrect sector time and pace reports (all games); Tweaked R3E yellow flag reporting to allow status changes to settle before reporting
+	
 Version 4.6.4.7: A few minor bug fixes
 
 Version 4.6.4.6: Some more Raceroom flag calling tweaks - should be less noisy but may miss rapidly changing flag situations; Added RF2 'stock car' mode (sound recordings to follow);Added R3E Nurburgring GP corner data
