@@ -753,7 +753,7 @@ namespace CrewChiefV4.RaceRoom
                                     new float[] { participantStruct.Position.X, participantStruct.Position.Z }, previousOpponentWorldPosition,
                                     participantStruct.LapDistance, participantStruct.TireType, participantStruct.DriverInfo.ClassId,
                                     currentGameState.SessionData.SessionHasFixedTime, currentGameState.SessionData.SessionTimeRemaining, 
-                                    currentGameState.carClass.carClassEnum);
+                                    currentOpponentData.CarClass.carClassEnum);
 
                             if (previousOpponentData != null)
                             {
@@ -1409,7 +1409,7 @@ namespace CrewChiefV4.RaceRoom
         private void upateOpponentData(OpponentData opponentData, int racePosition, int unfilteredRacePosition, int completedLaps, int sector, float sectorTime, 
             float completedLapTime, Boolean isInPits, Boolean lapIsValid, float sessionRunningTime, float secondsSinceLastUpdate, float[] currentWorldPosition,
             float[] previousWorldPosition, float distanceRoundTrack, int tire_type, int carClassId, Boolean sessionLengthIsTime, float sessionTimeRemaining,
-            CarData.CarClassEnum playerCarClass)
+            CarData.CarClassEnum opponentCarClass)
         {
             opponentData.DistanceRoundTrack = distanceRoundTrack;
             float speed;
@@ -1447,11 +1447,9 @@ namespace CrewChiefV4.RaceRoom
                 else if (opponentData.CurrentSectorNumber == 1 && sector == 2 || opponentData.CurrentSectorNumber == 2 && sector == 3)
                 {
                     opponentData.AddCumulativeSectorData(opponentData.CurrentSectorNumber, racePosition, sectorTime, sessionRunningTime, lapIsValid && validSpeed, false, 20, 20);
-                    if (sector == 2)
+                    if (sector == 2 && opponentCarClass != null)
                     {
-                        // crappy but necessary assumption - assume single class here. It only really matters for DTM races, which will be a single class.
-                        // The alternative is to check the opponent car class each tick (too expensive)
-                        opponentData.CurrentTyres = mapToTyreType(tire_type, playerCarClass);
+                        opponentData.CurrentTyres = mapToTyreType(tire_type, opponentCarClass);
                     }
                 }
                 opponentData.CurrentSectorNumber = sector;
