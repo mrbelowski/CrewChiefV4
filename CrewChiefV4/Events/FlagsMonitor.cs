@@ -142,7 +142,7 @@ namespace CrewChiefV4.Events
 
         private DateTime localYellowStartSettledTime = DateTime.MinValue;
         private DateTime localYellowEndSettledTime = DateTime.MinValue;
-        private TimeSpan localYellowChangeSettlingTime = TimeSpan.FromSeconds(3);
+        private TimeSpan localYellowChangeSettlingTime = TimeSpan.FromSeconds(2);
         private Boolean waitingForNewLocalYellowFlagToSettle = false;
         private Boolean waitingForNewLocalGreenFlagToSettle = false;
         private DateTime incidentAheadSettledTime = DateTime.MinValue;
@@ -441,24 +441,27 @@ namespace CrewChiefV4.Events
                             {
                                 if (sectorFlag == FlagEnum.YELLOW || sectorFlag == FlagEnum.DOUBLE_YELLOW)
                                 {
-                                    // Sector i changed to yellow
+                                    // Sector i changed to yellow - don't announce this if we're in a local yellow
                                     if (currentGameState.Now > lastSectorFlagsAnnouncedTime[i].Add(timeBetweenNewYellowFlagMessages))
                                     {
-                                        hasAlreadyWarnedAboutIllegalPass = false;
-                                        lastSectorFlagsAnnounced[i] = sectorFlag;
-                                        lastSectorFlagsAnnouncedTime[i] = currentGameState.Now;
+                                        if (!currentGameState.FlagData.isLocalYellow && currentGameState.SessionData.SectorNumber == i + 1)
+                                        {
+                                            hasAlreadyWarnedAboutIllegalPass = false;
+                                            lastSectorFlagsAnnounced[i] = sectorFlag;
+                                            lastSectorFlagsAnnouncedTime[i] = currentGameState.Now;
 
-                                        // don't call sector yellow if we've in a local yellow
-                                        if (isCurrentSector(currentGameState, i) && 4 > random.NextDouble() * 10 && !currentGameState.FlagData.isLocalYellow)
-                                        {
-                                            // If in current, sometimes announce without sector number.
-                                            audioPlayer.playMessage(new QueuedMessage(sectorFlag == FlagEnum.YELLOW ?
-                                                folderYellowFlag : folderDoubleYellowFlag, 0, this));
-                                        }
-                                        else if (!currentGameState.FlagData.isLocalYellow)
-                                        {
-                                            audioPlayer.playMessageImmediately(new QueuedMessage(sectorFlag == FlagEnum.YELLOW ?
-                                                folderYellowFlagSectors[i] : folderDoubleYellowFlagSectors[i], 0, null));
+                                            // don't call sector yellow if we've in a local yellow
+                                            if (isCurrentSector(currentGameState, i) && 4 > random.NextDouble() * 10)
+                                            {
+                                                // If in current, sometimes announce without sector number.
+                                                audioPlayer.playMessage(new QueuedMessage(sectorFlag == FlagEnum.YELLOW ?
+                                                    folderYellowFlag : folderDoubleYellowFlag, 0, this));
+                                            }
+                                            else
+                                            {
+                                                audioPlayer.playMessageImmediately(new QueuedMessage(sectorFlag == FlagEnum.YELLOW ?
+                                                    folderYellowFlagSectors[i] : folderDoubleYellowFlagSectors[i], 0, null));
+                                            }
                                         }
 
                                         // start working out who's gone off
