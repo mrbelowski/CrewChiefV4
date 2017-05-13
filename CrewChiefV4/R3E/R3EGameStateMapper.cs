@@ -80,6 +80,11 @@ namespace CrewChiefV4.RaceRoom
 
         private SpeechRecogniser speechRecogniser;
 
+        // blue flag zone for improvised blues when the 'full flag rules' are disabled
+        // note that this will be set to true at the start of a session and change to false as soon as the game sends a blue flag
+        private Boolean useImprovisedBlueFlagDetection = true;
+        private int blueFlagDetectionDistance = UserSettings.GetUserSettings().getInt("r3e_blue_flag_detection_distance");
+
         // now we're much stricter with the bollocks opponents data (duplicates, missing entries, stuff randomly being given the wrong
         // slot_id), can we remove this grotty delayed-position hack and all the associated crap it creates? Turns out that no, we can't. 
         // The data are broken and unreliable in multiple ways - the opponent data get jumbled up, and the data *within each opponent slot*
@@ -167,6 +172,9 @@ namespace CrewChiefV4.RaceRoom
                 Console.WriteLine("currentSessionPhase = " + currentGameState.SessionData.SessionPhase);
                 Console.WriteLine("rawSessionPhase = " + shared.SessionPhase);
                 Console.WriteLine("currentSessionRunningTime = " + currentGameState.SessionData.SessionRunningTime);
+
+                // reset the flag to allow the improvised blue flag calling
+                useImprovisedBlueFlagDetection = true;
 
                 currentGameState.SessionData.EventIndex = shared.EventIndex;
                 currentGameState.SessionData.SessionIteration = shared.SessionIteration;
@@ -378,6 +386,8 @@ namespace CrewChiefV4.RaceRoom
                     currentGameState.SessionData.PlayerBestLapSector2Time = previousGameState.SessionData.PlayerBestLapSector2Time;
                     currentGameState.SessionData.PlayerBestLapSector3Time = previousGameState.SessionData.PlayerBestLapSector3Time;
                     currentGameState.SessionData.trackLandmarksTiming = previousGameState.SessionData.trackLandmarksTiming;
+
+                    currentGameState.FlagData.useImprovisedIncidentCalling = previousGameState.FlagData.useImprovisedIncidentCalling;
                 }
             }
 
@@ -389,23 +399,40 @@ namespace CrewChiefV4.RaceRoom
             //------------------------ Session data -----------------------
             currentGameState.SessionData.Flag = FlagEnum.UNKNOWN;
             // Mark Yellow sectors.
+            // note that any yellow flag info will switch off improvised incident calling for the remainder of the session
             if (shared.sector1Yellow == 1) {
                 currentGameState.FlagData.sectorFlags[0] = FlagEnum.YELLOW;
+                currentGameState.FlagData.useImprovisedIncidentCalling = false;
             } else if (shared.sector1Yellow == 2) {
                 currentGameState.FlagData.sectorFlags[0] = FlagEnum.DOUBLE_YELLOW;
+                currentGameState.FlagData.useImprovisedIncidentCalling = false;
             }
             if (shared.sector2Yellow == 1) {
                 currentGameState.FlagData.sectorFlags[1] = FlagEnum.YELLOW;
+                currentGameState.FlagData.useImprovisedIncidentCalling = false;
             } else if (shared.sector2Yellow == 2) {
                 currentGameState.FlagData.sectorFlags[1] = FlagEnum.DOUBLE_YELLOW;
+                currentGameState.FlagData.useImprovisedIncidentCalling = false;
             }
             if (shared.sector3Yellow == 1) {
                 currentGameState.FlagData.sectorFlags[2] = FlagEnum.YELLOW;
+                currentGameState.FlagData.useImprovisedIncidentCalling = false;
             } else if (shared.sector3Yellow == 2) {
                 currentGameState.FlagData.sectorFlags[2] = FlagEnum.DOUBLE_YELLOW;
+                currentGameState.FlagData.useImprovisedIncidentCalling = false;
+            }
+            currentGameState.FlagData.isLocalYellow = shared.Flags.Yellow == 1;
+            if (currentGameState.FlagData.isLocalYellow)
+            {
+                currentGameState.FlagData.useImprovisedIncidentCalling = false;
+            }
+            // TODO: this hack ONLY APPLIES TO THE CURRENT R3E VERSION: the flag rules cover blue and yellow with a single in-game option.
+            // So as soon as we see any yellow flag data we know that the game is also handling blues, so we turn this off too.
+            if (!currentGameState.FlagData.useImprovisedIncidentCalling)
+            {
+                useImprovisedBlueFlagDetection = false;
             }
 
-            currentGameState.FlagData.isLocalYellow = shared.Flags.Yellow == 1;
             if (shared.FlagsExtended2.white == 1 && !currentGameState.FlagData.isLocalYellow)
             {
                 currentGameState.SessionData.Flag = FlagEnum.WHITE;
@@ -419,6 +446,7 @@ namespace CrewChiefV4.RaceRoom
             if (shared.FlagsExtended2.yellowOvertake == 1)
             {
                 currentGameState.FlagData.canOvertakeCarInFront = PassAllowedUnderYellow.YES;
+                currentGameState.FlagData.useImprovisedIncidentCalling = false;
             }
             else if (shared.FlagsExtended2.yellowOvertake == 0)
             {
@@ -429,11 +457,13 @@ namespace CrewChiefV4.RaceRoom
             if (shared.closestYellowLapDistance > 0)
             {
                 currentGameState.FlagData.distanceToNearestIncident = shared.closestYellowLapDistance;
+                currentGameState.FlagData.useImprovisedIncidentCalling = false;
             }
 
             if (shared.Flags.Blue == 1)
             {
                 currentGameState.SessionData.Flag = FlagEnum.BLUE;
+                useImprovisedBlueFlagDetection = false;
             }
 
             currentGameState.SessionData.SessionTimeRemaining = shared.SessionTimeRemaining;
@@ -795,6 +825,21 @@ namespace CrewChiefV4.RaceRoom
                                             }
                                         }
                                     }
+                                }
+                            }
+
+                            // improvised blue flag calculation when we have full flag rules disabled
+                            if (!useImprovisedBlueFlagDetection)
+                            {
+                                Boolean isInSector1OnOutlap = currentOpponentData.CurrentSectorNumber == 1 &&
+                                    (currentOpponentData.getCurrentLapData() != null && currentOpponentData.getCurrentLapData().OutLap);
+                                if (currentGameState.SessionData.SessionType == SessionType.Race && currentOpponentData.Position == participantStruct.Place &&
+                                    !isEnteringPits && !isLeavingPits && currentGameState.PositionAndMotionData.DistanceRoundTrack != 0 &&
+                                    currentOpponentData.Position + 1 < shared.Position && !isInSector1OnOutlap &&
+                                    isBehindWithinDistance(shared.LayoutLength, 8, blueFlagDetectionDistance, currentGameState.PositionAndMotionData.DistanceRoundTrack,
+                                    participantStruct.LapDistance))
+                                {
+                                    currentGameState.SessionData.Flag = FlagEnum.BLUE;
                                 }
                             }
                         }

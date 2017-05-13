@@ -72,7 +72,7 @@ namespace CrewChiefV4.GameState
     
     public class FlagData
     {
-        // holds newer (RF2 & Raceroom) flag data. This is game dependent - only RF2 and R3E will use this.
+        // holds newer (AMS, RF2 & Raceroom) flag data. This is game dependent - only AMS, RF2 and R3E will use this.
         public FlagEnum[] sectorFlags = new FlagEnum[] { FlagEnum.GREEN, FlagEnum.GREEN, FlagEnum.GREEN };
         public Boolean isFullCourseYellow; // FCY rules apply, no other announcements
         public Boolean isLocalYellow;  // local yellow - no overtaking, slow down
@@ -83,6 +83,10 @@ namespace CrewChiefV4.GameState
         // cars passed under yellow - need to give back this many places to avoid penalty (only implemented for R3E)
         public int numCarsPassedIllegally = 0;
         public PassAllowedUnderYellow canOvertakeCarInFront = PassAllowedUnderYellow.NO_DATA;
+
+        // bit of a hack... allow the mapper to decide which flag implemenation to use for yellow calls
+        // as this is game dependent and option dependent (i.e. R3E players may have 'full flag rules' off)
+        public Boolean useImprovisedIncidentCalling = true;
     }
 
     public class TransmissionData
