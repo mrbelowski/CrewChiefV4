@@ -2026,5 +2026,53 @@ namespace CrewChiefV4.Properties {
                 this["enable_simple_incident_detection"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool enable_yellow_flag_messages {
+            get {
+                return ((bool)(this["enable_yellow_flag_messages"]));
+            }
+            set {
+                this["enable_yellow_flag_messages"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string TOGGLE_YELLOW_FLAG_MESSAGES_device_guid {
+            get {
+                return ((string)(this["TOGGLE_YELLOW_FLAG_MESSAGES_device_guid"]));
+            }
+            set {
+                this["TOGGLE_YELLOW_FLAG_MESSAGES_device_guid"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string TOGGLE_YELLOW_FLAG_MESSAGES_device_type {
+            get {
+                return ((string)(this["TOGGLE_YELLOW_FLAG_MESSAGES_device_type"]));
+            }
+            set {
+                this["TOGGLE_YELLOW_FLAG_MESSAGES_device_type"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-1")]
+        public int TOGGLE_YELLOW_FLAG_MESSAGES_button_index {
+            get {
+                return ((int)(this["TOGGLE_YELLOW_FLAG_MESSAGES_button_index"]));
+            }
+            set {
+                this["TOGGLE_YELLOW_FLAG_MESSAGES_button_index"] = value;
+            }
+        }
     }
 }

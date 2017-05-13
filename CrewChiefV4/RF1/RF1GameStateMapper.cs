@@ -152,6 +152,9 @@ namespace CrewChiefV4.rFactor1
 
             // --------------------------------
             // flags data
+            // TODO: should RF1 ever drop back to the improvised incident calling?
+            currentGameState.FlagData.useImprovisedIncidentCalling = false;
+
             currentGameState.FlagData.isFullCourseYellow = currentGameState.SessionData.SessionPhase == SessionPhase.FullCourseYellow
                 || shared.yellowFlagState == (sbyte)rFactor1Constant.rfYellowFlagState.resume;
 
