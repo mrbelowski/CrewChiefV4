@@ -215,13 +215,13 @@ namespace CrewChiefV4.Events
                 return;
             }
 
-            if (CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT || CrewChief.gameDefinition.gameEnum == GameEnum.RF1 || CrewChief.gameDefinition.gameEnum == GameEnum.RACE_ROOM)
+            if (currentGameState.FlagData.useImprovisedIncidentCalling)
             {
-                newYellowFlagImplementation(previousGameState, currentGameState);
+                improvisedYellowFlagImplementation(previousGameState, currentGameState);
             }
             else
             {
-                oldYellowFlagImplementation(previousGameState, currentGameState);
+                gameDataYellowFlagImplementation(previousGameState, currentGameState);
             }
             //  now other flags
             if (currentGameState.PositionAndMotionData.CarSpeed < 1)
@@ -321,7 +321,7 @@ namespace CrewChiefV4.Events
             }
         }
 
-        private void newYellowFlagImplementation(GameStateData previousGameState, GameStateData currentGameState)
+        private void gameDataYellowFlagImplementation(GameStateData previousGameState, GameStateData currentGameState)
         {
             if (previousGameState != null)
             {
@@ -723,7 +723,7 @@ namespace CrewChiefV4.Events
         /**
          * Used by all other games, legacy code.
          */
-        private void oldYellowFlagImplementation(GameStateData previousGameState, GameStateData currentGameState)
+        private void improvisedYellowFlagImplementation(GameStateData previousGameState, GameStateData currentGameState)
         {
             if (currentGameState.PositionAndMotionData.CarSpeed < 1)
             {
