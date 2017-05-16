@@ -658,7 +658,7 @@ namespace CrewChiefV4.GameState
                     {
                         lapData.LapTime = estimatedLapTime;
                         LastLapTime = estimatedLapTime;
-                        if (lapData.IsValid && (CurrentBestLapTime == -1 || CurrentBestLapTime > lapData.LapTime))
+                        if (lapData.IsValid && lapData.LapTime > 0 && (CurrentBestLapTime == -1 || CurrentBestLapTime > lapData.LapTime))
                         {
                             PreviousBestLapTime = CurrentBestLapTime;
                             CurrentBestLapTime = lapData.LapTime;
@@ -697,7 +697,7 @@ namespace CrewChiefV4.GameState
                     {
                         lapData.LapTime = lapTime;
                         LastLapTime = lapTime;
-                        if (lapData.IsValid && (CurrentBestLapTime == -1 || CurrentBestLapTime > lapData.LapTime))
+                        if (lapData.IsValid && lapData.LapTime > 0 && (CurrentBestLapTime == -1 || CurrentBestLapTime > lapData.LapTime))
                         {
                             PreviousBestLapTime = CurrentBestLapTime;
                             CurrentBestLapTime = lapData.LapTime;
@@ -732,7 +732,7 @@ namespace CrewChiefV4.GameState
                     AddCumulativeSectorData(numberOfSectors, position, providedLapTime, gameTimeAtLapEnd, lapIsValid, isRaining, trackTemp, airTemp);
                     lapData.LapTime = providedLapTime;
                     LastLapTime = providedLapTime;
-                    if (lapData.IsValid && (CurrentBestLapTime == -1 || CurrentBestLapTime > lapData.LapTime))
+                    if (lapData.IsValid && lapData.LapTime > 0 && (CurrentBestLapTime == -1 || CurrentBestLapTime > lapData.LapTime))
                     {
                         PreviousBestLapTime = CurrentBestLapTime;
                         CurrentBestLapTime = lapData.LapTime;
@@ -863,54 +863,68 @@ namespace CrewChiefV4.GameState
 
         public OpponentDelta getTimeDifferenceToPlayer(SessionData playerSessionData)
         {
-
-            int lastSectorPlayerCompleted = playerSessionData.SectorNumber == 1 ? 3 : playerSessionData.SectorNumber - 1;
-            float playerLapTimeToUse = playerSessionData.LapTimePrevious;
-            if (playerLapTimeToUse == 0 || playerLapTimeToUse == -1)
+            if (playerSessionData.SessionType != SessionType.Race)
             {
-                playerLapTimeToUse = playerSessionData.LapTimePreviousEstimateForInvalidLap;
-            }
-
-            if (playerSessionData.SessionTimesAtEndOfSectors[lastSectorPlayerCompleted] == -1 || getGameTimeWhenSectorWasLastCompleted(lastSectorPlayerCompleted) == -1)
-            {
-                return null;
-            }
-            float timeDifference;
-            if (Position == playerSessionData.Position + 1)
-            {
-                timeDifference = -1 * playerSessionData.TimeDeltaBehind;
-            }
-            else if (Position == playerSessionData.Position - 1)
-            {
-                timeDifference = playerSessionData.TimeDeltaFront;
+                if (playerSessionData.PlayerLapTimeSessionBest > 0 && CurrentBestLapTime > 0)
+                {
+                    // use the best laps rather than the track positions
+                    return new OpponentDelta(playerSessionData.PlayerLapTimeSessionBest - CurrentBestLapTime, 0);
+                }
+                else
+                {
+                    return null;
+                }
             }
             else
             {
-                timeDifference = playerSessionData.SessionTimesAtEndOfSectors[lastSectorPlayerCompleted] - getGameTimeWhenSectorWasLastCompleted(lastSectorPlayerCompleted);
-            }
-            // if the player is ahead, the time difference is negative
+                int lastSectorPlayerCompleted = playerSessionData.SectorNumber == 1 ? 3 : playerSessionData.SectorNumber - 1;
+                float playerLapTimeToUse = playerSessionData.LapTimePrevious;
+                if (playerLapTimeToUse == 0 || playerLapTimeToUse == -1)
+                {
+                    playerLapTimeToUse = playerSessionData.LapTimePreviousEstimateForInvalidLap;
+                }
 
-            if (((playerSessionData.CompletedLaps == CompletedLaps + 1 && timeDifference < 0 && CurrentSectorNumber < playerSessionData.SectorNumber) ||
-                playerSessionData.CompletedLaps > CompletedLaps + 1 ||
-                (playerSessionData.CompletedLaps == CompletedLaps - 1 && timeDifference > 0 && CurrentSectorNumber >= playerSessionData.SectorNumber) ||
-                playerSessionData.CompletedLaps < CompletedLaps - 1))
-            {
-                // there's more than a lap difference
-                return new OpponentDelta(-1, playerSessionData.CompletedLaps - CompletedLaps);
-            }
-            else if (playerSessionData.CompletedLaps == CompletedLaps + 1 && timeDifference > 0)
-            {
-                // the player has completed 1 more lap but is behind on track
-                return new OpponentDelta(timeDifference - playerLapTimeToUse, 0);
-            }
-            else if (playerSessionData.CompletedLaps == CompletedLaps - 1 && timeDifference < 0)
-            {
-                // the player has completed 1 less lap but is ahead on track
-                return new OpponentDelta(playerLapTimeToUse - timeDifference, 0);
-            }
-            else
-            {
-                return new OpponentDelta(timeDifference, 0);
+                if (playerSessionData.SessionTimesAtEndOfSectors[lastSectorPlayerCompleted] == -1 || getGameTimeWhenSectorWasLastCompleted(lastSectorPlayerCompleted) == -1)
+                {
+                    return null;
+                }
+                float timeDifference;
+                if (Position == playerSessionData.Position + 1)
+                {
+                    timeDifference = -1 * playerSessionData.TimeDeltaBehind;
+                }
+                else if (Position == playerSessionData.Position - 1)
+                {
+                    timeDifference = playerSessionData.TimeDeltaFront;
+                }
+                else
+                {
+                    timeDifference = playerSessionData.SessionTimesAtEndOfSectors[lastSectorPlayerCompleted] - getGameTimeWhenSectorWasLastCompleted(lastSectorPlayerCompleted);
+                }
+                // if the player is ahead, the time difference is negative
+
+                if (((playerSessionData.CompletedLaps == CompletedLaps + 1 && timeDifference < 0 && CurrentSectorNumber < playerSessionData.SectorNumber) ||
+                    playerSessionData.CompletedLaps > CompletedLaps + 1 ||
+                    (playerSessionData.CompletedLaps == CompletedLaps - 1 && timeDifference > 0 && CurrentSectorNumber >= playerSessionData.SectorNumber) ||
+                    playerSessionData.CompletedLaps < CompletedLaps - 1))
+                {
+                    // there's more than a lap difference
+                    return new OpponentDelta(-1, playerSessionData.CompletedLaps - CompletedLaps);
+                }
+                else if (playerSessionData.CompletedLaps == CompletedLaps + 1 && timeDifference > 0)
+                {
+                    // the player has completed 1 more lap but is behind on track
+                    return new OpponentDelta(timeDifference - playerLapTimeToUse, 0);
+                }
+                else if (playerSessionData.CompletedLaps == CompletedLaps - 1 && timeDifference < 0)
+                {
+                    // the player has completed 1 less lap but is ahead on track
+                    return new OpponentDelta(playerLapTimeToUse - timeDifference, 0);
+                }
+                else
+                {
+                    return new OpponentDelta(timeDifference, 0);
+                }
             }
         }
 
