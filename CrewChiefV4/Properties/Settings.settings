@@ -515,5 +515,8 @@
     <Setting Name="TOGGLE_YELLOW_FLAG_MESSAGES_button_index" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">-1</Value>
     </Setting>
+    <Setting Name="enable_opponent_crash_messages" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

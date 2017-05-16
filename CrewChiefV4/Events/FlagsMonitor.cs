@@ -101,6 +101,7 @@ namespace CrewChiefV4.Events
 
         private Boolean reportYellowsInAllSectors = UserSettings.GetUserSettings().getBoolean("report_yellows_in_all_sectors");
         private Boolean enableSimpleIncidentDetection = UserSettings.GetUserSettings().getBoolean("enable_simple_incident_detection");
+        private Boolean enableOpponentCrashMessages = UserSettings.GetUserSettings().getBoolean("enable_opponent_crash_messages");
         
         private float maxDistanceToWarnOfLocalYellow = 300;    // metres - externalise? Is this sufficient? Make it speed-dependent?
         private float minDistanceToWarnOfLocalYellow = 50;    // metres - externalise? Is this sufficient? Make it speed-dependent?
@@ -340,11 +341,14 @@ namespace CrewChiefV4.Events
                                 audioPlayer.playMessageImmediately(new QueuedMessage(folderFCYellowStart, 0, null));
                             }
                             // start working out who's gone off
-                            findInitialIncidentCandidateKeys(-1, currentGameState.OpponentData);
-                            positionAtStartOfIncident = currentGameState.SessionData.Position;
-                            nextIncidentDriversCheck = currentGameState.Now + incidentDriversCheckInterval;
-                            getInvolvedInIncidentAttempts = 0;
-                            driversInvolvedInCurrentIncident.Clear();
+                            if (enableOpponentCrashMessages)
+                            {
+                                findInitialIncidentCandidateKeys(-1, currentGameState.OpponentData);
+                                positionAtStartOfIncident = currentGameState.SessionData.Position;
+                                nextIncidentDriversCheck = currentGameState.Now + incidentDriversCheckInterval;
+                                getInvolvedInIncidentAttempts = 0;
+                                driversInvolvedInCurrentIncident.Clear();
+                            }
                             break;
                         case FullCourseYellowPhase.PITS_CLOSED:
                             if (CrewChief.yellowFlagMessagesEnabled)
@@ -400,23 +404,26 @@ namespace CrewChiefV4.Events
                               currentGameState.FlagData.fcyPhase == FullCourseYellowPhase.PITS_CLOSED) && 
                           currentGameState.Now > nextIncidentDriversCheck)
                 {
-                    if (getInvolvedInIncidentAttempts >= maxFCYGetInvolvedInIncidentAttempts)
+                    if (enableOpponentCrashMessages)
                     {
-                        // we've collected as many involved drivers as we're going to get, so report them
-                        reportYellowFlagDrivers(currentGameState.OpponentData, currentGameState.SessionData.TrackDefinition);
-                        nextIncidentDriversCheck = DateTime.MaxValue;
-                        positionAtStartOfIncident = int.MaxValue;
-                        incidentCandidates.Clear();
-                        getInvolvedInIncidentAttempts = 0;
-                        driversInvolvedInCurrentIncident.Clear();
+                        if (getInvolvedInIncidentAttempts >= maxFCYGetInvolvedInIncidentAttempts)
+                        {
+                            // we've collected as many involved drivers as we're going to get, so report them
+                            reportYellowFlagDrivers(currentGameState.OpponentData, currentGameState.SessionData.TrackDefinition);
+                            nextIncidentDriversCheck = DateTime.MaxValue;
+                            positionAtStartOfIncident = int.MaxValue;
+                            incidentCandidates.Clear();
+                            getInvolvedInIncidentAttempts = 0;
+                            driversInvolvedInCurrentIncident.Clear();
+                        }
+                        else
+                        {
+                            // get more involved drivers and schedule the next check
+                            nextIncidentDriversCheck = currentGameState.Now + incidentDriversCheckInterval;
+                            driversInvolvedInCurrentIncident.AddRange(getInvolvedIncidentCandidates(-1, currentGameState.OpponentData));
+                        }
+                        getInvolvedInIncidentAttempts++;
                     }
-                    else
-                    {
-                        // get more involved drivers and schedule the next check
-                        nextIncidentDriversCheck = currentGameState.Now + incidentDriversCheckInterval;
-                        driversInvolvedInCurrentIncident.AddRange(getInvolvedIncidentCandidates(-1, currentGameState.OpponentData));
-                    }
-                    getInvolvedInIncidentAttempts++;
                 }
                 else
                 {
@@ -436,7 +443,8 @@ namespace CrewChiefV4.Events
                         //      - Announce delayed message and drop it if sector or sector flag changes
 
                         // we've announced this, so see if we can add more information
-                        if (i == waitingForCrashedDriverInSector && currentGameState.Now > nextIncidentDriversCheck)
+                        if (enableOpponentCrashMessages && i == waitingForCrashedDriverInSector && 
+                            currentGameState.Now > nextIncidentDriversCheck)
                         {
                             if (getInvolvedInIncidentAttempts >= maxLocalYellowGetInvolvedInIncidentAttempts)
                             {
@@ -492,14 +500,16 @@ namespace CrewChiefV4.Events
 
                                             }
                                         }
-
-                                        // start working out who's gone off
-                                        findInitialIncidentCandidateKeys(i + 1, currentGameState.OpponentData);
-                                        positionAtStartOfIncident = currentGameState.SessionData.Position;
-                                        nextIncidentDriversCheck = currentGameState.Now + incidentDriversCheckInterval;
-                                        getInvolvedInIncidentAttempts = 0;
-                                        driversInvolvedInCurrentIncident.Clear();
-                                        waitingForCrashedDriverInSector = i;
+                                        if (enableOpponentCrashMessages)
+                                        {
+                                            // start working out who's gone off
+                                            findInitialIncidentCandidateKeys(i + 1, currentGameState.OpponentData);
+                                            positionAtStartOfIncident = currentGameState.SessionData.Position;
+                                            nextIncidentDriversCheck = currentGameState.Now + incidentDriversCheckInterval;
+                                            getInvolvedInIncidentAttempts = 0;
+                                            driversInvolvedInCurrentIncident.Clear();
+                                            waitingForCrashedDriverInSector = i;
+                                        }
                                     }
                                 }
                                 else if (sectorFlag == FlagEnum.GREEN)
@@ -754,7 +764,6 @@ namespace CrewChiefV4.Events
                 }
             }
             // now check for stopped cars
-            // TODO: I think it should also be possible to dynamically disable and enable this through a button assignment and a voice command
             if (currentGameState.SessionData.SessionType == SessionType.Race && enableSimpleIncidentDetection)
             {
                 if (waitingForCrashedDriverInCorner == null)
@@ -819,15 +828,18 @@ namespace CrewChiefV4.Events
                     {
                         List<OpponentData> opponentNamesToRead = new List<OpponentData>();
                         int positionToRead = -1;
-                        foreach (OpponentData opponent in driversCrashedInCorner)
+                        if (enableOpponentCrashMessages)
                         {
-                            if (canReadName(opponent.DriverRawName))
+                            foreach (OpponentData opponent in driversCrashedInCorner)
                             {
-                                opponentNamesToRead.Add(opponent);
-                            }
-                            else if (opponent.Position <= folderPositionHasGoneOff.Length && positionToRead == -1)
-                            {
-                                positionToRead = opponent.Position;
+                                if (canReadName(opponent.DriverRawName))
+                                {
+                                    opponentNamesToRead.Add(opponent);
+                                }
+                                else if (opponent.Position <= folderPositionHasGoneOff.Length && positionToRead == -1)
+                                {
+                                    positionToRead = opponent.Position;
+                                }
                             }
                         }
                         if (opponentNamesToRead.Count > 0)
