@@ -47,6 +47,8 @@ namespace CrewChiefV4
         public static String[] TELL_ME_THE_GAPS = Configuration.getSpeechRecognitionPhrases("TELL_ME_THE_GAPS");
         public static String[] DONT_TELL_ME_THE_GAPS = Configuration.getSpeechRecognitionPhrases("DONT_TELL_ME_THE_GAPS");
         public static String[] WHATS_THE_TIME = Configuration.getSpeechRecognitionPhrases("WHATS_THE_TIME");
+        public static String[] ENABLE_YELLOW_FLAG_MESSAGES = Configuration.getSpeechRecognitionPhrases("ENABLE_YELLOW_FLAG_MESSAGES");
+        public static String[] DISABLE_YELLOW_FLAG_MESSAGES = Configuration.getSpeechRecognitionPhrases("DISABLE_YELLOW_FLAG_MESSAGES");
 
         public static String[] WHOS_IN_FRONT_IN_THE_RACE = Configuration.getSpeechRecognitionPhrases("WHOS_IN_FRONT_IN_THE_RACE");
         public static String[] WHOS_BEHIND_IN_THE_RACE = Configuration.getSpeechRecognitionPhrases("WHOS_BEHIND_IN_THE_RACE");
@@ -247,6 +249,8 @@ namespace CrewChiefV4
                 validateAndAdd(TELL_ME_THE_GAPS, staticSpeechChoices);
                 validateAndAdd(DONT_TELL_ME_THE_GAPS, staticSpeechChoices);
                 validateAndAdd(WHATS_THE_FASTEST_LAP_TIME, staticSpeechChoices);
+                validateAndAdd(ENABLE_YELLOW_FLAG_MESSAGES, staticSpeechChoices);
+                validateAndAdd(DISABLE_YELLOW_FLAG_MESSAGES, staticSpeechChoices);
 
                 validateAndAdd(HOW_LONGS_LEFT, staticSpeechChoices);
                 validateAndAdd(WHATS_THE_TIME, staticSpeechChoices);
@@ -507,6 +511,14 @@ namespace CrewChiefV4
             else if (ResultContains(recognisedSpeech, TELL_ME_THE_GAPS))
             {
                 crewChief.enableDeltasMode();
+            }
+            else if (ResultContains(recognisedSpeech, ENABLE_YELLOW_FLAG_MESSAGES))
+            {
+                crewChief.enableYellowFlagMessages();
+            }
+            else if (ResultContains(recognisedSpeech, DISABLE_YELLOW_FLAG_MESSAGES))
+            {
+                crewChief.disableYellowFlagMessages();
             }
             else if (ResultContains(recognisedSpeech, WHATS_THE_TIME))
             {

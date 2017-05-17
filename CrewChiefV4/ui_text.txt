@@ -92,6 +92,7 @@ udp_network_data_buttons = UDP network data buttons
 volume_up = Increase messages volume
 volume_down = Decrease messages volume
 print_track_data = Print track and position info
+toggle_yellow_flag_messages = Toggle yellow flag messages
 
 custom_device = custom device
 assigned_to = assigned to
@@ -217,3 +218,5 @@ enable_rf2_pit_stop_prediction_help = Play 'box now' messages when using offline
 enable_stockcars_mode_help = Uses Stock Cars wording for FCY phase, and enables White flag on last lap
 
 enable_simple_incident_detection_help = Watch for and report very slow cars as incidents (PCars and AC only)
+enable_yellow_flag_messages_help = Enable yellow flag messages (can be overridden during a session with voice command or button assignment)
+enable_opponent_crash_messages_help = Report the names of opponent cars involved in incidents where possible
