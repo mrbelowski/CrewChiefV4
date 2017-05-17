@@ -829,7 +829,7 @@ namespace CrewChiefV4.RaceRoom
                             }
 
                             // improvised blue flag calculation when we have full flag rules disabled
-                            if (!useImprovisedBlueFlagDetection)
+                            if (useImprovisedBlueFlagDetection)
                             {
                                 Boolean isInSector1OnOutlap = currentOpponentData.CurrentSectorNumber == 1 &&
                                     (currentOpponentData.getCurrentLapData() != null && currentOpponentData.getCurrentLapData().OutLap);
