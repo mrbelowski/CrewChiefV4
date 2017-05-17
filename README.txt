@@ -8,6 +8,8 @@ For support and discussions about Crew Chief we have our very own forum here: ht
 
 Changelog
 ---------
+Version 4.6.5.1: Fixed a silly bug in the legacy R3E blue flag detection (used when flag rules are disabled).
+
 Version 4.6.5.0: Automatically switch between yellow and blue flag implementations in R3E depending on whether flag rules are enabled in-game; Added some more incident calling and yellow flag options; Added button mapping and voice command to suspend and enable yellow flag messages - enable with "give me yellows", "tell me yellows", "give me incident updates" or "give me yellow flag updates". Disable with "no more yellows", "stop incident updates", "don't give me yellows" or "don't tell me yellows"; Fixed the "where is Bob?" voice message response in qual and practice sessions
 
 Version 4.6.4.9: Added R3E Mantorp Park (long), Norisring and Sachsenring corner data; A bit more R3E flag tweaking
