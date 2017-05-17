@@ -27,9 +27,12 @@ namespace CrewChiefV4
         public static GameDefinition gameDefinition;
 
         public static Boolean readOpponentDeltasForEveryLap = false;
+        // initial state from properties but can be overridden during a session:
+        public static Boolean yellowFlagMessagesEnabled = UserSettings.GetUserSettings().getBoolean("enable_yellow_flag_messages");
         private Boolean keepQuietEnabled = false;
+        
         private Boolean spotterEnabled = UserSettings.GetUserSettings().getBoolean("enable_spotter");
-
+        
         public static Boolean enableDriverNames = UserSettings.GetUserSettings().getBoolean("enable_driver_names");
 
         public static TimeSpan _timeInterval = TimeSpan.FromMilliseconds(UserSettings.GetUserSettings().getInt("update_interval"));
@@ -197,6 +200,32 @@ namespace CrewChiefV4
             }
             audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderDeltasDisabled, 0, null));
             
+        }
+
+        public void toggleEnableYellowFlagsMode()
+        {
+            if (yellowFlagMessagesEnabled)
+            {
+                disableYellowFlagMessages();
+            }
+            else
+            {
+                enableYellowFlagMessages();
+            }
+        }
+
+        public void enableYellowFlagMessages()
+        {
+            yellowFlagMessagesEnabled = true;
+            audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
+
+        }
+
+        public void disableYellowFlagMessages()
+        {
+            yellowFlagMessagesEnabled = false;
+            audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
+
         }
 
         public void toggleSpotterMode()
