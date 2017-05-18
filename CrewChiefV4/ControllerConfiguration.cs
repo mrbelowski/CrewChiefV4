@@ -28,7 +28,8 @@ namespace CrewChiefV4
         public static String REPEAT_LAST_MESSAGE_BUTTON = Configuration.getUIString("press_to_replay_the_last_message");
         public static String VOLUME_UP = Configuration.getUIString("volume_up");
         public static String VOLUME_DOWN = Configuration.getUIString("volume_down");
-        public static String PRINT_TRACK_DATA = Configuration.getUIString("print_track_data");        
+        public static String PRINT_TRACK_DATA = Configuration.getUIString("print_track_data");
+        public static String TOGGLE_YELLOW_FLAG_MESSAGES = Configuration.getUIString("toggle_yellow_flag_messages");        
 
         private ControllerData networkGamePad = new ControllerData(Configuration.getUIString("udp_network_data_buttons"), DeviceType.Gamepad, UDP_NETWORK_CONTROLLER_GUID);
         
@@ -67,6 +68,7 @@ namespace CrewChiefV4
             addButtonAssignment(REPEAT_LAST_MESSAGE_BUTTON);
             addButtonAssignment(VOLUME_UP);
             addButtonAssignment(VOLUME_DOWN);
+            addButtonAssignment(TOGGLE_YELLOW_FLAG_MESSAGES);
             addButtonAssignment(PRINT_TRACK_DATA);
             controllers = loadControllers();
         }
@@ -94,7 +96,8 @@ namespace CrewChiefV4
             pollForButtonClicks(buttonAssignments[buttonAssignmentIndexes[REPEAT_LAST_MESSAGE_BUTTON]]);
             pollForButtonClicks(buttonAssignments[buttonAssignmentIndexes[VOLUME_UP]]);
             pollForButtonClicks(buttonAssignments[buttonAssignmentIndexes[VOLUME_DOWN]]);
-            pollForButtonClicks(buttonAssignments[buttonAssignmentIndexes[PRINT_TRACK_DATA]]);  
+            pollForButtonClicks(buttonAssignments[buttonAssignmentIndexes[TOGGLE_YELLOW_FLAG_MESSAGES]]);
+            pollForButtonClicks(buttonAssignments[buttonAssignmentIndexes[PRINT_TRACK_DATA]]);
             pollForButtonClicks(buttonAssignments[buttonAssignmentIndexes[CHANNEL_OPEN_FUNCTION]]);
         }
 
@@ -209,6 +212,10 @@ namespace CrewChiefV4
                 {
                     actionId = "PRINT_TRACK_DATA";
                 }
+                else if (buttonAssignment.action == TOGGLE_YELLOW_FLAG_MESSAGES)
+                {
+                    actionId = "TOGGLE_YELLOW_FLAG_MESSAGES";
+                }
 
                 if (buttonAssignment.controller != null && (buttonAssignment.joystick != null || buttonAssignment.controller.guid == UDP_NETWORK_CONTROLLER_GUID) && buttonAssignment.buttonIndex != -1)
                 {
@@ -280,6 +287,13 @@ namespace CrewChiefV4
             if (printTrackDataButtonIndex != -1 && printTrackDataDeviceGuid.Length > 0)
             {
                 loadAssignment(parent, PRINT_TRACK_DATA, printTrackDataButtonIndex, printTrackDataDeviceGuid);
+            }
+
+            int toggleYellowFlagMessagesButtonIndex = UserSettings.GetUserSettings().getInt("TOGGLE_YELLOW_FLAG_MESSAGES_button_index");
+            String toggleYellowFlagMessagesDeviceGuid = UserSettings.GetUserSettings().getString("TOGGLE_YELLOW_FLAG_MESSAGES_device_guid");
+            if (toggleYellowFlagMessagesButtonIndex != -1 && toggleYellowFlagMessagesDeviceGuid.Length > 0)
+            {
+                loadAssignment(parent, TOGGLE_YELLOW_FLAG_MESSAGES, toggleYellowFlagMessagesButtonIndex, toggleYellowFlagMessagesDeviceGuid);
             }
         }
 

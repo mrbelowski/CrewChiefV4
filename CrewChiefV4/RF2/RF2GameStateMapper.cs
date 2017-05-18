@@ -721,7 +721,7 @@ namespace CrewChiefV4.rFactor2
                 opponent.CurrentSectorNumber = vehicle.mSector == 0 ? 3 : vehicle.mSector;
 
                 var isNewSector = csd.IsNewSession || (opponentPrevious != null && opponentPrevious.CurrentSectorNumber != opponent.CurrentSectorNumber);
-                opponent.IsNewLap = csd.IsNewSession || (isNewSector && opponent.CurrentSectorNumber == 1);
+                opponent.IsNewLap = csd.IsNewSession || (isNewSector && opponent.CurrentSectorNumber == 1 && opponent.CompletedLaps > 0);
                 opponent.Speed = (float)vehicle.mSpeed;
                 opponent.DistanceRoundTrack = (float)vehicle.mLapDist;
                 opponent.WorldPosition = new float[] { (float)vehicle.mPos.x, (float)vehicle.mPos.z };
@@ -754,7 +754,8 @@ namespace CrewChiefV4.rFactor2
                             (float)rf2state.mTrackTemp,
                             (float)rf2state.mAmbientTemp,
                             csd.SessionHasFixedTime,
-                            csd.SessionTimeRemaining);
+                            csd.SessionTimeRemaining,
+                            3);
                     }
                     opponent.StartNewLap(
                         opponent.CompletedLaps + 1,
@@ -768,6 +769,7 @@ namespace CrewChiefV4.rFactor2
                 else if (isNewSector && lastSectorTime > 0.0f)
                 {
                     opponent.AddCumulativeSectorData(
+                        opponentPrevious.CurrentSectorNumber,
                         opponent.Position,
                         lastSectorTime,
                         csd.SessionRunningTime,
@@ -784,7 +786,7 @@ namespace CrewChiefV4.rFactor2
                 {
                     opponent.setInLap();
                     var currentLapData = opponent.getCurrentLapData();
-                    int sector3Position = currentLapData != null && currentLapData.SectorPositions.Count > 2
+                    int sector3Position = currentLapData != null && currentLapData.SectorPositions[2] > 0
                                             ? currentLapData.SectorPositions[2]
                                             : opponent.Position;
 
@@ -891,6 +893,9 @@ namespace CrewChiefV4.rFactor2
 
             // --------------------------------
             // flags data
+            // TODO: should RF2 ever drop back to the improvised incident calling?
+            cgs.FlagData.useImprovisedIncidentCalling = false;
+            
             cgs.FlagData.isFullCourseYellow = csd.SessionPhase == SessionPhase.FullCourseYellow
                 || rf2state.mYellowFlagState == (sbyte)rFactor2Constants.rF2YellowFlagState.Resume;
 
@@ -1132,7 +1137,8 @@ namespace CrewChiefV4.rFactor2
                         (float)rf2state.mTrackTemp,
                         (float)rf2state.mAmbientTemp,
                         csd.SessionHasFixedTime,
-                        csd.SessionTimeRemaining);
+                        csd.SessionTimeRemaining,
+                        3);
                 }
 
                 csd.playerStartNewLap(
@@ -1147,6 +1153,7 @@ namespace CrewChiefV4.rFactor2
             else if (csd.IsNewSector && lastSectorTime > 0.0f)
             {
                 csd.playerAddCumulativeSectorData(
+                    psd.SectorNumber,
                     csd.Position,
                     lastSectorTime,
                     csd.SessionRunningTime,

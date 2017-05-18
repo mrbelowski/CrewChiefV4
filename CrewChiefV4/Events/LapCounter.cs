@@ -322,7 +322,12 @@ namespace CrewChiefV4.Events
                     }
                     else if (position >= currentGameState.SessionData.SessionStartPosition + 5)
                     {
-                        audioPlayer.playMessage(new QueuedMessage(folderTwoLeft, 0, this), PearlsOfWisdom.PearlType.BAD, 0.5);
+                        // yuk... don't yell at the player for being shit if he's play Assetto. Because assetto drivers *are* shit, and also the SessionStartPosition
+                        // might be invalid so perhaps they're really not being shit. At the moment.
+                        if (CrewChief.gameDefinition.gameEnum != GameEnum.ASSETTO_32BIT && CrewChief.gameDefinition.gameEnum != GameEnum.ASSETTO_64BIT)
+                        {
+                            audioPlayer.playMessage(new QueuedMessage(folderTwoLeft, 0, this), PearlsOfWisdom.PearlType.BAD, 0.5);
+                        }
                     }
                     else if (position >= 4)
                     {
