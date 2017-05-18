@@ -237,6 +237,7 @@
             "carClassEnum": "INDYCAR",
             "raceroomClassIds": [ 5383 ],
             "pCarsClassNames": [ "Indycar" ],
+			"rf2ClassNames": [ "IndyCar_2014_Chevrolet", "IndyCar_2014_Honda" ],
             "brakeType": "Carbon",
             "maxSafeWaterTemp": 105,
             "maxSafeOilTemp": 140

@@ -24,7 +24,7 @@ will be pulled from the thecrewchief.org ftp server. -->
 	<soundpackversion>112</soundpackversion>
 	<basesoundpackurl>http://thecrewchief.org/downloads/base_sound_pack.zip</basesoundpackurl>
 	<updatesoundpackurl>http://thecrewchief.org/downloads/update_sound_pack.zip</updatesoundpackurl>
-	<drivernamesversion>115</drivernamesversion>
+	<drivernamesversion>116</drivernamesversion>
 	<basedrivernamesurl>http://thecrewchief.org/downloads/base_driver_names.zip</basedrivernamesurl>
 	<updatedrivernamesurl>http://thecrewchief.org/downloads/update_driver_names.zip</updatedrivernamesurl>
 	<personalisationsversion>106</personalisationsversion>
