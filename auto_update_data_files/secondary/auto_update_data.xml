@@ -27,7 +27,7 @@ secondary update sources) can still be updated. All downloads from this source w
 	<soundpackversion>112</soundpackversion>
 	<basesoundpackurl>http://crewchief.isnais.de/base_sound_pack.zip</basesoundpackurl>
 	<updatesoundpackurl>http://crewchief.isnais.de/update_sound_pack.zip</updatesoundpackurl>
-	<drivernamesversion>115</drivernamesversion>
+	<drivernamesversion>116</drivernamesversion>
 	<basedrivernamesurl>http://crewchief.isnais.de/base_driver_names.zip</basedrivernamesurl>
 	<updatedrivernamesurl>http://crewchief.isnais.de/update_driver_names.zip</updatedrivernamesurl>
 	<personalisationsversion>106</personalisationsversion>
