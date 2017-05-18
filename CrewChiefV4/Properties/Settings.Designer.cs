@@ -2086,5 +2086,17 @@ namespace CrewChiefV4.Properties {
                 this["enable_opponent_crash_messages"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool prefer_alternative_download_site {
+            get {
+                return ((bool)(this["prefer_alternative_download_site"]));
+            }
+            set {
+                this["prefer_alternative_download_site"] = value;
+            }
+        }
     }
 }

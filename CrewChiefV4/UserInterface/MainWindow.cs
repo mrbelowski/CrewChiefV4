@@ -70,6 +70,8 @@ namespace CrewChiefV4
         // the legacy update stuff hosted on GoogleDrive with downloads on the isnais ftp server
         private static String autoUpdateXMLURL2 = "https://drive.google.com/uc?export=download&id=0B4KQS820QNFbWWFjaDAzRldMNUE";
 
+        private Boolean preferAlternativeDownloadSite = UserSettings.GetUserSettings().getBoolean("prefer_alternative_download_site");
+
         private float latestSoundPackVersion = -1;
         private float latestDriverNamesVersion = -1;
         private float latestPersonalisationsVersion = -1;
@@ -91,6 +93,9 @@ namespace CrewChiefV4
             new Thread(() =>
             {
                 Console.WriteLine("Checking for updates");
+                String firstUpdate = preferAlternativeDownloadSite ? autoUpdateXMLURL2 : autoUpdateXMLURL1;
+                String secondUpdate = preferAlternativeDownloadSite ? autoUpdateXMLURL1 : autoUpdateXMLURL2;
+
                 Thread.CurrentThread.IsBackground = true;
                 // now the sound packs
                 downloadSoundPackButton.Text = Configuration.getUIString("checking_sound_pack_version");
@@ -100,13 +105,13 @@ namespace CrewChiefV4
                 Boolean gotUpdateData = false;
                 try
                 {
-                    AutoUpdater.Start(autoUpdateXMLURL1);
-                    string xml = new WebClient().DownloadString(autoUpdateXMLURL1);
+                    AutoUpdater.Start(firstUpdate);
+                    string xml = new WebClient().DownloadString(firstUpdate);
                     doc = XDocument.Parse(xml);
                     if (doc.Descendants("soundpack").Count() > 0)
                     {
                         gotUpdateData = true;
-                        Console.WriteLine("Got update data from primary URL");
+                        Console.WriteLine("Got update data from primary URL: " + firstUpdate.Substring(0, 24));
                     }
                     else
                     {
@@ -121,13 +126,13 @@ namespace CrewChiefV4
                 {
                     try
                     {
-                        AutoUpdater.Start(autoUpdateXMLURL2);
-                        string xml = new WebClient().DownloadString(autoUpdateXMLURL2);
+                        AutoUpdater.Start(secondUpdate);
+                        string xml = new WebClient().DownloadString(secondUpdate);
                         doc = XDocument.Parse(xml);
                         if (doc.Descendants("soundpack").Count() > 0)
                         {
                             gotUpdateData = true;
-                            Console.WriteLine("Got update data from secondary URL");
+                            Console.WriteLine("Got update data from secondary URL: " + secondUpdate.Substring(0, 24));
                         }
                         else
                         {
