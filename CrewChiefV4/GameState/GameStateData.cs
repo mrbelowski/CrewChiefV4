@@ -72,7 +72,7 @@ namespace CrewChiefV4.GameState
     
     public class FlagData
     {
-        // holds newer (RF2 & Raceroom) flag data. This is game dependent - only RF2 and R3E will use this.
+        // holds newer (AMS, RF2 & Raceroom) flag data. This is game dependent - only AMS, RF2 and R3E will use this.
         public FlagEnum[] sectorFlags = new FlagEnum[] { FlagEnum.GREEN, FlagEnum.GREEN, FlagEnum.GREEN };
         public Boolean isFullCourseYellow; // FCY rules apply, no other announcements
         public Boolean isLocalYellow;  // local yellow - no overtaking, slow down
@@ -83,6 +83,10 @@ namespace CrewChiefV4.GameState
         // cars passed under yellow - need to give back this many places to avoid penalty (only implemented for R3E)
         public int numCarsPassedIllegally = 0;
         public PassAllowedUnderYellow canOvertakeCarInFront = PassAllowedUnderYellow.NO_DATA;
+
+        // bit of a hack... allow the mapper to decide which flag implemenation to use for yellow calls
+        // as this is game dependent and option dependent (i.e. R3E players may have 'full flag rules' off)
+        public Boolean useImprovisedIncidentCalling = true;
     }
 
     public class TransmissionData
@@ -321,7 +325,6 @@ namespace CrewChiefV4.GameState
         public void playerStartNewLap(int lapNumber, int position, Boolean inPits, float gameTimeAtStart, Boolean isRaining, float trackTemp, float airTemp)
         {
             LapData thisLapData = new LapData();
-            thisLapData.Conditions.Add(new LapConditions(isRaining, trackTemp, airTemp));
             thisLapData.GameTimeAtLapStart = gameTimeAtStart;
             thisLapData.OutLap = inPits;
             thisLapData.PositionAtStart = position;
@@ -330,76 +333,91 @@ namespace CrewChiefV4.GameState
         }
 
         public void playerCompleteLapWithProvidedLapTime(int position, float gameTimeAtLapEnd, float providedLapTime,
-            Boolean lapIsValid, Boolean isRaining, float trackTemp, float airTemp, Boolean sessionLengthIsTime, float sessionTimeRemaining)
+            Boolean lapIsValid, Boolean isRaining, float trackTemp, float airTemp, Boolean sessionLengthIsTime, float sessionTimeRemaining, int numberOfSectors)
         {
             if (PlayerLapData.Count > 0)
             {
                 LapData lapData = PlayerLapData[PlayerLapData.Count - 1];
-                playerAddCumulativeSectorData(position, providedLapTime, gameTimeAtLapEnd, lapIsValid, isRaining, trackTemp, airTemp);
-                lapData.LapTime = providedLapTime;
-
-                LapTimePrevious = providedLapTime;
-                if (lapData.IsValid && (PlayerLapTimeSessionBest == -1 || PlayerLapTimeSessionBest > lapData.LapTime))
+                if (PlayerLapData.Count == 1 || !lapData.hasMissingSectors)
                 {
-                    PlayerLapTimeSessionBestPrevious = PlayerLapTimeSessionBest;
-                    PlayerLapTimeSessionBest = lapData.LapTime;
+                    playerAddCumulativeSectorData(numberOfSectors, position, providedLapTime, gameTimeAtLapEnd, lapIsValid, isRaining, trackTemp, airTemp);
+                    lapData.LapTime = providedLapTime;
 
-                    if (lapData.SectorTimes.Count > 0)
+                    LapTimePrevious = providedLapTime;
+                    if (lapData.IsValid && (PlayerLapTimeSessionBest == -1 || PlayerLapTimeSessionBest > lapData.LapTime))
+                    {
+                        PlayerLapTimeSessionBestPrevious = PlayerLapTimeSessionBest;
+                        PlayerLapTimeSessionBest = lapData.LapTime;
+
                         PlayerBestLapSector1Time = lapData.SectorTimes[0];
-                    if (lapData.SectorTimes.Count > 1)
                         PlayerBestLapSector2Time = lapData.SectorTimes[1];
-                    if (lapData.SectorTimes.Count > 2)
                         PlayerBestLapSector3Time = lapData.SectorTimes[2];
+                    }
+                }
+                else
+                {
+                    PlayerLapData.Remove(lapData);
                 }
                 PreviousLapWasValid = lapData.IsValid;
             }
-
-            // Not sure we need this for player.
-            //if (sessionLengthIsTime && sessionTimeRemaining > 0 && CurrentBestLapTime > 0 && sessionTimeRemaining < CurrentBestLapTime - 5)
-            //{
-            //  isProbablyLastLap = true;
-            //}
         }
 
-        public void playerAddCumulativeSectorData(int position, float cumulativeSectorTime, float gameTimeAtSectorEnd, Boolean lapIsValid, Boolean isRaining, float trackTemp, float airTemp)
+        public void playerAddCumulativeSectorData(int sectorNumberJustCompleted, int position, float cumulativeSectorTime, float gameTimeAtSectorEnd, Boolean lapIsValid, 
+            Boolean isRaining, float trackTemp, float airTemp)
         {
             if (PlayerLapData.Count > 0)
             {
                 LapData lapData = PlayerLapData[PlayerLapData.Count - 1];
+
                 if (cumulativeSectorTime <= 0)
                 {
                     cumulativeSectorTime = gameTimeAtSectorEnd - lapData.GameTimeAtLapStart;
                 }
-                float thisSectorTime = cumulativeSectorTime;
-                int sectorNumber = 1;
-                foreach (float sectorTime in lapData.SectorTimes)
+                float thisSectorTime;
+                if (sectorNumberJustCompleted == 3 && lapData.SectorTimes[0] > 0 && lapData.SectorTimes[1] > 0)
                 {
-                    sectorNumber++;
-                    thisSectorTime = thisSectorTime - sectorTime;
+                    thisSectorTime = cumulativeSectorTime - lapData.SectorTimes[0] - lapData.SectorTimes[1];
                 }
-                lapData.SectorTimes.Add(thisSectorTime);
+                else if (sectorNumberJustCompleted == 2 && lapData.SectorTimes[0] > 0)
+                {
+                    thisSectorTime = cumulativeSectorTime - lapData.SectorTimes[0];
+                }
+                else if (sectorNumberJustCompleted == 1)
+                {
+                    thisSectorTime = cumulativeSectorTime;
+                }
+                else
+                {
+                    // we don't have enough data to calculate this sector time - given that we always drop back to calculated cumulative sector
+                    // times when the provided time <= 0, this should only happen if we've never actually completed a previous sector. So it's
+                    // safe to assume any sector < 0 means missing data.
+                    thisSectorTime = -1;
+                    lapData.hasMissingSectors = true;
+                }
                 if (lapIsValid && thisSectorTime > 0)
                 {
-                    if (sectorNumber == 1 && (PlayerBestSector1Time == -1 || thisSectorTime < PlayerBestSector1Time))
+                    if (sectorNumberJustCompleted == 1 && (PlayerBestSector1Time == -1 || thisSectorTime < PlayerBestSector1Time))
                     {
                         PlayerBestSector1Time = thisSectorTime;
                     }
-                    if (sectorNumber == 2 && (PlayerBestSector2Time == -1 || thisSectorTime < PlayerBestSector2Time))
+                    if (sectorNumberJustCompleted == 2 && (PlayerBestSector2Time == -1 || thisSectorTime < PlayerBestSector2Time))
                     {
                         PlayerBestSector2Time = thisSectorTime;
                     }
-                    if (sectorNumber == 3 && (PlayerBestSector3Time == -1 || thisSectorTime < PlayerBestSector3Time))
+                    if (sectorNumberJustCompleted == 3 && (PlayerBestSector3Time == -1 || thisSectorTime < PlayerBestSector3Time))
                     {
                         PlayerBestSector3Time = thisSectorTime;
                     }
                 }
-                lapData.SectorPositions.Add(position);
-                lapData.GameTimeAtSectorEnd.Add(gameTimeAtSectorEnd);
+                lapData.SectorTimes[sectorNumberJustCompleted - 1] = thisSectorTime;
+                lapData.SectorPositions[sectorNumberJustCompleted - 1] = position;
+                lapData.GameTimeAtSectorEnd[sectorNumberJustCompleted - 1] = gameTimeAtSectorEnd;
+                lapData.Conditions[sectorNumberJustCompleted - 1] = new LapConditions(isRaining, trackTemp, airTemp);
                 if (lapData.IsValid && !lapIsValid)
                 {
                     lapData.IsValid = false;
                 }
-                lapData.Conditions.Add(new LapConditions(isRaining, trackTemp, airTemp));
+                
             }
         }
 
@@ -421,18 +439,11 @@ namespace CrewChiefV4.GameState
                         (thisLapTime.LapTime > 0 && thisLapTime.LapTime < bestLapTimeAndSectorsSectors[0]))
                     {
                         bestLapTimeAndSectorsSectors[0] = thisLapTime.LapTime;
-                        int sectorCount = thisLapTime.SectorTimes.Count();
-                        if (sectorCount > 0)
+                        if (!thisLapTime.hasMissingSectors)
                         {
                             bestLapTimeAndSectorsSectors[1] = thisLapTime.SectorTimes[0];
-                        }
-                        if (sectorCount > 1)
-                        {
                             bestLapTimeAndSectorsSectors[2] = thisLapTime.SectorTimes[1];
-                        }
-                        if (sectorCount > 2)
-                        {
-                            bestLapTimeAndSectorsSectors[3] = thisLapTime.SectorTimes[2];
+                            bestLapTimeAndSectorsSectors[3] = thisLapTime.SectorTimes[2];                            
                         }
                     }
                 }
@@ -552,21 +563,16 @@ namespace CrewChiefV4.GameState
                     LapData thisLapTime = OpponentLapData[i];
                     if (thisLapTime.IsValid)
                     {
+                        // note the <= here. Because we're counting backwards this means we'll retrieve the earliest of any identical
+                        // laps. Bit of an edge case I suppose...
                         if (bestLapTimeAndSectorsSectors[0] == -1 ||
-                            (thisLapTime.LapTime > 0 && thisLapTime.LapTime < bestLapTimeAndSectorsSectors[0]))
+                            (thisLapTime.LapTime > 0 && thisLapTime.LapTime <= bestLapTimeAndSectorsSectors[0]))
                         {
                             bestLapTimeAndSectorsSectors[0] = thisLapTime.LapTime;
-                            int sectorCount = thisLapTime.SectorTimes.Count();
-                            if (sectorCount > 0)
+                            if (!thisLapTime.hasMissingSectors)
                             {
                                 bestLapTimeAndSectorsSectors[1] = thisLapTime.SectorTimes[0];
-                            }
-                            if (sectorCount > 1)
-                            {
                                 bestLapTimeAndSectorsSectors[2] = thisLapTime.SectorTimes[1];
-                            }
-                            if (sectorCount > 2)
-                            {
                                 bestLapTimeAndSectorsSectors[3] = thisLapTime.SectorTimes[2];
                             }
                         }
@@ -603,18 +609,22 @@ namespace CrewChiefV4.GameState
 
         public float getGameTimeWhenSectorWasLastCompleted(int sectorNumber)
         {
+            // try the last lap
             if (OpponentLapData.Count > 0)
             {
-                if (OpponentLapData[OpponentLapData.Count - 1].GameTimeAtSectorEnd.Count > sectorNumber)
+                float time = OpponentLapData[OpponentLapData.Count - 1].GameTimeAtSectorEnd[sectorNumber - 1];
+                if (time > 0)
                 {
-                    return OpponentLapData[OpponentLapData.Count - 1].GameTimeAtSectorEnd[sectorNumber];
+                    return time;
                 }
-            }
-            if (OpponentLapData.Count > 1)
-            {
-                if (OpponentLapData[OpponentLapData.Count - 2].GameTimeAtSectorEnd.Count > sectorNumber)
+                else if (OpponentLapData.Count > 1)
                 {
-                    return OpponentLapData[OpponentLapData.Count - 2].GameTimeAtSectorEnd[sectorNumber];
+                    // got back to the lap before
+                    time = OpponentLapData[OpponentLapData.Count - 2].GameTimeAtSectorEnd[sectorNumber - 1];
+                    if (time > 0)
+                    {
+                        return time;
+                    }
                 }
             }
             return -1;
@@ -623,7 +633,6 @@ namespace CrewChiefV4.GameState
         public void StartNewLap(int lapNumber, int position, Boolean inPits, float gameTimeAtStart, Boolean isRaining, float trackTemp, float airTemp)
         {
             LapData thisLapData = new LapData();
-            thisLapData.Conditions.Add(new LapConditions(isRaining, trackTemp, airTemp));
             thisLapData.GameTimeAtLapStart = gameTimeAtStart;
             thisLapData.OutLap = inPits;
             thisLapData.PositionAtStart = position;
@@ -634,20 +643,22 @@ namespace CrewChiefV4.GameState
         public void CompleteLapWithEstimatedLapTime(int position, float gameTimeAtLapEnd, float worldRecordLapTime, float worldRecordS1Time, float worldRecordS2Time, float worldRecordS3Time,
             Boolean lapIsValid, Boolean isRaining, float trackTemp, float airTemp, Boolean sessionLengthIsTime, float sessionTimeRemaining)
         {
-            AddCumulativeSectorData(position, -1, gameTimeAtLapEnd, lapIsValid, isRaining, trackTemp, airTemp);
+            // only used by PCars where all tracks have 3 sectors
+            AddCumulativeSectorData(3, position, -1, gameTimeAtLapEnd, lapIsValid, isRaining, trackTemp, airTemp);
             if (OpponentLapData.Count > 0)
             {
                 LapData lapData = OpponentLapData[OpponentLapData.Count - 1];
-                if (lapData.SectorTimes.Count > 2)
+                if (OpponentLapData.Count == 1 || !lapData.hasMissingSectors)
                 {
                     float estimatedLapTime = lapData.SectorTimes.Sum();
                     LastLapValid = lapData.IsValid;
-                    if (lapData.SectorTimes[0] > worldRecordS1Time - 0.1 && lapData.SectorTimes[1] > worldRecordS2Time - 0.1 && lapData.SectorTimes[2] > worldRecordS2Time - 0.1 &&
+                    // pcars-specific sanity checks
+                    if (lapData.SectorTimes[0] > worldRecordS1Time - 0.1 && lapData.SectorTimes[1] > worldRecordS2Time - 0.1 && lapData.SectorTimes[2] > worldRecordS3Time - 0.1 &&
                         estimatedLapTime > worldRecordLapTime - 0.1 && estimatedLapTime > 0)
                     {
                         lapData.LapTime = estimatedLapTime;
                         LastLapTime = estimatedLapTime;
-                        if (lapData.IsValid && (CurrentBestLapTime == -1 || CurrentBestLapTime > lapData.LapTime))
+                        if (lapData.IsValid && lapData.LapTime > 0 && (CurrentBestLapTime == -1 || CurrentBestLapTime > lapData.LapTime))
                         {
                             PreviousBestLapTime = CurrentBestLapTime;
                             CurrentBestLapTime = lapData.LapTime;
@@ -659,6 +670,10 @@ namespace CrewChiefV4.GameState
                         LastLapTime = -1;
                         lapData.IsValid = false;
                     }
+                }
+                else
+                {
+                    OpponentLapData.Remove(lapData);
                 }
             }
             if (sessionLengthIsTime && sessionTimeRemaining > 0 && CurrentBestLapTime > 0 && sessionTimeRemaining < CurrentBestLapTime - 5)
@@ -668,13 +683,13 @@ namespace CrewChiefV4.GameState
         }
 
         public void CompleteLapWithLastSectorTime(int position, float lastSectorTime, float gameTimeAtLapEnd,
-            Boolean lapIsValid, Boolean isRaining, float trackTemp, float airTemp, Boolean sessionLengthIsTime, float sessionTimeRemaining)
+            Boolean lapIsValid, Boolean isRaining, float trackTemp, float airTemp, Boolean sessionLengthIsTime, float sessionTimeRemaining, int numberOfSectors)
         {
-            AddSectorData(position, lastSectorTime, gameTimeAtLapEnd, lapIsValid, isRaining, trackTemp, airTemp);
+            AddSectorData(numberOfSectors, position, lastSectorTime, gameTimeAtLapEnd, lapIsValid, isRaining, trackTemp, airTemp);
             if (OpponentLapData.Count > 0)
             {
                 LapData lapData = OpponentLapData[OpponentLapData.Count - 1];
-                if (lapData.SectorTimes.Count > 2)
+                if (OpponentLapData.Count == 1 || !lapData.hasMissingSectors)
                 {
                     float lapTime = lapData.SectorTimes.Sum();
                     LastLapValid = lapData.IsValid;
@@ -682,7 +697,7 @@ namespace CrewChiefV4.GameState
                     {
                         lapData.LapTime = lapTime;
                         LastLapTime = lapTime;
-                        if (lapData.IsValid && (CurrentBestLapTime == -1 || CurrentBestLapTime > lapData.LapTime))
+                        if (lapData.IsValid && lapData.LapTime > 0 && (CurrentBestLapTime == -1 || CurrentBestLapTime > lapData.LapTime))
                         {
                             PreviousBestLapTime = CurrentBestLapTime;
                             CurrentBestLapTime = lapData.LapTime;
@@ -695,6 +710,10 @@ namespace CrewChiefV4.GameState
                         lapData.IsValid = false;
                     }
                 }
+                else
+                {
+                     OpponentLapData.Remove(lapData);
+                }
             }
             if (sessionLengthIsTime && sessionTimeRemaining > 0 && CurrentBestLapTime > 0 && sessionTimeRemaining < CurrentBestLapTime - 5)
             {
@@ -703,20 +722,27 @@ namespace CrewChiefV4.GameState
         }
 
         public void CompleteLapWithProvidedLapTime(int position, float gameTimeAtLapEnd, float providedLapTime,
-            Boolean lapIsValid, Boolean isRaining, float trackTemp, float airTemp, Boolean sessionLengthIsTime, float sessionTimeRemaining)
+            Boolean lapIsValid, Boolean isRaining, float trackTemp, float airTemp, Boolean sessionLengthIsTime, float sessionTimeRemaining, int numberOfSectors)
         {
             if (OpponentLapData.Count > 0)
-            {
+            {                
                 LapData lapData = OpponentLapData[OpponentLapData.Count - 1];
-                AddCumulativeSectorData(position, providedLapTime, gameTimeAtLapEnd, lapIsValid, isRaining, trackTemp, airTemp);
-                lapData.LapTime = providedLapTime;
-                LastLapTime = providedLapTime;
-                if (lapData.IsValid && (CurrentBestLapTime == -1 || CurrentBestLapTime > lapData.LapTime))
+                if (OpponentLapData.Count == 1 || !lapData.hasMissingSectors) 
                 {
-                    PreviousBestLapTime = CurrentBestLapTime;
-                    CurrentBestLapTime = lapData.LapTime;
+                    AddCumulativeSectorData(numberOfSectors, position, providedLapTime, gameTimeAtLapEnd, lapIsValid, isRaining, trackTemp, airTemp);
+                    lapData.LapTime = providedLapTime;
+                    LastLapTime = providedLapTime;
+                    if (lapData.IsValid && lapData.LapTime > 0 && (CurrentBestLapTime == -1 || CurrentBestLapTime > lapData.LapTime))
+                    {
+                        PreviousBestLapTime = CurrentBestLapTime;
+                        CurrentBestLapTime = lapData.LapTime;
+                    }
+                    LastLapValid = lapData.IsValid;
+                } 
+                else
+                { 
+                    OpponentLapData.Remove(lapData);
                 }
-                LastLapValid = lapData.IsValid;
             }
             if (sessionLengthIsTime && sessionTimeRemaining > 0 && CurrentBestLapTime > 0 && sessionTimeRemaining < CurrentBestLapTime - 5)
             {
@@ -724,7 +750,8 @@ namespace CrewChiefV4.GameState
             }
         }
 
-        public void AddCumulativeSectorData(int position, float cumulativeSectorTime, float gameTimeAtSectorEnd, Boolean lapIsValid, Boolean isRaining, float trackTemp, float airTemp)
+        public void AddCumulativeSectorData(int sectorNumberJustCompleted, int position, float cumulativeSectorTime, float gameTimeAtSectorEnd, Boolean lapIsValid, 
+            Boolean isRaining, float trackTemp, float airTemp)
         {
             if (OpponentLapData.Count > 0)
             {
@@ -733,72 +760,90 @@ namespace CrewChiefV4.GameState
                 {
                     cumulativeSectorTime = gameTimeAtSectorEnd - lapData.GameTimeAtLapStart;
                 }
-                float thisSectorTime = cumulativeSectorTime;
-                int sectorNumber = 1;
-                foreach (float sectorTime in lapData.SectorTimes)
+                float thisSectorTime;
+                if (sectorNumberJustCompleted == 3 && lapData.SectorTimes[0] > 0 && lapData.SectorTimes[1] > 0)
                 {
-                    sectorNumber++;
-                    thisSectorTime = thisSectorTime - sectorTime;
+                    thisSectorTime = cumulativeSectorTime - lapData.SectorTimes[0] - lapData.SectorTimes[1];
                 }
-                lapData.SectorTimes.Add(thisSectorTime);
+                else if (sectorNumberJustCompleted == 2 && lapData.SectorTimes[0] > 0)
+                {
+                    thisSectorTime = cumulativeSectorTime - lapData.SectorTimes[0];
+                }
+                else if (sectorNumberJustCompleted == 1)
+                {
+                    thisSectorTime = cumulativeSectorTime;
+                }
+                else
+                {
+                    // we don't have enough data to calculate this sector time - given that we always drop back to calculated cumulative sector
+                    // times when the provided time <= 0, this should only happen if we've never actually completed a previous sector. So it's
+                    // safe to assume any sector < 0 means missing data.
+                    thisSectorTime = -1;
+                    lapData.hasMissingSectors = true;
+                }
+                
                 if (lapIsValid && thisSectorTime > 0)
                 {
-                    if (sectorNumber == 1 && (bestSector1Time == -1 || thisSectorTime < bestSector1Time))
+                    if (sectorNumberJustCompleted == 1 && (bestSector1Time == -1 || thisSectorTime < bestSector1Time))
                     {
                         bestSector1Time = thisSectorTime;
                     }
-                    if (sectorNumber == 2 && (bestSector2Time == -1 || thisSectorTime < bestSector2Time))
+                    if (sectorNumberJustCompleted == 2 && (bestSector2Time == -1 || thisSectorTime < bestSector2Time))
                     {
                         bestSector2Time = thisSectorTime;
                     }
-                    if (sectorNumber == 3 && (bestSector3Time == -1 || thisSectorTime < bestSector3Time))
+                    if (sectorNumberJustCompleted == 3 && (bestSector3Time == -1 || thisSectorTime < bestSector3Time))
                     {
                         bestSector3Time = thisSectorTime;
                     }
                 }
-                lapData.SectorPositions.Add(position);
-                lapData.GameTimeAtSectorEnd.Add(gameTimeAtSectorEnd);
+                lapData.SectorTimes[sectorNumberJustCompleted - 1] = thisSectorTime;
+                lapData.SectorPositions[sectorNumberJustCompleted - 1] = position;
+                lapData.GameTimeAtSectorEnd[sectorNumberJustCompleted - 1] = gameTimeAtSectorEnd;
+                lapData.Conditions[sectorNumberJustCompleted - 1] = new LapConditions(isRaining, trackTemp, airTemp);
                 if (lapData.IsValid && !lapIsValid)
                 {
                     lapData.IsValid = false;
                 }
-                lapData.Conditions.Add(new LapConditions(isRaining, trackTemp, airTemp));
             }
         }
 
-        public void AddSectorData(int position, float thisSectorTime, float gameTimeAtSectorEnd, Boolean lapIsValid, Boolean isRaining, float trackTemp, float airTemp)
+        public void AddSectorData(int sectorNumberJustCompleted, int position, float thisSectorTime, float gameTimeAtSectorEnd, Boolean lapIsValid, Boolean isRaining, float trackTemp, float airTemp)
         {
             if (OpponentLapData.Count > 0)
             {
                 LapData lapData = OpponentLapData[OpponentLapData.Count - 1];
-                int sectorNumber = 1;
-                foreach (float sectorTime in lapData.SectorTimes)
+                lapData.SectorTimes[sectorNumberJustCompleted - 1] = thisSectorTime;
+
+                // fragile code here. If the lap is invalid PCars network mode sends -1 (-123 actually but never mind). If the data is just missing (we had no sectorX time info) 
+                // then we'll have 0. So looking for sectorTime[x] == 0 is different from looking for -1
+                if ((sectorNumberJustCompleted == 2 && lapData.SectorTimes[0] == 0) || (sectorNumberJustCompleted == 3 && lapData.SectorTimes[1] == 0))
                 {
-                    sectorNumber++;
+                    lapData.hasMissingSectors = true;
                 }
-                lapData.SectorTimes.Add(thisSectorTime);
                 if (lapIsValid && thisSectorTime > 0)
                 {
-                    if (sectorNumber == 1 && (bestSector1Time == -1 || thisSectorTime < bestSector1Time))
+                    if (sectorNumberJustCompleted == 1 && (bestSector1Time == -1 || thisSectorTime < bestSector1Time))
                     {
                         bestSector1Time = thisSectorTime;
                     }
-                    if (sectorNumber == 2 && (bestSector2Time == -1 || thisSectorTime < bestSector2Time))
+                    if (sectorNumberJustCompleted == 2 && (bestSector2Time == -1 || thisSectorTime < bestSector2Time))
                     {
                         bestSector2Time = thisSectorTime;
                     }
-                    if (sectorNumber == 3 && (bestSector3Time == -1 || thisSectorTime < bestSector3Time))
+                    if (sectorNumberJustCompleted == 3 && (bestSector3Time == -1 || thisSectorTime < bestSector3Time))
                     {
                         bestSector3Time = thisSectorTime;
                     }
                 }
-                lapData.SectorPositions.Add(position);
-                lapData.GameTimeAtSectorEnd.Add(gameTimeAtSectorEnd);
+                lapData.SectorTimes[sectorNumberJustCompleted - 1] = thisSectorTime;
+                lapData.SectorPositions[sectorNumberJustCompleted - 1] = position;
+                lapData.GameTimeAtSectorEnd[sectorNumberJustCompleted - 1] = gameTimeAtSectorEnd;
+                lapData.Conditions[sectorNumberJustCompleted - 1] = new LapConditions(isRaining, trackTemp, airTemp);
                 if (lapData.IsValid && !lapIsValid)
                 {
                     lapData.IsValid = false;
                 }
-                lapData.Conditions.Add(new LapConditions(isRaining, trackTemp, airTemp));
             }
         }
 
@@ -818,54 +863,68 @@ namespace CrewChiefV4.GameState
 
         public OpponentDelta getTimeDifferenceToPlayer(SessionData playerSessionData)
         {
-
-            int lastSectorPlayerCompleted = playerSessionData.SectorNumber == 1 ? 3 : playerSessionData.SectorNumber - 1;
-            float playerLapTimeToUse = playerSessionData.LapTimePrevious;
-            if (playerLapTimeToUse == 0 || playerLapTimeToUse == -1)
+            if (playerSessionData.SessionType != SessionType.Race)
             {
-                playerLapTimeToUse = playerSessionData.LapTimePreviousEstimateForInvalidLap;
-            }
-
-            if (playerSessionData.SessionTimesAtEndOfSectors[lastSectorPlayerCompleted] == -1 || getGameTimeWhenSectorWasLastCompleted(lastSectorPlayerCompleted - 1) == -1)
-            {
-                return null;
-            }
-            float timeDifference;
-            if (Position == playerSessionData.Position + 1)
-            {
-                timeDifference = -1 * playerSessionData.TimeDeltaBehind;
-            }
-            else if (Position == playerSessionData.Position - 1)
-            {
-                timeDifference = playerSessionData.TimeDeltaFront;
+                if (playerSessionData.PlayerLapTimeSessionBest > 0 && CurrentBestLapTime > 0)
+                {
+                    // use the best laps rather than the track positions
+                    return new OpponentDelta(playerSessionData.PlayerLapTimeSessionBest - CurrentBestLapTime, 0);
+                }
+                else
+                {
+                    return null;
+                }
             }
             else
             {
-                timeDifference = playerSessionData.SessionTimesAtEndOfSectors[lastSectorPlayerCompleted] - getGameTimeWhenSectorWasLastCompleted(lastSectorPlayerCompleted - 1);
-            }
-            // if the player is ahead, the time difference is negative
+                int lastSectorPlayerCompleted = playerSessionData.SectorNumber == 1 ? 3 : playerSessionData.SectorNumber - 1;
+                float playerLapTimeToUse = playerSessionData.LapTimePrevious;
+                if (playerLapTimeToUse == 0 || playerLapTimeToUse == -1)
+                {
+                    playerLapTimeToUse = playerSessionData.LapTimePreviousEstimateForInvalidLap;
+                }
 
-            if (((playerSessionData.CompletedLaps == CompletedLaps + 1 && timeDifference < 0 && CurrentSectorNumber < playerSessionData.SectorNumber) ||
-                playerSessionData.CompletedLaps > CompletedLaps + 1 ||
-                (playerSessionData.CompletedLaps == CompletedLaps - 1 && timeDifference > 0 && CurrentSectorNumber >= playerSessionData.SectorNumber) ||
-                playerSessionData.CompletedLaps < CompletedLaps - 1))
-            {
-                // there's more than a lap difference
-                return new OpponentDelta(-1, playerSessionData.CompletedLaps - CompletedLaps);
-            }
-            else if (playerSessionData.CompletedLaps == CompletedLaps + 1 && timeDifference > 0)
-            {
-                // the player has completed 1 more lap but is behind on track
-                return new OpponentDelta(timeDifference - playerLapTimeToUse, 0);
-            }
-            else if (playerSessionData.CompletedLaps == CompletedLaps - 1 && timeDifference < 0)
-            {
-                // the player has completed 1 less lap but is ahead on track
-                return new OpponentDelta(playerLapTimeToUse - timeDifference, 0);
-            }
-            else
-            {
-                return new OpponentDelta(timeDifference, 0);
+                if (playerSessionData.SessionTimesAtEndOfSectors[lastSectorPlayerCompleted] == -1 || getGameTimeWhenSectorWasLastCompleted(lastSectorPlayerCompleted) == -1)
+                {
+                    return null;
+                }
+                float timeDifference;
+                if (Position == playerSessionData.Position + 1)
+                {
+                    timeDifference = -1 * playerSessionData.TimeDeltaBehind;
+                }
+                else if (Position == playerSessionData.Position - 1)
+                {
+                    timeDifference = playerSessionData.TimeDeltaFront;
+                }
+                else
+                {
+                    timeDifference = playerSessionData.SessionTimesAtEndOfSectors[lastSectorPlayerCompleted] - getGameTimeWhenSectorWasLastCompleted(lastSectorPlayerCompleted);
+                }
+                // if the player is ahead, the time difference is negative
+
+                if (((playerSessionData.CompletedLaps == CompletedLaps + 1 && timeDifference < 0 && CurrentSectorNumber < playerSessionData.SectorNumber) ||
+                    playerSessionData.CompletedLaps > CompletedLaps + 1 ||
+                    (playerSessionData.CompletedLaps == CompletedLaps - 1 && timeDifference > 0 && CurrentSectorNumber >= playerSessionData.SectorNumber) ||
+                    playerSessionData.CompletedLaps < CompletedLaps - 1))
+                {
+                    // there's more than a lap difference
+                    return new OpponentDelta(-1, playerSessionData.CompletedLaps - CompletedLaps);
+                }
+                else if (playerSessionData.CompletedLaps == CompletedLaps + 1 && timeDifference > 0)
+                {
+                    // the player has completed 1 more lap but is behind on track
+                    return new OpponentDelta(timeDifference - playerLapTimeToUse, 0);
+                }
+                else if (playerSessionData.CompletedLaps == CompletedLaps - 1 && timeDifference < 0)
+                {
+                    // the player has completed 1 less lap but is ahead on track
+                    return new OpponentDelta(playerLapTimeToUse - timeDifference, 0);
+                }
+                else
+                {
+                    return new OpponentDelta(timeDifference, 0);
+                }
             }
         }
 
@@ -1111,9 +1170,12 @@ namespace CrewChiefV4.GameState
         public String updateLandmarkTiming(TrackDefinition trackDefinition, float gameTime, float previousDistanceRoundTrack, float currentDistanceRoundTrack, float speed) 
         {
             if (trackDefinition == null || trackDefinition.trackLandmarks == null || trackDefinition.trackLandmarks.Count == 0 ||
-                gameTime < 30)
+                gameTime < 30 || 
+                ((CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_32BIT || 
+                  CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_64BIT || 
+                  CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_NETWORK) && (currentDistanceRoundTrack == 0 || speed == 0)))
             {
-                // don't collect data if the session has been running < 30 seconds
+                // don't collect data if the session has been running < 30 seconds or we're PCars and the distanceRoundTrack or speed is exactly zero
                 return null;
             }
             // yuk...
@@ -1199,11 +1261,11 @@ namespace CrewChiefV4.GameState
             {
                 // again, we're waiting to enter a landmark zone - perhaps we've just left a zone so still check for stopped cars       
   
-                // TODO: refactor this - there's already a method in TrackData to get a landmark for a given track distance, with a 100 metre 'near' zone
+                // TODO: refactor this - there's already a method in TrackData to get a landmark for a given track distance, with a 70 metre 'near' zone
                 foreach (TrackLandmark trackLandmark in trackDefinition.trackLandmarks) 
                 {
-                    if (currentDistanceRoundTrack > Math.Max(0, trackLandmark.distanceRoundLapStart - 100) &&
-                        currentDistanceRoundTrack < Math.Min(trackDefinition.trackLength, trackLandmark.distanceRoundLapEnd + 100))
+                    if (currentDistanceRoundTrack > Math.Max(0, trackLandmark.distanceRoundLapStart - 70) &&
+                        currentDistanceRoundTrack < Math.Min(trackDefinition.trackLength, trackLandmark.distanceRoundLapEnd + 70))
                     {
                         if (nearLandmarkName != trackLandmark.landmarkName)
                         {
@@ -1226,9 +1288,9 @@ namespace CrewChiefV4.GameState
                 }
             }
 
-            if (landmarkStoppedCount >= 10)
+            if (landmarkStoppedCount >= 20)
             {
-                // slow for more than 1 second - this assumes 1 tick is 100ms, which isn't necessarily valid but it's close enough. 
+                // slow for more than 2 seconds - this assumes 1 tick is 100ms, which isn't necessarily valid but it's close enough. 
                 return landmarkNameStart == null ? nearLandmarkName : landmarkNameStart;
             }
             else
@@ -1254,12 +1316,13 @@ namespace CrewChiefV4.GameState
         public Boolean IsValid = true;
         public float LapTime = -1;
         public float GameTimeAtLapStart = 0;
-        public List<float> SectorTimes = new List<float>();
-        public List<float> GameTimeAtSectorEnd = new List<float>();
-        public List<LapConditions> Conditions = new List<LapConditions>();
-        public List<int> SectorPositions = new List<int>();
+        public float[] SectorTimes = new float[3];
+        public float[] GameTimeAtSectorEnd = new float[3];
+        public LapConditions[] Conditions = new LapConditions[3];
+        public int[] SectorPositions = new int[3];
         public Boolean OutLap = false;
         public Boolean InLap = false;
+        public Boolean hasMissingSectors = false;
     }
 
     public class LapConditions

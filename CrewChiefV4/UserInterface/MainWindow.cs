@@ -61,7 +61,16 @@ namespace CrewChiefV4
 
         private VoiceOptionEnum voiceOption;
 
-        private static String autoUpdateXMLURL = "https://drive.google.com/uc?export=download&id=0B4KQS820QNFbWWFjaDAzRldMNUE";
+        // the new update stuff all hosted on the CrewChief website
+        // this is the physical file:
+        // private static String autoUpdateXMLURL1 = "http://thecrewchief.org/downloads/auto_update_data_primary.xml";
+        // this is the file accessed via the PHP download script:
+        private static String autoUpdateXMLURL1 = "http://thecrewchief.org/downloads.php?do=downloadxml";
+
+        // the legacy update stuff hosted on GoogleDrive with downloads on the isnais ftp server
+        private static String autoUpdateXMLURL2 = "https://drive.google.com/uc?export=download&id=0B4KQS820QNFbWWFjaDAzRldMNUE";
+
+        private Boolean preferAlternativeDownloadSite = UserSettings.GetUserSettings().getBoolean("prefer_alternative_download_site");
 
         private float latestSoundPackVersion = -1;
         private float latestDriverNamesVersion = -1;
@@ -70,7 +79,7 @@ namespace CrewChiefV4
         private ControlWriter cw = null;
 
         private float currentVolume = -1;
-                
+                        
         private void FormMain_Load(object sender, EventArgs e)
         {            
             // Some update test code - uncomment this to allow the app to process an update .zip file in the root of the sound pack
@@ -84,151 +93,190 @@ namespace CrewChiefV4
             new Thread(() =>
             {
                 Console.WriteLine("Checking for updates");
-                Thread.CurrentThread.IsBackground = true;                
+                String firstUpdate = preferAlternativeDownloadSite ? autoUpdateXMLURL2 : autoUpdateXMLURL1;
+                String secondUpdate = preferAlternativeDownloadSite ? autoUpdateXMLURL1 : autoUpdateXMLURL2;
+
+                Thread.CurrentThread.IsBackground = true;
+                // now the sound packs
+                downloadSoundPackButton.Text = Configuration.getUIString("checking_sound_pack_version");
+                downloadDriverNamesButton.Text = Configuration.getUIString("checking_driver_names_version");
+                downloadPersonalisationsButton.Text = Configuration.getUIString("checking_personalisations_version");
+                XDocument doc = null;
+                Boolean gotUpdateData = false;
                 try
                 {
-                    AutoUpdater.Start(autoUpdateXMLURL);
+                    AutoUpdater.Start(firstUpdate);
+                    string xml = new WebClient().DownloadString(firstUpdate);
+                    doc = XDocument.Parse(xml);
+                    if (doc.Descendants("soundpack").Count() > 0)
+                    {
+                        gotUpdateData = true;
+                        Console.WriteLine("Got update data from primary URL: " + firstUpdate.Substring(0, 24));
+                    }
+                    else
+                    {
+                        Console.WriteLine("Unable to get update data with primary URL, trying secondary");
+                    }
                 }
-                catch (Exception)
+                catch (Exception updateException)
                 {
-                    Console.WriteLine("Unable to start auto updater");
+                    Console.WriteLine("Unable to start auto updater with primary URL, trying secondary. Error: " + updateException.Message);
                 }
-                try 
+                if (!gotUpdateData)
                 {
-                    // now the sound packs
-                    downloadSoundPackButton.Text = Configuration.getUIString("checking_sound_pack_version");
-                    downloadDriverNamesButton.Text = Configuration.getUIString("checking_driver_names_version");
-                    downloadPersonalisationsButton.Text = Configuration.getUIString("checking_personalisations_version");
-                    string xml = new WebClient().DownloadString(autoUpdateXMLURL);
-                    XDocument doc = XDocument.Parse(xml);
-
-                    String languageToCheck = AudioPlayer.soundPackLanguage == null ? "en" : AudioPlayer.soundPackLanguage;
-                    Boolean gotLanguageSpecificUpdateInfo = false;
                     try
                     {
-                        foreach (XElement element in doc.Descendants("soundpack"))
+                        AutoUpdater.Start(secondUpdate);
+                        string xml = new WebClient().DownloadString(secondUpdate);
+                        doc = XDocument.Parse(xml);
+                        if (doc.Descendants("soundpack").Count() > 0)
                         {
-                            XAttribute languageAttribute = element.Attribute(XName.Get("language", ""));
-                            if (languageAttribute.Value == languageToCheck)
+                            gotUpdateData = true;
+                            Console.WriteLine("Got update data from secondary URL: " + secondUpdate.Substring(0, 24));
+                        }
+                        else
+                        {
+                            Console.WriteLine("Unable to get update data with secondary URL, unable to check for updates");
+                        }
+                    }
+                    catch (Exception updateException)
+                    {
+                        Console.WriteLine("Unable to start auto updater with secondary URL, unable to check for updates. Error: " + updateException.Message);
+                    }
+                }
+                if (gotUpdateData)
+                {
+                    try
+                    {
+                        String languageToCheck = AudioPlayer.soundPackLanguage == null ? "en" : AudioPlayer.soundPackLanguage;
+                        Boolean gotLanguageSpecificUpdateInfo = false;
+                        try
+                        {
+                            foreach (XElement element in doc.Descendants("soundpack"))
                             {
-                                // this is the update set for this language
-                                float.TryParse(element.Descendants("soundpackversion").First().Value, out latestSoundPackVersion);
-                                float.TryParse(element.Descendants("drivernamesversion").First().Value, out latestDriverNamesVersion);
-                                float.TryParse(element.Descendants("personalisationsversion").First().Value, out latestPersonalisationsVersion);
-                                baseSoundPackDownloadLocation = element.Descendants("basesoundpackurl").First().Value;
-                                baseDriverNamesDownloadLocation = element.Descendants("basedrivernamesurl").First().Value;
-                                basePersonalisationsDownloadLocation = element.Descendants("basepersonalisationsurl").First().Value;
-                                updateSoundPackDownloadLocation = element.Descendants("updatesoundpackurl").First().Value;
-                                updateDriverNamesDownloadLocation = element.Descendants("updatedrivernamesurl").First().Value;
-                                updatePersonalisationsDownloadLocation = element.Descendants("updatepersonalisationsurl").First().Value;
-                                gotLanguageSpecificUpdateInfo = true;
-                                break;
+                                XAttribute languageAttribute = element.Attribute(XName.Get("language", ""));
+                                if (languageAttribute.Value == languageToCheck)
+                                {
+                                    // this is the update set for this language
+                                    float.TryParse(element.Descendants("soundpackversion").First().Value, out latestSoundPackVersion);
+                                    float.TryParse(element.Descendants("drivernamesversion").First().Value, out latestDriverNamesVersion);
+                                    float.TryParse(element.Descendants("personalisationsversion").First().Value, out latestPersonalisationsVersion);
+                                    baseSoundPackDownloadLocation = element.Descendants("basesoundpackurl").First().Value;
+                                    baseDriverNamesDownloadLocation = element.Descendants("basedrivernamesurl").First().Value;
+                                    basePersonalisationsDownloadLocation = element.Descendants("basepersonalisationsurl").First().Value;
+                                    updateSoundPackDownloadLocation = element.Descendants("updatesoundpackurl").First().Value;
+                                    updateDriverNamesDownloadLocation = element.Descendants("updatedrivernamesurl").First().Value;
+                                    updatePersonalisationsDownloadLocation = element.Descendants("updatepersonalisationsurl").First().Value;
+                                    gotLanguageSpecificUpdateInfo = true;
+                                    break;
+                                }
+                            }
+                            if (!gotLanguageSpecificUpdateInfo && AudioPlayer.soundPackLanguage == null)
+                            {
+                                float.TryParse(doc.Descendants("soundpackversion").First().Value, out latestSoundPackVersion);
+                                float.TryParse(doc.Descendants("drivernamesversion").First().Value, out latestDriverNamesVersion);
+                                float.TryParse(doc.Descendants("personalisationsversion").First().Value, out latestPersonalisationsVersion);
+                                baseSoundPackDownloadLocation = doc.Descendants("basesoundpackurl").First().Value;
+                                baseDriverNamesDownloadLocation = doc.Descendants("basedrivernamesurl").First().Value;
+                                basePersonalisationsDownloadLocation = doc.Descendants("basepersonalisationsurl").First().Value;
+                                updateSoundPackDownloadLocation = doc.Descendants("updatesoundpackurl").First().Value;
+                                updateDriverNamesDownloadLocation = doc.Descendants("updatedrivernamesurl").First().Value;
+                                updatePersonalisationsDownloadLocation = doc.Descendants("updatepersonalisationsurl").First().Value;
                             }
                         }
-                        if (!gotLanguageSpecificUpdateInfo && AudioPlayer.soundPackLanguage == null)
+                        catch (Exception e2)
                         {
-                            float.TryParse(doc.Descendants("soundpackversion").First().Value, out latestSoundPackVersion);
-                            float.TryParse(doc.Descendants("drivernamesversion").First().Value, out latestDriverNamesVersion);
-                            float.TryParse(doc.Descendants("personalisationsversion").First().Value, out latestPersonalisationsVersion);
-                            baseSoundPackDownloadLocation = doc.Descendants("basesoundpackurl").First().Value;
-                            baseDriverNamesDownloadLocation = doc.Descendants("basedrivernamesurl").First().Value;
-                            basePersonalisationsDownloadLocation = doc.Descendants("basepersonalisationsurl").First().Value;
-                            updateSoundPackDownloadLocation = doc.Descendants("updatesoundpackurl").First().Value;
-                            updateDriverNamesDownloadLocation = doc.Descendants("updatedrivernamesurl").First().Value;
-                            updatePersonalisationsDownloadLocation = doc.Descendants("updatepersonalisationsurl").First().Value;
+                            // can't parse the auto update XML
+                            Console.WriteLine("Unable to process auto-update data", e2.Message);
                         }
-                    }
-                    catch (Exception e2)
-                    {
-                        // can't parse the auto update XML
-                        Console.WriteLine("Unable to process auto-update data", e2.Message);
-                    }
 
-                    if (latestSoundPackVersion == -1 && AudioPlayer.soundPackVersion == -1)
-                    {
-                        downloadSoundPackButton.Text = Configuration.getUIString("no_sound_pack_detected_unable_to_locate_update");
-                        downloadSoundPackButton.Enabled = false;
-                        downloadSoundPackButton.BackColor = Color.LightGray;
-                    }
-                    else if (latestSoundPackVersion > AudioPlayer.soundPackVersion)
-                    {
-                        downloadSoundPackButton.Enabled = true;
-                        downloadSoundPackButton.BackColor = Color.LightGreen;
-                        if (AudioPlayer.soundPackVersion == -1)
+                        if (latestSoundPackVersion == -1 && AudioPlayer.soundPackVersion == -1)
                         {
-                            downloadSoundPackButton.Text = Configuration.getUIString("no_sound_pack_detected_press_to_download");
-                            getBaseSoundPack = true;
+                            downloadSoundPackButton.Text = Configuration.getUIString("no_sound_pack_detected_unable_to_locate_update");
+                            downloadSoundPackButton.Enabled = false;
+                            downloadSoundPackButton.BackColor = Color.LightGray;
+                        }
+                        else if (latestSoundPackVersion > AudioPlayer.soundPackVersion)
+                        {
+                            downloadSoundPackButton.Enabled = true;
+                            downloadSoundPackButton.BackColor = Color.LightGreen;
+                            if (AudioPlayer.soundPackVersion == -1)
+                            {
+                                downloadSoundPackButton.Text = Configuration.getUIString("no_sound_pack_detected_press_to_download");
+                                getBaseSoundPack = true;
+                            }
+                            else
+                            {
+                                downloadSoundPackButton.Text = Configuration.getUIString("updated_sound_pack_available_press_to_download");
+                            }
+                            newSoundPackAvailable = true;
+                            downloadSoundPackButton.Enabled = true;
                         }
                         else
                         {
-                            downloadSoundPackButton.Text = Configuration.getUIString("updated_sound_pack_available_press_to_download");
+                            downloadSoundPackButton.Text = Configuration.getUIString("sound_pack_is_up_to_date");
+                            downloadSoundPackButton.BackColor = Color.LightGray;
                         }
-                        newSoundPackAvailable = true;
-                        downloadSoundPackButton.Enabled = true;
-                    }
-                    else
-                    {
-                        downloadSoundPackButton.Text = Configuration.getUIString("sound_pack_is_up_to_date");
-                        downloadSoundPackButton.BackColor = Color.LightGray;
-                    }
-                    if (latestDriverNamesVersion == -1 && AudioPlayer.driverNamesVersion == -1) {
-                        downloadDriverNamesButton.Text = Configuration.getUIString("no_driver_names_detected_unable_to_locate_update");
-                        downloadDriverNamesButton.Enabled = false;
-                        downloadDriverNamesButton.BackColor = Color.LightGray;
-                    }
-                    else if (latestDriverNamesVersion > AudioPlayer.driverNamesVersion)
-                    {
-                        downloadDriverNamesButton.Enabled = true;
-                        downloadDriverNamesButton.BackColor = Color.LightGreen;
-                        if (AudioPlayer.driverNamesVersion == -1)
+                        if (latestDriverNamesVersion == -1 && AudioPlayer.driverNamesVersion == -1)
                         {
-                            downloadDriverNamesButton.Text = Configuration.getUIString("no_driver_names_detected_press_to_download");
-                            getBaseDriverNames = true;
+                            downloadDriverNamesButton.Text = Configuration.getUIString("no_driver_names_detected_unable_to_locate_update");
+                            downloadDriverNamesButton.Enabled = false;
+                            downloadDriverNamesButton.BackColor = Color.LightGray;
+                        }
+                        else if (latestDriverNamesVersion > AudioPlayer.driverNamesVersion)
+                        {
+                            downloadDriverNamesButton.Enabled = true;
+                            downloadDriverNamesButton.BackColor = Color.LightGreen;
+                            if (AudioPlayer.driverNamesVersion == -1)
+                            {
+                                downloadDriverNamesButton.Text = Configuration.getUIString("no_driver_names_detected_press_to_download");
+                                getBaseDriverNames = true;
+                            }
+                            else
+                            {
+                                downloadDriverNamesButton.Text = Configuration.getUIString("updated_driver_names_available_press_to_download");
+                            }
+                            newDriverNamesAvailable = true;
                         }
                         else
                         {
-                            downloadDriverNamesButton.Text = Configuration.getUIString("updated_driver_names_available_press_to_download");
+                            downloadDriverNamesButton.Text = Configuration.getUIString("driver_names_are_up_to_date");
+                            downloadDriverNamesButton.Enabled = false;
+                            downloadDriverNamesButton.BackColor = Color.LightGray;
                         }
-                        newDriverNamesAvailable = true;
-                    }
-                    else
-                    {
-                        downloadDriverNamesButton.Text = Configuration.getUIString("driver_names_are_up_to_date");
-                        downloadDriverNamesButton.Enabled = false;
-                        downloadDriverNamesButton.BackColor = Color.LightGray;
-                    }
-                    if (latestPersonalisationsVersion == -1 && AudioPlayer.personalisationsVersion == -1)
-                    {
-                        downloadPersonalisationsButton.Text = Configuration.getUIString("no_personalisations_detected_unable_to_locate_update");
-                        downloadPersonalisationsButton.Enabled = false;
-                        downloadPersonalisationsButton.BackColor = Color.LightGray;
-                    }
-                    else if (latestPersonalisationsVersion > AudioPlayer.personalisationsVersion)
-                    {
-                        downloadPersonalisationsButton.Enabled = true;
-                        downloadPersonalisationsButton.BackColor = Color.LightGreen;
-                        if (AudioPlayer.personalisationsVersion == -1)
+                        if (latestPersonalisationsVersion == -1 && AudioPlayer.personalisationsVersion == -1)
                         {
-                            downloadPersonalisationsButton.Text = Configuration.getUIString("no_personalisations_detected_press_to_download");
-                            getBasePersonalisations = true;
+                            downloadPersonalisationsButton.Text = Configuration.getUIString("no_personalisations_detected_unable_to_locate_update");
+                            downloadPersonalisationsButton.Enabled = false;
+                            downloadPersonalisationsButton.BackColor = Color.LightGray;
+                        }
+                        else if (latestPersonalisationsVersion > AudioPlayer.personalisationsVersion)
+                        {
+                            downloadPersonalisationsButton.Enabled = true;
+                            downloadPersonalisationsButton.BackColor = Color.LightGreen;
+                            if (AudioPlayer.personalisationsVersion == -1)
+                            {
+                                downloadPersonalisationsButton.Text = Configuration.getUIString("no_personalisations_detected_press_to_download");
+                                getBasePersonalisations = true;
+                            }
+                            else
+                            {
+                                downloadPersonalisationsButton.Text = Configuration.getUIString("updated_personalisations_available_press_to_download");
+                            }
+                            newPersonalisationsAvailable = true;
                         }
                         else
                         {
-                            downloadPersonalisationsButton.Text = Configuration.getUIString("updated_personalisations_available_press_to_download");
+                            downloadPersonalisationsButton.Text = Configuration.getUIString("personalisations_are_up_to_date");
+                            downloadPersonalisationsButton.Enabled = false;
+                            downloadPersonalisationsButton.BackColor = Color.LightGray;
                         }
-                        newPersonalisationsAvailable = true;
+                        Console.WriteLine("Check for updates completed");
                     }
-                    else
+                    catch (Exception error)
                     {
-                        downloadPersonalisationsButton.Text = Configuration.getUIString("personalisations_are_up_to_date");
-                        downloadPersonalisationsButton.Enabled = false;
-                        downloadPersonalisationsButton.BackColor = Color.LightGray;
+                        Console.WriteLine("Unable to get auto update details: " + error.Message);
                     }
-                    Console.WriteLine("Check for updates completed");
-                }
-                catch (Exception error)
-                {
-                    Console.WriteLine("Unable to get auto update details: " + error.Message);
                 }
             }).Start();
         }
@@ -277,6 +325,7 @@ namespace CrewChiefV4
                 startApplicationButton.Text = _IsAppRunning ? Configuration.getUIString("stop") : Configuration.getUIString("start_application");
                 downloadDriverNamesButton.Enabled = !value && newDriverNamesAvailable;
                 downloadSoundPackButton.Enabled = !value && newSoundPackAvailable;
+                downloadPersonalisationsButton.Enabled = !value && newPersonalisationsAvailable;
             }
         }
 
@@ -595,6 +644,12 @@ namespace CrewChiefV4
                         crewChief.audioPlayer.repeatLastMessage();
                         nextPollWait = 1000;
                     }
+                    else if (controllerConfiguration.hasOutstandingClick(ControllerConfiguration.TOGGLE_YELLOW_FLAG_MESSAGES))
+                    {
+                        Console.WriteLine("Toggling yellow flag messages to: " + (CrewChief.yellowFlagMessagesEnabled ? "disabled" : "enabled"));
+                        crewChief.toggleEnableYellowFlagsMode();
+                        nextPollWait = 1000;
+                    }
                     else if (controllerConfiguration.hasOutstandingClick(ControllerConfiguration.PRINT_TRACK_DATA))
                     {
                         if (crewChief.currentGameState != null && crewChief.currentGameState.SessionData != null && 
@@ -603,12 +658,12 @@ namespace CrewChiefV4
                             if (CrewChief.gameDefinition.gameEnum == GameEnum.RACE_ROOM) 
                             {
                                 Console.WriteLine("raceroomLayoutId: " + crewChief.currentGameState.SessionData.TrackDefinition.id + ", distanceRoundLap = " +
-                                    crewChief.currentGameState.PositionAndMotionData.DistanceRoundTrack + ", player's car ID: " + CarData.RACEROOM_CLASS_ID);
+                                    crewChief.currentGameState.PositionAndMotionData.DistanceRoundTrack + ", player's car ID: " + crewChief.currentGameState.carClass.getClassIdentifier());
                             }
                             else
                             {
                                 Console.WriteLine("TrackName: " + crewChief.currentGameState.SessionData.TrackDefinition.name + ", distanceRoundLap = " +
-                                    crewChief.currentGameState.PositionAndMotionData.DistanceRoundTrack + ", player's car ID: " + CarData.CLASS_ID);
+                                    crewChief.currentGameState.PositionAndMotionData.DistanceRoundTrack + ", player's car ID: " + crewChief.currentGameState.carClass.getClassIdentifier());
                             }
                         }
                         else

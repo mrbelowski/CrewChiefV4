@@ -2014,5 +2014,89 @@ namespace CrewChiefV4.Properties {
                 this["report_allowed_overtakes_under_yellow"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool enable_simple_incident_detection {
+            get {
+                return ((bool)(this["enable_simple_incident_detection"]));
+            }
+            set {
+                this["enable_simple_incident_detection"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool enable_yellow_flag_messages {
+            get {
+                return ((bool)(this["enable_yellow_flag_messages"]));
+            }
+            set {
+                this["enable_yellow_flag_messages"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string TOGGLE_YELLOW_FLAG_MESSAGES_device_guid {
+            get {
+                return ((string)(this["TOGGLE_YELLOW_FLAG_MESSAGES_device_guid"]));
+            }
+            set {
+                this["TOGGLE_YELLOW_FLAG_MESSAGES_device_guid"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string TOGGLE_YELLOW_FLAG_MESSAGES_device_type {
+            get {
+                return ((string)(this["TOGGLE_YELLOW_FLAG_MESSAGES_device_type"]));
+            }
+            set {
+                this["TOGGLE_YELLOW_FLAG_MESSAGES_device_type"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-1")]
+        public int TOGGLE_YELLOW_FLAG_MESSAGES_button_index {
+            get {
+                return ((int)(this["TOGGLE_YELLOW_FLAG_MESSAGES_button_index"]));
+            }
+            set {
+                this["TOGGLE_YELLOW_FLAG_MESSAGES_button_index"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool enable_opponent_crash_messages {
+            get {
+                return ((bool)(this["enable_opponent_crash_messages"]));
+            }
+            set {
+                this["enable_opponent_crash_messages"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool prefer_alternative_download_site {
+            get {
+                return ((bool)(this["prefer_alternative_download_site"]));
+            }
+            set {
+                this["prefer_alternative_download_site"] = value;
+            }
+        }
     }
 }

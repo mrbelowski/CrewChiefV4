@@ -128,22 +128,29 @@ namespace CrewChiefV4.assetto
             playerLapData.Add(thisLapData);
         }
 
-        public float addPlayerLapdata(float cumulativeSectorTime, float gameTimeAtSectorEnd)
+        public float addPlayerLapdata(int sectorNumberJustCompleted, float cumulativeSectorTime, float gameTimeAtSectorEnd, int position)
         {
             LapData lapData = playerLapData[playerLapData.Count - 1];
             if (cumulativeSectorTime <= 0)
             {
                 cumulativeSectorTime = gameTimeAtSectorEnd - lapData.GameTimeAtLapStart;
             }
-            float thisSectorTime = cumulativeSectorTime;
-            int sectorNumber = 1;
-            foreach (float sectorTime in lapData.SectorTimes)
+            float thisSectorTime = 0; ;
+            if (sectorNumberJustCompleted == 1)
             {
-                sectorNumber++;
-                thisSectorTime = thisSectorTime - sectorTime;
+                thisSectorTime = cumulativeSectorTime;
             }
-            lapData.SectorTimes.Add(thisSectorTime);
-            lapData.GameTimeAtSectorEnd.Add(gameTimeAtSectorEnd);
+            else if (sectorNumberJustCompleted == 2)
+            {
+                thisSectorTime = cumulativeSectorTime - lapData.SectorTimes[0];
+            }
+            else if (sectorNumberJustCompleted == 3)
+            {
+                thisSectorTime = cumulativeSectorTime - lapData.SectorTimes[1] - lapData.SectorTimes[0];
+            }
+            lapData.SectorTimes[sectorNumberJustCompleted - 1] = thisSectorTime;
+            lapData.SectorPositions[sectorNumberJustCompleted - 1] = position;
+            lapData.GameTimeAtSectorEnd[sectorNumberJustCompleted - 1] = gameTimeAtSectorEnd;
 
             return thisSectorTime;
         }
@@ -1294,7 +1301,7 @@ namespace CrewChiefV4.assetto
                         sectorTimeToUse = currentGameState.SessionData.LapTimeCurrent;
                     }
 
-                    sectorTimeToUse = addPlayerLapdata(sectorTimeToUse, currentGameState.SessionData.SessionRunningTime);
+                    sectorTimeToUse = addPlayerLapdata(previousGameState.SessionData.SectorNumber, sectorTimeToUse, currentGameState.SessionData.SessionRunningTime, currentGameState.SessionData.Position);
 
                     if (currentGameState.SessionData.SectorNumber == 1 && shared.acsGraphic.numberOfLaps > 0)
                     {
@@ -1335,7 +1342,6 @@ namespace CrewChiefV4.assetto
                             {
                                 currentGameState.SessionData.PlayerBestLapSector1Time = currentGameState.SessionData.LastSector1Time;
                                 currentGameState.SessionData.PlayerBestLapSector2Time = currentGameState.SessionData.LastSector2Time;
-                                currentGameState.SessionData.PlayerBestLapSector3Time = currentGameState.SessionData.LastSector3Time;
                             }
 
                         }
@@ -1503,9 +1509,9 @@ namespace CrewChiefV4.assetto
                                         int opponentPositionAtLastSector = currentOpponentData.Position;
                                         LapData currentLapData = currentOpponentData.getCurrentLapData();
 
-                                        if (currentLapData != null && currentLapData.SectorPositions.Count > numberOfSectorsOnTrack - 1)
+                                        if (currentLapData != null)
                                         {
-                                            opponentPositionAtLastSector = currentLapData.SectorPositions[numberOfSectorsOnTrack];
+                                            opponentPositionAtLastSector = currentLapData.SectorPositions[numberOfSectorsOnTrack - 1];
                                         }
                                         if (opponentPositionAtLastSector == 1)
                                         {
@@ -2021,17 +2027,28 @@ namespace CrewChiefV4.assetto
                 {
                     if (opponentData.OpponentLapData.Count > 0)
                     {
-                        opponentData.CompleteLapWithProvidedLapTime(leaderBoardPosition, sessionRunningTime, lastLapTime,
-                            lapIsValid && validSpeed, false, trackTempreture, airTemperature, sessionLengthIsTime, sessionTimeRemaining);
+                        // special case here: if there's only 1 lap in the list, and it's marked as an in-lap, and we don't have a laptime, remove it.
+                        // This is because we might have created a new LapData entry to hold a partially completed in-lap if we join mid-session, but
+                        // this also results in each opponent having a spurious 'emtpy' LapData element.
+                        if (opponentData.OpponentLapData.Count == 1 && opponentData.OpponentLapData[0].InLap && lastLapTime == 0)
+                        {
+                            opponentData.OpponentLapData.Clear();
+                        }
+                        else
+                        {
+                            opponentData.CompleteLapWithProvidedLapTime(leaderBoardPosition, sessionRunningTime, lastLapTime,
+                                lapIsValid && validSpeed, false, trackTempreture, airTemperature, sessionLengthIsTime, sessionTimeRemaining, trackNumberOfSectors);
+                        }
                     }
 
                     opponentData.StartNewLap(completedLaps + 1, leaderBoardPosition, isInPits, sessionRunningTime, false, trackTempreture, airTemperature);
                     opponentData.IsNewLap = true;
                     // recheck the car class here?
                 }
-                else if (opponentData.CurrentSectorNumber == 1 && sector == 2 || opponentData.CurrentSectorNumber == 2 && sector == 3)
+                else if ((opponentData.CurrentSectorNumber == 1 && sector == 2) || (opponentData.CurrentSectorNumber == 2 && sector == 3))
                 {
-                    opponentData.AddCumulativeSectorData(racePosition, completedLapTime, sessionRunningTime, lapIsValid && validSpeed, false, trackTempreture, airTemperature);
+                    opponentData.AddCumulativeSectorData(opponentData.CurrentSectorNumber, racePosition, completedLapTime, sessionRunningTime,
+                        lapIsValid && validSpeed, false, trackTempreture, airTemperature);
                 }
                 opponentData.CurrentSectorNumber = sector;
             }
