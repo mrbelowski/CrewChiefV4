@@ -220,3 +220,5 @@ enable_stockcars_mode_help = Uses Stock Cars wording for FCY phase, and enables 
 enable_simple_incident_detection_help = Watch for and report very slow cars as incidents (PCars and AC only)
 enable_yellow_flag_messages_help = Enable yellow flag messages (can be overridden during a session with voice command or button assignment)
 enable_opponent_crash_messages_help = Report the names of opponent cars involved in incidents where possible
+
+prefer_alternative_download_site_help = Use the secondary download location for updates
