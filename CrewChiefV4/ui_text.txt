@@ -222,3 +222,7 @@ enable_yellow_flag_messages_help = Enable yellow flag messages (can be overridde
 enable_opponent_crash_messages_help = Report the names of opponent cars involved in incidents where possible
 
 prefer_alternative_download_site_help = Use the secondary download location for updates
+
+version = Version
+the_application_must_be_restarted_to_check_for_updates = The application must be restarted to check for updates. Click OK to restart the application.
+check_for_updates = Force update check
