@@ -49,6 +49,44 @@
 #    "spotterVehicleWidth": 1.8 (meters)
 # }
 #
+# Default temperature ranges per tyre type:
+# Road tyres:
+#        maxColdRoadTyreTempPeak: 65
+#        maxWarmRoadTyreTempPeak: 106
+#        maxHotRoadTyreTempPeak: 120
+#
+# Unknown_Race tyres:
+#        maxColdUnknownRaceTyreTempPeak: 70
+#        maxWarmUnknownRaceTyreTempPeak: 117
+#        maxHotUnknownRaceTyreTempPeak: 137
+#
+# Bias_Ply tyres:
+#        maxColdBiasPlyTyreTempPeak: 70
+#        maxWarmBiasPlyTyreTempPeak: 103
+#        maxHotBiasPlyTyreTempPeak: 123
+#
+# Default temperature ranges per brake type:
+# Iron_Road (road cars):
+#        maxColdIronRoadBrakeTemp: 80
+#        maxWarmIronRoadBrakeTemp: 500
+#        maxHotIronRoadBrakeTemp: 750
+#
+# Iron_Race:
+#        maxColdIronRaceBrakeTemp: 150
+#        maxWarmIronRaceBrakeTemp: 700
+#        maxHotIronRaceBrakeTemp: 900
+#
+# Ceramic:
+#        maxColdCeramicBrakeTemp: 150
+#        maxWarmCeramicBrakeTemp: 950
+#        maxHotCeramicBrakeTemp: 1200
+#
+# Carbon:
+#        maxColdCarbonBrakeTemp: 400
+#        maxWarmCarbonBrakeTemp: 1200
+#        maxHotCarbonBrakeTemp: 1500
+#
+#
 # Crew Chief built-in car classes are:
 # GT1X, GT1, GTE, GT2, GTC, GTLM, GT3, GT4, GT5, Kart_1, Kart_2, KART_JUNIOR, KART_F1,
 # LMP1, LMP2, LMP3, ROAD_B, ROAD_C1, ROAD_C2, ROAD_D, ROAD_SUPERCAR, GROUPC, GROUPA, 
