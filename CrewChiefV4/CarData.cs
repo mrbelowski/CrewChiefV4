@@ -649,7 +649,7 @@ namespace CrewChiefV4
                         List<String> classNames = (List<String>)carClass.GetType().GetProperty(classNamesPropName).GetValue(carClass, null);
                         foreach (String thisClassName in classNames)
                         {
-                            if (thisClassName == className)
+                            if (string.Compare(thisClassName, className, StringComparison.InvariantCultureIgnoreCase) == 0)
                             {
                                 nameToCarClass.Add(className, carClass);
                                 return carClass;
