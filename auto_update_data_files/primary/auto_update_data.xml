@@ -15,7 +15,7 @@ will be pulled from the thecrewchief.org ftp server. -->
 <drivernamesversion>100</drivernamesversion>
 <basedrivernamesurl>http://thecrewchief.org/downloads/base_driver_names.zip</basedrivernamesurl>
 <updatedrivernamesurl>http://thecrewchief.org/downloads/update_driver_names.zip</updatedrivernamesurl>
-<personalisationsversion>106</personalisationsversion>
+<personalisationsversion>107</personalisationsversion>
 <basepersonalisationsurl>http://thecrewchief.org/downloads/personalisations.zip</basepersonalisationsurl>
 <updatepersonalisationsurl>http://thecrewchief.org/downloads/update_personalisations.zip</updatepersonalisationsurl>
 
@@ -24,10 +24,10 @@ will be pulled from the thecrewchief.org ftp server. -->
 	<soundpackversion>112</soundpackversion>
 	<basesoundpackurl>http://thecrewchief.org/downloads/base_sound_pack.zip</basesoundpackurl>
 	<updatesoundpackurl>http://thecrewchief.org/downloads/update_sound_pack.zip</updatesoundpackurl>
-	<drivernamesversion>116</drivernamesversion>
+	<drivernamesversion>117</drivernamesversion>
 	<basedrivernamesurl>http://thecrewchief.org/downloads/base_driver_names.zip</basedrivernamesurl>
 	<updatedrivernamesurl>http://thecrewchief.org/downloads/update_driver_names.zip</updatedrivernamesurl>
-	<personalisationsversion>106</personalisationsversion>
+	<personalisationsversion>107</personalisationsversion>
 	<basepersonalisationsurl>http://thecrewchief.org/downloads/personalisations.zip</basepersonalisationsurl>
 	<updatepersonalisationsurl>http://thecrewchief.org/downloads/update_personalisations.zip</updatepersonalisationsurl>
 </soundpack>
