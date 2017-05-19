@@ -43,6 +43,7 @@ namespace CrewChiefV4
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainWindow));
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.startApplicationButton = new System.Windows.Forms.Button();
+            this.forceVersionCheckButton = new System.Windows.Forms.Button();
             this.buttonActionSelect = new System.Windows.Forms.ListBox();
             this.controllersList = new System.Windows.Forms.ListBox();
             this.assignButtonToAction = new System.Windows.Forms.Button();
@@ -376,11 +377,22 @@ namespace CrewChiefV4
             // app_version
             // 
             this.app_version.AutoSize = true;
-            this.app_version.Location = new System.Drawing.Point(1069, 670);
+            this.app_version.Location = new System.Drawing.Point(1045, 650);
             this.app_version.Name = "app_version";
             this.app_version.Size = new System.Drawing.Size(65, 13);
             this.app_version.TabIndex = 27;
             this.app_version.Text = Configuration.getUIString("app_version");
+            // 
+            // reset_app_version
+            // 
+            this.forceVersionCheckButton.AutoSize = true;
+            this.forceVersionCheckButton.Location = new System.Drawing.Point(1030, 665);
+            this.forceVersionCheckButton.Name = "forceVersionCheckButton";
+            this.forceVersionCheckButton.Size = new System.Drawing.Size(65, 13);
+            this.forceVersionCheckButton.TabIndex = 90;
+            this.forceVersionCheckButton.Text = Configuration.getUIString("check_for_updates");
+            this.forceVersionCheckButton.UseVisualStyleBackColor = true;
+            this.forceVersionCheckButton.Click += new System.EventHandler(this.forceVersionCheckButtonClicked);
             // 
             // soundPackProgressBar
             // 
@@ -483,6 +495,7 @@ namespace CrewChiefV4
             this.Controls.Add(this.controllersList);
             this.Controls.Add(this.buttonActionSelect);
             this.Controls.Add(this.startApplicationButton);
+            this.Controls.Add(this.forceVersionCheckButton);
             this.Controls.Add(this.textBox1);
             this.Controls.Add(this.personalisationBox);
             this.Controls.Add(this.personalisationLabel);
@@ -504,6 +517,7 @@ namespace CrewChiefV4
 
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.Button startApplicationButton;
+        private System.Windows.Forms.Button forceVersionCheckButton;
         private System.Windows.Forms.ListBox buttonActionSelect;
         private System.Windows.Forms.ListBox controllersList;
         private System.Windows.Forms.Button assignButtonToAction;

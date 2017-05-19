@@ -471,7 +471,7 @@ namespace CrewChiefV4
             Console.WriteLine("Starting app");
             controllerConfiguration = new ControllerConfiguration(this);            
             setSelectedGameType();
-            this.app_version.Text = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+            this.app_version.Text = Configuration.getUIString("version") + ": " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
             this.filenameLabel.Visible = System.Diagnostics.Debugger.IsAttached;
             this.filenameTextbox.Visible = System.Diagnostics.Debugger.IsAttached;
             this.recordSession.Visible = System.Diagnostics.Debugger.IsAttached;
@@ -962,6 +962,18 @@ namespace CrewChiefV4
             form.ShowDialog(this);
         }
 
+        private void forceVersionCheckButtonClicked(object sender, EventArgs e)
+        {
+            try
+            {
+                Microsoft.Win32.Registry.CurrentUser.DeleteSubKeyTree("Software\\Britton IT Ltd");                
+            }
+            catch
+            {
+            }
+            doRestart(Configuration.getUIString("the_application_must_be_restarted_to_check_for_updates"), Configuration.getUIString("check_for_updates"));
+        }
+
         private void scanControllersButtonClicked(object sender, EventArgs e)
         {
             controllerConfiguration.controllers = this.controllerConfiguration.scanControllers();
@@ -1054,7 +1066,7 @@ namespace CrewChiefV4
             {
                 UserSettings.GetUserSettings().setProperty("PERSONALISATION_NAME", this.personalisationBox.Text);
                 UserSettings.GetUserSettings().saveUserSettings();
-                doRestart();
+                doRestart(Configuration.getUIString("the_application_must_be_restarted_to_load_the_new_sounds"), Configuration.getUIString("load_new_sounds"));
             }
         }
             
@@ -1246,7 +1258,7 @@ namespace CrewChiefV4
                 isDownloadingSoundPack = false;                    
                 if (success && !isDownloadingDriverNames && !isDownloadingPersonalisations)
                 {
-                    doRestart();
+                    doRestart(Configuration.getUIString("the_application_must_be_restarted_to_load_the_new_sounds"), Configuration.getUIString("load_new_sounds"));
                 }
             }
             if (!success)
@@ -1301,7 +1313,7 @@ namespace CrewChiefV4
                 isDownloadingDriverNames = false;
                 if (success && !isDownloadingSoundPack && !isDownloadingPersonalisations)
                 {
-                    doRestart();
+                    doRestart(Configuration.getUIString("the_application_must_be_restarted_to_load_the_new_sounds"), Configuration.getUIString("load_new_sounds"));
                 }
             }
             if (!success)
@@ -1360,7 +1372,7 @@ namespace CrewChiefV4
                 isDownloadingPersonalisations = false;
                 if (success && !isDownloadingSoundPack && !isDownloadingDriverNames)
                 {
-                    doRestart();
+                    doRestart(Configuration.getUIString("the_application_must_be_restarted_to_load_the_new_sounds"), Configuration.getUIString("load_new_sounds"));
                 }
             }
             if (!success)
@@ -1383,14 +1395,13 @@ namespace CrewChiefV4
             }
         }
 
-        private void doRestart()
+        private void doRestart(String warningMessage, String warningTitle)
         {
-            String warningMessage = Configuration.getUIString("the_application_must_be_restarted_to_load_the_new_sounds");
             if (System.Diagnostics.Debugger.IsAttached)
             {
-                warningMessage = "The app must be restarted manually to load the new sounds";
+                warningMessage = "The app must be restarted manually";
             }
-            if (MessageBox.Show(warningMessage, Configuration.getUIString("load_new_sounds"),
+            if (MessageBox.Show(warningMessage, warningTitle,
                 System.Diagnostics.Debugger.IsAttached ? MessageBoxButtons.OK : MessageBoxButtons.OKCancel) == DialogResult.OK)
             {
                 if (!System.Diagnostics.Debugger.IsAttached)
