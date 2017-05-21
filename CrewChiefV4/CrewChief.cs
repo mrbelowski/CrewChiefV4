@@ -217,14 +217,14 @@ namespace CrewChiefV4
         public void enableYellowFlagMessages()
         {
             yellowFlagMessagesEnabled = true;
-            audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
+            audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderYellowEnabled, 0, null));
 
         }
 
         public void disableYellowFlagMessages()
         {
             yellowFlagMessagesEnabled = false;
-            audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
+            audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderYellowDisabled, 0, null));
 
         }
 

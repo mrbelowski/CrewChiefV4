@@ -91,9 +91,9 @@ namespace CrewChiefV4.Events
 
             /*for (int i = 0; i < 5; i++)
             {
-                audioPlayer.playMessage(new QueuedMessage("timingtest" +i, MessageContents(TimeSpan.FromSeconds(random.Next(300) + ((float)random.Next(9) / 10f))), 0, this));
-            }
-            */
+                audioPlayer.playMessage(new QueuedMessage("timingtest" +i, MessageContents(TimeSpan.FromSeconds(random.Next(100) + ((float)random.Next(99) / 100f))), 0, this));
+            }*/
+            
             /*audioPlayer.playMessage(new QueuedMessage(ConditionsMonitor.folderDrizzleIncreasing, 0, this));
             audioPlayer.playMessage(new QueuedMessage(ConditionsMonitor.folderRainLightIncreasing, 0, this));
             audioPlayer.playMessage(new QueuedMessage(ConditionsMonitor.folderRainMidIncreasing, 0, this));
