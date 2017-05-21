@@ -2098,5 +2098,17 @@ namespace CrewChiefV4.Properties {
                 this["prefer_alternative_download_site"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool report_time_in_hundreths {
+            get {
+                return ((bool)(this["report_time_in_hundreths"]));
+            }
+            set {
+                this["report_time_in_hundreths"] = value;
+            }
+        }
     }
 }

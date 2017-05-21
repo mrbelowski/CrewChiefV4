@@ -6,6 +6,8 @@ namespace CrewChiefV4
 {
     public abstract class NumberReader
     {
+        private Boolean useHundreths = UserSettings.GetUserSettings().getBoolean("report_time_in_hundreths");
+
         /**
          * Language specific implementation to speak an integer, using whatever rules and words this language requires.
          * Note this char array may contain only '0'. This will typically include words for "seconds", "tenths", "hundreds", etc
@@ -48,11 +50,19 @@ namespace CrewChiefV4
         protected abstract String GetSecondsWithTenths(int seconds, int tenths);
 
         /**
+         * Separate recordings for when we just want a number of seconds with hundreths. This is only used when we have no minutes part,
+         * or we have a minutes part *and* the number of seconds is 10 or more (because these sounds have no "zero.." or "oh.." part.
+         * This is (currently) only applicable to English numbers.
+         *
+         */
+        protected abstract List<String> GetSecondsWithHundreths(int seconds, int hundreths);
+
+        /**
          * Separate recordings for when we just want a number of seconds with tenths with 1 or 2 minutes. 
          * This is (currently) only applicable to English numbers.
          *
          */
-        protected abstract List<String> GetMinutesAndSecondsWithTenths(int minutes, int seconds, int tenths);
+        protected abstract List<String> GetMinutesAndSecondsWithFraction(int minutes, int seconds, int fraction);
 
         protected abstract String getLocale();
 
@@ -74,22 +84,31 @@ namespace CrewChiefV4
                     timeSpan = timeSpan.Add(TimeSpan.FromMilliseconds(1000 - timeSpan.Milliseconds));
                 }
                 int tenths = (int)Math.Round((float)timeSpan.Milliseconds / 100f);
+                int hundreths = (int)Math.Round((float)timeSpan.Milliseconds / 10f);
 
                 // now call the language-specific implementations
                 Boolean useNewENMinutes = AudioPlayer.soundPackVersion > 106 && getLocale() == "en" && timeSpan.Hours == 0 && 
                     timeSpan.Minutes > 0 && timeSpan.Minutes < 3 && timeSpan.Seconds > 0 && timeSpan.Seconds < 60;
+
                 Boolean useNewENSeconds = AudioPlayer.soundPackVersion > 106 && getLocale() == "en" && timeSpan.Hours == 0 && 
-                    timeSpan.Minutes == 0 && (timeSpan.Seconds > 0 || tenths > 0) && timeSpan.Seconds < 60;
+                    timeSpan.Minutes == 0 && (timeSpan.Seconds > 0 || tenths > 0 || (useHundreths && hundreths > 0)) && timeSpan.Seconds < 60;
 
                 if (useNewENSeconds)
                 {
                     messageFolders.Add(AbstractEvent.Pause(50));
-                    messageFolders.Add(GetSecondsWithTenths(timeSpan.Seconds, tenths));
+                    if (useHundreths)
+                    {
+                        messageFolders.AddRange(GetSecondsWithHundreths(timeSpan.Seconds, hundreths));
+                    } 
+                    else 
+                    {
+                        messageFolders.Add(GetSecondsWithTenths(timeSpan.Seconds, tenths));
+                    }
                 }
                 else if (useNewENMinutes)
                 {
                     messageFolders.Add(AbstractEvent.Pause(50));
-                    messageFolders.AddRange(GetMinutesAndSecondsWithTenths(timeSpan.Minutes, timeSpan.Seconds, tenths));
+                    messageFolders.AddRange(GetMinutesAndSecondsWithFraction(timeSpan.Minutes, timeSpan.Seconds, useHundreths ? hundreths : tenths));
                 }
                 else
                 {
