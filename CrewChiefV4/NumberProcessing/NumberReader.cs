@@ -94,7 +94,8 @@ namespace CrewChiefV4
                     timeSpanWrapper.timeSpan.Minutes > 0 && timeSpanWrapper.timeSpan.Minutes < 3 && timeSpanWrapper.timeSpan.Seconds > 0 && timeSpanWrapper.timeSpan.Seconds < 60;
 
                 Boolean useNewENSeconds = AudioPlayer.soundPackVersion > 106 && getLocale() == "en" && timeSpanWrapper.timeSpan.Hours == 0 &&
-                    timeSpanWrapper.timeSpan.Minutes == 0 && (timeSpanWrapper.timeSpan.Seconds > 0 || tenths > 0 || (useHundreths && hundreths > 0)) && timeSpanWrapper.timeSpan.Seconds < 60;
+                    timeSpanWrapper.timeSpan.Minutes == 0 && (timeSpanWrapper.timeSpan.Seconds > 0 || tenths > 0 ||
+                    (timeSpanWrapper.getPrecision() == Precision.HUNDREDTHS && hundreths > 0)) && timeSpanWrapper.timeSpan.Seconds < 60;
 
                 if (useNewENSeconds)
                 {
@@ -112,7 +113,8 @@ namespace CrewChiefV4
                 else if (useNewENMinutes)
                 {
                     messageFolders.Add(AbstractEvent.Pause(50));
-                    messageFolders.AddRange(GetMinutesAndSecondsWithFraction(timeSpanWrapper.timeSpan.Minutes, timeSpanWrapper.timeSpan.Seconds, useHundreths ? hundreths : tenths));
+                    messageFolders.AddRange(GetMinutesAndSecondsWithFraction(timeSpanWrapper.timeSpan.Minutes, timeSpanWrapper.timeSpan.Seconds,
+                        timeSpanWrapper.getPrecision() == Precision.HUNDREDTHS ? hundreths : tenths));
                 }
                 else
                 {
