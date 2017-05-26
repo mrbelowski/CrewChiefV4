@@ -130,6 +130,10 @@ namespace CrewChiefV4.assetto
 
         public float addPlayerLapdata(int sectorNumberJustCompleted, float cumulativeSectorTime, float gameTimeAtSectorEnd, int position)
         {
+            if (playerLapData.Count == 0)
+            {
+                StartNewLap(1, gameTimeAtSectorEnd - cumulativeSectorTime);
+            }
             LapData lapData = playerLapData[playerLapData.Count - 1];
             if (cumulativeSectorTime <= 0)
             {

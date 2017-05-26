@@ -10,25 +10,25 @@ will be pulled from the thecrewchief.org ftp server. -->
 
 <!--legacy sound pack stuff for 4.1.2.2 and earlier-->
 <soundpackversion>112</soundpackversion>
-<basesoundpackurl>http://thecrewchief.org/downloads/base_sound_pack.zip</basesoundpackurl>
-<updatesoundpackurl>http://thecrewchief.org/downloads/update_sound_pack.zip</updatesoundpackurl>
+<basesoundpackurl>http://crewchief.isnais.de/base_sound_pack.zip</basesoundpackurl>
+<updatesoundpackurl>http://crewchief.isnais.de/update_sound_pack.zip</updatesoundpackurl>
 <drivernamesversion>100</drivernamesversion>
-<basedrivernamesurl>http://thecrewchief.org/downloads/base_driver_names.zip</basedrivernamesurl>
-<updatedrivernamesurl>http://thecrewchief.org/downloads/update_driver_names.zip</updatedrivernamesurl>
-<personalisationsversion>107</personalisationsversion>
-<basepersonalisationsurl>http://thecrewchief.org/downloads/personalisations.zip</basepersonalisationsurl>
-<updatepersonalisationsurl>http://thecrewchief.org/downloads/update_personalisations.zip</updatepersonalisationsurl>
+<basedrivernamesurl>http://crewchief.isnais.de/base_driver_names.zip</basedrivernamesurl>
+<updatedrivernamesurl>http://crewchief.isnais.de/update_driver_names.zip</updatedrivernamesurl>
+<personalisationsversion>108</personalisationsversion>
+<basepersonalisationsurl>http://crewchief.isnais.de/personalisations.zip</basepersonalisationsurl>
+<updatepersonalisationsurl>http://crewchief.isnais.de/update_personalisations.zip</updatepersonalisationsurl>
 
 <!-- language-aware sound pack stuff for later versions-->
 <soundpack language="en">
 	<soundpackversion>112</soundpackversion>
-	<basesoundpackurl>http://thecrewchief.org/downloads/base_sound_pack.zip</basesoundpackurl>
-	<updatesoundpackurl>http://thecrewchief.org/downloads/update_sound_pack.zip</updatesoundpackurl>
-	<drivernamesversion>117</drivernamesversion>
-	<basedrivernamesurl>http://thecrewchief.org/downloads/base_driver_names.zip</basedrivernamesurl>
-	<updatedrivernamesurl>http://thecrewchief.org/downloads/update_driver_names.zip</updatedrivernamesurl>
-	<personalisationsversion>107</personalisationsversion>
-	<basepersonalisationsurl>http://thecrewchief.org/downloads/personalisations.zip</basepersonalisationsurl>
-	<updatepersonalisationsurl>http://thecrewchief.org/downloads/update_personalisations.zip</updatepersonalisationsurl>
+	<basesoundpackurl>http://crewchief.isnais.de/base_sound_pack.zip</basesoundpackurl>
+	<updatesoundpackurl>http://crewchief.isnais.de/update_sound_pack.zip</updatesoundpackurl>
+	<drivernamesversion>118</drivernamesversion>
+	<basedrivernamesurl>http://crewchief.isnais.de/base_driver_names.zip</basedrivernamesurl>
+	<updatedrivernamesurl>http://crewchief.isnais.de/update_driver_names.zip</updatedrivernamesurl>
+	<personalisationsversion>108</personalisationsversion>
+	<basepersonalisationsurl>http://crewchief.isnais.de/personalisations.zip</basepersonalisationsurl>
+	<updatepersonalisationsurl>http://crewchief.isnais.de/update_personalisations.zip</updatepersonalisationsurl>
 </soundpack>
 </item>
