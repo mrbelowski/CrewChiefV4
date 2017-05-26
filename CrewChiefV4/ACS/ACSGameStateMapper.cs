@@ -132,6 +132,7 @@ namespace CrewChiefV4.assetto
         {
             if (playerLapData.Count == 0)
             {
+                // shouldn't ever happen but some add-on tracks have some pretty weird data...
                 StartNewLap(1, gameTimeAtSectorEnd - cumulativeSectorTime);
             }
             LapData lapData = playerLapData[playerLapData.Count - 1];
