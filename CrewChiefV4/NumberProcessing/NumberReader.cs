@@ -1,13 +1,12 @@
 ﻿using CrewChiefV4.Audio;
 using CrewChiefV4.Events;
+using CrewChiefV4.NumberProcessing;
 using System;
 using System.Collections.Generic;
 namespace CrewChiefV4
 {
     public abstract class NumberReader
     {
-        private Boolean useHundreths = UserSettings.GetUserSettings().getBoolean("report_time_in_hundreths");
-
         /**
          * Language specific implementation to speak an integer, using whatever rules and words this language requires.
          * Note this char array may contain only '0'. This will typically include words for "seconds", "tenths", "hundreds", etc
@@ -71,51 +70,56 @@ namespace CrewChiefV4
         /**
          * Convert a timeSpan to some sound files, using the current language's implementation.
          */
-        public List<String> ConvertTimeToSounds(TimeSpan timeSpan, Boolean useMoreInflection)
+        public List<String> ConvertTimeToSounds(TimeSpanWrapper timeSpanWrapper, Boolean useMoreInflection)
         {
             // Console.WriteLine(new DateTime(timeSpan.Ticks).ToString("HH:mm:ss.F"));
             List<String> messageFolders = new List<String>();
-            if (timeSpan != null)
+            if (timeSpanWrapper != null)
             {
                 // if the milliseconds in this timeSpan is > 949, when we turn this into tenths it'll get rounded up to 
                 // ten tenths, which we can't have. So move the timespan on so this rounding doesn't happen
-                if (timeSpan.Milliseconds > 949)
+                if (timeSpanWrapper.getPrecision() == Precision.TENTHS && timeSpanWrapper.timeSpan.Milliseconds > 949)
                 {
-                    timeSpan = timeSpan.Add(TimeSpan.FromMilliseconds(1000 - timeSpan.Milliseconds));
+                    timeSpanWrapper.timeSpan = timeSpanWrapper.timeSpan.Add(TimeSpan.FromMilliseconds(1000 - timeSpanWrapper.timeSpan.Milliseconds));
                 }
-                int tenths = (int)Math.Round((float)timeSpan.Milliseconds / 100f);
-                int hundreths = (int)Math.Round((float)timeSpan.Milliseconds / 10f);
+                else if (timeSpanWrapper.getPrecision() == Precision.HUNDREDTHS && timeSpanWrapper.timeSpan.Milliseconds > 995)
+                {
+                    timeSpanWrapper.timeSpan = timeSpanWrapper.timeSpan.Add(TimeSpan.FromMilliseconds(1000 - timeSpanWrapper.timeSpan.Milliseconds));
+                }
+                int tenths = (int)Math.Round((float)timeSpanWrapper.timeSpan.Milliseconds / 100f);
+                int hundreths = (int)Math.Round((float)timeSpanWrapper.timeSpan.Milliseconds / 10f);
 
                 // now call the language-specific implementations
-                Boolean useNewENMinutes = AudioPlayer.soundPackVersion > 106 && getLocale() == "en" && timeSpan.Hours == 0 && 
-                    timeSpan.Minutes > 0 && timeSpan.Minutes < 3 && timeSpan.Seconds > 0 && timeSpan.Seconds < 60;
+                Boolean useNewENMinutes = AudioPlayer.soundPackVersion > 106 && getLocale() == "en" && timeSpanWrapper.timeSpan.Hours == 0 &&
+                    timeSpanWrapper.timeSpan.Minutes > 0 && timeSpanWrapper.timeSpan.Minutes < 3 && timeSpanWrapper.timeSpan.Seconds > 0 && timeSpanWrapper.timeSpan.Seconds < 60;
 
-                Boolean useNewENSeconds = AudioPlayer.soundPackVersion > 106 && getLocale() == "en" && timeSpan.Hours == 0 && 
-                    timeSpan.Minutes == 0 && (timeSpan.Seconds > 0 || tenths > 0 || (useHundreths && hundreths > 0)) && timeSpan.Seconds < 60;
+                Boolean useNewENSeconds = AudioPlayer.soundPackVersion > 106 && getLocale() == "en" && timeSpanWrapper.timeSpan.Hours == 0 &&
+                    timeSpanWrapper.timeSpan.Minutes == 0 && (timeSpanWrapper.timeSpan.Seconds > 0 || tenths > 0 || (useHundreths && hundreths > 0)) && timeSpanWrapper.timeSpan.Seconds < 60;
 
                 if (useNewENSeconds)
                 {
                     messageFolders.Add(AbstractEvent.Pause(50));
-                    if (useHundreths)
+                    if (timeSpanWrapper.getPrecision() == Precision.HUNDREDTHS)
                     {
-                        messageFolders.AddRange(GetSecondsWithHundreths(timeSpan.Seconds, hundreths));
+                        messageFolders.AddRange(GetSecondsWithHundreths(timeSpanWrapper.timeSpan.Seconds, hundreths));
                     } 
                     else 
                     {
-                        messageFolders.Add(GetSecondsWithTenths(timeSpan.Seconds, tenths));
+                        messageFolders.Add(GetSecondsWithTenths(timeSpanWrapper.timeSpan.Seconds, tenths));
                     }
+                    // TODO: seconds and lower
                 }
                 else if (useNewENMinutes)
                 {
                     messageFolders.Add(AbstractEvent.Pause(50));
-                    messageFolders.AddRange(GetMinutesAndSecondsWithFraction(timeSpan.Minutes, timeSpan.Seconds, useHundreths ? hundreths : tenths));
+                    messageFolders.AddRange(GetMinutesAndSecondsWithFraction(timeSpanWrapper.timeSpan.Minutes, timeSpanWrapper.timeSpan.Seconds, useHundreths ? hundreths : tenths));
                 }
                 else
                 {
-                    messageFolders.AddRange(GetHoursSounds(timeSpan.Hours, timeSpan.Minutes, timeSpan.Seconds, tenths));
-                    messageFolders.AddRange(GetMinutesSounds(timeSpan.Hours, timeSpan.Minutes, timeSpan.Seconds, tenths));
-                    messageFolders.AddRange(GetSecondsSounds(timeSpan.Hours, timeSpan.Minutes, timeSpan.Seconds, tenths));
-                    messageFolders.AddRange(GetTenthsSounds(timeSpan.Hours, timeSpan.Minutes, timeSpan.Seconds, tenths, useMoreInflection));
+                    messageFolders.AddRange(GetHoursSounds(timeSpanWrapper.timeSpan.Hours, timeSpanWrapper.timeSpan.Minutes, timeSpanWrapper.timeSpan.Seconds, tenths));
+                    messageFolders.AddRange(GetMinutesSounds(timeSpanWrapper.timeSpan.Hours, timeSpanWrapper.timeSpan.Minutes, timeSpanWrapper.timeSpan.Seconds, tenths));
+                    messageFolders.AddRange(GetSecondsSounds(timeSpanWrapper.timeSpan.Hours, timeSpanWrapper.timeSpan.Minutes, timeSpanWrapper.timeSpan.Seconds, tenths));
+                    messageFolders.AddRange(GetTenthsSounds(timeSpanWrapper.timeSpan.Hours, timeSpanWrapper.timeSpan.Minutes, timeSpanWrapper.timeSpan.Seconds, tenths, useMoreInflection));
                 }
 
                 /*if (messageFolders.Count > 0)

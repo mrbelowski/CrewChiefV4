@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using CrewChiefV4.Audio;
+using CrewChiefV4.NumberProcessing;
 
 namespace CrewChiefV4.Events
 {
@@ -1118,7 +1119,7 @@ namespace CrewChiefV4.Events
                     {
                         messages.Add(MessageFragment.Text(folderSector3Is));
                     }
-                    messages.Add(MessageFragment.Time(TimeSpan.FromSeconds(delta)));
+                    messages.Add(MessageFragment.Time(TimeSpanWrapper.FromSeconds(delta, Precision.AUTO_GAPS)));
                     messages.Add(MessageFragment.Text(folderOffThePace));
                 }
             }
@@ -1218,7 +1219,7 @@ namespace CrewChiefV4.Events
                     else if (delta1 < 10 && delta1 > 0)
                     {
                         messageFragments.Add(MessageFragment.Text(folderAllThreeSectorsAre));
-                        messageFragments.Add(MessageFragment.Time(TimeSpan.FromSeconds(delta1)));
+                        messageFragments.Add(MessageFragment.Time(TimeSpanWrapper.FromSeconds(delta1, Precision.AUTO_GAPS)));
                         messageFragments.Add(MessageFragment.Text(folderOffThePace));
                     }
                 }
@@ -1245,7 +1246,7 @@ namespace CrewChiefV4.Events
                     else if (delta1 < 10 && delta1 > 0)
                     {
                         messageFragments.Add(MessageFragment.Text(folderSectors1And2Are));
-                        messageFragments.Add(MessageFragment.Time(TimeSpan.FromSeconds(delta1)));
+                        messageFragments.Add(MessageFragment.Time(TimeSpanWrapper.FromSeconds(delta1, Precision.AUTO_GAPS)));
                         messageFragments.Add(MessageFragment.Text(folderOffThePace));
                     }
                 }
@@ -1273,7 +1274,7 @@ namespace CrewChiefV4.Events
                 else if (delta2 < 10 && delta2 > 0)
                 {
                     messageFragments.Add(MessageFragment.Text(folderSectors2And3Are));
-                    messageFragments.Add(MessageFragment.Time(TimeSpan.FromSeconds(delta1)));
+                    messageFragments.Add(MessageFragment.Time(TimeSpanWrapper.FromSeconds(delta1, Precision.AUTO_GAPS)));
                     messageFragments.Add(MessageFragment.Text(folderOffThePace));
                 }
             }
@@ -1300,7 +1301,7 @@ namespace CrewChiefV4.Events
                 else if (delta1 < 10 && delta1 > 0)
                 {
                     messageFragments.Add(MessageFragment.Text(folderSectors1And3Are));
-                    messageFragments.Add(MessageFragment.Time(TimeSpan.FromSeconds(delta1)));
+                    messageFragments.Add(MessageFragment.Time(TimeSpanWrapper.FromSeconds(delta1, Precision.AUTO_GAPS)));
                     messageFragments.Add(MessageFragment.Text(folderOffThePace));
                 }
             }
@@ -1326,7 +1327,7 @@ namespace CrewChiefV4.Events
                 else if (delta1 < 10 && delta1 > 0)
                 {
                     messageFragments.Add(MessageFragment.Text(folderSector1Is));
-                    messageFragments.Add(MessageFragment.Time(TimeSpan.FromSeconds(delta1)));
+                    messageFragments.Add(MessageFragment.Time(TimeSpanWrapper.FromSeconds(delta1, Precision.AUTO_GAPS)));
                     messageFragments.Add(MessageFragment.Text(folderOffThePace));
                 }
             }
@@ -1351,7 +1352,7 @@ namespace CrewChiefV4.Events
                 else if (delta2 < 10 && delta2 > 0)
                 {
                     messageFragments.Add(MessageFragment.Text(folderSector2Is));
-                    messageFragments.Add(MessageFragment.Time(TimeSpan.FromSeconds(delta2)));
+                    messageFragments.Add(MessageFragment.Time(TimeSpanWrapper.FromSeconds(delta2, Precision.AUTO_GAPS)));
                     messageFragments.Add(MessageFragment.Text(folderOffThePace));
                 }
             }
@@ -1376,7 +1377,7 @@ namespace CrewChiefV4.Events
                 else if (delta3 < 10 && delta3 > 0)
                 {
                     messageFragments.Add(MessageFragment.Text(folderSector3Is));
-                    messageFragments.Add(MessageFragment.Time(TimeSpan.FromSeconds(delta3)));
+                    messageFragments.Add(MessageFragment.Time(TimeSpanWrapper.FromSeconds(delta3, Precision.AUTO_GAPS)));
                     messageFragments.Add(MessageFragment.Text(folderOffThePace));
                 }
             }
