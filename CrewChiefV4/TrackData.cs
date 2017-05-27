@@ -123,17 +123,17 @@ namespace CrewChiefV4
             return new TrackDataContainer(new List<TrackLandmark>(), false);
         }
 
-        public List<TrackLandmark> getTrackLandmarksForTrackLayoutId(int raceroomLayoutId)
+        public TrackDataContainer getTrackLandmarksForTrackLayoutId(int raceroomLayoutId)
         {
             foreach (TrackLandmarksForTrack trackLandmarksForTrack in trackLandmarksData)
             {
                 if (trackLandmarksForTrack.raceroomLayoutId == raceroomLayoutId)
                 {
                     Console.WriteLine(trackLandmarksForTrack.trackLandmarks.Count + " landmarks defined for this track");
-                    return trackLandmarksForTrack.trackLandmarks;
+                    return new TrackDataContainer(trackLandmarksForTrack.trackLandmarks, trackLandmarksForTrack.isOval);
                 }
             }
-            return new List<TrackLandmark>();
+            return new TrackDataContainer(new List<TrackLandmark>(), false);
         }
 
         public static TrackLandmarksData getTrackLandmarksDataFromFile(String filename)

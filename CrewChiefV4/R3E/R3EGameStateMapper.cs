@@ -182,7 +182,9 @@ namespace CrewChiefV4.RaceRoom
                 currentGameState.OpponentData.Clear();
                 currentGameState.SessionData.TrackDefinition = TrackData.getTrackDefinition(getNameFromBytes(shared.TrackName), shared.LayoutId, shared.LayoutLength);
                 CrewChief.trackDefinition = currentGameState.SessionData.TrackDefinition;
-                currentGameState.SessionData.TrackDefinition.trackLandmarks = TrackData.TRACK_LANDMARKS_DATA.getTrackLandmarksForTrackLayoutId(shared.LayoutId);
+                TrackDataContainer tdc = TrackData.TRACK_LANDMARKS_DATA.getTrackLandmarksForTrackLayoutId(shared.LayoutId);
+                currentGameState.SessionData.TrackDefinition.trackLandmarks = tdc.trackLandmarks;
+                currentGameState.SessionData.TrackDefinition.isOval = tdc.isOval;
                 currentGameState.SessionData.TrackDefinition.setGapPoints();
                 currentGameState.PitData.IsRefuellingAllowed = true;
 
@@ -280,7 +282,6 @@ namespace CrewChiefV4.RaceRoom
                             currentGameState.PitData.IsRefuellingAllowed = previousGameState.PitData.IsRefuellingAllowed;
                             currentGameState.OpponentData = previousGameState.OpponentData;
                             currentGameState.SessionData.TrackDefinition = previousGameState.SessionData.TrackDefinition;
-                            CrewChief.trackDefinition = currentGameState.SessionData.TrackDefinition;
                             currentGameState.SessionData.DriverRawName = previousGameState.SessionData.DriverRawName;
                         }
                         currentGameState.PitData.PitWindowStart = shared.PitWindowStart;
