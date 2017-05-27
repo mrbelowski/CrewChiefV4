@@ -90,7 +90,6 @@ namespace CrewChiefV4.NumberProcessing
         AUTO_LAPTIMES /* used for laptimes - will report hundredthds for, otherwise tenths. */, 
         HUNDREDTHS, 
         TENTHS, 
-        SECONDS, 
-        MINUTES
+        SECONDS
     }
 }

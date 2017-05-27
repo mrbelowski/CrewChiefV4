@@ -7,6 +7,7 @@ using System.Threading;
 using CrewChiefV4.GameState;
 using System.IO;
 using CrewChiefV4.Audio;
+using CrewChiefV4.NumberProcessing;
 
 namespace CrewChiefV4.Events
 {
@@ -89,10 +90,10 @@ namespace CrewChiefV4.Events
         {
             //audioPlayer.playMessage(new QueuedMessage("sectortest1", LapTimes.getSectorDeltaMessages(LapTimes.SectorReportOption.ALL, 20.5f, 20, 33, 34.1f, 10, 10.1f, true), 0, this));
 
-            /*for (int i = 0; i < 5; i++)
+            for (int i = 0; i < 5; i++)
             {
-                audioPlayer.playMessage(new QueuedMessage("timingtest" +i, MessageContents(TimeSpan.FromSeconds(random.Next(100) + ((float)random.Next(99) / 100f))), 0, this));
-            }*/
+                audioPlayer.playMessage(new QueuedMessage("timingtest" +i, MessageContents(TimeSpanWrapper.FromSeconds(random.Next(100) + ((float)random.Next(99) / 100f), Precision.AUTO_LAPTIMES)), 0, this));
+            }
             
             /*audioPlayer.playMessage(new QueuedMessage(ConditionsMonitor.folderDrizzleIncreasing, 0, this));
             audioPlayer.playMessage(new QueuedMessage(ConditionsMonitor.folderRainLightIncreasing, 0, this));

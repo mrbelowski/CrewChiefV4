@@ -217,7 +217,7 @@ namespace CrewChiefV4.NumberProcessing
         /**
          * Not implemented for Italian number reader.
          * */
-        protected override List<String> GetMinutesAndSecondsWithFraction(int minutes, int seconds, int fraction)
+        protected override List<String> GetMinutesAndSecondsWithFraction(int minutes, int seconds, String fraction)
         {
             return null;
         }
@@ -226,6 +226,14 @@ namespace CrewChiefV4.NumberProcessing
          * Not implemented for Italian number reader.
          * */
         protected override List<String> GetSecondsWithHundreths(int seconds, int hundreths)
+        {
+            return null;
+        }
+
+        /**
+         * Not implemented for Italian number reader.
+         * */
+        protected override List<String> GetSeconds(int seconds)
         {
             return null;
         }
