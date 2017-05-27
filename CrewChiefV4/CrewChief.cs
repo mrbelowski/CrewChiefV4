@@ -26,6 +26,10 @@ namespace CrewChiefV4
 
         public static GameDefinition gameDefinition;
 
+        // allow global access to the track definition because global variables rock and self-important technical architects who would
+        // grumble about doing this can go to hell. This may be null at any time.
+        public static TrackDefinition trackDefinition;
+
         public static Boolean readOpponentDeltasForEveryLap = false;
         // initial state from properties but can be overridden during a session:
         public static Boolean yellowFlagMessagesEnabled = UserSettings.GetUserSettings().getBoolean("enable_yellow_flag_messages");

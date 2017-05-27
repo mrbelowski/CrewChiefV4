@@ -12,7 +12,7 @@ namespace CrewChiefV4.NumberProcessing
         public TimeSpan timeSpan;
         private Precision precision;
         private static TimeSpan gapsInHundredthsThreshold = TimeSpan.FromMilliseconds(200);
-        private static TimeSpan gapsSecondsThreshold = TimeSpan.FromSeconds(8);
+        private static TimeSpan gapsSecondsThreshold = TimeSpan.FromSeconds(10);
 
         public TimeSpanWrapper(TimeSpan timeSpan, Precision precision)
         {
@@ -22,13 +22,14 @@ namespace CrewChiefV4.NumberProcessing
 
         public Precision getPrecision()
         {
+            Boolean isOval = CrewChief.trackDefinition == null ? false : CrewChief.trackDefinition.isOval;
             if (precision == Precision.AUTO_GAPS) 
             {
                 if (timeSpan > gapsSecondsThreshold)
                 {
                     return Precision.SECONDS;
                 }
-                else if (timeSpan < gapsInHundredthsThreshold || preferHundredths)
+                else if (timeSpan < gapsInHundredthsThreshold || preferHundredths || isOval)
                 {
                     return Precision.HUNDREDTHS;
                 }
@@ -39,7 +40,7 @@ namespace CrewChiefV4.NumberProcessing
             }
             else if (precision == Precision.AUTO_LAPTIMES)
             {
-                if (preferHundredths)
+                if (preferHundredths || isOval)
                 {
                     return Precision.HUNDREDTHS;
                 }
@@ -86,8 +87,8 @@ namespace CrewChiefV4.NumberProcessing
     }
 
     public enum Precision {
-        AUTO_GAPS /* used for gaps - will report hundredths for gaps in oval races, if the 'prefer hundredths' is set, or if gap < 0.2, otherwise tenths. */, 
-        AUTO_LAPTIMES /* used for laptimes - will report hundredthds for, otherwise tenths. */, 
+        AUTO_GAPS /* used for gaps - will report hundredths for gaps in oval races, if the 'prefer hundredths' is set, or if gap < 0.2, otherwise tenths. */,
+        AUTO_LAPTIMES /* used for laptimes - will report hundredthds for gaps in oval races, if the 'prefer hundredths' is set, otherwise tenths. */, 
         HUNDREDTHS, 
         TENTHS, 
         SECONDS

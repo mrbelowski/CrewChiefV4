@@ -1011,6 +1011,7 @@ namespace CrewChiefV4.assetto
 
             currentGameState.SessionData.TrackDefinition = TrackData.getTrackDefinition(shared.acsStatic.track
                 + ":" + shared.acsStatic.trackConfiguration, shared.acsStatic.trackSPlineLength, shared.acsStatic.sectorCount);
+            CrewChief.trackDefinition = currentGameState.SessionData.TrackDefinition;
 
             Boolean sessionOfSameTypeRestarted = ((currentGameState.SessionData.SessionType == SessionType.Race && lastSessionType == SessionType.Race) ||
                 (currentGameState.SessionData.SessionType == SessionType.Practice && lastSessionType == SessionType.Practice) ||
@@ -1120,7 +1121,9 @@ namespace CrewChiefV4.assetto
                 currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass = -1;
                 currentGameState.SessionData.OverallSessionBestLapTime = -1;
                 currentGameState.SessionData.PlayerClassSessionBestLapTime = -1;
-                currentGameState.SessionData.TrackDefinition.trackLandmarks = TrackData.TRACK_LANDMARKS_DATA.getTrackLandmarksForTrackName(currentGameState.SessionData.TrackDefinition.name);
+                TrackDataContainer tdc = TrackData.TRACK_LANDMARKS_DATA.getTrackDataForTrackName(currentGameState.SessionData.TrackDefinition.name);
+                currentGameState.SessionData.TrackDefinition.trackLandmarks = tdc.trackLandmarks;
+                currentGameState.SessionData.TrackDefinition.isOval = tdc.isOval;
                 currentGameState.SessionData.TrackDefinition.setGapPoints();
 
                 playerSplits.setSplitPoints(shared.acsStatic.trackSPlineLength, currentGameState.Now);
@@ -1152,11 +1155,14 @@ namespace CrewChiefV4.assetto
                         currentGameState.SessionData.LeaderHasFinishedRace = false;
                         currentGameState.SessionData.NumCarsAtStartOfSession = shared.acsChief.numVehicles;
                         currentGameState.SessionData.TrackDefinition = TrackData.getTrackDefinition(shared.acsStatic.track + ":" + shared.acsStatic.trackConfiguration, shared.acsStatic.trackSPlineLength, shared.acsStatic.sectorCount);
+                        CrewChief.trackDefinition = currentGameState.SessionData.TrackDefinition;
                         if (currentGameState.SessionData.TrackDefinition.unknownTrack)
                         {
                             currentGameState.SessionData.TrackDefinition.setSectorPointsForUnknownTracks();
                         }
-                        currentGameState.SessionData.TrackDefinition.trackLandmarks = TrackData.TRACK_LANDMARKS_DATA.getTrackLandmarksForTrackName(currentGameState.SessionData.TrackDefinition.name);
+                        TrackDataContainer tdc = TrackData.TRACK_LANDMARKS_DATA.getTrackDataForTrackName(currentGameState.SessionData.TrackDefinition.name);
+                        currentGameState.SessionData.TrackDefinition.trackLandmarks = tdc.trackLandmarks;
+                        currentGameState.SessionData.TrackDefinition.isOval = tdc.isOval;
                         currentGameState.SessionData.TrackDefinition.setGapPoints();
                         playerSplits.setSplitPoints(shared.acsStatic.trackSPlineLength, currentGameState.Now);
 

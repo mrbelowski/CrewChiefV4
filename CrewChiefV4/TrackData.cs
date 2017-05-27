@@ -33,12 +33,25 @@ namespace CrewChiefV4
         public String pcarsTrackName { get; set; }
         public int raceroomLayoutId { get; set; }
         public List<TrackLandmark> trackLandmarks { get; set; }
+        public Boolean isOval { get; set; }
         public TrackLandmarksForTrack()
         {
             this.trackLandmarks = new List<TrackLandmark>();
             this.raceroomLayoutId = -1;
         }
     }
+
+    public class TrackDataContainer
+    {
+        public List<TrackLandmark> trackLandmarks;
+        public Boolean isOval = false;
+        public TrackDataContainer(List<TrackLandmark> trackLandmarks, Boolean isOval)
+        {
+            this.trackLandmarks = trackLandmarks;
+            this.isOval = isOval;
+        }
+    }
+
     public class TrackLandmarksData
     {
         public List<TrackLandmarksForTrack> trackLandmarksData { get; set; }
@@ -47,7 +60,7 @@ namespace CrewChiefV4
             this.trackLandmarksData = new List<TrackLandmarksForTrack>();
         }
 
-        public List<TrackLandmark> getTrackLandmarksForTrackName(String trackName)
+        public TrackDataContainer getTrackDataForTrackName(String trackName)
         {
             foreach (TrackLandmarksForTrack trackLandmarksForTrack in trackLandmarksData)
             {
@@ -62,7 +75,7 @@ namespace CrewChiefV4
                                 if (String.Equals(acTrackName, trackName, StringComparison.OrdinalIgnoreCase))
                                 {
                                     Console.WriteLine(trackLandmarksForTrack.trackLandmarks.Count + " landmarks defined for this track");
-                                    return trackLandmarksForTrack.trackLandmarks;
+                                    return new TrackDataContainer(trackLandmarksForTrack.trackLandmarks, trackLandmarksForTrack.isOval);
                                 }
                             }
                         }
@@ -73,7 +86,7 @@ namespace CrewChiefV4
                         if (String.Equals(trackLandmarksForTrack.pcarsTrackName, trackName, StringComparison.OrdinalIgnoreCase))
                         {
                             Console.WriteLine(trackLandmarksForTrack.trackLandmarks.Count + " landmarks defined for this track");
-                            return trackLandmarksForTrack.trackLandmarks;
+                            return new TrackDataContainer(trackLandmarksForTrack.trackLandmarks, trackLandmarksForTrack.isOval);
                         }
                         break;
                     case GameEnum.RF1:
@@ -84,7 +97,7 @@ namespace CrewChiefV4
                                 if (String.Equals(rf1TrackName, trackName, StringComparison.OrdinalIgnoreCase))
                                 {
                                     Console.WriteLine(trackLandmarksForTrack.trackLandmarks.Count + " landmarks defined for this track");
-                                    return trackLandmarksForTrack.trackLandmarks;
+                                    return new TrackDataContainer(trackLandmarksForTrack.trackLandmarks, trackLandmarksForTrack.isOval);
                                 }
                             }
                         }
@@ -97,7 +110,7 @@ namespace CrewChiefV4
                                 if (String.Equals(rf2TrackName, trackName, StringComparison.OrdinalIgnoreCase))
                                 {
                                     Console.WriteLine(trackLandmarksForTrack.trackLandmarks.Count + " landmarks defined for this track");
-                                    return trackLandmarksForTrack.trackLandmarks;
+                                    return new TrackDataContainer(trackLandmarksForTrack.trackLandmarks, trackLandmarksForTrack.isOval);
                                 }
                             }
                         }
@@ -107,7 +120,7 @@ namespace CrewChiefV4
                 }
             }
             Console.WriteLine("No landmarks defined for this track");
-            return new List<TrackLandmark>();
+            return new TrackDataContainer(new List<TrackLandmark>(), false);
         }
 
         public List<TrackLandmark> getTrackLandmarksForTrackLayoutId(int raceroomLayoutId)
@@ -445,6 +458,7 @@ namespace CrewChiefV4
         public float[] sectorPoints = new float[] { 0, 0 };
         public Boolean unknownTrack = false;
         public List<TrackLandmark> trackLandmarks = new List<TrackLandmark>();
+        public Boolean isOval = false;
 
         public TrackDefinition(String name, float pitEntryExitPointsDiameter, float trackLength, float[] pitEntryPoint, float[] pitExitPoint)
         {

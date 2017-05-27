@@ -207,11 +207,14 @@ namespace CrewChiefV4.rFactor2
             this.brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(cgs.carClass);
             csd.DriverRawName = getStringFromBytes(player.mDriverName).ToLower();
             csd.TrackDefinition = new TrackDefinition(getStringFromBytes(rf2state.mTrackName), (float)rf2state.mLapDist);
+            CrewChief.trackDefinition = csd.TrackDefinition;
 
             if (pgs == null || psd.TrackDefinition.name != csd.TrackDefinition.name)
             {
                 // new game or new track
-                csd.TrackDefinition.trackLandmarks = TrackData.TRACK_LANDMARKS_DATA.getTrackLandmarksForTrackName(csd.TrackDefinition.name);
+                TrackDataContainer tdc = TrackData.TRACK_LANDMARKS_DATA.getTrackDataForTrackName(csd.TrackDefinition.name);
+                csd.TrackDefinition.trackLandmarks = tdc.trackLandmarks;
+                csd.TrackDefinition.isOval = tdc.isOval;
                 csd.TrackDefinition.setGapPoints();
             }
             else if (pgs != null)
