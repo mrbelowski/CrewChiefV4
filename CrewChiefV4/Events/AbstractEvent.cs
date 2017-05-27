@@ -130,8 +130,7 @@ namespace CrewChiefV4.Events
             }
             else if (o.GetType() == typeof(TimeSpanWrapper))
             {
-                TimeSpanWrapper tsw = (TimeSpanWrapper)o;
-                messageFragments.Add(MessageFragment.Time(tsw));
+                messageFragments.Add(MessageFragment.Time((TimeSpanWrapper)o));
             }
             else if (o.GetType() == typeof(OpponentData))
             {
