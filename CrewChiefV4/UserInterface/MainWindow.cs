@@ -18,6 +18,7 @@ using System.Xml.Linq;
 using System.IO.Compression;
 using CrewChiefV4.Audio;
 using CrewChiefV4.UserInterface;
+using System.Diagnostics;
 
 namespace CrewChiefV4
 {
@@ -1498,6 +1499,11 @@ namespace CrewChiefV4
         private void personalisationBox_SelectedIndexChanged(object sender, EventArgs e)
         {
 
+        }
+
+        private void internetPanHandler(object sender, EventArgs e)
+        {
+            Process.Start("http://thecrewchief.org/misc.php?do=donate");
         }
     }
 
