@@ -30,7 +30,7 @@ namespace CrewChiefV4
     public class MessageFragment
     {        
         public String text;
-        public TimeSpan timeSpan;
+        public TimeSpanWrapper timeSpan;
         public OpponentData opponent;
         public int integer;
         public FragmentType type;
@@ -41,7 +41,7 @@ namespace CrewChiefV4
             this.type = FragmentType.Text;
         }
 
-        private MessageFragment(TimeSpan timeSpan)
+        private MessageFragment(TimeSpanWrapper timeSpan)
         {
             this.timeSpan = timeSpan;
             this.type = FragmentType.Time;
@@ -63,7 +63,7 @@ namespace CrewChiefV4
         {
             return new MessageFragment(text);
         }
-        public static MessageFragment Time(TimeSpan timeSpan)
+        public static MessageFragment Time(TimeSpanWrapper timeSpan)
         {
             return new MessageFragment(timeSpan);
         }

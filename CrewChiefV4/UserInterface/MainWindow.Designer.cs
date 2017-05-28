@@ -79,6 +79,7 @@ namespace CrewChiefV4
             this.driverNamesProgressBar = new System.Windows.Forms.ProgressBar();
             this.personalisationsProgressBar = new System.Windows.Forms.ProgressBar();
             this.personalisationBox = new System.Windows.Forms.ComboBox();
+            this.donateLink = new System.Windows.Forms.LinkLabel();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.messagesVolumeSlider)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.backgroundVolumeSlider)).BeginInit();
@@ -455,6 +456,11 @@ namespace CrewChiefV4
             this.personalisationBox.Name = "personalisationBox";
             this.personalisationBox.Size = new System.Drawing.Size(142, 400);
             this.personalisationBox.TabIndex = 94;
+
+            this.donateLink.Location = new System.Drawing.Point(35, 650);
+            this.donateLink.Size = new System.Drawing.Size(250, 15);
+            this.donateLink.Text = Configuration.getUIString("donate_link_text");
+            this.donateLink.Click += new System.EventHandler(this.internetPanHandler);
             
             // Associate the event-handling method with the 
             // SelectedIndexChanged event.
@@ -499,6 +505,7 @@ namespace CrewChiefV4
             this.Controls.Add(this.textBox1);
             this.Controls.Add(this.personalisationBox);
             this.Controls.Add(this.personalisationLabel);
+            this.Controls.Add(this.donateLink);
             this.Name = "MainWindow";
             this.Text = "Crew Chief V4";
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -553,5 +560,6 @@ namespace CrewChiefV4
         private System.Windows.Forms.ProgressBar driverNamesProgressBar;
         private System.Windows.Forms.ProgressBar personalisationsProgressBar;
         private System.Windows.Forms.ComboBox personalisationBox;
+        private System.Windows.Forms.LinkLabel donateLink;
     }
 }
