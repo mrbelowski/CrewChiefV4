@@ -216,22 +216,34 @@ namespace CrewChiefV4.NumberProcessing
                 return folderNumbersStub + seconds + "point" + tenths;
             }
         }
-
+        
         /**
          * 
          */
-        protected override List<String> GetSecondsWithHundreths(int seconds, int hundreths)
+        protected override List<String> GetSeconds(int seconds)
         {
             List<String> messages = new List<String>();
             messages.Add(folderNumbersStub + seconds);
-            messages.Add(folderPoint + hundreths);
+            messages.Add(seconds > 1 ? folderSeconds : folderSecond);
             return messages;
         }
 
         /**
          * 
          */
-        protected override List<String> GetMinutesAndSecondsWithFraction(int minutes, int seconds, int fraction)
+        protected override List<String> GetSecondsWithHundreths(int seconds, int hundreths)
+        {
+            String leadingZero = hundreths < 10 ? "0" : "";
+            List<String> messages = new List<String>();
+            messages.Add(folderNumbersStub + seconds);
+            messages.Add(folderPoint + leadingZero + hundreths);
+            return messages;
+        }
+
+        /**
+         * fraction is String so we can pass "01" etc - we don't know if it's tenths or hundredths so it may need zero padding.
+         */
+        protected override List<String> GetMinutesAndSecondsWithFraction(int minutes, int seconds, String fraction)
         {
             List<String> messages = new List<String>();
 			// assume minutes is always 1 or 2

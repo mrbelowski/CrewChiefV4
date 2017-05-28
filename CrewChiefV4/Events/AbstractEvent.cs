@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using CrewChiefV4.GameState;
 using CrewChiefV4.Audio;
+using CrewChiefV4.NumberProcessing;
 
 namespace CrewChiefV4.Events
 {
@@ -12,6 +13,7 @@ namespace CrewChiefV4.Events
         private static String folderCelsius = "conditions/celsius";
         private static String folderFahrenheit = "conditions/fahrenheit";
         private static Boolean useFahrenheit = UserSettings.GetUserSettings().getBoolean("use_fahrenheit");
+        private static Boolean preferHundredths = UserSettings.GetUserSettings().getBoolean("report_time_in_hundreths");
 
         protected AudioPlayer audioPlayer;
 
@@ -124,7 +126,11 @@ namespace CrewChiefV4.Events
             }
             else if (o.GetType() == typeof(TimeSpan))
             {
-                messageFragments.Add(MessageFragment.Time((TimeSpan)o));
+                messageFragments.Add(MessageFragment.Time(new TimeSpanWrapper((TimeSpan)o, preferHundredths ? Precision.HUNDREDTHS : Precision.TENTHS)));
+            }
+            else if (o.GetType() == typeof(TimeSpanWrapper))
+            {
+                messageFragments.Add(MessageFragment.Time((TimeSpanWrapper)o));
             }
             else if (o.GetType() == typeof(OpponentData))
             {
