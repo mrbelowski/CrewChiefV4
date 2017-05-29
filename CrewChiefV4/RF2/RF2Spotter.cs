@@ -117,7 +117,7 @@ namespace CrewChiefV4.rFactor2
                 if (carClass != null && !String.Equals(currentPlayerCarClassID, carClass.getClassIdentifier()))
                 {
                     // Retrieve and use user overridable spotter car length/width.
-                    this.internalSpotter.setCarDimensions(GlobalBehaviourSettings.spotterCarLength, GlobalBehaviourSettings.spotterCarWidth);
+                    this.internalSpotter.setCarDimensions(GlobalBehaviourSettings.spotterVehicleLength, GlobalBehaviourSettings.spotterVehicleWidth);
                 }
             }
 

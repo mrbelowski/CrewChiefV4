@@ -318,7 +318,12 @@
         {
             "carClassEnum": "F4",
             "raceroomClassIds": [ 4867 ],
-            "pCarsClassNames": [ "F4" ]
+            "pCarsClassNames": [ "F4" ],
+            timesInHundredths: true,
+            enabledMessageTypes: "TYRE_TEMPS, BRAKE_TEMPS, FUEL",
+            spotterVehicleLength: 4.34,
+            spotterVehicleWidth: 1.75,
+            useAmericanTerms:  false
         },
         {
             "carClassEnum": "FF",

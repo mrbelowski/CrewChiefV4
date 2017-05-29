@@ -12,33 +12,39 @@ namespace CrewChiefV4.GameState
      */
     class GlobalBehaviourSettings
     {
-        private static float defaultSpotterCarLength = 4.5f;
-        private static float defaultSpotterCarWidth = 1.8f;
+        private static float defaultSpotterVehicleLength = 4.5f;
+        private static float defaultSpotterVehicleWidth = 1.8f;
 
         public static Boolean realisticMode = UserSettings.GetUserSettings().getBoolean("realistic_mode");
         public static Boolean useAmericanTerms = false; // if true we use american phrasing where appropriate ("pace car" etc).
-        public static Boolean usePaceCarAndCaution = false;
         public static Boolean useOvalLogic = false;    // if true, we don't care about cold brakes and cold left side tyres (?)
         public static Boolean useHundredths = false;
-        public static float spotterCarLength = defaultSpotterCarLength;   
-        public static float spotterCarWidth = defaultSpotterCarWidth;
+        public static float spotterVehicleLength = defaultSpotterVehicleLength;
+        public static float spotterVehicleWidth = defaultSpotterVehicleWidth;
 
-        public static List<MessageTypes> defaultEnabledMessageTypes = new List<MessageTypes> { MessageTypes.SPOTTER, 
+        public static Boolean spotterEnabled = UserSettings.GetUserSettings().getBoolean("enable_spotter");
+
+        public static List<MessageTypes> defaultEnabledMessageTypes = new List<MessageTypes> { 
             MessageTypes.TYRE_TEMPS, MessageTypes.TYRE_WEAR, MessageTypes.BRAKE_TEMPS, MessageTypes.BRAKE_DAMAGE, MessageTypes.FUEL };
-        public static List<MessageTypes> enabledMessageTypes = defaultEnabledMessageTypes;
+        public static List<MessageTypes> enabledMessageTypes = new List<MessageTypes>();
         
         public static void UpdateFromCarClass(CarData.CarClass carClass) 
         {
             useAmericanTerms = carClass.useAmericanTerms;
             useHundredths = carClass.timesInHundredths;
-            if (realisticMode)
+            enabledMessageTypes.Clear();            
+            if (realisticMode && carClass.enabledMessageTypes != null && carClass.enabledMessageTypes.Length > 0)
             {
                 parseMessageTypes(carClass.enabledMessageTypes);
+            }
+            else
+            {
+                enabledMessageTypes.AddRange(defaultEnabledMessageTypes);
             }
 
             if (carClass.spotterVehicleLength > 0)
             {
-                spotterCarLength = carClass.spotterVehicleLength;
+                spotterVehicleLength = carClass.spotterVehicleLength;
             }
             else
             {
@@ -47,20 +53,20 @@ namespace CrewChiefV4.GameState
                     case GameEnum.PCARS_64BIT:
                     case GameEnum.PCARS_32BIT:
                     case GameEnum.PCARS_NETWORK:
-                        spotterCarLength = UserSettings.GetUserSettings().getFloat("pcars_spotter_car_length");
+                        spotterVehicleLength = UserSettings.GetUserSettings().getFloat("pcars_spotter_car_length");
                         break;
                     case GameEnum.RF1:
-                        spotterCarLength = UserSettings.GetUserSettings().getFloat("rf1_spotter_car_length");
+                        spotterVehicleLength = UserSettings.GetUserSettings().getFloat("rf1_spotter_car_length");
                         break;
                     case GameEnum.ASSETTO_64BIT:
                     case GameEnum.ASSETTO_32BIT:
-                        spotterCarLength = UserSettings.GetUserSettings().getFloat("acs_spotter_car_length");
+                        spotterVehicleLength = UserSettings.GetUserSettings().getFloat("acs_spotter_car_length");
                         break;
                     case GameEnum.RF2_64BIT:
-                        spotterCarLength = UserSettings.GetUserSettings().getFloat("rf2_spotter_car_length");
+                        spotterVehicleLength = UserSettings.GetUserSettings().getFloat("rf2_spotter_car_length");
                         break;
                     case GameEnum.RACE_ROOM:
-                        spotterCarLength = UserSettings.GetUserSettings().getFloat("r3e_spotter_car_length");
+                        spotterVehicleLength = UserSettings.GetUserSettings().getFloat("r3e_spotter_car_length");
                         break;
                     default:
                         break;
@@ -68,41 +74,38 @@ namespace CrewChiefV4.GameState
             }
             if (carClass.spotterVehicleWidth > 0)
             {
-                spotterCarWidth = carClass.spotterVehicleWidth;
+                spotterVehicleWidth = carClass.spotterVehicleWidth;
             }
             else
             {
-                spotterCarWidth = defaultSpotterCarWidth;
+                spotterVehicleWidth = defaultSpotterVehicleWidth;
             }
         }
 
         public static void UpdateFromTrackDefinition(TrackDefinition trackDefinition)
         {
             useOvalLogic = trackDefinition.isOval;
-            if (realisticMode && !trackDefinition.isOval)
+            if (realisticMode && !useOvalLogic)
             {
-                enabledMessageTypes.Remove(MessageTypes.SPOTTER);
+                spotterEnabled = false;
             }
         }
 
         private static void parseMessageTypes(String messageTypes)
         {
-            enabledMessageTypes = defaultEnabledMessageTypes;
-            if (messageTypes.Length > 0)
+            String[] messageTypesArray = messageTypes.Split(',');
+            foreach (String messageType in messageTypesArray)
             {
-                String[] messageTypesArray = messageTypes.Split(',');
-                foreach (String messageType in messageTypesArray)
+                try
                 {
-                    try
-                    {
-                        enabledMessageTypes.Remove((MessageTypes)Enum.Parse(typeof(MessageTypes), messageType));
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine("Unrecognised message type " + messageType);
-                    }
+                    enabledMessageTypes.Add((MessageTypes)Enum.Parse(typeof(MessageTypes), messageType));
+                }
+                catch (Exception)
+                {
+                    Console.WriteLine("Unrecognised message type " + messageType);
                 }
             }
+            Console.WriteLine("enabling message types " + String.Join(", ", enabledMessageTypes));            
         }
     }
 
@@ -111,6 +114,6 @@ namespace CrewChiefV4.GameState
      */
     public enum MessageTypes
     {
-        SPOTTER, TYRE_TEMPS, TYRE_WEAR, BRAKE_TEMPS, BRAKE_DAMAGE, FUEL
+        TYRE_TEMPS, TYRE_WEAR, BRAKE_TEMPS, BRAKE_DAMAGE, FUEL
     }
 }

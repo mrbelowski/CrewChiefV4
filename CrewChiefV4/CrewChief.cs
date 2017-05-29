@@ -30,9 +30,7 @@ namespace CrewChiefV4
         // initial state from properties but can be overridden during a session:
         public static Boolean yellowFlagMessagesEnabled = UserSettings.GetUserSettings().getBoolean("enable_yellow_flag_messages");
         private Boolean keepQuietEnabled = false;
-        
-        private Boolean spotterEnabled = UserSettings.GetUserSettings().getBoolean("enable_spotter");
-        
+                
         public static Boolean enableDriverNames = UserSettings.GetUserSettings().getBoolean("enable_driver_names");
 
         public static TimeSpan _timeInterval = TimeSpan.FromMilliseconds(UserSettings.GetUserSettings().getInt("update_interval"));
@@ -230,7 +228,7 @@ namespace CrewChiefV4
 
         public void toggleSpotterMode()
         {
-            if (spotterEnabled)
+            if (GlobalBehaviourSettings.spotterEnabled)
             {
                 disableSpotter();
             }
@@ -264,7 +262,7 @@ namespace CrewChiefV4
             }
             else
             {
-                spotterEnabled = true;
+                GlobalBehaviourSettings.spotterEnabled = true;
                 spotter.enableSpotter();
             }           
         }
@@ -273,7 +271,7 @@ namespace CrewChiefV4
         {
             if (spotter != null)
             {
-                spotterEnabled = false;
+                GlobalBehaviourSettings.spotterEnabled = false;
                 spotter.disableSpotter();
             }            
         }
@@ -355,7 +353,7 @@ namespace CrewChiefV4
             if (filenameToRun != null && System.Diagnostics.Debugger.IsAttached)
             {
                 loadDataFromFile = true;
-                spotterEnabled = false;
+                GlobalBehaviourSettings.spotterEnabled = false;
                 if (interval > 0)
                 {
                     _timeInterval = TimeSpan.FromMilliseconds(interval);
@@ -377,8 +375,8 @@ namespace CrewChiefV4
             gameDataReader.dumpToFile = System.Diagnostics.Debugger.IsAttached && dumpToFile;
             if (gameDefinition.spotterName != null)
             {
-                spotter = (Spotter)Activator.CreateInstance(Type.GetType(gameDefinition.spotterName), 
-                    audioPlayer, spotterEnabled);
+                spotter = (Spotter)Activator.CreateInstance(Type.GetType(gameDefinition.spotterName),
+                    audioPlayer, GlobalBehaviourSettings.spotterEnabled);
             }
             else
             {
@@ -501,12 +499,6 @@ namespace CrewChiefV4
                                     faultingEvents.Clear();
                                     faultingEventsCount.Clear();
                                     stateCleared = true;
-
-                                    // set the initial spotter enabled state
-                                    if (!GlobalBehaviourSettings.enabledMessageTypes.Contains(MessageTypes.SPOTTER))
-                                    {
-                                        disableSpotter();
-                                    }
                                 }
                                 if (enableDriverNames)
                                 {
@@ -556,13 +548,13 @@ namespace CrewChiefV4
                                         triggerEvent(entry.Key, entry.Value, previousGameState, currentGameState);
                                     }
                                 }
-                                if (spotter != null && spotterEnabled && !spotterIsRunning && !loadDataFromFile)
+                                if (spotter != null && GlobalBehaviourSettings.spotterEnabled && !spotterIsRunning && !loadDataFromFile)
                                 {
                                     Console.WriteLine("********** starting spotter***********");
                                     spotter.clearState();
                                     startSpotterThread();
                                 }
-                                else if (spotterIsRunning && !spotterEnabled)
+                                else if (spotterIsRunning && !GlobalBehaviourSettings.spotterEnabled)
                                 {
                                     runSpotterThread = false;
                                 }
