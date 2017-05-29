@@ -114,9 +114,7 @@ namespace CrewChiefV4.rFactor1
                 if (carClass != null && !String.Equals(currentPlayerCarClassID, carClass.getClassIdentifier()))
                 {
                     // Retrieve and use user overridable spotter car length/width.
-                    currentPlayerCarClassID = carClass.getClassIdentifier();
-                    var preferences = carClass.getPreferences();
-                    this.internalSpotter.setCarDimensions(preferences.spotterVehicleLength, preferences.spotterVehicleWidth);
+                    this.internalSpotter.setCarDimensions(GlobalBehaviourSettings.spotterCarLength, GlobalBehaviourSettings.spotterCarWidth);
                 }
             }
             float[] currentPlayerPosition = new float[] { currentPlayerData.pos.x, currentPlayerData.pos.z };

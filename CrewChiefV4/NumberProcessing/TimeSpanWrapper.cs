@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CrewChiefV4.GameState;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,7 +9,6 @@ namespace CrewChiefV4.NumberProcessing
 {
     public class TimeSpanWrapper
     {
-        private static Boolean preferHundredths = UserSettings.GetUserSettings().getBoolean("report_time_in_hundreths");
         public TimeSpan timeSpan;
         private Precision precision;
         private static TimeSpan gapsInHundredthsThreshold = TimeSpan.FromMilliseconds(200);
@@ -22,14 +22,13 @@ namespace CrewChiefV4.NumberProcessing
 
         public Precision getPrecision()
         {
-            Boolean isOval = CrewChief.trackDefinition == null ? false : CrewChief.trackDefinition.isOval;
             if (precision == Precision.AUTO_GAPS) 
             {
                 if (timeSpan > gapsSecondsThreshold)
                 {
                     return Precision.SECONDS;
                 }
-                else if (timeSpan < gapsInHundredthsThreshold || preferHundredths || isOval)
+                else if (timeSpan < gapsInHundredthsThreshold || GlobalBehaviourSettings.useHundredths)
                 {
                     return Precision.HUNDREDTHS;
                 }
@@ -40,7 +39,7 @@ namespace CrewChiefV4.NumberProcessing
             }
             else if (precision == Precision.AUTO_LAPTIMES)
             {
-                if (preferHundredths || isOval)
+                if (GlobalBehaviourSettings.useHundredths)
                 {
                     return Precision.HUNDREDTHS;
                 }

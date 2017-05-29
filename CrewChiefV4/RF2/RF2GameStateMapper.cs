@@ -204,10 +204,10 @@ namespace CrewChiefV4.rFactor2
             var carClassId = getStringFromBytes(player.mVehicleClass);
             cgs.carClass = CarData.getCarClassForClassName(carClassId);
             CarData.CLASS_ID = carClassId;
+            GlobalBehaviourSettings.UpdateFromCarClass(cgs.carClass);
             this.brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(cgs.carClass);
             csd.DriverRawName = getStringFromBytes(player.mDriverName).ToLower();
             csd.TrackDefinition = new TrackDefinition(getStringFromBytes(rf2state.mTrackName), (float)rf2state.mLapDist);
-            CrewChief.trackDefinition = csd.TrackDefinition;
 
             if (pgs == null || psd.TrackDefinition.name != csd.TrackDefinition.name)
             {
@@ -216,6 +216,8 @@ namespace CrewChiefV4.rFactor2
                 csd.TrackDefinition.trackLandmarks = tdc.trackLandmarks;
                 csd.TrackDefinition.isOval = tdc.isOval;
                 csd.TrackDefinition.setGapPoints();
+                GlobalBehaviourSettings.UpdateFromTrackDefinition(csd.TrackDefinition);
+                GlobalBehaviourSettings.UpdateFromCarClass(cgs.carClass);
             }
             else if (pgs != null)
             {
@@ -260,7 +262,10 @@ namespace CrewChiefV4.rFactor2
 
             // Do not use previous game state if this is the new session.
             if (csd.IsNewSession)
+            {                
                 pgs = null;
+                GlobalBehaviourSettings.UpdateFromCarClass(cgs.carClass);
+            }
 
             csd.SessionStartTime = csd.IsNewSession ? cgs.Now : psd.SessionStartTime;
             csd.SessionHasFixedTime = csd.SessionTotalRunTime > 0.0f;
@@ -950,7 +955,7 @@ namespace CrewChiefV4.rFactor2
 
             var currFlag = FlagEnum.UNKNOWN;
 
-            if (cgs.carClass.getPreferences().enableStockCarsMode
+            if (GlobalBehaviourSettings.useAmericanTerms
                 && !cgs.FlagData.isFullCourseYellow)  // Don't announce White flag under FCY.
             {
                 // Only works correctly if race is not timed.
@@ -1048,7 +1053,6 @@ namespace CrewChiefV4.rFactor2
                 Console.WriteLine("Leader has finished race, player has done " + csd.CompletedLaps +
                     " laps, session time = " + csd.SessionRunningTime);
             }
-
             return cgs;
         }
 

@@ -181,11 +181,11 @@ namespace CrewChiefV4.RaceRoom
                 currentGameState.SessionData.SessionStartTime = currentGameState.Now;
                 currentGameState.OpponentData.Clear();
                 currentGameState.SessionData.TrackDefinition = TrackData.getTrackDefinition(getNameFromBytes(shared.TrackName), shared.LayoutId, shared.LayoutLength);
-                CrewChief.trackDefinition = currentGameState.SessionData.TrackDefinition;
                 TrackDataContainer tdc = TrackData.TRACK_LANDMARKS_DATA.getTrackLandmarksForTrackLayoutId(shared.LayoutId);
                 currentGameState.SessionData.TrackDefinition.trackLandmarks = tdc.trackLandmarks;
                 currentGameState.SessionData.TrackDefinition.isOval = tdc.isOval;
                 currentGameState.SessionData.TrackDefinition.setGapPoints();
+                GlobalBehaviourSettings.UpdateFromTrackDefinition(currentGameState.SessionData.TrackDefinition);
                 currentGameState.PitData.IsRefuellingAllowed = true;
 
                 lastActiveTimeForOpponents.Clear();
@@ -222,6 +222,7 @@ namespace CrewChiefV4.RaceRoom
                         currentGameState.PositionAndMotionData.DistanceRoundTrack = participantStruct.LapDistance;
                         currentGameState.carClass = CarData.getCarClassForRaceRoomId(participantStruct.DriverInfo.ClassId);
                         CarData.RACEROOM_CLASS_ID = participantStruct.DriverInfo.ClassId;
+                        GlobalBehaviourSettings.UpdateFromCarClass(currentGameState.carClass);
                         Console.WriteLine("Player is using car class " + currentGameState.carClass.getClassIdentifier() + " (class ID " + participantStruct.DriverInfo.ClassId + ")");
                         brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(currentGameState.carClass);
                     }
@@ -275,6 +276,7 @@ namespace CrewChiefV4.RaceRoom
                         currentGameState.SessionData.SessionStartTime = currentGameState.Now;
                         currentGameState.carClass = CarData.getCarClassForRaceRoomId(shared.VehicleInfo.ClassId);
                         CarData.RACEROOM_CLASS_ID = shared.VehicleInfo.ClassId;
+                        GlobalBehaviourSettings.UpdateFromCarClass(currentGameState.carClass);
                         Console.WriteLine("Player is using car class " + currentGameState.carClass.getClassIdentifier());
                         brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(currentGameState.carClass);
                         if (previousGameState != null)

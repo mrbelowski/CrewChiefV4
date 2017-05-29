@@ -2110,5 +2110,17 @@ namespace CrewChiefV4.Properties {
                 this["report_time_in_hundreths"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool use_american_terms {
+            get {
+                return ((bool)(this["use_american_terms"]));
+            }
+            set {
+                this["use_american_terms"] = value;
+            }
+        }
     }
 }

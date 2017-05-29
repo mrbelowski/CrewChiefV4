@@ -59,11 +59,6 @@ namespace CrewChiefV4
         private static float maxWarmCarbonBrakeTemp = 1200;
         private static float maxHotCarbonBrakeTemp = 1500;
 
-        private static float defaultSpotterVehicleWidth = 1.8f;
-        private static float defaultSpotterVehicleLength = 4.5f;
-
-        private static bool defaultEnableStockCarsMode = false;
-
         public enum CarClassEnum
         {
             GT1X, GT1, GTE, GT2, GTC, GTLM, GT3, GT4, GT5, Kart_1, Kart_2, KART_JUNIOR, KART_F1, LMP1, LMP2, LMP3, ROAD_B, ROAD_C1, ROAD_C2, ROAD_D, ROAD_SUPERCAR, GROUPC, GROUPA, GROUP4, GROUP5, GROUP6, GTO,
@@ -82,13 +77,6 @@ namespace CrewChiefV4
         private static Dictionary<BrakeType, List<CornerData.EnumWithThresholds>> brakeTempThresholds = new Dictionary<BrakeType, List<CornerData.EnumWithThresholds>>();
 
         private static List<List<CarClassEnum>> groupedClasses = new List<List<CarClassEnum>>();
-
-        public class Preferences
-        {
-            public float spotterVehicleLength = -1;
-            public float spotterVehicleWidth = -1;
-            public bool enableStockCarsMode = false;
-        }
 
         static CarData()
         {
@@ -168,11 +156,6 @@ namespace CrewChiefV4
             carbonBrakeTempsThresholds.Add(new CornerData.EnumWithThresholds(BrakeTemp.HOT, maxWarmCarbonBrakeTemp, maxHotCarbonBrakeTemp));
             carbonBrakeTempsThresholds.Add(new CornerData.EnumWithThresholds(BrakeTemp.COOKING, maxHotCarbonBrakeTemp, 10000));
             brakeTempThresholds.Add(BrakeType.Carbon, carbonBrakeTempsThresholds);
-
-            var overridablePrefsDefaults = getOverridablePreferencesDefaults();
-            defaultSpotterVehicleLength = overridablePrefsDefaults.spotterVehicleLength;
-            defaultSpotterVehicleWidth = overridablePrefsDefaults.spotterVehicleWidth;
-            defaultEnableStockCarsMode = overridablePrefsDefaults.enableStockCarsMode;
         }
 
         public class CarClassEnumConverter : Newtonsoft.Json.Converters.StringEnumConverter
@@ -243,7 +226,9 @@ namespace CrewChiefV4
             public float spotterVehicleWidth { get; set; }
             public float spotterVehicleLength { get; set; }
 
-            public bool enableStockCarsMode { get; set; }
+            public bool timesInHundredths { get; set; }
+            public bool useAmericanTerms { get; set; }
+            public List<MessageTypes> enabledMessageTypes { get; set; }
 
             public String placeholderClassId = "";
 
@@ -274,9 +259,8 @@ namespace CrewChiefV4
                 this.maxSafeOilTemp = 125;
                 this.minTyreCircumference = 0.5f * (float)Math.PI;
                 this.maxTyreCircumference = 1.2f * (float)Math.PI;
-                this.spotterVehicleWidth = CarData.defaultSpotterVehicleWidth;
-                this.spotterVehicleLength = CarData.defaultSpotterVehicleLength;
-                this.enableStockCarsMode = CarData.defaultEnableStockCarsMode;
+                this.enabledMessageTypes = new List<MessageTypes> { MessageTypes.SPOTTER, 
+                    MessageTypes.TYRE_TEMPS, MessageTypes.TYRE_WEAR, MessageTypes.BRAKE_TEMPS, MessageTypes.BRAKE_DAMAGE, MessageTypes.FUEL };
             }
 
             public String getClassIdentifier()
@@ -355,15 +339,6 @@ namespace CrewChiefV4
             private String wildcardToRegex(string pattern)
             {
                 return "^" + Regex.Escape(pattern).Replace("\\*", ".*").Replace("\\?", ".") + "$";
-            }
-
-            public Preferences getPreferences()
-            {
-                return new Preferences() {
-                    spotterVehicleLength = this.spotterVehicleLength,
-                    spotterVehicleWidth = this.spotterVehicleWidth,
-                    enableStockCarsMode = this.enableStockCarsMode
-                };
             }
         }
 
@@ -528,41 +503,6 @@ namespace CrewChiefV4
             {
                 return null;
             }
-        }
-
-        private static Preferences getOverridablePreferencesDefaults()
-        {
-            var overridableOptions = new Preferences() { spotterVehicleLength = 4.5f, spotterVehicleWidth = 1.8f, enableStockCarsMode = false };
-            var settings = UserSettings.GetUserSettings();
-            // Global overridable options:
-            overridableOptions.enableStockCarsMode = settings.getBoolean("enable_stockcars_mode");
-            // Per-game overridable options:
-            switch (CrewChief.gameDefinition.gameEnum)
-            {
-                case GameEnum.PCARS_64BIT:
-                case GameEnum.PCARS_32BIT:
-                case GameEnum.PCARS_NETWORK:
-                    overridableOptions.spotterVehicleLength = settings.getFloat("pcars_spotter_car_length");
-                    break;
-                case GameEnum.RF1:
-                    overridableOptions.spotterVehicleLength = settings.getFloat("rf1_spotter_car_length");
-                    break;
-                case GameEnum.ASSETTO_64BIT:
-                case GameEnum.ASSETTO_32BIT:
-                    overridableOptions.spotterVehicleLength = settings.getFloat("acs_spotter_car_length");
-                    break;
-                case GameEnum.RF2_64BIT:
-                    overridableOptions.spotterVehicleLength = settings.getFloat("rf2_spotter_car_length");
-                    break;
-                case GameEnum.RACE_ROOM:
-                    overridableOptions.spotterVehicleLength = settings.getFloat("r3e_spotter_car_length");
-                    break;
-                default:
-                    Debug.Assert(false, "Please fix this.");
-                    overridableOptions.spotterVehicleLength = 4.5f;
-                    break;
-            }
-            return overridableOptions;
         }
 
         public static CarClass getCarClassFromEnum(CarClassEnum carClassEnum)

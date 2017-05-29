@@ -215,7 +215,6 @@ namespace CrewChiefV4.rFactor1
             brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(currentGameState.carClass);
             currentGameState.SessionData.DriverRawName = getNameFromBytes(player.driverName).ToLower();
             currentGameState.SessionData.TrackDefinition = new TrackDefinition(getNameFromBytes(shared.trackName), shared.lapDist);
-            CrewChief.trackDefinition = currentGameState.SessionData.TrackDefinition;
             if (previousGameState == null || previousGameState.SessionData.TrackDefinition.name != currentGameState.SessionData.TrackDefinition.name)
             {
                 // new game or new track
@@ -223,6 +222,8 @@ namespace CrewChiefV4.rFactor1
                 currentGameState.SessionData.TrackDefinition.trackLandmarks = tdc.trackLandmarks;
                 currentGameState.SessionData.TrackDefinition.isOval = tdc.isOval;
                 currentGameState.SessionData.TrackDefinition.setGapPoints();
+                GlobalBehaviourSettings.UpdateFromTrackDefinition(currentGameState.SessionData.TrackDefinition);
+                GlobalBehaviourSettings.UpdateFromCarClass(currentGameState.carClass);
             }
             else if (previousGameState != null)
             {
@@ -258,8 +259,12 @@ namespace CrewChiefV4.rFactor1
                 currentGameState.SessionData.SessionPhase == SessionPhase.Countdown));
 
             // Do not use previous game state if this is the new session.
-            if (currentGameState.SessionData.IsNewSession)
-                previousGameState = null;
+            if (currentGameState.SessionData.IsNewSession) 
+            {
+                previousGameState = null; 
+                GlobalBehaviourSettings.UpdateFromCarClass(currentGameState.carClass);
+            }
+            
 
             currentGameState.SessionData.SessionStartTime = currentGameState.SessionData.IsNewSession ? currentGameState.Now : previousGameState.SessionData.SessionStartTime;
             currentGameState.SessionData.SessionHasFixedTime = currentGameState.SessionData.SessionTotalRunTime > 0;
@@ -964,7 +969,6 @@ namespace CrewChiefV4.rFactor1
                 Console.WriteLine("Leader has finished race, player has done " + currentGameState.SessionData.CompletedLaps + 
                     " laps, session time = " + currentGameState.SessionData.SessionRunningTime);
             }
-
             return currentGameState;
         }
         
