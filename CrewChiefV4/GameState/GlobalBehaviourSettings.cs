@@ -114,6 +114,6 @@ namespace CrewChiefV4.GameState
      */
     public enum MessageTypes
     {
-        TYRE_TEMPS, TYRE_WEAR, BRAKE_TEMPS, BRAKE_DAMAGE, FUEL
+        TYRE_TEMPS, TYRE_WEAR, BRAKE_TEMPS, BRAKE_DAMAGE, FUEL, LOCKING_AND_SPINNING
     }
 }

@@ -269,7 +269,9 @@
         {
             "carClassEnum": "GROUPA",
             "raceroomClassIds": [ 1712, 3499 ],
-            "pCarsClassNames": [ "Group A" ]
+            "pCarsClassNames": [ "Group A" ],
+            "timesInHundredths": true,
+            "enabledMessageTypes": "TYRE_TEMPS, BRAKE_TEMPS, FUEL"
         },
         {
             "carClassEnum": "INDYCAR",
@@ -322,7 +324,7 @@
             "raceroomClassIds": [ 4867 ],
             "pCarsClassNames": [ "F4" ],
             "timesInHundredths": true,
-            "enabledMessageTypes": "TYRE_TEMPS, BRAKE_TEMPS, FUEL",
+            "enabledMessageTypes": "TYRE_TEMPS, BRAKE_TEMPS, FUEL, LOCKING_AND_SPINNING",
             "spotterVehicleLength": 4.34,
             "spotterVehicleWidth": 1.75,
             "useAmericanTerms":  false

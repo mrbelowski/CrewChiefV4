@@ -375,6 +375,13 @@ namespace CrewChiefV4.Events
                     currentGameState.carClass.carClassEnum != CarData.CarClassEnum.KART_F1 &&
                     currentGameState.carClass.carClassEnum != CarData.CarClassEnum.KART_JUNIOR;
             }
+
+            enableWheelSpinWarnings = enableWheelSpinWarnings && GlobalBehaviourSettings.enabledMessageTypes.Contains(MessageTypes.LOCKING_AND_SPINNING);
+            enableBrakeLockWarnings = enableBrakeLockWarnings && GlobalBehaviourSettings.enabledMessageTypes.Contains(MessageTypes.LOCKING_AND_SPINNING);
+            enableTyreWearWarnings = enableTyreWearWarnings && GlobalBehaviourSettings.enabledMessageTypes.Contains(MessageTypes.TYRE_WEAR);
+            enableTyreTempWarnings = enableTyreTempWarnings && GlobalBehaviourSettings.enabledMessageTypes.Contains(MessageTypes.TYRE_TEMPS);
+            enableBrakeTempWarnings = enableBrakeTempWarnings && GlobalBehaviourSettings.enabledMessageTypes.Contains(MessageTypes.BRAKE_TEMPS);
+
             if (previousGameState != null && currentGameState.Ticks > previousGameState.Ticks) 
             {
                 addLockingAndSpinningData(currentGameState.TyreData, currentGameState.PitData.InPitlane,
@@ -586,6 +593,7 @@ namespace CrewChiefV4.Events
                 {
                     reportCurrentTyreTempStatus(false);
                 }
+                
                 if (!currentGameState.SessionData.LeaderHasFinishedRace &&
                      ((checkBrakesAtSector == 1 && currentGameState.SessionData.IsNewLap) ||
                      ((currentGameState.SessionData.IsNewSector && currentGameState.SessionData.SectorNumber == checkBrakesAtSector))))
