@@ -23,8 +23,9 @@ namespace CrewChiefV4.GameState
         public static float spotterCarLength = defaultSpotterCarLength;   
         public static float spotterCarWidth = defaultSpotterCarWidth;
 
-        public static List<MessageTypes> enabledMessageTypes = new List<MessageTypes> { MessageTypes.SPOTTER, 
+        public static List<MessageTypes> defaultEnabledMessageTypes = new List<MessageTypes> { MessageTypes.SPOTTER, 
             MessageTypes.TYRE_TEMPS, MessageTypes.TYRE_WEAR, MessageTypes.BRAKE_TEMPS, MessageTypes.BRAKE_DAMAGE, MessageTypes.FUEL };
+        public static List<MessageTypes> enabledMessageTypes = defaultEnabledMessageTypes;
         
         public static void UpdateFromCarClass(CarData.CarClass carClass) 
         {
@@ -32,7 +33,7 @@ namespace CrewChiefV4.GameState
             useHundredths = carClass.timesInHundredths;
             if (realisticMode)
             {
-                enabledMessageTypes = carClass.enabledMessageTypes;
+                parseMessageTypes(carClass.enabledMessageTypes);
             }
 
             if (carClass.spotterVehicleLength > 0)
@@ -81,6 +82,26 @@ namespace CrewChiefV4.GameState
             if (realisticMode && !trackDefinition.isOval)
             {
                 enabledMessageTypes.Remove(MessageTypes.SPOTTER);
+            }
+        }
+
+        private static void parseMessageTypes(String messageTypes)
+        {
+            enabledMessageTypes = defaultEnabledMessageTypes;
+            if (messageTypes.Length > 0)
+            {
+                String[] messageTypesArray = messageTypes.Split(',');
+                foreach (String messageType in messageTypesArray)
+                {
+                    try
+                    {
+                        enabledMessageTypes.Remove((MessageTypes)Enum.Parse(typeof(MessageTypes), messageType));
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("Unrecognised message type " + messageType);
+                    }
+                }
             }
         }
     }
