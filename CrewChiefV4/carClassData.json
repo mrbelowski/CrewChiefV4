@@ -278,7 +278,9 @@
 			"rf2ClassNames": [ "IndyCar_2014_Chevrolet", "IndyCar_2014_Honda" ],
             "brakeType": "Carbon",
             "maxSafeWaterTemp": 105,
-            "maxSafeOilTemp": 140
+            "maxSafeOilTemp": 140,
+            "timesInHundredths": true,
+            "useAmericanTerms":  true
         },
         {
             "carClassEnum": "F1",
@@ -319,11 +321,11 @@
             "carClassEnum": "F4",
             "raceroomClassIds": [ 4867 ],
             "pCarsClassNames": [ "F4" ],
-            timesInHundredths: true,
-            enabledMessageTypes: "TYRE_TEMPS, BRAKE_TEMPS, FUEL",
-            spotterVehicleLength: 4.34,
-            spotterVehicleWidth: 1.75,
-            useAmericanTerms:  false
+            "timesInHundredths": true,
+            "enabledMessageTypes": "TYRE_TEMPS, BRAKE_TEMPS, FUEL",
+            "spotterVehicleLength": 4.34,
+            "spotterVehicleWidth": 1.75,
+            "useAmericanTerms":  false
         },
         {
             "carClassEnum": "FF",
@@ -356,7 +358,9 @@
         {
             "carClassEnum": "VINTAGE_INDY_65",
             "pCarsClassNames": [ "Vintage Indy 65" ],
-            "defaultTyreType": "Bias_Ply"
+            "defaultTyreType": "Bias_Ply",
+            "timesInHundredths": false,
+            "useAmericanTerms":  true
         },
         {
             "carClassEnum": "VINTAGE_GT3",
@@ -543,12 +547,14 @@
         {
             "carClassEnum": "NASCAR_2016",
             "rf2ClassNames": [ "2016 Ford Fusion", "2016 Chevrolet SS", "2016 Toyota Camry" ],
-            "enableStockCarsMode": true
+            "timesInHundredths": true,
+            "useAmericanTerms":  true
         },
         {
             "carClassEnum": "ISI_STOCKCAR_2015",
             "rf2ClassNames": [ "2015 Titan StockCar", "2015 Centennial StockCar", "2015 Edgar GT StockCar", "StockCar" ],
-            "enableStockCarsMode": true
+            "timesInHundredths": true,
+            "useAmericanTerms":  true
         }
     ]
 }
