@@ -501,6 +501,12 @@ namespace CrewChiefV4
                                     faultingEvents.Clear();
                                     faultingEventsCount.Clear();
                                     stateCleared = true;
+
+                                    // set the initial spotter enabled state
+                                    if (!GlobalBehaviourSettings.enabledMessageTypes.Contains(MessageTypes.SPOTTER))
+                                    {
+                                        disableSpotter();
+                                    }
                                 }
                                 if (enableDriverNames)
                                 {

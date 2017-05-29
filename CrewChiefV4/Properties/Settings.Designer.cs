@@ -2122,5 +2122,17 @@ namespace CrewChiefV4.Properties {
                 this["use_american_terms"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool realistic_mode {
+            get {
+                return ((bool)(this["realistic_mode"]));
+            }
+            set {
+                this["realistic_mode"] = value;
+            }
+        }
     }
 }

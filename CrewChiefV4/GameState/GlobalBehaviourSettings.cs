@@ -15,21 +15,25 @@ namespace CrewChiefV4.GameState
         private static float defaultSpotterCarLength = 4.5f;
         private static float defaultSpotterCarWidth = 1.8f;
 
+        public static Boolean realisticMode = UserSettings.GetUserSettings().getBoolean("realistic_mode");
         public static Boolean useAmericanTerms = false; // if true we use american phrasing where appropriate ("pace car" etc).
         public static Boolean usePaceCarAndCaution = false;
         public static Boolean useOvalLogic = false;    // if true, we don't care about cold brakes and cold left side tyres (?)
         public static Boolean useHundredths = false;
         public static float spotterCarLength = defaultSpotterCarLength;   
-        public static float spotterCarWidth = defaultSpotterCarWidth;  
-        
-        private static List<MessageTypes> enabledMessageTypes = new List<MessageTypes> { MessageTypes.SPOTTER, 
+        public static float spotterCarWidth = defaultSpotterCarWidth;
+
+        public static List<MessageTypes> enabledMessageTypes = new List<MessageTypes> { MessageTypes.SPOTTER, 
             MessageTypes.TYRE_TEMPS, MessageTypes.TYRE_WEAR, MessageTypes.BRAKE_TEMPS, MessageTypes.BRAKE_DAMAGE, MessageTypes.FUEL };
         
         public static void UpdateFromCarClass(CarData.CarClass carClass) 
         {
             useAmericanTerms = carClass.useAmericanTerms;
             useHundredths = carClass.timesInHundredths;
-            enabledMessageTypes = carClass.enabledMessageTypes;
+            if (realisticMode)
+            {
+                enabledMessageTypes = carClass.enabledMessageTypes;
+            }
 
             if (carClass.spotterVehicleLength > 0)
             {
@@ -74,6 +78,10 @@ namespace CrewChiefV4.GameState
         public static void UpdateFromTrackDefinition(TrackDefinition trackDefinition)
         {
             useOvalLogic = trackDefinition.isOval;
+            if (realisticMode && !trackDefinition.isOval)
+            {
+                enabledMessageTypes.Remove(MessageTypes.SPOTTER);
+            }
         }
     }
 
