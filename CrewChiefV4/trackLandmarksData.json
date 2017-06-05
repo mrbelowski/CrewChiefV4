@@ -2406,7 +2406,7 @@
 					"isCommonOvertakingSpot": true
 				},
 				{
-					"landmarkName": "chicaine",
+					"landmarkName": "chicane",
 					"distanceRoundLapStart": 704,
 					"distanceRoundLapEnd": 812,
 					"isCommonOvertakingSpot": true
@@ -2546,7 +2546,7 @@
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "Chicaine",
+					"landmarkName": "chicane",
 					"distanceRoundLapStart": 700,
 					"distanceRoundLapEnd": 820,
 					"isCommonOvertakingSpot": false
@@ -2752,7 +2752,7 @@
 					"isCommonOvertakingSpot": true
 				},
 				{
-					"landmarkName": "Deer_Leep",
+					"landmarkName": "Deer_Leap",
 					"distanceRoundLapStart": 4075,
 					"distanceRoundLapEnd": 4120,
 					"isCommonOvertakingSpot": false
@@ -2846,7 +2846,7 @@
 					"isCommonOvertakingSpot": true
 				},
 				{
-					"landmarkName": "Deer_Leep",
+					"landmarkName": "Deer_Leap",
 					"distanceRoundLapStart": 4050,
 					"distanceRoundLapEnd": 4095,
 					"isCommonOvertakingSpot": false
@@ -2938,7 +2938,7 @@
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "dunlop_chicaine",
+					"landmarkName": "dunlop_chicane",
 					"distanceRoundLapStart": 815,
 					"distanceRoundLapEnd": 985,
 					"isCommonOvertakingSpot": true
@@ -2956,7 +2956,7 @@
 					"isCommonOvertakingSpot": true
 				},
 				{
-					"landmarkName": "playstation_chicaine",
+					"landmarkName": "playstation_chicane",
 					"distanceRoundLapStart": 4090,
 					"distanceRoundLapEnd": 4425,
 					"isCommonOvertakingSpot": true
@@ -2992,13 +2992,13 @@
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "first_ford_chicaine",
+					"landmarkName": "first_ford_chicane",
 					"distanceRoundLapStart": 13505,
 					"distanceRoundLapEnd": 13650,
 					"isCommonOvertakingSpot": true
 				},
 				{
-					"landmarkName": "second_ford_chicaine",
+					"landmarkName": "second_ford_chicane",
 					"distanceRoundLapStart": 13680,
 					"distanceRoundLapEnd": 13800,
 					"isCommonOvertakingSpot": false
@@ -3014,7 +3014,7 @@
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "dunlop_chicaine",
+					"landmarkName": "dunlop_chicane",
 					"distanceRoundLapStart": 790,
 					"distanceRoundLapEnd": 960,
 					"isCommonOvertakingSpot": true
@@ -3032,7 +3032,7 @@
 					"isCommonOvertakingSpot": true
 				},
 				{
-					"landmarkName": "playstation_chicaine",
+					"landmarkName": "playstation_chicane",
 					"distanceRoundLapStart": 3910,
 					"distanceRoundLapEnd": 4355,
 					"isCommonOvertakingSpot": true
@@ -3068,13 +3068,13 @@
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "first_ford_chicaine",
+					"landmarkName": "first_ford_chicane",
 					"distanceRoundLapStart": 13200,
 					"distanceRoundLapEnd": 13350,
 					"isCommonOvertakingSpot": true
 				},
 				{
-					"landmarkName": "second_ford_chicaine",
+					"landmarkName": "second_ford_chicane",
 					"distanceRoundLapStart": 13370,
 					"distanceRoundLapEnd": 13490,
 					"isCommonOvertakingSpot": false
@@ -3090,7 +3090,7 @@
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "dunlop_chicaine",
+					"landmarkName": "dunlop_chicane",
 					"distanceRoundLapStart": 770,
 					"distanceRoundLapEnd": 975,
 					"isCommonOvertakingSpot": true
@@ -3188,7 +3188,7 @@
 					"isCommonOvertakingSpot": true
 				},
 				{
-					"landmarkName": "rigthander",
+					"landmarkName": "righthander",
 					"distanceRoundLapStart": 750,
 					"distanceRoundLapEnd": 870,
 					"isCommonOvertakingSpot": false
@@ -3228,7 +3228,7 @@
 					"isCommonOvertakingSpot": true
 				},
 				{
-					"landmarkName": "rigthander",
+					"landmarkName": "righthander",
 					"distanceRoundLapStart": 750,
 					"distanceRoundLapEnd": 870,
 					"isCommonOvertakingSpot": false
@@ -3240,7 +3240,7 @@
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "west_bend_chicaine",
+					"landmarkName": "west_bend_chicane",
 					"distanceRoundLapStart": 1570,
 					"distanceRoundLapEnd": 1740,
 					"isCommonOvertakingSpot": false
@@ -3268,19 +3268,19 @@
 					"isCommonOvertakingSpot": true
 				},
 				{
-					"landmarkName": "rigthander",
+					"landmarkName": "righthander",
 					"distanceRoundLapStart": 750,
 					"distanceRoundLapEnd": 870,
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "uphill_chicaine",
+					"landmarkName": "uphill_chicane",
 					"distanceRoundLapStart": 1150,
 					"distanceRoundLapEnd": 1360,
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "west_bend_chicaine",
+					"landmarkName": "west_bend_chicane",
 					"distanceRoundLapStart": 1550,
 					"distanceRoundLapEnd": 1745,
 					"isCommonOvertakingSpot": false
@@ -3322,7 +3322,7 @@
 					"isCommonOvertakingSpot": true
 				},
 				{
-					"landmarkName": "fangio_chicaine",
+					"landmarkName": "fangio_chicane",
 					"distanceRoundLapStart": 2170,
 					"distanceRoundLapEnd": 2530,
 					"isCommonOvertakingSpot": false
@@ -3584,7 +3584,7 @@
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "chicaine",
+					"landmarkName": "chicane",
 					"distanceRoundLapStart": 2050,
 					"distanceRoundLapEnd": 2170,
 					"isCommonOvertakingSpot": true
@@ -4242,7 +4242,7 @@
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "chicaine",
+					"landmarkName": "chicane",
 					"distanceRoundLapStart": 660,
 					"distanceRoundLapEnd": 860,
 					"isCommonOvertakingSpot": false
