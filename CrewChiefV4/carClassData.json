@@ -229,7 +229,7 @@
             "carClassEnum": "LMP2",
             "raceroomClassIds": [ 1923 ],
             "pCarsClassNames": [ "LMP2" ],
-            "rf2ClassNames": [ "LMP2" ],
+            "rf2ClassNames": [ "LMP2", "ES_P2" ],
             "brakeType": "Ceramic"
         },
         {
