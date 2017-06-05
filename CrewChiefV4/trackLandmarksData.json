@@ -2394,37 +2394,37 @@
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "Mcintyre",
+					"landmarkName": "mcintyre",
 					"distanceRoundLapStart": 467,
 					"distanceRoundLapEnd": 565,
 					"isCommonOvertakingSpot": true
 				},
 				{
-					"landmarkName": "Butchers",
+					"landmarkName": "butchers",
 					"distanceRoundLapStart": 603,
 					"distanceRoundLapEnd": 678,
 					"isCommonOvertakingSpot": true
 				},
 				{
-					"landmarkName": "chicane",
+					"landmarkName": "the_chicane",
 					"distanceRoundLapStart": 704,
 					"distanceRoundLapEnd": 812,
 					"isCommonOvertakingSpot": true
 				},
 				{
-					"landmarkName": "Clarke",
+					"landmarkName": "clarke",
 					"distanceRoundLapStart": 1000,
 					"distanceRoundLapEnd": 1131,
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "Railway_bend",
+					"landmarkName": "railway_bend",
 					"distanceRoundLapStart": 1140,
 					"distanceRoundLapEnd": 1400,
 					"isCommonOvertakingSpot": true
 				},
 				{
-					"landmarkName": "Taylors_hairpin",
+					"landmarkName": "taylors_hairpin",
 					"distanceRoundLapStart": 1615,
 					"distanceRoundLapEnd": 1715,
 					"isCommonOvertakingSpot": false
@@ -2434,7 +2434,7 @@
 		{
 			"rf2TrackNames": ["CadwellParkSRW"],
 			"trackLandmarks": [{
-					"landmarkName": "Coppice",
+					"landmarkName": "coppice",
 					"distanceRoundLapStart": 275,
 					"distanceRoundLapEnd": 390,
 					"isCommonOvertakingSpot": true
@@ -2446,19 +2446,19 @@
 					"isCommonOvertakingSpot": true
 				},
 				{
-					"landmarkName": "Charlies",
+					"landmarkName": "charlies",
 					"distanceRoundLapStart": 635,
 					"distanceRoundLapEnd": 810,
 					"isCommonOvertakingSpot": true
 				},
 				{
-					"landmarkName": "Park",
+					"landmarkName": "park",
 					"distanceRoundLapStart": 1410,
 					"distanceRoundLapEnd": 1515,
 					"isCommonOvertakingSpot": true
 				},
 				{
-					"landmarkName": "Chris_Curve",
+					"landmarkName": "chris_curve",
 					"distanceRoundLapStart": 1565,
 					"distanceRoundLapEnd": 1770,
 					"isCommonOvertakingSpot": true
@@ -2476,7 +2476,7 @@
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "Mansfield",
+					"landmarkName": "mansfield",
 					"distanceRoundLapStart": 2185,
 					"distanceRoundLapEnd": 2310,
 					"isCommonOvertakingSpot": true
@@ -2518,7 +2518,7 @@
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "hairpin",
+					"landmarkName": "the_hairpin",
 					"distanceRoundLapStart": 3140,
 					"distanceRoundLapEnd": 3200,
 					"isCommonOvertakingSpot": false
@@ -2534,25 +2534,25 @@
 		{
 			"rf2TrackNames": ["Croft -- Road Course"],
 			"trackLandmarks": [{
-					"landmarkName": "Clervaux",
+					"landmarkName": "clervaux",
 					"distanceRoundLapStart": 342,
 					"distanceRoundLapEnd": 425,
 					"isCommonOvertakingSpot": true
 				},
 				{
-					"landmarkName": "Hawthorn",
+					"landmarkName": "hawthorn",
 					"distanceRoundLapStart": 475,
 					"distanceRoundLapEnd": 640,
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "chicane",
+					"landmarkName": "the_chicane",
 					"distanceRoundLapStart": 700,
 					"distanceRoundLapEnd": 820,
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "Tower",
+					"landmarkName": "tower",
 					"distanceRoundLapStart": 1335,
 					"distanceRoundLapEnd": 1511,
 					"isCommonOvertakingSpot": true
@@ -2570,43 +2570,43 @@
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "Barcroft",
+					"landmarkName": "barcroft",
 					"distanceRoundLapStart": 2105,
 					"distanceRoundLapEnd": 2220,
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "Sunny_in",
+					"landmarkName": "sunny_in",
 					"distanceRoundLapStart": 2280,
 					"distanceRoundLapEnd": 2420,
 					"isCommonOvertakingSpot": true
 				},
 				{
-					"landmarkName": "Sunny_out",
+					"landmarkName": "sunny_out",
 					"distanceRoundLapStart": 2440,
 					"distanceRoundLapEnd": 2590,
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "start_of_the_complex",
+					"landmarkName": "the_start_of_the_complex",
 					"distanceRoundLapStart": 2780,
 					"distanceRoundLapEnd": 2950,
 					"isCommonOvertakingSpot": true
 				},
 				{
-					"landmarkName": "middle_of_the_complex",
+					"landmarkName": "the_middle_of_the_complex",
 					"distanceRoundLapStart": 2960,
 					"distanceRoundLapEnd": 3050,
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "end_of_the_complex",
+					"landmarkName": "the_end_of_the_complex",
 					"distanceRoundLapStart": 3051,
 					"distanceRoundLapEnd": 3090,
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "hairpin",
+					"landmarkName": "the_hairpin",
 					"distanceRoundLapStart": 3140,
 					"distanceRoundLapEnd": 3250,
 					"isCommonOvertakingSpot": true
@@ -2622,31 +2622,31 @@
 					"isCommonOvertakingSpot": true
 				},
 				{
-					"landmarkName": "Dentons",
+					"landmarkName": "dentons",
 					"distanceRoundLapStart": 480,
 					"distanceRoundLapEnd": 575,
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "Cascades",
+					"landmarkName": "cascades",
 					"distanceRoundLapStart": 615,
 					"distanceRoundLapEnd": 745,
 					"isCommonOvertakingSpot": true
 				},
 				{
-					"landmarkName": "Fosters",
+					"landmarkName": "fosters",
 					"distanceRoundLapStart": 800,
 					"distanceRoundLapEnd": 860,
 					"isCommonOvertakingSpot": true
 				},
 				{
-					"landmarkName": "Knickerbrook",
+					"landmarkName": "knickerbrook",
 					"distanceRoundLapStart": 1020,
 					"distanceRoundLapEnd": 1150,
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "Druids",
+					"landmarkName": "druids",
 					"distanceRoundLapStart": 1650,
 					"distanceRoundLapEnd": 1870,
 					"isCommonOvertakingSpot": true
@@ -2674,13 +2674,13 @@
 					"isCommonOvertakingSpot": true
 				},
 				{
-					"landmarkName": "Dentons",
+					"landmarkName": "dentons",
 					"distanceRoundLapStart": 480,
 					"distanceRoundLapEnd": 575,
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "Cascades",
+					"landmarkName": "cascades",
 					"distanceRoundLapStart": 615,
 					"distanceRoundLapEnd": 845,
 					"isCommonOvertakingSpot": true
@@ -2722,7 +2722,7 @@
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "Knickerbrook",
+					"landmarkName": "knickerbrook",
 					"distanceRoundLapStart": 2675,
 					"distanceRoundLapEnd": 2790,
 					"isCommonOvertakingSpot": false
@@ -2740,7 +2740,7 @@
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "Druids",
+					"landmarkName": "druids",
 					"distanceRoundLapStart": 3285,
 					"distanceRoundLapEnd": 3505,
 					"isCommonOvertakingSpot": true
@@ -2768,13 +2768,13 @@
 					"isCommonOvertakingSpot": true
 				},
 				{
-					"landmarkName": "Dentons",
+					"landmarkName": "dentons",
 					"distanceRoundLapStart": 480,
 					"distanceRoundLapEnd": 575,
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "Cascades",
+					"landmarkName": "cascades",
 					"distanceRoundLapStart": 615,
 					"distanceRoundLapEnd": 845,
 					"isCommonOvertakingSpot": true
@@ -2816,7 +2816,7 @@
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "Knickerbrook",
+					"landmarkName": "knickerbrook",
 					"distanceRoundLapStart": 2631,
 					"distanceRoundLapEnd": 2770,
 					"isCommonOvertakingSpot": true
@@ -2834,7 +2834,7 @@
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "Druids",
+					"landmarkName": "druids",
 					"distanceRoundLapStart": 3260,
 					"distanceRoundLapEnd": 3480,
 					"isCommonOvertakingSpot": true
@@ -2892,13 +2892,13 @@
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "Knickerbrook",
+					"landmarkName": "knickerbrook",
 					"distanceRoundLapStart": 1925,
 					"distanceRoundLapEnd": 2040,
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "City_Hall",
+					"landmarkName": "city_Hall",
 					"distanceRoundLapStart": 2190,
 					"distanceRoundLapEnd": 2290,
 					"isCommonOvertakingSpot": false
@@ -2910,19 +2910,19 @@
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "Druids",
+					"landmarkName": "druids",
 					"distanceRoundLapStart": 2535,
 					"distanceRoundLapEnd": 2755,
 					"isCommonOvertakingSpot": true
 				},
 				{
-					"landmarkName": "Lodge_Corner",
+					"landmarkName": "lodge_Corner",
 					"distanceRoundLapStart": 3120,
 					"distanceRoundLapEnd": 3235,
 					"isCommonOvertakingSpot": true
 				},
 				{
-					"landmarkName": "Deer_Leep",
+					"landmarkName": "deer_Leep",
 					"distanceRoundLapStart": 3325,
 					"distanceRoundLapEnd": 3370,
 					"isCommonOvertakingSpot": false
@@ -2944,7 +2944,7 @@
 					"isCommonOvertakingSpot": true
 				},
 				{
-					"landmarkName": "esses",
+					"landmarkName": "the_esses",
 					"distanceRoundLapStart": 1060,
 					"distanceRoundLapEnd": 1700,
 					"isCommonOvertakingSpot": false
@@ -3020,7 +3020,7 @@
 					"isCommonOvertakingSpot": true
 				},
 				{
-					"landmarkName": "esses",
+					"landmarkName": "the_esses",
 					"distanceRoundLapStart": 1380,
 					"distanceRoundLapEnd": 1650,
 					"isCommonOvertakingSpot": false
@@ -3316,7 +3316,7 @@
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "hairpin",
+					"landmarkName": "the_hairpin",
 					"distanceRoundLapStart": 1925,
 					"distanceRoundLapEnd": 2050,
 					"isCommonOvertakingSpot": true
@@ -3410,7 +3410,7 @@
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "hairpin",
+					"landmarkName": "the_hairpin",
 					"distanceRoundLapStart": 1480,
 					"distanceRoundLapEnd": 1940,
 					"isCommonOvertakingSpot": true
@@ -3514,7 +3514,7 @@
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "hairpin",
+					"landmarkName": "the_hairpin",
 					"distanceRoundLapStart": 2600,
 					"distanceRoundLapEnd": 2765,
 					"isCommonOvertakingSpot": true
@@ -3554,19 +3554,19 @@
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "mirabeau_haut",
+					"landmarkName": "mirabeau",
 					"distanceRoundLapStart": 1070,
 					"distanceRoundLapEnd": 1170,
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "lowes_hairpin",
+					"landmarkName": "lowes",
 					"distanceRoundLapStart": 1210,
 					"distanceRoundLapEnd": 1290,
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "mirabeau_bas",
+					"landmarkName": "mirabeau",
 					"distanceRoundLapStart": 1300,
 					"distanceRoundLapEnd": 1370,
 					"isCommonOvertakingSpot": false
@@ -3578,13 +3578,13 @@
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "tunnel",
+					"landmarkName": "the_tunnel",
 					"distanceRoundLapStart": 1595,
 					"distanceRoundLapEnd": 1835,
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "chicane",
+					"landmarkName": "the_chicane",
 					"distanceRoundLapStart": 2050,
 					"distanceRoundLapEnd": 2170,
 					"isCommonOvertakingSpot": true
@@ -3596,14 +3596,8 @@
 					"isCommonOvertakingSpot": true
 				},
 				{
-					"landmarkName": "entry_to_swimming_pool",
+					"landmarkName": "the_swimming_pool",
 					"distanceRoundLapStart": 2470,
-					"distanceRoundLapEnd": 2580,
-					"isCommonOvertakingSpot": false
-				},
-				{
-					"landmarkName": "exit_to_swimming_pool",
-					"distanceRoundLapStart": 2630,
 					"distanceRoundLapEnd": 2745,
 					"isCommonOvertakingSpot": false
 				},
@@ -4242,7 +4236,7 @@
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "chicane",
+					"landmarkName": "the_chicane",
 					"distanceRoundLapStart": 660,
 					"distanceRoundLapEnd": 860,
 					"isCommonOvertakingSpot": false
@@ -4312,7 +4306,7 @@
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "hairpin",
+					"landmarkName": "the_hairpin",
 					"distanceRoundLapStart": 1410,
 					"distanceRoundLapEnd": 1510,
 					"isCommonOvertakingSpot": false
