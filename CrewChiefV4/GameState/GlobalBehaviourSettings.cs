@@ -25,7 +25,7 @@ namespace CrewChiefV4.GameState
         public static Boolean spotterEnabled = UserSettings.GetUserSettings().getBoolean("enable_spotter");
 
         public static List<MessageTypes> defaultEnabledMessageTypes = new List<MessageTypes> { 
-            MessageTypes.TYRE_TEMPS, MessageTypes.TYRE_WEAR, MessageTypes.BRAKE_TEMPS, MessageTypes.BRAKE_DAMAGE, MessageTypes.FUEL };
+            MessageTypes.TYRE_TEMPS, MessageTypes.TYRE_WEAR, MessageTypes.BRAKE_TEMPS, MessageTypes.BRAKE_DAMAGE, MessageTypes.FUEL, MessageTypes.LOCKING_AND_SPINNING };
         public static List<MessageTypes> enabledMessageTypes = new List<MessageTypes>();
         
         public static void UpdateFromCarClass(CarData.CarClass carClass) 
@@ -98,7 +98,22 @@ namespace CrewChiefV4.GameState
             {
                 try
                 {
-                    enabledMessageTypes.Add((MessageTypes)Enum.Parse(typeof(MessageTypes), messageType));
+                    MessageTypes messageTypeEnum = (MessageTypes)Enum.Parse(typeof(MessageTypes), messageType.Trim());
+                    if (messageTypeEnum == MessageTypes.ALL)
+                    {
+                        enabledMessageTypes.Clear();
+                        enabledMessageTypes.AddRange(defaultEnabledMessageTypes);
+                        break;
+                    }
+                    else if (messageTypeEnum == MessageTypes.NONE)
+                    {
+                        enabledMessageTypes.Clear();
+                        break;
+                    }
+                    else
+                    {
+                        enabledMessageTypes.Add(messageTypeEnum);
+                    }
                 }
                 catch (Exception)
                 {
@@ -114,6 +129,6 @@ namespace CrewChiefV4.GameState
      */
     public enum MessageTypes
     {
-        TYRE_TEMPS, TYRE_WEAR, BRAKE_TEMPS, BRAKE_DAMAGE, FUEL, LOCKING_AND_SPINNING
+        TYRE_TEMPS, TYRE_WEAR, BRAKE_TEMPS, BRAKE_DAMAGE, FUEL, LOCKING_AND_SPINNING, ALL, NONE
     }
 }
