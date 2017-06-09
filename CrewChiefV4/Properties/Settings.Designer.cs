@@ -2102,12 +2102,12 @@ namespace CrewChiefV4.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool report_time_in_hundreths {
+        public bool always_report_time_in_hundredths {
             get {
-                return ((bool)(this["report_time_in_hundreths"]));
+                return ((bool)(this["always_report_time_in_hundredths"]));
             }
             set {
-                this["report_time_in_hundreths"] = value;
+                this["always_report_time_in_hundredths"] = value;
             }
         }
         
