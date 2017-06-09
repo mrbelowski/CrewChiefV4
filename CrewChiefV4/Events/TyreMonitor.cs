@@ -811,7 +811,9 @@ namespace CrewChiefV4.Events
 
         private void reportEstimatedTyreLife(float maxWearThreshold, Boolean immediate)
         {
-            float maxWearPercent = Math.Max(leftFrontWearPercent, Math.Max(rightFrontWearPercent, Math.Max(leftRearWearPercent, rightRearWearPercent)));
+            float maxWearPercent = GlobalBehaviourSettings.useOvalLogic ?
+                  Math.Max(rightFrontWearPercent, rightRearWearPercent)
+                : Math.Max(leftFrontWearPercent, Math.Max(rightFrontWearPercent, Math.Max(leftRearWearPercent, rightRearWearPercent)));
             if (maxWearPercent >= maxWearThreshold)
             {
                 // 1/3 through the tyre's life
