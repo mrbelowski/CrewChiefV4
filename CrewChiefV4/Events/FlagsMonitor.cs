@@ -15,7 +15,7 @@ namespace CrewChiefV4.Events
         private String folderBlueFlag = "flags/blue_flag";
         private String folderYellowFlag = "flags/yellow_flag";
         private String folderDoubleYellowFlag = "flags/double_yellow_flag";
-        private String folderWhiteFlag = "flags/white_flag";
+        private String folderWhiteFlagEU = "flags/white_flag";
         private String folderBlackFlag = "flags/black_flag";
 
         private DateTime lastYellowFlagTime = DateTime.MinValue;
@@ -28,13 +28,20 @@ namespace CrewChiefV4.Events
         private TimeSpan timeBetweenBlackFlagMessages = TimeSpan.FromSeconds(20);
         private TimeSpan timeBetweenWhiteFlagMessages = TimeSpan.FromSeconds(20);
 
-        private String folderFCYellowStart = "flags/fc_yellow_start";
-        private String folderFCYellowPitsClosed = "flags/fc_yellow_pits_closed";
-        private String folderFCYellowPitsOpenLeadLapCars = "flags/fc_yellow_pits_open_lead_lap_cars";
-        private String folderFCYellowPitsOpen = "flags/fc_yellow_pits_open";
-        private String folderFCYellowLastLapNext = "flags/fc_yellow_last_lap_next";
-        private String folderFCYellowLastLapCurrent = "flags/fc_yellow_last_lap_current";
-        private String folderFCYellowPrepareForGreen = "flags/fc_yellow_prepare_for_green";
+        private String folderFCYellowStartEU = "flags/fc_yellow_start";
+        private String folderFCYellowPitsClosedEU = "flags/fc_yellow_pits_closed";
+        private String folderFCYellowPitsOpenLeadLapCarsEU = "flags/fc_yellow_pits_open_lead_lap_cars";
+        private String folderFCYellowPitsOpenEU = "flags/fc_yellow_pits_open";
+        private String folderFCYellowLastLapNextEU = "flags/fc_yellow_last_lap_next";
+        private String folderFCYellowLastLapCurrentEU = "flags/fc_yellow_last_lap_current";
+        private String folderFCYellowPrepareForGreenEU = "flags/fc_yellow_prepare_for_green";
+        private String folderFCYellowStartUS = "flags/fc_yellow_start_usa";
+        private String folderFCYellowPitsClosedUS = "flags/fc_yellow_pits_closed_usa";
+        private String folderFCYellowPitsOpenLeadLapCarsUS = "flags/fc_yellow_pits_open_lead_lap_cars_usa";
+        private String folderFCYellowPitsOpenUS = "flags/fc_yellow_pits_open_usa";
+        private String folderFCYellowLastLapNextUS = "flags/fc_yellow_last_lap_next_usa";
+        private String folderFCYellowLastLapCurrentUS = "flags/fc_yellow_last_lap_current_usa";
+        private String folderFCYellowPrepareForGreenUS = "flags/fc_yellow_prepare_for_green_usa";
         private String folderFCYellowGreenFlag = "flags/fc_yellow_green_flag";
 
         private String[] folderYellowFlagSectors = new String[] { "flags/yellow_flag_sector_1", "flags/yellow_flag_sector_2", "flags/yellow_flag_sector_3" };
@@ -245,12 +252,12 @@ namespace CrewChiefV4.Events
                     audioPlayer.playMessage(new QueuedMessage(folderBlueFlag, 0, this));
                 }
             }
-            else if (currentGameState.SessionData.Flag == FlagEnum.WHITE)
+            else if (currentGameState.SessionData.Flag == FlagEnum.WHITE && !GlobalBehaviourSettings.useAmericanTerms)
             {
                 if (currentGameState.Now > lastWhiteFlagTime.Add(timeBetweenWhiteFlagMessages))
                 {
                     lastWhiteFlagTime = currentGameState.Now;
-                    audioPlayer.playMessage(new QueuedMessage(folderWhiteFlag, 0, this));
+                    audioPlayer.playMessage(new QueuedMessage(folderWhiteFlagEU, 0, this));
                 }
             }
             if (currentGameState.FlagData.numCarsPassedIllegally >= 0 
@@ -338,7 +345,7 @@ namespace CrewChiefV4.Events
                             // don't allow any other message to override this one:
                             if (CrewChief.yellowFlagMessagesEnabled)
                             {
-                                audioPlayer.playMessageImmediately(new QueuedMessage(folderFCYellowStart, 0, null));
+                                audioPlayer.playMessageImmediately(new QueuedMessage(GlobalBehaviourSettings.useAmericanTerms ? folderFCYellowStartUS : folderFCYellowStartEU, 0, null));
                             }
                             // start working out who's gone off
                             if (enableOpponentCrashMessages)
@@ -353,31 +360,31 @@ namespace CrewChiefV4.Events
                         case FullCourseYellowPhase.PITS_CLOSED:
                             if (CrewChief.yellowFlagMessagesEnabled)
                             {
-                                audioPlayer.playMessage(new QueuedMessage(folderFCYellowPitsClosed, 0, this));
+                                audioPlayer.playMessage(new QueuedMessage(GlobalBehaviourSettings.useAmericanTerms ? folderFCYellowPitsClosedUS : folderFCYellowPitsClosedEU, 0, this));
                             }
                             break;
                         case FullCourseYellowPhase.PITS_OPEN_LEAD_LAP_VEHICLES:
                             if (CrewChief.yellowFlagMessagesEnabled)
                             {
-                                audioPlayer.playMessage(new QueuedMessage(folderFCYellowPitsOpenLeadLapCars, 0, this));
+                                audioPlayer.playMessage(new QueuedMessage(GlobalBehaviourSettings.useAmericanTerms ? folderFCYellowPitsOpenLeadLapCarsUS : folderFCYellowPitsOpenLeadLapCarsEU, 0, this));
                             }
                             break;
                         case FullCourseYellowPhase.PITS_OPEN:
                             if (CrewChief.yellowFlagMessagesEnabled)
                             {
-                                audioPlayer.playMessage(new QueuedMessage(folderFCYellowPitsOpen, 0, this));
+                                audioPlayer.playMessage(new QueuedMessage(GlobalBehaviourSettings.useAmericanTerms ? folderFCYellowPitsOpenUS : folderFCYellowPitsOpenEU, 0, this));
                             }
                             break;
                         case FullCourseYellowPhase.LAST_LAP_NEXT:
                             if (CrewChief.yellowFlagMessagesEnabled)
                             {
-                                audioPlayer.playMessage(new QueuedMessage(folderFCYellowLastLapNext, 0, this));
+                                audioPlayer.playMessage(new QueuedMessage(GlobalBehaviourSettings.useAmericanTerms ? folderFCYellowLastLapNextUS : folderFCYellowLastLapNextEU, 0, this));
                             }
                             break;
                         case FullCourseYellowPhase.LAST_LAP_CURRENT:
                             if (CrewChief.yellowFlagMessagesEnabled)
                             {
-                                audioPlayer.playMessage(new QueuedMessage(folderFCYellowLastLapCurrent, 0, this));
+                                audioPlayer.playMessage(new QueuedMessage(GlobalBehaviourSettings.useAmericanTerms ? folderFCYellowLastLapCurrentUS : folderFCYellowLastLapCurrentEU, 0, this));
                             }
                             break;
                         case FullCourseYellowPhase.RACING:
@@ -397,7 +404,7 @@ namespace CrewChiefV4.Events
                     // don't allow any other message to override this one:
                     if (CrewChief.yellowFlagMessagesEnabled)
                     {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(folderFCYellowPrepareForGreen, 0, null));
+                        audioPlayer.playMessageImmediately(new QueuedMessage(GlobalBehaviourSettings.useAmericanTerms ? folderFCYellowPrepareForGreenUS : folderFCYellowPrepareForGreenEU, 0, null));
                     }
                 }
                 else if ((currentGameState.FlagData.fcyPhase == FullCourseYellowPhase.PENDING ||

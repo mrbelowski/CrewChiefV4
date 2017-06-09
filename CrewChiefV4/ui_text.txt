@@ -229,4 +229,4 @@ check_for_updates = Force update check
 donate_link_text = Donate to Support Crew Chief development
 
 use_american_terms_help = Assume unknown cars use American phrasing ("pace car", "white flag" for last lap etc)
-realistic_mode_help = Tailor available message types to the car and track in use
+realistic_mode_help = Tailor available message types to the car and track in use (experimental)
