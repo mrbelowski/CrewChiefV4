@@ -156,7 +156,7 @@ namespace CrewChiefV4.Events
         private static String validationSectorNumberKey = "sectorNumber"; 
         private static String validationSectorFlagKey = "sectorFlag";
         private static String validationIsLocalYellowKey = "isLocalYellow";
-        private static String sectorFlagChangeMessageKeyStart = "sectorFlagChange";
+        private static String sectorFlagChangeMessageKeyStart = "sectorFlagChange_Sector";
         private static String localFlagChangeMessageKey = "localFlagChange";
         private static String isValidatingSectorMessage = "isValidatingSectorMessage";
         
