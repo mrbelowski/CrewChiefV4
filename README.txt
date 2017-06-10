@@ -8,7 +8,7 @@ For support and discussions about Crew Chief we have our very own forum here: ht
 
 Changelog
 ---------
-Version 4.6.6.0: Added a big set of corner name and location data thanks to Scoops' hard work; Read times accurate to hundredths of a second in some circumstances; added oval-specific behaviours (enabled per-track with a flag in trackLandmarks.json) - ignores brake and left side tyre temps, estimates tyre wear from right side tyres only); added an experimental 'realistic mode' option - enabling this supresses some messages based on car class and track (e.g. spotter is off at start of session when not on ovals, older car classes have less telemetry based info like tyre temps); added per-car class behaviours for yellow flag phrasing (e.g. pace car vs safety car) and last lap message ("white flag" for last lap only applies to Indy and NASCAR cars)
+Version 4.6.6.0: Added a big set of corner name and location data thanks to Scoops' hard work; Overhauled yellow flag logic for sector yellows and local yellows; Read times accurate to hundredths of a second in some circumstances; added oval-specific behaviours (enabled per-track with a flag in trackLandmarks.json) - ignores brake and left side tyre temps, estimates tyre wear from right side tyres only); added an experimental 'realistic mode' option - enabling this supresses some messages based on car class and track (e.g. spotter is off at start of session when not on ovals, older car classes have less telemetry based info like tyre temps); added per-car class behaviours for yellow flag phrasing (e.g. pace car vs safety car) and last lap message ("white flag" for last lap only applies to Indy and NASCAR cars)
 
 Version 4.6.5.2: Fixed AC plugin after 1.14 update.
 
