@@ -91,7 +91,7 @@ namespace CrewChiefV4.Events
         private DateTime[] lastSectorFlagsReportedTime = new DateTime[] { DateTime.MinValue, DateTime.MinValue, DateTime.MinValue };
         private FullCourseYellowPhase lastFCYAnnounced = FullCourseYellowPhase.RACING;
         private DateTime lastFCYAccounedTime = DateTime.MinValue;
-        private TimeSpan timeBetweenYellowAndClearFlagMessages = TimeSpan.FromSeconds(10);
+        private TimeSpan timeBetweenYellowAndClearFlagMessages = TimeSpan.FromSeconds(3);
         private TimeSpan minTimeBetweenNewYellowFlagMessages = TimeSpan.FromSeconds(10);
         private Random random = new Random();
 
