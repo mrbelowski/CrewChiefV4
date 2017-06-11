@@ -105,10 +105,7 @@ namespace CrewChiefV4.GameState
         public static void UpdateFromTrackDefinition(TrackDefinition trackDefinition)
         {
             useOvalLogic = trackDefinition.isOval;
-            if (realisticMode && !useOvalLogic)
-            {
-                spotterEnabled = false;
-            }
+            spotterEnabled = useOvalLogic || !realisticMode;
         }
 
         private static void parseMessageTypes(String messageTypes)
