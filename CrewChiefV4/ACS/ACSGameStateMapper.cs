@@ -932,6 +932,7 @@ namespace CrewChiefV4.assetto
                 if (!String.Equals(newClass.getClassIdentifier(), currentGameState.carClass.getClassIdentifier()))
                 {
                     currentGameState.carClass = newClass;
+                    GlobalBehaviourSettings.UpdateFromCarClass(currentGameState.carClass);
                     Console.WriteLine("Player is using car class " + currentGameState.carClass.getClassIdentifier());
                     brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(currentGameState.carClass);
                     // no tyre data in the block so get the default tyre types for this car
@@ -1010,7 +1011,7 @@ namespace CrewChiefV4.assetto
             currentGameState.SessionData.SessionPhase = mapToSessionPhase(currentGameState.SessionData.SessionType, currentFlag, status, isCountDown, lastSessionPhase, sessionTimeRemaining, lastSessionTotalRunTime, isInPits, lapsCompleated, raceFinished);
 
             currentGameState.SessionData.TrackDefinition = TrackData.getTrackDefinition(shared.acsStatic.track
-                + ":" + shared.acsStatic.trackConfiguration, shared.acsStatic.trackSPlineLength, shared.acsStatic.sectorCount);
+                + ":" + shared.acsStatic.trackConfiguration, shared.acsStatic.trackSPlineLength, shared.acsStatic.sectorCount);            
 
             Boolean sessionOfSameTypeRestarted = ((currentGameState.SessionData.SessionType == SessionType.Race && lastSessionType == SessionType.Race) ||
                 (currentGameState.SessionData.SessionType == SessionType.Practice && lastSessionType == SessionType.Practice) ||
@@ -1077,6 +1078,7 @@ namespace CrewChiefV4.assetto
 
                 //add carclasses for assetto corsa.
                 currentGameState.carClass = CarData.getCarClassForClassName(shared.acsStatic.carModel);
+                GlobalBehaviourSettings.UpdateFromCarClass(currentGameState.carClass);
                 CarData.CLASS_ID = shared.acsStatic.carModel;
 
                 Console.WriteLine("Player is using car class " + currentGameState.carClass.getClassIdentifier());
@@ -1120,8 +1122,11 @@ namespace CrewChiefV4.assetto
                 currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass = -1;
                 currentGameState.SessionData.OverallSessionBestLapTime = -1;
                 currentGameState.SessionData.PlayerClassSessionBestLapTime = -1;
-                currentGameState.SessionData.TrackDefinition.trackLandmarks = TrackData.TRACK_LANDMARKS_DATA.getTrackLandmarksForTrackName(currentGameState.SessionData.TrackDefinition.name);
+                TrackDataContainer tdc = TrackData.TRACK_LANDMARKS_DATA.getTrackDataForTrackName(currentGameState.SessionData.TrackDefinition.name);
+                currentGameState.SessionData.TrackDefinition.trackLandmarks = tdc.trackLandmarks;
+                currentGameState.SessionData.TrackDefinition.isOval = tdc.isOval;
                 currentGameState.SessionData.TrackDefinition.setGapPoints();
+                GlobalBehaviourSettings.UpdateFromTrackDefinition(currentGameState.SessionData.TrackDefinition);
 
                 playerSplits.setSplitPoints(shared.acsStatic.trackSPlineLength, currentGameState.Now);
                 playerSplits.setNextSplitPoint(0, 100, currentGameState.Now);
@@ -1156,12 +1161,16 @@ namespace CrewChiefV4.assetto
                         {
                             currentGameState.SessionData.TrackDefinition.setSectorPointsForUnknownTracks();
                         }
-                        currentGameState.SessionData.TrackDefinition.trackLandmarks = TrackData.TRACK_LANDMARKS_DATA.getTrackLandmarksForTrackName(currentGameState.SessionData.TrackDefinition.name);
+                        TrackDataContainer tdc = TrackData.TRACK_LANDMARKS_DATA.getTrackDataForTrackName(currentGameState.SessionData.TrackDefinition.name);
+                        currentGameState.SessionData.TrackDefinition.trackLandmarks = tdc.trackLandmarks;
+                        currentGameState.SessionData.TrackDefinition.isOval = tdc.isOval;                        
                         currentGameState.SessionData.TrackDefinition.setGapPoints();
+                        GlobalBehaviourSettings.UpdateFromTrackDefinition(currentGameState.SessionData.TrackDefinition);
                         playerSplits.setSplitPoints(shared.acsStatic.trackSPlineLength, currentGameState.Now);
 
-                        currentGameState.carClass = CarData.getCarClassForClassName(shared.acsStatic.carModel);
+                        currentGameState.carClass = CarData.getCarClassForClassName(shared.acsStatic.carModel);                        
                         CarData.CLASS_ID = shared.acsStatic.carModel;
+                        GlobalBehaviourSettings.UpdateFromCarClass(currentGameState.carClass);
                         Console.WriteLine("Player is using car class " + currentGameState.carClass.getClassIdentifier());
                         brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(currentGameState.carClass);
                         // no tyre data in the block so get the default tyre types for this car
@@ -1915,7 +1924,6 @@ namespace CrewChiefV4.assetto
                 currentGameState.Conditions.addSample(currentGameState.Now, currentGameState.SessionData.CompletedLaps, currentGameState.SessionData.SectorNumber,
                     shared.acsPhysics.airTemp, shared.acsPhysics.roadTemp, 0, 0, 0, 0, 0);
             }
-
             return currentGameState;
         }
 
