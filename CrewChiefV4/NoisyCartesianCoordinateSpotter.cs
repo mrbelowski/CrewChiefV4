@@ -6,6 +6,7 @@ using CrewChiefV4.RaceRoom.RaceRoomData;
 using System.Threading;
 using CrewChiefV4.Events;
 using CrewChiefV4.Audio;
+using CrewChiefV4.GameState;
 
 namespace CrewChiefV4
 {
@@ -129,7 +130,7 @@ namespace CrewChiefV4
         
         public void triggerInternal(float playerRotationInRadians, float[] currentPlayerPosition,
             float[] playerVelocityData, List<float[]> currentOpponentPositions)
-        {
+        {            
             DateTime now = DateTime.Now;
 
             if (currentPlayerPosition[0] != 0 && currentPlayerPosition[1] != 0 &&

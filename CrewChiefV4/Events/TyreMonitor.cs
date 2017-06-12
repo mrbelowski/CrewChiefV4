@@ -375,6 +375,13 @@ namespace CrewChiefV4.Events
                     currentGameState.carClass.carClassEnum != CarData.CarClassEnum.KART_F1 &&
                     currentGameState.carClass.carClassEnum != CarData.CarClassEnum.KART_JUNIOR;
             }
+
+            enableWheelSpinWarnings = enableWheelSpinWarnings && GlobalBehaviourSettings.enabledMessageTypes.Contains(MessageTypes.LOCKING_AND_SPINNING);
+            enableBrakeLockWarnings = enableBrakeLockWarnings && GlobalBehaviourSettings.enabledMessageTypes.Contains(MessageTypes.LOCKING_AND_SPINNING);
+            enableTyreWearWarnings = enableTyreWearWarnings && GlobalBehaviourSettings.enabledMessageTypes.Contains(MessageTypes.TYRE_WEAR);
+            enableTyreTempWarnings = enableTyreTempWarnings && GlobalBehaviourSettings.enabledMessageTypes.Contains(MessageTypes.TYRE_TEMPS);
+            enableBrakeTempWarnings = enableBrakeTempWarnings && GlobalBehaviourSettings.enabledMessageTypes.Contains(MessageTypes.BRAKE_TEMPS);
+
             if (previousGameState != null && currentGameState.Ticks > previousGameState.Ticks) 
             {
                 addLockingAndSpinningData(currentGameState.TyreData, currentGameState.PitData.InPitlane,
@@ -586,6 +593,7 @@ namespace CrewChiefV4.Events
                 {
                     reportCurrentTyreTempStatus(false);
                 }
+                
                 if (!currentGameState.SessionData.LeaderHasFinishedRace &&
                      ((checkBrakesAtSector == 1 && currentGameState.SessionData.IsNewLap) ||
                      ((currentGameState.SessionData.IsNewSector && currentGameState.SessionData.SectorNumber == checkBrakesAtSector))))
@@ -641,13 +649,19 @@ namespace CrewChiefV4.Events
             List<MessageFragment> messageContents = new List<MessageFragment>();
             if (peak)
             {
-                addBrakeTempWarningMessages(peakBrakeTempStatus.getCornersForStatus(BrakeTemp.COLD), BrakeTemp.COLD, messageContents);
+                if (!GlobalBehaviourSettings.useOvalLogic)
+                {
+                    addBrakeTempWarningMessages(peakBrakeTempStatus.getCornersForStatus(BrakeTemp.COLD), BrakeTemp.COLD, messageContents);
+                }
                 addBrakeTempWarningMessages(peakBrakeTempStatus.getCornersForStatus(BrakeTemp.HOT), BrakeTemp.HOT, messageContents);
                 addBrakeTempWarningMessages(peakBrakeTempStatus.getCornersForStatus(BrakeTemp.COOKING), BrakeTemp.COOKING, messageContents);
             }
             else
             {
-                addBrakeTempWarningMessages(currentBrakeTempStatus.getCornersForStatus(BrakeTemp.COLD), BrakeTemp.COLD, messageContents);
+                if (!GlobalBehaviourSettings.useOvalLogic)
+                {
+                    addBrakeTempWarningMessages(currentBrakeTempStatus.getCornersForStatus(BrakeTemp.COLD), BrakeTemp.COLD, messageContents);
+                }
                 addBrakeTempWarningMessages(currentBrakeTempStatus.getCornersForStatus(BrakeTemp.HOT), BrakeTemp.HOT, messageContents);
                 addBrakeTempWarningMessages(currentBrakeTempStatus.getCornersForStatus(BrakeTemp.COOKING), BrakeTemp.COOKING, messageContents);
             }
@@ -797,7 +811,9 @@ namespace CrewChiefV4.Events
 
         private void reportEstimatedTyreLife(float maxWearThreshold, Boolean immediate)
         {
-            float maxWearPercent = Math.Max(leftFrontWearPercent, Math.Max(rightFrontWearPercent, Math.Max(leftRearWearPercent, rightRearWearPercent)));
+            float maxWearPercent = GlobalBehaviourSettings.useOvalLogic ?
+                  Math.Max(rightFrontWearPercent, rightRearWearPercent)
+                : Math.Max(leftFrontWearPercent, Math.Max(rightFrontWearPercent, Math.Max(leftRearWearPercent, rightRearWearPercent)));
             if (maxWearPercent >= maxWearThreshold)
             {
                 // 1/3 through the tyre's life
@@ -943,19 +959,22 @@ namespace CrewChiefV4.Events
                     }
                     break;
                 case CornerData.Corners.LEFTS:
-                    switch (tyreTemp)
+                    if (!GlobalBehaviourSettings.useOvalLogic)
                     {
-                        case TyreTemp.COLD:
-                            messageContents.Add(MessageFragment.Text(folderColdLeftTyres));
-                            break;
-                        case TyreTemp.HOT:
-                            messageContents.Add(MessageFragment.Text(folderHotLeftTyres));
-                            break;
-                        case TyreTemp.COOKING:
-                            messageContents.Add(MessageFragment.Text(folderCookingLeftTyres));
-                            break;
-                        default:
-                            break;
+                        switch (tyreTemp)
+                        {
+                            case TyreTemp.COLD:
+                                messageContents.Add(MessageFragment.Text(folderColdLeftTyres));
+                                break;
+                            case TyreTemp.HOT:
+                                messageContents.Add(MessageFragment.Text(folderHotLeftTyres));
+                                break;
+                            case TyreTemp.COOKING:
+                                messageContents.Add(MessageFragment.Text(folderCookingLeftTyres));
+                                break;
+                            default:
+                                break;
+                        }
                     }
                     break;
                 case CornerData.Corners.RIGHTS:
@@ -975,16 +994,19 @@ namespace CrewChiefV4.Events
                     }
                     break;
                 case CornerData.Corners.FRONT_LEFT:
-                    switch (tyreTemp)
+                    if (!GlobalBehaviourSettings.useOvalLogic)
                     {
-                        case TyreTemp.HOT:
-                            messageContents.Add(MessageFragment.Text(folderHotLeftFrontTyre));
-                            break;
-                        case TyreTemp.COOKING:
-                            messageContents.Add(MessageFragment.Text(folderCookingLeftFrontTyre));
-                            break;
-                        default:
-                            break;
+                        switch (tyreTemp)
+                        {
+                            case TyreTemp.HOT:
+                                messageContents.Add(MessageFragment.Text(folderHotLeftFrontTyre));
+                                break;
+                            case TyreTemp.COOKING:
+                                messageContents.Add(MessageFragment.Text(folderCookingLeftFrontTyre));
+                                break;
+                            default:
+                                break;
+                        }
                     }
                     break;
                 case CornerData.Corners.FRONT_RIGHT:
@@ -1001,16 +1023,19 @@ namespace CrewChiefV4.Events
                     }
                     break;
                 case CornerData.Corners.REAR_LEFT:
-                    switch (tyreTemp)
+                    if (!GlobalBehaviourSettings.useOvalLogic)
                     {
-                        case TyreTemp.HOT:
-                            messageContents.Add(MessageFragment.Text(folderHotLeftRearTyre));
-                            break;
-                        case TyreTemp.COOKING:
-                            messageContents.Add(MessageFragment.Text(folderCookingLeftRearTyre));
-                            break;
-                        default:
-                            break;
+                        switch (tyreTemp)
+                        {
+                            case TyreTemp.HOT:
+                                messageContents.Add(MessageFragment.Text(folderHotLeftRearTyre));
+                                break;
+                            case TyreTemp.COOKING:
+                                messageContents.Add(MessageFragment.Text(folderCookingLeftRearTyre));
+                                break;
+                            default:
+                                break;
+                        }
                     }
                     break;
                 case CornerData.Corners.REAR_RIGHT:

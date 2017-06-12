@@ -18,7 +18,9 @@ namespace CrewChiefV4.Events
 
         public static String folderGetReady = "lap_counter/get_ready";
 
-        private String folderLastLap = "lap_counter/last_lap";
+        private String folderLastLapEU = "lap_counter/last_lap";
+
+        private String folderLastLapUS = "lap_counter/white_flag_last_lap";
 
         private String folderTwoLeft = "lap_counter/two_to_go";
 
@@ -302,7 +304,7 @@ namespace CrewChiefV4.Events
                     }
                     else if (position > 4)
                     {
-                        audioPlayer.playMessage(new QueuedMessage(folderLastLap, 0, this));
+                        audioPlayer.playMessage(new QueuedMessage(GlobalBehaviourSettings.useAmericanTerms ? folderLastLapUS : folderLastLapEU, 0, this));
                     }                    
                     else
                     {
