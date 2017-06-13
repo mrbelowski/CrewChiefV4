@@ -131,6 +131,10 @@ namespace CrewChiefV4.Events
 
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
+            if (GlobalBehaviourSettings.enabledMessageTypes.Contains(MessageTypes.FUEL))
+            {
+                return;
+            }
             // if the fuel level has increased, don't trigger
             if (currentFuel > -1 && currentFuel < currentGameState.FuelData.FuelLeft)
             {

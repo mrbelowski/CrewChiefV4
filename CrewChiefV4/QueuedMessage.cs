@@ -157,7 +157,7 @@ namespace CrewChiefV4
         {
             this.messageName = compoundMessageIdentifier + messageName;
             this.messageFolders = getMessageFolders(messageFragments, false);
-            this.dueTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + (secondsDelay * 1000) + updateInterval;
+            this.dueTime = (GameStateData.CurrentTime.Ticks / TimeSpan.TicksPerMillisecond) + (secondsDelay * 1000) + updateInterval;
             this.abstractEvent = abstractEvent;
         }
 
@@ -188,7 +188,7 @@ namespace CrewChiefV4
                         messageName + " can't be played");
                 }
             }
-            this.dueTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + (secondsDelay * 1000) + updateInterval;
+            this.dueTime = (GameStateData.CurrentTime.Ticks / TimeSpan.TicksPerMillisecond) + (secondsDelay * 1000) + updateInterval;
             this.abstractEvent = abstractEvent;
         }
 
@@ -204,7 +204,7 @@ namespace CrewChiefV4
             List<MessageFragment> messageFragments = new List<MessageFragment>();
             messageFragments.Add(MessageFragment.Text(message));
             this.messageFolders = getMessageFolders(messageFragments, false);
-            this.dueTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + (secondsDelay * 1000) + updateInterval;
+            this.dueTime = (GameStateData.CurrentTime.Ticks / TimeSpan.TicksPerMillisecond) + (secondsDelay * 1000) + updateInterval;
             this.abstractEvent = abstractEvent;
         }
 
@@ -213,7 +213,7 @@ namespace CrewChiefV4
             this.messageName = compoundMessageIdentifier + messageName;
             this.delayedMessageEvent = delayedMessageEvent;
             this.delayMessageResolution = true;
-            this.dueTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + (secondsDelay * 1000) + updateInterval;
+            this.dueTime = (GameStateData.CurrentTime.Ticks / TimeSpan.TicksPerMillisecond) + (secondsDelay * 1000) + updateInterval;
             this.delayMessageResolution = true;
             this.abstractEvent = abstractEvent;
         }
