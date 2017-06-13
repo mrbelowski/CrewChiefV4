@@ -342,6 +342,7 @@ namespace CrewChiefV4.PCars
                 if (!String.Equals(newClass.getClassIdentifier(), currentGameState.carClass.getClassIdentifier()))
                 {
                     currentGameState.carClass = newClass;
+                    GlobalBehaviourSettings.UpdateFromCarClass(currentGameState.carClass);
                     Console.WriteLine("Player is using car class " + currentGameState.carClass.getClassIdentifier());
                     brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(currentGameState.carClass);
                     // no tyre data in the block so get the default tyre types for this car
@@ -373,7 +374,6 @@ namespace CrewChiefV4.PCars
                         
             currentGameState.SessionData.TrackDefinition = TrackData.getTrackDefinition(StructHelper.getNameFromBytes(shared.mTrackLocation)
                 + ":" + StructHelper.getNameFromBytes(shared.mTrackVariation), -1, shared.mTrackLength);
-
             // now check if this is a new session...
 
             Boolean sessionOfSameTypeRestarted = ((currentGameState.SessionData.SessionType == SessionType.Race && lastSessionType == SessionType.Race) ||
@@ -427,6 +427,7 @@ namespace CrewChiefV4.PCars
 
                 String carClassId = StructHelper.getNameFromBytes(shared.mCarClassName);
                 currentGameState.carClass = CarData.getCarClassForClassName(carClassId);
+                GlobalBehaviourSettings.UpdateFromCarClass(currentGameState.carClass);
                 CarData.CLASS_ID = carClassId;
 
                 Console.WriteLine("Player is using car class " + currentGameState.carClass.getClassIdentifier());
@@ -449,8 +450,11 @@ namespace CrewChiefV4.PCars
                 currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass = -1;
                 currentGameState.SessionData.OverallSessionBestLapTime = -1;
                 currentGameState.SessionData.PlayerClassSessionBestLapTime = -1;
-                currentGameState.SessionData.TrackDefinition.trackLandmarks = TrackData.TRACK_LANDMARKS_DATA.getTrackLandmarksForTrackName(currentGameState.SessionData.TrackDefinition.name);
+                TrackDataContainer tdc = TrackData.TRACK_LANDMARKS_DATA.getTrackDataForTrackName(currentGameState.SessionData.TrackDefinition.name);
+                currentGameState.SessionData.TrackDefinition.trackLandmarks = tdc.trackLandmarks;
+                currentGameState.SessionData.TrackDefinition.isOval = tdc.isOval;
                 currentGameState.SessionData.TrackDefinition.setGapPoints();
+                GlobalBehaviourSettings.UpdateFromTrackDefinition(currentGameState.SessionData.TrackDefinition);
 
                 lastActiveTimeForOpponents.Clear();
                 nextOpponentCleanupTime = nextOpponentCleanupTime = currentGameState.Now + opponentCleanupInterval;
@@ -479,14 +483,18 @@ namespace CrewChiefV4.PCars
                         currentGameState.SessionData.NumCarsAtStartOfSession = shared.mNumParticipants;
                         currentGameState.SessionData.TrackDefinition = TrackData.getTrackDefinition(StructHelper.getNameFromBytes(shared.mTrackLocation) + ":" +
                             StructHelper.getNameFromBytes(shared.mTrackVariation), -1, shared.mTrackLength);
-                        currentGameState.SessionData.TrackDefinition.trackLandmarks = TrackData.TRACK_LANDMARKS_DATA.getTrackLandmarksForTrackName(currentGameState.SessionData.TrackDefinition.name);
+                        TrackDataContainer tdc = TrackData.TRACK_LANDMARKS_DATA.getTrackDataForTrackName(currentGameState.SessionData.TrackDefinition.name);
+                        currentGameState.SessionData.TrackDefinition.trackLandmarks = tdc.trackLandmarks;
+                        currentGameState.SessionData.TrackDefinition.isOval = tdc.isOval;
                         currentGameState.SessionData.TrackDefinition.setGapPoints();
+                        GlobalBehaviourSettings.UpdateFromTrackDefinition(currentGameState.SessionData.TrackDefinition);
 
                         lastActiveTimeForOpponents.Clear();
                         nextOpponentCleanupTime = currentGameState.Now + opponentCleanupInterval;
 
                         String carClassId = StructHelper.getNameFromBytes(shared.mCarClassName);
                         currentGameState.carClass = CarData.getCarClassForClassName(carClassId);
+                        GlobalBehaviourSettings.UpdateFromCarClass(currentGameState.carClass);
                         CarData.CLASS_ID = carClassId;
 
                         Console.WriteLine("Player is using car class " + currentGameState.carClass.getClassIdentifier());

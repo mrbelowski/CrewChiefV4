@@ -13,7 +13,6 @@ namespace CrewChiefV4.Events
         private static String folderCelsius = "conditions/celsius";
         private static String folderFahrenheit = "conditions/fahrenheit";
         private static Boolean useFahrenheit = UserSettings.GetUserSettings().getBoolean("use_fahrenheit");
-        private static Boolean preferHundredths = UserSettings.GetUserSettings().getBoolean("report_time_in_hundreths");
 
         protected AudioPlayer audioPlayer;
 
@@ -126,7 +125,7 @@ namespace CrewChiefV4.Events
             }
             else if (o.GetType() == typeof(TimeSpan))
             {
-                messageFragments.Add(MessageFragment.Time(new TimeSpanWrapper((TimeSpan)o, preferHundredths ? Precision.HUNDREDTHS : Precision.TENTHS)));
+                messageFragments.Add(MessageFragment.Time(new TimeSpanWrapper((TimeSpan)o, GlobalBehaviourSettings.useHundredths ? Precision.HUNDREDTHS : Precision.TENTHS)));
             }
             else if (o.GetType() == typeof(TimeSpanWrapper))
             {

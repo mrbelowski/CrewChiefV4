@@ -448,7 +448,8 @@ namespace CrewChiefV4.Events
             {
                 componentsWithMoreDamage.Add(new Tuple<Component, DamageLevel>(Component.SUSPENSION, maxSuspensionDamage));
             }
-            if (enableBrakeDamageMessages && maxBrakeDamage > getLastReportedDamageLevel(Component.BRAKES))
+            if (enableBrakeDamageMessages && GlobalBehaviourSettings.enabledMessageTypes.Contains(MessageTypes.BRAKE_DAMAGE) &&
+                maxBrakeDamage > getLastReportedDamageLevel(Component.BRAKES))
             {
                 componentsWithMoreDamage.Add(new Tuple<Component, DamageLevel>(Component.BRAKES, maxBrakeDamage));
             }
