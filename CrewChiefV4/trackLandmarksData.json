@@ -4241,26 +4241,26 @@
 			"trackLandmarks": [
 				{
 					"landmarkName": "turn1",
-					"distanceRoundLapStart": 500,
-					"distanceRoundLapEnd": 905,
+					"distanceRoundLapStart": 250,
+					"distanceRoundLapEnd": 700,
 					"isCommonOvertakingSpot": true
 				},
 				{
 					"landmarkName": "turn2",
-					"distanceRoundLapStart": 1100,
-					"distanceRoundLapEnd": 1500,
+					"distanceRoundLapStart": 930,
+					"distanceRoundLapEnd": 1380,
 					"isCommonOvertakingSpot": true
 				},
 				{
 					"landmarkName": "turn3",
-					"distanceRoundLapStart": 2500,
-					"distanceRoundLapEnd": 2950,
+					"distanceRoundLapStart": 2300,
+					"distanceRoundLapEnd": 2750,
 					"isCommonOvertakingSpot": true
 				},
 				{
 					"landmarkName": "turn4",
-					"distanceRoundLapStart": 3120,
-					"distanceRoundLapEnd": 3520,
+					"distanceRoundLapStart": 2936,
+					"distanceRoundLapEnd": 3386,
 					"isCommonOvertakingSpot": true
 				}
 			]
@@ -4270,33 +4270,39 @@
 			"isOval": true,
 			"trackLandmarks": [
 				{
+					"landmarkName": "tri_oval",
+					"distanceRoundLapStart": 0,
+					"distanceRoundLapEnd": 210,
+					"isCommonOvertakingSpot": true
+				},
+				{
 					"landmarkName": "turn1",
-					"distanceRoundLapStart": 600,
-					"distanceRoundLapEnd": 1070,
+					"distanceRoundLapStart": 663,
+					"distanceRoundLapEnd": 1107,
 					"isCommonOvertakingSpot": true
 				},
 				{
 					"landmarkName": "turn2",
-					"distanceRoundLapStart": 1070,
-					"distanceRoundLapEnd": 1540,
+					"distanceRoundLapStart": 1108,
+					"distanceRoundLapEnd": 1552,
 					"isCommonOvertakingSpot": true
 				},
 				{
 					"landmarkName": "turn3",
-					"distanceRoundLapStart": 2450,
-					"distanceRoundLapEnd": 2920,
+					"distanceRoundLapStart": 2506,
+					"distanceRoundLapEnd": 2932,
 					"isCommonOvertakingSpot": true
 				},
 				{
 					"landmarkName": "turn4",
-					"distanceRoundLapStart": 2920,
-					"distanceRoundLapEnd": 3390,
+					"distanceRoundLapStart": 2933,
+					"distanceRoundLapEnd": 3358,
 					"isCommonOvertakingSpot": true
 				},
 				{
-					"landmarkName": "turn4",
-					"distanceRoundLapStart": 2920,
-					"distanceRoundLapEnd": 3390,
+					"landmarkName": "tri_oval",
+					"distanceRoundLapStart": 3800,
+					"distanceRoundLapEnd": 4010,
 					"isCommonOvertakingSpot": true
 				}
 			]
