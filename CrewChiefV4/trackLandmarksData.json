@@ -4304,6 +4304,7 @@
 		{
 			"raceroomLayoutId": 4039,
 			"pcarsTrackName": "Silverstone:Grand Prix",
+			"acTrackNames": ["ks_silverstone:gp"],
 			"trackLandmarks": [
 				{
 					"landmarkName": "abbey",
