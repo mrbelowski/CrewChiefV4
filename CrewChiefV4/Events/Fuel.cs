@@ -131,7 +131,7 @@ namespace CrewChiefV4.Events
 
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
-            if (GlobalBehaviourSettings.enabledMessageTypes.Contains(MessageTypes.FUEL))
+            if (!GlobalBehaviourSettings.enabledMessageTypes.Contains(MessageTypes.FUEL))
             {
                 return;
             }
