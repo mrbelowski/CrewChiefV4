@@ -548,6 +548,9 @@ namespace CrewChiefV4.Events
                         waitingToWarnOfIncident = false;
                         lastReportedOvertakeAllowed = PassAllowedUnderYellow.NO_DATA;
                     }
+                    /*
+                    This produces false-positives. Not sure why - TODO: work out what the issue is here - perhaps
+                    the data doesn't contain what I think it contains
                     else if (!isUnderLocalYellow && !hasWarnedOfUpcomingIncident)
                     {
                         if (waitingToWarnOfIncident)
@@ -574,7 +577,7 @@ namespace CrewChiefV4.Events
                             waitingToWarnOfIncident = true;
                             incidentAheadSettledTime = currentGameState.Now + incidentAheadSettlingTime;
                         }
-                    }
+                    }*/
                     // sector yellows
                     for (int i = 0; i < 3; i++)
                     {
