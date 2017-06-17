@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using CrewChiefV4.GameState;
 using CrewChiefV4.Audio;
+using CrewChiefV4.NumberProcessing;
 
 namespace CrewChiefV4.Events
 {
@@ -124,7 +125,11 @@ namespace CrewChiefV4.Events
             }
             else if (o.GetType() == typeof(TimeSpan))
             {
-                messageFragments.Add(MessageFragment.Time((TimeSpan)o));
+                messageFragments.Add(MessageFragment.Time(new TimeSpanWrapper((TimeSpan)o, GlobalBehaviourSettings.useHundredths ? Precision.HUNDREDTHS : Precision.TENTHS)));
+            }
+            else if (o.GetType() == typeof(TimeSpanWrapper))
+            {
+                messageFragments.Add(MessageFragment.Time((TimeSpanWrapper)o));
             }
             else if (o.GetType() == typeof(OpponentData))
             {

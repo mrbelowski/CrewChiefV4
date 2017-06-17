@@ -30,7 +30,7 @@ namespace CrewChiefV4
     public class MessageFragment
     {        
         public String text;
-        public TimeSpan timeSpan;
+        public TimeSpanWrapper timeSpan;
         public OpponentData opponent;
         public int integer;
         public FragmentType type;
@@ -41,7 +41,7 @@ namespace CrewChiefV4
             this.type = FragmentType.Text;
         }
 
-        private MessageFragment(TimeSpan timeSpan)
+        private MessageFragment(TimeSpanWrapper timeSpan)
         {
             this.timeSpan = timeSpan;
             this.type = FragmentType.Time;
@@ -63,7 +63,7 @@ namespace CrewChiefV4
         {
             return new MessageFragment(text);
         }
-        public static MessageFragment Time(TimeSpan timeSpan)
+        public static MessageFragment Time(TimeSpanWrapper timeSpan)
         {
             return new MessageFragment(timeSpan);
         }
@@ -157,7 +157,7 @@ namespace CrewChiefV4
         {
             this.messageName = compoundMessageIdentifier + messageName;
             this.messageFolders = getMessageFolders(messageFragments, false);
-            this.dueTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + (secondsDelay * 1000) + updateInterval;
+            this.dueTime = (GameStateData.CurrentTime.Ticks / TimeSpan.TicksPerMillisecond) + (secondsDelay * 1000) + updateInterval;
             this.abstractEvent = abstractEvent;
         }
 
@@ -188,7 +188,7 @@ namespace CrewChiefV4
                         messageName + " can't be played");
                 }
             }
-            this.dueTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + (secondsDelay * 1000) + updateInterval;
+            this.dueTime = (GameStateData.CurrentTime.Ticks / TimeSpan.TicksPerMillisecond) + (secondsDelay * 1000) + updateInterval;
             this.abstractEvent = abstractEvent;
         }
 
@@ -204,7 +204,7 @@ namespace CrewChiefV4
             List<MessageFragment> messageFragments = new List<MessageFragment>();
             messageFragments.Add(MessageFragment.Text(message));
             this.messageFolders = getMessageFolders(messageFragments, false);
-            this.dueTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + (secondsDelay * 1000) + updateInterval;
+            this.dueTime = (GameStateData.CurrentTime.Ticks / TimeSpan.TicksPerMillisecond) + (secondsDelay * 1000) + updateInterval;
             this.abstractEvent = abstractEvent;
         }
 
@@ -213,7 +213,7 @@ namespace CrewChiefV4
             this.messageName = compoundMessageIdentifier + messageName;
             this.delayedMessageEvent = delayedMessageEvent;
             this.delayMessageResolution = true;
-            this.dueTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + (secondsDelay * 1000) + updateInterval;
+            this.dueTime = (GameStateData.CurrentTime.Ticks / TimeSpan.TicksPerMillisecond) + (secondsDelay * 1000) + updateInterval;
             this.delayMessageResolution = true;
             this.abstractEvent = abstractEvent;
         }

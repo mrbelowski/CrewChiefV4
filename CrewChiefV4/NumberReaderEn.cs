@@ -206,7 +206,7 @@ namespace CrewChiefV4.NumberProcessing
          */
         protected override String GetSecondsWithTenths(int seconds, int tenths)
         {
-             // sometimes include "seconds" if it's less than 10
+            // sometimes include "seconds" if it's less than 10
             if (seconds > 0 && seconds < 10 && random.NextDouble() <= 0.5)
             {
                 return folderNumbersStub + seconds + "point" + tenths + "seconds";
@@ -216,11 +216,34 @@ namespace CrewChiefV4.NumberProcessing
                 return folderNumbersStub + seconds + "point" + tenths;
             }
         }
+        
+        /**
+         * 
+         */
+        protected override List<String> GetSeconds(int seconds)
+        {
+            List<String> messages = new List<String>();
+            messages.Add(folderNumbersStub + seconds);
+            messages.Add(seconds > 1 ? folderSeconds : folderSecond);
+            return messages;
+        }
 
         /**
          * 
          */
-        protected override List<String> GetMinutesAndSecondsWithTenths(int minutes, int seconds, int tenths)
+        protected override List<String> GetSecondsWithHundreths(int seconds, int hundreths)
+        {
+            String leadingZero = hundreths < 10 ? "0" : "";
+            List<String> messages = new List<String>();
+            messages.Add(folderNumbersStub + seconds);
+            messages.Add(folderPoint + leadingZero + hundreths);
+            return messages;
+        }
+
+        /**
+         * fraction is String so we can pass "01" etc - we don't know if it's tenths or hundredths so it may need zero padding.
+         */
+        protected override List<String> GetMinutesAndSecondsWithFraction(int minutes, int seconds, String fraction)
         {
             List<String> messages = new List<String>();
 			// assume minutes is always 1 or 2
@@ -237,7 +260,7 @@ namespace CrewChiefV4.NumberProcessing
 				{
                     String paddedSeconds = seconds < 10 ? "_0" + seconds : "_" + seconds;
 					messages.Add(folderNumbersStub + minutes + paddedSeconds);					
-					messages.Add(folderPoint + tenths);
+					messages.Add(folderPoint + fraction);
 				}
 			}
             return messages;

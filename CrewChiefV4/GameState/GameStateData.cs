@@ -1579,6 +1579,8 @@ namespace CrewChiefV4.GameState
 
     public class GameStateData
     {
+        public static DateTime CurrentTime = DateTime.Now;
+
         public long Ticks;
 
         public DateTime Now;
@@ -1617,6 +1619,7 @@ namespace CrewChiefV4.GameState
         {
             this.Ticks = ticks;
             this.Now = new DateTime(ticks);
+            CurrentTime = Now;
         }
 
         // some convenience methods

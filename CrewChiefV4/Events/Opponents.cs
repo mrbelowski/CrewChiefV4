@@ -6,6 +6,7 @@ using CrewChiefV4.RaceRoom.RaceRoomData;
 using System.Threading;
 using CrewChiefV4.GameState;
 using CrewChiefV4.Audio;
+using CrewChiefV4.NumberProcessing;
 
 namespace CrewChiefV4.Events
 {
@@ -170,7 +171,7 @@ namespace CrewChiefV4.Events
                             (SoundCache.hasSuitableTTSVoice || SoundCache.availableDriverNames.Contains(DriverNameHelper.getUsableDriverName(opponentData.DriverRawName))))
                         {
                             audioPlayer.playMessage(new QueuedMessage("new_fastest_lap", MessageContents(folderNewFastestLapFor, opponentData,
-                                        TimeSpan.FromSeconds(opponentData.LastLapTime)), 0, this));
+                                        TimeSpanWrapper.FromSeconds(opponentData.LastLapTime, Precision.AUTO_LAPTIMES)), 0, this));
                         }
                         else if ((currentGameState.SessionData.SessionType == SessionType.Race &&
                                 (opponentData.LastLapTime <= opponentData.CurrentBestLapTime &&
@@ -185,7 +186,7 @@ namespace CrewChiefV4.Events
                                 // he's leading, and has recorded 3 or more laps, and this one's his fastest
                                 Console.WriteLine("Leader fast lap - this lap time = " + opponentData.LastLapTime +" session best = " + currentFastestLap);
                                 audioPlayer.playMessage(new QueuedMessage("leader_good_laptime", MessageContents(folderLeaderHasJustDoneA,
-                                        TimeSpan.FromSeconds(opponentData.LastLapTime)), 0, this));
+                                        TimeSpanWrapper.FromSeconds(opponentData.LastLapTime, Precision.AUTO_LAPTIMES)), 0, this));
                             }
                             else if (currentGameState.SessionData.UnFilteredPosition > 1 && opponentData.UnFilteredPosition == currentGameState.SessionData.Position - 1 &&
                                 (currentGameState.SessionData.SessionType == SessionType.Race || random.Next(10) < frequencyOfOpponentPracticeAndQualLapTimes))
@@ -193,7 +194,7 @@ namespace CrewChiefV4.Events
                                 // he's ahead of us, and has recorded 3 or more laps, and this one's his fastest
                                 Console.WriteLine("Car ahead fast lap - this lap time = " + opponentData.LastLapTime + " session best = " + currentFastestLap);
                                  audioPlayer.playMessage(new QueuedMessage("car_ahead_good_laptime", MessageContents(folderTheCarAheadHasJustDoneA,
-                                        TimeSpan.FromSeconds(opponentData.LastLapTime)), 0, this));
+                                        TimeSpanWrapper.FromSeconds(opponentData.LastLapTime, Precision.AUTO_LAPTIMES)), 0, this));
                             }
                             else if (!currentGameState.isLast() && opponentData.UnFilteredPosition == currentGameState.SessionData.Position + 1 &&
                                 (currentGameState.SessionData.SessionType == SessionType.Race || random.Next(10) < frequencyOfOpponentPracticeAndQualLapTimes))
@@ -201,7 +202,7 @@ namespace CrewChiefV4.Events
                                 // he's behind us, and has recorded 3 or more laps, and this one's his fastest
                                 Console.WriteLine("Car behind fast lap - this lap time = " + opponentData.LastLapTime + " session best = " + currentFastestLap);
                                 audioPlayer.playMessage(new QueuedMessage("car_behind_good_laptime", MessageContents(folderTheCarBehindHasJustDoneA,
-                                        TimeSpan.FromSeconds(opponentData.LastLapTime)), 0, this));
+                                        TimeSpanWrapper.FromSeconds(opponentData.LastLapTime, Precision.AUTO_LAPTIMES)), 0, this));
                             }
                         }
                     }
@@ -391,7 +392,7 @@ namespace CrewChiefV4.Events
                         {
                             gotData = true;
                             audioPlayer.playMessageImmediately(new QueuedMessage("opponentLastLap", MessageContents(
-                                TimeSpan.FromSeconds(lastLap)), 0, null));
+                                TimeSpanWrapper.FromSeconds(lastLap, Precision.AUTO_LAPTIMES)), 0, null));
                             
                         }                       
                     }
@@ -402,7 +403,7 @@ namespace CrewChiefV4.Events
                         {
                             gotData = true;
                             audioPlayer.playMessageImmediately(new QueuedMessage("opponentBestLap", MessageContents(
-                                TimeSpan.FromSeconds(bestLap)), 0, null));
+                                TimeSpanWrapper.FromSeconds(bestLap, Precision.AUTO_LAPTIMES)), 0, null));
                             
                         }
                     }  
@@ -524,7 +525,7 @@ namespace CrewChiefV4.Events
                                 }
                                 else
                                 {
-                                    TimeSpan delta = TimeSpan.FromSeconds(Math.Abs(opponentDelta.time));
+                                    TimeSpanWrapper delta = TimeSpanWrapper.FromSeconds(Math.Abs(opponentDelta.time), Precision.AUTO_GAPS);
                                     String aheadOrBehind = Position.folderAhead;
                                     if (opponentDelta.time < 0)
                                     {
