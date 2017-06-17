@@ -4546,13 +4546,13 @@
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "first_degner",
+					"landmarkName": "degner_1",
 					"distanceRoundLapStart": 2250,
 					"distanceRoundLapEnd": 2345,
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "second_degner",
+					"landmarkName": "degner_2",
 					"distanceRoundLapStart": 2410,
 					"distanceRoundLapEnd": 2500,
 					"isCommonOvertakingSpot": false
@@ -4564,7 +4564,7 @@
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "hairpin",
+					"landmarkName": "the_hairpin",
 					"distanceRoundLapStart": 2860,
 					"distanceRoundLapEnd": 2970,
 					"isCommonOvertakingSpot": true
@@ -4576,7 +4576,7 @@
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "spoon",
+					"landmarkName": "spoon_curve",
 					"distanceRoundLapStart": 3740,
 					"distanceRoundLapEnd": 4075,
 					"isCommonOvertakingSpot": false
@@ -4946,7 +4946,7 @@
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "esses",
+					"landmarkName": "the_esses",
 					"distanceRoundLapStart": 2714,
 					"distanceRoundLapEnd": 3350,
 					"isCommonOvertakingSpot": false
