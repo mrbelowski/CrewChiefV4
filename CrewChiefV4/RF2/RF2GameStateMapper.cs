@@ -204,24 +204,22 @@ namespace CrewChiefV4.rFactor2
             var carClassId = getStringFromBytes(player.mVehicleClass);
             cgs.carClass = CarData.getCarClassForClassName(carClassId);
             CarData.CLASS_ID = carClassId;
-            GlobalBehaviourSettings.UpdateFromCarClass(cgs.carClass);
             this.brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(cgs.carClass);
             csd.DriverRawName = getStringFromBytes(player.mDriverName).ToLower();
             csd.TrackDefinition = new TrackDefinition(getStringFromBytes(rf2state.mTrackName), (float)rf2state.mLapDist);
 
             if (pgs == null || psd.TrackDefinition.name != csd.TrackDefinition.name)
             {
-                // new game or new track
+                // New game or new track
                 TrackDataContainer tdc = TrackData.TRACK_LANDMARKS_DATA.getTrackDataForTrackName(csd.TrackDefinition.name);
                 csd.TrackDefinition.trackLandmarks = tdc.trackLandmarks;
                 csd.TrackDefinition.isOval = tdc.isOval;
                 csd.TrackDefinition.setGapPoints();
                 GlobalBehaviourSettings.UpdateFromTrackDefinition(csd.TrackDefinition);
-                GlobalBehaviourSettings.UpdateFromCarClass(cgs.carClass);
             }
             else if (pgs != null)
             {
-                // copy from previous gamestate
+                // Copy from previous gamestate
                 csd.TrackDefinition.trackLandmarks = psd.TrackDefinition.trackLandmarks;
                 csd.TrackDefinition.gapPoints = psd.TrackDefinition.gapPoints;
             }
