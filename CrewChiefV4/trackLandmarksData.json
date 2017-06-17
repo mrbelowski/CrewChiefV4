@@ -5360,7 +5360,7 @@
 			"rf2TrackNames": ["Malaysian Full Loop"],
 			"trackLandmarks": [{
 					"landmarkName": "turn1",
-					"distanceRoundLapStart": 600,
+					"distanceRoundLapStart": 540,
 					"distanceRoundLapEnd": 740,
 					"isCommonOvertakingSpot": true
 				},
