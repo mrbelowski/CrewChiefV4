@@ -24,6 +24,8 @@ namespace CrewChiefV4.Audio
         private CrewChief crewChief;
 
         public static String folderAcknowlegeOK = "acknowledge/OK";
+        public static String folderYellowEnabled = "acknowledge/yellowEnabled";
+        public static String folderYellowDisabled = "acknowledge/yellowDisabled";
         public static String folderAcknowlegeEnableKeepQuiet = "acknowledge/keepQuietEnabled";
         public static String folderEnableSpotter = "acknowledge/spotterEnabled";
         public static String folderDisableSpotter = "acknowledge/spotterDisabled";
@@ -510,7 +512,7 @@ namespace CrewChiefV4.Audio
 
         private void playQueueContents(OrderedDictionary queueToPlay, Boolean isImmediateMessages)
         {
-            long milliseconds = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
+            long milliseconds = GameStateData.CurrentTime.Ticks / TimeSpan.TicksPerMillisecond;
             List<String> keysToPlay = new List<String>();
             List<String> soundsProcessed = new List<String>();
 
@@ -528,7 +530,7 @@ namespace CrewChiefV4.Audio
                         Boolean messageIsStillValid = queuedMessage.isMessageStillValid(key, crewChief.currentGameState);
                         Boolean queueTooLongForMessage = queuedMessage.maxPermittedQueueLengthForMessage != 0 && willBePlayedCount > queuedMessage.maxPermittedQueueLengthForMessage;
                         Boolean hasJustPlayedAsAnImmediateMessage = !isImmediateMessages && lastImmediateMessageName != null &&
-                            key == lastImmediateMessageName && DateTime.Now - lastImmediateMessageTime < TimeSpan.FromSeconds(5);
+                            key == lastImmediateMessageName && GameStateData.CurrentTime - lastImmediateMessageTime < TimeSpan.FromSeconds(5);
                         if ((isImmediateMessages || !keepQuiet || queuedMessage.playEvenWhenSilenced) && queuedMessage.canBePlayed &&
                             messageIsStillValid && !keysToPlay.Contains(key) && !queueTooLongForMessage && !messageHasExpired && !hasJustPlayedAsAnImmediateMessage)
                         {
@@ -648,7 +650,7 @@ namespace CrewChiefV4.Audio
             }
             else
             {
-                long milliseconds = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
+                long milliseconds = GameStateData.CurrentTime.Ticks / TimeSpan.TicksPerMillisecond;
                 lock (queueToCheck)
                 {
                     foreach (String key in queueToCheck.Keys)
@@ -687,10 +689,10 @@ namespace CrewChiefV4.Audio
                         //  now double check this is still valid
                         if (!isImmediateMessages)
                         {
-                            Boolean messageHasExpired = thisMessage.expiryTime != 0 && thisMessage.expiryTime < DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond; ;
+                            Boolean messageHasExpired = thisMessage.expiryTime != 0 && thisMessage.expiryTime < GameStateData.CurrentTime.Ticks / TimeSpan.TicksPerMillisecond; ;
                             Boolean messageIsStillValid = thisMessage.isMessageStillValid(eventName, crewChief.currentGameState);
                             Boolean hasJustPlayedAsAnImmediateMessage = lastImmediateMessageName != null &&
-                                eventName == lastImmediateMessageName && DateTime.Now - lastImmediateMessageTime < TimeSpan.FromSeconds(5);
+                                eventName == lastImmediateMessageName && GameStateData.CurrentTime - lastImmediateMessageTime < TimeSpan.FromSeconds(5);
                             if (messageHasExpired || !messageIsStillValid || hasJustPlayedAsAnImmediateMessage)
                             {
                                 soundsProcessed.Add(eventName);
@@ -720,11 +722,11 @@ namespace CrewChiefV4.Audio
                             }
                             else
                             {
-                                timeLastPearlOfWisdomPlayed = DateTime.Now;
+                                timeLastPearlOfWisdomPlayed = GameStateData.CurrentTime;
                                 if (!mute)
                                 {
                                     soundCache.Play(eventName);
-                                    timeOfLastMessageEnd = DateTime.Now;
+                                    timeOfLastMessageEnd = GameStateData.CurrentTime;
                                 }
                             }
                         }
@@ -744,7 +746,7 @@ namespace CrewChiefV4.Audio
                                     thisMessage.resolveDelayedContents();
                                 }
                                 soundCache.Play(thisMessage.messageFolders);
-                                timeOfLastMessageEnd = DateTime.Now;
+                                timeOfLastMessageEnd = GameStateData.CurrentTime;
                             }
                             if (playedMessagesCount.ContainsKey(eventName))
                             {
@@ -950,7 +952,7 @@ namespace CrewChiefV4.Audio
                     else
                     {
                         lastImmediateMessageName = queuedMessage.messageName;
-                        lastImmediateMessageTime = DateTime.Now;
+                        lastImmediateMessageTime = GameStateData.CurrentTime;
                         this.useShortBeepWhenOpeningChannel = false;
                         this.holdChannelOpen = false;
                         immediateClips.Add(queuedMessage.messageName, queuedMessage);
@@ -1099,7 +1101,7 @@ namespace CrewChiefV4.Audio
 
         private Boolean hasPearlJustBeenPlayed()
         {
-            return timeLastPearlOfWisdomPlayed.Add(minTimeBetweenPearlsOfWisdom) > DateTime.Now;
+            return timeLastPearlOfWisdomPlayed.Add(minTimeBetweenPearlsOfWisdom) > GameStateData.CurrentTime;
         }
 
         public void suspendPearlsOfWisdom()

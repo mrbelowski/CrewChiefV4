@@ -108,8 +108,10 @@
     <Compile Include="Events\Spotter.cs" />
     <Compile Include="GameDefinition.cs" />
     <Compile Include="GameStateReaderFactory.cs" />
+    <Compile Include="GameState\GlobalBehaviourSettings.cs" />
     <Compile Include="NameValidator.cs" />
     <Compile Include="NoisyCartesianCoordinateSpotter.cs" />
+    <Compile Include="NumberProcessing\TimeSpanWrapper.cs" />
     <Compile Include="NumberReaderIt.cs" />
     <Compile Include="NumberReaderEn.cs" />
     <Compile Include="NumberProcessing\NumberReader.cs" />

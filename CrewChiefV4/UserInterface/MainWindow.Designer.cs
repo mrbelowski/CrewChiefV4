@@ -43,6 +43,7 @@ namespace CrewChiefV4
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainWindow));
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.startApplicationButton = new System.Windows.Forms.Button();
+            this.forceVersionCheckButton = new System.Windows.Forms.Button();
             this.buttonActionSelect = new System.Windows.Forms.ListBox();
             this.controllersList = new System.Windows.Forms.ListBox();
             this.assignButtonToAction = new System.Windows.Forms.Button();
@@ -78,6 +79,7 @@ namespace CrewChiefV4
             this.driverNamesProgressBar = new System.Windows.Forms.ProgressBar();
             this.personalisationsProgressBar = new System.Windows.Forms.ProgressBar();
             this.personalisationBox = new System.Windows.Forms.ComboBox();
+            this.donateLink = new System.Windows.Forms.LinkLabel();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.messagesVolumeSlider)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.backgroundVolumeSlider)).BeginInit();
@@ -376,11 +378,22 @@ namespace CrewChiefV4
             // app_version
             // 
             this.app_version.AutoSize = true;
-            this.app_version.Location = new System.Drawing.Point(1069, 670);
+            this.app_version.Location = new System.Drawing.Point(1045, 650);
             this.app_version.Name = "app_version";
             this.app_version.Size = new System.Drawing.Size(65, 13);
             this.app_version.TabIndex = 27;
             this.app_version.Text = Configuration.getUIString("app_version");
+            // 
+            // reset_app_version
+            // 
+            this.forceVersionCheckButton.AutoSize = true;
+            this.forceVersionCheckButton.Location = new System.Drawing.Point(1030, 665);
+            this.forceVersionCheckButton.Name = "forceVersionCheckButton";
+            this.forceVersionCheckButton.Size = new System.Drawing.Size(65, 13);
+            this.forceVersionCheckButton.TabIndex = 90;
+            this.forceVersionCheckButton.Text = Configuration.getUIString("check_for_updates");
+            this.forceVersionCheckButton.UseVisualStyleBackColor = true;
+            this.forceVersionCheckButton.Click += new System.EventHandler(this.forceVersionCheckButtonClicked);
             // 
             // soundPackProgressBar
             // 
@@ -443,6 +456,11 @@ namespace CrewChiefV4
             this.personalisationBox.Name = "personalisationBox";
             this.personalisationBox.Size = new System.Drawing.Size(142, 400);
             this.personalisationBox.TabIndex = 94;
+
+            this.donateLink.Location = new System.Drawing.Point(35, 650);
+            this.donateLink.Size = new System.Drawing.Size(250, 15);
+            this.donateLink.Text = Configuration.getUIString("donate_link_text");
+            this.donateLink.Click += new System.EventHandler(this.internetPanHandler);
             
             // Associate the event-handling method with the 
             // SelectedIndexChanged event.
@@ -483,9 +501,11 @@ namespace CrewChiefV4
             this.Controls.Add(this.controllersList);
             this.Controls.Add(this.buttonActionSelect);
             this.Controls.Add(this.startApplicationButton);
+            this.Controls.Add(this.forceVersionCheckButton);
             this.Controls.Add(this.textBox1);
             this.Controls.Add(this.personalisationBox);
             this.Controls.Add(this.personalisationLabel);
+            this.Controls.Add(this.donateLink);
             this.Name = "MainWindow";
             this.Text = "Crew Chief V4";
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -504,6 +524,7 @@ namespace CrewChiefV4
 
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.Button startApplicationButton;
+        private System.Windows.Forms.Button forceVersionCheckButton;
         private System.Windows.Forms.ListBox buttonActionSelect;
         private System.Windows.Forms.ListBox controllersList;
         private System.Windows.Forms.Button assignButtonToAction;
@@ -539,5 +560,6 @@ namespace CrewChiefV4
         private System.Windows.Forms.ProgressBar driverNamesProgressBar;
         private System.Windows.Forms.ProgressBar personalisationsProgressBar;
         private System.Windows.Forms.ComboBox personalisationBox;
+        private System.Windows.Forms.LinkLabel donateLink;
     }
 }

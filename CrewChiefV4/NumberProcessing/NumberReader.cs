@@ -1,5 +1,6 @@
 ﻿using CrewChiefV4.Audio;
 using CrewChiefV4.Events;
+using CrewChiefV4.NumberProcessing;
 using System;
 using System.Collections.Generic;
 namespace CrewChiefV4
@@ -48,12 +49,26 @@ namespace CrewChiefV4
         protected abstract String GetSecondsWithTenths(int seconds, int tenths);
 
         /**
-         * Separate recordings for when we just want a number of seconds with tenths with 1 or 2 minutes. 
+         *
+         */
+        protected abstract List<String> GetSeconds(int seconds);
+
+        /**
+         * Separate recordings for when we just want a number of seconds with hundreths. This is only used when we have no minutes part,
+         * or we have a minutes part *and* the number of seconds is 10 or more (because these sounds have no "zero.." or "oh.." part.
          * This is (currently) only applicable to English numbers.
          *
          */
-        protected abstract List<String> GetMinutesAndSecondsWithTenths(int minutes, int seconds, int tenths);
+        protected abstract List<String> GetSecondsWithHundreths(int seconds, int hundreths);
 
+        /**
+         * Separate recordings for when we just want a number of seconds with tenths with 1 or 2 minutes. 
+         * This is (currently) only applicable to English numbers.
+         * fraction is String so we can pass "01" etc - we don't know if it's tenths or hundredths so it may need zero padding.
+         * 
+         */
+        protected abstract List<String> GetMinutesAndSecondsWithFraction(int minutes, int seconds, String fraction);
+        
         protected abstract String getLocale();
 
         protected Random random = new Random();
@@ -61,42 +76,77 @@ namespace CrewChiefV4
         /**
          * Convert a timeSpan to some sound files, using the current language's implementation.
          */
-        public List<String> ConvertTimeToSounds(TimeSpan timeSpan, Boolean useMoreInflection)
+        public List<String> ConvertTimeToSounds(TimeSpanWrapper timeSpanWrapper, Boolean useMoreInflection)
         {
             // Console.WriteLine(new DateTime(timeSpan.Ticks).ToString("HH:mm:ss.F"));
             List<String> messageFolders = new List<String>();
-            if (timeSpan != null)
+            if (timeSpanWrapper != null)
             {
-                // if the milliseconds in this timeSpan is > 949, when we turn this into tenths it'll get rounded up to 
-                // ten tenths, which we can't have. So move the timespan on so this rounding doesn't happen
-                if (timeSpan.Milliseconds > 949)
+                Precision precision = timeSpanWrapper.getPrecision();
+                // Rounding hacks. Because we treat the tenths or hundredths as separate numbers, they may get
+                // rounded - .950 will be rounded to 'point 10' and .995 will be rounded to 'point 100', so we 
+                // move the time on a bit to ensure this doesn't happen:
+                if (precision == Precision.TENTHS && timeSpanWrapper.timeSpan.Milliseconds > 949)
                 {
-                    timeSpan = timeSpan.Add(TimeSpan.FromMilliseconds(1000 - timeSpan.Milliseconds));
+                    timeSpanWrapper.timeSpan = timeSpanWrapper.timeSpan.Add(TimeSpan.FromMilliseconds(1000 - timeSpanWrapper.timeSpan.Milliseconds));
                 }
-                int tenths = (int)Math.Round((float)timeSpan.Milliseconds / 100f);
+                else if (precision == Precision.HUNDREDTHS && timeSpanWrapper.timeSpan.Milliseconds > 995)
+                {
+                    timeSpanWrapper.timeSpan = timeSpanWrapper.timeSpan.Add(TimeSpan.FromMilliseconds(1000 - timeSpanWrapper.timeSpan.Milliseconds));
+                }
+                // so now these tenths and hundredths can never be 10 or 100 respectively:
+                int tenths = (int)Math.Round((float)timeSpanWrapper.timeSpan.Milliseconds / 100f);
+                int hundreths = (int)Math.Round((float)timeSpanWrapper.timeSpan.Milliseconds / 10f);
 
                 // now call the language-specific implementations
-                Boolean useNewENMinutes = AudioPlayer.soundPackVersion > 106 && getLocale() == "en" && timeSpan.Hours == 0 && 
-                    timeSpan.Minutes > 0 && timeSpan.Minutes < 3 && timeSpan.Seconds > 0 && timeSpan.Seconds < 60;
-                Boolean useNewENSeconds = AudioPlayer.soundPackVersion > 106 && getLocale() == "en" && timeSpan.Hours == 0 && 
-                    timeSpan.Minutes == 0 && (timeSpan.Seconds > 0 || tenths > 0) && timeSpan.Seconds < 60;
+                Boolean useNewENMinutes = AudioPlayer.soundPackVersion > 106 && getLocale() == "en" && timeSpanWrapper.timeSpan.Hours == 0 &&
+                    timeSpanWrapper.timeSpan.Minutes > 0 && timeSpanWrapper.timeSpan.Minutes < 3 && timeSpanWrapper.timeSpan.Seconds > 0 && timeSpanWrapper.timeSpan.Seconds < 60;
+
+                Boolean useNewENSeconds = AudioPlayer.soundPackVersion > 106 && getLocale() == "en" && timeSpanWrapper.timeSpan.Hours == 0 &&
+                    timeSpanWrapper.timeSpan.Minutes == 0 && (timeSpanWrapper.timeSpan.Seconds > 0 || tenths > 0 ||
+                    (precision == Precision.HUNDREDTHS && hundreths > 0)) && timeSpanWrapper.timeSpan.Seconds < 60;
 
                 if (useNewENSeconds)
                 {
                     messageFolders.Add(AbstractEvent.Pause(50));
-                    messageFolders.Add(GetSecondsWithTenths(timeSpan.Seconds, tenths));
+                    if (precision == Precision.HUNDREDTHS)
+                    {
+                        messageFolders.AddRange(GetSecondsWithHundreths(timeSpanWrapper.timeSpan.Seconds, hundreths));
+                    } 
+                    else if (precision == Precision.TENTHS)
+                    {
+                        messageFolders.Add(GetSecondsWithTenths(timeSpanWrapper.timeSpan.Seconds, tenths));
+                    }
+                    else if (precision == Precision.SECONDS)
+                    {
+                        messageFolders.AddRange(GetSeconds(timeSpanWrapper.timeSpan.Seconds));
+                    }
                 }
                 else if (useNewENMinutes)
                 {
                     messageFolders.Add(AbstractEvent.Pause(50));
-                    messageFolders.AddRange(GetMinutesAndSecondsWithTenths(timeSpan.Minutes, timeSpan.Seconds, tenths));
+                    if (precision == Precision.HUNDREDTHS)
+                    {
+                        String leadingZero = hundreths < 10 ? "0" : "";
+                        messageFolders.AddRange(GetMinutesAndSecondsWithFraction(timeSpanWrapper.timeSpan.Minutes, timeSpanWrapper.timeSpan.Seconds, leadingZero + hundreths));
+                    }
+                    else if (precision == Precision.TENTHS)
+                    {
+                        messageFolders.AddRange(GetMinutesAndSecondsWithFraction(timeSpanWrapper.timeSpan.Minutes, timeSpanWrapper.timeSpan.Seconds, tenths.ToString()));
+                    }
+                    else if (precision == Precision.SECONDS)
+                    {
+                        messageFolders.AddRange(GetHoursSounds(timeSpanWrapper.timeSpan.Hours, timeSpanWrapper.timeSpan.Minutes, timeSpanWrapper.timeSpan.Seconds, tenths));
+                        messageFolders.AddRange(GetMinutesSounds(timeSpanWrapper.timeSpan.Hours, timeSpanWrapper.timeSpan.Minutes, timeSpanWrapper.timeSpan.Seconds, tenths));
+                        messageFolders.AddRange(GetSecondsSounds(timeSpanWrapper.timeSpan.Hours, timeSpanWrapper.timeSpan.Minutes, timeSpanWrapper.timeSpan.Seconds, tenths));
+                    }                    
                 }
                 else
                 {
-                    messageFolders.AddRange(GetHoursSounds(timeSpan.Hours, timeSpan.Minutes, timeSpan.Seconds, tenths));
-                    messageFolders.AddRange(GetMinutesSounds(timeSpan.Hours, timeSpan.Minutes, timeSpan.Seconds, tenths));
-                    messageFolders.AddRange(GetSecondsSounds(timeSpan.Hours, timeSpan.Minutes, timeSpan.Seconds, tenths));
-                    messageFolders.AddRange(GetTenthsSounds(timeSpan.Hours, timeSpan.Minutes, timeSpan.Seconds, tenths, useMoreInflection));
+                    messageFolders.AddRange(GetHoursSounds(timeSpanWrapper.timeSpan.Hours, timeSpanWrapper.timeSpan.Minutes, timeSpanWrapper.timeSpan.Seconds, tenths));
+                    messageFolders.AddRange(GetMinutesSounds(timeSpanWrapper.timeSpan.Hours, timeSpanWrapper.timeSpan.Minutes, timeSpanWrapper.timeSpan.Seconds, tenths));
+                    messageFolders.AddRange(GetSecondsSounds(timeSpanWrapper.timeSpan.Hours, timeSpanWrapper.timeSpan.Minutes, timeSpanWrapper.timeSpan.Seconds, tenths));
+                    messageFolders.AddRange(GetTenthsSounds(timeSpanWrapper.timeSpan.Hours, timeSpanWrapper.timeSpan.Minutes, timeSpanWrapper.timeSpan.Seconds, tenths, useMoreInflection));
                 }
 
                 /*if (messageFolders.Count > 0)

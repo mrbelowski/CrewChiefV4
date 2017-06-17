@@ -2098,5 +2098,41 @@ namespace CrewChiefV4.Properties {
                 this["prefer_alternative_download_site"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool always_report_time_in_hundredths {
+            get {
+                return ((bool)(this["always_report_time_in_hundredths"]));
+            }
+            set {
+                this["always_report_time_in_hundredths"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool use_american_terms {
+            get {
+                return ((bool)(this["use_american_terms"]));
+            }
+            set {
+                this["use_american_terms"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool realistic_mode {
+            get {
+                return ((bool)(this["realistic_mode"]));
+            }
+            set {
+                this["realistic_mode"] = value;
+            }
+        }
     }
 }
