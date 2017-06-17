@@ -223,7 +223,6 @@ namespace CrewChiefV4.rFactor1
                 currentGameState.SessionData.TrackDefinition.isOval = tdc.isOval;
                 currentGameState.SessionData.TrackDefinition.setGapPoints();
                 GlobalBehaviourSettings.UpdateFromTrackDefinition(currentGameState.SessionData.TrackDefinition);
-                GlobalBehaviourSettings.UpdateFromCarClass(currentGameState.carClass);
             }
             else if (previousGameState != null)
             {
