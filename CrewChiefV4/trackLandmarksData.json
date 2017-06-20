@@ -5449,6 +5449,203 @@
 					"isCommonOvertakingSpot": false
 				}
 			]
+		},
+		{
+			"rf2TrackNames": ["60sHockenheim"],
+			"trackLandmarks": [{
+					"landmarkName": "nord_kurve",
+					"distanceRoundLapStart": 240,
+					"distanceRoundLapEnd": 380,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "ost_kurve",
+					"distanceRoundLapStart": 3140,
+					"distanceRoundLapEnd": 3530,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "sachs_kurve",
+					"distanceRoundLapStart": 5560,
+					"distanceRoundLapEnd": 5705,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "agip_kurve",
+					"distanceRoundLapStart": 5700,
+					"distanceRoundLapEnd": 5900,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn5",
+					"distanceRoundLapStart": 6055,
+					"distanceRoundLapEnd": 6160,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn6",
+					"distanceRoundLapStart": 6265,
+					"distanceRoundLapEnd": 6355,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "sud_kurve",
+					"distanceRoundLapStart": 6410,
+					"distanceRoundLapEnd": 6555,
+					"isCommonOvertakingSpot": true
+				}
+			]
+		},
+		{
+			"rf2TrackNames": ["75Kyalami"],
+			"trackLandmarks": [{
+					"landmarkName": "crowthorne_corner",
+					"distanceRoundLapStart": 720,
+					"distanceRoundLapEnd": 940,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "brabeque_bend",
+					"distanceRoundLapStart": 1085,
+					"distanceRoundLapEnd": 1225,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "jukskei_sweep",
+					"distanceRoundLapStart": 1440,
+					"distanceRoundLapEnd": 1555,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "sunset_bend",
+					"distanceRoundLapStart": 1795,
+					"distanceRoundLapEnd": 2070,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "clubhouse_bend",
+					"distanceRoundLapStart": 2205,
+					"distanceRoundLapEnd": 2360,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "the_esses",
+					"distanceRoundLapStart": 2525,
+					"distanceRoundLapEnd": 2820,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "leeukop_bend",
+					"distanceRoundLapStart": 2930,
+					"distanceRoundLapEnd": 3200,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "the_kink",
+					"distanceRoundLapStart": 3555,
+					"distanceRoundLapEnd": 3735,
+					"isCommonOvertakingSpot": false
+				}
+			]
+		},
+		{
+			"rf2TrackNames": ["Adelaide Street Circuit"],
+			"trackLandmarks": [{
+					"landmarkName": "senna_chicane",
+					"distanceRoundLapStart": 230,
+					"distanceRoundLapEnd": 450,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "wakefield",
+					"distanceRoundLapStart": 685,
+					"distanceRoundLapEnd": 765,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn5",
+					"distanceRoundLapStart": 850,
+					"distanceRoundLapEnd": 920,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn6",
+					"distanceRoundLapStart": 990,
+					"distanceRoundLapEnd": 1070,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn7",
+					"distanceRoundLapStart": 1125,
+					"distanceRoundLapEnd": 1205,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn9",
+					"distanceRoundLapStart": 1780,
+					"distanceRoundLapEnd": 1900,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "dequetteville_hairpin",
+					"distanceRoundLapStart": 2190,
+					"distanceRoundLapEnd": 2285,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "race_course",
+					"distanceRoundLapStart": 2355,
+					"distanceRoundLapEnd": 2665,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn15",
+					"distanceRoundLapStart": 2750,
+					"distanceRoundLapEnd": 2850,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn16",
+					"distanceRoundLapStart": 2920,
+					"distanceRoundLapEnd": 3050,
+					"isCommonOvertakingSpot": false
+				}
+			]
+		},
+		{
+			"rf2TrackNames": ["Alabama Superspeedway"],
+			"isOval": true,
+			"trackLandmarks": [{
+					"landmarkName": "turn1",
+					"distanceRoundLapStart": 300,
+					"distanceRoundLapEnd": 780,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn2",
+					"distanceRoundLapStart": 781,
+					"distanceRoundLapEnd": 1260,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn3",
+					"distanceRoundLapStart": 2240,
+					"distanceRoundLapEnd": 2710,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn4",
+					"distanceRoundLapStart": 1711,
+					"distanceRoundLapEnd": 3180,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "trioval",
+					"distanceRoundLapStart": 3500,
+					"distanceRoundLapEnd": 4325,
+					"isCommonOvertakingSpot": true
+				}
+			]
 		}
 	]
 }
