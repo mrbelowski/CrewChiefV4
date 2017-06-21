@@ -399,6 +399,7 @@ namespace CrewChiefV4
             while (running)
             {
                 DateTime now = DateTime.Now;
+                GameStateData.CurrentTime = now;
                 if (now > nextRunTime)
                 {
                     // ensure the updates don't get synchronised with the spotter / UDP receiver

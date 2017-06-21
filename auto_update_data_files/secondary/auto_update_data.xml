@@ -3,8 +3,8 @@
 Note that the filename has to remain 'auto_update_data.xml' so legacy installs (which have no concept of the primary / 
 secondary update sources) can still be updated. All downloads from this source will be pulled from the isnais ftp server. -->
 <item>
-<title>Crew Chief 4.6.6.1, updated 13 June 2017</title>
-<version>4.6.6.1</version>
+<title>Crew Chief 4.6.6.2, updated 17 June 2017</title>
+<version>4.6.6.2</version>
 <url>http://crewchief.isnais.de/CrewChiefV4.msi</url>
 <changelog>http://crewchief.isnais.de/change_log_for_auto_updated.html</changelog>
 
@@ -15,7 +15,7 @@ secondary update sources) can still be updated. All downloads from this source w
 <drivernamesversion>100</drivernamesversion>
 <basedrivernamesurl>http://crewchief.isnais.de/base_driver_names.zip</basedrivernamesurl>
 <updatedrivernamesurl>http://crewchief.isnais.de/update_driver_names.zip</updatedrivernamesurl>
-<personalisationsversion>111</personalisationsversion>
+<personalisationsversion>112</personalisationsversion>
 <basepersonalisationsurl>http://crewchief.isnais.de/personalisations.zip</basepersonalisationsurl>
 <updatepersonalisationsurl>http://crewchief.isnais.de/update_personalisations.zip</updatepersonalisationsurl>
 
@@ -27,7 +27,7 @@ secondary update sources) can still be updated. All downloads from this source w
 	<drivernamesversion>119</drivernamesversion>
 	<basedrivernamesurl>http://crewchief.isnais.de/base_driver_names.zip</basedrivernamesurl>
 	<updatedrivernamesurl>http://crewchief.isnais.de/update_driver_names.zip</updatedrivernamesurl>
-	<personalisationsversion>111</personalisationsversion>
+	<personalisationsversion>112</personalisationsversion>
 	<basepersonalisationsurl>http://crewchief.isnais.de/personalisations.zip</basepersonalisationsurl>
 	<updatepersonalisationsurl>http://crewchief.isnais.de/update_personalisations.zip</updatepersonalisationsurl>
 </soundpack>
