@@ -4576,7 +4576,7 @@
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "spoon",
+					"landmarkName": "spoon_curve",
 					"distanceRoundLapStart": 3740,
 					"distanceRoundLapEnd": 4075,
 					"isCommonOvertakingSpot": false
@@ -4946,7 +4946,7 @@
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "esses",
+					"landmarkName": "the_esses",
 					"distanceRoundLapStart": 2714,
 					"distanceRoundLapEnd": 3350,
 					"isCommonOvertakingSpot": false
@@ -5360,7 +5360,7 @@
 			"rf2TrackNames": ["Malaysian Full Loop"],
 			"trackLandmarks": [{
 					"landmarkName": "turn1",
-					"distanceRoundLapStart": 600,
+					"distanceRoundLapStart": 540,
 					"distanceRoundLapEnd": 740,
 					"isCommonOvertakingSpot": true
 				},
