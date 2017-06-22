@@ -129,7 +129,8 @@ namespace CrewChiefV4.Audio
                 }
                 else if (soundFolder.Name == "voice")
                 {
-                    prepareVoice(soundFolder);
+                    prepareVoiceWithoutLoading(soundFolder);
+                    loadVoices();
                 }
                 else if (soundFolder.Name == "driver_names")
                 {
@@ -397,7 +398,24 @@ namespace CrewChiefV4.Audio
             Console.WriteLine("Prepare sound effects completed");
         }
 
-        private void prepareVoice(DirectoryInfo voiceDirectory)
+        private void loadVoices()
+        {
+            new Thread(() =>
+            {
+                DateTime start = DateTime.Now;
+                Thread.CurrentThread.IsBackground = true;
+                foreach (SoundSet soundSet in soundSets.Values)
+                {
+                    if (!soundSet.loadSoundFiles)
+                    {
+                        soundSet.loadAll();
+                    }
+                }
+                Console.WriteLine("Took " + (DateTime.Now - start).TotalMilliseconds + " ms to load voice sounds");
+            }).Start();            
+        }
+
+        private void prepareVoiceWithoutLoading(DirectoryInfo voiceDirectory)
         {
             Console.WriteLine("Preparing voice messages");
             DirectoryInfo[] eventFolders = voiceDirectory.GetDirectories();
@@ -410,7 +428,7 @@ namespace CrewChiefV4.Audio
                     foreach (DirectoryInfo eventDetailFolder in eventDetailFolders)
                     {
                         String fullEventName = eventFolder.Name + "/" + eventDetailFolder.Name;
-                        SoundSet soundSet = new SoundSet(eventDetailFolder, this.useSwearyMessages, alwaysKeepCached, this.allowCaching);
+                        SoundSet soundSet = new SoundSet(eventDetailFolder, this.useSwearyMessages, alwaysKeepCached, false);
                         if (soundSet.hasSounds)
                         {
                             sortedAvailableSounds.Add(fullEventName);
@@ -490,7 +508,7 @@ namespace CrewChiefV4.Audio
         private DirectoryInfo soundFolder;
         private Boolean useSwearyMessages;
         public Boolean keepCached;
-        private Boolean allowCaching;
+        public Boolean loadSoundFiles;
         private Boolean initialised = false;
         public Boolean hasSounds = false;
         public int soundsCount;
@@ -500,12 +518,12 @@ namespace CrewChiefV4.Audio
         private List<int> indexes = null;
         private int indexesPosition = 0;
 
-        public SoundSet(DirectoryInfo soundFolder, Boolean useSwearyMessages, Boolean keepCached, Boolean allowCaching)
+        public SoundSet(DirectoryInfo soundFolder, Boolean useSwearyMessages, Boolean keepCached, Boolean loadSoundFiles)
         {
             this.soundsCount = 0;
             this.soundFolder = soundFolder;
             this.useSwearyMessages = useSwearyMessages;
-            this.allowCaching = allowCaching;
+            this.loadSoundFiles = loadSoundFiles;
             this.keepCached = keepCached;
             initialise();
         }
@@ -520,6 +538,19 @@ namespace CrewChiefV4.Audio
                 int value = list[k];
                 list[k] = list[n];
                 list[n] = value;
+            }
+        }
+
+        public void loadAll()
+        {
+            loadSoundFiles = true;
+            foreach (SingleSound sound in singleSoundsNoPrefixOrSuffix)
+            {
+                sound.loadAndCache(keepCached);
+            }
+            foreach (SingleSound sound in singleSoundsWithPrefixOrSuffix)
+            {
+                sound.loadAndCache(keepCached);
             }
         }
 
@@ -547,7 +578,7 @@ namespace CrewChiefV4.Audio
                                         {
                                             hasPrefixOrSuffix = true;
                                             hasSounds = true;
-                                            SingleSound singleSound = new SingleSound(soundFile.FullName, SoundCache.eagerLoadSoundFiles, this.keepCached, this.allowCaching);
+                                            SingleSound singleSound = new SingleSound(soundFile.FullName, SoundCache.eagerLoadSoundFiles, this.keepCached, this.loadSoundFiles);
                                             singleSound.isSweary = isSweary;
                                             if (soundFile.Name.Contains(SoundCache.OPTIONAL_SUFFIX_IDENTIFIER) || soundFile.Name.Contains(SoundCache.REQUIRED_SUFFIX_IDENTIFIER))
                                             {
@@ -567,7 +598,7 @@ namespace CrewChiefV4.Audio
                                 if (isOptional)
                                 {
                                     hasSounds = true;
-                                    SingleSound singleSound = new SingleSound(soundFile.FullName, SoundCache.eagerLoadSoundFiles, this.keepCached, this.allowCaching);
+                                    SingleSound singleSound = new SingleSound(soundFile.FullName, SoundCache.eagerLoadSoundFiles, this.keepCached, this.loadSoundFiles);
                                     singleSound.isSweary = isSweary;
                                     singleSoundsNoPrefixOrSuffix.Add(singleSound);
                                     soundsCount++;
@@ -576,7 +607,7 @@ namespace CrewChiefV4.Audio
                             else
                             {
                                 hasSounds = true;
-                                SingleSound singleSound = new SingleSound(soundFile.FullName, SoundCache.eagerLoadSoundFiles, this.keepCached, this.allowCaching);
+                                SingleSound singleSound = new SingleSound(soundFile.FullName, SoundCache.eagerLoadSoundFiles, this.keepCached, this.loadSoundFiles);
                                 singleSound.isSweary = isSweary;
                                 singleSoundsNoPrefixOrSuffix.Add(singleSound);
                                 soundsCount++;
@@ -713,7 +744,7 @@ namespace CrewChiefV4.Audio
         private byte[] fileBytes;
         private MemoryStream memoryStream;
         private SoundPlayer soundPlayer;
-        private Boolean allowCaching;
+        private Boolean loadSoundFiles;
         private Boolean loadedSoundPlayer = false;
         private Boolean loadedFile = false;
 
@@ -731,20 +762,22 @@ namespace CrewChiefV4.Audio
             this.ttsString = textToRender;
         }
 
-        public SingleSound(String fullPath, Boolean loadFile, Boolean loadSoundPlayer, Boolean allowCaching)
+        public SingleSound(String fullPath, Boolean loadFile, Boolean loadSoundPlayer, Boolean loadSoundFiles)
         {
-            this.allowCaching = allowCaching;
+            this.loadSoundFiles = loadSoundFiles;
             this.fullPath = fullPath;
-            if (allowCaching)
+            if (loadSoundFiles)
             {
-                if (loadFile)
-                {
-                    LoadFile();
-                }
-                if (loadSoundPlayer)
-                {
-                    LoadSoundPlayer();
-                }
+                loadAndCache(loadedSoundPlayer);
+            }
+        }
+
+        public void loadAndCache(Boolean loadSoundPlayer)
+        {
+            LoadFile();
+            if (loadSoundPlayer)
+            {
+                LoadSoundPlayer();
             }
         }
 
@@ -763,7 +796,7 @@ namespace CrewChiefV4.Audio
             }
             else
             {
-                if (!allowCaching)
+                if (!loadSoundFiles)
                 {
                     SoundPlayer soundPlayer = new SoundPlayer(fullPath);
                     soundPlayer.Load();
@@ -789,15 +822,24 @@ namespace CrewChiefV4.Audio
 
         public void LoadFile()
         {
-            this.fileBytes = File.ReadAllBytes(fullPath);
-            loadedFile = true;
+            lock (this)
+            {
+                if (!loadedFile)
+                {
+                    this.fileBytes = File.ReadAllBytes(fullPath);
+                    loadedFile = true;
+                }
+            }
         }
 
         public void LoadSoundPlayer()
         {
-            if (!loadedFile)
+            lock (this)
             {
-                LoadFile();
+                if (!loadedFile)
+                {
+                    LoadFile();
+                }
             }
             this.memoryStream = new MemoryStream(this.fileBytes);
             this.soundPlayer = new SoundPlayer(memoryStream);
