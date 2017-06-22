@@ -394,7 +394,7 @@ namespace CrewChiefV4.Events
                                         }
                                         else if (currentGameState.SessionData.SessionType == SessionType.Practice)
                                         {
-                                            if (SoundCache.availableSounds.Contains(Position.folderDriverPositionIntro))
+                                            if (SoundCache.sortedAvailableSounds.Contains(Position.folderDriverPositionIntro))
                                             {
                                                 audioPlayer.playMessage(new QueuedMessage("position", MessageContents(Position.folderDriverPositionIntro, Position.folderStub + 1), 0, this));
                                             }
@@ -973,7 +973,7 @@ namespace CrewChiefV4.Events
                             if (currentPosition > 1)
                             {
                                 // should always trigger
-                                if (SoundCache.availableSounds.Contains(Position.folderDriverPositionIntro))
+                                if (SoundCache.sortedAvailableSounds.Contains(Position.folderDriverPositionIntro))
                                 {
                                     audioPlayer.playMessageImmediately(new QueuedMessage("position", MessageContents(Position.folderDriverPositionIntro, Position.folderStub + currentPosition), 0, null));
                                 }
@@ -989,7 +989,7 @@ namespace CrewChiefV4.Events
                             if (currentPosition > 1)
                             {
                                 // should always trigger
-                                if (SoundCache.availableSounds.Contains(Position.folderDriverPositionIntro))
+                                if (SoundCache.sortedAvailableSounds.Contains(Position.folderDriverPositionIntro))
                                 {
                                     audioPlayer.playMessageImmediately(new QueuedMessage("position", MessageContents(Position.folderDriverPositionIntro, Position.folderStub + currentPosition), 0, null));
                                 }
