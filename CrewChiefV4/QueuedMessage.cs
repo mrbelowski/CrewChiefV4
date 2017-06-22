@@ -244,8 +244,8 @@ namespace CrewChiefV4
                 switch (messageFragment.type)
                 {
                     case FragmentType.Text:
-                        if (messageFragment.text.StartsWith(AudioPlayer.PAUSE_ID) || SoundCache.sortedAvailableSounds.Contains(messageFragment.text) ||
-                            SoundCache.sortedAvailableDriverNames.BinarySearch(messageFragment.text) > 0)
+                        if (messageFragment.text.StartsWith(AudioPlayer.PAUSE_ID) || SoundCache.sortedAvailableSounds.BinarySearch(messageFragment.text) >= 0 ||
+                            SoundCache.sortedAvailableDriverNames.BinarySearch(messageFragment.text) >= 0)
                         {
                             messages.Add(messageFragment.text);
                         }
@@ -269,7 +269,7 @@ namespace CrewChiefV4
                             {
                                 foreach (String timeFolder in timeFolders)
                                 {
-                                    if (!timeFolder.StartsWith(AudioPlayer.PAUSE_ID) && !SoundCache.sortedAvailableSounds.Contains(timeFolder))
+                                    if (!timeFolder.StartsWith(AudioPlayer.PAUSE_ID) && SoundCache.sortedAvailableSounds.BinarySearch(timeFolder) < 0)
                                     {
                                         canBePlayed = false;
                                         break;
@@ -289,7 +289,7 @@ namespace CrewChiefV4
                         if (messageFragment.opponent != null)
                         {
                             String usableName = DriverNameHelper.getUsableDriverName(messageFragment.opponent.DriverRawName);
-                            if (SoundCache.sortedAvailableDriverNames.BinarySearch(usableName) > 0)
+                            if (SoundCache.sortedAvailableDriverNames.BinarySearch(usableName) >= 0)
                             {
                                 messages.Add(usableName);
                                 canBePlayed = true;
@@ -314,7 +314,7 @@ namespace CrewChiefV4
                             {
                                 foreach (String integerFolder in integerFolders)
                                 {
-                                    if (!integerFolder.StartsWith(AudioPlayer.PAUSE_ID) && !SoundCache.sortedAvailableSounds.Contains(integerFolder))
+                                    if (!integerFolder.StartsWith(AudioPlayer.PAUSE_ID) && SoundCache.sortedAvailableSounds.BinarySearch(integerFolder) < 0)
                                     {
                                         canBePlayed = false;
                                         break;

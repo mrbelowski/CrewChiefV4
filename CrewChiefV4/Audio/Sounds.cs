@@ -478,6 +478,7 @@ namespace CrewChiefV4.Audio
                     break;
                 }
             }
+            sortedAvailablePrefixesAndSuffixes.Sort();
             Console.WriteLine("Prepare personalisations completed");
         }
     }
