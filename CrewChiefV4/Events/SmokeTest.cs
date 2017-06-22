@@ -67,7 +67,7 @@ namespace CrewChiefV4.Events
                 int index = 0;
                 foreach (OpponentData driverToTest in driversToTest)
                 {
-                    if (SoundCache.sortedAvailableDriverNames.BinarySearch(DriverNameHelper.getUsableDriverName(driverToTest.DriverRawName)) > 0)
+                    if (SoundCache.sortedAvailableDriverNames.BinarySearch(DriverNameHelper.getUsableDriverName(driverToTest.DriverRawName)) >= 0)
                     {
                         audioPlayer.playMessage(new QueuedMessage("gap_in_front" + index,
                                         MessageContents(Timings.folderTheGapTo, driverToTest, Timings.folderAheadIsIncreasing,
