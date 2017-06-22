@@ -22,9 +22,9 @@ namespace CrewChiefV4.Audio
         private List<String> dynamicLoadedSounds = new List<String>();
         public static Dictionary<String, SoundSet> soundSets = new Dictionary<String, SoundSet>();
         private Dictionary<String, SingleSound> singleSounds = new Dictionary<String, SingleSound>();
-        public static List<String> availableDriverNames = new List<String>();
-        public static List<String> availableSounds = new List<String>();
-        public static List<String> availablePrefixesAndSuffixes = new List<String>();
+        public static List<String> sortedAvailableDriverNames = new List<String>();
+        public static List<String> sortedAvailableSounds = new List<String>();
+        public static List<String> sortedAvailablePrefixesAndSuffixes = new List<String>();
         private Boolean useSwearyMessages;
         private Boolean allowCaching;
         private String[] eventTypesToKeepCached;
@@ -362,7 +362,7 @@ namespace CrewChiefV4.Audio
                             currentLoadedCount++;
                         }
                         singleSounds.Add("start_bleep", new SingleSound(bleepFile.FullName, this.allowCaching, this.allowCaching, this.allowCaching));
-                        availableSounds.Add("start_bleep");
+                        sortedAvailableSounds.Add("start_bleep");
                     }
                     else if (bleepFile.Name.StartsWith(alternate_prefix + "end") && !singleSounds.ContainsKey("end_bleep"))
                     {
@@ -371,7 +371,7 @@ namespace CrewChiefV4.Audio
                             currentLoadedCount++;
                         } 
                         singleSounds.Add("end_bleep", new SingleSound(bleepFile.FullName, this.allowCaching, this.allowCaching, this.allowCaching));
-                        availableSounds.Add("end_bleep");
+                        sortedAvailableSounds.Add("end_bleep");
                     }
                     else if (bleepFile.Name.StartsWith(alternate_prefix + "short_start") && !singleSounds.ContainsKey("short_start_bleep"))
                     {
@@ -380,7 +380,7 @@ namespace CrewChiefV4.Audio
                             currentLoadedCount++;
                         } 
                         singleSounds.Add("short_start_bleep", new SingleSound(bleepFile.FullName, this.allowCaching, this.allowCaching, this.allowCaching));
-                        availableSounds.Add("short_start_bleep");
+                        sortedAvailableSounds.Add("short_start_bleep");
                     }
                     else if (bleepFile.Name.StartsWith("listen_start") && !singleSounds.ContainsKey("listen_start_sound"))
                     {
@@ -389,10 +389,11 @@ namespace CrewChiefV4.Audio
                             currentLoadedCount++;
                         } 
                         singleSounds.Add("listen_start_sound", new SingleSound(bleepFile.FullName, this.allowCaching, this.allowCaching, this.allowCaching));
-                        availableSounds.Add("listen_start_sound");
+                        sortedAvailableSounds.Add("listen_start_sound");
                     }
                 }
             }
+            sortedAvailableSounds.Sort();
             Console.WriteLine("Prepare sound effects completed");
         }
 
@@ -412,7 +413,7 @@ namespace CrewChiefV4.Audio
                         SoundSet soundSet = new SoundSet(eventDetailFolder, this.useSwearyMessages, alwaysKeepCached, this.allowCaching);
                         if (soundSet.hasSounds)
                         {
-                            availableSounds.Add(fullEventName);
+                            sortedAvailableSounds.Add(fullEventName);
                             soundSets.Add(fullEventName, soundSet);
                             if (alwaysKeepCached)
                             {
@@ -426,6 +427,7 @@ namespace CrewChiefV4.Audio
                     Console.WriteLine("Unable to find events folder");
                 }
             }
+            sortedAvailableSounds.Sort();
             Console.WriteLine("Prepare voice message completed");
         }
 
@@ -439,9 +441,10 @@ namespace CrewChiefV4.Audio
                 {                    
                     String name = driverNameFile.Name.ToLower().Split(new[] { ".wav" }, StringSplitOptions.None)[0];
                     singleSounds.Add(name, new SingleSound(driverNameFile.FullName, false, false, this.allowCaching));
-                    availableDriverNames.Add(name);
+                    sortedAvailableDriverNames.Add(name);
                 }
             }
+            sortedAvailableDriverNames.Sort();
             Console.WriteLine("Prepare driver names completed");
         }
 
@@ -463,7 +466,7 @@ namespace CrewChiefV4.Audio
                             SoundSet soundSet = new SoundSet(prefixesAndSuffixesFolder, this.useSwearyMessages, alwaysKeepCached, this.allowCaching);
                             if (soundSet.hasSounds)
                             {
-                                availablePrefixesAndSuffixes.Add(prefixesAndSuffixesFolder.Name);
+                                sortedAvailablePrefixesAndSuffixes.Add(prefixesAndSuffixesFolder.Name);
                                 soundSets.Add(prefixesAndSuffixesFolder.Name, soundSet);
                                 if (alwaysKeepCached)
                                 {
@@ -534,7 +537,7 @@ namespace CrewChiefV4.Audio
                                 soundFile.Name.Contains(SoundCache.OPTIONAL_PREFIX_IDENTIFIER) || soundFile.Name.Contains(SoundCache.OPTIONAL_PREFIX_IDENTIFIER))
                             {
                                 Boolean isOptional = soundFile.Name.Contains(SoundCache.OPTIONAL_PREFIX_IDENTIFIER) || soundFile.Name.Contains(SoundCache.OPTIONAL_SUFFIX_IDENTIFIER);
-                                foreach (String prefixSuffixName in SoundCache.availablePrefixesAndSuffixes)
+                                foreach (String prefixSuffixName in SoundCache.sortedAvailablePrefixesAndSuffixes)
                                 {
                                     if (soundFile.Name.Contains(prefixSuffixName) && SoundCache.soundSets.ContainsKey(prefixSuffixName))
                                     {                                       

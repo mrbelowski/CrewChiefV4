@@ -168,7 +168,7 @@ namespace CrewChiefV4.Events
                         // a tenth quicker then his previous best we do...
                         if (((currentGameState.SessionData.SessionType == SessionType.Race && opponentData.CompletedLaps > 2) ||
                             (currentGameState.SessionData.SessionType != SessionType.Race && opponentData.CompletedLaps > 1)) && opponentData.LastLapTime <= currentFastestLap &&
-                            (SoundCache.hasSuitableTTSVoice || SoundCache.availableDriverNames.Contains(DriverNameHelper.getUsableDriverName(opponentData.DriverRawName))))
+                            (SoundCache.hasSuitableTTSVoice || SoundCache.sortedAvailableDriverNames.BinarySearch(DriverNameHelper.getUsableDriverName(opponentData.DriverRawName)) > 0))
                         {
                             audioPlayer.playMessage(new QueuedMessage("new_fastest_lap", MessageContents(folderNewFastestLapFor, opponentData,
                                         TimeSpanWrapper.FromSeconds(opponentData.LastLapTime, Precision.AUTO_LAPTIMES)), 0, this));
@@ -218,7 +218,7 @@ namespace CrewChiefV4.Events
                     {
                         OpponentData opponentData = currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position - 1, false);
                         if (opponentData != null && !opponentData.isEnteringPits() && !opponentData.InPits &&
-                            (SoundCache.hasSuitableTTSVoice || SoundCache.availableDriverNames.Contains(DriverNameHelper.getUsableDriverName(opponentData.DriverRawName))))
+                            (SoundCache.hasSuitableTTSVoice || SoundCache.sortedAvailableDriverNames.BinarySearch(DriverNameHelper.getUsableDriverName(opponentData.DriverRawName)) > 0))
                         {
                             audioPlayer.playMessage(new QueuedMessage("new_car_ahead", MessageContents(folderNextCarIs, opponentData),
                                 random.Next(Position.maxSecondsToWaitBeforeReportingPass + 1, Position.maxSecondsToWaitBeforeReportingPass + 3), this,
@@ -235,7 +235,7 @@ namespace CrewChiefV4.Events
                         String name = leader.DriverRawName;
                         if (currentGameState.SessionData.Position > 1 && previousGameState.SessionData.Position > 1 && 
                             currentGameState.Now > nextLeadChangeMessage &&
-                            (SoundCache.hasSuitableTTSVoice || SoundCache.availableDriverNames.Contains(DriverNameHelper.getUsableDriverName(name))))
+                            (SoundCache.hasSuitableTTSVoice || SoundCache.sortedAvailableDriverNames.BinarySearch(DriverNameHelper.getUsableDriverName(name)) > 0))
                         {
                             Console.WriteLine("Lead change, current leader is " + name + " laps completed = " + currentGameState.SessionData.CompletedLaps);
                             audioPlayer.playMessage(new QueuedMessage("new_leader", MessageContents(leader, folderIsNowLeading), 2, this,
@@ -427,7 +427,7 @@ namespace CrewChiefV4.Events
                                 // TODO: we need a "right infront" or "right behind" type response here for when the delta is < 0.05 (< 1 tenth rounded)
                                 if (!gotByPositionNumber)
                                 {
-                                    if (SoundCache.availableSounds.Contains(folderOpponentPositionIntro))
+                                    if (SoundCache.sortedAvailableSounds.Contains(folderOpponentPositionIntro))
                                     { 
                                         audioPlayer.playMessageImmediately(new QueuedMessage("opponentPosition", MessageContents(folderOpponentPositionIntro, Position.folderStub + position), 0, null));
                                     }
@@ -445,7 +445,7 @@ namespace CrewChiefV4.Events
                                 {
                                     if (!gotByPositionNumber)
                                     {
-                                        if (SoundCache.availableSounds.Contains(folderOpponentPositionIntro))
+                                        if (SoundCache.sortedAvailableSounds.Contains(folderOpponentPositionIntro))
                                         {
                                             audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta",
                                                 MessageContents(folderOpponentPositionIntro, Position.folderStub + position, Pause(200), Position.folderOneLapBehind), 0, null));
@@ -465,7 +465,7 @@ namespace CrewChiefV4.Events
                                 {
                                     if (!gotByPositionNumber)
                                     {
-                                        if (SoundCache.availableSounds.Contains(folderOpponentPositionIntro))
+                                        if (SoundCache.sortedAvailableSounds.Contains(folderOpponentPositionIntro))
                                         {
                                             audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta",
                                                 MessageContents(folderOpponentPositionIntro, Position.folderStub + position, Pause(200), opponentDelta.lapDifference, Position.folderLapsBehind), 0, null));
@@ -486,7 +486,7 @@ namespace CrewChiefV4.Events
                                 {
                                     if (!gotByPositionNumber)
                                     {
-                                        if (SoundCache.availableSounds.Contains(folderOpponentPositionIntro))
+                                        if (SoundCache.sortedAvailableSounds.Contains(folderOpponentPositionIntro))
                                         {
                                             audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta",
                                                 MessageContents(folderOpponentPositionIntro, Position.folderStub + position, Pause(200), Position.folderOneLapAhead), 0, null));
@@ -506,7 +506,7 @@ namespace CrewChiefV4.Events
                                 {
                                     if (!gotByPositionNumber)
                                     {
-                                        if (SoundCache.availableSounds.Contains(folderOpponentPositionIntro))
+                                        if (SoundCache.sortedAvailableSounds.Contains(folderOpponentPositionIntro))
                                         {
                                             audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta",
                                                 MessageContents(folderOpponentPositionIntro, Position.folderStub + position, Pause(200), Math.Abs(opponentDelta.lapDifference), Position.folderLapsAhead), 0, null));
@@ -533,7 +533,7 @@ namespace CrewChiefV4.Events
                                     }
                                     if (!gotByPositionNumber)
                                     {
-                                        if (SoundCache.availableSounds.Contains(folderOpponentPositionIntro))
+                                        if (SoundCache.sortedAvailableSounds.Contains(folderOpponentPositionIntro))
                                         {
                                             audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta",
                                                 MessageContents(folderOpponentPositionIntro, Position.folderStub + position, Pause(200), delta, aheadOrBehind), 0, null));

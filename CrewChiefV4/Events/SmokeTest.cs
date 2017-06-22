@@ -67,7 +67,7 @@ namespace CrewChiefV4.Events
                 int index = 0;
                 foreach (OpponentData driverToTest in driversToTest)
                 {
-                    if (SoundCache.availableDriverNames.Contains(DriverNameHelper.getUsableDriverName(driverToTest.DriverRawName)))
+                    if (SoundCache.sortedAvailableDriverNames.BinarySearch(DriverNameHelper.getUsableDriverName(driverToTest.DriverRawName)) > 0)
                     {
                         audioPlayer.playMessage(new QueuedMessage("gap_in_front" + index,
                                         MessageContents(Timings.folderTheGapTo, driverToTest, Timings.folderAheadIsIncreasing,
@@ -105,7 +105,7 @@ namespace CrewChiefV4.Events
             audioPlayer.playMessage(new QueuedMessage(ConditionsMonitor.folderRainLightDecreasing, 0, this));
             audioPlayer.playMessage(new QueuedMessage(ConditionsMonitor.folderDrizzleDecreasing, 0, this));*/
 
-            audioPlayer.playMessage(new QueuedMessage(folderTest, 0, this));
+            audioPlayer.playMessageImmediately(new QueuedMessage(folderTest, 0, this));
             
             /*audioPlayer.playMessage(new QueuedMessage("gap_in_front",
                                         MessageContents(Timings.folderTheGapTo, makeTempDriver("7908jimmy6^&^", new List<string>()), Timings.folderAheadIsIncreasing,

@@ -414,7 +414,7 @@ namespace CrewChiefV4.Events
             if (damageMessage != null)
             {
                 // play this immediately or play "stand by", and queue it to be played in a few seconds
-                if (delayResponses && random.Next(10) >= 2 && SoundCache.availableSounds.Contains(AudioPlayer.folderStandBy))
+                if (delayResponses && random.Next(10) >= 2 && SoundCache.sortedAvailableSounds.Contains(AudioPlayer.folderStandBy))
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderStandBy, 0, null));
                     int secondsDelay = Math.Max(5, random.Next(11));

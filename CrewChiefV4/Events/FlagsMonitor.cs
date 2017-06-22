@@ -1094,7 +1094,7 @@ namespace CrewChiefV4.Events
 
         private Boolean canReadName(String rawName)
         {
-            return SoundCache.hasSuitableTTSVoice || SoundCache.availableDriverNames.Contains(DriverNameHelper.getUsableDriverName(rawName));
+            return SoundCache.hasSuitableTTSVoice || SoundCache.sortedAvailableDriverNames.BinarySearch(DriverNameHelper.getUsableDriverName(rawName)) > 0;
         }
     }
 
