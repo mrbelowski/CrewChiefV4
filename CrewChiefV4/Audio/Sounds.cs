@@ -33,7 +33,7 @@ namespace CrewChiefV4.Audio
         public static int currentSoundsLoaded;
         public static int activeSoundPlayers;
         public static int prefixesAndSuffixesCount = 0;
-
+        
         public static String OPTIONAL_PREFIX_IDENTIFIER = "op_prefix";
         public static String OPTIONAL_SUFFIX_IDENTIFIER = "op_suffix";
         public static String REQUIRED_PREFIX_IDENTIFIER = "rq_prefix";
@@ -435,7 +435,7 @@ namespace CrewChiefV4.Audio
                     foreach (DirectoryInfo eventDetailFolder in eventDetailFolders)
                     {
                         String fullEventName = eventFolder.Name + "/" + eventDetailFolder.Name;
-                        SoundSet soundSet = new SoundSet(eventDetailFolder, this.useSwearyMessages, false, false, allowCaching, alwaysKeepCached);
+                        SoundSet soundSet = new SoundSet(eventDetailFolder, this.useSwearyMessages, alwaysKeepCached, alwaysKeepCached, allowCaching, alwaysKeepCached);
                         if (soundSet.hasSounds)
                         {
                             sortedAvailableSounds.Add(fullEventName);
