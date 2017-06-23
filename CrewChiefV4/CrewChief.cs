@@ -18,6 +18,11 @@ namespace CrewChiefV4
 {
     public class CrewChief : IDisposable
     {
+        readonly int timeBetweenProcConnectCheckMillis = 500;
+        readonly int timeBetweenProcDisconnectCheckMillis = 2000;
+        DateTime nextProcessStateCheck = DateTime.MinValue;
+        bool isGameProcessRunning = false;
+
         private Random random = new Random();
 
         public static Boolean loadDataFromFile = false;
@@ -264,7 +269,7 @@ namespace CrewChiefV4
             {
                 GlobalBehaviourSettings.spotterEnabled = true;
                 spotter.enableSpotter();
-            }           
+            }
         }
 
         public void disableSpotter()
@@ -273,7 +278,7 @@ namespace CrewChiefV4
             {
                 GlobalBehaviourSettings.spotterEnabled = false;
                 spotter.disableSpotter();
-            }            
+            }
         }
 
         public void respondToRadioCheck()
@@ -391,7 +396,7 @@ namespace CrewChiefV4
                 return false;
             }
             audioPlayer.startMonitor();
-            Boolean attemptedToRunGame = false;            
+            Boolean attemptedToRunGame = false;
 
             Console.WriteLine("Polling for shared data every " + _timeInterval.Milliseconds + "ms");
             Boolean sessionFinished = false;
@@ -408,11 +413,24 @@ namespace CrewChiefV4
                     nextRunTime.Add(TimeSpan.FromMilliseconds(updateTweak));
                     if (!loadDataFromFile)
                     {
-                        if (gameDefinition.processName == null || Utilities.IsGameRunning(gameDefinition.processName))
+                        // Turns our checking for running process by name is an expensive system call.  So don't do that on every tick.
+                        if (now > nextProcessStateCheck)
+                        {
+                            nextProcessStateCheck = now.Add(
+                                TimeSpan.FromMilliseconds(isGameProcessRunning ? timeBetweenProcDisconnectCheckMillis : timeBetweenProcConnectCheckMillis));
+                            isGameProcessRunning = Utilities.IsGameRunning(gameDefinition.processName);
+                        }
+
+                        if (gameDefinition.processName == null || isGameProcessRunning)
                         {
                             if (!mapped)
                             {
                                 mapped = gameDataReader.Initialise();
+
+                                // Instead of stressing process to death on failed mapping,
+                                // give a it a break.
+                                if (!mapped)
+                                    Thread.Sleep(1000);
                             }
                         }
                         else if (UserSettings.GetUserSettings().getBoolean(gameDefinition.gameStartEnabledProperty) && !attemptedToRunGame)
