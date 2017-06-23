@@ -143,7 +143,7 @@ namespace CrewChiefV4.Audio
                             {
                                 soundSet.loadAll();
                             }
-                            Console.WriteLine("Took " + (DateTime.Now - start).TotalMilliseconds + " ms to load voice sounds, there are now " +
+                            Console.WriteLine("Took " + (DateTime.Now - start).TotalSeconds.ToString("0.00") + " s to load voice sounds, there are now " +
                             SoundCache.currentSoundsLoaded + " loaded sound files with " + SoundCache.activeSoundPlayers + " active SoundPlayer objects");
                         }).Start();
                     }
@@ -482,7 +482,6 @@ namespace CrewChiefV4.Audio
                     {
                         foreach (DirectoryInfo prefixesAndSuffixesFolder in prefixesAndSuffixesFolders[0].GetDirectories())
                         {
-                            Boolean alwaysKeepCached = allowCaching && this.eventTypesToKeepCached.Contains(prefixesAndSuffixesFolder.Name);
                             // always keep the personalisations cached as they're reused frequently
                             SoundSet soundSet = new SoundSet(prefixesAndSuffixesFolder, this.useSwearyMessages, allowCaching, allowCaching, allowCaching, true);
                             if (soundSet.hasSounds)
