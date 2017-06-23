@@ -18,9 +18,9 @@ namespace CrewChiefV4
 {
     public class CrewChief : IDisposable
     {
-        readonly int timeBetweenProcConnectCheck = 500;
-        readonly int timeBetweenProcDisconnectCheck = 2000;
-        long nextProcessStateCheck = -1;
+        readonly int timeBetweenProcConnectCheckMillis = 500;
+        readonly int timeBetweenProcDisconnectCheckMillis = 2000;
+        DateTime nextProcessStateCheck = DateTime.MinValue;
         bool isGameProcessRunning = false;
 
         private Random random = new Random();
@@ -414,10 +414,10 @@ namespace CrewChiefV4
                     if (!loadDataFromFile)
                     {
                         // Turns our checking for running process by name is an expensive system call.  So don't do that on every tick.
-                        long millisNow = now.Ticks / TimeSpan.TicksPerMillisecond;
-                        if (millisNow > nextProcessStateCheck)
+                        if (now > nextProcessStateCheck)
                         {
-                            nextProcessStateCheck = millisNow + (isGameProcessRunning ? timeBetweenProcDisconnectCheck : timeBetweenProcConnectCheck);
+                            nextProcessStateCheck = now.Add(
+                                TimeSpan.FromMilliseconds(isGameProcessRunning ? timeBetweenProcDisconnectCheckMillis : timeBetweenProcConnectCheckMillis));
                             isGameProcessRunning = Utilities.IsGameRunning(gameDefinition.processName);
                         }
 
@@ -426,6 +426,11 @@ namespace CrewChiefV4
                             if (!mapped)
                             {
                                 mapped = gameDataReader.Initialise();
+
+                                // Instead of stressing process to death on failed mapping,
+                                // give a it a break.
+                                if (!mapped)
+                                    Thread.Sleep(1000);
                             }
                         }
                         else if (UserSettings.GetUserSettings().getBoolean(gameDefinition.gameStartEnabledProperty) && !attemptedToRunGame)
