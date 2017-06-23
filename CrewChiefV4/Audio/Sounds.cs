@@ -165,11 +165,16 @@ namespace CrewChiefV4.Audio
 
         public static void loadDriverNameSounds(List<String> names)
         {
+            int loadedCount = 0;
             foreach (String name in names)
             {
-                loadDriverNameSound(name);
+                if (sortedAvailableDriverNames.BinarySearch(name) >= 0)
+                {
+                    loadedCount++;
+                    loadDriverNameSound(name);
+                }
             }
-            Console.WriteLine("loaded " + names.Count + " driver names There are now" +
+            Console.WriteLine("loaded " + loadedCount + " driver name sounds. There are now" +
                 SoundCache.currentSoundsLoaded + " sound files loaded with " + SoundCache.activeSoundPlayers + " active SoundPlayer objects");
         }
 
