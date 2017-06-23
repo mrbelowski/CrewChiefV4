@@ -168,11 +168,8 @@ namespace CrewChiefV4.Audio
             int loadedCount = 0;
             foreach (String name in names)
             {
-                if (sortedAvailableDriverNames.BinarySearch(name) >= 0)
-                {
-                    loadedCount++;
-                    loadDriverNameSound(name);
-                }
+                loadedCount++;
+                loadDriverNameSound(name);
             }
             Console.WriteLine("loaded " + loadedCount + " driver name sounds. There are now" +
                 SoundCache.currentSoundsLoaded + " sound files loaded with " + SoundCache.activeSoundPlayers + " active SoundPlayer objects");
@@ -180,7 +177,8 @@ namespace CrewChiefV4.Audio
 
         public static void loadDriverNameSound(String name)
         {
-            if (allowCaching && singleSounds.ContainsKey(name))
+            // if the name is in the sortedAvailableDriverNames array then we have a sound file for it, so we can load it
+            if (allowCaching && sortedAvailableDriverNames.BinarySearch(name) >= 0)
             {
                 singleSounds[name].loadAndCache(true);
             }
