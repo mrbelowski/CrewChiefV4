@@ -169,6 +169,8 @@ namespace CrewChiefV4.Audio
             {
                 loadDriverNameSound(name);
             }
+            Console.WriteLine("loaded " + names.Count + " driver names There are now" +
+                SoundCache.currentSoundsLoaded + " sound files loaded with " + SoundCache.activeSoundPlayers + " active SoundPlayer objects");
         }
 
         public static void loadDriverNameSound(String name)
