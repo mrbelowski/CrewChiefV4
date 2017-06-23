@@ -171,7 +171,7 @@ namespace CrewChiefV4.Audio
                 loadedCount++;
                 loadDriverNameSound(name);
             }
-            Console.WriteLine("loaded " + loadedCount + " driver name sounds. There are now" +
+            Console.WriteLine("loaded " + loadedCount + " driver name sounds. There are now " +
                 SoundCache.currentSoundsLoaded + " sound files loaded with " + SoundCache.activeSoundPlayers + " active SoundPlayer objects");
         }
 
@@ -328,7 +328,6 @@ namespace CrewChiefV4.Audio
                 {
                     dynamicLoadedSounds.Remove(purged);
                 }
-                SoundCache.activeSoundPlayers = SoundCache.activeSoundPlayers - purgeCount;
                 Console.WriteLine("Purged " + purgedList.Count + " sounds, there are now " + SoundCache.activeSoundPlayers + " active SoundPlayer objects");
             }
         }
