@@ -143,7 +143,8 @@ namespace CrewChiefV4.Audio
                             {
                                 soundSet.loadAll();
                             }
-                            Console.WriteLine("Took " + (DateTime.Now - start).TotalMilliseconds + " ms to load voice sounds");
+                            Console.WriteLine("Took " + (DateTime.Now - start).TotalMilliseconds + " ms to load voice sounds, there are now " +
+                            SoundCache.currentSoundsLoaded + " loaded sound files with " + SoundCache.activeSoundPlayers + " active SoundPlayer objects");
                         }).Start();
                     }
                 }
