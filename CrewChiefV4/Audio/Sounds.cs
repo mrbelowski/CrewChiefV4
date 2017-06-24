@@ -19,7 +19,7 @@ namespace CrewChiefV4.Audio
         private double minSecondsBetweenPersonalisedMessages = (double)UserSettings.GetUserSettings().getInt("min_time_between_personalised_messages");
         public static Boolean eagerLoadSoundFiles = UserSettings.GetUserSettings().getBoolean("load_sound_files_on_startup");
         
-        private List<String> dynamicLoadedSounds = new List<String>();
+        private static List<String> dynamicLoadedSounds = new List<String>();
         public static Dictionary<String, SoundSet> soundSets = new Dictionary<String, SoundSet>();
         private static Dictionary<String, SingleSound> singleSounds = new Dictionary<String, SingleSound>();
         public static List<String> sortedAvailableDriverNames = new List<String>();
@@ -114,17 +114,21 @@ namespace CrewChiefV4.Audio
             this.useSwearyMessages = useSwearyMessages;
             SoundCache.allowCaching = allowCaching;
             DirectoryInfo[] soundsFolders = soundsFolder.GetDirectories();
-            foreach (DirectoryInfo soundFolder in soundsFolders) {
+            foreach (DirectoryInfo soundFolder in soundsFolders)
+            {
                 if (soundFolder.Name == "fx")
                 {
-                    // these are eagerly loaded, soundPlayers are created and they're always in the SoundPlayer cache
+                    // these are eagerly loaded on the main thread, soundPlayers are created and they're always in the SoundPlayer cache.
                     prepareFX(soundFolder);
                 }
                 else if (soundFolder.Name == "personalisations")
                 {
                     if (selectedPersonalisation != AudioPlayer.NO_PERSONALISATION_SELECTED)
                     {
-                        // these are eagerly loaded, soundPlayers are created and they're always in the SoundPlayer cache
+                        // these are eagerly loaded on the main thread, soundPlayers are created and they're always in the SoundPlayer cache.
+                        // If the number of prefixes and suffixes keeps growing this will need to be moved to a background thread but take care
+                        // to ensure the objects which hold the sounds are all created on the main thread, with only the file reading and 
+                        // SoundPlayer creation part done in the background (just like we do for voice messages).
                         preparePrefixesAndSuffixes(soundFolder, selectedPersonalisation);
                     }
                     else
@@ -169,8 +173,9 @@ namespace CrewChiefV4.Audio
                 }
                 else if (soundFolder.Name == "driver_names")
                 {
-                    prepareDriverNamesWithoutLoading(soundFolder);
-                    // these are lazy-loaded on session start
+                    // The folder of driver names is processed on the main thread and objects are created to hold the sounds, 
+                    // but the sound files are lazy-loaded on session start, along with the corresponding SoundPlayer objects.
+                    prepareDriverNamesWithoutLoading(soundFolder);                    
                 }                
             }
             Console.WriteLine("Finished preparing sounds cache, found " + singleSounds.Count + " driver names and " + soundSets.Count +
@@ -205,6 +210,10 @@ namespace CrewChiefV4.Audio
             if (allowCaching && sortedAvailableDriverNames.BinarySearch(name) >= 0)
             {
                 singleSounds[name].loadAndCache(true);
+                if (!SoundCache.dynamicLoadedSounds.Contains(name))
+                {
+                    SoundCache.dynamicLoadedSounds.Add(name);
+                }
             }
         }
 
