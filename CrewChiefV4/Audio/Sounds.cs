@@ -154,8 +154,8 @@ namespace CrewChiefV4.Audio
                                     soundSet.loadAll();
                                 }
                             }
-                            Console.WriteLine("Took " + (DateTime.Now - start).TotalSeconds.ToString("0.00") + " s to load voice sounds, there are now " +
-                            SoundCache.currentSoundsLoaded + " loaded sound files with " + SoundCache.activeSoundPlayers + " active SoundPlayer objects");
+                            Console.WriteLine("Took " + (DateTime.Now - start).TotalSeconds.ToString("0.00") + "s to lazy load remaining message sounds, there are now " +
+                            SoundCache.currentSoundsLoaded + " loaded message sounds with " + SoundCache.activeSoundPlayers + " active SoundPlayer objects");
                         }).Start();
                     }
                 }
@@ -165,8 +165,8 @@ namespace CrewChiefV4.Audio
                     // these are lazy-loaded on session start
                 }                
             }
-            Console.WriteLine("Finished preparing sounds cache, loaded " + singleSounds.Count + " single sounds and " + soundSets.Count +
-                " sound sets, loaded " + SoundCache.currentSoundsLoaded + " sound files with " + SoundCache.activeSoundPlayers + " active SoundPlayer objects");
+            Console.WriteLine("Finished preparing sounds cache, found " + singleSounds.Count + " driver names and " + soundSets.Count +
+                " sound sets. Loaded " + SoundCache.currentSoundsLoaded + " message sounds with " + SoundCache.activeSoundPlayers + " active SoundPlayer objects");
 
             if (prefixesAndSuffixesCount > 0)
             {
@@ -450,7 +450,7 @@ namespace CrewChiefV4.Audio
                     foreach (DirectoryInfo eventDetailFolder in eventDetailFolders)
                     {
                         String fullEventName = eventFolder.Name + "/" + eventDetailFolder.Name;
-                        SoundSet soundSet = new SoundSet(eventDetailFolder, this.useSwearyMessages, false, false, allowCaching, cachePermanently);
+                        SoundSet soundSet = new SoundSet(eventDetailFolder, this.useSwearyMessages, false, cachePermanently, allowCaching, cachePermanently);
                         if (soundSet.hasSounds)
                         {
                             sortedAvailableSounds.Add(fullEventName);
