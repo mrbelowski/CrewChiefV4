@@ -426,7 +426,7 @@ namespace CrewChiefV4.Events
                             {
                                 if (gapBehindStatus == GapStatus.INCREASING)
                                 {
-                                    OpponentData opponent = currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position - 1, false);
+                                    OpponentData opponent = currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position + 1, false);
                                     if (opponent != null)
                                     {
                                         audioPlayer.playMessage(new QueuedMessage("Timings/gap_behind",
