@@ -1420,6 +1420,26 @@ namespace CrewChiefV4.assetto
                 {
                     currentGameState.SessionData.GameTimeAtLastPositionBehindChange = currentGameState.SessionData.SessionRunningTime;
                 }
+
+                // get all the duplicate names
+                List<string> driversToBeProcessed = new List<string>();
+                List<string> duplicateNames = new List<string>();
+                for (int i = 0; i < shared.acsChief.numVehicles; i++)
+                {
+                    String participantName = getNameFromBytes(shared.acsChief.vehicle[i].driverName).ToLower();
+                    if (driversToBeProcessed.Contains(participantName))
+                    {
+                        if (!duplicateNames.Contains(participantName))
+                        {
+                            duplicateNames.Add(participantName);
+                        }
+                    }
+                    else
+                    {
+                        driversToBeProcessed.Add(participantName);
+                    }
+                }
+
                 for (int i = 0; i < shared.acsChief.numVehicles; i++)
                 {
                     acsVehicleInfo participantStruct = shared.acsChief.vehicle[i];
@@ -1427,12 +1447,13 @@ namespace CrewChiefV4.assetto
                     String participantName = getNameFromBytes(participantStruct.driverName).ToLower();
                     OpponentData currentOpponentData = getOpponentForName(currentGameState, participantName);
 
-                    if (i != 0 && participantName != null && participantName.Length > 0)
+                    if (i != 0 && participantName != null && participantName.Length > 0 && driversToBeProcessed.Contains(participantName))
                     {
                         if (currentOpponentData != null)
                         {
                             if (participantStruct.isConnected == 1)
                             {
+                                driversToBeProcessed.Remove(participantName);
                                 currentOpponentData.IsReallyDisconnectedCounter = 0;
                                 if (previousGameState != null)
                                 {
@@ -1621,8 +1642,10 @@ namespace CrewChiefV4.assetto
                                     }
                                 }
                             }
-                            else
+                            else if (!duplicateNames.Contains(participantName))
                             {
+                                // this drivers has disconnected, but only remove him from the OpponentData if he's not a duplicate
+                                driversToBeProcessed.Remove(participantName);
                                 currentOpponentData.IsActive = false;
                                 currentOpponentData.IsReallyDisconnectedCounter++;
                                 if (currentOpponentData.IsReallyDisconnectedCounter > 5)
