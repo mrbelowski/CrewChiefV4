@@ -284,6 +284,11 @@ namespace CrewChiefV4.Audio
                     else if (singleSounds.ContainsKey(soundName))
                     {
                         singleSound = singleSounds[soundName];
+                        if (dynamicLoadedSounds.Contains(soundName))
+                        {
+                            dynamicLoadedSounds.Remove(soundName);
+                        }
+                        dynamicLoadedSounds.Add(soundName);
                     }                    
                     if (singleSound != null)
                     {
