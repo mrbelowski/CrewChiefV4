@@ -139,9 +139,20 @@ namespace CrewChiefV4.Audio
                         {
                             DateTime start = DateTime.Now;
                             Thread.CurrentThread.IsBackground = true;
+                            // load the permanently cached sounds first, then the rest
                             foreach (SoundSet soundSet in soundSets.Values)
                             {
-                                soundSet.loadAll();
+                                if (soundSet.cachePermanently)
+                                {
+                                    soundSet.loadAll();
+                                }
+                            }
+                            foreach (SoundSet soundSet in soundSets.Values)
+                            {
+                                if (!soundSet.cachePermanently)
+                                {
+                                    soundSet.loadAll();
+                                }
                             }
                             Console.WriteLine("Took " + (DateTime.Now - start).TotalSeconds.ToString("0.00") + " s to load voice sounds, there are now " +
                             SoundCache.currentSoundsLoaded + " loaded sound files with " + SoundCache.activeSoundPlayers + " active SoundPlayer objects");
@@ -432,15 +443,14 @@ namespace CrewChiefV4.Audio
             DirectoryInfo[] eventFolders = voiceDirectory.GetDirectories();
             foreach (DirectoryInfo eventFolder in eventFolders)
             {
-                Boolean alwaysKeepCached = allowCaching && this.eventTypesToKeepCached.Contains(eventFolder.Name);
+                Boolean cachePermanently = allowCaching && this.eventTypesToKeepCached.Contains(eventFolder.Name);
                 try
                 {
                     DirectoryInfo[] eventDetailFolders = eventFolder.GetDirectories();
                     foreach (DirectoryInfo eventDetailFolder in eventDetailFolders)
                     {
                         String fullEventName = eventFolder.Name + "/" + eventDetailFolder.Name;
-                        SoundSet soundSet = new SoundSet(eventDetailFolder, this.useSwearyMessages, alwaysKeepCached && eagerLoadSoundFiles,
-                            alwaysKeepCached, allowCaching, alwaysKeepCached);
+                        SoundSet soundSet = new SoundSet(eventDetailFolder, this.useSwearyMessages, false, false, allowCaching, cachePermanently);
                         if (soundSet.hasSounds)
                         {
                             sortedAvailableSounds.Add(fullEventName);
