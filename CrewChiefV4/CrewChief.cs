@@ -534,6 +534,8 @@ namespace CrewChiefV4
                                         {
                                             speechRecogniser.addOpponentSpeechRecognition(usableDriverNames, enableDriverNames);
                                         }
+                                        // now load all the sound files for this set of driver names
+                                        SoundCache.loadDriverNameSounds(usableDriverNames);
                                     }
                                 }                                
                             }
