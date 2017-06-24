@@ -283,12 +283,15 @@ namespace CrewChiefV4.Audio
                     }
                     else if (singleSounds.ContainsKey(soundName))
                     {
-                        singleSound = singleSounds[soundName];
-                        if (dynamicLoadedSounds.Contains(soundName))
+                        if (!singleSound.cachePermanently)
                         {
-                            dynamicLoadedSounds.Remove(soundName);
+                            singleSound = singleSounds[soundName];
+                            if (dynamicLoadedSounds.Contains(soundName))
+                            {
+                                dynamicLoadedSounds.Remove(soundName);
+                            }
+                            dynamicLoadedSounds.Add(soundName);
                         }
-                        dynamicLoadedSounds.Add(soundName);
                     }                    
                     if (singleSound != null)
                     {
@@ -430,22 +433,30 @@ namespace CrewChiefV4.Audio
                 {
                     if (bleepFile.Name.StartsWith(alternate_prefix + "start") && !singleSounds.ContainsKey("start_bleep"))
                     {
-                        singleSounds.Add("start_bleep", new SingleSound(bleepFile.FullName, eagerLoadSoundFiles, allowCaching, allowCaching));
+                        SingleSound sound = new SingleSound(bleepFile.FullName, eagerLoadSoundFiles, allowCaching, allowCaching);
+                        sound.cachePermanently = true;
+                        singleSounds.Add("start_bleep", sound);
                         sortedAvailableSounds.Add("start_bleep");
                     }
                     else if (bleepFile.Name.StartsWith(alternate_prefix + "end") && !singleSounds.ContainsKey("end_bleep"))
                     {
-                        singleSounds.Add("end_bleep", new SingleSound(bleepFile.FullName, eagerLoadSoundFiles, allowCaching, allowCaching));
+                        SingleSound sound = new SingleSound(bleepFile.FullName, eagerLoadSoundFiles, allowCaching, allowCaching);
+                        sound.cachePermanently = true;
+                        singleSounds.Add("end_bleep", sound);
                         sortedAvailableSounds.Add("end_bleep");
                     }
                     else if (bleepFile.Name.StartsWith(alternate_prefix + "short_start") && !singleSounds.ContainsKey("short_start_bleep"))
                     {
-                        singleSounds.Add("short_start_bleep", new SingleSound(bleepFile.FullName, eagerLoadSoundFiles, allowCaching, allowCaching));
+                        SingleSound sound = new SingleSound(bleepFile.FullName, eagerLoadSoundFiles, allowCaching, allowCaching);
+                        sound.cachePermanently = true;
+                        singleSounds.Add("short_start_bleep", sound);
                         sortedAvailableSounds.Add("short_start_bleep");
                     }
                     else if (bleepFile.Name.StartsWith("listen_start") && !singleSounds.ContainsKey("listen_start_sound"))
                     {
-                        singleSounds.Add("listen_start_sound", new SingleSound(bleepFile.FullName, eagerLoadSoundFiles, allowCaching, allowCaching));
+                        SingleSound sound = new SingleSound(bleepFile.FullName, eagerLoadSoundFiles, allowCaching, allowCaching);
+                        sound.cachePermanently = true;
+                        singleSounds.Add("listen_start_sound", sound);
                         sortedAvailableSounds.Add("listen_start_sound");
                     }
                 }
@@ -787,6 +798,7 @@ namespace CrewChiefV4.Audio
         private Boolean allowCaching;
         private Boolean loadedSoundPlayer = false;
         private Boolean loadedFile = false;
+        public Boolean cachePermanently = false;
 
         public SoundSet prefixSoundSet = null;
         public SoundSet suffixSoundSet = null;
