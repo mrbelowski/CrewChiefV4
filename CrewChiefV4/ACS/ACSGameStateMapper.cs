@@ -1420,6 +1420,26 @@ namespace CrewChiefV4.assetto
                 {
                     currentGameState.SessionData.GameTimeAtLastPositionBehindChange = currentGameState.SessionData.SessionRunningTime;
                 }
+
+                // get all the duplicate names
+                List<string> namesToProcess = new List<string>();
+                List<string> duplicateNames = new List<string>();
+                for (int i = 0; i < shared.acsChief.numVehicles; i++)
+                {
+                    String participantName = getNameFromBytes(shared.acsChief.vehicle[i].driverName).ToLower();
+                    if (namesToProcess.Contains(participantName))
+                    {
+                        if (!duplicateNames.Contains(participantName))
+                        {
+                            duplicateNames.Add(participantName);
+                        }
+                    }
+                    else
+                    {
+                        namesToProcess.Add(participantName);
+                    }
+                }
+
                 for (int i = 0; i < shared.acsChief.numVehicles; i++)
                 {
                     acsVehicleInfo participantStruct = shared.acsChief.vehicle[i];
