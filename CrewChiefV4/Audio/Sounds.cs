@@ -19,7 +19,7 @@ namespace CrewChiefV4.Audio
         private double minSecondsBetweenPersonalisedMessages = (double)UserSettings.GetUserSettings().getInt("min_time_between_personalised_messages");
         public static Boolean eagerLoadSoundFiles = UserSettings.GetUserSettings().getBoolean("load_sound_files_on_startup");
         
-        private static List<String> dynamicLoadedSounds = new List<String>();
+        private static LinkedList<String> dynamicLoadedSounds = new LinkedList<String>();
         public static Dictionary<String, SoundSet> soundSets = new Dictionary<String, SoundSet>();
         private static Dictionary<String, SingleSound> singleSounds = new Dictionary<String, SingleSound>();
         public static List<String> sortedAvailableDriverNames = new List<String>();
@@ -210,10 +210,8 @@ namespace CrewChiefV4.Audio
             if (allowCaching && sortedAvailableDriverNames.BinarySearch(name) >= 0)
             {
                 singleSounds[name].loadAndCache(true);
-                if (!SoundCache.dynamicLoadedSounds.Contains(name))
-                {
-                    SoundCache.dynamicLoadedSounds.Add(name);
-                }
+                SoundCache.dynamicLoadedSounds.Remove(name);
+                SoundCache.dynamicLoadedSounds.AddLast(name);
             }
         }
 
@@ -274,11 +272,8 @@ namespace CrewChiefV4.Audio
                         singleSound = soundSet.getSingleSound(preferPersonalised);
                         if (!soundSet.cachePermanently)
                         {
-                            if (dynamicLoadedSounds.Contains(soundName))
-                            {
-                                dynamicLoadedSounds.Remove(soundName);
-                            }
-                            dynamicLoadedSounds.Add(soundName);
+                            SoundCache.dynamicLoadedSounds.Remove(soundName);
+                            SoundCache.dynamicLoadedSounds.AddLast(soundName);
                         }
                     }
                     else if (singleSounds.ContainsKey(soundName))
@@ -286,11 +281,8 @@ namespace CrewChiefV4.Audio
                         singleSound = singleSounds[soundName];
                         if (!singleSound.cachePermanently)
                         {
-                            if (dynamicLoadedSounds.Contains(soundName))
-                            {
-                                dynamicLoadedSounds.Remove(soundName);
-                            }
-                            dynamicLoadedSounds.Add(soundName);
+                            SoundCache.dynamicLoadedSounds.Remove(soundName);
+                            SoundCache.dynamicLoadedSounds.AddLast(soundName);
                         }
                     }                    
                     if (singleSound != null)
@@ -348,28 +340,26 @@ namespace CrewChiefV4.Audio
             if (SoundCache.activeSoundPlayers > maxCacheSize)
             {
                 int purgeCount = 0;
-                List<String> purgedList = new List<string>();
-                for (int i = 0; i < maxCacheSize && i < dynamicLoadedSounds.Count && i < purgeBlockSize; i++)
+                var soundToPurge = SoundCache.dynamicLoadedSounds.First;
+                while (soundToPurge != null && purgeCount <= purgeBlockSize)
                 {
-                    String soundToPurge = dynamicLoadedSounds[i];
-                    purgedList.Add(soundToPurge);
-                    if (soundSets.ContainsKey(soundToPurge))
+                    String soundToPurgeValue = soundToPurge.Value;
+                    if (soundSets.ContainsKey(soundToPurgeValue))
                     {
-                        purgeCount += soundSets[soundToPurge].UnLoadAll();
+                        purgeCount += soundSets[soundToPurgeValue].UnLoadAll();
                     }
-                    else if (singleSounds.ContainsKey(soundToPurge))
+                    else if (singleSounds.ContainsKey(soundToPurgeValue))
                     {
-                        if (singleSounds[soundToPurge].UnLoad())
+                        if (singleSounds[soundToPurgeValue].UnLoad())
                         {
                             purgeCount++;
                         }
                     }
+                    var nextSoundToPurge = soundToPurge.Next;
+                    SoundCache.dynamicLoadedSounds.Remove(soundToPurge);
+                    soundToPurge = nextSoundToPurge;
                 }
-                foreach (String purged in purgedList)
-                {
-                    dynamicLoadedSounds.Remove(purged);
-                }
-                Console.WriteLine("Purged " + purgedList.Count + " sounds, there are now " + SoundCache.activeSoundPlayers + " active SoundPlayer objects");
+                Console.WriteLine("Purged " + purgeCount + " sounds, there are now " + SoundCache.activeSoundPlayers + " active SoundPlayer objects");
             }
         }
 
