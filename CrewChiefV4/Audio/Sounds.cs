@@ -117,11 +117,14 @@ namespace CrewChiefV4.Audio
             foreach (DirectoryInfo soundFolder in soundsFolders) {
                 if (soundFolder.Name == "fx")
                 {
+                    // these are eagerly loaded, soundPlayers are created and they're always in the SoundPlayer cache
                     prepareFX(soundFolder);
                 }
-                else if (soundFolder.Name == "personalisations") {
+                else if (soundFolder.Name == "personalisations")
+                {
                     if (selectedPersonalisation != AudioPlayer.NO_PERSONALISATION_SELECTED)
                     {
+                        // these are eagerly loaded, soundPlayers are created and they're always in the SoundPlayer cache
                         preparePrefixesAndSuffixes(soundFolder, selectedPersonalisation);
                     }
                     else
@@ -131,8 +134,13 @@ namespace CrewChiefV4.Audio
                 }
                 else if (soundFolder.Name == "voice")
                 {
+                    // these are eagerly loaded on a background Thread. For frequently played sounds we create soundPlayers 
+                    // and hold them in the cache. For most sounds we just load the file(s) and create sound players when needed,
+                    // allowing them to be cached until evicted.
+
+                    // this creates empty sound objects:
                     prepareVoiceWithoutLoading(soundFolder);
-                    // now spawn a Thread to load the voices in the background
+                    // now spawn a Thread to load the sound files (and in some cases soundPlayers) in the background:
                     if (allowCaching && eagerLoadSoundFiles)
                     {
                         new Thread(() =>
@@ -450,6 +458,7 @@ namespace CrewChiefV4.Audio
                     foreach (DirectoryInfo eventDetailFolder in eventDetailFolders)
                     {
                         String fullEventName = eventFolder.Name + "/" + eventDetailFolder.Name;
+                        // if we're caching this sound set permanently, create the sound players immediately after the files are loaded
                         SoundSet soundSet = new SoundSet(eventDetailFolder, this.useSwearyMessages, false, cachePermanently, allowCaching, cachePermanently);
                         if (soundSet.hasSounds)
                         {
@@ -497,7 +506,7 @@ namespace CrewChiefV4.Audio
                     {
                         foreach (DirectoryInfo prefixesAndSuffixesFolder in prefixesAndSuffixesFolders[0].GetDirectories())
                         {
-                            // always keep the personalisations cached as they're reused frequently
+                            // always keep the personalisations cached as they're reused frequently, so create the sound players immediately after the files are loaded
                             SoundSet soundSet = new SoundSet(prefixesAndSuffixesFolder, this.useSwearyMessages, eagerLoadSoundFiles, allowCaching, allowCaching, true);
                             if (soundSet.hasSounds)
                             {
@@ -522,7 +531,7 @@ namespace CrewChiefV4.Audio
         private Boolean useSwearyMessages;
         public Boolean allowCaching;
         public Boolean loadFiles;
-        public Boolean loadSoundPlayers;
+        public Boolean createSoundPlayersImmediatelyAfterLoading;
         public Boolean cachePermanently;
         private Boolean initialised = false;
         public Boolean hasSounds = false;
@@ -533,13 +542,14 @@ namespace CrewChiefV4.Audio
         private List<int> indexes = null;
         private int indexesPosition = 0;
 
-        public SoundSet(DirectoryInfo soundFolder, Boolean useSwearyMessages, Boolean loadFiles, Boolean loadSoundPlayers, Boolean allowCaching, Boolean cachePermanently)
+        public SoundSet(DirectoryInfo soundFolder, Boolean useSwearyMessages, Boolean loadFiles, Boolean createSoundPlayersImmediatelyAfterLoading, 
+            Boolean allowCaching, Boolean cachePermanently)
         {
             this.soundsCount = 0;
             this.soundFolder = soundFolder;
             this.useSwearyMessages = useSwearyMessages;
             this.loadFiles = loadFiles;
-            this.loadSoundPlayers = loadSoundPlayers;
+            this.createSoundPlayersImmediatelyAfterLoading = createSoundPlayersImmediatelyAfterLoading;
             this.allowCaching = allowCaching;
             this.cachePermanently = allowCaching && cachePermanently;
             initialise();
@@ -562,11 +572,11 @@ namespace CrewChiefV4.Audio
         {
             foreach (SingleSound sound in singleSoundsNoPrefixOrSuffix)
             {
-                sound.loadAndCache(loadSoundPlayers);
+                sound.loadAndCache(createSoundPlayersImmediatelyAfterLoading);
             }
             foreach (SingleSound sound in singleSoundsWithPrefixOrSuffix)
             {
-                sound.loadAndCache(loadSoundPlayers);
+                sound.loadAndCache(createSoundPlayersImmediatelyAfterLoading);
             }
         }
 
@@ -594,7 +604,7 @@ namespace CrewChiefV4.Audio
                                         {
                                             hasPrefixOrSuffix = true;
                                             hasSounds = true;
-                                            SingleSound singleSound = new SingleSound(soundFile.FullName, this.loadFiles, this.loadSoundPlayers, this.allowCaching);
+                                            SingleSound singleSound = new SingleSound(soundFile.FullName, this.loadFiles, this.createSoundPlayersImmediatelyAfterLoading, this.allowCaching);
                                             singleSound.isSweary = isSweary;
                                             if (soundFile.Name.Contains(SoundCache.OPTIONAL_SUFFIX_IDENTIFIER) || soundFile.Name.Contains(SoundCache.REQUIRED_SUFFIX_IDENTIFIER))
                                             {
@@ -614,7 +624,7 @@ namespace CrewChiefV4.Audio
                                 if (isOptional)
                                 {
                                     hasSounds = true;
-                                    SingleSound singleSound = new SingleSound(soundFile.FullName, this.loadFiles, this.loadSoundPlayers, this.allowCaching);
+                                    SingleSound singleSound = new SingleSound(soundFile.FullName, this.loadFiles, this.createSoundPlayersImmediatelyAfterLoading, this.allowCaching);
                                     singleSound.isSweary = isSweary;
                                     singleSoundsNoPrefixOrSuffix.Add(singleSound);
                                     soundsCount++;
@@ -623,7 +633,7 @@ namespace CrewChiefV4.Audio
                             else
                             {
                                 hasSounds = true;
-                                SingleSound singleSound = new SingleSound(soundFile.FullName, this.loadFiles, this.loadSoundPlayers, this.allowCaching);
+                                SingleSound singleSound = new SingleSound(soundFile.FullName, this.loadFiles, this.createSoundPlayersImmediatelyAfterLoading, this.allowCaching);
                                 singleSound.isSweary = isSweary;
                                 singleSoundsNoPrefixOrSuffix.Add(singleSound);
                                 soundsCount++;
@@ -778,13 +788,13 @@ namespace CrewChiefV4.Audio
             this.ttsString = textToRender;
         }
 
-        public SingleSound(String fullPath, Boolean loadFile, Boolean loadSoundPlayer, Boolean allowCaching)
+        public SingleSound(String fullPath, Boolean loadFile, Boolean createSoundPlayerImmediatelyAfterLoading, Boolean allowCaching)
         {
             this.allowCaching = allowCaching;
             this.fullPath = fullPath;
             if (loadFile && allowCaching)
             {
-                loadAndCache(loadSoundPlayer);
+                loadAndCache(createSoundPlayerImmediatelyAfterLoading);
             }
         }
 
