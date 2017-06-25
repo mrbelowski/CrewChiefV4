@@ -526,6 +526,7 @@
 		{
 			"carClassEnum": "TC1",
 			"raceroomClassIds": [4517, 6036, 6309],
+			"rf2ClassNames": ["Lada Vesta", "Honda Civic WTCC-TC1", "Chevrolet Cruze TC1", "Citroen C-Elysee", "Volvo S60 TC1"],
 			"timesInHundredths": true,
 			"enabledMessageTypes": "ALL"
 		},

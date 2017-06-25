@@ -321,6 +321,10 @@ namespace CrewChiefV4
                         sre.LoadGrammar(newOpponentGrammar);
                         opponentGrammarList.Add(newOpponentGrammar);
                     }
+                    // This method is called when a new driver appears mid-session. We need to load the sound file for this new driver
+                    // so do it here - nasty nasty hack, need to refactor this. The alternative is to call
+                    // SoundCache.loadDriverNameSound in each of mappers when a new driver is added.
+                    SoundCache.loadDriverNameSound(usableName);
                     driverNamesInUse.Add(rawDriverName);
                 }
             }

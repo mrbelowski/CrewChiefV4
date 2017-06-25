@@ -157,7 +157,7 @@ namespace CrewChiefV4
         {
             this.messageName = compoundMessageIdentifier + messageName;
             this.messageFolders = getMessageFolders(messageFragments, false);
-            this.dueTime = (GameStateData.CurrentTime.Ticks / TimeSpan.TicksPerMillisecond) + (secondsDelay * 1000) + updateInterval;
+            this.dueTime = secondsDelay == 0 ? 0 : (GameStateData.CurrentTime.Ticks / TimeSpan.TicksPerMillisecond) + (secondsDelay * 1000) + updateInterval;
             this.abstractEvent = abstractEvent;
         }
 
@@ -188,7 +188,7 @@ namespace CrewChiefV4
                         messageName + " can't be played");
                 }
             }
-            this.dueTime = (GameStateData.CurrentTime.Ticks / TimeSpan.TicksPerMillisecond) + (secondsDelay * 1000) + updateInterval;
+            this.dueTime = secondsDelay == 0 ? 0 : (GameStateData.CurrentTime.Ticks / TimeSpan.TicksPerMillisecond) + (secondsDelay * 1000) + updateInterval;
             this.abstractEvent = abstractEvent;
         }
 
@@ -204,7 +204,7 @@ namespace CrewChiefV4
             List<MessageFragment> messageFragments = new List<MessageFragment>();
             messageFragments.Add(MessageFragment.Text(message));
             this.messageFolders = getMessageFolders(messageFragments, false);
-            this.dueTime = (GameStateData.CurrentTime.Ticks / TimeSpan.TicksPerMillisecond) + (secondsDelay * 1000) + updateInterval;
+            this.dueTime = secondsDelay == 0 ? 0 : (GameStateData.CurrentTime.Ticks / TimeSpan.TicksPerMillisecond) + (secondsDelay * 1000) + updateInterval;
             this.abstractEvent = abstractEvent;
         }
 
@@ -213,7 +213,7 @@ namespace CrewChiefV4
             this.messageName = compoundMessageIdentifier + messageName;
             this.delayedMessageEvent = delayedMessageEvent;
             this.delayMessageResolution = true;
-            this.dueTime = (GameStateData.CurrentTime.Ticks / TimeSpan.TicksPerMillisecond) + (secondsDelay * 1000) + updateInterval;
+            this.dueTime = secondsDelay == 0 ? 0 : (GameStateData.CurrentTime.Ticks / TimeSpan.TicksPerMillisecond) + (secondsDelay * 1000) + updateInterval;
             this.delayMessageResolution = true;
             this.abstractEvent = abstractEvent;
         }
@@ -244,8 +244,8 @@ namespace CrewChiefV4
                 switch (messageFragment.type)
                 {
                     case FragmentType.Text:
-                        if (messageFragment.text.StartsWith(AudioPlayer.PAUSE_ID) || SoundCache.availableSounds.Contains(messageFragment.text) ||
-                            SoundCache.availableDriverNames.Contains(messageFragment.text))
+                        if (messageFragment.text.StartsWith(AudioPlayer.PAUSE_ID) || SoundCache.sortedAvailableSounds.BinarySearch(messageFragment.text) >= 0 ||
+                            SoundCache.sortedAvailableDriverNames.BinarySearch(messageFragment.text) >= 0)
                         {
                             messages.Add(messageFragment.text);
                         }
@@ -269,7 +269,7 @@ namespace CrewChiefV4
                             {
                                 foreach (String timeFolder in timeFolders)
                                 {
-                                    if (!timeFolder.StartsWith(AudioPlayer.PAUSE_ID) && !SoundCache.availableSounds.Contains(timeFolder))
+                                    if (!timeFolder.StartsWith(AudioPlayer.PAUSE_ID) && SoundCache.sortedAvailableSounds.BinarySearch(timeFolder) < 0)
                                     {
                                         canBePlayed = false;
                                         break;
@@ -289,7 +289,7 @@ namespace CrewChiefV4
                         if (messageFragment.opponent != null)
                         {
                             String usableName = DriverNameHelper.getUsableDriverName(messageFragment.opponent.DriverRawName);
-                            if (SoundCache.availableDriverNames.Contains(usableName))
+                            if (SoundCache.sortedAvailableDriverNames.BinarySearch(usableName) >= 0)
                             {
                                 messages.Add(usableName);
                                 canBePlayed = true;
@@ -314,7 +314,7 @@ namespace CrewChiefV4
                             {
                                 foreach (String integerFolder in integerFolders)
                                 {
-                                    if (!integerFolder.StartsWith(AudioPlayer.PAUSE_ID) && !SoundCache.availableSounds.Contains(integerFolder))
+                                    if (!integerFolder.StartsWith(AudioPlayer.PAUSE_ID) && SoundCache.sortedAvailableSounds.BinarySearch(integerFolder) < 0)
                                     {
                                         canBePlayed = false;
                                         break;

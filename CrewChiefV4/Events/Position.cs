@@ -185,7 +185,7 @@ namespace CrewChiefV4.Events
                     // seems like belt and braces, but as Raceroom names aren't unique we need to double check a pass actually happened here:
                     if (frequencyOfOvertakingMessages > 0 && currentOpponentAheadKey != opponentAheadKey)
                     {
-                        if (currentGameState.SessionData.CurrentLapIsValid && !currentGameState.PitData.InPitlane &&
+                        if (currentOpponentBehindKey != null &&currentGameState.SessionData.CurrentLapIsValid && !currentGameState.PitData.InPitlane &&
                             currentOpponentBehindKey == opponentAheadKey && isPassMessageCandidate(gapsAhead, passCheckSamplesToCheck, minAverageGapForPassMessage))
                         {
                             OpponentData carWeJustPassed = currentGameState.OpponentData[currentOpponentBehindKey];
@@ -205,7 +205,8 @@ namespace CrewChiefV4.Events
                     }
                     if (frequencyOfBeingOvertakenMessages > 0 && opponentBehindKey != currentOpponentBehindKey)
                     {
-                        if (!currentGameState.PitData.InPitlane && currentOpponentAheadKey == opponentBehindKey && isPassMessageCandidate(gapsBehind, beingPassedCheckSamplesToCheck, minAverageGapForBeingPassedMessage))
+                        if (currentOpponentAheadKey != null && !currentGameState.PitData.InPitlane && currentOpponentAheadKey == opponentBehindKey && 
+                            isPassMessageCandidate(gapsBehind, beingPassedCheckSamplesToCheck, minAverageGapForBeingPassedMessage))
                         {
                             // TODO: check if we need to do a pit check here - don't think so
                             OpponentData carThatJustPassedUs = currentGameState.OpponentData[currentOpponentAheadKey];
@@ -448,7 +449,7 @@ namespace CrewChiefV4.Events
                     return MessageContents(folderLast);
                 }
             }
-            else if (SoundCache.availableSounds.Contains(folderDriverPositionIntro))
+            else if (SoundCache.sortedAvailableSounds.BinarySearch(folderDriverPositionIntro) >= 0)
             {
                 return MessageContents(folderDriverPositionIntro, folderStub + this.currentPosition);
             }
@@ -472,7 +473,7 @@ namespace CrewChiefV4.Events
                 }
                 else if (currentPosition > 0)
                 {
-                    if (SoundCache.availableSounds.Contains(folderDriverPositionIntro))
+                    if (SoundCache.sortedAvailableSounds.BinarySearch(folderDriverPositionIntro) >= 0)
                     {
                         audioPlayer.playMessageImmediately(new QueuedMessage("position", MessageContents(folderDriverPositionIntro, folderStub + currentPosition), 0, this));
                     }
