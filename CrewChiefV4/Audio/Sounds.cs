@@ -19,20 +19,21 @@ namespace CrewChiefV4.Audio
         private double minSecondsBetweenPersonalisedMessages = (double)UserSettings.GetUserSettings().getInt("min_time_between_personalised_messages");
         public static Boolean eagerLoadSoundFiles = UserSettings.GetUserSettings().getBoolean("load_sound_files_on_startup");
         
-        private List<String> dynamicLoadedSounds = new List<String>();
+        private static LinkedList<String> dynamicLoadedSounds = new LinkedList<String>();
         public static Dictionary<String, SoundSet> soundSets = new Dictionary<String, SoundSet>();
-        private Dictionary<String, SingleSound> singleSounds = new Dictionary<String, SingleSound>();
-        public static List<String> availableDriverNames = new List<String>();
-        public static List<String> availableSounds = new List<String>();
-        public static List<String> availablePrefixesAndSuffixes = new List<String>();
+        private static Dictionary<String, SingleSound> singleSounds = new Dictionary<String, SingleSound>();
+        public static List<String> sortedAvailableDriverNames = new List<String>();
+        public static List<String> sortedAvailableSounds = new List<String>();
+        public static List<String> sortedAvailablePrefixesAndSuffixes = new List<String>();
         private Boolean useSwearyMessages;
-        private Boolean allowCaching;
+        private static Boolean allowCaching;
         private String[] eventTypesToKeepCached;
         private int maxCacheSize = 600;
         private int purgeBlockSize = 100;
-        private int currentLoadedCount;
+        public static int currentSoundsLoaded;
+        public static int activeSoundPlayers;
         public static int prefixesAndSuffixesCount = 0;
-
+        
         public static String OPTIONAL_PREFIX_IDENTIFIER = "op_prefix";
         public static String OPTIONAL_SUFFIX_IDENTIFIER = "op_suffix";
         public static String REQUIRED_PREFIX_IDENTIFIER = "rq_prefix";
@@ -107,19 +108,27 @@ namespace CrewChiefV4.Audio
                     useTTS = false;
                 }
             }
-            this.currentLoadedCount = 0;
+            SoundCache.currentSoundsLoaded = 0;
+            SoundCache.activeSoundPlayers = 0;
             this.eventTypesToKeepCached = eventTypesToKeepCached;
             this.useSwearyMessages = useSwearyMessages;
-            this.allowCaching = allowCaching;
+            SoundCache.allowCaching = allowCaching;
             DirectoryInfo[] soundsFolders = soundsFolder.GetDirectories();
-            foreach (DirectoryInfo soundFolder in soundsFolders) {
+            foreach (DirectoryInfo soundFolder in soundsFolders)
+            {
                 if (soundFolder.Name == "fx")
                 {
+                    // these are eagerly loaded on the main thread, soundPlayers are created and they're always in the SoundPlayer cache.
                     prepareFX(soundFolder);
                 }
-                else if (soundFolder.Name == "personalisations") {
+                else if (soundFolder.Name == "personalisations")
+                {
                     if (selectedPersonalisation != AudioPlayer.NO_PERSONALISATION_SELECTED)
                     {
+                        // these are eagerly loaded on the main thread, soundPlayers are created and they're always in the SoundPlayer cache.
+                        // If the number of prefixes and suffixes keeps growing this will need to be moved to a background thread but take care
+                        // to ensure the objects which hold the sounds are all created on the main thread, with only the file reading and 
+                        // SoundPlayer creation part done in the background (just like we do for voice messages).
                         preparePrefixesAndSuffixes(soundFolder, selectedPersonalisation);
                     }
                     else
@@ -129,19 +138,80 @@ namespace CrewChiefV4.Audio
                 }
                 else if (soundFolder.Name == "voice")
                 {
-                    prepareVoice(soundFolder);
+                    // these are eagerly loaded on a background Thread. For frequently played sounds we create soundPlayers 
+                    // and hold them in the cache. For most sounds we just load the file(s) and create sound players when needed,
+                    // allowing them to be cached until evicted.
+
+                    // this creates empty sound objects:
+                    prepareVoiceWithoutLoading(soundFolder);
+                    // now spawn a Thread to load the sound files (and in some cases soundPlayers) in the background:
+                    if (allowCaching && eagerLoadSoundFiles)
+                    {
+                        new Thread(() =>
+                        {
+                            DateTime start = DateTime.Now;
+                            Thread.CurrentThread.IsBackground = true;
+                            // load the permanently cached sounds first, then the rest
+                            foreach (SoundSet soundSet in soundSets.Values)
+                            {
+                                if (soundSet.cachePermanently)
+                                {
+                                    soundSet.loadAll();
+                                }
+                            }
+                            foreach (SoundSet soundSet in soundSets.Values)
+                            {
+                                if (!soundSet.cachePermanently)
+                                {
+                                    soundSet.loadAll();
+                                }
+                            }
+                            Console.WriteLine("Took " + (DateTime.Now - start).TotalSeconds.ToString("0.00") + "s to lazy load remaining message sounds, there are now " +
+                            SoundCache.currentSoundsLoaded + " loaded message sounds with " + SoundCache.activeSoundPlayers + " active SoundPlayer objects");
+                        }).Start();
+                    }
                 }
                 else if (soundFolder.Name == "driver_names")
                 {
-                    prepareDriverNames(soundFolder);
+                    // The folder of driver names is processed on the main thread and objects are created to hold the sounds, 
+                    // but the sound files are lazy-loaded on session start, along with the corresponding SoundPlayer objects.
+                    prepareDriverNamesWithoutLoading(soundFolder);                    
                 }                
             }
-            Console.WriteLine("Finished preparing sounds cache, loaded " + singleSounds.Count + " single sounds and " + soundSets.Count + 
-                " sound sets, with " + currentLoadedCount + " active SoundPlayer objects");
+            Console.WriteLine("Finished preparing sounds cache, found " + singleSounds.Count + " driver names and " + soundSets.Count +
+                " sound sets. Loaded " + SoundCache.currentSoundsLoaded + " message sounds with " + SoundCache.activeSoundPlayers + " active SoundPlayer objects");
 
             if (prefixesAndSuffixesCount > 0)
             {
                 Console.WriteLine(prefixesAndSuffixesCount + " sounds have personalisations");
+            }
+        }
+
+        public static void loadDriverNameSounds(List<String> names)
+        {
+            new Thread(() =>
+            {
+                int loadedCount = 0;
+                DateTime start = DateTime.Now;
+                foreach (String name in names)
+                {
+                    loadedCount++;
+                    loadDriverNameSound(name);
+                }
+                Console.WriteLine("Took " + (DateTime.Now - start).TotalSeconds.ToString("0.00") + " seconds to load " + 
+                    loadedCount + " driver name sounds. There are now " + SoundCache.currentSoundsLoaded + 
+                    " sound files loaded with " + SoundCache.activeSoundPlayers + " active SoundPlayer objects");
+            }).Start();            
+        }
+
+        public static void loadDriverNameSound(String name)
+        {
+            // if the name is in the sortedAvailableDriverNames array then we have a sound file for it, so we can load it
+            if (allowCaching && sortedAvailableDriverNames.BinarySearch(name) >= 0)
+            {
+                singleSounds[name].loadAndCache(true);
+                SoundCache.dynamicLoadedSounds.Remove(name);
+                SoundCache.dynamicLoadedSounds.AddLast(name);
             }
         }
 
@@ -200,18 +270,20 @@ namespace CrewChiefV4.Audio
                     {
                         SoundSet soundSet = soundSets[soundName];
                         singleSound = soundSet.getSingleSound(preferPersonalised);
-                        if (!soundSet.keepCached)
+                        if (!soundSet.cachePermanently)
                         {
-                            if (dynamicLoadedSounds.Contains(soundName))
-                            {
-                                dynamicLoadedSounds.Remove(soundName);
-                            }
-                            dynamicLoadedSounds.Add(soundName);
+                            SoundCache.dynamicLoadedSounds.Remove(soundName);
+                            SoundCache.dynamicLoadedSounds.AddLast(soundName);
                         }
                     }
                     else if (singleSounds.ContainsKey(soundName))
                     {
                         singleSound = singleSounds[soundName];
+                        if (!singleSound.cachePermanently)
+                        {
+                            SoundCache.dynamicLoadedSounds.Remove(soundName);
+                            SoundCache.dynamicLoadedSounds.AddLast(soundName);
+                        }
                     }                    
                     if (singleSound != null)
                     {
@@ -250,10 +322,7 @@ namespace CrewChiefV4.Audio
                     }
                     else
                     {
-                        if (singleSound.Play())
-                        {
-                            currentLoadedCount++;
-                        }
+                        singleSound.Play();
                     }
                 }
             }
@@ -268,32 +337,29 @@ namespace CrewChiefV4.Audio
 
         public void ExpireCachedSounds()
         {
-            if (currentLoadedCount > maxCacheSize)
+            if (SoundCache.activeSoundPlayers > maxCacheSize)
             {
                 int purgeCount = 0;
-                List<String> purgedList = new List<string>();
-                for (int i = 0; i < maxCacheSize && i < dynamicLoadedSounds.Count && i < purgeBlockSize; i++)
+                var soundToPurge = SoundCache.dynamicLoadedSounds.First;
+                while (soundToPurge != null && purgeCount <= purgeBlockSize)
                 {
-                    String soundToPurge = dynamicLoadedSounds[i];
-                    purgedList.Add(soundToPurge);
-                    if (soundSets.ContainsKey(soundToPurge))
+                    String soundToPurgeValue = soundToPurge.Value;
+                    if (soundSets.ContainsKey(soundToPurgeValue))
                     {
-                        purgeCount += soundSets[soundToPurge].UnLoadAll();
+                        purgeCount += soundSets[soundToPurgeValue].UnLoadAll();
                     }
-                    else if (singleSounds.ContainsKey(soundToPurge))
+                    else if (singleSounds.ContainsKey(soundToPurgeValue))
                     {
-                        if (singleSounds[soundToPurge].UnLoad())
+                        if (singleSounds[soundToPurgeValue].UnLoad())
                         {
                             purgeCount++;
                         }
                     }
+                    var nextSoundToPurge = soundToPurge.Next;
+                    SoundCache.dynamicLoadedSounds.Remove(soundToPurge);
+                    soundToPurge = nextSoundToPurge;
                 }
-                foreach (String purged in purgedList)
-                {
-                    dynamicLoadedSounds.Remove(purged);
-                }
-                currentLoadedCount = currentLoadedCount - purgeCount;
-                Console.WriteLine("Purged " + purgedList.Count + " sounds, there are now " + currentLoadedCount + " active SoundPlayer objects");
+                Console.WriteLine("Purged " + purgeCount + " sounds, there are now " + SoundCache.activeSoundPlayers + " active SoundPlayer objects");
             }
         }
 
@@ -357,67 +423,62 @@ namespace CrewChiefV4.Audio
                 {
                     if (bleepFile.Name.StartsWith(alternate_prefix + "start") && !singleSounds.ContainsKey("start_bleep"))
                     {
-                        if (allowCaching)
-                        {
-                            currentLoadedCount++;
-                        }
-                        singleSounds.Add("start_bleep", new SingleSound(bleepFile.FullName, this.allowCaching, this.allowCaching, this.allowCaching));
-                        availableSounds.Add("start_bleep");
+                        SingleSound sound = new SingleSound(bleepFile.FullName, eagerLoadSoundFiles, allowCaching, allowCaching);
+                        sound.cachePermanently = true;
+                        singleSounds.Add("start_bleep", sound);
+                        sortedAvailableSounds.Add("start_bleep");
                     }
                     else if (bleepFile.Name.StartsWith(alternate_prefix + "end") && !singleSounds.ContainsKey("end_bleep"))
                     {
-                        if (allowCaching)
-                        {
-                            currentLoadedCount++;
-                        } 
-                        singleSounds.Add("end_bleep", new SingleSound(bleepFile.FullName, this.allowCaching, this.allowCaching, this.allowCaching));
-                        availableSounds.Add("end_bleep");
+                        SingleSound sound = new SingleSound(bleepFile.FullName, eagerLoadSoundFiles, allowCaching, allowCaching);
+                        sound.cachePermanently = true;
+                        singleSounds.Add("end_bleep", sound);
+                        sortedAvailableSounds.Add("end_bleep");
                     }
                     else if (bleepFile.Name.StartsWith(alternate_prefix + "short_start") && !singleSounds.ContainsKey("short_start_bleep"))
                     {
-                        if (allowCaching)
-                        {
-                            currentLoadedCount++;
-                        } 
-                        singleSounds.Add("short_start_bleep", new SingleSound(bleepFile.FullName, this.allowCaching, this.allowCaching, this.allowCaching));
-                        availableSounds.Add("short_start_bleep");
+                        SingleSound sound = new SingleSound(bleepFile.FullName, eagerLoadSoundFiles, allowCaching, allowCaching);
+                        sound.cachePermanently = true;
+                        singleSounds.Add("short_start_bleep", sound);
+                        sortedAvailableSounds.Add("short_start_bleep");
                     }
                     else if (bleepFile.Name.StartsWith("listen_start") && !singleSounds.ContainsKey("listen_start_sound"))
                     {
-                        if (allowCaching)
-                        {
-                            currentLoadedCount++;
-                        } 
-                        singleSounds.Add("listen_start_sound", new SingleSound(bleepFile.FullName, this.allowCaching, this.allowCaching, this.allowCaching));
-                        availableSounds.Add("listen_start_sound");
+                        SingleSound sound = new SingleSound(bleepFile.FullName, eagerLoadSoundFiles, allowCaching, allowCaching);
+                        sound.cachePermanently = true;
+                        singleSounds.Add("listen_start_sound", sound);
+                        sortedAvailableSounds.Add("listen_start_sound");
                     }
                 }
             }
+            sortedAvailableSounds.Sort();
             Console.WriteLine("Prepare sound effects completed");
         }
 
-        private void prepareVoice(DirectoryInfo voiceDirectory)
+        private void loadVoices()
+        {
+                       
+        }
+
+        private void prepareVoiceWithoutLoading(DirectoryInfo voiceDirectory)
         {
             Console.WriteLine("Preparing voice messages");
             DirectoryInfo[] eventFolders = voiceDirectory.GetDirectories();
             foreach (DirectoryInfo eventFolder in eventFolders)
             {
-                Boolean alwaysKeepCached = this.allowCaching && this.eventTypesToKeepCached.Contains(eventFolder.Name);
+                Boolean cachePermanently = allowCaching && this.eventTypesToKeepCached.Contains(eventFolder.Name);
                 try
                 {
                     DirectoryInfo[] eventDetailFolders = eventFolder.GetDirectories();
                     foreach (DirectoryInfo eventDetailFolder in eventDetailFolders)
                     {
                         String fullEventName = eventFolder.Name + "/" + eventDetailFolder.Name;
-                        SoundSet soundSet = new SoundSet(eventDetailFolder, this.useSwearyMessages, alwaysKeepCached, this.allowCaching);
+                        // if we're caching this sound set permanently, create the sound players immediately after the files are loaded
+                        SoundSet soundSet = new SoundSet(eventDetailFolder, this.useSwearyMessages, false, cachePermanently, allowCaching, cachePermanently);
                         if (soundSet.hasSounds)
                         {
-                            availableSounds.Add(fullEventName);
+                            sortedAvailableSounds.Add(fullEventName);
                             soundSets.Add(fullEventName, soundSet);
-                            if (alwaysKeepCached)
-                            {
-                                currentLoadedCount += soundSet.soundsCount;
-                            }
                         }
                     }
                 }
@@ -426,10 +487,11 @@ namespace CrewChiefV4.Audio
                     Console.WriteLine("Unable to find events folder");
                 }
             }
+            sortedAvailableSounds.Sort();
             Console.WriteLine("Prepare voice message completed");
         }
 
-        private void prepareDriverNames(DirectoryInfo driverNamesDirectory)
+        private void prepareDriverNamesWithoutLoading(DirectoryInfo driverNamesDirectory)
         {
             Console.WriteLine("Preparing driver names");
             FileInfo[] driverNameFiles = driverNamesDirectory.GetFiles();
@@ -438,10 +500,11 @@ namespace CrewChiefV4.Audio
                 if (driverNameFile.Name.EndsWith(".wav"))
                 {                    
                     String name = driverNameFile.Name.ToLower().Split(new[] { ".wav" }, StringSplitOptions.None)[0];
-                    singleSounds.Add(name, new SingleSound(driverNameFile.FullName, false, false, this.allowCaching));
-                    availableDriverNames.Add(name);
+                    singleSounds.Add(name, new SingleSound(driverNameFile.FullName, false, false, allowCaching));
+                    sortedAvailableDriverNames.Add(name);
                 }
             }
+            sortedAvailableDriverNames.Sort();
             Console.WriteLine("Prepare driver names completed");
         }
 
@@ -458,23 +521,19 @@ namespace CrewChiefV4.Audio
                     {
                         foreach (DirectoryInfo prefixesAndSuffixesFolder in prefixesAndSuffixesFolders[0].GetDirectories())
                         {
-                            Boolean alwaysKeepCached = this.allowCaching && this.eventTypesToKeepCached.Contains(prefixesAndSuffixesFolder.Name);
-
-                            SoundSet soundSet = new SoundSet(prefixesAndSuffixesFolder, this.useSwearyMessages, alwaysKeepCached, this.allowCaching);
+                            // always keep the personalisations cached as they're reused frequently, so create the sound players immediately after the files are loaded
+                            SoundSet soundSet = new SoundSet(prefixesAndSuffixesFolder, this.useSwearyMessages, eagerLoadSoundFiles, allowCaching, allowCaching, true);
                             if (soundSet.hasSounds)
                             {
-                                availablePrefixesAndSuffixes.Add(prefixesAndSuffixesFolder.Name);
+                                sortedAvailablePrefixesAndSuffixes.Add(prefixesAndSuffixesFolder.Name);
                                 soundSets.Add(prefixesAndSuffixesFolder.Name, soundSet);
-                                if (alwaysKeepCached)
-                                {
-                                    currentLoadedCount += soundSet.soundsCount;
-                                }
                             }
                         }
                     }
                     break;
                 }
             }
+            sortedAvailablePrefixesAndSuffixes.Sort();
             Console.WriteLine("Prepare personalisations completed");
         }
     }
@@ -485,8 +544,10 @@ namespace CrewChiefV4.Audio
         private List<SingleSound> singleSoundsWithPrefixOrSuffix = new List<SingleSound>();
         private DirectoryInfo soundFolder;
         private Boolean useSwearyMessages;
-        public Boolean keepCached;
-        private Boolean allowCaching;
+        public Boolean allowCaching;
+        public Boolean loadFiles;
+        public Boolean createSoundPlayersImmediatelyAfterLoading;
+        public Boolean cachePermanently;
         private Boolean initialised = false;
         public Boolean hasSounds = false;
         public int soundsCount;
@@ -496,13 +557,16 @@ namespace CrewChiefV4.Audio
         private List<int> indexes = null;
         private int indexesPosition = 0;
 
-        public SoundSet(DirectoryInfo soundFolder, Boolean useSwearyMessages, Boolean keepCached, Boolean allowCaching)
+        public SoundSet(DirectoryInfo soundFolder, Boolean useSwearyMessages, Boolean loadFiles, Boolean createSoundPlayersImmediatelyAfterLoading, 
+            Boolean allowCaching, Boolean cachePermanently)
         {
             this.soundsCount = 0;
             this.soundFolder = soundFolder;
             this.useSwearyMessages = useSwearyMessages;
+            this.loadFiles = loadFiles;
+            this.createSoundPlayersImmediatelyAfterLoading = createSoundPlayersImmediatelyAfterLoading;
             this.allowCaching = allowCaching;
-            this.keepCached = keepCached;
+            this.cachePermanently = allowCaching && cachePermanently;
             initialise();
         }
 
@@ -516,6 +580,18 @@ namespace CrewChiefV4.Audio
                 int value = list[k];
                 list[k] = list[n];
                 list[n] = value;
+            }
+        }
+
+        public void loadAll()
+        {
+            foreach (SingleSound sound in singleSoundsNoPrefixOrSuffix)
+            {
+                sound.loadAndCache(createSoundPlayersImmediatelyAfterLoading);
+            }
+            foreach (SingleSound sound in singleSoundsWithPrefixOrSuffix)
+            {
+                sound.loadAndCache(createSoundPlayersImmediatelyAfterLoading);
             }
         }
 
@@ -534,7 +610,7 @@ namespace CrewChiefV4.Audio
                                 soundFile.Name.Contains(SoundCache.OPTIONAL_PREFIX_IDENTIFIER) || soundFile.Name.Contains(SoundCache.OPTIONAL_PREFIX_IDENTIFIER))
                             {
                                 Boolean isOptional = soundFile.Name.Contains(SoundCache.OPTIONAL_PREFIX_IDENTIFIER) || soundFile.Name.Contains(SoundCache.OPTIONAL_SUFFIX_IDENTIFIER);
-                                foreach (String prefixSuffixName in SoundCache.availablePrefixesAndSuffixes)
+                                foreach (String prefixSuffixName in SoundCache.sortedAvailablePrefixesAndSuffixes)
                                 {
                                     if (soundFile.Name.Contains(prefixSuffixName) && SoundCache.soundSets.ContainsKey(prefixSuffixName))
                                     {                                       
@@ -543,7 +619,7 @@ namespace CrewChiefV4.Audio
                                         {
                                             hasPrefixOrSuffix = true;
                                             hasSounds = true;
-                                            SingleSound singleSound = new SingleSound(soundFile.FullName, SoundCache.eagerLoadSoundFiles, this.keepCached, this.allowCaching);
+                                            SingleSound singleSound = new SingleSound(soundFile.FullName, this.loadFiles, this.createSoundPlayersImmediatelyAfterLoading, this.allowCaching);
                                             singleSound.isSweary = isSweary;
                                             if (soundFile.Name.Contains(SoundCache.OPTIONAL_SUFFIX_IDENTIFIER) || soundFile.Name.Contains(SoundCache.REQUIRED_SUFFIX_IDENTIFIER))
                                             {
@@ -563,7 +639,7 @@ namespace CrewChiefV4.Audio
                                 if (isOptional)
                                 {
                                     hasSounds = true;
-                                    SingleSound singleSound = new SingleSound(soundFile.FullName, SoundCache.eagerLoadSoundFiles, this.keepCached, this.allowCaching);
+                                    SingleSound singleSound = new SingleSound(soundFile.FullName, this.loadFiles, this.createSoundPlayersImmediatelyAfterLoading, this.allowCaching);
                                     singleSound.isSweary = isSweary;
                                     singleSoundsNoPrefixOrSuffix.Add(singleSound);
                                     soundsCount++;
@@ -572,7 +648,7 @@ namespace CrewChiefV4.Audio
                             else
                             {
                                 hasSounds = true;
-                                SingleSound singleSound = new SingleSound(soundFile.FullName, SoundCache.eagerLoadSoundFiles, this.keepCached, this.allowCaching);
+                                SingleSound singleSound = new SingleSound(soundFile.FullName, this.loadFiles, this.createSoundPlayersImmediatelyAfterLoading, this.allowCaching);
                                 singleSound.isSweary = isSweary;
                                 singleSoundsNoPrefixOrSuffix.Add(singleSound);
                                 soundsCount++;
@@ -712,6 +788,7 @@ namespace CrewChiefV4.Audio
         private Boolean allowCaching;
         private Boolean loadedSoundPlayer = false;
         private Boolean loadedFile = false;
+        public Boolean cachePermanently = false;
 
         public SoundSet prefixSoundSet = null;
         public SoundSet suffixSoundSet = null;
@@ -727,26 +804,27 @@ namespace CrewChiefV4.Audio
             this.ttsString = textToRender;
         }
 
-        public SingleSound(String fullPath, Boolean loadFile, Boolean loadSoundPlayer, Boolean allowCaching)
+        public SingleSound(String fullPath, Boolean loadFile, Boolean createSoundPlayerImmediatelyAfterLoading, Boolean allowCaching)
         {
             this.allowCaching = allowCaching;
             this.fullPath = fullPath;
-            if (allowCaching)
+            if (loadFile && allowCaching)
             {
-                if (loadFile)
-                {
-                    LoadFile();
-                }
-                if (loadSoundPlayer)
-                {
-                    LoadSoundPlayer();
-                }
+                loadAndCache(createSoundPlayerImmediatelyAfterLoading);
             }
         }
 
-        public Boolean Play()
+        public void loadAndCache(Boolean loadSoundPlayer)
         {
-            Boolean hadToLoadSound = false;
+            LoadFile();
+            if (loadSoundPlayer)
+            {
+                LoadSoundPlayer();
+            }
+        }
+
+        public void Play()
+        {
             if (ttsString != null && SoundCache.synthesizer != null)
             {
                 try { 
@@ -775,58 +853,74 @@ namespace CrewChiefV4.Audio
                     if (!loadedSoundPlayer)
                     {
                         LoadSoundPlayer();
-                        hadToLoadSound = true;
                     }
                     this.soundPlayer.PlaySync();
                 }                
             }
-            return hadToLoadSound;
         }
 
         public void LoadFile()
         {
-            this.fileBytes = File.ReadAllBytes(fullPath);
-            loadedFile = true;
+            lock (this)
+            {
+                if (!loadedFile)
+                {
+                    this.fileBytes = File.ReadAllBytes(fullPath);
+                    loadedFile = true;
+                    SoundCache.currentSoundsLoaded++;
+                }
+            }
         }
 
         public void LoadSoundPlayer()
         {
-            if (!loadedFile)
+            lock (this)
             {
-                LoadFile();
+                if (!loadedFile)
+                {
+                    LoadFile();
+                }
+                if (!loadedSoundPlayer)
+                {
+                    this.memoryStream = new MemoryStream(this.fileBytes);
+                    this.soundPlayer = new SoundPlayer(memoryStream);
+                    this.soundPlayer.Load();
+                    loadedSoundPlayer = true;
+                    SoundCache.activeSoundPlayers++;
+                }
             }
-            this.memoryStream = new MemoryStream(this.fileBytes);
-            this.soundPlayer = new SoundPlayer(memoryStream);
-            this.soundPlayer.Load();
-            loadedSoundPlayer = true;
         }
 
         public Boolean UnLoad()
         {
             Boolean unloaded = false;
-            if (loadedSoundPlayer)
+            lock(this)
             {
-                unloaded = true;
-                if (this.soundPlayer != null)
-                {
-                    this.soundPlayer.Stop();
-                    try
+                if (loadedSoundPlayer)
+                {                
+                    unloaded = true;
+                    if (this.soundPlayer != null)
                     {
-                        this.soundPlayer.Dispose();
+                        this.soundPlayer.Stop();
+                        try
+                        {
+                            this.soundPlayer.Dispose();
+                        }
+                        catch (Exception) { }
+                        this.soundPlayer = null;
                     }
-                    catch (Exception) { }
-                    this.soundPlayer = null;
-                }
-                if (this.memoryStream != null)
-                {
-                    try
+                    if (this.memoryStream != null)
                     {
-                        this.memoryStream.Dispose();
+                        try
+                        {
+                            this.memoryStream.Dispose();
+                        }
+                        catch (Exception) { }
+                        this.memoryStream = null;
                     }
-                    catch (Exception) { }
-                    this.memoryStream = null;
+                    loadedSoundPlayer = false;
+                    SoundCache.activeSoundPlayers--;
                 }
-                loadedSoundPlayer = false;
             }
             return unloaded;
         }

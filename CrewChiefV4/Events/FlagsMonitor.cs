@@ -200,7 +200,7 @@ namespace CrewChiefV4.Events
                     {
                         lastSectorFlagsReported[sectorIndex] = sectorFlagWhenQueued;
                         lastSectorFlagsReportedTime[sectorIndex] = currentGameState.Now;
-                        Console.WriteLine("FLAG_DEBUG: transition to sector " + (sectorIndex + 1) + " " + sectorFlagWhenQueued + " is valid at " + currentGameState.Now.ToString("HH:mm:ss"));
+                        //Console.WriteLine("FLAG_DEBUG: transition to sector " + (sectorIndex + 1) + " " + sectorFlagWhenQueued + " is valid at " + currentGameState.Now.ToString("HH:mm:ss"));
                         return true;
                     }
                     else
@@ -208,7 +208,7 @@ namespace CrewChiefV4.Events
                         // reset the last reported flag and the time so we can report this flag transition when it's actually valid:
                         lastSectorFlagsReported[sectorIndex] = sectorFlagWhenQueued == FlagEnum.YELLOW ? FlagEnum.GREEN : FlagEnum.YELLOW;
                         lastSectorFlagsReportedTime[sectorIndex] = DateTime.MinValue;
-                        Console.WriteLine("FLAG_DEBUG: transition to sector " + (sectorIndex + 1) + " " + sectorFlagWhenQueued + " is NOT valid at " + currentGameState.Now.ToString("HH:mm:ss"));
+                        //Console.WriteLine("FLAG_DEBUG: transition to sector " + (sectorIndex + 1) + " " + sectorFlagWhenQueued + " is NOT valid at " + currentGameState.Now.ToString("HH:mm:ss"));
                         return false;
                     }
                 }
@@ -220,7 +220,7 @@ namespace CrewChiefV4.Events
                         hasReportedIsUnderLocalYellow = true;
                         lastSectorFlagsReported[currentGameState.SessionData.SectorNumber - 1] = FlagEnum.YELLOW;
                         lastSectorFlagsReportedTime[currentGameState.SessionData.SectorNumber - 1] = currentGameState.Now;
-                        Console.WriteLine("FLAG_DEBUG: transition to local YELLOW is valid at " + currentGameState.Now.ToString("HH:mm:ss"));
+                        //Console.WriteLine("FLAG_DEBUG: transition to local YELLOW is valid at " + currentGameState.Now.ToString("HH:mm:ss"));
                         return true;
                     }
                     else if (!currentGameState.FlagData.isLocalYellow && !wasLocalYellow && !currentGameState.PitData.InPitlane)
@@ -229,12 +229,12 @@ namespace CrewChiefV4.Events
                         // don't change the local sector state to green here - it might remain yellow after we pass the incident
                         // lastSectorFlagsReported[currentGameState.SessionData.SectorNumber - 1] = FlagEnum.GREEN;
                         lastSectorFlagsReportedTime[currentGameState.SessionData.SectorNumber - 1] = currentGameState.Now;
-                        Console.WriteLine("FLAG_DEBUG: transition to local GREEN is valid at " + currentGameState.Now.ToString("HH:mm:ss"));
+                        //Console.WriteLine("FLAG_DEBUG: transition to local GREEN is valid at " + currentGameState.Now.ToString("HH:mm:ss"));
                         return true;
                     }
                     else
                     {
-                        Console.WriteLine("FLAG_DEBUG: transition to local " + (wasLocalYellow ? "YELLOW" : "GREEN") + " is NOT valid at " + currentGameState.Now.ToString("HH:mm:ss"));
+                       // Console.WriteLine("FLAG_DEBUG: transition to local " + (wasLocalYellow ? "YELLOW" : "GREEN") + " is NOT valid at " + currentGameState.Now.ToString("HH:mm:ss"));
                     }
                 }
             }
@@ -500,11 +500,13 @@ namespace CrewChiefV4.Events
                 }
                 else
                 {
+                    // Console.WriteLine("Track lap distance: "  + currentGameState.PositionAndMotionData.DistanceRoundTrack + 
+                    //    " distanceToNearestIncident: " + currentGameState.FlagData.distanceToNearestIncident);
                     // local yellows
                     // note the 'allSectorsAreGreen' check - we can be under local yellow with no yellow sectors in the hairpin at Macau
                     if (!isUnderLocalYellow && currentGameState.FlagData.isLocalYellow && !allSectorsAreGreen(currentGameState.FlagData))
                     {
-                        Console.WriteLine("FLAG_DEBUG: local yellow at " + currentGameState.Now.ToString("HH:mm:ss"));
+                        //Console.WriteLine("FLAG_DEBUG: local yellow at " + currentGameState.Now.ToString("HH:mm:ss"));
                         isUnderLocalYellow = true;
                         // ensure the last state is updated, even if we don't actually read the transition
                         lastSectorFlags[currentGameState.SessionData.SectorNumber - 1] = FlagEnum.YELLOW;
@@ -518,13 +520,13 @@ namespace CrewChiefV4.Events
                         validationData.Add(isValidatingSectorMessage, false);
                         if (CrewChief.yellowFlagMessagesEnabled && !currentGameState.PitData.InPitlane && !hasReportedIsUnderLocalYellow)
                         {
-                            Console.WriteLine("FLAG_DEBUG: queuing local yellow " + " at " + currentGameState.Now.ToString("HH:mm:ss"));
+                            //Console.WriteLine("FLAG_DEBUG: queuing local yellow " + " at " + currentGameState.Now.ToString("HH:mm:ss"));
                             audioPlayer.playMessage(new QueuedMessage(localFlagChangeMessageKey, MessageContents(folderLocalYellow), 1, this, validationData));
                         }
                     }
                     else if (isUnderLocalYellow && !currentGameState.FlagData.isLocalYellow)
                     {
-                        Console.WriteLine("FLAG_DEBUG: local green at " + currentGameState.Now.ToString("HH:mm:ss"));
+                        //Console.WriteLine("FLAG_DEBUG: local green at " + currentGameState.Now.ToString("HH:mm:ss"));
                         isUnderLocalYellow = false;
                         // we've passed the incident so allow warnings of other incidents approaching
                         hasWarnedOfUpcomingIncident = false;
@@ -535,8 +537,7 @@ namespace CrewChiefV4.Events
                         validationData.Add(isValidatingSectorMessage, false);
                         if (CrewChief.yellowFlagMessagesEnabled && !currentGameState.PitData.InPitlane && hasReportedIsUnderLocalYellow)
                         {
-                            Console.WriteLine("FLAG_DEBUG: queuing local green " + " at " + currentGameState.Now.ToString("HH:mm:ss"));
-
+                            //Console.WriteLine("FLAG_DEBUG: queuing local green " + " at " + currentGameState.Now.ToString("HH:mm:ss"));
                             audioPlayer.playMessage(new QueuedMessage(localFlagChangeMessageKey, MessageContents(folderLocalYellowClear), 1, this, validationData));
                         }
                     }
@@ -549,7 +550,9 @@ namespace CrewChiefV4.Events
                         waitingToWarnOfIncident = false;
                         lastReportedOvertakeAllowed = PassAllowedUnderYellow.NO_DATA;
                     }
-                    else if (!isUnderLocalYellow && !hasWarnedOfUpcomingIncident)
+                    // This produces false-positives. Not sure why - TODO: work out what the issue is here - perhaps
+                    // the data doesn't contain what I think it contains
+                    /*else if (!isUnderLocalYellow && !hasWarnedOfUpcomingIncident)
                     {
                         if (waitingToWarnOfIncident)
                         {
@@ -575,7 +578,7 @@ namespace CrewChiefV4.Events
                             waitingToWarnOfIncident = true;
                             incidentAheadSettledTime = currentGameState.Now + incidentAheadSettlingTime;
                         }
-                    }
+                    }*/
                     // sector yellows
                     for (int i = 0; i < 3; i++)
                     {
@@ -618,7 +621,7 @@ namespace CrewChiefV4.Events
                         FlagEnum sectorFlag = currentGameState.FlagData.sectorFlags[i];
                         if (sectorFlag != lastSectorFlags[i])
                         {
-                            Console.WriteLine("FLAG_DEBUG: sector " + (i + 1) + " " + sectorFlag + " at " + currentGameState.Now.ToString("HH:mm:ss"));
+                            // Console.WriteLine("FLAG_DEBUG: sector " + (i + 1) + " " + sectorFlag + " at " + currentGameState.Now.ToString("HH:mm:ss"));
                             lastSectorFlags[i] = sectorFlag;
                             Dictionary<String, Object> validationData = new Dictionary<String, Object>();
                             validationData.Add(validationSectorNumberKey, i);
@@ -640,14 +643,14 @@ namespace CrewChiefV4.Events
                                         // If in current, sometimes announce without sector number.
                                         if (CrewChief.yellowFlagMessagesEnabled && !currentGameState.PitData.InPitlane)
                                         {
-                                            Console.WriteLine("FLAG_DEBUG: queuing sector " + (i + 1) + " " + sectorFlag + " at " + currentGameState.Now.ToString("HH:mm:ss"));
+                                            //Console.WriteLine("FLAG_DEBUG: queuing sector " + (i + 1) + " " + sectorFlag + " at " + currentGameState.Now.ToString("HH:mm:ss"));
                                             audioPlayer.playMessage(new QueuedMessage(sectorFlagChangeMessageKeyStart + (i + 1), MessageContents(sectorFlag == FlagEnum.YELLOW ?
                                                 folderYellowFlag : folderDoubleYellowFlag), 3, this, validationData));
                                         }
                                     }
                                     else if (CrewChief.yellowFlagMessagesEnabled && !currentGameState.PitData.InPitlane)
                                     {
-                                        Console.WriteLine("FLAG_DEBUG: queuing sector " + (i + 1) + " " + sectorFlag + " at " + currentGameState.Now.ToString("HH:mm:ss"));
+                                        //Console.WriteLine("FLAG_DEBUG: queuing sector " + (i + 1) + " " + sectorFlag + " at " + currentGameState.Now.ToString("HH:mm:ss"));
                                         audioPlayer.playMessage(new QueuedMessage(sectorFlagChangeMessageKeyStart + (i + 1), MessageContents(sectorFlag == FlagEnum.YELLOW ?
                                             folderYellowFlagSectors[i] : folderDoubleYellowFlagSectors[i]), 3, this, validationData));
                                     }
@@ -673,7 +676,7 @@ namespace CrewChiefV4.Events
                                     {
                                         // hack the message key if we're reporting green in the current sector. This prevents
                                         // a duplicate clear for local sectors
-                                        Console.WriteLine("FLAG_DEBUG: queuing sector " + (i + 1) + " " + sectorFlag + " at " + currentGameState.Now.ToString("HH:mm:ss"));
+                                        //Console.WriteLine("FLAG_DEBUG: queuing sector " + (i + 1) + " " + sectorFlag + " at " + currentGameState.Now.ToString("HH:mm:ss"));
                                         String messageKey = i == currentGameState.SessionData.SectorNumber - 1 ? localFlagChangeMessageKey : sectorFlagChangeMessageKeyStart + (i + 1);
                                         audioPlayer.playMessage(new QueuedMessage(messageKey,
                                             MessageContents(folderGreenFlagSectors[i]), 3, this, validationData));
@@ -1091,7 +1094,7 @@ namespace CrewChiefV4.Events
 
         private Boolean canReadName(String rawName)
         {
-            return SoundCache.hasSuitableTTSVoice || SoundCache.availableDriverNames.Contains(DriverNameHelper.getUsableDriverName(rawName));
+            return SoundCache.hasSuitableTTSVoice || SoundCache.sortedAvailableDriverNames.BinarySearch(DriverNameHelper.getUsableDriverName(rawName)) >= 0;
         }
     }
 
