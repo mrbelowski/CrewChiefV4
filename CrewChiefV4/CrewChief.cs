@@ -377,7 +377,7 @@ namespace CrewChiefV4
             gameDataReader = GameStateReaderFactory.getInstance().getGameStateReader(gameDefinition);
             gameDataReader.ResetGameDataFromFile();
 
-            gameDataReader.dumpToFile = System.Diagnostics.Debugger.IsAttached && dumpToFile;
+            gameDataReader.dumpToFile = dumpToFile;
             if (gameDefinition.spotterName != null)
             {
                 spotter = (Spotter)Activator.CreateInstance(Type.GetType(gameDefinition.spotterName),
