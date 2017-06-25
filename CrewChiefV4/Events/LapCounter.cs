@@ -113,7 +113,7 @@ namespace CrewChiefV4.Events
             if (currentGameState.SessionData.Position == 1)
             {
                 Console.WriteLine("pre-start message for pole");
-                if (SoundCache.sortedAvailableSounds.BinarySearch(Position.folderDriverPositionIntro) >= 0)
+                if (SoundCache.availableSounds.Contains(Position.folderDriverPositionIntro))
                 {
                     possibleMessages.Add(new QueuedMessage("position", MessageContents(Position.folderDriverPositionIntro, Position.folderPole), 0, this));                    
                 }
@@ -125,7 +125,7 @@ namespace CrewChiefV4.Events
             else
             {
                 Console.WriteLine("pre-start message for P " + currentGameState.SessionData.Position);
-                if (SoundCache.sortedAvailableSounds.BinarySearch(Position.folderDriverPositionIntro) >= 0)
+                if (SoundCache.availableSounds.Contains(Position.folderDriverPositionIntro))
                 {
                     possibleMessages.Add(new QueuedMessage("position", MessageContents(Position.folderDriverPositionIntro, 
                         Position.folderStub + currentGameState.SessionData.Position), 0, this));

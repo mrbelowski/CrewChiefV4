@@ -449,7 +449,7 @@ namespace CrewChiefV4.Events
                     return MessageContents(folderLast);
                 }
             }
-            else if (SoundCache.sortedAvailableSounds.BinarySearch(folderDriverPositionIntro) >= 0)
+            else if (SoundCache.availableSounds.Contains(folderDriverPositionIntro))
             {
                 return MessageContents(folderDriverPositionIntro, folderStub + this.currentPosition);
             }
@@ -473,7 +473,7 @@ namespace CrewChiefV4.Events
                 }
                 else if (currentPosition > 0)
                 {
-                    if (SoundCache.sortedAvailableSounds.BinarySearch(folderDriverPositionIntro) >= 0)
+                    if (SoundCache.availableSounds.Contains(folderDriverPositionIntro))
                     {
                         audioPlayer.playMessageImmediately(new QueuedMessage("position", MessageContents(folderDriverPositionIntro, folderStub + currentPosition), 0, this));
                     }
