@@ -1102,7 +1102,7 @@
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "130R",
+					"landmarkName": "130r",
 					"distanceRoundLapStart": 4600,
 					"distanceRoundLapEnd": 4830,
 					"isCommonOvertakingSpot": false
@@ -5639,7 +5639,7 @@
 					"isCommonOvertakingSpot": true
 				},
 				{
-					"landmarkName": "trioval",
+					"landmarkName": "tri_oval",
 					"distanceRoundLapStart": 3500,
 					"distanceRoundLapEnd": 4325,
 					"isCommonOvertakingSpot": true
