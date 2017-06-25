@@ -301,8 +301,8 @@ namespace CrewChiefV4.Events
                                             trackLandmarkAttackDriverNamesUsed[opponent.DriverRawName] = currentGameState.Now;
                                         }
                                     }
-                                    gapInFrontAtLastReport = gapsInFront[0];
                                 }
+                                gapInFrontAtLastReport = gapsInFront[0];
                             }
                         }
                         else if (gapInFrontStatus != GapStatus.NONE && sectorsSinceLastGapAheadReport >= sectorsUntilNextGapAheadReport)
@@ -403,8 +403,8 @@ namespace CrewChiefV4.Events
                                             trackLandmarkDefendDriverNamesUsed[opponent.DriverRawName] = currentGameState.Now;
                                         }
                                     }
-                                    gapBehindAtLastReport = gapsBehind[0];
                                 }
+                                gapBehindAtLastReport = gapsBehind[0];
                             }
                         }
                         else if (gapBehindStatus != GapStatus.NONE && sectorsSinceLastGapBehindReport >= sectorsUntilNextGapBehindReport)
