@@ -475,8 +475,28 @@ namespace CrewChiefV4
             this.app_version.Text = Configuration.getUIString("version") + ": " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
             this.filenameLabel.Visible = System.Diagnostics.Debugger.IsAttached;
             this.filenameTextbox.Visible = System.Diagnostics.Debugger.IsAttached;
-            this.recordSession.Visible = System.Diagnostics.Debugger.IsAttached;
-            this.playbackInterval.Visible = System.Diagnostics.Debugger.IsAttached;
+            if (System.Diagnostics.Debugger.IsAttached)
+            {
+                this.recordSession.Visible = true;
+            }
+            else
+            {
+                this.recordSession.Visible = false;
+                String[] commandLineArgs = Environment.GetCommandLineArgs();
+                if (commandLineArgs != null)
+                {
+                    foreach (String arg in commandLineArgs)
+                    {
+                        if (arg.Equals("DEBUG"))
+                        {
+                            Console.WriteLine("Allowing dump-to-file");
+                            this.recordSession.Visible = true;
+                            break;
+                        }
+                    }
+                }
+            }
+            this.playbackInterval.Visible = System.Diagnostics.Debugger.IsAttached;            
             
             if (!UserSettings.GetUserSettings().getBoolean("enable_console_logging"))
             {
@@ -825,7 +845,7 @@ namespace CrewChiefV4
                     interval = int.Parse(playbackInterval.Text);
                 }
             }
-            if (System.Diagnostics.Debugger.IsAttached && recordSession.Checked) {
+            if (recordSession.Checked) {
                 record = true;
             }
             if (!crewChief.Run(filenameToRun, interval, record))
