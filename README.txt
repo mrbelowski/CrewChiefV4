@@ -8,7 +8,7 @@ For support and discussions about Crew Chief we have our very own forum here: ht
 
 Changelog
 ---------
-Version 4.6.6.3: Overhauled internal sound handling to make the app behave better; Faster start up times; Better CPU usage
+Version 4.6.6.4: Overhauled internal sound handling to make the app behave better; Faster start up times; Better CPU usage; some internal fixes
 
 Version 4.6.6.2: Fixed some RFactor and RFactor2 issue; Added a few more track location mappings (thanks again Scoops); Disabled 'incident ahead' in R3E while I resolve the false-positives
 
