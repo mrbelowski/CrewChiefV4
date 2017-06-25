@@ -148,7 +148,7 @@
 			"rf1TrackNames": ["Brands Indy",
 				"Brands Hatch Indy"
 			],
-			"rf2TrackNames": ["Brands Hatch Indy",
+			"rf2TrackNames": [
 				"Brands"
 			],
 			"acTrackNames": ["ks_brands_hatch:indy"],
@@ -190,7 +190,6 @@
 			"rf1TrackNames": ["Brands GP",
 				"Brands Hatch Grand Prix"
 			],
-			"rf2TrackNames": ["Brands Hatch GP"],
 			"acTrackNames": ["ks_brands_hatch:gp"],
 			"pcarsTrackName": "Brands Hatch:Grand Prix",
 			"trackLandmarks": [{
@@ -5643,6 +5642,752 @@
 					"landmarkName": "trioval",
 					"distanceRoundLapStart": 3500,
 					"distanceRoundLapEnd": 4325,
+					"isCommonOvertakingSpot": true
+				}
+			]
+		},
+		{
+			"rf2TrackNames": ["Apple Valley Speedway"],
+			"isOval": true,
+			"trackLandmarks": [{
+					"landmarkName": "tri_oval",
+					"distanceRoundLapStart": 1,
+					"distanceRoundLapEnd": 230,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn1",
+					"distanceRoundLapStart": 405,
+					"distanceRoundLapEnd": 852,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn2",
+					"distanceRoundLapStart": 854,
+					"distanceRoundLapEnd": 1300,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn3",
+					"distanceRoundLapStart": 1915,
+					"distanceRoundLapEnd": 2340,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn4",
+					"distanceRoundLapStart": 2341,
+					"distanceRoundLapEnd": 2765,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "tri_oval",
+					"distanceRoundLapStart": 3035,
+					"distanceRoundLapEnd": 3236,
+					"isCommonOvertakingSpot": false
+				}
+			]
+		},
+		{
+			"rf2TrackNames": ["Assen TT Circuit"],
+			"trackLandmarks": [{
+					"landmarkName": "haarbocht",
+					"distanceRoundLapStart": 355,
+					"distanceRoundLapEnd": 460,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "madijk",
+					"distanceRoundLapStart": 530,
+					"distanceRoundLapEnd": 610,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "ossenbroeken",
+					"distanceRoundLapStart": 705,
+					"distanceRoundLapEnd": 965,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "strubben",
+					"distanceRoundLapStart": 985,
+					"distanceRoundLapEnd": 1110,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "ruskenhoek",
+					"distanceRoundLapStart": 1810,
+					"distanceRoundLapEnd": 1885,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn7",
+					"distanceRoundLapStart": 1890,
+					"distanceRoundLapEnd": 2090,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "stekkenwal",
+					"distanceRoundLapStart": 2160,
+					"distanceRoundLapEnd": 2345,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "de_built",
+					"distanceRoundLapStart": 2595,
+					"distanceRoundLapEnd": 2775,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "mandeveen",
+					"distanceRoundLapStart": 2840,
+					"distanceRoundLapEnd": 2990,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "duikersloot",
+					"distanceRoundLapStart": 3005,
+					"distanceRoundLapEnd": 3200,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "meeuwenmeer",
+					"distanceRoundLapStart": 3335,
+					"distanceRoundLapEnd": 3435,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "hoge_heide",
+					"distanceRoundLapStart": 3625,
+					"distanceRoundLapEnd": 3720,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "ramshoek",
+					"distanceRoundLapStart": 3745,
+					"distanceRoundLapEnd": 4050,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "geert_timmer_bocht",
+					"distanceRoundLapStart": 4225,
+					"distanceRoundLapEnd": 4485,
+					"isCommonOvertakingSpot": true
+				}
+			]
+		},
+		{
+			"rf2TrackNames": ["Portugal GP Layout"],
+			"trackLandmarks": [{
+					"landmarkName": "turn1",
+					"distanceRoundLapStart": 375,
+					"distanceRoundLapEnd": 545,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn2",
+					"distanceRoundLapStart": 665,
+					"distanceRoundLapEnd": 805,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn3",
+					"distanceRoundLapStart": 905,
+					"distanceRoundLapEnd": 1080,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "vip_curve",
+					"distanceRoundLapStart": 1145,
+					"distanceRoundLapEnd": 1340,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn5",
+					"distanceRoundLapStart": 1495,
+					"distanceRoundLapEnd": 1630,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "parabolica_interna",
+					"distanceRoundLapStart": 1980,
+					"distanceRoundLapEnd": 2250,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "orelha",
+					"distanceRoundLapStart": 2480,
+					"distanceRoundLapEnd": 2675,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn8",
+					"distanceRoundLapStart": 2805,
+					"distanceRoundLapEnd": 2965,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "the_esses",
+					"distanceRoundLapStart": 3000,
+					"distanceRoundLapEnd": 3240,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "parabolica_ayrton_senna",
+					"distanceRoundLapStart": 3250,
+					"distanceRoundLapEnd": 3685,
+					"isCommonOvertakingSpot": true
+				}
+			]
+		},
+		{
+			"rf2TrackNames": ["Portugal GT Layout"],
+			"trackLandmarks": [{
+					"landmarkName": "turn1",
+					"distanceRoundLapStart": 375,
+					"distanceRoundLapEnd": 545,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn2",
+					"distanceRoundLapStart": 665,
+					"distanceRoundLapEnd": 805,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn3",
+					"distanceRoundLapStart": 905,
+					"distanceRoundLapEnd": 1080,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "vip_curve",
+					"distanceRoundLapStart": 1145,
+					"distanceRoundLapEnd": 1345,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn5",
+					"distanceRoundLapStart": 1495,
+					"distanceRoundLapEnd": 1630,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "parabolica_interna",
+					"distanceRoundLapStart": 1980,
+					"distanceRoundLapEnd": 2250,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "orelha",
+					"distanceRoundLapStart": 2480,
+					"distanceRoundLapEnd": 2660,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn8",
+					"distanceRoundLapStart": 2675,
+					"distanceRoundLapEnd": 2810,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "gancho",
+					"distanceRoundLapStart": 2840,
+					"distanceRoundLapEnd": 2920,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn10",
+					"distanceRoundLapStart": 2925,
+					"distanceRoundLapEnd": 3020,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "the_esses",
+					"distanceRoundLapStart": 3030,
+					"distanceRoundLapEnd": 3245,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "parabolica_ayrton_senna",
+					"distanceRoundLapStart": 3250,
+					"distanceRoundLapEnd": 3680,
+					"isCommonOvertakingSpot": false
+				}
+			]
+		},
+		{
+			"rf2TrackNames": ["Portimao CircuiT"],
+			"trackLandmarks": [{
+					"landmarkName": "primeira",
+					"distanceRoundLapStart": 615,
+					"distanceRoundLapEnd": 710,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "lagos",
+					"distanceRoundLapStart": 935,
+					"distanceRoundLapEnd": 1030,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn4",
+					"distanceRoundLapStart": 1075,
+					"distanceRoundLapEnd": 1205,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "tore_vip",
+					"distanceRoundLapStart": 1620,
+					"distanceRoundLapEnd": 1780,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn6",
+					"distanceRoundLapStart": 1880,
+					"distanceRoundLapEnd": 2020,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn7",
+					"distanceRoundLapStart": 2105,
+					"distanceRoundLapEnd": 2235,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "samsung",
+					"distanceRoundLapStart": 2245,
+					"distanceRoundLapEnd": 2300,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "craig_jones",
+					"distanceRoundLapStart": 2590,
+					"distanceRoundLapEnd": 2770,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "portimao",
+					"distanceRoundLapStart": 2875,
+					"distanceRoundLapEnd": 3060,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn11",
+					"distanceRoundLapStart": 3150,
+					"distanceRoundLapEnd": 3300,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn12",
+					"distanceRoundLapStart": 3365,
+					"distanceRoundLapEnd": 3525,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "sagres",
+					"distanceRoundLapStart": 3550,
+					"distanceRoundLapEnd": 3835,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "galp",
+					"distanceRoundLapStart": 3935,
+					"distanceRoundLapEnd": 4325,
+					"isCommonOvertakingSpot": false
+				}
+			]
+		},
+		{
+			"rf2TrackNames": ["BATHURST2016"],
+			"trackLandmarks": [{
+					"landmarkName": "hell_corner",
+					"distanceRoundLapStart": 280,
+					"distanceRoundLapEnd": 440,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "griffins_bend",
+					"distanceRoundLapStart": 1410,
+					"distanceRoundLapEnd": 1635,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "the_cutting",
+					"distanceRoundLapStart": 1820,
+					"distanceRoundLapEnd": 2050,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "quarry",
+					"distanceRoundLapStart": 2060,
+					"distanceRoundLapEnd": 2370,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "mcphillamy_park",
+					"distanceRoundLapStart": 2870,
+					"distanceRoundLapEnd": 3065,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "the_esses",
+					"distanceRoundLapStart": 3250,
+					"distanceRoundLapEnd": 3605,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "the_dipper",
+					"distanceRoundLapStart": 3620,
+					"distanceRoundLapEnd": 3720,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "forrests_elbow",
+					"distanceRoundLapStart": 3830,
+					"distanceRoundLapEnd": 3955,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "the_chase",
+					"distanceRoundLapStart": 5430,
+					"distanceRoundLapEnd": 5700,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "murrays_corner",
+					"distanceRoundLapStart": 6030,
+					"distanceRoundLapEnd": 6155,
+					"isCommonOvertakingSpot": true
+				}
+
+			]
+		},
+		{
+			"rf2TrackNames": ["Barbagallo", "Barbagallo2013"],
+			"trackLandmarks": [{
+					"landmarkName": "handley_corner",
+					"distanceRoundLapStart": 110,
+					"distanceRoundLapEnd": 325,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "brownes_chill_man_up_esses",
+					"distanceRoundLapStart": 370,
+					"distanceRoundLapEnd": 545,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "v8_race_corner",
+					"distanceRoundLapStart": 546,
+					"distanceRoundLapEnd": 805,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn5",
+					"distanceRoundLapStart": 815,
+					"distanceRoundLapEnd": 940,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "kons_corner",
+					"distanceRoundLapStart": 1160,
+					"distanceRoundLapEnd": 1525,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "brownes_chill_fastbake_corner",
+					"distanceRoundLapStart": 2040,
+					"distanceRoundLapEnd": 2210,
+					"isCommonOvertakingSpot": true
+				}
+			]
+		},
+		{
+			"rf2TrackNames": ["Barbagallo_short"],
+			"trackLandmarks": [{
+					"landmarkName": "handley_corner",
+					"distanceRoundLapStart": 110,
+					"distanceRoundLapEnd": 325,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "brownes_chill_man_up_esses",
+					"distanceRoundLapStart": 370,
+					"distanceRoundLapEnd": 545,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "v8_race_corner",
+					"distanceRoundLapStart": 546,
+					"distanceRoundLapEnd": 805,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn5",
+					"distanceRoundLapStart": 810,
+					"distanceRoundLapEnd": 970,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn6",
+					"distanceRoundLapStart": 985,
+					"distanceRoundLapEnd": 1060,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn7",
+					"distanceRoundLapStart": 1075,
+					"distanceRoundLapEnd": 1180,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "brownes_chill_fastbake_corner",
+					"distanceRoundLapStart": 1385,
+					"distanceRoundLapEnd": 1524,
+					"isCommonOvertakingSpot": true
+				}
+			]
+		},
+		{
+			"rf2TrackNames": ["Barber Motorsports Park"],
+			"trackLandmarks": [{
+					"landmarkName": "turn1",
+					"distanceRoundLapStart": 80,
+					"distanceRoundLapEnd": 220,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "the_carousel",
+					"distanceRoundLapStart": 270,
+					"distanceRoundLapEnd": 550,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn4",
+					"distanceRoundLapStart": 580,
+					"distanceRoundLapEnd": 745,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "the_hairpin",
+					"distanceRoundLapStart": 980,
+					"distanceRoundLapEnd": 1155,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn6",
+					"distanceRoundLapStart": 1180,
+					"distanceRoundLapEnd": 1325,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn7",
+					"distanceRoundLapStart": 1560,
+					"distanceRoundLapEnd": 1694,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "the_corkscrew",
+					"distanceRoundLapStart": 1695,
+					"distanceRoundLapEnd": 1880,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "the_esses",
+					"distanceRoundLapStart": 2055,
+					"distanceRoundLapEnd": 2300,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn12",
+					"distanceRoundLapStart": 2550,
+					"distanceRoundLapEnd": 2672,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "the_tunnel",
+					"distanceRoundLapStart": 2673,
+					"distanceRoundLapEnd": 2840,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn14",
+					"distanceRoundLapStart": 2870,
+					"distanceRoundLapEnd": 3005,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn15",
+					"distanceRoundLapStart": 3085,
+					"distanceRoundLapEnd": 3205,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn16",
+					"distanceRoundLapStart": 3225,
+					"distanceRoundLapEnd": 3405,
+					"isCommonOvertakingSpot": false
+				}
+			]
+		},
+		{
+			"rf2TrackNames": ["Belgium"],
+			"trackLandmarks": [
+
+				{
+					"landmarkName": "eau_rouge",
+					"distanceRoundLapStart": 155,
+					"distanceRoundLapEnd": 580,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "les_combes",
+					"distanceRoundLapStart": 1740,
+					"distanceRoundLapEnd": 2070,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "brunenville",
+					"distanceRoundLapStart": 3210,
+					"distanceRoundLapEnd": 4040,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "malmedey",
+					"distanceRoundLapStart": 4250,
+					"distanceRoundLapEnd": 4490,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "masta_kink",
+					"distanceRoundLapStart": 6255,
+					"distanceRoundLapEnd": 6720,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "stavlot",
+					"distanceRoundLapStart": 7820,
+					"distanceRoundLapEnd": 8650,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "la_carriere",
+					"distanceRoundLapStart": 9565,
+					"distanceRoundLapEnd": 10175,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "blanchimont",
+					"distanceRoundLapStart": 12000,
+					"distanceRoundLapEnd": 12640,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "la_source",
+					"distanceRoundLapStart": 13560,
+					"distanceRoundLapEnd": 13710,
+					"isCommonOvertakingSpot": true
+				}
+			]
+		},
+		{
+			"rf2TrackNames": ["Brands Hatch INDY"],
+			"trackLandmarks": [
+
+				{
+					"landmarkName": "paddock_hill",
+					"distanceRoundLapStart": 45,
+					"distanceRoundLapEnd": 365,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "druids",
+					"distanceRoundLapStart": 495,
+					"distanceRoundLapEnd": 665,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "graham_hill_bend",
+					"distanceRoundLapStart": 770,
+					"distanceRoundLapEnd": 910,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "surtees",
+					"distanceRoundLapStart": 1075,
+					"distanceRoundLapEnd": 1220,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "mclaren",
+					"distanceRoundLapStart": 1225,
+					"distanceRoundLapEnd": 1345,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "clearways",
+					"distanceRoundLapStart": 1350,
+					"distanceRoundLapEnd": 1560,
+					"isCommonOvertakingSpot": true
+				}
+			]
+		},
+		{
+			"rf2TrackNames": ["Brands Hatch GP"],
+			"trackLandmarks": [
+
+				{
+					"landmarkName": "paddock_hill",
+					"distanceRoundLapStart": 45,
+					"distanceRoundLapEnd": 365,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "druids",
+					"distanceRoundLapStart": 495,
+					"distanceRoundLapEnd": 665,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "graham_hill_bend",
+					"distanceRoundLapStart": 770,
+					"distanceRoundLapEnd": 910,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "surtees",
+					"distanceRoundLapStart": 1075,
+					"distanceRoundLapEnd": 1335,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "hawthorns",
+					"distanceRoundLapStart": 1880,
+					"distanceRoundLapEnd": 2115,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "westfield",
+					"distanceRoundLapStart": 2240,
+					"distanceRoundLapEnd": 2380,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "sheenes",
+					"distanceRoundLapStart": 2620,
+					"distanceRoundLapEnd": 2750,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "stirlings",
+					"distanceRoundLapStart": 2880,
+					"distanceRoundLapEnd": 3025,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "clearways",
+					"distanceRoundLapStart": 3315,
+					"distanceRoundLapEnd": 3575,
 					"isCommonOvertakingSpot": true
 				}
 			]
