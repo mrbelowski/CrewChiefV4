@@ -1072,13 +1072,13 @@
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "degner_1",
+					"landmarkName": "degner1",
 					"distanceRoundLapStart": 1950,
 					"distanceRoundLapEnd": 2030,
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "degner_2",
+					"landmarkName": "degner2",
 					"distanceRoundLapStart": 2120,
 					"distanceRoundLapEnd": 2200,
 					"isCommonOvertakingSpot": false
@@ -1102,7 +1102,7 @@
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "130r",
+					"landmarkName": "130R",
 					"distanceRoundLapStart": 4600,
 					"distanceRoundLapEnd": 4830,
 					"isCommonOvertakingSpot": false
@@ -4451,7 +4451,7 @@
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "clarke",
+					"landmarkName": "clark",
 					"distanceRoundLapStart": 2505,
 					"distanceRoundLapEnd": 2580,
 					"isCommonOvertakingSpot": true
@@ -4545,13 +4545,13 @@
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "degner_1",
+					"landmarkName": "degner1",
 					"distanceRoundLapStart": 2250,
 					"distanceRoundLapEnd": 2345,
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "degner_2",
+					"landmarkName": "degner2",
 					"distanceRoundLapStart": 2410,
 					"distanceRoundLapEnd": 2500,
 					"isCommonOvertakingSpot": false
@@ -4581,7 +4581,7 @@
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "130r",
+					"landmarkName": "130R",
 					"distanceRoundLapStart": 4895,
 					"distanceRoundLapEnd": 5120,
 					"isCommonOvertakingSpot": false
@@ -6373,7 +6373,7 @@
 					"isCommonOvertakingSpot": true
 				},
 				{
-					"landmarkName": "sheenes",
+					"landmarkName": "sheen",
 					"distanceRoundLapStart": 2620,
 					"distanceRoundLapEnd": 2750,
 					"isCommonOvertakingSpot": true
