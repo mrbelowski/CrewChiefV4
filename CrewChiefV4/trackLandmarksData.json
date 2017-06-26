@@ -3421,7 +3421,7 @@
 		{
 			"rf2TrackNames": ["RaceRfactor Monaco 2013"],
 			"trackLandmarks": [{
-					"landmarkName": "saint_devote",
+					"landmarkName": "sainte_devote",
 					"distanceRoundLapStart": 150,
 					"distanceRoundLapEnd": 270,
 					"isCommonOvertakingSpot": true
@@ -5464,7 +5464,7 @@
 					"isCommonOvertakingSpot": true
 				},
 				{
-					"landmarkName": "sachs_kurve",
+					"landmarkName": "sachs",
 					"distanceRoundLapStart": 5560,
 					"distanceRoundLapEnd": 5705,
 					"isCommonOvertakingSpot": true
