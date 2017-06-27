@@ -1399,5 +1399,18 @@ namespace CrewChiefV4.rFactor2
 
             return str;
         }
+
+        // TODO: explain
+        public static Dictionary<long, int> GetIdsToTelIndicesMap(rF2Telemetry telemetry)
+        {
+            var idsToTelIndices = new Dictionary<long, int>();
+            for (int i = 0; i < telemetry.mNumVehicles; ++i)
+            {
+                if (!idsToTelIndices.ContainsKey(telemetry.mVehicles[i].mID))
+                    idsToTelIndices.Add(telemetry.mVehicles[i].mID, i);
+            }
+
+            return idsToTelIndices;
+        }
     }
 }

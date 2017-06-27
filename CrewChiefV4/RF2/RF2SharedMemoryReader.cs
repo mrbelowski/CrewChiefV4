@@ -15,14 +15,197 @@ namespace CrewChiefV4.rFactor2
 {
     public class RF2SharedMemoryReader : GameDataReader
     {
-        readonly int SHARED_MEMORY_SIZE_BYTES = Marshal.SizeOf(typeof(rF2State));
-        readonly int SHARED_MEMORY_HEADER_SIZE_BYTES = Marshal.SizeOf(typeof(rF2StateHeader));
+        private class MappedDoubleBuffer<MappedBufferT>
+        {
+            readonly int RF2_BUFFER_HEADER_SIZE_BYTES = Marshal.SizeOf(typeof(rF2BufferHeader));
+            readonly int RF2_BUFFER_HEADER_WITH_SIZE_SIZE_BYTES = Marshal.SizeOf(typeof(rF2MappedBufferHeaderWithSize));
 
-        Mutex fileAccessMutex = null;
-        MemoryMappedFile memoryMappedFile1 = null;
-        MemoryMappedFile memoryMappedFile2 = null;
+            readonly int BUFFER_SIZE_BYTES;
+            readonly string BUFFER1_NAME;
+            readonly string BUFFER2_NAME;
+            readonly string MUTEX_NAME;
 
-        private byte[] sharedMemoryReadBuffer;
+            // Holds the entire byte array that can be marshalled to a MappedBufferT.  Partial updates
+            // only read changed part of buffer, ignoring trailing uninteresting bytes.  However,
+            // to marshal we still need to supply entire structure size.  So, on update new bytes are copied
+            // (outside of the mutex).
+            byte[] fullSizeBuffer = null;
+
+            Mutex mutex = null;
+            MemoryMappedFile memoryMappedFile1 = null;
+            MemoryMappedFile memoryMappedFile2 = null;
+
+            public MappedDoubleBuffer(string buff1Name, string buff2Name, string mutexName)
+            {
+                this.BUFFER_SIZE_BYTES = Marshal.SizeOf(typeof(MappedBufferT));
+                this.BUFFER1_NAME = buff1Name;
+                this.BUFFER2_NAME = buff2Name;
+                this.MUTEX_NAME = mutexName;
+            }
+
+            public void Connect()
+            {
+                this.mutex = Mutex.OpenExisting(this.MUTEX_NAME);
+                this.memoryMappedFile1 = MemoryMappedFile.OpenExisting(this.BUFFER1_NAME);
+                this.memoryMappedFile2 = MemoryMappedFile.OpenExisting(this.BUFFER2_NAME);
+
+                // NOTE: Make sure that BUFFER_SIZE matches the structure size in the plugin (debug mode prints that).
+                this.fullSizeBuffer = new byte[this.BUFFER_SIZE_BYTES];
+            }
+
+            public void Disconnect()
+            {
+                if (this.memoryMappedFile1 != null)
+                    this.memoryMappedFile1.Dispose();
+
+                if (this.memoryMappedFile2 != null)
+                    this.memoryMappedFile2.Dispose();
+
+                if (this.mutex != null)
+                    this.mutex.Dispose();
+
+                this.memoryMappedFile1 = null;
+                this.memoryMappedFile2 = null;
+                this.fullSizeBuffer = null;
+                this.mutex = null;
+            }
+
+            public void GetMappedData(ref MappedBufferT mappedData)
+            {
+                //
+                // IMPORTANT:  Clients that do not need consistency accross the whole buffer, like dashboards that visualize data, _do not_ need to use mutexes.
+                //
+
+                // Note: if it is critical for client minimize wait time, same strategy as plugin uses can be employed.
+                // Pass 0 timeout and skip update if someone holds the lock.
+                if (this.mutex.WaitOne(5000))
+                {
+                    byte[] sharedMemoryReadBuffer = null;
+                    try
+                    {
+                        bool buf1Current = false;
+                        // Try buffer 1:
+                        using (var sharedMemoryStreamView = this.memoryMappedFile1.CreateViewStream())
+                        {
+                            var sharedMemoryStream = new BinaryReader(sharedMemoryStreamView);
+                            sharedMemoryReadBuffer = sharedMemoryStream.ReadBytes(this.RF2_BUFFER_HEADER_SIZE_BYTES);
+
+                            // Marhsal header.
+                            var headerHandle = GCHandle.Alloc(sharedMemoryReadBuffer, GCHandleType.Pinned);
+                            var header = (rF2MappedBufferHeader)Marshal.PtrToStructure(headerHandle.AddrOfPinnedObject(), typeof(rF2MappedBufferHeader));
+                            headerHandle.Free();
+
+                            if (header.mCurrentRead == 1)
+                            {
+                                sharedMemoryStream.BaseStream.Position = 0;
+                                sharedMemoryReadBuffer = sharedMemoryStream.ReadBytes(this.BUFFER_SIZE_BYTES);
+                                buf1Current = true;
+                            }
+                        }
+
+                        // Read buffer 2
+                        if (!buf1Current)
+                        {
+                            using (var sharedMemoryStreamView = this.memoryMappedFile2.CreateViewStream())
+                            {
+                                var sharedMemoryStream = new BinaryReader(sharedMemoryStreamView);
+                                sharedMemoryReadBuffer = sharedMemoryStream.ReadBytes(this.BUFFER_SIZE_BYTES);
+                            }
+                        }
+                    }
+                    finally
+                    {
+                        this.mutex.ReleaseMutex();
+                    }
+
+                    // Marshal rF2 State buffer
+                    var handle = GCHandle.Alloc(sharedMemoryReadBuffer, GCHandleType.Pinned);
+
+                    mappedData = (MappedBufferT)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(MappedBufferT));
+
+                    handle.Free();
+                }
+            }
+
+            public void GetMappedDataPartial(ref MappedBufferT mappedData)
+            {
+                //
+                // IMPORTANT:  Clients that do not need consistency accross the whole buffer, like dashboards that visualize data, _do not_ need to use mutexes.
+                //
+
+                // Note: if it is critical for client minimize wait time, same strategy as plugin uses can be employed.
+                // Pass 0 timeout and skip update if someone holds the lock.
+
+                // Using partial buffer copying reduces time under lock.  Scoring by 30%, telemetry by 70%.
+                if (this.mutex.WaitOne(5000))
+                {
+                    byte[] sharedMemoryReadBuffer = null;
+                    try
+                    {
+                        bool buf1Current = false;
+                        // Try buffer 1:
+                        using (var sharedMemoryStreamView = this.memoryMappedFile1.CreateViewStream())
+                        {
+                            var sharedMemoryStream = new BinaryReader(sharedMemoryStreamView);
+                            sharedMemoryReadBuffer = sharedMemoryStream.ReadBytes(this.RF2_BUFFER_HEADER_WITH_SIZE_SIZE_BYTES);
+
+                            // Marhsal header.
+                            var headerHandle = GCHandle.Alloc(sharedMemoryReadBuffer, GCHandleType.Pinned);
+                            var header = (rF2MappedBufferHeaderWithSize)Marshal.PtrToStructure(headerHandle.AddrOfPinnedObject(), typeof(rF2MappedBufferHeaderWithSize));
+                            headerHandle.Free();
+
+                            if (header.mCurrentRead == 1)
+                            {
+                                sharedMemoryStream.BaseStream.Position = 0;
+                                sharedMemoryReadBuffer = sharedMemoryStream.ReadBytes(header.mBytesUpdatedHint != 0 ? header.mBytesUpdatedHint : this.BUFFER_SIZE_BYTES);
+                                buf1Current = true;
+                            }
+                        }
+
+                        // Read buffer 2
+                        if (!buf1Current)
+                        {
+                            using (var sharedMemoryStreamView = this.memoryMappedFile2.CreateViewStream())
+                            {
+                                var sharedMemoryStream = new BinaryReader(sharedMemoryStreamView);
+                                sharedMemoryReadBuffer = sharedMemoryStream.ReadBytes(this.RF2_BUFFER_HEADER_WITH_SIZE_SIZE_BYTES);
+
+                                // Marhsal header.
+                                var headerHandle = GCHandle.Alloc(sharedMemoryReadBuffer, GCHandleType.Pinned);
+                                var header = (rF2MappedBufferHeaderWithSize)Marshal.PtrToStructure(headerHandle.AddrOfPinnedObject(), typeof(rF2MappedBufferHeaderWithSize));
+                                headerHandle.Free();
+
+                                sharedMemoryStream.BaseStream.Position = 0;
+                                sharedMemoryReadBuffer = sharedMemoryStream.ReadBytes(header.mBytesUpdatedHint != 0 ? header.mBytesUpdatedHint : this.BUFFER_SIZE_BYTES);
+                            }
+                        }
+                    }
+                    finally
+                    {
+                        this.mutex.ReleaseMutex();
+                    }
+
+                    Array.Copy(sharedMemoryReadBuffer, this.fullSizeBuffer, sharedMemoryReadBuffer.Length);
+
+                    // Marshal rF2 State buffer
+                    var handle = GCHandle.Alloc(this.fullSizeBuffer, GCHandleType.Pinned);
+
+                    mappedData = (MappedBufferT)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(MappedBufferT));
+
+                    handle.Free();
+                }
+            }
+        }
+
+        MappedDoubleBuffer<rF2Telemetry> telemetryBuffer = new MappedDoubleBuffer<rF2Telemetry>(rFactor2Constants.MM_TELEMETRY_FILE_NAME1,
+            rFactor2Constants.MM_TELEMETRY_FILE_NAME2, rFactor2Constants.MM_TELEMETRY_FILE_ACCESS_MUTEX);
+
+        MappedDoubleBuffer<rF2Scoring> scoringBuffer = new MappedDoubleBuffer<rF2Scoring>(rFactor2Constants.MM_SCORING_FILE_NAME1,
+            rFactor2Constants.MM_SCORING_FILE_NAME2, rFactor2Constants.MM_SCORING_FILE_ACCESS_MUTEX);
+
+        MappedDoubleBuffer<rF2Extended> extendedBuffer = new MappedDoubleBuffer<rF2Extended>(rFactor2Constants.MM_EXTENDED_FILE_NAME1,
+              rFactor2Constants.MM_EXTENDED_FILE_NAME2, rFactor2Constants.MM_EXTENDED_FILE_ACCESS_MUTEX);
+
         private bool initialised = false;
         private List<RF2StructWrapper> dataToDump;
         private RF2StructWrapper[] dataReadFromFile = null;
@@ -43,11 +226,11 @@ namespace CrewChiefV4.rFactor2
             {
                 foreach (var wrapper in this.dataToDump)
                 {
-                    wrapper.telemetry.mVehicles = getPopulatedVehicleArray<rF2VehicleTelemetry>(wrapper.telemetry.mVehicles, wrapper.telemetry.mNumVehicles);
-                    wrapper.scoring.mVehicles = getPopulatedVehicleArray<rF2VehicleScoring>(wrapper.scoring.mVehicles, wrapper.scoring.mScoringInfo.mNumVehicles);
+                    wrapper.telemetry.mVehicles = this.GetPopulatedVehicleInfoArray<rF2VehicleTelemetry>(wrapper.telemetry.mVehicles, wrapper.telemetry.mNumVehicles);
+                    wrapper.scoring.mVehicles = this.GetPopulatedVehicleInfoArray<rF2VehicleScoring>(wrapper.scoring.mVehicles, wrapper.scoring.mScoringInfo.mNumVehicles);
                 }
 
-                SerializeObject(this.dataToDump.ToArray<RF2StructWrapper>(), this.filenameToDump);
+                this.SerializeObject(this.dataToDump.ToArray<RF2StructWrapper>(), this.filenameToDump);
             }
         }
 
@@ -88,19 +271,15 @@ namespace CrewChiefV4.rFactor2
                 {
                     try
                     {
-                        this.fileAccessMutex = Mutex.OpenExisting(rFactor2Constants.MM_FILE_ACCESS_MUTEX);
-                        this.memoryMappedFile1 = MemoryMappedFile.OpenExisting(rFactor2Constants.MM_FILE_NAME1);
-                        this.memoryMappedFile2 = MemoryMappedFile.OpenExisting(rFactor2Constants.MM_FILE_NAME2);
-                        // NOTE: Make sure that SHARED_MEMORY_SIZE_BYTES matches
-                        // the structure size in the plugin (plugin debug mode prints that).
-                        this.sharedMemoryReadBuffer = new byte[this.SHARED_MEMORY_SIZE_BYTES];
-                        this.initialised = true;
+                        this.telemetryBuffer.Connect();
+                        this.scoringBuffer.Connect();
+                        this.extendedBuffer.Connect();
 
                         Console.WriteLine("Initialized rFactor 2 Shared Memory");
                     }
                     catch (Exception)
                     {
-                        initialised = false;
+                        this.initialised = false;
                         this.Disconnect();
                     }
                 }
@@ -112,7 +291,6 @@ namespace CrewChiefV4.rFactor2
         {
             lock (this)
             {
-                var rF2StateMarshalled = new rF2State();
                 if (!initialised)
                 {
                     if (!this.InitialiseInternal())
@@ -122,64 +300,21 @@ namespace CrewChiefV4.rFactor2
                 }
                 try 
                 {
-                    if (this.fileAccessMutex.WaitOne(5000))
-                    {
-                        try
-                        {
-                            bool buf1Current = false;
-                            // Try buffer 1:
-                            using (var sharedMemoryStreamView = this.memoryMappedFile1.CreateViewStream())
-                            {
-                                var sharedMemoryStream = new BinaryReader(sharedMemoryStreamView);
-                                this.sharedMemoryReadBuffer = sharedMemoryStream.ReadBytes(this.SHARED_MEMORY_HEADER_SIZE_BYTES);
+                    RF2StructWrapper structWrapper = new RF2StructWrapper();
 
-                                // Marhsal header
-                                var headerHandle = GCHandle.Alloc(this.sharedMemoryReadBuffer, GCHandleType.Pinned);
-                                var header = (rF2StateHeader)Marshal.PtrToStructure(headerHandle.AddrOfPinnedObject(), typeof(rF2StateHeader));
-                                headerHandle.Free();
+                    extendedBuffer.GetMappedData(ref structWrapper.extended);
+                    telemetryBuffer.GetMappedDataPartial(ref structWrapper.telemetry);
 
-                                if (header.mCurrentRead == 1)
-                                {
-                                    sharedMemoryStream.BaseStream.Position = 0;
-                                    this.sharedMemoryReadBuffer = sharedMemoryStream.ReadBytes(this.SHARED_MEMORY_SIZE_BYTES);
-                                    buf1Current = true;
-                                }
-                            }
+                    // Scoring is the most important game data in Crew Chief sense, 
+                    // so acquire it last, hoping it will be most recent view of all buffer types.
+                    scoringBuffer.GetMappedDataPartial(ref structWrapper.scoring);
 
-                            // Read buffer 2
-                            if (!buf1Current)
-                            {
-                                using (var sharedMemoryStreamView = this.memoryMappedFile2.CreateViewStream())
-                                {
-                                    var sharedMemoryStream = new BinaryReader(sharedMemoryStreamView);
-                                    this.sharedMemoryReadBuffer = sharedMemoryStream.ReadBytes(this.SHARED_MEMORY_SIZE_BYTES);
-                                }
-                            }
-                        }
-                        finally
-                        {
-                            this.fileAccessMutex.ReleaseMutex();
-                        }
+                    structWrapper.ticksWhenRead = DateTime.Now.Ticks;
 
-                        // Marshal rF2State
-                        var handle = GCHandle.Alloc(this.sharedMemoryReadBuffer, GCHandleType.Pinned);
-                        rF2StateMarshalled = (rF2State)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(rF2State));
-                        handle.Free();
+                    if (!forSpotter && dumpToFile && this.dataToDump != null)
+                        this.dataToDump.Add(structWrapper);
 
-                        RF2StructWrapper structWrapper = new RF2StructWrapper();
-                        structWrapper.ticksWhenRead = DateTime.Now.Ticks;
-                        structWrapper.state = rF2StateMarshalled;
-                        if (!forSpotter && dumpToFile && this.dataToDump != null)
-                        {
-                            this.dataToDump.Add(structWrapper);
-                        }
-                        return structWrapper;
-                    }
-                    else
-                    {
-                        Console.WriteLine("Timed out waiting on rFactor 2 Shared Memory mutex.");
-                        return null;
-                    }
+                    return structWrapper;
                 }
                 catch (Exception ex)
                 {
@@ -190,7 +325,7 @@ namespace CrewChiefV4.rFactor2
             }
         }
 
-        private VehicleInfoT[] getPopulatedVehicleArray<VehicleInfoT>(VehicleInfoT[] vehicles, int numPopulated)
+        private VehicleInfoT[] GetPopulatedVehicleInfoArray<VehicleInfoT>(VehicleInfoT[] vehicles, int numPopulated)
         {
             // To reduce serialized size, only return non-empty vehicles.
             var populated = new List<VehicleInfoT>();
@@ -235,19 +370,10 @@ namespace CrewChiefV4.rFactor2
         private void Disconnect()
         {
             this.initialised = false;
-            if (this.memoryMappedFile1 != null)
-                this.memoryMappedFile1.Dispose();
 
-            if (this.memoryMappedFile2 != null)
-                this.memoryMappedFile2.Dispose();
-
-            if (this.fileAccessMutex != null)
-                this.fileAccessMutex.Dispose();
-
-            this.memoryMappedFile1 = null;
-            this.memoryMappedFile2 = null;
-            this.sharedMemoryReadBuffer = null;
-            this.fileAccessMutex = null;
+            this.telemetryBuffer.Disconnect();
+            this.scoringBuffer.Disconnect();
+            this.extendedBuffer.Disconnect();
         }
 
 

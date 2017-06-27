@@ -59,15 +59,13 @@ namespace CrewChiefV4.rFactor2
             this.paused = false;
         }
 
-        private rF2VehScoringInfo getVehicleInfo(rF2State shared)
+        private rF2VehicleScoring getVehicleInfo(CrewChiefV4.rFactor2.RF2SharedMemoryReader.RF2StructWrapper shared)
         {
-            for (int i = 0; i < shared.mNumVehicles; ++i)
+            for (int i = 0; i < shared.scoring.mScoringInfo.mNumVehicles; ++i)
             {
-                var vehicle = shared.mVehicles[i];
+                var vehicle = shared.scoring.mVehicles[i];
                 if (vehicle.mIsPlayer == 1)
-                {
                     return vehicle;
-                }
             }
             throw new Exception("no vehicle for player!");
         }
@@ -75,28 +73,26 @@ namespace CrewChiefV4.rFactor2
         public void trigger(Object lastStateObj, Object currentStateObj, GameStateData currentGameState)
         {
             if (this.paused)
-            {
                 return;
-            }
 
-            var lastState = ((CrewChiefV4.rFactor2.RF2SharedMemoryReader.RF2StructWrapper)lastStateObj).state;
-            var currentState = ((CrewChiefV4.rFactor2.RF2SharedMemoryReader.RF2StructWrapper)currentStateObj).state;
-            
+            var lastState = lastStateObj as CrewChiefV4.rFactor2.RF2SharedMemoryReader.RF2StructWrapper;
+            var currentState = currentStateObj as CrewChiefV4.rFactor2.RF2SharedMemoryReader.RF2StructWrapper;
+
             if (!this.enabled 
-                || currentState.mCurrentET < this.timeAfterRaceStartToActivate
-                || currentState.mInRealtimeFC == 0
-                || lastState.mInRealtimeFC == 0
-                || currentState.mNumVehicles <= 2)
+                || currentState.scoring.mScoringInfo.mCurrentET < this.timeAfterRaceStartToActivate
+                || currentState.extended.mInRealtimeFC == 0
+                || lastState.extended.mInRealtimeFC == 0
+                || currentState.scoring.mScoringInfo.mNumVehicles <= 2)
                 return;
 
             var now = DateTime.Now;
-            rF2VehScoringInfo currentPlayerData;
-            rF2VehScoringInfo previousPlayerData;
+            rF2VehicleScoring currentPlayerScoring;
+            rF2VehicleScoring previousPlayerScoring;
             float timeDiffSeconds;
             try
             {
-                currentPlayerData = getVehicleInfo(currentState);
-                previousPlayerData = getVehicleInfo(lastState);
+                currentPlayerScoring = getVehicleInfo(currentState);
+                previousPlayerScoring = getVehicleInfo(lastState);
                 timeDiffSeconds = ((float)(now - this.previousTime).TotalMilliseconds) / 1000.0f;
                 this.previousTime = now;
 
@@ -120,29 +116,65 @@ namespace CrewChiefV4.rFactor2
                     this.internalSpotter.setCarDimensions(GlobalBehaviourSettings.spotterVehicleLength, GlobalBehaviourSettings.spotterVehicleWidth);
                 }
             }
+            
+            var idsToTelIndicesMap = RF2GameStateMapper.GetIdsToTelIndicesMap(currentState.telemetry);
+            int playerTelIdx = -1;
+            if (!idsToTelIndicesMap.TryGetValue(currentPlayerScoring.mID, out playerTelIdx))
+            {
+                // TODO: remove.
+                Console.WriteLine("Couldn't find player telemetry entry for spotter");
+                return;
+            }
 
-            var currentPlayerPosition = new float[] { (float) currentPlayerData.mPos.x, (float) currentPlayerData.mPos.z };
+            var currentPlayerTelemetry = currentState.telemetry.mVehicles[playerTelIdx];
 
-            if (currentPlayerData.mInPits == 0
-                && currentPlayerData.mControl == (int)rFactor2Constants.rF2Control.Player
-                && !(currentState.mGamePhase == (int)rFactor2Constants.rF2GamePhase.Formation))  // turn off spotter for formation lap before going green
+            // TODO: linear lookup since we don't need this more than once.
+            var previousIdsToTelIndicesMap = RF2GameStateMapper.GetIdsToTelIndicesMap(lastState.telemetry);
+            int previousPlayerTelIdx = -1;
+            if (!previousIdsToTelIndicesMap.TryGetValue(previousPlayerScoring.mID, out previousPlayerTelIdx))
+            {
+                // TODO: remove.
+                Console.WriteLine("Couldn't find prev player telemetry entry for spotter");
+                return;
+            }
+            var previousPlayerTelemetry = lastState.telemetry.mVehicles[playerTelIdx];
+
+            var currentPlayerPosition = new float[] { (float) currentPlayerTelemetry.mPos.x, (float) currentPlayerTelemetry.mPos.z };
+
+            if (currentPlayerScoring.mInPits == 0
+                && currentPlayerScoring.mControl == (int)rFactor2Constants.rF2Control.Player
+                && !(currentState.scoring.mScoringInfo.mGamePhase == (int)rFactor2Constants.rF2GamePhase.Formation))  // turn off spotter for formation lap before going green
             {
                 var currentOpponentPositions = new List<float[]>();
                 var playerVelocityData = new float[3];
-                playerVelocityData[0] = (float)currentState.mSpeed;
-                playerVelocityData[1] = ((float)currentPlayerData.mPos.x - (float)previousPlayerData.mPos.x) / timeDiffSeconds;
-                playerVelocityData[2] = ((float)currentPlayerData.mPos.z - (float)previousPlayerData.mPos.z) / timeDiffSeconds;
 
-                for (int i = 0; i < currentState.mNumVehicles; ++i)
+                playerVelocityData[0] = (float)Math.Sqrt((currentPlayerTelemetry.mLocalVel.x * currentPlayerTelemetry.mLocalVel.x)
+                    + (currentPlayerTelemetry.mLocalVel.y * currentPlayerTelemetry.mLocalVel.y)
+                    + (currentPlayerTelemetry.mLocalVel.z * currentPlayerTelemetry.mLocalVel.z));
+
+                playerVelocityData[1] = ((float)currentPlayerTelemetry.mPos.x - (float)previousPlayerTelemetry.mPos.x) / timeDiffSeconds;
+                playerVelocityData[2] = ((float)currentPlayerTelemetry.mPos.z - (float)previousPlayerTelemetry.mPos.z) / timeDiffSeconds;
+
+                for (int i = 0; i < currentState.scoring.mScoringInfo.mNumVehicles; ++i)
                 {
-                    var vehicle = currentState.mVehicles[i];
+                    var vehicle = currentState.scoring.mVehicles[i];
                     if (vehicle.mIsPlayer == 1 || vehicle.mInPits == 1 || vehicle.mLapDist < 0.0f)
                         continue;
 
-                    currentOpponentPositions.Add(new float[] { (float)vehicle.mPos.x, (float)vehicle.mPos.z });
+                    int opponentTelIdx = -1;
+                    if (!idsToTelIndicesMap.TryGetValue(vehicle.mID, out opponentTelIdx))
+                    {
+                        // TODO: remove.
+                        Console.WriteLine("Couldn't find opponent telemetry entry for spotter");
+                        return;
+                    }
+
+                    var opponentTelemetry = currentState.telemetry.mVehicles[opponentTelIdx];
+
+                    currentOpponentPositions.Add(new float[] { (float)opponentTelemetry.mPos.x, (float)opponentTelemetry.mPos.z });
                 }
 
-                float playerRotation = (float)(Math.Atan2((double)(currentState.mOri[rFactor2Constants.RowZ].x), (double)(currentState.mOri[rFactor2Constants.RowZ].z)));
+                float playerRotation = (float)(Math.Atan2((double)(currentPlayerTelemetry.mOri[rFactor2Constants.RowZ].x), (double)(currentPlayerTelemetry.mOri[rFactor2Constants.RowZ].z)));
                 if (playerRotation < 0)
                     playerRotation = (float)(2 * Math.PI) + playerRotation;
 
