@@ -32,7 +32,9 @@ namespace CrewChiefV4.rFactor2
         public class RF2StructWrapper
         {
             public long ticksWhenRead;
-            public rF2State state;
+            public rF2Telemetry telemetry;
+            public rF2Scoring scoring;
+            public rF2Extended extended;
         }
 
         public override void DumpRawGameData()
@@ -40,7 +42,10 @@ namespace CrewChiefV4.rFactor2
             if (this.dumpToFile && this.dataToDump != null && this.dataToDump.Count > 0 && this.filenameToDump != null)
             {
                 foreach (var wrapper in this.dataToDump)
-                    wrapper.state.mVehicles = getPopulatedVehicleInfoArray(wrapper.state.mVehicles);
+                {
+                    wrapper.telemetry.mVehicles = getPopulatedVehicleArray<rF2VehicleTelemetry>(wrapper.telemetry.mVehicles, wrapper.telemetry.mNumVehicles);
+                    wrapper.scoring.mVehicles = getPopulatedVehicleArray<rF2VehicleScoring>(wrapper.scoring.mVehicles, wrapper.scoring.mScoringInfo.mNumVehicles);
+                }
 
                 SerializeObject(this.dataToDump.ToArray<RF2StructWrapper>(), this.filenameToDump);
             }
@@ -185,22 +190,47 @@ namespace CrewChiefV4.rFactor2
             }
         }
 
-        private rF2VehScoringInfo[] getPopulatedVehicleInfoArray(rF2VehScoringInfo[] raw)
+        private VehicleInfoT[] getPopulatedVehicleArray<VehicleInfoT>(VehicleInfoT[] vehicles, int numPopulated)
         {
-            var populated = new List<rF2VehScoringInfo>();
-            foreach (var rawData in raw)
-            {
-                if (rawData.mPlace > 0)
-                {
-                    populated.Add(rawData);
-                }
-            }
+            // To reduce serialized size, only return non-empty vehicles.
+            var populated = new List<VehicleInfoT>();
+            for (int i = 0; i < numPopulated; ++i)
+                populated.Add(vehicles[i]);
+
+            // Not sure why this is needed.
             if (populated.Count == 0)
-            {
-                populated.Add(raw[0]);
-            }
+                populated.Add(vehicles[0]);  // In case of mNumVehicles == 0 this is all zero, should be.
+
             return populated.ToArray();
         }
+        /*
+        private rF2VehicleTelemetry[] getPopulatedVehicleTelemetryArray(rF2Telemetry telemetry)
+        {
+            // To reduce serialized size, only return non-empty vehicles.
+            var populated = new List<rF2VehicleTelemetry>();
+            for (int i = 0; i < telemetry.mNumVehicles; ++i)
+                populated.Add(telemetry.mVehicles[i]);
+
+            // Not sure why this is needed.
+            if (populated.Count == 0)
+                populated.Add(telemetry.mVehicles[0]);  // In case of mNumVehicles == 0 this is all zero, should be.
+
+            return populated.ToArray();
+        }
+
+        private rF2VehicleScoring[] getPopulatedVehicleScoringArray(rF2Scoring scoring)
+        {
+            // To reduce serialized size, only return non-empty vehicles.
+            var populated = new List<rF2VehicleScoring>();
+            for (int i = 0; i < scoring.mScoringInfo.mNumVehicles; ++i)
+                populated.Add(scoring.mVehicles[i]);
+
+            // Not sure why this is needed.
+            if (populated.Count == 0)
+                populated.Add(scoring.mVehicles[0]);  // In case of mNumVehicles == 0 this is all zero, should be.
+
+            return populated.ToArray();
+        }*/
 
         private void Disconnect()
         {
