@@ -116,7 +116,8 @@ namespace CrewChiefV4.rFactor2
                     this.internalSpotter.setCarDimensions(GlobalBehaviourSettings.spotterVehicleLength, GlobalBehaviourSettings.spotterVehicleWidth);
                 }
             }
-            
+
+            // Find telemetry data for current player vehicle.
             var idsToTelIndicesMap = RF2GameStateMapper.GetIdsToTelIndicesMap(currentState.telemetry);
             int playerTelIdx = -1;
             if (!idsToTelIndicesMap.TryGetValue(currentPlayerScoring.mID, out playerTelIdx))
@@ -128,16 +129,18 @@ namespace CrewChiefV4.rFactor2
 
             var currentPlayerTelemetry = currentState.telemetry.mVehicles[playerTelIdx];
 
-            // TODO: linear lookup since we don't need this more than once.
-            var previousIdsToTelIndicesMap = RF2GameStateMapper.GetIdsToTelIndicesMap(lastState.telemetry);
+            // Find telemetry data for previous player vehicle.
             int previousPlayerTelIdx = -1;
-            if (!previousIdsToTelIndicesMap.TryGetValue(previousPlayerScoring.mID, out previousPlayerTelIdx))
+            for (int i = 0; i < lastState.telemetry.mNumVehicles; ++i)
             {
-                // TODO: remove.
-                Console.WriteLine("Couldn't find prev player telemetry entry for spotter");
-                return;
+                if (previousPlayerScoring.mID == lastState.telemetry.mVehicles[i].mID)
+                {
+                    previousPlayerTelIdx = i;
+                    break;
+                }
             }
-            var previousPlayerTelemetry = lastState.telemetry.mVehicles[playerTelIdx];
+
+            var previousPlayerTelemetry = lastState.telemetry.mVehicles[previousPlayerTelIdx];
 
             var currentPlayerPosition = new float[] { (float) currentPlayerTelemetry.mPos.x, (float) currentPlayerTelemetry.mPos.z };
 
@@ -174,7 +177,7 @@ namespace CrewChiefV4.rFactor2
                     currentOpponentPositions.Add(new float[] { (float)opponentTelemetry.mPos.x, (float)opponentTelemetry.mPos.z });
                 }
 
-                float playerRotation = (float)(Math.Atan2((double)(currentPlayerTelemetry.mOri[rFactor2Constants.RowZ].x), (double)(currentPlayerTelemetry.mOri[rFactor2Constants.RowZ].z)));
+                float playerRotation = (float)(Math.Atan2(currentPlayerTelemetry.mOri[rFactor2Constants.RowZ].x, currentPlayerTelemetry.mOri[rFactor2Constants.RowZ].z));
                 if (playerRotation < 0)
                     playerRotation = (float)(2 * Math.PI) + playerRotation;
 
@@ -185,14 +188,13 @@ namespace CrewChiefV4.rFactor2
         public void enableSpotter()
         {
             this.enabled = true;
-            audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderEnableSpotter, 0, null));
-            
+            this.audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderEnableSpotter, 0, null));
         }
 
         public void disableSpotter()
         {
             this.enabled = false;
-            audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderDisableSpotter, 0, null));
+            this.audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderDisableSpotter, 0, null));
         }
     }
 }
