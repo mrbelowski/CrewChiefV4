@@ -280,7 +280,7 @@ namespace CrewChiefV4.rFactor2
 
             // Do not use previous game state if this is the new session.
             if (csd.IsNewSession)
-            {                
+            {
                 pgs = null;
                 GlobalBehaviourSettings.UpdateFromCarClass(cgs.carClass);
             }
@@ -309,11 +309,8 @@ namespace CrewChiefV4.rFactor2
 
             ////////////////////////////////////
             // motion data
-            cgs.PositionAndMotionData.CarSpeed = (float)Math.Sqrt((playerTelemetry.mLocalVel.x * playerTelemetry.mLocalVel.x)
-                + (playerTelemetry.mLocalVel.y * playerTelemetry.mLocalVel.y)
-                + (playerTelemetry.mLocalVel.z * playerTelemetry.mLocalVel.z));
-
-            cgs.PositionAndMotionData.DistanceRoundTrack = (float)playerScoring.mLapDist;
+            cgs.PositionAndMotionData.CarSpeed = (float)RF2GameStateMapper.getVehicleSpeed(ref playerTelemetry);
+            cgs.PositionAndMotionData.DistanceRoundTrack = (float)getEstimatedLapDist(shared, ref playerScoring, ref playerTelemetry);
 
             // Is online session?
             this.isOfflineSession = true;
@@ -380,11 +377,11 @@ namespace CrewChiefV4.rFactor2
 
             cgs.PitData.OnInLap = cgs.PitData.InPitlane && csd.SectorNumber == 3;
 
-            cgs.PitData.IsMakingMandatoryPitStop = cgs.PitData.HasMandatoryPitStop 
-                && cgs.PitData.OnInLap 
+            cgs.PitData.IsMakingMandatoryPitStop = cgs.PitData.HasMandatoryPitStop
+                && cgs.PitData.OnInLap
                 && csd.CompletedLaps > cgs.PitData.PitWindowStart;
 
-            cgs.PitData.PitWindow = cgs.PitData.IsMakingMandatoryPitStop 
+            cgs.PitData.PitWindow = cgs.PitData.IsMakingMandatoryPitStop
                 ? PitWindow.StopInProgress : mapToPitWindow((rFactor2Constants.rF2YellowFlagState)shared.scoring.mScoringInfo.mYellowFlagState);
 
             ////////////////////////////////////
@@ -396,7 +393,7 @@ namespace CrewChiefV4.rFactor2
                 psd.restorePlayerTimings(csd);
             }
 
-            this.processPlayerTimingData(ref rf2state, cgs, pgs, ref playerScoring);
+            this.processPlayerTimingData(ref shared.scoring, cgs, pgs, ref playerScoring);
 
             csd.SessionTimesAtEndOfSectors = pgs != null ? psd.SessionTimesAtEndOfSectors : new SessionData().SessionTimesAtEndOfSectors;
 
@@ -441,13 +438,13 @@ namespace CrewChiefV4.rFactor2
 
             // --------------------------------
             // engine data
-            cgs.EngineData.EngineRpm = (float)shared.scoring.mScoringInfo.mEngineRPM;
-            cgs.EngineData.MaxEngineRpm = (float)shared.scoring.mScoringInfo.mEngineMaxRPM;
+            cgs.EngineData.EngineRpm = (float)playerTelemetry.mEngineRPM;
+            cgs.EngineData.MaxEngineRpm = (float)playerTelemetry.mEngineMaxRPM;
             cgs.EngineData.MinutesIntoSessionBeforeMonitoring = 5;
-            cgs.EngineData.EngineOilTemp = (float)shared.scoring.mScoringInfo.mEngineOilTemp;
-            cgs.EngineData.EngineWaterTemp = (float)shared.scoring.mScoringInfo.mEngineWaterTemp;
+            cgs.EngineData.EngineOilTemp = (float)playerTelemetry.mEngineOilTemp;
+            cgs.EngineData.EngineWaterTemp = (float)playerTelemetry.mEngineWaterTemp;
             //HACK: there's probably a cleaner way to do this...
-            if (shared.scoring.mScoringInfo.mOverheating == 1)
+            if (playerTelemetry.mOverheating == 1)
             {
                 cgs.EngineData.EngineWaterTemp += 50;
                 cgs.EngineData.EngineOilTemp += 50;
@@ -455,48 +452,56 @@ namespace CrewChiefV4.rFactor2
 
             // --------------------------------
             // transmission data
-            cgs.TransmissionData.Gear = shared.scoring.mScoringInfo.mGear;
+            cgs.TransmissionData.Gear = playerTelemetry.mGear;
 
             // controls
-            cgs.ControlData.BrakePedal = (float)shared.scoring.mScoringInfo.mUnfilteredBrake;
-            cgs.ControlData.ThrottlePedal = (float)shared.scoring.mScoringInfo.mUnfilteredThrottle;
-            cgs.ControlData.ClutchPedal = (float)shared.scoring.mScoringInfo.mUnfilteredClutch;
+            cgs.ControlData.BrakePedal = (float)playerTelemetry.mUnfilteredBrake;
+            cgs.ControlData.ThrottlePedal = (float)playerTelemetry.mUnfilteredThrottle;
+            cgs.ControlData.ClutchPedal = (float)playerTelemetry.mUnfilteredClutch;
 
             // --------------------------------
             // damage
             cgs.CarDamageData.DamageEnabled = true;
-            cgs.CarDamageData.LastImpactTime = (float)shared.scoring.mScoringInfo.mLastImpactET;
+            cgs.CarDamageData.LastImpactTime = (float)playerTelemetry.mLastImpactET;
 
-            if (shared.scoring.mScoringInfo.mInvulnerable == 0)
+            var playerDamageInfo = new rF2TrackedDamage();
+            try
+            {
+                playerDamageInfo = shared.extended.mTrackedDamages[playerScoring.mID];
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                writeDebugMsg("Failed to find player vehicle damage info");
+            }
+
+            if (shared.extended.mPhysics.mInvulnerable == 0)
             {
                 const double MINOR_DAMAGE_THRESHOLD = 1500.0;
                 const double MAJOR_DAMAGE_THRESHOLD = 4000.0;
                 const double ACCUMULATED_THRESHOLD_FACTOR = 4.0;
 
                 bool anyWheelDetached = false;
-                foreach (var wheel in shared.scoring.mScoringInfo.mWheels)
-                {
+                foreach (var wheel in playerTelemetry.mWheels)
                     anyWheelDetached |= wheel.mDetached == 1;
-                }
 
-                if (shared.scoring.mScoringInfo.mDetached == 1
+                if (playerTelemetry.mDetached == 1
                     && anyWheelDetached)  // Wheel is not really aero damage, but it is bad situation.
                 {
                     // Things are sad if we have both part and wheel detached.
                     cgs.CarDamageData.OverallAeroDamage = DamageLevel.DESTROYED;
                 }
-                else if (shared.scoring.mScoringInfo.mDetached == 1  // If there are parts detached, consider damage major, and pit stop is necessary.
-                    || shared.scoring.mScoringInfo.mMaxImpactMagnitude > MAJOR_DAMAGE_THRESHOLD)  // Also take max impact magnitude into consideration.
+                else if (playerTelemetry.mDetached == 1  // If there are parts detached, consider damage major, and pit stop is necessary.
+                    || playerDamageInfo.mMaxImpactMagnitude > MAJOR_DAMAGE_THRESHOLD)  // Also take max impact magnitude into consideration.
                 {
 
                     cgs.CarDamageData.OverallAeroDamage = DamageLevel.MAJOR;
                 }
-                else if (shared.scoring.mScoringInfo.mMaxImpactMagnitude > MINOR_DAMAGE_THRESHOLD
-                    || shared.scoring.mScoringInfo.mAccumulatedImpactMagnitude > MINOR_DAMAGE_THRESHOLD * ACCUMULATED_THRESHOLD_FACTOR)  // Also consider accumulated damage, if user grinds car against the wall, max won't be high, but car is still damaged.
+                else if (playerDamageInfo.mMaxImpactMagnitude > MINOR_DAMAGE_THRESHOLD
+                    || playerDamageInfo.mAccumulatedImpactMagnitude > MINOR_DAMAGE_THRESHOLD * ACCUMULATED_THRESHOLD_FACTOR)  // Also consider accumulated damage, if user grinds car against the wall, max won't be high, but car is still damaged.
                 {
                     cgs.CarDamageData.OverallAeroDamage = DamageLevel.MINOR;
                 }
-                else if (shared.scoring.mScoringInfo.mMaxImpactMagnitude > 0.0)
+                else if (playerDamageInfo.mMaxImpactMagnitude > 0.0)
                 {
                     cgs.CarDamageData.OverallAeroDamage = DamageLevel.TRIVIAL;
                 }
@@ -505,10 +510,10 @@ namespace CrewChiefV4.rFactor2
                     cgs.CarDamageData.OverallAeroDamage = DamageLevel.NONE;
                 }
             }
-            else  // shared.scoring.mScoringInfo.mInvulnerable != 0
+            else  // shared.extended.mPhysics.mInvulnerable != 0
             {
                 // roll over all you want - it's just a scratch.
-                cgs.CarDamageData.OverallAeroDamage = shared.scoring.mScoringInfo.mMaxImpactMagnitude > 0.0 ? DamageLevel.TRIVIAL : DamageLevel.NONE;
+                cgs.CarDamageData.OverallAeroDamage = playerDamageInfo.mMaxImpactMagnitude > 0.0 ? DamageLevel.TRIVIAL : DamageLevel.NONE;
             }
 
             // --------------------------------
@@ -519,7 +524,7 @@ namespace CrewChiefV4.rFactor2
             // tire data
             // rF2 reports in Kelvin
             cgs.TyreData.TireWearActive = true;
-            var wheelFrontLeft = shared.scoring.mScoringInfo.mWheels[(int)rFactor2Constants.rF2WheelIndex.FrontLeft];
+            var wheelFrontLeft = playerTelemetry.mWheels[(int)rFactor2Constants.rF2WheelIndex.FrontLeft];
             cgs.TyreData.LeftFrontAttached = wheelFrontLeft.mDetached == 0;
             cgs.TyreData.FrontLeft_LeftTemp = (float)wheelFrontLeft.mTemperature[0] - 273.15f;
             cgs.TyreData.FrontLeft_CenterTemp = (float)wheelFrontLeft.mTemperature[1] - 273.15f;
@@ -537,7 +542,7 @@ namespace CrewChiefV4.rFactor2
                 cgs.TyreData.PeakFrontLeftTemperatureForLap = frontLeftTemp;
             }
 
-            var wheelFrontRight = shared.scoring.mScoringInfo.mWheels[(int)rFactor2Constants.rF2WheelIndex.FrontRight];
+            var wheelFrontRight = playerTelemetry.mWheels[(int)rFactor2Constants.rF2WheelIndex.FrontRight];
             cgs.TyreData.RightFrontAttached = wheelFrontRight.mDetached == 0;
             cgs.TyreData.FrontRight_LeftTemp = (float)wheelFrontRight.mTemperature[0] - 273.15f;
             cgs.TyreData.FrontRight_CenterTemp = (float)wheelFrontRight.mTemperature[1] - 273.15f;
@@ -552,7 +557,7 @@ namespace CrewChiefV4.rFactor2
             else if (pgs == null || frontRightTemp > pgs.TyreData.PeakFrontRightTemperatureForLap)
                 cgs.TyreData.PeakFrontRightTemperatureForLap = frontRightTemp;
 
-            var wheelRearLeft = shared.scoring.mScoringInfo.mWheels[(int)rFactor2Constants.rF2WheelIndex.RearLeft];
+            var wheelRearLeft = playerTelemetry.mWheels[(int)rFactor2Constants.rF2WheelIndex.RearLeft];
             cgs.TyreData.LeftRearAttached = wheelRearLeft.mDetached == 0;
             cgs.TyreData.RearLeft_LeftTemp = (float)wheelRearLeft.mTemperature[0] - 273.15f;
             cgs.TyreData.RearLeft_CenterTemp = (float)wheelRearLeft.mTemperature[1] - 273.15f;
@@ -567,7 +572,7 @@ namespace CrewChiefV4.rFactor2
             else if (pgs == null || rearLeftTemp > pgs.TyreData.PeakRearLeftTemperatureForLap)
                 cgs.TyreData.PeakRearLeftTemperatureForLap = rearLeftTemp;
 
-            var wheelRearRight = shared.scoring.mScoringInfo.mWheels[(int)rFactor2Constants.rF2WheelIndex.RearRight];
+            var wheelRearRight = playerTelemetry.mWheels[(int)rFactor2Constants.rF2WheelIndex.RearRight];
             cgs.TyreData.RightRearAttached = wheelRearRight.mDetached == 0;
             cgs.TyreData.RearRight_LeftTemp = (float)wheelRearRight.mTemperature[0] - 273.15f;
             cgs.TyreData.RearRight_CenterTemp = (float)wheelRearRight.mTemperature[1] - 273.15f;
@@ -652,8 +657,8 @@ namespace CrewChiefV4.rFactor2
             Dictionary<string, int> duplicatesCreated = new Dictionary<string, int>();
             for (int i = 0; i < shared.scoring.mScoringInfo.mNumVehicles; ++i)
             {
-                var vehicle = shared.scoring.mScoringInfo.mVehicles[i];
-                var driverName = getStringFromBytes(vehicle.mDriverName).ToLower();
+                var vehicleScoring = shared.scoring.mVehicles[i];
+                var driverName = getStringFromBytes(vehicleScoring.mDriverName).ToLower();
 
                 if (driverNameCounts.ContainsKey(driverName))
                     driverNameCounts[driverName] += 1;
@@ -663,8 +668,8 @@ namespace CrewChiefV4.rFactor2
 
             for (int i = 0; i < shared.scoring.mScoringInfo.mNumVehicles; ++i)
             {
-                var vehicle = shared.scoring.mScoringInfo.mVehicles[i];
-                if (vehicle.mIsPlayer == 1)
+                var vehicleScoring = shared.scoring.mVehicles[i];
+                if (vehicleScoring.mIsPlayer == 1)
                 {
                     csd.OverallSessionBestLapTime = csd.PlayerLapTimeSessionBest > 0.0f ?
                         csd.PlayerLapTimeSessionBest : -1.0f;
@@ -675,11 +680,22 @@ namespace CrewChiefV4.rFactor2
                     continue;
                 }
 
-                var ct = this.mapToControlType((rFactor2Constants.rF2Control)vehicle.mControl);
+                var ct = this.mapToControlType((rFactor2Constants.rF2Control)vehicleScoring.mControl);
                 if (ct == ControlType.Player || ct == ControlType.Replay || ct == ControlType.Unavailable)
                     continue;
 
-                var driverName = getStringFromBytes(vehicle.mDriverName).ToLower();
+                // Get telemetry for this vehicle.
+                int vehicleTelIdx = -1;
+                if (!idsToTelIndicesMap.TryGetValue(vehicleScoring.mID, out vehicleTelIdx))
+                {
+                    Console.WriteLine("Couldn't find opponent telemetry entry for mapper");
+                    // Temporary glitch?
+                    continue;
+                }
+
+                var vehicleTelemetry = shared.telemetry.mVehicles[vehicleTelIdx];
+
+                var driverName = getStringFromBytes(vehicleScoring.mDriverName).ToLower();
                 OpponentData opponentPrevious;
                 int duplicatesCount = driverNameCounts[driverName];
                 string opponentKey;
@@ -701,7 +717,7 @@ namespace CrewChiefV4.rFactor2
                     else
                     {
                         // offline we can have any number of duplicates :(
-                        opponentKey = getOpponentKeyForVehicleInfo(vehicle, pgs, csd.SessionRunningTime, driverName, duplicatesCount);
+                        opponentKey = getOpponentKeyForVehicleInfo(ref vehicleScoring, ref vehicleTelemetry, pgs, csd.SessionRunningTime, driverName, duplicatesCount);
                         if (opponentKey == null)
                         {
                             // there's no previous opponent data record for this driver so create one
@@ -718,14 +734,15 @@ namespace CrewChiefV4.rFactor2
                 {
                     opponentKey = driverName;
                 }
+
                 opponentPrevious = pgs == null || opponentKey == null || !pgs.OpponentData.ContainsKey(opponentKey) ? null : previousGameState.OpponentData[opponentKey];
                 var opponent = new OpponentData();
                 opponent.DriverRawName = driverName;
-                opponent.CarClass = CarData.getCarClassForClassName(getStringFromBytes(vehicle.mVehicleClass)); 
+                opponent.CarClass = CarData.getCarClassForClassName(getStringFromBytes(vehicleScoring.mVehicleClass));
 
                 opponent.DriverRawName = driverName;
                 opponent.DriverNameSet = opponent.DriverRawName.Length > 0;
-                opponent.Position = vehicle.mPlace;
+                opponent.Position = vehicleScoring.mPlace;
 
                 if (opponent.DriverNameSet && opponentPrevious == null && CrewChief.enableDriverNames)
                 {
@@ -746,28 +763,33 @@ namespace CrewChiefV4.rFactor2
                     = opponentPrevious != null && opponentPrevious.Position != opponent.Position
                             ? csd.SessionRunningTime : -1.0f;
 
-                opponent.CompletedLaps = vehicle.mTotalLaps;
-                opponent.CurrentSectorNumber = vehicle.mSector == 0 ? 3 : vehicle.mSector;
-
+                opponent.CompletedLaps = vehicleScoring.mTotalLaps;
+                opponent.CurrentSectorNumber = vehicleScoring.mSector == 0 ? 3 : vehicleScoring.mSector;
+                /*
+    // Below members have identical meaning in TelelmInfoV01 and VehicleScoringInfoV01
+    // so update them.
+    CHECK (consider using Tel number) - pBuf->mLapStartET = info.mVehicle[0].mLapStartET;
+    CHECK (consider using Tel number, mLapNumber) pBuf->mLapNumber = info.mVehicle[0].mTotalLaps;
+             */
                 var isNewSector = csd.IsNewSession || (opponentPrevious != null && opponentPrevious.CurrentSectorNumber != opponent.CurrentSectorNumber);
                 opponent.IsNewLap = csd.IsNewSession || (isNewSector && opponent.CurrentSectorNumber == 1 && opponent.CompletedLaps > 0);
-                opponent.Speed = (float)vehicle.mSpeed;
-                opponent.DistanceRoundTrack = (float)vehicle.mLapDist;
-                opponent.WorldPosition = new float[] { (float)vehicle.mPos.x, (float)vehicle.mPos.z };
-                opponent.CurrentBestLapTime = vehicle.mBestLapTime > 0.0f ? (float)vehicle.mBestLapTime : -1.0f;
+                opponent.Speed = (float)RF2GameStateMapper.getVehicleSpeed(ref vehicleTelemetry);
+                opponent.DistanceRoundTrack = (float)RF2GameStateMapper.getEstimatedLapDist(shared, ref vehicleScoring, ref vehicleTelemetry);
+                opponent.WorldPosition = new float[] { (float)vehicleTelemetry.mPos.x, (float)vehicleTelemetry.mPos.z };
+                opponent.CurrentBestLapTime = vehicleScoring.mBestLapTime > 0.0f ? (float)vehicleScoring.mBestLapTime : -1.0f;
                 opponent.PreviousBestLapTime = opponentPrevious != null && opponentPrevious.CurrentBestLapTime > 0.0f &&
                     opponentPrevious.CurrentBestLapTime > opponent.CurrentBestLapTime ? opponentPrevious.CurrentBestLapTime : -1.0f;
                 float previousDistanceRoundTrack = opponentPrevious != null ? opponentPrevious.DistanceRoundTrack : 0;
-                opponent.bestSector1Time = vehicle.mBestSector1 > 0 ? (float)vehicle.mBestSector1 : -1.0f;
-                opponent.bestSector2Time = vehicle.mBestSector2 > 0 && vehicle.mBestSector1 > 0.0f ? (float)(vehicle.mBestSector2 - vehicle.mBestSector1) : -1.0f;
-                opponent.bestSector3Time = vehicle.mBestLapTime > 0 && vehicle.mBestSector2 > 0.0f ? (float)(vehicle.mBestLapTime - vehicle.mBestSector2) : -1.0f;
-                opponent.LastLapTime = vehicle.mLastLapTime > 0 ? (float)vehicle.mLastLapTime : -1.0f;
-                opponent.InPits = vehicle.mInPits == 1;
+                opponent.bestSector1Time = vehicleScoring.mBestSector1 > 0 ? (float)vehicleScoring.mBestSector1 : -1.0f;
+                opponent.bestSector2Time = vehicleScoring.mBestSector2 > 0 && vehicleScoring.mBestSector1 > 0.0f ? (float)(vehicleScoring.mBestSector2 - vehicleScoring.mBestSector1) : -1.0f;
+                opponent.bestSector3Time = vehicleScoring.mBestLapTime > 0 && vehicleScoring.mBestSector2 > 0.0f ? (float)(vehicleScoring.mBestLapTime - vehicleScoring.mBestSector2) : -1.0f;
+                opponent.LastLapTime = vehicleScoring.mLastLapTime > 0 ? (float)vehicleScoring.mLastLapTime : -1.0f;
+                opponent.InPits = vehicleScoring.mInPits == 1;
 
-                var lastSectorTime = this.getLastSectorTime(ref vehicle, opponent.CurrentSectorNumber);
+                var lastSectorTime = this.getLastSectorTime(ref vehicleScoring, opponent.CurrentSectorNumber);
 
                 bool lapValid = true;
-                if (vehicle.mCountLapFlag != 2)
+                if (vehicleScoring.mCountLapFlag != 2)
                     lapValid = false;
 
                 if (opponent.IsNewLap)
@@ -789,7 +811,7 @@ namespace CrewChiefV4.rFactor2
                     opponent.StartNewLap(
                         opponent.CompletedLaps + 1,
                         opponent.Position,
-                        vehicle.mInPits == 1 || opponent.DistanceRoundTrack < 0.0f,
+                        vehicleScoring.mInPits == 1 || opponent.DistanceRoundTrack < 0.0f,
                         csd.SessionRunningTime,
                         shared.scoring.mScoringInfo.mRaining > minRainThreshold,
                         (float)shared.scoring.mScoringInfo.mTrackTemp,
@@ -808,7 +830,7 @@ namespace CrewChiefV4.rFactor2
                         (float)shared.scoring.mScoringInfo.mAmbientTemp);
                 }
 
-                if (vehicle.mInPits == 1
+                if (vehicleScoring.mInPits == 1
                     && opponent.CurrentSectorNumber == 3
                     && opponentPrevious != null
                     && !opponentPrevious.isEnteringPits())
@@ -847,7 +869,7 @@ namespace CrewChiefV4.rFactor2
 
                 // session best lap times
                 if (opponent.Position == csd.Position + 1)
-                    csd.TimeDeltaBehind = (float)Math.Abs(vehicle.mTimeBehindNext);
+                    csd.TimeDeltaBehind = (float)Math.Abs(vehicleScoring.mTimeBehindNext);
 
                 if (opponent.CurrentBestLapTime > 0.0f
                     && (opponent.CurrentBestLapTime < csd.OpponentsLapTimeSessionBestOverall
@@ -900,7 +922,7 @@ namespace CrewChiefV4.rFactor2
 
                 csd.trackLandmarksTiming = previousGameState.SessionData.trackLandmarksTiming;
                 String stoppedInLandmark = csd.trackLandmarksTiming.updateLandmarkTiming(csd.TrackDefinition,
-                    csd.SessionRunningTime, previousGameState.PositionAndMotionData.DistanceRoundTrack, cgs.PositionAndMotionData.DistanceRoundTrack, (float) shared.scoring.mScoringInfo.mSpeed);
+                    csd.SessionRunningTime, previousGameState.PositionAndMotionData.DistanceRoundTrack, cgs.PositionAndMotionData.DistanceRoundTrack, (float)shared.scoring.mScoringInfo.mSpeed);
                 cgs.SessionData.stoppedInLandmark = cgs.PitData.InPitlane ? null : stoppedInLandmark;
                 if (csd.IsNewLap)
                     csd.trackLandmarksTiming.cancelWaitingForLandmarkEnd();
@@ -924,7 +946,7 @@ namespace CrewChiefV4.rFactor2
             // flags data
             // TODO: should RF2 ever drop back to the improvised incident calling?
             cgs.FlagData.useImprovisedIncidentCalling = false;
-            
+
             cgs.FlagData.isFullCourseYellow = csd.SessionPhase == SessionPhase.FullCourseYellow
                 || shared.scoring.mScoringInfo.mYellowFlagState == (sbyte)rFactor2Constants.rF2YellowFlagState.Resume;
 
@@ -1077,11 +1099,36 @@ namespace CrewChiefV4.rFactor2
             return cgs;
         }
 
+        private static double getVehicleSpeed(ref rF2VehicleTelemetry playerTelemetry)
+        {
+            return Math.Sqrt((playerTelemetry.mLocalVel.x * playerTelemetry.mLocalVel.x)
+                + (playerTelemetry.mLocalVel.y * playerTelemetry.mLocalVel.y)
+                + (playerTelemetry.mLocalVel.z * playerTelemetry.mLocalVel.z));
+        }
+
+        // Estimate lapdist
+        // See how much ahead telemetry is ahead of scoring update
+        // TODO: experiment with pick speed from telemetry.
+        private static double getEstimatedLapDist(RF2SharedMemoryReader.RF2StructWrapper shared, ref rF2VehicleScoring vehicleScoring, ref rF2VehicleTelemetry vehicleTelemetry)
+        {
+            var delta = vehicleTelemetry.mElapsedTime - shared.scoring.mScoringInfo.mCurrentET;
+            var lapDistEstimated = vehicleScoring.mLapDist;
+            if (delta > 0.0)
+            {
+                var localZAccelEstimated = vehicleScoring.mLocalAccel.z * delta;
+                var localZVelEstimated = vehicleScoring.mLocalVel.z + localZAccelEstimated;
+
+                lapDistEstimated = vehicleScoring.mLapDist - localZVelEstimated * delta;
+            }
+
+            return lapDistEstimated;
+        }
+
         private void processPlayerTimingData(
-            ref rF2State rf2state,
+            ref rF2Scoring scoring,
             GameStateData currentGameState,
             GameStateData previousGameState,
-            ref rF2VehicleScoring player)
+            ref rF2VehicleScoring playerScoring)
         {
             var cgs = currentGameState;
             var csd = cgs.SessionData;
@@ -1095,16 +1142,16 @@ namespace CrewChiefV4.rFactor2
 
             /////////////////////////////////////
             // Current lap timings
-            csd.LapTimeCurrent = csd.SessionRunningTime - (float)player.mLapStartET;
-            csd.LapTimePrevious = player.mLastLapTime > 0.0f ? (float)player.mLastLapTime : -1.0f;
+            csd.LapTimeCurrent = csd.SessionRunningTime - (float)playerScoring.mLapStartET;
+            csd.LapTimePrevious = playerScoring.mLastLapTime > 0.0f ? (float)playerScoring.mLastLapTime : -1.0f;
 
             // Last (most current) per-sector times:
             // Note: this logic still misses invalid sector handling.
-            var lastS1Time = player.mLastSector1 > 0.0 ? player.mLastSector1 : -1.0;
-            var lastS2Time = player.mLastSector1 > 0.0 && player.mLastSector2 > 0.0
-                ? player.mLastSector2 - player.mLastSector1 : -1.0;
-            var lastS3Time = player.mLastSector2 > 0.0 && player.mLastLapTime > 0.0
-                ? player.mLastLapTime - player.mLastSector2 : -1.0;
+            var lastS1Time = playerScoring.mLastSector1 > 0.0 ? playerScoring.mLastSector1 : -1.0;
+            var lastS2Time = playerScoring.mLastSector1 > 0.0 && playerScoring.mLastSector2 > 0.0
+                ? playerScoring.mLastSector2 - playerScoring.mLastSector1 : -1.0;
+            var lastS3Time = playerScoring.mLastSector2 > 0.0 && playerScoring.mLastLapTime > 0.0
+                ? playerScoring.mLastLapTime - playerScoring.mLastSector2 : -1.0;
 
             csd.LastSector1Time = (float)lastS1Time;
             csd.LastSector2Time = (float)lastS2Time;
@@ -1112,11 +1159,11 @@ namespace CrewChiefV4.rFactor2
 
             // Check if we have more current values for S1 and S2.
             // S3 always equals to lastS3Time.
-            if (player.mCurSector1 > 0.0)
-                csd.LastSector1Time = (float)player.mCurSector1;
+            if (playerScoring.mCurSector1 > 0.0)
+                csd.LastSector1Time = (float)playerScoring.mCurSector1;
 
-            if (player.mCurSector1 > 0.0 && player.mCurSector2 > 0.0)
-                csd.LastSector2Time = (float)(player.mCurSector2 - player.mCurSector1);
+            if (playerScoring.mCurSector1 > 0.0 && playerScoring.mCurSector2 > 0.0)
+                csd.LastSector2Time = (float)(playerScoring.mCurSector2 - playerScoring.mCurSector1);
 
             // Verify lap is valid
             // TODO: Apply something similar to opponents.
@@ -1137,7 +1184,7 @@ namespace CrewChiefV4.rFactor2
                 csd.CurrentLapIsValid = false;
             }
             // rF2 lap time or whole lap won't count
-            else if (player.mCountLapFlag != (byte)rFactor2Constants.rF2CountLapFlag.CountLapAndTime
+            else if (playerScoring.mCountLapFlag != (byte)rFactor2Constants.rF2CountLapFlag.CountLapAndTime
                 // And, this is not an out/in lap
                 && !cgs.PitData.OnOutLap && !cgs.PitData.OnInLap)
             {
@@ -1150,7 +1197,7 @@ namespace CrewChiefV4.rFactor2
 
             /////////////////////////////////////////
             // Update Sector/Lap timings.
-            var lastSectorTime = this.getLastSectorTime(ref player, csd.SectorNumber);
+            var lastSectorTime = this.getLastSectorTime(ref playerScoring, csd.SectorNumber);
 
             if (csd.IsNewLap)
             {
@@ -1161,9 +1208,9 @@ namespace CrewChiefV4.rFactor2
                         csd.SessionRunningTime,
                         csd.LapTimePrevious,
                         csd.CurrentLapIsValid,
-                        shared.scoring.mScoringInfo.mRaining > minRainThreshold,
-                        (float)shared.scoring.mScoringInfo.mTrackTemp,
-                        (float)shared.scoring.mScoringInfo.mAmbientTemp,
+                        scoring.mScoringInfo.mRaining > minRainThreshold,
+                        (float)scoring.mScoringInfo.mTrackTemp,
+                        (float)scoring.mScoringInfo.mAmbientTemp,
                         csd.SessionHasFixedTime,
                         csd.SessionTimeRemaining,
                         3);
@@ -1172,11 +1219,11 @@ namespace CrewChiefV4.rFactor2
                 csd.playerStartNewLap(
                     csd.CompletedLaps + 1,
                     csd.Position,
-                    player.mInPits == 1 || currentGameState.PositionAndMotionData.DistanceRoundTrack < 0.0f,
+                    playerScoring.mInPits == 1 || currentGameState.PositionAndMotionData.DistanceRoundTrack < 0.0f,
                     csd.SessionRunningTime,
-                    shared.scoring.mScoringInfo.mRaining > minRainThreshold,
-                    (float)shared.scoring.mScoringInfo.mTrackTemp,
-                    (float)shared.scoring.mScoringInfo.mAmbientTemp);
+                    scoring.mScoringInfo.mRaining > minRainThreshold,
+                    (float)scoring.mScoringInfo.mTrackTemp,
+                    (float)scoring.mScoringInfo.mAmbientTemp);
             }
             else if (csd.IsNewSector && lastSectorTime > 0.0f)
             {
@@ -1186,9 +1233,9 @@ namespace CrewChiefV4.rFactor2
                     lastSectorTime,
                     csd.SessionRunningTime,
                     csd.CurrentLapIsValid,
-                    shared.scoring.mScoringInfo.mRaining > minRainThreshold,
-                    (float)shared.scoring.mScoringInfo.mTrackTemp,
-                    (float)shared.scoring.mScoringInfo.mAmbientTemp);
+                    scoring.mScoringInfo.mRaining > minRainThreshold,
+                    (float)scoring.mScoringInfo.mTrackTemp,
+                    (float)scoring.mScoringInfo.mAmbientTemp);
             }
         }
 
@@ -1304,7 +1351,7 @@ namespace CrewChiefV4.rFactor2
         }
 
         // finds OpponentData key for given vehicle based on driver name, vehicle class, and world position
-        private String getOpponentKeyForVehicleInfo(rF2VehicleScoring vehicle, GameStateData previousGameState, float sessionRunningTime, String driverName, int duplicatesCount)
+        private String getOpponentKeyForVehicleInfo(ref rF2VehicleScoring vehicleScoring, ref rF2VehicleTelemetry vehicleTelemetry, GameStateData previousGameState, float sessionRunningTime, String driverName, int duplicatesCount)
         {
             if (previousGameState == null)
                 return null;
@@ -1313,7 +1360,7 @@ namespace CrewChiefV4.rFactor2
             for (int i = 1; i <= duplicatesCount; i++)
                 possibleKeys.Add(driverName + "_duplicate_ " + i);
 
-            float[] worldPos = { (float)vehicle.mPos.x, (float)vehicle.mPos.z };
+            float[] worldPos = { (float)vehicleTelemetry.mPos.x, (float)vehicleTelemetry.mPos.z };
             float minDistDiff = -1.0f;
             float timeDelta = sessionRunningTime - previousGameState.SessionData.SessionRunningTime;
             String bestKey = null;
@@ -1324,8 +1371,8 @@ namespace CrewChiefV4.rFactor2
                     if (previousGameState.OpponentData.ContainsKey(possibleKey))
                     {
                         OpponentData o = previousGameState.OpponentData[possibleKey];
-                        if (o.DriverRawName != getStringFromBytes(vehicle.mDriverName).ToLower() ||
-                            o.CarClass != CarData.getCarClassForClassName(getStringFromBytes(vehicle.mVehicleClass)) ||
+                        if (o.DriverRawName != getStringFromBytes(vehicleScoring.mDriverName).ToLower() ||
+                            o.CarClass != CarData.getCarClassForClassName(getStringFromBytes(vehicleScoring.mVehicleClass)) ||
                             opponentKeysProcessed.Contains(possibleKey))
                         {
                             continue;
