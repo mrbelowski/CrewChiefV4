@@ -274,6 +274,7 @@ namespace CrewChiefV4.rFactor2
                         this.telemetryBuffer.Connect();
                         this.scoringBuffer.Connect();
                         this.extendedBuffer.Connect();
+                        this.initialised = true;
 
                         Console.WriteLine("Initialized rFactor 2 Shared Memory");
                     }
