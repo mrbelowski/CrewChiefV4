@@ -28,9 +28,8 @@ namespace CrewChiefV4
 
         protected String dataFilesPath;
 
-        public Boolean Initialise()
+        public GameDataReader()
         {
-            Console.WriteLine("initialising");
             if (System.Diagnostics.Debugger.IsAttached)
             {
                 dataFilesPath = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location), @"..\", @"..\dataFiles\");
@@ -45,10 +44,20 @@ namespace CrewChiefV4
                 catch (Exception)
                 {
                     Console.WriteLine("Unable to create folder for data file, no session record will be available");
-                    dumpToFile = false;
+                    dataFilesPath = null;
                 }
             }
+        }
+
+        public Boolean Initialise()
+        {
+            Console.WriteLine("initialising");
             Boolean initialised = InitialiseInternal();
+            if (dataFilesPath == null)
+            {
+                // We can't dump to file if there's no valid path.
+                dumpToFile = false;
+            }
             if (initialised && dumpToFile)
             {
                 filenameToDump = dataFilesPath + "\\recording_" + DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss") + ".xml";
