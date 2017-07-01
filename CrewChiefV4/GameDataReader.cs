@@ -37,7 +37,7 @@ namespace CrewChiefV4
             }
             else
             {
-                dataFilesPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "CrewChiefV4\\");
+                dataFilesPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "CrewChiefV4", "debugLogs");
                 try
                 {
                     System.IO.Directory.CreateDirectory(dataFilesPath);
@@ -51,7 +51,7 @@ namespace CrewChiefV4
             Boolean initialised = InitialiseInternal();
             if (initialised && dumpToFile)
             {
-                filenameToDump = dataFilesPath + "recording_" + DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss") + ".xml";
+                filenameToDump = dataFilesPath + "\\recording_" + DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss") + ".xml";
                 Console.WriteLine("session recording will be dumped to file: " + filenameToDump);
             }
             return initialised;
