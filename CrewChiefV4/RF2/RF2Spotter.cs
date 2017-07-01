@@ -118,7 +118,7 @@ namespace CrewChiefV4.rFactor2
             }
 
             // Find telemetry data for current player vehicle.
-            var idsToTelIndicesMap = RF2GameStateMapper.GetIdsToTelIndicesMap(ref currentState.telemetry);
+            var idsToTelIndicesMap = RF2GameStateMapper.getIdsToTelIndicesMap(ref currentState.telemetry);
             int playerTelIdx = -1;
             if (!idsToTelIndicesMap.TryGetValue(currentPlayerScoring.mID, out playerTelIdx))
             {

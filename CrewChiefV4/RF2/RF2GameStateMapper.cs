@@ -149,15 +149,6 @@ namespace CrewChiefV4.rFactor2
                 return pgs;
             }
 
-            // game is paused or other window has taken focus
-            // NOTE: this never hits so far.
-            // TODO: remove soon
-            if (shared.telemetry.mVehicles[0].mDeltaTime > 0.5)
-            {
-                RF2GameStateMapper.writeDebugMsg("mDeltaTime pause detected.");
-                return pgs;
-            }
-
             // --------------------------------
             // session data
             // get player scoring info (usually index 0)
@@ -195,18 +186,28 @@ namespace CrewChiefV4.rFactor2
             var playerTelemetry = new rF2VehicleTelemetry();
             var leaderTelemetry = new rF2VehicleTelemetry();
 
-            var idsToTelIndicesMap = RF2GameStateMapper.GetIdsToTelIndicesMap(ref shared.telemetry);
+            // TODO: finish hardening against missing telemetry.
+            bool playerTelemetryAvailable = true;
+            bool leaderTelemetryAvailable = true;
+
+            var idsToTelIndicesMap = RF2GameStateMapper.getIdsToTelIndicesMap(ref shared.telemetry);
             int playerTelIdx = -1;
             if (idsToTelIndicesMap.TryGetValue(playerScoring.mID, out playerTelIdx))
                 playerTelemetry = shared.telemetry.mVehicles[playerTelIdx];
             else
-                RF2GameStateMapper.InitEmptyVehicleTelemetry(ref playerTelemetry);
+            {
+                playerTelemetryAvailable = false;
+                RF2GameStateMapper.initEmptyVehicleTelemetry(ref playerTelemetry);
+            }
             
             int leaderTelIdx = -1;
             if (!idsToTelIndicesMap.TryGetValue(leaderScoring.mID, out leaderTelIdx))
                 leaderTelemetry = shared.telemetry.mVehicles[leaderTelIdx];
             else
-                RF2GameStateMapper.InitEmptyVehicleTelemetry(ref leaderTelemetry);
+            {
+                leaderTelemetryAvailable = false;
+                RF2GameStateMapper.initEmptyVehicleTelemetry(ref leaderTelemetry);
+            }
 
             // See if there are meaningful updates to the data.
             var currPlayerTelET = playerTelemetry.mElapsedTime;
@@ -305,7 +306,7 @@ namespace CrewChiefV4.rFactor2
             csd.SessionStartTime = csd.IsNewSession ? cgs.Now : psd.SessionStartTime;
             csd.SessionHasFixedTime = csd.SessionTotalRunTime > 0.0f;
 
-            csd.SessionRunningTime = (float)playerTelemetry.mElapsedTime;
+            csd.SessionRunningTime = (float)(playerTelemetryAvailable ? playerTelemetry.mElapsedTime : shared.scoring.mScoringInfo.mCurrentET);
             csd.SessionTimeRemaining = csd.SessionHasFixedTime ? csd.SessionTotalRunTime - csd.SessionRunningTime : 0.0f;
 
             // hack for test day sessions running longer than allotted time
@@ -329,8 +330,13 @@ namespace CrewChiefV4.rFactor2
 
             ////////////////////////////////////
             // motion data
-            cgs.PositionAndMotionData.CarSpeed = (float)RF2GameStateMapper.getVehicleSpeed(ref playerTelemetry);
-            cgs.PositionAndMotionData.DistanceRoundTrack = (float)getEstimatedLapDist(shared, ref playerScoring, ref playerTelemetry);
+            if (playerTelemetryAvailable)
+                cgs.PositionAndMotionData.CarSpeed = (float)RF2GameStateMapper.getVehicleSpeed(ref playerTelemetry);
+            else
+                cgs.PositionAndMotionData.CarSpeed = (float)RF2GameStateMapper.getVehicleSpeed(ref playerScoring);
+
+            cgs.PositionAndMotionData.DistanceRoundTrack 
+                = (float)(playerTelemetryAvailable ? getEstimatedLapDist(shared, ref playerScoring, ref playerTelemetry) : playerScoring.mLapDist);
 
             // Is online session?
             this.isOfflineSession = true;
@@ -712,7 +718,7 @@ namespace CrewChiefV4.rFactor2
                 if (!idsToTelIndicesMap.TryGetValue(vehicleScoring.mID, out vehicleTelIdx))
                     vehicleTelemetry = shared.telemetry.mVehicles[vehicleTelIdx];
                 else
-                    RF2GameStateMapper.InitEmptyVehicleTelemetry(ref vehicleTelemetry);
+                    RF2GameStateMapper.initEmptyVehicleTelemetry(ref vehicleTelemetry);
 
                 var driverName = getStringFromBytes(vehicleScoring.mDriverName).ToLower();
                 OpponentData opponentPrevious;
@@ -1120,11 +1126,18 @@ namespace CrewChiefV4.rFactor2
                 + (playerTelemetry.mLocalVel.z * playerTelemetry.mLocalVel.z));
         }
 
-        // Estimate lapdist
-        // See how much ahead telemetry is ahead of scoring update
-        // TODO: experiment with pick speed from telemetry.
+        private static double getVehicleSpeed(ref rF2VehicleScoring playerScoring)
+        {
+            return Math.Sqrt((playerScoring.mLocalVel.x * playerScoring.mLocalVel.x)
+                + (playerScoring.mLocalVel.y * playerScoring.mLocalVel.y)
+                + (playerScoring.mLocalVel.z * playerScoring.mLocalVel.z));
+        }
+
         private static double getEstimatedLapDist(RF2SharedMemoryReader.RF2StructWrapper shared, ref rF2VehicleScoring vehicleScoring, ref rF2VehicleTelemetry vehicleTelemetry)
         {
+            // Estimate lapdist
+            // See how much ahead telemetry is ahead of scoring update
+            // TODO: experiment with pick speed from telemetry.
             var delta = vehicleTelemetry.mElapsedTime - shared.scoring.mScoringInfo.mCurrentET;
             var lapDistEstimated = vehicleScoring.mLapDist;
             if (delta > 0.0)
@@ -1395,6 +1408,7 @@ namespace CrewChiefV4.rFactor2
                         float targetDist = o.Speed * timeDelta;
                         float dist = (float)Math.Abs(Math.Sqrt((double)((o.WorldPosition[0] - worldPos[0]) * (o.WorldPosition[0] - worldPos[0]) +
                             (o.WorldPosition[1] - worldPos[1]) * (o.WorldPosition[1] - worldPos[1]))) - targetDist);
+
                         if (minDistDiff < 0.0f || dist < minDistDiff)
                         {
                             minDistDiff = dist;
@@ -1403,10 +1417,10 @@ namespace CrewChiefV4.rFactor2
                     }
                 }
             }
+
             if (bestKey != null)
-            {
                 opponentKeysProcessed.Add(bestKey);
-            }
+
             return bestKey;
         }
 
@@ -1481,8 +1495,12 @@ namespace CrewChiefV4.rFactor2
               : Encoding.Default.GetString(bytes);
         }
 
-        // TODO: explain
-        public static Dictionary<long, int> GetIdsToTelIndicesMap(ref rF2Telemetry telemetry)
+        // Since it is not clear if there's any guarantee around vehicle telemetry update order in rF2
+        // I don't want to assume mID == i in telemetry.mVehicles.  Also, telemetry is updated separately from scoring,
+        // so it is possible order changes in between updates.  Lastly, it is possible scoring to contain mID, but not
+        // telemetry.  So, build a lookup map of mID -> i into telemetry mVehicles, for lookup between scoring.mVehicles[].mID
+        // into telemetry.
+        public static Dictionary<long, int> getIdsToTelIndicesMap(ref rF2Telemetry telemetry)
         {
             var idsToTelIndices = new Dictionary<long, int>();
             for (int i = 0; i < telemetry.mNumVehicles; ++i)
@@ -1497,7 +1515,8 @@ namespace CrewChiefV4.rFactor2
         // Vehicle telemetry is not always available (before sesssion start).  Instead of
         // hardening code against this case, create and zero intialize arrays within passed in object.
         // This is equivalent of how V1 and rF1 works.
-        public static void InitEmptyVehicleTelemetry(ref rF2VehicleTelemetry vehicleTelemetry)
+        // NOTE: not a complete initialization, just parts that were cause NRE.
+        public static void initEmptyVehicleTelemetry(ref rF2VehicleTelemetry vehicleTelemetry)
         {
             Debug.Assert(vehicleTelemetry.mWheels == null);
 
