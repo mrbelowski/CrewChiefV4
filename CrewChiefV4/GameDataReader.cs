@@ -44,7 +44,7 @@ namespace CrewChiefV4
                 catch (Exception)
                 {
                     Console.WriteLine("Unable to create folder for data file, no session record will be available");
-                    dumpToFile = false;
+                    dataFilesPath = null;
                 }
             }
         }
@@ -53,6 +53,11 @@ namespace CrewChiefV4
         {
             Console.WriteLine("initialising");
             Boolean initialised = InitialiseInternal();
+            if (dataFilesPath == null)
+            {
+                // We can't dump to file if there's no valid path.
+                dumpToFile = false;
+            }
             if (initialised && dumpToFile)
             {
                 filenameToDump = dataFilesPath + "\\recording_" + DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss") + ".xml";

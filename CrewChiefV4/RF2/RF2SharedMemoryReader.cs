@@ -339,34 +339,6 @@ namespace CrewChiefV4.rFactor2
 
             return populated.ToArray();
         }
-        /*
-        private rF2VehicleTelemetry[] getPopulatedVehicleTelemetryArray(rF2Telemetry telemetry)
-        {
-            // To reduce serialized size, only return non-empty vehicles.
-            var populated = new List<rF2VehicleTelemetry>();
-            for (int i = 0; i < telemetry.mNumVehicles; ++i)
-                populated.Add(telemetry.mVehicles[i]);
-
-            // Not sure why this is needed.
-            if (populated.Count == 0)
-                populated.Add(telemetry.mVehicles[0]);  // In case of mNumVehicles == 0 this is all zero, should be.
-
-            return populated.ToArray();
-        }
-
-        private rF2VehicleScoring[] getPopulatedVehicleScoringArray(rF2Scoring scoring)
-        {
-            // To reduce serialized size, only return non-empty vehicles.
-            var populated = new List<rF2VehicleScoring>();
-            for (int i = 0; i < scoring.mScoringInfo.mNumVehicles; ++i)
-                populated.Add(scoring.mVehicles[i]);
-
-            // Not sure why this is needed.
-            if (populated.Count == 0)
-                populated.Add(scoring.mVehicles[0]);  // In case of mNumVehicles == 0 this is all zero, should be.
-
-            return populated.ToArray();
-        }*/
 
         private void Disconnect()
         {
