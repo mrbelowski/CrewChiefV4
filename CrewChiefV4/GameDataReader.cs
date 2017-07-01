@@ -28,9 +28,8 @@ namespace CrewChiefV4
 
         protected String dataFilesPath;
 
-        public Boolean Initialise()
+        public GameDataReader()
         {
-            Console.WriteLine("initialising");
             if (System.Diagnostics.Debugger.IsAttached)
             {
                 dataFilesPath = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location), @"..\", @"..\dataFiles\");
@@ -48,6 +47,11 @@ namespace CrewChiefV4
                     dumpToFile = false;
                 }
             }
+        }
+
+        public Boolean Initialise()
+        {
+            Console.WriteLine("initialising");
             Boolean initialised = InitialiseInternal();
             if (initialised && dumpToFile)
             {

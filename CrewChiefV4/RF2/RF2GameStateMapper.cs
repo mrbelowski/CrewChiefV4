@@ -1472,14 +1472,13 @@ namespace CrewChiefV4.rFactor2
             }
         }
 
-        public static String getStringFromBytes(byte[] name)
+        public static String getStringFromBytes(byte[] bytes)
         {
-            var str = Encoding.Default.GetString(name);
-            var eosChar = str.IndexOf('\0');
-            if (eosChar != -1)
-              str = str.Substring(0, eosChar);
+            var nullIdx = Array.IndexOf(bytes, (byte)0);
 
-            return str;
+            return nullIdx >= 0
+              ? Encoding.Default.GetString(bytes, 0, nullIdx)
+              : Encoding.Default.GetString(bytes);
         }
 
         // TODO: explain
