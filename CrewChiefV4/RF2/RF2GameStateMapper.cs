@@ -182,13 +182,21 @@ namespace CrewChiefV4.rFactor2
                 return pgs;
 
             // Get player and leader telemetry objects.
-            // NOTE: Those are not available on first entry to the garage.  But using just zeroed structs is ok.
+            // NOTE: Those are not available on first entry to the garage and likely in rare
+            // cases during online races.  But using just zeroed structs are mostly ok.
             var playerTelemetry = new rF2VehicleTelemetry();
-            var leaderTelemetry = new rF2VehicleTelemetry();
 
-            // TODO: finish hardening against missing telemetry.
+            // This is shaky part of the mapping, but here goes:
+            // Telemetry and Scoring are updated separately by the game.  Therefore, one can be 
+            // ahead of another, sometimes in a significant way.  Particularly, this is possible with
+            // online races, where people quit/join the game.
+            //
+            // For Crew Chief in rF2, our primary data structure is _Scoring_ (because it contains timings).
+            // However, since Telemetry is updated more frequently (up to 90FPS vs 5FPS for Scoring), we
+            // try to use Telemetry values whenever possible (position, speed, elapsed time, orientation).
+            // In those rare cases where Scoring contains vehicle that is not in Telemetry set, use Scoring as a
+            // fallback where possible.  For the rest of values, use zeroed out Telemetry object (playerTelemetry).
             bool playerTelemetryAvailable = true;
-            bool leaderTelemetryAvailable = true;
 
             var idsToTelIndicesMap = RF2GameStateMapper.getIdsToTelIndicesMap(ref shared.telemetry);
             int playerTelIdx = -1;
@@ -198,15 +206,6 @@ namespace CrewChiefV4.rFactor2
             {
                 playerTelemetryAvailable = false;
                 RF2GameStateMapper.initEmptyVehicleTelemetry(ref playerTelemetry);
-            }
-            
-            int leaderTelIdx = -1;
-            if (!idsToTelIndicesMap.TryGetValue(leaderScoring.mID, out leaderTelIdx))
-                leaderTelemetry = shared.telemetry.mVehicles[leaderTelIdx];
-            else
-            {
-                leaderTelemetryAvailable = false;
-                RF2GameStateMapper.initEmptyVehicleTelemetry(ref leaderTelemetry);
             }
 
             // See if there are meaningful updates to the data.
@@ -331,12 +330,15 @@ namespace CrewChiefV4.rFactor2
             ////////////////////////////////////
             // motion data
             if (playerTelemetryAvailable)
+            {
                 cgs.PositionAndMotionData.CarSpeed = (float)RF2GameStateMapper.getVehicleSpeed(ref playerTelemetry);
+                cgs.PositionAndMotionData.DistanceRoundTrack = (float)getEstimatedLapDist(shared, ref playerScoring, ref playerTelemetry);
+            }
             else
+            {
                 cgs.PositionAndMotionData.CarSpeed = (float)RF2GameStateMapper.getVehicleSpeed(ref playerScoring);
-
-            cgs.PositionAndMotionData.DistanceRoundTrack 
-                = (float)(playerTelemetryAvailable ? getEstimatedLapDist(shared, ref playerScoring, ref playerTelemetry) : playerScoring.mLapDist);
+                cgs.PositionAndMotionData.DistanceRoundTrack = (float)playerScoring.mLapDist;
+            }
 
             // Is online session?
             this.isOfflineSession = true;
@@ -714,11 +716,15 @@ namespace CrewChiefV4.rFactor2
 
                 // Get telemetry for this vehicle.
                 var vehicleTelemetry = new rF2VehicleTelemetry();
+                bool vehicleTelemetryAvailable = true;
                 int vehicleTelIdx = -1;
                 if (!idsToTelIndicesMap.TryGetValue(vehicleScoring.mID, out vehicleTelIdx))
                     vehicleTelemetry = shared.telemetry.mVehicles[vehicleTelIdx];
                 else
+                {
+                    vehicleTelemetryAvailable = false;
                     RF2GameStateMapper.initEmptyVehicleTelemetry(ref vehicleTelemetry);
+                }
 
                 var driverName = getStringFromBytes(vehicleScoring.mDriverName).ToLower();
                 OpponentData opponentPrevious;
@@ -742,7 +748,8 @@ namespace CrewChiefV4.rFactor2
                     else
                     {
                         // offline we can have any number of duplicates :(
-                        opponentKey = getOpponentKeyForVehicleInfo(ref vehicleScoring, ref vehicleTelemetry, pgs, csd.SessionRunningTime, driverName, duplicatesCount);
+                        opponentKey = this.getOpponentKeyForVehicleInfo(ref vehicleScoring, ref vehicleTelemetry, pgs, csd.SessionRunningTime, driverName, duplicatesCount, vehicleTelemetryAvailable);
+
                         if (opponentKey == null)
                         {
                             // there's no previous opponent data record for this driver so create one
@@ -792,9 +799,20 @@ namespace CrewChiefV4.rFactor2
                 opponent.CurrentSectorNumber = vehicleScoring.mSector == 0 ? 3 : vehicleScoring.mSector;
                 var isNewSector = csd.IsNewSession || (opponentPrevious != null && opponentPrevious.CurrentSectorNumber != opponent.CurrentSectorNumber);
                 opponent.IsNewLap = csd.IsNewSession || (isNewSector && opponent.CurrentSectorNumber == 1 && opponent.CompletedLaps > 0);
-                opponent.Speed = (float)RF2GameStateMapper.getVehicleSpeed(ref vehicleTelemetry);
-                opponent.DistanceRoundTrack = (float)RF2GameStateMapper.getEstimatedLapDist(shared, ref vehicleScoring, ref vehicleTelemetry);
-                opponent.WorldPosition = new float[] { (float)vehicleTelemetry.mPos.x, (float)vehicleTelemetry.mPos.z };
+
+                if (vehicleTelemetryAvailable)
+                {
+                    opponent.Speed = (float)RF2GameStateMapper.getVehicleSpeed(ref vehicleTelemetry);
+                    opponent.WorldPosition = new float[] { (float)vehicleTelemetry.mPos.x, (float)vehicleTelemetry.mPos.z };
+                    opponent.DistanceRoundTrack = (float)RF2GameStateMapper.getEstimatedLapDist(shared, ref vehicleScoring, ref vehicleTelemetry);
+                }
+                else
+                {
+                    opponent.Speed = (float)RF2GameStateMapper.getVehicleSpeed(ref vehicleScoring);
+                    opponent.WorldPosition = new float[] { (float)vehicleScoring.mPos.x, (float)vehicleScoring.mPos.z };
+                    opponent.DistanceRoundTrack = (float)vehicleScoring.mLapDist;
+                }
+
                 opponent.CurrentBestLapTime = vehicleScoring.mBestLapTime > 0.0f ? (float)vehicleScoring.mBestLapTime : -1.0f;
                 opponent.PreviousBestLapTime = opponentPrevious != null && opponentPrevious.CurrentBestLapTime > 0.0f &&
                     opponentPrevious.CurrentBestLapTime > opponent.CurrentBestLapTime ? opponentPrevious.CurrentBestLapTime : -1.0f;
@@ -1119,18 +1137,18 @@ namespace CrewChiefV4.rFactor2
             return cgs;
         }
 
-        private static double getVehicleSpeed(ref rF2VehicleTelemetry playerTelemetry)
+        private static double getVehicleSpeed(ref rF2VehicleTelemetry vehicleTelemetry)
         {
-            return Math.Sqrt((playerTelemetry.mLocalVel.x * playerTelemetry.mLocalVel.x)
-                + (playerTelemetry.mLocalVel.y * playerTelemetry.mLocalVel.y)
-                + (playerTelemetry.mLocalVel.z * playerTelemetry.mLocalVel.z));
+            return Math.Sqrt((vehicleTelemetry.mLocalVel.x * vehicleTelemetry.mLocalVel.x)
+                + (vehicleTelemetry.mLocalVel.y * vehicleTelemetry.mLocalVel.y)
+                + (vehicleTelemetry.mLocalVel.z * vehicleTelemetry.mLocalVel.z));
         }
 
-        private static double getVehicleSpeed(ref rF2VehicleScoring playerScoring)
+        private static double getVehicleSpeed(ref rF2VehicleScoring vehicleScoring)
         {
-            return Math.Sqrt((playerScoring.mLocalVel.x * playerScoring.mLocalVel.x)
-                + (playerScoring.mLocalVel.y * playerScoring.mLocalVel.y)
-                + (playerScoring.mLocalVel.z * playerScoring.mLocalVel.z));
+            return Math.Sqrt((vehicleScoring.mLocalVel.x * vehicleScoring.mLocalVel.x)
+                + (vehicleScoring.mLocalVel.y * vehicleScoring.mLocalVel.y)
+                + (vehicleScoring.mLocalVel.z * vehicleScoring.mLocalVel.z));
         }
 
         private static double getEstimatedLapDist(RF2SharedMemoryReader.RF2StructWrapper shared, ref rF2VehicleScoring vehicleScoring, ref rF2VehicleTelemetry vehicleTelemetry)
@@ -1378,7 +1396,7 @@ namespace CrewChiefV4.rFactor2
         }
 
         // finds OpponentData key for given vehicle based on driver name, vehicle class, and world position
-        private String getOpponentKeyForVehicleInfo(ref rF2VehicleScoring vehicleScoring, ref rF2VehicleTelemetry vehicleTelemetry, GameStateData previousGameState, float sessionRunningTime, String driverName, int duplicatesCount)
+        private String getOpponentKeyForVehicleInfo(ref rF2VehicleScoring vehicleScoring, ref rF2VehicleTelemetry vehicleTelemetry, GameStateData previousGameState, float sessionRunningTime, String driverName, int duplicatesCount, bool vehicleTelemetryAvailable)
         {
             if (previousGameState == null)
                 return null;
@@ -1387,7 +1405,12 @@ namespace CrewChiefV4.rFactor2
             for (int i = 1; i <= duplicatesCount; i++)
                 possibleKeys.Add(driverName + "_duplicate_ " + i);
 
-            float[] worldPos = { (float)vehicleTelemetry.mPos.x, (float)vehicleTelemetry.mPos.z };
+            float[] worldPos = null;
+            if (vehicleTelemetryAvailable)
+                worldPos = new float[] { (float)vehicleTelemetry.mPos.x, (float)vehicleTelemetry.mPos.z };
+            else
+                worldPos = new float[] { (float)vehicleScoring.mPos.x, (float)vehicleScoring.mPos.z };
+
             float minDistDiff = -1.0f;
             float timeDelta = sessionRunningTime - previousGameState.SessionData.SessionRunningTime;
             String bestKey = null;
