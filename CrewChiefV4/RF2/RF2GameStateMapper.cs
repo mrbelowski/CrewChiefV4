@@ -206,6 +206,10 @@ namespace CrewChiefV4.rFactor2
             {
                 playerTelemetryAvailable = false;
                 RF2GameStateMapper.initEmptyVehicleTelemetry(ref playerTelemetry);
+
+                // It is known that no telemetry is available outside of realtime.
+                if (shared.extended.mInRealtimeFC == 1 && shared.scoring.mScoringInfo.mInRealtime == 1)
+                   Console.WriteLine("Failed to obtain player telemetry, falling back to scoring.");
             }
 
             // See if there are meaningful updates to the data.
@@ -389,6 +393,7 @@ namespace CrewChiefV4.rFactor2
             cgs.PitData.IsAtPitExit = pgs != null && pgs.PitData.InPitlane && !cgs.PitData.InPitlane;
             cgs.PitData.OnOutLap = cgs.PitData.InPitlane && csd.SectorNumber == 1;
 
+            // TODO: in RT.
             if (shared.extended.mInRealtimeFC == 0  // Mark pit limiter as unavailable if in Monitor (not real time).
                 || playerTelemetry.mSpeedLimiterAvailable == 0)
                 cgs.PitData.limiterStatus = -1;
@@ -718,12 +723,13 @@ namespace CrewChiefV4.rFactor2
                 var vehicleTelemetry = new rF2VehicleTelemetry();
                 bool vehicleTelemetryAvailable = true;
                 int vehicleTelIdx = -1;
-                if (!idsToTelIndicesMap.TryGetValue(vehicleScoring.mID, out vehicleTelIdx))
+                if (idsToTelIndicesMap.TryGetValue(vehicleScoring.mID, out vehicleTelIdx))
                     vehicleTelemetry = shared.telemetry.mVehicles[vehicleTelIdx];
                 else
                 {
                     vehicleTelemetryAvailable = false;
                     RF2GameStateMapper.initEmptyVehicleTelemetry(ref vehicleTelemetry);
+                    Console.WriteLine("Failed to obtain opponent telemetry, falling back to scoring.");
                 }
 
                 var driverName = getStringFromBytes(vehicleScoring.mDriverName).ToLower();

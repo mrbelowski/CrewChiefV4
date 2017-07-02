@@ -137,6 +137,7 @@ namespace CrewChiefV4.rFactor2
                 // Pass 0 timeout and skip update if someone holds the lock.
 
                 // Using partial buffer copying reduces time under lock.  Scoring by 30%, telemetry by 70%.
+                // TODO: think about what could possibly cause AbandonedMutex exception, this is likely what users are hitting (crash).
                 if (this.mutex.WaitOne(5000))
                 {
                     byte[] sharedMemoryReadBuffer = null;
@@ -228,6 +229,8 @@ namespace CrewChiefV4.rFactor2
                 {
                     wrapper.telemetry.mVehicles = this.GetPopulatedVehicleInfoArray<rF2VehicleTelemetry>(wrapper.telemetry.mVehicles, wrapper.telemetry.mNumVehicles);
                     wrapper.scoring.mVehicles = this.GetPopulatedVehicleInfoArray<rF2VehicleScoring>(wrapper.scoring.mVehicles, wrapper.scoring.mScoringInfo.mNumVehicles);
+
+                    // TODO: find max mID in scroing, and trim damage tracking array to that + 1. Also, minimally initialize unused buffers (reserved etc).  Will reduce file size.
                 }
 
                 this.SerializeObject(this.dataToDump.ToArray<RF2StructWrapper>(), this.filenameToDump);
