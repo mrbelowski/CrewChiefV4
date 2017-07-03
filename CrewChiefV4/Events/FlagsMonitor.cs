@@ -50,6 +50,7 @@ namespace CrewChiefV4.Events
 
         private String folderLocalYellow = "flags/local_yellow_flag";
         private String folderLocalYellowClear = "flags/local_yellow_clear";
+        private String folderLocalYellowAhead = "flags/local_yellow_ahead";
 
         public static String[] folderPositionHasGoneOff = new String[] { "flags/position1_has_gone_off", "flags/position2_has_gone_off", "flags/position3_has_gone_off", 
                                                                    "flags/position4_has_gone_off", "flags/position5_has_gone_off", "flags/position6_has_gone_off", };
@@ -100,6 +101,7 @@ namespace CrewChiefV4.Events
         private DateTime lastOvertakeAllowedReportTime = DateTime.MinValue;
         private Boolean isUnderLocalYellow = false;
         private Boolean hasReportedIsUnderLocalYellow = false;
+        private Boolean hasWarnedOfUpcomingIncident = false;
 
         private DateTime nextIncidentDriversCheck = DateTime.MaxValue;
 
@@ -149,6 +151,7 @@ namespace CrewChiefV4.Events
 
         private TimeSpan incidentAheadSettlingTime = TimeSpan.FromSeconds(2);
         private DateTime incidentAheadSettledTime = DateTime.MinValue;
+        private Boolean waitingToWarnOfIncident = false;
 
         private static String validationSectorNumberKey = "sectorNumber"; 
         private static String validationSectorFlagKey = "sectorFlag";
@@ -255,6 +258,7 @@ namespace CrewChiefV4.Events
             lastLocalYellowClearAnnouncedTime = DateTime.MinValue;
             lastOvertakeAllowedReportTime = DateTime.MinValue;
             isUnderLocalYellow = false;
+            hasWarnedOfUpcomingIncident = false;
             positionAtStartOfIncident = int.MaxValue;
             incidentCandidates.Clear();
             incidentWarnings.Clear();
@@ -273,6 +277,7 @@ namespace CrewChiefV4.Events
             lastReportedOvertakeAllowed = PassAllowedUnderYellow.NO_DATA;
 
             incidentAheadSettledTime = DateTime.MinValue;
+            waitingToWarnOfIncident = false;
             hasReportedIsUnderLocalYellow = false;
         }
 
@@ -508,6 +513,8 @@ namespace CrewChiefV4.Events
 
                         nextIllegalPassWarning = currentGameState.Now;
                         // we might not have warned of an incident ahead - no point in warning about it now we've actually reached it
+                        hasWarnedOfUpcomingIncident = true;
+                        waitingToWarnOfIncident = false;
                         Dictionary<String, Object> validationData = new Dictionary<String, Object>();
                         validationData.Add(validationIsLocalYellowKey, true);
                         validationData.Add(isValidatingSectorMessage, false);
@@ -522,6 +529,8 @@ namespace CrewChiefV4.Events
                         //Console.WriteLine("FLAG_DEBUG: local green at " + currentGameState.Now.ToString("HH:mm:ss"));
                         isUnderLocalYellow = false;
                         // we've passed the incident so allow warnings of other incidents approaching
+                        hasWarnedOfUpcomingIncident = false;
+                        waitingToWarnOfIncident = false;
                         lastReportedOvertakeAllowed = PassAllowedUnderYellow.NO_DATA;
                         Dictionary<String, Object> validationData = new Dictionary<String, Object>();
                         validationData.Add(validationIsLocalYellowKey, false);
@@ -537,6 +546,8 @@ namespace CrewChiefV4.Events
                         // if all the sectors are clear the local and warning booleans. This ensures we don't sit waiting for a 'clear' that never comes.
                         // Console.WriteLine("FLAG_DEBUG: all sectors green at " + currentGameState.Now.ToString("HH:mm:ss"));
                         isUnderLocalYellow = false;
+                        hasWarnedOfUpcomingIncident = false;
+                        waitingToWarnOfIncident = false;
                         lastReportedOvertakeAllowed = PassAllowedUnderYellow.NO_DATA;
                     }
                     // This produces false-positives. Not sure why - TODO: work out what the issue is here - perhaps

@@ -29,6 +29,8 @@ namespace CrewChiefV4.Events
         public static String folderGapIntro = "lap_times/gap_intro";
 
         public static String folderGapOutroOffPace = "lap_times/gap_outro_off_pace";
+        // "that was a 1:34.2, you're fastest in your class"
+        private String folderFastestInClass = "lap_times/fastest_in_your_class";
 
         private String folderLessThanATenthOffThePace = "lap_times/less_than_a_tenth_off_the_pace";
 
