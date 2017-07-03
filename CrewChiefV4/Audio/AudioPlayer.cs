@@ -397,7 +397,7 @@ namespace CrewChiefV4.Audio
                 {
                     backgroundPlayer.Stop();
                 }
-                catch (Exception e) { }
+                catch (Exception) { }
                 backgroundPlayerInitialised = false;
                 backgroundPlayer = null;
             }
@@ -852,7 +852,7 @@ namespace CrewChiefV4.Audio
                     {
                         backgroundPlayer.Stop();
                     }
-                    catch (Exception e)
+                    catch (Exception)
                     {
                         Console.WriteLine("Unable to stop background player");
                     }
