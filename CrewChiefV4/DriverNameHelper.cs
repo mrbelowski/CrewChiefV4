@@ -23,8 +23,6 @@ namespace CrewChiefV4
 
         private static Boolean useLastNameWherePossible = true;
 
-        private static Boolean rawNamesToUsableNamesFileRead = false;
-
         public static void readRawNamesToUsableNamesFiles(String soundsFolderName)
         {
             readRawNamesToUsableNamesFile(soundsFolderName, @"\driver_names\additional_names.txt");
@@ -65,11 +63,8 @@ namespace CrewChiefV4
                 file.Close();
                 Console.WriteLine("Read " + counter + " driver name mappings");
             }
-            catch (IOException e)
-            {
-
-            }
-            rawNamesToUsableNamesFileRead = true;
+            catch (IOException)
+            {}
         }
 
         private static String validateAndCleanUpName(String name)

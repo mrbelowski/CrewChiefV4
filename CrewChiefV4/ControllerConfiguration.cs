@@ -360,7 +360,7 @@ namespace CrewChiefV4
                     {
                         return ba.joystick.GetCurrentState().Buttons[ba.buttonIndex];
                     }
-                    catch (Exception e)
+                    catch (Exception)
                     {
                         // ignore this exception
                     }
