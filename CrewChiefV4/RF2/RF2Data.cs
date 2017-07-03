@@ -9,6 +9,9 @@ Website: thecrewchief.org
 */
 using System;
 using System.Runtime.InteropServices;
+using System.Xml.Serialization;
+
+// CC specific: Mark more common unused members with XmlIgnore for reduced trace sizes.
 
 namespace CrewChiefV4.rFactor2
 {
@@ -193,41 +196,64 @@ namespace CrewChiefV4.rFactor2
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi, Pack = 4)]
         public struct rF2Wheel
         {
+            [XmlIgnore]
             public double mSuspensionDeflection;  // meters
+            [XmlIgnore]
             public double mRideHeight;            // meters
+            [XmlIgnore]
             public double mSuspForce;             // pushrod load in Newtons
             public double mBrakeTemp;             // Celsius
+            [XmlIgnore]
             public double mBrakePressure;         // currently 0.0-1.0, depending on driver input and brake balance; will convert to true brake pressure (kPa) in future
 
             public double mRotation;              // radians/sec
+            [XmlIgnore]
             public double mLateralPatchVel;       // lateral velocity at contact patch
+            [XmlIgnore]
             public double mLongitudinalPatchVel;  // longitudinal velocity at contact patch
+            [XmlIgnore]
             public double mLateralGroundVel;      // lateral velocity at contact patch
+            [XmlIgnore]
             public double mLongitudinalGroundVel; // longitudinal velocity at contact patch
+            [XmlIgnore]
             public double mCamber;                // radians (positive is left for left-side wheels, right for right-side wheels)
+            [XmlIgnore]
             public double mLateralForce;          // Newtons
+            [XmlIgnore]
             public double mLongitudinalForce;     // Newtons
+            [XmlIgnore]
             public double mTireLoad;              // Newtons
 
+            [XmlIgnore]
             public double mGripFract;             // an approximation of what fraction of the contact patch is sliding
             public double mPressure;              // kPa (tire pressure)
+
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 3)]
             public double[] mTemperature;         // Kelvin (subtract 273.15 to get Celsius), left/center/right (not to be confused with inside/center/outside!)
             public double mWear;                  // wear (0.0-1.0, fraction of maximum) ... this is not necessarily proportional with grip loss
+
+            [XmlIgnore]
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 16)]
             public byte[] mTerrainName;           // the material prefixes from the TDF file
             public byte mSurfaceType;             // 0=dry, 1=wet, 2=grass, 3=dirt, 4=gravel, 5=rumblestrip, 6=special
             public byte mFlat;                    // whether tire is flat
             public byte mDetached;                // whether wheel is detached
 
+            [XmlIgnore]
             public double mVerticalTireDeflection;// how much is tire deflected from its (speed-sensitive) radius
+            [XmlIgnore]
             public double mWheelYLocation;        // wheel's y location relative to vehicle y location
+            [XmlIgnore]
             public double mToe;                   // current toe angle w.r.t. the vehicle
 
+            [XmlIgnore]
             public double mTireCarcassTemperature;       // rough average of temperature samples from carcass (Kelvin)
+
+            [XmlIgnore]
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 3)]
             public double[] mTireInnerLayerTemperature;  // rough average of temperature samples from innermost layer of rubber (before carcass) (Kelvin)
 
+            [XmlIgnore]
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 24)]
             byte[] mExpansion;                    // for future use
         }
@@ -242,8 +268,12 @@ namespace CrewChiefV4.rFactor2
             public double mElapsedTime;           // game session time
             public int mLapNumber;               // current lap number
             public double mLapStartET;            // time this lap was started
+
+            [XmlIgnore]
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 64)]
             public byte[] mVehicleName;         // current vehicle name
+
+            [XmlIgnore]
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 64)]
             public byte[] mTrackName;           // current track name
 
@@ -253,10 +283,15 @@ namespace CrewChiefV4.rFactor2
             public rF2Vec3 mLocalAccel;           // acceleration (meters/sec^2) in local vehicle coordinates
 
             // Orientation and derivatives
+
+            [XmlIgnore]
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 3)]
             public rF2Vec3[] mOri;               // rows of orientation matrix (use TelemQuat conversions if desired), also converts local
                                                  // vehicle vectors into world X, Y, or Z using dot product of rows 0, 1, or 2 respectively
+            [XmlIgnore]
             public rF2Vec3 mLocalRot;             // rotation (radians/sec) in local vehicle coordinates
+
+            [XmlIgnore]
             public rF2Vec3 mLocalRotAccel;        // rotational acceleration (radians/sec^2) in local vehicle coordinates
 
             // Vehicle status
@@ -298,6 +333,8 @@ namespace CrewChiefV4.rFactor2
             public byte mOverheating;            // whether overheating icon is shown
             public byte mDetached;               // whether any parts (besides wheels) have been detached
             public byte mHeadlights;             // whether headlights are on
+
+            [XmlIgnore] // mDentSeverity is always zero as of 7/3/2017.
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 8)]
             public byte[] mDentSeverity;// dent severity at 8 locations around the car (0=none, 1=some, 2=more)
             public double mLastImpactET;          // time of last impact
@@ -317,24 +354,34 @@ namespace CrewChiefV4.rFactor2
             public byte mRearFlapLegalStatus;      // 0=disallowed, 1=criteria detected but not allowed quite yet, 2=allowed
             public byte mIgnitionStarter;          // 0=off 1=ignition 2=ignition+starter
 
+            [XmlIgnore]
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 18)]
             public byte[] mFrontTireCompoundName;         // name of front tire compound
+
+            [XmlIgnore]
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 18)]
             public byte[] mRearTireCompoundName;          // name of rear tire compound
 
             public byte mSpeedLimiterAvailable;    // whether speed limiter is available
             public byte mAntiStallActivated;       // whether (hard) anti-stall is activated
+
+            [XmlIgnore]
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 2)]
             public byte[] mUnused;                //
+
             public float mVisualSteeringWheelRange;         // the *visual* steering wheel range
 
             public double mRearBrakeBias;                   // fraction of brakes on rear
             public double mTurboBoostPressure;              // current turbo boost pressure if available
+
+            [XmlIgnore]
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 3)]
             public float[] mPhysicsToGraphicsOffset;       // offset from static CG to graphical center
+
             public float mPhysicalSteeringWheelRange;       // the *physical* steering wheel range
 
             // Future use
+            [XmlIgnore]
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 152)]
             public byte[] mExpansion;           // for future use (note that the slot ID has been moved to mID above)
 
@@ -354,9 +401,10 @@ namespace CrewChiefV4.rFactor2
             public double mEndET;                 // ending time
             public int mMaxLaps;                // maximum laps
             public double mLapDist;               // distance around track
-                                                  // MM_NOT_USED
-                                                  //char *mResultsStream;          // results stream additions since last update (newline-delimited and NULL-terminated)
-                                                  // MM_NEW
+            // MM_NOT_USED
+            //char *mResultsStream;          // results stream additions since last update (newline-delimited and NULL-terminated)
+            // MM_NEW
+            [XmlIgnore]
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 8)]
             public byte[] pointer1;
 
@@ -391,8 +439,12 @@ namespace CrewChiefV4.rFactor2
             public byte mStartLight;       // start light frame (number depends on track)
             public byte mNumRedLights;     // number of red lights in start sequence
             public byte mInRealtime;                // in realtime as opposed to at the monitor
+
+            [XmlIgnore]
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 32)]
             public byte[] mPlayerName;            // player name (including possible multiplayer override)
+
+            [XmlIgnore]
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 64)]
             public byte[] mPlrFileName;           // may be encoded to be a legal filename
 
@@ -406,6 +458,7 @@ namespace CrewChiefV4.rFactor2
             public double mMaxPathWetness;          // maximum wetness on main path 0.0-1.0
 
             // Future use
+            [XmlIgnore]
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 256)]
             public byte[] mExpansion;
 
@@ -413,6 +466,7 @@ namespace CrewChiefV4.rFactor2
             // keeping this at the end of the structure to make it easier to replace in future versions
             // VehicleScoringInfoV01 *mVehicle; // array of vehicle scoring info's
             // MM_NEW
+            [XmlIgnore]
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 8)]
             public byte[] pointer2;
         }
@@ -422,10 +476,14 @@ namespace CrewChiefV4.rFactor2
         public struct rF2VehicleScoring
         {
             public int mID;                      // slot ID (note that it can be re-used in multiplayer after someone leaves)
+
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 32)]
             public byte[] mDriverName;          // driver name
+
+            [XmlIgnore]
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 64)]
             public byte[] mVehicleName;         // vehicle name
+
             public short mTotalLaps;              // laps completed
             public sbyte mSector;           // 0=sector3, 1=sector1, 2=sector2 (don't ask why)
             public sbyte mFinishStatus;     // 0=none, 1=finished, 2=dnf, 3=dq
@@ -466,10 +524,15 @@ namespace CrewChiefV4.rFactor2
             public rF2Vec3 mLocalAccel;           // acceleration (meters/sec^2) in local vehicle coordinates
 
             // Orientation and derivatives
+            [XmlIgnore]
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 3)]
             public rF2Vec3[] mOri;               // rows of orientation matrix (use TelemQuat conversions if desired), also converts local
                                                  // vehicle vectors into world X, Y, or Z using dot product of rows 0, 1, or 2 respectively
+
+            [XmlIgnore]
             public rF2Vec3 mLocalRot;             // rotation (radians/sec) in local vehicle coordinates
+
+            [XmlIgnore]
             public rF2Vec3 mLocalRotAccel;        // rotational acceleration (radians/sec^2) in local vehicle coordinates
 
             // tag.2012.03.01 - stopped casting some of these so variables now have names and mExpansion has shrunk, overall size and old data locations should be same
@@ -495,6 +558,7 @@ namespace CrewChiefV4.rFactor2
 
             // Future use
             // tag.2012.04.06 - SEE ABOVE!
+            [XmlIgnore]
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 60)]
             public byte[] mExpansion;  // for future use
         }

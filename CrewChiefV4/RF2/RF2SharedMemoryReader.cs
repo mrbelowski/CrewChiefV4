@@ -213,6 +213,9 @@ namespace CrewChiefV4.rFactor2
         private int dataReadFromFileIndex = 0;
         private string lastReadFileName = null;
 
+        // Capture mCurrentET from scoring to prevent dumping double frames to the file.
+        private double lastScoringET = -1.0;
+
         public class RF2StructWrapper
         {
             public long ticksWhenRead;
@@ -224,17 +227,7 @@ namespace CrewChiefV4.rFactor2
         public override void DumpRawGameData()
         {
             if (this.dumpToFile && this.dataToDump != null && this.dataToDump.Count > 0 && this.filenameToDump != null)
-            {
-                foreach (var wrapper in this.dataToDump)
-                {
-                    wrapper.telemetry.mVehicles = this.GetPopulatedVehicleInfoArray<rF2VehicleTelemetry>(wrapper.telemetry.mVehicles, wrapper.telemetry.mNumVehicles);
-                    wrapper.scoring.mVehicles = this.GetPopulatedVehicleInfoArray<rF2VehicleScoring>(wrapper.scoring.mVehicles, wrapper.scoring.mScoringInfo.mNumVehicles);
-
-                    // TODO: find max mID in scroing, and trim damage tracking array to that + 1. Also, minimally initialize unused buffers (reserved etc).  Will reduce file size.
-                }
-
                 this.SerializeObject(this.dataToDump.ToArray<RF2StructWrapper>(), this.filenameToDump);
-            }
         }
 
         public override void ResetGameDataFromFile()
@@ -264,6 +257,8 @@ namespace CrewChiefV4.rFactor2
 
         protected override Boolean InitialiseInternal()
         {
+            this.lastScoringET = -1.0;
+
             if (dumpToFile)
             {
                 this.dataToDump = new List<RF2StructWrapper>();
@@ -304,21 +299,42 @@ namespace CrewChiefV4.rFactor2
                 }
                 try 
                 {
-                    RF2StructWrapper structWrapper = new RF2StructWrapper();
+                    RF2StructWrapper wrapper = new RF2StructWrapper();
 
-                    extendedBuffer.GetMappedData(ref structWrapper.extended);
-                    telemetryBuffer.GetMappedDataPartial(ref structWrapper.telemetry);
+                    extendedBuffer.GetMappedData(ref wrapper.extended);
+                    telemetryBuffer.GetMappedDataPartial(ref wrapper.telemetry);
 
                     // Scoring is the most important game data in Crew Chief sense, 
                     // so acquire it last, hoping it will be most recent view of all buffer types.
-                    scoringBuffer.GetMappedDataPartial(ref structWrapper.scoring);
+                    scoringBuffer.GetMappedDataPartial(ref wrapper.scoring);
 
-                    structWrapper.ticksWhenRead = DateTime.Now.Ticks;
+                    wrapper.ticksWhenRead = DateTime.Now.Ticks;
 
                     if (!forSpotter && dumpToFile && this.dataToDump != null)
-                        this.dataToDump.Add(structWrapper);
+                    {
+                        // Exclude empty frames.
+                        if (wrapper.scoring.mScoringInfo.mNumVehicles > 0)
+                        {
+                            var currScoringET = wrapper.scoring.mScoringInfo.mCurrentET;
+                            if (currScoringET != this.lastScoringET  // scoring contains new payload
+                                || wrapper.telemetry.mNumVehicles > 0)  // Or, telemetry available
+                            {
+                                // NOTE: truncation code could be moved to DumpRawGameData method for reduced CPU use.
+                                // However, this causes huge memory pressure (~250Mb/minute with 22 vehicles), so probably better done here.
+                                wrapper.telemetry.mVehicles = this.GetPopulatedVehicleInfoArray<rF2VehicleTelemetry>(wrapper.telemetry.mVehicles, wrapper.telemetry.mNumVehicles);
+                                wrapper.scoring.mVehicles = this.GetPopulatedVehicleInfoArray<rF2VehicleScoring>(wrapper.scoring.mVehicles, wrapper.scoring.mScoringInfo.mNumVehicles);
 
-                    return structWrapper;
+                                // Since serialization to XML produces a lot of useless tags even for small arrays, truncate tracked damage array.
+                                // It is indexed by mID.  Max mID in current set is equal to mNumVehicles in 99% of cases, so just truncate to this size.
+                                wrapper.extended.mTrackedDamages = this.GetPopulatedVehicleInfoArray<rF2TrackedDamage>(wrapper.extended.mTrackedDamages, wrapper.scoring.mScoringInfo.mNumVehicles);
+
+                                this.dataToDump.Add(wrapper);
+                                this.lastScoringET = currScoringET;
+                            }
+                        }
+                    }
+
+                    return wrapper;
                 }
                 catch (Exception ex)
                 {

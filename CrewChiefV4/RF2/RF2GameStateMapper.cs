@@ -207,9 +207,14 @@ namespace CrewChiefV4.rFactor2
                 playerTelemetryAvailable = false;
                 RF2GameStateMapper.initEmptyVehicleTelemetry(ref playerTelemetry);
 
-                // It is known that no telemetry is available outside of realtime.
-                if (shared.extended.mInRealtimeFC == 1 && shared.scoring.mScoringInfo.mInRealtime == 1)
-                   Console.WriteLine("Failed to obtain player telemetry, falling back to scoring.");
+                // Exclude known situations when telemetry is not available, but log otherwise to get more
+                // insights.
+                if (shared.extended.mInRealtimeFC == 1 
+                    && shared.scoring.mScoringInfo.mInRealtime == 1
+                    && shared.scoring.mScoringInfo.mGamePhase != (byte)rFactor2Constants.rF2GamePhase.GridWalk)
+                {
+                    Console.WriteLine("Failed to obtain player telemetry, falling back to scoring.");
+                }
             }
 
             // See if there are meaningful updates to the data.
@@ -393,8 +398,8 @@ namespace CrewChiefV4.rFactor2
             cgs.PitData.IsAtPitExit = pgs != null && pgs.PitData.InPitlane && !cgs.PitData.InPitlane;
             cgs.PitData.OnOutLap = cgs.PitData.InPitlane && csd.SectorNumber == 1;
 
-            // TODO: in RT.
             if (shared.extended.mInRealtimeFC == 0  // Mark pit limiter as unavailable if in Monitor (not real time).
+                || shared.scoring.mScoringInfo.mInRealtime == 0
                 || playerTelemetry.mSpeedLimiterAvailable == 0)
                 cgs.PitData.limiterStatus = -1;
             else
@@ -729,7 +734,15 @@ namespace CrewChiefV4.rFactor2
                 {
                     vehicleTelemetryAvailable = false;
                     RF2GameStateMapper.initEmptyVehicleTelemetry(ref vehicleTelemetry);
-                    Console.WriteLine("Failed to obtain opponent telemetry, falling back to scoring.");
+
+                    // Exclude known situations when telemetry is not available, but log otherwise to get more
+                    // insights.
+                    if (shared.extended.mInRealtimeFC == 1
+                        && shared.scoring.mScoringInfo.mInRealtime == 1
+                        && shared.scoring.mScoringInfo.mGamePhase != (byte)rFactor2Constants.rF2GamePhase.GridWalk)
+                    {
+                        Console.WriteLine("Failed to obtain opponent telemetry, falling back to scoring.");
+                    }
                 }
 
                 var driverName = getStringFromBytes(vehicleScoring.mDriverName).ToLower();
