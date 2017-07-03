@@ -5924,6 +5924,12 @@
 					"isCommonOvertakingSpot": true
 				},
 				{
+					"landmarkName": "turn2",
+					"distanceRoundLapStart": 765,
+					"distanceRoundLapEnd": 880,
+					"isCommonOvertakingSpot": false
+				},
+				{
 					"landmarkName": "lagos",
 					"distanceRoundLapStart": 935,
 					"distanceRoundLapEnd": 1030,
@@ -6389,6 +6395,1043 @@
 					"distanceRoundLapStart": 3315,
 					"distanceRoundLapEnd": 3575,
 					"isCommonOvertakingSpot": true
+				}
+			]
+		},
+		{
+			"rf2TrackNames": ["1966 Brianza"],
+			"trackLandmarks": [{
+					"landmarkName": "curva_grande",
+					"distanceRoundLapStart": 925,
+					"distanceRoundLapEnd": 1525,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "first_lesmo",
+					"distanceRoundLapStart": 2100,
+					"distanceRoundLapEnd": 2375,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "second_lesmo",
+					"distanceRoundLapStart": 2435,
+					"distanceRoundLapEnd": 2665,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "curva_del_vialone",
+					"distanceRoundLapStart": 3435,
+					"distanceRoundLapEnd": 4005,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "curva_parabolica",
+					"distanceRoundLapStart": 4705,
+					"distanceRoundLapEnd": 5250,
+					"isCommonOvertakingSpot": true
+				}
+
+			]
+		},
+		{
+			"rf2TrackNames": ["Brianza 10K"],
+			"trackLandmarks": [{
+					"landmarkName": "curva_grande",
+					"distanceRoundLapStart": 925,
+					"distanceRoundLapEnd": 1525,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "first_lesmo",
+					"distanceRoundLapStart": 2100,
+					"distanceRoundLapEnd": 2375,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "second_lesmo",
+					"distanceRoundLapStart": 2435,
+					"distanceRoundLapEnd": 2665,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "curva_del_vialone",
+					"distanceRoundLapStart": 3435,
+					"distanceRoundLapEnd": 4005,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "curva_parabolica",
+					"distanceRoundLapStart": 4705,
+					"distanceRoundLapEnd": 5250,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "curva_nord_alta_velocita",
+					"distanceRoundLapStart": 6100,
+					"distanceRoundLapEnd": 7375,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "curva_sud_alta_velocita",
+					"distanceRoundLapStart": 8260,
+					"distanceRoundLapEnd": 9510,
+					"isCommonOvertakingSpot": true
+				}
+			]
+		},
+		{
+			"rf2TrackNames": ["Brianza Junior"],
+			"trackLandmarks": [{
+					"landmarkName": "turn1",
+					"distanceRoundLapStart": 170,
+					"distanceRoundLapEnd": 385,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn2",
+					"distanceRoundLapStart": 405,
+					"distanceRoundLapEnd": 490,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn3",
+					"distanceRoundLapStart": 495,
+					"distanceRoundLapEnd": 655,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "curva_parabolica",
+					"distanceRoundLapStart": 1400,
+					"distanceRoundLapEnd": 1915,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "curva_sud_alta_velocita",
+					"distanceRoundLapStart": 8260,
+					"distanceRoundLapEnd": 9510,
+					"isCommonOvertakingSpot": true
+				}
+			]
+		},
+		{
+			"rf2TrackNames": ["Bristol Motor Speedway"],
+			"isOval": true,
+			"trackLandmarks": [{
+					"landmarkName": "turn1",
+					"distanceRoundLapStart": 45,
+					"distanceRoundLapEnd": 195,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn2",
+					"distanceRoundLapStart": 196,
+					"distanceRoundLapEnd": 345,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn3",
+					"distanceRoundLapStart": 455,
+					"distanceRoundLapEnd": 622,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn4",
+					"distanceRoundLapStart": 623,
+					"distanceRoundLapEnd": 790,
+					"isCommonOvertakingSpot": true
+				}
+
+			]
+		},
+		{
+			"rf2TrackNames": ["Brookdale Speedway"],
+			"isOval": true,
+			"trackLandmarks": [{
+					"landmarkName": "turn1",
+					"distanceRoundLapStart": 200,
+					"distanceRoundLapEnd": 592,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn2",
+					"distanceRoundLapStart": 593,
+					"distanceRoundLapEnd": 985,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn3",
+					"distanceRoundLapStart": 1400,
+					"distanceRoundLapEnd": 1732,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn4",
+					"distanceRoundLapStart": 1733,
+					"distanceRoundLapEnd": 2095,
+					"isCommonOvertakingSpot": true
+				}
+
+			]
+		},
+		{
+			"rf2TrackNames": ["Canadian Tire Motorsport Park (after 2013)", "Mosport Park"],
+			"trackLandmarks": [{
+					"landmarkName": "turn1",
+					"distanceRoundLapStart": 535,
+					"distanceRoundLapEnd": 915,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "clayton_corner",
+					"distanceRoundLapStart": 1035,
+					"distanceRoundLapEnd": 1360,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "quebec_corner",
+					"distanceRoundLapStart": 1550,
+					"distanceRoundLapEnd": 1795,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn4",
+					"distanceRoundLapStart": 1570,
+					"distanceRoundLapEnd": 1840,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "moss_corner",
+					"distanceRoundLapStart": 1840,
+					"distanceRoundLapEnd": 2060,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn7",
+					"distanceRoundLapStart": 2070,
+					"distanceRoundLapEnd": 2260,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "the_esses",
+					"distanceRoundLapStart": 3140,
+					"distanceRoundLapEnd": 3660,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "whites_corner",
+					"distanceRoundLapStart": 3670,
+					"distanceRoundLapEnd": 3865,
+					"isCommonOvertakingSpot": true
+				}
+			]
+		},
+		{
+			"rf2TrackNames": ["Castle Combe modern"],
+			"trackLandmarks": [{
+					"landmarkName": "folley",
+					"distanceRoundLapStart": 135,
+					"distanceRoundLapEnd": 280,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "avon_rise",
+					"distanceRoundLapStart": 530,
+					"distanceRoundLapEnd": 670,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "quarry",
+					"distanceRoundLapStart": 675,
+					"distanceRoundLapEnd": 890,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "the_esses",
+					"distanceRoundLapStart": 1050,
+					"distanceRoundLapEnd": 1350,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "old_paddock_bend",
+					"distanceRoundLapStart": 1355,
+					"distanceRoundLapEnd": 1475,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "tower",
+					"distanceRoundLapStart": 1820,
+					"distanceRoundLapEnd": 2035,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "bobbies",
+					"distanceRoundLapStart": 2110,
+					"distanceRoundLapEnd": 2355,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "westway",
+					"distanceRoundLapStart": 2360,
+					"distanceRoundLapEnd": 2460,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "camp_corner",
+					"distanceRoundLapStart": 2680,
+					"distanceRoundLapEnd": 2900,
+					"isCommonOvertakingSpot": false
+				}
+			]
+		},
+		{
+			"rf2TrackNames": ["Castle Combe classic"],
+			"trackLandmarks": [{
+					"landmarkName": "folley",
+					"distanceRoundLapStart": 135,
+					"distanceRoundLapEnd": 280,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "avon_rise",
+					"distanceRoundLapStart": 530,
+					"distanceRoundLapEnd": 670,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "quarry",
+					"distanceRoundLapStart": 675,
+					"distanceRoundLapEnd": 890,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "old_paddock_bend",
+					"distanceRoundLapStart": 1300,
+					"distanceRoundLapEnd": 1480,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "tower",
+					"distanceRoundLapStart": 1815,
+					"distanceRoundLapEnd": 2035,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "westway",
+					"distanceRoundLapStart": 2290,
+					"distanceRoundLapEnd": 2465,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "camp_corner",
+					"distanceRoundLapStart": 2630,
+					"distanceRoundLapEnd": 2850,
+					"isCommonOvertakingSpot": false
+				}
+			]
+		},
+		{
+			"rf2TrackNames": ["Circuito Monteblanco Variante 1"],
+			"trackLandmarks": [{
+					"landmarkName": "turn1",
+					"distanceRoundLapStart": 440,
+					"distanceRoundLapEnd": 545,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn2",
+					"distanceRoundLapStart": 555,
+					"distanceRoundLapEnd": 635,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn3",
+					"distanceRoundLapStart": 700,
+					"distanceRoundLapEnd": 800,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn4",
+					"distanceRoundLapStart": 805,
+					"distanceRoundLapEnd": 885,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn5",
+					"distanceRoundLapStart": 960,
+					"distanceRoundLapEnd": 1050,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn6",
+					"distanceRoundLapStart": 1265,
+					"distanceRoundLapEnd": 1370,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn7",
+					"distanceRoundLapStart": 1435,
+					"distanceRoundLapEnd": 1540,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn8",
+					"distanceRoundLapStart": 1685,
+					"distanceRoundLapEnd": 1785,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn9",
+					"distanceRoundLapStart": 1930,
+					"distanceRoundLapEnd": 2035,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "chicane",
+					"distanceRoundLapStart": 2170,
+					"distanceRoundLapEnd": 2350,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn11",
+					"distanceRoundLapStart": 2455,
+					"distanceRoundLapEnd": 2570,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn12",
+					"distanceRoundLapStart": 2580,
+					"distanceRoundLapEnd": 2685,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn13",
+					"distanceRoundLapStart": 2790,
+					"distanceRoundLapEnd": 2915,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn14",
+					"distanceRoundLapStart": 3135,
+					"distanceRoundLapEnd": 3300,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn15",
+					"distanceRoundLapStart": 3405,
+					"distanceRoundLapEnd": 3510,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn16",
+					"distanceRoundLapStart": 3535,
+					"distanceRoundLapEnd": 3670,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn17",
+					"distanceRoundLapStart": 3820,
+					"distanceRoundLapEnd": 3985,
+					"isCommonOvertakingSpot": false
+				}
+			]
+		},
+		{
+			"rf2TrackNames": ["Circuito Monteblanco Variante 10"],
+			"trackLandmarks": [{
+					"landmarkName": "turn1",
+					"distanceRoundLapStart": 50,
+					"distanceRoundLapEnd": 160,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn2",
+					"distanceRoundLapStart": 285,
+					"distanceRoundLapEnd": 415,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "chicane",
+					"distanceRoundLapStart": 555,
+					"distanceRoundLapEnd": 715,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn4",
+					"distanceRoundLapStart": 860,
+					"distanceRoundLapEnd": 975,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn5",
+					"distanceRoundLapStart": 1000,
+					"distanceRoundLapEnd": 1150,
+					"isCommonOvertakingSpot": true
+				}
+			]
+		},
+		{
+			"rf2TrackNames": ["Circuito Monteblanco Variante 2"],
+			"trackLandmarks": [{
+					"landmarkName": "turn1",
+					"distanceRoundLapStart": 440,
+					"distanceRoundLapEnd": 545,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn2",
+					"distanceRoundLapStart": 555,
+					"distanceRoundLapEnd": 635,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn3",
+					"distanceRoundLapStart": 700,
+					"distanceRoundLapEnd": 800,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn4",
+					"distanceRoundLapStart": 805,
+					"distanceRoundLapEnd": 885,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn5",
+					"distanceRoundLapStart": 960,
+					"distanceRoundLapEnd": 1050,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn6",
+					"distanceRoundLapStart": 1265,
+					"distanceRoundLapEnd": 1370,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn7",
+					"distanceRoundLapStart": 1435,
+					"distanceRoundLapEnd": 1540,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn8",
+					"distanceRoundLapStart": 1685,
+					"distanceRoundLapEnd": 1785,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn9",
+					"distanceRoundLapStart": 1930,
+					"distanceRoundLapEnd": 2035,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "chicane",
+					"distanceRoundLapStart": 2170,
+					"distanceRoundLapEnd": 2350,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn11",
+					"distanceRoundLapStart": 2485,
+					"distanceRoundLapEnd": 2595,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn12",
+					"distanceRoundLapStart": 2790,
+					"distanceRoundLapEnd": 2905,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn13",
+					"distanceRoundLapStart": 2930,
+					"distanceRoundLapEnd": 3080,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn14",
+					"distanceRoundLapStart": 3220,
+					"distanceRoundLapEnd": 3385,
+					"isCommonOvertakingSpot": false
+				}
+			]
+		},
+		{
+			"rf2TrackNames": ["Circuito Monteblanco Variante 2ch2"],
+			"trackLandmarks": [{
+					"landmarkName": "turn1",
+					"distanceRoundLapStart": 440,
+					"distanceRoundLapEnd": 545,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn2",
+					"distanceRoundLapStart": 555,
+					"distanceRoundLapEnd": 635,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn3",
+					"distanceRoundLapStart": 700,
+					"distanceRoundLapEnd": 800,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn4",
+					"distanceRoundLapStart": 805,
+					"distanceRoundLapEnd": 885,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn5",
+					"distanceRoundLapStart": 960,
+					"distanceRoundLapEnd": 1050,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn6",
+					"distanceRoundLapStart": 1265,
+					"distanceRoundLapEnd": 1370,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn7",
+					"distanceRoundLapStart": 1435,
+					"distanceRoundLapEnd": 1540,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn8",
+					"distanceRoundLapStart": 1685,
+					"distanceRoundLapEnd": 1785,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn9",
+					"distanceRoundLapStart": 1930,
+					"distanceRoundLapEnd": 2035,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "chicane",
+					"distanceRoundLapStart": 2170,
+					"distanceRoundLapEnd": 2365,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn11",
+					"distanceRoundLapStart": 2500,
+					"distanceRoundLapEnd": 2610,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn12",
+					"distanceRoundLapStart": 2805,
+					"distanceRoundLapEnd": 2920,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn13",
+					"distanceRoundLapStart": 2945,
+					"distanceRoundLapEnd": 3095,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn14",
+					"distanceRoundLapStart": 3235,
+					"distanceRoundLapEnd": 3400,
+					"isCommonOvertakingSpot": false
+				}
+			]
+		},
+		{
+			"rf2TrackNames": ["Circuito Monteblanco Variante 3"],
+			"trackLandmarks": [{
+					"landmarkName": "turn1",
+					"distanceRoundLapStart": 440,
+					"distanceRoundLapEnd": 545,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn2",
+					"distanceRoundLapStart": 870,
+					"distanceRoundLapEnd": 954,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "chicane",
+					"distanceRoundLapStart": 1110,
+					"distanceRoundLapEnd": 1290,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn4",
+					"distanceRoundLapStart": 1395,
+					"distanceRoundLapEnd": 1510,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn5",
+					"distanceRoundLapStart": 1520,
+					"distanceRoundLapEnd": 1625,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn6",
+					"distanceRoundLapStart": 1730,
+					"distanceRoundLapEnd": 1855,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn7",
+					"distanceRoundLapStart": 2075,
+					"distanceRoundLapEnd": 2240,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn8",
+					"distanceRoundLapStart": 2345,
+					"distanceRoundLapEnd": 2450,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn9",
+					"distanceRoundLapStart": 2475,
+					"distanceRoundLapEnd": 2610,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn10",
+					"distanceRoundLapStart": 2730,
+					"distanceRoundLapEnd": 3965,
+					"isCommonOvertakingSpot": false
+				}
+			]
+		},
+		{
+			"rf2TrackNames": ["Circuito Monteblanco Variante 4"],
+			"trackLandmarks": [{
+					"landmarkName": "turn1",
+					"distanceRoundLapStart": 440,
+					"distanceRoundLapEnd": 545,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn2",
+					"distanceRoundLapStart": 870,
+					"distanceRoundLapEnd": 954,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "chicane",
+					"distanceRoundLapStart": 1110,
+					"distanceRoundLapEnd": 1290,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn4",
+					"distanceRoundLapStart": 1420,
+					"distanceRoundLapEnd": 1535,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn5",
+					"distanceRoundLapStart": 1715,
+					"distanceRoundLapEnd": 1830,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn6",
+					"distanceRoundLapStart": 1860,
+					"distanceRoundLapEnd": 1995,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn7",
+					"distanceRoundLapStart": 2170,
+					"distanceRoundLapEnd": 2325,
+					"isCommonOvertakingSpot": false
+				}
+			]
+		},
+		{
+			"rf2TrackNames": ["Circuito Monteblanco Variante 4ch3"],
+			"trackLandmarks": [{
+					"landmarkName": "turn1",
+					"distanceRoundLapStart": 440,
+					"distanceRoundLapEnd": 545,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn2",
+					"distanceRoundLapStart": 870,
+					"distanceRoundLapEnd": 954,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn3",
+					"distanceRoundLapStart": 1280,
+					"distanceRoundLapEnd": 1480,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn4",
+					"distanceRoundLapStart": 1365,
+					"distanceRoundLapEnd": 1470,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn5",
+					"distanceRoundLapStart": 1700,
+					"distanceRoundLapEnd": 1775,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn6",
+					"distanceRoundLapStart": 1805,
+					"distanceRoundLapEnd": 1940,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn7",
+					"distanceRoundLapStart": 2100,
+					"distanceRoundLapEnd": 2255,
+					"isCommonOvertakingSpot": false
+				}
+			]
+		},
+		{
+			"rf2TrackNames": ["Circuito Monteblanco Variante 6"],
+			"trackLandmarks": [{
+					"landmarkName": "turn1",
+					"distanceRoundLapStart": 440,
+					"distanceRoundLapEnd": 545,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn2",
+					"distanceRoundLapStart": 870,
+					"distanceRoundLapEnd": 954,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "chicane",
+					"distanceRoundLapStart": 1110,
+					"distanceRoundLapEnd": 1290,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn4",
+					"distanceRoundLapStart": 1000,
+					"distanceRoundLapEnd": 1500,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn5",
+					"distanceRoundLapStart": 1505,
+					"distanceRoundLapEnd": 1620,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn6",
+					"distanceRoundLapStart": 1735,
+					"distanceRoundLapEnd": 1835,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn7",
+					"distanceRoundLapStart": 2080,
+					"distanceRoundLapEnd": 2290,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn8",
+					"distanceRoundLapStart": 2495,
+					"distanceRoundLapEnd": 2600,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn9",
+					"distanceRoundLapStart": 2670,
+					"distanceRoundLapEnd": 2760,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn10",
+					"distanceRoundLapStart": 2925,
+					"distanceRoundLapEnd": 2985,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn11",
+					"distanceRoundLapStart": 2990,
+					"distanceRoundLapEnd": 3065,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn12",
+					"distanceRoundLapStart": 3085,
+					"distanceRoundLapEnd": 3160,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn13",
+					"distanceRoundLapStart": 3220,
+					"distanceRoundLapEnd": 3345,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn14",
+					"distanceRoundLapStart": 3615,
+					"distanceRoundLapEnd": 3690,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn15",
+					"distanceRoundLapStart": 3765,
+					"distanceRoundLapEnd": 3920,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn16",
+					"distanceRoundLapStart": 4075,
+					"distanceRoundLapEnd": 4225,
+					"isCommonOvertakingSpot": false
+				}
+			]
+		},
+		{
+			"rf2TrackNames": ["Circuito Monteblanco Variante 5"],
+			"trackLandmarks": [{
+					"landmarkName": "turn1",
+					"distanceRoundLapStart": 440,
+					"distanceRoundLapEnd": 545,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn2",
+					"distanceRoundLapStart": 870,
+					"distanceRoundLapEnd": 954,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "chicane",
+					"distanceRoundLapStart": 1110,
+					"distanceRoundLapEnd": 1290,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn4",
+					"distanceRoundLapStart": 1420,
+					"distanceRoundLapEnd": 1535,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn5",
+					"distanceRoundLapStart": 1560,
+					"distanceRoundLapEnd": 1690,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn6",
+					"distanceRoundLapStart": 1895,
+					"distanceRoundLapEnd": 2005,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn7",
+					"distanceRoundLapStart": 2050,
+					"distanceRoundLapEnd": 2165,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn8",
+					"distanceRoundLapStart": 2315,
+					"distanceRoundLapEnd": 2375,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn9",
+					"distanceRoundLapStart": 2400,
+					"distanceRoundLapEnd": 2465,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn10",
+					"distanceRoundLapStart": 2475,
+					"distanceRoundLapEnd": 2560,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn11",
+					"distanceRoundLapStart": 2605,
+					"distanceRoundLapEnd": 2715,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn12",
+					"distanceRoundLapStart": 2995,
+					"distanceRoundLapEnd": 3095,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn13",
+					"distanceRoundLapStart": 3155,
+					"distanceRoundLapEnd": 3310,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn14",
+					"distanceRoundLapStart": 3480,
+					"distanceRoundLapEnd": 3620,
+					"isCommonOvertakingSpot": false
+				}
+			]
+		},
+		{
+			"rf2TrackNames": ["Circuito Monteblanco Variante 7"],
+			"trackLandmarks": [{
+					"landmarkName": "turn1",
+					"distanceRoundLapStart": 440,
+					"distanceRoundLapEnd": 545,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn2",
+					"distanceRoundLapStart": 550,
+					"distanceRoundLapEnd": 630,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn3",
+					"distanceRoundLapStart": 710,
+					"distanceRoundLapEnd": 805,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn4",
+					"distanceRoundLapStart": 810,
+					"distanceRoundLapEnd": 895,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn5",
+					"distanceRoundLapStart": 950,
+					"distanceRoundLapEnd": 1065,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn6",
+					"distanceRoundLapStart": 1325,
+					"distanceRoundLapEnd": 1420,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn7",
+					"distanceRoundLapStart": 1800,
+					"distanceRoundLapEnd": 1945,
+					"isCommonOvertakingSpot": false
 				}
 			]
 		}
