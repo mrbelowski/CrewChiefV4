@@ -67,8 +67,6 @@ namespace CrewChiefV4.RaceRoom
         // a configurable 'max above baseline' for each. Assuming the base line temps are sensible (say, 85 for water 105 for oil), 
         // then anthing over 95 for water and 120 for oil is 'bad' - the numbers in the config reflect this
 
-        private Boolean gotBaselineEngineData = false;
-        private int baselineEngineDataSamples = 0;
         // record the average temperature between minutes 3 and 5 of driving
         private int baselineEngineDataSamplesStart = (int)(3d * 60d / CrewChief._timeInterval.TotalSeconds);
         private int baselineEngineDataSamplesEnd = (int)(5d * 60d / CrewChief._timeInterval.TotalSeconds);
@@ -199,8 +197,6 @@ namespace CrewChiefV4.RaceRoom
 
                 // reset the engine temp monitor stuff
 
-                gotBaselineEngineData = false;
-                baselineEngineDataSamples = 0;
                 baselineEngineDataOilTemp = targetEngineOilTemp;
                 baselineEngineDataWaterTemp = targetEngineWaterTemp;
                 for (int i = 0; i < shared.DriverData.Length; i++)
@@ -325,8 +321,6 @@ namespace CrewChiefV4.RaceRoom
                         Console.WriteLine("Just gone green, session details...");
 
                         // reset the engine temp monitor stuff
-                        gotBaselineEngineData = false;
-                        baselineEngineDataSamples = 0;
                         baselineEngineDataOilTemp = targetEngineOilTemp;
                         baselineEngineDataWaterTemp = targetEngineWaterTemp;
 

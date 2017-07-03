@@ -1040,7 +1040,6 @@ namespace CrewChiefV4.GameState
         private float landmarkStartTime = -1;
         private float landmarkStartSpeed = -1;
         private int landmarkStoppedCount = 0;
-        private Boolean inLandmark = false;
 
         // wonder if this'll work...
         private String nearLandmarkName = null;
@@ -1196,7 +1195,6 @@ namespace CrewChiefV4.GameState
                             landmarkStartSpeed = speed;                            
                         }
                         landmarkNameStart = trackLandmark.landmarkName;
-                        inLandmark = true;
                         // don't reset the landmarkStoppedCount when we enter the landmark - do this in the proximity check below
                         break;
                     }		
@@ -1236,7 +1234,6 @@ namespace CrewChiefV4.GameState
                             landmarkNameStart = null;
                             landmarkStartTime = -1;
                             landmarkStartSpeed = -1;
-                            inLandmark = false;
                         }
                         else
                         {
@@ -1245,7 +1242,6 @@ namespace CrewChiefV4.GameState
                             landmarkNameStart = null;
                             landmarkStartTime = -1;
                             landmarkStartSpeed = -1;
-                            inLandmark = false;
                             // we've left the landmark but haven't crossed the end trigger. We could be anywhere - even in the pit (for PCars). We
                             // don't want the stopped count for this section to carry over as we might reappear in the middle of a different
                             // section, so zero the counter
