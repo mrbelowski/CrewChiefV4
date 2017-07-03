@@ -94,7 +94,7 @@ namespace CrewChiefV4.Events
                         ((TyreMonitor)CrewChief.getEvent("TyreMonitor")).reportCurrentTyreTempStatus(false);
                     }
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     Console.WriteLine("Failed to report brake temp status on pit exit");
                 }

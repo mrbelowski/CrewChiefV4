@@ -55,18 +55,16 @@ namespace CrewChiefV4
                                 deletedCount++;
                             }
                         }
-                        catch (Exception e)
-                        {
-
-                        }
+                        catch (Exception)
+                        {}
                     }
                 }
                 Console.WriteLine("Successfully deleted " + deletedCount + " and renamed " + renamedCount + " sound files");
                 file.Close();
                 File.Delete(source + @"\updates.txt");
-            } catch (Exception e) {
-
             }
+            catch (Exception)
+            {}
         }
     }
 }
