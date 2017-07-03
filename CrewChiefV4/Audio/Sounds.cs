@@ -60,7 +60,7 @@ namespace CrewChiefV4.Audio
                             synthesizer.Dispose();
                             synthesizer = null;
                         }
-                        catch (Exception e) { }
+                        catch (Exception) { }
                     }
                     synthesizer = new SpeechSynthesizer();
                     Boolean hasMale = false;
@@ -102,7 +102,7 @@ namespace CrewChiefV4.Audio
                     synthesizer.Volume = 100;
                     synthesizer.Rate = 0;
                 }
-                catch (Exception e) {
+                catch (Exception) {
                     Console.WriteLine("Unable to initialise the TTS engine, TTS will not be available. " +
                                 "Check a suitable Microsoft TTS voice pack is installed");
                     useTTS = false;
@@ -372,7 +372,7 @@ namespace CrewChiefV4.Audio
                     synthesizer.Dispose();
                     synthesizer = null;
                 }
-                catch (Exception e) { }
+                catch (Exception) { }
             }
             foreach (SoundSet soundSet in soundSets.Values)
             {                
