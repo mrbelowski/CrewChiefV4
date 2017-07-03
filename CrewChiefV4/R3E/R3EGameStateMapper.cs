@@ -234,7 +234,7 @@ namespace CrewChiefV4.RaceRoom
                             {
                                 opponentDriverNamesProcessedThisUpdate.Add(driverName);
                                 currentGameState.OpponentData.Add(driverName, createOpponentData(participantStruct, driverName,
-                                    false, currentGameState.carClass.carClassEnum));
+                                    false, CarData.getCarClassForRaceRoomId(participantStruct.DriverInfo.ClassId).carClassEnum));
                             }
                         }
                     }
@@ -780,9 +780,8 @@ namespace CrewChiefV4.RaceRoom
                                     participantStruct.InPitlane == 1, participantStruct.CurrentLapValid == 1,
                                     currentGameState.SessionData.SessionRunningTime, secondsSinceLastUpdate,
                                     new float[] { participantStruct.Position.X, participantStruct.Position.Z }, previousOpponentWorldPosition,
-                                    participantStruct.LapDistance, participantStruct.TireType, participantStruct.DriverInfo.ClassId,
-                                    currentGameState.SessionData.SessionHasFixedTime, currentGameState.SessionData.SessionTimeRemaining, 
-                                    currentOpponentData.CarClass.carClassEnum);
+                                    participantStruct.LapDistance, participantStruct.TireType,
+                                    currentGameState.SessionData.SessionHasFixedTime, currentGameState.SessionData.SessionTimeRemaining);
 
                             if (previousOpponentData != null)
                             {
@@ -846,7 +845,8 @@ namespace CrewChiefV4.RaceRoom
                     else
                     {
                         opponentDriverNamesProcessedThisUpdate.Add(driverName);
-                        currentGameState.OpponentData.Add(driverName, createOpponentData(participantStruct, driverName, true, currentGameState.carClass.carClassEnum));
+                        currentGameState.OpponentData.Add(driverName, createOpponentData(participantStruct, driverName, true,
+                            CarData.getCarClassForRaceRoomId(participantStruct.DriverInfo.ClassId).carClassEnum));
                     }
                 }
             }
@@ -1452,8 +1452,7 @@ namespace CrewChiefV4.RaceRoom
 
         private void upateOpponentData(OpponentData opponentData, int racePosition, int unfilteredRacePosition, int completedLaps, int sector, float sectorTime, 
             float completedLapTime, Boolean isInPits, Boolean lapIsValid, float sessionRunningTime, float secondsSinceLastUpdate, float[] currentWorldPosition,
-            float[] previousWorldPosition, float distanceRoundTrack, int tire_type, int carClassId, Boolean sessionLengthIsTime, float sessionTimeRemaining,
-            CarData.CarClassEnum opponentCarClass)
+            float[] previousWorldPosition, float distanceRoundTrack, int tire_type, Boolean sessionLengthIsTime, float sessionTimeRemaining)
         {
             opponentData.DistanceRoundTrack = distanceRoundTrack;
             float speed;
@@ -1477,7 +1476,6 @@ namespace CrewChiefV4.RaceRoom
             opponentData.InPits = isInPits;
             if (opponentData.CurrentSectorNumber != sector)
             {
-                opponentData.CarClass = CarData.getCarClassForRaceRoomId(carClassId);
                 if (opponentData.CurrentSectorNumber == 3 && sector == 1)
                 {
                     if (opponentData.OpponentLapData.Count > 0)
@@ -1493,7 +1491,7 @@ namespace CrewChiefV4.RaceRoom
                     opponentData.AddCumulativeSectorData(opponentData.CurrentSectorNumber, racePosition, sectorTime, sessionRunningTime, lapIsValid && validSpeed, false, 20, 20);
                     if (sector == 2)
                     {
-                        opponentData.CurrentTyres = mapToTyreType(tire_type, opponentCarClass);
+                        opponentData.CurrentTyres = mapToTyreType(tire_type, opponentData.CarClass.carClassEnum);
                     }
                 }
                 opponentData.CurrentSectorNumber = sector;
