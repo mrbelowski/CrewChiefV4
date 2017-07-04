@@ -1040,6 +1040,10 @@ namespace CrewChiefV4.RaceRoom
             currentGameState.PitData.PitWindow = mapToPitWindow(shared.PitWindowStatus);
             currentGameState.PitData.IsMakingMandatoryPitStop = (currentGameState.PitData.PitWindow == PitWindow.Open || currentGameState.PitData.PitWindow == PitWindow.StopInProgress) &&
                (currentGameState.PitData.OnInLap || currentGameState.PitData.OnOutLap);
+            if (previousGameState != null)
+            {
+                currentGameState.PitData.MandatoryPitStopCompleted = previousGameState.PitData.MandatoryPitStopCompleted || shared.PitWindowStatus == (int)PitWindow.Completed;
+            }
             currentGameState.PitData.limiterStatus = shared.PitLimiter;
 
             //------------------------ Car position / motion data -----------------------

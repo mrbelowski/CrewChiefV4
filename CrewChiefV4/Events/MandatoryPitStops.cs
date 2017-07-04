@@ -152,6 +152,14 @@ namespace CrewChiefV4.Events
             {
                 enableWindowWarnings = false;
             }
+            if (!mandatoryStopCompleted && currentGameState.PitData.MandatoryPitStopCompleted)
+            {
+                mandatoryStopCompleted = true;
+                mandatoryStopMissed = false;
+                playPitThisLap = false;
+                playBoxNowMessage = false;
+                mandatoryStopBoxThisLap = false;
+            }
             if (currentGameState.PitData.limiterStatus != -1 && currentGameState.Now > timeOfLastLimiterWarning + TimeSpan.FromSeconds(30))
             {
                 if (currentGameState.SessionData.SectorNumber == 1 && 
@@ -225,14 +233,6 @@ namespace CrewChiefV4.Events
                         Console.WriteLine("Error getting pit data");
                     }
                     pitDataInitialised = true;
-                }
-                else if (currentGameState.PitData.IsMakingMandatoryPitStop)
-                {
-                    playPitThisLap = false;
-                    playBoxNowMessage = false;
-                    mandatoryStopCompleted = true;
-                    mandatoryStopBoxThisLap = false;
-                    mandatoryStopMissed = false;
                 }
                 else
                 {
