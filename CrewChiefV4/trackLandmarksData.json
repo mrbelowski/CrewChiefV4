@@ -4595,7 +4595,8 @@
 			]
 		},
 		{
-			"rf2TrackNames": ["RaceRfactor China 2014"],
+			"rf2TrackNames": [ "RaceRfactor China 2014" ],
+			"raceroomLayoutId": 2027,
 			"trackLandmarks": [{
 					"landmarkName": "turn1",
 					"distanceRoundLapStart": 470,
