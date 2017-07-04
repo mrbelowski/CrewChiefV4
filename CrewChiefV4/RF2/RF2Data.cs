@@ -44,7 +44,6 @@ namespace CrewChiefV4.rFactor2
         public const int MAX_MAPPED_IDS = 1024;
         public const string RFACTOR2_PROCESS_NAME = "rFactor2";
 
-        // TODO: remove if not needed
         public const byte RowX = 0;
         public const byte RowY = 1;
         public const byte RowZ = 2;
