@@ -1367,6 +1367,10 @@ namespace CrewChiefV4.GameState
 
         public Boolean IsMakingMandatoryPitStop = false;
 
+        // the pit window stuff isn't right here - the state can be 'completed' but then change to something
+        // else, so we need to keep track of whether we've completed a mandatory stop separately.
+        public Boolean MandatoryPitStopCompleted = false;
+
         // this is true for one tick, when the player is about to exit the pits
         public Boolean IsAtPitExit = false;
 
