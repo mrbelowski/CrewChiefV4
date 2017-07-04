@@ -324,9 +324,16 @@ namespace CrewChiefV4.rFactor2
                                 wrapper.telemetry.mVehicles = this.GetPopulatedVehicleInfoArray<rF2VehicleTelemetry>(wrapper.telemetry.mVehicles, wrapper.telemetry.mNumVehicles);
                                 wrapper.scoring.mVehicles = this.GetPopulatedVehicleInfoArray<rF2VehicleScoring>(wrapper.scoring.mVehicles, wrapper.scoring.mScoringInfo.mNumVehicles);
 
-                                // Since serialization to XML produces a lot of useless tags even for small arrays, truncate tracked damage array.
-                                // It is indexed by mID.  Max mID in current set is equal to mNumVehicles in 99% of cases, so just truncate to this size.
-                                wrapper.extended.mTrackedDamages = this.GetPopulatedVehicleInfoArray<rF2TrackedDamage>(wrapper.extended.mTrackedDamages, wrapper.scoring.mScoringInfo.mNumVehicles);
+                                int maxmID = 0;
+                                foreach (var vehicleScoring in wrapper.scoring.mVehicles)
+                                    maxmID = Math.Max(maxmID, vehicleScoring.mID);
+
+                                if (maxmID < rFactor2Constants.MAX_MAPPED_IDS)
+                                {
+                                    // Since serialization to XML produces a lot of useless tags even for small arrays, truncate tracked damage array.
+                                    // It is indexed by mID.  Max mID in current set is equal to mNumVehicles in 99% of cases, so just truncate to this size.
+                                    wrapper.extended.mTrackedDamages = this.GetPopulatedVehicleInfoArray<rF2TrackedDamage>(wrapper.extended.mTrackedDamages, maxmID + 1);
+                                }
 
                                 this.dataToDump.Add(wrapper);
                                 this.lastScoringET = currScoringET;

@@ -41,7 +41,7 @@ namespace CrewChiefV4.rFactor2
         public const string MM_EXTENDED_FILE_ACCESS_MUTEX = @"Global\$rFactor2SMMP_ExtendedMutex";
 
         public const int MAX_MAPPED_VEHICLES = 128;
-        public const int MAX_MAPPED_IDS = 256;
+        public const int MAX_MAPPED_IDS = 1024;
         public const string RFACTOR2_PROCESS_NAME = "rFactor2";
 
         // TODO: remove if not needed
