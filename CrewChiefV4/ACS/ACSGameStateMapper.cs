@@ -1796,7 +1796,10 @@ namespace CrewChiefV4.assetto
             }
 
             currentGameState.PitData.IsMakingMandatoryPitStop = (currentGameState.PitData.PitWindow == PitWindow.StopInProgress);
-
+            if (previousGameState != null)
+            {
+                currentGameState.PitData.MandatoryPitStopCompleted = previousGameState.PitData.MandatoryPitStopCompleted || shared.acsGraphic.MandatoryPitDone == 1;
+            }
 
             //damage data
             if (shared.acsChief.isInternalMemoryModuleLoaded == 1)

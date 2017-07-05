@@ -364,6 +364,10 @@ namespace CrewChiefV4.rFactor2
             cgs.PitData.PitWindow = cgs.PitData.IsMakingMandatoryPitStop 
                 ? PitWindow.StopInProgress : mapToPitWindow((rFactor2Constants.rF2YellowFlagState)rf2state.mYellowFlagState);
 
+            if (pgs != null)
+            {
+                cgs.PitData.MandatoryPitStopCompleted = pgs.PitData.MandatoryPitStopCompleted || cgs.PitData.IsMakingMandatoryPitStop;
+            }
             ////////////////////////////////////
             // Timings
             if (psd != null && !csd.IsNewSession)

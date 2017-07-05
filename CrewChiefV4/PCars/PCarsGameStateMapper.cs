@@ -982,6 +982,10 @@ namespace CrewChiefV4.PCars
                 currentGameState.PitData.PitWindow = mapToPitWindow(currentGameState, shared.mPitSchedule, shared.mPitMode);
                 currentGameState.PitData.IsMakingMandatoryPitStop = (currentGameState.PitData.PitWindow == PitWindow.Open || currentGameState.PitData.PitWindow == PitWindow.StopInProgress) &&
                                                                     (currentGameState.PitData.OnInLap || currentGameState.PitData.OnOutLap);
+                if (previousGameState != null)
+                {
+                    currentGameState.PitData.MandatoryPitStopCompleted = previousGameState.PitData.MandatoryPitStopCompleted || currentGameState.PitData.IsMakingMandatoryPitStop;
+                }
             }
             currentGameState.CarDamageData.DamageEnabled = true;    // no way to tell if it's disabled from the shared memory
             currentGameState.CarDamageData.OverallAeroDamage = mapToAeroDamageLevel(shared.mAeroDamage);
