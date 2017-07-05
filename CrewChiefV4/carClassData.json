@@ -690,6 +690,13 @@
 			"timesInHundredths": true,
 			"useAmericanTerms": true,
 			"enabledMessageTypes": "ALL"
+		},
+		{
+			"carClassEnum": "RADICAL_SR3",
+			"rf2ClassNames": ["Radical SR3 RSX"],
+			"brakeType": "Ceramic",
+			"timesInHundredths": true,
+			"enabledMessageTypes": "ALL"
 		}
 	]
 }
