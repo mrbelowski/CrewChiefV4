@@ -854,6 +854,12 @@ namespace CrewChiefV4.rFactor1
                 (currentGameState.SessionData.SessionType != SessionType.Race && currentGameState.SessionData.CompletedLaps == 0);
             currentGameState.PitData.OnInLap = currentGameState.PitData.InPitlane && currentGameState.SessionData.SectorNumber == 3;
             currentGameState.PitData.IsMakingMandatoryPitStop = currentGameState.PitData.HasMandatoryPitStop && currentGameState.PitData.OnInLap && currentGameState.SessionData.CompletedLaps > currentGameState.PitData.PitWindowStart;
+
+            if (previousGameState != null)
+            {
+                currentGameState.PitData.MandatoryPitStopCompleted = previousGameState.PitData.MandatoryPitStopCompleted || currentGameState.PitData.IsMakingMandatoryPitStop;
+            }
+
             currentGameState.PitData.PitWindow = currentGameState.PitData.IsMakingMandatoryPitStop ? PitWindow.StopInProgress : 
                 mapToPitWindow((rFactor1Constant.rfYellowFlagState)shared.yellowFlagState);
 
