@@ -121,6 +121,7 @@ namespace CrewChiefV4
         private DelayedMessageEvent delayedMessageEvent;
         public Boolean delayMessageResolution = false;
 
+        public int secondsDelay;
         private Random rand = new Random();
 
         // some snapshot of pertentent data at the point of creation, 
@@ -158,6 +159,7 @@ namespace CrewChiefV4
             this.messageName = compoundMessageIdentifier + messageName;
             this.messageFolders = getMessageFolders(messageFragments, false);
             this.dueTime = secondsDelay == 0 ? 0 : (GameStateData.CurrentTime.Ticks / TimeSpan.TicksPerMillisecond) + (secondsDelay * 1000) + updateInterval;
+            this.secondsDelay = secondsDelay;
             this.abstractEvent = abstractEvent;
         }
 
@@ -189,6 +191,7 @@ namespace CrewChiefV4
                 }
             }
             this.dueTime = secondsDelay == 0 ? 0 : (GameStateData.CurrentTime.Ticks / TimeSpan.TicksPerMillisecond) + (secondsDelay * 1000) + updateInterval;
+            this.secondsDelay = secondsDelay;
             this.abstractEvent = abstractEvent;
         }
 
@@ -205,6 +208,7 @@ namespace CrewChiefV4
             messageFragments.Add(MessageFragment.Text(message));
             this.messageFolders = getMessageFolders(messageFragments, false);
             this.dueTime = secondsDelay == 0 ? 0 : (GameStateData.CurrentTime.Ticks / TimeSpan.TicksPerMillisecond) + (secondsDelay * 1000) + updateInterval;
+            this.secondsDelay = secondsDelay;
             this.abstractEvent = abstractEvent;
         }
 
@@ -214,6 +218,7 @@ namespace CrewChiefV4
             this.delayedMessageEvent = delayedMessageEvent;
             this.delayMessageResolution = true;
             this.dueTime = secondsDelay == 0 ? 0 : (GameStateData.CurrentTime.Ticks / TimeSpan.TicksPerMillisecond) + (secondsDelay * 1000) + updateInterval;
+            this.secondsDelay = secondsDelay;
             this.delayMessageResolution = true;
             this.abstractEvent = abstractEvent;
         }
