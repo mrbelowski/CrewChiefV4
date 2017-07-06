@@ -931,7 +931,26 @@ namespace CrewChiefV4.Audio
 
         public void playMessage(QueuedMessage queuedMessage)
         {
-            playMessage(queuedMessage, PearlsOfWisdom.PearlType.NONE, 0);
+            if (GlobalBehaviourSettings.enabledMessageTypes.Contains(MessageTypes.NONE))
+            {
+                Console.WriteLine("All messages disabled for this car class. Message " + queuedMessage.messageName + " will not be played");
+            } 
+            else
+            {
+                playMessage(queuedMessage, PearlsOfWisdom.PearlType.NONE, 0);
+            }
+        }
+
+        // this should only be called in response to a voice message, following a 'standby' request. We want to play the 
+        // message via the 'immediate' mechanism, but not until the secondsDelay has expired.
+        public void playDelayedImmediateMessage(QueuedMessage queuedMessage)
+        {
+            new Thread(() =>
+            {
+                Thread.CurrentThread.IsBackground = true;
+                Thread.Sleep(queuedMessage.secondsDelay * 1000);
+                playMessageImmediately(queuedMessage);
+            }).Start();            
         }
 
         public void playMessageImmediately(QueuedMessage queuedMessage)
