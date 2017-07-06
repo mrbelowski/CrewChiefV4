@@ -211,7 +211,7 @@ namespace CrewChiefV4.rFactor2
             if (pgs == null || psd.TrackDefinition.name != csd.TrackDefinition.name)
             {
                 // New game or new track
-                TrackDataContainer tdc = TrackData.TRACK_LANDMARKS_DATA.getTrackDataForTrackName(csd.TrackDefinition.name);
+                TrackDataContainer tdc = TrackData.TRACK_LANDMARKS_DATA.getTrackDataForTrackName(csd.TrackDefinition.name, (float) rf2state.mLapDist);
                 csd.TrackDefinition.trackLandmarks = tdc.trackLandmarks;
                 csd.TrackDefinition.isOval = tdc.isOval;
                 csd.TrackDefinition.setGapPoints();

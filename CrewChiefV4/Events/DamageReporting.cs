@@ -420,7 +420,7 @@ namespace CrewChiefV4.Events
                     int secondsDelay = Math.Max(5, random.Next(11));
                     audioPlayer.pauseQueue(secondsDelay);
                     damageMessage.dueTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + (1000 * secondsDelay);
-                    audioPlayer.playMessage(damageMessage);
+                    audioPlayer.playDelayedImmediateMessage(damageMessage);
                 }
                 else
                 {
