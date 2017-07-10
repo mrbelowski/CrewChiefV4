@@ -82,9 +82,10 @@ namespace CrewChiefV4.rFactor2
                 || currentState.scoring.mScoringInfo.mCurrentET < this.timeAfterRaceStartToActivate
                 || currentState.extended.mInRealtimeFC == 0
                 || currentState.scoring.mScoringInfo.mInRealtime == 0
+                || currentState.scoring.mScoringInfo.mNumVehicles <= 2
                 || lastState.extended.mInRealtimeFC == 0
                 || lastState.scoring.mScoringInfo.mInRealtime == 0
-                || currentState.scoring.mScoringInfo.mNumVehicles <= 2)
+                || lastState.scoring.mScoringInfo.mNumVehicles <= 2)
                 return;
 
             var now = DateTime.Now;
@@ -120,31 +121,43 @@ namespace CrewChiefV4.rFactor2
             }
 
             // Find telemetry data for current player vehicle.
-            var idsToTelIndicesMap = RF2GameStateMapper.getIdsToTelIndicesMap(ref currentState.telemetry);
+            /*var idsToTelIndicesMap = RF2GameStateMapper.getIdsToTelIndicesMap(ref currentState.telemetry);
             int playerTelIdx = -1;
             if (!idsToTelIndicesMap.TryGetValue(currentPlayerScoring.mID, out playerTelIdx))
             {
-                // TODO: remove.
                 Console.WriteLine("Couldn't find player telemetry entry for spotter");
                 return;
-            }
+            }*/
 
-            var currentPlayerTelemetry = currentState.telemetry.mVehicles[playerTelIdx];
+            var currentPlayerTelemetry = new rF2VehicleTelemetry();
+            bool currentPlayerTelemetryAvailable = true;
+
+            var idsToTelIndicesMap = RF2GameStateMapper.getIdsToTelIndicesMap(ref currentState.telemetry);
+            int playerTelIdx = -1;
+            if (idsToTelIndicesMap.TryGetValue(currentPlayerScoring.mID, out playerTelIdx))
+                currentPlayerTelemetry = currentState.telemetry.mVehicles[playerTelIdx];
+            else
+                currentPlayerTelemetryAvailable = false;
 
             // Find telemetry data for previous player vehicle.
-            int previousPlayerTelIdx = -1;
+            var previousPlayerTelemetry = new rF2VehicleTelemetry();
+            bool previousPlayerTelemetryAvailable = false;
+
             for (int i = 0; i < lastState.telemetry.mNumVehicles; ++i)
             {
                 if (previousPlayerScoring.mID == lastState.telemetry.mVehicles[i].mID)
                 {
-                    previousPlayerTelIdx = i;
+                    previousPlayerTelemetry = lastState.telemetry.mVehicles[i];
+                    previousPlayerTelemetryAvailable = true;
                     break;
                 }
             }
 
-            var previousPlayerTelemetry = lastState.telemetry.mVehicles[previousPlayerTelIdx];
-
-            var currentPlayerPosition = new float[] { (float) currentPlayerTelemetry.mPos.x, (float) currentPlayerTelemetry.mPos.z };
+            float[] currentPlayerPosition = null;
+            if (currentPlayerTelemetryAvailable)
+                currentPlayerPosition = new float[] { (float)currentPlayerTelemetry.mPos.x, (float)currentPlayerTelemetry.mPos.z };
+            else
+                currentPlayerPosition = new float[] { (float)currentPlayerScoring.mPos.x, (float)currentPlayerScoring.mPos.z };
 
             if (currentPlayerScoring.mInPits == 0
                 && currentPlayerScoring.mControl == (int)rFactor2Constants.rF2Control.Player
