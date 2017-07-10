@@ -41,6 +41,7 @@ namespace CrewChiefV4
         public static String[] WHATS_THE_FASTEST_LAP_TIME = Configuration.getSpeechRecognitionPhrases("WHATS_THE_FASTEST_LAP_TIME");
         public static String[] WHATS_MY_POSITION = Configuration.getSpeechRecognitionPhrases("WHATS_MY_POSITION");
         public static String[] WHATS_MY_FUEL_LEVEL = Configuration.getSpeechRecognitionPhrases("WHATS_MY_FUEL_LEVEL");
+        public static String[] WHATS_MY_FUEL_USAGE = Configuration.getSpeechRecognitionPhrases("WHATS_MY_FUEL_USAGE");
 
         public static String[] KEEP_QUIET = Configuration.getSpeechRecognitionPhrases("KEEP_QUIET");
         public static String[] KEEP_ME_INFORMED = Configuration.getSpeechRecognitionPhrases("KEEP_ME_INFORMED");
@@ -243,6 +244,7 @@ namespace CrewChiefV4
                 validateAndAdd(WHATS_MY_BEST_LAP_TIME, staticSpeechChoices);
                 validateAndAdd(WHATS_MY_POSITION, staticSpeechChoices);
                 validateAndAdd(WHATS_MY_FUEL_LEVEL, staticSpeechChoices);
+                validateAndAdd(WHATS_MY_FUEL_USAGE, staticSpeechChoices);
 
                 validateAndAdd(KEEP_QUIET, staticSpeechChoices);
                 validateAndAdd(KEEP_ME_INFORMED, staticSpeechChoices);
