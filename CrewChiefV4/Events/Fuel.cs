@@ -206,7 +206,7 @@ namespace CrewChiefV4.Events
                     {
                         if (fuelAtStartOfLastLap > currentFuel)
                         {
-                            usagePerLap.Add(currentFuel - fuelAtStartOfLastLap);                            
+                            usagePerLap.Add(fuelAtStartOfLastLap - currentFuel);                            
                         }
                         fuelAtStartOfLastLap = currentFuel;                        
                     }
@@ -386,11 +386,11 @@ namespace CrewChiefV4.Events
         {
             if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.WHATS_MY_FUEL_USAGE))
             {
-                if (!fuelUseActive)
+                if (!fuelUseActive || usagePerLap.Count == 0)
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
                 }
-                else if (usagePerLap.Count > 0)
+                else
                 {
                     // round to 1dp
                     float meanUsePerLap = ((float)Math.Round(usagePerLap.Average() * 10f)) / 10f;
@@ -420,6 +420,10 @@ namespace CrewChiefV4.Events
                             audioPlayer.playMessageImmediately(new QueuedMessage("Fuel/mean_use_per_lap",
                                     MessageContents(wholePart, folderLitresPerLap), 0, null));
                         }
+                    }
+                    else
+                    {
+                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
                     }
                 }
             }
