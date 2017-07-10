@@ -7,6 +7,7 @@ namespace CrewChiefV4
 {
     public abstract class NumberReader
     {
+        public static String folderPoint = "numbers/point";
         /**
          * Language specific implementation to speak an integer, using whatever rules and words this language requires.
          * Note this char array may contain only '0'. This will typically include words for "seconds", "tenths", "hundreds", etc

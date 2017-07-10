@@ -88,6 +88,33 @@ namespace CrewChiefV4.Events
         }
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
+            float meanUsePerLap = 9.94f;
+            meanUsePerLap = ((float)Math.Round(meanUsePerLap * 10f)) / 10f;
+            String str = meanUsePerLap.ToString();
+            int pointPosition = str.IndexOf('.');
+            int wholePart = 0;
+            int fractionalPart = 0;
+            if (pointPosition > 0) {
+                wholePart = int.Parse(str.Substring(0, pointPosition));
+                fractionalPart = int.Parse(str[pointPosition + 1].ToString());
+            }
+            else
+            {
+                wholePart = (int) meanUsePerLap;
+            }
+            if (meanUsePerLap > 0)
+            {
+                if (fractionalPart > 0)
+                {
+                    audioPlayer.playMessageImmediately(new QueuedMessage("Fuel/mean_use_per_lap",
+                            MessageContents(wholePart, NumberReader.folderPoint, fractionalPart, Fuel.folderLitresPerLap), 0, null));
+                }
+                else
+                {
+                    audioPlayer.playMessageImmediately(new QueuedMessage("Fuel/mean_use_per_lap",
+                            MessageContents(wholePart, Fuel.folderLitresPerLap), 0, null));
+                }
+            }
             //audioPlayer.playMessage(new QueuedMessage("sectortest1", LapTimes.getSectorDeltaMessages(LapTimes.SectorReportOption.ALL, 20.5f, 20, 33, 34.1f, 10, 10.1f, true), 0, this));
 
             /*for (int i = 0; i < 5; i++)
