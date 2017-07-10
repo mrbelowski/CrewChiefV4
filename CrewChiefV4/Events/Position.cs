@@ -332,23 +332,22 @@ namespace CrewChiefV4.Events
                     playedRaceStartMessage = true;
                     Console.WriteLine("Race start message... isLast = " + isLast +
                         " session start pos = " + currentGameState.SessionData.SessionStartPosition + " current pos = " + currentGameState.SessionData.Position);
-                    if (currentGameState.SessionData.SessionStartPosition > 0)
-                    {
-                        if (currentGameState.SessionData.SessionStartPosition + 1 < currentGameState.SessionData.Position)
-                        {
-                            audioPlayer.playMessage(new QueuedMessage(folderBadStart, 0, this));
-                        }
-                        else if (!isLast && (currentGameState.SessionData.Position == 1 || currentGameState.SessionData.SessionStartPosition > currentGameState.SessionData.Position + 2) &&
+                    if (currentGameState.SessionData.SessionStartPosition > 0 &&
                             !currentGameState.PenaltiesData.HasDriveThrough && !currentGameState.PenaltiesData.HasStopAndGo)
-                        {
-                            audioPlayer.playMessage(new QueuedMessage(folderGoodStart, 0, this));
-                        }
-                        else if (currentGameState.SessionData.SessionStartPosition + 5 < currentGameState.SessionData.Position)
+                    {
+                        if (currentGameState.SessionData.Position > currentGameState.SessionData.SessionStartPosition + 4)
                         {
                             audioPlayer.playMessage(new QueuedMessage(folderTerribleStart, 0, this));
                         }
-                        else if (!isLast && rand.NextDouble() > 0.6 &&
-                            !currentGameState.PenaltiesData.HasDriveThrough && !currentGameState.PenaltiesData.HasStopAndGo)
+                        else if (currentGameState.SessionData.Position > currentGameState.SessionData.SessionStartPosition + 1)
+                        {
+                            audioPlayer.playMessage(new QueuedMessage(folderBadStart, 0, this));
+                        }
+                        else if (!isLast && (currentGameState.SessionData.Position == 1 || currentGameState.SessionData.Position < currentGameState.SessionData.SessionStartPosition - 1) )
+                        {
+                            audioPlayer.playMessage(new QueuedMessage(folderGoodStart, 0, this));
+                        }
+                        else if (!isLast && rand.NextDouble() > 0.6)
                         {
                             // only play the OK start message sometimes
                             audioPlayer.playMessage(new QueuedMessage(folderOKStart, 0, this));
