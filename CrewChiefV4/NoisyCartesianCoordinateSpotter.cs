@@ -77,6 +77,7 @@ namespace CrewChiefV4
         // don't play 'clear' or 'hold' messages unless we've actually been clear or overlapping for some time
         private TimeSpan clearMessageDelay = TimeSpan.FromMilliseconds(UserSettings.GetUserSettings().getInt("spotter_clear_delay"));
         private TimeSpan overlapMessageDelay = TimeSpan.FromMilliseconds(UserSettings.GetUserSettings().getInt("spotter_overlap_delay"));
+        private static Boolean use3WideLeftAndRight = UserSettings.GetUserSettings().getBoolean("spotter_enable_three_wide_left_and_right");
 
         private DateTime nextMessageDue = DateTime.Now;
         
@@ -95,6 +96,8 @@ namespace CrewChiefV4
         private Boolean reportedOverlapRight = false;
 
         private Boolean wasInMiddle = false;
+
+        private static int maxOverlapsPerSide = use3WideLeftAndRight ? 2 : 1;
 
         private enum Side {
             right, left, none
@@ -168,7 +171,7 @@ namespace CrewChiefV4
                                     opponentPreviousPositionAndVelocityData.zPosition = currentOpponentPosition[1];
                                 }
                                 // we've updated this guys cached position and velocity, but we only need to check his speed if we don't already have 2 overlaps on both sides
-                                if (carsOnLeft <= 1 || carsOnRight <= 1)
+                                if (carsOnLeft < maxOverlapsPerSide || carsOnRight < maxOverlapsPerSide)
                                 {
                                     isOpponentVelocityInRange = checkOpponentVelocityInRange(playerVelocityData[1], playerVelocityData[2],
                                             opponentPreviousPositionAndVelocityData.xSpeed, opponentPreviousPositionAndVelocityData.zSpeed);
@@ -179,7 +182,7 @@ namespace CrewChiefV4
                                 previousPositionAndVelocityData.Add(i, new PreviousPositionAndVelocityData(currentOpponentPosition[0], currentOpponentPosition[1], now));
                             }
                             // again, if we already have 2 overlaps on both sides here we don't need to calculate another
-                            if (carsOnLeft < 2 || carsOnRight < 2)
+                            if (carsOnLeft < maxOverlapsPerSide || carsOnRight < maxOverlapsPerSide)
                             {
                                 Side side = getSide(playerRotationInRadians, currentPlayerPosition[0], currentPlayerPosition[1], currentOpponentPosition[0], 
                                     currentOpponentPosition[1], isOpponentVelocityInRange);
@@ -359,7 +362,7 @@ namespace CrewChiefV4
                     nextMessageDue = now;
                 }
                 // we'll only ever go straight to 'three wide' here if both cars appear along side at exactly the same time
-                nextMessageType = carsOnLeftCount > 1 ? NextMessageType.threeWideYoureOnTheRight : NextMessageType.carLeft;
+                nextMessageType = carsOnLeftCount > 1 && use3WideLeftAndRight ? NextMessageType.threeWideYoureOnTheRight : NextMessageType.carLeft;
             }
             else if (carsOnLeftCount == 0 && carsOnRightCount > 0 && !hasCarLeft && !hasCarRight)
             {
@@ -374,11 +377,11 @@ namespace CrewChiefV4
                     nextMessageDue = now;
                 }
                 // we'll only ever go straight to 'three wide' here if both cars appear along side at exactly the same time
-                nextMessageType = carsOnRightCount > 1 ? NextMessageType.threeWideYoureOnTheLeft : NextMessageType.carRight;
+                nextMessageType = carsOnRightCount > 1 && use3WideLeftAndRight ? NextMessageType.threeWideYoureOnTheLeft : NextMessageType.carRight;
             }
 
             // special cases for 3-wide-on-left / right. If we're already overlapping on the left and we now have another overlap, report 3 wide
-            else if (carsOnLeftCount > 1 && carsOnRightCount == 0 && hasCarLeft && !hasCarRight)
+            else if (use3WideLeftAndRight && carsOnLeftCount > 1 && carsOnRightCount == 0 && hasCarLeft && !hasCarRight)
             {
                 if (reportedOverlapLeft)
                 {
@@ -392,7 +395,7 @@ namespace CrewChiefV4
                 }
                 nextMessageType = NextMessageType.threeWideYoureOnTheRight;
             }
-            else if (carsOnLeftCount == 0 && carsOnRightCount > 1 && !hasCarLeft && hasCarRight)
+            else if (use3WideLeftAndRight && carsOnLeftCount == 0 && carsOnRightCount > 1 && !hasCarLeft && hasCarRight)
             {
                 if (reportedOverlapRight)
                 {
