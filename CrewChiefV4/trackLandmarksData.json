@@ -4267,7 +4267,7 @@
 			"rf2TrackNames": ["Daytona International Speedway"],
 			"isOval": true,
 			"trackLandmarks": [{
-					"landmarkName": "tri_oval",
+					"landmarkName": "the_tri_oval",
 					"distanceRoundLapStart": 0,
 					"distanceRoundLapEnd": 210,
 					"isCommonOvertakingSpot": true
@@ -4297,7 +4297,7 @@
 					"isCommonOvertakingSpot": true
 				},
 				{
-					"landmarkName": "tri_oval",
+					"landmarkName": "the_tri_oval",
 					"distanceRoundLapStart": 3800,
 					"distanceRoundLapEnd": 4010,
 					"isCommonOvertakingSpot": true
@@ -5640,7 +5640,7 @@
 					"isCommonOvertakingSpot": true
 				},
 				{
-					"landmarkName": "tri_oval",
+					"landmarkName": "the_tri_oval",
 					"distanceRoundLapStart": 3500,
 					"distanceRoundLapEnd": 4325,
 					"isCommonOvertakingSpot": true
@@ -5651,7 +5651,7 @@
 			"rf2TrackNames": ["Apple Valley Speedway"],
 			"isOval": true,
 			"trackLandmarks": [{
-					"landmarkName": "tri_oval",
+					"landmarkName": "the_tri_oval",
 					"distanceRoundLapStart": 1,
 					"distanceRoundLapEnd": 230,
 					"isCommonOvertakingSpot": false
@@ -5681,7 +5681,7 @@
 					"isCommonOvertakingSpot": true
 				},
 				{
-					"landmarkName": "tri_oval",
+					"landmarkName": "the_tri_oval",
 					"distanceRoundLapStart": 3035,
 					"distanceRoundLapEnd": 3236,
 					"isCommonOvertakingSpot": false
@@ -6078,7 +6078,7 @@
 					"isCommonOvertakingSpot": true
 				},
 				{
-					"landmarkName": "brownes_chill_man_up_esses",
+					"landmarkName": "man_up_esses",
 					"distanceRoundLapStart": 370,
 					"distanceRoundLapEnd": 545,
 					"isCommonOvertakingSpot": false
@@ -6102,7 +6102,7 @@
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "brownes_chill_fastbake_corner",
+					"landmarkName": "fastbake_corner",
 					"distanceRoundLapStart": 2040,
 					"distanceRoundLapEnd": 2210,
 					"isCommonOvertakingSpot": true
@@ -6118,7 +6118,7 @@
 					"isCommonOvertakingSpot": true
 				},
 				{
-					"landmarkName": "brownes_chill_man_up_esses",
+					"landmarkName": "man_up_esses",
 					"distanceRoundLapStart": 370,
 					"distanceRoundLapEnd": 545,
 					"isCommonOvertakingSpot": false
@@ -6148,7 +6148,7 @@
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "brownes_chill_fastbake_corner",
+					"landmarkName": "fastbrake_corner",
 					"distanceRoundLapStart": 1385,
 					"distanceRoundLapEnd": 1524,
 					"isCommonOvertakingSpot": true
@@ -6467,13 +6467,13 @@
 					"isCommonOvertakingSpot": true
 				},
 				{
-					"landmarkName": "curva_nord_alta_velocita",
+					"landmarkName": "curva_nord",
 					"distanceRoundLapStart": 6100,
 					"distanceRoundLapEnd": 7375,
 					"isCommonOvertakingSpot": true
 				},
 				{
-					"landmarkName": "curva_sud_alta_velocita",
+					"landmarkName": "curva_sud",
 					"distanceRoundLapStart": 8260,
 					"distanceRoundLapEnd": 9510,
 					"isCommonOvertakingSpot": true
