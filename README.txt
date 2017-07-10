@@ -8,7 +8,7 @@ For support and discussions about Crew Chief we have our very own forum here: ht
 
 Changelog
 ---------
-Version 4.6.7.0: Overhauled internal sound handling to make the app behave better; Use game-provided mandatory pitstop data where available (should fix app thinking you've completed your mandatory pitstop when the game thinks otherwise); Some more car and track mappings; Added 'three wide you're on the left' and 'three wide you're on the right' to the spotter
+Version 4.6.7.0: Use game-provided mandatory pitstop data where available (should fix app thinking you've completed your mandatory pitstop when the game thinks otherwise); Some more car and track mappings; Added 'three wide you're on the left' and 'three wide you're on the right' to the spotter
 
 Version 4.6.6.4: Overhauled internal sound handling to make the app behave better; Faster start up times; Better CPU usage; some internal fixes; more of Scoop's corner mappings (recordings still to be done)
 
