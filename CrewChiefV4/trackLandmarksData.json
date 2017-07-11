@@ -7435,6 +7435,132 @@
 					"isCommonOvertakingSpot": false
 				}
 			]
+		},{
+			"pcarsTrackName": "Watkins Glen International:Grand Prix",
+			"trackLandmarks": [{
+					"landmarkName": "turn1",
+					"distanceRoundLapStart": 275,
+					"distanceRoundLapEnd": 410,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn2",
+					"distanceRoundLapStart": 580,
+					"distanceRoundLapEnd": 790,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn3",
+					"distanceRoundLapStart": 820,
+					"distanceRoundLapEnd": 990,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn4",
+					"distanceRoundLapStart": 1040,
+					"distanceRoundLapEnd": 1330,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "the_inner_loop",
+					"distanceRoundLapStart": 1770,
+					"distanceRoundLapEnd": 1990,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "the_outer_loop",
+					"distanceRoundLapStart": 2050,
+					"distanceRoundLapEnd": 2350,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn6",
+					"distanceRoundLapStart": 2530,
+					"distanceRoundLapEnd": 2740,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "toe",
+					"distanceRoundLapStart": 3000,
+					"distanceRoundLapEnd": 3220,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "heel",
+					"distanceRoundLapStart": 3690,
+					"distanceRoundLapEnd": 3830,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn9",
+					"distanceRoundLapStart": 4000,
+					"distanceRoundLapEnd": 4170,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn10",
+					"distanceRoundLapStart": 4380,
+					"distanceRoundLapEnd": 4550,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn11",
+					"distanceRoundLapStart": 4670,
+					"distanceRoundLapEnd": 4850,
+					"isCommonOvertakingSpot": false
+				}
+			]
+		},{
+			"pcarsTrackName": "Watkins Glen International:Short Circuit",
+			"trackLandmarks": [{
+					"landmarkName": "turn1",
+					"distanceRoundLapStart": 275,
+					"distanceRoundLapEnd": 410,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn2",
+					"distanceRoundLapStart": 580,
+					"distanceRoundLapEnd": 790,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn3",
+					"distanceRoundLapStart": 820,
+					"distanceRoundLapEnd": 990,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn4",
+					"distanceRoundLapStart": 1040,
+					"distanceRoundLapEnd": 1330,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "the_inner_loop",
+					"distanceRoundLapStart": 1770,
+					"distanceRoundLapEnd": 1990,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "the_outer_loop",
+					"distanceRoundLapStart": 2050,
+					"distanceRoundLapEnd": 2390,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn8",
+					"distanceRoundLapStart": 2940,
+					"distanceRoundLapEnd": 3080,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn9",
+					"distanceRoundLapStart": 3230,
+					"distanceRoundLapEnd": 3390,
+					"isCommonOvertakingSpot": false
+				}
+			]
 		}
 	]
 }
