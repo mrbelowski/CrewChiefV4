@@ -84,8 +84,7 @@ namespace CrewChiefV4.rFactor2
                 || currentState.scoring.mScoringInfo.mInRealtime == 0
                 || currentState.scoring.mScoringInfo.mNumVehicles <= 2
                 || lastState.extended.mInRealtimeFC == 0
-                || lastState.scoring.mScoringInfo.mInRealtime == 0
-                || lastState.scoring.mScoringInfo.mNumVehicles <= 2)
+                || lastState.scoring.mScoringInfo.mInRealtime == 0)
                 return;
 
             var now = DateTime.Now;
@@ -110,42 +109,42 @@ namespace CrewChiefV4.rFactor2
                 return;
             }
 
-            if (currentGameState != null)
-            {
-                var carClass = currentGameState.carClass;
-                if (carClass != null && !String.Equals(currentPlayerCarClassID, carClass.getClassIdentifier()))
-                {
-                    // Retrieve and use user overridable spotter car length/width.
-                    this.internalSpotter.setCarDimensions(GlobalBehaviourSettings.spotterVehicleLength, GlobalBehaviourSettings.spotterVehicleWidth);
-                }
-            }
-
-            // Find telemetry data for current player vehicle.
-            var currentPlayerTelemetry = new rF2VehicleTelemetry();
-            bool currentPlayerTelemetryAvailable = true;
-
-            var idsToTelIndicesMap = RF2GameStateMapper.getIdsToTelIndicesMap(ref currentState.telemetry);
-            int playerTelIdx = -1;
-            if (idsToTelIndicesMap.TryGetValue(currentPlayerScoring.mID, out playerTelIdx))
-                currentPlayerTelemetry = currentState.telemetry.mVehicles[playerTelIdx];
-            else
-                currentPlayerTelemetryAvailable = false;
-
-            // Find position data for previous player vehicle.  Default to scoring pos, but use telemetry if available.
-            float[] previousPlayerPosition = new float[] { (float)previousPlayerScoring.mPos.x, (float)previousPlayerScoring.mPos.z };
-            for (int i = 0; i < lastState.telemetry.mNumVehicles; ++i)
-            {
-                if (previousPlayerScoring.mID == lastState.telemetry.mVehicles[i].mID)
-                {
-                    previousPlayerPosition = new float[] { (float)lastState.telemetry.mVehicles[i].mPos.x, (float)lastState.telemetry.mVehicles[i].mPos.z };
-                    break;
-                }
-            }
-
             if (currentPlayerScoring.mInPits == 0
                 && currentPlayerScoring.mControl == (int)rFactor2Constants.rF2Control.Player
                 && !(currentState.scoring.mScoringInfo.mGamePhase == (int)rFactor2Constants.rF2GamePhase.Formation))  // turn off spotter for formation lap before going green
             {
+                if (currentGameState != null)
+                {
+                    var carClass = currentGameState.carClass;
+                    if (carClass != null && !String.Equals(currentPlayerCarClassID, carClass.getClassIdentifier()))
+                    {
+                        // Retrieve and use user overridable spotter car length/width.
+                        this.internalSpotter.setCarDimensions(GlobalBehaviourSettings.spotterVehicleLength, GlobalBehaviourSettings.spotterVehicleWidth);
+                    }
+                }
+
+                var idsToTelIndicesMap = RF2GameStateMapper.getIdsToTelIndicesMap(ref currentState.telemetry);
+
+                // Find telemetry data for current player vehicle.
+                var currentPlayerTelemetry = new rF2VehicleTelemetry();
+                bool currentPlayerTelemetryAvailable = true;
+                int playerTelIdx = -1;
+                if (idsToTelIndicesMap.TryGetValue(currentPlayerScoring.mID, out playerTelIdx))
+                    currentPlayerTelemetry = currentState.telemetry.mVehicles[playerTelIdx];
+                else
+                    currentPlayerTelemetryAvailable = false;
+
+                // Find position data for previous player vehicle.  Default to scoring pos, but use telemetry if available.
+                var previousPlayerPosition = new float[] { (float)previousPlayerScoring.mPos.x, (float)previousPlayerScoring.mPos.z };
+                for (int i = 0; i < lastState.telemetry.mNumVehicles; ++i)
+                {
+                    if (previousPlayerScoring.mID == lastState.telemetry.mVehicles[i].mID)
+                    {
+                        previousPlayerPosition = new float[] { (float)lastState.telemetry.mVehicles[i].mPos.x, (float)lastState.telemetry.mVehicles[i].mPos.z };
+                        break;
+                    }
+                }
+
                 float[] currentPlayerPosition = null;
                 float currentPlayerSpeed = -1.0f;
                 float playerRotation = 0.0f;
@@ -168,15 +167,15 @@ namespace CrewChiefV4.rFactor2
                     playerRotation = (float)(Math.Atan2(currentPlayerScoring.mOri[rFactor2Constants.RowZ].x, currentPlayerScoring.mOri[rFactor2Constants.RowZ].z));
                 }
 
-                if (playerRotation < 0)
-                    playerRotation = (float)(2 * Math.PI) + playerRotation;
+                if (playerRotation < 0.0f)
+                    playerRotation = (float)(2.0f * Math.PI) + playerRotation;
 
-                var currentOpponentPositions = new List<float[]>();
                 var playerVelocityData = new float[] {
                     currentPlayerSpeed,
                     (currentPlayerPosition[0] - previousPlayerPosition[0]) / timeDiffSeconds,
                     (currentPlayerPosition[1] - previousPlayerPosition[1]) / timeDiffSeconds };
 
+                var currentOpponentPositions = new List<float[]>();
                 for (int i = 0; i < currentState.scoring.mScoringInfo.mNumVehicles; ++i)
                 {
                     var vehicle = currentState.scoring.mVehicles[i];
