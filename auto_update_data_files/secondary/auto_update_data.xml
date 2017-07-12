@@ -9,7 +9,7 @@ secondary update sources) can still be updated. All downloads from this source w
 <changelog>http://crewchief.isnais.de/change_log_for_auto_updated.html</changelog>
 
 <!--legacy sound pack stuff for 4.1.2.2 and earlier-->
-<soundpackversion>114</soundpackversion>
+<soundpackversion>115</soundpackversion>
 <basesoundpackurl>http://crewchief.isnais.de/base_sound_pack.zip</basesoundpackurl>
 <updatesoundpackurl>http://crewchief.isnais.de/update_sound_pack.zip</updatesoundpackurl>
 <drivernamesversion>100</drivernamesversion>
