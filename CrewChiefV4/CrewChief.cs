@@ -73,7 +73,8 @@ namespace CrewChiefV4
 
         private GameDataReader gameDataReader;
 
-        public GameStateData currentGameState = null;
+        // hmm....
+        public static GameStateData currentGameState = null;
 
         public GameStateData previousGameState = null;
 
@@ -84,7 +85,7 @@ namespace CrewChiefV4
         public CrewChief()
         {
             speechRecogniser = new SpeechRecogniser(this);
-            audioPlayer = new AudioPlayer(this);
+            audioPlayer = new AudioPlayer();
             audioPlayer.initialise();
             eventsList.Add("Timings", new Timings(audioPlayer));
             eventsList.Add("Position", new Position(audioPlayer));

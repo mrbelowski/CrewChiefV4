@@ -673,18 +673,18 @@ namespace CrewChiefV4
                     }
                     else if (controllerConfiguration.hasOutstandingClick(ControllerConfiguration.PRINT_TRACK_DATA))
                     {
-                        if (crewChief.currentGameState != null && crewChief.currentGameState.SessionData != null && 
-                            crewChief.currentGameState.SessionData.TrackDefinition != null)
+                        if (CrewChief.currentGameState != null && CrewChief.currentGameState.SessionData != null &&
+                            CrewChief.currentGameState.SessionData.TrackDefinition != null)
                         {
                             if (CrewChief.gameDefinition.gameEnum == GameEnum.RACE_ROOM) 
                             {
-                                Console.WriteLine("raceroomLayoutId: " + crewChief.currentGameState.SessionData.TrackDefinition.id + ", distanceRoundLap = " +
-                                    crewChief.currentGameState.PositionAndMotionData.DistanceRoundTrack + ", player's car ID: " + crewChief.currentGameState.carClass.getClassIdentifier());
+                                Console.WriteLine("raceroomLayoutId: " + CrewChief.currentGameState.SessionData.TrackDefinition.id + ", distanceRoundLap = " +
+                                    CrewChief.currentGameState.PositionAndMotionData.DistanceRoundTrack + ", player's car ID: " + CrewChief.currentGameState.carClass.getClassIdentifier());
                             }
                             else
                             {
-                                Console.WriteLine("TrackName: " + crewChief.currentGameState.SessionData.TrackDefinition.name + ", distanceRoundLap = " +
-                                    crewChief.currentGameState.PositionAndMotionData.DistanceRoundTrack + ", player's car ID: " + crewChief.currentGameState.carClass.getClassIdentifier());
+                                Console.WriteLine("TrackName: " + CrewChief.currentGameState.SessionData.TrackDefinition.name + ", distanceRoundLap = " +
+                                    CrewChief.currentGameState.PositionAndMotionData.DistanceRoundTrack + ", player's car ID: " + CrewChief.currentGameState.carClass.getClassIdentifier());
                             }
                         }
                         else
