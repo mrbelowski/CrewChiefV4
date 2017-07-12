@@ -21,7 +21,7 @@ secondary update sources) can still be updated. All downloads from this source w
 
 <!-- language-aware sound pack stuff for later versions-->
 <soundpack language="en">
-	<soundpackversion>114</soundpackversion>
+	<soundpackversion>115</soundpackversion>
 	<basesoundpackurl>http://crewchief.isnais.de/base_sound_pack.zip</basesoundpackurl>
 	<updatesoundpackurl>http://crewchief.isnais.de/update_sound_pack.zip</updatesoundpackurl>
 	<drivernamesversion>119</drivernamesversion>
