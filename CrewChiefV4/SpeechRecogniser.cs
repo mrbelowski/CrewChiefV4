@@ -548,7 +548,9 @@ namespace CrewChiefV4
             {
                 crewChief.disableKeepQuietMode();
             }
-            else if (ResultContains(recognisedSpeech, WHATS_MY_FUEL_LEVEL) || ResultContains(recognisedSpeech, HOWS_MY_FUEL))
+            else if (ResultContains(recognisedSpeech, WHATS_MY_FUEL_LEVEL) 
+                || ResultContains(recognisedSpeech, HOWS_MY_FUEL)
+                || ResultContains(recognisedSpeech, WHATS_MY_FUEL_USAGE))
             {
                 return CrewChief.getEvent("Fuel");
             }
