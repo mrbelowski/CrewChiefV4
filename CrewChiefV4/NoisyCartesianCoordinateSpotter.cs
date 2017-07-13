@@ -325,8 +325,6 @@ namespace CrewChiefV4
             else if (carsOnLeftCount == 0 && carsOnLeftAtPreviousTick > 0 && 
                 ((carsOnRightCount == 0 && carsOnRightAtPreviousTick == 0) || (carsOnRightCount > 0 && carsOnRightAtPreviousTick > 0)))
             {
-                //Console.WriteLine("clear left, carsOnLeftCount " + carsOnLeftCount + " carsOnRightCount " + carsOnRightCount + 
-                //    " previousCarsOnLeftCount " + carsOnLeftAtPreviousTick + " previousCarsOnRightCount " + carsOnRightAtPreviousTick);
                 // just gone clear on the left - might still be a car right
                 nextMessageType = NextMessageType.clearLeft;
                 nextMessageDue = now.Add(clearMessageDelay);
@@ -334,8 +332,6 @@ namespace CrewChiefV4
             else if (carsOnRightCount == 0 && carsOnRightAtPreviousTick > 0 && 
                 ((carsOnLeftCount == 0 && carsOnLeftAtPreviousTick == 0) || (carsOnLeftCount > 0 && carsOnLeftAtPreviousTick > 0)))
             {
-                //Console.WriteLine("clear right, carsOnLeftCount " + carsOnLeftCount + " carsOnRightCount " + carsOnRightCount + " previousCarsOnLeftCount " +
-                //    carsOnLeftAtPreviousTick + " previousCarsOnRightCount " + carsOnRightAtPreviousTick);
                 // just gone clear on the right - might still be a car left
                 nextMessageType = NextMessageType.clearRight;
                 nextMessageDue = now.Add(clearMessageDelay);
@@ -347,14 +343,10 @@ namespace CrewChiefV4
                 // still in overlap-mode so don't want to say this immediately
                 if ((reportedSingleOverlapLeft || reportedDoubleOverlapLeft) && (reportedSingleOverlapRight || reportedDoubleOverlapRight))
                 {
-                   // Console.WriteLine("Delayed 3 wide, carsOnLeftCount " + carsOnLeftCount + " carsOnRightCount " + carsOnRightCount +
-                   //     " previousCarsOnLeftCount " + carsOnLeftAtPreviousTick + " previousCarsOnRightCount " + carsOnRightAtPreviousTick);
                     nextMessageDue = now.Add(repeatHoldFrequency);
                 }
                 else
                 {
-                   // Console.WriteLine("3 wide, carsOnLeftCount " + carsOnLeftCount + " carsOnRightCount " + carsOnRightCount +
-                    //    " previousCarsOnLeftCount " + carsOnLeftAtPreviousTick + " previousCarsOnRightCount " + carsOnRightAtPreviousTick);
                     nextMessageDue = now;
                 }
                 nextMessageType = NextMessageType.threeWide;                
@@ -365,14 +357,10 @@ namespace CrewChiefV4
                 // still in overlap-mode so don't want to say this immediately
                 if (reportedSingleOverlapLeft || reportedDoubleOverlapLeft)
                 {
-                    //Console.WriteLine("Delayed car left, carsOnLeftCount " + carsOnLeftCount + " carsOnRightCount " + carsOnRightCount +
-                    //    " previousCarsOnLeftCount " + carsOnLeftAtPreviousTick + " previousCarsOnRightCount " + carsOnRightAtPreviousTick);
                     nextMessageDue = now.Add(repeatHoldFrequency);
                 }
                 else
                 {
-                    //Console.WriteLine("Car left, carsOnLeftCount " + carsOnLeftCount + " carsOnRightCount " + carsOnRightCount +
-                    //    " previousCarsOnLeftCount " + carsOnLeftAtPreviousTick + " previousCarsOnRightCount " + carsOnRightAtPreviousTick);
                     nextMessageDue = now;
                 }
                 // we'll only ever go straight to 'three wide' here if both cars appear along side at exactly the same time, so this is a bit of an edge-case
@@ -389,14 +377,10 @@ namespace CrewChiefV4
             {
                 if (reportedSingleOverlapRight || reportedDoubleOverlapRight)
                 {
-                    //Console.WriteLine("Delayed car right, carsOnLeftCount " + carsOnLeftCount + " carsOnRightCount " + carsOnRightCount +
-                    //    " previousCarsOnLeftCount " + carsOnLeftAtPreviousTick + " previousCarsOnRightCount " + carsOnRightAtPreviousTick);
                     nextMessageDue = now.Add(repeatHoldFrequency);
                 }
                 else
                 {
-                    //Console.WriteLine("Car right, carsOnLeftCount " + carsOnLeftCount + " carsOnRightCount " + carsOnRightCount +
-                    //    " previousCarsOnLeftCount " + carsOnLeftAtPreviousTick + " previousCarsOnRightCount " + carsOnRightAtPreviousTick);
                     nextMessageDue = now;
                 }
                 // we'll only ever go straight to 'three wide' here if both cars appear along side at exactly the same time, so this is a bit of an edge-case
@@ -418,20 +402,14 @@ namespace CrewChiefV4
             {
                 if (reportedSingleOverlapLeft)
                 {
-                    //Console.WriteLine("Delayed transition from car left to 3 wide you're on right, carsOnLeftCount " + carsOnLeftCount + " carsOnRightCount " + carsOnRightCount +
-                    //    " previousCarsOnLeftCount " + carsOnLeftAtPreviousTick + " previousCarsOnRightCount " + carsOnRightAtPreviousTick);
                     nextMessageDue = now.Add(onSingleOverlapTo3WideDelay);                    
                 }
                 else if (reportedDoubleOverlapLeft)
                 {
-                    //Console.WriteLine("Delayed 3 wide you're on right, carsOnLeftCount " + carsOnLeftCount + " carsOnRightCount " + carsOnRightCount +
-                    //    " previousCarsOnLeftCount " + carsOnLeftAtPreviousTick + " previousCarsOnRightCount " + carsOnRightAtPreviousTick);
                     nextMessageDue = now.Add(repeatHoldFrequency);
                 }
                 else
                 {
-                    //Console.WriteLine("3 wide you're on the left, carsOnLeftCount " + carsOnLeftCount + " carsOnRightCount " + carsOnRightCount +
-                    //    " previousCarsOnLeftCount " + carsOnLeftAtPreviousTick + " previousCarsOnRightCount " + carsOnRightAtPreviousTick);
                     nextMessageDue = now;
                 }
                 nextMessageType = NextMessageType.threeWideYoureOnTheRight;                          
@@ -440,20 +418,14 @@ namespace CrewChiefV4
             {
                 if (reportedSingleOverlapRight)
                 {
-                    //Console.WriteLine("Delayed transition from car right to 3 wide on you're on the left, carsOnLeftCount " + carsOnLeftCount + " carsOnRightCount " + carsOnRightCount +
-                    //    " previousCarsOnLeftCount " + carsOnLeftAtPreviousTick + " previousCarsOnRightCount " + carsOnRightAtPreviousTick);
                     nextMessageDue = now.Add(onSingleOverlapTo3WideDelay);
                 }
                 else if (reportedDoubleOverlapRight)
                 {
-                    //Console.WriteLine("Delayed 3 wide you're on left, carsOnLeftCount " + carsOnLeftCount + " carsOnRightCount " + carsOnRightCount +
-                    //    " previousCarsOnLeftCount " + carsOnLeftAtPreviousTick + " previousCarsOnRightCount " + carsOnRightAtPreviousTick);
                     nextMessageDue = now.Add(repeatHoldFrequency);
                 }
                 else
                 {
-                    //Console.WriteLine("3 wide you're on left, carsOnLeftCount " + carsOnLeftCount + " carsOnRightCount " + carsOnRightCount +
-                    //    " previousCarsOnLeftCount " + carsOnLeftAtPreviousTick + " previousCarsOnRightCount " + carsOnRightAtPreviousTick);
                     nextMessageDue = now;
                     
                 }
