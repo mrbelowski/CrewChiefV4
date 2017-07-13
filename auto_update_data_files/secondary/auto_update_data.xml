@@ -3,8 +3,8 @@
 Note that the filename has to remain 'auto_update_data.xml' so legacy installs (which have no concept of the primary / 
 secondary update sources) can still be updated. All downloads from this source will be pulled from the isnais ftp server. -->
 <item>
-<title>Crew Chief 4.6.6.4, updated 26 June 2017</title>
-<version>4.6.6.4</version>
+<title>Crew Chief 4.6.7.2, updated 13 July 2017</title>
+<version>4.6.7.2</version>
 <url>http://crewchief.isnais.de/CrewChiefV4.msi</url>
 <changelog>http://crewchief.isnais.de/change_log_for_auto_updated.html</changelog>
 
