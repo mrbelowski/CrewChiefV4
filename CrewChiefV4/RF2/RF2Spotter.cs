@@ -87,6 +87,10 @@ namespace CrewChiefV4.rFactor2
                 || lastState.scoring.mScoringInfo.mInRealtime == 0)
                 return;
 
+            // turn off spotter for formation lap before going green
+            if (currentState.scoring.mScoringInfo.mGamePhase == (int)rFactor2Constants.rF2GamePhase.Formation)
+                return;
+
             var now = DateTime.Now;
             rF2VehicleScoring currentPlayerScoring;
             rF2VehicleScoring previousPlayerScoring;
@@ -109,10 +113,14 @@ namespace CrewChiefV4.rFactor2
                 return;
             }
 
-            if (currentPlayerScoring.mInPits != 0
+            if (currentPlayerScoring.mInPits != 0  // No spotter in pits.
+#if !DEBUG  // In release, disable spotter for AI
                  || currentPlayerScoring.mControl != (int)rFactor2Constants.rF2Control.Player
-                 || currentState.scoring.mScoringInfo.mGamePhase == (int)rFactor2Constants.rF2GamePhase.Formation)  // turn off spotter for formation lap before going green
+#endif
+            )
+            {
                 return;
+            }
 
             if (currentGameState != null)
             {
