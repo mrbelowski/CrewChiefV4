@@ -291,7 +291,7 @@ namespace CrewChiefV4
                         break;                    
                     case FragmentType.Opponent:
                         canBePlayed = false;
-                        if (messageFragment.opponent != null)
+                        if (messageFragment.opponent != null && messageFragment.opponent.CanUseName)
                         {
                             String usableName = DriverNameHelper.getUsableDriverName(messageFragment.opponent.DriverRawName);
                             if (SoundCache.availableDriverNames.Contains(usableName))
@@ -303,7 +303,7 @@ namespace CrewChiefV4
                             {
                                 messages.Add(SoundCache.TTS_IDENTIFIER + usableName);
                                 canBePlayed = true;
-                            }
+                            }                            
                         }                        
                         break;
                     case FragmentType.Integer:                        

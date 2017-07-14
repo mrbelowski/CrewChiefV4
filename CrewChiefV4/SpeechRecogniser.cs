@@ -57,6 +57,9 @@ namespace CrewChiefV4
         public static String[] WHOS_BEHIND_ON_TRACK = Configuration.getSpeechRecognitionPhrases("WHOS_BEHIND_ON_TRACK");
         public static String[] WHOS_LEADING = Configuration.getSpeechRecognitionPhrases("WHOS_LEADING");
 
+        public static String[] WHERE_AM_I_FASTER = Configuration.getSpeechRecognitionPhrases("WHERE_AM_I_FASTER");
+        public static String[] WHERE_AM_I_SLOWER = Configuration.getSpeechRecognitionPhrases("WHERE_AM_I_SLOWER");
+
         public static String[] HOW_LONGS_LEFT = Configuration.getSpeechRecognitionPhrases("HOW_LONGS_LEFT");
         public static String[] SPOT = Configuration.getSpeechRecognitionPhrases("SPOT");
         public static String[] DONT_SPOT = Configuration.getSpeechRecognitionPhrases("DONT_SPOT");
@@ -253,6 +256,9 @@ namespace CrewChiefV4
                 validateAndAdd(WHATS_THE_FASTEST_LAP_TIME, staticSpeechChoices);
                 validateAndAdd(ENABLE_YELLOW_FLAG_MESSAGES, staticSpeechChoices);
                 validateAndAdd(DISABLE_YELLOW_FLAG_MESSAGES, staticSpeechChoices);
+
+                validateAndAdd(WHERE_AM_I_FASTER, staticSpeechChoices);
+                validateAndAdd(WHERE_AM_I_SLOWER, staticSpeechChoices);
 
                 validateAndAdd(HOW_LONGS_LEFT, staticSpeechChoices);
                 validateAndAdd(WHATS_THE_TIME, staticSpeechChoices);
@@ -542,12 +548,16 @@ namespace CrewChiefV4
             {
                 crewChief.disableKeepQuietMode();
             }
-            else if (ResultContains(recognisedSpeech, WHATS_MY_FUEL_LEVEL) || ResultContains(recognisedSpeech, HOWS_MY_FUEL))
+            else if (ResultContains(recognisedSpeech, WHATS_MY_FUEL_LEVEL) 
+                || ResultContains(recognisedSpeech, HOWS_MY_FUEL)
+                || ResultContains(recognisedSpeech, WHATS_MY_FUEL_USAGE))
             {
                 return CrewChief.getEvent("Fuel");
             }
             else if (ResultContains(recognisedSpeech, WHATS_MY_GAP_IN_FRONT) ||
-                ResultContains(recognisedSpeech, WHATS_MY_GAP_BEHIND))
+                ResultContains(recognisedSpeech, WHATS_MY_GAP_BEHIND) ||
+                ResultContains(recognisedSpeech, WHERE_AM_I_FASTER) ||
+                ResultContains(recognisedSpeech, WHERE_AM_I_SLOWER))
             {
                 return CrewChief.getEvent("Timings");
             }

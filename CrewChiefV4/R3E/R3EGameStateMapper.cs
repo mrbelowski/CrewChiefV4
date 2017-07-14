@@ -980,8 +980,8 @@ namespace CrewChiefV4.RaceRoom
             
             //------------------------ Engine data -----------------------            
             currentGameState.EngineData.EngineOilPressure = shared.EngineOilPressure;
-            currentGameState.EngineData.EngineRpm = Utilities.RpsToRpm(shared.EngineRps);
-            currentGameState.EngineData.MaxEngineRpm = Utilities.RpsToRpm(shared.MaxEngineRps);
+            currentGameState.EngineData.EngineRpm = shared.EngineRps * (60 / (2 * (Single)Math.PI));
+            currentGameState.EngineData.MaxEngineRpm = shared.MaxEngineRps * (60 / (2 * (Single)Math.PI));
             currentGameState.EngineData.MinutesIntoSessionBeforeMonitoring = 5;
             
             // all this 'baseline' engine temp logic was only ever a hack and is now disabled
