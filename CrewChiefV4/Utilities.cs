@@ -5,19 +5,24 @@ namespace CrewChiefV4
 {
     public class Utilities
     {
-        public static Single RpsToRpm(Single rps)
+        public static bool IsGameRunning(String processName, String[] alternateProcessNames)
         {
-            return rps * (60 / (2 * (Single)Math.PI));
-        }
-
-        public static Single MpsToKph(Single mps)
-        {
-            return mps * 3.6f;
-        }
-
-        public static bool IsGameRunning(String processName)
-        {
-            return Process.GetProcessesByName(processName).Length > 0;
+            if (Process.GetProcessesByName(processName).Length > 0)
+            {
+                return true;
+            }
+            else if (alternateProcessNames != null && alternateProcessNames.Length > 0)
+            {
+                foreach (String alternateProcessName in alternateProcessNames)
+                {
+                    if (Process.GetProcessesByName(alternateProcessName).Length > 0)
+                    {
+                        Console.WriteLine("Expected " + processName + " but found " + alternateProcessName + ". This might not end well, but here goes...");
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
 
         public static void runGame(String launchExe, String launchParams)

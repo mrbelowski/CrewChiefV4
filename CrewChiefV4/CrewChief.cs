@@ -419,7 +419,7 @@ namespace CrewChiefV4
                         {
                             nextProcessStateCheck = now.Add(
                                 TimeSpan.FromMilliseconds(isGameProcessRunning ? timeBetweenProcDisconnectCheckMillis : timeBetweenProcConnectCheckMillis));
-                            isGameProcessRunning = Utilities.IsGameRunning(gameDefinition.processName);
+                            isGameProcessRunning = Utilities.IsGameRunning(gameDefinition.processName, gameDefinition.alternativeProcessNames);
                         }
 
                         if (gameDefinition.processName == null || isGameProcessRunning)

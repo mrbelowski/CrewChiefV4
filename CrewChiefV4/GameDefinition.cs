@@ -13,7 +13,7 @@ namespace CrewChiefV4
     public class GameDefinition
     {
         public static GameDefinition pCars64Bit = new GameDefinition(GameEnum.PCARS_64BIT, "pcars_64_bit", "pCARS64",
-            "CrewChiefV4.PCars.PCarsSpotterv2", "pcars64_launch_exe", "pcars64_launch_params", "launch_pcars");
+            "CrewChiefV4.PCars.PCarsSpotterv2", "pcars64_launch_exe", "pcars64_launch_params", "launch_pcars", new String[] { "pCARS2", "pCARS2Gld", "pCARS2QA" });
         public static GameDefinition pCars32Bit = new GameDefinition(GameEnum.PCARS_32BIT, "pcars_32_bit", "pCARS",
             "CrewChiefV4.PCars.PCarsSpotterv2", "pcars32_launch_exe", "pcars32_launch_params", "launch_pcars");
         public static GameDefinition raceRoom = new GameDefinition(GameEnum.RACE_ROOM, "race_room", "RRRE", "CrewChiefV4.RaceRoom.R3ESpotterv2",
@@ -95,6 +95,7 @@ namespace CrewChiefV4
         public String gameStartCommandOptionsProperty;
         public String gameStartEnabledProperty;
         public String gameInstallDirectory;
+        public String[] alternativeProcessNames;
 
         public GameDefinition(GameEnum gameEnum, String lookupName, String processName,
             String spotterName, String gameStartCommandProperty, String gameStartCommandOptionsProperty, String gameStartEnabledProperty, String gameInstallDirectory = "")
@@ -107,6 +108,22 @@ namespace CrewChiefV4
             this.gameStartCommandProperty = gameStartCommandProperty;
             this.gameStartCommandOptionsProperty = gameStartCommandOptionsProperty;
             this.gameStartEnabledProperty = gameStartEnabledProperty;
+            this.gameInstallDirectory = gameInstallDirectory;
+        }
+
+        public GameDefinition(GameEnum gameEnum, String lookupName, String processName,
+            String spotterName, String gameStartCommandProperty, String gameStartCommandOptionsProperty, String gameStartEnabledProperty, String[] alternativeProcessNames,
+            String gameInstallDirectory = "")
+        {
+            this.gameEnum = gameEnum;
+            this.lookupName = lookupName;
+            this.friendlyName = Configuration.getUIString(lookupName);
+            this.processName = processName;
+            this.spotterName = spotterName;
+            this.gameStartCommandProperty = gameStartCommandProperty;
+            this.gameStartCommandOptionsProperty = gameStartCommandOptionsProperty;
+            this.gameStartEnabledProperty = gameStartEnabledProperty;
+            this.alternativeProcessNames = alternativeProcessNames;
             this.gameInstallDirectory = gameInstallDirectory;
         }
     }
