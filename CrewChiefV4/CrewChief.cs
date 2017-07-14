@@ -519,6 +519,9 @@ namespace CrewChiefV4
                                     faultingEvents.Clear();
                                     faultingEventsCount.Clear();
                                     stateCleared = true;
+                                    PCarsGameStateMapper.FIRST_VIEWED_PARTICIPANT_NAME = null;
+                                    PCarsGameStateMapper.WARNED_ABOUT_MISSING_STEAM_ID = false;
+                                    PCarsGameStateMapper.FIRST_VIEWED_PARTICIPANT_INDEX = -1;
                                 }
                                 if (enableDriverNames)
                                 {
