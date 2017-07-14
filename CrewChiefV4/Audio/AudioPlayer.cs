@@ -20,9 +20,7 @@ namespace CrewChiefV4.Audio
         public Boolean disablePearlsOfWisdom = false;   // used for the last 2 laps / 3 minutes of a race session only
         public Boolean mute = false;
         public static float minimumSoundPackVersion = 105f;
-
-        private CrewChief crewChief;
-
+        
         public static String folderAcknowlegeOK = "acknowledge/OK";
         public static String folderYellowEnabled = "acknowledge/yellowEnabled";
         public static String folderYellowDisabled = "acknowledge/yellowDisabled";
@@ -121,9 +119,8 @@ namespace CrewChiefV4.Audio
 
         public String selectedPersonalisation = NO_PERSONALISATION_SELECTED;
 
-        public AudioPlayer(CrewChief crewChief)
+        public AudioPlayer()
         {
-            this.crewChief = crewChief;
             String soundPackLocationOverride = UserSettings.GetUserSettings().getString("override_default_sound_pack_location");
             String defaultSoundFilesPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\CrewChiefV4\sounds";
             DirectoryInfo defaultSoundDirectory = new DirectoryInfo(defaultSoundFilesPath);
@@ -527,7 +524,7 @@ namespace CrewChiefV4.Audio
                     if (isImmediateMessages || queuedMessage.dueTime <= milliseconds)
                     {
                         Boolean messageHasExpired = queuedMessage.expiryTime != 0 && queuedMessage.expiryTime < milliseconds;
-                        Boolean messageIsStillValid = queuedMessage.isMessageStillValid(key, crewChief.currentGameState);
+                        Boolean messageIsStillValid = queuedMessage.isMessageStillValid(key, CrewChief.currentGameState);
                         Boolean queueTooLongForMessage = queuedMessage.maxPermittedQueueLengthForMessage != 0 && willBePlayedCount > queuedMessage.maxPermittedQueueLengthForMessage;
                         Boolean hasJustPlayedAsAnImmediateMessage = !isImmediateMessages && lastImmediateMessageName != null &&
                             key == lastImmediateMessageName && GameStateData.CurrentTime - lastImmediateMessageTime < TimeSpan.FromSeconds(5);
@@ -690,7 +687,7 @@ namespace CrewChiefV4.Audio
                         if (!isImmediateMessages)
                         {
                             Boolean messageHasExpired = thisMessage.expiryTime != 0 && thisMessage.expiryTime < GameStateData.CurrentTime.Ticks / TimeSpan.TicksPerMillisecond; ;
-                            Boolean messageIsStillValid = thisMessage.isMessageStillValid(eventName, crewChief.currentGameState);
+                            Boolean messageIsStillValid = thisMessage.isMessageStillValid(eventName, CrewChief.currentGameState);
                             Boolean hasJustPlayedAsAnImmediateMessage = lastImmediateMessageName != null &&
                                 eventName == lastImmediateMessageName && GameStateData.CurrentTime - lastImmediateMessageTime < TimeSpan.FromSeconds(5);
                             if (messageHasExpired || !messageIsStillValid || hasJustPlayedAsAnImmediateMessage)

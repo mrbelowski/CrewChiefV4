@@ -20,6 +20,10 @@ namespace CrewChiefV4.PCars
     {
         public static String NULL_CHAR_STAND_IN = "?";
 
+        public static int FIRST_VIEWED_PARTICIPANT_INDEX = -1;
+        public static String FIRST_VIEWED_PARTICIPANT_NAME = null;
+        public static Boolean WARNED_ABOUT_MISSING_STEAM_ID = false;
+
         private Boolean attemptPitDetection = UserSettings.GetUserSettings().getBoolean("attempt_pcars_opponent_pit_detection");
         private Boolean enablePCarsPitWindowStuff = UserSettings.GetUserSettings().getBoolean("enable_pcars_pit_window_messages");
         private static String userSpecifiedSteamId = UserSettings.GetUserSettings().getString("pcars_steam_id");
@@ -135,6 +139,39 @@ namespace CrewChiefV4.PCars
             this.speechRecogniser = speechRecogniser;
         }
 
+        /**
+         * When a participant is no longer part of a session sometimes he's removed from the array. Sometimes the first char of his name
+         * is nullified. When a participant has a name with one or more chars not in the default codepage we also get a null first char, and
+         * any chars including and after the offending char will be nonsense (whatever as in the array before this guy joined). This method
+         * attempts to make sense of the *complete fucking clusterfuck*.
+         * @param participantData
+         * @param numParticipants
+        */
+        private void checkForPossiblyInactiveOpponents(pCarsAPIParticipantStruct[] participantData, int numParticipants) {
+            ISet<int> positions = new HashSet<int>();
+            // get a set of all the race positions which we're confident are occupied by actual opponents
+            for (int i=0; i<numParticipants; i++) {
+                pCarsAPIParticipantStruct participant = participantData[i];
+                if (participant.mIsActive && participant.mName != null && participant.mName[0] != 0) {
+                    // there can be duplicates here when the session first starts up
+                    positions.Add((int)participant.mRacePosition);
+                }
+            }
+            // now get the hooky opponents and set any which are in the same position as a proper opponent to inactive
+            for (int i=0; i<numParticipants; i++) {
+                pCarsAPIParticipantStruct participant = participantData[i];
+                if (participant.mIsActive && participant.mName != null && participant.mName[0] == 0)
+                {
+                    if (positions.Contains((int)participant.mRacePosition)) {
+                        participant.mIsActive = false;
+                    } else {
+                        // his name is potentially full of shit - possibly a pronouncable name left over from the previous session
+                        positions.Add((int)participant.mRacePosition);
+                    }
+                }
+            }
+        }
+
         public static Boolean namesMatch(String name1, String name2)
         {
             if (name1 != null && name1.Length > 0 && name2 != null && name2.Length > 0)
@@ -157,53 +194,79 @@ namespace CrewChiefV4.PCars
 
         public static Tuple<int, pCarsAPIParticipantStruct> getPlayerDataStruct(pCarsAPIParticipantStruct[] pCarsAPIParticipantStructArray, int viewedParticipantIndex)
         {
-            if (!getPlayerByName)
+            // sanity check
+            if (viewedParticipantIndex >= pCarsAPIParticipantStructArray.Length)
             {
-                return new Tuple<int, pCarsAPIParticipantStruct>(viewedParticipantIndex, pCarsAPIParticipantStructArray[viewedParticipantIndex]);
+                viewedParticipantIndex = 0;
             }
-            else if (playerSteamId == null)
+            Boolean haveDriverNames = StructHelper.getNameFromBytes(pCarsAPIParticipantStructArray[0].mName).Length > 0;
+            pCarsAPIParticipantStruct viewedParticipant = pCarsAPIParticipantStructArray[viewedParticipantIndex];
+
+            if (haveDriverNames && userSpecifiedSteamId != null && userSpecifiedSteamId.Length > 0)
             {
-                if (userSpecifiedSteamId == null || userSpecifiedSteamId.Length == 0)
+                if (namesMatch(StructHelper.getNameFromBytes(viewedParticipant.mName), userSpecifiedSteamId))
                 {
-                    // get the player ID from the first viewed participant the app 'sees' and use this for the remainder of the app's run time
-                    pCarsAPIParticipantStruct likelyParticipantData = pCarsAPIParticipantStructArray[viewedParticipantIndex];
-                    String likelyName = StructHelper.getNameFromBytes(likelyParticipantData.mName);
-                    if (likelyName == null || likelyName.Length == 0 || likelyName.StartsWith(NULL_CHAR_STAND_IN))
-                    {
-                        getPlayerByName = false;
-                        Console.WriteLine("Player steam ID - "+ likelyName + " is not valid, falling back to viewedParticipantIndex");
-                    }
-                    else 
-                    {
-                        playerSteamId = likelyName;
-                        Console.WriteLine("Using player steam ID " + playerSteamId + " from the first reported viewed participant");
-                        return new Tuple<int, pCarsAPIParticipantStruct>(viewedParticipantIndex, likelyParticipantData);
-                    }
+                    return new Tuple<int, pCarsAPIParticipantStruct>(viewedParticipantIndex, viewedParticipant);
                 }
                 else
                 {
-                    // use the steamID provided
-                    playerSteamId = userSpecifiedSteamId;
+                    for (int i = 0; i < pCarsAPIParticipantStructArray.Length; i++)
+                    {
+                        pCarsAPIParticipantStruct participant = pCarsAPIParticipantStructArray[i];
+                        if (participant.mIsActive && namesMatch(StructHelper.getNameFromBytes(participant.mName), userSpecifiedSteamId))
+                        {
+                            return new Tuple<int, pCarsAPIParticipantStruct>(i, participant);
+                        }
+                    }
+                    // this will spam so only send it once per session
+                    if (!WARNED_ABOUT_MISSING_STEAM_ID)
+                    {
+                        Console.WriteLine("User specified steam ID " +
+                                userSpecifiedSteamId + " not found in active participant data, getting player data based on provided index");
+                        WARNED_ABOUT_MISSING_STEAM_ID = true;
+                    }
                 }
             }
-            if (playerSteamId != null)
+
+            // FIRST_VIEWED_PARTICIPANT_NAME will be null in many cases, FIRST_VIEWED_PARTICIPANT_INDEX will generally be set
+            if (FIRST_VIEWED_PARTICIPANT_INDEX >= 0 && FIRST_VIEWED_PARTICIPANT_INDEX < pCarsAPIParticipantStructArray.Length)
             {
-                for (int i = 0; i < pCarsAPIParticipantStructArray.Length; i++)
+                pCarsAPIParticipantStruct guess1 = pCarsAPIParticipantStructArray[FIRST_VIEWED_PARTICIPANT_INDEX];
+                // only interested in 'guess1' if he's active
+                Boolean guess1IsActive = guess1.mIsActive;
+                String guess1Name = StructHelper.getNameFromBytes(guess1.mName);
+                if (haveDriverNames)
                 {
-                    String name = StructHelper.getNameFromBytes(pCarsAPIParticipantStructArray[i].mName);
-                    if (name.Length == 0 || name.StartsWith(NULL_CHAR_STAND_IN))
+                    if (FIRST_VIEWED_PARTICIPANT_NAME != null)
                     {
-                        continue;
+                        if (namesMatch(guess1Name, FIRST_VIEWED_PARTICIPANT_NAME) && guess1IsActive)
+                        {
+                            return new Tuple<int, pCarsAPIParticipantStruct>(FIRST_VIEWED_PARTICIPANT_INDEX, guess1);
+                        }
+                        else
+                        {
+                            for (int i = 0; i < pCarsAPIParticipantStructArray.Length; i++)
+                            {
+                                pCarsAPIParticipantStruct participant = pCarsAPIParticipantStructArray[i];
+                                if (participant.mIsActive && namesMatch(StructHelper.getNameFromBytes(participant.mName), FIRST_VIEWED_PARTICIPANT_NAME))
+                                {
+                                    return new Tuple<int, pCarsAPIParticipantStruct>(i, participant);
+                                }
+                            }
+                        }
                     }
-                    if (name.Equals(playerSteamId))
+                    else if (guess1IsActive)
                     {
-                        return new Tuple<int, pCarsAPIParticipantStruct>(i, pCarsAPIParticipantStructArray[i]);
+                        // set the first viewed name
+                        FIRST_VIEWED_PARTICIPANT_NAME = guess1Name;
                     }
                 }
+                if (guess1IsActive)
+                {
+                    return new Tuple<int, pCarsAPIParticipantStruct>(FIRST_VIEWED_PARTICIPANT_INDEX, guess1);
+                }
             }
-            // no match in the block, so use the viewParticipantIndex
-            getPlayerByName = false;
-            return new Tuple<int, pCarsAPIParticipantStruct>(viewedParticipantIndex, pCarsAPIParticipantStructArray[viewedParticipantIndex]);            
+            return new Tuple<int, pCarsAPIParticipantStruct>(viewedParticipantIndex, pCarsAPIParticipantStructArray[viewedParticipantIndex]);
         }
 
         public static void addOpponentForName(String name, OpponentData opponentData, GameStateData gameState)
@@ -279,7 +342,17 @@ namespace CrewChiefV4.PCars
                 }
                 return previousGameState;
             }
-            
+            checkForPossiblyInactiveOpponents(shared.mParticipantData, shared.mNumParticipants);
+            if (FIRST_VIEWED_PARTICIPANT_INDEX == -1)
+            {
+                FIRST_VIEWED_PARTICIPANT_INDEX = shared.mViewedParticipantIndex;
+                String thisName = StructHelper.getNameFromBytes(shared.mParticipantData[shared.mViewedParticipantIndex].mName);
+                if (thisName != null && thisName.Length > 0)
+                {
+                    FIRST_VIEWED_PARTICIPANT_NAME = thisName;
+                }
+            }
+
             Tuple<int, pCarsAPIParticipantStruct> playerData = getPlayerDataStruct(shared.mParticipantData, shared.mViewedParticipantIndex);
             String playerName = StructHelper.getNameFromBytes(shared.mParticipantData[shared.mViewedParticipantIndex].mName);
             if (getPlayerByName && playerName != null && playerSteamId != null && !namesMatch(playerName, playerSteamId))
@@ -441,7 +514,8 @@ namespace CrewChiefV4.PCars
                     if (i != playerDataIndex && participantStruct.mIsActive && participantName != null && participantName.Length > 0)
                     {
                         CarData.CarClass opponentCarClass = !shared.hasOpponentClassData || shared.isSameClassAsPlayer[i] ? currentGameState.carClass : CarData.DEFAULT_PCARS_OPPONENT_CLASS;
-                        addOpponentForName(participantName, createOpponentData(participantStruct, false, opponentCarClass), currentGameState);
+                        addOpponentForName(participantName, createOpponentData(participantStruct, false, opponentCarClass,
+                            participantStruct.mName != null && participantStruct.mName[0] != 0), currentGameState);
                     }
                 }
 
@@ -580,6 +654,8 @@ namespace CrewChiefV4.PCars
                     currentGameState.Conditions = previousGameState.Conditions;
                     currentGameState.SessionData.trackLandmarksTiming = previousGameState.SessionData.trackLandmarksTiming;
                     currentGameState.SessionData.PlayerLapData = previousGameState.SessionData.PlayerLapData;
+                    currentGameState.SessionData.CurrentLapIsValid = previousGameState.SessionData.CurrentLapIsValid;
+                    currentGameState.SessionData.PreviousLapWasValid = previousGameState.SessionData.PreviousLapWasValid;
                 }                
             }
 
@@ -598,6 +674,10 @@ namespace CrewChiefV4.PCars
             else
             {
                 currentGameState.SessionData.SessionRunningTime = (float)(currentGameState.Now - currentGameState.SessionData.SessionStartTime).TotalSeconds;
+            }
+            if (shared.mLapInvalidated)
+            {
+                currentGameState.SessionData.CurrentLapIsValid = false;
             }
             if (currentGameState.SessionData.IsNewSector)
             {
@@ -632,25 +712,25 @@ namespace CrewChiefV4.PCars
                     currentGameState.SessionData.SessionTimesAtEndOfSectors[1] = currentGameState.SessionData.SessionRunningTime;
                     // TODO: confirm that an invalid sector will put -1 in here...
                     currentGameState.SessionData.LastSector1Time = shared.mCurrentSector1Time;
-                    if (currentGameState.SessionData.LastSector1Time > 0 &&
+                    if (currentGameState.SessionData.LastSector1Time > 0 && !shared.mLapInvalidated &&
                         (currentGameState.SessionData.PlayerBestSector1Time == -1 || currentGameState.SessionData.LastSector1Time < currentGameState.SessionData.PlayerBestSector1Time))
                     {
                         currentGameState.SessionData.PlayerBestSector1Time = currentGameState.SessionData.LastSector1Time;
                     }
                     currentGameState.SessionData.playerAddCumulativeSectorData(1, currentGameState.SessionData.Position, shared.mCurrentSector1Time,
-                        currentGameState.SessionData.SessionRunningTime, shared.mCurrentSector1Time > 0, shared.mRainDensity > 0, shared.mTrackTemperature, shared.mAmbientTemperature);
+                        currentGameState.SessionData.SessionRunningTime, !shared.mLapInvalidated, shared.mRainDensity > 0, shared.mTrackTemperature, shared.mAmbientTemperature);
                 }
                 if (currentGameState.SessionData.SectorNumber == 3)
                 {
                     currentGameState.SessionData.SessionTimesAtEndOfSectors[2] = currentGameState.SessionData.SessionRunningTime;
                     currentGameState.SessionData.LastSector2Time = shared.mCurrentSector2Time;
-                    if (currentGameState.SessionData.LastSector2Time > 0 &&
+                    if (currentGameState.SessionData.LastSector2Time > 0 && !shared.mLapInvalidated &&
                         (currentGameState.SessionData.PlayerBestSector2Time == -1 || currentGameState.SessionData.LastSector2Time < currentGameState.SessionData.PlayerBestSector2Time))
                     {
                         currentGameState.SessionData.PlayerBestSector2Time = currentGameState.SessionData.LastSector2Time;
                     }
                     currentGameState.SessionData.playerAddCumulativeSectorData(2, currentGameState.SessionData.Position, shared.mCurrentSector2Time + shared.mCurrentSector1Time,
-                        currentGameState.SessionData.SessionRunningTime, shared.mCurrentSector2Time > 0, shared.mRainDensity > 0, shared.mTrackTemperature, shared.mAmbientTemperature);
+                        currentGameState.SessionData.SessionRunningTime, !shared.mLapInvalidated, shared.mRainDensity > 0, shared.mTrackTemperature, shared.mAmbientTemperature);
                 }
             }
 
@@ -885,7 +965,8 @@ namespace CrewChiefV4.PCars
                             if (participantStruct.mIsActive && participantName != null && participantName.Length > 0)
                             {
                                 lastActiveTimeForOpponents[participantName] = currentGameState.Now;
-                                addOpponentForName(participantName, createOpponentData(participantStruct, true, opponentCarClass), currentGameState);
+                                addOpponentForName(participantName, createOpponentData(participantStruct, true, opponentCarClass, 
+                                    participantStruct.mName != null && participantStruct.mName[0] != 0), currentGameState);
                             }
                         }
                     }
@@ -915,10 +996,11 @@ namespace CrewChiefV4.PCars
             if (currentGameState.SessionData.IsNewLap)
             {
                 currentGameState.SessionData.PreviousLapWasValid = previousGameState != null && previousGameState.SessionData.CurrentLapIsValid;
+                currentGameState.SessionData.CurrentLapIsValid = true;
                 currentGameState.SessionData.formattedPlayerLapTimes.Add(TimeSpan.FromSeconds(shared.mLastLapTime).ToString(@"mm\:ss\.fff"));
                 currentGameState.SessionData.PositionAtStartOfCurrentLap = currentGameState.SessionData.Position;
                 currentGameState.SessionData.playerCompleteLapWithProvidedLapTime(currentGameState.SessionData.Position, currentGameState.SessionData.SessionRunningTime,
-                        shared.mLastLapTime, shared.mLastLapTime > 0, false, shared.mTrackTemperature, shared.mAmbientTemperature, 
+                        shared.mLastLapTime, currentGameState.SessionData.PreviousLapWasValid, false, shared.mTrackTemperature, shared.mAmbientTemperature, 
                         currentGameState.SessionData.SessionHasFixedTime, currentGameState.SessionData.SessionTimeRemaining, 3);
                 currentGameState.SessionData.playerStartNewLap(currentGameState.SessionData.CompletedLaps + 1,
                     currentGameState.SessionData.Position, currentGameState.PitData.InPitlane, currentGameState.SessionData.SessionRunningTime, false, 
@@ -1313,7 +1395,7 @@ namespace CrewChiefV4.PCars
             opponentData.CompletedLaps = completedLaps;
         }
 
-        private OpponentData createOpponentData(pCarsAPIParticipantStruct participantStruct, Boolean loadDriverName, CarData.CarClass carClass)
+        private OpponentData createOpponentData(pCarsAPIParticipantStruct participantStruct, Boolean loadDriverName, CarData.CarClass carClass, Boolean canUseName)
         {            
             OpponentData opponentData = new OpponentData();
             String participantName = StructHelper.getNameFromBytes(participantStruct.mName).ToLower();
@@ -1333,6 +1415,8 @@ namespace CrewChiefV4.PCars
             opponentData.IsActive = true;
             String nameToLog = opponentData.DriverRawName == null ? "unknown" : opponentData.DriverRawName;
             Console.WriteLine("New driver " + nameToLog + " is using car class " + opponentData.CarClass.carClassEnum);
+            opponentData.CanUseName = canUseName;
+
             return opponentData;
         }
         

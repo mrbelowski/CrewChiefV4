@@ -62,6 +62,9 @@ WHOS_IN_FRONT_ON_TRACK = who's in front on track:who's ahead on track
 WHOS_BEHIND_ON_TRACK = who's behind on track
 WHOS_LEADING = who's leading:who's in the lead:who is leading:who is in the lead:who's the leader
 
+WHERE_AM_I_FASTER = where should I attack:where am I faster:where can I attack
+WHERE_AM_I_SLOWER = where should I defend:where am I slower:where is he faster:where will he attack
+
 HOW_LONGS_LEFT = how long's left:how many laps left:how many laps to go
 SPOT = spot
 DONT_SPOT = don't spot
