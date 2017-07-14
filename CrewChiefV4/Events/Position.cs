@@ -311,6 +311,13 @@ namespace CrewChiefV4.Events
 
         protected override void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
+            // edge case here - if we're the only can in the session, don't bother with this event
+            if (currentGameState.OpponentData.Count == 0)
+            {
+                currentPosition = 1;
+                return;
+            }
+
             if (opponentKeyForCarThatJustPassedUs == null && opponentKeyForCarWeJustPassed == null)
             {
                 checkForNewOvertakes(currentGameState, previousGameState);

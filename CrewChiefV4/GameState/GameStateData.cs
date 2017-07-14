@@ -465,6 +465,10 @@ namespace CrewChiefV4.GameState
 
     public class OpponentData
     {
+        // Sometimes the name is corrupted with previous session's data. Worst case is that the name is entirely readable
+        // but completely invalid. We must prevent such names being read.
+        public Boolean CanUseName = true;
+
         // set this to false if this opponent drops out of the race (i.e. leaves a server)
         public Boolean IsActive = true;
 
