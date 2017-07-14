@@ -8,7 +8,7 @@ For support and discussions about Crew Chief we have our very own forum here: ht
 
 Changelog
 ---------
-Version 4.7.7.0: Substantial RF2 plugin rewrite.
+Version 4.7.7.1: Substantial RF2 plugin rewrite; Ported some fixes from the PCars Android app - some free practice session improvements, more aggressive pruning of broken driver data, better (hopefully...) method of identifying player's data so monitoring other drivers shouldn't confuse the app.
 
 Version 4.6.7.2: Use game-provided mandatory pitstop data where available (should fix app thinking you've completed your mandatory pitstop when the game thinks otherwise); Some more car and track mappings from Scoops; Added 'three wide you're on the left' and 'three wide you're on the right' to the spotter - optional, disabled by default (spotter_enable_three_wide_left_and_right in the Properties screen); Added voice command to get info about the car in front / behind is slower / faster than you - "where should I attack" / "where am I faster" / "where can I attack" or "where should I defend" / "where am I slower" / "where is he faster" / "where will he attack"; A few bug fixes; mapped Watkins Glen for PCars; Added fuel use per lap response - "what's my fuel usage" / "what's my fuel consumption" / "what's my fuel use".
 
