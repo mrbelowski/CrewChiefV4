@@ -280,6 +280,7 @@ namespace CrewChiefV4
                     }
                 }
             }).Start();
+            this.editPropertiesButtonClicked(this, null);
         }
 
         public void updateMessagesVolume(float messagesVolume)
@@ -1572,6 +1573,5 @@ namespace CrewChiefV4
 
         [DllImport("winmm.dll")]
         public static extern int waveOutSetVolume(IntPtr hwo, uint dwVolume);
-
     }
 }
