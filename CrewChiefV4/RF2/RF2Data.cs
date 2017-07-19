@@ -41,7 +41,7 @@ namespace CrewChiefV4.rFactor2
         public const string MM_EXTENDED_FILE_ACCESS_MUTEX = @"Global\$rFactor2SMMP_ExtendedMutex";
 
         public const int MAX_MAPPED_VEHICLES = 128;
-        public const int MAX_MAPPED_IDS = 1024;
+        public const int MAX_MAPPED_IDS = 512;
         public const string RFACTOR2_PROCESS_NAME = "rFactor2";
 
         public const byte RowX = 0;
@@ -664,7 +664,7 @@ namespace CrewChiefV4.rFactor2
             // Physics options (updated on session start):
             public rF2PhysicsOptions mPhysics;
 
-            // Damage tracking for each vehicle (indexed by mID):
+            // Damage tracking for each vehicle (indexed by mID % rF2MappedBufferHeader::MAX_MAPPED_IDS):
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = rFactor2Constants.MAX_MAPPED_IDS)]
             public rF2TrackedDamage[] mTrackedDamages;
 
