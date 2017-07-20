@@ -87,8 +87,9 @@ namespace CrewChiefV4
                 widgetCount++;
             }
             pad(widgetCount);
-            widgetCount = 0;            
+            widgetCount = 0;
         }
+
         public void save()
         {
             foreach (var control in this.flowLayoutPanel1.Controls)
