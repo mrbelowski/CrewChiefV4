@@ -14,6 +14,10 @@ namespace CrewChiefV4
     {
         public static Boolean hasChanges;
 
+        private Timer searchTimer;
+        private const string DEFAULT_SEARCH_TEXT = "Search for property (Ctrl+E)";
+        private string searchTextPrev = DEFAULT_SEARCH_TEXT;
+
         System.Windows.Forms.Form parent;
         public PropertiesForm(System.Windows.Forms.Form parent)
         {
@@ -88,6 +92,16 @@ namespace CrewChiefV4
             }
             pad(widgetCount);
             widgetCount = 0;
+
+            this.textBox1.Text = DEFAULT_SEARCH_TEXT;
+            this.textBox1.ForeColor = Color.Gray;
+            this.textBox1.GotFocus += TextBox1_GotFocus;
+            this.textBox1.LostFocus += TextBox1_LostFocus;
+            this.textBox1.KeyDown += TextBox1_KeyDown;
+            this.button1.Select();
+
+            this.KeyPreview = true;
+            this.KeyDown += PropertiesForm_KeyDown;
         }
 
         public void save()
@@ -179,6 +193,70 @@ namespace CrewChiefV4
                     }
                 }
             }           
+        }
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+            if (this.textBox1.Text == DEFAULT_SEARCH_TEXT)
+                return;
+
+            if (this.searchTimer == null)
+            {
+                this.searchTimer = new Timer();
+                this.searchTimer.Interval = 100;
+                this.searchTimer.Tick += SearchTimer_Tick;
+                this.searchTimer.Start();
+            }
+        }
+
+        private void SearchTimer_Tick(object sender, EventArgs e)
+        {
+            var text = this.textBox1.Text;
+            if (text == DEFAULT_SEARCH_TEXT)
+            {
+                this.searchTextPrev = text;
+                return;
+            }
+
+            if (text != this.searchTextPrev)
+            {
+                this.searchTextPrev = text;
+            }
+        }
+
+        private void TextBox1_GotFocus(object sender, EventArgs e)
+        {
+            if (this.textBox1.Text == DEFAULT_SEARCH_TEXT)
+            {
+                this.textBox1.Text = "";
+                this.textBox1.ForeColor = Color.Black;
+            }
+        }
+
+        private void TextBox1_LostFocus(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(this.textBox1.Text))
+            {
+                this.textBox1.Text = DEFAULT_SEARCH_TEXT;
+                this.textBox1.ForeColor = Color.Gray;
+                this.button1.Select();
+            }
+        }
+
+        private void TextBox1_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Escape)
+            {
+                // TODO: make sure controls repopulate.
+                this.textBox1.Text = "";
+                this.button1.Select();
+            }
+        }
+
+        private void PropertiesForm_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Control && e.KeyCode == Keys.E)
+                this.textBox1.Select();
         }
     }
 }
