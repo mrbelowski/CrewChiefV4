@@ -49,8 +49,6 @@ namespace CrewChiefV4.rFactor2
         private double lastPlayerTelemetryET = -1.0;
         private double lastScoringET = -1.0;
 
-        private bool mIDLimitExceededWarningDisplayed = false;
-
         public RF2GameStateMapper()
         {
             this.tyreWearThresholds.Add(new CornerData.EnumWithThresholds(TyreCondition.NEW, -10000.0f, this.scrubbedTyreWearPercent));
@@ -311,8 +309,6 @@ namespace CrewChiefV4.rFactor2
             {
                 pgs = null;
                 GlobalBehaviourSettings.UpdateFromCarClass(cgs.carClass);
-
-                this.mIDLimitExceededWarningDisplayed = false;
             }
 
             csd.SessionStartTime = csd.IsNewSession ? cgs.Now : psd.SessionStartTime;
@@ -512,14 +508,7 @@ namespace CrewChiefV4.rFactor2
             cgs.CarDamageData.DamageEnabled = true;
             cgs.CarDamageData.LastImpactTime = (float)playerTelemetry.mLastImpactET;
 
-            var playerDamageInfo = new rF2TrackedDamage();
-            if (playerScoring.mID < rFactor2Constants.MAX_MAPPED_IDS)
-                playerDamageInfo = shared.extended.mTrackedDamages[playerScoring.mID];
-            else if (!this.mIDLimitExceededWarningDisplayed)
-            {
-                Console.WriteLine("Damage info is not available due to mID exceeded.  Current value:", playerScoring.mID);
-                this.mIDLimitExceededWarningDisplayed = true;
-            }
+            var playerDamageInfo = shared.extended.mTrackedDamages[playerScoring.mID % rFactor2Constants.MAX_MAPPED_IDS];
 
             if (shared.extended.mPhysics.mInvulnerable == 0)
             {
