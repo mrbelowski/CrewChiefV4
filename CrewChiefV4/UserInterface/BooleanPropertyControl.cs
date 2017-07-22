@@ -29,7 +29,7 @@ namespace CrewChiefV4
             return this.checkBox1.Checked;
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        public void button1_Click(object sender, EventArgs e)
         {
             this.checkBox1.Checked = defaultValue;
             if (this.originalValue != this.checkBox1.Checked)

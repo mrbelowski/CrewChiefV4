@@ -13,14 +13,15 @@ namespace CrewChiefV4
     public partial class PropertiesForm : Form
     {
         public static Boolean hasChanges;
+        System.Windows.Forms.Form parent;
 
         private Timer searchTimer;
         private const string DEFAULT_SEARCH_TEXT = "Search for property (Ctrl+E)";
         private readonly TimeSpan AUTO_SEARCH_DELAY_SPAN = TimeSpan.FromMilliseconds(500);
         private string searchTextPrev = DEFAULT_SEARCH_TEXT;
         private DateTime nextPrefsRefreshAttemptTime = DateTime.MinValue;
+        private Label noMatchedLabel = new Label() { Text = "No matches." };
 
-        System.Windows.Forms.Form parent;
         public PropertiesForm(System.Windows.Forms.Form parent)
         {
             hasChanges = false;
@@ -100,7 +101,7 @@ namespace CrewChiefV4
             this.textBox1.GotFocus += TextBox1_GotFocus;
             this.textBox1.LostFocus += TextBox1_LostFocus;
             this.textBox1.KeyDown += TextBox1_KeyDown;
-            this.button1.Select();
+            this.button2.Select();
 
             this.KeyPreview = true;
             this.KeyDown += PropertiesForm_KeyDown;
@@ -255,7 +256,7 @@ namespace CrewChiefV4
             {
                 this.textBox1.Text = DEFAULT_SEARCH_TEXT;
                 this.textBox1.ForeColor = Color.Gray;
-                this.button1.Select();
+                this.button2.Select();
             }
         }
 
@@ -263,8 +264,9 @@ namespace CrewChiefV4
         {
             if (e.KeyCode == Keys.Escape)
             {
+                this.textBox1.Select();
                 this.textBox1.Text = "";
-                this.button1.Select();
+                this.button2.Select();
 
                 if (!string.IsNullOrWhiteSpace(this.searchTextPrev) && this.searchTextPrev != DEFAULT_SEARCH_TEXT) 
                     this.PopulatePrefsFiltered(null);
@@ -280,21 +282,31 @@ namespace CrewChiefV4
         {
             if (e.Control && e.KeyCode == Keys.E)
                 this.textBox1.Select();
+            else if (e.KeyCode == Keys.Escape)
+            {
+                // Close only if no search is active.
+                if (this.textBox1.Text == DEFAULT_SEARCH_TEXT)
+                    this.Close();
+                else
+                    this.TextBox1_KeyDown(sender, e); // Otherwise, forward.
+            }
         }
 
         private void PopulatePrefsFiltered(string filter)
         {
-            // Unfortunately, stupid piece of shit fucking flow layout panel does not auto resize on hiding controls.
-            // I've no idea nor time to keep figuring out wtf is going on, so just remove all the shit but preserve user
-            // values.
             this.flowLayoutPanel1.SuspendLayout();
+
+            bool anyHits = false;
             foreach (var ctrl in this.flowLayoutPanel1.Controls)
             {
                 if (ctrl is StringPropertyControl)
                 {
                     var spc = ctrl as StringPropertyControl;
                     if (string.IsNullOrWhiteSpace(filter) || spc.propertyId.ToUpperInvariant().Contains(filter.ToUpperInvariant()))
+                    {
                         spc.Visible = true;
+                        anyHits = true;
+                    }
                     else
                         spc.Visible = false;
                 }
@@ -302,7 +314,10 @@ namespace CrewChiefV4
                 {
                     var bpc = ctrl as BooleanPropertyControl;
                     if (string.IsNullOrWhiteSpace(filter) || bpc.propertyId.ToUpperInvariant().Contains(filter.ToUpperInvariant()))
+                    {
                         bpc.Visible = true;
+                        anyHits = true;
+                    }
                     else
                         bpc.Visible = false;
                 }
@@ -310,7 +325,10 @@ namespace CrewChiefV4
                 {
                     var ipc = ctrl as IntPropertyControl;
                     if (string.IsNullOrWhiteSpace(filter) || ipc.propertyId.ToUpperInvariant().Contains(filter.ToUpperInvariant()))
+                    {
                         ipc.Visible = true;
+                        anyHits = true;
+                    }
                     else
                         ipc.Visible = false;
                 }
@@ -318,7 +336,10 @@ namespace CrewChiefV4
                 {
                     var fpc = ctrl as FloatPropertyControl;
                     if (string.IsNullOrWhiteSpace(filter) || fpc.propertyId.ToUpperInvariant().Contains(filter.ToUpperInvariant()))
+                    {
                         fpc.Visible = true;
+                        anyHits = true;
+                    }
                     else
                         fpc.Visible = false;
                 }
@@ -331,97 +352,50 @@ namespace CrewChiefV4
                         s.Visible = false;
                 }
             }
-            /*this.flowLayoutPanel1.Controls.Clear();
 
-            int widgetCount = 0;
-            foreach (SettingsProperty strProp in UserSettings.GetUserSettings().getProperties(typeof(String), null, null))
-            {
-                if (string.IsNullOrWhiteSpace(filter) || strProp.Name.ToUpperInvariant().Contains(filter.ToUpperInvariant()))
-                {
-                    this.flowLayoutPanel1.Controls.Add(new StringPropertyControl(strProp.Name, Configuration.getUIString(strProp.Name) + " " + Configuration.getUIString("text_prop_type"),
-                       UserSettings.GetUserSettings().getString(strProp.Name), (String)strProp.DefaultValue,
-                       Configuration.getUIString(strProp.Name + "_help")));
-                    widgetCount++;
-                }
-            }
-            pad(widgetCount);
-            widgetCount = 0;
-            foreach (SettingsProperty boolProp in UserSettings.GetUserSettings().getProperties(typeof(Boolean), "enable", null))
-            {
-                if (string.IsNullOrWhiteSpace(filter) || boolProp.Name.ToUpperInvariant().Contains(filter.ToUpperInvariant()))
-                {
-                    Boolean defaultValue;
-                    Boolean.TryParse((String)boolProp.DefaultValue, out defaultValue);
-                    this.flowLayoutPanel1.Controls.Add(new BooleanPropertyControl(boolProp.Name, Configuration.getUIString(boolProp.Name) + " " + Configuration.getUIString("boolean_prop_type"),
-                        UserSettings.GetUserSettings().getBoolean(boolProp.Name), defaultValue,
-                        Configuration.getUIString(boolProp.Name + "_help")));
-                    widgetCount++;
-                }
-            }
-            pad(widgetCount);
-            widgetCount = 0;
-            foreach (SettingsProperty intProp in UserSettings.GetUserSettings().getProperties(typeof(int), "frequency", null))
-            {
-                if (string.IsNullOrWhiteSpace(filter) || intProp.Name.ToUpperInvariant().Contains(filter.ToUpperInvariant()))
-                {
-                    int defaultValue;
-                    int.TryParse((String)intProp.DefaultValue, out defaultValue);
-                    this.flowLayoutPanel1.Controls.Add(new IntPropertyControl(intProp.Name, Configuration.getUIString(intProp.Name) + " " + Configuration.getUIString("integer_prop_type"),
-                        UserSettings.GetUserSettings().getInt(intProp.Name), defaultValue,
-                        Configuration.getUIString(intProp.Name + "_help")));
-                    widgetCount++;
-                }
-            }
-            pad(widgetCount);
-            widgetCount = 0;
-            foreach (SettingsProperty boolProp in UserSettings.GetUserSettings().getProperties(typeof(Boolean), null, "enable"))
-            {
-                if (string.IsNullOrWhiteSpace(filter) || boolProp.Name.ToUpperInvariant().Contains(filter.ToUpperInvariant()))
-                {
-                    Boolean defaultValue;
-                    Boolean.TryParse((String)boolProp.DefaultValue, out defaultValue);
-                    this.flowLayoutPanel1.Controls.Add(new BooleanPropertyControl(boolProp.Name, Configuration.getUIString(boolProp.Name) + " " + Configuration.getUIString("boolean_prop_type"),
-                        UserSettings.GetUserSettings().getBoolean(boolProp.Name), defaultValue,
-                        Configuration.getUIString(boolProp.Name + "_help")));
-                    widgetCount++;
-                }
-            }
-            pad(widgetCount);
-            widgetCount = 0;
-            foreach (SettingsProperty intProp in UserSettings.GetUserSettings().getProperties(typeof(int), null, "frequency"))
-            {
-                if (string.IsNullOrWhiteSpace(filter) || intProp.Name.ToUpperInvariant().Contains(filter.ToUpperInvariant()))
-                {
-                    int defaultValue;
-                    int.TryParse((String)intProp.DefaultValue, out defaultValue);
-                    this.flowLayoutPanel1.Controls.Add(new IntPropertyControl(intProp.Name, Configuration.getUIString(intProp.Name) + " " + Configuration.getUIString("integer_prop_type"),
-                        UserSettings.GetUserSettings().getInt(intProp.Name), defaultValue,
-                        Configuration.getUIString(intProp.Name + "_help")));
-                    widgetCount++;
-                }
-            }
-            pad(widgetCount);
-            widgetCount = 0;
-            foreach (SettingsProperty floatProp in UserSettings.GetUserSettings().getProperties(typeof(float), null, null))
-            {
-                if (string.IsNullOrWhiteSpace(filter) || floatProp.Name.ToUpperInvariant().Contains(filter.ToUpperInvariant()))
-                {
-                    float defaultValue;
-                    float.TryParse((String)floatProp.DefaultValue, out defaultValue);
-                    this.flowLayoutPanel1.Controls.Add(new FloatPropertyControl(floatProp.Name, Configuration.getUIString(floatProp.Name) + " " + Configuration.getUIString("real_number_prop_type"),
-                        UserSettings.GetUserSettings().getFloat(floatProp.Name), defaultValue,
-                        Configuration.getUIString(floatProp.Name + "_help")));
-                    widgetCount++;
-                }
-            }
-            pad(widgetCount);
-            widgetCount = 0;
+            if (!anyHits)
+                this.flowLayoutPanel1.Controls.Add(this.noMatchedLabel);
+            else
+                this.flowLayoutPanel1.Controls.Remove(this.noMatchedLabel);
 
-            if (this.flowLayoutPanel1.Controls.Count == 0)
-                this.flowLayoutPanel1.Controls.Add(new Label() { Text = "Nothing found." }); 
-                */
             this.flowLayoutPanel1.ResumeLayout();
-            //this.flowLayoutPanel1.PerformLayout();
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            // Note that even after this said yes, there's still "Save" step.  Maybe dialog isn't necessary.
+            var result = MessageBox.Show("This will reset all the Crew Chief settings to their default values, are you sure?", "Reset All Settings to Default values", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+            if (result == DialogResult.No)
+                return;
+
+            foreach (var ctrl in this.flowLayoutPanel1.Controls)
+            {
+                if (ctrl is StringPropertyControl)
+                {
+                    var spc = ctrl as StringPropertyControl;
+                    spc.button1_Click(sender, e);
+                }
+                else if (ctrl is BooleanPropertyControl)
+                {
+                    var bpc = ctrl as BooleanPropertyControl;
+                    bpc.button1_Click(sender, e);
+                }
+                else if (ctrl is IntPropertyControl)
+                {
+                    var ipc = ctrl as IntPropertyControl;
+                    ipc.button1_Click(sender, e);
+                }
+                else if (ctrl is FloatPropertyControl)
+                {
+                    var fpc = ctrl as FloatPropertyControl;
+                    fpc.button1_Click(sender, e);
+                }
+            }
         }
     }
 }

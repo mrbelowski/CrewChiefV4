@@ -40,7 +40,7 @@ namespace CrewChiefV4
             }
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        public void button1_Click(object sender, EventArgs e)
         {
             if (defaultValue != originalValue)
             {
