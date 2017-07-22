@@ -17,7 +17,6 @@ namespace CrewChiefV4
                 {
                     if (Process.GetProcessesByName(alternateProcessName).Length > 0)
                     {
-                        Console.WriteLine("Expected " + processName + " but found " + alternateProcessName + ". This might not end well, but here goes...");
                         return true;
                     }
                 }
