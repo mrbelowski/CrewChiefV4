@@ -280,7 +280,6 @@ namespace CrewChiefV4
                     }
                 }
             }).Start();
-            this.editPropertiesButtonClicked(this, null);
         }
 
         public void updateMessagesVolume(float messagesVolume)
