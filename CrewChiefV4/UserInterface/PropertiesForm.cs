@@ -302,7 +302,7 @@ namespace CrewChiefV4
                 if (ctrl is StringPropertyControl)
                 {
                     var spc = ctrl as StringPropertyControl;
-                    if (string.IsNullOrWhiteSpace(filter) || spc.propertyId.ToUpperInvariant().Contains(filter.ToUpperInvariant()))
+                    if (string.IsNullOrWhiteSpace(filter) || spc.label.ToUpperInvariant().Contains(filter.ToUpperInvariant()))
                     {
                         spc.Visible = true;
                         anyHits = true;
@@ -313,7 +313,7 @@ namespace CrewChiefV4
                 else if (ctrl is BooleanPropertyControl)
                 {
                     var bpc = ctrl as BooleanPropertyControl;
-                    if (string.IsNullOrWhiteSpace(filter) || bpc.propertyId.ToUpperInvariant().Contains(filter.ToUpperInvariant()))
+                    if (string.IsNullOrWhiteSpace(filter) || bpc.label.ToUpperInvariant().Contains(filter.ToUpperInvariant()))
                     {
                         bpc.Visible = true;
                         anyHits = true;
@@ -324,7 +324,7 @@ namespace CrewChiefV4
                 else if (ctrl is IntPropertyControl)
                 {
                     var ipc = ctrl as IntPropertyControl;
-                    if (string.IsNullOrWhiteSpace(filter) || ipc.propertyId.ToUpperInvariant().Contains(filter.ToUpperInvariant()))
+                    if (string.IsNullOrWhiteSpace(filter) || ipc.label.ToUpperInvariant().Contains(filter.ToUpperInvariant()))
                     {
                         ipc.Visible = true;
                         anyHits = true;
@@ -335,7 +335,7 @@ namespace CrewChiefV4
                 else if (ctrl is FloatPropertyControl)
                 {
                     var fpc = ctrl as FloatPropertyControl;
-                    if (string.IsNullOrWhiteSpace(filter) || fpc.propertyId.ToUpperInvariant().Contains(filter.ToUpperInvariant()))
+                    if (string.IsNullOrWhiteSpace(filter) || fpc.label.ToUpperInvariant().Contains(filter.ToUpperInvariant()))
                     {
                         fpc.Visible = true;
                         anyHits = true;

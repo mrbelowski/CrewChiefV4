@@ -12,11 +12,13 @@ namespace CrewChiefV4
     public partial class BooleanPropertyControl : UserControl
     {
         public String propertyId;
+        public String label;
         public Boolean defaultValue;
         public Boolean originalValue;
         public BooleanPropertyControl(String propertyId, String label, Boolean value, Boolean defaultValue, String helpText)
         {
             InitializeComponent();
+            this.label = label;
             this.propertyId = propertyId;
             this.originalValue = value;
             this.checkBox1.Text = label;            

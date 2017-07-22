@@ -14,9 +14,11 @@ namespace CrewChiefV4
         public String propertyId;
         public String defaultValue;
         public String originalValue;
+        public String label;
         public StringPropertyControl(String propertyId, String label, String currentValue, String defaultValue, String helpText)
         {
             InitializeComponent();
+            this.label = label;
             this.propertyId = propertyId;
             this.label1.Text = label;
             this.originalValue = currentValue;
