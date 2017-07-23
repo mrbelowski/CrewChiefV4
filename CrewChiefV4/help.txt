@@ -33,7 +33,7 @@ The source code for this plugin is here: https://github.com/dallongo/rFactorShar
 
 rFactor 2:
 
-You need Vytautas Leonavičius' plugin for rFactor 2. The app will check if this plugin is installed in the correct game folder. If it isn't, the app will offer to install it for you when you start the app with RF2 selected. In most cases all you need do is click the "OK" button in the popup.
+You need Vytautas Leonavicius' plugin for rFactor 2. The app will check if this plugin is installed in the correct game folder. If it isn't, the app will offer to install it for you when you start the app with RF2 selected. In most cases all you need do is click the "OK" button in the popup.
 
 If this process fails for any reason, copy the rFactor2SharedMemoryMapPlugin64.dll from the app's plugins folder - usually C:\Program Files (x86)\Britton IT Ltd\CrewChiefV4\plugins\rFactor 2\Bin64\Plugins\rFactor2SharedMemoryMapPlugin64.dll to the rFactor2 'Plugins' folder (usually something like C:\Program Files (x86)\Steam\steamapps\common\rFactor2\Bin64\Plugins). You need to enable this plugin from the game's Options->Plugins UI. 
 
@@ -58,19 +58,17 @@ Properties
 -------------------
 The app includes a rather rudamentary preferences screen accessed by the "Properties" button. Many many aspects of that app's behaviour can be customised here but it's important to note that you don't have to make any changes to these properties to get the app to work correctly - the defaults are sensisble settings and the app doesn't need any configuration (except for swearing - see below).
 
-We've added a search capability to the window.  Most of CC options apply to all simulators, but you can also search for game specific preferences by typing ACS, AMS, R3E, rF1, rF2 or pCars to filter accordingly.
-
 
 
 Swearing
 -----------------
-Because swearing is cool and I'm a 12 year old stuck in a middle-aged body, this has its own help section. Swearing is disabled by default so once you've got the app working you'll want to enable it because swearing is cool. Look for a checkbox in the Properties screen called "Use sweary messages" (near the bottom) and tick it. The app will swear where appropriate - it's not like listening to an Eddie Murphy gig and doesn't happen very often but it does help add a bit of personality to the messages.
+Because swearing is cool and I'm a 12 year old stuck in a middle-aged body, this has its own help section. Swearing is disabled by default so once you've got the app working you'll want to enable it because swearing is cool. Look for a checkbox in the Properties screen called "use_sweary_messages" (near the bottom) and tick it. The app will swear where appropriate - it's not like listening to an Eddie Murphy gig and doesn't happen very often but it does help add a bit of personality to the messages.
 
 
 
 Personalisations
 ------------------------
-The "My name" dropdown menu in the top right of the main UI allows you to select from a list of names which the app will use to address you, from time to time. These are incorporated into existing messages so for example, rather than just saying "box now" the app will say "box now, please Jim". There are lots of variations and they sound quite good, if you are lucky enough to have a first name that's in this list. How often you hear these personalised messages is controlled by the "Min time between personalised messages" property. The old default value (30s) is a bit low - 60s sounds better. The Personalisations come in the form of a mini-sound pack which is downloaded and managed by the app (they used to require lots of manual faffing) - if new personalisations are available the "Download personalisations" button will he highlighted in green. Swapping between personalisations requires an app restart.
+The "My name" dropdown menu in the top right of the main UI allows you to select from a list of names which the app will use to address you, from time to time. These are incorporated into existing messages so for example, rather than just saying "box now" the app will say "box now, please Jim". There are lots of variations and they sound quite good, if you are lucky enough to have a first name that's in this list. How often you hear these personalised messages is controlled by the "min_time_between_personalised_messages" property. The old default value (30s) is a bit low - 60s sounds better. The Personalisations come in the form of a mini-sound pack which is downloaded and managed by the app (they used to require lots of manual faffing) - if new personalisations are available the "Download personalisations" button will he highlighted in green. Swapping between personalisations requires an app restart.
 
 
 

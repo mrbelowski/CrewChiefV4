@@ -307,6 +307,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="engineer_edited.ico" />
+    <Content Include="help.txt" />
     <Content Include="sounds_config.txt" />
     <Content Include="speech_recognition_config.txt" />
     <Content Include="ui_text.txt" />
