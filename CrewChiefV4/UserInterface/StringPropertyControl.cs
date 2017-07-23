@@ -14,9 +14,11 @@ namespace CrewChiefV4
         public String propertyId;
         public String defaultValue;
         public String originalValue;
+        public String label;
         public StringPropertyControl(String propertyId, String label, String currentValue, String defaultValue, String helpText)
         {
             InitializeComponent();
+            this.label = label;
             this.propertyId = propertyId;
             this.label1.Text = label;
             this.originalValue = currentValue;
@@ -36,7 +38,7 @@ namespace CrewChiefV4
 
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        public void button1_Click(object sender, EventArgs e)
         {
             if (originalValue != defaultValue)
             {

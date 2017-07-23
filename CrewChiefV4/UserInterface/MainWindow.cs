@@ -1572,6 +1572,5 @@ namespace CrewChiefV4
 
         [DllImport("winmm.dll")]
         public static extern int waveOutSetVolume(IntPtr hwo, uint dwVolume);
-
     }
 }
