@@ -316,7 +316,7 @@ frequency_of_player_race_lap_time_reports = Frequency of player race lap time re
 frequency_of_player_race_lap_time_reports_help = How often to report player lap times in the race. 0 (never) to 10 (as often as possible)
 frequency_of_player_prac_and_qual_lap_time_reports = Frequency of player prac and qual lap time reports
 frequency_of_player_prac_and_qual_lap_time_reports_help = How often to report player lap times in the practice and qualifying. 0 (never) to 10 (as often as possible)
-frequency_of_prac_and_qual_sector_delta_reports = Frequency of player prac and qual sector delta_reports
+frequency_of_prac_and_qual_sector_delta_reports = Frequency of player prac and qual sector delta reports
 frequency_of_prac_and_qual_sector_delta_reports_help = How often to report player sector deltas in practice and qualifying. 0 (never) to 10 (as often as possible)
 frequency_of_race_sector_delta_reports = Frequency of race sector delta reports
 frequency_of_race_sector_delta_reports_help = How often to report a player sector deltas in race. 0 (never) to 10 (as often as possible)
@@ -417,12 +417,12 @@ restore_default_settings = Restore Default Settings
 
 search_box_default_text = Search for property (Ctrl+E)
 search_box_tooltip_line1 = Hint:
-search_box_tooltip_line2 = acs_ - for Assetto Corsa specific preferences
-search_box_tooltip_line3 = ams_ - for Automobilista specific preferences
-search_box_tooltip_line4 = r3e_ - for Raceroom specific preferences
-search_box_tooltip_line5 = rf1_ - for rFactor 1 specific preferences
-search_box_tooltip_line6 = rf2_ - for rFactor 2 specific preferences
-search_box_tooltip_line7 = pcars_ - for Project CARS specific preferences
+search_box_tooltip_line2 = ACS - for Assetto Corsa specific preferences
+search_box_tooltip_line3 = AMS - for Automobilista specific preferences
+search_box_tooltip_line4 = R3E - for Raceroom specific preferences
+search_box_tooltip_line5 = RF1 - for rFactor 1 specific preferences
+search_box_tooltip_line6 = RF2 - for rFactor 2 specific preferences
+search_box_tooltip_line7 = PCars - for Project CARS specific preferences
 
 no_matches = No matches.
 reset_warning_text = This will reset all the Crew Chief settings to their default values, are you sure?
