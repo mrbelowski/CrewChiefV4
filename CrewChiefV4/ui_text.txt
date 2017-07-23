@@ -6,13 +6,13 @@
 #
 # Any text set in that file will replace the corresponding default here
 
-checking_sound_pack_version = Checking sound pack version...
+checking_sound_pack_version = Checking Sound Pack version...
 checking_driver_names_version = Checking driver names version...
 checking_personalisations_version = Checking personalisations version...
-sound_pack_is_up_to_date = Sound pack is up to date
-no_sound_pack_detected_unable_to_locate_update = No sound pack detected, unable to locate update
-no_sound_pack_detected_press_to_download = No sound pack detected, press to download
-updated_sound_pack_available_press_to_download = Updated sound pack available, press to download
+sound_pack_is_up_to_date = Sound Pack is up to date
+no_sound_pack_detected_unable_to_locate_update = No Sound Pack detected, unable to locate update
+no_sound_pack_detected_press_to_download = No Sound Pack detected, press to download
+updated_sound_pack_available_press_to_download = Updated Sound Pack available, press to download
 no_driver_names_detected_unable_to_locate_update = No driver names detected, unable to locate update
 no_driver_names_detected_press_to_download = No driver names detected, press to download
 updated_driver_names_available_press_to_download = Updated driver names available, press to download
@@ -63,10 +63,10 @@ about = About Crew Chief
 messages_volume = Messages volume
 background_volume = Background volume
 
-extracting_sound_pack = Extracting sound pack...
+extracting_sound_pack = Extracting Sound Pack...
 
-error_downloading_sound_pack = Error downloading sound pack, check the readme file for instructions on how to manually download and install this.
-unable_to_download_sound_pack = Unable to download sound pack
+error_downloading_sound_pack = Error downloading Sound Pack, check the readme file for instructions on how to manually download and install this.
+unable_to_download_sound_pack = Unable to download Sound Pack
 extracting_driver_names = Extracting driver names...
 
 error_downloading_personalisations = Error personalisations names, check the readme file for instructions on how to manually download and install this.
@@ -79,13 +79,13 @@ the_application_must_be_restarted_to_load_the_new_sounds = The application must 
 
 load_new_sounds=Load new sounds
 
-downloading_sound_pack = Downloading sound pack...
+downloading_sound_pack = Downloading Sound Pack...
 downloading_driver_names = Downloading driver names...
 downloading_personalisations = Downloading personalisations...
 
 talk_to_crew_chief = Talk to crew chief
 toggle_race_updates_on/off = Toggle race updates on/off
-toggle_spotter_on/off = Toggle spotter on/off
+toggle_spotter_on/off = Toggle Spotter on/off
 toggle_opponent_deltas_on/off_for_each_lap = Toggle opponent deltas on/off for each lap
 press_to_replay_the_last_message = Press to replay the last message
 udp_network_data_buttons = UDP network data buttons
@@ -108,14 +108,14 @@ save_prop_changes_warning = You have unsaved changes. Click 'Yes' to save these 
 save_changes = Save changes
 save_and_restart = Save and restart
 
-unknown_sound_pack_language_text = The current sound pack has no language specified. Click "Yes" to proceed with the update (which will apply the default English sound pack update files and set the language to English). Click "No" to cancel.
-unknown_sound_pack_language_title = No sound pack language defined
+unknown_sound_pack_language_text = The current Sound Pack has no language specified. Click "Yes" to proceed with the update (which will apply the default English Sound Pack update files and set the language to English). Click "No" to cancel.
+unknown_sound_pack_language_title = No Sound Pack language defined
 
-unknown_driver_names_language_text = The current sound pack has no language specified. Click "Yes" to proceed with the update (which will download the default English driver name updates). Click "No" to cancel.
-unknown_driver_names_language_title = No sound pack language defined
+unknown_driver_names_language_text = The current Sound Pack has no language specified. Click "Yes" to proceed with the update (which will download the default English driver name updates). Click "No" to cancel.
+unknown_driver_names_language_title = No Sound Pack language defined
 
-unknown_personalisations_language_text = The current sound pack has no language specified. Click "Yes" to proceed with the update (which will download the default English personalisations). Click "No" to cancel.
-unknown_personalisations_language_title = No sound pack language defined
+unknown_personalisations_language_text = The current Sound Pack has no language specified. Click "Yes" to proceed with the update (which will download the default English personalisations). Click "No" to cancel.
+unknown_personalisations_language_title = No Sound Pack language defined
 
 # to change the name of the property title in the properties screen, just use the property name like this:
 # enable_spotter = Enable spotter
@@ -130,8 +130,8 @@ rf1_install_path = rF1 install path
 rf1_install_path_help = rF1 installation path for plugin installation and updating
 rf2_install_path = rF2 install path
 rf2_install_path_help = rF2 installation path for plugin installation and updating
-override_default_sound_pack_location = Override default sound pack location
-override_default_sound_pack_location_help = Use an alternative folder for the sound pack
+override_default_sound_pack_location = Override default Sound Pack location
+override_default_sound_pack_location_help = Use an alternative folder for the Sound Pack
 
 enable_brake_damage_messages = Enable brake damage messages
 enable_acs_log_sectors_for_unknown_tracks = Enable ACS log sectors for unknown tracks
@@ -150,7 +150,7 @@ enable_position_messages = Enable position messages
 enable_push_to_pass_messages = Enable push to pass messages
 enable_race_start_messages = Enable race start messages
 enable_session_end_messages = Enable session end messages
-enable_spotter_in_timetrial = Enable spotter in timetrial
+enable_spotter_in_timetrial = Enable Spotter in timetrial
 enable_suspension_damage_messages = Enable suspension damage messages
 enable_track_and_air_temp_reports = Enable track and air temp reports
 enable_tyre_temp_warnings = Enable tyre temp warnings
@@ -177,17 +177,17 @@ acs_practice_time_minuts = ACS practice time minutes
 min_time_between_personalised_messages = Min time between personalised messages
 minimum_time_between_pearls_of_wisdom = Min time between pearls of wisdom
 spotter_hold_repeat_frequency = Spotter hold repeat frequency
-spotter_hold_repeat_frequency_help = Time between the spotter repeating "hold your line" when along side a car
+spotter_hold_repeat_frequency_help = Time between the Spotter repeating "hold your line" when along side a car
 spotter_update_interval = Spotter update interval
 udp_data_port = PCars UDP port
 udp_data_port_help = PCars network data UDP port (should usually be 5606)
 
-acs_spotter_car_length = ACS spotter default car length
-ams_spotter_car_length = AMS spotter default car length
-pcars_spotter_car_length = PCars spotter default car length
-r3e_spotter_car_length = R3E spotter default car length
-rf1_spotter_car_length = rF1 spotter default car length
-rf2_spotter_car_length = rF2 spotter default car length
+acs_spotter_car_length = ACS Spotter default car length
+ams_spotter_car_length = AMS Spotter default car length
+pcars_spotter_car_length = PCars Spotter default car length
+r3e_spotter_car_length = R3E Spotter default car length
+rf1_spotter_car_length = rF1 Spotter default car length
+rf2_spotter_car_length = rF2 Spotter default car length
 spotter_gap_for_clear = Spotter gap for clear
 
 background_volume = Background volume
@@ -196,26 +196,26 @@ update_interval = Update interval
 update_interval_help = The time (milliseconds) between app updates
 use_sweary_messages = Use sweary messages
 use_sweary_messages_help = A few messages contain swearing - then enables / disables these
-enable_spotter = Enable spotter
-enable_spotter_help = The spotter can be enabled and disabled with a button. This setting sets it initial state
+enable_spotter = Enable Spotter
+enable_spotter_help = The Spotter can be enabled and disabled with a button. This setting sets it initial state
 speech_recognition_location = Speech recognition locale
 speech_recognition_location_help = Optional - the localisation to use for speech recognition. If this isn't set, the app will use which ever English pack you've installed (or the first it finds if you have more than one). If you set it, the value must be en-[something].
 spotter_car_length = Spotter car length
-spotter_car_length_help = The length of a car, used to check if there's an overlap. Decrease this if the spotter calls 'hold your line' when you're not overlapping. Increase it if the spotter doesn't call 'hold your line' when you clearly are overlapping.
+spotter_car_length_help = The length of a car, used to check if there's an overlap. Decrease this if the Spotter calls 'hold your line' when you're not overlapping. Increase it if the Spotter doesn't call 'hold your line' when you clearly are overlapping.
 time_after_race_start_for_spotter = Time after race start for spotter
 time_after_race_start_for_spotter_help = Wait this many seconds after race start before enabling the spotter
 min_speed_for_spotter = Min speed for spotter
-min_speed_for_spotter_help = Don't use the spotter if your speed is less than this
+min_speed_for_spotter_help = Don't use the Spotter if your speed is less than this
 max_closing_speed_for_spotter = Max closing speed for spotter
 max_closing_speed_for_spotter_help = Don't call 'hold your line' if the closing speed between you and the other car is greater than this
 spotter_clear_delay = Spotter clear delay
-spotter_clear_delay_help = You need to be clear for this many milliseconds before the spotter calls 'clear'
+spotter_clear_delay_help = You need to be clear for this many milliseconds before the Spotter calls 'clear'
 spotter_overlap_delay = Spotter overlap delay
-spotter_overlap_delay_help = You need to be overlapping for this many milliseconds before the spotter calls 'hold your line'
-custom_device_guid = Custom device guid
+spotter_overlap_delay_help = You need to be overlapping for this many milliseconds before the Spotter calls 'hold your line'
+custom_device_guid = Custom device GUID
 custom_device_guid_help = Manually set a controller GUID if the app doesn't display your controller in the devices list
 disable_immediate_messages = Disable immediate messages
-disable_immediate_messages_help = Disables all spotter messages and all voice recognition responses. Might allow the app to run in non-interactive mode on slow systems
+disable_immediate_messages_help = Disables all Spotter messages and all voice recognition responses. Might allow the app to run in non-interactive mode on slow systems
 max_safe_oil_temp_over_baseline_help = Baseline oil temp is taken after a few minutes. If the oil temp goes more than this value over the baseline a warning message is played. Reduce this to make the 'high oil temp' warning more sensitive
 max_safe_water_temp_over_baseline_help = Baseline water temp is taken after a few minutes. If the water temp goes more than this value over the baseline a warning message is played. Reduce this to make the 'high water temp' warning more sensitive
 launch_raceroom = Launch raceroom
@@ -308,13 +308,13 @@ frequency_of_gap_behind_reports = Frequency of gap behind reports
 frequency_of_gap_behind_reports_help = How often to report a the gap to the car behind. 0 (never) to 10 (as often as possible)
 frequency_of_opponent_race_lap_times = Frequency of opponent race lap times
 frequency_of_opponent_race_lap_times_help = How often to report fast laps times for race leader and car in front and behind. 0 (never) to 10 (as often as possible). If this is 1, times are only reported if they're the session best. This criteria becomes less strict up to 10 where the time just needs to be a few tenths off session best.
-frequency_of_opponent_practice_and_qual_lap_times = Frequency of opponent practice and qualifying lap times
+frequency_of_opponent_practice_and_qual_lap_times = Frequency of opponent practice and quali lap times
 frequency_of_opponent_practice_and_qual_lap_times_help = How often to report fast laps times for race leader and car in front and behind. 0 (never) to 10 (as often as possible). If this is 1, times are only reported if they're the session best. This criteria becomes less strict up to 10 where the time just needs to be a few tenths off session best.
 frequency_of_pearls_of_wisdom = Frequency of pearls of wisdom
 frequency_of_pearls_of_wisdom_help = How often to play general encouragement messages. 0 (never) to 10 (as often as possible)
 frequency_of_player_race_lap_time_reports = Frequency of player race lap time reports
 frequency_of_player_race_lap_time_reports_help = How often to report player lap times in the race. 0 (never) to 10 (as often as possible)
-frequency_of_player_prac_and_qual_lap_time_reports = Frequency of player prac and qual lap time reports
+frequency_of_player_prac_and_qual_lap_time_reports = Freq of player prac and qual lap time reports
 frequency_of_player_prac_and_qual_lap_time_reports_help = How often to report player lap times in the practice and qualifying. 0 (never) to 10 (as often as possible)
 frequency_of_prac_and_qual_sector_delta_reports = Frequency of player prac and qual sector delta reports
 frequency_of_prac_and_qual_sector_delta_reports_help = How often to report player sector deltas in practice and qualifying. 0 (never) to 10 (as often as possible)
@@ -386,7 +386,7 @@ enable_rf2_blue_on_slower = Enable rF2 blue on slower
 enable_rf2_blue_on_slower_help = Play 'Blue Flag' messages if car behind seems to be faster.  Useful in multi-class races
 enable_rf2_pit_stop_prediction = Enable rF2 pit stop prediction
 enable_rf2_pit_stop_prediction_help = Play 'box now' messages when using offline scheduled pit stops
-enable_stockcars_mode = Enable stockcars mode
+enable_stockcars_mode = Enable Stock Cars mode
 enable_stockcars_mode_help = Uses Stock Cars wording for FCY phase, and enables White flag on last lap
 
 enable_simple_incident_detection = Enable simple incident detection
@@ -404,7 +404,7 @@ the_application_must_be_restarted_to_check_for_updates = The application must be
 check_for_updates = Force update check
 donate_link_text = Donate to Support Crew Chief development
 
-use_american_terms = Use american terms
+use_american_terms = Use American terms
 use_american_terms_help = Assume unknown cars use American phrasing ("pace car", "white flag" for last lap etc)
 realistic_mode = Realistic mode
 realistic_mode_help = Restrict available message types based on the car and track in use (experimental)
