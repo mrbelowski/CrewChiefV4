@@ -77,10 +77,7 @@ namespace CrewChiefV4
         // don't play 'clear' or 'hold' messages unless we've actually been clear or overlapping for some time
         private TimeSpan clearMessageDelay = TimeSpan.FromMilliseconds(UserSettings.GetUserSettings().getInt("spotter_clear_delay"));
         private TimeSpan overlapMessageDelay = TimeSpan.FromMilliseconds(UserSettings.GetUserSettings().getInt("spotter_overlap_delay"));
-
-        // TODO: fix this or remove it entirely
-        // private static Boolean use3WideLeftAndRight = UserSettings.GetUserSettings().getBoolean("spotter_enable_three_wide_left_and_right");
-        private static Boolean use3WideLeftAndRight = false;
+        private static Boolean use3WideLeftAndRight = UserSettings.GetUserSettings().getBoolean("spotter_enable_three_wide_left_and_right");
 
         private DateTime nextMessageDue = DateTime.Now;
         
