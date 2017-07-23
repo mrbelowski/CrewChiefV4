@@ -64,7 +64,7 @@ We've added a search capability to the window.  Most of CC options apply to all 
 
 Swearing
 -----------------
-Because swearing is cool and I'm a 12 year old stuck in a middle-aged body, this has its own help section. Swearing is disabled by default so once you've got the app working you'll want to enable it because swearing is cool. Look for a checkbox in the Properties screen called "Use sweary messages" (near the bottom) and tick it. The app will swear where appropriate - it's not like listening to an Eddie Murphy gig and doesn't happen very often but it does help add a bit of personality to the messages.
+Because swearing is cool and I'm a 12 year old stuck in a middle-aged body, this has its own help section. Swearing is disabled by default so once you've got the app working you'll want to enable it because swearing is cool. Look for a checkbox in the Properties screen called "Use sweary messages" (search for "sweary" using the search box) and tick it. The app will swear where appropriate - it's not like listening to an Eddie Murphy gig and doesn't happen very often but it does help add a bit of personality to the messages.
 
 
 
