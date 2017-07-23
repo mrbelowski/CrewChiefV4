@@ -20,7 +20,7 @@ namespace CrewChiefV4
         private readonly TimeSpan AUTO_SEARCH_DELAY_SPAN = TimeSpan.FromMilliseconds(700);
         private string searchTextPrev = null;
         private DateTime nextPrefsRefreshAttemptTime = DateTime.MinValue;
-        private Label noMatchedLabel = new Label() { Text = "No matches." };
+        private Label noMatchedLabel = new Label() { Text = Configuration.getUIString("no_matches") };
 
         public PropertiesForm(System.Windows.Forms.Form parent)
         {
@@ -371,7 +371,7 @@ namespace CrewChiefV4
         private void button3_Click(object sender, EventArgs e)
         {
             // Note that even after this said yes, there's still "Save" step.  Maybe dialog isn't necessary.
-            var result = MessageBox.Show("This will reset all the Crew Chief settings to their default values, are you sure?", "Reset All Settings to Default values", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+            var result = MessageBox.Show(Configuration.getUIString("reset_warning_text"), Configuration.getUIString("reset_warning_title"), MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
             if (result == DialogResult.No)
                 return;
 

@@ -424,4 +424,6 @@ search_box_tooltip_line5 = rf1_ - for rFactor 1 specific preferences
 search_box_tooltip_line6 = rf2_ - for rFactor 2 specific preferences
 search_box_tooltip_line7 = pcars_ - for Project CARS specific preferences
 
-
+no_matches = No matches.
+reset_warning_text = This will reset all the Crew Chief settings to their default values, are you sure?
+reset_warning_title = Reset All Settings to Default Values
