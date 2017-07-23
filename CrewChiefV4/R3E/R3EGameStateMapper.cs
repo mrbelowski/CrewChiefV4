@@ -67,8 +67,6 @@ namespace CrewChiefV4.RaceRoom
         // a configurable 'max above baseline' for each. Assuming the base line temps are sensible (say, 85 for water 105 for oil), 
         // then anthing over 95 for water and 120 for oil is 'bad' - the numbers in the config reflect this
 
-        private Boolean gotBaselineEngineData = false;
-        private int baselineEngineDataSamples = 0;
         // record the average temperature between minutes 3 and 5 of driving
         private int baselineEngineDataSamplesStart = (int)(3d * 60d / CrewChief._timeInterval.TotalSeconds);
         private int baselineEngineDataSamplesEnd = (int)(5d * 60d / CrewChief._timeInterval.TotalSeconds);
@@ -199,8 +197,6 @@ namespace CrewChiefV4.RaceRoom
 
                 // reset the engine temp monitor stuff
 
-                gotBaselineEngineData = false;
-                baselineEngineDataSamples = 0;
                 baselineEngineDataOilTemp = targetEngineOilTemp;
                 baselineEngineDataWaterTemp = targetEngineWaterTemp;
                 for (int i = 0; i < shared.DriverData.Length; i++)
@@ -238,7 +234,7 @@ namespace CrewChiefV4.RaceRoom
                             {
                                 opponentDriverNamesProcessedThisUpdate.Add(driverName);
                                 currentGameState.OpponentData.Add(driverName, createOpponentData(participantStruct, driverName,
-                                    false, currentGameState.carClass.carClassEnum));
+                                    false, CarData.getCarClassForRaceRoomId(participantStruct.DriverInfo.ClassId).carClassEnum));
                             }
                         }
                     }
@@ -325,8 +321,6 @@ namespace CrewChiefV4.RaceRoom
                         Console.WriteLine("Just gone green, session details...");
 
                         // reset the engine temp monitor stuff
-                        gotBaselineEngineData = false;
-                        baselineEngineDataSamples = 0;
                         baselineEngineDataOilTemp = targetEngineOilTemp;
                         baselineEngineDataWaterTemp = targetEngineWaterTemp;
 
@@ -786,9 +780,8 @@ namespace CrewChiefV4.RaceRoom
                                     participantStruct.InPitlane == 1, participantStruct.CurrentLapValid == 1,
                                     currentGameState.SessionData.SessionRunningTime, secondsSinceLastUpdate,
                                     new float[] { participantStruct.Position.X, participantStruct.Position.Z }, previousOpponentWorldPosition,
-                                    participantStruct.LapDistance, participantStruct.TireType, participantStruct.DriverInfo.ClassId,
-                                    currentGameState.SessionData.SessionHasFixedTime, currentGameState.SessionData.SessionTimeRemaining, 
-                                    currentOpponentData.CarClass.carClassEnum);
+                                    participantStruct.LapDistance, participantStruct.TireType,
+                                    currentGameState.SessionData.SessionHasFixedTime, currentGameState.SessionData.SessionTimeRemaining);
 
                             if (previousOpponentData != null)
                             {
@@ -852,7 +845,8 @@ namespace CrewChiefV4.RaceRoom
                     else
                     {
                         opponentDriverNamesProcessedThisUpdate.Add(driverName);
-                        currentGameState.OpponentData.Add(driverName, createOpponentData(participantStruct, driverName, true, currentGameState.carClass.carClassEnum));
+                        currentGameState.OpponentData.Add(driverName, createOpponentData(participantStruct, driverName, true,
+                            CarData.getCarClassForRaceRoomId(participantStruct.DriverInfo.ClassId).carClassEnum));
                     }
                 }
             }
@@ -986,8 +980,8 @@ namespace CrewChiefV4.RaceRoom
             
             //------------------------ Engine data -----------------------            
             currentGameState.EngineData.EngineOilPressure = shared.EngineOilPressure;
-            currentGameState.EngineData.EngineRpm = Utilities.RpsToRpm(shared.EngineRps);
-            currentGameState.EngineData.MaxEngineRpm = Utilities.RpsToRpm(shared.MaxEngineRps);
+            currentGameState.EngineData.EngineRpm = shared.EngineRps * (60 / (2 * (Single)Math.PI));
+            currentGameState.EngineData.MaxEngineRpm = shared.MaxEngineRps * (60 / (2 * (Single)Math.PI));
             currentGameState.EngineData.MinutesIntoSessionBeforeMonitoring = 5;
             
             // all this 'baseline' engine temp logic was only ever a hack and is now disabled
@@ -1046,6 +1040,10 @@ namespace CrewChiefV4.RaceRoom
             currentGameState.PitData.PitWindow = mapToPitWindow(shared.PitWindowStatus);
             currentGameState.PitData.IsMakingMandatoryPitStop = (currentGameState.PitData.PitWindow == PitWindow.Open || currentGameState.PitData.PitWindow == PitWindow.StopInProgress) &&
                (currentGameState.PitData.OnInLap || currentGameState.PitData.OnOutLap);
+            if (previousGameState != null)
+            {
+                currentGameState.PitData.MandatoryPitStopCompleted = previousGameState.PitData.MandatoryPitStopCompleted || shared.PitWindowStatus == (int)PitWindow.Completed;
+            }
             currentGameState.PitData.limiterStatus = shared.PitLimiter;
 
             //------------------------ Car position / motion data -----------------------
@@ -1458,8 +1456,7 @@ namespace CrewChiefV4.RaceRoom
 
         private void upateOpponentData(OpponentData opponentData, int racePosition, int unfilteredRacePosition, int completedLaps, int sector, float sectorTime, 
             float completedLapTime, Boolean isInPits, Boolean lapIsValid, float sessionRunningTime, float secondsSinceLastUpdate, float[] currentWorldPosition,
-            float[] previousWorldPosition, float distanceRoundTrack, int tire_type, int carClassId, Boolean sessionLengthIsTime, float sessionTimeRemaining,
-            CarData.CarClassEnum opponentCarClass)
+            float[] previousWorldPosition, float distanceRoundTrack, int tire_type, Boolean sessionLengthIsTime, float sessionTimeRemaining)
         {
             opponentData.DistanceRoundTrack = distanceRoundTrack;
             float speed;
@@ -1483,7 +1480,6 @@ namespace CrewChiefV4.RaceRoom
             opponentData.InPits = isInPits;
             if (opponentData.CurrentSectorNumber != sector)
             {
-                opponentData.CarClass = CarData.getCarClassForRaceRoomId(carClassId);
                 if (opponentData.CurrentSectorNumber == 3 && sector == 1)
                 {
                     if (opponentData.OpponentLapData.Count > 0)
@@ -1497,9 +1493,9 @@ namespace CrewChiefV4.RaceRoom
                 else if (opponentData.CurrentSectorNumber == 1 && sector == 2 || opponentData.CurrentSectorNumber == 2 && sector == 3)
                 {
                     opponentData.AddCumulativeSectorData(opponentData.CurrentSectorNumber, racePosition, sectorTime, sessionRunningTime, lapIsValid && validSpeed, false, 20, 20);
-                    if (sector == 2 && opponentCarClass != null)
+                    if (sector == 2)
                     {
-                        opponentData.CurrentTyres = mapToTyreType(tire_type, opponentCarClass);
+                        opponentData.CurrentTyres = mapToTyreType(tire_type, opponentData.CarClass.carClassEnum);
                     }
                 }
                 opponentData.CurrentSectorNumber = sector;

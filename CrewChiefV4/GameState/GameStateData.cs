@@ -465,6 +465,10 @@ namespace CrewChiefV4.GameState
 
     public class OpponentData
     {
+        // Sometimes the name is corrupted with previous session's data. Worst case is that the name is entirely readable
+        // but completely invalid. We must prevent such names being read.
+        public Boolean CanUseName = true;
+
         // set this to false if this opponent drops out of the race (i.e. leaves a server)
         public Boolean IsActive = true;
 
@@ -1028,9 +1032,18 @@ namespace CrewChiefV4.GameState
         // These are used when we're checking time / speed difference at common overtaking spots
         private static float minSignificantRelativeTimeDiffOvertakingSpot = 0.07f;    // 7% - is this a good value?
         private static float minSignificantRelativeStartSpeedDiffOvertakingSpot = 0.1f;   // 10% - is this a good value? 
+
+        // these values are used when we're responding to a voice command, so are more generous
+        private static float minSignificantRelativeTimeDiffOvertakingSpotForVoiceCommand = 0f;    // as long as we're not slower we'll report
+        private static float minSignificantRelativeStartSpeedDiffOvertakingSpotForVoiceCommand = 0f;   // as long as we're not slower we'll report
+
         // these are used when we're checking time / speed difference at places where overtaking is rare, so need to be bigger 
         private static float minSignificantRelativeTimeDiff = 0.10f;    // 10% - is this a good value?
         private static float minSignificantRelativeStartSpeedDiff = 0.13f;   // 13% - is this a good value? 
+
+        // these values are used when we're responding to a voice command, so are more generous
+        private static float minSignificantRelativeTimeDiffForVoiceCommand = 0.03f;    // 3% - is this a good value?
+        private static float minSignificantRelativeStartSpeedDiffForVoiceCommand = 0.05f;   // 5% - is this a good value?
 
         private Dictionary<string, TrackLandmarksTimingData> sessionData = new Dictionary<string, TrackLandmarksTimingData>();
 
@@ -1040,7 +1053,6 @@ namespace CrewChiefV4.GameState
         private float landmarkStartTime = -1;
         private float landmarkStartSpeed = -1;
         private int landmarkStoppedCount = 0;
-        private Boolean inLandmark = false;
 
         // wonder if this'll work...
         private String nearLandmarkName = null;
@@ -1059,23 +1071,19 @@ namespace CrewChiefV4.GameState
                 sessionData[landmarkName].addTimeAndSpeeds(time, startSpeed, endSpeed);
             }
         }
-        public float[] getBestTimeAndSpeeds(String landmarkName)
-        {
-            return getBestTimeAndSpeeds(landmarkName, 5, 3);
-        }
-
+        
         // returns [timeInSection, entrySpeed, exitSpeed] for the quickest time through that section
         public float[] getBestTimeAndSpeeds(String landmarkName, int lapsToCheck, int minTimesRequired)
         {
             if (!sessionData.ContainsKey(landmarkName))
             {
-                return new float[] {- 1f, -1f, 1f };
+                return null;
             }
             float[] bestTimeAndSpeeds = new float[] { float.MaxValue, -1f, 1f };
             TrackLandmarksTimingData trackLandmarksTimingData = sessionData[landmarkName];
             if (trackLandmarksTimingData.timesAndSpeeds.Count < minTimesRequired)
             {
-                return new float[] { -1f, -1f, 1f };
+                return null;
             }
             for (int i = 0; i < lapsToCheck; i++)
             {
@@ -1089,13 +1097,13 @@ namespace CrewChiefV4.GameState
 
         // get the landmark name where I'm either much faster through the section or
         // am about as fast but have significantly higher entry speed
-        public LandmarkAndDeltaType getLandmarkWhereIAmFaster(TrackLandmarksTiming otherVehicleTrackLandMarksTiming, Boolean preferCommonOvertakingSpots)
+        public LandmarkAndDeltaType getLandmarkWhereIAmFaster(TrackLandmarksTiming otherVehicleTrackLandMarksTiming, Boolean preferCommonOvertakingSpots, Boolean forVoiceCommand)
         {
-            LandmarkDeltaContainer deltasForCommonOvertakingSpots = getLandmarksWithBiggestDeltas(otherVehicleTrackLandMarksTiming, true, preferCommonOvertakingSpots);
+            LandmarkDeltaContainer deltasForCommonOvertakingSpots = getLandmarksWithBiggestDeltas(otherVehicleTrackLandMarksTiming, true, preferCommonOvertakingSpots, forVoiceCommand);
             if (deltasForCommonOvertakingSpots.biggestStartSpeedDifferenceLandmark == null && deltasForCommonOvertakingSpots.biggestTimeDifferenceLandmark == null && preferCommonOvertakingSpots)
             {
                 // no hits for common overtaking spots so try again
-                deltasForCommonOvertakingSpots = getLandmarksWithBiggestDeltas(otherVehicleTrackLandMarksTiming, true, false);
+                deltasForCommonOvertakingSpots = getLandmarksWithBiggestDeltas(otherVehicleTrackLandMarksTiming, true, false, forVoiceCommand);
             }
             // this can contain 2 different results (one for the biggest entry speed difference, one for the biggest relative time difference)
             return deltasForCommonOvertakingSpots.selectLandmark();
@@ -1103,20 +1111,22 @@ namespace CrewChiefV4.GameState
 
         // get the landmark name where I'm either much faster through the section or
         // am about as fast but have significantly higher entry speed
-        public LandmarkAndDeltaType getLandmarkWhereIAmSlower(TrackLandmarksTiming otherVehicleTrackLandMarksTiming, Boolean preferCommonOvertakingSpots)
+        public LandmarkAndDeltaType getLandmarkWhereIAmSlower(TrackLandmarksTiming otherVehicleTrackLandMarksTiming, Boolean preferCommonOvertakingSpots, Boolean forVoiceCommand)
         {
-            LandmarkDeltaContainer deltasForCommonOvertakingSpots = getLandmarksWithBiggestDeltas(otherVehicleTrackLandMarksTiming, false, preferCommonOvertakingSpots);
+            LandmarkDeltaContainer deltasForCommonOvertakingSpots = getLandmarksWithBiggestDeltas(otherVehicleTrackLandMarksTiming, false, preferCommonOvertakingSpots, forVoiceCommand);
             if (deltasForCommonOvertakingSpots.biggestStartSpeedDifferenceLandmark == null && deltasForCommonOvertakingSpots.biggestTimeDifferenceLandmark == null && preferCommonOvertakingSpots)
             {
                 // no hits for common overtaking spots so try again
-                deltasForCommonOvertakingSpots = getLandmarksWithBiggestDeltas(otherVehicleTrackLandMarksTiming, false, false);
+                deltasForCommonOvertakingSpots = getLandmarksWithBiggestDeltas(otherVehicleTrackLandMarksTiming, false, false, forVoiceCommand);
             }
             // this can contain 2 different results (one for the biggest entry speed difference, one for the biggest relative time difference)
             return deltasForCommonOvertakingSpots.selectLandmark();
         }
 
-	private LandmarkDeltaContainer getLandmarksWithBiggestDeltas(TrackLandmarksTiming otherVehicleTrackLandMarksTiming, Boolean whereImFaster, Boolean preferCommonOvertakingSpots)
+	    private LandmarkDeltaContainer getLandmarksWithBiggestDeltas(TrackLandmarksTiming otherVehicleTrackLandMarksTiming, Boolean whereImFaster, Boolean preferCommonOvertakingSpots, Boolean forVoiceCommand)
         {
+            int lapsToCheck = 5;
+            int minTimesRequired = forVoiceCommand ? 2 : 3;
             float biggestTimeDifference = -1;
             float biggestStartSpeedDifference = -1;
             String biggestTimeDifferenceLandmark = null;
@@ -1127,35 +1137,48 @@ namespace CrewChiefV4.GameState
                 TrackLandmarksTimingData thisTiming = entry.Value;
                 if (!preferCommonOvertakingSpots || thisTiming.isCommonOvertakingSpot)
                 {
-                    float minSignificantRelativeTimeDiffToUse = thisTiming.isCommonOvertakingSpot ? minSignificantRelativeTimeDiffOvertakingSpot : minSignificantRelativeTimeDiff;
-                    float minSignificantRelativeStartSpeedDiffToUse = thisTiming.isCommonOvertakingSpot ? minSignificantRelativeStartSpeedDiffOvertakingSpot : minSignificantRelativeStartSpeedDiff;
-
-                    float[] myBestTimeAndSpeeds = getBestTimeAndSpeeds(landmarkName);
-                    float[] otherBestTimeAndSpeeds = otherVehicleTrackLandMarksTiming.getBestTimeAndSpeeds(landmarkName);
-                    // for times, other - mine if we want sections where I'm faster (more positive => better), 
-                    // or mine - other if we want sections where he's faster (more positive => worse)
-                    float relativeTimeDelta = whereImFaster ? (otherBestTimeAndSpeeds[0] - myBestTimeAndSpeeds[0]) / myBestTimeAndSpeeds[0] :
-                                                      (myBestTimeAndSpeeds[0] - otherBestTimeAndSpeeds[0]) / myBestTimeAndSpeeds[0];
-                    // for speeds, mine - other if we want sections where I'm faster (more positive => better),
-                    // or other - mine if we want sections where he's faster (more positive => worse)
-                    float relativeStartSpeedDelta = whereImFaster ? (myBestTimeAndSpeeds[1] - otherBestTimeAndSpeeds[1]) / myBestTimeAndSpeeds[1] :
-                                                            (otherBestTimeAndSpeeds[1] - myBestTimeAndSpeeds[1]) / myBestTimeAndSpeeds[1];
-                    // Console.WriteLine(landmarkName + " entry diff = " + relativeStartSpeedDelta + " through diff = " + relativeTimeDelta);
-                    if (relativeTimeDelta >= minSignificantRelativeTimeDiffToUse && relativeTimeDelta > biggestTimeDifference)
+                    float minSignificantRelativeTimeDiffToUse;
+                    float minSignificantRelativeStartSpeedDiffToUse;
+                    if (thisTiming.isCommonOvertakingSpot)
                     {
-                        // this is the biggest (so far) relative time difference
-                        biggestTimeDifference = relativeTimeDelta;
-                        biggestTimeDifferenceLandmark = landmarkName;
+                        minSignificantRelativeTimeDiffToUse = forVoiceCommand ? minSignificantRelativeTimeDiffOvertakingSpotForVoiceCommand : minSignificantRelativeTimeDiffOvertakingSpot;
+                        minSignificantRelativeStartSpeedDiffToUse = forVoiceCommand ? minSignificantRelativeStartSpeedDiffOvertakingSpotForVoiceCommand : minSignificantRelativeStartSpeedDiffOvertakingSpot;
+                    }
+                    else
+                    {
+                        minSignificantRelativeTimeDiffToUse = forVoiceCommand ? minSignificantRelativeTimeDiffForVoiceCommand : minSignificantRelativeTimeDiff;
+                        minSignificantRelativeStartSpeedDiffToUse = forVoiceCommand ? minSignificantRelativeStartSpeedDiffForVoiceCommand : minSignificantRelativeStartSpeedDiff;
                     }
 
-                    // additional check here - compare the entry speeds but only if the total speed through this section is no worse than our opponent
-                    // - there's no point in barrelling in and ballsing up the exit
-                    if (relativeStartSpeedDelta > minSignificantRelativeStartSpeedDiffToUse && relativeStartSpeedDelta > biggestStartSpeedDifference &&
-                        relativeTimeDelta > 0)
+                    float[] myBestTimeAndSpeeds = getBestTimeAndSpeeds(landmarkName, lapsToCheck, minTimesRequired);
+                    float[] otherBestTimeAndSpeeds = otherVehicleTrackLandMarksTiming.getBestTimeAndSpeeds(landmarkName, lapsToCheck, minTimesRequired);
+                    // for times, other - mine if we want sections where I'm faster (more positive => better), 
+                    // or mine - other if we want sections where he's faster (more positive => worse)
+                    if (myBestTimeAndSpeeds != null && otherBestTimeAndSpeeds != null)
                     {
-                        // this is the biggest (so far) relative speed difference
-                        biggestStartSpeedDifference = relativeStartSpeedDelta;
-                        biggestSpeedDifferenceLandmark = landmarkName;
+                        float relativeTimeDelta = whereImFaster ? (otherBestTimeAndSpeeds[0] - myBestTimeAndSpeeds[0]) / myBestTimeAndSpeeds[0] :
+                                                          (myBestTimeAndSpeeds[0] - otherBestTimeAndSpeeds[0]) / myBestTimeAndSpeeds[0];
+                        // for speeds, mine - other if we want sections where I'm faster (more positive => better),
+                        // or other - mine if we want sections where he's faster (more positive => worse)
+                        float relativeStartSpeedDelta = whereImFaster ? (myBestTimeAndSpeeds[1] - otherBestTimeAndSpeeds[1]) / myBestTimeAndSpeeds[1] :
+                                                                (otherBestTimeAndSpeeds[1] - myBestTimeAndSpeeds[1]) / myBestTimeAndSpeeds[1];
+                        // Console.WriteLine(landmarkName + " entry diff = " + relativeStartSpeedDelta + " through diff = " + relativeTimeDelta);
+                        if (relativeTimeDelta >= minSignificantRelativeTimeDiffToUse && relativeTimeDelta > biggestTimeDifference)
+                        {
+                            // this is the biggest (so far) relative time difference
+                            biggestTimeDifference = relativeTimeDelta;
+                            biggestTimeDifferenceLandmark = landmarkName;
+                        }
+
+                        // additional check here - compare the entry speeds but only if the total speed through this section is no worse than our opponent
+                        // - there's no point in barrelling in and ballsing up the exit
+                        if (relativeStartSpeedDelta > minSignificantRelativeStartSpeedDiffToUse && relativeStartSpeedDelta > biggestStartSpeedDifference &&
+                            relativeTimeDelta > 0)
+                        {
+                            // this is the biggest (so far) relative speed difference
+                            biggestStartSpeedDifference = relativeStartSpeedDelta;
+                            biggestSpeedDifferenceLandmark = landmarkName;
+                        }
                     }
                 }
             }
@@ -1196,7 +1219,6 @@ namespace CrewChiefV4.GameState
                             landmarkStartSpeed = speed;                            
                         }
                         landmarkNameStart = trackLandmark.landmarkName;
-                        inLandmark = true;
                         // don't reset the landmarkStoppedCount when we enter the landmark - do this in the proximity check below
                         break;
                     }		
@@ -1236,7 +1258,6 @@ namespace CrewChiefV4.GameState
                             landmarkNameStart = null;
                             landmarkStartTime = -1;
                             landmarkStartSpeed = -1;
-                            inLandmark = false;
                         }
                         else
                         {
@@ -1245,7 +1266,6 @@ namespace CrewChiefV4.GameState
                             landmarkNameStart = null;
                             landmarkStartTime = -1;
                             landmarkStartSpeed = -1;
-                            inLandmark = false;
                             // we've left the landmark but haven't crossed the end trigger. We could be anywhere - even in the pit (for PCars). We
                             // don't want the stopped count for this section to carry over as we might reappear in the middle of a different
                             // section, so zero the counter
@@ -1370,6 +1390,10 @@ namespace CrewChiefV4.GameState
         public Boolean OnOutLap = false;
 
         public Boolean IsMakingMandatoryPitStop = false;
+
+        // the pit window stuff isn't right here - the state can be 'completed' but then change to something
+        // else, so we need to keep track of whether we've completed a mandatory stop separately.
+        public Boolean MandatoryPitStopCompleted = false;
 
         // this is true for one tick, when the player is about to exit the pits
         public Boolean IsAtPitExit = false;

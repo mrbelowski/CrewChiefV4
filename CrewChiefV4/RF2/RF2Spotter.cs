@@ -59,15 +59,13 @@ namespace CrewChiefV4.rFactor2
             this.paused = false;
         }
 
-        private rF2VehScoringInfo getVehicleInfo(rF2State shared)
+        private rF2VehicleScoring getVehicleInfo(CrewChiefV4.rFactor2.RF2SharedMemoryReader.RF2StructWrapper shared)
         {
-            for (int i = 0; i < shared.mNumVehicles; ++i)
+            for (int i = 0; i < shared.scoring.mScoringInfo.mNumVehicles; ++i)
             {
-                var vehicle = shared.mVehicles[i];
+                var vehicle = shared.scoring.mVehicles[i];
                 if (vehicle.mIsPlayer == 1)
-                {
                     return vehicle;
-                }
             }
             throw new Exception("no vehicle for player!");
         }
@@ -75,28 +73,32 @@ namespace CrewChiefV4.rFactor2
         public void trigger(Object lastStateObj, Object currentStateObj, GameStateData currentGameState)
         {
             if (this.paused)
-            {
                 return;
-            }
 
-            var lastState = ((CrewChiefV4.rFactor2.RF2SharedMemoryReader.RF2StructWrapper)lastStateObj).state;
-            var currentState = ((CrewChiefV4.rFactor2.RF2SharedMemoryReader.RF2StructWrapper)currentStateObj).state;
-            
+            var lastState = lastStateObj as CrewChiefV4.rFactor2.RF2SharedMemoryReader.RF2StructWrapper;
+            var currentState = currentStateObj as CrewChiefV4.rFactor2.RF2SharedMemoryReader.RF2StructWrapper;
+
             if (!this.enabled 
-                || currentState.mCurrentET < this.timeAfterRaceStartToActivate
-                || currentState.mInRealtimeFC == 0
-                || lastState.mInRealtimeFC == 0
-                || currentState.mNumVehicles <= 2)
+                || currentState.scoring.mScoringInfo.mCurrentET < this.timeAfterRaceStartToActivate
+                || currentState.extended.mInRealtimeFC == 0
+                || currentState.scoring.mScoringInfo.mInRealtime == 0
+                || currentState.scoring.mScoringInfo.mNumVehicles <= 2
+                || lastState.extended.mInRealtimeFC == 0
+                || lastState.scoring.mScoringInfo.mInRealtime == 0)
+                return;
+
+            // turn off spotter for formation lap before going green
+            if (currentState.scoring.mScoringInfo.mGamePhase == (int)rFactor2Constants.rF2GamePhase.Formation)
                 return;
 
             var now = DateTime.Now;
-            rF2VehScoringInfo currentPlayerData;
-            rF2VehScoringInfo previousPlayerData;
+            rF2VehicleScoring currentPlayerScoring;
+            rF2VehicleScoring previousPlayerScoring;
             float timeDiffSeconds;
             try
             {
-                currentPlayerData = getVehicleInfo(currentState);
-                previousPlayerData = getVehicleInfo(lastState);
+                currentPlayerScoring = getVehicleInfo(currentState);
+                previousPlayerScoring = getVehicleInfo(lastState);
                 timeDiffSeconds = ((float)(now - this.previousTime).TotalMilliseconds) / 1000.0f;
                 this.previousTime = now;
 
@@ -111,6 +113,15 @@ namespace CrewChiefV4.rFactor2
                 return;
             }
 
+            if (currentPlayerScoring.mInPits != 0  // No spotter in pits.
+#if !DEBUG  // In release, disable spotter for AI
+                 || currentPlayerScoring.mControl != (int)rFactor2Constants.rF2Control.Player
+#endif
+            )
+            {
+                return;
+            }
+
             if (currentGameState != null)
             {
                 var carClass = currentGameState.carClass;
@@ -121,46 +132,85 @@ namespace CrewChiefV4.rFactor2
                 }
             }
 
-            var currentPlayerPosition = new float[] { (float) currentPlayerData.mPos.x, (float) currentPlayerData.mPos.z };
+            var idsToTelIndicesMap = RF2GameStateMapper.getIdsToTelIndicesMap(ref currentState.telemetry);
 
-            if (currentPlayerData.mInPits == 0
-                && currentPlayerData.mControl == (int)rFactor2Constants.rF2Control.Player
-                && !(currentState.mGamePhase == (int)rFactor2Constants.rF2GamePhase.Formation))  // turn off spotter for formation lap before going green
+            // Initialize current player information.
+            float[] currentPlayerPosition = null;
+            float currentPlayerSpeed = -1.0f;
+            float playerRotation = 0.0f;
+
+            int playerTelIdx = -1;
+            if (idsToTelIndicesMap.TryGetValue(currentPlayerScoring.mID, out playerTelIdx))
             {
-                var currentOpponentPositions = new List<float[]>();
-                var playerVelocityData = new float[3];
-                playerVelocityData[0] = (float)currentState.mSpeed;
-                playerVelocityData[1] = ((float)currentPlayerData.mPos.x - (float)previousPlayerData.mPos.x) / timeDiffSeconds;
-                playerVelocityData[2] = ((float)currentPlayerData.mPos.z - (float)previousPlayerData.mPos.z) / timeDiffSeconds;
+                var currentPlayerTelemetry = currentState.telemetry.mVehicles[playerTelIdx];
 
-                for (int i = 0; i < currentState.mNumVehicles; ++i)
-                {
-                    var vehicle = currentState.mVehicles[i];
-                    if (vehicle.mIsPlayer == 1 || vehicle.mInPits == 1 || vehicle.mLapDist < 0.0f)
-                        continue;
+                currentPlayerPosition = new float[] { (float)currentPlayerTelemetry.mPos.x, (float)currentPlayerTelemetry.mPos.z };
+                currentPlayerSpeed = (float)Math.Sqrt((currentPlayerTelemetry.mLocalVel.x * currentPlayerTelemetry.mLocalVel.x)
+                    + (currentPlayerTelemetry.mLocalVel.y * currentPlayerTelemetry.mLocalVel.y)
+                    + (currentPlayerTelemetry.mLocalVel.z * currentPlayerTelemetry.mLocalVel.z));
 
-                    currentOpponentPositions.Add(new float[] { (float)vehicle.mPos.x, (float)vehicle.mPos.z });
-                }
-
-                float playerRotation = (float)(Math.Atan2((double)(currentState.mOri[rFactor2Constants.RowZ].x), (double)(currentState.mOri[rFactor2Constants.RowZ].z)));
-                if (playerRotation < 0)
-                    playerRotation = (float)(2 * Math.PI) + playerRotation;
-
-                this.internalSpotter.triggerInternal(playerRotation, currentPlayerPosition, playerVelocityData, currentOpponentPositions);
+                playerRotation = (float)(Math.Atan2(currentPlayerTelemetry.mOri[rFactor2Constants.RowZ].x, currentPlayerTelemetry.mOri[rFactor2Constants.RowZ].z));
             }
+            else
+            {
+                // Telemetry is not available, fall back to scoring info.  This is corner case, should not happen often.
+                currentPlayerPosition = new float[] { (float)currentPlayerScoring.mPos.x, (float)currentPlayerScoring.mPos.z };
+                currentPlayerSpeed = (float)Math.Sqrt((currentPlayerScoring.mLocalVel.x * currentPlayerScoring.mLocalVel.x)
+                    + (currentPlayerScoring.mLocalVel.y * currentPlayerScoring.mLocalVel.y)
+                    + (currentPlayerScoring.mLocalVel.z * currentPlayerScoring.mLocalVel.z));
+
+                playerRotation = (float)(Math.Atan2(currentPlayerScoring.mOri[rFactor2Constants.RowZ].x, currentPlayerScoring.mOri[rFactor2Constants.RowZ].z));
+            }
+
+            if (playerRotation < 0.0f)
+                playerRotation = (float)(2.0f * Math.PI) + playerRotation;
+
+            // Find position data for previous player vehicle.  Default to scoring pos, but use telemetry if available (corner case, should not happen often).
+            var previousPlayerPosition = new float[] { (float)previousPlayerScoring.mPos.x, (float)previousPlayerScoring.mPos.z };
+            for (int i = 0; i < lastState.telemetry.mNumVehicles; ++i)
+            {
+                if (previousPlayerScoring.mID == lastState.telemetry.mVehicles[i].mID)
+                {
+                    previousPlayerPosition = new float[] { (float)lastState.telemetry.mVehicles[i].mPos.x, (float)lastState.telemetry.mVehicles[i].mPos.z };
+                    break;
+                }
+            }
+
+            var playerVelocityData = new float[] {
+                currentPlayerSpeed,
+                (currentPlayerPosition[0] - previousPlayerPosition[0]) / timeDiffSeconds,
+                (currentPlayerPosition[1] - previousPlayerPosition[1]) / timeDiffSeconds };
+
+            var currentOpponentPositions = new List<float[]>();
+            for (int i = 0; i < currentState.scoring.mScoringInfo.mNumVehicles; ++i)
+            {
+                var vehicle = currentState.scoring.mVehicles[i];
+                if (vehicle.mIsPlayer == 1 || vehicle.mInPits == 1 || vehicle.mLapDist < 0.0f)
+                    continue;
+
+                int opponentTelIdx = -1;
+                if (idsToTelIndicesMap.TryGetValue(vehicle.mID, out opponentTelIdx))
+                {
+                    var opponentTelemetry = currentState.telemetry.mVehicles[opponentTelIdx];
+                    currentOpponentPositions.Add(new float[] { (float)opponentTelemetry.mPos.x, (float)opponentTelemetry.mPos.z });
+                }
+                else
+                    currentOpponentPositions.Add(new float[] { (float)vehicle.mPos.x, (float)vehicle.mPos.z });  // Use scoring if telemetry isn't available.
+            }
+
+            this.internalSpotter.triggerInternal(playerRotation, currentPlayerPosition, playerVelocityData, currentOpponentPositions);
         }
 
         public void enableSpotter()
         {
             this.enabled = true;
-            audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderEnableSpotter, 0, null));
-            
+            this.audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderEnableSpotter, 0, null));
         }
 
         public void disableSpotter()
         {
             this.enabled = false;
-            audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderDisableSpotter, 0, null));
+            this.audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderDisableSpotter, 0, null));
         }
     }
 }

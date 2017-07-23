@@ -67,7 +67,7 @@ namespace CrewChiefV4.Events
                 int index = 0;
                 foreach (OpponentData driverToTest in driversToTest)
                 {
-                    if (SoundCache.sortedAvailableDriverNames.BinarySearch(DriverNameHelper.getUsableDriverName(driverToTest.DriverRawName)) >= 0)
+                    if (SoundCache.availableDriverNames.Contains(DriverNameHelper.getUsableDriverName(driverToTest.DriverRawName)))
                     {
                         audioPlayer.playMessage(new QueuedMessage("gap_in_front" + index,
                                         MessageContents(Timings.folderTheGapTo, driverToTest, Timings.folderAheadIsIncreasing,
@@ -87,7 +87,7 @@ namespace CrewChiefV4.Events
             }
         }
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
-        {
+        {            
             //audioPlayer.playMessage(new QueuedMessage("sectortest1", LapTimes.getSectorDeltaMessages(LapTimes.SectorReportOption.ALL, 20.5f, 20, 33, 34.1f, 10, 10.1f, true), 0, this));
 
             /*for (int i = 0; i < 5; i++)

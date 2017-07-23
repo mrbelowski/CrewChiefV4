@@ -717,7 +717,7 @@ namespace CrewChiefV4.Events
                     audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderStandBy, 0, null));
                     int secondsDelay = Math.Max(5, random.Next(11));
                     audioPlayer.pauseQueue(secondsDelay);
-                    audioPlayer.playMessage(new QueuedMessage("tyre_condition", messageContents, secondsDelay, null));
+                    audioPlayer.playDelayedImmediateMessage(new QueuedMessage("tyre_condition", messageContents, secondsDelay, null));
                 }
                 else
                 {

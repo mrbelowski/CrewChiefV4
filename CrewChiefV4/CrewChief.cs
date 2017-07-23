@@ -73,7 +73,8 @@ namespace CrewChiefV4
 
         private GameDataReader gameDataReader;
 
-        public GameStateData currentGameState = null;
+        // hmm....
+        public static GameStateData currentGameState = null;
 
         public GameStateData previousGameState = null;
 
@@ -84,7 +85,7 @@ namespace CrewChiefV4
         public CrewChief()
         {
             speechRecogniser = new SpeechRecogniser(this);
-            audioPlayer = new AudioPlayer(this);
+            audioPlayer = new AudioPlayer();
             audioPlayer.initialise();
             eventsList.Add("Timings", new Timings(audioPlayer));
             eventsList.Add("Position", new Position(audioPlayer));
@@ -377,7 +378,7 @@ namespace CrewChiefV4
             gameDataReader = GameStateReaderFactory.getInstance().getGameStateReader(gameDefinition);
             gameDataReader.ResetGameDataFromFile();
 
-            gameDataReader.dumpToFile = System.Diagnostics.Debugger.IsAttached && dumpToFile;
+            gameDataReader.dumpToFile = dumpToFile;
             if (gameDefinition.spotterName != null)
             {
                 spotter = (Spotter)Activator.CreateInstance(Type.GetType(gameDefinition.spotterName),
@@ -418,7 +419,7 @@ namespace CrewChiefV4
                         {
                             nextProcessStateCheck = now.Add(
                                 TimeSpan.FromMilliseconds(isGameProcessRunning ? timeBetweenProcDisconnectCheckMillis : timeBetweenProcConnectCheckMillis));
-                            isGameProcessRunning = Utilities.IsGameRunning(gameDefinition.processName);
+                            isGameProcessRunning = Utilities.IsGameRunning(gameDefinition.processName, gameDefinition.alternativeProcessNames);
                         }
 
                         if (gameDefinition.processName == null || isGameProcessRunning)
@@ -518,6 +519,9 @@ namespace CrewChiefV4
                                     faultingEvents.Clear();
                                     faultingEventsCount.Clear();
                                     stateCleared = true;
+                                    PCarsGameStateMapper.FIRST_VIEWED_PARTICIPANT_NAME = null;
+                                    PCarsGameStateMapper.WARNED_ABOUT_MISSING_STEAM_ID = false;
+                                    PCarsGameStateMapper.FIRST_VIEWED_PARTICIPANT_INDEX = -1;
                                 }
                                 if (enableDriverNames)
                                 {

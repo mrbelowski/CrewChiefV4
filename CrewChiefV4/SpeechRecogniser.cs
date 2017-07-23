@@ -41,6 +41,7 @@ namespace CrewChiefV4
         public static String[] WHATS_THE_FASTEST_LAP_TIME = Configuration.getSpeechRecognitionPhrases("WHATS_THE_FASTEST_LAP_TIME");
         public static String[] WHATS_MY_POSITION = Configuration.getSpeechRecognitionPhrases("WHATS_MY_POSITION");
         public static String[] WHATS_MY_FUEL_LEVEL = Configuration.getSpeechRecognitionPhrases("WHATS_MY_FUEL_LEVEL");
+        public static String[] WHATS_MY_FUEL_USAGE = Configuration.getSpeechRecognitionPhrases("WHATS_MY_FUEL_USAGE");
 
         public static String[] KEEP_QUIET = Configuration.getSpeechRecognitionPhrases("KEEP_QUIET");
         public static String[] KEEP_ME_INFORMED = Configuration.getSpeechRecognitionPhrases("KEEP_ME_INFORMED");
@@ -55,6 +56,9 @@ namespace CrewChiefV4
         public static String[] WHOS_IN_FRONT_ON_TRACK = Configuration.getSpeechRecognitionPhrases("WHOS_IN_FRONT_ON_TRACK");
         public static String[] WHOS_BEHIND_ON_TRACK = Configuration.getSpeechRecognitionPhrases("WHOS_BEHIND_ON_TRACK");
         public static String[] WHOS_LEADING = Configuration.getSpeechRecognitionPhrases("WHOS_LEADING");
+
+        public static String[] WHERE_AM_I_FASTER = Configuration.getSpeechRecognitionPhrases("WHERE_AM_I_FASTER");
+        public static String[] WHERE_AM_I_SLOWER = Configuration.getSpeechRecognitionPhrases("WHERE_AM_I_SLOWER");
 
         public static String[] HOW_LONGS_LEFT = Configuration.getSpeechRecognitionPhrases("HOW_LONGS_LEFT");
         public static String[] SPOT = Configuration.getSpeechRecognitionPhrases("SPOT");
@@ -243,6 +247,7 @@ namespace CrewChiefV4
                 validateAndAdd(WHATS_MY_BEST_LAP_TIME, staticSpeechChoices);
                 validateAndAdd(WHATS_MY_POSITION, staticSpeechChoices);
                 validateAndAdd(WHATS_MY_FUEL_LEVEL, staticSpeechChoices);
+                validateAndAdd(WHATS_MY_FUEL_USAGE, staticSpeechChoices);
 
                 validateAndAdd(KEEP_QUIET, staticSpeechChoices);
                 validateAndAdd(KEEP_ME_INFORMED, staticSpeechChoices);
@@ -251,6 +256,9 @@ namespace CrewChiefV4
                 validateAndAdd(WHATS_THE_FASTEST_LAP_TIME, staticSpeechChoices);
                 validateAndAdd(ENABLE_YELLOW_FLAG_MESSAGES, staticSpeechChoices);
                 validateAndAdd(DISABLE_YELLOW_FLAG_MESSAGES, staticSpeechChoices);
+
+                validateAndAdd(WHERE_AM_I_FASTER, staticSpeechChoices);
+                validateAndAdd(WHERE_AM_I_SLOWER, staticSpeechChoices);
 
                 validateAndAdd(HOW_LONGS_LEFT, staticSpeechChoices);
                 validateAndAdd(WHATS_THE_TIME, staticSpeechChoices);
@@ -540,12 +548,16 @@ namespace CrewChiefV4
             {
                 crewChief.disableKeepQuietMode();
             }
-            else if (ResultContains(recognisedSpeech, WHATS_MY_FUEL_LEVEL) || ResultContains(recognisedSpeech, HOWS_MY_FUEL))
+            else if (ResultContains(recognisedSpeech, WHATS_MY_FUEL_LEVEL) 
+                || ResultContains(recognisedSpeech, HOWS_MY_FUEL)
+                || ResultContains(recognisedSpeech, WHATS_MY_FUEL_USAGE))
             {
                 return CrewChief.getEvent("Fuel");
             }
             else if (ResultContains(recognisedSpeech, WHATS_MY_GAP_IN_FRONT) ||
-                ResultContains(recognisedSpeech, WHATS_MY_GAP_BEHIND))
+                ResultContains(recognisedSpeech, WHATS_MY_GAP_BEHIND) ||
+                ResultContains(recognisedSpeech, WHERE_AM_I_FASTER) ||
+                ResultContains(recognisedSpeech, WHERE_AM_I_SLOWER))
             {
                 return CrewChief.getEvent("Timings");
             }

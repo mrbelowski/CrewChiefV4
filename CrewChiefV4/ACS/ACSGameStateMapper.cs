@@ -1122,7 +1122,7 @@ namespace CrewChiefV4.assetto
                 currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass = -1;
                 currentGameState.SessionData.OverallSessionBestLapTime = -1;
                 currentGameState.SessionData.PlayerClassSessionBestLapTime = -1;
-                TrackDataContainer tdc = TrackData.TRACK_LANDMARKS_DATA.getTrackDataForTrackName(currentGameState.SessionData.TrackDefinition.name);
+                TrackDataContainer tdc = TrackData.TRACK_LANDMARKS_DATA.getTrackDataForTrackName(currentGameState.SessionData.TrackDefinition.name, shared.acsStatic.trackSPlineLength);
                 currentGameState.SessionData.TrackDefinition.trackLandmarks = tdc.trackLandmarks;
                 currentGameState.SessionData.TrackDefinition.isOval = tdc.isOval;
                 currentGameState.SessionData.TrackDefinition.setGapPoints();
@@ -1161,7 +1161,7 @@ namespace CrewChiefV4.assetto
                         {
                             currentGameState.SessionData.TrackDefinition.setSectorPointsForUnknownTracks();
                         }
-                        TrackDataContainer tdc = TrackData.TRACK_LANDMARKS_DATA.getTrackDataForTrackName(currentGameState.SessionData.TrackDefinition.name);
+                        TrackDataContainer tdc = TrackData.TRACK_LANDMARKS_DATA.getTrackDataForTrackName(currentGameState.SessionData.TrackDefinition.name, shared.acsStatic.trackSPlineLength);
                         currentGameState.SessionData.TrackDefinition.trackLandmarks = tdc.trackLandmarks;
                         currentGameState.SessionData.TrackDefinition.isOval = tdc.isOval;                        
                         currentGameState.SessionData.TrackDefinition.setGapPoints();
@@ -1796,7 +1796,10 @@ namespace CrewChiefV4.assetto
             }
 
             currentGameState.PitData.IsMakingMandatoryPitStop = (currentGameState.PitData.PitWindow == PitWindow.StopInProgress);
-
+            if (previousGameState != null)
+            {
+                currentGameState.PitData.MandatoryPitStopCompleted = previousGameState.PitData.MandatoryPitStopCompleted || shared.acsGraphic.MandatoryPitDone == 1;
+            }
 
             //damage data
             if (shared.acsChief.isInternalMemoryModuleLoaded == 1)

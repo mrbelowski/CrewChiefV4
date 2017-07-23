@@ -32,12 +32,14 @@ namespace CrewChiefV4
         public String[] acTrackNames { get; set; }
         public String pcarsTrackName { get; set; }
         public int raceroomLayoutId { get; set; }
+        public float approximateTrackLength { get; set; }   // this is optional and used to differentiate duplicated names
         public List<TrackLandmark> trackLandmarks { get; set; }
         public Boolean isOval { get; set; }
         public TrackLandmarksForTrack()
         {
             this.trackLandmarks = new List<TrackLandmark>();
             this.raceroomLayoutId = -1;
+            approximateTrackLength = -1;
         }
     }
 
@@ -60,7 +62,20 @@ namespace CrewChiefV4
             this.trackLandmarksData = new List<TrackLandmarksForTrack>();
         }
 
-        public TrackDataContainer getTrackDataForTrackName(String trackName)
+        public Boolean checkForAndMatchOnLength(float lengthFromGame, float approximateLengthFromJSON)
+        {
+            if (lengthFromGame == -1 || approximateLengthFromJSON == -1)
+            {
+                return true;
+            }
+            else
+            {
+                // if an approximate length is specified in the JSON, check that the length from the game is close to this
+                return Math.Abs(lengthFromGame - approximateLengthFromJSON) < 50;
+            }
+        }
+
+        public TrackDataContainer getTrackDataForTrackName(String trackName, float lengthFromGame)
         {
             foreach (TrackLandmarksForTrack trackLandmarksForTrack in trackLandmarksData)
             {
@@ -72,7 +87,8 @@ namespace CrewChiefV4
                         {
                             foreach (String acTrackName in trackLandmarksForTrack.acTrackNames)
                             {
-                                if (String.Equals(acTrackName, trackName, StringComparison.OrdinalIgnoreCase))
+                                if (String.Equals(acTrackName, trackName, StringComparison.OrdinalIgnoreCase)
+                                    && checkForAndMatchOnLength(lengthFromGame, trackLandmarksForTrack.approximateTrackLength))
                                 {
                                     Console.WriteLine(trackLandmarksForTrack.trackLandmarks.Count + " landmarks defined for this track");
                                     return new TrackDataContainer(trackLandmarksForTrack.trackLandmarks, trackLandmarksForTrack.isOval);
@@ -94,7 +110,8 @@ namespace CrewChiefV4
                         {
                             foreach (String rf1TrackName in trackLandmarksForTrack.rf1TrackNames)
                             {
-                                if (String.Equals(rf1TrackName, trackName, StringComparison.OrdinalIgnoreCase))
+                                if (String.Equals(rf1TrackName, trackName, StringComparison.OrdinalIgnoreCase)
+                                    && checkForAndMatchOnLength(lengthFromGame, trackLandmarksForTrack.approximateTrackLength))
                                 {
                                     Console.WriteLine(trackLandmarksForTrack.trackLandmarks.Count + " landmarks defined for this track");
                                     return new TrackDataContainer(trackLandmarksForTrack.trackLandmarks, trackLandmarksForTrack.isOval);
@@ -107,7 +124,8 @@ namespace CrewChiefV4
                         {
                             foreach (String rf2TrackName in trackLandmarksForTrack.rf2TrackNames)
                             {
-                                if (String.Equals(rf2TrackName, trackName, StringComparison.OrdinalIgnoreCase))
+                                if (String.Equals(rf2TrackName, trackName, StringComparison.OrdinalIgnoreCase)
+                                    && checkForAndMatchOnLength(lengthFromGame, trackLandmarksForTrack.approximateTrackLength))
                                 {
                                     Console.WriteLine(trackLandmarksForTrack.trackLandmarks.Count + " landmarks defined for this track");
                                     return new TrackDataContainer(trackLandmarksForTrack.trackLandmarks, trackLandmarksForTrack.isOval);

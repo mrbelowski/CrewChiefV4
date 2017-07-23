@@ -26,16 +26,42 @@ namespace CrewChiefV4
 
         public abstract void ResetGameDataFromFile();
 
-        protected String dataFilesPath = Path.Combine(Path.GetDirectoryName(
-                                            System.Reflection.Assembly.GetEntryAssembly().Location), @"..\", @"..\dataFiles\");
+        protected String dataFilesPath;
+
+        public GameDataReader()
+        {
+            if (System.Diagnostics.Debugger.IsAttached)
+            {
+                dataFilesPath = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location), @"..\", @"..\dataFiles\");
+            }
+            else
+            {
+                dataFilesPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "CrewChiefV4", "debugLogs");
+                try
+                {
+                    System.IO.Directory.CreateDirectory(dataFilesPath);
+                }
+                catch (Exception)
+                {
+                    Console.WriteLine("Unable to create folder for data file, no session record will be available");
+                    dataFilesPath = null;
+                }
+            }
+        }
 
         public Boolean Initialise()
         {
+            Console.WriteLine("initialising");
             Boolean initialised = InitialiseInternal();
+            if (dataFilesPath == null)
+            {
+                // We can't dump to file if there's no valid path.
+                dumpToFile = false;
+            }
             if (initialised && dumpToFile)
             {
-                Console.WriteLine("initialising");
-                filenameToDump = dataFilesPath + "recording_" + DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss") + ".xml";
+                filenameToDump = dataFilesPath + "\\recording_" + DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss") + ".xml";
+                Console.WriteLine("session recording will be dumped to file: " + filenameToDump);
             }
             return initialised;
         }
@@ -53,6 +79,7 @@ namespace CrewChiefV4
                     serializer.Serialize(fileStream, serializableObject);
                 }
                 Console.WriteLine("Done writing session data log to: " + fileName);
+                Console.WriteLine("PLEASE RESTART THE APPLICATION BEFORE ATTEMPTING TO RECORD ANOTHER SESSION");
             }
             catch (Exception ex)
             {
