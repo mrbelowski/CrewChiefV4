@@ -16,9 +16,9 @@ namespace CrewChiefV4
         System.Windows.Forms.Form parent;
 
         private Timer searchTimer;
-        private const string DEFAULT_SEARCH_TEXT = "Search for property (Ctrl+E)";
-        private readonly TimeSpan AUTO_SEARCH_DELAY_SPAN = TimeSpan.FromMilliseconds(500);
-        private string searchTextPrev = DEFAULT_SEARCH_TEXT;
+        private readonly string DEFAULT_SEARCH_TEXT = Configuration.getUIString("search_box_default_text");
+        private readonly TimeSpan AUTO_SEARCH_DELAY_SPAN = TimeSpan.FromMilliseconds(700);
+        private string searchTextPrev = null;
         private DateTime nextPrefsRefreshAttemptTime = DateTime.MinValue;
         private Label noMatchedLabel = new Label() { Text = "No matches." };
 
@@ -96,6 +96,7 @@ namespace CrewChiefV4
             pad(widgetCount);
             widgetCount = 0;
 
+            this.searchTextPrev = DEFAULT_SEARCH_TEXT;
             this.textBox1.Text = DEFAULT_SEARCH_TEXT;
             this.textBox1.ForeColor = Color.Gray;
             this.textBox1.GotFocus += TextBox1_GotFocus;
@@ -230,12 +231,12 @@ namespace CrewChiefV4
 
             if (text != this.searchTextPrev)
             {
-                // This is the case on entering the text box
+                // This is the case of clearing previously non-empty search
                 if (string.IsNullOrWhiteSpace(text) && this.searchTextPrev != DEFAULT_SEARCH_TEXT)
-                    this.PopulatePrefsFiltered(text);
+                    this.PopulatePrefsFiltered("");  // Clear filter out.
                 // General case, new filter.
                 else if (!string.IsNullOrWhiteSpace(text))
-                    this.PopulatePrefsFiltered(text);
+                    this.PopulatePrefsFiltered(text);  // Apply new filter.
 
                 this.searchTextPrev = text;
             }
@@ -297,12 +298,13 @@ namespace CrewChiefV4
             this.flowLayoutPanel1.SuspendLayout();
 
             bool anyHits = false;
+            var filterUpper = string.IsNullOrWhiteSpace(filter) ? filter : filter.ToUpperInvariant();
             foreach (var ctrl in this.flowLayoutPanel1.Controls)
             {
                 if (ctrl is StringPropertyControl)
                 {
                     var spc = ctrl as StringPropertyControl;
-                    if (string.IsNullOrWhiteSpace(filter) || spc.label.ToUpperInvariant().Contains(filter.ToUpperInvariant()))
+                    if (string.IsNullOrWhiteSpace(filterUpper) || spc.label.ToUpperInvariant().Contains(filterUpper))
                     {
                         spc.Visible = true;
                         anyHits = true;
@@ -313,7 +315,7 @@ namespace CrewChiefV4
                 else if (ctrl is BooleanPropertyControl)
                 {
                     var bpc = ctrl as BooleanPropertyControl;
-                    if (string.IsNullOrWhiteSpace(filter) || bpc.label.ToUpperInvariant().Contains(filter.ToUpperInvariant()))
+                    if (string.IsNullOrWhiteSpace(filterUpper) || bpc.label.ToUpperInvariant().Contains(filterUpper))
                     {
                         bpc.Visible = true;
                         anyHits = true;
@@ -324,7 +326,7 @@ namespace CrewChiefV4
                 else if (ctrl is IntPropertyControl)
                 {
                     var ipc = ctrl as IntPropertyControl;
-                    if (string.IsNullOrWhiteSpace(filter) || ipc.label.ToUpperInvariant().Contains(filter.ToUpperInvariant()))
+                    if (string.IsNullOrWhiteSpace(filterUpper) || ipc.label.ToUpperInvariant().Contains(filterUpper))
                     {
                         ipc.Visible = true;
                         anyHits = true;
@@ -335,7 +337,7 @@ namespace CrewChiefV4
                 else if (ctrl is FloatPropertyControl)
                 {
                     var fpc = ctrl as FloatPropertyControl;
-                    if (string.IsNullOrWhiteSpace(filter) || fpc.label.ToUpperInvariant().Contains(filter.ToUpperInvariant()))
+                    if (string.IsNullOrWhiteSpace(filterUpper) || fpc.label.ToUpperInvariant().Contains(filterUpper))
                     {
                         fpc.Visible = true;
                         anyHits = true;
@@ -346,7 +348,7 @@ namespace CrewChiefV4
                 else if (ctrl is Spacer)
                 {
                     var s = ctrl as Spacer;
-                    if (string.IsNullOrWhiteSpace(filter))
+                    if (string.IsNullOrWhiteSpace(filterUpper))
                         s.Visible = true;
                     else
                         s.Visible = false;

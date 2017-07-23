@@ -1,4 +1,6 @@
-﻿namespace CrewChiefV4
+﻿using System;
+
+namespace CrewChiefV4
 {
     partial class PropertiesForm
     {
@@ -51,7 +53,7 @@
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(159, 40);
             this.button1.TabIndex = 1;
-            this.button1.Text = "save_and_restart";
+            this.button1.Text = Configuration.getUIString("save_and_restart");
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
@@ -68,12 +70,18 @@
             // 
             // textBox1
             // 
+            var tooltip = Configuration.getUIString("search_box_tooltip_line1") + Environment.NewLine
+                + Configuration.getUIString("search_box_tooltip_line2") + Environment.NewLine
+                + Configuration.getUIString("search_box_tooltip_line4") + Environment.NewLine
+                + Configuration.getUIString("search_box_tooltip_line5") + Environment.NewLine
+                + Configuration.getUIString("search_box_tooltip_line6") + Environment.NewLine
+                + Configuration.getUIString("search_box_tooltip_line7") + Environment.NewLine;
             this.textBox1.Location = new System.Drawing.Point(780, 3);
             this.textBox1.Margin = new System.Windows.Forms.Padding(0, 3, 3, 3);
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(189, 20);
             this.textBox1.TabIndex = 11;
-            this.searchBoxTooltip.SetToolTip(this.textBox1, resources.GetString("textBox1.ToolTip"));
+            this.searchBoxTooltip.SetToolTip(this.textBox1, tooltip);
             this.textBox1.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
             // 
             // tableLayoutPanel1
@@ -118,7 +126,7 @@
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(159, 40);
             this.button2.TabIndex = 2;
-            this.button2.Text = "Exit without Saving";
+            this.button2.Text = Configuration.getUIString("exit_without_saving");
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
@@ -129,7 +137,7 @@
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(162, 40);
             this.button3.TabIndex = 3;
-            this.button3.Text = "Restore Default Settings";
+            this.button3.Text = Configuration.getUIString("restore_default_settings");
             this.button3.UseVisualStyleBackColor = true;
             this.button3.Click += new System.EventHandler(this.button3_Click);
             // 
@@ -163,7 +171,7 @@
             this.ClientSize = new System.Drawing.Size(975, 703);
             this.Controls.Add(this.tableLayoutPanel1);
             this.Name = "PropertiesForm";
-            this.Text = "properties_form";
+            this.Text = Configuration.getUIString("properties_form");
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.properties_FormClosing);
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.PerformLayout();

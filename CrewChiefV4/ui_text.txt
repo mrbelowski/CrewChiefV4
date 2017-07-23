@@ -257,3 +257,16 @@ donate_link_text = Donate to Support Crew Chief development
 use_american_terms_help = Assume unknown cars use American phrasing ("pace car", "white flag" for last lap etc)
 realistic_mode_help = Tailor available message types to the car and track in use (experimental)
 always_report_time_in_hundredths_help = Always report laptimes and gaps to hundredths of a second
+
+properties_form = Crew Chief Configuration Properties
+exit_without_saving = Exit without Saving
+restore_default_settings = Restore Default Settings
+
+search_box_default_text = Search for property (Ctrl+E)
+search_box_tooltip_line1 = Hint:
+search_box_tooltip_line2 = acs_ - for Assetto Corsa specific preferences
+search_box_tooltip_line3 = ams_ - for Automobilista specific preferences
+search_box_tooltip_line4 = r3e_ - for Raceroom specific preferences
+search_box_tooltip_line5 = rf1_ - for rFactor 1 specific preferences
+search_box_tooltip_line6 = rf2_ - for rFactor 2 specific preferences
+search_box_tooltip_line7 = pcars_ - for Project CARS specific preferences
