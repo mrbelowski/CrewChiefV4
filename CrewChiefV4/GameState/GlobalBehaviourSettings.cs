@@ -15,6 +15,9 @@ namespace CrewChiefV4.GameState
      * modern expensive cars are bristling with telemetry devices and send huge amounts of data back to the overworked
      * Chief who'll pass on lots of info. Shitty old bangers have no telemetry and the Chief is generally too busy having
      * a fag to report what little data he has, so the richness of the data provided is car class dependent.
+     * realisticMode also controls if useHundredths is pulled from car class. For most modern stuff this will be true,
+     * for (much) older stuff it'll be false. It's supposed to reflect the accuracy of timing data available to driver
+     * of whatever car you're in.
      *
      * The useOvalLogic flag is pulled from the track definition - enabling it means we only care about right side
      * tyre temps and don't care about brake temps, and will have a spotter enabled by default. And possibly other things.
@@ -22,8 +25,6 @@ namespace CrewChiefV4.GameState
      * The useAmericanTerms is separate from useOvalLogic and is taken from the car class. It's for NASCAR and Indycar
      * and enables American announcements like "pace car" instead of "safety car", and white flag being the last lap.
      *
-     * useHundredths is pulled from car class. For most modern stuff this will be true, for (much) older stuff it'll be false.
-     * It's supposed to reflect the accuracy of timing data available to drivers of whatever car you're in.
      *
      * The spotterEnabled flag starts out as whatever the use has set it to in properties screen. This is the initial
      * state of the spotter and it can be enabled (or disabled) at any time via a button or voice command. In realisticMode
@@ -51,7 +52,7 @@ namespace CrewChiefV4.GameState
         public static void UpdateFromCarClass(CarData.CarClass carClass) 
         {
             useAmericanTerms = carClass.useAmericanTerms;
-            useHundredths = carClass.timesInHundredths || alwaysUseHundredths;
+            useHundredths = (realisticMode && carClass.timesInHundredths) || alwaysUseHundredths;
             enabledMessageTypes.Clear();            
             if (realisticMode && carClass.enabledMessageTypes != null && carClass.enabledMessageTypes.Length > 0)
             {

@@ -475,8 +475,28 @@ namespace CrewChiefV4
             this.app_version.Text = Configuration.getUIString("version") + ": " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
             this.filenameLabel.Visible = System.Diagnostics.Debugger.IsAttached;
             this.filenameTextbox.Visible = System.Diagnostics.Debugger.IsAttached;
-            this.recordSession.Visible = System.Diagnostics.Debugger.IsAttached;
-            this.playbackInterval.Visible = System.Diagnostics.Debugger.IsAttached;
+            if (System.Diagnostics.Debugger.IsAttached)
+            {
+                this.recordSession.Visible = true;
+            }
+            else
+            {
+                this.recordSession.Visible = false;
+                String[] commandLineArgs = Environment.GetCommandLineArgs();
+                if (commandLineArgs != null)
+                {
+                    foreach (String arg in commandLineArgs)
+                    {
+                        if (arg.Equals("DEBUG"))
+                        {
+                            Console.WriteLine("Allowing dump-to-file");
+                            this.recordSession.Visible = true;
+                            break;
+                        }
+                    }
+                }
+            }
+            this.playbackInterval.Visible = System.Diagnostics.Debugger.IsAttached;            
             
             if (!UserSettings.GetUserSettings().getBoolean("enable_console_logging"))
             {
@@ -653,18 +673,18 @@ namespace CrewChiefV4
                     }
                     else if (controllerConfiguration.hasOutstandingClick(ControllerConfiguration.PRINT_TRACK_DATA))
                     {
-                        if (crewChief.currentGameState != null && crewChief.currentGameState.SessionData != null && 
-                            crewChief.currentGameState.SessionData.TrackDefinition != null)
+                        if (CrewChief.currentGameState != null && CrewChief.currentGameState.SessionData != null &&
+                            CrewChief.currentGameState.SessionData.TrackDefinition != null)
                         {
                             if (CrewChief.gameDefinition.gameEnum == GameEnum.RACE_ROOM) 
                             {
-                                Console.WriteLine("raceroomLayoutId: " + crewChief.currentGameState.SessionData.TrackDefinition.id + ", distanceRoundLap = " +
-                                    crewChief.currentGameState.PositionAndMotionData.DistanceRoundTrack + ", player's car ID: " + crewChief.currentGameState.carClass.getClassIdentifier());
+                                Console.WriteLine("raceroomLayoutId: " + CrewChief.currentGameState.SessionData.TrackDefinition.id + ", distanceRoundLap = " +
+                                    CrewChief.currentGameState.PositionAndMotionData.DistanceRoundTrack + ", player's car ID: " + CrewChief.currentGameState.carClass.getClassIdentifier());
                             }
                             else
                             {
-                                Console.WriteLine("TrackName: " + crewChief.currentGameState.SessionData.TrackDefinition.name + ", distanceRoundLap = " +
-                                    crewChief.currentGameState.PositionAndMotionData.DistanceRoundTrack + ", player's car ID: " + crewChief.currentGameState.carClass.getClassIdentifier());
+                                Console.WriteLine("TrackName: " + CrewChief.currentGameState.SessionData.TrackDefinition.name + ", distanceRoundLap = " +
+                                    CrewChief.currentGameState.PositionAndMotionData.DistanceRoundTrack + ", player's car ID: " + CrewChief.currentGameState.carClass.getClassIdentifier());
                             }
                         }
                         else
@@ -825,7 +845,7 @@ namespace CrewChiefV4
                     interval = int.Parse(playbackInterval.Text);
                 }
             }
-            if (System.Diagnostics.Debugger.IsAttached && recordSession.Checked) {
+            if (recordSession.Checked) {
                 record = true;
             }
             if (!crewChief.Run(filenameToRun, interval, record))
@@ -1552,6 +1572,5 @@ namespace CrewChiefV4
 
         [DllImport("winmm.dll")]
         public static extern int waveOutSetVolume(IntPtr hwo, uint dwVolume);
-
     }
 }

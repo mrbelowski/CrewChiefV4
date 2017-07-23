@@ -77,6 +77,22 @@ namespace CrewChiefV4.PCars
                         initialised = true;
                         Console.WriteLine("Initialised pcars shared memory");
                     }
+                    catch (FileNotFoundException) 
+                    {
+                        // try again with something that might or might not be pCARS2
+                        try
+                        {
+                            memoryMappedFile = MemoryMappedFile.OpenExisting("$pcars2$");
+                            sharedmemorysize = Marshal.SizeOf(typeof(pCarsAPIStruct));
+                            sharedMemoryReadBuffer = new byte[sharedmemorysize];
+                            initialised = true;
+                            Console.WriteLine("Initialised pcars2 shared memory. Oooo, exciting, I wonder if this is going to work?");
+                        }
+                        catch (Exception)
+                        {
+                            initialised = false;
+                        }
+                    }
                     catch (Exception)
                     {
                         initialised = false;

@@ -46,6 +46,7 @@ WHATS_MY_BEST_LAP_TIME = what's my best lap time:best lap time:best lap
 WHATS_THE_FASTEST_LAP_TIME = what's the fastest lap:what's the fastest lap time
 WHATS_MY_POSITION = what's my position
 WHATS_MY_FUEL_LEVEL = what's my fuel level
+WHATS_MY_FUEL_USAGE = what's my fuel usage:what's my fuel consumption:what's my fuel use
 
 KEEP_QUIET = keep quiet:shut up:I know what I'm doing:leave me alone
 KEEP_ME_INFORMED = keep me updated:keep me informed:keep me posted
@@ -60,6 +61,9 @@ WHOS_BEHIND_IN_THE_RACE = who's behind in the race:who's behind
 WHOS_IN_FRONT_ON_TRACK = who's in front on track:who's ahead on track
 WHOS_BEHIND_ON_TRACK = who's behind on track
 WHOS_LEADING = who's leading:who's in the lead:who is leading:who is in the lead:who's the leader
+
+WHERE_AM_I_FASTER = where should I attack:where am I faster:where can I attack
+WHERE_AM_I_SLOWER = where should I defend:where am I slower:where is he faster:where will he attack
 
 HOW_LONGS_LEFT = how long's left:how many laps left:how many laps to go
 SPOT = spot

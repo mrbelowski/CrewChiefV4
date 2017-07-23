@@ -121,6 +121,7 @@ namespace CrewChiefV4
         private DelayedMessageEvent delayedMessageEvent;
         public Boolean delayMessageResolution = false;
 
+        public int secondsDelay;
         private Random rand = new Random();
 
         // some snapshot of pertentent data at the point of creation, 
@@ -158,6 +159,7 @@ namespace CrewChiefV4
             this.messageName = compoundMessageIdentifier + messageName;
             this.messageFolders = getMessageFolders(messageFragments, false);
             this.dueTime = secondsDelay == 0 ? 0 : (GameStateData.CurrentTime.Ticks / TimeSpan.TicksPerMillisecond) + (secondsDelay * 1000) + updateInterval;
+            this.secondsDelay = secondsDelay;
             this.abstractEvent = abstractEvent;
         }
 
@@ -189,6 +191,7 @@ namespace CrewChiefV4
                 }
             }
             this.dueTime = secondsDelay == 0 ? 0 : (GameStateData.CurrentTime.Ticks / TimeSpan.TicksPerMillisecond) + (secondsDelay * 1000) + updateInterval;
+            this.secondsDelay = secondsDelay;
             this.abstractEvent = abstractEvent;
         }
 
@@ -205,6 +208,7 @@ namespace CrewChiefV4
             messageFragments.Add(MessageFragment.Text(message));
             this.messageFolders = getMessageFolders(messageFragments, false);
             this.dueTime = secondsDelay == 0 ? 0 : (GameStateData.CurrentTime.Ticks / TimeSpan.TicksPerMillisecond) + (secondsDelay * 1000) + updateInterval;
+            this.secondsDelay = secondsDelay;
             this.abstractEvent = abstractEvent;
         }
 
@@ -214,6 +218,7 @@ namespace CrewChiefV4
             this.delayedMessageEvent = delayedMessageEvent;
             this.delayMessageResolution = true;
             this.dueTime = secondsDelay == 0 ? 0 : (GameStateData.CurrentTime.Ticks / TimeSpan.TicksPerMillisecond) + (secondsDelay * 1000) + updateInterval;
+            this.secondsDelay = secondsDelay;
             this.delayMessageResolution = true;
             this.abstractEvent = abstractEvent;
         }
@@ -244,8 +249,8 @@ namespace CrewChiefV4
                 switch (messageFragment.type)
                 {
                     case FragmentType.Text:
-                        if (messageFragment.text.StartsWith(AudioPlayer.PAUSE_ID) || SoundCache.sortedAvailableSounds.BinarySearch(messageFragment.text) >= 0 ||
-                            SoundCache.sortedAvailableDriverNames.BinarySearch(messageFragment.text) >= 0)
+                        if (messageFragment.text.StartsWith(AudioPlayer.PAUSE_ID) || SoundCache.availableSounds.Contains(messageFragment.text) ||
+                            SoundCache.availableDriverNames.Contains(messageFragment.text))
                         {
                             messages.Add(messageFragment.text);
                         }
@@ -269,7 +274,7 @@ namespace CrewChiefV4
                             {
                                 foreach (String timeFolder in timeFolders)
                                 {
-                                    if (!timeFolder.StartsWith(AudioPlayer.PAUSE_ID) && SoundCache.sortedAvailableSounds.BinarySearch(timeFolder) < 0)
+                                    if (!timeFolder.StartsWith(AudioPlayer.PAUSE_ID) && !SoundCache.availableSounds.Contains(timeFolder))
                                     {
                                         canBePlayed = false;
                                         break;
@@ -286,10 +291,10 @@ namespace CrewChiefV4
                         break;                    
                     case FragmentType.Opponent:
                         canBePlayed = false;
-                        if (messageFragment.opponent != null)
+                        if (messageFragment.opponent != null && messageFragment.opponent.CanUseName)
                         {
                             String usableName = DriverNameHelper.getUsableDriverName(messageFragment.opponent.DriverRawName);
-                            if (SoundCache.sortedAvailableDriverNames.BinarySearch(usableName) >= 0)
+                            if (SoundCache.availableDriverNames.Contains(usableName))
                             {
                                 messages.Add(usableName);
                                 canBePlayed = true;
@@ -298,7 +303,7 @@ namespace CrewChiefV4
                             {
                                 messages.Add(SoundCache.TTS_IDENTIFIER + usableName);
                                 canBePlayed = true;
-                            }
+                            }                            
                         }                        
                         break;
                     case FragmentType.Integer:                        
@@ -314,7 +319,7 @@ namespace CrewChiefV4
                             {
                                 foreach (String integerFolder in integerFolders)
                                 {
-                                    if (!integerFolder.StartsWith(AudioPlayer.PAUSE_ID) && SoundCache.sortedAvailableSounds.BinarySearch(integerFolder) < 0)
+                                    if (!integerFolder.StartsWith(AudioPlayer.PAUSE_ID) && !SoundCache.availableSounds.Contains(integerFolder))
                                     {
                                         canBePlayed = false;
                                         break;

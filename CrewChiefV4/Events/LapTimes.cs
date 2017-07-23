@@ -272,9 +272,10 @@ namespace CrewChiefV4.Events
                     currentGameState.OpponentData.Count == 1 && currentGameState.OpponentData.First().Value.DriverRawName == currentGameState.SessionData.DriverRawName));
                 if (isHotLapping)
                 {
-                    lapAndSectorsComparisonData[1] = currentGameState.SessionData.PlayerBestLapSector1Time;
-                    lapAndSectorsComparisonData[2] = currentGameState.SessionData.PlayerBestLapSector2Time;
-                    lapAndSectorsComparisonData[3] = currentGameState.SessionData.PlayerBestLapSector3Time;
+                    lapAndSectorsComparisonData[0] = currentGameState.SessionData.PlayerLapTimeSessionBest;
+                    lapAndSectorsComparisonData[1] = currentGameState.SessionData.PlayerBestSector1Time;
+                    lapAndSectorsComparisonData[2] = currentGameState.SessionData.PlayerBestSector2Time;
+                    lapAndSectorsComparisonData[3] = currentGameState.SessionData.PlayerBestSector3Time;
                 }
                 else
                 {
@@ -394,7 +395,7 @@ namespace CrewChiefV4.Events
                                         }
                                         else if (currentGameState.SessionData.SessionType == SessionType.Practice)
                                         {
-                                            if (SoundCache.sortedAvailableSounds.BinarySearch(Position.folderDriverPositionIntro) >= 0)
+                                            if (SoundCache.availableSounds.Contains(Position.folderDriverPositionIntro))
                                             {
                                                 audioPlayer.playMessage(new QueuedMessage("position", MessageContents(Position.folderDriverPositionIntro, Position.folderStub + 1), 0, this));
                                             }
@@ -576,9 +577,11 @@ namespace CrewChiefV4.Events
                     double r = random.NextDouble() * 10;
                     Boolean canPlayForRace = frequencyOfRaceSectorDeltaReports > r;
                     Boolean canPlayForPracAndQual = frequencyOfPracticeAndQualSectorDeltaReports > r;
+                    
                     if ((currentGameState.SessionData.SessionType == SessionType.Race && canPlayForRace) ||
-                        ((currentGameState.SessionData.SessionType == SessionType.Practice || currentGameState.SessionData.SessionType == SessionType.Qualify ||
-                        currentGameState.SessionData.SessionType == SessionType.HotLap) && canPlayForPracAndQual))
+                        (((currentGameState.SessionData.SessionType == SessionType.Practice && (currentGameState.OpponentData.Count > 0 || currentGameState.SessionData.CompletedLaps > 1))
+                        || currentGameState.SessionData.SessionType == SessionType.Qualify ||
+                        (currentGameState.SessionData.SessionType == SessionType.HotLap && currentGameState.SessionData.CompletedLaps > 1)) && canPlayForPracAndQual))
                     {
                         float playerSector = -1;
                         float comparisonSector = -1;
@@ -973,7 +976,7 @@ namespace CrewChiefV4.Events
                             if (currentPosition > 1)
                             {
                                 // should always trigger
-                                if (SoundCache.sortedAvailableSounds.BinarySearch(Position.folderDriverPositionIntro) >= 0)
+                                if (SoundCache.availableSounds.Contains(Position.folderDriverPositionIntro))
                                 {
                                     audioPlayer.playMessageImmediately(new QueuedMessage("position", MessageContents(Position.folderDriverPositionIntro, Position.folderStub + currentPosition), 0, null));
                                 }
@@ -989,7 +992,7 @@ namespace CrewChiefV4.Events
                             if (currentPosition > 1)
                             {
                                 // should always trigger
-                                if (SoundCache.sortedAvailableSounds.BinarySearch(Position.folderDriverPositionIntro) >= 0)
+                                if (SoundCache.availableSounds.Contains(Position.folderDriverPositionIntro))
                                 {
                                     audioPlayer.playMessageImmediately(new QueuedMessage("position", MessageContents(Position.folderDriverPositionIntro, Position.folderStub + currentPosition), 0, null));
                                 }

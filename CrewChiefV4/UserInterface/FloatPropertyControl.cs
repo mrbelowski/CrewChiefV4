@@ -14,9 +14,11 @@ namespace CrewChiefV4
         public String propertyId;
         public float originalValue;
         public float defaultValue;
+        public String label;
         public FloatPropertyControl (String propertyId, String label, float value, float defaultValue, String helpText)
         {
             InitializeComponent();
+            this.label = label;
             this.propertyId = propertyId;
             this.label1.Text = label;
             this.originalValue = value;
@@ -40,7 +42,7 @@ namespace CrewChiefV4
             }
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        public void button1_Click(object sender, EventArgs e)
         {
             if (defaultValue != originalValue)
             {

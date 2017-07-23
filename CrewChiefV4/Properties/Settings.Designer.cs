@@ -2134,5 +2134,17 @@ namespace CrewChiefV4.Properties {
                 this["realistic_mode"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool spotter_enable_three_wide_left_and_right {
+            get {
+                return ((bool)(this["spotter_enable_three_wide_left_and_right"]));
+            }
+            set {
+                this["spotter_enable_three_wide_left_and_right"] = value;
+            }
+        }
     }
 }
