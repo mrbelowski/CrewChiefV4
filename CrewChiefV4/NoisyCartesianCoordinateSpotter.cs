@@ -55,7 +55,7 @@ namespace CrewChiefV4
         private TimeSpan repeatHoldFrequency = TimeSpan.FromSeconds(UserSettings.GetUserSettings().getInt("spotter_hold_repeat_frequency"));
 
         // this is the delay between saying "car left" then "3 wide, you're on the right"
-        private TimeSpan onSingleOverlapTo3WideDelay = TimeSpan.FromSeconds(1);
+        private TimeSpan onSingleOverlapTo3WideDelay = TimeSpan.FromSeconds(0.5);
 
         private int carsOnLeftAtPreviousTick;
         private int carsOnRightAtPreviousTick;
@@ -83,7 +83,7 @@ namespace CrewChiefV4
         
         private DateTime timeWhenChannelShouldBeClosed;
 
-        private TimeSpan timeToWaitBeforeClosingChannelLeftOpen = TimeSpan.FromMilliseconds(500);
+        private TimeSpan timeToWaitBeforeClosingChannelLeftOpen = TimeSpan.FromMilliseconds(5000);
 
         private Boolean channelLeftOpenTimerStarted = false;
         
@@ -144,13 +144,14 @@ namespace CrewChiefV4
         
         public void triggerInternal(float playerRotationInRadians, float[] currentPlayerPosition,
             float[] playerVelocityData, List<float[]> currentOpponentPositions)
-        {            
+        {
             DateTime now = DateTime.Now;
 
             if (currentPlayerPosition[0] != 0 && currentPlayerPosition[1] != 0 &&
                 currentPlayerPosition[0] != -1 && currentPlayerPosition[1] != -1 &&
                 playerVelocityData[0] > minSpeedForSpotterToOperate)
             {
+                channelLeftOpenTimerStarted = false;
                 int carsOnLeft = 0;
                 int carsOnRight = 0;
                 List<int> activeIDs = new List<int>();
@@ -208,7 +209,7 @@ namespace CrewChiefV4
                             previousPositionAndVelocityData.Remove(i);
                         }
                     }
-                }  
+                }
                 List<int> opponentsToPurge = new List<int>();
                 foreach (int cachedOpponentDataKey in previousPositionAndVelocityData.Keys)
                 {
@@ -240,7 +241,10 @@ namespace CrewChiefV4
                     timeWhenChannelShouldBeClosed = DateTime.MaxValue;
                     carsOnLeftAtPreviousTick = 0;
                     carsOnRightAtPreviousTick = 0;
-                    
+                    reportedDoubleOverlapLeft = false;
+                    reportedDoubleOverlapRight = false;
+                    reportedSingleOverlapLeft = false;
+                    reportedSingleOverlapRight = false;
                     channelLeftOpenTimerStarted = false;
                 }
             }
@@ -374,7 +378,7 @@ namespace CrewChiefV4
                 }
             }
             else if (carsOnLeftCount == 0 && carsOnRightCount > 0 && carsOnLeftAtPreviousTick == 0 && carsOnRightAtPreviousTick == 0)
-            {
+            {                
                 if (reportedSingleOverlapRight || reportedDoubleOverlapRight)
                 {
                     nextMessageDue = now.Add(repeatHoldFrequency);
@@ -406,7 +410,8 @@ namespace CrewChiefV4
                 }
                 else if (reportedDoubleOverlapLeft)
                 {
-                    nextMessageDue = now.Add(repeatHoldFrequency);
+                    // don't reset the message due time here
+                    // nextMessageDue = now.Add(repeatHoldFrequency);
                 }
                 else
                 {
@@ -422,7 +427,8 @@ namespace CrewChiefV4
                 }
                 else if (reportedDoubleOverlapRight)
                 {
-                    nextMessageDue = now.Add(repeatHoldFrequency);
+                    // don't reset the message due time here
+                    // nextMessageDue = now.Add(repeatHoldFrequency);
                 }
                 else
                 {
@@ -430,6 +436,16 @@ namespace CrewChiefV4
                     
                 }
                 nextMessageType = NextMessageType.threeWideYoureOnTheLeft;                                
+            }
+            // go from 3 wide on right to single car left
+            else if (use3WideLeftAndRight && carsOnLeftCount == 1 && carsOnRightCount == 0 && carsOnLeftAtPreviousTick > 1 && carsOnRightAtPreviousTick == 0)
+            {
+                nextMessageType = NextMessageType.carLeft;
+            }
+            // go from 3 wide on left to single car right
+            else if (use3WideLeftAndRight && carsOnLeftCount == 0 && carsOnRightCount == 1 && carsOnLeftAtPreviousTick == 0 && carsOnRightAtPreviousTick > 1)
+            {
+                nextMessageType = NextMessageType.carRight;
             }
         }
 
@@ -492,7 +508,6 @@ namespace CrewChiefV4
                             nextMessageDue = now.Add(repeatHoldFrequency);
                             reportedDoubleOverlapRight = true;
                             reportedSingleOverlapRight = false;
-                            wasInMiddle = true;
                             break;
                         case NextMessageType.threeWideYoureOnTheRight:
                             audioPlayer.removeImmediateMessages(new String[] { folderStillThere, folderCarLeft, folderCarRight, folderClearAllRound, folderClearLeft, folderClearRight, folderInTheMiddle, folderThreeWideYoureOnLeft });
@@ -503,7 +518,6 @@ namespace CrewChiefV4
                             nextMessageDue = now.Add(repeatHoldFrequency);
                             reportedDoubleOverlapLeft = true;
                             reportedSingleOverlapLeft = false;
-                            wasInMiddle = true;
                             break;
                         case NextMessageType.carLeft:
                             audioPlayer.removeImmediateMessages(new String[] { folderStillThere, folderInTheMiddle, folderCarRight, folderClearAllRound, folderClearLeft, folderClearRight, folderThreeWideYoureOnRight, folderThreeWideYoureOnLeft });
@@ -623,14 +637,6 @@ namespace CrewChiefV4
                         case NextMessageType.none:
                             break;
                     }
-                }
-                else
-                {
-                    // Console.WriteLine("message " + nextMessageType + " no longer valid, carsOnLeftCount = " + carsOnLeftCount + " carsOnRightCount = " + carsOnRightCount);
-                    /*reportedSingleOverlapLeft = false;
-                    reportedSingleOverlapRight = false;
-                    reportedDoubleOverlapLeft = false;
-                    reportedDoubleOverlapRight = false;*/
                 }
             }
         }
