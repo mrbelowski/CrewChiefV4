@@ -7838,7 +7838,7 @@
 			]
 		},
 		{
-			"rf2TrackNames": ["paul ricard HTTT"],
+			"rf2TrackNames": ["Paul Ricard HTTT"],
 			"approximateTrackLength": 5657,
 			"trackLandmarks": [{
 					"landmarkName": "verriere",
@@ -7921,7 +7921,7 @@
 			]
 		},
 		{
-			"rf2TrackNames": ["paul ricard HTTT"],
+			"rf2TrackNames": ["Paul Ricard HTTT"],
 			"approximateTrackLength": 5582,
 			"trackLandmarks": [{
 					"landmarkName": "verriere",
@@ -7949,8 +7949,8 @@
 				},
 				{
 					"landmarkName": "l'ecole",
-					"distanceRoundLapStart": 1700,
-					"distanceRoundLapEnd": 1840,
+					"distanceRoundLapStart": 1650,
+					"distanceRoundLapEnd": 1790,
 					"isCommonOvertakingSpot": false
 				},
 				{
@@ -7992,7 +7992,7 @@
 			]
 		},
 		{
-			"rf2TrackNames": ["paul ricard HTTT"],
+			"rf2TrackNames": ["Paul Ricard HTTT"],
 			"approximateTrackLength": 3752,
 			"trackLandmarks": [{
 					"landmarkName": "turn1",
@@ -8278,37 +8278,37 @@
 					"landmarkName": "hairpin",
 					"distanceRoundLapStart": 2050,
 					"distanceRoundLapEnd": 2170,
-					"isCommonOvertakingSpot": true
+					"isCommonOvertakingSpot": false
 				},
 				{
 					"landmarkName": "turn7",
 					"distanceRoundLapStart": 2170,
 					"distanceRoundLapEnd": 2265,
-					"isCommonOvertakingSpot": true
+					"isCommonOvertakingSpot": false
 				},
 				{
 					"landmarkName": "turn8",
 					"distanceRoundLapStart": 2270,
 					"distanceRoundLapEnd": 2405,
-					"isCommonOvertakingSpot": true
+					"isCommonOvertakingSpot": false
 				},
 				{
 					"landmarkName": "turn9",
 					"distanceRoundLapStart": 2410,
 					"distanceRoundLapEnd": 2600,
-					"isCommonOvertakingSpot": true
+					"isCommonOvertakingSpot": false
 				},
 				{
 					"landmarkName": "first_esses",
 					"distanceRoundLapStart": 2605,
 					"distanceRoundLapEnd": 2935,
-					"isCommonOvertakingSpot": true
+					"isCommonOvertakingSpot": false
 				},
 				{
 					"landmarkName": "second_esses",
 					"distanceRoundLapStart": 2880,
 					"distanceRoundLapEnd": 3255,
-					"isCommonOvertakingSpot": true
+					"isCommonOvertakingSpot": false
 				},
 				{
 					"landmarkName": "peraltada",
@@ -8656,7 +8656,7 @@
 					"isCommonOvertakingSpot": true
 				},
 				{
-					"landmarkName": "beemakurve2",
+					"landmarkName": "bremskurve2",
 					"distanceRoundLapStart": 3170,
 					"distanceRoundLapEnd": 3230,
 					"isCommonOvertakingSpot": true
@@ -8849,7 +8849,7 @@
 					"isCommonOvertakingSpot": true
 				},
 				{
-					"landmarkName": "curva VIP",
+					"landmarkName": "curva_VIP",
 					"distanceRoundLapStart": 1250,
 					"distanceRoundLapEnd": 1425,
 					"isCommonOvertakingSpot": false
@@ -9005,12 +9005,6 @@
 					"distanceRoundLapStart": 1070,
 					"distanceRoundLapEnd": 1210,
 					"isCommonOvertakingSpot": false
-				},
-				{
-					"landmarkName": "turn4",
-					"distanceRoundLapStart": 1580,
-					"distanceRoundLapEnd": 1710,
-					"isCommonOvertakingSpot": true
 				},
 				{
 					"landmarkName": "les_combes",
@@ -9755,6 +9749,353 @@
 					"landmarkName": "turn4",
 					"distanceRoundLapStart": 2895,
 					"distanceRoundLapEnd": 3385,
+					"isCommonOvertakingSpot": true
+				}
+
+			]
+		},
+		{
+			"rf2TrackNames": ["Jacksonville Superspeedway"],
+			"isOval": true,
+			"trackLandmarks": [{
+					"landmarkName": "trioval",
+					"distanceRoundLapStart": 0,
+					"distanceRoundLapEnd": 215,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn1",
+					"distanceRoundLapStart": 600,
+					"distanceRoundLapEnd": 1060,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn2",
+					"distanceRoundLapStart": 1061,
+					"distanceRoundLapEnd": 1520,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn3",
+					"distanceRoundLapStart": 2460,
+					"distanceRoundLapEnd": 2910,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn4",
+					"distanceRoundLapStart": 2911,
+					"distanceRoundLapEnd": 3360,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "trioval",
+					"distanceRoundLapStart": 3755,
+					"distanceRoundLapEnd": 4027,
+					"isCommonOvertakingSpot": true
+				}
+
+			]
+		},
+		{
+			"rf2TrackNames": ["Joseville Speedway"],
+			"isOval": true,
+			"trackLandmarks": [{
+					"landmarkName": "turn1",
+					"distanceRoundLapStart": 30,
+					"distanceRoundLapEnd": 155,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn2",
+					"distanceRoundLapStart": 280,
+					"distanceRoundLapEnd": 156,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn3",
+					"distanceRoundLapStart": 365,
+					"distanceRoundLapEnd": 485,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn4",
+					"distanceRoundLapStart": 486,
+					"distanceRoundLapEnd": 605,
+					"isCommonOvertakingSpot": true
+				}
+
+			]
+		},
+		{
+			"rf2TrackNames": ["Kansas Speedway"],
+			"isOval": true,
+			"trackLandmarks": [{
+					"landmarkName": "trioval",
+					"distanceRoundLapStart": 0,
+					"distanceRoundLapEnd": 235,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn1",
+					"distanceRoundLapStart": 330,
+					"distanceRoundLapEnd": 685,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn2",
+					"distanceRoundLapStart": 686,
+					"distanceRoundLapEnd": 1040,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn3",
+					"distanceRoundLapStart": 1400,
+					"distanceRoundLapEnd": 1770,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn4",
+					"distanceRoundLapStart": 1771,
+					"distanceRoundLapEnd": 2140,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "trioval",
+					"distanceRoundLapStart": 2200,
+					"distanceRoundLapEnd": 2475,
+					"isCommonOvertakingSpot": true
+				}
+
+			]
+		},
+		{
+			"rf2TrackNames": ["Las Vagas Motor Speedway"],
+			"isOval": true,
+			"trackLandmarks": [{
+					"landmarkName": "trioval",
+					"distanceRoundLapStart": 0,
+					"distanceRoundLapEnd": 225,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn1",
+					"distanceRoundLapStart": 315,
+					"distanceRoundLapEnd": 665,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn2",
+					"distanceRoundLapStart": 666,
+					"distanceRoundLapEnd": 1015,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn3",
+					"distanceRoundLapStart": 1385,
+					"distanceRoundLapEnd": 1717,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn4",
+					"distanceRoundLapStart": 1718,
+					"distanceRoundLapEnd": 2050,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "trioval",
+					"distanceRoundLapStart": 2180,
+					"distanceRoundLapEnd": 2423,
+					"isCommonOvertakingSpot": true
+				}
+
+			]
+		},
+		{
+			"rf2TrackNames": ["Lausitzring"],
+			"approximateTrackLength": 4528,
+			"trackLandmarks": [{
+					"landmarkName": "turn1",
+					"distanceRoundLapStart": 300,
+					"distanceRoundLapEnd": 420,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn2",
+					"distanceRoundLapStart": 420,
+					"distanceRoundLapEnd": 495,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn3",
+					"distanceRoundLapStart": 495,
+					"distanceRoundLapEnd": 640,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn4",
+					"distanceRoundLapStart": 650,
+					"distanceRoundLapEnd": 680,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn5",
+					"distanceRoundLapStart": 785,
+					"distanceRoundLapEnd": 905,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn6",
+					"distanceRoundLapStart": 1490,
+					"distanceRoundLapEnd": 1605,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn7",
+					"distanceRoundLapStart": 1605,
+					"distanceRoundLapEnd": 1710,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn8",
+					"distanceRoundLapStart": 1730,
+					"distanceRoundLapEnd": 2005,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn9",
+					"distanceRoundLapStart": 2465,
+					"distanceRoundLapEnd": 2845,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn10",
+					"distanceRoundLapStart": 3230,
+					"distanceRoundLapEnd": 3405,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn11",
+					"distanceRoundLapStart": 3460,
+					"distanceRoundLapEnd": 3610,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn12",
+					"distanceRoundLapStart": 3655,
+					"distanceRoundLapEnd": 3785,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn13",
+					"distanceRoundLapStart": 3785,
+					"distanceRoundLapEnd": 3890,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn14",
+					"distanceRoundLapStart": 3915,
+					"distanceRoundLapEnd": 4320,
+					"isCommonOvertakingSpot": false
+				}
+			]
+		},
+		{
+			"rf2TrackNames": ["Lausitzring"],
+			"approximateTrackLength": 3356,
+			"trackLandmarks": [{
+					"landmarkName": "turn1",
+					"distanceRoundLapStart": 300,
+					"distanceRoundLapEnd": 420,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn2",
+					"distanceRoundLapStart": 420,
+					"distanceRoundLapEnd": 495,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn3",
+					"distanceRoundLapStart": 495,
+					"distanceRoundLapEnd": 640,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn4",
+					"distanceRoundLapStart": 650,
+					"distanceRoundLapEnd": 680,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn5",
+					"distanceRoundLapStart": 785,
+					"distanceRoundLapEnd": 905,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn6",
+					"distanceRoundLapStart": 1140,
+					"distanceRoundLapEnd": 1325,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn7",
+					"distanceRoundLapStart": 1375,
+					"distanceRoundLapEnd": 1665,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn8",
+					"distanceRoundLapStart": 2065,
+					"distanceRoundLapEnd": 2235,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn9",
+					"distanceRoundLapStart": 2295,
+					"distanceRoundLapEnd": 2430,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn10",
+					"distanceRoundLapStart": 2485,
+					"distanceRoundLapEnd": 2610,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn11",
+					"distanceRoundLapStart": 2610,
+					"distanceRoundLapEnd": 2755,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn12",
+					"distanceRoundLapStart": 2775,
+					"distanceRoundLapEnd": 3135,
+					"isCommonOvertakingSpot": false
+				}
+			]
+		},
+		{
+			"rf2TrackNames": ["lausitzring superspeedway"],
+			"approximateTrackLength": 3256,
+			"isOval": true,
+			"trackLandmarks": [{
+					"landmarkName": "turn1",
+					"distanceRoundLapStart": 345,
+					"distanceRoundLapEnd": 955,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn2",
+					"distanceRoundLapStart": 1610,
+					"distanceRoundLapEnd": 2185,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn3",
+					"distanceRoundLapStart": 2585,
+					"distanceRoundLapEnd": 3000,
 					"isCommonOvertakingSpot": true
 				}
 			]
