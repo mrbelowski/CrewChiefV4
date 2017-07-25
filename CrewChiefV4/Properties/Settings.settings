@@ -534,7 +534,7 @@
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="spotter_name" Type="System.String" Scope="User">
-      <Value Profile="(Default)">bob</Value>
+      <Value Profile="(Default)">Jim (default)</Value>
     </Setting>
   </Settings>
 </SettingsFile>
