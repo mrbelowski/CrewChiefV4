@@ -2149,7 +2149,7 @@ namespace CrewChiefV4.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Jim (default)")]
+        [global::System.Configuration.DefaultSettingValueAttribute("bob")]
         public string spotter_name {
             get {
                 return ((string)(this["spotter_name"]));

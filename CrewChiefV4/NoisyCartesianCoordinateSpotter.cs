@@ -75,15 +75,30 @@ namespace CrewChiefV4
         private static String folderThreeWideYoureOnRight = "spotter/three_wide_on_right";
         private static String folderThreeWideYoureOnLeft = "spotter/three_wide_on_left";
 
+        private static String spotterFolderPrefix = "spotter_";
+        public static String defaultSpotterId = "Jim (default)";
+        public static List<String> availableSpotters = new List<String>();
+
         /**
          * static constructor to initialise spotter subfolder stuff.
          * 
          */
         static NoisyCartesianCoordinateSpotter()
         {
+            availableSpotters.Clear();
+            availableSpotters.Add(defaultSpotterId);
+            DirectoryInfo soundsDirectory = new DirectoryInfo(AudioPlayer.soundFilesPath + "/voice");
+            DirectoryInfo[] directories = soundsDirectory.GetDirectories();
+            foreach (DirectoryInfo folder in directories)
+            {
+                if (folder.Name.StartsWith(spotterFolderPrefix))
+                {
+                    availableSpotters.Add(folder.Name.Substring(spotterFolderPrefix.Length));
+                }
+            }
             String selectedSpotter = UserSettings.GetUserSettings().getString("spotter_name");
             // TODO: select boxes and UI stuff - this may change
-            if (!selectedSpotter.Equals("Jim (default)"))
+            if (!defaultSpotterId.Equals(selectedSpotter))
             {
                 if (Directory.Exists(AudioPlayer.soundFilesPath + "/voice/spotter_" + selectedSpotter))
                 {
@@ -100,6 +115,8 @@ namespace CrewChiefV4
                 else
                 {
                     Console.WriteLine("No spotter called " + selectedSpotter + " exists, dropping back to the default (Jim)");
+                    UserSettings.GetUserSettings().setProperty("spotter_name", defaultSpotterId);
+                    UserSettings.GetUserSettings().saveUserSettings();
                 }
             }
         }

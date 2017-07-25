@@ -505,6 +505,7 @@ namespace CrewChiefV4
             cw.enable = UserSettings.GetUserSettings().getBoolean("enable_console_logging");
             crewChief = new CrewChief();
             this.personalisationBox.Items.AddRange(this.crewChief.audioPlayer.personalisationsArray);
+            this.spotterNameBox.Items.AddRange(NoisyCartesianCoordinateSpotter.availableSpotters.ToArray());
             if (crewChief.audioPlayer.selectedPersonalisation == null || crewChief.audioPlayer.selectedPersonalisation.Length == 0 ||
                 crewChief.audioPlayer.selectedPersonalisation.Equals(AudioPlayer.NO_PERSONALISATION_SELECTED) ||
                 !this.crewChief.audioPlayer.personalisationsArray.Contains(crewChief.audioPlayer.selectedPersonalisation))
@@ -515,8 +516,19 @@ namespace CrewChiefV4
             {
                 this.personalisationBox.Text = crewChief.audioPlayer.selectedPersonalisation;
             }
-            // only register the value changed listener after loading the saved value
+
+            String savedSpotter = UserSettings.GetUserSettings().getString("spotter_name");
+            if (savedSpotter != null && savedSpotter.Length > 0 && NoisyCartesianCoordinateSpotter.availableSpotters.Contains(savedSpotter))
+            {
+                this.spotterNameBox.Text = savedSpotter;
+            }
+            else
+            {
+                this.spotterNameBox.Text = NoisyCartesianCoordinateSpotter.defaultSpotterId;
+            }
+            // only register the value changed listener after loading the saved values
             this.personalisationBox.SelectedValueChanged += new System.EventHandler(this.personalisationSelected);
+            this.spotterNameBox.SelectedValueChanged += new System.EventHandler(this.spotterNameSelected);
 
             float messagesVolume = UserSettings.GetUserSettings().getFloat("messages_volume");
             float backgroundVolume = UserSettings.GetUserSettings().getFloat("background_volume");
@@ -771,6 +783,7 @@ namespace CrewChiefV4
                 this.button1.Enabled = false;
                 this.scanControllersButton.Enabled = false;
                 this.personalisationBox.Enabled = false;
+                this.spotterNameBox.Enabled = false;
                 ThreadStart crewChiefWork = runApp;
                 Thread crewChiefThread = new Thread(crewChiefWork);
 
@@ -824,6 +837,7 @@ namespace CrewChiefV4
                 this.groupBox1.Enabled = true;
                 this.scanControllersButton.Enabled = true;
                 this.personalisationBox.Enabled = true;
+                this.spotterNameBox.Enabled = true;
             }
         }
 
@@ -1090,7 +1104,17 @@ namespace CrewChiefV4
                 doRestart(Configuration.getUIString("the_application_must_be_restarted_to_load_the_new_sounds"), Configuration.getUIString("load_new_sounds"));
             }
         }
-            
+
+        private void spotterNameSelected(object sender, EventArgs e)
+        {
+            if (!UserSettings.GetUserSettings().getString("spotter_name").Equals(this.spotterNameBox.Text))
+            {
+                UserSettings.GetUserSettings().setProperty("spotter_name", this.spotterNameBox.Text);
+                UserSettings.GetUserSettings().saveUserSettings();
+                doRestart(Configuration.getUIString("the_application_must_be_restarted_to_load_the_new_sounds"), Configuration.getUIString("load_new_sounds"));
+            }
+        }
+
         private VoiceOptionEnum getVoiceOptionEnum(String enumStr)
         {
             VoiceOptionEnum enumVal = VoiceOptionEnum.DISABLED;
@@ -1518,9 +1542,12 @@ namespace CrewChiefV4
 
         private void personalisationBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-
         }
-
+        
+        private void spotterNameBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+        }
+        
         private void internetPanHandler(object sender, EventArgs e)
         {
             Process.Start("http://thecrewchief.org/misc.php?do=donate");
