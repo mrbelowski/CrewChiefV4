@@ -2146,5 +2146,17 @@ namespace CrewChiefV4.Properties {
                 this["spotter_enable_three_wide_left_and_right"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Jim (default)")]
+        public string spotter_name {
+            get {
+                return ((string)(this["spotter_name"]));
+            }
+            set {
+                this["spotter_name"] = value;
+            }
+        }
     }
 }
