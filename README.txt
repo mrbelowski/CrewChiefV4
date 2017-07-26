@@ -8,6 +8,8 @@ For support and discussions about Crew Chief we have our very own forum here: ht
 
 Changelog
 ---------
+Version 4.7.7.6: Fixed a couple more spotter bugs; Added dropdown to main screen to allow a different spotter voice to be selected (still work-in-progress, waiting for some more voice packs)
+
 Version 4.7.7.5: More Scoops-Brand RF2 corner mappings; Fixed some spotter bugs; Added searching to Properties screen to make it a little less user-hostile; Replaced the nasty underscore_property_names with proper names on the Properties screen
 
 Version 4.7.7.4: Substantial RF2 plugin rewrite; Attempt to map game data if we detect the PCars2 exe - this does (apparently) work but expect some bugs and issues; Ported some fixes from the PCars Android app - some free practice session improvements, more aggressive pruning of broken driver data, better (hopefully...) method of identifying player's data so monitoring other drivers shouldn't confuse the app.
