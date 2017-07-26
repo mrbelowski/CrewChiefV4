@@ -232,6 +232,11 @@ namespace CrewChiefV4
 
         }
 
+        public void reportFuelStatus()
+        {
+            ((Fuel)eventsList["Fuel"]).reportFuelStatus();
+        }
+
         public void toggleSpotterMode()
         {
             if (GlobalBehaviourSettings.spotterEnabled)
