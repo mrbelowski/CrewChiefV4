@@ -683,6 +683,12 @@ namespace CrewChiefV4
                         crewChief.toggleEnableYellowFlagsMode();
                         nextPollWait = 1000;
                     }
+                    else if (controllerConfiguration.hasOutstandingClick(ControllerConfiguration.GET_FUEL_STATUS))
+                    {
+                        Console.WriteLine("Getting fuel status");
+                        crewChief.reportFuelStatus();
+                        nextPollWait = 1000;
+                    }
                     else if (controllerConfiguration.hasOutstandingClick(ControllerConfiguration.PRINT_TRACK_DATA))
                     {
                         if (CrewChief.currentGameState != null && CrewChief.currentGameState.SessionData != null &&

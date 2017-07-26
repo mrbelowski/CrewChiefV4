@@ -2158,5 +2158,41 @@ namespace CrewChiefV4.Properties {
                 this["spotter_name"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-1")]
+        public int GET_FUEL_STATUS_button_index {
+            get {
+                return ((int)(this["GET_FUEL_STATUS_button_index"]));
+            }
+            set {
+                this["GET_FUEL_STATUS_button_index"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string GET_FUEL_STATUS_device_guid {
+            get {
+                return ((string)(this["GET_FUEL_STATUS_device_guid"]));
+            }
+            set {
+                this["GET_FUEL_STATUS_device_guid"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string GET_FUEL_STATUS_device_type {
+            get {
+                return ((string)(this["GET_FUEL_STATUS_device_type"]));
+            }
+            set {
+                this["GET_FUEL_STATUS_device_type"] = value;
+            }
+        }
     }
 }
