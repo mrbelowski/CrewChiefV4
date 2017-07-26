@@ -54,6 +54,8 @@ namespace CrewChiefV4
 
         // say "still there" every 3 seconds
         private TimeSpan repeatHoldFrequency = TimeSpan.FromSeconds(UserSettings.GetUserSettings().getInt("spotter_hold_repeat_frequency"));
+        // use half the 'still there' wait if we're bouncing between clear and overlap
+        private TimeSpan bouncingWait = TimeSpan.FromSeconds(UserSettings.GetUserSettings().getInt("spotter_hold_repeat_frequency") / 2);
 
         // this is the delay between saying "car left" then "3 wide, you're on the right"
         private TimeSpan onSingleOverlapTo3WideDelay = TimeSpan.FromSeconds(0.5);
@@ -394,7 +396,7 @@ namespace CrewChiefV4
                 // still in overlap-mode so don't want to say this immediately
                 if ((reportedSingleOverlapLeft || reportedDoubleOverlapLeft) && (reportedSingleOverlapRight || reportedDoubleOverlapRight))
                 {
-                    nextMessageDue = now.Add(repeatHoldFrequency);
+                    nextMessageDue = now.Add(bouncingWait);
                 }
                 else
                 {
@@ -408,7 +410,7 @@ namespace CrewChiefV4
                 // still in overlap-mode so don't want to say this immediately
                 if (reportedSingleOverlapLeft || reportedDoubleOverlapLeft)
                 {
-                    nextMessageDue = now.Add(repeatHoldFrequency);
+                    nextMessageDue = now.Add(bouncingWait);
                 }
                 else
                 {
@@ -428,7 +430,7 @@ namespace CrewChiefV4
             {                
                 if (reportedSingleOverlapRight || reportedDoubleOverlapRight)
                 {
-                    nextMessageDue = now.Add(repeatHoldFrequency);
+                    nextMessageDue = now.Add(bouncingWait);
                 }
                 else
                 {
@@ -634,11 +636,16 @@ namespace CrewChiefV4
                                         audioPlayer.playSpotterMessage(clearLeftMessage, true);
                                         nextMessageType = NextMessageType.carRight;
                                         nextMessageDue = now.Add(repeatHoldFrequency);
+                                        
                                     }
                                     else
                                     {
                                         audioPlayer.playSpotterMessage(clearLeftMessage, false);
                                         nextMessageType = NextMessageType.none;
+                                        // belt'n'braces - the overlapRight stuff should have already been cleared by the time we reach here so this 
+                                        // may be unnecessary, but it does no harm to make sure
+                                        reportedSingleOverlapRight = false;
+                                        reportedDoubleOverlapRight = false;
                                     }
                                 }
                             }
@@ -676,6 +683,10 @@ namespace CrewChiefV4
                                     {
                                         audioPlayer.playSpotterMessage(clearRightMessage, false);
                                         nextMessageType = NextMessageType.none;
+                                        // belt'n'braces - the overlapLeft stuff should have already been cleared by the time we reach here so this 
+                                        // may be unnecessary, but it does no harm to make sure
+                                        reportedSingleOverlapLeft = false;
+                                        reportedDoubleOverlapLeft = false;
                                     }
                                 }
                             }
