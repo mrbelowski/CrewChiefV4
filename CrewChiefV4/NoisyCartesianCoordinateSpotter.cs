@@ -91,7 +91,7 @@ namespace CrewChiefV4
             DirectoryInfo[] directories = soundsDirectory.GetDirectories();
             foreach (DirectoryInfo folder in directories)
             {
-                if (folder.Name.StartsWith(spotterFolderPrefix))
+                if (folder.Name.StartsWith(spotterFolderPrefix) && folder.Name.Length > spotterFolderPrefix.Length)
                 {
                     availableSpotters.Add(folder.Name.Substring(spotterFolderPrefix.Length));
                 }
