@@ -8,7 +8,7 @@ For support and discussions about Crew Chief we have our very own forum here: ht
 
 Changelog
 ---------
-Version 4.7.7.6: Fixed a couple more spotter bugs; Added dropdown to main screen to allow a different spotter voice to be selected (still work-in-progress, waiting for some more voice packs)
+Version 4.7.7.7: Fixed a couple more spotter bugs; Added dropdown to main screen to allow a different spotter voice to be selected (still work-in-progress, waiting for some more voice packs); Added button binding to get fuel status (consumption and fuel remaining). The "how's my fuel?" voice command now reports the consumption as well as the remaining fuel
 
 Version 4.7.7.5: More Scoops-Brand RF2 corner mappings; Fixed some spotter bugs; Added searching to Properties screen to make it a little less user-hostile; Replaced the nasty underscore_property_names with proper names on the Properties screen
 
