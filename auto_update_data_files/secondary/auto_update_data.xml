@@ -15,7 +15,7 @@ secondary update sources) can still be updated. All downloads from this source w
 <drivernamesversion>100</drivernamesversion>
 <basedrivernamesurl>http://crewchief.isnais.de/base_driver_names.zip</basedrivernamesurl>
 <updatedrivernamesurl>http://crewchief.isnais.de/update_driver_names.zip</updatedrivernamesurl>
-<personalisationsversion>114</personalisationsversion>
+<personalisationsversion>115</personalisationsversion>
 <basepersonalisationsurl>http://crewchief.isnais.de/personalisations.zip</basepersonalisationsurl>
 <updatepersonalisationsurl>http://crewchief.isnais.de/update_personalisations.zip</updatepersonalisationsurl>
 
@@ -27,7 +27,7 @@ secondary update sources) can still be updated. All downloads from this source w
 	<drivernamesversion>119</drivernamesversion>
 	<basedrivernamesurl>http://crewchief.isnais.de/base_driver_names.zip</basedrivernamesurl>
 	<updatedrivernamesurl>http://crewchief.isnais.de/update_driver_names.zip</updatedrivernamesurl>
-	<personalisationsversion>114</personalisationsversion>
+	<personalisationsversion>115</personalisationsversion>
 	<basepersonalisationsurl>http://crewchief.isnais.de/personalisations.zip</basepersonalisationsurl>
 	<updatepersonalisationsurl>http://crewchief.isnais.de/update_personalisations.zip</updatepersonalisationsurl>
 </soundpack>
