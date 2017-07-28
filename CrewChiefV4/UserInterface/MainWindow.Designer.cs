@@ -79,6 +79,8 @@ namespace CrewChiefV4
             this.driverNamesProgressBar = new System.Windows.Forms.ProgressBar();
             this.personalisationsProgressBar = new System.Windows.Forms.ProgressBar();
             this.personalisationBox = new System.Windows.Forms.ComboBox();
+            this.spotterNameLabel = new System.Windows.Forms.Label();
+            this.spotterNameBox = new System.Windows.Forms.ComboBox();
             this.donateLink = new System.Windows.Forms.LinkLabel();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.messagesVolumeSlider)).BeginInit();
@@ -174,9 +176,9 @@ namespace CrewChiefV4
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(991, 58);
+            this.button1.Location = new System.Drawing.Point(991, 93);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(143, 41);
+            this.button1.Size = new System.Drawing.Size(143, 31);
             this.button1.TabIndex = 14;
             this.button1.Text = Configuration.getUIString("properties");
             this.button1.UseVisualStyleBackColor = true;
@@ -185,9 +187,9 @@ namespace CrewChiefV4
             // 
             // help button
             // 
-            this.helpButton.Location = new System.Drawing.Point(991, 100);
+            this.helpButton.Location = new System.Drawing.Point(991, 125);
             this.helpButton.Name = "help";
-            this.helpButton.Size = new System.Drawing.Size(143, 41);
+            this.helpButton.Size = new System.Drawing.Size(143, 31);
             this.helpButton.TabIndex = 97;
             this.helpButton.Text = Configuration.getUIString("help");
             this.helpButton.UseVisualStyleBackColor = true;
@@ -196,9 +198,9 @@ namespace CrewChiefV4
             // 
             // about button
             // 
-            this.aboutButton.Location = new System.Drawing.Point(991, 142);
+            this.aboutButton.Location = new System.Drawing.Point(991, 157);
             this.aboutButton.Name = "about";
-            this.aboutButton.Size = new System.Drawing.Size(143, 41);
+            this.aboutButton.Size = new System.Drawing.Size(143, 31);
             this.aboutButton.TabIndex = 98;
             this.aboutButton.Text = Configuration.getUIString("about");
             this.aboutButton.UseVisualStyleBackColor = true;
@@ -457,6 +459,22 @@ namespace CrewChiefV4
             this.personalisationBox.Size = new System.Drawing.Size(142, 400);
             this.personalisationBox.TabIndex = 94;
 
+            this.spotterNameLabel.AutoSize = true;
+            this.spotterNameLabel.Location = new System.Drawing.Point(991, 55);
+            this.spotterNameLabel.Name = "spotterNameLabel";
+            this.spotterNameLabel.Size = new System.Drawing.Size(33, 13);
+            this.spotterNameLabel.TabIndex = 22;
+            this.spotterNameLabel.Text = Configuration.getUIString("spotter_name_label");
+
+            this.spotterNameBox.Location = new System.Drawing.Point(991, 70);
+            this.spotterNameBox.IntegralHeight = false;
+            this.spotterNameBox.MaxDropDownItems = 5;
+            this.spotterNameBox.DropDownStyle = ComboBoxStyle.DropDownList;
+            this.spotterNameBox.Name = "spotterNameBox";
+            this.spotterNameBox.Size = new System.Drawing.Size(142, 400);
+            this.spotterNameBox.TabIndex = 93;
+            this.spotterNameBox.SelectedIndexChanged += new System.EventHandler(this.spotterNameBox_SelectedIndexChanged);
+
             this.donateLink.Location = new System.Drawing.Point(35, 650);
             this.donateLink.Size = new System.Drawing.Size(250, 15);
             this.donateLink.Text = Configuration.getUIString("donate_link_text");
@@ -504,7 +522,9 @@ namespace CrewChiefV4
             this.Controls.Add(this.forceVersionCheckButton);
             this.Controls.Add(this.textBox1);
             this.Controls.Add(this.personalisationBox);
+            this.Controls.Add(this.spotterNameBox);
             this.Controls.Add(this.personalisationLabel);
+            this.Controls.Add(this.spotterNameLabel);
             this.Controls.Add(this.donateLink);
             this.Name = "MainWindow";
             this.Text = "Crew Chief V4";
@@ -560,6 +580,8 @@ namespace CrewChiefV4
         private System.Windows.Forms.ProgressBar driverNamesProgressBar;
         private System.Windows.Forms.ProgressBar personalisationsProgressBar;
         private System.Windows.Forms.ComboBox personalisationBox;
+        private System.Windows.Forms.Label spotterNameLabel;
+        private System.Windows.Forms.ComboBox spotterNameBox;
         private System.Windows.Forms.LinkLabel donateLink;
     }
 }
