@@ -2,12 +2,18 @@ CrewChief version 4.6
 
 Written by Jim Britton (main app, voice acting, Raceroom and PCars implementations), Morten Roslev (Assetto Corsa implementation), Vytautas Leonavičius (rFactor2 implementation) and Dan Allongo (Automobilista and rFactor1 implementation). The application is the result of lots of lots of hard work and input from the guys above as well as some great advice and support from the community and the guys at Sector3 and SMS.
 
+Additional material from Scoops (fantastic track layout mapping work), Geoffrey Lessel (some amazing alternate spotter sounds) and Clare Britton (more alternate spotter sounds).
+
 The source code for Crew Chief is available here: https://github.com/mrbelowski/CrewChiefV4
 
 For support and discussions about Crew Chief we have our very own forum here: http://thecrewchief.org/
 
 Changelog
 ---------
+Version 4.7.7.8: Added dropdown to main screen to allow a different spotter voice to be selected; Added Geoffrey Lessel's awesome spotter sounds - these are in the latest sound pack. Select "Geoffrey" from the new 'Spotter voice pack' menu; Fixed a couple more spotter bugs; Added button binding to get fuel status (consumption and fuel remaining). The "how's my fuel?" voice command now reports the consumption as well as the remaining fuel
+
+Version 4.7.7.5: More Scoops-Brand RF2 corner mappings; Fixed some spotter bugs; Added searching to Properties screen to make it a little less user-hostile; Replaced the nasty underscore_property_names with proper names on the Properties screen
+
 Version 4.7.7.4: Substantial RF2 plugin rewrite; Attempt to map game data if we detect the PCars2 exe - this does (apparently) work but expect some bugs and issues; Ported some fixes from the PCars Android app - some free practice session improvements, more aggressive pruning of broken driver data, better (hopefully...) method of identifying player's data so monitoring other drivers shouldn't confuse the app.
 
 Version 4.6.7.2: Use game-provided mandatory pitstop data where available (should fix app thinking you've completed your mandatory pitstop when the game thinks otherwise); Some more car and track mappings from Scoops; Added 'three wide you're on the left' and 'three wide you're on the right' to the spotter - optional, disabled by default (spotter_enable_three_wide_left_and_right in the Properties screen); Added voice command to get info about the car in front / behind is slower / faster than you - "where should I attack" / "where am I faster" / "where can I attack" or "where should I defend" / "where am I slower" / "where is he faster" / "where will he attack"; A few bug fixes; mapped Watkins Glen for PCars; Added fuel use per lap response - "what's my fuel usage" / "what's my fuel consumption" / "what's my fuel use".

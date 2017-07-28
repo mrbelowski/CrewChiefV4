@@ -5,7 +5,7 @@ Crew Chief requires the .Net framework, version 4.6. This is included in Windows
 
 When you first start Crew Chief the app will be installed with no sounds. The UI should have 2 big buttons, highlighted in green. Pressing these will download the sound pack (voice messages) and optional (but highly recommended) driver names. Press them both and when they're both complete, you'll be prompted to restart the application.
 
-For Raceroom and Project Cars, Crew Chief is self contained and needs no other software and almost no configuration. For rFactor1 based games, rFactor2 and Assetto Corsa there are a couple of extra steps required. 
+For Raceroom and Project Cars, Crew Chief is self contained and needs no other software and almost no configuration. For rFactor 1 based games, rFactor 2 and Assetto Corsa there are a couple of extra steps required. 
 
 For voice recognition (entirely optional but quite handy and very cool) see below.
 
@@ -19,7 +19,7 @@ To use Crew Chief with Raceroom simply select Raceroom from Crew Chief's Game me
 
 Project Cars:
 
-Project cars can be run in 3 modes - 32 bit, 64 bit or Network. I recommend trying Nework first (the app will have access to more accurate information). In Project Cars' Gameplay menu, set UDP to 2 or 3. Select Project Cars (network data) from Crew Chief's Game menu and click the Start button. For some users this might not work due to the way the game sends data in this mode. If it doesn't work for you try selecting Project Cars (64 bit) or Project Cars (32 bit) from the Game menu, depending on which version of the game you're running (for most users this will be 64 bit). Be aware that in these modes the app has to time opponent laps itself, so the opponent laptime reporting will not be as accurate as it is for Network mode.
+Project Cars can be run in 3 modes - 32 bit, 64 bit or Network. I recommend trying Nework first (the app will have access to more accurate information). In Project Cars' Gameplay menu, set UDP to 2 or 3. Select Project Cars (network data) from Crew Chief's Game menu and click the Start button. For some users this might not work due to the way the game sends data in this mode. If it doesn't work for you try selecting Project Cars (64 bit) or Project Cars (32 bit) from the Game menu, depending on which version of the game you're running (for most users this will be 64 bit). Be aware that in these modes the app has to time opponent laps itself, so the opponent laptime reporting will not be as accurate as it is for Network mode.
 
 
 Automobilista / RF1 / Game Stock Car Extreme / Formula Truck / Copa Petrobras de Marcas:
@@ -33,9 +33,11 @@ The source code for this plugin is here: https://github.com/dallongo/rFactorShar
 
 rFactor 2:
 
-You need Vytautas Leonavicius' plugin for rFactor 2. The app will check if this plugin is installed in the correct game folder. If it isn't, the app will offer to install it for you when you start the app with RF2 selected. In most cases all you need do is click the "OK" button in the popup.
+You need Vytautas Leonavičius' plugin for rFactor 2. The app will check if this plugin is installed in the correct game folder. If it isn't, the app will offer to install it for you when you start the app with rF2 selected. In most cases all you need do is click the "OK" button in the popup.
 
-If this process fails for any reason, copy the rFactor2SharedMemoryMapPlugin64.dll from the app's plugins folder - usually C:\Program Files (x86)\Britton IT Ltd\CrewChiefV4\plugins\rFactor 2\Bin64\Plugins\rFactor2SharedMemoryMapPlugin64.dll to the rFactor2 'Plugins' folder (usually something like C:\Program Files (x86)\Steam\steamapps\common\rFactor2\Bin64\Plugins). You need to enable this plugin from the game's Options->Plugins UI. 
+If this process fails for any reason, copy the rFactor2SharedMemoryMapPlugin64.dll from the app's plugins folder - usually C:\Program Files (x86)\Britton IT Ltd\CrewChiefV4\plugins\rFactor 2\Bin64\Plugins\rFactor2SharedMemoryMapPlugin64.dll to the rFactor2 'Plugins' folder (usually something like C:\Program Files (x86)\Steam\steamapps\common\rFactor2\Bin64\Plugins). You need to enable this plugin from the game's Options->Plugins UI.
+
+Note: 32 bit rFactor 2 is no longer supported.
 
 
 Assetto Corsa:
@@ -58,17 +60,19 @@ Properties
 -------------------
 The app includes a rather rudamentary preferences screen accessed by the "Properties" button. Many many aspects of that app's behaviour can be customised here but it's important to note that you don't have to make any changes to these properties to get the app to work correctly - the defaults are sensisble settings and the app doesn't need any configuration (except for swearing - see below).
 
+We've added a search capability to the window.  Most of CC options apply to all simulators, but you can also search for game specific preferences by typing ACS, AMS, R3E, rF1, rF2 or pCars to filter accordingly.
+
 
 
 Swearing
 -----------------
-Because swearing is cool and I'm a 12 year old stuck in a middle-aged body, this has its own help section. Swearing is disabled by default so once you've got the app working you'll want to enable it because swearing is cool. Look for a checkbox in the Properties screen called "use_sweary_messages" (near the bottom) and tick it. The app will swear where appropriate - it's not like listening to an Eddie Murphy gig and doesn't happen very often but it does help add a bit of personality to the messages.
+Because swearing is cool and I'm a 12 year old stuck in a middle-aged body, this has its own help section. Swearing is disabled by default so once you've got the app working you'll want to enable it because swearing is cool. Look for a checkbox in the Properties screen called "Use sweary messages" (search for "sweary" using the search box) and tick it. The app will swear where appropriate - it's not like listening to an Eddie Murphy gig and doesn't happen very often but it does help add a bit of personality to the messages.
 
 
 
 Personalisations
 ------------------------
-The "My name" dropdown menu in the top right of the main UI allows you to select from a list of names which the app will use to address you, from time to time. These are incorporated into existing messages so for example, rather than just saying "box now" the app will say "box now, please Jim". There are lots of variations and they sound quite good, if you are lucky enough to have a first name that's in this list. How often you hear these personalised messages is controlled by the "min_time_between_personalised_messages" property. The old default value (30s) is a bit low - 60s sounds better. The Personalisations come in the form of a mini-sound pack which is downloaded and managed by the app (they used to require lots of manual faffing) - if new personalisations are available the "Download personalisations" button will he highlighted in green. Swapping between personalisations requires an app restart.
+The "My name" dropdown menu in the top right of the main UI allows you to select from a list of names which the app will use to address you, from time to time. These are incorporated into existing messages so for example, rather than just saying "box now" the app will say "box now, please Jim". There are lots of variations and they sound quite good, if you are lucky enough to have a first name that's in this list. How often you hear these personalised messages is controlled by the "Min time between personalised messages" property. The old default value (30s) is a bit low - 60s sounds better. The Personalisations come in the form of a mini-sound pack which is downloaded and managed by the app (they used to require lots of manual faffing) - if new personalisations are available the "Download personalisations" button will he highlighted in green. Swapping between personalisations requires an app restart.
 
 
 
@@ -81,7 +85,7 @@ Again, from this page click 'Download' and select the right version - for most u
 
 This is not the same as the voice recognition technology built into Windows - it isn't installed with Windows by default.
 
-Crew Chief will use the "Default" recording device for voice recognition - this can be selected in the "Recording devices" section of the Window Sounds control panel. 
+Crew Chief will use the "Default" recording device for voice recognition - this can be selected in the "Recording devices" section of the Window Sounds control panel.
 
 Voice recognition can be configured to be always-on (it listens continuously and responds when it recognises a command) or in response to a button press. To assign a button to a activate voice recognition, press the 'Scan for controllers' button at the bottom of Crew Chief UI. This will populate the 'Available controllers' list. Then select the controller you want to use from this list and select the 'Talk to crew chief' item from the 'Available actions' list. Then click the 'Assign control' button and press the wheel / controller / keyboard button you want to use for this action. By default you have to hold this button down while you talk - this can be changed by selecting a different 'Voice recognition mode'.
 

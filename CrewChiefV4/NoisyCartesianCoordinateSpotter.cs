@@ -7,6 +7,7 @@ using System.Threading;
 using CrewChiefV4.Events;
 using CrewChiefV4.Audio;
 using CrewChiefV4.GameState;
+using System.IO;
 
 namespace CrewChiefV4
 {
@@ -53,9 +54,11 @@ namespace CrewChiefV4
 
         // say "still there" every 3 seconds
         private TimeSpan repeatHoldFrequency = TimeSpan.FromSeconds(UserSettings.GetUserSettings().getInt("spotter_hold_repeat_frequency"));
+        // use half the 'still there' wait if we're bouncing between clear and overlap
+        private TimeSpan bouncingWait = TimeSpan.FromSeconds(UserSettings.GetUserSettings().getInt("spotter_hold_repeat_frequency") / 2);
 
         // this is the delay between saying "car left" then "3 wide, you're on the right"
-        private TimeSpan onSingleOverlapTo3WideDelay = TimeSpan.FromSeconds(1);
+        private TimeSpan onSingleOverlapTo3WideDelay = TimeSpan.FromSeconds(0.5);
 
         private int carsOnLeftAtPreviousTick;
         private int carsOnRightAtPreviousTick;
@@ -64,15 +67,61 @@ namespace CrewChiefV4
         private float carWidth;
         private float maxClosingSpeed = UserSettings.GetUserSettings().getFloat("max_closing_speed_for_spotter");
 
-        private String folderStillThere = "spotter/still_there";
-        private String folderInTheMiddle = "spotter/in_the_middle";
-        private String folderCarLeft = "spotter/car_left";
-        private String folderCarRight = "spotter/car_right"; 
-        private String folderClearLeft = "spotter/clear_left";
-        private String folderClearRight = "spotter/clear_right";
-        private String folderClearAllRound = "spotter/clear_all_round";
-        private String folderThreeWideYoureOnRight = "spotter/three_wide_on_right";
-        private String folderThreeWideYoureOnLeft = "spotter/three_wide_on_left";
+        private static String folderStillThere = "spotter/still_there";
+        private static String folderInTheMiddle = "spotter/in_the_middle";
+        private static String folderCarLeft = "spotter/car_left";
+        private static String folderCarRight = "spotter/car_right";
+        private static String folderClearLeft = "spotter/clear_left";
+        private static String folderClearRight = "spotter/clear_right";
+        private static String folderClearAllRound = "spotter/clear_all_round";
+        private static String folderThreeWideYoureOnRight = "spotter/three_wide_on_right";
+        private static String folderThreeWideYoureOnLeft = "spotter/three_wide_on_left";
+
+        private static String spotterFolderPrefix = "spotter_";
+        public static String defaultSpotterId = "Jim (default)";
+        public static List<String> availableSpotters = new List<String>();
+
+        /**
+         * static constructor to initialise spotter subfolder stuff.
+         * 
+         */
+        static NoisyCartesianCoordinateSpotter()
+        {
+            availableSpotters.Clear();
+            availableSpotters.Add(defaultSpotterId);
+            DirectoryInfo soundsDirectory = new DirectoryInfo(AudioPlayer.soundFilesPath + "/voice");
+            DirectoryInfo[] directories = soundsDirectory.GetDirectories();
+            foreach (DirectoryInfo folder in directories)
+            {
+                if (folder.Name.StartsWith(spotterFolderPrefix) && folder.Name.Length > spotterFolderPrefix.Length)
+                {
+                    availableSpotters.Add(folder.Name.Substring(spotterFolderPrefix.Length));
+                }
+            }
+            String selectedSpotter = UserSettings.GetUserSettings().getString("spotter_name");
+            // TODO: select boxes and UI stuff - this may change
+            if (!defaultSpotterId.Equals(selectedSpotter))
+            {
+                if (Directory.Exists(AudioPlayer.soundFilesPath + "/voice/spotter_" + selectedSpotter))
+                {
+                    folderStillThere = "spotter_" + selectedSpotter + "/still_there";
+                    folderInTheMiddle = "spotter_" + selectedSpotter + "/in_the_middle";
+                    folderCarLeft = "spotter_" + selectedSpotter + "/car_left";
+                    folderCarRight = "spotter_" + selectedSpotter + "/car_right";
+                    folderClearLeft = "spotter_" + selectedSpotter + "/clear_left";
+                    folderClearRight = "spotter_" + selectedSpotter + "/clear_right";
+                    folderClearAllRound = "spotter_" + selectedSpotter + "/clear_all_round";
+                    folderThreeWideYoureOnRight = "spotter_" + selectedSpotter + "/three_wide_on_right";
+                    folderThreeWideYoureOnLeft = "spotter_" + selectedSpotter + "/three_wide_on_left";
+                }
+                else
+                {
+                    Console.WriteLine("No spotter called " + selectedSpotter + " exists, dropping back to the default (Jim)");
+                    UserSettings.GetUserSettings().setProperty("spotter_name", defaultSpotterId);
+                    UserSettings.GetUserSettings().saveUserSettings();
+                }
+            }
+        }
 
         // don't play 'clear' or 'hold' messages unless we've actually been clear or overlapping for some time
         private TimeSpan clearMessageDelay = TimeSpan.FromMilliseconds(UserSettings.GetUserSettings().getInt("spotter_clear_delay"));
@@ -83,7 +132,7 @@ namespace CrewChiefV4
         
         private DateTime timeWhenChannelShouldBeClosed;
 
-        private TimeSpan timeToWaitBeforeClosingChannelLeftOpen = TimeSpan.FromMilliseconds(500);
+        private TimeSpan timeToWaitBeforeClosingChannelLeftOpen = TimeSpan.FromMilliseconds(5000);
 
         private Boolean channelLeftOpenTimerStarted = false;
         
@@ -144,13 +193,14 @@ namespace CrewChiefV4
         
         public void triggerInternal(float playerRotationInRadians, float[] currentPlayerPosition,
             float[] playerVelocityData, List<float[]> currentOpponentPositions)
-        {            
+        {
             DateTime now = DateTime.Now;
 
             if (currentPlayerPosition[0] != 0 && currentPlayerPosition[1] != 0 &&
                 currentPlayerPosition[0] != -1 && currentPlayerPosition[1] != -1 &&
                 playerVelocityData[0] > minSpeedForSpotterToOperate)
             {
+                channelLeftOpenTimerStarted = false;
                 int carsOnLeft = 0;
                 int carsOnRight = 0;
                 List<int> activeIDs = new List<int>();
@@ -208,7 +258,7 @@ namespace CrewChiefV4
                             previousPositionAndVelocityData.Remove(i);
                         }
                     }
-                }  
+                }
                 List<int> opponentsToPurge = new List<int>();
                 foreach (int cachedOpponentDataKey in previousPositionAndVelocityData.Keys)
                 {
@@ -240,7 +290,10 @@ namespace CrewChiefV4
                     timeWhenChannelShouldBeClosed = DateTime.MaxValue;
                     carsOnLeftAtPreviousTick = 0;
                     carsOnRightAtPreviousTick = 0;
-                    
+                    reportedDoubleOverlapLeft = false;
+                    reportedDoubleOverlapRight = false;
+                    reportedSingleOverlapLeft = false;
+                    reportedSingleOverlapRight = false;
                     channelLeftOpenTimerStarted = false;
                 }
             }
@@ -343,7 +396,7 @@ namespace CrewChiefV4
                 // still in overlap-mode so don't want to say this immediately
                 if ((reportedSingleOverlapLeft || reportedDoubleOverlapLeft) && (reportedSingleOverlapRight || reportedDoubleOverlapRight))
                 {
-                    nextMessageDue = now.Add(repeatHoldFrequency);
+                    nextMessageDue = now.Add(bouncingWait);
                 }
                 else
                 {
@@ -357,7 +410,7 @@ namespace CrewChiefV4
                 // still in overlap-mode so don't want to say this immediately
                 if (reportedSingleOverlapLeft || reportedDoubleOverlapLeft)
                 {
-                    nextMessageDue = now.Add(repeatHoldFrequency);
+                    nextMessageDue = now.Add(bouncingWait);
                 }
                 else
                 {
@@ -374,10 +427,10 @@ namespace CrewChiefV4
                 }
             }
             else if (carsOnLeftCount == 0 && carsOnRightCount > 0 && carsOnLeftAtPreviousTick == 0 && carsOnRightAtPreviousTick == 0)
-            {
+            {                
                 if (reportedSingleOverlapRight || reportedDoubleOverlapRight)
                 {
-                    nextMessageDue = now.Add(repeatHoldFrequency);
+                    nextMessageDue = now.Add(bouncingWait);
                 }
                 else
                 {
@@ -406,7 +459,8 @@ namespace CrewChiefV4
                 }
                 else if (reportedDoubleOverlapLeft)
                 {
-                    nextMessageDue = now.Add(repeatHoldFrequency);
+                    // don't reset the message due time here
+                    // nextMessageDue = now.Add(repeatHoldFrequency);
                 }
                 else
                 {
@@ -422,7 +476,8 @@ namespace CrewChiefV4
                 }
                 else if (reportedDoubleOverlapRight)
                 {
-                    nextMessageDue = now.Add(repeatHoldFrequency);
+                    // don't reset the message due time here
+                    // nextMessageDue = now.Add(repeatHoldFrequency);
                 }
                 else
                 {
@@ -430,6 +485,16 @@ namespace CrewChiefV4
                     
                 }
                 nextMessageType = NextMessageType.threeWideYoureOnTheLeft;                                
+            }
+            // go from 3 wide on right to single car left
+            else if (use3WideLeftAndRight && carsOnLeftCount == 1 && carsOnRightCount == 0 && carsOnLeftAtPreviousTick > 1 && carsOnRightAtPreviousTick == 0)
+            {
+                nextMessageType = NextMessageType.carLeft;
+            }
+            // go from 3 wide on left to single car right
+            else if (use3WideLeftAndRight && carsOnLeftCount == 0 && carsOnRightCount == 1 && carsOnLeftAtPreviousTick == 0 && carsOnRightAtPreviousTick > 1)
+            {
+                nextMessageType = NextMessageType.carRight;
             }
         }
 
@@ -471,7 +536,8 @@ namespace CrewChiefV4
                     switch (nextMessageType)
                     {
                         case NextMessageType.threeWide:
-                            audioPlayer.removeImmediateMessages(new String[] { folderStillThere, folderCarLeft, folderCarRight, folderClearAllRound, folderClearLeft, folderClearRight, folderThreeWideYoureOnRight, folderThreeWideYoureOnLeft });
+                            audioPlayer.removeImmediateMessages(new String[] { folderStillThere, folderCarLeft, folderCarRight, folderClearAllRound, folderClearLeft, 
+                                folderClearRight, folderThreeWideYoureOnRight, folderThreeWideYoureOnLeft });
                             QueuedMessage inTheMiddleMessage = new QueuedMessage(folderInTheMiddle, 0, null);
                             inTheMiddleMessage.expiryTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + inTheMiddleMessageExpiresAfter;
                             audioPlayer.playSpotterMessage(inTheMiddleMessage, true);
@@ -484,7 +550,8 @@ namespace CrewChiefV4
                             wasInMiddle = true;
                             break;
                         case NextMessageType.threeWideYoureOnTheLeft:
-                            audioPlayer.removeImmediateMessages(new String[] { folderStillThere, folderCarLeft, folderCarRight, folderClearAllRound, folderClearLeft, folderClearRight, folderInTheMiddle, folderThreeWideYoureOnRight });
+                            audioPlayer.removeImmediateMessages(new String[] { folderStillThere, folderCarLeft, folderCarRight, folderClearAllRound, folderClearLeft, 
+                                folderClearRight, folderInTheMiddle, folderThreeWideYoureOnRight });
                             QueuedMessage threeWideOnLeftMessage = new QueuedMessage(folderThreeWideYoureOnLeft, 0, null);
                             threeWideOnLeftMessage.expiryTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + holdMessageExpiresAfter;
                             audioPlayer.playSpotterMessage(threeWideOnLeftMessage, true);
@@ -492,10 +559,10 @@ namespace CrewChiefV4
                             nextMessageDue = now.Add(repeatHoldFrequency);
                             reportedDoubleOverlapRight = true;
                             reportedSingleOverlapRight = false;
-                            wasInMiddle = true;
                             break;
                         case NextMessageType.threeWideYoureOnTheRight:
-                            audioPlayer.removeImmediateMessages(new String[] { folderStillThere, folderCarLeft, folderCarRight, folderClearAllRound, folderClearLeft, folderClearRight, folderInTheMiddle, folderThreeWideYoureOnLeft });
+                            audioPlayer.removeImmediateMessages(new String[] { folderStillThere, folderCarLeft, folderCarRight, folderClearAllRound, folderClearLeft,
+                                folderClearRight, folderInTheMiddle, folderThreeWideYoureOnLeft });
                             QueuedMessage threeWideOnRightMessage = new QueuedMessage(folderThreeWideYoureOnRight, 0, null);
                             threeWideOnRightMessage.expiryTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + holdMessageExpiresAfter;
                             audioPlayer.playSpotterMessage(threeWideOnRightMessage, true);
@@ -503,10 +570,10 @@ namespace CrewChiefV4
                             nextMessageDue = now.Add(repeatHoldFrequency);
                             reportedDoubleOverlapLeft = true;
                             reportedSingleOverlapLeft = false;
-                            wasInMiddle = true;
                             break;
                         case NextMessageType.carLeft:
-                            audioPlayer.removeImmediateMessages(new String[] { folderStillThere, folderInTheMiddle, folderCarRight, folderClearAllRound, folderClearLeft, folderClearRight, folderThreeWideYoureOnRight, folderThreeWideYoureOnLeft });
+                            audioPlayer.removeImmediateMessages(new String[] { folderStillThere, folderInTheMiddle, folderCarRight, folderClearAllRound, 
+                                folderClearLeft, folderClearRight, folderThreeWideYoureOnRight, folderThreeWideYoureOnLeft });
                             QueuedMessage carLeftMessage = new QueuedMessage(folderCarLeft, 0, null);
                             carLeftMessage.expiryTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + holdMessageExpiresAfter;
                             audioPlayer.playSpotterMessage(carLeftMessage, true);
@@ -516,7 +583,8 @@ namespace CrewChiefV4
                             reportedDoubleOverlapLeft = false;
                             break;
                         case NextMessageType.carRight:
-                            audioPlayer.removeImmediateMessages(new String[] { folderStillThere, folderCarLeft, folderInTheMiddle, folderClearAllRound, folderClearLeft, folderClearRight, folderThreeWideYoureOnRight, folderThreeWideYoureOnLeft });
+                            audioPlayer.removeImmediateMessages(new String[] { folderStillThere, folderCarLeft, folderInTheMiddle, folderClearAllRound, 
+                                folderClearLeft, folderClearRight, folderThreeWideYoureOnRight, folderThreeWideYoureOnLeft });
                             QueuedMessage carRightMessage = new QueuedMessage(folderCarRight, 0, null);
                             carRightMessage.expiryTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + holdMessageExpiresAfter;
                             audioPlayer.playSpotterMessage(carRightMessage, true);
@@ -530,7 +598,8 @@ namespace CrewChiefV4
                             {
                                 QueuedMessage clearAllRoundMessage = new QueuedMessage(folderClearAllRound, 0, null);
                                 clearAllRoundMessage.expiryTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + clearAllRoundMessageExpiresAfter;
-                                audioPlayer.removeImmediateMessages(new String[] { folderCarLeft, folderStillThere, folderCarRight, folderInTheMiddle, folderClearLeft, folderClearRight, folderThreeWideYoureOnRight, folderThreeWideYoureOnLeft });
+                                audioPlayer.removeImmediateMessages(new String[] { folderCarLeft, folderStillThere, folderCarRight, folderInTheMiddle, 
+                                    folderClearLeft, folderClearRight, folderThreeWideYoureOnRight, folderThreeWideYoureOnLeft });
                                 audioPlayer.playSpotterMessage(clearAllRoundMessage, false);
                                 nextMessageType = NextMessageType.none;
                             }
@@ -548,27 +617,35 @@ namespace CrewChiefV4
                                 {
                                     QueuedMessage clearAllRoundMessage = new QueuedMessage(folderClearAllRound, 0, null);
                                     clearAllRoundMessage.expiryTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + clearMessageExpiresAfter;
-                                    audioPlayer.removeImmediateMessages(new String[] {folderCarLeft, folderStillThere, folderCarRight, folderInTheMiddle, folderClearRight, folderClearLeft, folderThreeWideYoureOnRight, folderThreeWideYoureOnLeft});
+                                    audioPlayer.removeImmediateMessages(new String[] {folderCarLeft, folderStillThere, folderCarRight, folderInTheMiddle, 
+                                        folderClearRight, folderClearLeft, folderThreeWideYoureOnRight, folderThreeWideYoureOnLeft});
                                     audioPlayer.playSpotterMessage(clearAllRoundMessage, false);
                                     nextMessageType = NextMessageType.none;
-
+                                    reportedDoubleOverlapRight = false;
+                                    reportedSingleOverlapRight = false;
                                     wasInMiddle = false;
                                 }
                                 else
                                 {
                                     QueuedMessage clearLeftMessage = new QueuedMessage(folderClearLeft, 0, null);
                                     clearLeftMessage.expiryTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + clearMessageExpiresAfter;
-                                    audioPlayer.removeImmediateMessages(new String[] { folderCarLeft, folderStillThere, folderCarRight, folderInTheMiddle, folderClearRight, folderClearAllRound, folderThreeWideYoureOnRight, folderThreeWideYoureOnLeft });
+                                    audioPlayer.removeImmediateMessages(new String[] { folderCarLeft, folderStillThere, folderCarRight, folderInTheMiddle,
+                                        folderClearRight, folderClearAllRound, folderThreeWideYoureOnRight, folderThreeWideYoureOnLeft });
                                     if (wasInMiddle)
                                     {
                                         audioPlayer.playSpotterMessage(clearLeftMessage, true);
                                         nextMessageType = NextMessageType.carRight;
                                         nextMessageDue = now.Add(repeatHoldFrequency);
+                                        
                                     }
                                     else
                                     {
                                         audioPlayer.playSpotterMessage(clearLeftMessage, false);
                                         nextMessageType = NextMessageType.none;
+                                        // belt'n'braces - the overlapRight stuff should have already been cleared by the time we reach here so this 
+                                        // may be unnecessary, but it does no harm to make sure
+                                        reportedSingleOverlapRight = false;
+                                        reportedDoubleOverlapRight = false;
                                     }
                                 }
                             }
@@ -582,17 +659,20 @@ namespace CrewChiefV4
                                 {
                                     QueuedMessage clearAllRoundMessage = new QueuedMessage(folderClearAllRound, 0, null);
                                     clearAllRoundMessage.expiryTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + clearMessageExpiresAfter;
-                                    audioPlayer.removeImmediateMessages(new String[] { folderCarLeft, folderStillThere, folderCarRight, folderInTheMiddle, folderClearLeft, folderClearRight, folderThreeWideYoureOnRight, folderThreeWideYoureOnLeft });
+                                    audioPlayer.removeImmediateMessages(new String[] { folderCarLeft, folderStillThere, folderCarRight, folderInTheMiddle, 
+                                        folderClearLeft, folderClearRight, folderThreeWideYoureOnRight, folderThreeWideYoureOnLeft });
                                     audioPlayer.playSpotterMessage(clearAllRoundMessage, false);
                                     nextMessageType = NextMessageType.none;
-                                    
+                                    reportedDoubleOverlapLeft = false;
+                                    reportedSingleOverlapLeft = false;
                                     wasInMiddle = false;
                                 }
                                 else
                                 {
                                     QueuedMessage clearRightMessage = new QueuedMessage(folderClearRight, 0, null);
                                     clearRightMessage.expiryTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + clearMessageExpiresAfter;
-                                    audioPlayer.removeImmediateMessages(new String[] { folderCarLeft, folderStillThere, folderCarRight, folderInTheMiddle, folderClearLeft, folderClearAllRound, folderThreeWideYoureOnRight, folderThreeWideYoureOnLeft });                                    
+                                    audioPlayer.removeImmediateMessages(new String[] { folderCarLeft, folderStillThere, folderCarRight, folderInTheMiddle, 
+                                        folderClearLeft, folderClearAllRound, folderThreeWideYoureOnRight, folderThreeWideYoureOnLeft });                                    
                                     if (wasInMiddle)
                                     {
                                         audioPlayer.playSpotterMessage(clearRightMessage, true);
@@ -603,6 +683,10 @@ namespace CrewChiefV4
                                     {
                                         audioPlayer.playSpotterMessage(clearRightMessage, false);
                                         nextMessageType = NextMessageType.none;
+                                        // belt'n'braces - the overlapLeft stuff should have already been cleared by the time we reach here so this 
+                                        // may be unnecessary, but it does no harm to make sure
+                                        reportedSingleOverlapLeft = false;
+                                        reportedDoubleOverlapLeft = false;
                                     }
                                 }
                             }
@@ -623,14 +707,6 @@ namespace CrewChiefV4
                         case NextMessageType.none:
                             break;
                     }
-                }
-                else
-                {
-                    // Console.WriteLine("message " + nextMessageType + " no longer valid, carsOnLeftCount = " + carsOnLeftCount + " carsOnRightCount = " + carsOnRightCount);
-                    /*reportedSingleOverlapLeft = false;
-                    reportedSingleOverlapRight = false;
-                    reportedDoubleOverlapLeft = false;
-                    reportedDoubleOverlapRight = false;*/
                 }
             }
         }
