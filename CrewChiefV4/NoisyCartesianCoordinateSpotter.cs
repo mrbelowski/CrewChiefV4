@@ -89,37 +89,45 @@ namespace CrewChiefV4
         {
             availableSpotters.Clear();
             availableSpotters.Add(defaultSpotterId);
-            DirectoryInfo soundsDirectory = new DirectoryInfo(AudioPlayer.soundFilesPath + "/voice");
-            DirectoryInfo[] directories = soundsDirectory.GetDirectories();
-            foreach (DirectoryInfo folder in directories)
+            try
             {
-                if (folder.Name.StartsWith(spotterFolderPrefix) && folder.Name.Length > spotterFolderPrefix.Length)
+                DirectoryInfo soundsDirectory = new DirectoryInfo(AudioPlayer.soundFilesPath + "/voice");
+                DirectoryInfo[] directories = soundsDirectory.GetDirectories();
+                foreach (DirectoryInfo folder in directories)
                 {
-                    availableSpotters.Add(folder.Name.Substring(spotterFolderPrefix.Length));
+                    if (folder.Name.StartsWith(spotterFolderPrefix) && folder.Name.Length > spotterFolderPrefix.Length)
+                    {
+                        availableSpotters.Add(folder.Name.Substring(spotterFolderPrefix.Length));
+                    }
+                }
+                String selectedSpotter = UserSettings.GetUserSettings().getString("spotter_name");
+                // TODO: select boxes and UI stuff - this may change
+                if (!defaultSpotterId.Equals(selectedSpotter))
+                {
+                    if (Directory.Exists(AudioPlayer.soundFilesPath + "/voice/spotter_" + selectedSpotter))
+                    {
+                        Console.WriteLine("Using spotter " + selectedSpotter);
+                        folderStillThere = "spotter_" + selectedSpotter + "/still_there";
+                        folderInTheMiddle = "spotter_" + selectedSpotter + "/in_the_middle";
+                        folderCarLeft = "spotter_" + selectedSpotter + "/car_left";
+                        folderCarRight = "spotter_" + selectedSpotter + "/car_right";
+                        folderClearLeft = "spotter_" + selectedSpotter + "/clear_left";
+                        folderClearRight = "spotter_" + selectedSpotter + "/clear_right";
+                        folderClearAllRound = "spotter_" + selectedSpotter + "/clear_all_round";
+                        folderThreeWideYoureOnRight = "spotter_" + selectedSpotter + "/three_wide_on_right";
+                        folderThreeWideYoureOnLeft = "spotter_" + selectedSpotter + "/three_wide_on_left";
+                    }
+                    else
+                    {
+                        Console.WriteLine("No spotter called " + selectedSpotter + " exists, dropping back to the default (Jim)");
+                        UserSettings.GetUserSettings().setProperty("spotter_name", defaultSpotterId);
+                        UserSettings.GetUserSettings().saveUserSettings();
+                    }
                 }
             }
-            String selectedSpotter = UserSettings.GetUserSettings().getString("spotter_name");
-            // TODO: select boxes and UI stuff - this may change
-            if (!defaultSpotterId.Equals(selectedSpotter))
+            catch (Exception)
             {
-                if (Directory.Exists(AudioPlayer.soundFilesPath + "/voice/spotter_" + selectedSpotter))
-                {
-                    folderStillThere = "spotter_" + selectedSpotter + "/still_there";
-                    folderInTheMiddle = "spotter_" + selectedSpotter + "/in_the_middle";
-                    folderCarLeft = "spotter_" + selectedSpotter + "/car_left";
-                    folderCarRight = "spotter_" + selectedSpotter + "/car_right";
-                    folderClearLeft = "spotter_" + selectedSpotter + "/clear_left";
-                    folderClearRight = "spotter_" + selectedSpotter + "/clear_right";
-                    folderClearAllRound = "spotter_" + selectedSpotter + "/clear_all_round";
-                    folderThreeWideYoureOnRight = "spotter_" + selectedSpotter + "/three_wide_on_right";
-                    folderThreeWideYoureOnLeft = "spotter_" + selectedSpotter + "/three_wide_on_left";
-                }
-                else
-                {
-                    Console.WriteLine("No spotter called " + selectedSpotter + " exists, dropping back to the default (Jim)");
-                    UserSettings.GetUserSettings().setProperty("spotter_name", defaultSpotterId);
-                    UserSettings.GetUserSettings().saveUserSettings();
-                }
+                Console.WriteLine("No sound folders available");
             }
         }
 
