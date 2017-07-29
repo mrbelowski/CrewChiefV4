@@ -204,13 +204,13 @@ namespace CrewChiefV4.rFactor2
         public void enableSpotter()
         {
             this.enabled = true;
-            this.audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderEnableSpotter, 0, null));
+            this.audioPlayer.playMessageImmediately(new QueuedMessage(NoisyCartesianCoordinateSpotter.folderEnableSpotter, 0, null));
         }
 
         public void disableSpotter()
         {
             this.enabled = false;
-            this.audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderDisableSpotter, 0, null));
+            this.audioPlayer.playMessageImmediately(new QueuedMessage(NoisyCartesianCoordinateSpotter.folderDisableSpotter, 0, null));
         }
     }
 }

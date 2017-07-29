@@ -83,6 +83,11 @@ namespace CrewChiefV4
         private static String folderThreeWideYoureOnInside = "spotter/three_wide_on_inside";
         private static String folderThreeWideYoureOnOutside = "spotter/three_wide_on_outside";
 
+        public static String folderEnableSpotter = "acknowledge/spotterEnabled";
+        public static String folderDisableSpotter = "acknowledge/spotterDisabled";
+
+        public static String folderSpotterRadioCheck = null;
+
         private static String spotterFolderPrefix = "spotter_";
         public static String defaultSpotterId = "Jim (default)";
         public static List<String> availableSpotters = new List<String>();
@@ -132,13 +137,25 @@ namespace CrewChiefV4
                         folderClearOutside = "spotter_" + selectedSpotter + "/clear_outside";
                         folderThreeWideYoureOnInside = "spotter_" + selectedSpotter + "/three_wide_on_inside";
                         folderThreeWideYoureOnOutside = "spotter_" + selectedSpotter + "/three_wide_on_outside";
+                        if (Directory.Exists(AudioPlayer.soundFilesPath + "/voice/acknowledge/spotterEnabled_" + selectedSpotter))
+                        {
+                            folderEnableSpotter = "acknowledge/spotterEnabled_" + selectedSpotter;
+                        }
+                        if (Directory.Exists(AudioPlayer.soundFilesPath + "/voice/acknowledge/spotterDisabled_" + selectedSpotter))
+                        {
+                            folderDisableSpotter = "acknowledge/spotterDisabled_" + selectedSpotter;
+                        }
+                        if (Directory.Exists(AudioPlayer.soundFilesPath + "/voice/radio_check_" + selectedSpotter + "/test"))
+                        {
+                            folderSpotterRadioCheck = "radio_check_" + selectedSpotter + "/test";
+                        }
                     }
                     else
                     {
                         Console.WriteLine("No spotter called " + selectedSpotter + " exists, dropping back to the default (Jim)");
                         UserSettings.GetUserSettings().setProperty("spotter_name", defaultSpotterId);
                         UserSettings.GetUserSettings().saveUserSettings();                        
-                    }
+                    }                    
                 }
                 // check the oval specific stuff exists before enabling it:
                 hasOvalSpecificSounds = Directory.Exists(AudioPlayer.soundFilesPath + "/voice/" + folderCarInside);                
