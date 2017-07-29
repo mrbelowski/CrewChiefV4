@@ -25,8 +25,6 @@ namespace CrewChiefV4.Audio
         public static String folderYellowEnabled = "acknowledge/yellowEnabled";
         public static String folderYellowDisabled = "acknowledge/yellowDisabled";
         public static String folderAcknowlegeEnableKeepQuiet = "acknowledge/keepQuietEnabled";
-        public static String folderEnableSpotter = "acknowledge/spotterEnabled";
-        public static String folderDisableSpotter = "acknowledge/spotterDisabled";
         public static String folderAcknowlegeDisableKeepQuiet = "acknowledge/keepQuietDisabled";
         public static String folderDidntUnderstand = "acknowledge/didnt_understand";
         public static String folderNoData = "acknowledge/no_data";
