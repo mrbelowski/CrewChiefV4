@@ -685,14 +685,14 @@ namespace CrewChiefV4.PCars
                 {
                     currentGameState.SessionData.LapTimePreviousEstimateForInvalidLap = currentGameState.SessionData.SessionRunningTime - currentGameState.SessionData.SessionTimesAtEndOfSectors[3];
                     currentGameState.SessionData.SessionTimesAtEndOfSectors[3] = currentGameState.SessionData.SessionRunningTime;
-                    // the sector 3 time gets reset when we start a new lap. Calculate it if this is the case and we have valid data to use
-                    if (shared.mCurrentSector3Time <= 0 && shared.mLastLapTime > 0 && currentGameState.SessionData.LastSector1Time > 0 && currentGameState.SessionData.LastSector2Time > 0)
+
+                    if (shared.mLastLapTime > 0 && currentGameState.SessionData.LastSector1Time > 0 && currentGameState.SessionData.LastSector2Time > 0)
                     {
                         currentGameState.SessionData.LastSector3Time = (shared.mLastLapTime - currentGameState.SessionData.LastSector1Time) - currentGameState.SessionData.LastSector2Time;
                     }
                     else
                     {
-                        currentGameState.SessionData.LastSector3Time = shared.mCurrentSector3Time;
+                        currentGameState.SessionData.LastSector3Time = -1;
                     }
                     if (currentGameState.SessionData.LastSector3Time > 0 && 
                         (currentGameState.SessionData.PlayerBestSector3Time == -1 || currentGameState.SessionData.LastSector3Time < currentGameState.SessionData.PlayerBestSector3Time))
