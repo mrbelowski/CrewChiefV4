@@ -200,8 +200,12 @@ namespace CrewChiefV4
         private Boolean reportedDoubleOverlapRight = false;
 
         private Boolean wasInMiddle = false;
-
-        private static int maxOverlapsPerSide = use3WideLeftAndRight ? 2 : 1;
+        
+        // 3 because this is the minimum number of cars we need to consider to be sure of a 3-wide-on-left / right.
+        // 2 along side one behind the other, then another out wide. There's an edge case here where the extra length allowed
+        // for overlap means we may have 3 cars the app considers to be along side, even though they're all lined up. But this
+        // is rare enough to discount I think.
+        private static int maxOverlapsPerSide = use3WideLeftAndRight ? 3 : 1;
 
         private enum Side {
             right, left, none
@@ -254,6 +258,11 @@ namespace CrewChiefV4
                 channelLeftOpenTimerStarted = false;
                 int carsOnLeft = 0;
                 int carsOnRight = 0;
+                float minLateralSeparationForOverlapLeft = -1;
+                float maxLateralSeparationForOverlapLeft = -1;
+                float minLateralSeparationForOverlapRight = -1;
+                float maxLateralSeparationForOverlapRight = -1;
+
                 List<int> activeIDs = new List<int>();
                 for (int i = 0; i < currentOpponentPositions.Count; i++)
                 {
@@ -288,18 +297,46 @@ namespace CrewChiefV4
                             {
                                 previousPositionAndVelocityData.Add(i, new PreviousPositionAndVelocityData(currentOpponentPosition[0], currentOpponentPosition[1], now));
                             }
-                            // again, if we already have 2 overlaps on both sides here we don't need to calculate another
+                            // again, if we already have max overlaps on both sides here we don't need to calculate another
                             if (carsOnLeft < maxOverlapsPerSide || carsOnRight < maxOverlapsPerSide)
                             {
-                                Side side = getSide(playerRotationInRadians, currentPlayerPosition[0], currentPlayerPosition[1], currentOpponentPosition[0], 
-                                    currentOpponentPosition[1], isOpponentVelocityInRange);
-                                if (side == Side.left)
+                                Tuple<Side, float> sideAndLateralSeparation = getSideAndSeparation(playerRotationInRadians, currentPlayerPosition[0], 
+                                    currentPlayerPosition[1], currentOpponentPosition[0], currentOpponentPosition[1], isOpponentVelocityInRange);
+                                if (sideAndLateralSeparation.Item1 == Side.left)
                                 {
                                     carsOnLeft++;
+                                    // no need to check for 3 wide on left if there's already a car right, so don't bother with this calculation
+                                    if (carsOnRight == 0)
+                                    {
+                                        // get the max and min lateral separation for the cars on the left - we can only be 3 wide if this is > carWidth
+                                        if (minLateralSeparationForOverlapLeft == -1 || minLateralSeparationForOverlapLeft > sideAndLateralSeparation.Item2)
+                                        {
+                                            minLateralSeparationForOverlapLeft = sideAndLateralSeparation.Item2;
+                                        }
+                                        if (maxLateralSeparationForOverlapLeft == -1 || maxLateralSeparationForOverlapLeft < sideAndLateralSeparation.Item2)
+                                        {
+                                            maxLateralSeparationForOverlapLeft = sideAndLateralSeparation.Item2;
+                                        }
+                                        //Console.WriteLine("cars on left = " + carsOnLeft + ", maxSep = " + maxLateralSeparationForOverlapLeft + ", minSep = " + minLateralSeparationForOverlapLeft);
+                                    }
                                 }
-                                else if (side == Side.right)
+                                else if (sideAndLateralSeparation.Item1 == Side.right)
                                 {
                                     carsOnRight++;
+                                    // no need to check for 3 wide on right if there's already a car left, so don't bother with this calculation
+                                    if (carsOnLeft == 0)
+                                    {
+                                        // get the max and min lateral separation for the cars on the right - we can only be 3 wide if this is > carWidth
+                                        if (minLateralSeparationForOverlapRight == -1 || minLateralSeparationForOverlapRight > sideAndLateralSeparation.Item2)
+                                        {
+                                            minLateralSeparationForOverlapRight = sideAndLateralSeparation.Item2;
+                                        }
+                                        if (maxLateralSeparationForOverlapRight == -1 || maxLateralSeparationForOverlapRight < sideAndLateralSeparation.Item2)
+                                        {
+                                            maxLateralSeparationForOverlapRight = sideAndLateralSeparation.Item2;
+                                        }
+                                        //Console.WriteLine("cars on right = " + carsOnRight + ", maxSep = " + maxLateralSeparationForOverlapRight + ", minSep = " + minLateralSeparationForOverlapRight);
+                                    }
                                 }
                             }
                         } 
@@ -321,6 +358,29 @@ namespace CrewChiefV4
                     if (previousPositionAndVelocityData.ContainsKey(idToPurge))
                     {
                         previousPositionAndVelocityData.Remove(idToPurge);
+                    }
+                }
+                // now check the min and max lateral separations before allowing 3 wide-on-left/right
+                if (carsOnLeft > 1 && carsOnRight == 0)
+                {
+                    float separationDelta = maxLateralSeparationForOverlapLeft - minLateralSeparationForOverlapLeft;
+                    //Console.WriteLine("checking 3 wide on left, separation delta = " + separationDelta);
+                    if (separationDelta < carWidth)
+                    {
+                        // there are 2 or more cars along side, but they're not stacked up 2 wide
+                        carsOnLeft = 1;
+                        //Console.WriteLine("cars on right are line-astern");
+                    }
+                }
+                if (carsOnRight > 1 && carsOnLeft == 0)
+                {
+                    float separationDelta = maxLateralSeparationForOverlapRight - minLateralSeparationForOverlapRight;
+                    //Console.WriteLine("checking 3 wide on right, separation delta = " + separationDelta);
+                    if (separationDelta < carWidth)
+                    {
+                        // there are 2 or more cars along side, but they're not stacked up 2 wide
+                        carsOnRight = 1;
+                        //Console.WriteLine("cars on right are line-astern");
                     }
                 }
                 getNextMessage(carsOnLeft, carsOnRight, now);
@@ -355,7 +415,7 @@ namespace CrewChiefV4
             return Math.Abs(playerX - opponentX) < maxClosingSpeed && Math.Abs(playerZ - opponentZ) < maxClosingSpeed;
         }
 
-        private Side getSide(float playerRotationInRadians, float playerX, float playerZ, float oppponentX, float opponentZ, Boolean isOpponentSpeedInRange)
+        private Tuple<Side, float> getSideAndSeparation(float playerRotationInRadians, float playerX, float playerZ, float oppponentX, float opponentZ, Boolean isOpponentSpeedInRange)
         {
             float rawXCoordinate = oppponentX - playerX;
             float rawZCoordinate = opponentZ - playerZ;
@@ -382,14 +442,14 @@ namespace CrewChiefV4
                     {
                         if (Math.Abs(alignedZCoordinate) < longCarLength)
                         {
-                            return Side.right;
+                            return new Tuple<Side, float>(Side.right, alignedXCoordinate * -1);
                         }
                     }
                     else if (((alignedZCoordinate < 0 && alignedZCoordinate * -1 < carLength) || (alignedZCoordinate > 0 && alignedZCoordinate < carLength + carBehindExtraLength)) &&
                         Math.Abs(alignedXCoordinate) > carWidth && isOpponentSpeedInRange)
                     {
                         // we have a new overlap on this side, it's only valid if we're not inside the other car and the speed isn't out of range
-                        return Side.right;
+                        return new Tuple<Side, float>(Side.right, alignedXCoordinate * -1);
                     }
                 }
                 else
@@ -398,17 +458,17 @@ namespace CrewChiefV4
                     {
                         if (Math.Abs(alignedZCoordinate) < longCarLength)
                         {
-                            return Side.left;
+                            return new Tuple<Side, float>(Side.left, alignedXCoordinate);
                         }
                     }
                     else if (((alignedZCoordinate < 0 && alignedZCoordinate * -1 < carLength) || (alignedZCoordinate > 0 && alignedZCoordinate < carLength + carBehindExtraLength)) &&
                         Math.Abs(alignedXCoordinate) > carWidth && isOpponentSpeedInRange)
                     {
-                        return Side.left;
+                        return new Tuple<Side, float>(Side.left, alignedXCoordinate);
                     }
                 }
             }
-            return Side.none;
+            return new Tuple<Side, float>(Side.none, -1);
         }
 
         private Boolean opponentPositionInRange(float[] opponentPosition, float[] playerPosition)
