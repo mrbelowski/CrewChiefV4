@@ -3349,7 +3349,7 @@
 			]
 		},
 		{
-			"rf2TrackNames": ["RaceRfactor Montreal 2013"],
+			"rf2TrackNames": ["RaceRfactor Montreal 2013", "Montreal GP"],
 			"trackLandmarks": [{
 					"landmarkName": "turn1",
 					"distanceRoundLapStart": 190,
@@ -3394,8 +3394,8 @@
 				},
 				{
 					"landmarkName": "turn8",
-					"distanceRoundLapStart": 1950,
-					"distanceRoundLapEnd": 2929,
+					"distanceRoundLapStart": 2025,
+					"distanceRoundLapEnd": 2995,
 					"isCommonOvertakingSpot": false
 				},
 				{
