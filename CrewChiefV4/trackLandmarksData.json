@@ -7725,7 +7725,7 @@
 			"approximateTrackLength": 3193,
 			"isOval": true,
 			"trackLandmarks": [{
-					"landmarkName": "trioval",
+					"landmarkName": "the_tri_oval",
 					"distanceRoundLapStart": 0,
 					"distanceRoundLapEnd": 225,
 					"isCommonOvertakingSpot": true
@@ -7755,7 +7755,7 @@
 					"isCommonOvertakingSpot": true
 				},
 				{
-					"landmarkName": "trioval",
+					"landmarkName": "the_tri_oval",
 					"distanceRoundLapStart": 3745,
 					"distanceRoundLapEnd": 4000,
 					"isCommonOvertakingSpot": true
@@ -7797,7 +7797,7 @@
 			"rf2TrackNames": ["Eagle Creek Speedway"],
 			"isOval": true,
 			"trackLandmarks": [{
-					"landmarkName": "trioval",
+					"landmarkName": "the_tri_oval",
 					"distanceRoundLapStart": 0,
 					"distanceRoundLapEnd": 235,
 					"isCommonOvertakingSpot": true
@@ -7827,7 +7827,7 @@
 					"isCommonOvertakingSpot": true
 				},
 				{
-					"landmarkName": "trioval",
+					"landmarkName": "the_tri_oval",
 					"distanceRoundLapStart": 2060,
 					"distanceRoundLapEnd": 2400,
 					"isCommonOvertakingSpot": true
@@ -8145,7 +8145,7 @@
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "acque+minerale",
+					"landmarkName": "acque_minerali",
 					"distanceRoundLapStart": 2530,
 					"distanceRoundLapEnd": 2660,
 					"isCommonOvertakingSpot": false
@@ -8661,7 +8661,7 @@
 				},
 
 				{
-					"landmarkName": "ost_curve",
+					"landmarkName": "ost_kurve",
 					"distanceRoundLapStart": 3230,
 					"distanceRoundLapEnd": 3550,
 					"isCommonOvertakingSpot": false
@@ -8673,19 +8673,19 @@
 					"isCommonOvertakingSpot": true
 				},
 				{
-					"landmarkName": "agipkurve",
+					"landmarkName": "agip_kurve",
 					"distanceRoundLapStart": 5510,
 					"distanceRoundLapEnd": 5700,
 					"isCommonOvertakingSpot": true
 				},
 				{
-					"landmarkName": "sachskurve",
+					"landmarkName": "sachs_kurve",
 					"distanceRoundLapStart": 5850,
 					"distanceRoundLapEnd": 6015,
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "opelkurve",
+					"landmarkName": "opel_kurve",
 					"distanceRoundLapStart": 6225,
 					"distanceRoundLapEnd": 6550,
 					"isCommonOvertakingSpot": false
@@ -9047,13 +9047,13 @@
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "stavelot",
+					"landmarkName": "stavlot",
 					"distanceRoundLapStart": 4900,
 					"distanceRoundLapEnd": 5080,
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "blanchemot",
+					"landmarkName": "blanchimont",
 					"distanceRoundLapStart": 5915,
 					"distanceRoundLapEnd": 6095,
 					"isCommonOvertakingSpot": false
@@ -9355,7 +9355,7 @@
 		{
 			"rf2TrackNames": ["Hockenheimring"],
 			"trackLandmarks": [{
-					"landmarkName": "nordkurve",
+					"landmarkName": "nord_kurve",
 					"distanceRoundLapStart": 210,
 					"distanceRoundLapEnd": 470,
 					"isCommonOvertakingSpot": false
@@ -9415,7 +9415,7 @@
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "mobil1",
+					"landmarkName": "mobile_1",
 					"distanceRoundLapStart": 3355,
 					"distanceRoundLapEnd": 3550,
 					"isCommonOvertakingSpot": false
@@ -9445,7 +9445,7 @@
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "sudkurve",
+					"landmarkName": "sud_kurve",
 					"distanceRoundLapStart": 4195,
 					"distanceRoundLapEnd": 4380,
 					"isCommonOvertakingSpot": false
@@ -9756,7 +9756,7 @@
 			"rf2TrackNames": ["Jacksonville Superspeedway"],
 			"isOval": true,
 			"trackLandmarks": [{
-					"landmarkName": "trioval",
+					"landmarkName": "the_tri_oval",
 					"distanceRoundLapStart": 0,
 					"distanceRoundLapEnd": 215,
 					"isCommonOvertakingSpot": true
@@ -9786,7 +9786,7 @@
 					"isCommonOvertakingSpot": true
 				},
 				{
-					"landmarkName": "trioval",
+					"landmarkName": "the_tri_oval",
 					"distanceRoundLapStart": 3755,
 					"distanceRoundLapEnd": 4027,
 					"isCommonOvertakingSpot": true
@@ -9828,7 +9828,7 @@
 			"rf2TrackNames": ["Kansas Speedway"],
 			"isOval": true,
 			"trackLandmarks": [{
-					"landmarkName": "trioval",
+					"landmarkName": "the_tri_oval",
 					"distanceRoundLapStart": 0,
 					"distanceRoundLapEnd": 235,
 					"isCommonOvertakingSpot": true
@@ -9858,7 +9858,7 @@
 					"isCommonOvertakingSpot": true
 				},
 				{
-					"landmarkName": "trioval",
+					"landmarkName": "the_tri_oval",
 					"distanceRoundLapStart": 2200,
 					"distanceRoundLapEnd": 2475,
 					"isCommonOvertakingSpot": true
@@ -9870,7 +9870,7 @@
 			"rf2TrackNames": ["Las Vagas Motor Speedway"],
 			"isOval": true,
 			"trackLandmarks": [{
-					"landmarkName": "trioval",
+					"landmarkName": "the_tri_oval",
 					"distanceRoundLapStart": 0,
 					"distanceRoundLapEnd": 225,
 					"isCommonOvertakingSpot": true
@@ -9900,7 +9900,7 @@
 					"isCommonOvertakingSpot": true
 				},
 				{
-					"landmarkName": "trioval",
+					"landmarkName": "the_tri_oval",
 					"distanceRoundLapStart": 2180,
 					"distanceRoundLapEnd": 2423,
 					"isCommonOvertakingSpot": true
@@ -11595,7 +11595,7 @@
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "andretti_hairpin",
+					"landmarkName": "the_andretti_hairpin",
 					"distanceRoundLapStart": 380,
 					"distanceRoundLapEnd": 590,
 					"isCommonOvertakingSpot": true
@@ -11631,7 +11631,7 @@
 					"isCommonOvertakingSpot": true
 				},
 				{
-					"landmarkName": "corkscrew",
+					"landmarkName": "the_corkscrew",
 					"distanceRoundLapStart": 2420,
 					"distanceRoundLapEnd": 2570,
 					"isCommonOvertakingSpot": false
@@ -11742,7 +11742,7 @@
 			"rf2TrackNames": ["Michigan International Speedway"],
 			"isOval": true,
 			"trackLandmarks": [{
-					"landmarkName": "trioval",
+					"landmarkName": "the_tri_oval",
 					"distanceRoundLapStart": 0,
 					"distanceRoundLapEnd": 350,
 					"isCommonOvertakingSpot": true
@@ -11772,7 +11772,7 @@
 					"isCommonOvertakingSpot": true
 				},
 				{
-					"landmarkName": "trioval",
+					"landmarkName": "the_tri_oval",
 					"distanceRoundLapStart": 2890,
 					"distanceRoundLapEnd": 3235,
 					"isCommonOvertakingSpot": true
