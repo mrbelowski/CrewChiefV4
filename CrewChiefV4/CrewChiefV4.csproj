@@ -275,6 +275,7 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+    <None Include="tools\GetUnvocalizedCorners.ps1" />
     <None Include="trackLandmarksData.json" />
   </ItemGroup>
   <ItemGroup>
