@@ -8679,7 +8679,7 @@
 					"isCommonOvertakingSpot": true
 				},
 				{
-					"landmarkName": "sachs_kurve",
+					"landmarkName": "sachs",
 					"distanceRoundLapStart": 5850,
 					"distanceRoundLapEnd": 6015,
 					"isCommonOvertakingSpot": false
@@ -8883,7 +8883,7 @@
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "esses",
+					"landmarkName": "the_esses",
 					"distanceRoundLapStart": 3215,
 					"distanceRoundLapEnd": 3330,
 					"isCommonOvertakingSpot": false
@@ -8929,7 +8929,7 @@
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "chicane",
+					"landmarkName": "the_chicane",
 					"distanceRoundLapStart": 1450,
 					"distanceRoundLapEnd": 1610,
 					"isCommonOvertakingSpot": false
@@ -9239,13 +9239,13 @@
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "craner_curves",
+					"landmarkName": "the_craner_curves",
 					"distanceRoundLapStart": 720,
 					"distanceRoundLapEnd": 950,
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "old_hairpin",
+					"landmarkName": "the_old_hairpin",
 					"distanceRoundLapStart": 1000,
 					"distanceRoundLapEnd": 1115,
 					"isCommonOvertakingSpot": false
@@ -9309,13 +9309,13 @@
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "craner_curves",
+					"landmarkName": "the_craner_curves",
 					"distanceRoundLapStart": 720,
 					"distanceRoundLapEnd": 950,
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "old_hairpin",
+					"landmarkName": "the_old_hairpin",
 					"distanceRoundLapStart": 1000,
 					"distanceRoundLapEnd": 1115,
 					"isCommonOvertakingSpot": false
@@ -9421,7 +9421,7 @@
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "sachskurve",
+					"landmarkName": "sachs",
 					"distanceRoundLapStart": 3700,
 					"distanceRoundLapEnd": 3860,
 					"isCommonOvertakingSpot": false
@@ -11283,7 +11283,7 @@
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "chicane",
+					"landmarkName": "the_chicane",
 					"distanceRoundLapStart": 5445,
 					"distanceRoundLapEnd": 5680,
 					"isCommonOvertakingSpot": true
