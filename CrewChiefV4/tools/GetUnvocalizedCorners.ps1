@@ -1,19 +1,28 @@
-﻿function GetScriptDirectory
-{
+﻿# This script tries to detect which landmarks still lack mappings.  Also, prints partially matching landmarks to help reusing existing sounds.
+# Passing "appdata" as param will make script search sounds from install location.  Might come handy for setup validation.
+function GetScriptDirectory {
   $invocation = (Get-Variable MyInvocation -Scope 1).Value
   Split-Path $invocation.MyCommand.Path
 }
 
-$cornersContents = Get-ChildItem $env:LOCALAPPDATA\CrewChiefV4\sounds\voice\corners
+$toolsPath = GetScriptDirectory
+if ($args -and $args[0].ToString().ToUpperInvariant() -eq "APPDATA") {
+    echo "Reading vocalized landmarks from the setup (appdata)"
+    $cornersContents = Get-ChildItem $env:LOCALAPPDATA\CrewChiefV4\sounds\voice\corners
+}
+else {
+    echo "Reading vocalized landmarks from the git"
+    $cornersPath = $toolsPath + "\..\sounds\voice\corners"
+    $cornersContents = Get-ChildItem $cornersPath
+}
 
 [System.Collections.ArrayList]$vocalizedCorners = @()
 foreach ($item in $cornersContents) {
     $vocalizedCorners.Add($item.Name.ToLowerInvariant()) > $null
 }
 
-$toolsPath = GetScriptDirectory
-$trackLandmarksFile = $toolsPath + "\..\trackLandmarksData.json"
 
+$trackLandmarksFile = $toolsPath + "\..\trackLandmarksData.json"
 $content = Get-Content $trackLandmarksFile
 
 $regexLandmarkName = new-object System.Text.RegularExpressions.Regex('landmarkName\": \"(?<name>.*?)\"', [System.Text.RegularExpressions.RegexOptions]::Singleline)
@@ -65,5 +74,3 @@ foreach ($unvocalizedCorner in $unvocalizedCorners) {
         }
     }
 }
-
-
