@@ -35,7 +35,7 @@ namespace CrewChiefV4.rFactor2
         private const int minMinutesBetweenPredictedStops = 10;
         private const int minLapsBetweenPredictedStops = 5;
 
-        // Uf we're running only against AI, force the pit window to open
+        // If we're running only against AI, force the pit window to open
         private Boolean isOfflineSession = true;
 
         // Keep track of opponents processed this time
@@ -62,10 +62,10 @@ namespace CrewChiefV4.rFactor2
         }
 
         private int[] minimumSupportedVersionParts = new int[] { 2, 0, 0, 0 };
-        private bool pluginSupported = false;
+        public static bool pluginVerified = false;
         public void versionCheck(Object memoryMappedFileStruct)
         {
-            if (this.pluginSupported)
+            if (RF2GameStateMapper.pluginVerified)
                 return;
 
             var shared = memoryMappedFileStruct as CrewChiefV4.rFactor2.RF2SharedMemoryReader.RF2StructWrapper;
@@ -113,7 +113,7 @@ namespace CrewChiefV4.rFactor2
             }
             else
             {
-                this.pluginSupported = true;
+                RF2GameStateMapper.pluginVerified = true;
 
                 var msg = "rFactor 2 Shared Memory version: " + versionStr + " 64bit";
                 Console.WriteLine(msg);
