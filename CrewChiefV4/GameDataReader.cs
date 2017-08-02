@@ -128,6 +128,9 @@ namespace CrewChiefV4
 
         public virtual void Disconnect()
         {
+            // Is called when game process exits or Stop button is pressed and run loop terminates.
+            // Can be used to release resources.
+
             // no op - only implemented for rF2.
         }
     }
