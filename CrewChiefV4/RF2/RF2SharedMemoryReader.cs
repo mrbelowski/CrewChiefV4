@@ -279,7 +279,7 @@ namespace CrewChiefV4.rFactor2
                     catch (Exception)
                     {
                         this.initialised = false;
-                        this.Disconnect();
+                        this.DisconnectInternal();
                     }
                 }
                 return initialised;
@@ -346,7 +346,7 @@ namespace CrewChiefV4.rFactor2
                 catch (Exception ex)
                 {
                     Console.WriteLine("rFactor 2 Shared Memory connection failed.");
-                    this.Disconnect();
+                    this.DisconnectInternal();
                     throw new GameDataReadException(ex.Message, ex);
                 }
             }
@@ -366,21 +366,29 @@ namespace CrewChiefV4.rFactor2
             return populated.ToArray();
         }
 
-        private void Disconnect()
+        public override void Disconnect()
+        {
+            this.DisconnectInternal();
+            Console.WriteLine("Disconnected from rFactor 2 Shared Memory");
+        }
+
+        private void DisconnectInternal()
         {
             this.initialised = false;
 
             this.telemetryBuffer.Disconnect();
             this.scoringBuffer.Disconnect();
             this.extendedBuffer.Disconnect();
-        }
 
+            // Hack to re-check plugin version.
+            RF2GameStateMapper.pluginVerified = false;
+        }
 
         public override void Dispose()
         {
             try
             {
-                this.Disconnect();
+                this.DisconnectInternal();
             }
             catch (Exception) { }
         }

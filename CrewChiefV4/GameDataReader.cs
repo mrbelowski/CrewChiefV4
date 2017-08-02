@@ -11,13 +11,13 @@ namespace CrewChiefV4
     public abstract class GameDataReader
     {
         protected String filenameToDump;
-        
-        public Boolean dumpToFile = false;        
+
+        public Boolean dumpToFile = false;
 
         protected abstract Boolean InitialiseInternal();
 
         public abstract Object ReadGameData(Boolean forSpotter);
-                
+
         public abstract void Dispose();
 
         public abstract void DumpRawGameData();
@@ -124,6 +124,11 @@ namespace CrewChiefV4
         public virtual void stop()
         {
             // no op - only implemented by UDP reader
+        }
+
+        public virtual void Disconnect()
+        {
+            // no op - only implemented for rF2.
         }
     }
 }
