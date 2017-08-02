@@ -13,8 +13,15 @@ namespace CrewChiefV4
     public partial class PropertiesForm : Form
     {
         public static Boolean hasChanges;
-
         System.Windows.Forms.Form parent;
+
+        private Timer searchTimer;
+        private readonly string DEFAULT_SEARCH_TEXT = Configuration.getUIString("search_box_default_text");
+        private readonly TimeSpan AUTO_SEARCH_DELAY_SPAN = TimeSpan.FromMilliseconds(700);
+        private string searchTextPrev = null;
+        private DateTime nextPrefsRefreshAttemptTime = DateTime.MinValue;
+        private Label noMatchedLabel = new Label() { Text = Configuration.getUIString("no_matches") };
+
         public PropertiesForm(System.Windows.Forms.Form parent)
         {
             hasChanges = false;
@@ -87,8 +94,22 @@ namespace CrewChiefV4
                 widgetCount++;
             }
             pad(widgetCount);
-            widgetCount = 0;            
+            widgetCount = 0;
+
+            this.searchTextPrev = DEFAULT_SEARCH_TEXT;
+            this.textBox1.Text = DEFAULT_SEARCH_TEXT;
+            this.textBox1.ForeColor = Color.Gray;
+            this.textBox1.GotFocus += TextBox1_GotFocus;
+            this.textBox1.LostFocus += TextBox1_LostFocus;
+            this.textBox1.KeyDown += TextBox1_KeyDown;
+            this.button2.Select();
+
+            this.KeyPreview = true;
+            this.KeyDown += PropertiesForm_KeyDown;
+
+            this.DoubleBuffered = true;
         }
+
         public void save()
         {
             foreach (var control in this.flowLayoutPanel1.Controls)
@@ -178,6 +199,205 @@ namespace CrewChiefV4
                     }
                 }
             }           
+        }
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+            this.nextPrefsRefreshAttemptTime = DateTime.Now.Add(AUTO_SEARCH_DELAY_SPAN);
+
+            if (this.textBox1.Text == DEFAULT_SEARCH_TEXT)
+                return;
+
+            if (this.searchTimer == null)
+            {
+                this.searchTimer = new Timer();
+                this.searchTimer.Interval = 100;
+                this.searchTimer.Tick += SearchTimer_Tick;
+                this.searchTimer.Start();
+            }
+        }
+
+        private void SearchTimer_Tick(object sender, EventArgs e)
+        {
+            if (DateTime.Now < this.nextPrefsRefreshAttemptTime)
+                return;
+
+            var text = this.textBox1.Text;
+            if (text == DEFAULT_SEARCH_TEXT)
+            {
+                this.searchTextPrev = text;
+                return;
+            }
+
+            if (text != this.searchTextPrev)
+            {
+                // This is the case of clearing previously non-empty search
+                if (string.IsNullOrWhiteSpace(text) && this.searchTextPrev != DEFAULT_SEARCH_TEXT)
+                    this.PopulatePrefsFiltered("");  // Clear filter out.
+                // General case, new filter.
+                else if (!string.IsNullOrWhiteSpace(text))
+                    this.PopulatePrefsFiltered(text);  // Apply new filter.
+
+                this.searchTextPrev = text;
+            }
+        }
+
+        private void TextBox1_GotFocus(object sender, EventArgs e)
+        {
+            if (this.textBox1.Text == DEFAULT_SEARCH_TEXT)
+            {
+                this.textBox1.Text = "";
+                this.textBox1.ForeColor = Color.Black;
+            }
+        }
+
+        private void TextBox1_LostFocus(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(this.textBox1.Text))
+            {
+                this.textBox1.Text = DEFAULT_SEARCH_TEXT;
+                this.textBox1.ForeColor = Color.Gray;
+                this.button2.Select();
+            }
+        }
+
+        private void TextBox1_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Escape)
+            {
+                this.textBox1.Select();
+                this.textBox1.Text = "";
+                this.button2.Select();
+
+                if (!string.IsNullOrWhiteSpace(this.searchTextPrev) && this.searchTextPrev != DEFAULT_SEARCH_TEXT) 
+                    this.PopulatePrefsFiltered(null);
+            }
+            else if (e.KeyCode == Keys.Enter)
+            {
+                this.searchTextPrev = this.textBox1.Text;
+                this.PopulatePrefsFiltered(this.searchTextPrev);
+            }
+        }
+
+        private void PropertiesForm_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Control && e.KeyCode == Keys.E)
+                this.textBox1.Select();
+            else if (e.KeyCode == Keys.Escape)
+            {
+                // Close only if no search is active.
+                if (this.textBox1.Text == DEFAULT_SEARCH_TEXT)
+                    this.Close();
+                else
+                    this.TextBox1_KeyDown(sender, e); // Otherwise, forward.
+            }
+        }
+
+        private void PopulatePrefsFiltered(string filter)
+        {
+            this.flowLayoutPanel1.SuspendLayout();
+
+            bool anyHits = false;
+            var filterUpper = string.IsNullOrWhiteSpace(filter) ? filter : filter.ToUpperInvariant();
+            foreach (var ctrl in this.flowLayoutPanel1.Controls)
+            {
+                if (ctrl is StringPropertyControl)
+                {
+                    var spc = ctrl as StringPropertyControl;
+                    if (string.IsNullOrWhiteSpace(filterUpper) || spc.label.ToUpperInvariant().Contains(filterUpper))
+                    {
+                        spc.Visible = true;
+                        anyHits = true;
+                    }
+                    else
+                        spc.Visible = false;
+                }
+                else if (ctrl is BooleanPropertyControl)
+                {
+                    var bpc = ctrl as BooleanPropertyControl;
+                    if (string.IsNullOrWhiteSpace(filterUpper) || bpc.label.ToUpperInvariant().Contains(filterUpper))
+                    {
+                        bpc.Visible = true;
+                        anyHits = true;
+                    }
+                    else
+                        bpc.Visible = false;
+                }
+                else if (ctrl is IntPropertyControl)
+                {
+                    var ipc = ctrl as IntPropertyControl;
+                    if (string.IsNullOrWhiteSpace(filterUpper) || ipc.label.ToUpperInvariant().Contains(filterUpper))
+                    {
+                        ipc.Visible = true;
+                        anyHits = true;
+                    }
+                    else
+                        ipc.Visible = false;
+                }
+                else if (ctrl is FloatPropertyControl)
+                {
+                    var fpc = ctrl as FloatPropertyControl;
+                    if (string.IsNullOrWhiteSpace(filterUpper) || fpc.label.ToUpperInvariant().Contains(filterUpper))
+                    {
+                        fpc.Visible = true;
+                        anyHits = true;
+                    }
+                    else
+                        fpc.Visible = false;
+                }
+                else if (ctrl is Spacer)
+                {
+                    var s = ctrl as Spacer;
+                    if (string.IsNullOrWhiteSpace(filterUpper))
+                        s.Visible = true;
+                    else
+                        s.Visible = false;
+                }
+            }
+
+            if (!anyHits)
+                this.flowLayoutPanel1.Controls.Add(this.noMatchedLabel);
+            else
+                this.flowLayoutPanel1.Controls.Remove(this.noMatchedLabel);
+
+            this.flowLayoutPanel1.ResumeLayout();
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            // Note that even after this said yes, there's still "Save" step.  Maybe dialog isn't necessary.
+            var result = MessageBox.Show(Configuration.getUIString("reset_warning_text"), Configuration.getUIString("reset_warning_title"), MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+            if (result == DialogResult.No)
+                return;
+
+            foreach (var ctrl in this.flowLayoutPanel1.Controls)
+            {
+                if (ctrl is StringPropertyControl)
+                {
+                    var spc = ctrl as StringPropertyControl;
+                    spc.button1_Click(sender, e);
+                }
+                else if (ctrl is BooleanPropertyControl)
+                {
+                    var bpc = ctrl as BooleanPropertyControl;
+                    bpc.button1_Click(sender, e);
+                }
+                else if (ctrl is IntPropertyControl)
+                {
+                    var ipc = ctrl as IntPropertyControl;
+                    ipc.button1_Click(sender, e);
+                }
+                else if (ctrl is FloatPropertyControl)
+                {
+                    var fpc = ctrl as FloatPropertyControl;
+                    fpc.button1_Click(sender, e);
+                }
+            }
         }
     }
 }

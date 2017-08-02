@@ -1178,14 +1178,15 @@ namespace CrewChiefV4.assetto
                         
                         currentGameState.TyreData.TyreTypeName = shared.acsGraphic.tyreCompound;
                         tyreTempThresholds = getTyreTempThresholds(currentGameState.carClass, currentGameState.TyreData.TyreTypeName);
-                        
-                        currentGameState.PitData.PitWindowStart = shared.acsStatic.PitWindowStart - 1;
+
                         if (currentGameState.SessionData.SessionHasFixedTime)
-                        {                            
+                        {
+                            currentGameState.PitData.PitWindowStart = shared.acsStatic.PitWindowStart;
                             currentGameState.PitData.PitWindowEnd = shared.acsStatic.PitWindowEnd;
                         }
                         else
                         {
+                            currentGameState.PitData.PitWindowStart = shared.acsStatic.PitWindowStart - 1;
                             currentGameState.PitData.PitWindowEnd = shared.acsStatic.PitWindowEnd - 1;
                         }
                         currentGameState.PitData.HasMandatoryPitStop = shared.acsStatic.PitWindowStart > 0 || shared.acsStatic.PitWindowEnd > 0;

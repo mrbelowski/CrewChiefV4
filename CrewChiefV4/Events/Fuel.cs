@@ -382,49 +382,127 @@ namespace CrewChiefV4.Events
             }
         }
 
+        private Boolean reportFuelConsumption()
+        {
+            Boolean haveData = false;
+            if (fuelUseActive && usagePerLap.Count > 0)
+            {
+                // round to 1dp
+                float meanUsePerLap = ((float)Math.Round(usagePerLap.Average() * 10f)) / 10f;
+                // get the whole and fractional part (yeah, I know this is shit)
+                String str = meanUsePerLap.ToString();
+                int pointPosition = str.IndexOf('.');
+                int wholePart = 0;
+                int fractionalPart = 0;
+                if (pointPosition > 0)
+                {
+                    wholePart = int.Parse(str.Substring(0, pointPosition));
+                    fractionalPart = int.Parse(str[pointPosition + 1].ToString());
+                }
+                else
+                {
+                    wholePart = (int)meanUsePerLap;
+                }
+                if (meanUsePerLap > 0)
+                {
+                    haveData = true;
+                    if (fractionalPart > 0)
+                    {
+                        audioPlayer.playMessageImmediately(new QueuedMessage("Fuel/mean_use_per_lap",
+                                MessageContents(wholePart, NumberReader.folderPoint, fractionalPart, folderLitresPerLap), 0, null));
+                    }
+                    else
+                    {
+                        audioPlayer.playMessageImmediately(new QueuedMessage("Fuel/mean_use_per_lap",
+                                MessageContents(wholePart, folderLitresPerLap), 0, null));
+                    }
+                }
+            }
+            return haveData;
+        }
+
+        private Boolean reportFuelRemaining()
+        {
+            Boolean haveData = false;
+            if (initialised && currentFuel > -1)
+            {
+                if (averageUsagePerLap > 0)
+                {
+                    haveData = true;
+                    int lapsOfFuelLeft = (int)Math.Floor(currentFuel / averageUsagePerLap);
+                    if (lapsOfFuelLeft <= 1)
+                    {
+                        audioPlayer.playMessageImmediately(new QueuedMessage("Fuel/estimate",
+                            MessageContents(folderAboutToRunOut), 0, null));
+                    }
+                    else
+                    {
+                        audioPlayer.playMessageImmediately(new QueuedMessage("Fuel/estimate",
+                            MessageContents(folderWeEstimate, lapsOfFuelLeft, folderLapsRemaining), 0, null));
+                    }                    
+                }
+                else if (averageUsagePerMinute > 0)
+                {
+                    haveData = true;
+                    int minutesOfFuelLeft = (int)Math.Floor(currentFuel / averageUsagePerMinute);
+                    if (minutesOfFuelLeft <= 1)
+                    {
+                        audioPlayer.playMessageImmediately(new QueuedMessage("Fuel/estimate",
+                            MessageContents(folderAboutToRunOut), 0, null));
+                    }
+                    else
+                    {
+                        audioPlayer.playMessageImmediately(new QueuedMessage("Fuel/estimate",
+                            MessageContents(folderWeEstimate, minutesOfFuelLeft, folderMinutesRemaining), 0, null));
+                    }                    
+                }
+            }
+            if (!haveData)
+            {
+                if (!fuelUseActive)
+                {
+                    haveData = true;
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderPlentyOfFuel, 0, null));
+                }
+                else if (currentFuel >= 2)
+                {
+                    haveData = true;
+                    audioPlayer.playMessageImmediately(new QueuedMessage("Fuel/level",
+                                MessageContents((int)currentFuel, folderLitresRemaining), 0, null));
+                }
+                else if (currentFuel >= 1)
+                {
+                    haveData = true;
+                    audioPlayer.playMessageImmediately(new QueuedMessage("Fuel/level",
+                                MessageContents(folderOneLitreRemaining), 0, null));
+                }
+                else if (currentFuel > 0)
+                {
+                    haveData = true;
+                    audioPlayer.playMessageImmediately(new QueuedMessage("Fuel/level",
+                            MessageContents(folderAboutToRunOut), 0, null));
+                }
+            }
+            return haveData;
+        }
+
+        public void reportFuelStatus()
+        {            
+            Boolean reportedRemaining = reportFuelRemaining();
+            Boolean reportedConsumption = reportFuelConsumption();
+            if (!reportedConsumption && !reportedRemaining)
+            {
+                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+            }
+        }
+
         public override void respond(String voiceMessage)
         {
             if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.WHATS_MY_FUEL_USAGE))
             {
-                if (!fuelUseActive || usagePerLap.Count == 0)
+                if (!reportFuelConsumption())
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
-                }
-                else
-                {
-                    // round to 1dp
-                    float meanUsePerLap = ((float)Math.Round(usagePerLap.Average() * 10f)) / 10f;
-                    // get the whole and fractional part (yeah, I know this is shit)
-                    String str = meanUsePerLap.ToString();
-                    int pointPosition = str.IndexOf('.');
-                    int wholePart = 0;
-                    int fractionalPart = 0;
-                    if (pointPosition > 0)
-                    {
-                        wholePart = int.Parse(str.Substring(0, pointPosition));
-                        fractionalPart = int.Parse(str[pointPosition + 1].ToString());
-                    }
-                    else
-                    {
-                        wholePart = (int) meanUsePerLap;
-                    }
-                    if (meanUsePerLap > 0)
-                    {
-                        if (fractionalPart > 0)
-                        {
-                            audioPlayer.playMessageImmediately(new QueuedMessage("Fuel/mean_use_per_lap",
-                                    MessageContents(wholePart, NumberReader.folderPoint, fractionalPart, folderLitresPerLap), 0, null));
-                        }
-                        else 
-                        {
-                            audioPlayer.playMessageImmediately(new QueuedMessage("Fuel/mean_use_per_lap",
-                                    MessageContents(wholePart, folderLitresPerLap), 0, null));
-                        }
-                    }
-                    else
-                    {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
-                    }
+                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));                    
                 }
             }
             else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.WHATS_MY_FUEL_LEVEL))
@@ -445,67 +523,7 @@ namespace CrewChiefV4.Events
             }
             else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOWS_MY_FUEL))
             {
-                Boolean haveData = false;
-                if (initialised && currentFuel > -1)
-                {
-                    if (averageUsagePerLap > 0)
-                    {
-                        int lapsOfFuelLeft = (int)Math.Floor(currentFuel / averageUsagePerLap);
-                        if (lapsOfFuelLeft <= 1)
-                        {
-                            audioPlayer.playMessageImmediately(new QueuedMessage("Fuel/estimate",
-                                MessageContents(folderAboutToRunOut), 0, null));
-                        }
-                        else
-                        {
-                            audioPlayer.playMessageImmediately(new QueuedMessage("Fuel/estimate",
-                                MessageContents(folderWeEstimate, lapsOfFuelLeft, folderLapsRemaining), 0, null));
-                        }
-                        haveData = true;
-                    }
-                    else if (averageUsagePerMinute > 0)
-                    {
-                        int minutesOfFuelLeft = (int)Math.Floor(currentFuel / averageUsagePerMinute);
-                        if (minutesOfFuelLeft <= 1)
-                        {
-                            audioPlayer.playMessageImmediately(new QueuedMessage("Fuel/estimate",
-                                MessageContents(folderAboutToRunOut), 0, null));
-                        }
-                        else
-                        {
-                            audioPlayer.playMessageImmediately(new QueuedMessage("Fuel/estimate",
-                                MessageContents(folderWeEstimate, minutesOfFuelLeft, folderMinutesRemaining), 0, null));
-                        }
-                        haveData = true;
-                    }
-                }
-                if (!haveData)
-                {
-                    if (!fuelUseActive)
-                    {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(folderPlentyOfFuel, 0, null));
-                    }
-                    else if (currentFuel >= 2)
-                    {
-                        audioPlayer.playMessageImmediately(new QueuedMessage("Fuel/level",
-                                    MessageContents((int)currentFuel, folderLitresRemaining), 0, null));
-                    }
-                    else if (currentFuel >= 1)
-                    {
-                        audioPlayer.playMessageImmediately(new QueuedMessage("Fuel/level",
-                                    MessageContents(folderOneLitreRemaining), 0, null));
-                    }
-                    else if (currentFuel > 0)
-                    {
-                        audioPlayer.playMessageImmediately(new QueuedMessage("Fuel/level",
-                                MessageContents(folderAboutToRunOut), 0, null));
-                    }
-                    else
-                    {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
-                    }
-
-                }
+                reportFuelStatus();
             }            
         }
     }

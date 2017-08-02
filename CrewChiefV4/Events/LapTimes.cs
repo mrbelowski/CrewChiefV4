@@ -272,7 +272,7 @@ namespace CrewChiefV4.Events
                     currentGameState.OpponentData.Count == 1 && currentGameState.OpponentData.First().Value.DriverRawName == currentGameState.SessionData.DriverRawName));
                 if (isHotLapping)
                 {
-                    lapAndSectorsComparisonData[1] = currentGameState.SessionData.PlayerLapTimeSessionBest;
+                    lapAndSectorsComparisonData[0] = currentGameState.SessionData.PlayerLapTimeSessionBest;
                     lapAndSectorsComparisonData[1] = currentGameState.SessionData.PlayerBestSector1Time;
                     lapAndSectorsComparisonData[2] = currentGameState.SessionData.PlayerBestSector2Time;
                     lapAndSectorsComparisonData[3] = currentGameState.SessionData.PlayerBestSector3Time;
