@@ -148,14 +148,14 @@ namespace CrewChiefV4.RaceRoom
         public void enableSpotter()
         {
             enabled = true;
-            audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderEnableSpotter, 0, null));
+            audioPlayer.playMessageImmediately(new QueuedMessage(NoisyCartesianCoordinateSpotter.folderEnableSpotter, 0, null));
             
         }
 
         public void disableSpotter()
         {
             enabled = false;
-            audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderDisableSpotter, 0, null));
+            audioPlayer.playMessageImmediately(new QueuedMessage(NoisyCartesianCoordinateSpotter.folderDisableSpotter, 0, null));
             
         }
     }

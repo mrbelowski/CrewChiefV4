@@ -533,5 +533,17 @@
     <Setting Name="spotter_enable_three_wide_left_and_right" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
+    <Setting Name="spotter_name" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Jim (default)</Value>
+    </Setting>
+    <Setting Name="GET_FUEL_STATUS_button_index" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">-1</Value>
+    </Setting>
+    <Setting Name="GET_FUEL_STATUS_device_guid" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="GET_FUEL_STATUS_device_type" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
   </Settings>
 </SettingsFile>

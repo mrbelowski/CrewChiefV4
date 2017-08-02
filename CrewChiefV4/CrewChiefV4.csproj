@@ -275,6 +275,7 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+    <None Include="tools\GetUnvocalizedCorners.ps1" />
     <None Include="trackLandmarksData.json" />
   </ItemGroup>
   <ItemGroup>
@@ -310,6 +311,7 @@
     <Content Include="sounds_config.txt" />
     <Content Include="speech_recognition_config.txt" />
     <Content Include="ui_text.txt" />
+    <Content Include="..\help.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\SharpDX.2.6.3\build\SharpDX.targets" Condition="Exists('..\packages\SharpDX.2.6.3\build\SharpDX.targets')" />
