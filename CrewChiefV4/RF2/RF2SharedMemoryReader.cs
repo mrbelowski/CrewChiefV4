@@ -263,6 +263,8 @@ namespace CrewChiefV4.rFactor2
             {
                 this.dataToDump = new List<RF2StructWrapper>();
             }
+
+            // This needs to be synchronized, because disconnection happens from CrewChief.Run and MainWindow.Dispose.
             lock (this)
             {
                 if (!this.initialised)
@@ -279,7 +281,7 @@ namespace CrewChiefV4.rFactor2
                     catch (Exception)
                     {
                         this.initialised = false;
-                        this.Disconnect();
+                        this.DisconnectInternal();
                     }
                 }
                 return initialised;
@@ -346,7 +348,7 @@ namespace CrewChiefV4.rFactor2
                 catch (Exception ex)
                 {
                     Console.WriteLine("rFactor 2 Shared Memory connection failed.");
-                    this.Disconnect();
+                    this.DisconnectInternal();
                     throw new GameDataReadException(ex.Message, ex);
                 }
             }
@@ -366,21 +368,37 @@ namespace CrewChiefV4.rFactor2
             return populated.ToArray();
         }
 
-        private void Disconnect()
+        public override void DisconnectFromProcess()
         {
-            this.initialised = false;
+            var wasInitialised = this.initialised;
+            this.DisconnectInternal();
 
-            this.telemetryBuffer.Disconnect();
-            this.scoringBuffer.Disconnect();
-            this.extendedBuffer.Disconnect();
+            // There's still possibility of double message, but who cares.
+            if (wasInitialised)
+                Console.WriteLine("Disconnected from rFactor 2 Shared Memory");
         }
 
+        private void DisconnectInternal()
+        {
+            // This needs to be synchronized, because disconnection happens from CrewChief.Run and MainWindow.Dispose.
+            lock (this)
+            {
+                this.initialised = false;
+
+                this.telemetryBuffer.Disconnect();
+                this.scoringBuffer.Disconnect();
+                this.extendedBuffer.Disconnect();
+
+                // Hack to re-check plugin version.
+                RF2GameStateMapper.pluginVerified = false;
+            }
+        }
 
         public override void Dispose()
         {
             try
             {
-                this.Disconnect();
+                this.DisconnectInternal();
             }
             catch (Exception) { }
         }

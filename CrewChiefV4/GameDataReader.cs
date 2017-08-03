@@ -11,13 +11,13 @@ namespace CrewChiefV4
     public abstract class GameDataReader
     {
         protected String filenameToDump;
-        
-        public Boolean dumpToFile = false;        
+
+        public Boolean dumpToFile = false;
 
         protected abstract Boolean InitialiseInternal();
 
         public abstract Object ReadGameData(Boolean forSpotter);
-                
+
         public abstract void Dispose();
 
         public abstract void DumpRawGameData();
@@ -49,6 +49,7 @@ namespace CrewChiefV4
             }
         }
 
+        // NOTE: InitialiseInternal must be synchronized internally.
         public Boolean Initialise()
         {
             Console.WriteLine("initialising");
@@ -124,6 +125,16 @@ namespace CrewChiefV4
         public virtual void stop()
         {
             // no op - only implemented by UDP reader
+        }
+
+        // NOTE: This needs to be synchronized, because disconnection happens from CrewChief.Run and MainWindow.Dispose.
+        // Does not apply to network data feeds.
+        public virtual void DisconnectFromProcess()
+        {
+            // Is called when game process exits or Stop button is pressed and run loop terminates.
+            // Can be used to release resources.
+
+            // no op - only implemented for rF2.
         }
     }
 }
