@@ -427,13 +427,16 @@ namespace CrewChiefV4
                             isGameProcessRunning = Utilities.IsGameRunning(gameDefinition.processName, gameDefinition.alternativeProcessNames);
                         }
 
-                        if (mapped && !isGameProcessRunning)
+                        if (mapped 
+                            && !isGameProcessRunning 
+                            && gameDefinition.HasAnyProcessNameAssociated())
                         {
-                            gameDataReader.Disconnect();
+                            gameDataReader.DisconnectFromProcess();
                             mapped = false;
                         }
 
-                        if (gameDefinition.processName == null || isGameProcessRunning)
+                        if (!gameDefinition.HasAnyProcessNameAssociated()  // Network data case.
+                            || isGameProcessRunning)
                         {
                             if (!mapped)
                             {
@@ -630,7 +633,7 @@ namespace CrewChiefV4
                 gameDataReader.DumpRawGameData();
             }
             gameDataReader.stop();
-            gameDataReader.Disconnect();
+            gameDataReader.DisconnectFromProcess();
             mapped = false;
 
             return true;

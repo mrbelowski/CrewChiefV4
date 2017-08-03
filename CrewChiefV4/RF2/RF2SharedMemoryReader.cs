@@ -366,7 +366,7 @@ namespace CrewChiefV4.rFactor2
             return populated.ToArray();
         }
 
-        public override void Disconnect()
+        public override void DisconnectFromProcess()
         {
             this.DisconnectInternal();
             Console.WriteLine("Disconnected from rFactor 2 Shared Memory");
