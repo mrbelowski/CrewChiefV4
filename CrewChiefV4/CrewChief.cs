@@ -148,6 +148,10 @@ namespace CrewChiefV4
             {
                 audioPlayer.Dispose();
             }
+
+            gameDataReader = null;
+            speechRecogniser = null;
+            audioPlayer = null;
         }
 
         public static AbstractEvent getEvent(String eventName)

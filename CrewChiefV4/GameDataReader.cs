@@ -49,7 +49,7 @@ namespace CrewChiefV4
             }
         }
 
-        // NOTE: should be called from the same thread as DisconnectFromProcess
+        // NOTE: InitialiseInternal must be synchronized internally.
         public Boolean Initialise()
         {
             Console.WriteLine("initialising");
@@ -127,7 +127,7 @@ namespace CrewChiefV4
             // no op - only implemented by UDP reader
         }
 
-        // NOTE: should be called from the same thread as Initialise.
+        // NOTE: This needs to be synchronized, because disconnection happens from CrewChief.Run and MainWindow.Dispose.
         // Does not apply to network data feeds.
         public virtual void DisconnectFromProcess()
         {

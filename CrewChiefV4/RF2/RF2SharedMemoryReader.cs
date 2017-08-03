@@ -263,6 +263,8 @@ namespace CrewChiefV4.rFactor2
             {
                 this.dataToDump = new List<RF2StructWrapper>();
             }
+
+            // This needs to be synchronized, because disconnection happens from CrewChief.Run and MainWindow.Dispose.
             lock (this)
             {
                 if (!this.initialised)
@@ -374,14 +376,18 @@ namespace CrewChiefV4.rFactor2
 
         private void DisconnectInternal()
         {
-            this.initialised = false;
+            // This needs to be synchronized, because disconnection happens from CrewChief.Run and MainWindow.Dispose.
+            lock (this)
+            {
+                this.initialised = false;
 
-            this.telemetryBuffer.Disconnect();
-            this.scoringBuffer.Disconnect();
-            this.extendedBuffer.Disconnect();
+                this.telemetryBuffer.Disconnect();
+                this.scoringBuffer.Disconnect();
+                this.extendedBuffer.Disconnect();
 
-            // Hack to re-check plugin version.
-            RF2GameStateMapper.pluginVerified = false;
+                // Hack to re-check plugin version.
+                RF2GameStateMapper.pluginVerified = false;
+            }
         }
 
         public override void Dispose()
