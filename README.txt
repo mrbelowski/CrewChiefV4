@@ -10,6 +10,8 @@ For support and discussions about Crew Chief we have our very own forum here: ht
 
 Changelog
 ---------
+Version 4.7.8.1: RF2 plugin fixes for car damage issues in online races
+	
 Version 4.7.8.0: Fixed spotter logic where it would consider 2 cars along side to be "3 side", even if those cars were one behind the other; Use oval spotter messages (inside / outside) when on known oval tracks, if the selected spotter has these sounds; Tweaked spotter enable / disable sound to be a bit more appropriate for non-default spotter voice packs; Fixed broken sector 3 time deltas in Project Cars
 
 Version 4.7.7.9: Fixed Assetto Corsa pit window open calculation for sessions with a fixed number of laps; Fixed a crash bug when starting the app with no sound pack
