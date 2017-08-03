@@ -148,6 +148,10 @@ namespace CrewChiefV4
             {
                 audioPlayer.Dispose();
             }
+
+            gameDataReader = null;
+            speechRecogniser = null;
+            audioPlayer = null;
         }
 
         public static AbstractEvent getEvent(String eventName)
@@ -427,7 +431,16 @@ namespace CrewChiefV4
                             isGameProcessRunning = Utilities.IsGameRunning(gameDefinition.processName, gameDefinition.alternativeProcessNames);
                         }
 
-                        if (gameDefinition.processName == null || isGameProcessRunning)
+                        if (mapped 
+                            && !isGameProcessRunning 
+                            && gameDefinition.HasAnyProcessNameAssociated())
+                        {
+                            gameDataReader.DisconnectFromProcess();
+                            mapped = false;
+                        }
+
+                        if (!gameDefinition.HasAnyProcessNameAssociated()  // Network data case.
+                            || isGameProcessRunning)
                         {
                             if (!mapped)
                             {
@@ -480,7 +493,7 @@ namespace CrewChiefV4
                         }
                         // if we're paused or viewing another car, the mapper will just return the previous game state so we don't lose all the
                         // persistent state information. If this is the case, don't process any stuff
-                        if (nextGameState != null && nextGameState != currentGameState) 
+                        if (nextGameState != null && nextGameState != currentGameState)
                         {
                             previousGameState = currentGameState;
                             currentGameState = nextGameState;
@@ -495,9 +508,9 @@ namespace CrewChiefV4
                                     Console.WriteLine(String.Join(";", currentGameState.SessionData.formattedPlayerLapTimes));
                                 }
                                 sessionEndMessages.trigger(previousGameState.SessionData.SessionRunningTime, previousGameState.SessionData.SessionType, currentGameState.SessionData.SessionPhase,
-                                    previousGameState.SessionData.SessionStartPosition, previousGameState.SessionData.Position, previousGameState.SessionData.NumCarsAtStartOfSession, previousGameState.SessionData.CompletedLaps, 
+                                    previousGameState.SessionData.SessionStartPosition, previousGameState.SessionData.Position, previousGameState.SessionData.NumCarsAtStartOfSession, previousGameState.SessionData.CompletedLaps,
                                     previousGameState.SessionData.IsDisqualified);
-                                
+
                                 sessionFinished = true;
                                 audioPlayer.disablePearlsOfWisdom = false;
                                 if (loadDataFromFile)
@@ -516,7 +529,7 @@ namespace CrewChiefV4
                                 {
                                     Console.WriteLine("Clearing game state...");
                                     audioPlayer.purgeQueues();
-                                    
+
                                     foreach (KeyValuePair<String, AbstractEvent> entry in eventsList)
                                     {
                                         entry.Value.clearState();
@@ -546,11 +559,11 @@ namespace CrewChiefV4
                                         // now load all the sound files for this set of driver names
                                         SoundCache.loadDriverNameSounds(usableDriverNames);
                                     }
-                                }                                
+                                }
                             }
                             // TODO: for AC free practice sessions, the SessionRunningTime is set to 1 hour in the mapper and stays there so this block never triggers
                             else if (!sessionFinished && previousGameState != null &&
-                                        (currentGameState.SessionData.SessionRunningTime > previousGameState.SessionData.SessionRunningTime || 
+                                        (currentGameState.SessionData.SessionRunningTime > previousGameState.SessionData.SessionRunningTime ||
                                         (previousGameState.SessionData.SessionPhase != currentGameState.SessionData.SessionPhase)) ||
                                         ((gameDefinition.gameEnum == GameEnum.PCARS_32BIT || gameDefinition.gameEnum == GameEnum.PCARS_64BIT || gameDefinition.gameEnum == GameEnum.PCARS_NETWORK) &&
                                             currentGameState.SessionData.SessionHasFixedTime && currentGameState.SessionData.SessionTotalRunTime == -1))
@@ -602,7 +615,7 @@ namespace CrewChiefV4
                     int threadSleepTime = 5 + random.Next(10);
                     Thread.Sleep(threadSleepTime);
                     continue;
-                }                
+                }
             }
             foreach (KeyValuePair<String, AbstractEvent> entry in eventsList)
             {
@@ -624,6 +637,9 @@ namespace CrewChiefV4
                 gameDataReader.DumpRawGameData();
             }
             gameDataReader.stop();
+            gameDataReader.DisconnectFromProcess();
+            mapped = false;
+
             return true;
         }
 
