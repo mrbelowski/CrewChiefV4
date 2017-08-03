@@ -370,8 +370,12 @@ namespace CrewChiefV4.rFactor2
 
         public override void DisconnectFromProcess()
         {
+            var wasInitialised = this.initialised;
             this.DisconnectInternal();
-            Console.WriteLine("Disconnected from rFactor 2 Shared Memory");
+
+            // There's still possibility of double message, but who cares.
+            if (wasInitialised)
+                Console.WriteLine("Disconnected from rFactor 2 Shared Memory");
         }
 
         private void DisconnectInternal()
