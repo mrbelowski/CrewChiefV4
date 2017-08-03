@@ -174,7 +174,7 @@
 		},
 		{
 			"carClassEnum": "GT4",
-			"raceroomClassIds": [1717],
+			"raceroomClassIds": [1717, 6344],
 			"pCarsClassNames": ["GT4"],
 			"rf2ClassNames": ["*GT4*"],
 			"acClassNames": ["*GT4*", "ks_bmw_m235i_racing", "lotus_evora_gx"],
