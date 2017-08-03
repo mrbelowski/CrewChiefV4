@@ -49,6 +49,7 @@ namespace CrewChiefV4
             }
         }
 
+        // NOTE: should be called from the same thread as DisconnectFromProcess
         public Boolean Initialise()
         {
             Console.WriteLine("initialising");
@@ -126,7 +127,9 @@ namespace CrewChiefV4
             // no op - only implemented by UDP reader
         }
 
-        public virtual void Disconnect()
+        // NOTE: should be called from the same thread as Initialise.
+        // Does not apply to network data feeds.
+        public virtual void DisconnectFromProcess()
         {
             // Is called when game process exits or Stop button is pressed and run loop terminates.
             // Can be used to release resources.
