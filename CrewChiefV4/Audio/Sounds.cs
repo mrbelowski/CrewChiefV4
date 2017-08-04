@@ -416,6 +416,7 @@ namespace CrewChiefV4.Audio
         private void prepareFX(DirectoryInfo fxSoundDirectory) {
             FileInfo[] bleepFiles = fxSoundDirectory.GetFiles();
             String alternate_prefix = useAlternateBeeps ? "alternate_" : "";
+            String opposite_prefix = !useAlternateBeeps ? "alternate_" : "";
             Console.WriteLine("Preparing sound effects");
             foreach (FileInfo bleepFile in bleepFiles)
             {
@@ -448,6 +449,27 @@ namespace CrewChiefV4.Audio
                         sound.cachePermanently = true;
                         singleSounds.Add("listen_start_sound", sound);
                         availableSounds.Add("listen_start_sound");
+                    }
+                    else if (bleepFile.Name.StartsWith(opposite_prefix + "start") && !singleSounds.ContainsKey("alternate_start_bleep"))
+                    {
+                        SingleSound sound = new SingleSound(bleepFile.FullName, eagerLoadSoundFiles, allowCaching, allowCaching);
+                        sound.cachePermanently = true;
+                        singleSounds.Add("alternate_start_bleep", sound);
+                        availableSounds.Add("alternate_start_bleep");
+                    }
+                    else if (bleepFile.Name.StartsWith(opposite_prefix + "end") && !singleSounds.ContainsKey("alternate_end_bleep"))
+                    {
+                        SingleSound sound = new SingleSound(bleepFile.FullName, eagerLoadSoundFiles, allowCaching, allowCaching);
+                        sound.cachePermanently = true;
+                        singleSounds.Add("alternate_end_bleep", sound);
+                        availableSounds.Add("alternate_end_bleep");
+                    }
+                    else if (bleepFile.Name.StartsWith(opposite_prefix + "short_start") && !singleSounds.ContainsKey("alternate_short_start_bleep"))
+                    {
+                        SingleSound sound = new SingleSound(bleepFile.FullName, eagerLoadSoundFiles, allowCaching, allowCaching);
+                        sound.cachePermanently = true;
+                        singleSounds.Add("alternate_short_start_bleep", sound);
+                        availableSounds.Add("alternate_short_start_bleep");
                     }
                 }
             }
