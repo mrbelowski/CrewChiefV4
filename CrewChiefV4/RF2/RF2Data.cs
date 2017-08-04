@@ -32,10 +32,6 @@ namespace CrewChiefV4.rFactor2
         public const string MM_SCORING_FILE_NAME2 = "$rFactor2SMMP_ScoringBuffer2$";
         public const string MM_SCORING_FILE_ACCESS_MUTEX = @"Global\$rFactor2SMMP_ScoringMutex";
 
-        public const string MM_PHYSICS_FILE_NAME1 = "$rFactor2SMMP_PhysicsBuffer1$";
-        public const string MM_PHYSICS_FILE_NAME2 = "$rFactor2SMMP_PhysicsBuffer2$";
-        public const string MM_PHYSICS_FILE_ACCESS_MUTEX = @"Global\$rFactor2SMMP_PhysicsMutex";
-
         public const string MM_EXTENDED_FILE_NAME1 = "$rFactor2SMMP_ExtendedBuffer1$";
         public const string MM_EXTENDED_FILE_NAME2 = "$rFactor2SMMP_ExtendedBuffer2$";
         public const string MM_EXTENDED_FILE_ACCESS_MUTEX = @"Global\$rFactor2SMMP_ExtendedMutex";
