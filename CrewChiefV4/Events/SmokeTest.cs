@@ -221,7 +221,7 @@ namespace CrewChiefV4.Events
                                         MessageContents(Timings.folderGapInFrontIncreasing, TimeSpan.FromSeconds((float)random.NextDouble() * 10)), 0, this));
 
 
-            Thread.Sleep(5000);
+            Thread.Sleep(4000);
             inTheMiddleMessage = new QueuedMessage("spotter/car_right", 0, null);
             inTheMiddleMessage.expiryTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + 20000;
             audioPlayer.playSpotterMessage(inTheMiddleMessage, true);
