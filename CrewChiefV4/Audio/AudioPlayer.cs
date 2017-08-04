@@ -520,7 +520,13 @@ namespace CrewChiefV4.Audio
             List<String> soundsProcessed = new List<String>();
 
             Boolean oneOrMoreEventsEnabled = false;
+
             Boolean bleepOutInAdded = false;
+
+            // Ok, so idea here is that Chief and Spotter have different bleeps.  So we use opposing sets.
+            String keyBleepOut = AudioPlayer.useAlternateBeeps ? "end_bleep" : "alternate_end_bleep";
+            String keyBleepIn = AudioPlayer.useAlternateBeeps ? "alternate_short_start_bleep" : "short_start_bleep";
+
             lock (queueToPlay)
             {
                 int willBePlayedCount = queueToPlay.Count;
@@ -554,10 +560,17 @@ namespace CrewChiefV4.Audio
                                         || (this.lastAddedKeyWasSpotter && !isSpotterKey))  // Or from the Spotter to Chief
                                         && this.isChannelOpen())  // And, channel is still open
                                     {
+                                        if (isSpotterKey)
+                                        {
+                                            // Spotter uses opposite blips.
+                                            keyBleepOut = AudioPlayer.useAlternateBeeps ? "alternate_end_bleep" : "end_bleep";
+                                            keyBleepIn = AudioPlayer.useAlternateBeeps ? "short_start_bleep" : "alternate_short_start_bleep";
+                                        }
+
                                         // insert bleep out/in
-                                        keysToPlay.Add("end_bleep");
+                                        keysToPlay.Add(keyBleepOut);
                                         // would be nice to have some slight random silence here
-                                        keysToPlay.Add("short_start_bleep");
+                                        keysToPlay.Add(keyBleepIn);
 
                                         bleepOutInAdded = true;
                                     }
@@ -633,8 +646,8 @@ namespace CrewChiefV4.Audio
                 // We moved from Spotter to Chief, or vice versa, while channel was open.  Add those fake messages
                 // so that bleep in/out is played properly.
                 // It's a hack :(
-                queueToPlay.Add("end_bleep", new QueuedMessage("end_bleep", 0, null));
-                queueToPlay.Add("short_start_bleep", new QueuedMessage("short_start_bleep", 0, null));
+                queueToPlay.Add(keyBleepOut, new QueuedMessage(keyBleepOut, 0, null));
+                queueToPlay.Add(keyBleepIn, new QueuedMessage(keyBleepIn, 0, null));
             }
 
             Boolean wasInterrupted = false;
