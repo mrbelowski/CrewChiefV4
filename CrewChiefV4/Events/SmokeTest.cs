@@ -111,12 +111,27 @@ namespace CrewChiefV4.Events
                 Thread.Sleep(3000);
                 audioPlayer.playMessageImmediately(new QueuedMessage(NoisyCartesianCoordinateSpotter.folderSpotterRadioCheck, 0, this));
             }
-            
-            /*audioPlayer.playMessage(new QueuedMessage("gap_in_front",
+
+            audioPlayer.playMessage(new QueuedMessage("gap_in_front",
                                         MessageContents(Timings.folderTheGapTo, makeTempDriver("7908jimmy6^&^", new List<string>()), Timings.folderAheadIsIncreasing,
                                         TimeSpan.FromSeconds((float)random.NextDouble() * 10)),
                                         MessageContents(Timings.folderGapInFrontIncreasing, TimeSpan.FromSeconds((float)random.NextDouble() * 10)), 0, this));
-            */
+
+            Thread.Sleep(2000);
+            QueuedMessage inTheMiddleMessage = new QueuedMessage("spotter/in_the_middle", 0, null);
+                inTheMiddleMessage.expiryTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + 2000;
+            audioPlayer.playSpotterMessage(inTheMiddleMessage, true);
+
+            inTheMiddleMessage = new QueuedMessage("spotter/car_right", 0, null);
+                inTheMiddleMessage.expiryTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + 2000;
+                audioPlayer.playSpotterMessage(inTheMiddleMessage, true);
+
+            audioPlayer.playMessage(new QueuedMessage("gap_in_front2",
+                                        MessageContents(Timings.folderTheGapTo, makeTempDriver("7908jimmy6^&^", new List<string>()), Timings.folderAheadIsIncreasing,
+                                        TimeSpan.FromSeconds((float)random.NextDouble() * 10)),
+                                        MessageContents(Timings.folderGapInFrontIncreasing, TimeSpan.FromSeconds((float)random.NextDouble() * 10)), 0, this));
+
+
             DirectoryInfo soundDirectory = new DirectoryInfo(AudioPlayer.soundFilesPath);
             FileInfo[] filesInSoundDirectory = soundDirectory.GetFiles();
             foreach (FileInfo fileInSoundDirectory in filesInSoundDirectory)
