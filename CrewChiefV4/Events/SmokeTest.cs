@@ -87,14 +87,14 @@ namespace CrewChiefV4.Events
             }
         }
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
-        {            
+        {
             //audioPlayer.playMessage(new QueuedMessage("sectortest1", LapTimes.getSectorDeltaMessages(LapTimes.SectorReportOption.ALL, 20.5f, 20, 33, 34.1f, 10, 10.1f, true), 0, this));
 
             /*for (int i = 0; i < 5; i++)
             {
                 audioPlayer.playMessage(new QueuedMessage("timingtest" +i, MessageContents(TimeSpanWrapper.FromSeconds(random.Next(100) + ((float)random.Next(99) / 100f), Precision.AUTO_LAPTIMES)), 0, this));
             }*/
-            
+
             /*audioPlayer.playMessage(new QueuedMessage(ConditionsMonitor.folderDrizzleIncreasing, 0, this));
             audioPlayer.playMessage(new QueuedMessage(ConditionsMonitor.folderRainLightIncreasing, 0, this));
             audioPlayer.playMessage(new QueuedMessage(ConditionsMonitor.folderRainMidIncreasing, 0, this));
@@ -112,25 +112,7 @@ namespace CrewChiefV4.Events
                 audioPlayer.playMessageImmediately(new QueuedMessage(NoisyCartesianCoordinateSpotter.folderSpotterRadioCheck, 0, this));
             }
 
-            audioPlayer.playMessage(new QueuedMessage("gap_in_front",
-                                        MessageContents(Timings.folderTheGapTo, makeTempDriver("7908jimmy6^&^", new List<string>()), Timings.folderAheadIsIncreasing,
-                                        TimeSpan.FromSeconds((float)random.NextDouble() * 10)),
-                                        MessageContents(Timings.folderGapInFrontIncreasing, TimeSpan.FromSeconds((float)random.NextDouble() * 10)), 0, this));
-
-            Thread.Sleep(2000);
-            QueuedMessage inTheMiddleMessage = new QueuedMessage("spotter/in_the_middle", 0, null);
-                inTheMiddleMessage.expiryTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + 2000;
-            audioPlayer.playSpotterMessage(inTheMiddleMessage, true);
-
-            inTheMiddleMessage = new QueuedMessage("spotter/car_right", 0, null);
-                inTheMiddleMessage.expiryTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + 2000;
-                audioPlayer.playSpotterMessage(inTheMiddleMessage, true);
-
-            audioPlayer.playMessage(new QueuedMessage("gap_in_front2",
-                                        MessageContents(Timings.folderTheGapTo, makeTempDriver("7908jimmy6^&^", new List<string>()), Timings.folderAheadIsIncreasing,
-                                        TimeSpan.FromSeconds((float)random.NextDouble() * 10)),
-                                        MessageContents(Timings.folderGapInFrontIncreasing, TimeSpan.FromSeconds((float)random.NextDouble() * 10)), 0, this));
-
+            //this.BeepOutInTest();
 
             DirectoryInfo soundDirectory = new DirectoryInfo(AudioPlayer.soundFilesPath);
             FileInfo[] filesInSoundDirectory = soundDirectory.GetFiles();
@@ -156,12 +138,12 @@ namespace CrewChiefV4.Events
                     }
                     break;
                 }
-            }            
+            }
 
             /*audioPlayer.playMessage(new QueuedMessage("gap test", MessageContents(LapTimes.folderGapIntro, TimeSpan.FromSeconds(3.1),
                 LapTimes.folderGapOutroOffPace), 0, this));*/
             testDriverNames();
-            
+
             /*
             audioPlayer.playMessage(new QueuedMessage(LapCounter.folderGetReady, 0, this));
             audioPlayer.playMessage(new QueuedMessage(MandatoryPitStops.folderMandatoryPitStopsPitThisLap, 0, this));
@@ -198,6 +180,42 @@ namespace CrewChiefV4.Events
             audioPlayer.playMessage(new QueuedMessage("laps_on_current_tyres", MessageContents(TyreMonitor.folderLapsOnCurrentTyresIntro,
                 5, TyreMonitor.folderLapsOnCurrentTyresOutro), 0, this));*/
 
+        }
+
+        private void BeepOutInTest()
+        {
+            audioPlayer.playMessage(new QueuedMessage("gap_in_front",
+                                        MessageContents(Timings.folderTheGapTo, makeTempDriver("7908jimmy6^&^", new List<string>()), Timings.folderAheadIsIncreasing,
+                                        TimeSpan.FromSeconds((float)random.NextDouble() * 10)),
+                                        MessageContents(Timings.folderGapInFrontIncreasing, TimeSpan.FromSeconds((float)random.NextDouble() * 10)), 0, this));
+
+            Thread.Sleep(2000);
+            QueuedMessage inTheMiddleMessage = new QueuedMessage("spotter/in_the_middle", 0, null);
+            inTheMiddleMessage.expiryTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + 2000;
+            audioPlayer.playSpotterMessage(inTheMiddleMessage, true);
+
+            inTheMiddleMessage = new QueuedMessage("spotter/car_right", 0, null);
+            inTheMiddleMessage.expiryTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + 2000;
+            audioPlayer.playSpotterMessage(inTheMiddleMessage, true);
+
+            audioPlayer.playMessage(new QueuedMessage("gap_in_front2",
+                                        MessageContents(Timings.folderTheGapTo, makeTempDriver("7908jimmy6^&^", new List<string>()), Timings.folderAheadIsIncreasing,
+                                        TimeSpan.FromSeconds((float)random.NextDouble() * 10)),
+                                        MessageContents(Timings.folderGapInFrontIncreasing, TimeSpan.FromSeconds((float)random.NextDouble() * 10)), 0, this));
+
+            audioPlayer.playMessage(new QueuedMessage("gap_in_front3",
+                                        MessageContents(Timings.folderTheGapTo, makeTempDriver("7908jimmy6^&^", new List<string>()), Timings.folderAheadIsIncreasing,
+                                        TimeSpan.FromSeconds((float)random.NextDouble() * 10)),
+                                        MessageContents(Timings.folderGapInFrontIncreasing, TimeSpan.FromSeconds((float)random.NextDouble() * 10)), 0, this));
+
+            audioPlayer.playMessage(new QueuedMessage("gap_in_front4",
+                                        MessageContents(Timings.folderTheGapTo, makeTempDriver("7908jimmy6^&^", new List<string>()), Timings.folderAheadIsIncreasing,
+                                        TimeSpan.FromSeconds((float)random.NextDouble() * 10)),
+                                        MessageContents(Timings.folderGapInFrontIncreasing, TimeSpan.FromSeconds((float)random.NextDouble() * 10)), 0, this));
+            Thread.Sleep(8000);
+            inTheMiddleMessage = new QueuedMessage("spotter/car_right", 0, null);
+            inTheMiddleMessage.expiryTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + 20000;
+            audioPlayer.playSpotterMessage(inTheMiddleMessage, true);
         }
     }
 }
