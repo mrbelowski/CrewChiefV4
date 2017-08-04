@@ -433,7 +433,8 @@ namespace CrewChiefV4.Audio
                     nextQueueCheck = nextQueueCheck.Add(queueMonitorInterval);
                     try
                     {
-                        if (DateTime.Now > unpauseTime)
+                        // Why there's no check for empty queue?
+                        if (DateTime.Now > unpauseTime && queuedClips.Count > 0)
                         {
                             playQueueContents(queuedClips, false);
                             allowPearlsOnNextPlay = true;
@@ -452,7 +453,7 @@ namespace CrewChiefV4.Audio
                 {
                     Thread.Sleep(immediateMessagesMonitorInterval);
                     continue;
-                }                
+                }
             }
             //writeMessagePlayedStats();
             playedMessagesCount.Clear();
@@ -505,6 +506,8 @@ namespace CrewChiefV4.Audio
             stopBackgroundPlayer();
         }
 
+        private bool lastAddedKeyWasSpotter = false;
+
         private void playQueueContents(OrderedDictionary queueToPlay, Boolean isImmediateMessages)
         {
             long milliseconds = GameStateData.CurrentTime.Ticks / TimeSpan.TicksPerMillisecond;
@@ -512,6 +515,7 @@ namespace CrewChiefV4.Audio
             List<String> soundsProcessed = new List<String>();
 
             Boolean oneOrMoreEventsEnabled = false;
+            Boolean bleepOutInAdded = false;
             lock (queueToPlay)
             {
                 int willBePlayedCount = queueToPlay.Count;
@@ -534,9 +538,25 @@ namespace CrewChiefV4.Audio
                             if (firstMovableEventWithPrefixOrSuffix == null && key != LapCounter.folderGetReady && soundCache.eventHasPersonalisedPrefixOrSuffix(key))
                             {
                                 firstMovableEventWithPrefixOrSuffix = key;
-                            } 
+                            }
                             else
                             {
+                                // Inject bleep out/in if needed.
+                                var isSpotterKey = key.StartsWith("spotter");  // Alternatively, we could assign a role to each queued sound.  We'll need this if we get more "personas" than Chief and Spotter.
+                                if (((!this.lastAddedKeyWasSpotter && isSpotterKey)  // If we are flipping from the Chief to Spotter
+                                    || (this.lastAddedKeyWasSpotter && !isSpotterKey))  // Or from the Spotter to Chief
+                                    && this.isChannelOpen())  // And, channel is still open
+                                {
+                                    // insert bleep out/in
+                                    keysToPlay.Add("end_bleep");
+                                    // would be nice to have some slight random silence here
+                                    keysToPlay.Add("short_start_bleep");
+
+                                    bleepOutInAdded = true;
+                                }
+
+                                this.lastAddedKeyWasSpotter = isSpotterKey;
+
                                 keysToPlay.Add(key);
                             }
                         }
@@ -564,19 +584,19 @@ namespace CrewChiefV4.Audio
                             {
                                 Console.WriteLine("Clip " + key + " has some missing sound files");
                             }
-                            else if (hasJustPlayedAsAnImmediateMessage) 
+                            else if (hasJustPlayedAsAnImmediateMessage)
                             {
                                 Console.WriteLine("Clip " + key + " has just been played in response to a voice command, skipping");
                             }
                             soundsProcessed.Add(key);
                             willBePlayedCount--;
                         }
-                    }                    
+                    }
                 }
                 if (firstMovableEventWithPrefixOrSuffix != null)
                 {
                     keysToPlay.Insert(0, firstMovableEventWithPrefixOrSuffix);
-                } 
+                }
                 if (keysToPlay.Count > 0)
                 {
                     if (keysToPlay.Count == 1 && clipIsPearlOfWisdom(keysToPlay[0]))
@@ -600,6 +620,16 @@ namespace CrewChiefV4.Audio
                     }
                 }
             }
+
+            if (bleepOutInAdded)
+            {
+                // We moved from Spotter to Chief, or vice versa, while channel was open.  Add those fake messages
+                // so that bleep in/out is played properly.
+                // It's a hack :(
+                queueToPlay.Add("end_bleep", new QueuedMessage("end_bleep", 0, null));
+                queueToPlay.Add("short_start_bleep", new QueuedMessage("short_start_bleep", 0, null));
+            }
+
             Boolean wasInterrupted = false;
             if (oneOrMoreEventsEnabled)
             {

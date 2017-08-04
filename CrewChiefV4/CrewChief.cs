@@ -630,14 +630,20 @@ namespace CrewChiefV4
             previousGameState = null;
             sessionFinished = false;
             Console.WriteLine("Stopping queue monitor");
-            audioPlayer.stopMonitor();
-            audioPlayer.disablePearlsOfWisdom = false;
-            if (gameDataReader != null && gameDataReader.dumpToFile)
+            if (audioPlayer != null)
             {
-                gameDataReader.DumpRawGameData();
+                audioPlayer.stopMonitor();
+                audioPlayer.disablePearlsOfWisdom = false;
             }
-            gameDataReader.stop();
-            gameDataReader.DisconnectFromProcess();
+            if (gameDataReader != null)
+            {
+                if (gameDataReader.dumpToFile)
+                {
+                    gameDataReader.DumpRawGameData();
+                }
+                gameDataReader.stop();
+                gameDataReader.DisconnectFromProcess();
+            }
             mapped = false;
 
             return true;
