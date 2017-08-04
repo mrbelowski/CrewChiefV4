@@ -117,6 +117,11 @@ namespace CrewChiefV4.Audio
 
         public String selectedPersonalisation = NO_PERSONALISATION_SELECTED;
 
+        // This field is necessary to avoid construction of NoisyCartesianCoordinateSpotter before AudioPlayer.
+        private static String defaultSpotterId = "Jim (default)";
+        private Boolean isSpotterAndChiefSameVoice = UserSettings.GetUserSettings().getString("spotter_name") == defaultSpotterId;
+        private Boolean insertBeepOutInBetweenSpotterAndChief = UserSettings.GetUserSettings().getBoolean("insert_beep_between_spotter_and_chief");
+
         public AudioPlayer()
         {
             String soundPackLocationOverride = UserSettings.GetUserSettings().getString("override_default_sound_pack_location");
@@ -541,22 +546,24 @@ namespace CrewChiefV4.Audio
                             }
                             else
                             {
-                                // Inject bleep out/in if needed.
-                                var isSpotterKey = key.StartsWith("spotter");  // Alternatively, we could assign a role to each queued sound.  We'll need this if we get more "personas" than Chief and Spotter.
-                                if (((!this.lastAddedKeyWasSpotter && isSpotterKey)  // If we are flipping from the Chief to Spotter
-                                    || (this.lastAddedKeyWasSpotter && !isSpotterKey))  // Or from the Spotter to Chief
-                                    && this.isChannelOpen())  // And, channel is still open
+                                if (!this.isSpotterAndChiefSameVoice && this.insertBeepOutInBetweenSpotterAndChief)
                                 {
-                                    // insert bleep out/in
-                                    keysToPlay.Add("end_bleep");
-                                    // would be nice to have some slight random silence here
-                                    keysToPlay.Add("short_start_bleep");
+                                    // Inject bleep out/in if needed.
+                                    var isSpotterKey = key.StartsWith("spotter");  // Alternatively, we could assign a role to each queued sound.  We'll need this if we get more "personas" than Chief and Spotter.
+                                    if (((!this.lastAddedKeyWasSpotter && isSpotterKey)  // If we are flipping from the Chief to Spotter
+                                        || (this.lastAddedKeyWasSpotter && !isSpotterKey))  // Or from the Spotter to Chief
+                                        && this.isChannelOpen())  // And, channel is still open
+                                    {
+                                        // insert bleep out/in
+                                        keysToPlay.Add("end_bleep");
+                                        // would be nice to have some slight random silence here
+                                        keysToPlay.Add("short_start_bleep");
 
-                                    bleepOutInAdded = true;
+                                        bleepOutInAdded = true;
+                                    }
+
+                                    this.lastAddedKeyWasSpotter = isSpotterKey;
                                 }
-
-                                this.lastAddedKeyWasSpotter = isSpotterKey;
-
                                 keysToPlay.Add(key);
                             }
                         }
