@@ -604,7 +604,7 @@ namespace CrewChiefV4
         private void listenForChannelOpen()
         {
             Boolean channelOpen = false;
-            if (crewChief.speechRecogniser.initialised && voiceOption == VoiceOptionEnum.HOLD)
+            if (crewChief.speechRecogniser != null && crewChief.speechRecogniser.initialised && voiceOption == VoiceOptionEnum.HOLD)
             {
                 Console.WriteLine("Running speech recognition in 'hold button' mode");
                 crewChief.speechRecogniser.voiceOptionEnum = VoiceOptionEnum.HOLD;
@@ -737,7 +737,7 @@ namespace CrewChiefV4
                         }
                         nextPollWait = 200;
                     }
-                    else if (crewChief.speechRecogniser.initialised && voiceOption == VoiceOptionEnum.TOGGLE)
+                    else if (crewChief.speechRecogniser != null && crewChief.speechRecogniser.initialised && voiceOption == VoiceOptionEnum.TOGGLE)
                     {
                         if (controllerConfiguration.hasOutstandingClick(ControllerConfiguration.CHANNEL_OPEN_FUNCTION))
                         {
@@ -800,15 +800,15 @@ namespace CrewChiefV4
 
                 crewChiefThread.Start();
                 runListenForChannelOpenThread = controllerConfiguration.listenForChannelOpen()
-                    && voiceOption == VoiceOptionEnum.HOLD && crewChief.speechRecogniser.initialised;
-                if (runListenForChannelOpenThread && voiceOption == VoiceOptionEnum.HOLD && crewChief.speechRecogniser.initialised)
+                    && voiceOption == VoiceOptionEnum.HOLD && crewChief.speechRecogniser != null && crewChief.speechRecogniser.initialised;
+                if (runListenForChannelOpenThread && voiceOption == VoiceOptionEnum.HOLD && crewChief.speechRecogniser != null && crewChief.speechRecogniser.initialised)
                 {
                     Console.WriteLine("Listening on default audio input device");
                     ThreadStart channelOpenButtonListenerWork = listenForChannelOpen;
                     Thread channelOpenButtonListenerThread = new Thread(channelOpenButtonListenerWork);
                     channelOpenButtonListenerThread.Start();
                 }
-                else if (voiceOption == VoiceOptionEnum.ALWAYS_ON && crewChief.speechRecogniser.initialised)
+                else if (voiceOption == VoiceOptionEnum.ALWAYS_ON && crewChief.speechRecogniser != null && crewChief.speechRecogniser.initialised)
                 {
                     Console.WriteLine("Running speech recognition in 'always on' mode");
                     crewChief.speechRecogniser.voiceOptionEnum = VoiceOptionEnum.ALWAYS_ON;
@@ -942,7 +942,7 @@ namespace CrewChiefV4
         {
             try
             {
-                if (!crewChief.speechRecogniser.initialised)
+                if (crewChief.speechRecogniser != null && !crewChief.speechRecogniser.initialised)
                 {
                     crewChief.speechRecogniser.initialiseSpeechEngine();
                     Console.WriteLine("Attempted to initialise speech engine - success = " + crewChief.speechRecogniser.initialised);
