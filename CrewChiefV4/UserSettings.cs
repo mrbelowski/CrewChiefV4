@@ -1,56 +1,90 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace CrewChiefV4
 {
     class UserSettings
     {
+        /// Depth-first recursive delete, with handling for descendant 
+        /// directories open in Windows Explorer.
+        public static void ForceablyDeleteDirectory(string path)
+        {
+            foreach (string directory in Directory.GetDirectories(path))
+            {
+                ForceablyDeleteDirectory(directory);
+            }
+
+            try
+            {
+                Directory.Delete(path, true);
+            }
+            catch (IOException)
+            {
+                Directory.Delete(path, true);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                Directory.Delete(path, true);
+            }
+        }
+
+        public Boolean initFailed = false;
         private String[] reservedNameStarts = new String[] { "CHANNEL_", "TOGGLE_", "VOICE_OPTION", "background_volume", 
             "messages_volume", "last_game_definition", "REPEAT_LAST_MESSAGE_BUTTON", "UpdateSettings", "VOLUME_UP", "VOLUME_DOWN", "GET_FUEL_STATUS",
             ControllerConfiguration.ControllerData.PROPERTY_CONTAINER, "PERSONALISATION_NAME", "app_version", "PRINT_TRACK_DATA", "spotter_name"};
         private UserSettings()
         {
+            try
+            {
+                init();
+            }
+            catch (Exception e)
+            {
+                initFailed = true;
+            }
+        }
+
+        private void init()
+        {
             // Copy user settings from previous application version if necessary
             String savedAppVersion = getString("app_version");
             if (savedAppVersion == null || !savedAppVersion.Equals(System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString()))
             {
-                try
-                {
-                    Properties.Settings.Default.Upgrade();
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine("Unable to upgrade properties from previous version, settings will be reset to default ", e.Message);
-                }
+                Properties.Settings.Default.Upgrade();                
                 setProperty("app_version", System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString());
-                Properties.Settings.Default.Save();                
-            }            
+                Properties.Settings.Default.Save();
+            }
         }
 
         public List<SettingsProperty> getProperties(Type requiredType, String nameMustStartWith, String nameMustNotStartWith)
         {
             List<SettingsProperty> props = new List<SettingsProperty>();
-            foreach (SettingsProperty prop in Properties.Settings.Default.Properties)
+            if (!initFailed)
             {
-                Boolean isReserved = false;
-                foreach (String reservedNameStart in reservedNameStarts)
+                foreach (SettingsProperty prop in Properties.Settings.Default.Properties)
                 {
-                    if (prop.Name.StartsWith(reservedNameStart))
+                    Boolean isReserved = false;
+                    foreach (String reservedNameStart in reservedNameStarts)
                     {
-                        isReserved = true;
-                        break;
+                        if (prop.Name.StartsWith(reservedNameStart))
+                        {
+                            isReserved = true;
+                            break;
+                        }
                     }
-                }
-                if (!isReserved && 
-                    (nameMustStartWith == null || nameMustStartWith.Length == 0 || prop.Name.StartsWith(nameMustStartWith)) &&
-                    (nameMustNotStartWith == null || nameMustNotStartWith.Length == 0 || !prop.Name.StartsWith(nameMustNotStartWith)) &&
-                    !prop.IsReadOnly && prop.PropertyType == requiredType)
-                {
-                    props.Add(prop);
+                    if (!isReserved &&
+                        (nameMustStartWith == null || nameMustStartWith.Length == 0 || prop.Name.StartsWith(nameMustStartWith)) &&
+                        (nameMustNotStartWith == null || nameMustNotStartWith.Length == 0 || !prop.Name.StartsWith(nameMustNotStartWith)) &&
+                        !prop.IsReadOnly && prop.PropertyType == requiredType)
+                    {
+                        props.Add(prop);
+                    }
                 }
             }
             return props.OrderBy(x => x.Name).ToList();
@@ -119,16 +153,19 @@ namespace CrewChiefV4
 
         public void setProperty(String name, Object value)
         {
-            if (value != Properties.Settings.Default[name])
+            if (!initFailed)
             {
-                Properties.Settings.Default[name] = value;
-                propertiesUpdated = true;
+                if (value != Properties.Settings.Default[name])
+                {
+                    Properties.Settings.Default[name] = value;
+                    propertiesUpdated = true;
+                }
             }
         }
 
         public void saveUserSettings()
         {
-            if (propertiesUpdated)
+            if (!initFailed && propertiesUpdated)
             {
                 Properties.Settings.Default.Save();
             }
