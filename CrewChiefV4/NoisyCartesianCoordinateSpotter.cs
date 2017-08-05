@@ -115,7 +115,7 @@ namespace CrewChiefV4
                         availableSpotters.Add(folder.Name.Substring(spotterFolderPrefix.Length));
                     }
                 }
-                String selectedSpotter = UserSettings.GetUserSettings().getString("spotter_name");                
+                String selectedSpotter = UserSettings.GetUserSettings().getString("spotter_name");
                 // TODO: select boxes and UI stuff - this may change
                 if (!defaultSpotterId.Equals(selectedSpotter))
                 {

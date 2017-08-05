@@ -545,5 +545,8 @@
     <Setting Name="GET_FUEL_STATUS_device_type" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="insert_beep_between_spotter_and_chief" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
