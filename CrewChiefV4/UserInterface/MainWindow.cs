@@ -469,6 +469,25 @@ namespace CrewChiefV4
             cw = new ControlWriter(textBox1);
             textBox1.KeyDown += TextBox1_KeyDown;
             Console.SetOut(cw);
+
+            // if we can't init the UserSettings the app will basically be fucked. So try to nuke the Britton_IT_Ltd directory from
+            // orbit (it's the only way to be sure) then restart the app. This shit is comically flakey but what else can we do here?
+            if (UserSettings.GetUserSettings().initFailed)
+            {
+                Console.WriteLine("Unable to upgrade properties from previous version, settings will be reset to default");
+                try
+                {
+                    UserSettings.ForceablyDeleteConfigDirectory();
+                    // note we can't load these from the UI settings because loading stuff will be broken at this point
+                    doRestart("Failed to load user settings, app must be restarted to try again.", "Failed to load user settings");
+                }
+                catch (Exception)
+                {
+                    // oh dear, now we are in a pickle.
+                    Console.WriteLine("Unable to remove broken app settings file\n Please exit the app and manually delete folder " + UserSettings.userConfigFolder);
+                }
+            }
+
             Console.WriteLine("Starting app");
             controllerConfiguration = new ControllerConfiguration(this);            
             setSelectedGameType();

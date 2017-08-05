@@ -45,27 +45,27 @@ namespace CrewChiefV4
                             Console.WriteLine("Failed to set process affinity");
                         }
                     }
-                    if(commandLineArg.Equals("multi"))
+                    if (commandLineArg.Equals("multi"))
                     {
                         allowMultipleInst = true;
                     }
                 }
-                if(!allowMultipleInst)
+                if (!allowMultipleInst)
                 {
                     try
                     {
                         if (System.Diagnostics.Process.GetProcessesByName(System.IO.Path.GetFileNameWithoutExtension(System.Reflection.Assembly.GetEntryAssembly().Location)).Count() > 1)
                         {
                             System.Diagnostics.Process.GetCurrentProcess().Kill();
-                        } 
+                        }
                     }
                     catch (Exception)
                     {
                         //ignore
                     }
-                       
+
                 }
-            }            
+            }
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new MainWindow());

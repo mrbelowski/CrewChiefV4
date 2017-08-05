@@ -10,6 +10,8 @@ For support and discussions about Crew Chief we have our very own forum here: ht
 
 Changelog
 ---------
+Version 4.7.8.2: Added optional radio beep for when the spotter or the Chief interrupt each other ("Insert beep out/in between Spotter and Chief"); Attempt to delete corrupted settings and force the app to restart if they can't be processed
+
 Version 4.7.8.1: RF2 plugin fixes for car damage issues in online races
 	
 Version 4.7.8.0: Fixed spotter logic where it would consider 2 cars along side to be "3 side", even if those cars were one behind the other; Use oval spotter messages (inside / outside) when on known oval tracks, if the selected spotter has these sounds; Tweaked spotter enable / disable sound to be a bit more appropriate for non-default spotter voice packs; Fixed broken sector 3 time deltas in Project Cars
