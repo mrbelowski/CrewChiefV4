@@ -573,8 +573,8 @@ namespace CrewChiefV4.Audio
                                         // them directly, add them to the delayed message's stuff to resolve.
                                         if (queuedMessage.messageFolders == null)
                                         {
-                                            queuedMessage.beepBeforeDelayedMessage = keyBleepOut;
-                                            queuedMessage.beepAfterDelayedMessage = keyBleepIn;
+                                            queuedMessage.delayedMessagBeepOut = keyBleepOut;
+                                            queuedMessage.delayedMessagBeepIn = keyBleepIn;
                                         }
                                         else
                                         {
