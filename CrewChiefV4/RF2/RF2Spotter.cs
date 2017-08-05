@@ -113,14 +113,8 @@ namespace CrewChiefV4.rFactor2
                 return;
             }
 
-            if (currentPlayerScoring.mInPits != 0  // No spotter in pits.
-#if !DEBUG  // In release, disable spotter for AI
-                 || currentPlayerScoring.mControl != (int)rFactor2Constants.rF2Control.Player
-#endif
-            )
-            {
+            if (currentPlayerScoring.mInPits != 0)  // No spotter in pits.
                 return;
-            }
 
             if (currentGameState != null)
             {

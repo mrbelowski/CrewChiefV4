@@ -569,6 +569,7 @@ namespace CrewChiefV4.Audio
                                             keyBleepIn = "short_start_bleep";
                                         }
 
+                                        Console.WriteLine("INSERTED FAKE BEEP OUT/IN");
                                         bool withBleepOut = true;
                                         if (withBleepOut)
                                         {

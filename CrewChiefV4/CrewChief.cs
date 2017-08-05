@@ -327,7 +327,7 @@ namespace CrewChiefV4
                 Thread thread = new Thread(work);
                 runSpotterThread = true;
                 thread.Start();
-            }            
+            }
         }
 
         private void spotterWork()
@@ -336,27 +336,34 @@ namespace CrewChiefV4
             DateTime nextRunTime = DateTime.Now;
             Console.WriteLine("Invoking spotter every " + spotterInterval.Milliseconds + "ms, pausing " + threadSleepTime + "ms between invocations");
 
-            while (runSpotterThread)
+            try
             {
-                DateTime now = DateTime.Now;
-                if (now > nextRunTime && spotter != null && gameDataReader.hasNewSpotterData())
+                while (runSpotterThread)
                 {
-                    currentSpotterState = gameDataReader.ReadGameData(true);
-                    if (lastSpotterState != null && currentSpotterState != null)
+                    DateTime now = DateTime.Now;
+                    if (now > nextRunTime && spotter != null && gameDataReader.hasNewSpotterData())
                     {
-                        try
+                        currentSpotterState = gameDataReader.ReadGameData(true);
+                        if (lastSpotterState != null && currentSpotterState != null)
                         {
-                            spotter.trigger(lastSpotterState, currentSpotterState, currentGameState);
+                            try
+                            {
+                                spotter.trigger(lastSpotterState, currentSpotterState, currentGameState);
+                            }
+                            catch (Exception e)
+                            {
+                                Console.WriteLine("Spotter failed: " + e.StackTrace);
+                            }
                         }
-                        catch (Exception e)
-                        {
-                            Console.WriteLine("Spotter failed: " + e.StackTrace);
-                        }
+                        lastSpotterState = currentSpotterState;
+                        nextRunTime = DateTime.Now.Add(spotterInterval);
                     }
-                    lastSpotterState = currentSpotterState;
-                    nextRunTime = DateTime.Now.Add(spotterInterval);
+                    Thread.Sleep(threadSleepTime);
                 }
-                Thread.Sleep(threadSleepTime);
+            }
+            catch (Exception)  // Exceptions can happen on Stop and DisconnectFromProcess.
+            {
+                Console.WriteLine("Spotter thread terminated.");
             }
             spotterIsRunning = false;
         }
