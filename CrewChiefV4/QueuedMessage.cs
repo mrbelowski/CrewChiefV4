@@ -238,13 +238,17 @@ namespace CrewChiefV4
             this.messageFolders = getMessageFolders((List<MessageFragment>) delayedMessageEvent.abstractEvent.GetType().GetMethod(delayedMessageEvent.methodName).
                 Invoke(delayedMessageEvent.abstractEvent, delayedMessageEvent.methodParams), false);
             // if the audioPlayer decided that this message should be surrounded by its own beeps, add them after resolving the message contents
-            if (beepBeforeDelayedMessage != null)
+            // if some contents actually got resolved.
+            if (this.messageFolders.Count > 0)
             {
-                this.messageFolders.Insert(0, beepBeforeDelayedMessage);
-            }
-            if (beepAfterDelayedMessage != null)
-            {
-                this.messageFolders.Add(beepBeforeDelayedMessage);
+                if (beepBeforeDelayedMessage != null)
+                {
+                    this.messageFolders.Insert(0, beepBeforeDelayedMessage);
+                }
+                if (beepAfterDelayedMessage != null)
+                {
+                    this.messageFolders.Add(beepBeforeDelayedMessage);
+                }
             }
         }
 
