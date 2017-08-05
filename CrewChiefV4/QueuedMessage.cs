@@ -118,8 +118,12 @@ namespace CrewChiefV4
         public List<String> messageFolders;
         public Boolean playEvenWhenSilenced;
 
+        // for delayed messages, sounds are resolved just-in-time
         private DelayedMessageEvent delayedMessageEvent;
         public Boolean delayMessageResolution = false;
+        // delayed messages may also need their own beep-in and beep-out
+        public String beepBeforeDelayedMessage;
+        public String beepAfterDelayedMessage;
 
         public int secondsDelay;
         private Random rand = new Random();
@@ -233,6 +237,15 @@ namespace CrewChiefV4
         {
             this.messageFolders = getMessageFolders((List<MessageFragment>) delayedMessageEvent.abstractEvent.GetType().GetMethod(delayedMessageEvent.methodName).
                 Invoke(delayedMessageEvent.abstractEvent, delayedMessageEvent.methodParams), false);
+            // if the audioPlayer decided that this message should be surrounded by its own beeps, add them after resolving the message contents
+            if (beepBeforeDelayedMessage != null)
+            {
+                this.messageFolders.Insert(0, beepBeforeDelayedMessage);
+            }
+            if (beepAfterDelayedMessage != null)
+            {
+                this.messageFolders.Add(beepBeforeDelayedMessage);
+            }
         }
 
         private List<String> getMessageFolders(List<MessageFragment> messageFragments, Boolean hasAlternative)
