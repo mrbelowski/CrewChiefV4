@@ -469,6 +469,22 @@ namespace CrewChiefV4
             cw = new ControlWriter(textBox1);
             textBox1.KeyDown += TextBox1_KeyDown;
             Console.SetOut(cw);
+
+            if (UserSettings.GetUserSettings().initFailed)
+            {
+                Console.WriteLine("Unable to upgrade properties from previous version, settings will be reset to default");
+                try
+                {
+                    String settingsFolder = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\Britton_IT_Ltd";
+                    UserSettings.ForceablyDeleteDirectory(settingsFolder);
+                    doRestart("Failed to load user settings, app must be restarted to try again", "Failed to load user settings");
+                }
+                catch (Exception e2)
+                {
+                    Console.WriteLine("Unable to initialise settings after nuking app settings file ", e2.Message);
+                }
+            }
+
             Console.WriteLine("Starting app");
             controllerConfiguration = new ControllerConfiguration(this);            
             setSelectedGameType();
