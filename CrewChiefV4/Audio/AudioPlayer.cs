@@ -117,6 +117,11 @@ namespace CrewChiefV4.Audio
 
         public String selectedPersonalisation = NO_PERSONALISATION_SELECTED;
 
+        // This field is necessary to avoid construction of NoisyCartesianCoordinateSpotter before AudioPlayer.
+        private static String defaultSpotterId = "Jim (default)";
+        private Boolean isSpotterAndChiefSameVoice = UserSettings.GetUserSettings().getString("spotter_name") == defaultSpotterId;
+        private Boolean insertBeepOutInBetweenSpotterAndChief = UserSettings.GetUserSettings().getBoolean("insert_beep_between_spotter_and_chief");
+
         public AudioPlayer()
         {
             String soundPackLocationOverride = UserSettings.GetUserSettings().getString("override_default_sound_pack_location");
@@ -433,7 +438,8 @@ namespace CrewChiefV4.Audio
                     nextQueueCheck = nextQueueCheck.Add(queueMonitorInterval);
                     try
                     {
-                        if (DateTime.Now > unpauseTime)
+                        // Why there's no check for empty queue?
+                        if (DateTime.Now > unpauseTime && queuedClips.Count > 0)
                         {
                             playQueueContents(queuedClips, false);
                             allowPearlsOnNextPlay = true;
@@ -452,7 +458,7 @@ namespace CrewChiefV4.Audio
                 {
                     Thread.Sleep(immediateMessagesMonitorInterval);
                     continue;
-                }                
+                }
             }
             //writeMessagePlayedStats();
             playedMessagesCount.Clear();
@@ -505,6 +511,8 @@ namespace CrewChiefV4.Audio
             stopBackgroundPlayer();
         }
 
+        private bool lastAddedKeyWasSpotter = false;
+
         private void playQueueContents(OrderedDictionary queueToPlay, Boolean isImmediateMessages)
         {
             long milliseconds = GameStateData.CurrentTime.Ticks / TimeSpan.TicksPerMillisecond;
@@ -512,6 +520,7 @@ namespace CrewChiefV4.Audio
             List<String> soundsProcessed = new List<String>();
 
             Boolean oneOrMoreEventsEnabled = false;
+
             lock (queueToPlay)
             {
                 int willBePlayedCount = queueToPlay.Count;
@@ -534,9 +543,50 @@ namespace CrewChiefV4.Audio
                             if (firstMovableEventWithPrefixOrSuffix == null && key != LapCounter.folderGetReady && soundCache.eventHasPersonalisedPrefixOrSuffix(key))
                             {
                                 firstMovableEventWithPrefixOrSuffix = key;
-                            } 
+                            }
                             else
                             {
+                                if (!this.isSpotterAndChiefSameVoice && this.insertBeepOutInBetweenSpotterAndChief)
+                                {
+                                    // Inject bleep out/in if needed.
+                                    var isSpotterKey = key.StartsWith("spotter");  // Alternatively, we could assign a role to each queued sound.  We'll need this if we get more "personas" than Chief and Spotter.
+                                    if (((!this.lastAddedKeyWasSpotter && isSpotterKey)  // If we are flipping from the Chief to Spotter
+                                        || (this.lastAddedKeyWasSpotter && !isSpotterKey))  // Or from the Spotter to Chief
+                                        && this.isChannelOpen())  // And, channel is still open
+                                    {
+                                        // Ok, so idea here is that Chief and Spotter have different bleeps.  So we use opposing sets.
+                                        String keyBleepOut = null;
+                                        String keyBleepIn = null;
+                                        if (isSpotterKey)
+                                        {
+                                            // Spotter uses opposite blips.
+                                            keyBleepOut = "end_bleep";  // Chief uses regular bleeps.
+                                            keyBleepIn = "alternate_short_start_bleep";
+                                        }
+                                        else  // Chief comes in.
+                                        {
+                                            keyBleepOut = "alternate_end_bleep";  // Spotter uses alternate bleeps
+                                            keyBleepIn = "short_start_bleep";
+                                        }
+
+                                        // the message folders will be null for messages with delayed (just-in-time) resolution, so rather than inserting
+                                        // them directly, add them to the delayed message's stuff to resolve.
+                                        if (queuedMessage.messageFolders == null)
+                                        {
+                                            queuedMessage.beepBeforeDelayedMessage = keyBleepOut;
+                                            queuedMessage.beepAfterDelayedMessage = keyBleepIn;
+                                        }
+                                        else
+                                        {
+                                            // insert bleep out/in
+                                            queuedMessage.messageFolders.Insert(0, keyBleepOut);
+                                            // would be nice to have some slight random silence here
+                                            queuedMessage.messageFolders.Insert(1, keyBleepIn);
+                                        }
+                                    }
+
+                                    this.lastAddedKeyWasSpotter = isSpotterKey;
+                                }
                                 keysToPlay.Add(key);
                             }
                         }
@@ -564,19 +614,19 @@ namespace CrewChiefV4.Audio
                             {
                                 Console.WriteLine("Clip " + key + " has some missing sound files");
                             }
-                            else if (hasJustPlayedAsAnImmediateMessage) 
+                            else if (hasJustPlayedAsAnImmediateMessage)
                             {
                                 Console.WriteLine("Clip " + key + " has just been played in response to a voice command, skipping");
                             }
                             soundsProcessed.Add(key);
                             willBePlayedCount--;
                         }
-                    }                    
+                    }
                 }
                 if (firstMovableEventWithPrefixOrSuffix != null)
                 {
                     keysToPlay.Insert(0, firstMovableEventWithPrefixOrSuffix);
-                } 
+                }
                 if (keysToPlay.Count > 0)
                 {
                     if (keysToPlay.Count == 1 && clipIsPearlOfWisdom(keysToPlay[0]))
@@ -600,6 +650,7 @@ namespace CrewChiefV4.Audio
                     }
                 }
             }
+
             Boolean wasInterrupted = false;
             if (oneOrMoreEventsEnabled)
             {
@@ -862,7 +913,15 @@ namespace CrewChiefV4.Audio
         {
             if (!mute)
             {
-                soundCache.Play("start_bleep");
+                if (!this.isSpotterAndChiefSameVoice && this.insertBeepOutInBetweenSpotterAndChief && this.lastAddedKeyWasSpotter)
+                {
+                    // Spotter uses opposite bleeps.
+                    soundCache.Play("alternate_start_bleep");
+                }
+                else
+                {
+                    soundCache.Play("start_bleep");
+                }
             }
         }
 
@@ -881,7 +940,15 @@ namespace CrewChiefV4.Audio
         {
             if (!mute)
             {
-                soundCache.Play("short_start_bleep");
+                if (!this.isSpotterAndChiefSameVoice && this.insertBeepOutInBetweenSpotterAndChief && this.lastAddedKeyWasSpotter)
+                {
+                    // Spotter uses opposite bleeps.
+                    soundCache.Play("alternate_short_start_bleep");
+                }
+                else
+                {
+                    soundCache.Play("short_start_bleep");
+                }
             }
         }
 
@@ -889,7 +956,15 @@ namespace CrewChiefV4.Audio
         {
             if (!mute)
             {
-                soundCache.Play("end_bleep");
+                if (!this.isSpotterAndChiefSameVoice && this.insertBeepOutInBetweenSpotterAndChief && this.lastAddedKeyWasSpotter)
+                {
+                    // Spotter uses opposite bleeps.
+                    soundCache.Play("alternate_end_bleep");
+                }
+                else
+                {
+                    soundCache.Play("end_bleep");
+                }
             }
         }
 
