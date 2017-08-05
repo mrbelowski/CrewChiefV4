@@ -571,23 +571,10 @@ namespace CrewChiefV4.Audio
 
                                         if (queuedMessage.messageFolders != null)
                                         {
-                                            Console.WriteLine("INSERTED FAKE BEEP OUT/IN");
-                                            bool withBleepOut = true;
-                                            if (withBleepOut)
-                                            {
-                                                // insert bleep out/in
-                                                queuedMessage.messageFolders.Insert(0, keyBleepOut);
-                                                // would be nice to have some slight random silence here
-                                                queuedMessage.messageFolders.Insert(1, keyBleepIn);
-                                            }
-                                            else
-                                            {
-                                                queuedMessage.messageFolders.Insert(0, keyBleepIn);
-                                            }
-                                        }
-                                        else
-                                        {
-                                            Console.WriteLine("COULD NOT INSERT FAKE BEEP OUT/IN due to messageFolders null");
+                                            // insert bleep out/in
+                                            queuedMessage.messageFolders.Insert(0, keyBleepOut);
+                                            // would be nice to have some slight random silence here
+                                            queuedMessage.messageFolders.Insert(1, keyBleepIn);
                                         }
                                     }
 
