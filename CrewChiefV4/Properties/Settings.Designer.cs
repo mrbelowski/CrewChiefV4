@@ -2194,5 +2194,17 @@ namespace CrewChiefV4.Properties {
                 this["GET_FUEL_STATUS_device_type"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool insert_beep_between_spotter_and_chief {
+            get {
+                return ((bool)(this["insert_beep_between_spotter_and_chief"]));
+            }
+            set {
+                this["insert_beep_between_spotter_and_chief"] = value;
+            }
+        }
     }
 }
