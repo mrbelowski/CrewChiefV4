@@ -11,9 +11,17 @@ namespace CrewChiefV4
 {
     class UserSettings
     {
+        public static String userConfigFolder = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\Britton_IT_Ltd";
+
+        // blat the user config folder for cases where it gets fucked up.
+        public static void ForceablyDeleteConfigDirectory()
+        {
+            ForceablyDeleteDirectory(userConfigFolder);
+        }
+
         /// Depth-first recursive delete, with handling for descendant 
-        /// directories open in Windows Explorer.
-        public static void ForceablyDeleteDirectory(string path)
+        /// directories open in Windows Explorer and other Windows "not doing what its been told" arseholery.
+        private static void ForceablyDeleteDirectory(string path)
         {
             foreach (string directory in Directory.GetDirectories(path))
             {
@@ -38,27 +46,24 @@ namespace CrewChiefV4
         private String[] reservedNameStarts = new String[] { "CHANNEL_", "TOGGLE_", "VOICE_OPTION", "background_volume", 
             "messages_volume", "last_game_definition", "REPEAT_LAST_MESSAGE_BUTTON", "UpdateSettings", "VOLUME_UP", "VOLUME_DOWN", "GET_FUEL_STATUS",
             ControllerConfiguration.ControllerData.PROPERTY_CONTAINER, "PERSONALISATION_NAME", "app_version", "PRINT_TRACK_DATA", "spotter_name"};
+        
         private UserSettings()
         {
             try
             {
-                init();
+                // Copy user settings from previous application version if necessary
+                String savedAppVersion = getString("app_version");
+                if (savedAppVersion == null || !savedAppVersion.Equals(System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString()))
+                {
+                    Properties.Settings.Default.Upgrade();                
+                    setProperty("app_version", System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString());
+                    Properties.Settings.Default.Save();
+                }
             }
-            catch (Exception e)
+            catch (Exception)
             {
+                // if any of this initialisation fails, the app is in an unusable state.
                 initFailed = true;
-            }
-        }
-
-        private void init()
-        {
-            // Copy user settings from previous application version if necessary
-            String savedAppVersion = getString("app_version");
-            if (savedAppVersion == null || !savedAppVersion.Equals(System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString()))
-            {
-                Properties.Settings.Default.Upgrade();                
-                setProperty("app_version", System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString());
-                Properties.Settings.Default.Save();
             }
         }
 
