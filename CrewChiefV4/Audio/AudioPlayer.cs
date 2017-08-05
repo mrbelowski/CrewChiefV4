@@ -569,7 +569,14 @@ namespace CrewChiefV4.Audio
                                             keyBleepIn = "short_start_bleep";
                                         }
 
-                                        if (queuedMessage.messageFolders != null)
+                                        // the message folders will be null for messages with delayed (just-in-time) resolution, so rather than inserting
+                                        // them directly, add them to the delayed message's stuff to resolve.
+                                        if (queuedMessage.messageFolders == null)
+                                        {
+                                            queuedMessage.beepBeforeDelayedMessage = keyBleepOut;
+                                            queuedMessage.beepAfterDelayedMessage = keyBleepIn;
+                                        }
+                                        else
                                         {
                                             // insert bleep out/in
                                             queuedMessage.messageFolders.Insert(0, keyBleepOut);
