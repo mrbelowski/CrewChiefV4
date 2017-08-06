@@ -122,8 +122,8 @@ namespace CrewChiefV4
         private DelayedMessageEvent delayedMessageEvent;
         public Boolean delayMessageResolution = false;
         // delayed messages may also need their own beep-in and beep-out
-        public String beepBeforeDelayedMessage;
-        public String beepAfterDelayedMessage;
+        public String delayedMessagBeepOut;
+        public String delayedMessagBeepIn;
 
         public int secondsDelay;
         private Random rand = new Random();
@@ -237,17 +237,17 @@ namespace CrewChiefV4
         {
             this.messageFolders = getMessageFolders((List<MessageFragment>) delayedMessageEvent.abstractEvent.GetType().GetMethod(delayedMessageEvent.methodName).
                 Invoke(delayedMessageEvent.abstractEvent, delayedMessageEvent.methodParams), false);
-            // if the audioPlayer decided that this message should be surrounded by its own beeps, add them after resolving the message contents
+            // if the audioPlayer decided that this message should be preceeded by fake beep in/out, add them after resolving the message contents
             // if some contents actually got resolved.
             if (this.messageFolders.Count > 0)
             {
-                if (beepBeforeDelayedMessage != null)
+                if (delayedMessagBeepOut != null)
                 {
-                    this.messageFolders.Insert(0, beepBeforeDelayedMessage);
+                    this.messageFolders.Insert(0, delayedMessagBeepOut);
                 }
-                if (beepAfterDelayedMessage != null)
+                if (delayedMessagBeepIn != null)
                 {
-                    this.messageFolders.Add(beepBeforeDelayedMessage);
+                    this.messageFolders.Insert(delayedMessagBeepOut == null ? 0 : 1, delayedMessagBeepIn);
                 }
             }
         }

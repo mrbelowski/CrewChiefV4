@@ -438,7 +438,6 @@ namespace CrewChiefV4.Audio
                     nextQueueCheck = nextQueueCheck.Add(queueMonitorInterval);
                     try
                     {
-                        // Why there's no check for empty queue?
                         if (DateTime.Now > unpauseTime && queuedClips.Count > 0)
                         {
                             playQueueContents(queuedClips, false);
@@ -573,8 +572,8 @@ namespace CrewChiefV4.Audio
                                         // them directly, add them to the delayed message's stuff to resolve.
                                         if (queuedMessage.messageFolders == null)
                                         {
-                                            queuedMessage.beepBeforeDelayedMessage = keyBleepOut;
-                                            queuedMessage.beepAfterDelayedMessage = keyBleepIn;
+                                            queuedMessage.delayedMessagBeepOut = keyBleepOut;
+                                            queuedMessage.delayedMessagBeepIn = keyBleepIn;
                                         }
                                         else
                                         {
