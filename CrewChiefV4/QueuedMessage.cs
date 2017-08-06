@@ -247,7 +247,7 @@ namespace CrewChiefV4
                 }
                 if (delayedMessagBeepIn != null)
                 {
-                    this.messageFolders.Insert(1, delayedMessagBeepIn);
+                    this.messageFolders.Insert(delayedMessagBeepOut == null ? 0 : 1, delayedMessagBeepIn);
                 }
             }
         }
