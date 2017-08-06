@@ -239,6 +239,7 @@ namespace CrewChiefV4
                 Invoke(delayedMessageEvent.abstractEvent, delayedMessageEvent.methodParams), false);
             // if the audioPlayer decided that this message should be preceeded by fake beep in/out, add them after resolving the message contents
             // if some contents actually got resolved.
+            // NOTE: If we continue this route, we need a check here to make sure radio channel is still open before injection.
             if (this.messageFolders.Count > 0)
             {
                 if (delayedMessagBeepOut != null)
