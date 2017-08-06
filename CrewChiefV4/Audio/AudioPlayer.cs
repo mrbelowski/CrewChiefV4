@@ -438,7 +438,6 @@ namespace CrewChiefV4.Audio
                     nextQueueCheck = nextQueueCheck.Add(queueMonitorInterval);
                     try
                     {
-                        // Why there's no check for empty queue?
                         if (DateTime.Now > unpauseTime && queuedClips.Count > 0)
                         {
                             playQueueContents(queuedClips, false);
