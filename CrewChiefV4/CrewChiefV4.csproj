@@ -93,6 +93,7 @@
     <Compile Include="ACS\ACSGameStateMapper.cs" />
     <Compile Include="ACS\ACSSharedMemoryReader.cs" />
     <Compile Include="ACS\ACSSpotter.cs" />
+    <Compile Include="Audio\PlaybackModerator.cs" />
     <Compile Include="Audio\Sounds.cs" />
     <Compile Include="CarData.cs" />
     <Compile Include="DriverNameHelper.cs" />

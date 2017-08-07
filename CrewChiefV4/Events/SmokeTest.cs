@@ -112,7 +112,7 @@ namespace CrewChiefV4.Events
                 audioPlayer.playMessageImmediately(new QueuedMessage(NoisyCartesianCoordinateSpotter.folderSpotterRadioCheck, 0, this));
             }
 
-            //this.BeepOutInTest();
+            this.BeepOutInTest();
 
             DirectoryInfo soundDirectory = new DirectoryInfo(AudioPlayer.soundFilesPath);
             FileInfo[] filesInSoundDirectory = soundDirectory.GetFiles();
@@ -184,6 +184,8 @@ namespace CrewChiefV4.Events
 
         private void BeepOutInTest()
         {
+            PlaybackModerator.SetTracing(true /*enabled*/);
+
             audioPlayer.playMessage(new QueuedMessage("gap_in_front",
                                         MessageContents(Timings.folderTheGapTo, makeTempDriver("7908jimmy6^&^", new List<string>()), Timings.folderAheadIsIncreasing,
                                         TimeSpan.FromSeconds((float)random.NextDouble() * 10)),

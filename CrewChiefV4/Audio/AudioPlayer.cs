@@ -117,11 +117,6 @@ namespace CrewChiefV4.Audio
 
         public String selectedPersonalisation = NO_PERSONALISATION_SELECTED;
 
-        // This field is necessary to avoid construction of NoisyCartesianCoordinateSpotter before AudioPlayer.
-        private static String defaultSpotterId = "Jim (default)";
-        private Boolean isSpotterAndChiefSameVoice = UserSettings.GetUserSettings().getString("spotter_name") == defaultSpotterId;
-        private Boolean insertBeepOutInBetweenSpotterAndChief = UserSettings.GetUserSettings().getBoolean("insert_beep_between_spotter_and_chief");
-
         public AudioPlayer()
         {
             String soundPackLocationOverride = UserSettings.GetUserSettings().getString("override_default_sound_pack_location");
@@ -545,47 +540,6 @@ namespace CrewChiefV4.Audio
                             }
                             else
                             {
-                                if (!this.isSpotterAndChiefSameVoice && this.insertBeepOutInBetweenSpotterAndChief)
-                                {
-                                    // Inject bleep out/in if needed.
-                                    var isSpotterKey = key.StartsWith("spotter");  // Alternatively, we could assign a role to each queued sound.  We'll need this if we get more "personas" than Chief and Spotter.
-                                    if (((!this.lastAddedKeyWasSpotter && isSpotterKey)  // If we are flipping from the Chief to Spotter
-                                        || (this.lastAddedKeyWasSpotter && !isSpotterKey))  // Or from the Spotter to Chief
-                                        && this.isChannelOpen())  // And, channel is still open
-                                    {
-                                        // Ok, so idea here is that Chief and Spotter have different bleeps.  So we use opposing sets.
-                                        String keyBleepOut = null;
-                                        String keyBleepIn = null;
-                                        if (isSpotterKey)
-                                        {
-                                            // Spotter uses opposite blips.
-                                            keyBleepOut = "end_bleep";  // Chief uses regular bleeps.
-                                            keyBleepIn = "alternate_short_start_bleep";
-                                        }
-                                        else  // Chief comes in.
-                                        {
-                                            keyBleepOut = "alternate_end_bleep";  // Spotter uses alternate bleeps
-                                            keyBleepIn = "short_start_bleep";
-                                        }
-
-                                        // the message folders will be null for messages with delayed (just-in-time) resolution, so rather than inserting
-                                        // them directly, add them to the delayed message's stuff to resolve.
-                                        if (queuedMessage.messageFolders == null)
-                                        {
-                                            queuedMessage.delayedMessagBeepOut = keyBleepOut;
-                                            queuedMessage.delayedMessagBeepIn = keyBleepIn;
-                                        }
-                                        else
-                                        {
-                                            // insert bleep out/in
-                                            queuedMessage.messageFolders.Insert(0, keyBleepOut);
-                                            // would be nice to have some slight random silence here
-                                            queuedMessage.messageFolders.Insert(1, keyBleepIn);
-                                        }
-                                    }
-
-                                    this.lastAddedKeyWasSpotter = isSpotterKey;
-                                }
                                 keysToPlay.Add(key);
                             }
                         }
@@ -912,15 +866,16 @@ namespace CrewChiefV4.Audio
         {
             if (!mute)
             {
-                if (!this.isSpotterAndChiefSameVoice && this.insertBeepOutInBetweenSpotterAndChief && this.lastAddedKeyWasSpotter)
+                // TOOD: Revisit.
+                /*if (!this.isSpotterAndChiefSameVoice && this.insertBeepOutInBetweenSpotterAndChief && this.lastAddedKeyWasSpotter)
                 {
                     // Spotter uses opposite bleeps.
                     soundCache.Play("alternate_start_bleep");
                 }
-                else
-                {
+                else*/
+                //{
                     soundCache.Play("start_bleep");
-                }
+                //}
             }
         }
 
@@ -939,15 +894,16 @@ namespace CrewChiefV4.Audio
         {
             if (!mute)
             {
-                if (!this.isSpotterAndChiefSameVoice && this.insertBeepOutInBetweenSpotterAndChief && this.lastAddedKeyWasSpotter)
+                // TODO: Revisit
+                /*if (!this.isSpotterAndChiefSameVoice && this.insertBeepOutInBetweenSpotterAndChief && this.lastAddedKeyWasSpotter)
                 {
                     // Spotter uses opposite bleeps.
                     soundCache.Play("alternate_short_start_bleep");
                 }
                 else
-                {
+                {*/
                     soundCache.Play("short_start_bleep");
-                }
+                //}
             }
         }
 
@@ -955,15 +911,16 @@ namespace CrewChiefV4.Audio
         {
             if (!mute)
             {
-                if (!this.isSpotterAndChiefSameVoice && this.insertBeepOutInBetweenSpotterAndChief && this.lastAddedKeyWasSpotter)
+                // TODO: Revisit
+                /*if (!this.isSpotterAndChiefSameVoice && this.insertBeepOutInBetweenSpotterAndChief && this.lastAddedKeyWasSpotter)
                 {
                     // Spotter uses opposite bleeps.
                     soundCache.Play("alternate_end_bleep");
                 }
                 else
-                {
+                {*/
                     soundCache.Play("end_bleep");
-                }
+                //}
             }
         }
 
