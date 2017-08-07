@@ -217,6 +217,12 @@ namespace CrewChiefV4.Audio
                     new String[] { /*"numbers", */"pearls_of_wisdom", "spotter", "acknowledge"  }, sweary, allowCaching, selectedPersonalisation);
             }
             initialised = true;
+            PlaybackModerator.SetAudioPlayer(this);
+        }
+        
+        public SoundCache getSoundCache()
+        {
+            return soundCache;
         }
 
         public void startMonitor()
