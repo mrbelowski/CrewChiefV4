@@ -23,6 +23,10 @@ namespace CrewChiefV4.Audio
         private static bool lastSoundWasSpotter = false;
         private static AudioPlayer audioPlayer = null;
 
+        private static string prevFirstKey = "";
+        private static string prevLastKey = "";
+        private static SingleSound lastSoundPreProcessed = null;
+
         public static void PreProcessSound(SingleSound sound)
         {
             if (PlaybackModerator.audioPlayer == null)
@@ -32,7 +36,87 @@ namespace CrewChiefV4.Audio
 
             PlaybackModerator.InjectBeepOutIn(sound);
 
+            PlaybackModerator.lastSoundPreProcessed = sound;
         }
+
+        public static void PreProcessAddedKeys(List<string> keys)
+        {
+            if (keys == null || keys.Count == 0)
+                return;
+
+            PlaybackModerator.prevFirstKey = keys.First();
+            PlaybackModerator.prevLastKey = keys.Last();
+        }
+
+        public static string GetSuggestedBleepStart()
+        {
+            var resolvedSoundName = "start_bleep";
+
+            // If there's nothing to do return default value.
+            if (PlaybackModerator.isSpotterAndChiefSameVoice
+                || !PlaybackModerator.insertBeepOutInBetweenSpotterAndChief)
+                return resolvedSoundName;
+
+            if (!string.IsNullOrWhiteSpace(PlaybackModerator.prevFirstKey)
+                && PlaybackModerator.prevFirstKey.Contains("spotter"))
+            {
+                // Spotter uses opposite bleeps.
+                resolvedSoundName = "alternate_start_bleep";
+            }
+
+            return resolvedSoundName;
+        }
+
+        public static string GetSuggestedBleepShorStart()
+        {
+            var resolvedSoundName = "short_start_bleep";
+
+            // If there's nothing to do return default value.
+            if (PlaybackModerator.isSpotterAndChiefSameVoice
+                || !PlaybackModerator.insertBeepOutInBetweenSpotterAndChief)
+                return resolvedSoundName;
+
+            if (!string.IsNullOrWhiteSpace(PlaybackModerator.prevFirstKey) 
+                && PlaybackModerator.prevFirstKey.Contains("spotter"))
+            {
+                // Spotter uses opposite bleeps.
+                resolvedSoundName = "alternate_short_start_bleep";
+            }
+
+            return resolvedSoundName;
+        }
+
+        public static string GetSuggestedBleepEnd()
+        {
+            var resolvedSoundName = "end_bleep";
+
+            // If there's nothing to do return default value.
+            if (PlaybackModerator.isSpotterAndChiefSameVoice
+                || !PlaybackModerator.insertBeepOutInBetweenSpotterAndChief)
+                return resolvedSoundName;
+
+            if (!string.IsNullOrWhiteSpace(PlaybackModerator.prevLastKey)
+                && PlaybackModerator.prevLastKey.Contains("spotter"))
+            {
+                // Spotter uses opposite bleeps.
+                resolvedSoundName = "alternate_end_bleep";
+
+                if (PlaybackModerator.lastSoundPreProcessed != null
+                    && !PlaybackModerator.lastSoundPreProcessed.isSpotter)
+                    PlaybackModerator.Trace(
+                        $"WARNING Last key and last sound pre-processed do not agree on role: {PlaybackModerator.lastSoundPreProcessed.fullPath} vs {PlaybackModerator.prevLastKey} ");
+            }
+            else
+            {
+                if (PlaybackModerator.lastSoundPreProcessed != null
+                    && PlaybackModerator.lastSoundPreProcessed.isSpotter)
+                    PlaybackModerator.Trace(
+                        $"WARNING Last key and last sound pre-processed do not agree on role: {PlaybackModerator.lastSoundPreProcessed.fullPath} vs {PlaybackModerator.prevLastKey} ");
+            }
+
+            return resolvedSoundName;
+        }
+
 
         public static void SetTracing(bool enabled)
         {

@@ -613,6 +613,8 @@ namespace CrewChiefV4.Audio
             Boolean wasInterrupted = false;
             if (oneOrMoreEventsEnabled)
             {
+                PlaybackModerator.PreProcessAddedKeys(keysToPlay);
+
                 openRadioChannelInternal();
                 soundsProcessed.AddRange(playSounds(keysToPlay, isImmediateMessages, out wasInterrupted));
             }
@@ -872,16 +874,8 @@ namespace CrewChiefV4.Audio
         {
             if (!mute)
             {
-                // TOOD: Revisit.
-                /*if (!this.isSpotterAndChiefSameVoice && this.insertBeepOutInBetweenSpotterAndChief && this.lastAddedKeyWasSpotter)
-                {
-                    // Spotter uses opposite bleeps.
-                    soundCache.Play("alternate_start_bleep");
-                }
-                else*/
-                //{
-                    soundCache.Play("start_bleep");
-                //}
+                var soundToPlay = PlaybackModerator.GetSuggestedBleepStart();
+                soundCache.Play(soundToPlay);
             }
         }
 
@@ -900,16 +894,8 @@ namespace CrewChiefV4.Audio
         {
             if (!mute)
             {
-                // TODO: Revisit
-                /*if (!this.isSpotterAndChiefSameVoice && this.insertBeepOutInBetweenSpotterAndChief && this.lastAddedKeyWasSpotter)
-                {
-                    // Spotter uses opposite bleeps.
-                    soundCache.Play("alternate_short_start_bleep");
-                }
-                else
-                {*/
-                    soundCache.Play("short_start_bleep");
-                //}
+                var soundToPlay = PlaybackModerator.GetSuggestedBleepShorStart();
+                soundCache.Play(soundToPlay);
             }
         }
 
@@ -917,16 +903,8 @@ namespace CrewChiefV4.Audio
         {
             if (!mute)
             {
-                // TODO: Revisit
-                /*if (!this.isSpotterAndChiefSameVoice && this.insertBeepOutInBetweenSpotterAndChief && this.lastAddedKeyWasSpotter)
-                {
-                    // Spotter uses opposite bleeps.
-                    soundCache.Play("alternate_end_bleep");
-                }
-                else
-                {*/
-                    soundCache.Play("end_bleep");
-                //}
+                var soundToPlay = PlaybackModerator.GetSuggestedBleepEnd();
+                soundCache.Play(soundToPlay);
             }
         }
 
