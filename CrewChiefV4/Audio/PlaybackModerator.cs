@@ -50,31 +50,39 @@ namespace CrewChiefV4.Audio
 
         public static string GetSuggestedBleepStart()
         {
-            return GetSuggestedBleep("start_bleep" /*chiefBleepSoundName*/, "alternate_start_bleep" /*spotterBleepSoundName*/);
+            return GetSuggestedStartBleep("start_bleep" /*chiefBleepSoundName*/, "alternate_start_bleep" /*spotterBleepSoundName*/);
         }
 
-        private static string GetSuggestedBleep(string chiefBleepSoundName, string spotterBleepSoundName)
+        private static string GetSuggestedStartBleep(string chiefBleepSoundName, string spotterBleepSoundName)
         {
             var resolvedSoundName = chiefBleepSoundName;
 
             // If there's nothing to do return default value.
-            if (PlaybackModerator.isSpotterAndChiefSameVoice
-                || !PlaybackModerator.insertBeepOutInBetweenSpotterAndChief)
+            if (!PlaybackModerator.IsFakeBleepInjectionEnabled())
                 return resolvedSoundName;
+
+            // We need to capture the fact that channel was opened as Spotter or Chief, so that
+            // subsequent injection is aware of that.
+            PlaybackModerator.lastSoundWasSpotter = false;
 
             if (!string.IsNullOrWhiteSpace(PlaybackModerator.prevFirstKey)
                 && PlaybackModerator.prevFirstKey.Contains("spotter"))
             {
                 // Spotter uses opposite bleeps.
                 resolvedSoundName = spotterBleepSoundName;
+                PlaybackModerator.lastSoundWasSpotter = true;
+
+                PlaybackModerator.Trace("Opening radio channel as Spotter");
             }
+            else
+                PlaybackModerator.Trace("Opening radio channel as Chief");
 
             return resolvedSoundName;
         }
 
         public static string GetSuggestedBleepShorStart()
         {
-            return GetSuggestedBleep("short_start_bleep" /*chiefBleepSoundName*/, "alternate_short_start_bleep" /*spotterBleepSoundName*/);
+            return GetSuggestedStartBleep("short_start_bleep" /*chiefBleepSoundName*/, "alternate_short_start_bleep" /*spotterBleepSoundName*/);
         }
 
         public static string GetSuggestedBleepEnd()
@@ -82,8 +90,7 @@ namespace CrewChiefV4.Audio
             var resolvedSoundName = "end_bleep";
 
             // If there's nothing to do return default value.
-            if (PlaybackModerator.isSpotterAndChiefSameVoice
-                || !PlaybackModerator.insertBeepOutInBetweenSpotterAndChief)
+            if (!PlaybackModerator.IsFakeBleepInjectionEnabled())
                 return resolvedSoundName;
 
             if (!string.IsNullOrWhiteSpace(PlaybackModerator.prevLastKey)
@@ -92,6 +99,8 @@ namespace CrewChiefV4.Audio
                 // Spotter uses opposite bleeps.
                 resolvedSoundName = "alternate_end_bleep";
 
+                PlaybackModerator.Trace("Closing radio channel as Spotter");
+
                 if (PlaybackModerator.lastSoundPreProcessed != null
                     && !PlaybackModerator.lastSoundPreProcessed.isSpotter)
                     PlaybackModerator.Trace(
@@ -99,6 +108,8 @@ namespace CrewChiefV4.Audio
             }
             else
             {
+                PlaybackModerator.Trace("Closing radio channel as Chief");
+
                 if (PlaybackModerator.lastSoundPreProcessed != null
                     && PlaybackModerator.lastSoundPreProcessed.isSpotter)
                     PlaybackModerator.Trace(
@@ -139,8 +150,7 @@ namespace CrewChiefV4.Audio
             Debug.Assert(PlaybackModerator.audioPlayer != null, "audioPlayer is not set.");
 
             // Only consider injection is preference is set and Spotter and Chief are different personas.
-            if (PlaybackModerator.isSpotterAndChiefSameVoice 
-                || !PlaybackModerator.insertBeepOutInBetweenSpotterAndChief)
+            if (!PlaybackModerator.IsFakeBleepInjectionEnabled())
                 return;
 
             // Skip bleep sounds.
@@ -154,8 +164,8 @@ namespace CrewChiefV4.Audio
                 && PlaybackModerator.audioPlayer.isChannelOpen())  // And, channel is still open
             {
                 // Ok, so idea here is that Chief and Spotter have different bleeps.  So we use opposing sets.
-                String keyBleepOut = null;
-                String keyBleepIn = null;
+                string keyBleepOut = null;
+                string keyBleepIn = null;
                 if (isSpotterSound)
                 {
                     // Spotter uses opposite blips.
@@ -177,6 +187,12 @@ namespace CrewChiefV4.Audio
             }
 
             PlaybackModerator.lastSoundWasSpotter = isSpotterSound;
+        }
+
+        private static bool IsFakeBleepInjectionEnabled()
+        {
+            return !PlaybackModerator.isSpotterAndChiefSameVoice
+                && PlaybackModerator.insertBeepOutInBetweenSpotterAndChief;
         }
     }
 }

@@ -187,18 +187,25 @@ namespace CrewChiefV4.Events
         {
             PlaybackModerator.SetTracing(true /*enabled*/);
 
-            audioPlayer.playMessage(new QueuedMessage("gap_in_front",
-                                        MessageContents(Timings.folderTheGapTo, makeTempDriver("7908jimmy6^&^", new List<string>()), Timings.folderAheadIsIncreasing,
-                                        TimeSpan.FromSeconds((float)random.NextDouble() * 10)),
-                                        MessageContents(Timings.folderGapInFrontIncreasing, TimeSpan.FromSeconds((float)random.NextDouble() * 10)), 0, this));
-
-            audioPlayer.playMessage(new QueuedMessage("position/bad_start", 0, this));
-
-            Thread.Sleep(2000);
             QueuedMessage inTheMiddleMessage = new QueuedMessage("spotter/in_the_middle", 0, null);
             inTheMiddleMessage.expiryTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + 2000;
             audioPlayer.playSpotterMessage(inTheMiddleMessage, true);
 
+            Thread.Sleep(5000);
+
+            /*audioPlayer.playMessage(new QueuedMessage("gap_in_front",
+                                        MessageContents(Timings.folderTheGapTo, makeTempDriver("7908jimmy6^&^", new List<string>()), Timings.folderAheadIsIncreasing,
+                                        TimeSpan.FromSeconds((float)random.NextDouble() * 10)),
+                                        MessageContents(Timings.folderGapInFrontIncreasing, TimeSpan.FromSeconds((float)random.NextDouble() * 10)), 0, this));*/
+
+            audioPlayer.playMessage(new QueuedMessage("position/bad_start", 0, this));
+
+            Thread.Sleep(5000);
+            inTheMiddleMessage = new QueuedMessage("spotter/in_the_middle", 0, null);
+            inTheMiddleMessage.expiryTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + 2000;
+            audioPlayer.playSpotterMessage(inTheMiddleMessage, true);
+
+            return; 
             inTheMiddleMessage = new QueuedMessage("spotter/car_right", 0, null);
             inTheMiddleMessage.expiryTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + 2000;
             audioPlayer.playSpotterMessage(inTheMiddleMessage, true);
