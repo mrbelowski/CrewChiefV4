@@ -1,5 +1,5 @@
 ﻿/*
- * 
+ * TODO: insert our corporate header.
  * 
  * thecrewchief.org 
  */
@@ -50,7 +50,12 @@ namespace CrewChiefV4.Audio
 
         public static string GetSuggestedBleepStart()
         {
-            var resolvedSoundName = "start_bleep";
+            return GetSuggestedBleep("start_bleep" /*chiefBleepSoundName*/, "alternate_start_bleep" /*spotterBleepSoundName*/);
+        }
+
+        private static string GetSuggestedBleep(string chiefBleepSoundName, string spotterBleepSoundName)
+        {
+            var resolvedSoundName = chiefBleepSoundName;
 
             // If there's nothing to do return default value.
             if (PlaybackModerator.isSpotterAndChiefSameVoice
@@ -61,7 +66,7 @@ namespace CrewChiefV4.Audio
                 && PlaybackModerator.prevFirstKey.Contains("spotter"))
             {
                 // Spotter uses opposite bleeps.
-                resolvedSoundName = "alternate_start_bleep";
+                resolvedSoundName = spotterBleepSoundName;
             }
 
             return resolvedSoundName;
@@ -69,21 +74,7 @@ namespace CrewChiefV4.Audio
 
         public static string GetSuggestedBleepShorStart()
         {
-            var resolvedSoundName = "short_start_bleep";
-
-            // If there's nothing to do return default value.
-            if (PlaybackModerator.isSpotterAndChiefSameVoice
-                || !PlaybackModerator.insertBeepOutInBetweenSpotterAndChief)
-                return resolvedSoundName;
-
-            if (!string.IsNullOrWhiteSpace(PlaybackModerator.prevFirstKey) 
-                && PlaybackModerator.prevFirstKey.Contains("spotter"))
-            {
-                // Spotter uses opposite bleeps.
-                resolvedSoundName = "alternate_short_start_bleep";
-            }
-
-            return resolvedSoundName;
+            return GetSuggestedBleep("short_start_bleep" /*chiefBleepSoundName*/, "alternate_short_start_bleep" /*spotterBleepSoundName*/);
         }
 
         public static string GetSuggestedBleepEnd()
@@ -143,9 +134,6 @@ namespace CrewChiefV4.Audio
         //public static bool ShouldPlaySound()
         //{ }
 
-        // TODO: next issue to figure out is how to open channel correctly depending on who is about to talk?
-        // Audio player has that info sort of.  There's only one openRadioChannel call, so it is fairly straightforward.
-        // On channel close, we need to check who was last to talk and use appropriate bleep. 
         private static void InjectBeepOutIn(SingleSound sound)
         {
             Debug.Assert(PlaybackModerator.audioPlayer != null, "audioPlayer is not set.");
@@ -184,10 +172,8 @@ namespace CrewChiefV4.Audio
 
                 // insert bleep out/in
                 PlaybackModerator.audioPlayer.getSoundCache().Play(keyBleepOut);
-                PlaybackModerator.audioPlayer.getSoundCache().Play(keyBleepIn);
-                //                    queuedMessage.messageFolders.Insert(0, keyBleepOut);
                 // would be nice to have some slight random silence here
-                //                  queuedMessage.messageFolders.Insert(1, keyBleepIn);
+                PlaybackModerator.audioPlayer.getSoundCache().Play(keyBleepIn);
             }
 
             PlaybackModerator.lastSoundWasSpotter = isSpotterSound;
