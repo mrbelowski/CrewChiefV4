@@ -136,7 +136,7 @@ namespace CrewChiefV4.Audio
             if (!PlaybackModerator.enableTracing)
                 return;
 
-            Console.WriteLine(msg);
+            Console.WriteLine($"PlaybackModerator: {msg}");
         }
 
         //public static void PostProcessSound()
