@@ -32,7 +32,7 @@ namespace CrewChiefV4.Audio
             if (PlaybackModerator.audioPlayer == null)
                 return;
 
-            PlaybackModerator.Trace($"Pre-Processing sound: {sound.fullPath}  isSpotter: {sound.isSpotter}  isBleep: {sound.isBleep} ");
+            //PlaybackModerator.Trace($"Pre-Processing sound: {sound.fullPath}  isSpotter: {sound.isSpotter}  isBleep: {sound.isBleep} ");
 
             PlaybackModerator.InjectBeepOutIn(sound);
 
