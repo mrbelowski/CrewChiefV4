@@ -166,19 +166,25 @@ namespace CrewChiefV4.Audio
                 // Ok, so idea here is that Chief and Spotter have different bleeps.  So we use opposing sets.
                 string keyBleepOut = null;
                 string keyBleepIn = null;
+
+                string traceMsgPostfix = null;
                 if (isSpotterSound)
                 {
                     // Spotter uses opposite blips.
                     keyBleepOut = "end_bleep";  // Chief uses regular bleeps.
                     keyBleepIn = "alternate_short_start_bleep";
+
+                    traceMsgPostfix = "Spotter interrupted Chief.";
                 }
                 else  // Chief comes in.
                 {
                     keyBleepOut = "alternate_end_bleep";  // Spotter uses alternate bleeps
                     keyBleepIn = "short_start_bleep";
+
+                    traceMsgPostfix = "Chief interrupted Spotter.";
                 }
 
-                PlaybackModerator.Trace($"Injecting: {keyBleepOut} and {keyBleepIn} messages.");
+                PlaybackModerator.Trace($"Injecting: {keyBleepOut} and {keyBleepIn} messages.  {traceMsgPostfix}");
 
                 // insert bleep out/in
                 PlaybackModerator.audioPlayer.getSoundCache().Play(keyBleepOut);
