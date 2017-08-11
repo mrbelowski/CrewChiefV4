@@ -103,8 +103,9 @@ namespace CrewChiefV4.Audio
 
                 if (PlaybackModerator.lastSoundPreProcessed != null
                     && !PlaybackModerator.lastSoundPreProcessed.isSpotter)
-                    PlaybackModerator.Trace(
-                        $"WARNING Last key and last sound pre-processed do not agree on role: {PlaybackModerator.lastSoundPreProcessed.fullPath} vs {PlaybackModerator.prevLastKey} ");
+                    PlaybackModerator.Trace(String.Format(
+                        "WARNING Last key and last sound pre-processed do not agree on role: {0} vs {1} ", 
+                        PlaybackModerator.lastSoundPreProcessed.fullPath, PlaybackModerator.prevLastKey));
             }
             else
             {
@@ -112,8 +113,9 @@ namespace CrewChiefV4.Audio
 
                 if (PlaybackModerator.lastSoundPreProcessed != null
                     && PlaybackModerator.lastSoundPreProcessed.isSpotter)
-                    PlaybackModerator.Trace(
-                        $"WARNING Last key and last sound pre-processed do not agree on role: {PlaybackModerator.lastSoundPreProcessed.fullPath} vs {PlaybackModerator.prevLastKey} ");
+                    PlaybackModerator.Trace(String.Format(
+                        "WARNING Last key and last sound pre-processed do not agree on role: {0} vs {1} ", 
+                        PlaybackModerator.lastSoundPreProcessed.fullPath, PlaybackModerator.lastSoundPreProcessed.fullPath));
             }
 
             return resolvedSoundName;
@@ -136,7 +138,7 @@ namespace CrewChiefV4.Audio
             if (!PlaybackModerator.enableTracing)
                 return;
 
-            Console.WriteLine($"PlaybackModerator: {msg}");
+            Console.WriteLine(String.Format("PlaybackModerator: {0}", msg));
         }
 
         //public static void PostProcessSound()
@@ -184,7 +186,7 @@ namespace CrewChiefV4.Audio
                     traceMsgPostfix = "Chief interrupted Spotter.";
                 }
 
-                PlaybackModerator.Trace($"Injecting: {keyBleepOut} and {keyBleepIn} messages.  {traceMsgPostfix}");
+                PlaybackModerator.Trace(String.Format("Injecting: {0} and {1} messages. {2}", keyBleepOut, keyBleepIn, traceMsgPostfix));
 
                 // insert bleep out/in
                 PlaybackModerator.audioPlayer.getSoundCache().Play(keyBleepOut);
