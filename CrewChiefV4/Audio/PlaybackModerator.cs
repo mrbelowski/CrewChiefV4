@@ -19,7 +19,8 @@ namespace CrewChiefV4.Audio
         // This field is necessary to avoid construction of NoisyCartesianCoordinateSpotter before AudioPlayer.
         private static string defaultSpotterId = "Jim (default)";
         private static bool isSpotterAndChiefSameVoice = UserSettings.GetUserSettings().getString("spotter_name") == defaultSpotterId;
-        private static bool insertBeepOutInBetweenSpotterAndChief = UserSettings.GetUserSettings().getBoolean("insert_beep_between_spotter_and_chief");
+        private static bool insertBeepOutBetweenSpotterAndChief = UserSettings.GetUserSettings().getBoolean("insert_beep_out_between_spotter_and_chief");
+        private static bool insertBeepInBetweenSpotterAndChief = UserSettings.GetUserSettings().getBoolean("insert_beep_in_between_spotter_and_chief");
         private static bool lastSoundWasSpotter = false;
         private static AudioPlayer audioPlayer = null;
 
@@ -189,9 +190,15 @@ namespace CrewChiefV4.Audio
                 PlaybackModerator.Trace(String.Format("Injecting: {0} and {1} messages. {2}", keyBleepOut, keyBleepIn, traceMsgPostfix));
 
                 // insert bleep out/in
-                PlaybackModerator.audioPlayer.getSoundCache().Play(keyBleepOut);
+                if (insertBeepOutBetweenSpotterAndChief)
+                {
+                    PlaybackModerator.audioPlayer.getSoundCache().Play(keyBleepOut);
+                }
                 // would be nice to have some slight random silence here
-                PlaybackModerator.audioPlayer.getSoundCache().Play(keyBleepIn);
+                if (insertBeepInBetweenSpotterAndChief)
+                {
+                    PlaybackModerator.audioPlayer.getSoundCache().Play(keyBleepIn);
+                }
             }
 
             PlaybackModerator.lastSoundWasSpotter = isSpotterSound;
@@ -200,7 +207,7 @@ namespace CrewChiefV4.Audio
         private static bool IsFakeBleepInjectionEnabled()
         {
             return !PlaybackModerator.isSpotterAndChiefSameVoice
-                && PlaybackModerator.insertBeepOutInBetweenSpotterAndChief;
+                && (PlaybackModerator.insertBeepOutBetweenSpotterAndChief || PlaybackModerator.insertBeepInBetweenSpotterAndChief);
         }
     }
 }
