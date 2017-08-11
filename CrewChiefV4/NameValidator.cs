@@ -11,7 +11,7 @@ namespace CrewChiefV4
 
         // TODO: add more undeserving shitbags to this list as and when they crawl out the woodwork
          private static String[] wankers = new String[] { "mr.sisterfister", "bigsilverhotdog", 
-             "paul hance", "aline senna", "giuseppe sangalli", "patrick förster", "chris iwaski", "gazman", "mr_belowski"
+             "paul hance", "aline senna", "giuseppe sangalli", "patrick förster", "chris iwaski", "gazman"
              /* ",Valentino Rossi" TODO add Rossi next time he behaves like a spoiled 5 year old */};
  
           public static void validateName(String name)
