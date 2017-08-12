@@ -496,7 +496,7 @@ namespace CrewChiefV4
                         }
                         catch (Exception e)
                         {
-                            Console.WriteLine("Error mapping game data: " + e.StackTrace);
+                            Console.WriteLine("Error mapping game data: " + e.Message + ", " + e.StackTrace);
                         }
                         // if we're paused or viewing another car, the mapper will just return the previous game state so we don't lose all the
                         // persistent state information. If this is the case, don't process any stuff
