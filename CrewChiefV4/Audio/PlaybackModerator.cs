@@ -1,14 +1,17 @@
 ﻿/*
- * TODO: insert our corporate header.
+ * The idea behind PlaybackModerator class is to allow us to adjust playback after all the high level logic is evaluated,
+ * messages resolved, duplicates removed etc.  It is plugged into SingleSound play and couple of other low level places.
+ * Currently, the only two things it does is injects fake beep-out/in between Spotter and Chief messages and decides which 
+ * sounds should be used for open/close of radio channel.  In the future we might use it to mess with playback: remove/add sounds,
+ * corrupt them etc.
  * 
- * thecrewchief.org 
+ * Official website: thecrewchief.org 
+ * License: MIT
  */
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CrewChiefV4.Audio
 {
@@ -104,7 +107,7 @@ namespace CrewChiefV4.Audio
 
                 if (PlaybackModerator.lastSoundPreProcessed != null
                     && !PlaybackModerator.lastSoundPreProcessed.isSpotter)
-                    PlaybackModerator.Trace(String.Format(
+                    PlaybackModerator.Trace(string.Format(
                         "WARNING Last key and last sound pre-processed do not agree on role: {0} vs {1} ", 
                         PlaybackModerator.lastSoundPreProcessed.fullPath, PlaybackModerator.prevLastKey));
             }
@@ -114,7 +117,7 @@ namespace CrewChiefV4.Audio
 
                 if (PlaybackModerator.lastSoundPreProcessed != null
                     && PlaybackModerator.lastSoundPreProcessed.isSpotter)
-                    PlaybackModerator.Trace(String.Format(
+                    PlaybackModerator.Trace(string.Format(
                         "WARNING Last key and last sound pre-processed do not agree on role: {0} vs {1} ", 
                         PlaybackModerator.lastSoundPreProcessed.fullPath, PlaybackModerator.lastSoundPreProcessed.fullPath));
             }
@@ -139,7 +142,7 @@ namespace CrewChiefV4.Audio
             if (!PlaybackModerator.enableTracing)
                 return;
 
-            Console.WriteLine(String.Format("PlaybackModerator: {0}", msg));
+            Console.WriteLine(string.Format("PlaybackModerator: {0}", msg));
         }
 
         //public static void PostProcessSound()
@@ -187,18 +190,15 @@ namespace CrewChiefV4.Audio
                     traceMsgPostfix = "Chief interrupted Spotter.";
                 }
 
-                PlaybackModerator.Trace(String.Format("Injecting: {0} and {1} messages. {2}", keyBleepOut, keyBleepIn, traceMsgPostfix));
+                PlaybackModerator.Trace(string.Format("Injecting: {0} and {1} messages. {2}", keyBleepOut, keyBleepIn, traceMsgPostfix));
 
                 // insert bleep out/in
-                if (insertBeepOutBetweenSpotterAndChief)
-                {
+                if (PlaybackModerator.insertBeepOutBetweenSpotterAndChief)
                     PlaybackModerator.audioPlayer.getSoundCache().Play(keyBleepOut);
-                }
+
                 // would be nice to have some slight random silence here
-                if (insertBeepInBetweenSpotterAndChief)
-                {
+                if (PlaybackModerator.insertBeepInBetweenSpotterAndChief)
                     PlaybackModerator.audioPlayer.getSoundCache().Play(keyBleepIn);
-                }
             }
 
             PlaybackModerator.lastSoundWasSpotter = isSpotterSound;

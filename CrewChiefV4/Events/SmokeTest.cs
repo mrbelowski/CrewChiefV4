@@ -112,7 +112,7 @@ namespace CrewChiefV4.Events
                 audioPlayer.playMessageImmediately(new QueuedMessage(NoisyCartesianCoordinateSpotter.folderSpotterRadioCheck, 0, this));
             }
 
-            PlaybackModerator.SetTracing(true /*enabled*/);
+            //PlaybackModerator.SetTracing(true /*enabled*/);
             //this.BeepOutInTest();
 
             DirectoryInfo soundDirectory = new DirectoryInfo(AudioPlayer.soundFilesPath);
