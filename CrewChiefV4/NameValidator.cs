@@ -10,13 +10,13 @@ namespace CrewChiefV4
     {
 
         // TODO: add more undeserving shitbags to this list as and when they crawl out the woodwork
-         private static String[] wankers = new String[] { "mr.sisterfister", "bigsilverhotdog", 
+         private static HashSet<String> wankers = new HashSet<String>(StringComparer.InvariantCultureIgnoreCase) { "mr.sisterfister", "bigsilverhotdog", 
              "paul hance", "aline senna", "giuseppe sangalli", "patrick förster", "chris iwaski", "gazman"
              /* ",Valentino Rossi" TODO add Rossi next time he behaves like a spoiled 5 year old */};
  
           public static void validateName(String name)
           {
-             if (wankers.Contains(name.ToLowerInvariant()))
+             if (wankers.Contains(name))
              {
                  throw new NameValidationException(name);
              }
