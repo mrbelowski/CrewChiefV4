@@ -410,8 +410,10 @@ realistic_mode = Realistic mode
 realistic_mode_help = Restrict available message types based on the car and track in use (experimental)
 always_report_time_in_hundredths = Always report time in hundredths
 always_report_time_in_hundredths_help = Always report laptimes and gaps to hundredths of a second
-insert_beep_between_spotter_and_chief = Insert beep out/in between Spotter and Chief
-insert_beep_between_spotter_and_chief_help = If Spotter and Chief are different people (spotter voices other than Jim), insert beep out/in sound on switching messages.
+insert_beep_in_between_spotter_and_chief = Insert beep-in between Spotter and Chief
+insert_beep_in_between_spotter_and_chief_help = If Spotter and Chief are different people (spotter voices other than Jim), insert open channel beep sound on switching messages.
+insert_beep_out_between_spotter_and_chief = Insert beep-out between Spotter and Chief
+insert_beep_out_between_spotter_and_chief_help = If Spotter and Chief are different people (spotter voices other than Jim), insert close channel beep sound on switching messages.
 
 properties_form = Crew Chief Configuration Properties
 exit_without_saving = Exit without Saving
