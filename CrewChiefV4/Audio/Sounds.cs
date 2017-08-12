@@ -630,7 +630,7 @@ namespace CrewChiefV4.Audio
                     if (soundFile.Name.EndsWith(".wav")) {
                         Boolean isSweary = soundFile.Name.Contains("sweary");
                         Boolean isBleep = soundFile.Name.Contains("bleep");
-                        Boolean isSpotter = soundFile.FullName.Contains(@"\spotter");
+                        Boolean isSpotter = soundFile.FullName.Contains(@"\spotter") || soundFile.FullName.Contains(@"\radio_check_");
                         if (this.useSwearyMessages || !isSweary)
                         {
                             if (soundFile.Name.Contains(SoundCache.REQUIRED_PREFIX_IDENTIFIER) || soundFile.Name.Contains(SoundCache.REQUIRED_SUFFIX_IDENTIFIER) ||
