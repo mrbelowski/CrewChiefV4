@@ -10,7 +10,7 @@ For support and discussions about Crew Chief we have our very own forum here: ht
 
 Changelog
 ---------
-Version 4.7.8.3: Added optional radio beep for when the spotter or the Chief interrupt each other ("Insert beep out/in between Spotter and Chief"); Attempt to delete corrupted settings and force the app to restart if they can't be processed
+Version 4.7.8.4: Added optional radio beeps for when the spotter or the Chief interrupt each other. "Insert beep-out between Spotter and Chief" plays the close-channel beep after the chief / spotter has finished, and "Insert beep-in between Spotter and Chief" plays the open-channel beep before the chief / spotter interrupts. The spotter and chief use different beep sounds here, and these options can be combined if you want 2 beeps (close then open) when interrupting; Attempt to delete corrupted settings and force the app to restart if they can't be processed
 
 Version 4.7.8.1: RF2 plugin fixes for car damage issues in online races
 	
