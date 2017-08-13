@@ -108,7 +108,7 @@ namespace CrewChiefV4.Events
             audioPlayer.playMessage(new QueuedMessage(folderTest, 0, this));
             if (NoisyCartesianCoordinateSpotter.folderSpotterRadioCheck != null)
             {
-                Thread.Sleep(3000);
+                Thread.Sleep(800);
                 audioPlayer.playSpotterMessage(new QueuedMessage(NoisyCartesianCoordinateSpotter.folderSpotterRadioCheck, 0, this), false);
             }
 
