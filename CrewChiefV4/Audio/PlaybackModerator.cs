@@ -69,7 +69,7 @@ namespace CrewChiefV4.Audio
             // subsequent injection is aware of that.
             PlaybackModerator.lastSoundWasSpotter = false;
 
-            if (!string.IsNullOrWhiteSpace(PlaybackModerator.prevFirstKey) && prevFirstKeyWasSpotter())
+            if (PlaybackModerator.PrevFirstKeyWasSpotter())
             {
                 // Spotter uses opposite bleeps.
                 resolvedSoundName = spotterBleepSoundName;
@@ -96,7 +96,7 @@ namespace CrewChiefV4.Audio
             if (!PlaybackModerator.IsFakeBleepInjectionEnabled())
                 return resolvedSoundName;
 
-            if (!string.IsNullOrWhiteSpace(PlaybackModerator.prevLastKey) && prevFirstKeyWasSpotter())
+            if (PlaybackModerator.PrevLastKeyWasSpotter())
             {
                 // Spotter uses opposite bleeps.
                 resolvedSoundName = "alternate_end_bleep";
@@ -208,10 +208,18 @@ namespace CrewChiefV4.Audio
                 && (PlaybackModerator.insertBeepOutBetweenSpotterAndChief || PlaybackModerator.insertBeepInBetweenSpotterAndChief);
         }
 
-        private static bool prevFirstKeyWasSpotter()
+        private static bool PrevFirstKeyWasSpotter()
         {
-            // the spotter 'radio check' is radio_check_SpotterName, so also check for this:
-            return PlaybackModerator.prevFirstKey.Contains("spotter") || PlaybackModerator.prevFirstKey.Contains("radio_check_");
+            // The spotter 'radio check' is radio_check_SpotterName, so also check for this:
+            return !string.IsNullOrWhiteSpace(PlaybackModerator.prevFirstKey)
+                && (PlaybackModerator.prevFirstKey.Contains("spotter") || PlaybackModerator.prevFirstKey.Contains("radio_check_"));
+        }
+
+        private static bool PrevLastKeyWasSpotter()
+        {
+            // The spotter 'radio check' is radio_check_SpotterName, so also check for this:
+            return !string.IsNullOrWhiteSpace(PlaybackModerator.prevLastKey)
+                && (PlaybackModerator.prevLastKey.Contains("spotter") || PlaybackModerator.prevLastKey.Contains("radio_check_"));
         }
     }
 }
