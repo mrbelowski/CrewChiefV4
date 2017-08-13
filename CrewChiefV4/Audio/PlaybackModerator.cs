@@ -69,7 +69,7 @@ namespace CrewChiefV4.Audio
             // subsequent injection is aware of that.
             PlaybackModerator.lastSoundWasSpotter = false;
 
-            if (PlaybackModerator.PrevLastKeyWasSpotter())
+            if (PlaybackModerator.PrevFirstKeyWasSpotter())
             {
                 // Spotter uses opposite bleeps.
                 resolvedSoundName = spotterBleepSoundName;
@@ -206,6 +206,13 @@ namespace CrewChiefV4.Audio
         {
             return !PlaybackModerator.isSpotterAndChiefSameVoice
                 && (PlaybackModerator.insertBeepOutBetweenSpotterAndChief || PlaybackModerator.insertBeepInBetweenSpotterAndChief);
+        }
+
+        private static bool PrevFirstKeyWasSpotter()
+        {
+            // The spotter 'radio check' is radio_check_SpotterName, so also check for this:
+            return !string.IsNullOrWhiteSpace(PlaybackModerator.prevFirstKey)
+                && (PlaybackModerator.prevFirstKey.Contains("spotter") || PlaybackModerator.prevFirstKey.Contains("radio_check_"));
         }
 
         private static bool PrevLastKeyWasSpotter()
