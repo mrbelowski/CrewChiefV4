@@ -529,7 +529,7 @@ namespace CrewChiefV4.Events
             else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOWS_MY_FUEL))
             {
                 reportFuelStatus();
-            }            
+            }
         }
     }
 }
