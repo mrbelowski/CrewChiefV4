@@ -47,6 +47,7 @@ namespace CrewChiefV4.rFactor2
         public void clearState()
         {            
             this.previousTime = DateTime.Now;
+            this.internalSpotter.clearState();
         }
 
         public void pause()
