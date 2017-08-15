@@ -60,7 +60,7 @@ namespace CrewChiefV4.PCars
         public void clearState()
         {
             timeToStartSpotting = DateTime.Now;
-            
+            internalSpotter.clearState();
         }
 
         public void pause()

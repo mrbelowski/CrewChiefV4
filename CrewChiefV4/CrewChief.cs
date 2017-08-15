@@ -541,6 +541,7 @@ namespace CrewChiefV4
                                     {
                                         entry.Value.clearState();
                                     }
+                                    spotter.clearState();
                                     faultingEvents.Clear();
                                     faultingEventsCount.Clear();
                                     stateCleared = true;
