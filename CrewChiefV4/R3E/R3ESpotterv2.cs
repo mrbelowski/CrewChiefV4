@@ -45,7 +45,6 @@ namespace CrewChiefV4.RaceRoom
 
         public void clearState()
         {
-            
             previousTime = DateTime.Now;
         }
 
