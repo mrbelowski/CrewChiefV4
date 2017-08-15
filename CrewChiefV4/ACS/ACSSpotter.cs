@@ -46,8 +46,8 @@ namespace CrewChiefV4.assetto
 
         public void clearState()
         {
-
             previousTime = DateTime.Now;
+            internalSpotter.clearState();
         }
 
         public void pause()
