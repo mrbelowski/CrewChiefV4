@@ -206,9 +206,9 @@ namespace CrewChiefV4.Events
                     {
                         if (fuelAtStartOfLastLap > currentFuel)
                         {
-                            usagePerLap.Add(fuelAtStartOfLastLap - currentFuel);                            
+                            usagePerLap.Add(fuelAtStartOfLastLap - currentFuel);
                         }
-                        fuelAtStartOfLastLap = currentFuel;                        
+                        fuelAtStartOfLastLap = currentFuel;
                     }
                     if (enableFuelMessages && currentFuel <= 2 && !played2LitreWarning)
                     {
