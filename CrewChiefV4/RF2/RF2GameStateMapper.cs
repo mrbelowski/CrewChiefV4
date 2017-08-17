@@ -983,17 +983,8 @@ namespace CrewChiefV4.rFactor2
 
             // --------------------------------
             // fuel data
-            // don't read fuel data until race session is green
-            // don't read fuel data for non-race session until out of pit lane and more than one lap completed
-            if ((csd.SessionType == SessionType.Race
-                 && (csd.SessionPhase == SessionPhase.Green || csd.SessionPhase == SessionPhase.FullCourseYellow
-                     || csd.SessionPhase == SessionPhase.Finished
-                     || csd.SessionPhase == SessionPhase.Checkered))
-                 || (!cgs.PitData.InPitlane && csd.CompletedLaps > 1))
-            {
-                cgs.FuelData.FuelUseActive = true;
-                cgs.FuelData.FuelLeft = (float)playerTelemetry.mFuel;
-            }
+            cgs.FuelData.FuelUseActive = shared.extended.mPhysics.mFuelMult > 0;
+            cgs.FuelData.FuelLeft = (float)playerTelemetry.mFuel;
 
             // --------------------------------
             // flags data

@@ -46,8 +46,8 @@ namespace CrewChiefV4.assetto
 
         public void clearState()
         {
-
             previousTime = DateTime.Now;
+            internalSpotter.clearState();
         }
 
         public void pause()
@@ -106,6 +106,7 @@ namespace CrewChiefV4.assetto
                 {
                     // Retrieve and use user overridable spotter car length/width.
                     this.internalSpotter.setCarDimensions(GlobalBehaviourSettings.spotterVehicleLength, GlobalBehaviourSettings.spotterVehicleWidth);
+                    this.currentPlayerCarClassID = carClass.getClassIdentifier();
                 }
             }
             float[] currentPlayerPosition = new float[] { currentPlayerData.worldPosition.x, currentPlayerData.worldPosition.z };
