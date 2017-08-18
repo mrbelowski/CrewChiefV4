@@ -10,17 +10,26 @@ namespace CrewChiefV4
     {
 
         // TODO: add more undeserving shitbags to this list as and when they crawl out the woodwork
-         private static String[] wankers = new String[] { "Mr.SisterFister", "BigSilverHotdog", 
-             "Paul Hance", "Aline Senna", "Giuseppe Sangalli", "Patrick Förster", "Chris Iwaski", 
-             /* "Valentino Rossi" TODO add Rossi next time he behaves like a spoiled 5 year old */};
+         private static HashSet<String> wankers = new HashSet<String>(StringComparer.InvariantCultureIgnoreCase) { "mr.sisterfister", "bigsilverhotdog", 
+             "paul hance", "aline senna", "giuseppe sangalli", "patrick förster", "chris iwaski", "gazman"
+             /* ",Valentino Rossi" TODO add Rossi next time he behaves like a spoiled 5 year old */};
  
-          public static Boolean validateName(String name)
+          public static void validateName(String name)
           {
              if (wankers.Contains(name))
              {
-                 Application.Exit();
+                 throw new NameValidationException(name);
              }
-              return true;
           }
+    }
+
+    /**
+     * special exception for special players so they can grumble that the app is spamming an exception. I'd call it something
+     * more colourful but my usual charm deserts me.
+     */
+    class NameValidationException : Exception
+    {
+        public NameValidationException(string message)
+            : base(message) { }
     }
 }

@@ -426,6 +426,7 @@ namespace CrewChiefV4.Audio
                     {
                         SingleSound sound = new SingleSound(bleepFile.FullName, eagerLoadSoundFiles, allowCaching, allowCaching);
                         sound.cachePermanently = true;
+                        sound.isBleep = true;
                         singleSounds.Add("start_bleep", sound);
                         availableSounds.Add("start_bleep");
                     }
@@ -433,6 +434,7 @@ namespace CrewChiefV4.Audio
                     {
                         SingleSound sound = new SingleSound(bleepFile.FullName, eagerLoadSoundFiles, allowCaching, allowCaching);
                         sound.cachePermanently = true;
+                        sound.isBleep = true;
                         singleSounds.Add("end_bleep", sound);
                         availableSounds.Add("end_bleep");
                     }
@@ -440,6 +442,7 @@ namespace CrewChiefV4.Audio
                     {
                         SingleSound sound = new SingleSound(bleepFile.FullName, eagerLoadSoundFiles, allowCaching, allowCaching);
                         sound.cachePermanently = true;
+                        sound.isBleep = true;
                         singleSounds.Add("short_start_bleep", sound);
                         availableSounds.Add("short_start_bleep");
                     }
@@ -447,6 +450,7 @@ namespace CrewChiefV4.Audio
                     {
                         SingleSound sound = new SingleSound(bleepFile.FullName, eagerLoadSoundFiles, allowCaching, allowCaching);
                         sound.cachePermanently = true;
+                        sound.isBleep = true;
                         singleSounds.Add("listen_start_sound", sound);
                         availableSounds.Add("listen_start_sound");
                     }
@@ -454,6 +458,7 @@ namespace CrewChiefV4.Audio
                     {
                         SingleSound sound = new SingleSound(bleepFile.FullName, eagerLoadSoundFiles, allowCaching, allowCaching);
                         sound.cachePermanently = true;
+                        sound.isBleep = true;
                         singleSounds.Add("alternate_start_bleep", sound);
                         availableSounds.Add("alternate_start_bleep");
                     }
@@ -461,6 +466,7 @@ namespace CrewChiefV4.Audio
                     {
                         SingleSound sound = new SingleSound(bleepFile.FullName, eagerLoadSoundFiles, allowCaching, allowCaching);
                         sound.cachePermanently = true;
+                        sound.isBleep = true;
                         singleSounds.Add("alternate_end_bleep", sound);
                         availableSounds.Add("alternate_end_bleep");
                     }
@@ -468,6 +474,7 @@ namespace CrewChiefV4.Audio
                     {
                         SingleSound sound = new SingleSound(bleepFile.FullName, eagerLoadSoundFiles, allowCaching, allowCaching);
                         sound.cachePermanently = true;
+                        sound.isBleep = true;
                         singleSounds.Add("alternate_short_start_bleep", sound);
                         availableSounds.Add("alternate_short_start_bleep");
                     }
@@ -622,6 +629,8 @@ namespace CrewChiefV4.Audio
                 {
                     if (soundFile.Name.EndsWith(".wav")) {
                         Boolean isSweary = soundFile.Name.Contains("sweary");
+                        Boolean isBleep = soundFile.Name.Contains("bleep");
+                        Boolean isSpotter = soundFile.FullName.Contains(@"\spotter") || soundFile.FullName.Contains(@"\radio_check_");
                         if (this.useSwearyMessages || !isSweary)
                         {
                             if (soundFile.Name.Contains(SoundCache.REQUIRED_PREFIX_IDENTIFIER) || soundFile.Name.Contains(SoundCache.REQUIRED_SUFFIX_IDENTIFIER) ||
@@ -659,6 +668,8 @@ namespace CrewChiefV4.Audio
                                     hasSounds = true;
                                     SingleSound singleSound = new SingleSound(soundFile.FullName, this.loadFiles, this.createSoundPlayersImmediatelyAfterLoading, this.allowCaching);
                                     singleSound.isSweary = isSweary;
+                                    singleSound.isSpotter = isSpotter;
+                                    singleSound.isBleep = isBleep;
                                     singleSoundsNoPrefixOrSuffix.Add(singleSound);
                                     soundsCount++;
                                 }
@@ -668,9 +679,11 @@ namespace CrewChiefV4.Audio
                                 hasSounds = true;
                                 SingleSound singleSound = new SingleSound(soundFile.FullName, this.loadFiles, this.createSoundPlayersImmediatelyAfterLoading, this.allowCaching);
                                 singleSound.isSweary = isSweary;
+                                singleSound.isSpotter = isSpotter;
+                                singleSound.isBleep = isBleep;
                                 singleSoundsNoPrefixOrSuffix.Add(singleSound);
                                 soundsCount++;
-                            }                         
+                            }
                         }
                     }
                 }
@@ -798,8 +811,10 @@ namespace CrewChiefV4.Audio
         public String ttsString = null;
         public Boolean isSweary = false;
         public Boolean isPause = false;
+        public Boolean isSpotter = false;
+        public Boolean isBleep = false;
         public int pauseLength = 0;
-        private String fullPath;
+        public String fullPath;
         private byte[] fileBytes;
         private MemoryStream memoryStream;
         private SoundPlayer soundPlayer;
@@ -843,6 +858,8 @@ namespace CrewChiefV4.Audio
 
         public void Play()
         {
+            PlaybackModerator.PreProcessSound(this);
+
             if (ttsString != null && SoundCache.synthesizer != null)
             {
                 try { 
@@ -873,7 +890,7 @@ namespace CrewChiefV4.Audio
                         LoadSoundPlayer();
                     }
                     this.soundPlayer.PlaySync();
-                }                
+                }
             }
         }
 

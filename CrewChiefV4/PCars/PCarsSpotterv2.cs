@@ -60,7 +60,7 @@ namespace CrewChiefV4.PCars
         public void clearState()
         {
             timeToStartSpotting = DateTime.Now;
-            
+            internalSpotter.clearState();
         }
 
         public void pause()
@@ -121,6 +121,7 @@ namespace CrewChiefV4.PCars
                     {
                         // Retrieve and use user overridable spotter car length/width.
                         this.internalSpotter.setCarDimensions(GlobalBehaviourSettings.spotterVehicleLength, GlobalBehaviourSettings.spotterVehicleWidth);
+                        this.currentPlayerCarClassID = carClass.getClassIdentifier();
                     }
                 }
                 float[] currentPlayerPosition = new float[] { playerData.mWorldPosition[0], playerData.mWorldPosition[2] };
