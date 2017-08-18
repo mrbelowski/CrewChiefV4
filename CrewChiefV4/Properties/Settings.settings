@@ -282,7 +282,7 @@
       <Value Profile="(Default)">8</Value>
     </Setting>
     <Setting Name="use_alternate_beeps" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
+      <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="disable_pcars_prac_and_qual_pole_deltas" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
@@ -545,7 +545,10 @@
     <Setting Name="GET_FUEL_STATUS_device_type" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="insert_beep_between_spotter_and_chief" Type="System.Boolean" Scope="User">
+    <Setting Name="insert_beep_in_between_spotter_and_chief" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="insert_beep_out_between_spotter_and_chief" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
   </Settings>

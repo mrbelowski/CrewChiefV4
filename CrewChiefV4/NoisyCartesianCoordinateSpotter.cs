@@ -155,7 +155,7 @@ namespace CrewChiefV4
                         Console.WriteLine("No spotter called " + selectedSpotter + " exists, dropping back to the default (Jim)");
                         UserSettings.GetUserSettings().setProperty("spotter_name", defaultSpotterId);
                         UserSettings.GetUserSettings().saveUserSettings();                        
-                    }                    
+                    }
                 }
                 // check the oval specific stuff exists before enabling it:
                 hasOvalSpecificSounds = Directory.Exists(AudioPlayer.soundFilesPath + "/voice/" + folderCarInside);                

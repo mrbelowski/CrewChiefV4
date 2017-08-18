@@ -206,9 +206,9 @@ namespace CrewChiefV4.Events
                     {
                         if (fuelAtStartOfLastLap > currentFuel)
                         {
-                            usagePerLap.Add(fuelAtStartOfLastLap - currentFuel);                            
+                            usagePerLap.Add(fuelAtStartOfLastLap - currentFuel);
                         }
-                        fuelAtStartOfLastLap = currentFuel;                        
+                        fuelAtStartOfLastLap = currentFuel;
                     }
                     if (enableFuelMessages && currentFuel <= 2 && !played2LitreWarning)
                     {
@@ -389,6 +389,11 @@ namespace CrewChiefV4.Events
             {
                 // round to 1dp
                 float meanUsePerLap = ((float)Math.Round(usagePerLap.Average() * 10f)) / 10f;
+                if (meanUsePerLap == 0)
+                {
+                    // rounded fuel use is < 0.1 litres per lap - can't really do anything with this.
+                    return false;
+                }
                 // get the whole and fractional part (yeah, I know this is shit)
                 String str = meanUsePerLap.ToString();
                 int pointPosition = str.IndexOf('.');
@@ -524,7 +529,7 @@ namespace CrewChiefV4.Events
             else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOWS_MY_FUEL))
             {
                 reportFuelStatus();
-            }            
+            }
         }
     }
 }
