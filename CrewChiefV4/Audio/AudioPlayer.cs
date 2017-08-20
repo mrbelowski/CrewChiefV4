@@ -25,8 +25,6 @@ namespace CrewChiefV4.Audio
         public static String folderYellowEnabled = "acknowledge/yellowEnabled";
         public static String folderYellowDisabled = "acknowledge/yellowDisabled";
         public static String folderAcknowlegeEnableKeepQuiet = "acknowledge/keepQuietEnabled";
-        public static String folderEnableSpotter = "acknowledge/spotterEnabled";
-        public static String folderDisableSpotter = "acknowledge/spotterDisabled";
         public static String folderAcknowlegeDisableKeepQuiet = "acknowledge/keepQuietDisabled";
         public static String folderDidntUnderstand = "acknowledge/didnt_understand";
         public static String folderNoData = "acknowledge/no_data";
@@ -219,6 +217,12 @@ namespace CrewChiefV4.Audio
                     new String[] { /*"numbers", */"pearls_of_wisdom", "spotter", "acknowledge"  }, sweary, allowCaching, selectedPersonalisation);
             }
             initialised = true;
+            PlaybackModerator.SetAudioPlayer(this);
+        }
+        
+        public SoundCache getSoundCache()
+        {
+            return soundCache;
         }
 
         public void startMonitor()
@@ -435,7 +439,7 @@ namespace CrewChiefV4.Audio
                     nextQueueCheck = nextQueueCheck.Add(queueMonitorInterval);
                     try
                     {
-                        if (DateTime.Now > unpauseTime)
+                        if (DateTime.Now > unpauseTime && queuedClips.Count > 0)
                         {
                             playQueueContents(queuedClips, false);
                             allowPearlsOnNextPlay = true;
@@ -454,7 +458,7 @@ namespace CrewChiefV4.Audio
                 {
                     Thread.Sleep(immediateMessagesMonitorInterval);
                     continue;
-                }                
+                }
             }
             //writeMessagePlayedStats();
             playedMessagesCount.Clear();
@@ -507,6 +511,8 @@ namespace CrewChiefV4.Audio
             stopBackgroundPlayer();
         }
 
+        private bool lastAddedKeyWasSpotter = false;
+
         private void playQueueContents(OrderedDictionary queueToPlay, Boolean isImmediateMessages)
         {
             long milliseconds = GameStateData.CurrentTime.Ticks / TimeSpan.TicksPerMillisecond;
@@ -514,6 +520,7 @@ namespace CrewChiefV4.Audio
             List<String> soundsProcessed = new List<String>();
 
             Boolean oneOrMoreEventsEnabled = false;
+
             lock (queueToPlay)
             {
                 int willBePlayedCount = queueToPlay.Count;
@@ -536,7 +543,7 @@ namespace CrewChiefV4.Audio
                             if (firstMovableEventWithPrefixOrSuffix == null && key != LapCounter.folderGetReady && soundCache.eventHasPersonalisedPrefixOrSuffix(key))
                             {
                                 firstMovableEventWithPrefixOrSuffix = key;
-                            } 
+                            }
                             else
                             {
                                 keysToPlay.Add(key);
@@ -566,19 +573,19 @@ namespace CrewChiefV4.Audio
                             {
                                 Console.WriteLine("Clip " + key + " has some missing sound files");
                             }
-                            else if (hasJustPlayedAsAnImmediateMessage) 
+                            else if (hasJustPlayedAsAnImmediateMessage)
                             {
                                 Console.WriteLine("Clip " + key + " has just been played in response to a voice command, skipping");
                             }
                             soundsProcessed.Add(key);
                             willBePlayedCount--;
                         }
-                    }                    
+                    }
                 }
                 if (firstMovableEventWithPrefixOrSuffix != null)
                 {
                     keysToPlay.Insert(0, firstMovableEventWithPrefixOrSuffix);
-                } 
+                }
                 if (keysToPlay.Count > 0)
                 {
                     if (keysToPlay.Count == 1 && clipIsPearlOfWisdom(keysToPlay[0]))
@@ -602,9 +609,12 @@ namespace CrewChiefV4.Audio
                     }
                 }
             }
+
             Boolean wasInterrupted = false;
             if (oneOrMoreEventsEnabled)
             {
+                PlaybackModerator.PreProcessAddedKeys(keysToPlay);
+
                 openRadioChannelInternal();
                 soundsProcessed.AddRange(playSounds(keysToPlay, isImmediateMessages, out wasInterrupted));
             }
@@ -864,7 +874,8 @@ namespace CrewChiefV4.Audio
         {
             if (!mute)
             {
-                soundCache.Play("start_bleep");
+                var soundToPlay = PlaybackModerator.GetSuggestedBleepStart();
+                soundCache.Play(soundToPlay);
             }
         }
 
@@ -883,7 +894,8 @@ namespace CrewChiefV4.Audio
         {
             if (!mute)
             {
-                soundCache.Play("short_start_bleep");
+                var soundToPlay = PlaybackModerator.GetSuggestedBleepShorStart();
+                soundCache.Play(soundToPlay);
             }
         }
 
@@ -891,7 +903,8 @@ namespace CrewChiefV4.Audio
         {
             if (!mute)
             {
-                soundCache.Play("end_bleep");
+                var soundToPlay = PlaybackModerator.GetSuggestedBleepEnd();
+                soundCache.Play(soundToPlay);
             }
         }
 

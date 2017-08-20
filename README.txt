@@ -1,8 +1,8 @@
-CrewChief version 4.6
+CrewChief version 4.7
 
 Written by Jim Britton (main app, voice acting, Raceroom and PCars implementations), Morten Roslev (Assetto Corsa implementation), Vytautas Leonavičius (rFactor2 implementation) and Dan Allongo (Automobilista and rFactor1 implementation). The application is the result of lots of lots of hard work and input from the guys above as well as some great advice and support from the community and the guys at Sector3 and SMS.
 
-Additional material from Scoops (fantastic track layout mapping work), Geoffrey Lessel (some amazing alternate spotter sounds) and Clare Britton (more alternate spotter sounds).
+Additional material from Scoops (fantastic track layout mapping work). Fantastic alternate spotter sounds by Geoffrey Lessel, Matt Orr (aka EmptyBox), Clare Britton, Mike Schreiner and Phil Linden.
 
 The source code for Crew Chief is available here: https://github.com/mrbelowski/CrewChiefV4
 
@@ -10,6 +10,16 @@ For support and discussions about Crew Chief we have our very own forum here: ht
 
 Changelog
 ---------
+Version 4.7.8.7: Fix for some settings getting corrupted on system which use a comma as a decimal separator - this causes some spotter and voice recognition issues. If you have already encountered this, please reload the app's default settings; Some fuel use calculation fixes; Spotter fixes
+
+Version 4.7.8.6: Added optional radio beeps for when the spotter or the Chief interrupt each other. "Insert beep-out between Spotter and Chief" plays the close-channel beep after the chief / spotter has finished, and "Insert beep-in between Spotter and Chief" (the default) plays the open-channel beep before the chief / spotter interrupts. The spotter and chief use different beep sounds here, and these options can be combined if you want 2 beeps (close then open) when interrupting; Attempt to delete corrupted settings and force the app to restart if they can't be processed; Don't play fuel consumption estimate if it's 0 litres per lap
+
+Version 4.7.8.1: RF2 plugin fixes for car damage issues in online races
+	
+Version 4.7.8.0: Fixed spotter logic where it would consider 2 cars along side to be "3 side", even if those cars were one behind the other; Use oval spotter messages (inside / outside) when on known oval tracks, if the selected spotter has these sounds; Tweaked spotter enable / disable sound to be a bit more appropriate for non-default spotter voice packs; Fixed broken sector 3 time deltas in Project Cars
+
+Version 4.7.7.9: Fixed Assetto Corsa pit window open calculation for sessions with a fixed number of laps; Fixed a crash bug when starting the app with no sound pack
+	
 Version 4.7.7.8: Added dropdown to main screen to allow a different spotter voice to be selected; Added Geoffrey Lessel's awesome spotter sounds - these are in the latest sound pack. Select "Geoffrey" from the new 'Spotter voice pack' menu; Fixed a couple more spotter bugs; Added button binding to get fuel status (consumption and fuel remaining). The "how's my fuel?" voice command now reports the consumption as well as the remaining fuel
 
 Version 4.7.7.5: More Scoops-Brand RF2 corner mappings; Fixed some spotter bugs; Added searching to Properties screen to make it a little less user-hostile; Replaced the nasty underscore_property_names with proper names on the Properties screen

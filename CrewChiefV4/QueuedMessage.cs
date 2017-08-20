@@ -118,6 +118,7 @@ namespace CrewChiefV4
         public List<String> messageFolders;
         public Boolean playEvenWhenSilenced;
 
+        // for delayed messages, sounds are resolved just-in-time
         private DelayedMessageEvent delayedMessageEvent;
         public Boolean delayMessageResolution = false;
 

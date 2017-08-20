@@ -54,7 +54,7 @@ TELL_ME_THE_GAPS = tell me the gaps:tell me the deltas:give me the deltas:time d
 DONT_TELL_ME_THE_GAPS = don't tell me the gaps:don't tell me the deltas:don't give me the deltas:no more deltas:no more gaps
 ENABLE_YELLOW_FLAG_MESSAGES = give me yellows:tell me yellows:give me incident updates:give me yellow flag updates
 DISABLE_YELLOW_FLAG_MESSAGES = no more yellows:stop incident updates:don't give me yellows:don't tell me yellows
-WHATS_THE_TIME = what's the time: what time is it
+WHATS_THE_TIME = what's the time:what time is it
 
 WHOS_IN_FRONT_IN_THE_RACE = who's in front in the race:who's ahead in the race:who's in front:who's ahead
 WHOS_BEHIND_IN_THE_RACE = who's behind in the race:who's behind

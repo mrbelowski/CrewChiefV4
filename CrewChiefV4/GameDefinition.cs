@@ -103,7 +103,7 @@ namespace CrewChiefV4
             this.gameEnum = gameEnum;
             this.lookupName = lookupName;
             this.friendlyName = Configuration.getUIString(lookupName);
-            this.processName = processName;            
+            this.processName = processName;
             this.spotterName = spotterName;
             this.gameStartCommandProperty = gameStartCommandProperty;
             this.gameStartCommandOptionsProperty = gameStartCommandOptionsProperty;
@@ -125,6 +125,12 @@ namespace CrewChiefV4
             this.gameStartEnabledProperty = gameStartEnabledProperty;
             this.alternativeProcessNames = alternativeProcessNames;
             this.gameInstallDirectory = gameInstallDirectory;
+        }
+
+        public bool HasAnyProcessNameAssociated()
+        {
+            return processName != null
+                || (alternativeProcessNames != null && alternativeProcessNames.Length > 0);
         }
     }
 }

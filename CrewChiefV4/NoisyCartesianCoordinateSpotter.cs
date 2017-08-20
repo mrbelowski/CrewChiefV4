@@ -71,15 +71,30 @@ namespace CrewChiefV4
         private static String folderInTheMiddle = "spotter/in_the_middle";
         private static String folderCarLeft = "spotter/car_left";
         private static String folderCarRight = "spotter/car_right";
+        private static String folderCarInside = "spotter/car_inside";
+        private static String folderCarOutside = "spotter/car_outside";
         private static String folderClearLeft = "spotter/clear_left";
         private static String folderClearRight = "spotter/clear_right";
+        private static String folderClearInside = "spotter/clear_inside";
+        private static String folderClearOutside = "spotter/clear_outside";
         private static String folderClearAllRound = "spotter/clear_all_round";
         private static String folderThreeWideYoureOnRight = "spotter/three_wide_on_right";
         private static String folderThreeWideYoureOnLeft = "spotter/three_wide_on_left";
+        private static String folderThreeWideYoureOnInside = "spotter/three_wide_on_inside";
+        private static String folderThreeWideYoureOnOutside = "spotter/three_wide_on_outside";
+
+        public static String folderEnableSpotter = "acknowledge/spotterEnabled";
+        public static String folderDisableSpotter = "acknowledge/spotterDisabled";
+
+        public static String folderSpotterRadioCheck = null;
 
         private static String spotterFolderPrefix = "spotter_";
         public static String defaultSpotterId = "Jim (default)";
         public static List<String> availableSpotters = new List<String>();
+
+        public static Boolean hasOvalSpecificSounds = false;
+
+        private Random random = new Random();
 
         /**
          * static constructor to initialise spotter subfolder stuff.
@@ -89,37 +104,73 @@ namespace CrewChiefV4
         {
             availableSpotters.Clear();
             availableSpotters.Add(defaultSpotterId);
-            DirectoryInfo soundsDirectory = new DirectoryInfo(AudioPlayer.soundFilesPath + "/voice");
-            DirectoryInfo[] directories = soundsDirectory.GetDirectories();
-            foreach (DirectoryInfo folder in directories)
+            try
             {
-                if (folder.Name.StartsWith(spotterFolderPrefix) && folder.Name.Length > spotterFolderPrefix.Length)
+                DirectoryInfo soundsDirectory = new DirectoryInfo(AudioPlayer.soundFilesPath + "/voice");
+                DirectoryInfo[] directories = soundsDirectory.GetDirectories();
+                foreach (DirectoryInfo folder in directories)
                 {
-                    availableSpotters.Add(folder.Name.Substring(spotterFolderPrefix.Length));
+                    if (folder.Name.StartsWith(spotterFolderPrefix) && folder.Name.Length > spotterFolderPrefix.Length)
+                    {
+                        availableSpotters.Add(folder.Name.Substring(spotterFolderPrefix.Length));
+                    }
                 }
-            }
-            String selectedSpotter = UserSettings.GetUserSettings().getString("spotter_name");
-            // TODO: select boxes and UI stuff - this may change
-            if (!defaultSpotterId.Equals(selectedSpotter))
-            {
-                if (Directory.Exists(AudioPlayer.soundFilesPath + "/voice/spotter_" + selectedSpotter))
+                String selectedSpotter = UserSettings.GetUserSettings().getString("spotter_name");
+                // TODO: select boxes and UI stuff - this may change
+                if (!defaultSpotterId.Equals(selectedSpotter))
                 {
-                    folderStillThere = "spotter_" + selectedSpotter + "/still_there";
-                    folderInTheMiddle = "spotter_" + selectedSpotter + "/in_the_middle";
-                    folderCarLeft = "spotter_" + selectedSpotter + "/car_left";
-                    folderCarRight = "spotter_" + selectedSpotter + "/car_right";
-                    folderClearLeft = "spotter_" + selectedSpotter + "/clear_left";
-                    folderClearRight = "spotter_" + selectedSpotter + "/clear_right";
-                    folderClearAllRound = "spotter_" + selectedSpotter + "/clear_all_round";
-                    folderThreeWideYoureOnRight = "spotter_" + selectedSpotter + "/three_wide_on_right";
-                    folderThreeWideYoureOnLeft = "spotter_" + selectedSpotter + "/three_wide_on_left";
+                    if (Directory.Exists(AudioPlayer.soundFilesPath + "/voice/spotter_" + selectedSpotter))
+                    {
+                        Console.WriteLine("Using spotter " + selectedSpotter);
+                        folderStillThere = "spotter_" + selectedSpotter + "/still_there";
+                        folderInTheMiddle = "spotter_" + selectedSpotter + "/in_the_middle";
+                        folderCarLeft = "spotter_" + selectedSpotter + "/car_left";
+                        folderCarRight = "spotter_" + selectedSpotter + "/car_right";
+                        folderClearLeft = "spotter_" + selectedSpotter + "/clear_left";
+                        folderClearRight = "spotter_" + selectedSpotter + "/clear_right";
+                        folderClearAllRound = "spotter_" + selectedSpotter + "/clear_all_round";
+                        folderThreeWideYoureOnRight = "spotter_" + selectedSpotter + "/three_wide_on_right";
+                        folderThreeWideYoureOnLeft = "spotter_" + selectedSpotter + "/three_wide_on_left";
+                        folderCarInside = "spotter_" + selectedSpotter + "/car_inside";
+                        folderCarOutside = "spotter_" + selectedSpotter + "/car_outside";
+                        folderClearInside = "spotter_" + selectedSpotter + "/clear_inside";
+                        folderClearOutside = "spotter_" + selectedSpotter + "/clear_outside";
+                        folderThreeWideYoureOnInside = "spotter_" + selectedSpotter + "/three_wide_on_inside";
+                        folderThreeWideYoureOnOutside = "spotter_" + selectedSpotter + "/three_wide_on_outside";
+                        if (Directory.Exists(AudioPlayer.soundFilesPath + "/voice/acknowledge/spotterEnabled_" + selectedSpotter))
+                        {
+                            folderEnableSpotter = "acknowledge/spotterEnabled_" + selectedSpotter;
+                        }
+                        if (Directory.Exists(AudioPlayer.soundFilesPath + "/voice/acknowledge/spotterDisabled_" + selectedSpotter))
+                        {
+                            folderDisableSpotter = "acknowledge/spotterDisabled_" + selectedSpotter;
+                        }
+                        if (Directory.Exists(AudioPlayer.soundFilesPath + "/voice/radio_check_" + selectedSpotter + "/test"))
+                        {
+                            folderSpotterRadioCheck = "radio_check_" + selectedSpotter + "/test";
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("No spotter called " + selectedSpotter + " exists, dropping back to the default (Jim)");
+                        UserSettings.GetUserSettings().setProperty("spotter_name", defaultSpotterId);
+                        UserSettings.GetUserSettings().saveUserSettings();                        
+                    }
+                }
+                // check the oval specific stuff exists before enabling it:
+                hasOvalSpecificSounds = Directory.Exists(AudioPlayer.soundFilesPath + "/voice/" + folderCarInside);                
+                if (hasOvalSpecificSounds) 
+                {
+                    Console.WriteLine("Spotter " + selectedSpotter + " has oval-specific sounds - these will be used for tracks marked as 'oval'");
                 }
                 else
                 {
-                    Console.WriteLine("No spotter called " + selectedSpotter + " exists, dropping back to the default (Jim)");
-                    UserSettings.GetUserSettings().setProperty("spotter_name", defaultSpotterId);
-                    UserSettings.GetUserSettings().saveUserSettings();
+                    Console.WriteLine("Spotter " + selectedSpotter + " has no oval-specific sounds");
                 }
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("No sound folders available");
             }
         }
 
@@ -149,8 +200,12 @@ namespace CrewChiefV4
         private Boolean reportedDoubleOverlapRight = false;
 
         private Boolean wasInMiddle = false;
-
-        private static int maxOverlapsPerSide = use3WideLeftAndRight ? 2 : 1;
+        
+        // 3 because this is the minimum number of cars we need to consider to be sure of a 3-wide-on-left / right.
+        // 2 along side one behind the other, then another out wide. There's an edge case here where the extra length allowed
+        // for overlap means we may have 3 cars the app considers to be along side, even though they're all lined up. But this
+        // is rare enough to discount I think.
+        private static int maxOverlapsPerSide = use3WideLeftAndRight ? 3 : 1;
 
         private enum Side {
             right, left, none
@@ -203,6 +258,11 @@ namespace CrewChiefV4
                 channelLeftOpenTimerStarted = false;
                 int carsOnLeft = 0;
                 int carsOnRight = 0;
+                float minLateralSeparationForOverlapLeft = -1;
+                float maxLateralSeparationForOverlapLeft = -1;
+                float minLateralSeparationForOverlapRight = -1;
+                float maxLateralSeparationForOverlapRight = -1;
+
                 List<int> activeIDs = new List<int>();
                 for (int i = 0; i < currentOpponentPositions.Count; i++)
                 {
@@ -237,18 +297,46 @@ namespace CrewChiefV4
                             {
                                 previousPositionAndVelocityData.Add(i, new PreviousPositionAndVelocityData(currentOpponentPosition[0], currentOpponentPosition[1], now));
                             }
-                            // again, if we already have 2 overlaps on both sides here we don't need to calculate another
+                            // again, if we already have max overlaps on both sides here we don't need to calculate another
                             if (carsOnLeft < maxOverlapsPerSide || carsOnRight < maxOverlapsPerSide)
                             {
-                                Side side = getSide(playerRotationInRadians, currentPlayerPosition[0], currentPlayerPosition[1], currentOpponentPosition[0], 
-                                    currentOpponentPosition[1], isOpponentVelocityInRange);
-                                if (side == Side.left)
+                                Tuple<Side, float> sideAndLateralSeparation = getSideAndSeparation(playerRotationInRadians, currentPlayerPosition[0], 
+                                    currentPlayerPosition[1], currentOpponentPosition[0], currentOpponentPosition[1], isOpponentVelocityInRange);
+                                if (sideAndLateralSeparation.Item1 == Side.left)
                                 {
                                     carsOnLeft++;
+                                    // no need to check for 3 wide on left if there's already a car right, so don't bother with this calculation
+                                    if (carsOnRight == 0)
+                                    {
+                                        // get the max and min lateral separation for the cars on the left - we can only be 3 wide if this is > carWidth
+                                        if (minLateralSeparationForOverlapLeft == -1 || minLateralSeparationForOverlapLeft > sideAndLateralSeparation.Item2)
+                                        {
+                                            minLateralSeparationForOverlapLeft = sideAndLateralSeparation.Item2;
+                                        }
+                                        if (maxLateralSeparationForOverlapLeft == -1 || maxLateralSeparationForOverlapLeft < sideAndLateralSeparation.Item2)
+                                        {
+                                            maxLateralSeparationForOverlapLeft = sideAndLateralSeparation.Item2;
+                                        }
+                                        //Console.WriteLine("cars on left = " + carsOnLeft + ", maxSep = " + maxLateralSeparationForOverlapLeft + ", minSep = " + minLateralSeparationForOverlapLeft);
+                                    }
                                 }
-                                else if (side == Side.right)
+                                else if (sideAndLateralSeparation.Item1 == Side.right)
                                 {
                                     carsOnRight++;
+                                    // no need to check for 3 wide on right if there's already a car left, so don't bother with this calculation
+                                    if (carsOnLeft == 0)
+                                    {
+                                        // get the max and min lateral separation for the cars on the right - we can only be 3 wide if this is > carWidth
+                                        if (minLateralSeparationForOverlapRight == -1 || minLateralSeparationForOverlapRight > sideAndLateralSeparation.Item2)
+                                        {
+                                            minLateralSeparationForOverlapRight = sideAndLateralSeparation.Item2;
+                                        }
+                                        if (maxLateralSeparationForOverlapRight == -1 || maxLateralSeparationForOverlapRight < sideAndLateralSeparation.Item2)
+                                        {
+                                            maxLateralSeparationForOverlapRight = sideAndLateralSeparation.Item2;
+                                        }
+                                        //Console.WriteLine("cars on right = " + carsOnRight + ", maxSep = " + maxLateralSeparationForOverlapRight + ", minSep = " + minLateralSeparationForOverlapRight);
+                                    }
                                 }
                             }
                         } 
@@ -270,6 +358,29 @@ namespace CrewChiefV4
                     if (previousPositionAndVelocityData.ContainsKey(idToPurge))
                     {
                         previousPositionAndVelocityData.Remove(idToPurge);
+                    }
+                }
+                // now check the min and max lateral separations before allowing 3 wide-on-left/right
+                if (carsOnLeft > 1 && carsOnRight == 0)
+                {
+                    float separationDelta = maxLateralSeparationForOverlapLeft - minLateralSeparationForOverlapLeft;
+                    //Console.WriteLine("checking 3 wide on left, separation delta = " + separationDelta);
+                    if (separationDelta < carWidth)
+                    {
+                        // there are 2 or more cars along side, but they're not stacked up 2 wide
+                        carsOnLeft = 1;
+                        //Console.WriteLine("cars on right are line-astern");
+                    }
+                }
+                if (carsOnRight > 1 && carsOnLeft == 0)
+                {
+                    float separationDelta = maxLateralSeparationForOverlapRight - minLateralSeparationForOverlapRight;
+                    //Console.WriteLine("checking 3 wide on right, separation delta = " + separationDelta);
+                    if (separationDelta < carWidth)
+                    {
+                        // there are 2 or more cars along side, but they're not stacked up 2 wide
+                        carsOnRight = 1;
+                        //Console.WriteLine("cars on right are line-astern");
                     }
                 }
                 getNextMessage(carsOnLeft, carsOnRight, now);
@@ -304,7 +415,7 @@ namespace CrewChiefV4
             return Math.Abs(playerX - opponentX) < maxClosingSpeed && Math.Abs(playerZ - opponentZ) < maxClosingSpeed;
         }
 
-        private Side getSide(float playerRotationInRadians, float playerX, float playerZ, float oppponentX, float opponentZ, Boolean isOpponentSpeedInRange)
+        private Tuple<Side, float> getSideAndSeparation(float playerRotationInRadians, float playerX, float playerZ, float oppponentX, float opponentZ, Boolean isOpponentSpeedInRange)
         {
             float rawXCoordinate = oppponentX - playerX;
             float rawZCoordinate = opponentZ - playerZ;
@@ -331,14 +442,14 @@ namespace CrewChiefV4
                     {
                         if (Math.Abs(alignedZCoordinate) < longCarLength)
                         {
-                            return Side.right;
+                            return new Tuple<Side, float>(Side.right, alignedXCoordinate * -1);
                         }
                     }
                     else if (((alignedZCoordinate < 0 && alignedZCoordinate * -1 < carLength) || (alignedZCoordinate > 0 && alignedZCoordinate < carLength + carBehindExtraLength)) &&
                         Math.Abs(alignedXCoordinate) > carWidth && isOpponentSpeedInRange)
                     {
                         // we have a new overlap on this side, it's only valid if we're not inside the other car and the speed isn't out of range
-                        return Side.right;
+                        return new Tuple<Side, float>(Side.right, alignedXCoordinate * -1);
                     }
                 }
                 else
@@ -347,17 +458,17 @@ namespace CrewChiefV4
                     {
                         if (Math.Abs(alignedZCoordinate) < longCarLength)
                         {
-                            return Side.left;
+                            return new Tuple<Side, float>(Side.left, alignedXCoordinate);
                         }
                     }
                     else if (((alignedZCoordinate < 0 && alignedZCoordinate * -1 < carLength) || (alignedZCoordinate > 0 && alignedZCoordinate < carLength + carBehindExtraLength)) &&
                         Math.Abs(alignedXCoordinate) > carWidth && isOpponentSpeedInRange)
                     {
-                        return Side.left;
+                        return new Tuple<Side, float>(Side.left, alignedXCoordinate);
                     }
                 }
             }
-            return Side.none;
+            return new Tuple<Side, float>(Side.none, -1);
         }
 
         private Boolean opponentPositionInRange(float[] opponentPosition, float[] playerPosition)
@@ -533,11 +644,14 @@ namespace CrewChiefV4
             {
                 if (messageIsValid(nextMessageType, carsOnLeftCount, carsOnRightCount))
                 {
+                    // this is the message selected for oval or road course overlaps and clears, used in the case statements later.
+                    String selectedMessage;
                     switch (nextMessageType)
                     {
                         case NextMessageType.threeWide:
-                            audioPlayer.removeImmediateMessages(new String[] { folderStillThere, folderCarLeft, folderCarRight, folderClearAllRound, folderClearLeft, 
-                                folderClearRight, folderThreeWideYoureOnRight, folderThreeWideYoureOnLeft });
+                            audioPlayer.removeImmediateMessages(new String[] { folderStillThere, folderCarLeft, folderCarRight, folderCarInside, folderCarOutside, folderClearAllRound,
+                                folderClearLeft, folderClearRight, folderClearInside, folderClearOutside, folderThreeWideYoureOnRight, folderThreeWideYoureOnLeft,
+                                folderThreeWideYoureOnInside, folderThreeWideYoureOnOutside });
                             QueuedMessage inTheMiddleMessage = new QueuedMessage(folderInTheMiddle, 0, null);
                             inTheMiddleMessage.expiryTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + inTheMiddleMessageExpiresAfter;
                             audioPlayer.playSpotterMessage(inTheMiddleMessage, true);
@@ -550,9 +664,17 @@ namespace CrewChiefV4
                             wasInMiddle = true;
                             break;
                         case NextMessageType.threeWideYoureOnTheLeft:
-                            audioPlayer.removeImmediateMessages(new String[] { folderStillThere, folderCarLeft, folderCarRight, folderClearAllRound, folderClearLeft, 
-                                folderClearRight, folderInTheMiddle, folderThreeWideYoureOnRight });
-                            QueuedMessage threeWideOnLeftMessage = new QueuedMessage(folderThreeWideYoureOnLeft, 0, null);
+                            audioPlayer.removeImmediateMessages(new String[] { folderStillThere, folderCarLeft, folderCarRight, folderCarInside, folderCarOutside, folderClearAllRound, 
+                                folderClearLeft, folderClearRight, folderClearInside, folderClearOutside, folderInTheMiddle, folderThreeWideYoureOnRight, folderThreeWideYoureOnOutside });
+                            if (hasOvalSpecificSounds && GlobalBehaviourSettings.useOvalLogic && random.Next() > 0.2)
+                            {
+                                selectedMessage = folderThreeWideYoureOnInside;
+                            }
+                            else
+                            {
+                                selectedMessage = folderThreeWideYoureOnLeft;
+                            }
+                            QueuedMessage threeWideOnLeftMessage = new QueuedMessage(selectedMessage, 0, null);
                             threeWideOnLeftMessage.expiryTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + holdMessageExpiresAfter;
                             audioPlayer.playSpotterMessage(threeWideOnLeftMessage, true);
                             nextMessageType = NextMessageType.stillThere;
@@ -561,9 +683,17 @@ namespace CrewChiefV4
                             reportedSingleOverlapRight = false;
                             break;
                         case NextMessageType.threeWideYoureOnTheRight:
-                            audioPlayer.removeImmediateMessages(new String[] { folderStillThere, folderCarLeft, folderCarRight, folderClearAllRound, folderClearLeft,
-                                folderClearRight, folderInTheMiddle, folderThreeWideYoureOnLeft });
-                            QueuedMessage threeWideOnRightMessage = new QueuedMessage(folderThreeWideYoureOnRight, 0, null);
+                            audioPlayer.removeImmediateMessages(new String[] { folderStillThere, folderCarLeft, folderCarRight, folderCarInside, folderCarOutside, folderClearAllRound,
+                                folderClearLeft, folderClearRight, folderClearInside, folderClearOutside, folderInTheMiddle, folderThreeWideYoureOnLeft, folderThreeWideYoureOnInside });
+                            if (hasOvalSpecificSounds && GlobalBehaviourSettings.useOvalLogic && random.Next() > 0.2)
+                            {
+                                selectedMessage = folderThreeWideYoureOnOutside;
+                            }
+                            else
+                            {
+                                selectedMessage = folderThreeWideYoureOnRight;
+                            }
+                            QueuedMessage threeWideOnRightMessage = new QueuedMessage(selectedMessage, 0, null);
                             threeWideOnRightMessage.expiryTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + holdMessageExpiresAfter;
                             audioPlayer.playSpotterMessage(threeWideOnRightMessage, true);
                             nextMessageType = NextMessageType.stillThere;
@@ -572,9 +702,18 @@ namespace CrewChiefV4
                             reportedSingleOverlapLeft = false;
                             break;
                         case NextMessageType.carLeft:
-                            audioPlayer.removeImmediateMessages(new String[] { folderStillThere, folderInTheMiddle, folderCarRight, folderClearAllRound, 
-                                folderClearLeft, folderClearRight, folderThreeWideYoureOnRight, folderThreeWideYoureOnLeft });
-                            QueuedMessage carLeftMessage = new QueuedMessage(folderCarLeft, 0, null);
+                            audioPlayer.removeImmediateMessages(new String[] { folderStillThere, folderInTheMiddle, folderCarRight, folderCarOutside, folderClearAllRound, 
+                                folderClearLeft, folderClearRight, folderClearInside, folderClearOutside, folderThreeWideYoureOnRight, folderThreeWideYoureOnLeft,  
+                                folderThreeWideYoureOnInside, folderThreeWideYoureOnOutside });
+                            if (hasOvalSpecificSounds && GlobalBehaviourSettings.useOvalLogic && random.Next() > 0.2)
+                            {
+                                selectedMessage = folderCarInside;
+                            }
+                            else
+                            {
+                                selectedMessage = folderCarLeft;
+                            }
+                            QueuedMessage carLeftMessage = new QueuedMessage(selectedMessage, 0, null);
                             carLeftMessage.expiryTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + holdMessageExpiresAfter;
                             audioPlayer.playSpotterMessage(carLeftMessage, true);
                             nextMessageType = NextMessageType.stillThere;
@@ -583,9 +722,18 @@ namespace CrewChiefV4
                             reportedDoubleOverlapLeft = false;
                             break;
                         case NextMessageType.carRight:
-                            audioPlayer.removeImmediateMessages(new String[] { folderStillThere, folderCarLeft, folderInTheMiddle, folderClearAllRound, 
-                                folderClearLeft, folderClearRight, folderThreeWideYoureOnRight, folderThreeWideYoureOnLeft });
-                            QueuedMessage carRightMessage = new QueuedMessage(folderCarRight, 0, null);
+                            audioPlayer.removeImmediateMessages(new String[] { folderStillThere, folderCarLeft, folderCarInside, folderInTheMiddle, folderClearAllRound, 
+                                folderClearLeft, folderClearRight, folderClearInside, folderClearOutside, folderThreeWideYoureOnRight, folderThreeWideYoureOnLeft,
+                                folderThreeWideYoureOnInside, folderThreeWideYoureOnOutside });
+                            if (hasOvalSpecificSounds && GlobalBehaviourSettings.useOvalLogic && random.Next() > 0.2)
+                            {
+                                selectedMessage = folderCarOutside;
+                            }
+                            else
+                            {
+                                selectedMessage = folderCarRight;
+                            }
+                            QueuedMessage carRightMessage = new QueuedMessage(selectedMessage, 0, null);
                             carRightMessage.expiryTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + holdMessageExpiresAfter;
                             audioPlayer.playSpotterMessage(carRightMessage, true);
                             nextMessageType = NextMessageType.stillThere;
@@ -598,8 +746,9 @@ namespace CrewChiefV4
                             {
                                 QueuedMessage clearAllRoundMessage = new QueuedMessage(folderClearAllRound, 0, null);
                                 clearAllRoundMessage.expiryTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + clearAllRoundMessageExpiresAfter;
-                                audioPlayer.removeImmediateMessages(new String[] { folderCarLeft, folderStillThere, folderCarRight, folderInTheMiddle, 
-                                    folderClearLeft, folderClearRight, folderThreeWideYoureOnRight, folderThreeWideYoureOnLeft });
+                                audioPlayer.removeImmediateMessages(new String[] { folderStillThere,folderCarLeft, folderCarRight, folderCarInside, folderCarOutside, folderInTheMiddle, 
+                                    folderClearLeft, folderClearRight, folderClearInside, folderClearOutside, folderThreeWideYoureOnRight, folderThreeWideYoureOnLeft, 
+                                    folderThreeWideYoureOnInside, folderThreeWideYoureOnOutside});
                                 audioPlayer.playSpotterMessage(clearAllRoundMessage, false);
                                 nextMessageType = NextMessageType.none;
                             }
@@ -617,8 +766,9 @@ namespace CrewChiefV4
                                 {
                                     QueuedMessage clearAllRoundMessage = new QueuedMessage(folderClearAllRound, 0, null);
                                     clearAllRoundMessage.expiryTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + clearMessageExpiresAfter;
-                                    audioPlayer.removeImmediateMessages(new String[] {folderCarLeft, folderStillThere, folderCarRight, folderInTheMiddle, 
-                                        folderClearRight, folderClearLeft, folderThreeWideYoureOnRight, folderThreeWideYoureOnLeft});
+                                    audioPlayer.removeImmediateMessages(new String[] {folderStillThere, folderCarLeft, folderCarRight, folderCarInside, folderCarOutside, folderInTheMiddle, 
+                                        folderClearRight, folderClearLeft, folderClearInside, folderClearOutside, folderThreeWideYoureOnRight, folderThreeWideYoureOnLeft, 
+                                        folderThreeWideYoureOnInside, folderThreeWideYoureOnOutside});
                                     audioPlayer.playSpotterMessage(clearAllRoundMessage, false);
                                     nextMessageType = NextMessageType.none;
                                     reportedDoubleOverlapRight = false;
@@ -627,10 +777,20 @@ namespace CrewChiefV4
                                 }
                                 else
                                 {
-                                    QueuedMessage clearLeftMessage = new QueuedMessage(folderClearLeft, 0, null);
+                                    if (hasOvalSpecificSounds && GlobalBehaviourSettings.useOvalLogic && random.Next() > 0.2)
+                                    {
+                                        selectedMessage = folderClearInside;
+                                    }
+                                    else
+                                    {
+                                        selectedMessage = folderClearLeft;
+                                    }
+                                    QueuedMessage clearLeftMessage = new QueuedMessage(selectedMessage, 0, null);
                                     clearLeftMessage.expiryTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + clearMessageExpiresAfter;
-                                    audioPlayer.removeImmediateMessages(new String[] { folderCarLeft, folderStillThere, folderCarRight, folderInTheMiddle,
-                                        folderClearRight, folderClearAllRound, folderThreeWideYoureOnRight, folderThreeWideYoureOnLeft });
+                                    audioPlayer.removeImmediateMessages(new String[] { folderStillThere, folderCarLeft, folderCarRight, folderCarInside, folderCarOutside, folderInTheMiddle,
+                                        folderClearRight, folderClearOutside, folderClearAllRound, folderThreeWideYoureOnRight, folderThreeWideYoureOnLeft, 
+                                        folderThreeWideYoureOnInside, folderThreeWideYoureOnOutside});
+                                    
                                     if (wasInMiddle)
                                     {
                                         audioPlayer.playSpotterMessage(clearLeftMessage, true);
@@ -659,8 +819,9 @@ namespace CrewChiefV4
                                 {
                                     QueuedMessage clearAllRoundMessage = new QueuedMessage(folderClearAllRound, 0, null);
                                     clearAllRoundMessage.expiryTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + clearMessageExpiresAfter;
-                                    audioPlayer.removeImmediateMessages(new String[] { folderCarLeft, folderStillThere, folderCarRight, folderInTheMiddle, 
-                                        folderClearLeft, folderClearRight, folderThreeWideYoureOnRight, folderThreeWideYoureOnLeft });
+                                    audioPlayer.removeImmediateMessages(new String[] {folderStillThere, folderCarLeft, folderCarRight, folderCarInside, folderCarOutside, folderInTheMiddle, 
+                                        folderClearRight, folderClearLeft, folderClearInside, folderClearOutside, folderThreeWideYoureOnRight, folderThreeWideYoureOnLeft,
+                                        folderThreeWideYoureOnInside, folderThreeWideYoureOnOutside});
                                     audioPlayer.playSpotterMessage(clearAllRoundMessage, false);
                                     nextMessageType = NextMessageType.none;
                                     reportedDoubleOverlapLeft = false;
@@ -669,10 +830,19 @@ namespace CrewChiefV4
                                 }
                                 else
                                 {
-                                    QueuedMessage clearRightMessage = new QueuedMessage(folderClearRight, 0, null);
+                                    if (hasOvalSpecificSounds && GlobalBehaviourSettings.useOvalLogic && random.Next() > 0.2)
+                                    {
+                                        selectedMessage = folderClearOutside;
+                                    }
+                                    else
+                                    {
+                                        selectedMessage = folderClearRight;
+                                    }
+                                    QueuedMessage clearRightMessage = new QueuedMessage(selectedMessage, 0, null);
                                     clearRightMessage.expiryTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + clearMessageExpiresAfter;
-                                    audioPlayer.removeImmediateMessages(new String[] { folderCarLeft, folderStillThere, folderCarRight, folderInTheMiddle, 
-                                        folderClearLeft, folderClearAllRound, folderThreeWideYoureOnRight, folderThreeWideYoureOnLeft });                                    
+                                    audioPlayer.removeImmediateMessages(new String[] { folderStillThere, folderCarLeft, folderCarRight, folderCarInside, folderCarOutside, folderInTheMiddle, 
+                                        folderClearLeft, folderClearInside, folderClearAllRound, folderThreeWideYoureOnRight, folderThreeWideYoureOnLeft,
+                                        folderThreeWideYoureOnInside, folderThreeWideYoureOnOutside});                                    
                                     if (wasInMiddle)
                                     {
                                         audioPlayer.playSpotterMessage(clearRightMessage, true);
@@ -698,7 +868,7 @@ namespace CrewChiefV4
                             {
                                 QueuedMessage holdYourLineMessage = new QueuedMessage(folderStillThere, 0, null);
                                 holdYourLineMessage.expiryTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + holdMessageExpiresAfter;
-                                audioPlayer.removeImmediateMessages(new String[] {folderClearRight, folderClearLeft, folderClearAllRound});
+                                audioPlayer.removeImmediateMessages(new String[] { folderClearRight, folderClearLeft, folderClearInside, folderClearOutside, folderClearAllRound });
                                 audioPlayer.playSpotterMessage(holdYourLineMessage, true);
                                 nextMessageType = NextMessageType.stillThere;
                                 nextMessageDue = now.Add(repeatHoldFrequency);
