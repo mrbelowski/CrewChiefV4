@@ -93,6 +93,7 @@
     <Compile Include="ACS\ACSGameStateMapper.cs" />
     <Compile Include="ACS\ACSSharedMemoryReader.cs" />
     <Compile Include="ACS\ACSSpotter.cs" />
+    <Compile Include="Audio\PlaybackModerator.cs" />
     <Compile Include="Audio\Sounds.cs" />
     <Compile Include="CarData.cs" />
     <Compile Include="DriverNameHelper.cs" />
@@ -275,6 +276,7 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+    <None Include="tools\GetUnvocalizedCorners.ps1" />
     <None Include="trackLandmarksData.json" />
   </ItemGroup>
   <ItemGroup>
@@ -311,6 +313,7 @@
     <Content Include="speech_recognition_config.txt" />
     <Content Include="ui_text.txt" />
     <Content Include="..\help.txt" />
+    <Content Include="..\README.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\SharpDX.2.6.3\build\SharpDX.targets" Condition="Exists('..\packages\SharpDX.2.6.3\build\SharpDX.targets')" />

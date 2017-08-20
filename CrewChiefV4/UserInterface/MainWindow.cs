@@ -469,6 +469,25 @@ namespace CrewChiefV4
             cw = new ControlWriter(textBox1);
             textBox1.KeyDown += TextBox1_KeyDown;
             Console.SetOut(cw);
+
+            // if we can't init the UserSettings the app will basically be fucked. So try to nuke the Britton_IT_Ltd directory from
+            // orbit (it's the only way to be sure) then restart the app. This shit is comically flakey but what else can we do here?
+            if (UserSettings.GetUserSettings().initFailed)
+            {
+                Console.WriteLine("Unable to upgrade properties from previous version, settings will be reset to default");
+                try
+                {
+                    UserSettings.ForceablyDeleteConfigDirectory();
+                    // note we can't load these from the UI settings because loading stuff will be broken at this point
+                    doRestart("Failed to load user settings, app must be restarted to try again.", "Failed to load user settings");
+                }
+                catch (Exception)
+                {
+                    // oh dear, now we are in a pickle.
+                    Console.WriteLine("Unable to remove broken app settings file\n Please exit the app and manually delete folder " + UserSettings.userConfigFolder);
+                }
+            }
+
             Console.WriteLine("Starting app");
             controllerConfiguration = new ControllerConfiguration(this);            
             setSelectedGameType();
@@ -604,7 +623,7 @@ namespace CrewChiefV4
         private void listenForChannelOpen()
         {
             Boolean channelOpen = false;
-            if (crewChief.speechRecogniser.initialised && voiceOption == VoiceOptionEnum.HOLD)
+            if (crewChief.speechRecogniser != null && crewChief.speechRecogniser.initialised && voiceOption == VoiceOptionEnum.HOLD)
             {
                 Console.WriteLine("Running speech recognition in 'hold button' mode");
                 crewChief.speechRecogniser.voiceOptionEnum = VoiceOptionEnum.HOLD;
@@ -737,7 +756,7 @@ namespace CrewChiefV4
                         }
                         nextPollWait = 200;
                     }
-                    else if (crewChief.speechRecogniser.initialised && voiceOption == VoiceOptionEnum.TOGGLE)
+                    else if (crewChief.speechRecogniser != null && crewChief.speechRecogniser.initialised && voiceOption == VoiceOptionEnum.TOGGLE)
                     {
                         if (controllerConfiguration.hasOutstandingClick(ControllerConfiguration.CHANNEL_OPEN_FUNCTION))
                         {
@@ -800,15 +819,15 @@ namespace CrewChiefV4
 
                 crewChiefThread.Start();
                 runListenForChannelOpenThread = controllerConfiguration.listenForChannelOpen()
-                    && voiceOption == VoiceOptionEnum.HOLD && crewChief.speechRecogniser.initialised;
-                if (runListenForChannelOpenThread && voiceOption == VoiceOptionEnum.HOLD && crewChief.speechRecogniser.initialised)
+                    && voiceOption == VoiceOptionEnum.HOLD && crewChief.speechRecogniser != null && crewChief.speechRecogniser.initialised;
+                if (runListenForChannelOpenThread && voiceOption == VoiceOptionEnum.HOLD && crewChief.speechRecogniser != null && crewChief.speechRecogniser.initialised)
                 {
                     Console.WriteLine("Listening on default audio input device");
                     ThreadStart channelOpenButtonListenerWork = listenForChannelOpen;
                     Thread channelOpenButtonListenerThread = new Thread(channelOpenButtonListenerWork);
                     channelOpenButtonListenerThread.Start();
                 }
-                else if (voiceOption == VoiceOptionEnum.ALWAYS_ON && crewChief.speechRecogniser.initialised)
+                else if (voiceOption == VoiceOptionEnum.ALWAYS_ON && crewChief.speechRecogniser != null && crewChief.speechRecogniser.initialised)
                 {
                     Console.WriteLine("Running speech recognition in 'always on' mode");
                     crewChief.speechRecogniser.voiceOptionEnum = VoiceOptionEnum.ALWAYS_ON;
@@ -942,7 +961,7 @@ namespace CrewChiefV4
         {
             try
             {
-                if (!crewChief.speechRecogniser.initialised)
+                if (crewChief.speechRecogniser != null && !crewChief.speechRecogniser.initialised)
                 {
                     crewChief.speechRecogniser.initialiseSpeechEngine();
                     Console.WriteLine("Attempted to initialise speech engine - success = " + crewChief.speechRecogniser.initialised);

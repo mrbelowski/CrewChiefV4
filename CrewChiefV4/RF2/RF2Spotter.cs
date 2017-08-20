@@ -45,8 +45,9 @@ namespace CrewChiefV4.rFactor2
         }
 
         public void clearState()
-        {            
+        {
             this.previousTime = DateTime.Now;
+            this.internalSpotter.clearState();
         }
 
         public void pause()
@@ -113,22 +114,17 @@ namespace CrewChiefV4.rFactor2
                 return;
             }
 
-            if (currentPlayerScoring.mInPits != 0  // No spotter in pits.
-#if !DEBUG  // In release, disable spotter for AI
-                 || currentPlayerScoring.mControl != (int)rFactor2Constants.rF2Control.Player
-#endif
-            )
-            {
+            if (currentPlayerScoring.mInPits != 0)  // No spotter in pits.
                 return;
-            }
 
             if (currentGameState != null)
             {
                 var carClass = currentGameState.carClass;
-                if (carClass != null && !String.Equals(currentPlayerCarClassID, carClass.getClassIdentifier()))
+                if (carClass != null && !string.Equals(this.currentPlayerCarClassID, carClass.getClassIdentifier()))
                 {
                     // Retrieve and use user overridable spotter car length/width.
                     this.internalSpotter.setCarDimensions(GlobalBehaviourSettings.spotterVehicleLength, GlobalBehaviourSettings.spotterVehicleWidth);
+                    this.currentPlayerCarClassID = carClass.getClassIdentifier();
                 }
             }
 
@@ -204,13 +200,13 @@ namespace CrewChiefV4.rFactor2
         public void enableSpotter()
         {
             this.enabled = true;
-            this.audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderEnableSpotter, 0, null));
+            this.audioPlayer.playMessageImmediately(new QueuedMessage(NoisyCartesianCoordinateSpotter.folderEnableSpotter, 0, null));
         }
 
         public void disableSpotter()
         {
             this.enabled = false;
-            this.audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderDisableSpotter, 0, null));
+            this.audioPlayer.playMessageImmediately(new QueuedMessage(NoisyCartesianCoordinateSpotter.folderDisableSpotter, 0, null));
         }
     }
 }

@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -26,6 +28,14 @@ namespace CrewChiefV4
         [STAThread]
         static void Main()
         {
+            // Set Invariant Culture for all threads as default.
+            CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
+            CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.InvariantCulture;
+
+            // Set Invariant Culture for current thead.
+            Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
+            Thread.CurrentThread.CurrentUICulture = CultureInfo.InvariantCulture;
+
             String[] commandLineArgs = Environment.GetCommandLineArgs();
             Boolean allowMultipleInst = false;
             if (commandLineArgs != null)
@@ -45,27 +55,27 @@ namespace CrewChiefV4
                             Console.WriteLine("Failed to set process affinity");
                         }
                     }
-                    if(commandLineArg.Equals("multi"))
+                    if (commandLineArg.Equals("multi"))
                     {
                         allowMultipleInst = true;
                     }
                 }
-                if(!allowMultipleInst)
+                if (!allowMultipleInst)
                 {
                     try
                     {
                         if (System.Diagnostics.Process.GetProcessesByName(System.IO.Path.GetFileNameWithoutExtension(System.Reflection.Assembly.GetEntryAssembly().Location)).Count() > 1)
                         {
                             System.Diagnostics.Process.GetCurrentProcess().Kill();
-                        } 
+                        }
                     }
                     catch (Exception)
                     {
                         //ignore
                     }
-                       
+
                 }
-            }            
+            }
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new MainWindow());

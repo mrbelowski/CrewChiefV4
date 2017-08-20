@@ -1,6 +1,34 @@
 <!DOCTYPE html>
 <html>
 <body>
+<h2>Version 4.7.8.7</h2>
+<ul>
+	<li>Fix for some settings getting corrupted on system which use a comma as a decimal separator - this causes some spotter and voice recognition issues. If you have already encountered this, please reload the app's default settings</li>
+	<li>Some fuel use calculation fixes</li>
+	<li>Spotter fixes</li>
+</ul>
+<h2>Version 4.7.8.6</h2>
+<ul>
+	<li>Added optional radio beeps for when the spotter or the Chief interrupt each other. "Insert beep-out between Spotter and Chief" plays the close-channel beep after the chief / spotter has finished, and "Insert beep-in between Spotter and Chief" (the default) plays the open-channel beep before the chief / spotter interrupts. The spotter and chief use different beep sounds here, and these options can be combined if you want 2 beeps (close then open) when interrupting</li>
+	<li>Attempt to delete corrupted settings and force the app to restart if they can't be processed</li>
+	<li>Don't play fuel consumption estimate if it's 0 litres per lap</li>
+</ul>
+<h2>Version 4.7.8.1</h2>
+<ul>
+	<li>RF2 plugin fixes for car damage issues in online races</li>
+</ul>
+<h2>Version 4.7.8.0</h2>
+<ul>
+	<li>Fixed spotter logic where it would consider 2 cars along side to be "3 side", even if those cars were one behind the other</li>
+	<li>Use oval spotter messages (inside / outside) when on known oval tracks, if the selected spotter has these sounds</li>
+	<li>Tweaked spotter enable / disable sound to be a bit more appropriate for non-default spotter voice packs</li>
+	<li>Fixed broken sector 3 time deltas in Project Cars</li>
+</ul>
+<h2>Version 4.7.7.9</h2>
+<ul>
+	<li>Fixed Assetto Corsa pit window open calculation for sessions with a fixed number of laps</li>
+	<li>Fixed a crash bug when starting the app with no sound pack</li>
+</ul>
 <h2>Version 4.7.7.8</h2>
 <ul>
 	<li>Added dropdown to main screen to allow a different spotter voice to be selected</li>
