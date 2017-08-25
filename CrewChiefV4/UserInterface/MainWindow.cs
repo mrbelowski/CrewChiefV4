@@ -690,6 +690,12 @@ namespace CrewChiefV4
                         crewChief.toggleReadOpponentDeltasMode();
                         nextPollWait = 1000;
                     }
+                    else if (controllerConfiguration.hasOutstandingClick(ControllerConfiguration.TOGGLE_MANUAL_FORMATION_LAP))
+                    {
+                        Console.WriteLine("Toggling manual formation lap mode");
+                        crewChief.toggleManualFormationLapMode();
+                        nextPollWait = 1000;
+                    }
                     else if (controllerConfiguration.hasOutstandingClick(ControllerConfiguration.REPEAT_LAST_MESSAGE_BUTTON))
                     {
                         Console.WriteLine("Repeating last message");

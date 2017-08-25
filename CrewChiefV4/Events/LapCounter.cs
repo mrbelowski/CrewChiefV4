@@ -21,6 +21,15 @@ namespace CrewChiefV4.Events
         // used in manual rolling starts - if we pass someone play a message
         private String folderHoldYourPosition = "lap_counter/hold_your_position";
 
+        // toggle / request acknowledgements when enabling / disabling manual formation lap mode
+        public static String folderManualFormationLapModeEnabled = "lap_counter/manual_formation_lap_mode_enabled";
+        public static String folderManualFormationLapModeDisabled = "lap_counter/manual_formation_lap_mode_disabled";
+        // only allow this mode to be enabled if we're on the first lap
+        public static Boolean isOnFirstLap = true;
+
+        private Boolean playedManualStartGetReady = false;
+        private Boolean playedManualStartLeaderHasCrossedLine = false;
+
         public static String folderGetReady = "lap_counter/get_ready";
 
         private String folderLastLapEU = "lap_counter/last_lap";
@@ -56,16 +65,6 @@ namespace CrewChiefV4.Events
 
         private static Boolean useFahrenheit = UserSettings.GetUserSettings().getBoolean("use_fahrenheit");
 
-        // public because who the fuck knows what'll set and unset these...
-        public static Boolean useManualFormationLap = false;
-        public static Boolean onManualFormationLap = false;
-        // "get ready"
-        public static Boolean manualFormationLapTransitionToStartPhase = false;
-        // "leader has crossed the line" - only if we're more than a few places behind him
-        public static Boolean manualFormationLapLeaderCrossedLine = false;
-        // "go go go"
-        public static Boolean manualFormationLapTransitionToGreen = false;
-
         private DateTime nextManualFormationOvertakeWarning = DateTime.MinValue;
 
         public override List<SessionPhase> applicableSessionPhases
@@ -89,12 +88,12 @@ namespace CrewChiefV4.Events
             playedFinished = false;
             playedPreLightsMessage = false;
             purgePreLightsMessages = false;
-            LapCounter.useManualFormationLap = false;
-            LapCounter.onManualFormationLap = false;
-            LapCounter.manualFormationLapTransitionToStartPhase = false;
-            LapCounter.manualFormationLapLeaderCrossedLine = false;
-            LapCounter.manualFormationLapTransitionToGreen = false;
+            // assume we start on the formation lap if we're using a manual formation lap
+            GameStateData.onManualFormationLap = GameStateData.useManualFormationLap;
+            playedManualStartGetReady = false;
+            playedManualStartLeaderHasCrossedLine = false;
             nextManualFormationOvertakeWarning = DateTime.MinValue;
+            LapCounter.isOnFirstLap = true;
         }
 
         private void playPreLightsMessage(GameStateData currentGameState, int maxNumberToPlay)
@@ -207,36 +206,54 @@ namespace CrewChiefV4.Events
 
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
-            if (useManualFormationLap)
+            if (GameStateData.useManualFormationLap)
             {
-                if (onManualFormationLap && currentGameState.SessionData.SessionStartPosition < currentGameState.SessionData.Position &&
-                    nextManualFormationOvertakeWarning < currentGameState.Now)
+                // wait a while before enabling formation lap stuff
+                if (currentGameState.SessionData.SessionRunningTime > 10)
                 {
-                    // we've overtaken someone
-                    nextManualFormationOvertakeWarning = currentGameState.Now.AddSeconds(30);
-                    audioPlayer.playMessage(new QueuedMessage(folderHoldYourPosition, 0, this));
-                }
-                if (manualFormationLapTransitionToStartPhase)
-                {
-                    audioPlayer.playMessage(new QueuedMessage(folderGetReady, 0, this));
-                    manualFormationLapTransitionToStartPhase = false;
-                }
-                else if (manualFormationLapLeaderCrossedLine)
-                {
-                    if (currentGameState.SessionData.Position > 4)
+                    if (GameStateData.onManualFormationLap && currentGameState.SessionData.SessionStartPosition < currentGameState.SessionData.Position &&
+                        nextManualFormationOvertakeWarning < currentGameState.Now)
                     {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(folderLeaderHasCrossedStartLine, 0, this));
+                        // we've overtaken someone
+                        nextManualFormationOvertakeWarning = currentGameState.Now.AddSeconds(30);
+                        audioPlayer.playMessage(new QueuedMessage(folderHoldYourPosition, 0, this));
                     }
-                    manualFormationLapTransitionToStartPhase = false;
-                    manualFormationLapLeaderCrossedLine = false;
-                }
-                else if (manualFormationLapTransitionToGreen)
-                {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderGreenGreenGreen, 0, this));
-                    manualFormationLapTransitionToGreen = false;
-                    manualFormationLapLeaderCrossedLine = false;
-                    onManualFormationLap = false;
-                    // note we leave useManualFormationLap set to true here so the other messages don't trigger in this session
+                    if (currentGameState.SessionData.Position > 1)
+                    {
+                        // we're not the leader, so give leader updates
+                        OpponentData leader = currentGameState.getOpponentAtPosition(1, false);
+                        if (leader != null)
+                        {
+                            if (!playedManualStartGetReady && leader.DistanceRoundTrack > currentGameState.SessionData.TrackDefinition.trackLength - 200)
+                            {
+                                audioPlayer.playMessage(new QueuedMessage(folderGetReady, 0, this));
+                                playedManualStartGetReady = true;
+                            }
+                            if (!playedManualStartLeaderHasCrossedLine && leader.CompletedLaps == 1)
+                            {
+                                playedManualStartLeaderHasCrossedLine = true;
+                                if (currentGameState.SessionData.Position > 3)
+                                {
+                                    // don't play this if we're right with the leader?
+                                    audioPlayer.playMessageImmediately(new QueuedMessage(folderLeaderHasCrossedStartLine, 0, this));
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // we're the leader, so play get ready when we're near the line
+                        if (!playedManualStartGetReady && currentGameState.PositionAndMotionData.DistanceRoundTrack > currentGameState.SessionData.TrackDefinition.trackLength - 100)
+                        {
+                            audioPlayer.playMessage(new QueuedMessage(folderGetReady, 0, this));
+                            playedManualStartGetReady = true;
+                        }
+                    }
+                    if (currentGameState.SessionData.CompletedLaps == 1)
+                    {
+                        audioPlayer.playMessageImmediately(new QueuedMessage(folderGreenGreenGreen, 0, this));
+                        GameStateData.onManualFormationLap = false;
+                    }
                 }                
             }
             else
@@ -337,68 +354,71 @@ namespace CrewChiefV4.Events
                     audioPlayer.playMessageImmediately(new QueuedMessage(folderGreenGreenGreen, 0, this));
                     audioPlayer.disablePearlsOfWisdom = false;
                 }
-                // looks like belt n braces but there's a bug in R3E DTM 2015 race 1 which has a number of laps and a time remaining
-                if (!currentGameState.SessionData.SessionHasFixedTime &&
-                    currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.IsNewLap && currentGameState.SessionData.CompletedLaps > 0)
+            }
+            // end of start race stuff
+
+            // looks like belt n braces but there's a bug in R3E DTM 2015 race 1 which has a number of laps and a time remaining
+            if (!currentGameState.SessionData.SessionHasFixedTime &&
+                currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.IsNewLap && currentGameState.SessionData.CompletedLaps > 0)
+            {
+                // a new lap has been started in race mode
+                if (currentGameState.SessionData.CompletedLaps == currentGameState.SessionData.SessionNumberOfLaps - 2)
                 {
-                    // a new lap has been started in race mode
-                    if (currentGameState.SessionData.CompletedLaps == currentGameState.SessionData.SessionNumberOfLaps - 2)
+                    // disable pearls for the last part of the race
+                    audioPlayer.disablePearlsOfWisdom = true;
+                }
+                int position = currentGameState.SessionData.Position;
+                if (currentGameState.SessionData.CompletedLaps == currentGameState.SessionData.SessionNumberOfLaps - 1)
+                {
+                    Console.WriteLine("1 lap remaining, SessionHasFixedTime = " + currentGameState.SessionData.SessionHasFixedTime);
+                    if (position == 1)
                     {
-                        // disable pearls for the last part of the race
-                        audioPlayer.disablePearlsOfWisdom = true;
+                        audioPlayer.playMessage(new QueuedMessage(folderLastLapLeading, 0, this));
                     }
-                    int position = currentGameState.SessionData.Position;
-                    if (currentGameState.SessionData.CompletedLaps == currentGameState.SessionData.SessionNumberOfLaps - 1)
+                    else if (position < 4)
                     {
-                        Console.WriteLine("1 lap remaining, SessionHasFixedTime = " + currentGameState.SessionData.SessionHasFixedTime);
-                        if (position == 1)
-                        {
-                            audioPlayer.playMessage(new QueuedMessage(folderLastLapLeading, 0, this));
-                        }
-                        else if (position < 4)
-                        {
-                            audioPlayer.playMessage(new QueuedMessage(folderLastLapTopThree, 0, this));
-                        }
-                        else if (position > 4)
-                        {
-                            audioPlayer.playMessage(new QueuedMessage(GlobalBehaviourSettings.useAmericanTerms ? folderLastLapUS : folderLastLapEU, 0, this));
-                        }
-                        else
-                        {
-                            Console.WriteLine("1 lap left but position is < 1");
-                        }
+                        audioPlayer.playMessage(new QueuedMessage(folderLastLapTopThree, 0, this));
                     }
-                    else if (currentGameState.SessionData.CompletedLaps == currentGameState.SessionData.SessionNumberOfLaps - 2)
+                    else if (position > 4)
                     {
-                        Console.WriteLine("2 laps remaining, SessionHasFixedTime = " + currentGameState.SessionData.SessionHasFixedTime);
-                        if (position == 1)
-                        {
-                            audioPlayer.playMessage(new QueuedMessage(folderTwoLeftLeading, 0, this));
-                        }
-                        else if (position < 4)
-                        {
-                            audioPlayer.playMessage(new QueuedMessage(folderTwoLeftTopThree, 0, this));
-                        }
-                        else if (position >= currentGameState.SessionData.SessionStartPosition + 5)
-                        {
-                            // yuk... don't yell at the player for being shit if he's play Assetto. Because assetto drivers *are* shit, and also the SessionStartPosition
-                            // might be invalid so perhaps they're really not being shit. At the moment.
-                            if (CrewChief.gameDefinition.gameEnum != GameEnum.ASSETTO_32BIT && CrewChief.gameDefinition.gameEnum != GameEnum.ASSETTO_64BIT)
-                            {
-                                audioPlayer.playMessage(new QueuedMessage(folderTwoLeft, 0, this), PearlsOfWisdom.PearlType.BAD, 0.5);
-                            }
-                        }
-                        else if (position >= 4)
-                        {
-                            audioPlayer.playMessage(new QueuedMessage(folderTwoLeft, 0, this), PearlsOfWisdom.PearlType.NEUTRAL, 0.5);
-                        }
-                        else
-                        {
-                            Console.WriteLine("2 laps left but position is < 1");
-                        }
-                        // 2 laps left, so prevent any further pearls of wisdom being added
+                        audioPlayer.playMessage(new QueuedMessage(GlobalBehaviourSettings.useAmericanTerms ? folderLastLapUS : folderLastLapEU, 0, this));
+                    }
+                    else
+                    {
+                        Console.WriteLine("1 lap left but position is < 1");
                     }
                 }
+                else if (currentGameState.SessionData.CompletedLaps == currentGameState.SessionData.SessionNumberOfLaps - 2)
+                {
+                    Console.WriteLine("2 laps remaining, SessionHasFixedTime = " + currentGameState.SessionData.SessionHasFixedTime);
+                    if (position == 1)
+                    {
+                        audioPlayer.playMessage(new QueuedMessage(folderTwoLeftLeading, 0, this));
+                    }
+                    else if (position < 4)
+                    {
+                        audioPlayer.playMessage(new QueuedMessage(folderTwoLeftTopThree, 0, this));
+                    }
+                    else if (position >= currentGameState.SessionData.SessionStartPosition + 5)
+                    {
+                        // yuk... don't yell at the player for being shit if he's play Assetto. Because assetto drivers *are* shit, and also the SessionStartPosition
+                        // might be invalid so perhaps they're really not being shit. At the moment.
+                        if (CrewChief.gameDefinition.gameEnum != GameEnum.ASSETTO_32BIT && CrewChief.gameDefinition.gameEnum != GameEnum.ASSETTO_64BIT)
+                        {
+                            audioPlayer.playMessage(new QueuedMessage(folderTwoLeft, 0, this), PearlsOfWisdom.PearlType.BAD, 0.5);
+                        }
+                    }
+                    else if (position >= 4)
+                    {
+                        audioPlayer.playMessage(new QueuedMessage(folderTwoLeft, 0, this), PearlsOfWisdom.PearlType.NEUTRAL, 0.5);
+                    }
+                    else
+                    {
+                        Console.WriteLine("2 laps left but position is < 1");
+                    }
+                    // 2 laps left, so prevent any further pearls of wisdom being added
+                }
+                
             }
         }
     }
