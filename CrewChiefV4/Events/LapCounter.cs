@@ -16,6 +16,11 @@ namespace CrewChiefV4.Events
 
         private String folderGreenGreenGreen = "lap_counter/green_green_green";
 
+        // used in manual rolling starts (hack...)
+        private String folderLeaderHasCrossedStartLine = "lap_counter/leader_has_crossed_start_line";
+        // used in manual rolling starts - if we pass someone play a message
+        private String folderHoldYourPosition = "lap_counter/hold_your_position";
+
         public static String folderGetReady = "lap_counter/get_ready";
 
         private String folderLastLapEU = "lap_counter/last_lap";
@@ -51,6 +56,18 @@ namespace CrewChiefV4.Events
 
         private static Boolean useFahrenheit = UserSettings.GetUserSettings().getBoolean("use_fahrenheit");
 
+        // public because who the fuck knows what'll set and unset these...
+        public static Boolean useManualFormationLap = false;
+        public static Boolean onManualFormationLap = false;
+        // "get ready"
+        public static Boolean manualFormationLapTransitionToStartPhase = false;
+        // "leader has crossed the line" - only if we're more than a few places behind him
+        public static Boolean manualFormationLapLeaderCrossedLine = false;
+        // "go go go"
+        public static Boolean manualFormationLapTransitionToGreen = false;
+
+        private DateTime nextManualFormationOvertakeWarning = DateTime.MinValue;
+
         public override List<SessionPhase> applicableSessionPhases
         {
             get { return new List<SessionPhase> { SessionPhase.Countdown, SessionPhase.Formation, SessionPhase.Gridwalk, SessionPhase.Green, SessionPhase.Checkered, SessionPhase.Finished }; }
@@ -72,6 +89,12 @@ namespace CrewChiefV4.Events
             playedFinished = false;
             playedPreLightsMessage = false;
             purgePreLightsMessages = false;
+            LapCounter.useManualFormationLap = false;
+            LapCounter.onManualFormationLap = false;
+            LapCounter.manualFormationLapTransitionToStartPhase = false;
+            LapCounter.manualFormationLapLeaderCrossedLine = false;
+            LapCounter.manualFormationLapTransitionToGreen = false;
+            nextManualFormationOvertakeWarning = DateTime.MinValue;
         }
 
         private void playPreLightsMessage(GameStateData currentGameState, int maxNumberToPlay)
@@ -184,162 +207,197 @@ namespace CrewChiefV4.Events
 
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
-            // nasty... 2 separate code paths here - one for the existing pre-lights logic which is a ball of spaghetti I don't fancy unpicking, 
-            // one for the 'cancel on control input' version
-            if (playPreRaceMessagesUntilCancelled)
-            {               
-               if (!playedGetReady)
-               {                   
-                    // in the pre-lights phase
-                    if (purgePreLightsMessages)
-                    {
-                        // empty the queue and play 'get ready'
-                        int purgedCount = audioPlayer.purgeQueues();
-                        Console.WriteLine("Purging pre-lights messages, removed = " + purgedCount + " messages");
-                        audioPlayer.playMessage(new QueuedMessage(folderGetReady, 0, this));
-                        playedGetReady = true;
-                    }
-                    else
-                    {
-                        if (playedPreLightsMessage && !purgePreLightsMessages)
-                        {
-                            // we've started playing the pre-lights messages. As soon as the play makes a throttle input purge this queue.
-                            // Some games hold the brake at '1' automatically on the grid, so this can't be used
-                            purgePreLightsMessages = previousGameState != null &&
-                                currentGameState.ControlData.ThrottlePedal > 0.2 && previousGameState.ControlData.ThrottlePedal > 0.2;
-                        }
-                        else
-                        {
-                            // Play these only for race sessions. Some game-specific rules here:
-                            //      Allow messages for countdown phase for any game
-                            //      Allow messages for gridwalk phase for any game *except* Raceroom (which treats gridwalk as its own session with different data to the race session)
-                            //      Allow messages for formation phase for Raceroom
-                            //      Allow messages for formation phase for RF1 (AMS) and rF2 only when we enter sector 3 of the formation lap.
-                            if (currentGameState.SessionData.SessionType == SessionType.Race &&
-                                    (currentGameState.SessionData.SessionPhase == SessionPhase.Countdown ||
-                                    (currentGameState.SessionData.SessionPhase == SessionPhase.Gridwalk && CrewChief.gameDefinition.gameEnum != GameEnum.RACE_ROOM) ||
-                                    (currentGameState.SessionData.SessionPhase == SessionPhase.Formation && CrewChief.gameDefinition.gameEnum == GameEnum.RACE_ROOM) ||
-                                    (currentGameState.SessionData.SessionPhase == SessionPhase.Formation && (CrewChief.gameDefinition.gameEnum == GameEnum.RF1 || CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT) && 
-                                    currentGameState.SessionData.SectorNumber == 3)))
-                            {
-                                Console.WriteLine("Queuing pre-lights messages");
-                                playPreLightsMessage(currentGameState, 10); // queue as many messages as we have here, in any order
-                            }
-                        }                        
-                    }
+            if (useManualFormationLap)
+            {
+                if (onManualFormationLap && currentGameState.SessionData.SessionStartPosition < currentGameState.SessionData.Position &&
+                    nextManualFormationOvertakeWarning < currentGameState.Now)
+                {
+                    // we've overtaken someone
+                    nextManualFormationOvertakeWarning = currentGameState.Now.AddSeconds(30);
+                    audioPlayer.playMessage(new QueuedMessage(folderHoldYourPosition, 0, this));
                 }
+                if (manualFormationLapTransitionToStartPhase)
+                {
+                    audioPlayer.playMessage(new QueuedMessage(folderGetReady, 0, this));
+                    manualFormationLapTransitionToStartPhase = false;
+                }
+                else if (manualFormationLapLeaderCrossedLine)
+                {
+                    if (currentGameState.SessionData.Position > 4)
+                    {
+                        audioPlayer.playMessageImmediately(new QueuedMessage(folderLeaderHasCrossedStartLine, 0, this));
+                    }
+                    manualFormationLapTransitionToStartPhase = false;
+                    manualFormationLapLeaderCrossedLine = false;
+                }
+                else if (manualFormationLapTransitionToGreen)
+                {
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderGreenGreenGreen, 0, this));
+                    manualFormationLapTransitionToGreen = false;
+                    manualFormationLapLeaderCrossedLine = false;
+                    onManualFormationLap = false;
+                    // note we leave useManualFormationLap set to true here so the other messages don't trigger in this session
+                }                
             }
             else
             {
-                int preLightsMessageCount = CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_32BIT ||
-                                            CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_64BIT ||
-                                            CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_NETWORK ? 1 : 2;
-                if (!playedPreLightsMessage && currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.SessionPhase == SessionPhase.Gridwalk &&
-                    (playPreLightsInRaceroom || CrewChief.gameDefinition.gameEnum != GameEnum.RACE_ROOM))
+                // nasty... 2 separate code paths here - one for the existing pre-lights logic which is a ball of spaghetti I don't fancy unpicking, 
+                // one for the 'cancel on control input' version
+                if (playPreRaceMessagesUntilCancelled)
                 {
-                    playPreLightsMessage(currentGameState, preLightsMessageCount);
-                    purgePreLightsMessages = true;
-                }
-                // TODO: in R3E online there's a GridWalk phase before the Countdown. In PCars they're combined. Add some messages to this phase.
-
-                // R3E's gridWalk phase isn't useable here - the data during this phase are bollocks
-                if (!playedGetReady && currentGameState.SessionData.SessionType == SessionType.Race && (currentGameState.SessionData.SessionPhase == SessionPhase.Countdown ||
-                    (currentGameState.SessionData.SessionPhase == SessionPhase.Formation && CrewChief.gameDefinition.gameEnum == GameEnum.RACE_ROOM) ||
-                    // play 'get ready' message when entering sector 3 of formation lap in Automobilista and RF2
-                    (currentGameState.SessionData.SessionPhase == SessionPhase.Formation && (CrewChief.gameDefinition.gameEnum == GameEnum.RF1 || CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT) &&
-                    currentGameState.SessionData.SectorNumber == 3)))
-                {
-                    // If we've not yet played the pre-lights messages, just play one of them here, but not for RaceRoom as the lights will already have started
-                    if (!playedPreLightsMessage && CrewChief.gameDefinition.gameEnum != GameEnum.RACE_ROOM)
+                    if (!playedGetReady)
                     {
-                        playPreLightsMessage(currentGameState, preLightsMessageCount);
-                        purgePreLightsMessages = false;
-                    }
-                    if (purgePreLightsMessages)
-                    {
-                        audioPlayer.purgeQueues();
-                    }
-                    audioPlayer.playMessage(new QueuedMessage(folderGetReady, 0, this));
-                    playedGetReady = true;
-                }
-            }
-            if (previousGameState != null && enableGreenLightMessages && 
-                currentGameState.SessionData.SessionType == SessionType.Race &&
-                currentGameState.SessionData.SessionPhase == SessionPhase.Green && 
-                (previousGameState.SessionData.SessionPhase == SessionPhase.Formation ||
-                 previousGameState.SessionData.SessionPhase == SessionPhase.Countdown))
-            {
-                // ensure we don't play 'get ready' or any pre-lights messages again
-                playedPreLightsMessage = true;
-                playedGetReady = true;
-                int purgeCount = audioPlayer.purgeQueues();
-                if (purgeCount > 0)
-                {
-                    Console.WriteLine("Purged " + purgeCount + " outstanding messages at green light");
-                }
-                audioPlayer.playMessageImmediately(new QueuedMessage(folderGreenGreenGreen, 0, this));
-                audioPlayer.disablePearlsOfWisdom = false;
-            }
-            // looks like belt n braces but there's a bug in R3E DTM 2015 race 1 which has a number of laps and a time remaining
-            if (!currentGameState.SessionData.SessionHasFixedTime && 
-                currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.IsNewLap && currentGameState.SessionData.CompletedLaps > 0)
-            {
-                // a new lap has been started in race mode
-                if (currentGameState.SessionData.CompletedLaps == currentGameState.SessionData.SessionNumberOfLaps - 2)
-                {
-                    // disable pearls for the last part of the race
-                    audioPlayer.disablePearlsOfWisdom = true;
-                }
-                int position = currentGameState.SessionData.Position;
-                if (currentGameState.SessionData.CompletedLaps == currentGameState.SessionData.SessionNumberOfLaps - 1)
-                {
-                    Console.WriteLine("1 lap remaining, SessionHasFixedTime = " + currentGameState.SessionData.SessionHasFixedTime);
-                    if (position == 1)
-                    {
-                        audioPlayer.playMessage(new QueuedMessage(folderLastLapLeading, 0, this));
-                    }
-                    else if (position < 4)
-                    {
-                        audioPlayer.playMessage(new QueuedMessage(folderLastLapTopThree, 0, this));
-                    }
-                    else if (position > 4)
-                    {
-                        audioPlayer.playMessage(new QueuedMessage(GlobalBehaviourSettings.useAmericanTerms ? folderLastLapUS : folderLastLapEU, 0, this));
-                    }                    
-                    else
-                    {
-                        Console.WriteLine("1 lap left but position is < 1");
-                    }
-                }
-                else if (currentGameState.SessionData.CompletedLaps == currentGameState.SessionData.SessionNumberOfLaps - 2)
-                {
-                    Console.WriteLine("2 laps remaining, SessionHasFixedTime = " + currentGameState.SessionData.SessionHasFixedTime);
-                    if (position == 1)
-                    {
-                        audioPlayer.playMessage(new QueuedMessage(folderTwoLeftLeading, 0, this));
-                    }
-                    else if (position < 4)
-                    {
-                        audioPlayer.playMessage(new QueuedMessage(folderTwoLeftTopThree, 0, this));
-                    }
-                    else if (position >= currentGameState.SessionData.SessionStartPosition + 5)
-                    {
-                        // yuk... don't yell at the player for being shit if he's play Assetto. Because assetto drivers *are* shit, and also the SessionStartPosition
-                        // might be invalid so perhaps they're really not being shit. At the moment.
-                        if (CrewChief.gameDefinition.gameEnum != GameEnum.ASSETTO_32BIT && CrewChief.gameDefinition.gameEnum != GameEnum.ASSETTO_64BIT)
+                        // in the pre-lights phase
+                        if (purgePreLightsMessages)
                         {
-                            audioPlayer.playMessage(new QueuedMessage(folderTwoLeft, 0, this), PearlsOfWisdom.PearlType.BAD, 0.5);
+                            // empty the queue and play 'get ready'
+                            int purgedCount = audioPlayer.purgeQueues();
+                            Console.WriteLine("Purging pre-lights messages, removed = " + purgedCount + " messages");
+                            audioPlayer.playMessage(new QueuedMessage(folderGetReady, 0, this));
+                            playedGetReady = true;
+                        }
+                        else
+                        {
+                            if (playedPreLightsMessage && !purgePreLightsMessages)
+                            {
+                                // we've started playing the pre-lights messages. As soon as the play makes a throttle input purge this queue.
+                                // Some games hold the brake at '1' automatically on the grid, so this can't be used
+                                purgePreLightsMessages = previousGameState != null &&
+                                    currentGameState.ControlData.ThrottlePedal > 0.2 && previousGameState.ControlData.ThrottlePedal > 0.2;
+                            }
+                            else
+                            {
+                                // Play these only for race sessions. Some game-specific rules here:
+                                //      Allow messages for countdown phase for any game
+                                //      Allow messages for gridwalk phase for any game *except* Raceroom (which treats gridwalk as its own session with different data to the race session)
+                                //      Allow messages for formation phase for Raceroom
+                                //      Allow messages for formation phase for RF1 (AMS) and rF2 only when we enter sector 3 of the formation lap.
+                                if (currentGameState.SessionData.SessionType == SessionType.Race &&
+                                        (currentGameState.SessionData.SessionPhase == SessionPhase.Countdown ||
+                                        (currentGameState.SessionData.SessionPhase == SessionPhase.Gridwalk && CrewChief.gameDefinition.gameEnum != GameEnum.RACE_ROOM) ||
+                                        (currentGameState.SessionData.SessionPhase == SessionPhase.Formation && CrewChief.gameDefinition.gameEnum == GameEnum.RACE_ROOM) ||
+                                        (currentGameState.SessionData.SessionPhase == SessionPhase.Formation && (CrewChief.gameDefinition.gameEnum == GameEnum.RF1 || CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT) &&
+                                        currentGameState.SessionData.SectorNumber == 3)))
+                                {
+                                    Console.WriteLine("Queuing pre-lights messages");
+                                    playPreLightsMessage(currentGameState, 10); // queue as many messages as we have here, in any order
+                                }
+                            }
                         }
                     }
-                    else if (position >= 4)
+                }
+                else
+                {
+                    int preLightsMessageCount = CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_32BIT ||
+                                                CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_64BIT ||
+                                                CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_NETWORK ? 1 : 2;
+                    if (!playedPreLightsMessage && currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.SessionPhase == SessionPhase.Gridwalk &&
+                        (playPreLightsInRaceroom || CrewChief.gameDefinition.gameEnum != GameEnum.RACE_ROOM))
                     {
-                        audioPlayer.playMessage(new QueuedMessage(folderTwoLeft, 0, this), PearlsOfWisdom.PearlType.NEUTRAL, 0.5);
+                        playPreLightsMessage(currentGameState, preLightsMessageCount);
+                        purgePreLightsMessages = true;
                     }
-                    else
+                    // TODO: in R3E online there's a GridWalk phase before the Countdown. In PCars they're combined. Add some messages to this phase.
+
+                    // R3E's gridWalk phase isn't useable here - the data during this phase are bollocks
+                    if (!playedGetReady && currentGameState.SessionData.SessionType == SessionType.Race && (currentGameState.SessionData.SessionPhase == SessionPhase.Countdown ||
+                        (currentGameState.SessionData.SessionPhase == SessionPhase.Formation && CrewChief.gameDefinition.gameEnum == GameEnum.RACE_ROOM) ||
+                        // play 'get ready' message when entering sector 3 of formation lap in Automobilista and RF2
+                        (currentGameState.SessionData.SessionPhase == SessionPhase.Formation && (CrewChief.gameDefinition.gameEnum == GameEnum.RF1 || CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT) &&
+                        currentGameState.SessionData.SectorNumber == 3)))
                     {
-                        Console.WriteLine("2 laps left but position is < 1");
+                        // If we've not yet played the pre-lights messages, just play one of them here, but not for RaceRoom as the lights will already have started
+                        if (!playedPreLightsMessage && CrewChief.gameDefinition.gameEnum != GameEnum.RACE_ROOM)
+                        {
+                            playPreLightsMessage(currentGameState, preLightsMessageCount);
+                            purgePreLightsMessages = false;
+                        }
+                        if (purgePreLightsMessages)
+                        {
+                            audioPlayer.purgeQueues();
+                        }
+                        audioPlayer.playMessage(new QueuedMessage(folderGetReady, 0, this));
+                        playedGetReady = true;
                     }
-                    // 2 laps left, so prevent any further pearls of wisdom being added
+                }
+                if (previousGameState != null && enableGreenLightMessages &&
+                    currentGameState.SessionData.SessionType == SessionType.Race &&
+                    currentGameState.SessionData.SessionPhase == SessionPhase.Green &&
+                    (previousGameState.SessionData.SessionPhase == SessionPhase.Formation ||
+                     previousGameState.SessionData.SessionPhase == SessionPhase.Countdown))
+                {
+                    // ensure we don't play 'get ready' or any pre-lights messages again
+                    playedPreLightsMessage = true;
+                    playedGetReady = true;
+                    int purgeCount = audioPlayer.purgeQueues();
+                    if (purgeCount > 0)
+                    {
+                        Console.WriteLine("Purged " + purgeCount + " outstanding messages at green light");
+                    }
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderGreenGreenGreen, 0, this));
+                    audioPlayer.disablePearlsOfWisdom = false;
+                }
+                // looks like belt n braces but there's a bug in R3E DTM 2015 race 1 which has a number of laps and a time remaining
+                if (!currentGameState.SessionData.SessionHasFixedTime &&
+                    currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.IsNewLap && currentGameState.SessionData.CompletedLaps > 0)
+                {
+                    // a new lap has been started in race mode
+                    if (currentGameState.SessionData.CompletedLaps == currentGameState.SessionData.SessionNumberOfLaps - 2)
+                    {
+                        // disable pearls for the last part of the race
+                        audioPlayer.disablePearlsOfWisdom = true;
+                    }
+                    int position = currentGameState.SessionData.Position;
+                    if (currentGameState.SessionData.CompletedLaps == currentGameState.SessionData.SessionNumberOfLaps - 1)
+                    {
+                        Console.WriteLine("1 lap remaining, SessionHasFixedTime = " + currentGameState.SessionData.SessionHasFixedTime);
+                        if (position == 1)
+                        {
+                            audioPlayer.playMessage(new QueuedMessage(folderLastLapLeading, 0, this));
+                        }
+                        else if (position < 4)
+                        {
+                            audioPlayer.playMessage(new QueuedMessage(folderLastLapTopThree, 0, this));
+                        }
+                        else if (position > 4)
+                        {
+                            audioPlayer.playMessage(new QueuedMessage(GlobalBehaviourSettings.useAmericanTerms ? folderLastLapUS : folderLastLapEU, 0, this));
+                        }
+                        else
+                        {
+                            Console.WriteLine("1 lap left but position is < 1");
+                        }
+                    }
+                    else if (currentGameState.SessionData.CompletedLaps == currentGameState.SessionData.SessionNumberOfLaps - 2)
+                    {
+                        Console.WriteLine("2 laps remaining, SessionHasFixedTime = " + currentGameState.SessionData.SessionHasFixedTime);
+                        if (position == 1)
+                        {
+                            audioPlayer.playMessage(new QueuedMessage(folderTwoLeftLeading, 0, this));
+                        }
+                        else if (position < 4)
+                        {
+                            audioPlayer.playMessage(new QueuedMessage(folderTwoLeftTopThree, 0, this));
+                        }
+                        else if (position >= currentGameState.SessionData.SessionStartPosition + 5)
+                        {
+                            // yuk... don't yell at the player for being shit if he's play Assetto. Because assetto drivers *are* shit, and also the SessionStartPosition
+                            // might be invalid so perhaps they're really not being shit. At the moment.
+                            if (CrewChief.gameDefinition.gameEnum != GameEnum.ASSETTO_32BIT && CrewChief.gameDefinition.gameEnum != GameEnum.ASSETTO_64BIT)
+                            {
+                                audioPlayer.playMessage(new QueuedMessage(folderTwoLeft, 0, this), PearlsOfWisdom.PearlType.BAD, 0.5);
+                            }
+                        }
+                        else if (position >= 4)
+                        {
+                            audioPlayer.playMessage(new QueuedMessage(folderTwoLeft, 0, this), PearlsOfWisdom.PearlType.NEUTRAL, 0.5);
+                        }
+                        else
+                        {
+                            Console.WriteLine("2 laps left but position is < 1");
+                        }
+                        // 2 laps left, so prevent any further pearls of wisdom being added
+                    }
                 }
             }
         }
