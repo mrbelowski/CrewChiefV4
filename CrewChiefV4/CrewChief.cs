@@ -512,7 +512,14 @@ namespace CrewChiefV4
                             {
                                 Console.WriteLine("Reached the end of the data file, sleeping to clear queued messages");
                                 Thread.Sleep(5000);
-                                audioPlayer.purgeQueues();
+                                try
+                                {
+                                    audioPlayer.purgeQueues();
+                                }
+                                catch (Exception)
+                                {
+                                    // ignore
+                                }
                                 running = false;
                                 continue;
                             }
