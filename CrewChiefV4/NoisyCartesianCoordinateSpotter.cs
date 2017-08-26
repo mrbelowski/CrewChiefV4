@@ -249,6 +249,10 @@ namespace CrewChiefV4
         public void triggerInternal(float playerRotationInRadians, float[] currentPlayerPosition,
             float[] playerVelocityData, List<float[]> currentOpponentPositions)
         {
+            if (GameStateData.onManualFormationLap)
+            {
+                return;
+            }
             DateTime now = DateTime.Now;
 
             if (currentPlayerPosition[0] != 0 && currentPlayerPosition[1] != 0 &&

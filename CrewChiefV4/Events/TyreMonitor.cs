@@ -325,6 +325,10 @@ namespace CrewChiefV4.Events
 
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
+            if (GameStateData.onManualFormationLap)
+            {
+                return;
+            }
             if (logTemps && currentGameState.SessionData.IsNewSector)
             {
                 logTyreTemps(currentGameState.TyreData, currentGameState.SessionData.SectorNumber, currentGameState.SessionData.CompletedLaps);
