@@ -209,7 +209,7 @@ namespace CrewChiefV4.Events
             if (GameStateData.useManualFormationLap)
             {
                 // wait a while before enabling formation lap stuff
-                if (currentGameState.SessionData.SessionRunningTime > 10)
+                if (currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.SessionRunningTime > 10)
                 {
                     if (GameStateData.onManualFormationLap && currentGameState.SessionData.SessionStartPosition > currentGameState.SessionData.Position &&
                         nextManualFormationOvertakeWarning < currentGameState.Now)
