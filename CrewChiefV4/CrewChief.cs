@@ -255,6 +255,7 @@ namespace CrewChiefV4
                 GameStateData.useManualFormationLap = true;
                 GameStateData.onManualFormationLap = true;
             }
+            Console.WriteLine("Manual formation lap mode is ACTIVE");
             audioPlayer.playMessageImmediately(new QueuedMessage(LapCounter.folderManualFormationLapModeEnabled, 0, null));
         }
 
@@ -265,6 +266,7 @@ namespace CrewChiefV4
                 GameStateData.useManualFormationLap = false;
                 GameStateData.onManualFormationLap = false;
             }
+            Console.WriteLine("Manual formation lap mode is DISABLED");
             audioPlayer.playMessageImmediately(new QueuedMessage(LapCounter.folderManualFormationLapModeDisabled, 0, null));
         }
 
