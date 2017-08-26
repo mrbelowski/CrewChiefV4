@@ -24,8 +24,6 @@ namespace CrewChiefV4.Events
         // toggle / request acknowledgements when enabling / disabling manual formation lap mode
         public static String folderManualFormationLapModeEnabled = "lap_counter/manual_formation_lap_mode_enabled";
         public static String folderManualFormationLapModeDisabled = "lap_counter/manual_formation_lap_mode_disabled";
-        // only allow this mode to be enabled if we're on the first lap
-        public static Boolean isOnFirstLap = true;
 
         private Boolean playedManualStartGetReady = false;
         private Boolean playedManualStartLeaderHasCrossedLine = false;
@@ -93,7 +91,6 @@ namespace CrewChiefV4.Events
             playedManualStartGetReady = false;
             playedManualStartLeaderHasCrossedLine = false;
             nextManualFormationOvertakeWarning = DateTime.MinValue;
-            LapCounter.isOnFirstLap = true;
         }
 
         private void playPreLightsMessage(GameStateData currentGameState, int maxNumberToPlay)
