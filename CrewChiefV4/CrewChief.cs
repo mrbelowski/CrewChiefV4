@@ -250,7 +250,7 @@ namespace CrewChiefV4
 
         public void enableManualFormationLapMode()
         {
-            if (!GameStateData.useManualFormationLap && LapCounter.isOnFirstLap)
+            if (!GameStateData.useManualFormationLap)
             {
                 GameStateData.useManualFormationLap = true;
                 GameStateData.onManualFormationLap = true;
