@@ -211,7 +211,7 @@ namespace CrewChiefV4.Events
                 // wait a while before enabling formation lap stuff
                 if (currentGameState.SessionData.SessionRunningTime > 10)
                 {
-                    if (GameStateData.onManualFormationLap && currentGameState.SessionData.SessionStartPosition < currentGameState.SessionData.Position &&
+                    if (GameStateData.onManualFormationLap && currentGameState.SessionData.SessionStartPosition > currentGameState.SessionData.Position &&
                         nextManualFormationOvertakeWarning < currentGameState.Now)
                     {
                         // we've overtaken someone
@@ -224,7 +224,8 @@ namespace CrewChiefV4.Events
                         OpponentData leader = currentGameState.getOpponentAtPosition(1, false);
                         if (leader != null)
                         {
-                            if (!playedManualStartGetReady && leader.DistanceRoundTrack > currentGameState.SessionData.TrackDefinition.trackLength - 200)
+                            if (!playedManualStartGetReady && leader.CurrentSectorNumber == 3 &&
+                                leader.DistanceRoundTrack > currentGameState.SessionData.TrackDefinition.trackLength - 200)
                             {
                                 audioPlayer.playMessage(new QueuedMessage(folderGetReady, 0, this));
                                 playedManualStartGetReady = true;
@@ -243,13 +244,14 @@ namespace CrewChiefV4.Events
                     else
                     {
                         // we're the leader, so play get ready when we're near the line
-                        if (!playedManualStartGetReady && currentGameState.PositionAndMotionData.DistanceRoundTrack > currentGameState.SessionData.TrackDefinition.trackLength - 100)
+                        if (!playedManualStartGetReady && currentGameState.SessionData.SectorNumber == 3 &&
+                            currentGameState.PositionAndMotionData.DistanceRoundTrack > currentGameState.SessionData.TrackDefinition.trackLength - 100)
                         {
                             audioPlayer.playMessage(new QueuedMessage(folderGetReady, 0, this));
                             playedManualStartGetReady = true;
                         }
                     }
-                    if (currentGameState.SessionData.CompletedLaps == 1)
+                    if (currentGameState.SessionData.CompletedLaps == 1 && GameStateData.onManualFormationLap)
                     {
                         audioPlayer.playMessageImmediately(new QueuedMessage(folderGreenGreenGreen, 0, this));
                         GameStateData.onManualFormationLap = false;
