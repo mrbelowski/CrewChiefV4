@@ -167,7 +167,7 @@ namespace CrewChiefV4.Events
             return currentGameState != null && isApplicableForCurrentSessionAndPhase(currentGameState.SessionData.SessionType, currentGameState.SessionData.SessionPhase);
         }
 
-        public Boolean isApplicableForCurrentSessionAndPhase(SessionType sessionType, SessionPhase sessionPhase)
+        public virtual Boolean isApplicableForCurrentSessionAndPhase(SessionType sessionType, SessionPhase sessionPhase)
         {
             return applicableSessionPhases.Contains(sessionPhase) && applicableSessionTypes.Contains(sessionType);
         }

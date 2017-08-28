@@ -51,7 +51,12 @@ namespace CrewChiefV4
                 String options = SpeechRecognitionConfig[key];
                 if (options.Contains(":"))
                 {
-                    return options.Split(':');
+                    var phrases = options.Split(':');
+                    for (int i = 0; i < phrases.Length; ++i)
+                    {
+                        phrases[i] = phrases[i].Trim();
+                    }
+                    return phrases;
                 }
                 else
                 {

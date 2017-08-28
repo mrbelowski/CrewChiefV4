@@ -50,6 +50,8 @@ namespace CrewChiefV4
         public static String[] WHATS_THE_TIME = Configuration.getSpeechRecognitionPhrases("WHATS_THE_TIME");
         public static String[] ENABLE_YELLOW_FLAG_MESSAGES = Configuration.getSpeechRecognitionPhrases("ENABLE_YELLOW_FLAG_MESSAGES");
         public static String[] DISABLE_YELLOW_FLAG_MESSAGES = Configuration.getSpeechRecognitionPhrases("DISABLE_YELLOW_FLAG_MESSAGES");
+        public static String[] ENABLE_MANUAL_FORMATION_LAP = Configuration.getSpeechRecognitionPhrases("ENABLE_MANUAL_FORMATION_LAP");
+        public static String[] DISABLE_MANUAL_FORMATION_LAP = Configuration.getSpeechRecognitionPhrases("DISABLE_MANUAL_FORMATION_LAP");
 
         public static String[] WHOS_IN_FRONT_IN_THE_RACE = Configuration.getSpeechRecognitionPhrases("WHOS_IN_FRONT_IN_THE_RACE");
         public static String[] WHOS_BEHIND_IN_THE_RACE = Configuration.getSpeechRecognitionPhrases("WHOS_BEHIND_IN_THE_RACE");
@@ -256,6 +258,8 @@ namespace CrewChiefV4
                 validateAndAdd(WHATS_THE_FASTEST_LAP_TIME, staticSpeechChoices);
                 validateAndAdd(ENABLE_YELLOW_FLAG_MESSAGES, staticSpeechChoices);
                 validateAndAdd(DISABLE_YELLOW_FLAG_MESSAGES, staticSpeechChoices);
+                validateAndAdd(ENABLE_MANUAL_FORMATION_LAP, staticSpeechChoices);
+                validateAndAdd(DISABLE_MANUAL_FORMATION_LAP, staticSpeechChoices);
 
                 validateAndAdd(WHERE_AM_I_FASTER, staticSpeechChoices);
                 validateAndAdd(WHERE_AM_I_SLOWER, staticSpeechChoices);
@@ -531,6 +535,14 @@ namespace CrewChiefV4
             else if (ResultContains(recognisedSpeech, DISABLE_YELLOW_FLAG_MESSAGES))
             {
                 crewChief.disableYellowFlagMessages();
+            }
+            else if (ResultContains(recognisedSpeech, ENABLE_MANUAL_FORMATION_LAP))
+            {
+                crewChief.enableManualFormationLapMode();
+            }
+            else if (ResultContains(recognisedSpeech, DISABLE_MANUAL_FORMATION_LAP))
+            {
+                crewChief.disableManualFormationLapMode();
             }
             else if (ResultContains(recognisedSpeech, WHATS_THE_TIME))
             {
