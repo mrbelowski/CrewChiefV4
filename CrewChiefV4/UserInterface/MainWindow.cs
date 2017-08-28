@@ -80,7 +80,10 @@ namespace CrewChiefV4
         private ControlWriter cw = null;
 
         private float currentVolume = -1;
-                        
+        private NotifyIcon notifyIcon;
+        private ToolStripItem notifyContextMenuStartItem;
+        private ToolStripItem notifyContextMenuStopItem;
+
         private void FormMain_Load(object sender, EventArgs e)
         {            
             // Some update test code - uncomment this to allow the app to process an update .zip file in the root of the sound pack
@@ -460,11 +463,51 @@ namespace CrewChiefV4
                 cw.textbox = null;
                 cw.Dispose();
             }
-        } 
+        }
+
+        private void SetUpTrayIcon()
+        {
+            notifyIcon = new NotifyIcon();
+
+            // TODO: UI crap, display state in a baloon (Listening to: rFactor 2).  Potentially, also add game name start/stop button
+            // Then, add start minimize to tray property and start minimized
+            // lastly, do not minimize first launch after upgrade.
+            notifyIcon.BalloonTipText = "Ballon minimize text";
+            notifyIcon.BalloonTipTitle = "Ballon minimize title";
+            notifyIcon.Text = "Icon hover text";
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainWindow));
+            notifyIcon.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            notifyIcon.DoubleClick += NotifyIcon_DoubleClick;
+
+            var cms = new ContextMenuStrip();
+            cms.Items.Add("Restore");
+            cms.Items.Add(new ToolStripSeparator());
+            notifyContextMenuStartItem = cms.Items.Add("Start", null, this.startApplicationButton_Click);
+            notifyContextMenuStopItem = cms.Items.Add("Stop", null, this.startApplicationButton_Click);
+            cms.Items.Add(new ToolStripSeparator());
+            cms.Items.Add("Close");
+            cms.Opening += ContextMenu_Opening;
+
+            notifyIcon.ContextMenuStrip = cms;
+        }
+
+        private void ContextMenu_Opening(object sender, CancelEventArgs e)
+        {
+            this.notifyContextMenuStartItem.Enabled = !this._IsAppRunning;
+            this.notifyContextMenuStopItem.Enabled = this._IsAppRunning;
+        }
+
+        private void NotifyIcon_DoubleClick(object sender, EventArgs e)
+        {
+            this.notifyIcon.Visible = false;
+            this.Show();
+            this.WindowState = FormWindowState.Normal;
+        }
 
         public MainWindow()
         {
             InitializeComponent();
+            SetUpTrayIcon();
             CheckForIllegalCrossThreadCalls = false;
             cw = new ControlWriter(textBox1);
             textBox1.KeyDown += TextBox1_KeyDown;
@@ -605,6 +648,17 @@ namespace CrewChiefV4
                 GameDefinition.getGameDefinitionForFriendlyName(gameDefinitionList.Text) != null)
             {
                 doStartAppStuff();
+            }
+
+            this.Resize += MainWindow_Resize;
+        }
+
+        private void MainWindow_Resize(object sender, EventArgs e)
+        {
+            if (this.WindowState == FormWindowState.Minimized)
+            {
+                this.Hide();
+                this.notifyIcon.Visible = true;
             }
         }
 
