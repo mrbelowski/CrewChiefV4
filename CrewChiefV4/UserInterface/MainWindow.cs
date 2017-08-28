@@ -472,6 +472,7 @@ namespace CrewChiefV4
             // TODO: UI crap, display state in a baloon (Listening to: rFactor 2).  Potentially, also add game name start/stop button
             // Then, add start minimize to tray property and start minimized
             // lastly, do not minimize first launch after upgrade.
+            // CrewChief.gameDefinition.gameEnum  for text.
             notifyIcon.BalloonTipText = "Ballon minimize text";
             notifyIcon.BalloonTipTitle = "Ballon minimize title";
             notifyIcon.Text = "Icon hover text";
@@ -480,15 +481,28 @@ namespace CrewChiefV4
             notifyIcon.DoubleClick += NotifyIcon_DoubleClick;
 
             var cms = new ContextMenuStrip();
-            cms.Items.Add("Restore");
+            var cmi = cms.Items.Add("Restore");
+            cmi.Click += ContextMenu_Restore_Click;
             cms.Items.Add(new ToolStripSeparator());
             notifyContextMenuStartItem = cms.Items.Add("Start", null, this.startApplicationButton_Click);
             notifyContextMenuStopItem = cms.Items.Add("Stop", null, this.startApplicationButton_Click);
             cms.Items.Add(new ToolStripSeparator());
-            cms.Items.Add("Close");
+            cmi = cms.Items.Add("Close");
+            cmi.Click += ContextMenu_Close_Click;
             cms.Opening += ContextMenu_Opening;
 
             notifyIcon.ContextMenuStrip = cms;
+        }
+
+        private void ContextMenu_Close_Click(object sender, EventArgs e)
+        {
+            this.notifyIcon.Visible = false;
+            this.Close();
+        }
+
+        private void ContextMenu_Restore_Click(object sender, EventArgs e)
+        {
+            this.NotifyIcon_DoubleClick(sender, e);
         }
 
         private void ContextMenu_Opening(object sender, CancelEventArgs e)
