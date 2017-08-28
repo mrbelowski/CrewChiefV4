@@ -1038,34 +1038,63 @@ namespace CrewChiefV4.rFactor1
         public SessionType mapToSessionType(Object memoryMappedFileStruct)
         {
             rFactor1Data.rfShared shared = (rFactor1Data.rfShared)memoryMappedFileStruct;
-            switch (shared.session)
+            if (CrewChief.gameDefinition == GameDefinition.rFactor1)
             {
-                // up to four possible practice sessions
-                case 1:
-                case 2:
-                case 3:
-                case 4:
-                // test day and pre-race warm-up sessions are 'Practice' as well since 'HotLap' seems to suppress flag info
-                case 0:
-                case 9:
-                    return SessionType.Practice;
-                // up to four possible qualifying sessions
-                case 5:
-                case 6:
-                case 7:
-                case 8:
-                    return SessionType.Qualify;
-                // up to four possible race sessions
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                    return SessionType.Race;
-                // Reiza Time Trial Mode
-                case 14:
-                    return SessionType.HotLap;
-                default:
-                    return SessionType.Unavailable;
+                // I don't have RF1 so am guessing at these
+                switch (shared.session)
+                {
+                    // up to three possible practice sessions?
+                    case 1:
+                    case 2:
+                    case 3:
+                    // test day and pre-race warm-up sessions are 'Practice' as well since 'HotLap' seems to suppress flag info?
+                    case 0:
+                    case 6:
+                        return SessionType.Practice;
+                    // one qualifying session?
+                    case 5:
+                        return SessionType.Qualify;
+                    // no idea how many race sessions are available and if there's a session type > 7
+                    case 7:
+                    case 8:
+                    case 9:
+                    case 10:
+                        return SessionType.Race;
+                    default:
+                        return SessionType.Unavailable;
+                }
+            }
+            else
+            {
+                switch (shared.session)
+                {
+                    // up to four possible practice sessions
+                    case 1:
+                    case 2:
+                    case 3:
+                    case 4:
+                    // test day and pre-race warm-up sessions are 'Practice' as well since 'HotLap' seems to suppress flag info
+                    case 0:
+                    case 9:
+                        return SessionType.Practice;
+                    // up to four possible qualifying sessions
+                    case 5:
+                    case 6:
+                    case 7:
+                    case 8:
+                        return SessionType.Qualify;
+                    // up to four possible race sessions
+                    case 10:
+                    case 11:
+                    case 12:
+                    case 13:
+                        return SessionType.Race;
+                    // Reiza Time Trial Mode
+                    case 14:
+                        return SessionType.HotLap;
+                    default:
+                        return SessionType.Unavailable;
+                }
             }
         }
 
