@@ -31,6 +31,11 @@ namespace CrewChiefV4.Events
             return true;
         }
 
+        public override Boolean isApplicableForCurrentSessionAndPhase(SessionType sessionType, SessionPhase sessionPhase)
+        {
+            return true;
+        }
+        
         private OpponentData makeTempDriver(String driverName, List<String> rawDriverNames)
         {
             OpponentData opponent = new OpponentData();

@@ -1603,6 +1603,18 @@ namespace CrewChiefV4.GameState
 
     public class GameStateData
     {
+        // first some static crap to ensure the code is sufficiently badly factored
+
+        // public because who the fuck knows what'll set and unset these...
+        public static Boolean useManualFormationLap = false;
+        public static Boolean onManualFormationLap = false;
+        // "get ready"
+        public static Boolean manualFormationLapTransitionToStartPhase = false;
+        // "leader has crossed the line" - only if we're more than a few places behind him
+        public static Boolean manualFormationLapLeaderCrossedLine = false;
+        // "go go go"
+        public static Boolean manualFormationLapTransitionToGreen = false;
+
         public static DateTime CurrentTime = DateTime.Now;
 
         public long Ticks;

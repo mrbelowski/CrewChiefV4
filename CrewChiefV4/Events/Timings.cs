@@ -203,6 +203,10 @@ namespace CrewChiefV4.Events
 
         protected override void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
+            if (GameStateData.onManualFormationLap)
+            {
+                return;
+            }
             isLeading = currentGameState.SessionData.Position == 1;
             isLast = currentGameState.isLast();
             isRace = currentGameState.SessionData.SessionType == SessionType.Race;
