@@ -221,6 +221,7 @@ namespace CrewChiefV4.RaceRoom
                         GlobalBehaviourSettings.UpdateFromCarClass(currentGameState.carClass);
                         Console.WriteLine("Player is using car class " + currentGameState.carClass.getClassIdentifier() + " (class ID " + participantStruct.DriverInfo.ClassId + ")");
                         brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(currentGameState.carClass);
+                        Utilities.TraceEventClass(currentGameState);
                     }
                     else
                     {

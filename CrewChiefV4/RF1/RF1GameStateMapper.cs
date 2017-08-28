@@ -955,8 +955,9 @@ namespace CrewChiefV4.rFactor1
                 Console.WriteLine("SessionStartPosition " + currentGameState.SessionData.SessionStartPosition);
                 Console.WriteLine("SessionStartTime " + currentGameState.SessionData.SessionStartTime);
                 Console.WriteLine("TrackName " + currentGameState.SessionData.TrackDefinition.name);
-                Console.WriteLine("Player is using car class " + currentGameState.carClass.getClassIdentifier() + 
+                Console.WriteLine("Player is using car class " + currentGameState.carClass.getClassIdentifier() +
                     " at position " + currentGameState.SessionData.Position.ToString());
+                Utilities.TraceEventClass(currentGameState);
             }
             if (previousGameState != null && previousGameState.SessionData.SessionPhase != currentGameState.SessionData.SessionPhase)
             {
