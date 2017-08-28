@@ -910,26 +910,31 @@ namespace CrewChiefV4.Audio
 
         public int purgeQueues()
         {
+            return purgeQueue(queuedClips) + purgeQueue(immediateClips);
+        }
+
+        private int purgeQueue(OrderedDictionary queue)
+        {
             int purged = 0;
-            lock (queuedClips)
+            lock (queue)
             {
-                ArrayList keysToPurge = new ArrayList(queuedClips.Keys);
+                ArrayList keysToPurge = new ArrayList(queue.Keys);
                 foreach (String keyStr in keysToPurge)
                 {
-                    if (!keyStr.Contains(SessionEndMessages.sessionEndMessageIdentifier) && queuedClips.Contains(keyStr))
+                    try
                     {
-                        queuedClips.Remove(keyStr);
-                        purged++;
+                        if (!keyStr.Contains(SessionEndMessages.sessionEndMessageIdentifier) &&
+                            !keyStr.Contains(SmokeTest.SMOKE_TEST))
+                        {
+                            queue.Remove(keyStr);
+                            purged++;
+                        }
                     }
-                    else
+                    catch (Exception)
                     {
-                        Console.WriteLine("Not purging session end message");
+                        // ignore - not sure why I'm try-catching here :)
                     }
                 }
-            }
-            lock (immediateClips)
-            {
-                immediateClips.Clear();
             }
             return purged;
         }
