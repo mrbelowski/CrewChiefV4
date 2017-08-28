@@ -90,9 +90,8 @@ namespace CrewChiefV4.Events
 
         public override bool isMessageStillValid(string eventSubType, GameStateData currentGameState, Dictionary<String, Object> validationData)
         {
-            // this validates that the 'give position back' messasge only so we don't care what's in the validationData
-
-            if (manualStartOpponentAhead != null)
+            // this validates that the 'give position back' messasge only so we don't care what's in the validationData. only that it is not null
+            if (validationData != null && manualStartOpponentAhead != null)
             {
                 OpponentData currentCarAhead = currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position - 1, true);
                 if (currentCarAhead != null && currentCarAhead.DriverRawName.Equals(manualStartOpponentAhead.DriverRawName))
