@@ -273,7 +273,7 @@ namespace CrewChiefV4.Events
                             else
                             {
                                 // check if the car in front has changed
-                                OpponentData currentOpponentInFront = currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position, true);
+                                OpponentData currentOpponentInFront = currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position - 1, true);
                                 if (manualStartOpponentAhead != null && 
                                     (currentOpponentInFront == null || !manualStartOpponentAhead.DriverRawName.Equals(currentOpponentInFront.DriverRawName)))
                                 {
