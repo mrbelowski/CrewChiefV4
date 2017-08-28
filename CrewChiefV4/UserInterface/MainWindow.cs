@@ -1,16 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using CrewChiefV4;
 using System.Threading;
 using System.IO;
-using SharpDX.DirectInput;
 using System.Runtime.InteropServices;
 using AutoUpdaterDotNET;
 using System.Net;
@@ -80,9 +76,11 @@ namespace CrewChiefV4
         private ControlWriter cw = null;
 
         private float currentVolume = -1;
-        private NotifyIcon notifyIcon;
-        private ToolStripItem notifyContextMenuStartItem;
-        private ToolStripItem notifyContextMenuStopItem;
+        private NotifyIcon notificationTrayIcon;
+        private ToolStripItem contextMenuStartItem;
+        private ToolStripItem contextMenuStopItem;
+        private ToolStripMenuItem gamesContextMenu;
+        private ToolStripItem contextMenuPreferencesItem;
 
         private void FormMain_Load(object sender, EventArgs e)
         {            
@@ -465,55 +463,83 @@ namespace CrewChiefV4
             }
         }
 
-        private void SetUpTrayIcon()
+        private void SetupNotificationTrayIcon()
         {
-            notifyIcon = new NotifyIcon();
+            notificationTrayIcon = new NotifyIcon();
 
-            // TODO: UI crap, display state in a baloon (Listening to: rFactor 2).  Potentially, also add game name start/stop button
-            // Then, add start minimize to tray property and start minimized
-            // lastly, do not minimize first launch after upgrade.
-            // CrewChief.gameDefinition.gameEnum  for text.
-            notifyIcon.BalloonTipText = "Ballon minimize text";
-            notifyIcon.BalloonTipTitle = "Ballon minimize title";
-            notifyIcon.Text = "Icon hover text";
+            // Load the icon.
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainWindow));
-            notifyIcon.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            notifyIcon.DoubleClick += NotifyIcon_DoubleClick;
+            notificationTrayIcon.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            notificationTrayIcon.DoubleClick += NotifyIcon_DoubleClick;
 
             var cms = new ContextMenuStrip();
+
+            // Restore item.
             var cmi = cms.Items.Add("Restore");
-            cmi.Click += ContextMenu_Restore_Click;
+            cmi.Click += NotifyIcon_DoubleClick;
+
+            // Start/Stop items.
             cms.Items.Add(new ToolStripSeparator());
-            notifyContextMenuStartItem = cms.Items.Add("Start", null, this.startApplicationButton_Click);
-            notifyContextMenuStopItem = cms.Items.Add("Stop", null, this.startApplicationButton_Click);
+            contextMenuStartItem = cms.Items.Add("Start", null, this.startApplicationButton_Click);
+            contextMenuStopItem = cms.Items.Add("Stop", null, this.startApplicationButton_Click);
+            cms.Items.Add(new ToolStripSeparator());
+
+            // Form Game context submenu.
+            cmi = cms.Items.Add("Game");
+            gamesContextMenu = cmi as ToolStripMenuItem;
+            foreach (var game in this.gameDefinitionList.Items)
+            {
+                var ddi = gamesContextMenu.DropDownItems.Add(game.ToString());
+                ddi.Click += (sender, e) =>
+                {
+                    var gameSelected = sender as ToolStripMenuItem;
+                    if (gameSelected == null)
+                        return;
+
+                    this.gameDefinitionList.Text = gameSelected.Text;
+                };
+            }
+
+            gamesContextMenu.DropDownOpening += (sender, e) =>
+            {
+                var currGameFriendlyName = this.gameDefinitionList.Text;
+                foreach (var game in gamesContextMenu.DropDownItems)
+                {
+                    var tsmi = game as ToolStripMenuItem;
+                    tsmi.Checked = tsmi.Text == currGameFriendlyName;
+                }
+            };
+
+            // Preferences and Close items
+            contextMenuPreferencesItem = cms.Items.Add("Properties", null, this.editPropertiesButtonClicked);
             cms.Items.Add(new ToolStripSeparator());
             cmi = cms.Items.Add("Close");
-            cmi.Click += ContextMenu_Close_Click;
-            cms.Opening += ContextMenu_Opening;
+            cmi.Click += (sender, e) =>
+            {
+                this.notificationTrayIcon.Visible = false;
+                this.Close();
+            };
 
-            notifyIcon.ContextMenuStrip = cms;
-        }
+            cms.Opening += (sender, e) =>
+            {
+                this.contextMenuStartItem.Enabled = !this._IsAppRunning;
+                this.contextMenuStopItem.Enabled = this._IsAppRunning;
 
-        private void ContextMenu_Close_Click(object sender, EventArgs e)
-        {
-            this.notifyIcon.Visible = false;
-            this.Close();
-        }
+                var startPostfix = string.IsNullOrWhiteSpace(this.gameDefinitionList.Text) ? "" : this.gameDefinitionList.Text + " mode";
+                this.contextMenuStartItem.Text = "Start " + startPostfix;
 
-        private void ContextMenu_Restore_Click(object sender, EventArgs e)
-        {
-            this.NotifyIcon_DoubleClick(sender, e);
-        }
+                // Only allow game selection if we're in Stopped state.
+                foreach (var game in this.gamesContextMenu.DropDownItems)
+                    (game as ToolStripMenuItem).Enabled = !this._IsAppRunning;
+            };
 
-        private void ContextMenu_Opening(object sender, CancelEventArgs e)
-        {
-            this.notifyContextMenuStartItem.Enabled = !this._IsAppRunning;
-            this.notifyContextMenuStopItem.Enabled = this._IsAppRunning;
+
+            notificationTrayIcon.ContextMenuStrip = cms;
         }
 
         private void NotifyIcon_DoubleClick(object sender, EventArgs e)
         {
-            this.notifyIcon.Visible = false;
+            this.notificationTrayIcon.Visible = false;
             this.Show();
             this.WindowState = FormWindowState.Normal;
         }
@@ -521,7 +547,7 @@ namespace CrewChiefV4
         public MainWindow()
         {
             InitializeComponent();
-            SetUpTrayIcon();
+            SetupNotificationTrayIcon();
             CheckForIllegalCrossThreadCalls = false;
             cw = new ControlWriter(textBox1);
             textBox1.KeyDown += TextBox1_KeyDown;
@@ -672,7 +698,7 @@ namespace CrewChiefV4
             if (this.WindowState == FormWindowState.Minimized)
             {
                 this.Hide();
-                this.notifyIcon.Visible = true;
+                this.notificationTrayIcon.Visible = true;
             }
         }
 
@@ -938,6 +964,14 @@ namespace CrewChiefV4
                 this.personalisationBox.Enabled = true;
                 this.spotterNameBox.Enabled = true;
             }
+
+            this.gameDefinitionList.Enabled = !this._IsAppRunning;
+            this.contextMenuPreferencesItem.Enabled = !this._IsAppRunning;
+
+            if (this._IsAppRunning)
+                this.notificationTrayIcon.Text = "Crew Chief is running in " + this.gameDefinitionList.Text + " mode";
+            else
+                this.notificationTrayIcon.Text = "Crew Chief is stopped";  // Or idling, smoking, any good jokes?
         }
 
         private void stopApp(object sender, FormClosedEventArgs e)
@@ -1080,8 +1114,17 @@ namespace CrewChiefV4
 
         private void editPropertiesButtonClicked(object sender, EventArgs e)
         {
+            // If minized to tray, hide tray icon while properties dialog is shown,
+            // and it again when dialog is gone.  This prevents all the weird scenarios while
+            // option dialog is visible.
+            if (!this.Visible)
+                this.notificationTrayIcon.Visible = false;
+
             var form = new PropertiesForm(this);
             form.ShowDialog(this);
+
+            if (!this.Visible)
+                this.notificationTrayIcon.Visible = true;
         }
 
         private void helpButtonClicked(object sender, EventArgs e)
