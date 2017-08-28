@@ -898,7 +898,7 @@
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "varianti_alta",
+					"landmarkName": "variante_alta",
 					"distanceRoundLapStart": 3300,
 					"distanceRoundLapEnd": 3380,
 					"isCommonOvertakingSpot": true
@@ -8179,7 +8179,7 @@
 		{
 			"rf2TrackNames": ["Monte Carlo  1988"],
 			"trackLandmarks": [{
-					"landmarkName": "saint_devote",
+					"landmarkName": "sainte_devote",
 					"distanceRoundLapStart": 170,
 					"distanceRoundLapEnd": 225,
 					"isCommonOvertakingSpot": true
@@ -8197,13 +8197,13 @@
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "miabeau_haut",
+					"landmarkName": "mirabeau",
 					"distanceRoundLapStart": 1065,
 					"distanceRoundLapEnd": 1155,
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "loews_hairpin",
+					"landmarkName": "lowes",
 					"distanceRoundLapStart": 1195,
 					"distanceRoundLapEnd": 1265,
 					"isCommonOvertakingSpot": false
@@ -8261,7 +8261,7 @@
 		{
 			"rf2TrackNames": ["Hermanos Rodriguez 1988"],
 			"trackLandmarks": [{
-					"landmarkName": "ese_moises_solana",
+					"landmarkName": "esses_moises_solana",
 					"distanceRoundLapStart": 900,
 					"distanceRoundLapEnd": 1260,
 					"isCommonOvertakingSpot": true
@@ -8783,25 +8783,25 @@
 					"isCommonOvertakingSpot": true
 				},
 				{
-					"landmarkName": "curve_grande",
+					"landmarkName": "curva_grande",
 					"distanceRoundLapStart": 665,
 					"distanceRoundLapEnd": 875,
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "variante_della_roggia",
+					"landmarkName": "della_roggia",
 					"distanceRoundLapStart": 1815,
 					"distanceRoundLapEnd": 1945,
 					"isCommonOvertakingSpot": true
 				},
 				{
-					"landmarkName": "lesmo1",
+					"landmarkName": "lesmos1",
 					"distanceRoundLapStart": 2110,
 					"distanceRoundLapEnd": 2355,
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "lesmo2",
+					"landmarkName": "lesmos2",
 					"distanceRoundLapStart": 2455,
 					"distanceRoundLapEnd": 2670,
 					"isCommonOvertakingSpot": false
@@ -8813,7 +8813,7 @@
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "variante_ascari",
+					"landmarkName": "ascari",
 					"distanceRoundLapStart": 3585,
 					"distanceRoundLapEnd": 3880,
 					"isCommonOvertakingSpot": false
@@ -8999,7 +8999,7 @@
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "raidillon",
+					"landmarkName": "radillon",
 					"distanceRoundLapStart": 1070,
 					"distanceRoundLapEnd": 1210,
 					"isCommonOvertakingSpot": false
@@ -9011,7 +9011,7 @@
 					"isCommonOvertakingSpot": true
 				},
 				{
-					"landmarkName": "malmedy",
+					"landmarkName": "malmedey",
 					"distanceRoundLapStart": 2430,
 					"distanceRoundLapEnd": 2550,
 					"isCommonOvertakingSpot": false
@@ -9379,7 +9379,7 @@
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "paralbolika",
+					"landmarkName": "parabolica",
 					"distanceRoundLapStart": 1130,
 					"distanceRoundLapEnd": 1790,
 					"isCommonOvertakingSpot": false
@@ -11826,7 +11826,7 @@
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "le_tunnel",
+					"landmarkName": "the_tunnel",
 					"distanceRoundLapStart": 1785,
 					"distanceRoundLapEnd": 1975,
 					"isCommonOvertakingSpot": false
