@@ -1057,8 +1057,6 @@ namespace CrewChiefV4.rFactor1
                     // no idea how many race sessions are available and if there's a session type > 7
                     case 7:
                     case 8:
-                    case 9:
-                    case 10:
                         return SessionType.Race;
                     default:
                         return SessionType.Unavailable;
