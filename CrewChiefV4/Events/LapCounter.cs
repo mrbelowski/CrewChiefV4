@@ -17,9 +17,15 @@ namespace CrewChiefV4.Events
         private String folderGreenGreenGreen = "lap_counter/green_green_green";
 
         // used in manual rolling starts (hack...)
-        private String folderLeaderHasCrossedStartLine = "lap_counter/leader_has_crossed_start_line";
-        // used in manual rolling starts - if we pass someone play a message
-        private String folderHoldYourPosition = "lap_counter/hold_your_position";
+        public static String folderLeaderHasCrossedStartLine = "lap_counter/leader_has_crossed_start_line";
+        // used in manual rolling starts - if we pass someone play a message. We don't know if we've passed someone because of
+        // a disconnection or because we've actually overtaken, so err on the side of caution here
+        public static String folderHoldYourPosition = "lap_counter/hold_your_position";
+        public static String folderGivePositionBack = "lap_counter/give_that_position_back";
+        public static String folderManualStartInitialIntro = "lap_counter/ok_youre_in";
+        public static String folderManualStartInitialOutroNoDriverName = "lap_counter/hold_this_position_until_start_line";
+        public static String folderManualStartInitialOutroWithDriverName1 = "lap_counter/hold_position_behind";
+        public static String folderManualStartInitialOutroWithDriverName2 = "lap_counter/until_start_line";
 
         // toggle / request acknowledgements when enabling / disabling manual formation lap mode
         public static String folderManualFormationLapModeEnabled = "lap_counter/manual_formation_lap_mode_enabled";
@@ -27,6 +33,8 @@ namespace CrewChiefV4.Events
 
         private Boolean playedManualStartGetReady = false;
         private Boolean playedManualStartLeaderHasCrossedLine = false;
+        private Boolean playedManualStartInitialMessage = false;
+        private OpponentData manualStartOpponentAhead = null;
 
         public static String folderGetReady = "lap_counter/get_ready";
 
@@ -80,6 +88,22 @@ namespace CrewChiefV4.Events
             this.audioPlayer = audioPlayer;
         }
 
+        public override bool isMessageStillValid(string eventSubType, GameStateData currentGameState, Dictionary<String, Object> validationData)
+        {
+            // this validates that the 'give position back' messasge only so we don't care what's in the validationData
+
+            if (manualStartOpponentAhead != null)
+            {
+                OpponentData currentCarAhead = currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position - 1, true);
+                if (currentCarAhead != null && currentCarAhead.DriverRawName.Equals(manualStartOpponentAhead.DriverRawName))
+                {
+                    // the opponent in front is who should be in front, so the message is invalid
+                    return false;
+                }
+            }
+            return true;
+        }
+
         public override void clearState()
         {
             playedGetReady = false;
@@ -90,7 +114,9 @@ namespace CrewChiefV4.Events
             GameStateData.onManualFormationLap = GameStateData.useManualFormationLap;
             playedManualStartGetReady = false;
             playedManualStartLeaderHasCrossedLine = false;
+            playedManualStartInitialMessage = false;
             nextManualFormationOvertakeWarning = DateTime.MinValue;
+            manualStartOpponentAhead = null;
         }
 
         private void playPreLightsMessage(GameStateData currentGameState, int maxNumberToPlay)
@@ -206,54 +232,104 @@ namespace CrewChiefV4.Events
             if (GameStateData.useManualFormationLap)
             {
                 // wait a while before enabling formation lap stuff
-                if (currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.SessionRunningTime > 10)
+                if (currentGameState.SessionData.SessionType == SessionType.Race) 
                 {
-                    if (GameStateData.onManualFormationLap && currentGameState.SessionData.SessionStartPosition > currentGameState.SessionData.Position &&
-                        nextManualFormationOvertakeWarning < currentGameState.Now)
-                    {
-                        // we've overtaken someone
-                        nextManualFormationOvertakeWarning = currentGameState.Now.AddSeconds(30);
-                        audioPlayer.playMessage(new QueuedMessage(folderHoldYourPosition, 0, this));
+                    // when the lights change, give some info:
+                    if (!playedManualStartInitialMessage && previousGameState != null &&
+                        currentGameState.SessionData.SessionType == SessionType.Race &&
+                        currentGameState.SessionData.SessionPhase == SessionPhase.Green &&
+                        (previousGameState.SessionData.SessionPhase == SessionPhase.Formation ||
+                         previousGameState.SessionData.SessionPhase == SessionPhase.Countdown))
+                    { 
+                        // belt and braces - ensure the num cars and start positions are accurate as of the green light
+                        currentGameState.SessionData.NumCarsAtStartOfSession = currentGameState.SessionData.NumCars;
+                        currentGameState.SessionData.SessionStartPosition = currentGameState.SessionData.Position;
+                        manualStartOpponentAhead = currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position - 1, true);
+
+                        // use the driver name in front if we have it - if we're starting on pole the manualStartOpponentAhead var will be null,
+                        // which will force the audio player to use the secondary message
+                        audioPlayer.playMessage(new QueuedMessage("manual_start_intro",
+                            MessageContents(folderManualStartInitialIntro, 
+                            Position.folderStub + currentGameState.SessionData.Position, folderManualStartInitialOutroWithDriverName1,
+                            manualStartOpponentAhead, folderManualStartInitialOutroWithDriverName2),
+                            MessageContents(folderManualStartInitialIntro, 
+                            Position.folderStub + currentGameState.SessionData.Position, folderManualStartInitialOutroNoDriverName), 0, this));
+                        playedManualStartInitialMessage = true;
+
                     }
-                    if (currentGameState.SessionData.Position > 1)
+                    // don't both with any other messages until things have had a few seconds to settle down:
+                    else if (currentGameState.SessionData.SessionRunningTime > 10)
                     {
-                        // we're not the leader, so give leader updates
-                        OpponentData leader = currentGameState.getOpponentAtPosition(1, false);
-                        if (leader != null)
+                        if (GameStateData.onManualFormationLap && currentGameState.SessionData.SessionStartPosition > currentGameState.SessionData.Position &&
+                            nextManualFormationOvertakeWarning < currentGameState.Now)
                         {
-                            if (!playedManualStartGetReady && leader.CurrentSectorNumber == 3 &&
-                                leader.DistanceRoundTrack > currentGameState.SessionData.TrackDefinition.trackLength - 200)
+                            // we've overtaken someone
+                            nextManualFormationOvertakeWarning = currentGameState.Now.AddSeconds(30);
+                            // if the number of cars in the session has reduced, just play a 'hold your position' message - 
+                            // perhaps someone disconnected in front.
+                            if (currentGameState.SessionData.NumCarsAtStartOfSession > currentGameState.SessionData.NumCars)
+                            {
+                                audioPlayer.playMessage(new QueuedMessage(folderHoldYourPosition, 0, this));
+                            }
+                            else
+                            {
+                                // check if the car in front has changed
+                                OpponentData currentOpponentInFront = currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position, true);
+                                if (manualStartOpponentAhead != null && 
+                                    (currentOpponentInFront == null || !manualStartOpponentAhead.DriverRawName.Equals(currentOpponentInFront.DriverRawName)))
+                                {
+                                    // delay and validate this message so we don't grumble about a different car in front if a couple of
+                                    // cars fall back through the field for whatever reason
+                                    audioPlayer.playMessage(new QueuedMessage("give_position_back",
+                                        MessageContents(folderGivePositionBack, folderManualStartInitialOutroWithDriverName1, manualStartOpponentAhead),
+                                        MessageContents(folderGivePositionBack), 5, this, new Dictionary<String, Object>()));
+                                }
+                            }
+                        }
+                        if (currentGameState.SessionData.Position > 1)
+                        {
+                            // we're not the leader, so give leader updates
+                            OpponentData leader = currentGameState.getOpponentAtPosition(1, false);
+                            if (leader != null)
+                            {
+                                if (!playedManualStartGetReady && leader.CurrentSectorNumber == 3 &&
+                                    leader.DistanceRoundTrack > currentGameState.SessionData.TrackDefinition.trackLength - 200)
+                                {
+                                    audioPlayer.playMessage(new QueuedMessage(folderGetReady, 0, this));
+                                    playedManualStartGetReady = true;
+                                }
+                                if (!playedManualStartLeaderHasCrossedLine && leader.CompletedLaps == 1)
+                                {
+                                    playedManualStartLeaderHasCrossedLine = true;
+                                    if (currentGameState.SessionData.Position > 3)
+                                    {
+                                        // don't play this if we're right with the leader?
+                                        audioPlayer.playMessageImmediately(new QueuedMessage(folderLeaderHasCrossedStartLine, 0, this));
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            // we're the leader, so play get ready when we're near the line
+                            if (!playedManualStartGetReady && currentGameState.SessionData.SectorNumber == 3 &&
+                                currentGameState.PositionAndMotionData.DistanceRoundTrack > currentGameState.SessionData.TrackDefinition.trackLength - 100)
                             {
                                 audioPlayer.playMessage(new QueuedMessage(folderGetReady, 0, this));
                                 playedManualStartGetReady = true;
                             }
-                            if (!playedManualStartLeaderHasCrossedLine && leader.CompletedLaps == 1)
-                            {
-                                playedManualStartLeaderHasCrossedLine = true;
-                                if (currentGameState.SessionData.Position > 3)
-                                {
-                                    // don't play this if we're right with the leader?
-                                    audioPlayer.playMessageImmediately(new QueuedMessage(folderLeaderHasCrossedStartLine, 0, this));
-                                }
-                            }
                         }
-                    }
-                    else
-                    {
-                        // we're the leader, so play get ready when we're near the line
-                        if (!playedManualStartGetReady && currentGameState.SessionData.SectorNumber == 3 &&
-                            currentGameState.PositionAndMotionData.DistanceRoundTrack > currentGameState.SessionData.TrackDefinition.trackLength - 100)
+                        if (currentGameState.SessionData.CompletedLaps == 1 && GameStateData.onManualFormationLap)
                         {
-                            audioPlayer.playMessage(new QueuedMessage(folderGetReady, 0, this));
+                            audioPlayer.playMessageImmediately(new QueuedMessage(folderGreenGreenGreen, 0, this));
+                            GameStateData.onManualFormationLap = false;
+                            // switch off the other updates
+                            playedManualStartLeaderHasCrossedLine = true;
                             playedManualStartGetReady = true;
+                            playedManualStartInitialMessage = true;
                         }
-                    }
-                    if (currentGameState.SessionData.CompletedLaps == 1 && GameStateData.onManualFormationLap)
-                    {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(folderGreenGreenGreen, 0, this));
-                        GameStateData.onManualFormationLap = false;
-                    }
-                }                
+                    }  
+                }
             }
             else
             {
