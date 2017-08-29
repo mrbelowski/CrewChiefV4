@@ -274,6 +274,37 @@ namespace CrewChiefV4
                             downloadPersonalisationsButton.Enabled = false;
                             downloadPersonalisationsButton.BackColor = Color.LightGray;
                         }
+
+                        if (newSoundPackAvailable || newPersonalisationsAvailable || newDriverNamesAvailable)
+                        {
+                            // Ok, we have something available for download (any of the buttons is green).
+                            // Restore CC once so that user gets higher chance of noticing.
+                            // I am not sure what is the best approach, we could also have text in the context menu,
+                            // but I definitely dislike Balloons and other distracting methods.  But, basically if we choose
+                            // to do anything, do it here.
+                            // This has limitation if, say, we have sound pack available, and at next startup we have driver pack
+                            // available, one property is not enough.  But this is ultra rare and not worth complications.
+
+                            if (!UserSettings.GetUserSettings().getBoolean("update_notify_attempted"))
+                            {
+                                // Do this once per update availability.
+                                UserSettings.GetUserSettings().setProperty("update_notify_attempted", true);
+                                UserSettings.GetUserSettings().saveUserSettings();
+
+                                // Slight race with minimize on startup :D
+                                this.Invoke((MethodInvoker)delegate
+                                {
+                                    this.RestoreFromTray();
+                                });
+                            }
+                        }
+                        else
+                        {
+                            // If there are no updates available, clear pit update notify attempted flag.
+                            UserSettings.GetUserSettings().setProperty("update_notify_attempted", false);
+                            UserSettings.GetUserSettings().saveUserSettings();
+                        }
+
                         Console.WriteLine("Check for updates completed");
                     }
                     catch (Exception error)
