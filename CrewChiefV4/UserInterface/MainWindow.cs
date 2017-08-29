@@ -81,6 +81,7 @@ namespace CrewChiefV4
         private ToolStripItem contextMenuStopItem;
         private ToolStripMenuItem gamesContextMenu;
         private ToolStripItem contextMenuPreferencesItem;
+        private Boolean minimizeToTray = UserSettings.GetUserSettings().getBoolean("minimize_to_tray");
 
         private void FormMain_Load(object sender, EventArgs e)
         {            
@@ -282,13 +283,20 @@ namespace CrewChiefV4
                 }
             }).Start();
 
-            // TODO: check property for minimize on startup.
-            this.HideToTray();
+            if (UserSettings.GetUserSettings().getBoolean("minimize_on_startup"))
+            {
+                if (this.minimizeToTray)
+                    this.HideToTray();
+                else
+                    this.WindowState = FormWindowState.Minimized;
+            }
         }
 
         private void HideToTray()
         {
-            // TODO: check property for minimize to tray
+            if (!this.minimizeToTray)
+                return;
+
             this.ShowInTaskbar = false;
             this.Hide();
             this.notificationTrayIcon.Visible = true;
@@ -298,14 +306,14 @@ namespace CrewChiefV4
 
         private void RestoreFromTray()
         {
-            // TODO: check property for minimize to tray
+            if (!this.minimizeToTray)
+                return;
+
             this.ShowInTaskbar = true;
-            
             this.notificationTrayIcon.Visible = false;
-            
             this.Show();
 
-            // This is necessary to bring window to foreground.  Why ffs bringToFront doesn't work is beyound me.
+            // This is necessary to bring window to the foreground.  Why ffs bringToFront doesn't work is beyound me.
             this.WindowState = FormWindowState.Normal;
         }
 
