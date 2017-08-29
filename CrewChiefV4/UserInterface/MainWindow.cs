@@ -281,6 +281,29 @@ namespace CrewChiefV4
                     }
                 }
             }).Start();
+
+            // TODO: check property for minimize on startup.
+            this.HideToTray();
+        }
+
+        private void HideToTray()
+        {
+            // TODO: check property for minimize to tray
+            this.ShowInTaskbar = false;
+            this.Hide();
+            this.notificationTrayIcon.Visible = true;
+
+            // Keep window not minimized, so that whatever message box shows up is not minimized.
+            this.WindowState = FormWindowState.Normal;
+        }
+
+        private void RestoreFromTray()
+        {
+            // TODO: check property for minimize to tray
+            this.ShowInTaskbar = true;
+            this.Show();
+            this.notificationTrayIcon.Visible = false;
+            this.WindowState = FormWindowState.Normal;
         }
 
         public void updateMessagesVolume(float messagesVolume)
@@ -539,15 +562,14 @@ namespace CrewChiefV4
 
         private void NotifyIcon_DoubleClick(object sender, EventArgs e)
         {
-            this.notificationTrayIcon.Visible = false;
-            this.Show();
-            this.WindowState = FormWindowState.Normal;
+            this.RestoreFromTray();
         }
 
         public MainWindow()
         {
             InitializeComponent();
             SetupNotificationTrayIcon();
+
             CheckForIllegalCrossThreadCalls = false;
             cw = new ControlWriter(textBox1);
             textBox1.KeyDown += TextBox1_KeyDown;
@@ -696,10 +718,7 @@ namespace CrewChiefV4
         private void MainWindow_Resize(object sender, EventArgs e)
         {
             if (this.WindowState == FormWindowState.Minimized)
-            {
-                this.Hide();
-                this.notificationTrayIcon.Visible = true;
-            }
+                this.HideToTray();
         }
 
         private void TextBox1_KeyDown(object sender, KeyEventArgs e)
@@ -1117,14 +1136,20 @@ namespace CrewChiefV4
             // If minized to tray, hide tray icon while properties dialog is shown,
             // and it again when dialog is gone.  This prevents all the weird scenarios while
             // option dialog is visible.
-            if (!this.Visible)
+            var minimizedToTray = this.notificationTrayIcon.Visible;
+            if (minimizedToTray)
                 this.notificationTrayIcon.Visible = false;
 
-            var form = new PropertiesForm(this);
-            form.ShowDialog(this);
-
-            if (!this.Visible)
-                this.notificationTrayIcon.Visible = true;
+            try
+            {
+                var form = new PropertiesForm(this);
+                form.ShowDialog(this);
+            }
+            finally
+            {
+                if (minimizedToTray)
+                    this.notificationTrayIcon.Visible = true;
+            }
         }
 
         private void helpButtonClicked(object sender, EventArgs e)
