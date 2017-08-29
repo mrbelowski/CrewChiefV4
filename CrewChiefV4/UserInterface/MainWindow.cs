@@ -293,16 +293,19 @@ namespace CrewChiefV4
             this.Hide();
             this.notificationTrayIcon.Visible = true;
 
-            // Keep window not minimized, so that whatever message box shows up is not minimized.
-            this.WindowState = FormWindowState.Normal;
+            // Do not mess with WindowState here, causes weirdest problems.
         }
 
         private void RestoreFromTray()
         {
             // TODO: check property for minimize to tray
             this.ShowInTaskbar = true;
-            this.Show();
+            
             this.notificationTrayIcon.Visible = false;
+            
+            this.Show();
+
+            // This is necessary to bring window to foreground.  Why ffs bringToFront doesn't work is beyound me.
             this.WindowState = FormWindowState.Normal;
         }
 
