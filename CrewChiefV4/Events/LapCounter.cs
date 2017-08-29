@@ -31,6 +31,10 @@ namespace CrewChiefV4.Events
         public static String folderManualFormationLapModeEnabled = "lap_counter/manual_formation_lap_mode_enabled";
         public static String folderManualFormationLapModeDisabled = "lap_counter/manual_formation_lap_mode_disabled";
 
+        // some folks might want to start racing when the leader crosses the line, others might not be allowed to overtake
+        // until their car crosses the line
+        private Boolean manualFormationGoWhenLeaderCrossesLine = UserSettings.GetUserSettings().getBoolean("manual_formation_go_with_leader");
+
         private Boolean playedManualStartGetReady = false;
         private Boolean playedManualStartLeaderHasCrossedLine = false;
         private Boolean playedManualStartInitialMessage = false;
@@ -231,7 +235,7 @@ namespace CrewChiefV4.Events
             if (GameStateData.useManualFormationLap)
             {
                 // wait a while before enabling formation lap stuff
-                if (currentGameState.SessionData.SessionType == SessionType.Race) 
+                if (currentGameState.SessionData.SessionType == SessionType.Race && GameStateData.onManualFormationLap) 
                 {
                     // when the lights change, give some info:
                     if (!playedManualStartInitialMessage && previousGameState != null &&
@@ -239,95 +243,15 @@ namespace CrewChiefV4.Events
                         currentGameState.SessionData.SessionPhase == SessionPhase.Green &&
                         (previousGameState.SessionData.SessionPhase == SessionPhase.Formation ||
                          previousGameState.SessionData.SessionPhase == SessionPhase.Countdown))
-                    { 
-                        // belt and braces - ensure the num cars and start positions are accurate as of the green light
-                        currentGameState.SessionData.NumCarsAtStartOfSession = currentGameState.SessionData.NumCars;
-                        currentGameState.SessionData.SessionStartPosition = currentGameState.SessionData.Position;
-                        manualStartOpponentAhead = currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position - 1, true);
-
-                        // use the driver name in front if we have it - if we're starting on pole the manualStartOpponentAhead var will be null,
-                        // which will force the audio player to use the secondary message
-                        audioPlayer.playMessage(new QueuedMessage("manual_start_intro",
-                            MessageContents(folderManualStartInitialIntro, 
-                            Position.folderStub + currentGameState.SessionData.Position, folderManualStartInitialOutroWithDriverName1,
-                            manualStartOpponentAhead, folderManualStartInitialOutroWithDriverName2),
-                            MessageContents(folderManualStartInitialIntro, 
-                            Position.folderStub + currentGameState.SessionData.Position, folderManualStartInitialOutroNoDriverName), 0, this));
-                        playedManualStartInitialMessage = true;
-
+                    {
+                        playManualStartInitialMessage(currentGameState);
                     }
                     // don't both with any other messages until things have had a few seconds to settle down:
                     else if (currentGameState.SessionData.SessionRunningTime > 10)
                     {
-                        if (GameStateData.onManualFormationLap && currentGameState.SessionData.SessionStartPosition > currentGameState.SessionData.Position &&
-                            nextManualFormationOvertakeWarning < currentGameState.Now)
-                        {
-                            // we've overtaken someone
-                            nextManualFormationOvertakeWarning = currentGameState.Now.AddSeconds(30);
-                            // if the number of cars in the session has reduced, just play a 'hold your position' message - 
-                            // perhaps someone disconnected in front.
-                            if (currentGameState.SessionData.NumCarsAtStartOfSession > currentGameState.SessionData.NumCars)
-                            {
-                                audioPlayer.playMessage(new QueuedMessage(folderHoldYourPosition, 0, this));
-                            }
-                            else
-                            {
-                                // check if the car in front has changed
-                                OpponentData currentOpponentInFront = currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position - 1, true);
-                                if (manualStartOpponentAhead != null && 
-                                    (currentOpponentInFront == null || !manualStartOpponentAhead.DriverRawName.Equals(currentOpponentInFront.DriverRawName)))
-                                {
-                                    // delay and validate this message so we don't grumble about a different car in front if a couple of
-                                    // cars fall back through the field for whatever reason
-                                    audioPlayer.playMessage(new QueuedMessage("give_position_back",
-                                        MessageContents(folderGivePositionBack, folderManualStartInitialOutroWithDriverName1, manualStartOpponentAhead),
-                                        MessageContents(folderGivePositionBack), 5, this, new Dictionary<String, Object>()));
-                                }
-                            }
-                        }
-                        if (currentGameState.SessionData.Position > 1)
-                        {
-                            // we're not the leader, so give leader updates
-                            OpponentData leader = currentGameState.getOpponentAtPosition(1, false);
-                            if (leader != null)
-                            {
-                                if (!playedManualStartGetReady && leader.CurrentSectorNumber == 3 &&
-                                    leader.DistanceRoundTrack > currentGameState.SessionData.TrackDefinition.trackLength - 200)
-                                {
-                                    audioPlayer.playMessage(new QueuedMessage(folderGetReady, 0, this));
-                                    playedManualStartGetReady = true;
-                                }
-                                if (!playedManualStartLeaderHasCrossedLine && leader.CompletedLaps == 1)
-                                {
-                                    playedManualStartLeaderHasCrossedLine = true;
-                                    if (currentGameState.SessionData.Position > 3)
-                                    {
-                                        // don't play this if we're right with the leader?
-                                        audioPlayer.playMessageImmediately(new QueuedMessage(folderLeaderHasCrossedStartLine, 0, this));
-                                    }
-                                }
-                            }
-                        }
-                        else
-                        {
-                            // we're the leader, so play get ready when we're near the line
-                            if (!playedManualStartGetReady && currentGameState.SessionData.SectorNumber == 3 &&
-                                currentGameState.PositionAndMotionData.DistanceRoundTrack > currentGameState.SessionData.TrackDefinition.trackLength - 100)
-                            {
-                                audioPlayer.playMessage(new QueuedMessage(folderGetReady, 0, this));
-                                playedManualStartGetReady = true;
-                            }
-                        }
-                        if (currentGameState.SessionData.CompletedLaps == 1 && GameStateData.onManualFormationLap)
-                        {
-                            audioPlayer.playMessageImmediately(new QueuedMessage(folderGreenGreenGreen, 0, this));
-                            GameStateData.onManualFormationLap = false;
-                            // switch off the other updates
-                            playedManualStartLeaderHasCrossedLine = true;
-                            playedManualStartGetReady = true;
-                            playedManualStartInitialMessage = true;
-                        }
-                    }  
+                        checkForIllegalPassesOnFormationLap(currentGameState);
+                        checkForManualFormationRaceStart(currentGameState, currentGameState.SessionData.Position == 1);
+                    }
                 }
             }
             else
@@ -493,6 +417,140 @@ namespace CrewChiefV4.Events
                     // 2 laps left, so prevent any further pearls of wisdom being added
                 }
                 
+            }
+        }
+
+        private void playManualStartGreenFlag()
+        {
+            audioPlayer.playMessageImmediately(new QueuedMessage(folderGreenGreenGreen, 0, this));
+            GameStateData.onManualFormationLap = false;
+            // switch off the other updates
+            playedManualStartLeaderHasCrossedLine = true;
+            playedManualStartGetReady = true;
+            playedManualStartInitialMessage = true;
+        }
+
+        private void playManualStartGetReady()
+        {
+            audioPlayer.playMessage(new QueuedMessage(folderGetReady, 0, this));
+            playedManualStartGetReady = true;
+        }
+
+        private void playManualStartInitialMessage(GameStateData currentGameState)
+        {
+            manualStartOpponentAhead = currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position - 1, true);
+            // use the driver name in front if we have it - if we're starting on pole the manualStartOpponentAhead var will be null,
+            // which will force the audio player to use the secondary message
+
+            if (manualFormationGoWhenLeaderCrossesLine)
+            {
+                // go when leader crosses line, so make sure we don't say "hold position until the start line"
+                audioPlayer.playMessage(new QueuedMessage("manual_start_intro",
+                    MessageContents(folderManualStartInitialIntro,
+                        Position.folderStub + currentGameState.SessionData.Position, folderManualStartInitialOutroWithDriverName1,
+                        manualStartOpponentAhead),
+                    MessageContents(folderManualStartInitialIntro,
+                        Position.folderStub + currentGameState.SessionData.Position, folderHoldYourPosition), 0, this));
+            }
+            else
+            {
+                audioPlayer.playMessage(new QueuedMessage("manual_start_intro",
+                    MessageContents(folderManualStartInitialIntro,
+                        Position.folderStub + currentGameState.SessionData.Position, folderManualStartInitialOutroWithDriverName1,
+                        manualStartOpponentAhead, folderManualStartInitialOutroWithDriverName2),
+                    MessageContents(folderManualStartInitialIntro,
+                        Position.folderStub + currentGameState.SessionData.Position, folderManualStartInitialOutroNoDriverName), 0, this));
+            }
+            playedManualStartInitialMessage = true;
+        }
+
+        private void checkForIllegalPassesOnFormationLap(GameStateData currentGameState)
+        {
+            if (GameStateData.onManualFormationLap && currentGameState.SessionData.SessionStartPosition > currentGameState.SessionData.Position &&
+                            nextManualFormationOvertakeWarning < currentGameState.Now)
+            {
+                // we've overtaken someone
+                nextManualFormationOvertakeWarning = currentGameState.Now.AddSeconds(30);
+                // if the number of cars in the session has reduced, just play a 'hold your position' message - 
+                // perhaps someone disconnected in front.
+                if (currentGameState.SessionData.NumCarsAtStartOfSession > currentGameState.SessionData.NumCars)
+                {
+                    audioPlayer.playMessage(new QueuedMessage(folderHoldYourPosition, 0, this));
+                }
+                else
+                {
+                    // check if the car in front has changed
+                    OpponentData currentOpponentInFront = currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position - 1, true);
+                    if (manualStartOpponentAhead != null &&
+                        (currentOpponentInFront == null || !manualStartOpponentAhead.DriverRawName.Equals(currentOpponentInFront.DriverRawName)))
+                    {
+                        // delay and validate this message so we don't grumble about a different car in front if a couple of
+                        // cars fall back through the field for whatever reason
+                        audioPlayer.playMessage(new QueuedMessage("give_position_back",
+                            MessageContents(folderGivePositionBack, folderManualStartInitialOutroWithDriverName1, manualStartOpponentAhead),
+                            MessageContents(folderGivePositionBack), 5, this, new Dictionary<String, Object>()));
+                    }
+                }
+            }
+        }
+
+        private void checkForManualFormationRaceStart(GameStateData currentGameState, Boolean isLeader)
+        {
+            if (isLeader)
+            {
+                // we're the leader, so play 'go' when we cross the line and get ready when we're near the line
+                if (currentGameState.SessionData.CompletedLaps == 1)
+                {
+                    playManualStartGreenFlag();
+                }
+                else if (!playedManualStartGetReady && currentGameState.SessionData.SectorNumber == 3 &&
+                    currentGameState.PositionAndMotionData.DistanceRoundTrack > currentGameState.SessionData.TrackDefinition.trackLength - 200)
+                {
+                    playManualStartGetReady();
+                }
+            }
+            else
+            {
+                if (manualFormationGoWhenLeaderCrossesLine)
+                {
+                    // here we're only interested in what the leader is up to
+                    OpponentData leader = currentGameState.getOpponentAtPosition(1, false);
+                    if (leader != null)
+                    {
+                        if (!playedManualStartGetReady && leader.CurrentSectorNumber == 3 &&
+                            leader.DistanceRoundTrack > currentGameState.SessionData.TrackDefinition.trackLength - 200)
+                        {
+                            playManualStartGetReady();
+                        }
+                        else if (leader.CompletedLaps == 1)
+                        {
+                            playManualStartGreenFlag();
+                        }
+                    }
+                }
+                else
+                {
+                    // give leader updates then green when we cross the line
+                    if (currentGameState.SessionData.CompletedLaps == 1)
+                    {
+                        playManualStartGreenFlag();
+                    }
+                    else if (!playedManualStartGetReady && currentGameState.SessionData.SectorNumber == 3 &&
+                            currentGameState.PositionAndMotionData.DistanceRoundTrack > currentGameState.SessionData.TrackDefinition.trackLength - 300)
+                    {
+                        playManualStartGetReady();
+                    }
+                    else if (currentGameState.SessionData.Position > 3)
+                    {
+                        // don't say "leader has crossed the line" if we're right behind him - this would delay the 'go go go' call
+                        OpponentData leader = currentGameState.getOpponentAtPosition(1, false);
+                        if (leader != null && !playedManualStartLeaderHasCrossedLine && leader.CompletedLaps == 1)
+                        {
+                            playedManualStartLeaderHasCrossedLine = true;
+                            audioPlayer.playMessageImmediately(new QueuedMessage(folderLeaderHasCrossedStartLine, 0, this));
+                        }
+                    }
+                }
             }
         }
     }
