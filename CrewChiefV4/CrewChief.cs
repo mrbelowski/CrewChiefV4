@@ -693,8 +693,15 @@ namespace CrewChiefV4
                 {
                     gameDataReader.DumpRawGameData();
                 }
-                gameDataReader.stop();
-                gameDataReader.DisconnectFromProcess();
+                try
+                {
+                    gameDataReader.stop();
+                    gameDataReader.DisconnectFromProcess();
+                }
+                catch (Exception)
+                {
+                    //ignore
+                }
             }
             mapped = false;
 
