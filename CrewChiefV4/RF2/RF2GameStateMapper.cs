@@ -1123,6 +1123,8 @@ namespace CrewChiefV4.rFactor2
                 Console.WriteLine("TrackName " + csd.TrackDefinition.name);
                 Console.WriteLine("Player is using car class " + cgs.carClass.getClassIdentifier() +
                     " at position " + csd.Position.ToString());
+
+                Utilities.TraceEventClass(cgs);
             }
             if (pgs != null && psd.SessionPhase != csd.SessionPhase)
             {

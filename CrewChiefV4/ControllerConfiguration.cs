@@ -30,7 +30,8 @@ namespace CrewChiefV4
         public static String VOLUME_DOWN = Configuration.getUIString("volume_down");
         public static String PRINT_TRACK_DATA = Configuration.getUIString("print_track_data");
         public static String TOGGLE_YELLOW_FLAG_MESSAGES = Configuration.getUIString("toggle_yellow_flag_messages");
-        public static String GET_FUEL_STATUS = Configuration.getUIString("get_fuel_status");        
+        public static String GET_FUEL_STATUS = Configuration.getUIString("get_fuel_status");
+        public static String TOGGLE_MANUAL_FORMATION_LAP = Configuration.getUIString("toggle_manual_formation_lap");        
 
         private ControllerData networkGamePad = new ControllerData(Configuration.getUIString("udp_network_data_buttons"), DeviceType.Gamepad, UDP_NETWORK_CONTROLLER_GUID);
         
@@ -71,6 +72,7 @@ namespace CrewChiefV4
             addButtonAssignment(VOLUME_DOWN);
             addButtonAssignment(TOGGLE_YELLOW_FLAG_MESSAGES);
             addButtonAssignment(GET_FUEL_STATUS);
+            addButtonAssignment(TOGGLE_MANUAL_FORMATION_LAP);
             addButtonAssignment(PRINT_TRACK_DATA);
             controllers = loadControllers();
         }
@@ -100,6 +102,7 @@ namespace CrewChiefV4
             pollForButtonClicks(buttonAssignments[buttonAssignmentIndexes[VOLUME_DOWN]]);
             pollForButtonClicks(buttonAssignments[buttonAssignmentIndexes[TOGGLE_YELLOW_FLAG_MESSAGES]]);
             pollForButtonClicks(buttonAssignments[buttonAssignmentIndexes[GET_FUEL_STATUS]]);
+            pollForButtonClicks(buttonAssignments[buttonAssignmentIndexes[TOGGLE_MANUAL_FORMATION_LAP]]);
             pollForButtonClicks(buttonAssignments[buttonAssignmentIndexes[PRINT_TRACK_DATA]]);
             pollForButtonClicks(buttonAssignments[buttonAssignmentIndexes[CHANNEL_OPEN_FUNCTION]]);
         }
@@ -223,6 +226,10 @@ namespace CrewChiefV4
                 {
                     actionId = "GET_FUEL_STATUS";
                 }
+                else if (buttonAssignment.action == TOGGLE_MANUAL_FORMATION_LAP)
+                {
+                    actionId = "TOGGLE_MANUAL_FORMATION_LAP";
+                }
 
                 if (buttonAssignment.controller != null && (buttonAssignment.joystick != null || buttonAssignment.controller.guid == UDP_NETWORK_CONTROLLER_GUID) && buttonAssignment.buttonIndex != -1)
                 {
@@ -308,6 +315,13 @@ namespace CrewChiefV4
             if (getFuelStatusButtonIndex != -1 && getFuelStatusDeviceGuid.Length > 0)
             {
                 loadAssignment(parent, GET_FUEL_STATUS, getFuelStatusButtonIndex, getFuelStatusDeviceGuid);
+            }
+
+            int toggleManualFormationLapButtonIndex = UserSettings.GetUserSettings().getInt("TOGGLE_MANUAL_FORMATION_LAP_button_index");
+            String toggleManualFormationLapDeviceGuid = UserSettings.GetUserSettings().getString("TOGGLE_MANUAL_FORMATION_LAP_device_guid");
+            if (toggleManualFormationLapButtonIndex != -1 && toggleManualFormationLapDeviceGuid.Length > 0)
+            {
+                loadAssignment(parent, TOGGLE_MANUAL_FORMATION_LAP, toggleManualFormationLapButtonIndex, toggleManualFormationLapDeviceGuid);
             }
         }
 

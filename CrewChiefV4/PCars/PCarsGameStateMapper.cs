@@ -420,6 +420,7 @@ namespace CrewChiefV4.PCars
                     brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(currentGameState.carClass);
                     // no tyre data in the block so get the default tyre types for this car
                     defaultTyreTypeForPlayersCar = CarData.getDefaultTyreType(currentGameState.carClass);
+                    Utilities.TraceEventClass(currentGameState);
                 }
             }
 

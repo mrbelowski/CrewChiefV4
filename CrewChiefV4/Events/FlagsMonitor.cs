@@ -283,7 +283,7 @@ namespace CrewChiefV4.Events
 
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
-            if (currentGameState.PitData.InPitlane || currentGameState.SessionData.SessionRunningTime < 10)
+            if (currentGameState.PitData.InPitlane || currentGameState.SessionData.SessionRunningTime < 10 || GameStateData.onManualFormationLap)
             {
                 // don't process if we're in the pits or just started a session
                 return;

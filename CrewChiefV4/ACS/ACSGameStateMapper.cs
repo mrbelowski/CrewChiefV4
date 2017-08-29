@@ -1082,6 +1082,7 @@ namespace CrewChiefV4.assetto
                 CarData.CLASS_ID = shared.acsStatic.carModel;
 
                 Console.WriteLine("Player is using car class " + currentGameState.carClass.getClassIdentifier());
+                Utilities.TraceEventClass(currentGameState);
 
                 if (acTyres.Count > 0 && !acTyres.ContainsKey(shared.acsGraphic.tyreCompound))
                 {

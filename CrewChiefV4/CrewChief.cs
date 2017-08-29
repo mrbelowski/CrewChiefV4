@@ -236,6 +236,40 @@ namespace CrewChiefV4
 
         }
 
+        public void toggleManualFormationLapMode()
+        {
+            if (GameStateData.useManualFormationLap)
+            {
+                disableManualFormationLapMode();
+            }
+            else
+            {
+                enableManualFormationLapMode();
+            }
+        }
+
+        public void enableManualFormationLapMode()
+        {
+            if (!GameStateData.useManualFormationLap)
+            {
+                GameStateData.useManualFormationLap = true;
+                GameStateData.onManualFormationLap = true;
+            }
+            Console.WriteLine("Manual formation lap mode is ACTIVE");
+            audioPlayer.playMessageImmediately(new QueuedMessage(LapCounter.folderManualFormationLapModeEnabled, 0, null));
+        }
+
+        public void disableManualFormationLapMode()
+        {
+            if (GameStateData.useManualFormationLap)
+            {
+                GameStateData.useManualFormationLap = false;
+                GameStateData.onManualFormationLap = false;
+            }
+            Console.WriteLine("Manual formation lap mode is DISABLED");
+            audioPlayer.playMessageImmediately(new QueuedMessage(LapCounter.folderManualFormationLapModeDisabled, 0, null));
+        }
+
         public void reportFuelStatus()
         {
             ((Fuel)eventsList["Fuel"]).reportFuelStatus();
@@ -478,7 +512,14 @@ namespace CrewChiefV4
                             {
                                 Console.WriteLine("Reached the end of the data file, sleeping to clear queued messages");
                                 Thread.Sleep(5000);
-                                audioPlayer.purgeQueues();
+                                try
+                                {
+                                    audioPlayer.purgeQueues();
+                                }
+                                catch (Exception)
+                                {
+                                    // ignore
+                                }
                                 running = false;
                                 continue;
                             }
@@ -652,8 +693,15 @@ namespace CrewChiefV4
                 {
                     gameDataReader.DumpRawGameData();
                 }
-                gameDataReader.stop();
-                gameDataReader.DisconnectFromProcess();
+                try
+                {
+                    gameDataReader.stop();
+                    gameDataReader.DisconnectFromProcess();
+                }
+                catch (Exception)
+                {
+                    //ignore
+                }
             }
             mapped = false;
 

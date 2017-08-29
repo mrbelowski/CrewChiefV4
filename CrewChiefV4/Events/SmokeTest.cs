@@ -13,6 +13,9 @@ namespace CrewChiefV4.Events
 {
     class SmokeTest : AbstractEvent
     {
+        public static String SMOKE_TEST = "SMOKE_TEST";
+        public static String SMOKE_TEST_SPOTTER = "SMOKE_TEST_SPOTTER";
+
         private String folderTest = "radio_check/test";
 
         private Random random = new Random();
@@ -31,6 +34,11 @@ namespace CrewChiefV4.Events
             return true;
         }
 
+        public override Boolean isApplicableForCurrentSessionAndPhase(SessionType sessionType, SessionPhase sessionPhase)
+        {
+            return true;
+        }
+        
         private OpponentData makeTempDriver(String driverName, List<String> rawDriverNames)
         {
             OpponentData opponent = new OpponentData();
@@ -105,11 +113,11 @@ namespace CrewChiefV4.Events
             audioPlayer.playMessage(new QueuedMessage(ConditionsMonitor.folderRainLightDecreasing, 0, this));
             audioPlayer.playMessage(new QueuedMessage(ConditionsMonitor.folderDrizzleDecreasing, 0, this));*/
 
-            audioPlayer.playMessage(new QueuedMessage(folderTest, 0, this));
+            audioPlayer.playMessage(new QueuedMessage(SMOKE_TEST, MessageContents(folderTest), 0, this));
             if (NoisyCartesianCoordinateSpotter.folderSpotterRadioCheck != null)
             {
                 Thread.Sleep(800);
-                audioPlayer.playSpotterMessage(new QueuedMessage(NoisyCartesianCoordinateSpotter.folderSpotterRadioCheck, 0, this), false);
+                audioPlayer.playSpotterMessage(new QueuedMessage(SMOKE_TEST_SPOTTER, MessageContents(NoisyCartesianCoordinateSpotter.folderSpotterRadioCheck), 0, this), false);
             }
 
             //PlaybackModerator.SetTracing(true /*enabled*/);
