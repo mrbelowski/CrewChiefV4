@@ -123,7 +123,7 @@ namespace CrewChiefV4.rFactor1
             }
             if (playerName == null)
             {
-                String driverName = getNameFromBytes(player.driverName).ToLower();
+                String driverName = getStringFromBytes(player.driverName).ToLower();
                 NameValidator.validateName(driverName);
                 playerName = driverName;
             }
@@ -211,10 +211,10 @@ namespace CrewChiefV4.rFactor1
                 }
             }
 
-            currentGameState.carClass = getCarClass(getNameFromBytes(shared.vehicleName), true);
+            currentGameState.carClass = getCarClass(getStringFromBytes(shared.vehicleName), true);
             brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(currentGameState.carClass);
-            currentGameState.SessionData.DriverRawName = getNameFromBytes(player.driverName).ToLower();
-            currentGameState.SessionData.TrackDefinition = new TrackDefinition(getNameFromBytes(shared.trackName), shared.lapDist);
+            currentGameState.SessionData.DriverRawName = getStringFromBytes(player.driverName).ToLower();
+            currentGameState.SessionData.TrackDefinition = new TrackDefinition(getStringFromBytes(shared.trackName), shared.lapDist);
             if (previousGameState == null || previousGameState.SessionData.TrackDefinition.name != currentGameState.SessionData.TrackDefinition.name)
             {
                 // new game or new track
@@ -586,7 +586,7 @@ namespace CrewChiefV4.rFactor1
             for (int i = 0; i < shared.numVehicles; ++i)
             {
                 var vehicle = shared.vehicle[i];
-                String driverName = getNameFromBytes(vehicle.driverName).ToLower();
+                String driverName = getStringFromBytes(vehicle.driverName).ToLower();
                 if (isOfflineSession && (rFactor1Constant.rfControl)vehicle.control == rFactor1Constant.rfControl.remote)
                 {
                     isOfflineSession = false;
@@ -624,7 +624,7 @@ namespace CrewChiefV4.rFactor1
                     default:
                         break;
                 }
-                String driverName = getNameFromBytes(vehicle.driverName).ToLower();
+                String driverName = getStringFromBytes(vehicle.driverName).ToLower();
                 OpponentData opponentPrevious;
                 int duplicatesCount = driverNameCounts[driverName];
                 string opponentKey;
@@ -667,7 +667,7 @@ namespace CrewChiefV4.rFactor1
                 OpponentData opponent = new OpponentData();
                 opponent.DriverRawName = driverName;
                 opponent.DriverNameSet = opponent.DriverRawName.Length > 0;
-                opponent.CarClass = getCarClass(getNameFromBytes(vehicle.vehicleName), false);
+                opponent.CarClass = getCarClass(getStringFromBytes(vehicle.vehicleName), false);
                 opponent.Position = vehicle.place;
                 if (opponent.DriverNameSet && opponentPrevious == null && CrewChief.enableDriverNames)
                 {
@@ -1148,8 +1148,8 @@ namespace CrewChiefV4.rFactor1
                 if (previousGameState.OpponentData.ContainsKey(possibleKey))
                 {
                     OpponentData o = previousGameState.OpponentData[possibleKey];
-                    if (o.DriverRawName != getNameFromBytes(vehicle.driverName).ToLower() ||
-                        o.CarClass != getCarClass(getNameFromBytes(vehicle.vehicleName), false) ||
+                    if (o.DriverRawName != getStringFromBytes(vehicle.driverName).ToLower() ||
+                        o.CarClass != getCarClass(getStringFromBytes(vehicle.vehicleName), false) ||
                         opponentKeysProcessed.Contains(possibleKey))
                     {
                         continue;
@@ -1172,9 +1172,13 @@ namespace CrewChiefV4.rFactor1
             return bestKey;
         }
 
-        public static String getNameFromBytes(byte[] name)
+        public static String getStringFromBytes(byte[] bytes)
         {
-            return Encoding.UTF8.GetString(name).TrimEnd('\0').Trim();
+            var nullIdx = Array.IndexOf(bytes, (byte)0);
+
+            return nullIdx >= 0
+              ? Encoding.Default.GetString(bytes, 0, nullIdx)
+              : Encoding.Default.GetString(bytes);
         }
 
         /**
