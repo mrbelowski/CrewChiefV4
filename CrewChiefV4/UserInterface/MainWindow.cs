@@ -79,7 +79,7 @@ namespace CrewChiefV4
         private NotifyIcon notificationTrayIcon;
         private ToolStripItem contextMenuStartItem;
         private ToolStripItem contextMenuStopItem;
-        private ToolStripMenuItem gamesContextMenu;
+        private ToolStripMenuItem contextMenuGamesMenu;
         private ToolStripItem contextMenuPreferencesItem;
         private Boolean minimizeToTray = UserSettings.GetUserSettings().getBoolean("minimize_to_tray");
 
@@ -347,7 +347,7 @@ namespace CrewChiefV4
             this.notificationTrayIcon.Visible = false;
             this.Show();
 
-            // This is necessary to bring window to the foreground.  Why ffs bringToFront doesn't work is beyound me.
+            // This is necessary to bring window to the foreground.  Why ffs BringToFront doesn't work is beyound me.
             this.WindowState = FormWindowState.Normal;
         }
 
@@ -533,13 +533,17 @@ namespace CrewChiefV4
 
         private void SetupNotificationTrayIcon()
         {
+            Debug.Assert(notificationTrayIcon == null, "Supposed to be called once");
+
             notificationTrayIcon = new NotifyIcon();
 
             // Load the icon.
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainWindow));
             notificationTrayIcon.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+
             notificationTrayIcon.DoubleClick += NotifyIcon_DoubleClick;
 
+            // Setup the context menu.
             var cms = new ContextMenuStrip();
 
             // Restore item.
@@ -554,10 +558,10 @@ namespace CrewChiefV4
 
             // Form Game context submenu.
             cmi = cms.Items.Add(Configuration.getUIString("game"));
-            gamesContextMenu = cmi as ToolStripMenuItem;
+            contextMenuGamesMenu = cmi as ToolStripMenuItem;
             foreach (var game in this.gameDefinitionList.Items)
             {
-                var ddi = gamesContextMenu.DropDownItems.Add(game.ToString());
+                var ddi = contextMenuGamesMenu.DropDownItems.Add(game.ToString());
                 ddi.Click += (sender, e) =>
                 {
                     var gameSelected = sender as ToolStripMenuItem;
@@ -568,10 +572,10 @@ namespace CrewChiefV4
                 };
             }
 
-            gamesContextMenu.DropDownOpening += (sender, e) =>
+            contextMenuGamesMenu.DropDownOpening += (sender, e) =>
             {
                 var currGameFriendlyName = this.gameDefinitionList.Text;
-                foreach (var game in gamesContextMenu.DropDownItems)
+                foreach (var game in contextMenuGamesMenu.DropDownItems)
                 {
                     var tsmi = game as ToolStripMenuItem;
                     tsmi.Checked = tsmi.Text == currGameFriendlyName;
@@ -597,8 +601,8 @@ namespace CrewChiefV4
                     ? Configuration.getUIString("start_application")
                     : string.Format(Configuration.getUIString("start_context_menu"), this.gameDefinitionList.Text);
 
-                // Only allow game selection if we're in Stopped state.
-                foreach (var game in this.gamesContextMenu.DropDownItems)
+                // Only allow game selection if we're in a Stopped state.
+                foreach (var game in this.contextMenuGamesMenu.DropDownItems)
                     (game as ToolStripMenuItem).Enabled = !this._IsAppRunning;
             };
 
@@ -1180,7 +1184,7 @@ namespace CrewChiefV4
         private void editPropertiesButtonClicked(object sender, EventArgs e)
         {
             // If minized to tray, hide tray icon while properties dialog is shown,
-            // and it again when dialog is gone.  This prevents all the weird scenarios while
+            // and it again when dialog is gone.  The goal is to prevent weird scenarios while
             // option dialog is visible.
             var minimizedToTray = this.notificationTrayIcon.Visible;
             if (minimizedToTray)

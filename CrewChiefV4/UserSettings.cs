@@ -172,9 +172,13 @@ namespace CrewChiefV4
 
         public void saveUserSettings()
         {
-            if (!initFailed && propertiesUpdated)
+            // By MSDN it is not ok to write from multiple threads simultaneously, so lock here.
+            lock (this)
             {
-                Properties.Settings.Default.Save();
+                if (!initFailed && propertiesUpdated)
+                {
+                    Properties.Settings.Default.Save();
+                }
             }
         }
     }
