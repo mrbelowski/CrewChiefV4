@@ -449,3 +449,5 @@ get_fuel_status = Report fuel status
 
 toggle_manual_formation_lap = Toggle manual formation lap mode
 
+manual_formation_go_with_leader = Manual formation 'go' when leader crosses line
+manual_formation_go_with_leader_help = Cars are allowed to overtake on a manual formation lap as soon as the leader crosses the line

@@ -61,9 +61,10 @@ namespace CrewChiefV4
                     Properties.Settings.Default.Save();
                 }
             }
-            catch (Exception)
+            catch (Exception exception)
             {
                 // if any of this initialisation fails, the app is in an unusable state.
+                Console.WriteLine(exception.Message);
                 initFailed = true;
             }
         }

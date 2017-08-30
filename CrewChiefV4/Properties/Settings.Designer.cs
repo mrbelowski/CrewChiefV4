@@ -2288,6 +2288,17 @@ namespace CrewChiefV4.Properties {
             }
             set {
                 this["update_notify_attempted"] = value;
+	    }
+        }
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool manual_formation_go_with_leader {
+            get {
+                return ((bool)(this["manual_formation_go_with_leader"]));
+            }
+            set {
+                this["manual_formation_go_with_leader"] = value;
             }
         }
     }
