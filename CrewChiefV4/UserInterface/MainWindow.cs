@@ -300,9 +300,12 @@ namespace CrewChiefV4
                         }
                         else
                         {
-                            // If there are no updates available, clear pit update notify attempted flag.
-                            UserSettings.GetUserSettings().setProperty("update_notify_attempted", false);
-                            UserSettings.GetUserSettings().saveUserSettings();
+                            // If there are no updates available, clear the update_notify_attempted flag if it is set.
+                            if (UserSettings.GetUserSettings().getBoolean("update_notify_attempted"))
+                            {
+                                UserSettings.GetUserSettings().setProperty("update_notify_attempted", false);
+                                UserSettings.GetUserSettings().saveUserSettings();
+                            }
                         }
 
                         Console.WriteLine("Check for updates completed");
