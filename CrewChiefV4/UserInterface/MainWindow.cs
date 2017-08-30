@@ -540,17 +540,17 @@ namespace CrewChiefV4
             var cms = new ContextMenuStrip();
 
             // Restore item.
-            var cmi = cms.Items.Add("Restore");
+            var cmi = cms.Items.Add(Configuration.getUIString("restore_context_menu"));
             cmi.Click += NotifyIcon_DoubleClick;
 
             // Start/Stop items.
             cms.Items.Add(new ToolStripSeparator());
-            contextMenuStartItem = cms.Items.Add("Start", null, this.startApplicationButton_Click);
-            contextMenuStopItem = cms.Items.Add("Stop", null, this.startApplicationButton_Click);
+            contextMenuStartItem = cms.Items.Add(Configuration.getUIString("start_application"), null, this.startApplicationButton_Click);
+            contextMenuStopItem = cms.Items.Add(Configuration.getUIString("stop"), null, this.startApplicationButton_Click);
             cms.Items.Add(new ToolStripSeparator());
 
             // Form Game context submenu.
-            cmi = cms.Items.Add("Game");
+            cmi = cms.Items.Add(Configuration.getUIString("game"));
             gamesContextMenu = cmi as ToolStripMenuItem;
             foreach (var game in this.gameDefinitionList.Items)
             {
@@ -576,9 +576,9 @@ namespace CrewChiefV4
             };
 
             // Preferences and Close items
-            contextMenuPreferencesItem = cms.Items.Add("Properties", null, this.editPropertiesButtonClicked);
+            contextMenuPreferencesItem = cms.Items.Add(Configuration.getUIString("properties"), null, this.editPropertiesButtonClicked);
             cms.Items.Add(new ToolStripSeparator());
-            cmi = cms.Items.Add("Close");
+            cmi = cms.Items.Add(Configuration.getUIString("close_context_menu"));
             cmi.Click += (sender, e) =>
             {
                 this.notificationTrayIcon.Visible = false;
@@ -590,8 +590,9 @@ namespace CrewChiefV4
                 this.contextMenuStartItem.Enabled = !this._IsAppRunning;
                 this.contextMenuStopItem.Enabled = this._IsAppRunning;
 
-                var startPostfix = string.IsNullOrWhiteSpace(this.gameDefinitionList.Text) ? "" : this.gameDefinitionList.Text + " mode";
-                this.contextMenuStartItem.Text = "Start " + startPostfix;
+                this.contextMenuStartItem.Text = string.IsNullOrWhiteSpace(this.gameDefinitionList.Text) 
+                    ? Configuration.getUIString("start_application")
+                    : string.Format(Configuration.getUIString("start_context_menu"), this.gameDefinitionList.Text);
 
                 // Only allow game selection if we're in Stopped state.
                 foreach (var game in this.gamesContextMenu.DropDownItems)
@@ -1030,9 +1031,9 @@ namespace CrewChiefV4
             this.contextMenuPreferencesItem.Enabled = !this._IsAppRunning;
 
             if (this._IsAppRunning)
-                this.notificationTrayIcon.Text = "Crew Chief is running in " + this.gameDefinitionList.Text + " mode";
+                this.notificationTrayIcon.Text = string.Format(Configuration.getUIString("running_context_menu"), this.gameDefinitionList.Text);
             else
-                this.notificationTrayIcon.Text = "Crew Chief is stopped";  // Or idling, smoking, any good jokes?
+                this.notificationTrayIcon.Text = Configuration.getUIString("idling_context_menu");  // Or idling, smoking, any good jokes?
         }
 
         private void stopApp(object sender, FormClosedEventArgs e)
@@ -1655,6 +1656,10 @@ namespace CrewChiefV4
             {
                 warningMessage = "The app must be restarted manually";
             }
+
+            // Make app visible first.
+            this.RestoreFromTray();
+
             if (MessageBox.Show(warningMessage, warningTitle,
                 System.Diagnostics.Debugger.IsAttached ? MessageBoxButtons.OK : MessageBoxButtons.OKCancel) == DialogResult.OK)
             {

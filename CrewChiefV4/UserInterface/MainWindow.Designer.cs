@@ -489,6 +489,7 @@ namespace CrewChiefV4
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1146, 692);
+            this.MaximizeBox = false;
             this.Controls.Add(this.driverNamesProgressBar);
             this.Controls.Add(this.downloadDriverNamesButton);
             this.Controls.Add(this.downloadSoundPackButton); 
