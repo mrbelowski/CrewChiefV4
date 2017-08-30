@@ -234,10 +234,10 @@ namespace CrewChiefV4.Events
         {
             if (GameStateData.useManualFormationLap)
             {
-                // wait a while before enabling formation lap stuff
-                if (currentGameState.SessionData.SessionType == SessionType.Race && GameStateData.onManualFormationLap) 
+                // when the session is first cleared, this will be true if we're using manual formation laps:
+                if (GameStateData.onManualFormationLap) 
                 {
-                    // when the lights change, give some info:
+                    // when the lights change to green, give some info:
                     if (!playedManualStartInitialMessage && previousGameState != null &&
                         currentGameState.SessionData.SessionType == SessionType.Race &&
                         currentGameState.SessionData.SessionPhase == SessionPhase.Green &&
@@ -246,13 +246,17 @@ namespace CrewChiefV4.Events
                     {
                         playManualStartInitialMessage(currentGameState);
                     }
-                    // don't both with any other messages until things have had a few seconds to settle down:
+                    // don't bother with any other messages until things have had a few seconds to settle down:
                     else if (currentGameState.SessionData.SessionRunningTime > 10)
                     {
                         checkForIllegalPassesOnFormationLap(currentGameState);
                         checkForManualFormationRaceStart(currentGameState, currentGameState.SessionData.Position == 1);
                     }
                 }
+                // now check if we really are on a manual formation lap. We have to do this *after* checking for the race start (above) because
+                // this will switch manual formation lap stuff off as soon as we cross the line (so would suppress the 'green green green' message).
+                // We want to ensure it's switched off if we're not in a race session, for obvious reasons.
+                GameStateData.onManualFormationLap = currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.CompletedLaps < 1;
             }
             else
             {
