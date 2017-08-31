@@ -10,6 +10,8 @@ For support and discussions about Crew Chief we have our very own forum here: ht
 
 Changelog
 ---------
+Version 4.7.9.1: Only allow manual formation lap mode to supress messages in race sessions; Fixed session end detection in RF1 / AMS.
+
 Version 4.7.9.0: Fixed initialisation errors in TTS engine which prevented the app from starting when "Use TTS for missing names" was enabled; added option to select where the race starts on a manual formation lap - "Manual formation 'go' when leader crosses line". If this is true (the default) the app assumes that the race starts and cars are allowed to overtake as soon as the leader crosses the start line. If it's false, the app assumes that no one is allowed to overtake until they cross the start line; Added some RF1 session identifier fixes - should correct a few issues caused by the app thinking the race was actually qualifying.
 
 Version 4.7.8.9: Fix for some settings getting corrupted on system which use a comma as a decimal separator - this causes some spotter and voice recognition issues. If you have already encountered this, please reload the app's default settings; Some fuel use calculation fixes; Spotter fixes; Added manual formation lap support. This supresses most messages on lap 1 and plays an alternate sequence of start messages - it assumes you're not allow to pass until you cross the start line. This mode can be activated and deactivated with a button press ("Toggle manual formation lap mode") or a voice command (enable with "this is the formation lap" / "formation lap" / "rolling start", disable with "standing start" / "no formation lap").
