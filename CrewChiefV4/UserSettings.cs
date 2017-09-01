@@ -45,8 +45,9 @@ namespace CrewChiefV4
         public Boolean initFailed = false;
         private String[] reservedNameStarts = new String[] { "CHANNEL_", "TOGGLE_", "VOICE_OPTION", "background_volume", 
             "messages_volume", "last_game_definition", "REPEAT_LAST_MESSAGE_BUTTON", "UpdateSettings", "VOLUME_UP", "VOLUME_DOWN", "GET_FUEL_STATUS",
-            ControllerConfiguration.ControllerData.PROPERTY_CONTAINER, "PERSONALISATION_NAME", "app_version", "PRINT_TRACK_DATA", "spotter_name"};
-        
+            ControllerConfiguration.ControllerData.PROPERTY_CONTAINER, "PERSONALISATION_NAME", "app_version", "PRINT_TRACK_DATA", "spotter_name",
+            "update_notify_attempted"};
+
         private UserSettings()
         {
             try
@@ -55,7 +56,7 @@ namespace CrewChiefV4
                 String savedAppVersion = getString("app_version");
                 if (savedAppVersion == null || !savedAppVersion.Equals(System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString()))
                 {
-                    Properties.Settings.Default.Upgrade();                
+                    Properties.Settings.Default.Upgrade();
                     setProperty("app_version", System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString());
                     Properties.Settings.Default.Save();
                 }
@@ -171,9 +172,13 @@ namespace CrewChiefV4
 
         public void saveUserSettings()
         {
-            if (!initFailed && propertiesUpdated)
+            // By MSDN it is not ok to write from multiple threads simultaneously, so lock here.
+            lock (this)
             {
-                Properties.Settings.Default.Save();
+                if (!initFailed && propertiesUpdated)
+                {
+                    Properties.Settings.Default.Save();
+                }
             }
         }
     }

@@ -1,16 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using CrewChiefV4;
 using System.Threading;
 using System.IO;
-using SharpDX.DirectInput;
 using System.Runtime.InteropServices;
 using AutoUpdaterDotNET;
 using System.Net;
@@ -80,7 +76,13 @@ namespace CrewChiefV4
         private ControlWriter cw = null;
 
         private float currentVolume = -1;
-                        
+        private NotifyIcon notificationTrayIcon;
+        private ToolStripItem contextMenuStartItem;
+        private ToolStripItem contextMenuStopItem;
+        private ToolStripMenuItem contextMenuGamesMenu;
+        private ToolStripItem contextMenuPreferencesItem;
+        private Boolean minimizeToTray = UserSettings.GetUserSettings().getBoolean("minimize_to_tray");
+
         private void FormMain_Load(object sender, EventArgs e)
         {            
             // Some update test code - uncomment this to allow the app to process an update .zip file in the root of the sound pack
@@ -272,6 +274,40 @@ namespace CrewChiefV4
                             downloadPersonalisationsButton.Enabled = false;
                             downloadPersonalisationsButton.BackColor = Color.LightGray;
                         }
+
+                        if (newSoundPackAvailable || newPersonalisationsAvailable || newDriverNamesAvailable)
+                        {
+                            // Ok, we have something available for download (any of the buttons is green).
+                            // Restore CC once so that user gets higher chance of noticing.
+                            // I am not sure what is the best approach, we could also have text in the context menu,
+                            // but I definitely dislike Balloons and other distracting methods.  But, basically if we choose
+                            // to do anything, do it here.
+                            // This has limitation if, say, we have sound pack available, and at next startup we have driver pack
+                            // available, one property is not enough.  But this is ultra rare and not worth complications.
+
+                            if (!UserSettings.GetUserSettings().getBoolean("update_notify_attempted"))
+                            {
+                                // Do this once per update availability.
+                                UserSettings.GetUserSettings().setProperty("update_notify_attempted", true);
+                                UserSettings.GetUserSettings().saveUserSettings();
+
+                                // Slight race with minimize on startup :D
+                                this.Invoke((MethodInvoker)delegate
+                                {
+                                    this.RestoreFromTray();
+                                });
+                            }
+                        }
+                        else
+                        {
+                            // If there are no updates available, clear the update_notify_attempted flag if it is set.
+                            if (UserSettings.GetUserSettings().getBoolean("update_notify_attempted"))
+                            {
+                                UserSettings.GetUserSettings().setProperty("update_notify_attempted", false);
+                                UserSettings.GetUserSettings().saveUserSettings();
+                            }
+                        }
+
                         Console.WriteLine("Check for updates completed");
                     }
                     catch (Exception error)
@@ -280,6 +316,39 @@ namespace CrewChiefV4
                     }
                 }
             }).Start();
+
+            if (UserSettings.GetUserSettings().getBoolean("minimize_on_startup"))
+            {
+                if (this.minimizeToTray)
+                    this.HideToTray();
+                else
+                    this.WindowState = FormWindowState.Minimized;
+            }
+        }
+
+        private void HideToTray()
+        {
+            if (!this.minimizeToTray)
+                return;
+
+            this.ShowInTaskbar = false;
+            this.Hide();
+            this.notificationTrayIcon.Visible = true;
+
+            // Do not mess with WindowState here, causes weirdest problems.
+        }
+
+        private void RestoreFromTray()
+        {
+            if (!this.minimizeToTray)
+                return;
+
+            this.ShowInTaskbar = true;
+            this.notificationTrayIcon.Visible = false;
+            this.Show();
+
+            // This is necessary to bring window to the foreground.  Why ffs BringToFront doesn't work is beyound me.
+            this.WindowState = FormWindowState.Normal;
         }
 
         public void updateMessagesVolume(float messagesVolume)
@@ -460,11 +529,97 @@ namespace CrewChiefV4
                 cw.textbox = null;
                 cw.Dispose();
             }
-        } 
+        }
+
+        private void SetupNotificationTrayIcon()
+        {
+            Debug.Assert(notificationTrayIcon == null, "Supposed to be called once");
+
+            notificationTrayIcon = new NotifyIcon();
+
+            // Load the icon.
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainWindow));
+            notificationTrayIcon.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+
+            notificationTrayIcon.DoubleClick += NotifyIcon_DoubleClick;
+
+            // Setup the context menu.
+            var cms = new ContextMenuStrip();
+
+            // Restore item.
+            var cmi = cms.Items.Add(Configuration.getUIString("restore_context_menu"));
+            cmi.Click += NotifyIcon_DoubleClick;
+
+            // Start/Stop items.
+            cms.Items.Add(new ToolStripSeparator());
+            contextMenuStartItem = cms.Items.Add(Configuration.getUIString("start_application"), null, this.startApplicationButton_Click);
+            contextMenuStopItem = cms.Items.Add(Configuration.getUIString("stop"), null, this.startApplicationButton_Click);
+            cms.Items.Add(new ToolStripSeparator());
+
+            // Form Game context submenu.
+            cmi = cms.Items.Add(Configuration.getUIString("game"));
+            contextMenuGamesMenu = cmi as ToolStripMenuItem;
+            foreach (var game in this.gameDefinitionList.Items)
+            {
+                var ddi = contextMenuGamesMenu.DropDownItems.Add(game.ToString());
+                ddi.Click += (sender, e) =>
+                {
+                    var gameSelected = sender as ToolStripMenuItem;
+                    if (gameSelected == null)
+                        return;
+
+                    this.gameDefinitionList.Text = gameSelected.Text;
+                };
+            }
+
+            contextMenuGamesMenu.DropDownOpening += (sender, e) =>
+            {
+                var currGameFriendlyName = this.gameDefinitionList.Text;
+                foreach (var game in contextMenuGamesMenu.DropDownItems)
+                {
+                    var tsmi = game as ToolStripMenuItem;
+                    tsmi.Checked = tsmi.Text == currGameFriendlyName;
+                }
+            };
+
+            // Preferences and Close items
+            contextMenuPreferencesItem = cms.Items.Add(Configuration.getUIString("properties"), null, this.editPropertiesButtonClicked);
+            cms.Items.Add(new ToolStripSeparator());
+            cmi = cms.Items.Add(Configuration.getUIString("close_context_menu"));
+            cmi.Click += (sender, e) =>
+            {
+                this.notificationTrayIcon.Visible = false;
+                this.Close();
+            };
+
+            cms.Opening += (sender, e) =>
+            {
+                this.contextMenuStartItem.Enabled = !this._IsAppRunning;
+                this.contextMenuStopItem.Enabled = this._IsAppRunning;
+
+                this.contextMenuStartItem.Text = string.IsNullOrWhiteSpace(this.gameDefinitionList.Text) 
+                    ? Configuration.getUIString("start_application")
+                    : string.Format(Configuration.getUIString("start_context_menu"), this.gameDefinitionList.Text);
+
+                // Only allow game selection if we're in a Stopped state.
+                foreach (var game in this.contextMenuGamesMenu.DropDownItems)
+                    (game as ToolStripMenuItem).Enabled = !this._IsAppRunning;
+            };
+
+
+            notificationTrayIcon.ContextMenuStrip = cms;
+        }
+
+        private void NotifyIcon_DoubleClick(object sender, EventArgs e)
+        {
+            this.RestoreFromTray();
+        }
 
         public MainWindow()
         {
             InitializeComponent();
+            SetupNotificationTrayIcon();
+
             CheckForIllegalCrossThreadCalls = false;
             cw = new ControlWriter(textBox1);
             textBox1.KeyDown += TextBox1_KeyDown;
@@ -606,6 +761,14 @@ namespace CrewChiefV4
             {
                 doStartAppStuff();
             }
+
+            this.Resize += MainWindow_Resize;
+        }
+
+        private void MainWindow_Resize(object sender, EventArgs e)
+        {
+            if (this.WindowState == FormWindowState.Minimized)
+                this.HideToTray();
         }
 
         private void TextBox1_KeyDown(object sender, KeyEventArgs e)
@@ -870,6 +1033,14 @@ namespace CrewChiefV4
                 this.personalisationBox.Enabled = true;
                 this.spotterNameBox.Enabled = true;
             }
+
+            this.gameDefinitionList.Enabled = !this._IsAppRunning;
+            this.contextMenuPreferencesItem.Enabled = !this._IsAppRunning;
+
+            if (this._IsAppRunning)
+                this.notificationTrayIcon.Text = string.Format(Configuration.getUIString("running_context_menu"), this.gameDefinitionList.Text);
+            else
+                this.notificationTrayIcon.Text = Configuration.getUIString("idling_context_menu");  // Or idling, smoking, any good jokes?
         }
 
         private void stopApp(object sender, FormClosedEventArgs e)
@@ -1012,8 +1183,23 @@ namespace CrewChiefV4
 
         private void editPropertiesButtonClicked(object sender, EventArgs e)
         {
-            var form = new PropertiesForm(this);
-            form.ShowDialog(this);
+            // If minized to tray, hide tray icon while properties dialog is shown,
+            // and it again when dialog is gone.  The goal is to prevent weird scenarios while
+            // option dialog is visible.
+            var minimizedToTray = this.notificationTrayIcon.Visible;
+            if (minimizedToTray)
+                this.notificationTrayIcon.Visible = false;
+
+            try
+            {
+                var form = new PropertiesForm(this);
+                form.ShowDialog(this);
+            }
+            finally
+            {
+                if (minimizedToTray)
+                    this.notificationTrayIcon.Visible = true;
+            }
         }
 
         private void helpButtonClicked(object sender, EventArgs e)
@@ -1477,6 +1663,10 @@ namespace CrewChiefV4
             {
                 warningMessage = "The app must be restarted manually";
             }
+
+            // Make app visible first.
+            this.RestoreFromTray();
+
             if (MessageBox.Show(warningMessage, warningTitle,
                 System.Diagnostics.Debugger.IsAttached ? MessageBoxButtons.OK : MessageBoxButtons.OKCancel) == DialogResult.OK)
             {
