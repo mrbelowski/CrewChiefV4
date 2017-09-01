@@ -2257,6 +2257,41 @@ namespace CrewChiefV4.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool minimize_to_tray {
+            get {
+                return ((bool)(this["minimize_to_tray"]));
+            }
+            set {
+                this["minimize_to_tray"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool minimize_on_startup {
+            get {
+                return ((bool)(this["minimize_on_startup"]));
+            }
+            set {
+                this["minimize_on_startup"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool update_notify_attempted {
+            get {
+                return ((bool)(this["update_notify_attempted"]));
+            }
+            set {
+                this["update_notify_attempted"] = value;
+	    }
+        }
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True")]
         public bool manual_formation_go_with_leader {
             get {
