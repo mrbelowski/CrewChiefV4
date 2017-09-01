@@ -134,21 +134,9 @@ namespace CrewChiefV4.rFactor1
                 shared.session >= 5 && shared.session <= 8 ? shared.session - 5 :
                 shared.session >= 10 && shared.session <= 13 ? shared.session - 10 : 0;
             currentGameState.SessionData.SessionType = mapToSessionType(shared);
-
-            Boolean startedNewLap = false;
-            Boolean finishedLap = false;
-            SessionPhase previousSessionPhase = SessionPhase.Unavailable;
-            if (previousGameState != null) 
-            {
-                // player.sectorNumber might go to 0 at session-end
-                finishedLap = previousGameState.SessionData.SectorNumber == 0 ||
-                              (previousGameState.SessionData.SectorNumber == 3 && player.sector <= 1);
-                startedNewLap = shared.lapNumber > previousGameState.SessionData.CompletedLaps;
-                previousSessionPhase = previousGameState.SessionData.SessionPhase;
-            }            
-            Boolean isInPits = player.inPits == 1;
+           
             currentGameState.SessionData.SessionPhase = mapToSessionPhase((rFactor1Constant.rfGamePhase)shared.gamePhase,
-                    previousSessionPhase, /*finishedLap ||*/ startedNewLap, isInPits);
+                currentGameState.SessionData.SessionType, ref player);
 
             // --------------------------------
             // flags data
@@ -997,8 +985,10 @@ namespace CrewChiefV4.rFactor1
             }
         }
 
-        private SessionPhase mapToSessionPhase(rFactor1Constant.rfGamePhase sessionPhase, SessionPhase previousSessionPhase, 
-            Boolean finishedLap, Boolean isInPit)
+        private SessionPhase mapToSessionPhase(
+            rFactor1Constant.rfGamePhase sessionPhase,
+            SessionType sessionType,
+            ref rfVehicleInfo player)
         {
             switch (sessionPhase)
             {
@@ -1015,17 +1005,16 @@ namespace CrewChiefV4.rFactor1
                 // sessions never go to sessionStopped, they always go straight from greenFlag to sessionOver
                 case rFactor1Constant.rfGamePhase.sessionStopped:
                 case rFactor1Constant.rfGamePhase.sessionOver:
-                    if (isInPit || finishedLap || previousSessionPhase == SessionPhase.Finished)
-                    {
-                        return SessionPhase.Finished;
-                    }
-                    else
+                    if (sessionType == SessionType.Race
+                        && player.finishStatus == (sbyte)rFactor1Constant.rfFinishStatus.none)
                     {
                         return SessionPhase.Checkered;
                     }
+                    else
+                    {
+                        return SessionPhase.Finished;
+                    }
                 // fullCourseYellow will count as greenFlag since we'll call it out in the Flags separately anyway
-
-                    // TODO: can we map to FullCourseYellow here?
                 case rFactor1Constant.rfGamePhase.fullCourseYellow:
                     return SessionPhase.FullCourseYellow;
                 case rFactor1Constant.rfGamePhase.greenFlag:
