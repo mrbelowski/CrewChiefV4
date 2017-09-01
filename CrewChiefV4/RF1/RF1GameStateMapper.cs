@@ -869,31 +869,36 @@ namespace CrewChiefV4.rFactor1
             // --------------------------------
             // flags data
             FlagEnum Flag = FlagEnum.UNKNOWN;
+            if (!currentGameState.FlagData.isFullCourseYellow)  // Don't announce blue on slower under FCY.
+            {
+                foreach (var opponent in currentGameState.OpponentData.Values)
+                {
+                    if (currentGameState.SessionData.SessionType != SessionType.Race
+                        || currentGameState.SessionData.CompletedLaps < 1
+                        || currentGameState.PositionAndMotionData.DistanceRoundTrack < 0.0f)
+                    {
+                        break;
+                    }
+
+                    if (opponent.getCurrentLapData().InLap
+                        || opponent.getCurrentLapData().OutLap
+                        || opponent.Position > currentGameState.SessionData.Position)
+                    {
+                        continue;
+                    }
+
+                    if (isBehindWithinDistance(currentGameState.SessionData.TrackDefinition.trackLength, 8.0f, 40.0f,
+                            currentGameState.PositionAndMotionData.DistanceRoundTrack, opponent.DistanceRoundTrack)
+                        && opponent.Speed >= currentGameState.PositionAndMotionData.CarSpeed)
+                    {
+                        Flag = FlagEnum.BLUE;
+                        break;
+                    }
+                }
+            }
             if (currentGameState.SessionData.IsDisqualified && previousGameState != null && !previousGameState.SessionData.IsDisqualified)
             {
                 Flag = FlagEnum.BLACK;
-            }
-            foreach (OpponentData opponent in currentGameState.OpponentData.Values)
-            {
-                if (currentGameState.SessionData.SessionType != SessionType.Race || 
-                    currentGameState.SessionData.CompletedLaps < 1 || 
-                    currentGameState.PositionAndMotionData.DistanceRoundTrack < 0)
-                {
-                    break;
-                }
-                if (opponent.getCurrentLapData().InLap || 
-                    opponent.getCurrentLapData().OutLap || 
-                    opponent.Position > currentGameState.SessionData.Position)
-                {
-                    continue;
-                }
-                if (isBehindWithinDistance(currentGameState.SessionData.TrackDefinition.trackLength, 8, 40, 
-                    currentGameState.PositionAndMotionData.DistanceRoundTrack, opponent.DistanceRoundTrack) && 
-                    opponent.Speed >= currentGameState.PositionAndMotionData.CarSpeed)
-                {
-                    Flag = FlagEnum.BLUE;
-                    break;
-                }
             }
             currentGameState.SessionData.Flag = Flag;
 
