@@ -11,7 +11,10 @@ secondary update sources) can still be updated. All downloads from this source w
 <!--legacy sound pack stuff for 4.1.2.2 and earlier-->
 <soundpackversion>121</soundpackversion>
 <basesoundpackurl>http://crewchief.isnais.de/base_sound_pack.zip</basesoundpackurl>
+<!-- sound pack update from base to version 121 will use this update pack -->
 <updatesoundpackurl>http://crewchief.isnais.de/update_sound_pack.zip</updatesoundpackurl>
+<!-- sound pack update from version 121 upwards will use this update pack -->
+<update2soundpackurl>http://crewchief.isnais.de/update_2_sound_pack.zip</update2soundpackurl>
 <drivernamesversion>100</drivernamesversion>
 <basedrivernamesurl>http://crewchief.isnais.de/base_driver_names.zip</basedrivernamesurl>
 <updatedrivernamesurl>http://crewchief.isnais.de/update_driver_names.zip</updatedrivernamesurl>
@@ -23,7 +26,10 @@ secondary update sources) can still be updated. All downloads from this source w
 <soundpack language="en">
 	<soundpackversion>121</soundpackversion>
 	<basesoundpackurl>http://crewchief.isnais.de/base_sound_pack.zip</basesoundpackurl>
+	<!-- sound pack update from base to version 121 will use this update pack -->
 	<updatesoundpackurl>http://crewchief.isnais.de/update_sound_pack.zip</updatesoundpackurl>
+	<!-- sound pack update from version 121 upwards will use this update pack -->
+	<update2soundpackurl>http://crewchief.isnais.de/update_2_sound_pack.zip</update2soundpackurl>
 	<drivernamesversion>119</drivernamesversion>
 	<basedrivernamesurl>http://crewchief.isnais.de/base_driver_names.zip</basedrivernamesurl>
 	<updatedrivernamesurl>http://crewchief.isnais.de/update_driver_names.zip</updatedrivernamesurl>
