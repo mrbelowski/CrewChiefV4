@@ -27,8 +27,10 @@ namespace CrewChiefV4
 
         private String baseSoundPackDownloadLocation;
         private String updateSoundPackDownloadLocation;
+        private String update2SoundPackDownloadLocation;
         private String soundPackTempFileName = "temp_sound_pack.zip";
         private Boolean getBaseSoundPack = false;
+        private Boolean getFirstUpdateSoundPack = false;
 
         private String basePersonalisationsDownloadLocation;
         private String updatePersonalisationsDownloadLocation;
@@ -168,6 +170,7 @@ namespace CrewChiefV4
                                     baseDriverNamesDownloadLocation = element.Descendants("basedrivernamesurl").First().Value;
                                     basePersonalisationsDownloadLocation = element.Descendants("basepersonalisationsurl").First().Value;
                                     updateSoundPackDownloadLocation = element.Descendants("updatesoundpackurl").First().Value;
+                                    update2SoundPackDownloadLocation = element.Descendants("update2soundpackurl").First().Value;
                                     updateDriverNamesDownloadLocation = element.Descendants("updatedrivernamesurl").First().Value;
                                     updatePersonalisationsDownloadLocation = element.Descendants("updatepersonalisationsurl").First().Value;
                                     gotLanguageSpecificUpdateInfo = true;
@@ -183,6 +186,7 @@ namespace CrewChiefV4
                                 baseDriverNamesDownloadLocation = doc.Descendants("basedrivernamesurl").First().Value;
                                 basePersonalisationsDownloadLocation = doc.Descendants("basepersonalisationsurl").First().Value;
                                 updateSoundPackDownloadLocation = doc.Descendants("updatesoundpackurl").First().Value;
+                                update2SoundPackDownloadLocation = doc.Descendants("update2soundpackurl").First().Value;
                                 updateDriverNamesDownloadLocation = doc.Descendants("updatedrivernamesurl").First().Value;
                                 updatePersonalisationsDownloadLocation = doc.Descendants("updatepersonalisationsurl").First().Value;
                             }
@@ -210,6 +214,8 @@ namespace CrewChiefV4
                             }
                             else
                             {
+                                // if we're on an old update sound pack, get the first (large) update
+                                getFirstUpdateSoundPack = AudioPlayer.soundPackVersion < AudioPlayer.lastUpdateSoundPackVersion;
                                 downloadSoundPackButton.Text = Configuration.getUIString("updated_sound_pack_available_press_to_download");
                             }
                             newSoundPackAvailable = true;
@@ -1405,9 +1411,13 @@ namespace CrewChiefV4
                     {
                         wc.DownloadFileAsync(new Uri(baseSoundPackDownloadLocation), AudioPlayer.soundFilesPath + @"\" + soundPackTempFileName);
                     }
-                    else
+                    else if (getFirstUpdateSoundPack)
                     {
                         wc.DownloadFileAsync(new Uri(updateSoundPackDownloadLocation), AudioPlayer.soundFilesPath + @"\" + soundPackTempFileName);
+                    }
+                    else
+                    {
+                        wc.DownloadFileAsync(new Uri(update2SoundPackDownloadLocation), AudioPlayer.soundFilesPath + @"\" + soundPackTempFileName);
                     }
                 }
                 else if (downloadType == DownloadType.DRIVER_NAMES)
