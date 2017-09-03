@@ -72,12 +72,25 @@ namespace CrewChiefV4.rFactor1
             // no session data
             if (shared.numVehicles == 0)
             {
-                isOfflineSession = true;
-                distanceOffTrack = 0;
-                isApproachingTrack = false;
-                wheelCircumference = new float[] { 0, 0 };
-                previousGameState = null;
-                return null;
+                // if we skip to next session the session phase never goes to 'finished'. We do, however, see the numVehicles drop to zero.
+                // If we have a previous game state and it's in a valid phase here, update it to Finished and return it. This requires some
+                // additional logic in the main CrewChief loop (because this means current and previous game state are the same object).
+                if (previousGameState != null && previousGameState.SessionData.SessionType != SessionType.Unavailable &&
+                    previousGameState.SessionData.SessionPhase != SessionPhase.Finished &&
+                    previousGameState.SessionData.SessionPhase != SessionPhase.Unavailable)
+                {
+                    previousGameState.SessionData.SessionPhase = SessionPhase.Finished;
+                    return previousGameState;
+                }
+                else
+                {
+                    isOfflineSession = true;
+                    distanceOffTrack = 0;
+                    isApproachingTrack = false;
+                    wheelCircumference = new float[] { 0, 0 };
+                    previousGameState = null;
+                    return null;
+                }
             }
             // game is paused or other window has taken focus
             if (shared.deltaTime >= 0.56)
@@ -134,7 +147,6 @@ namespace CrewChiefV4.rFactor1
                 shared.session >= 5 && shared.session <= 8 ? shared.session - 5 :
                 shared.session >= 10 && shared.session <= 13 ? shared.session - 10 : 0;
             currentGameState.SessionData.SessionType = mapToSessionType(shared);
-           
             currentGameState.SessionData.SessionPhase = mapToSessionPhase((rFactor1Constant.rfGamePhase)shared.gamePhase,
                 currentGameState.SessionData.SessionType, ref player);
 
