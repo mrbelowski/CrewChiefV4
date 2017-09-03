@@ -134,18 +134,28 @@ namespace CrewChiefV4.rFactor2
             // no session data
             if (shared.scoring.mScoringInfo.mNumVehicles == 0)
             {
-                this.isOfflineSession = true;
-                this.distanceOffTrack = 0;
-                this.isApproachingTrack = false;
-
-                if (pgs != null)
+                // if we skip to next session the session phase never goes to 'finished'. We do, however, see the numVehicles drop to zero.
+                // If we have a previous game state and it's in a valid phase here, update it to Finished and return it. This requires some
+                // additional logic in the main CrewChief loop (because this means current and previous game state are the same object).
+                if (pgs != null && pgs.SessionData.SessionType != SessionType.Unavailable && 
+                    pgs.SessionData.SessionPhase != SessionPhase.Finished && pgs.SessionData.SessionPhase != SessionPhase.Unavailable)
                 {
-                    // In rF2 user can quit practice session and we will never know
-                    // about it.  Mark previous game state with Unavailable flags.
-                    pgs.SessionData.SessionType = SessionType.Unavailable;
-                    pgs.SessionData.SessionPhase = SessionPhase.Unavailable;
+                    pgs.SessionData.SessionPhase = SessionPhase.Finished;
                 }
+                else
+                {
+                    this.isOfflineSession = true;
+                    this.distanceOffTrack = 0;
+                    this.isApproachingTrack = false;
 
+                    if (pgs != null)
+                    {
+                        // In rF2 user can quit practice session and we will never know
+                        // about it.  Mark previous game state with Unavailable flags.
+                        pgs.SessionData.SessionType = SessionType.Unavailable;
+                        pgs.SessionData.SessionPhase = SessionPhase.Unavailable;
+                    }
+                }
                 return pgs;
             }
 

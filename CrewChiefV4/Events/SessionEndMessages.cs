@@ -29,6 +29,8 @@ namespace CrewChiefV4.Events
 
         private AudioPlayer audioPlayer;
 
+        private int minSessionRunTimeForEndMessages = 60;
+
         public SessionEndMessages(AudioPlayer audioPlayer)
         {
             this.audioPlayer = audioPlayer;
@@ -44,7 +46,7 @@ namespace CrewChiefV4.Events
             }
             if (sessionType == SessionType.Race)
             {
-                if (sessionRunningTime > 60 || completedLaps > 0)
+                if (sessionRunningTime >= minSessionRunTimeForEndMessages || completedLaps > 0)
                 {
                     if (lastSessionPhase == SessionPhase.Finished)
                     {
@@ -58,12 +60,12 @@ namespace CrewChiefV4.Events
                 }
                 else
                 {
-                    Console.WriteLine("skipping race session end message because it didn't run for a lap or a minute");
+                    Console.WriteLine("skipping race session end message because it didn't run for a lap or " + minSessionRunTimeForEndMessages + " seconds");
                 }
             }
             else if (sessionType == SessionType.Practice || sessionType == SessionType.Qualify)
             {
-                if (sessionRunningTime > 60)
+                if (sessionRunningTime >= minSessionRunTimeForEndMessages)
                 {
                     if (lastSessionPhase == SessionPhase.Green || lastSessionPhase == SessionPhase.FullCourseYellow || 
                         lastSessionPhase == SessionPhase.Finished || lastSessionPhase == SessionPhase.Checkered)
@@ -77,7 +79,7 @@ namespace CrewChiefV4.Events
                 }
                 else
                 {
-                    Console.WriteLine("skipping non-race session end message because the session didn't run for a minute");
+                    Console.WriteLine("skipping non-race session end message because the session didn't run for " + minSessionRunTimeForEndMessages + " seconds");
                 }
             }
         }
