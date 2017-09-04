@@ -290,10 +290,6 @@ namespace CrewChiefV4
                             {
                                 staticSpeechChoices.Add(s + " " + entry.Key + " " + minuteArray);
                             }
-                            foreach (String hourArray in HOUR)
-                            {
-                                staticSpeechChoices.Add(s + " " + entry.Key + " " + hourArray);
-                            }
                         }
                         else
                         {
@@ -305,12 +301,25 @@ namespace CrewChiefV4
                             {
                                 staticSpeechChoices.Add(s + " " + entry.Key + " " + minutesArray);
                             }
+                        }
+                    }
+                    foreach (KeyValuePair<String, int> entry in hoursToNumber)
+                    {
+                        if (entry.Value == 1)
+                        {
+                            foreach (String hourArray in HOUR)
+                            {
+                                staticSpeechChoices.Add(s + " " + entry.Key + " " + hourArray);
+                            }
+                        }
+                        else
+                        {
                             foreach (String hoursArray in HOURS)
                             {
                                 staticSpeechChoices.Add(s + " " + entry.Key + " " + hoursArray);
                             }
                         }
-                    }                    
+                    }
                 }
 
                 validateAndAdd(KEEP_QUIET, staticSpeechChoices);
