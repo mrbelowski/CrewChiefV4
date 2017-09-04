@@ -282,11 +282,17 @@ namespace CrewChiefV4
                     {
                         if(entry.Value == 1)
                         {
-                            staticSpeechChoices.Add(s + " " + entry.Key + " " + "lap");
+                            foreach (String lapArray in LAP)
+                            {
+                                staticSpeechChoices.Add(s + " " + entry.Key + " " + lapArray);
+                            }                            
                         }
                         else
                         {
-                            staticSpeechChoices.Add(s + " " + entry.Key + " " + "laps");
+                            foreach (String lapsArray in LAPS)
+                            {
+                                staticSpeechChoices.Add(s + " " + entry.Key + " " + lapsArray);
+                            } 
                         }
                     }                    
                 }
