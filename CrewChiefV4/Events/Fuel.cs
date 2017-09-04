@@ -703,7 +703,7 @@ namespace CrewChiefV4.Events
                 }
                 else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOUR) || SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOURS))
                 {
-                    if (!reportFuelConsumptionForTimeInMinutes(unit))
+                    if (!reportFuelConsumptionForTimeInHours(unit))
                     {
                         audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
                     }
