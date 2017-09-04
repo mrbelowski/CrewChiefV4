@@ -42,6 +42,15 @@ namespace CrewChiefV4
         public static String[] WHATS_MY_POSITION = Configuration.getSpeechRecognitionPhrases("WHATS_MY_POSITION");
         public static String[] WHATS_MY_FUEL_LEVEL = Configuration.getSpeechRecognitionPhrases("WHATS_MY_FUEL_LEVEL");
         public static String[] WHATS_MY_FUEL_USAGE = Configuration.getSpeechRecognitionPhrases("WHATS_MY_FUEL_USAGE");
+        
+        
+        public static String[] CALCULATE_FUEL_FOR = Configuration.getSpeechRecognitionPhrases("CALCULATE_FUEL_FOR");
+        public static String[] LAP = Configuration.getSpeechRecognitionPhrases("LAP");
+        public static String[] LAPS = Configuration.getSpeechRecognitionPhrases("LAPS");
+        public static String[] MINUT = Configuration.getSpeechRecognitionPhrases("MINUT");
+        public static String[] MINUTS = Configuration.getSpeechRecognitionPhrases("MINUTS");
+        public static String[] HOUR = Configuration.getSpeechRecognitionPhrases("HOUR");
+        public static String[] HOURS = Configuration.getSpeechRecognitionPhrases("HOURS");
 
         public static String[] KEEP_QUIET = Configuration.getSpeechRecognitionPhrases("KEEP_QUIET");
         public static String[] KEEP_ME_INFORMED = Configuration.getSpeechRecognitionPhrases("KEEP_ME_INFORMED");
@@ -116,12 +125,24 @@ namespace CrewChiefV4
 
         public static Dictionary<String, int> numberToNumber = getNumberMappings();
 
+        public static Dictionary<String, int> hoursToNumber = getHourMappings();
+
         public Boolean waitingForSpeech = false;
 
         private static Dictionary<String, int> getNumberMappings()
         {
             Dictionary<String, int> dict = new Dictionary<string, int>();
-            for (int i = 1; i <= 50; i++)
+            for (int i = 1; i <= 59; i++)
+            {
+                dict.Add(Configuration.getSpeechRecognitionConfigOption(i.ToString()), i);
+            }
+            return dict;
+        }
+
+        private static Dictionary<String, int> getHourMappings()
+        {
+            Dictionary<String, int> dict = new Dictionary<string, int>();
+            for (int i = 1; i <= 24; i++)
             {
                 dict.Add(Configuration.getSpeechRecognitionConfigOption(i.ToString()), i);
             }
@@ -181,6 +202,25 @@ namespace CrewChiefV4
             }
         }
 
+        private void validateAndAdd(String[] speechPhrases, string suffix, Choices choices)
+        {
+            if (speechPhrases != null && speechPhrases.Count() > 0)
+            {
+                Boolean valid = true;
+                foreach (String s in speechPhrases)
+                {
+                    if (s == null || s.Trim().Count() == 0)
+                    {
+                        valid = false;
+                        break;
+                    }
+                }
+                if (valid)
+                {
+                    choices.Add(speechPhrases + " " + suffix);
+                }
+            }
+        }
         public void initialiseSpeechEngine()
         {
             initialised = false;
@@ -250,6 +290,25 @@ namespace CrewChiefV4
                 validateAndAdd(WHATS_MY_POSITION, staticSpeechChoices);
                 validateAndAdd(WHATS_MY_FUEL_LEVEL, staticSpeechChoices);
                 validateAndAdd(WHATS_MY_FUEL_USAGE, staticSpeechChoices);
+
+                foreach (String s in CALCULATE_FUEL_FOR)
+                {
+                    if (s == null || s.Trim().Count() == 0)
+                    {
+                        continue;
+                    }
+                    foreach (KeyValuePair<String, int> entry in numberToNumber)
+                    {
+                        if(entry.Value == 1)
+                        {
+                            staticSpeechChoices.Add(s + " " + entry.Key + " " + LAP);
+                        }
+                        else
+                        {
+                            staticSpeechChoices.Add(s + " " + entry.Key + " " + LAPS);
+                        }
+                    }                    
+                }
 
                 validateAndAdd(KEEP_QUIET, staticSpeechChoices);
                 validateAndAdd(KEEP_ME_INFORMED, staticSpeechChoices);
@@ -562,7 +621,8 @@ namespace CrewChiefV4
             }
             else if (ResultContains(recognisedSpeech, WHATS_MY_FUEL_LEVEL) 
                 || ResultContains(recognisedSpeech, HOWS_MY_FUEL)
-                || ResultContains(recognisedSpeech, WHATS_MY_FUEL_USAGE))
+                || ResultContains(recognisedSpeech, WHATS_MY_FUEL_USAGE)
+                || ResultContains(recognisedSpeech, CALCULATE_FUEL_FOR))
             {
                 return CrewChief.getEvent("Fuel");
             }
