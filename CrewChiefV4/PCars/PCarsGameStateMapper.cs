@@ -1189,7 +1189,7 @@ namespace CrewChiefV4.PCars
             currentGameState.TyreData.LeftFrontBrakeTemp = shared.mBrakeTempCelsius[0];
             currentGameState.TyreData.RightFrontBrakeTemp = shared.mBrakeTempCelsius[1];
             currentGameState.TyreData.LeftRearBrakeTemp = shared.mBrakeTempCelsius[2];
-            currentGameState.TyreData.RightRearBrakeTemp = shared.mBrakeTempCelsius[0];
+            currentGameState.TyreData.RightRearBrakeTemp = shared.mBrakeTempCelsius[3];
 
             // improvised cut track warnings...
             if (incrementCutTrackCountWhenLeavingRacingSurface)
