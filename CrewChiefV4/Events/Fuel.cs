@@ -101,7 +101,8 @@ namespace CrewChiefV4.Events
         private List<float> usagePerLap = new List<float>();
 
         private float fuelAtStartOfLastLap = 0;
-
+        private float OverallSessionBestLapTime = -1;
+        
         public Fuel(AudioPlayer audioPlayer)
         {
             this.audioPlayer = audioPlayer;
@@ -132,6 +133,7 @@ namespace CrewChiefV4.Events
             hasBeenRefuelled = false;
             usagePerLap.Clear();
             fuelAtStartOfLastLap = 0;
+            OverallSessionBestLapTime = -1;
         }
 
         // fuel not implemented for HotLap modes
@@ -152,7 +154,7 @@ namespace CrewChiefV4.Events
                 currentFuel = currentGameState.FuelData.FuelLeft;
                 return;
             }
-
+            OverallSessionBestLapTime = currentGameState.SessionData.OverallSessionBestLapTime;
             fuelUseActive = currentGameState.FuelData.FuelUseActive;
             currentFuel = currentGameState.FuelData.FuelLeft;
             if (fuelUseActive && ((currentGameState.SessionData.SessionType == SessionType.Race &&
@@ -469,6 +471,106 @@ namespace CrewChiefV4.Events
             }
             return haveData;
         }
+        int calculateEstimateNumberOfLapsFromMinutes(int minutes)
+        {
+            int estimateNrOfLaps = -1;
+            if(OverallSessionBestLapTime != 0 && OverallSessionBestLapTime != -1)
+            {
+                estimateNrOfLaps = (int)Math.Ceiling((minutes * 60) / OverallSessionBestLapTime);
+            }
+            return estimateNrOfLaps;
+        }
+        int calculateEstimateNumberOfLapsFromHours(int hours)
+        {
+            int estimateNrOfLaps = -1;
+            if (OverallSessionBestLapTime != 0 && OverallSessionBestLapTime != -1)
+            {
+                estimateNrOfLaps = (int)Math.Ceiling(((hours * 60) * 60) / OverallSessionBestLapTime);
+            }
+            return estimateNrOfLaps;
+        }
+        private Boolean reportFuelConsumptionForTimeInMinutes(int minutes)
+        {
+            Boolean haveData = false;
+            if (fuelUseActive && usagePerLap.Count > 0)
+            {
+                // round to 1dp
+                int numberOfLaps = calculateEstimateNumberOfLapsFromMinutes(minutes);
+                float meanUsePerLap = ((float)Math.Round(usagePerLap.Average() * numberOfLaps * 10f)) / 10f;
+                if (meanUsePerLap == 0)
+                {
+                    // rounded fuel use is < 0.1 litres per lap - can't really do anything with this.
+                    return false;
+                }
+                // get the whole and fractional part (yeah, I know this is shit)
+                String str = meanUsePerLap.ToString();
+                int pointPosition = str.IndexOf('.');
+                int wholePart = 0;
+                int fractionalPart = 0;
+                if (pointPosition > 0)
+                {
+                    wholePart = int.Parse(str.Substring(0, pointPosition));
+                    fractionalPart = int.Parse(str[pointPosition + 1].ToString());
+                    if(fractionalPart != 0)
+                    {
+                        wholePart += 1;
+                    }
+                }
+                else
+                {
+                    wholePart = (int)meanUsePerLap;
+                }
+                if (meanUsePerLap > 0)
+                {
+                    haveData = true;                    
+                    //folderLitresPerLap needs to be changed to liters folder, just needed this for testing
+                    audioPlayer.playMessageImmediately(new QueuedMessage("Fuel/estimate",
+                            MessageContents(folderWeEstimate, wholePart, folderLitresPerLap), 0, null));
+                }
+            }
+            return haveData;
+        }
+        private Boolean reportFuelConsumptionForTimeInHours(int hours)
+        {
+            Boolean haveData = false;
+            if (fuelUseActive && usagePerLap.Count > 0)
+            {
+                // round to 1dp
+                int numberOfLaps = calculateEstimateNumberOfLapsFromHours(hours);
+                float meanUsePerLap = ((float)Math.Round(usagePerLap.Average() * numberOfLaps * 10f)) / 10f;
+                if (meanUsePerLap == 0)
+                {
+                    // rounded fuel use is < 0.1 litres per lap - can't really do anything with this.
+                    return false;
+                }
+                // get the whole and fractional part (yeah, I know this is shit)
+                String str = meanUsePerLap.ToString();
+                int pointPosition = str.IndexOf('.');
+                int wholePart = 0;
+                int fractionalPart = 0;
+                if (pointPosition > 0)
+                {
+                    wholePart = int.Parse(str.Substring(0, pointPosition));
+                    fractionalPart = int.Parse(str[pointPosition + 1].ToString());
+                    if (fractionalPart != 0)
+                    {
+                        wholePart += 1;
+                    }
+                }
+                else
+                {
+                    wholePart = (int)meanUsePerLap;
+                }
+                if (meanUsePerLap > 0)
+                {
+                    haveData = true;
+                    //folderLitresPerLap needs to be changed to liters folder, just needed this for testing
+                    audioPlayer.playMessageImmediately(new QueuedMessage("Fuel/estimate",
+                            MessageContents(folderWeEstimate, wholePart, folderLitresPerLap), 0, null));
+                }
+            }
+            return haveData;
+        }
         private Boolean reportFuelRemaining()
         {
             Boolean haveData = false;
@@ -576,21 +678,35 @@ namespace CrewChiefV4.Events
             else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.CALCULATE_FUEL_FOR))
             {
 
-                int units = 0;
+                int unit = 0;
                 foreach (KeyValuePair<String, int> entry in SpeechRecogniser.numberToNumber)
                 {
                     if (voiceMessage.Contains(" " + entry.Key + " "))
                     {
-                        units = entry.Value;
+                        unit = entry.Value;
                         break;
                     }
                 }
                 if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.LAP) || SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.LAPS))
                 {
-                    if (!reportFuelConsumptionForLaps(units))
+                    if (!reportFuelConsumptionForLaps(unit))
                     {
                         audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
                     } 
+                }
+                else if(SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.MINUTE) || SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.MINUTES))
+                {
+                    if (!reportFuelConsumptionForTimeInMinutes(unit))
+                    {
+                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+                    } 
+                }
+                else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOUR) || SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOURS))
+                {
+                    if (!reportFuelConsumptionForTimeInMinutes(unit))
+                    {
+                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+                    }
                 }
             }
         }
