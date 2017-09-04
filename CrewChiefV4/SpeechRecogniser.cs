@@ -132,7 +132,7 @@ namespace CrewChiefV4
         private static Dictionary<String, int> getNumberMappings()
         {
             Dictionary<String, int> dict = new Dictionary<string, int>();
-            for (int i = 1; i <= 59; i++)
+            for (int i = 1; i <= 60; i++)
             {
                 dict.Add(Configuration.getSpeechRecognitionConfigOption(i.ToString()), i);
             }
