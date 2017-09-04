@@ -531,8 +531,6 @@ namespace CrewChiefV4
                         gameStateMapper.versionCheck(rawGameData);
 
                         GameStateData nextGameState = null;
-                        // hold the last session phase - we need it to detect early session exit in RF1 and RF2
-                        SessionPhase lastSessionPhase = currentGameState == null ? SessionPhase.Unavailable : currentGameState.SessionData.SessionPhase;
                         try
                         {
                             nextGameState = gameStateMapper.mapToGameStateData(rawGameData, currentGameState);
@@ -542,17 +540,9 @@ namespace CrewChiefV4
                             Console.WriteLine("Error mapping game data: " + e.Message + ", " + e.StackTrace);
                         }
 
-                        // special case for RF1 and RF2 - early session end stops the mapper from completing (the most recent shared memory data is bollocks). 
-                        // We catch this immediately in the mapper and return the previous game state with the session phase modified
-                        Boolean rFactorSessionEndCheck = (gameDefinition.gameEnum == GameEnum.RF1 || gameDefinition.gameEnum == GameEnum.RF2_64BIT) && 
-                            nextGameState == currentGameState && 
-                            lastSessionPhase != SessionPhase.Unavailable && 
-                            lastSessionPhase != SessionPhase.Finished && 
-                            currentGameState.SessionData.SessionPhase == SessionPhase.Finished;
-
                         // if we're paused or viewing another car, the mapper will just return the previous game state so we don't lose all the
                         // persistent state information. If this is the case, don't process any stuff
-                        if (nextGameState != null && (rFactorSessionEndCheck || nextGameState != currentGameState))
+                        if (nextGameState != null && (nextGameState.SessionData.AbruptSessionEndDetected || nextGameState != currentGameState))
                         {
                             previousGameState = currentGameState;
                             currentGameState = nextGameState;

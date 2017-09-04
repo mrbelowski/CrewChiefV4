@@ -295,6 +295,12 @@ namespace CrewChiefV4.GameState
 
         public String stoppedInLandmark = null;
 
+        // Currently, used by rFactor family of games to indicate that user finished session
+        // by proceeding to the next session while in the monitor.  Currently, those games do not go
+        // in into "Finished" phase in such case.  If this is true, SessionPhase is set to Finished
+        // artificially by mappers, not by the game.
+        public Boolean AbruptSessionEndDetected = false;
+
         public SessionData()
         {
             SessionTimesAtEndOfSectors.Add(1, -1);
