@@ -135,6 +135,7 @@ namespace CrewChiefV4.Events
             hasBeenRefuelled = false;
             usagePerLap.Clear();
             fuelAtStartOfLastLap = 0;
+            OverallSessionBestLapTime = -1;
         }
 
         // fuel not implemented for HotLap modes
