@@ -45,7 +45,6 @@ namespace CrewChiefV4.Events
 
         public static String folderLitresPerLap = "fuel/litres_per_lap";
 
-        //I'm gonna need you to add some speech for this
         public static String folderLitres = "fuel/litres";
 
         private float averageUsagePerLap;
@@ -96,12 +95,15 @@ namespace CrewChiefV4.Events
 
         private Boolean enableFuelMessages = UserSettings.GetUserSettings().getBoolean("enable_fuel_messages");
 
+        private Boolean delayResponses = UserSettings.GetUserSettings().getBoolean("enable_delayed_responses");
+
         private Boolean hasBeenRefuelled = false;
 
         private List<float> usagePerLap = new List<float>();
 
         private float fuelAtStartOfLastLap = 0;
-        private float OverallSessionBestLapTime = -1;
+
+        private Random random = new Random();
         
         public Fuel(AudioPlayer audioPlayer)
         {
@@ -162,8 +164,7 @@ namespace CrewChiefV4.Events
                  ((currentGameState.SessionData.SessionType == SessionType.Qualify || currentGameState.SessionData.SessionType == SessionType.Practice || 
                     currentGameState.SessionData.SessionType == SessionType.HotLap) &&
                     ((currentGameState.SessionData.SessionPhase == SessionPhase.Green || currentGameState.SessionData.SessionPhase == SessionPhase.FullCourseYellow) || 
-                        currentGameState.SessionData.SessionPhase == SessionPhase.Countdown) &&
-                    currentGameState.SessionData.LapTimeCurrent > 0)))
+                        currentGameState.SessionData.SessionPhase == SessionPhase.Countdown))))
             {               
                 // To get the initial fuel, wait for 15 seconds
                 if (currentGameState.SessionData.SessionRunningTime > 15)
@@ -439,10 +440,28 @@ namespace CrewChiefV4.Events
                 float totalUsage = (float)Math.Ceiling(usagePerLap.Average() * numberOfLaps);
                 if (totalUsage > 0)
                 {
-                    haveData = true;                    
-                    //folderLitresPerLap needs to be changed to liters folder, just needed this for testing
-                    audioPlayer.playMessageImmediately(new QueuedMessage("Fuel/estimate",
-                            MessageContents(folderWeEstimate, totalUsage, folderLitresPerLap), 0, null));
+                    haveData = true;
+                    // build up the message fragments the verbose way, so we can prevent the number reader from shortening hundreds to
+                    // stuff like "one thirty two" - we always want "one hundred and thirty two"
+                    List<MessageFragment> messageFragments = new List<MessageFragment>();
+                    messageFragments.Add(MessageFragment.Text(folderWeEstimate));
+                    messageFragments.Add(MessageFragment.Integer(Convert.ToInt32(totalUsage), false));
+                    messageFragments.Add(MessageFragment.Text(folderLitres));
+                    QueuedMessage fuelEstimateMessage = new QueuedMessage("Fuel/estimate",
+                            messageFragments, 0, null);
+                    // play this immediately or play "stand by", and queue it to be played in a few seconds
+                    if (delayResponses && random.Next(10) >= 2 && SoundCache.availableSounds.Contains(AudioPlayer.folderStandBy))
+                    {
+                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderStandBy, 0, null));
+                        int secondsDelay = Math.Max(5, random.Next(8));
+                        audioPlayer.pauseQueue(secondsDelay);
+                        fuelEstimateMessage.dueTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + (1000 * secondsDelay);
+                        audioPlayer.playDelayedImmediateMessage(fuelEstimateMessage);
+                    }
+                    else
+                    {
+                        audioPlayer.playMessageImmediately(fuelEstimateMessage);
+                    }
                 }
             }
             return haveData;
@@ -465,10 +484,28 @@ namespace CrewChiefV4.Events
                 float totalUsage = ((float)Math.Ceiling(averageUsagePerMinute * timeToUse));
                 if (totalUsage > 0)
                 {
-                    haveData = true;                    
-                    //folderLitresPerLap needs to be changed to liters folder, just needed this for testing
-                    audioPlayer.playMessageImmediately(new QueuedMessage("Fuel/estimate",
-                            MessageContents(folderWeEstimate, totalUsage, folderLitresPerLap), 0, null));
+                    haveData = true;
+                    // build up the message fragments the verbose way, so we can prevent the number reader from shortening hundreds to
+                    // stuff like "one thirty two" - we always want "one hundred and thirty two"
+                    List<MessageFragment> messageFragments = new List<MessageFragment>();
+                    messageFragments.Add(MessageFragment.Text(folderWeEstimate));
+                    messageFragments.Add(MessageFragment.Integer(Convert.ToInt32(totalUsage), false));
+                    messageFragments.Add(MessageFragment.Text(folderLitres));
+                    QueuedMessage fuelEstimateMessage = new QueuedMessage("Fuel/estimate",
+                            messageFragments, 0, null);
+                    // play this immediately or play "stand by", and queue it to be played in a few seconds
+                    if (delayResponses && random.Next(10) >= 2 && SoundCache.availableSounds.Contains(AudioPlayer.folderStandBy))
+                    {
+                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderStandBy, 0, null));
+                        int secondsDelay = Math.Max(5, random.Next(8));
+                        audioPlayer.pauseQueue(secondsDelay);
+                        fuelEstimateMessage.dueTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + (1000 * secondsDelay);
+                        audioPlayer.playDelayedImmediateMessage(fuelEstimateMessage);
+                    }
+                    else
+                    {
+                        audioPlayer.playMessageImmediately(fuelEstimateMessage);
+                    }
                 }
             }
             return haveData;
@@ -579,7 +616,6 @@ namespace CrewChiefV4.Events
             }
             else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.CALCULATE_FUEL_FOR))
             {
-
                 int unit = 0;
                 foreach (KeyValuePair<String, int> entry in SpeechRecogniser.numberToNumber)
                 {
