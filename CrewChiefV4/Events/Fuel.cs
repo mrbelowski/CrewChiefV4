@@ -435,7 +435,7 @@ namespace CrewChiefV4.Events
             if (fuelUseActive && usagePerLap.Count > 0)
             {
                 // round to 1dp
-                float meanUsePerLap = (((float)Math.Round(usagePerLap.Average() * 10f)) / 10f ) * numberOfLaps;
+                float meanUsePerLap = ((float)Math.Round(usagePerLap.Average() * numberOfLaps * 10f)) / 10f;
                 if (meanUsePerLap == 0)
                 {
                     // rounded fuel use is < 0.1 litres per lap - can't really do anything with this.
@@ -585,7 +585,7 @@ namespace CrewChiefV4.Events
                         break;
                     }
                 }
-                if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.LAP) ||SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.LAPS))
+                if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.LAP) || SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.LAPS))
                 {
                     if (!reportFuelConsumptionForLaps(units))
                     {
