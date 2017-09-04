@@ -21,7 +21,7 @@ namespace CrewChiefV4.NumberProcessing
         private Boolean prefix_hundred_and_thousand_with_one = Boolean.Parse(Configuration.getSoundConfigOption("prefix_hundred_and_thousand_with_one"));
         private Boolean say_and_between_hundred_and_units = Boolean.Parse(Configuration.getSoundConfigOption("say_and_between_hundred_and_units"));
         private Boolean say_and_between_thousand_and_units = Boolean.Parse(Configuration.getSoundConfigOption("say_and_between_thousand_and_units"));
-        private Boolean allow_short_hundreds = Boolean.Parse(Configuration.getSoundConfigOption("allow_short_hundreds"));   // allow "one oh four", instead of "one hundred and four"
+        private Boolean global_allow_short_hundreds = Boolean.Parse(Configuration.getSoundConfigOption("allow_short_hundreds"));   // allow "one oh four", instead of "one hundred and four"
         private Boolean always_use_thousands = Boolean.Parse(Configuration.getSoundConfigOption("always_use_thousands"));   // don't allow "thirteen hundred" etc
 
         // this folder contains lots of subfolders, one for each number from 0 to 99, so we can add a folder to the 
@@ -268,7 +268,7 @@ namespace CrewChiefV4.NumberProcessing
         /**
          * Get an English sound for an Integer from 0 to 99999.
          */
-        protected override List<String> GetIntegerSounds(char[] digits)
+        protected override List<String> GetIntegerSounds(char[] digits, Boolean allowShortHundredsForThisNumber)
         {
             List<String> messages = new List<String>();
             // if this is just zero, return a list with just "zero"
@@ -352,7 +352,7 @@ namespace CrewChiefV4.NumberProcessing
                     if (tensAndUnits != null)
                     {
                         // if there's a thousand, or we're saying something like "13 hundred", then always use the long version
-                        if (!allow_short_hundreds || hundreds.Length == 2 || thousands != null || random.NextDouble() > 0.6)
+                        if (!global_allow_short_hundreds || hundreds.Length == 2 || thousands != null || !allowShortHundredsForThisNumber || random.NextDouble() > 0.6)
                         {
                             if (say_and_between_hundred_and_units)
                             {

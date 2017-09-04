@@ -13,7 +13,7 @@ namespace CrewChiefV4
          * Note this char array may contain only '0'. This will typically include words for "seconds", "tenths", "hundreds", etc
          * as well as the number sounds.
          */
-        protected abstract List<String> GetIntegerSounds(char[] digits);
+        protected abstract List<String> GetIntegerSounds(char[] digits, Boolean allowShortHundredsForThisNumber);
 
         /**
          * Language specific implementation to speak a number of hours, using whatever rules and words this language requires.
@@ -161,11 +161,11 @@ namespace CrewChiefV4
         /**
          * Convert an integer to some sound files, using the current language's implementation.
          */
-        public List<String> GetIntegerSounds(int integer)
+        public List<String> GetIntegerSounds(int integer, Boolean allowShortHundredsForThisNumber)
         {
             if (integer >= 0 && integer <= 99999)
             {
-                return GetIntegerSounds(integer.ToString().ToCharArray());
+                return GetIntegerSounds(integer.ToString().ToCharArray(), allowShortHundredsForThisNumber);
             }
             else
             {
