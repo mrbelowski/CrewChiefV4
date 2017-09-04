@@ -436,36 +436,18 @@ namespace CrewChiefV4.Events
             if (fuelUseActive && usagePerLap.Count > 0)
             {
                 // round to 1dp
-                float meanUsePerLap = ((float)Math.Round(usagePerLap.Average() * numberOfLaps * 10f)) / 10f;
-                if (meanUsePerLap == 0)
+                float totalUsage = (float)Math.Ceiling(usagePerLap.Average() * numberOfLaps);
+                if (totalUsage == 0)
                 {
                     // rounded fuel use is < 0.1 litres per lap - can't really do anything with this.
                     return false;
                 }
-                // get the whole and fractional part (yeah, I know this is shit)
-                String str = meanUsePerLap.ToString();
-                int pointPosition = str.IndexOf('.');
-                int wholePart = 0;
-                int fractionalPart = 0;
-                if (pointPosition > 0)
-                {
-                    wholePart = int.Parse(str.Substring(0, pointPosition));
-                    fractionalPart = int.Parse(str[pointPosition + 1].ToString());
-                    if(fractionalPart != 0)
-                    {
-                        wholePart += 1;
-                    }
-                }
-                else
-                {
-                    wholePart = (int)meanUsePerLap;
-                }
-                if (meanUsePerLap > 0)
+                if (totalUsage > 0)
                 {
                     haveData = true;                    
                     //folderLitresPerLap needs to be changed to liters folder, just needed this for testing
                     audioPlayer.playMessageImmediately(new QueuedMessage("Fuel/estimate",
-                            MessageContents(folderWeEstimate, wholePart, folderLitresPerLap), 0, null));
+                            MessageContents(folderWeEstimate, totalUsage, folderLitresPerLap), 0, null));
                 }
             }
             return haveData;
@@ -476,36 +458,18 @@ namespace CrewChiefV4.Events
             if (fuelUseActive && usagePerLap.Count > 0)
             {
                 // round to 1dp
-                float meanUsePerLap = ((float)Math.Ceiling(averageUsagePerMinute * minutes));
-                if (meanUsePerLap == 0)
+                float totalUsage = ((float)Math.Ceiling(averageUsagePerMinute * minutes));
+                if (totalUsage == 0)
                 {
                     // rounded fuel use is < 0.1 litres per lap - can't really do anything with this.
                     return false;
                 }
-                // get the whole and fractional part (yeah, I know this is shit)
-                String str = meanUsePerLap.ToString();
-                int pointPosition = str.IndexOf('.');
-                int wholePart = 0;
-                int fractionalPart = 0;
-                if (pointPosition > 0)
-                {
-                    wholePart = int.Parse(str.Substring(0, pointPosition));
-                    fractionalPart = int.Parse(str[pointPosition + 1].ToString());
-                    if(fractionalPart != 0)
-                    {
-                        wholePart += 1;
-                    }
-                }
-                else
-                {
-                    wholePart = (int)meanUsePerLap;
-                }
-                if (meanUsePerLap > 0)
+                if (totalUsage > 0)
                 {
                     haveData = true;                    
                     //folderLitresPerLap needs to be changed to liters folder, just needed this for testing
                     audioPlayer.playMessageImmediately(new QueuedMessage("Fuel/estimate",
-                            MessageContents(folderWeEstimate, wholePart, folderLitresPerLap), 0, null));
+                            MessageContents(folderWeEstimate, totalUsage, folderLitresPerLap), 0, null));
                 }
             }
             return haveData;
@@ -516,36 +480,18 @@ namespace CrewChiefV4.Events
             if (fuelUseActive && usagePerLap.Count > 0)
             {
                 // round to 1dp
-                float meanUsePerLap = (float)Math.Ceiling(averageUsagePerMinute * (hours * 60));
-                if (meanUsePerLap == 0)
+                float totalUsage = (float)Math.Ceiling(averageUsagePerMinute * (hours * 60));
+                if (totalUsage == 0)
                 {
                     // rounded fuel use is < 0.1 litres per lap - can't really do anything with this.
                     return false;
                 }
-                // get the whole and fractional part (yeah, I know this is shit)
-                String str = meanUsePerLap.ToString();
-                int pointPosition = str.IndexOf('.');
-                int wholePart = 0;
-                int fractionalPart = 0;
-                if (pointPosition > 0)
-                {
-                    wholePart = int.Parse(str.Substring(0, pointPosition));
-                    fractionalPart = int.Parse(str[pointPosition + 1].ToString());
-                    if (fractionalPart != 0)
-                    {
-                        wholePart += 1;
-                    }
-                }
-                else
-                {
-                    wholePart = (int)meanUsePerLap;
-                }
-                if (meanUsePerLap > 0)
+                if (totalUsage > 0)
                 {
                     haveData = true;
                     //folderLitresPerLap needs to be changed to liters folder, just needed this for testing
                     audioPlayer.playMessageImmediately(new QueuedMessage("Fuel/estimate",
-                            MessageContents(folderWeEstimate, wholePart, folderLitresPerLap), 0, null));
+                            MessageContents(folderWeEstimate, totalUsage, folderLitresPerLap), 0, null));
                 }
             }
             return haveData;
