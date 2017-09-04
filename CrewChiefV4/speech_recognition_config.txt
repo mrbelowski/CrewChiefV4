@@ -165,8 +165,8 @@ POSSESSIVE = 's
 # used for fuel calculations 
 LAP = lap
 LAPS = laps
-MINUT = minut
-MINUTS = minuts
+MINUTE = minute
+MINUTES = minutes
 HOUR = hour
 HOURS = hours
 AND = and

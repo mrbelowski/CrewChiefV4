@@ -575,19 +575,23 @@ namespace CrewChiefV4.Events
             }
             else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.CALCULATE_FUEL_FOR))
             {
+
                 int units = 0;
                 foreach (KeyValuePair<String, int> entry in SpeechRecogniser.numberToNumber)
                 {
-                    if (voiceMessage.Contains(" " + entry.Key))
+                    if (voiceMessage.Contains(" " + entry.Key + " "))
                     {
                         units = entry.Value;
                         break;
                     }
                 }
-                if (!reportFuelConsumptionForLaps(units))
+                if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.LAP) ||SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.LAPS))
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
-                }    
+                    if (!reportFuelConsumptionForLaps(units))
+                    {
+                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+                    } 
+                }
             }
         }
     }
