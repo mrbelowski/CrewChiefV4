@@ -41,6 +41,8 @@ namespace CrewChiefV4.rFactor1
         // dynamically calculated wheel circumferences
         private float[] wheelCircumference = new float[] { 0, 0 };
 
+        SessionPhase lastSessionPhase = SessionPhase.Unavailable;
+
         public RF1GameStateMapper()
         {
             tyreWearThresholds.Add(new CornerData.EnumWithThresholds(TyreCondition.NEW, -10000, scrubbedTyreWearPercent));
@@ -72,12 +74,30 @@ namespace CrewChiefV4.rFactor1
             // no session data
             if (shared.numVehicles == 0)
             {
-                isOfflineSession = true;
-                distanceOffTrack = 0;
-                isApproachingTrack = false;
-                wheelCircumference = new float[] { 0, 0 };
-                previousGameState = null;
-                return null;
+                // if we skip to next session the session phase never goes to 'finished'. We do, however, see the numVehicles drop to zero.
+                // If we have a previous game state and it's in a valid phase here, update it to Finished and return it. This requires some
+                // additional logic in the main CrewChief loop (because this means current and previous game state are the same object).
+                if (previousGameState != null && previousGameState.SessionData.SessionType != SessionType.Unavailable &&
+                    previousGameState.SessionData.SessionPhase != SessionPhase.Finished &&
+                    previousGameState.SessionData.SessionPhase != SessionPhase.Unavailable &&
+                    lastSessionPhase != SessionPhase.Unavailable &&
+                    lastSessionPhase != SessionPhase.Finished)
+                {
+                    previousGameState.SessionData.SessionPhase = SessionPhase.Finished;
+                    lastSessionPhase = previousGameState.SessionData.SessionPhase;
+                    previousGameState.SessionData.AbruptSessionEndDetected = true;
+                    return previousGameState;
+                }
+                else
+                {
+                    isOfflineSession = true;
+                    distanceOffTrack = 0;
+                    isApproachingTrack = false;
+                    wheelCircumference = new float[] { 0, 0 };
+                    previousGameState = null;
+                    lastSessionPhase = SessionPhase.Unavailable;
+                    return null;
+                }
             }
             // game is paused or other window has taken focus
             if (shared.deltaTime >= 0.56)
@@ -123,7 +143,7 @@ namespace CrewChiefV4.rFactor1
             }
             if (playerName == null)
             {
-                String driverName = getNameFromBytes(player.driverName).ToLower();
+                String driverName = getStringFromBytes(player.driverName).ToLower();
                 NameValidator.validateName(driverName);
                 playerName = driverName;
             }
@@ -134,21 +154,9 @@ namespace CrewChiefV4.rFactor1
                 shared.session >= 5 && shared.session <= 8 ? shared.session - 5 :
                 shared.session >= 10 && shared.session <= 13 ? shared.session - 10 : 0;
             currentGameState.SessionData.SessionType = mapToSessionType(shared);
-
-            Boolean startedNewLap = false;
-            Boolean finishedLap = false;
-            SessionPhase previousSessionPhase = SessionPhase.Unavailable;
-            if (previousGameState != null) 
-            {
-                // player.sectorNumber might go to 0 at session-end
-                finishedLap = previousGameState.SessionData.SectorNumber == 0 ||
-                              (previousGameState.SessionData.SectorNumber == 3 && player.sector <= 1);
-                startedNewLap = shared.lapNumber > previousGameState.SessionData.CompletedLaps;
-                previousSessionPhase = previousGameState.SessionData.SessionPhase;
-            }            
-            Boolean isInPits = player.inPits == 1;
             currentGameState.SessionData.SessionPhase = mapToSessionPhase((rFactor1Constant.rfGamePhase)shared.gamePhase,
-                    previousSessionPhase, /*finishedLap ||*/ startedNewLap, isInPits);
+                currentGameState.SessionData.SessionType, ref player);
+            lastSessionPhase = currentGameState.SessionData.SessionPhase;
 
             // --------------------------------
             // flags data
@@ -211,10 +219,10 @@ namespace CrewChiefV4.rFactor1
                 }
             }
 
-            currentGameState.carClass = getCarClass(getNameFromBytes(shared.vehicleName), true);
+            currentGameState.carClass = getCarClass(getStringFromBytes(shared.vehicleName), true);
             brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(currentGameState.carClass);
-            currentGameState.SessionData.DriverRawName = getNameFromBytes(player.driverName).ToLower();
-            currentGameState.SessionData.TrackDefinition = new TrackDefinition(getNameFromBytes(shared.trackName), shared.lapDist);
+            currentGameState.SessionData.DriverRawName = getStringFromBytes(player.driverName).ToLower();
+            currentGameState.SessionData.TrackDefinition = new TrackDefinition(getStringFromBytes(shared.trackName), shared.lapDist);
             if (previousGameState == null || previousGameState.SessionData.TrackDefinition.name != currentGameState.SessionData.TrackDefinition.name)
             {
                 // new game or new track
@@ -586,7 +594,7 @@ namespace CrewChiefV4.rFactor1
             for (int i = 0; i < shared.numVehicles; ++i)
             {
                 var vehicle = shared.vehicle[i];
-                String driverName = getNameFromBytes(vehicle.driverName).ToLower();
+                String driverName = getStringFromBytes(vehicle.driverName).ToLower();
                 if (isOfflineSession && (rFactor1Constant.rfControl)vehicle.control == rFactor1Constant.rfControl.remote)
                 {
                     isOfflineSession = false;
@@ -624,7 +632,7 @@ namespace CrewChiefV4.rFactor1
                     default:
                         break;
                 }
-                String driverName = getNameFromBytes(vehicle.driverName).ToLower();
+                String driverName = getStringFromBytes(vehicle.driverName).ToLower();
                 OpponentData opponentPrevious;
                 int duplicatesCount = driverNameCounts[driverName];
                 string opponentKey;
@@ -667,7 +675,7 @@ namespace CrewChiefV4.rFactor1
                 OpponentData opponent = new OpponentData();
                 opponent.DriverRawName = driverName;
                 opponent.DriverNameSet = opponent.DriverRawName.Length > 0;
-                opponent.CarClass = getCarClass(getNameFromBytes(vehicle.vehicleName), false);
+                opponent.CarClass = getCarClass(getStringFromBytes(vehicle.vehicleName), false);
                 opponent.Position = vehicle.place;
                 if (opponent.DriverNameSet && opponentPrevious == null && CrewChief.enableDriverNames)
                 {
@@ -881,31 +889,36 @@ namespace CrewChiefV4.rFactor1
             // --------------------------------
             // flags data
             FlagEnum Flag = FlagEnum.UNKNOWN;
+            if (!currentGameState.FlagData.isFullCourseYellow)  // Don't announce blue on slower under FCY.
+            {
+                foreach (var opponent in currentGameState.OpponentData.Values)
+                {
+                    if (currentGameState.SessionData.SessionType != SessionType.Race
+                        || currentGameState.SessionData.CompletedLaps < 1
+                        || currentGameState.PositionAndMotionData.DistanceRoundTrack < 0.0f)
+                    {
+                        break;
+                    }
+
+                    if (opponent.getCurrentLapData().InLap
+                        || opponent.getCurrentLapData().OutLap
+                        || opponent.Position > currentGameState.SessionData.Position)
+                    {
+                        continue;
+                    }
+
+                    if (isBehindWithinDistance(currentGameState.SessionData.TrackDefinition.trackLength, 8.0f, 40.0f,
+                            currentGameState.PositionAndMotionData.DistanceRoundTrack, opponent.DistanceRoundTrack)
+                        && opponent.Speed >= currentGameState.PositionAndMotionData.CarSpeed)
+                    {
+                        Flag = FlagEnum.BLUE;
+                        break;
+                    }
+                }
+            }
             if (currentGameState.SessionData.IsDisqualified && previousGameState != null && !previousGameState.SessionData.IsDisqualified)
             {
                 Flag = FlagEnum.BLACK;
-            }
-            foreach (OpponentData opponent in currentGameState.OpponentData.Values)
-            {
-                if (currentGameState.SessionData.SessionType != SessionType.Race || 
-                    currentGameState.SessionData.CompletedLaps < 1 || 
-                    currentGameState.PositionAndMotionData.DistanceRoundTrack < 0)
-                {
-                    break;
-                }
-                if (opponent.getCurrentLapData().InLap || 
-                    opponent.getCurrentLapData().OutLap || 
-                    opponent.Position > currentGameState.SessionData.Position)
-                {
-                    continue;
-                }
-                if (isBehindWithinDistance(currentGameState.SessionData.TrackDefinition.trackLength, 8, 40, 
-                    currentGameState.PositionAndMotionData.DistanceRoundTrack, opponent.DistanceRoundTrack) && 
-                    opponent.Speed >= currentGameState.PositionAndMotionData.CarSpeed)
-                {
-                    Flag = FlagEnum.BLUE;
-                    break;
-                }
             }
             currentGameState.SessionData.Flag = Flag;
 
@@ -997,8 +1010,10 @@ namespace CrewChiefV4.rFactor1
             }
         }
 
-        private SessionPhase mapToSessionPhase(rFactor1Constant.rfGamePhase sessionPhase, SessionPhase previousSessionPhase, 
-            Boolean finishedLap, Boolean isInPit)
+        private SessionPhase mapToSessionPhase(
+            rFactor1Constant.rfGamePhase sessionPhase,
+            SessionType sessionType,
+            ref rfVehicleInfo player)
         {
             switch (sessionPhase)
             {
@@ -1015,17 +1030,16 @@ namespace CrewChiefV4.rFactor1
                 // sessions never go to sessionStopped, they always go straight from greenFlag to sessionOver
                 case rFactor1Constant.rfGamePhase.sessionStopped:
                 case rFactor1Constant.rfGamePhase.sessionOver:
-                    if (isInPit || finishedLap || previousSessionPhase == SessionPhase.Finished)
-                    {
-                        return SessionPhase.Finished;
-                    }
-                    else
+                    if (sessionType == SessionType.Race
+                        && player.finishStatus == (sbyte)rFactor1Constant.rfFinishStatus.none)
                     {
                         return SessionPhase.Checkered;
                     }
+                    else
+                    {
+                        return SessionPhase.Finished;
+                    }
                 // fullCourseYellow will count as greenFlag since we'll call it out in the Flags separately anyway
-
-                    // TODO: can we map to FullCourseYellow here?
                 case rFactor1Constant.rfGamePhase.fullCourseYellow:
                     return SessionPhase.FullCourseYellow;
                 case rFactor1Constant.rfGamePhase.greenFlag:
@@ -1148,8 +1162,8 @@ namespace CrewChiefV4.rFactor1
                 if (previousGameState.OpponentData.ContainsKey(possibleKey))
                 {
                     OpponentData o = previousGameState.OpponentData[possibleKey];
-                    if (o.DriverRawName != getNameFromBytes(vehicle.driverName).ToLower() ||
-                        o.CarClass != getCarClass(getNameFromBytes(vehicle.vehicleName), false) ||
+                    if (o.DriverRawName != getStringFromBytes(vehicle.driverName).ToLower() ||
+                        o.CarClass != getCarClass(getStringFromBytes(vehicle.vehicleName), false) ||
                         opponentKeysProcessed.Contains(possibleKey))
                     {
                         continue;
@@ -1172,9 +1186,13 @@ namespace CrewChiefV4.rFactor1
             return bestKey;
         }
 
-        public static String getNameFromBytes(byte[] name)
+        public static String getStringFromBytes(byte[] bytes)
         {
-            return Encoding.UTF8.GetString(name).TrimEnd('\0').Trim();
+            var nullIdx = Array.IndexOf(bytes, (byte)0);
+
+            return nullIdx >= 0
+              ? Encoding.Default.GetString(bytes, 0, nullIdx)
+              : Encoding.Default.GetString(bytes);
         }
 
         /**

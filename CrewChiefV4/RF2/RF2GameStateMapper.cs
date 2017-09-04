@@ -49,6 +49,8 @@ namespace CrewChiefV4.rFactor2
         private double lastPlayerTelemetryET = -1.0;
         private double lastScoringET = -1.0;
 
+        SessionPhase lastSessionPhase = SessionPhase.Unavailable;
+
         public RF2GameStateMapper()
         {
             this.tyreWearThresholds.Add(new CornerData.EnumWithThresholds(TyreCondition.NEW, -10000.0f, this.scrubbedTyreWearPercent));
@@ -131,21 +133,38 @@ namespace CrewChiefV4.rFactor2
             var shared = memoryMappedFileStruct as CrewChiefV4.rFactor2.RF2SharedMemoryReader.RF2StructWrapper;
             var cgs = new GameStateData(shared.ticksWhenRead);
 
-            // no session data
+            // No session data
             if (shared.scoring.mScoringInfo.mNumVehicles == 0)
             {
-                this.isOfflineSession = true;
-                this.distanceOffTrack = 0;
-                this.isApproachingTrack = false;
-
-                if (pgs != null)
+                // If we skip to next session the session phase never goes to 'Finished'. We do, however, see the numVehicles drop to zero.
+                // If we have a previous game state and it's in a valid phase here, update it to Finished and return it. This requires some
+                // additional logic in the main CrewChief loop (because this means current and previous game state are the same object).
+                if (pgs != null 
+                    && pgs.SessionData.SessionType != SessionType.Unavailable
+                    && pgs.SessionData.SessionPhase != SessionPhase.Finished
+                    && pgs.SessionData.SessionPhase != SessionPhase.Unavailable
+                    && this.lastSessionPhase != SessionPhase.Unavailable
+                    && this.lastSessionPhase != SessionPhase.Finished)
                 {
-                    // In rF2 user can quit practice session and we will never know
-                    // about it.  Mark previous game state with Unavailable flags.
-                    pgs.SessionData.SessionType = SessionType.Unavailable;
-                    pgs.SessionData.SessionPhase = SessionPhase.Unavailable;
+                    pgs.SessionData.SessionPhase = SessionPhase.Finished;
+                    this.lastSessionPhase = pgs.SessionData.SessionPhase;
+                    pgs.SessionData.AbruptSessionEndDetected = true;
                 }
+                else
+                {
+                    this.isOfflineSession = true;
+                    this.distanceOffTrack = 0;
+                    this.isApproachingTrack = false;
+                    this.lastSessionPhase = SessionPhase.Unavailable;
 
+                    if (pgs != null)
+                    {
+                        // In rF2 user can quit practice session and we will never know
+                        // about it.  Mark previous game state with Unavailable flags.
+                        pgs.SessionData.SessionType = SessionType.Unavailable;
+                        pgs.SessionData.SessionPhase = SessionPhase.Unavailable;
+                    }
+                }
                 return pgs;
             }
 
@@ -247,6 +266,8 @@ namespace CrewChiefV4.rFactor2
 
             csd.SessionType = mapToSessionType(shared);
             csd.SessionPhase = mapToSessionPhase((rFactor2Constants.rF2GamePhase)shared.scoring.mScoringInfo.mGamePhase, csd.SessionType, ref playerScoring);
+            this.lastSessionPhase = csd.SessionPhase;
+
             var carClassId = getStringFromBytes(playerScoring.mVehicleClass);
             cgs.carClass = CarData.getCarClassForClassName(carClassId);
             CarData.CLASS_ID = carClassId;

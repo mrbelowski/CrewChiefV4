@@ -539,16 +539,17 @@ namespace CrewChiefV4
                         {
                             Console.WriteLine("Error mapping game data: " + e.Message + ", " + e.StackTrace);
                         }
+
                         // if we're paused or viewing another car, the mapper will just return the previous game state so we don't lose all the
                         // persistent state information. If this is the case, don't process any stuff
-                        if (nextGameState != null && nextGameState != currentGameState)
+                        if (nextGameState != null && (nextGameState.SessionData.AbruptSessionEndDetected || nextGameState != currentGameState))
                         {
                             previousGameState = currentGameState;
                             currentGameState = nextGameState;
                             if (!sessionFinished && currentGameState.SessionData.SessionPhase == SessionPhase.Finished
                                 && previousGameState != null)
                             {
-                                Console.WriteLine("Session finished");
+                                Console.WriteLine("Session finished, position = " + currentGameState.SessionData.Position);
                                 audioPlayer.purgeQueues();
                                 if (displaySessionLapTimes)
                                 {
