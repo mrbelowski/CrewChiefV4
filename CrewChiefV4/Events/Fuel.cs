@@ -440,9 +440,15 @@ namespace CrewChiefV4.Events
                 if (totalUsage > 0)
                 {
                     haveData = true;
-                    // play this immediately or play "stand by", and queue it to be played in a few seconds
+                    // build up the message fragments the verbose way, so we can prevent the number reader from shortening hundreds to
+                    // stuff like "one thirty two" - we always want "one hundred and thirty two"
+                    List<MessageFragment> messageFragments = new List<MessageFragment>();
+                    messageFragments.Add(MessageFragment.Text(folderWeEstimate));
+                    messageFragments.Add(MessageFragment.Integer(Convert.ToInt32(totalUsage), false));
+                    messageFragments.Add(MessageFragment.Text(folderLitres));
                     QueuedMessage fuelEstimateMessage = new QueuedMessage("Fuel/estimate",
-                            MessageContents(folderWeEstimate, totalUsage, folderLitres), 0, null);
+                            messageFragments, 0, null);
+                    // play this immediately or play "stand by", and queue it to be played in a few seconds
                     if (delayResponses && random.Next(10) >= 2 && SoundCache.availableSounds.Contains(AudioPlayer.folderStandBy))
                     {
                         audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderStandBy, 0, null));
@@ -478,9 +484,15 @@ namespace CrewChiefV4.Events
                 if (totalUsage > 0)
                 {
                     haveData = true;
-                    // play this immediately or play "stand by", and queue it to be played in a few seconds
+                    // build up the message fragments the verbose way, so we can prevent the number reader from shortening hundreds to
+                    // stuff like "one thirty two" - we always want "one hundred and thirty two"
+                    List<MessageFragment> messageFragments = new List<MessageFragment>();
+                    messageFragments.Add(MessageFragment.Text(folderWeEstimate));
+                    messageFragments.Add(MessageFragment.Integer(Convert.ToInt32(totalUsage), false));
+                    messageFragments.Add(MessageFragment.Text(folderLitres));
                     QueuedMessage fuelEstimateMessage = new QueuedMessage("Fuel/estimate",
-                            MessageContents(folderWeEstimate, totalUsage, folderLitres), 0, null);
+                            messageFragments, 0, null);
+                    // play this immediately or play "stand by", and queue it to be played in a few seconds
                     if (delayResponses && random.Next(10) >= 2 && SoundCache.availableSounds.Contains(AudioPlayer.folderStandBy))
                     {
                         audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderStandBy, 0, null));
