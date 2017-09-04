@@ -435,13 +435,8 @@ namespace CrewChiefV4.Events
             Boolean haveData = false;
             if (fuelUseActive && usagePerLap.Count > 0)
             {
-                // round to 1dp
+                // round up
                 float totalUsage = (float)Math.Ceiling(usagePerLap.Average() * numberOfLaps);
-                if (totalUsage == 0)
-                {
-                    // rounded fuel use is < 0.1 litres per lap - can't really do anything with this.
-                    return false;
-                }
                 if (totalUsage > 0)
                 {
                     haveData = true;                    
@@ -452,43 +447,25 @@ namespace CrewChiefV4.Events
             }
             return haveData;
         }
-        private Boolean reportFuelConsumptionForTimeInMinutes(int minutes)
+        private Boolean reportFuelConsumptionForTime(int hours, int minutes)
         {
             Boolean haveData = false;
-            if (fuelUseActive && usagePerLap.Count > 0)
+            if (fuelUseActive && averageUsagePerMinute > 0)
             {
-                // round to 1dp
-                float totalUsage = ((float)Math.Ceiling(averageUsagePerMinute * minutes));
-                if (totalUsage == 0)
+                int timeToUse = 0;
+                if(hours > 0)
                 {
-                    // rounded fuel use is < 0.1 litres per lap - can't really do anything with this.
-                    return false;
+                    timeToUse = hours * 60;
                 }
+                else
+                {
+                    timeToUse = minutes;
+                }   
+                // round up
+                float totalUsage = ((float)Math.Ceiling(averageUsagePerMinute * timeToUse));
                 if (totalUsage > 0)
                 {
                     haveData = true;                    
-                    //folderLitresPerLap needs to be changed to liters folder, just needed this for testing
-                    audioPlayer.playMessageImmediately(new QueuedMessage("Fuel/estimate",
-                            MessageContents(folderWeEstimate, totalUsage, folderLitresPerLap), 0, null));
-                }
-            }
-            return haveData;
-        }
-        private Boolean reportFuelConsumptionForTimeInHours(int hours)
-        {
-            Boolean haveData = false;
-            if (fuelUseActive && usagePerLap.Count > 0)
-            {
-                // round to 1dp
-                float totalUsage = (float)Math.Ceiling(averageUsagePerMinute * (hours * 60));
-                if (totalUsage == 0)
-                {
-                    // rounded fuel use is < 0.1 litres per lap - can't really do anything with this.
-                    return false;
-                }
-                if (totalUsage > 0)
-                {
-                    haveData = true;
                     //folderLitresPerLap needs to be changed to liters folder, just needed this for testing
                     audioPlayer.playMessageImmediately(new QueuedMessage("Fuel/estimate",
                             MessageContents(folderWeEstimate, totalUsage, folderLitresPerLap), 0, null));
@@ -612,6 +589,11 @@ namespace CrewChiefV4.Events
                         break;
                     }
                 }
+                if (unit == 0)
+                {
+                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderDidntUnderstand, 0, null));
+                    return;
+                }
                 if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.LAP) || SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.LAPS))
                 {
                     if (!reportFuelConsumptionForLaps(unit))
@@ -621,14 +603,14 @@ namespace CrewChiefV4.Events
                 }
                 else if(SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.MINUTE) || SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.MINUTES))
                 {
-                    if (!reportFuelConsumptionForTimeInMinutes(unit))
+                    if (!reportFuelConsumptionForTime(0, unit))
                     {
                         audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
                     } 
                 }
                 else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOUR) || SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOURS))
                 {
-                    if (!reportFuelConsumptionForTimeInHours(unit))
+                    if (!reportFuelConsumptionForTime(unit, 0))
                     {
                         audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
                     }
