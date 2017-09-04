@@ -154,7 +154,6 @@ namespace CrewChiefV4.Events
                 currentFuel = currentGameState.FuelData.FuelLeft;
                 return;
             }
-            OverallSessionBestLapTime = currentGameState.SessionData.OverallSessionBestLapTime;
             fuelUseActive = currentGameState.FuelData.FuelUseActive;
             currentFuel = currentGameState.FuelData.FuelLeft;
             if (fuelUseActive && ((currentGameState.SessionData.SessionType == SessionType.Race &&
@@ -471,32 +470,13 @@ namespace CrewChiefV4.Events
             }
             return haveData;
         }
-        int calculateEstimateNumberOfLapsFromMinutes(int minutes)
-        {
-            int estimateNrOfLaps = -1;
-            if(OverallSessionBestLapTime != 0 && OverallSessionBestLapTime != -1)
-            {
-                estimateNrOfLaps = (int)Math.Ceiling((minutes * 60) / OverallSessionBestLapTime);
-            }
-            return estimateNrOfLaps;
-        }
-        int calculateEstimateNumberOfLapsFromHours(int hours)
-        {
-            int estimateNrOfLaps = -1;
-            if (OverallSessionBestLapTime != 0 && OverallSessionBestLapTime != -1)
-            {
-                estimateNrOfLaps = (int)Math.Ceiling(((hours * 60) * 60) / OverallSessionBestLapTime);
-            }
-            return estimateNrOfLaps;
-        }
         private Boolean reportFuelConsumptionForTimeInMinutes(int minutes)
         {
             Boolean haveData = false;
             if (fuelUseActive && usagePerLap.Count > 0)
             {
                 // round to 1dp
-                int numberOfLaps = calculateEstimateNumberOfLapsFromMinutes(minutes);
-                float meanUsePerLap = ((float)Math.Round(usagePerLap.Average() * numberOfLaps * 10f)) / 10f;
+                float meanUsePerLap = ((float)Math.Ceiling(averageUsagePerMinute * minutes));
                 if (meanUsePerLap == 0)
                 {
                     // rounded fuel use is < 0.1 litres per lap - can't really do anything with this.
@@ -536,8 +516,7 @@ namespace CrewChiefV4.Events
             if (fuelUseActive && usagePerLap.Count > 0)
             {
                 // round to 1dp
-                int numberOfLaps = calculateEstimateNumberOfLapsFromHours(hours);
-                float meanUsePerLap = ((float)Math.Round(usagePerLap.Average() * numberOfLaps * 10f)) / 10f;
+                float meanUsePerLap = (float)Math.Ceiling(averageUsagePerMinute * (hours * 60));
                 if (meanUsePerLap == 0)
                 {
                     // rounded fuel use is < 0.1 litres per lap - can't really do anything with this.
