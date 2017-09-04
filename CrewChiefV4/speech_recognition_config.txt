@@ -235,3 +235,4 @@ AND = and
 57 = fifty-seven
 58 = fifty-eight
 59 = fifty-nine
+60 = sixty
