@@ -41,6 +41,8 @@ namespace CrewChiefV4.rFactor1
         // dynamically calculated wheel circumferences
         private float[] wheelCircumference = new float[] { 0, 0 };
 
+        SessionPhase lastSessionPhase = SessionPhase.Unavailable;
+
         public RF1GameStateMapper()
         {
             tyreWearThresholds.Add(new CornerData.EnumWithThresholds(TyreCondition.NEW, -10000, scrubbedTyreWearPercent));
@@ -77,9 +79,13 @@ namespace CrewChiefV4.rFactor1
                 // additional logic in the main CrewChief loop (because this means current and previous game state are the same object).
                 if (previousGameState != null && previousGameState.SessionData.SessionType != SessionType.Unavailable &&
                     previousGameState.SessionData.SessionPhase != SessionPhase.Finished &&
-                    previousGameState.SessionData.SessionPhase != SessionPhase.Unavailable)
+                    previousGameState.SessionData.SessionPhase != SessionPhase.Unavailable &&
+                    lastSessionPhase != SessionPhase.Unavailable &&
+                    lastSessionPhase != SessionPhase.Finished)
                 {
                     previousGameState.SessionData.SessionPhase = SessionPhase.Finished;
+                    lastSessionPhase = previousGameState.SessionData.SessionPhase;
+                    previousGameState.SessionData.AbruptSessionEndDetected = true;
                     return previousGameState;
                 }
                 else
@@ -89,6 +95,7 @@ namespace CrewChiefV4.rFactor1
                     isApproachingTrack = false;
                     wheelCircumference = new float[] { 0, 0 };
                     previousGameState = null;
+                    lastSessionPhase = SessionPhase.Unavailable;
                     return null;
                 }
             }
@@ -149,6 +156,7 @@ namespace CrewChiefV4.rFactor1
             currentGameState.SessionData.SessionType = mapToSessionType(shared);
             currentGameState.SessionData.SessionPhase = mapToSessionPhase((rFactor1Constant.rfGamePhase)shared.gamePhase,
                 currentGameState.SessionData.SessionType, ref player);
+            lastSessionPhase = currentGameState.SessionData.SessionPhase;
 
             // --------------------------------
             // flags data
