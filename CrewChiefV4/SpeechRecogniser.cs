@@ -132,7 +132,7 @@ namespace CrewChiefV4
         private static Dictionary<String, int> getNumberMappings()
         {
             Dictionary<String, int> dict = new Dictionary<string, int>();
-            for (int i = 1; i <= 60; i++)
+            for (int i = 1; i <= 90; i++)
             {
                 dict.Add(Configuration.getSpeechRecognitionConfigOption(i.ToString()), i);
             }
@@ -285,14 +285,30 @@ namespace CrewChiefV4
                             foreach (String lapArray in LAP)
                             {
                                 staticSpeechChoices.Add(s + " " + entry.Key + " " + lapArray);
-                            }                            
+                            }
+                            foreach (String minuteArray in MINUTE)
+                            {
+                                staticSpeechChoices.Add(s + " " + entry.Key + " " + minuteArray);
+                            }
+                            foreach (String hourArray in HOUR)
+                            {
+                                staticSpeechChoices.Add(s + " " + entry.Key + " " + hourArray);
+                            }
                         }
                         else
                         {
                             foreach (String lapsArray in LAPS)
                             {
                                 staticSpeechChoices.Add(s + " " + entry.Key + " " + lapsArray);
-                            } 
+                            }
+                            foreach (String minutesArray in MINUTES)
+                            {
+                                staticSpeechChoices.Add(s + " " + entry.Key + " " + minutesArray);
+                            }
+                            foreach (String hoursArray in HOURS)
+                            {
+                                staticSpeechChoices.Add(s + " " + entry.Key + " " + hoursArray);
+                            }
                         }
                     }                    
                 }
