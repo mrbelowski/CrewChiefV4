@@ -47,8 +47,8 @@ namespace CrewChiefV4
         public static String[] CALCULATE_FUEL_FOR = Configuration.getSpeechRecognitionPhrases("CALCULATE_FUEL_FOR");
         public static String[] LAP = Configuration.getSpeechRecognitionPhrases("LAP");
         public static String[] LAPS = Configuration.getSpeechRecognitionPhrases("LAPS");
-        public static String[] MINUT = Configuration.getSpeechRecognitionPhrases("MINUT");
-        public static String[] MINUTS = Configuration.getSpeechRecognitionPhrases("MINUTS");
+        public static String[] MINUTE = Configuration.getSpeechRecognitionPhrases("MINUTE");
+        public static String[] MINUTES = Configuration.getSpeechRecognitionPhrases("MINUTES");
         public static String[] HOUR = Configuration.getSpeechRecognitionPhrases("HOUR");
         public static String[] HOURS = Configuration.getSpeechRecognitionPhrases("HOURS");
 
@@ -202,25 +202,6 @@ namespace CrewChiefV4
             }
         }
 
-        private void validateAndAdd(String[] speechPhrases, string suffix, Choices choices)
-        {
-            if (speechPhrases != null && speechPhrases.Count() > 0)
-            {
-                Boolean valid = true;
-                foreach (String s in speechPhrases)
-                {
-                    if (s == null || s.Trim().Count() == 0)
-                    {
-                        valid = false;
-                        break;
-                    }
-                }
-                if (valid)
-                {
-                    choices.Add(speechPhrases + " " + suffix);
-                }
-            }
-        }
         public void initialiseSpeechEngine()
         {
             initialised = false;
@@ -301,11 +282,11 @@ namespace CrewChiefV4
                     {
                         if(entry.Value == 1)
                         {
-                            staticSpeechChoices.Add(s + " " + entry.Key + " " + LAP);
+                            staticSpeechChoices.Add(s + " " + entry.Key + " " + "lap");
                         }
                         else
                         {
-                            staticSpeechChoices.Add(s + " " + entry.Key + " " + LAPS);
+                            staticSpeechChoices.Add(s + " " + entry.Key + " " + "laps");
                         }
                     }                    
                 }
