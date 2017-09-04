@@ -45,6 +45,9 @@ namespace CrewChiefV4.Events
 
         public static String folderLitresPerLap = "fuel/litres_per_lap";
 
+        //I'm gonna need you to add some speech for this
+        public static String folderLitres = "fuel/litres";
+
         private float averageUsagePerLap;
 
         private float averageUsagePerMinute;
@@ -98,7 +101,8 @@ namespace CrewChiefV4.Events
         private List<float> usagePerLap = new List<float>();
 
         private float fuelAtStartOfLastLap = 0;
-
+        private float OverallSessionBestLapTime = -1;
+        
         public Fuel(AudioPlayer audioPlayer)
         {
             this.audioPlayer = audioPlayer;
@@ -129,6 +133,7 @@ namespace CrewChiefV4.Events
             hasBeenRefuelled = false;
             usagePerLap.Clear();
             fuelAtStartOfLastLap = 0;
+            OverallSessionBestLapTime = -1;
         }
 
         // fuel not implemented for HotLap modes
@@ -149,7 +154,6 @@ namespace CrewChiefV4.Events
                 currentFuel = currentGameState.FuelData.FuelLeft;
                 return;
             }
-
             fuelUseActive = currentGameState.FuelData.FuelUseActive;
             currentFuel = currentGameState.FuelData.FuelLeft;
             if (fuelUseActive && ((currentGameState.SessionData.SessionType == SessionType.Race &&
@@ -426,6 +430,49 @@ namespace CrewChiefV4.Events
             return haveData;
         }
 
+        private Boolean reportFuelConsumptionForLaps(int numberOfLaps)
+        {
+            Boolean haveData = false;
+            if (fuelUseActive && usagePerLap.Count > 0)
+            {
+                // round up
+                float totalUsage = (float)Math.Ceiling(usagePerLap.Average() * numberOfLaps);
+                if (totalUsage > 0)
+                {
+                    haveData = true;                    
+                    //folderLitresPerLap needs to be changed to liters folder, just needed this for testing
+                    audioPlayer.playMessageImmediately(new QueuedMessage("Fuel/estimate",
+                            MessageContents(folderWeEstimate, totalUsage, folderLitresPerLap), 0, null));
+                }
+            }
+            return haveData;
+        }
+        private Boolean reportFuelConsumptionForTime(int hours, int minutes)
+        {
+            Boolean haveData = false;
+            if (fuelUseActive && averageUsagePerMinute > 0)
+            {
+                int timeToUse = 0;
+                if(hours > 0)
+                {
+                    timeToUse = hours * 60;
+                }
+                else
+                {
+                    timeToUse = minutes;
+                }   
+                // round up
+                float totalUsage = ((float)Math.Ceiling(averageUsagePerMinute * timeToUse));
+                if (totalUsage > 0)
+                {
+                    haveData = true;                    
+                    //folderLitresPerLap needs to be changed to liters folder, just needed this for testing
+                    audioPlayer.playMessageImmediately(new QueuedMessage("Fuel/estimate",
+                            MessageContents(folderWeEstimate, totalUsage, folderLitresPerLap), 0, null));
+                }
+            }
+            return haveData;
+        }
         private Boolean reportFuelRemaining()
         {
             Boolean haveData = false;
@@ -529,6 +576,45 @@ namespace CrewChiefV4.Events
             else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOWS_MY_FUEL))
             {
                 reportFuelStatus();
+            }
+            else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.CALCULATE_FUEL_FOR))
+            {
+
+                int unit = 0;
+                foreach (KeyValuePair<String, int> entry in SpeechRecogniser.numberToNumber)
+                {
+                    if (voiceMessage.Contains(" " + entry.Key + " "))
+                    {
+                        unit = entry.Value;
+                        break;
+                    }
+                }
+                if (unit == 0)
+                {
+                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderDidntUnderstand, 0, null));
+                    return;
+                }
+                if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.LAP) || SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.LAPS))
+                {
+                    if (!reportFuelConsumptionForLaps(unit))
+                    {
+                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+                    } 
+                }
+                else if(SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.MINUTE) || SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.MINUTES))
+                {
+                    if (!reportFuelConsumptionForTime(0, unit))
+                    {
+                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+                    } 
+                }
+                else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOUR) || SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOURS))
+                {
+                    if (!reportFuelConsumptionForTime(unit, 0))
+                    {
+                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+                    }
+                }
             }
         }
     }
