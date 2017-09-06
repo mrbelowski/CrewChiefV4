@@ -163,7 +163,9 @@ namespace CrewChiefV4.Events
                  ((currentGameState.SessionData.SessionType == SessionType.Qualify || currentGameState.SessionData.SessionType == SessionType.Practice || 
                     currentGameState.SessionData.SessionType == SessionType.HotLap) &&
                     ((currentGameState.SessionData.SessionPhase == SessionPhase.Green || currentGameState.SessionData.SessionPhase == SessionPhase.FullCourseYellow) || 
-                        currentGameState.SessionData.SessionPhase == SessionPhase.Countdown))))
+                        currentGameState.SessionData.SessionPhase == SessionPhase.Countdown) &&
+                    // don't process fuel data in prac and qual until we're actually moving:
+                    currentGameState.PositionAndMotionData.CarSpeed > 10)))
             {               
                 // To get the initial fuel, wait for 15 seconds
                 if (currentGameState.SessionData.SessionRunningTime > 15)
