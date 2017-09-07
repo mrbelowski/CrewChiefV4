@@ -151,8 +151,6 @@ namespace CrewChiefV4.Events
 
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
-            //Console.WriteLine("last fuel = " + currentFuel + " current fuel = " + currentGameState.FuelData.FuelLeft + " run time " + 
-            //    currentGameState.SessionData.SessionRunningTime + " speed " + currentGameState.PositionAndMotionData.CarSpeed + " in pit " + currentGameState.PitData.InPitlane);
             if (!GlobalBehaviourSettings.enabledMessageTypes.Contains(MessageTypes.FUEL))
             {
                 return;
@@ -218,7 +216,7 @@ namespace CrewChiefV4.Events
                             }
                         }
                     }
-                    Console.WriteLine("************* Fuel level initialised, initialFuelLevel = " + initialFuelLevel + ", halfDistance = " + halfDistance + " halfTime = " + halfTime);
+                    Console.WriteLine("Fuel level initialised, initialFuelLevel = " + initialFuelLevel + ", halfDistance = " + halfDistance + " halfTime = " + halfTime);
                     initialised = true;                    
                 }
                 if (initialised)
@@ -246,7 +244,6 @@ namespace CrewChiefV4.Events
                         {
                             averageUsagePerLap = (initialFuelLevel - currentGameState.FuelData.FuelLeft) / (currentGameState.SessionData.CompletedLaps - lapsCompletedWhenFuelWasReset);
                         }
-                        Console.WriteLine("********* new lap, average per minute = " + averageUsagePerMinute + " average per lap = " + averageUsagePerLap + " window data = " + String.Join(",", fuelLevelWindowByLap));
                     }
                     if (currentGameState.SessionData.SessionRunningTime > gameTimeAtLastFuelWindowUpdate + fuelUseSampleTime)
                     {
@@ -272,7 +269,6 @@ namespace CrewChiefV4.Events
                             averageUsagePerMinute = 60 * (initialFuelLevel - currentGameState.FuelData.FuelLeft) / (gameTimeAtLastFuelWindowUpdate - gameTimeWhenFuelWasReset);
                             Console.WriteLine("fuel use per minute (basic calc) = " + averageUsagePerMinute + " fuel left = " + currentGameState.FuelData.FuelLeft);
                         }
-                        Console.WriteLine("********* new time point, average per minute = " + averageUsagePerMinute + " average per lap = " + averageUsagePerLap + " window data = " + String.Join(",", fuelLevelWindowByTime));
                     }
 
                     // warnings for particular fuel levels
