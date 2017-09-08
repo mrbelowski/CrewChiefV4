@@ -47,7 +47,7 @@ WHATS_THE_FASTEST_LAP_TIME = what's the fastest lap:what's the fastest lap time
 WHATS_MY_POSITION = what's my position
 WHATS_MY_FUEL_LEVEL = what's my fuel level
 WHATS_MY_FUEL_USAGE = what's my fuel usage:what's my fuel consumption:what's my fuel use
-CALCULATE_FUEL_FOR = calculate fuel for:how much fuel do i need for
+CALCULATE_FUEL_FOR = calculate fuel for:how much fuel do i need for:how much fuel for
 
 KEEP_QUIET = keep quiet:shut up:I know what I'm doing:leave me alone
 KEEP_ME_INFORMED = keep me updated:keep me informed:keep me posted
