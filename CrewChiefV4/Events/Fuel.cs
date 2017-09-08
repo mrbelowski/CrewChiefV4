@@ -210,7 +210,7 @@ namespace CrewChiefV4.Events
                             if (halfDistance == -1)
                             {
                                 // TODO: Math.Ceiling this value
-                                halfDistance = currentGameState.SessionData.SessionNumberOfLaps / 2;
+                                halfDistance = (int) Math.Ceiling(currentGameState.SessionData.SessionNumberOfLaps / 2f);
                             }
                         }
                         else if (currentGameState.SessionData.SessionTotalRunTime > 0)
@@ -218,7 +218,7 @@ namespace CrewChiefV4.Events
                             if (halfTime == -1)
                             {
                                 // TODO: Math.Ceiling this value
-                                halfTime = currentGameState.SessionData.SessionTotalRunTime / 2;
+                                halfTime = (int) Math.Ceiling(currentGameState.SessionData.SessionTotalRunTime / 2f);
                             }
                         }
                     }
