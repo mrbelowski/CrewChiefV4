@@ -67,8 +67,12 @@ namespace CrewChiefV4.Events
         private Boolean played1LitreWarning;
 
         private Boolean played2LitreWarning;
-
-        private int fuelUseWindowLength = 3;
+        
+        // base fuel use by lap estimates on the last 3 laps
+        private int fuelUseByLapsWindowLength = 3;
+        
+        // base fuel use by time estimates on the last 6 samples (6 minutes)
+        private int fuelUseByTimeWindowLength = 6;
 
         private List<float> fuelLevelWindowByLap = new List<float>();
 
@@ -201,10 +205,11 @@ namespace CrewChiefV4.Events
                     // if this is the first time we've initialised the fuel stats (start of session), get the half way point of this session
                     if (!initialised)
                     {
-                        if (currentGameState.SessionData.SessionNumberOfLaps > 0)
+                        if (currentGameState.SessionData.SessionNumberOfLaps > 1)
                         {
                             if (halfDistance == -1)
                             {
+                                // TODO: Math.Ceiling this value
                                 halfDistance = currentGameState.SessionData.SessionNumberOfLaps / 2;
                             }
                         }
@@ -212,6 +217,7 @@ namespace CrewChiefV4.Events
                         {
                             if (halfTime == -1)
                             {
+                                // TODO: Math.Ceiling this value
                                 halfTime = currentGameState.SessionData.SessionTotalRunTime / 2;
                             }
                         }
@@ -227,18 +233,18 @@ namespace CrewChiefV4.Events
                         fuelAtStartOfLastLap = currentFuel;
                         // completed a lap, so store the fuel left at this point:
                         fuelLevelWindowByLap.Insert(0, currentGameState.FuelData.FuelLeft);
-                        // if we've got fuelUseWindowLength + 1 samples (note we initialise the window data with initialFuelLevel so we always
+                        // if we've got fuelUseByLapsWindowLength + 1 samples (note we initialise the window data with initialFuelLevel so we always
                         // have one extra), get the average difference between each pair of values
 
                         // only do this if we have a full window of data + one extra start point
-                        if (fuelLevelWindowByLap.Count > fuelUseWindowLength)
+                        if (fuelLevelWindowByLap.Count > fuelUseByLapsWindowLength)
                         {
                             averageUsagePerLap = 0;
-                            for (int i = 0; i < fuelUseWindowLength; i++)
+                            for (int i = 0; i < fuelUseByLapsWindowLength; i++)
                             {
                                 averageUsagePerLap += (fuelLevelWindowByLap[i + 1] - fuelLevelWindowByLap[i]);
                             }
-                            averageUsagePerLap = averageUsagePerLap / fuelUseWindowLength;
+                            averageUsagePerLap = averageUsagePerLap / fuelUseByLapsWindowLength;
                         }
                         else
                         {
@@ -250,18 +256,18 @@ namespace CrewChiefV4.Events
                         // it's x minutes since the last fuel window check
                         gameTimeAtLastFuelWindowUpdate = currentGameState.SessionData.SessionRunningTime;
                         fuelLevelWindowByTime.Insert(0, currentGameState.FuelData.FuelLeft);
-                        // if we've got fuelUseWindowLength + 1 samples (note we initialise the window data with fuelAt15Seconds so we always
+                        // if we've got fuelUseByTimeWindowLength + 1 samples (note we initialise the window data with fuelAt15Seconds so we always
                         // have one extra), get the average difference between each pair of values
 
                         // only do this if we have a full window of data + one extra start point
-                        if (fuelLevelWindowByTime.Count > fuelUseWindowLength)
+                        if (fuelLevelWindowByTime.Count > fuelUseByTimeWindowLength)
                         {
                             averageUsagePerMinute = 0;
-                            for (int i = 0; i < fuelUseWindowLength; i++)
+                            for (int i = 0; i < fuelUseByTimeWindowLength; i++)
                             {
                                 averageUsagePerMinute += (fuelLevelWindowByTime[i + 1] - fuelLevelWindowByTime[i]);
                             }
-                            averageUsagePerMinute = 60 * averageUsagePerMinute / (fuelUseWindowLength * fuelUseSampleTime);
+                            averageUsagePerMinute = 60 * averageUsagePerMinute / (fuelUseByTimeWindowLength * fuelUseSampleTime);
                             Console.WriteLine("fuel use per minute (windowed calc) = " + averageUsagePerMinute + " fuel left = " + currentGameState.FuelData.FuelLeft);
                         }
                         else
