@@ -1049,7 +1049,7 @@ namespace CrewChiefV4.rFactor2
                 // At default ruleset, both open and close sub states result in "Pits open" visible in the UI.
                 else if (shared.scoring.mScoringInfo.mYellowFlagState == (sbyte)rFactor2Constants.rF2YellowFlagState.PitOpen
                     || shared.scoring.mScoringInfo.mYellowFlagState == (sbyte)rFactor2Constants.rF2YellowFlagState.PitClosed)
-                    cgs.FlagData.fcyPhase = FullCourseYellowPhase.PITS_OPEN;
+                    cgs.FlagData.fcyPhase = FullCourseYellowPhase.PITS_OPEN;  // TODO: use mAllowedToPit from vehicle rules to distinguish here.  Seems like 2 is Closed 3 is Open.
                 else if (shared.scoring.mScoringInfo.mYellowFlagState == (sbyte)rFactor2Constants.rF2YellowFlagState.PitLeadLap)
                     cgs.FlagData.fcyPhase = FullCourseYellowPhase.PITS_OPEN_LEAD_LAP_VEHICLES;
                 else if (shared.scoring.mScoringInfo.mYellowFlagState == (sbyte)rFactor2Constants.rF2YellowFlagState.LastLap)
