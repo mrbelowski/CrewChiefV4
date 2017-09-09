@@ -326,7 +326,7 @@
 			"carClassEnum": "F1",
 			"raceroomClassIds": [5824],
 			"pCarsClassNames": ["FA"],
-			"rf2ClassNames": ["Formula ISI 2012"],
+			"rf2ClassNames": ["Formula ISI 2012", "OW Formula 1 2017 Single Player"],
 			"acClassNames": ["ks_ferrari_f138", "ferrari_f2002", "ks_ferrari_sf15t"],
 			"brakeType": "Carbon",
 			"maxSafeWaterTemp": 105,
