@@ -245,11 +245,11 @@ namespace CrewChiefV4.Events
                                 playBoxNowMessage = true;
                                 playPitThisLap = false;
                                 mandatoryStopBoxThisLap = true;
-                                if (mandatoryTyreChangeTyreType == TyreType.R3E_NEW_Prime)
+                                if (mandatoryTyreChangeTyreType == TyreType.Prime)
                                 {
                                     audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsFitPrimesThisLap, random.Next(0, 10), this));
                                 }
-                                else if (mandatoryTyreChangeTyreType == TyreType.R3E_NEW_Option)
+                                else if (mandatoryTyreChangeTyreType == TyreType.Option)
                                 {
                                     audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsFitOptionsThisLap, random.Next(0, 20), this));
                                 }
@@ -260,11 +260,11 @@ namespace CrewChiefV4.Events
                             }
                             else if (minDistanceOnCurrentTyre > 0 && currentGameState.SessionData.CompletedLaps == minDistanceOnCurrentTyre)
                             {
-                                if (mandatoryTyreChangeTyreType == TyreType.R3E_NEW_Prime)
+                                if (mandatoryTyreChangeTyreType == TyreType.Prime)
                                 {
                                     audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsCanNowFitPrimes, random.Next(0, 20), this));
                                 }
-                                else if (mandatoryTyreChangeTyreType == TyreType.R3E_NEW_Option)
+                                else if (mandatoryTyreChangeTyreType == TyreType.Option)
                                 {
                                     audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsCanNowFitOptions, random.Next(0, 20), this));
                                 }
@@ -298,11 +298,11 @@ namespace CrewChiefV4.Events
                                 currentGameState.PitData.PitWindow != PitWindow.StopInProgress)
                             {
                                 playBoxNowMessage = true;
-                                if (mandatoryTyreChangeTyreType == TyreType.R3E_NEW_Prime)
+                                if (mandatoryTyreChangeTyreType == TyreType.Prime)
                                 {
                                     audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsFitPrimesThisLap, random.Next(0, 10), this));
                                 }
-                                else if (mandatoryTyreChangeTyreType == TyreType.R3E_NEW_Option)
+                                else if (mandatoryTyreChangeTyreType == TyreType.Option)
                                 {
                                     audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsFitOptionsThisLap, random.Next(0, 10), this));
                                 }
@@ -352,11 +352,11 @@ namespace CrewChiefV4.Events
                                 playBoxNowMessage = true;
                                 playPitThisLap = false;
                                 mandatoryStopBoxThisLap = true;
-                                if (mandatoryTyreChangeTyreType == TyreType.R3E_NEW_Prime)
+                                if (mandatoryTyreChangeTyreType == TyreType.Prime)
                                 {
                                     audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsFitPrimesThisLap, random.Next(0, 20), this));
                                 }
-                                else if (mandatoryTyreChangeTyreType == TyreType.R3E_NEW_Option)
+                                else if (mandatoryTyreChangeTyreType == TyreType.Option)
                                 {
                                     audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsFitOptionsThisLap, random.Next(0, 20), this));
                                 }
@@ -450,11 +450,11 @@ namespace CrewChiefV4.Events
                     if (playBoxNowMessage && currentGameState.SessionData.SectorNumber == 3)
                     {
                         playBoxNowMessage = false;
-                        if (mandatoryTyreChangeTyreType == TyreType.R3E_NEW_Prime)
+                        if (mandatoryTyreChangeTyreType == TyreType.Prime)
                         {
                             audioPlayer.playMessage(new QueuedMessage("box_now_for_primes", MessageContents(folderMandatoryPitStopsPitNow, folderMandatoryPitStopsPrimeTyres), 3, this));
                         }
-                        else if (mandatoryTyreChangeTyreType == TyreType.R3E_NEW_Option)
+                        else if (mandatoryTyreChangeTyreType == TyreType.Option)
                         {
                             audioPlayer.playMessage(new QueuedMessage("box_now_for_options", MessageContents(folderMandatoryPitStopsPitNow, folderMandatoryPitStopsOptionTyres), 3, this));
                         }

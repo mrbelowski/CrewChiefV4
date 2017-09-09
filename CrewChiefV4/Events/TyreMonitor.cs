@@ -128,6 +128,18 @@ namespace CrewChiefV4.Events
         private static String folderLockingFrontsForCornerWarning = "tyre_monitor/locking_fronts_corner_warning";
         private static String folderLockingRearsForCornerWarning = "tyre_monitor/locking_rears_corner_warning";
 
+        public static String folderHardTyres = "tyre_monitor/hards";
+        public static String folderMediumTyres = "tyre_monitor/mediums";
+        public static String folderSoftTyres = "tyre_monitor/softs";
+        public static String folderSuperSoftTyres = "tyre_monitor/super_softs";
+        public static String folderPrimaryTyres = "tyre_monitor/primaries";
+        public static String folderAlternateTyres = "tyre_monitor/alternates";
+        public static String folderPrimeTyres = "tyre_monitor/primes";
+        public static String folderOptionTyres = "tyre_monitor/options";
+        public static String folderWetTyres = "tyre_monitor/wets";
+        public static String folderIntermediateTyres = "tyre_monitor/intermediates";
+        public static String folderSlickTyres = "tyre_monitor/slicks";
+
         private int lapsIntoSessionBeforeTempMessage = 2;        
 
         // check at start of which sector (1=s/f line)
@@ -226,6 +238,33 @@ namespace CrewChiefV4.Events
         public TyreMonitor(AudioPlayer audioPlayer)
         {
             this.audioPlayer = audioPlayer;
+        }
+
+        public static String getFolderForTyreType(TyreType tyreType)
+        {
+            switch (tyreType)
+            {
+                case TyreType.Soft:
+                    return folderSoftTyres;
+                case TyreType.Medium:
+                    return folderMediumTyres;
+                case TyreType.Hard:
+                    return folderHardTyres;
+                case TyreType.Primary:
+                    return folderPrimaryTyres;
+                case TyreType.Alternate:
+                    return folderAlternateTyres;
+                case TyreType.Prime:
+                    return folderPrimeTyres;
+                case TyreType.Option:
+                    return folderOptionTyres;
+                case TyreType.Wet:
+                    return folderWetTyres;
+                case TyreType.Intermediate:
+                    return folderIntermediateTyres;
+                default:
+                    return folderSlickTyres;
+            }
         }
 
         public override void clearState()
