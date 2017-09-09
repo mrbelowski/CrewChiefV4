@@ -236,6 +236,40 @@ namespace CrewChiefV4
 
         }
 
+        public void toggleManualFormationLapMode()
+        {
+            if (GameStateData.useManualFormationLap)
+            {
+                disableManualFormationLapMode();
+            }
+            else
+            {
+                enableManualFormationLapMode();
+            }
+        }
+
+        public void enableManualFormationLapMode()
+        {
+            if (!GameStateData.useManualFormationLap)
+            {
+                GameStateData.useManualFormationLap = true;
+                GameStateData.onManualFormationLap = true;
+            }
+            Console.WriteLine("Manual formation lap mode is ACTIVE");
+            audioPlayer.playMessageImmediately(new QueuedMessage(LapCounter.folderManualFormationLapModeEnabled, 0, null));
+        }
+
+        public void disableManualFormationLapMode()
+        {
+            if (GameStateData.useManualFormationLap)
+            {
+                GameStateData.useManualFormationLap = false;
+                GameStateData.onManualFormationLap = false;
+            }
+            Console.WriteLine("Manual formation lap mode is DISABLED");
+            audioPlayer.playMessageImmediately(new QueuedMessage(LapCounter.folderManualFormationLapModeDisabled, 0, null));
+        }
+
         public void reportFuelStatus()
         {
             ((Fuel)eventsList["Fuel"]).reportFuelStatus();
@@ -478,7 +512,14 @@ namespace CrewChiefV4
                             {
                                 Console.WriteLine("Reached the end of the data file, sleeping to clear queued messages");
                                 Thread.Sleep(5000);
-                                audioPlayer.purgeQueues();
+                                try
+                                {
+                                    audioPlayer.purgeQueues();
+                                }
+                                catch (Exception)
+                                {
+                                    // ignore
+                                }
                                 running = false;
                                 continue;
                             }
@@ -498,16 +539,17 @@ namespace CrewChiefV4
                         {
                             Console.WriteLine("Error mapping game data: " + e.Message + ", " + e.StackTrace);
                         }
+
                         // if we're paused or viewing another car, the mapper will just return the previous game state so we don't lose all the
                         // persistent state information. If this is the case, don't process any stuff
-                        if (nextGameState != null && nextGameState != currentGameState)
+                        if (nextGameState != null && (nextGameState.SessionData.AbruptSessionEndDetected || nextGameState != currentGameState))
                         {
                             previousGameState = currentGameState;
                             currentGameState = nextGameState;
                             if (!sessionFinished && currentGameState.SessionData.SessionPhase == SessionPhase.Finished
                                 && previousGameState != null)
                             {
-                                Console.WriteLine("Session finished");
+                                Console.WriteLine("Session finished, position = " + currentGameState.SessionData.Position);
                                 audioPlayer.purgeQueues();
                                 if (displaySessionLapTimes)
                                 {
@@ -541,7 +583,10 @@ namespace CrewChiefV4
                                     {
                                         entry.Value.clearState();
                                     }
-                                    spotter.clearState();
+                                    if (spotter != null)
+                                    {
+                                        spotter.clearState();
+                                    }
                                     faultingEvents.Clear();
                                     faultingEventsCount.Clear();
                                     stateCleared = true;
@@ -649,8 +694,15 @@ namespace CrewChiefV4
                 {
                     gameDataReader.DumpRawGameData();
                 }
-                gameDataReader.stop();
-                gameDataReader.DisconnectFromProcess();
+                try
+                {
+                    gameDataReader.stop();
+                    gameDataReader.DisconnectFromProcess();
+                }
+                catch (Exception)
+                {
+                    //ignore
+                }
             }
             mapped = false;
 

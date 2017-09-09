@@ -97,7 +97,10 @@ namespace CrewChiefV4.Audio
                         }
                     }
 
-                    synthesizer.SelectVoiceByHints(VoiceGender.Male, hasAdult ? VoiceAge.Adult : VoiceAge.Senior);
+                    // this appears to just hang indefinitely. So don't bother trying to set it and let the system use the default voice
+                    // which will probably be shit, but MS TTS is shit anyway and now it's even shitter because it crashes the fucking
+                    // app on start up. Nobbers.
+                    // synthesizer.SelectVoiceByHints(VoiceGender.Male, hasAdult ? VoiceAge.Adult : VoiceAge.Senior);
                     synthesizer.SetOutputToDefaultAudioDevice();
                     synthesizer.Volume = 100;
                     synthesizer.Rate = 0;

@@ -34,6 +34,7 @@ namespace CrewChiefV4
         public OpponentData opponent;
         public int integer;
         public FragmentType type;
+        public Boolean allowShortHundreds = true;   // allow a number like 160 to be read as "one sixty" instead of "one hundred and sixty"
 
         private MessageFragment(String text)
         {
@@ -57,6 +58,14 @@ namespace CrewChiefV4
         {
             this.integer = integer;
             this.type = FragmentType.Integer;
+            this.allowShortHundreds = true;
+        }
+
+        private MessageFragment(int integer, Boolean allowShortHundreds)
+        {
+            this.integer = integer;
+            this.type = FragmentType.Integer;
+            this.allowShortHundreds = allowShortHundreds;
         }
 
         public static MessageFragment Text(String text)
@@ -75,7 +84,12 @@ namespace CrewChiefV4
 
         public static MessageFragment Integer(int integer)
         {
-            return new MessageFragment(integer);
+            return MessageFragment.Integer(integer, true);
+        }
+
+        public static MessageFragment Integer(int integer, Boolean allowShortHundreds)
+        {
+            return new MessageFragment(integer, allowShortHundreds);
         }
 
         public override String ToString()
@@ -310,7 +324,7 @@ namespace CrewChiefV4
                     case FragmentType.Integer:                        
                         if (numberReader != null)
                         {
-                            List<String> integerFolders = numberReader.GetIntegerSounds(messageFragment.integer);
+                            List<String> integerFolders = numberReader.GetIntegerSounds(messageFragment.integer, messageFragment.allowShortHundreds);
                             if (integerFolders.Count() == 0)
                             {
                                 canBePlayed = false;

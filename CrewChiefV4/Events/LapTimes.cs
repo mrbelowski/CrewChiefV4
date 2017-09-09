@@ -221,6 +221,10 @@ namespace CrewChiefV4.Events
 
         protected override void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
+            if (GameStateData.onManualFormationLap)
+            {
+                return;
+            }
             sessionType = currentGameState.SessionData.SessionType;
             this.currentGameState = currentGameState;
             if (currentGameState.SessionData.IsNewLap)

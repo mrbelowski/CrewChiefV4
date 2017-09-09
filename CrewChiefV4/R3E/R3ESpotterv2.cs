@@ -115,6 +115,7 @@ namespace CrewChiefV4.RaceRoom
                 {
                     // Retrieve and use user overridable spotter car length/width.
                     this.internalSpotter.setCarDimensions(GlobalBehaviourSettings.spotterVehicleLength, GlobalBehaviourSettings.spotterVehicleWidth);
+                    this.currentPlayerCarClassID = carClass.getClassIdentifier();
                 }
             }
             float[] currentPlayerPosition = new float[] { currentPlayerData.Position.X, currentPlayerData.Position.Z };
