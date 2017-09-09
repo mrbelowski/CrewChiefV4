@@ -50,6 +50,8 @@ namespace CrewChiefV4.rFactor2
         private double lastScoringET = -1.0;
 
         SessionPhase lastSessionPhase = SessionPhase.Unavailable;
+        rFactor2Constants.rF2FinishStatus lastPlayerFinishStatus = rFactor2Constants.rF2FinishStatus.None;
+        bool lastInRealTimeState = false;
 
         public RF2GameStateMapper()
         {
@@ -139,34 +141,49 @@ namespace CrewChiefV4.rFactor2
                 // If we skip to next session the session phase never goes to 'Finished'. We do, however, see the numVehicles drop to zero.
                 // If we have a previous game state and it's in a valid phase here, update it to Finished and return it. This requires some
                 // additional logic in the main CrewChief loop (because this means current and previous game state are the same object).
-                if (pgs != null 
+                if (pgs != null
                     && pgs.SessionData.SessionType != SessionType.Unavailable
                     && pgs.SessionData.SessionPhase != SessionPhase.Finished
                     && pgs.SessionData.SessionPhase != SessionPhase.Unavailable
                     && this.lastSessionPhase != SessionPhase.Unavailable
                     && this.lastSessionPhase != SessionPhase.Finished)
                 {
-                    pgs.SessionData.SessionPhase = SessionPhase.Finished;
-                    this.lastSessionPhase = pgs.SessionData.SessionPhase;
-                    pgs.SessionData.AbruptSessionEndDetected = true;
-                }
-                else
-                {
-                    this.isOfflineSession = true;
-                    this.distanceOffTrack = 0;
-                    this.isApproachingTrack = false;
-                    this.lastSessionPhase = SessionPhase.Unavailable;
-
-                    if (pgs != null)
+                    if (this.lastInRealTimeState && pgs.SessionData.SessionType == SessionType.Race)  // Looks like race restart.
+                        Console.WriteLine("Abrupt Session End suppressed due to real time flag");
+                    else if (pgs.SessionData.SessionType == SessionType.Race
+                        && (this.lastPlayerFinishStatus == rFactor2Constants.rF2FinishStatus.Dnf  // Looks like exit to monitor in the middle of a race, so user doesn't care about result.
+                            || this.lastPlayerFinishStatus == rFactor2Constants.rF2FinishStatus.Dq))
                     {
-                        // In rF2 user can quit practice session and we will never know
-                        // about it.  Mark previous game state with Unavailable flags.
-                        pgs.SessionData.SessionType = SessionType.Unavailable;
-                        pgs.SessionData.SessionPhase = SessionPhase.Unavailable;
+                        Console.WriteLine("Abrupt Session End suppressed due to finish status: " + this.lastPlayerFinishStatus);
+                    }
+                    else
+                    {
+                        pgs.SessionData.SessionPhase = SessionPhase.Finished;
+                        this.lastSessionPhase = pgs.SessionData.SessionPhase;
+                        pgs.SessionData.AbruptSessionEndDetected = true;
+                        Console.WriteLine("Abrupt Session End detected.  SessionType: " + pgs.SessionData.SessionType);
+
+                        return pgs;
                     }
                 }
+
+                this.isOfflineSession = true;
+                this.distanceOffTrack = 0;
+                this.isApproachingTrack = false;
+                this.lastSessionPhase = SessionPhase.Unavailable;
+
+                if (pgs != null)
+                {
+                    // In rF2 user can quit practice session and we will never know
+                    // about it.  Mark previous game state with Unavailable flags.
+                    pgs.SessionData.SessionType = SessionType.Unavailable;
+                    pgs.SessionData.SessionPhase = SessionPhase.Unavailable;
+                }
+
                 return pgs;
             }
+
+            this.lastInRealTimeState = shared.extended.mInRealtimeFC == 1 || shared.scoring.mScoringInfo.mInRealtime == 1;
 
             // --------------------------------
             // session data
@@ -199,6 +216,8 @@ namespace CrewChiefV4.rFactor2
             // can't find the player or session leader vehicle info (replay)
             if (playerScoring.mIsPlayer != 1 || leaderScoring.mPlace != 1)
                 return pgs;
+
+            this.lastPlayerFinishStatus = (rFactor2Constants.rF2FinishStatus)playerScoring.mFinishStatus;
 
             // Get player and leader telemetry objects.
             // NOTE: Those are not available on first entry to the garage and likely in rare
