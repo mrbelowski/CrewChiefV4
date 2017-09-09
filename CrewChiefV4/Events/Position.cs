@@ -311,6 +311,10 @@ namespace CrewChiefV4.Events
 
         protected override void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
+            if (GameStateData.onManualFormationLap)
+            {
+                return;
+            }
             // edge case here - if we're the only can in the session, don't bother with this event
             if (currentGameState.OpponentData.Count == 0)
             {

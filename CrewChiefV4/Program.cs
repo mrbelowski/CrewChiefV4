@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -26,6 +28,14 @@ namespace CrewChiefV4
         [STAThread]
         static void Main()
         {
+            // Set Invariant Culture for all threads as default.
+            CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
+            CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.InvariantCulture;
+
+            // Set Invariant Culture for current thead.
+            Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
+            Thread.CurrentThread.CurrentUICulture = CultureInfo.InvariantCulture;
+
             String[] commandLineArgs = Environment.GetCommandLineArgs();
             Boolean allowMultipleInst = false;
             if (commandLineArgs != null)

@@ -131,6 +131,10 @@ namespace CrewChiefV4.Events
 
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
+            if (GameStateData.onManualFormationLap)
+            {
+                return;
+            }
             this.currentGameState = currentGameState;
             if (nextCarAheadChangeMessage == DateTime.MinValue)
             {

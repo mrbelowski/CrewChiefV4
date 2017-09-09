@@ -60,6 +60,12 @@ app_version = App version
 help = Help and getting started
 about = About Crew Chief
 
+restore_context_menu = Restore
+start_context_menu = Start {0} mode
+close_context_menu = Close
+running_context_menu = Crew Chief is running in {0} mode
+idling_context_menu = Crew Chief is idling
+
 messages_volume = Messages volume
 background_volume = Background volume
 
@@ -416,6 +422,10 @@ insert_beep_in_between_spotter_and_chief = Insert beep-in between Spotter and Ch
 insert_beep_in_between_spotter_and_chief_help = If Spotter and Chief are different people (spotter voices other than Jim), insert open channel beep sound on switching messages.
 insert_beep_out_between_spotter_and_chief = Insert beep-out between Spotter and Chief
 insert_beep_out_between_spotter_and_chief_help = If Spotter and Chief are different people (spotter voices other than Jim), insert close channel beep sound on switching messages.
+minimize_to_tray = Minimize to tray
+minimize_to_tray_help = Minimize Crew Chief to the system notification area instead of taskbar.
+minimize_on_startup = Minimize on startup
+minimize_to_tray_help = Starts Crew Chief minimized to task bar or system tray.
 
 properties_form = Crew Chief Configuration Properties
 exit_without_saving = Exit without Saving
@@ -436,3 +446,8 @@ reset_warning_title = Reset All Settings to Default Values
 
 spotter_name_label = Spotter voice (requires restart)
 get_fuel_status = Report fuel status
+
+toggle_manual_formation_lap = Toggle manual formation lap mode
+
+manual_formation_go_with_leader = Manual formation 'go' when leader crosses line
+manual_formation_go_with_leader_help = Cars are allowed to overtake on a manual formation lap as soon as the leader crosses the line

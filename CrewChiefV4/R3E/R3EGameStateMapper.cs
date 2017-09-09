@@ -221,6 +221,7 @@ namespace CrewChiefV4.RaceRoom
                         GlobalBehaviourSettings.UpdateFromCarClass(currentGameState.carClass);
                         Console.WriteLine("Player is using car class " + currentGameState.carClass.getClassIdentifier() + " (class ID " + participantStruct.DriverInfo.ClassId + ")");
                         brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(currentGameState.carClass);
+                        Utilities.TraceEventClass(currentGameState);
                     }
                     else
                     {
@@ -1020,7 +1021,7 @@ namespace CrewChiefV4.RaceRoom
             currentGameState.EngineData.EngineWaterTemp = shared.EngineWaterTemp;
 
             //------------------------ Fuel data -----------------------
-            currentGameState.FuelData.FuelUseActive = shared.FuelUseActive == 1;
+            currentGameState.FuelData.FuelUseActive = shared.FuelUseActive != 0;    // there seems to be some issue with this...
             currentGameState.FuelData.FuelPressure = shared.FuelPressure;
             currentGameState.FuelData.FuelCapacity = shared.FuelCapacity;
             currentGameState.FuelData.FuelLeft = shared.FuelLeft;

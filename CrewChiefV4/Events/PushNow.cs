@@ -49,6 +49,10 @@ namespace CrewChiefV4.Events
         
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
+            if (GameStateData.onManualFormationLap)
+            {
+                return;
+            }
             Boolean checkPushToGain = currentGameState.SessionData.SessionRunningTime - currentGameState.SessionData.GameTimeAtLastPositionFrontChange < minTimeToBeInThisPosition;
             Boolean checkPushToHold = currentGameState.SessionData.SessionRunningTime - currentGameState.SessionData.GameTimeAtLastPositionBehindChange < minTimeToBeInThisPosition;
             if (currentGameState.SessionData.SessionType == SessionType.Race && !currentGameState.PitData.InPitlane)

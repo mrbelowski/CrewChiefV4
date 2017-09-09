@@ -2218,5 +2218,88 @@ namespace CrewChiefV4.Properties {
                 this["insert_beep_out_between_spotter_and_chief"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-1")]
+        public int TOGGLE_MANUAL_FORMATION_LAP_button_index {
+            get {
+                return ((int)(this["TOGGLE_MANUAL_FORMATION_LAP_button_index"]));
+            }
+            set {
+                this["TOGGLE_MANUAL_FORMATION_LAP_button_index"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string TOGGLE_MANUAL_FORMATION_LAP_device_guid {
+            get {
+                return ((string)(this["TOGGLE_MANUAL_FORMATION_LAP_device_guid"]));
+            }
+            set {
+                this["TOGGLE_MANUAL_FORMATION_LAP_device_guid"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string TOGGLE_MANUAL_FORMATION_LAP_device_type {
+            get {
+                return ((string)(this["TOGGLE_MANUAL_FORMATION_LAP_device_type"]));
+            }
+            set {
+                this["TOGGLE_MANUAL_FORMATION_LAP_device_type"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool minimize_to_tray {
+            get {
+                return ((bool)(this["minimize_to_tray"]));
+            }
+            set {
+                this["minimize_to_tray"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool minimize_on_startup {
+            get {
+                return ((bool)(this["minimize_on_startup"]));
+            }
+            set {
+                this["minimize_on_startup"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool update_notify_attempted {
+            get {
+                return ((bool)(this["update_notify_attempted"]));
+            }
+            set {
+                this["update_notify_attempted"] = value;
+	    }
+        }
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool manual_formation_go_with_leader {
+            get {
+                return ((bool)(this["manual_formation_go_with_leader"]));
+            }
+            set {
+                this["manual_formation_go_with_leader"] = value;
+            }
+        }
     }
 }
