@@ -1527,7 +1527,11 @@ namespace CrewChiefV4.rFactor2
                 return TyreType.Hard;
             else if (frontCompound.Contains("MEDIUM"))
                 return TyreType.Medium;
-            else if (frontCompound.Contains("SOFT"))  // this is a bit too restrictive - ultra softs, super softs are lost.
+            else if (frontCompound.Contains("SUPER") && frontCompound.Contains("SOFT"))
+                return TyreType.SuperSoft;
+            else if (frontCompound.Contains("ULTRA") && frontCompound.Contains("SOFT"))
+                return TyreType.UltraSoft;
+            else if (frontCompound.Contains("SOFT"))
                 return TyreType.Soft;
             else if (frontCompound.Contains("WET"))
                 return TyreType.Wet;
