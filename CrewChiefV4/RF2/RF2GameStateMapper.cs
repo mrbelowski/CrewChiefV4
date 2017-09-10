@@ -16,7 +16,7 @@ namespace CrewChiefV4.rFactor2
     {
         private SpeechRecogniser speechRecogniser;
 
-        public static String playerName = null;
+        public static string playerName = null;
 
         private List<CornerData.EnumWithThresholds> suspensionDamageThresholds = new List<CornerData.EnumWithThresholds>();
         private List<CornerData.EnumWithThresholds> tyreWearThresholds = new List<CornerData.EnumWithThresholds>();
@@ -36,20 +36,24 @@ namespace CrewChiefV4.rFactor2
         private const int minLapsBetweenPredictedStops = 5;
 
         // If we're running only against AI, force the pit window to open
-        private Boolean isOfflineSession = true;
+        private bool isOfflineSession = true;
 
         // Keep track of opponents processed this time
-        private List<String> opponentKeysProcessed = new List<String>();
+        private List<string> opponentKeysProcessed = new List<string>();
 
         // Detect when approaching racing surface after being off track
         private float distanceOffTrack = 0.0f;
-        private Boolean isApproachingTrack = false;
+        private bool isApproachingTrack = false;
+
+        // User preferences.
+        private readonly bool enablePitStopPrediction = UserSettings.GetUserSettings().getBoolean("enable_rf2_pit_stop_prediction");
+        private readonly bool enableBlueOnSlower = UserSettings.GetUserSettings().getBoolean("enable_rf2_blue_on_slower");
 
         // Detect if there any changes in the the game data since the last update.
         private double lastPlayerTelemetryET = -1.0;
         private double lastScoringET = -1.0;
 
-        SessionPhase lastSessionPhase = SessionPhase.Unavailable;
+        // State tracking for hacks around model.
         rFactor2Constants.rF2FinishStatus lastPlayerFinishStatus = rFactor2Constants.rF2FinishStatus.None;
         bool lastInRealTimeState = false;
 
@@ -138,28 +142,34 @@ namespace CrewChiefV4.rFactor2
             // No session data
             if (shared.scoring.mScoringInfo.mNumVehicles == 0)
             {
-                // If we skip to next session the session phase never goes to 'Finished'. We do, however, see the numVehicles drop to zero.
+                // If we skip to next session the session phase never goes to "Finished". We do, however, see the numVehicles drop to zero.
                 // If we have a previous game state and it's in a valid phase here, update it to Finished and return it. This requires some
                 // additional logic in the main CrewChief loop (because this means current and previous game state are the same object).
                 if (pgs != null
                     && pgs.SessionData.SessionType != SessionType.Unavailable
                     && pgs.SessionData.SessionPhase != SessionPhase.Finished
-                    && pgs.SessionData.SessionPhase != SessionPhase.Unavailable
-                    && this.lastSessionPhase != SessionPhase.Unavailable
-                    && this.lastSessionPhase != SessionPhase.Finished)
+                    && pgs.SessionData.SessionPhase != SessionPhase.Unavailable)
                 {
-                    if (this.lastInRealTimeState && pgs.SessionData.SessionType == SessionType.Race)  // Looks like race restart.
+                    if (this.lastInRealTimeState && pgs.SessionData.SessionType == SessionType.Race)
+                    {
+                        // Looks like race restart without exiting to monitor.  We can't reliably detect session end
+                        // here, because it is timing affected (we might miss this between updates).  So better not do it.
                         Console.WriteLine("Abrupt Session End suppressed due to real time flag");
+                    }
                     else if (pgs.SessionData.SessionType == SessionType.Race
-                        && (this.lastPlayerFinishStatus == rFactor2Constants.rF2FinishStatus.Dnf  // Looks like exit to monitor in the middle of a race, so user doesn't care about result.
+                        && (this.lastPlayerFinishStatus == rFactor2Constants.rF2FinishStatus.Dnf
                             || this.lastPlayerFinishStatus == rFactor2Constants.rF2FinishStatus.Dq))
                     {
+                        // Looks like exit to monitor in the middle of a race, so user probably doesn't care about the result.
+                        // Not 100% sure how to handle this, but most often this results in "fucking waste of time" comment on leaving
+                        // race earlier, which might be appropriate, really.  Maybe a setting?
                         Console.WriteLine("Abrupt Session End suppressed due to finish status: " + this.lastPlayerFinishStatus);
                     }
                     else
                     {
+                        // While this detects the "Next Session" from Practice/Quali, this still sounds a bit weird if user clicks
+                        // "Leave Session" and goes to main menu.  60 sec delay (minSessionRunTimeForEndMessages) helps, but not entirely.
                         pgs.SessionData.SessionPhase = SessionPhase.Finished;
-                        this.lastSessionPhase = pgs.SessionData.SessionPhase;
                         pgs.SessionData.AbruptSessionEndDetected = true;
                         Console.WriteLine("Abrupt Session End detected.  SessionType: " + pgs.SessionData.SessionType);
 
@@ -170,7 +180,6 @@ namespace CrewChiefV4.rFactor2
                 this.isOfflineSession = true;
                 this.distanceOffTrack = 0;
                 this.isApproachingTrack = false;
-                this.lastSessionPhase = SessionPhase.Unavailable;
 
                 if (pgs != null)
                 {
@@ -285,7 +294,6 @@ namespace CrewChiefV4.rFactor2
 
             csd.SessionType = mapToSessionType(shared);
             csd.SessionPhase = mapToSessionPhase((rFactor2Constants.rF2GamePhase)shared.scoring.mScoringInfo.mGamePhase, csd.SessionType, ref playerScoring);
-            this.lastSessionPhase = csd.SessionPhase;
 
             var carClassId = getStringFromBytes(playerScoring.mVehicleClass);
             cgs.carClass = CarData.getCarClassForClassName(carClassId);
@@ -401,7 +409,7 @@ namespace CrewChiefV4.rFactor2
             // Pit Data
             cgs.PitData.IsRefuellingAllowed = true;
 
-            if (UserSettings.GetUserSettings().getBoolean("enable_rf2_pit_stop_prediction"))
+            if (this.enablePitStopPrediction)
             {
                 cgs.PitData.HasMandatoryPitStop = this.isOfflineSession
                     && playerTelemetry.mScheduledStops > 0
@@ -1096,7 +1104,7 @@ namespace CrewChiefV4.rFactor2
 
             if (playerScoring.mFlag == (byte)rFactor2Constants.rF2PrimaryFlag.Blue)
                 currFlag = FlagEnum.BLUE;
-            else if (UserSettings.GetUserSettings().getBoolean("enable_rf2_blue_on_slower")
+            else if (this.enableBlueOnSlower
                 && !cgs.FlagData.isFullCourseYellow)  // Don't announce blue on slower under FCY.
             {
                 foreach (var opponent in cgs.OpponentData.Values)
