@@ -581,7 +581,12 @@ namespace CrewChiefV4.rFactor2
             // tire data
             // rF2 reports in Kelvin
             cgs.TyreData.TireWearActive = true;
+
+            // For now, all tyres will be reported as front compund.
+            var tt = this.mapToTyreType(ref playerTelemetry);
+
             var wheelFrontLeft = playerTelemetry.mWheels[(int)rFactor2Constants.rF2WheelIndex.FrontLeft];
+            cgs.TyreData.FrontLeftTyreType = tt;
             cgs.TyreData.LeftFrontAttached = wheelFrontLeft.mDetached == 0;
             cgs.TyreData.FrontLeft_LeftTemp = (float)wheelFrontLeft.mTemperature[0] - 273.15f;
             cgs.TyreData.FrontLeft_CenterTemp = (float)wheelFrontLeft.mTemperature[1] - 273.15f;
@@ -600,6 +605,7 @@ namespace CrewChiefV4.rFactor2
             }
 
             var wheelFrontRight = playerTelemetry.mWheels[(int)rFactor2Constants.rF2WheelIndex.FrontRight];
+            cgs.TyreData.FrontRightTyreType = tt;
             cgs.TyreData.RightFrontAttached = wheelFrontRight.mDetached == 0;
             cgs.TyreData.FrontRight_LeftTemp = (float)wheelFrontRight.mTemperature[0] - 273.15f;
             cgs.TyreData.FrontRight_CenterTemp = (float)wheelFrontRight.mTemperature[1] - 273.15f;
@@ -615,6 +621,7 @@ namespace CrewChiefV4.rFactor2
                 cgs.TyreData.PeakFrontRightTemperatureForLap = frontRightTemp;
 
             var wheelRearLeft = playerTelemetry.mWheels[(int)rFactor2Constants.rF2WheelIndex.RearLeft];
+            cgs.TyreData.RearLeftTyreType = tt;
             cgs.TyreData.LeftRearAttached = wheelRearLeft.mDetached == 0;
             cgs.TyreData.RearLeft_LeftTemp = (float)wheelRearLeft.mTemperature[0] - 273.15f;
             cgs.TyreData.RearLeft_CenterTemp = (float)wheelRearLeft.mTemperature[1] - 273.15f;
@@ -630,6 +637,7 @@ namespace CrewChiefV4.rFactor2
                 cgs.TyreData.PeakRearLeftTemperatureForLap = rearLeftTemp;
 
             var wheelRearRight = playerTelemetry.mWheels[(int)rFactor2Constants.rF2WheelIndex.RearRight];
+            cgs.TyreData.RearRightTyreType = tt;
             cgs.TyreData.RightRearAttached = wheelRearRight.mDetached == 0;
             cgs.TyreData.RearRight_LeftTemp = (float)wheelRearRight.mTemperature[0] - 273.15f;
             cgs.TyreData.RearRight_CenterTemp = (float)wheelRearRight.mTemperature[1] - 273.15f;
@@ -807,6 +815,7 @@ namespace CrewChiefV4.rFactor2
                 var opponent = new OpponentData();
                 opponent.DriverRawName = driverName;
                 opponent.CarClass = CarData.getCarClassForClassName(getStringFromBytes(vehicleScoring.mVehicleClass));
+                opponent.CurrentTyres = this.mapToTyreType(ref vehicleTelemetry);
 
                 opponent.DriverRawName = driverName;
                 opponent.DriverNameSet = opponent.DriverRawName.Length > 0;
@@ -1505,6 +1514,37 @@ namespace CrewChiefV4.rFactor2
                 default:
                     return SessionType.Unavailable;
             }
+        }
+
+        private TyreType mapToTyreType(ref rF2VehicleTelemetry vehicleTelemetry)
+        {
+            // For now, use fronts.
+            var frontCompound = RF2GameStateMapper.getStringFromBytes(vehicleTelemetry.mFrontTireCompoundName).ToUpperInvariant();
+
+            if (string.IsNullOrWhiteSpace(frontCompound))
+                return TyreType.Unknown_Race;
+            else if (frontCompound.Contains("HARD"))
+                return TyreType.Hard;
+            else if (frontCompound.Contains("MEDIUM"))
+                return TyreType.Medium;
+            else if (frontCompound.Contains("SOFT"))  // this is a bit too restrictive - ultra softs, super softs are lost.
+                return TyreType.Soft;
+            else if (frontCompound.Contains("WET"))
+                return TyreType.Wet;
+            else if (frontCompound.Contains("INTERMEDIATE"))
+                return TyreType.Intermediate;
+            else if (frontCompound.Contains("BIAS") && frontCompound.Contains("PLY"))
+                return TyreType.Bias_Ply;
+            else if (frontCompound.Contains("PRIME"))
+                return TyreType.Prime;
+            else if (frontCompound.Contains("OPTION"))
+                return TyreType.Option;
+            else if (frontCompound.Contains("ALTERNATE"))
+                return TyreType.Alternate;
+            else if (frontCompound.Contains("PRIMARY"))
+                return TyreType.Primary;
+
+            return TyreType.Unknown_Race;
         }
 
         private ControlType mapToControlType(rFactor2Constants.rF2Control controlType)
