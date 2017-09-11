@@ -142,10 +142,16 @@ namespace CrewChiefV4.rFactor2
             // No session data
             if (shared.scoring.mScoringInfo.mNumVehicles == 0)
             {
-                // If user clicks "Next Session" or "Finish Session" the session phase goes to "Finished" only if user actually entered
-                // the session and did some valid laps.  Otherwise, game does not update Session Phase.  We do, however, see the numVehicles 
-                // drop to zero.
-                // If we have a previous game state and it's in a valid phase here, update it to "Finished" and return it.
+                // If user clicks "Next Session" the session phase goes to "Finished" only if session time actually ran out.
+                // Otherwise, game does not update Session Phase.  We do, however, see the numVehicles  drop to zero.
+                // If we have a previous game state and it's in a valid phase here, update it to "Finished" and return it,
+                // except if:
+                // - it looks like user clicked "Restart" button during the race.
+                // - it looks like user have not done any proper laps in a session.
+                //
+                // It is well known that a lot of comments is indicator of trouble.  Despite all attempts to keep this clean and correct,
+                // I suspect we might have to remove or hide all this crap behind the setting, because there will be cases when incorrect
+                // position is reported.  All of this might need revisiting on exposure of MultiSessionRulesV01.
                 if (pgs != null
                     && pgs.SessionData.SessionType != SessionType.Unavailable
                     && pgs.SessionData.SessionPhase != SessionPhase.Finished
@@ -156,6 +162,13 @@ namespace CrewChiefV4.rFactor2
                         // Looks like race restart without exiting to monitor.  We can't reliably detect session end
                         // here, because it is timing affected (we might miss this between updates).  So better not do it.
                         Console.WriteLine("Abrupt Session End suppressed due to restart during real time.");
+                    }
+                    else if (pgs.SessionData.PlayerLapTimeSessionBest < 0.0f)
+                    {
+                        // If user has not set any lap time during the session, he will likely be towards the end of a grid.
+                        // However, game does not send position update to us, and we report whatever last assigned pos was, which
+                        // is most often incorrect.
+                        Console.WriteLine("Abrupt Session End suppressed due to no valid laptime set.");
                     }
                     else
                     {
