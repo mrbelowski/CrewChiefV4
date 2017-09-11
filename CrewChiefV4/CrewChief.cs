@@ -558,7 +558,7 @@ namespace CrewChiefV4
                                 }
                                 sessionEndMessages.trigger(previousGameState.SessionData.SessionRunningTime, previousGameState.SessionData.SessionType, currentGameState.SessionData.SessionPhase,
                                     previousGameState.SessionData.SessionStartPosition, previousGameState.SessionData.Position, previousGameState.SessionData.NumCarsAtStartOfSession, previousGameState.SessionData.CompletedLaps,
-                                    previousGameState.SessionData.IsDisqualified);
+                                    previousGameState.SessionData.IsDisqualified, previousGameState.SessionData.IsDNF);
 
                                 sessionFinished = true;
                                 audioPlayer.disablePearlsOfWisdom = false;

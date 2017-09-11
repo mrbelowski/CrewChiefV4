@@ -37,7 +37,7 @@ namespace CrewChiefV4.Events
         }
 
         public void trigger(float sessionRunningTime, SessionType sessionType, SessionPhase lastSessionPhase, int startPosition,
-            int finishPosition, int numCars, int completedLaps, Boolean isDisqualified)
+            int finishPosition, int numCars, int completedLaps, Boolean isDisqualified, Boolean isDNF)
         {
             if (!enableSessionEndMessages)
             {
@@ -51,7 +51,7 @@ namespace CrewChiefV4.Events
                     if (lastSessionPhase == SessionPhase.Finished)
                     {
                         // only play session end message for races if we've actually finished, not restarted
-                        playFinishMessage(sessionType, startPosition, finishPosition, numCars, isDisqualified);
+                        playFinishMessage(sessionType, startPosition, finishPosition, numCars, isDisqualified, isDNF);
                     }
                     else
                     {
@@ -70,7 +70,7 @@ namespace CrewChiefV4.Events
                     if (lastSessionPhase == SessionPhase.Green || lastSessionPhase == SessionPhase.FullCourseYellow || 
                         lastSessionPhase == SessionPhase.Finished || lastSessionPhase == SessionPhase.Checkered)
                     {
-                        playFinishMessage(sessionType, startPosition, finishPosition, numCars, false);
+                        playFinishMessage(sessionType, startPosition, finishPosition, numCars, false, isDNF);
                     }
                     else
                     {
@@ -84,7 +84,7 @@ namespace CrewChiefV4.Events
             }
         }
 
-        public void playFinishMessage(SessionType sessionType, int startPosition, int position, int numCars, Boolean isDisqualified)
+        public void playFinishMessage(SessionType sessionType, int startPosition, int position, int numCars, Boolean isDisqualified, Boolean isDNF)
         {
             audioPlayer.suspendPearlsOfWisdom();
             if (position < 1)
@@ -98,6 +98,12 @@ namespace CrewChiefV4.Events
                 {
                     audioPlayer.playMessage(new QueuedMessage(sessionEndMessageIdentifier, AbstractEvent.MessageContents(
                         Penalties.folderDisqualified), 0, null));
+                }
+                else if (isDNF)
+                {
+                    // TODO: different msg probably.
+                    audioPlayer.playMessage(new QueuedMessage(sessionEndMessageIdentifier,
+                        AbstractEvent.MessageContents(folderFinishedRaceLast), 0, null));
                 }
                 else if (position == 1)
                 {
