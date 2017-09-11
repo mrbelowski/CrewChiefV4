@@ -54,7 +54,6 @@ namespace CrewChiefV4.rFactor2
         private double lastScoringET = -1.0;
 
         // State tracking for hacks around model.
-        rFactor2Constants.rF2FinishStatus lastPlayerFinishStatus = rFactor2Constants.rF2FinishStatus.None;
         bool lastInRealTimeState = false;
 
         public RF2GameStateMapper()
@@ -230,8 +229,6 @@ namespace CrewChiefV4.rFactor2
             // can't find the player or session leader vehicle info (replay)
             if (playerScoring.mIsPlayer != 1 || leaderScoring.mPlace != 1)
                 return pgs;
-
-            this.lastPlayerFinishStatus = (rFactor2Constants.rF2FinishStatus)playerScoring.mFinishStatus;
 
             // Get player and leader telemetry objects.
             // NOTE: Those are not available on first entry to the garage and likely in rare
