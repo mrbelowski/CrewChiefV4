@@ -142,9 +142,10 @@ namespace CrewChiefV4.rFactor2
             // No session data
             if (shared.scoring.mScoringInfo.mNumVehicles == 0)
             {
-                // If we skip to next session the session phase never goes to "Finished". We do, however, see the numVehicles drop to zero.
-                // If we have a previous game state and it's in a valid phase here, update it to Finished and return it. This requires some
-                // additional logic in the main CrewChief loop (because this means current and previous game state are the same object).
+                // If user clicks "Next Session" or "Finish Session" the session phase goes to "Finished" only if user actually entered
+                // the session and did some valid laps.  Otherwise, game does not update Session Phase.  We do, however, see the numVehicles 
+                // drop to zero.
+                // If we have a previous game state and it's in a valid phase here, update it to "Finished" and return it.
                 if (pgs != null
                     && pgs.SessionData.SessionType != SessionType.Unavailable
                     && pgs.SessionData.SessionPhase != SessionPhase.Finished
@@ -154,20 +155,11 @@ namespace CrewChiefV4.rFactor2
                     {
                         // Looks like race restart without exiting to monitor.  We can't reliably detect session end
                         // here, because it is timing affected (we might miss this between updates).  So better not do it.
-                        Console.WriteLine("Abrupt Session End suppressed due to real time flag");
-                    }
-                    else if (pgs.SessionData.SessionType == SessionType.Race
-                        && (this.lastPlayerFinishStatus == rFactor2Constants.rF2FinishStatus.Dnf
-                            || this.lastPlayerFinishStatus == rFactor2Constants.rF2FinishStatus.Dq))
-                    {
-                        // Looks like exit to monitor in the middle of a race, so user probably doesn't care about the result.
-                        // Not 100% sure how to handle this, but most often this results in "fucking waste of time" comment on leaving
-                        // race earlier, which might be appropriate, really.  Maybe a setting?
-                        Console.WriteLine("Abrupt Session End suppressed due to finish status: " + this.lastPlayerFinishStatus);
+                        Console.WriteLine("Abrupt Session End suppressed due to restart during real time.");
                     }
                     else
                     {
-                        // While this detects the "Next Session" from Practice/Quali, this still sounds a bit weird if user clicks
+                        // While this detects the "Next Session" this still sounds a bit weird if user clicks
                         // "Leave Session" and goes to main menu.  60 sec delay (minSessionRunTimeForEndMessages) helps, but not entirely.
                         pgs.SessionData.SessionPhase = SessionPhase.Finished;
                         pgs.SessionData.AbruptSessionEndDetected = true;
@@ -377,8 +369,9 @@ namespace CrewChiefV4.rFactor2
             csd.IsNewSector = csd.IsNewSession || csd.SectorNumber != psd.SectorNumber;
             csd.IsNewLap = csd.IsNewSession || (csd.IsNewSector && csd.SectorNumber == 1);
             csd.PositionAtStartOfCurrentLap = csd.IsNewLap ? csd.Position : psd.PositionAtStartOfCurrentLap;
-            // TODO: See if Black Flag handling needed here.
+            // TODO: See if Black Flag handling needed here.s
             csd.IsDisqualified = (rFactor2Constants.rF2FinishStatus)playerScoring.mFinishStatus == rFactor2Constants.rF2FinishStatus.Dq;
+            csd.IsDNF = (rFactor2Constants.rF2FinishStatus)playerScoring.mFinishStatus == rFactor2Constants.rF2FinishStatus.Dnf;
 
             // NOTE: Telemetry contains mLapNumber, which might be ahead of Scoring due to higher refresh rate.  However,
             // since we use Scoring fields for timing calculations, stick to Scoring here as well.

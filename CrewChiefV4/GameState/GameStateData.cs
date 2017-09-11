@@ -161,6 +161,8 @@ namespace CrewChiefV4.GameState
 
         public Boolean IsDisqualified = false;
 
+        public Boolean IsDNF = false;
+
         public FlagEnum Flag = FlagEnum.GREEN;
 
         public DateTime YellowFlagStartTime = DateTime.Now;
