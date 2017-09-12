@@ -370,26 +370,26 @@ namespace CrewChiefV4.Events
             Boolean gotData = false;
             if (currentGameState != null)
             {
-                if (voiceMessage.StartsWith(SpeechRecogniser.WHAT_TYRE_IS) || voiceMessage.StartsWith(SpeechRecogniser.WHAT_TYRES_IS))
+                if (SpeechRecogniser.WHAT_TYRES_AM_I_ON.Contains(voiceMessage))
+                {
+                    gotData = true;
+                    // TODO: mismatched tyre types...
+                    audioPlayer.playMessageImmediately(new QueuedMessage(TyreMonitor.getFolderForTyreType(currentGameState.TyreData.FrontLeftTyreType), 0, null));
+                }
+                else if (voiceMessage.StartsWith(SpeechRecogniser.WHAT_TYRE_IS) || voiceMessage.StartsWith(SpeechRecogniser.WHAT_TYRES_IS))
                 {
                     string opponentKey = getOpponentKey(voiceMessage, " " + SpeechRecogniser.ON).Item1;
                     if (opponentKey != null)
                     {
                         OpponentData opponentData = currentGameState.OpponentData[opponentKey];
-                        if (opponentData.CurrentTyres == TyreType.R3E_NEW_Option)
+                        if (opponentData != null)
                         {
                             gotData = true;
-                            audioPlayer.playMessageImmediately(new QueuedMessage(MandatoryPitStops.folderMandatoryPitStopsOptionTyres, 0, null));
-                        }
-                        else if (opponentData.CurrentTyres == TyreType.R3E_NEW_Prime)
-                        {
-                            gotData = true;
-                            audioPlayer.playMessageImmediately(new QueuedMessage(MandatoryPitStops.folderMandatoryPitStopsPrimeTyres, 0, null));
+                            audioPlayer.playMessageImmediately(new QueuedMessage(TyreMonitor.getFolderForTyreType(opponentData.CurrentTyres), 0, null));
                         }
                     }
                 }
-
-                if (voiceMessage.StartsWith(SpeechRecogniser.WHATS) && 
+                else if (voiceMessage.StartsWith(SpeechRecogniser.WHATS) && 
                     (voiceMessage.EndsWith(SpeechRecogniser.LAST_LAP) || voiceMessage.EndsWith(SpeechRecogniser.BEST_LAP)))
                 {
                     if (voiceMessage.EndsWith(SpeechRecogniser.LAST_LAP))
