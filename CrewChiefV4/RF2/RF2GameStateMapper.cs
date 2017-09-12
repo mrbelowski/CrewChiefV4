@@ -144,13 +144,15 @@ namespace CrewChiefV4.rFactor2
                 // If user clicks "Next Session" the session phase goes to "Finished" only if session time actually ran out.
                 // Otherwise, game does not update Session Phase.  We do, however, see the numVehicles  drop to zero.
                 // If we have a previous game state and it's in a valid phase here, update it to "Finished" and return it,
-                // except if:
-                // - it looks like user clicked "Restart" button during the race.
-                // - it looks like user have not done any proper laps in a session.
+                // unless it looks like user clicked "Restart" button during the race.
+                // Additionally, if user made no valid laps in a session, mark it as DNF, because position does not matter in that case
+                // (and it isn't reported by the game, so whatever we announce is wrong).
                 //
-                // It is well known that a lot of comments is indicator of trouble.  Despite all attempts to keep this clean and correct,
-                // I suspect we might have to remove or hide all this crap behind the setting, because there will be cases when incorrect
-                // position is reported.  All of this might need revisiting on exposure of MultiSessionRulesV01.
+                // It is well known that a lot of comments is an indicator of trouble.  I suspect we might have to remove or hide 
+                // all this crap behind the setting, because there will be cases when incorrect position is reported.  This, however,
+                // works most of the time.
+                // All of this might need revisiting on exposure of MultiSessionRulesV01.  Another thing to try is to capture last
+                // reported position in the plugin.  It is possible we are simply missing it.
                 if (pgs != null
                     && pgs.SessionData.SessionType != SessionType.Unavailable
                     && pgs.SessionData.SessionPhase != SessionPhase.Finished
@@ -160,22 +162,22 @@ namespace CrewChiefV4.rFactor2
                     {
                         // Looks like race restart without exiting to monitor.  We can't reliably detect session end
                         // here, because it is timing affected (we might miss this between updates).  So better not do it.
-                        Console.WriteLine("Abrupt Session End suppressed due to restart during real time.");
-                    }
-                    else if (pgs.SessionData.PlayerLapTimeSessionBest < 0.0f)
-                    {
-                        // If user has not set any lap time during the session, he will likely be towards the end of a grid.
-                        // However, game does not send position update to us, and we report whatever last assigned pos was, which
-                        // is most often incorrect.
-                        Console.WriteLine("Abrupt Session End suppressed due to no valid laptime set.");
+                        Console.WriteLine("Abrupt Session End: suppressed due to restart during real time.");
                     }
                     else
                     {
+                        if (pgs.SessionData.PlayerLapTimeSessionBest < 0.0f && !pgs.SessionData.IsDisqualified)
+                        {
+                            // If user has not set any lap time during the session, mark it as DNF.
+                            pgs.SessionData.IsDNF = true;
+
+                            Console.WriteLine("Abrupt Session End: mark session as DNF due to no valid laps made.");
+                        }
                         // While this detects the "Next Session" this still sounds a bit weird if user clicks
                         // "Leave Session" and goes to main menu.  60 sec delay (minSessionRunTimeForEndMessages) helps, but not entirely.
                         pgs.SessionData.SessionPhase = SessionPhase.Finished;
                         pgs.SessionData.AbruptSessionEndDetected = true;
-                        Console.WriteLine("Abrupt Session End detected.  SessionType: " + pgs.SessionData.SessionType);
+                        Console.WriteLine("Abrupt Session End: SessionType: " + pgs.SessionData.SessionType);
 
                         return pgs;
                     }
@@ -379,7 +381,7 @@ namespace CrewChiefV4.rFactor2
             csd.IsNewSector = csd.IsNewSession || csd.SectorNumber != psd.SectorNumber;
             csd.IsNewLap = csd.IsNewSession || (csd.IsNewSector && csd.SectorNumber == 1);
             csd.PositionAtStartOfCurrentLap = csd.IsNewLap ? csd.Position : psd.PositionAtStartOfCurrentLap;
-            // TODO: See if Black Flag handling needed here.s
+            // TODO: See if Black Flag handling needed here.
             csd.IsDisqualified = (rFactor2Constants.rF2FinishStatus)playerScoring.mFinishStatus == rFactor2Constants.rF2FinishStatus.Dq;
             csd.IsDNF = (rFactor2Constants.rF2FinishStatus)playerScoring.mFinishStatus == rFactor2Constants.rF2FinishStatus.Dnf;
 
