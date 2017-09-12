@@ -42,6 +42,7 @@ namespace CrewChiefV4
         public static String[] WHATS_MY_POSITION = Configuration.getSpeechRecognitionPhrases("WHATS_MY_POSITION");
         public static String[] WHATS_MY_FUEL_LEVEL = Configuration.getSpeechRecognitionPhrases("WHATS_MY_FUEL_LEVEL");
         public static String[] WHATS_MY_FUEL_USAGE = Configuration.getSpeechRecognitionPhrases("WHATS_MY_FUEL_USAGE");
+        public static String[] WHAT_TYRES_AM_I_ON = Configuration.getSpeechRecognitionPhrases("WHAT_TYRES_AM_I_ON");
         
         
         public static String[] CALCULATE_FUEL_FOR = Configuration.getSpeechRecognitionPhrases("CALCULATE_FUEL_FOR");
@@ -271,6 +272,7 @@ namespace CrewChiefV4
                 validateAndAdd(WHATS_MY_POSITION, staticSpeechChoices);
                 validateAndAdd(WHATS_MY_FUEL_LEVEL, staticSpeechChoices);
                 validateAndAdd(WHATS_MY_FUEL_USAGE, staticSpeechChoices);
+                validateAndAdd(WHAT_TYRES_AM_I_ON, staticSpeechChoices);
 
                 foreach (String s in CALCULATE_FUEL_FOR)
                 {
@@ -480,7 +482,7 @@ namespace CrewChiefV4
             validateAndAdd(WHOS_BEHIND_IN_THE_RACE, opponentChoices);
             validateAndAdd(WHOS_IN_FRONT_ON_TRACK, opponentChoices);
             validateAndAdd(WHOS_BEHIND_ON_TRACK, opponentChoices);
-            validateAndAdd(WHOS_LEADING, opponentChoices);
+            validateAndAdd(WHOS_LEADING, opponentChoices);            
 
             GrammarBuilder opponentGrammarBuilder = new GrammarBuilder();
             opponentGrammarBuilder.Culture = cultureInfo;
@@ -688,6 +690,10 @@ namespace CrewChiefV4
                ResultContains(recognisedSpeech, WHATS_THE_TRACK_TEMP))
             {
                 return CrewChief.getEvent("ConditionsMonitor");
+            }
+            else if (ResultContains(recognisedSpeech, WHAT_TYRES_AM_I_ON))
+            {
+                return CrewChief.getEvent("Opponents");
             }
             return null;
         }
