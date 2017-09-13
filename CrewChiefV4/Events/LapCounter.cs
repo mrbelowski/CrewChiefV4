@@ -37,6 +37,7 @@ namespace CrewChiefV4.Events
 
         private Boolean playedManualStartGetReady = false;
         private Boolean playedManualStartLeaderHasCrossedLine = false;
+        private Boolean playedManualStartPlayedGoGoGo = false;
         private Boolean playedManualStartInitialMessage = false;
         private OpponentData manualStartOpponentAhead = null;
 
@@ -118,6 +119,7 @@ namespace CrewChiefV4.Events
             playedManualStartGetReady = false;
             playedManualStartLeaderHasCrossedLine = false;
             playedManualStartInitialMessage = false;
+            playedManualStartPlayedGoGoGo = false;
             nextManualFormationOvertakeWarning = DateTime.MinValue;
             manualStartOpponentAhead = null;
         }
@@ -256,7 +258,7 @@ namespace CrewChiefV4.Events
                 // now check if we really are on a manual formation lap. We have to do this *after* checking for the race start (above) because
                 // this will switch manual formation lap stuff off as soon as we cross the line (so would suppress the 'green green green' message).
                 // We want to ensure it's switched off if we're not in a race session, for obvious reasons.
-                GameStateData.onManualFormationLap = currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.CompletedLaps < 1;
+                GameStateData.onManualFormationLap = currentGameState.SessionData.SessionType == SessionType.Race && !playedManualStartPlayedGoGoGo;
             }
             else
             {
@@ -426,9 +428,13 @@ namespace CrewChiefV4.Events
 
         private void playManualStartGreenFlag()
         {
-            audioPlayer.playMessageImmediately(new QueuedMessage(folderGreenGreenGreen, 0, this));
+            if (!playedManualStartPlayedGoGoGo)
+            {
+                audioPlayer.playMessageImmediately(new QueuedMessage(folderGreenGreenGreen, 0, this));
+            }
             GameStateData.onManualFormationLap = false;
             // switch off the other updates
+            playedManualStartPlayedGoGoGo = true;
             playedManualStartLeaderHasCrossedLine = true;
             playedManualStartGetReady = true;
             playedManualStartInitialMessage = true;
