@@ -10,7 +10,7 @@ For support and discussions about Crew Chief we have our very own forum here: ht
 
 Changelog
 ---------
-Version 4.7.9.6: Added Imola corner mappings for R3E; some additional checks to prevent mandatory pitstop messages playing during or after you've completed your stop
+Version 4.7.9.7: More RF2 race end detection fixes; Added Imola corner mappings for R3E; fixed race start message being repeated on manual rolling starts; some additional checks to prevent mandatory pitstop messages playing during or after you've completed your stop.
 
 Version 4.7.9.5: Compatibility fixes for new Raceroom shared memory layout; Map to new Raceroom tyre types - you can ask "what tyres is [opponent name] on?", or "what tyres am I on?"
 
