@@ -303,6 +303,11 @@ namespace CrewChiefV4.GameState
         // artificially by mappers, not by the game.
         public Boolean AbruptSessionEndDetected = false;
 
+        public Dictionary<TyreType, float> PlayerClassSessionBestLapTimeByTyre = new Dictionary<TyreType, float>();
+
+        // as above, but for the player only
+        public Dictionary<TyreType, float> PlayerBestLapTimeByTyre = new Dictionary<TyreType, float>();
+
         public SessionData()
         {
             SessionTimesAtEndOfSectors.Add(1, -1);
@@ -531,10 +536,18 @@ namespace CrewChiefV4.GameState
 
         // be careful with this one, not all games actually set it...
         public Boolean InPits = false;
+        // and this one:
+        public int NumPitStops = 0;
 
         public TrackLandmarksTiming trackLandmarksTiming = new TrackLandmarksTiming();
 
         public String stoppedInLandmark = null;
+
+        public int PitStopCount = 0;
+
+        // these are only set for R3E
+        public Dictionary<int, TyreType> TyreChangesByLap = new Dictionary<int, TyreType>();
+        public Dictionary<TyreType, float> BestLapTimeByTyreType = new Dictionary<TyreType, float>();
 
         public LapData getCurrentLapData()
         {
@@ -1444,6 +1457,8 @@ namespace CrewChiefV4.GameState
 
         // RF1 hack for mandatory pit stop windows, which are used to trigger 'box now' messages
         public Boolean ResetEvents;
+
+        public int NumPitStops = 0;
     }
 
     public class PenatiesData
