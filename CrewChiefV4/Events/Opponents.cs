@@ -24,6 +24,12 @@ namespace CrewChiefV4.Events
         public static String folderAheadIsPitting = "opponents/ahead_is_pitting";
         public static String folderBehindIsPitting = "opponents/behind_is_pitting";
 
+        // TODO: recordings for these
+        public static String folderTheLeaderIsNowOn = "opponents/the_leader_is_now_on";
+        public static String folderTheCarAheadIsNowOn = "opponents/the_car_ahead_is_now_on";
+        public static String folderTheCarBehindIsNowOn = "opponents/the_car_behind_is_now_on";
+        public static String folderIsNowOn = "opponents/is_now_on";
+
         public static String folderLeaderHasJustDoneA = "opponents/the_leader_has_just_done_a";
         public static String folderTheCarAheadHasJustDoneA = "opponents/the_car_ahead_has_just_done_a";
         public static String folderTheCarBehindHasJustDoneA = "opponents/the_car_behind_has_just_done_a";
