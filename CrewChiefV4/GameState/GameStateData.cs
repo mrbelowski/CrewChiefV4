@@ -548,6 +548,8 @@ namespace CrewChiefV4.GameState
         // these are only set for R3E
         public Dictionary<int, TyreType> TyreChangesByLap = new Dictionary<int, TyreType>();
         public Dictionary<TyreType, float> BestLapTimeByTyreType = new Dictionary<TyreType, float>();
+        // will be true for 1 tick
+        public Boolean hasJustChangedToDifferentTyreType = false;
 
         public LapData getCurrentLapData()
         {

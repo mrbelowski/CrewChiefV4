@@ -1535,12 +1535,14 @@ namespace CrewChiefV4.RaceRoom
             }
             opponentData.InPits = isInPits;
             TyreType previousTyreType = opponentData.CurrentTyres;
+            opponentData.hasJustChangedToDifferentTyreType = false;
             if (opponentData.InPits)
             {
                 opponentData.CurrentTyres = mapToTyreType(tire_type_front, tyre_sub_type_front, tire_type_rear, tyre_sub_type_rear, opponentData.CarClass.carClassEnum);
                 if (opponentData.CurrentTyres != previousTyreType)
                 {
                     opponentData.TyreChangesByLap[opponentData.OpponentLapData.Count] = opponentData.CurrentTyres;
+                    opponentData.hasJustChangedToDifferentTyreType = true;
                 }
             }
             if (opponentData.CurrentSectorNumber != sector)
