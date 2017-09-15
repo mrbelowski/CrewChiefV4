@@ -1365,7 +1365,7 @@ namespace CrewChiefV4.RaceRoom
             RaceRoomData.RaceRoomShared shared = (RaceRoomData.RaceRoomShared)memoryMappedFileStruct;
             int r3eSessionType = shared.SessionType;
             int numCars = shared.NumCars;
-            if ((int)RaceRoomConstant.Session.Practice == r3eSessionType)
+            if ((int)RaceRoomConstant.Session.Practice == r3eSessionType || (int)RaceRoomConstant.Session.Warmup == r3eSessionType)
             {
                 return SessionType.Practice;
             }
