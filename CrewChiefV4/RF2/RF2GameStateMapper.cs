@@ -779,6 +779,17 @@ namespace CrewChiefV4.rFactor2
                     csd.PlayerClassSessionBestLapTime = csd.PlayerLapTimeSessionBest > 0.0f ?
                         csd.PlayerLapTimeSessionBest : -1.0f;
 
+                    // TODO: different tyre types on the same car
+                    if (!csd.PlayerClassSessionBestLapTimeByTyre.ContainsKey(cgs.TyreData.FrontLeftTyreType)
+                        || csd.PlayerClassSessionBestLapTimeByTyre[cgs.TyreData.FrontLeftTyreType] > csd.LapTimePrevious)
+                    {
+                        csd.PlayerClassSessionBestLapTimeByTyre[cgs.TyreData.FrontLeftTyreType] = csd.LapTimePrevious;
+                    }
+                    if (!csd.PlayerBestLapTimeByTyre.ContainsKey(cgs.TyreData.FrontLeftTyreType)
+                        || csd.PlayerBestLapTimeByTyre[cgs.TyreData.FrontLeftTyreType] > csd.LapTimePrevious)
+                    {
+                        csd.PlayerBestLapTimeByTyre[cgs.TyreData.FrontLeftTyreType] = csd.LapTimePrevious;
+                    }
                     continue;
                 }
 
@@ -853,10 +864,11 @@ namespace CrewChiefV4.rFactor2
                 opponent.DriverRawName = driverName;
                 opponent.CarClass = CarData.getCarClassForClassName(getStringFromBytes(vehicleScoring.mVehicleClass));
                 opponent.CurrentTyres = this.mapToTyreType(ref vehicleTelemetry);
-
                 opponent.DriverRawName = driverName;
                 opponent.DriverNameSet = opponent.DriverRawName.Length > 0;
                 opponent.Position = vehicleScoring.mPlace;
+                // TODO: not sure about this.
+                opponent.TyreChangesByLap[0] = opponent.CurrentTyres;
 
                 if (opponent.DriverNameSet && opponentPrevious == null && CrewChief.enableDriverNames)
                 {
@@ -903,7 +915,20 @@ namespace CrewChiefV4.rFactor2
                 opponent.bestSector2Time = vehicleScoring.mBestSector2 > 0 && vehicleScoring.mBestSector1 > 0.0f ? (float)(vehicleScoring.mBestSector2 - vehicleScoring.mBestSector1) : -1.0f;
                 opponent.bestSector3Time = vehicleScoring.mBestLapTime > 0 && vehicleScoring.mBestSector2 > 0.0f ? (float)(vehicleScoring.mBestLapTime - vehicleScoring.mBestSector2) : -1.0f;
                 opponent.LastLapTime = vehicleScoring.mLastLapTime > 0 ? (float)vehicleScoring.mLastLapTime : -1.0f;
-                opponent.InPits = vehicleScoring.mInPits == 1;
+
+                var isInPits = vehicleScoring.mInPits == 1;
+                if (!opponent.InPits && isInPits)
+                    opponent.NumPitStops++;
+
+                opponent.InPits = isInPits;
+
+                var previousTyreType = opponent.CurrentTyres;
+                if (opponent.InPits)
+                {
+                    opponent.CurrentTyres = this.mapToTyreType(ref vehicleTelemetry);
+                    if (opponent.CurrentTyres != previousTyreType)
+                        opponent.TyreChangesByLap[opponent.OpponentLapData.Count] = opponent.CurrentTyres;
+                }
 
                 var lastSectorTime = this.getLastSectorTime(ref vehicleScoring, opponent.CurrentSectorNumber);
 
