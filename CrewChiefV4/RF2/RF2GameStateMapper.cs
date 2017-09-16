@@ -363,6 +363,12 @@ namespace CrewChiefV4.rFactor2
                 GlobalBehaviourSettings.UpdateFromCarClass(cgs.carClass);
             }
 
+            // Restore cumulative data.
+            if (psd != null && !csd.IsNewSession)
+            {
+                cgs.PitData.NumPitStops = pgs.PitData.NumPitStops;
+            }
+
             csd.SessionStartTime = csd.IsNewSession ? cgs.Now : psd.SessionStartTime;
             csd.SessionHasFixedTime = csd.SessionTotalRunTime > 0.0f;
 
@@ -449,7 +455,7 @@ namespace CrewChiefV4.rFactor2
             // mInGarageStall also means retired or before race start, but for now use it here.
             cgs.PitData.InPitlane = playerScoring.mInPits == 1 || playerScoring.mInGarageStall == 1;
 
-            if (pgs != null && !pgs.PitData.InPitlane)
+            if (cgs.PitData.InPitlane && pgs != null && !pgs.PitData.InPitlane)
                 cgs.PitData.NumPitStops++;
 
             cgs.PitData.IsAtPitExit = pgs != null && pgs.PitData.InPitlane && !cgs.PitData.InPitlane;
@@ -483,6 +489,7 @@ namespace CrewChiefV4.rFactor2
             {
                 cgs.PitData.MandatoryPitStopCompleted = pgs.PitData.MandatoryPitStopCompleted || cgs.PitData.IsMakingMandatoryPitStop;
             }
+
             ////////////////////////////////////
             // Timings
             if (psd != null && !csd.IsNewSession)
@@ -490,8 +497,10 @@ namespace CrewChiefV4.rFactor2
                 // Preserve current values.
                 // Those values change on sector/lap change, otherwise stay the same between updates.
                 psd.restorePlayerTimings(csd);
-                cgs.PitData.NumPitStops = pgs.PitData.NumPitStops;
             }
+
+            if (cgs.PitData.InPitlane && pgs != null && !pgs.PitData.InPitlane)
+                cgs.PitData.NumPitStops++;
 
             this.processPlayerTimingData(ref shared.scoring, cgs, pgs, ref playerScoring);
 
@@ -779,17 +788,21 @@ namespace CrewChiefV4.rFactor2
                     csd.PlayerClassSessionBestLapTime = csd.PlayerLapTimeSessionBest > 0.0f ?
                         csd.PlayerLapTimeSessionBest : -1.0f;
 
-                    // TODO: different tyre types on the same car
-                    if (!csd.PlayerClassSessionBestLapTimeByTyre.ContainsKey(cgs.TyreData.FrontLeftTyreType)
-                        || csd.PlayerClassSessionBestLapTimeByTyre[cgs.TyreData.FrontLeftTyreType] > csd.LapTimePrevious)
+                    if (csd.IsNewLap && psd != null && !psd.IsNewLap)
                     {
-                        csd.PlayerClassSessionBestLapTimeByTyre[cgs.TyreData.FrontLeftTyreType] = csd.LapTimePrevious;
+                        if (!csd.PlayerClassSessionBestLapTimeByTyre.ContainsKey(cgs.TyreData.FrontLeftTyreType)
+                            || csd.PlayerClassSessionBestLapTimeByTyre[cgs.TyreData.FrontLeftTyreType] > csd.LapTimePrevious)
+                        {
+                            csd.PlayerClassSessionBestLapTimeByTyre[cgs.TyreData.FrontLeftTyreType] = csd.LapTimePrevious;
+                        }
+
+                        if (!csd.PlayerBestLapTimeByTyre.ContainsKey(cgs.TyreData.FrontLeftTyreType)
+                            || csd.PlayerBestLapTimeByTyre[cgs.TyreData.FrontLeftTyreType] > csd.LapTimePrevious)
+                        {
+                            csd.PlayerBestLapTimeByTyre[cgs.TyreData.FrontLeftTyreType] = csd.LapTimePrevious;
+                        }
                     }
-                    if (!csd.PlayerBestLapTimeByTyre.ContainsKey(cgs.TyreData.FrontLeftTyreType)
-                        || csd.PlayerBestLapTimeByTyre[cgs.TyreData.FrontLeftTyreType] > csd.LapTimePrevious)
-                    {
-                        csd.PlayerBestLapTimeByTyre[cgs.TyreData.FrontLeftTyreType] = csd.LapTimePrevious;
-                    }
+
                     continue;
                 }
 
@@ -867,8 +880,9 @@ namespace CrewChiefV4.rFactor2
                 opponent.DriverRawName = driverName;
                 opponent.DriverNameSet = opponent.DriverRawName.Length > 0;
                 opponent.Position = vehicleScoring.mPlace;
-                // TODO: not sure about this.
-                opponent.TyreChangesByLap[0] = opponent.CurrentTyres;
+
+                if (opponentPrevious == null)
+                    opponent.TyreChangesByLap[0] = opponent.CurrentTyres;
 
                 if (opponent.DriverNameSet && opponentPrevious == null && CrewChief.enableDriverNames)
                 {
@@ -877,11 +891,18 @@ namespace CrewChiefV4.rFactor2
                         " is using car class " + opponent.CarClass.getClassIdentifier() +
                         " at position " + opponent.Position.ToString());
                 }
-
+                
+                // Carry over state
                 if (opponentPrevious != null)
                 {
+                    // Copy so that we can safely use previous state.
                     foreach (var old in opponentPrevious.OpponentLapData)
                         opponent.OpponentLapData.Add(old);
+
+                    foreach (var old in opponentPrevious.TyreChangesByLap)
+                        opponent.TyreChangesByLap.Add(old.Key, old.Value);
+
+                    opponent.NumPitStops = opponentPrevious.NumPitStops;
                 }
 
                 opponent.UnFilteredPosition = opponent.Position;
@@ -922,12 +943,12 @@ namespace CrewChiefV4.rFactor2
 
                 opponent.InPits = isInPits;
 
-                var previousTyreType = opponent.CurrentTyres;
                 opponent.hasJustChangedToDifferentTyreType = false;
                 if (opponent.InPits)
                 {
                     opponent.CurrentTyres = this.mapToTyreType(ref vehicleTelemetry);
-                    if (opponent.CurrentTyres != previousTyreType)
+                    if (opponentPrevious == null 
+                        || opponent.CurrentTyres != opponentPrevious.CurrentTyres)
                     {
                         opponent.TyreChangesByLap[opponent.OpponentLapData.Count] = opponent.CurrentTyres;
                         opponent.hasJustChangedToDifferentTyreType = true;
@@ -1036,12 +1057,15 @@ namespace CrewChiefV4.rFactor2
                     if (csd.OpponentsLapTimeSessionBestPlayerClass < csd.PlayerClassSessionBestLapTime)
                         csd.PlayerClassSessionBestLapTime = csd.OpponentsLapTimeSessionBestPlayerClass;
 
-                    if (opponent.LastLapTime > 0.0
-                        && opponent.LastLapValid
-                        && (!csd.PlayerClassSessionBestLapTimeByTyre.ContainsKey(opponent.CurrentTyres) 
-                            || csd.PlayerClassSessionBestLapTimeByTyre[opponent.CurrentTyres] > opponent.LastLapTime))
+                    if (opponent.IsNewLap && opponentPrevious != null && !opponentPrevious.IsNewLap)
                     {
-                        csd.PlayerClassSessionBestLapTimeByTyre[opponent.CurrentTyres] = opponent.LastLapTime;
+                        if (opponent.LastLapTime > 0.0
+                            && opponent.LastLapValid
+                            && (!csd.PlayerClassSessionBestLapTimeByTyre.ContainsKey(opponent.CurrentTyres)
+                                || csd.PlayerClassSessionBestLapTimeByTyre[opponent.CurrentTyres] > opponent.LastLapTime))
+                        {
+                            csd.PlayerClassSessionBestLapTimeByTyre[opponent.CurrentTyres] = opponent.LastLapTime;
+                        }
                     }
                 }
 
