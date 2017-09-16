@@ -946,7 +946,6 @@ namespace CrewChiefV4.rFactor2
                 opponent.hasJustChangedToDifferentTyreType = false;
                 if (opponent.InPits)
                 {
-                    opponent.CurrentTyres = this.mapToTyreType(ref vehicleTelemetry);
                     if (opponentPrevious == null 
                         || opponent.CurrentTyres != opponentPrevious.CurrentTyres)
                     {
