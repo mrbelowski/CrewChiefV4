@@ -29,7 +29,7 @@ namespace CrewChiefV4.GameState
     public enum TyreType
     {
         // separate enum for compound & weather, and prime / option?
-        Hard, Medium, Soft, Wet, Intermediate, Road, Bias_Ply, Unknown_Race, R3E_NEW, R3E_NEW_Prime, R3E_NEW_Option
+        Hard, Medium, Soft, Wet, Intermediate, Road, Bias_Ply, Unknown_Race, R3E_NEW, Prime, Option, Alternate, Primary
     }
 
     public enum BrakeType
@@ -160,6 +160,8 @@ namespace CrewChiefV4.GameState
         public TrackDefinition TrackDefinition = null;
 
         public Boolean IsDisqualified = false;
+
+        public Boolean IsDNF = false;
 
         public FlagEnum Flag = FlagEnum.GREEN;
 
@@ -300,6 +302,11 @@ namespace CrewChiefV4.GameState
         // in into "Finished" phase in such case.  If this is true, SessionPhase is set to Finished
         // artificially by mappers, not by the game.
         public Boolean AbruptSessionEndDetected = false;
+
+        public Dictionary<TyreType, float> PlayerClassSessionBestLapTimeByTyre = new Dictionary<TyreType, float>();
+
+        // as above, but for the player only
+        public Dictionary<TyreType, float> PlayerBestLapTimeByTyre = new Dictionary<TyreType, float>();
 
         public SessionData()
         {
@@ -529,10 +536,20 @@ namespace CrewChiefV4.GameState
 
         // be careful with this one, not all games actually set it...
         public Boolean InPits = false;
+        // and this one:
+        public int NumPitStops = 0;
 
         public TrackLandmarksTiming trackLandmarksTiming = new TrackLandmarksTiming();
 
         public String stoppedInLandmark = null;
+
+        public int PitStopCount = 0;
+
+        // these are only set for R3E
+        public Dictionary<int, TyreType> TyreChangesByLap = new Dictionary<int, TyreType>();
+        public Dictionary<TyreType, float> BestLapTimeByTyreType = new Dictionary<TyreType, float>();
+        // will be true for 1 tick
+        public Boolean hasJustChangedToDifferentTyreType = false;
 
         public LapData getCurrentLapData()
         {
@@ -1442,6 +1459,8 @@ namespace CrewChiefV4.GameState
 
         // RF1 hack for mandatory pit stop windows, which are used to trigger 'box now' messages
         public Boolean ResetEvents;
+
+        public int NumPitStops = 0;
     }
 
     public class PenatiesData

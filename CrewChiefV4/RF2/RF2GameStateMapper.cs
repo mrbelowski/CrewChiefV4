@@ -16,7 +16,7 @@ namespace CrewChiefV4.rFactor2
     {
         private SpeechRecogniser speechRecogniser;
 
-        public static String playerName = null;
+        public static string playerName = null;
 
         private List<CornerData.EnumWithThresholds> suspensionDamageThresholds = new List<CornerData.EnumWithThresholds>();
         private List<CornerData.EnumWithThresholds> tyreWearThresholds = new List<CornerData.EnumWithThresholds>();
@@ -36,20 +36,25 @@ namespace CrewChiefV4.rFactor2
         private const int minLapsBetweenPredictedStops = 5;
 
         // If we're running only against AI, force the pit window to open
-        private Boolean isOfflineSession = true;
+        private bool isOfflineSession = true;
 
         // Keep track of opponents processed this time
-        private List<String> opponentKeysProcessed = new List<String>();
+        private List<string> opponentKeysProcessed = new List<string>();
 
         // Detect when approaching racing surface after being off track
         private float distanceOffTrack = 0.0f;
-        private Boolean isApproachingTrack = false;
+        private bool isApproachingTrack = false;
+
+        // User preferences.
+        private readonly bool enablePitStopPrediction = UserSettings.GetUserSettings().getBoolean("enable_rf2_pit_stop_prediction");
+        private readonly bool enableBlueOnSlower = UserSettings.GetUserSettings().getBoolean("enable_rf2_blue_on_slower");
 
         // Detect if there any changes in the the game data since the last update.
         private double lastPlayerTelemetryET = -1.0;
         private double lastScoringET = -1.0;
 
-        SessionPhase lastSessionPhase = SessionPhase.Unavailable;
+        // State tracking for hacks around model.
+        bool lastInRealTimeState = false;
 
         public RF2GameStateMapper()
         {
@@ -136,37 +141,64 @@ namespace CrewChiefV4.rFactor2
             // No session data
             if (shared.scoring.mScoringInfo.mNumVehicles == 0)
             {
-                // If we skip to next session the session phase never goes to 'Finished'. We do, however, see the numVehicles drop to zero.
-                // If we have a previous game state and it's in a valid phase here, update it to Finished and return it. This requires some
-                // additional logic in the main CrewChief loop (because this means current and previous game state are the same object).
-                if (pgs != null 
+                // If user clicks "Next Session" the session phase goes to "Finished" only if session time actually ran out.
+                // Otherwise, game does not update Session Phase.  We do, however, see the numVehicles  drop to zero.
+                // If we have a previous game state and it's in a valid phase here, update it to "Finished" and return it,
+                // unless it looks like user clicked "Restart" button during the race.
+                // Additionally, if user made no valid laps in a session, mark it as DNF, because position does not matter in that case
+                // (and it isn't reported by the game, so whatever we announce is wrong).
+                //
+                // It is well known that a lot of comments is an indicator of trouble.  I suspect we might have to remove or hide 
+                // all this crap behind the setting, because there will be cases when incorrect position is reported.  This, however,
+                // works most of the time.
+                // All of this might need revisiting on exposure of MultiSessionRulesV01.  Another thing to try is to capture last
+                // reported position in the plugin.  It is possible we are simply missing it.
+                if (pgs != null
                     && pgs.SessionData.SessionType != SessionType.Unavailable
                     && pgs.SessionData.SessionPhase != SessionPhase.Finished
-                    && pgs.SessionData.SessionPhase != SessionPhase.Unavailable
-                    && this.lastSessionPhase != SessionPhase.Unavailable
-                    && this.lastSessionPhase != SessionPhase.Finished)
+                    && pgs.SessionData.SessionPhase != SessionPhase.Unavailable)
                 {
-                    pgs.SessionData.SessionPhase = SessionPhase.Finished;
-                    this.lastSessionPhase = pgs.SessionData.SessionPhase;
-                    pgs.SessionData.AbruptSessionEndDetected = true;
-                }
-                else
-                {
-                    this.isOfflineSession = true;
-                    this.distanceOffTrack = 0;
-                    this.isApproachingTrack = false;
-                    this.lastSessionPhase = SessionPhase.Unavailable;
-
-                    if (pgs != null)
+                    if (this.lastInRealTimeState && pgs.SessionData.SessionType == SessionType.Race)
                     {
-                        // In rF2 user can quit practice session and we will never know
-                        // about it.  Mark previous game state with Unavailable flags.
-                        pgs.SessionData.SessionType = SessionType.Unavailable;
-                        pgs.SessionData.SessionPhase = SessionPhase.Unavailable;
+                        // Looks like race restart without exiting to monitor.  We can't reliably detect session end
+                        // here, because it is timing affected (we might miss this between updates).  So better not do it.
+                        Console.WriteLine("Abrupt Session End: suppressed due to restart during real time.");
+                    }
+                    else
+                    {
+                        if (pgs.SessionData.PlayerLapTimeSessionBest < 0.0f && !pgs.SessionData.IsDisqualified)
+                        {
+                            // If user has not set any lap time during the session, mark it as DNF.
+                            pgs.SessionData.IsDNF = true;
+
+                            Console.WriteLine("Abrupt Session End: mark session as DNF due to no valid laps made.");
+                        }
+                        // While this detects the "Next Session" this still sounds a bit weird if user clicks
+                        // "Leave Session" and goes to main menu.  60 sec delay (minSessionRunTimeForEndMessages) helps, but not entirely.
+                        pgs.SessionData.SessionPhase = SessionPhase.Finished;
+                        pgs.SessionData.AbruptSessionEndDetected = true;
+                        Console.WriteLine("Abrupt Session End: SessionType: " + pgs.SessionData.SessionType);
+
+                        return pgs;
                     }
                 }
+
+                this.isOfflineSession = true;
+                this.distanceOffTrack = 0;
+                this.isApproachingTrack = false;
+
+                if (pgs != null)
+                {
+                    // In rF2 user can quit practice session and we will never know
+                    // about it.  Mark previous game state with Unavailable flags.
+                    pgs.SessionData.SessionType = SessionType.Unavailable;
+                    pgs.SessionData.SessionPhase = SessionPhase.Unavailable;
+                }
+
                 return pgs;
             }
+
+            this.lastInRealTimeState = shared.extended.mInRealtimeFC == 1 || shared.scoring.mScoringInfo.mInRealtime == 1;
 
             // --------------------------------
             // session data
@@ -266,7 +298,6 @@ namespace CrewChiefV4.rFactor2
 
             csd.SessionType = mapToSessionType(shared);
             csd.SessionPhase = mapToSessionPhase((rFactor2Constants.rF2GamePhase)shared.scoring.mScoringInfo.mGamePhase, csd.SessionType, ref playerScoring);
-            this.lastSessionPhase = csd.SessionPhase;
 
             var carClassId = getStringFromBytes(playerScoring.mVehicleClass);
             cgs.carClass = CarData.getCarClassForClassName(carClassId);
@@ -352,6 +383,7 @@ namespace CrewChiefV4.rFactor2
             csd.PositionAtStartOfCurrentLap = csd.IsNewLap ? csd.Position : psd.PositionAtStartOfCurrentLap;
             // TODO: See if Black Flag handling needed here.
             csd.IsDisqualified = (rFactor2Constants.rF2FinishStatus)playerScoring.mFinishStatus == rFactor2Constants.rF2FinishStatus.Dq;
+            csd.IsDNF = (rFactor2Constants.rF2FinishStatus)playerScoring.mFinishStatus == rFactor2Constants.rF2FinishStatus.Dnf;
 
             // NOTE: Telemetry contains mLapNumber, which might be ahead of Scoring due to higher refresh rate.  However,
             // since we use Scoring fields for timing calculations, stick to Scoring here as well.
@@ -382,7 +414,7 @@ namespace CrewChiefV4.rFactor2
             // Pit Data
             cgs.PitData.IsRefuellingAllowed = true;
 
-            if (UserSettings.GetUserSettings().getBoolean("enable_rf2_pit_stop_prediction"))
+            if (this.enablePitStopPrediction)
             {
                 cgs.PitData.HasMandatoryPitStop = this.isOfflineSession
                     && playerTelemetry.mScheduledStops > 0
@@ -1030,7 +1062,7 @@ namespace CrewChiefV4.rFactor2
                 // At default ruleset, both open and close sub states result in "Pits open" visible in the UI.
                 else if (shared.scoring.mScoringInfo.mYellowFlagState == (sbyte)rFactor2Constants.rF2YellowFlagState.PitOpen
                     || shared.scoring.mScoringInfo.mYellowFlagState == (sbyte)rFactor2Constants.rF2YellowFlagState.PitClosed)
-                    cgs.FlagData.fcyPhase = FullCourseYellowPhase.PITS_OPEN;
+                    cgs.FlagData.fcyPhase = FullCourseYellowPhase.PITS_OPEN;  // TODO: use mAllowedToPit from vehicle rules to distinguish here.  Seems like 2 is Closed 3 is Open.
                 else if (shared.scoring.mScoringInfo.mYellowFlagState == (sbyte)rFactor2Constants.rF2YellowFlagState.PitLeadLap)
                     cgs.FlagData.fcyPhase = FullCourseYellowPhase.PITS_OPEN_LEAD_LAP_VEHICLES;
                 else if (shared.scoring.mScoringInfo.mYellowFlagState == (sbyte)rFactor2Constants.rF2YellowFlagState.LastLap)
@@ -1077,7 +1109,7 @@ namespace CrewChiefV4.rFactor2
 
             if (playerScoring.mFlag == (byte)rFactor2Constants.rF2PrimaryFlag.Blue)
                 currFlag = FlagEnum.BLUE;
-            else if (UserSettings.GetUserSettings().getBoolean("enable_rf2_blue_on_slower")
+            else if (this.enableBlueOnSlower
                 && !cgs.FlagData.isFullCourseYellow)  // Don't announce blue on slower under FCY.
             {
                 foreach (var opponent in cgs.OpponentData.Values)

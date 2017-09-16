@@ -25,7 +25,8 @@ namespace CrewChiefV4.RaceRoom
             Unavailable = -1,
             Practice = 0,
             Qualify = 1,
-            Race = 2
+            Race = 2,
+            Warmup = 3
         }
 
         public enum SessionPhase
@@ -101,8 +102,19 @@ namespace CrewChiefV4.RaceRoom
             Unavailable = -1,
             DTM_Option = 0,
             Prime = 1
-        }     
+        }
 
+        public enum TireSubType
+        {
+            Unavailable = -1,
+            // FR-US:
+            Primary = 0,
+            Alternate = 1,
+            // FRX-17
+            Soft,
+            Medium,
+            Hard
+        }
     }
 
     namespace RaceRoomData
@@ -390,8 +402,11 @@ namespace CrewChiefV4.RaceRoom
             public Int32 NumPitstops;
             public CutTrackPenalties Penalties;
             public Single CarSpeed;
-            // Note: See the R3E.Constant.TireType enum
-            public Int32 TireType;
+            // Note: See the R3E.Constant.TireType enum and TireSubType enum
+            public Int32 TireTypeFront;
+            public Int32 TireTypeRear;
+            public Int32 TireSubTypeFront;
+            public Int32 TireSubTypeRear;
         }
 
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -632,6 +647,7 @@ namespace CrewChiefV4.RaceRoom
 
             // Which type of tires the player's car has (option, prime, etc.)
             // Note: See the R3E.Constant.TireType enum
+            // DEPRECATED
             public Int32 TireType;
 
             // Rotation speed
@@ -655,6 +671,11 @@ namespace CrewChiefV4.RaceRoom
             // Unit: Celsius (C)
             // Note: Not valid for AI or remote players
             public TireTemperature TireTemp;
+
+            public Int32 TireTypeFront;
+            public Int32 TireTypeRear;
+            public Int32 TireSubTypeFront;
+            public Int32 TireSubTypeRear;
 
             //////////////////////////////////////////////////////////////////////////
             // Damage

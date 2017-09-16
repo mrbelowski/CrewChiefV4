@@ -209,16 +209,14 @@ namespace CrewChiefV4.Events
                         {
                             if (halfDistance == -1)
                             {
-                                // TODO: Math.Ceiling this value
-                                halfDistance = currentGameState.SessionData.SessionNumberOfLaps / 2;
+                                halfDistance = (int) Math.Ceiling(currentGameState.SessionData.SessionNumberOfLaps / 2f);
                             }
                         }
                         else if (currentGameState.SessionData.SessionTotalRunTime > 0)
                         {
                             if (halfTime == -1)
                             {
-                                // TODO: Math.Ceiling this value
-                                halfTime = currentGameState.SessionData.SessionTotalRunTime / 2;
+                                halfTime = (int) Math.Ceiling(currentGameState.SessionData.SessionTotalRunTime / 2f);
                             }
                         }
                     }
@@ -245,10 +243,12 @@ namespace CrewChiefV4.Events
                                 averageUsagePerLap += (fuelLevelWindowByLap[i + 1] - fuelLevelWindowByLap[i]);
                             }
                             averageUsagePerLap = averageUsagePerLap / fuelUseByLapsWindowLength;
+                            Console.WriteLine("fuel use per lap (windowed calc) = " + averageUsagePerLap + " fuel left = " + currentGameState.FuelData.FuelLeft);
                         }
                         else
                         {
                             averageUsagePerLap = (initialFuelLevel - currentGameState.FuelData.FuelLeft) / (currentGameState.SessionData.CompletedLaps - lapsCompletedWhenFuelWasReset);
+                            Console.WriteLine("fuel use per lap (basic calc) = " + averageUsagePerLap + " fuel left = " + currentGameState.FuelData.FuelLeft);
                         }
                     }
                     if (currentGameState.SessionData.SessionRunningTime > gameTimeAtLastFuelWindowUpdate + fuelUseSampleTime)

@@ -3,8 +3,8 @@
 Note that the filename has to remain 'auto_update_data.xml' so legacy installs (which have no concept of the primary / 
 secondary update sources) can still be updated. All downloads from this source will be pulled from the isnais ftp server. -->
 <item>
-<title>Crew Chief 4.7.9.4, updated 07 September 2017</title>
-<version>4.7.9.4</version>
+<title>Crew Chief 4.7.9.7, updated 14 September 2017</title>
+<version>4.7.9.7</version>
 <url>http://crewchief.isnais.de/CrewChiefV4.msi</url>
 <changelog>http://crewchief.isnais.de/change_log_for_auto_updated.html</changelog>
 
@@ -24,7 +24,7 @@ secondary update sources) can still be updated. All downloads from this source w
 
 <!-- language-aware sound pack stuff for later versions-->
 <soundpack language="en">
-	<soundpackversion>121</soundpackversion>
+	<soundpackversion>122</soundpackversion>
 	<basesoundpackurl>http://crewchief.isnais.de/base_sound_pack.zip</basesoundpackurl>
 	<!-- sound pack update from base to version 121 will use this update pack -->
 	<updatesoundpackurl>http://crewchief.isnais.de/update_sound_pack.zip</updatesoundpackurl>

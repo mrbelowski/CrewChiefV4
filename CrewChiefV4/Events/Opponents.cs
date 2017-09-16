@@ -24,6 +24,12 @@ namespace CrewChiefV4.Events
         public static String folderAheadIsPitting = "opponents/ahead_is_pitting";
         public static String folderBehindIsPitting = "opponents/behind_is_pitting";
 
+        // TODO: recordings for these
+        public static String folderTheLeaderIsNowOn = "opponents/the_leader_is_now_on";
+        public static String folderTheCarAheadIsNowOn = "opponents/the_car_ahead_is_now_on";
+        public static String folderTheCarBehindIsNowOn = "opponents/the_car_behind_is_now_on";
+        public static String folderIsNowOn = "opponents/is_now_on";
+
         public static String folderLeaderHasJustDoneA = "opponents/the_leader_has_just_done_a";
         public static String folderTheCarAheadHasJustDoneA = "opponents/the_car_ahead_has_just_done_a";
         public static String folderTheCarBehindHasJustDoneA = "opponents/the_car_behind_has_just_done_a";
@@ -129,6 +135,23 @@ namespace CrewChiefV4.Events
             }
         }
 
+        private String getOpponentIdentifierForTyreChange(OpponentData opponentData, int playerRacePosition)
+        {
+            // leader
+            if (opponentData.Position == 1)
+            {
+                return folderTheLeader;
+            }
+            // 2nd, 3rd, or within 2 positions of the player
+            if ((opponentData.Position > 1 && opponentData.Position <= 3) || 
+                (playerRacePosition - 2 <= opponentData.Position && playerRacePosition + 2 >= opponentData.Position))   // TODO: check this logic when the kids aren't scrapping
+            {
+                // TODO: driver name?
+                return Position.folderStub + opponentData.Position;
+            }            
+            return null;
+        }
+
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
             if (GameStateData.onManualFormationLap)
@@ -150,6 +173,16 @@ namespace CrewChiefV4.Events
                 {
                     string opponentKey = entry.Key;
                     OpponentData opponentData = entry.Value;
+
+                    if (opponentData.hasJustChangedToDifferentTyreType)
+                    {
+                        String opponentIdentifier = getOpponentIdentifierForTyreChange(opponentData, currentGameState.SessionData.Position);
+                        if (opponentIdentifier != null)
+                        {
+                            audioPlayer.playMessage(new QueuedMessage("opponent_tyre_change", MessageContents(opponentIdentifier,
+                                folderIsNowOn, TyreMonitor.getFolderForTyreType(opponentData.CurrentTyres)), 0, this));
+                        }
+                    }
 
                     if (opponentData.IsNewLap && opponentData.LastLapTime > 0 && opponentData.OpponentLapData.Count > 1 &&
                         opponentData.LastLapValid && opponentData.CurrentBestLapTime > 0)
@@ -370,26 +403,26 @@ namespace CrewChiefV4.Events
             Boolean gotData = false;
             if (currentGameState != null)
             {
-                if (voiceMessage.StartsWith(SpeechRecogniser.WHAT_TYRE_IS) || voiceMessage.StartsWith(SpeechRecogniser.WHAT_TYRES_IS))
+                if (SpeechRecogniser.WHAT_TYRES_AM_I_ON.Contains(voiceMessage))
+                {
+                    gotData = true;
+                    // TODO: mismatched tyre types...
+                    audioPlayer.playMessageImmediately(new QueuedMessage(TyreMonitor.getFolderForTyreType(currentGameState.TyreData.FrontLeftTyreType), 0, null));
+                }
+                else if (voiceMessage.StartsWith(SpeechRecogniser.WHAT_TYRE_IS) || voiceMessage.StartsWith(SpeechRecogniser.WHAT_TYRES_IS))
                 {
                     string opponentKey = getOpponentKey(voiceMessage, " " + SpeechRecogniser.ON).Item1;
                     if (opponentKey != null)
                     {
                         OpponentData opponentData = currentGameState.OpponentData[opponentKey];
-                        if (opponentData.CurrentTyres == TyreType.R3E_NEW_Option)
+                        if (opponentData != null)
                         {
                             gotData = true;
-                            audioPlayer.playMessageImmediately(new QueuedMessage(MandatoryPitStops.folderMandatoryPitStopsOptionTyres, 0, null));
-                        }
-                        else if (opponentData.CurrentTyres == TyreType.R3E_NEW_Prime)
-                        {
-                            gotData = true;
-                            audioPlayer.playMessageImmediately(new QueuedMessage(MandatoryPitStops.folderMandatoryPitStopsPrimeTyres, 0, null));
+                            audioPlayer.playMessageImmediately(new QueuedMessage(TyreMonitor.getFolderForTyreType(opponentData.CurrentTyres), 0, null));
                         }
                     }
                 }
-
-                if (voiceMessage.StartsWith(SpeechRecogniser.WHATS) && 
+                else if (voiceMessage.StartsWith(SpeechRecogniser.WHATS) && 
                     (voiceMessage.EndsWith(SpeechRecogniser.LAST_LAP) || voiceMessage.EndsWith(SpeechRecogniser.BEST_LAP)))
                 {
                     if (voiceMessage.EndsWith(SpeechRecogniser.LAST_LAP))
