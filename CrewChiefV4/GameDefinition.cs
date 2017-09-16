@@ -17,7 +17,7 @@ namespace CrewChiefV4
         public static GameDefinition pCars32Bit = new GameDefinition(GameEnum.PCARS_32BIT, "pcars_32_bit", "pCARS",
             "CrewChiefV4.PCars.PCarsSpotterv2", "pcars32_launch_exe", "pcars32_launch_params", "launch_pcars");
         public static GameDefinition raceRoom = new GameDefinition(GameEnum.RACE_ROOM, "race_room", "RRRE", "CrewChiefV4.RaceRoom.R3ESpotterv2",
-            "r3e_launch_exe", "r3e_launch_params", "launch_raceroom");
+            "r3e_launch_exe", "r3e_launch_params", "launch_raceroom", new String[] {"RRRE64"});
         public static GameDefinition pCarsNetwork = new GameDefinition(GameEnum.PCARS_NETWORK, "pcars_udp", null, "CrewChiefV4.PCars.PCarsSpotterv2",
             null, null, null);
         public static GameDefinition rFactor1 = new GameDefinition(GameEnum.RF1, "rfactor1", "rFactor", "CrewChiefV4.rFactor1.RF1Spotter",

@@ -75,8 +75,7 @@ namespace CrewChiefV4.rFactor1
             if (shared.numVehicles == 0)
             {
                 // if we skip to next session the session phase never goes to 'finished'. We do, however, see the numVehicles drop to zero.
-                // If we have a previous game state and it's in a valid phase here, update it to Finished and return it. This requires some
-                // additional logic in the main CrewChief loop (because this means current and previous game state are the same object).
+                // If we have a previous game state and it's in a valid phase here, update it to Finished and return it.
                 if (previousGameState != null && previousGameState.SessionData.SessionType != SessionType.Unavailable &&
                     previousGameState.SessionData.SessionPhase != SessionPhase.Finished &&
                     previousGameState.SessionData.SessionPhase != SessionPhase.Unavailable &&

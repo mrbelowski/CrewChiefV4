@@ -866,7 +866,8 @@
 		{
 			"rf1TrackNames": ["Imola 2016"],
 			"acTrackNames": ["imola:"],
-			"pcarsTrackName": "Imola:Grand Prix",
+            "pcarsTrackName": "Imola:Grand Prix",
+            "raceroomLayoutId": 1850,
 			"trackLandmarks": [{
 					"landmarkName": "tamburello",
 					"distanceRoundLapStart": 660,

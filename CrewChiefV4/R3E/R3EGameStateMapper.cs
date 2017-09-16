@@ -300,20 +300,21 @@ namespace CrewChiefV4.RaceRoom
                                 if (currentGameState.carClass.carClassEnum == CarData.CarClassEnum.DTM_2014)
                                 {
                                     double halfRaceDistance = currentGameState.SessionData.SessionNumberOfLaps / 2d;
-                                    if (mapToTyreType(shared.TireType, currentGameState.carClass.carClassEnum) == TyreType.R3E_NEW_Option)
+                                    if (mapToTyreType(shared.TireTypeFront, shared.TireSubTypeFront, shared.TireTypeRear, shared.TireSubTypeFront, 
+                                        currentGameState.carClass.carClassEnum) == TyreType.Option)
                                     {
-                                        currentGameState.PitData.MandatoryTyreChangeRequiredTyreType = TyreType.R3E_NEW_Prime;
+                                        currentGameState.PitData.MandatoryTyreChangeRequiredTyreType = TyreType.Prime;
                                         currentGameState.PitData.MaxPermittedDistanceOnCurrentTyre = ((int)Math.Floor(halfRaceDistance)) - 1;
                                     }
                                     else
                                     {
-                                        currentGameState.PitData.MandatoryTyreChangeRequiredTyreType = TyreType.R3E_NEW_Option;
+                                        currentGameState.PitData.MandatoryTyreChangeRequiredTyreType = TyreType.Option;
                                         currentGameState.PitData.MinPermittedDistanceOnCurrentTyre = (int)Math.Ceiling(halfRaceDistance);
                                     }
                                 }
                                 else if (currentGameState.carClass.carClassEnum == CarData.CarClassEnum.DTM_2015 || currentGameState.carClass.carClassEnum == CarData.CarClassEnum.DTM_2016)
                                 {
-                                    currentGameState.PitData.MandatoryTyreChangeRequiredTyreType = TyreType.R3E_NEW_Prime;
+                                    currentGameState.PitData.MandatoryTyreChangeRequiredTyreType = TyreType.Prime;
                                     // the mandatory change must be completed by the end of the pit window
                                     currentGameState.PitData.MaxPermittedDistanceOnCurrentTyre = currentGameState.PitData.PitWindowEnd;
                                 }
@@ -363,12 +364,15 @@ namespace CrewChiefV4.RaceRoom
                     currentGameState.PitData.MinPermittedDistanceOnCurrentTyre = previousGameState.PitData.MinPermittedDistanceOnCurrentTyre;
                     currentGameState.PitData.OnInLap = previousGameState.PitData.OnInLap;
                     currentGameState.PitData.OnOutLap = previousGameState.PitData.OnOutLap;
+                    currentGameState.PitData.NumPitStops = previousGameState.PitData.NumPitStops;
                     currentGameState.SessionData.TrackDefinition = previousGameState.SessionData.TrackDefinition;
                     currentGameState.SessionData.formattedPlayerLapTimes = previousGameState.SessionData.formattedPlayerLapTimes;
                     currentGameState.SessionData.PlayerLapTimeSessionBest = previousGameState.SessionData.PlayerLapTimeSessionBest;
                     currentGameState.SessionData.OpponentsLapTimeSessionBestOverall = previousGameState.SessionData.OpponentsLapTimeSessionBestOverall;
                     currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass = previousGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass;
                     currentGameState.carClass = previousGameState.carClass;
+                    currentGameState.SessionData.PlayerClassSessionBestLapTimeByTyre = previousGameState.SessionData.PlayerClassSessionBestLapTimeByTyre;
+                    currentGameState.SessionData.PlayerBestLapTimeByTyre = previousGameState.SessionData.PlayerBestLapTimeByTyre;
                     currentGameState.SessionData.DriverRawName = previousGameState.SessionData.DriverRawName;
                     currentGameState.SessionData.SessionTimesAtEndOfSectors = previousGameState.SessionData.SessionTimesAtEndOfSectors;
                     currentGameState.SessionData.LapTimePreviousEstimateForInvalidLap = previousGameState.SessionData.LapTimePreviousEstimateForInvalidLap;
@@ -620,6 +624,10 @@ namespace CrewChiefV4.RaceRoom
                     }
                     if (currentGameState.PitData.InPitlane)
                     {
+                        if (previousGameState != null && !previousGameState.PitData.InPitlane)
+                        {
+                            currentGameState.PitData.NumPitStops++;
+                        }
                         if (participantStruct.TrackSector == 3)
                         {
                             currentGameState.PitData.OnInLap = true;
@@ -781,7 +789,8 @@ namespace CrewChiefV4.RaceRoom
                                     participantStruct.InPitlane == 1, participantStruct.CurrentLapValid == 1,
                                     currentGameState.SessionData.SessionRunningTime, secondsSinceLastUpdate,
                                     new float[] { participantStruct.Position.X, participantStruct.Position.Z }, previousOpponentWorldPosition,
-                                    participantStruct.LapDistance, participantStruct.TireType,
+                                    participantStruct.LapDistance, participantStruct.TireTypeFront, participantStruct.TireSubTypeFront,
+                                    participantStruct.TireTypeRear, participantStruct.TireSubTypeRear,
                                     currentGameState.SessionData.SessionHasFixedTime, currentGameState.SessionData.SessionTimeRemaining);
 
                             if (previousOpponentData != null)
@@ -813,6 +822,12 @@ namespace CrewChiefV4.RaceRoom
                                     }
                                     if (CarData.IsCarClassEqual(currentOpponentData.CarClass, currentGameState.carClass))
                                     {
+                                        if (currentOpponentData.LastLapTime > 0 && currentOpponentData.LastLapValid &&
+                                            (!currentGameState.SessionData.PlayerClassSessionBestLapTimeByTyre.ContainsKey(currentOpponentData.CurrentTyres) ||
+                                            currentGameState.SessionData.PlayerClassSessionBestLapTimeByTyre[currentOpponentData.CurrentTyres] > currentOpponentData.LastLapTime))
+                                        {
+                                            currentGameState.SessionData.PlayerClassSessionBestLapTimeByTyre[currentOpponentData.CurrentTyres] = currentOpponentData.LastLapTime;
+                                        }
                                         if (currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass == -1 ||
                                             currentOpponentData.CurrentBestLapTime < currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass)
                                         {
@@ -874,6 +889,17 @@ namespace CrewChiefV4.RaceRoom
             if (currentGameState.SessionData.IsNewLap && currentGameState.SessionData.PreviousLapWasValid &&
                 currentGameState.SessionData.LapTimePrevious > 0)
             {
+                // TODO: different tyre types on the same car
+                if (!currentGameState.SessionData.PlayerClassSessionBestLapTimeByTyre.ContainsKey(currentGameState.TyreData.FrontLeftTyreType) ||
+                    currentGameState.SessionData.PlayerClassSessionBestLapTimeByTyre[currentGameState.TyreData.FrontLeftTyreType] > currentGameState.SessionData.LapTimePrevious)
+                {
+                    currentGameState.SessionData.PlayerClassSessionBestLapTimeByTyre[currentGameState.TyreData.FrontLeftTyreType] = currentGameState.SessionData.LapTimePrevious;
+                }
+                if (!currentGameState.SessionData.PlayerBestLapTimeByTyre.ContainsKey(currentGameState.TyreData.FrontLeftTyreType) ||
+                    currentGameState.SessionData.PlayerBestLapTimeByTyre[currentGameState.TyreData.FrontLeftTyreType] > currentGameState.SessionData.LapTimePrevious)
+                {
+                    currentGameState.SessionData.PlayerBestLapTimeByTyre[currentGameState.TyreData.FrontLeftTyreType] = currentGameState.SessionData.LapTimePrevious;
+                }
                 if ((currentGameState.SessionData.PlayerLapTimeSessionBest == -1 ||
                      currentGameState.SessionData.LapTimePrevious < currentGameState.SessionData.PlayerLapTimeSessionBest))
                 {
@@ -1059,7 +1085,7 @@ namespace CrewChiefV4.RaceRoom
             // no way to have unmatched tyre types in R3E
             currentGameState.TyreData.HasMatchedTyreTypes = true;
             currentGameState.TyreData.TireWearActive = shared.TireWearActive == 1;
-            TyreType tyreType = mapToTyreType(shared.TireType, currentGameState.carClass.carClassEnum);            
+            TyreType tyreType = mapToTyreType(shared.TireTypeFront, shared.TireSubTypeFront, shared.TireTypeRear, shared.TireSubTypeFront, currentGameState.carClass.carClassEnum);            
             currentGameState.TyreData.FrontLeft_CenterTemp = shared.TireTemp.FrontLeft_Center;
             currentGameState.TyreData.FrontLeft_LeftTemp = shared.TireTemp.FrontLeft_Left;
             currentGameState.TyreData.FrontLeft_RightTemp = shared.TireTemp.FrontLeft_Right;
@@ -1217,16 +1243,39 @@ namespace CrewChiefV4.RaceRoom
                 return oldPosition;
             }
         }
-        
-        private TyreType mapToTyreType(int r3eTyreType, CarData.CarClassEnum carClass)
+
+        private TyreType mapToTyreType(int tire_type_front, int tire_sub_type_front, int tire_type_rear, int tire_sub_type_rear, CarData.CarClassEnum carClass)
         {
-            if ((int)RaceRoomConstant.TireType.DTM_Option == r3eTyreType)
+            // TODO: handle cases where the front and rears are different types or subtypes. Here we assume the rears are always the same as the fronts
+            if ((int)RaceRoomConstant.TireSubType.Hard == tire_sub_type_front)
             {
-                return TyreType.R3E_NEW_Option;
+                return TyreType.Hard;
             }
-            else if ((int)RaceRoomConstant.TireType.Prime == r3eTyreType)
+            else if ((int)RaceRoomConstant.TireSubType.Medium == tire_sub_type_front)
             {
-                return TyreType.R3E_NEW_Prime;
+                return TyreType.Medium;
+            }
+            else if ((int)RaceRoomConstant.TireSubType.Soft == tire_sub_type_front)
+            {
+                return TyreType.Soft;
+            }
+            else if ((int)RaceRoomConstant.TireSubType.Alternate == tire_sub_type_front)
+            {
+                return TyreType.Alternate;
+            }
+            else if ((int)RaceRoomConstant.TireSubType.Primary == tire_sub_type_front)
+            {
+                return TyreType.Primary;
+            }
+            else if ((carClass == CarData.CarClassEnum.DTM_2014 || carClass == CarData.CarClassEnum.DTM_2015 || carClass == CarData.CarClassEnum.DTM_2016) &&
+                (int)RaceRoomConstant.TireType.DTM_Option == tire_type_front)
+            {
+                return TyreType.Option;
+            }
+            else if ((carClass == CarData.CarClassEnum.DTM_2014 || carClass == CarData.CarClassEnum.DTM_2015 || carClass == CarData.CarClassEnum.DTM_2016) &&
+                (int)RaceRoomConstant.TireType.Prime == tire_type_front)
+            {
+                return TyreType.Prime;
             }
             else if (CarData.r3eNewTyreModelClasses.Contains(carClass))
             {
@@ -1340,7 +1389,7 @@ namespace CrewChiefV4.RaceRoom
             RaceRoomData.RaceRoomShared shared = (RaceRoomData.RaceRoomShared)memoryMappedFileStruct;
             int r3eSessionType = shared.SessionType;
             int numCars = shared.NumCars;
-            if ((int)RaceRoomConstant.Session.Practice == r3eSessionType)
+            if ((int)RaceRoomConstant.Session.Practice == r3eSessionType || (int)RaceRoomConstant.Session.Warmup == r3eSessionType)
             {
                 return SessionType.Practice;
             }
@@ -1457,7 +1506,8 @@ namespace CrewChiefV4.RaceRoom
 
         private void upateOpponentData(OpponentData opponentData, int racePosition, int unfilteredRacePosition, int completedLaps, int sector, float sectorTime, 
             float completedLapTime, Boolean isInPits, Boolean lapIsValid, float sessionRunningTime, float secondsSinceLastUpdate, float[] currentWorldPosition,
-            float[] previousWorldPosition, float distanceRoundTrack, int tire_type, Boolean sessionLengthIsTime, float sessionTimeRemaining)
+            float[] previousWorldPosition, float distanceRoundTrack, int tire_type_front, int tyre_sub_type_front, int tire_type_rear, int tyre_sub_type_rear,  
+            Boolean sessionLengthIsTime, float sessionTimeRemaining)
         {
             opponentData.DistanceRoundTrack = distanceRoundTrack;
             float speed;
@@ -1478,7 +1528,23 @@ namespace CrewChiefV4.RaceRoom
             opponentData.UnFilteredPosition = unfilteredRacePosition;
             opponentData.WorldPosition = currentWorldPosition;
             opponentData.IsNewLap = false;
+            
+            if (!opponentData.InPits && isInPits)
+            {
+                opponentData.NumPitStops++;
+            }
             opponentData.InPits = isInPits;
+            TyreType previousTyreType = opponentData.CurrentTyres;
+            opponentData.hasJustChangedToDifferentTyreType = false;
+            if (opponentData.InPits)
+            {
+                opponentData.CurrentTyres = mapToTyreType(tire_type_front, tyre_sub_type_front, tire_type_rear, tyre_sub_type_rear, opponentData.CarClass.carClassEnum);
+                if (opponentData.CurrentTyres != previousTyreType)
+                {
+                    opponentData.TyreChangesByLap[opponentData.OpponentLapData.Count] = opponentData.CurrentTyres;
+                    opponentData.hasJustChangedToDifferentTyreType = true;
+                }
+            }
             if (opponentData.CurrentSectorNumber != sector)
             {
                 if (opponentData.CurrentSectorNumber == 3 && sector == 1)
@@ -1496,7 +1562,7 @@ namespace CrewChiefV4.RaceRoom
                     opponentData.AddCumulativeSectorData(opponentData.CurrentSectorNumber, racePosition, sectorTime, sessionRunningTime, lapIsValid && validSpeed, false, 20, 20);
                     if (sector == 2)
                     {
-                        opponentData.CurrentTyres = mapToTyreType(tire_type, opponentData.CarClass.carClassEnum);
+                        opponentData.CurrentTyres = mapToTyreType(tire_type_front, tyre_sub_type_front, tire_type_rear, tyre_sub_type_rear, opponentData.CarClass.carClassEnum);
                     }
                 }
                 opponentData.CurrentSectorNumber = sector;
@@ -1523,10 +1589,11 @@ namespace CrewChiefV4.RaceRoom
             opponentData.WorldPosition = new float[] { participantStruct.Position.X, participantStruct.Position.Z };
             opponentData.DistanceRoundTrack = participantStruct.LapDistance;
             opponentData.CarClass = CarData.getCarClassForRaceRoomId(participantStruct.DriverInfo.ClassId);
-            opponentData.CurrentTyres = mapToTyreType(participantStruct.TireType, playerCarClass);
+            opponentData.CurrentTyres = mapToTyreType(participantStruct.TireTypeFront, participantStruct.TireSubTypeFront,
+                participantStruct.TireTypeRear, participantStruct.TireSubTypeRear, playerCarClass);
             Console.WriteLine("New driver " + driverName + " is using car class " +
-                opponentData.CarClass.getClassIdentifier() + " (class ID " + participantStruct.DriverInfo.ClassId + ")");
-
+                opponentData.CarClass.getClassIdentifier() + " (class ID " + participantStruct.DriverInfo.ClassId + ") with tyres " + opponentData.CurrentTyres);
+            opponentData.TyreChangesByLap[0] = opponentData.CurrentTyres;
             return opponentData;
         }
 
