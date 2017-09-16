@@ -1828,7 +1828,7 @@ namespace CrewChiefV4.assetto
 
             //tyre data
             currentGameState.TyreData.HasMatchedTyreTypes = true;
-            currentGameState.TyreData.TireWearActive = shared.acsStatic.aidTireRate > 0;
+            currentGameState.TyreData.TyreWearActive = shared.acsStatic.aidTireRate > 0;
 
             currentGameState.TyreData.FrontLeftPressure = playerVehicle.tyreInflation[0] == 1.0f ? shared.acsPhysics.wheelsPressure[0] * 6.894f : 0.0f;
             currentGameState.TyreData.FrontRightPressure = playerVehicle.tyreInflation[1] == 1.0f ? shared.acsPhysics.wheelsPressure[1] * 6.894f : 0.0f;

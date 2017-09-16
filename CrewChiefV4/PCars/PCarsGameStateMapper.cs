@@ -1109,7 +1109,7 @@ namespace CrewChiefV4.PCars
 
             //------------------------ Tyre data -----------------------          
             currentGameState.TyreData.HasMatchedTyreTypes = true;
-            currentGameState.TyreData.TireWearActive = true;
+            currentGameState.TyreData.TyreWearActive = true;
 
             currentGameState.TyreData.LeftFrontAttached = (shared.mTyreFlags[0] & 1) == 1;
             currentGameState.TyreData.RightFrontAttached = (shared.mTyreFlags[1] & 1) == 1;

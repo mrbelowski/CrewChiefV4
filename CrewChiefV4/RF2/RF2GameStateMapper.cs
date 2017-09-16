@@ -455,8 +455,8 @@ namespace CrewChiefV4.rFactor2
             // mInGarageStall also means retired or before race start, but for now use it here.
             cgs.PitData.InPitlane = playerScoring.mInPits == 1 || playerScoring.mInGarageStall == 1;
 
-            if (csd.SessionType == SessionType.Race && csd.SessionRunningTime > 10 &&
-                cgs.PitData.InPitlane && pgs != null && !pgs.PitData.InPitlane)
+            if (csd.SessionType == SessionType.Race && csd.SessionRunningTime > 10
+                && cgs.PitData.InPitlane && pgs != null && !pgs.PitData.InPitlane)
             {
                 cgs.PitData.NumPitStops++;
             }
@@ -624,9 +624,9 @@ namespace CrewChiefV4.rFactor2
             cgs.ControlData.ControlType = mapToControlType((rFactor2Constants.rF2Control)playerScoring.mControl);
 
             // --------------------------------
-            // tire data
+            // Tyre data
             // rF2 reports in Kelvin
-            cgs.TyreData.TireWearActive = true;
+            cgs.TyreData.TyreWearActive = true;
 
             // For now, all tyres will be reported as front compund.
             var tt = this.mapToTyreType(ref playerTelemetry);
@@ -788,7 +788,10 @@ namespace CrewChiefV4.rFactor2
                     csd.PlayerClassSessionBestLapTime = csd.PlayerLapTimeSessionBest > 0.0f ?
                         csd.PlayerLapTimeSessionBest : -1.0f;
 
-                    if (csd.IsNewLap && psd != null && !psd.IsNewLap)
+                    if (csd.IsNewLap 
+                        && psd != null && !psd.IsNewLap
+                        && csd.LapTimePrevious > 0.0f
+                        && csd.PreviousLapWasValid)
                     {
                         if (!csd.PlayerClassSessionBestLapTimeByTyre.ContainsKey(cgs.TyreData.FrontLeftTyreType)
                             || csd.PlayerClassSessionBestLapTimeByTyre[cgs.TyreData.FrontLeftTyreType] > csd.LapTimePrevious)
@@ -881,7 +884,10 @@ namespace CrewChiefV4.rFactor2
                 opponent.DriverNameSet = opponent.DriverRawName.Length > 0;
                 opponent.Position = vehicleScoring.mPlace;
 
-                if (opponentPrevious == null)
+                // Telemetry isn't always available, initialize first tyre set 10 secs or more into race.
+                if (csd.SessionType == SessionType.Race && csd.SessionRunningTime > 10
+                    && opponentPrevious != null
+                    && opponentPrevious.TyreChangesByLap.Count == 0)  // If tyre for initial lap was never set.
                     opponent.TyreChangesByLap[0] = opponent.CurrentTyres;
 
                 if (opponent.DriverNameSet && opponentPrevious == null && CrewChief.enableDriverNames)
@@ -938,21 +944,26 @@ namespace CrewChiefV4.rFactor2
                 opponent.LastLapTime = vehicleScoring.mLastLapTime > 0 ? (float)vehicleScoring.mLastLapTime : -1.0f;
 
                 var isInPits = vehicleScoring.mInPits == 1;
-                if (csd.SessionType == SessionType.Race && csd.SessionRunningTime > 10 &&
-                    opponentPrevious != null && !opponentPrevious.InPits && isInPits)
+                
+                if (csd.SessionType == SessionType.Race && csd.SessionRunningTime > 10
+                    && opponentPrevious != null && !opponentPrevious.InPits && isInPits)
                 {
                     opponent.NumPitStops++;
                 }
 
                 opponent.InPits = isInPits;
 
+                var wasInPits = opponentPrevious != null && opponentPrevious.InPits;
                 opponent.hasJustChangedToDifferentTyreType = false;
-                if (opponent.InPits)
+
+                // It looks like compound type fluctuates while in pits.  So, check for it on pit exit only.
+                if (wasInPits && !isInPits
+                    && opponent.TyreChangesByLap.Count != 0)  // This should be initialized above
                 {
-                    if (opponentPrevious == null 
-                        || opponent.CurrentTyres != opponentPrevious.CurrentTyres)
+                    var prevTyres = opponent.TyreChangesByLap.Last().Value;
+                    if (opponent.CurrentTyres != prevTyres)
                     {
-                        opponent.TyreChangesByLap[opponent.OpponentLapData.Count] = opponent.CurrentTyres;
+                        opponent.TyreChangesByLap[opponent.CompletedLaps] = opponent.CurrentTyres;
                         opponent.hasJustChangedToDifferentTyreType = true;
                     }
                 }
@@ -1619,7 +1630,7 @@ namespace CrewChiefV4.rFactor2
         private TyreType mapToTyreType(ref rF2VehicleTelemetry vehicleTelemetry)
         {
             // For now, use fronts.
-            var frontCompound = RF2GameStateMapper.getStringFromBytes(vehicleTelemetry.mFrontTireCompoundName).ToUpperInvariant();
+            var frontCompound = vehicleTelemetry.mFrontTireCompoundName == null ? "" : RF2GameStateMapper.getStringFromBytes(vehicleTelemetry.mFrontTireCompoundName).ToUpperInvariant();
 
             if (string.IsNullOrWhiteSpace(frontCompound))
                 return TyreType.Unknown_Race;
