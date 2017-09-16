@@ -1499,7 +1499,7 @@ namespace CrewChiefV4.GameState
         public Boolean LeftRearAttached = true;
         public Boolean RightRearAttached = true;
 
-        public Boolean TireWearActive = false;
+        public Boolean TyreWearActive = false;
 
         // true if all tyres are the same type
         public Boolean HasMatchedTyreTypes = true;

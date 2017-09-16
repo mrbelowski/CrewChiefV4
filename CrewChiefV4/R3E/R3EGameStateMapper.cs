@@ -1086,7 +1086,7 @@ namespace CrewChiefV4.RaceRoom
             //------------------------ Tyre data -----------------------
             // no way to have unmatched tyre types in R3E
             currentGameState.TyreData.HasMatchedTyreTypes = true;
-            currentGameState.TyreData.TireWearActive = shared.TireWearActive == 1;
+            currentGameState.TyreData.TyreWearActive = shared.TireWearActive == 1;
             TyreType tyreType = mapToTyreType(shared.TireTypeFront, shared.TireSubTypeFront, shared.TireTypeRear, shared.TireSubTypeFront, currentGameState.carClass.carClassEnum);            
             currentGameState.TyreData.FrontLeft_CenterTemp = shared.TireTemp.FrontLeft_Center;
             currentGameState.TyreData.FrontLeft_LeftTemp = shared.TireTemp.FrontLeft_Left;

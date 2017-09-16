@@ -590,7 +590,7 @@ namespace CrewChiefV4.Events
             leftRearTyreTemp = currentGameState.TyreData.RearLeft_CenterTemp;
             rightRearTyreTemp = currentGameState.TyreData.RearRight_CenterTemp;
 
-            if (currentGameState.TyreData.TireWearActive)
+            if (currentGameState.TyreData.TyreWearActive)
             {
                 leftFrontWearPercent = currentGameState.TyreData.FrontLeftPercentWear;
                 leftRearWearPercent = currentGameState.TyreData.RearLeftPercentWear;

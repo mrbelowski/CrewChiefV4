@@ -458,7 +458,7 @@ namespace CrewChiefV4.rFactor1
             // --------------------------------
             // tire data
             // Automobilista reports in Kelvin
-            currentGameState.TyreData.TireWearActive = true;
+            currentGameState.TyreData.TyreWearActive = true;
             currentGameState.TyreData.LeftFrontAttached = shared.wheel[(int)rFactor1Constant.rfWheelIndex.frontLeft].detached == 0;
             currentGameState.TyreData.FrontLeft_LeftTemp = shared.wheel[(int)rFactor1Constant.rfWheelIndex.frontLeft].temperature[0] - 273;
             currentGameState.TyreData.FrontLeft_CenterTemp = shared.wheel[(int)rFactor1Constant.rfWheelIndex.frontLeft].temperature[1] - 273;
