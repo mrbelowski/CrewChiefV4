@@ -173,7 +173,9 @@ namespace CrewChiefV4.Events
                     string opponentKey = entry.Key;
                     OpponentData opponentData = entry.Value;
 
-                    if (opponentData.hasJustChangedToDifferentTyreType)
+                    // in race sessions, announce tyre type changes once the session is underway
+                    if (currentGameState.SessionData.SessionType == SessionType.Race &&
+                        currentGameState.SessionData.SessionRunningTime > 10 && opponentData.hasJustChangedToDifferentTyreType)
                     {
                         String opponentIdentifier = getOpponentIdentifierForTyreChange(opponentData, currentGameState.SessionData.Position);
                         if (opponentIdentifier != null)

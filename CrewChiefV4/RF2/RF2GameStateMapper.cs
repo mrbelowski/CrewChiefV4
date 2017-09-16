@@ -455,8 +455,11 @@ namespace CrewChiefV4.rFactor2
             // mInGarageStall also means retired or before race start, but for now use it here.
             cgs.PitData.InPitlane = playerScoring.mInPits == 1 || playerScoring.mInGarageStall == 1;
 
-            if (cgs.PitData.InPitlane && pgs != null && !pgs.PitData.InPitlane)
+            if (csd.SessionType == SessionType.Race && csd.SessionRunningTime > 10 &&
+                cgs.PitData.InPitlane && pgs != null && !pgs.PitData.InPitlane)
+            {
                 cgs.PitData.NumPitStops++;
+            }
 
             cgs.PitData.IsAtPitExit = pgs != null && pgs.PitData.InPitlane && !cgs.PitData.InPitlane;
             cgs.PitData.OnOutLap = cgs.PitData.InPitlane && csd.SectorNumber == 1;
@@ -498,10 +501,7 @@ namespace CrewChiefV4.rFactor2
                 // Those values change on sector/lap change, otherwise stay the same between updates.
                 psd.restorePlayerTimings(csd);
             }
-
-            if (cgs.PitData.InPitlane && pgs != null && !pgs.PitData.InPitlane)
-                cgs.PitData.NumPitStops++;
-
+            
             this.processPlayerTimingData(ref shared.scoring, cgs, pgs, ref playerScoring);
 
             csd.SessionTimesAtEndOfSectors = pgs != null ? psd.SessionTimesAtEndOfSectors : new SessionData().SessionTimesAtEndOfSectors;
@@ -938,8 +938,11 @@ namespace CrewChiefV4.rFactor2
                 opponent.LastLapTime = vehicleScoring.mLastLapTime > 0 ? (float)vehicleScoring.mLastLapTime : -1.0f;
 
                 var isInPits = vehicleScoring.mInPits == 1;
-                if (!opponent.InPits && isInPits)
+                if (csd.SessionType == SessionType.Race && csd.SessionRunningTime > 10 &&
+                    opponentPrevious != null && !opponentPrevious.InPits && isInPits)
+                {
                     opponent.NumPitStops++;
+                }
 
                 opponent.InPits = isInPits;
 

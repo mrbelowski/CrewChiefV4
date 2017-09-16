@@ -624,7 +624,8 @@ namespace CrewChiefV4.RaceRoom
                     }
                     if (currentGameState.PitData.InPitlane)
                     {
-                        if (previousGameState != null && !previousGameState.PitData.InPitlane)
+                        if (currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.SessionRunningTime > 10 && 
+                            previousGameState != null && !previousGameState.PitData.InPitlane)
                         {
                             currentGameState.PitData.NumPitStops++;
                         }
@@ -791,7 +792,8 @@ namespace CrewChiefV4.RaceRoom
                                     new float[] { participantStruct.Position.X, participantStruct.Position.Z }, previousOpponentWorldPosition,
                                     participantStruct.LapDistance, participantStruct.TireTypeFront, participantStruct.TireSubTypeFront,
                                     participantStruct.TireTypeRear, participantStruct.TireSubTypeRear,
-                                    currentGameState.SessionData.SessionHasFixedTime, currentGameState.SessionData.SessionTimeRemaining);
+                                    currentGameState.SessionData.SessionHasFixedTime, currentGameState.SessionData.SessionTimeRemaining,
+                                    currentGameState.SessionData.SessionType == SessionType.Race);
 
                             if (previousOpponentData != null)
                             {
@@ -1507,7 +1509,7 @@ namespace CrewChiefV4.RaceRoom
         private void upateOpponentData(OpponentData opponentData, int racePosition, int unfilteredRacePosition, int completedLaps, int sector, float sectorTime, 
             float completedLapTime, Boolean isInPits, Boolean lapIsValid, float sessionRunningTime, float secondsSinceLastUpdate, float[] currentWorldPosition,
             float[] previousWorldPosition, float distanceRoundTrack, int tire_type_front, int tyre_sub_type_front, int tire_type_rear, int tyre_sub_type_rear,  
-            Boolean sessionLengthIsTime, float sessionTimeRemaining)
+            Boolean sessionLengthIsTime, float sessionTimeRemaining, Boolean isRace)
         {
             opponentData.DistanceRoundTrack = distanceRoundTrack;
             float speed;
@@ -1528,8 +1530,8 @@ namespace CrewChiefV4.RaceRoom
             opponentData.UnFilteredPosition = unfilteredRacePosition;
             opponentData.WorldPosition = currentWorldPosition;
             opponentData.IsNewLap = false;
-            
-            if (!opponentData.InPits && isInPits)
+
+            if (sessionRunningTime > 10 && isRace && !opponentData.InPits && isInPits)
             {
                 opponentData.NumPitStops++;
             }
