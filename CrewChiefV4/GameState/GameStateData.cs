@@ -336,6 +336,9 @@ namespace CrewChiefV4.GameState
 
             foreach (var ld in PlayerLapData)
                 restoreTo.PlayerLapData.Add(ld);
+
+            foreach (var entry in PlayerClassSessionBestLapTimeByTyre)
+                restoreTo.PlayerClassSessionBestLapTimeByTyre.Add(entry.Key, entry.Value);
         }
 
         public void playerStartNewLap(int lapNumber, int position, Boolean inPits, float gameTimeAtStart, Boolean isRaining, float trackTemp, float airTemp)
