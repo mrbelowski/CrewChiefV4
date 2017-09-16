@@ -370,8 +370,6 @@ namespace CrewChiefV4.RaceRoom
                     currentGameState.SessionData.PlayerLapTimeSessionBest = previousGameState.SessionData.PlayerLapTimeSessionBest;
                     currentGameState.SessionData.OpponentsLapTimeSessionBestOverall = previousGameState.SessionData.OpponentsLapTimeSessionBestOverall;
                     currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass = previousGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass;
-                    currentGameState.SessionData.PlayerClassSessionBestLapTimeByTyre = previousGameState.SessionData.PlayerClassSessionBestLapTimeByTyre;
-                    currentGameState.SessionData.PlayerBestLapTimeByTyre = previousGameState.SessionData.PlayerBestLapTimeByTyre;
                     currentGameState.carClass = previousGameState.carClass;
                     currentGameState.SessionData.PlayerClassSessionBestLapTimeByTyre = previousGameState.SessionData.PlayerClassSessionBestLapTimeByTyre;
                     currentGameState.SessionData.PlayerBestLapTimeByTyre = previousGameState.SessionData.PlayerBestLapTimeByTyre;
@@ -1562,7 +1560,6 @@ namespace CrewChiefV4.RaceRoom
                 else if (opponentData.CurrentSectorNumber == 1 && sector == 2 || opponentData.CurrentSectorNumber == 2 && sector == 3)
                 {
                     opponentData.AddCumulativeSectorData(opponentData.CurrentSectorNumber, racePosition, sectorTime, sessionRunningTime, lapIsValid && validSpeed, false, 20, 20);
-                    // do we need this here?
                     if (sector == 2)
                     {
                         opponentData.CurrentTyres = mapToTyreType(tire_type_front, tyre_sub_type_front, tire_type_rear, tyre_sub_type_rear, opponentData.CarClass.carClassEnum);
@@ -1598,7 +1595,6 @@ namespace CrewChiefV4.RaceRoom
 
             Console.WriteLine("New driver " + driverName + " is using car class " +
                 opponentData.CarClass.getClassIdentifier() + " (class ID " + participantStruct.DriverInfo.ClassId + ") with tyres " + opponentData.CurrentTyres);
-            opponentData.TyreChangesByLap[0] = opponentData.CurrentTyres;
             return opponentData;
         }
 
