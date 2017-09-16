@@ -331,14 +331,14 @@ namespace CrewChiefV4.GameState
             restoreTo.PreviousLapWasValid = PreviousLapWasValid;
             restoreTo.LapTimePrevious = LapTimePrevious;
 
-            restoreTo.PlayerClassSessionBestLapTimeByTyre = PlayerClassSessionBestLapTimeByTyre;
-            restoreTo.PlayerBestLapTimeByTyre = PlayerBestLapTimeByTyre;
-
             foreach (var ld in PlayerLapData)
                 restoreTo.PlayerLapData.Add(ld);
 
             foreach (var entry in PlayerClassSessionBestLapTimeByTyre)
                 restoreTo.PlayerClassSessionBestLapTimeByTyre.Add(entry.Key, entry.Value);
+
+            foreach (var entry in PlayerBestLapTimeByTyre)
+                restoreTo.PlayerBestLapTimeByTyre.Add(entry.Key, entry.Value);
         }
 
         public void playerStartNewLap(int lapNumber, int position, Boolean inPits, float gameTimeAtStart, Boolean isRaining, float trackTemp, float airTemp)
