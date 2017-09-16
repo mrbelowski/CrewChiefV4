@@ -373,6 +373,8 @@ namespace CrewChiefV4.RaceRoom
                     currentGameState.SessionData.PlayerClassSessionBestLapTimeByTyre = previousGameState.SessionData.PlayerClassSessionBestLapTimeByTyre;
                     currentGameState.SessionData.PlayerBestLapTimeByTyre = previousGameState.SessionData.PlayerBestLapTimeByTyre;
                     currentGameState.carClass = previousGameState.carClass;
+                    currentGameState.SessionData.PlayerClassSessionBestLapTimeByTyre = previousGameState.SessionData.PlayerClassSessionBestLapTimeByTyre;
+                    currentGameState.SessionData.PlayerBestLapTimeByTyre = previousGameState.SessionData.PlayerBestLapTimeByTyre;
                     currentGameState.SessionData.DriverRawName = previousGameState.SessionData.DriverRawName;
                     currentGameState.SessionData.SessionTimesAtEndOfSectors = previousGameState.SessionData.SessionTimesAtEndOfSectors;
                     currentGameState.SessionData.LapTimePreviousEstimateForInvalidLap = previousGameState.SessionData.LapTimePreviousEstimateForInvalidLap;
@@ -624,7 +626,7 @@ namespace CrewChiefV4.RaceRoom
                     }
                     if (currentGameState.PitData.InPitlane)
                     {
-                        if (!previousGameState.PitData.InPitlane)
+                        if (previousGameState != null && !previousGameState.PitData.InPitlane)
                         {
                             currentGameState.PitData.NumPitStops++;
                         }
@@ -900,7 +902,6 @@ namespace CrewChiefV4.RaceRoom
                 {
                     currentGameState.SessionData.PlayerBestLapTimeByTyre[currentGameState.TyreData.FrontLeftTyreType] = currentGameState.SessionData.LapTimePrevious;
                 }
-
                 if ((currentGameState.SessionData.PlayerLapTimeSessionBest == -1 ||
                      currentGameState.SessionData.LapTimePrevious < currentGameState.SessionData.PlayerLapTimeSessionBest))
                 {
@@ -1390,7 +1391,7 @@ namespace CrewChiefV4.RaceRoom
             RaceRoomData.RaceRoomShared shared = (RaceRoomData.RaceRoomShared)memoryMappedFileStruct;
             int r3eSessionType = shared.SessionType;
             int numCars = shared.NumCars;
-            if ((int)RaceRoomConstant.Session.Practice == r3eSessionType)
+            if ((int)RaceRoomConstant.Session.Practice == r3eSessionType || (int)RaceRoomConstant.Session.Warmup == r3eSessionType)
             {
                 return SessionType.Practice;
             }
@@ -1529,18 +1530,21 @@ namespace CrewChiefV4.RaceRoom
             opponentData.UnFilteredPosition = unfilteredRacePosition;
             opponentData.WorldPosition = currentWorldPosition;
             opponentData.IsNewLap = false;
+            
             if (!opponentData.InPits && isInPits)
             {
                 opponentData.NumPitStops++;
             }
             opponentData.InPits = isInPits;
             TyreType previousTyreType = opponentData.CurrentTyres;
+            opponentData.hasJustChangedToDifferentTyreType = false;
             if (opponentData.InPits)
             {
                 opponentData.CurrentTyres = mapToTyreType(tire_type_front, tyre_sub_type_front, tire_type_rear, tyre_sub_type_rear, opponentData.CarClass.carClassEnum);
                 if (opponentData.CurrentTyres != previousTyreType)
                 {
                     opponentData.TyreChangesByLap[opponentData.OpponentLapData.Count] = opponentData.CurrentTyres;
+                    opponentData.hasJustChangedToDifferentTyreType = true;
                 }
             }
             if (opponentData.CurrentSectorNumber != sector)
@@ -1593,8 +1597,8 @@ namespace CrewChiefV4.RaceRoom
             opponentData.TyreChangesByLap[0] = opponentData.CurrentTyres;
 
             Console.WriteLine("New driver " + driverName + " is using car class " +
-                opponentData.CarClass.getClassIdentifier() + " (class ID " + participantStruct.DriverInfo.ClassId + ")");
-
+                opponentData.CarClass.getClassIdentifier() + " (class ID " + participantStruct.DriverInfo.ClassId + ") with tyres " + opponentData.CurrentTyres);
+            opponentData.TyreChangesByLap[0] = opponentData.CurrentTyres;
             return opponentData;
         }
 

@@ -29,7 +29,7 @@ namespace CrewChiefV4.GameState
     public enum TyreType
     {
         // separate enum for compound & weather, and prime / option?
-        Hard, Medium, Soft, SuperSoft, UltraSoft, Wet, Intermediate, Road, Bias_Ply, Unknown_Race, R3E_NEW, Prime, Option, Alternate, Primary
+        Hard, Medium, Soft, Super_Soft, Ultra_Soft, Wet, Intermediate, Road, Bias_Ply, Unknown_Race, R3E_NEW, Prime, Option, Alternate, Primary
     }
 
     public enum BrakeType
@@ -160,6 +160,8 @@ namespace CrewChiefV4.GameState
         public TrackDefinition TrackDefinition = null;
 
         public Boolean IsDisqualified = false;
+
+        public Boolean IsDNF = false;
 
         public FlagEnum Flag = FlagEnum.GREEN;
 
@@ -301,12 +303,10 @@ namespace CrewChiefV4.GameState
         // artificially by mappers, not by the game.
         public Boolean AbruptSessionEndDetected = false;
 
-        // only enabled for R3E as this is the only game where we (currently) have the tyre type for all participants
         public Dictionary<TyreType, float> PlayerClassSessionBestLapTimeByTyre = new Dictionary<TyreType, float>();
-        
+
         // as above, but for the player only
         public Dictionary<TyreType, float> PlayerBestLapTimeByTyre = new Dictionary<TyreType, float>();
-
 
         public SessionData()
         {
@@ -548,6 +548,8 @@ namespace CrewChiefV4.GameState
         // these are only set for R3E
         public Dictionary<int, TyreType> TyreChangesByLap = new Dictionary<int, TyreType>();
         public Dictionary<TyreType, float> BestLapTimeByTyreType = new Dictionary<TyreType, float>();
+        // will be true for 1 tick
+        public Boolean hasJustChangedToDifferentTyreType = false;
 
         public LapData getCurrentLapData()
         {

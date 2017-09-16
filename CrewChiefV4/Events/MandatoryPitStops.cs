@@ -238,7 +238,8 @@ namespace CrewChiefV4.Events
                 {
                     if (currentGameState.SessionData.IsNewLap && currentGameState.SessionData.CompletedLaps > 0 && currentGameState.SessionData.SessionNumberOfLaps > 0)
                     {
-                        if (currentGameState.PitData.PitWindow != PitWindow.StopInProgress && currentGameState.PitData.PitWindow != PitWindow.Completed) 
+                        if (currentGameState.PitData.PitWindow != PitWindow.StopInProgress && 
+                            currentGameState.PitData.PitWindow != PitWindow.Completed && !currentGameState.PitData.InPitlane) 
                         {
                             if (maxDistanceOnCurrentTyre > 0 && currentGameState.SessionData.CompletedLaps == maxDistanceOnCurrentTyre && playPitThisLap)
                             {
@@ -294,7 +295,7 @@ namespace CrewChiefV4.Events
                             {
                                 audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsPitWindowClosing, random.Next(0, 20), this));
                             }
-                            if (currentGameState.PitData.PitWindow != PitWindow.Completed &&
+                            if (currentGameState.PitData.PitWindow != PitWindow.Completed && !currentGameState.PitData.InPitlane &&
                                 currentGameState.PitData.PitWindow != PitWindow.StopInProgress)
                             {
                                 playBoxNowMessage = true;
@@ -329,6 +330,7 @@ namespace CrewChiefV4.Events
                     else if (currentGameState.SessionData.IsNewLap && currentGameState.SessionData.CompletedLaps > 0 && currentGameState.SessionData.SessionTimeRemaining > 0)
                     {
                         if (pitWindowClosedTime > 0 && currentGameState.PitData.PitWindow != PitWindow.StopInProgress &&
+                            !currentGameState.PitData.InPitlane &&
                             currentGameState.PitData.PitWindow != PitWindow.Completed &&
                             currentGameState.SessionData.SessionTotalRunTime - currentGameState.SessionData.SessionTimeRemaining > pitWindowOpenTime * 60 &&
                             currentGameState.SessionData.SessionTotalRunTime - currentGameState.SessionData.SessionTimeRemaining < pitWindowClosedTime * 60)
@@ -450,17 +452,21 @@ namespace CrewChiefV4.Events
                     if (playBoxNowMessage && currentGameState.SessionData.SectorNumber == 3)
                     {
                         playBoxNowMessage = false;
-                        if (mandatoryTyreChangeTyreType == TyreType.Prime)
-                        {
-                            audioPlayer.playMessage(new QueuedMessage("box_now_for_primes", MessageContents(folderMandatoryPitStopsPitNow, folderMandatoryPitStopsPrimeTyres), 3, this));
-                        }
-                        else if (mandatoryTyreChangeTyreType == TyreType.Option)
-                        {
-                            audioPlayer.playMessage(new QueuedMessage("box_now_for_options", MessageContents(folderMandatoryPitStopsPitNow, folderMandatoryPitStopsOptionTyres), 3, this));
-                        }
-                        else
-                        {
-                            audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsPitNow, 3, this));
+                        if (!currentGameState.PitData.InPitlane && currentGameState.PitData.PitWindow != PitWindow.StopInProgress && 
+                            currentGameState.PitData.PitWindow != PitWindow.Completed)
+                        {                            
+                            if (mandatoryTyreChangeTyreType == TyreType.Prime)
+                            {
+                                audioPlayer.playMessage(new QueuedMessage("box_now_for_primes", MessageContents(folderMandatoryPitStopsPitNow, folderMandatoryPitStopsPrimeTyres), 3, this));
+                            }
+                            else if (mandatoryTyreChangeTyreType == TyreType.Option)
+                            {
+                                audioPlayer.playMessage(new QueuedMessage("box_now_for_options", MessageContents(folderMandatoryPitStopsPitNow, folderMandatoryPitStopsOptionTyres), 3, this));
+                            }
+                            else
+                            {
+                                audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsPitNow, 3, this));
+                            }
                         }
                     }
                 }
