@@ -449,7 +449,7 @@ namespace CrewChiefV4.rFactor2
             // mInGarageStall also means retired or before race start, but for now use it here.
             cgs.PitData.InPitlane = playerScoring.mInPits == 1 || playerScoring.mInGarageStall == 1;
 
-            if (!pgs.PitData.InPitlane)
+            if (pgs != null && !pgs.PitData.InPitlane)
                 cgs.PitData.NumPitStops++;
 
             cgs.PitData.IsAtPitExit = pgs != null && pgs.PitData.InPitlane && !cgs.PitData.InPitlane;
@@ -923,11 +923,15 @@ namespace CrewChiefV4.rFactor2
                 opponent.InPits = isInPits;
 
                 var previousTyreType = opponent.CurrentTyres;
+                opponent.hasJustChangedToDifferentTyreType = false;
                 if (opponent.InPits)
                 {
                     opponent.CurrentTyres = this.mapToTyreType(ref vehicleTelemetry);
                     if (opponent.CurrentTyres != previousTyreType)
+                    {
                         opponent.TyreChangesByLap[opponent.OpponentLapData.Count] = opponent.CurrentTyres;
+                        opponent.hasJustChangedToDifferentTyreType = true;
+                    }
                 }
 
                 var lastSectorTime = this.getLastSectorTime(ref vehicleScoring, opponent.CurrentSectorNumber);
