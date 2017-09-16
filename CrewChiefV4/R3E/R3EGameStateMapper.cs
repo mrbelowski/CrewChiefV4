@@ -1591,7 +1591,6 @@ namespace CrewChiefV4.RaceRoom
             opponentData.CarClass = CarData.getCarClassForRaceRoomId(participantStruct.DriverInfo.ClassId);
             opponentData.CurrentTyres = mapToTyreType(participantStruct.TireTypeFront, participantStruct.TireSubTypeFront,
                 participantStruct.TireTypeRear, participantStruct.TireSubTypeRear, playerCarClass);
-
             Console.WriteLine("New driver " + driverName + " is using car class " +
                 opponentData.CarClass.getClassIdentifier() + " (class ID " + participantStruct.DriverInfo.ClassId + ") with tyres " + opponentData.CurrentTyres);
             opponentData.TyreChangesByLap[0] = opponentData.CurrentTyres;

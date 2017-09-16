@@ -448,6 +448,10 @@ namespace CrewChiefV4.rFactor2
 
             // mInGarageStall also means retired or before race start, but for now use it here.
             cgs.PitData.InPitlane = playerScoring.mInPits == 1 || playerScoring.mInGarageStall == 1;
+
+            if (!pgs.PitData.InPitlane)
+                cgs.PitData.NumPitStops++;
+
             cgs.PitData.IsAtPitExit = pgs != null && pgs.PitData.InPitlane && !cgs.PitData.InPitlane;
             cgs.PitData.OnOutLap = cgs.PitData.InPitlane && csd.SectorNumber == 1;
 
@@ -486,6 +490,7 @@ namespace CrewChiefV4.rFactor2
                 // Preserve current values.
                 // Those values change on sector/lap change, otherwise stay the same between updates.
                 psd.restorePlayerTimings(csd);
+                cgs.PitData.NumPitStops = pgs.PitData.NumPitStops;
             }
 
             this.processPlayerTimingData(ref shared.scoring, cgs, pgs, ref playerScoring);
@@ -1001,6 +1006,14 @@ namespace CrewChiefV4.rFactor2
 
                     if (csd.OpponentsLapTimeSessionBestPlayerClass < csd.PlayerClassSessionBestLapTime)
                         csd.PlayerClassSessionBestLapTime = csd.OpponentsLapTimeSessionBestPlayerClass;
+
+                    if (opponent.LastLapTime > 0.0
+                        && opponent.LastLapValid
+                        && (!csd.PlayerClassSessionBestLapTimeByTyre.ContainsKey(opponent.CurrentTyres) 
+                            || csd.PlayerClassSessionBestLapTimeByTyre[opponent.CurrentTyres] > opponent.LastLapTime))
+                    {
+                        csd.PlayerClassSessionBestLapTimeByTyre[opponent.CurrentTyres] = opponent.LastLapTime;
+                    }
                 }
 
                 if (opponent.CurrentBestLapTime > 0.0f

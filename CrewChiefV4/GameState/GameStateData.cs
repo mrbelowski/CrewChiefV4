@@ -331,6 +331,9 @@ namespace CrewChiefV4.GameState
             restoreTo.PreviousLapWasValid = PreviousLapWasValid;
             restoreTo.LapTimePrevious = LapTimePrevious;
 
+            restoreTo.PlayerClassSessionBestLapTimeByTyre = PlayerClassSessionBestLapTimeByTyre;
+            restoreTo.PlayerBestLapTimeByTyre = PlayerBestLapTimeByTyre;
+
             foreach (var ld in PlayerLapData)
                 restoreTo.PlayerLapData.Add(ld);
         }
