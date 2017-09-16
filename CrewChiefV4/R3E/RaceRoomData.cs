@@ -25,7 +25,8 @@ namespace CrewChiefV4.RaceRoom
             Unavailable = -1,
             Practice = 0,
             Qualify = 1,
-            Race = 2
+            Race = 2,
+            Warmup = 3
         }
 
         public enum SessionPhase
