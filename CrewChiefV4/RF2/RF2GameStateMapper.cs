@@ -934,6 +934,20 @@ namespace CrewChiefV4.rFactor2
                     opponent.DistanceRoundTrack = (float)vehicleScoring.mLapDist;
                 }
 
+                if (opponentPrevious != null) 
+                {
+                    // if we've just crossed the 'near to pit entry' mark, update our near-pit-entry position. Otherwise copy it from the previous state
+                    if (opponentPrevious.DistanceRoundTrack < csd.TrackDefinition.distanceForNearPitEntryChecks
+                        && opponent.DistanceRoundTrack > csd.TrackDefinition.distanceForNearPitEntryChecks)
+                    {
+                        opponent.PositionOnApproachToPitEntry = opponent.Position;
+                    }
+                    else
+                    {
+                        opponent.PositionOnApproachToPitEntry = opponentPrevious.PositionOnApproachToPitEntry;
+                    }
+                }
+
                 opponent.CurrentBestLapTime = vehicleScoring.mBestLapTime > 0.0f ? (float)vehicleScoring.mBestLapTime : -1.0f;
                 opponent.PreviousBestLapTime = opponentPrevious != null && opponentPrevious.CurrentBestLapTime > 0.0f &&
                     opponentPrevious.CurrentBestLapTime > opponent.CurrentBestLapTime ? opponentPrevious.CurrentBestLapTime : -1.0f;
@@ -1019,23 +1033,20 @@ namespace CrewChiefV4.rFactor2
                 {
                     opponent.setInLap();
                     var currentLapData = opponent.getCurrentLapData();
-                    int sector3Position = currentLapData != null && currentLapData.SectorPositions[2] > 0
-                                            ? currentLapData.SectorPositions[2]
-                                            : opponent.Position;
-
-                    if (sector3Position == 1)
+                    
+                    if (opponent.PositionOnApproachToPitEntry == 1)
                     {
                         cgs.PitData.LeaderIsPitting = true;
                         cgs.PitData.OpponentForLeaderPitting = opponent;
                     }
 
-                    if (sector3Position == csd.Position - 1 && csd.Position > 2)
+                    if (opponent.PositionOnApproachToPitEntry == csd.Position - 1 && csd.Position > 2)
                     {
                         cgs.PitData.CarInFrontIsPitting = true;
                         cgs.PitData.OpponentForCarAheadPitting = opponent;
                     }
 
-                    if (sector3Position == csd.Position + 1 && !cgs.isLast())
+                    if (opponent.PositionOnApproachToPitEntry == csd.Position + 1 && !cgs.isLast())
                     {
                         cgs.PitData.CarBehindIsPitting = true;
                         cgs.PitData.OpponentForCarBehindPitting = opponent;

@@ -760,26 +760,23 @@ namespace CrewChiefV4.RaceRoom
 
                             if (isEnteringPits && !previousOpponentIsEnteringPits)
                             {
-                                int opponentPositionAtSector3 = currentOpponentData.Position;
-                                LapData currentLapData = currentOpponentData.getCurrentLapData();
-                                if (currentLapData != null)
+                                if (currentOpponentData.PositionOnApproachToPitEntry > 0)
                                 {
-                                    opponentPositionAtSector3 = currentLapData.SectorPositions[2];
-                                }
-                                if (opponentPositionAtSector3 == 1)
-                                {
-                                    currentGameState.PitData.LeaderIsPitting = true;
-                                    currentGameState.PitData.OpponentForLeaderPitting = currentOpponentData;
-                                }
-                                if (currentGameState.SessionData.Position > 2 && opponentPositionAtSector3 == currentGameState.SessionData.Position - 1)
-                                {
-                                    currentGameState.PitData.CarInFrontIsPitting = true;
-                                    currentGameState.PitData.OpponentForCarAheadPitting = currentOpponentData;
-                                }
-                                if (!currentGameState.isLast() && opponentPositionAtSector3 == currentGameState.SessionData.Position + 1)
-                                {
-                                    currentGameState.PitData.CarBehindIsPitting = true;
-                                    currentGameState.PitData.OpponentForCarBehindPitting = currentOpponentData;
+                                    if (currentOpponentData.PositionOnApproachToPitEntry == 1)
+                                    {
+                                        currentGameState.PitData.LeaderIsPitting = true;
+                                        currentGameState.PitData.OpponentForLeaderPitting = currentOpponentData;
+                                    }
+                                    if (currentGameState.SessionData.Position > 2 && currentOpponentData.PositionOnApproachToPitEntry == currentGameState.SessionData.Position - 1)
+                                    {
+                                        currentGameState.PitData.CarInFrontIsPitting = true;
+                                        currentGameState.PitData.OpponentForCarAheadPitting = currentOpponentData;
+                                    }
+                                    if (!currentGameState.isLast() && currentOpponentData.PositionOnApproachToPitEntry == currentGameState.SessionData.Position + 1)
+                                    {
+                                        currentGameState.PitData.CarBehindIsPitting = true;
+                                        currentGameState.PitData.OpponentForCarBehindPitting = currentOpponentData;
+                                    }
                                 }
                             }
                             float secondsSinceLastUpdate = (float)new TimeSpan(currentGameState.Ticks - previousGameState.Ticks).TotalSeconds;
@@ -793,7 +790,8 @@ namespace CrewChiefV4.RaceRoom
                                     participantStruct.LapDistance, participantStruct.TireTypeFront, participantStruct.TireSubTypeFront,
                                     participantStruct.TireTypeRear, participantStruct.TireSubTypeRear,
                                     currentGameState.SessionData.SessionHasFixedTime, currentGameState.SessionData.SessionTimeRemaining,
-                                    currentGameState.SessionData.SessionType == SessionType.Race);
+                                    currentGameState.SessionData.SessionType == SessionType.Race,
+                                    currentGameState.SessionData.TrackDefinition.distanceForNearPitEntryChecks);
 
                             if (previousOpponentData != null)
                             {
@@ -1509,8 +1507,9 @@ namespace CrewChiefV4.RaceRoom
         private void upateOpponentData(OpponentData opponentData, int racePosition, int unfilteredRacePosition, int completedLaps, int sector, float sectorTime, 
             float completedLapTime, Boolean isInPits, Boolean lapIsValid, float sessionRunningTime, float secondsSinceLastUpdate, float[] currentWorldPosition,
             float[] previousWorldPosition, float distanceRoundTrack, int tire_type_front, int tyre_sub_type_front, int tire_type_rear, int tyre_sub_type_rear,  
-            Boolean sessionLengthIsTime, float sessionTimeRemaining, Boolean isRace)
+            Boolean sessionLengthIsTime, float sessionTimeRemaining, Boolean isRace, float nearPitEntryPointDistance)
         {
+            float previousDistanceRoundTrack = opponentData.DistanceRoundTrack;
             opponentData.DistanceRoundTrack = distanceRoundTrack;
             float speed;
             Boolean validSpeed = true;
@@ -1528,6 +1527,10 @@ namespace CrewChiefV4.RaceRoom
             }
             opponentData.Position = racePosition;
             opponentData.UnFilteredPosition = unfilteredRacePosition;
+            if (previousDistanceRoundTrack < nearPitEntryPointDistance && opponentData.DistanceRoundTrack > nearPitEntryPointDistance)
+            {
+                opponentData.PositionOnApproachToPitEntry = opponentData.Position;
+            }
             opponentData.WorldPosition = currentWorldPosition;
             opponentData.IsNewLap = false;
 
