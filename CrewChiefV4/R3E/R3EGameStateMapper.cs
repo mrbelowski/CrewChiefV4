@@ -624,7 +624,8 @@ namespace CrewChiefV4.RaceRoom
                     }
                     if (currentGameState.PitData.InPitlane)
                     {
-                        if (previousGameState != null && !previousGameState.PitData.InPitlane)
+                        if (currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.SessionRunningTime > 10 && 
+                            previousGameState != null && !previousGameState.PitData.InPitlane)
                         {
                             currentGameState.PitData.NumPitStops++;
                         }
@@ -759,23 +760,17 @@ namespace CrewChiefV4.RaceRoom
 
                             if (isEnteringPits && !previousOpponentIsEnteringPits)
                             {
-                                int opponentPositionAtSector3 = currentOpponentData.Position;
-                                LapData currentLapData = currentOpponentData.getCurrentLapData();
-                                if (currentLapData != null)
-                                {
-                                    opponentPositionAtSector3 = currentLapData.SectorPositions[2];
-                                }
-                                if (opponentPositionAtSector3 == 1)
+                                if (currentOpponentData.PositionOnApproachToPitEntry == 1)
                                 {
                                     currentGameState.PitData.LeaderIsPitting = true;
                                     currentGameState.PitData.OpponentForLeaderPitting = currentOpponentData;
                                 }
-                                if (currentGameState.SessionData.Position > 2 && opponentPositionAtSector3 == currentGameState.SessionData.Position - 1)
+                                if (currentGameState.SessionData.Position > 2 && currentOpponentData.PositionOnApproachToPitEntry == currentGameState.SessionData.Position - 1)
                                 {
                                     currentGameState.PitData.CarInFrontIsPitting = true;
                                     currentGameState.PitData.OpponentForCarAheadPitting = currentOpponentData;
                                 }
-                                if (!currentGameState.isLast() && opponentPositionAtSector3 == currentGameState.SessionData.Position + 1)
+                                if (!currentGameState.isLast() && currentOpponentData.PositionOnApproachToPitEntry == currentGameState.SessionData.Position + 1)
                                 {
                                     currentGameState.PitData.CarBehindIsPitting = true;
                                     currentGameState.PitData.OpponentForCarBehindPitting = currentOpponentData;
@@ -791,7 +786,9 @@ namespace CrewChiefV4.RaceRoom
                                     new float[] { participantStruct.Position.X, participantStruct.Position.Z }, previousOpponentWorldPosition,
                                     participantStruct.LapDistance, participantStruct.TireTypeFront, participantStruct.TireSubTypeFront,
                                     participantStruct.TireTypeRear, participantStruct.TireSubTypeRear,
-                                    currentGameState.SessionData.SessionHasFixedTime, currentGameState.SessionData.SessionTimeRemaining);
+                                    currentGameState.SessionData.SessionHasFixedTime, currentGameState.SessionData.SessionTimeRemaining,
+                                    currentGameState.SessionData.SessionType == SessionType.Race,
+                                    currentGameState.SessionData.TrackDefinition.distanceForNearPitEntryChecks);
 
                             if (previousOpponentData != null)
                             {
@@ -1084,7 +1081,7 @@ namespace CrewChiefV4.RaceRoom
             //------------------------ Tyre data -----------------------
             // no way to have unmatched tyre types in R3E
             currentGameState.TyreData.HasMatchedTyreTypes = true;
-            currentGameState.TyreData.TireWearActive = shared.TireWearActive == 1;
+            currentGameState.TyreData.TyreWearActive = shared.TireWearActive == 1;
             TyreType tyreType = mapToTyreType(shared.TireTypeFront, shared.TireSubTypeFront, shared.TireTypeRear, shared.TireSubTypeFront, currentGameState.carClass.carClassEnum);            
             currentGameState.TyreData.FrontLeft_CenterTemp = shared.TireTemp.FrontLeft_Center;
             currentGameState.TyreData.FrontLeft_LeftTemp = shared.TireTemp.FrontLeft_Left;
@@ -1507,8 +1504,9 @@ namespace CrewChiefV4.RaceRoom
         private void upateOpponentData(OpponentData opponentData, int racePosition, int unfilteredRacePosition, int completedLaps, int sector, float sectorTime, 
             float completedLapTime, Boolean isInPits, Boolean lapIsValid, float sessionRunningTime, float secondsSinceLastUpdate, float[] currentWorldPosition,
             float[] previousWorldPosition, float distanceRoundTrack, int tire_type_front, int tyre_sub_type_front, int tire_type_rear, int tyre_sub_type_rear,  
-            Boolean sessionLengthIsTime, float sessionTimeRemaining)
+            Boolean sessionLengthIsTime, float sessionTimeRemaining, Boolean isRace, float nearPitEntryPointDistance)
         {
+            float previousDistanceRoundTrack = opponentData.DistanceRoundTrack;
             opponentData.DistanceRoundTrack = distanceRoundTrack;
             float speed;
             Boolean validSpeed = true;
@@ -1526,10 +1524,14 @@ namespace CrewChiefV4.RaceRoom
             }
             opponentData.Position = racePosition;
             opponentData.UnFilteredPosition = unfilteredRacePosition;
+            if (previousDistanceRoundTrack < nearPitEntryPointDistance && opponentData.DistanceRoundTrack > nearPitEntryPointDistance)
+            {
+                opponentData.PositionOnApproachToPitEntry = opponentData.Position;
+            }
             opponentData.WorldPosition = currentWorldPosition;
             opponentData.IsNewLap = false;
-            
-            if (!opponentData.InPits && isInPits)
+
+            if (sessionRunningTime > 10 && isRace && !opponentData.InPits && isInPits)
             {
                 opponentData.NumPitStops++;
             }
