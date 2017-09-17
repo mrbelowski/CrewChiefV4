@@ -38,8 +38,6 @@ namespace CrewChiefV4.Audio
         public static Boolean useAlternateBeeps = UserSettings.GetUserSettings().getBoolean("use_alternate_beeps");
         public static float pauseBetweenMessages = UserSettings.GetUserSettings().getFloat("pause_between_messages");
 
-        public static Boolean rejectMessagesWhenTalking = UserSettings.GetUserSettings().getBoolean("reject_message_when_talking");
-
         private QueuedMessage lastMessagePlayed = null;
 
         private Boolean allowPearlsOnNextPlay = true;
@@ -534,14 +532,13 @@ namespace CrewChiefV4.Audio
                     QueuedMessage queuedMessage = (QueuedMessage)queueToPlay[key];
                     if (isImmediateMessages || queuedMessage.dueTime <= milliseconds)
                     {
-                        Boolean rejectedBecauseTalking = rejectMessagesWhenTalking && SpeechRecogniser.waitingForSpeech;
                         Boolean messageHasExpired = queuedMessage.expiryTime != 0 && queuedMessage.expiryTime < milliseconds;
                         Boolean messageIsStillValid = queuedMessage.isMessageStillValid(key, CrewChief.currentGameState);
                         Boolean queueTooLongForMessage = queuedMessage.maxPermittedQueueLengthForMessage != 0 && willBePlayedCount > queuedMessage.maxPermittedQueueLengthForMessage;
                         Boolean hasJustPlayedAsAnImmediateMessage = !isImmediateMessages && lastImmediateMessageName != null &&
                             key == lastImmediateMessageName && GameStateData.CurrentTime - lastImmediateMessageTime < TimeSpan.FromSeconds(5);
                         if ((isImmediateMessages || !keepQuiet || queuedMessage.playEvenWhenSilenced) && queuedMessage.canBePlayed &&
-                            messageIsStillValid && !keysToPlay.Contains(key) && !queueTooLongForMessage && !messageHasExpired && !hasJustPlayedAsAnImmediateMessage && !rejectedBecauseTalking)
+                            messageIsStillValid && !keysToPlay.Contains(key) && !queueTooLongForMessage && !messageHasExpired && !hasJustPlayedAsAnImmediateMessage)
                         {
                             // special case for 'get ready' event here - we don't want to move this to the top of the queue because 
                             // it makes it sound shit. Bit of a hack, needs a better solution
