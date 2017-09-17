@@ -1543,24 +1543,17 @@ namespace CrewChiefV4.assetto
 
                                     if (isEnteringPits && !previousOpponentIsEnteringPits)
                                     {
-                                        int opponentPositionAtLastSector = currentOpponentData.Position;
-                                        LapData currentLapData = currentOpponentData.getCurrentLapData();
-
-                                        if (currentLapData != null)
-                                        {
-                                            opponentPositionAtLastSector = currentLapData.SectorPositions[numberOfSectorsOnTrack - 1];
-                                        }
-                                        if (opponentPositionAtLastSector == 1)
+                                        if (currentOpponentData.PositionOnApproachToPitEntry == 1)
                                         {
                                             currentGameState.PitData.LeaderIsPitting = true;
                                             currentGameState.PitData.OpponentForLeaderPitting = currentOpponentData;
                                         }
-                                        if (currentGameState.SessionData.Position > 2 && opponentPositionAtLastSector == currentGameState.SessionData.Position - 1)
+                                        if (currentGameState.SessionData.Position > 2 && currentOpponentData.PositionOnApproachToPitEntry == currentGameState.SessionData.Position - 1)
                                         {
                                             currentGameState.PitData.CarInFrontIsPitting = true;
                                             currentGameState.PitData.OpponentForCarAheadPitting = currentOpponentData;
                                         }
-                                        if (!currentGameState.isLast() && opponentPositionAtLastSector == currentGameState.SessionData.Position + 1)
+                                        if (!currentGameState.isLast() && currentOpponentData.PositionOnApproachToPitEntry == currentGameState.SessionData.Position + 1)
                                         {
                                             currentGameState.PitData.CarBehindIsPitting = true;
                                             currentGameState.PitData.OpponentForCarBehindPitting = currentOpponentData;
@@ -1597,8 +1590,8 @@ namespace CrewChiefV4.assetto
                                         currentGameState.SessionData.SessionRunningTime, secondsSinceLastUpdate,
                                         new float[] { participantStruct.worldPosition.x, participantStruct.worldPosition.z }, participantStruct.speedMS, currentOpponentLapDistance,
                                         currentGameState.SessionData.SessionHasFixedTime, currentGameState.SessionData.SessionTimeRemaining,
-                                        numberOfSectorsOnTrack, shared.acsPhysics.airTemp, shared.acsPhysics.roadTemp
-                                        );
+                                        numberOfSectorsOnTrack, shared.acsPhysics.airTemp, shared.acsPhysics.roadTemp,
+                                        currentGameState.SessionData.TrackDefinition.distanceForNearPitEntryChecks);
 
                                     if (previousOpponentData != null)
                                     {
@@ -1828,7 +1821,7 @@ namespace CrewChiefV4.assetto
 
             //tyre data
             currentGameState.TyreData.HasMatchedTyreTypes = true;
-            currentGameState.TyreData.TireWearActive = shared.acsStatic.aidTireRate > 0;
+            currentGameState.TyreData.TyreWearActive = shared.acsStatic.aidTireRate > 0;
 
             currentGameState.TyreData.FrontLeftPressure = playerVehicle.tyreInflation[0] == 1.0f ? shared.acsPhysics.wheelsPressure[0] * 6.894f : 0.0f;
             currentGameState.TyreData.FrontRightPressure = playerVehicle.tyreInflation[1] == 1.0f ? shared.acsPhysics.wheelsPressure[1] * 6.894f : 0.0f;
@@ -2041,8 +2034,9 @@ namespace CrewChiefV4.assetto
         private void upateOpponentData(OpponentData opponentData, int racePosition, int leaderBoardPosition, int completedLaps, int sector,
             float completedLapTime, float lastLapTime, Boolean isInPits, Boolean lapIsValid, float sessionRunningTime, float secondsSinceLastUpdate,
             float[] currentWorldPosition, float speed, float distanceRoundTrack, Boolean sessionLengthIsTime, float sessionTimeRemaining,
-            int trackNumberOfSectors, float airTemperature, float trackTempreture)
+            int trackNumberOfSectors, float airTemperature, float trackTempreture, float nearPitEntryPointDistance)
         {
+            float previousDistanceRoundTrack = opponentData.DistanceRoundTrack;
             opponentData.DistanceRoundTrack = distanceRoundTrack;
             Boolean validSpeed = true;
             if (speed > 500)
@@ -2058,6 +2052,10 @@ namespace CrewChiefV4.assetto
             }
             opponentData.Position = racePosition;
             opponentData.UnFilteredPosition = racePosition;
+            if (previousDistanceRoundTrack < nearPitEntryPointDistance && opponentData.DistanceRoundTrack > nearPitEntryPointDistance)
+            {
+                opponentData.PositionOnApproachToPitEntry = opponentData.Position;
+            }
             opponentData.WorldPosition = currentWorldPosition;
             opponentData.IsNewLap = false;
             opponentData.InPits = isInPits;

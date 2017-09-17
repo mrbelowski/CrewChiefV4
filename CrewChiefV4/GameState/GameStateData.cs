@@ -333,6 +333,12 @@ namespace CrewChiefV4.GameState
 
             foreach (var ld in PlayerLapData)
                 restoreTo.PlayerLapData.Add(ld);
+
+            foreach (var entry in PlayerClassSessionBestLapTimeByTyre)
+                restoreTo.PlayerClassSessionBestLapTimeByTyre.Add(entry.Key, entry.Value);
+
+            foreach (var entry in PlayerBestLapTimeByTyre)
+                restoreTo.PlayerBestLapTimeByTyre.Add(entry.Key, entry.Value);
         }
 
         public void playerStartNewLap(int lapNumber, int position, Boolean inPits, float gameTimeAtStart, Boolean isRaining, float trackTemp, float airTemp)
@@ -550,6 +556,14 @@ namespace CrewChiefV4.GameState
         public Dictionary<TyreType, float> BestLapTimeByTyreType = new Dictionary<TyreType, float>();
         // will be true for 1 tick
         public Boolean hasJustChangedToDifferentTyreType = false;
+
+        // this is a bit of a guess - it's actually the race position when the car is 300m(?) from the start line
+        public int PositionOnApproachToPitEntry = -1;
+
+        public override string ToString()
+        {
+            return DriverRawName;
+        }
 
         public LapData getCurrentLapData()
         {
@@ -1493,7 +1507,7 @@ namespace CrewChiefV4.GameState
         public Boolean LeftRearAttached = true;
         public Boolean RightRearAttached = true;
 
-        public Boolean TireWearActive = false;
+        public Boolean TyreWearActive = false;
 
         // true if all tyres are the same type
         public Boolean HasMatchedTyreTypes = true;
