@@ -851,7 +851,6 @@ namespace CrewChiefV4.PCars
                                     {
                                         currentGameState.SessionData.HasLeadChanged = true;
                                     }
-                                    int opponentPositionAtSector3 = previousOpponentPosition;
                                     Boolean isEnteringPits = false;
                                     Boolean isLeavingPits = false;
                                     if (attemptPitDetection)
@@ -860,11 +859,7 @@ namespace CrewChiefV4.PCars
                                         {
                                             if (currentOpponentSector == 3)
                                             {
-                                                if (previousOpponentSectorNumber == 2)
-                                                {
-                                                    opponentPositionAtSector3 = currentOpponentRacePosition;
-                                                }
-                                                else if (!previousOpponentIsEnteringPits)
+                                                if (!previousOpponentIsEnteringPits)
                                                 {
                                                     isEnteringPits = currentGameState.SessionData.TrackDefinition != null &&
                                                         currentGameState.SessionData.TrackDefinition.isAtPitEntry(participantStruct.mWorldPosition[0], participantStruct.mWorldPosition[2]);
@@ -882,23 +877,23 @@ namespace CrewChiefV4.PCars
                                         }
                                         if (isEnteringPits && !previousOpponentIsEnteringPits)
                                         {
-                                            if (opponentPositionAtSector3 == 1)
+                                            if (currentOpponentData.PositionOnApproachToPitEntry > 0)
                                             {
-                                                Console.WriteLine("leader pitting, pos at sector 3 = " + opponentPositionAtSector3 + " current pos = " + currentOpponentRacePosition);
-                                                currentGameState.PitData.LeaderIsPitting = true;
-                                                currentGameState.PitData.OpponentForLeaderPitting = currentOpponentData;
-                                            }
-                                            if (currentGameState.SessionData.Position > 2 && opponentPositionAtSector3 == currentGameState.SessionData.Position - 1)
-                                            {
-                                                Console.WriteLine("car in front pitting, pos at sector 3 = " + opponentPositionAtSector3 + " current pos = " + currentOpponentRacePosition);
-                                                currentGameState.PitData.CarInFrontIsPitting = true;
-                                                currentGameState.PitData.OpponentForCarAheadPitting = currentOpponentData;
-                                            }
-                                            if (!currentGameState.isLast() && opponentPositionAtSector3 == currentGameState.SessionData.Position + 1)
-                                            {
-                                                Console.WriteLine("car behind pitting, pos at sector 3 = " + opponentPositionAtSector3 + " current pos = " + currentOpponentRacePosition);
-                                                currentGameState.PitData.CarBehindIsPitting = true;
-                                                currentGameState.PitData.OpponentForCarBehindPitting = currentOpponentData;
+                                                if (currentOpponentData.PositionOnApproachToPitEntry == 1)
+                                                {
+                                                    currentGameState.PitData.LeaderIsPitting = true;
+                                                    currentGameState.PitData.OpponentForLeaderPitting = currentOpponentData;
+                                                }
+                                                if (currentGameState.SessionData.Position > 2 && currentOpponentData.PositionOnApproachToPitEntry == currentGameState.SessionData.Position - 1)
+                                                {
+                                                    currentGameState.PitData.CarInFrontIsPitting = true;
+                                                    currentGameState.PitData.OpponentForCarAheadPitting = currentOpponentData;
+                                                }
+                                                if (!currentGameState.isLast() && currentOpponentData.PositionOnApproachToPitEntry == currentGameState.SessionData.Position + 1)
+                                                {
+                                                    currentGameState.PitData.CarBehindIsPitting = true;
+                                                    currentGameState.PitData.OpponentForCarBehindPitting = currentOpponentData;
+                                                }
                                             }
                                         }
                                     }
@@ -910,7 +905,8 @@ namespace CrewChiefV4.PCars
                                             participantStruct.mCurrentLapDistance, shared.mRainDensity == 1,
                                             shared.mAmbientTemperature, shared.mTrackTemperature, opponentCarClass,
                                             currentGameState.SessionData.SessionHasFixedTime, currentGameState.SessionData.SessionTimeRemaining,
-                                            shared.mLastSectorData == null ? -1 : shared.mLastSectorData[i], shared.mLapInvalidatedData == null ? false : shared.mLapInvalidatedData[i]);
+                                            shared.mLastSectorData == null ? -1 : shared.mLastSectorData[i], shared.mLapInvalidatedData == null ? false : shared.mLapInvalidatedData[i],
+                                            currentGameState.SessionData.TrackDefinition.distanceForNearPitEntryChecks);
 
                                     if (previousOpponentData != null)
                                     {
@@ -1289,8 +1285,9 @@ namespace CrewChiefV4.PCars
             float sessionRunningTime, float secondsSinceLastUpdate, float[] currentWorldPosition, float[] previousWorldPosition,
             float previousSpeed, float worldRecordLapTime, float worldRecordS1Time, float worldRecordS2Time, float worldRecordS3Time, 
             float distanceRoundTrack, Boolean isRaining, float trackTemp, float airTemp, CarData.CarClass carClass,
-            Boolean sessionLengthIsTime, float sessionTimeRemaining, float lastSectorTime, Boolean lapInvalidated)
+            Boolean sessionLengthIsTime, float sessionTimeRemaining, float lastSectorTime, Boolean lapInvalidated, float nearPitEntryPointDistance)
         {
+            float previousDistanceRoundTrack = opponentData.DistanceRoundTrack;
             if (opponentData.DriverRawName.StartsWith(NULL_CHAR_STAND_IN) && name != null && name.Trim().Length > 0 && !name.StartsWith(NULL_CHAR_STAND_IN))
             {
                 opponentData.DriverRawName = name;
@@ -1337,6 +1334,10 @@ namespace CrewChiefV4.PCars
             }
             opponentData.Position = racePosition;
             opponentData.UnFilteredPosition = racePosition;
+            if (previousDistanceRoundTrack < nearPitEntryPointDistance && opponentData.DistanceRoundTrack > nearPitEntryPointDistance)
+            {
+                opponentData.PositionOnApproachToPitEntry = opponentData.Position;
+            }
             opponentData.WorldPosition = currentWorldPosition;
             opponentData.IsNewLap = false;
             opponentData.CarClass = carClass;
