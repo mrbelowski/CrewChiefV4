@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using CrewChiefV4.rFactor2;
+using CrewChiefV4.iRacing;
 
 namespace CrewChiefV4
 {
@@ -21,12 +22,14 @@ namespace CrewChiefV4
         private RF1SharedMemoryReader rf1SharedMemoryReader;
         private RF2SharedMemoryReader rf2SharedMemoryReader;
         private ACSSharedMemoryReader ascSharedMemoryReader;
+        private iRacingSharedMemoryReader iracingSharedMemoryReader;
 
         private PCarsGameStateMapper pcarsGameStateMapper;
         private R3EGameStateMapper r3eGameStateMapper;
         private RF1GameStateMapper rf1GameStateMapper;
         private RF2GameStateMapper rf2GameStateMapper;
         private ACSGameStateMapper ascGameStateMapper;
+        private iRacingGameStateMapper iracingGameStateMapper;
 
         public static GameStateReaderFactory getInstance()
         {
@@ -77,6 +80,12 @@ namespace CrewChiefV4
                             rf2SharedMemoryReader = new RF2SharedMemoryReader();
                         }
                         return rf2SharedMemoryReader;
+                    case GameEnum.IRACING_64BIT:
+                        if (iracingSharedMemoryReader == null)
+                        {
+                            iracingSharedMemoryReader = new iRacingSharedMemoryReader();
+                        }
+                        return iracingSharedMemoryReader;
                 }
             }
             return null;
@@ -121,6 +130,12 @@ namespace CrewChiefV4
                             rf2GameStateMapper = new RF2GameStateMapper();
                         }
                         return rf2GameStateMapper;
+                    case GameEnum.IRACING_64BIT:
+                        if (iracingGameStateMapper == null)
+                        {
+                            iracingGameStateMapper = new iRacingGameStateMapper();
+                        }
+                        return iracingGameStateMapper;
                 }
             }
             return null;

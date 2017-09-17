@@ -2288,8 +2288,9 @@ namespace CrewChiefV4.Properties {
             }
             set {
                 this["update_notify_attempted"] = value;
-	    }
+            }
         }
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True")]
@@ -2299,6 +2300,42 @@ namespace CrewChiefV4.Properties {
             }
             set {
                 this["manual_formation_go_with_leader"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool launch_iracing {
+            get {
+                return ((bool)(this["launch_iracing"]));
+            }
+            set {
+                this["launch_iracing"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string iracing_launch_params {
+            get {
+                return ((string)(this["iracing_launch_params"]));
+            }
+            set {
+                this["iracing_launch_params"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string iracing_launch_exe {
+            get {
+                return ((string)(this["iracing_launch_exe"]));
+            }
+            set {
+                this["iracing_launch_exe"] = value;
             }
         }
     }

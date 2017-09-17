@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>iRacingSDK</id>
+    <version>$version$</version>
+    <title>iRacingSDK</title>
+    <authors>Dean Netherton</authors>
+    <owners>Dean Netherton</owners>
+    <projectUrl>https://github.com/vipoo/iRacingSDK.Net</projectUrl>
+    <licenseUrl>https://github.com/vipoo/iRacingSDK.Net/blob/master/LICENSE.txt</licenseUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>
+      This dot.net library allows access to the raw data stream from the iRacing Motorsport Racing simulation (www.iracing.com).  It also provides an interface to control certain aspects of the game.  It is based on the official C++ SDK.
+    </description>
+    <copyright>Copyright 2015</copyright>
+    <tags>iRacing</tags>
+    <dependencies>
+      <dependency id="YamlDotNet" version="3.1.1" />
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="bin\AnyCPU\Release\iRacingSDK.dll" target="lib\net40-client" />
+    <file src="bin\AnyCPU\Release\iRacingSDK.pdb" target="lib\net40-client" />
+  </files>
+</package>

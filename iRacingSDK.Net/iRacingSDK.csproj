@@ -1,0 +1,158 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{5422AE20-F220-4BE1-9E61-5296981ABB5C}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>iRacingSDK</RootNamespace>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\CrewChiefV4\bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <Externalconsole>true</Externalconsole>
+    <LangVersion>5</LangVersion>
+    <AssemblyName>iRacingSDK</AssemblyName>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <GenerateSerializationAssemblies>On</GenerateSerializationAssemblies>
+    <Prefer32Bit>false</Prefer32Bit>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <Optimize>false</Optimize>
+    <OutputPath>..\CrewChiefV4\bin\Release\</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <Externalconsole>true</Externalconsole>
+    <LangVersion>5</LangVersion>
+    <AssemblyName>iRacingSDK</AssemblyName>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DebugType>pdbonly</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+    <Prefer32Bit>false</Prefer32Bit>
+    <DefineConstants>TRACE</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="YamlDotNet">
+      <HintPath>..\packages\YamlDotNet.3.1.1\lib\net35\YamlDotNet.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="DataFeed\CarLeftRight .cs" />
+    <Compile Include="CrossThreadEvents.cs" />
+    <Compile Include="DataFeed\EngineWarnings.cs" />
+    <Compile Include="DataFeed\Telemetry\CarIdxPitStopCount.cs" />
+    <Compile Include="DataSampleExtensions\EmitTo.cs" />
+    <Compile Include="DataSampleExtensions\WithPitStopCounts.cs" />
+    <Compile Include="DataSampleExtensions\VerifyReplayFrames.cs" />
+    <Compile Include="DataSampleExtensions\WithEvents.cs" />
+    <Compile Include="Messaging\Skies.cs" />
+    <Compile Include="Messaging\WeatherType.cs" />
+    <Compile Include="Messaging\iRacingMessaging.cs" />
+    <Compile Include="Messaging\TelemetryCommandMode.cs" />
+    <Compile Include="Messaging\PitCommandMode.cs" />
+    <Compile Include="DataFeed\GeneratedTelemetry.cs" />
+    <Compile Include="DataFeed\GeneratedSessionData.cs" />
+    <Compile Include="Messaging\ReplayPositionMode.cs" />
+    <Compile Include="Messaging\ChatCommandMode.cs" />
+    <Compile Include="DataFeed\Telemetry\FastestLap.cs" />
+    <Compile Include="DataFeed\Telemetry\RaceDistance.cs" />
+    <Compile Include="DataSampleExtensions\AfterEnumeration.cs" />
+    <Compile Include="DataSampleExtensions\WithLastSample.cs" />
+    <Compile Include="DataSampleExtensions\GetBufferedDataFeed.cs" />
+    <Compile Include="DataSampleExtensions\TakeUntil.cs" />
+    <Compile Include="DataSampleExtensions\TakeUntilEndOfReplay.cs" />
+    <Compile Include="DataSampleExtensions\Incidents.cs" />
+    <Compile Include="DataSampleExtensions\IncidentsSupport.cs" />
+    <Compile Include="DataSampleExtensions\WithFastestLaps.cs" />
+    <Compile Include="DataSampleExtensions\WithFinishingStatus.cs" />
+    <Compile Include="DataSampleExtensions\WithCorrectedDistances.cs" />
+    <Compile Include="DataSampleExtensions\WithCorrectedPercentages.cs" />
+    <Compile Include="DataSampleExtensions\RaceOnly.cs" />
+    <Compile Include="DataSampleExtensions\AtSpeed.cs" />
+    <Compile Include="iRacingInstance.cs" />
+    <Compile Include="iRacingListener.cs" />
+    <Compile Include="Messaging\PitCommand.cs" />
+    <Compile Include="Messaging\DisplayUnits.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="iRSDKHeader.cs" />
+    <Compile Include="Support\StringExtensions.cs" />
+    <Compile Include="Support\TimeSpanExtensions.cs" />
+    <Compile Include="Support\TraceError.cs" />
+    <Compile Include="Support\TraceWarning.cs" />
+    <Compile Include="Support\TraceDebug.cs" />
+    <Compile Include="Support\TraceInfo.cs" />
+    <Compile Include="VarBuf.cs" />
+    <Compile Include="VarBufWithIndex.cs" />
+    <Compile Include="Defines.cs" />
+    <Compile Include="VarHeader.cs" />
+    <Compile Include="VarType.cs" />
+    <Compile Include="iRSDKHeaderExtensions.cs" />
+    <Compile Include="DataFeed.cs" />
+    <Compile Include="DataFeed\DataSample.cs" />
+    <Compile Include="iRacing.cs" />
+    <Compile Include="iRacingMemory.cs" />
+    <Compile Include="MemoryMappedViewAccessorExtensions.cs" />
+    <Compile Include="DataFeed\SessionData.cs" />
+    <Compile Include="DataFeed\Session.cs" />
+    <Compile Include="Messaging\Replay.cs" />
+    <Compile Include="Win32\keyboard.cs" />
+    <Compile Include="Win32\Synchronization\Event.cs" />
+    <Compile Include="Win32\Messages.cs" />
+    <Compile Include="Messaging\BroadcastMessage.cs" />
+    <Compile Include="Messaging\ReplaySearchMode.cs" />
+    <Compile Include="DataFeed\SessionState.cs" />
+    <Compile Include="Messaging\TrackLocation.cs" />
+    <Compile Include="DataFeed\SessionFlags.cs" />
+    <Compile Include="DataFeed\Car.cs" />
+    <Compile Include="DataSampleExtensions\ForwardOnly.cs" />
+    <Compile Include="DataFeed\LapSector.cs" />
+    <Compile Include="DataFeed\Telemetry\Telemetry.cs" />
+    <Compile Include="DataFeed\Telemetry\RaceLapSector.cs" />
+    <Compile Include="DataFeed\Telemetry\CarSectorIdx.cs" />
+    <Compile Include="DataFeed\Telemetry\SessionTimeSpan.cs" />
+    <Compile Include="DataFeed\Telemetry\CarIdxDistance.cs" />
+    <Compile Include="DataFeed\Telemetry\Positions.cs" />
+    <Compile Include="DataFeed\Telemetry\FinishingStatuses.cs" />
+    <Compile Include="SerialisationSupport.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <None Include="Docs\DataFeedFilters_WithCorrectedDistances.md" />
+    <None Include="Docs\DataFeedFilters_WithCorrectedPercentages.md" />
+    <None Include="Docs\DataFeedFilters.md" />
+    <None Include="Docs\DataSample.md" />
+    <None Include="iRacingSDK.nuspec" />
+    <None Include="LICENSE.txt" />
+    <None Include="packages.config" />
+    <None Include="README.md" />
+    <None Include="tools\package.cmd" />
+  </ItemGroup>
+  <ProjectExtensions>
+    <MonoDevelop>
+      <Properties>
+        <Policies>
+          <StandardHeader Text="This file is part of iRacingSDK.&#xA;&#xA;Copyright 2014 Dean Netherton&#xA;https://github.com/vipoo/iRacingSDK.Net&#xA;&#xA;iRacingSDK is free software: you can redistribute it and/or modify&#xA;it under the terms of the GNU General Public License as published by&#xA;the Free Software Foundation, either version 3 of the License, or&#xA;(at your option) any later version.&#xA;&#xA;iRacingSDK is distributed in the hope that it will be useful,&#xA;but WITHOUT ANY WARRANTY; without even the implied warranty of&#xA;MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the&#xA;GNU General Public License for more details.&#xA;&#xA;You should have received a copy of the GNU General Public License&#xA;along with iRacingSDK.  If not, see &lt;http://www.gnu.org/licenses/&gt;." IncludeInNewFiles="True" />
+        </Policies>
+      </Properties>
+    </MonoDevelop>
+  </ProjectExtensions>
+  <ItemGroup>
+    <Content Include="tools\nuget.exe" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup />
+</Project>
