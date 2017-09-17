@@ -626,7 +626,8 @@ namespace CrewChiefV4.Events
                 {
                     reportedTyreWearForCurrentPitEntry = false;
                 }
-                if (currentGameState.SessionData.IsNewLap && !currentGameState.PitData.InPitlane && enableTyreWearWarnings && !currentGameState.SessionData.LeaderHasFinishedRace)
+                if (currentGameState.SessionData.IsNewSector && currentGameState.SessionData.SectorNumber == 3
+                    && !currentGameState.PitData.InPitlane && enableTyreWearWarnings && !currentGameState.SessionData.LeaderHasFinishedRace)
                 {
                     reportCurrentTyreConditionStatus(false, false);
                 }
@@ -645,7 +646,8 @@ namespace CrewChiefV4.Events
 
                 if (enableTyreTempWarnings && !currentGameState.SessionData.LeaderHasFinishedRace &&
                     !currentGameState.PitData.InPitlane &&
-                    currentGameState.SessionData.CompletedLaps >= lapsIntoSessionBeforeTempMessage && currentGameState.SessionData.IsNewLap)
+                    currentGameState.SessionData.CompletedLaps >= lapsIntoSessionBeforeTempMessage &&
+                    currentGameState.SessionData.IsNewSector && currentGameState.SessionData.SectorNumber == 2)
                 {
                     reportCurrentTyreTempStatus(false);
                 }
