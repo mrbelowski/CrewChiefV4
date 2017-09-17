@@ -242,6 +242,9 @@ namespace CrewChiefV4.Events
 
         private Dictionary<TyreType, float> playerClassSessionBestLapTimeByTyre = null;
 
+        private int thisLapTyreConditionReportSector = 2;
+        private int thisLapTyreTempReportSector = 3;
+
         public TyreMonitor(AudioPlayer audioPlayer)
         {
             this.audioPlayer = audioPlayer;
@@ -430,6 +433,17 @@ namespace CrewChiefV4.Events
                     currentGameState.carClass.carClassEnum != CarData.CarClassEnum.Kart_2 &&
                     currentGameState.carClass.carClassEnum != CarData.CarClassEnum.KART_F1 &&
                     currentGameState.carClass.carClassEnum != CarData.CarClassEnum.KART_JUNIOR;
+
+                if (random.Next() % 2 == 0)
+                {
+                    thisLapTyreConditionReportSector = 2;
+                    thisLapTyreTempReportSector = 3;
+                }
+                else
+                {
+                    thisLapTyreConditionReportSector = 3;
+                    thisLapTyreTempReportSector = 2;
+                }
             }
 
             enableWheelSpinWarnings = enableWheelSpinWarnings && GlobalBehaviourSettings.enabledMessageTypes.Contains(MessageTypes.LOCKING_AND_SPINNING);
@@ -626,7 +640,7 @@ namespace CrewChiefV4.Events
                 {
                     reportedTyreWearForCurrentPitEntry = false;
                 }
-                if (currentGameState.SessionData.IsNewSector && currentGameState.SessionData.SectorNumber == 3
+                if (currentGameState.SessionData.IsNewSector && currentGameState.SessionData.SectorNumber == thisLapTyreConditionReportSector
                     && !currentGameState.PitData.InPitlane && enableTyreWearWarnings && !currentGameState.SessionData.LeaderHasFinishedRace)
                 {
                     reportCurrentTyreConditionStatus(false, false);
@@ -647,7 +661,7 @@ namespace CrewChiefV4.Events
                 if (enableTyreTempWarnings && !currentGameState.SessionData.LeaderHasFinishedRace &&
                     !currentGameState.PitData.InPitlane &&
                     currentGameState.SessionData.CompletedLaps >= lapsIntoSessionBeforeTempMessage &&
-                    currentGameState.SessionData.IsNewSector && currentGameState.SessionData.SectorNumber == 2)
+                    currentGameState.SessionData.IsNewSector && currentGameState.SessionData.SectorNumber == thisLapTyreTempReportSector)
                 {
                     reportCurrentTyreTempStatus(false);
                 }
