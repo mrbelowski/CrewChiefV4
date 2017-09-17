@@ -814,9 +814,9 @@ namespace CrewChiefV4
                         new Thread(() =>
                         {
                             Thread.Sleep(2000);
-                            if (!channelOpen && crewChief.speechRecogniser.waitingForSpeech)
+                            if (!channelOpen && SpeechRecogniser.waitingForSpeech)
                             {
-                                crewChief.speechRecogniser.waitingForSpeech = false;
+                                SpeechRecogniser.waitingForSpeech = false;
                                 crewChief.youWot();
                             }
                         }).Start();                        
@@ -936,10 +936,10 @@ namespace CrewChiefV4
                         if (controllerConfiguration.hasOutstandingClick(ControllerConfiguration.CHANNEL_OPEN_FUNCTION))
                         {
                             crewChief.speechRecogniser.voiceOptionEnum = VoiceOptionEnum.TOGGLE;
-                            if (crewChief.speechRecogniser.waitingForSpeech)
+                            if (SpeechRecogniser.waitingForSpeech)
                             {
                                 Console.WriteLine("Cancelling...");
-                                crewChief.speechRecogniser.waitingForSpeech = false;
+                                SpeechRecogniser.waitingForSpeech = false;
                                 crewChief.speechRecogniser.recognizeAsyncCancel();
                             }
                             Console.WriteLine("Listening...");
@@ -1022,8 +1022,8 @@ namespace CrewChiefV4
                 {
                     Console.WriteLine("Stopping listening...");
                     try
-                    {                        
-                        crewChief.speechRecogniser.waitingForSpeech = false;
+                    {
+                        SpeechRecogniser.waitingForSpeech = false;
                         crewChief.speechRecogniser.recognizeAsyncCancel();
                     }
                     catch (Exception) { }
