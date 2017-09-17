@@ -1032,8 +1032,6 @@ namespace CrewChiefV4.rFactor2
                     && !opponentPrevious.isEnteringPits())
                 {
                     opponent.setInLap();
-                    var currentLapData = opponent.getCurrentLapData();
-                    
                     if (opponent.PositionOnApproachToPitEntry == 1)
                     {
                         cgs.PitData.LeaderIsPitting = true;

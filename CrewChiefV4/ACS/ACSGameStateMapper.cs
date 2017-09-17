@@ -1543,23 +1543,20 @@ namespace CrewChiefV4.assetto
 
                                     if (isEnteringPits && !previousOpponentIsEnteringPits)
                                     {
-                                        if (currentOpponentData.PositionOnApproachToPitEntry > 0)
+                                        if (currentOpponentData.PositionOnApproachToPitEntry == 1)
                                         {
-                                            if (currentOpponentData.PositionOnApproachToPitEntry == 1)
-                                            {
-                                                currentGameState.PitData.LeaderIsPitting = true;
-                                                currentGameState.PitData.OpponentForLeaderPitting = currentOpponentData;
-                                            }
-                                            if (currentGameState.SessionData.Position > 2 && currentOpponentData.PositionOnApproachToPitEntry == currentGameState.SessionData.Position - 1)
-                                            {
-                                                currentGameState.PitData.CarInFrontIsPitting = true;
-                                                currentGameState.PitData.OpponentForCarAheadPitting = currentOpponentData;
-                                            }
-                                            if (!currentGameState.isLast() && currentOpponentData.PositionOnApproachToPitEntry == currentGameState.SessionData.Position + 1)
-                                            {
-                                                currentGameState.PitData.CarBehindIsPitting = true;
-                                                currentGameState.PitData.OpponentForCarBehindPitting = currentOpponentData;
-                                            }
+                                            currentGameState.PitData.LeaderIsPitting = true;
+                                            currentGameState.PitData.OpponentForLeaderPitting = currentOpponentData;
+                                        }
+                                        if (currentGameState.SessionData.Position > 2 && currentOpponentData.PositionOnApproachToPitEntry == currentGameState.SessionData.Position - 1)
+                                        {
+                                            currentGameState.PitData.CarInFrontIsPitting = true;
+                                            currentGameState.PitData.OpponentForCarAheadPitting = currentOpponentData;
+                                        }
+                                        if (!currentGameState.isLast() && currentOpponentData.PositionOnApproachToPitEntry == currentGameState.SessionData.Position + 1)
+                                        {
+                                            currentGameState.PitData.CarBehindIsPitting = true;
+                                            currentGameState.PitData.OpponentForCarBehindPitting = currentOpponentData;
                                         }
                                     }
 
