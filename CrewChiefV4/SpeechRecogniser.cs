@@ -129,7 +129,7 @@ namespace CrewChiefV4
 
         public static Dictionary<String, int> hoursToNumber = getHourMappings();
 
-        public Boolean waitingForSpeech = false;
+        public static Boolean waitingForSpeech = false;
 
         private static Dictionary<String, int> getNumberMappings()
         {
@@ -518,7 +518,7 @@ namespace CrewChiefV4
         
         void sre_SpeechRecognized(object sender, SpeechRecognizedEventArgs e)
         {
-            waitingForSpeech = false;
+            SpeechRecogniser.waitingForSpeech = false;
             Console.WriteLine("recognised : " + e.Result.Text + " confidence = " + e.Result.Confidence);
             try
             {
@@ -569,7 +569,7 @@ namespace CrewChiefV4
 
         public void recognizeAsync()
         {
-            waitingForSpeech = true;
+            SpeechRecogniser.waitingForSpeech = true;
             sre.RecognizeAsync(RecognizeMode.Multiple);
         }
 
