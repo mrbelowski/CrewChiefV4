@@ -259,11 +259,6 @@ namespace CrewChiefV4.rFactor2
         {
             this.lastScoringET = -1.0;
 
-            if (dumpToFile)
-            {
-                this.dataToDump = new List<RF2StructWrapper>();
-            }
-
             // This needs to be synchronized, because disconnection happens from CrewChief.Run and MainWindow.Dispose.
             lock (this)
             {
@@ -274,6 +269,10 @@ namespace CrewChiefV4.rFactor2
                         this.telemetryBuffer.Connect();
                         this.scoringBuffer.Connect();
                         this.extendedBuffer.Connect();
+
+                        if (dumpToFile)
+                            this.dataToDump = new List<RF2StructWrapper>();
+
                         this.initialised = true;
 
                         Console.WriteLine("Initialized rFactor 2 Shared Memory");
