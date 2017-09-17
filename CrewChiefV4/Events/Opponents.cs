@@ -134,19 +134,35 @@ namespace CrewChiefV4.Events
             }
         }
 
-        private String getOpponentIdentifierForTyreChange(OpponentData opponentData, int playerRacePosition)
+        private Object getOpponentIdentifierForTyreChange(OpponentData opponentData, int playerRacePosition)
         {
             // leader
-            if (opponentData.Position == 1)
+            int positionToCheck;
+            if (opponentData.PositionOnApproachToPitEntry > 0)
+            {
+                positionToCheck = opponentData.PositionOnApproachToPitEntry;
+            }
+            else
+            {
+                // fallback if the PositionOnApproachToPitEntry isn't set - shouldn't really happen
+                positionToCheck = opponentData.Position;
+            }
+            if (positionToCheck == 1)
             {
                 return folderTheLeader;
             }
             // 2nd, 3rd, or within 2 positions of the player
-            if ((opponentData.Position > 1 && opponentData.Position <= 3) || 
-                (playerRacePosition - 2 <= opponentData.Position && playerRacePosition + 2 >= opponentData.Position))   // TODO: check this logic when the kids aren't scrapping
+            if ((positionToCheck > 1 && positionToCheck <= 3) ||
+                (playerRacePosition - 2 <= positionToCheck && playerRacePosition + 2 >= positionToCheck))
             {
-                // TODO: driver name?
-                return Position.folderStub + opponentData.Position;
+                if (opponentData.CanUseName && SoundCache.availableDriverNames.Contains(DriverNameHelper.getUsableDriverName(opponentData.DriverRawName)))
+                {
+                    return opponentData;
+                }
+                else
+                {
+                    return Position.folderStub + positionToCheck;
+                }
             }            
             return null;
         }
@@ -173,12 +189,15 @@ namespace CrewChiefV4.Events
                     string opponentKey = entry.Key;
                     OpponentData opponentData = entry.Value;
 
-                    if (opponentData.hasJustChangedToDifferentTyreType)
+                    // in race sessions, announce tyre type changes once the session is underway
+                    if (currentGameState.SessionData.SessionType == SessionType.Race &&
+                        currentGameState.SessionData.SessionRunningTime > 10 && opponentData.hasJustChangedToDifferentTyreType)
                     {
-                        String opponentIdentifier = getOpponentIdentifierForTyreChange(opponentData, currentGameState.SessionData.Position);
+                        // this may be a race position or an OpponentData object
+                        Object opponentIdentifier = getOpponentIdentifierForTyreChange(opponentData, currentGameState.SessionData.Position);
                         if (opponentIdentifier != null)
                         {
-                            audioPlayer.playMessage(new QueuedMessage("opponent_tyre_change", MessageContents(opponentIdentifier,
+                            audioPlayer.playMessage(new QueuedMessage("opponent_tyre_change_" + opponentIdentifier.ToString(), MessageContents(opponentIdentifier,
                                 folderIsNowOn, TyreMonitor.getFolderForTyreType(opponentData.CurrentTyres)), 0, this));
                         }
                     }
