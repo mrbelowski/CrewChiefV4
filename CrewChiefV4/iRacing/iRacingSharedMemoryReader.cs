@@ -16,19 +16,20 @@ namespace CrewChiefV4.iRacing
         private iRacingStructWrapper[] dataReadFromFile = null;
         private int dataReadFromFileIndex = 0;
         private String lastReadFileName = null;
-        private iRacingConnection iRacingConnection = null;
+        private iRacingConnection iracingConnection = null;
         
         public class iRacingStructWrapper
         {
             public long ticksWhenRead;
             public DataSample data;
-            public iRacingConnection iRacingConnection;
+            public iRacingConnection iracingConnection;
         }
 
         public override void DumpRawGameData()
         {
             if (dumpToFile && dataToDump != null && dataToDump.Count > 0 && filenameToDump != null)
             {
+                
                 SerializeObject(dataToDump.ToArray<iRacingStructWrapper>(), filenameToDump);
             }
         }
@@ -57,7 +58,7 @@ namespace CrewChiefV4.iRacing
                     {
                         initialised = true;
                         Console.WriteLine("Initialised iRacing Shared Memory");
-                        iRacingConnection = new iRacingConnection();                        
+                        iracingConnection = new iRacingConnection();                        
                     }
                     catch (Exception)
                     {
@@ -82,13 +83,15 @@ namespace CrewChiefV4.iRacing
                 }
                 try
                 {
-                    iRacingShared = iRacingConnection.GetDataFeed().First();
+                    iRacingShared = iracingConnection.GetDataFeed().First();
                     iRacingStructWrapper structWrapper = new iRacingStructWrapper();
                     structWrapper.ticksWhenRead = DateTime.Now.Ticks;
                     structWrapper.data = iRacingShared;
-                    structWrapper.iRacingConnection = iRacingConnection;
+                    structWrapper.iracingConnection = iracingConnection;
+
                     if (!forSpotter && dumpToFile && dataToDump != null)
                     {
+                        //iracingConnection.
                         dataToDump.Add(structWrapper);
                     }
                     return structWrapper;
