@@ -110,6 +110,9 @@
     <Compile Include="GameDefinition.cs" />
     <Compile Include="GameStateReaderFactory.cs" />
     <Compile Include="GameState\GlobalBehaviourSettings.cs" />
+    <Compile Include="iRacing\iRacingGameStateMapper.cs" />
+    <Compile Include="iRacing\iRacingSharedMemoryReader.cs" />
+    <Compile Include="iRacing\iRacingSpotter.cs" />
     <Compile Include="NameValidator.cs" />
     <Compile Include="NoisyCartesianCoordinateSpotter.cs" />
     <Compile Include="NumberProcessing\TimeSpanWrapper.cs" />
@@ -315,6 +318,12 @@
     <Content Include="ui_text.txt" />
     <Content Include="..\help.txt" />
     <Content Include="..\README.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\iRacingSDK.Net\iRacingSDK.csproj">
+      <Project>{5422ae20-f220-4be1-9e61-5296981abb5c}</Project>
+      <Name>iRacingSDK</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\SharpDX.2.6.3\build\SharpDX.targets" Condition="Exists('..\packages\SharpDX.2.6.3\build\SharpDX.targets')" />

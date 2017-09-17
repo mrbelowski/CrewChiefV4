@@ -414,6 +414,80 @@ namespace CrewChiefV4
             }
         }
 
+        /*
+            public enum CarLeftRight : uint
+    {
+        irsdk_LROff,
+        irsdk_LRClear, // no cars around us.
+        irsdk_LRCarLeft, // there is a car to our left.
+        irsdk_LRCarRight, // there is a car to our right.
+        irsdk_LRCarLeftRight, // there are cars on each side.
+        irsdk_LR2CarsLeft, // there are two cars to our left.
+        irsdk_LR2CarsRight // there are two cars to our right. 
+    };
+         */ 
+        public void triggerInternal(int carLeftRight)
+        {
+            if (GameStateData.onManualFormationLap)
+            {
+                return;
+            }
+            /*if(carLeftRight != 0 || carLeftRight != 1)
+            {
+                Console.WriteLine("carLeftRight " + carLeftRight);
+            }*/
+            DateTime now = DateTime.Now;
+            channelLeftOpenTimerStarted = false;
+            int carsOnLeft = 0;
+            int carsOnRight = 0;
+            if(carLeftRight == 2)
+            {
+                carsOnLeft = 1;
+            }
+            else if(carLeftRight == 3)
+            {
+                carsOnRight = 1;
+            }
+            else if (carLeftRight == 4)
+            {
+                carsOnRight = 1;
+                carsOnLeft = 1;
+            }
+            else if (carLeftRight == 5)
+            {
+                carsOnRight = 1;
+                carsOnLeft = 2;
+            }
+            else if (carLeftRight == 6)
+            {
+                carsOnRight = 2;
+            }
+            getNextMessage(carsOnLeft, carsOnRight, now);
+            playNextMessage(carsOnLeft, carsOnRight, now);
+            carsOnLeftAtPreviousTick = carsOnLeft;
+            carsOnRightAtPreviousTick = carsOnRight;
+
+            if (carsOnLeftAtPreviousTick > 0 || carsOnRightAtPreviousTick > 0)
+            {
+                if (!channelLeftOpenTimerStarted)
+                {
+                    timeWhenChannelShouldBeClosed = now.Add(timeToWaitBeforeClosingChannelLeftOpen);
+                    channelLeftOpenTimerStarted = true;
+                }
+                if (now > timeWhenChannelShouldBeClosed)
+                {
+                    Console.WriteLine("Closing channel left open in spotter");
+                    timeWhenChannelShouldBeClosed = DateTime.MaxValue;
+                    carsOnLeftAtPreviousTick = 0;
+                    carsOnRightAtPreviousTick = 0;
+                    reportedDoubleOverlapLeft = false;
+                    reportedDoubleOverlapRight = false;
+                    reportedSingleOverlapLeft = false;
+                    reportedSingleOverlapRight = false;
+                    channelLeftOpenTimerStarted = false;
+                }
+            }
+        }
         private Boolean checkOpponentVelocityInRange(float playerX, float playerZ, float opponentX, float opponentZ)
         {
             return Math.Abs(playerX - opponentX) < maxClosingSpeed && Math.Abs(playerZ - opponentZ) < maxClosingSpeed;

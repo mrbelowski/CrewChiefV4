@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+VisualStudioVersion = 12.0.40629.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrewChiefV4", "CrewChiefV4\CrewChiefV4.csproj", "{4240B0E2-69BC-4260-9706-C0CC5AAE04A5}"
 EndProject
@@ -9,6 +9,8 @@ Project("{6141683F-8A12-4E36-9623-2EB02B2C2303}") = "CrewChiefV4_setup_project",
 	ProjectSection(ProjectDependencies) = postProject
 		{4240B0E2-69BC-4260-9706-C0CC5AAE04A5} = {4240B0E2-69BC-4260-9706-C0CC5AAE04A5}
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "iRacingSDK", "iRacingSDK.Net\iRacingSDK.csproj", "{5422AE20-F220-4BE1-9E61-5296981ABB5C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,16 @@ Global
 		{63DF477B-E005-4D23-B3CA-2A118D88383D}.Release|Any CPU.Build.0 = SingleImage
 		{63DF477B-E005-4D23-B3CA-2A118D88383D}.SingleImage|Any CPU.ActiveCfg = SingleImage
 		{63DF477B-E005-4D23-B3CA-2A118D88383D}.SingleImage|Any CPU.Build.0 = SingleImage
+		{5422AE20-F220-4BE1-9E61-5296981ABB5C}.CD_ROM|Any CPU.ActiveCfg = Release|Any CPU
+		{5422AE20-F220-4BE1-9E61-5296981ABB5C}.CD_ROM|Any CPU.Build.0 = Release|Any CPU
+		{5422AE20-F220-4BE1-9E61-5296981ABB5C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5422AE20-F220-4BE1-9E61-5296981ABB5C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5422AE20-F220-4BE1-9E61-5296981ABB5C}.DVD-5|Any CPU.ActiveCfg = Debug|Any CPU
+		{5422AE20-F220-4BE1-9E61-5296981ABB5C}.DVD-5|Any CPU.Build.0 = Debug|Any CPU
+		{5422AE20-F220-4BE1-9E61-5296981ABB5C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5422AE20-F220-4BE1-9E61-5296981ABB5C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5422AE20-F220-4BE1-9E61-5296981ABB5C}.SingleImage|Any CPU.ActiveCfg = Release|Any CPU
+		{5422AE20-F220-4BE1-9E61-5296981ABB5C}.SingleImage|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
