@@ -862,37 +862,40 @@ namespace CrewChiefV4.Audio
         public void Play()
         {
             PlaybackModerator.PreProcessSound(this);
-
-            if (ttsString != null && SoundCache.synthesizer != null)
+            if (PlaybackModerator.ShouldPlaySound())
             {
-                try { 
-                    SoundCache.synthesizer.Speak(ttsString);
-                }
-                catch (Exception e)
+                if (ttsString != null && SoundCache.synthesizer != null)
                 {
-                    Console.WriteLine("TTS failed with sound " + ttsString + ", " + e.Message);
-                }
-            }
-            else
-            {
-                if (!allowCaching)
-                {
-                    SoundPlayer soundPlayer = new SoundPlayer(fullPath);
-                    soundPlayer.Load();
-                    soundPlayer.PlaySync();
                     try
                     {
-                        soundPlayer.Dispose();
+                        SoundCache.synthesizer.Speak(ttsString);
                     }
-                    catch (Exception) { }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("TTS failed with sound " + ttsString + ", " + e.Message);
+                    }
                 }
                 else
                 {
-                    if (!loadedSoundPlayer)
+                    if (!allowCaching)
                     {
-                        LoadSoundPlayer();
+                        SoundPlayer soundPlayer = new SoundPlayer(fullPath);
+                        soundPlayer.Load();
+                        soundPlayer.PlaySync();
+                        try
+                        {
+                            soundPlayer.Dispose();
+                        }
+                        catch (Exception) { }
                     }
-                    this.soundPlayer.PlaySync();
+                    else
+                    {
+                        if (!loadedSoundPlayer)
+                        {
+                            LoadSoundPlayer();
+                        }
+                        this.soundPlayer.PlaySync();
+                    }
                 }
             }
         }

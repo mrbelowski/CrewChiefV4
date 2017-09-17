@@ -24,6 +24,7 @@ namespace CrewChiefV4.Audio
         private static bool isSpotterAndChiefSameVoice = UserSettings.GetUserSettings().getString("spotter_name") == defaultSpotterId;
         private static bool insertBeepOutBetweenSpotterAndChief = UserSettings.GetUserSettings().getBoolean("insert_beep_out_between_spotter_and_chief");
         private static bool insertBeepInBetweenSpotterAndChief = UserSettings.GetUserSettings().getBoolean("insert_beep_in_between_spotter_and_chief");
+        private static bool rejectMessagesWhenTalking = UserSettings.GetUserSettings().getBoolean("reject_message_when_talking");
         private static bool lastSoundWasSpotter = false;
         private static AudioPlayer audioPlayer = null;
 
@@ -146,8 +147,10 @@ namespace CrewChiefV4.Audio
         //public static void PostProcessSound()
         //{ }
 
-        //public static bool ShouldPlaySound()
-        //{ }
+        public static bool ShouldPlaySound()
+        {
+            return !rejectMessagesWhenTalking || !SpeechRecogniser.waitingForSpeech;
+        }
 
         private static void InjectBeepOutIn(SingleSound sound)
         {
