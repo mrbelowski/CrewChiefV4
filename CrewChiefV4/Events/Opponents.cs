@@ -144,7 +144,7 @@ namespace CrewChiefV4.Events
             }
             else
             {
-                // TODO: update the PCars, AC, RF1 mappers to track this new position var
+                // fallback if the PositionOnApproachToPitEntry isn't set - shouldn't really happen
                 positionToCheck = opponentData.Position;
             }
             if (positionToCheck == 1)
