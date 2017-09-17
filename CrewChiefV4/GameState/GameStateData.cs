@@ -557,6 +557,14 @@ namespace CrewChiefV4.GameState
         // will be true for 1 tick
         public Boolean hasJustChangedToDifferentTyreType = false;
 
+        // this is a bit of a guess - it's actually the race position when the car is 300m(?) from the start line
+        public int PositionOnApproachToPitEntry = -1;
+
+        public override string ToString()
+        {
+            return DriverRawName;
+        }
+
         public LapData getCurrentLapData()
         {
             if (OpponentLapData.Count > 0)
