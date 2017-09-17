@@ -861,11 +861,15 @@ namespace CrewChiefV4.Audio
 
         public void Play()
         {
+            if (!PlaybackModerator.ShouldPlaySound(this))
+                return;
+
             PlaybackModerator.PreProcessSound(this);
 
             if (ttsString != null && SoundCache.synthesizer != null)
             {
-                try { 
+                try
+                {
                     SoundCache.synthesizer.Speak(ttsString);
                 }
                 catch (Exception e)
