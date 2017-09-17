@@ -38,11 +38,13 @@ namespace CrewChiefV4.iRacing
 
             if(!shared.IsConnected)
             {
-                return previousGameState;
+                return null;
             }
 
             var blah = shared.Telemetry.Speed;
             SessionType sessionType = mapToSessionType(shared.SessionData.SessionInfo.Sessions[0].SessionType);
+            currentGameState.SessionData.SessionRunningTime = (float)shared.Telemetry.SessionTime;
+
             /*foreach(Car car in shared.Telemetry.Cars)
             {
                 Console.WriteLine(car.Details.UserName);

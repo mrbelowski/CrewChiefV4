@@ -60,10 +60,12 @@ namespace CrewChiefV4.iRacing
 
         public void trigger(Object lastStateObj, Object currentStateObj, GameStateData currentGameState)
         {
-
             DataSample lastState = ((CrewChiefV4.iRacing.iRacingSharedMemoryReader.iRacingStructWrapper)lastStateObj).data;
             DataSample currentState = ((CrewChiefV4.iRacing.iRacingSharedMemoryReader.iRacingStructWrapper)currentStateObj).data;
-
+            if(!currentState.IsConnected)
+            {
+                return;
+            }
             this.internalSpotter.setCarDimensions(GlobalBehaviourSettings.spotterVehicleLength, GlobalBehaviourSettings.spotterVehicleWidth);
             internalSpotter.triggerInternal((int)currentState.Telemetry.CarLeftRight);
             return;

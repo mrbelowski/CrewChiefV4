@@ -542,7 +542,7 @@ namespace CrewChiefV4
 
                         // if we're paused or viewing another car, the mapper will just return the previous game state so we don't lose all the
                         // persistent state information. If this is the case, don't process any stuff
-                        if (nextGameState != null && (nextGameState.SessionData.AbruptSessionEndDetected || nextGameState != currentGameState) || gameDefinition.gameEnum == GameEnum.IRACING_64BIT)
+                        if (nextGameState != null && (nextGameState.SessionData.AbruptSessionEndDetected || nextGameState != currentGameState))
                         {
                             previousGameState = currentGameState;
                             currentGameState = nextGameState;
@@ -619,7 +619,7 @@ namespace CrewChiefV4
                                         (currentGameState.SessionData.SessionRunningTime > previousGameState.SessionData.SessionRunningTime ||
                                         (previousGameState.SessionData.SessionPhase != currentGameState.SessionData.SessionPhase)) ||
                                         ((gameDefinition.gameEnum == GameEnum.PCARS_32BIT || gameDefinition.gameEnum == GameEnum.PCARS_64BIT || gameDefinition.gameEnum == GameEnum.PCARS_NETWORK) &&
-                                            currentGameState.SessionData.SessionHasFixedTime && currentGameState.SessionData.SessionTotalRunTime == -1) || gameDefinition.gameEnum == GameEnum.IRACING_64BIT)
+                                            currentGameState.SessionData.SessionHasFixedTime && currentGameState.SessionData.SessionTotalRunTime == -1))
                             {
                                 if (spotter != null)
                                 {
