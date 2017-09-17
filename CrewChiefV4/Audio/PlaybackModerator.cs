@@ -17,8 +17,11 @@ namespace CrewChiefV4.Audio
 {
     public static class PlaybackModerator
     {
+#if DEBUG
+        private static bool enableTracing = true;
+#else
         private static bool enableTracing = false;
-
+#endif
         // This field is necessary to avoid construction of NoisyCartesianCoordinateSpotter before AudioPlayer.
         private static string defaultSpotterId = "Jim (default)";
         private static bool isSpotterAndChiefSameVoice = UserSettings.GetUserSettings().getString("spotter_name") == defaultSpotterId;
@@ -147,9 +150,15 @@ namespace CrewChiefV4.Audio
         //public static void PostProcessSound()
         //{ }
 
-        public static bool ShouldPlaySound()
+        public static bool ShouldPlaySound(SingleSound sound)
         {
-            return !rejectMessagesWhenTalking || !SpeechRecogniser.waitingForSpeech;
+            if (rejectMessagesWhenTalking && SpeechRecogniser.waitingForSpeech)
+            {
+                PlaybackModerator.Trace(string.Format("Sound {0} rejected because we're in the middle of a voice command", sound.fullPath));
+                return false;
+            }
+
+            return true;
         }
 
         private static void InjectBeepOutIn(SingleSound sound)

@@ -553,10 +553,6 @@ namespace CrewChiefV4.Audio
                         }
                         else
                         {
-                            if (rejectedBecauseTalking)
-                            {
-                                Console.WriteLine("Clip " + key + " rejected because we're in the middle of a voice command");
-                            }
                             if (!messageIsStillValid)
                             {
                                 Console.WriteLine("Clip " + key + " is not valid");

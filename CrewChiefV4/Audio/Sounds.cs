@@ -861,41 +861,42 @@ namespace CrewChiefV4.Audio
 
         public void Play()
         {
+            if (!PlaybackModerator.ShouldPlaySound(this))
+                return;
+
             PlaybackModerator.PreProcessSound(this);
-            if (PlaybackModerator.ShouldPlaySound())
+
+            if (ttsString != null && SoundCache.synthesizer != null)
             {
-                if (ttsString != null && SoundCache.synthesizer != null)
+                try
                 {
+                    SoundCache.synthesizer.Speak(ttsString);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("TTS failed with sound " + ttsString + ", " + e.Message);
+                }
+            }
+            else
+            {
+                if (!allowCaching)
+                {
+                    SoundPlayer soundPlayer = new SoundPlayer(fullPath);
+                    soundPlayer.Load();
+                    soundPlayer.PlaySync();
                     try
                     {
-                        SoundCache.synthesizer.Speak(ttsString);
+                        soundPlayer.Dispose();
                     }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine("TTS failed with sound " + ttsString + ", " + e.Message);
-                    }
+                    catch (Exception) { }
                 }
                 else
                 {
-                    if (!allowCaching)
+                    if (!loadedSoundPlayer)
                     {
-                        SoundPlayer soundPlayer = new SoundPlayer(fullPath);
-                        soundPlayer.Load();
-                        soundPlayer.PlaySync();
-                        try
-                        {
-                            soundPlayer.Dispose();
-                        }
-                        catch (Exception) { }
+                        LoadSoundPlayer();
                     }
-                    else
-                    {
-                        if (!loadedSoundPlayer)
-                        {
-                            LoadSoundPlayer();
-                        }
-                        this.soundPlayer.PlaySync();
-                    }
+                    this.soundPlayer.PlaySync();
                 }
             }
         }
