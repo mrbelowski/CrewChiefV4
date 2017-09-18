@@ -83,7 +83,7 @@ namespace CrewChiefV4.iRacing
                 }
                 try
                 {
-                    iRacingShared = iracingConnection.GetDataFeed().First();
+                    iRacingShared = iracingConnection.GetDataFeed().WithFinishingStatus().WithCorrectedDistances().WithCorrectedPercentages().First();
                     iRacingStructWrapper structWrapper = new iRacingStructWrapper();
                     structWrapper.ticksWhenRead = DateTime.Now.Ticks;
                     structWrapper.data = iRacingShared;

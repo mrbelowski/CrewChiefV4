@@ -1012,5 +1012,7 @@ namespace iRacingSDK
         /// </summary>
         public System.Int32 TickCount { get { return (System.Int32)this["TickCount"]; } }
 
+        public System.Int32 PlayerCarIdx { get { return (System.Int32)this["PlayerCarIdx"]; } }
+
     }
 }

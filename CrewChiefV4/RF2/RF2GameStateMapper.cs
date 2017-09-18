@@ -490,7 +490,7 @@ namespace CrewChiefV4.rFactor2
 
             this.processPlayerTimingData(ref shared.scoring, cgs, pgs, ref playerScoring);
 
-            csd.SessionTimesAtEndOfSectors = pgs != null ? psd.SessionTimesAtEndOfSectors : new SessionData().SessionTimesAtEndOfSectors;
+            csd.SessionTimesAtEndOfSectors = pgs != null ? psd.SessionTimesAtEndOfSectors : new CrewChiefV4.GameState.SessionData().SessionTimesAtEndOfSectors;
 
             if (csd.IsNewSector && !csd.IsNewSession)
             {

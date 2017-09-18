@@ -353,7 +353,7 @@ namespace CrewChiefV4.rFactor1
                     currentGameState.SessionData.SessionRunningTime,  lastSectorTime > 0 || (currentGameState.SessionData.SectorNumber >= 2 && player.totalLaps == 1), 
                     false, shared.trackTemp, shared.ambientTemp);
             }
-            currentGameState.SessionData.SessionTimesAtEndOfSectors = previousGameState != null ? previousGameState.SessionData.SessionTimesAtEndOfSectors : new SessionData().SessionTimesAtEndOfSectors;
+            currentGameState.SessionData.SessionTimesAtEndOfSectors = previousGameState != null ? previousGameState.SessionData.SessionTimesAtEndOfSectors : new CrewChiefV4.GameState.SessionData().SessionTimesAtEndOfSectors;
             if (currentGameState.SessionData.IsNewSector && !currentGameState.SessionData.IsNewSession)
             {
                 // there's a slight delay due to scoring updating every 500 ms, so we can't use SessionRunningTime here
