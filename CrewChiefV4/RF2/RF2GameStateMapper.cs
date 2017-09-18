@@ -158,10 +158,10 @@ namespace CrewChiefV4.rFactor2
             this.lastSessionStartTicks = shared.extended.mTicksSessionStarted;
             this.lastSessionEndTicks = shared.extended.mTicksSessionEnded;
 
+            // TODO: investigate game shutdown case, why we enter here?
             if (shared.scoring.mScoringInfo.mNumVehicles == 0  // No session data
-                || sessionJustEnded && sessionJustStarted
-                || sessionJustEnded && !sessionJustStarted
-                || !sessionJustEnded && sessionJustStarted && this.waitingToTerminateSession)
+                || sessionJustEnded
+                || this.waitingToTerminateSession)
             {
                 this.sessionStarted = shared.extended.mSessionStarted == 1;
 
@@ -184,10 +184,10 @@ namespace CrewChiefV4.rFactor2
                     && pgs.SessionData.SessionPhase != SessionPhase.Unavailable)
                 {
                     // Begin the wait for session re-start or a run out of time
-                    if (!this.waitingToTerminateSession && !sessionJustStarted)
+                    if (!this.waitingToTerminateSession && !this.sessionStarted)
                     {
                         // TODO: this sometimes triggers and never terminates.
-                        Console.WriteLine("Abrupt Session End: start session end wait.");
+                        Console.WriteLine("AAAAAAbrupt Session End: start to wait for session end.");
                         // Start waiting for session end.
                         this.ticksWhenSessionEnded = DateTime.Now.Ticks;
                         this.waitingToTerminateSession = true;
@@ -195,19 +195,19 @@ namespace CrewChiefV4.rFactor2
                         return pgs;
                     }
 
-                    if (!sessionJustStarted)
+                    if (!this.sessionStarted)
                     {
                         var timeSinceWaitStarted = TimeSpan.FromTicks(DateTime.Now.Ticks - this.ticksWhenSessionEnded);
                         if (timeSinceWaitStarted.TotalMilliseconds < 2000)
                         {
-                            Console.WriteLine("Abrupt Session End: continue session end wait.");
+                            Console.WriteLine("AAAAAAAAAAAbrupt Session End: continue session end wait.");
                             return pgs;
                         }
                         else
-                            Console.WriteLine("Abrupt Session End: session end wait timed out.");
+                            Console.WriteLine("AAAAAAAAAAAAAAbrupt Session End: session end wait timed out.");
                     }
                     else
-                        Console.WriteLine("Abrupt Session End: new session just started, terminate previous session.");
+                        Console.WriteLine("AAAAAAAAAAAAAbrupt Session End: new session just started, terminate previous session.");
 
                     // Wait is over.  Terminate the abrupt session.
                     this.waitingToTerminateSession = false; 
@@ -216,7 +216,7 @@ namespace CrewChiefV4.rFactor2
                     {
                         // Looks like race restart without exiting to monitor.  We can't reliably detect session end
                         // here, because it is timing affected (we might miss this between updates).  So better not do it.
-                        Console.WriteLine("Abrupt Session End: suppressed due to restart during real time.");
+                        Console.WriteLine("AAAAAAAAAAAAAAAAAAbrupt Session End: suppressed due to restart during real time.");
                     }
                     else
                     {
@@ -225,18 +225,19 @@ namespace CrewChiefV4.rFactor2
                             // If user has not set any lap time during the session, mark it as DNF.
                             pgs.SessionData.IsDNF = true;
 
-                            Console.WriteLine("Abrupt Session End: mark session as DNF due to no valid laps made.");
+                            Console.WriteLine("AAAAAAAAAbrupt Session End: mark session as DNF due to no valid laps made.");
                         }
                         // While this detects the "Next Session" this still sounds a bit weird if user clicks
                         // "Leave Session" and goes to main menu.  60 sec delay (minSessionRunTimeForEndMessages) helps, but not entirely.
                         pgs.SessionData.SessionPhase = SessionPhase.Finished;
                         pgs.SessionData.AbruptSessionEndDetected = true;
-                        Console.WriteLine("Abrupt Session End: SessionType: " + pgs.SessionData.SessionType);
+                        Console.WriteLine("AAAAAAAAbrupt Session End: SessionType: " + pgs.SessionData.SessionType);
 
                         return pgs;
                     }
                 }
 
+                this.waitingToTerminateSession = false;
                 this.isOfflineSession = true;
                 this.distanceOffTrack = 0;
                 this.isApproachingTrack = false;
