@@ -68,7 +68,7 @@ namespace CrewChiefV4.rFactor2
             this.suspensionDamageThresholds.Add(new CornerData.EnumWithThresholds(DamageLevel.DESTROYED, 1.0f, 2.0f));
         }
 
-        private int[] minimumSupportedVersionParts = new int[] { 2, 0, 0, 0 };
+        private int[] minimumSupportedVersionParts = new int[] { 2, 2, 0, 0 };
         public static bool pluginVerified = false;
         public void versionCheck(Object memoryMappedFileStruct)
         {
@@ -132,15 +132,40 @@ namespace CrewChiefV4.rFactor2
             this.speechRecogniser = speechRecogniser;
         }
 
+        private bool waitingToTerminateSession = false;
+        private bool sessionStarted = false;
+        private long ticksWhenSessionEnded = DateTime.MinValue.Ticks;
+        private Int64 lastSessionEndTicks = -1;
+        private Int64 lastSessionStartTicks = -1;
         public GameStateData mapToGameStateData(Object memoryMappedFileStruct, GameStateData previousGameState)
         {
             var pgs = previousGameState;
             var shared = memoryMappedFileStruct as CrewChiefV4.rFactor2.RF2SharedMemoryReader.RF2StructWrapper;
             var cgs = new GameStateData(shared.ticksWhenRead);
 
-            // No session data
-            if (shared.scoring.mScoringInfo.mNumVehicles == 0)
+            // Initialize session transition members.
+            if (this.lastSessionStartTicks == -1)
+                this.lastSessionStartTicks = shared.extended.mTicksSessionStarted;
+
+            if (this.lastSessionEndTicks == -1)
+                this.lastSessionEndTicks = shared.extended.mTicksSessionEnded;
+
+            // Check if session has just ended.
+            var sessionJustEnded = this.lastSessionEndTicks != shared.extended.mTicksSessionEnded;
+            var sessionJustStarted = this.lastSessionStartTicks != shared.extended.mTicksSessionStarted;
+
+            // Update transition tracking variables.
+            this.lastSessionStartTicks = shared.extended.mTicksSessionStarted;
+            this.lastSessionEndTicks = shared.extended.mTicksSessionEnded;
+
+            if (shared.scoring.mScoringInfo.mNumVehicles == 0  // No session data
+                || sessionJustEnded && sessionJustStarted
+                || sessionJustEnded && !sessionJustStarted
+                || !sessionJustEnded && sessionJustStarted && this.waitingToTerminateSession)
             {
+                this.sessionStarted = shared.extended.mSessionStarted == 1;
+
+                // Note on quali
                 // If user clicks "Next Session" the session phase goes to "Finished" only if session time actually ran out.
                 // Otherwise, game does not update Session Phase.  We do, however, see the numVehicles  drop to zero.
                 // If we have a previous game state and it's in a valid phase here, update it to "Finished" and return it,
@@ -158,6 +183,35 @@ namespace CrewChiefV4.rFactor2
                     && pgs.SessionData.SessionPhase != SessionPhase.Finished
                     && pgs.SessionData.SessionPhase != SessionPhase.Unavailable)
                 {
+                    // Begin the wait for session re-start or a run out of time
+                    if (!this.waitingToTerminateSession && !sessionJustStarted)
+                    {
+                        // TODO: this sometimes triggers and never terminates.
+                        Console.WriteLine("Abrupt Session End: start session end wait.");
+                        // Start waiting for session end.
+                        this.ticksWhenSessionEnded = DateTime.Now.Ticks;
+                        this.waitingToTerminateSession = true;
+
+                        return pgs;
+                    }
+
+                    if (!sessionJustStarted)
+                    {
+                        var timeSinceWaitStarted = TimeSpan.FromTicks(DateTime.Now.Ticks - this.ticksWhenSessionEnded);
+                        if (timeSinceWaitStarted.TotalMilliseconds < 2000)
+                        {
+                            Console.WriteLine("Abrupt Session End: continue session end wait.");
+                            return pgs;
+                        }
+                        else
+                            Console.WriteLine("Abrupt Session End: session end wait timed out.");
+                    }
+                    else
+                        Console.WriteLine("Abrupt Session End: new session just started, terminate previous session.");
+
+                    // Wait is over.  Terminate the abrupt session.
+                    this.waitingToTerminateSession = false; 
+
                     if (this.lastInRealTimeState && pgs.SessionData.SessionType == SessionType.Race)
                     {
                         // Looks like race restart without exiting to monitor.  We can't reliably detect session end
@@ -199,6 +253,7 @@ namespace CrewChiefV4.rFactor2
             }
 
             this.lastInRealTimeState = shared.extended.mInRealtimeFC == 1 || shared.scoring.mScoringInfo.mInRealtime == 1;
+            this.sessionStarted = shared.extended.mSessionStarted == 1;
 
             // --------------------------------
             // session data
