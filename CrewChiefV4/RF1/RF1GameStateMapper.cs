@@ -458,7 +458,7 @@ namespace CrewChiefV4.rFactor1
             // --------------------------------
             // tire data
             // Automobilista reports in Kelvin
-            currentGameState.TyreData.TireWearActive = true;
+            currentGameState.TyreData.TyreWearActive = true;
             currentGameState.TyreData.LeftFrontAttached = shared.wheel[(int)rFactor1Constant.rfWheelIndex.frontLeft].detached == 0;
             currentGameState.TyreData.FrontLeft_LeftTemp = shared.wheel[(int)rFactor1Constant.rfWheelIndex.frontLeft].temperature[0] - 273;
             currentGameState.TyreData.FrontLeft_CenterTemp = shared.wheel[(int)rFactor1Constant.rfWheelIndex.frontLeft].temperature[1] - 273;
@@ -689,6 +689,7 @@ namespace CrewChiefV4.rFactor1
                     {
                         opponent.OpponentLapData.Add(old);
                     }
+                    opponent.NumPitStops = opponentPrevious.NumPitStops;
                 }
                 opponent.UnFilteredPosition = opponent.Position;
                 opponent.SessionTimeAtLastPositionChange = opponentPrevious != null && opponentPrevious.Position != opponent.Position ? currentGameState.SessionData.SessionRunningTime : -1;
@@ -703,11 +704,33 @@ namespace CrewChiefV4.rFactor1
                 opponent.PreviousBestLapTime = opponentPrevious != null && opponentPrevious.CurrentBestLapTime > 0 && 
                     opponentPrevious.CurrentBestLapTime > opponent.CurrentBestLapTime ? opponentPrevious.CurrentBestLapTime : -1;
                 float previousDistanceRoundTrack = opponentPrevious != null ? opponentPrevious.DistanceRoundTrack : 0;
+
+                if (previousDistanceRoundTrack > 0)
+                {
+                    // if we've just crossed the 'near to pit entry' mark, update our near-pit-entry position. Otherwise copy it from the previous state
+                    if (previousDistanceRoundTrack < currentGameState.SessionData.TrackDefinition.distanceForNearPitEntryChecks
+                        && opponent.DistanceRoundTrack > currentGameState.SessionData.TrackDefinition.distanceForNearPitEntryChecks)
+                    {
+                        opponent.PositionOnApproachToPitEntry = opponent.Position;
+                    }
+                    else
+                    {
+                        opponent.PositionOnApproachToPitEntry = opponentPrevious.PositionOnApproachToPitEntry;
+                    }
+                }
+
                 opponent.bestSector1Time = vehicle.bestSector1 > 0 ? vehicle.bestSector1 : -1;
                 opponent.bestSector2Time = vehicle.bestSector2 > 0 && vehicle.bestSector1 > 0 ? vehicle.bestSector2 - vehicle.bestSector1 : -1;
                 opponent.bestSector3Time = vehicle.bestLapTime > 0 && vehicle.bestSector2 > 0 ? vehicle.bestLapTime - vehicle.bestSector2 : -1;
                 opponent.LastLapTime = vehicle.lastLapTime > 0 ? vehicle.lastLapTime : -1;
                 opponent.InPits = vehicle.inPits == 1;
+
+                if (currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.SessionRunningTime > 10
+                    && opponentPrevious != null && !opponentPrevious.InPits && opponent.InPits)
+                {
+                    opponent.NumPitStops++;
+                }
+
                 lastSectorTime = -1;
                 switch (opponent.CurrentSectorNumber)
                 {
@@ -748,23 +771,23 @@ namespace CrewChiefV4.rFactor1
                 if (vehicle.inPits == 1 && opponent.CurrentSectorNumber == 3 && opponentPrevious != null && !opponentPrevious.isEnteringPits())
                 {
                     opponent.setInLap();
-                    LapData currentLapData = opponent.getCurrentLapData();
-                    int sector3Position = currentLapData != null && currentLapData.SectorPositions[2] > 0 ? currentLapData.SectorPositions[2] : opponent.Position;
-                    if (sector3Position == 1)
+                    if (opponent.PositionOnApproachToPitEntry == 1)
                     {
                         currentGameState.PitData.LeaderIsPitting = true;
                         currentGameState.PitData.OpponentForLeaderPitting = opponent;
                     }
-                    if (sector3Position == currentGameState.SessionData.Position - 1 && currentGameState.SessionData.Position > 2)
+
+                    if (opponent.PositionOnApproachToPitEntry == currentGameState.SessionData.Position - 1 && currentGameState.SessionData.Position > 2)
                     {
                         currentGameState.PitData.CarInFrontIsPitting = true;
                         currentGameState.PitData.OpponentForCarAheadPitting = opponent;
                     }
-                    if (sector3Position == currentGameState.SessionData.Position + 1 && !currentGameState.isLast())
+
+                    if (opponent.PositionOnApproachToPitEntry == currentGameState.SessionData.Position + 1 && !currentGameState.isLast())
                     {
                         currentGameState.PitData.CarBehindIsPitting = true;
                         currentGameState.PitData.OpponentForCarBehindPitting = opponent;
-                    }
+                    }                    
                 }
                 if (opponentPrevious != null && opponentPrevious.Position > 1 && opponent.Position == 1)
                 {
