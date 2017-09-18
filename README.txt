@@ -10,7 +10,9 @@ For support and discussions about Crew Chief we have our very own forum here: ht
 
 Changelog
 ---------
-Version 4.7.9.6: Added Imola corner mappings for R3E; some additional checks to prevent mandatory pitstop messages playing during or after you've completed your stop
+Version 4.7.9.9: R3E 64Bit support; Added voice command to tell you (once the data is availalbe) what the relative performance difference is between different tyre types based on the best lap in the session for tyre type - e.g. "Softs are about 0.4 seconds faster than Mediums, Mediums are about 1.2 seconds faster than Hards". The voice command is "Give me tyre pace differences", "What are the tire speeds?" / "Whats the difference between tires?" / "Compare tire compounds" (currently R3E only); Added opponent tyre type info when they leave the pits after changing tyre type.
+
+Version 4.7.9.7: More RF2 race end detection fixes; Added Imola corner mappings for R3E; fixed race start message being repeated on manual rolling starts; some additional checks to prevent mandatory pitstop messages playing during or after you've completed your stop.
 
 Version 4.7.9.5: Compatibility fixes for new Raceroom shared memory layout; Map to new Raceroom tyre types - you can ask "what tyres is [opponent name] on?", or "what tyres am I on?"
 

@@ -29,7 +29,7 @@ namespace CrewChiefV4.GameState
     public enum TyreType
     {
         // separate enum for compound & weather, and prime / option?
-        Hard, Medium, Soft, Wet, Intermediate, Road, Bias_Ply, Unknown_Race, R3E_NEW, Prime, Option, Alternate, Primary
+        Hard, Medium, Soft, Super_Soft, Ultra_Soft, Wet, Intermediate, Road, Bias_Ply, Unknown_Race, R3E_NEW, Prime, Option, Alternate, Primary
     }
 
     public enum BrakeType
@@ -303,6 +303,11 @@ namespace CrewChiefV4.GameState
         // artificially by mappers, not by the game.
         public Boolean AbruptSessionEndDetected = false;
 
+        public Dictionary<TyreType, float> PlayerClassSessionBestLapTimeByTyre = new Dictionary<TyreType, float>();
+
+        // as above, but for the player only
+        public Dictionary<TyreType, float> PlayerBestLapTimeByTyre = new Dictionary<TyreType, float>();
+
         public SessionData()
         {
             SessionTimesAtEndOfSectors.Add(1, -1);
@@ -328,6 +333,12 @@ namespace CrewChiefV4.GameState
 
             foreach (var ld in PlayerLapData)
                 restoreTo.PlayerLapData.Add(ld);
+
+            foreach (var entry in PlayerClassSessionBestLapTimeByTyre)
+                restoreTo.PlayerClassSessionBestLapTimeByTyre.Add(entry.Key, entry.Value);
+
+            foreach (var entry in PlayerBestLapTimeByTyre)
+                restoreTo.PlayerBestLapTimeByTyre.Add(entry.Key, entry.Value);
         }
 
         public void playerStartNewLap(int lapNumber, int position, Boolean inPits, float gameTimeAtStart, Boolean isRaining, float trackTemp, float airTemp)
@@ -531,10 +542,28 @@ namespace CrewChiefV4.GameState
 
         // be careful with this one, not all games actually set it...
         public Boolean InPits = false;
+        // and this one:
+        public int NumPitStops = 0;
 
         public TrackLandmarksTiming trackLandmarksTiming = new TrackLandmarksTiming();
 
         public String stoppedInLandmark = null;
+
+        public int PitStopCount = 0;
+
+        // these are only set for R3E
+        public Dictionary<int, TyreType> TyreChangesByLap = new Dictionary<int, TyreType>();
+        public Dictionary<TyreType, float> BestLapTimeByTyreType = new Dictionary<TyreType, float>();
+        // will be true for 1 tick
+        public Boolean hasJustChangedToDifferentTyreType = false;
+
+        // this is a bit of a guess - it's actually the race position when the car is 300m(?) from the start line
+        public int PositionOnApproachToPitEntry = -1;
+
+        public override string ToString()
+        {
+            return DriverRawName;
+        }
 
         public LapData getCurrentLapData()
         {
@@ -1444,6 +1473,8 @@ namespace CrewChiefV4.GameState
 
         // RF1 hack for mandatory pit stop windows, which are used to trigger 'box now' messages
         public Boolean ResetEvents;
+
+        public int NumPitStops = 0;
     }
 
     public class PenatiesData
@@ -1476,7 +1507,7 @@ namespace CrewChiefV4.GameState
         public Boolean LeftRearAttached = true;
         public Boolean RightRearAttached = true;
 
-        public Boolean TireWearActive = false;
+        public Boolean TyreWearActive = false;
 
         // true if all tyres are the same type
         public Boolean HasMatchedTyreTypes = true;

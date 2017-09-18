@@ -24,6 +24,11 @@ namespace CrewChiefV4.Events
         public static String folderAheadIsPitting = "opponents/ahead_is_pitting";
         public static String folderBehindIsPitting = "opponents/behind_is_pitting";
 
+        public static String folderTheLeaderIsNowOn = "opponents/the_leader_is_now_on";
+        public static String folderTheCarAheadIsNowOn = "opponents/the_car_ahead_is_now_on";
+        public static String folderTheCarBehindIsNowOn = "opponents/the_car_behind_is_now_on";
+        public static String folderIsNowOn = "opponents/is_now_on";
+
         public static String folderLeaderHasJustDoneA = "opponents/the_leader_has_just_done_a";
         public static String folderTheCarAheadHasJustDoneA = "opponents/the_car_ahead_has_just_done_a";
         public static String folderTheCarBehindHasJustDoneA = "opponents/the_car_behind_has_just_done_a";
@@ -129,6 +134,39 @@ namespace CrewChiefV4.Events
             }
         }
 
+        private Object getOpponentIdentifierForTyreChange(OpponentData opponentData, int playerRacePosition)
+        {
+            // leader
+            int positionToCheck;
+            if (opponentData.PositionOnApproachToPitEntry > 0)
+            {
+                positionToCheck = opponentData.PositionOnApproachToPitEntry;
+            }
+            else
+            {
+                // fallback if the PositionOnApproachToPitEntry isn't set - shouldn't really happen
+                positionToCheck = opponentData.Position;
+            }
+            if (positionToCheck == 1)
+            {
+                return folderTheLeader;
+            }
+            // 2nd, 3rd, or within 2 positions of the player
+            if ((positionToCheck > 1 && positionToCheck <= 3) ||
+                (playerRacePosition - 2 <= positionToCheck && playerRacePosition + 2 >= positionToCheck))
+            {
+                if (opponentData.CanUseName && SoundCache.availableDriverNames.Contains(DriverNameHelper.getUsableDriverName(opponentData.DriverRawName)))
+                {
+                    return opponentData;
+                }
+                else
+                {
+                    return Position.folderStub + positionToCheck;
+                }
+            }            
+            return null;
+        }
+
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
             if (GameStateData.onManualFormationLap)
@@ -150,6 +188,19 @@ namespace CrewChiefV4.Events
                 {
                     string opponentKey = entry.Key;
                     OpponentData opponentData = entry.Value;
+
+                    // in race sessions, announce tyre type changes once the session is underway
+                    if (currentGameState.SessionData.SessionType == SessionType.Race &&
+                        currentGameState.SessionData.SessionRunningTime > 10 && opponentData.hasJustChangedToDifferentTyreType)
+                    {
+                        // this may be a race position or an OpponentData object
+                        Object opponentIdentifier = getOpponentIdentifierForTyreChange(opponentData, currentGameState.SessionData.Position);
+                        if (opponentIdentifier != null)
+                        {
+                            audioPlayer.playMessage(new QueuedMessage("opponent_tyre_change_" + opponentIdentifier.ToString(), MessageContents(opponentIdentifier,
+                                folderIsNowOn, TyreMonitor.getFolderForTyreType(opponentData.CurrentTyres)), 0, this));
+                        }
+                    }
 
                     if (opponentData.IsNewLap && opponentData.LastLapTime > 0 && opponentData.OpponentLapData.Count > 1 &&
                         opponentData.LastLapValid && opponentData.CurrentBestLapTime > 0)
