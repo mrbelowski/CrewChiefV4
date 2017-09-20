@@ -477,11 +477,15 @@ namespace CrewChiefV4
         public Boolean unknownTrack = false;
         public List<TrackLandmark> trackLandmarks = new List<TrackLandmark>();
         public Boolean isOval = false;
+        // this is the distance round the track where we save the opponent's race position before he slows for pit entry
+        public float distanceForNearPitEntryChecks;
 
         public TrackDefinition(String name, float pitEntryExitPointsDiameter, float trackLength, float[] pitEntryPoint, float[] pitExitPoint)
         {
             this.name = name;
             this.trackLength = trackLength;
+            // hard-code this to 300metres before start line for now, but it needs to be overrideable on a per-track basis
+            this.distanceForNearPitEntryChecks = trackLength - 300;
             this.hasPitLane = true;
             this.pitEntryPoint = pitEntryPoint;
             this.pitExitPoint = pitExitPoint;
@@ -492,6 +496,8 @@ namespace CrewChiefV4
         {
             this.name = name;
             this.trackLength = trackLength;
+            // hard-code this to 300metres before start line for now, but it needs to be overrideable on a per-track basis
+            this.distanceForNearPitEntryChecks = trackLength - 300;
             this.hasPitLane = false;
         }
 
@@ -500,6 +506,8 @@ namespace CrewChiefV4
             this.name = name;
             this.id = id;
             this.trackLength = trackLength;
+            // hard-code this to 300metres before start line for now, but it needs to be overrideable on a per-track basis
+            this.distanceForNearPitEntryChecks = trackLength - 300;
             this.hasPitLane = false;
         }
 
@@ -507,6 +515,8 @@ namespace CrewChiefV4
         {
             this.name = name;
             this.trackLength = trackLength;
+            // hard-code this to 300metres before start line for now, but it needs to be overrideable on a per-track basis
+            this.distanceForNearPitEntryChecks = trackLength - 300;
             this.hasPitLane = true;
             this.sectorsOnTrack = sectorsOnTrack;
             this.sectorPoints = sectorPoints;

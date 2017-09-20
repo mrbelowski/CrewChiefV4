@@ -5,6 +5,7 @@ using System.Text;
 using CrewChiefV4.RaceRoom.RaceRoomData;
 using CrewChiefV4.GameState;
 using CrewChiefV4.Audio;
+using CrewChiefV4.NumberProcessing;
 
 namespace CrewChiefV4.Events
 {
@@ -132,6 +133,7 @@ namespace CrewChiefV4.Events
         public static String folderMediumTyres = "tyre_monitor/mediums";
         public static String folderSoftTyres = "tyre_monitor/softs";
         public static String folderSuperSoftTyres = "tyre_monitor/super_softs";
+        public static String folderUltraSoftTyres = "tyre_monitor/ultra_softs";
         public static String folderPrimaryTyres = "tyre_monitor/primaries";
         public static String folderAlternateTyres = "tyre_monitor/alternates";
         public static String folderPrimeTyres = "tyre_monitor/primes";
@@ -139,6 +141,9 @@ namespace CrewChiefV4.Events
         public static String folderWetTyres = "tyre_monitor/wets";
         public static String folderIntermediateTyres = "tyre_monitor/intermediates";
         public static String folderSlickTyres = "tyre_monitor/slicks";
+
+        public static String folderAreAbout = "tyre_monitor/are_about";
+        public static String folderFasterThan = "tyre_monitor/faster_than";
 
         private int lapsIntoSessionBeforeTempMessage = 2;        
 
@@ -235,6 +240,11 @@ namespace CrewChiefV4.Events
         private Boolean lastBrakeTempCheckOK = true;
         private Boolean lastTyreTempCheckOK = true;
 
+        private Dictionary<TyreType, float> playerClassSessionBestLapTimeByTyre = null;
+
+        private int thisLapTyreConditionReportSector = 2;
+        private int thisLapTyreTempReportSector = 3;
+
         public TyreMonitor(AudioPlayer audioPlayer)
         {
             this.audioPlayer = audioPlayer;
@@ -244,6 +254,10 @@ namespace CrewChiefV4.Events
         {
             switch (tyreType)
             {
+                case TyreType.Ultra_Soft:
+                    return folderUltraSoftTyres;
+                case TyreType.Super_Soft:
+                    return folderSuperSoftTyres;
                 case TyreType.Soft:
                     return folderSoftTyres;
                 case TyreType.Medium:
@@ -288,8 +302,8 @@ namespace CrewChiefV4.Events
             lastTyreConditionMessage = null;
             peakBrakeTempForLap = 0;
             timeLeftFrontIsLockedForLap = 0;
-            timeRightFrontIsLockedForLap = 0; 
-            timeLeftRearIsLockedForLap = 0; 
+            timeRightFrontIsLockedForLap = 0;
+            timeLeftRearIsLockedForLap = 0;
             timeRightRearIsLockedForLap = 0;
             timeLeftFrontIsSpinningForLap = 0;
             timeRightFrontIsSpinningForLap = 0;
@@ -331,6 +345,7 @@ namespace CrewChiefV4.Events
 
             currentCornerName = null;
             enableCornerSpecificLockingAndSpinningChecks = false;
+            playerClassSessionBestLapTimeByTyre = null;
         }
 
         private Boolean isBrakeTempPeakForLap(float leftFront, float rightFront, float leftRear, float rightRear) 
@@ -368,6 +383,7 @@ namespace CrewChiefV4.Events
             {
                 return;
             }
+            playerClassSessionBestLapTimeByTyre = currentGameState.SessionData.PlayerClassSessionBestLapTimeByTyre;
             if (logTemps && currentGameState.SessionData.IsNewSector)
             {
                 logTyreTemps(currentGameState.TyreData, currentGameState.SessionData.SectorNumber, currentGameState.SessionData.CompletedLaps);
@@ -417,6 +433,17 @@ namespace CrewChiefV4.Events
                     currentGameState.carClass.carClassEnum != CarData.CarClassEnum.Kart_2 &&
                     currentGameState.carClass.carClassEnum != CarData.CarClassEnum.KART_F1 &&
                     currentGameState.carClass.carClassEnum != CarData.CarClassEnum.KART_JUNIOR;
+
+                if (random.Next(0, 1) == 0)
+                {
+                    thisLapTyreConditionReportSector = 2;
+                    thisLapTyreTempReportSector = 3;
+                }
+                else
+                {
+                    thisLapTyreConditionReportSector = 3;
+                    thisLapTyreTempReportSector = 2;
+                }
             }
 
             enableWheelSpinWarnings = enableWheelSpinWarnings && GlobalBehaviourSettings.enabledMessageTypes.Contains(MessageTypes.LOCKING_AND_SPINNING);
@@ -577,7 +604,7 @@ namespace CrewChiefV4.Events
             leftRearTyreTemp = currentGameState.TyreData.RearLeft_CenterTemp;
             rightRearTyreTemp = currentGameState.TyreData.RearRight_CenterTemp;
 
-            if (currentGameState.TyreData.TireWearActive)
+            if (currentGameState.TyreData.TyreWearActive)
             {
                 leftFrontWearPercent = currentGameState.TyreData.FrontLeftPercentWear;
                 leftRearWearPercent = currentGameState.TyreData.RearLeftPercentWear;
@@ -613,7 +640,8 @@ namespace CrewChiefV4.Events
                 {
                     reportedTyreWearForCurrentPitEntry = false;
                 }
-                if (currentGameState.SessionData.IsNewLap && !currentGameState.PitData.InPitlane && enableTyreWearWarnings && !currentGameState.SessionData.LeaderHasFinishedRace)
+                if (currentGameState.SessionData.IsNewSector && currentGameState.SessionData.SectorNumber == thisLapTyreConditionReportSector
+                    && !currentGameState.PitData.InPitlane && enableTyreWearWarnings && !currentGameState.SessionData.LeaderHasFinishedRace)
                 {
                     reportCurrentTyreConditionStatus(false, false);
                 }
@@ -632,7 +660,8 @@ namespace CrewChiefV4.Events
 
                 if (enableTyreTempWarnings && !currentGameState.SessionData.LeaderHasFinishedRace &&
                     !currentGameState.PitData.InPitlane &&
-                    currentGameState.SessionData.CompletedLaps >= lapsIntoSessionBeforeTempMessage && currentGameState.SessionData.IsNewLap)
+                    currentGameState.SessionData.CompletedLaps >= lapsIntoSessionBeforeTempMessage &&
+                    currentGameState.SessionData.IsNewSector && currentGameState.SessionData.SectorNumber == thisLapTyreTempReportSector)
                 {
                     reportCurrentTyreTempStatus(false);
                 }
@@ -945,6 +974,17 @@ namespace CrewChiefV4.Events
                 else
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));                    
+                }
+            }
+            else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.WHAT_ARE_THE_RELATIVE_TYRE_PERFORMANCES))
+            {
+                List<TyrePerformanceContainer> tyrePerformances = getRelativeTyrePerformance();
+                foreach (TyrePerformanceContainer tyrePeformance in tyrePerformances) 
+                {
+                    audioPlayer.playMessageImmediately(new QueuedMessage("tyre_comparison_" + tyrePeformance.type1 + "-" + tyrePeformance.type2, 
+                        MessageContents(getFolderForTyreType(tyrePeformance.type1), folderAreAbout, 
+                                        TimeSpanWrapper.FromSeconds(tyrePeformance.bestLapDelta, Precision.AUTO_GAPS),
+                                        folderFasterThan, getFolderForTyreType(tyrePeformance.type2)), 0, null));
                 }
             }
         }
@@ -1557,11 +1597,72 @@ namespace CrewChiefV4.Events
             return WheelsLockedEnum.NONE;
         }
 
+        private List<TyrePerformanceContainer> getRelativeTyrePerformance()
+        {
+            List<TyrePerformanceContainer> performanceData = new List<TyrePerformanceContainer>();
+            // don't bother unless we have 2 or more tyre types in the data:
+            if (this.playerClassSessionBestLapTimeByTyre != null && this.playerClassSessionBestLapTimeByTyre.Count > 1)
+            {
+                // get a TyrePeformanceContainer for each pair of tyres we have data for:
+                foreach (TyreType tyreType1 in Enum.GetValues(typeof(TyreType)))
+                {
+                    if (this.playerClassSessionBestLapTimeByTyre.ContainsKey(tyreType1))
+                    {
+                        float type1BestLap = this.playerClassSessionBestLapTimeByTyre[tyreType1];
+                        // now get all the other tyre types best lap to compare it to
+                        foreach (TyreType tyreType2 in Enum.GetValues(typeof(TyreType)))
+                        {
+                            if (tyreType1 != tyreType2 && this.playerClassSessionBestLapTimeByTyre.ContainsKey(tyreType2) &&
+                                !comparisonAlreadyPresent(performanceData, tyreType1, tyreType2))
+                            {
+                                float type2BestLap = this.playerClassSessionBestLapTimeByTyre[tyreType2];
+                                if (type1BestLap > type2BestLap)
+                                {
+                                    performanceData.Add(new TyrePerformanceContainer(tyreType2, tyreType1, type1BestLap - type2BestLap));
+                                }
+                                else if (type1BestLap < type2BestLap)
+                                {
+                                    performanceData.Add(new TyrePerformanceContainer(tyreType1, tyreType2, type2BestLap - type1BestLap));
+                                }
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            return performanceData;
+        }
+
+        private Boolean comparisonAlreadyPresent(List<TyrePerformanceContainer> performanceData, TyreType tyreType1, TyreType tyreType2)
+        {
+            foreach (TyrePerformanceContainer container in performanceData)
+            {
+                if ((container.type1 == tyreType1 && container.type2 == tyreType2) ||
+                    (container.type2 == tyreType1 && container.type1 == tyreType2))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         private enum WheelsLockedEnum
         {
             // note that we don't have separate values for left and right rear locking because it's common for FWD cars to cock 
             // a wheel on turn-in so we only care of both rears are locking
             NONE, FRONTS, LEFT_FRONT, RIGHT_FRONT, REARS
+        }
+    }
+    class TyrePerformanceContainer
+    {
+        public TyreType type1;
+        public TyreType type2;
+        public float bestLapDelta;
+        public TyrePerformanceContainer(TyreType type1, TyreType type2, float bestLapDelta)
+        {
+            this.type1 = type1;
+            this.type2 = type2;
+            this.bestLapDelta = bestLapDelta;
         }
     }
 }

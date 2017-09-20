@@ -143,7 +143,7 @@ namespace CrewChiefV4.Audio
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine("Unable to set override sound folder ", e.Message);
+                    Console.WriteLine("Unable to set override sound folder " + e.Message);
                 }
             }
             if (useOverride && overrideSoundDirectory != null)
