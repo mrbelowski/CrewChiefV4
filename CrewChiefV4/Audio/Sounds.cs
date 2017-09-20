@@ -49,6 +49,13 @@ namespace CrewChiefV4.Audio
 
         public SoundCache(DirectoryInfo soundsFolder, String[] eventTypesToKeepCached, Boolean useSwearyMessages, Boolean allowCaching, String selectedPersonalisation)
         {
+            // ensure the static state is nuked before we start updating it
+            SoundCache.dynamicLoadedSounds.Clear();
+            SoundCache.soundSets.Clear();
+            SoundCache.singleSounds.Clear();
+            SoundCache.availableDriverNames.Clear();
+            SoundCache.availableSounds.Clear();
+            SoundCache.availablePrefixesAndSuffixes.Clear();
             if (useTTS)
             {
                 try
@@ -508,8 +515,15 @@ namespace CrewChiefV4.Audio
                         SoundSet soundSet = new SoundSet(eventDetailFolder, this.useSwearyMessages, false, cachePermanently, allowCaching, cachePermanently);
                         if (soundSet.hasSounds)
                         {
-                            availableSounds.Add(fullEventName);
-                            soundSets.Add(fullEventName, soundSet);
+                            if (soundSets.ContainsKey(fullEventName))
+                            {
+                                Console.WriteLine("event " + fullEventName + " sound set is already loaded");
+                            }
+                            else 
+                            {
+                                availableSounds.Add(fullEventName);
+                                soundSets.Add(fullEventName, soundSet);
+                            }
                         }
                     }
                 }
