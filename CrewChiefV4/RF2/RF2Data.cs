@@ -349,11 +349,9 @@ namespace CrewChiefV4.rFactor2
             public byte mRearFlapLegalStatus;      // 0=disallowed, 1=criteria detected but not allowed quite yet, 2=allowed
             public byte mIgnitionStarter;          // 0=off 1=ignition 2=ignition+starter
 
-            [XmlIgnore]
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 18)]
             public byte[] mFrontTireCompoundName;         // name of front tire compound
 
-            [XmlIgnore]
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 18)]
             public byte[] mRearTireCompoundName;          // name of rear tire compound
 

@@ -363,6 +363,12 @@ namespace CrewChiefV4.rFactor2
                 GlobalBehaviourSettings.UpdateFromCarClass(cgs.carClass);
             }
 
+            // Restore cumulative data.
+            if (psd != null && !csd.IsNewSession)
+            {
+                cgs.PitData.NumPitStops = pgs.PitData.NumPitStops;
+            }
+
             csd.SessionStartTime = csd.IsNewSession ? cgs.Now : psd.SessionStartTime;
             csd.SessionHasFixedTime = csd.SessionTotalRunTime > 0.0f;
 
@@ -448,6 +454,13 @@ namespace CrewChiefV4.rFactor2
 
             // mInGarageStall also means retired or before race start, but for now use it here.
             cgs.PitData.InPitlane = playerScoring.mInPits == 1 || playerScoring.mInGarageStall == 1;
+
+            if (csd.SessionType == SessionType.Race && csd.SessionRunningTime > 10
+                && cgs.PitData.InPitlane && pgs != null && !pgs.PitData.InPitlane)
+            {
+                cgs.PitData.NumPitStops++;
+            }
+
             cgs.PitData.IsAtPitExit = pgs != null && pgs.PitData.InPitlane && !cgs.PitData.InPitlane;
             cgs.PitData.OnOutLap = cgs.PitData.InPitlane && csd.SectorNumber == 1;
 
@@ -479,6 +492,7 @@ namespace CrewChiefV4.rFactor2
             {
                 cgs.PitData.MandatoryPitStopCompleted = pgs.PitData.MandatoryPitStopCompleted || cgs.PitData.IsMakingMandatoryPitStop;
             }
+
             ////////////////////////////////////
             // Timings
             if (psd != null && !csd.IsNewSession)
@@ -487,7 +501,7 @@ namespace CrewChiefV4.rFactor2
                 // Those values change on sector/lap change, otherwise stay the same between updates.
                 psd.restorePlayerTimings(csd);
             }
-
+            
             this.processPlayerTimingData(ref shared.scoring, cgs, pgs, ref playerScoring);
 
             csd.SessionTimesAtEndOfSectors = pgs != null ? psd.SessionTimesAtEndOfSectors : new SessionData().SessionTimesAtEndOfSectors;
@@ -610,10 +624,15 @@ namespace CrewChiefV4.rFactor2
             cgs.ControlData.ControlType = mapToControlType((rFactor2Constants.rF2Control)playerScoring.mControl);
 
             // --------------------------------
-            // tire data
+            // Tyre data
             // rF2 reports in Kelvin
-            cgs.TyreData.TireWearActive = true;
+            cgs.TyreData.TyreWearActive = true;
+
+            // For now, all tyres will be reported as front compund.
+            var tt = this.mapToTyreType(ref playerTelemetry);
+
             var wheelFrontLeft = playerTelemetry.mWheels[(int)rFactor2Constants.rF2WheelIndex.FrontLeft];
+            cgs.TyreData.FrontLeftTyreType = tt;
             cgs.TyreData.LeftFrontAttached = wheelFrontLeft.mDetached == 0;
             cgs.TyreData.FrontLeft_LeftTemp = (float)wheelFrontLeft.mTemperature[0] - 273.15f;
             cgs.TyreData.FrontLeft_CenterTemp = (float)wheelFrontLeft.mTemperature[1] - 273.15f;
@@ -632,6 +651,7 @@ namespace CrewChiefV4.rFactor2
             }
 
             var wheelFrontRight = playerTelemetry.mWheels[(int)rFactor2Constants.rF2WheelIndex.FrontRight];
+            cgs.TyreData.FrontRightTyreType = tt;
             cgs.TyreData.RightFrontAttached = wheelFrontRight.mDetached == 0;
             cgs.TyreData.FrontRight_LeftTemp = (float)wheelFrontRight.mTemperature[0] - 273.15f;
             cgs.TyreData.FrontRight_CenterTemp = (float)wheelFrontRight.mTemperature[1] - 273.15f;
@@ -647,6 +667,7 @@ namespace CrewChiefV4.rFactor2
                 cgs.TyreData.PeakFrontRightTemperatureForLap = frontRightTemp;
 
             var wheelRearLeft = playerTelemetry.mWheels[(int)rFactor2Constants.rF2WheelIndex.RearLeft];
+            cgs.TyreData.RearLeftTyreType = tt;
             cgs.TyreData.LeftRearAttached = wheelRearLeft.mDetached == 0;
             cgs.TyreData.RearLeft_LeftTemp = (float)wheelRearLeft.mTemperature[0] - 273.15f;
             cgs.TyreData.RearLeft_CenterTemp = (float)wheelRearLeft.mTemperature[1] - 273.15f;
@@ -662,6 +683,7 @@ namespace CrewChiefV4.rFactor2
                 cgs.TyreData.PeakRearLeftTemperatureForLap = rearLeftTemp;
 
             var wheelRearRight = playerTelemetry.mWheels[(int)rFactor2Constants.rF2WheelIndex.RearRight];
+            cgs.TyreData.RearRightTyreType = tt;
             cgs.TyreData.RightRearAttached = wheelRearRight.mDetached == 0;
             cgs.TyreData.RearRight_LeftTemp = (float)wheelRearRight.mTemperature[0] - 273.15f;
             cgs.TyreData.RearRight_CenterTemp = (float)wheelRearRight.mTemperature[1] - 273.15f;
@@ -766,6 +788,24 @@ namespace CrewChiefV4.rFactor2
                     csd.PlayerClassSessionBestLapTime = csd.PlayerLapTimeSessionBest > 0.0f ?
                         csd.PlayerLapTimeSessionBest : -1.0f;
 
+                    if (csd.IsNewLap 
+                        && psd != null && !psd.IsNewLap
+                        && csd.LapTimePrevious > 0.0f
+                        && csd.PreviousLapWasValid)
+                    {
+                        if (!csd.PlayerClassSessionBestLapTimeByTyre.ContainsKey(cgs.TyreData.FrontLeftTyreType)
+                            || csd.PlayerClassSessionBestLapTimeByTyre[cgs.TyreData.FrontLeftTyreType] > csd.LapTimePrevious)
+                        {
+                            csd.PlayerClassSessionBestLapTimeByTyre[cgs.TyreData.FrontLeftTyreType] = csd.LapTimePrevious;
+                        }
+
+                        if (!csd.PlayerBestLapTimeByTyre.ContainsKey(cgs.TyreData.FrontLeftTyreType)
+                            || csd.PlayerBestLapTimeByTyre[cgs.TyreData.FrontLeftTyreType] > csd.LapTimePrevious)
+                        {
+                            csd.PlayerBestLapTimeByTyre[cgs.TyreData.FrontLeftTyreType] = csd.LapTimePrevious;
+                        }
+                    }
+
                     continue;
                 }
 
@@ -839,10 +879,16 @@ namespace CrewChiefV4.rFactor2
                 var opponent = new OpponentData();
                 opponent.DriverRawName = driverName;
                 opponent.CarClass = CarData.getCarClassForClassName(getStringFromBytes(vehicleScoring.mVehicleClass));
-
+                opponent.CurrentTyres = this.mapToTyreType(ref vehicleTelemetry);
                 opponent.DriverRawName = driverName;
                 opponent.DriverNameSet = opponent.DriverRawName.Length > 0;
                 opponent.Position = vehicleScoring.mPlace;
+
+                // Telemetry isn't always available, initialize first tyre set 10 secs or more into race.
+                if (csd.SessionType == SessionType.Race && csd.SessionRunningTime > 10
+                    && opponentPrevious != null
+                    && opponentPrevious.TyreChangesByLap.Count == 0)  // If tyre for initial lap was never set.
+                    opponent.TyreChangesByLap[0] = opponent.CurrentTyres;
 
                 if (opponent.DriverNameSet && opponentPrevious == null && CrewChief.enableDriverNames)
                 {
@@ -851,11 +897,18 @@ namespace CrewChiefV4.rFactor2
                         " is using car class " + opponent.CarClass.getClassIdentifier() +
                         " at position " + opponent.Position.ToString());
                 }
-
+                
+                // Carry over state
                 if (opponentPrevious != null)
                 {
+                    // Copy so that we can safely use previous state.
                     foreach (var old in opponentPrevious.OpponentLapData)
                         opponent.OpponentLapData.Add(old);
+
+                    foreach (var old in opponentPrevious.TyreChangesByLap)
+                        opponent.TyreChangesByLap.Add(old.Key, old.Value);
+
+                    opponent.NumPitStops = opponentPrevious.NumPitStops;
                 }
 
                 opponent.UnFilteredPosition = opponent.Position;
@@ -881,6 +934,20 @@ namespace CrewChiefV4.rFactor2
                     opponent.DistanceRoundTrack = (float)vehicleScoring.mLapDist;
                 }
 
+                if (opponentPrevious != null) 
+                {
+                    // if we've just crossed the 'near to pit entry' mark, update our near-pit-entry position. Otherwise copy it from the previous state
+                    if (opponentPrevious.DistanceRoundTrack < csd.TrackDefinition.distanceForNearPitEntryChecks
+                        && opponent.DistanceRoundTrack > csd.TrackDefinition.distanceForNearPitEntryChecks)
+                    {
+                        opponent.PositionOnApproachToPitEntry = opponent.Position;
+                    }
+                    else
+                    {
+                        opponent.PositionOnApproachToPitEntry = opponentPrevious.PositionOnApproachToPitEntry;
+                    }
+                }
+
                 opponent.CurrentBestLapTime = vehicleScoring.mBestLapTime > 0.0f ? (float)vehicleScoring.mBestLapTime : -1.0f;
                 opponent.PreviousBestLapTime = opponentPrevious != null && opponentPrevious.CurrentBestLapTime > 0.0f &&
                     opponentPrevious.CurrentBestLapTime > opponent.CurrentBestLapTime ? opponentPrevious.CurrentBestLapTime : -1.0f;
@@ -889,7 +956,31 @@ namespace CrewChiefV4.rFactor2
                 opponent.bestSector2Time = vehicleScoring.mBestSector2 > 0 && vehicleScoring.mBestSector1 > 0.0f ? (float)(vehicleScoring.mBestSector2 - vehicleScoring.mBestSector1) : -1.0f;
                 opponent.bestSector3Time = vehicleScoring.mBestLapTime > 0 && vehicleScoring.mBestSector2 > 0.0f ? (float)(vehicleScoring.mBestLapTime - vehicleScoring.mBestSector2) : -1.0f;
                 opponent.LastLapTime = vehicleScoring.mLastLapTime > 0 ? (float)vehicleScoring.mLastLapTime : -1.0f;
-                opponent.InPits = vehicleScoring.mInPits == 1;
+
+                var isInPits = vehicleScoring.mInPits == 1;
+                
+                if (csd.SessionType == SessionType.Race && csd.SessionRunningTime > 10
+                    && opponentPrevious != null && !opponentPrevious.InPits && isInPits)
+                {
+                    opponent.NumPitStops++;
+                }
+
+                opponent.InPits = isInPits;
+
+                var wasInPits = opponentPrevious != null && opponentPrevious.InPits;
+                opponent.hasJustChangedToDifferentTyreType = false;
+
+                // It looks like compound type fluctuates while in pits.  So, check for it on pit exit only.
+                if (wasInPits && !isInPits
+                    && opponent.TyreChangesByLap.Count != 0)  // This should be initialized above
+                {
+                    var prevTyres = opponent.TyreChangesByLap.Last().Value;
+                    if (opponent.CurrentTyres != prevTyres)
+                    {
+                        opponent.TyreChangesByLap[opponent.CompletedLaps] = opponent.CurrentTyres;
+                        opponent.hasJustChangedToDifferentTyreType = true;
+                    }
+                }
 
                 var lastSectorTime = this.getLastSectorTime(ref vehicleScoring, opponent.CurrentSectorNumber);
 
@@ -941,24 +1032,19 @@ namespace CrewChiefV4.rFactor2
                     && !opponentPrevious.isEnteringPits())
                 {
                     opponent.setInLap();
-                    var currentLapData = opponent.getCurrentLapData();
-                    int sector3Position = currentLapData != null && currentLapData.SectorPositions[2] > 0
-                                            ? currentLapData.SectorPositions[2]
-                                            : opponent.Position;
-
-                    if (sector3Position == 1)
+                    if (opponent.PositionOnApproachToPitEntry == 1)
                     {
                         cgs.PitData.LeaderIsPitting = true;
                         cgs.PitData.OpponentForLeaderPitting = opponent;
                     }
 
-                    if (sector3Position == csd.Position - 1 && csd.Position > 2)
+                    if (opponent.PositionOnApproachToPitEntry == csd.Position - 1 && csd.Position > 2)
                     {
                         cgs.PitData.CarInFrontIsPitting = true;
                         cgs.PitData.OpponentForCarAheadPitting = opponent;
                     }
 
-                    if (sector3Position == csd.Position + 1 && !cgs.isLast())
+                    if (opponent.PositionOnApproachToPitEntry == csd.Position + 1 && !cgs.isLast())
                     {
                         cgs.PitData.CarBehindIsPitting = true;
                         cgs.PitData.OpponentForCarBehindPitting = opponent;
@@ -992,6 +1078,17 @@ namespace CrewChiefV4.rFactor2
 
                     if (csd.OpponentsLapTimeSessionBestPlayerClass < csd.PlayerClassSessionBestLapTime)
                         csd.PlayerClassSessionBestLapTime = csd.OpponentsLapTimeSessionBestPlayerClass;
+
+                    if (opponent.IsNewLap && opponentPrevious != null && !opponentPrevious.IsNewLap)
+                    {
+                        if (opponent.LastLapTime > 0.0
+                            && opponent.LastLapValid
+                            && (!csd.PlayerClassSessionBestLapTimeByTyre.ContainsKey(opponent.CurrentTyres)
+                                || csd.PlayerClassSessionBestLapTimeByTyre[opponent.CurrentTyres] > opponent.LastLapTime))
+                        {
+                            csd.PlayerClassSessionBestLapTimeByTyre[opponent.CurrentTyres] = opponent.LastLapTime;
+                        }
+                    }
                 }
 
                 if (opponent.CurrentBestLapTime > 0.0f
@@ -1537,6 +1634,44 @@ namespace CrewChiefV4.rFactor2
                 default:
                     return SessionType.Unavailable;
             }
+        }
+
+        private TyreType mapToTyreType(ref rF2VehicleTelemetry vehicleTelemetry)
+        {
+            // For now, use fronts.
+            var frontCompound = vehicleTelemetry.mFrontTireCompoundName == null ? "" : RF2GameStateMapper.getStringFromBytes(vehicleTelemetry.mFrontTireCompoundName).ToUpperInvariant();
+
+            if (string.IsNullOrWhiteSpace(frontCompound))
+                return TyreType.Unknown_Race;
+            else if (frontCompound.Contains("HARD"))
+                return TyreType.Hard;
+            else if (frontCompound.Contains("MEDIUM"))
+                return TyreType.Medium;
+            else if (frontCompound.Contains("SOFT"))
+            {
+                if (frontCompound.Contains("SUPER"))
+                    return TyreType.Super_Soft;
+                else if (frontCompound.Contains("ULTRA"))
+                    return TyreType.Ultra_Soft;
+
+                return TyreType.Soft;
+            }
+            else if (frontCompound.Contains("WET"))
+                return TyreType.Wet;
+            else if (frontCompound.Contains("INTERMEDIATE"))
+                return TyreType.Intermediate;
+            else if (frontCompound.Contains("BIAS") && frontCompound.Contains("PLY"))
+                return TyreType.Bias_Ply;
+            else if (frontCompound.Contains("PRIME"))
+                return TyreType.Prime;
+            else if (frontCompound.Contains("OPTION"))
+                return TyreType.Option;
+            else if (frontCompound.Contains("ALTERNATE"))
+                return TyreType.Alternate;
+            else if (frontCompound.Contains("PRIMARY"))
+                return TyreType.Primary;
+
+            return TyreType.Unknown_Race;
         }
 
         private ControlType mapToControlType(rFactor2Constants.rF2Control controlType)
