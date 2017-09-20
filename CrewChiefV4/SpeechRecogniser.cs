@@ -43,6 +43,7 @@ namespace CrewChiefV4
         public static String[] WHATS_MY_FUEL_LEVEL = Configuration.getSpeechRecognitionPhrases("WHATS_MY_FUEL_LEVEL");
         public static String[] WHATS_MY_FUEL_USAGE = Configuration.getSpeechRecognitionPhrases("WHATS_MY_FUEL_USAGE");
         public static String[] WHAT_TYRES_AM_I_ON = Configuration.getSpeechRecognitionPhrases("WHAT_TYRES_AM_I_ON");
+        public static String[] WHAT_ARE_THE_RELATIVE_TYRE_PERFORMANCES = Configuration.getSpeechRecognitionPhrases("WHAT_ARE_THE_RELATIVE_TYRE_PERFORMANCES");
         
         
         public static String[] CALCULATE_FUEL_FOR = Configuration.getSpeechRecognitionPhrases("CALCULATE_FUEL_FOR");
@@ -128,7 +129,7 @@ namespace CrewChiefV4
 
         public static Dictionary<String, int> hoursToNumber = getHourMappings();
 
-        public Boolean waitingForSpeech = false;
+        public static Boolean waitingForSpeech = false;
 
         private static Dictionary<String, int> getNumberMappings()
         {
@@ -273,6 +274,8 @@ namespace CrewChiefV4
                 validateAndAdd(WHATS_MY_FUEL_LEVEL, staticSpeechChoices);
                 validateAndAdd(WHATS_MY_FUEL_USAGE, staticSpeechChoices);
                 validateAndAdd(WHAT_TYRES_AM_I_ON, staticSpeechChoices);
+                validateAndAdd(WHAT_ARE_THE_RELATIVE_TYRE_PERFORMANCES, staticSpeechChoices);
+                
 
                 foreach (String s in CALCULATE_FUEL_FOR)
                 {
@@ -515,7 +518,7 @@ namespace CrewChiefV4
         
         void sre_SpeechRecognized(object sender, SpeechRecognizedEventArgs e)
         {
-            waitingForSpeech = false;
+            SpeechRecogniser.waitingForSpeech = false;
             Console.WriteLine("recognised : " + e.Result.Text + " confidence = " + e.Result.Confidence);
             try
             {
@@ -566,7 +569,7 @@ namespace CrewChiefV4
 
         public void recognizeAsync()
         {
-            waitingForSpeech = true;
+            SpeechRecogniser.waitingForSpeech = true;
             sre.RecognizeAsync(RecognizeMode.Multiple);
         }
 
@@ -664,7 +667,8 @@ namespace CrewChiefV4
                 ResultContains(recognisedSpeech, HOW_ARE_MY_TYRE_TEMPS) ||
                 ResultContains(recognisedSpeech, HOWS_MY_TYRE_WEAR) ||
                 ResultContains(recognisedSpeech, HOW_ARE_MY_BRAKE_TEMPS) ||
-                ResultContains(recognisedSpeech, WHAT_ARE_MY_BRAKE_TEMPS))
+                ResultContains(recognisedSpeech, WHAT_ARE_MY_BRAKE_TEMPS) ||
+                ResultContains(recognisedSpeech, WHAT_ARE_THE_RELATIVE_TYRE_PERFORMANCES))
             {
                 return CrewChief.getEvent("TyreMonitor");
             }
