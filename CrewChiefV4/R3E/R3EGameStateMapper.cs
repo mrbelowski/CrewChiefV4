@@ -1090,7 +1090,7 @@ namespace CrewChiefV4.RaceRoom
             currentGameState.TyreData.FrontLeftTyreType = tyreType;
             currentGameState.TyreData.FrontLeftPressure = shared.TirePressure.FrontLeft;
             currentGameState.TyreData.FrontLeftPercentWear = getTyreWearPercentage(shared.TireWear.FrontLeft);
-            if (currentGameState.SessionData.IsNewLap)
+            if (currentGameState.SessionData.IsNewLap || currentGameState.TyreData.PeakFrontLeftTemperatureForLap == 0)
             {
                 currentGameState.TyreData.PeakFrontLeftTemperatureForLap = frontLeftTemp;
             }
@@ -1106,7 +1106,7 @@ namespace CrewChiefV4.RaceRoom
             currentGameState.TyreData.FrontRightTyreType = tyreType;
             currentGameState.TyreData.FrontRightPressure = shared.TirePressure.FrontRight;
             currentGameState.TyreData.FrontRightPercentWear = getTyreWearPercentage(shared.TireWear.FrontRight);
-            if (currentGameState.SessionData.IsNewLap)
+            if (currentGameState.SessionData.IsNewLap || currentGameState.TyreData.PeakFrontRightTemperatureForLap == 0)
             {
                 currentGameState.TyreData.PeakFrontRightTemperatureForLap = frontRightTemp;
             }
@@ -1122,7 +1122,7 @@ namespace CrewChiefV4.RaceRoom
             currentGameState.TyreData.RearLeftTyreType = tyreType;
             currentGameState.TyreData.RearLeftPressure = shared.TirePressure.RearLeft;
             currentGameState.TyreData.RearLeftPercentWear = getTyreWearPercentage(shared.TireWear.RearLeft);
-            if (currentGameState.SessionData.IsNewLap)
+            if (currentGameState.SessionData.IsNewLap || currentGameState.TyreData.PeakRearLeftTemperatureForLap == 0)
             {
                 currentGameState.TyreData.PeakRearLeftTemperatureForLap = rearLeftTemp;
             }
@@ -1138,7 +1138,7 @@ namespace CrewChiefV4.RaceRoom
             currentGameState.TyreData.RearRightTyreType = tyreType;
             currentGameState.TyreData.RearRightPressure = shared.TirePressure.RearRight;
             currentGameState.TyreData.RearRightPercentWear = getTyreWearPercentage(shared.TireWear.RearRight);
-            if (currentGameState.SessionData.IsNewLap)
+            if (currentGameState.SessionData.IsNewLap || currentGameState.TyreData.PeakRearRightTemperatureForLap == 0)
             {
                 currentGameState.TyreData.PeakRearRightTemperatureForLap = rearRightTemp;
             }

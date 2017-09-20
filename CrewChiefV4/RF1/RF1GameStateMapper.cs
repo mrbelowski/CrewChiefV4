@@ -467,7 +467,7 @@ namespace CrewChiefV4.rFactor1
             float frontLeftTemp = (currentGameState.TyreData.FrontLeft_CenterTemp + currentGameState.TyreData.FrontLeft_LeftTemp + currentGameState.TyreData.FrontLeft_RightTemp) / 3;
             currentGameState.TyreData.FrontLeftPressure = shared.wheel[(int)rFactor1Constant.rfWheelIndex.frontLeft].pressure;
             currentGameState.TyreData.FrontLeftPercentWear = (1 - shared.wheel[(int)rFactor1Constant.rfWheelIndex.frontLeft].wear) * 100;
-            if (currentGameState.SessionData.IsNewLap)
+            if (currentGameState.SessionData.IsNewLap || currentGameState.TyreData.PeakFrontLeftTemperatureForLap == 0)
             {
                 currentGameState.TyreData.PeakFrontLeftTemperatureForLap = frontLeftTemp;
             }
@@ -484,7 +484,7 @@ namespace CrewChiefV4.rFactor1
             float frontRightTemp = (currentGameState.TyreData.FrontRight_CenterTemp + currentGameState.TyreData.FrontRight_LeftTemp + currentGameState.TyreData.FrontRight_RightTemp) / 3;
             currentGameState.TyreData.FrontRightPressure = shared.wheel[(int)rFactor1Constant.rfWheelIndex.frontRight].pressure;
             currentGameState.TyreData.FrontRightPercentWear = (1 - shared.wheel[(int)rFactor1Constant.rfWheelIndex.frontRight].wear) * 100;
-            if (currentGameState.SessionData.IsNewLap)
+            if (currentGameState.SessionData.IsNewLap || currentGameState.TyreData.PeakFrontRightTemperatureForLap == 0)
             {
                 currentGameState.TyreData.PeakFrontRightTemperatureForLap = frontRightTemp;
             }
@@ -501,7 +501,7 @@ namespace CrewChiefV4.rFactor1
             float rearLeftTemp = (currentGameState.TyreData.RearLeft_CenterTemp + currentGameState.TyreData.RearLeft_LeftTemp + currentGameState.TyreData.RearLeft_RightTemp) / 3;
             currentGameState.TyreData.RearLeftPressure = shared.wheel[(int)rFactor1Constant.rfWheelIndex.rearLeft].pressure;
             currentGameState.TyreData.RearLeftPercentWear = (1 - shared.wheel[(int)rFactor1Constant.rfWheelIndex.rearLeft].wear) * 100;
-            if (currentGameState.SessionData.IsNewLap)
+            if (currentGameState.SessionData.IsNewLap || currentGameState.TyreData.PeakRearLeftTemperatureForLap == 0)
             {
                 currentGameState.TyreData.PeakRearLeftTemperatureForLap = rearLeftTemp;
             }
@@ -518,7 +518,7 @@ namespace CrewChiefV4.rFactor1
             float rearRightTemp = (currentGameState.TyreData.RearRight_CenterTemp + currentGameState.TyreData.RearRight_LeftTemp + currentGameState.TyreData.RearRight_RightTemp) / 3;
             currentGameState.TyreData.RearRightPressure = shared.wheel[(int)rFactor1Constant.rfWheelIndex.rearRight].pressure;
             currentGameState.TyreData.RearRightPercentWear = (1 - shared.wheel[(int)rFactor1Constant.rfWheelIndex.rearRight].wear) * 100;
-            if (currentGameState.SessionData.IsNewLap)
+            if (currentGameState.SessionData.IsNewLap || currentGameState.TyreData.PeakRearRightTemperatureForLap == 0)
             {
                 currentGameState.TyreData.PeakRearRightTemperatureForLap = rearRightTemp;
             }
