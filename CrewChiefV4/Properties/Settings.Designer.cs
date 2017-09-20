@@ -2288,8 +2288,9 @@ namespace CrewChiefV4.Properties {
             }
             set {
                 this["update_notify_attempted"] = value;
-	    }
+            }
         }
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True")]
@@ -2299,6 +2300,18 @@ namespace CrewChiefV4.Properties {
             }
             set {
                 this["manual_formation_go_with_leader"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool reject_message_when_talking {
+            get {
+                return ((bool)(this["reject_message_when_talking"]));
+            }
+            set {
+                this["reject_message_when_talking"] = value;
             }
         }
     }

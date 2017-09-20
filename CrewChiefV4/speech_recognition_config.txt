@@ -50,6 +50,11 @@ WHATS_MY_FUEL_USAGE = what's my fuel usage:what's my fuel consumption:what's my 
 CALCULATE_FUEL_FOR = calculate fuel for:how much fuel do i need for:how much fuel for
 WHAT_TYRES_AM_I_ON = what tires am i on:what tire am i on:what tire type am i on
 
+### TODO: the response to this is the relative best lap delta for each tyre combination - i.e.
+### "softs are 0.5 seconds faster than mediums, mediums are 0.8 seconds faster than hards". What should the question be???
+WHAT_ARE_THE_RELATIVE_TYRE_PERFORMANCES = give me tyre pace differences:what are the tire speeds:whats the difference between tires:compare tire compounds
+
+
 KEEP_QUIET = keep quiet:shut up:I know what I'm doing:leave me alone
 KEEP_ME_INFORMED = keep me updated:keep me informed:keep me posted
 TELL_ME_THE_GAPS = tell me the gaps:tell me the deltas:give me the deltas:time deltas every lap
