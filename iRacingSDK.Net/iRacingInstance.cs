@@ -151,7 +151,7 @@ namespace iRacingSDK
                             continue; //Got the same sample - try again.
 
                         if (logging && data.Telemetry.TickCount != nextTickCount && nextTickCount != 0)
-                            Debug.WriteLine("Dropped DataSample from {0} to {1}. Over time of {2}",
+                            Console.WriteLine("Dropped DataSample from {0} to {1}. Over time of {2}",
                                 nextTickCount, data.Telemetry.TickCount - 1, (DateTime.Now - lastTickTime).ToString(@"s\.fff"), "WARN");
 
                         nextTickCount = data.Telemetry.TickCount + 1;

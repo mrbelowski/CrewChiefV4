@@ -111,6 +111,7 @@
     <Compile Include="GameStateReaderFactory.cs" />
     <Compile Include="GameState\GlobalBehaviourSettings.cs" />
     <Compile Include="iRacing\iRacingGameStateMapper.cs" />
+    <Compile Include="iRacing\iRacingHelper.cs" />
     <Compile Include="iRacing\iRacingSharedMemoryReader.cs" />
     <Compile Include="iRacing\iRacingSpotter.cs" />
     <Compile Include="NameValidator.cs" />

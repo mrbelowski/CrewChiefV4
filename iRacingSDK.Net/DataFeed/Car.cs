@@ -70,6 +70,7 @@ namespace iRacingSDK
 
         public int Lap { get { return telemetry.CarIdxLap[carIdx]; } }
         public float DistancePercentage { get { return telemetry.CarIdxLapDistPct[carIdx]; } }
+        public float DistanceRoundTrack { get { return telemetry.CarIdxDistance[carIdx]; } }
         public float TotalDistance { get { return this.Lap + this.DistancePercentage; } }
         public LapSector LapSector { get { return telemetry.CarSectorIdx[carIdx]; } }
         public int Position { get { return telemetry.Positions[carIdx]; } }
@@ -79,6 +80,8 @@ namespace iRacingSDK
         public bool HasRetired { get { return telemetry.HasRetired[carIdx]; } }
         public TrackLocation TrackSurface { get { return telemetry.CarIdxTrackSurface[carIdx]; } }
         public int PitStopCount { get { return telemetry.CarIdxPitStopCount[carIdx]; } }
+        public int LapCompleated { get { return telemetry.CarIdxLapCompleted[carIdx]; } }
+
 
         public SessionData._SessionInfo._Sessions._ResultsPositions ResultPosition
         {

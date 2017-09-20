@@ -16,6 +16,8 @@ namespace CrewChiefV4.iRacing
     {
         public static String playerName = null;
         private SpeechRecogniser speechRecogniser;
+        private TimeDelta timeDelta = null; 
+
         public iRacingGameStateMapper()
         {
 
@@ -33,7 +35,10 @@ namespace CrewChiefV4.iRacing
 
         public GameStateData mapToGameStateData(Object memoryMappedFileStruct, GameStateData previousGameState)
         {
-
+            if(memoryMappedFileStruct == null)
+            {
+                return null;
+            }
             CrewChiefV4.iRacing.iRacingSharedMemoryReader.iRacingStructWrapper wrapper = (CrewChiefV4.iRacing.iRacingSharedMemoryReader.iRacingStructWrapper)memoryMappedFileStruct;
             GameStateData currentGameState = new GameStateData(wrapper.ticksWhenRead);
             DataSample shared = wrapper.data;
@@ -99,12 +104,15 @@ namespace CrewChiefV4.iRacing
                     currentGameState.SessionData.SessionHasFixedTime = true;
                     Console.WriteLine("SessionTotalRunTime = " + currentGameState.SessionData.SessionTotalRunTime);
                 }
+
+                timeDelta = new TimeDelta((float)ParseTrackLength(shared.SessionData.WeekendInfo.TrackLength) * 1000f, 20, 64);
+                
                 foreach(Car car in shared.Telemetry.RaceCars)
                 {
                     
                     String driverName = car.Details.Driver.UserName.ToLower();
                     Console.WriteLine("Driver Added: " + driverName);
-                    if(car.CarIdx == shared.Telemetry.PlayerCarIdx)
+                    if (car.CarIdx == PlayerCarIdx)
                     {
                         if (playerName == null)
                         {
@@ -114,8 +122,19 @@ namespace CrewChiefV4.iRacing
                         currentGameState.PitData.InPitlane = shared.Telemetry.CarIdxTrackSurface[PlayerCarIdx] == TrackLocation.InPitStall;                        
                         currentGameState.PositionAndMotionData.DistanceRoundTrack = shared.Telemetry.LapDist;
                     }
-                }
+                    else
+                    {
 
+                        currentGameState.OpponentData.Add(driverName, createOpponentData(car, driverName,
+                            false, CarData.CarClassEnum.GT1X));
+                    }
+                }
+                
+            }
+            else
+            {
+                timeDelta.Update(shared.Telemetry.SessionTime, shared.Telemetry.CarIdxLapDistPct);
+                Console.WriteLine("timeDelta:" + TimeDelta.DeltaToString(TimeSpan.FromSeconds(timeDelta.currentlapTime[PlayerCarIdx])));
             }
             return currentGameState;
            
@@ -139,12 +158,35 @@ namespace CrewChiefV4.iRacing
             }
             return SessionType.Unavailable;
         }
+
         private SessionPhase mapToSessionPhase(SessionPhase lastSessionPhase, SessionState sessionState,  SessionType currentSessionType )
         {
 
             return SessionPhase.Garage;
         }
 
+        private OpponentData createOpponentData(Car opponentCar, String driverName, Boolean loadDriverName, CarData.CarClassEnum playerCarClass)
+        {
+            if (loadDriverName && CrewChief.enableDriverNames)
+            {
+                speechRecogniser.addNewOpponentName(driverName);
+            }
+            OpponentData opponentData = new OpponentData();
+            opponentData.DriverRawName = driverName;
+            opponentData.Position = opponentCar.OfficialPostion;
+            opponentData.UnFilteredPosition = opponentData.Position;
+            opponentData.CompletedLaps = opponentCar.LapCompleated;
+            opponentData.CurrentSectorNumber = opponentCar.LapSector.Sector;
+            //opponentData.WorldPosition = new float[] { opponentCar.Position.X, opponentCar.Position.Z };
+            opponentData.DistanceRoundTrack = opponentCar.DistanceRoundTrack;
+            //opponentData.CarClass = CarData.getCarClassForRaceRoomId(opponentCar.DriverInfo.ClassId);
+            //opponentData.CurrentTyres = mapToTyreType(opponentCar.TireTypeFront, opponentCar.TireSubTypeFront,
+                //opponentCar.TireTypeRear, opponentCar.TireSubTypeRear, playerCarClass);
+            //Console.WriteLine("New driver " + driverName + " is using car class " +
+                //opponentData.CarClass.getClassIdentifier() + " (class ID " + opponentCar.DriverInfo.ClassId + ") with tyres " + opponentData.CurrentTyres);
+            //opponentData.TyreChangesByLap[0] = opponentData.CurrentTyres;
+            return opponentData;
+        }
         public static double ParseTrackLength(string value)
         {
             // value = "6.93 km"
