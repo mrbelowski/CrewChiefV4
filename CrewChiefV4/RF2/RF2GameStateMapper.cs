@@ -77,7 +77,7 @@ namespace CrewChiefV4.rFactor2
                 return;
 
             var shared = memoryMappedFileStruct as CrewChiefV4.rFactor2.RF2SharedMemoryReader.RF2StructWrapper;
-            var versionStr = getStringFromBytes(shared.extended.mVersion);
+            var versionStr = GetStringFromBytes(shared.extended.mVersion);
 
             var versionParts = versionStr.Split('.');
             if (versionParts.Length != 4)
@@ -298,7 +298,7 @@ namespace CrewChiefV4.rFactor2
             for (int i = 0; i < shared.scoring.mScoringInfo.mNumVehicles; ++i)
             {
                 var vehicle = shared.scoring.mVehicles[i];
-                switch (mapToControlType((rFactor2Constants.rF2Control)vehicle.mControl))
+                switch (MapToControlType((rFactor2Constants.rF2Control)vehicle.mControl))
                 {
                     case ControlType.AI:
                     case ControlType.Player:
@@ -345,7 +345,7 @@ namespace CrewChiefV4.rFactor2
             else
             {
                 playerTelemetryAvailable = false;
-                RF2GameStateMapper.initEmptyVehicleTelemetry(ref playerTelemetry);
+                RF2GameStateMapper.InitEmptyVehicleTelemetry(ref playerTelemetry);
 
                 // Exclude known situations when telemetry is not available, but log otherwise to get more
                 // insights.
@@ -368,9 +368,20 @@ namespace CrewChiefV4.rFactor2
             this.lastPlayerTelemetryET = currPlayerTelET;
             this.lastScoringET = currScoringET;
 
+            // Get player vehicle track rules.
+            var playerRulesIdx = -1;
+            for (int i = 0; i < shared.rules.mTrackRules.mNumParticipants; ++i)
+            {
+                if (shared.rules.mParticipants[i].mID == playerScoring.mID)
+                {
+                    playerRulesIdx = i;
+                    break;
+                }
+            }
+
             if (RF2GameStateMapper.playerName == null)
             {
-                var driverName = getStringFromBytes(playerScoring.mDriverName).ToLower();
+                var driverName = GetStringFromBytes(playerScoring.mDriverName).ToLower();
                 NameValidator.validateName(driverName);
                 RF2GameStateMapper.playerName = driverName;
             }
@@ -388,12 +399,12 @@ namespace CrewChiefV4.rFactor2
             csd.SessionType = mapToSessionType(shared);
             csd.SessionPhase = mapToSessionPhase((rFactor2Constants.rF2GamePhase)shared.scoring.mScoringInfo.mGamePhase, csd.SessionType, ref playerScoring);
 
-            var carClassId = getStringFromBytes(playerScoring.mVehicleClass);
+            var carClassId = GetStringFromBytes(playerScoring.mVehicleClass);
             cgs.carClass = CarData.getCarClassForClassName(carClassId);
             CarData.CLASS_ID = carClassId;
             this.brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(cgs.carClass);
-            csd.DriverRawName = getStringFromBytes(playerScoring.mDriverName).ToLower();
-            csd.TrackDefinition = new TrackDefinition(getStringFromBytes(shared.scoring.mScoringInfo.mTrackName), (float)shared.scoring.mScoringInfo.mLapDist);
+            csd.DriverRawName = GetStringFromBytes(playerScoring.mDriverName).ToLower();
+            csd.TrackDefinition = new TrackDefinition(GetStringFromBytes(shared.scoring.mScoringInfo.mTrackName), (float)shared.scoring.mScoringInfo.mLapDist);
 
             if (pgs == null || psd.TrackDefinition.name != csd.TrackDefinition.name)
             {
@@ -710,7 +721,7 @@ namespace CrewChiefV4.rFactor2
 
             // --------------------------------
             // control data
-            cgs.ControlData.ControlType = mapToControlType((rFactor2Constants.rF2Control)playerScoring.mControl);
+            cgs.ControlData.ControlType = MapToControlType((rFactor2Constants.rF2Control)playerScoring.mControl);
 
             // --------------------------------
             // Tyre data
@@ -718,7 +729,7 @@ namespace CrewChiefV4.rFactor2
             cgs.TyreData.TyreWearActive = true;
 
             // For now, all tyres will be reported as front compund.
-            var tt = this.mapToTyreType(ref playerTelemetry);
+            var tt = this.MapToTyreType(ref playerTelemetry);
 
             var wheelFrontLeft = playerTelemetry.mWheels[(int)rFactor2Constants.rF2WheelIndex.FrontLeft];
             cgs.TyreData.FrontLeftTyreType = tt;
@@ -858,7 +869,7 @@ namespace CrewChiefV4.rFactor2
             for (int i = 0; i < shared.scoring.mScoringInfo.mNumVehicles; ++i)
             {
                 var vehicleScoring = shared.scoring.mVehicles[i];
-                var driverName = getStringFromBytes(vehicleScoring.mDriverName).ToLower();
+                var driverName = GetStringFromBytes(vehicleScoring.mDriverName).ToLower();
 
                 if (driverNameCounts.ContainsKey(driverName))
                     driverNameCounts[driverName] += 1;
@@ -898,7 +909,7 @@ namespace CrewChiefV4.rFactor2
                     continue;
                 }
 
-                var ct = this.mapToControlType((rFactor2Constants.rF2Control)vehicleScoring.mControl);
+                var ct = this.MapToControlType((rFactor2Constants.rF2Control)vehicleScoring.mControl);
                 if (ct == ControlType.Player || ct == ControlType.Replay || ct == ControlType.Unavailable)
                     continue;
 
@@ -911,7 +922,7 @@ namespace CrewChiefV4.rFactor2
                 else
                 {
                     vehicleTelemetryAvailable = false;
-                    RF2GameStateMapper.initEmptyVehicleTelemetry(ref vehicleTelemetry);
+                    RF2GameStateMapper.InitEmptyVehicleTelemetry(ref vehicleTelemetry);
 
                     // Exclude known situations when telemetry is not available, but log otherwise to get more
                     // insights.
@@ -923,7 +934,7 @@ namespace CrewChiefV4.rFactor2
                     }
                 }
 
-                var driverName = getStringFromBytes(vehicleScoring.mDriverName).ToLower();
+                var driverName = GetStringFromBytes(vehicleScoring.mDriverName).ToLower();
                 OpponentData opponentPrevious;
                 int duplicatesCount = driverNameCounts[driverName];
                 string opponentKey;
@@ -945,7 +956,7 @@ namespace CrewChiefV4.rFactor2
                     else
                     {
                         // offline we can have any number of duplicates :(
-                        opponentKey = this.getOpponentKeyForVehicleInfo(ref vehicleScoring, ref vehicleTelemetry, pgs, csd.SessionRunningTime, driverName, duplicatesCount, vehicleTelemetryAvailable);
+                        opponentKey = this.GetOpponentKeyForVehicleInfo(ref vehicleScoring, ref vehicleTelemetry, pgs, csd.SessionRunningTime, driverName, duplicatesCount, vehicleTelemetryAvailable);
 
                         if (opponentKey == null)
                         {
@@ -967,8 +978,8 @@ namespace CrewChiefV4.rFactor2
                 opponentPrevious = pgs == null || opponentKey == null || !pgs.OpponentData.ContainsKey(opponentKey) ? null : previousGameState.OpponentData[opponentKey];
                 var opponent = new OpponentData();
                 opponent.DriverRawName = driverName;
-                opponent.CarClass = CarData.getCarClassForClassName(getStringFromBytes(vehicleScoring.mVehicleClass));
-                opponent.CurrentTyres = this.mapToTyreType(ref vehicleTelemetry);
+                opponent.CarClass = CarData.getCarClassForClassName(GetStringFromBytes(vehicleScoring.mVehicleClass));
+                opponent.CurrentTyres = this.MapToTyreType(ref vehicleTelemetry);
                 opponent.DriverRawName = driverName;
                 opponent.DriverNameSet = opponent.DriverRawName.Length > 0;
                 opponent.Position = vehicleScoring.mPlace;
@@ -1314,7 +1325,7 @@ namespace CrewChiefV4.rFactor2
                         continue;
                     }
 
-                    if (isBehindWithinDistance(csd.TrackDefinition.trackLength, 8.0f, 40.0f,
+                    if (IsBehindWithinDistance(csd.TrackDefinition.trackLength, 8.0f, 40.0f,
                             cgs.PositionAndMotionData.DistanceRoundTrack, opponent.DistanceRoundTrack)
                         && opponent.Speed >= cgs.PositionAndMotionData.CarSpeed)
                     {
@@ -1332,6 +1343,9 @@ namespace CrewChiefV4.rFactor2
             }
 
             csd.Flag = currFlag;
+
+            if (playerRulesIdx != -1)
+                cgs.FrozenOrderData = this.GetFrozenOrderData(ref playerScoring, ref shared.scoring, ref shared.rules.mParticipants[playerRulesIdx], ref shared.rules);
 
             // --------------------------------
             // penalties data
@@ -1643,7 +1657,7 @@ namespace CrewChiefV4.rFactor2
         }
 
         // finds OpponentData key for given vehicle based on driver name, vehicle class, and world position
-        private String getOpponentKeyForVehicleInfo(ref rF2VehicleScoring vehicleScoring, ref rF2VehicleTelemetry vehicleTelemetry, GameStateData previousGameState, float sessionRunningTime, String driverName, int duplicatesCount, bool vehicleTelemetryAvailable)
+        private String GetOpponentKeyForVehicleInfo(ref rF2VehicleScoring vehicleScoring, ref rF2VehicleTelemetry vehicleTelemetry, GameStateData previousGameState, float sessionRunningTime, String driverName, int duplicatesCount, bool vehicleTelemetryAvailable)
         {
             if (previousGameState == null)
                 return null;
@@ -1668,8 +1682,8 @@ namespace CrewChiefV4.rFactor2
                     if (previousGameState.OpponentData.ContainsKey(possibleKey))
                     {
                         OpponentData o = previousGameState.OpponentData[possibleKey];
-                        if (o.DriverRawName != getStringFromBytes(vehicleScoring.mDriverName).ToLower() ||
-                            o.CarClass != CarData.getCarClassForClassName(getStringFromBytes(vehicleScoring.mVehicleClass)) ||
+                        if (o.DriverRawName != GetStringFromBytes(vehicleScoring.mDriverName).ToLower() ||
+                            o.CarClass != CarData.getCarClassForClassName(GetStringFromBytes(vehicleScoring.mVehicleClass)) ||
                             opponentKeysProcessed.Contains(possibleKey))
                         {
                             continue;
@@ -1725,10 +1739,10 @@ namespace CrewChiefV4.rFactor2
             }
         }
 
-        private TyreType mapToTyreType(ref rF2VehicleTelemetry vehicleTelemetry)
+        private TyreType MapToTyreType(ref rF2VehicleTelemetry vehicleTelemetry)
         {
             // For now, use fronts.
-            var frontCompound = vehicleTelemetry.mFrontTireCompoundName == null ? "" : RF2GameStateMapper.getStringFromBytes(vehicleTelemetry.mFrontTireCompoundName).ToUpperInvariant();
+            var frontCompound = vehicleTelemetry.mFrontTireCompoundName == null ? "" : RF2GameStateMapper.GetStringFromBytes(vehicleTelemetry.mFrontTireCompoundName).ToUpperInvariant();
 
             if (string.IsNullOrWhiteSpace(frontCompound))
                 return TyreType.Unknown_Race;
@@ -1763,7 +1777,7 @@ namespace CrewChiefV4.rFactor2
             return TyreType.Unknown_Race;
         }
 
-        private ControlType mapToControlType(rFactor2Constants.rF2Control controlType)
+        private ControlType MapToControlType(rFactor2Constants.rF2Control controlType)
         {
             switch (controlType)
             {
@@ -1780,7 +1794,7 @@ namespace CrewChiefV4.rFactor2
             }
         }
 
-        public Boolean isBehindWithinDistance(float trackLength, float minDistance, float maxDistance, float playerTrackDistance, float opponentTrackDistance)
+        public Boolean IsBehindWithinDistance(float trackLength, float minDistance, float maxDistance, float playerTrackDistance, float opponentTrackDistance)
         {
             float difference = playerTrackDistance - opponentTrackDistance;
             if (difference > 0)
@@ -1794,7 +1808,7 @@ namespace CrewChiefV4.rFactor2
             }
         }
 
-        public static String getStringFromBytes(byte[] bytes)
+        public static String GetStringFromBytes(byte[] bytes)
         {
             var nullIdx = Array.IndexOf(bytes, (byte)0);
 
@@ -1824,13 +1838,193 @@ namespace CrewChiefV4.rFactor2
         // hardening code against this case, create and zero intialize arrays within passed in object.
         // This is equivalent of how V1 and rF1 works.
         // NOTE: not a complete initialization, just parts that were cause NRE.
-        public static void initEmptyVehicleTelemetry(ref rF2VehicleTelemetry vehicleTelemetry)
+        public static void InitEmptyVehicleTelemetry(ref rF2VehicleTelemetry vehicleTelemetry)
         {
             Debug.Assert(vehicleTelemetry.mWheels == null);
 
             vehicleTelemetry.mWheels = new rF2Wheel[4];
             for (int i = 0; i < 4; ++i)
                 vehicleTelemetry.mWheels[i].mTemperature = new double[3];
+        }
+
+        private FrozenOrderData GetFrozenOrderData(ref rF2VehicleScoring vehicle, ref rF2Scoring scoring, ref rF2TrackRulesParticipant vehicleRules, ref rF2Rules rules)
+        {
+            var fod = new FrozenOrderData();
+
+            // TODO: Scope to only right game sessions/phases.
+            var foStage = rules.mTrackRules.mStage;
+            if (foStage == rF2TrackRulesStage.Normal
+              || scoring.mScoringInfo.mGamePhase == (int)rFactor2Constants.rF2GamePhase.GridWalk  // Do not try figuring this out during Gridwalk, not enough data.
+              || scoring.mScoringInfo.mGamePhase == (int)rFactor2Constants.rF2GamePhase.Countdown)  // Definetely no FO during Countdown.
+                return fod; // Note, there's slight race between scoring and rules here, FO messages should have validation on them.
+
+            // Figure out the phase:
+            if (foStage == rF2TrackRulesStage.CautionInit || foStage == rF2TrackRulesStage.CautionUpdate)
+                fod.Phase = FrozenOrderPhase.FullCourseYellow;
+            else if (foStage == rF2TrackRulesStage.FormationInit || foStage == rF2TrackRulesStage.FormationUpdate)
+            {
+                if (rules.mTrackRules.mSafetyCarActive == 1)
+                    fod.Phase = FrozenOrderPhase.Rolling;
+                else
+                {
+                    // Formation / Standing and Fast Rolling have no Safety Car.
+                    fod.Phase = rules.mTrackRules.mStage == rF2TrackRulesStage.FormationInit && RF2GameStateMapper.GetSector(vehicle.mSector) == 3
+                      ? FrozenOrderPhase.FastRolling  // Fast rolling never goes into FormationUpdate and usually starts in S3.
+                      : FrozenOrderPhase.FormationStanding;
+                }
+            }
+
+            Debug.Assert(fod.Phase != FrozenOrderPhase.None);
+
+            if (vehicleRules.mPositionAssignment != -1)
+            {
+                var gridOrder = false;
+                // Core FCY does not use grid order.
+                if (fod.Phase == FrozenOrderPhase.FullCourseYellow/* && !MainForm.useStockCarRulesPlugin*/)
+                {
+                    gridOrder = false;
+                    fod.AssignedPosition = vehicleRules.mPositionAssignment + 1;  // + 1, because it is zero based with 0 meaning follow SC.
+                }
+                else  // SCR plugin is enabled or this is not FCY case, the the order reported is grid order, with columns specified.
+                {
+                    gridOrder = true;
+                    fod.AssignedGridPosition = vehicleRules.mPositionAssignment + 1;
+                    fod.AssignedColumn = vehicleRules.mColumnAssignment == rF2TrackRulesColumn.LeftLane ? FrozenOrderColumn.Left : FrozenOrderColumn.Right;
+
+                    if (rules.mTrackRules.mPoleColumn == rF2TrackRulesColumn.LeftLane)
+                    {
+                        fod.AssignedPosition = (vehicleRules.mColumnAssignment == rF2TrackRulesColumn.LeftLane
+                          ? vehicleRules.mPositionAssignment * 2
+                          : vehicleRules.mPositionAssignment * 2 + 1) + 1;
+                    }
+                    else if (rules.mTrackRules.mPoleColumn == rF2TrackRulesColumn.RightLane)
+                    {
+                        fod.AssignedPosition = (vehicleRules.mColumnAssignment == rF2TrackRulesColumn.RightLane
+                          ? vehicleRules.mPositionAssignment * 2
+                          : vehicleRules.mPositionAssignment * 2 + 1) + 1;
+                    }
+
+                }
+
+                // Figure out Driver Name to follow.
+                // NOTE: In Formation/Standing, game does not report those in UI, but we can.
+                var vehToFollowId = -1;
+                if ((gridOrder && fod.AssignedPosition > 2)  // In grid order, first 2 vehicles are following SC.
+                  || (!gridOrder && fod.AssignedPosition > 1))  // In non-grid order, 1st car is following SC.
+                {
+                    // Find the mID of a vehicle in front of us by frozen order.
+                    for (int i = 0; i < rules.mTrackRules.mNumParticipants; ++i)
+                    {
+                        var p = rules.mParticipants[i];
+                        if ((!gridOrder  // Don't care about column in non-grid order case.
+                            || (gridOrder && p.mColumnAssignment == vehicleRules.mColumnAssignment))  // Should be vehicle in the same column.
+                          && p.mPositionAssignment == (vehicleRules.mPositionAssignment - 1))
+                        {
+                            vehToFollowId = p.mID;
+                            break;
+                        }
+                    }
+                }
+
+                // Now find the vehicle to follow from the scoring info.
+                for (int i = 0; i < scoring.mScoringInfo.mNumVehicles; ++i)
+                {
+                    var v = scoring.mVehicles[i];
+                    if (v.mID == vehToFollowId)
+                    {
+                        fod.DriverToFollow = RF2GameStateMapper.GetStringFromBytes(v.mDriverName);
+
+                        var playerDist = RF2GameStateMapper.GetDistanceCompleteded(ref scoring, ref vehicle);
+                        var toFollowDist = RF2GameStateMapper.GetDistanceCompleteded(ref scoring, ref v);
+
+                        fod.Action = FrozenOrderAction.Follow;
+
+                        var distDelta = toFollowDist - playerDist;
+                        if (distDelta < 0.0)
+                            fod.Action = FrozenOrderAction.AllowToPass;
+                        else if (distDelta > 70.0)
+                            fod.Action = FrozenOrderAction.CatchUp;
+
+                        break;
+                    }
+                }
+            }
+            else if ((fod.Phase == FrozenOrderPhase.Rolling || fod.Phase == FrozenOrderPhase.FastRolling || fod.Phase == FrozenOrderPhase.FormationStanding)
+              && vehicleRules.mPositionAssignment != -1)
+            {
+                fod.AssignedGridPosition = vehicleRules.mPositionAssignment + 1;
+                fod.AssignedColumn = vehicleRules.mColumnAssignment == rF2TrackRulesColumn.LeftLane ? FrozenOrderColumn.Left : FrozenOrderColumn.Right;
+
+                if (rules.mTrackRules.mPoleColumn == rF2TrackRulesColumn.LeftLane)
+                {
+                    fod.AssignedPosition = (vehicleRules.mColumnAssignment == rF2TrackRulesColumn.LeftLane
+                      ? vehicleRules.mPositionAssignment * 2
+                      : vehicleRules.mPositionAssignment * 2 + 1) + 1;
+                }
+                else if (rules.mTrackRules.mPoleColumn == rF2TrackRulesColumn.RightLane)
+                {
+                    fod.AssignedPosition = (vehicleRules.mColumnAssignment == rF2TrackRulesColumn.RightLane
+                      ? vehicleRules.mPositionAssignment * 2
+                      : vehicleRules.mPositionAssignment * 2 + 1) + 1;
+                }
+
+                // Figure out Driver Name to follow.
+                // NOTE: does not apply to Formation/Standing.
+                if (fod.AssignedPosition > 2) // First 2 vehicles are following SC.
+                {
+                    // Find the mID of a vehicle in front of us by frozen order.
+                    var vehToFollowId = -1;
+                    for (int i = 0; i < rules.mTrackRules.mNumParticipants; ++i)
+                    {
+                        var p = rules.mParticipants[i];
+                        if (p.mColumnAssignment == vehicleRules.mColumnAssignment  // Should be vehicle in the same column.
+                          && p.mPositionAssignment == (vehicleRules.mPositionAssignment - 1))
+                        {
+                            vehToFollowId = p.mID;
+                            break;
+                        }
+                    }
+
+                    // Now find the vehicle to follow from the scoring info.
+                    for (int i = 0; i < scoring.mScoringInfo.mNumVehicles; ++i)
+                    {
+                        var v = scoring.mVehicles[i];
+                        if (v.mID == vehToFollowId)
+                        {
+                            fod.DriverToFollow = RF2GameStateMapper.GetStringFromBytes(v.mDriverName);
+
+                            var playerDist = RF2GameStateMapper.GetDistanceCompleteded(ref scoring, ref vehicle);
+                            var toFollowDist = RF2GameStateMapper.GetDistanceCompleteded(ref scoring, ref v);
+
+                            fod.Action = FrozenOrderAction.Follow;
+
+                            var distDelta = toFollowDist - playerDist;
+                            if (distDelta < 0.0)
+                                fod.Action = FrozenOrderAction.AllowToPass;
+                            else if (distDelta > 70.0)
+                                fod.Action = FrozenOrderAction.CatchUp;
+
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (rules.mTrackRules.mSafetyCarActive == 1)
+                fod.SafetyCarSpeed = rules.mTrackRules.mSafetyCarSpeed;
+
+            return fod;
+        }
+
+        private static double GetDistanceCompleteded(ref rF2Scoring scoring, ref rF2VehicleScoring vehicle)
+        {
+            // Note: Can be interpolated a bit.
+            return vehicle.mTotalLaps * scoring.mScoringInfo.mLapDist + vehicle.mLapDist;
+        }
+
+        private static int GetSector(int rf2Sector)
+        {
+            return rf2Sector == 0 ? 3 : rf2Sector;
         }
     }
 }

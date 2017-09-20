@@ -153,6 +153,50 @@ namespace CrewChiefV4.GameState
         public float LastImpactTime = -1.0f;
     }
 
+
+    public enum FrozenOrderPhase
+    {
+        None,
+        FullCourseYellow,
+        FormationStanding,
+        Rolling,
+        FastRolling
+    }
+
+    public enum FrozenOrderColumn
+    {
+        None,
+        Left,
+        Right
+    }
+
+    public enum FrozenOrderAction
+    {
+        None,
+        Follow,
+        CatchUp,
+        AllowToPass
+    }
+
+    public class FrozenOrderData
+    {
+        public FrozenOrderPhase Phase = FrozenOrderPhase.None;
+        public FrozenOrderAction Action = FrozenOrderAction.None;
+
+        // If column is assigned, p1 and p2 follows SC.  Otherwise,
+        // only p1 follows SC.
+        public int AssignedPosition = -1;
+
+        public FrozenOrderColumn AssignedColumn = FrozenOrderColumn.None;
+        // Only matters if AssignedColumn != None
+        public int AssignedGridPosition = -1;
+
+        public string DriverToFollow = "";
+
+        // Meters/s.  If -1, SC either left or not present.
+        public float SafetyCarSpeed = -1.0f;
+    }
+
     public class SessionData
     {
         public List<String> formattedPlayerLapTimes = new List<String>();
@@ -1683,6 +1727,8 @@ namespace CrewChiefV4.GameState
         public OvertakingAids OvertakingAids = new OvertakingAids();
 
         public FlagData FlagData = new FlagData();
+
+        public FrozenOrderData FrozenOrderData = new FrozenOrderData();
 
         public GameStateData(long ticks)
         {
