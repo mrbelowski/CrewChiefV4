@@ -22,6 +22,7 @@ namespace CrewChiefV4.rFactor2
     // signed char   ->    sbyte
     // bool          ->    byte
     // long          ->    int
+    // ULONGLONG     ->    Int64
     public class rFactor2Constants
     {
         public const string MM_TELEMETRY_FILE_NAME1 = "$rFactor2SMMP_TelemetryBuffer1$";
@@ -31,6 +32,10 @@ namespace CrewChiefV4.rFactor2
         public const string MM_SCORING_FILE_NAME1 = "$rFactor2SMMP_ScoringBuffer1$";
         public const string MM_SCORING_FILE_NAME2 = "$rFactor2SMMP_ScoringBuffer2$";
         public const string MM_SCORING_FILE_ACCESS_MUTEX = @"Global\$rFactor2SMMP_ScoringMutex";
+
+        public const string MM_RULES_FILE_NAME1 = "$rFactor2SMMP_RulesBuffer1$";
+        public const string MM_RULES_FILE_NAME2 = "$rFactor2SMMP_RulesBuffer2$";
+        public const string MM_RULES_FILE_ACCESS_MUTEX = @"Global\$rFactor2SMMP_RulesMutex";
 
         public const string MM_EXTENDED_FILE_NAME1 = "$rFactor2SMMP_ExtendedBuffer1$";
         public const string MM_EXTENDED_FILE_NAME2 = "$rFactor2SMMP_ExtendedBuffer2$";
@@ -595,6 +600,173 @@ namespace CrewChiefV4.rFactor2
         }
 
 
+        //////////////////////////////////////////////////////////////////////////////////////////
+        // Identical to TrackRulesCommandV01, except where noted by MM_NEW/MM_NOT_USED comments.  Renamed to match plugin convention.
+        //////////////////////////////////////////////////////////////////////////////////////////
+        public enum rF2TrackRulesCommand
+        {
+            AddFromTrack = 0,             // crossed s/f line for first time after full-course yellow was called
+            AddFromPit,                   // exited pit during full-course yellow
+            AddFromUndq,                  // during a full-course yellow, the admin reversed a disqualification
+            RemoveToPit,                  // entered pit during full-course yellow
+            RemoveToDnf,                  // vehicle DNF'd during full-course yellow
+            RemoveToDq,                   // vehicle DQ'd during full-course yellow
+            RemoveToUnloaded,             // vehicle unloaded (possibly kicked out or banned) during full-course yellow
+            MoveToBack,                   // misbehavior during full-course yellow, resulting in the penalty of being moved to the back of their current line
+            LongestTime,                  // misbehavior during full-course yellow, resulting in the penalty of being moved to the back of the longest line
+                                          //------------------
+            Maximum                       // should be last
+        }
+
+
+        //////////////////////////////////////////////////////////////////////////////////////////
+        // Identical to TrackRulesActionV01, except where noted by MM_NEW/MM_NOT_USED comments.
+        //////////////////////////////////////////////////////////////////////////////////////////
+        [StructLayout(LayoutKind.Sequential, Pack = 4)]
+        public struct rF2TrackRulesAction
+        {
+            // input only
+            public rF2TrackRulesCommand mCommand;        // recommended action
+            public long mID;                             // slot ID if applicable
+            public double mET;                           // elapsed time that event occurred, if applicable
+        }
+
+
+        //////////////////////////////////////////////////////////////////////////////////////////
+        // Identical to TrackRulesColumnV01, except where noted by MM_NEW/MM_NOT_USED comments.  Renamed to match plugin convention.
+        //////////////////////////////////////////////////////////////////////////////////////////
+        public enum rF2TrackRulesColumn
+        {
+            LeftLane = 0,                  // left (inside)
+            MidLefLane,                    // mid-left
+            MiddleLane,                    // middle
+            MidrRghtLane,                  // mid-right
+            RightLane,                     // right (outside)
+                                           //------------------
+            MaxLanes,                      // should be after the valid static lane choices
+                                           //------------------
+            Invalid = MaxLanes,            // currently invalid (hasn't crossed line or in pits/garage)
+            FreeChoice,                    // free choice (dynamically chosen by driver)
+            Pending,                       // depends on another participant's free choice (dynamically set after another driver chooses)
+                                           //------------------
+            Maximum                        // should be last
+        }
+
+
+        //////////////////////////////////////////////////////////////////////////////////////////
+        // Identical to TrackRulesParticipantV01, except where noted by MM_NEW/MM_NOT_USED comments.
+        //////////////////////////////////////////////////////////////////////////////////////////
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi, Pack = 4)]
+        public struct rF2TrackRulesParticipant
+        {
+            // input only
+            public int mID;                             // slot ID
+            public short mFrozenOrder;                   // 0-based place when caution came out (not valid for formation laps)
+            public short mPlace;                         // 1-based place (typically used for the initialization of the formation lap track order)
+            public float mYellowSeverity;                // a rating of how much this vehicle is contributing to a yellow flag (the sum of all vehicles is compared to TrackRulesV01::mSafetyCarThreshold)
+            public double mCurrentRelativeDistance;      // equal to ( ( ScoringInfoV01::mLapDist * this->mRelativeLaps ) + VehicleScoringInfoV01::mLapDist )
+
+            // input/output
+            public int mRelativeLaps;                   // current formation/caution laps relative to safety car (should generally be zero except when safety car crosses s/f line); this can be decremented to implement 'wave around' or 'beneficiary rule' (a.k.a. 'lucky dog' or 'free pass')
+            public rF2TrackRulesColumn mColumnAssignment;// which column (line/lane) that participant is supposed to be in
+            public int mPositionAssignment;             // 0-based position within column (line/lane) that participant is supposed to be located at (-1 is invalid)
+            public byte mAllowedToPit;                   // whether the rules allow this particular vehicle to enter pits right now
+
+            [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 3)]
+            public byte[] mUnused;                    //
+
+            public double mGoalRelativeDistance;         // calculated based on where the leader is, and adjusted by the desired column spacing and the column/position assignments
+
+            [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 96)]
+            public byte[] mMessage;                  // a message for this participant to explain what is going on (untranslated; it will get run through translator on client machines)
+
+            // future expansion
+            [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 192)]
+            public byte[] mExpansion;
+        }
+
+
+        //////////////////////////////////////////////////////////////////////////////////////////
+        // Identical to TrackRulesStageV01, except where noted by MM_NEW/MM_NOT_USED comments.  Renamed to match plugin convention.
+        //////////////////////////////////////////////////////////////////////////////////////////
+        public enum rF2TrackRulesStage
+        {
+            FormationInit = 0,           // initialization of the formation lap
+            FormationUpdate,             // update of the formation lap
+            Normal,                      // normal (non-yellow) update
+            CautionInit,                 // initialization of a full-course yellow
+            CautionUpdate,               // update of a full-course yellow
+                                         //------------------
+            Maximum                      // should be last
+        }
+
+
+        //////////////////////////////////////////////////////////////////////////////////////////
+        // Identical to TrackRulesV01, except where noted by MM_NEW/MM_NOT_USED comments.
+        //////////////////////////////////////////////////////////////////////////////////////////
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi, Pack = 4)]
+        public struct rF2TrackRules
+        {
+            // input only
+            public double mCurrentET;                    // current time
+            public rF2TrackRulesStage mStage;            // current stage
+            public rF2TrackRulesColumn mPoleColumn;      // column assignment where pole position seems to be located
+            public int mNumActions;                     // number of recent actions
+
+            // MM_NOT_USED
+            // TrackRulesActionV01 *mAction;         // array of recent actions
+            // MM_NEW
+            [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 8)]
+            public byte[] pointer1;
+
+            public int mNumParticipants;                // number of participants (vehicles)
+
+            public byte mYellowFlagDetected;             // whether yellow flag was requested or sum of participant mYellowSeverity's exceeds mSafetyCarThreshold
+            public byte mYellowFlagLapsWasOverridden;    // whether mYellowFlagLaps (below) is an admin request
+
+            public byte mSafetyCarExists;                // whether safety car even exists
+            public byte mSafetyCarActive;                // whether safety car is active
+            public int mSafetyCarLaps;                  // number of laps
+            public float mSafetyCarThreshold;            // the threshold at which a safety car is called out (compared to the sum of TrackRulesParticipantV01::mYellowSeverity for each vehicle)
+            public double mSafetyCarLapDist;             // safety car lap distance
+            public float mSafetyCarLapDistAtStart;       // where the safety car starts from
+
+            public float mPitLaneStartDist;              // where the waypoint branch to the pits breaks off (this may not be perfectly accurate)
+            public float mTeleportLapDist;               // the front of the teleport locations (a useful first guess as to where to throw the green flag)
+
+            // future input expansion
+            [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 256)]
+            public byte[] mInputExpansion;
+
+            // input/output
+            public sbyte mYellowFlagState;         // see ScoringInfoV01 for values
+            public short mYellowFlagLaps;                // suggested number of laps to run under yellow (may be passed in with admin command)
+
+            public int mSafetyCarInstruction;           // 0=no change, 1=go active, 2=head for pits
+            public float mSafetyCarSpeed;                // maximum speed at which to drive
+            public float mSafetyCarMinimumSpacing;       // minimum spacing behind safety car (-1 to indicate no limit)
+            public float mSafetyCarMaximumSpacing;       // maximum spacing behind safety car (-1 to indicate no limit)
+
+            public float mMinimumColumnSpacing;          // minimum desired spacing between vehicles in a column (-1 to indicate indeterminate/unenforced)
+            public float mMaximumColumnSpacing;          // maximum desired spacing between vehicles in a column (-1 to indicate indeterminate/unenforced)
+
+            public float mMinimumSpeed;                  // minimum speed that anybody should be driving (-1 to indicate no limit)
+            public float mMaximumSpeed;                  // maximum speed that anybody should be driving (-1 to indicate no limit)
+
+            [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 96)]
+            public byte[] mMessage;                  // a message for everybody to explain what is going on (which will get run through translator on client machines)
+
+            // MM_NOT_USED
+            // TrackRulesParticipantV01 *mParticipant;         // array of partipants (vehicles)
+            // MM_NEW
+            [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 8)]
+            public byte[] pointer2;
+
+            // future input/output expansion
+            [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 256)]
+            public byte[] mInputOutputExpansion;
+        };
+
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi, Pack = 4)]
         public struct rF2MappedBufferHeader
         {
@@ -635,6 +807,23 @@ namespace CrewChiefV4.rFactor2
 
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = rFactor2Constants.MAX_MAPPED_VEHICLES)]
             public rF2VehicleScoring[] mVehicles;
+        }
+
+
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi, Pack = 4)]
+        public struct rF2Rules
+        {
+            public byte mCurrentRead;                 // True indicates buffer is safe to read under mutex.
+            public int mBytesUpdatedHint;             // How many bytes of the structure were written during the last update.
+                                                      // 0 means unknown (whole buffer should be considered as updated).
+
+            public rF2TrackRules mTrackRules;
+
+            [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = rFactor2Constants.MAX_MAPPED_VEHICLES)]
+            public rF2TrackRulesAction[] mActions;
+
+            [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = rFactor2Constants.MAX_MAPPED_VEHICLES)]
+            public rF2TrackRulesParticipant[] mParticipants;
         }
 
 
