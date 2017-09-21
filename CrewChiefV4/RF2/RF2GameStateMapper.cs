@@ -1344,8 +1344,9 @@ namespace CrewChiefV4.rFactor2
 
             csd.Flag = currFlag;
 
-            if (playerRulesIdx != -1)
-                cgs.FrozenOrderData = this.GetFrozenOrderData(ref playerScoring, ref shared.scoring, ref shared.rules.mParticipants[playerRulesIdx], ref shared.rules);
+            // TODO: hide behind preference.
+            if (playerRulesIdx != -1 && pgs != null)
+                cgs.FrozenOrderData = this.GetFrozenOrderData(pgs.FrozenOrderData, ref playerScoring, ref shared.scoring, ref shared.rules.mParticipants[playerRulesIdx], ref shared.rules);
 
             // --------------------------------
             // penalties data
@@ -1847,15 +1848,17 @@ namespace CrewChiefV4.rFactor2
                 vehicleTelemetry.mWheels[i].mTemperature = new double[3];
         }
 
-        private FrozenOrderData GetFrozenOrderData(ref rF2VehicleScoring vehicle, ref rF2Scoring scoring, ref rF2TrackRulesParticipant vehicleRules, ref rF2Rules rules)
+        private FrozenOrderData GetFrozenOrderData(FrozenOrderData prevFrozenOrderData, ref rF2VehicleScoring vehicle, ref rF2Scoring scoring, ref rF2TrackRulesParticipant vehicleRules, ref rF2Rules rules)
         {
             var fod = new FrozenOrderData();
 
-            // TODO: Scope to only right game sessions/phases.
+            // Only applies to formation laps and FCY.
+            if (scoring.mScoringInfo.mGamePhase != (int)rFactor2Constants.rF2GamePhase.Formation
+                && scoring.mScoringInfo.mGamePhase != (int)rFactor2Constants.rF2GamePhase.FullCourseYellow)
+                return fod;
+
             var foStage = rules.mTrackRules.mStage;
-            if (foStage == rF2TrackRulesStage.Normal
-              || scoring.mScoringInfo.mGamePhase == (int)rFactor2Constants.rF2GamePhase.GridWalk  // Do not try figuring this out during Gridwalk, not enough data.
-              || scoring.mScoringInfo.mGamePhase == (int)rFactor2Constants.rF2GamePhase.Countdown)  // Definetely no FO during Countdown.
+            if (foStage == rF2TrackRulesStage.Normal)
                 return fod; // Note, there's slight race between scoring and rules here, FO messages should have validation on them.
 
             // Figure out the phase:
@@ -1863,7 +1866,8 @@ namespace CrewChiefV4.rFactor2
                 fod.Phase = FrozenOrderPhase.FullCourseYellow;
             else if (foStage == rF2TrackRulesStage.FormationInit || foStage == rF2TrackRulesStage.FormationUpdate)
             {
-                if (rules.mTrackRules.mSafetyCarActive == 1)
+                if (rules.mTrackRules.mSafetyCarActive == 1
+                      || prevFrozenOrderData.Phase == FrozenOrderPhase.Rolling)  // If FO started as Rolling, keep it as Rolling even after SC leaves the track
                     fod.Phase = FrozenOrderPhase.Rolling;
                 else
                 {

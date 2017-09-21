@@ -627,7 +627,7 @@ namespace CrewChiefV4.rFactor2
         {
             // input only
             public rF2TrackRulesCommand mCommand;        // recommended action
-            public long mID;                             // slot ID if applicable
+            public int mID;                              // slot ID if applicable
             public double mET;                           // elapsed time that event occurred, if applicable
         }
 
