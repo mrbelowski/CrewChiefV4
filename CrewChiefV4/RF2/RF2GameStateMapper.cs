@@ -741,7 +741,7 @@ namespace CrewChiefV4.rFactor2
             var frontLeftTemp = (cgs.TyreData.FrontLeft_CenterTemp + cgs.TyreData.FrontLeft_LeftTemp + cgs.TyreData.FrontLeft_RightTemp) / 3.0f;
             cgs.TyreData.FrontLeftPressure = wheelFrontLeft.mFlat == 0 ? (float)wheelFrontLeft.mPressure : 0.0f;
             cgs.TyreData.FrontLeftPercentWear = (float)(1.0f - wheelFrontLeft.mWear) * 100.0f;
-            if (csd.IsNewLap)
+            if (csd.IsNewLap || cgs.TyreData.PeakFrontLeftTemperatureForLap == 0)
             {
                 cgs.TyreData.PeakFrontLeftTemperatureForLap = frontLeftTemp;
             }
@@ -761,7 +761,7 @@ namespace CrewChiefV4.rFactor2
             cgs.TyreData.FrontRightPressure = wheelFrontRight.mFlat == 0 ? (float)wheelFrontRight.mPressure : 0.0f;
             cgs.TyreData.FrontRightPercentWear = (float)(1.0f - wheelFrontRight.mWear) * 100.0f;
 
-            if (csd.IsNewLap)
+            if (csd.IsNewLap || cgs.TyreData.PeakFrontRightTemperatureForLap == 0)
                 cgs.TyreData.PeakFrontRightTemperatureForLap = frontRightTemp;
             else if (pgs == null || frontRightTemp > pgs.TyreData.PeakFrontRightTemperatureForLap)
                 cgs.TyreData.PeakFrontRightTemperatureForLap = frontRightTemp;
@@ -777,7 +777,7 @@ namespace CrewChiefV4.rFactor2
             cgs.TyreData.RearLeftPressure = wheelRearLeft.mFlat == 0 ? (float)wheelRearLeft.mPressure : 0.0f;
             cgs.TyreData.RearLeftPercentWear = (float)(1.0f - wheelRearLeft.mWear) * 100.0f;
 
-            if (csd.IsNewLap)
+            if (csd.IsNewLap || cgs.TyreData.PeakRearLeftTemperatureForLap == 0)
                 cgs.TyreData.PeakRearLeftTemperatureForLap = rearLeftTemp;
             else if (pgs == null || rearLeftTemp > pgs.TyreData.PeakRearLeftTemperatureForLap)
                 cgs.TyreData.PeakRearLeftTemperatureForLap = rearLeftTemp;
@@ -793,7 +793,7 @@ namespace CrewChiefV4.rFactor2
             cgs.TyreData.RearRightPressure = wheelRearRight.mFlat == 0 ? (float)wheelRearRight.mPressure : 0.0f;
             cgs.TyreData.RearRightPercentWear = (float)(1.0f - wheelRearRight.mWear) * 100.0f;
 
-            if (csd.IsNewLap)
+            if (csd.IsNewLap || cgs.TyreData.PeakRearRightTemperatureForLap == 0)
                 cgs.TyreData.PeakRearRightTemperatureForLap = rearRightTemp;
             else if (pgs == null || rearRightTemp > pgs.TyreData.PeakRearRightTemperatureForLap)
                 cgs.TyreData.PeakRearRightTemperatureForLap = rearRightTemp;
