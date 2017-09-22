@@ -288,211 +288,352 @@ namespace CrewChiefV4.Events
             */
             var cgs = currentGameState;
             var pgs = previousGameState;
-            if (cgs.PitData.InPitlane /*|| cgs.SessionData.SessionRunningTime < 10 */|| GameStateData.onManualFormationLap || pgs == null)
+            if (cgs.PitData.InPitlane /*|| cgs.SessionData.SessionRunningTime < 10 */
+                || GameStateData.onManualFormationLap  // We may want manual formation to phase of FrozenOrder.
+                || pgs == null)
                 return; // don't process if we're in the pits or just started a session
 
-            if (cgs.FrozenOrderData.Phase == FrozenOrderPhase.None)
+            var cfod = cgs.FrozenOrderData;
+            var pfod = pgs.FrozenOrderData;
+            var cfodp = cgs.FrozenOrderData.Phase;
+            if (cfodp == FrozenOrderPhase.None)
                 return;  // Nothing to do.
 
-            if (pgs.FrozenOrderData.Phase == FrozenOrderPhase.None)
+            if (pfod.Phase == FrozenOrderPhase.None)
             {
-                Console.WriteLine("FO: NEW PHASE DETECTED: " +  cgs.FrozenOrderData.Phase);
-                return;
+                Console.WriteLine("FO: NEW PHASE DETECTED: " +  cfod.Phase);
             }
 
+            if (cfodp == FrozenOrderPhase.Rolling)
+            {
+                if (cfod.Action == FrozenOrderAction.Follow 
+                    && pfod.Action != FrozenOrderAction.Follow)
+                {
+                    Console.WriteLine(string.Format("FO: FOLLOW DIRVER: {0} IN COLUMN {1}", cfod.DriverToFollow, cfod.AssignedColumn));
+                }
+                else if (cfod.Action == FrozenOrderAction.AllowToPass
+                    && pfod.Action != FrozenOrderAction.AllowToPass)
+                {
+                    Console.WriteLine(string.Format("FO: ALLOW DIRVER: {0} TO PASS", cfod.DriverToFollow));
+                }
+                else if (cfod.Action == FrozenOrderAction.CatchUp
+                    && pfod.Action != FrozenOrderAction.CatchUp)
+                {
+                    Console.WriteLine(string.Format("FO: CATCH UP TO DIRVER: {0}", cfod.DriverToFollow));
+                }
+            }
 
-            /*
-            if (currentGameState.FlagData.useImprovisedIncidentCalling)
+        /*
+        if (currentGameState.FlagData.useImprovisedIncidentCalling)
+        {
+            improvisedYellowFlagImplementation(previousGameState, currentGameState);
+        }
+        else
+        {
+            gameDataYellowFlagImplementation(previousGameState, currentGameState);
+        }
+        //  now other flags
+        if (currentGameState.PositionAndMotionData.CarSpeed < 1)
+        {
+            return;
+        }
+        if (currentGameState.SessionData.Flag == FlagEnum.BLACK)
+        {
+            if (currentGameState.Now > lastBlackFlagTime.Add(timeBetweenBlackFlagMessages))
             {
-                improvisedYellowFlagImplementation(previousGameState, currentGameState);
-            }
-            else
-            {
-                gameDataYellowFlagImplementation(previousGameState, currentGameState);
-            }
-            //  now other flags
-            if (currentGameState.PositionAndMotionData.CarSpeed < 1)
-            {
-                return;
-            }
-            if (currentGameState.SessionData.Flag == FlagEnum.BLACK)
-            {
-                if (currentGameState.Now > lastBlackFlagTime.Add(timeBetweenBlackFlagMessages))
-                {
-                    lastBlackFlagTime = currentGameState.Now;
-                    audioPlayer.playMessage(new QueuedMessage(folderBlackFlag, 0, this));
-                }
-            }
-            else if (!currentGameState.PitData.InPitlane && currentGameState.SessionData.Flag == FlagEnum.BLUE)
-            {
-                if (currentGameState.Now > lastBlueFlagTime.Add(timeBetweenBlueFlagMessages))
-                {
-                    lastBlueFlagTime = currentGameState.Now;
-                    audioPlayer.playMessage(new QueuedMessage(folderBlueFlag, 0, this));
-                }
-            }
-            else if (currentGameState.SessionData.Flag == FlagEnum.WHITE && !GlobalBehaviourSettings.useAmericanTerms)
-            {
-                if (currentGameState.Now > lastWhiteFlagTime.Add(timeBetweenWhiteFlagMessages))
-                {
-                    lastWhiteFlagTime = currentGameState.Now;
-                    audioPlayer.playMessage(new QueuedMessage(folderWhiteFlagEU, 0, this));
-                }
-            }
-            if (currentGameState.FlagData.numCarsPassedIllegally >= 0 
-                && currentGameState.Now > nextIllegalPassWarning && currentGameState.FlagData.numCarsPassedIllegally != illegalPassCarsCountAtLastAnnouncement)
-            {                
-                processIllegalOvertakes(previousGameState, currentGameState);
-                illegalPassCarsCountAtLastAnnouncement = currentGameState.FlagData.numCarsPassedIllegally;
+                lastBlackFlagTime = currentGameState.Now;
+                audioPlayer.playMessage(new QueuedMessage(folderBlackFlag, 0, this));
             }
         }
-
-        // note that these messages still play even if the yellow flag messages are disabled - I suppose they're penalty related
-        private void processIllegalOvertakes(GameStateData previousGameState, GameStateData currentGameState)
+        else if (!currentGameState.PitData.InPitlane && currentGameState.SessionData.Flag == FlagEnum.BLUE)
         {
-            // some uncertainty here - once a penalty has been applied, does the numCarsPassedIllegally reset or remain non-zero?
-            if (illegalPassCarsCountAtLastAnnouncement > 0 && previousGameState.PenaltiesData.NumPenalties > currentGameState.PenaltiesData.NumPenalties)
+            if (currentGameState.Now > lastBlueFlagTime.Add(timeBetweenBlueFlagMessages))
             {
-                Console.WriteLine("numCarsPassedIllegally has changed from " + illegalPassCarsCountAtLastAnnouncement +
-                    " to  " + currentGameState.FlagData.numCarsPassedIllegally + " and penalty count has increased");
-                hasAlreadyWarnedAboutIllegalPass = false;
-                // TODO: really struggling to actually get penalised for passing under yellow, so I'm guessing here. 
-                // If we have a new penalty delay the next check for a while
-                nextIllegalPassWarning = currentGameState.Now + TimeSpan.FromSeconds(30);
+                lastBlueFlagTime = currentGameState.Now;
+                audioPlayer.playMessage(new QueuedMessage(folderBlueFlag, 0, this));
             }
-            else
+        }
+        else if (currentGameState.SessionData.Flag == FlagEnum.WHITE && !GlobalBehaviourSettings.useAmericanTerms)
+        {
+            if (currentGameState.Now > lastWhiteFlagTime.Add(timeBetweenWhiteFlagMessages))
             {
-                nextIllegalPassWarning = currentGameState.Now + illegalPassRepeatInterval;
-                if (currentGameState.FlagData.numCarsPassedIllegally > 0)
+                lastWhiteFlagTime = currentGameState.Now;
+                audioPlayer.playMessage(new QueuedMessage(folderWhiteFlagEU, 0, this));
+            }
+        }
+        if (currentGameState.FlagData.numCarsPassedIllegally >= 0 
+            && currentGameState.Now > nextIllegalPassWarning && currentGameState.FlagData.numCarsPassedIllegally != illegalPassCarsCountAtLastAnnouncement)
+        {                
+            processIllegalOvertakes(previousGameState, currentGameState);
+            illegalPassCarsCountAtLastAnnouncement = currentGameState.FlagData.numCarsPassedIllegally;
+        }
+    }
+
+    // note that these messages still play even if the yellow flag messages are disabled - I suppose they're penalty related
+    private void processIllegalOvertakes(GameStateData previousGameState, GameStateData currentGameState)
+    {
+        // some uncertainty here - once a penalty has been applied, does the numCarsPassedIllegally reset or remain non-zero?
+        if (illegalPassCarsCountAtLastAnnouncement > 0 && previousGameState.PenaltiesData.NumPenalties > currentGameState.PenaltiesData.NumPenalties)
+        {
+            Console.WriteLine("numCarsPassedIllegally has changed from " + illegalPassCarsCountAtLastAnnouncement +
+                " to  " + currentGameState.FlagData.numCarsPassedIllegally + " and penalty count has increased");
+            hasAlreadyWarnedAboutIllegalPass = false;
+            // TODO: really struggling to actually get penalised for passing under yellow, so I'm guessing here. 
+            // If we have a new penalty delay the next check for a while
+            nextIllegalPassWarning = currentGameState.Now + TimeSpan.FromSeconds(30);
+        }
+        else
+        {
+            nextIllegalPassWarning = currentGameState.Now + illegalPassRepeatInterval;
+            if (currentGameState.FlagData.numCarsPassedIllegally > 0)
+            {
+                if (hasAlreadyWarnedAboutIllegalPass)
                 {
-                    if (hasAlreadyWarnedAboutIllegalPass)
+                    if (currentGameState.FlagData.numCarsPassedIllegally == 1)
                     {
-                        if (currentGameState.FlagData.numCarsPassedIllegally == 1)
-                        {
-                            // don't allow any other message to override this one:
-                            audioPlayer.playMessageImmediately(new QueuedMessage("give_position_back_repeat", MessageContents(folderGiveOnePositionsBackNextWarning), 0, null));
-                        }
-                        else
-                        {
-                            // don't allow any other message to override this one:
-                            audioPlayer.playMessageImmediately(new QueuedMessage("give_positions_back_repeat", MessageContents(folderGivePositionsBackNextWarningIntro,
-                                currentGameState.FlagData.numCarsPassedIllegally, folderGivePositionsBackNextWarningOutro), 0, null));
-                        }
+                        // don't allow any other message to override this one:
+                        audioPlayer.playMessageImmediately(new QueuedMessage("give_position_back_repeat", MessageContents(folderGiveOnePositionsBackNextWarning), 0, null));
                     }
                     else
                     {
-                        hasAlreadyWarnedAboutIllegalPass = true;
-                        if (currentGameState.FlagData.numCarsPassedIllegally == 1)
-                        {
-                            // don't allow any other message to override this one:
-                            audioPlayer.playMessageImmediately(new QueuedMessage("give_position_back", MessageContents(folderGiveOnePositionBackFirstWarning), 0, null));
-                        }
-                        else
-                        {
-                            // don't allow any other message to override this one:
-                            audioPlayer.playMessageImmediately(new QueuedMessage("give_positions_back", MessageContents(folderGivePositionsBackFirstWarningIntro,
-                                currentGameState.FlagData.numCarsPassedIllegally, folderGivePositionsBackFirstWarningOutro), 0, null));
-                        }
+                        // don't allow any other message to override this one:
+                        audioPlayer.playMessageImmediately(new QueuedMessage("give_positions_back_repeat", MessageContents(folderGivePositionsBackNextWarningIntro,
+                            currentGameState.FlagData.numCarsPassedIllegally, folderGivePositionsBackNextWarningOutro), 0, null));
                     }
                 }
                 else
                 {
-                    // more guesswork :(
-                    if (currentGameState.PenaltiesData.NumPenalties == 0)
+                    hasAlreadyWarnedAboutIllegalPass = true;
+                    if (currentGameState.FlagData.numCarsPassedIllegally == 1)
                     {
                         // don't allow any other message to override this one:
-                        audioPlayer.playMessageImmediately(new QueuedMessage("give_positions_back_completed", MessageContents(folderGivePositionsBackCompleted), 0, null));
+                        audioPlayer.playMessageImmediately(new QueuedMessage("give_position_back", MessageContents(folderGiveOnePositionBackFirstWarning), 0, null));
                     }
-                    hasAlreadyWarnedAboutIllegalPass = false;
+                    else
+                    {
+                        // don't allow any other message to override this one:
+                        audioPlayer.playMessageImmediately(new QueuedMessage("give_positions_back", MessageContents(folderGivePositionsBackFirstWarningIntro,
+                            currentGameState.FlagData.numCarsPassedIllegally, folderGivePositionsBackFirstWarningOutro), 0, null));
+                    }
                 }
             }
-        }
-
-        private void gameDataYellowFlagImplementation(GameStateData previousGameState, GameStateData currentGameState)
-        {
-            if (previousGameState != null)
+            else
             {
-                Boolean playerStartedSector3 = previousGameState.SessionData.SectorNumber == 2 && currentGameState.SessionData.SectorNumber == 3;
-                Boolean leaderStartedSector3 = previousGameState.SessionData.LeaderSectorNumber == 2 && currentGameState.SessionData.LeaderSectorNumber == 3;
-                if (announceFCYPhase(previousGameState.FlagData.fcyPhase, currentGameState.FlagData.fcyPhase, currentGameState.Now, playerStartedSector3))
+                // more guesswork :(
+                if (currentGameState.PenaltiesData.NumPenalties == 0)
                 {
-                    lastFCYAnnounced = currentGameState.FlagData.fcyPhase;
-                    lastFCYAccounedTime = currentGameState.Now;
-                    switch (currentGameState.FlagData.fcyPhase)
-                    {
-                        case FullCourseYellowPhase.PENDING:
-                            // don't allow any other message to override this one:
-                            if (CrewChief.yellowFlagMessagesEnabled)
-                            {
-                                audioPlayer.playMessageImmediately(new QueuedMessage(GlobalBehaviourSettings.useAmericanTerms ? folderFCYellowStartUS : folderFCYellowStartEU, 0, null));
-                            }
-                            // start working out who's gone off
-                            if (enableOpponentCrashMessages)
-                            {
-                                findInitialIncidentCandidateKeys(-1, currentGameState.OpponentData);
-                                positionAtStartOfIncident = currentGameState.SessionData.Position;
-                                nextIncidentDriversCheck = currentGameState.Now + incidentDriversCheckInterval;
-                                getInvolvedInIncidentAttempts = 0;
-                                driversInvolvedInCurrentIncident.Clear();
-                            }
-                            break;
-                        case FullCourseYellowPhase.PITS_CLOSED:
-                            if (CrewChief.yellowFlagMessagesEnabled)
-                            {
-                                audioPlayer.playMessage(new QueuedMessage(GlobalBehaviourSettings.useAmericanTerms ? folderFCYellowPitsClosedUS : folderFCYellowPitsClosedEU, 0, this));
-                            }
-                            break;
-                        case FullCourseYellowPhase.PITS_OPEN_LEAD_LAP_VEHICLES:
-                            if (CrewChief.yellowFlagMessagesEnabled)
-                            {
-                                audioPlayer.playMessage(new QueuedMessage(GlobalBehaviourSettings.useAmericanTerms ? folderFCYellowPitsOpenLeadLapCarsUS : folderFCYellowPitsOpenLeadLapCarsEU, 0, this));
-                            }
-                            break;
-                        case FullCourseYellowPhase.PITS_OPEN:
-                            if (CrewChief.yellowFlagMessagesEnabled)
-                            {
-                                audioPlayer.playMessage(new QueuedMessage(GlobalBehaviourSettings.useAmericanTerms ? folderFCYellowPitsOpenUS : folderFCYellowPitsOpenEU, 0, this));
-                            }
-                            break;
-                        case FullCourseYellowPhase.LAST_LAP_NEXT:
-                            if (CrewChief.yellowFlagMessagesEnabled)
-                            {
-                                audioPlayer.playMessage(new QueuedMessage(GlobalBehaviourSettings.useAmericanTerms ? folderFCYellowLastLapNextUS : folderFCYellowLastLapNextEU, 0, this));
-                            }
-                            break;
-                        case FullCourseYellowPhase.LAST_LAP_CURRENT:
-                            if (CrewChief.yellowFlagMessagesEnabled)
-                            {
-                                audioPlayer.playMessage(new QueuedMessage(GlobalBehaviourSettings.useAmericanTerms ? folderFCYellowLastLapCurrentUS : folderFCYellowLastLapCurrentEU, 0, this));
-                            }
-                            break;
-                        case FullCourseYellowPhase.RACING:
-                            // don't allow any other message to override this one:
-                            if (CrewChief.yellowFlagMessagesEnabled)
-                            {
-                                audioPlayer.playMessageImmediately(new QueuedMessage(folderFCYellowGreenFlag, 0, null));
-                            }
-                            break;
-                        default:
-                            break;
-                    }
-                }
-                else if (currentGameState.FlagData.fcyPhase == FullCourseYellowPhase.LAST_LAP_CURRENT && leaderStartedSector3)
-                {
-                    // last sector, safety car coming in
                     // don't allow any other message to override this one:
-                    if (CrewChief.yellowFlagMessagesEnabled)
+                    audioPlayer.playMessageImmediately(new QueuedMessage("give_positions_back_completed", MessageContents(folderGivePositionsBackCompleted), 0, null));
+                }
+                hasAlreadyWarnedAboutIllegalPass = false;
+            }
+        }
+    }
+
+    private void gameDataYellowFlagImplementation(GameStateData previousGameState, GameStateData currentGameState)
+    {
+        if (previousGameState != null)
+        {
+            Boolean playerStartedSector3 = previousGameState.SessionData.SectorNumber == 2 && currentGameState.SessionData.SectorNumber == 3;
+            Boolean leaderStartedSector3 = previousGameState.SessionData.LeaderSectorNumber == 2 && currentGameState.SessionData.LeaderSectorNumber == 3;
+            if (announceFCYPhase(previousGameState.FlagData.fcyPhase, currentGameState.FlagData.fcyPhase, currentGameState.Now, playerStartedSector3))
+            {
+                lastFCYAnnounced = currentGameState.FlagData.fcyPhase;
+                lastFCYAccounedTime = currentGameState.Now;
+                switch (currentGameState.FlagData.fcyPhase)
+                {
+                    case FullCourseYellowPhase.PENDING:
+                        // don't allow any other message to override this one:
+                        if (CrewChief.yellowFlagMessagesEnabled)
+                        {
+                            audioPlayer.playMessageImmediately(new QueuedMessage(GlobalBehaviourSettings.useAmericanTerms ? folderFCYellowStartUS : folderFCYellowStartEU, 0, null));
+                        }
+                        // start working out who's gone off
+                        if (enableOpponentCrashMessages)
+                        {
+                            findInitialIncidentCandidateKeys(-1, currentGameState.OpponentData);
+                            positionAtStartOfIncident = currentGameState.SessionData.Position;
+                            nextIncidentDriversCheck = currentGameState.Now + incidentDriversCheckInterval;
+                            getInvolvedInIncidentAttempts = 0;
+                            driversInvolvedInCurrentIncident.Clear();
+                        }
+                        break;
+                    case FullCourseYellowPhase.PITS_CLOSED:
+                        if (CrewChief.yellowFlagMessagesEnabled)
+                        {
+                            audioPlayer.playMessage(new QueuedMessage(GlobalBehaviourSettings.useAmericanTerms ? folderFCYellowPitsClosedUS : folderFCYellowPitsClosedEU, 0, this));
+                        }
+                        break;
+                    case FullCourseYellowPhase.PITS_OPEN_LEAD_LAP_VEHICLES:
+                        if (CrewChief.yellowFlagMessagesEnabled)
+                        {
+                            audioPlayer.playMessage(new QueuedMessage(GlobalBehaviourSettings.useAmericanTerms ? folderFCYellowPitsOpenLeadLapCarsUS : folderFCYellowPitsOpenLeadLapCarsEU, 0, this));
+                        }
+                        break;
+                    case FullCourseYellowPhase.PITS_OPEN:
+                        if (CrewChief.yellowFlagMessagesEnabled)
+                        {
+                            audioPlayer.playMessage(new QueuedMessage(GlobalBehaviourSettings.useAmericanTerms ? folderFCYellowPitsOpenUS : folderFCYellowPitsOpenEU, 0, this));
+                        }
+                        break;
+                    case FullCourseYellowPhase.LAST_LAP_NEXT:
+                        if (CrewChief.yellowFlagMessagesEnabled)
+                        {
+                            audioPlayer.playMessage(new QueuedMessage(GlobalBehaviourSettings.useAmericanTerms ? folderFCYellowLastLapNextUS : folderFCYellowLastLapNextEU, 0, this));
+                        }
+                        break;
+                    case FullCourseYellowPhase.LAST_LAP_CURRENT:
+                        if (CrewChief.yellowFlagMessagesEnabled)
+                        {
+                            audioPlayer.playMessage(new QueuedMessage(GlobalBehaviourSettings.useAmericanTerms ? folderFCYellowLastLapCurrentUS : folderFCYellowLastLapCurrentEU, 0, this));
+                        }
+                        break;
+                    case FullCourseYellowPhase.RACING:
+                        // don't allow any other message to override this one:
+                        if (CrewChief.yellowFlagMessagesEnabled)
+                        {
+                            audioPlayer.playMessageImmediately(new QueuedMessage(folderFCYellowGreenFlag, 0, null));
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+            else if (currentGameState.FlagData.fcyPhase == FullCourseYellowPhase.LAST_LAP_CURRENT && leaderStartedSector3)
+            {
+                // last sector, safety car coming in
+                // don't allow any other message to override this one:
+                if (CrewChief.yellowFlagMessagesEnabled)
+                {
+                    audioPlayer.playMessageImmediately(new QueuedMessage(GlobalBehaviourSettings.useAmericanTerms ? folderFCYellowPrepareForGreenUS : folderFCYellowPrepareForGreenEU, 0, null));
+                }
+            }
+            else if ((currentGameState.FlagData.fcyPhase == FullCourseYellowPhase.PENDING ||
+                          currentGameState.FlagData.fcyPhase == FullCourseYellowPhase.PITS_CLOSED) && 
+                      currentGameState.Now > nextIncidentDriversCheck)
+            {
+                if (enableOpponentCrashMessages)
+                {
+                    if (getInvolvedInIncidentAttempts >= maxFCYGetInvolvedInIncidentAttempts)
                     {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(GlobalBehaviourSettings.useAmericanTerms ? folderFCYellowPrepareForGreenUS : folderFCYellowPrepareForGreenEU, 0, null));
+                        // we've collected as many involved drivers as we're going to get, so report them
+                        reportYellowFlagDrivers(currentGameState.OpponentData, currentGameState.SessionData.TrackDefinition);
+                        nextIncidentDriversCheck = DateTime.MaxValue;
+                        positionAtStartOfIncident = int.MaxValue;
+                        incidentCandidates.Clear();
+                        getInvolvedInIncidentAttempts = 0;
+                        driversInvolvedInCurrentIncident.Clear();
+                    }
+                    else
+                    {
+                        // get more involved drivers and schedule the next check
+                        nextIncidentDriversCheck = currentGameState.Now + incidentDriversCheckInterval;
+                        driversInvolvedInCurrentIncident.AddRange(getInvolvedIncidentCandidates(-1, currentGameState.OpponentData));
+                    }
+                    getInvolvedInIncidentAttempts++;
+                }
+            }
+            else
+            {
+                // Console.WriteLine("Track lap distance: "  + currentGameState.PositionAndMotionData.DistanceRoundTrack + 
+                //    " distanceToNearestIncident: " + currentGameState.FlagData.distanceToNearestIncident);
+                // local yellows
+                // note the 'allSectorsAreGreen' check - we can be under local yellow with no yellow sectors in the hairpin at Macau
+                if (!isUnderLocalYellow && currentGameState.FlagData.isLocalYellow && !allSectorsAreGreen(currentGameState.FlagData))
+                {
+                    //Console.WriteLine("FLAG_DEBUG: local yellow at " + currentGameState.Now.ToString("HH:mm:ss"));
+                    isUnderLocalYellow = true;
+                    // ensure the last state is updated, even if we don't actually read the transition
+                    lastSectorFlags[currentGameState.SessionData.SectorNumber - 1] = FlagEnum.YELLOW;
+
+                    nextIllegalPassWarning = currentGameState.Now;
+                    // we might not have warned of an incident ahead - no point in warning about it now we've actually reached it
+                    hasWarnedOfUpcomingIncident = true;
+                    waitingToWarnOfIncident = false;
+                    Dictionary<String, Object> validationData = new Dictionary<String, Object>();
+                    validationData.Add(validationIsLocalYellowKey, true);
+                    validationData.Add(isValidatingSectorMessage, false);
+                    if (CrewChief.yellowFlagMessagesEnabled && !currentGameState.PitData.InPitlane && !hasReportedIsUnderLocalYellow)
+                    {
+                        //Console.WriteLine("FLAG_DEBUG: queuing local yellow " + " at " + currentGameState.Now.ToString("HH:mm:ss"));
+                        audioPlayer.playMessage(new QueuedMessage(localFlagChangeMessageKey, MessageContents(folderLocalYellow), 1, this, validationData));
                     }
                 }
-                else if ((currentGameState.FlagData.fcyPhase == FullCourseYellowPhase.PENDING ||
-                              currentGameState.FlagData.fcyPhase == FullCourseYellowPhase.PITS_CLOSED) && 
-                          currentGameState.Now > nextIncidentDriversCheck)
+                else if (isUnderLocalYellow && !currentGameState.FlagData.isLocalYellow)
                 {
-                    if (enableOpponentCrashMessages)
+                    //Console.WriteLine("FLAG_DEBUG: local green at " + currentGameState.Now.ToString("HH:mm:ss"));
+                    isUnderLocalYellow = false;
+                    // we've passed the incident so allow warnings of other incidents approaching
+                    hasWarnedOfUpcomingIncident = false;
+                    waitingToWarnOfIncident = false;
+                    lastReportedOvertakeAllowed = PassAllowedUnderYellow.NO_DATA;
+                    Dictionary<String, Object> validationData = new Dictionary<String, Object>();
+                    validationData.Add(validationIsLocalYellowKey, false);
+                    validationData.Add(isValidatingSectorMessage, false);
+                    if (CrewChief.yellowFlagMessagesEnabled && !currentGameState.PitData.InPitlane && hasReportedIsUnderLocalYellow)
                     {
-                        if (getInvolvedInIncidentAttempts >= maxFCYGetInvolvedInIncidentAttempts)
+                        //Console.WriteLine("FLAG_DEBUG: queuing local green " + " at " + currentGameState.Now.ToString("HH:mm:ss"));
+                        audioPlayer.playMessage(new QueuedMessage(localFlagChangeMessageKey, MessageContents(folderLocalYellowClear), 1, this, validationData));
+                    }
+                }
+                else if (allSectorsAreGreen(currentGameState.FlagData))
+                {
+                    // if all the sectors are clear the local and warning booleans. This ensures we don't sit waiting for a 'clear' that never comes.
+                    // Console.WriteLine("FLAG_DEBUG: all sectors green at " + currentGameState.Now.ToString("HH:mm:ss"));
+                    isUnderLocalYellow = false;
+                    hasWarnedOfUpcomingIncident = false;
+                    waitingToWarnOfIncident = false;
+                    lastReportedOvertakeAllowed = PassAllowedUnderYellow.NO_DATA;
+                }
+                // This produces false-positives. Not sure why - TODO: work out what the issue is here - perhaps
+                // the data doesn't contain what I think it contains
+                /*else if (!isUnderLocalYellow && !hasWarnedOfUpcomingIncident)
+                {
+                    if (waitingToWarnOfIncident)
+                    {
+                        if (shouldWarnOfUpComingYellow(currentGameState))
+                        {
+                            if (currentGameState.Now > incidentAheadSettledTime)
+                            {
+                                waitingToWarnOfIncident = false;
+                                hasWarnedOfUpcomingIncident = true;
+                                if (CrewChief.yellowFlagMessagesEnabled && !currentGameState.PitData.InPitlane)
+                                {
+                                    audioPlayer.playMessageImmediately(new QueuedMessage(folderLocalYellowAhead, 0, null));
+                                }
+                            }
+                        }
+                        else
+                        {
+                            waitingToWarnOfIncident = false;
+                        }
+                    }
+                    else if (shouldWarnOfUpComingYellow(currentGameState))
+                    {
+                        waitingToWarnOfIncident = true;
+                        incidentAheadSettledTime = currentGameState.Now + incidentAheadSettlingTime;
+                    }
+                }
+                // sector yellows
+                for (int i = 0; i < 3; i++)
+                {
+                    //  Yellow Flags:
+                    // * Only announce Yellow if
+                    //      - Not in pits
+                    //      - Enough time ellapsed since last announcement
+                    //      - Yellow is in current or next sector (relative to player's sector).
+                    //      - For current sector, sometimes announce yellow without sector number.
+                    // * Only announce Clear message if
+                    //      - Not in pits
+                    //      - Enough time passed since Yellow was announced
+                    //      - Yellow went away in or next sector (relative to player's sector).
+                    //      - Announce delayed message and drop it if sector or sector flag changes
+
+                    // we've announced this, so see if we can add more information
+                    if (enableOpponentCrashMessages && i == waitingForCrashedDriverInSector && 
+                        currentGameState.Now > nextIncidentDriversCheck)
+                    {
+                        if (getInvolvedInIncidentAttempts >= maxLocalYellowGetInvolvedInIncidentAttempts)
                         {
                             // we've collected as many involved drivers as we're going to get, so report them
                             reportYellowFlagDrivers(currentGameState.OpponentData, currentGameState.SessionData.TrackDefinition);
@@ -501,230 +642,111 @@ namespace CrewChiefV4.Events
                             incidentCandidates.Clear();
                             getInvolvedInIncidentAttempts = 0;
                             driversInvolvedInCurrentIncident.Clear();
+                            waitingForCrashedDriverInSector = -1;
                         }
                         else
                         {
                             // get more involved drivers and schedule the next check
                             nextIncidentDriversCheck = currentGameState.Now + incidentDriversCheckInterval;
-                            driversInvolvedInCurrentIncident.AddRange(getInvolvedIncidentCandidates(-1, currentGameState.OpponentData));
+                            driversInvolvedInCurrentIncident.AddRange(getInvolvedIncidentCandidates(waitingForCrashedDriverInSector + 1, currentGameState.OpponentData));
                         }
                         getInvolvedInIncidentAttempts++;
                     }
-                }
-                else
-                {
-                    // Console.WriteLine("Track lap distance: "  + currentGameState.PositionAndMotionData.DistanceRoundTrack + 
-                    //    " distanceToNearestIncident: " + currentGameState.FlagData.distanceToNearestIncident);
-                    // local yellows
-                    // note the 'allSectorsAreGreen' check - we can be under local yellow with no yellow sectors in the hairpin at Macau
-                    if (!isUnderLocalYellow && currentGameState.FlagData.isLocalYellow && !allSectorsAreGreen(currentGameState.FlagData))
-                    {
-                        //Console.WriteLine("FLAG_DEBUG: local yellow at " + currentGameState.Now.ToString("HH:mm:ss"));
-                        isUnderLocalYellow = true;
-                        // ensure the last state is updated, even if we don't actually read the transition
-                        lastSectorFlags[currentGameState.SessionData.SectorNumber - 1] = FlagEnum.YELLOW;
 
-                        nextIllegalPassWarning = currentGameState.Now;
-                        // we might not have warned of an incident ahead - no point in warning about it now we've actually reached it
-                        hasWarnedOfUpcomingIncident = true;
-                        waitingToWarnOfIncident = false;
+                    FlagEnum sectorFlag = currentGameState.FlagData.sectorFlags[i];
+                    if (sectorFlag != lastSectorFlags[i])
+                    {
+                        // Console.WriteLine("FLAG_DEBUG: sector " + (i + 1) + " " + sectorFlag + " at " + currentGameState.Now.ToString("HH:mm:ss"));
+                        lastSectorFlags[i] = sectorFlag;
                         Dictionary<String, Object> validationData = new Dictionary<String, Object>();
-                        validationData.Add(validationIsLocalYellowKey, true);
-                        validationData.Add(isValidatingSectorMessage, false);
-                        if (CrewChief.yellowFlagMessagesEnabled && !currentGameState.PitData.InPitlane && !hasReportedIsUnderLocalYellow)
+                        validationData.Add(validationSectorNumberKey, i);
+                        validationData.Add(validationSectorFlagKey, sectorFlag);
+                        validationData.Add(isValidatingSectorMessage, true);
+                        if ((sectorFlag == FlagEnum.YELLOW || sectorFlag == FlagEnum.DOUBLE_YELLOW) && 
+                            currentGameState.Now > lastSectorFlagsReportedTime[i].Add(minTimeBetweenNewYellowFlagMessages) &&
+                                    (reportYellowsInAllSectors || isCurrentSector(currentGameState, i) || isNextSector(currentGameState, i)))
                         {
-                            //Console.WriteLine("FLAG_DEBUG: queuing local yellow " + " at " + currentGameState.Now.ToString("HH:mm:ss"));
-                            audioPlayer.playMessage(new QueuedMessage(localFlagChangeMessageKey, MessageContents(folderLocalYellow), 1, this, validationData));
-                        }
-                    }
-                    else if (isUnderLocalYellow && !currentGameState.FlagData.isLocalYellow)
-                    {
-                        //Console.WriteLine("FLAG_DEBUG: local green at " + currentGameState.Now.ToString("HH:mm:ss"));
-                        isUnderLocalYellow = false;
-                        // we've passed the incident so allow warnings of other incidents approaching
-                        hasWarnedOfUpcomingIncident = false;
-                        waitingToWarnOfIncident = false;
-                        lastReportedOvertakeAllowed = PassAllowedUnderYellow.NO_DATA;
-                        Dictionary<String, Object> validationData = new Dictionary<String, Object>();
-                        validationData.Add(validationIsLocalYellowKey, false);
-                        validationData.Add(isValidatingSectorMessage, false);
-                        if (CrewChief.yellowFlagMessagesEnabled && !currentGameState.PitData.InPitlane && hasReportedIsUnderLocalYellow)
-                        {
-                            //Console.WriteLine("FLAG_DEBUG: queuing local green " + " at " + currentGameState.Now.ToString("HH:mm:ss"));
-                            audioPlayer.playMessage(new QueuedMessage(localFlagChangeMessageKey, MessageContents(folderLocalYellowClear), 1, this, validationData));
-                        }
-                    }
-                    else if (allSectorsAreGreen(currentGameState.FlagData))
-                    {
-                        // if all the sectors are clear the local and warning booleans. This ensures we don't sit waiting for a 'clear' that never comes.
-                        // Console.WriteLine("FLAG_DEBUG: all sectors green at " + currentGameState.Now.ToString("HH:mm:ss"));
-                        isUnderLocalYellow = false;
-                        hasWarnedOfUpcomingIncident = false;
-                        waitingToWarnOfIncident = false;
-                        lastReportedOvertakeAllowed = PassAllowedUnderYellow.NO_DATA;
-                    }
-                    // This produces false-positives. Not sure why - TODO: work out what the issue is here - perhaps
-                    // the data doesn't contain what I think it contains
-                    /*else if (!isUnderLocalYellow && !hasWarnedOfUpcomingIncident)
-                    {
-                        if (waitingToWarnOfIncident)
-                        {
-                            if (shouldWarnOfUpComingYellow(currentGameState))
-                            {
-                                if (currentGameState.Now > incidentAheadSettledTime)
+                            // Sector i changed to yellow - don't announce this if we're in a local yellow
+                            if (!currentGameState.FlagData.isLocalYellow && lastSectorFlagsReported[i] != sectorFlag && 
+                                !incidentIsInCurrentSectorButBehind(i + 1, currentGameState))
+                            {                                            
+                                hasAlreadyWarnedAboutIllegalPass = false;
+
+                                // don't call sector yellow if we've in a local yellow
+                                if (CrewChief.gameDefinition.gameEnum != GameEnum.RACE_ROOM && isCurrentSector(currentGameState, i) && 4 > random.NextDouble() * 10)
                                 {
-                                    waitingToWarnOfIncident = false;
-                                    hasWarnedOfUpcomingIncident = true;
+                                    // If in current, sometimes announce without sector number.
                                     if (CrewChief.yellowFlagMessagesEnabled && !currentGameState.PitData.InPitlane)
-                                    {
-                                        audioPlayer.playMessageImmediately(new QueuedMessage(folderLocalYellowAhead, 0, null));
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                waitingToWarnOfIncident = false;
-                            }
-                        }
-                        else if (shouldWarnOfUpComingYellow(currentGameState))
-                        {
-                            waitingToWarnOfIncident = true;
-                            incidentAheadSettledTime = currentGameState.Now + incidentAheadSettlingTime;
-                        }
-                    }
-                    // sector yellows
-                    for (int i = 0; i < 3; i++)
-                    {
-                        //  Yellow Flags:
-                        // * Only announce Yellow if
-                        //      - Not in pits
-                        //      - Enough time ellapsed since last announcement
-                        //      - Yellow is in current or next sector (relative to player's sector).
-                        //      - For current sector, sometimes announce yellow without sector number.
-                        // * Only announce Clear message if
-                        //      - Not in pits
-                        //      - Enough time passed since Yellow was announced
-                        //      - Yellow went away in or next sector (relative to player's sector).
-                        //      - Announce delayed message and drop it if sector or sector flag changes
-
-                        // we've announced this, so see if we can add more information
-                        if (enableOpponentCrashMessages && i == waitingForCrashedDriverInSector && 
-                            currentGameState.Now > nextIncidentDriversCheck)
-                        {
-                            if (getInvolvedInIncidentAttempts >= maxLocalYellowGetInvolvedInIncidentAttempts)
-                            {
-                                // we've collected as many involved drivers as we're going to get, so report them
-                                reportYellowFlagDrivers(currentGameState.OpponentData, currentGameState.SessionData.TrackDefinition);
-                                nextIncidentDriversCheck = DateTime.MaxValue;
-                                positionAtStartOfIncident = int.MaxValue;
-                                incidentCandidates.Clear();
-                                getInvolvedInIncidentAttempts = 0;
-                                driversInvolvedInCurrentIncident.Clear();
-                                waitingForCrashedDriverInSector = -1;
-                            }
-                            else
-                            {
-                                // get more involved drivers and schedule the next check
-                                nextIncidentDriversCheck = currentGameState.Now + incidentDriversCheckInterval;
-                                driversInvolvedInCurrentIncident.AddRange(getInvolvedIncidentCandidates(waitingForCrashedDriverInSector + 1, currentGameState.OpponentData));
-                            }
-                            getInvolvedInIncidentAttempts++;
-                        }
-
-                        FlagEnum sectorFlag = currentGameState.FlagData.sectorFlags[i];
-                        if (sectorFlag != lastSectorFlags[i])
-                        {
-                            // Console.WriteLine("FLAG_DEBUG: sector " + (i + 1) + " " + sectorFlag + " at " + currentGameState.Now.ToString("HH:mm:ss"));
-                            lastSectorFlags[i] = sectorFlag;
-                            Dictionary<String, Object> validationData = new Dictionary<String, Object>();
-                            validationData.Add(validationSectorNumberKey, i);
-                            validationData.Add(validationSectorFlagKey, sectorFlag);
-                            validationData.Add(isValidatingSectorMessage, true);
-                            if ((sectorFlag == FlagEnum.YELLOW || sectorFlag == FlagEnum.DOUBLE_YELLOW) && 
-                                currentGameState.Now > lastSectorFlagsReportedTime[i].Add(minTimeBetweenNewYellowFlagMessages) &&
-                                        (reportYellowsInAllSectors || isCurrentSector(currentGameState, i) || isNextSector(currentGameState, i)))
-                            {
-                                // Sector i changed to yellow - don't announce this if we're in a local yellow
-                                if (!currentGameState.FlagData.isLocalYellow && lastSectorFlagsReported[i] != sectorFlag && 
-                                    !incidentIsInCurrentSectorButBehind(i + 1, currentGameState))
-                                {                                            
-                                    hasAlreadyWarnedAboutIllegalPass = false;
-                                    
-                                    // don't call sector yellow if we've in a local yellow
-                                    if (CrewChief.gameDefinition.gameEnum != GameEnum.RACE_ROOM && isCurrentSector(currentGameState, i) && 4 > random.NextDouble() * 10)
-                                    {
-                                        // If in current, sometimes announce without sector number.
-                                        if (CrewChief.yellowFlagMessagesEnabled && !currentGameState.PitData.InPitlane)
-                                        {
-                                            //Console.WriteLine("FLAG_DEBUG: queuing sector " + (i + 1) + " " + sectorFlag + " at " + currentGameState.Now.ToString("HH:mm:ss"));
-                                            audioPlayer.playMessage(new QueuedMessage(sectorFlagChangeMessageKeyStart + (i + 1), MessageContents(sectorFlag == FlagEnum.YELLOW ?
-                                                folderYellowFlag : folderDoubleYellowFlag), 3, this, validationData));
-                                        }
-                                    }
-                                    else if (CrewChief.yellowFlagMessagesEnabled && !currentGameState.PitData.InPitlane)
                                     {
                                         //Console.WriteLine("FLAG_DEBUG: queuing sector " + (i + 1) + " " + sectorFlag + " at " + currentGameState.Now.ToString("HH:mm:ss"));
                                         audioPlayer.playMessage(new QueuedMessage(sectorFlagChangeMessageKeyStart + (i + 1), MessageContents(sectorFlag == FlagEnum.YELLOW ?
-                                            folderYellowFlagSectors[i] : folderDoubleYellowFlagSectors[i]), 3, this, validationData));
+                                            folderYellowFlag : folderDoubleYellowFlag), 3, this, validationData));
                                     }
                                 }
-                                if (enableOpponentCrashMessages)
+                                else if (CrewChief.yellowFlagMessagesEnabled && !currentGameState.PitData.InPitlane)
                                 {
-                                    // start working out who's gone off
-                                    findInitialIncidentCandidateKeys(i + 1, currentGameState.OpponentData);
-                                    positionAtStartOfIncident = currentGameState.SessionData.Position;
-                                    nextIncidentDriversCheck = currentGameState.Now + incidentDriversCheckInterval;
-                                    getInvolvedInIncidentAttempts = 0;
-                                    driversInvolvedInCurrentIncident.Clear();
-                                    waitingForCrashedDriverInSector = i;
+                                    //Console.WriteLine("FLAG_DEBUG: queuing sector " + (i + 1) + " " + sectorFlag + " at " + currentGameState.Now.ToString("HH:mm:ss"));
+                                    audioPlayer.playMessage(new QueuedMessage(sectorFlagChangeMessageKeyStart + (i + 1), MessageContents(sectorFlag == FlagEnum.YELLOW ?
+                                        folderYellowFlagSectors[i] : folderDoubleYellowFlagSectors[i]), 3, this, validationData));
                                 }
                             }
-                            else if (sectorFlag == FlagEnum.GREEN)
+                            if (enableOpponentCrashMessages)
                             {
-                                // Sector i changed to green.  Check time since last announcement.
-                                if (lastSectorFlagsReported[i] != sectorFlag &&
-                                    currentGameState.Now > lastSectorFlagsReportedTime[i].Add(timeBetweenYellowAndClearFlagMessages))
+                                // start working out who's gone off
+                                findInitialIncidentCandidateKeys(i + 1, currentGameState.OpponentData);
+                                positionAtStartOfIncident = currentGameState.SessionData.Position;
+                                nextIncidentDriversCheck = currentGameState.Now + incidentDriversCheckInterval;
+                                getInvolvedInIncidentAttempts = 0;
+                                driversInvolvedInCurrentIncident.Clear();
+                                waitingForCrashedDriverInSector = i;
+                            }
+                        }
+                        else if (sectorFlag == FlagEnum.GREEN)
+                        {
+                            // Sector i changed to green.  Check time since last announcement.
+                            if (lastSectorFlagsReported[i] != sectorFlag &&
+                                currentGameState.Now > lastSectorFlagsReportedTime[i].Add(timeBetweenYellowAndClearFlagMessages))
+                            {
+                                if (CrewChief.yellowFlagMessagesEnabled && !currentGameState.PitData.InPitlane)
                                 {
-                                    if (CrewChief.yellowFlagMessagesEnabled && !currentGameState.PitData.InPitlane)
-                                    {
-                                        // hack the message key if we're reporting green in the current sector. This prevents
-                                        // a duplicate clear for local sectors
-                                        //Console.WriteLine("FLAG_DEBUG: queuing sector " + (i + 1) + " " + sectorFlag + " at " + currentGameState.Now.ToString("HH:mm:ss"));
-                                        String messageKey = i == currentGameState.SessionData.SectorNumber - 1 ? localFlagChangeMessageKey : sectorFlagChangeMessageKeyStart + (i + 1);
-                                        audioPlayer.playMessage(new QueuedMessage(messageKey,
-                                            MessageContents(folderGreenFlagSectors[i]), 3, this, validationData));
-                                    }
+                                    // hack the message key if we're reporting green in the current sector. This prevents
+                                    // a duplicate clear for local sectors
+                                    //Console.WriteLine("FLAG_DEBUG: queuing sector " + (i + 1) + " " + sectorFlag + " at " + currentGameState.Now.ToString("HH:mm:ss"));
+                                    String messageKey = i == currentGameState.SessionData.SectorNumber - 1 ? localFlagChangeMessageKey : sectorFlagChangeMessageKeyStart + (i + 1);
+                                    audioPlayer.playMessage(new QueuedMessage(messageKey,
+                                        MessageContents(folderGreenFlagSectors[i]), 3, this, validationData));
                                 }
                             }
                         }
-                    }
-                }                
-
-                if (isUnderLocalYellow && reportAllowedOvertakesUnderYellow)
-                {
-                    if (currentGameState.FlagData.canOvertakeCarInFront == PassAllowedUnderYellow.YES
-                        && lastReportedOvertakeAllowed == PassAllowedUnderYellow.NO && lastOvertakeAllowedReportTime.Add(TimeSpan.FromSeconds(3)) < currentGameState.Now)
-                    {
-                        if (CrewChief.yellowFlagMessagesEnabled)
-                        {
-                            audioPlayer.playMessageImmediately(new QueuedMessage(folderClearToOvertake, 0, this));
-                        }
-                        lastReportedOvertakeAllowed = PassAllowedUnderYellow.YES;
-                        lastOvertakeAllowedReportTime = currentGameState.Now;
-                    }
-                    else if (currentGameState.FlagData.canOvertakeCarInFront == PassAllowedUnderYellow.NO
-                        && lastReportedOvertakeAllowed == PassAllowedUnderYellow.YES && lastOvertakeAllowedReportTime.Add(TimeSpan.FromSeconds(3)) < currentGameState.Now)
-                    {
-                        if (CrewChief.yellowFlagMessagesEnabled)
-                        {
-                            audioPlayer.playMessageImmediately(new QueuedMessage(folderNoOvertaking, 0, this));
-                        }
-                        lastReportedOvertakeAllowed = PassAllowedUnderYellow.NO;
-                        lastOvertakeAllowedReportTime = currentGameState.Now;                                               
                     }
                 }
-            }*/
-        }
+            }                
+
+            if (isUnderLocalYellow && reportAllowedOvertakesUnderYellow)
+            {
+                if (currentGameState.FlagData.canOvertakeCarInFront == PassAllowedUnderYellow.YES
+                    && lastReportedOvertakeAllowed == PassAllowedUnderYellow.NO && lastOvertakeAllowedReportTime.Add(TimeSpan.FromSeconds(3)) < currentGameState.Now)
+                {
+                    if (CrewChief.yellowFlagMessagesEnabled)
+                    {
+                        audioPlayer.playMessageImmediately(new QueuedMessage(folderClearToOvertake, 0, this));
+                    }
+                    lastReportedOvertakeAllowed = PassAllowedUnderYellow.YES;
+                    lastOvertakeAllowedReportTime = currentGameState.Now;
+                }
+                else if (currentGameState.FlagData.canOvertakeCarInFront == PassAllowedUnderYellow.NO
+                    && lastReportedOvertakeAllowed == PassAllowedUnderYellow.YES && lastOvertakeAllowedReportTime.Add(TimeSpan.FromSeconds(3)) < currentGameState.Now)
+                {
+                    if (CrewChief.yellowFlagMessagesEnabled)
+                    {
+                        audioPlayer.playMessageImmediately(new QueuedMessage(folderNoOvertaking, 0, this));
+                    }
+                    lastReportedOvertakeAllowed = PassAllowedUnderYellow.NO;
+                    lastOvertakeAllowedReportTime = currentGameState.Now;                                               
+                }
+            }
+        }*/
+    }
 
 /*        private Boolean shouldWarnOfUpComingYellow(GameStateData gameState)
         {
