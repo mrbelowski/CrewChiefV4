@@ -661,28 +661,28 @@ namespace CrewChiefV4.rFactor2
         {
             // input only
             public int mID;                             // slot ID
-            public short mFrozenOrder;                   // 0-based place when caution came out (not valid for formation laps)
+            [XmlIgnore] public short mFrozenOrder;                   // 0-based place when caution came out (not valid for formation laps)
             public short mPlace;                         // 1-based place (typically used for the initialization of the formation lap track order)
-            public float mYellowSeverity;                // a rating of how much this vehicle is contributing to a yellow flag (the sum of all vehicles is compared to TrackRulesV01::mSafetyCarThreshold)
-            public double mCurrentRelativeDistance;      // equal to ( ( ScoringInfoV01::mLapDist * this->mRelativeLaps ) + VehicleScoringInfoV01::mLapDist )
+            [XmlIgnore] public float mYellowSeverity;                // a rating of how much this vehicle is contributing to a yellow flag (the sum of all vehicles is compared to TrackRulesV01::mSafetyCarThreshold)
+            [XmlIgnore] public double mCurrentRelativeDistance;      // equal to ( ( ScoringInfoV01::mLapDist * this->mRelativeLaps ) + VehicleScoringInfoV01::mLapDist )
 
             // input/output
-            public int mRelativeLaps;                   // current formation/caution laps relative to safety car (should generally be zero except when safety car crosses s/f line); this can be decremented to implement 'wave around' or 'beneficiary rule' (a.k.a. 'lucky dog' or 'free pass')
+            [XmlIgnore] public int mRelativeLaps;                   // current formation/caution laps relative to safety car (should generally be zero except when safety car crosses s/f line); this can be decremented to implement 'wave around' or 'beneficiary rule' (a.k.a. 'lucky dog' or 'free pass')
             public rF2TrackRulesColumn mColumnAssignment;// which column (line/lane) that participant is supposed to be in
             public int mPositionAssignment;             // 0-based position within column (line/lane) that participant is supposed to be located at (-1 is invalid)
             public byte mAllowedToPit;                   // whether the rules allow this particular vehicle to enter pits right now
 
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 3)]
-            public byte[] mUnused;                    //
+            [XmlIgnore] public byte[] mUnused;                    //
 
-            public double mGoalRelativeDistance;         // calculated based on where the leader is, and adjusted by the desired column spacing and the column/position assignments
+            [XmlIgnore] public double mGoalRelativeDistance;         // calculated based on where the leader is, and adjusted by the desired column spacing and the column/position assignments
 
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 96)]
-            public byte[] mMessage;                  // a message for this participant to explain what is going on (untranslated; it will get run through translator on client machines)
+            [XmlIgnore] public byte[] mMessage;                  // a message for this participant to explain what is going on (untranslated; it will get run through translator on client machines)
 
             // future expansion
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 192)]
-            public byte[] mExpansion;
+            [XmlIgnore] public byte[] mExpansion;
         }
 
 
@@ -708,63 +708,63 @@ namespace CrewChiefV4.rFactor2
         public struct rF2TrackRules
         {
             // input only
-            public double mCurrentET;                    // current time
+            [XmlIgnore] public double mCurrentET;                    // current time
             public rF2TrackRulesStage mStage;            // current stage
             public rF2TrackRulesColumn mPoleColumn;      // column assignment where pole position seems to be located
-            public int mNumActions;                     // number of recent actions
+            [XmlIgnore] public int mNumActions;                     // number of recent actions
 
             // MM_NOT_USED
             // TrackRulesActionV01 *mAction;         // array of recent actions
             // MM_NEW
+            
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 8)]
-            public byte[] pointer1;
+            [XmlIgnore] public byte[] pointer1;
 
             public int mNumParticipants;                // number of participants (vehicles)
 
-            public byte mYellowFlagDetected;             // whether yellow flag was requested or sum of participant mYellowSeverity's exceeds mSafetyCarThreshold
-            public byte mYellowFlagLapsWasOverridden;    // whether mYellowFlagLaps (below) is an admin request
-
-            public byte mSafetyCarExists;                // whether safety car even exists
+            [XmlIgnore] public byte mYellowFlagDetected;             // whether yellow flag was requested or sum of participant mYellowSeverity's exceeds mSafetyCarThreshold
+            [XmlIgnore] public byte mYellowFlagLapsWasOverridden;    // whether mYellowFlagLaps (below) is an admin request
+            [XmlIgnore] public byte mSafetyCarExists;                // whether safety car even exists
             public byte mSafetyCarActive;                // whether safety car is active
-            public int mSafetyCarLaps;                  // number of laps
-            public float mSafetyCarThreshold;            // the threshold at which a safety car is called out (compared to the sum of TrackRulesParticipantV01::mYellowSeverity for each vehicle)
-            public double mSafetyCarLapDist;             // safety car lap distance
-            public float mSafetyCarLapDistAtStart;       // where the safety car starts from
 
-            public float mPitLaneStartDist;              // where the waypoint branch to the pits breaks off (this may not be perfectly accurate)
-            public float mTeleportLapDist;               // the front of the teleport locations (a useful first guess as to where to throw the green flag)
+            [XmlIgnore] public int mSafetyCarLaps;                  // number of laps
+            [XmlIgnore] public float mSafetyCarThreshold;            // the threshold at which a safety car is called out (compared to the sum of TrackRulesParticipantV01::mYellowSeverity for each vehicle) 
+            [XmlIgnore] public double mSafetyCarLapDist;             // safety car lap distance
+
+            [XmlIgnore] public float mSafetyCarLapDistAtStart;       // where the safety car starts from
+            [XmlIgnore] public float mPitLaneStartDist;              // where the waypoint branch to the pits breaks off (this may not be perfectly accurate)
+            [XmlIgnore] public float mTeleportLapDist;               // the front of the teleport locations (a useful first guess as to where to throw the green flag)
 
             // future input expansion
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 256)]
-            public byte[] mInputExpansion;
+            [XmlIgnore] public byte[] mInputExpansion;
 
             // input/output
-            public sbyte mYellowFlagState;         // see ScoringInfoV01 for values
-            public short mYellowFlagLaps;                // suggested number of laps to run under yellow (may be passed in with admin command)
-
-            public int mSafetyCarInstruction;           // 0=no change, 1=go active, 2=head for pits
+            [XmlIgnore] public sbyte mYellowFlagState;         // see ScoringInfoV01 for values
+            [XmlIgnore] public short mYellowFlagLaps;                // suggested number of laps to run under yellow (may be passed in with admin command)
+            [XmlIgnore] public int mSafetyCarInstruction;           // 0=no change, 1=go active, 2=head for pits
             public float mSafetyCarSpeed;                // maximum speed at which to drive
-            public float mSafetyCarMinimumSpacing;       // minimum spacing behind safety car (-1 to indicate no limit)
-            public float mSafetyCarMaximumSpacing;       // maximum spacing behind safety car (-1 to indicate no limit)
 
-            public float mMinimumColumnSpacing;          // minimum desired spacing between vehicles in a column (-1 to indicate indeterminate/unenforced)
-            public float mMaximumColumnSpacing;          // maximum desired spacing between vehicles in a column (-1 to indicate indeterminate/unenforced)
+            [XmlIgnore] public float mSafetyCarMinimumSpacing;       // minimum spacing behind safety car (-1 to indicate no limit)
+            [XmlIgnore] public float mSafetyCarMaximumSpacing;       // maximum spacing behind safety car (-1 to indicate no limit)
+            [XmlIgnore] public float mMinimumColumnSpacing;          // minimum desired spacing between vehicles in a column (-1 to indicate indeterminate/unenforced)
+            [XmlIgnore] public float mMaximumColumnSpacing;          // maximum desired spacing between vehicles in a column (-1 to indicate indeterminate/unenforced)
 
-            public float mMinimumSpeed;                  // minimum speed that anybody should be driving (-1 to indicate no limit)
-            public float mMaximumSpeed;                  // maximum speed that anybody should be driving (-1 to indicate no limit)
+            [XmlIgnore] public float mMinimumSpeed;                  // minimum speed that anybody should be driving (-1 to indicate no limit)
+            [XmlIgnore] public float mMaximumSpeed;                  // maximum speed that anybody should be driving (-1 to indicate no limit)
 
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 96)]
-            public byte[] mMessage;                  // a message for everybody to explain what is going on (which will get run through translator on client machines)
+            [XmlIgnore] public byte[] mMessage;                  // a message for everybody to explain what is going on (which will get run through translator on client machines)
 
             // MM_NOT_USED
             // TrackRulesParticipantV01 *mParticipant;         // array of partipants (vehicles)
             // MM_NEW
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 8)]
-            public byte[] pointer2;
+            [XmlIgnore] public byte[] pointer2;
 
             // future input/output expansion
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 256)]
-            public byte[] mInputOutputExpansion;
+            [XmlIgnore] public byte[] mInputOutputExpansion;
         };
 
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi, Pack = 4)]
@@ -819,6 +819,7 @@ namespace CrewChiefV4.rFactor2
 
             public rF2TrackRules mTrackRules;
 
+            [XmlIgnore]
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = rFactor2Constants.MAX_MAPPED_VEHICLES)]
             public rF2TrackRulesAction[] mActions;
 
