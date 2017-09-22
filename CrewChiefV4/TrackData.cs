@@ -98,6 +98,7 @@ namespace CrewChiefV4
                         break;
                     case GameEnum.PCARS_32BIT:
                     case GameEnum.PCARS_64BIT:
+                    case GameEnum.PCARS2:
                     case GameEnum.PCARS_NETWORK:
                         if (String.Equals(trackLandmarksForTrack.pcarsTrackName, trackName, StringComparison.OrdinalIgnoreCase))
                         {
@@ -376,7 +377,8 @@ namespace CrewChiefV4
 
         public static TrackDefinition getTrackDefinition(String trackName, int trackId, float trackLength)
         {
-            if (CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_32BIT || CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_64BIT || CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_NETWORK)
+            if (CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_32BIT || CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_64BIT ||
+                CrewChief.gameDefinition.gameEnum == GameEnum.PCARS2 || CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_NETWORK)
             {
                 List<TrackDefinition> defsWhichMatchName = new List<TrackDefinition>();
                 foreach (TrackDefinition def in pCarsTracks)
