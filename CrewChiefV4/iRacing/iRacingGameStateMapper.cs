@@ -16,8 +16,8 @@ namespace CrewChiefV4.iRacing
     {
         public static String playerName = null;
         private SpeechRecogniser speechRecogniser;
-        private TimeDelta timeDelta = null; 
-
+        private TimeDelta timeDelta = null;
+        private Car playerCar = null;
         public iRacingGameStateMapper()
         {
 
@@ -105,7 +105,7 @@ namespace CrewChiefV4.iRacing
                     Console.WriteLine("SessionTotalRunTime = " + currentGameState.SessionData.SessionTotalRunTime);
                 }
 
-                timeDelta = new TimeDelta((float)ParseTrackLength(shared.SessionData.WeekendInfo.TrackLength) * 1000f, 20, 64);
+                timeDelta = new TimeDelta((float)ParseTrackLength(shared.SessionData.WeekendInfo.TrackLength) * 1000f, 10, 64);
                 
                 foreach(Car car in shared.Telemetry.RaceCars)
                 {
@@ -114,6 +114,7 @@ namespace CrewChiefV4.iRacing
                     Console.WriteLine("Driver Added: " + driverName);
                     if (car.CarIdx == PlayerCarIdx)
                     {
+                        playerCar = car;
                         if (playerName == null)
                         {
                             NameValidator.validateName(driverName);
@@ -134,7 +135,7 @@ namespace CrewChiefV4.iRacing
             else
             {
                 timeDelta.Update(shared.Telemetry.SessionTime, shared.Telemetry.CarIdxLapDistPct);
-                Console.WriteLine("timeDelta:" + TimeDelta.DeltaToString(TimeSpan.FromSeconds(timeDelta.currentlapTime[PlayerCarIdx])));
+                Console.WriteLine("timeDelta:" + TimeDelta.DeltaToString(playerCar.LastTimeSpan));
             }
             return currentGameState;
            

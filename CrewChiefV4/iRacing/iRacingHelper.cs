@@ -120,7 +120,7 @@ namespace CrewChiefV4.iRacing
     public class TimeDelta
     {
 
-        private Single splitdistance = 20;
+        private Single splitdistance = 10;
 
         private Int32 maxcars = 64;
         private Double[][] splits = new Double[0][];
