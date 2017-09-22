@@ -24,10 +24,10 @@ personalisations_are_up_to_date = Personalisations are up to date
 stop = Stop
 start_application = Start application
 
-pcars_64_bit = Project Cars (64 bit)
-pcars_32_bit = Project Cars (32 bit)
+pcars_64_bit = Project Cars 1 and 2 (64 bit)
+pcars_32_bit = Project Cars 1 (32 bit)
 race_room = Race Room
-pcars_udp = Project Cars (network data)
+pcars_udp = Project Cars 1 and 2 (network data)
 rfactor1 = rFactor
 gamestockcar = Stock Car Extreme
 automobilista = Automobilista
