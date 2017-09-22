@@ -101,6 +101,7 @@
     <Compile Include="Audio\AudioPlayer.cs" />
     <Compile Include="ControllerConfiguration.cs" />
     <Compile Include="Events\CommonDataContainers.cs" />
+    <Compile Include="Events\FrozenOrderMonitor.cs" />
     <Compile Include="Events\OvertakingAidsMonitor.cs" />
     <Compile Include="Events\ConditionsMonitor.cs" />
     <Compile Include="Events\SessionEndMessages.cs" />
