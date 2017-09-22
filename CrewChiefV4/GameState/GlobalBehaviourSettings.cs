@@ -73,6 +73,7 @@ namespace CrewChiefV4.GameState
                 {
                     case GameEnum.PCARS_64BIT:
                     case GameEnum.PCARS_32BIT:
+                    case GameEnum.PCARS2:
                     case GameEnum.PCARS_NETWORK:
                         spotterVehicleLength = UserSettings.GetUserSettings().getFloat("pcars_spotter_car_length");
                         break;
