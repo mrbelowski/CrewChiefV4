@@ -2317,7 +2317,7 @@ namespace CrewChiefV4.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("C:/Program Files (x86)/Steam//steamapps/common/Project CARS 2/pCARS2AVX.exe")]
+        [global::System.Configuration.DefaultSettingValueAttribute("C:/Program Files (x86)/Steam/steamapps/common/Project CARS 2/pCARS2AVX.exe")]
         public string pcars2_launch_exe {
             get {
                 return ((string)(this["pcars2_launch_exe"]));

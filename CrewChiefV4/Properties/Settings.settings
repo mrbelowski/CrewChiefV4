@@ -576,7 +576,7 @@
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="pcars2_launch_exe" Type="System.String" Scope="User">
-      <Value Profile="(Default)">C:/Program Files (x86)/Steam//steamapps/common/Project CARS 2/pCARS2AVX.exe</Value>
+      <Value Profile="(Default)">C:/Program Files (x86)/Steam/steamapps/common/Project CARS 2/pCARS2AVX.exe</Value>
     </Setting>
     <Setting Name="pcars2_launch_params" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
