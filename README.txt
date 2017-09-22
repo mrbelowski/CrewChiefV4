@@ -10,6 +10,8 @@ For support and discussions about Crew Chief we have our very own forum here: ht
 
 Changelog
 ---------
+Version 4.8.0.2: Fixed broken PCars2 oval track mapping - should now correctly call 'car low' / 'car high' on ovals for all spotters except Geoffrey
+
 Version 4.8.0.1: Added some Project Cars 2 stuff - game type, launch options, and a couple of initial track mappings; fixed some incorrect tyre temperature warnings
 
 Version 4.8.0.0: Updated Assetto Corsa plugin to be compatible with latest AC update; Added "Block messages when talking to the chief" option - this prevents any messages being played while you're making a voice command; Some fuel consumption calculation fixes.

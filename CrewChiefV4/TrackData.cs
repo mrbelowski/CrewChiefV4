@@ -71,7 +71,8 @@ namespace CrewChiefV4
             else
             {
                 // if an approximate length is specified in the JSON, check that the length from the game is close to this
-                return Math.Abs(lengthFromGame - approximateLengthFromJSON) < 50;
+                // pretty lenient here as it has to work for multiple games each with their own inaccuracies.
+                return Math.Abs(lengthFromGame - approximateLengthFromJSON) < 200;
             }
         }
 
@@ -100,7 +101,8 @@ namespace CrewChiefV4
                     case GameEnum.PCARS_64BIT:
                     case GameEnum.PCARS2:
                     case GameEnum.PCARS_NETWORK:
-                        if (String.Equals(trackLandmarksForTrack.pcarsTrackName, trackName, StringComparison.OrdinalIgnoreCase))
+                        if (String.Equals(trackLandmarksForTrack.pcarsTrackName, trackName, StringComparison.OrdinalIgnoreCase)
+                            && checkForAndMatchOnLength(lengthFromGame, trackLandmarksForTrack.approximateTrackLength))
                         {
                             Console.WriteLine(trackLandmarksForTrack.trackLandmarks.Count + " landmarks defined for this track");
                             return new TrackDataContainer(trackLandmarksForTrack.trackLandmarks, trackLandmarksForTrack.isOval);
@@ -405,8 +407,8 @@ namespace CrewChiefV4
                 {
                     return defGuessedFromLength;
                 }
-                String nameToLog = trackName != null ? trackName : "null";
-                return new TrackDefinition("unknown track - name " + nameToLog + ", length = " + trackLength, trackLength);
+                String nameToUse = trackName != null ? trackName : "unknown track (no name)";
+                return new TrackDefinition(nameToUse, trackLength);
             }
             else if (CrewChief.gameDefinition.gameEnum == GameEnum.RACE_ROOM)
             {
