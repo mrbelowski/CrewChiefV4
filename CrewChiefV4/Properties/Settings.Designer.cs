@@ -2314,5 +2314,41 @@ namespace CrewChiefV4.Properties {
                 this["reject_message_when_talking"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("C:/Program Files (x86)/Steam/steamapps/common/Project CARS 2/pCARS2AVX.exe")]
+        public string pcars2_launch_exe {
+            get {
+                return ((string)(this["pcars2_launch_exe"]));
+            }
+            set {
+                this["pcars2_launch_exe"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string pcars2_launch_params {
+            get {
+                return ((string)(this["pcars2_launch_params"]));
+            }
+            set {
+                this["pcars2_launch_params"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool launch_pcars2 {
+            get {
+                return ((bool)(this["launch_pcars2"]));
+            }
+            set {
+                this["launch_pcars2"] = value;
+            }
+        }
     }
 }

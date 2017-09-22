@@ -45,8 +45,9 @@ namespace CrewChiefV4
                             pcarsUDPreader = new PCarsUDPreader();
                         }
                         return pcarsUDPreader;
-                    case GameEnum.PCARS_32BIT:                        
+                    case GameEnum.PCARS_32BIT:
                     case GameEnum.PCARS_64BIT:
+                    case GameEnum.PCARS2:
                         if (pcarsSharedMemoryReader == null) 
                         {
                             pcarsSharedMemoryReader = new PCarsSharedMemoryReader();
@@ -91,6 +92,7 @@ namespace CrewChiefV4
                     case GameEnum.PCARS_NETWORK:                        
                     case GameEnum.PCARS_32BIT:
                     case GameEnum.PCARS_64BIT:
+                    case GameEnum.PCARS2:
                         if (pcarsGameStateMapper == null)
                         {
                             pcarsGameStateMapper = new PCarsGameStateMapper();
