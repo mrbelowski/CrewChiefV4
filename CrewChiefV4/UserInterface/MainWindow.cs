@@ -420,6 +420,13 @@ namespace CrewChiefV4
                         setFromCommandLine = true;
                         break;
                     }
+                    else if (arg.Equals(GameDefinition.pCars2.gameEnum.ToString()))
+                    {
+                        Console.WriteLine("Set PCars 2 mode from command line");
+                        this.gameDefinitionList.Text = GameDefinition.pCars2.friendlyName;
+                        setFromCommandLine = true;
+                        break;
+                    }
                     else if (arg.Equals(GameDefinition.pCars32Bit.gameEnum.ToString()))
                     {
                         Console.WriteLine("Set PCars 32bit mode from command line");
@@ -434,6 +441,7 @@ namespace CrewChiefV4
                         setFromCommandLine = true;
                         break;
                     }
+                    
                     else if (arg.Equals(GameDefinition.pCarsNetwork.gameEnum.ToString()))
                     {
                         Console.WriteLine("Set PCars network mode from command line");
