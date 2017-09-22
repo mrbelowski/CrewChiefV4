@@ -188,6 +188,7 @@ namespace CrewChiefV4.Events
                         // for PCars mRainDensity value is 0 or 1
                         if (CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_32BIT ||
                             CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_64BIT ||
+                            CrewChief.gameDefinition.gameEnum == GameEnum.PCARS2 ||
                             CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_NETWORK)
                         {
                             if (currentConditions.RainDensity == 0 && rainAtLastReport == 1)

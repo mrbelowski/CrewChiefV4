@@ -10,6 +10,12 @@ For support and discussions about Crew Chief we have our very own forum here: ht
 
 Changelog
 ---------
+Version 4.8.0.2: Fixed broken PCars2 oval track mapping - should now correctly call 'car low' / 'car high' on ovals for all spotters except Geoffrey
+
+Version 4.8.0.1: Added some Project Cars 2 stuff - game type, launch options, and a couple of initial track mappings; fixed some incorrect tyre temperature warnings
+
+Version 4.8.0.0: Updated Assetto Corsa plugin to be compatible with latest AC update; Added "Block messages when talking to the chief" option - this prevents any messages being played while you're making a voice command; Some fuel consumption calculation fixes.
+
 Version 4.7.9.9: R3E 64Bit support; Added voice command to tell you (once the data is availalbe) what the relative performance difference is between different tyre types based on the best lap in the session for tyre type - e.g. "Softs are about 0.4 seconds faster than Mediums, Mediums are about 1.2 seconds faster than Hards". The voice command is "Give me tyre pace differences", "What are the tire speeds?" / "Whats the difference between tires?" / "Compare tire compounds" (R3E and RF2 only); Added opponent tyre type info when they leave the pits after changing tyre type (R3E and RF2 only).
 
 Version 4.7.9.7: More RF2 race end detection fixes; Added Imola corner mappings for R3E; fixed race start message being repeated on manual rolling starts; some additional checks to prevent mandatory pitstop messages playing during or after you've completed your stop.

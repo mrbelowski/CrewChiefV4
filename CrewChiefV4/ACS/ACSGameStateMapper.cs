@@ -1839,7 +1839,7 @@ namespace CrewChiefV4.assetto
             currentGameState.TyreData.FrontLeft_LeftTemp = shared.acsPhysics.tyreTempO[0];
             currentGameState.TyreData.FrontLeft_RightTemp = shared.acsPhysics.tyreTempI[0];
             currentGameState.TyreData.FrontLeftTyreType = defaultTyreTypeForPlayersCar;
-            if (currentGameState.SessionData.IsNewLap)
+            if (currentGameState.SessionData.IsNewLap || currentGameState.TyreData.PeakFrontLeftTemperatureForLap == 0)
             {
                 currentGameState.TyreData.PeakFrontLeftTemperatureForLap = currentGameState.TyreData.FrontLeft_CenterTemp;
             }
@@ -1852,7 +1852,7 @@ namespace CrewChiefV4.assetto
             currentGameState.TyreData.FrontRight_LeftTemp = shared.acsPhysics.tyreTempI[1];
             currentGameState.TyreData.FrontRight_RightTemp = shared.acsPhysics.tyreTempO[1];
             currentGameState.TyreData.FrontRightTyreType = defaultTyreTypeForPlayersCar;
-            if (currentGameState.SessionData.IsNewLap)
+            if (currentGameState.SessionData.IsNewLap || currentGameState.TyreData.PeakFrontRightTemperatureForLap == 0)
             {
                 currentGameState.TyreData.PeakFrontRightTemperatureForLap = currentGameState.TyreData.FrontRight_CenterTemp;
             }
@@ -1865,7 +1865,7 @@ namespace CrewChiefV4.assetto
             currentGameState.TyreData.RearLeft_LeftTemp = shared.acsPhysics.tyreTempO[2];
             currentGameState.TyreData.RearLeft_RightTemp = shared.acsPhysics.tyreTempI[2];
             currentGameState.TyreData.RearLeftTyreType = defaultTyreTypeForPlayersCar;
-            if (currentGameState.SessionData.IsNewLap)
+            if (currentGameState.SessionData.IsNewLap || currentGameState.TyreData.PeakRearLeftTemperatureForLap == 0)
             {
                 currentGameState.TyreData.PeakRearLeftTemperatureForLap = currentGameState.TyreData.RearLeft_CenterTemp;
             }
@@ -1878,7 +1878,7 @@ namespace CrewChiefV4.assetto
             currentGameState.TyreData.RearRight_LeftTemp = shared.acsPhysics.tyreTempI[3];
             currentGameState.TyreData.RearRight_RightTemp = shared.acsPhysics.tyreTempO[3];
             currentGameState.TyreData.RearRightTyreType = defaultTyreTypeForPlayersCar;
-            if (currentGameState.SessionData.IsNewLap)
+            if (currentGameState.SessionData.IsNewLap || currentGameState.TyreData.PeakRearRightTemperatureForLap == 0)
             {
                 currentGameState.TyreData.PeakRearRightTemperatureForLap = currentGameState.TyreData.RearRight_CenterTemp;
             }

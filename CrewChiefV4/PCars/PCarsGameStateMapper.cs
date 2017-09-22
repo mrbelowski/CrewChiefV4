@@ -1049,10 +1049,6 @@ namespace CrewChiefV4.PCars
                 previousGameState.PitData.InPitlane && !currentGameState.PitData.InPitlane;
             
             currentGameState.PitData.HasRequestedPitStop = shared.mPitSchedule == (int)ePitSchedule.PIT_SCHEDULE_STANDARD;
-            if (previousGameState != null && previousGameState.PitData.HasRequestedPitStop)
-            {
-                Console.WriteLine("Has requested pitstop");
-            }
             if (currentGameState.SessionData.SessionType == SessionType.Race && shared.mEnforcedPitStopLap > 0 && enablePCarsPitWindowStuff)
             {
                 currentGameState.PitData.HasMandatoryPitStop = true;
@@ -1115,7 +1111,7 @@ namespace CrewChiefV4.PCars
             currentGameState.TyreData.FrontLeftTyreType = defaultTyreTypeForPlayersCar;
             currentGameState.TyreData.FrontLeftPressure = -1; // not in the block
             currentGameState.TyreData.FrontLeftPercentWear = Math.Min(100, shared.mTyreWear[0] * 100 / wornOutTyreWearLevel);
-            if (currentGameState.SessionData.IsNewLap)
+            if (currentGameState.SessionData.IsNewLap || currentGameState.TyreData.PeakFrontLeftTemperatureForLap == 0)
             {
                 currentGameState.TyreData.PeakFrontLeftTemperatureForLap = currentGameState.TyreData.FrontLeft_CenterTemp;
             }
@@ -1130,7 +1126,7 @@ namespace CrewChiefV4.PCars
             currentGameState.TyreData.FrontRightTyreType = defaultTyreTypeForPlayersCar;
             currentGameState.TyreData.FrontRightPressure = -1; // not in the block
             currentGameState.TyreData.FrontRightPercentWear = Math.Min(100, shared.mTyreWear[1] * 100 / wornOutTyreWearLevel);
-            if (currentGameState.SessionData.IsNewLap)
+            if (currentGameState.SessionData.IsNewLap || currentGameState.TyreData.PeakFrontRightTemperatureForLap == 0)
             {
                 currentGameState.TyreData.PeakFrontRightTemperatureForLap = currentGameState.TyreData.FrontRight_CenterTemp;
             }
@@ -1145,7 +1141,7 @@ namespace CrewChiefV4.PCars
             currentGameState.TyreData.RearLeftTyreType = defaultTyreTypeForPlayersCar;
             currentGameState.TyreData.RearLeftPressure = -1; // not in the block
             currentGameState.TyreData.RearLeftPercentWear = Math.Min(100, shared.mTyreWear[2] * 100 / wornOutTyreWearLevel);
-            if (currentGameState.SessionData.IsNewLap)
+            if (currentGameState.SessionData.IsNewLap || currentGameState.TyreData.PeakRearLeftTemperatureForLap == 0)
             {
                 currentGameState.TyreData.PeakRearLeftTemperatureForLap = currentGameState.TyreData.RearLeft_CenterTemp;
             }
@@ -1160,7 +1156,7 @@ namespace CrewChiefV4.PCars
             currentGameState.TyreData.RearRightTyreType = defaultTyreTypeForPlayersCar;
             currentGameState.TyreData.RearRightPressure = -1; // not in the block
             currentGameState.TyreData.RearRightPercentWear = Math.Min(100, shared.mTyreWear[3] * 100 / wornOutTyreWearLevel);
-            if (currentGameState.SessionData.IsNewLap)
+            if (currentGameState.SessionData.IsNewLap || currentGameState.TyreData.PeakRearRightTemperatureForLap == 0)
             {
                 currentGameState.TyreData.PeakRearRightTemperatureForLap = currentGameState.TyreData.RearRight_CenterTemp;
             }

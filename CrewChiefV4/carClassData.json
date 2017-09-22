@@ -90,7 +90,7 @@
 #
 #
 # Crew Chief built-in car classes are:
-# GT1X, GT1, GTE, GT2, GTC, GTLM, GT3, GT4, GT5, Kart_1, Kart_2, KART_JUNIOR, KART_F1,
+# GT1X, GT1, GTE, GT2, GTC, GTLM, GT3, GT4, GT5, GT500, Kart_1, Kart_2, KART_JUNIOR, KART_F1,
 # LMP1, LMP2, LMP3, ROAD_B, ROAD_C1, ROAD_C2, ROAD_D, ROAD_SUPERCAR, GROUPC, GROUPA, 
 # GROUP4, GROUP5, GROUP6, GTO, VINTAGE_INDY_65, VINTAGE_F3_A, VINTAGE_F1_A, VINTAGE_F1_A1,
 # VINTAGE_GT3, VINTAGE_GT, HISTORIC_TOURING_1, HISTORIC_TOURING_2, VINTAGE_F1_B,
@@ -196,6 +196,15 @@
 		{
 			"carClassEnum": "GT5",
 			"pCarsClassNames": ["GT5"],
+			"timesInHundredths": true,
+			"enabledMessageTypes": "ALL"
+		},
+		{
+			"carClassEnum": "GT500",
+			"rf2ClassNames": ["GT-R GT500 2013"],
+			"brakeType": "Carbon",
+			"maxSafeWaterTemp": 105,
+			"maxSafeOilTemp": 140,
 			"timesInHundredths": true,
 			"enabledMessageTypes": "ALL"
 		},
