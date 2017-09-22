@@ -8,7 +8,7 @@ namespace CrewChiefV4
 {
     public enum GameEnum
     {
-        RACE_ROOM, PCARS_64BIT, PCARS_32BIT, PCARS_NETWORK, RF1, ASSETTO_64BIT, ASSETTO_32BIT, RF2_64BIT
+        RACE_ROOM, PCARS2, PCARS_64BIT, PCARS_32BIT, PCARS_NETWORK, RF1, ASSETTO_64BIT, ASSETTO_32BIT, RF2_64BIT
     }
     public class GameDefinition
     {
@@ -16,6 +16,8 @@ namespace CrewChiefV4
             "CrewChiefV4.PCars.PCarsSpotterv2", "pcars64_launch_exe", "pcars64_launch_params", "launch_pcars", new String[] { "pCARS2", "pCARS2Gld", "pCARS2QA", "pCARS2AVX" });
         public static GameDefinition pCars32Bit = new GameDefinition(GameEnum.PCARS_32BIT, "pcars_32_bit", "pCARS",
             "CrewChiefV4.PCars.PCarsSpotterv2", "pcars32_launch_exe", "pcars32_launch_params", "launch_pcars");
+        public static GameDefinition pCars2 = new GameDefinition(GameEnum.PCARS2, "pcars_2", "pCARS2AVX",
+            "CrewChiefV4.PCars.PCarsSpotterv2", "pcars2_launch_exe", "pcars2_launch_params", "launch_pcars2", new String[] { "pCARS2", "pCARS2Gld" });
         public static GameDefinition raceRoom = new GameDefinition(GameEnum.RACE_ROOM, "race_room", "RRRE", "CrewChiefV4.RaceRoom.R3ESpotterv2",
             "r3e_launch_exe", "r3e_launch_params", "launch_raceroom", new String[] {"RRRE64"});
         public static GameDefinition pCarsNetwork = new GameDefinition(GameEnum.PCARS_NETWORK, "pcars_udp", null, "CrewChiefV4.PCars.PCarsSpotterv2",
@@ -44,7 +46,8 @@ namespace CrewChiefV4
         {
             List<GameDefinition> definitions = new List<GameDefinition>();
             definitions.Add(automobilista); definitions.Add(gameStockCar); definitions.Add(marcas); definitions.Add(ftruck);
-            definitions.Add(pCars64Bit); definitions.Add(pCars32Bit); definitions.Add(raceRoom); definitions.Add(pCarsNetwork); definitions.Add(rFactor1);
+            definitions.Add(pCars2); definitions.Add(pCars64Bit); definitions.Add(pCars32Bit);  
+            definitions.Add(raceRoom); definitions.Add(pCarsNetwork); definitions.Add(rFactor1);
             definitions.Add(assetto64Bit); definitions.Add(assetto32Bit); definitions.Add(rfactor2_64bit);
             return definitions;
         }
