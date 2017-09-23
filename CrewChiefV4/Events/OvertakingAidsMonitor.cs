@@ -22,7 +22,7 @@ namespace CrewChiefV4.Events
 
         private Boolean hasUsedDrsOnThisLap = false;    // Note that DTM 2015 experience has 3 DRS activations per lap - only moans if we've used none of them
         private Boolean drsAvailableOnThisLap = false;
-        private Boolean drsAvailableInAnyZoneThisLap = false;  // In rF2, there are multiple DRS zones allowed.  Track if there was any moment user could've engaged DRS.
+        private Boolean drsAvailableInAnyZoneOnThisLap = false;  // In rF2, there are multiple DRS zones allowed.  Track if there was any moment user could've engaged DRS.
         private float trackDistanceToCheckDRSGapFrontAt = -1;
 
         private Boolean playedGetCloserForDRSOnThisLap = false;
@@ -42,7 +42,7 @@ namespace CrewChiefV4.Events
         {
             this.hasUsedDrsOnThisLap = false;
             this.drsAvailableOnThisLap = false;
-            this.drsAvailableInAnyZoneThisLap = false;
+            this.drsAvailableInAnyZoneOnThisLap = false;
             this.trackDistanceToCheckDRSGapFrontAt = -1;
             this.playedOpponentHasDRSOnThisLap = false;
             this.playedGetCloserForDRSOnThisLap = false;
@@ -65,26 +65,26 @@ namespace CrewChiefV4.Events
                 if (currentGameState.SessionData.IsNewLap)
                 {
                     if (drsAvailableOnThisLap && !hasUsedDrsOnThisLap
-                        || (CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT && drsAvailableInAnyZoneThisLap && !hasUsedDrsOnThisLap))
+                        || (CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT && drsAvailableInAnyZoneOnThisLap && !hasUsedDrsOnThisLap))
                     {
                         audioPlayer.playMessage(new QueuedMessage("missed_available_drs", MessageContents(folderDontForgetDRS), 0, this));
                     }
                     drsAvailableOnThisLap = currentGameState.OvertakingAids.DrsAvailable;
-                    drsAvailableInAnyZoneThisLap = false;
+                    drsAvailableInAnyZoneOnThisLap = false;
                     hasUsedDrsOnThisLap = false;
                     playedGetCloserForDRSOnThisLap = false;
                     playedOpponentHasDRSOnThisLap = false;
                 }
-                if (!drsAvailableInAnyZoneThisLap && currentGameState.OvertakingAids.DrsAvailable)
+                if (currentGameState.OvertakingAids.DrsAvailable)
                 {
-                    drsAvailableInAnyZoneThisLap = true;
+                    drsAvailableInAnyZoneOnThisLap = true;
                 }
                 if (currentGameState.OvertakingAids.DrsEngaged)
                 {
                     hasUsedDrsOnThisLap = true;
                 }
                 var hadChanceToUseDrs = CrewChief.gameDefinition.gameEnum != GameEnum.RF2_64BIT
-                    ? !drsAvailableOnThisLap : !drsAvailableInAnyZoneThisLap;
+                    ? drsAvailableOnThisLap : drsAvailableInAnyZoneOnThisLap;
                 if (!hasUsedDrsOnThisLap && !hadChanceToUseDrs && !playedGetCloserForDRSOnThisLap &&
                     currentGameState.PositionAndMotionData.DistanceRoundTrack > trackDistanceToCheckDRSGapFrontAt)
                 {
