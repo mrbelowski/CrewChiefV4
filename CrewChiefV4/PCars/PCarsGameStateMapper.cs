@@ -1049,10 +1049,6 @@ namespace CrewChiefV4.PCars
                 previousGameState.PitData.InPitlane && !currentGameState.PitData.InPitlane;
             
             currentGameState.PitData.HasRequestedPitStop = shared.mPitSchedule == (int)ePitSchedule.PIT_SCHEDULE_STANDARD;
-            if (previousGameState != null && previousGameState.PitData.HasRequestedPitStop)
-            {
-                Console.WriteLine("Has requested pitstop");
-            }
             if (currentGameState.SessionData.SessionType == SessionType.Race && shared.mEnforcedPitStopLap > 0 && enablePCarsPitWindowStuff)
             {
                 currentGameState.PitData.HasMandatoryPitStop = true;
