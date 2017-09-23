@@ -12,7 +12,9 @@ function GetScriptDirectory {
 }
 
 function CopyFile($from, $to) {
-    Copy-Item $from -Destination $to -Force -Verbose
+# TODO: replace with robocopy /MIR
+    Write-Host "Overwriting " $from " with " $to
+    Copy-Item $from -Destination $to -Force -Recurse
     echo ""
 }
 
@@ -29,6 +31,7 @@ CopyFile $releaseBinPath\"CrewChiefV4.exe.config" $ccLayoutMainPath
 CopyFile $rootPath\"ui_text.txt" $ccLayoutMainPath
 CopyFile $rootPath\"carClassData.json" $ccLayoutMainPath
 CopyFile $rootPath\"trackLandmarksData.json" $ccLayoutMainPath
+CopyFile $rootPath\"plugins" $ccLayoutMainPath
 
 echo "Press any key to finish..."
 
