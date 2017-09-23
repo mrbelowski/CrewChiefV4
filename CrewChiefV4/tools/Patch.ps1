@@ -12,7 +12,7 @@ function GetScriptDirectory {
 }
 
 function CopyFile($from, $to) {
-    Copy-Item $from -Destination $to -Force -Verbose
+    Copy-Item $from -Destination $to -Force -Verbose -Recurse
     echo ""
 }
 
