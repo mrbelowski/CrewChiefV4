@@ -29,6 +29,7 @@ CopyFile $releaseBinPath\"CrewChiefV4.exe.config" $ccLayoutMainPath
 CopyFile $rootPath\"ui_text.txt" $ccLayoutMainPath
 CopyFile $rootPath\"carClassData.json" $ccLayoutMainPath
 CopyFile $rootPath\"trackLandmarksData.json" $ccLayoutMainPath
+CopyFile $rootPath\"plugins" $ccLayoutMainPath
 
 echo "Press any key to finish..."
 
