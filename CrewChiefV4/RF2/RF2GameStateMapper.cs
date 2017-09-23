@@ -194,7 +194,7 @@ namespace CrewChiefV4.rFactor2
                     if (!this.waitingToTerminateSession && !sessionStarted)
                     {
                         Console.WriteLine("Abrupt Session End: start to wait for session end.");
-                        
+
                         // Start waiting for session end.
                         this.ticksWhenSessionEnded = DateTime.Now.Ticks;
                         this.waitingToTerminateSession = true;
@@ -222,7 +222,7 @@ namespace CrewChiefV4.rFactor2
                         Console.WriteLine("Abrupt Session End: new session just started, terminate previous session.");
 
                     // Wait is over.  Terminate the abrupt session.
-                    this.waitingToTerminateSession = false; 
+                    this.waitingToTerminateSession = false;
 
                     if (this.lastInRealTimeState && pgs.SessionData.SessionType == SessionType.Race)
                     {
@@ -352,7 +352,7 @@ namespace CrewChiefV4.rFactor2
 
                 // Exclude known situations when telemetry is not available, but log otherwise to get more
                 // insights.
-                if (shared.extended.mInRealtimeFC == 1 
+                if (shared.extended.mInRealtimeFC == 1
                     && shared.scoring.mScoringInfo.mInRealtime == 1
                     && shared.scoring.mScoringInfo.mGamePhase != (byte)rFactor2Constants.rF2GamePhase.GridWalk)
                 {
@@ -364,7 +364,7 @@ namespace CrewChiefV4.rFactor2
             var currPlayerTelET = playerTelemetry.mElapsedTime;
             var currScoringET = shared.scoring.mScoringInfo.mCurrentET;
 
-            if (currPlayerTelET == this.lastPlayerTelemetryET 
+            if (currPlayerTelET == this.lastPlayerTelemetryET
                 && currScoringET == this.lastScoringET)
                 return pgs;  // Skip this update.
 
@@ -595,7 +595,7 @@ namespace CrewChiefV4.rFactor2
                 // Those values change on sector/lap change, otherwise stay the same between updates.
                 psd.restorePlayerTimings(csd);
             }
-            
+
             this.processPlayerTimingData(ref shared.scoring, cgs, pgs, ref playerScoring);
 
             csd.SessionTimesAtEndOfSectors = pgs != null ? psd.SessionTimesAtEndOfSectors : new SessionData().SessionTimesAtEndOfSectors;
@@ -855,7 +855,8 @@ namespace CrewChiefV4.rFactor2
 
             // --------------------------------
             // DRS data
-            cgs.OvertakingAids.DrsAvailable = playerTelemetry.mRearFlapLegalStatus == (int)rFactor2Constants.rF2RearFlapLegalStatus.Alllowed;
+            cgs.OvertakingAids.DrsAvailable = playerTelemetry.mRearFlapLegalStatus == (int)rFactor2Constants.rF2RearFlapLegalStatus.Alllowed
+                || playerTelemetry.mRearFlapLegalStatus == (int)rFactor2Constants.rF2RearFlapLegalStatus.DetectedButNotAllowedYet;
 
             // Many of rF2 tracks have no DRS zones defined.  One of the symptoms is DRS alloweved immediately on race start.
             // Disallow DRS messages in such case.
