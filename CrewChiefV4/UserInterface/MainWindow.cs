@@ -70,6 +70,8 @@ namespace CrewChiefV4
         private static String autoUpdateXMLURL2 = "https://drive.google.com/uc?export=download&id=0B4KQS820QNFbWWFjaDAzRldMNUE";
 
         private Boolean preferAlternativeDownloadSite = UserSettings.GetUserSettings().getBoolean("prefer_alternative_download_site");
+        private Boolean minimizeToTray = UserSettings.GetUserSettings().getBoolean("minimize_to_tray");
+        private Boolean rejectMessagesWhenTalking = UserSettings.GetUserSettings().getBoolean("reject_message_when_talking");
 
         private float latestSoundPackVersion = -1;
         private float latestDriverNamesVersion = -1;
@@ -83,7 +85,6 @@ namespace CrewChiefV4
         private ToolStripItem contextMenuStopItem;
         private ToolStripMenuItem contextMenuGamesMenu;
         private ToolStripItem contextMenuPreferencesItem;
-        private Boolean minimizeToTray = UserSettings.GetUserSettings().getBoolean("minimize_to_tray");
 
         private void FormMain_Load(object sender, EventArgs e)
         {            
@@ -802,6 +803,7 @@ namespace CrewChiefV4
             Boolean channelOpen = false;
             if (crewChief.speechRecogniser != null && crewChief.speechRecogniser.initialised && voiceOption == VoiceOptionEnum.HOLD)
             {
+                double bgVolume = 0.0;
                 Console.WriteLine("Running speech recognition in 'hold button' mode");
                 crewChief.speechRecogniser.voiceOptionEnum = VoiceOptionEnum.HOLD;
                 while (runListenForChannelOpenThread)
@@ -813,12 +815,23 @@ namespace CrewChiefV4
                         crewChief.audioPlayer.playStartListeningBeep();
                         crewChief.speechRecogniser.recognizeAsync();
                         Console.WriteLine("Listening...");
+
+                        if (rejectMessagesWhenTalking)
+                        {
+                            setMessagesVolume(0.0f);
+                        }
                     }
                     else if (channelOpen && !controllerConfiguration.isChannelOpen())
                     {
-                        Console.WriteLine("Stopping listening...");                        
+                        if (rejectMessagesWhenTalking)
+                        {
+                            setMessagesVolume(currentVolume);
+                        }
+
+                        Console.WriteLine("Stopping listening...");
                         crewChief.speechRecogniser.recognizeAsyncCancel();
                         channelOpen = false;
+
                         new Thread(() =>
                         {
                             Thread.Sleep(2000);

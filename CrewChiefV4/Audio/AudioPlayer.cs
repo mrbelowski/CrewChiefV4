@@ -69,13 +69,15 @@ namespace CrewChiefV4.Audio
         // if this is true, no 'green green green', 'get ready', or spotter messages are played
         private Boolean disableImmediateMessages = UserSettings.GetUserSettings().getBoolean("disable_immediate_messages");
 
+        private Boolean rejectMessagesWhenTalking = UserSettings.GetUserSettings().getBoolean("reject_message_when_talking");
+
         private Random random = new Random();
 
         private OrderedDictionary queuedClips = new OrderedDictionary();
 
         private OrderedDictionary immediateClips = new OrderedDictionary();
         
-        MediaPlayer backgroundPlayer;
+        public MediaPlayer backgroundPlayer;
 
         public static String soundFilesPath;
 
@@ -118,6 +120,8 @@ namespace CrewChiefV4.Audio
         public String[] personalisationsArray = new String[] { NO_PERSONALISATION_SELECTED };
 
         public String selectedPersonalisation = NO_PERSONALISATION_SELECTED;
+
+        public double lastBackgroundPlayerVolume = -1.0;
 
         public AudioPlayer()
         {
@@ -406,6 +410,28 @@ namespace CrewChiefV4.Audio
             }
         }
 
+        private void updateBackgroundVolume()
+        {
+            if (rejectMessagesWhenTalking)
+            {
+                // TODO: this still throws sometimes, need investigating.
+                if (SpeechRecogniser.waitingForSpeech && lastBackgroundPlayerVolume != 0.0)
+                {
+                    backgroundPlayer.Volume = 0.0;
+                    lastBackgroundPlayerVolume = 0.0;
+                }
+                else if (!SpeechRecogniser.waitingForSpeech && lastBackgroundPlayerVolume == 0.0)
+                {
+                    lastBackgroundPlayerVolume = getBackgroundVolume();
+                    backgroundPlayer.Volume = lastBackgroundPlayerVolume;
+                }
+            }
+            else
+            {
+                backgroundPlayer.Volume = getBackgroundVolume();
+            }
+        }
+
         private void monitorQueue()
         {
             Console.WriteLine("Monitor starting");
@@ -413,6 +439,8 @@ namespace CrewChiefV4.Audio
             DateTime nextQueueCheck = DateTime.Now;
             while (monitorRunning)
             {
+                updateBackgroundVolume();
+
                 if (channelOpen && (!holdChannelOpen || DateTime.Now > timeOfLastMessageEnd + maxTimeToHoldEmptyChannelOpen))
                 {
                     if (!queueHasDueMessages(queuedClips, false) && !queueHasDueMessages(immediateClips, true))
@@ -493,6 +521,8 @@ namespace CrewChiefV4.Audio
             initialiseBackgroundPlayer();
             while (monitorRunning)
             {
+                updateBackgroundVolume();
+
                 Thread.Sleep(queueMonitorInterval);
                 try
                 {
@@ -807,7 +837,7 @@ namespace CrewChiefV4.Audio
                     {
                         initialiseBackgroundPlayer();
                     }
-                    backgroundPlayer.Volume = getBackgroundVolume();
+                    updateBackgroundVolume();
                     backgroundPlayer.Open(new System.Uri(path, System.UriKind.Absolute));
                     loadNewBackground = false;
                 }
@@ -820,7 +850,7 @@ namespace CrewChiefV4.Audio
                     {
                         initialiseBackgroundPlayer();
                     }
-                    backgroundPlayer.Volume = getBackgroundVolume();
+                    updateBackgroundVolume();
                     int backgroundDuration = 0;
                     int backgroundOffset = 0;
                     if (backgroundPlayer.NaturalDuration.HasTimeSpan)
