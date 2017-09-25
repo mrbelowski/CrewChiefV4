@@ -16,7 +16,23 @@ namespace CrewChiefV4.iRacing
         private iRacingStructWrapper[] dataReadFromFile = null;
         private int dataReadFromFileIndex = 0;
         private String lastReadFileName = null;
-        private iRacingConnection iracingConnection = null;
+        private iRacingConnection iracingConnection = new iRacingConnection();
+        bool doOnce = false;
+        bool connected = false;
+        void eventDisconnected()
+        {
+            connected = false;
+            //Console.WriteLine("Notified by iRacingConnection of application data disconnection from event handler");
+        }
+
+        void eventConnected()
+        {
+            connected = true;
+            //Console.WriteLine("Notified by iRacingConnection of application data connection from event handler");
+        }
+
+
+        
         
         public class iRacingStructWrapper
         {
@@ -56,9 +72,18 @@ namespace CrewChiefV4.iRacing
                 {
                     try
                     {
-                        initialised = true;
-                        Console.WriteLine("Initialised iRacing Shared Memory");
-                        iracingConnection = new iRacingConnection();                        
+                        if (!doOnce)
+                        {
+                            iracingConnection.Connected += eventConnected;
+                            iracingConnection.Disconnected += eventDisconnected;
+                            doOnce = true;
+                        }
+
+                        if (iracingConnection.GetDataFeed(logging: false).First().IsConnected)
+                        {
+                            initialised = true;
+                            Console.WriteLine("Initialised iRacing Shared Memory");
+                        }     
                     }
                     catch (Exception)
                     {
@@ -73,7 +98,7 @@ namespace CrewChiefV4.iRacing
         {
             lock (this)
             {
-                DataSample iRacingShared = new DataSample();
+
                 if (!initialised)
                 {
                     if (!InitialiseInternal())
@@ -83,18 +108,26 @@ namespace CrewChiefV4.iRacing
                 }
                 try
                 {
-                    iRacingShared = iracingConnection.GetDataFeed().WithFinishingStatus().WithCorrectedDistances().WithCorrectedPercentages().First();
-                    iRacingStructWrapper structWrapper = new iRacingStructWrapper();
-                    structWrapper.ticksWhenRead = DateTime.Now.Ticks;
-                    structWrapper.data = iRacingShared;
-                    structWrapper.iracingConnection = iracingConnection;
-
-                    if (!forSpotter && dumpToFile && dataToDump != null)
+                    if(!connected)
                     {
-                        //iracingConnection.
-                        dataToDump.Add(structWrapper);
+                        return null;
                     }
-                    return structWrapper;
+                    IEnumerable<DataSample> iRacingShared = iracingConnection.GetDataFeed(logging: false); //WithFinishingStatus().WithCorrectedDistances().WithCorrectedPercentages().WithCurrentLapTime().First();
+                    if(iRacingShared.First().IsConnected)
+                    {
+                        iRacingStructWrapper structWrapper = new iRacingStructWrapper();
+                        structWrapper.ticksWhenRead = DateTime.Now.Ticks;
+                        structWrapper.data = iRacingShared.WithFinishingStatus().WithCorrectedDistances().WithCorrectedPercentages().WithCurrentLapTime().First();
+                        structWrapper.iracingConnection = iracingConnection;
+
+                        if (!forSpotter && dumpToFile && dataToDump != null)
+                        {
+
+                            dataToDump.Add(structWrapper);
+                        }
+                        return structWrapper;
+                    }
+                    return null;
                 }
                 catch (Exception ex)
                 {
@@ -102,9 +135,23 @@ namespace CrewChiefV4.iRacing
                 }
             }
         }
-
+        public override void DisconnectFromProcess()
+        {
+            Dispose();
+            return;
+        }
+        public override void stop()
+        {
+            Dispose();
+            return;
+        }
         public override void Dispose()
         {
+            lock (this)
+            {
+                initialised = false;
+                connected = false;
+            }
             return;
         }
     }

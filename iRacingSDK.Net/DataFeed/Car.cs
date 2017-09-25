@@ -81,7 +81,7 @@ namespace iRacingSDK
         public TrackLocation TrackSurface { get { return telemetry.CarIdxTrackSurface[carIdx]; } }
         public int PitStopCount { get { return telemetry.CarIdxPitStopCount[carIdx]; } }
         public int LapCompleated { get { return telemetry.CarIdxLapCompleted[carIdx]; } }
-
+        public double LapTime { get { return telemetry.CarIdxLapTime[carIdx]; } }
 
         public SessionData._SessionInfo._Sessions._ResultsPositions ResultPosition
         {

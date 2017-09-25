@@ -36,15 +36,18 @@ namespace iRacingSDK
 
             foreach (var data in samples.ForwardOnly())
             {
-                if (lastLaps == null)
-                    lastLaps = (int[])data.Telemetry.CarIdxLap.Clone();
+                if (data.IsConnected)
+                {
+                    if (lastLaps == null)
+                        lastLaps = (int[])data.Telemetry.CarIdxLap.Clone();
 
-                for (int i = 0; i < data.SessionData.DriverInfo.CompetingDrivers.Length; i++)
-                    if (data.Telemetry.HasData(i))
-                        FixPercentagesOnLapChange(
-                            ref lastLaps[i],
-                            ref data.Telemetry.CarIdxLapDistPct[i],
-                            data.Telemetry.CarIdxLap[i]);
+                    for (int i = 0; i < data.SessionData.DriverInfo.CompetingDrivers.Length; i++)
+                        if (data.Telemetry.HasData(i))
+                            FixPercentagesOnLapChange(
+                                ref lastLaps[i],
+                                ref data.Telemetry.CarIdxLapDistPct[i],
+                                data.Telemetry.CarIdxLap[i]);
+                }
 
                 yield return data;
             }

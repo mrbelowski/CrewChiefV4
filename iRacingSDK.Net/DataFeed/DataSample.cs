@@ -35,11 +35,11 @@ namespace iRacingSDK
         {
             get
             {
-                if (!IsConnected)
-                    throw new Exception("Attempt to read session data before connection to iRacing");
+                //if (!IsConnected)
+                    //throw new Exception("Attempt to read session data before connection to iRacing");
 
-                if (sessionData == null)
-                    throw new Exception("SessionData is null");
+                //if (sessionData == null)
+                    //throw new Exception("SessionData is null");
 
                 return sessionData;
             }
@@ -53,11 +53,11 @@ namespace iRacingSDK
         {
             get
             {
-                if (!IsConnected)
-                    throw new Exception("Attempt to read telemetry data before connection to iRacing");
+                //if (!IsConnected)
+                    //throw new Exception("Attempt to read telemetry data before connection to iRacing");
 
-                if (telemetry == null)
-                    throw new Exception("Telemetry is null");
+                //if (telemetry == null)
+                    //throw new Exception("Telemetry is null");
 
                 return telemetry;
             }

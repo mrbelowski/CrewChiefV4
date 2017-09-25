@@ -37,14 +37,16 @@ namespace iRacingSDK
 
             foreach (var data in samples)
             {
-                ApplyIsFinalLap(data);
+                if(data.IsConnected)
+                {
+                    ApplyIsFinalLap(data);
 
-                ApplyLeaderHasFinished(data);
+                    ApplyLeaderHasFinished(data);
 
-                ApplyHasSeenCheckeredFlag(data, hasSeenCheckeredFlag);
+                    ApplyHasSeenCheckeredFlag(data, hasSeenCheckeredFlag);
 
-                ApplyHasRetired(data, lastTimeForData);
-
+                    ApplyHasRetired(data, lastTimeForData);
+                }
                 yield return data;
             }
         }

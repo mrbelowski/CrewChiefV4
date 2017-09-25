@@ -57,7 +57,9 @@
     <Compile Include="CrossThreadEvents.cs" />
     <Compile Include="DataFeed\EngineWarnings.cs" />
     <Compile Include="DataFeed\Telemetry\CarIdxPitStopCount.cs" />
+    <Compile Include="DataFeed\Telemetry\CurrentLapTime.cs" />
     <Compile Include="DataSampleExtensions\EmitTo.cs" />
+    <Compile Include="DataSampleExtensions\WithCurrentLapTime.cs" />
     <Compile Include="DataSampleExtensions\WithPitStopCounts.cs" />
     <Compile Include="DataSampleExtensions\VerifyReplayFrames.cs" />
     <Compile Include="DataSampleExtensions\WithEvents.cs" />
