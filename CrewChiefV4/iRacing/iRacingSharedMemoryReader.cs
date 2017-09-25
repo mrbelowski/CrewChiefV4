@@ -17,22 +17,6 @@ namespace CrewChiefV4.iRacing
         private int dataReadFromFileIndex = 0;
         private String lastReadFileName = null;
         private iRacingConnection iracingConnection = new iRacingConnection();
-        bool doOnce = false;
-        bool connected = false;
-        void eventDisconnected()
-        {
-            connected = false;
-            //Console.WriteLine("Notified by iRacingConnection of application data disconnection from event handler");
-        }
-
-        void eventConnected()
-        {
-            connected = true;
-            //Console.WriteLine("Notified by iRacingConnection of application data connection from event handler");
-        }
-
-
-        
         
         public class iRacingStructWrapper
         {
@@ -72,13 +56,6 @@ namespace CrewChiefV4.iRacing
                 {
                     try
                     {
-                        if (!doOnce)
-                        {
-                            iracingConnection.Connected += eventConnected;
-                            iracingConnection.Disconnected += eventDisconnected;
-                            doOnce = true;
-                        }
-
                         if (iracingConnection.GetDataFeed(logging: false).First().IsConnected)
                         {
                             initialised = true;
@@ -108,10 +85,6 @@ namespace CrewChiefV4.iRacing
                 }
                 try
                 {
-                    if(!connected)
-                    {
-                        return null;
-                    }
                     IEnumerable<DataSample> iRacingShared = iracingConnection.GetDataFeed(logging: false); //WithFinishingStatus().WithCorrectedDistances().WithCorrectedPercentages().WithCurrentLapTime().First();
                     if(iRacingShared.First().IsConnected)
                     {
@@ -150,7 +123,6 @@ namespace CrewChiefV4.iRacing
             lock (this)
             {
                 initialised = false;
-                connected = false;
             }
             return;
         }
