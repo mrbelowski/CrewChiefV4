@@ -222,7 +222,7 @@ namespace CrewChiefV4.rFactor2
                         Console.WriteLine("Abrupt Session End: new session just started, terminate previous session.");
 
                     // Wait is over.  Terminate the abrupt session.
-                    this.waitingToTerminateSession = false;
+                    this.waitingToTerminateSession = false; 
 
                     if (this.lastInRealTimeState && pgs.SessionData.SessionType == SessionType.Race)
                     {
