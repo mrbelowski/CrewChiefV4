@@ -93,8 +93,8 @@ namespace CrewChiefV4.iRacing
                         structWrapper.data = iRacingShared.First();
                         structWrapper.iracingConnection = iracingConnection;
                         structWrapper.data = PostProcessData.ProcessCorrectedDistances(structWrapper.data);
-                        structWrapper.data = PostProcessData.ProcessLapTimes(structWrapper.data);
                         structWrapper.data = PostProcessData.ProcessCorrectedPercentages(structWrapper.data);
+                        structWrapper.data = PostProcessData.ProcessLapTimes(structWrapper.data);
                         structWrapper.data = PostProcessData.ProcessFinishingStatus(structWrapper.data);
                         if (!forSpotter && dumpToFile && dataToDump != null)
                         {

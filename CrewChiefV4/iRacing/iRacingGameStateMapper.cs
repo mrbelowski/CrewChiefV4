@@ -100,11 +100,6 @@ namespace CrewChiefV4.iRacing
                 
                 currentGameState.SessionData.TrackDefinition = TrackData.getTrackDefinition(shared.SessionData.WeekendInfo.TrackDisplayShortName + ":" + shared.SessionData.WeekendInfo.TrackConfigName, 
                     (float)ParseTrackLength(shared.SessionData.WeekendInfo.TrackLength),3);
-                if (currentGameState.SessionData.TrackDefinition.unknownTrack)
-                {
-                    Console.WriteLine("Track is unknown, setting virtual sectors");
-                    currentGameState.SessionData.TrackDefinition.setSectorPointsForUnknownTracks();
-                }
 
                 currentGameState.SessionData.SessionNumberOfLaps = ParseInt(currentSessionData.SessionLaps);
                 currentGameState.SessionData.LeaderHasFinishedRace = false;
@@ -242,7 +237,23 @@ namespace CrewChiefV4.iRacing
                     currentGameState.FlagData.useImprovisedIncidentCalling = previousGameState.FlagData.useImprovisedIncidentCalling;
                 }
             }
+            currentGameState.ControlData.ThrottlePedal = shared.Telemetry.Throttle;
+            currentGameState.ControlData.ClutchPedal = shared.Telemetry.Clutch;
+            currentGameState.ControlData.BrakePedal = shared.Telemetry.Brake;
+            currentGameState.TransmissionData.Gear = shared.Telemetry.Gear;
 
+            //TODO add yellow 
+
+
+            currentGameState.SessionData.SessionTimeRemaining = (float)shared.Telemetry.SessionTimeRemain;
+            currentGameState.SessionData.CompletedLaps = shared.Telemetry.LapCompleted;
+            
+            //TODO validate laptimes
+            currentGameState.SessionData.LapTimeCurrent = shared.Telemetry.LapCurrentLapTime;
+            currentGameState.SessionData.CurrentLapIsValid = true;
+            currentGameState.SessionData.LapTimePrevious = shared.Telemetry.LapLastLapTime;
+            currentGameState.SessionData.PreviousLapWasValid = true;
+            currentGameState.SessionData.NumCars = shared.SessionData.DriverInfo.CompetingDrivers.Length;
             return currentGameState;
            
 
