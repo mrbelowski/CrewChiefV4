@@ -114,6 +114,7 @@
     <Compile Include="iRacing\iRacingHelper.cs" />
     <Compile Include="iRacing\iRacingSharedMemoryReader.cs" />
     <Compile Include="iRacing\iRacingSpotter.cs" />
+    <Compile Include="iRacing\PostProcessData.cs" />
     <Compile Include="NameValidator.cs" />
     <Compile Include="NoisyCartesianCoordinateSpotter.cs" />
     <Compile Include="NumberProcessing\TimeSpanWrapper.cs" />

@@ -7,15 +7,15 @@ namespace iRacingSDK
 {
     public static partial class DataSampleExtensions
     {
-        static int[] lastDriverLaps = new int[64];
-        static double[] driverLapStartTime = new double[64];
-        static double[] lapTime = new double[64];
+
         public static IEnumerable<DataSample> WithCurrentLapTime(this IEnumerable<DataSample> samples)
         {
-
+            int[] lastDriverLaps = new int[64];
+            double[] driverLapStartTime = new double[64];
+            double[] lapTime = new double[64];
             foreach (var data in samples.ForwardOnly())
             {
-                if (data.IsConnected)
+                if (data.IsConnected && data.Telemetry!=null)
                 {
                     var carsAndLaps = data.Telemetry
                         .CarIdxLap

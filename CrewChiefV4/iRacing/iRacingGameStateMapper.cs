@@ -67,19 +67,21 @@ namespace CrewChiefV4.iRacing
                 currentGameState.SessionData.SessionType, 
                 lastSessionRunningTime, 
                 (float)shared.Telemetry.SessionTime, 
-                previousLapsCompleted,shared.Telemetry.LapCompleted,
-                shared.Telemetry.SessionFlags); 
+                previousLapsCompleted,shared.Telemetry.Lap,
+                shared.Telemetry.SessionFlags,shared.Telemetry.IsInGarage); 
             currentGameState.SessionData.NumCarsAtStartOfSession = shared.SessionData.DriverInfo.CompetingDrivers.Length;
             int sessionNumber = shared.Telemetry.SessionNum;
             iRacingSDK.SessionData._SessionInfo._Sessions currentSessionData  = shared.SessionData.SessionInfo.Sessions[sessionNumber];
             int PlayerCarIdx = shared.Telemetry.PlayerCarIdx;
             Boolean justGoneGreen = false;
 
-            /*if ((lastSessionPhase != currentGameState.SessionData.SessionPhase && (lastSessionPhase == SessionPhase.Unavailable || lastSessionPhase == SessionPhase.Finished)) ||
-                ((lastSessionPhase == SessionPhase.Checkered || lastSessionPhase == SessionPhase.Finished || lastSessionPhase == SessionPhase.Green || lastSessionPhase == SessionPhase.FullCourseYellow) &&
-                    currentGameState.SessionData.SessionPhase == SessionPhase.Countdown) ||
-                lastSessionRunningTime > currentGameState.SessionData.SessionRunningTime)*/
-            if (currentGameState.SessionData.SessionType != SessionType.Unavailable 
+            Boolean sessionOfSameTypeRestarted = ((currentGameState.SessionData.SessionType == SessionType.Race && lastSessionType == SessionType.Race) ||
+                (currentGameState.SessionData.SessionType == SessionType.Practice && lastSessionType == SessionType.Practice) ||
+                (currentGameState.SessionData.SessionType == SessionType.Qualify && lastSessionType == SessionType.Qualify)) &&
+                ((lastSessionPhase == SessionPhase.Green || lastSessionPhase == SessionPhase.FullCourseYellow) || lastSessionPhase == SessionPhase.Finished) &&
+                (currentGameState.SessionData.SessionPhase == SessionPhase.Countdown);
+
+            if (sessionOfSameTypeRestarted || currentGameState.SessionData.SessionType != SessionType.Unavailable 
                 && lastSessionPhase != SessionPhase.Countdown 
                 && lastSessionType != currentGameState.SessionData.SessionType)
             {
@@ -265,7 +267,9 @@ namespace CrewChiefV4.iRacing
             return SessionType.Unavailable;
         }
 
-        private SessionPhase mapToSessionPhase(SessionPhase lastSessionPhase, SessionState sessionState, SessionType currentSessionType, float lastSessionRunningTime, float thisSessionRunningTime, int previousLapsCompleted, int currentLapsCompleted, SessionFlags sessionFlags)
+        private SessionPhase mapToSessionPhase(SessionPhase lastSessionPhase, SessionState sessionState, 
+            SessionType currentSessionType, float lastSessionRunningTime, float thisSessionRunningTime, 
+            int previousLapsCompleted, int laps, SessionFlags sessionFlags, bool isInPit)
         {
             /*
                 Invalid = 0,
@@ -287,7 +291,7 @@ namespace CrewChiefV4.iRacing
                 {
                     return SessionPhase.Checkered;
                 }
-                else if (lastSessionPhase.HasFlag(SessionPhase.Unavailable) && !lastSessionPhase.HasFlag(SessionPhase.Countdown))
+                else if (isInPit && laps <= 0)
                 {
                     return SessionPhase.Countdown;
                 }
@@ -300,9 +304,9 @@ namespace CrewChiefV4.iRacing
                 {
                     if (lastSessionPhase == SessionPhase.Green || lastSessionPhase == SessionPhase.FullCourseYellow)
                     {
-                        if (previousLapsCompleted != currentLapsCompleted || sessionState.HasFlag(SessionState.CoolDown))
+                        if (previousLapsCompleted != laps || sessionState.HasFlag(SessionState.CoolDown))
                         {
-                            Console.WriteLine("finished - completed " + currentLapsCompleted + " laps (was " + previousLapsCompleted + "), session running time = " +
+                            Console.WriteLine("finished - completed " + laps + " laps (was " + previousLapsCompleted + "), session running time = " +
                                 thisSessionRunningTime);
                             return SessionPhase.Finished;
                         }

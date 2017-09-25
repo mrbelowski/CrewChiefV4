@@ -24,7 +24,7 @@ namespace CrewChiefV4.iRacing
             public DataSample data;
             public iRacingConnection iracingConnection;
         }
-
+        
         public override void DumpRawGameData()
         {
             if (dumpToFile && dataToDump != null && dataToDump.Count > 0 && filenameToDump != null)
@@ -90,9 +90,12 @@ namespace CrewChiefV4.iRacing
                     {
                         iRacingStructWrapper structWrapper = new iRacingStructWrapper();
                         structWrapper.ticksWhenRead = DateTime.Now.Ticks;
-                        structWrapper.data = iRacingShared.WithFinishingStatus().WithCorrectedDistances().WithCorrectedPercentages().WithCurrentLapTime().First();
+                        structWrapper.data = iRacingShared.First();
                         structWrapper.iracingConnection = iracingConnection;
-
+                        structWrapper.data = PostProcessData.ProcessCorrectedDistances(structWrapper.data);
+                        structWrapper.data = PostProcessData.ProcessLapTimes(structWrapper.data);
+                        structWrapper.data = PostProcessData.ProcessCorrectedPercentages(structWrapper.data);
+                        structWrapper.data = PostProcessData.ProcessFinishingStatus(structWrapper.data);
                         if (!forSpotter && dumpToFile && dataToDump != null)
                         {
 
@@ -108,6 +111,7 @@ namespace CrewChiefV4.iRacing
                 }
             }
         }
+
         public override void DisconnectFromProcess()
         {
             Dispose();
