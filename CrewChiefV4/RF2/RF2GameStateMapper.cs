@@ -49,13 +49,13 @@ namespace CrewChiefV4.rFactor2
         private float distanceOffTrack = 0.0f;
         private bool isApproachingTrack = false;
 
-        // User preferences.
-        private readonly bool enablePitStopPrediction = UserSettings.GetUserSettings().getBoolean("enable_rf2_pit_stop_prediction");
-        private readonly bool enableBlueOnSlower = UserSettings.GetUserSettings().getBoolean("enable_rf2_blue_on_slower");
-
         // Detect if there any changes in the the game data since the last update.
         private double lastPlayerTelemetryET = -1.0;
         private double lastScoringET = -1.0;
+
+        // User preferences.
+        private readonly bool enablePitStopPrediction = UserSettings.GetUserSettings().getBoolean("enable_rf2_pit_stop_prediction");
+        private readonly bool enableBlueOnSlower = UserSettings.GetUserSettings().getBoolean("enable_rf2_blue_on_slower");
 
         public RF2GameStateMapper()
         {
@@ -69,8 +69,9 @@ namespace CrewChiefV4.rFactor2
             this.suspensionDamageThresholds.Add(new CornerData.EnumWithThresholds(DamageLevel.DESTROYED, 1.0f, 2.0f));
         }
 
-        private int[] minimumSupportedVersionParts = new int[] { 2, 2, 0, 0 };
+        private int[] minimumSupportedVersionParts = new int[] { 2, 2, 1, 0 };
         public static bool pluginVerified = false;
+        private string lastVersionString;
         public void versionCheck(Object memoryMappedFileStruct)
         {
             if (RF2GameStateMapper.pluginVerified)
@@ -78,12 +79,15 @@ namespace CrewChiefV4.rFactor2
 
             var shared = memoryMappedFileStruct as CrewChiefV4.rFactor2.RF2SharedMemoryReader.RF2StructWrapper;
             var versionStr = GetStringFromBytes(shared.extended.mVersion);
+            if (this.lastVersionString == versionStr)
+                return;
+
+            this.lastVersionString = versionStr;
 
             var versionParts = versionStr.Split('.');
             if (versionParts.Length != 4)
             {
-                var msg = "Corrupt rFactor 2 Shared Memory version string: " + versionStr;
-                Console.WriteLine(msg);
+                Console.WriteLine("Corrupt or leaked rFactor 2 Shared Memory.  Version string: " + versionStr);
                 return;
             }
 
@@ -95,8 +99,7 @@ namespace CrewChiefV4.rFactor2
                 int versionPart = 0;
                 if (!int.TryParse(versionParts[i], out versionPart))
                 {
-                    var msg = "Corrupt rFactor 2 Shared Memory version string: " + versionStr;
-                    Console.WriteLine(msg);
+                    Console.WriteLine("Corrupt or leaked rFactor 2 Shared Memory version.  Version string: " + versionStr);
                     return;
                 }
 
@@ -106,9 +109,7 @@ namespace CrewChiefV4.rFactor2
             }
 
             if (shared.extended.is64bit == 0)
-            {
                 Console.WriteLine("Only 64bit version of rFactor 2 is supported.");
-            }
             else if (smVer < minVer)
             {
                 var minVerStr = string.Join(".", this.minimumSupportedVersionParts);
@@ -141,7 +142,7 @@ namespace CrewChiefV4.rFactor2
         private int sessionWaitMessageCounter = 0;
 
         private Int64 lastSessionEndTicks = -1;
-        bool lastInRealTimeState = false;
+        private bool lastInRealTimeState = false;
 
         public GameStateData mapToGameStateData(Object memoryMappedFileStruct, GameStateData previousGameState)
         {
@@ -273,19 +274,15 @@ namespace CrewChiefV4.rFactor2
 
                 // Session is not in progress and no abrupt session end detection is in progress, simply return pgs.
                 Debug.Assert(!this.waitingToTerminateSession, "Previous abrupt session end detection hasn't ended correctly.");
+
                 this.waitingToTerminateSession = false;
                 this.isOfflineSession = true;
                 this.distanceOffTrack = 0;
                 this.isApproachingTrack = false;
+                this.lastPlayerTelemetryET = -1.0;
+                this.lastScoringET = -1.0;
 
-                if (pgs != null)
-                {
-                    pgs.SessionData.SessionType = SessionType.Unavailable;
-                    pgs.SessionData.SessionPhase = SessionPhase.Unavailable;
-                    pgs.SessionData.AbruptSessionEndDetected = false;
-                }
-
-                return pgs;
+                return null;
             }
 
             this.lastInRealTimeState = shared.extended.mInRealtimeFC == 1 || shared.scoring.mScoringInfo.mInRealtime == 1;
