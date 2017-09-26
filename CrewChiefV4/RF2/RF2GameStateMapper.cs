@@ -254,8 +254,8 @@ namespace CrewChiefV4.rFactor2
                             var playerVehCapture = shared.extended.mSessionTransitionCapture.mScoringVehicles[playerVehIdx];
                             if (pgs.SessionData.Position != playerVehCapture.mPlace)
                             {
-                                Console.WriteLine(string.Format("Abrupt Session End: player position was updated after session end, updating from pos {0} to: {1}."),
-                                    pgs.SessionData.Position, playerVehCapture.mPlace);
+                                Console.WriteLine(string.Format("Abrupt Session End: player position was updated after session end, updating from pos {0} to: {1}.",
+                                    pgs.SessionData.Position, playerVehCapture.mPlace));
                                 pgs.SessionData.Position = playerVehCapture.mPlace;
                             }
                         }
@@ -282,7 +282,14 @@ namespace CrewChiefV4.rFactor2
                 this.lastPlayerTelemetryET = -1.0;
                 this.lastScoringET = -1.0;
 
-                return null;
+                if (pgs != null)
+                {
+                    pgs.SessionData.SessionType = SessionType.Unavailable;
+                    pgs.SessionData.SessionPhase = SessionPhase.Unavailable;
+                    pgs.SessionData.AbruptSessionEndDetected = false;
+                }
+
+                return pgs;
             }
 
             this.lastInRealTimeState = shared.extended.mInRealtimeFC == 1 || shared.scoring.mScoringInfo.mInRealtime == 1;
@@ -458,6 +465,11 @@ namespace CrewChiefV4.rFactor2
             if (csd.IsNewSession)
             {
                 pgs = null;
+
+                this.isOfflineSession = true;
+                this.distanceOffTrack = 0;
+                this.isApproachingTrack = false;
+
                 GlobalBehaviourSettings.UpdateFromCarClass(cgs.carClass);
             }
 
@@ -1911,6 +1923,7 @@ namespace CrewChiefV4.rFactor2
                 // Figure out Driver Name to follow.
                 // NOTE: In Formation/Standing, game does not report those in UI, but we can.
                 var vehToFollowId = -1;
+                bool followSC = false;
                 if ((gridOrder && fod.AssignedPosition > 2)  // In grid order, first 2 vehicles are following SC.
                   || (!gridOrder && fod.AssignedPosition > 1))  // In non-grid order, 1st car is following SC.
                 {
@@ -1927,32 +1940,47 @@ namespace CrewChiefV4.rFactor2
                         }
                     }
                 }
+                else
+                    followSC = true;
 
-                // Now find the vehicle to follow from the scoring info.
-                for (int i = 0; i < scoring.mScoringInfo.mNumVehicles; ++i)
+                var playerDist = RF2GameStateMapper.GetDistanceCompleteded(ref scoring, ref vehicle);
+                var toFollowDist = -1.0;
+
+                if (!followSC)
                 {
-                    var v = scoring.mVehicles[i];
-                    if (v.mID == vehToFollowId)
+                    // Now find the vehicle to follow from the scoring info.
+                    for (int i = 0; i < scoring.mScoringInfo.mNumVehicles; ++i)
                     {
-                        fod.DriverToFollow = RF2GameStateMapper.GetStringFromBytes(v.mDriverName);
+                        var v = scoring.mVehicles[i];
+                        if (v.mID == vehToFollowId)
+                        {
+                            fod.DriverToFollow = RF2GameStateMapper.GetStringFromBytes(v.mDriverName);
 
-                        var playerDist = RF2GameStateMapper.GetDistanceCompleteded(ref scoring, ref vehicle);
-                        var toFollowDist = RF2GameStateMapper.GetDistanceCompleteded(ref scoring, ref v);
-
-                        fod.Action = FrozenOrderAction.Follow;
-
-                        var distDelta = toFollowDist - playerDist;
-                        if (distDelta < 0.0)
-                            fod.Action = FrozenOrderAction.AllowToPass;
-                        else if (distDelta > 70.0)
-                            fod.Action = FrozenOrderAction.CatchUp;
-
-                        break;
+                            toFollowDist = RF2GameStateMapper.GetDistanceCompleteded(ref scoring, ref v);
+                            break;
+                        }
                     }
                 }
+                else
+                {
+                    // TODO: mSafetyCarLaps is probably not correct if in the middle of a race.  This can be solved but need repro first.
+                    toFollowDist = rules.mTrackRules.mSafetyCarLaps * scoring.mScoringInfo.mLapDist + rules.mTrackRules.mSafetyCarLapDist;
+                }
+
+                Debug.Assert(toFollowDist != -1.0);
+
+                fod.Action = FrozenOrderAction.Follow;
+
+                var distDelta = toFollowDist - playerDist;
+                if (distDelta < 0.0)
+                    fod.Action = FrozenOrderAction.AllowToPass;
+                else if (distDelta > 70.0)
+                    fod.Action = FrozenOrderAction.CatchUp;
+
             }
+            // TODO: REMOVE THIS?
             else if ((fod.Phase == FrozenOrderPhase.Rolling || fod.Phase == FrozenOrderPhase.FastRolling || fod.Phase == FrozenOrderPhase.FormationStanding)
-              && vehicleRules.mPositionAssignment != -1)
+                  && vehicleRules.mPositionAssignment != -1)
             {
                 fod.AssignedGridPosition = vehicleRules.mPositionAssignment + 1;
                 fod.AssignedColumn = vehicleRules.mColumnAssignment == rF2TrackRulesColumn.LeftLane ? FrozenOrderColumn.Left : FrozenOrderColumn.Right;
