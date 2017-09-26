@@ -4,42 +4,59 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using iRacingSDK;
+using iRacingSDK.Support;
 namespace CrewChiefV4.iRacing
 {
     class PostProcessData
     {
+        static int[] lastDriverLaps = new int[64];
+        static double[] driverLapStartTime = new double[64];
+        static double[] lapTime = new double[64];
+        static double[] lastLapTime = new double[64];
         public static DataSample ProcessLapTimes(DataSample data)
         {
-            int[] lastDriverLaps = new int[64];
-            double[] driverLapStartTime = new double[64];
-            double[] lapTime = new double[64];
-            
+
 
             var carsAndLaps = data.Telemetry
                 .CarIdxLap
                 .Select((l, i) => new { CarIdx = i, Lap = l })
                 .Skip(1)
-                .Take(data.SessionData.DriverInfo.CompetingDrivers.Length - 1);
+                .Take(data.SessionData.DriverInfo.CompetingDrivers.Length);
 
             foreach (var lap in carsAndLaps)
             {
                 
                 if (lap.Lap == -1)
                     continue;
+
                 lapTime[lap.CarIdx] = data.Telemetry.SessionTime - driverLapStartTime[lap.CarIdx];
 
                 if (lap.Lap > data.Telemetry.CarIdxLapCompleted[lap.CarIdx]
                     && lap.Lap > lastDriverLaps[lap.CarIdx]
                     && data.Telemetry.CarIdxTrackSurface[lap.CarIdx] == TrackLocation.OnTrack)
                 {
+
                     driverLapStartTime[lap.CarIdx] = data.Telemetry.SessionTime;
                     lastDriverLaps[lap.CarIdx] = lap.Lap;
+                    lastLapTime[lap.CarIdx] = lapTime[lap.CarIdx];
+                    Console.WriteLine("NewLap started by " + data.Telemetry.CarDetails[lap.CarIdx].UserName + " laptime:" + TimeSpan.FromSeconds(lapTime[lap.CarIdx]).ToString());
+ 
                 }
             }
+            data.Telemetry.CarIdxLastLapTime = lastLapTime;
             data.Telemetry.CarIdxLapTime = lapTime;
             
             return data;
         }
+        public static void ProcessCalculateSpeed(DataSample data)
+        {
+            foreach(Car car in data.Telemetry.RaceCars)
+            {
+                car.CalculateSpeed(data.Telemetry, iRacingHelpers.ParseTrackLength(data.SessionData.WeekendInfo.TrackLength));
+                car.CalculatePitInfo(data.Telemetry.SessionTime);                
+            }
+        }
+
         public static DataSample ProcessCorrectedDistances(DataSample data)
         {
             var maxDistance = new float[64];
@@ -157,6 +174,48 @@ namespace CrewChiefV4.iRacing
                 if (lastTimeOfData[i] + TimeSpan.FromSeconds(30) < data.Telemetry.SessionTimeSpan)
                     data.Telemetry.HasRetired[i] = true;
             }
+        }
+        public static DataSample ProcessFastestLaps(DataSample data)
+        {
+            FastLap lastFastLap = new FastLap();
+            var lastDriverLaps = new int[64];
+            var driverLapStartTime = new double[64];
+            var fastestLapTime = double.MaxValue;
+
+
+            var carsAndLaps = data.Telemetry
+                .CarIdxLap
+                .Select((l, i) => new { CarIdx = i, Lap = l })
+                .Skip(1)
+                .Take(data.SessionData.DriverInfo.CompetingDrivers.Length);
+
+            foreach (var lap in carsAndLaps)
+            {
+                if (lap.Lap == -1)
+                    continue;
+
+                if (lap.Lap > data.Telemetry.CarIdxLapCompleted[lap.CarIdx]
+                    && lap.Lap > lastDriverLaps[lap.CarIdx])
+                {
+                    var lapTime = data.Telemetry.SessionTime - driverLapStartTime[lap.CarIdx];
+
+                    driverLapStartTime[lap.CarIdx] = data.Telemetry.SessionTime;
+                    lastDriverLaps[lap.CarIdx] = lap.Lap;
+
+                    if (lap.Lap > 1 && lapTime < fastestLapTime)
+                    {
+                        fastestLapTime = lapTime;
+
+                        lastFastLap = new FastLap
+                        {
+                            Time = TimeSpan.FromSeconds(lapTime),
+                            Driver = data.SessionData.DriverInfo.CompetingDrivers[lap.CarIdx]
+                        };
+                    }
+                }
+            }
+            data.Telemetry.FastestLap = lastFastLap;
+            return data;
         }
     }
 }

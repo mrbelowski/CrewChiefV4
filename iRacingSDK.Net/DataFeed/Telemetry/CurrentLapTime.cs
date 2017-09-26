@@ -19,6 +19,20 @@ namespace iRacingSDK
                 _carIdxLapTime = value;
             }
         }
+        double[] _carIdxLastLapTime;
+        public double[] CarIdxLastLapTime
+        {
+            get
+            {
+                return _carIdxLastLapTime;
+            }
+            set
+            {
+                _carIdxLastLapTime = value;
+            }
+        }
+
+
 
 
     }

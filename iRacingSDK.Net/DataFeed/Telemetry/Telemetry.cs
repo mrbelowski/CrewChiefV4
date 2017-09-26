@@ -96,7 +96,7 @@ namespace iRacingSDK
         {
             get
             {
-                return Cars.Where(c => !c.Details.IsPaceCar);
+                return Cars;
             }
         }
 

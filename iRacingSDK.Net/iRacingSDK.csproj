@@ -58,10 +58,6 @@
     <Compile Include="DataFeed\EngineWarnings.cs" />
     <Compile Include="DataFeed\Telemetry\CarIdxPitStopCount.cs" />
     <Compile Include="DataFeed\Telemetry\CurrentLapTime.cs" />
-    <Compile Include="DataSampleExtensions\EmitTo.cs" />
-    <Compile Include="DataSampleExtensions\WithCurrentLapTime.cs" />
-    <Compile Include="DataSampleExtensions\WithPitStopCounts.cs" />
-    <Compile Include="DataSampleExtensions\VerifyReplayFrames.cs" />
     <Compile Include="DataSampleExtensions\WithEvents.cs" />
     <Compile Include="Messaging\Skies.cs" />
     <Compile Include="Messaging\WeatherType.cs" />
@@ -74,19 +70,7 @@
     <Compile Include="Messaging\ChatCommandMode.cs" />
     <Compile Include="DataFeed\Telemetry\FastestLap.cs" />
     <Compile Include="DataFeed\Telemetry\RaceDistance.cs" />
-    <Compile Include="DataSampleExtensions\AfterEnumeration.cs" />
     <Compile Include="DataSampleExtensions\WithLastSample.cs" />
-    <Compile Include="DataSampleExtensions\GetBufferedDataFeed.cs" />
-    <Compile Include="DataSampleExtensions\TakeUntil.cs" />
-    <Compile Include="DataSampleExtensions\TakeUntilEndOfReplay.cs" />
-    <Compile Include="DataSampleExtensions\Incidents.cs" />
-    <Compile Include="DataSampleExtensions\IncidentsSupport.cs" />
-    <Compile Include="DataSampleExtensions\WithFastestLaps.cs" />
-    <Compile Include="DataSampleExtensions\WithFinishingStatus.cs" />
-    <Compile Include="DataSampleExtensions\WithCorrectedDistances.cs" />
-    <Compile Include="DataSampleExtensions\WithCorrectedPercentages.cs" />
-    <Compile Include="DataSampleExtensions\RaceOnly.cs" />
-    <Compile Include="DataSampleExtensions\AtSpeed.cs" />
     <Compile Include="iRacingInstance.cs" />
     <Compile Include="iRacingListener.cs" />
     <Compile Include="Messaging\PitCommand.cs" />
@@ -122,7 +106,6 @@
     <Compile Include="Messaging\TrackLocation.cs" />
     <Compile Include="DataFeed\SessionFlags.cs" />
     <Compile Include="DataFeed\Car.cs" />
-    <Compile Include="DataSampleExtensions\ForwardOnly.cs" />
     <Compile Include="DataFeed\LapSector.cs" />
     <Compile Include="DataFeed\Telemetry\Telemetry.cs" />
     <Compile Include="DataFeed\Telemetry\RaceLapSector.cs" />
@@ -139,11 +122,9 @@
     <None Include="Docs\DataFeedFilters_WithCorrectedPercentages.md" />
     <None Include="Docs\DataFeedFilters.md" />
     <None Include="Docs\DataSample.md" />
-    <None Include="iRacingSDK.nuspec" />
     <None Include="LICENSE.txt" />
     <None Include="packages.config" />
     <None Include="README.md" />
-    <None Include="tools\package.cmd" />
   </ItemGroup>
   <ProjectExtensions>
     <MonoDevelop>
@@ -154,9 +135,6 @@
       </Properties>
     </MonoDevelop>
   </ProjectExtensions>
-  <ItemGroup>
-    <Content Include="tools\nuget.exe" />
-  </ItemGroup>
   <ItemGroup />
   <ItemGroup />
 </Project>

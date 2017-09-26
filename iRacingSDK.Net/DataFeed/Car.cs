@@ -56,6 +56,8 @@ namespace iRacingSDK
         readonly Telemetry telemetry;
         readonly SessionData._DriverInfo._Drivers driver;
         public readonly CarDetails Details;
+        private const float SPEED_CALC_INTERVAL = 0.5f;
+        private const float PIT_MINSPEED = 0.01f;
 
         public Car(Telemetry telemetry, int carIdx)
         {
@@ -82,7 +84,215 @@ namespace iRacingSDK
         public int PitStopCount { get { return telemetry.CarIdxPitStopCount[carIdx]; } }
         public int LapCompleated { get { return telemetry.CarIdxLapCompleted[carIdx]; } }
         public double LapTime { get { return telemetry.CarIdxLapTime[carIdx]; } }
+        
+        public int Gear { get; private set; }
+        public float Rpm { get; private set; }
+        public double SteeringAngle { get; private set; }
 
+        public double Speed { get; private set; }
+        public double SpeedKph { get; private set; }
+
+        public string DeltaToLeader { get; set; }
+        public string DeltaToNext { get; set; }
+
+        public int CurrentSector { get; set; }
+        public int CurrentFakeSector { get; set; }
+
+
+        private bool _hasIncrementedCounter;
+
+        public int Pitstops { get; set; }
+
+        public bool InPitLane { get; set; }
+        public bool InPitStall { get; set; }
+
+        public double? PitLaneEntryTime { get; set; }
+        public double? PitLaneExitTime { get; set; }
+
+        public double? PitStallEntryTime { get; set; }
+        public double? PitStallExitTime { get; set; }
+
+        public double LastPitLaneTimeSeconds { get; set; }
+        public double LastPitStallTimeSeconds { get; set; }
+
+        public double CurrentPitLaneTimeSeconds { get; set; }
+        public double CurrentPitStallTimeSeconds { get; set; }
+
+        public int LastPitLap { get; set; }
+        public int CurrentStint { get; set; }
+
+
+        private double _prevSpeedUpdateTime;
+        private double _prevSpeedUpdateDist;
+
+        public void CalculateSpeed(Telemetry current, double? trackLengthKm)
+        {
+            if (current == null) return;
+            if (trackLengthKm == null) return;
+
+            try
+            {
+                var t1 = current.SessionTime;
+                var t0 = _prevSpeedUpdateTime;
+                var time = t1 - t0;
+
+                if (time < SPEED_CALC_INTERVAL)
+                {
+                    // Ignore
+                    return;
+                }
+
+                var p1 = current.CarIdxLapDistPct[CarIdx];
+                var p0 = _prevSpeedUpdateDist;
+
+                if (p1 < -0.5 || TrackSurface == TrackLocation.NotInWorld)
+                {
+                    // Not in world?
+                    return;
+                }
+
+                if (p0 - p1 > 0.5)
+                {
+                    // Lap crossing
+                    p1 += 1;
+                }
+                var distancePct = p1 - p0;
+
+                var distance = distancePct * trackLengthKm.GetValueOrDefault() * 1000; //meters
+
+
+                if (time >= Double.Epsilon)
+                {
+                    this.Speed = distance / (time); // m/s
+                }
+                else
+                {
+                    if (distance < 0)
+                        this.Speed = Double.NegativeInfinity;
+                    else
+                        this.Speed = Double.PositiveInfinity;
+                }
+                this.SpeedKph = this.Speed * 3.6;
+
+                _prevSpeedUpdateTime = t1;
+                _prevSpeedUpdateDist = p1;
+            }
+            catch (Exception ex)
+            {
+                //Log.Instance.LogError("Calculating speed of car " + this.Driver.Id, ex);
+                this.Speed = 0;
+            }
+        }
+        public void CalculatePitInfo(double time)
+        {
+            // If we are not in the world (blinking?), stop checking
+            if (TrackSurface == TrackLocation.NotInWorld)
+            {
+                return;
+            }
+
+            // Are we NOW in pit lane (pitstall includes pitlane)
+            this.InPitLane = TrackSurface == TrackLocation.AproachingPits ||
+                        TrackSurface == TrackLocation.InPitStall;
+
+            // Are we NOW in pit stall?
+            this.InPitStall = TrackSurface == TrackLocation.InPitStall;
+
+
+            this.CurrentStint = LapCompleated - this.LastPitLap;
+
+            // Were we already in pitlane previously?
+            if (this.PitLaneEntryTime == null)
+            {
+                // We were not previously in pitlane
+                if (this.InPitLane)
+                {
+                    // We have only just now entered pitlane
+                    this.PitLaneEntryTime = time;
+                    this.CurrentPitLaneTimeSeconds = 0;
+
+                }
+            }
+            else
+            {
+                // We were already in pitlane but have not exited yet
+                this.CurrentPitLaneTimeSeconds = time - this.PitLaneEntryTime.Value;
+
+                // Were we already in pit stall?
+                if (this.PitStallEntryTime == null)
+                {
+                    // We were not previously in our pit stall yet
+                    if (this.InPitStall)
+                    {
+                        if (Math.Abs(Speed) > PIT_MINSPEED)
+                        {
+                            Debug.WriteLine("PIT: did not stop in pit stall, ignored.");
+                        }
+                        else
+                        {
+                            // We have only just now entered our pit stall
+
+                            this.PitStallEntryTime = time;
+                            this.CurrentPitStallTimeSeconds = 0;
+                        }
+                    }
+                }
+                else
+                {
+                    // We already were in our pit stall
+                    this.CurrentPitStallTimeSeconds = time - this.PitStallEntryTime.Value;
+
+                    if (!this.InPitStall)
+                    {
+                        // We have now left our pit stall
+
+                        this.LastPitStallTimeSeconds = time - this.PitStallEntryTime.Value;
+
+                        this.CurrentPitStallTimeSeconds = 0;
+
+                        if (this.PitStallExitTime != null)
+                        {
+                            var diff = this.PitStallExitTime.Value - time;
+                            if (Math.Abs(diff) < 5)
+                            {
+                                // Sim detected pit stall exit again less than 5 seconds after previous exit.
+                                // This is not possible?
+                                return;
+                            }
+                        }
+
+                        // Did we already count this stop?
+                        if (!_hasIncrementedCounter)
+                        {
+                            // Now increment pitstop count
+                            this.Pitstops += 1;
+                            _hasIncrementedCounter = true;
+                        }
+
+                        this.LastPitLap = LapCompleated;
+                        this.CurrentStint = 0;
+
+                        // Reset
+                        this.PitStallEntryTime = null;
+                        this.PitStallExitTime = time;
+                    }
+                }
+
+                if (!this.InPitLane)
+                {
+                    // We have now left pitlane
+                    this.PitLaneExitTime = time;
+                    _hasIncrementedCounter = false;
+
+                    this.LastPitLaneTimeSeconds = this.PitLaneExitTime.Value - this.PitLaneEntryTime.Value;
+                    this.CurrentPitLaneTimeSeconds = 0;
+
+
+                    // Reset
+                    this.PitLaneEntryTime = null;
+                }
+            }
+        }
         public SessionData._SessionInfo._Sessions._ResultsPositions ResultPosition
         {
             get

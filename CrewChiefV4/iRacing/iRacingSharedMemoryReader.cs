@@ -96,6 +96,8 @@ namespace CrewChiefV4.iRacing
                         structWrapper.data = PostProcessData.ProcessCorrectedPercentages(structWrapper.data);
                         structWrapper.data = PostProcessData.ProcessLapTimes(structWrapper.data);
                         structWrapper.data = PostProcessData.ProcessFinishingStatus(structWrapper.data);
+                        structWrapper.data = PostProcessData.ProcessFastestLaps(structWrapper.data);
+                        PostProcessData.ProcessCalculateSpeed(structWrapper.data);
                         if (!forSpotter && dumpToFile && dataToDump != null)
                         {
 

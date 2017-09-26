@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using CrewChiefV4.GameState;
 using CrewChiefV4.Events;
 using iRacingSDK;
-
+using iRacingSDK.Support;
 using System.Diagnostics;
 using System.Globalization;
 
@@ -99,9 +99,9 @@ namespace CrewChiefV4.iRacing
                 currentGameState.SessionData.SessionStartTime = currentGameState.Now;
                 
                 currentGameState.SessionData.TrackDefinition = TrackData.getTrackDefinition(shared.SessionData.WeekendInfo.TrackDisplayShortName + ":" + shared.SessionData.WeekendInfo.TrackConfigName, 
-                    (float)ParseTrackLength(shared.SessionData.WeekendInfo.TrackLength),3);
+                    (float)iRacingHelpers.ParseTrackLength(shared.SessionData.WeekendInfo.TrackLength),3);
 
-                currentGameState.SessionData.SessionNumberOfLaps = ParseInt(currentSessionData.SessionLaps);
+                currentGameState.SessionData.SessionNumberOfLaps = iRacingHelpers.ParseInt(currentSessionData.SessionLaps);
                 currentGameState.SessionData.LeaderHasFinishedRace = false;
                 currentGameState.SessionData.SessionStartPosition = shared.Telemetry.PlayerCarPosition;
                 Console.WriteLine("SessionStartPosition = " + currentGameState.SessionData.SessionStartPosition);
@@ -151,7 +151,7 @@ namespace CrewChiefV4.iRacing
                         }
                         else 
                         {
-                            currentGameState.SessionData.SessionNumberOfLaps = ParseInt(currentSessionData.SessionLaps);
+                            currentGameState.SessionData.SessionNumberOfLaps = iRacingHelpers.ParseInt(currentSessionData.SessionLaps);
                             currentGameState.SessionData.SessionHasFixedTime = false;
                         }
                         Console.WriteLine("Player is using car class " + currentGameState.carClass.getClassIdentifier());
@@ -246,14 +246,44 @@ namespace CrewChiefV4.iRacing
 
 
             currentGameState.SessionData.SessionTimeRemaining = (float)shared.Telemetry.SessionTimeRemain;
+            
             currentGameState.SessionData.CompletedLaps = shared.Telemetry.LapCompleted;
             
             //TODO validate laptimes
             currentGameState.SessionData.LapTimeCurrent = shared.Telemetry.LapCurrentLapTime;
             currentGameState.SessionData.CurrentLapIsValid = true;
-            currentGameState.SessionData.LapTimePrevious = shared.Telemetry.LapLastLapTime;
+
+
+            currentGameState.SessionData.LapTimePrevious = (float)shared.Telemetry.CarIdxLastLapTime[PlayerCarIdx];
+            currentGameState.SessionData.CompletedLaps = shared.Telemetry.LapCompleted;
+
+
             currentGameState.SessionData.PreviousLapWasValid = true;
             currentGameState.SessionData.NumCars = shared.SessionData.DriverInfo.CompetingDrivers.Length;
+
+            currentGameState.SessionData.Position = shared.Telemetry.PlayerCarPosition;
+            currentGameState.SessionData.UnFilteredPosition = shared.Telemetry.PlayerCarPosition;
+
+            currentGameState.SessionData.SessionFastestLapTimeFromGame = shared.Telemetry.FastestLap.Time.Seconds;
+
+            if (currentGameState.SessionData.OverallSessionBestLapTime == -1 ||
+                currentGameState.SessionData.OverallSessionBestLapTime > shared.Telemetry.FastestLap.Time.Seconds)
+            {
+                currentGameState.SessionData.OverallSessionBestLapTime = shared.Telemetry.FastestLap.Time.Seconds;
+            }
+            currentGameState.SessionData.IsNewLap = previousGameState != null && previousGameState.SessionData.IsNewLap == false  &&
+                (shared.Telemetry.LapCompleted == previousGameState.SessionData.CompletedLaps + 1 ||
+                ((lastSessionPhase == SessionPhase.Countdown || lastSessionPhase == SessionPhase.Formation || lastSessionPhase == SessionPhase.Garage)
+                && (currentGameState.SessionData.SessionPhase == SessionPhase.Green || currentGameState.SessionData.SessionPhase == SessionPhase.FullCourseYellow)));
+            
+            if (currentGameState.SessionData.IsNewLap)
+            {
+                currentGameState.SessionData.PositionAtStartOfCurrentLap = currentGameState.SessionData.Position;
+                currentGameState.SessionData.formattedPlayerLapTimes.Add(TimeSpan.FromSeconds(shared.Telemetry.CarIdxLastLapTime[PlayerCarIdx]).ToString(@"mm\:ss\.fff"));
+                Console.WriteLine(TimeSpan.FromSeconds(shared.Telemetry.CarIdxLastLapTime[PlayerCarIdx]).ToString(@"mm\:ss\.fff"));
+                //currentGameState.SessionData.trackLandmarksTiming.cancelWaitingForLandmarkEnd();
+            }
+            Console.WriteLine("Speed:" + playerCar.SpeedKph);
             return currentGameState;
            
 
@@ -365,50 +395,7 @@ namespace CrewChiefV4.iRacing
             //opponentData.TyreChangesByLap[0] = opponentData.CurrentTyres;
             return opponentData;
         }
-        public static double ParseTrackLength(string value)
-        {
-            // value = "6.93 km"
-            double length = 0;
 
-            var indexOfKm = value.IndexOf("km");
-            if (indexOfKm > 0) value = value.Substring(0, indexOfKm);
-
-            if (double.TryParse(value, NumberStyles.AllowDecimalPoint | NumberStyles.AllowTrailingWhite, CultureInfo.InvariantCulture, out length))
-            {
-                return length;
-            }
-            return 0;
-        }
-
-        public static int ParseInt(string value, int @default = 0)
-        {
-            int val;
-            if (int.TryParse(value, out val)) return val;
-            return @default;
-        }
-
-        public static float ParseFloat(string value, float @default = 0f)
-        {
-            float val;
-            if (float.TryParse(value, NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign | NumberStyles.AllowTrailingWhite,
-                CultureInfo.InvariantCulture, out val)) return val;
-            return @default;
-        }
-
-        public static double ParseSec(string value)
-        {
-            // value = "600.00 sec"
-            double length = 0;
-
-            var indexOfSec = value.IndexOf(" sec");
-            if (indexOfSec > 0) value = value.Substring(0, indexOfSec);
-
-            if (double.TryParse(value, NumberStyles.AllowDecimalPoint | NumberStyles.AllowTrailingWhite, CultureInfo.InvariantCulture, out length))
-            {
-                return length;
-            }
-            return 0;
-        }
     }
 
 }
