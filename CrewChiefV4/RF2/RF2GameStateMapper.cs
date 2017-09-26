@@ -278,10 +278,12 @@ namespace CrewChiefV4.rFactor2
                 this.distanceOffTrack = 0;
                 this.isApproachingTrack = false;
 
+
                 if (pgs != null)
                 {
                     pgs.SessionData.SessionType = SessionType.Unavailable;
                     pgs.SessionData.SessionPhase = SessionPhase.Unavailable;
+                    pgs.SessionData.AbruptSessionEndDetected = false;
                 }
 
                 return pgs;
