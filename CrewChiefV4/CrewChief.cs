@@ -433,6 +433,8 @@ namespace CrewChiefV4
             {
                 spotter = (Spotter)Activator.CreateInstance(Type.GetType(gameDefinition.spotterName),
                     audioPlayer, GlobalBehaviourSettings.spotterEnabled);
+                if (spotter == null)
+                    Console.WriteLine("No spotter defined for game " + gameDefinition.spotterName);
             }
             else
             {
@@ -620,7 +622,7 @@ namespace CrewChiefV4
                                         (previousGameState.SessionData.SessionPhase != currentGameState.SessionData.SessionPhase)) ||
                                         ((gameDefinition.gameEnum == GameEnum.PCARS_32BIT || gameDefinition.gameEnum == GameEnum.PCARS_64BIT || 
                                                 gameDefinition.gameEnum == GameEnum.PCARS2 || gameDefinition.gameEnum == GameEnum.PCARS_NETWORK) &&
-                                            currentGameState.SessionData.SessionHasFixedTime && currentGameState.SessionData.SessionTotalRunTime == -1))
+                                            currentGameState.SessionData.SessionHasFixedTime && currentGameState.SessionData.SessionTotalRunTime == -1) || gameDefinition.gameEnum == GameEnum.IRACING)
                             {
                                 if (spotter != null)
                                 {
