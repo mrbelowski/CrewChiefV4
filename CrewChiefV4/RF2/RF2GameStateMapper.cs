@@ -256,8 +256,8 @@ namespace CrewChiefV4.rFactor2
                             var playerVehCapture = shared.extended.mSessionTransitionCapture.mScoringVehicles[playerVehIdx];
                             if (pgs.SessionData.Position != playerVehCapture.mPlace)
                             {
-                                Console.WriteLine(string.Format("Abrupt Session End: player position was updated after session end, updating from pos {0} to: {1}."),
-                                    pgs.SessionData.Position, playerVehCapture.mPlace);
+                                Console.WriteLine(string.Format("Abrupt Session End: player position was updated after session end, updating from pos {0} to: {1}.",
+                                    pgs.SessionData.Position, playerVehCapture.mPlace));
                                 pgs.SessionData.Position = playerVehCapture.mPlace;
                             }
                         }
@@ -285,6 +285,7 @@ namespace CrewChiefV4.rFactor2
                 {
                     pgs.SessionData.SessionType = SessionType.Unavailable;
                     pgs.SessionData.SessionPhase = SessionPhase.Unavailable;
+                    pgs.SessionData.AbruptSessionEndDetected = false;
                 }
 
                 return pgs;
