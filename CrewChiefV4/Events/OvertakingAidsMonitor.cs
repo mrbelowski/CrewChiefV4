@@ -64,13 +64,13 @@ namespace CrewChiefV4.Events
                 }
                 if (currentGameState.SessionData.IsNewLap)
                 {
-                    if (drsAvailableOnThisLap && !hasUsedDrsOnThisLap
+                    if ((drsAvailableOnThisLap && !hasUsedDrsOnThisLap)
                         || (CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT && drsAvailableInAnyZoneOnThisLap && !hasUsedDrsOnThisLap))
                     {
                         audioPlayer.playMessage(new QueuedMessage("missed_available_drs", MessageContents(folderDontForgetDRS), 0, this));
                     }
                     drsAvailableOnThisLap = currentGameState.OvertakingAids.DrsAvailable;
-                    drsAvailableInAnyZoneOnThisLap = false;
+                    drsAvailableInAnyZoneOnThisLap = currentGameState.OvertakingAids.DrsAvailable;
                     hasUsedDrsOnThisLap = false;
                     playedGetCloserForDRSOnThisLap = false;
                     playedOpponentHasDRSOnThisLap = false;
@@ -83,7 +83,7 @@ namespace CrewChiefV4.Events
                 {
                     hasUsedDrsOnThisLap = true;
                 }
-                var hadChanceToUseDrs = CrewChief.gameDefinition.gameEnum != GameEnum.RF2_64BIT
+                bool hadChanceToUseDrs = CrewChief.gameDefinition.gameEnum != GameEnum.RF2_64BIT
                     ? drsAvailableOnThisLap : drsAvailableInAnyZoneOnThisLap;
                 if (!hasUsedDrsOnThisLap && !hadChanceToUseDrs && !playedGetCloserForDRSOnThisLap &&
                     currentGameState.PositionAndMotionData.DistanceRoundTrack > trackDistanceToCheckDRSGapFrontAt)
