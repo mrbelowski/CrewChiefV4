@@ -878,8 +878,7 @@ namespace CrewChiefV4.rFactor2
                     csd.PlayerClassSessionBestLapTime = csd.PlayerLapTimeSessionBest > 0.0f ?
                         csd.PlayerLapTimeSessionBest : -1.0f;
 
-                    if (csd.IsNewLap 
-                        && psd != null && !psd.IsNewLap
+                    if (cgs.LastLapTimeUpdated
                         && csd.LapTimePrevious > 0.0f
                         && csd.PreviousLapWasValid)
                     {

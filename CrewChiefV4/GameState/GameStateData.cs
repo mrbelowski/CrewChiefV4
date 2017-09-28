@@ -1721,10 +1721,16 @@ namespace CrewChiefV4.GameState
                     this.WaitingForNewLapData = true;
                     this.NewLapDataTimerExpiry = this.Now.Add(GameStateData.MaxWaitForNewLapData);
                 }
-                // if we were waiting in the previous game state, see if the timer has expired or we have a change in the previous laptime value
-                if (previousGameState.WaitingForNewLapData
+                else
+                {
+                    // not a new lap but may be waiting, so copy over the wait variables
+                    this.WaitingForNewLapData = previousGameState.WaitingForNewLapData;
+                    this.NewLapDataTimerExpiry = previousGameState.NewLapDataTimerExpiry;
+                }
+                // if we're waiting, see if the timer has expired or we have a change in the previous laptime value
+                if (this.WaitingForNewLapData
                     && (previousGameState.SessionData.LapTimePrevious != gameProvidedLastLapTime
-                        || this.Now > previousGameState.NewLapDataTimerExpiry))
+                        || this.Now > this.NewLapDataTimerExpiry))
                 {
                     // the timer has expired or we have new data
                     this.WaitingForNewLapData = false;
@@ -1734,8 +1740,6 @@ namespace CrewChiefV4.GameState
                 }
                 else
                 {
-                    this.WaitingForNewLapData = previousGameState.WaitingForNewLapData;
-                    this.LastLapTimeUpdated = previousGameState.LastLapTimeUpdated;
                     this.SessionData.LapTimePrevious = previousGameState.SessionData.LapTimePrevious;
                     this.SessionData.PreviousLapWasValid = previousGameState.SessionData.PreviousLapWasValid;
                 }
