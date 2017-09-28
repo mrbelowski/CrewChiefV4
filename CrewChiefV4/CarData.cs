@@ -229,6 +229,8 @@ namespace CrewChiefV4
             public bool timesInHundredths { get; set; }
             public bool useAmericanTerms { get; set; }
             public String enabledMessageTypes { get; set; }
+            public bool isDRSCapable { get; set; }
+            public float DRSRange { get; set; }
 
             public String placeholderClassId = "";
 
@@ -260,6 +262,8 @@ namespace CrewChiefV4
                 this.minTyreCircumference = 0.5f * (float)Math.PI;
                 this.maxTyreCircumference = 1.2f * (float)Math.PI;
                 this.enabledMessageTypes = "";
+                this.isDRSCapable = false;
+                this.DRSRange = -1.0f;
             }
 
             public String getClassIdentifier()
