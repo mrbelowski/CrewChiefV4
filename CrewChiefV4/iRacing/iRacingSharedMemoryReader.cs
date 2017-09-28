@@ -18,7 +18,7 @@ namespace CrewChiefV4.iRacing
         private int dataReadFromFileIndex = 0;
         private String lastReadFileName = null;
         int lastUpdate = -1;
-        private int _DriverId;
+        private int _DriverId = -1;
         public int DriverId { get { return _DriverId; } }
        
         public object GetData(string headerName)
@@ -137,7 +137,7 @@ namespace CrewChiefV4.iRacing
                     iRacingStructWrapper structWrapper = new iRacingStructWrapper();
                     structWrapper.ticksWhenRead = DateTime.Now.Ticks;
 
-                    var time = (double)sdk.GetData("SessionTime");
+                    
                     if(forSpotter)
                     {
                         var carLeftRight = (int)sdk.GetData("CarLeftRight");
@@ -147,13 +147,17 @@ namespace CrewChiefV4.iRacing
                     int newUpdate = sdk.Header.SessionInfoUpdate;                   
                     if (newUpdate != lastUpdate)
                     {
-                        lastUpdate = newUpdate;
 
-                        // Get the session info string
-                        var sessionInfoString = sdk.GetSessionInfo();
-                        SessionInfo sessionInfo = new SessionInfo(sessionInfoString, time);
-                        // Raise the SessionInfoUpdated event and pass along the session info and session time.
-                        sim.SdkOnSessionInfoUpdated(sessionInfo, (int)TryGetSessionNum());
+                        var time = sdk.GetData("SessionTime");
+                        if(time != null)
+                        {
+                            // Get the session info string
+                            var sessionInfoString = sdk.GetSessionInfo();
+                            SessionInfo sessionInfo = new SessionInfo(sessionInfoString, (double)time);
+                            // Raise the SessionInfoUpdated event and pass along the session info and session time.
+                            sim.SdkOnSessionInfoUpdated(sessionInfo, (int)TryGetSessionNum(),DriverId);
+                            lastUpdate = newUpdate;
+                        }
                     }
                     sim.SdkOnTelemetryUpdated(new TelemetryInfo(sdk));
                     structWrapper.data = sim;                 

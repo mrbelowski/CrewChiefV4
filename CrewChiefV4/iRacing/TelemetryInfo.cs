@@ -559,6 +559,25 @@ namespace CrewChiefV4.iRacing
         public TelemetryValue<int> PlayerCarIdx { get { return new TelemetryValue<int>(sdk, "PlayerCarIdx"); } }
 
         public TelemetryValue<int> CarLeftRight { get { return new TelemetryValue<int>(sdk, "CarLeftRight"); } }
+
+        public TelemetryValue<int> PlayerCarPosition { get { return new TelemetryValue<int>(sdk, "PlayerCarPosition"); } }
+        /// <summary>
+        /// Players class position in race
+        /// </summary>
+        public TelemetryValue<int> PlayerCarClassPosition { get { return new TelemetryValue<int>(sdk, "PlayerCarClassPosition"); } }
+        /// <summary>
+        /// Players car track surface material type
+        /// </summary>
+        public TelemetryValue<int> PlayerTrackSurfaceMaterial { get { return new TelemetryValue<int>(sdk, "PlayerTrackSurfaceMaterial"); } }
+        /// <summary>
+        /// Estimate of players current lap time as shown in F3 box
+        /// </summary>
+        public TelemetryValue<System.Single> LapCurrentLapTime { get { return new TelemetryValue<System.Single>(sdk, "LapCurrentLapTime"); } }
+        /// <summary>
+        /// Players last lap time
+        /// </summary>
+        public TelemetryValue<System.Single> LapLastLapTime { get { return new TelemetryValue<System.Single>(sdk, "LapLastLapTime"); } }
         
+
     }
 }

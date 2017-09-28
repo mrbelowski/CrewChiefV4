@@ -622,7 +622,7 @@ namespace CrewChiefV4
                                         (previousGameState.SessionData.SessionPhase != currentGameState.SessionData.SessionPhase)) ||
                                         ((gameDefinition.gameEnum == GameEnum.PCARS_32BIT || gameDefinition.gameEnum == GameEnum.PCARS_64BIT || 
                                                 gameDefinition.gameEnum == GameEnum.PCARS2 || gameDefinition.gameEnum == GameEnum.PCARS_NETWORK) &&
-                                            currentGameState.SessionData.SessionHasFixedTime && currentGameState.SessionData.SessionTotalRunTime == -1) || gameDefinition.gameEnum == GameEnum.IRACING)
+                                            currentGameState.SessionData.SessionHasFixedTime && currentGameState.SessionData.SessionTotalRunTime == -1))
                             {
                                 if (spotter != null)
                                 {

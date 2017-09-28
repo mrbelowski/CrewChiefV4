@@ -11,6 +11,7 @@ namespace CrewChiefV4.iRacing
         public SessionData()
         {
             this.ClassBestLaps = new Dictionary<int, BestLap>();
+
         }
 
         public Track Track { get; set; }
@@ -19,6 +20,7 @@ namespace CrewChiefV4.iRacing
         public int SubsessionId { get; set; }
 
         public double SessionTime { get; set; }
+        public string SessionTimeString { get; set; }
         public double TimeRemaining { get; set; }
         public int LeaderLap { get; set; }
 
@@ -30,9 +32,10 @@ namespace CrewChiefV4.iRacing
         public string RaceLaps { get; set; }
         public double RaceTime { get; set; }
 
+
         public Dictionary<int, BestLap> ClassBestLaps { get; set; }
         public BestLap OverallBestLap { get; set; }
-        
+
         public SessionFlag Flags { get; set; }
         public SessionStates State { get; set; }
 
@@ -40,7 +43,6 @@ namespace CrewChiefV4.iRacing
         /// Is the checkered flag shown? (e.g. winner has passed the finish, but other drivers may still be racing)
         /// </summary>
         public bool IsCheckered { get; set; }
-
         /// <summary>
         /// Is the session finished? (e.g. all drivers have finished and session is in cool-down)
         /// </summary>
@@ -64,7 +66,9 @@ namespace CrewChiefV4.iRacing
             this.DynamicTrack = weekend["TrackDynamicTrack"].GetValue() == "1";
 
             var laps = session["SessionLaps"].GetValue();
-            var time = Parser.ParseSec(session["SessionTime"].GetValue());
+            this.SessionTimeString = session["SessionTime"].GetValue();
+            
+            var time = Parser.ParseSec(SessionTimeString);
             
             this.RaceLaps = laps;
             this.RaceTime = time;
@@ -91,7 +95,13 @@ namespace CrewChiefV4.iRacing
             {
                 this.ClassBestLaps.Add(classId, BestLap.Default);
             }
-
+            if (this.OverallBestLap == null)
+            {
+                
+                var DefaultLap = new Laptime(int.MaxValue);
+                DefaultLap.LapNumber = 0;
+                this.OverallBestLap = new BestLap(DefaultLap, new Driver());
+            }
             if (lap.Value > 0 && this.ClassBestLaps[classId].Laptime.Value > lap.Value)
             {
                 var bestlap = new BestLap(lap, driver);
@@ -105,6 +115,22 @@ namespace CrewChiefV4.iRacing
                 return bestlap;
             }
             return null;
+        }
+
+        public bool IsLimitedSessionLaps
+        {
+            get
+            {
+                return RaceLaps.ToLower() != "unlimited";
+            }
+        }
+
+        public bool IsLimitedTime
+        {
+            get
+            {
+                return SessionTimeString.ToLower() != "unlimited";
+            }
         }
 
     }
