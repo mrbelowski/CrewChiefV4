@@ -630,7 +630,7 @@ namespace CrewChiefV4.rFactor2
                     csd.formattedPlayerLapTimes.Add(lt);
             }
 
-            if (csd.IsNewLap && csd.LapTimePrevious > 0)
+            if (cgs.LastLapTimeUpdated && csd.LapTimePrevious > 0)
                 csd.formattedPlayerLapTimes.Add(TimeSpan.FromSeconds(csd.LapTimePrevious).ToString(@"mm\:ss\.fff"));
 
             csd.LeaderHasFinishedRace = leaderScoring.mFinishStatus == (int)rFactor2Constants.rF2FinishStatus.Finished;
@@ -1436,7 +1436,8 @@ namespace CrewChiefV4.rFactor2
             /////////////////////////////////////
             // Current lap timings
             csd.LapTimeCurrent = csd.SessionRunningTime - (float)playerScoring.mLapStartET;
-            csd.LapTimePrevious = playerScoring.mLastLapTime > 0.0f ? (float)playerScoring.mLastLapTime : -1.0f;
+
+            cgs.checkForNewLapData((float) playerScoring.mLastLapTime);
 
             // Last (most current) per-sector times:
             // NOTE: this logic still misses invalid sector handling.
