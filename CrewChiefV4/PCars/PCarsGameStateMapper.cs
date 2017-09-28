@@ -743,6 +743,8 @@ namespace CrewChiefV4.PCars
                 shared.mSessionState == (int)eSessionState.SESSION_TEST || shared.mSessionState == (int)eSessionState.SESSION_TIME_ATTACK) 
                 && previousGameState.SessionData.LapTimeCurrent == -1 && shared.mCurrentTime > 0);
 
+            currentGameState.checkForNewLapData(shared.mLastLapTime);
+
             currentGameState.PitData.InPitlane = shared.mPitMode == (int)ePitMode.PIT_MODE_DRIVING_INTO_PITS ||
                 shared.mPitMode == (int)ePitMode.PIT_MODE_IN_PIT ||
                 shared.mPitMode == (int)ePitMode.PIT_MODE_DRIVING_OUT_OF_PITS ||
@@ -986,10 +988,8 @@ namespace CrewChiefV4.PCars
                 }
             }
 
-            currentGameState.SessionData.LapTimePrevious = shared.mLastLapTime;
             if (currentGameState.SessionData.IsNewLap)
             {
-                currentGameState.SessionData.PreviousLapWasValid = previousGameState != null && previousGameState.SessionData.CurrentLapIsValid;
                 currentGameState.SessionData.CurrentLapIsValid = true;
                 currentGameState.SessionData.formattedPlayerLapTimes.Add(TimeSpan.FromSeconds(shared.mLastLapTime).ToString(@"mm\:ss\.fff"));
                 currentGameState.SessionData.PositionAtStartOfCurrentLap = currentGameState.SessionData.Position;
@@ -1005,7 +1005,7 @@ namespace CrewChiefV4.PCars
                 currentGameState.SessionData.PreviousLapWasValid = previousGameState.SessionData.PreviousLapWasValid;
             }
 
-            if (currentGameState.SessionData.IsNewLap && currentGameState.SessionData.PreviousLapWasValid &&
+            if (currentGameState.LastLapTimeUpdated && currentGameState.SessionData.PreviousLapWasValid &&
                 currentGameState.SessionData.LapTimePrevious > 0)
             {
                 if (currentGameState.SessionData.PlayerLapTimeSessionBest == -1 ||

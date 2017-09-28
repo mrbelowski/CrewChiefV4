@@ -290,7 +290,8 @@ namespace CrewChiefV4.rFactor1
             currentGameState.SessionData.IsDisqualified = (rFactor1Constant.rfFinishStatus)player.finishStatus == rFactor1Constant.rfFinishStatus.dq;
             currentGameState.SessionData.CompletedLaps = shared.lapNumber < 0 ? 0 : shared.lapNumber;
             currentGameState.SessionData.LapTimeCurrent = currentGameState.SessionData.SessionRunningTime - player.lapStartET;
-            currentGameState.SessionData.LapTimePrevious = player.lastLapTime > 0 ? player.lastLapTime : -1;
+
+            currentGameState.checkForNewLapData(player.lastLapTime);
 
             // Last (most current) per-sector times:
             // Note: this logic still misses invalid sector handling.
@@ -379,7 +380,7 @@ namespace CrewChiefV4.rFactor1
                     currentGameState.SessionData.formattedPlayerLapTimes.Add(lt);
                 }
             }
-            if (currentGameState.SessionData.IsNewLap && currentGameState.SessionData.LapTimePrevious > 0)
+            if (currentGameState.LastLapTimeUpdated && currentGameState.SessionData.LapTimePrevious > 0)
             {
                 currentGameState.SessionData.formattedPlayerLapTimes.Add(TimeSpan.FromSeconds(currentGameState.SessionData.LapTimePrevious).ToString(@"mm\:ss\.fff"));
             }
