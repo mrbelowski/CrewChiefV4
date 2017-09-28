@@ -1,4 +1,10 @@
-﻿using System;
+﻿/*
+ * This monitor announces order information during Full Course Yellow/Yellow (in NASCAR), Rolling start and Formation/standing starts.
+ * 
+ * Official website: thecrewchief.org 
+ * License: MIT
+ */
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,8 +17,22 @@ namespace CrewChiefV4.Events
 {
     class FrozenOrderMonitor : AbstractEvent
     {
+        private const int ACTION_STABLE_THRESHOLD = 3;
+
+        // Number of updates FO Action and Driver name were the same.
+        private int numUpdatesActionSame = 0;
+
+        // Last FO Action and Driver name announced.
+        private FrozenOrderAction currFrozenOrderAction = FrozenOrderAction.None;
+        private string currDriverToFollow = "";
+
+        // Next FO Action and Driver to be announced if it stays stable for a ACTION_STABLE_THRESHOLD times.
+        private FrozenOrderAction newFrozenOrderAction = FrozenOrderAction.None;
+        private string newDriverToFollow = "";
+
         private bool formationStandingStartAnnounced = false;
         private bool formationStandingPreStartReminderAnnounced = false;
+
 
         public FrozenOrderMonitor(AudioPlayer audioPlayer)
         {
@@ -97,6 +117,11 @@ namespace CrewChiefV4.Events
         {
             this.formationStandingStartAnnounced = false;
             this.formationStandingPreStartReminderAnnounced = false;
+            this.numUpdatesActionSame = 0;
+            this.newFrozenOrderAction = FrozenOrderAction.None;
+            this.newDriverToFollow = "";
+            this.currFrozenOrderAction = FrozenOrderAction.None;
+            this.currDriverToFollow = "";
         }
 
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
@@ -125,26 +150,45 @@ namespace CrewChiefV4.Events
                 this.clearState();
             }
 
+            // Because FO Action is distance dependent, it tends to fluctuate.
+            // We need to detect when it stabilizes (values stay identical for ACTION_STABLE_THRESHOLD times).
+            if (cfod.Action == pfod.Action
+                && cfod.DriverToFollow == pfod.DriverToFollow)
+                ++this.numUpdatesActionSame;
+            else
+            {
+                this.newFrozenOrderAction = cfod.Action;
+                this.newDriverToFollow = cfod.DriverToFollow;
+
+                this.numUpdatesActionSame = 0;
+            }
+
+            var isActionUpdateStable = this.numUpdatesActionSame >= FrozenOrderMonitor.ACTION_STABLE_THRESHOLD;
+
             if (cfodp == FrozenOrderPhase.Rolling)
             {
                 var shouldFollowSafetyCar = cfod.AssignedGridPosition == 1;
                 var driverToFollow = shouldFollowSafetyCar ? "Safety/Pace car" : cfod.DriverToFollow;
 
-                // TODO: needs to allow announce on start .
-                if (cfod.Action == FrozenOrderAction.Follow
-                    && pfod.Action != FrozenOrderAction.Follow)
+                if (isActionUpdateStable
+                    && (this.currFrozenOrderAction != this.newFrozenOrderAction
+                        || this.currDriverToFollow != this.newDriverToFollow))
                 {
-                    Console.WriteLine(string.Format("FO: FOLLOW DIRVER: {0} IN COLUMN {1}", driverToFollow, cfod.AssignedColumn));
-                }
-                else if (cfod.Action == FrozenOrderAction.AllowToPass
-                    && pfod.Action != FrozenOrderAction.AllowToPass)
-                {
-                    Console.WriteLine(string.Format("FO: ALLOW DIRVER: {0} TO PASS", driverToFollow));
-                }
-                else if (cfod.Action == FrozenOrderAction.CatchUp
-                    && pfod.Action != FrozenOrderAction.CatchUp)
-                {
-                    Console.WriteLine(string.Format("FO: CATCH UP TO DIRVER: {0}", driverToFollow));
+                    this.currFrozenOrderAction = this.newFrozenOrderAction;
+                    this.currDriverToFollow = this.newDriverToFollow;
+
+                    if (this.newFrozenOrderAction == FrozenOrderAction.Follow)
+                    {
+                        Console.WriteLine(string.Format("FO: FOLLOW DIRVER: {0} IN COLUMN {1}", driverToFollow, cfod.AssignedColumn));
+                    }
+                    else if (this.newFrozenOrderAction == FrozenOrderAction.AllowToPass)
+                    {
+                        Console.WriteLine(string.Format("FO: ALLOW DIRVER: {0} TO PASS", driverToFollow));
+                    }
+                    else if (this.newFrozenOrderAction == FrozenOrderAction.CatchUp)
+                    {
+                        Console.WriteLine(string.Format("FO: CATCH UP TO DIRVER: {0}", driverToFollow));
+                    }
                 }
 
                 if (pfod.SafetyCarSpeed != -1.0f && cfod.SafetyCarSpeed == -1.0f)
@@ -156,20 +200,26 @@ namespace CrewChiefV4.Events
             {
                 var shouldFollowSafetyCar = cfod.AssignedPosition == 1;
                 var driverToFollow = shouldFollowSafetyCar ? "Safety/Pace car" : cfod.DriverToFollow;
-                if (cfod.Action == FrozenOrderAction.Follow
-                    && pfod.Action != FrozenOrderAction.Follow)
+
+                if (isActionUpdateStable
+                    && (this.currFrozenOrderAction != this.newFrozenOrderAction
+                        || this.currDriverToFollow != this.newDriverToFollow))
                 {
-                    Console.WriteLine(string.Format("FO: FOLLOW DIRVER: {0}", driverToFollow));
-                }
-                else if (cfod.Action == FrozenOrderAction.AllowToPass
-                    && pfod.Action != FrozenOrderAction.AllowToPass)
-                {
-                    Console.WriteLine(string.Format("FO: ALLOW DIRVER: {0} TO PASS", driverToFollow));
-                }
-                else if (cfod.Action == FrozenOrderAction.CatchUp
-                    && pfod.Action != FrozenOrderAction.CatchUp)
-                {
-                    Console.WriteLine(string.Format("FO: CATCH UP TO DIRVER: {0}", driverToFollow));
+                    this.currFrozenOrderAction = this.newFrozenOrderAction;
+                    this.currDriverToFollow = this.newDriverToFollow;
+
+                    if (this.newFrozenOrderAction == FrozenOrderAction.Follow)
+                    {
+                        Console.WriteLine(string.Format("FO: FOLLOW DIRVER: {0}", driverToFollow));
+                    }
+                    else if (this.newFrozenOrderAction == FrozenOrderAction.AllowToPass)
+                    {
+                        Console.WriteLine(string.Format("FO: ALLOW DIRVER: {0} TO PASS", driverToFollow));
+                    }
+                    else if (this.newFrozenOrderAction == FrozenOrderAction.CatchUp)
+                    {
+                        Console.WriteLine(string.Format("FO: CATCH UP TO DIRVER: {0}", driverToFollow));
+                    }
                 }
 
                 if (pfod.SafetyCarSpeed != -1.0f && cfod.SafetyCarSpeed == -1.0f)

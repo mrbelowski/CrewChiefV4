@@ -59,6 +59,7 @@ namespace CrewChiefV4.rFactor2
         // User preferences.
         private readonly bool enablePitStopPrediction = UserSettings.GetUserSettings().getBoolean("enable_rf2_pit_stop_prediction");
         private readonly bool enableBlueOnSlower = UserSettings.GetUserSettings().getBoolean("enable_rf2_blue_on_slower");
+        private readonly bool enableFrozenOrderMessages = UserSettings.GetUserSettings().getBoolean("enable_rf2_frozen_order_messages");
 
         public RF2GameStateMapper()
         {
@@ -1359,8 +1360,11 @@ namespace CrewChiefV4.rFactor2
 
             csd.Flag = currFlag;
 
-            // TODO: hide behind preference.
-            if (playerRulesIdx != -1 && pgs != null)
+            // --------------------------------
+            // Frozen order data
+            if (this.enableFrozenOrderMessages 
+                && playerRulesIdx != -1 
+                && pgs != null)
                 cgs.FrozenOrderData = this.GetFrozenOrderData(pgs.FrozenOrderData, ref playerScoring, ref shared.scoring, ref shared.rules.mParticipants[playerRulesIdx], ref shared.rules);
 
             // --------------------------------
