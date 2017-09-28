@@ -40,8 +40,11 @@ namespace CrewChiefV4.iRacing
         public double Speed { get; private set; }
         public double SpeedKph { get; private set; }
         
-        public string DeltaToLeader { get; set; }
-        public string DeltaToNext { get; set; }
+        public string DeltaToLeaderString { get; set; }
+        public string DeltaToNextString { get; set; }
+
+        public double DeltaToLeader { get; set; }
+        public double DeltaToNext { get; set; }
 
         public int CurrentSector { get; set; }
         public int CurrentFakeSector { get; set; }

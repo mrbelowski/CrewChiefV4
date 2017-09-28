@@ -81,7 +81,7 @@ namespace CrewChiefV4.iRacing
 
         private void UpdateDriverList(SessionInfo info)
         {
-            Debug.WriteLine("UpdateDriverList");
+            Console.WriteLine("UpdateDriverList");
             _isUpdatingDrivers = true;
             this.GetDrivers(info);
             _isUpdatingDrivers = false;
@@ -91,10 +91,10 @@ namespace CrewChiefV4.iRacing
 
         private void GetDrivers(SessionInfo info)
         {
-            Debug.WriteLine("GetDrivers");
+            Console.WriteLine("GetDrivers");
             if (_mustReloadDrivers)
             {
-                Debug.WriteLine("MustReloadDrivers: true");
+                Console.WriteLine("MustReloadDrivers: true");
                 _drivers.Clear();
                 _mustReloadDrivers = false;
             }
@@ -189,17 +189,23 @@ namespace CrewChiefV4.iRacing
         {
             var query =
                 info["SessionInfo"]["Sessions"]["SessionNum", _currentSessionNumber]["ResultsPositions"];
-
+            //Console.WriteLine(info.Yaml);
             for (int position = 1; position <= _drivers.Count; position++)
             {
                 var positionQuery = query["Position", position];
 
-                string idValue;
-                if (!positionQuery["CarIdx"].TryGetValue(out idValue))
-                {
-                    // Driver not found
+                //string idValue;
+                string idValue = positionQuery["CarIdx"].GetValue("0");
+                string reasonOut;
+                if(!positionQuery["ReasonOutId"].TryGetValue(out reasonOut))
                     continue;
-                }
+                
+                if (int.Parse(reasonOut) != 0)
+                    continue;
+                // Driver not found
+                //Console.WriteLine("GetRaceResults Driver not found");
+                //
+                
 
                 // Find driver and update results
                 int id = int.Parse(idValue);
@@ -210,7 +216,7 @@ namespace CrewChiefV4.iRacing
                     var previousPosition = driver.Results.Current.ClassPosition;
 
                     driver.UpdateResultsInfo(_currentSessionNumber.Value, positionQuery, position);
-
+                    Console.WriteLine("UpdateResultsInfo:" + driver.Name);
                     if (_telemetry != null)
                     {
                         // Check for new leader
@@ -325,8 +331,8 @@ namespace CrewChiefV4.iRacing
             {
                 // Get leader
                 //var leader = drivers[0];
-                this.Leader.Live.DeltaToLeader = "-";
-                this.Leader.Live.DeltaToNext = "-";
+                this.Leader.Live.DeltaToLeaderString = "-";
+                this.Leader.Live.DeltaToNextString = "-";
 
                 // Loop through drivers
                 for (int i = 1; i < drivers.Count; i++)
@@ -341,21 +347,26 @@ namespace CrewChiefV4.iRacing
                     if (leaderLapDiff < 1)
                     {
                         var leaderDelta = _timeDelta.GetDelta(behind.Id, this.Leader.Id);
-                        behind.Live.DeltaToLeader = TimeDelta.DeltaToString(leaderDelta);
+                        behind.Live.DeltaToLeader = leaderDelta.Seconds;
+                        behind.Live.DeltaToLeaderString = TimeDelta.DeltaToString(leaderDelta);
                     }
                     else
                     {
-                        behind.Live.DeltaToLeader = Math.Floor(leaderLapDiff) + " L";
+                        behind.Live.DeltaToLeaderString = Math.Floor(leaderLapDiff) + " L";
+                        behind.Live.DeltaToLeader = Math.Floor(leaderLapDiff);
                     }
 
                     if (nextLapDiff < 1)
                     {
                         var nextDelta = _timeDelta.GetDelta(behind.Id, ahead.Id);
-                        behind.Live.DeltaToNext = TimeDelta.DeltaToString(nextDelta);
+                        behind.Live.DeltaToNext = nextDelta.Seconds;
+                        behind.Live.DeltaToNextString = TimeDelta.DeltaToString(nextDelta);
+                        
                     }
                     else
                     {
-                        behind.Live.DeltaToNext = Math.Floor(nextLapDiff) + " L";
+                        behind.Live.DeltaToNextString = Math.Floor(nextLapDiff) + " L";
+                        behind.Live.DeltaToNext = Math.Floor(nextLapDiff);
                     }
                 }
             }
@@ -409,11 +420,13 @@ namespace CrewChiefV4.iRacing
 
         #region Events
 
-        public void SdkOnSessionInfoUpdated(SessionInfo sessionInfo, int sessionNumber)
-        {         
+        public void SdkOnSessionInfoUpdated(SessionInfo sessionInfo, int sessionNumber,int driverId)
+        {
+           
             // Cache info
             _sessionInfo = sessionInfo;
             _currentSessionNumber = sessionNumber;
+            _DriverId = driverId;
             // Stop if we don't have a session number yet
             if (_currentSessionNumber == null) 
                 return;
