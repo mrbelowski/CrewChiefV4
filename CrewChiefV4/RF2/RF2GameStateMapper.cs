@@ -1437,7 +1437,7 @@ namespace CrewChiefV4.rFactor2
             // Current lap timings
             csd.LapTimeCurrent = csd.SessionRunningTime - (float)playerScoring.mLapStartET;
 
-            cgs.checkForNewLapData((float) playerScoring.mLastLapTime);
+            cgs.checkForNewLapData(previousGameState, (float) playerScoring.mLastLapTime);
 
             // Last (most current) per-sector times:
             // NOTE: this logic still misses invalid sector handling.

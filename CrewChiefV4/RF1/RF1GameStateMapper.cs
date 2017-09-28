@@ -291,7 +291,7 @@ namespace CrewChiefV4.rFactor1
             currentGameState.SessionData.CompletedLaps = shared.lapNumber < 0 ? 0 : shared.lapNumber;
             currentGameState.SessionData.LapTimeCurrent = currentGameState.SessionData.SessionRunningTime - player.lapStartET;
 
-            currentGameState.checkForNewLapData(player.lastLapTime);
+            currentGameState.checkForNewLapData(previousGameState, player.lastLapTime);
 
             // Last (most current) per-sector times:
             // Note: this logic still misses invalid sector handling.
