@@ -680,60 +680,6 @@ namespace CrewChiefV4.PCars
             {
                 currentGameState.SessionData.CurrentLapIsValid = false;
             }
-            if (currentGameState.SessionData.IsNewSector)
-            {
-                if (currentGameState.SessionData.SectorNumber == 1)
-                {
-                    currentGameState.SessionData.LapTimePreviousEstimateForInvalidLap = currentGameState.SessionData.SessionRunningTime - currentGameState.SessionData.SessionTimesAtEndOfSectors[3];
-                    currentGameState.SessionData.SessionTimesAtEndOfSectors[3] = currentGameState.SessionData.SessionRunningTime;
-
-                    if (shared.mLastLapTime > 0 && currentGameState.SessionData.LastSector1Time > 0 && currentGameState.SessionData.LastSector2Time > 0)
-                    {
-                        currentGameState.SessionData.LastSector3Time = (shared.mLastLapTime - currentGameState.SessionData.LastSector1Time) - currentGameState.SessionData.LastSector2Time;
-                    }
-                    else
-                    {
-                        currentGameState.SessionData.LastSector3Time = -1;
-                    }
-                    if (currentGameState.SessionData.LastSector3Time > 0 && 
-                        (currentGameState.SessionData.PlayerBestSector3Time == -1 || currentGameState.SessionData.LastSector3Time < currentGameState.SessionData.PlayerBestSector3Time))
-                    {
-                        currentGameState.SessionData.PlayerBestSector3Time = currentGameState.SessionData.LastSector3Time;
-                    }
-                    if (shared.mLastLapTime > 0 &&
-                        (currentGameState.SessionData.PlayerLapTimeSessionBest == -1 || shared.mLastLapTime <= currentGameState.SessionData.PlayerLapTimeSessionBest))
-                    {
-                        currentGameState.SessionData.PlayerBestLapSector1Time = currentGameState.SessionData.LastSector1Time;
-                        currentGameState.SessionData.PlayerBestLapSector2Time = currentGameState.SessionData.LastSector2Time;
-                        currentGameState.SessionData.PlayerBestLapSector3Time = currentGameState.SessionData.LastSector3Time;
-                    }
-                }
-                else if (currentGameState.SessionData.SectorNumber == 2)
-                {
-                    currentGameState.SessionData.SessionTimesAtEndOfSectors[1] = currentGameState.SessionData.SessionRunningTime;
-                    // TODO: confirm that an invalid sector will put -1 in here...
-                    currentGameState.SessionData.LastSector1Time = shared.mCurrentSector1Time;
-                    if (currentGameState.SessionData.LastSector1Time > 0 && !shared.mLapInvalidated &&
-                        (currentGameState.SessionData.PlayerBestSector1Time == -1 || currentGameState.SessionData.LastSector1Time < currentGameState.SessionData.PlayerBestSector1Time))
-                    {
-                        currentGameState.SessionData.PlayerBestSector1Time = currentGameState.SessionData.LastSector1Time;
-                    }
-                    currentGameState.SessionData.playerAddCumulativeSectorData(1, currentGameState.SessionData.Position, shared.mCurrentSector1Time,
-                        currentGameState.SessionData.SessionRunningTime, !shared.mLapInvalidated, shared.mRainDensity > 0, shared.mTrackTemperature, shared.mAmbientTemperature);
-                }
-                if (currentGameState.SessionData.SectorNumber == 3)
-                {
-                    currentGameState.SessionData.SessionTimesAtEndOfSectors[2] = currentGameState.SessionData.SessionRunningTime;
-                    currentGameState.SessionData.LastSector2Time = shared.mCurrentSector2Time;
-                    if (currentGameState.SessionData.LastSector2Time > 0 && !shared.mLapInvalidated &&
-                        (currentGameState.SessionData.PlayerBestSector2Time == -1 || currentGameState.SessionData.LastSector2Time < currentGameState.SessionData.PlayerBestSector2Time))
-                    {
-                        currentGameState.SessionData.PlayerBestSector2Time = currentGameState.SessionData.LastSector2Time;
-                    }
-                    currentGameState.SessionData.playerAddCumulativeSectorData(2, currentGameState.SessionData.Position, shared.mCurrentSector2Time + shared.mCurrentSector1Time,
-                        currentGameState.SessionData.SessionRunningTime, !shared.mLapInvalidated, shared.mRainDensity > 0, shared.mTrackTemperature, shared.mAmbientTemperature);
-                }
-            }
 
             currentGameState.SessionData.Flag = mapToFlagEnum(shared.mHighestFlagColour);
             currentGameState.SessionData.NumCars = shared.mNumParticipants;
@@ -744,6 +690,58 @@ namespace CrewChiefV4.PCars
                 && previousGameState.SessionData.LapTimeCurrent == -1 && shared.mCurrentTime > 0);
 
             currentGameState.checkForNewLapData(previousGameState, shared.mLastLapTime);
+
+            if (currentGameState.LastLapTimeUpdated)
+            {
+                currentGameState.SessionData.LapTimePreviousEstimateForInvalidLap = currentGameState.SessionData.SessionRunningTime - currentGameState.SessionData.SessionTimesAtEndOfSectors[3];
+                currentGameState.SessionData.SessionTimesAtEndOfSectors[3] = currentGameState.SessionData.SessionRunningTime;
+
+                if (shared.mLastLapTime > 0 && currentGameState.SessionData.LastSector1Time > 0 && currentGameState.SessionData.LastSector2Time > 0)
+                {
+                    currentGameState.SessionData.LastSector3Time = (shared.mLastLapTime - currentGameState.SessionData.LastSector1Time) - currentGameState.SessionData.LastSector2Time;
+                }
+                else
+                {
+                    currentGameState.SessionData.LastSector3Time = -1;
+                }
+                if (currentGameState.SessionData.LastSector3Time > 0 &&
+                    (currentGameState.SessionData.PlayerBestSector3Time == -1 || currentGameState.SessionData.LastSector3Time < currentGameState.SessionData.PlayerBestSector3Time))
+                {
+                    currentGameState.SessionData.PlayerBestSector3Time = currentGameState.SessionData.LastSector3Time;
+                }
+                if (shared.mLastLapTime > 0 &&
+                    (currentGameState.SessionData.PlayerLapTimeSessionBest == -1 || shared.mLastLapTime <= currentGameState.SessionData.PlayerLapTimeSessionBest))
+                {
+                    currentGameState.SessionData.PlayerBestLapSector1Time = currentGameState.SessionData.LastSector1Time;
+                    currentGameState.SessionData.PlayerBestLapSector2Time = currentGameState.SessionData.LastSector2Time;
+                    currentGameState.SessionData.PlayerBestLapSector3Time = currentGameState.SessionData.LastSector3Time;
+                }
+            }
+            else if (currentGameState.SessionData.IsNewSector && currentGameState.SessionData.SectorNumber == 2)
+            {
+                currentGameState.SessionData.SessionTimesAtEndOfSectors[1] = currentGameState.SessionData.SessionRunningTime;
+                // TODO: confirm that an invalid sector will put -1 in here...
+                currentGameState.SessionData.LastSector1Time = shared.mCurrentSector1Time;
+                if (currentGameState.SessionData.LastSector1Time > 0 && !shared.mLapInvalidated &&
+                    (currentGameState.SessionData.PlayerBestSector1Time == -1 || currentGameState.SessionData.LastSector1Time < currentGameState.SessionData.PlayerBestSector1Time))
+                {
+                    currentGameState.SessionData.PlayerBestSector1Time = currentGameState.SessionData.LastSector1Time;
+                }
+                currentGameState.SessionData.playerAddCumulativeSectorData(1, currentGameState.SessionData.Position, shared.mCurrentSector1Time,
+                    currentGameState.SessionData.SessionRunningTime, !shared.mLapInvalidated, shared.mRainDensity > 0, shared.mTrackTemperature, shared.mAmbientTemperature);
+            }
+            if (currentGameState.SessionData.IsNewSector && currentGameState.SessionData.SectorNumber == 3)
+            {
+                currentGameState.SessionData.SessionTimesAtEndOfSectors[2] = currentGameState.SessionData.SessionRunningTime;
+                currentGameState.SessionData.LastSector2Time = shared.mCurrentSector2Time;
+                if (currentGameState.SessionData.LastSector2Time > 0 && !shared.mLapInvalidated &&
+                    (currentGameState.SessionData.PlayerBestSector2Time == -1 || currentGameState.SessionData.LastSector2Time < currentGameState.SessionData.PlayerBestSector2Time))
+                {
+                    currentGameState.SessionData.PlayerBestSector2Time = currentGameState.SessionData.LastSector2Time;
+                }
+                currentGameState.SessionData.playerAddCumulativeSectorData(2, currentGameState.SessionData.Position, shared.mCurrentSector2Time + shared.mCurrentSector1Time,
+                    currentGameState.SessionData.SessionRunningTime, !shared.mLapInvalidated, shared.mRainDensity > 0, shared.mTrackTemperature, shared.mAmbientTemperature);
+            }
 
             currentGameState.PitData.InPitlane = shared.mPitMode == (int)ePitMode.PIT_MODE_DRIVING_INTO_PITS ||
                 shared.mPitMode == (int)ePitMode.PIT_MODE_IN_PIT ||
