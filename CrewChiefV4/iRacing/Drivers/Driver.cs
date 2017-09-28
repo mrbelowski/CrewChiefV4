@@ -19,6 +19,7 @@ namespace CrewChiefV4.iRacing
             this.Live = new DriverLiveInfo(this);
             this.Championship = new DriverChampInfo(this);
             this.Private = new DriverPrivateInfo(this);
+            this.CurrentResults = new DriverSessionResults(this,0);
         }
 
         /// <summary>
@@ -132,7 +133,7 @@ namespace CrewChiefV4.iRacing
             driver.Id = carIdx;
             driver.ParseStaticSessionInfo(info);
             driver.ParseDynamicSessionInfo(info);
-
+            Console.WriteLine(driver.Name);
             return driver;
         }
 
@@ -230,8 +231,14 @@ namespace CrewChiefV4.iRacing
                         var crossTime = (float)(t - (p1 - s.StartPercentage) * dp);
 
                         // Finish previous
+                        
                         var prevNum = s.Number <= 0 ? sectorcount - 1 : s.Number - 1;
                         var sector = results.FakeSectorTimes[prevNum];
+                        if (s.Number == 0 && sector != null && sector.EnterSessionTime > 0)
+                        {
+                          this.Live.LastLaptime = (float)(crossTime - results.FakeSector1.EnterSessionTime);
+
+                        }
                         if (sector != null && sector.EnterSessionTime > 0)
                         {
                             sector.SectorTime = new Laptime((float)(crossTime - sector.EnterSessionTime));
@@ -239,6 +246,7 @@ namespace CrewChiefV4.iRacing
 
                         // Begin next sector
                         s.EnterSessionTime = crossTime;
+                        
 
                         this.Live.CurrentFakeSector = s.Number;
 
