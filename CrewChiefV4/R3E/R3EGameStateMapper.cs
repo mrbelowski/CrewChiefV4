@@ -383,6 +383,7 @@ namespace CrewChiefV4.RaceRoom
                     currentGameState.SessionData.LastSector1Time = previousGameState.SessionData.LastSector1Time;
                     currentGameState.SessionData.LastSector2Time = previousGameState.SessionData.LastSector2Time;
                     currentGameState.SessionData.LastSector3Time = previousGameState.SessionData.LastSector3Time;
+                    currentGameState.SessionData.LapTimePrevious = previousGameState.SessionData.LapTimePrevious;
                     currentGameState.SessionData.PlayerBestSector1Time = previousGameState.SessionData.PlayerBestSector1Time;
                     currentGameState.SessionData.PlayerBestSector2Time = previousGameState.SessionData.PlayerBestSector2Time;
                     currentGameState.SessionData.PlayerBestSector3Time = previousGameState.SessionData.PlayerBestSector3Time;
