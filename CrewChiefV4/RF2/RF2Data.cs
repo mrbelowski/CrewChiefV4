@@ -727,9 +727,9 @@ namespace CrewChiefV4.rFactor2
             [XmlIgnore] public byte mSafetyCarExists;                // whether safety car even exists
             public byte mSafetyCarActive;                // whether safety car is active
 
-            [XmlIgnore] public int mSafetyCarLaps;                  // number of laps
+            public int mSafetyCarLaps;                  // number of laps
             [XmlIgnore] public float mSafetyCarThreshold;            // the threshold at which a safety car is called out (compared to the sum of TrackRulesParticipantV01::mYellowSeverity for each vehicle) 
-            [XmlIgnore] public double mSafetyCarLapDist;             // safety car lap distance
+            public double mSafetyCarLapDist;             // safety car lap distance
 
             [XmlIgnore] public float mSafetyCarLapDistAtStart;       // where the safety car starts from
             [XmlIgnore] public float mPitLaneStartDist;              // where the waypoint branch to the pits breaks off (this may not be perfectly accurate)
