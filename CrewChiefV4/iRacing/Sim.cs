@@ -109,7 +109,10 @@ namespace CrewChiefV4.iRacing
                     driver = Driver.FromSessionInfo(info, id);
 
                     // If no driver found, end of list reached
-                    if (driver == null) break;
+                    if (driver == null)
+                    {
+                        continue;
+                    }
 
                     driver.IsCurrentDriver = false;
 
@@ -216,7 +219,6 @@ namespace CrewChiefV4.iRacing
                     var previousPosition = driver.Results.Current.ClassPosition;
 
                     driver.UpdateResultsInfo(_currentSessionNumber.Value, positionQuery, position);
-                    Console.WriteLine("UpdateResultsInfo:" + driver.Name);
                     if (_telemetry != null)
                     {
                         // Check for new leader
@@ -427,6 +429,7 @@ namespace CrewChiefV4.iRacing
             _sessionInfo = sessionInfo;
             _currentSessionNumber = sessionNumber;
             _DriverId = driverId;
+
             // Stop if we don't have a session number yet
             if (_currentSessionNumber == null) 
                 return;

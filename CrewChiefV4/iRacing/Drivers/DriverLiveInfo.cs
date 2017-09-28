@@ -12,6 +12,7 @@ namespace CrewChiefV4.iRacing
         public DriverLiveInfo(Driver driver)
         {
             _driver = driver;
+
         }
 
         private readonly Driver _driver;
@@ -48,6 +49,7 @@ namespace CrewChiefV4.iRacing
 
         public int CurrentSector { get; set; }
         public int CurrentFakeSector { get; set; }
+        public float LastLaptime { get; set; }
 
         public void ParseTelemetry(TelemetryInfo e)
         {

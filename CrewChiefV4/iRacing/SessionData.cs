@@ -11,6 +11,7 @@ namespace CrewChiefV4.iRacing
         public SessionData()
         {
             this.ClassBestLaps = new Dictionary<int, BestLap>();
+            this.OverallBestLap = new BestLap(new Laptime(int.MaxValue), new Driver());
 
         }
 
@@ -100,7 +101,7 @@ namespace CrewChiefV4.iRacing
                 
                 var DefaultLap = new Laptime(int.MaxValue);
                 DefaultLap.LapNumber = 0;
-                this.OverallBestLap = new BestLap(DefaultLap, new Driver());
+                this.OverallBestLap = new BestLap(DefaultLap, driver);
             }
             if (lap.Value > 0 && this.ClassBestLaps[classId].Laptime.Value > lap.Value)
             {
@@ -114,7 +115,7 @@ namespace CrewChiefV4.iRacing
 
                 return bestlap;
             }
-            return null;
+            return new BestLap(new Laptime(int.MaxValue), new Driver());
         }
 
         public bool IsLimitedSessionLaps

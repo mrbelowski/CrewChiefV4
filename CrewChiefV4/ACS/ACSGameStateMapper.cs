@@ -1396,6 +1396,8 @@ namespace CrewChiefV4.assetto
                     currentGameState.SessionData.YellowFlagStartTime = currentGameState.Now;
                 }*/
                 currentGameState.SessionData.NumCars = shared.acsChief.numVehicles;
+                
+                currentGameState.SessionData.CompletedLaps = shared.acsGraphic.completedLaps;
 
                 currentGameState.SessionData.IsNewLap = previousGameState != null && previousGameState.SessionData.IsNewLap == false &&
                     (shared.acsGraphic.completedLaps == previousGameState.SessionData.CompletedLaps + 1 || ((lastSessionPhase == SessionPhase.Countdown)
@@ -1688,7 +1690,7 @@ namespace CrewChiefV4.assetto
                     currentGameState.SessionData.formattedPlayerLapTimes.Add(TimeSpan.FromSeconds(currentGameState.SessionData.LapTimePrevious).ToString(@"mm\:ss\.fff"));
                     currentGameState.SessionData.PositionAtStartOfCurrentLap = currentGameState.SessionData.Position;
                     currentGameState.SessionData.CurrentLapIsValid = true;
-                    StartNewLap(currentGameState.SessionData.CompletedLaps + 1, currentGameState.SessionData.SessionRunningTime);
+                    StartNewLap(currentGameState.SessionData.CompletedLaps, currentGameState.SessionData.SessionRunningTime);
                     currentGameState.SessionData.Position = playerVehicle.carLeaderboardPosition;
                     currentGameState.SessionData.UnFilteredPosition = playerVehicle.carLeaderboardPosition;
                     // currentGameState.displayOpponentData();
