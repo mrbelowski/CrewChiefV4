@@ -1258,7 +1258,6 @@ namespace CrewChiefV4.assetto
                     currentGameState.SessionData.LastSector1Time = previousGameState.SessionData.LastSector1Time;
                     currentGameState.SessionData.LastSector2Time = previousGameState.SessionData.LastSector2Time;
                     currentGameState.SessionData.LastSector3Time = previousGameState.SessionData.LastSector3Time;
-                    currentGameState.SessionData.LapTimePrevious = previousGameState.SessionData.LapTimePrevious;
                     currentGameState.SessionData.PlayerBestSector1Time = previousGameState.SessionData.PlayerBestSector1Time;
                     currentGameState.SessionData.PlayerBestSector2Time = previousGameState.SessionData.PlayerBestSector2Time;
                     currentGameState.SessionData.PlayerBestSector3Time = previousGameState.SessionData.PlayerBestSector3Time;
@@ -1402,7 +1401,7 @@ namespace CrewChiefV4.assetto
                     (shared.acsGraphic.completedLaps == previousGameState.SessionData.CompletedLaps + 1 || ((lastSessionPhase == SessionPhase.Countdown)
                     && (currentGameState.SessionData.SessionPhase == SessionPhase.Green || currentGameState.SessionData.SessionPhase == SessionPhase.FullCourseYellow)));
 
-                currentGameState.checkForNewLapData(mapToFloatTime(shared.acsGraphic.iLastTime));
+                currentGameState.checkForNewLapData(previousGameState, mapToFloatTime(shared.acsGraphic.iLastTime));
 
                 if (previousGameState != null)
                 {

@@ -1711,25 +1711,34 @@ namespace CrewChiefV4.GameState
         // some convenience methods
 
         // call this AFTER updating IsNewLap
-        public void checkForNewLapData(float gameProvidedLastLapTime)
+        public void checkForNewLapData(GameStateData previousGameState, float gameProvidedLastLapTime)
         {
-            this.LastLapTimeUpdated = false;
-            if (this.SessionData.IsNewLap)
+            if (previousGameState != null)
             {
-                // reset the timer and start waiting for an updated laptime...
-                this.WaitingForNewLapData = true;
-                this.NewLapDataTimerExpiry = this.Now.Add(GameStateData.MaxWaitForNewLapData);
-            }
-            // if we're waiting, see if the timer has expired or we have a change in the previous laptime value
-            if (this.WaitingForNewLapData
-                && (this.SessionData.LapTimePrevious != gameProvidedLastLapTime
-                    || this.Now > this.NewLapDataTimerExpiry))
-            {
-                // the timer has expired or we have new data
-                this.WaitingForNewLapData = false;
-                this.LastLapTimeUpdated = true;
-                this.SessionData.LapTimePrevious = gameProvidedLastLapTime;
-                this.SessionData.PreviousLapWasValid = gameProvidedLastLapTime > 0;                
+                if (this.SessionData.IsNewLap)
+                {
+                    // reset the timer and start waiting for an updated laptime...
+                    this.WaitingForNewLapData = true;
+                    this.NewLapDataTimerExpiry = this.Now.Add(GameStateData.MaxWaitForNewLapData);
+                }
+                // if we were waiting in the previous game state, see if the timer has expired or we have a change in the previous laptime value
+                if (previousGameState.WaitingForNewLapData
+                    && (previousGameState.SessionData.LapTimePrevious != gameProvidedLastLapTime
+                        || this.Now > previousGameState.NewLapDataTimerExpiry))
+                {
+                    // the timer has expired or we have new data
+                    this.WaitingForNewLapData = false;
+                    this.LastLapTimeUpdated = true;
+                    this.SessionData.LapTimePrevious = gameProvidedLastLapTime;
+                    this.SessionData.PreviousLapWasValid = gameProvidedLastLapTime > 0;
+                }
+                else
+                {
+                    this.WaitingForNewLapData = previousGameState.WaitingForNewLapData;
+                    this.LastLapTimeUpdated = previousGameState.LastLapTimeUpdated;
+                    this.SessionData.LapTimePrevious = previousGameState.SessionData.LapTimePrevious;
+                    this.SessionData.PreviousLapWasValid = previousGameState.SessionData.PreviousLapWasValid;
+                }
             }
         }
 
