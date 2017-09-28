@@ -1492,7 +1492,7 @@ namespace CrewChiefV4.rFactor2
             // Update Sector/Lap timings.
             var lastSectorTime = this.getLastSectorTime(ref playerScoring, csd.SectorNumber);
 
-            if (csd.IsNewLap)
+            if (cgs.LastLapTimeUpdated)
             {
                 if (lastSectorTime > 0.0f)
                 {
@@ -1518,7 +1518,8 @@ namespace CrewChiefV4.rFactor2
                     (float)scoring.mScoringInfo.mTrackTemp,
                     (float)scoring.mScoringInfo.mAmbientTemp);
             }
-            else if (csd.IsNewSector && lastSectorTime > 0.0f)
+            // don't want to add cumulative sector data if we're in sector1 - this is covered by the lap completion stuff
+            else if (csd.IsNewSector && lastSectorTime > 0.0f && psd != null && csd.SectorNumber != 1)
             {
                 csd.playerAddCumulativeSectorData(
                     psd.SectorNumber,

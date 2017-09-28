@@ -349,7 +349,7 @@ namespace CrewChiefV4.rFactor1
                         shared.trackTemp, shared.ambientTemp, currentGameState.SessionData.SessionHasFixedTime, currentGameState.SessionData.SessionTimeRemaining, 3);
                 currentGameState.SessionData.playerStartNewLap(currentGameState.SessionData.CompletedLaps + 1, currentGameState.SessionData.Position, player.inPits == 1 || player.lapDist < 0, currentGameState.SessionData.SessionRunningTime, false, shared.trackTemp, shared.ambientTemp);
             }
-            else if (currentGameState.SessionData.IsNewSector && previousGameState != null)
+            else if (currentGameState.SessionData.IsNewSector && previousGameState != null && currentGameState.SessionData.SectorNumber != 1)
             {
                 currentGameState.SessionData.playerAddCumulativeSectorData(previousGameState.SessionData.SectorNumber, currentGameState.SessionData.Position, lastSectorTime,
                     currentGameState.SessionData.SessionRunningTime,  lastSectorTime > 0 || (currentGameState.SessionData.SectorNumber >= 2 && player.totalLaps == 1), 
