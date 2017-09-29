@@ -54,7 +54,7 @@ namespace CrewChiefV4.iRacing
         public void ParseTelemetry(TelemetryInfo e)
         {
             this.Lap = e.CarIdxLap.Value[this.Driver.Id];
-            this.LapDistance = e.CarIdxLapDistPct.Value[this.Driver.Id];
+            FixPercentagesOnLapChange(e.CarIdxLapDistPct.Value[this.Driver.Id]);
             this.TrackSurface = e.CarIdxTrackSurface.Value[this.Driver.Id];
 
             this.Gear = e.CarIdxGear.Value[this.Driver.Id];
@@ -66,6 +66,15 @@ namespace CrewChiefV4.iRacing
 
         private double _prevSpeedUpdateTime;
         private double _prevSpeedUpdateDist;
+
+        private int _prevLap;
+        private void FixPercentagesOnLapChange(float carIdxLapDistPct)
+        {
+            if (this.Lap > _prevLap && carIdxLapDistPct > 0.80f)
+                this.LapDistance  = 0;
+            else
+                _prevLap = this.Lap;
+        }
 
         public void CalculateSpeed(TelemetryInfo current, double? trackLengthKm)
         {

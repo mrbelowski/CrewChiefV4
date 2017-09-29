@@ -11,12 +11,17 @@ namespace CrewChiefV4.iRacing
         public DriverPitInfo(Driver driver)
         {
             _driver = driver;
+            this.IsAtPitEntry = false;
+            this.IsAtPitExit = false;
         }
 
         private readonly Driver _driver;
         private bool _hasIncrementedCounter;
 
         public int Pitstops { get; set; }
+
+        public bool IsAtPitEntry { get; set; }
+        public bool IsAtPitExit { get; set; }
 
         public bool InPitLane { get; set; }
         public bool InPitStall { get; set; }
@@ -47,6 +52,11 @@ namespace CrewChiefV4.iRacing
             // Are we NOW in pit lane (pitstall includes pitlane)
             this.InPitLane = _driver.Live.TrackSurface == TrackSurfaces.AproachingPits ||
                         _driver.Live.TrackSurface == TrackSurfaces.InPitStall;
+            if(InPitLane)
+            {
+                IsAtPitEntry = false;
+                IsAtPitExit = false;
+            }
 
             // Are we NOW in pit stall?
             this.InPitStall = _driver.Live.TrackSurface == TrackSurfaces.InPitStall;
@@ -63,8 +73,7 @@ namespace CrewChiefV4.iRacing
                     // We have only just now entered pitlane
                     this.PitLaneEntryTime = time;
                     this.CurrentPitLaneTimeSeconds = 0;
-                    
-                    //Sim.Instance.NotifyPitstop(RaceEvent.EventTypes.PitEntry, _driver);
+                    this.IsAtPitEntry = true;
                 }
             }
             else
@@ -78,6 +87,8 @@ namespace CrewChiefV4.iRacing
                     // We were not previously in our pit stall yet
                     if (this.InPitStall)
                     {
+                        IsAtPitEntry = false;
+                        IsAtPitExit = false;
                         if (Math.Abs(_driver.Live.Speed) > PIT_MINSPEED)
                         {
                             Debug.WriteLine("PIT: did not stop in pit stall, ignored.");
@@ -140,7 +151,7 @@ namespace CrewChiefV4.iRacing
 
                     this.LastPitLaneTimeSeconds = this.PitLaneExitTime.Value - this.PitLaneEntryTime.Value;
                     this.CurrentPitLaneTimeSeconds = 0;
-
+                    IsAtPitExit = true;
                     //Sim.Instance.NotifyPitstop(RaceEvent.EventTypes.PitExit, _driver);
 
                     // Reset
