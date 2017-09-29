@@ -81,7 +81,7 @@ namespace CrewChiefV4.iRacing
 
         private void UpdateDriverList(SessionInfo info)
         {
-            Console.WriteLine("UpdateDriverList");
+            //Console.WriteLine("UpdateDriverList");
             _isUpdatingDrivers = true;
             this.GetDrivers(info);
             _isUpdatingDrivers = false;
@@ -91,10 +91,10 @@ namespace CrewChiefV4.iRacing
 
         private void GetDrivers(SessionInfo info)
         {
-            Console.WriteLine("GetDrivers");
+            //Console.WriteLine("GetDrivers");
             if (_mustReloadDrivers)
             {
-                Console.WriteLine("MustReloadDrivers: true");
+                //Console.WriteLine("MustReloadDrivers: true");
                 _drivers.Clear();
                 _mustReloadDrivers = false;
             }
@@ -267,12 +267,12 @@ namespace CrewChiefV4.iRacing
                 driver.UpdateLiveInfo(info);
                 driver.UpdateSectorTimes(_sessionData.Track, info);
             }
-            
-            this.CalculateLivePositions();
+
+            this.CalculateLivePositions(info);
             this.UpdateTimeDelta();
         }
 
-        private void CalculateLivePositions()
+        private void CalculateLivePositions(TelemetryInfo info)
         {
             // In a race that is not yet in checkered flag mode,
             // Live positions are determined from track position (total lap distance)
@@ -284,7 +284,8 @@ namespace CrewChiefV4.iRacing
                 int pos = 1;
                 foreach (var driver in _drivers.OrderByDescending(d => d.Live.TotalLapDistance))
                 {
-                    if (pos == 1) _leader = driver;
+                    if (pos == 1) 
+                        _leader = driver;
                     driver.Live.Position = pos;
                     pos++;
                 }
@@ -294,16 +295,15 @@ namespace CrewChiefV4.iRacing
                 // In P or Q, set live position from result position (== best lap according to iRacing)
                 foreach (var driver in _drivers.OrderBy(d => d.Results.Current.Position))
                 {
-                    if (this.Leader == null) _leader = driver;
+                    if (this.Leader == null) 
+                        _leader = driver;
                     driver.Live.Position = driver.Results.Current.Position;
                 }
             }
 
             // Determine live class position from live positions and class
             // Group drivers in dictionary with key = classid and value = list of all drivers in that class
-            var dict = (from driver in _drivers
-                        group driver by driver.Car.CarClassId)
-                .ToDictionary(d => d.Key, d => d.ToList());
+            var dict = (from driver in _drivers group driver by driver.Car.CarClassId).ToDictionary(d => d.Key, d => d.ToList());
 
             // Set class position
             foreach (var drivers in dict.Values)
