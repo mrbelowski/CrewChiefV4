@@ -191,7 +191,7 @@ namespace CrewChiefV4.GameState
         // Only matters if AssignedColumn != None
         public int AssignedGridPosition = -1;
 
-        public string DriverToFollow = "";
+        public string DriverToFollowRaw = "";
 
         // Meters/s.  If -1, SC either left or not present.
         public float SafetyCarSpeed = -1.0f;

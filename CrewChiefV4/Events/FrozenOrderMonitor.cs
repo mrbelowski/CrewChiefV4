@@ -142,9 +142,17 @@ namespace CrewChiefV4.Events
             if (cfodp == FrozenOrderPhase.None)
                 return;  // Nothing to do.
 
+            var useAmericanTerms = GlobalBehaviourSettings.useAmericanTerms || GlobalBehaviourSettings.useOvalLogic;
+            var useOvalLogic = GlobalBehaviourSettings.useOvalLogic;
+
             if (pfod.Phase == FrozenOrderPhase.None)
             {
                 Console.WriteLine("FO: NEW PHASE DETECTED: " + cfod.Phase);
+
+                if (cfod.Phase == FrozenOrderPhase.Rolling)
+                    Console.WriteLine("FO: OK, THAT'S A ROLLING START.");
+                else if (cfod.Phase == FrozenOrderPhase.FormationStanding)
+                    Console.WriteLine("FO: OK, THAT'S FORMATION/STANDING START.");
 
                 // Clear previous state.
                 this.clearState();
@@ -153,12 +161,12 @@ namespace CrewChiefV4.Events
             // Because FO Action is distance dependent, it tends to fluctuate.
             // We need to detect when it stabilizes (values stay identical for ACTION_STABLE_THRESHOLD times).
             if (cfod.Action == pfod.Action
-                && cfod.DriverToFollow == pfod.DriverToFollow)
+                && cfod.DriverToFollowRaw == pfod.DriverToFollowRaw)
                 ++this.numUpdatesActionSame;
             else
             {
                 this.newFrozenOrderAction = cfod.Action;
-                this.newDriverToFollow = cfod.DriverToFollow;
+                this.newDriverToFollow = cfod.DriverToFollowRaw;
 
                 this.numUpdatesActionSame = 0;
             }
@@ -168,7 +176,7 @@ namespace CrewChiefV4.Events
             if (cfodp == FrozenOrderPhase.Rolling)
             {
                 var shouldFollowSafetyCar = cfod.AssignedGridPosition == 1;
-                var driverToFollow = shouldFollowSafetyCar ? "Safety/Pace car" : cfod.DriverToFollow;
+                var driverToFollow = shouldFollowSafetyCar ? (useAmericanTerms ? "Pace car" : "Safety car") : cfod.DriverToFollowRaw;
 
                 if (isActionUpdateStable
                     && (this.currFrozenOrderAction != this.newFrozenOrderAction
@@ -179,27 +187,48 @@ namespace CrewChiefV4.Events
 
                     if (this.newFrozenOrderAction == FrozenOrderAction.Follow)
                     {
-                        Console.WriteLine(string.Format("FO: FOLLOW DIRVER: {0} IN COLUMN {1}", driverToFollow, cfod.AssignedColumn));
+                        // Follow messages are only meaningful if there's name to announce.
+                        if (SoundCache.hasSuitableTTSVoice || SoundCache.availableDriverNames.Contains(DriverNameHelper.getUsableDriverName(driverToFollow)))
+                        {
+                            string columnName;
+                            if (useOvalLogic)
+                                columnName = cfod.AssignedColumn == FrozenOrderColumn.Left ? "inside" : "outside";
+                            else
+                                columnName = cfod.AssignedColumn.ToString();
+
+                            Console.WriteLine(string.Format("FO: FOLLOW DIRVER: {0} IN COLUMN {1}", driverToFollow, columnName));
+                        }
                     }
                     else if (this.newFrozenOrderAction == FrozenOrderAction.AllowToPass)
                     {
-                        Console.WriteLine(string.Format("FO: ALLOW DIRVER: {0} TO PASS", driverToFollow));
+                        // Follow messages are only meaningful if there's name to announce.
+                        if (SoundCache.hasSuitableTTSVoice || SoundCache.availableDriverNames.Contains(DriverNameHelper.getUsableDriverName(driverToFollow)))
+                            Console.WriteLine(string.Format("FO: ALLOW DIRVER: {0} TO PASS", driverToFollow));
+                        else
+                            Console.WriteLine(string.Format("FO: YOU ARE AHEAD OF A GUY YOU SHOULD BE FOLLOWING, LET HIM PASS"));
                     }
                     else if (this.newFrozenOrderAction == FrozenOrderAction.CatchUp)
                     {
-                        Console.WriteLine(string.Format("FO: CATCH UP TO DIRVER: {0}", driverToFollow));
+                        if (SoundCache.hasSuitableTTSVoice || SoundCache.availableDriverNames.Contains(DriverNameHelper.getUsableDriverName(driverToFollow)))
+                            Console.WriteLine(string.Format("FO: CATCH UP TO DIRVER: {0}", driverToFollow)); 
+                        else
+                            Console.WriteLine(string.Format("FO: YOU NEED TO CATCH UP TO THE GUY YOU SHOULD BE FOLLOWING"));
+
                     }
                 }
 
                 if (pfod.SafetyCarSpeed != -1.0f && cfod.SafetyCarSpeed == -1.0f)
                 {
-                    Console.WriteLine("FO: SAFETY CAR JUST LEFT.");
+                    if (useAmericanTerms)
+                        Console.WriteLine("FO: PACE CAR JUST LEFT.");
+                    else
+                        Console.WriteLine("FO: SAFETY CAR JUST LEFT.");
                 }
             }
             else if (cfodp == FrozenOrderPhase.FullCourseYellow)
             {
                 var shouldFollowSafetyCar = cfod.AssignedPosition == 1;
-                var driverToFollow = shouldFollowSafetyCar ? "Safety/Pace car" : cfod.DriverToFollow;
+                var driverToFollow = shouldFollowSafetyCar ? (useAmericanTerms ? "Pace car" : "Safety car") : cfod.DriverToFollowRaw;
 
                 if (isActionUpdateStable
                     && (this.currFrozenOrderAction != this.newFrozenOrderAction
@@ -210,36 +239,53 @@ namespace CrewChiefV4.Events
 
                     if (this.newFrozenOrderAction == FrozenOrderAction.Follow)
                     {
-                        Console.WriteLine(string.Format("FO: FOLLOW DIRVER: {0}", driverToFollow));
+                        // Follow messages are only meaningful if there's name to announce.
+                        if (SoundCache.hasSuitableTTSVoice || SoundCache.availableDriverNames.Contains(DriverNameHelper.getUsableDriverName(driverToFollow)))
+                            Console.WriteLine(string.Format("FO: FOLLOW DIRVER: {0}", driverToFollow));
                     }
                     else if (this.newFrozenOrderAction == FrozenOrderAction.AllowToPass)
                     {
-                        Console.WriteLine(string.Format("FO: ALLOW DIRVER: {0} TO PASS", driverToFollow));
+                        if (SoundCache.hasSuitableTTSVoice || SoundCache.availableDriverNames.Contains(DriverNameHelper.getUsableDriverName(driverToFollow)))
+                            Console.WriteLine(string.Format("FO: ALLOW DIRVER: {0} TO PASS", driverToFollow));
+                        else
+                            Console.WriteLine(string.Format("FO: YOU ARE AHEAD OF A GUY YOU SHOULD BE FOLLOWING, LET HIM PASS"));
                     }
                     else if (this.newFrozenOrderAction == FrozenOrderAction.CatchUp)
                     {
-                        Console.WriteLine(string.Format("FO: CATCH UP TO DIRVER: {0}", driverToFollow));
+                        if (SoundCache.hasSuitableTTSVoice || SoundCache.availableDriverNames.Contains(DriverNameHelper.getUsableDriverName(driverToFollow)))
+                            Console.WriteLine(string.Format("FO: CATCH UP TO DIRVER: {0}", driverToFollow));
+                        else
+                            Console.WriteLine(string.Format("FO: YOU NEED TO CATCH UP TO THE GUY YOU SHOULD BE FOLLOWING"));
                     }
                 }
 
                 if (pfod.SafetyCarSpeed != -1.0f && cfod.SafetyCarSpeed == -1.0f)
                 {
-                    Console.WriteLine("FO: SAFETY CAR JUST LEFT.");
+                    if (useAmericanTerms)
+                        Console.WriteLine("FO: PACE CAR JUST LEFT.");
+                    else
+                        Console.WriteLine("FO: SAFETY CAR JUST LEFT.");
                 }
             }
             else if (cfodp == FrozenOrderPhase.FormationStanding)
             {
+                string columnName;
+                if (useOvalLogic)
+                    columnName = cfod.AssignedColumn == FrozenOrderColumn.Left ? "inside" : "outside";
+                else
+                    columnName = cfod.AssignedColumn.ToString();
+
                 if (!this.formationStandingStartAnnounced && cgs.SessionData.SessionRunningTime > 10)
                 {
                     this.formationStandingStartAnnounced = true;
                     var isStartingFromPole = cfod.AssignedPosition == 1;
                     if (isStartingFromPole)
                     {
-                        Console.WriteLine(string.Format("FO: YOU'RE STARTING FROM THE POLE IN THE {0} COLUMN", cfod.AssignedColumn));
+                        Console.WriteLine(string.Format("FO: YOU'RE STARTING FROM THE POLE IN THE {0} COLUMN", columnName));
                     }
                     else
                     {
-                        Console.WriteLine(string.Format("FO: YOU'RE STARTING FROM POSITION {0} ROW {1} IN THE {2} COLUMN", cfod.AssignedPosition, cfod.AssignedGridPosition, cfod.AssignedColumn));
+                        Console.WriteLine(string.Format("FO: YOU'RE STARTING FROM POSITION {0} ROW {1} IN THE {2} COLUMN", cfod.AssignedPosition, cfod.AssignedGridPosition, columnName));
                     }
                 }
 
@@ -252,11 +298,11 @@ namespace CrewChiefV4.Events
                     var isStartingFromPole = cfod.AssignedPosition == 1;
                     if (isStartingFromPole)
                     {
-                        Console.WriteLine(string.Format("FO: GET READY, YOU'RE STARTING FROM THE POLE IN THE {0} COLUMN", cfod.AssignedColumn));
+                        Console.WriteLine(string.Format("FO: GET READY, YOU'RE STARTING FROM THE POLE IN THE {0} COLUMN", columnName));
                     }
                     else
                     {
-                        Console.WriteLine(string.Format("FO: GET READY, YOU'RE STARTING FROM POSITION {0} ROW {1} IN THE {2} COLUMN", cfod.AssignedPosition, cfod.AssignedGridPosition, cfod.AssignedColumn));
+                        Console.WriteLine(string.Format("FO: GET READY, YOU'RE STARTING FROM POSITION {0} ROW {1} IN THE {2} COLUMN", cfod.AssignedPosition, cfod.AssignedGridPosition, columnName));
                     }
                 }
             }
