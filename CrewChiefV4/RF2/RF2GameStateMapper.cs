@@ -2002,7 +2002,7 @@ namespace CrewChiefV4.rFactor2
                         var v = scoring.mVehicles[i];
                         if (v.mID == vehToFollowId)
                         {
-                            fod.DriverToFollow = RF2GameStateMapper.GetStringFromBytes(v.mDriverName);
+                            fod.DriverToFollowRaw = RF2GameStateMapper.GetStringFromBytes(v.mDriverName).ToLower();
 
                             toFollowDist = RF2GameStateMapper.GetDistanceCompleteded(ref scoring, ref v);
                             break;
