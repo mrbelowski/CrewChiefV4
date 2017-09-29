@@ -71,6 +71,10 @@ namespace CrewChiefV4.Events
                     playedGetCloserForDRSOnThisLap = false;
                     playedOpponentHasDRSOnThisLap = false;
                 }
+                if (currentGameState.OvertakingAids.DrsAvailable)
+                {
+                    drsAvailableOnThisLap = true;
+                }
                 if (currentGameState.OvertakingAids.DrsEngaged)
                 {
                     hasUsedDrsOnThisLap = true;

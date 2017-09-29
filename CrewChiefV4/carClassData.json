@@ -341,7 +341,9 @@
 			"maxSafeWaterTemp": 105,
 			"maxSafeOilTemp": 140,
 			"timesInHundredths": true,
-			"enabledMessageTypes": "ALL"
+ 			"enabledMessageTypes": "ALL",
+			"isDRSCapable": true,
+			"DRSRange": 1.0
 		},
 		{
 			"carClassEnum": "F2",
@@ -481,7 +483,9 @@
 			"maxSafeWaterTemp": 105,
 			"maxSafeOilTemp": 140,
 			"timesInHundredths": true,
-			"enabledMessageTypes": "ALL"
+			"enabledMessageTypes": "ALL",
+			"isDRSCapable": true,
+			"DRSRange": 2.0
 		},
 		{
 			"carClassEnum": "DTM_2013",
