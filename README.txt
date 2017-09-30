@@ -10,6 +10,8 @@ For support and discussions about Crew Chief we have our very own forum here: ht
 
 Changelog
 ---------
+Version 4.8.0.4: RF2 DRS support; some AC fixes; other stuff I've forgotten
+
 Version 4.8.0.3: RF2 session transition fixes
 
 Version 4.8.0.2: Fixed broken PCars2 oval track mapping - should now correctly call 'car low' / 'car high' on ovals for all spotters except Geoffrey
