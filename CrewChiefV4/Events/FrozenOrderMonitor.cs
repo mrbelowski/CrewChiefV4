@@ -198,12 +198,15 @@ namespace CrewChiefV4.Events
                 this.numUpdatesActionSame = 0;
             }
 
+            
             var isActionUpdateStable = this.numUpdatesActionSame >= FrozenOrderMonitor.ACTION_STABLE_THRESHOLD;
 
             if (cfodp == FrozenOrderPhase.Rolling)
             {
                 var shouldFollowSafetyCar = cfod.AssignedGridPosition == 1;
                 var driverToFollow = shouldFollowSafetyCar ? (useAmericanTerms ? folderThePaceCar : folderTheSafetyCar) : cfod.DriverToFollowRaw;
+
+                var prevDriverToFollow = this.currDriverToFollow;
 
                 if (isActionUpdateStable
                     && (this.currFrozenOrderAction != this.newFrozenOrderAction
@@ -212,10 +215,12 @@ namespace CrewChiefV4.Events
                     this.currFrozenOrderAction = this.newFrozenOrderAction;
                     this.currDriverToFollow = this.newDriverToFollow;
 
-                    if (this.newFrozenOrderAction == FrozenOrderAction.Follow)
+                    var usableDriverNameToFollow = DriverNameHelper.getUsableDriverName(driverToFollow);
+                    if (this.newFrozenOrderAction == FrozenOrderAction.Follow
+                        && prevDriverToFollow != this.currDriverToFollow)  // Don't announce Follow messages for the driver that we caught up to or allowed to pass.
                     {
                         // Follow messages are only meaningful if there's name to announce.
-                        if (SoundCache.hasSuitableTTSVoice || SoundCache.availableDriverNames.Contains(DriverNameHelper.getUsableDriverName(driverToFollow)))
+                        if (SoundCache.hasSuitableTTSVoice || SoundCache.availableDriverNames.Contains(usableDriverNameToFollow))
                         {
                             if (cfod.AssignedColumn == FrozenOrderColumn.None)
                             {
@@ -228,24 +233,24 @@ namespace CrewChiefV4.Events
                                     columnName = cfod.AssignedColumn == FrozenOrderColumn.Left ? folderInTheInsideColumn : folderInTheOutsideColumn;
                                 else
                                     columnName = cfod.AssignedColumn == FrozenOrderColumn.Left ? folderInTheLeftColumn : folderInTheRightColumn;
-                                audioPlayer.playMessage(new QueuedMessage("frozen_order/follow_driver", MessageContents(folderFollow, driverToFollow, columnName), 0, this));
+                                audioPlayer.playMessage(new QueuedMessage("frozen_order/follow_driver", MessageContents(folderFollow, usableDriverNameToFollow, columnName), 0, this));
                             }
                         }
                     }
                     else if (this.newFrozenOrderAction == FrozenOrderAction.AllowToPass)
                     {
                         // Follow messages are only meaningful if there's name to announce.
-                        if (SoundCache.hasSuitableTTSVoice || SoundCache.availableDriverNames.Contains(DriverNameHelper.getUsableDriverName(driverToFollow)))
+                        if (SoundCache.hasSuitableTTSVoice || SoundCache.availableDriverNames.Contains(usableDriverNameToFollow))
                             audioPlayer.playMessage(new QueuedMessage("frozen_order/allow_driver_to_pass", 
-                                MessageContents(folderAllow, driverToFollow, folderToPass), 0, this));
+                                MessageContents(folderAllow, usableDriverNameToFollow, folderToPass), 0, this));
                         else
                             audioPlayer.playMessage(new QueuedMessage(folderYoureAheadOfAGuyYouShouldBeFollowing, 0, this));
                     }
                     else if (this.newFrozenOrderAction == FrozenOrderAction.CatchUp)
                     {
-                        if (SoundCache.hasSuitableTTSVoice || SoundCache.availableDriverNames.Contains(DriverNameHelper.getUsableDriverName(driverToFollow)))
+                        if (SoundCache.hasSuitableTTSVoice || SoundCache.availableDriverNames.Contains(usableDriverNameToFollow))
                             audioPlayer.playMessage(new QueuedMessage("frozen_order/allow_driver_to_pass", 
-                                MessageContents(folderCatchUpTo, driverToFollow), 0, this));
+                                MessageContents(folderCatchUpTo, usableDriverNameToFollow), 0, this));
                         else
                             audioPlayer.playMessage(new QueuedMessage(folderYouNeedToCatchUpToTheGuyAhead, 0, this));
                     }
@@ -265,6 +270,8 @@ namespace CrewChiefV4.Events
                 var shouldFollowSafetyCar = cfod.AssignedPosition == 1;
                 var driverToFollow = shouldFollowSafetyCar ? (useAmericanTerms ? folderThePaceCar : folderTheSafetyCar) : cfod.DriverToFollowRaw;
 
+                var prevDriverToFollow = this.currDriverToFollow;
+
                 if (isActionUpdateStable
                     && (this.currFrozenOrderAction != this.newFrozenOrderAction
                         || this.currDriverToFollow != this.newDriverToFollow))
@@ -272,25 +279,27 @@ namespace CrewChiefV4.Events
                     this.currFrozenOrderAction = this.newFrozenOrderAction;
                     this.currDriverToFollow = this.newDriverToFollow;
 
-                    if (this.newFrozenOrderAction == FrozenOrderAction.Follow)
+                    var usableDriverNameToFollow = DriverNameHelper.getUsableDriverName(driverToFollow);
+                    if (this.newFrozenOrderAction == FrozenOrderAction.Follow
+                        && prevDriverToFollow != this.currDriverToFollow)  // Don't announce Follow messages for the driver that we caught up to or allowed to pass.)
                     {
                         // Follow messages are only meaningful if there's name to announce.
-                        if (SoundCache.hasSuitableTTSVoice || SoundCache.availableDriverNames.Contains(DriverNameHelper.getUsableDriverName(driverToFollow)))
-                            audioPlayer.playMessage(new QueuedMessage("frozen_order/follow_driver", MessageContents(folderFollow, driverToFollow), 0, this));
+                        if (SoundCache.hasSuitableTTSVoice || SoundCache.availableDriverNames.Contains(usableDriverNameToFollow))
+                            audioPlayer.playMessage(new QueuedMessage("frozen_order/follow_driver", MessageContents(folderFollow, usableDriverNameToFollow), 0, this));
                     }
                     else if (this.newFrozenOrderAction == FrozenOrderAction.AllowToPass)
                     {
-                        if (SoundCache.hasSuitableTTSVoice || SoundCache.availableDriverNames.Contains(DriverNameHelper.getUsableDriverName(driverToFollow)))
+                        if (SoundCache.hasSuitableTTSVoice || SoundCache.availableDriverNames.Contains(usableDriverNameToFollow))
                             audioPlayer.playMessage(new QueuedMessage("frozen_order/allow_driver_to_pass", 
-                                MessageContents(folderAllow, driverToFollow, folderToPass), 0, this));
+                                MessageContents(folderAllow, usableDriverNameToFollow, folderToPass), 0, this));
                         else
                             audioPlayer.playMessage(new QueuedMessage(folderYoureAheadOfAGuyYouShouldBeFollowing, 0, this));
                     }
                     else if (this.newFrozenOrderAction == FrozenOrderAction.CatchUp)
                     {
-                        if (SoundCache.hasSuitableTTSVoice || SoundCache.availableDriverNames.Contains(DriverNameHelper.getUsableDriverName(driverToFollow)))
+                        if (SoundCache.hasSuitableTTSVoice || SoundCache.availableDriverNames.Contains(usableDriverNameToFollow))
                             audioPlayer.playMessage(new QueuedMessage("frozen_order/catch_up_to_driver", 
-                                MessageContents(folderCatchUpTo, driverToFollow), 0, this));
+                                MessageContents(folderCatchUpTo, usableDriverNameToFollow), 0, this));
                         else
                             audioPlayer.playMessage(new QueuedMessage(folderYouNeedToCatchUpToTheGuyAhead, 0, this));
                     }
