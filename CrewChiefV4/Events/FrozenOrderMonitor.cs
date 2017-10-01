@@ -217,12 +217,19 @@ namespace CrewChiefV4.Events
                         // Follow messages are only meaningful if there's name to announce.
                         if (SoundCache.hasSuitableTTSVoice || SoundCache.availableDriverNames.Contains(DriverNameHelper.getUsableDriverName(driverToFollow)))
                         {
-                            string columnName;
-                            if (useOvalLogic)
-                                columnName = cfod.AssignedColumn == FrozenOrderColumn.Left ? folderInTheInsideColumn : folderInTheOutsideColumn;
+                            if (cfod.AssignedColumn == FrozenOrderColumn.None)
+                            {
+                                audioPlayer.playMessage(new QueuedMessage("frozen_order/follow_driver", MessageContents(folderFollow, driverToFollow), 0, this));
+                            }
                             else
-                                columnName = cfod.AssignedColumn == FrozenOrderColumn.Left ? folderInTheLeftColumn : folderInTheRightColumn;
-                            audioPlayer.playMessage(new QueuedMessage("frozen_order/follow_driver", MessageContents(folderFollow, driverToFollow, columnName), 0, this));
+                            {
+                                string columnName;
+                                if (useOvalLogic)
+                                    columnName = cfod.AssignedColumn == FrozenOrderColumn.Left ? folderInTheInsideColumn : folderInTheOutsideColumn;
+                                else
+                                    columnName = cfod.AssignedColumn == FrozenOrderColumn.Left ? folderInTheLeftColumn : folderInTheRightColumn;
+                                audioPlayer.playMessage(new QueuedMessage("frozen_order/follow_driver", MessageContents(folderFollow, driverToFollow, columnName), 0, this));
+                            }
                         }
                     }
                     else if (this.newFrozenOrderAction == FrozenOrderAction.AllowToPass)
@@ -300,25 +307,42 @@ namespace CrewChiefV4.Events
             }
             else if (cfodp == FrozenOrderPhase.FormationStanding)
             {
-                string columnName;
-                if (useOvalLogic)
-                    columnName = cfod.AssignedColumn == FrozenOrderColumn.Left ? folderInTheInsideColumn : folderInTheOutsideColumn;
-                else
-                    columnName = cfod.AssignedColumn == FrozenOrderColumn.Left ? folderInTheLeftColumn : folderInTheRightColumn;
-
+                string columnName = null;
+                if (cfod.AssignedColumn != FrozenOrderColumn.None)
+                {
+                    if (useOvalLogic)
+                        columnName = cfod.AssignedColumn == FrozenOrderColumn.Left ? folderInTheInsideColumn : folderInTheOutsideColumn;
+                    else
+                        columnName = cfod.AssignedColumn == FrozenOrderColumn.Left ? folderInTheLeftColumn : folderInTheRightColumn;
+                }
                 if (!this.formationStandingStartAnnounced && cgs.SessionData.SessionRunningTime > 10)
                 {
                     this.formationStandingStartAnnounced = true;
                     var isStartingFromPole = cfod.AssignedPosition == 1;
                     if (isStartingFromPole)
                     {
-                        audioPlayer.playMessage(new QueuedMessage("frozen_order/youre_starting_from_pole_in_column",
-                                MessageContents(folderWereStartingFromPole, columnName), 0, this));
+                        if (columnName == null)
+                        {
+                            audioPlayer.playMessage(new QueuedMessage(folderWereStartingFromPole, 0, this));
+                        }
+                        else
+                        {
+                            audioPlayer.playMessage(new QueuedMessage("frozen_order/youre_starting_from_pole_in_column",
+                                    MessageContents(folderWereStartingFromPole, columnName), 0, this));
+                        }
                     }
                     else
                     {
-                        audioPlayer.playMessage(new QueuedMessage("frozen_order/youre_starting_from_pos_row_in_column",
-                                MessageContents(folderWeStartingFromPosition, cfod.AssignedPosition, folderRow, cfod.AssignedGridPosition, columnName), 0, this));
+                        if (columnName == null)
+                        {
+                            audioPlayer.playMessage(new QueuedMessage("frozen_order/youre_starting_from_pos",
+                                    MessageContents(folderWeStartingFromPosition, cfod.AssignedPosition), 0, this));
+                        }
+                        else
+                        {
+                            audioPlayer.playMessage(new QueuedMessage("frozen_order/youre_starting_from_pos_row_in_column",
+                                    MessageContents(folderWeStartingFromPosition, cfod.AssignedPosition, folderRow, cfod.AssignedGridPosition, columnName), 0, this));
+                        }
                     }
                 }
 
@@ -331,13 +355,29 @@ namespace CrewChiefV4.Events
                     var isStartingFromPole = cfod.AssignedPosition == 1;
                     if (isStartingFromPole)
                     {
-                        audioPlayer.playMessage(new QueuedMessage("frozen_order/get_ready_starting_from_pole_in_column",
-                                MessageContents(LapCounter.folderGetReady, folderWeStartingFromPosition, columnName), 0, this));
+                        if (columnName == null)
+                        {
+                            audioPlayer.playMessage(new QueuedMessage("frozen_order/get_ready_starting_from_pole",
+                                    MessageContents(LapCounter.folderGetReady, folderWeStartingFromPosition), 0, this));
+                        }
+                        else
+                        {
+                            audioPlayer.playMessage(new QueuedMessage("frozen_order/get_ready_starting_from_pole_in_column",
+                                    MessageContents(LapCounter.folderGetReady, folderWeStartingFromPosition, columnName), 0, this));
+                        }
                     }
                     else
                     {
-                        audioPlayer.playMessage(new QueuedMessage("frozen_order/get_ready_youre_starting_from_pos_row_in_column",
-                                MessageContents(LapCounter.folderGetReady, folderWeStartingFromPosition, cfod.AssignedPosition, folderRow, cfod.AssignedGridPosition, columnName), 0, this));
+                        if (columnName == null)
+                        {
+                            audioPlayer.playMessage(new QueuedMessage("frozen_order/get_ready_youre_starting_from_pos",
+                                    MessageContents(LapCounter.folderGetReady, folderWeStartingFromPosition, cfod.AssignedPosition), 0, this));
+                        }
+                        else
+                        {
+                            audioPlayer.playMessage(new QueuedMessage("frozen_order/get_ready_youre_starting_from_pos_row_in_column",
+                                    MessageContents(LapCounter.folderGetReady, folderWeStartingFromPosition, cfod.AssignedPosition, folderRow, cfod.AssignedGridPosition, columnName), 0, this));
+                        }
                     }
                 }
             }
