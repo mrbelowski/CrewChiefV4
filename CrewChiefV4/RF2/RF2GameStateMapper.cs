@@ -52,7 +52,7 @@ namespace CrewChiefV4.rFactor2
         // User preferences.
         private readonly bool enablePitStopPrediction = UserSettings.GetUserSettings().getBoolean("enable_rf2_pit_stop_prediction");
         private readonly bool enableBlueOnSlower = UserSettings.GetUserSettings().getBoolean("enable_rf2_blue_on_slower");
-        private bool incrementCutTrackCountWhenLeavingRacingSurface = true;
+        private readonly bool incrementCutTrackCountWhenLeavingRacingSurface = true;
 
         // Detect if there any changes in the the game data since the last update.
         private double lastPlayerTelemetryET = -1.0;
@@ -1379,7 +1379,7 @@ namespace CrewChiefV4.rFactor2
             this.isApproachingTrack = offTrackDistanceDelta < 0 && cgs.PenaltiesData.IsOffRacingSurface && lateralDistDiff < 3;
 
             // improvised cut track warnings from pCars.
-            if (!cgs.PenaltiesData.IsOffRacingSurface && incrementCutTrackCountWhenLeavingRacingSurface)
+            if (!cgs.PenaltiesData.IsOffRacingSurface && this.incrementCutTrackCountWhenLeavingRacingSurface)
             {
                 cgs.PenaltiesData.IsOffRacingSurface =
                     wheelFrontLeft.mSurfaceType != (int)rFactor2Constants.rF2SurfaceType.Dry && wheelFrontLeft.mSurfaceType != (int)rFactor2Constants.rF2SurfaceType.Wet
@@ -1389,7 +1389,7 @@ namespace CrewChiefV4.rFactor2
 
                 if (pgs != null && !pgs.PenaltiesData.IsOffRacingSurface && cgs.PenaltiesData.IsOffRacingSurface)
                 {
-                    Console.WriteLine("Detected player off track due to surface type.");
+                    Console.WriteLine("Player off track: by surface type.");
                     cgs.PenaltiesData.CutTrackWarnings = pgs.PenaltiesData.CutTrackWarnings + 1;
                 }
             }
@@ -1398,7 +1398,7 @@ namespace CrewChiefV4.rFactor2
                 && !pgs.PenaltiesData.IsOffRacingSurface && cgs.PenaltiesData.IsOffRacingSurface
                 && !(cgs.SessionData.SessionType == SessionType.Race && cgs.SessionData.SessionPhase == SessionPhase.Countdown))
             {
-                Console.WriteLine("Off track. Lap valid: " + cgs.SessionData.CurrentLapIsValid);
+                Console.WriteLine("Player off track: by distance.");
                 cgs.PenaltiesData.CutTrackWarnings = pgs.PenaltiesData.CutTrackWarnings + 1;
             }
 

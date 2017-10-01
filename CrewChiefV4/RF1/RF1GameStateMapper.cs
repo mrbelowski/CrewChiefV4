@@ -970,7 +970,7 @@ namespace CrewChiefV4.rFactor1
 
                 if (previousGameState != null && !previousGameState.PenaltiesData.IsOffRacingSurface && currentGameState.PenaltiesData.IsOffRacingSurface)
                 {
-                    Console.WriteLine("Detected player off track due to surface type.");
+                    Console.WriteLine("Player off track: by surface type.");
                     currentGameState.PenaltiesData.CutTrackWarnings = previousGameState.PenaltiesData.CutTrackWarnings + 1;
                 }
             }
@@ -979,7 +979,7 @@ namespace CrewChiefV4.rFactor1
                 && !previousGameState.PenaltiesData.IsOffRacingSurface && currentGameState.PenaltiesData.IsOffRacingSurface
                 && !(currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.SessionPhase == SessionPhase.Countdown))
             {
-                Console.WriteLine("Off track. Lap valid: " + currentGameState.SessionData.CurrentLapIsValid);
+                Console.WriteLine("Player off track: by distance.");
                 currentGameState.PenaltiesData.CutTrackWarnings = previousGameState.PenaltiesData.CutTrackWarnings + 1;
             }
 
