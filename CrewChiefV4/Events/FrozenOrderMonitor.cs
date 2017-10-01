@@ -33,6 +33,33 @@ namespace CrewChiefV4.Events
         private bool formationStandingStartAnnounced = false;
         private bool formationStandingPreStartReminderAnnounced = false;
 
+        // sounds...
+        public static String folderFollow = "frozen_order/follow";
+        public static String folderInTheLeftColumn = "frozen_order/in_the_left_column";
+        public static String folderInTheRightColumn = "frozen_order/in_the_right_column";
+        public static String folderInTheInsideColumn = "frozen_order/in_the_inside_column";
+        public static String folderInTheOutsideColumn = "frozen_order/in_the_outside_column";
+        public static String folderCatchUpTo = "frozen_order/catch_up_to";    // can we have multiple phrasings of this without needing different structure?
+        public static String folderAllow = "frozen_order/allow";
+        public static String folderToPass = "frozen_order/to_pass";
+        public static String folderTheSafetyCar = "frozen_order/the_safety_car";
+        public static String folderThePaceCar = "frozen_order/the_pace_car";
+        public static String folderYoureAheadOfAGuyYouShouldBeFollowing = "frozen_order/youre_ahead_of_guy_you_should_follow";
+        public static String folderYouNeedToCatchUpToTheGuyAhead = "frozen_order/you_need_to_catch_up_to_the_guy_ahead";
+        public static String folderAllowGuyBehindToPass = "frozen_order/allow_guy_behind_to_pass";
+
+        public static String folderWeStartingFromPosition = "frozen_order/were_starting_from_position";
+        public static String folderRow = "frozen_order/row";    // "starting from position 4, row 2 in the outside column" - uses column stuff above
+        // we'll use the get-ready sound from the LapCounter event here
+        public static String folderWereStartingFromPole = "frozen_order/were_starting_from_pole";
+        public static String folderSafetyCarSpeedIs = "frozen_order/safety_car_speed_is";
+        public static String folderPaceCarSpeedIs = "frozen_order/pace_car_speed_is";
+        public static String folderMilesPerHour = "frozen_order/miles_per_hour";
+        public static String folderKilometresPerHour = "frozen_order/kilometres_per_hour";
+        public static String folderSafetyCarJustLeft = "frozen_order/safety_car_just_left"; // left the pits?
+        public static String folderPaceCarJustLeft = "frozen_order/pace_car_just_left"; // left the pits?
+        public static String folderRollingStartReminder = "frozen_order/thats_a_rolling_start";
+        public static String folderStandingStartReminder = "frozen_order/thats_a_standing_start";
 
         public FrozenOrderMonitor(AudioPlayer audioPlayer)
         {
@@ -150,9 +177,9 @@ namespace CrewChiefV4.Events
                 Console.WriteLine("FO: NEW PHASE DETECTED: " + cfod.Phase);
 
                 if (cfod.Phase == FrozenOrderPhase.Rolling)
-                    Console.WriteLine("FO: OK, THAT'S A ROLLING START.");
+                    audioPlayer.playMessage(new QueuedMessage(folderRollingStartReminder, 0, this));
                 else if (cfod.Phase == FrozenOrderPhase.FormationStanding)
-                    Console.WriteLine("FO: OK, THAT'S FORMATION/STANDING START.");
+                    audioPlayer.playMessage(new QueuedMessage(folderStandingStartReminder, 0, this));
 
                 // Clear previous state.
                 this.clearState();
@@ -176,7 +203,7 @@ namespace CrewChiefV4.Events
             if (cfodp == FrozenOrderPhase.Rolling)
             {
                 var shouldFollowSafetyCar = cfod.AssignedGridPosition == 1;
-                var driverToFollow = shouldFollowSafetyCar ? (useAmericanTerms ? "Pace car" : "Safety car") : cfod.DriverToFollowRaw;
+                var driverToFollow = shouldFollowSafetyCar ? (useAmericanTerms ? folderThePaceCar : folderTheSafetyCar) : cfod.DriverToFollowRaw;
 
                 if (isActionUpdateStable
                     && (this.currFrozenOrderAction != this.newFrozenOrderAction
@@ -192,43 +219,43 @@ namespace CrewChiefV4.Events
                         {
                             string columnName;
                             if (useOvalLogic)
-                                columnName = cfod.AssignedColumn == FrozenOrderColumn.Left ? "inside" : "outside";
+                                columnName = cfod.AssignedColumn == FrozenOrderColumn.Left ? folderInTheInsideColumn : folderInTheOutsideColumn;
                             else
-                                columnName = cfod.AssignedColumn.ToString();
-
-                            Console.WriteLine(string.Format("FO: FOLLOW DIRVER: {0} IN COLUMN {1}", driverToFollow, columnName));
+                                columnName = cfod.AssignedColumn == FrozenOrderColumn.Left ? folderInTheLeftColumn : folderInTheRightColumn;
+                            audioPlayer.playMessage(new QueuedMessage("frozen_order/follow_driver", MessageContents(folderFollow, driverToFollow, columnName), 0, this));
                         }
                     }
                     else if (this.newFrozenOrderAction == FrozenOrderAction.AllowToPass)
                     {
                         // Follow messages are only meaningful if there's name to announce.
                         if (SoundCache.hasSuitableTTSVoice || SoundCache.availableDriverNames.Contains(DriverNameHelper.getUsableDriverName(driverToFollow)))
-                            Console.WriteLine(string.Format("FO: ALLOW DIRVER: {0} TO PASS", driverToFollow));
+                            audioPlayer.playMessage(new QueuedMessage("frozen_order/allow_driver_to_pass", 
+                                MessageContents(folderAllow, driverToFollow, folderToPass), 0, this));
                         else
-                            Console.WriteLine(string.Format("FO: YOU ARE AHEAD OF A GUY YOU SHOULD BE FOLLOWING, LET HIM PASS"));
+                            audioPlayer.playMessage(new QueuedMessage(folderYoureAheadOfAGuyYouShouldBeFollowing, 0, this));
                     }
                     else if (this.newFrozenOrderAction == FrozenOrderAction.CatchUp)
                     {
                         if (SoundCache.hasSuitableTTSVoice || SoundCache.availableDriverNames.Contains(DriverNameHelper.getUsableDriverName(driverToFollow)))
-                            Console.WriteLine(string.Format("FO: CATCH UP TO DIRVER: {0}", driverToFollow)); 
+                            audioPlayer.playMessage(new QueuedMessage("frozen_order/allow_driver_to_pass", 
+                                MessageContents(folderCatchUpTo, driverToFollow), 0, this));
                         else
-                            Console.WriteLine(string.Format("FO: YOU NEED TO CATCH UP TO THE GUY YOU SHOULD BE FOLLOWING"));
-
+                            audioPlayer.playMessage(new QueuedMessage(folderYouNeedToCatchUpToTheGuyAhead, 0, this));
                     }
                 }
 
                 if (pfod.SafetyCarSpeed != -1.0f && cfod.SafetyCarSpeed == -1.0f)
                 {
                     if (useAmericanTerms)
-                        Console.WriteLine("FO: PACE CAR JUST LEFT.");
+                        audioPlayer.playMessage(new QueuedMessage(folderPaceCarJustLeft, 0, this));
                     else
-                        Console.WriteLine("FO: SAFETY CAR JUST LEFT.");
+                        audioPlayer.playMessage(new QueuedMessage(folderSafetyCarJustLeft, 0, this));
                 }
             }
             else if (cfodp == FrozenOrderPhase.FullCourseYellow)
             {
                 var shouldFollowSafetyCar = cfod.AssignedPosition == 1;
-                var driverToFollow = shouldFollowSafetyCar ? (useAmericanTerms ? "Pace car" : "Safety car") : cfod.DriverToFollowRaw;
+                var driverToFollow = shouldFollowSafetyCar ? (useAmericanTerms ? folderThePaceCar : folderTheSafetyCar) : cfod.DriverToFollowRaw;
 
                 if (isActionUpdateStable
                     && (this.currFrozenOrderAction != this.newFrozenOrderAction
@@ -241,39 +268,41 @@ namespace CrewChiefV4.Events
                     {
                         // Follow messages are only meaningful if there's name to announce.
                         if (SoundCache.hasSuitableTTSVoice || SoundCache.availableDriverNames.Contains(DriverNameHelper.getUsableDriverName(driverToFollow)))
-                            Console.WriteLine(string.Format("FO: FOLLOW DIRVER: {0}", driverToFollow));
+                            audioPlayer.playMessage(new QueuedMessage("frozen_order/follow_driver", MessageContents(folderFollow, driverToFollow), 0, this));
                     }
                     else if (this.newFrozenOrderAction == FrozenOrderAction.AllowToPass)
                     {
                         if (SoundCache.hasSuitableTTSVoice || SoundCache.availableDriverNames.Contains(DriverNameHelper.getUsableDriverName(driverToFollow)))
-                            Console.WriteLine(string.Format("FO: ALLOW DIRVER: {0} TO PASS", driverToFollow));
+                            audioPlayer.playMessage(new QueuedMessage("frozen_order/allow_driver_to_pass", 
+                                MessageContents(folderAllow, driverToFollow, folderToPass), 0, this));
                         else
-                            Console.WriteLine(string.Format("FO: YOU ARE AHEAD OF A GUY YOU SHOULD BE FOLLOWING, LET HIM PASS"));
+                            audioPlayer.playMessage(new QueuedMessage(folderYoureAheadOfAGuyYouShouldBeFollowing, 0, this));
                     }
                     else if (this.newFrozenOrderAction == FrozenOrderAction.CatchUp)
                     {
                         if (SoundCache.hasSuitableTTSVoice || SoundCache.availableDriverNames.Contains(DriverNameHelper.getUsableDriverName(driverToFollow)))
-                            Console.WriteLine(string.Format("FO: CATCH UP TO DIRVER: {0}", driverToFollow));
+                            audioPlayer.playMessage(new QueuedMessage("frozen_order/catch_up_to_driver", 
+                                MessageContents(folderCatchUpTo, driverToFollow), 0, this));
                         else
-                            Console.WriteLine(string.Format("FO: YOU NEED TO CATCH UP TO THE GUY YOU SHOULD BE FOLLOWING"));
+                            audioPlayer.playMessage(new QueuedMessage(folderYouNeedToCatchUpToTheGuyAhead, 0, this));
                     }
                 }
 
                 if (pfod.SafetyCarSpeed != -1.0f && cfod.SafetyCarSpeed == -1.0f)
                 {
                     if (useAmericanTerms)
-                        Console.WriteLine("FO: PACE CAR JUST LEFT.");
+                        audioPlayer.playMessage(new QueuedMessage(folderPaceCarJustLeft, 0, this));
                     else
-                        Console.WriteLine("FO: SAFETY CAR JUST LEFT.");
+                        audioPlayer.playMessage(new QueuedMessage(folderSafetyCarJustLeft, 0, this));
                 }
             }
             else if (cfodp == FrozenOrderPhase.FormationStanding)
             {
                 string columnName;
                 if (useOvalLogic)
-                    columnName = cfod.AssignedColumn == FrozenOrderColumn.Left ? "inside" : "outside";
+                    columnName = cfod.AssignedColumn == FrozenOrderColumn.Left ? folderInTheInsideColumn : folderInTheOutsideColumn;
                 else
-                    columnName = cfod.AssignedColumn.ToString();
+                    columnName = cfod.AssignedColumn == FrozenOrderColumn.Left ? folderInTheLeftColumn : folderInTheRightColumn;
 
                 if (!this.formationStandingStartAnnounced && cgs.SessionData.SessionRunningTime > 10)
                 {
@@ -281,11 +310,13 @@ namespace CrewChiefV4.Events
                     var isStartingFromPole = cfod.AssignedPosition == 1;
                     if (isStartingFromPole)
                     {
-                        Console.WriteLine(string.Format("FO: YOU'RE STARTING FROM THE POLE IN THE {0} COLUMN", columnName));
+                        audioPlayer.playMessage(new QueuedMessage("frozen_order/youre_starting_from_pole_in_column",
+                                MessageContents(folderWereStartingFromPole, columnName), 0, this));
                     }
                     else
                     {
-                        Console.WriteLine(string.Format("FO: YOU'RE STARTING FROM POSITION {0} ROW {1} IN THE {2} COLUMN", cfod.AssignedPosition, cfod.AssignedGridPosition, columnName));
+                        audioPlayer.playMessage(new QueuedMessage("frozen_order/youre_starting_from_pos_row_in_column",
+                                MessageContents(folderWeStartingFromPosition, cfod.AssignedPosition, folderRow, cfod.AssignedGridPosition, columnName), 0, this));
                     }
                 }
 
@@ -298,11 +329,13 @@ namespace CrewChiefV4.Events
                     var isStartingFromPole = cfod.AssignedPosition == 1;
                     if (isStartingFromPole)
                     {
-                        Console.WriteLine(string.Format("FO: GET READY, YOU'RE STARTING FROM THE POLE IN THE {0} COLUMN", columnName));
+                        audioPlayer.playMessage(new QueuedMessage("frozen_order/get_ready_starting_from_pole_in_column",
+                                MessageContents(LapCounter.folderGetReady, folderWeStartingFromPosition, columnName), 0, this));
                     }
                     else
                     {
-                        Console.WriteLine(string.Format("FO: GET READY, YOU'RE STARTING FROM POSITION {0} ROW {1} IN THE {2} COLUMN", cfod.AssignedPosition, cfod.AssignedGridPosition, columnName));
+                        audioPlayer.playMessage(new QueuedMessage("frozen_order/get_ready_youre_starting_from_pos_row_in_column",
+                                MessageContents(LapCounter.folderGetReady, folderWeStartingFromPosition, cfod.AssignedPosition, folderRow, cfod.AssignedGridPosition, columnName), 0, this));
                     }
                 }
             }
