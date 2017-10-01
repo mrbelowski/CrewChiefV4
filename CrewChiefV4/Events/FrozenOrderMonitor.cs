@@ -246,6 +246,7 @@ namespace CrewChiefV4.Events
 
                 if (pfod.SafetyCarSpeed != -1.0f && cfod.SafetyCarSpeed == -1.0f)
                 {
+                    // TODO: pace car speed (if we want it) - need to get the units right for this
                     if (useAmericanTerms)
                         audioPlayer.playMessage(new QueuedMessage(folderPaceCarJustLeft, 0, this));
                     else
@@ -290,6 +291,7 @@ namespace CrewChiefV4.Events
 
                 if (pfod.SafetyCarSpeed != -1.0f && cfod.SafetyCarSpeed == -1.0f)
                 {
+                    // TODO: pace car speed (if we want it) - need to get the units right for this
                     if (useAmericanTerms)
                         audioPlayer.playMessage(new QueuedMessage(folderPaceCarJustLeft, 0, this));
                     else
