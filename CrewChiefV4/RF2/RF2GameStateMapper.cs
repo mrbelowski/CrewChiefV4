@@ -60,6 +60,7 @@ namespace CrewChiefV4.rFactor2
         private readonly bool enablePitStopPrediction = UserSettings.GetUserSettings().getBoolean("enable_rf2_pit_stop_prediction");
         private readonly bool enableBlueOnSlower = UserSettings.GetUserSettings().getBoolean("enable_rf2_blue_on_slower");
         private readonly bool enableFrozenOrderMessages = UserSettings.GetUserSettings().getBoolean("enable_rf2_frozen_order_messages");
+        private readonly bool incrementCutTrackCountWhenLeavingRacingSurface = true;
 
         // True if it looks like track has no DRS zones defined.
         private bool detectedTrackNoDRSZones = false;
@@ -1410,9 +1411,8 @@ namespace CrewChiefV4.rFactor2
             this.distanceOffTrack = cgs.PenaltiesData.IsOffRacingSurface ? lateralDistDiff : 0;
             this.isApproachingTrack = offTrackDistanceDelta < 0 && cgs.PenaltiesData.IsOffRacingSurface && lateralDistDiff < 3;
 
-            var incrementCutTrackCountWhenLeavingRacingSurface = true;
             // improvised cut track warnings from pCars.
-            if (!cgs.PenaltiesData.IsOffRacingSurface && incrementCutTrackCountWhenLeavingRacingSurface)
+            if (!cgs.PenaltiesData.IsOffRacingSurface && this.incrementCutTrackCountWhenLeavingRacingSurface)
             {
                 cgs.PenaltiesData.IsOffRacingSurface =
                     wheelFrontLeft.mSurfaceType != (int)rFactor2Constants.rF2SurfaceType.Dry && wheelFrontLeft.mSurfaceType != (int)rFactor2Constants.rF2SurfaceType.Wet
@@ -1420,9 +1420,9 @@ namespace CrewChiefV4.rFactor2
                     && wheelRearLeft.mSurfaceType != (int)rFactor2Constants.rF2SurfaceType.Dry && wheelRearLeft.mSurfaceType != (int)rFactor2Constants.rF2SurfaceType.Wet
                     && wheelRearRight.mSurfaceType != (int)rFactor2Constants.rF2SurfaceType.Dry && wheelRearRight.mSurfaceType != (int)rFactor2Constants.rF2SurfaceType.Wet;
 
-                if (pgs != null && pgs.PenaltiesData.IsOffRacingSurface && cgs.PenaltiesData.IsOffRacingSurface)
+                if (pgs != null && !pgs.PenaltiesData.IsOffRacingSurface && cgs.PenaltiesData.IsOffRacingSurface)
                 {
-                    Console.WriteLine("Detected player off track due to surface type.");
+                    Console.WriteLine("Player off track: by surface type.");
                     cgs.PenaltiesData.CutTrackWarnings = pgs.PenaltiesData.CutTrackWarnings + 1;
                 }
             }
@@ -1431,7 +1431,20 @@ namespace CrewChiefV4.rFactor2
                 && !pgs.PenaltiesData.IsOffRacingSurface && cgs.PenaltiesData.IsOffRacingSurface
                 && !(cgs.SessionData.SessionType == SessionType.Race && cgs.SessionData.SessionPhase == SessionPhase.Countdown))
             {
-                Console.WriteLine("Off track. Lap valid: " + cgs.SessionData.CurrentLapIsValid);
+                Console.WriteLine("Player off track: by distance.");
+                cgs.PenaltiesData.CutTrackWarnings = pgs.PenaltiesData.CutTrackWarnings + 1;
+            }
+
+            // If lap state changed from valid to invalid, consider it due to cut track.
+            if (!cgs.PitData.OnOutLap
+                && pgs != null
+                && pgs.SessionData.CurrentLapIsValid
+                && !cgs.SessionData.CurrentLapIsValid
+                && !(cgs.SessionData.SessionType == SessionType.Race
+                    && (cgs.SessionData.SessionPhase == SessionPhase.Countdown 
+                        || cgs.SessionData.SessionPhase == SessionPhase.Gridwalk)))
+            {
+                Console.WriteLine("Player off track: by an inalid lap.");
                 cgs.PenaltiesData.CutTrackWarnings = pgs.PenaltiesData.CutTrackWarnings + 1;
             }
 
