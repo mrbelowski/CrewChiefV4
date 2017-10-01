@@ -214,7 +214,7 @@ namespace CrewChiefV4.rFactor2
                         var timeSinceWaitStarted = TimeSpan.FromTicks(DateTime.Now.Ticks - this.ticksWhenSessionEnded);
                         if (timeSinceWaitStarted.TotalMilliseconds < RF2GameStateMapper.waitForSessionEndMillis)
                         {
-                            if (this.sessionWaitMessageCounter % 5 == 0)
+                            if (this.sessionWaitMessageCounter % 10 == 0)
                                 Console.WriteLine("Abrupt Session End: continue session end wait.");
 
                             this.sessionWaitMessageCounter++;
