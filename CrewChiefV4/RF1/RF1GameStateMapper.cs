@@ -26,6 +26,7 @@ namespace CrewChiefV4.rFactor1
         private float wornOutTyreWearPercent = 85f;
 
         private Boolean enablePitWindowHack = UserSettings.GetUserSettings().getBoolean("enable_ams_pit_schedule_messages");
+        private bool incrementCutTrackCountWhenLeavingRacingSurface = true;
 
         private List<CornerData.EnumWithThresholds> brakeTempThresholdsForPlayersCar = null;
 
@@ -952,6 +953,37 @@ namespace CrewChiefV4.rFactor1
             float offTrackDistanceDelta = lateralDistDiff - distanceOffTrack;
             distanceOffTrack = currentGameState.PenaltiesData.IsOffRacingSurface ? lateralDistDiff : 0;
             isApproachingTrack = offTrackDistanceDelta < 0 && currentGameState.PenaltiesData.IsOffRacingSurface && lateralDistDiff < 3;
+
+            if (previousGameState != null)
+            {
+                currentGameState.PenaltiesData.CutTrackWarnings = previousGameState.PenaltiesData.CutTrackWarnings;
+            }
+
+            // improvised cut track warnings from pCars.
+            if (!currentGameState.PenaltiesData.IsOffRacingSurface && incrementCutTrackCountWhenLeavingRacingSurface)
+            {
+                currentGameState.PenaltiesData.IsOffRacingSurface =
+                    shared.wheel[(int)rFactor1Constant.rfWheelIndex.frontLeft].surfaceType != (int)rFactor1Constant.rfSurfaceType.dry && shared.wheel[(int)rFactor1Constant.rfWheelIndex.frontLeft].surfaceType != (int)rFactor1Constant.rfSurfaceType.wet
+                    && shared.wheel[(int)rFactor1Constant.rfWheelIndex.frontRight].surfaceType != (int)rFactor1Constant.rfSurfaceType.dry && shared.wheel[(int)rFactor1Constant.rfWheelIndex.frontRight].surfaceType != (int)rFactor1Constant.rfSurfaceType.wet
+                    && shared.wheel[(int)rFactor1Constant.rfWheelIndex.rearLeft].surfaceType != (int)rFactor1Constant.rfSurfaceType.dry && shared.wheel[(int)rFactor1Constant.rfWheelIndex.rearLeft].surfaceType != (int)rFactor1Constant.rfSurfaceType.wet
+                    && shared.wheel[(int)rFactor1Constant.rfWheelIndex.rearRight].surfaceType != (int)rFactor1Constant.rfSurfaceType.dry && shared.wheel[(int)rFactor1Constant.rfWheelIndex.rearRight].surfaceType != (int)rFactor1Constant.rfSurfaceType.wet;
+
+                if (previousGameState != null && !previousGameState.PenaltiesData.IsOffRacingSurface && currentGameState.PenaltiesData.IsOffRacingSurface)
+                {
+                    Console.WriteLine("Player off track: by surface type.");
+                    currentGameState.PenaltiesData.CutTrackWarnings = previousGameState.PenaltiesData.CutTrackWarnings + 1;
+                }
+            }
+
+            if (!currentGameState.PitData.OnOutLap && previousGameState != null
+                && !previousGameState.PenaltiesData.IsOffRacingSurface && currentGameState.PenaltiesData.IsOffRacingSurface
+                && !(currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.SessionPhase == SessionPhase.Countdown))
+            {
+                Console.WriteLine("Player off track: by distance.");
+                currentGameState.PenaltiesData.CutTrackWarnings = previousGameState.PenaltiesData.CutTrackWarnings + 1;
+            }
+
+
             // primitive cut track detection for Reiza Time Trial Mode
             if (currentGameState.SessionData.SessionType == SessionType.HotLap)
             {

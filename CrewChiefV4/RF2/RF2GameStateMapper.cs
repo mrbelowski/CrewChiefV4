@@ -52,6 +52,7 @@ namespace CrewChiefV4.rFactor2
         // User preferences.
         private readonly bool enablePitStopPrediction = UserSettings.GetUserSettings().getBoolean("enable_rf2_pit_stop_prediction");
         private readonly bool enableBlueOnSlower = UserSettings.GetUserSettings().getBoolean("enable_rf2_blue_on_slower");
+        private readonly bool incrementCutTrackCountWhenLeavingRacingSurface = true;
 
         // Detect if there any changes in the the game data since the last update.
         private double lastPlayerTelemetryET = -1.0;
@@ -462,6 +463,7 @@ namespace CrewChiefV4.rFactor2
             if (psd != null && !csd.IsNewSession)
             {
                 cgs.PitData.NumPitStops = pgs.PitData.NumPitStops;
+                cgs.PenaltiesData.CutTrackWarnings = pgs.PenaltiesData.CutTrackWarnings;
             }
 
             csd.SessionStartTime = csd.IsNewSession ? cgs.Now : psd.SessionStartTime;
@@ -1375,6 +1377,30 @@ namespace CrewChiefV4.rFactor2
             float offTrackDistanceDelta = lateralDistDiff - this.distanceOffTrack;
             this.distanceOffTrack = cgs.PenaltiesData.IsOffRacingSurface ? lateralDistDiff : 0;
             this.isApproachingTrack = offTrackDistanceDelta < 0 && cgs.PenaltiesData.IsOffRacingSurface && lateralDistDiff < 3;
+
+            // improvised cut track warnings from pCars.
+            if (!cgs.PenaltiesData.IsOffRacingSurface && this.incrementCutTrackCountWhenLeavingRacingSurface)
+            {
+                cgs.PenaltiesData.IsOffRacingSurface =
+                    wheelFrontLeft.mSurfaceType != (int)rFactor2Constants.rF2SurfaceType.Dry && wheelFrontLeft.mSurfaceType != (int)rFactor2Constants.rF2SurfaceType.Wet
+                    && wheelFrontRight.mSurfaceType != (int)rFactor2Constants.rF2SurfaceType.Dry && wheelFrontRight.mSurfaceType != (int)rFactor2Constants.rF2SurfaceType.Wet
+                    && wheelRearLeft.mSurfaceType != (int)rFactor2Constants.rF2SurfaceType.Dry && wheelRearLeft.mSurfaceType != (int)rFactor2Constants.rF2SurfaceType.Wet
+                    && wheelRearRight.mSurfaceType != (int)rFactor2Constants.rF2SurfaceType.Dry && wheelRearRight.mSurfaceType != (int)rFactor2Constants.rF2SurfaceType.Wet;
+
+                if (pgs != null && !pgs.PenaltiesData.IsOffRacingSurface && cgs.PenaltiesData.IsOffRacingSurface)
+                {
+                    Console.WriteLine("Player off track: by surface type.");
+                    cgs.PenaltiesData.CutTrackWarnings = pgs.PenaltiesData.CutTrackWarnings + 1;
+                }
+            }
+
+            if (!cgs.PitData.OnOutLap && pgs != null
+                && !pgs.PenaltiesData.IsOffRacingSurface && cgs.PenaltiesData.IsOffRacingSurface
+                && !(cgs.SessionData.SessionType == SessionType.Race && cgs.SessionData.SessionPhase == SessionPhase.Countdown))
+            {
+                Console.WriteLine("Player off track: by distance.");
+                cgs.PenaltiesData.CutTrackWarnings = pgs.PenaltiesData.CutTrackWarnings + 1;
+            }
 
             // --------------------------------
             // console output
