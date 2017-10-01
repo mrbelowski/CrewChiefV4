@@ -137,7 +137,7 @@ namespace CrewChiefV4.Events
                     }
                 }
             }*/
-            return false;
+            return true;
         }
 
         public override void clearState()
