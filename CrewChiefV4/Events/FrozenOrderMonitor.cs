@@ -215,7 +215,7 @@ namespace CrewChiefV4.Events
                     this.currFrozenOrderAction = this.newFrozenOrderAction;
                     this.currDriverToFollow = this.newDriverToFollow;
 
-                    var usableDriverNameToFollow = DriverNameHelper.getUsableDriverName(driverToFollow);
+                    var usableDriverNameToFollow = shouldFollowSafetyCar ? driverToFollow : DriverNameHelper.getUsableDriverName(driverToFollow);
                     if (this.newFrozenOrderAction == FrozenOrderAction.Follow
                         && prevDriverToFollow != this.currDriverToFollow)  // Don't announce Follow messages for the driver that we caught up to or allowed to pass.
                     {
@@ -279,7 +279,7 @@ namespace CrewChiefV4.Events
                     this.currFrozenOrderAction = this.newFrozenOrderAction;
                     this.currDriverToFollow = this.newDriverToFollow;
 
-                    var usableDriverNameToFollow = DriverNameHelper.getUsableDriverName(driverToFollow);
+                    var usableDriverNameToFollow = shouldFollowSafetyCar ? driverToFollow : DriverNameHelper.getUsableDriverName(driverToFollow);
                     if (this.newFrozenOrderAction == FrozenOrderAction.Follow
                         && prevDriverToFollow != this.currDriverToFollow)  // Don't announce Follow messages for the driver that we caught up to or allowed to pass.)
                     {
