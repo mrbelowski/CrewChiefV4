@@ -290,7 +290,8 @@ namespace CrewChiefV4.rFactor1
             currentGameState.SessionData.IsDisqualified = (rFactor1Constant.rfFinishStatus)player.finishStatus == rFactor1Constant.rfFinishStatus.dq;
             currentGameState.SessionData.CompletedLaps = shared.lapNumber < 0 ? 0 : shared.lapNumber;
             currentGameState.SessionData.LapTimeCurrent = currentGameState.SessionData.SessionRunningTime - player.lapStartET;
-            currentGameState.SessionData.LapTimePrevious = player.lastLapTime > 0 ? player.lastLapTime : -1;
+
+            currentGameState.checkForNewLapData(previousGameState, player.lastLapTime);
 
             // Last (most current) per-sector times:
             // Note: this logic still misses invalid sector handling.
@@ -341,13 +342,14 @@ namespace CrewChiefV4.rFactor1
                 default:
                     break;
             }
-            if (currentGameState.SessionData.IsNewLap)
+            if (currentGameState.LastLapTimeUpdated)
             {
                 currentGameState.SessionData.playerCompleteLapWithProvidedLapTime(currentGameState.SessionData.Position, currentGameState.SessionData.SessionRunningTime,
-                        lastSectorTime, lastSectorTime > 0, false, shared.trackTemp, shared.ambientTemp, currentGameState.SessionData.SessionHasFixedTime, currentGameState.SessionData.SessionTimeRemaining, 3);
+                        currentGameState.SessionData.LapTimePrevious, currentGameState.SessionData.LapTimePrevious > 0, false,
+                        shared.trackTemp, shared.ambientTemp, currentGameState.SessionData.SessionHasFixedTime, currentGameState.SessionData.SessionTimeRemaining, 3);
                 currentGameState.SessionData.playerStartNewLap(currentGameState.SessionData.CompletedLaps + 1, currentGameState.SessionData.Position, player.inPits == 1 || player.lapDist < 0, currentGameState.SessionData.SessionRunningTime, false, shared.trackTemp, shared.ambientTemp);
             }
-            else if (currentGameState.SessionData.IsNewSector)
+            else if (currentGameState.SessionData.IsNewSector && previousGameState != null && currentGameState.SessionData.SectorNumber != 1)
             {
                 currentGameState.SessionData.playerAddCumulativeSectorData(previousGameState.SessionData.SectorNumber, currentGameState.SessionData.Position, lastSectorTime,
                     currentGameState.SessionData.SessionRunningTime,  lastSectorTime > 0 || (currentGameState.SessionData.SectorNumber >= 2 && player.totalLaps == 1), 
@@ -379,7 +381,7 @@ namespace CrewChiefV4.rFactor1
                     currentGameState.SessionData.formattedPlayerLapTimes.Add(lt);
                 }
             }
-            if (currentGameState.SessionData.IsNewLap && currentGameState.SessionData.LapTimePrevious > 0)
+            if (currentGameState.LastLapTimeUpdated && currentGameState.SessionData.LapTimePrevious > 0)
             {
                 currentGameState.SessionData.formattedPlayerLapTimes.Add(TimeSpan.FromSeconds(currentGameState.SessionData.LapTimePrevious).ToString(@"mm\:ss\.fff"));
             }

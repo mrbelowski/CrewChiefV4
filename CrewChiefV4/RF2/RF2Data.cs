@@ -646,6 +646,31 @@ namespace CrewChiefV4.rFactor2
         };
 
 
+        [StructLayout(LayoutKind.Sequential, Pack = 4)]
+        public struct rF2VehScoringCapture
+        {
+            // VehicleScoringInfoV01 members:
+            public int mID;                      // slot ID (note that it can be re-used in multiplayer after someone leaves)
+            public byte mPlace;
+            public byte mIsPlayer;
+            public sbyte mFinishStatus;     // 0=none, 1=finished, 2=dnf, 3=dq
+        };
+
+
+        [StructLayout(LayoutKind.Sequential, Pack = 4)]
+        public struct rF2SessionTransitionCapture
+        {
+            // ScoringInfoV01 members:
+            public byte mGamePhase;
+            public int mSession;
+
+            // VehicleScoringInfoV01 members:
+            public int mNumScoringVehicles;
+            [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = rFactor2Constants.MAX_MAPPED_VEHICLES)]
+            public rF2VehScoringCapture[] mScoringVehicles;
+        };
+
+
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi, Pack = 4)]
         public struct rF2Extended
         {
@@ -666,6 +691,11 @@ namespace CrewChiefV4.rFactor2
             public byte mInRealtimeFC;                         // in realtime as opposed to at the monitor (reported via last EnterRealtime/ExitRealtime calls).
             public byte mMultimediaThreadStarted;              // multimedia thread started (reported via ThreadStarted/ThreadStopped calls).
             public byte mSimulationThreadStarted;              // simulation thread started (reported via ThreadStarted/ThreadStopped calls).
+
+            public byte mSessionStarted;                       // Set to true on Session Started, set to false on Session Ended.
+            public Int64 mTicksSessionStarted;                 // Ticks when session started.
+            public Int64 mTicksSessionEnded;                   // Ticks when session ended.
+            public rF2SessionTransitionCapture mSessionTransitionCapture;  // Contains partial internals capture at session transition time.
         }
 
 
