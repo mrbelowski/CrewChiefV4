@@ -549,6 +549,14 @@ namespace CrewChiefV4.RaceRoom
                     {
                         if (participantStruct.TrackSector == 1)
                         {
+                            // if the player's sector time is invalidated the game won't update SectorTimePreviousSelf so if the reported time is identical
+                            // to the previous time assume it's an invalid sector:
+                            if (currentGameState.SessionData.CurrentLapIsValid && 
+                                participantStruct.SectorTimePreviousSelf.Sector3 == currentGameState.SessionData.LastSector3Time)
+                            {
+                                currentGameState.SessionData.CurrentLapIsValid = false;
+                            }
+
                             if (currentGameState.SessionData.SessionTimesAtEndOfSectors[3] != -1)
                             {
                                 currentGameState.SessionData.LapTimePreviousEstimateForInvalidLap = currentGameState.SessionData.SessionRunningTime - currentGameState.SessionData.SessionTimesAtEndOfSectors[3];
@@ -578,6 +586,14 @@ namespace CrewChiefV4.RaceRoom
                         }
                         else if (participantStruct.TrackSector == 2)
                         {
+                            // if the player's sector time is invalidated the game won't update SectorTimePreviousSelf so if the reported time is identical
+                            // to the previous time assume it's an invalid sector:
+                            if (currentGameState.SessionData.CurrentLapIsValid &&
+                                participantStruct.SectorTimePreviousSelf.Sector1 == currentGameState.SessionData.LastSector1Time)
+                            {
+                                currentGameState.SessionData.CurrentLapIsValid = false;
+                            }
+
                             currentGameState.SessionData.SessionTimesAtEndOfSectors[1] = currentGameState.SessionData.SessionRunningTime;
                             if (participantStruct.SectorTimeCurrentSelf.Sector1 > 0 && currentGameState.SessionData.CurrentLapIsValid)
                             {
@@ -594,6 +610,14 @@ namespace CrewChiefV4.RaceRoom
                         }
                         else if (participantStruct.TrackSector == 3)
                         {
+                            // if the player's sector time is invalidated the game won't update SectorTimePreviousSelf so if the reported time is identical
+                            // to the previous time assume it's an invalid sector:
+                            if (currentGameState.SessionData.CurrentLapIsValid &&
+                                participantStruct.SectorTimePreviousSelf.Sector2 == currentGameState.SessionData.LastSector2Time)
+                            {
+                                currentGameState.SessionData.CurrentLapIsValid = false;
+                            }
+
                             currentGameState.SessionData.SessionTimesAtEndOfSectors[2] = currentGameState.SessionData.SessionRunningTime;
                             if (participantStruct.SectorTimeCurrentSelf.Sector2 > 0 && participantStruct.SectorTimeCurrentSelf.Sector1 > 0 &&
                                  currentGameState.SessionData.CurrentLapIsValid)
@@ -1553,8 +1577,17 @@ namespace CrewChiefV4.RaceRoom
                 {
                     if (opponentData.OpponentLapData.Count > 0)
                     {
-                        opponentData.CompleteLapWithProvidedLapTime(racePosition, sessionRunningTime, completedLapTime,
-                            lapIsValid && validSpeed, false, 20, 20, sessionLengthIsTime, sessionTimeRemaining, 3);
+                        // if the opponent hasn't set a valid time, the game will not update the lastSector3Time, so we check to see if this has changed - 
+                        // if it's identical to the previous time, assume it's invalid
+                        if (opponentData.LastLapTime == completedLapTime)
+                        {
+                            lapIsValid = false;
+                        }
+                        else
+                        {
+                            opponentData.CompleteLapWithProvidedLapTime(racePosition, sessionRunningTime, completedLapTime,
+                                lapIsValid && validSpeed, false, 20, 20, sessionLengthIsTime, sessionTimeRemaining, 3);
+                        }
                     }
                     opponentData.StartNewLap(completedLaps + 1, racePosition, isInPits, sessionRunningTime, false, 20, 20);
                     opponentData.IsNewLap = true;
