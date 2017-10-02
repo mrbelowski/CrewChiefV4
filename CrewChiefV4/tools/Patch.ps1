@@ -32,6 +32,7 @@ CopyFile $rootPath\"ui_text.txt" $ccLayoutMainPath
 CopyFile $rootPath\"carClassData.json" $ccLayoutMainPath
 CopyFile $rootPath\"trackLandmarksData.json" $ccLayoutMainPath
 CopyFile $rootPath\"plugins" $ccLayoutMainPath
+CopyFile $rootPath\"sounds" $env:LOCALAPPDATA"\CrewChiefV4\"
 
 echo "Press any key to finish..."
 
