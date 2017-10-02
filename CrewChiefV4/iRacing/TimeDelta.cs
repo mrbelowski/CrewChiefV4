@@ -81,12 +81,13 @@ namespace CrewChiefV4.iRacing
         private Boolean validbestlap;
         private Double lapstarttime;
         private Int32 arraySize;
+        private Single trackLength;
 
         public TimeDelta(Single length, Single splitdist, Int32 drivers)
         {
             // save split distance
             this.splitdistance = splitdist;
-
+            this.trackLength = length;
             // save car count
             maxcars = drivers;
             // split times every 10 meters
@@ -130,15 +131,16 @@ namespace CrewChiefV4.iRacing
 
                 for (Int32 i = 0; i < trackPosition.Length; i++)
                 {
-                    if (trackPosition[i] > 0)
+                    Double currentTrackDistance = trackPosition[i] * this.trackLength;
+                    if (currentTrackDistance > 0)
                     {
                         // interpolate split border crossing
-                        currentSplitPointer = (Int32)Math.Floor((trackPosition[i] % 1) / splitLength);
+                        currentSplitPointer = (Int32)Math.Floor((currentTrackDistance % 1) / splitLength);
 
                         if (currentSplitPointer != splitPointer[i])
                         {
                             // interpolate
-                            Double distance = trackPosition[i] - (currentSplitPointer * splitLength);
+                            Double distance = currentTrackDistance - (currentSplitPointer * splitLength);
                             Double correction = distance / splitLength;
                             Double currentSplitTime = timestamp - ((timestamp - prevTimestamp) * correction);
                             Boolean newlap = false;
