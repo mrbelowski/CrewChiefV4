@@ -63,6 +63,13 @@ namespace CrewChiefV4.Events
         public static String folderRollingStartReminder = "frozen_order/thats_a_rolling_start";
         public static String folderStandingStartReminder = "frozen_order/thats_a_standing_start";
 
+        // Validation stuff:
+        private const string validateMessageTypeKey = "validateMessageTypeKey";
+        private const string validateMessageTypeAction = "validateMessageTypeAction";
+        private const string validationActionKey = "validationActionKey";
+        private const string validationAssignedPositionKey = "validationAssignedPositionKey";
+        private const string validationDriverToFollowKey = "validationDriverToFollowKey";
+
         public FrozenOrderMonitor(AudioPlayer audioPlayer)
         {
             this.audioPlayer = audioPlayer;
@@ -84,61 +91,33 @@ namespace CrewChiefV4.Events
          */
         public override bool isMessageStillValid(string eventSubType, GameStateData currentGameState, Dictionary<String, Object> validationData)
         {
-            /*if (base.isMessageStillValid(eventSubType, currentGameState, validationData))
+            if (base.isMessageStillValid(eventSubType, currentGameState, validationData))
             {
                 if (currentGameState.PitData.InPitlane)
-                {
                     return false;
-                }
-                if (validationData == null) {
+               
+                if (validationData == null)
                     return true;
-                }
-                if ((Boolean) validationData[isValidatingSectorMessage])
-                {                    
-                    int sectorIndex = (int)validationData[validationSectorNumberKey];
-                    FlagEnum sectorFlagWhenQueued = (FlagEnum)validationData[validationSectorFlagKey];
-                    if (lastSectorFlags[sectorIndex] == sectorFlagWhenQueued)
+               
+                if ((string)validationData[FrozenOrderMonitor.validateMessageTypeKey] == FrozenOrderMonitor.validateMessageTypeAction)
+                {
+                    var queuedAction = (FrozenOrderAction)validationData[FrozenOrderMonitor.validationActionKey];
+                    var queuedAssignedPosition = (int)validationData[FrozenOrderMonitor.validationAssignedPositionKey];
+                    var queuedDriverToFollow = (string)validationData[FrozenOrderMonitor.validationDriverToFollowKey];
+                    if (queuedAction == currentGameState.FrozenOrderData.Action
+                        && queuedAssignedPosition == currentGameState.FrozenOrderData.AssignedPosition
+                        && queuedDriverToFollow == currentGameState.FrozenOrderData.DriverToFollowRaw)
                     {
-                        lastSectorFlagsReported[sectorIndex] = sectorFlagWhenQueued;
-                        lastSectorFlagsReportedTime[sectorIndex] = currentGameState.Now;
-                        //Console.WriteLine("FLAG_DEBUG: transition to sector " + (sectorIndex + 1) + " " + sectorFlagWhenQueued + " is valid at " + currentGameState.Now.ToString("HH:mm:ss"));
                         return true;
                     }
                     else
                     {
-                        // reset the last reported flag and the time so we can report this flag transition when it's actually valid:
-                        lastSectorFlagsReported[sectorIndex] = sectorFlagWhenQueued == FlagEnum.YELLOW ? FlagEnum.GREEN : FlagEnum.YELLOW;
-                        lastSectorFlagsReportedTime[sectorIndex] = DateTime.MinValue;
-                        //Console.WriteLine("FLAG_DEBUG: transition to sector " + (sectorIndex + 1) + " " + sectorFlagWhenQueued + " is NOT valid at " + currentGameState.Now.ToString("HH:mm:ss"));
+                        Console.WriteLine(string.Format("FO: MESSAGE INVALIDATED.  WAS {0} {1} {2} IS {3} {4} {5}", queuedAction, queuedAssignedPosition, queuedDriverToFollow,
+                            currentGameState.FrozenOrderData.Action, currentGameState.FrozenOrderData.AssignedPosition, currentGameState.FrozenOrderData.DriverToFollowRaw));
                         return false;
                     }
                 }
-                else
-                {
-                    Boolean wasLocalYellow = (Boolean)validationData[validationIsLocalYellowKey];
-                    if (currentGameState.FlagData.isLocalYellow && wasLocalYellow)
-                    {
-                        hasReportedIsUnderLocalYellow = true;
-                        lastSectorFlagsReported[currentGameState.SessionData.SectorNumber - 1] = FlagEnum.YELLOW;
-                        lastSectorFlagsReportedTime[currentGameState.SessionData.SectorNumber - 1] = currentGameState.Now;
-                        //Console.WriteLine("FLAG_DEBUG: transition to local YELLOW is valid at " + currentGameState.Now.ToString("HH:mm:ss"));
-                        return true;
-                    }
-                    else if (!currentGameState.FlagData.isLocalYellow && !wasLocalYellow && !currentGameState.PitData.InPitlane)
-                    {
-                        hasReportedIsUnderLocalYellow = false;
-                        // don't change the local sector state to green here - it might remain yellow after we pass the incident
-                        // lastSectorFlagsReported[currentGameState.SessionData.SectorNumber - 1] = FlagEnum.GREEN;
-                        lastSectorFlagsReportedTime[currentGameState.SessionData.SectorNumber - 1] = currentGameState.Now;
-                        //Console.WriteLine("FLAG_DEBUG: transition to local GREEN is valid at " + currentGameState.Now.ToString("HH:mm:ss"));
-                        return true;
-                    }
-                    else
-                    {
-                       // Console.WriteLine("FLAG_DEBUG: transition to local " + (wasLocalYellow ? "YELLOW" : "GREEN") + " is NOT valid at " + currentGameState.Now.ToString("HH:mm:ss"));
-                    }
-                }
-            }*/
+            }
             return true;
         }
 
@@ -155,9 +134,6 @@ namespace CrewChiefV4.Events
 
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
-            /*
-            rolling\recording_2017-22-9--09-45-31.xml
-            */
             var cgs = currentGameState;
             var pgs = previousGameState;
             if (cgs.PitData.InPitlane /*|| cgs.SessionData.SessionRunningTime < 10 */
@@ -218,6 +194,12 @@ namespace CrewChiefV4.Events
                     this.currDriverToFollow = this.newDriverToFollow;
 
                     var usableDriverNameToFollow = shouldFollowSafetyCar ? driverToFollow : DriverNameHelper.getUsableDriverName(driverToFollow);
+
+                    var validationData = new Dictionary<string, object>();
+                    validationData.Add(FrozenOrderMonitor.validateMessageTypeKey, FrozenOrderMonitor.validationActionKey);
+                    validationData.Add(FrozenOrderMonitor.validationAssignedPositionKey, cfod.AssignedPosition);
+                    validationData.Add(FrozenOrderMonitor.validationDriverToFollowKey, cfod.DriverToFollowRaw);
+
                     if (this.newFrozenOrderAction == FrozenOrderAction.Follow
                         && prevDriverToFollow != this.currDriverToFollow)  // Don't announce Follow messages for the driver that we caught up to or allowed to pass.
                     {
@@ -226,7 +208,7 @@ namespace CrewChiefV4.Events
                         {
                             if (cfod.AssignedColumn == FrozenOrderColumn.None
                                 || this.random.Next(1, 10) > 8)  // Randomly, announce message without coulmn info.
-                                audioPlayer.playMessage(new QueuedMessage("frozen_order/follow_driver", MessageContents(folderFollow, driverToFollow), this.random.Next(0, 2), this));
+                                audioPlayer.playMessage(new QueuedMessage("frozen_order/follow_driver", MessageContents(folderFollow, driverToFollow), this.random.Next(0, 2), this, validationData));
                             else
                             {
                                 string columnName;
@@ -234,7 +216,7 @@ namespace CrewChiefV4.Events
                                     columnName = cfod.AssignedColumn == FrozenOrderColumn.Left ? folderInTheInsideColumn : folderInTheOutsideColumn;
                                 else
                                     columnName = cfod.AssignedColumn == FrozenOrderColumn.Left ? folderInTheLeftColumn : folderInTheRightColumn;
-                                audioPlayer.playMessage(new QueuedMessage("frozen_order/follow_driver", MessageContents(folderFollow, usableDriverNameToFollow, columnName), this.random.Next(0, 2), this));
+                                audioPlayer.playMessage(new QueuedMessage("frozen_order/follow_driver", MessageContents(folderFollow, usableDriverNameToFollow, columnName), this.random.Next(0, 2), this, validationData));
                             }
                         }
                     }
@@ -244,18 +226,18 @@ namespace CrewChiefV4.Events
                         if ((SoundCache.hasSuitableTTSVoice || SoundCache.availableDriverNames.Contains(usableDriverNameToFollow))
                             && this.random.Next(1, 10) > 2)  // Randomly, announce message without name.
                             audioPlayer.playMessage(new QueuedMessage("frozen_order/allow_driver_to_pass", 
-                                MessageContents(folderAllow, usableDriverNameToFollow, folderToPass), this.random.Next(1, 3), this));
+                                MessageContents(folderAllow, usableDriverNameToFollow, folderToPass), this.random.Next(1, 3), this, validationData));
                         else
-                            audioPlayer.playMessage(new QueuedMessage(folderYoureAheadOfAGuyYouShouldBeFollowing, this.random.Next(1, 3), this));
+                            audioPlayer.playMessage(new QueuedMessage(folderYoureAheadOfAGuyYouShouldBeFollowing, this.random.Next(1, 3), this, validationData));
                     }
                     else if (this.newFrozenOrderAction == FrozenOrderAction.CatchUp)
                     {
                         if ((SoundCache.hasSuitableTTSVoice || SoundCache.availableDriverNames.Contains(usableDriverNameToFollow))
                             && this.random.Next(1, 10) > 2)  // Randomly, announce message without name.
                             audioPlayer.playMessage(new QueuedMessage("frozen_order/allow_driver_to_pass", 
-                                MessageContents(folderCatchUpTo, usableDriverNameToFollow), this.random.Next(1, 3), this));
+                                MessageContents(folderCatchUpTo, usableDriverNameToFollow), this.random.Next(1, 3), this, validationData));
                         else
-                            audioPlayer.playMessage(new QueuedMessage(folderYouNeedToCatchUpToTheGuyAhead, this.random.Next(1, 3), this));
+                            audioPlayer.playMessage(new QueuedMessage(folderYouNeedToCatchUpToTheGuyAhead, this.random.Next(1, 3), this, validationData));
                     }
                 }
 
@@ -283,30 +265,36 @@ namespace CrewChiefV4.Events
                     this.currDriverToFollow = this.newDriverToFollow;
 
                     var usableDriverNameToFollow = shouldFollowSafetyCar ? driverToFollow : DriverNameHelper.getUsableDriverName(driverToFollow);
+
+                    var validationData = new Dictionary<string, object>();
+                    validationData.Add(FrozenOrderMonitor.validateMessageTypeKey, FrozenOrderMonitor.validationActionKey);
+                    validationData.Add(FrozenOrderMonitor.validationAssignedPositionKey, cfod.AssignedPosition);
+                    validationData.Add(FrozenOrderMonitor.validationDriverToFollowKey, cfod.DriverToFollowRaw);
+
                     if (this.newFrozenOrderAction == FrozenOrderAction.Follow
                         && prevDriverToFollow != this.currDriverToFollow)  // Don't announce Follow messages for the driver that we caught up to or allowed to pass.
                     {
                         // Follow messages are only meaningful if there's name to announce.
                         if (SoundCache.hasSuitableTTSVoice || SoundCache.availableDriverNames.Contains(usableDriverNameToFollow))
-                            audioPlayer.playMessage(new QueuedMessage("frozen_order/follow_driver", MessageContents(folderFollow, usableDriverNameToFollow), this.random.Next(0, 2), this));
+                            audioPlayer.playMessage(new QueuedMessage("frozen_order/follow_driver", MessageContents(folderFollow, usableDriverNameToFollow), this.random.Next(0, 2), this, validationData));
                     }
                     else if (this.newFrozenOrderAction == FrozenOrderAction.AllowToPass)
                     {
                         if ((SoundCache.hasSuitableTTSVoice || SoundCache.availableDriverNames.Contains(usableDriverNameToFollow))
                              && this.random.Next(1, 10) > 2)  // Randomly, announce message without name.
                             audioPlayer.playMessage(new QueuedMessage("frozen_order/allow_driver_to_pass", 
-                                MessageContents(folderAllow, usableDriverNameToFollow, folderToPass), this.random.Next(1, 3), this));
+                                MessageContents(folderAllow, usableDriverNameToFollow, folderToPass), this.random.Next(1, 3), this, validationData));
                         else
-                            audioPlayer.playMessage(new QueuedMessage(folderYoureAheadOfAGuyYouShouldBeFollowing, this.random.Next(1, 3), this));
+                            audioPlayer.playMessage(new QueuedMessage(folderYoureAheadOfAGuyYouShouldBeFollowing, this.random.Next(1, 3), this, validationData));
                     }
                     else if (this.newFrozenOrderAction == FrozenOrderAction.CatchUp)
                     {
                         if ((SoundCache.hasSuitableTTSVoice || SoundCache.availableDriverNames.Contains(usableDriverNameToFollow))
                              && this.random.Next(1, 10) > 2)  // Randomly, announce message without name.
                             audioPlayer.playMessage(new QueuedMessage("frozen_order/catch_up_to_driver", 
-                                MessageContents(folderCatchUpTo, usableDriverNameToFollow), this.random.Next(1, 3), this));
+                                MessageContents(folderCatchUpTo, usableDriverNameToFollow), this.random.Next(1, 3), this, validationData));
                         else
-                            audioPlayer.playMessage(new QueuedMessage(folderYouNeedToCatchUpToTheGuyAhead, this.random.Next(1, 3), this));
+                            audioPlayer.playMessage(new QueuedMessage(folderYouNeedToCatchUpToTheGuyAhead, this.random.Next(1, 3), this, validationData));
                     }
                 }
 
