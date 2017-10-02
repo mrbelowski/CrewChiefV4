@@ -214,7 +214,7 @@ namespace CrewChiefV4.rFactor2
                         var timeSinceWaitStarted = TimeSpan.FromTicks(DateTime.Now.Ticks - this.ticksWhenSessionEnded);
                         if (timeSinceWaitStarted.TotalMilliseconds < RF2GameStateMapper.waitForSessionEndMillis)
                         {
-                            if (this.sessionWaitMessageCounter % 5 == 0)
+                            if (this.sessionWaitMessageCounter % 10 == 0)
                                 Console.WriteLine("Abrupt Session End: continue session end wait.");
 
                             this.sessionWaitMessageCounter++;
@@ -1405,14 +1405,27 @@ namespace CrewChiefV4.rFactor2
             // --------------------------------
             // penalties data
             cgs.PenaltiesData.NumPenalties = playerScoring.mNumPenalties;
-            float lateralDistDiff = (float)(Math.Abs(playerScoring.mPathLateral) - Math.Abs(playerScoring.mTrackEdge));
-            cgs.PenaltiesData.IsOffRacingSurface = !cgs.PitData.InPitlane && lateralDistDiff >= 2;
-            float offTrackDistanceDelta = lateralDistDiff - this.distanceOffTrack;
-            this.distanceOffTrack = cgs.PenaltiesData.IsOffRacingSurface ? lateralDistDiff : 0;
-            this.isApproachingTrack = offTrackDistanceDelta < 0 && cgs.PenaltiesData.IsOffRacingSurface && lateralDistDiff < 3;
 
-            // improvised cut track warnings from pCars.
-            if (!cgs.PenaltiesData.IsOffRacingSurface && this.incrementCutTrackCountWhenLeavingRacingSurface)
+            var cutTrackByInvalidLapDetected = false;
+            // If lap state changed from valid to invalid, consider it due to cut track.
+            if (!cgs.PitData.OnOutLap
+                && pgs != null
+                && pgs.SessionData.CurrentLapIsValid
+                && !cgs.SessionData.CurrentLapIsValid
+                && !(cgs.SessionData.SessionType == SessionType.Race
+                    && (cgs.SessionData.SessionPhase == SessionPhase.Countdown
+                        || cgs.SessionData.SessionPhase == SessionPhase.Gridwalk)))
+            {
+                Console.WriteLine("Player off track: by an inalid lap.");
+                cgs.PenaltiesData.CutTrackWarnings = pgs.PenaltiesData.CutTrackWarnings + 1;
+                cutTrackByInvalidLapDetected = true;
+            }
+
+            // Improvised cut track warnings based on surface type.
+            if (this.incrementCutTrackCountWhenLeavingRacingSurface
+                && !cutTrackByInvalidLapDetected
+                && !cgs.PitData.InPitlane
+                && !cgs.PitData.OnOutLap)
             {
                 cgs.PenaltiesData.IsOffRacingSurface =
                     wheelFrontLeft.mSurfaceType != (int)rFactor2Constants.rF2SurfaceType.Dry && wheelFrontLeft.mSurfaceType != (int)rFactor2Constants.rF2SurfaceType.Wet
@@ -1427,25 +1440,23 @@ namespace CrewChiefV4.rFactor2
                 }
             }
 
-            if (!cgs.PitData.OnOutLap && pgs != null
-                && !pgs.PenaltiesData.IsOffRacingSurface && cgs.PenaltiesData.IsOffRacingSurface
-                && !(cgs.SessionData.SessionType == SessionType.Race && cgs.SessionData.SessionPhase == SessionPhase.Countdown))
+            // See if we're off track by distance.
+            if (!cutTrackByInvalidLapDetected
+                && !cgs.PenaltiesData.IsOffRacingSurface)
             {
-                Console.WriteLine("Player off track: by distance.");
-                cgs.PenaltiesData.CutTrackWarnings = pgs.PenaltiesData.CutTrackWarnings + 1;
-            }
+                float lateralDistDiff = (float)(Math.Abs(playerScoring.mPathLateral) - Math.Abs(playerScoring.mTrackEdge));
+                cgs.PenaltiesData.IsOffRacingSurface = !cgs.PitData.InPitlane && lateralDistDiff >= 2;
+                float offTrackDistanceDelta = lateralDistDiff - this.distanceOffTrack;
+                this.distanceOffTrack = cgs.PenaltiesData.IsOffRacingSurface ? lateralDistDiff : 0;
+                this.isApproachingTrack = offTrackDistanceDelta < 0 && cgs.PenaltiesData.IsOffRacingSurface && lateralDistDiff < 3;
 
-            // If lap state changed from valid to invalid, consider it due to cut track.
-            if (!cgs.PitData.OnOutLap
-                && pgs != null
-                && pgs.SessionData.CurrentLapIsValid
-                && !cgs.SessionData.CurrentLapIsValid
-                && !(cgs.SessionData.SessionType == SessionType.Race
-                    && (cgs.SessionData.SessionPhase == SessionPhase.Countdown 
-                        || cgs.SessionData.SessionPhase == SessionPhase.Gridwalk)))
-            {
-                Console.WriteLine("Player off track: by an inalid lap.");
-                cgs.PenaltiesData.CutTrackWarnings = pgs.PenaltiesData.CutTrackWarnings + 1;
+                if (!cgs.PitData.OnOutLap && pgs != null
+                    && !pgs.PenaltiesData.IsOffRacingSurface && cgs.PenaltiesData.IsOffRacingSurface
+                    && !(cgs.SessionData.SessionType == SessionType.Race && cgs.SessionData.SessionPhase == SessionPhase.Countdown))
+                {
+                    Console.WriteLine("Player off track: by distance.");
+                    cgs.PenaltiesData.CutTrackWarnings = pgs.PenaltiesData.CutTrackWarnings + 1;
+                }
             }
 
             // --------------------------------
