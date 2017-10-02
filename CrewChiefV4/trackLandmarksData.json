@@ -1238,7 +1238,8 @@
 		{
 			"pcarsTrackName": "Zolder:Grand Prix",
 			"raceroomLayoutId": 1684,
-			"rf2TrackNames": ["Zolder"],
+            "rf2TrackNames": [ "Zolder" ],
+            "irTrackName":   "zolder gp",
 			"trackLandmarks": [{
 					"landmarkName": "turn1",
 					"distanceRoundLapStart": 250,

@@ -23,10 +23,11 @@ namespace CrewChiefV4.iRacing
         }
 
         public int Position { get; set; }
+        public int TrackPosition { get; set; }
         public int ClassPosition { get; set; }
         public int Lap { get; private set; }
         public float LapDistance { get; private set; }
-
+        public float CorrectedLapDistance { get; private set; }
         public float TotalLapDistance
         {
             get { return Lap + LapDistance; }
@@ -54,7 +55,9 @@ namespace CrewChiefV4.iRacing
         public void ParseTelemetry(TelemetryInfo e)
         {
             this.Lap = e.CarIdxLap.Value[this.Driver.Id];
-            FixPercentagesOnLapChange(e.CarIdxLapDistPct.Value[this.Driver.Id]);
+            
+            this.LapDistance = e.CarIdxLapDistPct.Value[this.Driver.Id];
+            this.CorrectedLapDistance = FixPercentagesOnLapChange(e.CarIdxLapDistPct.Value[this.Driver.Id]);
             this.TrackSurface = e.CarIdxTrackSurface.Value[this.Driver.Id];
 
             this.Gear = e.CarIdxGear.Value[this.Driver.Id];
@@ -68,12 +71,14 @@ namespace CrewChiefV4.iRacing
         private double _prevSpeedUpdateDist;
 
         private int _prevLap;
-        private void FixPercentagesOnLapChange(float carIdxLapDistPct)
+        private float FixPercentagesOnLapChange(float carIdxLapDistPct)
         {
             if (this.Lap > _prevLap && carIdxLapDistPct > 0.80f)
-                this.LapDistance  = 0;
+                return 0;
             else
                 _prevLap = this.Lap;
+
+            return carIdxLapDistPct;
         }
 
         public void CalculateSpeed(TelemetryInfo current, double? trackLengthKm)

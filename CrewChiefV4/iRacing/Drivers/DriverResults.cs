@@ -123,17 +123,7 @@ namespace CrewChiefV4.iRacing
         
         public LaptimeCollection Laps { get; set; }
 
-        public Sector[] SectorTimes { get; set; }
         public Sector[] FakeSectorTimes { get; set; }
-
-        public string SectorsDisplay
-        {
-            get
-            {
-                if (SectorTimes == null || SectorTimes.Length == 0) return "-";
-                return string.Join(",  ", SectorTimes.Select(s => s.SectorTime == null || s.SectorTime.Value == 0 ? "0.00" : s.SectorTime.DisplayShort));
-            }
-        }
 
         public Sector FakeSector1
         {

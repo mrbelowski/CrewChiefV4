@@ -133,7 +133,6 @@ namespace CrewChiefV4.iRacing
             driver.Id = carIdx;
             driver.ParseStaticSessionInfo(info);
             driver.ParseDynamicSessionInfo(info);
-            Console.WriteLine(driver.Name);
             return driver;
         }
 
@@ -162,19 +161,12 @@ namespace CrewChiefV4.iRacing
 
         public void UpdateSectorTimes(Track track, TelemetryInfo telemetry)
         {
-            if (track == null) return;
-            if (track.Sectors.Count == 0) return;
+            if (track == null) 
+                return;
 
             var results = this.CurrentResults;
             if (results != null)
             {
-                var sectorcount = track.Sectors.Count;
-
-                // Set arrays
-                if (results.SectorTimes == null || results.SectorTimes.Length == 0)
-                {
-                    results.SectorTimes = track.Sectors.Select(s => s.Copy()).ToArray();
-                }
 
                 var p0 = _prevPos;
                 var p1 = telemetry.CarIdxLapDistPct.Value[this.Id];
@@ -196,33 +188,8 @@ namespace CrewChiefV4.iRacing
                     p0 -= 1;
                 }
                     
-                // Check all real sectors
-                foreach (var s in results.SectorTimes)
-                {
-                    if (p1 > s.StartPercentage && p0 <= s.StartPercentage)
-                    {
-                        // Crossed into new sector
-                        var crossTime = (float)(t - (p1 - s.StartPercentage) * dp);
-
-                        // Finish previous
-                        var prevNum = s.Number <= 0 ? sectorcount - 1 : s.Number - 1;
-                        var sector = results.SectorTimes[prevNum];
-                        if (sector != null && sector.EnterSessionTime > 0)
-                        {
-                            sector.SectorTime = new Laptime((float)(crossTime - sector.EnterSessionTime));
-                        }
-
-                        // Begin next sector
-                        s.EnterSessionTime = crossTime;
-
-                        this.Live.CurrentSector = s.Number;
-
-                        break;
-                    }
-                }
-
                 // Check 'fake' sectors (divide track into thirds)
-                sectorcount = 3;
+                int sectorcount = 3;
                 foreach (var s in results.FakeSectorTimes)
                 {
                     if (p1 > s.StartPercentage && p0 <= s.StartPercentage)

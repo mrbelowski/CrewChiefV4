@@ -289,6 +289,16 @@ namespace CrewChiefV4.iRacing
                     driver.Live.Position = pos;
                     pos++;
                 }
+                pos = 1;
+                foreach (var driver in _drivers.OrderBy(d => d.Live.LapDistance))
+                {
+                    if (driver.Live.LapDistance < 0)
+                    {
+                        continue;
+                    }
+                    driver.Live.TrackPosition = pos;
+                    pos++;
+                }
             }
             else
             {
@@ -299,6 +309,19 @@ namespace CrewChiefV4.iRacing
                         _leader = driver;
                     driver.Live.Position = driver.Results.Current.Position;
                 }
+
+                // Determine live position from lapdistance
+                int pos = 1;
+                foreach (var driver in _drivers.OrderBy(d => d.Live.LapDistance))
+                {
+                    if(driver.Live.LapDistance < 0 )
+                    {
+                        continue;
+                    }
+                    driver.Live.TrackPosition = pos;
+                    pos++;
+                }
+
             }
 
             // Determine live class position from live positions and class
