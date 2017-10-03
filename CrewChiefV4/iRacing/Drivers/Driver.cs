@@ -201,8 +201,9 @@ namespace CrewChiefV4.iRacing
                         
                         var prevNum = s.Number <= 0 ? sectorcount - 1 : s.Number - 1;
                         var sector = results.FakeSectorTimes[prevNum];
-                        if (s.Number == 0 && sector != null && sector.EnterSessionTime > 0)
+                        if (s.Number == 0 && sector != null && sector.EnterSessionTime > 0 && results.FakeSector1.EnterSessionTime > 0)
                         {
+
                           this.Live.LastLaptime = (float)(crossTime - results.FakeSector1.EnterSessionTime);
 
                         }
@@ -212,9 +213,7 @@ namespace CrewChiefV4.iRacing
                         }
 
                         // Begin next sector
-                        s.EnterSessionTime = crossTime;
-                        
-
+                        s.EnterSessionTime = crossTime;                        
                         this.Live.CurrentFakeSector = s.Number;
 
                         break;
