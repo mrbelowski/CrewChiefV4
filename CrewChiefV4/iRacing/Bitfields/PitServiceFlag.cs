@@ -5,14 +5,6 @@ using System.Text;
 
 namespace CrewChiefV4.iRacing
 {
-    class PitServiceFlag : BitfieldBase<PitServiceFlags>
-    {
-        public PitServiceFlag() : this(0) { }
-
-        public PitServiceFlag(int value) : base(value)
-        { }
-    }
-
     [Flags]
     public enum PitServiceFlags : uint
     {
