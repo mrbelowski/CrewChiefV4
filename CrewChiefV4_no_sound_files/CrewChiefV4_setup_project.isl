@@ -1945,6 +1945,7 @@
 		<col def="S255">ISBuildSourcePath</col>
 		<col def="I4">ISAttributes</col>
 		<col def="S72">ISComponentSubFolder_</col>
+		<row><td>CrewChiefV4.primary_output</td><td>CrewChiefV4.Primary_output</td><td>CrewChiefV4.Primary output</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;CrewChiefV4&gt;|Built</td><td>3</td><td/></row>
 		<row><td>_ctypes.pyd</td><td>ISX_DEFAULTCOMPONENT6</td><td>_ctypes.pyd</td><td>0</td><td/><td/><td/><td>1</td><td>C:\projects\crewchief_c_sharp\CrewChiefV4\CrewChiefV4\plugins\assettocorsa\apps\python\CrewChiefEx\stdlib\_ctypes.pyd</td><td>1</td><td/></row>
 		<row><td>_ctypes.pyd1</td><td>ISX_DEFAULTCOMPONENT7</td><td>_ctypes.pyd</td><td>0</td><td/><td/><td/><td>1</td><td>C:\projects\crewchief_c_sharp\CrewChiefV4\CrewChiefV4\plugins\assettocorsa\apps\python\CrewChiefEx\stdlib64\_ctypes.pyd</td><td>1</td><td/></row>
 		<row><td>acinternalmemoryreader.dll</td><td>ACInternalMemoryReader.dll</td><td>ACINTE~1.DLL|ACInternalMemoryReader.dll</td><td>0</td><td/><td/><td/><td>1</td><td>C:\projects\crewchief_c_sharp\CrewChiefV4\CrewChiefV4\plugins\assettocorsa\apps\python\CrewChiefEx\stdlib64\ACInternalMemoryReader.dll</td><td>1</td><td/></row>
