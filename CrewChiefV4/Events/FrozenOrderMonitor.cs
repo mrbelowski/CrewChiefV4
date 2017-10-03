@@ -204,7 +204,7 @@ namespace CrewChiefV4.Events
                         && prevDriverToFollow != this.currDriverToFollow)  // Don't announce Follow messages for the driver that we caught up to or allowed to pass.
                     {
                         // Follow messages are only meaningful if there's name to announce.
-                        if (SoundCache.hasSuitableTTSVoice || SoundCache.availableDriverNames.Contains(usableDriverNameToFollow))
+                        if (shouldFollowSafetyCar || SoundCache.hasSuitableTTSVoice || SoundCache.availableDriverNames.Contains(usableDriverNameToFollow))
                         {
                             if (cfod.AssignedColumn == FrozenOrderColumn.None
                                 || this.random.Next(1, 10) > 8)  // Randomly, announce message without coulmn info.
@@ -223,7 +223,7 @@ namespace CrewChiefV4.Events
                     else if (this.newFrozenOrderAction == FrozenOrderAction.AllowToPass)
                     {
                         // Follow messages are only meaningful if there's name to announce.
-                        if ((SoundCache.hasSuitableTTSVoice || SoundCache.availableDriverNames.Contains(usableDriverNameToFollow))
+                        if ((shouldFollowSafetyCar || SoundCache.hasSuitableTTSVoice || SoundCache.availableDriverNames.Contains(usableDriverNameToFollow))
                             && this.random.Next(1, 10) > 2)  // Randomly, announce message without name.
                             audioPlayer.playMessage(new QueuedMessage("frozen_order/allow_driver_to_pass", 
                                 MessageContents(folderAllow, usableDriverNameToFollow, folderToPass), this.random.Next(1, 3), this, validationData));
@@ -275,12 +275,12 @@ namespace CrewChiefV4.Events
                         && prevDriverToFollow != this.currDriverToFollow)  // Don't announce Follow messages for the driver that we caught up to or allowed to pass.
                     {
                         // Follow messages are only meaningful if there's name to announce.
-                        if (SoundCache.hasSuitableTTSVoice || SoundCache.availableDriverNames.Contains(usableDriverNameToFollow))
+                        if (shouldFollowSafetyCar || SoundCache.hasSuitableTTSVoice || SoundCache.availableDriverNames.Contains(usableDriverNameToFollow))
                             audioPlayer.playMessage(new QueuedMessage("frozen_order/follow_driver", MessageContents(folderFollow, usableDriverNameToFollow), this.random.Next(0, 2), this, validationData));
                     }
                     else if (this.newFrozenOrderAction == FrozenOrderAction.AllowToPass)
                     {
-                        if ((SoundCache.hasSuitableTTSVoice || SoundCache.availableDriverNames.Contains(usableDriverNameToFollow))
+                        if ((shouldFollowSafetyCar || SoundCache.hasSuitableTTSVoice || SoundCache.availableDriverNames.Contains(usableDriverNameToFollow))
                              && this.random.Next(1, 10) > 2)  // Randomly, announce message without name.
                             audioPlayer.playMessage(new QueuedMessage("frozen_order/allow_driver_to_pass", 
                                 MessageContents(folderAllow, usableDriverNameToFollow, folderToPass), this.random.Next(1, 3), this, validationData));
@@ -289,7 +289,7 @@ namespace CrewChiefV4.Events
                     }
                     else if (this.newFrozenOrderAction == FrozenOrderAction.CatchUp)
                     {
-                        if ((SoundCache.hasSuitableTTSVoice || SoundCache.availableDriverNames.Contains(usableDriverNameToFollow))
+                        if ((shouldFollowSafetyCar || SoundCache.hasSuitableTTSVoice || SoundCache.availableDriverNames.Contains(usableDriverNameToFollow))
                              && this.random.Next(1, 10) > 2)  // Randomly, announce message without name.
                             audioPlayer.playMessage(new QueuedMessage("frozen_order/catch_up_to_driver", 
                                 MessageContents(folderCatchUpTo, usableDriverNameToFollow), this.random.Next(1, 3), this, validationData));
