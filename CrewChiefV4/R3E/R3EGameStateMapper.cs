@@ -549,14 +549,6 @@ namespace CrewChiefV4.RaceRoom
                     {
                         if (participantStruct.TrackSector == 1)
                         {
-                            // if the player's sector time is invalidated the game won't update SectorTimePreviousSelf so if the reported time is identical
-                            // to the previous time assume it's an invalid sector:
-                            if (currentGameState.SessionData.CurrentLapIsValid && 
-                                participantStruct.SectorTimePreviousSelf.Sector3 == currentGameState.SessionData.LastSector3Time)
-                            {
-                                currentGameState.SessionData.CurrentLapIsValid = false;
-                            }
-
                             if (currentGameState.SessionData.SessionTimesAtEndOfSectors[3] != -1)
                             {
                                 currentGameState.SessionData.LapTimePreviousEstimateForInvalidLap = currentGameState.SessionData.SessionRunningTime - currentGameState.SessionData.SessionTimesAtEndOfSectors[3];
@@ -586,14 +578,6 @@ namespace CrewChiefV4.RaceRoom
                         }
                         else if (participantStruct.TrackSector == 2)
                         {
-                            // if the player's sector time is invalidated the game won't update SectorTimePreviousSelf so if the reported time is identical
-                            // to the previous time assume it's an invalid sector:
-                            if (currentGameState.SessionData.CurrentLapIsValid &&
-                                participantStruct.SectorTimePreviousSelf.Sector1 == currentGameState.SessionData.LastSector1Time)
-                            {
-                                currentGameState.SessionData.CurrentLapIsValid = false;
-                            }
-
                             currentGameState.SessionData.SessionTimesAtEndOfSectors[1] = currentGameState.SessionData.SessionRunningTime;
                             if (participantStruct.SectorTimeCurrentSelf.Sector1 > 0 && currentGameState.SessionData.CurrentLapIsValid)
                             {
@@ -610,14 +594,6 @@ namespace CrewChiefV4.RaceRoom
                         }
                         else if (participantStruct.TrackSector == 3)
                         {
-                            // if the player's sector time is invalidated the game won't update SectorTimePreviousSelf so if the reported time is identical
-                            // to the previous time assume it's an invalid sector:
-                            if (currentGameState.SessionData.CurrentLapIsValid &&
-                                participantStruct.SectorTimePreviousSelf.Sector2 == currentGameState.SessionData.LastSector2Time)
-                            {
-                                currentGameState.SessionData.CurrentLapIsValid = false;
-                            }
-
                             currentGameState.SessionData.SessionTimesAtEndOfSectors[2] = currentGameState.SessionData.SessionRunningTime;
                             if (participantStruct.SectorTimeCurrentSelf.Sector2 > 0 && participantStruct.SectorTimeCurrentSelf.Sector1 > 0 &&
                                  currentGameState.SessionData.CurrentLapIsValid)
