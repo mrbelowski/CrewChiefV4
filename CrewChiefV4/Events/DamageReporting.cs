@@ -76,6 +76,8 @@ namespace CrewChiefV4.Events
 
         private static float punctureThreshold = 30f; // about 5psi
 
+        private Component componentDestroyed = Component.NONE;
+
         private enum Component
         {
             ENGINE, TRANNY, AERO, SUSPENSION, BRAKES, NONE
@@ -99,6 +101,7 @@ namespace CrewChiefV4.Events
             reportedDamagesLevels.Clear();
             minDamageToReport = DamageLevel.TRIVIAL;
             nextPunctureCheck = DateTime.Now + timeToWaitForDamageToSettle;
+            componentDestroyed = Component.NONE;
         }
 
         private Boolean hasBeenReported(Component component, DamageLevel damageLevel)
@@ -196,6 +199,7 @@ namespace CrewChiefV4.Events
                 if (currentGameState.CarDamageData.BrakeDamageStatus.hasValueAtLevel(DamageLevel.DESTROYED))
                 {
                     maxBrakeDamage = DamageLevel.DESTROYED;
+                    componentDestroyed = Component.BRAKES;
                 }
                 else if (currentGameState.CarDamageData.BrakeDamageStatus.hasValueAtLevel(DamageLevel.MAJOR))
                 {
@@ -213,6 +217,7 @@ namespace CrewChiefV4.Events
                 if (currentGameState.CarDamageData.SuspensionDamageStatus.hasValueAtLevel(DamageLevel.DESTROYED))
                 {
                     maxSuspensionDamage = DamageLevel.DESTROYED;
+                    componentDestroyed = Component.SUSPENSION;
                 }
                 else if (currentGameState.CarDamageData.SuspensionDamageStatus.hasValueAtLevel(DamageLevel.MAJOR))
                 {
@@ -492,11 +497,18 @@ namespace CrewChiefV4.Events
                     audioPlayer.disablePearlsOfWisdom = true;
                 }
             }
+            if (componentDestroyed != Component.NONE  // If there is any component already destroyed
+                && damageToReportNext.Item1 != componentDestroyed)  // And it is not the current component
+            {
+                // Do not play any message, because it does not matter if Aero is minor after suspension is damaged.
+                Console.WriteLine(string.Format("Not reporting damage {0} for {1} because {2} is already destroyed", damageToReportNext.Item2, damageToReportNext.Item1, componentDestroyed));
+                return;
+            }
             if (damageToReportNext.Item1 == Component.ENGINE)
             {
                 if (damageToReportNext.Item2 == DamageLevel.DESTROYED)
                 {
-                    audioPlayer.playMessage(new QueuedMessage(folderBustedEngine, 0, this));                    
+                    audioPlayer.playMessage(new QueuedMessage(folderBustedEngine, 0, this));
                 }
                 else if (damageToReportNext.Item2 == DamageLevel.MAJOR)
                 {
