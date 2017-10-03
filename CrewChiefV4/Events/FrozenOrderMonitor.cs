@@ -24,11 +24,11 @@ namespace CrewChiefV4.Events
 
         // Last FO Action and Driver name announced.
         private FrozenOrderAction currFrozenOrderAction = FrozenOrderAction.None;
-        private string currDriverToFollow = "";
+        private string currDriverToFollow = null;
 
         // Next FO Action and Driver to be announced if it stays stable for a ACTION_STABLE_THRESHOLD times.
         private FrozenOrderAction newFrozenOrderAction = FrozenOrderAction.None;
-        private string newDriverToFollow = "";
+        private string newDriverToFollow = null;
 
         private bool formationStandingStartAnnounced = false;
         private bool formationStandingPreStartReminderAnnounced = false;
@@ -127,9 +127,9 @@ namespace CrewChiefV4.Events
             this.formationStandingPreStartReminderAnnounced = false;
             this.numUpdatesActionSame = 0;
             this.newFrozenOrderAction = FrozenOrderAction.None;
-            this.newDriverToFollow = "";
+            this.newDriverToFollow = null;
             this.currFrozenOrderAction = FrozenOrderAction.None;
-            this.currDriverToFollow = "";
+            this.currDriverToFollow = null;
         }
 
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
