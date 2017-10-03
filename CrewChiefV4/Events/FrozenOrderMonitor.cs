@@ -208,7 +208,7 @@ namespace CrewChiefV4.Events
                         {
                             if (cfod.AssignedColumn == FrozenOrderColumn.None
                                 || this.random.Next(1, 10) > 8)  // Randomly, announce message without coulmn info.
-                                audioPlayer.playMessage(new QueuedMessage("frozen_order/follow_driver", MessageContents(folderFollow, driverToFollow), this.random.Next(0, 2), this, validationData));
+                                audioPlayer.playMessage(new QueuedMessage("frozen_order/follow_driver", MessageContents(folderFollow, usableDriverNameToFollow), this.random.Next(0, 2), this, validationData));
                             else
                             {
                                 string columnName;
