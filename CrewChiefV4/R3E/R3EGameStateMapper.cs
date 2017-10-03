@@ -1553,8 +1553,17 @@ namespace CrewChiefV4.RaceRoom
                 {
                     if (opponentData.OpponentLapData.Count > 0)
                     {
-                        opponentData.CompleteLapWithProvidedLapTime(racePosition, sessionRunningTime, completedLapTime,
-                            lapIsValid && validSpeed, false, 20, 20, sessionLengthIsTime, sessionTimeRemaining, 3);
+                        // if the opponent hasn't set a valid time, the game will not update the lastSector3Time, so we check to see if this has changed - 
+                        // if it's identical to the previous time, assume it's invalid
+                        if (opponentData.LastLapTime == completedLapTime)
+                        {
+                            lapIsValid = false;
+                        }
+                        else
+                        {
+                            opponentData.CompleteLapWithProvidedLapTime(racePosition, sessionRunningTime, completedLapTime,
+                                lapIsValid && validSpeed, false, 20, 20, sessionLengthIsTime, sessionTimeRemaining, 3);
+                        }
                     }
                     opponentData.StartNewLap(completedLaps + 1, racePosition, isInPits, sessionRunningTime, false, 20, 20);
                     opponentData.IsNewLap = true;
