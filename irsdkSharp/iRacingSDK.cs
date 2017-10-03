@@ -180,8 +180,15 @@ namespace iRSDKSharp
         {
             IsInitialized = false;
             Header = null;
-            FileMapView.Dispose();
-            iRacingFile.Dispose();
+            if (FileMapView != null)
+            {
+                FileMapView.Dispose();
+            }
+            if (iRacingFile != null)
+            {
+                iRacingFile.Dispose();
+            }
+            
         }
 
         IntPtr GetBroadcastMessageID()

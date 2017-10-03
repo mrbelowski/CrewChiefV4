@@ -16,7 +16,7 @@ namespace CrewChiefV4.iRacing
             get { return _instance ?? (_instance = new Sim()); }
         }*/
 
-        private TelemetryInfo _telemetry;
+        private iRacingData _telemetry;
         private SessionInfo _sessionInfo;
 
         private bool _mustUpdateSessionData, _mustReloadDrivers;
@@ -39,7 +39,7 @@ namespace CrewChiefV4.iRacing
         private int? _currentSessionNumber;
         public int? CurrentSessionNumber { get { return _currentSessionNumber; } }
 
-        public TelemetryInfo Telemetry { get { return _telemetry; } }
+        public iRacingData Telemetry { get { return _telemetry; } }
         public SessionInfo SessionInfo { get { return _sessionInfo; } }
 
         private SessionData _sessionData;
@@ -134,7 +134,7 @@ namespace CrewChiefV4.iRacing
                         e.PreviousDriverName = oldName;
                         e.CurrentDriverId = driver.Id;
                         e.CurrentDriverName = driver.Name;
-                        e.SessionTime = _telemetry.SessionTime.Value;
+                        e.SessionTime = _telemetry.SessionTime;
                         e.Lap = driver.Live.Lap;
 
                         this.OnRaceEvent(e);
@@ -226,7 +226,7 @@ namespace CrewChiefV4.iRacing
                         {
                             var e = new NewLeaderRaceEvent();
                             e.Driver = driver;
-                            e.SessionTime = _telemetry.SessionTime.Value;
+                            e.SessionTime = _telemetry.SessionTime;
                             e.Lap = driver.Live.Lap;
 
                             this.OnRaceEvent(e);
@@ -239,7 +239,7 @@ namespace CrewChiefV4.iRacing
                             var e = new BestLapRaceEvent();
                             e.Driver = driver;
                             e.BestLap = bestlap;
-                            e.SessionTime = _telemetry.SessionTime.Value;
+                            e.SessionTime = _telemetry.SessionTime;
                             e.Lap = driver.Live.Lap;
 
                             this.OnRaceEvent(e);
@@ -255,7 +255,7 @@ namespace CrewChiefV4.iRacing
             _mustReloadDrivers = true;
         }
 
-        private void UpdateDriverTelemetry(TelemetryInfo info)
+        private void UpdateDriverTelemetry(iRacingData info)
         {
             // If currently updating list, no need to update telemetry info 
             if (_isUpdatingDrivers) return;
@@ -272,7 +272,7 @@ namespace CrewChiefV4.iRacing
             this.UpdateTimeDelta();
         }
 
-        private void CalculateLivePositions(TelemetryInfo info)
+        private void CalculateLivePositions(iRacingData info)
         {
             // In a race that is not yet in checkered flag mode,
             // Live positions are determined from track position (total lap distance)
@@ -348,7 +348,7 @@ namespace CrewChiefV4.iRacing
             if (_timeDelta == null) return;
 
             // Update the positions of all cars
-            _timeDelta.Update(_telemetry.SessionTime.Value, _telemetry.CarIdxLapDistPct.Value);
+            _timeDelta.Update(_telemetry.SessionTime, _telemetry.CarIdxLapDistPct);
 
             // Order drivers by live position
             var drivers = _drivers.OrderBy(d => d.Live.Position).ToList();
@@ -397,7 +397,7 @@ namespace CrewChiefV4.iRacing
             }
         }
 
-        private void CheckSessionFlagUpdates(SessionFlag prevFlags, SessionFlag curFlags)
+        private void CheckSessionFlagUpdates(SessionFlags prevFlags, SessionFlags curFlags)
         {
             if (prevFlags == null || curFlags == null) return;
 
@@ -405,21 +405,21 @@ namespace CrewChiefV4.iRacing
             var green = SessionFlags.Green;
             var yellow = SessionFlags.Caution;
 
-            bool isGreen = !prevFlags.Contains(go) && curFlags.Contains(go) 
-                || !prevFlags.Contains(green) && curFlags.Contains(green);
+            bool isGreen = !prevFlags.HasFlag(go) && curFlags.HasFlag(go)
+                || !prevFlags.HasFlag(green) && curFlags.HasFlag(green);
 
             if (isGreen)
             {
                 var e=  new GreenFlagRaceEvent();
-                e.SessionTime = _telemetry.SessionTime.Value;
+                e.SessionTime = _telemetry.SessionTime;
                 e.Lap = Leader == null ? 0 : Leader.Live.Lap;
                 this.OnRaceEvent(e);
             }
 
-            if (!prevFlags.Contains(yellow) && curFlags.Contains(yellow))
+            if (!prevFlags.HasFlag(yellow) && curFlags.HasFlag(yellow))
             {
                 var e = new YellowFlagRaceEvent();
-                e.SessionTime = _telemetry.SessionTime.Value;
+                e.SessionTime = _telemetry.SessionTime;
                 e.Lap = Leader == null ? 0 : Leader.Live.Lap;
                 this.OnRaceEvent(e);
             }
@@ -470,16 +470,15 @@ namespace CrewChiefV4.iRacing
             this.UpdateDriverList(sessionInfo);
         }
 
-        public void SdkOnTelemetryUpdated(TelemetryInfo telemetry)
+        public void SdkOnTelemetryUpdated(iRacingData telemetry)
         {
             // Cache info
             
             _telemetry = telemetry;
 
-            _isReplay = telemetry.IsReplayPlaying.Value;
 
             // Check if session changed
-            if (_currentSessionNumber == null || (_currentSessionNumber.Value != telemetry.SessionNum.Value))
+            if (_currentSessionNumber == null || (_currentSessionNumber.Value != telemetry.SessionNum))
             {
                 _mustUpdateSessionData = true;
 
@@ -488,14 +487,14 @@ namespace CrewChiefV4.iRacing
             }
 
             // Store current session number
-            _currentSessionNumber = telemetry.SessionNum.Value;
+            _currentSessionNumber = telemetry.SessionNum;
 
             // Get previous state
             var sessionWasFinished = this.SessionData.IsFinished;
             var prevFlags = this.SessionData.Flags;
 
             // Update session state
-            _sessionData.UpdateState(telemetry.SessionState.Value);
+            _sessionData.UpdateState(telemetry.SessionState);
 
             // Update drivers telemetry
             this.UpdateDriverTelemetry(telemetry);
@@ -516,7 +515,7 @@ namespace CrewChiefV4.iRacing
                 {
                     var ev = new WinnerRaceEvent();
                     ev.Driver = winner;
-                    ev.SessionTime = _telemetry.SessionTime.Value;
+                    ev.SessionTime = _telemetry.SessionTime;
                     ev.Lap = winner.Live.Lap;
                     this.OnRaceEvent(ev);
                 }

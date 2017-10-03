@@ -147,19 +147,19 @@ namespace CrewChiefV4.iRacing
             this.QualyResults.ParseYaml(query, position);
         }
 
-        internal void UpdateLiveInfo(TelemetryInfo e)
+        internal void UpdateLiveInfo(iRacingData e)
         {
             this.Live.ParseTelemetry(e);
         }
 
-        internal void UpdatePrivateInfo(TelemetryInfo e)
+        internal void UpdatePrivateInfo(iRacingData e)
         {
             this.Private.ParseTelemetry(e);
         }
 
         private double _prevPos;
 
-        public void UpdateSectorTimes(Track track, TelemetryInfo telemetry)
+        public void UpdateSectorTimes(Track track, iRacingData telemetry)
         {
             if (track == null) 
                 return;
@@ -169,7 +169,7 @@ namespace CrewChiefV4.iRacing
             {
 
                 var p0 = _prevPos;
-                var p1 = telemetry.CarIdxLapDistPct.Value[this.Id];
+                var p1 = telemetry.CarIdxLapDistPct[this.Id];
                 var dp = p1 - p0;
 
                 if (p1 < -0.5)
@@ -178,7 +178,7 @@ namespace CrewChiefV4.iRacing
                     return;
                 }
 
-                var t = telemetry.SessionTime.Value;
+                var t = telemetry.SessionTime;
                 
                 // Check lap crossing
                 if (p0 - p1 > 0.5) // more than 50% jump in track distance == lap crossing occurred from 0.99xx -> 0.00x

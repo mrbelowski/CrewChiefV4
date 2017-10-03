@@ -87,15 +87,15 @@ namespace CrewChiefV4.iRacing
             this.Laps = new LaptimeCollection();
             this.IsEmpty = true;
             this.FastestLap = -1;
-            Laptime defaultLaptime = new Laptime(int.MaxValue);
+            Laptime defaultLaptime = new Laptime(-1);
             this.Time = defaultLaptime;
             this.LastTime = defaultLaptime;
             this.AverageTime = defaultLaptime;
             this.FakeSectorTimes = new[]
                     {
-                        new Sector() {Number = 0, StartPercentage = 0f},
-                        new Sector() {Number = 1, StartPercentage = 0.333f},
-                        new Sector() {Number = 2, StartPercentage = 0.666f}
+                        new Sector() {Number = 0, StartPercentage = 0f, EnterSessionTime = -1},
+                        new Sector() {Number = 1, StartPercentage = 0.333f, EnterSessionTime = -1},
+                        new Sector() {Number = 2, StartPercentage = 0.666f, EnterSessionTime = -1}
                     };
         }
 

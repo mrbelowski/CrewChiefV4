@@ -37,7 +37,7 @@ namespace CrewChiefV4.iRacing
         public Dictionary<int, BestLap> ClassBestLaps { get; set; }
         public BestLap OverallBestLap { get; set; }
 
-        public SessionFlag Flags { get; set; }
+        public SessionFlags Flags { get; set; }
         public SessionStates State { get; set; }
 
         /// <summary>
@@ -75,11 +75,11 @@ namespace CrewChiefV4.iRacing
             this.RaceTime = time;
         }
 
-        public void Update(TelemetryInfo telemetry)
+        public void Update(iRacingData telemetry)
         {
-            this.SessionTime = telemetry.SessionTime.Value;
-            this.TimeRemaining = telemetry.SessionTimeRemain.Value;
-            this.Flags = telemetry.SessionFlags.Value;
+            this.SessionTime = telemetry.SessionTime;
+            this.TimeRemaining = telemetry.SessionTimeRemain;
+            this.Flags = telemetry.SessionFlags;
         }
 
         public void UpdateState(SessionStates state)
@@ -103,6 +103,8 @@ namespace CrewChiefV4.iRacing
                 DefaultLap.LapNumber = 0;
                 this.OverallBestLap = new BestLap(DefaultLap, driver);
             }
+
+
             if (lap.Value > 0 && this.ClassBestLaps[classId].Laptime.Value > lap.Value)
             {
                 var bestlap = new BestLap(lap, driver);
