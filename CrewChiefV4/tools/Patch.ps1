@@ -38,7 +38,10 @@ echo "Patching main CC install"
 echo ""
 
 MirrorDirectory $rootPath\"plugins" $ccLayoutMainPath"\plugins"
-MirrorDirectory $rootPath\"sounds" $env:LOCALAPPDATA"\CrewChiefV4\sounds"
+MirrorDirectory $rootPath\"sounds\background_sounds" $env:LOCALAPPDATA"\CrewChiefV4\sounds\background_sounds"
+MirrorDirectory $rootPath\"sounds\driver_names" $env:LOCALAPPDATA"\CrewChiefV4\sounds\driver_names"
+MirrorDirectory $rootPath\"sounds\fx" $env:LOCALAPPDATA"\CrewChiefV4\sounds\fx"
+MirrorDirectory $rootPath\"sounds\voice" $env:LOCALAPPDATA"\CrewChiefV4\sounds\voice"
 
 OverwriteFile $releaseBinPath\"CrewChiefV4.exe" $ccLayoutMainPath
 OverwriteFile $releaseBinPath\"CrewChiefV4.exe.config" $ccLayoutMainPath
