@@ -93,9 +93,9 @@ namespace CrewChiefV4.iRacing
             this.AverageTime = defaultLaptime;
             this.FakeSectorTimes = new[]
                     {
-                        new Sector() {Number = 0, StartPercentage = 0f, EnterSessionTime = -1},
-                        new Sector() {Number = 1, StartPercentage = 0.333f, EnterSessionTime = -1},
-                        new Sector() {Number = 2, StartPercentage = 0.666f, EnterSessionTime = -1}
+                        new Sector() {Number = 0, StartPercentage = 0f},
+                        new Sector() {Number = 1, StartPercentage = 0.333f},
+                        new Sector() {Number = 2, StartPercentage = 0.666f}
                     };
         }
 

@@ -85,9 +85,8 @@ namespace CrewChiefV4.iRacing
                 SessionInfo sessionInfo = new SessionInfo(structDumpWrapperData.data.sessionInfo, (double)structDumpWrapperData.data.SessionTime);
                 sim.SdkOnSessionInfoUpdated(sessionInfo, structDumpWrapperData.data.SessionNum, structDumpWrapperData.data.PlayerCarIdx);
                 sim.SdkOnTelemetryUpdated(structDumpWrapperData.data);  
-                
-                dataReadFromFileIndex++;
                 iRacingStructWrapper structWrapperData = new iRacingStructWrapper() { data = sim, ticksWhenRead = structDumpWrapperData.ticksWhenRead };
+                dataReadFromFileIndex++;
 
                 return structWrapperData;
             }
@@ -109,6 +108,8 @@ namespace CrewChiefV4.iRacing
                 {
                     try
                     {
+                        sdk.Shutdown();
+
                         if(!sdk.IsInitialized)
                         {
                             sdk.Startup();
@@ -207,7 +208,8 @@ namespace CrewChiefV4.iRacing
         public override void Dispose()
         {
             lock (this)
-            {                
+            {
+                sim.Reset();
                 sdk.Shutdown();
                 initialised = false;
                 Console.WriteLine("Disconnected from iRacing Shared Memory");
