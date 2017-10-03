@@ -29,10 +29,6 @@ namespace CrewChiefV4.iRacing
             return sdk.GetData(headerName);
         }
 
-        public TelemetryValue<T> GetTelemetryValue<T>(string name)
-        {
-            return new TelemetryValue<T>(sdk, name);
-        }
         private object TryGetSessionNum()
         {
             try
