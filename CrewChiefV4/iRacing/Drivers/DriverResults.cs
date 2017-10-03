@@ -87,7 +87,7 @@ namespace CrewChiefV4.iRacing
             this.Laps = new LaptimeCollection();
             this.IsEmpty = true;
             this.FastestLap = -1;
-            Laptime defaultLaptime = new Laptime(-1);
+            Laptime defaultLaptime = new Laptime(Int32.MaxValue);
             this.Time = defaultLaptime;
             this.LastTime = defaultLaptime;
             this.AverageTime = defaultLaptime;

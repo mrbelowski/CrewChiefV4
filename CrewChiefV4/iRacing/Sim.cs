@@ -20,11 +20,8 @@ namespace CrewChiefV4.iRacing
         public Sim()
         {
             _drivers = new List<Driver>();
-
             _sessionData = new SessionData();
             _mustUpdateSessionData = true;
-
-            // Attach events
         }
 
         #region Properties
@@ -255,6 +252,7 @@ namespace CrewChiefV4.iRacing
                 driver.Live.CalculateSpeed(info, _sessionData.Track.Length);
                 driver.UpdateLiveInfo(info);
                 driver.UpdateSectorTimes(_sessionData.Track, info);
+                //_sessionData.UpdateFastestLap(new Laptime(driver.Live.LastLaptime, driver.Live.Lap - 1), driver);
             }
             this.CalculateLivePositions(info);
         }

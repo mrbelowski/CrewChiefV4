@@ -18,7 +18,6 @@ namespace CrewChiefV4.iRacing
             this.Value = value;
             this.Time = TimeSpan.FromMilliseconds(value);
         }
-
         public Laptime(float seconds)
             : this((int)(seconds * 1000f))
         {
