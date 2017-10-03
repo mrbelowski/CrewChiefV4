@@ -8,8 +8,6 @@ using iRSDKSharp;
 using YamlDotNet.RepresentationModel;
 namespace CrewChiefV4.iRacing
 {
-
-
     public class SessionInfo
     {
         public SessionInfo(string yaml, double updateTime)
@@ -24,38 +22,38 @@ namespace CrewChiefV4.iRacing
 
         #region Properties
 
-        private readonly double _updateTime;
+        public double _updateTime;
         /// <summary>
         /// The time of this update.
         /// </summary>
         public double UpdateTime { get { return _updateTime; } }
 
-        private string _yaml;
+        public string _yaml;
         /// <summary>
         /// The YAML string representing the session info, modified to ensure correct parsing.
         /// </summary>
         public string Yaml { get { return _yaml; } }
 
-        private string _rawYaml;
+        public string _rawYaml;
         /// <summary>
         /// The raw YAML string as originally returned from the sim.
         /// </summary>
         public string RawYaml { get { return _rawYaml; } }
 
-        private bool _isValidYaml;
+        public bool _isValidYaml;
         public bool IsValidYaml { get { return _isValidYaml; } }
 
-        private YamlStream _yamlStream;
+        public YamlStream _yamlStream;
         public YamlStream YamlStream { get { return _yamlStream; } }
 
-        private YamlMappingNode _yamlRoot;
+        public YamlMappingNode _yamlRoot;
         public YamlMappingNode YamlRoot { get { return _yamlRoot; } }
 
         #endregion
 
         #region Methods
 
-        private void FixYaml(string yaml)
+        public void FixYaml(string yaml)
         {
             // Quick hack: if there's more than 1 colon ":" in a line, keep only the first
             using (var reader = new StringReader(yaml))
@@ -96,7 +94,7 @@ namespace CrewChiefV4.iRacing
             }
         }
 
-        private void ParseYaml()
+        public void ParseYaml()
         {
             try
             {

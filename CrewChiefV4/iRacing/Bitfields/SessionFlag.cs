@@ -2,6 +2,7 @@
 
 namespace CrewChiefV4.iRacing
 {
+    [Serializable]
     public class SessionFlag : BitfieldBase<SessionFlags>
     {
         public SessionFlag(int value) : base(value)

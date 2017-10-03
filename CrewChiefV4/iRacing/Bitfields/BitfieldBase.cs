@@ -5,6 +5,7 @@ using System.Text;
 
 namespace CrewChiefV4.iRacing
 {
+    [Serializable]
     public abstract class BitfieldBase<T>
        where T : struct, IConvertible, IComparable
     {

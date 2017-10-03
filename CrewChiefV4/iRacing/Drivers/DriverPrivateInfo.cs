@@ -29,15 +29,15 @@ namespace CrewChiefV4.iRacing
         public float FuelPercentage { get; private set; }
         public float FuelPressure { get; private set; }
 
-        public void ParseTelemetry(TelemetryInfo e)
+        public void ParseTelemetry(iRacingData e)
         {
-            this.Speed = e.Speed.Value;
-            this.Throttle = e.Throttle.Value;
-            this.Brake = e.Brake.Value;
-            this.Clutch = e.Clutch.Value;
-            this.Fuel = e.FuelLevel.Value;
-            this.FuelPercentage = e.FuelLevelPct.Value;
-            this.FuelPressure = e.FuelPress.Value;
+            this.Speed = e.Speed;
+            this.Throttle = e.Throttle;
+            this.Brake = e.Brake;
+            this.Clutch = e.Clutch;
+            this.Fuel = e.FuelLevel;
+            this.FuelPercentage = e.FuelLevelPct;
+            this.FuelPressure = e.FuelPress;
 
             // TODO: add remaining parameters
         }

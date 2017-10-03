@@ -37,7 +37,6 @@ namespace CrewChiefV4.iRacing
 
         public int Gear { get; private set; }
         public float Rpm { get; private set; }
-        public double SteeringAngle { get; private set; }
 
         public double Speed { get; private set; }
         public double SpeedKph { get; private set; }
@@ -52,19 +51,18 @@ namespace CrewChiefV4.iRacing
         public int CurrentFakeSector { get; set; }
         public float LastLaptime { get; set; }
 
-        public void ParseTelemetry(TelemetryInfo e)
+        public void ParseTelemetry(iRacingData e)
         {
-            this.Lap = e.CarIdxLap.Value[this.Driver.Id];
+            this.Lap = e.CarIdxLap[this.Driver.Id];
             
-            this.LapDistance = e.CarIdxLapDistPct.Value[this.Driver.Id];
-            this.CorrectedLapDistance = FixPercentagesOnLapChange(e.CarIdxLapDistPct.Value[this.Driver.Id]);
-            this.TrackSurface = e.CarIdxTrackSurface.Value[this.Driver.Id];
+            this.LapDistance = e.CarIdxLapDistPct[this.Driver.Id];
+            this.CorrectedLapDistance = FixPercentagesOnLapChange(e.CarIdxLapDistPct[this.Driver.Id]);
+            this.TrackSurface = e.CarIdxTrackSurface[this.Driver.Id];
 
-            this.Gear = e.CarIdxGear.Value[this.Driver.Id];
-            this.Rpm = e.CarIdxRPM.Value[this.Driver.Id];
-            this.SteeringAngle = e.CarIdxSteer.Value[this.Driver.Id];
+            this.Gear = e.CarIdxGear[this.Driver.Id];
+            this.Rpm = e.CarIdxRPM[this.Driver.Id];
 
-            this.Driver.PitInfo.CalculatePitInfo(e.SessionTime.Value);
+            this.Driver.PitInfo.CalculatePitInfo(e.SessionTime);
         }
 
         private double _prevSpeedUpdateTime;
@@ -81,14 +79,14 @@ namespace CrewChiefV4.iRacing
             return carIdxLapDistPct;
         }
 
-        public void CalculateSpeed(TelemetryInfo current, double? trackLengthKm)
+        public void CalculateSpeed(iRacingData current, double? trackLengthKm)
         {
             if (current == null) return;
             if (trackLengthKm == null) return;
 
             try
             {
-                var t1 = current.SessionTime.Value;
+                var t1 = current.SessionTime;
                 var t0 = _prevSpeedUpdateTime;
                 var time = t1 - t0;
 
@@ -98,7 +96,7 @@ namespace CrewChiefV4.iRacing
                     return;
                 }
 
-                var p1 = current.CarIdxLapDistPct.Value[this.Driver.Id];
+                var p1 = current.CarIdxLapDistPct[this.Driver.Id];
                 var p0 = _prevSpeedUpdateDist;
 
                 if (p1 < -0.5 || _driver.Live.TrackSurface == TrackSurfaces.NotInWorld)
