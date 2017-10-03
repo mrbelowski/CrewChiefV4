@@ -352,12 +352,12 @@ namespace CrewChiefV4.Events
                         if (columnName == null)
                         {
                             audioPlayer.playMessage(new QueuedMessage("frozen_order/get_ready_starting_from_pole",
-                                    MessageContents(LapCounter.folderGetReady, folderWeStartingFromPosition), this.random.Next(0, 2), this));
+                                    MessageContents(folderWereStartingFromPole), this.random.Next(0, 2), this));
                         }
                         else
                         {
                             audioPlayer.playMessage(new QueuedMessage("frozen_order/get_ready_starting_from_pole_in_column",
-                                    MessageContents(LapCounter.folderGetReady, folderWeStartingFromPosition, columnName), this.random.Next(0, 2), this));
+                                    MessageContents(folderWereStartingFromPole, columnName), this.random.Next(0, 2), this));
                         }
                     }
                     else
@@ -365,12 +365,12 @@ namespace CrewChiefV4.Events
                         if (columnName == null)
                         {
                             audioPlayer.playMessage(new QueuedMessage("frozen_order/get_ready_youre_starting_from_pos",
-                                    MessageContents(LapCounter.folderGetReady, folderWeStartingFromPosition, cfod.AssignedPosition), this.random.Next(0, 2), this));
+                                    MessageContents(folderWeStartingFromPosition, cfod.AssignedPosition), this.random.Next(0, 2), this));
                         }
                         else
                         {
                             audioPlayer.playMessage(new QueuedMessage("frozen_order/get_ready_youre_starting_from_pos_row_in_column",
-                                    MessageContents(LapCounter.folderGetReady, folderWeStartingFromPosition, cfod.AssignedPosition, folderRow, cfod.AssignedGridPosition, columnName), this.random.Next(0, 2), this));
+                                    MessageContents(folderWeStartingFromPosition, cfod.AssignedPosition, folderRow, cfod.AssignedGridPosition, columnName), this.random.Next(0, 2), this));
                         }
                     }
                 }
