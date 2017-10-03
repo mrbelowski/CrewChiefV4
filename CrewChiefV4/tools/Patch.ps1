@@ -11,10 +11,21 @@ function GetScriptDirectory {
   Split-Path $invocation.MyCommand.Path
 }
 
-function CopyFile($from, $to) {
-# TODO: replace with robocopy /MIR
+function OverwriteFile($from, $to) {
+
     Write-Host "Overwriting " $from " with " $to
-    Copy-Item $from -Destination $to -Force -Recurse
+    Copy-Item $from -Destination $to -Force
+    
+    echo ""
+}
+
+function MirrorDirectory($from, $to) {
+
+    Write-Host "Mirroring " $from " with " $to
+    
+    $cmdArgs = @("$from","$to",'/MIR')
+    robocopy @cmdArgs
+
     echo ""
 }
 
@@ -26,13 +37,14 @@ $ccLayoutMainPath = ${env:ProgramFiles(x86)} + "\Britton IT Ltd\CrewChiefV4\"
 echo "Patching main CC install"
 echo ""
 
-CopyFile $releaseBinPath\"CrewChiefV4.exe" $ccLayoutMainPath
-CopyFile $releaseBinPath\"CrewChiefV4.exe.config" $ccLayoutMainPath
-CopyFile $rootPath\"ui_text.txt" $ccLayoutMainPath
-CopyFile $rootPath\"carClassData.json" $ccLayoutMainPath
-CopyFile $rootPath\"trackLandmarksData.json" $ccLayoutMainPath
-CopyFile $rootPath\"plugins" $ccLayoutMainPath
-CopyFile $rootPath\"sounds" $env:LOCALAPPDATA"\CrewChiefV4\"
+MirrorDirectory $rootPath\"plugins" $ccLayoutMainPath"\plugins"
+MirrorDirectory $rootPath\"sounds" $env:LOCALAPPDATA"\CrewChiefV4\sounds"
+
+OverwriteFile $releaseBinPath\"CrewChiefV4.exe" $ccLayoutMainPath
+OverwriteFile $releaseBinPath\"CrewChiefV4.exe.config" $ccLayoutMainPath
+OverwriteFile $rootPath\"ui_text.txt" $ccLayoutMainPath
+OverwriteFile $rootPath\"carClassData.json" $ccLayoutMainPath
+OverwriteFile $rootPath\"trackLandmarksData.json" $ccLayoutMainPath
 
 echo "Press any key to finish..."
 
