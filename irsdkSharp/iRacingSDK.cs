@@ -8,16 +8,35 @@ using System.IO.MemoryMappedFiles;
 
 namespace iRSDKSharp
 {
-    public enum BroadcastMessageTypes {CamSwitchPos = 0, CamSwitchNum, CamSetState, ReplaySetPlaySpeed, ReplaySetPlayPosition, ReplaySearch};
-    public enum ReplaySearchModeTypes {ToStart = 0, ToEnd, PreviousSession, NextSession, PreviousLap, NextLap, PreviousFrame, NextFrame, PreviousIncident, NextIncident};
-    public enum ReplayPositionModeTypes {Begin = 0, Current, End};
+    public enum BroadcastMessageTypes { CamSwitchPos = 0, CamSwitchNum, CamSetState, ReplaySetPlaySpeed, ReplaySetPlayPosition, ReplaySearch, ReplaySetState, ReloadTextures, ChatCommand, PitCommand, TelemCommand };
+    public enum CamSwitchModeTypes { FocusAtIncident = -3, FocusAtLeader = -2, FocusAtExciting = -1, FocusAtDriver = 0 };
     public enum CameraStateTypes { None = 0x0000, IsSessionScreen = 0x0001, IsScenicActive = 0x0002, CamToolActive = 0x0004, UIHidden = 0x0008, UseAutoShotSelection = 0x0010, UseTemporaryEdits = 0x0020, UseKeyAcceleration = 0x0040, UseKey10xAcceleration = 0x0080, UseMouseAimMode = 0x0100 };
+    public enum ReplayPositionModeTypes { Begin = 0, Current, End };
+    public enum ReplaySearchModeTypes { ToStart = 0, ToEnd, PreviousSession, NextSession, PreviousLap, NextLap, PreviousFrame, NextFrame, PreviousIncident, NextIncident };
+    public enum ReplayStateModeTypes { Erasetape = 0 };
+    public enum ReloadTexturesModeTypes { All = 0, CarIdx };
+    public enum ChatCommandModeTypes { Macro = 0, BeginChat, Reply, Cancel };
+    
+    public enum PitCommandModeTypes
+    {
+        Clear = 0,
+        WS = 1,
+        Fuel = 2,
+        LF = 3,
+        RF = 4,
+        LR = 5,
+        RR = 6,
+        ClearTires = 7,
+        FastRepair = 8
+    };
 
+    public enum TelemCommandModeTypes { Stop = 0, Start, Restart };
     public class Defines
     {
         public const string DataValidEventName = "Local\\IRSDKDataValidEvent";
         public const string MemMapFileName = "Local\\IRSDKMemMapFileName";
         public const string BroadcastMessageName = "IRSDK_BROADCASTMSG";
+        public const string PadCarNumName = "IRSDK_PADCARNUM";
         public const int MaxString = 32;
         public const int MaxDesc = 64;
         public const int MaxVars = 4096;
@@ -190,7 +209,10 @@ namespace iRSDKSharp
             }
             
         }
-
+        IntPtr GetPadCarNumID()
+        {
+            return RegisterWindowMessage(Defines.PadCarNumName);
+        }
         IntPtr GetBroadcastMessageID()
         {
             return RegisterWindowMessage(Defines.BroadcastMessageName);
@@ -201,21 +223,23 @@ namespace iRSDKSharp
             BroadcastMessage(msg, var1, MakeLong((short)var2, (short)var3));
         }
 
-        public void BroadcastMessage(BroadcastMessageTypes msg, int var1, int var2)
+        public int BroadcastMessage(BroadcastMessageTypes msg, int var1, int var2)
         {
             IntPtr msgId = GetBroadcastMessageID();
             IntPtr hwndBroadcast = IntPtr.Add(IntPtr.Zero, 0xffff);
+            IntPtr result = IntPtr.Zero;
             if (msgId != IntPtr.Zero)
             {
-                SendMessage(hwndBroadcast, msgId.ToInt32(), MakeLong((short)msg, (short)var1), var2);
+                result = PostMessage(hwndBroadcast, msgId.ToInt32(), MakeLong((short)msg, (short)var1), var2);
             }
+            return result.ToInt32();
         }
 
         [DllImport("user32.dll")]
         private static extern IntPtr RegisterWindowMessage(string lpProcName);
 
         [DllImport("user32.dll")]
-        private static extern IntPtr SendMessage(IntPtr hWnd, int Msg, int wParam, int lParam);
+        private static extern IntPtr PostMessage(IntPtr hWnd, int Msg, int wParam, int lParam);
 
         public int MakeLong(short lowPart, short highPart)
         {

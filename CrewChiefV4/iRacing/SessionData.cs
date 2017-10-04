@@ -1,8 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-//using iRacingSdkWrapper;
-//using iRacingSdkWrapper.Bitfields;
-///using iRacingSimulator.Drivers;
 
 namespace CrewChiefV4.iRacing
 {
@@ -89,8 +86,13 @@ namespace CrewChiefV4.iRacing
             this.IsCheckered = (state == SessionStates.CoolDown || state == SessionStates.Checkered);
         }
 
-        public BestLap UpdateFastestLap(Laptime lap, Driver driver)
+        public BestLap UpdateFastestLap(Driver driver)
         {
+            return UpdateFastestLap(new Laptime(driver.Live.LastLaptime), driver);
+        }
+
+        public BestLap UpdateFastestLap(Laptime lap, Driver driver)
+        {                       
             var classId = driver.Car.CarClassId;
             if (!this.ClassBestLaps.ContainsKey(classId))
             {

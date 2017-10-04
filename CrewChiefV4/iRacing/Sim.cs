@@ -252,7 +252,7 @@ namespace CrewChiefV4.iRacing
                 driver.Live.CalculateSpeed(info, _sessionData.Track.Length);
                 driver.UpdateLiveInfo(info);
                 driver.UpdateSectorTimes(_sessionData.Track, info);
-                //_sessionData.UpdateFastestLap(new Laptime(driver.Live.LastLaptime, driver.Live.Lap - 1), driver);
+                //_sessionData.UpdateFastestLap(driver);
             }
             this.CalculateLivePositions(info);
         }

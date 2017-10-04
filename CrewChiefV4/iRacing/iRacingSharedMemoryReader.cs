@@ -20,7 +20,7 @@ namespace CrewChiefV4.iRacing
         int lastUpdate = -1;
         private int _DriverId = -1;
         public int DriverId { get { return _DriverId; } }
-       
+        public string sessionInfoString;
         public object GetData(string headerName)
         {
             if (!sdk.IsConnected()) 
@@ -50,7 +50,9 @@ namespace CrewChiefV4.iRacing
         public class iRacingStructDumpWrapper
         {
             public long ticksWhenRead;
+            public string rewSessionData;
             public iRacingData data;
+
 
         }
         public override void DumpRawGameData()
@@ -78,7 +80,7 @@ namespace CrewChiefV4.iRacing
             if (dataReadFromFile != null && dataReadFromFile.Length > dataReadFromFileIndex)
             {
                 iRacingStructDumpWrapper structDumpWrapperData = dataReadFromFile[dataReadFromFileIndex];
-                SessionInfo sessionInfo = new SessionInfo(structDumpWrapperData.data.sessionInfo, (double)structDumpWrapperData.data.SessionTime);
+                SessionInfo sessionInfo = new SessionInfo(structDumpWrapperData.rewSessionData, (double)structDumpWrapperData.data.SessionTime);
                 sim.SdkOnSessionInfoUpdated(sessionInfo, structDumpWrapperData.data.SessionNum, structDumpWrapperData.data.PlayerCarIdx);
                 sim.SdkOnTelemetryUpdated(structDumpWrapperData.data);  
                 iRacingStructWrapper structWrapperData = new iRacingStructWrapper() { data = sim, ticksWhenRead = structDumpWrapperData.ticksWhenRead };
@@ -141,7 +143,7 @@ namespace CrewChiefV4.iRacing
                 return initialised;
             }
         }
-        public string sessionInfoString;
+        
         public override Object ReadGameData(Boolean forSpotter)
         {
             lock (this)
@@ -182,12 +184,12 @@ namespace CrewChiefV4.iRacing
                             lastUpdate = newUpdate;
                         }
                     }
-                    sim.SdkOnTelemetryUpdated(new iRacingData(sdk, sessionInfoString));                   
+                    sim.SdkOnTelemetryUpdated(new iRacingData(sdk));                   
                     structWrapper.data = sim;                
                     if (!forSpotter && dumpToFile && dataToDump != null)
                     {
                         dataToDump.Add(new iRacingStructDumpWrapper() { ticksWhenRead = structWrapper.ticksWhenRead,
-                            data = new iRacingData(sdk, sessionInfoString) });
+                            data = new iRacingData(sdk), rewSessionData=sessionInfoString });
                     }
                     return structWrapper;
                 }
