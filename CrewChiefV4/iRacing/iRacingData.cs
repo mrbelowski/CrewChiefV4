@@ -10,9 +10,9 @@ namespace CrewChiefV4.iRacing
     [Serializable]
     public class iRacingData
     {
-        public iRacingData( iRacingSDK sdk, string sessionInfoSting )
+        public iRacingData( iRacingSDK sdk )
         {
-            sessionInfo = sessionInfoSting;
+
             SessionTime = (System.Double)sdk.GetData("SessionTime");
             SessionTick = (System.Int32)sdk.GetData("SessionTick");
             SessionNum = (System.Int32)sdk.GetData("SessionNum");
@@ -93,7 +93,7 @@ namespace CrewChiefV4.iRacing
         {
 
         }
-        public string sessionInfo;
+        //public string sessionInfo;
         /// <summary>
         /// Seconds since session start
         /// </summary>
