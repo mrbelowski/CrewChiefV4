@@ -41,6 +41,7 @@ namespace CrewChiefV4.Events
         private Boolean playedManualStartInitialMessage = false;
         private OpponentData manualStartOpponentAhead = null;
 
+        // used by the FrozenOrder event
         public static String folderGetReady = "lap_counter/get_ready";
 
         private String folderLastLapEU = "lap_counter/last_lap";

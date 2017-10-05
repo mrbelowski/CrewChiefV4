@@ -462,3 +462,6 @@ manual_formation_go_with_leader_help = Cars are allowed to overtake on a manual 
 
 reject_message_when_talking = Block messages when talking to the Chief
 reject_message_when_talking_help = Don't play any messages while you have the 'talk to chief' radio channel open
+
+enable_rf2_frozen_order_messages = Enable rF2 frozen order messages
+enable_rf2_frozen_order_messages_help = Announce order information during Full Course Yellow, Rolling and Formation/Standing starts.
