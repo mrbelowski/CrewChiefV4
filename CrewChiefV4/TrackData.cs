@@ -30,6 +30,7 @@ namespace CrewChiefV4
         public String[] rf1TrackNames { get; set; }
         public String[] rf2TrackNames { get; set; }        
         public String[] acTrackNames { get; set; }
+        public String irTrackName { get; set; }
         public String pcarsTrackName { get; set; }
         public int raceroomLayoutId { get; set; }
         public float approximateTrackLength { get; set; }   // this is optional and used to differentiate duplicated names
@@ -133,6 +134,17 @@ namespace CrewChiefV4
                                     Console.WriteLine(trackLandmarksForTrack.trackLandmarks.Count + " landmarks defined for this track");
                                     return new TrackDataContainer(trackLandmarksForTrack.trackLandmarks, trackLandmarksForTrack.isOval);
                                 }
+                            }
+                        }
+                        break;
+                    case GameEnum.IRACING:
+                        if(trackLandmarksForTrack.irTrackName != null)
+                        {
+                            if (String.Equals(trackLandmarksForTrack.irTrackName, trackName, StringComparison.OrdinalIgnoreCase)
+                                && checkForAndMatchOnLength(lengthFromGame, trackLandmarksForTrack.approximateTrackLength))
+                            {
+                                Console.WriteLine(trackLandmarksForTrack.trackLandmarks.Count + " landmarks defined for this track");
+                                return new TrackDataContainer(trackLandmarksForTrack.trackLandmarks, trackLandmarksForTrack.isOval);
                             }
                         }
                         break;
@@ -435,6 +447,7 @@ namespace CrewChiefV4
             }
             TrackDefinition unknownTrackDef = new TrackDefinition(trackName, trackLength, sectorsOnTrack, new float[] { 0f, 0f });
             unknownTrackDef.unknownTrack = true;
+            unknownTrackDef.setSectorPointsForUnknownTracks();
             return unknownTrackDef;
         }
         private static TrackDefinition getDefinitionForLength(List<TrackDefinition> possibleDefinitions, float trackLength, int maxError)

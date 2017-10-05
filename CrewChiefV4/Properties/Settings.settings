@@ -586,6 +586,14 @@
     </Setting>
     <Setting Name="enable_rf2_frozen_order_messages" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
+    <Setting Name="iracing_launch_exe" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="iracing_launch_params" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="launch_iracing" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
     </Setting>
   </Settings>
 </SettingsFile>
