@@ -35,6 +35,10 @@ namespace CrewChiefV4.rFactor2
         private const int minMinutesBetweenPredictedStops = 10;
         private const int minLapsBetweenPredictedStops = 5;
 
+        // On 3930k@4.6 transitions sometimes take above 2 secs,
+        // the issue is that if we leave to monitor, long delayed message is a bit annoying, might need to revisit.
+        private const int waitForSessionEndMillis = 2500;
+
         // If we're running only against AI, force the pit window to open
         private bool isOfflineSession = true;
 
@@ -53,9 +57,6 @@ namespace CrewChiefV4.rFactor2
         private double lastPlayerTelemetryET = -1.0;
         private double lastScoringET = -1.0;
 
-        // State tracking for hacks around model.
-        bool lastInRealTimeState = false;
-
         public RF2GameStateMapper()
         {
             this.tyreWearThresholds.Add(new CornerData.EnumWithThresholds(TyreCondition.NEW, -10000.0f, this.scrubbedTyreWearPercent));
@@ -68,7 +69,7 @@ namespace CrewChiefV4.rFactor2
             this.suspensionDamageThresholds.Add(new CornerData.EnumWithThresholds(DamageLevel.DESTROYED, 1.0f, 2.0f));
         }
 
-        private int[] minimumSupportedVersionParts = new int[] { 2, 0, 0, 0 };
+        private int[] minimumSupportedVersionParts = new int[] { 2, 2, 0, 0 };
         public static bool pluginVerified = false;
         public void versionCheck(Object memoryMappedFileStruct)
         {
@@ -132,32 +133,94 @@ namespace CrewChiefV4.rFactor2
             this.speechRecogniser = speechRecogniser;
         }
 
+        // Abrupt session detection variables.
+        private bool waitingToTerminateSession = false;
+        private long ticksWhenSessionEnded = DateTime.MinValue.Ticks;
+
+        // Used to reduce number of "Waiting" messages on abrupt session end.
+        private int sessionWaitMessageCounter = 0;
+
+        private Int64 lastSessionEndTicks = -1;
+        bool lastInRealTimeState = false;
+
         public GameStateData mapToGameStateData(Object memoryMappedFileStruct, GameStateData previousGameState)
         {
             var pgs = previousGameState;
             var shared = memoryMappedFileStruct as CrewChiefV4.rFactor2.RF2SharedMemoryReader.RF2StructWrapper;
             var cgs = new GameStateData(shared.ticksWhenRead);
 
-            // No session data
-            if (shared.scoring.mScoringInfo.mNumVehicles == 0)
+            //
+            // This block has two purposes:
+            //
+            // * If no session is active it just returns previous game state, except if abrupt session end detection is in progress.
+            //
+            // * Terminate game sessions that did not go to "Finished" state.  Most often this happens because user finishes session early
+            //   by clicking "Next Session", any "Restart" button or leaves to the main menu.  However, we may end up in that situation as well,
+            //   simply because we're reading shared memory, and we might miss some transitions.
+            //   One particularly interesting case is that sometimes, game updates state between session ended/started states.
+            //   This was observed, in particular, after qualification.  This code tries to extract most current position in such case.
+            //
+            // Note: if we're in progress of detecting session end (this.waitingToTerminateSession == true), we will skip first frame of the new session
+            // which should be ok.
+            //
+
+            // Check if session has _just_ ended and we are possibly hanging in between.
+            var sessionJustEnded = shared.extended.mTicksSessionEnded != 0 && this.lastSessionEndTicks != shared.extended.mTicksSessionEnded;
+
+            this.lastSessionEndTicks = shared.extended.mTicksSessionEnded;
+            var sessionStarted = shared.extended.mSessionStarted == 1;
+
+            if (shared.scoring.mScoringInfo.mNumVehicles == 0  // No session data (game startup, new session or game shutdown).
+                || sessionJustEnded  // Need to start the wait for the next session
+                || this.waitingToTerminateSession  // Wait for the next session (or timeout) is in progress
+                || !sessionStarted)  // We don't process game state updates outside of the active session
             {
-                // If user clicks "Next Session" the session phase goes to "Finished" only if session time actually ran out.
-                // Otherwise, game does not update Session Phase.  We do, however, see the numVehicles  drop to zero.
+                //
                 // If we have a previous game state and it's in a valid phase here, update it to "Finished" and return it,
                 // unless it looks like user clicked "Restart" button during the race.
                 // Additionally, if user made no valid laps in a session, mark it as DNF, because position does not matter in that case
-                // (and it isn't reported by the game, so whatever we announce is wrong).
+                // (and it isn't reported by the game, so whatever we announce is wrong).  Lastly, try updating end position to match
+                // the one captured during last session transition.
                 //
-                // It is well known that a lot of comments is an indicator of trouble.  I suspect we might have to remove or hide 
-                // all this crap behind the setting, because there will be cases when incorrect position is reported.  This, however,
-                // works most of the time.
-                // All of this might need revisiting on exposure of MultiSessionRulesV01.  Another thing to try is to capture last
-                // reported position in the plugin.  It is possible we are simply missing it.
                 if (pgs != null
                     && pgs.SessionData.SessionType != SessionType.Unavailable
                     && pgs.SessionData.SessionPhase != SessionPhase.Finished
                     && pgs.SessionData.SessionPhase != SessionPhase.Unavailable)
                 {
+                    // Begin the wait for session re-start or a run out of time
+                    if (!this.waitingToTerminateSession && !sessionStarted)
+                    {
+                        Console.WriteLine("Abrupt Session End: start to wait for session end.");
+                        
+                        // Start waiting for session end.
+                        this.ticksWhenSessionEnded = DateTime.Now.Ticks;
+                        this.waitingToTerminateSession = true;
+                        this.sessionWaitMessageCounter = 0;
+
+                        return pgs;
+                    }
+
+                    if (!sessionStarted)
+                    {
+                        var timeSinceWaitStarted = TimeSpan.FromTicks(DateTime.Now.Ticks - this.ticksWhenSessionEnded);
+                        if (timeSinceWaitStarted.TotalMilliseconds < RF2GameStateMapper.waitForSessionEndMillis)
+                        {
+                            if (this.sessionWaitMessageCounter % 5 == 0)
+                                Console.WriteLine("Abrupt Session End: continue session end wait.");
+
+                            this.sessionWaitMessageCounter++;
+
+                            return pgs;
+                        }
+                        else
+                            Console.WriteLine("Abrupt Session End: session end wait timed out.");
+                    }
+                    else
+                        Console.WriteLine("Abrupt Session End: new session just started, terminate previous session.");
+
+                    // Wait is over.  Terminate the abrupt session.
+                    this.waitingToTerminateSession = false; 
+
                     if (this.lastInRealTimeState && pgs.SessionData.SessionType == SessionType.Race)
                     {
                         // Looks like race restart without exiting to monitor.  We can't reliably detect session end
@@ -173,26 +236,53 @@ namespace CrewChiefV4.rFactor2
 
                             Console.WriteLine("Abrupt Session End: mark session as DNF due to no valid laps made.");
                         }
+
+                        // Get the latest position info available.  Try to find player's vehicle.
+                        int playerVehIdx = -1;
+                        for (int i = 0; i < shared.extended.mSessionTransitionCapture.mNumScoringVehicles; ++i)
+                        {
+                            if (shared.extended.mSessionTransitionCapture.mScoringVehicles[i].mIsPlayer == 1)
+                            {
+                                playerVehIdx = i;
+                                break;
+                            }
+                        }
+
+                        if (playerVehIdx != -1)
+                        {
+                            var playerVehCapture = shared.extended.mSessionTransitionCapture.mScoringVehicles[playerVehIdx];
+                            if (pgs.SessionData.Position != playerVehCapture.mPlace)
+                            {
+                                Console.WriteLine(string.Format("Abrupt Session End: player position was updated after session end, updating from pos {0} to: {1}.",
+                                    pgs.SessionData.Position, playerVehCapture.mPlace));
+                                pgs.SessionData.Position = playerVehCapture.mPlace;
+                            }
+                        }
+                        else
+                            Console.WriteLine("Abrupt Session End: failed to locate player vehicle info capture.");
+
                         // While this detects the "Next Session" this still sounds a bit weird if user clicks
                         // "Leave Session" and goes to main menu.  60 sec delay (minSessionRunTimeForEndMessages) helps, but not entirely.
                         pgs.SessionData.SessionPhase = SessionPhase.Finished;
                         pgs.SessionData.AbruptSessionEndDetected = true;
-                        Console.WriteLine("Abrupt Session End: SessionType: " + pgs.SessionData.SessionType);
+                        Console.WriteLine("Abrupt Session End: ended SessionType: " + pgs.SessionData.SessionType);
 
                         return pgs;
                     }
                 }
 
+                // Session is not in progress and no abrupt session end detection is in progress, simply return pgs.
+                Debug.Assert(!this.waitingToTerminateSession, "Previous abrupt session end detection hasn't ended correctly.");
+                this.waitingToTerminateSession = false;
                 this.isOfflineSession = true;
                 this.distanceOffTrack = 0;
                 this.isApproachingTrack = false;
 
                 if (pgs != null)
                 {
-                    // In rF2 user can quit practice session and we will never know
-                    // about it.  Mark previous game state with Unavailable flags.
                     pgs.SessionData.SessionType = SessionType.Unavailable;
                     pgs.SessionData.SessionPhase = SessionPhase.Unavailable;
+                    pgs.SessionData.AbruptSessionEndDetected = false;
                 }
 
                 return pgs;
@@ -540,7 +630,7 @@ namespace CrewChiefV4.rFactor2
                     csd.formattedPlayerLapTimes.Add(lt);
             }
 
-            if (csd.IsNewLap && csd.LapTimePrevious > 0)
+            if (cgs.LastLapTimeUpdated && csd.LapTimePrevious > 0)
                 csd.formattedPlayerLapTimes.Add(TimeSpan.FromSeconds(csd.LapTimePrevious).ToString(@"mm\:ss\.fff"));
 
             csd.LeaderHasFinishedRace = leaderScoring.mFinishStatus == (int)rFactor2Constants.rF2FinishStatus.Finished;
@@ -788,8 +878,7 @@ namespace CrewChiefV4.rFactor2
                     csd.PlayerClassSessionBestLapTime = csd.PlayerLapTimeSessionBest > 0.0f ?
                         csd.PlayerLapTimeSessionBest : -1.0f;
 
-                    if (csd.IsNewLap 
-                        && psd != null && !psd.IsNewLap
+                    if (cgs.LastLapTimeUpdated
                         && csd.LapTimePrevious > 0.0f
                         && csd.PreviousLapWasValid)
                     {
@@ -1346,7 +1435,8 @@ namespace CrewChiefV4.rFactor2
             /////////////////////////////////////
             // Current lap timings
             csd.LapTimeCurrent = csd.SessionRunningTime - (float)playerScoring.mLapStartET;
-            csd.LapTimePrevious = playerScoring.mLastLapTime > 0.0f ? (float)playerScoring.mLastLapTime : -1.0f;
+
+            cgs.checkForNewLapData(previousGameState, (float) playerScoring.mLastLapTime);
 
             // Last (most current) per-sector times:
             // NOTE: this logic still misses invalid sector handling.
@@ -1402,7 +1492,7 @@ namespace CrewChiefV4.rFactor2
             // Update Sector/Lap timings.
             var lastSectorTime = this.getLastSectorTime(ref playerScoring, csd.SectorNumber);
 
-            if (csd.IsNewLap)
+            if (cgs.LastLapTimeUpdated)
             {
                 if (lastSectorTime > 0.0f)
                 {
@@ -1428,7 +1518,8 @@ namespace CrewChiefV4.rFactor2
                     (float)scoring.mScoringInfo.mTrackTemp,
                     (float)scoring.mScoringInfo.mAmbientTemp);
             }
-            else if (csd.IsNewSector && lastSectorTime > 0.0f)
+            // don't want to add cumulative sector data if we're in sector1 - this is covered by the lap completion stuff
+            else if (csd.IsNewSector && lastSectorTime > 0.0f && psd != null && csd.SectorNumber != 1)
             {
                 csd.playerAddCumulativeSectorData(
                     psd.SectorNumber,
