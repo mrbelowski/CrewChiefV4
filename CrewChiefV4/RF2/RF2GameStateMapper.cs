@@ -475,13 +475,14 @@ namespace CrewChiefV4.rFactor2
             {
                 // Do not use previous game state if this is the new session.
                 pgs = null;
+
                 this.isOfflineSession = true;
                 this.distanceOffTrack = 0;
                 this.isApproachingTrack = false;
                 this.playerLapsWhenFCYPosAssigned = -1;
                 this.detectedTrackNoDRSZones = false;
+
                 GlobalBehaviourSettings.UpdateFromCarClass(cgs.carClass);
-                this.detectedTrackNoDRSZones = false;
             }
 
             // Restore cumulative data.

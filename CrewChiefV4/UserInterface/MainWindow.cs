@@ -800,6 +800,7 @@ namespace CrewChiefV4
             }
         }
 
+        private bool silenced = false;
         private void listenForChannelOpen()
         {
             Boolean channelOpen = false;
@@ -820,6 +821,10 @@ namespace CrewChiefV4
 
                         if (rejectMessagesWhenTalking)
                         {
+                            if (this.silenced)
+                                Console.WriteLine("FUCKUP - SILENCED BEFORE SILENCING.");
+                            this.silenced = true;
+
                             setMessagesVolume(0.0f);
                         }
                     }
@@ -827,6 +832,10 @@ namespace CrewChiefV4
                     {
                         if (rejectMessagesWhenTalking)
                         {
+                            if (!this.silenced)
+                                Console.WriteLine("FUCKUP - NOT SILENCED BEFORE RESTORING VOLUME.");
+                            this.silenced = false;
+
                             setMessagesVolume(currentVolume);
                         }
 
