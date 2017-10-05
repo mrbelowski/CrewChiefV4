@@ -65,6 +65,9 @@ namespace CrewChiefV4.rFactor2
         // True if it looks like track has no DRS zones defined.
         private bool detectedTrackNoDRSZones = false;
 
+        // True if it looks like track has no DRS zones defined.
+        private bool detectedTrackNoDRSZones = false;
+
         public RF2GameStateMapper()
         {
             this.tyreWearThresholds.Add(new CornerData.EnumWithThresholds(TyreCondition.NEW, -10000.0f, this.scrubbedTyreWearPercent));
@@ -475,14 +478,13 @@ namespace CrewChiefV4.rFactor2
             {
                 // Do not use previous game state if this is the new session.
                 pgs = null;
-
                 this.isOfflineSession = true;
                 this.distanceOffTrack = 0;
                 this.isApproachingTrack = false;
                 this.playerLapsWhenFCYPosAssigned = -1;
                 this.detectedTrackNoDRSZones = false;
-
                 GlobalBehaviourSettings.UpdateFromCarClass(cgs.carClass);
+                this.detectedTrackNoDRSZones = false;
             }
 
             // Restore cumulative data.
