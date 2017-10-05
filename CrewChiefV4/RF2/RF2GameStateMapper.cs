@@ -65,9 +65,6 @@ namespace CrewChiefV4.rFactor2
         // True if it looks like track has no DRS zones defined.
         private bool detectedTrackNoDRSZones = false;
 
-        // True if it looks like track has no DRS zones defined.
-        private bool detectedTrackNoDRSZones = false;
-
         public RF2GameStateMapper()
         {
             this.tyreWearThresholds.Add(new CornerData.EnumWithThresholds(TyreCondition.NEW, -10000.0f, this.scrubbedTyreWearPercent));

@@ -2350,17 +2350,23 @@ namespace CrewChiefV4.Properties {
                 this["launch_pcars2"] = value;
             }
         }
-        
+
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool enable_rf2_frozen_order_messages {
-            get {
+        public bool enable_rf2_frozen_order_messages
+        {
+            get
+            {
                 return ((bool)(this["enable_rf2_frozen_order_messages"]));
             }
-            set {
+            set
+            {
                 this["enable_rf2_frozen_order_messages"] = value;
-                
+            }
+        }
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string iracing_launch_exe {
             get {
