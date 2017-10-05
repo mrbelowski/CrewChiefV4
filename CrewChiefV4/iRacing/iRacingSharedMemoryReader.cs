@@ -50,7 +50,7 @@ namespace CrewChiefV4.iRacing
         public class iRacingStructDumpWrapper
         {
             public long ticksWhenRead;
-            public string rewSessionData;
+            public string rawSessionData;
             public iRacingData data;
 
 
@@ -80,7 +80,7 @@ namespace CrewChiefV4.iRacing
             if (dataReadFromFile != null && dataReadFromFile.Length > dataReadFromFileIndex)
             {
                 iRacingStructDumpWrapper structDumpWrapperData = dataReadFromFile[dataReadFromFileIndex];
-                SessionInfo sessionInfo = new SessionInfo(structDumpWrapperData.rewSessionData, (double)structDumpWrapperData.data.SessionTime);
+                SessionInfo sessionInfo = new SessionInfo(structDumpWrapperData.rawSessionData, (double)structDumpWrapperData.data.SessionTime);
                 sim.SdkOnSessionInfoUpdated(sessionInfo, structDumpWrapperData.data.SessionNum, structDumpWrapperData.data.PlayerCarIdx);
                 sim.SdkOnTelemetryUpdated(structDumpWrapperData.data);  
                 iRacingStructWrapper structWrapperData = new iRacingStructWrapper() { data = sim, ticksWhenRead = structDumpWrapperData.ticksWhenRead };
@@ -189,7 +189,7 @@ namespace CrewChiefV4.iRacing
                     if (!forSpotter && dumpToFile && dataToDump != null)
                     {
                         dataToDump.Add(new iRacingStructDumpWrapper() { ticksWhenRead = structWrapper.ticksWhenRead,
-                            data = new iRacingData(sdk), rewSessionData=sessionInfoString });
+                            data = new iRacingData(sdk), rawSessionData=sessionInfoString });
                     }
                     return structWrapper;
                 }
