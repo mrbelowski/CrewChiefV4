@@ -499,23 +499,6 @@ namespace CrewChiefV4.RaceRoom
             }
             // TODO: calculate the actual session best sector times from the bollocks in the block (cumulative deltas between the last player sector time and the session best)
 
-            currentGameState.SessionData.IsNewLap = previousGameState != null && previousGameState.SessionData.IsNewLap == false &&
-                (shared.CompletedLaps == previousGameState.SessionData.CompletedLaps + 1 ||
-                ((lastSessionPhase == SessionPhase.Countdown || lastSessionPhase == SessionPhase.Formation || lastSessionPhase == SessionPhase.Garage)
-                && (currentGameState.SessionData.SessionPhase == SessionPhase.Green || currentGameState.SessionData.SessionPhase == SessionPhase.FullCourseYellow)));
-            
-            if (currentGameState.SessionData.IsNewLap)
-            {
-                currentGameState.SessionData.PositionAtStartOfCurrentLap = currentGameState.SessionData.Position;
-                currentGameState.SessionData.formattedPlayerLapTimes.Add(TimeSpan.FromSeconds(shared.LapTimePreviousSelf).ToString(@"mm\:ss\.fff"));
-                // quick n dirty hack here - if the current car class is unknown, try and get it again
-                if (currentGameState.carClass.carClassEnum == CarData.CarClassEnum.UNKNOWN_RACE)
-                {
-                    currentGameState.carClass = CarData.getCarClassForRaceRoomId(shared.VehicleInfo.ClassId);
-                    brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(currentGameState.carClass);                    
-                }
-                currentGameState.SessionData.trackLandmarksTiming.cancelWaitingForLandmarkEnd();
-            }
             if (previousGameState != null && !currentGameState.SessionData.IsNewSession)
             {
                 currentGameState.OpponentData = previousGameState.OpponentData;
@@ -540,7 +523,13 @@ namespace CrewChiefV4.RaceRoom
                             brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(currentGameState.carClass);
                         }
                     }
+                    
                     currentGameState.SessionData.IsNewSector = participantStruct.TrackSector != 0 && currentGameState.SessionData.SectorNumber != participantStruct.TrackSector;
+                    currentGameState.SessionData.IsNewLap = previousGameState != null && previousGameState.SessionData.IsNewLap == false &&
+                        (shared.CompletedLaps == previousGameState.SessionData.CompletedLaps + 1 ||
+                         (participantStruct.TrackSector == 1 && currentGameState.SessionData.IsNewSector) ||
+                        ((lastSessionPhase == SessionPhase.Countdown || lastSessionPhase == SessionPhase.Formation || lastSessionPhase == SessionPhase.Garage)
+                        && (currentGameState.SessionData.SessionPhase == SessionPhase.Green || currentGameState.SessionData.SessionPhase == SessionPhase.FullCourseYellow)));
                     
                     if (currentGameState.SessionData.CurrentLapIsValid && participantStruct.CurrentLapValid != 1) {
                         currentGameState.SessionData.CurrentLapIsValid = false;
@@ -652,6 +641,19 @@ namespace CrewChiefV4.RaceRoom
                     }
                     break;
                 }
+            }
+
+            if (currentGameState.SessionData.IsNewLap)
+            {
+                currentGameState.SessionData.PositionAtStartOfCurrentLap = currentGameState.SessionData.Position;
+                currentGameState.SessionData.formattedPlayerLapTimes.Add(TimeSpan.FromSeconds(shared.LapTimePreviousSelf).ToString(@"mm\:ss\.fff"));
+                // quick n dirty hack here - if the current car class is unknown, try and get it again
+                if (currentGameState.carClass.carClassEnum == CarData.CarClassEnum.UNKNOWN_RACE)
+                {
+                    currentGameState.carClass = CarData.getCarClassForRaceRoomId(shared.VehicleInfo.ClassId);
+                    brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(currentGameState.carClass);
+                }
+                currentGameState.SessionData.trackLandmarksTiming.cancelWaitingForLandmarkEnd();
             }
 
             foreach (DriverData participantStruct in shared.DriverData)
@@ -1553,8 +1555,17 @@ namespace CrewChiefV4.RaceRoom
                 {
                     if (opponentData.OpponentLapData.Count > 0)
                     {
-                        opponentData.CompleteLapWithProvidedLapTime(racePosition, sessionRunningTime, completedLapTime,
-                            lapIsValid && validSpeed, false, 20, 20, sessionLengthIsTime, sessionTimeRemaining, 3);
+                        // if the opponent hasn't set a valid time, the game will not update the lastSector3Time, so we check to see if this has changed - 
+                        // if it's identical to the previous time, assume it's invalid
+                        if (opponentData.LastLapTime == completedLapTime)
+                        {
+                            lapIsValid = false;
+                        }
+                        else
+                        {
+                            opponentData.CompleteLapWithProvidedLapTime(racePosition, sessionRunningTime, completedLapTime,
+                                lapIsValid && validSpeed, false, 20, 20, sessionLengthIsTime, sessionTimeRemaining, 3);
+                        }
                     }
                     opponentData.StartNewLap(completedLaps + 1, racePosition, isInPits, sessionRunningTime, false, 20, 20);
                     opponentData.IsNewLap = true;

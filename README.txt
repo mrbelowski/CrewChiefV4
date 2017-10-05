@@ -1,4 +1,4 @@
-CrewChief version 4.7
+CrewChief version 4.8
 
 Written by Jim Britton (main app, voice acting, Raceroom and PCars implementations), Morten Roslev (Assetto Corsa implementation), Vytautas Leonavičius (rFactor2 implementation) and Dan Allongo (Automobilista and rFactor1 implementation). The application is the result of lots of lots of hard work and input from the guys above as well as some great advice and support from the community and the guys at Sector3 and SMS.
 
@@ -10,6 +10,8 @@ For support and discussions about Crew Chief we have our very own forum here: ht
 
 Changelog
 ---------
+Version 4.8.0.6: RF2 DRS support; Added RF1 / AMS and RF2 cut track warnings; RF2 full-course-yellow, standing start and rolling start order messages; R3E opponent laptime validation fix; don't play aero damage if the rest of the car is knackered; some AC fixes; Fixed first lap out of pits massively skewing fuel consumption estimate
+
 Version 4.8.0.3: RF2 session transition fixes
 
 Version 4.8.0.2: Fixed broken PCars2 oval track mapping - should now correctly call 'car low' / 'car high' on ovals for all spotters except Geoffrey

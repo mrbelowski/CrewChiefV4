@@ -2353,6 +2353,14 @@ namespace CrewChiefV4.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool enable_rf2_frozen_order_messages {
+            get {
+                return ((bool)(this["enable_rf2_frozen_order_messages"]));
+            }
+            set {
+                this["enable_rf2_frozen_order_messages"] = value;
+                
         [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string iracing_launch_exe {
             get {
@@ -2384,6 +2392,7 @@ namespace CrewChiefV4.Properties {
             }
             set {
                 this["launch_iracing"] = value;
+
             }
         }
     }

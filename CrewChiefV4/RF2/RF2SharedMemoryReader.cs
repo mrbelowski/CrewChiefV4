@@ -204,6 +204,9 @@ namespace CrewChiefV4.rFactor2
         MappedDoubleBuffer<rF2Scoring> scoringBuffer = new MappedDoubleBuffer<rF2Scoring>(rFactor2Constants.MM_SCORING_FILE_NAME1,
             rFactor2Constants.MM_SCORING_FILE_NAME2, rFactor2Constants.MM_SCORING_FILE_ACCESS_MUTEX);
 
+        MappedDoubleBuffer<rF2Rules> rulesBuffer = new MappedDoubleBuffer<rF2Rules>(rFactor2Constants.MM_RULES_FILE_NAME1,
+            rFactor2Constants.MM_RULES_FILE_NAME2, rFactor2Constants.MM_RULES_FILE_ACCESS_MUTEX);
+
         MappedDoubleBuffer<rF2Extended> extendedBuffer = new MappedDoubleBuffer<rF2Extended>(rFactor2Constants.MM_EXTENDED_FILE_NAME1,
               rFactor2Constants.MM_EXTENDED_FILE_NAME2, rFactor2Constants.MM_EXTENDED_FILE_ACCESS_MUTEX);
 
@@ -221,6 +224,7 @@ namespace CrewChiefV4.rFactor2
             public long ticksWhenRead;
             public rF2Telemetry telemetry;
             public rF2Scoring scoring;
+            public rF2Rules rules;
             public rF2Extended extended;
         }
 
@@ -268,6 +272,7 @@ namespace CrewChiefV4.rFactor2
                     {
                         this.telemetryBuffer.Connect();
                         this.scoringBuffer.Connect();
+                        this.rulesBuffer.Connect();
                         this.extendedBuffer.Connect();
 
                         if (dumpToFile)
@@ -304,6 +309,7 @@ namespace CrewChiefV4.rFactor2
 
                     extendedBuffer.GetMappedData(ref wrapper.extended);
                     telemetryBuffer.GetMappedDataPartial(ref wrapper.telemetry);
+                    rulesBuffer.GetMappedDataPartial(ref wrapper.rules);
 
                     // Scoring is the most important game data in Crew Chief sense, 
                     // so acquire it last, hoping it will be most recent view of all buffer types.
@@ -321,9 +327,10 @@ namespace CrewChiefV4.rFactor2
                                 || wrapper.telemetry.mNumVehicles > 0)  // Or, telemetry available
                             {
                                 // NOTE: truncation code could be moved to DumpRawGameData method for reduced CPU use.
-                                // However, this causes huge memory pressure (~250Mb/minute with 22 vehicles), so probably better done here.
+                                // However, this causes memory pressure (~250Mb/minute with 22 vehicles), so probably better done here.
                                 wrapper.telemetry.mVehicles = this.GetPopulatedVehicleInfoArray<rF2VehicleTelemetry>(wrapper.telemetry.mVehicles, wrapper.telemetry.mNumVehicles);
                                 wrapper.scoring.mVehicles = this.GetPopulatedVehicleInfoArray<rF2VehicleScoring>(wrapper.scoring.mVehicles, wrapper.scoring.mScoringInfo.mNumVehicles);
+                                wrapper.rules.mParticipants = this.GetPopulatedVehicleInfoArray<rF2TrackRulesParticipant>(wrapper.rules.mParticipants, wrapper.rules.mTrackRules.mNumParticipants);
 
                                 int maxmID = 0;
                                 foreach (var vehicleScoring in wrapper.scoring.mVehicles)
@@ -386,6 +393,7 @@ namespace CrewChiefV4.rFactor2
 
                 this.telemetryBuffer.Disconnect();
                 this.scoringBuffer.Disconnect();
+                this.rulesBuffer.Disconnect();
                 this.extendedBuffer.Disconnect();
 
                 // Hack to re-check plugin version.
