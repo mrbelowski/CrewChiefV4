@@ -12,7 +12,9 @@ function GetScriptDirectory {
 }
 
 function CopyFile($from, $to) {
-    Copy-Item $from -Destination $to -Force -Verbose -Recurse
+# TODO: replace with robocopy /MIR
+    Write-Host "Overwriting " $from " with " $to
+    Copy-Item $from -Destination $to -Force -Recurse
     echo ""
 }
 

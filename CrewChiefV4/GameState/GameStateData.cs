@@ -202,10 +202,12 @@ namespace CrewChiefV4.GameState
 
         public Boolean IsNewLap = false;
 
+
         // How many laps the player has completed. If this value is 6, the player is on his 7th lap.
         public int CompletedLaps = 0;
 
         // Unit: Seconds (-1.0 = none)
+        // DON'T SET THIS DIRECTLY - ALWAYS GO THROUGH checkForNewLapData
         public Single LapTimePrevious = -1;
 
         public Single LapTimePreviousEstimateForInvalidLap = -1;
@@ -313,6 +315,11 @@ namespace CrewChiefV4.GameState
             SessionTimesAtEndOfSectors.Add(1, -1);
             SessionTimesAtEndOfSectors.Add(2, -1);
             SessionTimesAtEndOfSectors.Add(3, -1);
+        }
+
+        public Boolean checkForNewLapData(Boolean resetTimer, DateTime gameTime, float previousLaptime, float currentLaptime)
+        {
+            return false;
         }
 
         public void restorePlayerTimings(SessionData restoreTo)
@@ -1649,6 +1656,8 @@ namespace CrewChiefV4.GameState
         public static Boolean useManualFormationLap = false;
         public static Boolean onManualFormationLap = false;
 
+        private static TimeSpan MaxWaitForNewLapData = TimeSpan.FromSeconds(3);
+
         public static DateTime CurrentTime = DateTime.Now;
 
         public long Ticks;
@@ -1685,6 +1694,13 @@ namespace CrewChiefV4.GameState
 
         public FlagData FlagData = new FlagData();
 
+        private DateTime NewLapDataTimerExpiry = DateTime.MaxValue;
+
+        // this may be true a short time *after* IsNewLap is true
+        public Boolean LastLapTimeUpdated = false;
+
+        private Boolean WaitingForNewLapData = false;
+
         public GameStateData(long ticks)
         {
             this.Ticks = ticks;
@@ -1693,6 +1709,43 @@ namespace CrewChiefV4.GameState
         }
 
         // some convenience methods
+
+        // call this AFTER updating IsNewLap
+        public void checkForNewLapData(GameStateData previousGameState, float gameProvidedLastLapTime)
+        {
+            if (previousGameState != null)
+            {
+                if (this.SessionData.IsNewLap)
+                {
+                    // reset the timer and start waiting for an updated laptime...
+                    this.WaitingForNewLapData = true;
+                    this.NewLapDataTimerExpiry = this.Now.Add(GameStateData.MaxWaitForNewLapData);
+                }
+                else
+                {
+                    // not a new lap but may be waiting, so copy over the wait variables
+                    this.WaitingForNewLapData = previousGameState.WaitingForNewLapData;
+                    this.NewLapDataTimerExpiry = previousGameState.NewLapDataTimerExpiry;
+                }
+                // if we're waiting, see if the timer has expired or we have a change in the previous laptime value
+                if (this.WaitingForNewLapData
+                    && (previousGameState.SessionData.LapTimePrevious != gameProvidedLastLapTime
+                        || this.Now > this.NewLapDataTimerExpiry))
+                {
+                    // the timer has expired or we have new data
+                    this.WaitingForNewLapData = false;
+                    this.LastLapTimeUpdated = true;
+                    this.SessionData.LapTimePrevious = gameProvidedLastLapTime;
+                    this.SessionData.PreviousLapWasValid = gameProvidedLastLapTime > 0;
+                }
+                else
+                {
+                    this.SessionData.LapTimePrevious = previousGameState.SessionData.LapTimePrevious;
+                    this.SessionData.PreviousLapWasValid = previousGameState.SessionData.PreviousLapWasValid;
+                }
+            }
+        }
+
         public Boolean isLast()
         {
             return SessionData.UnFilteredPosition == SessionData.NumCars;

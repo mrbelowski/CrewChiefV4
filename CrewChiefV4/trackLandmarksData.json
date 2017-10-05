@@ -3188,9 +3188,11 @@
 			]
 		},
 		{
-			"rf2TrackNames": ["Sebring 12h Course",
-				"Sebring 12h Course League Edition"
-			],
+            "rf2TrackNames": [
+                "Sebring 12h Course",
+                "Sebring 12h Course League Edition"
+            ],
+            "irTrackName" : "sebring international",
 			"trackLandmarks": [{
 					"landmarkName": "turn1",
 					"distanceRoundLapStart": 320,
@@ -3266,7 +3268,8 @@
 			]
 		},
 		{
-			"rf2TrackNames": ["Sebring Club Course"],
+            "rf2TrackNames": [ "Sebring Club Course" ],
+            "irTrackName" : "sebring  club course",
 			"trackLandmarks": [{
 					"landmarkName": "cunningham",
 					"distanceRoundLapStart": 290,
@@ -3312,7 +3315,8 @@
 			]
 		},
 		{
-			"rf2TrackNames": ["Sebring Modified Course"],
+            "rf2TrackNames": [ "Sebring Modified Course" ],
+
 			"trackLandmarks": [{
 					"landmarkName": "turn1",
 					"distanceRoundLapStart": 3150,
