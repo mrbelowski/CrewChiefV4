@@ -28,13 +28,13 @@ namespace CrewChiefV4.Events
         private TimeSpan timeBetweenBlackFlagMessages = TimeSpan.FromSeconds(20);
         private TimeSpan timeBetweenWhiteFlagMessages = TimeSpan.FromSeconds(20);
 
-        private String folderFCYellowStartEU = "flags/fc_yellow_start";
-        private String folderFCYellowPitsClosedEU = "flags/fc_yellow_pits_closed";
-        private String folderFCYellowPitsOpenLeadLapCarsEU = "flags/fc_yellow_pits_open_lead_lap_cars";
-        private String folderFCYellowPitsOpenEU = "flags/fc_yellow_pits_open";
-        private String folderFCYellowLastLapNextEU = "flags/fc_yellow_last_lap_next";
-        private String folderFCYellowLastLapCurrentEU = "flags/fc_yellow_last_lap_current";
-        private String folderFCYellowPrepareForGreenEU = "flags/fc_yellow_prepare_for_green";
+        private String folderFCYellowStartEU = "flags/fc_yellow_start_eu";
+        private String folderFCYellowPitsClosedEU = "flags/fc_yellow_pits_closed_eu";
+        private String folderFCYellowPitsOpenLeadLapCarsEU = "flags/fc_yellow_pits_open_lead_lap_cars_eu";
+        private String folderFCYellowPitsOpenEU = "flags/fc_yellow_pits_open_eu";
+        private String folderFCYellowLastLapNextEU = "flags/fc_yellow_last_lap_next_eu";
+        private String folderFCYellowLastLapCurrentEU = "flags/fc_yellow_last_lap_current_eu";
+        private String folderFCYellowPrepareForGreenEU = "flags/fc_yellow_prepare_for_green_eu";
         private String folderFCYellowStartUS = "flags/fc_yellow_start_usa";
         private String folderFCYellowPitsClosedUS = "flags/fc_yellow_pits_closed_usa";
         private String folderFCYellowPitsOpenLeadLapCarsUS = "flags/fc_yellow_pits_open_lead_lap_cars_usa";

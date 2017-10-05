@@ -18,6 +18,7 @@ namespace CrewChiefV4.Events
     class FrozenOrderMonitor : AbstractEvent
     {
         private const int ACTION_STABLE_THRESHOLD = 3;
+        private const float DIST_TO_START_TO_ANNOUNCE_POS_REMINDER = 250.0f;
 
         // Number of updates FO Action and Driver name were the same.
         private int numUpdatesActionSame = 0;
@@ -112,7 +113,7 @@ namespace CrewChiefV4.Events
                     }
                     else
                     {
-                        Console.WriteLine(string.Format("FO: MESSAGE INVALIDATED.  WAS {0} {1} {2} IS {3} {4} {5}", queuedAction, queuedAssignedPosition, queuedDriverToFollow,
+                        Console.WriteLine(string.Format("Frozen Order: message invalidated.  Was {0} {1} {2} is {3} {4} {5}", queuedAction, queuedAssignedPosition, queuedDriverToFollow,
                             currentGameState.FrozenOrderData.Action, currentGameState.FrozenOrderData.AssignedPosition, currentGameState.FrozenOrderData.DriverToFollowRaw));
                         return false;
                     }
@@ -152,7 +153,7 @@ namespace CrewChiefV4.Events
 
             if (pfod.Phase == FrozenOrderPhase.None)
             {
-                Console.WriteLine("FO: NEW PHASE DETECTED: " + cfod.Phase);
+                Console.WriteLine("Frozen Order: New Phase detected: " + cfod.Phase);
 
                 if (cfod.Phase == FrozenOrderPhase.Rolling)
                     audioPlayer.playMessage(new QueuedMessage(folderRollingStartReminder, this.random.Next(0, 2), this));
@@ -240,15 +241,6 @@ namespace CrewChiefV4.Events
                             audioPlayer.playMessage(new QueuedMessage(folderYouNeedToCatchUpToTheGuyAhead, this.random.Next(1, 3), this, validationData));
                     }
                 }
-
-                if (pfod.SafetyCarSpeed != -1.0f && cfod.SafetyCarSpeed == -1.0f)
-                {
-                    // TODO: pace car speed (if we want it) - need to get the units right for this
-                    if (useAmericanTerms)
-                        audioPlayer.playMessage(new QueuedMessage(folderPaceCarJustLeft, 0, this));
-                    else
-                        audioPlayer.playMessage(new QueuedMessage(folderSafetyCarJustLeft, 0, this));
-                }
             }
             else if (cfodp == FrozenOrderPhase.FullCourseYellow)
             {
@@ -297,15 +289,6 @@ namespace CrewChiefV4.Events
                             audioPlayer.playMessage(new QueuedMessage(folderYouNeedToCatchUpToTheGuyAhead, this.random.Next(1, 3), this, validationData));
                     }
                 }
-
-                if (pfod.SafetyCarSpeed != -1.0f && cfod.SafetyCarSpeed == -1.0f)
-                {
-                    // TODO: pace car speed (if we want it) - need to get the units right for this
-                    if (useAmericanTerms)
-                        audioPlayer.playMessage(new QueuedMessage(folderPaceCarJustLeft, 0, this));
-                    else
-                        audioPlayer.playMessage(new QueuedMessage(folderSafetyCarJustLeft, 0, this));
-                }
             }
             else if (cfodp == FrozenOrderPhase.FormationStanding)
             {
@@ -340,10 +323,9 @@ namespace CrewChiefV4.Events
                     }
                 }
 
-                // TODO: Not sure how will this play with formation lap message in S3.
                 if (!this.formationStandingPreStartReminderAnnounced
                     && cgs.SessionData.SectorNumber == 3
-                    && cgs.PositionAndMotionData.DistanceRoundTrack > cgs.SessionData.TrackDefinition.distanceForNearPitEntryChecks)
+                    && cgs.PositionAndMotionData.DistanceRoundTrack > (cgs.SessionData.TrackDefinition.trackLength - FrozenOrderMonitor.DIST_TO_START_TO_ANNOUNCE_POS_REMINDER))
                 {
                     this.formationStandingPreStartReminderAnnounced = true;
                     var isStartingFromPole = cfod.AssignedPosition == 1;
@@ -352,12 +334,12 @@ namespace CrewChiefV4.Events
                         if (columnName == null)
                         {
                             audioPlayer.playMessage(new QueuedMessage("frozen_order/get_ready_starting_from_pole",
-                                    MessageContents(folderWereStartingFromPole), this.random.Next(0, 2), this));
+                                    MessageContents(LapCounter.folderGetReady, folderWereStartingFromPole), this.random.Next(0, 2), this));
                         }
                         else
                         {
                             audioPlayer.playMessage(new QueuedMessage("frozen_order/get_ready_starting_from_pole_in_column",
-                                    MessageContents(folderWereStartingFromPole, columnName), this.random.Next(0, 2), this));
+                                    MessageContents(LapCounter.folderGetReady, folderWereStartingFromPole, columnName), this.random.Next(0, 2), this));
                         }
                     }
                     else
@@ -365,15 +347,42 @@ namespace CrewChiefV4.Events
                         if (columnName == null)
                         {
                             audioPlayer.playMessage(new QueuedMessage("frozen_order/get_ready_youre_starting_from_pos",
-                                    MessageContents(folderWeStartingFromPosition, cfod.AssignedPosition), this.random.Next(0, 2), this));
+                                    MessageContents(LapCounter.folderGetReady, folderWeStartingFromPosition, cfod.AssignedPosition), this.random.Next(0, 2), this));
                         }
                         else
                         {
                             audioPlayer.playMessage(new QueuedMessage("frozen_order/get_ready_youre_starting_from_pos_row_in_column",
-                                    MessageContents(folderWeStartingFromPosition, cfod.AssignedPosition, folderRow, cfod.AssignedGridPosition, columnName), this.random.Next(0, 2), this));
+                                    MessageContents(LapCounter.folderGetReady, folderWeStartingFromPosition, cfod.AssignedPosition, folderRow, cfod.AssignedGridPosition, columnName), this.random.Next(0, 2), this));
                         }
                     }
                 }
+            }
+
+            // Announce SC speed.
+            if (pfod.SafetyCarSpeed == -1.0f && cfod.SafetyCarSpeed != -1.0f)
+            {
+                // TODO: may also need to announce basic "SC in" message.
+                var kmPerHour = cfod.SafetyCarSpeed * 3.6f;
+                if (useAmericanTerms)
+                {
+                    var milesPerHour = kmPerHour * 0.621371f;
+                    audioPlayer.playMessage(new QueuedMessage("frozen_order/pace_car_speed",
+                        MessageContents(FrozenOrderMonitor.folderPaceCarSpeedIs, (int)Math.Round(milesPerHour), FrozenOrderMonitor.folderMilesPerHour),
+                        this.random.Next(10, 15), this));
+                }
+                else
+                    audioPlayer.playMessage(new QueuedMessage("frozen_order/pace_car_speed",
+                        MessageContents(FrozenOrderMonitor.folderSafetyCarSpeedIs, (int)Math.Round(kmPerHour), FrozenOrderMonitor.folderKilometresPerHour),
+                        this.random.Next(10, 15), this));
+            }
+
+            // Announce SC left.
+            if (pfod.SafetyCarSpeed != -1.0f && cfod.SafetyCarSpeed == -1.0f)
+            {
+                if (useAmericanTerms)
+                    audioPlayer.playMessage(new QueuedMessage(folderPaceCarJustLeft, 0, this));
+                else
+                    audioPlayer.playMessage(new QueuedMessage(folderSafetyCarJustLeft, 0, this));
             }
 
             // For fast rolling, do nothing for now.
