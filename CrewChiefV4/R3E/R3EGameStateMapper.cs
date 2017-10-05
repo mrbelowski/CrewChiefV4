@@ -475,6 +475,7 @@ namespace CrewChiefV4.RaceRoom
 
             currentGameState.SessionData.LapTimeCurrent = shared.LapTimeCurrentSelf;
             currentGameState.SessionData.CurrentLapIsValid = currentGameState.SessionData.LapTimeCurrent != -1;
+            currentGameState.SessionData.LapTimePrevious = shared.LapTimePreviousSelf;
             currentGameState.SessionData.PreviousLapWasValid = shared.LapTimePreviousSelf > 0;
             currentGameState.SessionData.NumCars = shared.NumCars;
             
@@ -502,9 +503,7 @@ namespace CrewChiefV4.RaceRoom
                 (shared.CompletedLaps == previousGameState.SessionData.CompletedLaps + 1 ||
                 ((lastSessionPhase == SessionPhase.Countdown || lastSessionPhase == SessionPhase.Formation || lastSessionPhase == SessionPhase.Garage)
                 && (currentGameState.SessionData.SessionPhase == SessionPhase.Green || currentGameState.SessionData.SessionPhase == SessionPhase.FullCourseYellow)));
-
-            currentGameState.checkForNewLapData(previousGameState, shared.LapTimePreviousSelf);
-
+            
             if (currentGameState.SessionData.IsNewLap)
             {
                 currentGameState.SessionData.PositionAtStartOfCurrentLap = currentGameState.SessionData.Position;
@@ -884,7 +883,7 @@ namespace CrewChiefV4.RaceRoom
                 }
             }
 
-            if (currentGameState.LastLapTimeUpdated && currentGameState.SessionData.PreviousLapWasValid &&
+            if (currentGameState.SessionData.IsNewLap && currentGameState.SessionData.PreviousLapWasValid &&
                 currentGameState.SessionData.LapTimePrevious > 0)
             {
                 // TODO: different tyre types on the same car
