@@ -2,13 +2,6 @@
 
 namespace CrewChiefV4.iRacing
 {
-    public class SessionFlag : BitfieldBase<SessionFlags>
-    {
-        public SessionFlag(int value) : base(value)
-        {
-        }
-    }
-
     [Flags]
     public enum SessionFlags : uint
     {

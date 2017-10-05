@@ -15,6 +15,42 @@ namespace CrewChiefV4.iRacing
         OnTrack
     }
     [Flags]
+    public enum TrackSurfaceMaterial
+    {
+        SurfaceNotInWorld = -1,
+        UndefinedMaterial = 0,
+
+        Asphalt1Material,
+        Asphalt2Material,
+        Asphalt3Material,
+        Asphalt4Material,
+        Concrete1Material,
+        Concrete2Material,
+        RacingDirt1Material,
+        RacingDirt2Material,
+        Paint1Material,
+        Paint2Material,
+        Rumble1Material,
+        Rumble2Material,
+        Rumble3Material,
+        Rumble4Material,
+
+        Grass1Material,
+        Grass2Material,
+        Grass3Material,
+        Grass4Material,
+        Dirt1Material,
+        Dirt2Material,
+        Dirt3Material,
+        Dirt4Material,
+        SandMaterial,
+        Gravel1Material,
+        Gravel2Material,
+        GrasscreteMaterial,
+        AstroturfMaterial,
+    };
+
+    [Flags]
     public enum SessionStates
     {
         Invalid,
@@ -36,4 +72,25 @@ namespace CrewChiefV4.iRacing
         irsdk_LR2CarsLeft, // there are two cars to our left.
         irsdk_LR2CarsRight // there are two cars to our right. 
     };
+    [Flags]
+    public enum DisplayUnits
+    {
+        EnglishImperial = 0,
+        Metric = 1
+    }
+    [Flags]
+    public enum WeatherType
+    {
+        Constant = 0,
+        Dynamic = 1
+    }
+    [Flags]
+    public enum Skies
+    {
+        Clear = 0,
+        PartlyCloudy = 1,
+        MostlyCloudy = 2,
+        Overcast = 3
+    }
+
 }

@@ -3,15 +3,6 @@ using System.Text;
 
 namespace CrewChiefV4.iRacing
 {
-    public class CameraState : BitfieldBase<CameraStates>
-    {
-        public CameraState() : this(0) { }
-
-        public CameraState(int value) : base(value)
-        {
-        }
-    }
-
     [Flags]
     public enum CameraStates : uint
     {

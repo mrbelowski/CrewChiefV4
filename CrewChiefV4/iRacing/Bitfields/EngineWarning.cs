@@ -2,14 +2,6 @@
 
 namespace CrewChiefV4.iRacing
 {
-    public class EngineWarning : BitfieldBase<EngineWarnings>
-    {
-        public EngineWarning(int value)
-            : base(value)
-        {
-        }
-    }
-
     [Flags]
     public enum EngineWarnings : uint
     {
