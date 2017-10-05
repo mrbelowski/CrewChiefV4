@@ -7,20 +7,20 @@ using iRSDKSharp;
 
 namespace CrewChiefV4.iRacing
 {
-    class iRacingSharedMemoryReader : GameDataReader
+    public class iRacingSharedMemoryReader : GameDataReader
     {
 
         iRacingSDK sdk = new iRacingSDK();
         Sim sim = new Sim();
         private Boolean initialised = false;
-        private List<iRacingStructWrapper> dataToDump;
-        private iRacingStructWrapper[] dataReadFromFile = null;
+        private List<iRacingStructDumpWrapper> dataToDump;
+        private iRacingStructDumpWrapper[] dataReadFromFile = null;
         private int dataReadFromFileIndex = 0;
         private String lastReadFileName = null;
         int lastUpdate = -1;
         private int _DriverId = -1;
         public int DriverId { get { return _DriverId; } }
-       
+        public string sessionInfoString;
         public object GetData(string headerName)
         {
             if (!sdk.IsConnected()) 
@@ -29,10 +29,6 @@ namespace CrewChiefV4.iRacing
             return sdk.GetData(headerName);
         }
 
-        public TelemetryValue<T> GetTelemetryValue<T>(string name)
-        {
-            return new TelemetryValue<T>(sdk, name);
-        }
         private object TryGetSessionNum()
         {
             try
@@ -51,12 +47,19 @@ namespace CrewChiefV4.iRacing
             public Sim data;
 
         }
+        public class iRacingStructDumpWrapper
+        {
+            public long ticksWhenRead;
+            public string rawSessionData;
+            public iRacingData data;
 
+
+        }
         public override void DumpRawGameData()
         {
             if (dumpToFile && dataToDump != null && dataToDump.Count > 0 && filenameToDump != null)
             {
-                SerializeObject(dataToDump.ToArray<iRacingStructWrapper>(), filenameToDump);
+                SerializeObject(dataToDump.ToArray<iRacingStructDumpWrapper>(), filenameToDump);
             }
         }
 
@@ -68,14 +71,34 @@ namespace CrewChiefV4.iRacing
         public override Object ReadGameDataFromFile(String filename)
         {
 
+            if (dataReadFromFile == null || filename != lastReadFileName)
+            {
+                dataReadFromFileIndex = 0;
+                dataReadFromFile = DeSerializeObject<iRacingStructDumpWrapper[]>(dataFilesPath + filename);
+                lastReadFileName = filename;
+            }
+            if (dataReadFromFile != null && dataReadFromFile.Length > dataReadFromFileIndex)
+            {
+                iRacingStructDumpWrapper structDumpWrapperData = dataReadFromFile[dataReadFromFileIndex];
+                SessionInfo sessionInfo = new SessionInfo(structDumpWrapperData.rawSessionData, (double)structDumpWrapperData.data.SessionTime);
+                sim.SdkOnSessionInfoUpdated(sessionInfo, structDumpWrapperData.data.SessionNum, structDumpWrapperData.data.PlayerCarIdx);
+                sim.SdkOnTelemetryUpdated(structDumpWrapperData.data);  
+                iRacingStructWrapper structWrapperData = new iRacingStructWrapper() { data = sim, ticksWhenRead = structDumpWrapperData.ticksWhenRead };
+                dataReadFromFileIndex++;
+
+                return structWrapperData;
+            }
+            else
+            {
                 return null;
+            }
         }
 
         protected override Boolean InitialiseInternal()
         {
             if (dumpToFile)
             {
-                dataToDump = new List<iRacingStructWrapper>();
+                dataToDump = new List<iRacingStructDumpWrapper>();
             }
             lock (this)
             {
@@ -83,6 +106,8 @@ namespace CrewChiefV4.iRacing
                 {
                     try
                     {
+                        sdk.Shutdown();
+
                         if(!sdk.IsInitialized)
                         {
                             sdk.Startup();
@@ -118,7 +143,7 @@ namespace CrewChiefV4.iRacing
                 return initialised;
             }
         }
-
+        
         public override Object ReadGameData(Boolean forSpotter)
         {
             lock (this)
@@ -152,18 +177,19 @@ namespace CrewChiefV4.iRacing
                         if(time != null)
                         {
                             // Get the session info string
-                            var sessionInfoString = sdk.GetSessionInfo();
+                            sessionInfoString = (string)sdk.GetSessionInfo();
                             SessionInfo sessionInfo = new SessionInfo(sessionInfoString, (double)time);
                             // Raise the SessionInfoUpdated event and pass along the session info and session time.
                             sim.SdkOnSessionInfoUpdated(sessionInfo, (int)TryGetSessionNum(),DriverId);
                             lastUpdate = newUpdate;
                         }
                     }
-                    sim.SdkOnTelemetryUpdated(new TelemetryInfo(sdk));
-                    structWrapper.data = sim;                 
+                    sim.SdkOnTelemetryUpdated(new iRacingData(sdk));                   
+                    structWrapper.data = sim;                
                     if (!forSpotter && dumpToFile && dataToDump != null)
                     {
-                        dataToDump.Add(structWrapper);
+                        dataToDump.Add(new iRacingStructDumpWrapper() { ticksWhenRead = structWrapper.ticksWhenRead,
+                            data = new iRacingData(sdk), rawSessionData=sessionInfoString });
                     }
                     return structWrapper;
                 }
@@ -173,22 +199,15 @@ namespace CrewChiefV4.iRacing
                 }
             }
         }
-        private void DisconnectInternal()
+        public override void DisconnectFromProcess()
         {
-            // This needs to be synchronized, because disconnection happens from CrewChief.Run and MainWindow.Dispose.
-            lock (this)
-            {
-                
-                sdk.Shutdown();
-                initialised = false;
-                Console.WriteLine("Disconnected from iRacing Shared Memory");
-            }
+            this.Dispose();
         }
         public override void Dispose()
         {
             lock (this)
             {
-                
+                sim.Reset();
                 sdk.Shutdown();
                 initialised = false;
                 Console.WriteLine("Disconnected from iRacing Shared Memory");

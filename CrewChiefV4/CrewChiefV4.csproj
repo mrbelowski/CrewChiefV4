@@ -114,7 +114,6 @@
     <Compile Include="GameDefinition.cs" />
     <Compile Include="GameStateReaderFactory.cs" />
     <Compile Include="GameState\GlobalBehaviourSettings.cs" />
-    <Compile Include="iRacing\Bitfields\BitfieldBase.cs" />
     <Compile Include="iRacing\Bitfields\CameraState.cs" />
     <Compile Include="iRacing\Bitfields\EngineWarning.cs" />
     <Compile Include="iRacing\Bitfields\PitServiceFlag.cs" />
@@ -129,7 +128,7 @@
     <Compile Include="iRacing\Drivers\DriverResults.cs" />
     <Compile Include="iRacing\Drivers\License.cs" />
     <Compile Include="iRacing\Enums.cs" />
-    <Compile Include="iRacing\Events\RaceEvent.cs" />
+    <Compile Include="iRacing\iRacingData.cs" />
     <Compile Include="iRacing\iRacingGameStateMapper.cs" />
     <Compile Include="iRacing\SessionInfo.cs" />
     <Compile Include="iRacing\iRacingSharedMemoryReader.cs" />
@@ -141,9 +140,6 @@
     <Compile Include="iRacing\Sector.cs" />
     <Compile Include="iRacing\SessionData.cs" />
     <Compile Include="iRacing\Sim.cs" />
-    <Compile Include="iRacing\TelemetryInfo.cs" />
-    <Compile Include="iRacing\TelemetryValue.cs" />
-    <Compile Include="iRacing\TimeDelta.cs" />
     <Compile Include="iRacing\Track.cs" />
     <Compile Include="iRacing\TrackConditions.cs" />
     <Compile Include="iRacing\YamlQuery.cs" />
