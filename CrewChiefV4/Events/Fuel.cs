@@ -598,7 +598,7 @@ namespace CrewChiefV4.Events
                     audioPlayer.playMessageImmediately(new QueuedMessage("Fuel/level",
                                 MessageContents(folderOneLitreRemaining), 0, null));
                 }
-                else if (currentFuel >= 0)
+                else if (currentFuel > 0)
                 {
                     haveData = true;
                     audioPlayer.playMessageImmediately(new QueuedMessage("Fuel/level",
