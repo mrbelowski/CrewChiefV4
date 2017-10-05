@@ -103,6 +103,7 @@ namespace CrewChiefV4
             eventsList.Add("FlagsMonitor", new FlagsMonitor(audioPlayer));
             eventsList.Add("ConditionsMonitor", new ConditionsMonitor(audioPlayer));
             eventsList.Add("OvertakingAidsMonitor", new OvertakingAidsMonitor(audioPlayer));
+            eventsList.Add("FrozenOrderMonitor", new FrozenOrderMonitor(audioPlayer));
             sessionEndMessages = new SessionEndMessages(audioPlayer);
             DriverNameHelper.readRawNamesToUsableNamesFiles(AudioPlayer.soundFilesPath);
         }
@@ -549,7 +550,20 @@ namespace CrewChiefV4
                             if (!sessionFinished && currentGameState.SessionData.SessionPhase == SessionPhase.Finished
                                 && previousGameState != null)
                             {
-                                Console.WriteLine("Session finished, position = " + currentGameState.SessionData.Position);
+                                string positionMsg;
+                                if (currentGameState.SessionData.IsDisqualified)
+                                {
+                                    positionMsg = "Disqualified";
+                                }
+                                else if (currentGameState.SessionData.IsDNF)
+                                {
+                                    positionMsg = "DNF";
+                                }
+                                else
+                                {
+                                    positionMsg = currentGameState.SessionData.Position.ToString();
+                                }
+                                Console.WriteLine("Session finished, position = " + positionMsg);
                                 audioPlayer.purgeQueues();
                                 if (displaySessionLapTimes)
                                 {

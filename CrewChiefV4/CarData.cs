@@ -187,6 +187,7 @@ namespace CrewChiefV4
         private static Dictionary<int, CarClass> intToCarClass;
         private static List<String> userCarClassIds = new List<string>();
         public static int RACEROOM_CLASS_ID = -1;
+        public static int IRACING_CLASS_ID = -1;
         public static String CLASS_ID = "";
 
         public class TyreTypeData
@@ -201,6 +202,7 @@ namespace CrewChiefV4
             [JsonConverter(typeof(CarClassEnumConverter))]
             public CarClassEnum carClassEnum { get; set; }
             public List<int> raceroomClassIds { get; set; }
+            public List<int> iracingClassIds { get; set; }
             public List<string> pCarsClassNames { get; set; }
             public List<string> rf1ClassNames { get; set; }
             public List<string> rf2ClassNames { get; set; }
@@ -229,6 +231,8 @@ namespace CrewChiefV4
             public bool timesInHundredths { get; set; }
             public bool useAmericanTerms { get; set; }
             public String enabledMessageTypes { get; set; }
+            public bool isDRSCapable { get; set; }
+            public float DRSRange { get; set; }
 
             public String placeholderClassId = "";
 
@@ -242,6 +246,7 @@ namespace CrewChiefV4
                 // initialise with default values
                 this.carClassEnum = CarClassEnum.UNKNOWN_RACE;
                 this.raceroomClassIds = new List<int>();
+                this.iracingClassIds = new List<int>();
                 this.pCarsClassNames = new List<string>();
                 this.rf1ClassNames = new List<string>();
                 this.rf2ClassNames = new List<string>();
@@ -260,6 +265,8 @@ namespace CrewChiefV4
                 this.minTyreCircumference = 0.5f * (float)Math.PI;
                 this.maxTyreCircumference = 1.2f * (float)Math.PI;
                 this.enabledMessageTypes = "";
+                this.isDRSCapable = false;
+                this.DRSRange = -1.0f;
             }
 
             public String getClassIdentifier()
@@ -538,7 +545,28 @@ namespace CrewChiefV4
             newCarClass.placeholderClassId = carClassId.ToString();
             return newCarClass;
         }
+        public static CarClass getCarClassForIRacingId(int carClassId)
+        {
+            // first check if it's in the cache
+            if (intToCarClass.ContainsKey(carClassId))
+            {
+                return intToCarClass[carClassId];
+            }
+            foreach (CarClass carClass in CAR_CLASSES.carClasses)
+            {
+                if (carClass.iracingClassIds.Contains(carClassId))
+                {
+                    intToCarClass.Add(carClassId, carClass);
+                    return carClass;
+                }
+            }
 
+            // create one if it doesn't exist
+            CarClass newCarClass = new CarClass();
+            intToCarClass.Add(carClassId, newCarClass);
+            newCarClass.placeholderClassId = carClassId.ToString();
+            return newCarClass;
+        }
         public static CarClass getCarClassForClassName(String className)
         {
             if (className == null)
