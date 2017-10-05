@@ -10,6 +10,8 @@ For support and discussions about Crew Chief we have our very own forum here: ht
 
 Changelog
 ---------
+Version 4.8.0.7: RF2 fixes - fixed low fuel message playing when it shouldn't, fixed European versions of full course yellow messages not playing on new installs
+
 Version 4.8.0.6: RF2 DRS support; RF2 full-course-yellow, standing start and rolling start order messages; R3E opponent laptime validation fix; don't play aero damage if the rest of the car is knackered; some AC fixes; Fixed first lap out of pits massively skewing fuel consumption estimate
 
 Version 4.8.0.3: RF2 session transition fixes
