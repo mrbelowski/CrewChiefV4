@@ -433,8 +433,6 @@ namespace CrewChiefV4
             {
                 spotter = (Spotter)Activator.CreateInstance(Type.GetType(gameDefinition.spotterName),
                     audioPlayer, GlobalBehaviourSettings.spotterEnabled);
-                if (spotter == null)
-                    Console.WriteLine("No spotter defined for game " + gameDefinition.spotterName);
             }
             else
             {

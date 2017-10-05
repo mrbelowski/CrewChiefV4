@@ -1403,8 +1403,6 @@ namespace CrewChiefV4.assetto
                     (shared.acsGraphic.completedLaps == previousGameState.SessionData.CompletedLaps + 1 || ((lastSessionPhase == SessionPhase.Countdown)
                     && (currentGameState.SessionData.SessionPhase == SessionPhase.Green || currentGameState.SessionData.SessionPhase == SessionPhase.FullCourseYellow)));
 
-                currentGameState.checkForNewLapData(previousGameState, mapToFloatTime(shared.acsGraphic.iLastTime));
-
                 if (previousGameState != null)
                 {
                     String stoppedInLandmark = currentGameState.SessionData.trackLandmarksTiming.updateLandmarkTiming(currentGameState.SessionData.TrackDefinition,
@@ -1678,15 +1676,17 @@ namespace CrewChiefV4.assetto
                 }
 
                 playerSplits.setNextSplitPoint(distanceRoundTrack, playerVehicle.speedMS, currentGameState.Now);
-                // more to come here                 
+                // more to come here 
+                currentGameState.SessionData.LapTimePrevious = mapToFloatTime(shared.acsGraphic.iLastTime);
 
                 if (previousGameState != null && previousGameState.SessionData.CurrentLapIsValid /*&& shared.acsStatic.penaltiesEnabled == 1*/)
                 {
                     currentGameState.SessionData.CurrentLapIsValid = shared.acsPhysics.numberOfTyresOut < 3;
                 }
 
-                if (currentGameState.LastLapTimeUpdated && currentGameState.SessionData.LapTimePrevious > 0)
+                if (currentGameState.SessionData.IsNewLap && currentGameState.SessionData.LapTimePrevious > 0)
                 {
+                    currentGameState.SessionData.PreviousLapWasValid = previousGameState != null && previousGameState.SessionData.CurrentLapIsValid;
                     currentGameState.SessionData.formattedPlayerLapTimes.Add(TimeSpan.FromSeconds(currentGameState.SessionData.LapTimePrevious).ToString(@"mm\:ss\.fff"));
                     currentGameState.SessionData.PositionAtStartOfCurrentLap = currentGameState.SessionData.Position;
                     currentGameState.SessionData.CurrentLapIsValid = true;
@@ -1700,9 +1700,10 @@ namespace CrewChiefV4.assetto
                     currentGameState.SessionData.PreviousLapWasValid = previousGameState.SessionData.PreviousLapWasValid;
                 }
 
-                if (currentGameState.LastLapTimeUpdated && currentGameState.SessionData.PreviousLapWasValid &&
+                if (currentGameState.SessionData.IsNewLap && currentGameState.SessionData.PreviousLapWasValid &&
                      currentGameState.SessionData.LapTimePrevious > 0)
                 {
+
                     if (currentGameState.SessionData.PlayerLapTimeSessionBest == -1 ||
                          currentGameState.SessionData.LapTimePrevious < currentGameState.SessionData.PlayerLapTimeSessionBest)
                     {

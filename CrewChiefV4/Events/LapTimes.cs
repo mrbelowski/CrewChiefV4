@@ -227,7 +227,7 @@ namespace CrewChiefV4.Events
             }
             sessionType = currentGameState.SessionData.SessionType;
             this.currentGameState = currentGameState;
-            if (currentGameState.LastLapTimeUpdated)
+            if (currentGameState.SessionData.IsNewLap)
             {
                 deltaPlayerLastToSessionBestInClassSet = false;
                 if (currentGameState.SessionData.LapTimePrevious > 0)
@@ -252,11 +252,11 @@ namespace CrewChiefV4.Events
 
             // check the current lap is still valid
             if (lapIsValid && currentGameState.SessionData.CompletedLaps > 0 &&
-                !currentGameState.LastLapTimeUpdated && !currentGameState.SessionData.CurrentLapIsValid)
+                !currentGameState.SessionData.IsNewLap && !currentGameState.SessionData.CurrentLapIsValid)
             {
                 lapIsValid = false;
             }
-            if (currentGameState.LastLapTimeUpdated)
+            if (currentGameState.SessionData.IsNewLap)
             {
                 lastLapTime = currentGameState.SessionData.LapTimePrevious;
                 if (lastLapTime > 0 && lapIsValid) {
@@ -291,7 +291,7 @@ namespace CrewChiefV4.Events
                     {
                         lapAndSectorsComparisonData = currentGameState.getTimeAndSectorsForBestOpponentLapInWindow(-1, currentGameState.carClass);
                         float[] playerBestLapAndSectors = new float[] { -1, -1, -1, -1 };
-                        if (currentGameState.LastLapTimeUpdated)
+                        if (currentGameState.SessionData.IsNewLap)
                         {
                             // If this is a new lap, then the just completed lap became last lap.  We do not want to use it as a comparison,
                             // we need previous player best time.
@@ -313,8 +313,8 @@ namespace CrewChiefV4.Events
             if (!currentGameState.PitData.OnInLap && previousGameState != null && !previousGameState.PitData.OnOutLap 
                 && !currentGameState.PitData.InPitlane)   // as this is a new lap, check whether the *previous* state was an outlap
             {
-                Boolean sectorsReportedForLap = false;
-                if (currentGameState.LastLapTimeUpdated && 
+                Boolean sectorsReportedForLap = false;                
+                if (currentGameState.SessionData.IsNewLap && 
                     ((currentGameState.SessionData.SessionType == SessionType.HotLap && currentGameState.SessionData.CompletedLaps > 0) || currentGameState.SessionData.CompletedLaps > 1))
                 {
                     if (lapTimesWindow == null)

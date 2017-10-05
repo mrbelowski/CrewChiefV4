@@ -57,6 +57,9 @@ namespace CrewChiefV4.rFactor2
         private double lastPlayerTelemetryET = -1.0;
         private double lastScoringET = -1.0;
 
+        // True if it looks like track has no DRS zones defined.
+        private bool detectedTrackNoDRSZones = false;
+
         public RF2GameStateMapper()
         {
             this.tyreWearThresholds.Add(new CornerData.EnumWithThresholds(TyreCondition.NEW, -10000.0f, this.scrubbedTyreWearPercent));
@@ -191,7 +194,7 @@ namespace CrewChiefV4.rFactor2
                     if (!this.waitingToTerminateSession && !sessionStarted)
                     {
                         Console.WriteLine("Abrupt Session End: start to wait for session end.");
-                        
+
                         // Start waiting for session end.
                         this.ticksWhenSessionEnded = DateTime.Now.Ticks;
                         this.waitingToTerminateSession = true;
@@ -350,7 +353,7 @@ namespace CrewChiefV4.rFactor2
 
                 // Exclude known situations when telemetry is not available, but log otherwise to get more
                 // insights.
-                if (shared.extended.mInRealtimeFC == 1 
+                if (shared.extended.mInRealtimeFC == 1
                     && shared.scoring.mScoringInfo.mInRealtime == 1
                     && shared.scoring.mScoringInfo.mGamePhase != (byte)rFactor2Constants.rF2GamePhase.GridWalk)
                 {
@@ -362,7 +365,7 @@ namespace CrewChiefV4.rFactor2
             var currPlayerTelET = playerTelemetry.mElapsedTime;
             var currScoringET = shared.scoring.mScoringInfo.mCurrentET;
 
-            if (currPlayerTelET == this.lastPlayerTelemetryET 
+            if (currPlayerTelET == this.lastPlayerTelemetryET
                 && currScoringET == this.lastScoringET)
                 return pgs;  // Skip this update.
 
@@ -446,11 +449,13 @@ namespace CrewChiefV4.rFactor2
                 csd.IsNewSession = true;
             }
 
-            // Do not use previous game state if this is the new session.
             if (csd.IsNewSession)
             {
+                // Do not use previous game state if this is the new session.
                 pgs = null;
+
                 GlobalBehaviourSettings.UpdateFromCarClass(cgs.carClass);
+                this.detectedTrackNoDRSZones = false;
             }
 
             // Restore cumulative data.
@@ -591,7 +596,7 @@ namespace CrewChiefV4.rFactor2
                 // Those values change on sector/lap change, otherwise stay the same between updates.
                 psd.restorePlayerTimings(csd);
             }
-            
+
             this.processPlayerTimingData(ref shared.scoring, cgs, pgs, ref playerScoring);
 
             csd.SessionTimesAtEndOfSectors = pgs != null ? psd.SessionTimesAtEndOfSectors : new SessionData().SessionTimesAtEndOfSectors;
@@ -630,7 +635,7 @@ namespace CrewChiefV4.rFactor2
                     csd.formattedPlayerLapTimes.Add(lt);
             }
 
-            if (cgs.LastLapTimeUpdated && csd.LapTimePrevious > 0)
+            if (csd.IsNewLap && csd.LapTimePrevious > 0)
                 csd.formattedPlayerLapTimes.Add(TimeSpan.FromSeconds(csd.LapTimePrevious).ToString(@"mm\:ss\.fff"));
 
             csd.LeaderHasFinishedRace = leaderScoring.mFinishStatus == (int)rFactor2Constants.rF2FinishStatus.Finished;
@@ -850,6 +855,34 @@ namespace CrewChiefV4.rFactor2
             }
 
             // --------------------------------
+            // DRS data
+            cgs.OvertakingAids.DrsAvailable = playerTelemetry.mRearFlapLegalStatus == (int)rFactor2Constants.rF2RearFlapLegalStatus.Alllowed;
+
+            // Many of rF2 tracks have no DRS zones defined.  One of the symptoms is DRS alloweved immediately on race start.
+            // Disallow DRS messages in such case.
+            if (!this.detectedTrackNoDRSZones
+                && csd.CompletedLaps == 0 
+                && csd.SessionRunningTime > 10 
+                && cgs.OvertakingAids.DrsAvailable)
+            {
+                this.detectedTrackNoDRSZones = true;
+                if (cgs.carClass.isDRSCapable)
+                    Console.WriteLine("Track has no valid DRS zones defined, disabling DRS messages.");
+            }
+
+            cgs.OvertakingAids.DrsEngaged = playerTelemetry.mRearFlapActivated == 1;
+
+            if (cgs.SessionData.SessionPhase != SessionPhase.FullCourseYellow)
+            {
+                // Doesn't look like game is providing info on when DRS is actually enabled in race, so guess.
+                cgs.OvertakingAids.DrsEnabled = cgs.carClass.isDRSCapable
+                    && csd.CompletedLaps > 2  // Hack of course.
+                    && !this.detectedTrackNoDRSZones;
+            }
+
+            cgs.OvertakingAids.DrsRange = cgs.carClass.DRSRange;
+
+            // --------------------------------
             // opponent data
             this.opponentKeysProcessed.Clear();
 
@@ -878,7 +911,8 @@ namespace CrewChiefV4.rFactor2
                     csd.PlayerClassSessionBestLapTime = csd.PlayerLapTimeSessionBest > 0.0f ?
                         csd.PlayerLapTimeSessionBest : -1.0f;
 
-                    if (cgs.LastLapTimeUpdated
+                    if (csd.IsNewLap 
+                        && psd != null && !psd.IsNewLap
                         && csd.LapTimePrevious > 0.0f
                         && csd.PreviousLapWasValid)
                     {
@@ -1435,8 +1469,7 @@ namespace CrewChiefV4.rFactor2
             /////////////////////////////////////
             // Current lap timings
             csd.LapTimeCurrent = csd.SessionRunningTime - (float)playerScoring.mLapStartET;
-
-            cgs.checkForNewLapData(previousGameState, (float) playerScoring.mLastLapTime);
+            csd.LapTimePrevious = playerScoring.mLastLapTime > 0.0f ? (float)playerScoring.mLastLapTime : -1.0f;
 
             // Last (most current) per-sector times:
             // NOTE: this logic still misses invalid sector handling.
@@ -1492,7 +1525,7 @@ namespace CrewChiefV4.rFactor2
             // Update Sector/Lap timings.
             var lastSectorTime = this.getLastSectorTime(ref playerScoring, csd.SectorNumber);
 
-            if (cgs.LastLapTimeUpdated)
+            if (csd.IsNewLap)
             {
                 if (lastSectorTime > 0.0f)
                 {
@@ -1518,8 +1551,7 @@ namespace CrewChiefV4.rFactor2
                     (float)scoring.mScoringInfo.mTrackTemp,
                     (float)scoring.mScoringInfo.mAmbientTemp);
             }
-            // don't want to add cumulative sector data if we're in sector1 - this is covered by the lap completion stuff
-            else if (csd.IsNewSector && lastSectorTime > 0.0f && psd != null && csd.SectorNumber != 1)
+            else if (csd.IsNewSector && lastSectorTime > 0.0f)
             {
                 csd.playerAddCumulativeSectorData(
                     psd.SectorNumber,
