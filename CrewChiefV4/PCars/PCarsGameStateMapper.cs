@@ -324,6 +324,19 @@ namespace CrewChiefV4.PCars
             return null;
         }
 
+        private void setCurrentParticipant(pCarsAPIStruct shared)
+        {
+            if (FIRST_VIEWED_PARTICIPANT_INDEX == -1)
+            {
+                FIRST_VIEWED_PARTICIPANT_INDEX = shared.mViewedParticipantIndex;
+                String thisName = StructHelper.getNameFromBytes(shared.mParticipantData[shared.mViewedParticipantIndex].mName);
+                if (thisName != null && thisName.Length > 0)
+                {
+                    FIRST_VIEWED_PARTICIPANT_NAME = thisName;
+                }
+            }
+        }
+
         public GameStateData mapToGameStateData(Object memoryMappedFileStruct, GameStateData previousGameState)
         {
             pCarsAPIStruct shared = ((CrewChiefV4.PCars.PCarsSharedMemoryReader.PCarsStructWrapper)memoryMappedFileStruct).data;
@@ -343,15 +356,7 @@ namespace CrewChiefV4.PCars
                 return previousGameState;
             }
             checkForPossiblyInactiveOpponents(shared.mParticipantData, shared.mNumParticipants);
-            if (FIRST_VIEWED_PARTICIPANT_INDEX == -1)
-            {
-                FIRST_VIEWED_PARTICIPANT_INDEX = shared.mViewedParticipantIndex;
-                String thisName = StructHelper.getNameFromBytes(shared.mParticipantData[shared.mViewedParticipantIndex].mName);
-                if (thisName != null && thisName.Length > 0)
-                {
-                    FIRST_VIEWED_PARTICIPANT_NAME = thisName;
-                }
-            }
+            setCurrentParticipant(shared);
 
             Tuple<int, pCarsAPIParticipantStruct> playerData = getPlayerDataStruct(shared.mParticipantData, shared.mViewedParticipantIndex);
             String playerName = StructHelper.getNameFromBytes(shared.mParticipantData[shared.mViewedParticipantIndex].mName);
@@ -544,6 +549,8 @@ namespace CrewChiefV4.PCars
                         if (currentGameState.SessionData.SessionType == SessionType.Race)
                         {
                             justGoneGreen = true;
+                            // ensure that we track the car we're in at the point when the lights change
+                            setCurrentParticipant(shared);
                             if (currentGameState.SessionData.SessionHasFixedTime)
                             {
                                 currentGameState.SessionData.SessionTotalRunTime = shared.mEventTimeRemaining;
