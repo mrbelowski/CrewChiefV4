@@ -1667,7 +1667,7 @@ namespace CrewChiefV4.GameState
 
         }
 
-        public float GetDeltaTime(DeltaTime playerDelta)
+        public float GetSignedDeltaTime(DeltaTime playerDelta)
         {
             TimeSpan splitTime = new TimeSpan(0);
             if (playerDelta.deltaPoints.Count > 0 && deltaPoints.Count > 0)
@@ -1686,7 +1686,12 @@ namespace CrewChiefV4.GameState
                     return 0f;
                 }
             }
-            return Math.Abs((float)splitTime.TotalSeconds);
+            return (float)splitTime.TotalSeconds;
+        }
+
+        public float GetDeltaTime(DeltaTime playerDelta)
+        {
+            return Math.Abs(GetSignedDeltaTime(playerDelta));
         }
     }
 
