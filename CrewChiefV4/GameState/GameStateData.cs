@@ -525,7 +525,7 @@ namespace CrewChiefV4.GameState
 
         // other stuff like X/Y/Z co-ordinates, acceleration, orientation, ...
     }
-
+    
     public class OpponentData
     {
         // Sometimes the name is corrupted with previous session's data. Worst case is that the name is entirely readable
@@ -1684,6 +1684,59 @@ namespace CrewChiefV4.GameState
         public Boolean DrsEngaged = false;
         public Single DrsRange = 0;
     }
+
+    public class DeltaTime
+    {
+        private Dictionary<float, DateTime> deltaPoints = new Dictionary<float, DateTime>();
+        private float currentDeltaPoint = 0;
+        private float nextDeltaPoint = 0;
+        public DeltaTime(float trackLength, float distanceRoundTrack, DateTime now, float spacing = 50f)
+        {
+            deltaPoints.Clear();
+            float totalSpacing = 0;
+            while (totalSpacing < trackLength)
+            {
+                //first one at s/f line
+                if (totalSpacing == 0)
+                {
+                    deltaPoints.Add(totalSpacing, now);
+                }
+                totalSpacing += spacing;
+                if (totalSpacing < trackLength - spacing)
+                {
+                    deltaPoints.Add(totalSpacing, now);
+                }
+                if(distanceRoundTrack >= totalSpacing)
+                {
+                    currentDeltaPoint = totalSpacing;
+                }
+            }
+        }
+        public void SetNextDeltaPoint(float distanceRoundTrack, float speed, DateTime now)
+        {
+            foreach (KeyValuePair<float, DateTime> gap in deltaPoints)
+            {
+                if (gap.Key >= distanceRoundTrack)
+                {
+                    if (currentDeltaPoint != gap.Key)
+                    {
+                        nextDeltaPoint = gap.Key;
+                    }
+                    break;
+                }
+            }
+            if (currentDeltaPoint != nextDeltaPoint || speed < 5)
+            {
+                deltaPoints[nextDeltaPoint] = now;
+                currentDeltaPoint = nextDeltaPoint;
+            }
+        }
+        public DateTime GetCurrentDeltaPointTime()
+        {
+            return deltaPoints[currentDeltaPoint];
+        }
+    }
+
 
     public class GameStateData
     {

@@ -21,7 +21,7 @@ namespace CrewChiefV4.iRacing
         {
             get { return _driver; }
         }
-
+        public float SessionTime { get; set; }
         public int Position { get; set; }
         public int TrackPosition { get; set; }
         public int ClassPosition { get; set; }
@@ -44,6 +44,13 @@ namespace CrewChiefV4.iRacing
         public int CurrentSector { get; set; }
         public int CurrentFakeSector { get; set; }
         public float LastLaptime { get; set; }
+        public float CurrentLapTime 
+        { 
+            get
+            {
+                return SessionTime - (float)this.Driver.CurrentResults.FakeSector1.EnterSessionTime;
+            }
+        }
 
         public void ParseTelemetry(iRacingData e)
         {
@@ -55,7 +62,7 @@ namespace CrewChiefV4.iRacing
 
             this.Gear = e.CarIdxGear[this.Driver.Id];
             this.Rpm = e.CarIdxRPM[this.Driver.Id];
-
+            this.SessionTime = (float)e.SessionTime;
             this.Driver.PitInfo.CalculatePitInfo(e.SessionTime);
         }
 
