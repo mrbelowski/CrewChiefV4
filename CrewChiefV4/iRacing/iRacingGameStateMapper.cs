@@ -34,24 +34,20 @@ namespace CrewChiefV4.iRacing
                 float totalGaps = 0;
                 while (totalGaps < trackLength)
                 {
+                    if (totalGaps == 0)
+                    {
+                        splitPoints.Add(totalGaps, now);
+                    }
                     totalGaps += splitSpacing;
-
                     if (totalGaps < trackLength - splitSpacing)
                     {
                         splitPoints.Add(totalGaps, now);
                     }
-                    else
-                    {
-                        break;
-                    }
-
                 }
-                splitPoints.Add(trackLength - 50, now);
             }
 
             public void setNextSplitPoint(float distanceRoundTrack, float speed, DateTime now, int currentLap)
             {
-                //float distance = FixPercentagesOnLapChange(distanceRoundTrack, currentLap);
                 foreach (KeyValuePair<float, DateTime> gap in splitPoints)
                 {
                     if (gap.Key >= distanceRoundTrack)
@@ -65,7 +61,6 @@ namespace CrewChiefV4.iRacing
                 }
                 if (currentSplitPoint != nextSplitPoint || speed < 5)
                 {
-                    // Console.WriteLine("setting split:" + nextSplitPoint);
                     splitPoints[nextSplitPoint] = now;
                     currentSplitPoint = nextSplitPoint;
                 }
@@ -188,6 +183,7 @@ namespace CrewChiefV4.iRacing
                 if (shared.SessionData.IsLimitedTime)
                 {
                     currentGameState.SessionData.SessionTimeRemaining = (float)shared.Telemetry.SessionTimeRemain;
+                    currentGameState.SessionData.SessionTotalRunTime = (float)shared.Telemetry.SessionTimeRemain;
                     currentGameState.SessionData.SessionHasFixedTime = true;
                     Console.WriteLine("SessionTotalRunTime = " + currentGameState.SessionData.SessionTotalRunTime);
                 }
@@ -244,10 +240,11 @@ namespace CrewChiefV4.iRacing
                     {
                         justGoneGreen = true;
                         // just gone green, so get the session data
-                        if (shared.SessionData.IsLimitedSessionLaps)
+                        if (shared.SessionData.IsLimitedTime)
                         {
                             currentGameState.SessionData.SessionTotalRunTime = (float)shared.Telemetry.SessionTimeRemain;
                             currentGameState.SessionData.SessionHasFixedTime = true;
+
                             if(currentGameState.SessionData.SessionType.HasFlag(SessionType.Race))
                             {
                                 currentGameState.SessionData.HasExtraLap = true;
