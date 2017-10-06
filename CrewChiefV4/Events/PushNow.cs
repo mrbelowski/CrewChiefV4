@@ -105,44 +105,65 @@ namespace CrewChiefV4.Events
             }
         }
 
-        private void checkTempsAfterPitExit() { 
-
-}
-
         private Boolean isOpponentApproachingPitExit(GameStateData currentGameState)
         {
-            float distanceStartCheckPoint;
-            float distanceEndCheckPoint;
-
-            // hack for PCars - the distanceRoundTrack will be zero until we enter turn one after leaving the pits. Stupid...
-            if (currentGameState.PositionAndMotionData.DistanceRoundTrack == 0)
+            if (CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_32BIT ||
+                CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_64BIT ||
+                CrewChief.gameDefinition.gameEnum == GameEnum.PCARS2 ||
+                CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_NETWORK)
             {
-                distanceStartCheckPoint = 0;
-                distanceEndCheckPoint = maxSeparationForPitExitWarning - minSeparationForPitExitWarning;
+                // Hooray for PCars and its broken data
+                float distanceStartCheckPoint;
+                float distanceEndCheckPoint;
+
+                // hack for PCars - the distanceRoundTrack will be zero until we enter turn one after leaving the pits. Stupid...
+                if (currentGameState.PositionAndMotionData.DistanceRoundTrack == 0)
+                {
+                    distanceStartCheckPoint = 0;
+                    distanceEndCheckPoint = maxSeparationForPitExitWarning - minSeparationForPitExitWarning;
+                }
+                else
+                {
+                    distanceStartCheckPoint = currentGameState.PositionAndMotionData.DistanceRoundTrack - maxSeparationForPitExitWarning;
+                    distanceEndCheckPoint = currentGameState.PositionAndMotionData.DistanceRoundTrack - minSeparationForPitExitWarning;
+                }
+                Boolean startCheckPointIsInSector1 = true;
+                // here we assume the end check point will be in sector 1 (after the s/f line)
+                if (distanceStartCheckPoint < 0)
+                {
+                    startCheckPointIsInSector1 = false;
+                    distanceStartCheckPoint = currentGameState.SessionData.TrackDefinition.trackLength + distanceStartCheckPoint;
+                }
+                foreach (KeyValuePair<string, OpponentData> opponent in currentGameState.OpponentData)
+                {
+                    if ((opponent.Value.OpponentLapData.Count > 0 || !startCheckPointIsInSector1) && opponent.Value.Speed > 0 &&
+                        !opponent.Value.isEnteringPits() && !opponent.Value.isExitingPits() && !opponent.Value.InPits &&
+                        ((startCheckPointIsInSector1 && opponent.Value.DistanceRoundTrack > distanceStartCheckPoint && opponent.Value.DistanceRoundTrack < distanceEndCheckPoint) ||
+                         (!startCheckPointIsInSector1 && (opponent.Value.DistanceRoundTrack > distanceStartCheckPoint || opponent.Value.DistanceRoundTrack < distanceEndCheckPoint))))
+                    {
+                        return true;
+                    }
+                }
+                return false;
             }
             else
             {
-                distanceStartCheckPoint = currentGameState.PositionAndMotionData.DistanceRoundTrack - maxSeparationForPitExitWarning;
-                distanceEndCheckPoint = currentGameState.PositionAndMotionData.DistanceRoundTrack - minSeparationForPitExitWarning;
-            }
-            Boolean startCheckPointIsInSector1 = true;
-            // here we assume the end check point will be in sector 1 (after the s/f line)
-            if (distanceStartCheckPoint < 0) 
-            {
-                startCheckPointIsInSector1 = false;
-                distanceStartCheckPoint = currentGameState.SessionData.TrackDefinition.trackLength + distanceStartCheckPoint;
-            }
-            foreach (KeyValuePair<string, OpponentData> opponent in currentGameState.OpponentData)
-            {
-                if ((opponent.Value.OpponentLapData.Count > 0 || !startCheckPointIsInSector1) && opponent.Value.Speed > 0 && 
-                    !opponent.Value.isEnteringPits() && !opponent.Value.isExitingPits() && !opponent.Value.InPits &&
-                    ((startCheckPointIsInSector1 && opponent.Value.DistanceRoundTrack > distanceStartCheckPoint && opponent.Value.DistanceRoundTrack < distanceEndCheckPoint) ||
-                     (!startCheckPointIsInSector1 && (opponent.Value.DistanceRoundTrack > distanceStartCheckPoint || opponent.Value.DistanceRoundTrack < distanceEndCheckPoint))))
+                // games with sane lap distance data when pitting
+                foreach (KeyValuePair<string, OpponentData> opponent in currentGameState.OpponentData)
                 {
-                    return true;
+                    if (opponent.Value.Speed > 0 &&
+                        !opponent.Value.isEnteringPits() && !opponent.Value.isExitingPits() && !opponent.Value.InPits)
+                    {
+                        if (opponent.Value.DeltaTime.GetSignedDeltaTime(currentGameState.SessionData.DeltaTime) > 0 &&
+                            opponent.Value.DeltaTime.GetSignedDeltaTime(currentGameState.SessionData.DeltaTime) < 7)
+                        {
+                            // more than 0 but less than 7 seconds behind, so warn about an approaching car
+                            return true;
+                        }
+                    }
                 }
+                return false;
             }
-            return false;
         }
 
         private Boolean checkGaps(GameStateData currentGameState, int numLapsLeft, Boolean checkPushToGain, Boolean checkPushToHold)
