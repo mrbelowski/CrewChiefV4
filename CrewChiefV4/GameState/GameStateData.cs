@@ -352,6 +352,8 @@ namespace CrewChiefV4.GameState
         // as above, but for the player only
         public Dictionary<TyreType, float> PlayerBestLapTimeByTyre = new Dictionary<TyreType, float>();
 
+        public DeltaTime DeltaTime = new DeltaTime();
+
         public SessionData()
         {
             SessionTimesAtEndOfSectors.Add(1, -1);
@@ -603,6 +605,8 @@ namespace CrewChiefV4.GameState
 
         // this is a bit of a guess - it's actually the race position when the car is 300m(?) from the start line
         public int PositionOnApproachToPitEntry = -1;
+
+        public DeltaTime DeltaTime = null;
 
         public override string ToString()
         {
@@ -1687,12 +1691,19 @@ namespace CrewChiefV4.GameState
 
     public class DeltaTime
     {
-        private Dictionary<float, DateTime> deltaPoints = new Dictionary<float, DateTime>();
-        private float currentDeltaPoint = 0;
-        private float nextDeltaPoint = 0;
-        public DeltaTime(float trackLength, float distanceRoundTrack, DateTime now, float spacing = 50f)
+        public Dictionary<float, DateTime> deltaPoints =  new Dictionary<float, DateTime>();
+        public float currentDeltaPoint = -1;
+        public float nextDeltaPoint = -1;
+        public float distanceRoundTrack = -1;
+        public DeltaTime()
         {
-            deltaPoints.Clear();
+            this.deltaPoints = new Dictionary<float, DateTime>();
+        }
+        public DeltaTime(float trackLength, float distanceRoundTrack, DateTime now, float spacing = 20f)
+        {
+            this.distanceRoundTrack = distanceRoundTrack;
+            this.deltaPoints = new Dictionary<float, DateTime>();
+            //deltaPoints.Clear();
             float totalSpacing = 0;
             while (totalSpacing < trackLength)
             {
@@ -1714,6 +1725,7 @@ namespace CrewChiefV4.GameState
         }
         public void SetNextDeltaPoint(float distanceRoundTrack, float speed, DateTime now)
         {
+            this.distanceRoundTrack = distanceRoundTrack;
             foreach (KeyValuePair<float, DateTime> gap in deltaPoints)
             {
                 if (gap.Key >= distanceRoundTrack)
@@ -1730,10 +1742,29 @@ namespace CrewChiefV4.GameState
                 deltaPoints[nextDeltaPoint] = now;
                 currentDeltaPoint = nextDeltaPoint;
             }
+
         }
-        public DateTime GetCurrentDeltaPointTime()
+
+        public float GetDeltaTime(DeltaTime playerDelta)
         {
-            return deltaPoints[currentDeltaPoint];
+            TimeSpan splitTime = new TimeSpan(0);
+            if (playerDelta.deltaPoints.Count > 0 && deltaPoints.Count > 0)
+            {
+                //opponent is behind
+                if (distanceRoundTrack < playerDelta.distanceRoundTrack)
+                {
+                    splitTime = playerDelta.deltaPoints[currentDeltaPoint] - deltaPoints[currentDeltaPoint];
+                }
+                else if (distanceRoundTrack > playerDelta.distanceRoundTrack)
+                {
+                    splitTime = playerDelta.deltaPoints[playerDelta.currentDeltaPoint] - deltaPoints[playerDelta.currentDeltaPoint];
+                }
+                else
+                {
+                    return 0f;
+                }
+            }
+            return Math.Abs((float)splitTime.TotalSeconds);
         }
     }
 
