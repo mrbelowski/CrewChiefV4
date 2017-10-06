@@ -950,6 +950,11 @@ namespace CrewChiefV4.GameState
             }
         }
 
+        public int getLapDifferenceToPlayer(SessionData playerSessionData)
+        {
+            return playerSessionData.CompletedLaps - CompletedLaps;
+        }
+
         public OpponentDelta getTimeDifferenceToPlayer(SessionData playerSessionData)
         {
             if (playerSessionData.SessionType != SessionType.Race)
