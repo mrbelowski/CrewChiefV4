@@ -152,8 +152,6 @@ namespace CrewChiefV4.iRacing
                     this.LastPitLaneTimeSeconds = this.PitLaneExitTime.Value - this.PitLaneEntryTime.Value;
                     this.CurrentPitLaneTimeSeconds = 0;
                     IsAtPitExit = true;
-                    //Sim.Instance.NotifyPitstop(RaceEvent.EventTypes.PitExit, _driver);
-
                     // Reset
                     this.PitLaneEntryTime = null;
                 }
