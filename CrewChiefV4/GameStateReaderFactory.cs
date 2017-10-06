@@ -48,7 +48,7 @@ namespace CrewChiefV4
                     case GameEnum.PCARS_32BIT:
                     case GameEnum.PCARS_64BIT:
                     case GameEnum.PCARS2:
-                        if (pcarsSharedMemoryReader == null) 
+                        if (pcarsSharedMemoryReader == null)
                         {
                             pcarsSharedMemoryReader = new PCarsSharedMemoryReader();
                         }
