@@ -82,8 +82,7 @@ namespace CrewChiefV4.iRacing
                 iRacingStructDumpWrapper structDumpWrapperData = dataReadFromFile[dataReadFromFileIndex];
                 if(structDumpWrapperData.rawSessionData.Length > 0)
                 {
-                    sessionInfoString = structDumpWrapperData.rawSessionData;
-                    SessionInfo sessionInfo = new SessionInfo(sessionInfoString, (double)structDumpWrapperData.data.SessionTime);
+                    SessionInfo sessionInfo = new SessionInfo(structDumpWrapperData.rawSessionData, (double)structDumpWrapperData.data.SessionTime);
                     sim.SdkOnSessionInfoUpdated(sessionInfo, structDumpWrapperData.data.SessionNum, structDumpWrapperData.data.PlayerCarIdx);
                 }
                 sim.SdkOnTelemetryUpdated(structDumpWrapperData.data);  
