@@ -18,7 +18,7 @@ namespace CrewChiefV4.Events
     class FrozenOrderMonitor : AbstractEvent
     {
         private const int ACTION_STABLE_THRESHOLD = 3;
-        private const float DIST_TO_START_TO_ANNOUNCE_POS_REMINDER = 250.0f;
+        private const float DIST_TO_START_TO_ANNOUNCE_POS_REMINDER = 300.0f;
 
         // Number of updates FO Action and Driver name were the same.
         private int numUpdatesActionSame = 0;
