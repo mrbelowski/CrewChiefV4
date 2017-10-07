@@ -142,12 +142,12 @@ namespace CrewChiefV4.iRacing
                     }
                     else
                     {
-                        //still trying to decide if we should remove inactive clients 
-                        //if (!driver.CurrentResults.IsEmpty && !driver.CurrentResults.IsOut)
-                        //{
+                        
+                        if (!driver.IsPacecar)
+                        {
                             currentGameState.OpponentData.Add(driverName, createOpponentData(driver, driverName,
                             false, CarData.getCarClassForIRacingId(driver.Car.CarClassId).carClassEnum, currentGameState.SessionData.TrackDefinition.trackLength));                           
-                        //}
+                        }
 
                     }
                 }
@@ -679,12 +679,12 @@ namespace CrewChiefV4.iRacing
                 else
                 {
 
-                    //if (!driver.CurrentResults.IsEmpty && !driver.CurrentResults.IsOut)
-                    //{
+                    if (!driver.IsPacecar)
+                    {
                         currentGameState.OpponentData.Add(driverName, createOpponentData(driver, driverName,
                                   false, CarData.getCarClassForIRacingId(driver.Car.CarClassId).carClassEnum, currentGameState.SessionData.TrackDefinition.trackLength));
                         
-                    //}
+                    }
   
                 }
             }
