@@ -800,7 +800,6 @@ namespace CrewChiefV4
             }
         }
 
-        private bool silenced = false;
         private void listenForChannelOpen()
         {
             Boolean channelOpen = false;
@@ -820,24 +819,12 @@ namespace CrewChiefV4
                         Console.WriteLine("Listening...");
 
                         if (rejectMessagesWhenTalking)
-                        {
-                            if (this.silenced)
-                                Console.WriteLine("FUCKUP - SILENCED BEFORE SILENCING.");
-                            this.silenced = true;
-
                             setMessagesVolume(0.0f);
-                        }
                     }
                     else if (channelOpen && !controllerConfiguration.isChannelOpen())
                     {
                         if (rejectMessagesWhenTalking)
-                        {
-                            if (!this.silenced)
-                                Console.WriteLine("FUCKUP - NOT SILENCED BEFORE RESTORING VOLUME.");
-                            this.silenced = false;
-
                             setMessagesVolume(currentVolume);
-                        }
 
                         Console.WriteLine("Stopping listening...");
                         crewChief.speechRecogniser.recognizeAsyncCancel();
