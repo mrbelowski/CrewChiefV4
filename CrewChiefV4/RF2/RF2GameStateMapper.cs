@@ -464,6 +464,7 @@ namespace CrewChiefV4.rFactor2
                         || csd.SessionPhase == SessionPhase.Formation
                         || csd.SessionPhase == SessionPhase.Countdown))
             {
+                Console.WriteLine("JUST CAUSE YOU FEEL IT, DOESN'T MEAN IT'S THERE");
                 csd.IsNewSession = true;
             }
 
@@ -2019,7 +2020,8 @@ namespace CrewChiefV4.rFactor2
                     gridOrder = false;
                     fod.AssignedPosition = vehicleRules.mPositionAssignment + 1;  // + 1, because it is zero based with 0 meaning follow SC.
 
-                    if (prevFrozenOrderData.Phase == FrozenOrderPhase.None)
+                    // Initialize player laps when FCY was assigned.  This is used as a base to calculate SC full distance.6
+                    if (this.playerLapsWhenFCYPosAssigned == -1)
                         this.playerLapsWhenFCYPosAssigned = vehicle.mTotalLaps;
                 }
                 else  // SCR plugin is enabled or this is not FCY case, the the order reported is grid order, with columns specified.
@@ -2101,7 +2103,6 @@ namespace CrewChiefV4.rFactor2
                     fod.Action = FrozenOrderAction.AllowToPass;
                 else if (distDelta > 70.0)
                     fod.Action = FrozenOrderAction.CatchUp;
-
             }
 
             if (rules.mTrackRules.mSafetyCarActive == 1)
