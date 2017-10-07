@@ -1069,11 +1069,6 @@ namespace CrewChiefV4.rFactor2
                         opponent.TyreChangesByLap.Add(old.Key, old.Value);
 
                     opponent.NumPitStops = opponentPrevious.NumPitStops;
-                    opponent.DeltaTime = opponentPrevious.DeltaTime;
-                }
-                else
-                {
-                    opponent.DeltaTime = new DeltaTime(csd.TrackDefinition.trackLength, opponent.DistanceRoundTrack, DateTime.Now);
                 }
 
                 opponent.UnFilteredPosition = opponent.Position;
@@ -1099,8 +1094,6 @@ namespace CrewChiefV4.rFactor2
                     opponent.DistanceRoundTrack = (float)vehicleScoring.mLapDist;
                 }
 
-                opponent.DeltaTime.SetNextDeltaPoint(opponent.DistanceRoundTrack, opponent.Speed, cgs.Now);
-
                 if (opponentPrevious != null) 
                 {
                     // if we've just crossed the 'near to pit entry' mark, update our near-pit-entry position. Otherwise copy it from the previous state
@@ -1113,7 +1106,14 @@ namespace CrewChiefV4.rFactor2
                     {
                         opponent.PositionOnApproachToPitEntry = opponentPrevious.PositionOnApproachToPitEntry;
                     }
+                    // carry over the delta time - do this here so if we have to initalise it we have the correct distance data
+                    opponent.DeltaTime = opponentPrevious.DeltaTime;
                 }
+                else
+                {
+                    opponent.DeltaTime = new DeltaTime(csd.TrackDefinition.trackLength, opponent.DistanceRoundTrack, DateTime.Now);
+                }
+                opponent.DeltaTime.SetNextDeltaPoint(opponent.DistanceRoundTrack, opponent.Speed, cgs.Now);
 
                 opponent.CurrentBestLapTime = vehicleScoring.mBestLapTime > 0.0f ? (float)vehicleScoring.mBestLapTime : -1.0f;
                 opponent.PreviousBestLapTime = opponentPrevious != null && opponentPrevious.CurrentBestLapTime > 0.0f &&
@@ -1221,6 +1221,7 @@ namespace CrewChiefV4.rFactor2
                 if (opponent.Position == csd.Position + 1 && csd.SessionType == SessionType.Race)
                     csd.TimeDeltaBehind = opponent.DeltaTime.GetDeltaTime(csd.DeltaTime);
 
+                // Note the game exposes a value for this directly (mTimeBehindNext) - do we want to use it?
                 if (opponent.Position == csd.Position - 1 && csd.SessionType == SessionType.Race)
                     csd.TimeDeltaFront = opponent.DeltaTime.GetDeltaTime(csd.DeltaTime);
 
@@ -1232,9 +1233,6 @@ namespace CrewChiefV4.rFactor2
                 }
 
                 // session best lap times
-                if (opponent.Position == csd.Position + 1)
-                    csd.TimeDeltaBehind = (float)Math.Abs(vehicleScoring.mTimeBehindNext);
-
                 if (opponent.CurrentBestLapTime > 0.0f
                     && (opponent.CurrentBestLapTime < csd.OpponentsLapTimeSessionBestOverall
                         || csd.OpponentsLapTimeSessionBestOverall < 0.0f))
