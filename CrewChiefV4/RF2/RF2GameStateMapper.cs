@@ -457,7 +457,8 @@ namespace CrewChiefV4.rFactor2
             else if ((psd.SessionPhase == SessionPhase.Checkered
                         || psd.SessionPhase == SessionPhase.Finished
                         || psd.SessionPhase == SessionPhase.Green
-                        || psd.SessionPhase == SessionPhase.FullCourseYellow)
+                        || psd.SessionPhase == SessionPhase.FullCourseYellow
+                        || psd.SessionPhase == SessionPhase.Unavailable)
                     && (csd.SessionPhase == SessionPhase.Garage
                         || csd.SessionPhase == SessionPhase.Gridwalk
                         || csd.SessionPhase == SessionPhase.Formation
