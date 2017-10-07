@@ -424,17 +424,12 @@ namespace CrewChiefV4.rFactor2
             if (pgs == null || psd.TrackDefinition.name != csd.TrackDefinition.name)
             {
                 // New game or new track
-                TrackDataContainer tdc = TrackData.TRACK_LANDMARKS_DATA.getTrackDataForTrackName(csd.TrackDefinition.name, (float)shared.scoring.mScoringInfo.mLapDist);
+                var tdc = TrackData.TRACK_LANDMARKS_DATA.getTrackDataForTrackName(csd.TrackDefinition.name, (float)shared.scoring.mScoringInfo.mLapDist);
                 csd.TrackDefinition.trackLandmarks = tdc.trackLandmarks;
                 csd.TrackDefinition.isOval = tdc.isOval;
                 csd.TrackDefinition.setGapPoints();
+
                 GlobalBehaviourSettings.UpdateFromTrackDefinition(csd.TrackDefinition);
-            }
-            else if (pgs != null)
-            {
-                // Copy from previous gamestate
-                csd.TrackDefinition.trackLandmarks = psd.TrackDefinition.trackLandmarks;
-                csd.TrackDefinition.gapPoints = psd.TrackDefinition.gapPoints;
             }
 
             csd.SessionNumberOfLaps = shared.scoring.mScoringInfo.mMaxLaps > 0 && shared.scoring.mScoringInfo.mMaxLaps < 1000 ? shared.scoring.mScoringInfo.mMaxLaps : 0;
@@ -475,20 +470,31 @@ namespace CrewChiefV4.rFactor2
             {
                 // Do not use previous game state if this is the new session.
                 pgs = null;
+
                 this.isOfflineSession = true;
                 this.distanceOffTrack = 0;
                 this.isApproachingTrack = false;
                 this.playerLapsWhenFCYPosAssigned = -1;
                 this.detectedTrackNoDRSZones = false;
+
                 GlobalBehaviourSettings.UpdateFromCarClass(cgs.carClass);
-                this.detectedTrackNoDRSZones = false;
             }
 
             // Restore cumulative data.
             if (psd != null && !csd.IsNewSession)
             {
+                csd.TrackDefinition.trackLandmarks = psd.TrackDefinition.trackLandmarks;
+                csd.TrackDefinition.gapPoints = psd.TrackDefinition.gapPoints;
+
                 cgs.PitData.NumPitStops = pgs.PitData.NumPitStops;
                 cgs.PenaltiesData.CutTrackWarnings = pgs.PenaltiesData.CutTrackWarnings;
+
+                csd.DeltaTime.deltaPoints = psd.DeltaTime.deltaPoints;
+                csd.DeltaTime.currentDeltaPoint = psd.DeltaTime.currentDeltaPoint;
+                csd.DeltaTime.nextDeltaPoint = psd.DeltaTime.currentDeltaPoint;
+                csd.DeltaTime.lapsCompleted = psd.DeltaTime.lapsCompleted;
+                csd.DeltaTime.totalDistanceTravelled = psd.DeltaTime.totalDistanceTravelled;
+                csd.DeltaTime.trackLength = psd.DeltaTime.trackLength;
             }
 
             csd.SessionStartTime = csd.IsNewSession ? cgs.Now : psd.SessionStartTime;
@@ -529,6 +535,13 @@ namespace CrewChiefV4.rFactor2
                 cgs.PositionAndMotionData.CarSpeed = (float)RF2GameStateMapper.getVehicleSpeed(ref playerScoring);
                 cgs.PositionAndMotionData.DistanceRoundTrack = (float)playerScoring.mLapDist;
             }
+
+            // Initialize DeltaTime.
+            if (csd.IsNewSession)
+                csd.DeltaTime = new DeltaTime(csd.TrackDefinition.trackLength, cgs.PositionAndMotionData.DistanceRoundTrack, cgs.Now);
+
+            csd.DeltaTime.SetNextDeltaPoint(cgs.PositionAndMotionData.DistanceRoundTrack, csd.CompletedLaps, cgs.PositionAndMotionData.CarSpeed, cgs.Now);
+
 
             // Is online session?
             this.isOfflineSession = true;
@@ -1096,7 +1109,14 @@ namespace CrewChiefV4.rFactor2
                     {
                         opponent.PositionOnApproachToPitEntry = opponentPrevious.PositionOnApproachToPitEntry;
                     }
+                    // carry over the delta time - do this here so if we have to initalise it we have the correct distance data
+                    opponent.DeltaTime = opponentPrevious.DeltaTime;
                 }
+                else
+                {
+                    opponent.DeltaTime = new DeltaTime(csd.TrackDefinition.trackLength, opponent.DistanceRoundTrack, DateTime.Now);
+                }
+                opponent.DeltaTime.SetNextDeltaPoint(opponent.DistanceRoundTrack, opponent.CompletedLaps, opponent.Speed, cgs.Now);
 
                 opponent.CurrentBestLapTime = vehicleScoring.mBestLapTime > 0.0f ? (float)vehicleScoring.mBestLapTime : -1.0f;
                 opponent.PreviousBestLapTime = opponentPrevious != null && opponentPrevious.CurrentBestLapTime > 0.0f &&
@@ -1201,6 +1221,13 @@ namespace CrewChiefV4.rFactor2
                     }
                 }
 
+                if (opponent.Position == csd.Position + 1 && csd.SessionType == SessionType.Race)
+                    csd.TimeDeltaBehind = opponent.DeltaTime.GetAbsoluteTimeDeltaAllowingForLapDifferences(csd.DeltaTime);
+
+                // Note the game exposes a value for this directly (mTimeBehindNext) - do we want to use it?
+                if (opponent.Position == csd.Position - 1 && csd.SessionType == SessionType.Race)
+                    csd.TimeDeltaFront = opponent.DeltaTime.GetAbsoluteTimeDeltaAllowingForLapDifferences(csd.DeltaTime);
+
                 if (opponentPrevious != null
                     && opponentPrevious.Position > 1
                     && opponent.Position == 1)
@@ -1209,9 +1236,6 @@ namespace CrewChiefV4.rFactor2
                 }
 
                 // session best lap times
-                if (opponent.Position == csd.Position + 1)
-                    csd.TimeDeltaBehind = (float)Math.Abs(vehicleScoring.mTimeBehindNext);
-
                 if (opponent.CurrentBestLapTime > 0.0f
                     && (opponent.CurrentBestLapTime < csd.OpponentsLapTimeSessionBestOverall
                         || csd.OpponentsLapTimeSessionBestOverall < 0.0f))

@@ -318,6 +318,13 @@ namespace CrewChiefV4.rFactor1
                 // Preserve current timing values.
                 // Those values change on sector/lap change, otherwise stay the same between updates.
                 previousGameState.SessionData.restorePlayerTimings(currentGameState.SessionData);
+
+                currentGameState.SessionData.DeltaTime.deltaPoints = previousGameState.SessionData.DeltaTime.deltaPoints;
+                currentGameState.SessionData.DeltaTime.currentDeltaPoint = previousGameState.SessionData.DeltaTime.currentDeltaPoint;
+                currentGameState.SessionData.DeltaTime.nextDeltaPoint = previousGameState.SessionData.DeltaTime.currentDeltaPoint;
+                currentGameState.SessionData.DeltaTime.lapsCompleted = previousGameState.SessionData.DeltaTime.lapsCompleted;
+                currentGameState.SessionData.DeltaTime.totalDistanceTravelled = previousGameState.SessionData.DeltaTime.totalDistanceTravelled;
+                currentGameState.SessionData.DeltaTime.trackLength = previousGameState.SessionData.DeltaTime.trackLength;
             }
             float lastSectorTime = -1;
             switch (currentGameState.SessionData.SectorNumber)
@@ -455,6 +462,15 @@ namespace CrewChiefV4.rFactor1
             // motion data
             currentGameState.PositionAndMotionData.CarSpeed = shared.speed;
             currentGameState.PositionAndMotionData.DistanceRoundTrack = player.lapDist;
+
+            // Initialize DeltaTime.
+            if (currentGameState.SessionData.IsNewSession)
+            {
+                currentGameState.SessionData.DeltaTime = new DeltaTime(currentGameState.SessionData.TrackDefinition.trackLength,
+                    currentGameState.PositionAndMotionData.DistanceRoundTrack, currentGameState.Now);
+            }
+            currentGameState.SessionData.DeltaTime.SetNextDeltaPoint(currentGameState.PositionAndMotionData.DistanceRoundTrack,
+                currentGameState.SessionData.CompletedLaps, currentGameState.PositionAndMotionData.CarSpeed, currentGameState.Now);
 
             // --------------------------------
             // tire data
@@ -718,7 +734,14 @@ namespace CrewChiefV4.rFactor1
                     {
                         opponent.PositionOnApproachToPitEntry = opponentPrevious.PositionOnApproachToPitEntry;
                     }
+                    // carry over the delta time - do this here so if we have to initalise it we have the correct distance data
+                    opponent.DeltaTime = opponentPrevious.DeltaTime;
                 }
+                else
+                {
+                    opponent.DeltaTime = new DeltaTime(currentGameState.SessionData.TrackDefinition.trackLength, opponent.DistanceRoundTrack, DateTime.Now);
+                }
+                opponent.DeltaTime.SetNextDeltaPoint(opponent.DistanceRoundTrack, opponent.CompletedLaps, opponent.Speed, currentGameState.Now);
 
                 opponent.bestSector1Time = vehicle.bestSector1 > 0 ? vehicle.bestSector1 : -1;
                 opponent.bestSector2Time = vehicle.bestSector2 > 0 && vehicle.bestSector1 > 0 ? vehicle.bestSector2 - vehicle.bestSector1 : -1;
@@ -790,15 +813,18 @@ namespace CrewChiefV4.rFactor1
                         currentGameState.PitData.OpponentForCarBehindPitting = opponent;
                     }                    
                 }
+
+                if (opponent.Position == currentGameState.SessionData.Position + 1 && currentGameState.SessionData.SessionType == SessionType.Race)
+                    currentGameState.SessionData.TimeDeltaBehind = opponent.DeltaTime.GetAbsoluteTimeDeltaAllowingForLapDifferences(currentGameState.SessionData.DeltaTime);
+
+                if (opponent.Position == currentGameState.SessionData.Position - 1 && currentGameState.SessionData.SessionType == SessionType.Race)
+                    currentGameState.SessionData.TimeDeltaFront = opponent.DeltaTime.GetAbsoluteTimeDeltaAllowingForLapDifferences(currentGameState.SessionData.DeltaTime);
+
                 if (opponentPrevious != null && opponentPrevious.Position > 1 && opponent.Position == 1)
                 {
                     currentGameState.SessionData.HasLeadChanged = true;
                 }
                 // session best lap times
-                if (opponent.Position == currentGameState.SessionData.Position + 1)
-                {
-                    currentGameState.SessionData.TimeDeltaBehind = Math.Abs(vehicle.timeBehindNext);
-                }
                 if (opponent.CurrentBestLapTime > 0 && (opponent.CurrentBestLapTime < currentGameState.SessionData.OpponentsLapTimeSessionBestOverall || 
                     currentGameState.SessionData.OpponentsLapTimeSessionBestOverall < 0))
                 {
