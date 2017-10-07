@@ -363,17 +363,20 @@ namespace CrewChiefV4.Events
             {
                 // TODO: may also need to announce basic "SC in" message.
                 var kmPerHour = cfod.SafetyCarSpeed * 3.6f;
+                List<MessageFragment> messageFragments = new List<MessageFragment>();
+                messageFragments.Add(MessageFragment.Text(FrozenOrderMonitor.folderPaceCarSpeedIs));
                 if (useAmericanTerms)
                 {
                     var milesPerHour = kmPerHour * 0.621371f;
-                    audioPlayer.playMessage(new QueuedMessage("frozen_order/pace_car_speed",
-                        MessageContents(FrozenOrderMonitor.folderPaceCarSpeedIs, MessageFragment.Integer((int)Math.Round(milesPerHour), false),
-                        FrozenOrderMonitor.folderMilesPerHour),this.random.Next(10, 15), this));
+                    messageFragments.Add(MessageFragment.Integer((int)Math.Round(milesPerHour), false));
+                    messageFragments.Add(MessageFragment.Text(FrozenOrderMonitor.folderMilesPerHour));                    
                 }
                 else
-                    audioPlayer.playMessage(new QueuedMessage("frozen_order/pace_car_speed",
-                        MessageContents(FrozenOrderMonitor.folderSafetyCarSpeedIs, MessageFragment.Integer((int)Math.Round(kmPerHour), false),
-                        FrozenOrderMonitor.folderKilometresPerHour), this.random.Next(10, 15), this));
+                {
+                    messageFragments.Add(MessageFragment.Integer((int)Math.Round(kmPerHour), false));
+                    messageFragments.Add(MessageFragment.Text(FrozenOrderMonitor.folderKilometresPerHour));
+                }
+                audioPlayer.playMessage(new QueuedMessage("frozen_order/pace_car_speed", messageFragments, this.random.Next(10, 15), this));
             }
 
             // Announce SC left.
