@@ -367,13 +367,13 @@ namespace CrewChiefV4.Events
                 {
                     var milesPerHour = kmPerHour * 0.621371f;
                     audioPlayer.playMessage(new QueuedMessage("frozen_order/pace_car_speed",
-                        MessageContents(FrozenOrderMonitor.folderPaceCarSpeedIs, (int)Math.Round(milesPerHour), FrozenOrderMonitor.folderMilesPerHour),
-                        this.random.Next(10, 15), this));
+                        MessageContents(FrozenOrderMonitor.folderPaceCarSpeedIs, MessageFragment.Integer((int)Math.Round(milesPerHour), false),
+                        FrozenOrderMonitor.folderMilesPerHour),this.random.Next(10, 15), this));
                 }
                 else
                     audioPlayer.playMessage(new QueuedMessage("frozen_order/pace_car_speed",
-                        MessageContents(FrozenOrderMonitor.folderSafetyCarSpeedIs, (int)Math.Round(kmPerHour), FrozenOrderMonitor.folderKilometresPerHour),
-                        this.random.Next(10, 15), this));
+                        MessageContents(FrozenOrderMonitor.folderSafetyCarSpeedIs, MessageFragment.Integer((int)Math.Round(kmPerHour), false),
+                        FrozenOrderMonitor.folderKilometresPerHour), this.random.Next(10, 15), this));
             }
 
             // Announce SC left.
