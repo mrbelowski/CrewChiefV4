@@ -218,6 +218,8 @@ namespace CrewChiefV4.rFactor2
 
         // Capture mCurrentET from scoring to prevent dumping double frames to the file.
         private double lastScoringET = -1.0;
+        // Capture mElapsedTime from telemetry of the first vehicle to prevent dumping double frames to the file.
+        private double lastTelemetryET = -1.0;
 
         public class RF2StructWrapper
         {
@@ -319,12 +321,24 @@ namespace CrewChiefV4.rFactor2
 
                     if (!forSpotter && dumpToFile && this.dataToDump != null)
                     {
+                        // Note: this is lossy save, because we only save update if Telemtry or Scoring changed.
+                        // Other buffers don't change that much, so it should be fine.
+
                         // Exclude empty frames.
-                        if (wrapper.scoring.mScoringInfo.mNumVehicles > 0)
+                        if (wrapper.scoring.mScoringInfo.mNumVehicles > 0
+                            && wrapper.extended.mSessionStarted == 1)
                         {
+                            var hasTelemetryChanged = false;
+                            if (wrapper.telemetry.mNumVehicles > 0)
+                            {
+                                var currTelET = wrapper.telemetry.mVehicles[0].mElapsedTime;
+                                hasTelemetryChanged = currTelET != this.lastTelemetryET;
+                                this.lastTelemetryET = currTelET;
+                            }
+
                             var currScoringET = wrapper.scoring.mScoringInfo.mCurrentET;
                             if (currScoringET != this.lastScoringET  // scoring contains new payload
-                                || wrapper.telemetry.mNumVehicles > 0)  // Or, telemetry available
+                                || hasTelemetryChanged)  // Or, telemetry updated.
                             {
                                 // NOTE: truncation code could be moved to DumpRawGameData method for reduced CPU use.
                                 // However, this causes memory pressure (~250Mb/minute with 22 vehicles), so probably better done here.

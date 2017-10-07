@@ -47,74 +47,6 @@ namespace CrewChiefV4.assetto
         private List<CornerData.EnumWithThresholds> brakeTempThresholdsForPlayersCar = null;
         private static string expectedVersion = "1.7";
         private static string expectedPluginVersion = "1.0.0";
-        class splitTimes
-        {
-            private float currentSplitPoint = 0;
-            private float nextSplitPoint = 0;
-            private const float splitSpacing = 150;
-            private Dictionary<float, DateTime> splitPoints = new Dictionary<float, DateTime>();
-            public void setSplitPoints(float trackLength, DateTime now)
-            {
-                splitPoints.Clear();
-                float totalGaps = 0;
-                while (totalGaps < trackLength)
-                {
-                    totalGaps += splitSpacing;
-
-                    if (totalGaps < trackLength - splitSpacing)
-                    {
-                        splitPoints.Add(totalGaps, now);
-                    }
-                    else
-                    {
-                        break;
-                    }
-
-                }
-                splitPoints.Add(trackLength - 50, now);
-            }
-
-            public void setNextSplitPoint(float distanceRoundTrack, float speed, DateTime now)
-            {
-                foreach (KeyValuePair<float, DateTime> gap in splitPoints)
-                {
-                    if (gap.Key >= distanceRoundTrack)
-                    {
-                        if (currentSplitPoint != gap.Key)
-                        {
-                            nextSplitPoint = gap.Key;
-                        }
-                        break;
-                    }
-                }
-                if (currentSplitPoint != nextSplitPoint || speed < 5)
-                {
-                    splitPoints[nextSplitPoint] = now;
-                    currentSplitPoint = nextSplitPoint;
-                }
-            }
-
-            public float getSplitTime(splitTimes playerGaps, Boolean behind)
-            {
-                TimeSpan splitTime = new TimeSpan(0);
-                if (playerGaps.splitPoints.Count > 0 && splitPoints.Count > 0)
-                {
-                    if (behind)
-                    {
-                        splitTime = playerGaps.splitPoints[currentSplitPoint] - splitPoints[currentSplitPoint];
-                    }
-                    else
-                    {
-                        splitTime = playerGaps.splitPoints[playerGaps.currentSplitPoint] - splitPoints[playerGaps.currentSplitPoint];
-                    }
-                }
-                return Math.Abs((float)splitTime.TotalSeconds);
-            }
-        }
-
-        private Dictionary<string, splitTimes> opponentsSplits = new Dictionary<string, splitTimes>();
-
-        private static splitTimes playerSplits = new splitTimes();
 
         private SpeechRecogniser speechRecogniser;
 
@@ -1031,7 +963,6 @@ namespace CrewChiefV4.assetto
             {
 
                 playerLapData.Clear();
-                opponentsSplits.Clear();
                 Console.WriteLine("New session, trigger...");
                 if (sessionOfSameTypeRestarted)
                 {
@@ -1108,12 +1039,6 @@ namespace CrewChiefV4.assetto
                         {
                             CarData.CarClass opponentCarClass = CarData.getCarClassForClassName(getNameFromBytes(participantStruct.carModel));
                             addOpponentForName(participantName, createOpponentData(participantStruct, false, opponentCarClass, shared.acsStatic.trackSPlineLength), currentGameState);
-                            if (!opponentsSplits.ContainsKey(participantName))
-                            {
-                                opponentsSplits.Add(participantName, new splitTimes());
-                                opponentsSplits[participantName].setSplitPoints(shared.acsStatic.trackSPlineLength, currentGameState.Now);
-                                opponentsSplits[participantName].setNextSplitPoint(0, 100, currentGameState.Now);
-                            }
                         }
                     }
                 }
@@ -1128,9 +1053,7 @@ namespace CrewChiefV4.assetto
                 currentGameState.SessionData.TrackDefinition.isOval = tdc.isOval;
                 currentGameState.SessionData.TrackDefinition.setGapPoints();
                 GlobalBehaviourSettings.UpdateFromTrackDefinition(currentGameState.SessionData.TrackDefinition);
-
-                playerSplits.setSplitPoints(shared.acsStatic.trackSPlineLength, currentGameState.Now);
-                playerSplits.setNextSplitPoint(0, 100, currentGameState.Now);
+                currentGameState.SessionData.DeltaTime = new DeltaTime(currentGameState.SessionData.TrackDefinition.trackLength, distanceRoundTrack, currentGameState.Now);
             }
             else
             {
@@ -1167,7 +1090,8 @@ namespace CrewChiefV4.assetto
                         currentGameState.SessionData.TrackDefinition.isOval = tdc.isOval;                        
                         currentGameState.SessionData.TrackDefinition.setGapPoints();
                         GlobalBehaviourSettings.UpdateFromTrackDefinition(currentGameState.SessionData.TrackDefinition);
-                        playerSplits.setSplitPoints(shared.acsStatic.trackSPlineLength, currentGameState.Now);
+
+                        currentGameState.SessionData.DeltaTime = new DeltaTime(currentGameState.SessionData.TrackDefinition.trackLength, distanceRoundTrack, currentGameState.Now);
 
                         currentGameState.carClass = CarData.getCarClassForClassName(shared.acsStatic.carModel);                        
                         CarData.CLASS_ID = shared.acsStatic.carModel;
@@ -1267,6 +1191,13 @@ namespace CrewChiefV4.assetto
                     currentGameState.Conditions = previousGameState.Conditions;
                     currentGameState.SessionData.trackLandmarksTiming = previousGameState.SessionData.trackLandmarksTiming;
                     currentGameState.TyreData.TyreTypeName = previousGameState.TyreData.TyreTypeName;
+
+                    currentGameState.SessionData.DeltaTime.deltaPoints = previousGameState.SessionData.DeltaTime.deltaPoints;
+                    currentGameState.SessionData.DeltaTime.currentDeltaPoint = previousGameState.SessionData.DeltaTime.currentDeltaPoint;
+                    currentGameState.SessionData.DeltaTime.nextDeltaPoint = previousGameState.SessionData.DeltaTime.currentDeltaPoint;
+                    currentGameState.SessionData.DeltaTime.lapsCompleted = previousGameState.SessionData.DeltaTime.lapsCompleted;
+                    currentGameState.SessionData.DeltaTime.totalDistanceTravelled = previousGameState.SessionData.DeltaTime.totalDistanceTravelled;
+                    currentGameState.SessionData.DeltaTime.trackLength = previousGameState.SessionData.DeltaTime.trackLength;
                 }
                 //------------------- Variable session data ---------------------------
 
@@ -1424,7 +1355,8 @@ namespace CrewChiefV4.assetto
                 {
                     currentGameState.SessionData.GameTimeAtLastPositionBehindChange = currentGameState.SessionData.SessionRunningTime;
                 }
-
+                currentGameState.SessionData.DeltaTime.SetNextDeltaPoint(distanceRoundTrack, currentGameState.SessionData.CompletedLaps, playerVehicle.speedMS, currentGameState.Now);
+                
                 // get all the duplicate names
                 List<string> driversToBeProcessed = new List<string>();
                 List<string> duplicateNames = new List<string>();
@@ -1487,7 +1419,10 @@ namespace CrewChiefV4.assetto
                                     }
                                     float currentOpponentLapDistance = spLineLengthToDistanceRoundTrack(shared.acsStatic.trackSPlineLength, participantStruct.spLineLength);
                                     currentOpponentSector = getCurrentSector(currentGameState.SessionData.TrackDefinition, currentOpponentLapDistance);
-
+                                    
+                                    currentOpponentData.DeltaTime.SetNextDeltaPoint(currentOpponentLapDistance, participantStruct.lapCount,
+                                        participantStruct.speedMS, currentGameState.Now);
+                                    
                                     Boolean useCarLeaderBoardPosition = previousOpponentSectorNumber != currentOpponentSector && currentOpponentSector == 1;
 
                                     if (shared.acsGraphic.session == AC_SESSION_TYPE.AC_PRACTICE || shared.acsGraphic.session == AC_SESSION_TYPE.AC_QUALIFY
@@ -1564,24 +1499,11 @@ namespace CrewChiefV4.assetto
 
                                     if (currentOpponentRacePosition == currentGameState.SessionData.Position + 1 && !useCarLeaderBoardPosition)
                                     {
-                                        if (opponentsSplits.ContainsKey(participantName))
-                                        {
-                                            float timeDeltaBehind =
-                                            currentGameState.SessionData.TimeDeltaBehind = opponentsSplits[participantName].getSplitTime(playerSplits, true);
-                                        }
+                                        currentGameState.SessionData.TimeDeltaBehind = currentOpponentData.DeltaTime.GetAbsoluteTimeDeltaAllowingForLapDifferences(currentGameState.SessionData.DeltaTime);
                                     }
                                     if (currentOpponentRacePosition == currentGameState.SessionData.Position - 1 && !useCarLeaderBoardPosition)
                                     {
-                                        if (opponentsSplits.ContainsKey(participantName))
-                                        {
-                                            currentGameState.SessionData.TimeDeltaFront = opponentsSplits[participantName].getSplitTime(playerSplits, false);
-                                        }
-
-                                    }
-
-                                    if (opponentsSplits.ContainsKey(participantName))
-                                    {
-                                        opponentsSplits[participantName].setNextSplitPoint(currentOpponentLapDistance, participantStruct.speedMS, currentGameState.Now);
+                                        currentGameState.SessionData.TimeDeltaFront = currentOpponentData.DeltaTime.GetAbsoluteTimeDeltaAllowingForLapDifferences(currentGameState.SessionData.DeltaTime);
                                     }
 
                                     float secondsSinceLastUpdate = (float)new TimeSpan(currentGameState.Ticks - previousGameState.Ticks).TotalSeconds;
@@ -1649,10 +1571,6 @@ namespace CrewChiefV4.assetto
                                 {
                                     Console.WriteLine("Removing " + participantName + " -> " + currentOpponentData.DriverRawName);
                                     currentGameState.OpponentData.Remove(participantName);
-                                    if (opponentsSplits.ContainsKey(participantName))
-                                    {
-                                        opponentsSplits.Remove(participantName);
-                                    }
                                 }
 
                             }
@@ -1663,19 +1581,13 @@ namespace CrewChiefV4.assetto
                             {
                                 addOpponentForName(participantName, createOpponentData(participantStruct, true, CarData.getCarClassForClassName(getNameFromBytes(participantStruct.carModel)),
                                     shared.acsStatic.trackSPlineLength), currentGameState);
-                                if (!opponentsSplits.ContainsKey(participantName))
-                                {
-                                    opponentsSplits.Add(participantName, new splitTimes());
-                                    opponentsSplits[participantName].setSplitPoints(shared.acsStatic.trackSPlineLength, currentGameState.Now);
-                                    opponentsSplits[participantName].setNextSplitPoint(0, 100, currentGameState.Now);
-                                }
                             }
                         }
                     }
 
                 }
 
-                playerSplits.setNextSplitPoint(distanceRoundTrack, playerVehicle.speedMS, currentGameState.Now);
+                
                 // more to come here 
                 currentGameState.SessionData.LapTimePrevious = mapToFloatTime(shared.acsGraphic.iLastTime);
 
@@ -2117,6 +2029,7 @@ namespace CrewChiefV4.assetto
             opponentData.CurrentSectorNumber = 0;
             opponentData.WorldPosition = new float[] { participantStruct.worldPosition.x, participantStruct.worldPosition.z };
             opponentData.DistanceRoundTrack = spLineLengthToDistanceRoundTrack(trackSplineLength, participantStruct.spLineLength);
+            opponentData.DeltaTime = new DeltaTime(trackSplineLength, opponentData.DistanceRoundTrack, DateTime.Now);
             opponentData.CarClass = carClass;
             opponentData.IsActive = true;
             String nameToLog = opponentData.DriverRawName == null ? "unknown" : opponentData.DriverRawName;

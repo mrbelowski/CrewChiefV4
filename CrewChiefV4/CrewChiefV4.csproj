@@ -121,7 +121,6 @@
     <Compile Include="iRacing\Bitfields\SessionFlag.cs" />
     <Compile Include="iRacing\Drivers\Driver.cs" />
     <Compile Include="iRacing\Drivers\DriverCarInfo.cs" />
-    <Compile Include="iRacing\Drivers\DriverChampInfo.cs" />
     <Compile Include="iRacing\Drivers\DriverLiveInfo.cs" />
     <Compile Include="iRacing\Drivers\DriverPitInfo.cs" />
     <Compile Include="iRacing\Drivers\DriverPrivateInfo.cs" />

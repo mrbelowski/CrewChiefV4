@@ -9,6 +9,7 @@ namespace CrewChiefV4.iRacing
     public partial class Driver
     {
         private const string PACECAR_NAME = "safety pcfr500s";
+        private const string PACECAR_NAME2 = "pace car";
 
         public Driver()
         {
@@ -17,7 +18,6 @@ namespace CrewChiefV4.iRacing
             this.Results = new DriverResults(this);
             this.QualyResults = new DriverQualyResults(this);
             this.Live = new DriverLiveInfo(this);
-            this.Championship = new DriverChampInfo(this);
             this.Private = new DriverPrivateInfo(this);
             this.CurrentResults = new DriverSessionResults(this,0);
         }
@@ -58,7 +58,6 @@ namespace CrewChiefV4.iRacing
         public DriverSessionResults CurrentResults { get; set; }
         public DriverQualyResults QualyResults { get; set; }
         public DriverLiveInfo Live { get; private set; }
-        public DriverChampInfo Championship { get; private set; }
         public DriverPrivateInfo Private { get; private set; }
 
         public string LongDisplay
@@ -94,6 +93,7 @@ namespace CrewChiefV4.iRacing
             this.CarSponsor2 = query["CarSponsor_2"].GetValue();
             this.ClubName = query["ClubName"].GetValue();
             this.DivisionName = query["DivisionName"].GetValue();
+            this.IsPacecar = this.Name.ToLower().Equals(PACECAR_NAME2);
         }
 
         public void ParseStaticSessionInfo(SessionInfo info)
@@ -115,7 +115,7 @@ namespace CrewChiefV4.iRacing
             this.Car.CarShortName = query["CarScreenNameShort"].GetValue();
             this.Car.CarPath = query["CarPath"].GetValue();
 
-            this.IsPacecar = this.CustId == -1 || this.Car.CarName == PACECAR_NAME;
+            this.IsPacecar = this.CustId == -1 || this.Car.CarName.ToLower().Equals(PACECAR_NAME);
         }
 
         public static Driver FromSessionInfo(SessionInfo info, int carIdx)

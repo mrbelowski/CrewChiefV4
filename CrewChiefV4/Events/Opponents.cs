@@ -477,8 +477,10 @@ namespace CrewChiefV4.Events
                         if (opponent.IsActive)
                         {
                             int position = opponent.Position;
-                            OpponentData.OpponentDelta opponentDelta = opponent.getTimeDifferenceToPlayer(currentGameState.SessionData);
-                            if (opponentDelta == null || (opponentDelta.lapDifference == 0 && Math.Abs(opponentDelta.time) < 0.05))
+                            Tuple<int, float> deltas = currentGameState.SessionData.DeltaTime.GetSignedDeltaTimeWithLapDifference(opponent.DeltaTime);
+                            int lapDifference = deltas.Item1;
+                            float timeDelta = deltas.Item2;
+                            if (currentGameState.SessionData.SessionType != SessionType.Race || timeDelta == 0 || (lapDifference == 0 && Math.Abs(timeDelta) < 0.05))
                             {
                                 // the delta is not usable - say the position if we didn't directly ask by position
 
@@ -499,7 +501,7 @@ namespace CrewChiefV4.Events
                             else
                             {
                                 gotData = true;
-                                if (opponentDelta.lapDifference == 1)
+                                if (lapDifference == 1)
                                 {
                                     if (!gotByPositionNumber)
                                     {
@@ -519,28 +521,28 @@ namespace CrewChiefV4.Events
                                         audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta", MessageContents(Position.folderOneLapBehind), 0, null));
                                     }
                                 }
-                                else if (opponentDelta.lapDifference > 1)
+                                else if (lapDifference > 1)
                                 {
                                     if (!gotByPositionNumber)
                                     {
                                         if (SoundCache.availableSounds.Contains(folderOpponentPositionIntro))
                                         {
                                             audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta",
-                                                MessageContents(folderOpponentPositionIntro, Position.folderStub + position, Pause(200), opponentDelta.lapDifference, Position.folderLapsBehind), 0, null));
+                                                MessageContents(folderOpponentPositionIntro, Position.folderStub + position, Pause(200), lapDifference, Position.folderLapsBehind), 0, null));
                                         } 
                                         else
                                         {
                                             audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta",
-                                               MessageContents(Position.folderStub + position, Pause(200), opponentDelta.lapDifference, Position.folderLapsBehind), 0, null));
+                                               MessageContents(Position.folderStub + position, Pause(200), lapDifference, Position.folderLapsBehind), 0, null));
                                         }
                                     }
                                     else
                                     {
                                         audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta",
-                                            MessageContents(opponentDelta.lapDifference, Position.folderLapsBehind), 0, null));
+                                            MessageContents(lapDifference, Position.folderLapsBehind), 0, null));
                                     }
                                 }
-                                else if (opponentDelta.lapDifference == -1)
+                                else if (lapDifference == -1)
                                 {
                                     if (!gotByPositionNumber)
                                     {
@@ -560,32 +562,32 @@ namespace CrewChiefV4.Events
                                         audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta", MessageContents(Position.folderOneLapAhead), 0, null));
                                     }
                                 }
-                                else if (opponentDelta.lapDifference < -1)
+                                else if (lapDifference < -1)
                                 {
                                     if (!gotByPositionNumber)
                                     {
                                         if (SoundCache.availableSounds.Contains(folderOpponentPositionIntro))
                                         {
                                             audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta",
-                                                MessageContents(folderOpponentPositionIntro, Position.folderStub + position, Pause(200), Math.Abs(opponentDelta.lapDifference), Position.folderLapsAhead), 0, null));
+                                                MessageContents(folderOpponentPositionIntro, Position.folderStub + position, Pause(200), Math.Abs(lapDifference), Position.folderLapsAhead), 0, null));
                                         }
                                         else
                                         {
                                             audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta",
-                                                MessageContents(Position.folderStub + position, Pause(200), Math.Abs(opponentDelta.lapDifference), Position.folderLapsAhead), 0, null));
+                                                MessageContents(Position.folderStub + position, Pause(200), Math.Abs(lapDifference), Position.folderLapsAhead), 0, null));
                                         }
                                     }
                                     else
                                     {
                                         audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta",
-                                            MessageContents(Math.Abs(opponentDelta.lapDifference), Position.folderLapsAhead), 0, null));
+                                            MessageContents(Math.Abs(lapDifference), Position.folderLapsAhead), 0, null));
                                     }
                                 }
                                 else
                                 {
-                                    TimeSpanWrapper delta = TimeSpanWrapper.FromSeconds(Math.Abs(opponentDelta.time), Precision.AUTO_GAPS);
+                                    TimeSpanWrapper delta = TimeSpanWrapper.FromSeconds(Math.Abs(timeDelta), Precision.AUTO_GAPS);
                                     String aheadOrBehind = Position.folderAhead;
-                                    if (opponentDelta.time < 0)
+                                    if (timeDelta >= 0)
                                     {
                                         aheadOrBehind = Position.folderBehind;
                                     }

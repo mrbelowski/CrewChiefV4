@@ -342,6 +342,13 @@ namespace CrewChiefV4.Events
                                 Console.WriteLine("1 lap fuel left, starting fuel = " + initialFuelLevel +
                                     ", current fuel = " + currentGameState.FuelData.FuelLeft + ", usage per lap = " + averageUsagePerLap);
                                 audioPlayer.playMessage(new QueuedMessage(folderOneLapEstimate, 0, this));
+                                // if we've not played the pit-now message, play it with a bit of a delay - should probably wait for sector3 here
+                                // but i'd have to move some stuff around and I'm an idle fucker
+                                if (!playedPitForFuelNow)
+                                {
+                                    playedPitForFuelNow = true;
+                                    audioPlayer.playMessage(new QueuedMessage(MandatoryPitStops.folderMandatoryPitStopsPitThisLap, 10, this));
+                                }
                             }
                         }
 
@@ -598,7 +605,7 @@ namespace CrewChiefV4.Events
                     audioPlayer.playMessageImmediately(new QueuedMessage("Fuel/level",
                                 MessageContents(folderOneLitreRemaining), 0, null));
                 }
-                else if (currentFuel >= 0)
+                else if (currentFuel > 0)
                 {
                     haveData = true;
                     audioPlayer.playMessageImmediately(new QueuedMessage("Fuel/level",

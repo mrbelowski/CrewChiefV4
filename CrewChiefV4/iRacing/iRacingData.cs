@@ -86,7 +86,7 @@ namespace CrewChiefV4.iRacing
             OilPress = (System.Single)sdk.GetData("OilPress");
             OilLevel = (System.Single)sdk.GetData("OilLevel");
             Speed = (System.Single)sdk.GetData("Speed");
-            //TickCount = (System.Int32)sdk.GetData("TickCount");
+            IsReplayPlaying = (System.Boolean)sdk.GetData("IsReplayPlaying");
 
         }
         public iRacingData()
@@ -466,6 +466,7 @@ namespace CrewChiefV4.iRacing
         /// </summary>
         public System.Single OilLevel;
         public System.Single Speed;
+        public System.Boolean IsReplayPlaying;
         //public System.Int32 TickCount;
 
 

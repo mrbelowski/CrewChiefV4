@@ -258,6 +258,7 @@ namespace CrewChiefV4
                 MessageFragment messageFragment = messageFragments[i];
                 if (messageFragment == null)
                 {
+                    Console.WriteLine("Message " + this.messageName + " can't be played because it has no contents");
                     canBePlayed = false;
                     break;
                 }
@@ -271,6 +272,7 @@ namespace CrewChiefV4
                         }
                         else
                         {
+                            Console.WriteLine("Message " + this.messageName + " can't be played because there is no sound for text fragment " + messageFragment.text);
                             canBePlayed = false;
                         }                     
                         break;
@@ -283,6 +285,8 @@ namespace CrewChiefV4
                             List<String> timeFolders = numberReader.ConvertTimeToSounds(messageFragment.timeSpan, useMoreInflection);
                             if (timeFolders.Count == 0)
                             {
+                                Console.WriteLine("Message " + this.messageName + " can't be played because the number reader found no sounds for timespan " 
+                                    + messageFragment.timeSpan.timeSpan.ToString() + " precision " + messageFragment.timeSpan.getPrecision());
                                 canBePlayed = false;
                             }
                             else
@@ -291,6 +295,7 @@ namespace CrewChiefV4
                                 {
                                     if (!timeFolder.StartsWith(AudioPlayer.PAUSE_ID) && !SoundCache.availableSounds.Contains(timeFolder))
                                     {
+                                        Console.WriteLine("Message " + this.messageName + " can't be played because there is no sound for time fragment " + timeFolder);
                                         canBePlayed = false;
                                         break;
                                     }
@@ -300,7 +305,7 @@ namespace CrewChiefV4
                         }
                         else
                         {
-                            Console.WriteLine("Number reader is not available");
+                            Console.WriteLine("Message " + this.messageName + " can't be played because the number reader is not available");
                             canBePlayed = false;
                         }
                         break;                    
@@ -318,8 +323,16 @@ namespace CrewChiefV4
                             {
                                 messages.Add(SoundCache.TTS_IDENTIFIER + usableName);
                                 canBePlayed = true;
-                            }                            
-                        }                        
+                            }
+                            else
+                            {
+                                Console.WriteLine("Message " + this.messageName + " can't be played because there is no sound for opponent name " + usableName);
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine("Message " + this.messageName + " can't be played because the opponent is null or unusable");
+                        }
                         break;
                     case FragmentType.Integer:                        
                         if (numberReader != null)
@@ -327,6 +340,7 @@ namespace CrewChiefV4
                             List<String> integerFolders = numberReader.GetIntegerSounds(messageFragment.integer, messageFragment.allowShortHundreds);
                             if (integerFolders.Count() == 0)
                             {
+                                Console.WriteLine("Message " + this.messageName + " can't be played because the number reader found no sounds for number " + messageFragment.integer);
                                 canBePlayed = false;
                                 break;
                             }
@@ -336,6 +350,7 @@ namespace CrewChiefV4
                                 {
                                     if (!integerFolder.StartsWith(AudioPlayer.PAUSE_ID) && !SoundCache.availableSounds.Contains(integerFolder))
                                     {
+                                        Console.WriteLine("Message " + this.messageName + " can't be played because there is no sound for number fragment " + integerFolder);
                                         canBePlayed = false;
                                         break;
                                     }
@@ -345,7 +360,7 @@ namespace CrewChiefV4
                         }
                         else
                         {
-                            Console.WriteLine("Number reader is not available");
+                            Console.WriteLine("Message " + this.messageName + " can't be played because the number reader is not available"); 
                             canBePlayed = false;
                         }
                         break;
