@@ -283,7 +283,7 @@ namespace CrewChiefV4.RaceRoom
                             currentGameState.OpponentData = previousGameState.OpponentData;
                             currentGameState.SessionData.TrackDefinition = previousGameState.SessionData.TrackDefinition;
                             currentGameState.SessionData.DriverRawName = previousGameState.SessionData.DriverRawName;
-                            currentGameState.PositionAndMotionData.DistanceRoundTrack = previousGameState.PositionAndMotionData.DistanceRoundTrack;
+                            currentGameState.PositionAndMotionData.DistanceRoundTrack = shared.DriverData[shared.VehicleInfo.SlotId].LapDistance;
                         }
                         currentGameState.PitData.PitWindowStart = shared.PitWindowStart;
                         currentGameState.PitData.PitWindowEnd = shared.PitWindowEnd;
