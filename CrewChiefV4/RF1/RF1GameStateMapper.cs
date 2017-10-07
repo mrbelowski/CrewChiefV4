@@ -322,6 +322,9 @@ namespace CrewChiefV4.rFactor1
                 currentGameState.SessionData.DeltaTime.deltaPoints = previousGameState.SessionData.DeltaTime.deltaPoints;
                 currentGameState.SessionData.DeltaTime.currentDeltaPoint = previousGameState.SessionData.DeltaTime.currentDeltaPoint;
                 currentGameState.SessionData.DeltaTime.nextDeltaPoint = previousGameState.SessionData.DeltaTime.currentDeltaPoint;
+                currentGameState.SessionData.DeltaTime.lapsCompleted = previousGameState.SessionData.DeltaTime.lapsCompleted;
+                currentGameState.SessionData.DeltaTime.totalDistanceTravelled = previousGameState.SessionData.DeltaTime.totalDistanceTravelled;
+                currentGameState.SessionData.DeltaTime.trackLength = previousGameState.SessionData.DeltaTime.trackLength;
             }
             float lastSectorTime = -1;
             switch (currentGameState.SessionData.SectorNumber)
@@ -467,7 +470,7 @@ namespace CrewChiefV4.rFactor1
                     currentGameState.PositionAndMotionData.DistanceRoundTrack, currentGameState.Now);
             }
             currentGameState.SessionData.DeltaTime.SetNextDeltaPoint(currentGameState.PositionAndMotionData.DistanceRoundTrack,
-                currentGameState.PositionAndMotionData.CarSpeed, currentGameState.Now);
+                currentGameState.SessionData.CompletedLaps, currentGameState.PositionAndMotionData.CarSpeed, currentGameState.Now);
 
             // --------------------------------
             // tire data
@@ -738,7 +741,7 @@ namespace CrewChiefV4.rFactor1
                 {
                     opponent.DeltaTime = new DeltaTime(currentGameState.SessionData.TrackDefinition.trackLength, opponent.DistanceRoundTrack, DateTime.Now);
                 }
-                opponent.DeltaTime.SetNextDeltaPoint(opponent.DistanceRoundTrack, opponent.Speed, currentGameState.Now);
+                opponent.DeltaTime.SetNextDeltaPoint(opponent.DistanceRoundTrack, opponent.CompletedLaps, opponent.Speed, currentGameState.Now);
 
                 opponent.bestSector1Time = vehicle.bestSector1 > 0 ? vehicle.bestSector1 : -1;
                 opponent.bestSector2Time = vehicle.bestSector2 > 0 && vehicle.bestSector1 > 0 ? vehicle.bestSector2 - vehicle.bestSector1 : -1;
@@ -812,10 +815,10 @@ namespace CrewChiefV4.rFactor1
                 }
 
                 if (opponent.Position == currentGameState.SessionData.Position + 1 && currentGameState.SessionData.SessionType == SessionType.Race)
-                    currentGameState.SessionData.TimeDeltaBehind = opponent.DeltaTime.GetDeltaTime(currentGameState.SessionData.DeltaTime);
+                    currentGameState.SessionData.TimeDeltaBehind = opponent.DeltaTime.GetAbsoluteTimeDeltaAllowingForLapDifferences(currentGameState.SessionData.DeltaTime);
 
                 if (opponent.Position == currentGameState.SessionData.Position - 1 && currentGameState.SessionData.SessionType == SessionType.Race)
-                    currentGameState.SessionData.TimeDeltaFront = opponent.DeltaTime.GetDeltaTime(currentGameState.SessionData.DeltaTime);
+                    currentGameState.SessionData.TimeDeltaFront = opponent.DeltaTime.GetAbsoluteTimeDeltaAllowingForLapDifferences(currentGameState.SessionData.DeltaTime);
 
                 if (opponentPrevious != null && opponentPrevious.Position > 1 && opponent.Position == 1)
                 {

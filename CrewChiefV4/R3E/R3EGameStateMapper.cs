@@ -401,6 +401,9 @@ namespace CrewChiefV4.RaceRoom
                     currentGameState.SessionData.DeltaTime.deltaPoints = previousGameState.SessionData.DeltaTime.deltaPoints;
                     currentGameState.SessionData.DeltaTime.currentDeltaPoint = previousGameState.SessionData.DeltaTime.currentDeltaPoint;
                     currentGameState.SessionData.DeltaTime.nextDeltaPoint = previousGameState.SessionData.DeltaTime.currentDeltaPoint;
+                    currentGameState.SessionData.DeltaTime.lapsCompleted = previousGameState.SessionData.DeltaTime.lapsCompleted;
+                    currentGameState.SessionData.DeltaTime.totalDistanceTravelled = previousGameState.SessionData.DeltaTime.totalDistanceTravelled;
+                    currentGameState.SessionData.DeltaTime.trackLength = previousGameState.SessionData.DeltaTime.trackLength;
                 }
             }
 
@@ -613,7 +616,8 @@ namespace CrewChiefV4.RaceRoom
                     currentGameState.SessionData.SectorNumber = participantStruct.TrackSector;
                     currentGameState.PitData.InPitlane = participantStruct.InPitlane == 1;
                     currentGameState.PositionAndMotionData.DistanceRoundTrack = participantStruct.LapDistance;
-                    currentGameState.SessionData.DeltaTime.SetNextDeltaPoint(currentGameState.PositionAndMotionData.DistanceRoundTrack, shared.CarSpeed, currentGameState.Now);
+                    currentGameState.SessionData.DeltaTime.SetNextDeltaPoint(currentGameState.PositionAndMotionData.DistanceRoundTrack, 
+                        currentGameState.SessionData.CompletedLaps, shared.CarSpeed, currentGameState.Now);
 
                     if (previousGameState != null)
                     {
@@ -803,7 +807,7 @@ namespace CrewChiefV4.RaceRoom
                                     currentGameState.SessionData.SessionType == SessionType.Race,
                                     currentGameState.SessionData.TrackDefinition.distanceForNearPitEntryChecks);
 
-                            currentOpponentData.DeltaTime.SetNextDeltaPoint(currentOpponentLapDistance, currentOpponentData.Speed, currentGameState.Now);
+                            currentOpponentData.DeltaTime.SetNextDeltaPoint(currentOpponentLapDistance, currentOpponentData.CompletedLaps, currentOpponentData.Speed, currentGameState.Now);
 
                             if (previousOpponentData != null)
                             {

@@ -672,6 +672,9 @@ namespace CrewChiefV4.PCars
                     currentGameState.SessionData.DeltaTime.deltaPoints = previousGameState.SessionData.DeltaTime.deltaPoints;
                     currentGameState.SessionData.DeltaTime.currentDeltaPoint = previousGameState.SessionData.DeltaTime.currentDeltaPoint;
                     currentGameState.SessionData.DeltaTime.nextDeltaPoint = previousGameState.SessionData.DeltaTime.currentDeltaPoint;
+                    currentGameState.SessionData.DeltaTime.lapsCompleted = previousGameState.SessionData.DeltaTime.lapsCompleted;
+                    currentGameState.SessionData.DeltaTime.totalDistanceTravelled = previousGameState.SessionData.DeltaTime.totalDistanceTravelled;
+                    currentGameState.SessionData.DeltaTime.trackLength = previousGameState.SessionData.DeltaTime.trackLength;
                 }                
             }
 
@@ -963,7 +966,8 @@ namespace CrewChiefV4.PCars
                                         }
                                     }
 
-                                    currentOpponentData.DeltaTime.SetNextDeltaPoint(currentOpponentLapDistance, currentOpponentData.Speed, currentGameState.Now);
+                                    currentOpponentData.DeltaTime.SetNextDeltaPoint(currentOpponentLapDistance, currentOpponentData.CompletedLaps,
+                                        currentOpponentData.Speed, currentGameState.Now);
                                 }
                             }
                             else
@@ -1113,7 +1117,8 @@ namespace CrewChiefV4.PCars
 
             currentGameState.PositionAndMotionData.CarSpeed = shared.mSpeed;
 
-            currentGameState.SessionData.DeltaTime.SetNextDeltaPoint(currentGameState.PositionAndMotionData.DistanceRoundTrack, shared.mSpeed, currentGameState.Now);
+            currentGameState.SessionData.DeltaTime.SetNextDeltaPoint(currentGameState.PositionAndMotionData.DistanceRoundTrack, 
+                currentGameState.SessionData.CompletedLaps, shared.mSpeed, currentGameState.Now);
 
             //------------------------ Tyre data -----------------------          
             currentGameState.TyreData.HasMatchedTyreTypes = true;

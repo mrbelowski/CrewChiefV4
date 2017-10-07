@@ -477,8 +477,9 @@ namespace CrewChiefV4.Events
                         if (opponent.IsActive)
                         {
                             int position = opponent.Position;
-                            float timeDelta = currentGameState.SessionData.DeltaTime.GetSignedDeltaTime(opponent.DeltaTime);
-                            int lapDifference = currentGameState.SessionData.CompletedLaps - opponent.CompletedLaps;
+                            Tuple<int, float> deltas = currentGameState.SessionData.DeltaTime.GetSignedDeltaTimeWithLapDifference(opponent.DeltaTime);
+                            int lapDifference = deltas.Item1;
+                            float timeDelta = deltas.Item2;
                             if (currentGameState.SessionData.SessionType != SessionType.Race || timeDelta == 0 || (lapDifference == 0 && Math.Abs(timeDelta) < 0.05))
                             {
                                 // the delta is not usable - say the position if we didn't directly ask by position

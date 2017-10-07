@@ -1348,7 +1348,7 @@ namespace CrewChiefV4.assetto
                 {
                     currentGameState.SessionData.GameTimeAtLastPositionBehindChange = currentGameState.SessionData.SessionRunningTime;
                 }
-                currentGameState.SessionData.DeltaTime.SetNextDeltaPoint(distanceRoundTrack, playerVehicle.speedMS, currentGameState.Now);
+                currentGameState.SessionData.DeltaTime.SetNextDeltaPoint(distanceRoundTrack, currentGameState.SessionData.CompletedLaps, playerVehicle.speedMS, currentGameState.Now);
                 
                 // get all the duplicate names
                 List<string> driversToBeProcessed = new List<string>();
@@ -1413,7 +1413,8 @@ namespace CrewChiefV4.assetto
                                     float currentOpponentLapDistance = spLineLengthToDistanceRoundTrack(shared.acsStatic.trackSPlineLength, participantStruct.spLineLength);
                                     currentOpponentSector = getCurrentSector(currentGameState.SessionData.TrackDefinition, currentOpponentLapDistance);
                                     
-                                    currentOpponentData.DeltaTime.SetNextDeltaPoint(currentOpponentLapDistance, participantStruct.speedMS, currentGameState.Now);
+                                    currentOpponentData.DeltaTime.SetNextDeltaPoint(currentOpponentLapDistance, participantStruct.lapCount,
+                                        participantStruct.speedMS, currentGameState.Now);
                                     
                                     Boolean useCarLeaderBoardPosition = previousOpponentSectorNumber != currentOpponentSector && currentOpponentSector == 1;
 
@@ -1491,11 +1492,11 @@ namespace CrewChiefV4.assetto
 
                                     if (currentOpponentRacePosition == currentGameState.SessionData.Position + 1 && !useCarLeaderBoardPosition)
                                     {
-                                        currentGameState.SessionData.TimeDeltaBehind = currentOpponentData.DeltaTime.GetDeltaTime(currentGameState.SessionData.DeltaTime);
+                                        currentGameState.SessionData.TimeDeltaBehind = currentOpponentData.DeltaTime.GetAbsoluteTimeDeltaAllowingForLapDifferences(currentGameState.SessionData.DeltaTime);
                                     }
                                     if (currentOpponentRacePosition == currentGameState.SessionData.Position - 1 && !useCarLeaderBoardPosition)
                                     {
-                                        currentGameState.SessionData.TimeDeltaFront = currentOpponentData.DeltaTime.GetDeltaTime(currentGameState.SessionData.DeltaTime);
+                                        currentGameState.SessionData.TimeDeltaFront = currentOpponentData.DeltaTime.GetAbsoluteTimeDeltaAllowingForLapDifferences(currentGameState.SessionData.DeltaTime);
                                     }
 
                                     float secondsSinceLastUpdate = (float)new TimeSpan(currentGameState.Ticks - previousGameState.Ticks).TotalSeconds;

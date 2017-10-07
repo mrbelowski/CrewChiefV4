@@ -276,6 +276,9 @@ namespace CrewChiefV4.iRacing
                     currentGameState.SessionData.DeltaTime.deltaPoints = previousGameState.SessionData.DeltaTime.deltaPoints;
                     currentGameState.SessionData.DeltaTime.currentDeltaPoint = previousGameState.SessionData.DeltaTime.currentDeltaPoint;
                     currentGameState.SessionData.DeltaTime.nextDeltaPoint = previousGameState.SessionData.DeltaTime.currentDeltaPoint;
+                    currentGameState.SessionData.DeltaTime.lapsCompleted = previousGameState.SessionData.DeltaTime.lapsCompleted;
+                    currentGameState.SessionData.DeltaTime.totalDistanceTravelled = previousGameState.SessionData.DeltaTime.totalDistanceTravelled;
+                    currentGameState.SessionData.DeltaTime.trackLength = previousGameState.SessionData.DeltaTime.trackLength;
                 }
             }
             currentGameState.ControlData.ThrottlePedal = shared.Telemetry.Throttle;
@@ -440,7 +443,8 @@ namespace CrewChiefV4.iRacing
             currentGameState.PositionAndMotionData.DistanceRoundTrack = spLineLengthToDistanceRoundTrack(currentGameState.SessionData.TrackDefinition.trackLength, playerCar.Live.CorrectedLapDistance);
             currentGameState.PositionAndMotionData.CarSpeed = (float)playerCar.Live.Speed;
             
-            currentGameState.SessionData.DeltaTime.SetNextDeltaPoint(currentGameState.PositionAndMotionData.DistanceRoundTrack, (float)playerCar.Live.Speed, currentGameState.Now);
+            currentGameState.SessionData.DeltaTime.SetNextDeltaPoint(currentGameState.PositionAndMotionData.DistanceRoundTrack, currentGameState.SessionData.CompletedLaps,
+                (float)playerCar.Live.Speed, currentGameState.Now);
 
             if (previousGameState != null)
             {
@@ -564,7 +568,7 @@ namespace CrewChiefV4.iRacing
                         }
                         float currentOpponentLapDistance = spLineLengthToDistanceRoundTrack(currentGameState.SessionData.TrackDefinition.trackLength,driver.Live.CorrectedLapDistance);
                         //Console.WriteLine("lapdistance:" + currentOpponentLapDistance);
-                        currentOpponentData.DeltaTime.SetNextDeltaPoint(currentOpponentLapDistance, (float)driver.Live.Speed, currentGameState.Now);
+                        currentOpponentData.DeltaTime.SetNextDeltaPoint(currentOpponentLapDistance, currentOpponentLapsCompleted, (float)driver.Live.Speed, currentGameState.Now);
                         
                         Boolean finishedAllottedRaceLaps = currentGameState.SessionData.SessionNumberOfLaps > 0 && currentGameState.SessionData.SessionNumberOfLaps == currentOpponentLapsCompleted;
                         Boolean finishedAllottedRaceTime = false;
@@ -626,11 +630,11 @@ namespace CrewChiefV4.iRacing
 
                         if (currentOpponentRacePosition == currentGameState.SessionData.Position + 1 && currentGameState.SessionData.SessionType == SessionType.Race)
                         {
-                            currentGameState.SessionData.TimeDeltaBehind = currentOpponentData.DeltaTime.GetDeltaTime(currentGameState.SessionData.DeltaTime);
+                            currentGameState.SessionData.TimeDeltaBehind = currentOpponentData.DeltaTime.GetAbsoluteTimeDeltaAllowingForLapDifferences(currentGameState.SessionData.DeltaTime);
                         }
                         if (currentOpponentRacePosition == currentGameState.SessionData.Position - 1 && currentGameState.SessionData.SessionType == SessionType.Race)
                         {
-                            currentGameState.SessionData.TimeDeltaFront = currentOpponentData.DeltaTime.GetDeltaTime(currentGameState.SessionData.DeltaTime);
+                            currentGameState.SessionData.TimeDeltaFront = currentOpponentData.DeltaTime.GetAbsoluteTimeDeltaAllowingForLapDifferences(currentGameState.SessionData.DeltaTime);
                         }
                         
                         

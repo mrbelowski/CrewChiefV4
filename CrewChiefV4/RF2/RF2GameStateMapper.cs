@@ -492,6 +492,9 @@ namespace CrewChiefV4.rFactor2
                 csd.DeltaTime.deltaPoints = psd.DeltaTime.deltaPoints;
                 csd.DeltaTime.currentDeltaPoint = psd.DeltaTime.currentDeltaPoint;
                 csd.DeltaTime.nextDeltaPoint = psd.DeltaTime.currentDeltaPoint;
+                csd.DeltaTime.lapsCompleted = psd.DeltaTime.lapsCompleted;
+                csd.DeltaTime.totalDistanceTravelled = psd.DeltaTime.totalDistanceTravelled;
+                csd.DeltaTime.trackLength = psd.DeltaTime.trackLength;
             }
 
             csd.SessionStartTime = csd.IsNewSession ? cgs.Now : psd.SessionStartTime;
@@ -537,7 +540,7 @@ namespace CrewChiefV4.rFactor2
             if (csd.IsNewSession)
                 csd.DeltaTime = new DeltaTime(csd.TrackDefinition.trackLength, cgs.PositionAndMotionData.DistanceRoundTrack, cgs.Now);
 
-            csd.DeltaTime.SetNextDeltaPoint(cgs.PositionAndMotionData.DistanceRoundTrack, cgs.PositionAndMotionData.CarSpeed, cgs.Now);
+            csd.DeltaTime.SetNextDeltaPoint(cgs.PositionAndMotionData.DistanceRoundTrack, csd.CompletedLaps, cgs.PositionAndMotionData.CarSpeed, cgs.Now);
 
 
             // Is online session?
@@ -1113,7 +1116,7 @@ namespace CrewChiefV4.rFactor2
                 {
                     opponent.DeltaTime = new DeltaTime(csd.TrackDefinition.trackLength, opponent.DistanceRoundTrack, DateTime.Now);
                 }
-                opponent.DeltaTime.SetNextDeltaPoint(opponent.DistanceRoundTrack, opponent.Speed, cgs.Now);
+                opponent.DeltaTime.SetNextDeltaPoint(opponent.DistanceRoundTrack, opponent.CompletedLaps, opponent.Speed, cgs.Now);
 
                 opponent.CurrentBestLapTime = vehicleScoring.mBestLapTime > 0.0f ? (float)vehicleScoring.mBestLapTime : -1.0f;
                 opponent.PreviousBestLapTime = opponentPrevious != null && opponentPrevious.CurrentBestLapTime > 0.0f &&
@@ -1219,11 +1222,11 @@ namespace CrewChiefV4.rFactor2
                 }
 
                 if (opponent.Position == csd.Position + 1 && csd.SessionType == SessionType.Race)
-                    csd.TimeDeltaBehind = opponent.DeltaTime.GetDeltaTime(csd.DeltaTime);
+                    csd.TimeDeltaBehind = opponent.DeltaTime.GetAbsoluteTimeDeltaAllowingForLapDifferences(csd.DeltaTime);
 
                 // Note the game exposes a value for this directly (mTimeBehindNext) - do we want to use it?
                 if (opponent.Position == csd.Position - 1 && csd.SessionType == SessionType.Race)
-                    csd.TimeDeltaFront = opponent.DeltaTime.GetDeltaTime(csd.DeltaTime);
+                    csd.TimeDeltaFront = opponent.DeltaTime.GetAbsoluteTimeDeltaAllowingForLapDifferences(csd.DeltaTime);
 
                 if (opponentPrevious != null
                     && opponentPrevious.Position > 1
