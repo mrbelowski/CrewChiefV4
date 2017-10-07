@@ -464,7 +464,6 @@ namespace CrewChiefV4.rFactor2
                         || csd.SessionPhase == SessionPhase.Formation
                         || csd.SessionPhase == SessionPhase.Countdown))
             {
-                Console.WriteLine("JUST CAUSE YOU FEEL IT, DOESN'T MEAN IT'S THERE");
                 csd.IsNewSession = true;
             }
 
