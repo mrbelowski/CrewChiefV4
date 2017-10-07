@@ -115,7 +115,7 @@ namespace CrewChiefV4.iRacing
             this.Car.CarShortName = query["CarScreenNameShort"].GetValue();
             this.Car.CarPath = query["CarPath"].GetValue();
 
-            this.IsPacecar = this.CustId == -1 || this.Car.CarName.ToLower().Equals(PACECAR_NAME) || this.Name.ToLower().Equals(PACECAR_NAME2);
+            this.IsPacecar = this.CustId == -1 || this.Car.CarName.ToLower().Equals(PACECAR_NAME);
         }
 
         public static Driver FromSessionInfo(SessionInfo info, int carIdx)
