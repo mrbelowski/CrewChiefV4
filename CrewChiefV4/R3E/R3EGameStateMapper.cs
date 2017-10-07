@@ -235,11 +235,12 @@ namespace CrewChiefV4.RaceRoom
                             {
                                 opponentDriverNamesProcessedThisUpdate.Add(driverName);
                                 currentGameState.OpponentData.Add(driverName, createOpponentData(participantStruct, driverName,
-                                    false, CarData.getCarClassForRaceRoomId(participantStruct.DriverInfo.ClassId).carClassEnum));
+                                    false, CarData.getCarClassForRaceRoomId(participantStruct.DriverInfo.ClassId).carClassEnum, currentGameState.SessionData.TrackDefinition.trackLength));
                             }
                         }
                     }
                 }
+                currentGameState.SessionData.DeltaTime = new DeltaTime(currentGameState.SessionData.TrackDefinition.trackLength, currentGameState.PositionAndMotionData.DistanceRoundTrack, currentGameState.Now);
             }
             else
             {                
@@ -282,6 +283,7 @@ namespace CrewChiefV4.RaceRoom
                             currentGameState.OpponentData = previousGameState.OpponentData;
                             currentGameState.SessionData.TrackDefinition = previousGameState.SessionData.TrackDefinition;
                             currentGameState.SessionData.DriverRawName = previousGameState.SessionData.DriverRawName;
+                            currentGameState.PositionAndMotionData.DistanceRoundTrack = shared.DriverData[shared.VehicleInfo.SlotId].LapDistance;
                         }
                         currentGameState.PitData.PitWindowStart = shared.PitWindowStart;
                         currentGameState.PitData.PitWindowEnd = shared.PitWindowEnd;
@@ -320,6 +322,9 @@ namespace CrewChiefV4.RaceRoom
                                 }
                             }
                         }
+
+                        currentGameState.SessionData.DeltaTime = new DeltaTime(currentGameState.SessionData.TrackDefinition.trackLength, currentGameState.PositionAndMotionData.DistanceRoundTrack, currentGameState.Now);
+
                         Console.WriteLine("Just gone green, session details...");
 
                         // reset the engine temp monitor stuff
@@ -392,6 +397,13 @@ namespace CrewChiefV4.RaceRoom
                     currentGameState.SessionData.trackLandmarksTiming = previousGameState.SessionData.trackLandmarksTiming;
 
                     currentGameState.FlagData.useImprovisedIncidentCalling = previousGameState.FlagData.useImprovisedIncidentCalling;
+
+                    currentGameState.SessionData.DeltaTime.deltaPoints = previousGameState.SessionData.DeltaTime.deltaPoints;
+                    currentGameState.SessionData.DeltaTime.currentDeltaPoint = previousGameState.SessionData.DeltaTime.currentDeltaPoint;
+                    currentGameState.SessionData.DeltaTime.nextDeltaPoint = previousGameState.SessionData.DeltaTime.currentDeltaPoint;
+                    currentGameState.SessionData.DeltaTime.lapsCompleted = previousGameState.SessionData.DeltaTime.lapsCompleted;
+                    currentGameState.SessionData.DeltaTime.totalDistanceTravelled = previousGameState.SessionData.DeltaTime.totalDistanceTravelled;
+                    currentGameState.SessionData.DeltaTime.trackLength = previousGameState.SessionData.DeltaTime.trackLength;
                 }
             }
 
@@ -604,6 +616,9 @@ namespace CrewChiefV4.RaceRoom
                     currentGameState.SessionData.SectorNumber = participantStruct.TrackSector;
                     currentGameState.PitData.InPitlane = participantStruct.InPitlane == 1;
                     currentGameState.PositionAndMotionData.DistanceRoundTrack = participantStruct.LapDistance;
+                    currentGameState.SessionData.DeltaTime.SetNextDeltaPoint(currentGameState.PositionAndMotionData.DistanceRoundTrack, 
+                        currentGameState.SessionData.CompletedLaps, shared.CarSpeed, currentGameState.Now);
+
                     if (previousGameState != null)
                     {
                         String stoppedInLandmark = currentGameState.SessionData.trackLandmarksTiming.updateLandmarkTiming(currentGameState.SessionData.TrackDefinition,
@@ -792,6 +807,8 @@ namespace CrewChiefV4.RaceRoom
                                     currentGameState.SessionData.SessionType == SessionType.Race,
                                     currentGameState.SessionData.TrackDefinition.distanceForNearPitEntryChecks);
 
+                            currentOpponentData.DeltaTime.SetNextDeltaPoint(currentOpponentLapDistance, currentOpponentData.CompletedLaps, currentOpponentData.Speed, currentGameState.Now);
+
                             if (previousOpponentData != null)
                             {
                                 currentOpponentData.trackLandmarksTiming = previousOpponentData.trackLandmarksTiming;
@@ -861,7 +878,7 @@ namespace CrewChiefV4.RaceRoom
                     {
                         opponentDriverNamesProcessedThisUpdate.Add(driverName);
                         currentGameState.OpponentData.Add(driverName, createOpponentData(participantStruct, driverName, true,
-                            CarData.getCarClassForRaceRoomId(participantStruct.DriverInfo.ClassId).carClassEnum));
+                            CarData.getCarClassForRaceRoomId(participantStruct.DriverInfo.ClassId).carClassEnum, currentGameState.SessionData.TrackDefinition.trackLength));
                     }
                 }
             }
@@ -1587,7 +1604,7 @@ namespace CrewChiefV4.RaceRoom
             }
         }
 
-        private OpponentData createOpponentData(DriverData participantStruct, String driverName, Boolean loadDriverName, CarData.CarClassEnum playerCarClass)
+        private OpponentData createOpponentData(DriverData participantStruct, String driverName, Boolean loadDriverName, CarData.CarClassEnum playerCarClass, float trackLength)
         {
             if (loadDriverName && CrewChief.enableDriverNames)
             {
@@ -1601,6 +1618,7 @@ namespace CrewChiefV4.RaceRoom
             opponentData.CurrentSectorNumber = participantStruct.TrackSector;
             opponentData.WorldPosition = new float[] { participantStruct.Position.X, participantStruct.Position.Z };
             opponentData.DistanceRoundTrack = participantStruct.LapDistance;
+            opponentData.DeltaTime = new DeltaTime(trackLength, opponentData.DistanceRoundTrack, DateTime.Now);
             opponentData.CarClass = CarData.getCarClassForRaceRoomId(participantStruct.DriverInfo.ClassId);
             opponentData.CurrentTyres = mapToTyreType(participantStruct.TireTypeFront, participantStruct.TireSubTypeFront,
                 participantStruct.TireTypeRear, participantStruct.TireSubTypeRear, playerCarClass);

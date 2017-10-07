@@ -949,84 +949,6 @@ namespace CrewChiefV4.GameState
                 OpponentLapData.Add(lapData);
             }
         }
-
-        public OpponentDelta getTimeDifferenceToPlayer(SessionData playerSessionData)
-        {
-            if (playerSessionData.SessionType != SessionType.Race)
-            {
-                if (playerSessionData.PlayerLapTimeSessionBest > 0 && CurrentBestLapTime > 0)
-                {
-                    // use the best laps rather than the track positions
-                    return new OpponentDelta(playerSessionData.PlayerLapTimeSessionBest - CurrentBestLapTime, 0);
-                }
-                else
-                {
-                    return null;
-                }
-            }
-            else
-            {
-                int lastSectorPlayerCompleted = playerSessionData.SectorNumber == 1 ? 3 : playerSessionData.SectorNumber - 1;
-                float playerLapTimeToUse = playerSessionData.LapTimePrevious;
-                if (playerLapTimeToUse == 0 || playerLapTimeToUse == -1)
-                {
-                    playerLapTimeToUse = playerSessionData.LapTimePreviousEstimateForInvalidLap;
-                }
-
-                if (playerSessionData.SessionTimesAtEndOfSectors[lastSectorPlayerCompleted] == -1 || getGameTimeWhenSectorWasLastCompleted(lastSectorPlayerCompleted) == -1)
-                {
-                    return null;
-                }
-                float timeDifference;
-                if (Position == playerSessionData.Position + 1)
-                {
-                    timeDifference = -1 * playerSessionData.TimeDeltaBehind;
-                }
-                else if (Position == playerSessionData.Position - 1)
-                {
-                    timeDifference = playerSessionData.TimeDeltaFront;
-                }
-                else
-                {
-                    timeDifference = playerSessionData.SessionTimesAtEndOfSectors[lastSectorPlayerCompleted] - getGameTimeWhenSectorWasLastCompleted(lastSectorPlayerCompleted);
-                }
-                // if the player is ahead, the time difference is negative
-
-                if (((playerSessionData.CompletedLaps == CompletedLaps + 1 && timeDifference < 0 && CurrentSectorNumber < playerSessionData.SectorNumber) ||
-                    playerSessionData.CompletedLaps > CompletedLaps + 1 ||
-                    (playerSessionData.CompletedLaps == CompletedLaps - 1 && timeDifference > 0 && CurrentSectorNumber >= playerSessionData.SectorNumber) ||
-                    playerSessionData.CompletedLaps < CompletedLaps - 1))
-                {
-                    // there's more than a lap difference
-                    return new OpponentDelta(-1, playerSessionData.CompletedLaps - CompletedLaps);
-                }
-                else if (playerSessionData.CompletedLaps == CompletedLaps + 1 && timeDifference > 0)
-                {
-                    // the player has completed 1 more lap but is behind on track
-                    return new OpponentDelta(timeDifference - playerLapTimeToUse, 0);
-                }
-                else if (playerSessionData.CompletedLaps == CompletedLaps - 1 && timeDifference < 0)
-                {
-                    // the player has completed 1 less lap but is ahead on track
-                    return new OpponentDelta(playerLapTimeToUse - timeDifference, 0);
-                }
-                else
-                {
-                    return new OpponentDelta(timeDifference, 0);
-                }
-            }
-        }
-
-        public class OpponentDelta
-        {
-            public float time;
-            public int lapDifference;
-            public OpponentDelta(float time, int lapDifference)
-            {
-                this.time = time;
-                this.lapDifference = lapDifference;
-            }
-        }
     }
 
     public class TrackLandmarksTiming
@@ -1694,15 +1616,20 @@ namespace CrewChiefV4.GameState
         public Dictionary<float, DateTime> deltaPoints =  new Dictionary<float, DateTime>();
         public float currentDeltaPoint = -1;
         public float nextDeltaPoint = -1;
-        public float distanceRoundTrack = -1;
+        public float distanceRoundTrackOnCurrentLap = -1;
+        public float totalDistanceTravelled = -1;
+        public int lapsCompleted = -1;
+        public float trackLength = 0;
         public DeltaTime()
         {
             this.deltaPoints = new Dictionary<float, DateTime>();
         }
-        public DeltaTime(float trackLength, float distanceRoundTrack, DateTime now, float spacing = 20f)
+        public DeltaTime(float trackLength, float distanceRoundTrackOnCurrentLap, DateTime now, float spacing = 20f)
         {
-            this.distanceRoundTrack = distanceRoundTrack;
+            this.distanceRoundTrackOnCurrentLap = distanceRoundTrackOnCurrentLap;
+            this.totalDistanceTravelled = distanceRoundTrackOnCurrentLap;
             this.deltaPoints = new Dictionary<float, DateTime>();
+            this.trackLength = trackLength;
             //deltaPoints.Clear();
             float totalSpacing = 0;
             while (totalSpacing < trackLength)
@@ -1717,18 +1644,20 @@ namespace CrewChiefV4.GameState
                 {
                     deltaPoints.Add(totalSpacing, now);
                 }
-                if(distanceRoundTrack >= totalSpacing)
+                if (distanceRoundTrackOnCurrentLap >= totalSpacing)
                 {
                     currentDeltaPoint = totalSpacing;
                 }
             }
         }
-        public void SetNextDeltaPoint(float distanceRoundTrack, float speed, DateTime now)
+        public void SetNextDeltaPoint(float distanceRoundTrackOnCurrentLap, int lapsCompleted, float speed, DateTime now)
         {
-            this.distanceRoundTrack = distanceRoundTrack;
+            this.distanceRoundTrackOnCurrentLap = distanceRoundTrackOnCurrentLap;
+            this.lapsCompleted = lapsCompleted;
+            this.totalDistanceTravelled = (lapsCompleted * this.trackLength) + distanceRoundTrackOnCurrentLap;
             foreach (KeyValuePair<float, DateTime> gap in deltaPoints)
             {
-                if (gap.Key >= distanceRoundTrack)
+                if (gap.Key >= distanceRoundTrackOnCurrentLap)
                 {
                     if (currentDeltaPoint != gap.Key)
                     {
@@ -1742,29 +1671,73 @@ namespace CrewChiefV4.GameState
                 deltaPoints[nextDeltaPoint] = now;
                 currentDeltaPoint = nextDeltaPoint;
             }
-
         }
 
-        public float GetDeltaTime(DeltaTime playerDelta)
+        // get the delta to otherCar in whole laps and seconds.
+        public Tuple<int, float> GetSignedDeltaTimeWithLapDifference(DeltaTime otherCarDelta)
         {
             TimeSpan splitTime = new TimeSpan(0);
-            if (playerDelta.deltaPoints.Count > 0 && deltaPoints.Count > 0)
+            int lapDifference = 0;
+            if (otherCarDelta.deltaPoints.Count > 0 && deltaPoints.Count > 0)
+            {
+                // +ve means I've travelled further than him:
+                float totalDistanceTravelledDifference = totalDistanceTravelled - otherCarDelta.totalDistanceTravelled;
+                // +ve means I've completed more laps:
+                lapDifference = lapsCompleted - otherCarDelta.lapsCompleted;
+                if (lapDifference > 0 && Math.Abs(totalDistanceTravelledDifference) < this.trackLength)
+                {
+                    // OK, I've completed more laps, but I'm one less complete lap ahead than the lapDifference suggests
+                    lapDifference--;
+                }
+                else if (lapDifference < 0 && Math.Abs(totalDistanceTravelledDifference) < this.trackLength)
+                {
+                    // I've completed less laps, but I'm one less complete lap behind than the lapDifference suggests
+                    lapDifference++;
+                }
+                if (totalDistanceTravelled < otherCarDelta.totalDistanceTravelled)
+                {
+                    // I'm behind otherCar, so we want to know time between otherCar reaching the last deltaPoint I've just hit, and me reaching it.
+                    // Because otherCar reached it further in the past than me, this will be negative
+                    splitTime = otherCarDelta.deltaPoints[currentDeltaPoint] - deltaPoints[currentDeltaPoint];
+                }
+                else if (totalDistanceTravelled > otherCarDelta.totalDistanceTravelled)
+                {
+                    // I'm ahead of otherCar, so we want to know time between otherCar reaching the last deltaPoint he's just hit, and me reaching 
+                    // that delta point.
+                    // Because otherCar reached it more recently than me, this will be positive
+                    splitTime = otherCarDelta.deltaPoints[otherCarDelta.currentDeltaPoint] - deltaPoints[otherCarDelta.currentDeltaPoint];
+                }
+            }
+            return new Tuple<int, float>(lapDifference, (float) splitTime.TotalSeconds);
+        }
+
+        // get the time difference between this car and another car, allowing for partial laps completed differences
+        public float GetAbsoluteTimeDeltaAllowingForLapDifferences(DeltaTime otherCarDelta)
+        {
+            return Math.Abs(GetSignedDeltaTimeWithLapDifference(otherCarDelta).Item2);
+        }
+        
+        // return a signed delta based only on track position
+        public float GetSignedDeltaTimeOnly(DeltaTime otherCarDelta)
+        {
+            TimeSpan splitTime = new TimeSpan(0);
+            if (otherCarDelta.deltaPoints.Count > 0 && deltaPoints.Count > 0)
             {
                 //opponent is behind
-                if (distanceRoundTrack < playerDelta.distanceRoundTrack)
+                if (distanceRoundTrackOnCurrentLap < otherCarDelta.distanceRoundTrackOnCurrentLap)
                 {
-                    splitTime = playerDelta.deltaPoints[currentDeltaPoint] - deltaPoints[currentDeltaPoint];
+                    splitTime = otherCarDelta.deltaPoints[currentDeltaPoint] - deltaPoints[currentDeltaPoint];
                 }
-                else if (distanceRoundTrack > playerDelta.distanceRoundTrack)
+                else if (distanceRoundTrackOnCurrentLap > otherCarDelta.distanceRoundTrackOnCurrentLap)
                 {
-                    splitTime = playerDelta.deltaPoints[playerDelta.currentDeltaPoint] - deltaPoints[playerDelta.currentDeltaPoint];
+                    splitTime = otherCarDelta.deltaPoints[otherCarDelta.currentDeltaPoint] - deltaPoints[otherCarDelta.currentDeltaPoint];
                 }
                 else
                 {
                     return 0f;
                 }
             }
-            return Math.Abs((float)splitTime.TotalSeconds);
+            return (float)splitTime.TotalSeconds;
         }
     }
 
