@@ -586,7 +586,7 @@ namespace CrewChiefV4.Events
                                 {
                                     TimeSpanWrapper delta = TimeSpanWrapper.FromSeconds(Math.Abs(timeDelta), Precision.AUTO_GAPS);
                                     String aheadOrBehind = Position.folderAhead;
-                                    if (timeDelta <= 0)
+                                    if (timeDelta >= 0)
                                     {
                                         aheadOrBehind = Position.folderBehind;
                                     }
