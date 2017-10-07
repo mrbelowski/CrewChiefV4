@@ -154,8 +154,8 @@ namespace CrewChiefV4.Events
                     if (opponent.Value.Speed > 0 &&
                         !opponent.Value.isEnteringPits() && !opponent.Value.isExitingPits() && !opponent.Value.InPits)
                     {
-                        if (opponent.Value.DeltaTime.GetSignedDeltaTime(currentGameState.SessionData.DeltaTime) < 0 &&
-                            opponent.Value.DeltaTime.GetSignedDeltaTime(currentGameState.SessionData.DeltaTime) < -7)
+                        float signedDelta = opponent.Value.DeltaTime.GetSignedDeltaTime(currentGameState.SessionData.DeltaTime);
+                        if (signedDelta < 0 && signedDelta < -7)
                         {
                             // more than 0 but less than 7 seconds behind, so warn about an approaching car
                             return true;
