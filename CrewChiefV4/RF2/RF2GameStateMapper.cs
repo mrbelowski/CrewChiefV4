@@ -1069,6 +1069,11 @@ namespace CrewChiefV4.rFactor2
                         opponent.TyreChangesByLap.Add(old.Key, old.Value);
 
                     opponent.NumPitStops = opponentPrevious.NumPitStops;
+                    opponent.DeltaTime = opponentPrevious.DeltaTime;
+                }
+                else
+                {
+                    opponent.DeltaTime = new DeltaTime(csd.TrackDefinition.trackLength, opponent.DistanceRoundTrack, DateTime.Now);
                 }
 
                 opponent.UnFilteredPosition = opponent.Position;
@@ -1094,7 +1099,6 @@ namespace CrewChiefV4.rFactor2
                     opponent.DistanceRoundTrack = (float)vehicleScoring.mLapDist;
                 }
 
-                opponent.DeltaTime = new DeltaTime(csd.TrackDefinition.trackLength, opponent.DistanceRoundTrack, DateTime.Now);
                 opponent.DeltaTime.SetNextDeltaPoint(opponent.DistanceRoundTrack, opponent.Speed, cgs.Now);
 
                 if (opponentPrevious != null) 
