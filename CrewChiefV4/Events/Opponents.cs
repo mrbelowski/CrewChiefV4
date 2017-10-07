@@ -477,7 +477,7 @@ namespace CrewChiefV4.Events
                         if (opponent.IsActive)
                         {
                             int position = opponent.Position;
-                            float timeDelta = currentGameState.SessionData.DeltaTime.GetDeltaTime(opponent.DeltaTime);
+                            float timeDelta = currentGameState.SessionData.DeltaTime.GetSignedDeltaTime(opponent.DeltaTime);
                             int lapDifference = currentGameState.SessionData.CompletedLaps - opponent.CompletedLaps;
                             if (timeDelta == 0 || lapDifference == 0 && Math.Abs(timeDelta) < 0.05)
                             {
@@ -586,7 +586,7 @@ namespace CrewChiefV4.Events
                                 {
                                     TimeSpanWrapper delta = TimeSpanWrapper.FromSeconds(Math.Abs(timeDelta), Precision.AUTO_GAPS);
                                     String aheadOrBehind = Position.folderAhead;
-                                    if (opponent.Position > currentGameState.SessionData.Position)
+                                    if (timeDelta <= 0)
                                     {
                                         aheadOrBehind = Position.folderBehind;
                                     }
