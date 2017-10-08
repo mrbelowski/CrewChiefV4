@@ -411,31 +411,31 @@ namespace CrewChiefV4.Audio
 
         private void stopBackgroundPlayer()
         {
-            if (backgroundPlayer != null && backgroundPlayerInitialised)
+            this.mainThreadContext.Send(delegate
             {
-                this.mainThreadContext.Send(delegate
+                if (backgroundPlayer == null || !backgroundPlayerInitialised)
+                    return;
+
+                try
                 {
-                    try
-                    {
-                        backgroundPlayer.Stop();
-                    }
-                    catch (Exception) { }
-                    backgroundPlayerInitialised = false;
-                    backgroundPlayer = null;
-                }, null);
-            }
+                    backgroundPlayer.Stop();
+                }
+                catch (Exception) { }
+                backgroundPlayerInitialised = false;
+                backgroundPlayer = null;
+            }, null);
         }
 
-        public void muteBackgroundPlayer(bool mute)
+        public void muteBackgroundPlayer(bool doMute)
         {
             this.mainThreadContext.Send(delegate
             {
                 if (backgroundPlayer == null || !backgroundPlayerInitialised)
                     return;
 
-                if (mute && !backgroundPlayer.IsMuted)
+                if (doMute && !backgroundPlayer.IsMuted)
                     backgroundPlayer.IsMuted = true;
-                else if (!mute && backgroundPlayer.IsMuted)
+                else if (!doMute && backgroundPlayer.IsMuted)
                     backgroundPlayer.IsMuted = false;
             }, null);
         }
