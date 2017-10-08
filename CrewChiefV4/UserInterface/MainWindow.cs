@@ -828,7 +828,9 @@ namespace CrewChiefV4
                     {
                         if (rejectMessagesWhenTalking)
                         {
-                            // Would be nice to drop all messages here, but how?
+                            // Drop any outstanding messages queued while user was talking, this should prevent weird half phrases.
+                            crewChief.audioPlayer.purgeQueues();
+
                             setMessagesVolume(currentVolume);
                             crewChief.audioPlayer.muteBackgroundPlayer(false /*mute*/);
                         }
