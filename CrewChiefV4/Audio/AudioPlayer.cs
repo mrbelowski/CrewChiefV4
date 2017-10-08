@@ -10,6 +10,7 @@ using System.Windows.Media;
 using System.Collections.Specialized;
 using CrewChiefV4.GameState;
 using System.Collections;
+using System.Runtime.Remoting.Contexts;
 
 namespace CrewChiefV4.Audio
 {
@@ -76,8 +77,9 @@ namespace CrewChiefV4.Audio
         private OrderedDictionary queuedClips = new OrderedDictionary();
 
         private OrderedDictionary immediateClips = new OrderedDictionary();
-        
-        public MediaPlayer backgroundPlayer;
+
+        // All access should be via UI thread.
+        private MediaPlayer backgroundPlayer;
 
         public static String soundFilesPath;
 
@@ -89,6 +91,7 @@ namespace CrewChiefV4.Audio
 
         public static String dtmPitWindowClosedBackground = "dtm_pit_window_closed.wav";
 
+        // TODO: this is no longer applicable and could be simplify as bg player is now UI thread synchronized.
         // only the monitor Thread can request a reload of the background wav file, so
         // the events thread will have to set these variables to ask for a reload
         private Boolean loadNewBackground = false;
@@ -122,9 +125,16 @@ namespace CrewChiefV4.Audio
         public String selectedPersonalisation = NO_PERSONALISATION_SELECTED;
 
         public double lastBackgroundPlayerVolume = -1.0;
+        SynchronizationContext mainThreadContext;
 
         public AudioPlayer()
         {
+            this.mainThreadContext = SynchronizationContext.Current;
+            this.mainThreadContext.Send(delegate
+            {
+                this.initialiseBackgroundPlayer();
+            }, null);
+            
             String soundPackLocationOverride = UserSettings.GetUserSettings().getString("override_default_sound_pack_location");
             String defaultSoundFilesPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\CrewChiefV4\sounds";
             DirectoryInfo defaultSoundDirectory = new DirectoryInfo(defaultSoundFilesPath);
@@ -386,50 +396,48 @@ namespace CrewChiefV4.Audio
 
         private void initialiseBackgroundPlayer()
         {
-            if (!backgroundPlayerInitialised && getBackgroundVolume() > 0)
+            this.mainThreadContext.Send(delegate
             {
-                backgroundPlayer = new MediaPlayer();
-                backgroundPlayer.MediaEnded += new EventHandler(backgroundPlayer_MediaEnded);
-                backgroundPlayer.Volume = getBackgroundVolume();
-                setBackgroundSound(dtmPitWindowClosedBackground);
-                backgroundPlayerInitialised = true;
-            }
+                if (!backgroundPlayerInitialised && getBackgroundVolume() > 0)
+                {
+                    backgroundPlayer = new MediaPlayer();
+                    backgroundPlayer.MediaEnded += new EventHandler(backgroundPlayer_MediaEnded);
+                    backgroundPlayer.Volume = getBackgroundVolume();
+                    setBackgroundSound(dtmPitWindowClosedBackground);
+                    backgroundPlayerInitialised = true;
+                }
+            }, null);
         }
 
         private void stopBackgroundPlayer()
         {
             if (backgroundPlayer != null && backgroundPlayerInitialised)
             {
-                try
+                this.mainThreadContext.Send(delegate
                 {
-                    backgroundPlayer.Stop();
-                }
-                catch (Exception) { }
-                backgroundPlayerInitialised = false;
-                backgroundPlayer = null;
+                    try
+                    {
+                        backgroundPlayer.Stop();
+                    }
+                    catch (Exception) { }
+                    backgroundPlayerInitialised = false;
+                    backgroundPlayer = null;
+                }, null);
             }
         }
 
-        private void updateBackgroundVolume()
+        public void muteBackgroundPlayer(bool mute)
         {
-            if (rejectMessagesWhenTalking)
+            this.mainThreadContext.Send(delegate
             {
-                // TODO: this still throws sometimes, need investigating.
-                if (SpeechRecogniser.waitingForSpeech && lastBackgroundPlayerVolume != 0.0)
-                {
-                    backgroundPlayer.Volume = 0.0;
-                    lastBackgroundPlayerVolume = 0.0;
-                }
-                else if (!SpeechRecogniser.waitingForSpeech && lastBackgroundPlayerVolume == 0.0)
-                {
-                    lastBackgroundPlayerVolume = getBackgroundVolume();
-                    backgroundPlayer.Volume = lastBackgroundPlayerVolume;
-                }
-            }
-            else
-            {
-                backgroundPlayer.Volume = getBackgroundVolume();
-            }
+                if (backgroundPlayer == null || !backgroundPlayerInitialised)
+                    return;
+
+                if (mute && !backgroundPlayer.IsMuted)
+                    backgroundPlayer.IsMuted = true;
+                else if (!mute && backgroundPlayer.IsMuted)
+                    backgroundPlayer.IsMuted = false;
+            }, null);
         }
 
         private void monitorQueue()
@@ -439,8 +447,6 @@ namespace CrewChiefV4.Audio
             DateTime nextQueueCheck = DateTime.Now;
             while (monitorRunning)
             {
-                updateBackgroundVolume();
-
                 if (channelOpen && (!holdChannelOpen || DateTime.Now > timeOfLastMessageEnd + maxTimeToHoldEmptyChannelOpen))
                 {
                     if (!queueHasDueMessages(queuedClips, false) && !queueHasDueMessages(immediateClips, true))
@@ -521,8 +527,6 @@ namespace CrewChiefV4.Audio
             initialiseBackgroundPlayer();
             while (monitorRunning)
             {
-                updateBackgroundVolume();
-
                 Thread.Sleep(queueMonitorInterval);
                 try
                 {
@@ -542,8 +546,6 @@ namespace CrewChiefV4.Audio
             playedMessagesCount.Clear();
             stopBackgroundPlayer();
         }
-
-        private bool lastAddedKeyWasSpotter = false;
 
         private void playQueueContents(OrderedDictionary queueToPlay, Boolean isImmediateMessages)
         {
@@ -829,41 +831,42 @@ namespace CrewChiefV4.Audio
             if (!channelOpen)
             {
                 channelOpen = true;
-                if (getBackgroundVolume() > 0 && loadNewBackground && backgroundToLoad != null && !mute)
+                this.mainThreadContext.Send(delegate
                 {
-                    Console.WriteLine("Setting background sounds file to  " + backgroundToLoad);
-                    String path = Path.Combine(backgroundFilesPath, backgroundToLoad);
-                    if (!backgroundPlayerInitialised)
+                    if (getBackgroundVolume() > 0 && loadNewBackground && backgroundToLoad != null && !mute)
                     {
-                        initialiseBackgroundPlayer();
+                        Console.WriteLine("Setting background sounds file to  " + backgroundToLoad);
+                        String path = Path.Combine(backgroundFilesPath, backgroundToLoad);
+                        if (!backgroundPlayerInitialised)
+                        {
+                            initialiseBackgroundPlayer();
+                        }
+                        backgroundPlayer.Open(new System.Uri(path, System.UriKind.Absolute));
+                        loadNewBackground = false;
                     }
-                    updateBackgroundVolume();
-                    backgroundPlayer.Open(new System.Uri(path, System.UriKind.Absolute));
-                    loadNewBackground = false;
-                }
 
-                // this looks like we're doing it the wrong way round but there's a short
-                // delay playing the event sound, so if we kick off the background before the bleep
-                if (getBackgroundVolume() > 0)
-                {
-                    if (!backgroundPlayerInitialised)
+                    // this looks like we're doing it the wrong way round but there's a short
+                    // delay playing the event sound, so if we kick off the background before the bleep
+                    if (getBackgroundVolume() > 0)
                     {
-                        initialiseBackgroundPlayer();
+                        if (!backgroundPlayerInitialised)
+                        {
+                            initialiseBackgroundPlayer();
+                        }
+                        int backgroundDuration = 0;
+                        int backgroundOffset = 0;
+                        if (backgroundPlayer.NaturalDuration.HasTimeSpan)
+                        {
+                            backgroundDuration = (backgroundPlayer.NaturalDuration.TimeSpan.Minutes * 60) +
+                                backgroundPlayer.NaturalDuration.TimeSpan.Seconds;
+                            //Console.WriteLine("Duration from file is " + backgroundDuration);
+                            backgroundOffset = random.Next(0, backgroundDuration - backgroundLeadout);
+                        }
+                        //Console.WriteLine("Background offset = " + backgroundOffset);
+                        backgroundPlayer.Position = TimeSpan.FromSeconds(backgroundOffset);
+                        backgroundPlayer.Play();
                     }
-                    updateBackgroundVolume();
-                    int backgroundDuration = 0;
-                    int backgroundOffset = 0;
-                    if (backgroundPlayer.NaturalDuration.HasTimeSpan)
-                    {
-                        backgroundDuration = (backgroundPlayer.NaturalDuration.TimeSpan.Minutes * 60) +
-                            backgroundPlayer.NaturalDuration.TimeSpan.Seconds;
-                        //Console.WriteLine("Duration from file is " + backgroundDuration);
-                        backgroundOffset = random.Next(0, backgroundDuration - backgroundLeadout);
-                    }
-                    //Console.WriteLine("Background offset = " + backgroundOffset);
-                    backgroundPlayer.Position = TimeSpan.FromSeconds(backgroundOffset);
-                    backgroundPlayer.Play();
-                }
+                }, null);
 
                 if (useShortBeepWhenOpeningChannel)
                 {
@@ -881,21 +884,24 @@ namespace CrewChiefV4.Audio
             if (channelOpen)
             {
                 playEndSpeakingBeep();
-                if (getBackgroundVolume() > 0 && !mute)
+                this.mainThreadContext.Send(delegate
                 {
-                    if (!backgroundPlayerInitialised)
+                    if (getBackgroundVolume() > 0 && !mute)
                     {
-                        initialiseBackgroundPlayer();
+                        if (!backgroundPlayerInitialised)
+                        {
+                            initialiseBackgroundPlayer();
+                        }
+                        try
+                        {
+                            backgroundPlayer.Stop();
+                        }
+                        catch (Exception)
+                        {
+                            Console.WriteLine("Unable to stop background player");
+                        }
                     }
-                    try
-                    {
-                        backgroundPlayer.Stop();
-                    }
-                    catch (Exception)
-                    {
-                        Console.WriteLine("Unable to stop background player");
-                    }
-                }                
+                }, null);
                 soundCache.ExpireCachedSounds();
             }
             useShortBeepWhenOpeningChannel = false;
@@ -1118,8 +1124,11 @@ namespace CrewChiefV4.Audio
 
         private void backgroundPlayer_MediaEnded(object sender, EventArgs e)
         {
-            Console.WriteLine("looping...");
-            backgroundPlayer.Position = TimeSpan.FromMilliseconds(1);
+            this.mainThreadContext.Send(delegate
+            {
+                Console.WriteLine("looping...");
+                backgroundPlayer.Position = TimeSpan.FromMilliseconds(1);
+            }, null);
         }
 
         // checks that another pearl isn't already queued. If one of the same type is already
