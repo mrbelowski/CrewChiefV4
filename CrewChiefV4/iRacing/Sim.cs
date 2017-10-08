@@ -142,39 +142,12 @@ namespace CrewChiefV4.iRacing
         private void GetResults(SessionInfo info)
         {
             // If currently updating list, or no session yet, then no need to update result info 
-            if (_isUpdatingDrivers) return;
-            if (_currentSessionNumber == null) return;
+            if (_isUpdatingDrivers) 
+                return;
+            if (_currentSessionNumber == null) 
+                return;
 
-            this.GetQualyResults(info);
             this.GetRaceResults(info);
-        }
-
-        private void GetQualyResults(SessionInfo info)
-        {
-            // TODO: stop if qualy is finished
-            var query =
-                info["QualifyResultsInfo"]["Results"];
-
-            for (int position = 0; position < _drivers.Count; position++)
-            {
-                var positionQuery = query["Position", position];
-
-                string idValue;
-                if (!positionQuery["CarIdx"].TryGetValue(out idValue))
-                {
-                    // Driver not found
-                    continue;
-                }
-
-                // Find driver and update results
-                int id = int.Parse(idValue);
-
-                var driver = _drivers.SingleOrDefault(d => d.Id == id);
-                if (driver != null)
-                {
-                    driver.UpdateQualyResultsInfo(positionQuery, position);
-                }
-            }
         }
 
         private void GetRaceResults(SessionInfo info)
