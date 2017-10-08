@@ -91,12 +91,6 @@ namespace CrewChiefV4.Audio
 
         public static String dtmPitWindowClosedBackground = "dtm_pit_window_closed.wav";
 
-        // TODO: this is no longer applicable and could be simplify as bg player is now UI thread synchronized.
-        // only the monitor Thread can request a reload of the background wav file, so
-        // the events thread will have to set these variables to ask for a reload
-        private Boolean loadNewBackground = false;
-        private String backgroundToLoad;
-
         private PearlsOfWisdom pearlsOfWisdom = new PearlsOfWisdom();
 
         DateTime timeLastPearlOfWisdomPlayed = DateTime.Now;
@@ -130,11 +124,7 @@ namespace CrewChiefV4.Audio
         public AudioPlayer()
         {
             this.mainThreadContext = SynchronizationContext.Current;
-            this.mainThreadContext.Send(delegate
-            {
-                this.initialiseBackgroundPlayer();
-            }, null);
-            
+
             String soundPackLocationOverride = UserSettings.GetUserSettings().getString("override_default_sound_pack_location");
             String defaultSoundFilesPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\CrewChiefV4\sounds";
             DirectoryInfo defaultSoundDirectory = new DirectoryInfo(defaultSoundFilesPath);
@@ -205,6 +195,9 @@ namespace CrewChiefV4.Audio
         {
             DirectoryInfo soundDirectory = new DirectoryInfo(soundFilesPath);
             backgroundFilesPath = Path.Combine(soundFilesPath, "background_sounds");
+
+            initialiseBackgroundPlayer();
+
             if (!soundDirectory.Exists)
             {
                 Console.WriteLine("Unable to find sound directory " + soundDirectory.FullName);
@@ -390,8 +383,19 @@ namespace CrewChiefV4.Audio
 
         public void setBackgroundSound(String backgroundSoundName)
         {
-            backgroundToLoad = backgroundSoundName;
-            loadNewBackground = true;
+            this.mainThreadContext.Send(delegate
+            {
+                if (getBackgroundVolume() > 0 && !mute)
+                {
+                    Console.WriteLine("Setting background sounds file to  " + backgroundSoundName);
+                    String path = Path.Combine(backgroundFilesPath, backgroundSoundName);
+                    if (!backgroundPlayerInitialised)
+                    {
+                        initialiseBackgroundPlayer();
+                    }
+                    backgroundPlayer.Open(new System.Uri(path, System.UriKind.Absolute));
+                }
+            }, null);
         }
 
         private void initialiseBackgroundPlayer()
@@ -403,8 +407,8 @@ namespace CrewChiefV4.Audio
                     backgroundPlayer = new MediaPlayer();
                     backgroundPlayer.MediaEnded += new EventHandler(backgroundPlayer_MediaEnded);
                     backgroundPlayer.Volume = getBackgroundVolume();
-                    setBackgroundSound(dtmPitWindowClosedBackground);
                     backgroundPlayerInitialised = true;
+                    setBackgroundSound(dtmPitWindowClosedBackground);
                 }
             }, null);
         }
@@ -833,18 +837,6 @@ namespace CrewChiefV4.Audio
                 channelOpen = true;
                 this.mainThreadContext.Send(delegate
                 {
-                    if (getBackgroundVolume() > 0 && loadNewBackground && backgroundToLoad != null && !mute)
-                    {
-                        Console.WriteLine("Setting background sounds file to  " + backgroundToLoad);
-                        String path = Path.Combine(backgroundFilesPath, backgroundToLoad);
-                        if (!backgroundPlayerInitialised)
-                        {
-                            initialiseBackgroundPlayer();
-                        }
-                        backgroundPlayer.Open(new System.Uri(path, System.UriKind.Absolute));
-                        loadNewBackground = false;
-                    }
-
                     // this looks like we're doing it the wrong way round but there's a short
                     // delay playing the event sound, so if we kick off the background before the bleep
                     if (getBackgroundVolume() > 0)
