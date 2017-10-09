@@ -383,9 +383,9 @@ namespace CrewChiefV4.Audio
 
         public void setBackgroundSound(String backgroundSoundName)
         {
-            this.mainThreadContext.Send(delegate
+            if (getBackgroundVolume() > 0 && !mute)
             {
-                if (getBackgroundVolume() > 0 && !mute)
+                this.mainThreadContext.Send(delegate
                 {
                     Console.WriteLine("Setting background sounds file to  " + backgroundSoundName);
                     String path = Path.Combine(backgroundFilesPath, backgroundSoundName);
@@ -394,12 +394,17 @@ namespace CrewChiefV4.Audio
                         initialiseBackgroundPlayer();
                     }
                     backgroundPlayer.Open(new System.Uri(path, System.UriKind.Absolute));
-                }
-            }, null);
+                }, null);
+            }
         }
 
         private void initialiseBackgroundPlayer()
         {
+            if (backgroundPlayer != null 
+                && backgroundPlayerInitialised
+                && getBackgroundVolume() > 0)
+                return;
+
             this.mainThreadContext.Send(delegate
             {
                 if (!backgroundPlayerInitialised && getBackgroundVolume() > 0)
@@ -415,11 +420,11 @@ namespace CrewChiefV4.Audio
 
         private void stopBackgroundPlayer()
         {
+            if (backgroundPlayer == null || !backgroundPlayerInitialised)
+                return;
+
             this.mainThreadContext.Send(delegate
             {
-                if (backgroundPlayer == null || !backgroundPlayerInitialised)
-                    return;
-
                 try
                 {
                     backgroundPlayer.Stop();
@@ -432,11 +437,11 @@ namespace CrewChiefV4.Audio
 
         public void muteBackgroundPlayer(bool doMute)
         {
+            if (backgroundPlayer == null || !backgroundPlayerInitialised)
+                return;
+
             this.mainThreadContext.Send(delegate
             {
-                if (backgroundPlayer == null || !backgroundPlayerInitialised)
-                    return;
-
                 if (doMute && !backgroundPlayer.IsMuted)
                     backgroundPlayer.IsMuted = true;
                 else if (!doMute && backgroundPlayer.IsMuted)
@@ -835,30 +840,30 @@ namespace CrewChiefV4.Audio
             if (!channelOpen)
             {
                 channelOpen = true;
-                this.mainThreadContext.Send(delegate
+                if (getBackgroundVolume() > 0)
                 {
-                    // this looks like we're doing it the wrong way round but there's a short
-                    // delay playing the event sound, so if we kick off the background before the bleep
-                    if (getBackgroundVolume() > 0)
+                    this.mainThreadContext.Send(delegate
                     {
-                        if (!backgroundPlayerInitialised)
-                        {
-                            initialiseBackgroundPlayer();
-                        }
-                        int backgroundDuration = 0;
-                        int backgroundOffset = 0;
-                        if (backgroundPlayer.NaturalDuration.HasTimeSpan)
-                        {
-                            backgroundDuration = (backgroundPlayer.NaturalDuration.TimeSpan.Minutes * 60) +
-                                backgroundPlayer.NaturalDuration.TimeSpan.Seconds;
-                            //Console.WriteLine("Duration from file is " + backgroundDuration);
-                            backgroundOffset = random.Next(0, backgroundDuration - backgroundLeadout);
-                        }
-                        //Console.WriteLine("Background offset = " + backgroundOffset);
-                        backgroundPlayer.Position = TimeSpan.FromSeconds(backgroundOffset);
-                        backgroundPlayer.Play();
-                    }
-                }, null);
+                        // this looks like we're doing it the wrong way round but there's a short
+                        // delay playing the event sound, so if we kick off the background before the bleep
+                            if (!backgroundPlayerInitialised)
+                            {
+                                initialiseBackgroundPlayer();
+                            }
+                            int backgroundDuration = 0;
+                            int backgroundOffset = 0;
+                            if (backgroundPlayer.NaturalDuration.HasTimeSpan)
+                            {
+                                backgroundDuration = (backgroundPlayer.NaturalDuration.TimeSpan.Minutes * 60) +
+                                    backgroundPlayer.NaturalDuration.TimeSpan.Seconds;
+                                //Console.WriteLine("Duration from file is " + backgroundDuration);
+                                backgroundOffset = random.Next(0, backgroundDuration - backgroundLeadout);
+                            }
+                            //Console.WriteLine("Background offset = " + backgroundOffset);
+                            backgroundPlayer.Position = TimeSpan.FromSeconds(backgroundOffset);
+                            backgroundPlayer.Play();
+                    }, null);
+                }
 
                 if (useShortBeepWhenOpeningChannel)
                 {
@@ -876,9 +881,9 @@ namespace CrewChiefV4.Audio
             if (channelOpen)
             {
                 playEndSpeakingBeep();
-                this.mainThreadContext.Send(delegate
+                if (getBackgroundVolume() > 0 && !mute)
                 {
-                    if (getBackgroundVolume() > 0 && !mute)
+                    this.mainThreadContext.Send(delegate
                     {
                         if (!backgroundPlayerInitialised)
                         {
@@ -892,8 +897,8 @@ namespace CrewChiefV4.Audio
                         {
                             Console.WriteLine("Unable to stop background player");
                         }
-                    }
-                }, null);
+                    }, null);
+                }
                 soundCache.ExpireCachedSounds();
             }
             useShortBeepWhenOpeningChannel = false;
