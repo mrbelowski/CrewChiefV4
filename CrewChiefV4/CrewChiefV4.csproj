@@ -100,6 +100,9 @@
     <Compile Include="Audio\PlaybackModerator.cs" />
     <Compile Include="Audio\Sounds.cs" />
     <Compile Include="CarData.cs" />
+    <Compile Include="commands\KeyPresser.cs" />
+    <Compile Include="commands\CommandMacro.cs" />
+    <Compile Include="commands\MacroManager.cs" />
     <Compile Include="DriverNameHelper.cs" />
     <Compile Include="Events\AbstractEvent.cs" />
     <Compile Include="Audio\AudioPlayer.cs" />
