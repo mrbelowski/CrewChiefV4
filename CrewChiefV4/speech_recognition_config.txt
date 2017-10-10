@@ -272,3 +272,8 @@ HOURS = hours
 88 = eighty-eight
 89 = eighty-nine
 90 = ninety
+
+
+####
+# Macro triggers
+MACRO_TEST = macro test
