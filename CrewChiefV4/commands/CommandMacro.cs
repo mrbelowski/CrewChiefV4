@@ -26,7 +26,7 @@ namespace CrewChiefV4.commands
             {
                 if (item.macroItemType == MacroItem.MacroItemType.KEYPRESS)
                 {
-                    KeyPresser.SendScanCodeKeyPress(item.keycode);
+                    KeyPresser.SendScanCodeKeyPress(item.keycode, 20);
                 }
                 else if (item.macroItemType == MacroItem.MacroItemType.PAUSE)
                 {
