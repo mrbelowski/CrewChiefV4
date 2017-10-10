@@ -17,6 +17,12 @@ namespace CrewChiefV4.commands
         [DllImport("user32.dll", SetLastError = true)]
         private static extern uint SendInput(uint numberOfInputs, INPUT[] inputs, int sizeOfInputStructure);
 
+        [DllImport("user32.dll")]
+        public static extern uint MapVirtualKey(uint uCode, uint uMapType);
+
+        public const uint KEYEVENTF_KEYUP = 0x0002;
+        public const uint KEYEVENTF_SCANCODE = 0x0008;
+
         /// <summary>
         /// simulate key press
         /// </summary>
@@ -44,7 +50,7 @@ namespace CrewChiefV4.commands
             {
                 Vk = (ushort)keyCode,
                 Scan = 0,
-                Flags = 2,
+                Flags = KEYEVENTF_KEYUP,
                 Time = 0,
                 ExtraInfo = IntPtr.Zero
             };
@@ -53,52 +59,38 @@ namespace CrewChiefV4.commands
                 throw new Exception();
         }
 
-        /// <summary>
-        /// Send a key down and hold it down until sendkeyup method is called
-        /// </summary>
-        /// <param name="keyCode"></param>
-        public static void SendKeyDown(KeyCode keyCode)
+        public static void SendScanCodeKeyPress(KeyCode keyCode)
         {
+            ushort scanCode = (ushort)MapVirtualKey((ushort)keyCode, 0);
             INPUT input = new INPUT
             {
                 Type = 1
             };
-            input.Data.Keyboard = new KEYBDINPUT();
-            input.Data.Keyboard.Vk = (ushort)keyCode;
-            input.Data.Keyboard.Scan = 0;
-            input.Data.Keyboard.Flags = 0;
-            input.Data.Keyboard.Time = 0;
-            input.Data.Keyboard.ExtraInfo = IntPtr.Zero;
-            INPUT[] inputs = new INPUT[] { input };
-            if (SendInput(1, inputs, Marshal.SizeOf(typeof(INPUT))) == 0)
+            input.Data.Keyboard = new KEYBDINPUT()
             {
-                throw new Exception();
-            }
-        }
+                Vk = 0,
+                Scan = scanCode,
+                Flags = KEYEVENTF_SCANCODE,
+                Time = 0,
+                ExtraInfo = IntPtr.Zero,
+            };
 
-        /// <summary>
-        /// Release a key that is being hold down
-        /// </summary>
-        /// <param name="keyCode"></param>
-        public static void SendKeyUp(KeyCode keyCode)
-        {
-            INPUT input = new INPUT
+            INPUT input2 = new INPUT
             {
                 Type = 1
             };
-            input.Data.Keyboard = new KEYBDINPUT();
-            input.Data.Keyboard.Vk = (ushort)keyCode;
-            input.Data.Keyboard.Scan = 0;
-            input.Data.Keyboard.Flags = 2;
-            input.Data.Keyboard.Time = 0;
-            input.Data.Keyboard.ExtraInfo = IntPtr.Zero;
-            INPUT[] inputs = new INPUT[] { input };
-            if (SendInput(1, inputs, Marshal.SizeOf(typeof(INPUT))) == 0)
+            input2.Data.Keyboard = new KEYBDINPUT()
+            {
+                Vk = 0,
+                Scan = scanCode,
+                Flags = KEYEVENTF_SCANCODE | KEYEVENTF_KEYUP,
+                Time = 0,
+                ExtraInfo = IntPtr.Zero
+            };
+            INPUT[] inputs = new INPUT[] { input, input2 };
+            if (SendInput(2, inputs, Marshal.SizeOf(typeof(INPUT))) == 0)
                 throw new Exception();
-
         }
-
-
 
         /// <summary>
         /// http://msdn.microsoft.com/en-us/library/windows/desktop/ms646270(v=vs.85).aspx
