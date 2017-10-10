@@ -58,18 +58,13 @@ namespace CrewChiefV4.iRacing
             currentGameState.SessionData.SessionRunningTime = (float)shared.Telemetry.SessionTime;
             currentGameState.SessionData.SessionTimeRemaining = (float)shared.Telemetry.SessionTimeRemain;
             int previousLapsCompleted = previousGameState == null ? 0 : previousGameState.SessionData.CompletedLaps;
-                currentGameState.SessionData.SessionPhase = mapToSessionPhase(lastSessionPhase,
-                shared.Telemetry.SessionState,currentGameState.SessionData.SessionType, shared.Telemetry.IsReplayPlaying,
+            currentGameState.SessionData.SessionPhase = mapToSessionPhase(lastSessionPhase,shared.Telemetry.SessionState,currentGameState.SessionData.SessionType, shared.Telemetry.IsReplayPlaying,
                 (float)shared.Telemetry.SessionTime, previousLapsCompleted, shared.Telemetry.Lap, shared.Telemetry.SessionFlags, shared.Telemetry.IsInGarage);
             
             currentGameState.SessionData.NumCarsAtStartOfSession = shared.Drivers.Count;
             
             int sessionNumber = shared.Telemetry.SessionNum;
             int PlayerCarIdx = shared.Telemetry.PlayerCarIdx;
-
-
-
-
 
             Boolean justGoneGreen = false;
             if(shared.Driver != null)
@@ -177,12 +172,6 @@ namespace CrewChiefV4.iRacing
                         {
                             currentGameState.SessionData.SessionTotalRunTime = (float)shared.Telemetry.SessionTimeRemain;
                             currentGameState.SessionData.SessionHasFixedTime = true;
-
-                            if(currentGameState.SessionData.SessionType.HasFlag(SessionType.Race))
-                            {
-                                currentGameState.SessionData.HasExtraLap = true;
-                            }
-
                         }
                         else
                         {
@@ -592,23 +581,7 @@ namespace CrewChiefV4.iRacing
                         Boolean finishedAllottedRaceLaps = currentGameState.SessionData.SessionNumberOfLaps > 0 && currentGameState.SessionData.SessionNumberOfLaps == currentOpponentLapsCompleted;
                         Boolean finishedAllottedRaceTime = false;
                         
-                        if (currentGameState.SessionData.HasExtraLap &&
-                            currentGameState.SessionData.SessionType == SessionType.Race)
-                        {
-                            if (currentGameState.SessionData.SessionTotalRunTime > 0 && currentGameState.SessionData.SessionTimeRemaining <= 0 &&
-                                previousOpponentCompletedLaps < currentOpponentLapsCompleted)
-                            {
-                                if (!currentOpponentData.HasStartedExtraLap)
-                                {
-                                    currentOpponentData.HasStartedExtraLap = true;
-                                }
-                                else
-                                {
-                                    finishedAllottedRaceTime = true;
-                                }
-                            }
-                        }
-                        else if (currentGameState.SessionData.SessionTotalRunTime > 0 && currentGameState.SessionData.SessionTimeRemaining <= 0 &&
+                        if (currentGameState.SessionData.SessionTotalRunTime > 0 && currentGameState.SessionData.SessionTimeRemaining <= 0 &&
                             previousOpponentCompletedLaps < currentOpponentLapsCompleted)
                         {
                             finishedAllottedRaceTime = true;
@@ -812,8 +785,8 @@ namespace CrewChiefV4.iRacing
                 }
                 else if (opponentData.CurrentSectorNumber == 1 && sector == 2 || opponentData.CurrentSectorNumber == 2 && sector == 3)
                 {
-                    //opponentData.AddSectorData(opponentData.CurrentSectorNumber, racePosition, sectorTime, sessionRunningTime, lapIsValid && validSpeed, false, trackTempreture, airTemperature);
-                    opponentData.AddCumulativeSectorData(opponentData.CurrentSectorNumber, racePosition, currentLaptime, sessionRunningTime, lapIsValid && validSpeed, false, trackTempreture, airTemperature);
+                    opponentData.AddSectorData(opponentData.CurrentSectorNumber, racePosition, sectorTime, sessionRunningTime, lapIsValid && validSpeed, false, trackTempreture, airTemperature);
+                    //opponentData.AddCumulativeSectorData(opponentData.CurrentSectorNumber, racePosition, currentLaptime, sessionRunningTime, lapIsValid && validSpeed, false, trackTempreture, airTemperature);
                 }
                 opponentData.CurrentSectorNumber = sector;
             }

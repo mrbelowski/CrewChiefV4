@@ -10,7 +10,7 @@ namespace CrewChiefV4.iRacing
     public class iRacingSharedMemoryReader : GameDataReader
     {
 
-        iRacingSDK sdk = new iRacingSDK();
+        iRacingSDK sdk = null;
         Sim sim = new Sim();
         private Boolean initialised = false;
         private List<iRacingStructDumpWrapper> dataToDump;
@@ -109,6 +109,10 @@ namespace CrewChiefV4.iRacing
                 {
                     try
                     {
+                        if (sdk == null)
+                        {
+                            sdk = new iRacingSDK();
+                        }
                         sdk.Shutdown();
 
                         if(!sdk.IsInitialized)
@@ -216,10 +220,18 @@ namespace CrewChiefV4.iRacing
         {
             lock (this)
             {
+                if(sdk != null)
+                {
+                    sdk.Shutdown();
+                    sdk = null;
+                }
                 sim.Reset();
-                sdk.Shutdown();
-                initialised = false;
-                Console.WriteLine("Disconnected from iRacing Shared Memory");
+                if (initialised)
+                {
+                    initialised = false;
+                    Console.WriteLine("Disconnected from iRacing Shared Memory");
+                }
+
             }
             
         }
