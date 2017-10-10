@@ -98,12 +98,12 @@ namespace CrewChiefV4.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool log_tyre_temps {
+        public bool log_tyre_stats {
             get {
-                return ((bool)(this["log_tyre_temps"]));
+                return ((bool)(this["log_tyre_stats"]));
             }
             set {
-                this["log_tyre_temps"] = value;
+                this["log_tyre_stats"] = value;
             }
         }
         

@@ -12,7 +12,7 @@ namespace CrewChiefV4.Events
     class TyreMonitor : AbstractEvent
     {
         private Boolean delayResponses = UserSettings.GetUserSettings().getBoolean("enable_delayed_responses");
-        private Boolean logTemps = UserSettings.GetUserSettings().getBoolean("log_tyre_temps");
+        private Boolean logStats = UserSettings.GetUserSettings().getBoolean("log_tyre_stats");
 
         // tyre temp messages...
         private String folderColdFrontTyres = "tyre_monitor/cold_front_tyres";
@@ -358,9 +358,10 @@ namespace CrewChiefV4.Events
             return false;
         }
 
-        private void logTyreTemps(TyreData tyreData, int sectorNumber, int lapNumber)
+        private void logTyreStats(TyreData tyreData, int sectorNumber, int lapNumber)
         {
-            // tyre temp debug code
+            // tyre stats debug code
+            Console.WriteLine("-------------------------");
             Console.WriteLine("Lap "+ (lapNumber + 1) + " sector " + sectorNumber + " tyre temps, Outer, middle, inner  |------|  inner, middle, outer");
             Console.WriteLine("Fronts:    " + Math.Round(tyreData.FrontLeft_LeftTemp, 2) + 
                 ", " + Math.Round(tyreData.FrontLeft_CenterTemp, 2) + 
@@ -375,6 +376,18 @@ namespace CrewChiefV4.Events
                 ", " + Math.Round(tyreData.RearRight_CenterTemp, 2) + 
                 ", " + Math.Round(tyreData.RearRight_LeftTemp, 2));
             Console.WriteLine("-------------------------");
+            Console.WriteLine("Wear, percentage, bracket  |------|  percentage, bracket");
+            Console.WriteLine("Fronts:    " + Math.Round(tyreData.FrontLeftPercentWear, 2) +
+                "  |------|  " + Math.Round(tyreData.FrontRightPercentWear, 2));
+            Console.WriteLine("Rears:    " + Math.Round(tyreData.RearLeftPercentWear, 2) +
+                "  |------|  " + Math.Round(tyreData.RearRightPercentWear, 2));
+            Console.WriteLine("-------------------------");
+            Console.WriteLine("Wear interpratation:");
+            foreach (var key in tyreData.TyreConditionStatus.cornersForEachStatus)
+            {
+                Console.WriteLine("Status: " + key);
+            }
+            Console.WriteLine("-------------------------");
         }
 
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
@@ -384,9 +397,9 @@ namespace CrewChiefV4.Events
                 return;
             }
             playerClassSessionBestLapTimeByTyre = currentGameState.SessionData.PlayerClassSessionBestLapTimeByTyre;
-            if (logTemps && currentGameState.SessionData.IsNewSector)
+            if (logStats && currentGameState.SessionData.IsNewSector)
             {
-                logTyreTemps(currentGameState.TyreData, currentGameState.SessionData.SectorNumber, currentGameState.SessionData.CompletedLaps);
+                logTyreStats(currentGameState.TyreData, currentGameState.SessionData.SectorNumber, currentGameState.SessionData.CompletedLaps);
             }
             if (currentGameState.SessionData.IsNewLap)
             {
