@@ -70,8 +70,6 @@ namespace CrewChiefV4.Audio
         // if this is true, no 'green green green', 'get ready', or spotter messages are played
         private Boolean disableImmediateMessages = UserSettings.GetUserSettings().getBoolean("disable_immediate_messages");
 
-        private Boolean rejectMessagesWhenTalking = UserSettings.GetUserSettings().getBoolean("reject_message_when_talking");
-
         private Random random = new Random();
 
         private OrderedDictionary queuedClips = new OrderedDictionary();
@@ -118,8 +116,7 @@ namespace CrewChiefV4.Audio
 
         public String selectedPersonalisation = NO_PERSONALISATION_SELECTED;
 
-        public double lastBackgroundPlayerVolume = -1.0;
-        SynchronizationContext mainThreadContext;
+        private SynchronizationContext mainThreadContext = null; 
 
         public AudioPlayer()
         {
@@ -846,22 +843,22 @@ namespace CrewChiefV4.Audio
                     {
                         // this looks like we're doing it the wrong way round but there's a short
                         // delay playing the event sound, so if we kick off the background before the bleep
-                            if (!backgroundPlayerInitialised)
-                            {
-                                initialiseBackgroundPlayer();
-                            }
-                            int backgroundDuration = 0;
-                            int backgroundOffset = 0;
-                            if (backgroundPlayer.NaturalDuration.HasTimeSpan)
-                            {
-                                backgroundDuration = (backgroundPlayer.NaturalDuration.TimeSpan.Minutes * 60) +
-                                    backgroundPlayer.NaturalDuration.TimeSpan.Seconds;
-                                //Console.WriteLine("Duration from file is " + backgroundDuration);
-                                backgroundOffset = random.Next(0, backgroundDuration - backgroundLeadout);
-                            }
-                            //Console.WriteLine("Background offset = " + backgroundOffset);
-                            backgroundPlayer.Position = TimeSpan.FromSeconds(backgroundOffset);
-                            backgroundPlayer.Play();
+                        if (!backgroundPlayerInitialised)
+                        {
+                            initialiseBackgroundPlayer();
+                        }
+                        int backgroundDuration = 0;
+                        int backgroundOffset = 0;
+                        if (backgroundPlayer.NaturalDuration.HasTimeSpan)
+                        {
+                            backgroundDuration = (backgroundPlayer.NaturalDuration.TimeSpan.Minutes * 60) +
+                                backgroundPlayer.NaturalDuration.TimeSpan.Seconds;
+                            //Console.WriteLine("Duration from file is " + backgroundDuration);
+                            backgroundOffset = random.Next(0, backgroundDuration - backgroundLeadout);
+                        }
+                        //Console.WriteLine("Background offset = " + backgroundOffset);
+                        backgroundPlayer.Position = TimeSpan.FromSeconds(backgroundOffset);
+                        backgroundPlayer.Play();
                     }, null);
                 }
 
