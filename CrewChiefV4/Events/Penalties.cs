@@ -74,6 +74,8 @@ namespace CrewChiefV4.Events
 
         private Boolean playedNotServedPenalty;
 
+        private Random random = new Random();
+
         public Penalties(AudioPlayer audioPlayer)
         {
             this.audioPlayer = audioPlayer;
@@ -106,8 +108,8 @@ namespace CrewChiefV4.Events
         {
             if (base.isMessageStillValid(eventSubType, currentGameState, validationData))
             {
-                // when a new penalty is given we queue a 'three laps left to serve' message for 20 seconds in the future.
-                // If, 20 seconds later, the player has started a new lap, this message is no longer valid so shouldn't be played
+                // When a new penalty is given we queue a 'three laps left to serve' delayed message.
+                // If, the moment message is about to play, the player has started a new lap, this message is no longer valid so shouldn't be played
                 if (eventSubType == folderThreeLapsToServe)
                 {
                     Console.WriteLine("checking penalty validity, pen lap = " + penaltyLap + ", completed =" + lapsCompleted);
@@ -227,7 +229,8 @@ namespace CrewChiefV4.Events
                 }
             }
             else if (currentGameState.PositionAndMotionData.CarSpeed > 1 && playCutTrackWarnings && 
-                currentGameState.PenaltiesData.CutTrackWarnings > cutTrackWarningsCount)
+                currentGameState.PenaltiesData.CutTrackWarnings > cutTrackWarningsCount &&
+                currentGameState.PenaltiesData.NumPenalties == previousGameState.PenaltiesData.NumPenalties)  // Make sure we've no new penalty for this cut.
             {
                 cutTrackWarningsCount = currentGameState.PenaltiesData.CutTrackWarnings;
                 if (currentGameState.ControlData.ControlType != ControlType.AI &&
@@ -258,9 +261,9 @@ namespace CrewChiefV4.Events
                 {
                     lapsCompleted = currentGameState.SessionData.CompletedLaps;
                     // this is a new penalty
-                    audioPlayer.playMessage(new QueuedMessage(folderYouHavePenalty, 0, this));
+                    audioPlayer.playMessage(new QueuedMessage(folderYouHavePenalty, random.Next(3, 7), this));
                     // queue a '3 laps to serve penalty' message - this might not get played
-                    audioPlayer.playMessage(new QueuedMessage(folderThreeLapsToServe, 20, this));
+                    audioPlayer.playMessage(new QueuedMessage(folderThreeLapsToServe, random.Next(10, 20), this));
                     // we don't already have a penalty
                     if (penaltyLap == -1 || !hasOutstandingPenalty)
                     {

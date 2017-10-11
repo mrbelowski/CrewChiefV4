@@ -49,7 +49,9 @@ namespace CrewChiefV4.Events
 
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
-            if (GameStateData.onManualFormationLap)
+            if (GameStateData.onManualFormationLap
+                || currentGameState.PitData.InPitlane
+                || previousGameState == null)
             {
                 return;
             }
@@ -110,7 +112,7 @@ namespace CrewChiefV4.Events
             }
 
             // push to pass
-            if (ptpMessagesEnabled && previousGameState != null)
+            if (ptpMessagesEnabled)
             {
                 if (previousGameState.OvertakingAids.PushToPassEngaged && !currentGameState.OvertakingAids.PushToPassEngaged &&
                     currentGameState.OvertakingAids.PushToPassActivationsRemaining == 0)

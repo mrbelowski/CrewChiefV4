@@ -21,10 +21,12 @@ namespace CrewChiefV4.rFactor2
         private List<CornerData.EnumWithThresholds> suspensionDamageThresholds = new List<CornerData.EnumWithThresholds>();
         private List<CornerData.EnumWithThresholds> tyreWearThresholds = new List<CornerData.EnumWithThresholds>();
 
+        // Numbers below are pretty good match for HUD colors, all series, tire types.  Yay for best in class physics ;)
+        // Exact thresholds probably depend on tire type/series, even user preferences.  Maybe expose this via car class data in the future.
         private float scrubbedTyreWearPercent = 5.0f;
-        private float minorTyreWearPercent = 30.0f;
-        private float majorTyreWearPercent = 60.0f;
-        private float wornOutTyreWearPercent = 85.0f;
+        private float minorTyreWearPercent = 20.0f;  // Turns Yellow in HUD.
+        private float majorTyreWearPercent = 50.0f;  // Turns Red in HUD.
+        private float wornOutTyreWearPercent = 75.0f;  // Still not black, but tires are usually almost dead.
 
         private List<CornerData.EnumWithThresholds> brakeTempThresholdsForPlayersCar = null;
 
@@ -777,14 +779,11 @@ namespace CrewChiefV4.rFactor2
             var frontLeftTemp = (cgs.TyreData.FrontLeft_CenterTemp + cgs.TyreData.FrontLeft_LeftTemp + cgs.TyreData.FrontLeft_RightTemp) / 3.0f;
             cgs.TyreData.FrontLeftPressure = wheelFrontLeft.mFlat == 0 ? (float)wheelFrontLeft.mPressure : 0.0f;
             cgs.TyreData.FrontLeftPercentWear = (float)(1.0f - wheelFrontLeft.mWear) * 100.0f;
+
             if (csd.IsNewLap || cgs.TyreData.PeakFrontLeftTemperatureForLap == 0)
-            {
                 cgs.TyreData.PeakFrontLeftTemperatureForLap = frontLeftTemp;
-            }
             else if (pgs == null || frontLeftTemp > pgs.TyreData.PeakFrontLeftTemperatureForLap)
-            {
                 cgs.TyreData.PeakFrontLeftTemperatureForLap = frontLeftTemp;
-            }
 
             var wheelFrontRight = playerTelemetry.mWheels[(int)rFactor2Constants.rF2WheelIndex.FrontRight];
             cgs.TyreData.FrontRightTyreType = tt;
@@ -859,8 +858,8 @@ namespace CrewChiefV4.rFactor2
                 cgs.TyreData.LeftRearIsSpinning = Math.Abs(wheelRearLeft.mRotation) > maxRotatingSpeed;
                 cgs.TyreData.RightRearIsSpinning = Math.Abs(wheelRearRight.mRotation) > maxRotatingSpeed;
 #if DEBUG
-                RF2GameStateMapper.writeSpinningLockingDebugMsg(cgs, wheelFrontLeft.mRotation, wheelFrontRight.mRotation,
-                    wheelRearLeft.mRotation, wheelRearRight.mRotation, minRotatingSpeed, maxRotatingSpeed);
+//                RF2GameStateMapper.writeSpinningLockingDebugMsg(cgs, wheelFrontLeft.mRotation, wheelFrontRight.mRotation,
+//                    wheelRearLeft.mRotation, wheelRearRight.mRotation, minRotatingSpeed, maxRotatingSpeed);
 #endif
             }
 
