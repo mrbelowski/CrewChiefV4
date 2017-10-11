@@ -1,0 +1,82 @@
+{
+	"macros": [ 
+	{
+		"name": "request pit",
+		"description": "requests a pitstop",
+		"voiceTriggers": [ "request pit", "box this lap" ],
+		"buttonTriggers": [ 
+		{
+			"description": "wheel button X",
+			"deviceId": "12345456",
+			"buttonIndex": "1"
+		},
+		{
+			"description": "keyboard key z",
+			"deviceId": "1",
+			"buttonIndex": "99"
+		}],
+		"commandSets": [
+		{
+			"description": "r3e version, holdTimeMillis quite short because of low key-repeat-delay",
+			"gameEnums": [ "R3E" ],
+			"commandSet": [ "q", "w", "e" ],
+			"holdTimeMillis": 10,
+			"waitTimeMillis": 100
+		},
+		{
+			"description": "pcars2 version, holdTimeMillis longer, uses arrow keys and enter - arrow keys probably mapped to an enun somewhere",
+			"gameEnums": [ "PCARS2" ],
+			"commandSet": [ "p", "ARROW_DOWN", "ENTER" ],
+			"holdTimeMillis": 30,
+			"waitTimeMillis": 100
+		}]
+	},
+	{
+		"name": "confirm pit",
+		"description": "confirms pitstop actions - r3e only",
+		"voiceTriggers": [ "confirm pit", "stop as planned" ],
+		"buttonTriggers": [ 
+		{
+			"description": "wheel button A",
+			"deviceId": "12345456",
+			"buttonIndex": "2"
+		},
+		{
+			"description": "keyboard key x",
+			"deviceId": "1",
+			"buttonIndex": "101"
+		}],
+		"commandSets": [
+		{
+			"description": "r3e version - no pcars version needed",
+			"gameEnums": [ "R3E" ],
+			"commandSet": [ "q", "w", "e" ],
+			"holdTimeMillis": 10,
+			"waitTimeMillis": 100
+		}]
+	},
+	{
+		"name": "next pit preset",
+		"description": "selects next pitstop preset",
+		"voiceTriggers": [ "next strategy", "next pit preset" ],
+		"buttonTriggers": [ 
+		{
+			"description": "wheel button right",
+			"deviceId": "12345456",
+			"buttonIndex": "22"
+		},
+		{
+			"description": "keyboard key l",
+			"deviceId": "1",
+			"buttonIndex": "23"
+		}],
+		"commandSets": [
+		{
+			"description": "r3e version - no pcars version needed",
+			"gameEnums": [ "R3E" ],
+			"commandSet": [ "q", "d", "e" ],
+			"holdTimeMillis": 10,
+			"waitTimeMillis": 100
+		}]
+	}]
+}
