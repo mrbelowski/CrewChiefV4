@@ -131,6 +131,11 @@
     <Compile Include="iRacing\Enums.cs" />
     <Compile Include="iRacing\iRacingData.cs" />
     <Compile Include="iRacing\iRacingGameStateMapper.cs" />
+    <Compile Include="iRacing\iRSDKSharp\CiRSDKHeader.cs" />
+    <Compile Include="iRacing\iRSDKSharp\CVarBuf.cs" />
+    <Compile Include="iRacing\iRSDKSharp\CVarHeader.cs" />
+    <Compile Include="iRacing\iRSDKSharp\iRacingSDK.cs" />
+    <Compile Include="iRacing\iRSDKSharp\YamlParser.cs" />
     <Compile Include="iRacing\SessionInfo.cs" />
     <Compile Include="iRacing\iRacingSharedMemoryReader.cs" />
     <Compile Include="iRacing\iRacingSpotter.cs" />
@@ -349,12 +354,6 @@
     <Content Include="ui_text.txt" />
     <Content Include="..\help.txt" />
     <Content Include="..\README.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\irsdkSharp\iRSDKSharp.csproj">
-      <Project>{72631b85-eb9a-473e-9b4c-65b355a9000d}</Project>
-      <Name>iRSDKSharp</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\SharpDX.2.6.3\build\SharpDX.targets" Condition="Exists('..\packages\SharpDX.2.6.3\build\SharpDX.targets')" />
