@@ -21,10 +21,12 @@ namespace CrewChiefV4.rFactor2
         private List<CornerData.EnumWithThresholds> suspensionDamageThresholds = new List<CornerData.EnumWithThresholds>();
         private List<CornerData.EnumWithThresholds> tyreWearThresholds = new List<CornerData.EnumWithThresholds>();
 
+        // Numbers below are pretty good match for HUD colors, all series, tire types.  Yay for best in class physics ;)
+        // Exact thresholds probably depend on tire type/series, even user preferences.  Maybe expose this via car class data in the future.
         private float scrubbedTyreWearPercent = 5.0f;
-        private float minorTyreWearPercent = 20.0f;
-        private float majorTyreWearPercent = 50.0f;
-        private float wornOutTyreWearPercent = 80.0f;
+        private float minorTyreWearPercent = 20.0f;  // Turns Yellow in HUD.
+        private float majorTyreWearPercent = 50.0f;  // Turns Red in HUD.
+        private float wornOutTyreWearPercent = 75.0f;  // Still not black, but tires are usually almost dead.
 
         private List<CornerData.EnumWithThresholds> brakeTempThresholdsForPlayersCar = null;
 
