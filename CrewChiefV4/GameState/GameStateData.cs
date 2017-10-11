@@ -608,6 +608,8 @@ namespace CrewChiefV4.GameState
 
         public DeltaTime DeltaTime = null;
 
+        public bool IsAtPitExit = false;
+
         public override string ToString()
         {
             return DriverRawName;

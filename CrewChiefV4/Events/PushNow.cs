@@ -103,11 +103,11 @@ namespace CrewChiefV4.Events
                     Console.WriteLine("Failed to report brake temp status on pit exit");
                 }
             }
-            /*if(currentGameState.PositionAndMotionData.CarSpeed > 5 && isOpponentLeavingPits(currentGameState))
+            if(currentGameState.PositionAndMotionData.CarSpeed > 5 && isOpponentLeavingPits(currentGameState))
             {
                 //This needs another message just using it for testing
                 audioPlayer.playMessage(new QueuedMessage(folderTrafficBehindExitingPits, 0, this));
-            }*/
+            }
 
         }
 
@@ -177,11 +177,11 @@ namespace CrewChiefV4.Events
             // games with sane lap distance data when pitting
             foreach (KeyValuePair<string, OpponentData> opponent in currentGameState.OpponentData)
             {
-                if (opponent.Value.Speed > 0 && opponent.Value.isExitingPits())
+                if (opponent.Value.Speed > 0 && opponent.Value.IsAtPitExit)
                 {
                     float signedDelta = opponent.Value.DeltaTime.GetSignedDeltaTimeOnly(currentGameState.SessionData.DeltaTime);
-                    
-                    if (signedDelta < 5)
+
+                    if (signedDelta < 5 && signedDelta > 0)
                     {
                         return true;
                     }
