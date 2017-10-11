@@ -377,10 +377,6 @@ namespace CrewChiefV4.iRacing
             {
                 if (currentSector == 1)
                 {
-                    if (currentGameState.SessionData.SessionTimesAtEndOfSectors[3] != -1)
-                    {
-                        currentGameState.SessionData.LapTimePreviousEstimateForInvalidLap = currentGameState.SessionData.SessionRunningTime - currentGameState.SessionData.SessionTimesAtEndOfSectors[3];
-                    }
                     currentGameState.SessionData.SessionTimesAtEndOfSectors[3] = currentGameState.SessionData.SessionRunningTime;
                     float sectorTime = (float)playerCar.CurrentResults.FakeSector3.SectorTime.Time.TotalSeconds;
                     
@@ -447,7 +443,7 @@ namespace CrewChiefV4.iRacing
             } 
             currentGameState.SessionData.SectorNumber = currentSector;
             currentGameState.PitData.InPitlane = playerCar.PitInfo.InPitLane;
-            currentGameState.PositionAndMotionData.DistanceRoundTrack = spLineLengthToDistanceRoundTrack(currentGameState.SessionData.TrackDefinition.trackLength, playerCar.Live.CorrectedLapDistance);
+            currentGameState.PositionAndMotionData.DistanceRoundTrack = currentGameState.SessionData.TrackDefinition.trackLength * playerCar.Live.CorrectedLapDistance;
             currentGameState.PositionAndMotionData.CarSpeed = (float)playerCar.Live.Speed;
             
             currentGameState.SessionData.DeltaTime.SetNextDeltaPoint(currentGameState.PositionAndMotionData.DistanceRoundTrack, currentGameState.SessionData.CompletedLaps,
@@ -577,7 +573,7 @@ namespace CrewChiefV4.iRacing
                         {
                             currentOpponentSector = previousOpponentSectorNumber;
                         }
-                        float currentOpponentLapDistance = spLineLengthToDistanceRoundTrack(currentGameState.SessionData.TrackDefinition.trackLength,driver.Live.CorrectedLapDistance);
+                        float currentOpponentLapDistance = currentGameState.SessionData.TrackDefinition.trackLength * driver.Live.CorrectedLapDistance;
                         //Console.WriteLine("lapdistance:" + currentOpponentLapDistance);
                         currentOpponentData.DeltaTime.SetNextDeltaPoint(currentOpponentLapDistance, currentOpponentLapsCompleted, (float)driver.Live.Speed, currentGameState.Now);
                         
@@ -640,7 +636,7 @@ namespace CrewChiefV4.iRacing
                                  currentGameState.SessionData.SessionType == SessionType.Race, shared.Telemetry.TrackTemp,
                                  shared.Telemetry.AirTemp, currentGameState.SessionData.TrackDefinition.distanceForNearPitEntryChecks, (float)driver.Live.Speed);
 
-                        if (previousIsInPits && !driver.PitInfo.InPitLane && currentOpponentData.isExitingPits())
+                        /*if (driver.PitInfo.IsAtPitExit)
                         {
                             Console.WriteLine(currentOpponentData.DriverRawName + " Is At Pit Exit");
                             currentOpponentData.IsAtPitExit = true;
@@ -648,7 +644,7 @@ namespace CrewChiefV4.iRacing
                         else
                         {
                             currentOpponentData.IsAtPitExit = false;
-                        }
+                        }*/
                         
                         if (previousOpponentData != null)
                         {
