@@ -125,7 +125,7 @@ namespace CrewChiefV4
 
         private Grammar macroGrammar = null;
 
-        private Dictionary<String, CommandMacro> macroLookup = new Dictionary<string, CommandMacro>();
+        private Dictionary<String, ExecutableCommandMacro> macroLookup = new Dictionary<string, ExecutableCommandMacro>();
         
         private System.Globalization.CultureInfo cultureInfo;
 
@@ -138,7 +138,7 @@ namespace CrewChiefV4
         // load voice commands for triggering keyboard macros. The String key of the input Dictionary is the
         // command list key in speech_recognition_config.txt. When one of these phrases is heard the map value
         // CommandMacro is executed.
-        public void loadMacroVoiceTriggers(Dictionary<string, CommandMacro> voiceTriggeredMacros) 
+        public void loadMacroVoiceTriggers(Dictionary<string, ExecutableCommandMacro> voiceTriggeredMacros) 
         {
             macroLookup.Clear();
             if (macroGrammar != null && macroGrammar.Loaded)
@@ -146,24 +146,21 @@ namespace CrewChiefV4
                 sre.UnloadGrammar(macroGrammar);
             }
             Choices macroChoices = new Choices();
-            foreach (String trigger in voiceTriggeredMacros.Keys)
+            foreach (String triggerPhrase in voiceTriggeredMacros.Keys)
             {
-                String[] phrases = Configuration.getSpeechRecognitionPhrases(trigger);
                 // validate?
-                foreach (String phrase in phrases)
+                if (!macroLookup.ContainsKey(triggerPhrase))
                 {
-                    if (!macroLookup.ContainsKey(phrase))
-                    {
-                        macroLookup.Add(phrase, voiceTriggeredMacros[trigger]);
-                    }
+                    macroLookup.Add(triggerPhrase, voiceTriggeredMacros[triggerPhrase]);
                 }
-                macroChoices.Add(phrases);
+                macroChoices.Add(triggerPhrase);
                 GrammarBuilder macroGrammarBuilder = new GrammarBuilder();
                 macroGrammarBuilder.Culture = cultureInfo;
                 macroGrammarBuilder.Append(macroChoices);
                 macroGrammar = new Grammar(macroGrammarBuilder);
                 sre.LoadGrammar(macroGrammar);
             }
+            Console.WriteLine("Loaded " + voiceTriggeredMacros.Count + " macro voice triggers into the speech recogniser");
         }
 
         private static Dictionary<String, int> getNumberMappings()

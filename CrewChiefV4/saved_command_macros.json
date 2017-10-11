@@ -3,6 +3,7 @@
 	{
 		"name": "request pit",
 		"description": "requests a pitstop",
+		"confirmationMessage": "acknowledge/OK",
 		"voiceTriggers": [ "request pit", "box this lap" ],
 		"buttonTriggers": [ 
 		{
@@ -34,6 +35,7 @@
 	{
 		"name": "confirm pit",
 		"description": "confirms pitstop actions - r3e only",
+		"confirmationMessage": "acknowledge/OK",
 		"voiceTriggers": [ "confirm pit", "stop as planned" ],
 		"buttonTriggers": [ 
 		{
