@@ -17,18 +17,18 @@
 		}],
 		"commandSets": [
 		{
-			"description": "r3e version, holdTimeMillis quite short because of low key-repeat-delay",
-			"gameEnums": [ "R3E" ],
-			"commandSet": [ "q", "w", "e" ],
-			"holdTimeMillis": 10,
-			"waitTimeMillis": 100
+			"description": "r3e version, keyPressTime quite short because of low key-repeat-delay - keys mapped to KeyCode enum in KeyPresser class",
+			"gameDefinition": "R3E",
+			"keyPressSequence": [ "KEY_Q", "KEY_W", "KEY_E" ],
+			"keyPressTime": 10,
+			"waitBetweenEachCommand": 100
 		},
 		{
-			"description": "pcars2 version, holdTimeMillis longer, uses arrow keys and enter - arrow keys probably mapped to an enun somewhere",
-			"gameEnums": [ "PCARS2" ],
-			"commandSet": [ "p", "ARROW_DOWN", "ENTER" ],
-			"holdTimeMillis": 30,
-			"waitTimeMillis": 100
+			"description": "pcars2 version, keyPressTime longer, uses arrow keys and enter - keys mapped to KeyCode enum in KeyPresser class",
+			"gameDefinition": "PCARS2",
+			"keyPressSequence": [ "KEY_P", "DOWN", "ENTER" ],
+			"keyPressTime": 30,
+			"waitBetweenEachCommand": 100
 		}]
 	},
 	{
@@ -49,10 +49,10 @@
 		"commandSets": [
 		{
 			"description": "r3e version - no pcars version needed",
-			"gameEnums": [ "R3E" ],
-			"commandSet": [ "q", "w", "e" ],
-			"holdTimeMillis": 10,
-			"waitTimeMillis": 100
+			"gameDefinition": "R3E",
+			"keyPressSequence": [ "KEY_E" ],
+			"keyPressTime": 10,
+			"waitBetweenEachCommand": 100
 		}]
 	},
 	{
@@ -73,10 +73,10 @@
 		"commandSets": [
 		{
 			"description": "r3e version - no pcars version needed",
-			"gameEnums": [ "R3E" ],
-			"commandSet": [ "q", "d", "e" ],
-			"holdTimeMillis": 10,
-			"waitTimeMillis": 100
+			"gameDefinition": "R3E",
+			"keyPressSequence": [ "KEY_Q", "KEY_D", "KEY_E" ],
+			"keyPressTime": 10,
+			"waitBetweenEachCommand": 100
 		}]
 	}]
 }
