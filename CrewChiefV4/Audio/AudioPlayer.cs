@@ -896,7 +896,10 @@ namespace CrewChiefV4.Audio
                         }
                     }, null);
                 }
-                soundCache.ExpireCachedSounds();
+                if (soundCache != null)
+                {
+                    soundCache.ExpireCachedSounds();
+                }
             }
             useShortBeepWhenOpeningChannel = false;
             channelOpen = false;
