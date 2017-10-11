@@ -22,9 +22,9 @@ namespace CrewChiefV4.rFactor2
         private List<CornerData.EnumWithThresholds> tyreWearThresholds = new List<CornerData.EnumWithThresholds>();
 
         private float scrubbedTyreWearPercent = 5.0f;
-        private float minorTyreWearPercent = 30.0f;
-        private float majorTyreWearPercent = 60.0f;
-        private float wornOutTyreWearPercent = 85.0f;
+        private float minorTyreWearPercent = 20.0f;
+        private float majorTyreWearPercent = 50.0f;
+        private float wornOutTyreWearPercent = 80.0f;
 
         private List<CornerData.EnumWithThresholds> brakeTempThresholdsForPlayersCar = null;
 
@@ -777,14 +777,11 @@ namespace CrewChiefV4.rFactor2
             var frontLeftTemp = (cgs.TyreData.FrontLeft_CenterTemp + cgs.TyreData.FrontLeft_LeftTemp + cgs.TyreData.FrontLeft_RightTemp) / 3.0f;
             cgs.TyreData.FrontLeftPressure = wheelFrontLeft.mFlat == 0 ? (float)wheelFrontLeft.mPressure : 0.0f;
             cgs.TyreData.FrontLeftPercentWear = (float)(1.0f - wheelFrontLeft.mWear) * 100.0f;
+
             if (csd.IsNewLap || cgs.TyreData.PeakFrontLeftTemperatureForLap == 0)
-            {
                 cgs.TyreData.PeakFrontLeftTemperatureForLap = frontLeftTemp;
-            }
             else if (pgs == null || frontLeftTemp > pgs.TyreData.PeakFrontLeftTemperatureForLap)
-            {
                 cgs.TyreData.PeakFrontLeftTemperatureForLap = frontLeftTemp;
-            }
 
             var wheelFrontRight = playerTelemetry.mWheels[(int)rFactor2Constants.rF2WheelIndex.FrontRight];
             cgs.TyreData.FrontRightTyreType = tt;

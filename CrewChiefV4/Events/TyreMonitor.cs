@@ -376,13 +376,13 @@ namespace CrewChiefV4.Events
                 ", " + Math.Round(tyreData.RearRight_CenterTemp, 2) + 
                 ", " + Math.Round(tyreData.RearRight_LeftTemp, 2));
             Console.WriteLine("-------------------------");
-            Console.WriteLine("Wear, percentage, bracket  |------|  percentage, bracket");
+            Console.WriteLine("Wear, percentage  |------|  percentage");
             Console.WriteLine("Fronts:    " + Math.Round(tyreData.FrontLeftPercentWear, 2) +
                 "  |------|  " + Math.Round(tyreData.FrontRightPercentWear, 2));
             Console.WriteLine("Rears:    " + Math.Round(tyreData.RearLeftPercentWear, 2) +
                 "  |------|  " + Math.Round(tyreData.RearRightPercentWear, 2));
             Console.WriteLine("-------------------------");
-            Console.WriteLine("Wear interpratation:");
+            Console.WriteLine("Wear interpretation:");
             foreach (var key in tyreData.TyreConditionStatus.cornersForEachStatus)
             {
                 Console.WriteLine("Status: " + key);
