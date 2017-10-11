@@ -1,165 +1,133 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Runtime.InteropServices;
-using System.Diagnostics;
+using System.Text;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace CrewChiefV4.commands
 {
-    // shamelessly nicked from some random Stackoverflow post. Works OK for notepad but not in R3E. Last time 
-    // I checked we weren't playing fucking notepad :(
-    //
-    // To show this working, start notepad and launch and start the app. Put notepad in front and issue a voice command
-    // "macro test". It'll type some shit to notepad. Not very awesome.
     public class KeyPresser
     {
-        [DllImport("user32.dll", SetLastError = true)]
-        private static extern uint SendInput(uint numberOfInputs, INPUT[] inputs, int sizeOfInputStructure);
+        const int INPUT_MOUSE = 0;
+        const int INPUT_KEYBOARD = 1;
+        const int INPUT_HARDWARE = 2;
+        const uint KEYEVENTF_EXTENDEDKEY = 0x0001;
+        const uint KEYEVENTF_KEYUP = 0x0002;
+        const uint KEYEVENTF_UNICODE = 0x0004;
+        const uint KEYEVENTF_SCANCODE = 0x0008;
 
-        /// <summary>
-        /// simulate key press
-        /// </summary>
-        /// <param name="keyCode"></param>
-        public static void SendKeyPress(KeyCode keyCode)
+        struct INPUT
         {
-            INPUT input = new INPUT
-            {
-                Type = 1
-            };
-            input.Data.Keyboard = new KEYBDINPUT()
-            {
-                Vk = (ushort)keyCode,
-                Scan = 0,
-                Flags = 0,
-                Time = 0,
-                ExtraInfo = IntPtr.Zero,
-            };
-
-            INPUT input2 = new INPUT
-            {
-                Type = 1
-            };
-            input2.Data.Keyboard = new KEYBDINPUT()
-            {
-                Vk = (ushort)keyCode,
-                Scan = 0,
-                Flags = 2,
-                Time = 0,
-                ExtraInfo = IntPtr.Zero
-            };
-            INPUT[] inputs = new INPUT[] { input, input2 };
-            if (SendInput(2, inputs, Marshal.SizeOf(typeof(INPUT))) == 0)
-                throw new Exception();
+            public int type;
+            public InputUnion u;
         }
 
-        /// <summary>
-        /// Send a key down and hold it down until sendkeyup method is called
-        /// </summary>
-        /// <param name="keyCode"></param>
-        public static void SendKeyDown(KeyCode keyCode)
-        {
-            INPUT input = new INPUT
-            {
-                Type = 1
-            };
-            input.Data.Keyboard = new KEYBDINPUT();
-            input.Data.Keyboard.Vk = (ushort)keyCode;
-            input.Data.Keyboard.Scan = 0;
-            input.Data.Keyboard.Flags = 0;
-            input.Data.Keyboard.Time = 0;
-            input.Data.Keyboard.ExtraInfo = IntPtr.Zero;
-            INPUT[] inputs = new INPUT[] { input };
-            if (SendInput(1, inputs, Marshal.SizeOf(typeof(INPUT))) == 0)
-            {
-                throw new Exception();
-            }
-        }
-
-        /// <summary>
-        /// Release a key that is being hold down
-        /// </summary>
-        /// <param name="keyCode"></param>
-        public static void SendKeyUp(KeyCode keyCode)
-        {
-            INPUT input = new INPUT
-            {
-                Type = 1
-            };
-            input.Data.Keyboard = new KEYBDINPUT();
-            input.Data.Keyboard.Vk = (ushort)keyCode;
-            input.Data.Keyboard.Scan = 0;
-            input.Data.Keyboard.Flags = 2;
-            input.Data.Keyboard.Time = 0;
-            input.Data.Keyboard.ExtraInfo = IntPtr.Zero;
-            INPUT[] inputs = new INPUT[] { input };
-            if (SendInput(1, inputs, Marshal.SizeOf(typeof(INPUT))) == 0)
-                throw new Exception();
-
-        }
-
-
-
-        /// <summary>
-        /// http://msdn.microsoft.com/en-us/library/windows/desktop/ms646270(v=vs.85).aspx
-        /// </summary>
-        [StructLayout(LayoutKind.Sequential)]
-        internal struct INPUT
-        {
-            public uint Type;
-            public MOUSEKEYBDHARDWAREINPUT Data;
-        }
-
-        /// <summary>
-        /// http://social.msdn.microsoft.com/Forums/en/csharplanguage/thread/f0e82d6e-4999-4d22-b3d3-32b25f61fb2a
-        /// </summary>
         [StructLayout(LayoutKind.Explicit)]
-        internal struct MOUSEKEYBDHARDWAREINPUT
+        struct InputUnion
         {
             [FieldOffset(0)]
-            public HARDWAREINPUT Hardware;
+            public MOUSEINPUT mi;
             [FieldOffset(0)]
-            public KEYBDINPUT Keyboard;
+            public KEYBDINPUT ki;
             [FieldOffset(0)]
-            public MOUSEINPUT Mouse;
+            public HARDWAREINPUT hi;
         }
 
-        /// <summary>
-        /// http://msdn.microsoft.com/en-us/library/windows/desktop/ms646310(v=vs.85).aspx
-        /// </summary>
         [StructLayout(LayoutKind.Sequential)]
-        internal struct HARDWAREINPUT
+        struct MOUSEINPUT
         {
-            public uint Msg;
-            public ushort ParamL;
-            public ushort ParamH;
+            public int dx;
+            public int dy;
+            public uint mouseData;
+            public uint dwFlags;
+            public uint time;
+            public IntPtr dwExtraInfo;
         }
 
-        /// <summary>
-        /// http://msdn.microsoft.com/en-us/library/windows/desktop/ms646310(v=vs.85).aspx
-        /// </summary>
         [StructLayout(LayoutKind.Sequential)]
-        internal struct KEYBDINPUT
+        struct KEYBDINPUT
         {
-            public ushort Vk;
-            public ushort Scan;
-            public uint Flags;
-            public uint Time;
-            public IntPtr ExtraInfo;
+            /*Virtual Key code.  Must be from 1-254.  If the dwFlags member specifies KEYEVENTF_UNICODE, wVk must be 0.*/
+            public ushort wVk;
+            /*A hardware scan code for the key. If dwFlags specifies KEYEVENTF_UNICODE, wScan specifies a Unicode character which is to be sent to the foreground application.*/
+            public ushort wScan;
+            /*Specifies various aspects of a keystroke.  See the KEYEVENTF_ constants for more information.*/
+            public uint dwFlags;
+            /*The time stamp for the event, in milliseconds. If this parameter is zero, the system will provide its own time stamp.*/
+            public uint time;
+            /*An additional value associated with the keystroke. Use the GetMessageExtraInfo function to obtain this information.*/
+            public IntPtr dwExtraInfo;
         }
 
-        /// <summary>
-        /// http://social.msdn.microsoft.com/forums/en-US/netfxbcl/thread/2abc6be8-c593-4686-93d2-89785232dacd
-        /// </summary>
         [StructLayout(LayoutKind.Sequential)]
-        internal struct MOUSEINPUT
+        struct HARDWAREINPUT
         {
-            public int X;
-            public int Y;
-            public uint MouseData;
-            public uint Flags;
-            public uint Time;
-            public IntPtr ExtraInfo;
+            public uint uMsg;
+            public ushort wParamL;
+            public ushort wParamH;
+        }
+
+        [DllImport("user32.dll")]
+        static extern IntPtr GetMessageExtraInfo();
+
+        [DllImport("user32.dll", SetLastError = true)]
+        static extern uint SendInput(uint nInputs, INPUT[] pInputs, int cbSize);
+
+        [DllImport("user32.dll")]
+        public static extern uint MapVirtualKey(uint uCode, uint uMapType);
+        
+        public static void SendScanCodeKeyPress(KeyCode keyCode, int holdTimeMillis)
+        {
+            ushort scanCode = (ushort)MapVirtualKey((ushort)keyCode, 0);
+            press(scanCode);
+            Thread.Sleep(holdTimeMillis);
+            release(scanCode);
+        }
+        private static void press(ushort scanCode)
+        {
+            INPUT[] inputs = new INPUT[]
+            {
+                new INPUT
+                {
+                    type = INPUT_KEYBOARD,
+                    u = new InputUnion
+                    {
+                        ki = new KEYBDINPUT
+                        {
+                            wVk = 0,
+                            wScan = scanCode,
+                            dwFlags = KEYEVENTF_SCANCODE,
+                            dwExtraInfo = GetMessageExtraInfo(),
+                        }
+                    }
+                }
+            };
+
+            SendInput((uint)inputs.Length, inputs, Marshal.SizeOf(typeof(INPUT)));
+        }
+
+        private static void release(ushort scanCode)
+        {
+            INPUT[] inputs = new INPUT[]
+            {
+                new INPUT
+                {
+                    type = INPUT_KEYBOARD,
+                    u = new InputUnion
+                    {
+                        ki = new KEYBDINPUT
+                        {
+                            wVk = 0,
+                            wScan = scanCode,
+                            dwFlags = KEYEVENTF_SCANCODE | KEYEVENTF_KEYUP,
+                            dwExtraInfo = GetMessageExtraInfo(),
+                        }
+                    }
+                }
+            };
+            SendInput((uint)inputs.Length, inputs, Marshal.SizeOf(typeof(INPUT)));
         }
 
         public enum KeyCode : ushort
@@ -781,4 +749,3 @@ namespace CrewChiefV4.commands
         }
     }
 }
-

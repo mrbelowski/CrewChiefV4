@@ -15,19 +15,54 @@ namespace CrewChiefV4.commands
         {
             Dictionary<string, CommandMacro> voiceTriggeredMacros = new Dictionary<string, CommandMacro>();
 
-            // the test command at the bottom of the speech recogniser config file
-            String testCommandSpeechRecogniserPhrase = "MACRO_TEST";    
+            // quick n dirty hard-coded macros to test R3E integration. Assume R3E pit menu assignments are:
+            // Q: open / close menu
+            // WASD: up / down / left / right
+            // E: select
+            MacroItem[] r3emakeOrCancelPitRequest = new MacroItem[] { 
+                new MacroItem(CrewChiefV4.commands.KeyPresser.KeyCode.KEY_Q),
+                new MacroItem(100),
+                new MacroItem(CrewChiefV4.commands.KeyPresser.KeyCode.KEY_W),
+                new MacroItem(100),
+                new MacroItem(CrewChiefV4.commands.KeyPresser.KeyCode.KEY_E),
+                new MacroItem(100),
+                new MacroItem(CrewChiefV4.commands.KeyPresser.KeyCode.KEY_Q)
+            };
 
-            // quick n dirty smoke test - press some keys with pauses - these could be assigned to open pit menu, go right, confirm, whatever
-            MacroItem[] r3eSelectNextPitItem = new MacroItem[] { 
+            MacroItem[] r3eSelectNextPitPreset = new MacroItem[] { 
                 new MacroItem(CrewChiefV4.commands.KeyPresser.KeyCode.KEY_Q),
                 new MacroItem(100),
                 new MacroItem(CrewChiefV4.commands.KeyPresser.KeyCode.KEY_D),
                 new MacroItem(100),
+                new MacroItem(CrewChiefV4.commands.KeyPresser.KeyCode.KEY_Q)
+            };
+
+            MacroItem[] r3eSelectPreviousPitPreset = new MacroItem[] { 
+                new MacroItem(CrewChiefV4.commands.KeyPresser.KeyCode.KEY_Q),
+                new MacroItem(100),
+                new MacroItem(CrewChiefV4.commands.KeyPresser.KeyCode.KEY_A),
+                new MacroItem(100),
+                new MacroItem(CrewChiefV4.commands.KeyPresser.KeyCode.KEY_Q)
+            };
+
+            MacroItem[] r3eConfirmPitActions = new MacroItem[] { 
+                new MacroItem(CrewChiefV4.commands.KeyPresser.KeyCode.KEY_Q),
+                new MacroItem(100),
+                new MacroItem(CrewChiefV4.commands.KeyPresser.KeyCode.KEY_S),
+                new MacroItem(100),
+                new MacroItem(CrewChiefV4.commands.KeyPresser.KeyCode.KEY_S),
+                new MacroItem(100),
+                new MacroItem(CrewChiefV4.commands.KeyPresser.KeyCode.KEY_S),
+                new MacroItem(100),
+                new MacroItem(CrewChiefV4.commands.KeyPresser.KeyCode.KEY_S),
+                new MacroItem(100),
                 new MacroItem(CrewChiefV4.commands.KeyPresser.KeyCode.KEY_E)
             };
 
-            voiceTriggeredMacros.Add(testCommandSpeechRecogniserPhrase, new CommandMacro(audioPlayer, AudioPlayer.folderAcknowlegeOK, r3eSelectNextPitItem));
+            voiceTriggeredMacros.Add("PIT_REQUEST", new CommandMacro(audioPlayer, AudioPlayer.folderAcknowlegeOK, r3emakeOrCancelPitRequest));
+            voiceTriggeredMacros.Add("NEXT_PIT_PRESET", new CommandMacro(audioPlayer, AudioPlayer.folderAcknowlegeOK, r3eSelectNextPitPreset));
+            voiceTriggeredMacros.Add("PREVIOUS_PIT_PRESET", new CommandMacro(audioPlayer, AudioPlayer.folderAcknowlegeOK, r3eSelectPreviousPitPreset));
+            voiceTriggeredMacros.Add("CONFIRM_PIT_ACTIONS", new CommandMacro(audioPlayer, AudioPlayer.folderAcknowlegeOK, r3eConfirmPitActions));
             speechRecogniser.loadMacroVoiceTriggers(voiceTriggeredMacros);
         }
     }
