@@ -481,6 +481,10 @@ namespace CrewChiefV4.rFactor2
                 this.detectedTrackNoDRSZones = false;
 
                 GlobalBehaviourSettings.UpdateFromCarClass(cgs.carClass);
+
+                Console.WriteLine("Enabled message types:");
+                foreach (var m in GlobalBehaviourSettings.enabledMessageTypes)
+                    Console.WriteLine('\t' + m.ToString());
             }
 
             // Restore cumulative data.
