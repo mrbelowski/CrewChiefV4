@@ -19,7 +19,7 @@
 		"commandSets": [
 		{
 			"description": "r3e version, keyPressTime quite short because of low key-repeat-delay - keys mapped to KeyCode enum in KeyPresser class",
-			"gameDefinition": "R3E",
+			"gameDefinition": "RACE_ROOM",
 			"keyPressSequence": [ "KEY_Q", "KEY_W", "KEY_E" ],
 			"keyPressTime": 10,
 			"waitBetweenEachCommand": 100
@@ -51,7 +51,7 @@
 		"commandSets": [
 		{
 			"description": "r3e version - no pcars version needed",
-			"gameDefinition": "R3E",
+			"gameDefinition": "RACE_ROOM",
 			"keyPressSequence": [ "KEY_E" ],
 			"keyPressTime": 10,
 			"waitBetweenEachCommand": 100
@@ -75,7 +75,7 @@
 		"commandSets": [
 		{
 			"description": "r3e version - no pcars version needed",
-			"gameDefinition": "R3E",
+			"gameDefinition": "RACE_ROOM",
 			"keyPressSequence": [ "KEY_Q", "KEY_D", "KEY_E" ],
 			"keyPressTime": 10,
 			"waitBetweenEachCommand": 100
