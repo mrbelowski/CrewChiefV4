@@ -154,6 +154,17 @@ namespace CrewChiefV4.rFactor2
         private Int64 lastSessionEndTicks = -1;
         private bool lastInRealTimeState = false;
 
+        private void ClearState()
+        {
+            this.waitingToTerminateSession = false;
+            this.isOfflineSession = true;
+            this.distanceOffTrack = 0;
+            this.isApproachingTrack = false;
+            this.playerLapsWhenFCYPosAssigned = -1;
+            this.detectedTrackNoDRSZones = false;
+            RF2GameStateMapper.sanitizedNamesMap.Clear();
+        }
+
         public GameStateData mapToGameStateData(Object memoryMappedFileStruct, GameStateData previousGameState)
         {
             var pgs = previousGameState;
@@ -285,14 +296,10 @@ namespace CrewChiefV4.rFactor2
                 // Session is not in progress and no abrupt session end detection is in progress, simply return pgs.
                 Debug.Assert(!this.waitingToTerminateSession, "Previous abrupt session end detection hasn't ended correctly.");
 
-                this.waitingToTerminateSession = false;
-                this.isOfflineSession = true;
-                this.distanceOffTrack = 0;
-                this.isApproachingTrack = false;
                 this.lastPlayerTelemetryET = -1.0;
                 this.lastScoringET = -1.0;
-                this.playerLapsWhenFCYPosAssigned = -1;
-                this.detectedTrackNoDRSZones = false;
+
+                this.ClearState();
 
                 if (pgs != null)
                 {
@@ -474,11 +481,7 @@ namespace CrewChiefV4.rFactor2
                 // Do not use previous game state if this is the new session.
                 pgs = null;
 
-                this.isOfflineSession = true;
-                this.distanceOffTrack = 0;
-                this.isApproachingTrack = false;
-                this.playerLapsWhenFCYPosAssigned = -1;
-                this.detectedTrackNoDRSZones = false;
+                this.ClearState();
 
                 GlobalBehaviourSettings.UpdateFromCarClass(cgs.carClass);
 
@@ -931,12 +934,13 @@ namespace CrewChiefV4.rFactor2
             this.opponentKeysProcessed.Clear();
 
             // first check for duplicates:
-            Dictionary<string, int> driverNameCounts = new Dictionary<string, int>();
-            Dictionary<string, int> duplicatesCreated = new Dictionary<string, int>();
+            var driverNameCounts = new Dictionary<string, int>();
+            var duplicatesCreated = new Dictionary<string, int>();
             for (int i = 0; i < shared.scoring.mScoringInfo.mNumVehicles; ++i)
             {
                 var vehicleScoring = shared.scoring.mVehicles[i];
-                var driverName = GetStringFromBytes(vehicleScoring.mDriverName).ToLower();
+                var driverName = RF2GameStateMapper.GetStringFromBytes(vehicleScoring.mDriverName).ToLowerInvariant();
+                driverName = RF2GameStateMapper.GetSanitizedDriverName(driverName);
 
                 if (driverNameCounts.ContainsKey(driverName))
                     driverNameCounts[driverName] += 1;
@@ -1001,7 +1005,8 @@ namespace CrewChiefV4.rFactor2
                     }
                 }
 
-                var driverName = GetStringFromBytes(vehicleScoring.mDriverName).ToLower();
+                var driverName = GetStringFromBytes(vehicleScoring.mDriverName).ToLowerInvariant();
+                driverName = RF2GameStateMapper.GetSanitizedDriverName(driverName);
                 OpponentData opponentPrevious;
                 int duplicatesCount = driverNameCounts[driverName];
                 string opponentKey;
@@ -1044,7 +1049,6 @@ namespace CrewChiefV4.rFactor2
 
                 opponentPrevious = pgs == null || opponentKey == null || !pgs.OpponentData.ContainsKey(opponentKey) ? null : previousGameState.OpponentData[opponentKey];
                 var opponent = new OpponentData();
-                opponent.DriverRawName = driverName;
                 opponent.CarClass = CarData.getCarClassForClassName(GetStringFromBytes(vehicleScoring.mVehicleClass));
                 opponent.CurrentTyres = this.MapToTyreType(ref vehicleTelemetry);
                 opponent.DriverRawName = driverName;
@@ -1787,13 +1791,13 @@ namespace CrewChiefV4.rFactor2
         }
 
         // finds OpponentData key for given vehicle based on driver name, vehicle class, and world position
-        private String GetOpponentKeyForVehicleInfo(ref rF2VehicleScoring vehicleScoring, ref rF2VehicleTelemetry vehicleTelemetry, GameStateData previousGameState, float sessionRunningTime, String driverName, int duplicatesCount, bool vehicleTelemetryAvailable)
+        private String GetOpponentKeyForVehicleInfo(ref rF2VehicleScoring vehicleScoring, ref rF2VehicleTelemetry vehicleTelemetry, GameStateData previousGameState, float sessionRunningTime, string driverName, int duplicatesCount, bool vehicleTelemetryAvailable)
         {
             if (previousGameState == null)
                 return null;
 
-            List<string> possibleKeys = new List<string>();
-            for (int i = 1; i <= duplicatesCount; i++)
+            var possibleKeys = new List<string>();
+            for (int i = 1; i <= duplicatesCount; ++i)
                 possibleKeys.Add(driverName + "_duplicate_ " + i);
 
             float[] worldPos = null;
@@ -1807,17 +1811,19 @@ namespace CrewChiefV4.rFactor2
             String bestKey = null;
             if (timeDelta >= 0.0f)
             {
-                foreach (String possibleKey in possibleKeys)
+                foreach (var possibleKey in possibleKeys)
                 {
                     if (previousGameState.OpponentData.ContainsKey(possibleKey))
                     {
-                        OpponentData o = previousGameState.OpponentData[possibleKey];
-                        if (o.DriverRawName != GetStringFromBytes(vehicleScoring.mDriverName).ToLower() ||
-                            o.CarClass != CarData.getCarClassForClassName(GetStringFromBytes(vehicleScoring.mVehicleClass)) ||
-                            opponentKeysProcessed.Contains(possibleKey))
-                        {
+                        var o = previousGameState.OpponentData[possibleKey];
+                        var driverNameFromScoring = RF2GameStateMapper.GetStringFromBytes(vehicleScoring.mDriverName).ToLowerInvariant();
+                        driverNameFromScoring = RF2GameStateMapper.GetSanitizedDriverName(driverNameFromScoring);
+
+                        if (o.DriverRawName != driverNameFromScoring
+                            || o.CarClass != CarData.getCarClassForClassName(GetStringFromBytes(vehicleScoring.mVehicleClass))
+                            || opponentKeysProcessed.Contains(possibleKey))
                             continue;
-                        }
+                        
                         // distance from predicted position
                         float targetDist = o.Speed * timeDelta;
                         float dist = (float)Math.Abs(Math.Sqrt((double)((o.WorldPosition[0] - worldPos[0]) * (o.WorldPosition[0] - worldPos[0]) +
@@ -1924,7 +1930,7 @@ namespace CrewChiefV4.rFactor2
             }
         }
 
-        public Boolean IsBehindWithinDistance(float trackLength, float minDistance, float maxDistance, float playerTrackDistance, float opponentTrackDistance)
+        public bool IsBehindWithinDistance(float trackLength, float minDistance, float maxDistance, float playerTrackDistance, float opponentTrackDistance)
         {
             float difference = playerTrackDistance - opponentTrackDistance;
             if (difference > 0)
@@ -1938,7 +1944,7 @@ namespace CrewChiefV4.rFactor2
             }
         }
 
-        public static String GetStringFromBytes(byte[] bytes)
+        public static string GetStringFromBytes(byte[] bytes)
         {
             var nullIdx = Array.IndexOf(bytes, (byte)0);
 
@@ -1946,6 +1952,27 @@ namespace CrewChiefV4.rFactor2
               ? Encoding.Default.GetString(bytes, 0, nullIdx)
               : Encoding.Default.GetString(bytes);
         }
+
+        // Some Endurance mods use format of LastName1/LastName2.  This is 24hrs stuff with driver swap.
+        // CC currently does not support pair of names for a vehicle.  However, this is such a rare case,
+        // that for now let's just use first last name.
+        private static Dictionary<string, string> sanitizedNamesMap = new Dictionary<string, string>();
+
+        public static string GetSanitizedDriverName(string nameFromGame)
+        {
+            string sanitizedName = "";
+            if (sanitizedNamesMap.TryGetValue(nameFromGame, out sanitizedName))
+                return sanitizedName;
+
+            var fwdSlashPos = nameFromGame.IndexOf('/');
+            sanitizedName = fwdSlashPos == -1 ? nameFromGame : nameFromGame.Substring(0, fwdSlashPos);
+
+            // Save for fast lookup next time.
+            RF2GameStateMapper.sanitizedNamesMap.Add(nameFromGame, sanitizedName);
+
+            return sanitizedName;
+        }
+
 
         // Since it is not clear if there's any guarantee around vehicle telemetry update order in rF2
         // I don't want to assume mID == i in telemetry.mVehicles.  Also, telemetry is updated separately from scoring,
@@ -2080,7 +2107,8 @@ namespace CrewChiefV4.rFactor2
                         var v = scoring.mVehicles[i];
                         if (v.mID == vehToFollowId)
                         {
-                            fod.DriverToFollowRaw = RF2GameStateMapper.GetStringFromBytes(v.mDriverName).ToLower();
+                            fod.DriverToFollowRaw = RF2GameStateMapper.GetStringFromBytes(v.mDriverName).ToLowerInvariant();
+                            fod.DriverToFollowRaw = RF2GameStateMapper.GetSanitizedDriverName(fod.DriverToFollowRaw);
 
                             toFollowDist = RF2GameStateMapper.GetDistanceCompleteded(ref scoring, ref v);
                             break;
