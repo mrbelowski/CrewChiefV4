@@ -20,14 +20,14 @@
 		{
 			"description": "r3e version, keyPressTime quite short because of low key-repeat-delay - keys mapped to KeyCode enum in KeyPresser class",
 			"gameDefinition": "RACE_ROOM",
-			"keyPressSequence": [ "KEY_Q", "KEY_W", "KEY_E" ],
+			"keyPressSequence": [ "KEY_Q", "KEY_W", "KEY_E", "KEY_Q" ],
 			"keyPressTime": 10,
 			"waitBetweenEachCommand": 100
 		},
 		{
 			"description": "pcars2 version, keyPressTime longer, uses arrow keys and enter - keys mapped to KeyCode enum in KeyPresser class",
 			"gameDefinition": "PCARS2",
-			"keyPressSequence": [ "KEY_P", "DOWN", "ENTER" ],
+			"keyPressSequence": [ "KEY_E", "KEY_S", "KEY_D" ],
 			"keyPressTime": 30,
 			"waitBetweenEachCommand": 100
 		}]
@@ -37,20 +37,10 @@
 		"description": "confirms pitstop actions - r3e only",
 		"confirmationMessage": "acknowledge/OK",
 		"voiceTriggers": [ "confirm pit", "stop as planned" ],
-		"buttonTriggers": [ 
-		{
-			"description": "wheel button A",
-			"deviceId": "12345456",
-			"buttonIndex": "2"
-		},
-		{
-			"description": "keyboard key x",
-			"deviceId": "1",
-			"buttonIndex": "101"
-		}],
+		"buttonTriggers": [],
 		"commandSets": [
 		{
-			"description": "r3e version - no pcars version needed",
+			"description": "r3e only - presses the 'confirm' button when entering the pits",
 			"gameDefinition": "RACE_ROOM",
 			"keyPressSequence": [ "KEY_E" ],
 			"keyPressTime": 10,
@@ -59,25 +49,85 @@
 	},
 	{
 		"name": "next pit preset",
-		"description": "selects next pitstop preset",
+		"description": "selects next pitstop preset, r3e only",
 		"voiceTriggers": [ "next strategy", "next pit preset" ],
-		"buttonTriggers": [ 
-		{
-			"description": "wheel button right",
-			"deviceId": "12345456",
-			"buttonIndex": "22"
-		},
-		{
-			"description": "keyboard key l",
-			"deviceId": "1",
-			"buttonIndex": "23"
-		}],
+		"buttonTriggers": [],
 		"commandSets": [
 		{
-			"description": "r3e version - no pcars version needed",
+			"description": "r3e version - pcars indexes the strategies (see 'select strategy 1' etc)",
 			"gameDefinition": "RACE_ROOM",
-			"keyPressSequence": [ "KEY_Q", "KEY_D", "KEY_E" ],
+			"keyPressSequence": [ "KEY_Q", "KEY_D", "KEY_Q" ],
 			"keyPressTime": 10,
+			"waitBetweenEachCommand": 100
+		}]
+	},
+	{
+		"name": "previous pit preset",
+		"description": "selects previous pitstop preset, r3e only",
+		"voiceTriggers": [ "previous strategy", "previous pit preset" ],
+		"buttonTriggers": [],
+		"commandSets": [
+		{
+			"description": "r3e version - pcars indexes the strategies (see 'select strategy 1' etc)",
+			"gameDefinition": "RACE_ROOM",
+			"keyPressSequence": [ "KEY_Q", "KEY_A", "KEY_Q" ],
+			"keyPressTime": 10,
+			"waitBetweenEachCommand": 100
+		}]
+	},
+	{
+		"name": "select race strategy 1",
+		"description": "selects strategy 1 from the pCARS2 ICM",
+		"voiceTriggers": [ "strategy one", "strat one" ],
+		"buttonTriggers": [],
+		"commandSets": [
+		{
+			"description": "pcars2 select strat 1",
+			"gameDefinition": "PCARS2",
+			"keyPressSequence": [ "KEY_E", "KEY_W", "KEY_D", "KEY_S", "KEY_D", "KEY_S", "KEY_D", "KEY_W", "KEY_D", "KEY_W", "KEY_D", "KEY_S", "KEY_D"],
+			"keyPressTime": 30,
+			"waitBetweenEachCommand": 100
+		}]
+	},
+	{
+		"name": "select race strategy 2",
+		"description": "selects strategy 2 from the pCARS2 ICM",
+		"voiceTriggers": [ "strategy two", "strat two" ],
+		"buttonTriggers": [],
+		"commandSets": [
+		{
+			"description": "pcars2 select strat 2",
+			"gameDefinition": "PCARS2",
+			"keyPressSequence": [ "KEY_E", "KEY_W", "KEY_D", "KEY_S", "KEY_D", "KEY_S", "KEY_S", "KEY_D", "KEY_W", "KEY_W", "KEY_D", "KEY_W", "KEY_D", "KEY_S", "KEY_D" ],
+			"keyPressTime": 30,
+			"waitBetweenEachCommand": 100
+		}]
+	},
+	{
+		"name": "select race strategy 3",
+		"description": "selects strategy 3 from the pCARS2 ICM",
+		"voiceTriggers": [ "strategy three", "strat three" ],
+		"buttonTriggers": [],
+		"commandSets": [
+		{
+			"description": "pcars2 select strat 3",
+			"gameDefinition": "PCARS2",
+			"keyPressSequence": [ "KEY_E", "KEY_W", "KEY_D", "KEY_S", "KEY_D", "KEY_S", "KEY_S", "KEY_S", "KEY_D", "KEY_W", "KEY_W", "KEY_D", "KEY_W", "KEY_D", "KEY_S", "KEY_D" ],
+			"keyPressTime": 30,
+			"waitBetweenEachCommand": 100
+		}]
+	},
+	{
+		"name": "select race strategy 4",
+		"description": "selects strategy 4 from the pCARS2 ICM",
+		"voiceTriggers": [ "strategy four", "strat four" ],
+		"buttonTriggers": [],
+		"commandSets": [
+		{
+			"description": "pcars2 select strat 4",
+			"gameDefinition": "PCARS2",
+			"keyPressSequence": [ "KEY_E", "KEY_W", "KEY_D", "KEY_S", "KEY_D", "KEY_S", "KEY_S", "KEY_S", "KEY_S", "KEY_D", "KEY_W", "KEY_W", "KEY_D", "KEY_W", "KEY_D", "KEY_S", "KEY_D" ],
+			"keyPressTime": 30,
 			"waitBetweenEachCommand": 100
 		}]
 	}]
