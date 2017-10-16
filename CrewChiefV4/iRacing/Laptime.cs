@@ -10,7 +10,7 @@ namespace CrewChiefV4.iRacing
     {
         public Laptime() : this(0)
         {
-            this.Time = TimeSpan.MaxValue;
+
         }
 
         public Laptime(int value)

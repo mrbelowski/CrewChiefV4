@@ -81,7 +81,7 @@ namespace CrewChiefV4.iRacing
             //Console.WriteLine("GetDrivers");
             if (_mustReloadDrivers)
             {
-                //Console.WriteLine("MustReloadDrivers: true");
+                Console.WriteLine("MustReloadDrivers: true");
                 _drivers.Clear();
                 _mustReloadDrivers = false;
             }

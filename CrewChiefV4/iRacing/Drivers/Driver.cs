@@ -155,7 +155,7 @@ namespace CrewChiefV4.iRacing
                 if (p0 - p1 > 0.5) // more than 50% jump in track distance == lap crossing occurred from 0.99xx -> 0.00x
                 {
                     this.Live.CurrentSector = 0;
-                    this.Live.CurrentFakeSector = 0;
+                    this.Live.CurrentFakeSector = 1;
                     p0 -= 1;
                 }
                     
@@ -185,7 +185,7 @@ namespace CrewChiefV4.iRacing
 
                         // Begin next sector
                         s.EnterSessionTime = crossTime;                        
-                        this.Live.CurrentFakeSector = s.Number;
+                        this.Live.CurrentFakeSector = s.Number + 1;
 
                         break;
                     }

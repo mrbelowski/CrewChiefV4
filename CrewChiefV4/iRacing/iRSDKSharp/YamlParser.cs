@@ -5,118 +5,166 @@ using System.Text;
 
 namespace iRSDKSharp
 {
-    public static class YamlParser
+    // Unsafe (eg - uses pointers and is much faster) implementation of the YAML parser
+    // Written by Tomasz Terlecki
+    public class YamlParser
     {
         enum StateType { Space, Key, KeySep, Value, NewLine };
 
-        public static string Parse(string data, string path)
+        static unsafe int strncmp(char* s1, char* s2, int keylen)
         {
+            while (*s1 == *s2 && keylen-- > 0)
+            {
+                if (*s1 == '\0' || keylen == 0)
+                    return (0);
+                s1++;
+                s2++;
+            }
+            return (*s1 - *s2);
+        }
+
+        public static unsafe string Parse(string data, string path)
+        {
+            char* val = null;
+            int len = 0;
+
             int depth = 0;
             StateType state = StateType.Space;
-            
-            string keystr = null;
+
+            char* keystr = null;
             int keylen = 0;
 
-            string valuestr = null;
+            char* valuestr = null;
             int valuelen = 0;
 
-            int pathdepth = 0;
+            bool ok = false;
+            bool end = false;
 
-            while(data != "")//for (int i = 0; i < data.Length; i++)
+            fixed (char* pathptrFixed = path.ToCharArray())
             {
-                switch (data[0])
+                int pathdepth = 0;
+
+                fixed (char* dataptrFixed = data.ToCharArray())
                 {
-                    case ' ':
-                    case '-':
-                        if (state == StateType.NewLine)
-                            state = StateType.Space;
-                        if (state == StateType.Space)
-                            depth++;
-                        else if (state == StateType.Key)
-                            keylen++;
-                        else if (state == StateType.Value)
-                            valuelen++;
-                        break;
-                    case ':':
-                        if (state == StateType.Key)
+
+                    char* pathPtr = pathptrFixed;
+                    char* dataPtr = dataptrFixed;
+
+                    while (*dataPtr > 0)
+                    {
+                        switch (*dataPtr)
                         {
-                            state = StateType.KeySep;
-                            keylen++;
-                        }
-                        else if (state == StateType.KeySep)
-                        {
-                            state = StateType.Value;
-                            valuestr = data;
-                        }
-                        break;
-                    case '\n':
-                    case '\r':
-                        if (state != StateType.NewLine)
-                        {
-                            if (depth < pathdepth)
-                            {
-                                return null;
-                            }
-                            else if (keylen > 0)
-                            {
-                                string key = keystr.Substring(0, keystr.Length > keylen ? keylen : keystr.Length);
-                                string pa = path.Substring(0, path.Length > keylen ? keylen : path.Length);
-                                if (key.Equals(pa))
+                            case ' ':
+                            case '-':
+                                if (state == StateType.NewLine)
+                                    state = StateType.Space;
+                                if (state == StateType.Space)
+                                    depth++;
+                                else if (state == StateType.Key)
+                                    keylen++;
+                                else if (state == StateType.Value)
+                                    valuelen++;
+                                break;
+                            case ':':
+                                if (state == StateType.Key)
                                 {
-                                    bool found = true;
-                                    if (path.Length > keylen && path[keylen] == '{')
+                                    state = StateType.KeySep;
+                                    keylen++;
+                                }
+                                else if (state == StateType.KeySep)
+                                {
+                                    state = StateType.Value;
+                                    valuestr = dataPtr;
+                                }
+                                else if (state == StateType.Value)
+                                    valuelen++;
+                                break;
+                            case '\n':
+                            case '\r':
+                                if (state != StateType.NewLine)
+                                {
+                                    if (depth < pathdepth)
                                     {
-                                        string val = valuestr.Substring(0, valuelen);
-                                        string p2 = path.Substring(keylen + 1, path.IndexOf('}') - (keylen + 1));
-                                        if (val.Equals(p2))
-                                            path = path.Substring(valuelen + 2);
-                                        else
-                                            found = false;
+                                        ok = false;
+                                        end = true;
+                                        break;
                                     }
-
-                                    if (found)
+                                    else if (keylen > 0 && 0 == strncmp(keystr, pathPtr, keylen))
                                     {
-                                        pathdepth = depth;
-                                        if(path != "")
-                                            path = path.Substring(keylen);
-
-                                        if (path == "")
+                                        bool found = true;
+                                        //do we need to test the value?
+                                        if (*(pathPtr + keylen) == '{')
                                         {
-                                            string val = valuestr.Substring(0, valuelen);
-                                            return val;
+                                            //search for closing brace
+                                            int pathvaluelen = keylen + 1;
+                                            while (*(pathPtr + pathvaluelen) > 0 && *(pathPtr + pathvaluelen) != '}')
+                                                pathvaluelen++;
+
+                                            if (valuelen == pathvaluelen - (keylen + 1) && 0 == strncmp(valuestr, (pathPtr + keylen + 1), valuelen))
+                                                pathPtr += valuelen + 2;
+                                            else
+                                                found = false;
+                                        }
+
+                                        if (found)
+                                        {
+                                            pathPtr += keylen;
+                                            pathdepth = depth;
+
+                                            if (*pathPtr == '\0')
+                                            {
+                                                val = valuestr;
+                                                len = valuelen;
+                                                ok = true;
+                                                end = true;
+                                                break;
+                                            }
                                         }
                                     }
+
+                                    depth = 0;
+                                    keylen = 0;
+                                    valuelen = 0;
                                 }
-                            }
-                            depth = 0;
-                            keylen = 0;
-                            valuelen = 0;
+                                state = StateType.NewLine;
+                                break;
+                            default:
+                                if (state == StateType.Space || state == StateType.NewLine)
+                                {
+                                    state = StateType.Key;
+                                    keystr = dataPtr;
+                                    keylen = 0; //redundant?
+                                }
+                                else if (state == StateType.KeySep)
+                                {
+                                    state = StateType.Value;
+                                    valuestr = dataPtr;
+                                    valuelen = 0; //redundant?
+                                }
+                                if (state == StateType.Key)
+                                    keylen++;
+                                if (state == StateType.Value)
+                                    valuelen++;
+                                break;
                         }
-                        state = StateType.NewLine;
-                        break;
-                    default:
-                        if (state == StateType.Space || state == StateType.NewLine)
+
+                        if (end)
                         {
-                            state = StateType.Key;
-                            keystr = data;
-                            keylen = 0;
+                            break;
                         }
-                        else if (state == StateType.KeySep)
-                        {
-                            state = StateType.Value;
-                            valuestr = data;
-                            valuelen = 0;
-                        }
-                        if (state == StateType.Key)
-                            keylen++;
-                        if (state == StateType.Value)
-                            valuelen++;
-                        break;
+
+                        // important, increment our pointer
+                        dataPtr++;
+                    }
                 }
-                data = data.Substring(1);
             }
 
-            return null;
+            if (!ok)
+            {
+                return null;
+            }
+
+            return new string(val, 0, len);
         }
     }
 }

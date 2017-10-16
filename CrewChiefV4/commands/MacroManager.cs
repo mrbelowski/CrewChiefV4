@@ -46,16 +46,6 @@ namespace CrewChiefV4.commands
             };
 
             MacroItem[] r3eConfirmPitActions = new MacroItem[] { 
-                new MacroItem(CrewChiefV4.commands.KeyPresser.KeyCode.KEY_Q),
-                new MacroItem(100),
-                new MacroItem(CrewChiefV4.commands.KeyPresser.KeyCode.KEY_S),
-                new MacroItem(100),
-                new MacroItem(CrewChiefV4.commands.KeyPresser.KeyCode.KEY_S),
-                new MacroItem(100),
-                new MacroItem(CrewChiefV4.commands.KeyPresser.KeyCode.KEY_S),
-                new MacroItem(100),
-                new MacroItem(CrewChiefV4.commands.KeyPresser.KeyCode.KEY_S),
-                new MacroItem(100),
                 new MacroItem(CrewChiefV4.commands.KeyPresser.KeyCode.KEY_E)
             };
 
