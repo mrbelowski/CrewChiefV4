@@ -27,7 +27,7 @@
 		{
 			"description": "pcars2 version, keyPressTime longer, uses arrow keys and enter - keys mapped to KeyCode enum in KeyPresser class",
 			"gameDefinition": "PCARS2",
-			"keyPressSequence": [ "KEY_E", "KEY_S", "KEY_D" ],
+			"keyPressSequence": [ "KEY_E", "KEY_W", "KEY_W", "KEY_W", "KEY_D", "KEY_S", "KEY_S", "KEY_S", "KEY_D" ],
 			"keyPressTime": 30,
 			"waitBetweenEachCommand": 100
 		}]
