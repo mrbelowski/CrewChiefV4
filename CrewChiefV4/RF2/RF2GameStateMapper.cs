@@ -51,6 +51,8 @@ namespace CrewChiefV4.rFactor2
         private float distanceOffTrack = 0.0f;
         private bool isApproachingTrack = false;
 
+        private double minTrackWidthThisLap = -1;
+
         // Detect if there any changes in the the game data since the last update.
         private double lastPlayerTelemetryET = -1.0;
         private double lastScoringET = -1.0;
@@ -162,6 +164,7 @@ namespace CrewChiefV4.rFactor2
             this.isApproachingTrack = false;
             this.playerLapsWhenFCYPosAssigned = -1;
             this.detectedTrackNoDRSZones = false;
+            this.minTrackWidthThisLap = -1.0;
             RF2GameStateMapper.sanitizedNamesMap.Clear();
         }
 
@@ -595,6 +598,17 @@ namespace CrewChiefV4.rFactor2
                 }
 
                 cgs.PitData.PitWindowEnd = pitWindowEndLapOrTime;
+            }
+
+            if (csd.IsNewLap)
+                this.minTrackWidthThisLap = -1.0;
+
+            var estTrackWidth = Math.Abs(playerScoring.mTrackEdge);
+
+            if (this.minTrackWidthThisLap == -1.0 || estTrackWidth < this.minTrackWidthThisLap)
+            {
+                this.minTrackWidthThisLap = estTrackWidth;
+                Debug.WriteLine("New min track width:" + (this.minTrackWidthThisLap * 2.0).ToString("0.000") +  " pit lane: " + shared.rules.mTrackRules.mPitLaneStartDist);
             }
 
             // mInGarageStall also means retired or before race start, but for now use it here.
