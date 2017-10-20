@@ -14030,6 +14030,75 @@
 					"isCommonOvertakingSpot": true
 				}
 			]
+		}, {
+			"rf2TrackNames": ["Palm Springs Road Course B"],
+			"trackLandmarks": [{
+					"landmarkName": "turn1",
+					"distanceRoundLapStart": 160,
+					"distanceRoundLapEnd": 285,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn2",
+					"distanceRoundLapStart": 380,
+					"distanceRoundLapEnd": 475,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn3",
+					"distanceRoundLapStart": 555,
+					"distanceRoundLapEnd": 655,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn4",
+					"distanceRoundLapStart": 655,
+					"distanceRoundLapEnd": 765,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn5",
+					"distanceRoundLapStart": 770,
+					"distanceRoundLapEnd": 890,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn6",
+					"distanceRoundLapStart": 1245,
+					"distanceRoundLapEnd": 1340,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn7",
+					"distanceRoundLapStart": 1380,
+					"distanceRoundLapEnd": 1545,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn8",
+					"distanceRoundLapStart": 1990,
+					"distanceRoundLapEnd": 2100,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn9",
+					"distanceRoundLapStart": 2130,
+					"distanceRoundLapEnd": 2360,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn10",
+					"distanceRoundLapStart": 2330,
+					"distanceRoundLapEnd": 2355,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn11",
+					"distanceRoundLapStart": 2675,
+					"distanceRoundLapEnd": 3450,
+					"isCommonOvertakingSpot": true
+				}
+			]
 		}
 	]
 }
