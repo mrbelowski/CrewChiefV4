@@ -471,6 +471,38 @@ namespace CrewChiefV4.Events
                     }
                 }
             }
+            if (previousGameState != null && currentGameState.SessionData.SessionType == SessionType.Race)
+            {
+                if (!previousGameState.PitData.IsApproachingPitlane
+                    && currentGameState.PitData.IsApproachingPitlane)
+                {
+                    Console.WriteLine("PIT STOPS: WATCH YOUR SPEED IN PITS");
+                }
+                if (!previousGameState.PitData.IsPitCrewReady
+                    && currentGameState.PitData.IsPitCrewReady)
+                {
+                    Console.WriteLine("PIT STOPS: PIT CREW IS READY");
+                }
+                if (!previousGameState.PitData.IsPitCrewDone
+                    && currentGameState.PitData.IsPitCrewDone)
+                {
+                    audioPlayer.playMessageImmediately(new QueuedMessage(LapCounter.folderGreenGreenGreen, 0, this));
+                }
+                // TODO: need checks how long since last announcement
+                if (!previousGameState.PitData.HasRequestedPitStop
+                    && currentGameState.PitData.HasRequestedPitStop)
+                {
+                    Console.WriteLine("PIT STOPS: REQUESTED PIT STOP");
+                }
+                // TODO: need checks how long since last announcement
+                if (!currentGameState.PitData.InPitlane && !previousGameState.PitData.InPitlane  // Make sure we're not in pits.  More checks might be needed.
+                    && previousGameState.PitData.HasRequestedPitStop
+                    && !currentGameState.PitData.HasRequestedPitStop)
+                {
+                    Console.WriteLine("PIT STOPS: CANCELLED PIT STOP REQUEST");
+                }
+            }
+
         }
 
         public override void respond(String voiceMessage)
