@@ -51,7 +51,10 @@ namespace CrewChiefV4.rFactor2
         private float distanceOffTrack = 0.0f;
         private bool isApproachingTrack = false;
 
+        // Pit stop detection tracking variables.
         private double minTrackWidthThisLap = -1;
+        private DateTime timePitStopRequested = DateTime.MinValue;
+        private bool isApproachingPitEntry = false;
 
         // Detect if there any changes in the the game data since the last update.
         private double lastPlayerTelemetryET = -1.0;
@@ -165,6 +168,8 @@ namespace CrewChiefV4.rFactor2
             this.playerLapsWhenFCYPosAssigned = -1;
             this.detectedTrackNoDRSZones = false;
             this.minTrackWidthThisLap = -1.0;
+            this.timePitStopRequested = DateTime.MinValue;
+            this.isApproachingPitEntry = false;
             RF2GameStateMapper.sanitizedNamesMap.Clear();
         }
 
@@ -244,7 +249,7 @@ namespace CrewChiefV4.rFactor2
                         Console.WriteLine("Abrupt Session End: new session just started, terminate previous session.");
 
                     // Wait is over.  Terminate the abrupt session.
-                    this.waitingToTerminateSession = false; 
+                    this.waitingToTerminateSession = false;
 
                     if (this.lastInRealTimeState && pgs.SessionData.SessionType == SessionType.Race)
                     {
@@ -600,17 +605,6 @@ namespace CrewChiefV4.rFactor2
                 cgs.PitData.PitWindowEnd = pitWindowEndLapOrTime;
             }
 
-            if (csd.IsNewLap)
-                this.minTrackWidthThisLap = -1.0;
-
-            var estTrackWidth = Math.Abs(playerScoring.mTrackEdge);
-
-            if (this.minTrackWidthThisLap == -1.0 || estTrackWidth < this.minTrackWidthThisLap)
-            {
-                this.minTrackWidthThisLap = estTrackWidth;
-                Debug.WriteLine("New min track width:" + (this.minTrackWidthThisLap * 2.0).ToString("0.000") +  " pit lane: " + shared.rules.mTrackRules.mPitLaneStartDist);
-            }
-
             // mInGarageStall also means retired or before race start, but for now use it here.
             cgs.PitData.InPitlane = playerScoring.mInPits == 1 || playerScoring.mInGarageStall == 1;
 
@@ -651,6 +645,51 @@ namespace CrewChiefV4.rFactor2
             {
                 cgs.PitData.MandatoryPitStopCompleted = pgs.PitData.MandatoryPitStopCompleted || cgs.PitData.IsMakingMandatoryPitStop;
             }
+
+            cgs.PitData.HasRequestedPitStop = (rFactor2Constants.rF2PitState)playerScoring.mPitState == rFactor2Constants.rF2PitState.Request;
+
+            // Is this new pit request?
+            if (pgs != null && !pgs.PitData.HasRequestedPitStop && cgs.PitData.HasRequestedPitStop)
+                this.timePitStopRequested = cgs.Now;
+
+            // Check if it's time to mark pit crew as ready.
+            if (pgs != null
+                && pgs.PitData.HasRequestedPitStop
+                && cgs.PitData.HasRequestedPitStop
+                && (cgs.Now - this.timePitStopRequested).TotalSeconds > 15)  // Haha!
+            {
+                cgs.PitData.IsPitCrewReady = true;
+            }
+
+            cgs.PitData.IsPitCrewDone = (rFactor2Constants.rF2PitState)playerScoring.mPitState == rFactor2Constants.rF2PitState.Exiting;
+
+            if (csd.IsNewLap)
+            {
+                this.minTrackWidthThisLap = -1.0;
+                this.isApproachingPitEntry = false;
+            }
+
+            if (cgs.PitData.InPitlane)
+                this.isApproachingPitEntry = false;
+
+            var estTrackWidth = Math.Abs(playerScoring.mTrackEdge) * 2.0;
+            if (this.minTrackWidthThisLap == -1.0 || estTrackWidth < this.minTrackWidthThisLap)
+            {
+                this.minTrackWidthThisLap = estTrackWidth;
+                Debug.WriteLine("New min track width:" + (this.minTrackWidthThisLap).ToString("0.000") + " pit lane: " + shared.rules.mTrackRules.mPitLaneStartDist);
+
+                // See if it looks like we're entering the pits.
+                // The idea here is that if:
+                // - current DistanceRoundTrack is past the point where track forks into pits
+                // - this appears like narrowest part of a track surface (tracked for an entire lap)
+                // - and pit is requested, assume we're approaching pit entry.
+                if (cgs.SessionData.SessionType == SessionType.Race
+                    && cgs.PositionAndMotionData.DistanceRoundTrack > shared.rules.mTrackRules.mPitLaneStartDist
+                    && cgs.PitData.HasRequestedPitStop)
+                    this.isApproachingPitEntry = true;
+            }
+
+            cgs.PitData.IsApproachingPitlane = this.isApproachingPitEntry;
 
             ////////////////////////////////////
             // Timings
