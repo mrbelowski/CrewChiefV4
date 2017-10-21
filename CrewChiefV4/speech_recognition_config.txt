@@ -274,11 +274,3 @@ HOURS = hours
 88 = eighty-eight
 89 = eighty-nine
 90 = ninety
-
-
-################
-# Macro triggers - hard coded for R3E integration testing and proof-of-concept
-PIT_REQUEST = pit request
-NEXT_PIT_PRESET = next strategy
-PREVIOUS_PIT_PRESET = previous strategy
-CONFIRM_PIT_ACTIONS = confirm pit actions
