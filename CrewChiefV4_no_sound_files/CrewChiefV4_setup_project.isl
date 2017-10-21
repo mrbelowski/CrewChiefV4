@@ -1964,6 +1964,7 @@
 		<row><td>speech_recognition_config.tx</td><td>ISX_DEFAULTCOMPONENT</td><td>SPEECH~1.TXT|speech_recognition_config.txt</td><td>0</td><td/><td/><td/><td>1</td><td>C:\projects\crewchief_c_sharp\CrewChiefV4\CrewChiefV4\speech_recognition_config.txt</td><td>1</td><td/></row>
 		<row><td>tracklandmarksdata.json</td><td>ISX_DEFAULTCOMPONENT</td><td>TRACKL~1.JSO|trackLandmarksData.json</td><td>0</td><td/><td/><td/><td>1</td><td>C:\projects\crewchief_c_sharp\CrewChiefV4\CrewChiefV4\trackLandmarksData.json</td><td>1</td><td/></row>
 		<row><td>ui_text.txt</td><td>ISX_DEFAULTCOMPONENT</td><td>ui_text.txt</td><td>0</td><td/><td/><td/><td>1</td><td>C:\projects\crewchief_c_sharp\CrewChiefV4\CrewChiefV4\ui_text.txt</td><td>1</td><td/></row>
+		<row><td>saved_command_macros.json</td><td>ISX_DEFAULTCOMPONENT</td><td>SAVED_~1.JSO|saved_command_macros.json</td><td>0</td><td/><td/><td/><td>1</td><td>C:\projects\crewchief_c_sharp\CrewChiefV4\CrewChiefV4\saved_command_macros.json</td><td>1</td><td/></row>
 	</table>
 
 	<table name="FileSFPCatalog">
