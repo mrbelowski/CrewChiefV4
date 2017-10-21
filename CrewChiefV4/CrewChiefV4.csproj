@@ -140,7 +140,6 @@
     <Compile Include="iRacing\SessionInfo.cs" />
     <Compile Include="iRacing\iRacingSharedMemoryReader.cs" />
     <Compile Include="iRacing\iRacingSpotter.cs" />
-    <Compile Include="iRacing\Laptime.cs" />
     <Compile Include="iRacing\Parser.cs">
       <SubType>Code</SubType>
     </Compile>

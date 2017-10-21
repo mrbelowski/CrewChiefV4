@@ -175,7 +175,6 @@ namespace CrewChiefV4.iRacing
                     }
 
                     int newUpdate = sdk.Header.SessionInfoUpdate;
-                    bool hasNewSessionInfo = false;
                     if (newUpdate != lastUpdate)
                     {
 
@@ -187,7 +186,6 @@ namespace CrewChiefV4.iRacing
                             // Raise the SessionInfoUpdated event and pass along the session info and session time.
                             sim.SdkOnSessionInfoUpdated(sessionInfo, (int)TryGetSessionNum(), DriverId);
                             lastUpdate = newUpdate;
-                            hasNewSessionInfo = true;
                         }
                     }
                     iRacingData irData = new iRacingData(sdk, dumpToFile);

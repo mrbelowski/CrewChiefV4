@@ -180,7 +180,7 @@ namespace CrewChiefV4.iRacing
                         }
                         if (sector != null && sector.EnterSessionTime > 0)
                         {
-                            sector.SectorTime = new Laptime((float)(crossTime - sector.EnterSessionTime));
+                            sector.SectorTime = (float)(crossTime - sector.EnterSessionTime);
                         }
 
                         // Begin next sector

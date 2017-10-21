@@ -18,9 +18,9 @@ namespace CrewChiefV4.iRacing
         public DriverLiveInfo(Driver driver)
         {
             _driver = driver;
-            LastLaptimeFromGame = new Laptime(0);
             PreviousLapWasValid = false;
             HasCrossedSFLine = false;
+            LapTimePrevious = 0;
             FirstTime = false;
             IsNewLap = false;
         }
@@ -55,7 +55,6 @@ namespace CrewChiefV4.iRacing
         public int CurrentSector { get; set; }
         public int CurrentFakeSector  { get; set; }
         public float LastLaptime { get; set; }
-        public Laptime LastLaptimeFromGame { get; set; }
         public int LapsCompleted { get; set; }
         public bool IsNewLap { get; set; }
         public bool PreviousLapWasValid { get; set; }
@@ -95,7 +94,6 @@ namespace CrewChiefV4.iRacing
                     this.LastLapTimeUpdated = true;
                     this.LapTimePrevious = gameProvidedLastLapTime;
                     this.PreviousLapWasValid = gameProvidedLastLapTime > 1;
-                    this.LastLaptimeFromGame = new Laptime(gameProvidedLastLapTime);
                     this.IsNewLap = true;
                 }
                 else
@@ -142,7 +140,6 @@ namespace CrewChiefV4.iRacing
                 if (!FirstTime)
                 {
                     this.LapTimePrevious = e.LapLastLapTime;
-                    this.LastLaptimeFromGame = new Laptime(LapTimePrevious);
                     FirstTime = true;
                 }
                 checkForNewLapData(e.LapLastLapTime);                
@@ -151,33 +148,11 @@ namespace CrewChiefV4.iRacing
             {
                 if (!FirstTime)
                 {
-                    this.LapTimePrevious = (float)this._driver.CurrentResults.LastTime.Time.TotalSeconds;
-                    this.LastLaptimeFromGame = new Laptime(LapTimePrevious);
+                    this.LapTimePrevious = (float)this._driver.CurrentResults.LastTime;
                     FirstTime = true;
                 }
-                checkForNewLapData((float)this._driver.CurrentResults.LastTime.Time.TotalSeconds);
+                checkForNewLapData((float)this._driver.CurrentResults.LastTime);
             }
-                 
-            /*else if (this._driver.CurrentResults.Laps.Count > this.LapsCompleted)
-            {
-                if (this._driver.CurrentResults.Laps.Count < 0)
-                {
-                    this.LapsCompleted = 0;
-                }
-                else
-                {
-                    this.LapsCompleted = this._driver.CurrentResults.Laps.Count;
-                    //this.DelayedLap = this._driver.CurrentResults.Lap;
-                }
-                //Console.WriteLine(this.Driver.Name + " Has just started lap nr " + this._driver.CurrentResults.LapsComplete + " Last Time " + this._driver.CurrentResults.LastTime.DisplayShort);
-                this.LastLaptimeFromGame = this._driver.CurrentResults.LastTime;                
-                this.PreviousLapWasValid = LastLaptimeFromGame.Value > 1;
-                this.IsNewLap = true;
-            } 
-            else
-            {
-                this.IsNewLap = false;
-            }*/
                 
         }
 
