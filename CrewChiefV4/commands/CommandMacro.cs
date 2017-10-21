@@ -12,10 +12,12 @@ namespace CrewChiefV4.commands
     {
         AudioPlayer audioPlayer;
         Macro macro;
-        public ExecutableCommandMacro(AudioPlayer audioPlayer, Macro macro)
+        Dictionary<String, KeyBinding[]> assignmentsByGame;
+        public ExecutableCommandMacro(AudioPlayer audioPlayer, Macro macro, Dictionary<String, KeyBinding[]> assignmentsByGame)
         {
             this.audioPlayer = audioPlayer;
             this.macro = macro;
+            this.assignmentsByGame = assignmentsByGame;
         }
         public void execute()
         {
@@ -23,9 +25,10 @@ namespace CrewChiefV4.commands
             foreach (CommandSet commandSet in macro.commandSets)
             {
                 // only execute for the requested game - is this check sensible?
-                if (CrewChief.gameDefinition.gameEnum.ToString().Equals(commandSet.gameDefinition))
+                if (CrewChief.gameDefinition.gameEnum.ToString().Equals(commandSet.gameDefinition) &&
+                    assignmentsByGame.ContainsKey(commandSet.gameDefinition))
                 {
-                    foreach (KeyPresser.KeyCode keyCode in commandSet.getKeyCodes())
+                    foreach (KeyPresser.KeyCode keyCode in commandSet.getKeyCodes(assignmentsByGame[commandSet.gameDefinition]))
                     {
                         KeyPresser.SendScanCodeKeyPress(keyCode, commandSet.keyPressTime);
                         Thread.Sleep(commandSet.waitBetweenEachCommand);
@@ -43,7 +46,22 @@ namespace CrewChiefV4.commands
     // JSON objects
     public class MacroContainer
     {
+        public Assignment[] assignments { get; set; }
         public Macro[] macros { get; set; }
+    }
+
+    public class Assignment
+    {
+        public String description { get; set; }
+        public String gameDefinition { get; set; }
+        public KeyBinding[] keyBindings { get; set; }
+    }
+
+    public class KeyBinding
+    {
+        public String description { get; set; }
+        public String action { get; set; }
+        public String key { get; set; }
     }
 
     public class Macro
@@ -60,26 +78,33 @@ namespace CrewChiefV4.commands
     {
         public String description { get; set; }
         public String gameDefinition { get; set; }
-		public String[] keyPressSequence { get; set; }
+		public String[] actionSequence { get; set; }
 		public int keyPressTime { get; set; }
         public int waitBetweenEachCommand { get; set; }
 
         private List<KeyPresser.KeyCode> codes = null;
 
-        public List<KeyPresser.KeyCode> getKeyCodes()
+        public List<KeyPresser.KeyCode> getKeyCodes(KeyBinding[] keyBindings)
         {
             if (this.codes == null)
             {
                 this.codes = new List<KeyPresser.KeyCode>();
-                foreach (String key in keyPressSequence)
+                foreach (String action in actionSequence)
                 {
                     try
                     {
-                        codes.Add((KeyPresser.KeyCode)Enum.Parse(typeof(KeyPresser.KeyCode), key, true));
-                    }
+                        foreach (KeyBinding keyBinding in keyBindings)
+                        {
+                            if (String.Equals(keyBinding.action, action, StringComparison.InvariantCultureIgnoreCase))
+                            {
+                                codes.Add((KeyPresser.KeyCode)Enum.Parse(typeof(KeyPresser.KeyCode), keyBinding.key, true));
+                                break;
+                            }
+                        }
+                    }                        
                     catch (Exception)
                     {
-                        Console.WriteLine("Key " + key + " not recognised");
+                        Console.WriteLine("Action " + action + " not recognised");
                     }
                 }
             }
