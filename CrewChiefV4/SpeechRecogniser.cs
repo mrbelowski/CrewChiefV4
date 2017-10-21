@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using CrewChiefV4.Events;
 using System.Threading;
 using CrewChiefV4.Audio;
+using CrewChiefV4.commands;
 
 namespace CrewChiefV4
 {
@@ -111,8 +112,7 @@ namespace CrewChiefV4
 
         public static String WHAT_TYRES_IS = Configuration.getSpeechRecognitionConfigOption("WHAT_TYRES_IS");
         public static String WHAT_TYRE_IS = Configuration.getSpeechRecognitionConfigOption("WHAT_TYRE_IS");
-        
-        
+
         private CrewChief crewChief;
 
         public Boolean initialised = false;
@@ -122,6 +122,10 @@ namespace CrewChiefV4
         private List<String> driverNamesInUse = new List<string>();
 
         private List<Grammar> opponentGrammarList = new List<Grammar>();
+
+        private Grammar macroGrammar = null;
+
+        private Dictionary<String, ExecutableCommandMacro> macroLookup = new Dictionary<string, ExecutableCommandMacro>();
         
         private System.Globalization.CultureInfo cultureInfo;
 
@@ -130,6 +134,34 @@ namespace CrewChiefV4
         public static Dictionary<String, int> hoursToNumber = getHourMappings();
 
         public static Boolean waitingForSpeech = false;
+
+        // load voice commands for triggering keyboard macros. The String key of the input Dictionary is the
+        // command list key in speech_recognition_config.txt. When one of these phrases is heard the map value
+        // CommandMacro is executed.
+        public void loadMacroVoiceTriggers(Dictionary<string, ExecutableCommandMacro> voiceTriggeredMacros) 
+        {
+            macroLookup.Clear();
+            if (macroGrammar != null && macroGrammar.Loaded)
+            {
+                sre.UnloadGrammar(macroGrammar);
+            }
+            Choices macroChoices = new Choices();
+            foreach (String triggerPhrase in voiceTriggeredMacros.Keys)
+            {
+                // validate?
+                if (!macroLookup.ContainsKey(triggerPhrase))
+                {
+                    macroLookup.Add(triggerPhrase, voiceTriggeredMacros[triggerPhrase]);
+                }
+                macroChoices.Add(triggerPhrase);
+                GrammarBuilder macroGrammarBuilder = new GrammarBuilder();
+                macroGrammarBuilder.Culture = cultureInfo;
+                macroGrammarBuilder.Append(macroChoices);
+                macroGrammar = new Grammar(macroGrammarBuilder);
+                sre.LoadGrammar(macroGrammar);
+            }
+            Console.WriteLine("Loaded " + voiceTriggeredMacros.Count + " macro voice triggers into the speech recogniser");
+        }
 
         private static Dictionary<String, int> getNumberMappings()
         {
@@ -522,7 +554,14 @@ namespace CrewChiefV4
             Console.WriteLine("recognised : " + e.Result.Text + " confidence = " + e.Result.Confidence);
             try
             {
-                if (opponentGrammarList.Contains(e.Result.Grammar))
+                if (macroGrammar == e.Result.Grammar)
+                {
+                    if (macroLookup.ContainsKey(e.Result.Text))
+                    {
+                        macroLookup[e.Result.Text].execute();
+                    }
+                }
+                else if (opponentGrammarList.Contains(e.Result.Grammar))
                 {
                     if (e.Result.Confidence > minimum_name_voice_recognition_confidence)
                     {
