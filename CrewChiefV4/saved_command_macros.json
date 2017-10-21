@@ -2,7 +2,7 @@
     "description": "This is the default command macro configuration. You can modify this file directly if you want, but it'll be overwritten when the app is updated. Make a copy in your Documents folder in a subfolder called CrewChiefV4 and modify the copy - the app will load this file from Documents/CrewChiefV4/ if it can find it, and will then fall back to the one in the installation folder. All text in 'description' elements will be ignored. These elements are only to provide a place to put comments.",
     "assignments": [
 	{
-	    "description": "Race Room command mappings - these are the key assignments in the Controller menu -> Primary",
+	    "description": "Race Room command mappings - these are the key assignments in the Controller menu -> Primary. The key is what key to press, the action maps a elements in the actionSequence list in the commandSets below.",
 	    "gameDefinition": "RACE_ROOM",
 		"keyBindings" : [
 		{
@@ -65,12 +65,12 @@
 		"voiceTriggers": [ "request pit", "box this lap" ],
 		"buttonTriggers": [ 
 		{
-			"description": "wheel button X",
+			"description": "wheel button X - button trigger not yet implemented",
 			"deviceId": "12345456",
 			"buttonIndex": "1"
 		},
 		{
-			"description": "keyboard key z",
+			"description": "keyboard key z - key trigger not yet implemented",
 			"deviceId": "1",
 			"buttonIndex": "99"
 		}],
