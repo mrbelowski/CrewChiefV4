@@ -1,4 +1,62 @@
 {
+    "description": "This is the default command macro configuration. You can modify this file directly if you want, but it'll be overwritten when the app is updated. Make a copy in your Documents folder in a subfolder called CrewChiefV4 and modify the copy - the app will load this file from Documents/CrewChiefV4/ if it can find it, and will then fall back to the one in the installation folder. All text in 'description' elements will be ignored. These elements are only to provide a place to put comments.",
+    "assignments": [
+	{
+	    "description": "Race Room command mappings - these are the key assignments in the Controller menu -> Primary",
+	    "gameDefinition": "RACE_ROOM",
+		"keyBindings" : [
+		{
+		    "action": "Pit Menu Toggle",
+			"key": "KEY_Q"
+		},
+		{
+		    "action": "Pit Menu Select",
+			"key": "KEY_E"
+		},
+		{
+		    "action": "Pit Menu Up",
+			"key": "KEY_W"
+		},
+		{
+		    "action": "Pit Menu Down",
+			"key": "KEY_S"
+		},
+		{
+		    "action": "Pit Menu Decrease",
+			"key": "KEY_A"
+		},
+		{
+		    "action": "Pit Menu Increase",
+			"key": "KEY_D"
+		}
+		]
+	},
+	{
+	    "description": "Project Cars 2 command mappings - these are the key assignments in the Controller menu -> Game",
+	    "gameDefinition": "PCARS2",
+		"keyBindings" : [
+		{
+		    "action": "Car Management",
+			"key": "KEY_E"
+		},
+		{
+		    "action": "ICM Menu Up",
+			"key": "KEY_W"
+		},
+		{
+		    "action": "ICM Menu Down",
+			"key": "KEY_S"
+		},
+		{
+		    "action": "ICM Menu Left",
+			"key": "KEY_A"
+		},
+		{
+		    "action": "ICM Menu Right",
+			"key": "KEY_D"
+		}
+		]
+	}],
 	"macros": [ 
 	{
 		"name": "request pit",
@@ -18,16 +76,16 @@
 		}],
 		"commandSets": [
 		{
-			"description": "r3e version, keyPressTime quite short because of low key-repeat-delay - keys mapped to KeyCode enum in KeyPresser class",
+			"description": "r3e version, keyPressTime quite short because of low key-repeat-delay",
 			"gameDefinition": "RACE_ROOM",
-			"keyPressSequence": [ "KEY_Q", "KEY_W", "KEY_E", "KEY_Q" ],
+			"actionSequence": [ "Pit Menu Toggle", "Pit Menu Up", "Pit Menu Select", "Pit Menu Toggle" ],
 			"keyPressTime": 10,
 			"waitBetweenEachCommand": 100
 		},
 		{
-			"description": "pcars2 version, keyPressTime longer, uses arrow keys and enter - keys mapped to KeyCode enum in KeyPresser class",
+			"description": "pcars2 version, keyPressTime longer",
 			"gameDefinition": "PCARS2",
-			"keyPressSequence": [ "KEY_E", "KEY_W", "KEY_W", "KEY_W", "KEY_D", "KEY_S", "KEY_S", "KEY_S", "KEY_D" ],
+			"actionSequence": [ "Car Management", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Right", "ICM Menu Down", "ICM Menu Down", "ICM Menu Down", "ICM Menu Right" ],
 			"keyPressTime": 30,
 			"waitBetweenEachCommand": 100
 		}]
@@ -42,7 +100,7 @@
 		{
 			"description": "r3e only - presses the 'confirm' button when entering the pits",
 			"gameDefinition": "RACE_ROOM",
-			"keyPressSequence": [ "KEY_E" ],
+			"actionSequence": [ "Pit Menu Select", "Pit Menu Toggle" ],
 			"keyPressTime": 10,
 			"waitBetweenEachCommand": 100
 		}]
@@ -56,7 +114,7 @@
 		{
 			"description": "r3e version - pcars indexes the strategies (see 'select strategy 1' etc)",
 			"gameDefinition": "RACE_ROOM",
-			"keyPressSequence": [ "KEY_Q", "KEY_D", "KEY_Q" ],
+			"actionSequence": [ "Pit Menu Toggle", "Pit Menu Increase", "Pit Menu Toggle" ],
 			"keyPressTime": 10,
 			"waitBetweenEachCommand": 100
 		}]
@@ -70,7 +128,7 @@
 		{
 			"description": "r3e version - pcars indexes the strategies (see 'select strategy 1' etc)",
 			"gameDefinition": "RACE_ROOM",
-			"keyPressSequence": [ "KEY_Q", "KEY_A", "KEY_Q" ],
+			"actionSequence": [ "Pit Menu Toggle", "Pit Menu Decrease", "Pit Menu Toggle" ],
 			"keyPressTime": 10,
 			"waitBetweenEachCommand": 100
 		}]
@@ -84,7 +142,7 @@
 		{
 			"description": "pcars2 select strat 1",
 			"gameDefinition": "PCARS2",
-			"keyPressSequence": [ "KEY_E", "KEY_W", "KEY_D", "KEY_S", "KEY_D", "KEY_S", "KEY_D", "KEY_W", "KEY_D", "KEY_W", "KEY_D", "KEY_S", "KEY_D"],
+			"actionSequence": [ "Car Management", "ICM Menu Up", "ICM Menu Right", "ICM Menu Down", "ICM Menu Right", "ICM Menu Down", "ICM Menu Right", "ICM Menu Up", "ICM Menu Right", "ICM Menu Up", "ICM Menu Right", "ICM Menu Down", "ICM Menu Right"],
 			"keyPressTime": 30,
 			"waitBetweenEachCommand": 100
 		}]
@@ -98,7 +156,7 @@
 		{
 			"description": "pcars2 select strat 2",
 			"gameDefinition": "PCARS2",
-			"keyPressSequence": [ "KEY_E", "KEY_W", "KEY_D", "KEY_S", "KEY_D", "KEY_S", "KEY_S", "KEY_D", "KEY_W", "KEY_W", "KEY_D", "KEY_W", "KEY_D", "KEY_S", "KEY_D" ],
+			"actionSequence": [ "Car Management", "ICM Menu Up", "ICM Menu Right", "ICM Menu Down", "ICM Menu Right", "ICM Menu Down", "ICM Menu Down", "ICM Menu Right", "ICM Menu Up", "ICM Menu Up", "ICM Menu Right", "ICM Menu Up", "ICM Menu Right", "ICM Menu Down", "ICM Menu Right" ],
 			"keyPressTime": 30,
 			"waitBetweenEachCommand": 100
 		}]
@@ -112,7 +170,7 @@
 		{
 			"description": "pcars2 select strat 3",
 			"gameDefinition": "PCARS2",
-			"keyPressSequence": [ "KEY_E", "KEY_W", "KEY_D", "KEY_S", "KEY_D", "KEY_S", "KEY_S", "KEY_S", "KEY_D", "KEY_W", "KEY_W", "KEY_D", "KEY_W", "KEY_D", "KEY_S", "KEY_D" ],
+			"actionSequence": [ "Car Management", "ICM Menu Up", "ICM Menu Right", "ICM Menu Down", "ICM Menu Right", "ICM Menu Down", "ICM Menu Down", "ICM Menu Down", "ICM Menu Right", "ICM Menu Up", "ICM Menu Up", "ICM Menu Right", "ICM Menu Up", "ICM Menu Right", "ICM Menu Down", "ICM Menu Right" ],
 			"keyPressTime": 30,
 			"waitBetweenEachCommand": 100
 		}]
@@ -126,7 +184,7 @@
 		{
 			"description": "pcars2 select strat 4",
 			"gameDefinition": "PCARS2",
-			"keyPressSequence": [ "KEY_E", "KEY_W", "KEY_D", "KEY_S", "KEY_D", "KEY_S", "KEY_S", "KEY_S", "KEY_S", "KEY_D", "KEY_W", "KEY_W", "KEY_D", "KEY_W", "KEY_D", "KEY_S", "KEY_D" ],
+			"actionSequence": [ "Car Management", "ICM Menu Up", "ICM Menu Right", "ICM Menu Down", "ICM Menu Right", "ICM Menu Down", "ICM Menu Down", "ICM Menu Down", "ICM Menu Down", "ICM Menu Right", "ICM Menu Up", "ICM Menu Up", "ICM Menu Right", "ICM Menu Up", "ICM Menu Right", "ICM Menu Down", "ICM Menu Right" ],
 			"keyPressTime": 30,
 			"waitBetweenEachCommand": 100
 		}]
