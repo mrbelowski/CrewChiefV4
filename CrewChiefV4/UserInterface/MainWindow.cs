@@ -15,6 +15,7 @@ using System.IO.Compression;
 using CrewChiefV4.Audio;
 using CrewChiefV4.UserInterface;
 using System.Diagnostics;
+using CrewChiefV4.commands;
 
 namespace CrewChiefV4
 {
@@ -1191,6 +1192,7 @@ namespace CrewChiefV4
                 if (crewChief.speechRecogniser != null && !crewChief.speechRecogniser.initialised)
                 {
                     crewChief.speechRecogniser.initialiseSpeechEngine();
+                    MacroManager.initialise(crewChief.audioPlayer, crewChief.speechRecogniser);
                     Console.WriteLine("Attempted to initialise speech engine - success = " + crewChief.speechRecogniser.initialised);
                 }
             }
