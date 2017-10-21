@@ -1958,13 +1958,13 @@
 		<row><td>rfactor2sharedmemorymapplugi</td><td>rFactor2SharedMemoryMapPlugin64.dll</td><td>RFACTO~1.DLL|rFactor2SharedMemoryMapPlugin64.dll</td><td>0</td><td/><td/><td/><td>1</td><td>C:\projects\crewchief_c_sharp\CrewChiefV4\CrewChiefV4\plugins\rFactor 2\Bin64\Plugins\rFactor2SharedMemoryMapPlugin64.dll</td><td>1</td><td/></row>
 		<row><td>rfactorsharedmemorymap.dll</td><td>rFactorSharedMemoryMap.dll</td><td>RFACTO~1.DLL|rFactorSharedMemoryMap.dll</td><td>0</td><td/><td/><td/><td>1</td><td>C:\projects\crewchief_c_sharp\CrewChiefV4\CrewChiefV4\plugins\Automobilista\Plugins\rFactorSharedMemoryMap.dll</td><td>1</td><td/></row>
 		<row><td>rfactorsharedmemorymap.dll1</td><td>rFactorSharedMemoryMap.dll1</td><td>RFACTO~1.DLL|rFactorSharedMemoryMap.dll</td><td>0</td><td/><td/><td/><td>1</td><td>C:\projects\crewchief_c_sharp\CrewChiefV4\CrewChiefV4\plugins\rFactor\Plugins\rFactorSharedMemoryMap.dll</td><td>1</td><td/></row>
+		<row><td>saved_command_macros.json</td><td>ISX_DEFAULTCOMPONENT</td><td>SAVED_~1.JSO|saved_command_macros.json</td><td>0</td><td/><td/><td/><td>1</td><td>C:\projects\crewchief_c_sharp\CrewChiefV4\CrewChiefV4\saved_command_macros.json</td><td>1</td><td/></row>
 		<row><td>shared_mem.py</td><td>ISX_DEFAULTCOMPONENT5</td><td>SHARED~1.PY|shared_mem.py</td><td>0</td><td/><td/><td/><td>1</td><td>C:\projects\crewchief_c_sharp\CrewChiefV4\CrewChiefV4\plugins\assettocorsa\apps\python\CrewChiefEx\shared_mem.py</td><td>1</td><td/></row>
 		<row><td>sharpdx_licence.txt</td><td>ISX_DEFAULTCOMPONENT</td><td>SHARPD~1.TXT|SharpDX_licence.txt</td><td>0</td><td/><td/><td/><td>1</td><td>C:\projects\crewchief_c_sharp\CrewChiefV4\SharpDX_licence.txt</td><td>1</td><td/></row>
 		<row><td>sounds_config.txt</td><td>ISX_DEFAULTCOMPONENT</td><td>SOUNDS~1.TXT|sounds_config.txt</td><td>0</td><td/><td/><td/><td>1</td><td>C:\projects\crewchief_c_sharp\CrewChiefV4\CrewChiefV4\sounds_config.txt</td><td>1</td><td/></row>
 		<row><td>speech_recognition_config.tx</td><td>ISX_DEFAULTCOMPONENT</td><td>SPEECH~1.TXT|speech_recognition_config.txt</td><td>0</td><td/><td/><td/><td>1</td><td>C:\projects\crewchief_c_sharp\CrewChiefV4\CrewChiefV4\speech_recognition_config.txt</td><td>1</td><td/></row>
 		<row><td>tracklandmarksdata.json</td><td>ISX_DEFAULTCOMPONENT</td><td>TRACKL~1.JSO|trackLandmarksData.json</td><td>0</td><td/><td/><td/><td>1</td><td>C:\projects\crewchief_c_sharp\CrewChiefV4\CrewChiefV4\trackLandmarksData.json</td><td>1</td><td/></row>
 		<row><td>ui_text.txt</td><td>ISX_DEFAULTCOMPONENT</td><td>ui_text.txt</td><td>0</td><td/><td/><td/><td>1</td><td>C:\projects\crewchief_c_sharp\CrewChiefV4\CrewChiefV4\ui_text.txt</td><td>1</td><td/></row>
-		<row><td>saved_command_macros.json</td><td>ISX_DEFAULTCOMPONENT</td><td>SAVED_~1.JSO|saved_command_macros.json</td><td>0</td><td/><td/><td/><td>1</td><td>C:\projects\crewchief_c_sharp\CrewChiefV4\CrewChiefV4\saved_command_macros.json</td><td>1</td><td/></row>
 	</table>
 
 	<table name="FileSFPCatalog">
@@ -4476,9 +4476,9 @@ RABWAEQALQA1AAEARQB4AHAAcgBlAHMAcwA=
 		<row><td>PROGMSG_IIS_ROLLBACKVROOTS</td><td>##IDS_PROGMSG_IIS_ROLLBACKVROOTS##</td><td/></row>
 		<row><td>PROGMSG_IIS_ROLLBACKWEBSERVICEEXTENSIONS</td><td>##IDS_PROGMSG_IIS_ROLLBACKWEBSERVICEEXTENSIONS##</td><td/></row>
 		<row><td>PROGRAMFILETOLAUNCHATEND</td><td>[INSTALLDIR]CrewChiefV4.Primary output</td><td/></row>
-		<row><td>ProductCode</td><td>{7AAEB59B-7CFA-453A-8837-66D69C2DFF5B}</td><td/></row>
+		<row><td>ProductCode</td><td>{BCDDED77-B465-462E-B3ED-BAF71C9B3343}</td><td/></row>
 		<row><td>ProductName</td><td>CrewChiefV4</td><td/></row>
-		<row><td>ProductVersion</td><td>4.8.0.7</td><td/></row>
+		<row><td>ProductVersion</td><td>4.8.0.8</td><td/></row>
 		<row><td>ProgressType0</td><td>install</td><td/></row>
 		<row><td>ProgressType1</td><td>Installing</td><td/></row>
 		<row><td>ProgressType2</td><td>installed</td><td/></row>

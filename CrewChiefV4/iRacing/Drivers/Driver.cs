@@ -16,7 +16,6 @@ namespace CrewChiefV4.iRacing
             this.Car = new DriverCarInfo();
             this.PitInfo = new DriverPitInfo(this);
             this.Results = new DriverResults(this);
-            this.QualyResults = new DriverQualyResults(this);
             this.Live = new DriverLiveInfo(this);
             this.Private = new DriverPrivateInfo(this);
             this.CurrentResults = new DriverSessionResults(this,0);
@@ -37,17 +36,9 @@ namespace CrewChiefV4.iRacing
         public string TeamName { get; set; }
 
         public int IRating { get; set; }
-        public License License { get; set; }
 
         public bool IsSpectator { get; set; }
         public bool IsPacecar { get; set; }
-
-        public string HelmetDesign { get; set; }
-        public string CarDesign { get; set; }
-        public string SuitDesign { get; set; }
-        public string CarNumberDesign { get; set; }
-        public string CarSponsor1 { get; set; }
-        public string CarSponsor2 { get; set; }
 
         public string ClubName { get; set; }
         public string DivisionName { get; set; }
@@ -56,7 +47,6 @@ namespace CrewChiefV4.iRacing
         public DriverPitInfo PitInfo { get; set; }
         public DriverResults Results { get; private set; }
         public DriverSessionResults CurrentResults { get; set; }
-        public DriverQualyResults QualyResults { get; set; }
         public DriverLiveInfo Live { get; private set; }
         public DriverPrivateInfo Private { get; private set; }
 
@@ -78,19 +68,8 @@ namespace CrewChiefV4.iRacing
             this.ShortName = query["AbbrevName"].GetValue();
 
             this.IRating = Parser.ParseInt(query["IRating"].GetValue());
-            var licenseLevel = Parser.ParseInt(query["LicLevel"].GetValue());
-            var licenseSublevel = Parser.ParseInt(query["LicSubLevel"].GetValue());
-            var licenseColor = Parser.ParseColor(query["LicColor"].GetValue());
-            this.License = new License(licenseLevel, licenseSublevel, licenseColor);
-
             this.IsSpectator = Parser.ParseInt(query["IsSpectator"].GetValue()) == 1;
 
-            this.HelmetDesign = query["HelmetDesignStr"].GetValue();
-            this.CarDesign = query["CarDesignStr"].GetValue();
-            this.SuitDesign = query["SuitDesignStr"].GetValue();
-            this.CarNumberDesign = query["CarNumberDesignStr"].GetValue();
-            this.CarSponsor1 = query["CarSponsor_1"].GetValue();
-            this.CarSponsor2 = query["CarSponsor_2"].GetValue();
             this.ClubName = query["ClubName"].GetValue();
             this.DivisionName = query["DivisionName"].GetValue();
             this.IsPacecar = this.Name.ToLower().Equals(PACECAR_NAME2);
@@ -109,11 +88,8 @@ namespace CrewChiefV4.iRacing
             this.Car.CarNumberRaw = Parser.ParseInt(query["CarNumberRaw"].GetValue());
             this.Car.CarName = query["CarScreenName"].GetValue();
             this.Car.CarClassId = Parser.ParseInt(query["CarClassID"].GetValue());
-            this.Car.CarClassRelSpeed = Parser.ParseInt(query["CarClassRelSpeed"].GetValue());
-            this.Car.CarClassColor = Parser.ParseColor(query["CarClassColor"].GetValue());
             this.Car.CarClassShortName = query["CarClassShortName"].GetValue();
             this.Car.CarShortName = query["CarScreenNameShort"].GetValue();
-            this.Car.CarPath = query["CarPath"].GetValue();
 
             this.IsPacecar = this.CustId == -1 || this.Car.CarName.ToLower().Equals(PACECAR_NAME);
         }
@@ -140,11 +116,6 @@ namespace CrewChiefV4.iRacing
         {
             this.Results.SetResults(sessionNumber, query, position);
             this.CurrentResults = this.Results.Current;
-        }
-
-        internal void UpdateQualyResultsInfo(YamlQuery query, int position)
-        {
-            this.QualyResults.ParseYaml(query, position);
         }
 
         internal void UpdateLiveInfo(iRacingData e)
@@ -184,7 +155,7 @@ namespace CrewChiefV4.iRacing
                 if (p0 - p1 > 0.5) // more than 50% jump in track distance == lap crossing occurred from 0.99xx -> 0.00x
                 {
                     this.Live.CurrentSector = 0;
-                    this.Live.CurrentFakeSector = 0;
+                    this.Live.CurrentFakeSector = 1;
                     p0 -= 1;
                 }
                     
@@ -204,17 +175,17 @@ namespace CrewChiefV4.iRacing
                         if (s.Number == 0 && sector != null && sector.EnterSessionTime > 0 && results.FakeSector1.EnterSessionTime > 0)
                         {
 
-                          this.Live.LastLaptime = (float)(crossTime - results.FakeSector1.EnterSessionTime);
+                            this.Live.LastLaptime = (float)(crossTime - results.FakeSector1.EnterSessionTime);
 
                         }
                         if (sector != null && sector.EnterSessionTime > 0)
                         {
-                            sector.SectorTime = new Laptime((float)(crossTime - sector.EnterSessionTime));
+                            sector.SectorTime = (float)(crossTime - sector.EnterSessionTime);
                         }
 
                         // Begin next sector
                         s.EnterSessionTime = crossTime;                        
-                        this.Live.CurrentFakeSector = s.Number;
+                        this.Live.CurrentFakeSector = s.Number + 1;
 
                         break;
                     }
