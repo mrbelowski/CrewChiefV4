@@ -608,6 +608,8 @@ namespace CrewChiefV4.GameState
 
         public DeltaTime DeltaTime = null;
 
+        public bool IsAtPitExit = false;
+
         public override string ToString()
         {
             return DriverRawName;
@@ -1621,8 +1623,14 @@ namespace CrewChiefV4.GameState
         public int lapsCompleted = -1;
         public float trackLength = 0;
         public DeltaTime()
-        {
+        {            
             this.deltaPoints = new Dictionary<float, DateTime>();
+            this.currentDeltaPoint = -1;
+            this.nextDeltaPoint = -1;
+            this.distanceRoundTrackOnCurrentLap = -1;
+            this.totalDistanceTravelled = -1;
+            this.lapsCompleted = -1;
+            this.trackLength = 0;
         }
         public DeltaTime(float trackLength, float distanceRoundTrackOnCurrentLap, DateTime now, float spacing = 20f)
         {
@@ -1630,7 +1638,6 @@ namespace CrewChiefV4.GameState
             this.totalDistanceTravelled = distanceRoundTrackOnCurrentLap;
             this.deltaPoints = new Dictionary<float, DateTime>();
             this.trackLength = trackLength;
-            //deltaPoints.Clear();
             float totalSpacing = 0;
             while (totalSpacing < trackLength)
             {
@@ -1655,17 +1662,9 @@ namespace CrewChiefV4.GameState
             this.distanceRoundTrackOnCurrentLap = distanceRoundTrackOnCurrentLap;
             this.lapsCompleted = lapsCompleted;
             this.totalDistanceTravelled = (lapsCompleted * this.trackLength) + distanceRoundTrackOnCurrentLap;
-            foreach (KeyValuePair<float, DateTime> gap in deltaPoints)
-            {
-                if (gap.Key >= distanceRoundTrackOnCurrentLap)
-                {
-                    if (currentDeltaPoint != gap.Key)
-                    {
-                        nextDeltaPoint = gap.Key;
-                    }
-                    break;
-                }
-            }
+
+            nextDeltaPoint = deltaPoints.FirstOrDefault(d => d.Key >= distanceRoundTrackOnCurrentLap).Key;
+
             if (currentDeltaPoint != nextDeltaPoint || speed < 5)
             {
                 deltaPoints[nextDeltaPoint] = now;

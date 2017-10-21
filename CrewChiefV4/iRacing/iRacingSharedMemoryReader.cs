@@ -10,7 +10,7 @@ namespace CrewChiefV4.iRacing
     public class iRacingSharedMemoryReader : GameDataReader
     {
 
-        iRacingSDK sdk = new iRacingSDK();
+        iRacingSDK sdk = null;
         Sim sim = new Sim();
         private Boolean initialised = false;
         private List<iRacingStructDumpWrapper> dataToDump;
@@ -20,10 +20,9 @@ namespace CrewChiefV4.iRacing
         int lastUpdate = -1;
         private int _DriverId = -1;
         public int DriverId { get { return _DriverId; } }
-        public string sessionInfoString;
         public object GetData(string headerName)
         {
-            if (!sdk.IsConnected()) 
+            if (!sdk.IsConnected())
                 return null;
 
             return sdk.GetData(headerName);
@@ -50,7 +49,6 @@ namespace CrewChiefV4.iRacing
         public class iRacingStructDumpWrapper
         {
             public long ticksWhenRead;
-            public string rawSessionData;
             public iRacingData data;
 
 
@@ -80,12 +78,12 @@ namespace CrewChiefV4.iRacing
             if (dataReadFromFile != null && dataReadFromFile.Length > dataReadFromFileIndex)
             {
                 iRacingStructDumpWrapper structDumpWrapperData = dataReadFromFile[dataReadFromFileIndex];
-                if(structDumpWrapperData.rawSessionData.Length > 0)
+                if (!structDumpWrapperData.data.SessionInfo.Equals(""))
                 {
-                    SessionInfo sessionInfo = new SessionInfo(structDumpWrapperData.rawSessionData, (double)structDumpWrapperData.data.SessionTime);
+                    SessionInfo sessionInfo = new SessionInfo(structDumpWrapperData.data.SessionInfo, (double)structDumpWrapperData.data.SessionTime);
                     sim.SdkOnSessionInfoUpdated(sessionInfo, structDumpWrapperData.data.SessionNum, structDumpWrapperData.data.PlayerCarIdx);
                 }
-                sim.SdkOnTelemetryUpdated(structDumpWrapperData.data);  
+                sim.SdkOnTelemetryUpdated(structDumpWrapperData.data);
                 iRacingStructWrapper structWrapperData = new iRacingStructWrapper() { data = sim, ticksWhenRead = structDumpWrapperData.ticksWhenRead };
                 dataReadFromFileIndex++;
 
@@ -109,9 +107,13 @@ namespace CrewChiefV4.iRacing
                 {
                     try
                     {
+                        if (sdk == null)
+                        {
+                            sdk = new iRacingSDK();
+                        }
                         sdk.Shutdown();
 
-                        if(!sdk.IsInitialized)
+                        if (!sdk.IsInitialized)
                         {
                             sdk.Startup();
                         }
@@ -136,7 +138,7 @@ namespace CrewChiefV4.iRacing
                                 _DriverId = (int)sdk.GetData("PlayerCarIdx");
                             }
                             Console.WriteLine("Initialised iRacing shared memory");
-                        } 
+                        }
                     }
                     catch (Exception)
                     {
@@ -146,7 +148,7 @@ namespace CrewChiefV4.iRacing
                 return initialised;
             }
         }
-        
+
         public override Object ReadGameData(Boolean forSpotter)
         {
             lock (this)
@@ -165,40 +167,34 @@ namespace CrewChiefV4.iRacing
                     iRacingStructWrapper structWrapper = new iRacingStructWrapper();
                     structWrapper.ticksWhenRead = DateTime.Now.Ticks;
 
-                    
-                    if(forSpotter)
+
+                    if (forSpotter)
                     {
                         var carLeftRight = (int)sdk.GetData("CarLeftRight");
                         return carLeftRight;
                     }
 
                     int newUpdate = sdk.Header.SessionInfoUpdate;
-                    bool hasNewSessionInfo = false;
                     if (newUpdate != lastUpdate)
                     {
 
                         var time = sdk.GetData("SessionTime");
-                        if(time != null)
+                        if (time != null)
                         {
                             // Get the session info string
-                            sessionInfoString = (string)sdk.GetSessionInfo();
-                            SessionInfo sessionInfo = new SessionInfo(sessionInfoString, (double)time);
+                            SessionInfo sessionInfo = new SessionInfo(sdk.GetSessionInfo(), (double)time);
                             // Raise the SessionInfoUpdated event and pass along the session info and session time.
-                            sim.SdkOnSessionInfoUpdated(sessionInfo, (int)TryGetSessionNum(),DriverId);
+                            sim.SdkOnSessionInfoUpdated(sessionInfo, (int)TryGetSessionNum(), DriverId);
                             lastUpdate = newUpdate;
-                            hasNewSessionInfo = true;
                         }
                     }
-                    sim.SdkOnTelemetryUpdated(new iRacingData(sdk));                   
-                    structWrapper.data = sim;                
+                    iRacingData irData = new iRacingData(sdk, dumpToFile);
+
+                    sim.SdkOnTelemetryUpdated(irData);
+                    structWrapper.data = sim;
                     if (!forSpotter && dumpToFile && dataToDump != null)
                     {
-                        string sessionStr ="";
-                        if (hasNewSessionInfo)
-                        {
-                            sessionStr = sessionInfoString;
-                        }
-                        dataToDump.Add(new iRacingStructDumpWrapper() { ticksWhenRead = structWrapper.ticksWhenRead, data = new iRacingData(sdk), rawSessionData = sessionStr });
+                        dataToDump.Add(new iRacingStructDumpWrapper() { ticksWhenRead = structWrapper.ticksWhenRead, data = irData });
                     }
                     return structWrapper;
                 }
@@ -216,12 +212,20 @@ namespace CrewChiefV4.iRacing
         {
             lock (this)
             {
+                if (sdk != null)
+                {
+                    sdk.Shutdown();
+                    sdk = null;
+                }
                 sim.Reset();
-                sdk.Shutdown();
-                initialised = false;
-                Console.WriteLine("Disconnected from iRacing Shared Memory");
+                if (initialised)
+                {
+                    initialised = false;
+                    Console.WriteLine("Disconnected from iRacing Shared Memory");
+                }
+
             }
-            
+
         }
     }
 }

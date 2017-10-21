@@ -7,8 +7,6 @@ namespace CrewChiefV4.iRacing
     {
         public SessionData()
         {
-            this.ClassBestLaps = new Dictionary<int, BestLap>();
-            this.OverallBestLap = new BestLap(new Laptime(int.MaxValue), new Driver());
 
         }
 
@@ -31,8 +29,7 @@ namespace CrewChiefV4.iRacing
         public double RaceTime { get; set; }
 
 
-        public Dictionary<int, BestLap> ClassBestLaps { get; set; }
-        public BestLap OverallBestLap { get; set; }
+
 
         public SessionFlags Flags { get; set; }
         public SessionStates State { get; set; }
@@ -84,42 +81,6 @@ namespace CrewChiefV4.iRacing
             this.State = state;
             this.IsFinished = state == SessionStates.CoolDown;
             this.IsCheckered = (state == SessionStates.CoolDown || state == SessionStates.Checkered);
-        }
-
-        public BestLap UpdateFastestLap(Driver driver)
-        {
-            return UpdateFastestLap(new Laptime(driver.Live.LastLaptime), driver);
-        }
-
-        public BestLap UpdateFastestLap(Laptime lap, Driver driver)
-        {                       
-            var classId = driver.Car.CarClassId;
-            if (!this.ClassBestLaps.ContainsKey(classId))
-            {
-                this.ClassBestLaps.Add(classId, BestLap.Default);
-            }
-            if (this.OverallBestLap == null)
-            {
-                
-                var DefaultLap = new Laptime(int.MaxValue);
-                DefaultLap.LapNumber = 0;
-                this.OverallBestLap = new BestLap(DefaultLap, driver);
-            }
-
-
-            if (lap.Value > 0 && this.ClassBestLaps[classId].Laptime.Value > lap.Value)
-            {
-                var bestlap = new BestLap(lap, driver);
-                this.ClassBestLaps[classId] = bestlap;
-
-                this.OverallBestLap =
-                    this.ClassBestLaps.Values.Where(l => l.Laptime.Value > 0)
-                        .OrderBy(l => l.Laptime.Value)
-                        .FirstOrDefault();
-
-                return bestlap;
-            }
-            return new BestLap(new Laptime(int.MaxValue), new Driver());
         }
 
         public bool IsLimitedSessionLaps
