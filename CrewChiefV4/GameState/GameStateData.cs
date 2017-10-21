@@ -525,7 +525,9 @@ namespace CrewChiefV4.GameState
         // distance (m) from the start line (around the track)
         public Single DistanceRoundTrack = 0;
 
-        // other stuff like X/Y/Z co-ordinates, acceleration, orientation, ...
+        public float[] WorldPosition;
+
+        // other stuff: acceleration, orientation, ...
     }
     
     public class OpponentData
