@@ -28,7 +28,7 @@ namespace CrewChiefV4.commands
                 if (CrewChief.gameDefinition.gameEnum.ToString().Equals(commandSet.gameDefinition) &&
                     assignmentsByGame.ContainsKey(commandSet.gameDefinition))
                 {
-                    foreach (KeyPresser.KeyCode keyCode in commandSet.getKeyCodes(assignmentsByGame[commandSet.gameDefinition]))
+                    foreach (KeyPresser.KeyCode keyCode in commandSet.getKeyCodes(true, assignmentsByGame[commandSet.gameDefinition]))
                     {
                         KeyPresser.SendScanCodeKeyPress(keyCode, commandSet.keyPressTime);
                         Thread.Sleep(commandSet.waitBetweenEachCommand);
@@ -84,7 +84,7 @@ namespace CrewChiefV4.commands
 
         private List<KeyPresser.KeyCode> codes = null;
 
-        public List<KeyPresser.KeyCode> getKeyCodes(KeyBinding[] keyBindings)
+        public List<KeyPresser.KeyCode> getKeyCodes(Boolean writeToConsole, KeyBinding[] keyBindings)
         {
             if (this.codes == null)
             {
@@ -107,6 +107,11 @@ namespace CrewChiefV4.commands
                         Console.WriteLine("Action " + action + " not recognised");
                     }
                 }
+            }
+            if (writeToConsole)
+            {
+                Console.WriteLine("Sending actions " + String.Join(", ", actionSequence));
+                Console.WriteLine("Pressing keys " + String.Join(", ", codes));
             }
             return codes;
         }
