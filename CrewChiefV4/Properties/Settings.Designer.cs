@@ -2350,21 +2350,19 @@ namespace CrewChiefV4.Properties {
                 this["launch_pcars2"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool enable_rf2_frozen_order_messages
-        {
-            get
-            {
+        public bool enable_rf2_frozen_order_messages {
+            get {
                 return ((bool)(this["enable_rf2_frozen_order_messages"]));
             }
-            set
-            {
+            set {
                 this["enable_rf2_frozen_order_messages"] = value;
             }
         }
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
@@ -2398,7 +2396,30 @@ namespace CrewChiefV4.Properties {
             }
             set {
                 this["launch_iracing"] = value;
-
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool enable_rf2_cut_track_heuristics {
+            get {
+                return ((bool)(this["enable_rf2_cut_track_heuristics"]));
+            }
+            set {
+                this["enable_rf2_cut_track_heuristics"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool enable_rf2_pit_lane_approach_heuristics {
+            get {
+                return ((bool)(this["enable_rf2_pit_lane_approach_heuristics"]));
+            }
+            set {
+                this["enable_rf2_pit_lane_approach_heuristics"] = value;
             }
         }
     }
