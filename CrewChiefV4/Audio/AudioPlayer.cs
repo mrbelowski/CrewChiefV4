@@ -390,6 +390,7 @@ namespace CrewChiefV4.Audio
                     {
                         initialiseBackgroundPlayer();
                     }
+                    backgroundPlayer.Volume = 0.0;
                     backgroundPlayer.Open(new System.Uri(path, System.UriKind.Absolute));
                 }, null);
             }
@@ -408,7 +409,9 @@ namespace CrewChiefV4.Audio
                 {
                     backgroundPlayer = new MediaPlayer();
                     backgroundPlayer.MediaEnded += new EventHandler(backgroundPlayer_MediaEnded);
-                    backgroundPlayer.Volume = getBackgroundVolume();
+
+                    // Start background player mute, as otherwise it causes some noise (sounds like some buffers flushed).
+                    backgroundPlayer.Volume = 0.0;
                     backgroundPlayerInitialised = true;
                     setBackgroundSound(dtmPitWindowClosedBackground);
                 }
@@ -425,6 +428,7 @@ namespace CrewChiefV4.Audio
                 try
                 {
                     backgroundPlayer.Stop();
+                    backgroundPlayer.Volume = 0.0;
                 }
                 catch (Exception) { }
                 backgroundPlayerInitialised = false;
@@ -858,6 +862,9 @@ namespace CrewChiefV4.Audio
                         }
                         //Console.WriteLine("Background offset = " + backgroundOffset);
                         backgroundPlayer.Position = TimeSpan.FromSeconds(backgroundOffset);
+
+                        // Restore the desired volume.
+                        backgroundPlayer.Volume = getBackgroundVolume();
                         backgroundPlayer.Play();
                     }, null);
                 }

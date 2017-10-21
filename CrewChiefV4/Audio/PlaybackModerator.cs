@@ -152,7 +152,9 @@ namespace CrewChiefV4.Audio
 
         public static bool ShouldPlaySound(SingleSound sound)
         {
-            if (rejectMessagesWhenTalking && SpeechRecogniser.waitingForSpeech)
+            if (rejectMessagesWhenTalking 
+                && SpeechRecogniser.waitingForSpeech 
+                && MainWindow.voiceOption != MainWindow.VoiceOptionEnum.ALWAYS_ON)
             {
                 PlaybackModerator.Trace(string.Format("Sound {0} rejected because we're in the middle of a voice command", sound.fullPath));
                 return false;
