@@ -59,7 +59,7 @@ namespace CrewChiefV4
 
         private TimeSpan buttonCheckInterval = TimeSpan.FromMilliseconds(100);
 
-        private VoiceOptionEnum voiceOption;
+        public static VoiceOptionEnum voiceOption;
 
         // the new update stuff all hosted on the CrewChief website
         // this is the physical file:
