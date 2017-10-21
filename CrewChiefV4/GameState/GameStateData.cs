@@ -1452,6 +1452,8 @@ namespace CrewChiefV4.GameState
         public Boolean IsPitCrewDone = false;
 
         public Boolean IsPitCrewReady = false;
+
+        public float PitSpeedLimit = -1.0f;
     }
 
     public class PenatiesData
