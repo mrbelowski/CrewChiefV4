@@ -1,59 +1,114 @@
 ﻿using CrewChiefV4.Audio;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace CrewChiefV4.commands
 {
     class MacroManager
     {
-        // initialise some static test hack to see if this shit hangs together. This is called immediately after initialising 
-        // the speech recogniser in MainWindow.
+        // This is called immediately after initialising the speech recogniser in MainWindow
         public static void initialise(AudioPlayer audioPlayer, SpeechRecogniser speechRecogniser)
         {
-            Dictionary<string, CommandMacro> voiceTriggeredMacros = new Dictionary<string, CommandMacro>();
+            // load the json:
+            MacroContainer macroContainer = loadCommands(getUserMacrosFileLocation());
 
-            // quick n dirty hard-coded macros to test R3E integration. Assume R3E pit menu assignments are:
-            // Q: open / close menu
-            // WASD: up / down / left / right
-            // E: select
-            MacroItem[] r3emakeOrCancelPitRequest = new MacroItem[] { 
-                new MacroItem(CrewChiefV4.commands.KeyPresser.KeyCode.KEY_Q),
-                new MacroItem(100),
-                new MacroItem(CrewChiefV4.commands.KeyPresser.KeyCode.KEY_W),
-                new MacroItem(100),
-                new MacroItem(CrewChiefV4.commands.KeyPresser.KeyCode.KEY_E),
-                new MacroItem(100),
-                new MacroItem(CrewChiefV4.commands.KeyPresser.KeyCode.KEY_Q)
-            };
+            // get the assignments by game:
+            Dictionary<String, KeyBinding[]> assignmentsByGame = new Dictionary<String, KeyBinding[]>();
+            foreach (Assignment assignment in macroContainer.assignments)
+            {
+                if (!assignmentsByGame.ContainsKey(assignment.gameDefinition))
+                {
+                    assignmentsByGame.Add(assignment.gameDefinition, assignment.keyBindings);
+                }
+            }
 
-            MacroItem[] r3eSelectNextPitPreset = new MacroItem[] { 
-                new MacroItem(CrewChiefV4.commands.KeyPresser.KeyCode.KEY_Q),
-                new MacroItem(100),
-                new MacroItem(CrewChiefV4.commands.KeyPresser.KeyCode.KEY_D),
-                new MacroItem(100),
-                new MacroItem(CrewChiefV4.commands.KeyPresser.KeyCode.KEY_Q)
-            };
-
-            MacroItem[] r3eSelectPreviousPitPreset = new MacroItem[] { 
-                new MacroItem(CrewChiefV4.commands.KeyPresser.KeyCode.KEY_Q),
-                new MacroItem(100),
-                new MacroItem(CrewChiefV4.commands.KeyPresser.KeyCode.KEY_A),
-                new MacroItem(100),
-                new MacroItem(CrewChiefV4.commands.KeyPresser.KeyCode.KEY_Q)
-            };
-
-            MacroItem[] r3eConfirmPitActions = new MacroItem[] { 
-                new MacroItem(CrewChiefV4.commands.KeyPresser.KeyCode.KEY_E)
-            };
-
-            voiceTriggeredMacros.Add("PIT_REQUEST", new CommandMacro(audioPlayer, AudioPlayer.folderAcknowlegeOK, r3emakeOrCancelPitRequest));
-            voiceTriggeredMacros.Add("NEXT_PIT_PRESET", new CommandMacro(audioPlayer, AudioPlayer.folderAcknowlegeOK, r3eSelectNextPitPreset));
-            voiceTriggeredMacros.Add("PREVIOUS_PIT_PRESET", new CommandMacro(audioPlayer, AudioPlayer.folderAcknowlegeOK, r3eSelectPreviousPitPreset));
-            voiceTriggeredMacros.Add("CONFIRM_PIT_ACTIONS", new CommandMacro(audioPlayer, AudioPlayer.folderAcknowlegeOK, r3eConfirmPitActions));
+            // now load them into the speech recogniser
+            Dictionary<string, ExecutableCommandMacro> voiceTriggeredMacros = new Dictionary<string, ExecutableCommandMacro>();
+            foreach (Macro macro in macroContainer.macros)
+            {
+                if (macro.voiceTriggers != null && macro.voiceTriggers.Length > 0)
+                {
+                    ExecutableCommandMacro commandMacro = new ExecutableCommandMacro(audioPlayer, macro, assignmentsByGame);
+                    foreach (String voiceTrigger in macro.voiceTriggers)
+                    {
+                        voiceTriggeredMacros.Add(voiceTrigger, commandMacro);
+                    }
+                }
+                // now eagerly load the key bindings for each macro:
+                foreach (CommandSet commandSet in macro.commandSets)
+                {
+                    // this does the conversion from key characters to key enums and stores the result to save us doing it every time
+                    commandSet.getKeyCodes(assignmentsByGame[commandSet.gameDefinition]);
+                }
+            }
             speechRecogniser.loadMacroVoiceTriggers(voiceTriggeredMacros);
+        }
+
+        // file loading boilerplate - needs refactoring
+        private static MacroContainer loadCommands(String filename)
+        {
+            if (filename != null)
+            {
+                try
+                {
+                    return JsonConvert.DeserializeObject<MacroContainer>(getFileContents(filename));
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Error pasing " + filename + ": " + e.Message);
+                }
+            }
+            return new MacroContainer();
+        }
+
+        private static String getFileContents(String fullFilePath)
+        {
+            StringBuilder jsonString = new StringBuilder();
+            StreamReader file = null;
+            try
+            {
+                file = new StreamReader(fullFilePath);
+                String line;
+                while ((line = file.ReadLine()) != null)
+                {
+                    if (!line.Trim().StartsWith("#"))
+                    {
+                        jsonString.AppendLine(line);
+                    }
+                }
+                return jsonString.ToString();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error reading file " + fullFilePath + ": " + e.Message);
+            }
+            finally
+            {
+                if (file != null)
+                {
+                    file.Close();
+                }
+            }
+            return null;
+        }
+
+        private static String getUserMacrosFileLocation()
+        {
+            String path = System.IO.Path.Combine(Environment.GetFolderPath(
+                Environment.SpecialFolder.MyDocuments), "CrewChiefV4", "saved_command_macros.json");
+
+            if (File.Exists(path))
+            {
+                return path;
+            }
+            else
+            {
+                return Configuration.getDefaultFileLocation("saved_command_macros.json");
+            }
         }
     }
 }

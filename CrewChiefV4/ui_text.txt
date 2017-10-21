@@ -371,8 +371,8 @@ enable_delayed_responses = Enable delayed responses
 enable_delayed_responses_help = Some voice commands will trigger a "stand by" response, followed some time later by the requested into
 enable_console_logging = Enable console logging
 enable_console_logging_help = Uncheck this to prevent console window messages being shown. Reduces the CPU load of the app
-log_tyre_temps = Log tyre temps
-log_tyre_temps_help = Show tyre temps at the start of each sector
+log_tyre_stats = Log tyre stats
+log_tyre_stats_help = Show tyre temps and wear at the start of each sector
 
 r3e_blue_flag_detection_distance = R3E blue flag detection distance
 r3e_blue_flag_detection_distance_help = Max distance (metres) for R3E blue flag trigger

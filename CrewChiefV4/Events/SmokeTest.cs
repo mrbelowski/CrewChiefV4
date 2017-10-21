@@ -120,8 +120,6 @@ namespace CrewChiefV4.Events
                 audioPlayer.playSpotterMessage(new QueuedMessage(SMOKE_TEST_SPOTTER, MessageContents(NoisyCartesianCoordinateSpotter.folderSpotterRadioCheck), 0, this), false);
             }
 
-            // audioPlayer.playMessage(new QueuedMessage("frozen_order/follow_driver", MessageContents(FrozenOrderMonitor.folderFollow, "britton", FrozenOrderMonitor.folderInTheRightColumn), 0, this));
-
             //PlaybackModerator.SetTracing(true /*enabled*/);
             //this.BeepOutInTest();
 

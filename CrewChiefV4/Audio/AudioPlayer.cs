@@ -10,6 +10,7 @@ using System.Windows.Media;
 using System.Collections.Specialized;
 using CrewChiefV4.GameState;
 using System.Collections;
+using System.Runtime.Remoting.Contexts;
 
 namespace CrewChiefV4.Audio
 {
@@ -74,8 +75,9 @@ namespace CrewChiefV4.Audio
         private OrderedDictionary queuedClips = new OrderedDictionary();
 
         private OrderedDictionary immediateClips = new OrderedDictionary();
-        
-        MediaPlayer backgroundPlayer;
+
+        // All access should be via UI thread.
+        private MediaPlayer backgroundPlayer;
 
         public static String soundFilesPath;
 
@@ -86,11 +88,6 @@ namespace CrewChiefV4.Audio
         public static String dtmPitWindowOpenBackground = "dtm_pit_window_open.wav";
 
         public static String dtmPitWindowClosedBackground = "dtm_pit_window_closed.wav";
-
-        // only the monitor Thread can request a reload of the background wav file, so
-        // the events thread will have to set these variables to ask for a reload
-        private Boolean loadNewBackground = false;
-        private String backgroundToLoad;
 
         private PearlsOfWisdom pearlsOfWisdom = new PearlsOfWisdom();
 
@@ -119,8 +116,12 @@ namespace CrewChiefV4.Audio
 
         public String selectedPersonalisation = NO_PERSONALISATION_SELECTED;
 
+        private SynchronizationContext mainThreadContext = null; 
+
         public AudioPlayer()
         {
+            this.mainThreadContext = SynchronizationContext.Current;
+
             String soundPackLocationOverride = UserSettings.GetUserSettings().getString("override_default_sound_pack_location");
             String defaultSoundFilesPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\CrewChiefV4\sounds";
             DirectoryInfo defaultSoundDirectory = new DirectoryInfo(defaultSoundFilesPath);
@@ -191,6 +192,9 @@ namespace CrewChiefV4.Audio
         {
             DirectoryInfo soundDirectory = new DirectoryInfo(soundFilesPath);
             backgroundFilesPath = Path.Combine(soundFilesPath, "background_sounds");
+
+            initialiseBackgroundPlayer();
+
             if (!soundDirectory.Exists)
             {
                 Console.WriteLine("Unable to find sound directory " + soundDirectory.FullName);
@@ -376,25 +380,47 @@ namespace CrewChiefV4.Audio
 
         public void setBackgroundSound(String backgroundSoundName)
         {
-            backgroundToLoad = backgroundSoundName;
-            loadNewBackground = true;
+            if (getBackgroundVolume() > 0 && !mute)
+            {
+                this.mainThreadContext.Send(delegate
+                {
+                    Console.WriteLine("Setting background sounds file to  " + backgroundSoundName);
+                    String path = Path.Combine(backgroundFilesPath, backgroundSoundName);
+                    if (!backgroundPlayerInitialised)
+                    {
+                        initialiseBackgroundPlayer();
+                    }
+                    backgroundPlayer.Open(new System.Uri(path, System.UriKind.Absolute));
+                }, null);
+            }
         }
 
         private void initialiseBackgroundPlayer()
         {
-            if (!backgroundPlayerInitialised && getBackgroundVolume() > 0)
+            if (backgroundPlayer != null 
+                && backgroundPlayerInitialised
+                && getBackgroundVolume() > 0)
+                return;
+
+            this.mainThreadContext.Send(delegate
             {
-                backgroundPlayer = new MediaPlayer();
-                backgroundPlayer.MediaEnded += new EventHandler(backgroundPlayer_MediaEnded);
-                backgroundPlayer.Volume = getBackgroundVolume();
-                setBackgroundSound(dtmPitWindowClosedBackground);
-                backgroundPlayerInitialised = true;
-            }
+                if (!backgroundPlayerInitialised && getBackgroundVolume() > 0)
+                {
+                    backgroundPlayer = new MediaPlayer();
+                    backgroundPlayer.MediaEnded += new EventHandler(backgroundPlayer_MediaEnded);
+                    backgroundPlayer.Volume = getBackgroundVolume();
+                    backgroundPlayerInitialised = true;
+                    setBackgroundSound(dtmPitWindowClosedBackground);
+                }
+            }, null);
         }
 
         private void stopBackgroundPlayer()
         {
-            if (backgroundPlayer != null && backgroundPlayerInitialised)
+            if (backgroundPlayer == null || !backgroundPlayerInitialised)
+                return;
+
+            this.mainThreadContext.Send(delegate
             {
                 try
                 {
@@ -403,7 +429,21 @@ namespace CrewChiefV4.Audio
                 catch (Exception) { }
                 backgroundPlayerInitialised = false;
                 backgroundPlayer = null;
-            }
+            }, null);
+        }
+
+        public void muteBackgroundPlayer(bool doMute)
+        {
+            if (backgroundPlayer == null || !backgroundPlayerInitialised)
+                return;
+
+            this.mainThreadContext.Send(delegate
+            {
+                if (doMute && !backgroundPlayer.IsMuted)
+                    backgroundPlayer.IsMuted = true;
+                else if (!doMute && backgroundPlayer.IsMuted)
+                    backgroundPlayer.IsMuted = false;
+            }, null);
         }
 
         private void monitorQueue()
@@ -512,8 +552,6 @@ namespace CrewChiefV4.Audio
             playedMessagesCount.Clear();
             stopBackgroundPlayer();
         }
-
-        private bool lastAddedKeyWasSpotter = false;
 
         private void playQueueContents(OrderedDictionary queueToPlay, Boolean isImmediateMessages)
         {
@@ -799,40 +837,29 @@ namespace CrewChiefV4.Audio
             if (!channelOpen)
             {
                 channelOpen = true;
-                if (getBackgroundVolume() > 0 && loadNewBackground && backgroundToLoad != null && !mute)
-                {
-                    Console.WriteLine("Setting background sounds file to  " + backgroundToLoad);
-                    String path = Path.Combine(backgroundFilesPath, backgroundToLoad);
-                    if (!backgroundPlayerInitialised)
-                    {
-                        initialiseBackgroundPlayer();
-                    }
-                    backgroundPlayer.Volume = getBackgroundVolume();
-                    backgroundPlayer.Open(new System.Uri(path, System.UriKind.Absolute));
-                    loadNewBackground = false;
-                }
-
-                // this looks like we're doing it the wrong way round but there's a short
-                // delay playing the event sound, so if we kick off the background before the bleep
                 if (getBackgroundVolume() > 0)
                 {
-                    if (!backgroundPlayerInitialised)
+                    this.mainThreadContext.Send(delegate
                     {
-                        initialiseBackgroundPlayer();
-                    }
-                    backgroundPlayer.Volume = getBackgroundVolume();
-                    int backgroundDuration = 0;
-                    int backgroundOffset = 0;
-                    if (backgroundPlayer.NaturalDuration.HasTimeSpan)
-                    {
-                        backgroundDuration = (backgroundPlayer.NaturalDuration.TimeSpan.Minutes * 60) +
-                            backgroundPlayer.NaturalDuration.TimeSpan.Seconds;
-                        //Console.WriteLine("Duration from file is " + backgroundDuration);
-                        backgroundOffset = random.Next(0, backgroundDuration - backgroundLeadout);
-                    }
-                    //Console.WriteLine("Background offset = " + backgroundOffset);
-                    backgroundPlayer.Position = TimeSpan.FromSeconds(backgroundOffset);
-                    backgroundPlayer.Play();
+                        // this looks like we're doing it the wrong way round but there's a short
+                        // delay playing the event sound, so if we kick off the background before the bleep
+                        if (!backgroundPlayerInitialised)
+                        {
+                            initialiseBackgroundPlayer();
+                        }
+                        int backgroundDuration = 0;
+                        int backgroundOffset = 0;
+                        if (backgroundPlayer.NaturalDuration.HasTimeSpan)
+                        {
+                            backgroundDuration = (backgroundPlayer.NaturalDuration.TimeSpan.Minutes * 60) +
+                                backgroundPlayer.NaturalDuration.TimeSpan.Seconds;
+                            //Console.WriteLine("Duration from file is " + backgroundDuration);
+                            backgroundOffset = random.Next(0, backgroundDuration - backgroundLeadout);
+                        }
+                        //Console.WriteLine("Background offset = " + backgroundOffset);
+                        backgroundPlayer.Position = TimeSpan.FromSeconds(backgroundOffset);
+                        backgroundPlayer.Play();
+                    }, null);
                 }
 
                 if (useShortBeepWhenOpeningChannel)
@@ -853,20 +880,26 @@ namespace CrewChiefV4.Audio
                 playEndSpeakingBeep();
                 if (getBackgroundVolume() > 0 && !mute)
                 {
-                    if (!backgroundPlayerInitialised)
+                    this.mainThreadContext.Send(delegate
                     {
-                        initialiseBackgroundPlayer();
-                    }
-                    try
-                    {
-                        backgroundPlayer.Stop();
-                    }
-                    catch (Exception)
-                    {
-                        Console.WriteLine("Unable to stop background player");
-                    }
-                }                
-                soundCache.ExpireCachedSounds();
+                        if (!backgroundPlayerInitialised)
+                        {
+                            initialiseBackgroundPlayer();
+                        }
+                        try
+                        {
+                            backgroundPlayer.Stop();
+                        }
+                        catch (Exception)
+                        {
+                            Console.WriteLine("Unable to stop background player");
+                        }
+                    }, null);
+                }
+                if (soundCache != null)
+                {
+                    soundCache.ExpireCachedSounds();
+                }
             }
             useShortBeepWhenOpeningChannel = false;
             channelOpen = false;
@@ -1088,8 +1121,11 @@ namespace CrewChiefV4.Audio
 
         private void backgroundPlayer_MediaEnded(object sender, EventArgs e)
         {
-            Console.WriteLine("looping...");
-            backgroundPlayer.Position = TimeSpan.FromMilliseconds(1);
+            this.mainThreadContext.Send(delegate
+            {
+                Console.WriteLine("looping...");
+                backgroundPlayer.Position = TimeSpan.FromMilliseconds(1);
+            }, null);
         }
 
         // checks that another pearl isn't already queued. If one of the same type is already

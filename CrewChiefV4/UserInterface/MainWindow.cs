@@ -806,7 +806,6 @@ namespace CrewChiefV4
             Boolean channelOpen = false;
             if (crewChief.speechRecogniser != null && crewChief.speechRecogniser.initialised && voiceOption == VoiceOptionEnum.HOLD)
             {
-                double bgVolume = 0.0;
                 Console.WriteLine("Running speech recognition in 'hold button' mode");
                 crewChief.speechRecogniser.voiceOptionEnum = VoiceOptionEnum.HOLD;
                 while (runListenForChannelOpenThread)
@@ -815,7 +814,11 @@ namespace CrewChiefV4
                     if (!channelOpen && controllerConfiguration.isChannelOpen())
                     {
                         channelOpen = true;
+
                         crewChief.audioPlayer.playStartListeningBeep();
+                        if (rejectMessagesWhenTalking)
+                            crewChief.audioPlayer.muteBackgroundPlayer(true /*mute*/);
+
                         crewChief.speechRecogniser.recognizeAsync();
                         Console.WriteLine("Listening...");
 
@@ -825,7 +828,13 @@ namespace CrewChiefV4
                     else if (channelOpen && !controllerConfiguration.isChannelOpen())
                     {
                         if (rejectMessagesWhenTalking)
+                        {
+                            // Drop any outstanding messages queued while user was talking, this should prevent weird half phrases.
+                            crewChief.audioPlayer.purgeQueues();
+
                             setMessagesVolume(currentVolume);
+                            crewChief.audioPlayer.muteBackgroundPlayer(false /*mute*/);
+                        }
 
                         Console.WriteLine("Stopping listening...");
                         crewChief.speechRecogniser.recognizeAsyncCancel();

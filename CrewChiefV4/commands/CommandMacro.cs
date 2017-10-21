@@ -4,60 +4,118 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace CrewChiefV4.commands
 {
-    public class CommandMacro
+    // wrapper that actually runs the macro
+    public class ExecutableCommandMacro
     {
         AudioPlayer audioPlayer;
-        MacroItem[] items;
-        String confirmationMessage;
-        public CommandMacro(AudioPlayer audioPlayer, String confirmationMessage, params MacroItem[] items)
+        Macro macro;
+        Dictionary<String, KeyBinding[]> assignmentsByGame;
+        public ExecutableCommandMacro(AudioPlayer audioPlayer, Macro macro, Dictionary<String, KeyBinding[]> assignmentsByGame)
         {
             this.audioPlayer = audioPlayer;
-            this.confirmationMessage = confirmationMessage;
-            this.items = items;
+            this.macro = macro;
+            this.assignmentsByGame = assignmentsByGame;
         }
         public void execute()
         {
             // blocking...
-            foreach (MacroItem item in items)
+            foreach (CommandSet commandSet in macro.commandSets)
             {
-                if (item.macroItemType == MacroItem.MacroItemType.KEYPRESS)
+                // only execute for the requested game - is this check sensible?
+                if (CrewChief.gameDefinition.gameEnum.ToString().Equals(commandSet.gameDefinition) &&
+                    assignmentsByGame.ContainsKey(commandSet.gameDefinition))
                 {
-                    KeyPresser.SendScanCodeKeyPress(item.keycode, 20);
-                }
-                else if (item.macroItemType == MacroItem.MacroItemType.PAUSE)
-                {
-                    Thread.Sleep(item.pauseMillis);
+                    foreach (KeyPresser.KeyCode keyCode in commandSet.getKeyCodes(assignmentsByGame[commandSet.gameDefinition]))
+                    {
+                        KeyPresser.SendScanCodeKeyPress(keyCode, commandSet.keyPressTime);
+                        Thread.Sleep(commandSet.waitBetweenEachCommand);
+                    }
+                    if (macro.confirmationMessage != null && macro.confirmationMessage.Length > 0)
+                    {
+                        audioPlayer.playMessageImmediately(new QueuedMessage(macro.confirmationMessage, 0, null));
+                    }
+                    break;
                 }
             }
-            audioPlayer.playMessageImmediately(new QueuedMessage(confirmationMessage, 0, null));
         }
     }
 
-    public class MacroItem
+    // JSON objects
+    public class MacroContainer
     {
-        public CrewChiefV4.commands.KeyPresser.KeyCode keycode;
-        public int pauseMillis;
-        public MacroItemType macroItemType;
+        public Assignment[] assignments { get; set; }
+        public Macro[] macros { get; set; }
+    }
 
-        public MacroItem(CrewChiefV4.commands.KeyPresser.KeyCode keycode)
-        {
-            this.keycode = keycode;
-            this.macroItemType = MacroItemType.KEYPRESS;
-        }
+    public class Assignment
+    {
+        public String description { get; set; }
+        public String gameDefinition { get; set; }
+        public KeyBinding[] keyBindings { get; set; }
+    }
 
-        public MacroItem(int pauseMillis)
-        {
-            this.pauseMillis = pauseMillis;
-            this.macroItemType = MacroItemType.PAUSE;
-        }
+    public class KeyBinding
+    {
+        public String description { get; set; }
+        public String action { get; set; }
+        public String key { get; set; }
+    }
 
-        public enum MacroItemType
+    public class Macro
+    {
+        public String name { get; set; }
+		public String description { get; set; }
+        public String confirmationMessage { get; set; }
+		public String[] voiceTriggers { get; set; }
+        public ButtonTrigger[] buttonTriggers { get; set; }
+        public CommandSet[] commandSets { get; set; }
+    }
+
+    public class CommandSet
+    {
+        public String description { get; set; }
+        public String gameDefinition { get; set; }
+		public String[] actionSequence { get; set; }
+		public int keyPressTime { get; set; }
+        public int waitBetweenEachCommand { get; set; }
+
+        private List<KeyPresser.KeyCode> codes = null;
+
+        public List<KeyPresser.KeyCode> getKeyCodes(KeyBinding[] keyBindings)
         {
-            KEYPRESS, PAUSE
+            if (this.codes == null)
+            {
+                this.codes = new List<KeyPresser.KeyCode>();
+                foreach (String action in actionSequence)
+                {
+                    try
+                    {
+                        foreach (KeyBinding keyBinding in keyBindings)
+                        {
+                            if (String.Equals(keyBinding.action, action, StringComparison.InvariantCultureIgnoreCase))
+                            {
+                                codes.Add((KeyPresser.KeyCode)Enum.Parse(typeof(KeyPresser.KeyCode), keyBinding.key, true));
+                                break;
+                            }
+                        }
+                    }                        
+                    catch (Exception)
+                    {
+                        Console.WriteLine("Action " + action + " not recognised");
+                    }
+                }
+            }
+            return codes;
         }
+    }
+
+    public class ButtonTrigger
+    {
+        public String description { get; set; }
+        public String deviceId { get; set; }
+        public int buttonIndex { get; set; }
     }
 }

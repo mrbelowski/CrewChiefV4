@@ -342,11 +342,11 @@
 			"rf2TrackNames": ["RaceRfactor Austria 2014",
 				"Red Bull Ring GP"
 			],
-            "acTrackNames": [
-                "ks_red_bull_ring:layout_gp",
-                "spielberg:circuit_full"
-            ],
-            "pcarsTrackName": "Red Bull Ring:Grand Prix",
+			"acTrackNames": [
+				"ks_red_bull_ring:layout_gp",
+				"spielberg:circuit_full"
+			],
+			"pcarsTrackName": "Red Bull Ring:Grand Prix",
 			"raceroomLayoutId": 2556,
 			"trackLandmarks": [{
 					"landmarkName": "turn1",
@@ -868,8 +868,8 @@
 		{
 			"rf1TrackNames": ["Imola 2016"],
 			"acTrackNames": ["imola:"],
-            "pcarsTrackName": "Imola:Grand Prix",
-            "raceroomLayoutId": 1850,
+			"pcarsTrackName": "Imola:Grand Prix",
+			"raceroomLayoutId": 1850,
 			"trackLandmarks": [{
 					"landmarkName": "tamburello",
 					"distanceRoundLapStart": 660,
@@ -1238,8 +1238,8 @@
 		{
 			"pcarsTrackName": "Zolder:Grand Prix",
 			"raceroomLayoutId": 1684,
-            "rf2TrackNames": [ "Zolder" ],
-            "irTrackName":   "zolder gp",
+			"rf2TrackNames": ["Zolder"],
+			"irTrackName": "zolder gp",
 			"trackLandmarks": [{
 					"landmarkName": "turn1",
 					"distanceRoundLapStart": 250,
@@ -1292,7 +1292,6 @@
 		},
 		{
 			"rf1TrackNames": ["Road America"],
-			"rf2TrackNames": ["Road America"],
 			"trackLandmarks": [{
 					"landmarkName": "turn1",
 					"distanceRoundLapStart": 569,
@@ -1363,7 +1362,6 @@
 		},
 		{
 			"rf1TrackNames": ["Road America 2016"],
-			"rf2TrackNames": ["Road America 2016"],
 			"pcarsTrackName": "Road America:",
 			"trackLandmarks": [{
 					"landmarkName": "turn1",
@@ -2270,7 +2268,6 @@
 		},
 		{
 			"raceroomLayoutId": 3538,
-			"rf2TrackNames": ["Sachsenring"],
 			"trackLandmarks": [{
 					"landmarkName": "turn1",
 					"distanceRoundLapStart": 280,
@@ -2381,7 +2378,7 @@
 			]
 		},
 		{
-            "rf2TrackNames": [ "Knockhill11" ],
+			"rf2TrackNames": ["Knockhill11"],
 			"pcarsTrackName": "Knockhill:International",
 			"trackLandmarks": [{
 					"landmarkName": "the_right_into_duffus_dip",
@@ -3189,11 +3186,11 @@
 			]
 		},
 		{
-            "rf2TrackNames": [
-                "Sebring 12h Course",
-                "Sebring 12h Course League Edition"
-            ],
-            "irTrackName" : "sebring international",
+			"rf2TrackNames": [
+				"Sebring 12h Course",
+				"Sebring 12h Course League Edition"
+			],
+			"irTrackName": "sebring international",
 			"trackLandmarks": [{
 					"landmarkName": "turn1",
 					"distanceRoundLapStart": 320,
@@ -3269,8 +3266,8 @@
 			]
 		},
 		{
-            "rf2TrackNames": [ "Sebring Club Course" ],
-            "irTrackName" : "sebring  club course",
+			"rf2TrackNames": ["Sebring Club Course"],
+			"irTrackName": "sebring  club course",
 			"trackLandmarks": [{
 					"landmarkName": "cunningham",
 					"distanceRoundLapStart": 290,
@@ -3316,7 +3313,7 @@
 			]
 		},
 		{
-            "rf2TrackNames": [ "Sebring Modified Course" ],
+			"rf2TrackNames": ["Sebring Modified Course"],
 
 			"trackLandmarks": [{
 					"landmarkName": "turn1",
@@ -4243,8 +4240,8 @@
 			]
 		},
 		{
-            "rf2TrackNames": [ "Indianapolis -- Oval" ],
-            "pcarsTrackName": "Indianapolis Motor Speedway:Oval",
+			"rf2TrackNames": ["Indianapolis -- Oval"],
+			"pcarsTrackName": "Indianapolis Motor Speedway:Oval",
 			"isOval": true,
 			"trackLandmarks": [{
 					"landmarkName": "turn1",
@@ -7631,8 +7628,8 @@
 			]
 		},
 		{
-            "rf2TrackNames": [ "Daytona International Speedway" ],
-            "pcarsTrackName": "Daytona International Speedway:Road_Course",
+			"rf2TrackNames": ["Daytona International Speedway"],
+			"pcarsTrackName": "Daytona International Speedway:Road_Course",
 			"approximateTrackLength": 5800,
 			"trackLandmarks": [{
 					"landmarkName": "turn1",
@@ -7693,7 +7690,7 @@
 		},
 		{
 			"rf2TrackNames": ["Daytona International Speedway"],
-            "pcarsTrackName": "Daytona International Speedway:Tri_Oval",
+			"pcarsTrackName": "Daytona International Speedway:Tri_Oval",
 			"approximateTrackLength": 4000,
 			"isOval": true,
 			"trackLandmarks": [{
@@ -9695,7 +9692,7 @@
 			]
 		},
 		{
-            "rf2TrackNames": [ "Indianapolis - Brickyard", "Indianapolis - Oval" ],
+			"rf2TrackNames": ["Indianapolis - Brickyard", "Indianapolis - Oval"],
 			"isOval": true,
 			"trackLandmarks": [{
 					"landmarkName": "turn1",
@@ -10243,8 +10240,8 @@
 
 
 		{
-            "rf2TrackNames": [ "Long_Beech_2014" ],
-            "pcarsTrackName": "Long Beach:Street Circuit",
+			"rf2TrackNames": ["Long_Beech_2014"],
+			"pcarsTrackName": "Long Beach:Street Circuit",
 			"trackLandmarks": [{
 					"landmarkName": "turn1",
 					"distanceRoundLapStart": 700,
@@ -11820,6 +11817,2286 @@
 					"landmarkName": "gazometre",
 					"distanceRoundLapStart": 2960,
 					"distanceRoundLapEnd": 3060,
+					"isCommonOvertakingSpot": true
+				}
+			]
+		},
+
+		{
+
+			"rf2TrackNames": ["Full Course"],
+			"trackLandmarks": [{
+					"landmarkName": "turn1",
+					"distanceRoundLapStart": 125,
+					"distanceRoundLapEnd": 340,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn2",
+					"distanceRoundLapStart": 270,
+					"distanceRoundLapEnd": 430,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn3",
+					"distanceRoundLapStart": 465,
+					"distanceRoundLapEnd": 565,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn4",
+					"distanceRoundLapStart": 605,
+					"distanceRoundLapEnd": 715,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn5",
+					"distanceRoundLapStart": 1395,
+					"distanceRoundLapEnd": 1605,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn6",
+					"distanceRoundLapStart": 1750,
+					"distanceRoundLapEnd": 1875,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn7",
+					"distanceRoundLapStart": 1875,
+					"distanceRoundLapEnd": 2075,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn8",
+					"distanceRoundLapStart": 2135,
+					"distanceRoundLapEnd": 2305,
+					"isCommonOvertakingSpot": false
+				}
+			]
+		},
+		{
+
+			"rf2TrackNames": ["Mores - Short Layout"],
+			"trackLandmarks": [{
+					"landmarkName": "turn1",
+					"distanceRoundLapStart": 250,
+					"distanceRoundLapEnd": 250,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "the_chicane",
+					"distanceRoundLapStart": 370,
+					"distanceRoundLapEnd": 520,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn3",
+					"distanceRoundLapStart": 690,
+					"distanceRoundLapEnd": 520,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn4",
+					"distanceRoundLapStart": 915,
+					"distanceRoundLapEnd": 1015,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn5",
+					"distanceRoundLapStart": 1150,
+					"distanceRoundLapEnd": 1240,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn6",
+					"distanceRoundLapStart": 1320,
+					"distanceRoundLapEnd": 1200,
+					"isCommonOvertakingSpot": false
+				}
+			]
+		},
+		{
+			"rf2TrackNames": ["Mountain Peak - Legends Oval"],
+			"isOval": true,
+			"trackLandmarks": [{
+					"landmarkName": "turn1",
+					"distanceRoundLapStart": 25,
+					"distanceRoundLapEnd": 175,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn2",
+					"distanceRoundLapStart": 245,
+					"distanceRoundLapEnd": 390,
+					"isCommonOvertakingSpot": true
+				}
+
+			]
+		},
+		{
+
+			"rf2TrackNames": ["mountainpeak road course"],
+			"trackLandmarks": [{
+					"landmarkName": "turn1",
+					"distanceRoundLapStart": 120,
+					"distanceRoundLapEnd": 230,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn2",
+					"distanceRoundLapStart": 265,
+					"distanceRoundLapEnd": 455,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn3",
+					"distanceRoundLapStart": 500,
+					"distanceRoundLapEnd": 634,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn4",
+					"distanceRoundLapStart": 650,
+					"distanceRoundLapEnd": 840,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn5",
+					"distanceRoundLapStart": 850,
+					"distanceRoundLapEnd": 935,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn6",
+					"distanceRoundLapStart": 945,
+					"distanceRoundLapEnd": 1030,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn7",
+					"distanceRoundLapStart": 1060,
+					"distanceRoundLapEnd": 1175,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn8",
+					"distanceRoundLapStart": 1175,
+					"distanceRoundLapEnd": 1315,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn9",
+					"distanceRoundLapStart": 1360,
+					"distanceRoundLapEnd": 1550,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn10",
+					"distanceRoundLapStart": 1595,
+					"distanceRoundLapEnd": 2250,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn11",
+					"distanceRoundLapStart": 2700,
+					"distanceRoundLapEnd": 3360,
+					"isCommonOvertakingSpot": true
+				}
+			]
+		},
+		{
+			"rf2TrackNames": ["mountain peak speedway"],
+			"isOval": true,
+			"trackLandmarks": [{
+					"landmarkName": "trioval",
+					"distanceRoundLapStart": 0,
+					"distanceRoundLapEnd": 200,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn1",
+					"distanceRoundLapStart": 305,
+					"distanceRoundLapEnd": 640,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn2",
+					"distanceRoundLapStart": 641,
+					"distanceRoundLapEnd": 975,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn3",
+					"distanceRoundLapStart": 1410,
+					"distanceRoundLapEnd": 1725,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn4",
+					"distanceRoundLapStart": 1726,
+					"distanceRoundLapEnd": 2040,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "trioval",
+					"distanceRoundLapStart": 2160,
+					"distanceRoundLapEnd": 2315,
+					"isCommonOvertakingSpot": true
+				}
+
+			]
+		},
+		{
+
+			"rf2TrackNames": ["Louisiana -- Indy Grand Prixp"],
+			"trackLandmarks": [{
+					"landmarkName": "turn1",
+					"distanceRoundLapStart": 500,
+					"distanceRoundLapEnd": 590,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn2",
+					"distanceRoundLapStart": 645,
+					"distanceRoundLapEnd": 850,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn3",
+					"distanceRoundLapStart": 1035,
+					"distanceRoundLapEnd": 1275,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn4",
+					"distanceRoundLapStart": 1330,
+					"distanceRoundLapEnd": 1590,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn5",
+					"distanceRoundLapStart": 1725,
+					"distanceRoundLapEnd": 1860,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn6",
+					"distanceRoundLapStart": 1955,
+					"distanceRoundLapEnd": 2070,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn7",
+					"distanceRoundLapStart": 2175,
+					"distanceRoundLapEnd": 2340,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn8",
+					"distanceRoundLapStart": 2615,
+					"distanceRoundLapEnd": 2740,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn9",
+					"distanceRoundLapStart": 2770,
+					"distanceRoundLapEnd": 2950,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn10",
+					"distanceRoundLapStart": 3450,
+					"distanceRoundLapEnd": 3535,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn11",
+					"distanceRoundLapStart": 3550,
+					"distanceRoundLapEnd": 3705,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn12",
+					"distanceRoundLapStart": 3720,
+					"distanceRoundLapEnd": 3830,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn13",
+					"distanceRoundLapStart": 3845,
+					"distanceRoundLapEnd": 4025,
+					"isCommonOvertakingSpot": false
+				}
+			]
+		},
+		{
+
+			"rf2TrackNames": ["NolaMP -- A - Course"],
+			"trackLandmarks": [{
+					"landmarkName": "turn1",
+					"distanceRoundLapStart": 500,
+					"distanceRoundLapEnd": 590,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn2",
+					"distanceRoundLapStart": 645,
+					"distanceRoundLapEnd": 850,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn3",
+					"distanceRoundLapStart": 1035,
+					"distanceRoundLapEnd": 1275,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn4",
+					"distanceRoundLapStart": 1330,
+					"distanceRoundLapEnd": 1590,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn5",
+					"distanceRoundLapStart": 1725,
+					"distanceRoundLapEnd": 1860,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn6",
+					"distanceRoundLapStart": 1955,
+					"distanceRoundLapEnd": 2070,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn7",
+					"distanceRoundLapStart": 2175,
+					"distanceRoundLapEnd": 2340,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn8",
+					"distanceRoundLapStart": 2615,
+					"distanceRoundLapEnd": 2740,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn9",
+					"distanceRoundLapStart": 2740,
+					"distanceRoundLapEnd": 2620,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn10",
+					"distanceRoundLapStart": 2965,
+					"distanceRoundLapEnd": 3065,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn11",
+					"distanceRoundLapStart": 3095,
+					"distanceRoundLapEnd": 3255,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn12",
+					"distanceRoundLapStart": 3270,
+					"distanceRoundLapEnd": 3380,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn13",
+					"distanceRoundLapStart": 3430,
+					"distanceRoundLapEnd": 3545,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn14",
+					"distanceRoundLapStart": 3550,
+					"distanceRoundLapEnd": 3700,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn15",
+					"distanceRoundLapStart": 3705,
+					"distanceRoundLapEnd": 3835,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn16",
+					"distanceRoundLapStart": 3845,
+					"distanceRoundLapEnd": 4020,
+					"isCommonOvertakingSpot": false
+				}
+			]
+		},
+		{
+
+			"rf2TrackNames": ["NolaMP -- B - Course"],
+			"trackLandmarks": [{
+					"landmarkName": "turn1",
+					"distanceRoundLapStart": 500,
+					"distanceRoundLapEnd": 590,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn2",
+					"distanceRoundLapStart": 645,
+					"distanceRoundLapEnd": 850,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn3",
+					"distanceRoundLapStart": 880,
+					"distanceRoundLapEnd": 1120,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn4",
+					"distanceRoundLapStart": 1230,
+					"distanceRoundLapEnd": 1370,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn5",
+					"distanceRoundLapStart": 1390,
+					"distanceRoundLapEnd": 1575,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn6",
+					"distanceRoundLapStart": 1595,
+					"distanceRoundLapEnd": 1710,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn7",
+					"distanceRoundLapStart": 1725,
+					"distanceRoundLapEnd": 1905,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn8",
+					"distanceRoundLapStart": 1910,
+					"distanceRoundLapEnd": 2020,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn9",
+					"distanceRoundLapStart": 2100,
+					"distanceRoundLapEnd": 2200,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn10",
+					"distanceRoundLapStart": 2210,
+					"distanceRoundLapEnd": 2360,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn11",
+					"distanceRoundLapStart": 2375,
+					"distanceRoundLapEnd": 2480,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn12",
+					"distanceRoundLapStart": 2495,
+					"distanceRoundLapEnd": 2670,
+					"isCommonOvertakingSpot": false
+				}
+			]
+		},
+		{
+			"rf2TrackNames": ["NolaMP -- C - Course"],
+			"trackLandmarks": [{
+					"landmarkName": "turn1",
+					"distanceRoundLapStart": 1030,
+					"distanceRoundLapEnd": 1145,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn2",
+					"distanceRoundLapStart": 1210,
+					"distanceRoundLapEnd": 1400,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn3",
+					"distanceRoundLapStart": 1395,
+					"distanceRoundLapEnd": 1590,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn4",
+					"distanceRoundLapStart": 1885,
+					"distanceRoundLapEnd": 2025,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn5",
+					"distanceRoundLapStart": 2060,
+					"distanceRoundLapEnd": 2240,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn6",
+					"distanceRoundLapStart": 2250,
+					"distanceRoundLapEnd": 2380,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn7",
+					"distanceRoundLapStart": 2405,
+					"distanceRoundLapEnd": 2560,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn8",
+					"distanceRoundLapStart": 2565,
+					"distanceRoundLapEnd": 2580,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn9",
+					"distanceRoundLapStart": 2770,
+					"distanceRoundLapEnd": 2850,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn10",
+					"distanceRoundLapStart": 2860,
+					"distanceRoundLapEnd": 3015,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn11",
+					"distanceRoundLapStart": 3025,
+					"distanceRoundLapEnd": 3135,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn12",
+					"distanceRoundLapStart": 3150,
+					"distanceRoundLapEnd": 3320,
+					"isCommonOvertakingSpot": false
+				}
+			]
+		},
+		{
+			"rf2TrackNames": ["NolaMP -- D - Course"],
+			"trackLandmarks": [{
+					"landmarkName": "turn1",
+					"distanceRoundLapStart": 735,
+					"distanceRoundLapEnd": 820,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn2",
+					"distanceRoundLapStart": 825,
+					"distanceRoundLapEnd": 950,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn3",
+					"distanceRoundLapStart": 1020,
+					"distanceRoundLapEnd": 1240,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn4",
+					"distanceRoundLapStart": 1275,
+					"distanceRoundLapEnd": 1360,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn5",
+					"distanceRoundLapStart": 1360,
+					"distanceRoundLapEnd": 1485,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn6",
+					"distanceRoundLapStart": 1620,
+					"distanceRoundLapEnd": 1740,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn7",
+					"distanceRoundLapStart": 1770,
+					"distanceRoundLapEnd": 1950,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn8",
+					"distanceRoundLapStart": 1975,
+					"distanceRoundLapEnd": 2100,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn9",
+					"distanceRoundLapStart": 2125,
+					"distanceRoundLapEnd": 2280,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn10",
+					"distanceRoundLapStart": 2305,
+					"distanceRoundLapEnd": 2415,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn11",
+					"distanceRoundLapStart": 2485,
+					"distanceRoundLapEnd": 2580,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn12",
+					"distanceRoundLapStart": 2585,
+					"distanceRoundLapEnd": 2735,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn13",
+					"distanceRoundLapStart": 2755,
+					"distanceRoundLapEnd": 2855,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn14",
+					"distanceRoundLapStart": 2875,
+					"distanceRoundLapEnd": 3045,
+					"isCommonOvertakingSpot": false
+				}
+			]
+		},
+		{
+			"rf2TrackNames": ["Nogaro"],
+			"trackLandmarks": [{
+					"landmarkName": "premiere_virage",
+					"distanceRoundLapStart": 170,
+					"distanceRoundLapEnd": 315,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "virage_de_la_ferme",
+					"distanceRoundLapStart": 350,
+					"distanceRoundLapEnd": 465,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "double_droit_de_capuenne",
+					"distanceRoundLapStart": 515,
+					"distanceRoundLapEnd": 880,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn5",
+					"distanceRoundLapStart": 900,
+					"distanceRoundLapEnd": 1030,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "coueve_de_l'aviation",
+					"distanceRoundLapStart": 1075,
+					"distanceRoundLapEnd": 1265,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "epingle_de_L'ecole",
+					"distanceRoundLapStart": 1900,
+					"distanceRoundLapEnd": 2035,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn8",
+					"distanceRoundLapStart": 2055,
+					"distanceRoundLapEnd": 2165,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "courbe_roger_dubois",
+					"distanceRoundLapStart": 2195,
+					"distanceRoundLapEnd": 2325,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "courve_henri_oreller",
+					"distanceRoundLapStart": 2350,
+					"distanceRoundLapEnd": 2490,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn11",
+					"distanceRoundLapStart": 2550,
+					"distanceRoundLapEnd": 2645,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn12",
+					"distanceRoundLapStart": 2685,
+					"distanceRoundLapEnd": 2795,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "courve_claude_storez",
+					"distanceRoundLapStart": 2780,
+					"distanceRoundLapEnd": 2910,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "s_du_Lac",
+					"distanceRoundLapStart": 3140,
+					"distanceRoundLapEnd": 3535,
+					"isCommonOvertakingSpot": false
+				}
+			]
+		},
+		{
+			"rf2TrackNames": ["Northside International Racewa"],
+			"isOval": true,
+			"trackLandmarks": [{
+					"landmarkName": "trioval",
+					"distanceRoundLapStart": 0,
+					"distanceRoundLapEnd": 105,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn1",
+					"distanceRoundLapStart": 185,
+					"distanceRoundLapEnd": 362,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn2",
+					"distanceRoundLapStart": 363,
+					"distanceRoundLapEnd": 540,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn3",
+					"distanceRoundLapStart": 725,
+					"distanceRoundLapEnd": 892,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn4",
+					"distanceRoundLapStart": 893,
+					"distanceRoundLapEnd": 1060,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "trioval",
+					"distanceRoundLapStart": 1061,
+					"distanceRoundLapEnd": 1174,
+					"isCommonOvertakingSpot": true
+				}
+
+			]
+		},
+		{
+			"rf2TrackNames": [" Nuerburg Sprint"],
+			"trackLandmarks": [{
+					"landmarkName": "haug_Hhken",
+					"distanceRoundLapStart": 545,
+					"distanceRoundLapEnd": 665,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "mercedes_arena",
+					"distanceRoundLapStart": 730,
+					"distanceRoundLapEnd": 1220,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn5",
+					"distanceRoundLapStart": 1500,
+					"distanceRoundLapEnd": 1680,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "michelin_kurve",
+					"distanceRoundLapStart": 1795,
+					"distanceRoundLapEnd": 1920,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "bit_kurve",
+					"distanceRoundLapStart": 1995,
+					"distanceRoundLapEnd": 2170,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "ITT_Bogen",
+					"distanceRoundLapStart": 2410,
+					"distanceRoundLapEnd": 1610,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "ngk_shalken",
+					"distanceRoundLapStart": 2910,
+					"distanceRoundLapEnd": 3050,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "coco-cola_kurve",
+					"distanceRoundLapStart": 3195,
+					"distanceRoundLapEnd": 3395,
+					"isCommonOvertakingSpot": false
+				}
+			]
+		},
+		{
+			"rf2TrackNames": ["Oschersleben_MC"],
+			"trackLandmarks": [{
+					"landmarkName": "turn1",
+					"distanceRoundLapStart": 375,
+					"distanceRoundLapEnd": 480,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "hotel",
+					"distanceRoundLapStart": 485,
+					"distanceRoundLapEnd": 730,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "hasseroder",
+					"distanceRoundLapStart": 930,
+					"distanceRoundLapEnd": 1125,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "triple",
+					"distanceRoundLapStart": 1360,
+					"distanceRoundLapEnd": 1675,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn5",
+					"distanceRoundLapStart": 1680,
+					"distanceRoundLapEnd": 1905,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "schikane",
+					"distanceRoundLapStart": 1975,
+					"distanceRoundLapEnd": 2090,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn7",
+					"distanceRoundLapStart": 2095,
+					"distanceRoundLapEnd": 2270,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "shell_s",
+					"distanceRoundLapStart": 2720,
+					"distanceRoundLapEnd": 2930,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn9",
+					"distanceRoundLapStart": 3090,
+					"distanceRoundLapEnd": 3185,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "sachcsen-anhalt_kurve",
+					"distanceRoundLapStart": 3285,
+					"distanceRoundLapEnd": 3440,
+					"isCommonOvertakingSpot": true
+				}
+			]
+		},
+		{
+			"rf2TrackNames": ["Oschersleben Motorsport Park"],
+			"approximateTrackLength": 3681.2,
+			"trackLandmarks": [{
+					"landmarkName": "turn1",
+					"distanceRoundLapStart": 230,
+					"distanceRoundLapEnd": 350,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "hotel",
+					"distanceRoundLapStart": 355,
+					"distanceRoundLapEnd": 595,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "hasseroder",
+					"distanceRoundLapStart": 790,
+					"distanceRoundLapEnd": 1015,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "triple",
+					"distanceRoundLapStart": 1240,
+					"distanceRoundLapEnd": 1540,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn5",
+					"distanceRoundLapStart": 1545,
+					"distanceRoundLapEnd": 1750,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "schikane",
+					"distanceRoundLapStart": 1850,
+					"distanceRoundLapEnd": 1950,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn7",
+					"distanceRoundLapStart": 1955,
+					"distanceRoundLapEnd": 2135,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "shell_s",
+					"distanceRoundLapStart": 2585,
+					"distanceRoundLapEnd": 2795,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn9",
+					"distanceRoundLapStart": 2930,
+					"distanceRoundLapEnd": 3075,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "sachcn-anhalt_kurve",
+					"distanceRoundLapStart": 3144,
+					"distanceRoundLapEnd": 3295,
+					"isCommonOvertakingSpot": true
+				}
+			]
+		},
+		{
+			"rf2TrackNames": ["Oschersleben Motorsport Park"],
+			"approximateTrackLength": 3784,
+			"trackLandmarks": [{
+					"landmarkName": "turn1",
+					"distanceRoundLapStart": 375,
+					"distanceRoundLapEnd": 450,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "hotel",
+					"distanceRoundLapStart": 455,
+					"distanceRoundLapEnd": 710,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "hasseroder",
+					"distanceRoundLapStart": 905,
+					"distanceRoundLapEnd": 1125,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "triple",
+					"distanceRoundLapStart": 1370,
+					"distanceRoundLapEnd": 1645,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn5",
+					"distanceRoundLapStart": 1650,
+					"distanceRoundLapEnd": 1880,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "schikane",
+					"distanceRoundLapStart": 1960,
+					"distanceRoundLapEnd": 2060,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn7",
+					"distanceRoundLapStart": 2065,
+					"distanceRoundLapEnd": 2240,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "shell_s",
+					"distanceRoundLapStart": 2700,
+					"distanceRoundLapEnd": 2915,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn9",
+					"distanceRoundLapStart": 3050,
+					"distanceRoundLapEnd": 3185,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "sachcsen-anhalt_kurve",
+					"distanceRoundLapStart": 3250,
+					"distanceRoundLapEnd": 3400,
+					"isCommonOvertakingSpot": true
+				}
+			]
+		},
+		{
+			"rf2TrackNames": ["Oschersleben Motorsport Park"],
+			"approximateTrackLength": 3670.4,
+			"trackLandmarks": [{
+					"landmarkName": "turn1",
+					"distanceRoundLapStart": 430,
+					"distanceRoundLapEnd": 505,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "hotel",
+					"distanceRoundLapStart": 510,
+					"distanceRoundLapEnd": 750,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "hasseroder",
+					"distanceRoundLapStart": 960,
+					"distanceRoundLapEnd": 1145,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "triple",
+					"distanceRoundLapStart": 1390,
+					"distanceRoundLapEnd": 1685,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn5",
+					"distanceRoundLapStart": 1690,
+					"distanceRoundLapEnd": 1925,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "schikane",
+					"distanceRoundLapStart": 2000,
+					"distanceRoundLapEnd": 2105,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn7",
+					"distanceRoundLapStart": 2110,
+					"distanceRoundLapEnd": 2280,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "shell_s",
+					"distanceRoundLapStart": 2735,
+					"distanceRoundLapEnd": 2950,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn9",
+					"distanceRoundLapStart": 3100,
+					"distanceRoundLapEnd": 3210,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "sachcsen-anhalt_kurve",
+					"distanceRoundLapStart": 3305,
+					"distanceRoundLapEnd": 3455,
+					"isCommonOvertakingSpot": true
+				}
+			]
+		},
+		{
+			"rf2TrackNames": ["Palm Beach Intl Road Course"],
+			"trackLandmarks": [{
+					"landmarkName": "turn1",
+					"distanceRoundLapStart": 175,
+					"distanceRoundLapEnd": 270,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn2",
+					"distanceRoundLapStart": 275,
+					"distanceRoundLapEnd": 370,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn3",
+					"distanceRoundLapStart": 410,
+					"distanceRoundLapEnd": 510,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn4",
+					"distanceRoundLapStart": 630,
+					"distanceRoundLapEnd": 780,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn5",
+					"distanceRoundLapStart": 780,
+					"distanceRoundLapEnd": 830,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn6",
+					"distanceRoundLapStart": 980,
+					"distanceRoundLapEnd": 1245,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn7",
+					"distanceRoundLapStart": 1440,
+					"distanceRoundLapEnd": 1545,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn8",
+					"distanceRoundLapStart": 1545,
+					"distanceRoundLapEnd": 1620,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn9",
+					"distanceRoundLapStart": 1620,
+					"distanceRoundLapEnd": 1830,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn10",
+					"distanceRoundLapStart": 2700,
+					"distanceRoundLapEnd": 2915,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn11",
+					"distanceRoundLapStart": 2920,
+					"distanceRoundLapEnd": 3015,
+					"isCommonOvertakingSpot": false
+				}
+			]
+		},
+		{
+			"rf2TrackNames": ["Palm Springs Road Course A"],
+			"trackLandmarks": [{
+					"landmarkName": "turn1",
+					"distanceRoundLapStart": 160,
+					"distanceRoundLapEnd": 285,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn2",
+					"distanceRoundLapStart": 380,
+					"distanceRoundLapEnd": 475,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn3",
+					"distanceRoundLapStart": 555,
+					"distanceRoundLapEnd": 655,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn4",
+					"distanceRoundLapStart": 655,
+					"distanceRoundLapEnd": 765,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn5",
+					"distanceRoundLapStart": 770,
+					"distanceRoundLapEnd": 890,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn6",
+					"distanceRoundLapStart": 1245,
+					"distanceRoundLapEnd": 1340,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn7",
+					"distanceRoundLapStart": 1380,
+					"distanceRoundLapEnd": 1545,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn8",
+					"distanceRoundLapStart": 1990,
+					"distanceRoundLapEnd": 2100,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn9",
+					"distanceRoundLapStart": 2130,
+					"distanceRoundLapEnd": 2360,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn10",
+					"distanceRoundLapStart": 2330,
+					"distanceRoundLapEnd": 2355,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn11",
+					"distanceRoundLapStart": 2635,
+					"distanceRoundLapEnd": 2805,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn12",
+					"distanceRoundLapStart": 2915,
+					"distanceRoundLapEnd": 2995,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn13",
+					"distanceRoundLapStart": 3070,
+					"distanceRoundLapEnd": 3120,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn14",
+					"distanceRoundLapStart": 3185,
+					"distanceRoundLapEnd": 3305,
+					"isCommonOvertakingSpot": false
+				}
+			]
+		},
+		{
+			"rf2TrackNames": ["Palm Springs Speedway"],
+			"isOval": true,
+			"trackLandmarks": [{
+					"landmarkName": "turn1",
+					"distanceRoundLapStart": 180,
+					"distanceRoundLapEnd": 590,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn2",
+					"distanceRoundLapStart": 591,
+					"distanceRoundLapEnd": 1000,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn3",
+					"distanceRoundLapStart": 1370,
+					"distanceRoundLapEnd": 1795,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn4",
+					"distanceRoundLapStart": 1796,
+					"distanceRoundLapEnd": 2220,
+					"isCommonOvertakingSpot": true
+				}
+			]
+		},
+		{
+			"rf2TrackNames": ["Pembrey"],
+			"trackLandmarks": [{
+					"landmarkName": "hatchets_hairpin",
+					"distanceRoundLapStart": 230,
+					"distanceRoundLapEnd": 310,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "spitfires",
+					"distanceRoundLapStart": 360,
+					"distanceRoundLapEnd": 460,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "dibeni",
+					"distanceRoundLapStart": 505,
+					"distanceRoundLapEnd": 630,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn4",
+					"distanceRoundLapStart": 750,
+					"distanceRoundLapEnd": 875,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "the_esses",
+					"distanceRoundLapStart": 985,
+					"distanceRoundLapEnd": 1140,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "brooklands_hairpin",
+					"distanceRoundLapStart": 1235,
+					"distanceRoundLapEnd": 1365,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "woodlands",
+					"distanceRoundLapStart": 1665,
+					"distanceRoundLapEnd": 1775,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "honda_curve",
+					"distanceRoundLapStart": 1905,
+					"distanceRoundLapEnd": 2095,
+					"isCommonOvertakingSpot": false
+				}
+			]
+		},
+		{
+			"rf2TrackNames": ["Phakisa"],
+			"trackLandmarks": [{
+					"landmarkName": "turn1",
+					"distanceRoundLapStart": 205,
+					"distanceRoundLapEnd": 495,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn2",
+					"distanceRoundLapStart": 570,
+					"distanceRoundLapEnd": 750,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn3",
+					"distanceRoundLapStart": 965,
+					"distanceRoundLapEnd": 1130,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "the_boot",
+					"distanceRoundLapStart": 1415,
+					"distanceRoundLapEnd": 1660,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "castle_corner",
+					"distanceRoundLapStart": 1760,
+					"distanceRoundLapEnd": 1910,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn6",
+					"distanceRoundLapStart": 2130,
+					"distanceRoundLapEnd": 2260,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "uncini_1",
+					"distanceRoundLapStart": 2345,
+					"distanceRoundLapEnd": 2550,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "uncini_2",
+					"distanceRoundLapStart": 2620,
+					"distanceRoundLapEnd": 2720,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn9",
+					"distanceRoundLapStart": 3115,
+					"distanceRoundLapEnd": 3565,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "giel's_kop",
+					"distanceRoundLapStart": 3755,
+					"distanceRoundLapEnd": 3770,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn11",
+					"distanceRoundLapStart": 3855,
+					"distanceRoundLapEnd": 4085,
+					"isCommonOvertakingSpot": false
+				}
+			]
+		},
+		{
+			"rf2TrackNames": ["Phoenix"],
+			"isOval": true,
+			"trackLandmarks": [{
+					"landmarkName": "turn1",
+					"distanceRoundLapStart": 127,
+					"distanceRoundLapEnd": 323,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn2",
+					"distanceRoundLapStart": 324,
+					"distanceRoundLapEnd": 520,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn3",
+					"distanceRoundLapStart": 975,
+					"distanceRoundLapEnd": 1250,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn4",
+					"distanceRoundLapStart": 1251,
+					"distanceRoundLapEnd": 1525,
+					"isCommonOvertakingSpot": true
+				}
+
+			]
+		},
+		{
+			"rf2TrackNames": ["Pocono Raceway"],
+			"isOval": true,
+			"trackLandmarks": [{
+					"landmarkName": "turn1",
+					"distanceRoundLapStart": 715,
+					"distanceRoundLapEnd": 1320,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn2",
+					"distanceRoundLapStart": 2140,
+					"distanceRoundLapEnd": 2615,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn3",
+					"distanceRoundLapStart": 3030,
+					"distanceRoundLapEnd": 3685,
+					"isCommonOvertakingSpot": true
+				}
+			]
+		},
+		{
+			"rf2TrackNames": ["Portland International Raceway Chicane"],
+			"trackLandmarks": [{
+					"landmarkName": "turn1",
+					"distanceRoundLapStart": 270,
+					"distanceRoundLapEnd": 340,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn2",
+					"distanceRoundLapStart": 345,
+					"distanceRoundLapEnd": 430,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn3",
+					"distanceRoundLapStart": 470,
+					"distanceRoundLapEnd": 575,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn4",
+					"distanceRoundLapStart": 725,
+					"distanceRoundLapEnd": 880,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn5",
+					"distanceRoundLapStart": 915,
+					"distanceRoundLapEnd": 1070,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn6",
+					"distanceRoundLapStart": 1100,
+					"distanceRoundLapEnd": 1340,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn7",
+					"distanceRoundLapStart": 1385,
+					"distanceRoundLapEnd": 1520,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn8",
+					"distanceRoundLapStart": 1590,
+					"distanceRoundLapEnd": 1656,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn9",
+					"distanceRoundLapStart": 1685,
+					"distanceRoundLapEnd": 2195,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn10",
+					"distanceRoundLapStart": 2420,
+					"distanceRoundLapEnd": 2510,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn11",
+					"distanceRoundLapStart": 2520,
+					"distanceRoundLapEnd": 2625,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn12",
+					"distanceRoundLapStart": 2655,
+					"distanceRoundLapEnd": 2885,
+					"isCommonOvertakingSpot": false
+				}
+			]
+		},
+		{
+			"rf2TrackNames": ["Portland International Raceway No Chicane"],
+			"trackLandmarks": [{
+					"landmarkName": "turn1",
+					"distanceRoundLapStart": 650,
+					"distanceRoundLapEnd": 805,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn2",
+					"distanceRoundLapStart": 840,
+					"distanceRoundLapEnd": 995,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn3",
+					"distanceRoundLapStart": 1025,
+					"distanceRoundLapEnd": 1285,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn4",
+					"distanceRoundLapStart": 1340,
+					"distanceRoundLapEnd": 1470,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn5",
+					"distanceRoundLapStart": 1515,
+					"distanceRoundLapEnd": 1605,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn6",
+					"distanceRoundLapStart": 1610,
+					"distanceRoundLapEnd": 2150,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn7",
+					"distanceRoundLapStart": 2370,
+					"distanceRoundLapEnd": 2460,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn8",
+					"distanceRoundLapStart": 2465,
+					"distanceRoundLapEnd": 2560,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn9",
+					"distanceRoundLapStart": 2600,
+					"distanceRoundLapEnd": 2820,
+					"isCommonOvertakingSpot": false
+				}
+			]
+		},
+		{
+			"rf2TrackNames": ["Road America 2016"],
+			"approximateTrackLength": 6494.4,
+			"trackLandmarks": [{
+					"landmarkName": "turn1",
+					"distanceRoundLapStart": 565,
+					"distanceRoundLapEnd": 755,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn2",
+					"distanceRoundLapStart": 880,
+					"distanceRoundLapEnd": 990,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn3",
+					"distanceRoundLapStart": 1045,
+					"distanceRoundLapEnd": 1210,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn4",
+					"distanceRoundLapStart": 1520,
+					"distanceRoundLapEnd": 1820,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn5",
+					"distanceRoundLapStart": 2250,
+					"distanceRoundLapEnd": 2365,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn6",
+					"distanceRoundLapStart": 2535,
+					"distanceRoundLapEnd": 2660,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn7",
+					"distanceRoundLapStart": 2775,
+					"distanceRoundLapEnd": 2910,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn8",
+					"distanceRoundLapStart": 3195,
+					"distanceRoundLapEnd": 3300,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "the_carousel",
+					"distanceRoundLapStart": 3370,
+					"distanceRoundLapEnd": 3890,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn10",
+					"distanceRoundLapStart": 3925,
+					"distanceRoundLapEnd": 4045,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn11",
+					"distanceRoundLapStart": 4115,
+					"distanceRoundLapEnd": 4205,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "canada_corner",
+					"distanceRoundLapStart": 5085,
+					"distanceRoundLapEnd": 5245,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn13",
+					"distanceRoundLapStart": 5395,
+					"distanceRoundLapEnd": 5580,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn14",
+					"distanceRoundLapStart": 5715,
+					"distanceRoundLapEnd": 5900,
+					"isCommonOvertakingSpot": false
+				}
+			]
+		},
+		{
+			"rf2TrackNames": ["Road America 2016"],
+			"approximateTrackLength": 6439,
+			"trackLandmarks": [{
+					"landmarkName": "turn1",
+					"distanceRoundLapStart": 565,
+					"distanceRoundLapEnd": 755,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn2",
+					"distanceRoundLapStart": 880,
+					"distanceRoundLapEnd": 990,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn3",
+					"distanceRoundLapStart": 1045,
+					"distanceRoundLapEnd": 1210,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn4",
+					"distanceRoundLapStart": 1520,
+					"distanceRoundLapEnd": 1820,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn5",
+					"distanceRoundLapStart": 2250,
+					"distanceRoundLapEnd": 2365,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn6",
+					"distanceRoundLapStart": 2535,
+					"distanceRoundLapEnd": 2660,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn7",
+					"distanceRoundLapStart": 2775,
+					"distanceRoundLapEnd": 2910,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn8",
+					"distanceRoundLapStart": 3195,
+					"distanceRoundLapEnd": 3300,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "the_carousel",
+					"distanceRoundLapStart": 3370,
+					"distanceRoundLapEnd": 3890,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "the_kink",
+					"distanceRoundLapStart": 4150,
+					"distanceRoundLapEnd": 4360,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "canada_corner",
+					"distanceRoundLapStart": 5020,
+					"distanceRoundLapEnd": 5180,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn13",
+					"distanceRoundLapStart": 53330,
+					"distanceRoundLapEnd": 5520,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn14",
+					"distanceRoundLapStart": 5645,
+					"distanceRoundLapEnd": 5830,
+					"isCommonOvertakingSpot": false
+				}
+			]
+		},
+		{
+			"rf2TrackNames": ["Road America"],
+			"approximateTrackLength": 6274.7,
+			"trackLandmarks": [{
+					"landmarkName": "turn1",
+					"distanceRoundLapStart": 565,
+					"distanceRoundLapEnd": 755,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn2",
+					"distanceRoundLapStart": 880,
+					"distanceRoundLapEnd": 990,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn3",
+					"distanceRoundLapStart": 1040,
+					"distanceRoundLapEnd": 1190,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn4",
+					"distanceRoundLapStart": 1520,
+					"distanceRoundLapEnd": 1820,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn5",
+					"distanceRoundLapStart": 2170,
+					"distanceRoundLapEnd": 2330,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn6",
+					"distanceRoundLapStart": 2510,
+					"distanceRoundLapEnd": 2620,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn7",
+					"distanceRoundLapStart": 2720,
+					"distanceRoundLapEnd": 2880,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn8",
+					"distanceRoundLapStart": 3115,
+					"distanceRoundLapEnd": 3250,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "the_carousel",
+					"distanceRoundLapStart": 3300,
+					"distanceRoundLapEnd": 3800,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn11",
+					"distanceRoundLapStart": 4045,
+					"distanceRoundLapEnd": 4250,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "canada_corner",
+					"distanceRoundLapStart": 4850,
+					"distanceRoundLapEnd": 5015,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn13",
+					"distanceRoundLapStart": 5180,
+					"distanceRoundLapEnd": 5350,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn14",
+					"distanceRoundLapStart": 5500,
+					"distanceRoundLapEnd": 5680,
+					"isCommonOvertakingSpot": false
+				}
+			]
+		},
+		{
+			"rf2TrackNames": ["Poznan Circuit -- Race Weekend"],
+			"trackLandmarks": [{
+					"landmarkName": "turn1",
+					"distanceRoundLapStart": 315,
+					"distanceRoundLapEnd": 675,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn2",
+					"distanceRoundLapStart": 730,
+					"distanceRoundLapEnd": 875,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn3",
+					"distanceRoundLapStart": 1105,
+					"distanceRoundLapEnd": 1250,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn4",
+					"distanceRoundLapStart": 1340,
+					"distanceRoundLapEnd": 1500,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn5",
+					"distanceRoundLapStart": 1520,
+					"distanceRoundLapEnd": 1645,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn6",
+					"distanceRoundLapStart": 1875,
+					"distanceRoundLapEnd": 2040,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn7",
+					"distanceRoundLapStart": 2110,
+					"distanceRoundLapEnd": 2215,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn8",
+					"distanceRoundLapStart": 2235,
+					"distanceRoundLapEnd": 2395,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn9",
+					"distanceRoundLapStart": 2520,
+					"distanceRoundLapEnd": 2650,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn10",
+					"distanceRoundLapStart": 2685,
+					"distanceRoundLapEnd": 2840,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn11",
+					"distanceRoundLapStart": 2920,
+					"distanceRoundLapEnd": 3015,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn12",
+					"distanceRoundLapStart": 3020,
+					"distanceRoundLapEnd": 3080,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn13",
+					"distanceRoundLapStart": 3085,
+					"distanceRoundLapEnd": 3220,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn14",
+					"distanceRoundLapStart": 3585,
+					"distanceRoundLapEnd": 3820,
+					"isCommonOvertakingSpot": false
+				}
+			]
+		},
+		{
+			"rf2TrackNames": ["Poznan Circuit -- Track Day"],
+			"trackLandmarks": [{
+					"landmarkName": "turn1",
+					"distanceRoundLapStart": 315,
+					"distanceRoundLapEnd": 675,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn2",
+					"distanceRoundLapStart": 730,
+					"distanceRoundLapEnd": 875,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn3",
+					"distanceRoundLapStart": 1105,
+					"distanceRoundLapEnd": 1250,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn4",
+					"distanceRoundLapStart": 1340,
+					"distanceRoundLapEnd": 1500,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn5",
+					"distanceRoundLapStart": 1520,
+					"distanceRoundLapEnd": 1645,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn6",
+					"distanceRoundLapStart": 1875,
+					"distanceRoundLapEnd": 2040,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn7",
+					"distanceRoundLapStart": 2110,
+					"distanceRoundLapEnd": 2215,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn8",
+					"distanceRoundLapStart": 2235,
+					"distanceRoundLapEnd": 2395,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn9",
+					"distanceRoundLapStart": 2520,
+					"distanceRoundLapEnd": 2650,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn10",
+					"distanceRoundLapStart": 2685,
+					"distanceRoundLapEnd": 2840,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn11",
+					"distanceRoundLapStart": 2920,
+					"distanceRoundLapEnd": 3015,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn12",
+					"distanceRoundLapStart": 3020,
+					"distanceRoundLapEnd": 3080,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn13",
+					"distanceRoundLapStart": 3085,
+					"distanceRoundLapEnd": 3220,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn14",
+					"distanceRoundLapStart": 3585,
+					"distanceRoundLapEnd": 3820,
+					"isCommonOvertakingSpot": false
+				}
+			]
+		},
+		{
+			"rf2TrackNames": ["PrinceGeorgeCircuit"],
+			"trackLandmarks": [{
+					"landmarkName": "potters_pass_curve",
+					"distanceRoundLapStart": 470,
+					"distanceRoundLapEnd": 725,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "rifle_bend",
+					"distanceRoundLapStart": 1010,
+					"distanceRoundLapEnd": 1180,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "cocobana_corner",
+					"distanceRoundLapStart": 1480,
+					"distanceRoundLapEnd": 1625,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "butts_bend",
+					"distanceRoundLapStart": 2040,
+					"distanceRoundLapEnd": 2170,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "the_esses",
+					"distanceRoundLapStart": 2260,
+					"distanceRoundLapEnd": 2480,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "coxs_corner",
+					"distanceRoundLapStart": 2530,
+					"distanceRoundLapEnd": 2670,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "the_sweep",
+					"distanceRoundLapStart": 2715,
+					"distanceRoundLapEnd": 2950,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "beacon_bend",
+					"distanceRoundLapStart": 3360,
+					"distanceRoundLapEnd": 3525,
+					"isCommonOvertakingSpot": true
+				}
+			]
+		},
+		{
+			"rf2TrackNames": ["Rouen 1955-70"],
+			"trackLandmarks": [{
+					"landmarkName": "turn1",
+					"distanceRoundLapStart": 65,
+					"distanceRoundLapEnd": 295,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn2",
+					"distanceRoundLapStart": 585,
+					"distanceRoundLapEnd": 820,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "des_roches",
+					"distanceRoundLapStart": 875,
+					"distanceRoundLapEnd": 1180,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "virage_du_nouveau_monde",
+					"distanceRoundLapStart": 1615,
+					"distanceRoundLapEnd": 1740,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn5",
+					"distanceRoundLapStart": 1770,
+					"distanceRoundLapEnd": 1950,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn6",
+					"distanceRoundLapStart": 2360,
+					"distanceRoundLapEnd": 2385,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "virage_samson",
+					"distanceRoundLapStart": 2615,
+					"distanceRoundLapEnd": 2740,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "virage_du_beauville",
+					"distanceRoundLapStart": 2775,
+					"distanceRoundLapEnd": 2930,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "courbe_de_l'etoile",
+					"distanceRoundLapStart": 3015,
+					"distanceRoundLapEnd": 3175,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "virage_du_gresil",
+					"distanceRoundLapStart": 3375,
+					"distanceRoundLapEnd": 4775,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "virage_de_la_foret",
+					"distanceRoundLapStart": 3850,
+					"distanceRoundLapEnd": 4000,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "virage_du_autoroute",
+					"distanceRoundLapStart": 4030,
+					"distanceRoundLapEnd": 4190,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "virage_cote_134",
+					"distanceRoundLapStart": 4225,
+					"distanceRoundLapEnd": 4470,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "virage_du_paradis",
+					"distanceRoundLapStart": 4655,
+					"distanceRoundLapEnd": 4830,
+					"isCommonOvertakingSpot": false
+				}
+			]
+		},
+		{
+			"rf2TrackNames": ["Sachsenring"],
+			"trackLandmarks": [{
+					"landmarkName": "coca_cola_kurve",
+					"distanceRoundLapStart": 265,
+					"distanceRoundLapEnd": 430,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "castrol_omega",
+					"distanceRoundLapStart": 440,
+					"distanceRoundLapEnd": 1055,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "sternquell",
+					"distanceRoundLapStart": 1075,
+					"distanceRoundLapEnd": 1195,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "karthallen",
+					"distanceRoundLapStart": 1250,
+					"distanceRoundLapEnd": 1515,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn5",
+					"distanceRoundLapStart": 1570,
+					"distanceRoundLapEnd": 1800,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn6",
+					"distanceRoundLapStart": 2050,
+					"distanceRoundLapEnd": 2185,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn7",
+					"distanceRoundLapStart": 2275,
+					"distanceRoundLapEnd": 240,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "sachsen_kurve",
+					"distanceRoundLapStart": 2730,
+					"distanceRoundLapEnd": 2985,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "queckenberg_kurve",
+					"distanceRoundLapStart": 3165,
+					"distanceRoundLapEnd": 3330,
+					"isCommonOvertakingSpot": true
+				}
+			]
+		}, {
+			"rf2TrackNames": ["Palm Springs Road Course B"],
+			"trackLandmarks": [{
+					"landmarkName": "turn1",
+					"distanceRoundLapStart": 160,
+					"distanceRoundLapEnd": 285,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn2",
+					"distanceRoundLapStart": 380,
+					"distanceRoundLapEnd": 475,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn3",
+					"distanceRoundLapStart": 555,
+					"distanceRoundLapEnd": 655,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn4",
+					"distanceRoundLapStart": 655,
+					"distanceRoundLapEnd": 765,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn5",
+					"distanceRoundLapStart": 770,
+					"distanceRoundLapEnd": 890,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn6",
+					"distanceRoundLapStart": 1245,
+					"distanceRoundLapEnd": 1340,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn7",
+					"distanceRoundLapStart": 1380,
+					"distanceRoundLapEnd": 1545,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn8",
+					"distanceRoundLapStart": 1990,
+					"distanceRoundLapEnd": 2100,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn9",
+					"distanceRoundLapStart": 2130,
+					"distanceRoundLapEnd": 2360,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn10",
+					"distanceRoundLapStart": 2330,
+					"distanceRoundLapEnd": 2355,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn11",
+					"distanceRoundLapStart": 2675,
+					"distanceRoundLapEnd": 3450,
 					"isCommonOvertakingSpot": true
 				}
 			]
