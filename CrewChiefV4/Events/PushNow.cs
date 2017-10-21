@@ -103,6 +103,12 @@ namespace CrewChiefV4.Events
                     Console.WriteLine("Failed to report brake temp status on pit exit");
                 }
             }
+            if(currentGameState.PositionAndMotionData.CarSpeed > 5 && isOpponentLeavingPits(currentGameState))
+            {
+                //This needs another message just using it for testing
+                audioPlayer.playMessage(new QueuedMessage(folderTrafficBehindExitingPits, 0, this));
+            }
+
         }
 
         private Boolean isOpponentApproachingPitExit(GameStateData currentGameState)
@@ -155,7 +161,8 @@ namespace CrewChiefV4.Events
                         !opponent.Value.isEnteringPits() && !opponent.Value.isExitingPits() && !opponent.Value.InPits)
                     {
                         float signedDelta = opponent.Value.DeltaTime.GetSignedDeltaTimeOnly(currentGameState.SessionData.DeltaTime);
-                        if (signedDelta < 0 && signedDelta < -7)
+                        //add a little to gap as 0 is right next to us when leaving the pits
+                        if (signedDelta < 0.2 && signedDelta < -7)
                         {
                             // more than 0 but less than 7 seconds behind, so warn about an approaching car
                             return true;
@@ -164,6 +171,23 @@ namespace CrewChiefV4.Events
                 }
                 return false;
             }
+        }
+        private Boolean isOpponentLeavingPits(GameStateData currentGameState)
+        {
+            // games with sane lap distance data when pitting
+            foreach (KeyValuePair<string, OpponentData> opponent in currentGameState.OpponentData)
+            {
+                if (opponent.Value.Speed > 0 && opponent.Value.IsAtPitExit)
+                {
+                    float signedDelta = opponent.Value.DeltaTime.GetSignedDeltaTimeOnly(currentGameState.SessionData.DeltaTime);
+
+                    if (signedDelta < 5 && signedDelta > 0)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;           
         }
 
         private Boolean checkGaps(GameStateData currentGameState, int numLapsLeft, Boolean checkPushToGain, Boolean checkPushToHold)

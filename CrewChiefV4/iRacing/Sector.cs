@@ -10,13 +10,13 @@ namespace CrewChiefV4.iRacing
     {
         public Sector()
         {
-            SectorTime = new Laptime(0);
+            SectorTime = -1;
         }
         public int Number { get; set; }
         public float StartPercentage { get; set; }
 
         public double EnterSessionTime { get; set; }
-        public Laptime SectorTime { get; set; }
+        public float SectorTime { get; set; }
 
         public Sector Copy()
         {

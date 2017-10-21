@@ -84,13 +84,10 @@ namespace CrewChiefV4.iRacing
             _driver = driver;
             _sessionNumber = sessionNumber;
 
-            this.Laps = new LaptimeCollection();
             this.IsEmpty = true;
             this.FastestLap = -1;
-            Laptime defaultLaptime = new Laptime(Int32.MaxValue);
-            this.Time = defaultLaptime;
-            this.LastTime = defaultLaptime;
-            this.AverageTime = defaultLaptime;
+            this.Time = -1;
+            this.LastTime = -1;
             this.FakeSectorTimes = new[]
                     {
                         new Sector() {Number = 0, StartPercentage = 0f},
@@ -111,17 +108,15 @@ namespace CrewChiefV4.iRacing
         public int ClassPosition { get; set; }
 
         public int Lap { get; set; }
-        public Laptime Time { get; set; }
+        public float Time { get; set; }
 
         public int FastestLap { get; set; }
-        public Laptime FastestTime { get; set; }
-        public Laptime LastTime { get; set; }
-        public Laptime AverageTime { get; set; }
+        public float FastestTime { get; set; }
+        public float  LastTime { get; set; }
         public int LapsLed { get; set; }
         public int LapsComplete { get; set; }
         public int LapsDriven { get; set; }
         
-        public LaptimeCollection Laps { get; set; }
 
         public Sector[] FakeSectorTimes { get; set; }
 
@@ -153,25 +148,15 @@ namespace CrewChiefV4.iRacing
             this.ClassPosition = Parser.ParseInt(query["ClassPosition"].GetValue()) + 1;
 
             this.Lap = Parser.ParseInt(query["Lap"].GetValue());
-            this.Time = new Laptime(Parser.ParseFloat(query["Time"].GetValue()));
+            this.Time = Parser.ParseFloat(query["Time"].GetValue());
             this.FastestLap = Parser.ParseInt(query["FastestLap"].GetValue());
-            this.FastestTime = new Laptime(Parser.ParseFloat(query["FastestTime"].GetValue()));
-            this.LastTime = new Laptime(Parser.ParseFloat(query["LastTime"].GetValue()));
+            this.FastestTime = Parser.ParseFloat(query["FastestTime"].GetValue());
+            this.LastTime = Parser.ParseFloat(query["LastTime"].GetValue());
             this.LapsLed = Parser.ParseInt(query["LapsLed"].GetValue());
 
             var previousLaps = this.LapsComplete;
             this.LapsComplete = Parser.ParseInt(query["LapsComplete"].GetValue());
             this.LapsDriven = Parser.ParseInt(query["LapsDriven"].GetValue());
-
-            this.FastestTime.LapNumber = this.FastestLap;
-            this.LastTime.LapNumber = this.LapsComplete;
-
-            // Check if a new lap is completed, and add it to Laps
-            if (this.LapsComplete > previousLaps)
-            {
-                this.Laps.Add(this.LastTime);
-                this.AverageTime = this.Laps.Average();
-            }
 
             this.Incidents = Parser.ParseInt(query["Incidents"].GetValue());;
             this.OutReasonId = Parser.ParseInt(query["ReasonOutId"].GetValue());
