@@ -465,3 +465,7 @@ reject_message_when_talking_help = Don't play any messages while you have the 't
 
 enable_rf2_frozen_order_messages = Enable rF2 frozen order messages
 enable_rf2_frozen_order_messages_help = Announce order information during Full Course Yellow, Rolling and Formation/Standing starts.
+enable_rf2_cut_track_heuristics = Enable rF2 cut track heurisitc detection
+enable_rf2_cut_track_heuristics_help = If enabled, CC will try to detect if user cut track.  If disabled, cut track will only be reported if game reported that lap got invalidated.
+enable_rf2_pit_lane_approach_heuristics = Enable rF2 pit lane approach detection
+enable_rf2_pit_lane_approach_heuristics_help = If enabled, CC will try to detect if user approaches the pit lane entry and remind him to respect speed limit.  Might not work correctly for all tracks.

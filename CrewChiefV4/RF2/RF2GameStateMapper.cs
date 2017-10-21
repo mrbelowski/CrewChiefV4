@@ -67,6 +67,8 @@ namespace CrewChiefV4.rFactor2
         private readonly bool enablePitStopPrediction = UserSettings.GetUserSettings().getBoolean("enable_rf2_pit_stop_prediction");
         private readonly bool enableBlueOnSlower = UserSettings.GetUserSettings().getBoolean("enable_rf2_blue_on_slower");
         private readonly bool enableFrozenOrderMessages = UserSettings.GetUserSettings().getBoolean("enable_rf2_frozen_order_messages");
+        private readonly bool enableCutTrackHeuristics = UserSettings.GetUserSettings().getBoolean("enable_rf2_cut_track_heuristics");
+        private readonly bool enablePitLaneApproachHeuristics = UserSettings.GetUserSettings().getBoolean("enable_rf2_pit_lane_approach_heuristics");
         private readonly bool incrementCutTrackCountWhenLeavingRacingSurface = true;
 
         // True if it looks like track has no DRS zones defined.
@@ -671,27 +673,30 @@ namespace CrewChiefV4.rFactor2
                 this.isApproachingPitEntry = false;
             }
 
-            if (cgs.PitData.InPitlane)
-                this.isApproachingPitEntry = false;
-
-            var estTrackWidth = Math.Abs(playerScoring.mTrackEdge) * 2.0;
-            if (this.minTrackWidthThisLap == -1.0 || estTrackWidth < this.minTrackWidthThisLap)
+            if (this.enablePitLaneApproachHeuristics)
             {
-                this.minTrackWidthThisLap = estTrackWidth;
-                Debug.WriteLine("New min track width:" + (this.minTrackWidthThisLap).ToString("0.000") + " pit lane: " + shared.rules.mTrackRules.mPitLaneStartDist);
+                if (cgs.PitData.InPitlane)
+                    this.isApproachingPitEntry = false;
 
-                // See if it looks like we're entering the pits.
-                // The idea here is that if:
-                // - current DistanceRoundTrack is past the point where track forks into pits
-                // - this appears like narrowest part of a track surface (tracked for an entire lap)
-                // - and pit is requested, assume we're approaching pit entry.
-                if (cgs.SessionData.SessionType == SessionType.Race
-                    && cgs.PositionAndMotionData.DistanceRoundTrack > shared.rules.mTrackRules.mPitLaneStartDist
-                    && cgs.PitData.HasRequestedPitStop)
-                    this.isApproachingPitEntry = true;
+                var estTrackWidth = Math.Abs(playerScoring.mTrackEdge) * 2.0;
+                if (this.minTrackWidthThisLap == -1.0 || estTrackWidth < this.minTrackWidthThisLap)
+                {
+                    this.minTrackWidthThisLap = estTrackWidth;
+                    Debug.WriteLine("New min track width:" + (this.minTrackWidthThisLap).ToString("0.000") + " pit lane: " + shared.rules.mTrackRules.mPitLaneStartDist);
+
+                    // See if it looks like we're entering the pits.
+                    // The idea here is that if:
+                    // - current DistanceRoundTrack is past the point where track forks into pits
+                    // - this appears like narrowest part of a track surface (tracked for an entire lap)
+                    // - and pit is requested, assume we're approaching pit entry.
+                    if (cgs.SessionData.SessionType == SessionType.Race
+                        && cgs.PositionAndMotionData.DistanceRoundTrack > shared.rules.mTrackRules.mPitLaneStartDist
+                        && cgs.PitData.HasRequestedPitStop)
+                        this.isApproachingPitEntry = true;
+                }
+
+                cgs.PitData.IsApproachingPitlane = this.isApproachingPitEntry;
             }
-
-            cgs.PitData.IsApproachingPitlane = this.isApproachingPitEntry;
 
             ////////////////////////////////////
             // Timings
@@ -1507,41 +1512,44 @@ namespace CrewChiefV4.rFactor2
                 cutTrackByInvalidLapDetected = true;
             }
 
-            // Improvised cut track warnings based on surface type.
-            if (this.incrementCutTrackCountWhenLeavingRacingSurface
-                && !cutTrackByInvalidLapDetected
-                && !cgs.PitData.InPitlane
-                && !cgs.PitData.OnOutLap)
+            if (this.enableCutTrackHeuristics)
             {
-                cgs.PenaltiesData.IsOffRacingSurface =
-                    wheelFrontLeft.mSurfaceType != (int)rFactor2Constants.rF2SurfaceType.Dry && wheelFrontLeft.mSurfaceType != (int)rFactor2Constants.rF2SurfaceType.Wet
-                    && wheelFrontRight.mSurfaceType != (int)rFactor2Constants.rF2SurfaceType.Dry && wheelFrontRight.mSurfaceType != (int)rFactor2Constants.rF2SurfaceType.Wet
-                    && wheelRearLeft.mSurfaceType != (int)rFactor2Constants.rF2SurfaceType.Dry && wheelRearLeft.mSurfaceType != (int)rFactor2Constants.rF2SurfaceType.Wet
-                    && wheelRearRight.mSurfaceType != (int)rFactor2Constants.rF2SurfaceType.Dry && wheelRearRight.mSurfaceType != (int)rFactor2Constants.rF2SurfaceType.Wet;
-
-                if (pgs != null && !pgs.PenaltiesData.IsOffRacingSurface && cgs.PenaltiesData.IsOffRacingSurface)
+                // Improvised cut track warnings based on surface type.
+                if (this.incrementCutTrackCountWhenLeavingRacingSurface
+                    && !cutTrackByInvalidLapDetected
+                    && !cgs.PitData.InPitlane
+                    && !cgs.PitData.OnOutLap)
                 {
-                    Console.WriteLine("Player off track: by surface type.");
-                    cgs.PenaltiesData.CutTrackWarnings = pgs.PenaltiesData.CutTrackWarnings + 1;
+                    cgs.PenaltiesData.IsOffRacingSurface =
+                        wheelFrontLeft.mSurfaceType != (int)rFactor2Constants.rF2SurfaceType.Dry && wheelFrontLeft.mSurfaceType != (int)rFactor2Constants.rF2SurfaceType.Wet
+                        && wheelFrontRight.mSurfaceType != (int)rFactor2Constants.rF2SurfaceType.Dry && wheelFrontRight.mSurfaceType != (int)rFactor2Constants.rF2SurfaceType.Wet
+                        && wheelRearLeft.mSurfaceType != (int)rFactor2Constants.rF2SurfaceType.Dry && wheelRearLeft.mSurfaceType != (int)rFactor2Constants.rF2SurfaceType.Wet
+                        && wheelRearRight.mSurfaceType != (int)rFactor2Constants.rF2SurfaceType.Dry && wheelRearRight.mSurfaceType != (int)rFactor2Constants.rF2SurfaceType.Wet;
+
+                    if (pgs != null && !pgs.PenaltiesData.IsOffRacingSurface && cgs.PenaltiesData.IsOffRacingSurface)
+                    {
+                        Console.WriteLine("Player off track: by surface type.");
+                        cgs.PenaltiesData.CutTrackWarnings = pgs.PenaltiesData.CutTrackWarnings + 1;
+                    }
                 }
-            }
 
-            // See if we're off track by distance.
-            if (!cutTrackByInvalidLapDetected
-                && !cgs.PenaltiesData.IsOffRacingSurface)
-            {
-                float lateralDistDiff = (float)(Math.Abs(playerScoring.mPathLateral) - Math.Abs(playerScoring.mTrackEdge));
-                cgs.PenaltiesData.IsOffRacingSurface = !cgs.PitData.InPitlane && lateralDistDiff >= 2;
-                float offTrackDistanceDelta = lateralDistDiff - this.distanceOffTrack;
-                this.distanceOffTrack = cgs.PenaltiesData.IsOffRacingSurface ? lateralDistDiff : 0;
-                this.isApproachingTrack = offTrackDistanceDelta < 0 && cgs.PenaltiesData.IsOffRacingSurface && lateralDistDiff < 3;
-
-                if (!cgs.PitData.OnOutLap && pgs != null
-                    && !pgs.PenaltiesData.IsOffRacingSurface && cgs.PenaltiesData.IsOffRacingSurface
-                    && !(cgs.SessionData.SessionType == SessionType.Race && cgs.SessionData.SessionPhase == SessionPhase.Countdown))
+                // See if we're off track by distance.
+                if (!cutTrackByInvalidLapDetected
+                    && !cgs.PenaltiesData.IsOffRacingSurface)
                 {
-                    Console.WriteLine("Player off track: by distance.");
-                    cgs.PenaltiesData.CutTrackWarnings = pgs.PenaltiesData.CutTrackWarnings + 1;
+                    float lateralDistDiff = (float)(Math.Abs(playerScoring.mPathLateral) - Math.Abs(playerScoring.mTrackEdge));
+                    cgs.PenaltiesData.IsOffRacingSurface = !cgs.PitData.InPitlane && lateralDistDiff >= 2;
+                    float offTrackDistanceDelta = lateralDistDiff - this.distanceOffTrack;
+                    this.distanceOffTrack = cgs.PenaltiesData.IsOffRacingSurface ? lateralDistDiff : 0;
+                    this.isApproachingTrack = offTrackDistanceDelta < 0 && cgs.PenaltiesData.IsOffRacingSurface && lateralDistDiff < 3;
+
+                    if (!cgs.PitData.OnOutLap && pgs != null
+                        && !pgs.PenaltiesData.IsOffRacingSurface && cgs.PenaltiesData.IsOffRacingSurface
+                        && !(cgs.SessionData.SessionType == SessionType.Race && cgs.SessionData.SessionPhase == SessionPhase.Countdown))
+                    {
+                        Console.WriteLine("Player off track: by distance.");
+                        cgs.PenaltiesData.CutTrackWarnings = pgs.PenaltiesData.CutTrackWarnings + 1;
+                    }
                 }
             }
 
