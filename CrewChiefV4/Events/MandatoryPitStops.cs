@@ -176,7 +176,7 @@ namespace CrewChiefV4.Events
                         !previousGameState.PitData.InPitlane && currentGameState.PitData.InPitlane && currentGameState.PitData.limiterStatus == 0)
                     {
                         // just entered the pit lane with no limiter active
-                        audioPlayer.playMessage(new QueuedMessage(folderEngageLimiter, 0, this));
+                        audioPlayer.playMessageImmediately(new QueuedMessage(folderEngageLimiter, 0, this));
                         timeOfLastLimiterWarning = currentGameState.Now;
                     }
                     else if (currentGameState.SessionData.SectorNumber == 1 &&
@@ -477,6 +477,8 @@ namespace CrewChiefV4.Events
                     && currentGameState.PitData.IsApproachingPitlane)
                 {
                     Console.WriteLine("PIT STOPS: WATCH YOUR SPEED IN PITS");
+                    // Temporary message.
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderEngageLimiter, 0, this));
                 }
                 if (!previousGameState.PitData.IsPitCrewReady
                     && currentGameState.PitData.IsPitCrewReady)
