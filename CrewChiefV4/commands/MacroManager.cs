@@ -42,7 +42,7 @@ namespace CrewChiefV4.commands
                 foreach (CommandSet commandSet in macro.commandSets)
                 {
                     // this does the conversion from key characters to key enums and stores the result to save us doing it every time
-                    commandSet.getKeyCodes(assignmentsByGame[commandSet.gameDefinition]);
+                    commandSet.getKeyCodes(false, assignmentsByGame[commandSet.gameDefinition]);
                 }
             }
             speechRecogniser.loadMacroVoiceTriggers(voiceTriggeredMacros);
@@ -103,10 +103,12 @@ namespace CrewChiefV4.commands
 
             if (File.Exists(path))
             {
+                Console.WriteLine("Loading user-configured command macros from Documents/CrewChiefV4/ folder");
                 return path;
             }
             else
             {
+                Console.WriteLine("Loading default command macros from installation folder");
                 return Configuration.getDefaultFileLocation("saved_command_macros.json");
             }
         }
