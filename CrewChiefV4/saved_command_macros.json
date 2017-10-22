@@ -59,6 +59,84 @@
 	}],
 	"macros": [ 
 	{
+		"name": "open / close pit menu",
+		"description": "open or close the pit menu",
+		"voiceTriggers": [ "toggle pit menu", "pit menu toggle" ],
+		"commandSets": [
+		{
+			"description": "r3e version",
+			"gameDefinition": "RACE_ROOM",
+			"actionSequence": [ "Pit Menu Toggle" ],
+			"keyPressTime": 10,
+			"waitBetweenEachCommand": 100
+		}]
+	},
+	{
+		"name": "pit menu up",
+		"description": "pit menu up",
+		"voiceTriggers": [ "pit menu up" ],
+		"commandSets": [
+		{
+			"description": "r3e version",
+			"gameDefinition": "RACE_ROOM",
+			"actionSequence": [ "Pit Menu Up" ],
+			"keyPressTime": 10,
+			"waitBetweenEachCommand": 100
+		}]
+	},
+	{
+		"name": "pit menu down",
+		"description": "pit menu down",
+		"voiceTriggers": [ "pit menu down" ],
+		"commandSets": [
+		{
+			"description": "r3e version",
+			"gameDefinition": "RACE_ROOM",
+			"actionSequence": [ "Pit Menu Down" ],
+			"keyPressTime": 10,
+			"waitBetweenEachCommand": 100
+		}]
+	},
+	{
+		"name": "pit menu left",
+		"description": "pit menu left",
+		"voiceTriggers": [ "pit menu left" ],
+		"commandSets": [
+		{
+			"description": "r3e version",
+			"gameDefinition": "RACE_ROOM",
+			"actionSequence": [ "Pit Menu Left" ],
+			"keyPressTime": 10,
+			"waitBetweenEachCommand": 100
+		}]
+	},
+	{
+		"name": "pit menu right",
+		"description": "pit menu right",
+		"voiceTriggers": [ "pit menu right" ],
+		"commandSets": [
+		{
+			"description": "r3e version",
+			"gameDefinition": "RACE_ROOM",
+			"actionSequence": [ "Pit Menu Right" ],
+			"keyPressTime": 10,
+			"waitBetweenEachCommand": 100
+		}]
+	},
+	{
+		"name": "pit menu select",
+		"description": "pit menu select",
+		"voiceTriggers": [ "pit menu select" ],
+		"commandSets": [
+		{
+			"description": "r3e version",
+			"gameDefinition": "RACE_ROOM",
+			"actionSequence": [ "Pit Menu Select" ],
+			"keyPressTime": 10,
+			"waitBetweenEachCommand": 100
+		}]
+	},
+	{
 		"name": "request pit",
 		"description": "requests a pitstop",
 		"confirmationMessage": "acknowledge/OK",
