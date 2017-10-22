@@ -78,10 +78,11 @@ namespace CrewChiefV4.iRacing
             if (dataReadFromFile != null && dataReadFromFile.Length > dataReadFromFileIndex)
             {
                 iRacingStructDumpWrapper structDumpWrapperData = dataReadFromFile[dataReadFromFileIndex];
-                if (!structDumpWrapperData.data.SessionInfo.Equals(""))
+                if (structDumpWrapperData.data.SessionInfoUpdate != lastUpdate)
                 {
-                    SessionInfo sessionInfo = new SessionInfo(structDumpWrapperData.data.SessionInfo, (double)structDumpWrapperData.data.SessionTime);
+                    SessionInfo sessionInfo = new SessionInfo(structDumpWrapperData.data.SessionInfo);
                     sim.SdkOnSessionInfoUpdated(sessionInfo, structDumpWrapperData.data.SessionNum, structDumpWrapperData.data.PlayerCarIdx);
+                    lastUpdate = structDumpWrapperData.data.SessionInfoUpdate;
                 }
                 sim.SdkOnTelemetryUpdated(structDumpWrapperData.data);
                 iRacingStructWrapper structWrapperData = new iRacingStructWrapper() { data = sim, ticksWhenRead = structDumpWrapperData.ticksWhenRead };
@@ -177,16 +178,11 @@ namespace CrewChiefV4.iRacing
                     int newUpdate = sdk.Header.SessionInfoUpdate;
                     if (newUpdate != lastUpdate)
                     {
-
-                        var time = sdk.GetData("SessionTime");
-                        if (time != null)
-                        {
-                            // Get the session info string
-                            SessionInfo sessionInfo = new SessionInfo(sdk.GetSessionInfo(), (double)time);
-                            // Raise the SessionInfoUpdated event and pass along the session info and session time.
-                            sim.SdkOnSessionInfoUpdated(sessionInfo, (int)TryGetSessionNum(), DriverId);
-                            lastUpdate = newUpdate;
-                        }
+                        // Get the session info string
+                        SessionInfo sessionInfo = new SessionInfo(sdk.GetSessionInfo());
+                        // Raise the SessionInfoUpdated event and pass along the session info and session time.
+                        sim.SdkOnSessionInfoUpdated(sessionInfo, (int)TryGetSessionNum(), DriverId);
+                        lastUpdate = newUpdate;
                     }
                     iRacingData irData = new iRacingData(sdk, dumpToFile);
 

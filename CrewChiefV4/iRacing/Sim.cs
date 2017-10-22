@@ -72,7 +72,6 @@ namespace CrewChiefV4.iRacing
             _isUpdatingDrivers = true;
             this.GetDrivers(info);
             _isUpdatingDrivers = false;
-
             this.GetResults(info);
         }
 
@@ -219,7 +218,6 @@ namespace CrewChiefV4.iRacing
             // If currently updating list, no need to update telemetry info 
             if (_isUpdatingDrivers) return;
 
-            if (_driver != null) _driver.UpdatePrivateInfo(info);
             foreach (var driver in _drivers)
             {
                 driver.Live.CalculateSpeed(info, _sessionData.Track.Length);
@@ -236,7 +234,7 @@ namespace CrewChiefV4.iRacing
             // Live positions are determined from track position (total lap distance)
             // Any other conditions (race finished, P, Q, etc), positions are ordered as result positions
 
-            if (this.SessionData.EventType == "Race" && !this.SessionData.IsCheckered)
+            if (this.SessionData.EventType == "Race" && !info.SessionFlags.HasFlag(SessionFlags.Checkered))
             {
                 // Determine live position from lapdistance
                 int pos = 1;
@@ -272,7 +270,7 @@ namespace CrewChiefV4.iRacing
                 int pos = 1;
                 foreach (var driver in _drivers.OrderBy(d => d.Live.LapDistance))
                 {
-                    if(driver.Live.LapDistance < 0 || driver.PitInfo.InPitStall)
+                    if(driver.Live.LapDistance < 0 || info.CarIdxOnPitRoad[driver.Id])
                     {
                         continue;
                     }
@@ -297,8 +295,6 @@ namespace CrewChiefV4.iRacing
                 }
             }
 
-            if (this.Leader != null && this.Leader.CurrentResults != null)
-                _sessionData.LeaderLap = this.Leader.CurrentResults.LapsComplete + 1;
         }
         
         #endregion
@@ -341,9 +337,6 @@ namespace CrewChiefV4.iRacing
 
             // Store current session number
             _currentSessionNumber = telemetry.SessionNum;
-
-            // Update session state
-            _sessionData.UpdateState(telemetry.SessionState);
 
             // Update drivers telemetry
             this.UpdateDriverTelemetry(telemetry);
