@@ -13,39 +13,46 @@ namespace CrewChiefV4.commands
         // This is called immediately after initialising the speech recogniser in MainWindow
         public static void initialise(AudioPlayer audioPlayer, SpeechRecogniser speechRecogniser)
         {
-            // load the json:
-            MacroContainer macroContainer = loadCommands(getUserMacrosFileLocation());
-
-            // get the assignments by game:
-            Dictionary<String, KeyBinding[]> assignmentsByGame = new Dictionary<String, KeyBinding[]>();
-            foreach (Assignment assignment in macroContainer.assignments)
+            if (UserSettings.GetUserSettings().getBoolean("enable_command_macros"))
             {
-                if (!assignmentsByGame.ContainsKey(assignment.gameDefinition))
-                {
-                    assignmentsByGame.Add(assignment.gameDefinition, assignment.keyBindings);
-                }
-            }
+                // load the json:
+                MacroContainer macroContainer = loadCommands(getUserMacrosFileLocation());
 
-            // now load them into the speech recogniser
-            Dictionary<string, ExecutableCommandMacro> voiceTriggeredMacros = new Dictionary<string, ExecutableCommandMacro>();
-            foreach (Macro macro in macroContainer.macros)
-            {
-                if (macro.voiceTriggers != null && macro.voiceTriggers.Length > 0)
+                // get the assignments by game:
+                Dictionary<String, KeyBinding[]> assignmentsByGame = new Dictionary<String, KeyBinding[]>();
+                foreach (Assignment assignment in macroContainer.assignments)
                 {
-                    ExecutableCommandMacro commandMacro = new ExecutableCommandMacro(audioPlayer, macro, assignmentsByGame);
-                    foreach (String voiceTrigger in macro.voiceTriggers)
+                    if (!assignmentsByGame.ContainsKey(assignment.gameDefinition))
                     {
-                        voiceTriggeredMacros.Add(voiceTrigger, commandMacro);
+                        assignmentsByGame.Add(assignment.gameDefinition, assignment.keyBindings);
                     }
                 }
-                // now eagerly load the key bindings for each macro:
-                foreach (CommandSet commandSet in macro.commandSets)
+
+                // now load them into the speech recogniser
+                Dictionary<string, ExecutableCommandMacro> voiceTriggeredMacros = new Dictionary<string, ExecutableCommandMacro>();
+                foreach (Macro macro in macroContainer.macros)
                 {
-                    // this does the conversion from key characters to key enums and stores the result to save us doing it every time
-                    commandSet.getActionItems(false, assignmentsByGame[commandSet.gameDefinition]);
+                    if (macro.voiceTriggers != null && macro.voiceTriggers.Length > 0)
+                    {
+                        ExecutableCommandMacro commandMacro = new ExecutableCommandMacro(audioPlayer, macro, assignmentsByGame);
+                        foreach (String voiceTrigger in macro.voiceTriggers)
+                        {
+                            voiceTriggeredMacros.Add(voiceTrigger, commandMacro);
+                        }
+                    }
+                    // now eagerly load the key bindings for each macro:
+                    foreach (CommandSet commandSet in macro.commandSets)
+                    {
+                        // this does the conversion from key characters to key enums and stores the result to save us doing it every time
+                        commandSet.getActionItems(false, assignmentsByGame[commandSet.gameDefinition]);
+                    }
                 }
+                speechRecogniser.loadMacroVoiceTriggers(voiceTriggeredMacros);
             }
-            speechRecogniser.loadMacroVoiceTriggers(voiceTriggeredMacros);
+            else
+            {
+                Console.WriteLine("Command macros are disabled");
+            }
         }
 
         // file loading boilerplate - needs refactoring
