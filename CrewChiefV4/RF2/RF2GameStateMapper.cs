@@ -667,13 +667,13 @@ namespace CrewChiefV4.rFactor2
 
             cgs.PitData.IsPitCrewDone = (rFactor2Constants.rF2PitState)playerScoring.mPitState == rFactor2Constants.rF2PitState.Exiting;
 
-            if (csd.IsNewLap)
+            // On out lap and S1, reset pit approach detection vars.
+            if (cgs.PitData.OnOutLap && csd.SectorNumber == 1)
             {
                 this.minTrackWidthThisLap = -1.0;
                 this.isApproachingPitEntry = false;
             }
-
-            if (this.enablePitLaneApproachHeuristics)
+            else if (this.enablePitLaneApproachHeuristics)
             {
                 if (cgs.PitData.InPitlane)
                     this.isApproachingPitEntry = false;
@@ -683,6 +683,7 @@ namespace CrewChiefV4.rFactor2
                 {
                     this.minTrackWidthThisLap = estTrackWidth;
                     Debug.WriteLine("New min track width:" + (this.minTrackWidthThisLap).ToString("0.000") + " pit lane: " + shared.rules.mTrackRules.mPitLaneStartDist);
+                    //lapDist: {playerScoring.mLapDist.ToString("0.000")}  pathLateral {playerScoring.mPathLateral.ToString("0.000")} estW {(estTrackWidth * 2.0).ToString("0.000")} inPit {cgs.PitData.InPitlane} ps: {playerScoring.mPitState}
 
                     // See if it looks like we're entering the pits.
                     // The idea here is that if:
@@ -690,6 +691,7 @@ namespace CrewChiefV4.rFactor2
                     // - this appears like narrowest part of a track surface (tracked for an entire lap)
                     // - and pit is requested, assume we're approaching pit entry.
                     if (cgs.SessionData.SessionType == SessionType.Race
+                        && !cgs.PitData.OnOutLap  // Exclude out lap because we don't have enough data.
                         && cgs.PositionAndMotionData.DistanceRoundTrack > shared.rules.mTrackRules.mPitLaneStartDist
                         && cgs.PitData.HasRequestedPitStop)
                         this.isApproachingPitEntry = true;
