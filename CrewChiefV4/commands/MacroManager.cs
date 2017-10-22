@@ -42,7 +42,7 @@ namespace CrewChiefV4.commands
                 foreach (CommandSet commandSet in macro.commandSets)
                 {
                     // this does the conversion from key characters to key enums and stores the result to save us doing it every time
-                    commandSet.getKeyCodes(false, assignmentsByGame[commandSet.gameDefinition]);
+                    commandSet.getActionItems(false, assignmentsByGame[commandSet.gameDefinition]);
                 }
             }
             speechRecogniser.loadMacroVoiceTriggers(voiceTriggeredMacros);

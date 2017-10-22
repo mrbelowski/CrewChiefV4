@@ -28,9 +28,16 @@ namespace CrewChiefV4.commands
                 if (CrewChief.gameDefinition.gameEnum.ToString().Equals(commandSet.gameDefinition) &&
                     assignmentsByGame.ContainsKey(commandSet.gameDefinition))
                 {
-                    foreach (KeyPresser.KeyCode keyCode in commandSet.getKeyCodes(true, assignmentsByGame[commandSet.gameDefinition]))
+                    foreach (ActionItem actionItem in commandSet.getActionItems(true, assignmentsByGame[commandSet.gameDefinition]))
                     {
-                        KeyPresser.SendScanCodeKeyPress(keyCode, commandSet.keyPressTime);
+                        if (actionItem.pauseMillis > 0)
+                        {
+                            Thread.Sleep(actionItem.pauseMillis);
+                        }
+                        else
+                        {
+                            KeyPresser.SendScanCodeKeyPress(actionItem.keyCode, commandSet.keyPressTime);
+                        }
                         Thread.Sleep(commandSet.waitBetweenEachCommand);
                     }
                     if (macro.confirmationMessage != null && macro.confirmationMessage.Length > 0)
@@ -82,38 +89,83 @@ namespace CrewChiefV4.commands
 		public int keyPressTime { get; set; }
         public int waitBetweenEachCommand { get; set; }
 
-        private List<KeyPresser.KeyCode> codes = null;
+        private List<ActionItem> actionItems = null;
 
-        public List<KeyPresser.KeyCode> getKeyCodes(Boolean writeToConsole, KeyBinding[] keyBindings)
+        public List<ActionItem> getActionItems(Boolean writeToConsole, KeyBinding[] keyBindings)
         {
-            if (this.codes == null)
+            if (this.actionItems == null)
             {
-                this.codes = new List<KeyPresser.KeyCode>();
+                this.actionItems = new List<ActionItem>();
                 foreach (String action in actionSequence)
                 {
-                    try
+                    ActionItem actionItem = new ActionItem(action, keyBindings);
+                    if (actionItem.parsedSuccessfully)
                     {
-                        foreach (KeyBinding keyBinding in keyBindings)
-                        {
-                            if (String.Equals(keyBinding.action, action, StringComparison.InvariantCultureIgnoreCase))
-                            {
-                                codes.Add((KeyPresser.KeyCode)Enum.Parse(typeof(KeyPresser.KeyCode), keyBinding.key, true));
-                                break;
-                            }
-                        }
-                    }                        
-                    catch (Exception)
-                    {
-                        Console.WriteLine("Action " + action + " not recognised");
+                        this.actionItems.Add(actionItem);
                     }
                 }
             }
             if (writeToConsole)
             {
                 Console.WriteLine("Sending actions " + String.Join(", ", actionSequence));
-                Console.WriteLine("Pressing keys " + String.Join(", ", codes));
+                Console.WriteLine("Pressing keys " + String.Join(", ", actionItems));
             }
-            return codes;
+            return actionItems;
+        }
+    }
+
+    public class ActionItem
+    {
+        public Boolean parsedSuccessfully = false;
+        public int pauseMillis = -1;
+        public KeyPresser.KeyCode keyCode;
+        public String actionText;
+        public ActionItem(String action, KeyBinding[] keyBindings)
+        {
+            this.actionText = action;
+            if (action.StartsWith("WAIT_"))
+            {
+                pauseMillis = int.Parse(action.Substring(5));
+                parsedSuccessfully = pauseMillis > 0;
+            }
+            else
+            {
+                try
+                {
+                    foreach (KeyBinding keyBinding in keyBindings)
+                    {
+                        if (String.Equals(keyBinding.action, action, StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            keyCode = (KeyPresser.KeyCode)Enum.Parse(typeof(KeyPresser.KeyCode), keyBinding.key, true);
+                            parsedSuccessfully = true;
+                            break;
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+                    Console.WriteLine("Action " + action + " not recognised");
+                }
+            }
+        }
+
+        public override String ToString()
+        {
+            if (parsedSuccessfully)
+            {
+                if (pauseMillis > 0)
+                {
+                    return "Pause " + pauseMillis + " milliseconds";
+                }
+                else
+                {
+                    return keyCode.ToString();
+                }
+            }
+            else
+            {
+                return "unable to parse action " + actionText;
+            }
         }
     }
 
