@@ -10,9 +10,8 @@ namespace CrewChiefV4.iRacing
 {
     public class SessionInfo
     {
-        public SessionInfo(string yaml, double updateTime)
+        public SessionInfo(string yaml)
         {
-            _updateTime = updateTime;
 
             _rawYaml = yaml;
 
@@ -21,12 +20,6 @@ namespace CrewChiefV4.iRacing
         }
 
         #region Properties
-
-        public double _updateTime;
-        /// <summary>
-        /// The time of this update.
-        /// </summary>
-        public double UpdateTime { get { return _updateTime; } }
 
         public string _yaml;
         /// <summary>

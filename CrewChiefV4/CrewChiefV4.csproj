@@ -126,8 +126,6 @@
     <Compile Include="iRacing\Drivers\Driver.cs" />
     <Compile Include="iRacing\Drivers\DriverCarInfo.cs" />
     <Compile Include="iRacing\Drivers\DriverLiveInfo.cs" />
-    <Compile Include="iRacing\Drivers\DriverPitInfo.cs" />
-    <Compile Include="iRacing\Drivers\DriverPrivateInfo.cs" />
     <Compile Include="iRacing\Drivers\DriverResults.cs" />
     <Compile Include="iRacing\Enums.cs" />
     <Compile Include="iRacing\iRacingData.cs" />
@@ -147,7 +145,6 @@
     <Compile Include="iRacing\SessionData.cs" />
     <Compile Include="iRacing\Sim.cs" />
     <Compile Include="iRacing\Track.cs" />
-    <Compile Include="iRacing\TrackConditions.cs" />
     <Compile Include="iRacing\YamlQuery.cs" />
     <Compile Include="NameValidator.cs" />
     <Compile Include="NoisyCartesianCoordinateSpotter.cs" />
