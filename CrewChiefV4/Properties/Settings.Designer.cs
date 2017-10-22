@@ -2432,7 +2432,7 @@ namespace CrewChiefV4.Properties {
             }
             set {
                 this["enable_command_macros"] = value;
->           }
+           }
         }
     }
 }
