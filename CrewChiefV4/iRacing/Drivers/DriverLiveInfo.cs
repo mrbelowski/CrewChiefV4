@@ -14,7 +14,6 @@ namespace CrewChiefV4.iRacing
         private DateTime NewLapDataTimerExpiry = DateTime.MaxValue;
         private DateTime Now = new DateTime(DateTime.Now.Ticks);
 
-
         public DriverLiveInfo(Driver driver)
         {
             _driver = driver;
@@ -63,7 +62,6 @@ namespace CrewChiefV4.iRacing
         public bool FirstTime { get; set; }
         // this may be true a short time *after* IsNewLap is true
         public Boolean LastLapTimeUpdated = false;
-
         private Boolean WaitingForNewLapData = false;
 
         private double _prevSpeedUpdateTime;
@@ -131,8 +129,6 @@ namespace CrewChiefV4.iRacing
             this.Rpm = e.CarIdxRPM[this.Driver.Id];
             this.SessionTime = (float)e.SessionTime;
 
-
-            this.Driver.PitInfo.CalculatePitInfo(e.SessionTime);
             //for local player we use data from telemetry as its updated faster the session info,
             //we do not have lastlaptime from opponents available in telemetry so we use data from sessioninfo.
             if(Driver.Id == e.PlayerCarIdx)
@@ -155,7 +151,6 @@ namespace CrewChiefV4.iRacing
             }
                 
         }
-
 
         private float FixPercentagesOnLapChange(float carIdxLapDistPct)
         {
