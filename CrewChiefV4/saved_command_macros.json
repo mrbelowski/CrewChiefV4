@@ -2,7 +2,7 @@
     "description": "This is the default command macro configuration. You can modify this file directly if you want, but it'll be overwritten when the app is updated. Make a copy in your Documents folder in a subfolder called CrewChiefV4 and modify the copy - the app will load this file from Documents/CrewChiefV4/ if it can find it, and will then fall back to the one in the installation folder. All text in 'description' elements will be ignored. These elements are only to provide a place to put comments.",
     "assignments": [
 	{
-	    "description": "Race Room command mappings - these are the key assignments in the Controller menu -> Primary. The key is what key to press, the action maps a elements in the actionSequence list in the commandSets below.",
+	    "description": "Race Room command mappings - these are the key assignments in the Controller menu -> Primary. The key is what key to press, the action maps a elements in the actionSequence list in the commandSets below. WAIT_1000 as an action makes the macro pause for (in this example) 1000 milliseconds (1 second). Use this to allow the player to see what item is about to be selected",
 	    "gameDefinition": "RACE_ROOM",
 		"keyBindings" : [
 		{
@@ -62,7 +62,7 @@
 		"name": "request pit",
 		"description": "requests a pitstop",
 		"confirmationMessage": "acknowledge/OK",
-		"voiceTriggers": [ "request pit", "box this lap" ],
+		"voiceTriggers": [ "request pit", "box this lap", "in this lap" ],
 		"buttonTriggers": [ 
 		{
 			"description": "wheel button X - button trigger not yet implemented",
@@ -94,7 +94,7 @@
 		"name": "confirm pit",
 		"description": "confirms pitstop actions - r3e only",
 		"confirmationMessage": "acknowledge/OK",
-		"voiceTriggers": [ "confirm pit", "stop as planned" ],
+		"voiceTriggers": [ "confirm pit", "confirm", "stop as planned" ],
 		"buttonTriggers": [],
 		"commandSets": [
 		{
@@ -114,7 +114,7 @@
 		{
 			"description": "r3e version - pcars indexes the strategies (see 'select strategy 1' etc)",
 			"gameDefinition": "RACE_ROOM",
-			"actionSequence": [ "Pit Menu Toggle", "Pit Menu Increase", "Pit Menu Toggle" ],
+			"actionSequence": [ "Pit Menu Toggle", "Pit Menu Increase", "WAIT_2000", "Pit Menu Toggle" ],
 			"keyPressTime": 10,
 			"waitBetweenEachCommand": 100
 		}]
@@ -128,7 +128,7 @@
 		{
 			"description": "r3e version - pcars indexes the strategies (see 'select strategy 1' etc)",
 			"gameDefinition": "RACE_ROOM",
-			"actionSequence": [ "Pit Menu Toggle", "Pit Menu Decrease", "Pit Menu Toggle" ],
+			"actionSequence": [ "Pit Menu Toggle", "Pit Menu Decrease", "WAIT_2000", "Pit Menu Toggle" ],
 			"keyPressTime": 10,
 			"waitBetweenEachCommand": 100
 		}]
@@ -186,6 +186,84 @@
 			"gameDefinition": "PCARS2",
 			"actionSequence": [ "Car Management", "ICM Menu Up", "ICM Menu Right", "ICM Menu Down", "ICM Menu Right", "ICM Menu Down", "ICM Menu Down", "ICM Menu Down", "ICM Menu Down", "ICM Menu Right", "ICM Menu Up", "ICM Menu Up", "ICM Menu Right", "ICM Menu Up", "ICM Menu Right", "ICM Menu Down", "ICM Menu Right" ],
 			"keyPressTime": 30,
+			"waitBetweenEachCommand": 100
+		}]
+	},
+	{
+		"name": "open / close pit menu",
+		"description": "open or close the pit menu - fallback for manual navigation",
+		"voiceTriggers": [ "toggle pit menu", "pit menu toggle" ],
+		"commandSets": [
+		{
+			"description": "r3e version",
+			"gameDefinition": "RACE_ROOM",
+			"actionSequence": [ "Pit Menu Toggle" ],
+			"keyPressTime": 10,
+			"waitBetweenEachCommand": 100
+		}]
+	},
+	{
+		"name": "pit menu select",
+		"description": "pit menu select - fallback for manual navigation",
+		"voiceTriggers": [ "pit menu select" ],
+		"commandSets": [
+		{
+			"description": "r3e version",
+			"gameDefinition": "RACE_ROOM",
+			"actionSequence": [ "Pit Menu Select" ],
+			"keyPressTime": 10,
+			"waitBetweenEachCommand": 100
+		}]
+	},
+	{
+		"name": "pit menu up",
+		"description": "pit menu up - fallback for manual navigation",
+		"voiceTriggers": [ "pit menu up" ],
+		"commandSets": [
+		{
+			"description": "r3e version",
+			"gameDefinition": "RACE_ROOM",
+			"actionSequence": [ "Pit Menu Up" ],
+			"keyPressTime": 10,
+			"waitBetweenEachCommand": 100
+		}]
+	},
+	{
+		"name": "pit menu down",
+		"description": "pit menu down - fallback for manual navigation",
+		"voiceTriggers": [ "pit menu down" ],
+		"commandSets": [
+		{
+			"description": "r3e version",
+			"gameDefinition": "RACE_ROOM",
+			"actionSequence": [ "Pit Menu Down" ],
+			"keyPressTime": 10,
+			"waitBetweenEachCommand": 100
+		}]
+	},
+	{
+		"name": "pit menu left",
+		"description": "pit menu left - fallback for manual navigation",
+		"voiceTriggers": [ "pit menu left" ],
+		"commandSets": [
+		{
+			"description": "r3e version",
+			"gameDefinition": "RACE_ROOM",
+			"actionSequence": [ "Pit Menu Decrease" ],
+			"keyPressTime": 10,
+			"waitBetweenEachCommand": 100
+		}]
+	},
+	{
+		"name": "pit menu right",
+		"description": "pit menu right - fallback for manual navigation",
+		"voiceTriggers": [ "pit menu right" ],
+		"commandSets": [
+		{
+			"description": "r3e version",
+			"gameDefinition": "RACE_ROOM",
+			"actionSequence": [ "Pit Menu Increase" ],
+			"keyPressTime": 10,
 			"waitBetweenEachCommand": 100
 		}]
 	}]

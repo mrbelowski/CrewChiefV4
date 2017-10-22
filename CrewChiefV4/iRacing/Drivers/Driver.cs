@@ -14,10 +14,8 @@ namespace CrewChiefV4.iRacing
         public Driver()
         {
             this.Car = new DriverCarInfo();
-            this.PitInfo = new DriverPitInfo(this);
             this.Results = new DriverResults(this);
             this.Live = new DriverLiveInfo(this);
-            this.Private = new DriverPrivateInfo(this);
             this.CurrentResults = new DriverSessionResults(this,0);
         }
 
@@ -44,11 +42,9 @@ namespace CrewChiefV4.iRacing
         public string DivisionName { get; set; }
 
         public DriverCarInfo Car { get; set; }
-        public DriverPitInfo PitInfo { get; set; }
         public DriverResults Results { get; private set; }
         public DriverSessionResults CurrentResults { get; set; }
         public DriverLiveInfo Live { get; private set; }
-        public DriverPrivateInfo Private { get; private set; }
 
         public string LongDisplay
         {
@@ -72,6 +68,7 @@ namespace CrewChiefV4.iRacing
 
             this.ClubName = query["ClubName"].GetValue();
             this.DivisionName = query["DivisionName"].GetValue();
+            
             this.IsPacecar = this.Name.ToLower().Equals(PACECAR_NAME2);
         }
 
@@ -121,11 +118,6 @@ namespace CrewChiefV4.iRacing
         internal void UpdateLiveInfo(iRacingData e)
         {
             this.Live.ParseTelemetry(e);
-        }
-
-        internal void UpdatePrivateInfo(iRacingData e)
-        {
-            this.Private.ParseTelemetry(e);
         }
 
         private double _prevPos;
