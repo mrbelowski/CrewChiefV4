@@ -53,6 +53,10 @@ namespace CrewChiefV4.rFactor2
 
         // Pit stop detection tracking variables.
         private double minTrackWidth = -1;
+
+        // It means we completed at least one full lap since exiting the pits (out lap excluded).
+        // When true. minTrackWidth is ready to be used for pit lane approach detection.
+        private bool trackWidthMapped = false;
         private DateTime timePitStopRequested = DateTime.MinValue;
         private bool isApproachingPitEntry = false;
 
@@ -172,6 +176,7 @@ namespace CrewChiefV4.rFactor2
             this.minTrackWidth = -1.0;
             this.timePitStopRequested = DateTime.MinValue;
             this.isApproachingPitEntry = false;
+            this.trackWidthMapped = false;
             RF2GameStateMapper.sanitizedNamesMap.Clear();
         }
 
@@ -667,20 +672,33 @@ namespace CrewChiefV4.rFactor2
 
             cgs.PitData.IsPitCrewDone = (rFactor2Constants.rF2PitState)playerScoring.mPitState == rFactor2Constants.rF2PitState.Exiting;
 
-            // Do not attempt to detect pit lane approach on the Out Lap.  This is because on that lap we are more likely to generate
-            // false positive past fork point (less track covered).  We do need to reset the minTrackWidth though, because we need to
-            // forget width of the previous pit entry.
-            if (cgs.PitData.OnOutLap)
+            // Reset pit lane approach prediction variables on exiting the pits.  Also, do not collect widths in a first
+            // sector of the out lap, as it may include pit exit lane values, which we don't need.
+            if (cgs.PitData.OnOutLap && csd.SectorNumber == 1)
             {
                 this.minTrackWidth = -1.0;
                 this.isApproachingPitEntry = false;
+                this.trackWidthMapped = false;
             }
             else if (this.enablePitLaneApproachHeuristics)
             {
+                // We need to have completed at least one full lap before we attempt guessing on pit lane approach.
+                if (pgs != null 
+                    && !pgs.PitData.OnOutLap
+                    && !cgs.PitData.OnOutLap
+                    && !cgs.PitData.InPitlane
+                    && csd.IsNewLap
+                    && csd.CompletedLaps > 0
+                    && this.minTrackWidth != -1.0)
+                {
+                    this.trackWidthMapped = true;
+                }
+
                 if (cgs.PitData.InPitlane)
                     this.isApproachingPitEntry = false;
 
                 var estTrackWidth = Math.Abs(playerScoring.mTrackEdge) * 2.0;
+
                 if (this.minTrackWidth == -1.0 || estTrackWidth < this.minTrackWidth)
                 {
                     this.minTrackWidth = estTrackWidth;
@@ -693,10 +711,13 @@ namespace CrewChiefV4.rFactor2
                     // - this appears like narrowest part of a track surface (tracked for an entire lap)
                     // - and pit is requested, assume we're approaching pit entry.
                     if (cgs.SessionData.SessionType == SessionType.Race
+                        && this.trackWidthMapped == true
                         && cgs.PositionAndMotionData.DistanceRoundTrack > shared.rules.mTrackRules.mPitLaneStartDist
                         && cgs.PitData.HasRequestedPitStop)
                         this.isApproachingPitEntry = true;
                 }
+
+                Debug.WriteLine($"lapDist: {playerScoring.mLapDist.ToString("0.000")}  pathLat {playerScoring.mPathLateral.ToString("0.000")} estW {(estTrackWidth * 2.0).ToString("0.000")} inPit {cgs.PitData.InPitlane} ps: {playerScoring.mPitState} appr: {this.isApproachingPitEntry} mapped: {this.trackWidthMapped}");
 
                 cgs.PitData.IsApproachingPitlane = this.isApproachingPitEntry;
             }
