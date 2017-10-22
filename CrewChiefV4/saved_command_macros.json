@@ -82,7 +82,7 @@
 		{
 			"description": "r3e version, keyPressTime quite short because of low key-repeat-delay",
 			"gameDefinition": "RACE_ROOM",
-			"actionSequence": [ "Pit Request Toggle" ],
+			"actionSequence": [ "Pit Request Toggle", "Pit Menu Toggle" ],
 			"keyPressTime": 10,
 			"waitBetweenEachCommand": 100
 		},
