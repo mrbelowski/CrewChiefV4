@@ -13,39 +13,69 @@ namespace CrewChiefV4.commands
         // This is called immediately after initialising the speech recogniser in MainWindow
         public static void initialise(AudioPlayer audioPlayer, SpeechRecogniser speechRecogniser)
         {
-            // load the json:
-            MacroContainer macroContainer = loadCommands(getUserMacrosFileLocation());
-
-            // get the assignments by game:
-            Dictionary<String, KeyBinding[]> assignmentsByGame = new Dictionary<String, KeyBinding[]>();
-            foreach (Assignment assignment in macroContainer.assignments)
+            if (UserSettings.GetUserSettings().getBoolean("enable_command_macros"))
             {
-                if (!assignmentsByGame.ContainsKey(assignment.gameDefinition))
+                // load the json:
+                MacroContainer macroContainer = loadCommands(getUserMacrosFileLocation());
+                // if it's valid, load the command sets:
+                if (macroContainer.assignments != null && macroContainer.assignments.Length > 0 && macroContainer.macros != null)
                 {
-                    assignmentsByGame.Add(assignment.gameDefinition, assignment.keyBindings);
-                }
-            }
-
-            // now load them into the speech recogniser
-            Dictionary<string, ExecutableCommandMacro> voiceTriggeredMacros = new Dictionary<string, ExecutableCommandMacro>();
-            foreach (Macro macro in macroContainer.macros)
-            {
-                if (macro.voiceTriggers != null && macro.voiceTriggers.Length > 0)
-                {
-                    ExecutableCommandMacro commandMacro = new ExecutableCommandMacro(audioPlayer, macro, assignmentsByGame);
-                    foreach (String voiceTrigger in macro.voiceTriggers)
+                    // get the assignments by game:
+                    Dictionary<String, KeyBinding[]> assignmentsByGame = new Dictionary<String, KeyBinding[]>();
+                    foreach (Assignment assignment in macroContainer.assignments)
                     {
-                        voiceTriggeredMacros.Add(voiceTrigger, commandMacro);
+                        if (!assignmentsByGame.ContainsKey(assignment.gameDefinition))
+                        {
+                            assignmentsByGame.Add(assignment.gameDefinition, assignment.keyBindings);
+                        }
+                    }
+
+                    // now load them into the speech recogniser
+                    Dictionary<string, ExecutableCommandMacro> voiceTriggeredMacros = new Dictionary<string, ExecutableCommandMacro>();
+                    foreach (Macro macro in macroContainer.macros)
+                    {
+                        Boolean hasCommandForCurrentGame = false;
+                        // eagerly load the key bindings for each macro:
+                        foreach (CommandSet commandSet in macro.commandSets)
+                        {
+                            if (commandSet.gameDefinition.Equals(CrewChief.gameDefinition.gameEnum.ToString(), StringComparison.InvariantCultureIgnoreCase))
+                            {
+                                hasCommandForCurrentGame = true;
+                                // this does the conversion from key characters to key enums and stores the result to save us doing it every time
+                                commandSet.getActionItems(false, assignmentsByGame[commandSet.gameDefinition]);
+                            }
+                        }
+                        if (hasCommandForCurrentGame && macro.voiceTriggers != null && macro.voiceTriggers.Length > 0)
+                        {
+                            ExecutableCommandMacro commandMacro = new ExecutableCommandMacro(audioPlayer, macro, assignmentsByGame);
+                            foreach (String voiceTrigger in macro.voiceTriggers)
+                            {
+                                if (voiceTriggeredMacros.ContainsKey(voiceTrigger))
+                                {
+                                    Console.WriteLine("Voice trigger " + voiceTrigger + " has already been allocated to a different command");
+                                }
+                                else
+                                {
+                                    voiceTriggeredMacros.Add(voiceTrigger, commandMacro);
+                                }
+                            }
+                        }                        
+                    }
+                    Console.WriteLine("Loading " + voiceTriggeredMacros.Count + " macro voice commands into speech recogniser");
+                    try
+                    {
+                        speechRecogniser.loadMacroVoiceTriggers(voiceTriggeredMacros);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("Failed to load command macros into speech recogniser: " + e.Message);
                     }
                 }
-                // now eagerly load the key bindings for each macro:
-                foreach (CommandSet commandSet in macro.commandSets)
-                {
-                    // this does the conversion from key characters to key enums and stores the result to save us doing it every time
-                    commandSet.getActionItems(false, assignmentsByGame[commandSet.gameDefinition]);
-                }
             }
-            speechRecogniser.loadMacroVoiceTriggers(voiceTriggeredMacros);
+            else
+            {
+                Console.WriteLine("Command macros are disabled");
+            }
         }
 
         // file loading boilerplate - needs refactoring
