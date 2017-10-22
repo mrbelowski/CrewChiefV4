@@ -28,6 +28,10 @@
 		{
 		    "action": "Pit Menu Increase",
 			"key": "KEY_D"
+		},
+		{
+		    "action": "Pit Request Toggle",
+			"key": "KEY_R"
 		}
 		]
 	},
@@ -78,7 +82,7 @@
 		{
 			"description": "r3e version, keyPressTime quite short because of low key-repeat-delay",
 			"gameDefinition": "RACE_ROOM",
-			"actionSequence": [ "Pit Menu Toggle", "Pit Menu Up", "Pit Menu Select", "Pit Menu Toggle" ],
+			"actionSequence": [ "Pit Request Toggle" ],
 			"keyPressTime": 10,
 			"waitBetweenEachCommand": 100
 		},
@@ -218,7 +222,7 @@
 	{
 		"name": "pit menu up",
 		"description": "pit menu up - fallback for manual navigation",
-		"voiceTriggers": [ "pit menu up" ],
+		"voiceTriggers": [ "pit menu down" ],
 		"commandSets": [
 		{
 			"description": "r3e version",
