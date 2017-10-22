@@ -2422,5 +2422,17 @@ namespace CrewChiefV4.Properties {
                 this["enable_rf2_pit_lane_approach_heuristics"] = value;
             }
         }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool enable_command_macros {
+            get {
+                return ((bool)(this["enable_command_macros"]));
+            }
+            set {
+                this["enable_command_macros"] = value;
+>           }
+        }
     }
 }
