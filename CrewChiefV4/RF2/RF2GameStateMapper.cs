@@ -54,8 +54,9 @@ namespace CrewChiefV4.rFactor2
         // Pit stop detection tracking variables.
         private double minTrackWidth = -1;
 
-        // It means we completed at least one full lap since exiting the pits (out lap excluded).
-        // When true. minTrackWidth is ready to be used for pit lane approach detection.
+        // Experimantal: If true, means we completed at least one full lap since exiting the pits (out lap excluded)
+        // and minTrackWidth is ready to be used for pit lane approach detection.
+        // However, it looks like depending on track authoring errors this might cause bad width stuck, so this is disabled currently.
         private bool trackWidthMapped = false;
         private DateTime timePitStopRequested = DateTime.MinValue;
         private bool isApproachingPitEntry = false;
@@ -73,7 +74,8 @@ namespace CrewChiefV4.rFactor2
         private readonly bool enableFrozenOrderMessages = UserSettings.GetUserSettings().getBoolean("enable_rf2_frozen_order_messages");
         private readonly bool enableCutTrackHeuristics = UserSettings.GetUserSettings().getBoolean("enable_rf2_cut_track_heuristics");
         private readonly bool enablePitLaneApproachHeuristics = UserSettings.GetUserSettings().getBoolean("enable_rf2_pit_lane_approach_heuristics");
-        private readonly bool incrementCutTrackCountWhenLeavingRacingSurface = true;
+        private const bool incrementCutTrackCountWhenLeavingRacingSurface = true;
+        private const bool resetMinWidthEveryLap = true;
 
         // True if it looks like track has no DRS zones defined.
         private bool detectedTrackNoDRSZones = false;
@@ -672,6 +674,12 @@ namespace CrewChiefV4.rFactor2
 
             cgs.PitData.IsPitCrewDone = (rFactor2Constants.rF2PitState)playerScoring.mPitState == rFactor2Constants.rF2PitState.Exiting;
 
+            if (csd.IsNewLap && RF2GameStateMapper.resetMinWidthEveryLap)
+            {
+                this.minTrackWidth = -1.0;
+                this.isApproachingPitEntry = false;
+            }
+
             // Reset pit lane approach prediction variables on exiting the pits.  Also, do not collect widths in a first
             // sector of the out lap, as it may include pit exit lane values, which we don't need.
             if (cgs.PitData.OnOutLap && csd.SectorNumber == 1)
@@ -703,7 +711,6 @@ namespace CrewChiefV4.rFactor2
                 {
                     this.minTrackWidth = estTrackWidth;
                     Debug.WriteLine("New min track width:" + (this.minTrackWidth).ToString("0.000") + " pit lane: " + shared.rules.mTrackRules.mPitLaneStartDist);
-                    //lapDist: {playerScoring.mLapDist.ToString("0.000")}  pathLateral {playerScoring.mPathLateral.ToString("0.000")} estW {(estTrackWidth * 2.0).ToString("0.000")} inPit {cgs.PitData.InPitlane} ps: {playerScoring.mPitState}
 
                     // See if it looks like we're entering the pits.
                     // The idea here is that if:
@@ -711,13 +718,13 @@ namespace CrewChiefV4.rFactor2
                     // - this appears like narrowest part of a track surface (tracked for an entire lap)
                     // - and pit is requested, assume we're approaching pit entry.
                     if (cgs.SessionData.SessionType == SessionType.Race
-                        && this.trackWidthMapped == true
+                        && (this.trackWidthMapped == true || RF2GameStateMapper.resetMinWidthEveryLap)
                         && cgs.PositionAndMotionData.DistanceRoundTrack > shared.rules.mTrackRules.mPitLaneStartDist
                         && cgs.PitData.HasRequestedPitStop)
                         this.isApproachingPitEntry = true;
                 }
 
-                Debug.WriteLine($"lapDist: {playerScoring.mLapDist.ToString("0.000")}  pathLat {playerScoring.mPathLateral.ToString("0.000")} estW {(estTrackWidth * 2.0).ToString("0.000")} inPit {cgs.PitData.InPitlane} ps: {playerScoring.mPitState} appr: {this.isApproachingPitEntry} mapped: {this.trackWidthMapped}");
+                Debug.WriteLine($"lapDist: {playerScoring.mLapDist.ToString("0.000")}  pathLat {playerScoring.mPathLateral.ToString("0.000")} estW {(estTrackWidth).ToString("0.000")} inPit {cgs.PitData.InPitlane} ps: {playerScoring.mPitState} appr: {this.isApproachingPitEntry} mapped: {this.trackWidthMapped}");
 
                 cgs.PitData.IsApproachingPitlane = this.isApproachingPitEntry;
             }
@@ -1539,7 +1546,7 @@ namespace CrewChiefV4.rFactor2
             if (this.enableCutTrackHeuristics)
             {
                 // Improvised cut track warnings based on surface type.
-                if (this.incrementCutTrackCountWhenLeavingRacingSurface
+                if (RF2GameStateMapper.incrementCutTrackCountWhenLeavingRacingSurface
                     && !cutTrackByInvalidLapDetected
                     && !cgs.PitData.InPitlane
                     && !cgs.PitData.OnOutLap)
@@ -1562,10 +1569,10 @@ namespace CrewChiefV4.rFactor2
                     && !cgs.PenaltiesData.IsOffRacingSurface)
                 {
                     float lateralDistDiff = (float)(Math.Abs(playerScoring.mPathLateral) - Math.Abs(playerScoring.mTrackEdge));
-                    cgs.PenaltiesData.IsOffRacingSurface = !cgs.PitData.InPitlane && lateralDistDiff >= 2;
+                    cgs.PenaltiesData.IsOffRacingSurface = !cgs.PitData.InPitlane && lateralDistDiff >= 2.0f;
                     float offTrackDistanceDelta = lateralDistDiff - this.distanceOffTrack;
-                    this.distanceOffTrack = cgs.PenaltiesData.IsOffRacingSurface ? lateralDistDiff : 0;
-                    this.isApproachingTrack = offTrackDistanceDelta < 0 && cgs.PenaltiesData.IsOffRacingSurface && lateralDistDiff < 3;
+                    this.distanceOffTrack = cgs.PenaltiesData.IsOffRacingSurface ? lateralDistDiff : 0.0f;
+                    this.isApproachingTrack = offTrackDistanceDelta < 0 && cgs.PenaltiesData.IsOffRacingSurface && lateralDistDiff < 3.0f;
 
                     if (!cgs.PitData.OnOutLap && pgs != null
                         && !pgs.PenaltiesData.IsOffRacingSurface && cgs.PenaltiesData.IsOffRacingSurface
@@ -2052,6 +2059,9 @@ namespace CrewChiefV4.rFactor2
                 return sanitizedName;
 
             var fwdSlashPos = nameFromGame.IndexOf('/');
+            if (fwdSlashPos != -1)
+                Console.WriteLine(string.Format(@"Detected pair name: ""{0}"" . Crew Chief does not currently support double names, first part will be used.", nameFromGame));
+
             sanitizedName = fwdSlashPos == -1 ? nameFromGame : nameFromGame.Substring(0, fwdSlashPos);
 
             // Save for fast lookup next time.

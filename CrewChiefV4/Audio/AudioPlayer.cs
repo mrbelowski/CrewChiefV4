@@ -410,7 +410,7 @@ namespace CrewChiefV4.Audio
                     backgroundPlayer = new MediaPlayer();
                     backgroundPlayer.MediaEnded += new EventHandler(backgroundPlayer_MediaEnded);
 
-                    // Start background player mute, as otherwise it causes some noise (sounds like some buffers flushed).
+                    // Start background player muted, as otherwise it causes some noise (sounds like some buffers are flushed).
                     backgroundPlayer.Volume = 0.0;
                     backgroundPlayerInitialised = true;
                     setBackgroundSound(dtmPitWindowClosedBackground);
