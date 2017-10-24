@@ -710,6 +710,17 @@ namespace CrewChiefV4.rFactor2
                 if (this.minTrackWidth == -1.0 || estTrackWidth < this.minTrackWidth)
                 {
                     this.minTrackWidth = estTrackWidth;
+
+                    Console.WriteLine(string.Format("New min width:{0} pit lane: {1} lapDist: {2} pathLat: {3} inPit: {4} ps: {5} appr: {6} lap: {7}",
+                        (this.minTrackWidth).ToString("0.000"),
+                        shared.rules.mTrackRules.mPitLaneStartDist,
+                        playerScoring.mLapDist.ToString("0.000"),
+                        playerScoring.mPathLateral.ToString("0.000"),
+                        cgs.PitData.InPitlane,
+                        playerScoring.mPitState,
+                        this.isApproachingPitEntry,
+                        csd.CompletedLaps + 1));
+
                     Debug.WriteLine("New min track width:" + (this.minTrackWidth).ToString("0.000") + " pit lane: " + shared.rules.mTrackRules.mPitLaneStartDist);
 
                     // See if it looks like we're entering the pits.
