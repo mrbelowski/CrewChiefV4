@@ -104,9 +104,10 @@
 		{
 			"description": "r3e only - presses the 'confirm' button when entering the pits",
 			"gameDefinition": "RACE_ROOM",
-			"actionSequence": [ "Pit Menu Select", "Pit Menu Toggle" ],
+			"actionSequence": [ "Pit Menu Select", "WAIT_1000", "Pit Menu Toggle" ],
 			"keyPressTime": 10,
-			"waitBetweenEachCommand": 100
+			"waitBetweenEachCommand": 100,
+			"allowAutomaticTriggering": true
 		}]
 	},
 	{
@@ -222,7 +223,7 @@
 	{
 		"name": "pit menu up",
 		"description": "pit menu up - fallback for manual navigation",
-		"voiceTriggers": [ "pit menu down" ],
+		"voiceTriggers": [ "pit menu up" ],
 		"commandSets": [
 		{
 			"description": "r3e version",

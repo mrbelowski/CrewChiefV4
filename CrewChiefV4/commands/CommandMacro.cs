@@ -13,11 +13,17 @@ namespace CrewChiefV4.commands
         AudioPlayer audioPlayer;
         Macro macro;
         Dictionary<String, KeyBinding[]> assignmentsByGame;
-        public ExecutableCommandMacro(AudioPlayer audioPlayer, Macro macro, Dictionary<String, KeyBinding[]> assignmentsByGame)
+        public Boolean allowAutomaticTriggering;
+        public ExecutableCommandMacro(AudioPlayer audioPlayer, Macro macro, Dictionary<String, KeyBinding[]> assignmentsByGame, Boolean allowAutomaticTriggering)
         {
             this.audioPlayer = audioPlayer;
             this.macro = macro;
             this.assignmentsByGame = assignmentsByGame;
+            this.allowAutomaticTriggering = allowAutomaticTriggering;
+            if (allowAutomaticTriggering)
+            {
+                Console.WriteLine("Macro \"" + macro.name + "\" can be triggered automatically");
+            }
         }
         public void execute()
         {
@@ -88,6 +94,7 @@ namespace CrewChiefV4.commands
 		public String[] actionSequence { get; set; }
 		public int keyPressTime { get; set; }
         public int waitBetweenEachCommand { get; set; }
+        public Boolean allowAutomaticTriggering { get; set; }
 
         private List<ActionItem> actionItems = null;
 
