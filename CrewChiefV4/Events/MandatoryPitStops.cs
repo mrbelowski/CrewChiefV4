@@ -173,11 +173,20 @@ namespace CrewChiefV4.Events
                 else if (previousGameState != null)
                 {
                     if (currentGameState.SessionData.SectorNumber == 3 &&
-                        !previousGameState.PitData.InPitlane && currentGameState.PitData.InPitlane && currentGameState.PitData.limiterStatus == 0)
+                        !previousGameState.PitData.InPitlane && currentGameState.PitData.InPitlane)
                     {
-                        // just entered the pit lane with no limiter active
-                        audioPlayer.playMessage(new QueuedMessage(folderEngageLimiter, 0, this));
-                        timeOfLastLimiterWarning = currentGameState.Now;
+                        // just passed the limiter line. Nasty hack - if we're playing Raceroom, confirm the pit actions using the macro if it exists:
+                        if (CrewChief.gameDefinition.gameEnum == GameEnum.RACE_ROOM && CrewChiefV4.commands.MacroManager.macros.ContainsKey("confirm pit")
+                            && CrewChiefV4.commands.MacroManager.macros["confirm pit"].allowAutomaticTriggering)
+                        {
+                            CrewChiefV4.commands.MacroManager.macros["confirm pit"].execute();
+                        }
+                        if (currentGameState.PitData.limiterStatus == 0)
+                        {
+                            // just entered the pit lane with no limiter active
+                            audioPlayer.playMessage(new QueuedMessage(folderEngageLimiter, 0, this));
+                            timeOfLastLimiterWarning = currentGameState.Now;
+                        }
                     }
                     else if (currentGameState.SessionData.SectorNumber == 1 &&
                         previousGameState.PitData.InPitlane && !currentGameState.PitData.InPitlane && currentGameState.PitData.limiterStatus == 1)
