@@ -27,6 +27,11 @@ namespace CrewChiefV4.commands
         }
         public void execute()
         {
+            execute(false);
+        }
+
+        public void execute(Boolean supressConfirmationMessage)
+        {
             // blocking...
             foreach (CommandSet commandSet in macro.commandSets)
             {
@@ -46,7 +51,7 @@ namespace CrewChiefV4.commands
                         }
                         Thread.Sleep(commandSet.waitBetweenEachCommand);
                     }
-                    if (macro.confirmationMessage != null && macro.confirmationMessage.Length > 0)
+                    if (macro.confirmationMessage != null && macro.confirmationMessage.Length > 0 && !supressConfirmationMessage)
                     {
                         audioPlayer.playMessageImmediately(new QueuedMessage(macro.confirmationMessage, 0, null));
                     }

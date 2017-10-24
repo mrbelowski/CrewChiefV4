@@ -179,7 +179,7 @@ namespace CrewChiefV4.Events
                         if (CrewChief.gameDefinition.gameEnum == GameEnum.RACE_ROOM && CrewChiefV4.commands.MacroManager.macros.ContainsKey("confirm pit")
                             && CrewChiefV4.commands.MacroManager.macros["confirm pit"].allowAutomaticTriggering)
                         {
-                            CrewChiefV4.commands.MacroManager.macros["confirm pit"].execute();
+                            CrewChiefV4.commands.MacroManager.macros["confirm pit"].execute(true);
                         }
                         if (currentGameState.PitData.limiterStatus == 0)
                         {
