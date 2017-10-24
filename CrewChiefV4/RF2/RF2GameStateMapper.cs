@@ -631,7 +631,9 @@ namespace CrewChiefV4.rFactor2
             if (shared.extended.mInRealtimeFC == 0  // Mark pit limiter as unavailable if in Monitor (not real time).
                 || shared.scoring.mScoringInfo.mInRealtime == 0
                 || playerTelemetry.mSpeedLimiterAvailable == 0)
+            {
                 cgs.PitData.limiterStatus = -1;
+            }
             else
                 cgs.PitData.limiterStatus = playerTelemetry.mSpeedLimiter > 0 ? 1 : 0;
 
@@ -653,9 +655,7 @@ namespace CrewChiefV4.rFactor2
                 ? PitWindow.StopInProgress : mapToPitWindow((rFactor2Constants.rF2YellowFlagState)shared.scoring.mScoringInfo.mYellowFlagState);
 
             if (pgs != null)
-            {
                 cgs.PitData.MandatoryPitStopCompleted = pgs.PitData.MandatoryPitStopCompleted || cgs.PitData.IsMakingMandatoryPitStop;
-            }
 
             cgs.PitData.HasRequestedPitStop = (rFactor2Constants.rF2PitState)playerScoring.mPitState == rFactor2Constants.rF2PitState.Request;
 
@@ -852,13 +852,9 @@ namespace CrewChiefV4.rFactor2
                     cgs.CarDamageData.OverallAeroDamage = DamageLevel.MINOR;
                 }
                 else if (playerDamageInfo.mMaxImpactMagnitude > 0.0)
-                {
                     cgs.CarDamageData.OverallAeroDamage = DamageLevel.TRIVIAL;
-                }
                 else
-                {
                     cgs.CarDamageData.OverallAeroDamage = DamageLevel.NONE;
-                }
             }
             else  // shared.extended.mPhysics.mInvulnerable != 0
             {
