@@ -558,6 +558,7 @@ namespace CrewChiefV4
                 {
                     if (macroLookup.ContainsKey(e.Result.Text))
                     {
+                        // TODO: check the confidence level here
                         macroLookup[e.Result.Text].execute();
                     }
                 }
@@ -596,7 +597,11 @@ namespace CrewChiefV4
             {
                 Console.WriteLine("Unable to respond - error message: " + exception.Message);
             }
-
+            
+            // TODO: 'stop' the recogniser if we're ALWAYS_ON (because we restart it below) or TOGGLE
+            // (because the user might have forgotten to press the button to close the channel).
+            // For HOLD mode, let the recogniser continue listening and executing commands (invoking this callback)
+            // for as long as the button is pressed
             sre.RecognizeAsyncStop(); 
             Thread.Sleep(500);
             if (voiceOptionEnum == MainWindow.VoiceOptionEnum.ALWAYS_ON)
