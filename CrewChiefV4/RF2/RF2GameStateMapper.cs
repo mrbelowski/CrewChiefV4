@@ -667,7 +667,7 @@ namespace CrewChiefV4.rFactor2
             if (pgs != null
                 && pgs.PitData.HasRequestedPitStop
                 && cgs.PitData.HasRequestedPitStop
-                && (cgs.Now - this.timePitStopRequested).TotalSeconds > 15)  // Haha!
+                && (cgs.Now - this.timePitStopRequested).TotalSeconds > cgs.carClass.pitCrewPreparationTime)
             {
                 cgs.PitData.IsPitCrewReady = true;
             }
@@ -711,18 +711,6 @@ namespace CrewChiefV4.rFactor2
                 {
                     this.minTrackWidth = estTrackWidth;
 
-                    Console.WriteLine(string.Format("New min width:{0} pit lane: {1} lapDist: {2} pathLat: {3} inPit: {4} ps: {5} appr: {6} lap: {7}",
-                        (this.minTrackWidth).ToString("0.000"),
-                        shared.rules.mTrackRules.mPitLaneStartDist,
-                        playerScoring.mLapDist.ToString("0.000"),
-                        playerScoring.mPathLateral.ToString("0.000"),
-                        cgs.PitData.InPitlane,
-                        playerScoring.mPitState,
-                        this.isApproachingPitEntry,
-                        csd.CompletedLaps + 1));
-
-                    Debug.WriteLine("New min track width:" + (this.minTrackWidth).ToString("0.000") + " pit lane: " + shared.rules.mTrackRules.mPitLaneStartDist);
-
                     // See if it looks like we're entering the pits.
                     // The idea here is that if:
                     // - current DistanceRoundTrack is past the point where track forks into pits
@@ -733,10 +721,21 @@ namespace CrewChiefV4.rFactor2
                         && cgs.PositionAndMotionData.DistanceRoundTrack > shared.rules.mTrackRules.mPitLaneStartDist
                         && cgs.PitData.HasRequestedPitStop)
                         this.isApproachingPitEntry = true;
+
+                    Console.WriteLine(string.Format("New min width:{0:0.000}    lapDist:{1:0.000}    pathLat:{2:0.000}    inPit:{3}    ps:{4}    appr:{5}    lap:{6}    pit lane:{7:0.000}",
+                        this.minTrackWidth,
+                        playerScoring.mLapDist,
+                        playerScoring.mPathLateral,
+                        cgs.PitData.InPitlane,
+                        playerScoring.mPitState,
+                        this.isApproachingPitEntry,
+                        csd.CompletedLaps + 1,
+                        shared.rules.mTrackRules.mPitLaneStartDist));
+
+                    //Debug.WriteLine("New min track width:" + (this.minTrackWidth).ToString("0.000") + " pit lane: " + shared.rules.mTrackRules.mPitLaneStartDist);
                 }
 
-                Debug.WriteLine($"lapDist: {playerScoring.mLapDist.ToString("0.000")}  pathLat {playerScoring.mPathLateral.ToString("0.000")} estW {(estTrackWidth).ToString("0.000")} inPit {cgs.PitData.InPitlane} ps: {playerScoring.mPitState} appr: {this.isApproachingPitEntry} mapped: {this.trackWidthMapped}");
-
+                //Debug.WriteLine($"lapDist: {playerScoring.mLapDist.ToString("0.000")}  pathLat {playerScoring.mPathLateral.ToString("0.000")} estW {(estTrackWidth).ToString("0.000")} inPit {cgs.PitData.InPitlane} ps: {playerScoring.mPitState} appr: {this.isApproachingPitEntry} mapped: {this.trackWidthMapped}");
                 cgs.PitData.IsApproachingPitlane = this.isApproachingPitEntry;
             }
 
