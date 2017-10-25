@@ -152,7 +152,7 @@ namespace CrewChiefV4.iRacing
                 foreach (Driver driver in shared.Drivers)
                 {
                     driverName = driver.Name.ToLower();
-                    if (driver.Id == PlayerCarIdx /*|| driver.CurrentResults.IsOut*/ || driver.IsPacecar /*|| driver.Live.TrackSurface.HasFlag(TrackSurfaces.NotInWorld)*/)
+                    if (driver.Id == PlayerCarIdx || driver.CurrentResults.IsOut || driver.IsPacecar || driver.Live.TrackSurface.HasFlag(TrackSurfaces.NotInWorld))
                     {
                         continue;
                     }
@@ -333,26 +333,11 @@ namespace CrewChiefV4.iRacing
             {
                 currentGameState.SessionData.OverallSessionBestLapTime = shared.Telemetry.LapBestLapTime;
             }
-            /*
-            float playerClassBestLap = (float)shared.SessionData.ClassBestLaps[playerCar.Car.CarClassId].Laptime.Time.TotalSeconds;
-            currentGameState.SessionData.SessionFastestLapTimeFromGamePlayerClass = playerClassBestLap;
-            
-            if (currentGameState.SessionData.OverallSessionBestLapTime == -1 ||
-                currentGameState.SessionData.OverallSessionBestLapTime > shared.SessionData.OverallBestLap.Laptime.Time.TotalSeconds)
-            {
-                currentGameState.SessionData.OverallSessionBestLapTime = (float)shared.SessionData.OverallBestLap.Laptime.Time.TotalSeconds;
-            }
-            if (currentGameState.SessionData.PlayerClassSessionBestLapTime == -1 ||
-                currentGameState.SessionData.PlayerClassSessionBestLapTime > playerClassBestLap)
-            {
-                currentGameState.SessionData.PlayerClassSessionBestLapTime = playerClassBestLap;
-            }
-            */
 
-            currentGameState.SessionData.IsNewLap = playerCar.Live.IsNewLap || ((lastSessionPhase == SessionPhase.Countdown)
-                && (currentGameState.SessionData.SessionPhase == SessionPhase.Green || currentGameState.SessionData.SessionPhase == SessionPhase.FullCourseYellow));
+            //currentGameState.SessionData.IsNewLap = playerCar.Live.IsNewLap || ((lastSessionPhase == SessionPhase.Countdown)
+               // && (currentGameState.SessionData.SessionPhase == SessionPhase.Green || currentGameState.SessionData.SessionPhase == SessionPhase.FullCourseYellow));
 
-            //currentGameState.SessionData.IsNewLap = playerCar.Live.IsNewLap; 
+            currentGameState.SessionData.IsNewLap = playerCar.Live.IsNewLap; 
             if (previousGameState != null && !currentGameState.SessionData.IsNewSession)
             {
                 currentGameState.OpponentData = previousGameState.OpponentData;
@@ -367,9 +352,9 @@ namespace CrewChiefV4.iRacing
             //int currentSector = getCurrentSector(currentGameState.SessionData.TrackDefinition, currentGameState.PositionAndMotionData.DistanceRoundTrack);
             currentGameState.SessionData.IsNewSector = currentGameState.SessionData.SectorNumber != currentSector;
 
-            if (currentGameState.SessionData.IsNewSector && playerCar.Live.Lap > 0)
+            if (currentGameState.SessionData.IsNewSector || currentGameState.SessionData.IsNewLap)
             {
-                if (currentSector == 1)
+                if (currentSector == 1 && currentGameState.SessionData.IsNewLap)
                 {
                     currentGameState.SessionData.SessionTimesAtEndOfSectors[3] = currentGameState.SessionData.SessionRunningTime;
                     float sectorTime = (float)playerCar.CurrentResults.FakeSector3.SectorTime;
@@ -382,7 +367,7 @@ namespace CrewChiefV4.iRacing
                         {
                             currentGameState.SessionData.PlayerBestSector3Time = currentGameState.SessionData.LastSector3Time;
                         }
-                        if (currentGameState.SessionData.LapTimePrevious > 0 &&
+                        if (currentGameState.SessionData.LapTimePrevious > 1 &&
                             (currentGameState.SessionData.PlayerLapTimeSessionBest == -1 || currentGameState.SessionData.LapTimePrevious <= currentGameState.SessionData.PlayerLapTimeSessionBest))
                         {
                             currentGameState.SessionData.PlayerBestLapSector1Time = currentGameState.SessionData.LastSector1Time;
@@ -489,17 +474,21 @@ namespace CrewChiefV4.iRacing
                 currentGameState.SessionData.PositionAtStartOfCurrentLap = currentGameState.SessionData.Position;
                 currentGameState.SessionData.formattedPlayerLapTimes.Add(TimeSpan.FromSeconds(playerCar.Live.LapTimePrevious).ToString(@"mm\:ss\.fff"));
                 Console.WriteLine(TimeSpan.FromSeconds(playerCar.Live.LapTimePrevious).ToString(@"mm\:ss\.fff"));
+                if (currentGameState.carClass.carClassEnum == CarData.CarClassEnum.UNKNOWN_RACE)
+                {
+                    currentGameState.carClass = CarData.getCarClassForIRacingId(playerCar.Car.CarClassId);
+                }
 
             }
 
             foreach (Driver driver in shared.Drivers)
             {
-                if (driver.Id == PlayerCarIdx || driver.CurrentResults.IsOut/* || driver.Live.TrackSurface.HasFlag(TrackSurfaces.NotInWorld)*/||driver.IsPacecar)
+                if (driver.Id == PlayerCarIdx || driver.CurrentResults.IsOut || driver.Live.TrackSurface.HasFlag(TrackSurfaces.NotInWorld) || driver.IsPacecar)
                 {
                     continue;
                 }
                 String driverName = driver.Name.ToLower();
-                //lastActiveTimeForOpponents[driverName] = currentGameState.Now;
+                lastActiveTimeForOpponents[driverName] = currentGameState.Now;
                 if (currentGameState.OpponentData.ContainsKey(driverName))
                 {
 
@@ -592,8 +581,6 @@ namespace CrewChiefV4.iRacing
                             currentGameState.SessionData.HasLeadChanged = true;
                         }
 
-
-
                         Boolean isEnteringPits = shared.Telemetry.CarIdxOnPitRoad[driver.Id] && currentOpponentSector == 3;
                         Boolean isLeavingPits = shared.Telemetry.CarIdxOnPitRoad[driver.Id] && currentOpponentSector == 1;
 
@@ -659,7 +646,7 @@ namespace CrewChiefV4.iRacing
                         {
                             currentOpponentData.trackLandmarksTiming.cancelWaitingForLandmarkEnd();
                         }
-                        if (currentOpponentData.CurrentBestLapTime > 0)
+                        if (currentOpponentData.CurrentBestLapTime > 1)
                         {
                             if (currentGameState.SessionData.OpponentsLapTimeSessionBestOverall == -1 ||
                                 currentOpponentData.CurrentBestLapTime < currentGameState.SessionData.OpponentsLapTimeSessionBestOverall)
@@ -696,7 +683,7 @@ namespace CrewChiefV4.iRacing
                     }
                 }
             }
-            /*if (currentGameState.Now > nextOpponentCleanupTime)
+            if (currentGameState.Now > nextOpponentCleanupTime)
             {
                 nextOpponentCleanupTime = currentGameState.Now + opponentCleanupInterval;
                 DateTime oldestAllowedUpdate = currentGameState.Now - opponentCleanupInterval;
@@ -713,7 +700,7 @@ namespace CrewChiefV4.iRacing
                 {
                     currentGameState.OpponentData.Remove(inactiveOpponent);
                 }
-            }*/
+            }
 
             if (currentGameState.SessionData.IsNewLap && currentGameState.SessionData.PreviousLapWasValid &&
                 currentGameState.SessionData.LapTimePrevious > 1)
@@ -761,11 +748,8 @@ namespace CrewChiefV4.iRacing
                 currentGameState.Conditions.addSample(currentGameState.Now, currentGameState.SessionData.CompletedLaps, currentGameState.SessionData.SectorNumber,
                     shared.Telemetry.AirTemp, shared.Telemetry.TrackTemp, 0, shared.Telemetry.WindVel, 0, 0, 0);
             }
-
             //Console.WriteLine("Speed:" + playerCar.SpeedKph);
             return currentGameState;
-
-
         }
 
         private void upateOpponentData(OpponentData opponentData, int racePosition, int unfilteredRacePosition, int completedLaps,
@@ -829,6 +813,7 @@ namespace CrewChiefV4.iRacing
                 opponentData.setInLap();
             }
         }
+
         private static Dictionary<String, SessionType> sessionTypeMap = new Dictionary<String, SessionType>()
         {
             {"Offline Testing", SessionType.Practice},
@@ -962,6 +947,7 @@ namespace CrewChiefV4.iRacing
 
             return opponentData;
         }
+
         private float spLineLengthToDistanceRoundTrack(float trackLength, float spLine)
         {
             if (spLine < 0.0f)
@@ -970,6 +956,7 @@ namespace CrewChiefV4.iRacing
             }
             return spLine * trackLength;
         }
+
         private int getCurrentSector(TrackDefinition trackDef, float distanceRoundtrack)
         {
 

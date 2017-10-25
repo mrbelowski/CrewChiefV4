@@ -96,17 +96,18 @@
 	},
 	{
 		"name": "confirm pit",
-		"description": "confirms pitstop actions - r3e only",
+		"description": "confirms pitstop actions - r3e only. Note that the 'name' element here shouldn't be changed if you want the app to automate this - the app is hard-coded to look for an event with the name 'confirm pit'",
 		"confirmationMessage": "acknowledge/OK",
 		"voiceTriggers": [ "confirm pit", "confirm", "stop as planned" ],
 		"buttonTriggers": [],
 		"commandSets": [
 		{
-			"description": "r3e only - presses the 'confirm' button when entering the pits",
+			"description": "r3e only - presses the 'confirm' button when entering the pits. The 'allowAutomaticTriggering' element below tells the app that it can execute this command set when a particular event happens - in this case, the event is crossing the pit limiter line (when playing R3E)",
 			"gameDefinition": "RACE_ROOM",
-			"actionSequence": [ "Pit Menu Select", "Pit Menu Toggle" ],
+			"actionSequence": [ "Pit Menu Select", "WAIT_1000", "Pit Menu Toggle" ],
 			"keyPressTime": 10,
-			"waitBetweenEachCommand": 100
+			"waitBetweenEachCommand": 100,
+			"allowAutomaticTriggering": true
 		}]
 	},
 	{
@@ -222,7 +223,7 @@
 	{
 		"name": "pit menu up",
 		"description": "pit menu up - fallback for manual navigation",
-		"voiceTriggers": [ "pit menu down" ],
+		"voiceTriggers": [ "pit menu up" ],
 		"commandSets": [
 		{
 			"description": "r3e version",

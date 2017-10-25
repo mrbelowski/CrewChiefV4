@@ -2434,5 +2434,17 @@ namespace CrewChiefV4.Properties {
                 this["enable_command_macros"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool iracing_delayed_laptimes {
+            get {
+                return ((bool)(this["iracing_delayed_laptimes"]));
+            }
+            set {
+                this["iracing_delayed_laptimes"] = value;
+            }
+        }
     }
 }

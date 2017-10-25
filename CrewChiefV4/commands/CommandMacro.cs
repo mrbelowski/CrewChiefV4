@@ -13,13 +13,24 @@ namespace CrewChiefV4.commands
         AudioPlayer audioPlayer;
         Macro macro;
         Dictionary<String, KeyBinding[]> assignmentsByGame;
-        public ExecutableCommandMacro(AudioPlayer audioPlayer, Macro macro, Dictionary<String, KeyBinding[]> assignmentsByGame)
+        public Boolean allowAutomaticTriggering;
+        public ExecutableCommandMacro(AudioPlayer audioPlayer, Macro macro, Dictionary<String, KeyBinding[]> assignmentsByGame, Boolean allowAutomaticTriggering)
         {
             this.audioPlayer = audioPlayer;
             this.macro = macro;
             this.assignmentsByGame = assignmentsByGame;
+            this.allowAutomaticTriggering = allowAutomaticTriggering;
+            if (allowAutomaticTriggering)
+            {
+                Console.WriteLine("Macro \"" + macro.name + "\" can be triggered automatically");
+            }
         }
         public void execute()
+        {
+            execute(false);
+        }
+
+        public void execute(Boolean supressConfirmationMessage)
         {
             // blocking...
             foreach (CommandSet commandSet in macro.commandSets)
@@ -40,7 +51,7 @@ namespace CrewChiefV4.commands
                         }
                         Thread.Sleep(commandSet.waitBetweenEachCommand);
                     }
-                    if (macro.confirmationMessage != null && macro.confirmationMessage.Length > 0)
+                    if (macro.confirmationMessage != null && macro.confirmationMessage.Length > 0 && !supressConfirmationMessage)
                     {
                         audioPlayer.playMessageImmediately(new QueuedMessage(macro.confirmationMessage, 0, null));
                     }
@@ -88,6 +99,7 @@ namespace CrewChiefV4.commands
 		public String[] actionSequence { get; set; }
 		public int keyPressTime { get; set; }
         public int waitBetweenEachCommand { get; set; }
+        public Boolean allowAutomaticTriggering { get; set; }
 
         private List<ActionItem> actionItems = null;
 
