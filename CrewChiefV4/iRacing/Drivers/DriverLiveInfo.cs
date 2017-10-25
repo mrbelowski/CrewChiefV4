@@ -9,17 +9,17 @@ namespace CrewChiefV4.iRacing
     {
         private const float SPEED_CALC_INTERVAL = 0.1f;
         private static TimeSpan MaxWaitForNewLapData = TimeSpan.FromSeconds(3);
-        public static DateTime CurrentTime = DateTime.Now;
 
         private DateTime NewLapDataTimerExpiry = DateTime.MaxValue;
         private DateTime Now = new DateTime(DateTime.Now.Ticks);
-
+        private bool  UseDelayedLaptimes = UserSettings.GetUserSettings().getBoolean("iracing_delayed_laptimes");
+        
         public DriverLiveInfo(Driver driver)
         {
             _driver = driver;
             PreviousLapWasValid = false;
             HasCrossedSFLine = false;
-            LapTimePrevious = 0;
+            LapTimePrevious = -1;
             FirstTime = false;
             IsNewLap = false;
         }
@@ -33,7 +33,6 @@ namespace CrewChiefV4.iRacing
         
         public float SessionTime { get; set; }
         public int Position { get; set; }
-        public int TrackPosition { get; set; }
         public int ClassPosition { get; set; }
         public int Lap { get; private set; }
         public float LapDistance { get; private set; }
@@ -51,7 +50,6 @@ namespace CrewChiefV4.iRacing
         public double Speed { get; private set; }
         public double SpeedKph { get; private set; }
         
-        public int CurrentSector { get; set; }
         public int CurrentFakeSector  { get; set; }
         public float LastLaptime { get; set; }
         public int LapsCompleted { get; set; }
@@ -75,30 +73,29 @@ namespace CrewChiefV4.iRacing
                 return SessionTime - (float)this.Driver.CurrentResults.FakeSector1.EnterSessionTime;
             }
         }
-        public void checkForNewLapData( float gameProvidedLastLapTime)
+        public void checkForNewLapData(float gameProvidedLastLapTime)
         {
-
-                if (this.HasCrossedSFLine)
-                {
-                    // reset the timer and start waiting for an updated laptime...
-                    this.WaitingForNewLapData = true;
-                    this.NewLapDataTimerExpiry = this.Now.Add(MaxWaitForNewLapData);
-                }
-                // if we're waiting, see if the timer has expired or we have a change in the previous laptime value
-                if (this.WaitingForNewLapData && (this.LapTimePrevious != gameProvidedLastLapTime || this.Now > this.NewLapDataTimerExpiry))
-                {
-                    // the timer has expired or we have new data
-                    this.WaitingForNewLapData = false;
-                    this.LastLapTimeUpdated = true;
-                    this.LapTimePrevious = gameProvidedLastLapTime;
-                    this.PreviousLapWasValid = gameProvidedLastLapTime > 1;
-                    this.IsNewLap = true;
-                }
-                else
-                {
-                    LastLapTimeUpdated = false;
-                    this.IsNewLap = false;
-                }
+            if (this.HasCrossedSFLine)
+            {
+                // reset the timer and start waiting for an updated laptime...
+                this.WaitingForNewLapData = true;
+                this.NewLapDataTimerExpiry = this.Now.Add(MaxWaitForNewLapData);
+            }
+            // if we're waiting, see if the timer has expired or we have a change in the previous laptime value
+            if (this.WaitingForNewLapData && (this.LapTimePrevious != gameProvidedLastLapTime || this.Now > this.NewLapDataTimerExpiry))
+            {
+                // the timer has expired or we have new data
+                this.WaitingForNewLapData = false;
+                this.LastLapTimeUpdated = true;
+                this.LapTimePrevious = gameProvidedLastLapTime;
+                this.PreviousLapWasValid = gameProvidedLastLapTime > 1;
+                this.IsNewLap = true;
+            }
+            else
+            {
+                LastLapTimeUpdated = false;
+                this.IsNewLap = false;
+            }
         }
         public void ParseTelemetry(iRacingData e)
         {   
@@ -119,17 +116,20 @@ namespace CrewChiefV4.iRacing
                 this._prevSector = this.CurrentFakeSector;
             }
 
-
             this.CorrectedLapDistance = FixPercentagesOnLapChange(e.CarIdxLapDistPct[this.Driver.Id]);
             this.LapsCompleted = e.CarIdxLapCompleted[this.Driver.Id];
+
             if (this.LapsCompleted < 0)
+            {
                 this.LapsCompleted = 0;
+            }
+
             this.TrackSurface = e.CarIdxTrackSurface[this.Driver.Id];            
             this.Gear = e.CarIdxGear[this.Driver.Id];
             this.Rpm = e.CarIdxRPM[this.Driver.Id];
             this.SessionTime = (float)e.SessionTime;
 
-            //for local player we use data from telemetry as its updated faster the session info,
+            //for local player we use data from telemetry as its updated faster then session info,
             //we do not have lastlaptime from opponents available in telemetry so we use data from sessioninfo.
             if(Driver.Id == e.PlayerCarIdx)
             {
@@ -138,18 +138,31 @@ namespace CrewChiefV4.iRacing
                     this.LapTimePrevious = e.LapLastLapTime;
                     FirstTime = true;
                 }
-                checkForNewLapData(e.LapLastLapTime);                
+                if (UseDelayedLaptimes)
+                {
+                    checkForNewLapData(e.LapLastLapTime);   
+                }
+                else
+                {
+                    checkForNewLapData((float)this.LastLaptime);
+                }                             
             }
-            else if (!this._driver.CurrentResults.IsEmpty)
+            else
             {
                 if (!FirstTime)
                 {
                     this.LapTimePrevious = (float)this._driver.CurrentResults.LastTime;
                     FirstTime = true;
                 }
-                checkForNewLapData((float)this._driver.CurrentResults.LastTime);
-            }
-                
+                if (UseDelayedLaptimes && !this._driver.CurrentResults.IsEmpty)
+                {
+                    checkForNewLapData((float)this._driver.CurrentResults.LastTime);
+                }
+                else if (!UseDelayedLaptimes)
+                {
+                    checkForNewLapData((float)this.LastLaptime);
+                }                
+            }                
         }
 
         private float FixPercentagesOnLapChange(float carIdxLapDistPct)
@@ -161,6 +174,7 @@ namespace CrewChiefV4.iRacing
 
             return carIdxLapDistPct;
         }
+
         public void CalculateSpeed(iRacingData current, double? trackLengthKm)
         {
             if (current == null) return;

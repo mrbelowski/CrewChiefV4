@@ -10,9 +10,13 @@ namespace CrewChiefV4.commands
 {
     class MacroManager
     {
+        // make all the macros available so the events can press buttons as they see fit:
+        public static Dictionary<string, ExecutableCommandMacro> macros = new Dictionary<string, ExecutableCommandMacro>();
+
         // This is called immediately after initialising the speech recogniser in MainWindow
         public static void initialise(AudioPlayer audioPlayer, SpeechRecogniser speechRecogniser)
         {
+            macros.Clear();
             if (UserSettings.GetUserSettings().getBoolean("enable_command_macros"))
             {
                 // load the json:
@@ -30,38 +34,45 @@ namespace CrewChiefV4.commands
                         }
                     }
 
-                    // now load them into the speech recogniser
                     Dictionary<string, ExecutableCommandMacro> voiceTriggeredMacros = new Dictionary<string, ExecutableCommandMacro>();
                     foreach (Macro macro in macroContainer.macros)
                     {
                         Boolean hasCommandForCurrentGame = false;
+                        Boolean allowAutomaticTriggering = false;
                         // eagerly load the key bindings for each macro:
                         foreach (CommandSet commandSet in macro.commandSets)
                         {
                             if (commandSet.gameDefinition.Equals(CrewChief.gameDefinition.gameEnum.ToString(), StringComparison.InvariantCultureIgnoreCase))
                             {
                                 hasCommandForCurrentGame = true;
+                                allowAutomaticTriggering = commandSet.allowAutomaticTriggering;
                                 // this does the conversion from key characters to key enums and stores the result to save us doing it every time
                                 commandSet.getActionItems(false, assignmentsByGame[commandSet.gameDefinition]);
+                                break;
                             }
                         }
-                        if (hasCommandForCurrentGame && macro.voiceTriggers != null && macro.voiceTriggers.Length > 0)
+                        if (hasCommandForCurrentGame)
                         {
-                            ExecutableCommandMacro commandMacro = new ExecutableCommandMacro(audioPlayer, macro, assignmentsByGame);
-                            foreach (String voiceTrigger in macro.voiceTriggers)
+                            // make this macro globally visible:
+                            ExecutableCommandMacro commandMacro = new ExecutableCommandMacro(audioPlayer, macro, assignmentsByGame, allowAutomaticTriggering);
+                            macros.Add(macro.name, commandMacro);
+                            // if there's a voice command, load it into the recogniser:
+                            if (macro.voiceTriggers != null && macro.voiceTriggers.Length > 0)
                             {
-                                if (voiceTriggeredMacros.ContainsKey(voiceTrigger))
+                                foreach (String voiceTrigger in macro.voiceTriggers)
                                 {
-                                    Console.WriteLine("Voice trigger " + voiceTrigger + " has already been allocated to a different command");
-                                }
-                                else
-                                {
-                                    voiceTriggeredMacros.Add(voiceTrigger, commandMacro);
+                                    if (voiceTriggeredMacros.ContainsKey(voiceTrigger))
+                                    {
+                                        Console.WriteLine("Voice trigger " + voiceTrigger + " has already been allocated to a different command");
+                                    }
+                                    else
+                                    {
+                                        voiceTriggeredMacros.Add(voiceTrigger, commandMacro);
+                                    }
                                 }
                             }
-                        }                        
+                        }
                     }
-                    Console.WriteLine("Loading " + voiceTriggeredMacros.Count + " macro voice commands into speech recogniser");
                     try
                     {
                         speechRecogniser.loadMacroVoiceTriggers(voiceTriggeredMacros);
