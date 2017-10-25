@@ -468,3 +468,6 @@ enable_rf2_frozen_order_messages_help = Announce order information during Full C
 
 enable_command_macros = Enable command macros
 enable_command_macros_help = Enable voice-triggered command macros for pit actions etc
+
+iracing_delayed_laptimes = iRacing delayed laptimes
+iracing_delayed_laptimes_help = Enables delayed but accurate laptimes for iRacing

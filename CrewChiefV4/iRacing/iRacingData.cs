@@ -97,9 +97,9 @@ namespace CrewChiefV4.iRacing
         {
 
         }
-        public int SessionInfoUpdate;
+        public System.Int32 SessionInfoUpdate;
 
-        public string SessionInfo;
+        public System.String SessionInfo;
 
         /// <summary>
         /// Seconds since session start
