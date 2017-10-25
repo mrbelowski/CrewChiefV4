@@ -26,7 +26,6 @@ namespace CrewChiefV4.iRacing
 
         #region Properties
 
-
         private int? _currentSessionNumber;
         public int? CurrentSessionNumber { get { return _currentSessionNumber; } }
 
@@ -39,9 +38,6 @@ namespace CrewChiefV4.iRacing
         private Driver _driver;
         public Driver Driver { get { return _driver; } }
 
-        private Driver _leader;
-        public Driver Leader{ get { return _leader; } }
-
         #endregion
 
         #region Methods
@@ -52,7 +48,6 @@ namespace CrewChiefV4.iRacing
             _mustReloadDrivers = true;
             _currentSessionNumber = null;
             _driver = null;
-            _leader = null;
             _drivers.Clear();
             _telemetry = null;
             _sessionInfo = null;
@@ -133,8 +128,7 @@ namespace CrewChiefV4.iRacing
                 {
                     _driver = driver;
                     _driver.IsCurrentDriver = true;
-                }
-                
+                }                
             }
         }
         
@@ -174,35 +168,7 @@ namespace CrewChiefV4.iRacing
                 var driver = _drivers.SingleOrDefault(d => d.Id == id);
                 if (driver != null)
                 {
-                    var previousPosition = driver.Results.Current.ClassPosition;
-
                     driver.UpdateResultsInfo(_currentSessionNumber.Value, positionQuery, position);
-                    /*if (_telemetry != null)
-                    {
-                        // Check for new leader
-                        if (previousPosition > 1 && driver.Results.Current.ClassPosition == 1)
-                        {
-                            var e = new NewLeaderRaceEvent();
-                            e.Driver = driver;
-                            e.SessionTime = _telemetry.SessionTime;
-                            e.Lap = driver.Live.Lap;
-
-                            this.OnRaceEvent(e);
-                        }
-
-                        // Check for new best lap
-                        var bestlap = _sessionData.UpdateFastestLap(driver.CurrentResults.FastestTime, driver);
-                        if (bestlap != null)
-                        {
-                            var e = new BestLapRaceEvent();
-                            e.Driver = driver;
-                            e.BestLap = bestlap;
-                            e.SessionTime = _telemetry.SessionTime;
-                            e.Lap = driver.Live.Lap;
-
-                            this.OnRaceEvent(e);
-                        }
-                    }*/
                 }
             }
         }
@@ -221,8 +187,9 @@ namespace CrewChiefV4.iRacing
             foreach (var driver in _drivers)
             {
                 driver.Live.CalculateSpeed(info, _sessionData.Track.Length);
-                driver.UpdateLiveInfo(info);
                 driver.UpdateSectorTimes(_sessionData.Track, info);
+                driver.UpdateLiveInfo(info);
+                
                 //_sessionData.UpdateFastestLap(driver);
             }
             this.CalculateLivePositions(info);
@@ -240,44 +207,17 @@ namespace CrewChiefV4.iRacing
                 int pos = 1;
                 foreach (var driver in _drivers.OrderByDescending(d => d.Live.TotalLapDistance))
                 {
-                    if (pos == 1) 
-                        _leader = driver;
                     driver.Live.Position = pos;
-                    pos++;
-                }
-                pos = 1;
-                foreach (var driver in _drivers.OrderBy(d => d.Live.LapDistance))
-                {
-                    if (driver.Live.LapDistance < 0)
-                    {
-                        continue;
-                    }
-                    driver.Live.TrackPosition = pos;
                     pos++;
                 }
             }
             else
             {
                 // In P or Q, set live position from result position (== best lap according to iRacing)
-                foreach (var driver in _drivers.OrderBy(d => d.Results.Current.Position))
+                foreach (var driver in _drivers)
                 {
-                    if (this.Leader == null) 
-                        _leader = driver;
-                    driver.Live.Position = driver.Results.Current.Position;
+                    driver.Live.Position = info.CarIdxPosition[driver.Id];
                 }
-
-                // Determine live position from lapdistance
-                int pos = 1;
-                foreach (var driver in _drivers.OrderBy(d => d.Live.LapDistance))
-                {
-                    if(driver.Live.LapDistance < 0 || info.CarIdxOnPitRoad[driver.Id])
-                    {
-                        continue;
-                    }
-                    driver.Live.TrackPosition = pos;
-                    pos++;
-                }
-
             }
 
             // Determine live class position from live positions and class
@@ -343,28 +283,6 @@ namespace CrewChiefV4.iRacing
 
             // Update session data
             this.SessionData.Update(telemetry);
-
-            // Check if flags updated
-            //this.CheckSessionFlagUpdates(prevFlags, this.SessionData.Flags);
-            /*
-            if (!sessionWasFinished && this.SessionData.IsFinished)
-            {
-                // If session just finished, get winners
-                // Use result position (not live position)
-                
-                var winners =
-                    Drivers.Where(d => d.CurrentResults != null && d.CurrentResults.ClassPosition == 1).OrderBy(d => d.CurrentResults.Position);
-                foreach (var winner in winners)
-                {
-                    var ev = new WinnerRaceEvent();
-                    ev.Driver = winner;
-                    ev.SessionTime = _telemetry.SessionTime;
-                    ev.Lap = winner.Live.Lap;
-                    this.OnRaceEvent(ev);
-                }
-                 * 
-            }
-             */
         }
 
       
