@@ -104,7 +104,7 @@
 		{
 			"description": "r3e only. The 'allowAutomaticTriggering' element below tells the app that it can execute this command set when a particular event happens - in this case, the event is getting a drive through or stop-go penalty (when playing R3E)",
 			"gameDefinition": "RACE_ROOM",
-			"actionSequence": [ "Pit Menu Toggle", "Pit Menu Down", "Pit Menu Select", "WAIT_1000", "Pit Menu Toggle" ],
+			"actionSequence": [ "Pit Menu Toggle", "Pit Menu Down", "Pit Menu Select", "WAIT_2000", "Pit Menu Toggle" ],
 			"keyPressTime": 10,
 			"waitBetweenEachCommand": 100,
 			"allowAutomaticTriggering": true
