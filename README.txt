@@ -10,7 +10,7 @@ For support and discussions about Crew Chief we have our very own forum here: ht
 
 Changelog
 ---------
-Version 4.8.0.8: iRacing Beta; Pit command macros beta (example implementations for R3E and pCARS2 included - see saved_command_macros.json in the app's installation folder); a ton of other stuff that'll be documented for the proper release
+Version 4.8.0.9: iRacing Beta; Pit command macros beta (example implementations for R3E and pCARS2 included - see saved_command_macros.json in the app's installation folder); a ton of other stuff that'll be documented for the proper release
 
 Version 4.8.0.7: RF2 fixes - fixed low fuel message playing when it shouldn't, fixed European versions of full course yellow messages not playing on new installs
 

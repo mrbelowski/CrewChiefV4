@@ -596,6 +596,12 @@
     <Setting Name="launch_iracing" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
+    <Setting Name="enable_rf2_cut_track_heuristics" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="enable_rf2_pit_lane_approach_heuristics" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
     <Setting Name="enable_command_macros" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>

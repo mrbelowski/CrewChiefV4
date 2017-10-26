@@ -525,7 +525,9 @@ namespace CrewChiefV4.GameState
         // distance (m) from the start line (around the track)
         public Single DistanceRoundTrack = 0;
 
-        // other stuff like X/Y/Z co-ordinates, acceleration, orientation, ...
+        public float[] WorldPosition;
+
+        // other stuff: acceleration, orientation, ...
     }
     
     public class OpponentData
@@ -1395,6 +1397,8 @@ namespace CrewChiefV4.GameState
 
         public Boolean InPitlane = false;
 
+        public Boolean IsApproachingPitlane = false;
+
         public Boolean OnInLap = false;
 
         public Boolean OnOutLap = false;
@@ -1444,10 +1448,16 @@ namespace CrewChiefV4.GameState
         // -1 == n/a; 0 = inactive; 1 = active
         public int limiterStatus = -1;
 
-        // RF1 hack for mandatory pit stop windows, which are used to trigger 'box now' messages
+        // RF1/RF2 hack for mandatory pit stop windows, which are used to trigger 'box now' messages
         public Boolean ResetEvents;
 
         public int NumPitStops = 0;
+
+        public Boolean IsPitCrewDone = false;
+
+        public Boolean IsPitCrewReady = false;
+
+        public float PitSpeedLimit = -1.0f;
     }
 
     public class PenatiesData

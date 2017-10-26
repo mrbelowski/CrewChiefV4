@@ -14,7 +14,7 @@ namespace CrewChiefV4.Events
 
         private Random rand = new Random();
 
-        private String folderGreenGreenGreen = "lap_counter/green_green_green";
+        public static String folderGreenGreenGreen = "lap_counter/green_green_green";
 
         // used in manual rolling starts (hack...)
         public static String folderLeaderHasCrossedStartLine = "lap_counter/leader_has_crossed_start_line";
