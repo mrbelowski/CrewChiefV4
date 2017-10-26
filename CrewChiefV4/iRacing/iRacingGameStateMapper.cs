@@ -120,10 +120,10 @@ namespace CrewChiefV4.iRacing
                 currentGameState.SessionData.SessionStartPosition = shared.Telemetry.PlayerCarPosition;
                 Console.WriteLine("SessionStartPosition = " + currentGameState.SessionData.SessionStartPosition);
                 currentGameState.PitData.IsRefuellingAllowed = true;
+                currentGameState.SessionData.SessionTimeRemaining = (float)shared.Telemetry.SessionTimeRemain;
+                currentGameState.SessionData.SessionTotalRunTime = (float)shared.Telemetry.SessionTimeRemain;
                 if (shared.SessionData.IsLimitedTime)
                 {
-                    currentGameState.SessionData.SessionTimeRemaining = (float)shared.Telemetry.SessionTimeRemain;
-                    currentGameState.SessionData.SessionTotalRunTime = (float)shared.Telemetry.SessionTimeRemain;
                     currentGameState.SessionData.SessionHasFixedTime = true;
                     Console.WriteLine("SessionTotalRunTime = " + currentGameState.SessionData.SessionTotalRunTime);
                 }
@@ -173,9 +173,9 @@ namespace CrewChiefV4.iRacing
                     {
                         justGoneGreen = true;
                         // just gone green, so get the session data
+                        currentGameState.SessionData.SessionTotalRunTime = (float)shared.Telemetry.SessionTimeRemain;
                         if (shared.SessionData.IsLimitedTime)
-                        {
-                            currentGameState.SessionData.SessionTotalRunTime = (float)shared.Telemetry.SessionTimeRemain;
+                        {                            
                             currentGameState.SessionData.SessionHasFixedTime = true;
                         }
                         else
@@ -909,11 +909,10 @@ namespace CrewChiefV4.iRacing
                 {
                     return SessionPhase.Formation;
                 }
-                else if ((SessionStates.Racing == sessionState && isReplay) || sessionFlags.HasFlag(SessionFlags.Green))
+                else if ((SessionStates.Racing == sessionState && isReplay) || sessionFlags.HasFlag(SessionFlags.Green) || sessionFlags.HasFlag(SessionFlags.StartGo))
                 {
                     return SessionPhase.Green;
                 }
-                return SessionPhase.Unavailable;
             }
             return lastSessionPhase;
         }

@@ -151,16 +151,16 @@ namespace CrewChiefV4.iRacing
             {
                 if (!FirstTime)
                 {
-                    this.LapTimePrevious = (float)this._driver.CurrentResults.LastTime;
+                    this.LapTimePrevious = this._driver.CurrentResults.LastTime;
                     FirstTime = true;
                 }
-                if (UseDelayedLaptimes && !this._driver.CurrentResults.IsEmpty)
+                if (UseDelayedLaptimes)
                 {
-                    checkForNewLapData((float)this._driver.CurrentResults.LastTime);
+                    checkForNewLapData(this._driver.CurrentResults.LastTime);
                 }
-                else if (!UseDelayedLaptimes)
+                else
                 {
-                    checkForNewLapData((float)this.LastLaptime);
+                    checkForNewLapData(this.LastLaptime);
                 }                
             }                
         }
