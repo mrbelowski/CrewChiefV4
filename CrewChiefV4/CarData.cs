@@ -233,6 +233,7 @@ namespace CrewChiefV4
             public String enabledMessageTypes { get; set; }
             public bool isDRSCapable { get; set; }
             public float DRSRange { get; set; }
+            public int pitCrewPreparationTime { get; set; }
 
             public String placeholderClassId = "";
 
@@ -267,6 +268,7 @@ namespace CrewChiefV4
                 this.enabledMessageTypes = "";
                 this.isDRSCapable = false;
                 this.DRSRange = -1.0f;
+                this.pitCrewPreparationTime = 25;
             }
 
             public String getClassIdentifier()

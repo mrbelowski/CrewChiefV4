@@ -103,6 +103,9 @@ namespace CrewChiefV4.Events
 
         private DateTime timeOfDisengageCheck = DateTime.MaxValue;
 
+        private DateTime timeOfPitRequestOrCancel = DateTime.MaxValue;
+        private const int minSecondsBetweenPitRequestCancel = 10;
+
         private Boolean enableWindowWarnings = true;
         
         public MandatoryPitStops(AudioPlayer audioPlayer)
@@ -119,6 +122,7 @@ namespace CrewChiefV4.Events
         {
             timeOfLastLimiterWarning = DateTime.MinValue;
             timeOfDisengageCheck = DateTime.MaxValue;
+            timeOfPitRequestOrCancel = DateTime.MaxValue;
             pitWindowOpenLap = 0;
             pitWindowClosedLap = 0;
             pitWindowOpenTime = 0;
@@ -141,6 +145,34 @@ namespace CrewChiefV4.Events
             minDistanceOnCurrentTyre = -1;
             maxDistanceOnCurrentTyre = -1;
             enableWindowWarnings = true;
+        }
+
+        public override bool isMessageStillValid(String eventSubType, GameStateData currentGameState, Dictionary<String, Object> validationData)
+        {
+            if (base.isMessageStillValid(eventSubType, currentGameState, validationData))
+            {
+/*              // When a new penalty is given we queue a 'three laps left to serve' delayed message.
+                // If, the moment message is about to play, the player has started a new lap, this message is no longer valid so shouldn't be played
+                if (eventSubType == folderThreeLapsToServe)
+                {
+                    Console.WriteLine("checking penalty validity, pen lap = " + penaltyLap + ", completed =" + lapsCompleted);
+                    return hasOutstandingPenalty && lapsCompleted == penaltyLap && currentGameState.SessionData.SessionPhase != SessionPhase.Finished;
+                }
+                else if (eventSubType == folderCutTrackInRace)
+                {
+                    return !hasOutstandingPenalty && currentGameState.SessionData.SessionPhase != SessionPhase.Finished && !currentGameState.PitData.InPitlane;
+                }
+                else
+                {
+                    return hasOutstandingPenalty && currentGameState.SessionData.SessionPhase != SessionPhase.Finished;
+                }*/
+            }
+            else
+            {
+                return false;
+            }
+
+            return true;
         }
 
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
@@ -184,7 +216,7 @@ namespace CrewChiefV4.Events
                         if (currentGameState.PitData.limiterStatus == 0)
                         {
                             // just entered the pit lane with no limiter active
-                            audioPlayer.playMessage(new QueuedMessage(folderEngageLimiter, 0, this));
+                            audioPlayer.playMessageImmediately(new QueuedMessage(folderEngageLimiter, 0, this));
                             timeOfLastLimiterWarning = currentGameState.Now;
                         }
                     }
@@ -480,6 +512,44 @@ namespace CrewChiefV4.Events
                     }
                 }
             }
+            if (previousGameState != null && currentGameState.SessionData.SessionType == SessionType.Race)
+            {
+                if (!previousGameState.PitData.IsApproachingPitlane
+                    && currentGameState.PitData.IsApproachingPitlane)
+                {
+                    Console.WriteLine("PIT STOPS: WATCH YOUR SPEED IN PITS");
+                    // Temporary message.
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderEngageLimiter, 0, this));
+                }
+                if (!previousGameState.PitData.IsPitCrewReady
+                    && currentGameState.PitData.IsPitCrewReady)
+                {
+                    Console.WriteLine("PIT STOPS: PIT CREW IS READY");
+                }
+                if (!previousGameState.PitData.IsPitCrewDone
+                    && currentGameState.PitData.IsPitCrewDone)
+                {
+                    audioPlayer.playMessageImmediately(new QueuedMessage(LapCounter.folderGreenGreenGreen, 0, this));
+                }
+                if (!previousGameState.PitData.HasRequestedPitStop
+                    && currentGameState.PitData.HasRequestedPitStop
+                    && (currentGameState.Now - timeOfPitRequestOrCancel).TotalSeconds > minSecondsBetweenPitRequestCancel)
+                {
+                    Console.WriteLine("PIT STOPS: REQUESTED PIT STOP");
+                    timeOfPitRequestOrCancel = currentGameState.Now;
+                    // TODO: should be random delayed  (1-3 secs) and validated, because comes from the button.
+                }
+                if (!currentGameState.PitData.InPitlane && !previousGameState.PitData.InPitlane  // Make sure we're not in pits.  More checks might be needed.
+                    && previousGameState.PitData.HasRequestedPitStop
+                    && !currentGameState.PitData.HasRequestedPitStop
+                    && (currentGameState.Now - timeOfPitRequestOrCancel).TotalSeconds > minSecondsBetweenPitRequestCancel)
+                {
+                    Console.WriteLine("PIT STOPS: CANCELLED PIT STOP REQUEST");
+                    timeOfPitRequestOrCancel = currentGameState.Now;
+                    // TODO: should be random delayed  (1-3 secs) and validated, because comes from the button.
+                }
+            }
+
         }
 
         public override void respond(String voiceMessage)

@@ -148,6 +148,7 @@ namespace CrewChiefV4.RaceRoom
                 // belt n braces checks to ensure we have our static data loaded
                 String trackNameFromGame = getNameFromBytes(shared.TrackName);
                 if (trackNameFromGame != null && trackNameFromGame.Length > 0 && (previousGameState.SessionData.TrackDefinition == null ||
+                    previousGameState.SessionData.TrackDefinition.name == null || previousGameState.SessionData.TrackDefinition.name.Length == 0 ||
                     !previousGameState.SessionData.TrackDefinition.name.Equals(trackNameFromGame)))
                 {
                     currentGameState.SessionData.TrackDefinition = TrackData.getTrackDefinition(getNameFromBytes(shared.TrackName), shared.LayoutId, shared.LayoutLength);
