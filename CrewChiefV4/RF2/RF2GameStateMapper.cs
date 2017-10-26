@@ -51,6 +51,16 @@ namespace CrewChiefV4.rFactor2
         private float distanceOffTrack = 0.0f;
         private bool isApproachingTrack = false;
 
+        // Pit stop detection tracking variables.
+        private double minTrackWidth = -1;
+
+        // Experimantal: If true, means we completed at least one full lap since exiting the pits (out lap excluded)
+        // and minTrackWidth is ready to be used for pit lane approach detection.
+        // However, it looks like depending on track authoring errors this might cause bad width stuck, so this is disabled currently.
+        private bool trackWidthMapped = false;
+        private DateTime timePitStopRequested = DateTime.MinValue;
+        private bool isApproachingPitEntry = false;
+
         // Detect if there any changes in the the game data since the last update.
         private double lastPlayerTelemetryET = -1.0;
         private double lastScoringET = -1.0;
@@ -62,7 +72,10 @@ namespace CrewChiefV4.rFactor2
         private readonly bool enablePitStopPrediction = UserSettings.GetUserSettings().getBoolean("enable_rf2_pit_stop_prediction");
         private readonly bool enableBlueOnSlower = UserSettings.GetUserSettings().getBoolean("enable_rf2_blue_on_slower");
         private readonly bool enableFrozenOrderMessages = UserSettings.GetUserSettings().getBoolean("enable_rf2_frozen_order_messages");
-        private readonly bool incrementCutTrackCountWhenLeavingRacingSurface = true;
+        private readonly bool enableCutTrackHeuristics = UserSettings.GetUserSettings().getBoolean("enable_rf2_cut_track_heuristics");
+        private readonly bool enablePitLaneApproachHeuristics = UserSettings.GetUserSettings().getBoolean("enable_rf2_pit_lane_approach_heuristics");
+        private const bool incrementCutTrackCountWhenLeavingRacingSurface = true;
+        private const bool resetMinWidthEveryLap = true;
 
         // True if it looks like track has no DRS zones defined.
         private bool detectedTrackNoDRSZones = false;
@@ -154,6 +167,21 @@ namespace CrewChiefV4.rFactor2
         private Int64 lastSessionEndTicks = -1;
         private bool lastInRealTimeState = false;
 
+        private void ClearState()
+        {
+            this.waitingToTerminateSession = false;
+            this.isOfflineSession = true;
+            this.distanceOffTrack = 0;
+            this.isApproachingTrack = false;
+            this.playerLapsWhenFCYPosAssigned = -1;
+            this.detectedTrackNoDRSZones = false;
+            this.minTrackWidth = -1.0;
+            this.timePitStopRequested = DateTime.MinValue;
+            this.isApproachingPitEntry = false;
+            this.trackWidthMapped = false;
+            RF2GameStateMapper.sanitizedNamesMap.Clear();
+        }
+
         public GameStateData mapToGameStateData(Object memoryMappedFileStruct, GameStateData previousGameState)
         {
             var pgs = previousGameState;
@@ -230,7 +258,7 @@ namespace CrewChiefV4.rFactor2
                         Console.WriteLine("Abrupt Session End: new session just started, terminate previous session.");
 
                     // Wait is over.  Terminate the abrupt session.
-                    this.waitingToTerminateSession = false; 
+                    this.waitingToTerminateSession = false;
 
                     if (this.lastInRealTimeState && pgs.SessionData.SessionType == SessionType.Race)
                     {
@@ -285,14 +313,10 @@ namespace CrewChiefV4.rFactor2
                 // Session is not in progress and no abrupt session end detection is in progress, simply return pgs.
                 Debug.Assert(!this.waitingToTerminateSession, "Previous abrupt session end detection hasn't ended correctly.");
 
-                this.waitingToTerminateSession = false;
-                this.isOfflineSession = true;
-                this.distanceOffTrack = 0;
-                this.isApproachingTrack = false;
                 this.lastPlayerTelemetryET = -1.0;
                 this.lastScoringET = -1.0;
-                this.playerLapsWhenFCYPosAssigned = -1;
-                this.detectedTrackNoDRSZones = false;
+
+                this.ClearState();
 
                 if (pgs != null)
                 {
@@ -474,13 +498,13 @@ namespace CrewChiefV4.rFactor2
                 // Do not use previous game state if this is the new session.
                 pgs = null;
 
-                this.isOfflineSession = true;
-                this.distanceOffTrack = 0;
-                this.isApproachingTrack = false;
-                this.playerLapsWhenFCYPosAssigned = -1;
-                this.detectedTrackNoDRSZones = false;
+                this.ClearState();
 
                 GlobalBehaviourSettings.UpdateFromCarClass(cgs.carClass);
+
+                Console.WriteLine("Enabled message types:");
+                foreach (var m in GlobalBehaviourSettings.enabledMessageTypes)
+                    Console.WriteLine('\t' + m.ToString());
             }
 
             // Restore cumulative data.
@@ -532,11 +556,13 @@ namespace CrewChiefV4.rFactor2
             {
                 cgs.PositionAndMotionData.CarSpeed = (float)RF2GameStateMapper.getVehicleSpeed(ref playerTelemetry);
                 cgs.PositionAndMotionData.DistanceRoundTrack = (float)getEstimatedLapDist(shared, ref playerScoring, ref playerTelemetry);
+                cgs.PositionAndMotionData.WorldPosition = new float[] { (float)playerTelemetry.mPos.x, (float)playerTelemetry.mPos.y, (float)playerTelemetry.mPos.z };
             }
             else
             {
                 cgs.PositionAndMotionData.CarSpeed = (float)RF2GameStateMapper.getVehicleSpeed(ref playerScoring);
                 cgs.PositionAndMotionData.DistanceRoundTrack = (float)playerScoring.mLapDist;
+                cgs.PositionAndMotionData.WorldPosition = new float[] { (float)playerScoring.mPos.x, (float)playerScoring.mPos.y, (float)playerScoring.mPos.z };
             }
 
             // Initialize DeltaTime.
@@ -605,7 +631,9 @@ namespace CrewChiefV4.rFactor2
             if (shared.extended.mInRealtimeFC == 0  // Mark pit limiter as unavailable if in Monitor (not real time).
                 || shared.scoring.mScoringInfo.mInRealtime == 0
                 || playerTelemetry.mSpeedLimiterAvailable == 0)
+            {
                 cgs.PitData.limiterStatus = -1;
+            }
             else
                 cgs.PitData.limiterStatus = playerTelemetry.mSpeedLimiter > 0 ? 1 : 0;
 
@@ -627,8 +655,88 @@ namespace CrewChiefV4.rFactor2
                 ? PitWindow.StopInProgress : mapToPitWindow((rFactor2Constants.rF2YellowFlagState)shared.scoring.mScoringInfo.mYellowFlagState);
 
             if (pgs != null)
-            {
                 cgs.PitData.MandatoryPitStopCompleted = pgs.PitData.MandatoryPitStopCompleted || cgs.PitData.IsMakingMandatoryPitStop;
+
+            cgs.PitData.HasRequestedPitStop = (rFactor2Constants.rF2PitState)playerScoring.mPitState == rFactor2Constants.rF2PitState.Request;
+
+            // Is this new pit request?
+            if (pgs != null && !pgs.PitData.HasRequestedPitStop && cgs.PitData.HasRequestedPitStop)
+                this.timePitStopRequested = cgs.Now;
+
+            // Check if it's time to mark pit crew as ready.
+            if (pgs != null
+                && pgs.PitData.HasRequestedPitStop
+                && cgs.PitData.HasRequestedPitStop
+                && (cgs.Now - this.timePitStopRequested).TotalSeconds > cgs.carClass.pitCrewPreparationTime)
+            {
+                cgs.PitData.IsPitCrewReady = true;
+            }
+
+            cgs.PitData.IsPitCrewDone = (rFactor2Constants.rF2PitState)playerScoring.mPitState == rFactor2Constants.rF2PitState.Exiting;
+
+            if (csd.IsNewLap && RF2GameStateMapper.resetMinWidthEveryLap)
+            {
+                this.minTrackWidth = -1.0;
+                this.isApproachingPitEntry = false;
+            }
+
+            // Reset pit lane approach prediction variables on exiting the pits.  Also, do not collect widths in a first
+            // sector of the out lap, as it may include pit exit lane values, which we don't need.
+            if (cgs.PitData.OnOutLap && csd.SectorNumber == 1)
+            {
+                this.minTrackWidth = -1.0;
+                this.isApproachingPitEntry = false;
+                this.trackWidthMapped = false;
+            }
+            else if (this.enablePitLaneApproachHeuristics)
+            {
+                // We need to have completed at least one full lap before we attempt guessing on pit lane approach.
+                if (pgs != null 
+                    && !pgs.PitData.OnOutLap
+                    && !cgs.PitData.OnOutLap
+                    && !cgs.PitData.InPitlane
+                    && csd.IsNewLap
+                    && csd.CompletedLaps > 0
+                    && this.minTrackWidth != -1.0)
+                {
+                    this.trackWidthMapped = true;
+                }
+
+                if (cgs.PitData.InPitlane)
+                    this.isApproachingPitEntry = false;
+
+                var estTrackWidth = Math.Abs(playerScoring.mTrackEdge) * 2.0;
+
+                if (this.minTrackWidth == -1.0 || estTrackWidth < this.minTrackWidth)
+                {
+                    this.minTrackWidth = estTrackWidth;
+
+                    // See if it looks like we're entering the pits.
+                    // The idea here is that if:
+                    // - current DistanceRoundTrack is past the point where track forks into pits
+                    // - this appears like narrowest part of a track surface (tracked for an entire lap)
+                    // - and pit is requested, assume we're approaching pit entry.
+                    if (cgs.SessionData.SessionType == SessionType.Race
+                        && (this.trackWidthMapped == true || RF2GameStateMapper.resetMinWidthEveryLap)
+                        && cgs.PositionAndMotionData.DistanceRoundTrack > shared.rules.mTrackRules.mPitLaneStartDist
+                        && cgs.PitData.HasRequestedPitStop)
+                        this.isApproachingPitEntry = true;
+
+                    Console.WriteLine(string.Format("New min width:{0:0.000}    lapDist:{1:0.000}    pathLat:{2:0.000}    inPit:{3}    ps:{4}    appr:{5}    lap:{6}    pit lane:{7:0.000}",
+                        this.minTrackWidth,
+                        playerScoring.mLapDist,
+                        playerScoring.mPathLateral,
+                        cgs.PitData.InPitlane,
+                        playerScoring.mPitState,
+                        this.isApproachingPitEntry,
+                        csd.CompletedLaps + 1,
+                        shared.rules.mTrackRules.mPitLaneStartDist));
+
+                    //Debug.WriteLine("New min track width:" + (this.minTrackWidth).ToString("0.000") + " pit lane: " + shared.rules.mTrackRules.mPitLaneStartDist);
+                }
+
+                //Debug.WriteLine($"lapDist: {playerScoring.mLapDist.ToString("0.000")}  pathLat {playerScoring.mPathLateral.ToString("0.000")} estW {(estTrackWidth).ToString("0.000")} inPit {cgs.PitData.InPitlane} ps: {playerScoring.mPitState} appr: {this.isApproachingPitEntry} mapped: {this.trackWidthMapped}");
+                cgs.PitData.IsApproachingPitlane = this.isApproachingPitEntry;
             }
 
             ////////////////////////////////////
@@ -743,13 +851,9 @@ namespace CrewChiefV4.rFactor2
                     cgs.CarDamageData.OverallAeroDamage = DamageLevel.MINOR;
                 }
                 else if (playerDamageInfo.mMaxImpactMagnitude > 0.0)
-                {
                     cgs.CarDamageData.OverallAeroDamage = DamageLevel.TRIVIAL;
-                }
                 else
-                {
                     cgs.CarDamageData.OverallAeroDamage = DamageLevel.NONE;
-                }
             }
             else  // shared.extended.mPhysics.mInvulnerable != 0
             {
@@ -927,12 +1031,13 @@ namespace CrewChiefV4.rFactor2
             this.opponentKeysProcessed.Clear();
 
             // first check for duplicates:
-            Dictionary<string, int> driverNameCounts = new Dictionary<string, int>();
-            Dictionary<string, int> duplicatesCreated = new Dictionary<string, int>();
+            var driverNameCounts = new Dictionary<string, int>();
+            var duplicatesCreated = new Dictionary<string, int>();
             for (int i = 0; i < shared.scoring.mScoringInfo.mNumVehicles; ++i)
             {
                 var vehicleScoring = shared.scoring.mVehicles[i];
-                var driverName = GetStringFromBytes(vehicleScoring.mDriverName).ToLower();
+                var driverName = RF2GameStateMapper.GetStringFromBytes(vehicleScoring.mDriverName).ToLowerInvariant();
+                driverName = RF2GameStateMapper.GetSanitizedDriverName(driverName);
 
                 if (driverNameCounts.ContainsKey(driverName))
                     driverNameCounts[driverName] += 1;
@@ -997,7 +1102,8 @@ namespace CrewChiefV4.rFactor2
                     }
                 }
 
-                var driverName = GetStringFromBytes(vehicleScoring.mDriverName).ToLower();
+                var driverName = GetStringFromBytes(vehicleScoring.mDriverName).ToLowerInvariant();
+                driverName = RF2GameStateMapper.GetSanitizedDriverName(driverName);
                 OpponentData opponentPrevious;
                 int duplicatesCount = driverNameCounts[driverName];
                 string opponentKey;
@@ -1040,7 +1146,6 @@ namespace CrewChiefV4.rFactor2
 
                 opponentPrevious = pgs == null || opponentKey == null || !pgs.OpponentData.ContainsKey(opponentKey) ? null : previousGameState.OpponentData[opponentKey];
                 var opponent = new OpponentData();
-                opponent.DriverRawName = driverName;
                 opponent.CarClass = CarData.getCarClassForClassName(GetStringFromBytes(vehicleScoring.mVehicleClass));
                 opponent.CurrentTyres = this.MapToTyreType(ref vehicleTelemetry);
                 opponent.DriverRawName = driverName;
@@ -1444,41 +1549,44 @@ namespace CrewChiefV4.rFactor2
                 cutTrackByInvalidLapDetected = true;
             }
 
-            // Improvised cut track warnings based on surface type.
-            if (this.incrementCutTrackCountWhenLeavingRacingSurface
-                && !cutTrackByInvalidLapDetected
-                && !cgs.PitData.InPitlane
-                && !cgs.PitData.OnOutLap)
+            if (this.enableCutTrackHeuristics)
             {
-                cgs.PenaltiesData.IsOffRacingSurface =
-                    wheelFrontLeft.mSurfaceType != (int)rFactor2Constants.rF2SurfaceType.Dry && wheelFrontLeft.mSurfaceType != (int)rFactor2Constants.rF2SurfaceType.Wet
-                    && wheelFrontRight.mSurfaceType != (int)rFactor2Constants.rF2SurfaceType.Dry && wheelFrontRight.mSurfaceType != (int)rFactor2Constants.rF2SurfaceType.Wet
-                    && wheelRearLeft.mSurfaceType != (int)rFactor2Constants.rF2SurfaceType.Dry && wheelRearLeft.mSurfaceType != (int)rFactor2Constants.rF2SurfaceType.Wet
-                    && wheelRearRight.mSurfaceType != (int)rFactor2Constants.rF2SurfaceType.Dry && wheelRearRight.mSurfaceType != (int)rFactor2Constants.rF2SurfaceType.Wet;
-
-                if (pgs != null && !pgs.PenaltiesData.IsOffRacingSurface && cgs.PenaltiesData.IsOffRacingSurface)
+                // Improvised cut track warnings based on surface type.
+                if (RF2GameStateMapper.incrementCutTrackCountWhenLeavingRacingSurface
+                    && !cutTrackByInvalidLapDetected
+                    && !cgs.PitData.InPitlane
+                    && !cgs.PitData.OnOutLap)
                 {
-                    Console.WriteLine("Player off track: by surface type.");
-                    cgs.PenaltiesData.CutTrackWarnings = pgs.PenaltiesData.CutTrackWarnings + 1;
+                    cgs.PenaltiesData.IsOffRacingSurface =
+                        wheelFrontLeft.mSurfaceType != (int)rFactor2Constants.rF2SurfaceType.Dry && wheelFrontLeft.mSurfaceType != (int)rFactor2Constants.rF2SurfaceType.Wet
+                        && wheelFrontRight.mSurfaceType != (int)rFactor2Constants.rF2SurfaceType.Dry && wheelFrontRight.mSurfaceType != (int)rFactor2Constants.rF2SurfaceType.Wet
+                        && wheelRearLeft.mSurfaceType != (int)rFactor2Constants.rF2SurfaceType.Dry && wheelRearLeft.mSurfaceType != (int)rFactor2Constants.rF2SurfaceType.Wet
+                        && wheelRearRight.mSurfaceType != (int)rFactor2Constants.rF2SurfaceType.Dry && wheelRearRight.mSurfaceType != (int)rFactor2Constants.rF2SurfaceType.Wet;
+
+                    if (pgs != null && !pgs.PenaltiesData.IsOffRacingSurface && cgs.PenaltiesData.IsOffRacingSurface)
+                    {
+                        Console.WriteLine("Player off track: by surface type.");
+                        cgs.PenaltiesData.CutTrackWarnings = pgs.PenaltiesData.CutTrackWarnings + 1;
+                    }
                 }
-            }
 
-            // See if we're off track by distance.
-            if (!cutTrackByInvalidLapDetected
-                && !cgs.PenaltiesData.IsOffRacingSurface)
-            {
-                float lateralDistDiff = (float)(Math.Abs(playerScoring.mPathLateral) - Math.Abs(playerScoring.mTrackEdge));
-                cgs.PenaltiesData.IsOffRacingSurface = !cgs.PitData.InPitlane && lateralDistDiff >= 2;
-                float offTrackDistanceDelta = lateralDistDiff - this.distanceOffTrack;
-                this.distanceOffTrack = cgs.PenaltiesData.IsOffRacingSurface ? lateralDistDiff : 0;
-                this.isApproachingTrack = offTrackDistanceDelta < 0 && cgs.PenaltiesData.IsOffRacingSurface && lateralDistDiff < 3;
-
-                if (!cgs.PitData.OnOutLap && pgs != null
-                    && !pgs.PenaltiesData.IsOffRacingSurface && cgs.PenaltiesData.IsOffRacingSurface
-                    && !(cgs.SessionData.SessionType == SessionType.Race && cgs.SessionData.SessionPhase == SessionPhase.Countdown))
+                // See if we're off track by distance.
+                if (!cutTrackByInvalidLapDetected
+                    && !cgs.PenaltiesData.IsOffRacingSurface)
                 {
-                    Console.WriteLine("Player off track: by distance.");
-                    cgs.PenaltiesData.CutTrackWarnings = pgs.PenaltiesData.CutTrackWarnings + 1;
+                    float lateralDistDiff = (float)(Math.Abs(playerScoring.mPathLateral) - Math.Abs(playerScoring.mTrackEdge));
+                    cgs.PenaltiesData.IsOffRacingSurface = !cgs.PitData.InPitlane && lateralDistDiff >= 2.0f;
+                    float offTrackDistanceDelta = lateralDistDiff - this.distanceOffTrack;
+                    this.distanceOffTrack = cgs.PenaltiesData.IsOffRacingSurface ? lateralDistDiff : 0.0f;
+                    this.isApproachingTrack = offTrackDistanceDelta < 0 && cgs.PenaltiesData.IsOffRacingSurface && lateralDistDiff < 3.0f;
+
+                    if (!cgs.PitData.OnOutLap && pgs != null
+                        && !pgs.PenaltiesData.IsOffRacingSurface && cgs.PenaltiesData.IsOffRacingSurface
+                        && !(cgs.SessionData.SessionType == SessionType.Race && cgs.SessionData.SessionPhase == SessionPhase.Countdown))
+                    {
+                        Console.WriteLine("Player off track: by distance.");
+                        cgs.PenaltiesData.CutTrackWarnings = pgs.PenaltiesData.CutTrackWarnings + 1;
+                    }
                 }
             }
 
@@ -1783,13 +1891,13 @@ namespace CrewChiefV4.rFactor2
         }
 
         // finds OpponentData key for given vehicle based on driver name, vehicle class, and world position
-        private String GetOpponentKeyForVehicleInfo(ref rF2VehicleScoring vehicleScoring, ref rF2VehicleTelemetry vehicleTelemetry, GameStateData previousGameState, float sessionRunningTime, String driverName, int duplicatesCount, bool vehicleTelemetryAvailable)
+        private String GetOpponentKeyForVehicleInfo(ref rF2VehicleScoring vehicleScoring, ref rF2VehicleTelemetry vehicleTelemetry, GameStateData previousGameState, float sessionRunningTime, string driverName, int duplicatesCount, bool vehicleTelemetryAvailable)
         {
             if (previousGameState == null)
                 return null;
 
-            List<string> possibleKeys = new List<string>();
-            for (int i = 1; i <= duplicatesCount; i++)
+            var possibleKeys = new List<string>();
+            for (int i = 1; i <= duplicatesCount; ++i)
                 possibleKeys.Add(driverName + "_duplicate_ " + i);
 
             float[] worldPos = null;
@@ -1803,17 +1911,19 @@ namespace CrewChiefV4.rFactor2
             String bestKey = null;
             if (timeDelta >= 0.0f)
             {
-                foreach (String possibleKey in possibleKeys)
+                foreach (var possibleKey in possibleKeys)
                 {
                     if (previousGameState.OpponentData.ContainsKey(possibleKey))
                     {
-                        OpponentData o = previousGameState.OpponentData[possibleKey];
-                        if (o.DriverRawName != GetStringFromBytes(vehicleScoring.mDriverName).ToLower() ||
-                            o.CarClass != CarData.getCarClassForClassName(GetStringFromBytes(vehicleScoring.mVehicleClass)) ||
-                            opponentKeysProcessed.Contains(possibleKey))
-                        {
+                        var o = previousGameState.OpponentData[possibleKey];
+                        var driverNameFromScoring = RF2GameStateMapper.GetStringFromBytes(vehicleScoring.mDriverName).ToLowerInvariant();
+                        driverNameFromScoring = RF2GameStateMapper.GetSanitizedDriverName(driverNameFromScoring);
+
+                        if (o.DriverRawName != driverNameFromScoring
+                            || o.CarClass != CarData.getCarClassForClassName(GetStringFromBytes(vehicleScoring.mVehicleClass))
+                            || opponentKeysProcessed.Contains(possibleKey))
                             continue;
-                        }
+                        
                         // distance from predicted position
                         float targetDist = o.Speed * timeDelta;
                         float dist = (float)Math.Abs(Math.Sqrt((double)((o.WorldPosition[0] - worldPos[0]) * (o.WorldPosition[0] - worldPos[0]) +
@@ -1920,7 +2030,7 @@ namespace CrewChiefV4.rFactor2
             }
         }
 
-        public Boolean IsBehindWithinDistance(float trackLength, float minDistance, float maxDistance, float playerTrackDistance, float opponentTrackDistance)
+        public bool IsBehindWithinDistance(float trackLength, float minDistance, float maxDistance, float playerTrackDistance, float opponentTrackDistance)
         {
             float difference = playerTrackDistance - opponentTrackDistance;
             if (difference > 0)
@@ -1934,7 +2044,7 @@ namespace CrewChiefV4.rFactor2
             }
         }
 
-        public static String GetStringFromBytes(byte[] bytes)
+        public static string GetStringFromBytes(byte[] bytes)
         {
             var nullIdx = Array.IndexOf(bytes, (byte)0);
 
@@ -1942,6 +2052,30 @@ namespace CrewChiefV4.rFactor2
               ? Encoding.Default.GetString(bytes, 0, nullIdx)
               : Encoding.Default.GetString(bytes);
         }
+
+        // Some Endurance mods use format of LastName1/LastName2.  This is 24hrs stuff with driver swap.
+        // CC currently does not support pair of names for a vehicle.  However, this is such a rare case,
+        // that for now let's just use first last name.
+        private static Dictionary<string, string> sanitizedNamesMap = new Dictionary<string, string>();
+
+        public static string GetSanitizedDriverName(string nameFromGame)
+        {
+            string sanitizedName = "";
+            if (sanitizedNamesMap.TryGetValue(nameFromGame, out sanitizedName))
+                return sanitizedName;
+
+            var fwdSlashPos = nameFromGame.IndexOf('/');
+            if (fwdSlashPos != -1)
+                Console.WriteLine(string.Format(@"Detected pair name: ""{0}"" . Crew Chief does not currently support double names, first part will be used.", nameFromGame));
+
+            sanitizedName = fwdSlashPos == -1 ? nameFromGame : nameFromGame.Substring(0, fwdSlashPos);
+
+            // Save for fast lookup next time.
+            RF2GameStateMapper.sanitizedNamesMap.Add(nameFromGame, sanitizedName);
+
+            return sanitizedName;
+        }
+
 
         // Since it is not clear if there's any guarantee around vehicle telemetry update order in rF2
         // I don't want to assume mID == i in telemetry.mVehicles.  Also, telemetry is updated separately from scoring,
@@ -2076,7 +2210,8 @@ namespace CrewChiefV4.rFactor2
                         var v = scoring.mVehicles[i];
                         if (v.mID == vehToFollowId)
                         {
-                            fod.DriverToFollowRaw = RF2GameStateMapper.GetStringFromBytes(v.mDriverName).ToLower();
+                            fod.DriverToFollowRaw = RF2GameStateMapper.GetStringFromBytes(v.mDriverName).ToLowerInvariant();
+                            fod.DriverToFollowRaw = RF2GameStateMapper.GetSanitizedDriverName(fod.DriverToFollowRaw);
 
                             toFollowDist = RF2GameStateMapper.GetDistanceCompleteded(ref scoring, ref v);
                             break;

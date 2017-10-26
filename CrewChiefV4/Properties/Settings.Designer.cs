@@ -2402,6 +2402,30 @@ namespace CrewChiefV4.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool enable_rf2_cut_track_heuristics {
+            get {
+                return ((bool)(this["enable_rf2_cut_track_heuristics"]));
+            }
+            set {
+                this["enable_rf2_cut_track_heuristics"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool enable_rf2_pit_lane_approach_heuristics {
+            get {
+                return ((bool)(this["enable_rf2_pit_lane_approach_heuristics"]));
+            }
+            set {
+                this["enable_rf2_pit_lane_approach_heuristics"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
         public bool enable_command_macros {
             get {
                 return ((bool)(this["enable_command_macros"]));
