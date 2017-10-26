@@ -48,6 +48,7 @@ OverwriteFile $releaseBinPath\"CrewChiefV4.exe.config" $ccLayoutMainPath
 OverwriteFile $rootPath\"ui_text.txt" $ccLayoutMainPath
 OverwriteFile $rootPath\"carClassData.json" $ccLayoutMainPath
 OverwriteFile $rootPath\"trackLandmarksData.json" $ccLayoutMainPath
+OverwriteFile $rootPath\"saved_command_macros.json" $ccLayoutMainPath
 
 echo "Press any key to finish..."
 

@@ -693,7 +693,7 @@ namespace CrewChiefV4.rFactor2
             public double mSafetyCarLapDist;             // safety car lap distance
 
             [XmlIgnore] public float mSafetyCarLapDistAtStart;       // where the safety car starts from
-            [XmlIgnore] public float mPitLaneStartDist;              // where the waypoint branch to the pits breaks off (this may not be perfectly accurate)
+            public float mPitLaneStartDist;              // where the waypoint branch to the pits breaks off (this may not be perfectly accurate)
             [XmlIgnore] public float mTeleportLapDist;               // the front of the teleport locations (a useful first guess as to where to throw the green flag)
 
             // future input expansion

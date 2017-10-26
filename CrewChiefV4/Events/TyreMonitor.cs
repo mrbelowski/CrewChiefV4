@@ -366,15 +366,15 @@ namespace CrewChiefV4.Events
             Console.WriteLine("Fronts:    " + Math.Round(tyreData.FrontLeft_LeftTemp, 2) + 
                 ", " + Math.Round(tyreData.FrontLeft_CenterTemp, 2) + 
                 ", " + Math.Round(tyreData.FrontLeft_RightTemp, 2) + 
-                "  |------|  " + Math.Round(tyreData.FrontRight_RightTemp, 2) + 
+                "  |------|  " + Math.Round(tyreData.FrontRight_LeftTemp, 2) + 
                 ", " + Math.Round(tyreData.FrontRight_CenterTemp, 2) + 
-                ", " + Math.Round(tyreData.FrontRight_LeftTemp, 2));
+                ", " + Math.Round(tyreData.FrontRight_RightTemp, 2));
             Console.WriteLine("Rears:    " + Math.Round(tyreData.RearLeft_LeftTemp, 2) + 
                 ", " + Math.Round(tyreData.RearLeft_CenterTemp, 2) + 
                 ", " + Math.Round(tyreData.RearLeft_RightTemp, 2) +
-                "  |------|  " + Math.Round(tyreData.RearRight_RightTemp, 2) + 
+                "  |------|  " + Math.Round(tyreData.RearRight_LeftTemp, 2) + 
                 ", " + Math.Round(tyreData.RearRight_CenterTemp, 2) + 
-                ", " + Math.Round(tyreData.RearRight_LeftTemp, 2));
+                ", " + Math.Round(tyreData.RearRight_RightTemp, 2));
             Console.WriteLine("-------------------------");
             Console.WriteLine("Wear, percentage  |------|  percentage");
             Console.WriteLine("Fronts:    " + Math.Round(tyreData.FrontLeftPercentWear, 2) +
