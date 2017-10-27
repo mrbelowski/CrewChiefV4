@@ -54,6 +54,12 @@ namespace CrewChiefV4.Events
         public static String folderMandatoryPitStopsYesStopAfter = "mandatory_pit_stops/yes_stop_after";
         public static String folderMandatoryPitStopsMissedStop = "mandatory_pit_stops/missed_stop";
 
+        // pit stop messages
+        private String folderApproachingPits = "mandatory_pit_stops/approaching_pits";
+        private String folderPitCrewReady = "mandatory_pit_stops/pit_crew_ready";
+        private String folderPitCrewDone = "mandatory_pit_stops/pit_crew_done";
+        private String folderPitStopRequestReceived = "mandatory_pit_stops/pit_stop_request_received";
+        private String folderPitStopRequestCancelled = "mandatory_pit_stops/pit_stop_request_cancelled";
 
         private int pitWindowOpenLap;
 
@@ -151,21 +157,14 @@ namespace CrewChiefV4.Events
         {
             if (base.isMessageStillValid(eventSubType, currentGameState, validationData))
             {
-/*              // When a new penalty is given we queue a 'three laps left to serve' delayed message.
-                // If, the moment message is about to play, the player has started a new lap, this message is no longer valid so shouldn't be played
-                if (eventSubType == folderThreeLapsToServe)
+                if (eventSubType == folderPitStopRequestReceived)
                 {
-                    Console.WriteLine("checking penalty validity, pen lap = " + penaltyLap + ", completed =" + lapsCompleted);
-                    return hasOutstandingPenalty && lapsCompleted == penaltyLap && currentGameState.SessionData.SessionPhase != SessionPhase.Finished;
+                    return currentGameState.PitData.HasRequestedPitStop;
                 }
-                else if (eventSubType == folderCutTrackInRace)
+                else if (eventSubType == folderPitStopRequestCancelled)
                 {
-                    return !hasOutstandingPenalty && currentGameState.SessionData.SessionPhase != SessionPhase.Finished && !currentGameState.PitData.InPitlane;
+                    return !currentGameState.PitData.HasRequestedPitStop;
                 }
-                else
-                {
-                    return hasOutstandingPenalty && currentGameState.SessionData.SessionPhase != SessionPhase.Finished;
-                }*/
             }
             else
             {
