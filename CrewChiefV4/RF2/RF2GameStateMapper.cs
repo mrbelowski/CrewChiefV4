@@ -1433,12 +1433,23 @@ namespace CrewChiefV4.rFactor2
             {
                 if (shared.scoring.mScoringInfo.mYellowFlagState == (sbyte)rFactor2Constants.rF2YellowFlagState.Pending)
                     cgs.FlagData.fcyPhase = FullCourseYellowPhase.PENDING;
-                //else if (shared.scoring.mScoringInfo.mYellowFlagState == (sbyte)rFactor2Constants.rF2YellowFlagState.PitClosed)
-                //    cgs.FlagData.fcyPhase = FullCourseYellowPhase.PITS_CLOSED;
-                // At default ruleset, both open and close sub states result in "Pits open" visible in the UI.
                 else if (shared.scoring.mScoringInfo.mYellowFlagState == (sbyte)rFactor2Constants.rF2YellowFlagState.PitOpen
                     || shared.scoring.mScoringInfo.mYellowFlagState == (sbyte)rFactor2Constants.rF2YellowFlagState.PitClosed)
-                    cgs.FlagData.fcyPhase = FullCourseYellowPhase.PITS_OPEN;  // TODO: use mAllowedToPit from vehicle rules to distinguish here.  Seems like 2 is Closed 3 is Open.
+                {
+                    if (playerRulesIdx != -1 
+                        && shared.scoring.mScoringInfo.mYellowFlagState == (sbyte)rFactor2Constants.rF2YellowFlagState.PitClosed)
+                    {
+                        var allowedToPit = shared.rules.mParticipants[playerRulesIdx].mAllowedToPit;
+
+                        // Apparently, 2 means not allowed, 3 means allowed.  Currently, only SCR plugin sets this to 2.
+                        Debug.Assert(allowedToPit == 2 || allowedToPit == 3);
+
+                        var pitsClosedForPlayer = allowedToPit == 2;
+                        cgs.FlagData.fcyPhase = pitsClosedForPlayer ? FullCourseYellowPhase.PITS_CLOSED : FullCourseYellowPhase.PITS_OPEN;
+                    }
+                    else
+                        cgs.FlagData.fcyPhase = FullCourseYellowPhase.PITS_OPEN; 
+                }
                 else if (shared.scoring.mScoringInfo.mYellowFlagState == (sbyte)rFactor2Constants.rF2YellowFlagState.PitLeadLap)
                     cgs.FlagData.fcyPhase = FullCourseYellowPhase.PITS_OPEN_LEAD_LAP_VEHICLES;
                 else if (shared.scoring.mScoringInfo.mYellowFlagState == (sbyte)rFactor2Constants.rF2YellowFlagState.LastLap)
