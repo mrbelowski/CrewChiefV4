@@ -560,8 +560,9 @@
 			"carClassEnum": "TC2",
 			"raceroomClassIds": [1922],
 			"pCarsClassNames": ["TC2"],
-			"rf1ClassNames": ["Marcas"],
-			"timesInHundredths": true,
+            "rf1ClassNames": [ "Marcas" ],
+            "rf2ClassNames": ["BMW 125i", "Ford Focus", "Chevrolet Cruze", "Toyota Avensis", "Civic BTCC 2013"],
+            "timesInHundredths": true,
 			"enabledMessageTypes": "TYRE_TEMPS, BRAKE_TEMPS, FUEL, LOCKING_AND_SPINNING"
 		},
 		{
