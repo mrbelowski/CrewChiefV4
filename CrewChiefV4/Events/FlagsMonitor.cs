@@ -189,11 +189,19 @@ namespace CrewChiefV4.Events
                 {
                     return false;
                 }
+                if (eventSubType == folderFCYellowPitsClosedEU || eventSubType == folderFCYellowPitsClosedUS)
+                {
+                    return currentGameState.FlagData.fcyPhase == FullCourseYellowPhase.PITS_CLOSED;
+                }
+                else if (eventSubType == folderFCYellowPitsOpenEU || eventSubType == folderFCYellowPitsOpenUS)
+                {
+                    return currentGameState.FlagData.fcyPhase == FullCourseYellowPhase.PITS_OPEN;
+                }
                 if (validationData == null) {
                     return true;
                 }
                 if ((Boolean) validationData[isValidatingSectorMessage])
-                {                    
+                {
                     int sectorIndex = (int)validationData[validationSectorNumberKey];
                     FlagEnum sectorFlagWhenQueued = (FlagEnum)validationData[validationSectorFlagKey];
                     if (lastSectorFlags[sectorIndex] == sectorFlagWhenQueued)
@@ -426,7 +434,7 @@ namespace CrewChiefV4.Events
                         case FullCourseYellowPhase.PITS_CLOSED:
                             if (CrewChief.yellowFlagMessagesEnabled)
                             {
-                                audioPlayer.playMessage(new QueuedMessage(GlobalBehaviourSettings.useAmericanTerms ? folderFCYellowPitsClosedUS : folderFCYellowPitsClosedEU, 0, this));
+                                audioPlayer.playMessage(new QueuedMessage(GlobalBehaviourSettings.useAmericanTerms ? folderFCYellowPitsClosedUS : folderFCYellowPitsClosedEU, random.Next(1, 3), this));
                             }
                             break;
                         case FullCourseYellowPhase.PITS_OPEN_LEAD_LAP_VEHICLES:
@@ -438,7 +446,7 @@ namespace CrewChiefV4.Events
                         case FullCourseYellowPhase.PITS_OPEN:
                             if (CrewChief.yellowFlagMessagesEnabled)
                             {
-                                audioPlayer.playMessage(new QueuedMessage(GlobalBehaviourSettings.useAmericanTerms ? folderFCYellowPitsOpenUS : folderFCYellowPitsOpenEU, 0, this));
+                                audioPlayer.playMessage(new QueuedMessage(GlobalBehaviourSettings.useAmericanTerms ? folderFCYellowPitsOpenUS : folderFCYellowPitsOpenEU, random.Next(1, 3), this));
                             }
                             break;
                         case FullCourseYellowPhase.LAST_LAP_NEXT:
