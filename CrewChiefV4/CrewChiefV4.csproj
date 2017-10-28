@@ -156,6 +156,7 @@
     <Compile Include="NumberProcessing\NumberReaderFactory.cs" />
     <Compile Include="PCars\PCarsUDPreader.cs" />
     <Compile Include="PCars\PCarsSpotterv2.cs" />
+    <Compile Include="PCars\PCars2UDPTelemetryDataStruct.cs" />
     <Compile Include="PCars\PCarsUDPTelemetryDataStruct.cs" />
     <Compile Include="PluginInstaller.cs" />
     <Compile Include="Properties\Settings.Designer.cs">

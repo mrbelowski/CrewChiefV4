@@ -843,9 +843,8 @@ namespace CrewChiefV4
                         new Thread(() =>
                         {
                             Thread.Sleep(2000);
-                            if (!channelOpen && SpeechRecogniser.waitingForSpeech)
+                            if (!channelOpen && !SpeechRecogniser.gotRecognitionResult)
                             {
-                                SpeechRecogniser.waitingForSpeech = false;
                                 crewChief.youWot();
                             }
                         }).Start();
