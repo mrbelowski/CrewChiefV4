@@ -1226,6 +1226,10 @@ namespace CrewChiefV4.assetto
                 currentGameState.SessionData.IsNewSector = previousGameState == null || currentGameState.SessionData.SectorNumber != previousGameState.SessionData.SectorNumber;
                 currentGameState.SessionData.LapTimeCurrent = mapToFloatTime(shared.acsGraphic.iCurrentTime);
 
+                currentGameState.SessionData.IsNewLap = currentGameState.HasNewLapData(previousGameState, mapToFloatTime(shared.acsGraphic.iLastTime))
+                    || ((lastSessionPhase == SessionPhase.Countdown)
+                    && (currentGameState.SessionData.SessionPhase == SessionPhase.Green || currentGameState.SessionData.SessionPhase == SessionPhase.FullCourseYellow));
+
                 //Sector Log
                 if (currentGameState.SessionData.TrackDefinition.unknownTrack && logUnknownTrackSectors && !isOnline && currentGameState.SessionData.IsNewSector &&
                     (shared.acsGraphic.currentSectorIndex + 1 == 2 || shared.acsGraphic.currentSectorIndex + 1 == 3))
@@ -1234,11 +1238,11 @@ namespace CrewChiefV4.assetto
                 }
 
                 //Sector
-                if (currentGameState.SessionData.IsNewSector && playerLapData.Count > 0)
+                if ((currentGameState.SessionData.IsNewSector || currentGameState.SessionData.IsNewLap) && playerLapData.Count > 0)
                 {
 
                     float sectorTimeToUse = -1;
-                    float lastLapTime = mapToFloatTime(shared.acsGraphic.iLastTime);
+                    float lastLapTime = currentGameState.SessionData.LapTimePrevious;
                     if (currentGameState.SessionData.SectorNumber == 1)
                     {
                         sectorTimeToUse = lastLapTime;
@@ -1250,7 +1254,7 @@ namespace CrewChiefV4.assetto
 
                     sectorTimeToUse = addPlayerLapdata(previousGameState.SessionData.SectorNumber, sectorTimeToUse, currentGameState.SessionData.SessionRunningTime, currentGameState.SessionData.Position);
 
-                    if (currentGameState.SessionData.SectorNumber == 1 && shared.acsGraphic.numberOfLaps > 0)
+                    if (currentGameState.SessionData.IsNewLap && shared.acsGraphic.numberOfLaps > 0)
                     {
                         currentGameState.SessionData.LapTimePreviousEstimateForInvalidLap = currentGameState.SessionData.SessionRunningTime - currentGameState.SessionData.SessionTimesAtEndOfSectors[numberOfSectorsOnTrack];
                         currentGameState.SessionData.SessionTimesAtEndOfSectors[numberOfSectorsOnTrack] = currentGameState.SessionData.SessionRunningTime;
@@ -1330,10 +1334,11 @@ namespace CrewChiefV4.assetto
                 
                 currentGameState.SessionData.CompletedLaps = shared.acsGraphic.completedLaps;
 
-                currentGameState.SessionData.IsNewLap = previousGameState != null && previousGameState.SessionData.IsNewLap == false &&
+
+                /*previousGameState != null && previousGameState.SessionData.IsNewLap == false &&
                     (shared.acsGraphic.completedLaps == previousGameState.SessionData.CompletedLaps + 1 || ((lastSessionPhase == SessionPhase.Countdown)
                     && (currentGameState.SessionData.SessionPhase == SessionPhase.Green || currentGameState.SessionData.SessionPhase == SessionPhase.FullCourseYellow)));
-
+                */
                 if (previousGameState != null)
                 {
                     String stoppedInLandmark = currentGameState.SessionData.trackLandmarksTiming.updateLandmarkTiming(currentGameState.SessionData.TrackDefinition,
@@ -1508,7 +1513,7 @@ namespace CrewChiefV4.assetto
 
                                     float secondsSinceLastUpdate = (float)new TimeSpan(currentGameState.Ticks - previousGameState.Ticks).TotalSeconds;
 
-                                    upateOpponentData(currentOpponentData, currentOpponentRacePosition, participantStruct.carLeaderboardPosition, currentOpponentLapsCompleted,
+                                    upateOpponentData(currentOpponentData, previousOpponentData, currentOpponentRacePosition, participantStruct.carLeaderboardPosition, currentOpponentLapsCompleted,
                                         currentOpponentSector, mapToFloatTime(participantStruct.currentLapTimeMS), mapToFloatTime(participantStruct.lastLapTimeMS),
                                         participantStruct.isCarInPitline == 1, participantStruct.currentLapInvalid == 0,
                                         currentGameState.SessionData.SessionRunningTime, secondsSinceLastUpdate,
@@ -1589,7 +1594,7 @@ namespace CrewChiefV4.assetto
 
                 
                 // more to come here 
-                currentGameState.SessionData.LapTimePrevious = mapToFloatTime(shared.acsGraphic.iLastTime);
+                //currentGameState.SessionData.LapTimePrevious = mapToFloatTime(shared.acsGraphic.iLastTime);
 
                 if (previousGameState != null && previousGameState.SessionData.CurrentLapIsValid /*&& shared.acsStatic.penaltiesEnabled == 1*/)
                 {
@@ -1945,7 +1950,7 @@ namespace CrewChiefV4.assetto
             return SessionPhase.Unavailable;
         }
 
-        private void upateOpponentData(OpponentData opponentData, int racePosition, int leaderBoardPosition, int completedLaps, int sector,
+        private void upateOpponentData(OpponentData opponentData, OpponentData previousOpponentData, int racePosition, int leaderBoardPosition, int completedLaps, int sector,
             float completedLapTime, float lastLapTime, Boolean isInPits, Boolean lapIsValid, float sessionRunningTime, float secondsSinceLastUpdate,
             float[] currentWorldPosition, float speed, float distanceRoundTrack, Boolean sessionLengthIsTime, float sessionTimeRemaining,
             int trackNumberOfSectors, float airTemperature, float trackTempreture, float nearPitEntryPointDistance)
@@ -1973,10 +1978,10 @@ namespace CrewChiefV4.assetto
             opponentData.WorldPosition = currentWorldPosition;
             opponentData.IsNewLap = false;
             opponentData.InPits = isInPits;
-
-            if (opponentData.CurrentSectorNumber != sector)
+            bool hasNewLapData = opponentData.HasNewLapData(previousOpponentData, sector, lastLapTime);
+            if (opponentData.CurrentSectorNumber != sector || hasNewLapData)
             {
-                if (opponentData.CurrentSectorNumber == trackNumberOfSectors && sector == 1)
+                if (hasNewLapData)
                 {
                     if (opponentData.OpponentLapData.Count > 0)
                     {
