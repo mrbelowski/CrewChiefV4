@@ -1978,7 +1978,7 @@ namespace CrewChiefV4.assetto
             opponentData.WorldPosition = currentWorldPosition;
             opponentData.IsNewLap = false;
             opponentData.InPits = isInPits;
-            bool hasNewLapData = opponentData.HasNewLapData(previousOpponentData, sector, lastLapTime);
+            bool hasNewLapData = opponentData.HasNewLapData(previousOpponentData, sector, lastLapTime, trackNumberOfSectors);
             if (opponentData.CurrentSectorNumber != sector || hasNewLapData)
             {
                 if (hasNewLapData)

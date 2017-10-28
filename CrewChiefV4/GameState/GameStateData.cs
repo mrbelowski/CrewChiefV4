@@ -964,12 +964,12 @@ namespace CrewChiefV4.GameState
 
         private Boolean WaitingForNewLapData = false;
         private DateTime Now = new DateTime(DateTime.Now.Ticks);
-        //call this after setting currentGameState.SessionData.SectorNumber and currentGameState.SessionData.IsNewSector
-        public bool HasNewLapData(OpponentData previousOpponentData, int currentSectorNumber, float gameProvidedLastLapTime)
+
+        public bool HasNewLapData(OpponentData previousOpponentData, int currentSectorNumber, float gameProvidedLastLapTime, int trackNumberOfSectors)
         {
             if (previousOpponentData != null)
             {
-                if (currentSectorNumber == 1 && previousOpponentData.CurrentSectorNumber == 3)
+                if (currentSectorNumber == 1 && previousOpponentData.CurrentSectorNumber == trackNumberOfSectors)
                 {
                     // reset the timer and start waiting for an updated laptime...
                     this.WaitingForNewLapData = true;
