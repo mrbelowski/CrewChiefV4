@@ -13,19 +13,6 @@ namespace CrewChiefV4.PCars2
         public byte[] nameByteArray;
     }
 
-    public enum EUDPStreamerPacketHandlerType
-    {
-	    eCarPhysics = 0,
-	    eRaceDefinition = 1,
-	    eParticipants = 2,
-	    eTimings = 3,
-	    eGameState = 4,
-	    eWeatherState = 5, // not sent at the moment, information can be found in the game state packet
-	    eVehicleNames = 6, //not sent at the moment
-	    eTimeStats = 7,
-	    eParticipantVehicleNames = 8
-    };
-
     public struct packetBase
     {
         // starts with packet base (0-12)
@@ -46,14 +33,21 @@ namespace CrewChiefV4.PCars2
     //	When it is sent: in race
     //
     *******************************************************************************************************************/
+    
     public struct sTelemetryData
     {
+        public const uint sPacketSize = 538;
         // starts with packet base (0-12)
         [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 12)]
         public packetBase mPacketBase;
 
         // Participant info
         public sbyte sViewedParticipantIndex;	// 12
+
+        public byte sUnfilteredThrottle;							// 13 1
+	    public byte	sUnfilteredBrake;									// 14 1
+	    public sbyte sUnfilteredSteering;							// 15 1
+	    public byte	sUnfilteredClutch;								// 16 1
 
         public byte sCarFlags;												// 17 1
         public short sOilTempCelsius;									// 18 2
@@ -168,6 +162,7 @@ namespace CrewChiefV4.PCars2
     *******************************************************************************************************************/
     public struct sRaceData
     {
+        public const uint sPacketSize = 308;
         // starts with packet base (0-12)
         [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 12)]
         public packetBase mPacketBase;
@@ -206,6 +201,7 @@ namespace CrewChiefV4.PCars2
     *******************************************************************************************************************/
     public struct sParticipantsData
     {
+        public const uint sPacketSize = 1040;
         // starts with packet base (0-12)
         [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 12)]
         public packetBase mPacketBase;
@@ -244,6 +240,7 @@ namespace CrewChiefV4.PCars2
 
     public struct sTimingsData
     {
+        public const uint sPacketSize = 993;
         // starts with packet base (0-12)
         [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 12)]
         public packetBase mPacketBase;
@@ -269,6 +266,7 @@ namespace CrewChiefV4.PCars2
     *******************************************************************************************************************/
     public struct sGameStateData
     {
+        public const uint sPacketSize = 24;
         // starts with packet base (0-12)
         [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 12)]
         public packetBase mPacketBase;
@@ -296,6 +294,7 @@ namespace CrewChiefV4.PCars2
     *******************************************************************************************************************/
     public struct sParticipantStatsInfo
     {
+        public const uint sPacketSize = 24;
         public float sFastestLapTime;								// 0
         public float sLastLapTime;									// 4
         public float sLastSectorTime;								// 8
@@ -312,6 +311,7 @@ namespace CrewChiefV4.PCars2
 
     public struct sTimeStatsData
     {
+        public const uint sPacketSize = 784;
         // starts with packet base (0-12)
         [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 12)]
         public packetBase mPacketBase;
@@ -342,9 +342,9 @@ namespace CrewChiefV4.PCars2
         public byte[] sName; // 6 70
     }; // padded to 72
 
-
     public struct sParticipantVehicleNamesData
     {
+        public const uint sPacketSize = 1164;
         // starts with packet base (0-12)
         [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 12)]
         public packetBase mPacketBase;
@@ -362,6 +362,7 @@ namespace CrewChiefV4.PCars2
 
     public struct sVehicleClassNamesData
     {
+        public const uint sPacketSize = 1452;
         // starts with packet base (0-12)
         [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 12)]
         public packetBase mPacketBase;
