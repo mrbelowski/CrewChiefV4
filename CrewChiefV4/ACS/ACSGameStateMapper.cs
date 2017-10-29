@@ -1226,7 +1226,7 @@ namespace CrewChiefV4.assetto
                 currentGameState.SessionData.IsNewSector = previousGameState == null || currentGameState.SessionData.SectorNumber != previousGameState.SessionData.SectorNumber;
                 currentGameState.SessionData.LapTimeCurrent = mapToFloatTime(shared.acsGraphic.iCurrentTime);
 
-                currentGameState.SessionData.IsNewLap = currentGameState.HasNewLapData(previousGameState, mapToFloatTime(shared.acsGraphic.iLastTime))
+                currentGameState.SessionData.IsNewLap = currentGameState.HasNewLapData(previousGameState, mapToFloatTime(shared.acsGraphic.iLastTime), currentGameState.SessionData.SectorNumber)
                     || ((lastSessionPhase == SessionPhase.Countdown)
                     && (currentGameState.SessionData.SessionPhase == SessionPhase.Green || currentGameState.SessionData.SessionPhase == SessionPhase.FullCourseYellow));
 

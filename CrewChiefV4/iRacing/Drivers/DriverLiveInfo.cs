@@ -8,10 +8,6 @@ namespace CrewChiefV4.iRacing
     public class DriverLiveInfo
     {
         private const float SPEED_CALC_INTERVAL = 0.1f;
-        private static TimeSpan MaxWaitForNewLapData = TimeSpan.FromSeconds(3);
-
-        private DateTime NewLapDataTimerExpiry = DateTime.MaxValue;
-        private DateTime Now = new DateTime(DateTime.Now.Ticks);
         private bool  UseDelayedLaptimes = UserSettings.GetUserSettings().getBoolean("iracing_delayed_laptimes");
         
         public DriverLiveInfo(Driver driver)
@@ -20,8 +16,6 @@ namespace CrewChiefV4.iRacing
             PreviousLapWasValid = false;
             HasCrossedSFLine = false;
             LapTimePrevious = -1;
-            FirstTime = false;
-            IsNewLap = false;
         }
 
         private readonly Driver _driver;
@@ -57,10 +51,7 @@ namespace CrewChiefV4.iRacing
         public bool PreviousLapWasValid { get; set; }
         public float LapTimePrevious { get; set; }
         public bool HasCrossedSFLine { get; set; }
-        public bool FirstTime { get; set; }
-        // this may be true a short time *after* IsNewLap is true
-        public Boolean LastLapTimeUpdated = false;
-        private Boolean WaitingForNewLapData = false;
+
 
         private double _prevSpeedUpdateTime;
         private double _prevSpeedUpdateDist;
@@ -71,30 +62,6 @@ namespace CrewChiefV4.iRacing
             get
             {
                 return SessionTime - (float)this.Driver.CurrentResults.FakeSector1.EnterSessionTime;
-            }
-        }
-        public void checkForNewLapData(float gameProvidedLastLapTime)
-        {
-            if (this.HasCrossedSFLine)
-            {
-                // reset the timer and start waiting for an updated laptime...
-                this.WaitingForNewLapData = true;
-                this.NewLapDataTimerExpiry = this.Now.Add(MaxWaitForNewLapData);
-            }
-            // if we're waiting, see if the timer has expired or we have a change in the previous laptime value
-            if (this.WaitingForNewLapData && (this.LapTimePrevious != gameProvidedLastLapTime || this.Now > this.NewLapDataTimerExpiry))
-            {
-                // the timer has expired or we have new data
-                this.WaitingForNewLapData = false;
-                this.LastLapTimeUpdated = true;
-                this.LapTimePrevious = gameProvidedLastLapTime;
-                this.PreviousLapWasValid = gameProvidedLastLapTime > 1;
-                this.IsNewLap = true;
-            }
-            else
-            {
-                LastLapTimeUpdated = false;
-                this.IsNewLap = false;
             }
         }
         public void ParseTelemetry(iRacingData e)
@@ -133,34 +100,25 @@ namespace CrewChiefV4.iRacing
             //we do not have lastlaptime from opponents available in telemetry so we use data from sessioninfo.
             if(Driver.Id == e.PlayerCarIdx)
             {
-                if (!FirstTime)
-                {
-                    this.LapTimePrevious = e.LapLastLapTime;
-                    FirstTime = true;
-                }
+
                 if (UseDelayedLaptimes)
                 {
-                    checkForNewLapData(e.LapLastLapTime);   
+                    this.LapTimePrevious = e.LapLastLapTime;
                 }
                 else
                 {
-                    checkForNewLapData((float)this.LastLaptime);
+                    this.LapTimePrevious = this.LastLaptime;
                 }                             
             }
             else
             {
-                if (!FirstTime)
-                {
-                    this.LapTimePrevious = this._driver.CurrentResults.LastTime;
-                    FirstTime = true;
-                }
                 if (UseDelayedLaptimes)
                 {
-                    checkForNewLapData(this._driver.CurrentResults.LastTime);
+                    this.LapTimePrevious = this._driver.CurrentResults.LastTime;
                 }
                 else
                 {
-                    checkForNewLapData(this.LastLaptime);
+                    this.LapTimePrevious = this.LastLaptime;
                 }                
             }                
         }
