@@ -148,7 +148,6 @@
 			"rf1TrackNames": ["Brands Indy",
 				"Brands Hatch Indy"
 			],
-			"rf2TrackNames": ["Brands"],
 			"acTrackNames": ["ks_brands_hatch:indy"],
 			"pcarsTrackName": "Brands Hatch:Indy",
 			"raceroomLayoutId": 2520,
@@ -6263,7 +6262,7 @@
 			]
 		},
 		{
-			"rf2TrackNames": ["Brands Hatch INDY"],
+			"rf2TrackNames": ["Brands Hatch INDY", "Brands"],
 			"trackLandmarks": [
 
 				{
