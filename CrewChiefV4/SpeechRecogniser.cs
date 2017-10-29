@@ -547,14 +547,22 @@ namespace CrewChiefV4
             }
             return false;
         }
-
+        
         void sre_SpeechRecognized(object sender, SpeechRecognizedEventArgs e)
         {
             SpeechRecogniser.waitingForSpeech = false;
             Console.WriteLine("recognised : " + e.Result.Text + " confidence = " + e.Result.Confidence);
             try
             {
-                if (opponentGrammarList.Contains(e.Result.Grammar))
+                if (macroGrammar == e.Result.Grammar)
+                {
+                    if (macroLookup.ContainsKey(e.Result.Text))
+                    {
+                        // TODO: check the confidence level here
+                        macroLookup[e.Result.Text].execute();
+                    }
+                }
+                else if (opponentGrammarList.Contains(e.Result.Grammar))
                 {
                     if (e.Result.Confidence > minimum_name_voice_recognition_confidence)
                     {
@@ -567,11 +575,7 @@ namespace CrewChiefV4
                 }
                 else if (e.Result.Confidence > minimum_voice_recognition_confidence)
                 {
-                    if (macroGrammar == e.Result.Grammar && macroLookup.ContainsKey(e.Result.Text))
-                    {
-                        macroLookup[e.Result.Text].execute();
-                    }
-                    else if (ResultContains(e.Result.Text, REPEAT_LAST_MESSAGE))
+                    if (ResultContains(e.Result.Text, REPEAT_LAST_MESSAGE))
                     {
                         crewChief.audioPlayer.repeatLastMessage();
                     }
@@ -594,21 +598,14 @@ namespace CrewChiefV4
                 Console.WriteLine("Unable to respond - error message: " + exception.Message);
             }
             
-            // 'stop' the recogniser if we're ALWAYS_ON (because we restart it below) or TOGGLE
+            // TODO: 'stop' the recogniser if we're ALWAYS_ON (because we restart it below) or TOGGLE
             // (because the user might have forgotten to press the button to close the channel).
-            // For HOLD mode, let the recogniser continue listening and executing commands (invoking this 
-            // callback again from another thread) until the button is released, which will call
-            // RecogniseAsyncCancel
-            if (voiceOptionEnum == MainWindow.VoiceOptionEnum.TOGGLE)
+            // For HOLD mode, let the recogniser continue listening and executing commands (invoking this callback)
+            // for as long as the button is pressed
+            sre.RecognizeAsyncStop(); 
+            Thread.Sleep(500);
+            if (voiceOptionEnum == MainWindow.VoiceOptionEnum.ALWAYS_ON)
             {
-                sre.RecognizeAsyncStop();
-                Thread.Sleep(500);
-                Console.WriteLine("stopping speech recognition");
-            }
-            else if (voiceOptionEnum == MainWindow.VoiceOptionEnum.ALWAYS_ON)
-            {
-                sre.RecognizeAsyncStop(); 
-                Thread.Sleep(500);
                 Console.WriteLine("restarting speech recognition");
                 recognizeAsync();
             }
@@ -623,7 +620,6 @@ namespace CrewChiefV4
         public void recognizeAsyncCancel()
         {
             sre.RecognizeAsyncCancel();
-            SpeechRecogniser.waitingForSpeech = false;
         }
 
         private AbstractEvent getEventForSpeech(String recognisedSpeech)
