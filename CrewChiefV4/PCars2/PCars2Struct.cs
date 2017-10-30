@@ -48,31 +48,8 @@ namespace CrewChiefV4.PCars2
             existingState.mUnfilteredSteering = (float)udpTelemetryData.sUnfilteredSteering / 127f;
             existingState.mUnfilteredClutch = (float)udpTelemetryData.sUnfilteredClutch / 255f;
 
-            // Timing & Scoring
-            // lapInvalidated doesn't appear to exist in the UDP data for the player...
-            // existingState.mLapInvalidated = (udpTelemetryData.sRaceStateFlags >> 3 & 1) == 1;
-
-            existingState.mSessionFastestLapTime = udpTelemetryData.sBestLapTime;
-            existingState.mLastLapTime = udpTelemetryData.sLastLapTime;
-            existingState.mCurrentTime = udpTelemetryData.sCurrentTime;
-            existingState.mSplitTimeAhead = udpTelemetryData.sSplitTimeAhead;
-            existingState.mSplitTimeBehind = udpTelemetryData.sSplitTimeBehind;
-            existingState.mSplitTime = udpTelemetryData.sSplitTime;
-            existingState.mEventTimeRemaining = udpTelemetryData.sEventTimeRemaining; 
-            existingState.mPersonalFastestLapTime = udpTelemetryData.sPersonalFastestLapTime;
-            existingState.mWorldFastestLapTime = udpTelemetryData.sWorldFastestLapTime;
-            existingState.mCurrentSector1Time = udpTelemetryData.sCurrentSector1Time;
-            existingState.mCurrentSector2Time = udpTelemetryData.sCurrentSector2Time; 
-            existingState.mCurrentSector3Time = udpTelemetryData.sCurrentSector3Time; 
-            existingState.mSessionFastestSector1Time = udpTelemetryData.sFastestSector1Time; 
-            existingState.mSessionFastestSector2Time = udpTelemetryData.sFastestSector2Time; 
-            existingState.mSessionFastestSector3Time = udpTelemetryData.sFastestSector3Time; 
-            existingState.mPersonalFastestSector1Time = udpTelemetryData.sPersonalFastestSector1Time; 
-            existingState.mPersonalFastestSector2Time = udpTelemetryData.sPersonalFastestSector2Time; 
-            existingState.mPersonalFastestSector3Time = udpTelemetryData.sPersonalFastestSector3Time;
-            existingState.mWorldFastestSector1Time = udpTelemetryData.sWorldFastestSector1Time; 
-            existingState.mWorldFastestSector2Time = udpTelemetryData.sWorldFastestSector2Time;
-            existingState.mWorldFastestSector3Time = udpTelemetryData.sWorldFastestSector3Time;
+            // Timing & Scoring are not in this packet
+           
 
             // Flags
             existingState.mHighestFlagColour = (uint) udpTelemetryData.sHighestFlag & 7; 
@@ -454,7 +431,7 @@ namespace CrewChiefV4.PCars2
         public byte[] mTrackVariation;          // [ string ]- untranslated shortened English variation description
         public float mTrackLength;                               // [ UNITS = Metres ]   [ RANGE = 0.0f->... ]    [ UNSET = 0.0f ]
 
-  // Timings
+  // Timings - DO  NOT USE THESE
         public int mNumSectors;                                  // [ RANGE = 0->... ]   [ UNSET = -1 ]
         public bool mLapInvalidated;                             // [ UNITS = boolean ]   [ RANGE = false->true ]   [ UNSET = false ]
         public float mBestLapTime;                               // [ UNITS = seconds ]   [ RANGE = 0.0f->... ]   [ UNSET = -1.0f ]
