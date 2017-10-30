@@ -161,6 +161,10 @@ namespace CrewChiefV4.PCars2
 
         public static pCars2APIStruct MergeWithExistingState(pCars2APIStruct existingState, sParticipantsData participantsData)
         {
+            if (existingState.mParticipantData == null)
+            {
+                existingState.mParticipantData = new pCars2APIParticipantStruct[32];
+            }
             int offset = (participantsData.mPartialPacketIndex -1) * 16;
             // existingState is a struct, so any changes we make as we iterate this array will be done to a copy, not a reference
             for (int i = offset; i < offset + 16 && i < existingState.mParticipantData.Length; i++)
