@@ -239,21 +239,21 @@ namespace CrewChiefV4.PCars2
                         lastPacketRateEstimate = (int)((float)TimeSpan.TicksPerSecond * (float)(telemPacketCount - packetCountAtStartOfCurrentRateCheck) / (float)(DateTime.Now.Ticks - ticksAtStartOfCurrentPacketRateCheck));
                         Console.WriteLine("Packet rate = " + lastPacketRateEstimate + 
                             "Hz, totals:" +
-                            "\ntelem = " + telemPacketCount +
-                            "\nraceDefinition = " + raceDefinitionPacketCount +
-                            "\nparticipants = " + participantsPacketCount +
-                            "\ntimings = " + timingsPacketCount +
-                            "\ngameState = " + gameStatePacketCount +
-                            "\nweather = " + weatherStatePacketCount +
-                            "\nvehicleNames = " + vehicleNamesPacketCount +
-                            "\ntimeStats = " + timeStatsPacketCount +
-                            "\nparticipantVehicleNames = " + participantVehicleNamesPacketCount +
-                            "\nin sequence = " + inSequenceTelemCount + " oos accepted = " + acceptedOutOfSequenceTelemCount + " oos rejected = " + discardedTelemCount);
+                            "\rtelem = " + telemPacketCount +
+                            "\rraceDefinition = " + raceDefinitionPacketCount +
+                            "\rparticipants = " + participantsPacketCount +
+                            "\rtimings = " + timingsPacketCount +
+                            "\rgameState = " + gameStatePacketCount +
+                            "\rweather = " + weatherStatePacketCount +
+                            "\rvehicleNames = " + vehicleNamesPacketCount +
+                            "\rtimeStats = " + timeStatsPacketCount +
+                            "\rparticipantVehicleNames = " + participantVehicleNamesPacketCount +
+                            "\rin sequence = " + inSequenceTelemCount + " oos accepted = " + acceptedOutOfSequenceTelemCount + " oos rejected = " + discardedTelemCount);
                         packetCountAtStartOfCurrentRateCheck = telemPacketCount;
                         packetCountAtStartOfNextRateCheck = packetCountAtStartOfCurrentRateCheck + packetRateCheckInterval;
                         ticksAtStartOfCurrentPacketRateCheck = DateTime.Now.Ticks;
                     }
-                    frameLength = sTelemetryData.sPacketSize;
+                    frameLength = UDPPacketSizes.telemetryPacketSize;
                     Boolean sequenceCheckOK = isNextInSequence(packetNumber);
                     if (sequenceCheckOK)
                     {
@@ -285,7 +285,7 @@ namespace CrewChiefV4.PCars2
                     break;
                 case EUDPStreamerPacketHandlerType.eRaceDefinition:
                     raceDefinitionPacketCount++;
-                    frameLength = sRaceData.sPacketSize;
+                    frameLength = UDPPacketSizes.raceDataPacketSize;
                     GCHandle raceDefHandle = GCHandle.Alloc(rawData.Take(frameLength).ToArray(), GCHandleType.Pinned);
                     try
                     {
@@ -299,7 +299,7 @@ namespace CrewChiefV4.PCars2
                     break;
                 case EUDPStreamerPacketHandlerType.eParticipants:
                     participantsPacketCount++;
-                    frameLength = sParticipantsData.sPacketSize;
+                    frameLength = UDPPacketSizes.participantsDataPacketSize;
                     GCHandle participantsHandle = GCHandle.Alloc(rawData.Take(frameLength).ToArray(), GCHandleType.Pinned);
                     try
                     {
@@ -313,7 +313,7 @@ namespace CrewChiefV4.PCars2
                     break;
                 case EUDPStreamerPacketHandlerType.eTimings:
                     timingsPacketCount++;
-                    frameLength = sTimingsData.sPacketSize;
+                    frameLength = UDPPacketSizes.timingsDataPacketSize;
                     GCHandle timingsHandle = GCHandle.Alloc(rawData.Take(frameLength).ToArray(), GCHandleType.Pinned);
                     try
                     {
@@ -327,7 +327,7 @@ namespace CrewChiefV4.PCars2
                     break;
                 case EUDPStreamerPacketHandlerType.eGameState:
                     gameStatePacketCount++;
-                    frameLength = sGameStateData.sPacketSize;
+                    frameLength = UDPPacketSizes.gameStateDataPacketSize;
                     GCHandle gameStateHandle = GCHandle.Alloc(rawData.Take(frameLength).ToArray(), GCHandleType.Pinned);
                     try
                     {
@@ -343,9 +343,13 @@ namespace CrewChiefV4.PCars2
                     weatherStatePacketCount++;
                     Console.WriteLine("Got an undocumented and unsupported weather packet");
                     break;
+                case EUDPStreamerPacketHandlerType.eVehicleNames:
+                    weatherStatePacketCount++;
+                    Console.WriteLine("Got an undocumented and unsupported vehicle names packet");
+                    break;
                 case EUDPStreamerPacketHandlerType.eTimeStats:
                     participantsPacketCount++;
-                    frameLength = sTimeStatsData.sPacketSize;
+                    frameLength = UDPPacketSizes.timeStatsPacketSize;
                     GCHandle timeStatsHandle = GCHandle.Alloc(rawData.Take(frameLength).ToArray(), GCHandleType.Pinned);
                     try
                     {
@@ -359,7 +363,7 @@ namespace CrewChiefV4.PCars2
                     break;
                 case EUDPStreamerPacketHandlerType.eParticipantVehicleNames:
                     participantsPacketCount++;
-                    frameLength = sParticipantVehicleNamesData.sPacketSize;
+                    frameLength = UDPPacketSizes.participantVehicleNamesPacketSize;
                     GCHandle vehNamesHandle = GCHandle.Alloc(rawData.Take(frameLength).ToArray(), GCHandleType.Pinned);
                     try
                     {

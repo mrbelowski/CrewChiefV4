@@ -161,7 +161,7 @@ namespace CrewChiefV4.PCars2
 
         public static pCars2APIStruct MergeWithExistingState(pCars2APIStruct existingState, sParticipantsData participantsData)
         {
-            int offset = participantsData.mPacketBase.mPartialPacketIndex;  // TODO: is this *16?
+            int offset = (participantsData.mPartialPacketIndex -1) * 16;
             // existingState is a struct, so any changes we make as we iterate this array will be done to a copy, not a reference
             for (int i = offset; i < offset + 16 && i < existingState.mParticipantData.Length; i++)
             {
@@ -180,6 +180,34 @@ namespace CrewChiefV4.PCars2
             existingState.mSplitTimeBehind = timingsData.sSplitTimeBehind;
             existingState.mSplitTime = timingsData.sSplitTime;  // what's this?
             byte[] participantHighestFlags = new byte[32];
+            if (existingState.mParticipantData == null)
+            {
+                existingState.mParticipantData = new pCars2APIParticipantStruct[32];
+            }
+            if (existingState.mRaceStates == null)
+            {
+                existingState.mRaceStates = new uint[32];
+            }
+            if (existingState.mLapsInvalidated == null)
+            {
+                existingState.mLapsInvalidated = new bool[32];
+            }
+            if (existingState.mPitModes == null)
+            {
+                existingState.mPitModes = new uint[32];
+            }
+            if (existingState.mCurrentSector1Times == null)
+            {
+                existingState.mCurrentSector1Times = new float[32];
+            }
+            if (existingState.mCurrentSector2Times == null)
+            {
+                existingState.mCurrentSector2Times = new float[32];
+            }
+            if (existingState.mCurrentSector3Times == null)
+            {
+                existingState.mCurrentSector3Times = new float[32];
+            }
             for (int i = 0; i < existingState.mParticipantData.Length; i++)
             {
                 sParticipantInfo newParticipantInfo = timingsData.sParticipants[i];
@@ -268,6 +296,22 @@ namespace CrewChiefV4.PCars2
         public static pCars2APIStruct MergeWithExistingState(pCars2APIStruct existingState, sTimeStatsData timeStatsData)
         {
             float[] lastSectorTimes = new float[32];
+            if (existingState.mFastestLapTimes == null)
+            {
+                existingState.mFastestLapTimes = new float[32];
+            }
+            if (existingState.mFastestSector1Times == null)
+            {
+                existingState.mFastestSector1Times = new float[32];
+            }
+            if (existingState.mFastestSector2Times == null)
+            {
+                existingState.mFastestSector2Times = new float[32];
+            }
+            if (existingState.mFastestSector3Times == null)
+            {
+                existingState.mFastestSector3Times = new float[32];
+            }
             for (int i = 0; i < 32; i++)
             {
                 sParticipantStatsInfo participantInfo = timeStatsData.sStats.sParticipants[i];
@@ -288,19 +332,24 @@ namespace CrewChiefV4.PCars2
 
         public static pCars2APIStruct MergeWithExistingState(pCars2APIStruct existingState, sParticipantVehicleNamesData participantVehicleNamesData)
         {
-            int offset = participantVehicleNamesData.mPacketBase.mPartialPacketIndex;  // TODO: is this *16?
+            int offset = (participantVehicleNamesData.mPartialPacketIndex - 1) * 16;
+            if (existingState.mCarNames == null)
+            {
+                existingState.mCarNames = new byte[64*64];
+            }
             for (int i = 0; i < 16; i++)
             {
                 ushort index = participantVehicleNamesData.sVehicles[i].sIndex;
                 uint classIndex = participantVehicleNamesData.sVehicles[i].sClass;
                 byte[] name = participantVehicleNamesData.sVehicles[i].sName;
                 // TODO: should we use index here instead of i?
-                int start = offset;
-                int end = offset + 20;
+                int start = (offset + i) * 64;
+                int end = start + 64;
                 int sourceIndex = 0;
-                for (int j = start; j < offset; j++)
+                for (int j = start; j < end; j++)
                 {
                     existingState.mCarNames[j] = name[sourceIndex];
+                    sourceIndex++;
                 }
             }
             return existingState;
@@ -314,6 +363,15 @@ namespace CrewChiefV4.PCars2
                 // TODO: understand this data and map it
             }
             return existingState;
+        }
+
+        public static String getCarClassName(pCars2APIStruct shared, int participantIndex)
+        {
+            if (shared.mCarClassNames == null)
+            {
+                return "";
+            }
+            return getNameFromBytes(shared.mCarClassNames.Skip(participantIndex * 64).Take(64).ToArray());
         }
 
         public static String getNameFromBytes(byte[] name)
@@ -423,31 +481,6 @@ namespace CrewChiefV4.PCars2
         public uint mCurrentLap;                                // [ RANGE = 0->... ]   [ UNSET = 0 ]
         public int mCurrentSector;                             // [ enum (Type#4) Current Sector ]
 
-    }
-
-    [Serializable]
-    public struct pCars2APIParticipantAdditionalDataStruct
-    {
-        public float mCurrentSector1Time;        // [ UNITS = seconds ]   [ RANGE = 0.0f->... ]   [ UNSET = -1.0f ]
-        public float mCurrentSector2Time;        // [ UNITS = seconds ]   [ RANGE = 0.0f->... ]   [ UNSET = -1.0f ]
-        public float mCurrentSector3Time;        // [ UNITS = seconds ]   [ RANGE = 0.0f->... ]   [ UNSET = -1.0f ]
-        public float mFastestSector1Time;        // [ UNITS = seconds ]   [ RANGE = 0.0f->... ]   [ UNSET = -1.0f ]
-        public float mFastestSector2Time;        // [ UNITS = seconds ]   [ RANGE = 0.0f->... ]   [ UNSET = -1.0f ]
-        public float mFastestSector3Time;        // [ UNITS = seconds ]   [ RANGE = 0.0f->... ]   [ UNSET = -1.0f ]
-        public float mFastestLapTime;            // [ UNITS = seconds ]   [ RANGE = 0.0f->... ]   [ UNSET = -1.0f ]
-        public float mLastLapTime;               // [ UNITS = seconds ]   [ RANGE = 0.0f->... ]   [ UNSET = -1.0f ]
-        [MarshalAs(UnmanagedType.I1)]
-        public bool mLapInvalidated;             // [ UNITS = boolean ]   [ RANGE = false->true ]   [ UNSET = false ]
-        public uint mRaceState;         // [ enum (Type#3) Race State ]
-        public uint mPitMode;           // [ enum (Type#7)  Pit Mode ]
-
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)]
-        public float[] mOrientation;      // [ UNITS = Euler Angles ]
-        public float mmfOnly_mSpeed;     
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
-        public byte[] mCarName; // [ string ]
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
-        public byte[] mCarClassName; // [ string ]
     }
 
     [Serializable]

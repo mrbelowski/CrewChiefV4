@@ -6,24 +6,25 @@ using System.Text;
 
 namespace CrewChiefV4.PCars2
 {
+    public class UDPPacketSizes
+    {
+        public const int telemetryPacketSize = 538;
+        public const int raceDataPacketSize = 308;
+        public const int participantsDataPacketSize = 1040;
+        public const int gameStateDataPacketSize = 24;
+        public const int timingsDataPacketSize = 993;
+        public const int timeStatsPacketSize = 784;
+        public const int participantVehicleNamesPacketSize = 1164;
+        public const int vehicleClassNamesPacketSize = 1452;        
+    }
+        
     // simple type to hold a name, so we can map to an array of these
+    [Serializable]
     public struct nameString
     {
         [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 64)]
         public byte[] nameByteArray;
     }
-
-    public struct packetBase
-    {
-        // starts with packet base (0-12)
-        public uint mPacketNumber;						//0 counter reflecting all the packets that have been sent during the game run
-        public uint mCategoryPacketNumber;		//4 counter of the packet groups belonging to the given category
-        public byte mPartialPacketIndex;			//8 If the data from this class had to be sent in several packets, the index number
-        public byte mPartialPacketNumber;			//9 If the data from this class had to be sent in several packets, the total number
-        public byte mPacketType;							//10 what is the type of this packet (see EUDPStreamerPacketHanlderType for details)
-        public byte mPacketVersion;						//11 what is the version of protocol for this handler, to be bumped with data structure change
-    };
-
     
     /*******************************************************************************************************************
     //
@@ -33,13 +34,17 @@ namespace CrewChiefV4.PCars2
     //	When it is sent: in race
     //
     *******************************************************************************************************************/
-    
+
+    [Serializable]
     public struct sTelemetryData
     {
-        public const int sPacketSize = 538;
         // starts with packet base (0-12)
-        [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 12)]
-        public packetBase mPacketBase;
+        public uint mPacketNumber;						//0 counter reflecting all the packets that have been sent during the game run
+        public uint mCategoryPacketNumber;		//4 counter of the packet groups belonging to the given category
+        public byte mPartialPacketIndex;			//8 If the data from this class had to be sent in several packets, the index number
+        public byte mPartialPacketNumber;			//9 If the data from this class had to be sent in several packets, the total number
+        public byte mPacketType;							//10 what is the type of this packet (see EUDPStreamerPacketHanlderType for details)
+        public byte mPacketVersion;						//11 what is the version of protocol for this handler, to be bumped with data structure change
 
         // Participant info
         public sbyte sViewedParticipantIndex;	// 12
@@ -161,12 +166,16 @@ namespace CrewChiefV4.PCars2
     //	When it is sent: Counter resets on entering InRace state and again each time any of the values changes
     //
     *******************************************************************************************************************/
+    [Serializable]
     public struct sRaceData
     {
-        public const int sPacketSize = 308;
         // starts with packet base (0-12)
-        [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 12)]
-        public packetBase mPacketBase;
+        public uint mPacketNumber;						//0 counter reflecting all the packets that have been sent during the game run
+        public uint mCategoryPacketNumber;		//4 counter of the packet groups belonging to the given category
+        public byte mPartialPacketIndex;			//8 If the data from this class had to be sent in several packets, the index number
+        public byte mPartialPacketNumber;			//9 If the data from this class had to be sent in several packets, the total number
+        public byte mPacketType;							//10 what is the type of this packet (see EUDPStreamerPacketHanlderType for details)
+        public byte mPacketVersion;						//11 what is the version of protocol for this handler, to be bumped with data structure change
 
         public float sWorldFastestLapTime;								// 12
         public float sPersonalFastestLapTime;							// 16
@@ -200,12 +209,16 @@ namespace CrewChiefV4.PCars2
     //	this information with the rest of the participant related packets
     //
     *******************************************************************************************************************/
+    [Serializable]
     public struct sParticipantsData
     {
-        public const int sPacketSize = 1040;
         // starts with packet base (0-12)
-        [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 12)]
-        public packetBase mPacketBase;
+        public uint mPacketNumber;						//0 counter reflecting all the packets that have been sent during the game run
+        public uint mCategoryPacketNumber;		//4 counter of the packet groups belonging to the given category
+        public byte mPartialPacketIndex;			//8 If the data from this class had to be sent in several packets, the index number
+        public byte mPartialPacketNumber;			//9 If the data from this class had to be sent in several packets, the total number
+        public byte mPacketType;							//10 what is the type of this packet (see EUDPStreamerPacketHanlderType for details)
+        public byte mPacketVersion;						//11 what is the version of protocol for this handler, to be bumped with data structure change
 
         public uint sParticipantsChangedTimestamp;
         [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 16)]
@@ -220,6 +233,7 @@ namespace CrewChiefV4.PCars2
     //	When it is sent: in race
     //
     *******************************************************************************************************************/
+    [Serializable]
     public struct sParticipantInfo
     {
         [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 3)]
@@ -236,15 +250,18 @@ namespace CrewChiefV4.PCars2
         public byte sCurrentLap;									// 21 -- 
         public float sCurrentTime;									// 22 --
         public float sCurrentSectorTime;								// 26 --
-    };	
+    };
 
-
+    [Serializable]
     public struct sTimingsData
     {
-        public const int sPacketSize = 993;
         // starts with packet base (0-12)
-        [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 12)]
-        public packetBase mPacketBase;
+        public uint mPacketNumber;						//0 counter reflecting all the packets that have been sent during the game run
+        public uint mCategoryPacketNumber;		//4 counter of the packet groups belonging to the given category
+        public byte mPartialPacketIndex;			//8 If the data from this class had to be sent in several packets, the index number
+        public byte mPartialPacketNumber;			//9 If the data from this class had to be sent in several packets, the total number
+        public byte mPacketType;							//10 what is the type of this packet (see EUDPStreamerPacketHanlderType for details)
+        public byte mPacketVersion;						//11 what is the version of protocol for this handler, to be bumped with data structure change
 
         public sbyte sNumParticipants;										// 12 --
         public uint sParticipantsChangedTimestamp;							// 13 -- 
@@ -265,12 +282,16 @@ namespace CrewChiefV4.PCars2
     //	When it is sent: Always
     //
     *******************************************************************************************************************/
+    [Serializable]
     public struct sGameStateData
     {
-        public const int sPacketSize = 24;
         // starts with packet base (0-12)
-        [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 12)]
-        public packetBase mPacketBase;
+        public uint mPacketNumber;						//0 counter reflecting all the packets that have been sent during the game run
+        public uint mCategoryPacketNumber;		//4 counter of the packet groups belonging to the given category
+        public byte mPartialPacketIndex;			//8 If the data from this class had to be sent in several packets, the index number
+        public byte mPartialPacketNumber;			//9 If the data from this class had to be sent in several packets, the total number
+        public byte mPacketType;							//10 what is the type of this packet (see EUDPStreamerPacketHanlderType for details)
+        public byte mPacketVersion;						//11 what is the version of protocol for this handler, to be bumped with data structure change
 
         public ushort mBuildVersionNumber; 		//12
         public byte mGameState;					//15 -- first 3 bits are used for game state enum, second 3 bits for session state enum See shared memory example file for the enums
@@ -293,6 +314,7 @@ namespace CrewChiefV4.PCars2
     //	When it is sent: In Race
     //
     *******************************************************************************************************************/
+    [Serializable]
     public struct sParticipantStatsInfo
     {
         public const int sPacketSize = 24;
@@ -304,18 +326,23 @@ namespace CrewChiefV4.PCars2
         public float sFastestSector3Time;							// 20
     };																					// 24
 
+    [Serializable]
     public struct sParticipantsStats
     {
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
         public sParticipantStatsInfo[] sParticipants; //768
     };
 
+    [Serializable]
     public struct sTimeStatsData
     {
-        public const int sPacketSize = 784;
         // starts with packet base (0-12)
-        [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 12)]
-        public packetBase mPacketBase;
+        public uint mPacketNumber;						//0 counter reflecting all the packets that have been sent during the game run
+        public uint mCategoryPacketNumber;		//4 counter of the packet groups belonging to the given category
+        public byte mPartialPacketIndex;			//8 If the data from this class had to be sent in several packets, the index number
+        public byte mPartialPacketNumber;			//9 If the data from this class had to be sent in several packets, the total number
+        public byte mPacketType;							//10 what is the type of this packet (see EUDPStreamerPacketHanlderType for details)
+        public byte mPacketVersion;						//11 what is the version of protocol for this handler, to be bumped with data structure change
 
         public uint sParticipantsChangedTimestamp;					// 12
         public sParticipantsStats sStats;											// 16 + 768
@@ -335,6 +362,7 @@ namespace CrewChiefV4.PCars2
     //	The last one holding the class names.
     //
     *******************************************************************************************************************/
+    [Serializable]
     public struct sVehicleInfo
     {
         public ushort sIndex; // 0 2
@@ -343,17 +371,22 @@ namespace CrewChiefV4.PCars2
         public byte[] sName; // 6 70
     }; // padded to 72
 
+    [Serializable]
     public struct sParticipantVehicleNamesData
     {
-        public const int sPacketSize = 1164;
         // starts with packet base (0-12)
-        [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 12)]
-        public packetBase mPacketBase;
+        public uint mPacketNumber;						//0 counter reflecting all the packets that have been sent during the game run
+        public uint mCategoryPacketNumber;		//4 counter of the packet groups belonging to the given category
+        public byte mPartialPacketIndex;			//8 If the data from this class had to be sent in several packets, the index number
+        public byte mPartialPacketNumber;			//9 If the data from this class had to be sent in several packets, the total number
+        public byte mPacketType;							//10 what is the type of this packet (see EUDPStreamerPacketHanlderType for details)
+        public byte mPacketVersion;						//11 what is the version of protocol for this handler, to be bumped with data structure change
 
         [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 16)]
         public sVehicleInfo[] sVehicles; //12 16*72
     };	// 1164
 
+    [Serializable]
     public struct sClassInfo
     {
         public uint sClassIndex; // 0 4 
@@ -361,12 +394,16 @@ namespace CrewChiefV4.PCars2
         public byte[] sName; // 4 24
     };
 
+    [Serializable]
     public struct sVehicleClassNamesData
     {
-        public const int sPacketSize = 1452;
         // starts with packet base (0-12)
-        [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 12)]
-        public packetBase mPacketBase;
+        public uint mPacketNumber;						//0 counter reflecting all the packets that have been sent during the game run
+        public uint mCategoryPacketNumber;		//4 counter of the packet groups belonging to the given category
+        public byte mPartialPacketIndex;			//8 If the data from this class had to be sent in several packets, the index number
+        public byte mPartialPacketNumber;			//9 If the data from this class had to be sent in several packets, the total number
+        public byte mPacketType;							//10 what is the type of this packet (see EUDPStreamerPacketHanlderType for details)
+        public byte mPacketVersion;						//11 what is the version of protocol for this handler, to be bumped with data structure change
 
         [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 60)]
         public sClassInfo[] sClasses; //12 24*60

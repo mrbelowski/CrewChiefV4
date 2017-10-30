@@ -311,7 +311,7 @@ namespace CrewChiefV4.PCars2
                     String participantName = StructHelper.getNameFromBytes(participantStruct.mName).ToLower();
                     if (i != shared.mViewedParticipantIndex && participantStruct.mIsActive && participantName != null && participantName.Length > 0)
                     {
-                        CarData.CarClass opponentCarClass = CarData.getCarClassForClassName(StructHelper.getNameFromBytes(shared.mCarClassNames.Skip(i*64).Take(64).ToArray()));
+                        CarData.CarClass opponentCarClass = CarData.getCarClassForClassName(StructHelper.getCarClassName(shared, i));
                         addOpponentForName(participantName, createOpponentData(participantStruct, false, opponentCarClass,
                             participantStruct.mName != null && participantStruct.mName[0] != 0, currentGameState.SessionData.TrackDefinition.trackLength), currentGameState);
                     }
@@ -588,7 +588,7 @@ namespace CrewChiefV4.PCars2
                         // first character of name is null - this means the game regards this driver as inactive or missing for this update
                         continue;
                     }
-                    CarData.CarClass opponentCarClass = CarData.getCarClassForClassName(StructHelper.getNameFromBytes(shared.mCarClassNames.Skip(i*64).Take(64).ToArray()));
+                    CarData.CarClass opponentCarClass = CarData.getCarClassForClassName(StructHelper.getCarClassName(shared, i));
                     String participantName = StructHelper.getNameFromBytes(participantStruct.mName).ToLower();
 
                     if (participantName != null && participantName.Length > 0 && !namesInRawData.Contains(participantName))
