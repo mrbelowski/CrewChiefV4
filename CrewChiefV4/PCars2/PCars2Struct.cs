@@ -189,7 +189,6 @@ namespace CrewChiefV4.PCars2
 
                 Boolean isActive = (newParticipantInfo.sRacePosition >> 7) == 1;
                 pCars2APIParticipantStruct existingPartInfo = existingState.mParticipantData[i];
-                pCars2APIParticipantAdditionalDataStruct existingAdditionalPartInfo = existingState.mAdditionalParticipantData[i];
 
                 if (isActive)
                 {
@@ -201,27 +200,27 @@ namespace CrewChiefV4.PCars2
                     existingPartInfo.mLapsCompleted = existingPartInfo.mCurrentLap - 1;
                     existingPartInfo.mCurrentLapDistance = newParticipantInfo.sCurrentLapDistance;
                     existingPartInfo.mRacePosition = (uint)newParticipantInfo.sRacePosition & 127;
-                    existingPartInfo.mCurrentSector = (uint)newParticipantInfo.sSector & 7;
+                    existingPartInfo.mCurrentSector = newParticipantInfo.sSector & 7;
 
                     // err... laps completed is missing?
                     // existingPartInfo.mLapsCompleted = (uint)newParticipantInfo.sLapsCompleted & 127;
                     Boolean lapInvalidated = (newParticipantInfo.sRaceState >> 7) == 1;
-                    existingAdditionalPartInfo.mRaceState = (uint)newParticipantInfo.sRaceState & 127;
-                    existingAdditionalPartInfo.mLapInvalidated = lapInvalidated;
-                    existingAdditionalPartInfo.mPitMode = newParticipantInfo.sPitModeSchedule;
+                    existingState.mRaceStates[i] = (uint)newParticipantInfo.sRaceState & 127;
+                    existingState.mLapsInvalidated[i] = lapInvalidated;
+                    existingState.mPitModes[i] = newParticipantInfo.sPitModeSchedule;
                     participantHighestFlags[i] = newParticipantInfo.sHighestFlag;
                     // no obvious slot in MMF for currentTime - do we need it if we have currentsectortime for S3?
                     if (existingPartInfo.mCurrentSector == 1)
                     {
-                        existingAdditionalPartInfo.mCurrentSector1Time = newParticipantInfo.sCurrentSectorTime;
+                        existingState.mCurrentSector1Times[i] = newParticipantInfo.sCurrentSectorTime;
                     }
                     if (existingPartInfo.mCurrentSector == 2)
                     {
-                        existingAdditionalPartInfo.mCurrentSector2Time = newParticipantInfo.sCurrentSectorTime;
+                        existingState.mCurrentSector2Times[i] = newParticipantInfo.sCurrentSectorTime;
                     }
                     if (existingPartInfo.mCurrentSector == 3)
                     {
-                        existingAdditionalPartInfo.mCurrentSector3Time = newParticipantInfo.sCurrentSectorTime;
+                        existingState.mCurrentSector3Times[i] = newParticipantInfo.sCurrentSectorTime;
                     }
                     
                     // and now the bit magic for the extra position precision...
@@ -272,15 +271,12 @@ namespace CrewChiefV4.PCars2
             for (int i = 0; i < 32; i++)
             {
                 sParticipantStatsInfo participantInfo = timeStatsData.sStats.sParticipants[i];
-                pCars2APIParticipantAdditionalDataStruct existingAdditionParticipantData = existingState.mAdditionalParticipantData[i];
-                existingAdditionParticipantData.mFastestLapTime = participantInfo.sFastestLapTime;
-                existingAdditionParticipantData.mFastestSector1Time = participantInfo.sFastestSector1Time;
-                existingAdditionParticipantData.mFastestSector2Time = participantInfo.sFastestSector2Time;
-                existingAdditionParticipantData.mFastestSector3Time = participantInfo.sFastestSector3Time;
-                existingAdditionParticipantData.mLastLapTime = participantInfo.sLastLapTime;
-                existingAdditionParticipantData.mFastestSector3Time = participantInfo.sFastestSector3Time;
-                lastSectorTimes[i] = participantInfo.sFastestSector2Time;
-                existingState.mAdditionalParticipantData[i] = existingAdditionParticipantData;
+                existingState.mFastestLapTimes[i] = participantInfo.sFastestLapTime;
+                existingState.mFastestSector1Times[i] = participantInfo.sFastestSector1Time;
+                existingState.mFastestSector2Times[i] = participantInfo.sFastestSector2Time;
+                existingState.mFastestSector3Times[i] = participantInfo.sFastestSector3Time;
+                existingState.mLastLapTime = participantInfo.sLastLapTime;
+                lastSectorTimes[i] = participantInfo.sLastSectorTime;
                 if (i == existingState.mViewedParticipantIndex)
                 {
                     existingState.mLastLapTime = participantInfo.sLastLapTime;
@@ -299,22 +295,24 @@ namespace CrewChiefV4.PCars2
                 uint classIndex = participantVehicleNamesData.sVehicles[i].sClass;
                 byte[] name = participantVehicleNamesData.sVehicles[i].sName;
                 // TODO: should we use index here instead of i?
-                pCars2APIParticipantAdditionalDataStruct existingAdditionalData = existingState.mAdditionalParticipantData[i];
-                existingAdditionalData.mCarName = name;
-                existingAdditionalData.mCarClassName = existingState.carClassNames[i];
-                existingState.mAdditionalParticipantData[i] = existingAdditionalData;
+                int start = offset;
+                int end = offset + 20;
+                int sourceIndex = 0;
+                for (int j = start; j < offset; j++)
+                {
+                    existingState.mCarNames[j] = name[sourceIndex];
+                }
             }
             return existingState;
         }
 
         public static pCars2APIStruct MergeWithExistingState(pCars2APIStruct existingState, sVehicleClassNamesData vehicleClassNamesData)
-        {
-            byte[][] classNames = new byte[60][];
+        {            
             for (int i = 0; i < 60; i++)    // why 60 class names here? Who knows
             {
-                classNames[i] = vehicleClassNamesData.sClasses[i].sName;
+                // we only have 20 bytes of data per name here
+                // TODO: understand this data and map it
             }
-            existingState.carClassNames = classNames;
             return existingState;
         }
 
@@ -401,6 +399,13 @@ namespace CrewChiefV4.PCars2
     }
 
     [Serializable]
+    public struct CarClassNameString
+    {
+        [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 20)]
+        public byte[] classNameByteArray;
+    }
+
+    [Serializable]
     public struct pCars2APIParticipantStruct
     {
         [MarshalAs(UnmanagedType.I1)]
@@ -416,7 +421,7 @@ namespace CrewChiefV4.PCars2
         public uint mRacePosition;                              // [ RANGE = 1->... ]   [ UNSET = 0 ]
         public uint mLapsCompleted;                             // [ RANGE = 0->... ]   [ UNSET = 0 ]
         public uint mCurrentLap;                                // [ RANGE = 0->... ]   [ UNSET = 0 ]
-        public uint mCurrentSector;                             // [ enum (Type#4) Current Sector ]
+        public int mCurrentSector;                             // [ enum (Type#4) Current Sector ]
 
     }
 
@@ -431,12 +436,13 @@ namespace CrewChiefV4.PCars2
         public float mFastestSector3Time;        // [ UNITS = seconds ]   [ RANGE = 0.0f->... ]   [ UNSET = -1.0f ]
         public float mFastestLapTime;            // [ UNITS = seconds ]   [ RANGE = 0.0f->... ]   [ UNSET = -1.0f ]
         public float mLastLapTime;               // [ UNITS = seconds ]   [ RANGE = 0.0f->... ]   [ UNSET = -1.0f ]
+        [MarshalAs(UnmanagedType.I1)]
         public bool mLapInvalidated;             // [ UNITS = boolean ]   [ RANGE = false->true ]   [ UNSET = false ]
         public uint mRaceState;         // [ enum (Type#3) Race State ]
         public uint mPitMode;           // [ enum (Type#7)  Pit Mode ]
 
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)]
-        public float[] mOrientations;      // [ UNITS = Euler Angles ]
+        public float[] mOrientation;      // [ UNITS = Euler Angles ]
         public float mmfOnly_mSpeed;     
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
         public byte[] mCarName; // [ string ]
@@ -451,30 +457,30 @@ namespace CrewChiefV4.PCars2
         public uint mVersion;                           // [ RANGE = 0->... ]
         public uint mBuildVersionNumber;                // [ RANGE = 0->... ]   [ UNSET = 0 ]
 
-  // Game States
+        // Game States
         public uint mGameState;                         // [ enum (Type#1) Game state ]
         public uint mSessionState;                      // [ enum (Type#2) Session state ]
         public uint mRaceState;                         // [ enum (Type#3) Race State ]
 
-  // Participant Info
+        // Participant Info
         public int mViewedParticipantIndex;                                  // [ RANGE = 0->STORED_PARTICIPANTS_MAX ]   [ UNSET = -1 ]
         public int mNumParticipants;                                         // [ RANGE = 0->STORED_PARTICIPANTS_MAX ]   [ UNSET = -1 ]
-  [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
         public pCars2APIParticipantStruct[] mParticipantData;    // [ struct (Type#13) ParticipantInfo struct ]
 
-  // Unfiltered Input
-  public float mUnfilteredThrottle;                        // [ RANGE = 0.0f->1.0f ]
-  public float mUnfilteredBrake;                           // [ RANGE = 0.0f->1.0f ]
-  public float mUnfilteredSteering;                        // [ RANGE = -1.0f->1.0f ]
-  public float mUnfilteredClutch;                          // [ RANGE = 0.0f->1.0f ]
+        // Unfiltered Input
+        public float mUnfilteredThrottle;                        // [ RANGE = 0.0f->1.0f ]
+        public float mUnfilteredBrake;                           // [ RANGE = 0.0f->1.0f ]
+        public float mUnfilteredSteering;                        // [ RANGE = -1.0f->1.0f ]
+        public float mUnfilteredClutch;                          // [ RANGE = 0.0f->1.0f ]
 
-  // Vehicle information
+        // Vehicle information
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
-  public byte[] mCarName;                 // [ string ]
+        public byte[] mCarName;                 // [ string ]
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
         public byte[] mCarClassName;            // [ string ]
 
-  // Event information
+        // Event information
         public uint mLapsInEvent;                        // [ RANGE = 0->... ]   [ UNSET = 0 ]
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
         public byte[] mTrackLocation;           // [ string ] - untranslated shortened English name
@@ -483,6 +489,7 @@ namespace CrewChiefV4.PCars2
         public float mTrackLength;                               // [ UNITS = Metres ]   [ RANGE = 0.0f->... ]    [ UNSET = 0.0f ]
 
         public int mmfOnly_mNumSectors;                                  // [ RANGE = 0->... ]   [ UNSET = -1 ]
+        [MarshalAs(UnmanagedType.I1)]
         public bool mLapInvalidated;                             // [ UNITS = boolean ]   [ RANGE = false->true ]   [ UNSET = false ]
         public float mmfOnly_mBestLapTime;                               // [ UNITS = seconds ]   [ RANGE = 0.0f->... ]   [ UNSET = -1.0f ]
         public float mLastLapTime;                               // [ UNITS = seconds ]   [ RANGE = 0.0f->... ]   [ UNSET = 0.0f ]
@@ -533,9 +540,11 @@ namespace CrewChiefV4.PCars2
         public int mGear;                                       // [ RANGE = -1 (Reverse)  0 (Neutral)  1 (Gear 1)  2 (Gear 2)  etc... ]   [ UNSET = 0 (Neutral) ]
         public int mNumGears;                                   // [ RANGE = 0->... ]   [ UNSET = -1 ]
         public float mOdometerKM;                               // [ RANGE = 0.0f->... ]   [ UNSET = -1.0f ]
+        [MarshalAs(UnmanagedType.I1)]
         public bool mAntiLockActive;                            // [ UNITS = boolean ]   [ RANGE = false->true ]   [ UNSET = false ]
         public int mLastOpponentCollisionIndex;                 // [ RANGE = 0->STORED_PARTICIPANTS_MAX ]   [ UNSET = -1 ]
         public float mLastOpponentCollisionMagnitude;           // [ RANGE = 0.0f->... ]
+        [MarshalAs(UnmanagedType.I1)]
         public bool mBoostActive;                               // [ UNITS = boolean ]   [ RANGE = false->true ]   [ UNSET = false ]
         public float mBoostAmount;                              // [ RANGE = 0.0f->100.0f ] 
 
@@ -573,7 +582,7 @@ namespace CrewChiefV4.PCars2
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
         public float[] mTyreHeightAboveGround;          // [ UNITS = Local Space  Y ]
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
-        public float mTyreLateralStiffness;           // OBSOLETE, kept for backward compatibility only
+        public float[] mTyreLateralStiffness;           // OBSOLETE, kept for backward compatibility only
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
         public float[] mTyreWear;                       // [ RANGE = 0.0f->1.0f ]
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
@@ -628,7 +637,37 @@ namespace CrewChiefV4.PCars2
 
 	    // additional race variables for each participant
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
-        public pCars2APIParticipantAdditionalDataStruct[] mAdditionalParticipantData;      // 
+        public float[] mCurrentSector1Times;        // [ UNITS = seconds ]   [ RANGE = 0.0f->... ]   [ UNSET = -1.0f ]
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
+        public float[] mCurrentSector2Times;        // [ UNITS = seconds ]   [ RANGE = 0.0f->... ]   [ UNSET = -1.0f ]
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
+        public float[] mCurrentSector3Times;        // [ UNITS = seconds ]   [ RANGE = 0.0f->... ]   [ UNSET = -1.0f ]
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
+        public float[] mFastestSector1Times;        // [ UNITS = seconds ]   [ RANGE = 0.0f->... ]   [ UNSET = -1.0f ]
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
+        public float[] mFastestSector2Times;        // [ UNITS = seconds ]   [ RANGE = 0.0f->... ]   [ UNSET = -1.0f ]
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
+        public float[] mFastestSector3Times;        // [ UNITS = seconds ]   [ RANGE = 0.0f->... ]   [ UNSET = -1.0f ]
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
+        public float[] mFastestLapTimes;            // [ UNITS = seconds ]   [ RANGE = 0.0f->... ]   [ UNSET = -1.0f ]
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
+        public float[] mLastLapTimes;               // [ UNITS = seconds ]   [ RANGE = 0.0f->... ]   [ UNSET = -1.0f ]
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
+        public bool[] mLapsInvalidated;            // [ UNITS = boolean for all participants ]   [ RANGE = false->true ]   [ UNSET = false ]
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
+        public uint[] mRaceStates;         // [ enum (Type#3) Race State ]
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
+        public uint[] mPitModes;           // [ enum (Type#7)  Pit Mode ]
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64*3)]
+        public float[] mOrientations;      // [ UNITS = Euler Angles ]
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
+	    public float[] mSpeeds;                     // [ UNITS = Metres per-second ]   [ RANGE = 0.0f->... ]
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64*64)]
+        public byte[] mCarNames; // [ string ]
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64*64)]
+        public byte[] mCarClassNames; // [ string ]
+        /*[MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
+        public pCars2APIParticipantAdditionalDataStruct[] mAdditionalParticipantData;   */   // 
 																											// additional race variables
         public int mEnforcedPitStopLap;                          // [ UNITS = in which lap there will be a mandatory pitstop] [ RANGE = 0.0f->... ] [ UNSET = -1 ]
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
@@ -642,21 +681,30 @@ namespace CrewChiefV4.PCars2
         public byte mJoyPad2;
         public byte mDPad;
         // UDP has player tyre types. Shared memory does not. Dumb.
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
         public byte[] mLFTyreCompoundName;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
         public byte[] mRFTyreCompoundName;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
         public byte[] mLRTyreCompoundName;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
         public byte[] mRRTyreCompoundName;
         // and other stuff that's missing from the MMF:
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
         public float[] mSuspensionRideHeight;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
         public float[] mRideHeight;
 
         // more per-participant data items not in the shared memory. Or documented.
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
         public byte[] participantHighestFlags;
         public float snowDensity;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
         public float[] lastSectorTimes;
 
         // this is a big byte array of all the car class names being sent via UDP
-        public byte[][] carClassNames;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 60)]
+        public CarClassNameString[] carClassNames;
 
         /*
         // extras from the UDP data - pcars1

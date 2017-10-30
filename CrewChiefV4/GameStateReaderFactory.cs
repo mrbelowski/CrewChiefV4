@@ -116,12 +116,18 @@ namespace CrewChiefV4
                     case GameEnum.PCARS_NETWORK:
                     case GameEnum.PCARS_32BIT:
                     case GameEnum.PCARS_64BIT:
-                    case GameEnum.PCARS2:
                         if (pcarsGameStateMapper == null)
                         {
                             pcarsGameStateMapper = new PCarsGameStateMapper();
                         }
                         return pcarsGameStateMapper;
+                    case GameEnum.PCARS2_NETWORK:
+                    case GameEnum.PCARS2:
+                        if (pcars2GameStateMapper == null)
+                        {
+                            pcars2GameStateMapper = new PCars2GameStateMapper();
+                        }
+                        return pcars2GameStateMapper;
                     case GameEnum.RACE_ROOM:
                         if (r3eGameStateMapper == null)
                         {
