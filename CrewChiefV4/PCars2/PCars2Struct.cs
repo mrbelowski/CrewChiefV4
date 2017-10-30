@@ -238,6 +238,10 @@ namespace CrewChiefV4.PCars2
                     // existingPartInfo.mLapsCompleted = (uint)newParticipantInfo.sLapsCompleted & 127;
                     Boolean lapInvalidated = (newParticipantInfo.sRaceState >> 7) == 1;
                     existingState.mRaceStates[i] = (uint)newParticipantInfo.sRaceState & 127;
+                    if (i == existingState.mViewedParticipantIndex)
+                    {
+                        existingState.mRaceState = existingState.mRaceStates[i];
+                    }
                     existingState.mLapsInvalidated[i] = lapInvalidated;
                     existingState.mPitModes[i] = newParticipantInfo.sPitModeSchedule;
                     participantHighestFlags[i] = newParticipantInfo.sHighestFlag;
