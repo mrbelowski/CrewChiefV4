@@ -135,6 +135,8 @@ namespace CrewChiefV4
 
         public static Boolean waitingForSpeech = false;
 
+        public static Boolean gotRecognitionResult = false;
+
         // load voice commands for triggering keyboard macros. The String key of the input Dictionary is the
         // command list key in speech_recognition_config.txt. When one of these phrases is heard the map value
         // CommandMacro is executed.
@@ -551,6 +553,7 @@ namespace CrewChiefV4
         void sre_SpeechRecognized(object sender, SpeechRecognizedEventArgs e)
         {
             SpeechRecogniser.waitingForSpeech = false;
+            SpeechRecogniser.gotRecognitionResult = true;
             Console.WriteLine("recognised : " + e.Result.Text + " confidence = " + e.Result.Confidence);
             try
             {
@@ -611,12 +614,20 @@ namespace CrewChiefV4
                 Thread.Sleep(500);
                 Console.WriteLine("restarting speech recognition");
                 recognizeAsync();
+                // in always-on mode, we're now waiting-for-speech until we get another result
+                waitingForSpeech = true;
             }
+            else
+            {
+                // in toggle mode, we're now waiting-for-speech until we get another result or the button is released
+                waitingForSpeech = true;
+             }
         }
 
         public void recognizeAsync()
         {
             SpeechRecogniser.waitingForSpeech = true;
+            SpeechRecogniser.gotRecognitionResult = false;
             sre.RecognizeAsync(RecognizeMode.Multiple);
         }
 
