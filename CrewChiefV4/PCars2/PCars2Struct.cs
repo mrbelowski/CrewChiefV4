@@ -48,17 +48,6 @@ namespace CrewChiefV4.PCars2
             existingState.mUnfilteredSteering = (float)udpTelemetryData.sUnfilteredSteering / 127f;
             existingState.mUnfilteredClutch = (float)udpTelemetryData.sUnfilteredClutch / 255f;
 
-            // Timing & Scoring are not in this packet
-           
-
-            // Flags
-            existingState.mHighestFlagColour = (uint) udpTelemetryData.sHighestFlag & 7; 
-            existingState.mHighestFlagReason = (uint) udpTelemetryData.sHighestFlag >> 3 & 3;
-
-            // Pit Info
-            existingState.mPitMode = (uint) udpTelemetryData.sPitModeSchedule & 7;
-            existingState.mPitSchedule = (uint) udpTelemetryData.sPitModeSchedule >> 3 & 3;
-
             // Car State
             existingState.mCarFlags = udpTelemetryData.sCarFlags;
             existingState.mOilTempCelsius = udpTelemetryData.sOilTempCelsius; 
@@ -96,101 +85,43 @@ namespace CrewChiefV4.PCars2
             existingState.mTyreTemp = toFloatArray(udpTelemetryData.sTyreTemp, 255); 
             existingState.mTyreHeightAboveGround = udpTelemetryData.sTyreHeightAboveGround;
             existingState.mTyreWear = toFloatArray(udpTelemetryData.sTyreWear, 255); 
-            existingState.mBrakeDamage = toFloatArray(udpTelemetryData.sBrakeDamage, 255);
-            existingState.mSuspensionDamage = toFloatArray(udpTelemetryData.sSuspensionDamage, 255);    
             existingState.mBrakeTempCelsius = toFloatArray(udpTelemetryData.sBrakeTempCelsius, 1);
             existingState.mTyreTreadTemp = toFloatArray(udpTelemetryData.sTyreTreadTemp, 1);            
             existingState.mTyreLayerTemp = toFloatArray(udpTelemetryData.sTyreLayerTemp, 1); 
             existingState.mTyreCarcassTemp = toFloatArray(udpTelemetryData.sTyreCarcassTemp, 1); 
             existingState.mTyreRimTemp = toFloatArray(udpTelemetryData.sTyreRimTemp, 1);    
             existingState.mTyreInternalAirTemp = toFloatArray(udpTelemetryData.sTyreInternalAirTemp, 1);
+            // IMO tyre temps aren't mapped here - they're in UDP but not MMF
+            existingState.mWheelLocalPositionY = udpTelemetryData.sWheelLocalPositionY;
+            existingState.mRideHeight = udpTelemetryData.sRideHeight;
             existingState.mSuspensionTravel = udpTelemetryData.sSuspensionTravel;
+            existingState.mSuspensionRideHeight = toFloatArray(udpTelemetryData.sSuspensionRideHeight, 1);
             existingState.mSuspensionVelocity = udpTelemetryData.sSuspensionVelocity;
             existingState.mAirPressure = toFloatArray(udpTelemetryData.sAirPressure, 1);
 
             existingState.mEngineSpeed = udpTelemetryData.sEngineSpeed;
             existingState.mEngineTorque = udpTelemetryData.sEngineTorque;
-            existingState.mEnforcedPitStopLap = udpTelemetryData.sEnforcedPitStopLap;
 
             // Car Damage
             existingState.mCrashState = udpTelemetryData.sCrashState;
             existingState.mAeroDamage = (float)udpTelemetryData.sAeroDamage / 255f;
-            existingState.mEngineDamage = (float)udpTelemetryData.sEngineDamage / 255f; 
+            existingState.mEngineDamage = (float)udpTelemetryData.sEngineDamage / 255f;
+            existingState.mBrakeDamage = toFloatArray(udpTelemetryData.sBrakeDamage, 255);
+            existingState.mSuspensionDamage = toFloatArray(udpTelemetryData.sSuspensionDamage, 255);    
 
-            // Weather
-            existingState.mAmbientTemperature = udpTelemetryData.sAmbientTemperature;
-            existingState.mTrackTemperature = udpTelemetryData.sTrackTemperature;
-            existingState.mRainDensity = (float)udpTelemetryData.sRainDensity / 255f;         
-            existingState.mWindSpeed = udpTelemetryData.sWindSpeed * 2;
-            existingState.mWindDirectionX = (float)udpTelemetryData.sWindDirectionX / 127f;
-            existingState.mWindDirectionY = (float)udpTelemetryData.sWindDirectionY / 127f;
-            //existingState.mCloudBrightness = udpTelemetryData.sCloudBrightness / 255;
+            // TODO: check this - do we even need it?
+            existingState.mWings = toFloatArray(udpTelemetryData.sWings, 1);
 
-            if (existingState.mParticipantData == null)
-            {
-                existingState.mParticipantData = new pCarsAPIParticipantStruct[56];
-            }
+            existingState.mJoyPad1 = udpTelemetryData.sJoyPad1;
+            existingState.mJoyPad2 = udpTelemetryData.sJoyPad2;
+            existingState.mDPad = udpTelemetryData.sDPad;
 
-            if (existingState.mLastSectorData == null)
-            {
-                existingState.mLastSectorData = new float[56];
-            }
-
-            if (existingState.mLapInvalidatedData == null)
-            {
-                existingState.mLapInvalidatedData = new Boolean[56];
-            }
-            for (int i = 0; i < udpTelemetryData.sParticipantInfo.Count(); i++) 
-            {
-                sParticipantInfo newPartInfo = udpTelemetryData.sParticipantInfo[i];
-                Boolean isActive = (newPartInfo.sRacePosition >> 7) == 1;
-                pCars2APIParticipantStruct existingPartInfo = existingState.mParticipantData[i];
-                
-                if (isActive)
-                {
-                    existingPartInfo.mIsActive = i < existingState.mNumParticipants;
-                    existingPartInfo.mCurrentLap = newPartInfo.sCurrentLap;
-                    existingPartInfo.mCurrentLapDistance = newPartInfo.sCurrentLapDistance;
-                    existingPartInfo.mLapsCompleted = (uint) newPartInfo.sLapsCompleted & 127;
-                    // TODO: there's a 'lapInvalidated' flag here but nowhere to put it in the existing struct
-                    Boolean lapInvalidated = (newPartInfo.sLapsCompleted >> 7) == 1;
-                    existingPartInfo.mRacePosition = (uint) newPartInfo.sRacePosition & 127;
-                    existingPartInfo.mCurrentSector = (uint)newPartInfo.sSector & 7;
-                    Boolean sameClassAsPlayer = (newPartInfo.sSector >> 3 & 1) == 1;
-                    if (sameClassAsPlayer) {
-                        existingState.hasOpponentClassData = true;
-                    }
-                    existingState.isSameClassAsPlayer[i] = sameClassAsPlayer;
-
-
-                    // and now the bit magic for the extra position precision...
-                    float[] newWorldPositions = toFloatArray(newPartInfo.sWorldPosition, 1);
-                    float xAdjustment = ((float)((uint)newPartInfo.sSector >> 6 & 3)) / 4f;
-                    float zAdjustment = ((float)((uint)newPartInfo.sSector >> 4 & 3)) / 4f;
-
-                    newWorldPositions[0] = newWorldPositions[0] + xAdjustment;
-                    newWorldPositions[2] = newWorldPositions[2] + zAdjustment;
-                    if (!existingState.hasNewPositionData && i != udpTelemetryData.sViewedParticipantIndex && 
-                        (existingPartInfo.mWorldPosition == null || (newWorldPositions[0] != existingPartInfo.mWorldPosition[0] || newWorldPositions[2] != existingPartInfo.mWorldPosition[2])))
-                    {
-                        existingState.hasNewPositionData = true;
-                    }
-                    existingPartInfo.mWorldPosition = newWorldPositions;
-
-                    // LastSectorTime is now in the UDP data, but there's no slot for this in the participants struct
-                    // so bung it in a separate array at the end
-                    existingState.mLastSectorData[i] = newPartInfo.sLastSectorTime;
-                    existingState.mLapInvalidatedData[i] = lapInvalidated;
-                }
-                else
-                {
-                    existingPartInfo.mWorldPosition = new float[] { 0, 0, 0 };
-                    existingPartInfo.mIsActive = false;
-                }
-                existingState.mParticipantData[i] = existingPartInfo;
-            }
-
-            // TODO: buttons
+            // tyres
+            existingState.mLFTyreCompoundName = udpTelemetryData.lfTyreCompound;
+            existingState.mRFTyreCompoundName = udpTelemetryData.rfTyreCompound;
+            existingState.mLRTyreCompoundName = udpTelemetryData.lrTyreCompound;
+            existingState.mRRTyreCompoundName = udpTelemetryData.rrTyreCompound;
+            
             return existingState;
         }
 
@@ -209,17 +140,114 @@ namespace CrewChiefV4.PCars2
                 existingState.mLapsInEvent = 0;
             }
             existingState.mTrackLength = raceData.sTrackLength;
+
+            existingState.mWorldFastestLapTime = raceData.sWorldFastestLapTime;
+            existingState.mWorldFastestSector1Time = raceData.sWorldFastestSector1Time;
+            existingState.mWorldFastestSector2Time = raceData.sWorldFastestSector2Time;
+            existingState.mWorldFastestSector3Time = raceData.sWorldFastestSector3Time;
+            existingState.mPersonalFastestLapTime = raceData.sPersonalFastestLapTime;
+            existingState.mPersonalFastestSector1Time = raceData.sPersonalFastestSector1Time;
+            existingState.mPersonalFastestSector2Time = raceData.sPersonalFastestSector2Time;
+            existingState.mPersonalFastestSector3Time = raceData.sPersonalFastestSector3Time;
+
+            existingState.mTrackLocation = raceData.sTrackLocation;
+            existingState.mTrackVariation = raceData.sTrackVariation;
+            existingState.mTranslatedTrackLocation = raceData.sTranslatedTrackLocation;
+            existingState.mTranslatedTrackVariation = raceData.sTranslatedTrackVariation;
+
+            existingState.mEnforcedPitStopLap = raceData.sEnforcedPitStopLap;
             return existingState;
         }
 
         public static pCars2APIStruct MergeWithExistingState(pCars2APIStruct existingState, sParticipantsData participantsData)
         {
+            int offset = participantsData.mPacketBase.mPartialPacketIndex;  // TODO: is this *16?
+            // existingState is a struct, so any changes we make as we iterate this array will be done to a copy, not a reference
+            for (int i = offset; i < offset + 16 && i < existingState.mParticipantData.Length; i++)
+            {
+                pCars2APIParticipantStruct existingParticipant = existingState.mParticipantData[i];
+                existingParticipant.mName = participantsData.sName[i - offset].nameByteArray;
+                existingState.mParticipantData[i] = existingParticipant;
+            }
             return existingState;
         }
 
         public static pCars2APIStruct MergeWithExistingState(pCars2APIStruct existingState, sTimingsData timingsData)
         {
-            existingState.mNumParticipants = timingsData.sNumParticipants;            
+            existingState.mNumParticipants = timingsData.sNumParticipants;   
+            existingState.mEventTimeRemaining = timingsData.sEventTimeRemaining;// time remaining, -1 for invalid time,  -1 - laps remaining in lap based races  --
+            existingState.mSplitTimeAhead = timingsData.sSplitTimeAhead;
+            existingState.mSplitTimeBehind = timingsData.sSplitTimeBehind;
+            existingState.mSplitTime = timingsData.sSplitTime;  // what's this?
+            byte[] participantHighestFlags = new byte[32];
+            for (int i = 0; i < existingState.mParticipantData.Length; i++)
+            {
+                sParticipantInfo newParticipantInfo = timingsData.sParticipants[i];
+                // TODO: is there a use for these:
+                Boolean isHuman = (newParticipantInfo.sCarIndex >> 7) == 1;
+                uint carIndex = (uint)newParticipantInfo.sCarIndex & 127;
+
+                Boolean isActive = (newParticipantInfo.sRacePosition >> 7) == 1;
+                pCars2APIParticipantStruct existingPartInfo = existingState.mParticipantData[i];
+                pCars2APIParticipantAdditionalDataStruct existingAdditionalPartInfo = existingState.mAdditionalParticipantData[i];
+
+                if (isActive)
+                {
+                    // TODO: active checks...:
+                    existingPartInfo.mIsActive = i < existingState.mNumParticipants;
+
+                    existingPartInfo.mCurrentLap = newParticipantInfo.sCurrentLap;
+                    // is this safe?:
+                    existingPartInfo.mLapsCompleted = existingPartInfo.mCurrentLap - 1;
+                    existingPartInfo.mCurrentLapDistance = newParticipantInfo.sCurrentLapDistance;
+                    existingPartInfo.mRacePosition = (uint)newParticipantInfo.sRacePosition & 127;
+                    existingPartInfo.mCurrentSector = (uint)newParticipantInfo.sSector & 7;
+
+                    // err... laps completed is missing?
+                    // existingPartInfo.mLapsCompleted = (uint)newParticipantInfo.sLapsCompleted & 127;
+                    Boolean lapInvalidated = (newParticipantInfo.sRaceState >> 7) == 1;
+                    existingAdditionalPartInfo.mRaceState = (uint)newParticipantInfo.sRaceState & 127;
+                    existingAdditionalPartInfo.mLapInvalidated = lapInvalidated;
+                    existingAdditionalPartInfo.mPitMode = newParticipantInfo.sPitModeSchedule;
+                    participantHighestFlags[i] = newParticipantInfo.sHighestFlag;
+                    // no obvious slot in MMF for currentTime - do we need it if we have currentsectortime for S3?
+                    if (existingPartInfo.mCurrentSector == 1)
+                    {
+                        existingAdditionalPartInfo.mCurrentSector1Time = newParticipantInfo.sCurrentSectorTime;
+                    }
+                    if (existingPartInfo.mCurrentSector == 2)
+                    {
+                        existingAdditionalPartInfo.mCurrentSector2Time = newParticipantInfo.sCurrentSectorTime;
+                    }
+                    if (existingPartInfo.mCurrentSector == 3)
+                    {
+                        existingAdditionalPartInfo.mCurrentSector3Time = newParticipantInfo.sCurrentSectorTime;
+                    }
+                    
+                    // and now the bit magic for the extra position precision...
+                    float[] newWorldPositions = toFloatArray(newParticipantInfo.sWorldPosition, 1);
+                    float xAdjustment = ((float)((uint)newParticipantInfo.sSector >> 6 & 3)) / 4f;
+                    float zAdjustment = ((float)((uint)newParticipantInfo.sSector >> 4 & 3)) / 4f;
+
+                    newWorldPositions[0] = newWorldPositions[0] + xAdjustment;
+                    newWorldPositions[2] = newWorldPositions[2] + zAdjustment;
+                    // TODO: do we need the 'has new world position' stuff from pcars1?
+                    existingPartInfo.mWorldPosition = newWorldPositions;
+
+                    if (i == existingState.mViewedParticipantIndex)
+                    {
+                        existingState.mLapInvalidated = lapInvalidated;
+                        existingState.mHighestFlagColour = newParticipantInfo.sHighestFlag;
+                    }
+                }
+                else
+                {
+                    existingPartInfo.mWorldPosition = new float[] { 0, 0, 0 };
+                    existingPartInfo.mIsActive = false;
+                }
+                existingState.mParticipantData[i] = existingPartInfo;
+            }
+            existingState.participantHighestFlags = participantHighestFlags;
             return existingState;
         }
 
@@ -227,56 +255,68 @@ namespace CrewChiefV4.PCars2
         {
             existingState.mGameState = (uint)gameStateData.mGameState & 7;
             existingState.mSessionState = (uint)gameStateData.mGameState>> 4;
-            //existingState.mRaceState = (uint)gameStateData.sRaceStateFlags & 7;
+            existingState.mAmbientTemperature = gameStateData.sAmbientTemperature;
+            existingState.mTrackTemperature = gameStateData.sTrackTemperature;
+            existingState.mRainDensity = gameStateData.sRainDensity;
+            // snow isn't in the shared memory data...
+            existingState.snowDensity = gameStateData.sSnowDensity;
+            existingState.mWindSpeed = gameStateData.sWindSpeed;
+            existingState.mWindDirectionX = gameStateData.sWindDirectionX;
+            existingState.mWindDirectionY = gameStateData.sWindDirectionY;
             return existingState;
         }
 
         public static pCars2APIStruct MergeWithExistingState(pCars2APIStruct existingState, sTimeStatsData timeStatsData)
         {
+            float[] lastSectorTimes = new float[32];
+            for (int i = 0; i < 32; i++)
+            {
+                sParticipantStatsInfo participantInfo = timeStatsData.sStats.sParticipants[i];
+                pCars2APIParticipantAdditionalDataStruct existingAdditionParticipantData = existingState.mAdditionalParticipantData[i];
+                existingAdditionParticipantData.mFastestLapTime = participantInfo.sFastestLapTime;
+                existingAdditionParticipantData.mFastestSector1Time = participantInfo.sFastestSector1Time;
+                existingAdditionParticipantData.mFastestSector2Time = participantInfo.sFastestSector2Time;
+                existingAdditionParticipantData.mFastestSector3Time = participantInfo.sFastestSector3Time;
+                existingAdditionParticipantData.mLastLapTime = participantInfo.sLastLapTime;
+                existingAdditionParticipantData.mFastestSector3Time = participantInfo.sFastestSector3Time;
+                lastSectorTimes[i] = participantInfo.sFastestSector2Time;
+                existingState.mAdditionalParticipantData[i] = existingAdditionParticipantData;
+                if (i == existingState.mViewedParticipantIndex)
+                {
+                    existingState.mLastLapTime = participantInfo.sLastLapTime;
+                }
+            }
+            existingState.lastSectorTimes = lastSectorTimes;
             return existingState;
         }
 
         public static pCars2APIStruct MergeWithExistingState(pCars2APIStruct existingState, sParticipantVehicleNamesData participantVehicleNamesData)
         {
+            int offset = participantVehicleNamesData.mPacketBase.mPartialPacketIndex;  // TODO: is this *16?
+            for (int i = 0; i < 16; i++)
+            {
+                ushort index = participantVehicleNamesData.sVehicles[i].sIndex;
+                uint classIndex = participantVehicleNamesData.sVehicles[i].sClass;
+                byte[] name = participantVehicleNamesData.sVehicles[i].sName;
+                // TODO: should we use index here instead of i?
+                pCars2APIParticipantAdditionalDataStruct existingAdditionalData = existingState.mAdditionalParticipantData[i];
+                existingAdditionalData.mCarName = name;
+                existingAdditionalData.mCarClassName = existingState.carClassNames[i];
+                existingState.mAdditionalParticipantData[i] = existingAdditionalData;
+            }
             return existingState;
         }
 
         public static pCars2APIStruct MergeWithExistingState(pCars2APIStruct existingState, sVehicleClassNamesData vehicleClassNamesData)
         {
+            byte[][] classNames = new byte[60][];
+            for (int i = 0; i < 60; i++)    // why 60 class names here? Who knows
+            {
+                classNames[i] = vehicleClassNamesData.sClasses[i].sName;
+            }
+            existingState.carClassNames = classNames;
             return existingState;
         }
-
-        /*public static pCars2APIStruct MergeWithExistingState(pCars2APIStruct existingState, sParticipantInfoStringsAdditional udpAdditionalStrings)
-        {
-            int offset = udpAdditionalStrings.sOffset;
-            if (existingState.mParticipantData == null)
-            {
-                existingState.mParticipantData = new pCarsAPIParticipantStruct[56];
-            }
-            for (int i = offset; i < offset + 16 && i<existingState.mParticipantData.Length; i++) 
-            {
-                existingState.mParticipantData[i].mName = udpAdditionalStrings.sName[i - offset].nameByteArray;
-            }
-            return existingState;
-        }
-
-        public static pCars2APIStruct MergeWithExistingState(pCars2APIStruct existingState, sParticipantInfoStrings udpParticipantStrings)
-        {
-            existingState.mCarClassName = udpParticipantStrings.sCarClassName;
-            existingState.mCarName = udpParticipantStrings.sCarName;
-
-            existingState.mTrackLocation = udpParticipantStrings.sTrackLocation;
-            existingState.mTrackVariation = udpParticipantStrings.sTrackVariation;
-            if (existingState.mParticipantData == null)
-            {
-                existingState.mParticipantData = new pCarsAPIParticipantStruct[56];
-            }
-            for (int i = 0; i < udpParticipantStrings.sName.Count(); i++)
-            {
-                existingState.mParticipantData[i].mName = udpParticipantStrings.sName[i].nameByteArray;
-            }
-            return existingState;
-        }*/
 
         public static String getNameFromBytes(byte[] name)
         {
@@ -383,14 +423,25 @@ namespace CrewChiefV4.PCars2
     [Serializable]
     public struct pCars2APIParticipantAdditionalDataStruct
     {
-         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)]
-        public float[] mOrientations;      // [ UNITS = Euler Angles ]
-         public float mSpeed;     
-         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
-         public byte[] mCarNames; // [ string ]
-                 [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
-         public byte[] mCarClassNames; // [ string ]
+        public float mCurrentSector1Time;        // [ UNITS = seconds ]   [ RANGE = 0.0f->... ]   [ UNSET = -1.0f ]
+        public float mCurrentSector2Time;        // [ UNITS = seconds ]   [ RANGE = 0.0f->... ]   [ UNSET = -1.0f ]
+        public float mCurrentSector3Time;        // [ UNITS = seconds ]   [ RANGE = 0.0f->... ]   [ UNSET = -1.0f ]
+        public float mFastestSector1Time;        // [ UNITS = seconds ]   [ RANGE = 0.0f->... ]   [ UNSET = -1.0f ]
+        public float mFastestSector2Time;        // [ UNITS = seconds ]   [ RANGE = 0.0f->... ]   [ UNSET = -1.0f ]
+        public float mFastestSector3Time;        // [ UNITS = seconds ]   [ RANGE = 0.0f->... ]   [ UNSET = -1.0f ]
+        public float mFastestLapTime;            // [ UNITS = seconds ]   [ RANGE = 0.0f->... ]   [ UNSET = -1.0f ]
+        public float mLastLapTime;               // [ UNITS = seconds ]   [ RANGE = 0.0f->... ]   [ UNSET = -1.0f ]
+        public bool mLapInvalidated;             // [ UNITS = boolean ]   [ RANGE = false->true ]   [ UNSET = false ]
+        public uint mRaceState;         // [ enum (Type#3) Race State ]
+        public uint mPitMode;           // [ enum (Type#7)  Pit Mode ]
 
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)]
+        public float[] mOrientations;      // [ UNITS = Euler Angles ]
+        public float mmfOnly_mSpeed;     
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
+        public byte[] mCarName; // [ string ]
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
+        public byte[] mCarClassName; // [ string ]
     }
 
     [Serializable]
@@ -431,24 +482,23 @@ namespace CrewChiefV4.PCars2
         public byte[] mTrackVariation;          // [ string ]- untranslated shortened English variation description
         public float mTrackLength;                               // [ UNITS = Metres ]   [ RANGE = 0.0f->... ]    [ UNSET = 0.0f ]
 
-  // Timings - DO  NOT USE THESE
-        public int mNumSectors;                                  // [ RANGE = 0->... ]   [ UNSET = -1 ]
+        public int mmfOnly_mNumSectors;                                  // [ RANGE = 0->... ]   [ UNSET = -1 ]
         public bool mLapInvalidated;                             // [ UNITS = boolean ]   [ RANGE = false->true ]   [ UNSET = false ]
-        public float mBestLapTime;                               // [ UNITS = seconds ]   [ RANGE = 0.0f->... ]   [ UNSET = -1.0f ]
+        public float mmfOnly_mBestLapTime;                               // [ UNITS = seconds ]   [ RANGE = 0.0f->... ]   [ UNSET = -1.0f ]
         public float mLastLapTime;                               // [ UNITS = seconds ]   [ RANGE = 0.0f->... ]   [ UNSET = 0.0f ]
-        public float mCurrentTime;                               // [ UNITS = seconds ]   [ RANGE = 0.0f->... ]   [ UNSET = 0.0f ]
+        public float mmfOnly_mCurrentTime;                               // [ UNITS = seconds ]   [ RANGE = 0.0f->... ]   [ UNSET = 0.0f ]
         public float mSplitTimeAhead;                            // [ UNITS = seconds ]   [ RANGE = 0.0f->... ]   [ UNSET = -1.0f ]
         public float mSplitTimeBehind;                           // [ UNITS = seconds ]   [ RANGE = 0.0f->... ]   [ UNSET = -1.0f ]
         public float mSplitTime;                                 // [ UNITS = seconds ]   [ RANGE = 0.0f->... ]   [ UNSET = 0.0f ]
         public float mEventTimeRemaining;                        // [ UNITS = milli-seconds ]   [ RANGE = 0.0f->... ]   [ UNSET = -1.0f ]
         public float mPersonalFastestLapTime;                    // [ UNITS = seconds ]   [ RANGE = 0.0f->... ]   [ UNSET = -1.0f ]
         public float mWorldFastestLapTime;                       // [ UNITS = seconds ]   [ RANGE = 0.0f->... ]   [ UNSET = -1.0f ]
-        public float mCurrentSector1Time;                        // [ UNITS = seconds ]   [ RANGE = 0.0f->... ]   [ UNSET = -1.0f ]
-        public float mCurrentSector2Time;                        // [ UNITS = seconds ]   [ RANGE = 0.0f->... ]   [ UNSET = -1.0f ]
-        public float mCurrentSector3Time;                        // [ UNITS = seconds ]   [ RANGE = 0.0f->... ]   [ UNSET = -1.0f ]
-        public float mFastestSector1Time;                        // [ UNITS = seconds ]   [ RANGE = 0.0f->... ]   [ UNSET = -1.0f ]
-        public float mFastestSector2Time;                        // [ UNITS = seconds ]   [ RANGE = 0.0f->... ]   [ UNSET = -1.0f ]
-        public float mFastestSector3Time;                        // [ UNITS = seconds ]   [ RANGE = 0.0f->... ]   [ UNSET = -1.0f ]
+        public float mmfOnly_mCurrentSector1Time;                        // [ UNITS = seconds ]   [ RANGE = 0.0f->... ]   [ UNSET = -1.0f ]
+        public float mmfOnly_mCurrentSector2Time;                        // [ UNITS = seconds ]   [ RANGE = 0.0f->... ]   [ UNSET = -1.0f ]
+        public float mmfOnly_mCurrentSector3Time;                        // [ UNITS = seconds ]   [ RANGE = 0.0f->... ]   [ UNSET = -1.0f ]
+        public float mmfOnly_mFastestSector1Time;                        // [ UNITS = seconds ]   [ RANGE = 0.0f->... ]   [ UNSET = -1.0f ]
+        public float mmfOnly_mFastestSector2Time;                        // [ UNITS = seconds ]   [ RANGE = 0.0f->... ]   [ UNSET = -1.0f ]
+        public float mmfOnly_mFastestSector3Time;                        // [ UNITS = seconds ]   [ RANGE = 0.0f->... ]   [ UNSET = -1.0f ]
         public float mPersonalFastestSector1Time;                // [ UNITS = seconds ]   [ RANGE = 0.0f->... ]   [ UNSET = -1.0f ]
         public float mPersonalFastestSector2Time;                // [ UNITS = seconds ]   [ RANGE = 0.0f->... ]   [ UNSET = -1.0f ]
         public float mPersonalFastestSector3Time;                // [ UNITS = seconds ]   [ RANGE = 0.0f->... ]   [ UNSET = -1.0f ]
@@ -458,11 +508,11 @@ namespace CrewChiefV4.PCars2
 
         // Flags
         public uint mHighestFlagColour;                 // [ enum (Type#5) Flag Colour ]
-        public uint mHighestFlagReason;                 // [ enum (Type#6) Flag Reason ]
+        public uint mmfOnly_mHighestFlagReason;                 // [ enum (Type#6) Flag Reason ]
 
         // Pit Info
-        public uint mPitMode;                           // [ enum (Type#7) Pit Mode ]
-        public uint mPitSchedule;                       // [ enum (Type#8) Pit Stop Schedule ]
+        public uint mmfOnly_mPitMode;                           // [ enum (Type#7) Pit Mode ]
+        public uint mmfOnly_mPitSchedule;                       // [ enum (Type#8) Pit Stop Schedule ]
 
         // Car State
         public uint mCarFlags;                          // [ enum (Type#9) Car Flags ]
@@ -576,33 +626,9 @@ namespace CrewChiefV4.PCars2
         public float[] mWings;                                // [ RANGE = 0.0f->1.0f ] [UNSET = 0.f ]
         public float mHandBrake;                               // [ RANGE = 0.0f->1.0f ] [UNSET = 0.f ]
 
-	// additional race variables
+	    // additional race variables for each participant
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
-        public float[] mCurrentSector1Times;        // [ UNITS = seconds ]   [ RANGE = 0.0f->... ]   [ UNSET = -1.0f ]
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
-        public float[] mCurrentSector2Times;        // [ UNITS = seconds ]   [ RANGE = 0.0f->... ]   [ UNSET = -1.0f ]
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
-        public float[] mCurrentSector3Times;        // [ UNITS = seconds ]   [ RANGE = 0.0f->... ]   [ UNSET = -1.0f ]
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
-        public float[] mFastestSector1Times;        // [ UNITS = seconds ]   [ RANGE = 0.0f->... ]   [ UNSET = -1.0f ]
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
-        public float[] mFastestSector2Times;        // [ UNITS = seconds ]   [ RANGE = 0.0f->... ]   [ UNSET = -1.0f ]
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
-        public float[] mFastestSector3Times;        // [ UNITS = seconds ]   [ RANGE = 0.0f->... ]   [ UNSET = -1.0f ]
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
-        public float[] mFastestLapTimes;            // [ UNITS = seconds ]   [ RANGE = 0.0f->... ]   [ UNSET = -1.0f ]
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
-        public float[] mLastLapTimes;               // [ UNITS = seconds ]   [ RANGE = 0.0f->... ]   [ UNSET = -1.0f ]
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
-        public bool[] mLapsInvalidated;            // [ UNITS = boolean for all participants ]   [ RANGE = false->true ]   [ UNSET = false ]
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
-        public uint[] mRaceStates;         // [ enum (Type#3) Race State ]
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
-        public uint[] mPitModes;           // [ enum (Type#7)  Pit Mode ]
-
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
-	    pCars2APIParticipantAdditionalDataStruct[] mAdditionalParticipantData;      // 
-
+        public pCars2APIParticipantAdditionalDataStruct[] mAdditionalParticipantData;      // 
 																											// additional race variables
         public int mEnforcedPitStopLap;                          // [ UNITS = in which lap there will be a mandatory pitstop] [ RANGE = 0.0f->... ] [ UNSET = -1 ]
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
@@ -612,6 +638,25 @@ namespace CrewChiefV4.PCars2
 
         // extra from the UDP data
         public uint mSessionLengthTimeFromGame;  // seconds, 0 => not a timed session
+        public byte mJoyPad1;
+        public byte mJoyPad2;
+        public byte mDPad;
+        // UDP has player tyre types. Shared memory does not. Dumb.
+        public byte[] mLFTyreCompoundName;
+        public byte[] mRFTyreCompoundName;
+        public byte[] mLRTyreCompoundName;
+        public byte[] mRRTyreCompoundName;
+        // and other stuff that's missing from the MMF:
+        public float[] mSuspensionRideHeight;
+        public float[] mRideHeight;
+
+        // more per-participant data items not in the shared memory. Or documented.
+        public byte[] participantHighestFlags;
+        public float snowDensity;
+        public float[] lastSectorTimes;
+
+        // this is a big byte array of all the car class names being sent via UDP
+        public byte[][] carClassNames;
 
         /*
         // extras from the UDP data - pcars1

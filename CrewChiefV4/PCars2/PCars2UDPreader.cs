@@ -27,8 +27,14 @@ namespace CrewChiefV4.PCars2
         private int lastSequenceNumberForTelemPacket = -1;
 
         private long telemPacketCount = 0;
-        private long stringsPacketCount = 0;
-        private long additionalStringsPacketCount = 0;
+        private long raceDefinitionPacketCount = 0; 
+        private long participantsPacketCount = 0; 
+        private long timingsPacketCount = 0; 
+        private long gameStatePacketCount = 0; 
+        private long weatherStatePacketCount = 0;
+        private long vehicleNamesPacketCount = 0;
+        private long timeStatsPacketCount = 0;
+        private long participantVehicleNamesPacketCount = 0;
 
         private long inSequenceTelemCount = 0;
         private long discardedTelemCount = 0;
@@ -110,8 +116,14 @@ namespace CrewChiefV4.PCars2
                 discardedTelemCount = 0;
                 inSequenceTelemCount = 0;
                 telemPacketCount = 0;
-                stringsPacketCount = 0;
-                additionalStringsPacketCount = 0;
+                raceDefinitionPacketCount = 0; 
+                participantsPacketCount = 0; 
+                timingsPacketCount = 0; 
+                gameStatePacketCount = 0; 
+                weatherStatePacketCount = 0;
+                vehicleNamesPacketCount = 0;
+                timeStatsPacketCount = 0;
+                participantVehicleNamesPacketCount = 0;
                 lastValidTelemCurrentLapTime = -1;
                 lastValidTelemLapsCompleted = 0;
 
@@ -217,84 +229,150 @@ namespace CrewChiefV4.PCars2
             EUDPStreamerPacketHandlerType packetType = (EUDPStreamerPacketHandlerType) rawData[10];
             int packetVersion = rawData[11];
 
-            uint frameLength = 0;
-            if (packetType == EUDPStreamerPacketHandlerType.eCarPhysics)
+            int frameLength = 0;
+            switch (packetType)
             {
-                telemPacketCount++;
-                if (telemPacketCount > packetCountAtStartOfNextRateCheck)
-                {
-                    lastPacketRateEstimate = (int)((float)TimeSpan.TicksPerSecond * (float)(telemPacketCount - packetCountAtStartOfCurrentRateCheck) / (float)(DateTime.Now.Ticks - ticksAtStartOfCurrentPacketRateCheck));
-                    Console.WriteLine("Packet rate = " + lastPacketRateEstimate + "Hz, totals: type0 = " + telemPacketCount + " type1 = " + stringsPacketCount + " type2 = " + additionalStringsPacketCount +
-                        " in sequence = " + inSequenceTelemCount + " oos accepted = " + acceptedOutOfSequenceTelemCount + " oos rejected = " + discardedTelemCount);
-                    packetCountAtStartOfCurrentRateCheck = telemPacketCount;
-                    packetCountAtStartOfNextRateCheck = packetCountAtStartOfCurrentRateCheck + packetRateCheckInterval;
-                    ticksAtStartOfCurrentPacketRateCheck = DateTime.Now.Ticks;
-                }
-                frameLength = sTelemetryData.sPacketSize;
-                Boolean sequenceCheckOK = isNextInSequence(packetNumber);
-                if (sequenceCheckOK)
-                {
-                    inSequenceTelemCount++;
-                }
-                if (strictPacketOrdering && !sequenceCheckOK)
-                {
-                    discardedTelemCount++;
-                }
-                else
-                {
-                    GCHandle handle = GCHandle.Alloc(rawData.Take(frameLength).ToArray(), GCHandleType.Pinned);
+                case EUDPStreamerPacketHandlerType.eCarPhysics:
+                    telemPacketCount++;
+                    if (telemPacketCount > packetCountAtStartOfNextRateCheck)
+                    {
+                        lastPacketRateEstimate = (int)((float)TimeSpan.TicksPerSecond * (float)(telemPacketCount - packetCountAtStartOfCurrentRateCheck) / (float)(DateTime.Now.Ticks - ticksAtStartOfCurrentPacketRateCheck));
+                        Console.WriteLine("Packet rate = " + lastPacketRateEstimate + 
+                            "Hz, totals:" +
+                            "\ntelem = " + telemPacketCount +
+                            "\nraceDefinition = " + raceDefinitionPacketCount +
+                            "\nparticipants = " + participantsPacketCount +
+                            "\ntimings = " + timingsPacketCount +
+                            "\ngameState = " + gameStatePacketCount +
+                            "\nweather = " + weatherStatePacketCount +
+                            "\nvehicleNames = " + vehicleNamesPacketCount +
+                            "\ntimeStats = " + timeStatsPacketCount +
+                            "\nparticipantVehicleNames = " + participantVehicleNamesPacketCount +
+                            "\nin sequence = " + inSequenceTelemCount + " oos accepted = " + acceptedOutOfSequenceTelemCount + " oos rejected = " + discardedTelemCount);
+                        packetCountAtStartOfCurrentRateCheck = telemPacketCount;
+                        packetCountAtStartOfNextRateCheck = packetCountAtStartOfCurrentRateCheck + packetRateCheckInterval;
+                        ticksAtStartOfCurrentPacketRateCheck = DateTime.Now.Ticks;
+                    }
+                    frameLength = sTelemetryData.sPacketSize;
+                    Boolean sequenceCheckOK = isNextInSequence(packetNumber);
+                    if (sequenceCheckOK)
+                    {
+                        inSequenceTelemCount++;
+                    }
+                    if (strictPacketOrdering && !sequenceCheckOK)
+                    {
+                        discardedTelemCount++;
+                    }
+                    else
+                    {
+                        GCHandle telemHandle = GCHandle.Alloc(rawData.Take(frameLength).ToArray(), GCHandleType.Pinned);
+                        try
+                        {
+                            sTelemetryData telem = (sTelemetryData)Marshal.PtrToStructure(telemHandle.AddrOfPinnedObject(), typeof(sTelemetryData));
+                            if (sequenceCheckOK || !telemIsOutOfSequence(telem))
+                            {
+                                buttonsState = ConvertBytesToBoolArray(telem.sDPad, telem.sJoyPad1, telem.sJoyPad2);
+                                lastSequenceNumberForTelemPacket = (int)packetNumber;
+                                workingGameState = StructHelper.MergeWithExistingState(workingGameState, telem);
+                                newSpotterData = true;// TODO
+                            }
+                        }
+                        finally
+                        {
+                            telemHandle.Free();
+                        }
+                    }
+                    break;
+                case EUDPStreamerPacketHandlerType.eRaceDefinition:
+                    raceDefinitionPacketCount++;
+                    frameLength = sRaceData.sPacketSize;
+                    GCHandle raceDefHandle = GCHandle.Alloc(rawData.Take(frameLength).ToArray(), GCHandleType.Pinned);
                     try
                     {
-                        sTelemetryData telem = (sTelemetryData)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(sTelemetryData));
-                        if (sequenceCheckOK || !telemIsOutOfSequence(telem))
-                        {
-                            buttonsState = ConvertBytesToBoolArray(telem.sDPad, telem.sJoyPad1, telem.sJoyPad2);
-                            lastSequenceNumberForTelemPacket = sequence;
-                            workingGameState = StructHelper.MergeWithExistingState(workingGameState, telem);
-                            newSpotterData = workingGameState.hasNewPositionData;
-                        }
+                        sRaceData raceDefinition = (sRaceData)Marshal.PtrToStructure(raceDefHandle.AddrOfPinnedObject(), typeof(sRaceData));
+                        workingGameState = StructHelper.MergeWithExistingState(workingGameState, raceDefinition);
                     }
                     finally
                     {
-                        handle.Free();
+                        raceDefHandle.Free();
                     }
-                }    
+                    break;
+                case EUDPStreamerPacketHandlerType.eParticipants:
+                    participantsPacketCount++;
+                    frameLength = sParticipantsData.sPacketSize;
+                    GCHandle participantsHandle = GCHandle.Alloc(rawData.Take(frameLength).ToArray(), GCHandleType.Pinned);
+                    try
+                    {
+                        sParticipantsData participants = (sParticipantsData)Marshal.PtrToStructure(participantsHandle.AddrOfPinnedObject(), typeof(sParticipantsData));
+                        workingGameState = StructHelper.MergeWithExistingState(workingGameState, participants);
+                    }
+                    finally
+                    {
+                        participantsHandle.Free();
+                    }
+                    break;
+                case EUDPStreamerPacketHandlerType.eTimings:
+                    timingsPacketCount++;
+                    frameLength = sTimingsData.sPacketSize;
+                    GCHandle timingsHandle = GCHandle.Alloc(rawData.Take(frameLength).ToArray(), GCHandleType.Pinned);
+                    try
+                    {
+                        sTimingsData timings = (sTimingsData)Marshal.PtrToStructure(timingsHandle.AddrOfPinnedObject(), typeof(sTimingsData));
+                        workingGameState = StructHelper.MergeWithExistingState(workingGameState, timings);
+                    }
+                    finally
+                    {
+                        timingsHandle.Free();
+                    }
+                    break;
+                case EUDPStreamerPacketHandlerType.eGameState:
+                    gameStatePacketCount++;
+                    frameLength = sGameStateData.sPacketSize;
+                    GCHandle gameStateHandle = GCHandle.Alloc(rawData.Take(frameLength).ToArray(), GCHandleType.Pinned);
+                    try
+                    {
+                        sGameStateData gameState = (sGameStateData)Marshal.PtrToStructure(gameStateHandle.AddrOfPinnedObject(), typeof(sGameStateData));
+                        workingGameState = StructHelper.MergeWithExistingState(workingGameState, gameState);
+                    }
+                    finally
+                    {
+                        gameStateHandle.Free();
+                    }
+                    break;
+                case EUDPStreamerPacketHandlerType.eWeatherState:
+                    weatherStatePacketCount++;
+                    Console.WriteLine("Got an undocumented and unsupported weather packet");
+                    break;
+                case EUDPStreamerPacketHandlerType.eTimeStats:
+                    participantsPacketCount++;
+                    frameLength = sTimeStatsData.sPacketSize;
+                    GCHandle timeStatsHandle = GCHandle.Alloc(rawData.Take(frameLength).ToArray(), GCHandleType.Pinned);
+                    try
+                    {
+                        sTimeStatsData timeStatsData = (sTimeStatsData)Marshal.PtrToStructure(timeStatsHandle.AddrOfPinnedObject(), typeof(sTimeStatsData));
+                        workingGameState = StructHelper.MergeWithExistingState(workingGameState, timeStatsData);
+                    }
+                    finally
+                    {
+                        timeStatsHandle.Free();
+                    }
+                    break;
+                case EUDPStreamerPacketHandlerType.eParticipantVehicleNames:
+                    participantsPacketCount++;
+                    frameLength = sParticipantVehicleNamesData.sPacketSize;
+                    GCHandle vehNamesHandle = GCHandle.Alloc(rawData.Take(frameLength).ToArray(), GCHandleType.Pinned);
+                    try
+                    {
+                        sParticipantVehicleNamesData participantVehicleNames = (sParticipantVehicleNamesData)Marshal.PtrToStructure(vehNamesHandle.AddrOfPinnedObject(), typeof(sParticipantVehicleNamesData));
+                        workingGameState = StructHelper.MergeWithExistingState(workingGameState, participantVehicleNames);
+                    }
+                    finally
+                    {
+                        vehNamesHandle.Free();
+                    }
+                    break;
             }
-            else if (frameType == 1)
-            {
-                stringsPacketCount++;
-                frameLength = sParticipantInfoStrings_PacketSize;
-                GCHandle handle = GCHandle.Alloc(rawData.Skip(offset).Take(frameLength).ToArray(), GCHandleType.Pinned);
-                try
-                {
-                    sParticipantInfoStrings strings = (sParticipantInfoStrings)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(sParticipantInfoStrings));
-                    workingGameState = StructHelper.MergeWithExistingState(workingGameState, strings);
-                }
-                finally
-                {
-                    handle.Free();
-                }
-            }
-            else if (frameType == 2)
-            {
-                additionalStringsPacketCount++;
-                frameLength = sParticipantInfoStringsAdditional_PacketSize;
-                GCHandle handle = GCHandle.Alloc(rawData.Skip(offset).Take(frameLength).ToArray(), GCHandleType.Pinned);
-                try
-                {
-                    sParticipantInfoStringsAdditional additional = (sParticipantInfoStringsAdditional)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(sParticipantInfoStringsAdditional));
-                    workingGameState = StructHelper.MergeWithExistingState(workingGameState, additional);
-                }
-                finally
-                {
-                    handle.Free();
-                }
-            }
-            else
-            {
-                Console.WriteLine("Unrecognised frame type " + frameType + " from byte " + rawData[offset + 2]);
-            }
-            return frameLength + offset;
+            return frameLength;
         }
 
         private Boolean isNextInSequence(uint thisPacketSequenceNumber)
@@ -316,25 +394,7 @@ namespace CrewChiefV4.PCars2
 
         private Boolean telemIsOutOfSequence(sTelemetryData telem)
         {
-            if (telem.sViewedParticipantIndex >= 0 && telem.sParticipantInfo.Length > telem.sViewedParticipantIndex)
-            {
-                int lapsCompletedInTelem = telem.sParticipantInfo[telem.sViewedParticipantIndex].sLapsCompleted;
-                float lapTimeInTelem = telem.sCurrentTime;
-                if (lapTimeInTelem > 0 && lastValidTelemCurrentLapTime > 0)
-                {
-                    // if the number of completed laps has decreased, or our laptime has decreased without starting
-                    // a new lap then we need to discard the packet. The lapsCompleted is unreliable, this may end badly
-                    if (lastValidTelemLapsCompleted > lapsCompletedInTelem ||
-                        (lapTimeInTelem < lastValidTelemCurrentLapTime && lastValidTelemLapsCompleted == lapsCompletedInTelem))
-                    {
-                        discardedTelemCount++;
-                        return true;
-                    }
-                }
-                lastValidTelemCurrentLapTime = lapTimeInTelem;
-                lastValidTelemLapsCompleted = lapsCompletedInTelem;
-                acceptedOutOfSequenceTelemCount++;
-            }            
+            // TODO: 
             return false;
         }
     
@@ -370,8 +430,14 @@ namespace CrewChiefV4.PCars2
             inSequenceTelemCount = 0;
             discardedTelemCount = 0;
             telemPacketCount = 0;
-            stringsPacketCount = 0;
-            additionalStringsPacketCount = 0;
+            raceDefinitionPacketCount = 0;
+            participantsPacketCount = 0;
+            timingsPacketCount = 0;
+            gameStatePacketCount = 0;
+            weatherStatePacketCount = 0;
+            vehicleNamesPacketCount = 0;
+            timeStatsPacketCount = 0;
+            participantVehicleNamesPacketCount = 0;
             lastValidTelemCurrentLapTime = -1;
             lastValidTelemLapsCompleted = 0; 
             buttonsState = new Boolean[24];

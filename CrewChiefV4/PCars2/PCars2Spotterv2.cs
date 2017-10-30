@@ -112,9 +112,7 @@ namespace CrewChiefV4.PCars2
             if (enabled && currentState.mNumParticipants > 1 && 
                 (enableSpotterInTimetrial || currentState.mSessionState != (uint)eSessionState.SESSION_TIME_ATTACK))
             {
-                Tuple<int, pCars2APIParticipantStruct> playerDataWithIndex = PCars2GameStateMapper.getPlayerDataStruct(currentState.mParticipantData, currentState.mViewedParticipantIndex);
-                int playerIndex = playerDataWithIndex.Item1;
-                pCars2APIParticipantStruct playerData = playerDataWithIndex.Item2;
+                pCars2APIParticipantStruct playerData = currentState.mParticipantData[currentState.mViewedParticipantIndex];
                 if (currentGameState != null)
                 {
                     var carClass = currentGameState.carClass;
@@ -127,7 +125,7 @@ namespace CrewChiefV4.PCars2
                 }
                 float[] currentPlayerPosition = new float[] { playerData.mWorldPosition[0], playerData.mWorldPosition[2] };
 
-                if (currentState.mPitMode == (uint)ePitMode.PIT_MODE_NONE)
+                if (/*playerData.mPitMode == (uint)ePitMode.PIT_MODE_NONE*/ true)
                 {
                     List<float[]> currentOpponentPositions = new List<float[]>();
                     float[] playerVelocityData = new float[3];
@@ -137,7 +135,7 @@ namespace CrewChiefV4.PCars2
 
                     for (int i = 0; i < currentState.mParticipantData.Count(); i++)
                     {
-                        if (i == playerIndex)
+                        if (i == currentState.mViewedParticipantIndex)
                         {
                             continue;
                         }

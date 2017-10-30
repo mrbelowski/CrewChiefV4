@@ -49,8 +49,8 @@ namespace CrewChiefV4
         {
             List<GameDefinition> definitions = new List<GameDefinition>();
             definitions.Add(automobilista); definitions.Add(gameStockCar); definitions.Add(marcas); definitions.Add(ftruck);
-            definitions.Add(pCars2); definitions.Add(pCars64Bit); definitions.Add(pCars32Bit);  
-            definitions.Add(raceRoom); definitions.Add(pCarsNetwork); definitions.Add(rFactor1);
+            definitions.Add(pCars2); definitions.Add(pCars64Bit); definitions.Add(pCars32Bit);
+            definitions.Add(raceRoom); definitions.Add(pCarsNetwork); definitions.Add(pCars2Network); definitions.Add(rFactor1);
             definitions.Add(assetto64Bit); definitions.Add(assetto32Bit); definitions.Add(rfactor2_64bit);
             definitions.Add(iracing);
             return definitions;

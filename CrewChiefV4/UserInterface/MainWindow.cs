@@ -451,6 +451,13 @@ namespace CrewChiefV4
                         setFromCommandLine = true;
                         break;
                     }
+                    else if (arg.Equals(GameDefinition.pCars2Network.gameEnum.ToString()))
+                    {
+                        Console.WriteLine("Set PCars2 network mode from command line");
+                        this.gameDefinitionList.Text = GameDefinition.pCars2Network.friendlyName;
+                        setFromCommandLine = true;
+                        break;
+                    }
                     else if (arg.Equals(GameDefinition.assetto64Bit.gameEnum.ToString()))
                     {
                         Console.WriteLine("Set Assetto Corsa mode from command line");
@@ -1282,7 +1289,7 @@ namespace CrewChiefV4
         {
             controllerConfiguration.controllers = this.controllerConfiguration.scanControllers();
             this.controllersList.Items.Clear();
-            if (this.gameDefinitionList.Text.Equals(GameDefinition.pCarsNetwork.friendlyName))
+            if (this.gameDefinitionList.Text.Equals(GameDefinition.pCarsNetwork.friendlyName) || this.gameDefinitionList.Text.Equals(GameDefinition.pCars2Network.friendlyName))
             {
                 controllerConfiguration.addNetworkControllerToList();
             }
@@ -1424,7 +1431,7 @@ namespace CrewChiefV4
 
         private void updateSelectedGameDefinition(object sender, EventArgs e)
         {
-            if (this.gameDefinitionList.Text.Equals(GameDefinition.pCarsNetwork.friendlyName))
+            if (this.gameDefinitionList.Text.Equals(GameDefinition.pCarsNetwork.friendlyName) || this.gameDefinitionList.Text.Equals(GameDefinition.pCars2Network.friendlyName))
             {
                 controllerConfiguration.addNetworkControllerToList();
             }

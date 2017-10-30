@@ -57,7 +57,7 @@ namespace CrewChiefV4
                         {
                             pcars2UDPreader = new PCars2UDPreader();
                         }
-                        return pcarsUDPreader;
+                        return pcars2UDPreader;
                     case GameEnum.PCARS_32BIT:
                     case GameEnum.PCARS_64BIT:                    
                         if (pcarsSharedMemoryReader == null)
@@ -70,7 +70,7 @@ namespace CrewChiefV4
                         {
                             pcars2SharedMemoryReader = new PCars2SharedMemoryReader();
                         }
-                        return pcarsSharedMemoryReader;
+                        return pcars2SharedMemoryReader;
                     case GameEnum.RACE_ROOM:
                         if (r3eSharedMemoryReader == null)
                         {
