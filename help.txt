@@ -124,3 +124,57 @@ The app understands lots of command including:
 "repeat last message / say again" (replays the last message)
 "What are my [brake / tyre] [temperatures / temps]"
 "What time is it / what's the time" (reports current real-world time)
+"What's my fuel usage / what's my fuel consumption / what's my fuel use" (reports the per-lap or per-minute average fuel consumption)
+"What tires am I on / what tire am / on / what tire type am i on" (reports the tyre name you're currently using, if available)
+"Calculate fuel for [X minutes / laps] / how much fuel do I need for [X minutes / laps] / how much fuel for [X minutes / laps]" (estimates how much fuel you'll probably need for this many minutes or laps)
+"Give me tyre pace differences / what are the tire speeds / whats the difference between tires / compare tire compounds" (Raceroom only - gives lap time deltas for the best lap on each tyre type that's been used during the session, across all drivers in the same car class as the player)
+"This is the formation lap / formation lap / rolling start": Enable manual rolling-start mode (used by some online leagues)
+"Standing start / no formation lap": Disable manual rolling-start mode
+"Where should I attack / where am I faster / where can I attack": If the app has enough data, will report the corner name where you're gaining the most time on the guy in front
+"Where should I defend / where am I slower / where is he faster / where will he attack": If the app has enough data, will report the corner name where you're losing the most time to the guy behind
+
+
+
+Command macros
+--------------
+The app can send sequences of key presses in response to voice command or some specific (hard-coded) in-game events. These can be used for anything you like, but their primary function is to ease the pain of navigating the awkward in-game pit menus. The app comes with a default set of command macros which (at the time of writing) are for PCars2 and Raceroom only. More will be added for other games. The default commands can be found in [install folder]/saved_command_macros.json. If you want to make your own, copy this file to a your Documents folder, in a subfolder called CrewChiefV4 (i.e. Documents/CrewChiefV4/saved_command_macros.json) and edit it as you like. 
+
+The first thing you need to do is to update your key assignments in-game so they match the keys that the command macro will send. 
+
+
+Raceroom
+
+default key bindings:
+"Pit Menu Toggle":		q
+"Pit Menu Select": 		e
+"Pit Menu Up": 			w
+"Pit Menu Down":		s
+"Pit Menu Decrease":	a
+"Pit Menu Increase":	d
+"Pit Request Toggle":	r
+
+Ensure that there's a least one Pitstop Preset defined (from the in-game pit menu).
+
+You can request a pit stop by saying "pit request", "in this lap" or "box this lap". This will open the pit menu, select 'pit request' and close it again. When you enter the pitlane the app will automatically open select 'confirm pit actions' from the pit menu so you don't have to fumble around.
+
+If you get a drive through or stop-go penalty, the app will automatically open the pit menu and select 'serve penalty', and close it again. When you then enter the pitlane it'll automatically confirm that action. So you don't need to do anything to serve a drive through other than enter the pitlane (at the right speed of course).
+
+You can also cycle pit presets with the voice commands "next strategy", "next pit preset", "previous strategy", "previous pit preset".
+
+If you want to manually navigate the pit menu with voice commands, use "pit menu toggle", "pit menu up", "pit menu down", "pit menu left", "pit menu right" and "pit menu select".
+
+
+PCars2
+
+default key bindings:
+"Car Management":	e
+"ICM Menu Up":		w
+"ICM Menu Down":	s
+"ICM Menu Left":	a
+"ICM Menu Right":	d
+
+You can request a pit stop by saying "pit request", "in this lap" or "box this lap". This will open the pit menu, select 'pit request' and close it again.
+
+You can select strategies with the voice commands "strategy one" / "strat one", up to "strategy four" / "strat four".
+
+If you want to manually navigate the pit menu with voice commands, use "pit menu toggle", "pit menu up", "pit menu down", "pit menu left" and "pit menu right".

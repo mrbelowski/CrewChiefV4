@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using CrewChiefV4.rFactor2;
 using CrewChiefV4.iRacing;
+using CrewChiefV4.PCars2;
 
 namespace CrewChiefV4
 {
@@ -17,7 +18,9 @@ namespace CrewChiefV4
         private static GameStateReaderFactory INSTANCE = new GameStateReaderFactory();
 
         private PCarsUDPreader pcarsUDPreader;
+        private PCars2UDPreader pcars2UDPreader;
         private PCarsSharedMemoryReader pcarsSharedMemoryReader;
+        private PCars2SharedMemoryReader pcars2SharedMemoryReader;
         private R3ESharedMemoryReader r3eSharedMemoryReader;
         private RF1SharedMemoryReader rf1SharedMemoryReader;
         private RF2SharedMemoryReader rf2SharedMemoryReader;
@@ -25,6 +28,7 @@ namespace CrewChiefV4
         private iRacingSharedMemoryReader iracingSharedMemoryReader;
 
         private PCarsGameStateMapper pcarsGameStateMapper;
+        private PCars2GameStateMapper pcars2GameStateMapper;
         private R3EGameStateMapper r3eGameStateMapper;
         private RF1GameStateMapper rf1GameStateMapper;
         private RF2GameStateMapper rf2GameStateMapper;
@@ -48,14 +52,25 @@ namespace CrewChiefV4
                             pcarsUDPreader = new PCarsUDPreader();
                         }
                         return pcarsUDPreader;
+                    case GameEnum.PCARS2_NETWORK:
+                        if (pcars2UDPreader == null)
+                        {
+                            pcars2UDPreader = new PCars2UDPreader();
+                        }
+                        return pcars2UDPreader;
                     case GameEnum.PCARS_32BIT:
-                    case GameEnum.PCARS_64BIT:
-                    case GameEnum.PCARS2:
+                    case GameEnum.PCARS_64BIT:                    
                         if (pcarsSharedMemoryReader == null)
                         {
                             pcarsSharedMemoryReader = new PCarsSharedMemoryReader();
                         }
                         return pcarsSharedMemoryReader;
+                    case GameEnum.PCARS2:
+                        if (pcars2SharedMemoryReader == null)
+                        {
+                            pcars2SharedMemoryReader = new PCars2SharedMemoryReader();
+                        }
+                        return pcars2SharedMemoryReader;
                     case GameEnum.RACE_ROOM:
                         if (r3eSharedMemoryReader == null)
                         {
@@ -101,12 +116,18 @@ namespace CrewChiefV4
                     case GameEnum.PCARS_NETWORK:
                     case GameEnum.PCARS_32BIT:
                     case GameEnum.PCARS_64BIT:
-                    case GameEnum.PCARS2:
                         if (pcarsGameStateMapper == null)
                         {
                             pcarsGameStateMapper = new PCarsGameStateMapper();
                         }
                         return pcarsGameStateMapper;
+                    case GameEnum.PCARS2_NETWORK:
+                    case GameEnum.PCARS2:
+                        if (pcars2GameStateMapper == null)
+                        {
+                            pcars2GameStateMapper = new PCars2GameStateMapper();
+                        }
+                        return pcars2GameStateMapper;
                     case GameEnum.RACE_ROOM:
                         if (r3eGameStateMapper == null)
                         {

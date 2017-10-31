@@ -10,7 +10,7 @@ For support and discussions about Crew Chief we have our very own forum here: ht
 
 Changelog
 ---------
-Version 4.8.0.9: iRacing Beta; Pit command macros beta (example implementations for R3E and pCARS2 included - see saved_command_macros.json in the app's installation folder); a ton of other stuff that'll be documented for the proper release
+Version 4.8.1.0: iRacing beta; PCars2 (shared memory) beta; Pit command macros beta (example implementations for R3E and pCARS2 included - see the "Command macros" section of the Help file, and saved_command_macros.json in the app's installation folder); fixed lap time issues in AC (caused by the laptime not being sent to the app at the same time as the new-lap notification); extended support for RF2 StockCar rules plugin; more car class and track mapping data; RF2 opponent pit detection; Allow the background sound to be muted when you talk to the chief; lots and lots of bugfixes for RF2, PCars, AC and R3E; a ton of other stuff that'll be documented for the proper release
 
 Version 4.8.0.7: RF2 fixes - fixed low fuel message playing when it shouldn't, fixed European versions of full course yellow messages not playing on new installs
 
@@ -279,7 +279,8 @@ You need to speak clearly and your mic needs to be properly set up - you might n
 I've not finished implementing this but currently the app understands and responds to the following commands:
 
 "how's my [fuel / tyre wear / body work / aero / engine / transmission / suspension / pace ]"
-"how are my [tyre temps / tyre temperatures / brakes / brake temps / brake temperatures / engine temps / engine temperatures]"
+"how are my [tyre temps / tyre temperatures / brakes / brake temps / brake temperatures / engine temps / engine temperatures]" (gives a good / bad type response)
+"What are my [brake temps / tyre temps]" (gives the actual temps)
 "what's my [gap in front / gap ahead / gap behind / last lap / last lap time / lap time / position / fuel level / best lap / best lap time]"
 "what's the fastest lap" (reports the fastest lap in the session for the player's car class)
 "keep quiet / I know what I'm doing / leave me alone" (switches off messages)
@@ -289,7 +290,6 @@ I've not finished implementing this but currently the app understands and respon
 "do I still have a penalty / do I have a penalty / have I served my penalty"
 "do I have to pit / do I need to pit / do I have a mandatory pit stop / do I have a mandatory stop / do I have to make a pit stop"
 "where's [opponent driver last name]"
-"where's P [opponent position]"
 "what's [opponent driver last name]'s last lap"
 "what's [opponent driver last name]'s best lap"
 "what's [opponent race position]'s last lap" (for example, "what's p 4's best lap", or "what's position 4's last lap")
@@ -307,9 +307,16 @@ I've not finished implementing this but currently the app understands and respon
 "tell me the gaps / give me the gaps / tell me the deltas / give me the deltas" (switch on 'deltas' mode where the time deltas in front and behind get read out on each lap. Note that these messages will play even if you have disabled messages)
 "don't tell me the gaps / don't tell me the deltas / no more gaps / no more deltas" (switch off deltas mode)
 "repeat last message / say again" (replays the last message)
-"What's the air temp / what's the air temperature / what's the track temp / what's the track temperature" (current air / track temps in celsius)
 "What are my [brake / tyre] [temperatures / temps]"
 "What time is it / what's the time" (reports current real-world time)
+"What's my fuel usage / what's my fuel consumption / what's my fuel use" (reports the per-lap or per-minute average fuel consumption)
+"What tires am I on / what tire am / on / what tire type am i on" (reports the tyre name you're currently using, if available)
+"Calculate fuel for [X minutes / laps] / how much fuel do I need for [X minutes / laps] / how much fuel for [X minutes / laps]" (estimates how much fuel you'll probably need for this many minutes or laps)
+"Give me tyre pace differences / what are the tire speeds / whats the difference between tires / compare tire compounds" (Raceroom only - gives lap time deltas for the best lap on each tyre type that's been used during the session, across all drivers in the same car class as the player)
+"This is the formation lap / formation lap / rolling start": Enable manual rolling-start mode (used by some online leagues)
+"Standing start / no formation lap": Disable manual rolling-start mode
+"Where should I attack / where am I faster / where can I attack": If the app has enough data, will report the corner name where you're gaining the most time on the guy in front
+"Where should I defend / where am I slower / where is he faster / where will he attack": If the app has enough data, will report the corner name where you're losing the most time to the guy behind
 
 
 
