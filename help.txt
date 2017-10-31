@@ -124,6 +124,14 @@ The app understands lots of command including:
 "repeat last message / say again" (replays the last message)
 "What are my [brake / tyre] [temperatures / temps]"
 "What time is it / what's the time" (reports current real-world time)
+"What's my fuel usage / what's my fuel consumption / what's my fuel use" (reports the per-lap or per-minute average fuel consumption)
+"What tires am I on / what tire am / on / what tire type am i on" (reports the tyre name you're currently using, if available)
+"Calculate fuel for [X minutes / laps] / how much fuel do I need for [X minutes / laps] / how much fuel for [X minutes / laps]" (estimates how much fuel you'll probably need for this many minutes or laps)
+"Give me tyre pace differences / what are the tire speeds / whats the difference between tires / compare tire compounds" (Raceroom only - gives lap time deltas for the best lap on each tyre type that's been used during the session, across all drivers in the same car class as the player)
+"This is the formation lap / formation lap / rolling start": Enable manual rolling-start mode (used by some online leagues)
+"Standing start / no formation lap": Disable manual rolling-start mode
+"Where should I attack / where am I faster / where can I attack": If the app has enough data, will report the corner name where you're gaining the most time on the guy in front
+"Where should I defend / where am I slower / where is he faster / where will he attack": If the app has enough data, will report the corner name where you're losing the most time to the guy behind
 
 
 
