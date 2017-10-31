@@ -45,14 +45,10 @@ namespace CrewChiefV4.iRacing
         public DriverResults Results { get; private set; }
         public DriverSessionResults CurrentResults { get; set; }
         public DriverLiveInfo Live { get; private set; }
-
-        public string LongDisplay
-        {
-            get { return string.Format("#{0} {1}{2}",
-                this.Car.CarNumber,
-                this.Name,
-                this.TeamId > 0 ? " (" + this.TeamName + ")" : ""); }
-        }
+        private double _prevPos;
+        private double _prevTime;
+        private double _prevSpeed;
+        private double _prevDistance;
 
         public void ParseDynamicSessionInfo(SessionInfo info)
         {
@@ -120,8 +116,35 @@ namespace CrewChiefV4.iRacing
             this.Live.ParseTelemetry(e);
         }
 
-        private double _prevPos;
+        
+        /*
+        public double InterpolateTimeExact(TelemetryUpdate prev, TelemetryUpdate cur, double targetPos)
+        {
+            var t0 = _prevTime;
+            var t1 = cur.Time;
+            var p0 = _prevDistance;
+            var p1 = cur.LapDistance;
+            var v0 = _prevSpeed;
+            var v1 = cur.Speed;
+            var p = targetPos;
 
+            var dv = v0 - v1;
+            var dt = t0 - t1;
+
+            var term1 = t0 * v0 - 2 * t0 * v1 + t1 * v0;
+            var term2 = Math.Sqrt(dt * (4 * dv * (p + p0) + v0 * v0 * dt));
+            var term3 = 2 * (v0 - v1);
+
+            // Two possible answers
+            var timePos = (term1 + term2) / term3;
+            var timeNeg = (term1 - term2) / term3;
+
+            // Take the one that is in between t0 and t1
+            if (timePos > t1 || timePos < t0)
+                return timeNeg;
+            return timePos;
+        }
+        */
         public void UpdateSectorTimes(Track track, iRacingData telemetry)
         {
             if (track == null) 
