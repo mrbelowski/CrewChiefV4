@@ -221,6 +221,13 @@
 			"actionSequence": [ "Pit Menu Toggle" ],
 			"keyPressTime": 10,
 			"waitBetweenEachCommand": 100
+		},
+		{
+			"description": "pcars2 version",
+			"gameDefinition": "PCARS2",
+			"actionSequence": [ "Car Management" ],
+			"keyPressTime": 10,
+			"waitBetweenEachCommand": 100
 		}]
 	},
 	{
@@ -247,6 +254,13 @@
 			"actionSequence": [ "Pit Menu Up" ],
 			"keyPressTime": 10,
 			"waitBetweenEachCommand": 100
+		},
+		{
+			"description": "pcars2 version",
+			"gameDefinition": "PCARS2",
+			"actionSequence": [ "ICM Menu Up" ],
+			"keyPressTime": 10,
+			"waitBetweenEachCommand": 100
 		}]
 	},
 	{
@@ -258,6 +272,13 @@
 			"description": "r3e version",
 			"gameDefinition": "RACE_ROOM",
 			"actionSequence": [ "Pit Menu Down" ],
+			"keyPressTime": 10,
+			"waitBetweenEachCommand": 100
+		},
+		{
+			"description": "pcars2 version",
+			"gameDefinition": "PCARS2",
+			"actionSequence": [ "ICM Menu Down" ],
 			"keyPressTime": 10,
 			"waitBetweenEachCommand": 100
 		}]
@@ -273,6 +294,13 @@
 			"actionSequence": [ "Pit Menu Decrease" ],
 			"keyPressTime": 10,
 			"waitBetweenEachCommand": 100
+		},
+		{
+			"description": "pcars2 version",
+			"gameDefinition": "PCARS2",
+			"actionSequence": [ "ICM Menu Left" ],
+			"keyPressTime": 10,
+			"waitBetweenEachCommand": 100
 		}]
 	},
 	{
@@ -284,6 +312,13 @@
 			"description": "r3e version",
 			"gameDefinition": "RACE_ROOM",
 			"actionSequence": [ "Pit Menu Increase" ],
+			"keyPressTime": 10,
+			"waitBetweenEachCommand": 100
+		},
+		{
+			"description": "pcars2 version",
+			"gameDefinition": "PCARS2",
+			"actionSequence": [ "ICM Menu Right" ],
 			"keyPressTime": 10,
 			"waitBetweenEachCommand": 100
 		}]
