@@ -594,6 +594,7 @@ namespace CrewChiefV4
                         case GameEnum.PCARS_32BIT:
                         case GameEnum.PCARS2:
                         case GameEnum.PCARS_NETWORK:
+                        case GameEnum.PCARS2_NETWORK:
                             classNamesPropName = "pCarsClassNames";
                             regexsPropName = "pCarsClassNamesRegexs";
                             break;

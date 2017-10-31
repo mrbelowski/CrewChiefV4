@@ -313,7 +313,8 @@ namespace CrewChiefV4.Events
                     int preLightsMessageCount = CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_32BIT ||
                                                 CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_64BIT ||
                                                 CrewChief.gameDefinition.gameEnum == GameEnum.PCARS2 ||
-                                                CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_NETWORK ? 1 : 2;
+                                                CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_NETWORK ||
+                                                CrewChief.gameDefinition.gameEnum == GameEnum.PCARS2_NETWORK ? 1 : 2;
                     if (!playedPreLightsMessage && currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.SessionPhase == SessionPhase.Gridwalk &&
                         (playPreLightsInRaceroom || CrewChief.gameDefinition.gameEnum != GameEnum.RACE_ROOM))
                     {

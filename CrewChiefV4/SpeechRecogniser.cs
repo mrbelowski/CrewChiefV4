@@ -621,7 +621,7 @@ namespace CrewChiefV4
             {
                 // in toggle mode, we're now waiting-for-speech until we get another result or the button is released
                 waitingForSpeech = true;
-             }
+            }
         }
 
         public void recognizeAsync()
