@@ -75,6 +75,7 @@ namespace CrewChiefV4.PCars2
         private Dictionary<string, float> waitingForCarsToFinish = new Dictionary<string, float>();
         private DateTime nextDebugCheckeredToFinishMessageTime = DateTime.MinValue;
 
+        private static int lastGuessAtPlayerIndex = -1;
 
         public PCars2GameStateMapper()
         {
@@ -136,8 +137,25 @@ namespace CrewChiefV4.PCars2
 
         public static int getPlayerIndex(pCars2APIStruct pCars2APIStruct)
         {
-            // do we need to do anything clever to get this?
-            return 0;
+            // we have no idea where in the participants array the local player is. No idea at all. And there's no way to work it out.
+            // Offline it's generally 0. Online it can be anything. We can't use mViewedParticipantIndex here because monitoring other
+            // cars will fck up the internal state. mViewedParticipantIndex is random and wrong when you first enter a session so we 
+            // can't grab and reuse the first value we get.
+            //
+            // If we're 'playing' assume we're the player:
+            if (pCars2APIStruct.mGameState == (uint) eGameState.GAME_INGAME_PLAYING)
+            {
+                lastGuessAtPlayerIndex = pCars2APIStruct.mViewedParticipantIndex;
+                //Console.WriteLine("Playing, updating player index guess to " + pCars2APIStruct.mViewedParticipantIndex + 
+                //    " player name " + StructHelper.getNameFromBytes(pCars2APIStruct.mParticipantData[lastGuessAtPlayerIndex].mName));                
+            }
+            // if we've never played in this session, return what the game tells us:
+            if (lastGuessAtPlayerIndex == -1)
+            {
+                // all we can do here is report what the game tells us, even though it'll be wrong
+                return pCars2APIStruct.mViewedParticipantIndex;
+            }
+            return lastGuessAtPlayerIndex;
         }
 
         public GameStateData mapToGameStateData(Object memoryMappedFileStruct, GameStateData previousGameState)
@@ -268,6 +286,7 @@ namespace CrewChiefV4.PCars2
                         lastSessionTrack == null || lastSessionTrack.name != currentGameState.SessionData.TrackDefinition.name ||
                             (currentGameState.SessionData.SessionHasFixedTime && currentGameState.SessionData.SessionTimeRemaining > lastSessionTimeRemaining + 1))))
             {
+                lastGuessAtPlayerIndex = -1;
                 Console.WriteLine("New session, trigger...");
                 if (sessionOfSameTypeRestarted)
                 {
