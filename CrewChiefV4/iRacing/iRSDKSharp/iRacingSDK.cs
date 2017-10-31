@@ -181,7 +181,7 @@ namespace iRSDKSharp
             {
                 byte[] data = new byte[Header.SessionInfoLength];
                 FileMapView.ReadArray<byte>(Header.SessionInfoOffset, data, 0, Header.SessionInfoLength);
-                return System.Text.Encoding.UTF8.GetString(data).TrimEnd(new char[] { '\0' });
+                return System.Text.Encoding.Default.GetString(data).TrimEnd(new char[] { '\0' });
             }
             return null;
         }
