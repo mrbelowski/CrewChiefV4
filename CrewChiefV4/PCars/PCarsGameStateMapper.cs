@@ -1068,8 +1068,12 @@ namespace CrewChiefV4.PCars
 
             currentGameState.PitData.IsAtPitExit = previousGameState != null && currentGameState.PitData.OnOutLap && 
                 previousGameState.PitData.InPitlane && !currentGameState.PitData.InPitlane;
-            
-            currentGameState.PitData.HasRequestedPitStop = shared.mPitSchedule == (int)ePitSchedule.PIT_SCHEDULE_STANDARD;
+
+            if (CrewChief.gameDefinition.gameEnum != GameEnum.PCARS_NETWORK)
+            {
+                // broken pit schedule data in pcars1 UDP
+                currentGameState.PitData.HasRequestedPitStop = shared.mPitSchedule == (int)ePitSchedule.PIT_SCHEDULE_STANDARD;
+            }
             if (currentGameState.SessionData.SessionType == SessionType.Race && shared.mEnforcedPitStopLap > 0 && enablePCarsPitWindowStuff)
             {
                 currentGameState.PitData.HasMandatoryPitStop = true;
@@ -1112,8 +1116,13 @@ namespace CrewChiefV4.PCars
             currentGameState.FuelData.FuelPressure = shared.mFuelPressureKPa;
             currentGameState.FuelData.FuelUseActive = true;         // no way to tell if it's disabled
 
-            currentGameState.PenaltiesData.HasDriveThrough = shared.mPitSchedule == (int)ePitSchedule.PIT_SCHEDULE_DRIVE_THROUGH;
-            currentGameState.PenaltiesData.HasStopAndGo = shared.mPitSchedule == (int)ePitSchedule.PIT_SCHEDULE_STOP_GO;
+            if (CrewChief.gameDefinition.gameEnum != GameEnum.PCARS_NETWORK)
+            {
+                // broken pitschedule data in pcars1 UDP
+                currentGameState.PenaltiesData.HasDriveThrough = shared.mPitSchedule == (int)ePitSchedule.PIT_SCHEDULE_DRIVE_THROUGH;
+                currentGameState.PenaltiesData.HasStopAndGo = shared.mPitSchedule == (int)ePitSchedule.PIT_SCHEDULE_STOP_GO;
+            }
+
 
             currentGameState.PositionAndMotionData.CarSpeed = shared.mSpeed;
 
@@ -1687,6 +1696,7 @@ namespace CrewChiefV4.PCars
                     if (pitSchedule == (uint)ePitSchedule.PIT_SCHEDULE_STANDARD &&
                         (pitMode == (uint)ePitMode.PIT_MODE_DRIVING_INTO_PITS || pitMode == (uint)ePitMode.PIT_MODE_IN_PIT))
                     {
+                        // pcars1 UDP pit schedule is broken - this may be unsafe:
                         return PitWindow.StopInProgress;
                     }
                     else
