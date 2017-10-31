@@ -112,7 +112,12 @@ namespace CrewChiefV4.PCars2
             if (enabled && currentState.mNumParticipants > 1 && 
                 (enableSpotterInTimetrial || currentState.mSessionState != (uint)eSessionState.SESSION_TIME_ATTACK))
             {
-                pCars2APIParticipantStruct playerData = currentState.mParticipantData[currentState.mViewedParticipantIndex];
+                int playerIndex = PCars2GameStateMapper.getPlayerIndex(currentState);
+                if (playerIndex != currentState.mViewedParticipantIndex)
+                {
+                    return;
+                }
+                pCars2APIParticipantStruct playerData = currentState.mParticipantData[playerIndex];
                 if (currentGameState != null)
                 {
                     var carClass = currentGameState.carClass;
@@ -135,7 +140,7 @@ namespace CrewChiefV4.PCars2
 
                     for (int i = 0; i < currentState.mParticipantData.Count(); i++)
                     {
-                        if (i == currentState.mViewedParticipantIndex)
+                        if (i == playerIndex)
                         {
                             continue;
                         }
