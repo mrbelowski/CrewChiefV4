@@ -1,4 +1,5 @@
 ﻿using CrewChiefV4.PCars;
+using CrewChiefV4.PCars2;
 using SharpDX.DirectInput;
 using System;
 using System.Collections.Generic;
@@ -135,9 +136,19 @@ namespace CrewChiefV4
                 }
                 else if (ba.controller.guid == UDP_NETWORK_CONTROLLER_GUID)
                 {
-                    if (PCarsUDPreader.getButtonState(ba.buttonIndex))
+                    if (CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_NETWORK)
                     {
-                        ba.hasUnprocessedClick = true;
+                        if (PCarsUDPreader.getButtonState(ba.buttonIndex))
+                        {
+                            ba.hasUnprocessedClick = true;
+                        }
+                    }
+                    else if (CrewChief.gameDefinition.gameEnum == GameEnum.PCARS2_NETWORK)
+                    {
+                        if (PCars2UDPreader.getButtonState(ba.buttonIndex))
+                        {
+                            ba.hasUnprocessedClick = true;
+                        }
                     }
                 }
             }
@@ -392,9 +403,14 @@ namespace CrewChiefV4
                     {
                         // ignore this exception
                     }
-                } else if (ba.controller.guid == UDP_NETWORK_CONTROLLER_GUID)
+                }
+                else if (ba.controller.guid == UDP_NETWORK_CONTROLLER_GUID && CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_NETWORK)
                 {
                     return PCarsUDPreader.getButtonState(ba.buttonIndex);
+                }
+                else if (ba.controller.guid == UDP_NETWORK_CONTROLLER_GUID && CrewChief.gameDefinition.gameEnum == GameEnum.PCARS2_NETWORK)
+                {
+                    return PCars2UDPreader.getButtonState(ba.buttonIndex);
                 }
             }
             return false;
@@ -469,8 +485,17 @@ namespace CrewChiefV4
             Boolean gotAssignment = false;
             if (controllerData.guid == UDP_NETWORK_CONTROLLER_GUID)
             {
-                PCarsUDPreader gameDataReader = (PCarsUDPreader)GameStateReaderFactory.getInstance().getGameStateReader(GameDefinition.pCarsNetwork);
-                int assignedButton = gameDataReader.getButtonIndexForAssignment();
+                int assignedButton;
+                if (CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_NETWORK)
+                {
+                    PCarsUDPreader gameDataReader = (PCarsUDPreader)GameStateReaderFactory.getInstance().getGameStateReader(GameDefinition.pCarsNetwork);
+                    assignedButton = gameDataReader.getButtonIndexForAssignment();
+                }
+                else
+                {
+                    PCars2UDPreader gameDataReader = (PCars2UDPreader)GameStateReaderFactory.getInstance().getGameStateReader(GameDefinition.pCars2Network);
+                    assignedButton = gameDataReader.getButtonIndexForAssignment();
+                }
                 if (assignedButton != -1)
                 {
                     removeAssignmentsForControllerAndButton(controllerData.guid, assignedButton);

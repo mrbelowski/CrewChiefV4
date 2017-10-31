@@ -116,7 +116,8 @@ namespace CrewChiefV4.Events
             if (CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_32BIT ||
                 CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_64BIT ||
                 CrewChief.gameDefinition.gameEnum == GameEnum.PCARS2 ||
-                CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_NETWORK)
+                CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_NETWORK ||
+                CrewChief.gameDefinition.gameEnum == GameEnum.PCARS2_NETWORK)
             {
                 // Hooray for PCars and its broken data
                 float distanceStartCheckPoint;

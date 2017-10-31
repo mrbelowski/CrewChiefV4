@@ -365,7 +365,7 @@
 		},
 		{
 			"carClassEnum": "FORMULA_RENAULT",
-			"pCarsClassNames": ["Forumula Renault"],
+			"pCarsClassNames": ["Formula Renault"],
 			"rf2ClassNames": ["FR3.5*"],
 			"acClassNames": ["vsfr-formularenault35_2014_hdf", "vsfr-formularenault35_2014_ldf", "vsfr-formularenault35_2014_mdf"],
 			"brakeType": "Carbon",

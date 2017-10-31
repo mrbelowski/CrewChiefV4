@@ -47,7 +47,7 @@ namespace CrewChiefV4.GameState
 
         public static List<MessageTypes> defaultEnabledMessageTypes = new List<MessageTypes> { 
             MessageTypes.TYRE_TEMPS, MessageTypes.TYRE_WEAR, MessageTypes.BRAKE_TEMPS, MessageTypes.BRAKE_DAMAGE, MessageTypes.FUEL, MessageTypes.LOCKING_AND_SPINNING };
-        public static List<MessageTypes> enabledMessageTypes = new List<MessageTypes>();
+        public static List<MessageTypes> enabledMessageTypes = defaultEnabledMessageTypes;
         
         public static void UpdateFromCarClass(CarData.CarClass carClass) 
         {
@@ -75,6 +75,7 @@ namespace CrewChiefV4.GameState
                     case GameEnum.PCARS_32BIT:
                     case GameEnum.PCARS2:
                     case GameEnum.PCARS_NETWORK:
+                    case GameEnum.PCARS2_NETWORK:
                         spotterVehicleLength = UserSettings.GetUserSettings().getFloat("pcars_spotter_car_length");
                         break;
                     case GameEnum.RF1:

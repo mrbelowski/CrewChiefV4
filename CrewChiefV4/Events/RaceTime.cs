@@ -175,7 +175,7 @@ namespace CrewChiefV4.Events
                 }
                 // Console.WriteLine("Session time left = " + timeLeft + " SessionRunningTime = " + currentGameState.SessionData.SessionRunningTime);
                 if (!currentGameState.SessionData.HasExtraLap && 
-                    currentGameState.SessionData.SessionRunningTime >= 0 && !played0mins && timeLeft <= 0.2)
+                    currentGameState.SessionData.SessionRunningTime > 0 && !played0mins && timeLeft <= 0.2)
                 {
                     played0mins = true;
                     played2mins = true;
