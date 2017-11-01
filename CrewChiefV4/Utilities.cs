@@ -8,7 +8,7 @@ namespace CrewChiefV4
 {
     public static class Utilities
     {
-        public static Random random { get; private set; } = new Random();
+        public static Random random = new Random();
 
         public static bool IsGameRunning(String processName, String[] alternateProcessNames)
         {
