@@ -367,7 +367,7 @@ namespace CrewChiefV4.iRacing
                     float sectorTime = (float)playerCar.CurrentResults.FakeSector3.SectorTime;
                     if (sectorTime > 0 && previousGameState != null && previousGameState.SessionData.CurrentLapIsValid)
                     {
-                        //Console.WriteLine("sector 3 time: " + TimeSpan.FromSeconds(sectorTime).ToString(@"mm\:ss\.fff"));
+                        Console.WriteLine("sector 3 time: " + TimeSpan.FromSeconds(sectorTime).ToString(@"mm\:ss\.fff"));
                         currentGameState.SessionData.LastSector3Time = sectorTime;
                         if (currentGameState.SessionData.PlayerBestSector3Time == -1 || currentGameState.SessionData.LastSector3Time < currentGameState.SessionData.PlayerBestSector3Time)
                         {
@@ -393,7 +393,7 @@ namespace CrewChiefV4.iRacing
 
                     if (sectorTime > 0 && previousGameState != null && previousGameState.SessionData.CurrentLapIsValid)
                     {
-                        //Console.WriteLine("sector 1 time: " + TimeSpan.FromSeconds(sectorTime).ToString(@"mm\:ss\.fff"));
+                        Console.WriteLine("sector 1 time: " + TimeSpan.FromSeconds(sectorTime).ToString(@"mm\:ss\.fff"));
                         currentGameState.SessionData.LastSector1Time = sectorTime;
                         if (currentGameState.SessionData.PlayerBestSector1Time == -1 || currentGameState.SessionData.LastSector1Time < currentGameState.SessionData.PlayerBestSector1Time)
                         {
@@ -415,7 +415,7 @@ namespace CrewChiefV4.iRacing
 
                     if (sectorTime > 0 && previousGameState != null && previousGameState.SessionData.CurrentLapIsValid)
                     {
-                        //Console.WriteLine("sector 2 time: " + TimeSpan.FromSeconds(sectorTime).ToString(@"mm\:ss\.fff"));
+                        Console.WriteLine("sector 2 time: " + TimeSpan.FromSeconds(sectorTime).ToString(@"mm\:ss\.fff"));
                         currentGameState.SessionData.LastSector2Time = sectorTime;
                         if (currentGameState.SessionData.PlayerBestSector2Time == -1 || currentGameState.SessionData.LastSector2Time < currentGameState.SessionData.PlayerBestSector2Time)
                         {
@@ -805,13 +805,13 @@ namespace CrewChiefV4.iRacing
                 opponentData.NumPitStops++;
             }
             opponentData.InPits = isInPits;
-            bool hasNewLapData = opponentData.HasNewLapData(previousOpponentData, sector, completedLapTime, 3);
+            bool hasNewLapData = opponentData.HasNewLapData(previousOpponentData, sector, completedLapTime, 3) || opponentData.OpponentLapData.Count <=0;
             if (hasNewLapData)
             {
                 if (opponentData.OpponentLapData.Count > 0)
                 {
                     opponentData.CompleteLapWithProvidedLapTime(racePosition, sessionRunningTime, completedLapTime,
-                        lapIsValid && validSpeed, false, trackTempreture, airTemperature, sessionLengthIsTime, sessionTimeRemaining, 3);
+                        /*lapIsValid && validSpeed*/ true, false, trackTempreture, airTemperature, sessionLengthIsTime, sessionTimeRemaining, 3);
                 }
                 opponentData.StartNewLap(completedLaps + 1, racePosition, isInPits, sessionRunningTime, false, trackTempreture, airTemperature);
                 opponentData.IsNewLap = true;
@@ -912,7 +912,7 @@ namespace CrewChiefV4.iRacing
                         }
                     }
                 }
-                else if (sessionFlags.HasFlag(SessionFlags.StartReady) || sessionFlags.HasFlag(SessionFlags.StartSet))
+                else if (sessionFlags.HasFlag(SessionFlags.StartReady) || sessionFlags.HasFlag(SessionFlags.StartSet) || SessionStates.Racing != sessionState && isReplay )
                 {
                     // don't allow a transition to Countdown if the game time has increased
                     //if (lastSessionRunningTime < thisSessionRunningTime)
