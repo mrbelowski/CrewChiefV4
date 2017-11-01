@@ -55,11 +55,11 @@ namespace CrewChiefV4.Events
         public static String folderMandatoryPitStopsMissedStop = "mandatory_pit_stops/missed_stop";
 
         // pit stop messages
-        private String folderApproachingPits = "mandatory_pit_stops/approaching_pits";
+        private String folderWatchYourPitSpeed = "mandatory_pit_stops/watch_your_pit_speed";
         private String folderPitCrewReady = "mandatory_pit_stops/pit_crew_ready";
-        private String folderPitCrewDone = "mandatory_pit_stops/pit_crew_done";
-        private String folderPitStopRequestReceived = "mandatory_pit_stops/pit_stop_request_received";
-        private String folderPitStopRequestCancelled = "mandatory_pit_stops/pit_stop_request_cancelled";
+        private String folderStopCompleteGo = "mandatory_pit_stops/stop_complete_go";
+        private String folderPitStopRequestReceived = "mandatory_pit_stops/pit_stop_requested";
+        private String folderPitStopRequestCancelled = "mandatory_pit_stops/pit_request_cancelled";
 
         private int pitWindowOpenLap;
 
@@ -518,7 +518,7 @@ namespace CrewChiefV4.Events
                 {
                     Console.WriteLine("PIT STOPS: WATCH YOUR SPEED IN PITS");
                     // Temporary message.
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderEngageLimiter, 0, this));
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderWatchYourPitSpeed, 0, this));
                 }
                 if (!previousGameState.PitData.IsPitCrewReady
                     && currentGameState.PitData.IsPitCrewReady)
@@ -528,7 +528,7 @@ namespace CrewChiefV4.Events
                 if (!previousGameState.PitData.IsPitCrewDone
                     && currentGameState.PitData.IsPitCrewDone)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(LapCounter.folderGreenGreenGreen, 0, this));
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderStopCompleteGo, 0, this));
                 }
                 if (!previousGameState.PitData.HasRequestedPitStop
                     && currentGameState.PitData.HasRequestedPitStop
@@ -537,6 +537,7 @@ namespace CrewChiefV4.Events
                     Console.WriteLine("PIT STOPS: REQUESTED PIT STOP");
                     timeOfPitRequestOrCancel = currentGameState.Now;
                     // TODO: should be random delayed  (1-3 secs) and validated, because comes from the button.
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderPitStopRequestReceived, 0, this));
                 }
                 if (!currentGameState.PitData.InPitlane && !previousGameState.PitData.InPitlane  // Make sure we're not in pits.  More checks might be needed.
                     && previousGameState.PitData.HasRequestedPitStop
@@ -546,6 +547,7 @@ namespace CrewChiefV4.Events
                     Console.WriteLine("PIT STOPS: CANCELLED PIT STOP REQUEST");
                     timeOfPitRequestOrCancel = currentGameState.Now;
                     // TODO: should be random delayed  (1-3 secs) and validated, because comes from the button.
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderPitStopRequestCancelled, 0, this));
                 }
             }
 

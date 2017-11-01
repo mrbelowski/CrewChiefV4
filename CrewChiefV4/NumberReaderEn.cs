@@ -41,6 +41,7 @@ namespace CrewChiefV4.NumberProcessing
         private static String folderMinute = "numbers/minute"; 
         private static String folderHours = "numbers/hours";
         private static String folderHour = "numbers/hour";
+        private static String folderMinus = "numbers/minus";
 
         protected override String getLocale()
         {
@@ -268,9 +269,20 @@ namespace CrewChiefV4.NumberProcessing
         /**
          * Get an English sound for an Integer from 0 to 99999.
          */
-        protected override List<String> GetIntegerSounds(char[] digits, Boolean allowShortHundredsForThisNumber)
+        protected override List<String> GetIntegerSounds(char[] rawDigits, Boolean allowShortHundredsForThisNumber)
         {
             List<String> messages = new List<String>();
+            char[] digits;
+            if (rawDigits.Length >= 2 && rawDigits[0] == '-')
+            {
+                digits = new char[rawDigits.Length - 1];
+                Array.Copy(rawDigits, 1, digits, 0, digits.Length);
+                messages.Add(folderMinus);
+            }
+            else
+            {
+                digits = rawDigits;
+            }            
             // if this is just zero, return a list with just "zero"
             if (digits.Length == 0 || (digits.Length == 1 && digits[0] == '0'))
             {

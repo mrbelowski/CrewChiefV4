@@ -163,6 +163,7 @@
 		{
 			"description": "pcars2 select strat 1",
 			"gameDefinition": "PCARS2",
+			"confirmationMessage": "acknowledge/pit_strategy_1",
 			"actionSequence": [ "Car Management", "ICM Menu Up", "ICM Menu Right", "ICM Menu Down", "ICM Menu Right", "ICM Menu Down", "ICM Menu Right", "ICM Menu Up", "ICM Menu Right", "ICM Menu Up", "ICM Menu Right", "ICM Menu Down", "ICM Menu Right"],
 			"keyPressTime": 30,
 			"waitBetweenEachCommand": 100
@@ -177,6 +178,7 @@
 		{
 			"description": "pcars2 select strat 2",
 			"gameDefinition": "PCARS2",
+			"confirmationMessage": "acknowledge/pit_strategy_2",
 			"actionSequence": [ "Car Management", "ICM Menu Up", "ICM Menu Right", "ICM Menu Down", "ICM Menu Right", "ICM Menu Down", "ICM Menu Down", "ICM Menu Right", "ICM Menu Up", "ICM Menu Up", "ICM Menu Right", "ICM Menu Up", "ICM Menu Right", "ICM Menu Down", "ICM Menu Right" ],
 			"keyPressTime": 30,
 			"waitBetweenEachCommand": 100
@@ -191,6 +193,7 @@
 		{
 			"description": "pcars2 select strat 3",
 			"gameDefinition": "PCARS2",
+			"confirmationMessage": "acknowledge/pit_strategy_3",
 			"actionSequence": [ "Car Management", "ICM Menu Up", "ICM Menu Right", "ICM Menu Down", "ICM Menu Right", "ICM Menu Down", "ICM Menu Down", "ICM Menu Down", "ICM Menu Right", "ICM Menu Up", "ICM Menu Up", "ICM Menu Right", "ICM Menu Up", "ICM Menu Right", "ICM Menu Down", "ICM Menu Right" ],
 			"keyPressTime": 30,
 			"waitBetweenEachCommand": 100
@@ -205,6 +208,7 @@
 		{
 			"description": "pcars2 select strat 4",
 			"gameDefinition": "PCARS2",
+			"confirmationMessage": "acknowledge/pit_strategy_4",
 			"actionSequence": [ "Car Management", "ICM Menu Up", "ICM Menu Right", "ICM Menu Down", "ICM Menu Right", "ICM Menu Down", "ICM Menu Down", "ICM Menu Down", "ICM Menu Down", "ICM Menu Right", "ICM Menu Up", "ICM Menu Up", "ICM Menu Right", "ICM Menu Up", "ICM Menu Right", "ICM Menu Down", "ICM Menu Right" ],
 			"keyPressTime": 30,
 			"waitBetweenEachCommand": 100

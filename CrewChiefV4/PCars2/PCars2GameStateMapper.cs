@@ -633,7 +633,6 @@ namespace CrewChiefV4.PCars2
                                     Boolean previousOpponentIsExitingPits = false;
 
                                     float[] previousOpponentWorldPosition = new float[] { 0, 0, 0 };
-                                    float previousOpponentSpeed = 0;
                                     float previousDistanceRoundTrack = 0;
                                     OpponentData previousOpponentData = null;
                                     if (previousGameState.OpponentData.ContainsKey(participantName))
@@ -645,7 +644,6 @@ namespace CrewChiefV4.PCars2
                                         previousOpponentIsEnteringPits = previousOpponentData.isEnteringPits();
                                         previousOpponentIsExitingPits = previousOpponentData.isExitingPits();
                                         previousOpponentWorldPosition = previousOpponentData.WorldPosition;
-                                        previousOpponentSpeed = previousOpponentData.Speed;
                                         previousDistanceRoundTrack = previousOpponentData.DistanceRoundTrack;
                                     }
 
@@ -702,7 +700,7 @@ namespace CrewChiefV4.PCars2
                                     updateOpponentData(currentOpponentData, participantName, currentOpponentRacePosition, currentOpponentLapsCompleted,
                                             currentOpponentSector, isEnteringPits, isInPits, isLeavingPits, currentGameState.SessionData.SessionRunningTime, secondsSinceLastUpdate,
                                             new float[] { participantStruct.mWorldPosition[0], participantStruct.mWorldPosition[2] }, previousOpponentWorldPosition,
-                                            previousOpponentSpeed, shared.mWorldFastestLapTime, shared.mWorldFastestSector1Time, shared.mWorldFastestSector2Time, shared.mWorldFastestSector3Time, 
+                                            shared.mSpeeds[i], shared.mWorldFastestLapTime, shared.mWorldFastestSector1Time, shared.mWorldFastestSector2Time, shared.mWorldFastestSector3Time, 
                                             participantStruct.mCurrentLapDistance, shared.mRainDensity == 1,
                                             shared.mAmbientTemperature, shared.mTrackTemperature, opponentCarClass,
                                             currentGameState.SessionData.SessionHasFixedTime, currentGameState.SessionData.SessionTimeRemaining,
@@ -1069,7 +1067,7 @@ namespace CrewChiefV4.PCars2
         private void updateOpponentData(OpponentData opponentData, String name, int racePosition, int completedLaps, int sector, Boolean isEnteringPits,
             Boolean isInPits, Boolean isLeavingPits,
             float sessionRunningTime, float secondsSinceLastUpdate, float[] currentWorldPosition, float[] previousWorldPosition,
-            float previousSpeed, float worldRecordLapTime, float worldRecordS1Time, float worldRecordS2Time, float worldRecordS3Time, 
+            float speed, float worldRecordLapTime, float worldRecordS1Time, float worldRecordS2Time, float worldRecordS3Time, 
             float distanceRoundTrack, Boolean isRaining, float trackTemp, float airTemp, CarData.CarClass carClass,
             Boolean sessionLengthIsTime, float sessionTimeRemaining, float lastSectorTime, Boolean lapInvalidated)
         {
@@ -1083,15 +1081,6 @@ namespace CrewChiefV4.PCars2
                 }
             }
             opponentData.DistanceRoundTrack = distanceRoundTrack;
-            float speed;
-            if (secondsSinceLastUpdate == 0)
-            {
-                speed = opponentData.Speed;
-            }
-            else
-            {
-                speed = (float)Math.Sqrt(Math.Pow(currentWorldPosition[0] - previousWorldPosition[0], 2) + Math.Pow(currentWorldPosition[1] - previousWorldPosition[1], 2)) / secondsSinceLastUpdate;
-            }
             opponentData.Speed = speed;
             opponentData.Position = racePosition;
             opponentData.UnFilteredPosition = racePosition;

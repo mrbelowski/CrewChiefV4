@@ -163,7 +163,7 @@ namespace CrewChiefV4
          */
         public List<String> GetIntegerSounds(int integer, Boolean allowShortHundredsForThisNumber)
         {
-            if (integer >= 0 && integer <= 99999)
+            if (integer >= -99999 && integer <= 99999)
             {
                 return GetIntegerSounds(integer.ToString().ToCharArray(), allowShortHundredsForThisNumber);
             }
