@@ -746,6 +746,8 @@ namespace CrewChiefV4.Audio
                                 eventName == lastImmediateMessageName && GameStateData.CurrentTime - lastImmediateMessageTime < TimeSpan.FromSeconds(5);
                             if (messageHasExpired || !messageIsStillValid || hasJustPlayedAsAnImmediateMessage)
                             {
+                                Console.WriteLine("skipping message " + eventName +
+                                    ", messageHasExpired:" + messageHasExpired + ", messageIsStillValid:" + messageIsStillValid + ", hasJustPlayedAsAnImmediateMessage:" + hasJustPlayedAsAnImmediateMessage);
                                 soundsProcessed.Add(eventName);
                                 continue;
                             }
@@ -779,6 +781,10 @@ namespace CrewChiefV4.Audio
                                     soundCache.Play(eventName);
                                     timeOfLastMessageEnd = GameStateData.CurrentTime;
                                 }
+                                else
+                                {
+                                    Console.WriteLine("Skipping message " + eventName + " because we're muted");
+                                }
                             }
                         }
                         else
@@ -798,6 +804,10 @@ namespace CrewChiefV4.Audio
                                 }
                                 soundCache.Play(thisMessage.messageFolders);
                                 timeOfLastMessageEnd = GameStateData.CurrentTime;
+                            }
+                            else
+                            {
+                                Console.WriteLine("Skipping message " + eventName + " because we're muted");
                             }
                             if (playedMessagesCount.ContainsKey(eventName))
                             {
