@@ -182,7 +182,7 @@ namespace CrewChiefV4.NumberProcessing
                     // the "seconds", sometimes not
                     if (tenths > 0)
                     {
-                        if (random.NextDouble() > 0.5)
+                        if (Utilities.random.NextDouble() > 0.5)
                         {
                             messages.Add(folderPoint + tenths + "seconds");
                         }
@@ -207,7 +207,7 @@ namespace CrewChiefV4.NumberProcessing
         protected override String GetSecondsWithTenths(int seconds, int tenths)
         {
             // sometimes include "seconds" if it's less than 10
-            if (seconds > 0 && seconds < 10 && random.NextDouble() <= 0.5)
+            if (seconds > 0 && seconds < 10 && Utilities.random.NextDouble() <= 0.5)
             {
                 return folderNumbersStub + seconds + "point" + tenths + "seconds";
             }
@@ -364,7 +364,7 @@ namespace CrewChiefV4.NumberProcessing
                     if (tensAndUnits != null)
                     {
                         // if there's a thousand, or we're saying something like "13 hundred", then always use the long version
-                        if (!global_allow_short_hundreds || hundreds.Length == 2 || thousands != null || !allowShortHundredsForThisNumber || random.NextDouble() > 0.6)
+                        if (!global_allow_short_hundreds || hundreds.Length == 2 || thousands != null || !allowShortHundredsForThisNumber || Utilities.random.NextDouble() > 0.6)
                         {
                             if (say_and_between_hundred_and_units)
                             {

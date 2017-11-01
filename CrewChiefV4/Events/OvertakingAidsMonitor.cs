@@ -18,8 +18,6 @@ namespace CrewChiefV4.Events
         public static String folderGuyBehindHasDRS = "overtaking_aids/guy_behind_has_drs";
         public static String folderPushToPassNowAvailable = "overtaking_aids/push_to_pass_now_available";
 
-        private Random random = new Random();
-
         private Boolean hasUsedDrsOnThisLap = false;    // Note that DTM 2015 experience has 3 DRS activations per lap - only moans if we've used none of them
         private Boolean drsAvailableOnThisLap = false;
         private float trackDistanceToCheckDRSGapFrontAt = -1;
@@ -104,7 +102,7 @@ namespace CrewChiefV4.Events
                 {
                     string opponentBehindKey = currentGameState.getOpponentKeyBehind(false);
                     playedOpponentHasDRSOnThisLap = true;
-                    if (random.NextDouble() >= 0.4 && opponentBehindKey != null && !currentGameState.OpponentData[opponentBehindKey].isEnteringPits() &&
+                    if (Utilities.random.NextDouble() >= 0.4 && opponentBehindKey != null && !currentGameState.OpponentData[opponentBehindKey].isEnteringPits() &&
                         !currentGameState.OpponentData[opponentBehindKey].isExitingPits()) { 
                         audioPlayer.playMessage(new QueuedMessage("opponent_has_drs", MessageContents(folderGuyBehindHasDRS), 0, this));                        
                     }

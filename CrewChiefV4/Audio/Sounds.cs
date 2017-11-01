@@ -13,7 +13,6 @@ namespace CrewChiefV4.Audio
     public class SoundCache
     {
         public static String TTS_IDENTIFIER = "TTS_IDENTIFIER";
-        public static Random random = new Random();
         private Boolean useAlternateBeeps = UserSettings.GetUserSettings().getBoolean("use_alternate_beeps");
         public static Boolean useTTS = UserSettings.GetUserSettings().getBoolean("use_tts_for_missing_names");
         private double minSecondsBetweenPersonalisedMessages = (double)UserSettings.GetUserSettings().getInt("min_time_between_personalised_messages");
@@ -242,7 +241,7 @@ namespace CrewChiefV4.Audio
             {
                 // we can now select a personalised message, but we don't always do this - the probability is based 
                 // on the time since the last one
-                due = random.NextDouble() < (secondsSinceLastPersonalisedMessage / minSecondsBetweenPersonalisedMessages) - 1;
+                due = Utilities.random.NextDouble() < (secondsSinceLastPersonalisedMessage / minSecondsBetweenPersonalisedMessages) - 1;
             }
             return due;
         }
@@ -618,7 +617,7 @@ namespace CrewChiefV4.Audio
             while (n > 1)
             {
                 n--;
-                int k = SoundCache.random.Next(n + 1);
+                int k = Utilities.random.Next(n + 1);
                 int value = list[k];
                 list[k] = list[n];
                 list[n] = value;
