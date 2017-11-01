@@ -137,7 +137,6 @@ namespace CrewChiefV4
         public Boolean delayMessageResolution = false;
 
         public int secondsDelay;
-        private Random rand = new Random();
 
         // some snapshot of pertentent data at the point of creation, 
         // which can be validated before it actually gets played. E.g.

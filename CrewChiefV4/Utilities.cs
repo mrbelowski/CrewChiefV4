@@ -6,8 +6,10 @@ using System.Linq;
 
 namespace CrewChiefV4
 {
-    public class Utilities
+    public static class Utilities
     {
+        public static Random random { get; private set; } = new Random();
+
         public static bool IsGameRunning(String processName, String[] alternateProcessNames)
         {
             if (Process.GetProcessesByName(processName).Length > 0)

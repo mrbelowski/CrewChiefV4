@@ -70,8 +70,6 @@ namespace CrewChiefV4.Audio
         // if this is true, no 'green green green', 'get ready', or spotter messages are played
         private Boolean disableImmediateMessages = UserSettings.GetUserSettings().getBoolean("disable_immediate_messages");
 
-        private Random random = new Random();
-
         private OrderedDictionary queuedClips = new OrderedDictionary();
 
         private OrderedDictionary immediateClips = new OrderedDictionary();
@@ -868,7 +866,7 @@ namespace CrewChiefV4.Audio
                             backgroundDuration = (backgroundPlayer.NaturalDuration.TimeSpan.Minutes * 60) +
                                 backgroundPlayer.NaturalDuration.TimeSpan.Seconds;
                             //Console.WriteLine("Duration from file is " + backgroundDuration);
-                            backgroundOffset = random.Next(0, backgroundDuration - backgroundLeadout);
+                            backgroundOffset = Utilities.random.Next(0, backgroundDuration - backgroundLeadout);
                         }
                         //Console.WriteLine("Background offset = " + backgroundOffset);
                         backgroundPlayer.Position = TimeSpan.FromSeconds(backgroundOffset);

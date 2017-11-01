@@ -103,8 +103,6 @@ namespace CrewChiefV4.Events
 
         private Boolean hasBeenRefuelled = false;
 
-        private Random random = new Random();
-
         // checking if we need to read fuel messages involves a bit of arithmetic and stuff, so only do this every few seconds
         private DateTime nextFuelStatusCheck = DateTime.MinValue;
 
@@ -490,10 +488,10 @@ namespace CrewChiefV4.Events
                     QueuedMessage fuelEstimateMessage = new QueuedMessage("Fuel/estimate",
                             messageFragments, 0, null);
                     // play this immediately or play "stand by", and queue it to be played in a few seconds
-                    if (delayResponses && random.Next(10) >= 2 && SoundCache.availableSounds.Contains(AudioPlayer.folderStandBy))
+                    if (delayResponses && Utilities.random.Next(10) >= 2 && SoundCache.availableSounds.Contains(AudioPlayer.folderStandBy))
                     {
                         audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderStandBy, 0, null));
-                        int secondsDelay = Math.Max(5, random.Next(8));
+                        int secondsDelay = Math.Max(5, Utilities.random.Next(8));
                         audioPlayer.pauseQueue(secondsDelay);
                         fuelEstimateMessage.dueTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + (1000 * secondsDelay);
                         audioPlayer.playDelayedImmediateMessage(fuelEstimateMessage);
@@ -534,10 +532,10 @@ namespace CrewChiefV4.Events
                     QueuedMessage fuelEstimateMessage = new QueuedMessage("Fuel/estimate",
                             messageFragments, 0, null);
                     // play this immediately or play "stand by", and queue it to be played in a few seconds
-                    if (delayResponses && random.Next(10) >= 2 && SoundCache.availableSounds.Contains(AudioPlayer.folderStandBy))
+                    if (delayResponses && Utilities.random.Next(10) >= 2 && SoundCache.availableSounds.Contains(AudioPlayer.folderStandBy))
                     {
                         audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderStandBy, 0, null));
-                        int secondsDelay = Math.Max(5, random.Next(8));
+                        int secondsDelay = Math.Max(5, Utilities.random.Next(8));
                         audioPlayer.pauseQueue(secondsDelay);
                         fuelEstimateMessage.dueTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + (1000 * secondsDelay);
                         audioPlayer.playDelayedImmediateMessage(fuelEstimateMessage);

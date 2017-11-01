@@ -12,8 +12,6 @@ namespace CrewChiefV4.Events
         // can't play these messages as the GridWalk phase has bollocks data :(
         private Boolean playPreLightsInRaceroom = false;
 
-        private Random rand = new Random();
-
         public static String folderGreenGreenGreen = "lap_counter/green_green_green";
 
         // used in manual rolling starts (hack...)
@@ -219,7 +217,7 @@ namespace CrewChiefV4.Events
             if (possibleMessages.Count > 0)
             {
                 int played = 0;
-                var shuffled = possibleMessages.OrderBy(item => rand.Next());
+                var shuffled = possibleMessages.OrderBy(item => Utilities.random.Next());
                 foreach (var message in shuffled)
                 {
                     played++;

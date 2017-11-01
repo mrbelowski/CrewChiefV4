@@ -72,8 +72,6 @@ namespace CrewChiefV4
         
         protected abstract String getLocale();
 
-        protected Random random = new Random();
-
         /**
          * Convert a timeSpan to some sound files, using the current language's implementation.
          */

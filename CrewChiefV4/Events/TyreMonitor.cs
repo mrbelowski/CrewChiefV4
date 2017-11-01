@@ -235,8 +235,6 @@ namespace CrewChiefV4.Events
 
         private TimeSpan lockingAndSpinningCheckInterval = TimeSpan.FromSeconds(3);
 
-        private Random random = new Random();
-
         private Boolean lastBrakeTempCheckOK = true;
         private Boolean lastTyreTempCheckOK = true;
 
@@ -447,7 +445,7 @@ namespace CrewChiefV4.Events
                     currentGameState.carClass.carClassEnum != CarData.CarClassEnum.KART_F1 &&
                     currentGameState.carClass.carClassEnum != CarData.CarClassEnum.KART_JUNIOR;
 
-                if (random.Next(0, 1) == 0)
+                if (Utilities.random.Next(0, 1) == 0)
                 {
                     thisLapTyreConditionReportSector = 2;
                     thisLapTyreTempReportSector = 3;
@@ -516,19 +514,19 @@ namespace CrewChiefV4.Events
                                 {
                                     case WheelsLockedEnum.FRONTS:
                                         audioPlayer.playMessage(new QueuedMessage("corner_locking",
-                                            MessageContents(folderLockingFrontsForCornerWarning, "corners/" + currentGameState.SessionData.trackLandmarksTiming.atMidPointOfLandmark), random.Next(4, 8), this));
+                                            MessageContents(folderLockingFrontsForCornerWarning, "corners/" + currentGameState.SessionData.trackLandmarksTiming.atMidPointOfLandmark), Utilities.random.Next(4, 8), this));
                                         break;
                                     case WheelsLockedEnum.LEFT_FRONT:
                                         audioPlayer.playMessage(new QueuedMessage("corner_locking",
-                                            MessageContents(folderLockingLeftFrontForCornerWarning, "corners/" + currentGameState.SessionData.trackLandmarksTiming.atMidPointOfLandmark), random.Next(4, 8), this));
+                                            MessageContents(folderLockingLeftFrontForCornerWarning, "corners/" + currentGameState.SessionData.trackLandmarksTiming.atMidPointOfLandmark), Utilities.random.Next(4, 8), this));
                                         break;
                                     case WheelsLockedEnum.RIGHT_FRONT:
                                         audioPlayer.playMessage(new QueuedMessage("corner_locking",
-                                            MessageContents(folderLockingRightFrontForCornerWarning, "corners/" + currentGameState.SessionData.trackLandmarksTiming.atMidPointOfLandmark), random.Next(4, 8), this));
+                                            MessageContents(folderLockingRightFrontForCornerWarning, "corners/" + currentGameState.SessionData.trackLandmarksTiming.atMidPointOfLandmark), Utilities.random.Next(4, 8), this));
                                         break;
                                     case WheelsLockedEnum.REARS:
                                         audioPlayer.playMessage(new QueuedMessage("corner_locking",
-                                            MessageContents(folderLockingRearsForCornerWarning, "corners/" + currentGameState.SessionData.trackLandmarksTiming.atMidPointOfLandmark), random.Next(4, 8), this));
+                                            MessageContents(folderLockingRearsForCornerWarning, "corners/" + currentGameState.SessionData.trackLandmarksTiming.atMidPointOfLandmark), Utilities.random.Next(4, 8), this));
                                         break;
                                     default:
                                         break;
@@ -565,42 +563,42 @@ namespace CrewChiefV4.Events
                             {
                                 Console.WriteLine("Spinning fronts out of " + currentCornerName);
                                 audioPlayer.playMessage(new QueuedMessage("corner_spinning",
-                                    MessageContents(folderSpinningFrontsForCornerWarning, "corners/" + currentCornerName), random.Next(4, 8), this));
+                                    MessageContents(folderSpinningFrontsForCornerWarning, "corners/" + currentCornerName), Utilities.random.Next(4, 8), this));
                                 cornerSpinningWarningsPlayed[currentCornerName] = currentGameState.Now;
                             }
                             else if (leftRearCornerSpecificWheelSpinTime > cornerExitSpinningThreshold && rightRearCornerSpecificWheelSpinTime > cornerExitSpinningThreshold)
                             {
                                 Console.WriteLine("Spinning rears out of " + currentCornerName);
                                 audioPlayer.playMessage(new QueuedMessage("corner_spinning",
-                                    MessageContents(folderSpinningRearsForCornerWarning, "corners/" + currentCornerName), random.Next(4, 8), this));
+                                    MessageContents(folderSpinningRearsForCornerWarning, "corners/" + currentCornerName), Utilities.random.Next(4, 8), this));
                                 cornerSpinningWarningsPlayed[currentCornerName] = currentGameState.Now;
                             }
                             else if (leftFrontCornerSpecificWheelSpinTime > cornerExitSpinningThreshold)
                             {
                                 Console.WriteLine("Spinning left front out of " + currentCornerName);
                                 audioPlayer.playMessage(new QueuedMessage("corner_spinning",
-                                    MessageContents(folderSpinningLeftFrontForCornerWarning, "corners/" + currentCornerName), random.Next(4, 8), this));
+                                    MessageContents(folderSpinningLeftFrontForCornerWarning, "corners/" + currentCornerName), Utilities.random.Next(4, 8), this));
                                 cornerSpinningWarningsPlayed[currentCornerName] = currentGameState.Now;
                             }
                             else if (rightFrontCornerSpecificWheelSpinTime > cornerExitSpinningThreshold)
                             {
                                 Console.WriteLine("Spinning right front out of " + currentCornerName);
                                 audioPlayer.playMessage(new QueuedMessage("corner_spinning",
-                                    MessageContents(folderSpinningRightFrontForCornerWarning, "corners/" + currentCornerName), random.Next(4, 8), this));
+                                    MessageContents(folderSpinningRightFrontForCornerWarning, "corners/" + currentCornerName), Utilities.random.Next(4, 8), this));
                                 cornerSpinningWarningsPlayed[currentCornerName] = currentGameState.Now;
                             }
                             else if (leftRearCornerSpecificWheelSpinTime > cornerExitSpinningThreshold)
                             {
                                 Console.WriteLine("Spinning left rear out of " + currentCornerName);
                                 audioPlayer.playMessage(new QueuedMessage("corner_spinning",
-                                    MessageContents(folderSpinningLeftRearForCornerWarning, "corners/" + currentCornerName), random.Next(4, 8), this));
+                                    MessageContents(folderSpinningLeftRearForCornerWarning, "corners/" + currentCornerName), Utilities.random.Next(4, 8), this));
                                 cornerSpinningWarningsPlayed[currentCornerName] = currentGameState.Now;
                             }
                             else if (rightRearCornerSpecificWheelSpinTime > cornerExitSpinningThreshold)
                             {
                                 Console.WriteLine("Spinning right rear out of " + currentCornerName);
                                 audioPlayer.playMessage(new QueuedMessage("corner_spinning",
-                                    MessageContents(folderSpinningRightRearForCornerWarning, "corners/" + currentCornerName), random.Next(4, 8), this));
+                                    MessageContents(folderSpinningRightRearForCornerWarning, "corners/" + currentCornerName), Utilities.random.Next(4, 8), this));
                                 cornerSpinningWarningsPlayed[currentCornerName] = currentGameState.Now;
                             }
                         }
@@ -723,7 +721,7 @@ namespace CrewChiefV4.Events
                 else if (lastTyreTempMessage == null || !messagesHaveSameContent(lastTyreTempMessage, messageContents))
                 {
                     Console.WriteLine("Tyre temp warning, temps : "+ String.Join(", ", messageContents));
-                    audioPlayer.playMessage(new QueuedMessage("tyre_temps", messageContents, random.Next(0, 10), this));
+                    audioPlayer.playMessage(new QueuedMessage("tyre_temps", messageContents, Utilities.random.Next(0, 10), this));
                 }
             }
             lastTyreTempMessage = messageContents;
@@ -775,7 +773,7 @@ namespace CrewChiefV4.Events
                 }
                 else if (lastBrakeTempMessage == null || !messagesHaveSameContent(lastBrakeTempMessage, messageContents))
                 {
-                    audioPlayer.playMessage(new QueuedMessage("brake_temps", messageContents, random.Next(0, 10), this));
+                    audioPlayer.playMessage(new QueuedMessage("brake_temps", messageContents, Utilities.random.Next(0, 10), this));
                 }
             }
             lastBrakeTempMessage = messageContents;
@@ -797,10 +795,10 @@ namespace CrewChiefV4.Events
             if (playImmediately)
             {
                 // might be a "stand by..." response
-                if (delayResponses && random.Next(10) >= 2)
+                if (delayResponses && Utilities.random.Next(10) >= 2)
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderStandBy, 0, null));
-                    int secondsDelay = Math.Max(5, random.Next(11));
+                    int secondsDelay = Math.Max(5, Utilities.random.Next(11));
                     audioPlayer.pauseQueue(secondsDelay);
                     audioPlayer.playDelayedImmediateMessage(new QueuedMessage("tyre_condition", messageContents, secondsDelay, null));
                 }
@@ -812,7 +810,7 @@ namespace CrewChiefV4.Events
             else if (playEvenIfUnchanged || 
                 (lastTyreConditionMessage != null && !messagesHaveSameContent(lastTyreConditionMessage, messageContents) && !wearIsGood))
             {
-                audioPlayer.playMessage(new QueuedMessage("tyre_condition", messageContents, random.Next(0, 10), this));
+                audioPlayer.playMessage(new QueuedMessage("tyre_condition", messageContents, Utilities.random.Next(0, 10), this));
             }
             lastTyreConditionMessage = messageContents;
         }
@@ -1394,7 +1392,7 @@ namespace CrewChiefV4.Events
         private Boolean checkLocking()
         {
             Boolean playedMessage = false;
-            int messageDelay = random.Next(0, 5);
+            int messageDelay = Utilities.random.Next(0, 5);
             if (!warnedOnLockingForLap)
             {
                 if (timeLeftFrontIsLockedForLap > totalLockupThresholdForNextLap)
@@ -1468,7 +1466,7 @@ namespace CrewChiefV4.Events
         private Boolean checkWheelSpinning()
         {
             Boolean playedMessage = false;
-            int messageDelay = random.Next(0, 5);
+            int messageDelay = Utilities.random.Next(0, 5);
             if (!warnedOnWheelspinForLap)
             {
                 if (timeLeftFrontIsSpinningForLap > totalWheelspinThresholdForNextLap)
