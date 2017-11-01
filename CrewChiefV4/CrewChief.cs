@@ -423,7 +423,9 @@ namespace CrewChiefV4
                 }
                 dumpToFile = false;
             }
-            
+            SpeechRecogniser.waitingForSpeech = false;
+            SpeechRecogniser.gotRecognitionResult = false;
+            SpeechRecogniser.keepRecognisingInHoldMode = false;
             gameStateMapper = GameStateReaderFactory.getInstance().getGameStateMapper(gameDefinition);
             gameStateMapper.setSpeechRecogniser(speechRecogniser);
             gameDataReader = GameStateReaderFactory.getInstance().getGameStateReader(gameDefinition);
