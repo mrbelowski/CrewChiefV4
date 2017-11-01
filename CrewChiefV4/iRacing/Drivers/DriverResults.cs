@@ -88,6 +88,7 @@ namespace CrewChiefV4.iRacing
             this.FastestLap = -1;
             this.Time = -1;
             this.LastTime = -1;
+            this.FastestTime = -1;
             this.FakeSectorTimes = new[]
                     {
                         new Sector() {Number = 0, StartPercentage = 0f},
