@@ -2446,5 +2446,17 @@ namespace CrewChiefV4.Properties {
                 this["iracing_delayed_laptimes"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool pcars_enable_rain_prediction {
+            get {
+                return ((bool)(this["pcars_enable_rain_prediction"]));
+            }
+            set {
+                this["pcars_enable_rain_prediction"] = value;
+            }
+        }
     }
 }
