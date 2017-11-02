@@ -1257,6 +1257,8 @@ namespace CrewChiefV4.PCars
                 currentGameState.Conditions.addSample(currentGameState.Now, currentGameState.SessionData.CompletedLaps, currentGameState.SessionData.SectorNumber,
                     shared.mAmbientTemperature, shared.mTrackTemperature, shared.mRainDensity, shared.mWindSpeed, shared.mWindDirectionX, shared.mWindDirectionY, shared.mCloudBrightness);
             }
+            currentGameState.CloudBrightness = shared.mCloudBrightness;
+            currentGameState.RainDensity = shared.mRainDensity;
             return currentGameState;
         }
 

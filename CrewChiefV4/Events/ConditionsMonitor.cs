@@ -27,6 +27,7 @@ namespace CrewChiefV4.Events
         }
 
         private Boolean enableTrackAndAirTempReports = UserSettings.GetUserSettings().getBoolean("enable_track_and_air_temp_reports");
+        private Boolean enablePCarsRainPrediction = UserSettings.GetUserSettings().getBoolean("pcars_enable_rain_prediction");
 
         public static TimeSpan ConditionsSampleFrequency = TimeSpan.FromSeconds(10);
         private TimeSpan AirTemperatureReportMaxFrequency = TimeSpan.FromSeconds(UserSettings.GetUserSettings().getInt("ambient_temp_check_interval_seconds"));
@@ -194,7 +195,9 @@ namespace CrewChiefV4.Events
                         }
                     }
                     //pcars2 test warning
-                    if (CrewChief.gameDefinition.gameEnum == GameEnum.PCARS2)
+                    if (enablePCarsRainPrediction && 
+                        (CrewChief.gameDefinition.gameEnum == GameEnum.PCARS2 || CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_32BIT || 
+                         CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_64BIT || CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_NETWORK))
                     {
                         if (previousGameState != null && currentGameState.SessionData.SessionRunningTime > 10)
                         {
@@ -260,7 +263,6 @@ namespace CrewChiefV4.Events
                                 rainAtLastReport = currentGameState.RainDensity;
                                 lastRainReport = currentGameState.Now;
                                 audioPlayer.playMessage(new QueuedMessage(folderSeeingSomeRain, 0, this));
-                                Console.WriteLine("Rain at " + currentGameState.Now + " expected at " + timeWhenRainExpected + " cloudBrightness " + currentGameState.CloudBrightness);
                             }
                         }
                         else if (CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT)

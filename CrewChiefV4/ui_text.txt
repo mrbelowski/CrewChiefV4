@@ -476,3 +476,6 @@ enable_command_macros_help = Enable voice-triggered command macros for pit actio
 
 iracing_delayed_laptimes = iRacing delayed laptimes
 iracing_delayed_laptimes_help = Enables delayed but accurate laptimes for iRacing
+
+pcars_enable_rain_prediction = Enable PCars rain prediction using CloudBrightness
+pcars_enable_rain_prediction_help = Use CloudBrightness to guess when it might rain - can be quite inaccurate

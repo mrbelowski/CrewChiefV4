@@ -1025,7 +1025,6 @@ namespace CrewChiefV4.PCars2
             }
             currentGameState.CloudBrightness = shared.mCloudBrightness;
             currentGameState.RainDensity = shared.mRainDensity;
-            // Console.WriteLine("Rain: " + shared.mRainDensity + " cloud: " + shared.mCloudBrightness + " ambient " + shared.mAmbientTemperature + " track " + shared.mTrackTemperature);
             return currentGameState;
         }
 
