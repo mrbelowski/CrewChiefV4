@@ -194,7 +194,7 @@ namespace CrewChiefV4.PCars2
             }
             if (existingState.mLapsInvalidated == null)
             {
-                existingState.mLapsInvalidated = new bool[32];
+                existingState.mLapsInvalidated = new byte[32];
             }
             if (existingState.mPitModes == null)
             {
@@ -236,7 +236,7 @@ namespace CrewChiefV4.PCars2
 
                     // err... laps completed is missing?
                     // existingPartInfo.mLapsCompleted = (uint)newParticipantInfo.sLapsCompleted & 127;
-                    Boolean lapInvalidated = (newParticipantInfo.sRaceState >> 7) == 1;
+                    byte lapInvalidated = (byte)(newParticipantInfo.sRaceState >> 7);
                     existingState.mRaceStates[i] = (uint)newParticipantInfo.sRaceState & 127;
                     if (i == existingState.mViewedParticipantIndex)
                     {
@@ -271,7 +271,7 @@ namespace CrewChiefV4.PCars2
 
                     if (i == existingState.mViewedParticipantIndex)
                     {
-                        existingState.mLapInvalidated = lapInvalidated;
+                        existingState.mLapInvalidated = lapInvalidated == 1;
                         existingState.mHighestFlagColour = newParticipantInfo.sHighestFlag;
                     }
                 }
@@ -694,7 +694,7 @@ namespace CrewChiefV4.PCars2
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
         public float[] mLastLapTimes;               // [ UNITS = seconds ]   [ RANGE = 0.0f->... ]   [ UNSET = -1.0f ]
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
-        public bool[] mLapsInvalidated;            // [ UNITS = boolean for all participants ]   [ RANGE = false->true ]   [ UNSET = false ]
+        public byte[] mLapsInvalidated;            // [ UNITS = boolean for all participants ]   [ RANGE = false->true ]   [ UNSET = false ]
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
         public uint[] mRaceStates;         // [ enum (Type#3) Race State ]
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
