@@ -1023,6 +1023,8 @@ namespace CrewChiefV4.PCars2
                 currentGameState.Conditions.addSample(currentGameState.Now, currentGameState.SessionData.CompletedLaps, currentGameState.SessionData.SectorNumber,
                     shared.mAmbientTemperature, shared.mTrackTemperature, shared.mRainDensity, shared.mWindSpeed, shared.mWindDirectionX, shared.mWindDirectionY, shared.mCloudBrightness);
             }
+            currentGameState.CloudBrightness = shared.mCloudBrightness;
+            // Console.WriteLine("Rain: " + shared.mRainDensity + " cloud: " + shared.mCloudBrightness + " ambient " + shared.mAmbientTemperature + " track " + shared.mTrackTemperature);
             return currentGameState;
         }
 

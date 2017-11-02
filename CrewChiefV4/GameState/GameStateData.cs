@@ -1841,6 +1841,9 @@ namespace CrewChiefV4.GameState
         private DateTime NewLapDataTimerExpiry = DateTime.MaxValue;
 
         private Boolean WaitingForNewLapData = false;
+        
+        // special case for pcars CloudBrightness because we want to track this in real-time
+        public float CloudBrightness = -1;
 
         //call this after setting currentGameState.SessionData.SectorNumber and currentGameState.SessionData.IsNewSector
         public bool HasNewLapData(GameStateData previousGameState, float gameProvidedLastLapTime, int currentSector)
