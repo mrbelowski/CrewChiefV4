@@ -85,6 +85,7 @@ namespace CrewChiefV4.Events
 
         // PCars2 only
         private DateTime timeWhenCloudIncreased = DateTime.MinValue;
+        private DateTime timeWhenRainExpected = DateTime.MinValue;
         private Boolean waitingForRainEstimate = false;
 
         public ConditionsMonitor(AudioPlayer audioPlayer)
@@ -102,6 +103,7 @@ namespace CrewChiefV4.Events
             rainAtLastReport = float.MinValue;
             currentConditions = null;
             timeWhenCloudIncreased = DateTime.MinValue;
+            timeWhenRainExpected = DateTime.MinValue;
             waitingForRainEstimate = false;
         }
 
@@ -194,37 +196,46 @@ namespace CrewChiefV4.Events
                     //pcars2 test warning
                     if (CrewChief.gameDefinition.gameEnum == GameEnum.PCARS2)
                     {
-                        if (previousGameState != null && currentGameState.SessionData.SessionRunningTime > 10 && currentConditions.RainDensity == 0)
+                        if (previousGameState != null && currentGameState.SessionData.SessionRunningTime > 10)
                         {
-                            if (!waitingForRainEstimate)
+                            if (currentGameState.RainDensity == 0)
                             {
-                                if (previousGameState.CloudBrightness == 2 && currentGameState.CloudBrightness < 2)
+                                // not raining so see if we can guess when it might start
+                                if (!waitingForRainEstimate)
                                 {
-                                    timeWhenCloudIncreased = previousGameState.Now;
-                                    waitingForRainEstimate = true;
+                                    if (previousGameState.CloudBrightness == 2 && currentGameState.CloudBrightness < 2)
+                                    {
+                                        timeWhenCloudIncreased = previousGameState.Now;
+                                        waitingForRainEstimate = true;
+                                    }
+                                }
+                                else if (currentGameState.CloudBrightness < 1.99)
+                                {
+                                    // big enough change to calculate expected rain time
+                                    TimeSpan timeDelta = currentGameState.Now - timeWhenCloudIncreased;
+                                    // assume rain just after it hits 1.9
+                                    float millisTillRain = (float)timeDelta.TotalMilliseconds * 11f;
+                                    timeWhenRainExpected = currentGameState.Now.AddMilliseconds(millisTillRain);
+                                    waitingForRainEstimate = false;
+                                    timeWhenCloudIncreased = DateTime.MinValue;
+                                    DateTime when = currentGameState.Now.AddMilliseconds(millisTillRain);
+                                    Console.WriteLine("It is now " + currentGameState.Now + ", we expect rain at game time " + when);
+                                    int minutes = (int) Math.Round(millisTillRain / 60000);
+                                    if (minutes == 1)
+                                    {
+                                        audioPlayer.playMessage(new QueuedMessage("expecting_rain", MessageContents(folderExpectRain, NumberReader.folderMinute), 0, this));
+                                    }
+                                    else if (minutes > 1)
+                                    {
+                                        audioPlayer.playMessage(new QueuedMessage("expecting_rain", MessageContents(folderExpectRain, minutes, NumberReader.folderMinutes), 0, this));
+                                    }
                                 }
                             }
-                            else if (currentGameState.CloudBrightness < 1.97)
+                            else
                             {
-                                // big enough change to calculate expected rain time
-                                TimeSpan timeDelta = currentGameState.Now - timeWhenCloudIncreased;
-                                float cloudDelta = 2 - currentConditions.CloudBrightness;
-                                // assume rain at 1.88
-                                float millisTillRain = (float)timeDelta.TotalMilliseconds * 0.09f / cloudDelta;
+                                // cancel waiting for rain
                                 waitingForRainEstimate = false;
                                 timeWhenCloudIncreased = DateTime.MinValue;
-                                Console.WriteLine("It is now " + currentGameState.Now + ", we expect rain at game time " + currentGameState.Now.AddMilliseconds(millisTillRain));
-                                DateTime when = DateTime.Now.AddMilliseconds(millisTillRain);
-                                TimeSpan ts = when - currentGameState.Now;
-                                int minutes = (int)ts.TotalMinutes;
-                                if (minutes == 1)
-                                {
-                                    audioPlayer.playMessage(new QueuedMessage("expecting_rain", MessageContents(folderExpectRain, NumberReader.folderMinute), 0, this));
-                                }
-                                else
-                                {
-                                    audioPlayer.playMessage(new QueuedMessage("expecting_rain", MessageContents(folderExpectRain, minutes, NumberReader.folderMinutes), 0, this));
-                                }
                             }
                         }
                     }
@@ -237,18 +248,18 @@ namespace CrewChiefV4.Events
                             CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_NETWORK ||
                             CrewChief.gameDefinition.gameEnum == GameEnum.PCARS2_NETWORK)
                         {
-                            if (currentConditions.RainDensity == 0 && rainAtLastReport == 1)
+                            if (currentGameState.RainDensity == 0 && rainAtLastReport == 1)
                             {
-                                rainAtLastReport = currentConditions.RainDensity;
+                                rainAtLastReport = currentGameState.RainDensity;
                                 lastRainReport = currentGameState.Now;
                                 audioPlayer.playMessage(new QueuedMessage(folderStoppedRaining, 0, this));
                             }
                             else if (currentConditions.RainDensity == 1 && rainAtLastReport == 0)
                             {
-                                rainAtLastReport = currentConditions.RainDensity;
+                                rainAtLastReport = currentGameState.RainDensity;
                                 lastRainReport = currentGameState.Now;
                                 audioPlayer.playMessage(new QueuedMessage(folderSeeingSomeRain, 0, this));
-                                Console.WriteLine("Rain at " + currentGameState.Now);
+                                Console.WriteLine("Rain at " + currentGameState.Now + " expected at " + timeWhenRainExpected + " cloudBrightness " + currentGameState.CloudBrightness);
                             }
                         }
                         else if (CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT)
