@@ -655,6 +655,8 @@ namespace CrewChiefV4.PCars2
         public float mWindSpeed;                                // [ RANGE = 0.0f->100.0f ]   [ UNSET = 2.0f ]
         public float mWindDirectionX;                           // [ UNITS = Normalised Vector X ]
         public float mWindDirectionY;                           // [ UNITS = Normalised Vector Y ]
+        // from sunny all the way to light rain = 2 (at start of session - not transition), rain to thunder storm, blizzard, fog = 1.5. 
+        // Transitions from 2 down to 1.9ish as rain starts
         public float mCloudBrightness;                          // [ RANGE = 0.0f->... ]
 
   //PCars2 additions start, version 8

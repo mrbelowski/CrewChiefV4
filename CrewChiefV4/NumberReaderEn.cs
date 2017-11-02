@@ -37,8 +37,6 @@ namespace CrewChiefV4.NumberProcessing
         private static String folderTenth = "numbers/tenth";
         private static String folderSeconds = "numbers/seconds";
         private static String folderSecond = "numbers/second";
-        private static String folderMinutes = "numbers/minutes";
-        private static String folderMinute = "numbers/minute"; 
         private static String folderHours = "numbers/hours";
         private static String folderHour = "numbers/hour";
         private static String folderMinus = "numbers/minus";
