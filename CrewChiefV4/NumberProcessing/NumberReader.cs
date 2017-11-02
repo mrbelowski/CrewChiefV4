@@ -72,8 +72,6 @@ namespace CrewChiefV4
         
         protected abstract String getLocale();
 
-        protected Random random = new Random();
-
         /**
          * Convert a timeSpan to some sound files, using the current language's implementation.
          */
@@ -163,7 +161,7 @@ namespace CrewChiefV4
          */
         public List<String> GetIntegerSounds(int integer, Boolean allowShortHundredsForThisNumber)
         {
-            if (integer >= 0 && integer <= 99999)
+            if (integer >= -99999 && integer <= 99999)
             {
                 return GetIntegerSounds(integer.ToString().ToCharArray(), allowShortHundredsForThisNumber);
             }

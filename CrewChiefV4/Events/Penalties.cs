@@ -74,8 +74,6 @@ namespace CrewChiefV4.Events
 
         private Boolean playedNotServedPenalty;
 
-        private Random random = new Random();
-
         public Penalties(AudioPlayer audioPlayer)
         {
             this.audioPlayer = audioPlayer;
@@ -271,9 +269,9 @@ namespace CrewChiefV4.Events
                 {
                     lapsCompleted = currentGameState.SessionData.CompletedLaps;
                     // this is a new penalty
-                    audioPlayer.playMessage(new QueuedMessage(folderYouHavePenalty, random.Next(3, 7), this));
+                    audioPlayer.playMessage(new QueuedMessage(folderYouHavePenalty, Utilities.random.Next(3, 7), this));
                     // queue a '3 laps to serve penalty' message - this might not get played
-                    audioPlayer.playMessage(new QueuedMessage(folderThreeLapsToServe, random.Next(10, 20), this));
+                    audioPlayer.playMessage(new QueuedMessage(folderThreeLapsToServe, Utilities.random.Next(10, 20), this));
                     // we don't already have a penalty
                     if (penaltyLap == -1 || !hasOutstandingPenalty)
                     {

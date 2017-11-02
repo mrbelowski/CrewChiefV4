@@ -136,6 +136,9 @@ namespace CrewChiefV4
         public static Boolean waitingForSpeech = false;
 
         public static Boolean gotRecognitionResult = false;
+        
+        // guard against race condition between closing channel and sre_SpeechRecognised event completing
+        public static Boolean keepRecognisingInHoldMode = false;
 
         // load voice commands for triggering keyboard macros. The String key of the input Dictionary is the
         // command list key in speech_recognition_config.txt. When one of these phrases is heard the map value
@@ -620,21 +623,29 @@ namespace CrewChiefV4
             else
             {
                 // in toggle mode, we're now waiting-for-speech until we get another result or the button is released
-                waitingForSpeech = true;
+                if (SpeechRecogniser.keepRecognisingInHoldMode)
+                {
+                    Console.WriteLine("waiting for more speech");
+                    waitingForSpeech = true;
+                }
             }
         }
 
         public void recognizeAsync()
         {
+            Console.WriteLine("opened channel - waiting for speech");
             SpeechRecogniser.waitingForSpeech = true;
             SpeechRecogniser.gotRecognitionResult = false;
+            SpeechRecogniser.keepRecognisingInHoldMode = true;
             sre.RecognizeAsync(RecognizeMode.Multiple);
         }
 
         public void recognizeAsyncCancel()
         {
-            sre.RecognizeAsyncCancel();
+            Console.WriteLine("cancelling wait for speech");
             SpeechRecogniser.waitingForSpeech = false;
+            SpeechRecogniser.keepRecognisingInHoldMode = false;
+            sre.RecognizeAsyncCancel();            
         }
 
         private AbstractEvent getEventForSpeech(String recognisedSpeech)

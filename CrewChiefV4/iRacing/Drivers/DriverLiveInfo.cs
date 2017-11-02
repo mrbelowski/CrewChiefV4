@@ -52,7 +52,6 @@ namespace CrewChiefV4.iRacing
         public float LapTimePrevious { get; set; }
         public bool HasCrossedSFLine { get; set; }
 
-
         private double _prevSpeedUpdateTime;
         private double _prevSpeedUpdateDist;
         private int _prevLap;
@@ -100,7 +99,7 @@ namespace CrewChiefV4.iRacing
             //we do not have lastlaptime from opponents available in telemetry so we use data from sessioninfo.
             if(Driver.Id == e.PlayerCarIdx)
             {
-                if (UseDelayedLaptimes)
+                if (UseDelayedLaptimes && !e.IsReplayPlaying)
                 {
                     this.LapTimePrevious = e.LapLastLapTime;
                 }
@@ -111,7 +110,7 @@ namespace CrewChiefV4.iRacing
             }
             else
             {
-                if (UseDelayedLaptimes)
+                if (UseDelayedLaptimes && !e.IsReplayPlaying)
                 {
                     this.LapTimePrevious = this._driver.CurrentResults.LastTime;
                 }

@@ -39,22 +39,25 @@ namespace CrewChiefV4.commands
                 if (CrewChief.gameDefinition.gameEnum.ToString().Equals(commandSet.gameDefinition) &&
                     assignmentsByGame.ContainsKey(commandSet.gameDefinition))
                 {
-                    foreach (ActionItem actionItem in commandSet.getActionItems(true, assignmentsByGame[commandSet.gameDefinition]))
-                    {
-                        if (actionItem.pauseMillis > 0)
-                        {
-                            Thread.Sleep(actionItem.pauseMillis);
-                        }
-                        else
-                        {
-                            KeyPresser.SendScanCodeKeyPress(actionItem.keyCode, commandSet.keyPressTime);
-                        }
-                        Thread.Sleep(commandSet.waitBetweenEachCommand);
-                    }
                     if (macro.confirmationMessage != null && macro.confirmationMessage.Length > 0 && !supressConfirmationMessage)
                     {
                         audioPlayer.playMessageImmediately(new QueuedMessage(macro.confirmationMessage, 0, null));
                     }
+                    new Thread(() =>
+                    {
+                        foreach (ActionItem actionItem in commandSet.getActionItems(true, assignmentsByGame[commandSet.gameDefinition]))
+                        {
+                            if (actionItem.pauseMillis > 0)
+                            {
+                                Thread.Sleep(actionItem.pauseMillis);
+                            }
+                            else
+                            {
+                                KeyPresser.SendScanCodeKeyPress(actionItem.keyCode, commandSet.keyPressTime);
+                            }
+                            Thread.Sleep(commandSet.waitBetweenEachCommand);
+                        } 
+                    }).Start();                                  
                     break;
                 }
             }

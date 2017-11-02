@@ -45,8 +45,6 @@ namespace CrewChiefV4.Events
 
         private int lapNumberAtLastMessage;
 
-        private Random rand = new Random();
-
         private int numberOfLapsInLastPlace;
 
         private Boolean playedRaceStartMessage;
@@ -126,7 +124,7 @@ namespace CrewChiefV4.Events
             lapNumberAtLastMessage = 0;
             numberOfLapsInLastPlace = 0;
             playedRaceStartMessage = false;
-            startMessageTime = rand.Next(30, 50);
+            startMessageTime = Utilities.random.Next(30, 50);
             isLast = false;
             lastPassCheck = DateTime.MinValue;
             gapsAhead.Clear();
@@ -360,7 +358,7 @@ namespace CrewChiefV4.Events
                         {
                             audioPlayer.playMessage(new QueuedMessage(folderGoodStart, 0, this));
                         }
-                        else if (!isLast && rand.NextDouble() > 0.6)
+                        else if (!isLast && Utilities.random.NextDouble() > 0.6)
                         {
                             // only play the OK start message sometimes
                             audioPlayer.playMessage(new QueuedMessage(folderOKStart, 0, this));

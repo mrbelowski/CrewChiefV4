@@ -94,8 +94,6 @@ namespace CrewChiefV4
 
         public static Boolean hasOvalSpecificSounds = false;
 
-        private Random random = new Random();
-
         /**
          * static constructor to initialise spotter subfolder stuff.
          * 
@@ -727,7 +725,7 @@ namespace CrewChiefV4
                         case NextMessageType.threeWideYoureOnTheLeft:
                             audioPlayer.removeImmediateMessages(new String[] { folderStillThere, folderCarLeft, folderCarRight, folderCarInside, folderCarOutside, folderClearAllRound, 
                                 folderClearLeft, folderClearRight, folderClearInside, folderClearOutside, folderInTheMiddle, folderThreeWideYoureOnRight, folderThreeWideYoureOnOutside });
-                            if (hasOvalSpecificSounds && GlobalBehaviourSettings.useOvalLogic && random.Next() > 0.2)
+                            if (hasOvalSpecificSounds && GlobalBehaviourSettings.useOvalLogic && Utilities.random.Next() > 0.2)
                             {
                                 selectedMessage = folderThreeWideYoureOnInside;
                             }
@@ -746,7 +744,7 @@ namespace CrewChiefV4
                         case NextMessageType.threeWideYoureOnTheRight:
                             audioPlayer.removeImmediateMessages(new String[] { folderStillThere, folderCarLeft, folderCarRight, folderCarInside, folderCarOutside, folderClearAllRound,
                                 folderClearLeft, folderClearRight, folderClearInside, folderClearOutside, folderInTheMiddle, folderThreeWideYoureOnLeft, folderThreeWideYoureOnInside });
-                            if (hasOvalSpecificSounds && GlobalBehaviourSettings.useOvalLogic && random.Next() > 0.2)
+                            if (hasOvalSpecificSounds && GlobalBehaviourSettings.useOvalLogic && Utilities.random.Next() > 0.2)
                             {
                                 selectedMessage = folderThreeWideYoureOnOutside;
                             }
@@ -766,7 +764,7 @@ namespace CrewChiefV4
                             audioPlayer.removeImmediateMessages(new String[] { folderStillThere, folderInTheMiddle, folderCarRight, folderCarOutside, folderClearAllRound, 
                                 folderClearLeft, folderClearRight, folderClearInside, folderClearOutside, folderThreeWideYoureOnRight, folderThreeWideYoureOnLeft,  
                                 folderThreeWideYoureOnInside, folderThreeWideYoureOnOutside });
-                            if (hasOvalSpecificSounds && GlobalBehaviourSettings.useOvalLogic && random.Next() > 0.2)
+                            if (hasOvalSpecificSounds && GlobalBehaviourSettings.useOvalLogic && Utilities.random.Next() > 0.2)
                             {
                                 selectedMessage = folderCarInside;
                             }
@@ -786,7 +784,7 @@ namespace CrewChiefV4
                             audioPlayer.removeImmediateMessages(new String[] { folderStillThere, folderCarLeft, folderCarInside, folderInTheMiddle, folderClearAllRound, 
                                 folderClearLeft, folderClearRight, folderClearInside, folderClearOutside, folderThreeWideYoureOnRight, folderThreeWideYoureOnLeft,
                                 folderThreeWideYoureOnInside, folderThreeWideYoureOnOutside });
-                            if (hasOvalSpecificSounds && GlobalBehaviourSettings.useOvalLogic && random.Next() > 0.2)
+                            if (hasOvalSpecificSounds && GlobalBehaviourSettings.useOvalLogic && Utilities.random.Next() > 0.2)
                             {
                                 selectedMessage = folderCarOutside;
                             }
@@ -838,7 +836,7 @@ namespace CrewChiefV4
                                 }
                                 else
                                 {
-                                    if (hasOvalSpecificSounds && GlobalBehaviourSettings.useOvalLogic && random.Next() > 0.2)
+                                    if (hasOvalSpecificSounds && GlobalBehaviourSettings.useOvalLogic && Utilities.random.Next() > 0.2)
                                     {
                                         selectedMessage = folderClearInside;
                                     }
@@ -891,7 +889,7 @@ namespace CrewChiefV4
                                 }
                                 else
                                 {
-                                    if (hasOvalSpecificSounds && GlobalBehaviourSettings.useOvalLogic && random.Next() > 0.2)
+                                    if (hasOvalSpecificSounds && GlobalBehaviourSettings.useOvalLogic && Utilities.random.Next() > 0.2)
                                     {
                                         selectedMessage = folderClearOutside;
                                     }

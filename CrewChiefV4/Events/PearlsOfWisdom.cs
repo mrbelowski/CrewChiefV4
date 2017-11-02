@@ -12,8 +12,6 @@ namespace CrewChiefV4
         public static String folderKeepItUp = "pearls_of_wisdom/keep_it_up";
         public static String folderNeutral = "pearls_of_wisdom/neutral";
 
-        private Random random = new Random();
-
         public enum PearlType
         {
             GOOD, BAD, NEUTRAL, NONE
@@ -26,9 +24,9 @@ namespace CrewChiefV4
 
         public PearlMessagePosition getMessagePosition(double messageProbability)
         {
-            if (messageProbability * pearlsFrequency > random.NextDouble() * 10)
+            if (messageProbability * pearlsFrequency > Utilities.random.NextDouble() * 10)
             {
-                if (random.NextDouble() < 0.33)
+                if (Utilities.random.NextDouble() < 0.33)
                 {
                     return PearlMessagePosition.BEFORE;
                 }

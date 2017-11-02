@@ -147,7 +147,7 @@ Raceroom
 default key bindings:
 "Pit Menu Toggle":		q
 "Pit Menu Select": 		e
-"Pit Menu Up": 			w
+"Pit Menu Up": 		w
 "Pit Menu Down":		s
 "Pit Menu Decrease":	a
 "Pit Menu Increase":	d
@@ -168,7 +168,7 @@ PCars2
 
 default key bindings:
 "Car Management":	e
-"ICM Menu Up":		w
+"ICM Menu Up":	w
 "ICM Menu Down":	s
 "ICM Menu Left":	a
 "ICM Menu Right":	d

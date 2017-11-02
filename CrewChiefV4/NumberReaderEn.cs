@@ -41,6 +41,7 @@ namespace CrewChiefV4.NumberProcessing
         private static String folderMinute = "numbers/minute"; 
         private static String folderHours = "numbers/hours";
         private static String folderHour = "numbers/hour";
+        private static String folderMinus = "numbers/minus";
 
         protected override String getLocale()
         {
@@ -181,7 +182,7 @@ namespace CrewChiefV4.NumberProcessing
                     // the "seconds", sometimes not
                     if (tenths > 0)
                     {
-                        if (random.NextDouble() > 0.5)
+                        if (Utilities.random.NextDouble() > 0.5)
                         {
                             messages.Add(folderPoint + tenths + "seconds");
                         }
@@ -206,7 +207,7 @@ namespace CrewChiefV4.NumberProcessing
         protected override String GetSecondsWithTenths(int seconds, int tenths)
         {
             // sometimes include "seconds" if it's less than 10
-            if (seconds > 0 && seconds < 10 && random.NextDouble() <= 0.5)
+            if (seconds > 0 && seconds < 10 && Utilities.random.NextDouble() <= 0.5)
             {
                 return folderNumbersStub + seconds + "point" + tenths + "seconds";
             }
@@ -268,9 +269,20 @@ namespace CrewChiefV4.NumberProcessing
         /**
          * Get an English sound for an Integer from 0 to 99999.
          */
-        protected override List<String> GetIntegerSounds(char[] digits, Boolean allowShortHundredsForThisNumber)
+        protected override List<String> GetIntegerSounds(char[] rawDigits, Boolean allowShortHundredsForThisNumber)
         {
             List<String> messages = new List<String>();
+            char[] digits;
+            if (rawDigits.Length >= 2 && rawDigits[0] == '-')
+            {
+                digits = new char[rawDigits.Length - 1];
+                Array.Copy(rawDigits, 1, digits, 0, digits.Length);
+                messages.Add(folderMinus);
+            }
+            else
+            {
+                digits = rawDigits;
+            }            
             // if this is just zero, return a list with just "zero"
             if (digits.Length == 0 || (digits.Length == 1 && digits[0] == '0'))
             {
@@ -352,7 +364,7 @@ namespace CrewChiefV4.NumberProcessing
                     if (tensAndUnits != null)
                     {
                         // if there's a thousand, or we're saying something like "13 hundred", then always use the long version
-                        if (!global_allow_short_hundreds || hundreds.Length == 2 || thousands != null || !allowShortHundredsForThisNumber || random.NextDouble() > 0.6)
+                        if (!global_allow_short_hundreds || hundreds.Length == 2 || thousands != null || !allowShortHundredsForThisNumber || Utilities.random.NextDouble() > 0.6)
                         {
                             if (say_and_between_hundred_and_units)
                             {

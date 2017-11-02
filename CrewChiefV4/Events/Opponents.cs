@@ -57,8 +57,6 @@ namespace CrewChiefV4.Events
 
         private string positionIsPlayerKey = "";
 
-        private Random random = new Random();
-
         public Opponents(AudioPlayer audioPlayer)
         {
             this.audioPlayer = audioPlayer;
@@ -245,7 +243,7 @@ namespace CrewChiefV4.Events
                                         TimeSpanWrapper.FromSeconds(opponentData.LastLapTime, Precision.AUTO_LAPTIMES)), 0, this));
                             }
                             else if (currentGameState.SessionData.UnFilteredPosition > 1 && opponentData.UnFilteredPosition == currentGameState.SessionData.Position - 1 &&
-                                (currentGameState.SessionData.SessionType == SessionType.Race || random.Next(10) < frequencyOfOpponentPracticeAndQualLapTimes))
+                                (currentGameState.SessionData.SessionType == SessionType.Race || Utilities.random.Next(10) < frequencyOfOpponentPracticeAndQualLapTimes))
                             {
                                 // he's ahead of us, and has recorded 3 or more laps, and this one's his fastest
                                 Console.WriteLine("Car ahead fast lap - this lap time = " + opponentData.LastLapTime + " session best = " + currentFastestLap);
@@ -253,7 +251,7 @@ namespace CrewChiefV4.Events
                                         TimeSpanWrapper.FromSeconds(opponentData.LastLapTime, Precision.AUTO_LAPTIMES)), 0, this));
                             }
                             else if (!currentGameState.isLast() && opponentData.UnFilteredPosition == currentGameState.SessionData.Position + 1 &&
-                                (currentGameState.SessionData.SessionType == SessionType.Race || random.Next(10) < frequencyOfOpponentPracticeAndQualLapTimes))
+                                (currentGameState.SessionData.SessionType == SessionType.Race || Utilities.random.Next(10) < frequencyOfOpponentPracticeAndQualLapTimes))
                             {
                                 // he's behind us, and has recorded 3 or more laps, and this one's his fastest
                                 Console.WriteLine("Car behind fast lap - this lap time = " + opponentData.LastLapTime + " session best = " + currentFastestLap);
@@ -278,7 +276,7 @@ namespace CrewChiefV4.Events
                                 (SoundCache.hasSuitableTTSVoice || SoundCache.availableDriverNames.Contains(DriverNameHelper.getUsableDriverName(opponentData.DriverRawName)))))
                         {
                             audioPlayer.playMessage(new QueuedMessage("new_car_ahead", MessageContents(folderNextCarIs, opponentData),
-                                random.Next(Position.maxSecondsToWaitBeforeReportingPass + 1, Position.maxSecondsToWaitBeforeReportingPass + 3), this,
+                                Utilities.random.Next(Position.maxSecondsToWaitBeforeReportingPass + 1, Position.maxSecondsToWaitBeforeReportingPass + 3), this,
                                 new Dictionary<string, object> { { validationDriverAheadKey, opponentData.DriverRawName } }));
                             nextCarAheadChangeMessage = currentGameState.Now.Add(TimeSpan.FromSeconds(30));
                         }                        

@@ -93,7 +93,6 @@ namespace CrewChiefV4.Events
         private DateTime lastFCYAccounedTime = DateTime.MinValue;
         private TimeSpan timeBetweenYellowAndClearFlagMessages = TimeSpan.FromSeconds(3);
         private TimeSpan minTimeBetweenNewYellowFlagMessages = TimeSpan.FromSeconds(10);
-        private Random random = new Random();
 
         // do we need this?
         private DateTime lastLocalYellowAnnouncedTime = DateTime.MinValue;
@@ -434,7 +433,7 @@ namespace CrewChiefV4.Events
                         case FullCourseYellowPhase.PITS_CLOSED:
                             if (CrewChief.yellowFlagMessagesEnabled)
                             {
-                                audioPlayer.playMessage(new QueuedMessage(GlobalBehaviourSettings.useAmericanTerms ? folderFCYellowPitsClosedUS : folderFCYellowPitsClosedEU, random.Next(1, 3), this));
+                                audioPlayer.playMessage(new QueuedMessage(GlobalBehaviourSettings.useAmericanTerms ? folderFCYellowPitsClosedUS : folderFCYellowPitsClosedEU, Utilities.random.Next(1, 3), this));
                             }
                             break;
                         case FullCourseYellowPhase.PITS_OPEN_LEAD_LAP_VEHICLES:
@@ -446,7 +445,7 @@ namespace CrewChiefV4.Events
                         case FullCourseYellowPhase.PITS_OPEN:
                             if (CrewChief.yellowFlagMessagesEnabled)
                             {
-                                audioPlayer.playMessage(new QueuedMessage(GlobalBehaviourSettings.useAmericanTerms ? folderFCYellowPitsOpenUS : folderFCYellowPitsOpenEU, random.Next(1, 3), this));
+                                audioPlayer.playMessage(new QueuedMessage(GlobalBehaviourSettings.useAmericanTerms ? folderFCYellowPitsOpenUS : folderFCYellowPitsOpenEU, Utilities.random.Next(1, 3), this));
                             }
                             break;
                         case FullCourseYellowPhase.LAST_LAP_NEXT:
@@ -646,7 +645,7 @@ namespace CrewChiefV4.Events
                                     hasAlreadyWarnedAboutIllegalPass = false;
                                     
                                     // don't call sector yellow if we've in a local yellow
-                                    if (CrewChief.gameDefinition.gameEnum != GameEnum.RACE_ROOM && isCurrentSector(currentGameState, i) && 4 > random.NextDouble() * 10)
+                                    if (CrewChief.gameDefinition.gameEnum != GameEnum.RACE_ROOM && isCurrentSector(currentGameState, i) && 4 > Utilities.random.NextDouble() * 10)
                                     {
                                         // If in current, sometimes announce without sector number.
                                         if (CrewChief.yellowFlagMessagesEnabled && !currentGameState.PitData.InPitlane)
