@@ -197,7 +197,7 @@ namespace CrewChiefV4.Events
                     //pcars2 test warning
                     if (enablePCarsRainPrediction && 
                         (CrewChief.gameDefinition.gameEnum == GameEnum.PCARS2 || CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_32BIT || 
-                         CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_64BIT || CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_NETWORK))
+                         CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_64BIT))
                     {
                         if (previousGameState != null && currentGameState.SessionData.SessionRunningTime > 10)
                         {
