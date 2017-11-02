@@ -20,8 +20,6 @@ namespace CrewChiefV4.PCars2
     {
         public static String NULL_CHAR_STAND_IN = "?";
 
-        private Boolean enablePCarsPitWindowStuff = UserSettings.GetUserSettings().getBoolean("enable_pcars_pit_window_messages");
-
         private List<CornerData.EnumWithThresholds> suspensionDamageThresholds = new List<CornerData.EnumWithThresholds>();
         private List<CornerData.EnumWithThresholds> tyreWearThresholds = new List<CornerData.EnumWithThresholds>();
         private List<CornerData.EnumWithThresholds> brakeDamageThresholds = new List<CornerData.EnumWithThresholds>();
@@ -32,8 +30,6 @@ namespace CrewChiefV4.PCars2
 
         // if all 4 wheels are off the racing surface, increment the number of cut track incedents
         private Boolean incrementCutTrackCountWhenLeavingRacingSurface = false;
-
-        private static uint expectedVersion = 5;
 
         private List<uint> racingSurfaces = new List<uint>() { (uint)eTerrainMaterials.TERRAIN_BUMPY_DIRT_ROAD, 
             (uint)eTerrainMaterials.TERRAIN_BUMPY_ROAD1, (uint)eTerrainMaterials.TERRAIN_BUMPY_ROAD2, (uint)eTerrainMaterials.TERRAIN_BUMPY_ROAD3, 
@@ -186,14 +182,14 @@ namespace CrewChiefV4.PCars2
             
             NameValidator.validateName(playerName);
             currentGameState.SessionData.CompletedLaps = (int)playerData.mLapsCompleted;
-            currentGameState.SessionData.SectorNumber = (int)playerData.mCurrentSector;
+            currentGameState.SessionData.SectorNumber = (int)playerData.mCurrentSector + 1; // zero indexed
             currentGameState.SessionData.Position = (int)playerData.mRacePosition;
             if (currentGameState.SessionData.Position == 1)
             {
                 currentGameState.SessionData.LeaderSectorNumber = currentGameState.SessionData.SectorNumber;
             }
             currentGameState.SessionData.UnFilteredPosition = (int)playerData.mRacePosition;
-            currentGameState.SessionData.IsNewSector = previousGameState == null || playerData.mCurrentSector != previousGameState.SessionData.SectorNumber;
+            currentGameState.SessionData.IsNewSector = previousGameState == null || playerData.mCurrentSector + 1 != previousGameState.SessionData.SectorNumber;
             // When in the pit lane, mCurrentLapDistance gets set to 0 when crossing the start line and *remains at 0* until some distance into the lap (about 300 metres)
             currentGameState.PositionAndMotionData.DistanceRoundTrack = playerData.mCurrentLapDistance;
                         
@@ -539,7 +535,7 @@ namespace CrewChiefV4.PCars2
                 else if (currentGameState.SessionData.SectorNumber == 2)
                 {
                     currentGameState.SessionData.SessionTimesAtEndOfSectors[1] = currentGameState.SessionData.SessionRunningTime;
-                    // TODO: confirm that an invalid sector will put -1 in here...
+
                     currentGameState.SessionData.LastSector1Time = shared.mCurrentSector1Times[playerIndex];
                     if (currentGameState.SessionData.LastSector1Time > 0 && !shared.mLapInvalidated &&
                         (currentGameState.SessionData.PlayerBestSector1Time == -1 || currentGameState.SessionData.LastSector1Time < currentGameState.SessionData.PlayerBestSector1Time))
@@ -649,7 +645,7 @@ namespace CrewChiefV4.PCars2
 
                                     int currentOpponentRacePosition = (int)participantStruct.mRacePosition;
                                     int currentOpponentLapsCompleted = (int)participantStruct.mLapsCompleted;
-                                    int currentOpponentSector = (int)participantStruct.mCurrentSector;
+                                    int currentOpponentSector = (int)participantStruct.mCurrentSector + 1;  // zero-indexed
                                     if (currentOpponentSector == 0)
                                     {
                                         currentOpponentSector = previousOpponentSectorNumber;
@@ -697,6 +693,19 @@ namespace CrewChiefV4.PCars2
                                     }
                                     
                                     float secondsSinceLastUpdate = (float)new TimeSpan(currentGameState.Ticks - previousGameState.Ticks).TotalSeconds;
+                                    float lastSectorTime = -1;
+                                    if (currentOpponentSector == 1)
+                                    {
+                                        lastSectorTime = shared.mCurrentSector3Times[i];
+                                    }
+                                    else if (currentOpponentSector == 2)
+                                    {
+                                        lastSectorTime = shared.mCurrentSector1Times[i];
+                                    }
+                                    else if (currentOpponentSector == 3)
+                                    {
+                                        lastSectorTime = shared.mCurrentSector2Times[i];
+                                    }
                                     updateOpponentData(currentOpponentData, participantName, currentOpponentRacePosition, currentOpponentLapsCompleted,
                                             currentOpponentSector, isEnteringPits, isInPits, isLeavingPits, currentGameState.SessionData.SessionRunningTime, secondsSinceLastUpdate,
                                             new float[] { participantStruct.mWorldPosition[0], participantStruct.mWorldPosition[2] }, previousOpponentWorldPosition,
@@ -704,7 +713,7 @@ namespace CrewChiefV4.PCars2
                                             participantStruct.mCurrentLapDistance, shared.mRainDensity == 1,
                                             shared.mAmbientTemperature, shared.mTrackTemperature, opponentCarClass,
                                             currentGameState.SessionData.SessionHasFixedTime, currentGameState.SessionData.SessionTimeRemaining,
-                                            -1 /* expecting lastSectorTime here*/, shared.mLapsInvalidated[i]);
+                                            lastSectorTime, shared.mLapsInvalidated[i] == 1, currentGameState.SessionData.TrackDefinition.distanceForNearPitEntryChecks);
 
                                     if (previousOpponentData != null)
                                     {
@@ -834,7 +843,7 @@ namespace CrewChiefV4.PCars2
                 previousGameState.PitData.InPitlane && !currentGameState.PitData.InPitlane;
             // looks like this is fucked up in the data - UDP has pitModeSchedule for each participant, MMF has pitMode. We need both.
             currentGameState.PitData.HasRequestedPitStop = false;
-            if (currentGameState.SessionData.SessionType == SessionType.Race && shared.mEnforcedPitStopLap > 0 && enablePCarsPitWindowStuff)
+            if (currentGameState.SessionData.SessionType == SessionType.Race && shared.mEnforcedPitStopLap > 0)
             {
                 currentGameState.PitData.HasMandatoryPitStop = true;
                 currentGameState.PitData.PitWindowStart = (int) shared.mEnforcedPitStopLap;
@@ -1069,7 +1078,7 @@ namespace CrewChiefV4.PCars2
             float sessionRunningTime, float secondsSinceLastUpdate, float[] currentWorldPosition, float[] previousWorldPosition,
             float speed, float worldRecordLapTime, float worldRecordS1Time, float worldRecordS2Time, float worldRecordS3Time, 
             float distanceRoundTrack, Boolean isRaining, float trackTemp, float airTemp, CarData.CarClass carClass,
-            Boolean sessionLengthIsTime, float sessionTimeRemaining, float lastSectorTime, Boolean lapInvalidated)
+            Boolean sessionLengthIsTime, float sessionTimeRemaining, float lastSectorTime, Boolean lapInvalidated, float nearPitEntryPointDistance)
         {
             float previousDistanceRoundTrack = opponentData.DistanceRoundTrack;
             if (opponentData.DriverRawName.StartsWith(NULL_CHAR_STAND_IN) && name != null && name.Trim().Length > 0 && !name.StartsWith(NULL_CHAR_STAND_IN))
@@ -1084,6 +1093,10 @@ namespace CrewChiefV4.PCars2
             opponentData.Speed = speed;
             opponentData.Position = racePosition;
             opponentData.UnFilteredPosition = racePosition;
+            if (previousDistanceRoundTrack < nearPitEntryPointDistance && opponentData.DistanceRoundTrack > nearPitEntryPointDistance)
+            {
+                opponentData.PositionOnApproachToPitEntry = opponentData.Position;
+            }
             opponentData.WorldPosition = currentWorldPosition;
             opponentData.IsNewLap = false;
             opponentData.CarClass = carClass;
@@ -1094,46 +1107,26 @@ namespace CrewChiefV4.PCars2
                 {
                     if (opponentData.OpponentLapData.Count > 0)
                     {
-                        // lastSectorTime values are -123 at the start of the session
-                        if (CrewChief.gameDefinition.gameEnum == GameEnum.PCARS2_NETWORK) 
+                        if (lastSectorTime <= 0)
                         {
-                            // use the last sector time, or -1 if it's that magic -123 number (and mark the lap as invalid)
-                            if (lastSectorTime <= 0)
-                            {
-                                lastSectorTime = -1;
-                                lapInvalidated = true;
-                            }
-                            opponentData.CompleteLapWithLastSectorTime(racePosition, lastSectorTime, sessionRunningTime, 
-                                !lapInvalidated, isRaining, trackTemp, airTemp, sessionLengthIsTime, sessionTimeRemaining, 3);
+                            lastSectorTime = -1;
+                            lapInvalidated = true;
                         }
-                        else
-                        {
-                            // use the inbuilt timing
-                            opponentData.CompleteLapWithEstimatedLapTime(racePosition, sessionRunningTime, worldRecordLapTime, worldRecordS1Time, worldRecordS2Time, worldRecordS3Time,
-                                !lapInvalidated, isRaining, trackTemp, airTemp, sessionLengthIsTime, sessionTimeRemaining);
-                        }
+                        opponentData.CompleteLapWithLastSectorTime(racePosition, lastSectorTime, sessionRunningTime, 
+                            !lapInvalidated, isRaining, trackTemp, airTemp, sessionLengthIsTime, sessionTimeRemaining, 3);
+                        
                     }
                     opponentData.StartNewLap(completedLaps + 1, racePosition, isInPits || isLeavingPits, sessionRunningTime, isRaining, trackTemp, airTemp);
                     opponentData.IsNewLap = true;
                 }
                 else if (opponentData.CurrentSectorNumber == 1 && sector == 2 || opponentData.CurrentSectorNumber == 2 && sector == 3)
                 {
-                    // lastSectorTime values are -123 at the start of the session
-                    if (CrewChief.gameDefinition.gameEnum == GameEnum.PCARS2_NETWORK) 
+                    if (lastSectorTime <= 0)
                     {
-                        // use the last sector time, or -1 if it's that magic -123 number (and mark the lap as invalid)
-                        if (lastSectorTime <= 0)
-                        {
-                            lastSectorTime = -1;
-                            lapInvalidated = true;
-                        }
-                        opponentData.AddSectorData(opponentData.CurrentSectorNumber, racePosition, lastSectorTime, sessionRunningTime, !lapInvalidated, isRaining, trackTemp, airTemp);
+                        lastSectorTime = -1;
+                        lapInvalidated = true;
                     }
-                    else
-                    {
-                        // use the inbuilt timing
-                        opponentData.AddCumulativeSectorData(opponentData.CurrentSectorNumber, racePosition, -1, sessionRunningTime, !lapInvalidated, isRaining, trackTemp, airTemp);
-                    }
+                    opponentData.AddSectorData(opponentData.CurrentSectorNumber, racePosition, lastSectorTime, sessionRunningTime, !lapInvalidated, isRaining, trackTemp, airTemp);             
                 }
                 opponentData.CurrentSectorNumber = sector;
             }
@@ -1157,7 +1150,7 @@ namespace CrewChiefV4.PCars2
             opponentData.Position = (int)participantStruct.mRacePosition;
             opponentData.UnFilteredPosition = opponentData.Position;
             opponentData.CompletedLaps = (int)participantStruct.mLapsCompleted;
-            opponentData.CurrentSectorNumber = (int)participantStruct.mCurrentSector;
+            opponentData.CurrentSectorNumber = (int)participantStruct.mCurrentSector + 1;   // zero indexed
             opponentData.WorldPosition = new float[] { participantStruct.mWorldPosition[0], participantStruct.mWorldPosition[2] };
             opponentData.DistanceRoundTrack = participantStruct.mCurrentLapDistance;
             opponentData.DeltaTime = new DeltaTime(trackLength, opponentData.DistanceRoundTrack, DateTime.Now);
