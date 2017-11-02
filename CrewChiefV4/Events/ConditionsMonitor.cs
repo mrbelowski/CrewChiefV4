@@ -209,18 +209,19 @@ namespace CrewChiefV4.Events
                                         waitingForRainEstimate = true;
                                     }
                                 }
-                                else if (currentGameState.CloudBrightness < 1.99)
+                                else if (currentGameState.CloudBrightness < 1.98)
                                 {
                                     // big enough change to calculate expected rain time
                                     TimeSpan timeDelta = currentGameState.Now - timeWhenCloudIncreased;
                                     // assume rain just after it hits 1.9
-                                    float millisTillRain = (float)timeDelta.TotalMilliseconds * 11f;
-                                    timeWhenRainExpected = currentGameState.Now.AddMilliseconds(millisTillRain);
+                                    float millisTillRain = (float)timeDelta.TotalMilliseconds * 6f;
+                                    // this is usually really inaccurate and can go either way
+                                    timeWhenRainExpected = timeWhenCloudIncreased.AddMilliseconds(millisTillRain);
                                     waitingForRainEstimate = false;
                                     timeWhenCloudIncreased = DateTime.MinValue;
                                     DateTime when = currentGameState.Now.AddMilliseconds(millisTillRain);
                                     Console.WriteLine("It is now " + currentGameState.Now + ", we expect rain at game time " + when);
-                                    int minutes = (int) Math.Round(millisTillRain / 60000);
+                                    int minutes = (int) Math.Round(millisTillRain / 60000) + 1;
                                     if (minutes == 1)
                                     {
                                         audioPlayer.playMessage(new QueuedMessage("expecting_rain", MessageContents(folderExpectRain, NumberReader.folderMinute), 0, this));
