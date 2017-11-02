@@ -55,11 +55,11 @@ namespace CrewChiefV4.Events
         public static String folderMandatoryPitStopsMissedStop = "mandatory_pit_stops/missed_stop";
 
         // pit stop messages
-        private String folderApproachingPits = "mandatory_pit_stops/approaching_pits";
+        private String folderWatchYourPitSpeed = "mandatory_pit_stops/watch_your_pit_speed";
         private String folderPitCrewReady = "mandatory_pit_stops/pit_crew_ready";
-        private String folderPitCrewDone = "mandatory_pit_stops/pit_crew_done";
-        private String folderPitStopRequestReceived = "mandatory_pit_stops/pit_stop_request_received";
-        private String folderPitStopRequestCancelled = "mandatory_pit_stops/pit_stop_request_cancelled";
+        private String folderStopCompleteGo = "mandatory_pit_stops/stop_complete_go";
+        private String folderPitStopRequestReceived = "mandatory_pit_stops/pit_stop_requested";
+        private String folderPitStopRequestCancelled = "mandatory_pit_stops/pit_request_cancelled";
 
         private int pitWindowOpenLap;
 
@@ -102,8 +102,6 @@ namespace CrewChiefV4.Events
         private float minDistanceOnCurrentTyre;
 
         private float maxDistanceOnCurrentTyre;
-
-        private Random random = new Random();
 
         private DateTime timeOfLastLimiterWarning = DateTime.MinValue;
 
@@ -288,26 +286,26 @@ namespace CrewChiefV4.Events
                                 mandatoryStopBoxThisLap = true;
                                 if (mandatoryTyreChangeTyreType == TyreType.Prime)
                                 {
-                                    audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsFitPrimesThisLap, random.Next(0, 10), this));
+                                    audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsFitPrimesThisLap, Utilities.random.Next(0, 10), this));
                                 }
                                 else if (mandatoryTyreChangeTyreType == TyreType.Option)
                                 {
-                                    audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsFitOptionsThisLap, random.Next(0, 20), this));
+                                    audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsFitOptionsThisLap, Utilities.random.Next(0, 20), this));
                                 }
                                 else
                                 {
-                                    audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsPitThisLap, random.Next(0, 20), this));
+                                    audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsPitThisLap, Utilities.random.Next(0, 20), this));
                                 }
                             }
                             else if (minDistanceOnCurrentTyre > 0 && currentGameState.SessionData.CompletedLaps == minDistanceOnCurrentTyre)
                             {
                                 if (mandatoryTyreChangeTyreType == TyreType.Prime)
                                 {
-                                    audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsCanNowFitPrimes, random.Next(0, 20), this));
+                                    audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsCanNowFitPrimes, Utilities.random.Next(0, 20), this));
                                 }
                                 else if (mandatoryTyreChangeTyreType == TyreType.Option)
                                 {
-                                    audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsCanNowFitOptions, random.Next(0, 20), this));
+                                    audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsCanNowFitOptions, Utilities.random.Next(0, 20), this));
                                 }
                             }
                         }
@@ -318,7 +316,7 @@ namespace CrewChiefV4.Events
                             // so we play it 1 lap before the window opens
                             if (enableWindowWarnings)
                             {
-                                audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsPitWindowOpening, random.Next(0, 20), this));
+                                audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsPitWindowOpening, Utilities.random.Next(0, 20), this));
                             }
                         }
                         else if (pitWindowOpenLap > 0 && currentGameState.SessionData.CompletedLaps == pitWindowOpenLap)
@@ -333,7 +331,7 @@ namespace CrewChiefV4.Events
                         {
                             if (enableWindowWarnings)
                             {
-                                audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsPitWindowClosing, random.Next(0, 20), this));
+                                audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsPitWindowClosing, Utilities.random.Next(0, 20), this));
                             }
                             if (currentGameState.PitData.PitWindow != PitWindow.Completed && !currentGameState.PitData.InPitlane &&
                                 currentGameState.PitData.PitWindow != PitWindow.StopInProgress)
@@ -341,15 +339,15 @@ namespace CrewChiefV4.Events
                                 playBoxNowMessage = true;
                                 if (mandatoryTyreChangeTyreType == TyreType.Prime)
                                 {
-                                    audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsFitPrimesThisLap, random.Next(0, 10), this));
+                                    audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsFitPrimesThisLap, Utilities.random.Next(0, 10), this));
                                 }
                                 else if (mandatoryTyreChangeTyreType == TyreType.Option)
                                 {
-                                    audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsFitOptionsThisLap, random.Next(0, 10), this));
+                                    audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsFitOptionsThisLap, Utilities.random.Next(0, 10), this));
                                 }
                                 else
                                 {
-                                    audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsPitThisLap, random.Next(0, 10), this));
+                                    audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsPitThisLap, Utilities.random.Next(0, 10), this));
                                 }
                             }
                         }
@@ -396,15 +394,15 @@ namespace CrewChiefV4.Events
                                 mandatoryStopBoxThisLap = true;
                                 if (mandatoryTyreChangeTyreType == TyreType.Prime)
                                 {
-                                    audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsFitPrimesThisLap, random.Next(0, 20), this));
+                                    audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsFitPrimesThisLap, Utilities.random.Next(0, 20), this));
                                 }
                                 else if (mandatoryTyreChangeTyreType == TyreType.Option)
                                 {
-                                    audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsFitOptionsThisLap, random.Next(0, 20), this));
+                                    audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsFitOptionsThisLap, Utilities.random.Next(0, 20), this));
                                 }
                                 else
                                 {
-                                    audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsPitThisLap, random.Next(0, 20), this));
+                                    audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsPitThisLap, Utilities.random.Next(0, 20), this));
                                 }
                             }
                         }
@@ -516,36 +514,32 @@ namespace CrewChiefV4.Events
                 if (!previousGameState.PitData.IsApproachingPitlane
                     && currentGameState.PitData.IsApproachingPitlane)
                 {
-                    Console.WriteLine("PIT STOPS: WATCH YOUR SPEED IN PITS");
-                    // Temporary message.
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderEngageLimiter, 0, this));
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderWatchYourPitSpeed, 0, this));
                 }
                 if (!previousGameState.PitData.IsPitCrewReady
                     && currentGameState.PitData.IsPitCrewReady)
                 {
-                    Console.WriteLine("PIT STOPS: PIT CREW IS READY");
+                    audioPlayer.playMessage(new QueuedMessage(folderPitCrewReady, Utilities.random.Next(1, 3), this));
                 }
                 if (!previousGameState.PitData.IsPitCrewDone
                     && currentGameState.PitData.IsPitCrewDone)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(LapCounter.folderGreenGreenGreen, 0, this));
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderStopCompleteGo, 0, this));
                 }
                 if (!previousGameState.PitData.HasRequestedPitStop
                     && currentGameState.PitData.HasRequestedPitStop
                     && (currentGameState.Now - timeOfPitRequestOrCancel).TotalSeconds > minSecondsBetweenPitRequestCancel)
                 {
-                    Console.WriteLine("PIT STOPS: REQUESTED PIT STOP");
                     timeOfPitRequestOrCancel = currentGameState.Now;
-                    // TODO: should be random delayed  (1-3 secs) and validated, because comes from the button.
+                    audioPlayer.playMessage(new QueuedMessage(folderPitStopRequestReceived, Utilities.random.Next(1, 3), this));
                 }
                 if (!currentGameState.PitData.InPitlane && !previousGameState.PitData.InPitlane  // Make sure we're not in pits.  More checks might be needed.
                     && previousGameState.PitData.HasRequestedPitStop
                     && !currentGameState.PitData.HasRequestedPitStop
                     && (currentGameState.Now - timeOfPitRequestOrCancel).TotalSeconds > minSecondsBetweenPitRequestCancel)
                 {
-                    Console.WriteLine("PIT STOPS: CANCELLED PIT STOP REQUEST");
                     timeOfPitRequestOrCancel = currentGameState.Now;
-                    // TODO: should be random delayed  (1-3 secs) and validated, because comes from the button.
+                    audioPlayer.playMessage(new QueuedMessage(folderPitStopRequestCancelled, Utilities.random.Next(1, 3), this));
                 }
             }
 

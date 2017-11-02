@@ -75,6 +75,7 @@ namespace CrewChiefV4.PCars2
         private Dictionary<string, float> waitingForCarsToFinish = new Dictionary<string, float>();
         private DateTime nextDebugCheckeredToFinishMessageTime = DateTime.MinValue;
 
+        private static int lastGuessAtPlayerIndex = -1;
 
         public PCars2GameStateMapper()
         {
@@ -134,6 +135,29 @@ namespace CrewChiefV4.PCars2
             gameState.OpponentData.Add(name, opponentData);
         }
 
+        public static int getPlayerIndex(pCars2APIStruct pCars2APIStruct)
+        {
+            // we have no idea where in the participants array the local player is. No idea at all. And there's no way to work it out.
+            // Offline it's generally 0. Online it can be anything. We can't use mViewedParticipantIndex here because monitoring other
+            // cars will fck up the internal state. mViewedParticipantIndex is random and wrong when you first enter a session so we 
+            // can't grab and reuse the first value we get.
+            //
+            // If we're 'playing' assume we're the player:
+            if (pCars2APIStruct.mGameState == (uint) eGameState.GAME_INGAME_PLAYING)
+            {
+                lastGuessAtPlayerIndex = pCars2APIStruct.mViewedParticipantIndex;
+                //Console.WriteLine("Playing, updating player index guess to " + pCars2APIStruct.mViewedParticipantIndex + 
+                //    " player name " + StructHelper.getNameFromBytes(pCars2APIStruct.mParticipantData[lastGuessAtPlayerIndex].mName));                
+            }
+            // if we've never played in this session, return what the game tells us:
+            if (lastGuessAtPlayerIndex == -1)
+            {
+                // all we can do here is report what the game tells us, even though it'll be wrong
+                return pCars2APIStruct.mViewedParticipantIndex;
+            }
+            return lastGuessAtPlayerIndex;
+        }
+
         public GameStateData mapToGameStateData(Object memoryMappedFileStruct, GameStateData previousGameState)
         {
             pCars2APIStruct shared = ((CrewChiefV4.PCars2.PCars2SharedMemoryReader.PCars2StructWrapper)memoryMappedFileStruct).data;
@@ -153,10 +177,10 @@ namespace CrewChiefV4.PCars2
                 }
                 return previousGameState;
             }
+            int playerIndex = getPlayerIndex(shared);
+            pCars2APIParticipantStruct playerData = shared.mParticipantData[playerIndex];
 
-            pCars2APIParticipantStruct playerData = shared.mParticipantData[shared.mViewedParticipantIndex];
-
-            String playerName = StructHelper.getNameFromBytes(shared.mParticipantData[shared.mViewedParticipantIndex].mName);
+            String playerName = StructHelper.getNameFromBytes(shared.mParticipantData[playerIndex].mName);
 
             GameStateData currentGameState = new GameStateData(ticks);          
             
@@ -240,7 +264,7 @@ namespace CrewChiefV4.PCars2
 
             currentGameState.SessionData.SessionPhase = mapToSessionPhase(currentGameState.SessionData.SessionType,
                 shared.mSessionState, shared.mRaceState, shared.mNumParticipants, leaderHasFinished, lastSessionPhase, lastSessionTimeRemaining,
-                lastSessionRunningTime, shared.mPitModes[shared.mViewedParticipantIndex], previousGameState == null ? null : previousGameState.OpponentData,
+                lastSessionRunningTime, shared.mPitModes[playerIndex], previousGameState == null ? null : previousGameState.OpponentData,
                 shared.mSpeed, currentGameState.Now);
                         
             currentGameState.SessionData.TrackDefinition = TrackData.getTrackDefinition(StructHelper.getNameFromBytes(shared.mTrackLocation)
@@ -262,6 +286,7 @@ namespace CrewChiefV4.PCars2
                         lastSessionTrack == null || lastSessionTrack.name != currentGameState.SessionData.TrackDefinition.name ||
                             (currentGameState.SessionData.SessionHasFixedTime && currentGameState.SessionData.SessionTimeRemaining > lastSessionTimeRemaining + 1))))
             {
+                lastGuessAtPlayerIndex = -1;
                 Console.WriteLine("New session, trigger...");
                 if (sessionOfSameTypeRestarted)
                 {
@@ -309,7 +334,7 @@ namespace CrewChiefV4.PCars2
                 {
                     pCars2APIParticipantStruct participantStruct = shared.mParticipantData[i];
                     String participantName = StructHelper.getNameFromBytes(participantStruct.mName).ToLower();
-                    if (i != shared.mViewedParticipantIndex && participantStruct.mIsActive && participantName != null && participantName.Length > 0)
+                    if (i != playerIndex && participantStruct.mIsActive && participantName != null && participantName.Length > 0)
                     {
                         CarData.CarClass opponentCarClass = CarData.getCarClassForClassName(StructHelper.getCarClassName(shared, i));
                         addOpponentForName(participantName, createOpponentData(participantStruct, false, opponentCarClass,
@@ -490,9 +515,9 @@ namespace CrewChiefV4.PCars2
                     currentGameState.SessionData.LapTimePreviousEstimateForInvalidLap = currentGameState.SessionData.SessionRunningTime - currentGameState.SessionData.SessionTimesAtEndOfSectors[3];
                     currentGameState.SessionData.SessionTimesAtEndOfSectors[3] = currentGameState.SessionData.SessionRunningTime;
 
-                    if (shared.mLastLapTimes[shared.mViewedParticipantIndex] > 0 && currentGameState.SessionData.LastSector1Time > 0 && currentGameState.SessionData.LastSector2Time > 0)
+                    if (shared.mLastLapTimes[playerIndex] > 0 && currentGameState.SessionData.LastSector1Time > 0 && currentGameState.SessionData.LastSector2Time > 0)
                     {
-                        currentGameState.SessionData.LastSector3Time = (shared.mLastLapTimes[shared.mViewedParticipantIndex] - currentGameState.SessionData.LastSector1Time) - currentGameState.SessionData.LastSector2Time;
+                        currentGameState.SessionData.LastSector3Time = (shared.mLastLapTimes[playerIndex] - currentGameState.SessionData.LastSector1Time) - currentGameState.SessionData.LastSector2Time;
                     }
                     else
                     {
@@ -503,8 +528,8 @@ namespace CrewChiefV4.PCars2
                     {
                         currentGameState.SessionData.PlayerBestSector3Time = currentGameState.SessionData.LastSector3Time;
                     }
-                    if (shared.mLastLapTimes[shared.mViewedParticipantIndex] > 0 &&
-                        (currentGameState.SessionData.PlayerLapTimeSessionBest == -1 || shared.mLastLapTimes[shared.mViewedParticipantIndex] <= currentGameState.SessionData.PlayerLapTimeSessionBest))
+                    if (shared.mLastLapTimes[playerIndex] > 0 &&
+                        (currentGameState.SessionData.PlayerLapTimeSessionBest == -1 || shared.mLastLapTimes[playerIndex] <= currentGameState.SessionData.PlayerLapTimeSessionBest))
                     {
                         currentGameState.SessionData.PlayerBestLapSector1Time = currentGameState.SessionData.LastSector1Time;
                         currentGameState.SessionData.PlayerBestLapSector2Time = currentGameState.SessionData.LastSector2Time;
@@ -515,25 +540,25 @@ namespace CrewChiefV4.PCars2
                 {
                     currentGameState.SessionData.SessionTimesAtEndOfSectors[1] = currentGameState.SessionData.SessionRunningTime;
                     // TODO: confirm that an invalid sector will put -1 in here...
-                    currentGameState.SessionData.LastSector1Time = shared.mCurrentSector1Times[shared.mViewedParticipantIndex];
+                    currentGameState.SessionData.LastSector1Time = shared.mCurrentSector1Times[playerIndex];
                     if (currentGameState.SessionData.LastSector1Time > 0 && !shared.mLapInvalidated &&
                         (currentGameState.SessionData.PlayerBestSector1Time == -1 || currentGameState.SessionData.LastSector1Time < currentGameState.SessionData.PlayerBestSector1Time))
                     {
                         currentGameState.SessionData.PlayerBestSector1Time = currentGameState.SessionData.LastSector1Time;
                     }
-                    currentGameState.SessionData.playerAddCumulativeSectorData(1, currentGameState.SessionData.Position, shared.mCurrentSector1Times[shared.mViewedParticipantIndex],
+                    currentGameState.SessionData.playerAddCumulativeSectorData(1, currentGameState.SessionData.Position, shared.mCurrentSector1Times[playerIndex],
                         currentGameState.SessionData.SessionRunningTime, !shared.mLapInvalidated, shared.mRainDensity > 0, shared.mTrackTemperature, shared.mAmbientTemperature);
                 }
                 if (currentGameState.SessionData.SectorNumber == 3)
                 {
                     currentGameState.SessionData.SessionTimesAtEndOfSectors[2] = currentGameState.SessionData.SessionRunningTime;
-                    currentGameState.SessionData.LastSector2Time = shared.mCurrentSector2Times[shared.mViewedParticipantIndex];
+                    currentGameState.SessionData.LastSector2Time = shared.mCurrentSector2Times[playerIndex];
                     if (currentGameState.SessionData.LastSector2Time > 0 && !shared.mLapInvalidated &&
                         (currentGameState.SessionData.PlayerBestSector2Time == -1 || currentGameState.SessionData.LastSector2Time < currentGameState.SessionData.PlayerBestSector2Time))
                     {
                         currentGameState.SessionData.PlayerBestSector2Time = currentGameState.SessionData.LastSector2Time;
                     }
-                    currentGameState.SessionData.playerAddCumulativeSectorData(2, currentGameState.SessionData.Position, shared.mCurrentSector2Times[shared.mViewedParticipantIndex] + shared.mCurrentSector1Times[shared.mViewedParticipantIndex],
+                    currentGameState.SessionData.playerAddCumulativeSectorData(2, currentGameState.SessionData.Position, shared.mCurrentSector2Times[playerIndex] + shared.mCurrentSector1Times[playerIndex],
                         currentGameState.SessionData.SessionRunningTime, !shared.mLapInvalidated, shared.mRainDensity > 0, shared.mTrackTemperature, shared.mAmbientTemperature);
                 }
             }
@@ -543,10 +568,10 @@ namespace CrewChiefV4.PCars2
             currentGameState.SessionData.CurrentLapIsValid = !shared.mLapInvalidated;                
             currentGameState.SessionData.IsNewLap = previousGameState == null || currentGameState.SessionData.CompletedLaps == previousGameState.SessionData.CompletedLaps + 1;
 
-            currentGameState.PitData.InPitlane = shared.mPitModes[shared.mViewedParticipantIndex] == (int)ePitMode.PIT_MODE_DRIVING_INTO_PITS ||
-                shared.mPitModes[shared.mViewedParticipantIndex] == (int)ePitMode.PIT_MODE_IN_PIT ||
-               shared.mPitModes[shared.mViewedParticipantIndex] == (int)ePitMode.PIT_MODE_DRIVING_OUT_OF_PITS ||
-                shared.mPitModes[shared.mViewedParticipantIndex] == (int)ePitMode.PIT_MODE_IN_GARAGE;
+            currentGameState.PitData.InPitlane = shared.mPitModes[playerIndex] == (int)ePitMode.PIT_MODE_DRIVING_INTO_PITS ||
+                shared.mPitModes[playerIndex] == (int)ePitMode.PIT_MODE_IN_PIT ||
+               shared.mPitModes[playerIndex] == (int)ePitMode.PIT_MODE_DRIVING_OUT_OF_PITS ||
+                shared.mPitModes[playerIndex] == (int)ePitMode.PIT_MODE_IN_GARAGE;
 
             if (previousGameState != null)
             {
@@ -572,15 +597,15 @@ namespace CrewChiefV4.PCars2
             }
 
             // TODO: assume non-cumulative sectors....
-            currentGameState.SessionData.LapTimeCurrent = shared.mCurrentSector1Times[shared.mViewedParticipantIndex] +
-                shared.mCurrentSector3Times[shared.mViewedParticipantIndex] + shared.mCurrentSector3Times[shared.mViewedParticipantIndex];
+            currentGameState.SessionData.LapTimeCurrent = shared.mCurrentSector1Times[playerIndex] +
+                shared.mCurrentSector3Times[playerIndex] + shared.mCurrentSector3Times[playerIndex];
             currentGameState.SessionData.TimeDeltaBehind = shared.mSplitTimeBehind;
             currentGameState.SessionData.TimeDeltaFront = shared.mSplitTimeAhead;
 
             List<String> namesInRawData = new List<String>();
             for (int i = 0; i < shared.mParticipantData.Length; i++)
             {
-                if (i != shared.mViewedParticipantIndex)
+                if (i != playerIndex)
                 {
                     pCars2APIParticipantStruct participantStruct = shared.mParticipantData[i];
                     if (participantStruct.mName == null || participantStruct.mName[0] == 0)
@@ -608,7 +633,6 @@ namespace CrewChiefV4.PCars2
                                     Boolean previousOpponentIsExitingPits = false;
 
                                     float[] previousOpponentWorldPosition = new float[] { 0, 0, 0 };
-                                    float previousOpponentSpeed = 0;
                                     float previousDistanceRoundTrack = 0;
                                     OpponentData previousOpponentData = null;
                                     if (previousGameState.OpponentData.ContainsKey(participantName))
@@ -620,7 +644,6 @@ namespace CrewChiefV4.PCars2
                                         previousOpponentIsEnteringPits = previousOpponentData.isEnteringPits();
                                         previousOpponentIsExitingPits = previousOpponentData.isExitingPits();
                                         previousOpponentWorldPosition = previousOpponentData.WorldPosition;
-                                        previousOpponentSpeed = previousOpponentData.Speed;
                                         previousDistanceRoundTrack = previousOpponentData.DistanceRoundTrack;
                                     }
 
@@ -677,7 +700,7 @@ namespace CrewChiefV4.PCars2
                                     updateOpponentData(currentOpponentData, participantName, currentOpponentRacePosition, currentOpponentLapsCompleted,
                                             currentOpponentSector, isEnteringPits, isInPits, isLeavingPits, currentGameState.SessionData.SessionRunningTime, secondsSinceLastUpdate,
                                             new float[] { participantStruct.mWorldPosition[0], participantStruct.mWorldPosition[2] }, previousOpponentWorldPosition,
-                                            previousOpponentSpeed, shared.mWorldFastestLapTime, shared.mWorldFastestSector1Time, shared.mWorldFastestSector2Time, shared.mWorldFastestSector3Time, 
+                                            shared.mSpeeds[i], shared.mWorldFastestLapTime, shared.mWorldFastestSector1Time, shared.mWorldFastestSector2Time, shared.mWorldFastestSector3Time, 
                                             participantStruct.mCurrentLapDistance, shared.mRainDensity == 1,
                                             shared.mAmbientTemperature, shared.mTrackTemperature, opponentCarClass,
                                             currentGameState.SessionData.SessionHasFixedTime, currentGameState.SessionData.SessionTimeRemaining,
@@ -789,13 +812,13 @@ namespace CrewChiefV4.PCars2
             if (currentGameState.PitData.InPitlane)
             {
                 // should we just use the sector number to check this?
-                if (shared.mPitModes[shared.mViewedParticipantIndex] == (int)ePitMode.PIT_MODE_DRIVING_INTO_PITS)
+                if (shared.mPitModes[playerIndex] == (int)ePitMode.PIT_MODE_DRIVING_INTO_PITS)
                 {
                     currentGameState.PitData.OnInLap = true;
                     currentGameState.PitData.OnOutLap = false;
                 }
-                else if (shared.mPitModes[shared.mViewedParticipantIndex] == (int)ePitMode.PIT_MODE_DRIVING_OUT_OF_PITS || shared.mPitModes[shared.mViewedParticipantIndex] == (int)ePitMode.PIT_MODE_IN_GARAGE
-                    || shared.mPitModes[shared.mViewedParticipantIndex] == (int)ePitMode.PIT_MODE_IN_PIT)
+                else if (shared.mPitModes[playerIndex] == (int)ePitMode.PIT_MODE_DRIVING_OUT_OF_PITS || shared.mPitModes[playerIndex] == (int)ePitMode.PIT_MODE_IN_GARAGE
+                    || shared.mPitModes[playerIndex] == (int)ePitMode.PIT_MODE_IN_PIT)
                 {
                     currentGameState.PitData.OnInLap = false;
                     currentGameState.PitData.OnOutLap = true;
@@ -1044,7 +1067,7 @@ namespace CrewChiefV4.PCars2
         private void updateOpponentData(OpponentData opponentData, String name, int racePosition, int completedLaps, int sector, Boolean isEnteringPits,
             Boolean isInPits, Boolean isLeavingPits,
             float sessionRunningTime, float secondsSinceLastUpdate, float[] currentWorldPosition, float[] previousWorldPosition,
-            float previousSpeed, float worldRecordLapTime, float worldRecordS1Time, float worldRecordS2Time, float worldRecordS3Time, 
+            float speed, float worldRecordLapTime, float worldRecordS1Time, float worldRecordS2Time, float worldRecordS3Time, 
             float distanceRoundTrack, Boolean isRaining, float trackTemp, float airTemp, CarData.CarClass carClass,
             Boolean sessionLengthIsTime, float sessionTimeRemaining, float lastSectorTime, Boolean lapInvalidated)
         {
@@ -1058,15 +1081,6 @@ namespace CrewChiefV4.PCars2
                 }
             }
             opponentData.DistanceRoundTrack = distanceRoundTrack;
-            float speed;
-            if (secondsSinceLastUpdate == 0)
-            {
-                speed = opponentData.Speed;
-            }
-            else
-            {
-                speed = (float)Math.Sqrt(Math.Pow(currentWorldPosition[0] - previousWorldPosition[0], 2) + Math.Pow(currentWorldPosition[1] - previousWorldPosition[1], 2)) / secondsSinceLastUpdate;
-            }
             opponentData.Speed = speed;
             opponentData.Position = racePosition;
             opponentData.UnFilteredPosition = racePosition;

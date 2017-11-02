@@ -23,8 +23,6 @@ namespace CrewChiefV4
         DateTime nextProcessStateCheck = DateTime.MinValue;
         bool isGameProcessRunning = false;
 
-        private Random random = new Random();
-
         public static Boolean loadDataFromFile = false;
 
         public SpeechRecogniser speechRecogniser;
@@ -423,7 +421,9 @@ namespace CrewChiefV4
                 }
                 dumpToFile = false;
             }
-            
+            SpeechRecogniser.waitingForSpeech = false;
+            SpeechRecogniser.gotRecognitionResult = false;
+            SpeechRecogniser.keepRecognisingInHoldMode = false;
             gameStateMapper = GameStateReaderFactory.getInstance().getGameStateMapper(gameDefinition);
             gameStateMapper.setSpeechRecogniser(speechRecogniser);
             gameDataReader = GameStateReaderFactory.getInstance().getGameStateReader(gameDefinition);
@@ -460,7 +460,7 @@ namespace CrewChiefV4
                 if (now > nextRunTime)
                 {
                     // ensure the updates don't get synchronised with the spotter / UDP receiver
-                    int updateTweak = random.Next(10) - 5;
+                    int updateTweak = Utilities.random.Next(10) - 5;
                     nextRunTime = DateTime.Now.Add(_timeInterval);
                     nextRunTime.Add(TimeSpan.FromMilliseconds(updateTweak));
                     if (!loadDataFromFile)
@@ -681,7 +681,7 @@ namespace CrewChiefV4
                 else
                 {
                     // ensure the updates don't get synchronised with the spotter / UDP receiver
-                    int threadSleepTime = 5 + random.Next(10);
+                    int threadSleepTime = 5 + Utilities.random.Next(10);
                     Thread.Sleep(threadSleepTime);
                     continue;
                 }

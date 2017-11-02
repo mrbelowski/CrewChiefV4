@@ -15,7 +15,6 @@ namespace CrewChiefV4.Events
         }
 
         private Boolean delayResponses = UserSettings.GetUserSettings().getBoolean("enable_delayed_responses");
-        private Random random = new Random();
 
         private Boolean enableDamageMessages = UserSettings.GetUserSettings().getBoolean("enable_damage_messages");
         private Boolean enableBrakeDamageMessages = UserSettings.GetUserSettings().getBoolean("enable_brake_damage_messages");
@@ -419,10 +418,10 @@ namespace CrewChiefV4.Events
             if (damageMessage != null)
             {
                 // play this immediately or play "stand by", and queue it to be played in a few seconds
-                if (delayResponses && random.Next(10) >= 2 && SoundCache.availableSounds.Contains(AudioPlayer.folderStandBy))
+                if (delayResponses && Utilities.random.Next(10) >= 2 && SoundCache.availableSounds.Contains(AudioPlayer.folderStandBy))
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderStandBy, 0, null));
-                    int secondsDelay = Math.Max(5, random.Next(11));
+                    int secondsDelay = Math.Max(5, Utilities.random.Next(11));
                     audioPlayer.pauseQueue(secondsDelay);
                     damageMessage.dueTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + (1000 * secondsDelay);
                     audioPlayer.playDelayedImmediateMessage(damageMessage);

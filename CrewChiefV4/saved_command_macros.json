@@ -84,14 +84,14 @@
 			"gameDefinition": "RACE_ROOM",
 			"actionSequence": [ "Pit Request Toggle", "Pit Menu Toggle" ],
 			"keyPressTime": 10,
-			"waitBetweenEachCommand": 100
+			"waitBetweenEachCommand": 200
 		},
 		{
 			"description": "pcars2 version, keyPressTime longer",
 			"gameDefinition": "PCARS2",
 			"actionSequence": [ "Car Management", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Right", "ICM Menu Down", "ICM Menu Down", "ICM Menu Down", "ICM Menu Right" ],
 			"keyPressTime": 30,
-			"waitBetweenEachCommand": 100
+			"waitBetweenEachCommand": 200
 		}]
 	},
 	{
@@ -106,7 +106,7 @@
 			"gameDefinition": "RACE_ROOM",
 			"actionSequence": [ "Pit Menu Toggle", "Pit Menu Down", "Pit Menu Select", "WAIT_2000", "Pit Menu Toggle" ],
 			"keyPressTime": 10,
-			"waitBetweenEachCommand": 100,
+			"waitBetweenEachCommand": 200,
 			"allowAutomaticTriggering": true
 		}]
 	},
@@ -122,7 +122,7 @@
 			"gameDefinition": "RACE_ROOM",
 			"actionSequence": [ "Pit Menu Select", "WAIT_1000", "Pit Menu Toggle" ],
 			"keyPressTime": 10,
-			"waitBetweenEachCommand": 100,
+			"waitBetweenEachCommand": 200,
 			"allowAutomaticTriggering": true
 		}]
 	},
@@ -137,7 +137,7 @@
 			"gameDefinition": "RACE_ROOM",
 			"actionSequence": [ "Pit Menu Toggle", "Pit Menu Increase", "WAIT_2000", "Pit Menu Toggle" ],
 			"keyPressTime": 10,
-			"waitBetweenEachCommand": 100
+			"waitBetweenEachCommand": 200
 		}]
 	},
 	{
@@ -151,7 +151,7 @@
 			"gameDefinition": "RACE_ROOM",
 			"actionSequence": [ "Pit Menu Toggle", "Pit Menu Decrease", "WAIT_2000", "Pit Menu Toggle" ],
 			"keyPressTime": 10,
-			"waitBetweenEachCommand": 100
+			"waitBetweenEachCommand": 200
 		}]
 	},
 	{
@@ -159,13 +159,15 @@
 		"description": "selects strategy 1 from the pCARS2 ICM",
 		"voiceTriggers": [ "strategy one", "strat one" ],
 		"buttonTriggers": [],
+		"confirmationMessage": "acknowledge/pit_strategy_1",
 		"commandSets": [
 		{
 			"description": "pcars2 select strat 1",
 			"gameDefinition": "PCARS2",
+			
 			"actionSequence": [ "Car Management", "ICM Menu Up", "ICM Menu Right", "ICM Menu Down", "ICM Menu Right", "ICM Menu Down", "ICM Menu Right", "ICM Menu Up", "ICM Menu Right", "ICM Menu Up", "ICM Menu Right", "ICM Menu Down", "ICM Menu Right"],
 			"keyPressTime": 30,
-			"waitBetweenEachCommand": 100
+			"waitBetweenEachCommand": 200
 		}]
 	},
 	{
@@ -173,13 +175,14 @@
 		"description": "selects strategy 2 from the pCARS2 ICM",
 		"voiceTriggers": [ "strategy two", "strat two" ],
 		"buttonTriggers": [],
+		"confirmationMessage": "acknowledge/pit_strategy_2",
 		"commandSets": [
 		{
 			"description": "pcars2 select strat 2",
 			"gameDefinition": "PCARS2",
 			"actionSequence": [ "Car Management", "ICM Menu Up", "ICM Menu Right", "ICM Menu Down", "ICM Menu Right", "ICM Menu Down", "ICM Menu Down", "ICM Menu Right", "ICM Menu Up", "ICM Menu Up", "ICM Menu Right", "ICM Menu Up", "ICM Menu Right", "ICM Menu Down", "ICM Menu Right" ],
 			"keyPressTime": 30,
-			"waitBetweenEachCommand": 100
+			"waitBetweenEachCommand": 200
 		}]
 	},
 	{
@@ -187,13 +190,14 @@
 		"description": "selects strategy 3 from the pCARS2 ICM",
 		"voiceTriggers": [ "strategy three", "strat three" ],
 		"buttonTriggers": [],
+		"confirmationMessage": "acknowledge/pit_strategy_3",
 		"commandSets": [
 		{
 			"description": "pcars2 select strat 3",
 			"gameDefinition": "PCARS2",
 			"actionSequence": [ "Car Management", "ICM Menu Up", "ICM Menu Right", "ICM Menu Down", "ICM Menu Right", "ICM Menu Down", "ICM Menu Down", "ICM Menu Down", "ICM Menu Right", "ICM Menu Up", "ICM Menu Up", "ICM Menu Right", "ICM Menu Up", "ICM Menu Right", "ICM Menu Down", "ICM Menu Right" ],
 			"keyPressTime": 30,
-			"waitBetweenEachCommand": 100
+			"waitBetweenEachCommand": 200
 		}]
 	},
 	{
@@ -201,13 +205,14 @@
 		"description": "selects strategy 4 from the pCARS2 ICM",
 		"voiceTriggers": [ "strategy four", "strat four" ],
 		"buttonTriggers": [],
+		"confirmationMessage": "acknowledge/pit_strategy_4",
 		"commandSets": [
 		{
 			"description": "pcars2 select strat 4",
 			"gameDefinition": "PCARS2",
 			"actionSequence": [ "Car Management", "ICM Menu Up", "ICM Menu Right", "ICM Menu Down", "ICM Menu Right", "ICM Menu Down", "ICM Menu Down", "ICM Menu Down", "ICM Menu Down", "ICM Menu Right", "ICM Menu Up", "ICM Menu Up", "ICM Menu Right", "ICM Menu Up", "ICM Menu Right", "ICM Menu Down", "ICM Menu Right" ],
 			"keyPressTime": 30,
-			"waitBetweenEachCommand": 100
+			"waitBetweenEachCommand": 200
 		}]
 	},
 	{
@@ -220,14 +225,14 @@
 			"gameDefinition": "RACE_ROOM",
 			"actionSequence": [ "Pit Menu Toggle" ],
 			"keyPressTime": 10,
-			"waitBetweenEachCommand": 100
+			"waitBetweenEachCommand": 200
 		},
 		{
 			"description": "pcars2 version",
 			"gameDefinition": "PCARS2",
 			"actionSequence": [ "Car Management" ],
 			"keyPressTime": 10,
-			"waitBetweenEachCommand": 100
+			"waitBetweenEachCommand": 200
 		}]
 	},
 	{
@@ -240,7 +245,7 @@
 			"gameDefinition": "RACE_ROOM",
 			"actionSequence": [ "Pit Menu Select" ],
 			"keyPressTime": 10,
-			"waitBetweenEachCommand": 100
+			"waitBetweenEachCommand": 200
 		}]
 	},
 	{
@@ -253,14 +258,14 @@
 			"gameDefinition": "RACE_ROOM",
 			"actionSequence": [ "Pit Menu Up" ],
 			"keyPressTime": 10,
-			"waitBetweenEachCommand": 100
+			"waitBetweenEachCommand": 200
 		},
 		{
 			"description": "pcars2 version",
 			"gameDefinition": "PCARS2",
 			"actionSequence": [ "ICM Menu Up" ],
 			"keyPressTime": 10,
-			"waitBetweenEachCommand": 100
+			"waitBetweenEachCommand": 200
 		}]
 	},
 	{
@@ -273,14 +278,14 @@
 			"gameDefinition": "RACE_ROOM",
 			"actionSequence": [ "Pit Menu Down" ],
 			"keyPressTime": 10,
-			"waitBetweenEachCommand": 100
+			"waitBetweenEachCommand": 200
 		},
 		{
 			"description": "pcars2 version",
 			"gameDefinition": "PCARS2",
 			"actionSequence": [ "ICM Menu Down" ],
 			"keyPressTime": 10,
-			"waitBetweenEachCommand": 100
+			"waitBetweenEachCommand": 200
 		}]
 	},
 	{
@@ -293,14 +298,14 @@
 			"gameDefinition": "RACE_ROOM",
 			"actionSequence": [ "Pit Menu Decrease" ],
 			"keyPressTime": 10,
-			"waitBetweenEachCommand": 100
+			"waitBetweenEachCommand": 200
 		},
 		{
 			"description": "pcars2 version",
 			"gameDefinition": "PCARS2",
 			"actionSequence": [ "ICM Menu Left" ],
 			"keyPressTime": 10,
-			"waitBetweenEachCommand": 100
+			"waitBetweenEachCommand": 200
 		}]
 	},
 	{
@@ -313,14 +318,14 @@
 			"gameDefinition": "RACE_ROOM",
 			"actionSequence": [ "Pit Menu Increase" ],
 			"keyPressTime": 10,
-			"waitBetweenEachCommand": 100
+			"waitBetweenEachCommand": 200
 		},
 		{
 			"description": "pcars2 version",
 			"gameDefinition": "PCARS2",
 			"actionSequence": [ "ICM Menu Right" ],
 			"keyPressTime": 10,
-			"waitBetweenEachCommand": 100
+			"waitBetweenEachCommand": 200
 		}]
 	}]
 }

@@ -15,18 +15,12 @@ namespace CrewChiefV4.PCars2
         private int sharedmemorysize;
         private byte[] sharedMemoryReadBuffer;
         private Boolean initialised = false;
-        private List<PCars2RawStructWrapper> dataToDump;
-        private PCars2RawStructWrapper[] dataReadFromFile = null;
+        private List<PCars2StructWrapper> dataToDump;
+        private PCars2StructWrapper[] dataReadFromFile = null;
         private int dataReadFromFileIndex = 0;
         private String lastReadFileName = null;
         private long tornFramesCount = 0;
-
-        public class PCars2RawStructWrapper
-        {
-            public long ticksWhenRead;
-            public byte[] data;
-        }
-
+        
         public class PCars2StructWrapper
         {
             public long ticksWhenRead;
@@ -37,7 +31,7 @@ namespace CrewChiefV4.PCars2
         {
             if (dumpToFile && dataToDump != null && dataToDump.Count > 0 && filenameToDump != null)
             {
-                SerializeObject(dataToDump.ToArray<PCars2RawStructWrapper>(), filenameToDump);
+                SerializeObject(dataToDump.ToArray<PCars2StructWrapper>(), filenameToDump);
             }
         }
 
@@ -51,17 +45,14 @@ namespace CrewChiefV4.PCars2
             if (dataReadFromFile == null || filename != lastReadFileName)
             {
                 dataReadFromFileIndex = 0;
-                dataReadFromFile = DeSerializeObject<PCars2RawStructWrapper[]>(dataFilesPath + filename);
+                dataReadFromFile = DeSerializeObject<PCars2StructWrapper[]>(dataFilesPath + filename);
                 lastReadFileName = filename;
             }
             if (dataReadFromFile != null && dataReadFromFile.Length > dataReadFromFileIndex)
             {
-                PCars2RawStructWrapper rawStructWrapperData = dataReadFromFile[dataReadFromFileIndex];
+                PCars2StructWrapper structWrapperData = dataReadFromFile[dataReadFromFileIndex];
                 dataReadFromFileIndex++;
-                PCars2StructWrapper wrapperToReturn = new PCars2StructWrapper();
-                wrapperToReturn.ticksWhenRead = rawStructWrapperData.ticksWhenRead;
-                wrapperToReturn.data = BytesToStructure(rawStructWrapperData.data);
-                return wrapperToReturn;
+                return structWrapperData;
             }
             else
             {
@@ -87,7 +78,7 @@ namespace CrewChiefV4.PCars2
         {
             if (dumpToFile)
             {
-                dataToDump = new List<PCars2RawStructWrapper>();
+                dataToDump = new List<PCars2StructWrapper>();
             }
             lock (this)
             {
@@ -144,18 +135,14 @@ namespace CrewChiefV4.PCars2
                         }
                     } while (_pcarsapistruct.mSequenceNumber % 2 != 0);
                     tornFramesCount += retries;
-                    long now = DateTime.Now.Ticks;
-                    if (!forSpotter && dumpToFile && dataToDump != null && _pcarsapistruct.mTrackLocation != null &&
-                        _pcarsapistruct.mTrackLocation.Length > 0)
-                    {
-                        PCars2RawStructWrapper rawStructWrapper = new PCars2RawStructWrapper();
-                        rawStructWrapper.ticksWhenRead = now;
-                        rawStructWrapper.data = sharedMemoryReadBuffer;
-                        dataToDump.Add(rawStructWrapper);
-                    }
                     PCars2StructWrapper structWrapper = new PCars2StructWrapper();
                     structWrapper.ticksWhenRead = DateTime.Now.Ticks;
                     structWrapper.data = _pcarsapistruct;
+                    if (!forSpotter && dumpToFile && dataToDump != null && _pcarsapistruct.mTrackLocation != null &&
+                        _pcarsapistruct.mTrackLocation.Length > 0)
+                    {
+                        dataToDump.Add(structWrapper);
+                    }
                     return structWrapper;
                 }
                 catch (Exception ex)

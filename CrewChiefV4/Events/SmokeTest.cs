@@ -18,8 +18,6 @@ namespace CrewChiefV4.Events
 
         private String folderTest = "radio_check/test";
 
-        private Random random = new Random();
-
         public SmokeTest(AudioPlayer audioPlayer)
         {
             this.audioPlayer = audioPlayer;
@@ -79,12 +77,12 @@ namespace CrewChiefV4.Events
                     {
                         audioPlayer.playMessage(new QueuedMessage("gap_in_front" + index,
                                         MessageContents(Timings.folderTheGapTo, driverToTest, Timings.folderAheadIsIncreasing,
-                                        TimeSpan.FromSeconds((float)random.NextDouble() * 10)),
-                                        MessageContents(Timings.folderGapInFrontIncreasing, TimeSpan.FromSeconds((float)random.NextDouble() * 10)), 0, this));
+                                        TimeSpan.FromSeconds((float)Utilities.random.NextDouble() * 10)),
+                                        MessageContents(Timings.folderGapInFrontIncreasing, TimeSpan.FromSeconds((float)Utilities.random.NextDouble() * 10)), 0, this));
                         audioPlayer.playMessage(new QueuedMessage("leader_pitting" + index,
                             MessageContents(Opponents.folderTheLeader, driverToTest, Opponents.folderIsPitting), 0, this));
                         audioPlayer.playMessage(new QueuedMessage("new_fastest_lap" + index, MessageContents(Opponents.folderNewFastestLapFor, driverToTest,
-                                            TimeSpan.FromSeconds(random.NextDouble() * 100)), 0, this));
+                                            TimeSpan.FromSeconds(Utilities.random.NextDouble() * 100)), 0, this));
                         index++;
                     }
                     else
@@ -100,7 +98,7 @@ namespace CrewChiefV4.Events
 
             /*for (int i = 0; i < 5; i++)
             {
-                audioPlayer.playMessage(new QueuedMessage("timingtest" +i, MessageContents(TimeSpanWrapper.FromSeconds(random.Next(100) + ((float)random.Next(99) / 100f), Precision.AUTO_LAPTIMES)), 0, this));
+                audioPlayer.playMessage(new QueuedMessage("timingtest" +i, MessageContents(TimeSpanWrapper.FromSeconds(Utilities.random.Next(100) + ((float)random.Next(99) / 100f), Precision.AUTO_LAPTIMES)), 0, this));
             }*/
 
             /*audioPlayer.playMessage(new QueuedMessage(ConditionsMonitor.folderDrizzleIncreasing, 0, this));
@@ -131,19 +129,19 @@ namespace CrewChiefV4.Events
                 {
                     for (int i = 0; i < 10; i++)
                     {
-                        audioPlayer.playMessage(new QueuedMessage("int" + i, MessageContents(random.Next(3100)), 0, this));
+                        audioPlayer.playMessage(new QueuedMessage("int" + i, MessageContents(Utilities.random.Next(3100)), 0, this));
                     }
                     for (int i = 0; i < 10; i++)
                     {
-                        audioPlayer.playMessage(new QueuedMessage("time" + i, MessageContents(TimeSpan.FromSeconds(random.Next(4000) + ((float)random.Next(9) / 10f))), 0, this));
+                        audioPlayer.playMessage(new QueuedMessage("time" + i, MessageContents(TimeSpan.FromSeconds(Utilities.random.Next(4000) + ((float)Utilities.random.Next(9) / 10f))), 0, this));
                     }
                     for (int i = 0; i < 10; i++)
                     {
-                        audioPlayer.playMessage(new QueuedMessage("time" + i, MessageContents(TimeSpan.FromSeconds(random.Next(60) + ((float)random.Next(9) / 10f))), 0, this));
+                        audioPlayer.playMessage(new QueuedMessage("time" + i, MessageContents(TimeSpan.FromSeconds(Utilities.random.Next(60) + ((float)Utilities.random.Next(9) / 10f))), 0, this));
                     }
                     for (int i = 0; i < 5; i++)
                     {
-                        audioPlayer.playMessage(new QueuedMessage("time" + i, MessageContents(TimeSpan.FromSeconds(random.NextDouble())), 0, this));
+                        audioPlayer.playMessage(new QueuedMessage("time" + i, MessageContents(TimeSpan.FromSeconds(Utilities.random.NextDouble())), 0, this));
                     }
                     break;
                 }
@@ -182,7 +180,7 @@ namespace CrewChiefV4.Events
             audioPlayer.playMessage(new QueuedMessage("Fuel/estimate", MessageContents(
                                         Fuel.folderWeEstimate, 12, Fuel.folderMinutesRemaining), 0, this));
             audioPlayer.playMessage(new QueuedMessage("laptime", MessageContents(LapTimes.folderLapTimeIntro, 
-                TimeSpan.FromSeconds(60 + (random.NextDouble() * 60))), 0, this));
+                TimeSpan.FromSeconds(60 + (Utilities.random.NextDouble() * 60))), 0, this));
 
             audioPlayer.playMessage(new QueuedMessage("yesBoxAfter", MessageContents(MandatoryPitStops.folderMandatoryPitStopsYesStopAfter,
                 TimeSpan.FromMinutes(10)), 0, null));
@@ -220,15 +218,15 @@ namespace CrewChiefV4.Events
 
             audioPlayer.playMessage(new QueuedMessage("gap_in_front2",
                                         MessageContents(Timings.folderTheGapTo, makeTempDriver("7908jimmy6^&^", new List<string>()), Timings.folderAheadIsIncreasing,
-                                        TimeSpan.FromSeconds((float)random.NextDouble() * 10)),
-                                        MessageContents(Timings.folderGapInFrontIncreasing, TimeSpan.FromSeconds((float)random.NextDouble() * 10)), 0, this));
+                                        TimeSpan.FromSeconds((float)Utilities.random.NextDouble() * 10)),
+                                        MessageContents(Timings.folderGapInFrontIncreasing, TimeSpan.FromSeconds((float)Utilities.random.NextDouble() * 10)), 0, this));
 
             
 
             audioPlayer.playMessage(new QueuedMessage("gap_in_front4",
                                         MessageContents(Timings.folderTheGapTo, makeTempDriver("7908jimmy6^&^", new List<string>()), Timings.folderAheadIsIncreasing,
-                                        TimeSpan.FromSeconds((float)random.NextDouble() * 10)),
-                                        MessageContents(Timings.folderGapInFrontIncreasing, TimeSpan.FromSeconds((float)random.NextDouble() * 10)), 0, this));
+                                        TimeSpan.FromSeconds((float)Utilities.random.NextDouble() * 10)),
+                                        MessageContents(Timings.folderGapInFrontIncreasing, TimeSpan.FromSeconds((float)Utilities.random.NextDouble() * 10)), 0, this));
             Thread.Sleep(8000);
             inTheMiddleMessage = new QueuedMessage("spotter/car_right", 0, null);
             inTheMiddleMessage.expiryTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + 20000;
@@ -237,8 +235,8 @@ namespace CrewChiefV4.Events
             Thread.Sleep(2000);
             audioPlayer.playMessage(new QueuedMessage("gap_in_front3",
                                         MessageContents(Timings.folderTheGapTo, makeTempDriver("7908jimmy6^&^", new List<string>()), Timings.folderAheadIsIncreasing,
-                                        TimeSpan.FromSeconds((float)random.NextDouble() * 10)),
-                                        MessageContents(Timings.folderGapInFrontIncreasing, TimeSpan.FromSeconds((float)random.NextDouble() * 10)), 0, this));
+                                        TimeSpan.FromSeconds((float)Utilities.random.NextDouble() * 10)),
+                                        MessageContents(Timings.folderGapInFrontIncreasing, TimeSpan.FromSeconds((float)Utilities.random.NextDouble() * 10)), 0, this));
 
 
             Thread.Sleep(4000);
@@ -249,8 +247,8 @@ namespace CrewChiefV4.Events
             Thread.Sleep(5000);
             audioPlayer.playMessage(new QueuedMessage("gap_in_front4",
                                         MessageContents(Timings.folderTheGapTo, makeTempDriver("7908jimmy6^&^", new List<string>()), Timings.folderAheadIsIncreasing,
-                                        TimeSpan.FromSeconds((float)random.NextDouble() * 10)),
-                                        MessageContents(Timings.folderGapInFrontIncreasing, TimeSpan.FromSeconds((float)random.NextDouble() * 10)), 0, this));
+                                        TimeSpan.FromSeconds((float)Utilities.random.NextDouble() * 10)),
+                                        MessageContents(Timings.folderGapInFrontIncreasing, TimeSpan.FromSeconds((float)Utilities.random.NextDouble() * 10)), 0, this));
         }
     }
 }

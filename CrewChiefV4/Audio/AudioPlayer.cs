@@ -70,8 +70,6 @@ namespace CrewChiefV4.Audio
         // if this is true, no 'green green green', 'get ready', or spotter messages are played
         private Boolean disableImmediateMessages = UserSettings.GetUserSettings().getBoolean("disable_immediate_messages");
 
-        private Random random = new Random();
-
         private OrderedDictionary queuedClips = new OrderedDictionary();
 
         private OrderedDictionary immediateClips = new OrderedDictionary();
@@ -746,6 +744,8 @@ namespace CrewChiefV4.Audio
                                 eventName == lastImmediateMessageName && GameStateData.CurrentTime - lastImmediateMessageTime < TimeSpan.FromSeconds(5);
                             if (messageHasExpired || !messageIsStillValid || hasJustPlayedAsAnImmediateMessage)
                             {
+                                Console.WriteLine("skipping message " + eventName +
+                                    ", messageHasExpired:" + messageHasExpired + ", messageIsStillValid:" + messageIsStillValid + ", hasJustPlayedAsAnImmediateMessage:" + hasJustPlayedAsAnImmediateMessage);
                                 soundsProcessed.Add(eventName);
                                 continue;
                             }
@@ -779,6 +779,10 @@ namespace CrewChiefV4.Audio
                                     soundCache.Play(eventName);
                                     timeOfLastMessageEnd = GameStateData.CurrentTime;
                                 }
+                                else
+                                {
+                                    Console.WriteLine("Skipping message " + eventName + " because we're muted");
+                                }
                             }
                         }
                         else
@@ -798,6 +802,10 @@ namespace CrewChiefV4.Audio
                                 }
                                 soundCache.Play(thisMessage.messageFolders);
                                 timeOfLastMessageEnd = GameStateData.CurrentTime;
+                            }
+                            else
+                            {
+                                Console.WriteLine("Skipping message " + eventName + " because we're muted");
                             }
                             if (playedMessagesCount.ContainsKey(eventName))
                             {
@@ -858,7 +866,7 @@ namespace CrewChiefV4.Audio
                             backgroundDuration = (backgroundPlayer.NaturalDuration.TimeSpan.Minutes * 60) +
                                 backgroundPlayer.NaturalDuration.TimeSpan.Seconds;
                             //Console.WriteLine("Duration from file is " + backgroundDuration);
-                            backgroundOffset = random.Next(0, backgroundDuration - backgroundLeadout);
+                            backgroundOffset = Utilities.random.Next(0, backgroundDuration - backgroundLeadout);
                         }
                         //Console.WriteLine("Background offset = " + backgroundOffset);
                         backgroundPlayer.Position = TimeSpan.FromSeconds(backgroundOffset);
