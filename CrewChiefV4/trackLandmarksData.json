@@ -10348,7 +10348,8 @@
 			]
 		},
 		{
-			"rf2TrackNames": ["Guia_Circuit"],
+            "rf2TrackNames": [ "Guia_Circuit" ],
+            "raceroomLayoutId": 2123,
 			"trackLandmarks": [{
 					"landmarkName": "reservoir",
 					"distanceRoundLapStart": 55,
@@ -12847,7 +12848,8 @@
 		},
 		{
 			"rf2TrackNames": ["Oschersleben Motorsport Park"],
-			"approximateTrackLength": 3670.4,
+            "approximateTrackLength": 3670.4,
+            "raceroomLayoutId": 2384,
 			"trackLandmarks": [{
 					"landmarkName": "turn1",
 					"distanceRoundLapStart": 430,
