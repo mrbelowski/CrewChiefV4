@@ -203,6 +203,13 @@ namespace CrewChiefV4.Events
 
         protected override void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
+            // do the corner names stuff first, if it's enabled
+            if (currentGameState.readLandmarksForThisLap && currentGameState.SessionData.trackLandmarksTiming != null &&
+                currentGameState.SessionData.trackLandmarksTiming.atMidPointOfLandmark != null)
+            {
+                // mid-point it true for only 1 tick so this should be safe
+                audioPlayer.playMessage(new QueuedMessage("corners/" + currentGameState.SessionData.trackLandmarksTiming.atMidPointOfLandmark, 0, this));
+            }
             if (GameStateData.onManualFormationLap)
             {
                 return;

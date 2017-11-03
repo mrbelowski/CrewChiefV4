@@ -855,6 +855,7 @@ namespace CrewChiefV4.assetto
                 currentGameState.SessionData.OverallSessionBestLapTime = previousGameState.SessionData.OverallSessionBestLapTime;
                 currentGameState.SessionData.PlayerClassSessionBestLapTime = previousGameState.SessionData.PlayerClassSessionBestLapTime;
                 currentGameState.SessionData.CurrentLapIsValid = previousGameState.SessionData.CurrentLapIsValid;
+                currentGameState.readLandmarksForThisLap = previousGameState.readLandmarksForThisLap;
             }
 
             if (currentGameState.carClass.carClassEnum == CarData.CarClassEnum.UNKNOWN_RACE)
@@ -1229,7 +1230,10 @@ namespace CrewChiefV4.assetto
                 currentGameState.SessionData.IsNewLap = currentGameState.HasNewLapData(previousGameState, mapToFloatTime(shared.acsGraphic.iLastTime), currentGameState.SessionData.SectorNumber)
                     || ((lastSessionPhase == SessionPhase.Countdown)
                     && (currentGameState.SessionData.SessionPhase == SessionPhase.Green || currentGameState.SessionData.SessionPhase == SessionPhase.FullCourseYellow));
-
+                if (currentGameState.SessionData.IsNewLap)
+                {
+                    currentGameState.readLandmarksForThisLap = false;
+                }
                 //Sector Log
                 if (currentGameState.SessionData.TrackDefinition.unknownTrack && logUnknownTrackSectors && !isOnline && currentGameState.SessionData.IsNewSector &&
                     (shared.acsGraphic.currentSectorIndex + 1 == 2 || shared.acsGraphic.currentSectorIndex + 1 == 3))

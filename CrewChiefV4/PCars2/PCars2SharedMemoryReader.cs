@@ -92,9 +92,9 @@ namespace CrewChiefV4.PCars2
                         initialised = true;
                         Console.WriteLine("Initialised pcars2 shared memory");
                     }
-                    catch (Exception e)
+                    catch (Exception)
                     {
-                        Console.WriteLine("found PCars2 process, but can't find PCars2 shared memory - check the game isn't running in PCars mode");
+                        Console.WriteLine("found PCars2 process, but can't find PCars2 shared memory - check the game isn't running in PCars1 mode");
                         initialised = false;
                     }
                 }

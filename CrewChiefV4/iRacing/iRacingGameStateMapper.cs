@@ -60,6 +60,7 @@ namespace CrewChiefV4.iRacing
                 currentGameState.SessionData.PlayerClassSessionBestLapTime = previousGameState.SessionData.PlayerClassSessionBestLapTime;
                 currentGameState.SessionData.CurrentLapIsValid = previousGameState.SessionData.CurrentLapIsValid;
                 currentGameState.SessionData.SessionStartPosition = previousGameState.SessionData.SessionStartPosition;
+                currentGameState.readLandmarksForThisLap = previousGameState.readLandmarksForThisLap;
             }
             currentGameState.SessionData.SessionType = mapToSessionType(shared.SessionData.SessionType);
             currentGameState.SessionData.SessionRunningTime = (float)shared.Telemetry.SessionTime;
@@ -361,6 +362,11 @@ namespace CrewChiefV4.iRacing
             currentGameState.SessionData.IsNewLap = currentGameState.HasNewLapData(previousGameState, playerCar.Live.LapTimePrevious, currentSector) ||
                 ((lastSessionPhase == SessionPhase.Countdown) && (currentGameState.SessionData.SessionPhase == SessionPhase.Green ||
                 currentGameState.SessionData.SessionPhase == SessionPhase.FullCourseYellow));
+
+            if (currentGameState.SessionData.IsNewLap)
+            {
+                currentGameState.readLandmarksForThisLap = false;
+            }
 
             currentGameState.SessionData.SectorNumber = currentSector;
 

@@ -90,6 +90,8 @@ WHATS_THE_AIR_TEMP = what's the air temp:what's the air temperature
 WHATS_THE_TRACK_TEMP = what's the track temp:what's the track temperature
 RADIO_CHECK = can you hear me
 
+PLAY_CORNER_NAMES = read corner names:corner names:tell me the corner names
+
 
 #################################################
 # Dynamic recognition phrase fragments - these are used to build up recognition sentences for opponent information.

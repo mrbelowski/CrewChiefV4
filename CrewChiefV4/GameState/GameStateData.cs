@@ -1846,6 +1846,8 @@ namespace CrewChiefV4.GameState
         public float CloudBrightness = -1;
         public float RainDensity = -1;
 
+        public Boolean readLandmarksForThisLap = false;
+
         //call this after setting currentGameState.SessionData.SectorNumber and currentGameState.SessionData.IsNewSector
         public bool HasNewLapData(GameStateData previousGameState, float gameProvidedLastLapTime, int currentSector)
         {
