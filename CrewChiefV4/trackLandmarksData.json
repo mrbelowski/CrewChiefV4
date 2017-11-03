@@ -13410,7 +13410,8 @@
 		},
 		{
 			"rf2TrackNames": ["Road America 2016"],
-			"approximateTrackLength": 6494.4,
+            "approximateTrackLength": 6494.4,
+            "raceroomLayoutId": 5276,
 			"trackLandmarks": [{
 					"landmarkName": "turn1",
 					"distanceRoundLapStart": 565,
