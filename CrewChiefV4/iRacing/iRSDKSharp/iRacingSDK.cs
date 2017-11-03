@@ -175,7 +175,7 @@ namespace iRSDKSharp
             return null;
         }
 
-        public string GetSessionInfo()
+        public string GetSessionInfoString()
         {
             if(IsInitialized && Header != null)
             {
@@ -185,7 +185,16 @@ namespace iRSDKSharp
             }
             return null;
         }
-
+        public byte [] GetSessionInfo()
+        {
+            if (IsInitialized && Header != null)
+            {
+                byte[] data = new byte[Header.SessionInfoLength];
+                FileMapView.ReadArray<byte>(Header.SessionInfoOffset, data, 0, Header.SessionInfoLength);
+                return data;
+            }
+            return null;
+        }
         public bool IsConnected()
         {
             if (IsInitialized && Header != null)
