@@ -901,7 +901,7 @@
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "variante_alta",
+					"landmarkName": "varianti_alta",
 					"distanceRoundLapStart": 3300,
 					"distanceRoundLapEnd": 3380,
 					"isCommonOvertakingSpot": true
@@ -8126,7 +8126,7 @@
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "variante_alta",
+					"landmarkName": "varianti_alta",
 					"distanceRoundLapStart": 3200,
 					"distanceRoundLapEnd": 3325,
 					"isCommonOvertakingSpot": false
@@ -8968,7 +8968,7 @@
 					"isCommonOvertakingSpot": false
 				},
 				{
-					"landmarkName": "radillon",
+					"landmarkName": "radillion",
 					"distanceRoundLapStart": 1070,
 					"distanceRoundLapEnd": 1210,
 					"isCommonOvertakingSpot": false
