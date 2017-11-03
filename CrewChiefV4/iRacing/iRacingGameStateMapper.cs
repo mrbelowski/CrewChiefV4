@@ -67,7 +67,8 @@ namespace CrewChiefV4.iRacing
             currentGameState.SessionData.SessionTimeRemaining = (float)shared.Telemetry.SessionTimeRemain;
             int previousLapsCompleted = previousGameState == null ? 0 : previousGameState.SessionData.CompletedLaps;
             currentGameState.SessionData.SessionPhase = mapToSessionPhase(lastSessionPhase, shared.Telemetry.SessionState, currentGameState.SessionData.SessionType, shared.Telemetry.IsReplayPlaying,
-                (float)shared.Telemetry.SessionTime, previousLapsCompleted, shared.Telemetry.Lap, shared.Telemetry.SessionFlags, shared.Telemetry.IsInGarage);
+                (float)shared.Telemetry.SessionTime, previousLapsCompleted, shared.Telemetry.Lap, shared.Telemetry.SessionFlags, shared.Telemetry.IsInGarage,
+                shared.SessionData.IsLimitedTime, shared.Telemetry.SessionTimeRemain, shared.Telemetry.SessionTime);
 
             currentGameState.SessionData.NumCarsAtStartOfSession = shared.Drivers.Count;
 
@@ -129,7 +130,7 @@ namespace CrewChiefV4.iRacing
                 Console.WriteLine("SessionStartPosition = " + currentGameState.SessionData.SessionStartPosition);
                 currentGameState.PitData.IsRefuellingAllowed = true;
                 currentGameState.SessionData.SessionTimeRemaining = (float)shared.Telemetry.SessionTimeRemain;
-                currentGameState.SessionData.SessionTotalRunTime = (float)shared.Telemetry.SessionTimeRemain;
+                currentGameState.SessionData.SessionTotalRunTime = (float)(shared.Telemetry.SessionTimeRemain + shared.Telemetry.SessionTime);
                 if (shared.SessionData.IsLimitedTime)
                 {
                     currentGameState.SessionData.SessionHasFixedTime = true;
@@ -181,7 +182,7 @@ namespace CrewChiefV4.iRacing
                     {
                         justGoneGreen = true;
                         // just gone green, so get the session data
-                        currentGameState.SessionData.SessionTotalRunTime = (float)shared.Telemetry.SessionTimeRemain;
+                        currentGameState.SessionData.SessionTotalRunTime = (float)(shared.Telemetry.SessionTimeRemain + shared.Telemetry.SessionTime);
                         if (shared.SessionData.IsLimitedTime)
                         {                            
                             currentGameState.SessionData.SessionHasFixedTime = true;
@@ -785,6 +786,9 @@ namespace CrewChiefV4.iRacing
                     shared.Telemetry.AirTemp, shared.Telemetry.TrackTemp, 0, shared.Telemetry.WindVel, 0, 0, 0);
             }
             //Console.WriteLine("Speed:" + playerCar.SpeedKph);
+
+
+            // Console.WriteLine("Session running time = " + currentGameState.SessionData.SessionRunningTime + " type = " + currentGameState.SessionData.SessionType + " phase " + currentGameState.SessionData.SessionPhase + " run time = " + currentGameState.SessionData.SessionTotalRunTime);
             return currentGameState;
         }
 
@@ -875,8 +879,15 @@ namespace CrewChiefV4.iRacing
 
         private SessionPhase mapToSessionPhase(SessionPhase lastSessionPhase, SessionStates sessionState,
             SessionType currentSessionType, bool isReplay, float thisSessionRunningTime,
-            int previousLapsCompleted, int laps, SessionFlags sessionFlags, bool isInPit)
+            int previousLapsCompleted, int laps, SessionFlags sessionFlags, bool isInPit, bool fixedTimeSession,
+            double sessionTimeRemaining, double sessionRunningTime)
         {
+            // here we assume a timed session must be at least 1 minute - if the time remaining < 0 and we've been running for < 60 seconds, it's bollocks
+            if (fixedTimeSession && sessionTimeRemaining < 0 && sessionRunningTime < 60)
+            {
+                // Console.WriteLine("assuming unavailable - fixed time with " + sessionTimeRemaining + " left and has run for " + sessionRunningTime);
+                return SessionPhase.Unavailable;
+            }
             /*if (!prevSessionFlags.Equals(sessionFlags.ToString()))
             {
                 Console.WriteLine(sessionFlags.ToString());
@@ -931,7 +942,7 @@ namespace CrewChiefV4.iRacing
                         }
                     }
                 }
-                else if (sessionFlags.HasFlag(SessionFlags.StartReady) || sessionFlags.HasFlag(SessionFlags.StartSet) || SessionStates.Racing != sessionState && isReplay )
+                else if (sessionFlags.HasFlag(SessionFlags.StartReady) || sessionFlags.HasFlag(SessionFlags.StartSet) || SessionStates.Racing != sessionState && isReplay)
                 {
                     // don't allow a transition to Countdown if the game time has increased
                     //if (lastSessionRunningTime < thisSessionRunningTime)
