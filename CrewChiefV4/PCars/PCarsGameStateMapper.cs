@@ -410,6 +410,7 @@ namespace CrewChiefV4.PCars
                 currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass = previousGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass;
                 currentGameState.SessionData.OverallSessionBestLapTime = previousGameState.SessionData.OverallSessionBestLapTime;
                 currentGameState.SessionData.PlayerClassSessionBestLapTime = previousGameState.SessionData.PlayerClassSessionBestLapTime;
+                currentGameState.readLandmarksForThisLap = previousGameState.readLandmarksForThisLap;
             }
 
             if (currentGameState.carClass.carClassEnum == CarData.CarClassEnum.UNKNOWN_RACE)
@@ -760,6 +761,10 @@ namespace CrewChiefV4.PCars
                 ((shared.mSessionState == (int)eSessionState.SESSION_PRACTICE || shared.mSessionState == (int)eSessionState.SESSION_QUALIFY || 
                 shared.mSessionState == (int)eSessionState.SESSION_TEST || shared.mSessionState == (int)eSessionState.SESSION_TIME_ATTACK) 
                 && previousGameState.SessionData.LapTimeCurrent == -1 && shared.mCurrentTime > 0);
+            if (currentGameState.SessionData.IsNewLap)
+            {
+                currentGameState.readLandmarksForThisLap = false;
+            }
 
             currentGameState.PitData.InPitlane = shared.mPitMode == (int)ePitMode.PIT_MODE_DRIVING_INTO_PITS ||
                 shared.mPitMode == (int)ePitMode.PIT_MODE_IN_PIT ||

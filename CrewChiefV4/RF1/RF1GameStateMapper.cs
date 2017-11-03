@@ -237,6 +237,7 @@ namespace CrewChiefV4.rFactor1
                 // copy from previous gamestate
                 currentGameState.SessionData.TrackDefinition.trackLandmarks = previousGameState.SessionData.TrackDefinition.trackLandmarks;
                 currentGameState.SessionData.TrackDefinition.gapPoints = previousGameState.SessionData.TrackDefinition.gapPoints;
+                currentGameState.readLandmarksForThisLap = previousGameState.readLandmarksForThisLap;
             }
             
             currentGameState.SessionData.TrackDefinition.setGapPoints();
@@ -287,6 +288,10 @@ namespace CrewChiefV4.rFactor1
             currentGameState.SessionData.SectorNumber = player.sector == 0 ? 3 : player.sector;
             currentGameState.SessionData.IsNewSector = currentGameState.SessionData.IsNewSession || currentGameState.SessionData.SectorNumber != previousGameState.SessionData.SectorNumber;
             currentGameState.SessionData.IsNewLap = currentGameState.SessionData.IsNewSession || (currentGameState.SessionData.IsNewSector && currentGameState.SessionData.SectorNumber == 1);
+            if (currentGameState.SessionData.IsNewLap)
+            {
+                currentGameState.readLandmarksForThisLap = false;
+            }
             currentGameState.SessionData.PositionAtStartOfCurrentLap = currentGameState.SessionData.IsNewLap ? currentGameState.SessionData.Position : previousGameState.SessionData.PositionAtStartOfCurrentLap;
             currentGameState.SessionData.IsDisqualified = (rFactor1Constant.rfFinishStatus)player.finishStatus == rFactor1Constant.rfFinishStatus.dq;
             currentGameState.SessionData.CompletedLaps = shared.lapNumber < 0 ? 0 : shared.lapNumber;
