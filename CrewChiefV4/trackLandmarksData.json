@@ -4,7 +4,8 @@
 				"Bathurst 2010 - MAX Detail"
 			],
 			"rf2TrackNames": ["Bathurst"],
-			"pcarsTrackName": "Bathurst:",
+            "pcarsTrackName": "Bathurst:",
+            "irTrackName": "bathurst",
 			"raceroomLayoutId": 1846,
 			"trackLandmarks": [{
 					"landmarkName": "hell_corner",
@@ -501,7 +502,8 @@
 			]
 		},
 		{
-			"acTrackNames": ["spa:"],
+            "acTrackNames": [ "spa:" ],
+            "irTrackName": "spa up",
 			"raceroomLayoutId": 3870,
 			"trackLandmarks": [{
 					"landmarkName": "la_source",
@@ -924,7 +926,8 @@
 		{
 			"acTrackNames": ["ks_zandvoort:"],
 			"raceroomLayoutId": 1678,
-			"rf2TrackNames": ["Zandvoort"],
+            "rf2TrackNames": [ "Zandvoort" ],
+            "irTrackName": "zandvoort grandprix",
 			"trackLandmarks": [{
 					"landmarkName": "tarzanbocht",
 					"distanceRoundLapStart": 370,
@@ -2822,7 +2825,8 @@
 		},
 		{
 			"rf2TrackNames": ["Circuit de la Sarthe"],
-			"pcarsTrackName": "Le Mans:Circuit des 24 Heures du Mans",
+            "pcarsTrackName": "Le Mans:Circuit des 24 Heures du Mans",
+            "irTrackName": "lemans full",            
 			"trackLandmarks": [{
 					"landmarkName": "dunlop_curve",
 					"distanceRoundLapStart": 380,
@@ -3068,7 +3072,8 @@
 			]
 		},
 		{
-			"rf2TrackNames": ["Lime Rock Park -- Uphill Chicane"],
+            "rf2TrackNames": [ "Lime Rock Park -- Uphill Chicane" ],
+            "irTrackName" :  "limerock chicane",
 			"trackLandmarks": [{
 					"landmarkName": "big_bend",
 					"distanceRoundLapStart": 190,
@@ -6266,7 +6271,8 @@
 			]
 		},
 		{
-			"rf2TrackNames": ["Brands Hatch INDY"],
+            "rf2TrackNames": [ "Brands Hatch INDY" ],
+            "irTrackName": "brandshatch indy",
 			"trackLandmarks": [
 
 				{
@@ -6308,7 +6314,8 @@
 			]
 		},
 		{
-			"rf2TrackNames": ["Brands Hatch GP"],
+            "rf2TrackNames": [ "Brands Hatch GP" ],
+            "irTrackName": "brandshatch grandprix",
 			"trackLandmarks": [
 
 				{
@@ -6543,7 +6550,8 @@
 			]
 		},
 		{
-			"rf2TrackNames": ["Canadian Tire Motorsport Park (after 2013)", "Mosport Park"],
+            "rf2TrackNames": [ "Canadian Tire Motorsport Park (after 2013)", "Mosport Park" ],
+            "irTrackName": "mosport",
 			"trackLandmarks": [{
 					"landmarkName": "turn1",
 					"distanceRoundLapStart": 535,
@@ -7632,7 +7640,8 @@
 		},
 		{
 			"rf2TrackNames": ["Daytona International Speedway"],
-			"pcarsTrackName": "Daytona International Speedway:Road_Course",
+            "pcarsTrackName": "Daytona International Speedway:Road_Course",
+            "irTrackName": "daytona 2011 road",
 			"approximateTrackLength": 5800,
 			"trackLandmarks": [{
 					"landmarkName": "turn1",
@@ -9197,7 +9206,8 @@
 			]
 		},
 		{
-			"rf2TrackNames": ["Donington Park GP Circuit"],
+            "rf2TrackNames": [ "Donington Park GP Circuit" ],
+            "irTrackName": "donington gp",            
 			"trackLandmarks": [{
 					"landmarkName": "redgate",
 					"distanceRoundLapStart": 220,
@@ -9267,7 +9277,8 @@
 			]
 		},
 		{
-			"rf2TrackNames": ["Donington Park National Circuit"],
+            "rf2TrackNames": [ "Donington Park National Circuit" ],
+            "irTrackName": "donington national", 
 			"trackLandmarks": [{
 					"landmarkName": "redgate",
 					"distanceRoundLapStart": 220,
@@ -11560,7 +11571,8 @@
 			]
 		},
 		{
-			"rf2TrackNames": ["Mazda Raceway Laguna Seca"],
+            "rf2TrackNames": [ "Mazda Raceway Laguna Seca" ],
+            "irTrackName": "lagunaseca",
 			"trackLandmarks": [{
 					"landmarkName": "turn1",
 					"distanceRoundLapStart": 200,
