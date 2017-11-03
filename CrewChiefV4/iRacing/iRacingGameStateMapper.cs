@@ -118,7 +118,14 @@ namespace CrewChiefV4.iRacing
 
                 currentGameState.SessionData.SessionNumberOfLaps = Parser.ParseInt(shared.SessionData.RaceLaps);
                 currentGameState.SessionData.LeaderHasFinishedRace = false;
-                currentGameState.SessionData.SessionStartPosition = playerCar.Live.Position;
+                if (currentGameState.SessionData.SessionType == SessionType.Race)
+                {
+                    currentGameState.SessionData.SessionStartPosition = playerCar.CurrentResults.QualifyingPosition;
+                }
+                else
+                {
+                    currentGameState.SessionData.SessionStartPosition = playerCar.Live.Position;
+                }
                 Console.WriteLine("SessionStartPosition = " + currentGameState.SessionData.SessionStartPosition);
                 currentGameState.PitData.IsRefuellingAllowed = true;
                 currentGameState.SessionData.SessionTimeRemaining = (float)shared.Telemetry.SessionTimeRemain;
