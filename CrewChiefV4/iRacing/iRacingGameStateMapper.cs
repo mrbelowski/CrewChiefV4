@@ -329,8 +329,13 @@ namespace CrewChiefV4.iRacing
             currentGameState.SessionData.Position = playerCar.Live.Position;
             currentGameState.SessionData.UnFilteredPosition = playerCar.CurrentResults.Position;
 
-            currentGameState.SessionData.SessionFastestLapTimeFromGamePlayerClass =
-                shared.Drivers.OrderBy(d => d.CurrentResults.FastestTime).Where(e => e.Car.CarClassId == playerCar.Car.CarClassId && e.CurrentResults.FastestTime > 1).FirstOrDefault().CurrentResults.FastestTime;
+            Driver fastestPlayerClassDriver = shared.Drivers.OrderBy(d => d.CurrentResults.FastestTime).Where(e => e.Car.CarClassId == playerCar.Car.CarClassId && e.CurrentResults.FastestTime > 1).FirstOrDefault();
+            if (fastestPlayerClassDriver != null)
+            {
+                currentGameState.SessionData.SessionFastestLapTimeFromGamePlayerClass = fastestPlayerClassDriver.CurrentResults.FastestTime;
+            }
+                
+
 
             //Console.WriteLine("fastest " + currentGameState.SessionData.SessionFastestLapTimeFromGamePlayerClass);
             

@@ -868,7 +868,8 @@
 		{
 			"rf1TrackNames": ["Imola 2016"],
 			"acTrackNames": ["imola:"],
-			"pcarsTrackName": "Imola:Grand Prix",
+            "pcarsTrackName": "Imola:Grand Prix",
+            "irTrackName": "imola gp",
 			"raceroomLayoutId": 1850,
 			"trackLandmarks": [{
 					"landmarkName": "tamburello",
@@ -1119,7 +1120,8 @@
 		{
 			"pcarsTrackName": "Autodromo Nazionale Monza:Grand Prix",
 			"acTrackNames": ["monza:"],
-			"rf2TrackNames": ["RaceRfactor Monza 2014"],
+            "rf2TrackNames": [ "RaceRfactor Monza 2014" ],
+            "irTrackName": "monza full",
 			"raceroomLayoutId": 1671,
 			"trackLandmarks": [{
 					"landmarkName": "the_first_chicane",
@@ -6121,7 +6123,8 @@
 			]
 		},
 		{
-			"rf2TrackNames": ["Barber Motorsports Park"],
+            "rf2TrackNames": [ "Barber Motorsports Park" ],
+            "irTrackName": "barber full",
 			"trackLandmarks": [{
 					"landmarkName": "turn1",
 					"distanceRoundLapStart": 80,
