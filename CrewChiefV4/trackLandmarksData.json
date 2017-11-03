@@ -12861,6 +12861,7 @@
 		{
 			"rf2TrackNames": ["Oschersleben Motorsport Park"],
             "approximateTrackLength": 3670.4,
+            "pcarsTrackName":  "Oschersleben:Grand Prix",
             "raceroomLayoutId": 2384,
 			"trackLandmarks": [{
 					"landmarkName": "turn1",
