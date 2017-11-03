@@ -224,12 +224,14 @@ namespace CrewChiefV4.Events
                                     timeWhenCloudIncreased = DateTime.MinValue;
                                     DateTime when = currentGameState.Now.AddMilliseconds(millisTillRain);
                                     Console.WriteLine("It is now " + currentGameState.Now + ", we expect rain at game time " + when);
-                                    int minutes = (int) Math.Round(millisTillRain / 60000) + 1;
+                                    int minutes = (int)Math.Round(millisTillRain / 60000);
+
+                                    // if this comes out to 1 minute, make it 2 so it sounds less shit
                                     if (minutes == 1)
                                     {
-                                        audioPlayer.playMessage(new QueuedMessage("expecting_rain", MessageContents(folderExpectRain, NumberReader.folderMinute), 0, this));
+                                        minutes++;
                                     }
-                                    else if (minutes > 1)
+                                    if (minutes > 1)
                                     {
                                         audioPlayer.playMessage(new QueuedMessage("expecting_rain", MessageContents(folderExpectRain, minutes, NumberReader.folderMinutes), 0, this));
                                     }
