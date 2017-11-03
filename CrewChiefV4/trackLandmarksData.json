@@ -992,7 +992,8 @@
 		},
 		{
 			"pcarsTrackName": "Mazda Raceway:Laguna Seca",
-			"raceroomLayoutId": 1856,
+            "raceroomLayoutId": 1856,
+            "irTrackName": "lagunaseca",
 			"trackLandmarks": [{
 					"landmarkName": "turn1",
 					"distanceRoundLapStart": 160,
@@ -11576,7 +11577,6 @@
 		},
 		{
             "rf2TrackNames": [ "Mazda Raceway Laguna Seca" ],
-            "irTrackName": "lagunaseca",
 			"trackLandmarks": [{
 					"landmarkName": "turn1",
 					"distanceRoundLapStart": 200,
