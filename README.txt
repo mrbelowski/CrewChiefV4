@@ -10,7 +10,7 @@ For support and discussions about Crew Chief we have our very own forum here: ht
 
 Changelog
 ---------
-Version 4.8.1.1: Corrected and added some corner mappings; Added function to read corner mappings for the current lap (activated with a button assignment or voice command "read corner names" / "corner names" / "tell me the corner names"); 
+Version 4.8.1.1: Corrected and added some corner mappings; Added function to read corner mappings for the current lap (activated with a button assignment or voice command "read corner names" / "corner names" / "tell me the corner names"); More iRacing beta updates; Tweaked overtake message probability
 
 Version 4.8.1.0: iRacing beta; PCars2 beta (shared memory only - UDP isn't ready); Pit command macros beta (example implementations for R3E and pCARS2 included - see the "Command macros" section at the end of the Help file, and saved_command_macros.json in the app's installation folder); fixed lap time issues in AC (caused by the laptime not being sent to the app at the same time as the new-lap notification); extended support for RF2 StockCar rules plugin; more car class and track mapping data; RF2 opponent pit detection and additional pit messages; Mute the background sound when you talk to the chief; Block all messages when you're talking to the chief (optional - use property "Block messages when talking to the Chief"); lots and lots of bugfixes for RF2, PCars, AC and R3E; Attempt to predict when it might rain for PCars and PCars2 (enabled by default, use property "Enable PCars rain prediction using CloudBrightness" to disable). Note this uses changes in reported CloudBrightness value and is quite inaccurate
 
@@ -319,7 +319,7 @@ I've not finished implementing this but currently the app understands and respon
 "Standing start / no formation lap": Disable manual rolling-start mode
 "Where should I attack / where am I faster / where can I attack": If the app has enough data, will report the corner name where you're gaining the most time on the guy in front
 "Where should I defend / where am I slower / where is he faster / where will he attack": If the app has enough data, will report the corner name where you're losing the most time to the guy behind
-
+"Read corner names / corner names / tell me the corner names": read out each corner name when you hit the mid-point of the corner, for this lap only (useful to test corner name mappings)
 
 
 Speech recognition customisation
