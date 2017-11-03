@@ -1367,7 +1367,8 @@
 		},
 		{
 			"rf1TrackNames": ["Road America 2016"],
-			"pcarsTrackName": "Road America:",
+            "pcarsTrackName": "Road America:",
+            "irTrackName": "roadamerica full",
 			"trackLandmarks": [{
 					"landmarkName": "turn1",
 					"distanceRoundLapStart": 568,
@@ -2590,7 +2591,8 @@
 		},
 		{
 			"rf2TrackNames": ["Oulton Park Fosters"],
-			"pcarsTrackName": "Oulton Park:Fosters",
+            "pcarsTrackName": "Oulton Park:Fosters",
+            "irTrackName": "oulton fosters",
 			"trackLandmarks": [{
 					"landmarkName": "old_hall",
 					"distanceRoundLapStart": 130,
@@ -2643,7 +2645,8 @@
 		},
 		{
 			"rf2TrackNames": ["Oulton Park International"],
-			"pcarsTrackName": "Oulton Park:International",
+            "pcarsTrackName": "Oulton Park:International",
+            "irTrackName": "oulton international",
 			"trackLandmarks": [{
 					"landmarkName": "old_hall",
 					"distanceRoundLapStart": 130,
@@ -2772,7 +2775,8 @@
 		},
 		{
 			"rf2TrackNames": ["Oulton Park Island"],
-			"pcarsTrackName": "Oulton Park:Island",
+            "pcarsTrackName": "Oulton Park:Island",
+            "irTrackName": "oulton islandhistoric",            
 			"trackLandmarks": [{
 					"landmarkName": "old_hall",
 					"distanceRoundLapStart": 130,
@@ -2825,8 +2829,7 @@
 		},
 		{
 			"rf2TrackNames": ["Circuit de la Sarthe"],
-            "pcarsTrackName": "Le Mans:Circuit des 24 Heures du Mans",
-            "irTrackName": "lemans full",            
+            "pcarsTrackName": "Le Mans:Circuit des 24 Heures du Mans",          
 			"trackLandmarks": [{
 					"landmarkName": "dunlop_curve",
 					"distanceRoundLapStart": 380,
