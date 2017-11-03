@@ -95,17 +95,17 @@ namespace CrewChiefV4.Events
             this.audioPlayer = audioPlayer;
             // frequency of 5 means you need to be < 2.5 seconds apart for at least 20 seconds
             // 9 means you need to be < 4.5 seconds apart for at least 11 seconds
-            minAverageGapForPassMessage = 0.2f * (float)frequencyOfOvertakingMessages;
-            minAverageGapForBeingPassedMessage = 0.4f * (float)frequencyOfBeingOvertakenMessages;
+            minAverageGapForPassMessage = 0.5f * (float)frequencyOfOvertakingMessages;
+            minAverageGapForBeingPassedMessage = 0.5f * (float)frequencyOfBeingOvertakenMessages;
             if (frequencyOfOvertakingMessages > 0)
             {
                 passCheckSamplesToCheck = (int)(100 / frequencyOfOvertakingMessages);
-                maxSpeedDifferenceForReportablePass = frequencyOfOvertakingMessages + 8;
+                maxSpeedDifferenceForReportablePass = frequencyOfOvertakingMessages + 15;
             }
             if (frequencyOfBeingOvertakenMessages > 0)
             {
                 beingPassedCheckSamplesToCheck = (int)(100 / frequencyOfBeingOvertakenMessages);
-                maxSpeedDifferenceForReportableBeingPassed = frequencyOfBeingOvertakenMessages + 8;
+                maxSpeedDifferenceForReportableBeingPassed = frequencyOfBeingOvertakenMessages + 15;
             }
 
             minTimeBetweenOvertakeMessages = TimeSpan.FromSeconds(20);
