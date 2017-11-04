@@ -16,6 +16,7 @@ namespace CrewChiefV4.iRacing
             PreviousLapWasValid = false;
             HasCrossedSFLine = false;
             LapTimePrevious = -1;
+            _prevSector = -1;
         }
 
         private readonly Driver _driver;
