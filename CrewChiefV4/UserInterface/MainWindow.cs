@@ -686,8 +686,9 @@ namespace CrewChiefV4
                     {
                         if (arg.Equals("DEBUG"))
                         {
-                            Console.WriteLine("Allowing dump-to-file");
+                            Console.WriteLine("Dump-to-file enabled");
                             this.recordSession.Visible = true;
+                            this.recordSession.Checked = true;
                             break;
                         }
                     }

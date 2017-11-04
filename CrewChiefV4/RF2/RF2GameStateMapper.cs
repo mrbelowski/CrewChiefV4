@@ -539,12 +539,15 @@ namespace CrewChiefV4.rFactor2
             csd.Position = playerScoring.mPlace;
             csd.UnFilteredPosition = csd.Position;
             csd.SessionStartPosition = csd.IsNewSession ? csd.Position : psd.SessionStartPosition;
+
+            // Fixup session start pos.  I do not fully understand why this is happening,
+            // but it appears like wrong value gets stuck sometimes.  There might be delay on start to set a position.
             if (psd != null && (csd.SessionPhase == SessionPhase.Gridwalk || csd.SessionPhase == SessionPhase.Countdown))
             {
                 if (csd.SessionStartPosition != playerScoring.mPlace)
                 {
-                    Console.WriteLine("POSITION MISMATCH DETECTED: PHASE" + csd.SessionPhase + " PREV POS: " 
-                        + csd.SessionStartPosition + " CURRENT POS: " + playerScoring.mPlace + " ET " + shared.scoring.mScoringInfo.mCurrentET);
+                    Console.WriteLine(string.Format("Position mismatch detected: phase:{0}  prev pos:{1}  curr pos:{2}  ET:{3}",
+                        csd.SessionPhase, csd.SessionStartPosition, playerScoring.mPlace, shared.scoring.mScoringInfo.mCurrentET.ToString("0.000")));
 
                     csd.SessionStartPosition = playerScoring.mPlace;
                 }
