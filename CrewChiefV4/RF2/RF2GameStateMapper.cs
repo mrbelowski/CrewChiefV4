@@ -540,9 +540,12 @@ namespace CrewChiefV4.rFactor2
             csd.UnFilteredPosition = csd.Position;
             csd.SessionStartPosition = csd.IsNewSession ? csd.Position : psd.SessionStartPosition;
 
-            // Fixup session start pos.  I do not fully understand why this is happening,
-            // but it appears like wrong value gets stuck sometimes.  There might be delay on start to set a position.
-            if (psd != null && (csd.SessionPhase == SessionPhase.Gridwalk || csd.SessionPhase == SessionPhase.Countdown))
+            // Position isn't accurate till ~1.5 secs since Gridwalk (for in-session restart case).  So, fix it up.
+            if (csd.SessionType == SessionType.Race && csd.SessionPhase == SessionPhase.Countdown)
+                csd.SessionStartPosition = csd.Position;
+
+            // TODO: Below is for debugging only, remove once more insight gathered.
+            if (psd != null && csd.SessionType == SessionType.Race && (csd.SessionPhase == SessionPhase.Gridwalk || csd.SessionPhase == SessionPhase.Countdown))
             {
                 if (csd.SessionStartPosition != playerScoring.mPlace)
                 {

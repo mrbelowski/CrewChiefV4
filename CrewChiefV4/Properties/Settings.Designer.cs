@@ -2401,7 +2401,7 @@ namespace CrewChiefV4.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool enable_rf2_cut_track_heuristics {
             get {
                 return ((bool)(this["enable_rf2_cut_track_heuristics"]));
