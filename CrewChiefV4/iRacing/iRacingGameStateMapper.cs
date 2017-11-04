@@ -308,14 +308,6 @@ namespace CrewChiefV4.iRacing
                 }
             }
 
-           /* if (currentGameState.SessionData.SessionHasFixedTime)
-            {
-                currentGameState.SessionData.SessionRunningTime = currentGameState.SessionData.SessionTotalRunTime - (float)shared.Telemetry.SessionTimeRemain;
-            }
-            else
-            {
-                currentGameState.SessionData.SessionRunningTime = (float)(currentGameState.Now - currentGameState.SessionData.SessionStartTime).TotalSeconds;
-            }*/
             currentGameState.ControlData.ThrottlePedal = shared.Telemetry.Throttle;
             currentGameState.ControlData.ClutchPedal = shared.Telemetry.Clutch;
             currentGameState.ControlData.BrakePedal = shared.Telemetry.Brake;
@@ -350,7 +342,7 @@ namespace CrewChiefV4.iRacing
             currentGameState.SessionData.NumCars = shared.Drivers.Count;
 
             
-            if(currentGameState.SessionData.SessionPhase.HasFlag(SessionPhase.Countdown) && currentGameState.SessionData.SessionType.HasFlag(SessionType.Race))
+            if(currentGameState.SessionData.SessionPhase == SessionPhase.Countdown && currentGameState.SessionData.SessionType == SessionType.Race)
             {
                 currentGameState.SessionData.Position = playerCar.CurrentResults.QualifyingPosition;
             }
@@ -358,6 +350,7 @@ namespace CrewChiefV4.iRacing
             {
                 currentGameState.SessionData.Position = playerCar.Live.Position;
             }
+
             currentGameState.SessionData.UnFilteredPosition = playerCar.CurrentResults.Position;
 
             Driver fastestPlayerClassDriver = shared.Drivers.OrderBy(d => d.CurrentResults.FastestTime).Where(e => e.Car.CarClassId == playerCar.Car.CarClassId && e.CurrentResults.FastestTime > 1).FirstOrDefault();
