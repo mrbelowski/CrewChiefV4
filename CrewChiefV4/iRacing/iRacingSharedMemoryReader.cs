@@ -10,8 +10,8 @@ namespace CrewChiefV4.iRacing
     public class iRacingSharedMemoryReader : GameDataReader
     {
 
-        iRacingSDK sdk = null;
-        Sim sim = new Sim();
+        private iRacingSDK sdk = null;
+        private Sim sim = new Sim();
         private Boolean initialised = false;
         private List<iRacingStructDumpWrapper> dataToDump;
         private iRacingStructDumpWrapper[] dataReadFromFile = null;
@@ -80,7 +80,7 @@ namespace CrewChiefV4.iRacing
                 iRacingStructDumpWrapper structDumpWrapperData = dataReadFromFile[dataReadFromFileIndex];
                 if (structDumpWrapperData.data.SessionInfoUpdate != lastUpdate)
                 {
-                    SessionInfo sessionInfo = new SessionInfo(structDumpWrapperData.data.SessionInfo);
+                    SessionInfo sessionInfo = new SessionInfo(System.Text.Encoding.Default.GetString(structDumpWrapperData.data.SessionInfo).TrimEnd(new char[] { '\0' }));
                     sim.SdkOnSessionInfoUpdated(sessionInfo, structDumpWrapperData.data.SessionNum, structDumpWrapperData.data.PlayerCarIdx);
                     lastUpdate = structDumpWrapperData.data.SessionInfoUpdate;
                 }
@@ -179,7 +179,7 @@ namespace CrewChiefV4.iRacing
                     if (newUpdate != lastUpdate)
                     {
                         // Get the session info string
-                        SessionInfo sessionInfo = new SessionInfo(sdk.GetSessionInfo());
+                        SessionInfo sessionInfo = new SessionInfo(sdk.GetSessionInfoString());
                         // Raise the SessionInfoUpdated event and pass along the session info and session time.
                         sim.SdkOnSessionInfoUpdated(sessionInfo, (int)TryGetSessionNum(), DriverId);
                         lastUpdate = newUpdate;

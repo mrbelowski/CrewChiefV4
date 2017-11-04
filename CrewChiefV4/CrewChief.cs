@@ -292,6 +292,15 @@ namespace CrewChiefV4
             audioPlayer.enableKeepQuietMode();
         }
 
+        public void playCornerNamesForCurrentLap()
+        {
+            if (currentGameState != null)
+            {
+                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
+                currentGameState.readLandmarksForThisLap = true;
+            }
+        }
+
         public void disableKeepQuietMode()
         {
             keepQuietEnabled = false;

@@ -89,6 +89,7 @@ namespace CrewChiefV4.iRacing
             this.Time = -1;
             this.LastTime = -1;
             this.FastestTime = -1;
+            this.QualifyingPosition = -1;
             this.FakeSectorTimes = new[]
                     {
                         new Sector() {Number = 0, StartPercentage = 0f},
@@ -107,6 +108,7 @@ namespace CrewChiefV4.iRacing
 
         public int Position { get; set; }
         public int ClassPosition { get; set; }
+        public int QualifyingPosition { get; set; }
 
         public int Lap { get; set; }
         public float Time { get; set; }

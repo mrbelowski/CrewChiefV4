@@ -113,6 +113,8 @@ namespace CrewChiefV4
         public static String WHAT_TYRES_IS = Configuration.getSpeechRecognitionConfigOption("WHAT_TYRES_IS");
         public static String WHAT_TYRE_IS = Configuration.getSpeechRecognitionConfigOption("WHAT_TYRE_IS");
 
+        public static String[] PLAY_CORNER_NAMES = Configuration.getSpeechRecognitionPhrases("PLAY_CORNER_NAMES");
+
         private CrewChief crewChief;
 
         public Boolean initialised = false;
@@ -312,7 +314,7 @@ namespace CrewChiefV4
                 validateAndAdd(WHATS_MY_FUEL_USAGE, staticSpeechChoices);
                 validateAndAdd(WHAT_TYRES_AM_I_ON, staticSpeechChoices);
                 validateAndAdd(WHAT_ARE_THE_RELATIVE_TYRE_PERFORMANCES, staticSpeechChoices);
-                
+                validateAndAdd(PLAY_CORNER_NAMES, staticSpeechChoices);
 
                 foreach (String s in CALCULATE_FUEL_FOR)
                 {
@@ -665,6 +667,10 @@ namespace CrewChiefV4
             else if (ResultContains(recognisedSpeech, KEEP_QUIET))
             {
                 crewChief.enableKeepQuietMode();
+            }
+            else if (ResultContains(recognisedSpeech, PLAY_CORNER_NAMES))
+            {
+                crewChief.playCornerNamesForCurrentLap();
             }
             else if (ResultContains(recognisedSpeech, DONT_TELL_ME_THE_GAPS))
             {
