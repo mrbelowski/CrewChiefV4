@@ -49,7 +49,6 @@ namespace CrewChiefV4.rFactor2
 
         // Detect when approaching racing surface after being off track
         private float distanceOffTrack = 0.0f;
-        private bool isApproachingTrack = false;
 
         // Pit stop detection tracking variables.
         private double minTrackWidth = -1;
@@ -172,7 +171,6 @@ namespace CrewChiefV4.rFactor2
             this.waitingToTerminateSession = false;
             this.isOfflineSession = true;
             this.distanceOffTrack = 0;
-            this.isApproachingTrack = false;
             this.playerLapsWhenFCYPosAssigned = -1;
             this.detectedTrackNoDRSZones = false;
             this.minTrackWidth = -1.0;
@@ -1606,10 +1604,9 @@ namespace CrewChiefV4.rFactor2
                     && !cgs.PenaltiesData.IsOffRacingSurface)
                 {
                     float lateralDistDiff = (float)(Math.Abs(playerScoring.mPathLateral) - Math.Abs(playerScoring.mTrackEdge));
-                    cgs.PenaltiesData.IsOffRacingSurface = !cgs.PitData.InPitlane && lateralDistDiff >= 2.0f;
+                    cgs.PenaltiesData.IsOffRacingSurface = !cgs.PitData.InPitlane && lateralDistDiff >= 2.5f;
                     float offTrackDistanceDelta = lateralDistDiff - this.distanceOffTrack;
                     this.distanceOffTrack = cgs.PenaltiesData.IsOffRacingSurface ? lateralDistDiff : 0.0f;
-                    this.isApproachingTrack = offTrackDistanceDelta < 0 && cgs.PenaltiesData.IsOffRacingSurface && lateralDistDiff < 3.0f;
 
                     if (!cgs.PitData.OnOutLap && pgs != null
                         && !pgs.PenaltiesData.IsOffRacingSurface && cgs.PenaltiesData.IsOffRacingSurface
