@@ -539,6 +539,17 @@ namespace CrewChiefV4.rFactor2
             csd.Position = playerScoring.mPlace;
             csd.UnFilteredPosition = csd.Position;
             csd.SessionStartPosition = csd.IsNewSession ? csd.Position : psd.SessionStartPosition;
+            if (psd != null && (csd.SessionPhase == SessionPhase.Gridwalk || csd.SessionPhase == SessionPhase.Countdown))
+            {
+                if (csd.SessionStartPosition != playerScoring.mPlace)
+                {
+                    Console.WriteLine("POSITION MISMATCH DETECTED: PHASE" + csd.SessionPhase + " PREV POS: " 
+                        + csd.SessionStartPosition + " CURRENT POS: " + playerScoring.mPlace + " ET " + shared.scoring.mScoringInfo.mCurrentET);
+
+                    csd.SessionStartPosition = playerScoring.mPlace;
+                }
+            }
+
             csd.SectorNumber = playerScoring.mSector == 0 ? 3 : playerScoring.mSector;
             csd.IsNewSector = csd.IsNewSession || csd.SectorNumber != psd.SectorNumber;
             csd.IsNewLap = csd.IsNewSession || (csd.IsNewSector && csd.SectorNumber == 1);
