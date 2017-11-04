@@ -141,8 +141,39 @@ namespace CrewChiefV4.iRacing
                 return;
 
             this.GetRaceResults(info);
+            this.GetQualyResults(info);
         }
 
+        private void GetQualyResults(SessionInfo info)
+        {
+            // TODO: stop if qualy is finished
+            var query = info["QualifyResultsInfo"]["Results"];
+            if(_driver.CurrentResults.QualifyingPosition != -1)
+            {
+                return;
+            }
+
+            for (int position = 0; position < _drivers.Count; position++)
+            {
+                var positionQuery = query["Position", position];
+
+                string idValue;
+                if (!positionQuery["CarIdx"].TryGetValue(out idValue))
+                {
+                    // Driver not found
+                    continue;
+                }
+
+                // Find driver and update results
+                int id = int.Parse(idValue);
+
+                var driver = _drivers.SingleOrDefault(d => d.Id == id);
+                if (driver != null)
+                {
+                    driver.CurrentResults.QualifyingPosition = position + 1; 
+                }
+            }
+        }
         private void GetRaceResults(SessionInfo info)
         {
             var query =

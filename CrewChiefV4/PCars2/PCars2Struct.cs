@@ -194,7 +194,7 @@ namespace CrewChiefV4.PCars2
             }
             if (existingState.mLapsInvalidated == null)
             {
-                existingState.mLapsInvalidated = new bool[32];
+                existingState.mLapsInvalidated = new byte[32];
             }
             if (existingState.mPitModes == null)
             {
@@ -236,7 +236,7 @@ namespace CrewChiefV4.PCars2
 
                     // err... laps completed is missing?
                     // existingPartInfo.mLapsCompleted = (uint)newParticipantInfo.sLapsCompleted & 127;
-                    Boolean lapInvalidated = (newParticipantInfo.sRaceState >> 7) == 1;
+                    byte lapInvalidated = (byte)(newParticipantInfo.sRaceState >> 7);
                     existingState.mRaceStates[i] = (uint)newParticipantInfo.sRaceState & 127;
                     if (i == existingState.mViewedParticipantIndex)
                     {
@@ -271,7 +271,7 @@ namespace CrewChiefV4.PCars2
 
                     if (i == existingState.mViewedParticipantIndex)
                     {
-                        existingState.mLapInvalidated = lapInvalidated;
+                        existingState.mLapInvalidated = lapInvalidated == 1;
                         existingState.mHighestFlagColour = newParticipantInfo.sHighestFlag;
                     }
                 }
@@ -655,6 +655,9 @@ namespace CrewChiefV4.PCars2
         public float mWindSpeed;                                // [ RANGE = 0.0f->100.0f ]   [ UNSET = 2.0f ]
         public float mWindDirectionX;                           // [ UNITS = Normalised Vector X ]
         public float mWindDirectionY;                           // [ UNITS = Normalised Vector Y ]
+        // from sunny all the way to light rain = 2 (at start of session - not transition), rain to thunder storm, blizzard, fog = 1.5. 
+        // Transitions from 2 down to 1.9ish as rain starts.
+        // NOTE: this is not in the UDP data for pcars or pcars2 (why?)
         public float mCloudBrightness;                          // [ RANGE = 0.0f->... ]
 
   //PCars2 additions start, version 8
@@ -694,7 +697,7 @@ namespace CrewChiefV4.PCars2
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
         public float[] mLastLapTimes;               // [ UNITS = seconds ]   [ RANGE = 0.0f->... ]   [ UNSET = -1.0f ]
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
-        public bool[] mLapsInvalidated;            // [ UNITS = boolean for all participants ]   [ RANGE = false->true ]   [ UNSET = false ]
+        public byte[] mLapsInvalidated;            // [ UNITS = boolean for all participants ]   [ RANGE = false->true ]   [ UNSET = false ]
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
         public uint[] mRaceStates;         // [ enum (Type#3) Race State ]
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]

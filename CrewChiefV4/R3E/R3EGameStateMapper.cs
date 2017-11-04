@@ -158,6 +158,7 @@ namespace CrewChiefV4.RaceRoom
                     currentGameState.SessionData.TrackDefinition.setGapPoints();
                     GlobalBehaviourSettings.UpdateFromTrackDefinition(currentGameState.SessionData.TrackDefinition);
                 }
+                currentGameState.readLandmarksForThisLap = previousGameState.readLandmarksForThisLap;
             }
             else
             {
@@ -565,6 +566,10 @@ namespace CrewChiefV4.RaceRoom
                          (participantStruct.TrackSector == 1 && currentGameState.SessionData.IsNewSector) ||
                         ((lastSessionPhase == SessionPhase.Countdown || lastSessionPhase == SessionPhase.Formation || lastSessionPhase == SessionPhase.Garage)
                         && (currentGameState.SessionData.SessionPhase == SessionPhase.Green || currentGameState.SessionData.SessionPhase == SessionPhase.FullCourseYellow)));
+                    if (currentGameState.SessionData.IsNewLap)
+                    {
+                        currentGameState.readLandmarksForThisLap = false;
+                    }
                     
                     if (currentGameState.SessionData.CurrentLapIsValid && participantStruct.CurrentLapValid != 1) {
                         currentGameState.SessionData.CurrentLapIsValid = false;

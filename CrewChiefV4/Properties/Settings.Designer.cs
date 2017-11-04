@@ -2446,5 +2446,53 @@ namespace CrewChiefV4.Properties {
                 this["iracing_delayed_laptimes"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool pcars_enable_rain_prediction {
+            get {
+                return ((bool)(this["pcars_enable_rain_prediction"]));
+            }
+            set {
+                this["pcars_enable_rain_prediction"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-1")]
+        public int READ_CORNER_NAMES_FOR_LAP_button_index {
+            get {
+                return ((int)(this["READ_CORNER_NAMES_FOR_LAP_button_index"]));
+            }
+            set {
+                this["READ_CORNER_NAMES_FOR_LAP_button_index"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string READ_CORNER_NAMES_FOR_LAP_device_guid {
+            get {
+                return ((string)(this["READ_CORNER_NAMES_FOR_LAP_device_guid"]));
+            }
+            set {
+                this["READ_CORNER_NAMES_FOR_LAP_device_guid"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string READ_CORNER_NAMES_FOR_LAP_device_type {
+            get {
+                return ((string)(this["READ_CORNER_NAMES_FOR_LAP_device_type"]));
+            }
+            set {
+                this["READ_CORNER_NAMES_FOR_LAP_device_type"] = value;
+            }
+        }
     }
 }

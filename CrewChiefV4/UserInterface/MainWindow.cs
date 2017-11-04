@@ -900,6 +900,12 @@ namespace CrewChiefV4
                         crewChief.toggleManualFormationLapMode();
                         nextPollWait = 1000;
                     }
+                    else if (controllerConfiguration.hasOutstandingClick(ControllerConfiguration.READ_CORNER_NAMES_FOR_LAP))
+                    {
+                        Console.WriteLine("Enabling corner name reading for current lap");
+                        crewChief.playCornerNamesForCurrentLap();
+                        nextPollWait = 1000;
+                    }
                     else if (controllerConfiguration.hasOutstandingClick(ControllerConfiguration.REPEAT_LAST_MESSAGE_BUTTON))
                     {
                         Console.WriteLine("Repeating last message");

@@ -90,16 +90,21 @@ namespace CrewChiefV4.PCars2
                         sharedmemorysize = Marshal.SizeOf(typeof(pCars2APIStruct));
                         sharedMemoryReadBuffer = new byte[sharedmemorysize];
                         initialised = true;
-                        Console.WriteLine("Initialised pcars shared memory");
+                        Console.WriteLine("Initialised pcars2 shared memory");
                     }
-                    catch (Exception e)
+                    catch (Exception)
                     {
-                        Console.WriteLine(e.Message);
+                        Console.WriteLine("found PCars2 process, but can't find PCars2 shared memory - check the game isn't running in PCars1 mode");
                         initialised = false;
                     }
                 }
                 return initialised;
             }            
+        }
+
+        public override void stop()
+        {
+            Console.WriteLine("Stopped reading pcars data, discarded " + tornFramesCount + " torn frames");
         }
 
         public override Object ReadGameData(Boolean forSpotter)

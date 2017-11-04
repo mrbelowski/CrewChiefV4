@@ -91,7 +91,35 @@ namespace CrewChiefV4.iRacing
             OilLevel = (System.Single)sdk.GetData("OilLevel");
             Speed = (System.Single)sdk.GetData("Speed");
             IsReplayPlaying = (System.Boolean)sdk.GetData("IsReplayPlaying");
-
+            
+            RRcoldPressure = (System.Single)sdk.GetData("RRcoldPressure");
+            RRtempCL = (System.Single)sdk.GetData("RRtempCL");
+            RRtempCM = (System.Single)sdk.GetData("RRtempCM");
+            RRtempCR = (System.Single)sdk.GetData("RRtempCR");
+            RRwearL = (System.Single)sdk.GetData("RRwearL");
+            RRwearM = (System.Single)sdk.GetData("RRwearM");
+            RRwearR = (System.Single)sdk.GetData("RRwearR");
+            LRcoldPressure = (System.Single)sdk.GetData("LRcoldPressure");
+            LRtempCL = (System.Single)sdk.GetData("LRtempCL");
+            LRtempCM = (System.Single)sdk.GetData("LRtempCM");
+            LRtempCR = (System.Single)sdk.GetData("LRtempCR");
+            LRwearL = (System.Single)sdk.GetData("LRwearL");
+            LRwearM = (System.Single)sdk.GetData("LRwearM");
+            LRwearR = (System.Single)sdk.GetData("LRwearR");
+            RFcoldPressure = (System.Single)sdk.GetData("RFcoldPressure");
+            RFtempCL = (System.Single)sdk.GetData("RFtempCL");
+            RFtempCM = (System.Single)sdk.GetData("RFtempCM");
+            RFtempCR = (System.Single)sdk.GetData("RFtempCR");
+            RFwearL = (System.Single)sdk.GetData("RFwearL");
+            RFwearM = (System.Single)sdk.GetData("RFwearM");
+            RFwearR = (System.Single)sdk.GetData("RFwearR");
+            LFcoldPressure = (System.Single)sdk.GetData("LFcoldPressure");
+            LFtempCL = (System.Single)sdk.GetData("LFtempCL");
+            LFtempCM = (System.Single)sdk.GetData("LFtempCM");
+            LFtempCR = (System.Single)sdk.GetData("LFtempCR");
+            LFwearL = (System.Single)sdk.GetData("LFwearL");
+            LFwearM = (System.Single)sdk.GetData("LFwearM");
+            LFwearR = (System.Single)sdk.GetData("LFwearR");
         }
         public iRacingData()
         {
@@ -99,8 +127,7 @@ namespace CrewChiefV4.iRacing
         }
         public System.Int32 SessionInfoUpdate;
 
-        public System.String SessionInfo;
-
+        public System.Byte [] SessionInfo;
         /// <summary>
         /// Seconds since session start
         /// </summary>
@@ -472,9 +499,150 @@ namespace CrewChiefV4.iRacing
         /// Engine oil level
         /// </summary>
         public System.Single OilLevel;
+
         public System.Single Speed;
+
         public System.Boolean IsReplayPlaying;
-        //public System.Int32 TickCount;
+
+        /// <summary>
+        /// RR tire cold pressure  as set in the garage
+        /// </summary>
+        public System.Single RRcoldPressure;
+
+        /// <summary>
+        /// RR tire left carcass temperature
+        /// </summary>
+        public System.Single RRtempCL;
+
+        /// <summary>
+        /// RR tire middle carcass temperature
+        /// </summary>
+        public System.Single RRtempCM;
+
+        /// <summary>
+        /// RR tire right carcass temperature
+        /// </summary>
+        public System.Single RRtempCR;
+
+        /// <summary>
+        /// RR tire left percent tread remaining
+        /// </summary>
+        public System.Single RRwearL;
+
+        /// <summary>
+        /// RR tire middle percent tread remaining
+        /// </summary>
+        public System.Single RRwearM;
+
+        /// <summary>
+        /// RR tire right percent tread remaining
+        /// </summary>
+        public System.Single RRwearR;
+
+        /// <summary>
+        /// LR tire cold pressure  as set in the garage
+        /// </summary>
+        public System.Single LRcoldPressure;
+
+        /// <summary>
+        /// LR tire left carcass temperature
+        /// </summary>
+        public System.Single LRtempCL;
+
+        /// <summary>
+        /// LR tire middle carcass temperature
+        /// </summary>
+        public System.Single LRtempCM;
+
+        /// <summary>
+        /// LR tire right carcass temperature
+        /// </summary>
+        public System.Single LRtempCR;
+
+        /// <summary>
+        /// LR tire left percent tread remaining
+        /// </summary>
+        public System.Single LRwearL;
+
+        /// <summary>
+        /// LR tire middle percent tread remaining
+        /// </summary>
+        public System.Single LRwearM;
+
+        /// <summary>
+        /// LR tire right percent tread remaining
+        /// </summary>
+        public System.Single LRwearR;
+
+        /// <summary>
+        /// RF tire cold pressure  as set in the garage
+        /// </summary>
+        public System.Single RFcoldPressure;
+
+        /// <summary>
+        /// RF tire left carcass temperature
+        /// </summary>
+        public System.Single RFtempCL;
+
+        /// <summary>
+        /// RF tire middle carcass temperature
+        /// </summary>
+        public System.Single RFtempCM;
+
+        /// <summary>
+        /// RF tire right carcass temperature
+        /// </summary>
+        public System.Single RFtempCR;
+
+        /// <summary>
+        /// RF tire left percent tread remaining
+        /// </summary>
+        public System.Single RFwearL;
+
+        /// <summary>
+        /// RF tire middle percent tread remaining
+        /// </summary>
+        public System.Single RFwearM;
+
+        /// <summary>
+        /// RF tire right percent tread remaining
+        /// </summary>
+        public System.Single RFwearR;
+
+        /// <summary>
+        /// LF tire cold pressure  as set in the garage
+        /// </summary>
+        public System.Single LFcoldPressure;
+
+        /// <summary>
+        /// LF tire left carcass temperature
+        /// </summary>
+        public System.Single LFtempCL;
+
+        /// <summary>
+        /// LF tire middle carcass temperature
+        /// </summary>
+        public System.Single LFtempCM;
+
+        /// <summary>
+        /// LF tire right carcass temperature
+        /// </summary>
+        public System.Single LFtempCR;
+
+        /// <summary>
+        /// LF tire left percent tread remaining
+        /// </summary>
+        public System.Single LFwearL;
+
+        /// <summary>
+        /// LF tire middle percent tread remaining
+        /// </summary>
+        public System.Single LFwearM;
+
+        /// <summary>
+        /// LF tire right percent tread remaining
+        /// </summary>
+        public System.Single LFwearR;
 
 
     }

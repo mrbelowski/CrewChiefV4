@@ -522,6 +522,7 @@ namespace CrewChiefV4.rFactor2
                 csd.DeltaTime.lapsCompleted = psd.DeltaTime.lapsCompleted;
                 csd.DeltaTime.totalDistanceTravelled = psd.DeltaTime.totalDistanceTravelled;
                 csd.DeltaTime.trackLength = psd.DeltaTime.trackLength;
+                cgs.readLandmarksForThisLap = previousGameState.readLandmarksForThisLap;
             }
 
             csd.SessionStartTime = csd.IsNewSession ? cgs.Now : psd.SessionStartTime;
@@ -541,6 +542,8 @@ namespace CrewChiefV4.rFactor2
             csd.SectorNumber = playerScoring.mSector == 0 ? 3 : playerScoring.mSector;
             csd.IsNewSector = csd.IsNewSession || csd.SectorNumber != psd.SectorNumber;
             csd.IsNewLap = csd.IsNewSession || (csd.IsNewSector && csd.SectorNumber == 1);
+            if (csd.IsNewLap)
+                cgs.readLandmarksForThisLap = false;
             csd.PositionAtStartOfCurrentLap = csd.IsNewLap ? csd.Position : psd.PositionAtStartOfCurrentLap;
             // TODO: See if Black Flag handling needed here.
             csd.IsDisqualified = (rFactor2Constants.rF2FinishStatus)playerScoring.mFinishStatus == rFactor2Constants.rF2FinishStatus.Dq;

@@ -47,8 +47,13 @@ namespace CrewChiefV4.GameState
 
         public static List<MessageTypes> defaultEnabledMessageTypes = new List<MessageTypes> { 
             MessageTypes.TYRE_TEMPS, MessageTypes.TYRE_WEAR, MessageTypes.BRAKE_TEMPS, MessageTypes.BRAKE_DAMAGE, MessageTypes.FUEL, MessageTypes.LOCKING_AND_SPINNING };
-        public static List<MessageTypes> enabledMessageTypes = defaultEnabledMessageTypes;
-        
+        public static List<MessageTypes> enabledMessageTypes = new List<MessageTypes>();
+
+        static GlobalBehaviourSettings()
+        {
+            enabledMessageTypes.AddRange(defaultEnabledMessageTypes);
+        }
+
         public static void UpdateFromCarClass(CarData.CarClass carClass) 
         {
             useAmericanTerms = carClass.useAmericanTerms;
