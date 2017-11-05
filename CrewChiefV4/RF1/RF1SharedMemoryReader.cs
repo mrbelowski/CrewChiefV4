@@ -52,7 +52,8 @@ namespace CrewChiefV4.rFactor1
             if (dataReadFromFile == null || filename != lastReadFileName)
             {
                 dataReadFromFileIndex = 0;
-                dataReadFromFile = DeSerializeObject<RF1StructWrapper[]>(dataFilesPath + filename);
+                var filePathResolved = Utilities.ResolveDataFile(this.dataFilesPath, filename);
+                dataReadFromFile = DeSerializeObject<RF1StructWrapper[]>(filePathResolved);
                 lastReadFileName = filename;
             }
             if (dataReadFromFile != null && dataReadFromFile.Length > dataReadFromFileIndex)
