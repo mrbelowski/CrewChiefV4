@@ -620,5 +620,8 @@
     <Setting Name="READ_CORNER_NAMES_FOR_LAP_device_type" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="last_trace_file_name" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
   </Settings>
 </SettingsFile>
