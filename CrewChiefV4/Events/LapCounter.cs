@@ -208,7 +208,7 @@ namespace CrewChiefV4.Events
                     possibleMessages.Add(new QueuedMessage("race_time", MessageContents(minutes, folderMinutesYouNeedToGetOnWithIt), 0, this));
                 }
                 //dont play pre-start message for race time unless its more then 2 minuts
-                else if (minutes > 2)
+                else
                 {
                     Console.WriteLine("pre-start message for race time");
                     possibleMessages.Add(new QueuedMessage("race_time", MessageContents(minutes), 0, this));

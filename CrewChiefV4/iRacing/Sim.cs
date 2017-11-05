@@ -287,12 +287,19 @@ namespace CrewChiefV4.iRacing
            
             // Cache info
             _sessionInfo = sessionInfo;
-            _currentSessionNumber = sessionNumber;
             _DriverId = driverId;
 
             // Stop if we don't have a session number yet
-            if (_currentSessionNumber == null) 
-                return;
+
+
+            if (_currentSessionNumber == null || (_currentSessionNumber.Value != sessionNumber))
+            {
+                _mustUpdateSessionData = true;
+
+                // Session changed, reset session info
+                this.ResetSession();
+            }
+
 
             if (_mustUpdateSessionData)
             {
@@ -301,31 +308,16 @@ namespace CrewChiefV4.iRacing
             }
             // Update drivers
             this.UpdateDriverList(sessionInfo);
+            _currentSessionNumber = sessionNumber;
         }
 
         public void SdkOnTelemetryUpdated(iRacingData telemetry)
         {
             // Cache info            
             _telemetry = telemetry;
-            // Check if session changed
-            if (_currentSessionNumber == null || (_currentSessionNumber.Value != telemetry.SessionNum))
-            {
-                _mustUpdateSessionData = true;
-
-                // Session changed, reset session info
-                this.ResetSession();
-            }
-
-            // Store current session number
-            _currentSessionNumber = telemetry.SessionNum;
-
             // Update drivers telemetry
             this.UpdateDriverTelemetry(telemetry);
-
-            // Update session data
-            this.SessionData.Update(telemetry);
         }
-
       
         #endregion
 
