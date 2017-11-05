@@ -1365,7 +1365,13 @@ namespace CrewChiefV4.assetto
                     currentGameState.SessionData.GameTimeAtLastPositionBehindChange = currentGameState.SessionData.SessionRunningTime;
                 }
                 currentGameState.SessionData.DeltaTime.SetNextDeltaPoint(distanceRoundTrack, currentGameState.SessionData.CompletedLaps, playerVehicle.speedMS, currentGameState.Now);
-                
+
+
+                if (currentGameState.SessionData.SessionFastestLapTimeFromGamePlayerClass == -1 ||
+                    currentGameState.SessionData.SessionFastestLapTimeFromGamePlayerClass > mapToFloatTime(playerVehicle.bestLapMS))
+                {
+                    currentGameState.SessionData.SessionFastestLapTimeFromGamePlayerClass = mapToFloatTime(playerVehicle.bestLapMS);
+                }
                 // get all the duplicate names
                 List<string> driversToBeProcessed = new List<string>();
                 List<string> duplicateNames = new List<string>();
@@ -1538,6 +1544,11 @@ namespace CrewChiefV4.assetto
                                     {
                                         currentOpponentData.trackLandmarksTiming = new TrackLandmarksTiming();
                                     }
+                                    if (currentGameState.SessionData.SessionFastestLapTimeFromGamePlayerClass == -1 ||
+                                            currentGameState.SessionData.SessionFastestLapTimeFromGamePlayerClass > mapToFloatTime(participantStruct.bestLapMS))
+                                    {
+                                        currentGameState.SessionData.SessionFastestLapTimeFromGamePlayerClass = mapToFloatTime(participantStruct.bestLapMS);
+                                    }
                                     if (currentOpponentData.IsNewLap)
                                     {
                                         currentOpponentData.trackLandmarksTiming.cancelWaitingForLandmarkEnd();
@@ -1604,7 +1615,6 @@ namespace CrewChiefV4.assetto
                 {
                     currentGameState.SessionData.CurrentLapIsValid = shared.acsPhysics.numberOfTyresOut < 3;
                 }
-
                 if (currentGameState.SessionData.IsNewLap && currentGameState.SessionData.LapTimePrevious > 0)
                 {
                     currentGameState.SessionData.PreviousLapWasValid = previousGameState != null && previousGameState.SessionData.CurrentLapIsValid;
@@ -1641,6 +1651,7 @@ namespace CrewChiefV4.assetto
                         }
                     }
                 }
+
             }
 
             // engine/transmission data

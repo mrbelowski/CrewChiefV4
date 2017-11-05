@@ -547,7 +547,6 @@ namespace CrewChiefV4.iRacing
                 lastActiveTimeForOpponents[driverName] = currentGameState.Now;
                 if (currentGameState.OpponentData.ContainsKey(driverName))
                 {
-
                     if (previousGameState != null)
                     {
                         OpponentData previousOpponentData = null;
