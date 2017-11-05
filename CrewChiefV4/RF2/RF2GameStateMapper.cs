@@ -690,7 +690,11 @@ namespace CrewChiefV4.rFactor2
                 cgs.PitData.IsPitCrewReady = true;
             }
 
-            cgs.PitData.IsPitCrewDone = (rFactor2Constants.rF2PitState)playerScoring.mPitState == rFactor2Constants.rF2PitState.Exiting;
+            // This sometimes fires under Countdown, so limit to phases when message might make sense.
+            if (csd.SessionPhase == SessionPhase.Green
+                || csd.SessionPhase == SessionPhase.FullCourseYellow
+                || csd.SessionPhase == SessionPhase.Formation)
+                cgs.PitData.IsPitCrewDone = (rFactor2Constants.rF2PitState)playerScoring.mPitState == rFactor2Constants.rF2PitState.Exiting;
 
             if (csd.IsNewLap && RF2GameStateMapper.resetMinWidthEveryLap)
             {
