@@ -643,6 +643,9 @@ namespace CrewChiefV4
             InitializeComponent();
             SetupNotificationTrayIcon();
 
+            this.filenameTextbox.Text = UserSettings.GetUserSettings().getString("last_trace_file_name");
+            this.filenameTextbox.TextChanged += MainWindow_TextChanged;
+
             CheckForIllegalCrossThreadCalls = false;
             cw = new ControlWriter(textBox1);
             textBox1.KeyDown += TextBox1_KeyDown;
@@ -789,6 +792,12 @@ namespace CrewChiefV4
             }
 
             this.Resize += MainWindow_Resize;
+        }
+
+        private void MainWindow_TextChanged(object sender, EventArgs e)
+        {
+            UserSettings.GetUserSettings().setProperty("last_trace_file_name", this.filenameTextbox.Text);
+            UserSettings.GetUserSettings().saveUserSettings();
         }
 
         private void MainWindow_Resize(object sender, EventArgs e)
