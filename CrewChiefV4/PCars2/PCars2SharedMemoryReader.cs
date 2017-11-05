@@ -45,7 +45,8 @@ namespace CrewChiefV4.PCars2
             if (dataReadFromFile == null || filename != lastReadFileName)
             {
                 dataReadFromFileIndex = 0;
-                dataReadFromFile = DeSerializeObject<PCars2StructWrapper[]>(dataFilesPath + filename);
+                var filePathResolved = Utilities.ResolveDataFile(this.dataFilesPath, filename);
+                dataReadFromFile = DeSerializeObject<PCars2StructWrapper[]>(filePathResolved);
                 lastReadFileName = filename;
             }
             if (dataReadFromFile != null && dataReadFromFile.Length > dataReadFromFileIndex)
