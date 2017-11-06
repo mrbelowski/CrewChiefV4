@@ -107,8 +107,8 @@ namespace CrewChiefV4.Events
 
         private DateTime timeOfDisengageCheck = DateTime.MaxValue;
 
-        private DateTime timeOfPitRequestOrCancel = DateTime.MaxValue;
-        private const int minSecondsBetweenPitRequestCancel = 10;
+        private DateTime timeOfPitRequestOrCancel = DateTime.MinValue;
+        private const int minSecondsBetweenPitRequestCancel = 5;
 
         private Boolean enableWindowWarnings = true;
         
@@ -126,7 +126,7 @@ namespace CrewChiefV4.Events
         {
             timeOfLastLimiterWarning = DateTime.MinValue;
             timeOfDisengageCheck = DateTime.MaxValue;
-            timeOfPitRequestOrCancel = DateTime.MaxValue;
+            timeOfPitRequestOrCancel = DateTime.MinValue;
             pitWindowOpenLap = 0;
             pitWindowClosedLap = 0;
             pitWindowOpenTime = 0;

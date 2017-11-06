@@ -72,7 +72,8 @@ namespace CrewChiefV4.assetto
             if (dataReadFromFile == null || filename != lastReadFileName)
             {
                 dataReadFromFileIndex = 0;
-                dataReadFromFile = DeSerializeObject<ACSStructWrapper[]>(dataFilesPath + filename);
+                var filePathResolved = Utilities.ResolveDataFile(this.dataFilesPath, filename);
+                dataReadFromFile = DeSerializeObject<ACSStructWrapper[]>(filePathResolved);
                 lastReadFileName = filename;
             }
             if (dataReadFromFile != null && dataReadFromFile.Length > dataReadFromFileIndex)

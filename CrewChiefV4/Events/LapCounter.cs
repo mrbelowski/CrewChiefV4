@@ -290,12 +290,12 @@ namespace CrewChiefV4.Events
                             {
                                 // Play these only for race sessions. Some game-specific rules here:
                                 //      Allow messages for countdown phase for any game
-                                //      Allow messages for gridwalk phase for any game *except* Raceroom (which treats gridwalk as its own session with different data to the race session)
+                                //      Allow messages for gridwalk phase for any game *except* Raceroom (which treats gridwalk as its own session with different data to the race session) and rF2 (there's delay for updates from the game, generally till Countdown).
                                 //      Allow messages for formation phase for Raceroom
                                 //      Allow messages for formation phase for RF1 (AMS) and rF2 only when we enter sector 3 of the formation lap.
                                 if (currentGameState.SessionData.SessionType == SessionType.Race &&
                                         (currentGameState.SessionData.SessionPhase == SessionPhase.Countdown ||
-                                        (currentGameState.SessionData.SessionPhase == SessionPhase.Gridwalk && CrewChief.gameDefinition.gameEnum != GameEnum.RACE_ROOM) ||
+                                        (currentGameState.SessionData.SessionPhase == SessionPhase.Gridwalk && CrewChief.gameDefinition.gameEnum != GameEnum.RACE_ROOM && CrewChief.gameDefinition.gameEnum != GameEnum.RF2_64BIT) ||
                                         (currentGameState.SessionData.SessionPhase == SessionPhase.Formation && CrewChief.gameDefinition.gameEnum == GameEnum.RACE_ROOM) ||
                                         (currentGameState.SessionData.SessionPhase == SessionPhase.Formation && (CrewChief.gameDefinition.gameEnum == GameEnum.RF1 || CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT) &&
                                         currentGameState.SessionData.SectorNumber == 3)))
@@ -314,7 +314,9 @@ namespace CrewChiefV4.Events
                                                 CrewChief.gameDefinition.gameEnum == GameEnum.PCARS2 ||
                                                 CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_NETWORK ||
                                                 CrewChief.gameDefinition.gameEnum == GameEnum.PCARS2_NETWORK ? 1 : 2;
-                    if (!playedPreLightsMessage && currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.SessionPhase == SessionPhase.Gridwalk &&
+                    if (!playedPreLightsMessage && currentGameState.SessionData.SessionType == SessionType.Race && 
+                        ((currentGameState.SessionData.SessionPhase == SessionPhase.Gridwalk && CrewChief.gameDefinition.gameEnum != GameEnum.RF2_64BIT) ||  // In rF2, wait till Countdown.
+                            (currentGameState.SessionData.SessionPhase == SessionPhase.Countdown && CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT)) &&
                         (playPreLightsInRaceroom || CrewChief.gameDefinition.gameEnum != GameEnum.RACE_ROOM))
                     {
                         playPreLightsMessage(currentGameState, preLightsMessageCount);

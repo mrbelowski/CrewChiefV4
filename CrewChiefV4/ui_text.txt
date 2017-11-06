@@ -424,7 +424,7 @@ donate_link_text = Donate to Support Crew Chief development
 use_american_terms = Use American terms
 use_american_terms_help = Assume unknown cars use American phrasing ("pace car", "white flag" for last lap etc)
 realistic_mode = Realistic mode
-realistic_mode_help = Restrict available message types based on the car and track in use (experimental)
+realistic_mode_help = Experimental: Restrict available message types based on the car and track in use
 always_report_time_in_hundredths = Always report time in hundredths
 always_report_time_in_hundredths_help = Always report laptimes and gaps to hundredths of a second
 insert_beep_in_between_spotter_and_chief = Insert beep-in between Spotter and Chief
@@ -470,7 +470,7 @@ enable_rf2_frozen_order_messages_help = Announce order information during Full C
 enable_rf2_cut_track_heuristics = Enable rF2 cut track heuristic detection
 enable_rf2_cut_track_heuristics_help = If enabled, CC will try to detect if user cut track.  If disabled, cut track will only be reported if game reported that lap got invalidated.
 enable_rf2_pit_lane_approach_heuristics = Enable rF2 pit lane approach detection
-enable_rf2_pit_lane_approach_heuristics_help = If enabled, CC will try to detect if user approaches the pit lane entry and remind him to respect speed limit.  Might not work correctly for all tracks.
+enable_rf2_pit_lane_approach_heuristics_help = Experimental: If enabled, CC will try to detect if user approaches the pit lane entry and remind him to respect speed limit.  Might not work correctly for all tracks.
 
 enable_command_macros = Enable command macros
 enable_command_macros_help = Enable voice-triggered command macros for pit actions etc

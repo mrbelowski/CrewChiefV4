@@ -243,10 +243,13 @@ namespace CrewChiefV4.rFactor2
 
         public override Object ReadGameDataFromFile(String filename)
         {
-            if (dataReadFromFile == null || filename != this.lastReadFileName)
+            if (this.dataReadFromFile == null || filename != this.lastReadFileName)
             {
                 this.dataReadFromFileIndex = 0;
-                dataReadFromFile = DeSerializeObject<RF2StructWrapper[]>(dataFilesPath + filename);
+
+                var filePathResolved = Utilities.ResolveDataFile(this.dataFilesPath, filename);
+                dataReadFromFile = DeSerializeObject<RF2StructWrapper[]>(filePathResolved);
+
                 this.lastReadFileName = filename;
             }
             if (dataReadFromFile != null && dataReadFromFile.Length > this.dataReadFromFileIndex)

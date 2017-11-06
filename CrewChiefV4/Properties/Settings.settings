@@ -597,7 +597,7 @@
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="enable_rf2_cut_track_heuristics" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
+      <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="enable_rf2_pit_lane_approach_heuristics" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
@@ -618,6 +618,9 @@
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="READ_CORNER_NAMES_FOR_LAP_device_type" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="last_trace_file_name" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
   </Settings>
