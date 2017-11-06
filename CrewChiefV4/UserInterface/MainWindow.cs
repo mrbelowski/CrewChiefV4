@@ -643,8 +643,12 @@ namespace CrewChiefV4
             InitializeComponent();
             SetupNotificationTrayIcon();
 
-            this.filenameTextbox.Text = UserSettings.GetUserSettings().getString("last_trace_file_name");
-            this.filenameTextbox.TextChanged += MainWindow_TextChanged;
+            if (System.Diagnostics.Debugger.IsAttached)
+            {
+                // Restore last saved trace file name.
+                filenameTextbox.Text = UserSettings.GetUserSettings().getString("last_trace_file_name");
+                filenameTextbox.TextChanged += MainWindow_TextChanged;
+            }
 
             CheckForIllegalCrossThreadCalls = false;
             cw = new ControlWriter(textBox1);
@@ -796,7 +800,9 @@ namespace CrewChiefV4
 
         private void MainWindow_TextChanged(object sender, EventArgs e)
         {
-            UserSettings.GetUserSettings().setProperty("last_trace_file_name", this.filenameTextbox.Text);
+            UserSettings.GetUserSettings().setProperty("last_trace_file_name", filenameTextbox.Text);
+
+            // It's awful to save on each character entered, but alternatives are far hairier, so let it be (debug only stuff anyway).
             UserSettings.GetUserSettings().saveUserSettings();
         }
 
