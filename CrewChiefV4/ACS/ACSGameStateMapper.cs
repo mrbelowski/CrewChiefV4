@@ -1227,7 +1227,7 @@ namespace CrewChiefV4.assetto
                 currentGameState.SessionData.IsNewSector = previousGameState == null || currentGameState.SessionData.SectorNumber != previousGameState.SessionData.SectorNumber;
                 currentGameState.SessionData.LapTimeCurrent = mapToFloatTime(shared.acsGraphic.iCurrentTime);
 
-                currentGameState.SessionData.IsNewLap = currentGameState.HasNewLapData(previousGameState, mapToFloatTime(shared.acsGraphic.iLastTime), currentGameState.SessionData.SectorNumber)
+                currentGameState.SessionData.IsNewLap = currentGameState.HasNewLapData(previousGameState, mapToFloatTime(shared.acsGraphic.iLastTime), shared.acsGraphic.completedLaps)
                     || ((lastSessionPhase == SessionPhase.Countdown)
                     && (currentGameState.SessionData.SessionPhase == SessionPhase.Green || currentGameState.SessionData.SessionPhase == SessionPhase.FullCourseYellow));
                 if (currentGameState.SessionData.IsNewLap)
@@ -1336,7 +1336,7 @@ namespace CrewChiefV4.assetto
                 }*/
                 currentGameState.SessionData.NumCars = shared.acsChief.numVehicles;
                 
-                currentGameState.SessionData.CompletedLaps = shared.acsGraphic.completedLaps;
+                //currentGameState.SessionData.CompletedLaps = shared.acsGraphic.completedLaps;
 
 
                 /*previousGameState != null && previousGameState.SessionData.IsNewLap == false &&
@@ -1993,7 +1993,7 @@ namespace CrewChiefV4.assetto
             opponentData.WorldPosition = currentWorldPosition;
             opponentData.IsNewLap = false;
             opponentData.InPits = isInPits;
-            bool hasNewLapData = opponentData.HasNewLapData(previousOpponentData, sector, lastLapTime, trackNumberOfSectors);
+            bool hasNewLapData = opponentData.HasNewLapData(previousOpponentData, lastLapTime, completedLaps);
             if (opponentData.CurrentSectorNumber != sector || hasNewLapData)
             {
                 if (hasNewLapData)

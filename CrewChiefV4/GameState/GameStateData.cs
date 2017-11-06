@@ -957,11 +957,11 @@ namespace CrewChiefV4.GameState
         private DateTime NewLapDataTimerExpiry = DateTime.MaxValue;
         private Boolean WaitingForNewLapData = false;
 
-        public bool HasNewLapData(OpponentData previousOpponentData, int currentSectorNumber, float gameProvidedLastLapTime, int trackNumberOfSectors)
+        public bool HasNewLapData(OpponentData previousOpponentData, float gameProvidedLastLapTime, int lapsCompleated)
         {
             if (previousOpponentData != null)
             {
-                if (currentSectorNumber == 1 && previousOpponentData.CurrentSectorNumber == trackNumberOfSectors)
+                if (lapsCompleated != previousOpponentData.CompletedLaps)
                 {
                     // reset the timer and start waiting for an updated laptime...
                     this.WaitingForNewLapData = true;
@@ -987,6 +987,7 @@ namespace CrewChiefV4.GameState
                     this.LastLapTime = previousOpponentData.LastLapTime;
                     this.LastLapValid = previousOpponentData.LastLapValid;
                 }
+                this.CompletedLaps = lapsCompleated;
             }
             return false;
         }
@@ -1849,11 +1850,11 @@ namespace CrewChiefV4.GameState
         public Boolean readLandmarksForThisLap = false;
 
         //call this after setting currentGameState.SessionData.SectorNumber and currentGameState.SessionData.IsNewSector
-        public bool HasNewLapData(GameStateData previousGameState, float gameProvidedLastLapTime, int currentSector)
+        public bool HasNewLapData(GameStateData previousGameState, float gameProvidedLastLapTime, int lapsCompleated)
         {
             if (previousGameState != null)
             {
-                if (currentSector == 1 && this.SessionData.IsNewSector)
+                if (lapsCompleated != previousGameState.SessionData.CompletedLaps)
                 {
                     // reset the timer and start waiting for an updated laptime...
                     this.WaitingForNewLapData = true;
@@ -1872,13 +1873,16 @@ namespace CrewChiefV4.GameState
                     this.WaitingForNewLapData = false;
                     this.SessionData.LapTimePrevious = gameProvidedLastLapTime;
                     this.SessionData.PreviousLapWasValid = gameProvidedLastLapTime > 1;
+                    this.SessionData.CompletedLaps = lapsCompleated;
                     return true;
                 }
                 else
                 {
                     this.SessionData.LapTimePrevious = previousGameState.SessionData.LapTimePrevious;
                     this.SessionData.PreviousLapWasValid = previousGameState.SessionData.PreviousLapWasValid;
-                }                
+                    
+                }
+                this.SessionData.CompletedLaps = lapsCompleated;
             }
             return false;
         }
