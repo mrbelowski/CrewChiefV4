@@ -49,7 +49,6 @@ namespace CrewChiefV4.rFactor2
 
         // Detect when approaching racing surface after being off track
         private float distanceOffTrack = 0.0f;
-        private bool isApproachingTrack = false;
 
         // Pit stop detection tracking variables.
         private double minTrackWidth = -1;
@@ -172,7 +171,6 @@ namespace CrewChiefV4.rFactor2
             this.waitingToTerminateSession = false;
             this.isOfflineSession = true;
             this.distanceOffTrack = 0;
-            this.isApproachingTrack = false;
             this.playerLapsWhenFCYPosAssigned = -1;
             this.detectedTrackNoDRSZones = false;
             this.minTrackWidth = -1.0;
@@ -539,6 +537,23 @@ namespace CrewChiefV4.rFactor2
             csd.Position = playerScoring.mPlace;
             csd.UnFilteredPosition = csd.Position;
             csd.SessionStartPosition = csd.IsNewSession ? csd.Position : psd.SessionStartPosition;
+
+            // Position isn't accurate till ~1.5 secs since Gridwalk (for in-session restart case).  So, fix it up.
+            if (csd.SessionType == SessionType.Race && csd.SessionPhase == SessionPhase.Countdown)
+                csd.SessionStartPosition = csd.Position;
+
+            // TODO: Below is for debugging only, remove once more insight gathered.
+            if (psd != null && csd.SessionType == SessionType.Race && (csd.SessionPhase == SessionPhase.Gridwalk || csd.SessionPhase == SessionPhase.Countdown))
+            {
+                if (csd.SessionStartPosition != playerScoring.mPlace)
+                {
+                    Console.WriteLine(string.Format("Position mismatch detected: phase:{0}  prev pos:{1}  curr pos:{2}  ET:{3}",
+                        csd.SessionPhase, csd.SessionStartPosition, playerScoring.mPlace, shared.scoring.mScoringInfo.mCurrentET.ToString("0.000")));
+
+                    csd.SessionStartPosition = playerScoring.mPlace;
+                }
+            }
+
             csd.SectorNumber = playerScoring.mSector == 0 ? 3 : playerScoring.mSector;
             csd.IsNewSector = csd.IsNewSession || csd.SectorNumber != psd.SectorNumber;
             csd.IsNewLap = csd.IsNewSession || (csd.IsNewSector && csd.SectorNumber == 1);
@@ -675,7 +690,11 @@ namespace CrewChiefV4.rFactor2
                 cgs.PitData.IsPitCrewReady = true;
             }
 
-            cgs.PitData.IsPitCrewDone = (rFactor2Constants.rF2PitState)playerScoring.mPitState == rFactor2Constants.rF2PitState.Exiting;
+            // This sometimes fires under Countdown, so limit to phases when message might make sense.
+            if (csd.SessionPhase == SessionPhase.Green
+                || csd.SessionPhase == SessionPhase.FullCourseYellow
+                || csd.SessionPhase == SessionPhase.Formation)
+                cgs.PitData.IsPitCrewDone = (rFactor2Constants.rF2PitState)playerScoring.mPitState == rFactor2Constants.rF2PitState.Exiting;
 
             if (csd.IsNewLap && RF2GameStateMapper.resetMinWidthEveryLap)
             {
@@ -1589,10 +1608,9 @@ namespace CrewChiefV4.rFactor2
                     && !cgs.PenaltiesData.IsOffRacingSurface)
                 {
                     float lateralDistDiff = (float)(Math.Abs(playerScoring.mPathLateral) - Math.Abs(playerScoring.mTrackEdge));
-                    cgs.PenaltiesData.IsOffRacingSurface = !cgs.PitData.InPitlane && lateralDistDiff >= 2.0f;
+                    cgs.PenaltiesData.IsOffRacingSurface = !cgs.PitData.InPitlane && lateralDistDiff >= 2.5f;
                     float offTrackDistanceDelta = lateralDistDiff - this.distanceOffTrack;
                     this.distanceOffTrack = cgs.PenaltiesData.IsOffRacingSurface ? lateralDistDiff : 0.0f;
-                    this.isApproachingTrack = offTrackDistanceDelta < 0 && cgs.PenaltiesData.IsOffRacingSurface && lateralDistDiff < 3.0f;
 
                     if (!cgs.PitData.OnOutLap && pgs != null
                         && !pgs.PenaltiesData.IsOffRacingSurface && cgs.PenaltiesData.IsOffRacingSurface

@@ -4,8 +4,8 @@
 				"Bathurst 2010 - MAX Detail"
 			],
 			"rf2TrackNames": ["Bathurst"],
-            "pcarsTrackName": "Bathurst:",
-            "irTrackName": "bathurst",
+			"pcarsTrackName": "Bathurst:",
+			"irTrackName": "bathurst",
 			"raceroomLayoutId": 1846,
 			"trackLandmarks": [{
 					"landmarkName": "hell_corner",
@@ -149,7 +149,6 @@
 			"rf1TrackNames": ["Brands Indy",
 				"Brands Hatch Indy"
 			],
-			"rf2TrackNames": ["Brands"],
 			"acTrackNames": ["ks_brands_hatch:indy"],
 			"pcarsTrackName": "Brands Hatch:Indy",
 			"raceroomLayoutId": 2520,
@@ -502,8 +501,8 @@
 			]
 		},
 		{
-            "acTrackNames": [ "spa:" ],
-            "irTrackName": "spa up",
+			"acTrackNames": ["spa:"],
+			"irTrackName": "spa up",
 			"raceroomLayoutId": 3870,
 			"trackLandmarks": [{
 					"landmarkName": "la_source",
@@ -870,8 +869,8 @@
 		{
 			"rf1TrackNames": ["Imola 2016"],
 			"acTrackNames": ["imola:"],
-            "pcarsTrackName": "Imola:Grand Prix",
-            "irTrackName": "imola gp",
+			"pcarsTrackName": "Imola:Grand Prix",
+			"irTrackName": "imola gp",
 			"raceroomLayoutId": 1850,
 			"trackLandmarks": [{
 					"landmarkName": "tamburello",
@@ -926,8 +925,8 @@
 		{
 			"acTrackNames": ["ks_zandvoort:"],
 			"raceroomLayoutId": 1678,
-            "rf2TrackNames": [ "Zandvoort" ],
-            "irTrackName": "zandvoort grandprix",
+			"rf2TrackNames": ["Zandvoort"],
+			"irTrackName": "zandvoort grandprix",
 			"trackLandmarks": [{
 					"landmarkName": "tarzanbocht",
 					"distanceRoundLapStart": 370,
@@ -992,8 +991,8 @@
 		},
 		{
 			"pcarsTrackName": "Mazda Raceway:Laguna Seca",
-            "raceroomLayoutId": 1856,
-            "irTrackName": "lagunaseca",
+			"raceroomLayoutId": 1856,
+			"irTrackName": "lagunaseca",
 			"trackLandmarks": [{
 					"landmarkName": "turn1",
 					"distanceRoundLapStart": 160,
@@ -1124,8 +1123,8 @@
 		{
 			"pcarsTrackName": "Autodromo Nazionale Monza:Grand Prix",
 			"acTrackNames": ["monza:"],
-            "rf2TrackNames": [ "RaceRfactor Monza 2014" ],
-            "irTrackName": "monza full",
+			"rf2TrackNames": ["RaceRfactor Monza 2014"],
+			"irTrackName": "monza full",
 			"raceroomLayoutId": 1671,
 			"trackLandmarks": [{
 					"landmarkName": "the_first_chicane",
@@ -1368,8 +1367,8 @@
 		},
 		{
 			"rf1TrackNames": ["Road America 2016"],
-            "pcarsTrackName": "Road America:",
-            "irTrackName": "roadamerica full",
+			"pcarsTrackName": "Road America:",
+			"irTrackName": "roadamerica full",
 			"trackLandmarks": [{
 					"landmarkName": "turn1",
 					"distanceRoundLapStart": 568,
@@ -2592,8 +2591,8 @@
 		},
 		{
 			"rf2TrackNames": ["Oulton Park Fosters"],
-            "pcarsTrackName": "Oulton Park:Fosters",
-            "irTrackName": "oulton fosters",
+			"pcarsTrackName": "Oulton Park:Fosters",
+			"irTrackName": "oulton fosters",
 			"trackLandmarks": [{
 					"landmarkName": "old_hall",
 					"distanceRoundLapStart": 130,
@@ -2646,8 +2645,8 @@
 		},
 		{
 			"rf2TrackNames": ["Oulton Park International"],
-            "pcarsTrackName": "Oulton Park:International",
-            "irTrackName": "oulton international",
+			"pcarsTrackName": "Oulton Park:International",
+			"irTrackName": "oulton international",
 			"trackLandmarks": [{
 					"landmarkName": "old_hall",
 					"distanceRoundLapStart": 130,
@@ -2776,8 +2775,8 @@
 		},
 		{
 			"rf2TrackNames": ["Oulton Park Island"],
-            "pcarsTrackName": "Oulton Park:Island",
-            "irTrackName": "oulton islandhistoric",            
+			"pcarsTrackName": "Oulton Park:Island",
+			"irTrackName": "oulton islandhistoric",
 			"trackLandmarks": [{
 					"landmarkName": "old_hall",
 					"distanceRoundLapStart": 130,
@@ -2830,7 +2829,7 @@
 		},
 		{
 			"rf2TrackNames": ["Circuit de la Sarthe"],
-            "pcarsTrackName": "Le Mans:Circuit des 24 Heures du Mans",          
+			"pcarsTrackName": "Le Mans:Circuit des 24 Heures du Mans",
 			"trackLandmarks": [{
 					"landmarkName": "dunlop_curve",
 					"distanceRoundLapStart": 380,
@@ -3035,8 +3034,8 @@
 			]
 		},
 		{
-            "rf2TrackNames": [ "Lime Rock Park -- No Chicanes" ],
-            "irTrackName" :  "limerock full",
+			"rf2TrackNames": ["Lime Rock Park -- No Chicanes"],
+			"irTrackName": "limerock full",
 			"trackLandmarks": [{
 					"landmarkName": "big_bend",
 					"distanceRoundLapStart": 190,
@@ -3076,8 +3075,8 @@
 			]
 		},
 		{
-            "rf2TrackNames": [ "Lime Rock Park -- Uphill Chicane" ],
-            "irTrackName" :  "limerock chicane",
+			"rf2TrackNames": ["Lime Rock Park -- Uphill Chicane"],
+			"irTrackName": "limerock chicane",
 			"trackLandmarks": [{
 					"landmarkName": "big_bend",
 					"distanceRoundLapStart": 190,
@@ -6132,8 +6131,8 @@
 			]
 		},
 		{
-            "rf2TrackNames": [ "Barber Motorsports Park" ],
-            "irTrackName": "barber full",
+			"rf2TrackNames": ["Barber Motorsports Park"],
+			"irTrackName": "barber full",
 			"trackLandmarks": [{
 					"landmarkName": "turn1",
 					"distanceRoundLapStart": 80,
@@ -6275,8 +6274,8 @@
 			]
 		},
 		{
-            "rf2TrackNames": [ "Brands Hatch INDY" ],
-            "irTrackName": "brandshatch indy",
+			"rf2TrackNames": ["Brands Hatch INDY", "Brands"],
+			"irTrackName": "brandshatch indy",
 			"trackLandmarks": [
 
 				{
@@ -6318,8 +6317,8 @@
 			]
 		},
 		{
-            "rf2TrackNames": [ "Brands Hatch GP" ],
-            "irTrackName": "brandshatch grandprix",
+			"rf2TrackNames": ["Brands Hatch GP"],
+			"irTrackName": "brandshatch grandprix",
 			"trackLandmarks": [
 
 				{
@@ -6554,8 +6553,8 @@
 			]
 		},
 		{
-            "rf2TrackNames": [ "Canadian Tire Motorsport Park (after 2013)", "Mosport Park" ],
-            "irTrackName": "mosport",
+			"rf2TrackNames": ["Canadian Tire Motorsport Park (after 2013)", "Mosport Park"],
+			"irTrackName": "mosport",
 			"trackLandmarks": [{
 					"landmarkName": "turn1",
 					"distanceRoundLapStart": 535,
@@ -7644,8 +7643,8 @@
 		},
 		{
 			"rf2TrackNames": ["Daytona International Speedway"],
-            "pcarsTrackName": "Daytona International Speedway:Road_Course",
-            "irTrackName": "daytona 2011 road",
+			"pcarsTrackName": "Daytona International Speedway:Road_Course",
+			"irTrackName": "daytona 2011 road",
 			"approximateTrackLength": 5800,
 			"trackLandmarks": [{
 					"landmarkName": "turn1",
@@ -9210,8 +9209,8 @@
 			]
 		},
 		{
-            "rf2TrackNames": [ "Donington Park GP Circuit" ],
-            "irTrackName": "donington gp",            
+			"rf2TrackNames": ["Donington Park GP Circuit"],
+			"irTrackName": "donington gp",
 			"trackLandmarks": [{
 					"landmarkName": "redgate",
 					"distanceRoundLapStart": 220,
@@ -9281,8 +9280,8 @@
 			]
 		},
 		{
-            "rf2TrackNames": [ "Donington Park National Circuit" ],
-            "irTrackName": "donington national", 
+			"rf2TrackNames": ["Donington Park National Circuit"],
+			"irTrackName": "donington national",
 			"trackLandmarks": [{
 					"landmarkName": "redgate",
 					"distanceRoundLapStart": 220,
@@ -10363,8 +10362,8 @@
 			]
 		},
 		{
-            "rf2TrackNames": [ "Guia_Circuit" ],
-            "raceroomLayoutId": 2123,
+			"rf2TrackNames": ["Guia_Circuit"],
+			"raceroomLayoutId": 2123,
 			"trackLandmarks": [{
 					"landmarkName": "reservoir",
 					"distanceRoundLapStart": 55,
@@ -11576,7 +11575,7 @@
 			]
 		},
 		{
-            "rf2TrackNames": [ "Mazda Raceway Laguna Seca" ],
+			"rf2TrackNames": ["Mazda Raceway Laguna Seca"],
 			"trackLandmarks": [{
 					"landmarkName": "turn1",
 					"distanceRoundLapStart": 200,
@@ -12863,9 +12862,9 @@
 		},
 		{
 			"rf2TrackNames": ["Oschersleben Motorsport Park"],
-            "approximateTrackLength": 3670.4,
-            "pcarsTrackName":  "Oschersleben:Grand Prix",
-            "raceroomLayoutId": 2384,
+			"approximateTrackLength": 3670.4,
+			"pcarsTrackName": "Oschersleben:Grand Prix",
+			"raceroomLayoutId": 2384,
 			"trackLandmarks": [{
 					"landmarkName": "turn1",
 					"distanceRoundLapStart": 430,
@@ -13426,8 +13425,8 @@
 		},
 		{
 			"rf2TrackNames": ["Road America 2016"],
-            "approximateTrackLength": 6494.4,
-            "raceroomLayoutId": 5276,
+			"approximateTrackLength": 6494.4,
+			"raceroomLayoutId": 5276,
 			"trackLandmarks": [{
 					"landmarkName": "turn1",
 					"distanceRoundLapStart": 565,

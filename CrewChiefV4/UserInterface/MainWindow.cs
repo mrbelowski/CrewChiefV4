@@ -643,6 +643,13 @@ namespace CrewChiefV4
             InitializeComponent();
             SetupNotificationTrayIcon();
 
+            if (System.Diagnostics.Debugger.IsAttached)
+            {
+                // Restore last saved trace file name.
+                filenameTextbox.Text = UserSettings.GetUserSettings().getString("last_trace_file_name");
+                filenameTextbox.TextChanged += MainWindow_TextChanged;
+            }
+
             CheckForIllegalCrossThreadCalls = false;
             cw = new ControlWriter(textBox1);
             textBox1.KeyDown += TextBox1_KeyDown;
@@ -686,8 +693,9 @@ namespace CrewChiefV4
                     {
                         if (arg.Equals("DEBUG"))
                         {
-                            Console.WriteLine("Allowing dump-to-file");
+                            Console.WriteLine("Dump-to-file enabled");
                             this.recordSession.Visible = true;
+                            this.recordSession.Checked = true;
                             break;
                         }
                     }
@@ -788,6 +796,14 @@ namespace CrewChiefV4
             }
 
             this.Resize += MainWindow_Resize;
+        }
+
+        private void MainWindow_TextChanged(object sender, EventArgs e)
+        {
+            UserSettings.GetUserSettings().setProperty("last_trace_file_name", filenameTextbox.Text);
+
+            // It's awful to save on each character entered, but alternatives are far hairier, so let it be (debug only stuff anyway).
+            UserSettings.GetUserSettings().saveUserSettings();
         }
 
         private void MainWindow_Resize(object sender, EventArgs e)

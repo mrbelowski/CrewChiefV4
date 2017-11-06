@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 
 namespace CrewChiefV4
@@ -30,7 +31,7 @@ namespace CrewChiefV4
         }
 
         public static void runGame(String launchExe, String launchParams)
-        {            
+        {
             try
             {
                 Console.WriteLine("Attempting to run game using " + launchExe + " " + launchParams);
@@ -75,7 +76,7 @@ namespace CrewChiefV4
             {
                 foreach (var opponent in gsd.OpponentData)
                 {
-                    if (opponent.Value.CarClass != null 
+                    if (opponent.Value.CarClass != null
                         && !eventCarClasses.ContainsKey(opponent.Value.CarClass.getClassIdentifier()))
                     {
                         eventCarClasses.Add(opponent.Value.CarClass.getClassIdentifier(), opponent.Value.CarClass.carClassEnum);
@@ -105,6 +106,24 @@ namespace CrewChiefV4
                 return "(user defined)";
 
             return "(built-in)";
+        }
+
+        public static string ResolveDataFile(string dataFilesPath, string fileNameToResolve)
+        {
+            // Search in dataFiles:
+            var resolvedFilePaths = Directory.GetFiles(dataFilesPath, fileNameToResolve, SearchOption.AllDirectories);
+            if (resolvedFilePaths.Length > 0)
+                return resolvedFilePaths[0];
+
+            // Search documents debugLogs:
+            resolvedFilePaths = Directory.GetFiles(System.IO.Path.Combine(Environment.GetFolderPath(
+                Environment.SpecialFolder.MyDocuments), @"CrewChiefV4\debugLogs"), fileNameToResolve, SearchOption.AllDirectories);
+
+            if (resolvedFilePaths.Length > 0)
+                return resolvedFilePaths[0];
+
+            Console.WriteLine("Failed to resolve trace file full path: " + fileNameToResolve);
+            return null;
         }
     }
 }

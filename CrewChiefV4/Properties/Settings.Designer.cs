@@ -2401,7 +2401,7 @@ namespace CrewChiefV4.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool enable_rf2_cut_track_heuristics {
             get {
                 return ((bool)(this["enable_rf2_cut_track_heuristics"]));
@@ -2492,6 +2492,18 @@ namespace CrewChiefV4.Properties {
             }
             set {
                 this["READ_CORNER_NAMES_FOR_LAP_device_type"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string last_trace_file_name {
+            get {
+                return ((string)(this["last_trace_file_name"]));
+            }
+            set {
+                this["last_trace_file_name"] = value;
             }
         }
     }

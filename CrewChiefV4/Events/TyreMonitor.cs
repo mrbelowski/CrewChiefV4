@@ -76,6 +76,16 @@ namespace CrewChiefV4.Events
 
         private String folderGoodWear = "tyre_monitor/good_wear";
 
+        private String folderMinorWearLeftFront = "tyre_monitor/minor_wear_left_front";
+        private String folderMinorWearLeftRear = "tyre_monitor/minor_wear_left_rear";
+        private String folderMinorWearRightFront = "tyre_monitor/minor_wear_right_front";
+        private String folderMinorWearRightRear = "tyre_monitor/minor_wear_right_rear";
+        private String folderMinorWearFronts = "tyre_monitor/minor_wear_fronts";
+        private String folderMinorWearRears = "tyre_monitor/minor_wear_rears";
+        private String folderMinorWearLefts = "tyre_monitor/minor_wear_lefts";
+        private String folderMinorWearRights = "tyre_monitor/minor_wear_rights";
+        private String folderMinorWearAllRound = "tyre_monitor/minor_wear_all_round";
+
         private String folderWornLeftFront = "tyre_monitor/worn_left_front";
         private String folderWornLeftRear = "tyre_monitor/worn_left_rear";
         private String folderWornRightFront = "tyre_monitor/worn_right_front";
@@ -1155,6 +1165,9 @@ namespace CrewChiefV4.Events
                 case CornerData.Corners.ALL:
                     switch (tyreCondition)
                     {
+                        case TyreCondition.MINOR_WEAR:
+                            messageContents.Add(MessageFragment.Text(folderMinorWearAllRound));
+                            break;
                         case TyreCondition.MAJOR_WEAR:
                             messageContents.Add(MessageFragment.Text(folderWornAllRound));
                             break;
@@ -1168,6 +1181,9 @@ namespace CrewChiefV4.Events
                 case CornerData.Corners.FRONTS:
                     switch (tyreCondition)
                     {
+                        case TyreCondition.MINOR_WEAR:
+                            messageContents.Add(MessageFragment.Text(folderMinorWearFronts));
+                            break;
                         case TyreCondition.MAJOR_WEAR:
                             messageContents.Add(MessageFragment.Text(folderWornFronts));
                             break;
@@ -1181,6 +1197,9 @@ namespace CrewChiefV4.Events
                 case CornerData.Corners.REARS:
                     switch (tyreCondition)
                     {
+                        case TyreCondition.MINOR_WEAR:
+                            messageContents.Add(MessageFragment.Text(folderMinorWearRears));
+                            break;
                         case TyreCondition.MAJOR_WEAR:
                             messageContents.Add(MessageFragment.Text(folderWornRears));
                             break;
@@ -1194,6 +1213,9 @@ namespace CrewChiefV4.Events
                 case CornerData.Corners.LEFTS:
                     switch (tyreCondition)
                     {
+                        case TyreCondition.MINOR_WEAR:
+                            messageContents.Add(MessageFragment.Text(folderMinorWearLefts));
+                            break;
                         case TyreCondition.MAJOR_WEAR:
                             messageContents.Add(MessageFragment.Text(folderWornLefts));
                             break;
@@ -1207,6 +1229,9 @@ namespace CrewChiefV4.Events
                 case CornerData.Corners.RIGHTS:
                     switch (tyreCondition)
                     {
+                        case TyreCondition.MINOR_WEAR:
+                            messageContents.Add(MessageFragment.Text(folderMinorWearRights));
+                            break;
                         case TyreCondition.MAJOR_WEAR:
                             messageContents.Add(MessageFragment.Text(folderWornRights));
                             break;
@@ -1220,6 +1245,9 @@ namespace CrewChiefV4.Events
                 case CornerData.Corners.FRONT_LEFT:
                     switch (tyreCondition)
                     {
+                        case TyreCondition.MINOR_WEAR:
+                            messageContents.Add(MessageFragment.Text(folderMinorWearLeftFront));
+                            break;
                         case TyreCondition.MAJOR_WEAR:
                             messageContents.Add(MessageFragment.Text(folderWornLeftFront));
                             break;
@@ -1233,6 +1261,9 @@ namespace CrewChiefV4.Events
                 case CornerData.Corners.FRONT_RIGHT:
                     switch (tyreCondition)
                     {
+                        case TyreCondition.MINOR_WEAR:
+                            messageContents.Add(MessageFragment.Text(folderMinorWearRightFront));
+                            break;
                         case TyreCondition.MAJOR_WEAR:
                             messageContents.Add(MessageFragment.Text(folderWornRightFront));
                             break;
@@ -1246,6 +1277,9 @@ namespace CrewChiefV4.Events
                 case CornerData.Corners.REAR_LEFT:
                     switch (tyreCondition)
                     {
+                        case TyreCondition.MINOR_WEAR:
+                            messageContents.Add(MessageFragment.Text(folderMinorWearLeftRear));
+                            break;
                         case TyreCondition.MAJOR_WEAR:
                             messageContents.Add(MessageFragment.Text(folderWornLeftRear));
                             break;
@@ -1259,6 +1293,9 @@ namespace CrewChiefV4.Events
                 case CornerData.Corners.REAR_RIGHT:
                     switch (tyreCondition)
                     {
+                        case TyreCondition.MINOR_WEAR:
+                            messageContents.Add(MessageFragment.Text(folderMinorWearRightRear));
+                            break;
                         case TyreCondition.MAJOR_WEAR:
                             messageContents.Add(MessageFragment.Text(folderWornRightRear));
                             break;
