@@ -34,7 +34,7 @@ namespace CrewChiefV4.iRacing
         public float CorrectedLapDistance { get; private set; }
         public float TotalLapDistance
         {
-            get { return Lap + LapDistance; }
+            get { return Lap + CorrectedLapDistance; }
         }
 
         public TrackSurfaces TrackSurface { get; private set; }
@@ -85,7 +85,10 @@ namespace CrewChiefV4.iRacing
 
             this.CorrectedLapDistance = FixPercentagesOnLapChange(e.CarIdxLapDistPct[this.Driver.Id]);
             this.LapsCompleted = e.CarIdxLapCompleted[this.Driver.Id];
-
+            if (this.LapsCompleted < 0)
+            {
+                this.LapsCompleted = 0;
+            }
             this.TrackSurface = e.CarIdxTrackSurface[this.Driver.Id];            
             this.Gear = e.CarIdxGear[this.Driver.Id];
             this.Rpm = e.CarIdxRPM[this.Driver.Id];
