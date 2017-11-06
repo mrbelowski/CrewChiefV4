@@ -971,7 +971,7 @@ namespace CrewChiefV4.iRacing
                 {
                     return SessionPhase.Unavailable;
                 }
-                else if (sessionFlags.HasFlag(SessionFlags.StartHidden) || sessionFlags.HasFlag(SessionFlags.StartReady) || sessionFlags.HasFlag(SessionFlags.StartSet) || SessionStates.Racing != sessionState && isReplay)
+                else if (sessionFlags.HasFlag(SessionFlags.StartReady) || sessionFlags.HasFlag(SessionFlags.StartSet) || SessionStates.Racing != sessionState && isReplay)
                 {
                     // don't allow a transition to Countdown if the game time has increased
                     //if (lastSessionRunningTime < thisSessionRunningTime)
