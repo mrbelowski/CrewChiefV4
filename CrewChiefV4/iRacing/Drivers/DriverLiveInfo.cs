@@ -86,11 +86,6 @@ namespace CrewChiefV4.iRacing
             this.CorrectedLapDistance = FixPercentagesOnLapChange(e.CarIdxLapDistPct[this.Driver.Id]);
             this.LapsCompleted = e.CarIdxLapCompleted[this.Driver.Id];
 
-            if (this.LapsCompleted < 0)
-            {
-                this.LapsCompleted = 0;
-            }
-
             this.TrackSurface = e.CarIdxTrackSurface[this.Driver.Id];            
             this.Gear = e.CarIdxGear[this.Driver.Id];
             this.Rpm = e.CarIdxRPM[this.Driver.Id];

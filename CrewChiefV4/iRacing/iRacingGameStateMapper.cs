@@ -384,7 +384,7 @@ namespace CrewChiefV4.iRacing
             int currentSector = playerCar.Live.CurrentFakeSector;
             
             currentGameState.SessionData.IsNewSector = currentGameState.SessionData.SectorNumber != currentSector;
-            currentGameState.SessionData.IsNewLap = currentGameState.HasNewLapData(previousGameState, playerCar.Live.LapTimePrevious, playerCar.Live.LapsCompleted);
+            currentGameState.SessionData.IsNewLap = currentGameState.HasNewLapData(previousGameState, playerCar.Live.LapTimePrevious, shared.Telemetry.Lap);
             /* ||
                 ((lastSessionPhase == SessionPhase.Countdown) && (currentGameState.SessionData.SessionPhase == SessionPhase.Green ||
                 currentGameState.SessionData.SessionPhase == SessionPhase.FullCourseYellow));*/
