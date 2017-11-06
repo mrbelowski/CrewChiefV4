@@ -85,6 +85,7 @@ namespace CrewChiefV4
             catch (Exception ex)
             {
                 Console.WriteLine("Unable to write raw game data: " + ex.Message);
+                Console.WriteLine("Stack trace: " + ex.StackTrace);
             }
         }
 

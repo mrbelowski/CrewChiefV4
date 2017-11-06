@@ -91,7 +91,7 @@
 			"gameDefinition": "PCARS2",
 			"actionSequence": [ "Car Management", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Right", "ICM Menu Down", "ICM Menu Down", "ICM Menu Down", "ICM Menu Right" ],
 			"keyPressTime": 30,
-			"waitBetweenEachCommand": 200
+			"waitBetweenEachCommand": 100
 		}]
 	},
 	{
@@ -165,9 +165,9 @@
 			"description": "pcars2 select strat 1",
 			"gameDefinition": "PCARS2",
 			
-			"actionSequence": [ "Car Management", "ICM Menu Up", "ICM Menu Right", "ICM Menu Down", "ICM Menu Right", "ICM Menu Down", "ICM Menu Right", "ICM Menu Up", "ICM Menu Right", "ICM Menu Up", "ICM Menu Right", "ICM Menu Down", "ICM Menu Right"],
+			"actionSequence": [ "Car Management", "ICM Menu Up", "ICM Menu Right", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Down", "ICM Menu Right", "ICM Menu Down", "ICM Menu Right", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Right", "ICM Menu Up", "ICM Menu Right", "ICM Menu Down", "ICM Menu Right" ],
 			"keyPressTime": 30,
-			"waitBetweenEachCommand": 200
+			"waitBetweenEachCommand": 100
 		}]
 	},
 	{
@@ -180,9 +180,9 @@
 		{
 			"description": "pcars2 select strat 2",
 			"gameDefinition": "PCARS2",
-			"actionSequence": [ "Car Management", "ICM Menu Up", "ICM Menu Right", "ICM Menu Down", "ICM Menu Right", "ICM Menu Down", "ICM Menu Down", "ICM Menu Right", "ICM Menu Up", "ICM Menu Up", "ICM Menu Right", "ICM Menu Up", "ICM Menu Right", "ICM Menu Down", "ICM Menu Right" ],
+			"actionSequence": [ "Car Management", "ICM Menu Up", "ICM Menu Right", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Down", "ICM Menu Right", "ICM Menu Down", "ICM Menu Down", "ICM Menu Right", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Right", "ICM Menu Up", "ICM Menu Right", "ICM Menu Down", "ICM Menu Right" ],
 			"keyPressTime": 30,
-			"waitBetweenEachCommand": 200
+			"waitBetweenEachCommand": 100
 		}]
 	},
 	{
@@ -195,9 +195,9 @@
 		{
 			"description": "pcars2 select strat 3",
 			"gameDefinition": "PCARS2",
-			"actionSequence": [ "Car Management", "ICM Menu Up", "ICM Menu Right", "ICM Menu Down", "ICM Menu Right", "ICM Menu Down", "ICM Menu Down", "ICM Menu Down", "ICM Menu Right", "ICM Menu Up", "ICM Menu Up", "ICM Menu Right", "ICM Menu Up", "ICM Menu Right", "ICM Menu Down", "ICM Menu Right" ],
+			"actionSequence": [  "Car Management", "ICM Menu Up", "ICM Menu Right", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Down", "ICM Menu Right", "ICM Menu Down", "ICM Menu Down", "ICM Menu Down", "ICM Menu Right", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Right", "ICM Menu Up", "ICM Menu Right", "ICM Menu Down", "ICM Menu Right" ],
 			"keyPressTime": 30,
-			"waitBetweenEachCommand": 200
+			"waitBetweenEachCommand": 100
 		}]
 	},
 	{
@@ -210,9 +210,9 @@
 		{
 			"description": "pcars2 select strat 4",
 			"gameDefinition": "PCARS2",
-			"actionSequence": [ "Car Management", "ICM Menu Up", "ICM Menu Right", "ICM Menu Down", "ICM Menu Right", "ICM Menu Down", "ICM Menu Down", "ICM Menu Down", "ICM Menu Down", "ICM Menu Right", "ICM Menu Up", "ICM Menu Up", "ICM Menu Right", "ICM Menu Up", "ICM Menu Right", "ICM Menu Down", "ICM Menu Right" ],
+			"actionSequence": [ "Car Management", "ICM Menu Up", "ICM Menu Right", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Down", "ICM Menu Right", "ICM Menu Down", "ICM Menu Down", "ICM Menu Down", "ICM Menu Down", "ICM Menu Right", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Right", "ICM Menu Up", "ICM Menu Right", "ICM Menu Down", "ICM Menu Right" ],
 			"keyPressTime": 30,
-			"waitBetweenEachCommand": 200
+			"waitBetweenEachCommand": 100
 		}]
 	},
 	{
@@ -231,8 +231,8 @@
 			"description": "pcars2 version",
 			"gameDefinition": "PCARS2",
 			"actionSequence": [ "Car Management" ],
-			"keyPressTime": 10,
-			"waitBetweenEachCommand": 200
+			"keyPressTime": 30,
+			"waitBetweenEachCommand": 100
 		}]
 	},
 	{
@@ -264,8 +264,8 @@
 			"description": "pcars2 version",
 			"gameDefinition": "PCARS2",
 			"actionSequence": [ "ICM Menu Up" ],
-			"keyPressTime": 10,
-			"waitBetweenEachCommand": 200
+			"keyPressTime": 30,
+			"waitBetweenEachCommand": 100
 		}]
 	},
 	{
@@ -284,8 +284,8 @@
 			"description": "pcars2 version",
 			"gameDefinition": "PCARS2",
 			"actionSequence": [ "ICM Menu Down" ],
-			"keyPressTime": 10,
-			"waitBetweenEachCommand": 200
+			"keyPressTime": 30,
+			"waitBetweenEachCommand": 100
 		}]
 	},
 	{
@@ -304,8 +304,8 @@
 			"description": "pcars2 version",
 			"gameDefinition": "PCARS2",
 			"actionSequence": [ "ICM Menu Left" ],
-			"keyPressTime": 10,
-			"waitBetweenEachCommand": 200
+			"keyPressTime": 30,
+			"waitBetweenEachCommand": 100
 		}]
 	},
 	{
@@ -324,8 +324,8 @@
 			"description": "pcars2 version",
 			"gameDefinition": "PCARS2",
 			"actionSequence": [ "ICM Menu Right" ],
-			"keyPressTime": 10,
-			"waitBetweenEachCommand": 200
+			"keyPressTime": 30,
+			"waitBetweenEachCommand": 100
 		}]
 	}]
 }
