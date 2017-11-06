@@ -14,10 +14,7 @@ namespace CrewChiefV4.iRacing
         public string EventType { get; set; }
         public string SessionType { get; set; }
         public int SubsessionId { get; set; }
-
-        public double SessionTime { get; set; }
         public string SessionTimeString { get; set; }
-        public double TimeRemaining { get; set; }
 
         public string RaceLaps { get; set; }
         public double RaceTime { get; set; }
@@ -41,13 +38,6 @@ namespace CrewChiefV4.iRacing
             this.RaceLaps = laps;
             this.RaceTime = time;
         }
-
-        public void Update(iRacingData telemetry)
-        {
-            this.SessionTime = telemetry.SessionTime;
-            this.TimeRemaining = telemetry.SessionTimeRemain;
-        }
-
         public bool IsLimitedSessionLaps
         {
             get

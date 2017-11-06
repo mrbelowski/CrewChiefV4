@@ -14,9 +14,8 @@ namespace CrewChiefV4.iRacing
         public Driver()
         {
             this.Car = new DriverCarInfo();
-            this.Results = new DriverResults(this);
             this.Live = new DriverLiveInfo(this);
-            this.CurrentResults = new DriverSessionResults(this,0);
+            this.CurrentResults = new DriverSessionResults();
         }
 
         /// <summary>
@@ -42,7 +41,6 @@ namespace CrewChiefV4.iRacing
         public string DivisionName { get; set; }
 
         public DriverCarInfo Car { get; set; }
-        public DriverResults Results { get; private set; }
         public DriverSessionResults CurrentResults { get; set; }
         public DriverLiveInfo Live { get; private set; }
         private double _prevPos;
@@ -107,8 +105,7 @@ namespace CrewChiefV4.iRacing
 
         internal void UpdateResultsInfo(int sessionNumber, YamlQuery query, int position)
         {
-            this.Results.SetResults(sessionNumber, query, position);
-            this.CurrentResults = this.Results.Current;
+            this.CurrentResults.ParseYaml( query, position);
         }
 
         internal void UpdateLiveInfo(iRacingData e)

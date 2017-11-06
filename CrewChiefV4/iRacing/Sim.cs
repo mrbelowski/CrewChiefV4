@@ -231,13 +231,17 @@ namespace CrewChiefV4.iRacing
             // In a race that is not yet in checkered flag mode,
             // Live positions are determined from track position (total lap distance)
             // Any other conditions (race finished, P, Q, etc), positions are ordered as result positions
-
-            if (this.SessionData.EventType == "Race" && !info.SessionFlags.HasFlag(SessionFlags.Checkered))
+            SessionFlags flag = (SessionFlags)info.SessionFlags;
+            if (this.SessionData.EventType == "Race" && !flag.HasFlag(SessionFlags.Checkered))
             {
                 // Determine live position from lapdistance
                 int pos = 1;
-                foreach (var driver in _drivers.OrderByDescending(d => d.Live.TotalLapDistance))
+                foreach (var driver in _drivers.OrderByDescending(d => d.Live.TotalLapDistance))                
                 {
+                    if(driver.IsPacecar)
+                    {
+                        continue;
+                    }
                     driver.Live.Position = pos;
                     pos++;
                 }
@@ -246,9 +250,9 @@ namespace CrewChiefV4.iRacing
             {
                 // In P or Q, set live position from result position (== best lap according to iRacing)
                 // In P or Q, set live position from result position (== best lap according to iRacing)
-                foreach (var driver in _drivers.OrderBy(d => d.Results.Current.Position))
+                foreach (var driver in _drivers.OrderBy(d => d.CurrentResults.Position))
                 {
-                    driver.Live.Position = driver.Results.Current.Position;
+                    driver.Live.Position = driver.CurrentResults.Position;
                 }
 
                 //foreach (var driver in _drivers)
@@ -281,15 +285,19 @@ namespace CrewChiefV4.iRacing
         public void SdkOnSessionInfoUpdated(SessionInfo sessionInfo, int sessionNumber,int driverId)
         {
            
-            // Cache info
-            _sessionInfo = sessionInfo;
-            _currentSessionNumber = sessionNumber;
             _DriverId = driverId;
 
             // Stop if we don't have a session number yet
-            if (_currentSessionNumber == null) 
-                return;
 
+
+            if (_currentSessionNumber == null || (_currentSessionNumber.Value != sessionNumber))
+            {
+                _mustUpdateSessionData = true;
+
+                // Session changed, reset session info
+                this.ResetSession();
+            }
+            _currentSessionNumber = sessionNumber;
             if (_mustUpdateSessionData)
             {
                 _sessionData.Update(sessionInfo, sessionNumber);
@@ -297,31 +305,16 @@ namespace CrewChiefV4.iRacing
             }
             // Update drivers
             this.UpdateDriverList(sessionInfo);
+            
         }
 
         public void SdkOnTelemetryUpdated(iRacingData telemetry)
         {
             // Cache info            
             _telemetry = telemetry;
-            // Check if session changed
-            if (_currentSessionNumber == null || (_currentSessionNumber.Value != telemetry.SessionNum))
-            {
-                _mustUpdateSessionData = true;
-
-                // Session changed, reset session info
-                this.ResetSession();
-            }
-
-            // Store current session number
-            _currentSessionNumber = telemetry.SessionNum;
-
             // Update drivers telemetry
             this.UpdateDriverTelemetry(telemetry);
-
-            // Update session data
-            this.SessionData.Update(telemetry);
         }
-
       
         #endregion
 
