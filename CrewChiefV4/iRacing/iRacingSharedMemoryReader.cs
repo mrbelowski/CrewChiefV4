@@ -22,8 +22,7 @@ namespace CrewChiefV4.iRacing
         int lastUpdate = -1;
         private int _DriverId = -1;
         public int DriverId { get { return _DriverId; } }
-        private DateTime StopSavingSessionDataDoingStartRaceTimer = DateTime.MaxValue;
-        private bool HasSetTimer = false;
+
         public object GetData(string headerName)
         {
             if (!sdk.IsConnected())
@@ -190,13 +189,8 @@ namespace CrewChiefV4.iRacing
 
                     sim.SdkOnTelemetryUpdated(irData);
                     structWrapper.data = sim;
-                    if (dumpToFile && irData.SessionFlags.HasFlag(SessionFlags.StartGo) && !HasSetTimer && sim.SessionData.SessionType == "Race")
-                    {
-                        StopSavingSessionDataDoingStartRaceTimer = DateTime.Now.Add(TimeSpan.FromSeconds(3));
-                        HasSetTimer = true;
-                    }
 
-                    if (!forSpotter && dumpToFile && dataToDump != null && !(HasSetTimer && DateTime.Now > StopSavingSessionDataDoingStartRaceTimer))
+                    if (!forSpotter && dumpToFile && dataToDump != null )
                     {
                         dataToDump.Add(new iRacingStructDumpWrapper() { ticksWhenRead = structWrapper.ticksWhenRead, data = irData });
                     }

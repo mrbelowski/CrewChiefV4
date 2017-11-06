@@ -68,7 +68,7 @@ namespace CrewChiefV4.iRacing
             int previousLapsCompleted = previousGameState == null ? 0 : previousGameState.SessionData.CompletedLaps;
 
             currentGameState.SessionData.SessionPhase = mapToSessionPhase(lastSessionPhase, shared.Telemetry.SessionState, currentGameState.SessionData.SessionType, shared.Telemetry.IsReplayPlaying,
-                (float)shared.Telemetry.SessionTime, previousLapsCompleted, shared.Telemetry.Lap, shared.Telemetry.SessionFlags, shared.Telemetry.IsInGarage,
+                (float)shared.Telemetry.SessionTime, previousLapsCompleted, shared.Telemetry.Lap, (SessionFlags)shared.Telemetry.SessionFlags, shared.Telemetry.IsInGarage,
                 shared.SessionData.IsLimitedTime, shared.Telemetry.SessionTimeRemain, shared.Telemetry.SessionTime);
 
             currentGameState.SessionData.NumCarsAtStartOfSession = shared.Drivers.Count;
@@ -317,15 +317,16 @@ namespace CrewChiefV4.iRacing
             currentGameState.TransmissionData.Gear = shared.Telemetry.Gear;
 
             //TODO add yellow 
-            if (shared.Telemetry.SessionFlags.HasFlag(SessionFlags.Black) && !shared.Telemetry.SessionFlags.HasFlag(SessionFlags.Furled))
+            SessionFlags flag = (SessionFlags)shared.Telemetry.SessionFlags;
+            if (flag.HasFlag(SessionFlags.Black) && !flag.HasFlag(SessionFlags.Furled))
             {
                 currentGameState.PenaltiesData.HasStopAndGo = true;
             }
-            if (shared.Telemetry.SessionFlags.HasFlag(SessionFlags.Black) && shared.Telemetry.SessionFlags.HasFlag(SessionFlags.Furled))
+            if (flag.HasFlag(SessionFlags.Black) && flag.HasFlag(SessionFlags.Furled))
             {
                 currentGameState.PenaltiesData.HasSlowDown = true;
             }
-            if (shared.Telemetry.SessionFlags.HasFlag(SessionFlags.Yellow))
+            if (flag.HasFlag(SessionFlags.Yellow))
             {
                 currentGameState.FlagData.isLocalYellow = true;
             }

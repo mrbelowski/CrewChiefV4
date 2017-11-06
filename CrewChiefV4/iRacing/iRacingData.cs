@@ -21,7 +21,7 @@ namespace CrewChiefV4.iRacing
             SessionTick = (System.Int32)sdk.GetData("SessionTick");
             SessionNum = (System.Int32)sdk.GetData("SessionNum");
             SessionState = (SessionStates)sdk.GetData("SessionState");
-            SessionFlags = (SessionFlags)(int)sdk.GetData("SessionFlags");
+            SessionFlags = (int)sdk.GetData("SessionFlags");
             SessionTimeRemain = (System.Double)sdk.GetData("SessionTimeRemain");
             SessionLapsRemain = (System.Int32)sdk.GetData("SessionLapsRemain");
             SessionLapsRemainEx = (System.Int32)sdk.GetData("SessionLapsRemainEx");
@@ -151,7 +151,7 @@ namespace CrewChiefV4.iRacing
         /// <summary>
         /// Session flags
         /// </summary>
-        public SessionFlags 	SessionFlags;
+        public int 	SessionFlags;
 
         /// <summary>
         /// Seconds left till session ends
