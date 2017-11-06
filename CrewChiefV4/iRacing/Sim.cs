@@ -250,9 +250,9 @@ namespace CrewChiefV4.iRacing
             {
                 // In P or Q, set live position from result position (== best lap according to iRacing)
                 // In P or Q, set live position from result position (== best lap according to iRacing)
-                foreach (var driver in _drivers.OrderBy(d => d.Results.Current.Position))
+                foreach (var driver in _drivers.OrderBy(d => d.CurrentResults.Position))
                 {
-                    driver.Live.Position = driver.Results.Current.Position;
+                    driver.Live.Position = driver.CurrentResults.Position;
                 }
 
                 //foreach (var driver in _drivers)
@@ -285,8 +285,6 @@ namespace CrewChiefV4.iRacing
         public void SdkOnSessionInfoUpdated(SessionInfo sessionInfo, int sessionNumber,int driverId)
         {
            
-            // Cache info
-            _sessionInfo = sessionInfo;
             _DriverId = driverId;
 
             // Stop if we don't have a session number yet
@@ -299,8 +297,7 @@ namespace CrewChiefV4.iRacing
                 // Session changed, reset session info
                 this.ResetSession();
             }
-
-
+            _currentSessionNumber = sessionNumber;
             if (_mustUpdateSessionData)
             {
                 _sessionData.Update(sessionInfo, sessionNumber);
@@ -308,7 +305,7 @@ namespace CrewChiefV4.iRacing
             }
             // Update drivers
             this.UpdateDriverList(sessionInfo);
-            _currentSessionNumber = sessionNumber;
+            
         }
 
         public void SdkOnTelemetryUpdated(iRacingData telemetry)

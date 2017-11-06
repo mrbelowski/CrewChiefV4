@@ -15,10 +15,6 @@ namespace CrewChiefV4.iRacing
             if(dumpData)
             {
                 SessionInfo = sdk.GetSessionInfoString();
-                if(!SessionInfo.EndsWith("\0"))
-                {
-                    SessionInfo = SessionInfo + "\0";
-                }
             }
             SessionInfoUpdate = sdk.Header.SessionInfoUpdate;     
             SessionTime = (System.Double)sdk.GetData("SessionTime");
