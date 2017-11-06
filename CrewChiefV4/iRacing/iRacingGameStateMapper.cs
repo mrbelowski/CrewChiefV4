@@ -53,12 +53,6 @@ namespace CrewChiefV4.iRacing
                 lastSessionPhase = previousGameState.SessionData.SessionPhase;
                 lastSessionRunningTime = previousGameState.SessionData.SessionRunningTime;
                 lastSessionType = previousGameState.SessionData.SessionType;
-                currentGameState.SessionData.PlayerLapTimeSessionBest = previousGameState.SessionData.PlayerLapTimeSessionBest;
-                currentGameState.SessionData.OpponentsLapTimeSessionBestOverall = previousGameState.SessionData.OpponentsLapTimeSessionBestOverall;
-                currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass = previousGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass;
-                currentGameState.SessionData.OverallSessionBestLapTime = previousGameState.SessionData.OverallSessionBestLapTime;
-                currentGameState.SessionData.PlayerClassSessionBestLapTime = previousGameState.SessionData.PlayerClassSessionBestLapTime;
-                currentGameState.SessionData.CurrentLapIsValid = previousGameState.SessionData.CurrentLapIsValid;
                 currentGameState.SessionData.SessionStartPosition = previousGameState.SessionData.SessionStartPosition;
                 currentGameState.readLandmarksForThisLap = previousGameState.readLandmarksForThisLap;
             }
@@ -233,11 +227,7 @@ namespace CrewChiefV4.iRacing
 
                         Console.WriteLine("SessionType " + currentGameState.SessionData.SessionType);
                         Console.WriteLine("SessionPhase " + currentGameState.SessionData.SessionPhase);
-                        Console.WriteLine("EventIndex " + currentGameState.SessionData.EventIndex);
-                        Console.WriteLine("SessionIteration " + currentGameState.SessionData.SessionIteration);
                         Console.WriteLine("HasMandatoryPitStop " + currentGameState.PitData.HasMandatoryPitStop);
-                        Console.WriteLine("PitWindowStart " + currentGameState.PitData.PitWindowStart);
-                        Console.WriteLine("PitWindowEnd " + currentGameState.PitData.PitWindowEnd);
                         Console.WriteLine("NumCarsAtStartOfSession " + currentGameState.SessionData.NumCarsAtStartOfSession);
                         Console.WriteLine("SessionNumberOfLaps " + currentGameState.SessionData.SessionNumberOfLaps);
                         Console.WriteLine("SessionRunTime " + currentGameState.SessionData.SessionTotalRunTime);
@@ -297,7 +287,7 @@ namespace CrewChiefV4.iRacing
                     currentGameState.SessionData.PlayerBestLapSector1Time = previousGameState.SessionData.PlayerBestLapSector1Time;
                     currentGameState.SessionData.PlayerBestLapSector2Time = previousGameState.SessionData.PlayerBestLapSector2Time;
                     currentGameState.SessionData.PlayerBestLapSector3Time = previousGameState.SessionData.PlayerBestLapSector3Time;
-                    currentGameState.SessionData.PlayerLapData = previousGameState.SessionData.PlayerLapData;
+                    //currentGameState.SessionData.PlayerLapData = previousGameState.SessionData.PlayerLapData;
                     currentGameState.SessionData.trackLandmarksTiming = previousGameState.SessionData.trackLandmarksTiming;
                     currentGameState.SessionData.CompletedLaps = previousGameState.SessionData.CompletedLaps;
                     currentGameState.FlagData.useImprovisedIncidentCalling = previousGameState.FlagData.useImprovisedIncidentCalling;
@@ -336,7 +326,7 @@ namespace CrewChiefV4.iRacing
             //currentGameState.SessionData.PreviousLapWasValid = playerCar.Live.PreviousLapWasValid;
 
 
-            //currentGameState.SessionData.CompletedLaps = playerCar.Live.LapsCompleted;
+            currentGameState.SessionData.CompletedLaps = playerCar.Live.LapsCompleted;
             //TODO validate laptimes
             currentGameState.SessionData.LapTimeCurrent = shared.Telemetry.LapCurrentLapTime;
             currentGameState.SessionData.CurrentLapIsValid = true;
@@ -384,7 +374,7 @@ namespace CrewChiefV4.iRacing
             int currentSector = playerCar.Live.CurrentFakeSector;
             
             currentGameState.SessionData.IsNewSector = currentGameState.SessionData.SectorNumber != currentSector;
-            currentGameState.SessionData.IsNewLap = currentGameState.HasNewLapData(previousGameState, playerCar.Live.LapTimePrevious, shared.Telemetry.Lap);
+            currentGameState.SessionData.IsNewLap = currentGameState.HasNewLapData(previousGameState, playerCar.Live.LapTimePrevious, playerCar.Live.HasCrossedSFLine);
             /* ||
                 ((lastSessionPhase == SessionPhase.Countdown) && (currentGameState.SessionData.SessionPhase == SessionPhase.Green ||
                 currentGameState.SessionData.SessionPhase == SessionPhase.FullCourseYellow));*/
@@ -553,7 +543,6 @@ namespace CrewChiefV4.iRacing
                     if (previousGameState != null)
                     {
                         OpponentData previousOpponentData = null;
-                        Boolean newOpponentLap = false;
                         int previousOpponentSectorNumber = 1;
                         int previousOpponentCompletedLaps = 0;
                         int previousOpponentPosition = 0;
@@ -677,15 +666,14 @@ namespace CrewChiefV4.iRacing
                             currentGameState.SessionData.TimeDeltaFront = currentOpponentData.DeltaTime.GetAbsoluteTimeDeltaAllowingForLapDifferences(currentGameState.SessionData.DeltaTime);
                         }
 
-                        updateOpponentData(currentOpponentData, currentOpponentRacePosition,
-                                 currentOpponentRacePosition, currentOpponentLapsCompleted,
-                                 currentOpponentSector, sectorTime, driver.Live.CurrentLapTime, (float)driver.Live.LapTimePrevious, newOpponentLap,
+                        updateOpponentData(currentOpponentData, currentOpponentRacePosition,currentOpponentRacePosition, currentOpponentLapsCompleted,
+                                 currentOpponentSector, sectorTime, driver.Live.CurrentLapTime, (float)driver.Live.LapTimePrevious, hasCrossedSFLine,
                                  shared.Telemetry.CarIdxOnPitRoad[driver.Id], previousIsInPits, currentOpponentLapValid, currentGameState.SessionData.SessionRunningTime, currentOpponentLapDistance,
                                  currentGameState.SessionData.SessionHasFixedTime, currentGameState.SessionData.SessionTimeRemaining,
                                  currentGameState.SessionData.SessionType == SessionType.Race, shared.Telemetry.TrackTemp,
                                  shared.Telemetry.AirTemp, currentGameState.SessionData.TrackDefinition.distanceForNearPitEntryChecks, (float)driver.Live.Speed,
-                                 previousOpponentCompletedLaps, previousOpponentDataWaitingForNewLapData,
-                                 previousOpponentNewLapDataTimerExpiry, previousOpponentLastLapTime, previousOpponentLastLapValid);
+                                 previousOpponentDataWaitingForNewLapData,previousOpponentNewLapDataTimerExpiry, 
+                                 previousOpponentLastLapTime, previousOpponentLastLapValid);
 
                         /*if (driver.PitInfo.IsAtPitExit)
                         {
@@ -823,11 +811,11 @@ namespace CrewChiefV4.iRacing
         }
 
         private void updateOpponentData(OpponentData opponentData, int racePosition, int unfilteredRacePosition, int completedLaps,
-            int sector, float sectorTime, float currentLaptime, float completedLapTime, Boolean isNewLap, Boolean isInPits, bool previousIsInPits, Boolean lapIsValid, float sessionRunningTime,
+            int sector, float sectorTime, float currentLaptime, float completedLapTime, Boolean hasCrossedSFLine, Boolean isInPits, bool previousIsInPits, Boolean lapIsValid, float sessionRunningTime,
             float distanceRoundTrack, Boolean sessionLengthIsTime, float sessionTimeRemaining,
             Boolean isRace, float airTemperature, float trackTempreture, float nearPitEntryPointDistance, float speed,
             /* previous tick data for hasNewLapData check*/
-            int previousOpponentDataLapsCompleted, Boolean previousOpponentDataWaitingForNewLapData,
+            Boolean previousOpponentDataWaitingForNewLapData,
             DateTime previousOpponentNewLapDataTimerExpiry, float previousOpponentLastLapTime, Boolean previousOpponentLastLapValid)
         {
             float previousDistanceRoundTrack = opponentData.DistanceRoundTrack;
@@ -861,8 +849,7 @@ namespace CrewChiefV4.iRacing
                 opponentData.NumPitStops++;
             }
             opponentData.InPits = isInPits;
-            bool hasNewLapData = opponentData.HasNewLapData(completedLapTime, completedLaps, previousOpponentDataLapsCompleted,
-                previousOpponentDataWaitingForNewLapData, previousOpponentNewLapDataTimerExpiry, previousOpponentLastLapTime, previousOpponentLastLapValid);
+            bool hasNewLapData = opponentData.HasNewLapData(completedLapTime, hasCrossedSFLine, previousOpponentDataWaitingForNewLapData, previousOpponentNewLapDataTimerExpiry, previousOpponentLastLapTime, previousOpponentLastLapValid);
             if (hasNewLapData)
             {
                 if (opponentData.OpponentLapData.Count > 0)

@@ -77,6 +77,7 @@ namespace CrewChiefV4.iRacing
             {
                 Console.WriteLine("MustReloadDrivers: true");
                 _drivers.Clear();
+                _driver = null;
                 _mustReloadDrivers = false;
             }
 
@@ -97,31 +98,13 @@ namespace CrewChiefV4.iRacing
 
                     driver.IsCurrentDriver = false;
 
-                    // Add to list
                     _drivers.Add(driver);
                 }
                 else
                 {
-                    // Update and check if driver swap occurred
                     var oldId = driver.CustId;
                     var oldName = driver.Name;
                     driver.ParseDynamicSessionInfo(info);
-
-                    /*
-                    if (oldId != driver.CustId)
-                    {
-                        var e = new DriverSwapRaceEvent();
-                        e.Driver = driver;
-                        e.PreviousDriverId = oldId;
-                        e.PreviousDriverName = oldName;
-                        e.CurrentDriverId = driver.Id;
-                        e.CurrentDriverName = driver.Name;
-                        e.SessionTime = _telemetry.SessionTime;
-                        e.Lap = driver.Live.Lap;
-
-                        this.OnRaceEvent(e);
-                    }
-                     * */
                 }
                 
                 if (DriverId == driver.Id)
@@ -290,7 +273,7 @@ namespace CrewChiefV4.iRacing
             // Stop if we don't have a session number yet
 
 
-            if (_currentSessionNumber == null || (_currentSessionNumber.Value != sessionNumber))
+            if (_currentSessionNumber == null || (_currentSessionNumber != sessionNumber))
             {
                 _mustUpdateSessionData = true;
 
