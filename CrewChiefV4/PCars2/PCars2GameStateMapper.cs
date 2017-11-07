@@ -847,6 +847,7 @@ namespace CrewChiefV4.PCars2
                 previousGameState.PitData.InPitlane && !currentGameState.PitData.InPitlane;
             // looks like this is fucked up in the data - UDP has pitModeSchedule for each participant, MMF has pitMode. We need both.
             currentGameState.PitData.HasRequestedPitStop = false;
+            currentGameState.PitData.PitWindow = PitWindow.Unavailable;
             if (currentGameState.SessionData.SessionType == SessionType.Race && shared.mEnforcedPitStopLap > 0)
             {
                 currentGameState.PitData.HasMandatoryPitStop = true;
@@ -855,13 +856,19 @@ namespace CrewChiefV4.PCars2
                 if (currentGameState.SessionData.SessionHasFixedTime)
                 {
                     currentGameState.PitData.PitWindowEnd = (int)((currentGameState.SessionData.SessionTotalRunTime - 120f) / 60f);
+                    // TODO: fixme, there's no pit schedule data in shared memory because that would be too 'working'.
+                    currentGameState.PitData.PitWindow = currentGameState.SessionData.SessionRunningTime >= currentGameState.PitData.PitWindowStart &&
+                        currentGameState.SessionData.SessionRunningTime <= currentGameState.PitData.PitWindowEnd ?
+                            currentGameState.PitData.PitWindow = PitWindow.Open : currentGameState.PitData.PitWindow = PitWindow.Closed;
                 }
                 else
                 {
                     currentGameState.PitData.PitWindowEnd = currentGameState.SessionData.SessionNumberOfLaps - 1;
+                    // TODO: fixme, there's no pit schedule data in shared memory because that would be too 'working'.
+                    currentGameState.PitData.PitWindow = currentGameState.SessionData.CompletedLaps >= currentGameState.PitData.PitWindowStart &&
+                        currentGameState.SessionData.CompletedLaps <= currentGameState.PitData.PitWindowEnd ?
+                            currentGameState.PitData.PitWindow = PitWindow.Open : currentGameState.PitData.PitWindow = PitWindow.Closed;
                 }
-                // TODO:
-                currentGameState.PitData.PitWindow = PitWindow.Unavailable;
                 currentGameState.PitData.IsMakingMandatoryPitStop = (currentGameState.PitData.PitWindow == PitWindow.Open || currentGameState.PitData.PitWindow == PitWindow.StopInProgress) &&
                                                                     (currentGameState.PitData.OnInLap || currentGameState.PitData.OnOutLap);
                 if (previousGameState != null)
