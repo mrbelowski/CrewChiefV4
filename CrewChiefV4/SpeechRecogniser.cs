@@ -321,6 +321,11 @@ namespace CrewChiefV4
                 validateAndAdd(WHAT_ARE_THE_RELATIVE_TYRE_PERFORMANCES, staticSpeechChoices);
                 validateAndAdd(PLAY_CORNER_NAMES, staticSpeechChoices);
 
+                validateAndAdd(DAMAGE_REPORT, staticSpeechChoices);
+                validateAndAdd(CAR_STATUS, staticSpeechChoices);
+                validateAndAdd(SESSION_STATUS, staticSpeechChoices);
+                validateAndAdd(STATUS, staticSpeechChoices);
+
                 foreach (String s in CALCULATE_FUEL_FOR)
                 {
                     if (s == null || s.Trim().Count() == 0)

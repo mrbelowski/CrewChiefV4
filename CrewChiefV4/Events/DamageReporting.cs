@@ -51,7 +51,7 @@ namespace CrewChiefV4.Events
         private String folderLeftRearPuncture = "damage_reporting/left_rear_puncture";
         private String folderRightRearPuncture = "damage_reporting/right_rear_puncture";
 
-        // TODO: add this - "the car's in good shape" / "we have no significant damage" etc
+        // "the car's in good shape" / "we have no significant damage" etc
         private String folderNoDamageOnAnyComponent = "damage_reporting/no_damage";
 
         private DamageLevel engineDamage;
