@@ -320,72 +320,86 @@ namespace CrewChiefV4.Events
 
         public override void respond(string voiceMessage)
         {
-            if (!hasHadAPenalty)
+            if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.SESSION_STATUS) ||
+                     SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.STATUS))
             {
-                audioPlayer.playMessageImmediately(new QueuedMessage(folderYouDontHaveAPenalty, 0, null));
-                
-                return;
-            }
-            if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.DO_I_HAVE_A_PENALTY))
-            {
-                if (hasOutstandingPenalty) {
-                    if (lapsCompleted - penaltyLap == 2) {
+                if (hasOutstandingPenalty)
+                {
+                    if (lapsCompleted - penaltyLap == 2)
+                    {
                         audioPlayer.playMessageImmediately(new QueuedMessage("youHaveAPenaltyBoxThisLap",
                             MessageContents(folderYouHavePenalty, MandatoryPitStops.folderMandatoryPitStopsPitThisLap), 0, null));
-                        
-                    } else
+                    }
+                    else
                     {
                         audioPlayer.playMessageImmediately(new QueuedMessage(folderYouHavePenalty, 0, null));
-                        
                     }
                 }
-                else
+            }
+            else
+            {
+                if (!hasHadAPenalty)
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage(folderYouDontHaveAPenalty, 0, null));
-                    
+                    return;
                 }
-            }
-            else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HAVE_I_SERVED_MY_PENALTY))
-            {
-                if (hasOutstandingPenalty)
+                if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.DO_I_HAVE_A_PENALTY))
                 {
-                    List<MessageFragment> messages = new List<MessageFragment>();
-                    messages.Add(MessageFragment.Text(AudioPlayer.folderNo));
-                    messages.Add(MessageFragment.Text(folderYouStillHavePenalty));
-                    if (lapsCompleted - penaltyLap == 2)
+                    if (hasOutstandingPenalty)
                     {
-                        messages.Add(MessageFragment.Text(MandatoryPitStops.folderMandatoryPitStopsPitThisLap));
+                        if (lapsCompleted - penaltyLap == 2)
+                        {
+                            audioPlayer.playMessageImmediately(new QueuedMessage("youHaveAPenaltyBoxThisLap",
+                                MessageContents(folderYouHavePenalty, MandatoryPitStops.folderMandatoryPitStopsPitThisLap), 0, null));
+                        }
+                        else
+                        {
+                            audioPlayer.playMessageImmediately(new QueuedMessage(folderYouHavePenalty, 0, null));
+                        }
                     }
-                    audioPlayer.playMessageImmediately(new QueuedMessage("noYouStillHaveAPenalty", messages, 0, null));
-                    
-                }
-                else
-                {
-                    audioPlayer.playMessageImmediately(new QueuedMessage("yesYouServedYourPenalty",
-                        MessageContents(AudioPlayer.folderYes, folderPenaltyServed), 0, null));
-                    
-                }
-            }
-            else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.DO_I_STILL_HAVE_A_PENALTY))
-            {
-                if (hasOutstandingPenalty)
-                {
-                    List<MessageFragment> messages = new List<MessageFragment>();
-                    messages.Add(MessageFragment.Text(AudioPlayer.folderYes));
-                    messages.Add(MessageFragment.Text(folderYouStillHavePenalty));
-                    if (lapsCompleted - penaltyLap == 2)
+                    else
                     {
-                        messages.Add(MessageFragment.Text(MandatoryPitStops.folderMandatoryPitStopsPitThisLap));
+                        audioPlayer.playMessageImmediately(new QueuedMessage(folderYouDontHaveAPenalty, 0, null));
                     }
-                    audioPlayer.playMessageImmediately(new QueuedMessage("yesYouStillHaveAPenalty", messages, 0, null));
-                    
                 }
-                else
+                else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HAVE_I_SERVED_MY_PENALTY))
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage("noYouServedYourPenalty",
-                        MessageContents(AudioPlayer.folderNo, folderPenaltyServed), 0, null));
-                    
-                }                
+                    if (hasOutstandingPenalty)
+                    {
+                        List<MessageFragment> messages = new List<MessageFragment>();
+                        messages.Add(MessageFragment.Text(AudioPlayer.folderNo));
+                        messages.Add(MessageFragment.Text(folderYouStillHavePenalty));
+                        if (lapsCompleted - penaltyLap == 2)
+                        {
+                            messages.Add(MessageFragment.Text(MandatoryPitStops.folderMandatoryPitStopsPitThisLap));
+                        }
+                        audioPlayer.playMessageImmediately(new QueuedMessage("noYouStillHaveAPenalty", messages, 0, null));
+                    }
+                    else
+                    {
+                        audioPlayer.playMessageImmediately(new QueuedMessage("yesYouServedYourPenalty",
+                            MessageContents(AudioPlayer.folderYes, folderPenaltyServed), 0, null));
+                    }
+                }
+                else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.DO_I_STILL_HAVE_A_PENALTY))
+                {
+                    if (hasOutstandingPenalty)
+                    {
+                        List<MessageFragment> messages = new List<MessageFragment>();
+                        messages.Add(MessageFragment.Text(AudioPlayer.folderYes));
+                        messages.Add(MessageFragment.Text(folderYouStillHavePenalty));
+                        if (lapsCompleted - penaltyLap == 2)
+                        {
+                            messages.Add(MessageFragment.Text(MandatoryPitStops.folderMandatoryPitStopsPitThisLap));
+                        }
+                        audioPlayer.playMessageImmediately(new QueuedMessage("yesYouStillHaveAPenalty", messages, 0, null));
+                    }
+                    else
+                    {
+                        audioPlayer.playMessageImmediately(new QueuedMessage("noYouServedYourPenalty",
+                            MessageContents(AudioPlayer.folderNo, folderPenaltyServed), 0, null));
+                    }
+                }
             }
         }
     }
