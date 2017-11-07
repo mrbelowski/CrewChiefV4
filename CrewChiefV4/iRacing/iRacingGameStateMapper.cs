@@ -1035,7 +1035,7 @@ namespace CrewChiefV4.iRacing
                 {
                     if (lastSessionPhase == SessionPhase.Green || lastSessionPhase == SessionPhase.FullCourseYellow)
                     {
-                        if (previousLapsCompleted != laps || sessionState.HasFlag(SessionStates.CoolDown))
+                        if ((!fixedTimeSession && previousLapsCompleted != laps) || (fixedTimeSession && sessionState.HasFlag(SessionStates.CoolDown) && previousLapsCompleted != laps))
                         {
                             Console.WriteLine("finished - completed " + laps + " laps (was " + previousLapsCompleted + "), session running time = " +
                                 thisSessionRunningTime);
