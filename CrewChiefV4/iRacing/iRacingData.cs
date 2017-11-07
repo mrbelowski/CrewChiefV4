@@ -15,7 +15,7 @@ namespace CrewChiefV4.iRacing
             
             if(hasNewSessionData)
             {
-                SessionInfo = sdk.GetSessionInfoString();
+                SessionInfo = new SessionInfo(sdk.GetSessionInfoString()).Yaml;
             }
             else
             {
