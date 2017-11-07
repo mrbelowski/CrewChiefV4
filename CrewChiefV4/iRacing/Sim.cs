@@ -17,6 +17,8 @@ namespace CrewChiefV4.iRacing
         private bool _mustUpdateSessionData, _mustReloadDrivers;
         private int _DriverId;
         public int DriverId { get { return _DriverId; } }
+
+        
         public Sim()
         {
             _drivers = new List<Driver>();
@@ -38,6 +40,8 @@ namespace CrewChiefV4.iRacing
         private Driver _driver;
         public Driver Driver { get { return _driver; } }
 
+        private Driver _paceCar;
+        public Driver PaceCar { get { return _driver; } }
         #endregion
 
         #region Methods
@@ -48,6 +52,7 @@ namespace CrewChiefV4.iRacing
             _mustReloadDrivers = true;
             _currentSessionNumber = null;
             _driver = null;
+            _paceCar = null;
             _drivers.Clear();
             _telemetry = null;
             _sessionInfo = null;
@@ -78,6 +83,7 @@ namespace CrewChiefV4.iRacing
                 Console.WriteLine("MustReloadDrivers: true");
                 _drivers.Clear();
                 _driver = null;
+                _paceCar = null;
                 _mustReloadDrivers = false;
             }
 
@@ -97,7 +103,12 @@ namespace CrewChiefV4.iRacing
                     }
 
                     driver.IsCurrentDriver = false;
-
+                    // Exclude pace car from driver array
+                    if (driver.IsPacecar)
+                    {
+                        _paceCar = driver;
+                        continue;
+                    }
                     _drivers.Add(driver);
                 }
                 else
@@ -221,10 +232,6 @@ namespace CrewChiefV4.iRacing
                 int pos = 1;
                 foreach (var driver in _drivers.OrderByDescending(d => d.Live.TotalLapDistance))                
                 {
-                    if(driver.IsPacecar)
-                    {
-                        continue;
-                    }
                     driver.Live.Position = pos;
                     pos++;
                 }

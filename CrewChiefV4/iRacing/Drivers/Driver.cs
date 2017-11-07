@@ -8,9 +8,6 @@ namespace CrewChiefV4.iRacing
     [Serializable]
     public partial class Driver
     {
-        private const string PACECAR_NAME = "safety pcfr500s";
-        private const string PACECAR_NAME2 = "pace car";
-
         public Driver()
         {
             this.Car = new DriverCarInfo();
@@ -61,9 +58,7 @@ namespace CrewChiefV4.iRacing
             this.IsSpectator = Parser.ParseInt(query["IsSpectator"].GetValue()) == 1;
 
             this.ClubName = query["ClubName"].GetValue();
-            this.DivisionName = query["DivisionName"].GetValue();
-            
-            this.IsPacecar = this.Name.ToLower().Equals(PACECAR_NAME2);
+            this.DivisionName = query["DivisionName"].GetValue();            
         }
 
         public void ParseStaticSessionInfo(SessionInfo info)
@@ -82,7 +77,9 @@ namespace CrewChiefV4.iRacing
             this.Car.CarClassShortName = query["CarClassShortName"].GetValue();
             this.Car.CarShortName = query["CarScreenNameShort"].GetValue();
 
-            this.IsPacecar = this.CustId == -1 || this.Car.CarName.ToLower().Equals(PACECAR_NAME);
+            bool isPaceCar = Parser.ParseInt(query["CarIsPaceCar"].GetValue()) == 1;
+
+            this.IsPacecar = this.CustId == -1 || isPaceCar;
         }
 
         public static Driver FromSessionInfo(SessionInfo info, int carIdx)

@@ -123,7 +123,7 @@ namespace CrewChiefV4.iRacing
 
                 TrackDataContainer tdc = TrackData.TRACK_LANDMARKS_DATA.getTrackDataForTrackName(shared.SessionData.Track.CodeName, currentGameState.SessionData.TrackDefinition.trackLength);
                 currentGameState.SessionData.TrackDefinition.trackLandmarks = tdc.trackLandmarks;
-                currentGameState.SessionData.TrackDefinition.isOval = tdc.isOval;
+                currentGameState.SessionData.TrackDefinition.isOval = tdc.isOval || shared.SessionData.Track.IsOval;
                 currentGameState.SessionData.TrackDefinition.setGapPoints();
                 GlobalBehaviourSettings.UpdateFromTrackDefinition(currentGameState.SessionData.TrackDefinition);
 
@@ -166,7 +166,7 @@ namespace CrewChiefV4.iRacing
                 GlobalBehaviourSettings.UpdateFromCarClass(currentGameState.carClass);
                 Console.WriteLine("Player is using car class " + currentGameState.carClass.getClassIdentifier() + " (class ID " + playerCar.Car.CarClassId + ")");
 
-                Utilities.TraceEventClass(currentGameState);
+                
                 currentGameState.SessionData.DeltaTime = new DeltaTime(currentGameState.SessionData.TrackDefinition.trackLength, currentGameState.PositionAndMotionData.DistanceRoundTrack, currentGameState.Now);
                 currentGameState.SessionData.SectorNumber = playerCar.Live.CurrentFakeSector;
                 foreach (Driver driver in shared.Drivers)
@@ -183,6 +183,8 @@ namespace CrewChiefV4.iRacing
                     }
 
                 }
+                //need to call this after adding opponents else we have nothing to compare against 
+                Utilities.TraceEventClass(currentGameState);
             }
             else
             {
@@ -961,6 +963,7 @@ namespace CrewChiefV4.iRacing
         }
 
         string prevSessionFlags = "";
+        string prevSessionStates = "";
 
         private SessionPhase mapToSessionPhase(SessionPhase lastSessionPhase, SessionStates sessionState,
             SessionType currentSessionType, bool isReplay, float thisSessionRunningTime,
@@ -977,7 +980,12 @@ namespace CrewChiefV4.iRacing
             {
                 Console.WriteLine(sessionFlags.ToString());
                 prevSessionFlags = sessionFlags.ToString();
-            }   
+            }
+            if (!prevSessionStates.Equals(sessionState.ToString()))
+            {
+                Console.WriteLine(sessionState.ToString());
+                prevSessionStates = sessionState.ToString();
+            }  
             if (currentSessionType == SessionType.Practice)
             {
                 if (sessionState.HasFlag(SessionStates.CoolDown))
@@ -1039,11 +1047,11 @@ namespace CrewChiefV4.iRacing
                 {
                     return SessionPhase.Unavailable;
                 }
-                else if (sessionState.HasFlag(SessionStates.ParadeLaps))
+                else if (sessionState.HasFlag(SessionStates.ParadeLaps) && !sessionFlags.HasFlag(SessionFlags.StartGo))
                 {
                     return SessionPhase.Formation;
                 }
-                else if (sessionFlags.HasFlag(SessionFlags.StartReady) || sessionFlags.HasFlag(SessionFlags.StartSet) || SessionStates.Racing != sessionState && isReplay)
+                else if (sessionState == SessionStates.Warmup && !sessionFlags.HasFlag(SessionFlags.StartGo))
                 {
                     // don't allow a transition to Countdown if the game time has increased
                     //if (lastSessionRunningTime < thisSessionRunningTime)
