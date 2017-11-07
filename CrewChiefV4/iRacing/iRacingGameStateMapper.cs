@@ -179,7 +179,7 @@ namespace CrewChiefV4.iRacing
                     else
                     {
                         currentGameState.OpponentData.Add(driverName, createOpponentData(driver, driverName,
-                        true, CarData.getCarClassForIRacingId(driver.Car.CarClassId).carClassEnum, currentGameState.SessionData.TrackDefinition.trackLength));
+                            true, CarData.getCarClassForIRacingId(driver.Car.CarClassId).carClassEnum, currentGameState.SessionData.TrackDefinition.trackLength));
                     }
 
                 }
@@ -750,7 +750,7 @@ namespace CrewChiefV4.iRacing
                     if (!driver.CurrentResults.IsOut || !driver.IsPacecar || !driver.Live.TrackSurface.HasFlag(TrackSurfaces.NotInWorld) || !driver.IsSpectator)
                     {
                         currentGameState.OpponentData.Add(driverName, createOpponentData(driver, driverName,
-                            true, CarData.getCarClassForIRacingId(driver.Car.CarClassId).carClassEnum, currentGameState.SessionData.TrackDefinition.trackLength));
+                            false, CarData.getCarClassForIRacingId(driver.Car.CarClassId).carClassEnum, currentGameState.SessionData.TrackDefinition.trackLength));
                     }
                 }
             }

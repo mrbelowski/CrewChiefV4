@@ -82,7 +82,7 @@ namespace CrewChiefV4.iRacing
             if (dataReadFromFile != null && dataReadFromFile.Length > dataReadFromFileIndex)
             {
                 iRacingStructDumpWrapper structDumpWrapperData = dataReadFromFile[dataReadFromFileIndex];
-                if (structDumpWrapperData.data.SessionInfoUpdate != lastUpdate)
+                if (structDumpWrapperData.data.SessionInfoUpdate != lastUpdate && structDumpWrapperData.data.SessionInfo.Length > 0)
                 {
                     SessionInfo sessionInfo = new SessionInfo(structDumpWrapperData.data.SessionInfo);
                     sim.SdkOnSessionInfoUpdated(sessionInfo, structDumpWrapperData.data.SessionNum, structDumpWrapperData.data.PlayerCarIdx);
@@ -178,15 +178,17 @@ namespace CrewChiefV4.iRacing
                     structWrapper.ticksWhenRead = DateTime.Now.Ticks;
 
                     int newUpdate = sdk.Header.SessionInfoUpdate;
+                    bool hasNewSessionData = false;
                     if (newUpdate != lastUpdate)
                     {
                         // Get the session info string
                         SessionInfo sessionInfo = new SessionInfo(sdk.GetSessionInfoString());
                         // Raise the SessionInfoUpdated event and pass along the session info and session time.
                         sim.SdkOnSessionInfoUpdated(sessionInfo, (int)TryGetSessionNum(), DriverId);
-                        lastUpdate = newUpdate;                    
+                        lastUpdate = newUpdate;
+                        hasNewSessionData = true;
                     }
-                    iRacingData irData = new iRacingData(sdk, dumpToFile);
+                    iRacingData irData = new iRacingData(sdk, hasNewSessionData && dumpToFile);
 
                     sim.SdkOnTelemetryUpdated(irData);
                     structWrapper.data = sim;
