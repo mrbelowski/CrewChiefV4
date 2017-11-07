@@ -374,7 +374,6 @@ namespace CrewChiefV4
             getEvent("Fuel").respond(SpeechRecogniser.CAR_STATUS[0]);
             getEvent("TyreMonitor").respond(SpeechRecogniser.CAR_STATUS[0]);
             getEvent("EngineMonitor").respond(SpeechRecogniser.CAR_STATUS[0]);
-            getEvent("Timings").respond(SpeechRecogniser.CAR_STATUS[0]);
         }
 
         public static void getDamageReport()

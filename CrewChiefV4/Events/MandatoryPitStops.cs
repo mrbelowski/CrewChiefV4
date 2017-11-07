@@ -552,33 +552,35 @@ namespace CrewChiefV4.Events
 
         public override void respond(String voiceMessage)
         {
-            if (enableWindowWarnings && pitDataInitialised &&
-                    (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.SESSION_STATUS) ||
-                     SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.STATUS)))
+            if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.SESSION_STATUS) ||
+                 SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.STATUS))
             {
-                if (mandatoryStopMissed)
+                if (enableWindowWarnings && pitDataInitialised)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderMandatoryPitStopsMissedStop, 0, null));
-                }
-                else if (hasMandatoryPitStop && !mandatoryStopCompleted)
-                {
-                    if (!inPitWindow)
+                    if (mandatoryStopMissed)
                     {
-                        if (pitWindowOpenLap > 0)
-                        {
-                            audioPlayer.playMessageImmediately(new QueuedMessage("pit_window_open_lap",
-                                MessageContents(folderMandatoryPitStopsPitWindowOpensOnLap, pitWindowOpenLap), 0, null));
-                        }
-                        else if (pitWindowOpenTime > 0)
-                        {
-                            audioPlayer.playMessageImmediately(new QueuedMessage("pit_window_open_time",
-                                MessageContents(folderMandatoryPitStopsPitWindowOpensAfter, TimeSpan.FromMinutes(pitWindowOpenTime)), 0, null));
-                        }
+                        audioPlayer.playMessageImmediately(new QueuedMessage(folderMandatoryPitStopsMissedStop, 0, null));
                     }
-                    else
+                    else if (hasMandatoryPitStop && !mandatoryStopCompleted)
                     {
-                        audioPlayer.playMessageImmediately(new QueuedMessage("pit_window_open", 
-                            MessageContents(folderMandatoryPitStopsPitWindowOpen, pitWindowOpenLap), 0, null));
+                        if (!inPitWindow)
+                        {
+                            if (pitWindowOpenLap > 0)
+                            {
+                                audioPlayer.playMessageImmediately(new QueuedMessage("pit_window_open_lap",
+                                    MessageContents(folderMandatoryPitStopsPitWindowOpensOnLap, pitWindowOpenLap), 0, null));
+                            }
+                            else if (pitWindowOpenTime > 0)
+                            {
+                                audioPlayer.playMessageImmediately(new QueuedMessage("pit_window_open_time",
+                                    MessageContents(folderMandatoryPitStopsPitWindowOpensAfter, TimeSpan.FromMinutes(pitWindowOpenTime)), 0, null));
+                            }
+                        }
+                        else
+                        {
+                            audioPlayer.playMessageImmediately(new QueuedMessage("pit_window_open", 
+                                MessageContents(folderMandatoryPitStopsPitWindowOpen, pitWindowOpenLap), 0, null));
+                        }
                     }
                 }
             }

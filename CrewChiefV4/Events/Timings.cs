@@ -567,7 +567,7 @@ namespace CrewChiefV4.Events
                     if (currentGapBehind > 2)
                     {
                         audioPlayer.playMessageImmediately(new QueuedMessage("Timings/gap_behind",
-                                MessageContents(TimeSpanWrapper.FromMilliseconds(currentGapBehind * 1000, Precision.AUTO_GAPS)), 0, this));
+                                MessageContents(folderGapBehindIsNow, TimeSpanWrapper.FromMilliseconds(currentGapBehind * 1000, Precision.AUTO_GAPS)), 0, this));
                     }
                 }
                 else
@@ -575,7 +575,7 @@ namespace CrewChiefV4.Events
                     if (currentGapInFront > 2)
                     {
                         audioPlayer.playMessageImmediately(new QueuedMessage("Timings/gap_in_front",
-                            MessageContents(TimeSpanWrapper.FromMilliseconds(currentGapInFront * 1000, Precision.AUTO_GAPS)), 0, this));
+                            MessageContents(folderGapInFrontIsNow, TimeSpanWrapper.FromMilliseconds(currentGapInFront * 1000, Precision.AUTO_GAPS)), 0, this));
                     }
                 }
             }

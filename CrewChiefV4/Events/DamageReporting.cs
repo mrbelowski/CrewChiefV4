@@ -498,46 +498,49 @@ namespace CrewChiefV4.Events
             {
                 readStatus();
             }
-            QueuedMessage damageMessage = null;
-            if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOWS_MY_AERO))
+            else
             {
-                damageMessage = getDamageMessage(Component.AERO, true);
-            }
-            if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOWS_MY_TRANSMISSION))
-            {
-                damageMessage = getDamageMessage(Component.TRANNY, true);
-            }
-            if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOWS_MY_ENGINE))
-            {
-                damageMessage = getDamageMessage(Component.ENGINE, true);
-            }
-            if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOWS_MY_SUSPENSION))
-            {
-                damageMessage = getDamageMessage(Component.SUSPENSION, true);
-            }
-            if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOWS_MY_BRAKES))
-            {
-                damageMessage = getDamageMessage(Component.BRAKES, true);
-            }
-            if (damageMessage != null)
-            {
-                // play this immediately or play "stand by", and queue it to be played in a few seconds
-                if (delayResponses && Utilities.random.Next(10) >= 2 && SoundCache.availableSounds.Contains(AudioPlayer.folderStandBy))
+                QueuedMessage damageMessage = null;
+                if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOWS_MY_AERO))
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderStandBy, 0, null));
-                    int secondsDelay = Math.Max(5, Utilities.random.Next(11));
-                    audioPlayer.pauseQueue(secondsDelay);
-                    damageMessage.dueTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + (1000 * secondsDelay);
-                    audioPlayer.playDelayedImmediateMessage(damageMessage);
+                    damageMessage = getDamageMessage(Component.AERO, true);
+                }
+                if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOWS_MY_TRANSMISSION))
+                {
+                    damageMessage = getDamageMessage(Component.TRANNY, true);
+                }
+                if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOWS_MY_ENGINE))
+                {
+                    damageMessage = getDamageMessage(Component.ENGINE, true);
+                }
+                if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOWS_MY_SUSPENSION))
+                {
+                    damageMessage = getDamageMessage(Component.SUSPENSION, true);
+                }
+                if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOWS_MY_BRAKES))
+                {
+                    damageMessage = getDamageMessage(Component.BRAKES, true);
+                }
+                if (damageMessage != null)
+                {
+                    // play this immediately or play "stand by", and queue it to be played in a few seconds
+                    if (delayResponses && Utilities.random.Next(10) >= 2 && SoundCache.availableSounds.Contains(AudioPlayer.folderStandBy))
+                    {
+                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderStandBy, 0, null));
+                        int secondsDelay = Math.Max(5, Utilities.random.Next(11));
+                        audioPlayer.pauseQueue(secondsDelay);
+                        damageMessage.dueTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + (1000 * secondsDelay);
+                        audioPlayer.playDelayedImmediateMessage(damageMessage);
+                    }
+                    else
+                    {
+                        audioPlayer.playMessageImmediately(damageMessage);
+                    }
                 }
                 else
                 {
-                    audioPlayer.playMessageImmediately(damageMessage);
+                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
                 }
-            }
-            else
-            {
-                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
             }
         }
 

@@ -105,6 +105,8 @@ namespace CrewChiefV4.Events
 
         public override void respond(string voiceMessage)
         {
+            Boolean fromStatusRequest = SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.CAR_STATUS) ||
+                                        SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.STATUS);
             Boolean gotData = false;
             if (engineData != null)
             {
@@ -114,7 +116,10 @@ namespace CrewChiefV4.Events
                 {
                     case EngineStatus.ALL_CLEAR:
                         lastStatusMessage = currentEngineStatus;
-                        audioPlayer.playMessageImmediately(new QueuedMessage(folderAllClear, 0, null));
+                        if (!fromStatusRequest)
+                        {
+                            audioPlayer.playMessageImmediately(new QueuedMessage(folderAllClear, 0, null));
+                        }
                         break;
                     case EngineStatus.HOT_OIL:
                         // don't play this if the last message was about hot oil *and* water - wait for 'all clear'
@@ -139,8 +144,7 @@ namespace CrewChiefV4.Events
                 }
                 
             }
-            if (!gotData && !SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.CAR_STATUS) &
-                            !SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.STATUS))
+            if (!gotData && !fromStatusRequest)
             {
                 audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, this));                
             }
