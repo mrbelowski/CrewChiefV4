@@ -10,7 +10,7 @@ For support and discussions about Crew Chief we have our very own forum here: ht
 
 Changelog
 ---------
-Version 4.8.1.2: More iRacing bug fixes, mostly around session state tracking; Improved default pCARS2 command macros (massive thanks to Belaki on the pCARS forums); fixed pCARS2 pit window end message playing when it shouldn't
+Version 4.8.1.2: More iRacing bug fixes, mostly around session state tracking; Improved default pCARS2 command macros (massive thanks to Belaki on the pCARS forums); fixed pCARS2 pit window end message playing when it shouldn't; Added more tyre wear messages; RF2 bug fixes; Added damage report ("damage report / how's my car / is my car ok"), session status ("session status / race status"), car status ("car status") and combined status ("full update / full status / update me") voice commands and button bindings to get aggregated info; Added a few more messages
 
 Version 4.8.1.1: Corrected and added some corner mappings; Added function to read corner mappings for the current lap (activated with a button assignment or voice command "read corner names" / "corner names" / "tell me the corner names"); More iRacing beta updates; Tweaked overtake message probability
 
