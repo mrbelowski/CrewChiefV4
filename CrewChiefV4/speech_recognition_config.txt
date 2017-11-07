@@ -92,6 +92,10 @@ RADIO_CHECK = can you hear me
 
 PLAY_CORNER_NAMES = read corner names:corner names:tell me the corner names
 
+DAMAGE_REPORT = damage report:how's my car:is my car ok
+CAR_STATUS = car status
+SESSION_STATUS = session status:race status
+STATUS = full update:full status:update me
 
 #################################################
 # Dynamic recognition phrase fragments - these are used to build up recognition sentences for opponent information.

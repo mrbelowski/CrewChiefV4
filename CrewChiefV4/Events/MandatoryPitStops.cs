@@ -65,6 +65,8 @@ namespace CrewChiefV4.Events
 
         private int pitWindowClosedLap;
 
+        private Boolean inPitWindow;
+
         private int pitWindowOpenTime;
 
         private int pitWindowClosedTime;
@@ -131,6 +133,7 @@ namespace CrewChiefV4.Events
             pitWindowClosedLap = 0;
             pitWindowOpenTime = 0;
             pitWindowClosedTime = 0;
+            inPitWindow = false;
             pitDataInitialised = false;
             playBoxNowMessage = false;
             play2minOpenWarning = false;
@@ -321,6 +324,7 @@ namespace CrewChiefV4.Events
                         }
                         else if (pitWindowOpenLap > 0 && currentGameState.SessionData.CompletedLaps == pitWindowOpenLap)
                         {
+                            inPitWindow = true;
                             if (enableWindowWarnings)
                             {
                                 audioPlayer.setBackgroundSound(AudioPlayer.dtmPitWindowOpenBackground);
@@ -354,6 +358,7 @@ namespace CrewChiefV4.Events
                         else if (pitWindowClosedLap > 0 && currentGameState.SessionData.CompletedLaps == pitWindowClosedLap)
                         {
                             mandatoryStopBoxThisLap = false;
+                            inPitWindow = false;
                             if (currentGameState.PitData.PitWindow != PitWindow.Completed)
                             {
                                 mandatoryStopMissed = true;
@@ -547,38 +552,67 @@ namespace CrewChiefV4.Events
 
         public override void respond(String voiceMessage)
         {
-            if (!hasMandatoryPitStop || mandatoryStopCompleted || !enableWindowWarnings)
+            if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.SESSION_STATUS) ||
+                 SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.STATUS))
             {
-                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNo, 0, null));
-                
+                if (enableWindowWarnings && pitDataInitialised)
+                {
+                    if (mandatoryStopMissed)
+                    {
+                        audioPlayer.playMessageImmediately(new QueuedMessage(folderMandatoryPitStopsMissedStop, 0, null));
+                    }
+                    else if (hasMandatoryPitStop && !mandatoryStopCompleted)
+                    {
+                        if (!inPitWindow)
+                        {
+                            if (pitWindowOpenLap > 0)
+                            {
+                                audioPlayer.playMessageImmediately(new QueuedMessage("pit_window_open_lap",
+                                    MessageContents(folderMandatoryPitStopsPitWindowOpensOnLap, pitWindowOpenLap), 0, null));
+                            }
+                            else if (pitWindowOpenTime > 0)
+                            {
+                                audioPlayer.playMessageImmediately(new QueuedMessage("pit_window_open_time",
+                                    MessageContents(folderMandatoryPitStopsPitWindowOpensAfter, TimeSpan.FromMinutes(pitWindowOpenTime)), 0, null));
+                            }
+                        }
+                        else
+                        {
+                            audioPlayer.playMessageImmediately(new QueuedMessage("pit_window_open", 
+                                MessageContents(folderMandatoryPitStopsPitWindowOpen, pitWindowOpenLap), 0, null));
+                        }
+                    }
+                }
             }
-            else if (mandatoryStopMissed)
-            {
-                audioPlayer.playMessageImmediately(new QueuedMessage(folderMandatoryPitStopsMissedStop, 0, null));
-                
-            }
-            else if (mandatoryStopBoxThisLap)
-            {
-                audioPlayer.playMessageImmediately(new QueuedMessage("yesBoxThisLap",
-                    MessageContents(AudioPlayer.folderYes, folderMandatoryPitStopsPitThisLap), 0, null));
-                
-            }
-            else if (pitWindowOpenLap > 0)
-            {
-                audioPlayer.playMessageImmediately(new QueuedMessage("yesBoxOnLap",
-                    MessageContents(folderMandatoryPitStopsYesStopOnLap, pitWindowOpenLap), 0, null));
-                
-            }
-            else if (pitWindowOpenTime > 0)
-            {
-                audioPlayer.playMessageImmediately(new QueuedMessage("yesBoxAfter",
-                    MessageContents(folderMandatoryPitStopsYesStopAfter, TimeSpan.FromMinutes(pitWindowOpenTime)), 0, null));
-                
-            }            
             else
             {
-                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
-                
+                if (!hasMandatoryPitStop || mandatoryStopCompleted || !enableWindowWarnings)
+                {
+                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNo, 0, null));
+                }
+                else if (mandatoryStopMissed)
+                {
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderMandatoryPitStopsMissedStop, 0, null));
+                }
+                else if (mandatoryStopBoxThisLap)
+                {
+                    audioPlayer.playMessageImmediately(new QueuedMessage("yesBoxThisLap",
+                        MessageContents(AudioPlayer.folderYes, folderMandatoryPitStopsPitThisLap), 0, null));
+                }
+                else if (pitWindowOpenLap > 0)
+                {
+                    audioPlayer.playMessageImmediately(new QueuedMessage("yesBoxOnLap",
+                        MessageContents(folderMandatoryPitStopsYesStopOnLap, pitWindowOpenLap), 0, null));
+                }
+                else if (pitWindowOpenTime > 0)
+                {
+                    audioPlayer.playMessageImmediately(new QueuedMessage("yesBoxAfter",
+                        MessageContents(folderMandatoryPitStopsYesStopAfter, TimeSpan.FromMinutes(pitWindowOpenTime)), 0, null));
+                }
+                else
+                {
+                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+                }
             }
         }
     }

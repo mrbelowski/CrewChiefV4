@@ -664,7 +664,7 @@ namespace CrewChiefV4.Events
                 if (currentGameState.SessionData.IsNewSector && currentGameState.SessionData.SectorNumber == thisLapTyreConditionReportSector
                     && !currentGameState.PitData.InPitlane && enableTyreWearWarnings && !currentGameState.SessionData.LeaderHasFinishedRace)
                 {
-                    reportCurrentTyreConditionStatus(false, false);
+                    reportCurrentTyreConditionStatus(false, false, delayResponses);
                 }
                 if (!currentGameState.PitData.InPitlane && !reportedEstimatedTimeLeft && enableTyreWearWarnings && !currentGameState.SessionData.LeaderHasFinishedRace)
                 {
@@ -789,7 +789,7 @@ namespace CrewChiefV4.Events
             lastBrakeTempMessage = messageContents;
         }
 
-        private void reportCurrentTyreConditionStatus(Boolean playImmediately, Boolean playEvenIfUnchanged)
+        private void reportCurrentTyreConditionStatus(Boolean playImmediately, Boolean playEvenIfUnchanged, Boolean allowDelayedResponse)
         {
             List<MessageFragment> messageContents = new List<MessageFragment>();
             addTyreConditionWarningMessages(currentTyreConditionStatus.getCornersForStatus(TyreCondition.MINOR_WEAR), TyreCondition.MINOR_WEAR, messageContents);
@@ -805,7 +805,7 @@ namespace CrewChiefV4.Events
             if (playImmediately)
             {
                 // might be a "stand by..." response
-                if (delayResponses && Utilities.random.Next(10) >= 2)
+                if (allowDelayedResponse && Utilities.random.Next(10) >= 2)
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderStandBy, 0, null));
                     int secondsDelay = Math.Max(5, Utilities.random.Next(11));
@@ -962,8 +962,7 @@ namespace CrewChiefV4.Events
                 }
                 else
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
-                        
+                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));                        
                 }
             }
             else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.WHAT_ARE_MY_TYRE_TEMPS))
@@ -979,7 +978,6 @@ namespace CrewChiefV4.Events
                 else
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
-
                 }
             }
             else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.WHAT_ARE_MY_BRAKE_TEMPS))
@@ -988,11 +986,12 @@ namespace CrewChiefV4.Events
             }            
             else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOWS_MY_TYRE_WEAR))
             {
+                Boolean forStatusReport = !SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOWS_MY_TYRE_WEAR);
                 if (currentTyreConditionStatus != null)
                 {
-                    reportCurrentTyreConditionStatus(true, true);
+                    reportCurrentTyreConditionStatus(true, true, delayResponses);
                 }
-                else
+                else if (!forStatusReport)
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));                    
                 }
@@ -1006,6 +1005,22 @@ namespace CrewChiefV4.Events
                         MessageContents(getFolderForTyreType(tyrePeformance.type1), folderAreAbout, 
                                         TimeSpanWrapper.FromSeconds(tyrePeformance.bestLapDelta, Precision.AUTO_GAPS),
                                         folderFasterThan, getFolderForTyreType(tyrePeformance.type2)), 0, null));
+                }
+            }
+            else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.CAR_STATUS) ||
+                SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.STATUS))
+            {
+                if (currentTyreConditionStatus != null)
+                {
+                    reportCurrentTyreConditionStatus(true, true, false);
+                }
+                if (currentTyreTempStatus != null)
+                {
+                    reportCurrentTyreTempStatus(true);
+                }
+                if (currentBrakeTempStatus != null)
+                {
+                    reportBrakeTempStatus(true, true);
                 }
             }
         }
