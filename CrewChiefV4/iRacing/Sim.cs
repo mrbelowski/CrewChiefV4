@@ -41,7 +41,7 @@ namespace CrewChiefV4.iRacing
         public Driver Driver { get { return _driver; } }
 
         private Driver _paceCar;
-        public Driver PaceCar { get { return _driver; } }
+        public Driver PaceCar { get { return _paceCar; } }
         #endregion
 
         #region Methods
