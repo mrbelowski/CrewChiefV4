@@ -111,15 +111,16 @@ namespace CrewChiefV4.Events
                 if (!playedQualExitMessage && currentGameState.SessionData.SessionType == SessionType.Qualify)
                 {
                     playedQualExitMessage = true;
-                    if (currentGameState.SessionData.SessionHasFixedTime)
+                    if (currentGameState.SessionData.SessionNumberOfLaps > 0)
+                    {
+                        // special case for iracing - AFAIK no other games have number-of-laps in qual sessions
+                        audioPlayer.playMessage(new QueuedMessage("qual_pit_exit", MessageContents(folderQualExitIntro, 
+                            currentGameState.SessionData.SessionNumberOfLaps, folderQualExitOutroLaps), 0, this));
+                    }
+                    else if (currentGameState.SessionData.SessionHasFixedTime)
                     {
                         int minutesLeft = (int)Math.Floor(currentGameState.SessionData.SessionTimeRemaining / 60f);
                         audioPlayer.playMessage(new QueuedMessage("qual_pit_exit", MessageContents(folderQualExitIntro, minutesLeft, folderQualExitOutroMinutes), 0, this));
-                    }
-                    else
-                    {
-                        int lapsLeft = currentGameState.SessionData.SessionNumberOfLaps - currentGameState.SessionData.CompletedLaps;
-                        audioPlayer.playMessage(new QueuedMessage("qual_pit_exit", MessageContents(folderQualExitIntro, lapsLeft, folderQualExitOutroLaps), 0, this));
                     }
                 }
             }
