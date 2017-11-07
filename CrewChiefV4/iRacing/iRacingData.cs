@@ -10,18 +10,23 @@ namespace CrewChiefV4.iRacing
     [Serializable]
     public class iRacingData
     {
-        public iRacingData( iRacingSDK sdk, bool dumpData)
+        public iRacingData( iRacingSDK sdk, bool hasNewSessionData)
         {
-            if(dumpData)
+            
+            if(hasNewSessionData)
             {
-                SessionInfo = sdk.GetSessionInfo(); 
+                SessionInfo = new SessionInfo(sdk.GetSessionInfoString()).Yaml;
+            }
+            else
+            {
+                SessionInfo = "";
             }
             SessionInfoUpdate = sdk.Header.SessionInfoUpdate;     
             SessionTime = (System.Double)sdk.GetData("SessionTime");
             SessionTick = (System.Int32)sdk.GetData("SessionTick");
             SessionNum = (System.Int32)sdk.GetData("SessionNum");
             SessionState = (SessionStates)sdk.GetData("SessionState");
-            SessionFlags = (SessionFlags)(int)sdk.GetData("SessionFlags");
+            SessionFlags = (int)sdk.GetData("SessionFlags");
             SessionTimeRemain = (System.Double)sdk.GetData("SessionTimeRemain");
             SessionLapsRemain = (System.Int32)sdk.GetData("SessionLapsRemain");
             SessionLapsRemainEx = (System.Int32)sdk.GetData("SessionLapsRemainEx");
@@ -127,7 +132,7 @@ namespace CrewChiefV4.iRacing
         }
         public System.Int32 SessionInfoUpdate;
 
-        public System.Byte [] SessionInfo;
+        public System.String SessionInfo;
         /// <summary>
         /// Seconds since session start
         /// </summary>
@@ -151,7 +156,7 @@ namespace CrewChiefV4.iRacing
         /// <summary>
         /// Session flags
         /// </summary>
-        public SessionFlags 	SessionFlags;
+        public int 	SessionFlags;
 
         /// <summary>
         /// Seconds left till session ends

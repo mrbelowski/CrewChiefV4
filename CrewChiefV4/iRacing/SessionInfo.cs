@@ -12,9 +12,6 @@ namespace CrewChiefV4.iRacing
     {
         public SessionInfo(string yaml)
         {
-
-            _rawYaml = yaml;
-
             this.FixYaml(yaml);
             this.ParseYaml();
         }
@@ -26,12 +23,6 @@ namespace CrewChiefV4.iRacing
         /// The YAML string representing the session info, modified to ensure correct parsing.
         /// </summary>
         public string Yaml { get { return _yaml; } }
-
-        public string _rawYaml;
-        /// <summary>
-        /// The raw YAML string as originally returned from the sim.
-        /// </summary>
-        public string RawYaml { get { return _rawYaml; } }
 
         public bool _isValidYaml;
         public bool IsValidYaml { get { return _isValidYaml; } }
@@ -79,6 +70,15 @@ namespace CrewChiefV4.iRacing
                 _yaml = builder.ToString();
             }
 
+            //Remove info that we do not need and that will just cause the dumping of data to be stupid large.
+            int indexOfCameraInfo = _yaml.IndexOf("CameraInfo:");            
+            int indexOfDriverInfo = _yaml.IndexOf("DriverInfo:");
+            //Console.WriteLine("indexOfDriverInfo " + indexOfCameraInfo + " indexOfDriverInfo " + indexOfDriverInfo);
+            if(indexOfCameraInfo > 0 && indexOfDriverInfo > 0)
+            {
+                _yaml = _yaml.Remove(indexOfCameraInfo, indexOfDriverInfo - indexOfCameraInfo);
+            }
+            
             // Incorrect setup info dump fix: remove the setup info
             var indexOfSetup = _yaml.IndexOf("CarSetup:");
             if (indexOfSetup > 0)

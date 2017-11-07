@@ -8,15 +8,11 @@ namespace CrewChiefV4.iRacing
     [Serializable]
     public partial class Driver
     {
-        private const string PACECAR_NAME = "safety pcfr500s";
-        private const string PACECAR_NAME2 = "pace car";
-
         public Driver()
         {
             this.Car = new DriverCarInfo();
-            this.Results = new DriverResults(this);
             this.Live = new DriverLiveInfo(this);
-            this.CurrentResults = new DriverSessionResults(this,0);
+            this.CurrentResults = new DriverSessionResults();
         }
 
         /// <summary>
@@ -42,7 +38,6 @@ namespace CrewChiefV4.iRacing
         public string DivisionName { get; set; }
 
         public DriverCarInfo Car { get; set; }
-        public DriverResults Results { get; private set; }
         public DriverSessionResults CurrentResults { get; set; }
         public DriverLiveInfo Live { get; private set; }
         private double _prevPos;
@@ -63,9 +58,7 @@ namespace CrewChiefV4.iRacing
             this.IsSpectator = Parser.ParseInt(query["IsSpectator"].GetValue()) == 1;
 
             this.ClubName = query["ClubName"].GetValue();
-            this.DivisionName = query["DivisionName"].GetValue();
-            
-            this.IsPacecar = this.Name.ToLower().Equals(PACECAR_NAME2);
+            this.DivisionName = query["DivisionName"].GetValue();            
         }
 
         public void ParseStaticSessionInfo(SessionInfo info)
@@ -84,7 +77,9 @@ namespace CrewChiefV4.iRacing
             this.Car.CarClassShortName = query["CarClassShortName"].GetValue();
             this.Car.CarShortName = query["CarScreenNameShort"].GetValue();
 
-            this.IsPacecar = this.CustId == -1 || this.Car.CarName.ToLower().Equals(PACECAR_NAME);
+            bool isPaceCar = Parser.ParseInt(query["CarIsPaceCar"].GetValue()) == 1;
+
+            this.IsPacecar = this.CustId == -1 || isPaceCar;
         }
 
         public static Driver FromSessionInfo(SessionInfo info, int carIdx)
@@ -107,8 +102,7 @@ namespace CrewChiefV4.iRacing
 
         internal void UpdateResultsInfo(int sessionNumber, YamlQuery query, int position)
         {
-            this.Results.SetResults(sessionNumber, query, position);
-            this.CurrentResults = this.Results.Current;
+            this.CurrentResults.ParseYaml( query, position);
         }
 
         internal void UpdateLiveInfo(iRacingData e)

@@ -17,6 +17,8 @@ namespace CrewChiefV4.iRacing
         private bool _mustUpdateSessionData, _mustReloadDrivers;
         private int _DriverId;
         public int DriverId { get { return _DriverId; } }
+
+        
         public Sim()
         {
             _drivers = new List<Driver>();
@@ -38,6 +40,8 @@ namespace CrewChiefV4.iRacing
         private Driver _driver;
         public Driver Driver { get { return _driver; } }
 
+        private Driver _paceCar;
+        public Driver PaceCar { get { return _paceCar; } }
         #endregion
 
         #region Methods
@@ -48,6 +52,7 @@ namespace CrewChiefV4.iRacing
             _mustReloadDrivers = true;
             _currentSessionNumber = null;
             _driver = null;
+            _paceCar = null;
             _drivers.Clear();
             _telemetry = null;
             _sessionInfo = null;
@@ -77,6 +82,8 @@ namespace CrewChiefV4.iRacing
             {
                 Console.WriteLine("MustReloadDrivers: true");
                 _drivers.Clear();
+                _driver = null;
+                _paceCar = null;
                 _mustReloadDrivers = false;
             }
 
@@ -96,32 +103,19 @@ namespace CrewChiefV4.iRacing
                     }
 
                     driver.IsCurrentDriver = false;
-
-                    // Add to list
+                    // Exclude pace car from driver array
+                    if (driver.IsPacecar)
+                    {
+                        _paceCar = driver;
+                        continue;
+                    }
                     _drivers.Add(driver);
                 }
                 else
                 {
-                    // Update and check if driver swap occurred
                     var oldId = driver.CustId;
                     var oldName = driver.Name;
                     driver.ParseDynamicSessionInfo(info);
-
-                    /*
-                    if (oldId != driver.CustId)
-                    {
-                        var e = new DriverSwapRaceEvent();
-                        e.Driver = driver;
-                        e.PreviousDriverId = oldId;
-                        e.PreviousDriverName = oldName;
-                        e.CurrentDriverId = driver.Id;
-                        e.CurrentDriverName = driver.Name;
-                        e.SessionTime = _telemetry.SessionTime;
-                        e.Lap = driver.Live.Lap;
-
-                        this.OnRaceEvent(e);
-                    }
-                     * */
                 }
                 
                 if (DriverId == driver.Id)
@@ -231,12 +225,12 @@ namespace CrewChiefV4.iRacing
             // In a race that is not yet in checkered flag mode,
             // Live positions are determined from track position (total lap distance)
             // Any other conditions (race finished, P, Q, etc), positions are ordered as result positions
-
-            if (this.SessionData.EventType == "Race" && !info.SessionFlags.HasFlag(SessionFlags.Checkered))
+            SessionFlags flag = (SessionFlags)info.SessionFlags;
+            if (this.SessionData.EventType == "Race" && !flag.HasFlag(SessionFlags.Checkered))
             {
                 // Determine live position from lapdistance
                 int pos = 1;
-                foreach (var driver in _drivers.OrderByDescending(d => d.Live.TotalLapDistance))
+                foreach (var driver in _drivers.OrderByDescending(d => d.Live.TotalLapDistance))                
                 {
                     driver.Live.Position = pos;
                     pos++;
@@ -246,9 +240,9 @@ namespace CrewChiefV4.iRacing
             {
                 // In P or Q, set live position from result position (== best lap according to iRacing)
                 // In P or Q, set live position from result position (== best lap according to iRacing)
-                foreach (var driver in _drivers.OrderBy(d => d.Results.Current.Position))
+                foreach (var driver in _drivers.OrderBy(d => d.CurrentResults.Position))
                 {
-                    driver.Live.Position = driver.Results.Current.Position;
+                    driver.Live.Position = driver.CurrentResults.Position;
                 }
 
                 //foreach (var driver in _drivers)
@@ -281,15 +275,19 @@ namespace CrewChiefV4.iRacing
         public void SdkOnSessionInfoUpdated(SessionInfo sessionInfo, int sessionNumber,int driverId)
         {
            
-            // Cache info
-            _sessionInfo = sessionInfo;
-            _currentSessionNumber = sessionNumber;
             _DriverId = driverId;
 
             // Stop if we don't have a session number yet
-            if (_currentSessionNumber == null) 
-                return;
 
+
+            if (_currentSessionNumber == null || (_currentSessionNumber != sessionNumber))
+            {
+                _mustUpdateSessionData = true;
+
+                // Session changed, reset session info
+                this.ResetSession();
+            }
+            _currentSessionNumber = sessionNumber;
             if (_mustUpdateSessionData)
             {
                 _sessionData.Update(sessionInfo, sessionNumber);
@@ -297,31 +295,16 @@ namespace CrewChiefV4.iRacing
             }
             // Update drivers
             this.UpdateDriverList(sessionInfo);
+            
         }
 
         public void SdkOnTelemetryUpdated(iRacingData telemetry)
         {
             // Cache info            
             _telemetry = telemetry;
-            // Check if session changed
-            if (_currentSessionNumber == null || (_currentSessionNumber.Value != telemetry.SessionNum))
-            {
-                _mustUpdateSessionData = true;
-
-                // Session changed, reset session info
-                this.ResetSession();
-            }
-
-            // Store current session number
-            _currentSessionNumber = telemetry.SessionNum;
-
             // Update drivers telemetry
             this.UpdateDriverTelemetry(telemetry);
-
-            // Update session data
-            this.SessionData.Update(telemetry);
         }
-
       
         #endregion
 
