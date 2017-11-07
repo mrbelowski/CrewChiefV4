@@ -613,11 +613,11 @@ namespace CrewChiefV4.Events
             return haveData;
         }
 
-        public void reportFuelStatus()
+        public void reportFuelStatus(Boolean allowNoDataMessage)
         {            
             Boolean reportedRemaining = reportFuelRemaining();
             Boolean reportedConsumption = reportFuelConsumption();
-            if (!reportedConsumption && !reportedRemaining)
+            if (!reportedConsumption && !reportedRemaining && allowNoDataMessage)
             {
                 audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
             }
@@ -648,9 +648,11 @@ namespace CrewChiefV4.Events
                     audioPlayer.playMessageImmediately(new QueuedMessage(folderAboutToRunOut, 0, null));
                 }
             }
-            else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOWS_MY_FUEL))
+            else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOWS_MY_FUEL) ||
+                SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.CAR_STATUS) ||
+                SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.STATUS))
             {
-                reportFuelStatus();
+                reportFuelStatus(SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOWS_MY_FUEL));
             }
             else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.CALCULATE_FUEL_FOR))
             {

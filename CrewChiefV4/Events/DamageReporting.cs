@@ -51,6 +51,9 @@ namespace CrewChiefV4.Events
         private String folderLeftRearPuncture = "damage_reporting/left_rear_puncture";
         private String folderRightRearPuncture = "damage_reporting/right_rear_puncture";
 
+        // TODO: add this - "the car's in good shape" / "we have no significant damage" etc
+        private String folderNoDamageOnAnyComponent = "damage_reporting/no_damage";
+
         private DamageLevel engineDamage;
         private DamageLevel trannyDamage;
         private DamageLevel aeroDamage;
@@ -313,107 +316,208 @@ namespace CrewChiefV4.Events
             }
         }
 
+        private QueuedMessage getDamageMessage(Component component, Boolean includeNoDamage)
+        {
+            QueuedMessage damageMessage = null;
+            switch (component)
+            {
+                case Component.AERO:
+                    if (aeroDamage == DamageLevel.NONE)
+                    {
+                        if (includeNoDamage)
+                        {
+                            damageMessage = new QueuedMessage(folderNoAeroDamage, 0, null);
+                        }
+                    }
+                    else if (aeroDamage == DamageLevel.MAJOR || aeroDamage == DamageLevel.DESTROYED)
+                    {
+                        damageMessage = new QueuedMessage(folderSevereAeroDamage, 0, null);
+                    }
+                    else if (aeroDamage == DamageLevel.MINOR)
+                    {
+                        damageMessage = new QueuedMessage(folderMinorAeroDamage, 0, null);
+                    }
+                    else if (aeroDamage == DamageLevel.TRIVIAL)
+                    {
+                        damageMessage = new QueuedMessage(folderJustAScratch, 0, null);
+                    }
+                    break;
+                case Component.BRAKES:
+                    if (maxBrakeDamage == DamageLevel.NONE || maxBrakeDamage == DamageLevel.TRIVIAL)
+                    {
+                        if (includeNoDamage)
+                        {
+                            damageMessage = new QueuedMessage(folderNoBrakeDamage, 0, null);
+                        }
+                    }
+                    else if (maxBrakeDamage == DamageLevel.DESTROYED)
+                    {
+                        damageMessage = new QueuedMessage(folderBustedBrakes, 0, null);
+                    }
+                    else if (maxBrakeDamage == DamageLevel.MAJOR)
+                    {
+                        damageMessage = new QueuedMessage(folderSevereBrakeDamage, 0, null);
+                    }
+                    else if (maxBrakeDamage == DamageLevel.MINOR)
+                    {
+                        damageMessage = new QueuedMessage(folderMinorBrakeDamage, 0, null);
+                    }
+                    break;
+                case Component.ENGINE:
+                    if (engineDamage == DamageLevel.NONE || engineDamage == DamageLevel.TRIVIAL)
+                    {
+                        if (includeNoDamage)
+                        {
+                            damageMessage = new QueuedMessage(folderNoEngineDamage, 0, null);
+                        }
+                    }
+                    else if (engineDamage == DamageLevel.DESTROYED)
+                    {
+                        damageMessage = new QueuedMessage(folderBustedEngine, 0, null);
+                    }
+                    else if (engineDamage == DamageLevel.MAJOR)
+                    {
+                        damageMessage = new QueuedMessage(folderSevereEngineDamage, 0, null);
+                    }
+                    else if (engineDamage == DamageLevel.MINOR)
+                    {
+                        damageMessage = new QueuedMessage(folderMinorEngineDamage, 0, null);
+                    }
+                    break;
+                case Component.SUSPENSION:
+                    if (isMissingWheel)
+                    {
+                        damageMessage = new QueuedMessage(folderMissingWheel, 0, null);                        
+                    }
+                    if ((maxSuspensionDamage == DamageLevel.NONE || maxSuspensionDamage == DamageLevel.TRIVIAL) && !isMissingWheel)
+                    {
+                        if (includeNoDamage)
+                        {
+                            damageMessage = new QueuedMessage(folderNoSuspensionDamage, 0, null);
+                        }
+                    }
+                    else if (maxSuspensionDamage == DamageLevel.DESTROYED)
+                    {
+                        damageMessage = new QueuedMessage(folderBustedSuspension, 0, null);                        
+                    }
+                    else if (maxSuspensionDamage == DamageLevel.MAJOR)
+                    {
+                        damageMessage = new QueuedMessage(folderSevereSuspensionDamage, 0, null);                        
+                    }
+                    else if (maxSuspensionDamage == DamageLevel.MINOR && !isMissingWheel)
+                    {
+                        damageMessage = new QueuedMessage(folderMinorSuspensionDamage, 0, null);                        
+                    }
+                    break;
+                case Component.TRANNY:
+                    if (trannyDamage == DamageLevel.NONE || trannyDamage == DamageLevel.TRIVIAL)
+                    {
+                        if (includeNoDamage)
+                        {
+                            damageMessage = new QueuedMessage(folderNoTransmissionDamage, 0, null);
+                        }
+                    }
+                    else if (trannyDamage == DamageLevel.DESTROYED)
+                    {
+                        damageMessage = new QueuedMessage(folderBustedTransmission, 0, null);
+                    }
+                    else if (trannyDamage == DamageLevel.MAJOR)
+                    {
+                        damageMessage = new QueuedMessage(folderSevereTransmissionDamage, 0, null);
+                    }
+                    else if (trannyDamage == DamageLevel.MINOR)
+                    {
+                        damageMessage = new QueuedMessage(folderMinorTransmissionDamage, 0, null);
+                    }
+                    break;
+                default:
+                    break;
+            }
+            return damageMessage;
+        }
+
+        private void readStatus()
+        {
+            List<QueuedMessage> damageMessages = new List<QueuedMessage>();
+            switch (lastReportedPunctureCorner)
+            {
+                case CornerData.Corners.FRONT_LEFT:
+                    damageMessages.Add(new QueuedMessage(folderLeftFrontPuncture, 0, this));
+                    break;
+                case CornerData.Corners.FRONT_RIGHT:
+                    damageMessages.Add(new QueuedMessage(folderRightFrontPuncture, 0, this));
+                    break;
+                case CornerData.Corners.REAR_LEFT:
+                    damageMessages.Add(new QueuedMessage(folderLeftRearPuncture, 0, this));
+                    break;
+                case CornerData.Corners.REAR_RIGHT:
+                    damageMessages.Add(new QueuedMessage(folderRightRearPuncture, 0, this));
+                    break;
+            }
+            QueuedMessage aero = getDamageMessage(Component.AERO, false);
+            if (aero != null)
+            {
+                damageMessages.Add(aero);
+            }
+            QueuedMessage tranny = getDamageMessage(Component.TRANNY, false);
+            if (tranny != null)
+            {
+                damageMessages.Add(tranny);
+            }
+            QueuedMessage engine = getDamageMessage(Component.ENGINE, false);
+            if (engine != null)
+            {
+                damageMessages.Add(engine);
+            }
+            QueuedMessage sus = getDamageMessage(Component.SUSPENSION, false);
+            if (sus != null)
+            {
+                damageMessages.Add(sus);
+            }
+            QueuedMessage brakes = getDamageMessage(Component.BRAKES, false);
+            if (brakes != null)
+            {
+                damageMessages.Add(brakes);
+            }           
+            if (damageMessages.Count == 0)
+            {
+                // no damage
+                damageMessages.Add(new QueuedMessage(folderNoDamageOnAnyComponent, 0, this));
+            }
+            foreach (QueuedMessage message in damageMessages)
+            {
+                audioPlayer.playMessageImmediately(message);
+            }
+        }
+
         public override void respond(String voiceMessage)
         {
+            if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.CAR_STATUS) ||
+                SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.DAMAGE_REPORT) ||
+                SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.STATUS))
+            {
+                readStatus();
+            }
             QueuedMessage damageMessage = null;
             if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOWS_MY_AERO))
             {
-                if (aeroDamage == DamageLevel.NONE)
-                {
-                    damageMessage = new QueuedMessage(folderNoAeroDamage, 0, null);                    
-                }
-                else if (aeroDamage == DamageLevel.MAJOR || aeroDamage == DamageLevel.DESTROYED)
-                {
-                    damageMessage = new QueuedMessage(folderSevereAeroDamage, 0, null);                    
-                }
-                else if (aeroDamage == DamageLevel.MINOR)
-                {
-                    damageMessage = new QueuedMessage(folderMinorAeroDamage, 0, null);
-                }
-                else if (aeroDamage == DamageLevel.TRIVIAL)
-                {
-                    damageMessage = new QueuedMessage(folderJustAScratch, 0, null);                    
-                }
+                damageMessage = getDamageMessage(Component.AERO, true);
             }
             if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOWS_MY_TRANSMISSION))
             {
-                if (trannyDamage == DamageLevel.NONE || trannyDamage == DamageLevel.TRIVIAL)
-                {
-                    damageMessage = new QueuedMessage(folderNoTransmissionDamage, 0, null);                    
-                }
-                else if (trannyDamage == DamageLevel.DESTROYED)
-                {
-                    damageMessage = new QueuedMessage(folderBustedTransmission, 0, null);                    
-                }
-                else if (trannyDamage == DamageLevel.MAJOR)
-                {
-                    damageMessage = new QueuedMessage(folderSevereTransmissionDamage, 0, null);                    
-                }
-                else if (trannyDamage == DamageLevel.MINOR)
-                {
-                    damageMessage = new QueuedMessage(folderMinorTransmissionDamage, 0, null);                    
-                }
+                damageMessage = getDamageMessage(Component.TRANNY, true);
             }
             if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOWS_MY_ENGINE))
             {
-                if (engineDamage == DamageLevel.NONE || engineDamage == DamageLevel.TRIVIAL)
-                {
-                    damageMessage = new QueuedMessage(folderNoEngineDamage, 0, null);                    
-                }
-                else if (engineDamage == DamageLevel.DESTROYED)
-                {
-                    damageMessage = new QueuedMessage(folderBustedEngine, 0, null);                    
-                }
-                else if (engineDamage == DamageLevel.MAJOR)
-                {
-                    damageMessage = new QueuedMessage(folderSevereEngineDamage, 0, null);                    
-                }
-                else if (engineDamage == DamageLevel.MINOR)
-                {
-                    damageMessage = new QueuedMessage(folderMinorEngineDamage, 0, null);                    
-                }
+                damageMessage = getDamageMessage(Component.ENGINE, true);
             }
             if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOWS_MY_SUSPENSION))
             {
-                if (isMissingWheel)
-                {
-                    damageMessage = new QueuedMessage(folderMissingWheel, 0, null);                        
-                }
-                if ((maxSuspensionDamage == DamageLevel.NONE || maxSuspensionDamage == DamageLevel.TRIVIAL) && !isMissingWheel)
-                {
-                    damageMessage = new QueuedMessage(folderNoSuspensionDamage, 0, null);                        
-                }
-                else if (maxSuspensionDamage == DamageLevel.DESTROYED)
-                {
-                    damageMessage = new QueuedMessage(folderBustedSuspension, 0, null);                        
-                }
-                else if (maxSuspensionDamage == DamageLevel.MAJOR)
-                {
-                    damageMessage = new QueuedMessage(folderSevereSuspensionDamage, 0, null);                        
-                }
-                else if (maxSuspensionDamage == DamageLevel.MINOR && !isMissingWheel)
-                {
-                    damageMessage = new QueuedMessage(folderMinorSuspensionDamage, 0, null);                        
-                }
+                damageMessage = getDamageMessage(Component.SUSPENSION, true);
             }
             if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOWS_MY_BRAKES))
             {
-                if (maxBrakeDamage == DamageLevel.NONE || maxBrakeDamage == DamageLevel.TRIVIAL)
-                {
-                    damageMessage = new QueuedMessage(folderNoBrakeDamage, 0, null);                        
-                }
-                else if (maxBrakeDamage == DamageLevel.DESTROYED)
-                {
-                    damageMessage = new QueuedMessage(folderBustedBrakes, 0, null);                        
-                }
-                else if (maxBrakeDamage == DamageLevel.MAJOR)
-                {
-                    damageMessage = new QueuedMessage(folderSevereBrakeDamage, 0, null);                        
-                }
-                else if (maxBrakeDamage == DamageLevel.MINOR)
-                {
-                    damageMessage = new QueuedMessage(folderMinorBrakeDamage, 0, null);                        
-                }
+                damageMessage = getDamageMessage(Component.BRAKES, true);
             }
             if (damageMessage != null)
             {

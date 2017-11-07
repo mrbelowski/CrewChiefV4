@@ -322,8 +322,7 @@ namespace CrewChiefV4.Events
         {
             if (!hasHadAPenalty)
             {
-                audioPlayer.playMessageImmediately(new QueuedMessage(folderYouDontHaveAPenalty, 0, null));
-                
+                audioPlayer.playMessageImmediately(new QueuedMessage(folderYouDontHaveAPenalty, 0, null));                
                 return;
             }
             if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.DO_I_HAVE_A_PENALTY))
@@ -331,18 +330,16 @@ namespace CrewChiefV4.Events
                 if (hasOutstandingPenalty) {
                     if (lapsCompleted - penaltyLap == 2) {
                         audioPlayer.playMessageImmediately(new QueuedMessage("youHaveAPenaltyBoxThisLap",
-                            MessageContents(folderYouHavePenalty, MandatoryPitStops.folderMandatoryPitStopsPitThisLap), 0, null));
-                        
-                    } else
+                            MessageContents(folderYouHavePenalty, MandatoryPitStops.folderMandatoryPitStopsPitThisLap), 0, null));                        
+                    }
+                    else
                     {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(folderYouHavePenalty, 0, null));
-                        
+                        audioPlayer.playMessageImmediately(new QueuedMessage(folderYouHavePenalty, 0, null));                        
                     }
                 }
                 else
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderYouDontHaveAPenalty, 0, null));
-                    
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderYouDontHaveAPenalty, 0, null));                    
                 }
             }
             else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HAVE_I_SERVED_MY_PENALTY))
@@ -356,14 +353,12 @@ namespace CrewChiefV4.Events
                     {
                         messages.Add(MessageFragment.Text(MandatoryPitStops.folderMandatoryPitStopsPitThisLap));
                     }
-                    audioPlayer.playMessageImmediately(new QueuedMessage("noYouStillHaveAPenalty", messages, 0, null));
-                    
+                    audioPlayer.playMessageImmediately(new QueuedMessage("noYouStillHaveAPenalty", messages, 0, null));                    
                 }
                 else
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage("yesYouServedYourPenalty",
-                        MessageContents(AudioPlayer.folderYes, folderPenaltyServed), 0, null));
-                    
+                        MessageContents(AudioPlayer.folderYes, folderPenaltyServed), 0, null));                    
                 }
             }
             else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.DO_I_STILL_HAVE_A_PENALTY))
@@ -377,15 +372,29 @@ namespace CrewChiefV4.Events
                     {
                         messages.Add(MessageFragment.Text(MandatoryPitStops.folderMandatoryPitStopsPitThisLap));
                     }
-                    audioPlayer.playMessageImmediately(new QueuedMessage("yesYouStillHaveAPenalty", messages, 0, null));
-                    
+                    audioPlayer.playMessageImmediately(new QueuedMessage("yesYouStillHaveAPenalty", messages, 0, null));                    
                 }
                 else
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage("noYouServedYourPenalty",
-                        MessageContents(AudioPlayer.folderNo, folderPenaltyServed), 0, null));
-                    
+                        MessageContents(AudioPlayer.folderNo, folderPenaltyServed), 0, null));                    
                 }                
+            }
+            else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.SESSION_STATUS) ||
+                     SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.STATUS))
+            {
+                if (hasOutstandingPenalty)
+                {
+                    if (lapsCompleted - penaltyLap == 2)
+                    {
+                        audioPlayer.playMessageImmediately(new QueuedMessage("youHaveAPenaltyBoxThisLap",
+                            MessageContents(folderYouHavePenalty, MandatoryPitStops.folderMandatoryPitStopsPitThisLap), 0, null));
+                    }
+                    else
+                    {
+                        audioPlayer.playMessageImmediately(new QueuedMessage(folderYouHavePenalty, 0, null));
+                    }
+                }
             }
         }
     }

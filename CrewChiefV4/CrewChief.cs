@@ -271,7 +271,7 @@ namespace CrewChiefV4
 
         public void reportFuelStatus()
         {
-            ((Fuel)eventsList["Fuel"]).reportFuelStatus();
+            ((Fuel)eventsList["Fuel"]).reportFuelStatus(true);
         }
 
         public void toggleSpotterMode()
@@ -342,6 +342,47 @@ namespace CrewChiefV4
         {
             audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderDidntUnderstand, 0, null));
         }
+
+
+        // nasty... these triggers come from the speech recogniser or from button presses, and invoke speech
+        // recognition 'respond' methods in the events
+        public static void getStatus()
+        {
+            getEvent("Penalties").respond(SpeechRecogniser.STATUS[0]);
+            getEvent("RaceTime").respond(SpeechRecogniser.STATUS[0]);
+            getEvent("Position").respond(SpeechRecogniser.STATUS[0]);
+            getEvent("MandatoryPitStops").respond(SpeechRecogniser.STATUS[0]);
+            getEvent("DamageReporting").respond(SpeechRecogniser.STATUS[0]);
+            getEvent("Fuel").respond(SpeechRecogniser.STATUS[0]);
+            getEvent("TyreMonitor").respond(SpeechRecogniser.STATUS[0]);
+            getEvent("EngineMonitor").respond(SpeechRecogniser.STATUS[0]);
+            getEvent("Timings").respond(SpeechRecogniser.STATUS[0]);
+        }
+
+        public static void getSessionStatus()
+        {
+            getEvent("Penalties").respond(SpeechRecogniser.SESSION_STATUS[0]);
+            getEvent("RaceTime").respond(SpeechRecogniser.SESSION_STATUS[0]);
+            getEvent("Position").respond(SpeechRecogniser.SESSION_STATUS[0]);
+            getEvent("MandatoryPitStops").respond(SpeechRecogniser.SESSION_STATUS[0]);
+            getEvent("Timings").respond(SpeechRecogniser.SESSION_STATUS[0]);
+        }
+
+        public static void getCarStatus()
+        {
+            getEvent("DamageReporting").respond(SpeechRecogniser.CAR_STATUS[0]);
+            getEvent("Fuel").respond(SpeechRecogniser.CAR_STATUS[0]);
+            getEvent("TyreMonitor").respond(SpeechRecogniser.CAR_STATUS[0]);
+            getEvent("EngineMonitor").respond(SpeechRecogniser.CAR_STATUS[0]);
+            getEvent("Timings").respond(SpeechRecogniser.CAR_STATUS[0]);
+        }
+
+        public static void getDamageReport()
+        {
+            getEvent("DamageReporting").respond(SpeechRecogniser.DAMAGE_REPORT[0]);
+        }
+        //
+
 
         public void reportCurrentTime()
         {

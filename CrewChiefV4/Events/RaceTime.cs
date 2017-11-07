@@ -264,34 +264,29 @@ namespace CrewChiefV4.Events
                 if (leaderHasFinishedRace)
                 {
                     Console.WriteLine("Playing last lap message, timeleft = " + timeLeft);
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderThisIsTheLastLap, 0, null));
-                    
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderThisIsTheLastLap, 0, null));                    
                 }
                 if (timeLeft >= 120)
                 {
                     int minutesLeft = (int)Math.Round(timeLeft / 60f);
                     audioPlayer.playMessageImmediately(new QueuedMessage("RaceTime/time_remaining",
-                        MessageContents(TimeSpan.FromMinutes(minutesLeft), folderRemaining), 0, null));
-                    
+                        MessageContents(TimeSpan.FromMinutes(minutesLeft), folderRemaining), 0, null));                    
                 }
                 else if (timeLeft >= 60)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderOneMinuteRemaining, 0, null));
-                    
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderOneMinuteRemaining, 0, null));                    
                 }
                 else if (timeLeft <= 0)
                 {
                     if (addExtraLap && !startedExtraLap)
                     {
                         Console.WriteLine("Playing extra lap one more lap message, timeleft = " + timeLeft);
-                        audioPlayer.playMessageImmediately(new QueuedMessage(folderOneLapAfterThisOne, 0, null));
-                        
+                        audioPlayer.playMessageImmediately(new QueuedMessage(folderOneLapAfterThisOne, 0, null));                        
                     }
                     else 
                     {
                         Console.WriteLine("Playing last lap message, timeleft = " + timeLeft);
-                        audioPlayer.playMessageImmediately(new QueuedMessage(folderThisIsTheLastLap, 0, null));
-                        
+                        audioPlayer.playMessageImmediately(new QueuedMessage(folderThisIsTheLastLap, 0, null));                        
                     }                   
                 }
                 else if (timeLeft < 60)
@@ -306,8 +301,6 @@ namespace CrewChiefV4.Events
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage("RaceTime/laps_remaining",
                         MessageContents(lapsLeft, folderLapsLeft), 0, null));
-
-                    
                 }
                 else if (lapsLeft == 2)
                 {
@@ -315,8 +308,7 @@ namespace CrewChiefV4.Events
                 }
                 else if (lapsLeft == 1)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderThisIsTheLastLap, 0, null));
-                    
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderThisIsTheLastLap, 0, null));                    
                 }
             }     
         }

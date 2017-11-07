@@ -139,10 +139,10 @@ namespace CrewChiefV4.Events
                 }
                 
             }
-            if (!gotData)
+            if (!gotData && !SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.CAR_STATUS) &
+                            !SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.STATUS))
             {
-                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, this));
-                
+                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, this));                
             }
         }
 

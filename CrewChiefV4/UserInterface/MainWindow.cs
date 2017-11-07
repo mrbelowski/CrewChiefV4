@@ -940,6 +940,30 @@ namespace CrewChiefV4
                         crewChief.reportFuelStatus();
                         nextPollWait = 1000;
                     }
+                    else if (controllerConfiguration.hasOutstandingClick(ControllerConfiguration.GET_STATUS))
+                    {
+                        Console.WriteLine("Getting full status");
+                        CrewChief.getStatus();
+                        nextPollWait = 1000;
+                    }
+                    else if (controllerConfiguration.hasOutstandingClick(ControllerConfiguration.GET_SESSION_STATUS))
+                    {
+                        Console.WriteLine("Getting session status");
+                        CrewChief.getSessionStatus();
+                        nextPollWait = 1000;
+                    }
+                    else if (controllerConfiguration.hasOutstandingClick(ControllerConfiguration.GET_DAMAGE_REPORT))
+                    {
+                        Console.WriteLine("Getting damage report");
+                        CrewChief.getDamageReport();
+                        nextPollWait = 1000;
+                    }
+                    else if (controllerConfiguration.hasOutstandingClick(ControllerConfiguration.GET_CAR_STATUS))
+                    {
+                        Console.WriteLine("Getting car status");
+                        CrewChief.getCarStatus();
+                        nextPollWait = 1000;
+                    }
                     else if (controllerConfiguration.hasOutstandingClick(ControllerConfiguration.PRINT_TRACK_DATA))
                     {
                         if (CrewChief.currentGameState != null && CrewChief.currentGameState.SessionData != null &&
