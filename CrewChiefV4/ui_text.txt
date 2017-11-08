@@ -485,3 +485,6 @@ get_status = Report car, damage and session status
 get_car_status = Report car status and damage
 get_session_status = Report session status
 get_damage_report = Report car damage
+
+disable_alternative_voice_commands = Disable alternative voice commands
+disable_alternative_voice_commands_help = Only use the first item from each voice command set - may improve recognition accuracy
