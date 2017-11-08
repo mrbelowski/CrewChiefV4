@@ -5,6 +5,7 @@
 <ul>
     <li>Fixed an issue in the speech recogniser where grammars were initialised multiple times, reducing recognition accuracy - this should make the recogniser work more reliably</li>
 	<li>Fixed an issue in R3E and AC where a invalidated in sector 3 could cause stale best-lap data to be announced</li>
+	<li>Remove opponents who are reported as DNF / DQ / DNS in R3E</li>
 	<li>Added experimental option 'Disable alternative voice commands' (disabled by default). Enabling this will force the speech recogniser to only load the first command from each row in speech_recognition_config.txt. Instead of recognising any of "who's leading", "who's in the lead", "who is leading", "who is in the lead", or "who's the leader" the app will only recognise the first in the list - "who's leading". This will limit the number of phrases the recogniser understands and *may* improve recognition accuracy</li>
 </ul>
 <h2>Version 4.8.1.2</h2>
