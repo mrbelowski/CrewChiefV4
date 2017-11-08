@@ -1,6 +1,11 @@
 <!DOCTYPE html>
 <html>
 <body>
+<h2>Version 4.8.1.3</h2>
+<ul>
+    <li>Fixed an issue in the speech recogniser where grammars were initialised multiple times, reducing recognition accuracy - this should make the recogniser work more reliably</li>
+	<li>Added experimental option 'Disable alternative voice commands' (disabled by default). Enabling this will force the speech recogniser to only load the first command from each row in speech_recognition_config.txt. Instead of recognising any of "who's leading", "who's in the lead", "who is leading", "who is in the lead", or "who's the leader" the app will only recognise the first in the list - "who's leading". This will limit the number of phrases the recogniser understands and *may* improve recognition accuracy</li>
+</ul>
 <h2>Version 4.8.1.2</h2>
 <ul>
 	<li>More iRacing bug fixes, mostly around session state tracking</li>
