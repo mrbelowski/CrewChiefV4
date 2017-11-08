@@ -1594,6 +1594,11 @@ namespace CrewChiefV4.RaceRoom
                     opponentData.hasJustChangedToDifferentTyreType = true;
                 }
             }
+            if (opponentData.CurrentSectorNumber == 3 && sector == 3 && (!lapIsValid || !validSpeed))
+            {
+                // special case for s3 - need to invalidate lap immediately
+                opponentData.InvalidateCurrentLap();
+            }
             if (opponentData.CurrentSectorNumber != sector)
             {
                 if (opponentData.CurrentSectorNumber == 3 && sector == 1)
@@ -1604,12 +1609,11 @@ namespace CrewChiefV4.RaceRoom
                         // if it's identical to the previous time, assume it's invalid
                         if (opponentData.LastLapTime == completedLapTime)
                         {
-                            lapIsValid = false;
+                            opponentData.InvalidateCurrentLap();
                         }
                         else
                         {
-                            opponentData.CompleteLapWithProvidedLapTime(racePosition, sessionRunningTime, completedLapTime,
-                                lapIsValid && validSpeed, false, 20, 20, sessionLengthIsTime, sessionTimeRemaining, 3);
+                            opponentData.CompleteLapWithProvidedLapTime(racePosition, sessionRunningTime, completedLapTime, false, 20, 20, sessionLengthIsTime, sessionTimeRemaining, 3);
                         }
                     }
                     opponentData.StartNewLap(completedLaps + 1, racePosition, isInPits, sessionRunningTime, false, 20, 20);

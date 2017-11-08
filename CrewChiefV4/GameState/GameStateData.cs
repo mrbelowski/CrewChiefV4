@@ -814,15 +814,36 @@ namespace CrewChiefV4.GameState
             }
         }
 
+        // used to immediately invalidate a lap only when we're in sector3 - this is necessary because when we start a new lap,
+        // the 'current lap is valid' flag will apply to the new lap, not the one we just completed
+        public void InvalidateCurrentLap()
+        {
+            if (OpponentLapData.Count > 0)
+            {
+                OpponentLapData[OpponentLapData.Count - 1].IsValid = false;
+            }
+        }
+
+        public void CompleteLapWithProvidedLapTime(int position, float gameTimeAtLapEnd, float providedLapTime, Boolean lapWasValid,
+            Boolean isRaining, float trackTemp, float airTemp, Boolean sessionLengthIsTime, float sessionTimeRemaining, int numberOfSectors)
+        {
+            // if this completed lap is invalid, mark it as such *before* we complete it
+            if (!lapWasValid)
+            {
+                InvalidateCurrentLap();
+            }
+            CompleteLapWithProvidedLapTime(position, gameTimeAtLapEnd, providedLapTime, isRaining, trackTemp, airTemp, sessionLengthIsTime, sessionTimeRemaining, numberOfSectors);
+        }
+
         public void CompleteLapWithProvidedLapTime(int position, float gameTimeAtLapEnd, float providedLapTime,
-            Boolean lapIsValid, Boolean isRaining, float trackTemp, float airTemp, Boolean sessionLengthIsTime, float sessionTimeRemaining, int numberOfSectors)
+            Boolean isRaining, float trackTemp, float airTemp, Boolean sessionLengthIsTime, float sessionTimeRemaining, int numberOfSectors)
         {
             if (OpponentLapData.Count > 0)
             {                
                 LapData lapData = OpponentLapData[OpponentLapData.Count - 1];
                 if (OpponentLapData.Count == 1 || !lapData.hasMissingSectors) 
                 {
-                    AddCumulativeSectorData(numberOfSectors, position, providedLapTime, gameTimeAtLapEnd, lapIsValid, isRaining, trackTemp, airTemp);
+                    AddCumulativeSectorData(numberOfSectors, position, providedLapTime, gameTimeAtLapEnd, lapData.IsValid, isRaining, trackTemp, airTemp);
                     lapData.LapTime = providedLapTime;
                     LastLapTime = providedLapTime;
                     if (lapData.IsValid && lapData.LapTime > 0 && (CurrentBestLapTime == -1 || CurrentBestLapTime > lapData.LapTime))
