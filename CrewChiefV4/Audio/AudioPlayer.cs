@@ -380,17 +380,24 @@ namespace CrewChiefV4.Audio
         {
             if (getBackgroundVolume() > 0 && !mute)
             {
-                this.mainThreadContext.Send(delegate
+                try
                 {
-                    Console.WriteLine("Setting background sounds file to  " + backgroundSoundName);
-                    String path = Path.Combine(backgroundFilesPath, backgroundSoundName);
-                    if (!backgroundPlayerInitialised)
+                    this.mainThreadContext.Send(delegate
                     {
-                        initialiseBackgroundPlayer();
-                    }
-                    backgroundPlayer.Volume = 0.0;
-                    backgroundPlayer.Open(new System.Uri(path, System.UriKind.Absolute));
-                }, null);
+                        Console.WriteLine("Setting background sounds file to  " + backgroundSoundName);
+                        String path = Path.Combine(backgroundFilesPath, backgroundSoundName);
+                        if (!backgroundPlayerInitialised)
+                        {
+                            initialiseBackgroundPlayer();
+                        }
+                        backgroundPlayer.Volume = 0.0;
+                        backgroundPlayer.Open(new System.Uri(path, System.UriKind.Absolute));
+                    }, null);
+                }
+                catch (Exception)
+                {
+                    // ignore - edge case where the app's closing so as removed the UI thread when this call is invoked
+                }
             }
         }
 
@@ -401,37 +408,50 @@ namespace CrewChiefV4.Audio
                 && getBackgroundVolume() > 0)
                 return;
 
-            this.mainThreadContext.Send(delegate
+            try
             {
-                if (!backgroundPlayerInitialised && getBackgroundVolume() > 0)
+                this.mainThreadContext.Send(delegate
                 {
-                    backgroundPlayer = new MediaPlayer();
-                    backgroundPlayer.MediaEnded += new EventHandler(backgroundPlayer_MediaEnded);
+                    if (!backgroundPlayerInitialised && getBackgroundVolume() > 0)
+                    {
+                        backgroundPlayer = new MediaPlayer();
+                        backgroundPlayer.MediaEnded += new EventHandler(backgroundPlayer_MediaEnded);
 
-                    // Start background player muted, as otherwise it causes some noise (sounds like some buffers are flushed).
-                    backgroundPlayer.Volume = 0.0;
-                    backgroundPlayerInitialised = true;
-                    setBackgroundSound(dtmPitWindowClosedBackground);
-                }
-            }, null);
+                        // Start background player muted, as otherwise it causes some noise (sounds like some buffers are flushed).
+                        backgroundPlayer.Volume = 0.0;
+                        backgroundPlayerInitialised = true;
+                        setBackgroundSound(dtmPitWindowClosedBackground);
+                    }
+                }, null);
+            }
+            catch (Exception)
+            {
+                // ignore - edge case where the app's closing so as removed the UI thread when this call is invoked
+            }
         }
 
         private void stopBackgroundPlayer()
         {
             if (backgroundPlayer == null || !backgroundPlayerInitialised)
                 return;
-
-            this.mainThreadContext.Send(delegate
+            try
             {
-                try
+                this.mainThreadContext.Send(delegate
                 {
-                    backgroundPlayer.Stop();
-                    backgroundPlayer.Volume = 0.0;
-                }
-                catch (Exception) { }
-                backgroundPlayerInitialised = false;
-                backgroundPlayer = null;
-            }, null);
+                    try
+                    {
+                        backgroundPlayer.Stop();
+                        backgroundPlayer.Volume = 0.0;
+                    }
+                    catch (Exception) { }
+                    backgroundPlayerInitialised = false;
+                    backgroundPlayer = null;
+                }, null);
+            }
+            catch (Exception)
+            {
+                // ignore - edge case where the app's closing so as removed the UI thread when this call is invoked
+            }
         }
 
         public void muteBackgroundPlayer(bool doMute)
@@ -439,13 +459,20 @@ namespace CrewChiefV4.Audio
             if (backgroundPlayer == null || !backgroundPlayerInitialised)
                 return;
 
-            this.mainThreadContext.Send(delegate
+            try
             {
-                if (doMute && !backgroundPlayer.IsMuted)
-                    backgroundPlayer.IsMuted = true;
-                else if (!doMute && backgroundPlayer.IsMuted)
-                    backgroundPlayer.IsMuted = false;
-            }, null);
+                this.mainThreadContext.Send(delegate
+                {
+                    if (doMute && !backgroundPlayer.IsMuted)
+                        backgroundPlayer.IsMuted = true;
+                    else if (!doMute && backgroundPlayer.IsMuted)
+                        backgroundPlayer.IsMuted = false;
+                }, null);
+            }
+            catch (Exception)
+            {
+                // ignore - edge case where the app's closing so as removed the UI thread when this call is invoked
+            }
         }
 
         private void monitorQueue()
@@ -851,30 +878,37 @@ namespace CrewChiefV4.Audio
                 channelOpen = true;
                 if (getBackgroundVolume() > 0)
                 {
-                    this.mainThreadContext.Send(delegate
+                    try
                     {
-                        // this looks like we're doing it the wrong way round but there's a short
-                        // delay playing the event sound, so if we kick off the background before the bleep
-                        if (!backgroundPlayerInitialised)
+                        this.mainThreadContext.Send(delegate
                         {
-                            initialiseBackgroundPlayer();
-                        }
-                        int backgroundDuration = 0;
-                        int backgroundOffset = 0;
-                        if (backgroundPlayer.NaturalDuration.HasTimeSpan)
-                        {
-                            backgroundDuration = (backgroundPlayer.NaturalDuration.TimeSpan.Minutes * 60) +
-                                backgroundPlayer.NaturalDuration.TimeSpan.Seconds;
-                            //Console.WriteLine("Duration from file is " + backgroundDuration);
-                            backgroundOffset = Utilities.random.Next(0, backgroundDuration - backgroundLeadout);
-                        }
-                        //Console.WriteLine("Background offset = " + backgroundOffset);
-                        backgroundPlayer.Position = TimeSpan.FromSeconds(backgroundOffset);
+                            // this looks like we're doing it the wrong way round but there's a short
+                            // delay playing the event sound, so if we kick off the background before the bleep
+                            if (!backgroundPlayerInitialised)
+                            {
+                                initialiseBackgroundPlayer();
+                            }
+                            int backgroundDuration = 0;
+                            int backgroundOffset = 0;
+                            if (backgroundPlayer.NaturalDuration.HasTimeSpan)
+                            {
+                                backgroundDuration = (backgroundPlayer.NaturalDuration.TimeSpan.Minutes * 60) +
+                                    backgroundPlayer.NaturalDuration.TimeSpan.Seconds;
+                                //Console.WriteLine("Duration from file is " + backgroundDuration);
+                                backgroundOffset = Utilities.random.Next(0, backgroundDuration - backgroundLeadout);
+                            }
+                            //Console.WriteLine("Background offset = " + backgroundOffset);
+                            backgroundPlayer.Position = TimeSpan.FromSeconds(backgroundOffset);
 
-                        // Restore the desired volume.
-                        backgroundPlayer.Volume = getBackgroundVolume();
-                        backgroundPlayer.Play();
-                    }, null);
+                            // Restore the desired volume.
+                            backgroundPlayer.Volume = getBackgroundVolume();
+                            backgroundPlayer.Play();
+                        }, null);
+                    }
+                    catch (Exception)
+                    {
+                        // ignore - edge case where the app's closing so as removed the UI thread when this call is invoked
+                    }
                 }
 
                 if (useShortBeepWhenOpeningChannel)
@@ -895,21 +929,28 @@ namespace CrewChiefV4.Audio
                 playEndSpeakingBeep();
                 if (getBackgroundVolume() > 0 && !mute)
                 {
-                    this.mainThreadContext.Send(delegate
+                    try
                     {
-                        if (!backgroundPlayerInitialised)
+                        this.mainThreadContext.Send(delegate
                         {
-                            initialiseBackgroundPlayer();
-                        }
-                        try
-                        {
-                            backgroundPlayer.Stop();
-                        }
-                        catch (Exception)
-                        {
-                            Console.WriteLine("Unable to stop background player");
-                        }
-                    }, null);
+                            if (!backgroundPlayerInitialised)
+                            {
+                                initialiseBackgroundPlayer();
+                            }
+                            try
+                            {
+                                backgroundPlayer.Stop();
+                            }
+                            catch (Exception)
+                            {
+                                Console.WriteLine("Unable to stop background player");
+                            }
+                        }, null);
+                    }
+                    catch (Exception)
+                    {
+                        // ignore - edge case where the app's closing so as removed the UI thread when this call is invoked
+                    }
                 }
                 if (soundCache != null)
                 {
@@ -1136,11 +1177,18 @@ namespace CrewChiefV4.Audio
 
         private void backgroundPlayer_MediaEnded(object sender, EventArgs e)
         {
-            this.mainThreadContext.Send(delegate
+            try
             {
-                Console.WriteLine("looping...");
-                backgroundPlayer.Position = TimeSpan.FromMilliseconds(1);
-            }, null);
+                this.mainThreadContext.Send(delegate
+                {
+                    Console.WriteLine("looping...");
+                    backgroundPlayer.Position = TimeSpan.FromMilliseconds(1);
+                }, null);
+            }
+            catch (Exception)
+            {
+                // ignore - edge case where the app's closing so as removed the UI thread when this call is invoked
+            }
         }
 
         // checks that another pearl isn't already queued. If one of the same type is already
