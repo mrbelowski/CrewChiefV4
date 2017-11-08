@@ -100,7 +100,7 @@
 # VINTAGE_F1_C, VINTAGE_STOCK_CAR,
 # F1, F2, F3, F4, FF, TC1, TC2, TC1_2014, AUDI_TT_CUP, AUDI_TT_VLN, CLIO_CUP, DTM, DTM_2013, V8_SUPERCAR, DTM_2014, DTM_2015, DTM_2016, TRANS_AM, HILL_CLIMB_ICONS, FORMULA_RENAULT,
 # MEGANE_TROPHY, NSU_TT, KTM_RR, INDYCAR, HYPER_CAR, HYPER_CAR_RACE, UNKNOWN_RACE, STOCK_V8, BOXER_CUP, NASCAR_2016, ISI_STOCKCAR_2015, RADICAL_SR3,
-# RS01_TROPHY, TRACKDAY_A, TRACKDAY_B
+# RS01_TROPHY, TRACKDAY_A, TRACKDAY_B, BMW_235I, CARRERA_CUP
 # 
 # Car classes can skip an entry if they're using the default - e.g. most cars
 # skip defaultTyreType so they use Unknown_Race - this is only overridden in
@@ -160,13 +160,19 @@
 			"timesInHundredths": true,
 			"enabledMessageTypes": "ALL"
 		},
-		{
-			"carClassEnum": "GT3",
-			"raceroomClassIds": [1703, 2922, 3375, 4516],
-			"pCarsClassNames": ["GT3"],
-			"rf2ClassNames": ["*GT3*"],
+        {
+            "carClassEnum": "GT3",
+            "raceroomClassIds": [ 1703, 2922, 3375, 4516 ],
+            "pCarsClassNames": [ "GT3" ],
+            "rf2ClassNames": [ "*GT3*" ],
             "acClassNames": [ "ks_audi_r8_lms", "*GT3*" ],
-            "iracingClassIds" : [101],
+            "iracingClassIds": [ 101 ],
+            "timesInHundredths": true,
+            "enabledMessageTypes": "ALL"
+        },
+        {
+			"carClassEnum": "CARRERA_CUP",
+			"raceroomClassIds": [6345],
 			"timesInHundredths": true,
 			"enabledMessageTypes": "ALL"
 		},
@@ -178,7 +184,7 @@
 		},
 		{
 			"carClassEnum": "GT4",
-			"raceroomClassIds": [1717, 6344],
+			"raceroomClassIds": [5825],
 			"pCarsClassNames": ["GT4"],
 			"rf2ClassNames": ["*GT4*"],
 			"acClassNames": ["*GT4*", "ks_bmw_m235i_racing", "lotus_evora_gx"],
@@ -197,9 +203,15 @@
 				}
 			}
 		},
-		{
-			"carClassEnum": "GT5",
-			"pCarsClassNames": ["GT5", "G40 Junior"],
+        {
+            "carClassEnum": "GT5",
+            "pCarsClassNames": [ "GT5", "G40 Junior" ],
+            "timesInHundredths": true,
+            "enabledMessageTypes": "ALL"
+        },
+        {
+			"carClassEnum": "BMW_235I",
+			"raceroomClassIds": [6344],
 			"timesInHundredths": true,
 			"enabledMessageTypes": "ALL"
 		},
@@ -780,7 +792,8 @@
 		},
 		{
 			"carClassEnum": "TRACKDAY_B",
-			"pCarsClassNames": ["Track Day B"],
+            "pCarsClassNames": [ "Track Day B" ],
+            "raceroomClassIds": [1717],
 			"timesInHundredths": true,
 			"enabledMessageTypes": "ALL"
 		}
