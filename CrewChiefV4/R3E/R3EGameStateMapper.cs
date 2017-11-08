@@ -704,7 +704,10 @@ namespace CrewChiefV4.RaceRoom
                 if (participantStruct.DriverInfo.SlotId != -1 && participantStruct.DriverInfo.SlotId != shared.VehicleInfo.SlotId)
                 {
                     String driverName = getNameFromBytes(participantStruct.DriverInfo.Name).ToLower();
-                    if (driverName.Length == 0 || driverName == currentGameState.SessionData.DriverRawName || opponentDriverNamesProcessedThisUpdate.Contains(driverName) || participantStruct.Place < 1) 
+                    if (driverName.Length == 0 || driverName == currentGameState.SessionData.DriverRawName || opponentDriverNamesProcessedThisUpdate.Contains(driverName) || participantStruct.Place < 1 ||
+                        participantStruct.FinishStatus == (int) CrewChiefV4.RaceRoom.RaceRoomConstant.FinishStatus.R3E_FINISH_STATUS_DNF ||
+                        participantStruct.FinishStatus == (int) CrewChiefV4.RaceRoom.RaceRoomConstant.FinishStatus.R3E_FINISH_STATUS_DNS ||
+                        participantStruct.FinishStatus == (int) CrewChiefV4.RaceRoom.RaceRoomConstant.FinishStatus.R3E_FINISH_STATUS_DQ)
                     {
                         continue;
                     }
