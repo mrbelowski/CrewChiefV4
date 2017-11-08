@@ -218,7 +218,7 @@ namespace CrewChiefV4.Events
             if (possibleMessages.Count > 0)
             {
                 int played = 0;
-                var shuffled = possibleMessages.OrderBy(item => Utilities.random.Next());
+                var shuffled = possibleMessages.OrderBy(item => Utilities.random.Next()).ToList();
                 foreach (var message in shuffled)
                 {
                     played++;
@@ -227,7 +227,7 @@ namespace CrewChiefV4.Events
                         break;
                     }
                     audioPlayer.playMessage(message);
-                }            
+                }
             }
             // TODO: in the countdown / pre-lights phase, we don't know how long the race is going to be so we can't use the 'get on with it' messages :(
         }
