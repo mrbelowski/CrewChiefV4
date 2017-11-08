@@ -310,6 +310,14 @@ namespace CrewChiefV4
             }
             try
             {
+                if (disable_alternative_voice_commands)
+                {
+                    Console.WriteLine("*Alternative voice commands are disabled, only the first command from each line in speech_recognition_config.txt will be available*");
+                }
+                else
+                {
+                    Console.WriteLine("Loading all voice command alternatives from speech_recognition_config.txt");
+                }
                 staticGrammarSize = 0;
                 Choices staticSpeechChoices = new Choices();
                 validateAndAdd(HOWS_MY_TYRE_WEAR, staticSpeechChoices);
