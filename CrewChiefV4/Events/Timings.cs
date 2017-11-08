@@ -559,88 +559,106 @@ namespace CrewChiefV4.Events
 
         public override void respond(String voiceMessage)
         {
-            Boolean haveData = false;
-            if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.WHERE_AM_I_FASTER))
+            if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.SESSION_STATUS) ||
+                SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.STATUS))
             {
-                GameStateData currentGameState = CrewChief.currentGameState;
-                if (currentGameState != null)
+                if (isLeading)
                 {
-                    OpponentData opponent = currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position - 1, false);
-                    if (opponent != null)
+                    if (currentGapBehind > 2)
                     {
-                        CrewChiefV4.GameState.TrackLandmarksTiming.LandmarkAndDeltaType landmarkAndDeltaType =
-                            currentGameState.SessionData.trackLandmarksTiming.getLandmarkWhereIAmFaster(opponent.trackLandmarksTiming, true, true);
-                        if (landmarkAndDeltaType != null && landmarkAndDeltaType.landmarkName != null)
-                        {
-                            haveData = true;
-                            // either we're faster on entry or faster through
-                            String attackFolder = landmarkAndDeltaType.deltaType == TrackLandmarksTiming.DeltaType.Time ? folderHeIsSlowerThroughCorner : folderHeIsSlowerEnteringCorner;
-                            audioPlayer.playMessageImmediately(new QueuedMessage("Timings/corner_to_attack_in",
-                                MessageContents(Pause(200), attackFolder, "corners/" + landmarkAndDeltaType.landmarkName), 0, this));
-                            trackLandmarkAttackDriverNamesUsed[opponent.DriverRawName] = currentGameState.Now;
-                        }
+                        audioPlayer.playMessageImmediately(new QueuedMessage("Timings/gap_behind",
+                                MessageContents(folderGapBehindIsNow, TimeSpanWrapper.FromMilliseconds(currentGapBehind * 1000, Precision.AUTO_GAPS)), 0, this));
                     }
-                }
-            }
-            else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.WHERE_AM_I_SLOWER))
-            {
-                GameStateData currentGameState = CrewChief.currentGameState;
-                if (currentGameState != null)
-                {
-                    OpponentData opponent = currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position + 1, false);
-                    if (opponent != null)
-                    {
-                        CrewChiefV4.GameState.TrackLandmarksTiming.LandmarkAndDeltaType landmarkAndDeltaType =
-                                    currentGameState.SessionData.trackLandmarksTiming.getLandmarkWhereIAmSlower(opponent.trackLandmarksTiming, true, true);
-                        if (landmarkAndDeltaType != null && landmarkAndDeltaType.landmarkName != null)
-                        {
-                            haveData = true;
-                            // either we're slower on entry or slower through
-                            String defendFolder = landmarkAndDeltaType.deltaType == TrackLandmarksTiming.DeltaType.Time ? folderHeIsFasterThroughCorner : folderHeIsFasterEnteringCorner;
-                            audioPlayer.playMessageImmediately(new QueuedMessage("Timings/corner_to_defend_in",
-                                MessageContents(Pause(200), defendFolder, "corners/" + landmarkAndDeltaType.landmarkName), 0, this));
-                            trackLandmarkDefendDriverNamesUsed[opponent.DriverRawName] = currentGameState.Now;
-                        }
-                    }
-                }
-            }
-            else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.WHATS_MY_GAP_IN_FRONT) && currentGapInFront != -1)
-            {
-                if (isLeading && isRace)
-                {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(Position.folderLeading, 0, this));
-                    
-                    haveData = true;
-                }
-                else 
-                {
-                    audioPlayer.playMessageImmediately(new QueuedMessage("Timings/gap_in_front",
-                        MessageContents(TimeSpanWrapper.FromMilliseconds(currentGapInFront * 1000, Precision.AUTO_GAPS)), 0, this));
-                    
-                    haveData = true;
-                }
-            }
-            else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.WHATS_MY_GAP_BEHIND) &&
-                currentGapBehind != -1)
-            {
-                if (isLast && isRace)
-                {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(Position.folderLast, 0, this));
-                    
-                    haveData = true;
                 }
                 else
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage("Timings/gap_behind",
-                        MessageContents(TimeSpanWrapper.FromMilliseconds(currentGapBehind * 1000, Precision.AUTO_GAPS)), 0, this));
-                    
-                    haveData = true;
+                    if (currentGapInFront > 2)
+                    {
+                        audioPlayer.playMessageImmediately(new QueuedMessage("Timings/gap_in_front",
+                            MessageContents(folderGapInFrontIsNow, TimeSpanWrapper.FromMilliseconds(currentGapInFront * 1000, Precision.AUTO_GAPS)), 0, this));
+                    }
                 }
             }
-            if (!haveData)
+            else
             {
-                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, this));
-                
+                Boolean haveData = false;
+                if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.WHERE_AM_I_FASTER))
+                {
+                    GameStateData currentGameState = CrewChief.currentGameState;
+                    if (currentGameState != null)
+                    {
+                        OpponentData opponent = currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position - 1, false);
+                        if (opponent != null)
+                        {
+                            CrewChiefV4.GameState.TrackLandmarksTiming.LandmarkAndDeltaType landmarkAndDeltaType =
+                                currentGameState.SessionData.trackLandmarksTiming.getLandmarkWhereIAmFaster(opponent.trackLandmarksTiming, true, true);
+                            if (landmarkAndDeltaType != null && landmarkAndDeltaType.landmarkName != null)
+                            {
+                                haveData = true;
+                                // either we're faster on entry or faster through
+                                String attackFolder = landmarkAndDeltaType.deltaType == TrackLandmarksTiming.DeltaType.Time ? folderHeIsSlowerThroughCorner : folderHeIsSlowerEnteringCorner;
+                                audioPlayer.playMessageImmediately(new QueuedMessage("Timings/corner_to_attack_in",
+                                    MessageContents(Pause(200), attackFolder, "corners/" + landmarkAndDeltaType.landmarkName), 0, this));
+                                trackLandmarkAttackDriverNamesUsed[opponent.DriverRawName] = currentGameState.Now;
+                            }
+                        }
+                    }
+                }
+                else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.WHERE_AM_I_SLOWER))
+                {
+                    GameStateData currentGameState = CrewChief.currentGameState;
+                    if (currentGameState != null)
+                    {
+                        OpponentData opponent = currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position + 1, false);
+                        if (opponent != null)
+                        {
+                            CrewChiefV4.GameState.TrackLandmarksTiming.LandmarkAndDeltaType landmarkAndDeltaType =
+                                        currentGameState.SessionData.trackLandmarksTiming.getLandmarkWhereIAmSlower(opponent.trackLandmarksTiming, true, true);
+                            if (landmarkAndDeltaType != null && landmarkAndDeltaType.landmarkName != null)
+                            {
+                                haveData = true;
+                                // either we're slower on entry or slower through
+                                String defendFolder = landmarkAndDeltaType.deltaType == TrackLandmarksTiming.DeltaType.Time ? folderHeIsFasterThroughCorner : folderHeIsFasterEnteringCorner;
+                                audioPlayer.playMessageImmediately(new QueuedMessage("Timings/corner_to_defend_in",
+                                    MessageContents(Pause(200), defendFolder, "corners/" + landmarkAndDeltaType.landmarkName), 0, this));
+                                trackLandmarkDefendDriverNamesUsed[opponent.DriverRawName] = currentGameState.Now;
+                            }
+                        }
+                    }
+                }
+                else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.WHATS_MY_GAP_IN_FRONT) && currentGapInFront != -1)
+                {
+                    if (isLeading && isRace)
+                    {
+                        audioPlayer.playMessageImmediately(new QueuedMessage(Position.folderLeading, 0, this));
+                        haveData = true;
+                    }
+                    else
+                    {
+                        audioPlayer.playMessageImmediately(new QueuedMessage("Timings/gap_in_front",
+                            MessageContents(TimeSpanWrapper.FromMilliseconds(currentGapInFront * 1000, Precision.AUTO_GAPS)), 0, this));
+                        haveData = true;
+                    }
+                }
+                else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.WHATS_MY_GAP_BEHIND) &&
+                    currentGapBehind != -1)
+                {
+                    if (isLast && isRace)
+                    {
+                        audioPlayer.playMessageImmediately(new QueuedMessage(Position.folderLast, 0, this));
+                        haveData = true;
+                    }
+                    else
+                    {
+                        audioPlayer.playMessageImmediately(new QueuedMessage("Timings/gap_behind",
+                            MessageContents(TimeSpanWrapper.FromMilliseconds(currentGapBehind * 1000, Precision.AUTO_GAPS)), 0, this));
+                        haveData = true;
+                    }
+                }
+                if (!haveData)
+                {
+                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, this));
+                }
             }
         }
 

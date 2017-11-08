@@ -25,10 +25,15 @@ namespace CrewChiefV4.Events
         private String folderPushExitingPits = "push_now/pits_exit_clear";
         private String folderTrafficBehindExitingPits = "push_now/pits_exit_traffic_behind";
 
+        public static String folderQualExitIntro = "push_now/we_have";
+        public static String folderQualExitOutroMinutes = "push_now/minutes_to_set_a_lap";
+        public static String folderQualExitOutroLaps = "push_now/laps_to_get_the_job_done";
+
         private Boolean playedNearEndTimePush;
         private int lapsToCountBackForOpponentBest = 4;
         private Boolean playedNearEndLapsPush;
 
+        private Boolean playedQualExitMessage = false;
         private float minTimeToBeInThisPosition = 60;
 
         public PushNow(AudioPlayer audioPlayer)
@@ -40,6 +45,7 @@ namespace CrewChiefV4.Events
         {
             playedNearEndTimePush = false;
             playedNearEndLapsPush = false;
+            playedQualExitMessage = false;
         }
 
         public override List<SessionType> applicableSessionTypes
@@ -101,6 +107,21 @@ namespace CrewChiefV4.Events
                 catch (Exception)
                 {
                     Console.WriteLine("Failed to report brake temp status on pit exit");
+                }
+                if (!playedQualExitMessage && currentGameState.SessionData.SessionType == SessionType.Qualify)
+                {
+                    playedQualExitMessage = true;
+                    if (currentGameState.SessionData.SessionNumberOfLaps > 0)
+                    {
+                        // special case for iracing - AFAIK no other games have number-of-laps in qual sessions
+                        audioPlayer.playMessage(new QueuedMessage("qual_pit_exit", MessageContents(folderQualExitIntro, 
+                            currentGameState.SessionData.SessionNumberOfLaps, folderQualExitOutroLaps), 0, this));
+                    }
+                    else if (currentGameState.SessionData.SessionHasFixedTime)
+                    {
+                        int minutesLeft = (int)Math.Floor(currentGameState.SessionData.SessionTimeRemaining / 60f);
+                        audioPlayer.playMessage(new QueuedMessage("qual_pit_exit", MessageContents(folderQualExitIntro, minutesLeft, folderQualExitOutroMinutes), 0, this));
+                    }
                 }
             }
             if(currentGameState.PositionAndMotionData.CarSpeed > 5 && isOpponentLeavingPits(currentGameState))

@@ -33,7 +33,12 @@ namespace CrewChiefV4
         public static String TOGGLE_YELLOW_FLAG_MESSAGES = Configuration.getUIString("toggle_yellow_flag_messages");
         public static String GET_FUEL_STATUS = Configuration.getUIString("get_fuel_status");
         public static String TOGGLE_MANUAL_FORMATION_LAP = Configuration.getUIString("toggle_manual_formation_lap");
-        public static String READ_CORNER_NAMES_FOR_LAP = Configuration.getUIString("read_corner_names_for_lap");        
+        public static String READ_CORNER_NAMES_FOR_LAP = Configuration.getUIString("read_corner_names_for_lap");
+
+        public static String GET_CAR_STATUS = Configuration.getUIString("get_car_status");
+        public static String GET_STATUS = Configuration.getUIString("get_status");
+        public static String GET_SESSION_STATUS = Configuration.getUIString("get_session_status");
+        public static String GET_DAMAGE_REPORT = Configuration.getUIString("get_damage_report");        
 
         private ControllerData networkGamePad = new ControllerData(Configuration.getUIString("udp_network_data_buttons"), DeviceType.Gamepad, UDP_NETWORK_CONTROLLER_GUID);
         
@@ -77,6 +82,10 @@ namespace CrewChiefV4
             addButtonAssignment(TOGGLE_MANUAL_FORMATION_LAP);
             addButtonAssignment(PRINT_TRACK_DATA);
             addButtonAssignment(READ_CORNER_NAMES_FOR_LAP);
+            addButtonAssignment(GET_CAR_STATUS);
+            addButtonAssignment(GET_DAMAGE_REPORT);
+            addButtonAssignment(GET_SESSION_STATUS);
+            addButtonAssignment(GET_STATUS);
             controllers = loadControllers();
         }
 
@@ -109,6 +118,11 @@ namespace CrewChiefV4
             pollForButtonClicks(buttonAssignments[buttonAssignmentIndexes[READ_CORNER_NAMES_FOR_LAP]]);
             pollForButtonClicks(buttonAssignments[buttonAssignmentIndexes[PRINT_TRACK_DATA]]);
             pollForButtonClicks(buttonAssignments[buttonAssignmentIndexes[CHANNEL_OPEN_FUNCTION]]);
+            pollForButtonClicks(buttonAssignments[buttonAssignmentIndexes[GET_STATUS]]);
+            pollForButtonClicks(buttonAssignments[buttonAssignmentIndexes[GET_SESSION_STATUS]]);
+            pollForButtonClicks(buttonAssignments[buttonAssignmentIndexes[GET_DAMAGE_REPORT]]);
+            pollForButtonClicks(buttonAssignments[buttonAssignmentIndexes[GET_CAR_STATUS]]);
+
         }
 
         private void pollForButtonClicks(ButtonAssignment ba)
@@ -248,6 +262,22 @@ namespace CrewChiefV4
                 {
                     actionId = "READ_CORNER_NAMES_FOR_LAP";
                 }
+                else if (buttonAssignment.action == GET_CAR_STATUS)
+                {
+                    actionId = "GET_CAR_STATUS";
+                }
+                else if (buttonAssignment.action == GET_DAMAGE_REPORT)
+                {
+                    actionId = "GET_DAMAGE_REPORT";
+                }
+                else if (buttonAssignment.action == GET_SESSION_STATUS)
+                {
+                    actionId = "GET_SESSION_STATUS";
+                }
+                else if (buttonAssignment.action == GET_STATUS)
+                {
+                    actionId = "GET_STATUS";
+                }
 
                 if (buttonAssignment.controller != null && (buttonAssignment.joystick != null || buttonAssignment.controller.guid == UDP_NETWORK_CONTROLLER_GUID) && buttonAssignment.buttonIndex != -1)
                 {
@@ -347,6 +377,34 @@ namespace CrewChiefV4
             if (readCornerNamesForLapButtonIndex != -1 && readCornerNamesForLapDeviceGuid.Length > 0)
             {
                 loadAssignment(parent, READ_CORNER_NAMES_FOR_LAP, readCornerNamesForLapButtonIndex, readCornerNamesForLapDeviceGuid);
+            }
+
+            int getStatusButtonIndex = UserSettings.GetUserSettings().getInt("GET_STATUS_button_index");
+            String getStatusDeviceGuid = UserSettings.GetUserSettings().getString("GET_STATUS_device_guid");
+            if (getStatusButtonIndex != -1 && getStatusDeviceGuid.Length > 0)
+            {
+                loadAssignment(parent, GET_STATUS, getStatusButtonIndex, getStatusDeviceGuid);
+            }
+
+            int getDamageReportButtonIndex = UserSettings.GetUserSettings().getInt("GET_DAMAGE_REPORT_button_index");
+            String getDamageReportDeviceGuid = UserSettings.GetUserSettings().getString("GET_DAMAGE_REPORT_device_guid");
+            if (getDamageReportButtonIndex != -1 && getDamageReportDeviceGuid.Length > 0)
+            {
+                loadAssignment(parent, GET_DAMAGE_REPORT, getDamageReportButtonIndex, getDamageReportDeviceGuid);
+            }
+
+            int getCarStatusButtonIndex = UserSettings.GetUserSettings().getInt("GET_CAR_STATUS_button_index");
+            String getCarStatusDeviceGuid = UserSettings.GetUserSettings().getString("GET_CAR_STATUS_device_guid");
+            if (getCarStatusButtonIndex != -1 && getCarStatusDeviceGuid.Length > 0)
+            {
+                loadAssignment(parent, GET_CAR_STATUS, getCarStatusButtonIndex, getCarStatusDeviceGuid);
+            }
+
+            int getSessionStatusButtonIndex = UserSettings.GetUserSettings().getInt("GET_SESSION_STATUS_button_index");
+            String getSessionStatusDeviceGuid = UserSettings.GetUserSettings().getString("GET_SESSION_STATUS_device_guid");
+            if (getSessionStatusButtonIndex != -1 && getSessionStatusDeviceGuid.Length > 0)
+            {
+                loadAssignment(parent, GET_SESSION_STATUS, getSessionStatusButtonIndex, getSessionStatusDeviceGuid);
             }
         }
 

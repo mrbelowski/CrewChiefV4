@@ -115,6 +115,11 @@ namespace CrewChiefV4
 
         public static String[] PLAY_CORNER_NAMES = Configuration.getSpeechRecognitionPhrases("PLAY_CORNER_NAMES");
 
+        public static String[] DAMAGE_REPORT = Configuration.getSpeechRecognitionPhrases("DAMAGE_REPORT");
+        public static String[] CAR_STATUS = Configuration.getSpeechRecognitionPhrases("CAR_STATUS");
+        public static String[] SESSION_STATUS = Configuration.getSpeechRecognitionPhrases("SESSION_STATUS");
+        public static String[] STATUS = Configuration.getSpeechRecognitionPhrases("STATUS");
+
         private CrewChief crewChief;
 
         public Boolean initialised = false;
@@ -315,6 +320,11 @@ namespace CrewChiefV4
                 validateAndAdd(WHAT_TYRES_AM_I_ON, staticSpeechChoices);
                 validateAndAdd(WHAT_ARE_THE_RELATIVE_TYRE_PERFORMANCES, staticSpeechChoices);
                 validateAndAdd(PLAY_CORNER_NAMES, staticSpeechChoices);
+
+                validateAndAdd(DAMAGE_REPORT, staticSpeechChoices);
+                validateAndAdd(CAR_STATUS, staticSpeechChoices);
+                validateAndAdd(SESSION_STATUS, staticSpeechChoices);
+                validateAndAdd(STATUS, staticSpeechChoices);
 
                 foreach (String s in CALCULATE_FUEL_FOR)
                 {
@@ -774,6 +784,23 @@ namespace CrewChiefV4
             else if (ResultContains(recognisedSpeech, WHAT_TYRES_AM_I_ON))
             {
                 return CrewChief.getEvent("Opponents");
+            }
+                // multiple events for status reporting:
+            else if (ResultContains(recognisedSpeech, DAMAGE_REPORT))
+            {
+                CrewChief.getDamageReport();
+            }
+            else if (ResultContains(recognisedSpeech, CAR_STATUS))
+            {
+                CrewChief.getCarStatus();
+            }
+            else if (ResultContains(recognisedSpeech, STATUS))
+            {
+                CrewChief.getStatus();
+            }
+            else if (ResultContains(recognisedSpeech, SESSION_STATUS))
+            {
+                CrewChief.getSessionStatus();
             }
             return null;
         }

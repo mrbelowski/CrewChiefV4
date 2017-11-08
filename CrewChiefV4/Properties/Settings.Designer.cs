@@ -2506,5 +2506,149 @@ namespace CrewChiefV4.Properties {
                 this["last_trace_file_name"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-1")]
+        public int GET_CAR_STATUS_button_index {
+            get {
+                return ((int)(this["GET_CAR_STATUS_button_index"]));
+            }
+            set {
+                this["GET_CAR_STATUS_button_index"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string GET_CAR_STATUS_device_guid {
+            get {
+                return ((string)(this["GET_CAR_STATUS_device_guid"]));
+            }
+            set {
+                this["GET_CAR_STATUS_device_guid"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string GET_CAR_STATUS_device_type {
+            get {
+                return ((string)(this["GET_CAR_STATUS_device_type"]));
+            }
+            set {
+                this["GET_CAR_STATUS_device_type"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-1")]
+        public int GET_STATUS_button_index {
+            get {
+                return ((int)(this["GET_STATUS_button_index"]));
+            }
+            set {
+                this["GET_STATUS_button_index"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string GET_STATUS_device_guid {
+            get {
+                return ((string)(this["GET_STATUS_device_guid"]));
+            }
+            set {
+                this["GET_STATUS_device_guid"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string GET_STATUS_device_type {
+            get {
+                return ((string)(this["GET_STATUS_device_type"]));
+            }
+            set {
+                this["GET_STATUS_device_type"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-1")]
+        public int GET_SESSION_STATUS_button_index {
+            get {
+                return ((int)(this["GET_SESSION_STATUS_button_index"]));
+            }
+            set {
+                this["GET_SESSION_STATUS_button_index"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string GET_SESSION_STATUS_device_guid {
+            get {
+                return ((string)(this["GET_SESSION_STATUS_device_guid"]));
+            }
+            set {
+                this["GET_SESSION_STATUS_device_guid"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string GET_SESSION_STATUS_device_type {
+            get {
+                return ((string)(this["GET_SESSION_STATUS_device_type"]));
+            }
+            set {
+                this["GET_SESSION_STATUS_device_type"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-1")]
+        public int GET_DAMAGE_REPORT_button_index {
+            get {
+                return ((int)(this["GET_DAMAGE_REPORT_button_index"]));
+            }
+            set {
+                this["GET_DAMAGE_REPORT_button_index"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string GET_DAMAGE_REPORT_device_guid {
+            get {
+                return ((string)(this["GET_DAMAGE_REPORT_device_guid"]));
+            }
+            set {
+                this["GET_DAMAGE_REPORT_device_guid"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string GET_DAMAGE_REPORT_device_type {
+            get {
+                return ((string)(this["GET_DAMAGE_REPORT_device_type"]));
+            }
+            set {
+                this["GET_DAMAGE_REPORT_device_type"] = value;
+            }
+        }
     }
 }
