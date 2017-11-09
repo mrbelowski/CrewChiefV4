@@ -409,6 +409,7 @@ namespace CrewChiefV4.RaceRoom
                     currentGameState.SessionData.PlayerClassSessionBestLapTime = previousGameState.SessionData.PlayerClassSessionBestLapTime;
                     currentGameState.SessionData.GameTimeAtLastPositionFrontChange = previousGameState.SessionData.GameTimeAtLastPositionFrontChange;
                     currentGameState.SessionData.GameTimeAtLastPositionBehindChange = previousGameState.SessionData.GameTimeAtLastPositionBehindChange;
+                    currentGameState.SessionData.CurrentLapIsValid = previousGameState.SessionData.CurrentLapIsValid;
                     currentGameState.SessionData.LastSector1Time = previousGameState.SessionData.LastSector1Time;
                     currentGameState.SessionData.LastSector2Time = previousGameState.SessionData.LastSector2Time;
                     currentGameState.SessionData.LastSector3Time = previousGameState.SessionData.LastSector3Time;
@@ -510,7 +511,6 @@ namespace CrewChiefV4.RaceRoom
             currentGameState.SessionData.CompletedLaps = shared.CompletedLaps;
 
             currentGameState.SessionData.LapTimeCurrent = shared.LapTimeCurrentSelf;
-            currentGameState.SessionData.CurrentLapIsValid = currentGameState.SessionData.LapTimeCurrent != -1;
             currentGameState.SessionData.LapTimePrevious = shared.LapTimePreviousSelf;
             currentGameState.SessionData.PreviousLapWasValid = shared.LapTimePreviousSelf > 0;
             currentGameState.SessionData.NumCars = shared.NumCars;
@@ -569,6 +569,7 @@ namespace CrewChiefV4.RaceRoom
                     if (currentGameState.SessionData.IsNewLap)
                     {
                         currentGameState.readLandmarksForThisLap = false;
+                        currentGameState.SessionData.CurrentLapIsValid = true;
                     }
                     
                     if (currentGameState.SessionData.CurrentLapIsValid && participantStruct.CurrentLapValid != 1) {
@@ -587,17 +588,26 @@ namespace CrewChiefV4.RaceRoom
                                 previousGameState != null && previousGameState.SessionData.CurrentLapIsValid)
                             {
                                 float sectorTime = participantStruct.SectorTimePreviousSelf.Sector3 - participantStruct.SectorTimeCurrentSelf.Sector2;
-                                currentGameState.SessionData.LastSector3Time = sectorTime;
-                                if (currentGameState.SessionData.PlayerBestSector3Time == -1 || currentGameState.SessionData.LastSector3Time < currentGameState.SessionData.PlayerBestSector3Time)
+                                if (sectorTime == currentGameState.SessionData.LastSector3Time)
                                 {
-                                    currentGameState.SessionData.PlayerBestSector3Time = currentGameState.SessionData.LastSector3Time;
+                                    Console.WriteLine("Identical sector3 time to previous lap");
+                                    // TODO: does it make sense to drop this lap as invalid, like we do for opponents?
+                                    currentGameState.SessionData.LastSector3Time = -1;
                                 }
-                                if (currentGameState.SessionData.LapTimePrevious > 0 &&
-                                    (currentGameState.SessionData.PlayerLapTimeSessionBest == -1 || currentGameState.SessionData.LapTimePrevious <= currentGameState.SessionData.PlayerLapTimeSessionBest))
+                                else
                                 {
-                                    currentGameState.SessionData.PlayerBestLapSector1Time = currentGameState.SessionData.LastSector1Time;
-                                    currentGameState.SessionData.PlayerBestLapSector2Time = currentGameState.SessionData.LastSector2Time;
-                                    currentGameState.SessionData.PlayerBestLapSector3Time = currentGameState.SessionData.LastSector3Time;
+                                    currentGameState.SessionData.LastSector3Time = sectorTime;
+                                    if (currentGameState.SessionData.PlayerBestSector3Time == -1 || currentGameState.SessionData.LastSector3Time < currentGameState.SessionData.PlayerBestSector3Time)
+                                    {
+                                        currentGameState.SessionData.PlayerBestSector3Time = currentGameState.SessionData.LastSector3Time;
+                                    }
+                                    if (currentGameState.SessionData.LapTimePrevious > 0 &&
+                                        (currentGameState.SessionData.PlayerLapTimeSessionBest == -1 || currentGameState.SessionData.LapTimePrevious <= currentGameState.SessionData.PlayerLapTimeSessionBest))
+                                    {
+                                        currentGameState.SessionData.PlayerBestLapSector1Time = currentGameState.SessionData.LastSector1Time;
+                                        currentGameState.SessionData.PlayerBestLapSector2Time = currentGameState.SessionData.LastSector2Time;
+                                        currentGameState.SessionData.PlayerBestLapSector3Time = currentGameState.SessionData.LastSector3Time;
+                                    }
                                 }
                             }
                             else
@@ -610,10 +620,20 @@ namespace CrewChiefV4.RaceRoom
                             currentGameState.SessionData.SessionTimesAtEndOfSectors[1] = currentGameState.SessionData.SessionRunningTime;
                             if (participantStruct.SectorTimeCurrentSelf.Sector1 > 0 && currentGameState.SessionData.CurrentLapIsValid)
                             {
-                                currentGameState.SessionData.LastSector1Time = participantStruct.SectorTimeCurrentSelf.Sector1;
-                                if (currentGameState.SessionData.PlayerBestSector1Time == -1 || currentGameState.SessionData.LastSector1Time < currentGameState.SessionData.PlayerBestSector1Time)
+                                if (currentGameState.SessionData.LastSector1Time == participantStruct.SectorTimeCurrentSelf.Sector1)
                                 {
-                                    currentGameState.SessionData.PlayerBestSector1Time = currentGameState.SessionData.LastSector1Time;
+                                    Console.WriteLine("Identical sector1 time to previous lap");
+                                    // TODO: does it make sense to drop this lap as invalid, like we do for opponents?
+                                    currentGameState.SessionData.LastSector1Time = -1;
+                                    currentGameState.SessionData.CurrentLapIsValid = false;
+                                }
+                                else
+                                {
+                                    currentGameState.SessionData.LastSector1Time = participantStruct.SectorTimeCurrentSelf.Sector1;
+                                    if (currentGameState.SessionData.PlayerBestSector1Time == -1 || currentGameState.SessionData.LastSector1Time < currentGameState.SessionData.PlayerBestSector1Time)
+                                    {
+                                        currentGameState.SessionData.PlayerBestSector1Time = currentGameState.SessionData.LastSector1Time;
+                                    }
                                 }
                             }
                             else
@@ -628,10 +648,20 @@ namespace CrewChiefV4.RaceRoom
                                  currentGameState.SessionData.CurrentLapIsValid)
                             {
                                 float sectorTime = participantStruct.SectorTimeCurrentSelf.Sector2 - participantStruct.SectorTimeCurrentSelf.Sector1;
-                                currentGameState.SessionData.LastSector2Time = sectorTime;
-                                if (currentGameState.SessionData.PlayerBestSector2Time == -1 || currentGameState.SessionData.LastSector2Time < currentGameState.SessionData.PlayerBestSector2Time)
+                                if (currentGameState.SessionData.LastSector2Time == sectorTime)
                                 {
-                                    currentGameState.SessionData.PlayerBestSector2Time = currentGameState.SessionData.LastSector2Time;
+                                    Console.WriteLine("Identical sector2 time to previous lap");
+                                    // TODO: does it make sense to drop this lap as invalid, like we do for opponents?
+                                    currentGameState.SessionData.LastSector2Time = -1;
+                                    currentGameState.SessionData.CurrentLapIsValid = false;
+                                }
+                                else
+                                {
+                                    currentGameState.SessionData.LastSector2Time = sectorTime;
+                                    if (currentGameState.SessionData.PlayerBestSector2Time == -1 || currentGameState.SessionData.LastSector2Time < currentGameState.SessionData.PlayerBestSector2Time)
+                                    {
+                                        currentGameState.SessionData.PlayerBestSector2Time = currentGameState.SessionData.LastSector2Time;
+                                    }
                                 }
                             }
                             else
