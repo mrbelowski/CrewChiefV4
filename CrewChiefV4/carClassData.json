@@ -793,6 +793,11 @@
 		{
 			"carClassEnum": "TRACKDAY_B",
             "pCarsClassNames": [ "Track Day B" ],
+			"timesInHundredths": true,
+			"enabledMessageTypes": "ALL"
+		},
+		{
+			"carClassEnum": "R3E_SILHOUETTE",
             "raceroomClassIds": [1717],
 			"timesInHundredths": true,
 			"enabledMessageTypes": "ALL"
