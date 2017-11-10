@@ -1853,6 +1853,10 @@ namespace CrewChiefV4.GameState
         public FlagData FlagData = new FlagData();
 
         public FrozenOrderData FrozenOrderData = new FrozenOrderData();
+
+        public HashSet<String> retriedDriverNames = new HashSet<String>();
+
+        public HashSet<String> disqualifiedDriverNames = new HashSet<String>();
         
         private static TimeSpan MaxWaitForNewLapData = TimeSpan.FromSeconds(3);
 

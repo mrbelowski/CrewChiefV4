@@ -44,6 +44,9 @@ namespace CrewChiefV4.Events
         // optional intro for opponent position (not used in English)
         public static String folderOpponentPositionIntro = "position/opponent_position_intro";
 
+        public static String folderHasJustRetired = "opponents/has_just_retired";
+        public static String folderHasJustBeenDisqualified = "opponents/has_just_been_disqualified";
+
         private int frequencyOfOpponentRaceLapTimes = UserSettings.GetUserSettings().getInt("frequency_of_opponent_race_lap_times");
         private int frequencyOfOpponentPracticeAndQualLapTimes = UserSettings.GetUserSettings().getInt("frequency_of_opponent_practice_and_qual_lap_times");
         private float minImprovementBeforeReadingOpponentRaceTime;
@@ -56,6 +59,9 @@ namespace CrewChiefV4.Events
         private DateTime nextCarAheadChangeMessage = DateTime.MinValue;
 
         private string positionIsPlayerKey = "";
+
+        // single set here because we never want to announce a DQ and a retirement for the same guy
+        private HashSet<String> announcedRetirementsAndDQs = new HashSet<String>();
 
         public Opponents(AudioPlayer audioPlayer)
         {
@@ -74,6 +80,7 @@ namespace CrewChiefV4.Events
             currentGameState = null;
             nextLeadChangeMessage = DateTime.MinValue;
             nextCarAheadChangeMessage = DateTime.MinValue;
+            announcedRetirementsAndDQs.Clear();
         }
 
         public override bool isMessageStillValid(string eventSubType, GameStateData currentGameState, Dictionary<String, Object> validationData)
@@ -265,6 +272,30 @@ namespace CrewChiefV4.Events
 
             if (currentGameState.SessionData.SessionType == SessionType.Race)
             {
+                foreach (String retiredDriver in currentGameState.retriedDriverNames)
+                {
+                    if (!announcedRetirementsAndDQs.Contains(retiredDriver))
+                    {
+                        announcedRetirementsAndDQs.Add(retiredDriver);
+                        String nameToAnnounce = DriverNameHelper.getUsableDriverName(retiredDriver);
+                        if (SoundCache.hasSuitableTTSVoice || SoundCache.availableDriverNames.Contains(nameToAnnounce))
+                        {
+                            audioPlayer.playMessage(new QueuedMessage("retirement", MessageContents(nameToAnnounce, folderHasJustRetired), 0, this));
+                        }
+                    }
+                }
+                foreach (String dqDriver in currentGameState.disqualifiedDriverNames)
+                {
+                    if (!announcedRetirementsAndDQs.Contains(dqDriver))
+                    {
+                        announcedRetirementsAndDQs.Add(dqDriver);
+                        String nameToAnnounce = DriverNameHelper.getUsableDriverName(dqDriver);
+                        if (SoundCache.hasSuitableTTSVoice || SoundCache.availableDriverNames.Contains(nameToAnnounce))
+                        {
+                            audioPlayer.playMessage(new QueuedMessage("retirement", MessageContents(nameToAnnounce, folderHasJustBeenDisqualified), 0, this));
+                        }
+                    }
+                }
                 if (!currentGameState.SessionData.IsRacingSameCarInFront)
                 {
                     if (currentGameState.SessionData.Position > 2 && currentGameState.Now > nextCarAheadChangeMessage && !currentGameState.PitData.InPitlane
