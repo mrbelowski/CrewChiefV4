@@ -631,6 +631,7 @@ namespace CrewChiefV4.PCars2
                     String participantName = StructHelper.getNameFromBytes(participantStruct.mName).ToLower();
                     if (participantName != null && participantName.Length > 0 && !namesInRawData.Contains(participantName))
                     {
+                        namesInRawData.Add(participantName);
                         if (shared.mRaceStates[i] == (uint)eRaceState.RACESTATE_DNF || shared.mRaceStates[i] == (uint)eRaceState.RACESTATE_RETIRED)
                         {
                             if (!currentGameState.retriedDriverNames.Contains(participantName))
@@ -659,9 +660,8 @@ namespace CrewChiefV4.PCars2
                             }
                             continue;
                         }
-
                         CarData.CarClass opponentCarClass = CarData.getCarClassForClassName(StructHelper.getCarClassName(shared, i));
-                        namesInRawData.Add(participantName);
+                        
                         if (currentGameState.OpponentData.ContainsKey(participantName))
                         {
                             OpponentData currentOpponentData = currentGameState.OpponentData[participantName];
