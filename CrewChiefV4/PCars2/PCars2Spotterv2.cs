@@ -42,6 +42,8 @@ namespace CrewChiefV4.PCars2
 
         private string currentPlayerCarClassID = "#not_set#";
 
+        private HashSet<uint> positionsFilledForThisTick = new HashSet<uint>();
+
         public PCars2Spotterv2(AudioPlayer audioPlayer, Boolean initialEnabledState)
         {
             this.audioPlayer = audioPlayer;
@@ -138,6 +140,8 @@ namespace CrewChiefV4.PCars2
                     playerVelocityData[1] = currentState.mWorldVelocity[0];
                     playerVelocityData[2] = currentState.mWorldVelocity[2];
 
+                    positionsFilledForThisTick.Clear();
+                    positionsFilledForThisTick.Add(playerData.mRacePosition);
                     for (int i = 0; i < currentState.mParticipantData.Count(); i++)
                     {
                         if (i == playerIndex)
@@ -145,10 +149,11 @@ namespace CrewChiefV4.PCars2
                             continue;
                         }
                         pCars2APIParticipantStruct opponentData = currentState.mParticipantData[i];
-                        if (opponentData.mIsActive)
+                        if (opponentData.mIsActive && !positionsFilledForThisTick.Contains(opponentData.mRacePosition))
                         {
                             float[] currentPositions = new float[] { opponentData.mWorldPosition[0], opponentData.mWorldPosition[2] };
                             currentOpponentPositions.Add(currentPositions);
+                            positionsFilledForThisTick.Add(opponentData.mRacePosition);
                         }
                     }
                     if (currentOpponentPositions.Count() > 0)

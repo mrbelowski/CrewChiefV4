@@ -1,6 +1,19 @@
 <!DOCTYPE html>
 <html>
 <body>
+<h2>Version 4.8.1.4</h2>
+<ul>
+	<li>Better pruning of pCARS2 stale and duplicated opponent data in online sessions (hacks adapted from pCARS1 to work around bugs inherited from pCARS1)</li>
+	<li>Added opponent retired and opponent disqualified messages (pCARS2 / R3E) - will be enabled with next sound pack update</li>
+	<li>R3E and pCARS2 car and track mapping fixes</li>
+</ul>
+<h2>Version 4.8.1.3</h2>
+<ul>
+    <li>Fixed an issue in the speech recogniser where grammars were initialised multiple times, reducing recognition accuracy - this should make the recogniser work more reliably</li>
+	<li>Fixed an issue in R3E and AC where a invalidated in sector 3 could cause stale best-lap data to be announced</li>
+	<li>Remove opponents who are reported as DNF / DQ / DNS in R3E</li>
+	<li>Added experimental option 'Disable alternative voice commands' (disabled by default). Enabling this will force the speech recogniser to only load the first command from each row in speech_recognition_config.txt. Instead of recognising any of "who's leading", "who's in the lead", "who is leading", "who is in the lead", or "who's the leader" the app will only recognise the first in the list - "who's leading". This will limit the number of phrases the recogniser understands and *may* improve recognition accuracy</li>
+</ul>
 <h2>Version 4.8.1.2</h2>
 <ul>
 	<li>More iRacing bug fixes, mostly around session state tracking</li>

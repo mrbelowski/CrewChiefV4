@@ -73,6 +73,12 @@ namespace CrewChiefV4.PCars2
 
         private static int lastGuessAtPlayerIndex = -1;
 
+        Dictionary<string, DateTime> lastActiveTimeForOpponents = new Dictionary<string, DateTime>();
+        DateTime nextOpponentCleanupTime = DateTime.MinValue;
+        TimeSpan opponentCleanupInterval = TimeSpan.FromSeconds(4);
+        HashSet<uint> positionsFilledForThisTick = new HashSet<uint>();
+        List<String> opponentDriverNamesProcessedForThisTick = new List<String>();
+
         public PCars2GameStateMapper()
         {
             CornerData.EnumWithThresholds suspensionDamageNone = new CornerData.EnumWithThresholds(DamageLevel.NONE, -10000, trivialSuspensionDamageThreshold);
@@ -284,6 +290,8 @@ namespace CrewChiefV4.PCars2
                             (currentGameState.SessionData.SessionHasFixedTime && currentGameState.SessionData.SessionTimeRemaining > lastSessionTimeRemaining + 1))))
             {
                 lastGuessAtPlayerIndex = -1;
+                lastActiveTimeForOpponents.Clear();
+                nextOpponentCleanupTime = currentGameState.Now + opponentCleanupInterval;
                 Console.WriteLine("New session, trigger...");
                 if (sessionOfSameTypeRestarted)
                 {
@@ -327,15 +335,23 @@ namespace CrewChiefV4.PCars2
                 brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(currentGameState.carClass);
                 // no tyre data in the block so get the default tyre types for this car
                 defaultTyreTypeForPlayersCar = CarData.getDefaultTyreType(currentGameState.carClass);
+
+                opponentDriverNamesProcessedForThisTick.Clear();
+                opponentDriverNamesProcessedForThisTick.Add(playerName);
+                positionsFilledForThisTick.Clear();
+                positionsFilledForThisTick.Add((uint)currentGameState.SessionData.Position);
                 for (int i = 0; i < shared.mParticipantData.Length; i++)
                 {
                     pCars2APIParticipantStruct participantStruct = shared.mParticipantData[i];
                     String participantName = StructHelper.getNameFromBytes(participantStruct.mName).ToLower();
-                    if (i != playerIndex && participantStruct.mIsActive && participantName != null && participantName.Length > 0)
+                    if (i != playerIndex && participantStruct.mIsActive && participantName != null && participantName.Length > 0
+                        && !opponentDriverNamesProcessedForThisTick.Contains(participantName) && !positionsFilledForThisTick.Contains(participantStruct.mRacePosition))
                     {
                         CarData.CarClass opponentCarClass = CarData.getCarClassForClassName(StructHelper.getCarClassName(shared, i));
                         addOpponentForName(participantName, createOpponentData(participantStruct, false, opponentCarClass,
                             participantStruct.mName != null && participantStruct.mName[0] != 0, currentGameState.SessionData.TrackDefinition.trackLength), currentGameState);
+                        opponentDriverNamesProcessedForThisTick.Add(participantName);
+                        positionsFilledForThisTick.Add(participantStruct.mRacePosition);
                     }
                 }
 
@@ -359,6 +375,8 @@ namespace CrewChiefV4.PCars2
                     if (currentGameState.SessionData.SessionPhase == SessionPhase.Green)
                     {
                         // just gone green, so get the session data.
+                        lastActiveTimeForOpponents.Clear();
+                        nextOpponentCleanupTime = currentGameState.Now + opponentCleanupInterval;
                         if (currentGameState.SessionData.SessionType == SessionType.Race)
                         {
                             justGoneGreen = true;
@@ -482,6 +500,9 @@ namespace CrewChiefV4.PCars2
                     currentGameState.SessionData.DeltaTime.lapsCompleted = previousGameState.SessionData.DeltaTime.lapsCompleted;
                     currentGameState.SessionData.DeltaTime.totalDistanceTravelled = previousGameState.SessionData.DeltaTime.totalDistanceTravelled;
                     currentGameState.SessionData.DeltaTime.trackLength = previousGameState.SessionData.DeltaTime.trackLength;
+
+                    currentGameState.disqualifiedDriverNames = previousGameState.disqualifiedDriverNames;
+                    currentGameState.retriedDriverNames = previousGameState.retriedDriverNames;
                 }                
             }
 
@@ -602,7 +623,13 @@ namespace CrewChiefV4.PCars2
             currentGameState.SessionData.TimeDeltaBehind = shared.mSplitTimeBehind;
             currentGameState.SessionData.TimeDeltaFront = shared.mSplitTimeAhead;
 
-            List<String> namesInRawData = new List<String>();
+            opponentDriverNamesProcessedForThisTick.Clear();
+            opponentDriverNamesProcessedForThisTick.Add(playerName);
+            positionsFilledForThisTick.Clear();
+            positionsFilledForThisTick.Add((uint)currentGameState.SessionData.Position);
+            // the player can appear many times in the participant data array. We have no sane way of knowing which is the 'correct' player.
+            // So all we can do is discard all of them as duplicates. Where an opponent appears multiple times, only use the first one. All 
+            // these stupid bugs have existed since PCars1
             for (int i = 0; i < shared.mParticipantData.Length; i++)
             {
                 if (i != playerIndex)
@@ -613,17 +640,52 @@ namespace CrewChiefV4.PCars2
                         // first character of name is null - this means the game regards this driver as inactive or missing for this update
                         continue;
                     }
-                    CarData.CarClass opponentCarClass = CarData.getCarClassForClassName(StructHelper.getCarClassName(shared, i));
-                    String participantName = StructHelper.getNameFromBytes(participantStruct.mName).ToLower();
-
-                    if (participantName != null && participantName.Length > 0 && !namesInRawData.Contains(participantName))
+                    if (positionsFilledForThisTick.Contains(participantStruct.mRacePosition))
                     {
-                        namesInRawData.Add(participantName);
+                        // discard this participant element because the race position is already occupied
+                        continue;
+                    }
+                    String participantName = StructHelper.getNameFromBytes(participantStruct.mName).ToLower();
+                    if (participantName != null && participantName.Length > 0 && !opponentDriverNamesProcessedForThisTick.Contains(participantName))
+                    {
+                        opponentDriverNamesProcessedForThisTick.Add(participantName);
+                        positionsFilledForThisTick.Add(participantStruct.mRacePosition);
+                        if (shared.mRaceStates[i] == (uint)eRaceState.RACESTATE_DNF || shared.mRaceStates[i] == (uint)eRaceState.RACESTATE_RETIRED)
+                        {
+                            if (!currentGameState.retriedDriverNames.Contains(participantName))
+                            {
+                                Console.WriteLine("Opponent " + participantName + " has retired");
+                                currentGameState.retriedDriverNames.Add(participantName);
+                            }
+                            // remove this driver from the set immediately
+                            if (currentGameState.OpponentData.ContainsKey(participantName))
+                            {
+                                currentGameState.OpponentData.Remove(participantName);
+                            }
+                            continue;
+                        }
+                        if (shared.mRaceStates[i] == (uint)eRaceState.RACESTATE_DISQUALIFIED)
+                        {
+                            if (!currentGameState.disqualifiedDriverNames.Contains(participantName))
+                            {
+                                Console.WriteLine("Opponent " + participantName + " has been disqualified");
+                                currentGameState.disqualifiedDriverNames.Add(participantName);
+                            }
+                            // remove this driver from the set immediately
+                            if (currentGameState.OpponentData.ContainsKey(participantName))
+                            {
+                                currentGameState.OpponentData.Remove(participantName);
+                            }
+                            continue;
+                        }
+                        CarData.CarClass opponentCarClass = CarData.getCarClassForClassName(StructHelper.getCarClassName(shared, i));
+                        
                         if (currentGameState.OpponentData.ContainsKey(participantName))
                         {
                             OpponentData currentOpponentData = currentGameState.OpponentData[participantName];
                             if (participantStruct.mIsActive)
                             {
+                                lastActiveTimeForOpponents[participantName] = currentGameState.Now;
                                 if (previousGameState != null)
                                 {
                                     int previousOpponentSectorNumber = 1;
@@ -780,6 +842,25 @@ namespace CrewChiefV4.PCars2
                             }
                         }
                     }
+                }
+            }
+
+            if (currentGameState.Now > nextOpponentCleanupTime)
+            {
+                nextOpponentCleanupTime = currentGameState.Now + opponentCleanupInterval;
+                DateTime oldestAllowedUpdate = currentGameState.Now - opponentCleanupInterval;
+                List<string> inactiveOpponents = new List<string>();
+                foreach (string opponentName in currentGameState.OpponentData.Keys)
+                {
+                    if (!lastActiveTimeForOpponents.ContainsKey(opponentName) || lastActiveTimeForOpponents[opponentName] < oldestAllowedUpdate)
+                    {
+                        inactiveOpponents.Add(opponentName);
+                        Console.WriteLine("Opponent " + opponentName + " has been inactive for " + opponentCleanupInterval + ", removing him");
+                    }
+                }
+                foreach (String inactiveOpponent in inactiveOpponents)
+                {
+                    currentGameState.OpponentData.Remove(inactiveOpponent);
                 }
             }
             
@@ -1323,7 +1404,7 @@ namespace CrewChiefV4.PCars2
                         else if (now > nextDebugCheckeredToFinishMessageTime)
                         {
                             Console.WriteLine("Session has finished but there are " + waitingForCount + " cars still out on track");
-                            nextDebugCheckeredToFinishMessageTime.Add(TimeSpan.FromSeconds(10));
+                            nextDebugCheckeredToFinishMessageTime = now.Add(TimeSpan.FromSeconds(10));
                         }
                     }
                     return currentPhase;

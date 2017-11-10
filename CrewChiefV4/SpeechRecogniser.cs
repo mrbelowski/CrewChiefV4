@@ -19,6 +19,7 @@ namespace CrewChiefV4
 
         private float minimum_name_voice_recognition_confidence = UserSettings.GetUserSettings().getFloat("minimum_name_voice_recognition_confidence");
         private float minimum_voice_recognition_confidence = UserSettings.GetUserSettings().getFloat("minimum_voice_recognition_confidence");
+        private Boolean disable_alternative_voice_commands = UserSettings.GetUserSettings().getBoolean("disable_alternative_voice_commands");
 
         private static String defaultLocale = Configuration.getSpeechRecognitionConfigOption("defaultLocale");
 
@@ -147,6 +148,9 @@ namespace CrewChiefV4
         // guard against race condition between closing channel and sre_SpeechRecognised event completing
         public static Boolean keepRecognisingInHoldMode = false;
 
+        private int staticGrammarSize = 0;
+        private int dynamicGrammarSize = 0;
+
         // load voice commands for triggering keyboard macros. The String key of the input Dictionary is the
         // command list key in speech_recognition_config.txt. When one of these phrases is heard the map value
         // CommandMacro is executed.
@@ -166,12 +170,13 @@ namespace CrewChiefV4
                     macroLookup.Add(triggerPhrase, voiceTriggeredMacros[triggerPhrase]);
                 }
                 macroChoices.Add(triggerPhrase);
-                GrammarBuilder macroGrammarBuilder = new GrammarBuilder();
-                macroGrammarBuilder.Culture = cultureInfo;
-                macroGrammarBuilder.Append(macroChoices);
-                macroGrammar = new Grammar(macroGrammarBuilder);
-                sre.LoadGrammar(macroGrammar);
+                
             }
+            GrammarBuilder macroGrammarBuilder = new GrammarBuilder();
+            macroGrammarBuilder.Culture = cultureInfo;
+            macroGrammarBuilder.Append(macroChoices);
+            macroGrammar = new Grammar(macroGrammarBuilder);
+            sre.LoadGrammar(macroGrammar);
             Console.WriteLine("Loaded " + voiceTriggeredMacros.Count + " macro voice triggers into the speech recogniser");
         }
 
@@ -243,7 +248,16 @@ namespace CrewChiefV4
                 }
                 if (valid)
                 {
-                    choices.Add(speechPhrases);
+                    if (disable_alternative_voice_commands)
+                    {
+                        staticGrammarSize++;
+                        choices.Add(speechPhrases[0]);
+                    }
+                    else
+                    {
+                        staticGrammarSize+=speechPhrases.Length;
+                        choices.Add(speechPhrases);
+                    }                    
                 }
             }
         }
@@ -296,6 +310,15 @@ namespace CrewChiefV4
             }
             try
             {
+                if (disable_alternative_voice_commands)
+                {
+                    Console.WriteLine("*Alternative voice commands are disabled, only the first command from each line in speech_recognition_config.txt will be available*");
+                }
+                else
+                {
+                    Console.WriteLine("Loading all voice command alternatives from speech_recognition_config.txt");
+                }
+                staticGrammarSize = 0;
                 Choices staticSpeechChoices = new Choices();
                 validateAndAdd(HOWS_MY_TYRE_WEAR, staticSpeechChoices);
                 validateAndAdd(HOWS_MY_TRANSMISSION, staticSpeechChoices);
@@ -338,10 +361,12 @@ namespace CrewChiefV4
                         {
                             foreach (String lapArray in LAP)
                             {
+                                staticGrammarSize++;
                                 staticSpeechChoices.Add(s + " " + entry.Key + " " + lapArray);
                             }
                             foreach (String minuteArray in MINUTE)
                             {
+                                staticGrammarSize++;
                                 staticSpeechChoices.Add(s + " " + entry.Key + " " + minuteArray);
                             }
                         }
@@ -349,10 +374,12 @@ namespace CrewChiefV4
                         {
                             foreach (String lapsArray in LAPS)
                             {
+                                staticGrammarSize++;
                                 staticSpeechChoices.Add(s + " " + entry.Key + " " + lapsArray);
                             }
                             foreach (String minutesArray in MINUTES)
                             {
+                                staticGrammarSize++;
                                 staticSpeechChoices.Add(s + " " + entry.Key + " " + minutesArray);
                             }
                         }
@@ -363,6 +390,7 @@ namespace CrewChiefV4
                         {
                             foreach (String hourArray in HOUR)
                             {
+                                staticGrammarSize++;
                                 staticSpeechChoices.Add(s + " " + entry.Key + " " + hourArray);
                             }
                         }
@@ -370,9 +398,14 @@ namespace CrewChiefV4
                         {
                             foreach (String hoursArray in HOURS)
                             {
+                                staticGrammarSize++;
                                 staticSpeechChoices.Add(s + " " + entry.Key + " " + hoursArray);
                             }
                         }
+                    }
+                    if (disable_alternative_voice_commands)
+                    {
+                        break;
                     }
                 }
 
@@ -409,6 +442,7 @@ namespace CrewChiefV4
                 staticGrammarBuilder.Append(staticSpeechChoices);
                 Grammar staticGrammar = new Grammar(staticGrammarBuilder);
                 sre.LoadGrammar(staticGrammar);
+                Console.WriteLine("Loaded " + staticGrammarSize + " items into static grammar");
             }
             catch (Exception e)
             {
@@ -457,6 +491,8 @@ namespace CrewChiefV4
                         Grammar newOpponentGrammar = new Grammar(opponentGrammarBuilder);
                         sre.LoadGrammar(newOpponentGrammar);
                         opponentGrammarList.Add(newOpponentGrammar);
+                        dynamicGrammarSize+=5;
+                        Console.WriteLine("added 5 items to dynamic (opponent) grammar, total is now " + dynamicGrammarSize);
                     }
                     // This method is called when a new driver appears mid-session. We need to load the sound file for this new driver
                     // so do it here - nasty nasty hack, need to refactor this. The alternative is to call
@@ -473,7 +509,8 @@ namespace CrewChiefV4
 
         public void addOpponentSpeechRecognition(List<String> names, Boolean useNames)
         {
-            driverNamesInUse.Clear();            
+            driverNamesInUse.Clear();
+            dynamicGrammarSize = 0;
             foreach (Grammar opponentGrammar in opponentGrammarList)
             {
                 sre.UnloadGrammar(opponentGrammar);
@@ -490,6 +527,7 @@ namespace CrewChiefV4
                     opponentChoices.Add(WHATS + " " + name + POSSESSIVE + " " + BEST_LAP);
                     opponentChoices.Add(WHAT_TYRES_IS + " " + name + " " + ON);
                     opponentChoices.Add(WHAT_TYRE_IS + " " + name + " " + ON);
+                    dynamicGrammarSize += 5;
                 }
             }
             foreach (KeyValuePair<String, int> entry in numberToNumber)
@@ -506,6 +544,7 @@ namespace CrewChiefV4
                 opponentChoices.Add(WHAT_TYRES_IS + " " + POSITION_SHORT + " " + entry.Key + " " + ON);
                 opponentChoices.Add(WHERE_IS + " " + POSITION_SHORT + " " + entry.Key);
                 opponentChoices.Add(WHERE_IS + " " + POSITION_LONG + " " + entry.Key);
+                dynamicGrammarSize += 12;
             }
             opponentChoices.Add(WHATS + " " + THE_LEADER + POSSESSIVE + " " + BEST_LAP);
             opponentChoices.Add(WHATS + " " + THE_LEADER + POSSESSIVE + " " + LAST_LAP);
@@ -529,6 +568,7 @@ namespace CrewChiefV4
             opponentChoices.Add(WHAT_TYRES_IS + " " + THE_GUY_AHEAD + " " + ON);
             opponentChoices.Add(WHAT_TYRE_IS + " " + THE_GUY_BEHIND + " " + ON);
             opponentChoices.Add(WHAT_TYRES_IS + " " + THE_GUY_BEHIND + " " + ON);
+            dynamicGrammarSize += 20;
 
             validateAndAdd(WHOS_IN_FRONT_IN_THE_RACE, opponentChoices);
             validateAndAdd(WHOS_BEHIND_IN_THE_RACE, opponentChoices);
@@ -543,6 +583,7 @@ namespace CrewChiefV4
             sre.LoadGrammar(newOpponentGrammar);
             opponentGrammarList.Add(newOpponentGrammar);
             driverNamesInUse.AddRange(names);
+            Console.WriteLine("Loaded " + dynamicGrammarSize + " items into dynamic (opponent) grammar");
         }
 
         public static Boolean ResultContains(String result, String[] alternatives)

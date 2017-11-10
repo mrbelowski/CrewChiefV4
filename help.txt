@@ -116,6 +116,7 @@ The app understands lots of command including:
 "what tyre(s) is [opponent driver last name / opponent race position] on" (DTM 2014 only - reports "options" or "primes")
 "what are my sector times"
 "what's my last sector time"
+"what's the [air / track] [temp / temperature]"
 "who's leading" (this one only works if you have the driver name recording for the lead car)
 "who's [ahead / ahead in the race / in front / in front in the race / behind / behind in the race]" (gives the name of the car in front / behind in the race or on the timing sheet for qual / practice. This one only works if you have the driver name recording for that driver)
 "who's [ahead on track / in front on track / behind on track]" (gives the name of the car in front / behind in on track, regardless of his race / qual position. This one only works if you have the driver name recording for that driver)
@@ -133,8 +134,11 @@ The app understands lots of command including:
 "Where should I attack / where am I faster / where can I attack": If the app has enough data, will report the corner name where you're gaining the most time on the guy in front
 "Where should I defend / where am I slower / where is he faster / where will he attack": If the app has enough data, will report the corner name where you're losing the most time to the guy behind
 "Read corner names / corner names / tell me the corner names": read out each corner name when you hit the mid-point of the corner, for this lap only (useful to test corner name mappings)
-
-
+"Damage report / how's my car / is my car ok" : read out any damage you have
+"Car status" : read out any damage, along with tyre wear, brake wear, engine temps etc if the values for these are not in the ideal range
+"Session status / race status" : give an overview of the session - time left, position, gaps, pitstop status etc
+"Full update / full status / update me" : damage report, car status and session status combined
+"What's the time / what time is it" : read the current (clock) time
 
 Command macros
 --------------
