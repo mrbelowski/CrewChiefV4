@@ -429,6 +429,9 @@ namespace CrewChiefV4.RaceRoom
                     currentGameState.SessionData.DeltaTime.lapsCompleted = previousGameState.SessionData.DeltaTime.lapsCompleted;
                     currentGameState.SessionData.DeltaTime.totalDistanceTravelled = previousGameState.SessionData.DeltaTime.totalDistanceTravelled;
                     currentGameState.SessionData.DeltaTime.trackLength = previousGameState.SessionData.DeltaTime.trackLength;
+
+                    currentGameState.retriedDriverNames = previousGameState.retriedDriverNames;
+                    currentGameState.disqualifiedDriverNames = previousGameState.disqualifiedDriverNames;
                 }
             }
 
@@ -734,11 +737,38 @@ namespace CrewChiefV4.RaceRoom
                 if (participantStruct.DriverInfo.SlotId != -1 && participantStruct.DriverInfo.SlotId != shared.VehicleInfo.SlotId)
                 {
                     String driverName = getNameFromBytes(participantStruct.DriverInfo.Name).ToLower();
-                    if (driverName.Length == 0 || driverName == currentGameState.SessionData.DriverRawName || opponentDriverNamesProcessedThisUpdate.Contains(driverName) || participantStruct.Place < 1 ||
-                        participantStruct.FinishStatus == (int) CrewChiefV4.RaceRoom.RaceRoomConstant.FinishStatus.R3E_FINISH_STATUS_DNF ||
-                        participantStruct.FinishStatus == (int) CrewChiefV4.RaceRoom.RaceRoomConstant.FinishStatus.R3E_FINISH_STATUS_DNS ||
-                        participantStruct.FinishStatus == (int) CrewChiefV4.RaceRoom.RaceRoomConstant.FinishStatus.R3E_FINISH_STATUS_DQ)
+                    if (driverName.Length == 0 || driverName == currentGameState.SessionData.DriverRawName || opponentDriverNamesProcessedThisUpdate.Contains(driverName) ||
+                        participantStruct.Place < 1 || participantStruct.FinishStatus == (int)CrewChiefV4.RaceRoom.RaceRoomConstant.FinishStatus.R3E_FINISH_STATUS_DNS)
                     {
+                        // allow these drivers be pruned from the set if we continue to receive no data for them
+                        continue;
+                    } 
+                    else if (participantStruct.FinishStatus == (int) CrewChiefV4.RaceRoom.RaceRoomConstant.FinishStatus.R3E_FINISH_STATUS_DNF)
+                    {
+                        // remove this driver from the set immediately
+                        if (!currentGameState.retriedDriverNames.Contains(driverName))
+                        {
+                            Console.WriteLine("Opponent " + driverName + " has retired");
+                            currentGameState.retriedDriverNames.Add(driverName);
+                        }
+                        if (currentGameState.OpponentData.ContainsKey(driverName))
+                        {
+                            currentGameState.OpponentData.Remove(driverName);
+                        }
+                        continue;
+                    }
+                    else if (participantStruct.FinishStatus == (int) CrewChiefV4.RaceRoom.RaceRoomConstant.FinishStatus.R3E_FINISH_STATUS_DQ)
+                    {
+                        // remove this driver from the set immediately
+                        if (!currentGameState.disqualifiedDriverNames.Contains(driverName))
+                        {
+                            Console.WriteLine("Opponent " + driverName + " has been disqualified");
+                            currentGameState.disqualifiedDriverNames.Add(driverName);
+                        }
+                        if (currentGameState.OpponentData.ContainsKey(driverName))
+                        {
+                            currentGameState.OpponentData.Remove(driverName);
+                        } 
                         continue;
                     }
                     lastActiveTimeForOpponents[driverName] = currentGameState.Now;
