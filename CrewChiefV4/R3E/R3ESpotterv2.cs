@@ -35,6 +35,8 @@ namespace CrewChiefV4.RaceRoom
 
         private string currentPlayerCarClassID = "#not_set#";
 
+        private HashSet<int> positionsFilledForThisTick = new HashSet<int>();
+
         public R3ESpotterv2(AudioPlayer audioPlayer, Boolean initialEnabledState)
         {
             this.audioPlayer = audioPlayer;
@@ -128,12 +130,16 @@ namespace CrewChiefV4.RaceRoom
                 playerVelocityData[1] = (currentPlayerData.Position.X - previousPlayerData.Position.X) / timeDiffSeconds;
                 playerVelocityData[2] = (currentPlayerData.Position.Z - previousPlayerData.Position.Z) / timeDiffSeconds;
 
+                positionsFilledForThisTick.Clear();
+                positionsFilledForThisTick.Add(currentPlayerData.Place);
                 foreach (DriverData driverData in currentState.DriverData)
                 {
-                    if (driverData.DriverInfo.SlotId == currentState.VehicleInfo.SlotId || driverData.DriverInfo.SlotId == -1 || driverData.InPitlane == 1)
+                    if (driverData.DriverInfo.SlotId == currentState.VehicleInfo.SlotId || driverData.DriverInfo.SlotId == -1 || driverData.InPitlane == 1 ||
+                        positionsFilledForThisTick.Contains(driverData.Place))
                     {
                         continue;
                     }
+                    positionsFilledForThisTick.Add(driverData.Place);
                     currentOpponentPositions.Add(new float[] { driverData.Position.X, driverData.Position.Z });
                 }
                 float playerRotation = currentState.CarOrientation.Yaw;                
