@@ -76,6 +76,8 @@ namespace CrewChiefV4.PCars2
         Dictionary<string, DateTime> lastActiveTimeForOpponents = new Dictionary<string, DateTime>();
         DateTime nextOpponentCleanupTime = DateTime.MinValue;
         TimeSpan opponentCleanupInterval = TimeSpan.FromSeconds(4);
+        HashSet<uint> positionsFilledForThisTick = new HashSet<uint>();
+        List<String> opponentDriverNamesProcessedForThisTick = new List<String>();
 
         public PCars2GameStateMapper()
         {
@@ -333,15 +335,23 @@ namespace CrewChiefV4.PCars2
                 brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(currentGameState.carClass);
                 // no tyre data in the block so get the default tyre types for this car
                 defaultTyreTypeForPlayersCar = CarData.getDefaultTyreType(currentGameState.carClass);
+
+                opponentDriverNamesProcessedForThisTick.Clear();
+                opponentDriverNamesProcessedForThisTick.Add(playerName);
+                positionsFilledForThisTick.Clear();
+                positionsFilledForThisTick.Add((uint)currentGameState.SessionData.Position);
                 for (int i = 0; i < shared.mParticipantData.Length; i++)
                 {
                     pCars2APIParticipantStruct participantStruct = shared.mParticipantData[i];
                     String participantName = StructHelper.getNameFromBytes(participantStruct.mName).ToLower();
-                    if (i != playerIndex && participantStruct.mIsActive && participantName != null && participantName.Length > 0)
+                    if (i != playerIndex && participantStruct.mIsActive && participantName != null && participantName.Length > 0
+                        && !opponentDriverNamesProcessedForThisTick.Contains(participantName) && !positionsFilledForThisTick.Contains(participantStruct.mRacePosition))
                     {
                         CarData.CarClass opponentCarClass = CarData.getCarClassForClassName(StructHelper.getCarClassName(shared, i));
                         addOpponentForName(participantName, createOpponentData(participantStruct, false, opponentCarClass,
                             participantStruct.mName != null && participantStruct.mName[0] != 0, currentGameState.SessionData.TrackDefinition.trackLength), currentGameState);
+                        opponentDriverNamesProcessedForThisTick.Add(participantName);
+                        positionsFilledForThisTick.Add(participantStruct.mRacePosition);
                     }
                 }
 
@@ -613,8 +623,10 @@ namespace CrewChiefV4.PCars2
             currentGameState.SessionData.TimeDeltaBehind = shared.mSplitTimeBehind;
             currentGameState.SessionData.TimeDeltaFront = shared.mSplitTimeAhead;
 
-            List<String> namesInRawData = new List<String>();
-            namesInRawData.Add(playerName);
+            opponentDriverNamesProcessedForThisTick.Clear();
+            opponentDriverNamesProcessedForThisTick.Add(playerName);
+            positionsFilledForThisTick.Clear();
+            positionsFilledForThisTick.Add((uint)currentGameState.SessionData.Position);
             // the player can appear many times in the participant data array. We have no sane way of knowing which is the 'correct' player.
             // So all we can do is discard all of them as duplicates. Where an opponent appears multiple times, only use the first one. All 
             // these stupid bugs have existed since PCars1
@@ -628,10 +640,16 @@ namespace CrewChiefV4.PCars2
                         // first character of name is null - this means the game regards this driver as inactive or missing for this update
                         continue;
                     }
-                    String participantName = StructHelper.getNameFromBytes(participantStruct.mName).ToLower();
-                    if (participantName != null && participantName.Length > 0 && !namesInRawData.Contains(participantName))
+                    if (positionsFilledForThisTick.Contains(participantStruct.mRacePosition))
                     {
-                        namesInRawData.Add(participantName);
+                        // discard this participant element because the race position is already occupied
+                        continue;
+                    }
+                    String participantName = StructHelper.getNameFromBytes(participantStruct.mName).ToLower();
+                    if (participantName != null && participantName.Length > 0 && !opponentDriverNamesProcessedForThisTick.Contains(participantName))
+                    {
+                        opponentDriverNamesProcessedForThisTick.Add(participantName);
+                        positionsFilledForThisTick.Add(participantStruct.mRacePosition);
                         if (shared.mRaceStates[i] == (uint)eRaceState.RACESTATE_DNF || shared.mRaceStates[i] == (uint)eRaceState.RACESTATE_RETIRED)
                         {
                             if (!currentGameState.retriedDriverNames.Contains(participantName))

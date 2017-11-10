@@ -614,7 +614,7 @@ namespace CrewChiefV4.GameState
 
         public override string ToString()
         {
-            return DriverRawName;
+            return DriverRawName + " position " + Position + " lapsCompleted " + CompletedLaps + " lapDist " + DistanceRoundTrack;
         }
 
         public LapData getCurrentLapData()

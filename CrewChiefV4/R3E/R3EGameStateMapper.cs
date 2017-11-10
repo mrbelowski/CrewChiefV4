@@ -94,6 +94,9 @@ namespace CrewChiefV4.RaceRoom
         DateTime nextOpponentCleanupTime = DateTime.MinValue;
         TimeSpan opponentCleanupInterval = TimeSpan.FromSeconds(2);
 
+        HashSet<int> positionsFilledForThisTick = new HashSet<int>();
+        List<String> opponentDriverNamesProcessedForThisTick = new List<String>();
+
         class PendingRacePositionChange
         {
             public int newPosition;
@@ -180,7 +183,6 @@ namespace CrewChiefV4.RaceRoom
                 currentGameState.SessionData.SessionRunningTime, shared.SessionPhase, currentGameState.ControlData.ControlType,
                 previousLapsCompleted, shared.CompletedLaps, isCarRunning, shared.FlagsExtended.checkered == 1);
 
-            List<String> opponentDriverNamesProcessedThisUpdate = new List<String>();
             Boolean justGoneGreen = false;
             if ((lastSessionPhase != currentGameState.SessionData.SessionPhase && (lastSessionPhase == SessionPhase.Unavailable || lastSessionPhase == SessionPhase.Finished)) ||
                 ((lastSessionPhase == SessionPhase.Checkered || lastSessionPhase == SessionPhase.Finished || lastSessionPhase == SessionPhase.Green || lastSessionPhase == SessionPhase.FullCourseYellow) && 
@@ -223,6 +225,7 @@ namespace CrewChiefV4.RaceRoom
 
                 baselineEngineDataOilTemp = targetEngineOilTemp;
                 baselineEngineDataWaterTemp = targetEngineWaterTemp;
+                opponentDriverNamesProcessedForThisTick.Clear();
                 for (int i = 0; i < shared.DriverData.Length; i++)
                 {
                     DriverData participantStruct = shared.DriverData[i];
@@ -251,13 +254,9 @@ namespace CrewChiefV4.RaceRoom
                     {
                         if (driverName.Length > 0 && currentGameState.SessionData.DriverRawName != driverName)
                         {
-                            if (opponentDriverNamesProcessedThisUpdate.Contains(driverName))
+                            if (!opponentDriverNamesProcessedForThisTick.Contains(driverName))
                             {
-                                // would be nice to warn here, but this happens a lot :(
-                            }
-                            else
-                            {
-                                opponentDriverNamesProcessedThisUpdate.Add(driverName);
+                                opponentDriverNamesProcessedForThisTick.Add(driverName);
                                 currentGameState.OpponentData.Add(driverName, createOpponentData(participantStruct, driverName,
                                     false, CarData.getCarClassForRaceRoomId(participantStruct.DriverInfo.ClassId).carClassEnum, currentGameState.SessionData.TrackDefinition.trackLength));
                             }
@@ -732,12 +731,21 @@ namespace CrewChiefV4.RaceRoom
                 currentGameState.SessionData.trackLandmarksTiming.cancelWaitingForLandmarkEnd();
             }
 
+            opponentDriverNamesProcessedForThisTick.Clear();
+            opponentDriverNamesProcessedForThisTick.Add(playerName);
+            positionsFilledForThisTick.Clear();
+            positionsFilledForThisTick.Add(currentGameState.SessionData.Position);
             foreach (DriverData participantStruct in shared.DriverData)
             {
                 if (participantStruct.DriverInfo.SlotId != -1 && participantStruct.DriverInfo.SlotId != shared.VehicleInfo.SlotId)
                 {
+                    if (positionsFilledForThisTick.Contains(participantStruct.Place))
+                    {
+                        // discard this participant element because the race position is already occupied
+                        continue;
+                    }
                     String driverName = getNameFromBytes(participantStruct.DriverInfo.Name).ToLower();
-                    if (driverName.Length == 0 || driverName == currentGameState.SessionData.DriverRawName || opponentDriverNamesProcessedThisUpdate.Contains(driverName) ||
+                    if (driverName.Length == 0 || driverName == currentGameState.SessionData.DriverRawName || opponentDriverNamesProcessedForThisTick.Contains(driverName) ||
                         participantStruct.Place < 1 || participantStruct.FinishStatus == (int)CrewChiefV4.RaceRoom.RaceRoomConstant.FinishStatus.R3E_FINISH_STATUS_DNS)
                     {
                         // allow these drivers be pruned from the set if we continue to receive no data for them
@@ -772,9 +780,10 @@ namespace CrewChiefV4.RaceRoom
                         continue;
                     }
                     lastActiveTimeForOpponents[driverName] = currentGameState.Now;
+                    positionsFilledForThisTick.Add(participantStruct.Place);
+                    opponentDriverNamesProcessedForThisTick.Add(driverName);
                     if (currentGameState.OpponentData.ContainsKey(driverName))
-                    {
-                        opponentDriverNamesProcessedThisUpdate.Add(driverName);
+                    {                        
                         if (previousGameState != null)
                         {
                             OpponentData previousOpponentData = null;
@@ -967,7 +976,6 @@ namespace CrewChiefV4.RaceRoom
                     }
                     else
                     {
-                        opponentDriverNamesProcessedThisUpdate.Add(driverName);
                         currentGameState.OpponentData.Add(driverName, createOpponentData(participantStruct, driverName, true,
                             CarData.getCarClassForRaceRoomId(participantStruct.DriverInfo.ClassId).carClassEnum, currentGameState.SessionData.TrackDefinition.trackLength));
                     }
