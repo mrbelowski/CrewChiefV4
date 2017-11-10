@@ -521,6 +521,9 @@ namespace CrewChiefV4.rFactor2
                 csd.DeltaTime.totalDistanceTravelled = psd.DeltaTime.totalDistanceTravelled;
                 csd.DeltaTime.trackLength = psd.DeltaTime.trackLength;
                 cgs.readLandmarksForThisLap = previousGameState.readLandmarksForThisLap;
+
+                cgs.retriedDriverNames = pgs.retriedDriverNames;
+                cgs.disqualifiedDriverNames = pgs.disqualifiedDriverNames;
             }
 
             csd.SessionStartTime = csd.IsNewSession ? cgs.Now : psd.SessionStartTime;
@@ -1164,6 +1167,28 @@ namespace CrewChiefV4.rFactor2
                 else
                 {
                     opponentKey = driverName;
+                }
+
+                var ofs = (rFactor2Constants.rF2FinishStatus)vehicleScoring.mFinishStatus;
+                if (ofs == rFactor2Constants.rF2FinishStatus.Dnf)
+                {
+                    // Note driver DNF and don't tack him anymore.
+                    if (!cgs.retriedDriverNames.Contains(driverName))
+                    {
+                        Console.WriteLine("Opponent " + driverName + " has retired");
+                        cgs.retriedDriverNames.Add(driverName);
+                    }
+                    continue;
+                }
+                else if (ofs == rFactor2Constants.rF2FinishStatus.Dq)
+                {
+                    // Note driver DQ and don't tack him anymore.
+                    if (!cgs.disqualifiedDriverNames.Contains(driverName))
+                    {
+                        Console.WriteLine("Opponent " + driverName + " has been disqualified");
+                        cgs.disqualifiedDriverNames.Add(driverName);
+                    }
+                    continue;
                 }
 
                 opponentPrevious = pgs == null || opponentKey == null || !pgs.OpponentData.ContainsKey(opponentKey) ? null : previousGameState.OpponentData[opponentKey];
