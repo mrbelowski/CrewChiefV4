@@ -1603,7 +1603,7 @@ namespace CrewChiefV4.PCars
                         else if (now > nextDebugCheckeredToFinishMessageTime)
                         {
                             Console.WriteLine("Session has finished but there are " + waitingForCount + " cars still out on track");
-                            nextDebugCheckeredToFinishMessageTime.Add(TimeSpan.FromSeconds(10));
+                            nextDebugCheckeredToFinishMessageTime = now.Add(TimeSpan.FromSeconds(10));
                         }
                     }
                     return currentPhase;
