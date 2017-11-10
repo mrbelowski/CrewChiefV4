@@ -407,6 +407,11 @@ namespace CrewChiefV4.RaceRoom
             public Int32 TireTypeRear;
             public Int32 TireSubTypeFront;
             public Int32 TireSubTypeRear;
+
+            public override string ToString()
+            {
+                return "position " + Place + " name " + R3EGameStateMapper.getNameFromBytes(DriverInfo.Name).ToLower() + " lapsCompleted " + CompletedLaps + " lapDist " + LapDistance;
+            }
         }
 
         [StructLayout(LayoutKind.Sequential, Pack = 1)]

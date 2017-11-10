@@ -94,6 +94,9 @@ namespace CrewChiefV4.RaceRoom
         DateTime nextOpponentCleanupTime = DateTime.MinValue;
         TimeSpan opponentCleanupInterval = TimeSpan.FromSeconds(2);
 
+        HashSet<int> positionsFilledForThisTick = new HashSet<int>();
+        List<String> opponentDriverNamesProcessedForThisTick = new List<String>();
+
         class PendingRacePositionChange
         {
             public int newPosition;
@@ -180,7 +183,6 @@ namespace CrewChiefV4.RaceRoom
                 currentGameState.SessionData.SessionRunningTime, shared.SessionPhase, currentGameState.ControlData.ControlType,
                 previousLapsCompleted, shared.CompletedLaps, isCarRunning, shared.FlagsExtended.checkered == 1);
 
-            List<String> opponentDriverNamesProcessedThisUpdate = new List<String>();
             Boolean justGoneGreen = false;
             if ((lastSessionPhase != currentGameState.SessionData.SessionPhase && (lastSessionPhase == SessionPhase.Unavailable || lastSessionPhase == SessionPhase.Finished)) ||
                 ((lastSessionPhase == SessionPhase.Checkered || lastSessionPhase == SessionPhase.Finished || lastSessionPhase == SessionPhase.Green || lastSessionPhase == SessionPhase.FullCourseYellow) && 
@@ -223,6 +225,7 @@ namespace CrewChiefV4.RaceRoom
 
                 baselineEngineDataOilTemp = targetEngineOilTemp;
                 baselineEngineDataWaterTemp = targetEngineWaterTemp;
+                opponentDriverNamesProcessedForThisTick.Clear();
                 for (int i = 0; i < shared.DriverData.Length; i++)
                 {
                     DriverData participantStruct = shared.DriverData[i];
@@ -251,13 +254,9 @@ namespace CrewChiefV4.RaceRoom
                     {
                         if (driverName.Length > 0 && currentGameState.SessionData.DriverRawName != driverName)
                         {
-                            if (opponentDriverNamesProcessedThisUpdate.Contains(driverName))
+                            if (!opponentDriverNamesProcessedForThisTick.Contains(driverName))
                             {
-                                // would be nice to warn here, but this happens a lot :(
-                            }
-                            else
-                            {
-                                opponentDriverNamesProcessedThisUpdate.Add(driverName);
+                                opponentDriverNamesProcessedForThisTick.Add(driverName);
                                 currentGameState.OpponentData.Add(driverName, createOpponentData(participantStruct, driverName,
                                     false, CarData.getCarClassForRaceRoomId(participantStruct.DriverInfo.ClassId).carClassEnum, currentGameState.SessionData.TrackDefinition.trackLength));
                             }
@@ -409,6 +408,7 @@ namespace CrewChiefV4.RaceRoom
                     currentGameState.SessionData.PlayerClassSessionBestLapTime = previousGameState.SessionData.PlayerClassSessionBestLapTime;
                     currentGameState.SessionData.GameTimeAtLastPositionFrontChange = previousGameState.SessionData.GameTimeAtLastPositionFrontChange;
                     currentGameState.SessionData.GameTimeAtLastPositionBehindChange = previousGameState.SessionData.GameTimeAtLastPositionBehindChange;
+                    currentGameState.SessionData.CurrentLapIsValid = previousGameState.SessionData.CurrentLapIsValid;
                     currentGameState.SessionData.LastSector1Time = previousGameState.SessionData.LastSector1Time;
                     currentGameState.SessionData.LastSector2Time = previousGameState.SessionData.LastSector2Time;
                     currentGameState.SessionData.LastSector3Time = previousGameState.SessionData.LastSector3Time;
@@ -428,6 +428,9 @@ namespace CrewChiefV4.RaceRoom
                     currentGameState.SessionData.DeltaTime.lapsCompleted = previousGameState.SessionData.DeltaTime.lapsCompleted;
                     currentGameState.SessionData.DeltaTime.totalDistanceTravelled = previousGameState.SessionData.DeltaTime.totalDistanceTravelled;
                     currentGameState.SessionData.DeltaTime.trackLength = previousGameState.SessionData.DeltaTime.trackLength;
+
+                    currentGameState.retriedDriverNames = previousGameState.retriedDriverNames;
+                    currentGameState.disqualifiedDriverNames = previousGameState.disqualifiedDriverNames;
                 }
             }
 
@@ -510,7 +513,6 @@ namespace CrewChiefV4.RaceRoom
             currentGameState.SessionData.CompletedLaps = shared.CompletedLaps;
 
             currentGameState.SessionData.LapTimeCurrent = shared.LapTimeCurrentSelf;
-            currentGameState.SessionData.CurrentLapIsValid = currentGameState.SessionData.LapTimeCurrent != -1;
             currentGameState.SessionData.LapTimePrevious = shared.LapTimePreviousSelf;
             currentGameState.SessionData.PreviousLapWasValid = shared.LapTimePreviousSelf > 0;
             currentGameState.SessionData.NumCars = shared.NumCars;
@@ -569,6 +571,7 @@ namespace CrewChiefV4.RaceRoom
                     if (currentGameState.SessionData.IsNewLap)
                     {
                         currentGameState.readLandmarksForThisLap = false;
+                        currentGameState.SessionData.CurrentLapIsValid = true;
                     }
                     
                     if (currentGameState.SessionData.CurrentLapIsValid && participantStruct.CurrentLapValid != 1) {
@@ -587,17 +590,26 @@ namespace CrewChiefV4.RaceRoom
                                 previousGameState != null && previousGameState.SessionData.CurrentLapIsValid)
                             {
                                 float sectorTime = participantStruct.SectorTimePreviousSelf.Sector3 - participantStruct.SectorTimeCurrentSelf.Sector2;
-                                currentGameState.SessionData.LastSector3Time = sectorTime;
-                                if (currentGameState.SessionData.PlayerBestSector3Time == -1 || currentGameState.SessionData.LastSector3Time < currentGameState.SessionData.PlayerBestSector3Time)
+                                if (sectorTime == currentGameState.SessionData.LastSector3Time)
                                 {
-                                    currentGameState.SessionData.PlayerBestSector3Time = currentGameState.SessionData.LastSector3Time;
+                                    Console.WriteLine("Identical sector3 time to previous lap");
+                                    // TODO: does it make sense to drop this lap as invalid, like we do for opponents?
+                                    currentGameState.SessionData.LastSector3Time = -1;
                                 }
-                                if (currentGameState.SessionData.LapTimePrevious > 0 &&
-                                    (currentGameState.SessionData.PlayerLapTimeSessionBest == -1 || currentGameState.SessionData.LapTimePrevious <= currentGameState.SessionData.PlayerLapTimeSessionBest))
+                                else
                                 {
-                                    currentGameState.SessionData.PlayerBestLapSector1Time = currentGameState.SessionData.LastSector1Time;
-                                    currentGameState.SessionData.PlayerBestLapSector2Time = currentGameState.SessionData.LastSector2Time;
-                                    currentGameState.SessionData.PlayerBestLapSector3Time = currentGameState.SessionData.LastSector3Time;
+                                    currentGameState.SessionData.LastSector3Time = sectorTime;
+                                    if (currentGameState.SessionData.PlayerBestSector3Time == -1 || currentGameState.SessionData.LastSector3Time < currentGameState.SessionData.PlayerBestSector3Time)
+                                    {
+                                        currentGameState.SessionData.PlayerBestSector3Time = currentGameState.SessionData.LastSector3Time;
+                                    }
+                                    if (currentGameState.SessionData.LapTimePrevious > 0 &&
+                                        (currentGameState.SessionData.PlayerLapTimeSessionBest == -1 || currentGameState.SessionData.LapTimePrevious <= currentGameState.SessionData.PlayerLapTimeSessionBest))
+                                    {
+                                        currentGameState.SessionData.PlayerBestLapSector1Time = currentGameState.SessionData.LastSector1Time;
+                                        currentGameState.SessionData.PlayerBestLapSector2Time = currentGameState.SessionData.LastSector2Time;
+                                        currentGameState.SessionData.PlayerBestLapSector3Time = currentGameState.SessionData.LastSector3Time;
+                                    }
                                 }
                             }
                             else
@@ -610,10 +622,20 @@ namespace CrewChiefV4.RaceRoom
                             currentGameState.SessionData.SessionTimesAtEndOfSectors[1] = currentGameState.SessionData.SessionRunningTime;
                             if (participantStruct.SectorTimeCurrentSelf.Sector1 > 0 && currentGameState.SessionData.CurrentLapIsValid)
                             {
-                                currentGameState.SessionData.LastSector1Time = participantStruct.SectorTimeCurrentSelf.Sector1;
-                                if (currentGameState.SessionData.PlayerBestSector1Time == -1 || currentGameState.SessionData.LastSector1Time < currentGameState.SessionData.PlayerBestSector1Time)
+                                if (currentGameState.SessionData.LastSector1Time == participantStruct.SectorTimeCurrentSelf.Sector1)
                                 {
-                                    currentGameState.SessionData.PlayerBestSector1Time = currentGameState.SessionData.LastSector1Time;
+                                    Console.WriteLine("Identical sector1 time to previous lap");
+                                    // TODO: does it make sense to drop this lap as invalid, like we do for opponents?
+                                    currentGameState.SessionData.LastSector1Time = -1;
+                                    currentGameState.SessionData.CurrentLapIsValid = false;
+                                }
+                                else
+                                {
+                                    currentGameState.SessionData.LastSector1Time = participantStruct.SectorTimeCurrentSelf.Sector1;
+                                    if (currentGameState.SessionData.PlayerBestSector1Time == -1 || currentGameState.SessionData.LastSector1Time < currentGameState.SessionData.PlayerBestSector1Time)
+                                    {
+                                        currentGameState.SessionData.PlayerBestSector1Time = currentGameState.SessionData.LastSector1Time;
+                                    }
                                 }
                             }
                             else
@@ -628,10 +650,20 @@ namespace CrewChiefV4.RaceRoom
                                  currentGameState.SessionData.CurrentLapIsValid)
                             {
                                 float sectorTime = participantStruct.SectorTimeCurrentSelf.Sector2 - participantStruct.SectorTimeCurrentSelf.Sector1;
-                                currentGameState.SessionData.LastSector2Time = sectorTime;
-                                if (currentGameState.SessionData.PlayerBestSector2Time == -1 || currentGameState.SessionData.LastSector2Time < currentGameState.SessionData.PlayerBestSector2Time)
+                                if (currentGameState.SessionData.LastSector2Time == sectorTime)
                                 {
-                                    currentGameState.SessionData.PlayerBestSector2Time = currentGameState.SessionData.LastSector2Time;
+                                    Console.WriteLine("Identical sector2 time to previous lap");
+                                    // TODO: does it make sense to drop this lap as invalid, like we do for opponents?
+                                    currentGameState.SessionData.LastSector2Time = -1;
+                                    currentGameState.SessionData.CurrentLapIsValid = false;
+                                }
+                                else
+                                {
+                                    currentGameState.SessionData.LastSector2Time = sectorTime;
+                                    if (currentGameState.SessionData.PlayerBestSector2Time == -1 || currentGameState.SessionData.LastSector2Time < currentGameState.SessionData.PlayerBestSector2Time)
+                                    {
+                                        currentGameState.SessionData.PlayerBestSector2Time = currentGameState.SessionData.LastSector2Time;
+                                    }
                                 }
                             }
                             else
@@ -699,19 +731,59 @@ namespace CrewChiefV4.RaceRoom
                 currentGameState.SessionData.trackLandmarksTiming.cancelWaitingForLandmarkEnd();
             }
 
+            opponentDriverNamesProcessedForThisTick.Clear();
+            opponentDriverNamesProcessedForThisTick.Add(playerName);
+            positionsFilledForThisTick.Clear();
+            positionsFilledForThisTick.Add(currentGameState.SessionData.Position);
             foreach (DriverData participantStruct in shared.DriverData)
             {
                 if (participantStruct.DriverInfo.SlotId != -1 && participantStruct.DriverInfo.SlotId != shared.VehicleInfo.SlotId)
                 {
-                    String driverName = getNameFromBytes(participantStruct.DriverInfo.Name).ToLower();
-                    if (driverName.Length == 0 || driverName == currentGameState.SessionData.DriverRawName || opponentDriverNamesProcessedThisUpdate.Contains(driverName) || participantStruct.Place < 1) 
+                    if (positionsFilledForThisTick.Contains(participantStruct.Place))
                     {
+                        // discard this participant element because the race position is already occupied
+                        continue;
+                    }
+                    String driverName = getNameFromBytes(participantStruct.DriverInfo.Name).ToLower();
+                    if (driverName.Length == 0 || driverName == currentGameState.SessionData.DriverRawName || opponentDriverNamesProcessedForThisTick.Contains(driverName) ||
+                        participantStruct.Place < 1 || participantStruct.FinishStatus == (int)CrewChiefV4.RaceRoom.RaceRoomConstant.FinishStatus.R3E_FINISH_STATUS_DNS)
+                    {
+                        // allow these drivers be pruned from the set if we continue to receive no data for them
+                        continue;
+                    } 
+                    else if (participantStruct.FinishStatus == (int) CrewChiefV4.RaceRoom.RaceRoomConstant.FinishStatus.R3E_FINISH_STATUS_DNF)
+                    {
+                        // remove this driver from the set immediately
+                        if (!currentGameState.retriedDriverNames.Contains(driverName))
+                        {
+                            Console.WriteLine("Opponent " + driverName + " has retired");
+                            currentGameState.retriedDriverNames.Add(driverName);
+                        }
+                        if (currentGameState.OpponentData.ContainsKey(driverName))
+                        {
+                            currentGameState.OpponentData.Remove(driverName);
+                        }
+                        continue;
+                    }
+                    else if (participantStruct.FinishStatus == (int) CrewChiefV4.RaceRoom.RaceRoomConstant.FinishStatus.R3E_FINISH_STATUS_DQ)
+                    {
+                        // remove this driver from the set immediately
+                        if (!currentGameState.disqualifiedDriverNames.Contains(driverName))
+                        {
+                            Console.WriteLine("Opponent " + driverName + " has been disqualified");
+                            currentGameState.disqualifiedDriverNames.Add(driverName);
+                        }
+                        if (currentGameState.OpponentData.ContainsKey(driverName))
+                        {
+                            currentGameState.OpponentData.Remove(driverName);
+                        } 
                         continue;
                     }
                     lastActiveTimeForOpponents[driverName] = currentGameState.Now;
+                    positionsFilledForThisTick.Add(participantStruct.Place);
+                    opponentDriverNamesProcessedForThisTick.Add(driverName);
                     if (currentGameState.OpponentData.ContainsKey(driverName))
-                    {
-                        opponentDriverNamesProcessedThisUpdate.Add(driverName);
+                    {                        
                         if (previousGameState != null)
                         {
                             OpponentData previousOpponentData = null;
@@ -904,7 +976,6 @@ namespace CrewChiefV4.RaceRoom
                     }
                     else
                     {
-                        opponentDriverNamesProcessedThisUpdate.Add(driverName);
                         currentGameState.OpponentData.Add(driverName, createOpponentData(participantStruct, driverName, true,
                             CarData.getCarClassForRaceRoomId(participantStruct.DriverInfo.ClassId).carClassEnum, currentGameState.SessionData.TrackDefinition.trackLength));
                     }
@@ -1594,6 +1665,11 @@ namespace CrewChiefV4.RaceRoom
                     opponentData.hasJustChangedToDifferentTyreType = true;
                 }
             }
+            if (opponentData.CurrentSectorNumber == 3 && sector == 3 && (!lapIsValid || !validSpeed))
+            {
+                // special case for s3 - need to invalidate lap immediately
+                opponentData.InvalidateCurrentLap();
+            }
             if (opponentData.CurrentSectorNumber != sector)
             {
                 if (opponentData.CurrentSectorNumber == 3 && sector == 1)
@@ -1604,12 +1680,11 @@ namespace CrewChiefV4.RaceRoom
                         // if it's identical to the previous time, assume it's invalid
                         if (opponentData.LastLapTime == completedLapTime)
                         {
-                            lapIsValid = false;
+                            opponentData.InvalidateCurrentLap();
                         }
                         else
                         {
-                            opponentData.CompleteLapWithProvidedLapTime(racePosition, sessionRunningTime, completedLapTime,
-                                lapIsValid && validSpeed, false, 20, 20, sessionLengthIsTime, sessionTimeRemaining, 3);
+                            opponentData.CompleteLapWithProvidedLapTime(racePosition, sessionRunningTime, completedLapTime, false, 20, 20, sessionLengthIsTime, sessionTimeRemaining, 3);
                         }
                     }
                     opponentData.StartNewLap(completedLaps + 1, racePosition, isInPits, sessionRunningTime, false, 20, 20);

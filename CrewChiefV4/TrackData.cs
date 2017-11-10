@@ -257,6 +257,7 @@ namespace CrewChiefV4
             new TrackDefinition("Mazda Raceway:Laguna Seca", 2, 3593.582f, new float[] {-70.22401f, 432.3777f}, new float[] {-279.2681f, 228.165f}),
             new TrackDefinition("Nordschleife:Full", 3, 20735.4f,  new float[] {599.293f, 606.7135f}, new float[] {391.6694f, 694.4844f}),
             new TrackDefinition("Nürburgring:Grand Prix", 2.5f, 5122.845f, new float[] {443.6332f, 527.8024f}, new float[] {66.84711f, 96.7378f}),
+            new TrackDefinition("Nurburgring:GP", 2.5f, 5122.845f, new float[] {443.6332f, 527.8024f}, new float[] {66.84711f, 96.7378f}),
             new TrackDefinition("Nürburgring:MuellenBach", 1488.941f),
             new TrackDefinition("Nürburgring:Sprint", 2.5f, 3603.18f, new float[] {443.6332f, 527.8024f}, new float[] {66.84711f, 96.7378f}),
             new TrackDefinition("Nürburgring:Sprint Short", 2.5f, 3083.551f, new float[] {443.6332f, 527.8024f}, new float[] {66.84711f, 96.7378f}),

@@ -659,5 +659,8 @@
     <Setting Name="GET_DAMAGE_REPORT_device_type" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="disable_alternative_voice_commands" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

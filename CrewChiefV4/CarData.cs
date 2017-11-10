@@ -61,17 +61,20 @@ namespace CrewChiefV4
 
         public enum CarClassEnum
         {
-            GT1X, GT1, GTE, GT2, GTC, GTLM, GT3, GT4, GT5, GT500, Kart_1, Kart_2, KART_JUNIOR, KART_F1, LMP1, LMP2, LMP3, ROAD_B, ROAD_C1, ROAD_C2, ROAD_D, ROAD_SUPERCAR, GROUPC, GROUPA, GROUP4, GROUP5, GROUP6, GTO,
-            VINTAGE_INDY_65, VINTAGE_F3_A, VINTAGE_F1_A, VINTAGE_F1_A1, VINTAGE_GT3, VINTAGE_GT, HISTORIC_TOURING_1, HISTORIC_TOURING_2, VINTAGE_F1_B, VINTAGE_F1_C, STOCK_CAR,
+            GT1X, GT1, GTE, GT2, GTC, GTLM, GT3, GT4, GT5, GT500, Kart_1, Kart_2, KART_JUNIOR, KART_F1, LMP1, LMP2, LMP3, LMP900, ROAD_B, ROAD_C1, ROAD_C2, ROAD_D, ROAD_E, ROAD_F, ROAD_G, 
+            ROAD_SUPERCAR, GROUPC, GROUPA, GROUP4, GROUP5, GROUP6, GTO,
+            VINTAGE_INDY_65, VINTAGE_F3_A, VINTAGE_F1_A, VINTAGE_F1_A1, VINTAGE_PROTOTYPE_B, VINTAGE_GT_D, VINTAGE_GT_C, HISTORIC_TOURING_1, HISTORIC_TOURING_2, VINTAGE_F1_B,
+            VINTAGE_F1_C, VINTAGE_STOCK_CAR,
             F1, F2, F3, F4, FF, TC1, TC2, TC1_2014, AUDI_TT_CUP, AUDI_TT_VLN, CLIO_CUP, DTM, DTM_2013, V8_SUPERCAR, DTM_2014, DTM_2015, DTM_2016, TRANS_AM, HILL_CLIMB_ICONS, FORMULA_RENAULT,
-            MEGANE_TROPHY, NSU_TT, KTM_RR, INDYCAR, HYPER_CAR, HYPER_CAR_RACE, UNKNOWN_RACE, STOCK_V8, BOXER_CUP, NASCAR_2016, ISI_STOCKCAR_2015, RADICAL_SR3, USER_CREATED
+            MEGANE_TROPHY, NSU_TT, KTM_RR, INDYCAR, HYPER_CAR, HYPER_CAR_RACE, UNKNOWN_RACE, STOCK_V8, BOXER_CUP, NASCAR_2016, ISI_STOCKCAR_2015, RADICAL_SR3, USER_CREATED,
+            RS01_TROPHY, TRACKDAY_A, TRACKDAY_B, BMW_235I, CARRERA_CUP, R3E_SILHOUETTE
         }
 
         // use different thresholds for newer R3E car classes:
         public static CarClassEnum[] r3eNewTyreModelClasses = new CarClassEnum[] {
             CarClassEnum.GT3, CarClassEnum.GT4, CarClassEnum.LMP1, CarClassEnum.LMP2, CarClassEnum.GROUP5, CarClassEnum.GROUP4, CarClassEnum.GTO, CarClassEnum.F2, CarClassEnum.F4,
             CarClassEnum.FF, CarClassEnum.TC1, CarClassEnum.AUDI_TT_CUP, CarClassEnum.DTM_2013, CarClassEnum.DTM_2014, CarClassEnum.DTM_2015, CarClassEnum.DTM_2016, CarClassEnum.NSU_TT,
-            CarClassEnum.F3, CarClassEnum.AUDI_TT_VLN, CarClassEnum.KTM_RR, CarClassEnum.FF, CarClassEnum.FF, CarClassEnum.FF};
+            CarClassEnum.F3, CarClassEnum.AUDI_TT_VLN, CarClassEnum.KTM_RR, CarClassEnum.F1, CarClassEnum.TRACKDAY_A, CarClassEnum.R3E_SILHOUETTE, CarClassEnum.BMW_235I, CarClassEnum.CARRERA_CUP};
 
         private static Dictionary<TyreType, List<CornerData.EnumWithThresholds>> tyreTempThresholds = new Dictionary<TyreType, List<CornerData.EnumWithThresholds>>();
         private static Dictionary<BrakeType, List<CornerData.EnumWithThresholds>> brakeTempThresholds = new Dictionary<BrakeType, List<CornerData.EnumWithThresholds>>();

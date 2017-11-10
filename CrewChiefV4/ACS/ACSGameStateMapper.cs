@@ -2012,6 +2012,12 @@ namespace CrewChiefV4.assetto
             bool hasCrossedSFline = opponentData.CurrentSectorNumber == 3 && sector == 1;
             bool hasNewLapData = opponentData.HasNewLapData(lastLapTime, hasCrossedSFline, previousOpponentDataWaitingForNewLapData,
                 previousOpponentNewLapDataTimerExpiry, previousOpponentLastLapTime, previousOpponentLastLapValid);
+
+            if (opponentData.CurrentSectorNumber == 3 && sector == 3 && (!lapIsValid || !validSpeed))
+            {
+                // special case for s3 - need to invalidate lap immediately
+                opponentData.InvalidateCurrentLap();
+            }
             if (opponentData.CurrentSectorNumber != sector || hasNewLapData)
             {
                 if (hasNewLapData)
@@ -2020,7 +2026,7 @@ namespace CrewChiefV4.assetto
                     {
                         // special case here: if there's only 1 lap in the list, and it's marked as an in-lap, and we don't have a laptime, remove it.
                         // This is because we might have created a new LapData entry to hold a partially completed in-lap if we join mid-session, but
-                        // this also results in each opponent having a spurious 'emtpy' LapData element.
+                        // this also results in each opponent having a spurious 'empty' LapData element.
                         if (opponentData.OpponentLapData.Count == 1 && opponentData.OpponentLapData[0].InLap && lastLapTime == 0)
                         {
                             opponentData.OpponentLapData.Clear();
@@ -2028,7 +2034,7 @@ namespace CrewChiefV4.assetto
                         else
                         {
                             opponentData.CompleteLapWithProvidedLapTime(leaderBoardPosition, sessionRunningTime, lastLapTime,
-                                lapIsValid && validSpeed, false, trackTempreture, airTemperature, sessionLengthIsTime, sessionTimeRemaining, trackNumberOfSectors);
+                                false, trackTempreture, airTemperature, sessionLengthIsTime, sessionTimeRemaining, trackNumberOfSectors);
                         }
                     }
 

@@ -489,6 +489,10 @@ namespace CrewChiefV4.PCars2
         public uint mCurrentLap;                                // [ RANGE = 0->... ]   [ UNSET = 0 ]
         public int mCurrentSector;                             // [ enum (Type#4) Current Sector ]
 
+        public override string ToString()
+        {
+            return "position " + mRacePosition + " name " + StructHelper.getNameFromBytes(mName).ToLower() + " lapsCompleted " + mLapsCompleted + " lapDist " + mCurrentLapDistance;
+        }
     }
 
     [Serializable]
