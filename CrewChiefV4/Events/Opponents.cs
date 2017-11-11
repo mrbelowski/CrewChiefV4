@@ -270,7 +270,9 @@ namespace CrewChiefV4.Events
                 }
             }
 
-            if (currentGameState.SessionData.SessionType == SessionType.Race)
+            if (currentGameState.SessionData.SessionType == SessionType.Race &&
+                ((currentGameState.SessionData.SessionHasFixedTime && currentGameState.SessionData.SessionTimeRemaining > 0) ||
+                 (!currentGameState.SessionData.SessionHasFixedTime && currentGameState.SessionData.CompletedLaps < currentGameState.SessionData.SessionNumberOfLaps)))
             {
                 foreach (String retiredDriver in currentGameState.retriedDriverNames)
                 {
