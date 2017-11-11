@@ -280,7 +280,9 @@ namespace CrewChiefV4.Events
                     {
                         announcedRetirementsAndDQs.Add(retiredDriver);
                         if ((CrewChief.gameDefinition.gameEnum == GameEnum.RF1 || CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT)
-                            && currentGameState.SessionData.SessionPhase != SessionPhase.Green)
+                            && currentGameState.SessionData.SessionPhase != SessionPhase.Green
+                            && currentGameState.SessionData.SessionPhase != SessionPhase.FullCourseYellow
+                            && currentGameState.SessionData.SessionPhase != SessionPhase.Checkered)
                         {
                             // In an offline session of the ISI games it is possible to select more AI drivers than a track can handle.
                             // The ones that don't fit on a track are marked as DNF before session goes Green.  Don't announce those.
