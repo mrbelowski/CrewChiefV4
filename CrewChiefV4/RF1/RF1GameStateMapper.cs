@@ -238,8 +238,10 @@ namespace CrewChiefV4.rFactor1
                 currentGameState.SessionData.TrackDefinition.trackLandmarks = previousGameState.SessionData.TrackDefinition.trackLandmarks;
                 currentGameState.SessionData.TrackDefinition.gapPoints = previousGameState.SessionData.TrackDefinition.gapPoints;
                 currentGameState.readLandmarksForThisLap = previousGameState.readLandmarksForThisLap;
+                currentGameState.retriedDriverNames = previousGameState.retriedDriverNames;
+                currentGameState.disqualifiedDriverNames = previousGameState.disqualifiedDriverNames;
             }
-            
+
             currentGameState.SessionData.TrackDefinition.setGapPoints();
             currentGameState.SessionData.SessionNumberOfLaps = shared.maxLaps > 0 && shared.maxLaps < 1000 ? shared.maxLaps : 0;
             // default to 60:30 if both session time and number of laps undefined (test day)
@@ -690,8 +692,31 @@ namespace CrewChiefV4.rFactor1
                 }
                 else
                 {
-                    opponentKey = driverName;                    
+                    opponentKey = driverName;
                 }
+
+                var ofs = (rFactor1Constant.rfFinishStatus)vehicle.finishStatus;
+                if (ofs == rFactor1Constant.rfFinishStatus.dnf)
+                {
+                    // Note driver DNF and don't tack him anymore.
+                    if (!currentGameState.retriedDriverNames.Contains(driverName))
+                    {
+                        Console.WriteLine("Opponent " + driverName + " has retired");
+                        currentGameState.retriedDriverNames.Add(driverName);
+                    }
+                    continue;
+                }
+                else if (ofs == rFactor1Constant.rfFinishStatus.dq)
+                {
+                    // Note driver DQ and don't tack him anymore.
+                    if (!currentGameState.disqualifiedDriverNames.Contains(driverName))
+                    {
+                        Console.WriteLine("Opponent " + driverName + " has been disqualified");
+                        currentGameState.disqualifiedDriverNames.Add(driverName);
+                    }
+                    continue;
+                }
+
                 opponentPrevious = previousGameState == null || opponentKey == null || !previousGameState.OpponentData.ContainsKey(opponentKey) ? null : previousGameState.OpponentData[opponentKey];
                 OpponentData opponent = new OpponentData();
                 opponent.DriverRawName = driverName;
