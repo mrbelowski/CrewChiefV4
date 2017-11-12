@@ -747,17 +747,18 @@ namespace CrewChiefV4.rFactor2
                         && cgs.PitData.HasRequestedPitStop)
                         this.isApproachingPitEntry = true;
 
-                    Console.WriteLine(string.Format("New min width:{0:0.000}    lapDist:{1:0.000}    pathLat:{2:0.000}    inPit:{3}    ps:{4}    appr:{5}    lap:{6}    pit lane:{7:0.000}",
-                        this.minTrackWidth,
-                        playerScoring.mLapDist,
-                        playerScoring.mPathLateral,
-                        cgs.PitData.InPitlane,
-                        playerScoring.mPitState,
-                        this.isApproachingPitEntry,
-                        csd.CompletedLaps + 1,
-                        shared.rules.mTrackRules.mPitLaneStartDist));
-
-                    //Debug.WriteLine("New min track width:" + (this.minTrackWidth).ToString("0.000") + " pit lane: " + shared.rules.mTrackRules.mPitLaneStartDist);
+                    if (cgs.SessionData.SectorNumber > 2)  // Only print in S3, that's the most interesting.
+                    {
+                        Console.WriteLine(string.Format("New min width:{0:0.000}    lapDist:{1:0.000}    pathLat:{2:0.000}    inPit:{3}    ps:{4}    appr:{5}    lap:{6}    pit lane:{7:0.000}",
+                            this.minTrackWidth,
+                            playerScoring.mLapDist,
+                            playerScoring.mPathLateral,
+                            cgs.PitData.InPitlane,
+                            playerScoring.mPitState,
+                            this.isApproachingPitEntry,
+                            csd.CompletedLaps + 1,
+                            shared.rules.mTrackRules.mPitLaneStartDist));
+                    }
                 }
 
                 //Debug.WriteLine($"lapDist: {playerScoring.mLapDist.ToString("0.000")}  pathLat {playerScoring.mPathLateral.ToString("0.000")} estW {(estTrackWidth).ToString("0.000")} inPit {cgs.PitData.InPitlane} ps: {playerScoring.mPitState} appr: {this.isApproachingPitEntry} mapped: {this.trackWidthMapped}");
@@ -1607,36 +1608,39 @@ namespace CrewChiefV4.rFactor2
                 cutTrackByInvalidLapDetected = true;
             }
 
-            if (this.enableCutTrackHeuristics)
+            // Improvised cut track warnings based on surface type.
+            if (RF2GameStateMapper.incrementCutTrackCountWhenLeavingRacingSurface
+                && !cutTrackByInvalidLapDetected
+                && !cgs.PitData.InPitlane
+                && !cgs.PitData.OnOutLap)
             {
-                // Improvised cut track warnings based on surface type.
-                if (RF2GameStateMapper.incrementCutTrackCountWhenLeavingRacingSurface
-                    && !cutTrackByInvalidLapDetected
-                    && !cgs.PitData.InPitlane
-                    && !cgs.PitData.OnOutLap)
-                {
-                    cgs.PenaltiesData.IsOffRacingSurface =
-                        wheelFrontLeft.mSurfaceType != (int)rFactor2Constants.rF2SurfaceType.Dry && wheelFrontLeft.mSurfaceType != (int)rFactor2Constants.rF2SurfaceType.Wet
-                        && wheelFrontRight.mSurfaceType != (int)rFactor2Constants.rF2SurfaceType.Dry && wheelFrontRight.mSurfaceType != (int)rFactor2Constants.rF2SurfaceType.Wet
-                        && wheelRearLeft.mSurfaceType != (int)rFactor2Constants.rF2SurfaceType.Dry && wheelRearLeft.mSurfaceType != (int)rFactor2Constants.rF2SurfaceType.Wet
-                        && wheelRearRight.mSurfaceType != (int)rFactor2Constants.rF2SurfaceType.Dry && wheelRearRight.mSurfaceType != (int)rFactor2Constants.rF2SurfaceType.Wet;
+                cgs.PenaltiesData.IsOffRacingSurface =
+                    wheelFrontLeft.mSurfaceType != (int)rFactor2Constants.rF2SurfaceType.Dry && wheelFrontLeft.mSurfaceType != (int)rFactor2Constants.rF2SurfaceType.Wet
+                    && wheelFrontRight.mSurfaceType != (int)rFactor2Constants.rF2SurfaceType.Dry && wheelFrontRight.mSurfaceType != (int)rFactor2Constants.rF2SurfaceType.Wet
+                    && wheelRearLeft.mSurfaceType != (int)rFactor2Constants.rF2SurfaceType.Dry && wheelRearLeft.mSurfaceType != (int)rFactor2Constants.rF2SurfaceType.Wet
+                    && wheelRearRight.mSurfaceType != (int)rFactor2Constants.rF2SurfaceType.Dry && wheelRearRight.mSurfaceType != (int)rFactor2Constants.rF2SurfaceType.Wet;
 
+                if (this.enableCutTrackHeuristics)
+                {
                     if (pgs != null && !pgs.PenaltiesData.IsOffRacingSurface && cgs.PenaltiesData.IsOffRacingSurface)
                     {
                         Console.WriteLine("Player off track: by surface type.");
                         cgs.PenaltiesData.CutTrackWarnings = pgs.PenaltiesData.CutTrackWarnings + 1;
                     }
                 }
+            }
 
-                // See if we're off track by distance.
-                if (!cutTrackByInvalidLapDetected
-                    && !cgs.PenaltiesData.IsOffRacingSurface)
+            // See if we're off track by distance.
+            if (!cutTrackByInvalidLapDetected
+                && !cgs.PenaltiesData.IsOffRacingSurface)
+            {
+                float lateralDistDiff = (float)(Math.Abs(playerScoring.mPathLateral) - Math.Abs(playerScoring.mTrackEdge));
+                cgs.PenaltiesData.IsOffRacingSurface = !cgs.PitData.InPitlane && lateralDistDiff >= 2.5f;
+                float offTrackDistanceDelta = lateralDistDiff - this.distanceOffTrack;
+                this.distanceOffTrack = cgs.PenaltiesData.IsOffRacingSurface ? lateralDistDiff : 0.0f;
+
+                if (this.enableCutTrackHeuristics)
                 {
-                    float lateralDistDiff = (float)(Math.Abs(playerScoring.mPathLateral) - Math.Abs(playerScoring.mTrackEdge));
-                    cgs.PenaltiesData.IsOffRacingSurface = !cgs.PitData.InPitlane && lateralDistDiff >= 2.5f;
-                    float offTrackDistanceDelta = lateralDistDiff - this.distanceOffTrack;
-                    this.distanceOffTrack = cgs.PenaltiesData.IsOffRacingSurface ? lateralDistDiff : 0.0f;
-
                     if (!cgs.PitData.OnOutLap && pgs != null
                         && !pgs.PenaltiesData.IsOffRacingSurface && cgs.PenaltiesData.IsOffRacingSurface
                         && !(cgs.SessionData.SessionType == SessionType.Race && cgs.SessionData.SessionPhase == SessionPhase.Countdown))
