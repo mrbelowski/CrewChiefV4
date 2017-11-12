@@ -197,6 +197,11 @@ namespace CrewChiefV4.Events
                                 {
                                     lastOvertakeWasClean = false;
                                 }
+                                else if (previousGameState != null && (previousGameState.PenaltiesData.IsOffRacingSurface || currentGameState.PenaltiesData.IsOffRacingSurface))
+                                {
+                                    // TODO: check ~5 seconds of past history to make sure we weren't off track.
+                                    lastOvertakeWasClean = false;
+                                }
                             }
                         }
                         gapsAhead.Clear();
@@ -226,11 +231,11 @@ namespace CrewChiefV4.Events
         private void checkCompletedOvertake(GameStateData currentGameState)
         {
             if (opponentKeyForCarWeJustPassed != null)
-            {                
+            {
                 if (currentGameState.Now < timeWhenWeMadeAPass.Add(maxTimeToWaitBeforeReportingPass) && lastOvertakeWasClean)
                 {
                     Boolean reported = false;
-                    OpponentData carWeJustPassed = currentGameState.OpponentData[opponentKeyForCarWeJustPassed];               
+                    OpponentData carWeJustPassed = currentGameState.OpponentData[opponentKeyForCarWeJustPassed];
                     if (currentGameState.Now > timeWhenWeMadeAPass.Add(minTimeToWaitBeforeReportingPass))
                     {                                 
                         if (currentGameState.Now > lastOvertakeMessageTime.Add(minTimeBetweenOvertakeMessages) && 

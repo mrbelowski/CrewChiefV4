@@ -250,7 +250,7 @@ namespace CrewChiefV4.Events
         {
             if (this.currentPosition != positionWhenQueued)
             {
-                Console.WriteLine("Delay-evaluated pre-start pos updated from: " + positionWhenQueued + " to: " + this.currentPosition);
+                Console.WriteLine("pre-start delay-evaluated  pos updated from: " + positionWhenQueued + " to: " + this.currentPosition);
             }
 
             if (this.currentPosition == 1)
