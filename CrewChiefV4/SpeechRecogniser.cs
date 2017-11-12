@@ -161,6 +161,11 @@ namespace CrewChiefV4
             {
                 sre.UnloadGrammar(macroGrammar);
             }
+            if (voiceTriggeredMacros.Count == 0)
+            {
+                Console.WriteLine("No macro voice triggers defined for the current game.");
+                return;
+            }
             Choices macroChoices = new Choices();
             foreach (String triggerPhrase in voiceTriggeredMacros.Keys)
             {
