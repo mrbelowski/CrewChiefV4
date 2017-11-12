@@ -761,7 +761,6 @@ namespace CrewChiefV4.rFactor2
                     }
                 }
 
-                //Debug.WriteLine($"lapDist: {playerScoring.mLapDist.ToString("0.000")}  pathLat {playerScoring.mPathLateral.ToString("0.000")} estW {(estTrackWidth).ToString("0.000")} inPit {cgs.PitData.InPitlane} ps: {playerScoring.mPitState} appr: {this.isApproachingPitEntry} mapped: {this.trackWidthMapped}");
                 cgs.PitData.IsApproachingPitlane = this.isApproachingPitEntry;
             }
 

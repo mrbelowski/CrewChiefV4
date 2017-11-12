@@ -186,7 +186,6 @@ namespace CrewChiefV4.Events
                     {
                         possibleMessages.Add(new QueuedMessage("position", MessageContents(Pause(200), Position.folderStub + currentGameState.SessionData.Position), 0, this));
                     }
-
                 }
             }
             else
@@ -250,7 +249,7 @@ namespace CrewChiefV4.Events
         {
             if (this.currentPosition != positionWhenQueued)
             {
-                Console.WriteLine("pre-start delay-evaluated  pos updated from: " + positionWhenQueued + " to: " + this.currentPosition);
+                Console.WriteLine("pre-start delay-evaluated pos updated from: " + positionWhenQueued + " to: " + this.currentPosition);
             }
 
             if (this.currentPosition == 1)
@@ -365,7 +364,7 @@ namespace CrewChiefV4.Events
                         (playPreLightsInRaceroom || CrewChief.gameDefinition.gameEnum != GameEnum.RACE_ROOM))
                     {
                         playPreLightsMessage(currentGameState, preLightsMessageCount);
-                        if (CrewChief.gameDefinition.gameEnum != GameEnum.RF2_64BIT)
+                        if (CrewChief.gameDefinition.gameEnum != GameEnum.RF2_64BIT)  // In rF2, Gridwalk/Countown phase is long enough to not purge messages.
                         {
                             purgePreLightsMessages = true;
                         }
