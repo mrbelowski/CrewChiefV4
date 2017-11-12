@@ -76,6 +76,7 @@ namespace CrewChiefV4.Events
         private static Boolean useFahrenheit = UserSettings.GetUserSettings().getBoolean("use_fahrenheit");
 
         private DateTime nextManualFormationOvertakeWarning = DateTime.MinValue;
+        private int currentPosition = -1;
 
         public override List<SessionPhase> applicableSessionPhases
         {
@@ -159,30 +160,42 @@ namespace CrewChiefV4.Events
                         currentGameState.PitData.PitWindowStart), 0, this));
                 }
             }
-            if (currentGameState.SessionData.Position == 1)
+            if (CrewChief.gameDefinition.gameEnum != GameEnum.RF2_64BIT)
             {
-                Console.WriteLine("pre-start message for pole");
-                if (SoundCache.availableSounds.Contains(Position.folderDriverPositionIntro))
+                if (currentGameState.SessionData.Position == 1)
                 {
-                    possibleMessages.Add(new QueuedMessage("position", MessageContents(Position.folderDriverPositionIntro, Position.folderPole), 0, this));                    
+                    Console.WriteLine("pre-start message for pole");
+                    if (SoundCache.availableSounds.Contains(Position.folderDriverPositionIntro))
+                    {
+                        possibleMessages.Add(new QueuedMessage("position", MessageContents(Position.folderDriverPositionIntro, Position.folderPole), 0, this));
+                    }
+                    else
+                    {
+                        possibleMessages.Add(new QueuedMessage("position", MessageContents(Pause(200), Position.folderPole), 0, this));
+                    }
                 }
                 else
                 {
-                    possibleMessages.Add(new QueuedMessage("position", MessageContents(Pause(200), Position.folderPole), 0, this));
-                }                
+                    Console.WriteLine("pre-start message for P " + currentGameState.SessionData.Position);
+                    if (SoundCache.availableSounds.Contains(Position.folderDriverPositionIntro))
+                    {
+                        possibleMessages.Add(new QueuedMessage("position", MessageContents(Position.folderDriverPositionIntro,
+                            Position.folderStub + currentGameState.SessionData.Position), 0, this));
+                    }
+                    else
+                    {
+                        possibleMessages.Add(new QueuedMessage("position", MessageContents(Pause(200), Position.folderStub + currentGameState.SessionData.Position), 0, this));
+                    }
+                }
             }
             else
             {
-                Console.WriteLine("pre-start message for P " + currentGameState.SessionData.Position);
-                if (SoundCache.availableSounds.Contains(Position.folderDriverPositionIntro))
-                {
-                    possibleMessages.Add(new QueuedMessage("position", MessageContents(Position.folderDriverPositionIntro, 
-                        Position.folderStub + currentGameState.SessionData.Position), 0, this));
-                }
-                else 
-                {
-                    possibleMessages.Add(new QueuedMessage("position", MessageContents(Pause(200), Position.folderStub + currentGameState.SessionData.Position), 0, this));
-                }
+                // In rF2 there's a delay for position to get updated (usually by the end of a gridwalk).
+                Console.WriteLine("pre-start message for (delay evaluated)");
+
+                DelayedMessageEvent delayedMessageEvent = new DelayedMessageEvent("getPositionMessages", new Object[] {
+                    currentGameState.SessionData.Position }, this);
+                possibleMessages.Add(new QueuedMessage("position", delayedMessageEvent, 1 /*secondsDelay*/, null));
             }
             if (currentGameState.SessionData.SessionNumberOfLaps > 0) {
                 // check how long the race is
@@ -227,13 +240,46 @@ namespace CrewChiefV4.Events
                         break;
                     }
                     audioPlayer.playMessage(message);
-                }            
+                }
             }
             // TODO: in the countdown / pre-lights phase, we don't know how long the race is going to be so we can't use the 'get on with it' messages :(
         }
 
+        public List<MessageFragment> getPositionMessages(int positionWhenQueued)
+        {
+            if (this.currentPosition != positionWhenQueued)
+            {
+                Console.WriteLine("pre-start delay-evaluated pos updated from: " + positionWhenQueued + " to: " + this.currentPosition);
+            }
+
+            if (this.currentPosition == 1)
+            {
+                if (SoundCache.availableSounds.Contains(Position.folderDriverPositionIntro))
+                {
+                    return MessageContents(Position.folderDriverPositionIntro, Position.folderPole);
+                }
+                else
+                {
+                    return MessageContents(Pause(200), Position.folderPole);
+                }
+            }
+            else
+            {
+                if (SoundCache.availableSounds.Contains(Position.folderDriverPositionIntro))
+                {
+                    return MessageContents(Position.folderDriverPositionIntro, Position.folderStub + this.currentPosition);
+                }
+                else
+                {
+                    return MessageContents(Position.folderStub + this.currentPosition);
+                }
+            }
+        }
+
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
+            this.currentPosition = currentGameState.SessionData.Position;
+
             if (GameStateData.useManualFormationLap)
             {
                 // when the session is first cleared, this will be true if we're using manual formation laps:
@@ -290,12 +336,12 @@ namespace CrewChiefV4.Events
                             {
                                 // Play these only for race sessions. Some game-specific rules here:
                                 //      Allow messages for countdown phase for any game
-                                //      Allow messages for gridwalk phase for any game *except* Raceroom (which treats gridwalk as its own session with different data to the race session) and rF2 (there's delay for updates from the game, generally till Countdown).
+                                //      Allow messages for gridwalk phase for any game *except* Raceroom (which treats gridwalk as its own session with different data to the race session)
                                 //      Allow messages for formation phase for Raceroom
                                 //      Allow messages for formation phase for RF1 (AMS) and rF2 only when we enter sector 3 of the formation lap.
                                 if (currentGameState.SessionData.SessionType == SessionType.Race &&
                                         (currentGameState.SessionData.SessionPhase == SessionPhase.Countdown ||
-                                        (currentGameState.SessionData.SessionPhase == SessionPhase.Gridwalk && CrewChief.gameDefinition.gameEnum != GameEnum.RACE_ROOM && CrewChief.gameDefinition.gameEnum != GameEnum.RF2_64BIT) ||
+                                        (currentGameState.SessionData.SessionPhase == SessionPhase.Gridwalk && CrewChief.gameDefinition.gameEnum != GameEnum.RACE_ROOM) ||
                                         (currentGameState.SessionData.SessionPhase == SessionPhase.Formation && CrewChief.gameDefinition.gameEnum == GameEnum.RACE_ROOM) ||
                                         (currentGameState.SessionData.SessionPhase == SessionPhase.Formation && (CrewChief.gameDefinition.gameEnum == GameEnum.RF1 || CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT) &&
                                         currentGameState.SessionData.SectorNumber == 3)))
@@ -314,13 +360,14 @@ namespace CrewChiefV4.Events
                                                 CrewChief.gameDefinition.gameEnum == GameEnum.PCARS2 ||
                                                 CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_NETWORK ||
                                                 CrewChief.gameDefinition.gameEnum == GameEnum.PCARS2_NETWORK ? 1 : 2;
-                    if (!playedPreLightsMessage && currentGameState.SessionData.SessionType == SessionType.Race && 
-                        ((currentGameState.SessionData.SessionPhase == SessionPhase.Gridwalk && CrewChief.gameDefinition.gameEnum != GameEnum.RF2_64BIT) ||  // In rF2, wait till Countdown.
-                            (currentGameState.SessionData.SessionPhase == SessionPhase.Countdown && CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT)) &&
+                    if (!playedPreLightsMessage && currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.SessionPhase == SessionPhase.Gridwalk &&
                         (playPreLightsInRaceroom || CrewChief.gameDefinition.gameEnum != GameEnum.RACE_ROOM))
                     {
                         playPreLightsMessage(currentGameState, preLightsMessageCount);
-                        purgePreLightsMessages = true;
+                        if (CrewChief.gameDefinition.gameEnum != GameEnum.RF2_64BIT)  // In rF2, Gridwalk/Countown phase is long enough to not purge messages.
+                        {
+                            purgePreLightsMessages = true;
+                        }
                     }
                     // TODO: in R3E online there's a GridWalk phase before the Countdown. In PCars they're combined. Add some messages to this phase.
 

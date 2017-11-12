@@ -80,7 +80,8 @@ namespace CrewChiefV4.Events
         private DateTime timeWhenWeMadeAPass;
         private DateTime timeWhenWeWerePassed;
 
-        private const int secondsToCheckForDamageOnPass = 30;
+        private const int secondsToCheckForDamageOrOfftrackOnPass = 10;
+        private float lastOffTrackSessionTime = -1.0f;
         private bool lastOvertakeWasClean = true;
 
         private string opponentAheadKey = null;
@@ -134,6 +135,7 @@ namespace CrewChiefV4.Events
             timeWhenWeWerePassed = DateTime.MinValue;
             timeWhenWeMadeAPass = DateTime.MinValue;
             lastOvertakeMessageTime = DateTime.MinValue;
+            lastOffTrackSessionTime = -1.0f;
         }
 
         public override bool isMessageStillValid(string eventSubType, GameStateData currentGameState, Dictionary<String, Object> validationData)
@@ -164,6 +166,10 @@ namespace CrewChiefV4.Events
 
         private void checkForNewOvertakes(GameStateData previousGameState, GameStateData currentGameState)
         {
+            if (currentGameState.PenaltiesData.IsOffRacingSurface)
+            {
+                lastOffTrackSessionTime = currentGameState.SessionData.SessionRunningTime;
+            }
             if (currentGameState.SessionData.SessionPhase == SessionPhase.Green &&
                 currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.CompletedLaps > 0)
             {                
@@ -193,9 +199,15 @@ namespace CrewChiefV4.Events
                                 timeWhenWeMadeAPass = currentGameState.Now;
                                 opponentKeyForCarWeJustPassed = currentOpponentBehindKey;
                                 lastOvertakeWasClean = true;
-                                if (currentGameState.CarDamageData.LastImpactTime > 0 && (currentGameState.SessionData.SessionRunningTime - currentGameState.CarDamageData.LastImpactTime) < secondsToCheckForDamageOnPass)
+                                if (currentGameState.CarDamageData.LastImpactTime > 0.0f && (currentGameState.SessionData.SessionRunningTime - currentGameState.CarDamageData.LastImpactTime) < secondsToCheckForDamageOrOfftrackOnPass)
                                 {
                                     lastOvertakeWasClean = false;
+                                    Console.WriteLine("Overtake considered not clean due to vehicle damage.");
+                                }
+                                else if (lastOffTrackSessionTime > 0.0f && (currentGameState.SessionData.SessionRunningTime - lastOffTrackSessionTime) < secondsToCheckForDamageOrOfftrackOnPass)
+                                {
+                                    lastOvertakeWasClean = false;
+                                    Console.WriteLine("Overtake considered not clean due to vehicle off track.");
                                 }
                             }
                         }
@@ -226,11 +238,11 @@ namespace CrewChiefV4.Events
         private void checkCompletedOvertake(GameStateData currentGameState)
         {
             if (opponentKeyForCarWeJustPassed != null)
-            {                
+            {
                 if (currentGameState.Now < timeWhenWeMadeAPass.Add(maxTimeToWaitBeforeReportingPass) && lastOvertakeWasClean)
                 {
                     Boolean reported = false;
-                    OpponentData carWeJustPassed = currentGameState.OpponentData[opponentKeyForCarWeJustPassed];               
+                    OpponentData carWeJustPassed = currentGameState.OpponentData[opponentKeyForCarWeJustPassed];
                     if (currentGameState.Now > timeWhenWeMadeAPass.Add(minTimeToWaitBeforeReportingPass))
                     {                                 
                         if (currentGameState.Now > lastOvertakeMessageTime.Add(minTimeBetweenOvertakeMessages) && 
