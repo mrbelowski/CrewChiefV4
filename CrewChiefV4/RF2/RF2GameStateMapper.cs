@@ -444,18 +444,6 @@ namespace CrewChiefV4.rFactor2
             this.brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(cgs.carClass);
             csd.DriverRawName = GetStringFromBytes(playerScoring.mDriverName).ToLower();
             csd.TrackDefinition = new TrackDefinition(GetStringFromBytes(shared.scoring.mScoringInfo.mTrackName), (float)shared.scoring.mScoringInfo.mLapDist);
-
-            if (pgs == null || psd.TrackDefinition.name != csd.TrackDefinition.name)
-            {
-                // New game or new track
-                var tdc = TrackData.TRACK_LANDMARKS_DATA.getTrackDataForTrackName(csd.TrackDefinition.name, (float)shared.scoring.mScoringInfo.mLapDist);
-                csd.TrackDefinition.trackLandmarks = tdc.trackLandmarks;
-                csd.TrackDefinition.isOval = tdc.isOval;
-                csd.TrackDefinition.setGapPoints();
-
-                GlobalBehaviourSettings.UpdateFromTrackDefinition(csd.TrackDefinition);
-            }
-
             csd.SessionNumberOfLaps = shared.scoring.mScoringInfo.mMaxLaps > 0 && shared.scoring.mScoringInfo.mMaxLaps < 1000 ? shared.scoring.mScoringInfo.mMaxLaps : 0;
 
             // default to 60:30 if both session time and number of laps undefined (test day)
@@ -503,6 +491,14 @@ namespace CrewChiefV4.rFactor2
                 Console.WriteLine("Enabled message types:");
                 foreach (var m in GlobalBehaviourSettings.enabledMessageTypes)
                     Console.WriteLine('\t' + m.ToString());
+
+                // Initialize track landmarks for this session.
+                var tdc = TrackData.TRACK_LANDMARKS_DATA.getTrackDataForTrackName(csd.TrackDefinition.name, (float)shared.scoring.mScoringInfo.mLapDist);
+                csd.TrackDefinition.trackLandmarks = tdc.trackLandmarks;
+                csd.TrackDefinition.isOval = tdc.isOval;
+                csd.TrackDefinition.setGapPoints();
+
+                GlobalBehaviourSettings.UpdateFromTrackDefinition(csd.TrackDefinition);
             }
 
             // Restore cumulative data.
