@@ -307,7 +307,7 @@ namespace CrewChiefV4.Events
                     }
                 }
             }
-            
+            // TODO: in R3E this previousGameState OnOutLap doesn't appear to true when we start our flying lap
             if (!currentGameState.PitData.OnInLap && previousGameState != null && !previousGameState.PitData.OnOutLap 
                 && !currentGameState.PitData.InPitlane)   // as this is a new lap, check whether the *previous* state was an outlap
             {

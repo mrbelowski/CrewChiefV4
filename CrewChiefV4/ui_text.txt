@@ -71,15 +71,15 @@ idling_context_menu = Crew Chief is idling
 messages_volume = Messages volume
 background_volume = Background volume
 
-extracting_sound_pack = Extracting Sound Pack...
+extracting_sound_pack = Extracting Sound Pack
 
 error_downloading_sound_pack = Error downloading Sound Pack, check the readme file for instructions on how to manually download and install this.
 unable_to_download_sound_pack = Unable to download Sound Pack
-extracting_driver_names = Extracting driver names...
+extracting_driver_names = Extracting driver names
 
 error_downloading_personalisations = Error personalisations names, check the readme file for instructions on how to manually download and install this.
 unable_to_download_personalisations = Unable to download personalisations
-extracting_personalisations = Extracting personalisations...
+extracting_personalisations = Extracting personalisations
 
 error_downloading_driver_names = Error downloading driver names, check the readme file for instructions on how to manually download and install this.
 unable_to_download_driver_names = Unable to download driver names
