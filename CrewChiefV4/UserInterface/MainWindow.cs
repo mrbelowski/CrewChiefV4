@@ -1595,178 +1595,223 @@ namespace CrewChiefV4
 
         void soundpack_DownloadFileCompleted(object sender, AsyncCompletedEventArgs e)
         {
-            Boolean success = false;
-            try
+            if (e.Error == null && !e.Cancelled)
             {
-                if (e.Error == null && !e.Cancelled)
+                downloadSoundPackButton.Text = Configuration.getUIString("extracting_sound_pack");
+                new Thread(() =>
                 {
-                    downloadSoundPackButton.Text = Configuration.getUIString("extracting_sound_pack");
-                    if (Directory.Exists(AudioPlayer.soundFilesPath + @"\sounds_temp"))
-                    {
-                        Directory.Delete(AudioPlayer.soundFilesPath + @"\sounds_temp", true);
-                    }
-                    ZipFile.ExtractToDirectory(AudioPlayer.soundFilesPath + @"\" + soundPackTempFileName, AudioPlayer.soundFilesPath + @"\sounds_temp");
-                    // It's important to note that the order of these two calls must *not* matter. If it does, the update process results will be inconsistent.
-                    // The update pack can contain file rename instructions and file delete instructions but it can *never* contain obsolete files (or files
-                    // with old names). As long as this is the case, it shouldn't matter what order we do these in...
-                    UpdateHelper.ProcessFileUpdates(AudioPlayer.soundFilesPath + @"\sounds_temp");
-                    UpdateHelper.MoveDirectory(AudioPlayer.soundFilesPath + @"\sounds_temp", AudioPlayer.soundFilesPath);
-                    success = true;
-                    downloadSoundPackButton.Text = Configuration.getUIString("sound_pack_is_up_to_date");
-                }
-            }
-            catch (Exception) { }
-            finally
-            {
-                if (success)
-                {
+                    Thread.CurrentThread.IsBackground = true;
+                    Boolean success = false;
                     try
                     {
-                        File.Delete(AudioPlayer.soundFilesPath + @"\" + soundPackTempFileName);
+                        if (Directory.Exists(AudioPlayer.soundFilesPath + @"\sounds_temp"))
+                        {
+                            Directory.Delete(AudioPlayer.soundFilesPath + @"\sounds_temp", true);
+                        }
+                        ZipFile.ExtractToDirectory(AudioPlayer.soundFilesPath + @"\" + soundPackTempFileName, AudioPlayer.soundFilesPath + @"\sounds_temp");
+                        // It's important to note that the order of these two calls must *not* matter. If it does, the update process results will be inconsistent.
+                        // The update pack can contain file rename instructions and file delete instructions but it can *never* contain obsolete files (or files
+                        // with old names). As long as this is the case, it shouldn't matter what order we do these in...
+                        UpdateHelper.ProcessFileUpdates(AudioPlayer.soundFilesPath + @"\sounds_temp");
+                        UpdateHelper.MoveDirectory(AudioPlayer.soundFilesPath + @"\sounds_temp", AudioPlayer.soundFilesPath);
+                        success = true;
+                        downloadSoundPackButton.Text = Configuration.getUIString("sound_pack_is_up_to_date");
                     }
                     catch (Exception) { }
-                }
-                soundPackProgressBar.Value = 0;
-                isDownloadingSoundPack = false;
-                if (success && !isDownloadingDriverNames && !isDownloadingPersonalisations)
-                {
-                    doRestart(Configuration.getUIString("the_application_must_be_restarted_to_load_the_new_sounds"), Configuration.getUIString("load_new_sounds"));
-                }
+                    finally
+                    {
+                        if (success)
+                        {
+                            try
+                            {
+                                File.Delete(AudioPlayer.soundFilesPath + @"\" + soundPackTempFileName);
+                            }
+                            catch (Exception) { }
+                        }
+                        soundPackProgressBar.Value = 0;
+                        isDownloadingSoundPack = false;
+                        if (success && !isDownloadingDriverNames && !isDownloadingPersonalisations)
+                        {
+                            doRestart(Configuration.getUIString("the_application_must_be_restarted_to_load_the_new_sounds"), Configuration.getUIString("load_new_sounds"));
+                        }
+                    }
+                    if (!success)
+                    {
+                        soundPackUpdateFailed(false);
+                    }
+                }).Start();
             }
-            if (!success)
+            else
             {
-                startApplicationButton.Enabled = !isDownloadingDriverNames && !isDownloadingPersonalisations;
-                if (AudioPlayer.soundPackVersion == -1)
-                {
-                    downloadSoundPackButton.Text = Configuration.getUIString("no_sound_pack_detected_press_to_download");
-                }
-                else
-                {
-                    downloadSoundPackButton.Text = Configuration.getUIString("updated_sound_pack_available_press_to_download");
-                }
-                downloadSoundPackButton.Enabled = true;
-                if (!e.Cancelled)
-                {
-                    MessageBox.Show(Configuration.getUIString("error_downloading_sound_pack"), Configuration.getUIString("unable_to_download_sound_pack"),
-                        MessageBoxButtons.OK);
-                }
+                soundPackUpdateFailed(e.Cancelled);
             }
         }
+
         void drivernames_DownloadFileCompleted(object sender, AsyncCompletedEventArgs e)
         {
-            Boolean success = false;
-            try
+            if (e.Error == null && !e.Cancelled)
             {
-                if (e.Error == null && !e.Cancelled)
+                downloadDriverNamesButton.Text = Configuration.getUIString("extracting_driver_names");
+                new Thread(() =>
                 {
-                    downloadDriverNamesButton.Text = Configuration.getUIString("extracting_driver_names");
-                    if (Directory.Exists(AudioPlayer.soundFilesPath + @"\driver_names_temp"))
-                    {
-                        Directory.Delete(AudioPlayer.soundFilesPath + @"\driver_names_temp", true);
-                    }
-                    ZipFile.ExtractToDirectory(AudioPlayer.soundFilesPath + @"\" + driverNamesTempFileName, AudioPlayer.soundFilesPath + @"\driver_names_temp", Encoding.UTF8);
-                    UpdateHelper.MoveDirectory(AudioPlayer.soundFilesPath + @"\driver_names_temp", AudioPlayer.soundFilesPath);
-                    success = true;
-                    downloadDriverNamesButton.Text = Configuration.getUIString("driver_names_are_up_to_date");
-                }
-            }
-            catch (Exception) { }
-            finally
-            {
-                if (success)
-                {
+                    Thread.CurrentThread.IsBackground = true;
+                    Boolean success = false;
                     try
                     {
-                        File.Delete(AudioPlayer.soundFilesPath + @"\" + driverNamesTempFileName);
+                        downloadDriverNamesButton.Text = Configuration.getUIString("extracting_driver_names");
+                        if (Directory.Exists(AudioPlayer.soundFilesPath + @"\driver_names_temp"))
+                        {
+                            Directory.Delete(AudioPlayer.soundFilesPath + @"\driver_names_temp", true);
+                        }
+                        ZipFile.ExtractToDirectory(AudioPlayer.soundFilesPath + @"\" + driverNamesTempFileName, AudioPlayer.soundFilesPath + @"\driver_names_temp", Encoding.UTF8);
+                        UpdateHelper.MoveDirectory(AudioPlayer.soundFilesPath + @"\driver_names_temp", AudioPlayer.soundFilesPath);
+                        success = true;
+                        downloadDriverNamesButton.Text = Configuration.getUIString("driver_names_are_up_to_date");
                     }
                     catch (Exception) { }
-                }
-                driverNamesProgressBar.Value = 0;
-                isDownloadingDriverNames = false;
-                if (success && !isDownloadingSoundPack && !isDownloadingPersonalisations)
-                {
-                    doRestart(Configuration.getUIString("the_application_must_be_restarted_to_load_the_new_sounds"), Configuration.getUIString("load_new_sounds"));
-                }
+                    finally
+                    {
+                        if (success)
+                        {
+                            try
+                            {
+                                File.Delete(AudioPlayer.soundFilesPath + @"\" + driverNamesTempFileName);
+                            }
+                            catch (Exception) { }
+                        }
+                        driverNamesProgressBar.Value = 0;
+                        isDownloadingDriverNames = false;
+                        if (success && !isDownloadingSoundPack && !isDownloadingPersonalisations)
+                        {
+                            doRestart(Configuration.getUIString("the_application_must_be_restarted_to_load_the_new_sounds"), Configuration.getUIString("load_new_sounds"));
+                        }
+                    }
+                    if (!success)
+                    {
+                        driverNamesUpdateFailed(false);
+                    }
+                }).Start();
             }
-            if (!success)
+            else
             {
-                startApplicationButton.Enabled = !isDownloadingSoundPack && !isDownloadingPersonalisations;
-                if (AudioPlayer.driverNamesVersion == -1)
-                {
-                    downloadDriverNamesButton.Text = Configuration.getUIString("no_driver_names_detected_press_to_download");
-                }
-                else
-                {
-                    downloadDriverNamesButton.Text = Configuration.getUIString("updated_driver_names_available_press_to_download");
-                }
-                downloadDriverNamesButton.Enabled = true;
-                if (e.Error != null)
-                {
-                    MessageBox.Show(Configuration.getUIString("error_downloading_driver_names"), Configuration.getUIString("unable_to_download_driver_names"),
-                        MessageBoxButtons.OK);
-                }
+                driverNamesUpdateFailed(e.Cancelled);
             }
         }
 
         void personalisations_DownloadFileCompleted(object sender, AsyncCompletedEventArgs e)
         {
-            Boolean success = false;
-            try
+            if (e.Error == null && !e.Cancelled)
             {
-                if (e.Error == null && !e.Cancelled)
+                new Thread(() =>
                 {
+                    Thread.CurrentThread.IsBackground = true;
                     downloadPersonalisationsButton.Text = Configuration.getUIString("extracting_personalisations");
-                    if (Directory.Exists(AudioPlayer.soundFilesPath + @"\personalisations_temp"))
-                    {
-                        Directory.Delete(AudioPlayer.soundFilesPath + @"\personalisations_temp", true);
-                    }
-                    ZipFile.ExtractToDirectory(AudioPlayer.soundFilesPath + @"\" + personalisationsTempFileName, AudioPlayer.soundFilesPath + @"\personalisations_temp", Encoding.UTF8);
-                    UpdateHelper.MoveDirectory(AudioPlayer.soundFilesPath + @"\personalisations_temp", AudioPlayer.soundFilesPath + @"\personalisations");
-                    success = true;
-                    downloadPersonalisationsButton.Text = Configuration.getUIString("personalisations_are_up_to_date");
-                }
-            }
-            catch (Exception e2)
-            {
-                Console.WriteLine("Error extracting, " + e2.Message);
-            }
-            finally
-            {
-                if (success)
-                {
+                    Boolean success = false;
                     try
                     {
-                        File.Delete(AudioPlayer.soundFilesPath + @"\" + personalisationsTempFileName);
+                        if (e.Error == null && !e.Cancelled)
+                        {
+
+                            if (Directory.Exists(AudioPlayer.soundFilesPath + @"\personalisations_temp"))
+                            {
+                                Directory.Delete(AudioPlayer.soundFilesPath + @"\personalisations_temp", true);
+                            }
+                            ZipFile.ExtractToDirectory(AudioPlayer.soundFilesPath + @"\" + personalisationsTempFileName, AudioPlayer.soundFilesPath + @"\personalisations_temp", Encoding.UTF8);
+                            UpdateHelper.MoveDirectory(AudioPlayer.soundFilesPath + @"\personalisations_temp", AudioPlayer.soundFilesPath + @"\personalisations");
+                            success = true;
+                            downloadPersonalisationsButton.Text = Configuration.getUIString("personalisations_are_up_to_date");
+                        }
                     }
-                    catch (Exception) { }
-                }
-                personalisationsProgressBar.Value = 0;
-                isDownloadingPersonalisations = false;
-                if (success && !isDownloadingSoundPack && !isDownloadingDriverNames)
-                {
-                    doRestart(Configuration.getUIString("the_application_must_be_restarted_to_load_the_new_sounds"), Configuration.getUIString("load_new_sounds"));
-                }
+                    catch (Exception e2)
+                    {
+                        Console.WriteLine("Error extracting, " + e2.Message);
+                    }
+                    finally
+                    {
+                        if (success)
+                        {
+                            try
+                            {
+                                File.Delete(AudioPlayer.soundFilesPath + @"\" + personalisationsTempFileName);
+                            }
+                            catch (Exception) { }
+                        }
+                        personalisationsProgressBar.Value = 0;
+                        isDownloadingPersonalisations = false;
+                        if (success && !isDownloadingSoundPack && !isDownloadingDriverNames)
+                        {
+                            doRestart(Configuration.getUIString("the_application_must_be_restarted_to_load_the_new_sounds"), Configuration.getUIString("load_new_sounds"));
+                        }
+                    }
+                    if (!success)
+                    {
+                        personalisationsUpdateFailed(false);
+                    }
+                }).Start();
             }
-            if (!success)
+            else
             {
-                startApplicationButton.Enabled = !isDownloadingSoundPack && !isDownloadingDriverNames;
-                if (AudioPlayer.personalisationsVersion == -1)
-                {
-                    downloadPersonalisationsButton.Text = Configuration.getUIString("no_personalisations_detected_press_to_download");
-                }
-                else
-                {
-                    downloadPersonalisationsButton.Text = Configuration.getUIString("updated_personalisations_available_press_to_download");
-                }
-                downloadPersonalisationsButton.Enabled = true;
-                if (e.Error != null)
-                {
-                    MessageBox.Show(Configuration.getUIString("error_downloading_personalisations"), Configuration.getUIString("unable_to_download_personalisations"),
-                        MessageBoxButtons.OK);
-                }
+                personalisationsUpdateFailed(e.Cancelled);
             }
         }
 
+        private void driverNamesUpdateFailed(Boolean cancelled)
+        {
+            startApplicationButton.Enabled = !isDownloadingSoundPack && !isDownloadingPersonalisations;
+            if (AudioPlayer.driverNamesVersion == -1)
+            {
+                downloadDriverNamesButton.Text = Configuration.getUIString("no_driver_names_detected_press_to_download");
+            }
+            else
+            {
+                downloadDriverNamesButton.Text = Configuration.getUIString("updated_driver_names_available_press_to_download");
+            }
+            downloadDriverNamesButton.Enabled = true;
+            if (!cancelled)
+            {
+                MessageBox.Show(Configuration.getUIString("error_downloading_driver_names"), Configuration.getUIString("unable_to_download_driver_names"),
+                    MessageBoxButtons.OK);
+            }
+        }
+
+        private void soundPackUpdateFailed(Boolean cancelled)
+        {
+            startApplicationButton.Enabled = !isDownloadingDriverNames && !isDownloadingPersonalisations;
+            if (AudioPlayer.soundPackVersion == -1)
+            {
+                downloadSoundPackButton.Text = Configuration.getUIString("no_sound_pack_detected_press_to_download");
+            }
+            else
+            {
+                downloadSoundPackButton.Text = Configuration.getUIString("updated_sound_pack_available_press_to_download");
+            }
+            downloadSoundPackButton.Enabled = true;
+            if (!cancelled)
+            {
+                MessageBox.Show(Configuration.getUIString("error_downloading_sound_pack"), Configuration.getUIString("unable_to_download_sound_pack"),
+                    MessageBoxButtons.OK);
+            }
+        }
+
+        private void personalisationsUpdateFailed(Boolean cancelled)
+        {
+            startApplicationButton.Enabled = !isDownloadingSoundPack && !isDownloadingDriverNames;
+            if (AudioPlayer.personalisationsVersion == -1)
+            {
+                downloadPersonalisationsButton.Text = Configuration.getUIString("no_personalisations_detected_press_to_download");
+            }
+            else
+            {
+                downloadPersonalisationsButton.Text = Configuration.getUIString("updated_personalisations_available_press_to_download");
+            }
+            downloadPersonalisationsButton.Enabled = true;
+            if (!cancelled)
+            {
+                MessageBox.Show(Configuration.getUIString("error_downloading_personalisations"), Configuration.getUIString("unable_to_download_personalisations"),
+                    MessageBoxButtons.OK);
+            }
+        }
+        
         private void doRestart(String warningMessage, String warningTitle)
         {
             if (System.Diagnostics.Debugger.IsAttached)
