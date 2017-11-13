@@ -1655,15 +1655,14 @@ namespace CrewChiefV4
         {
             if (e.Error == null && !e.Cancelled)
             {
-                downloadDriverNamesButton.Text = Configuration.getUIString("extracting_driver_names");
+                String extractingButtonText = Configuration.getUIString("extracting_driver_names");
+                downloadDriverNamesButton.Text = extractingButtonText;
                 new Thread(() =>
                 {
                     Thread.CurrentThread.IsBackground = true;
                     Boolean success = false;
                     try
                     {
-                        String extractingButtonText = Configuration.getUIString("extracting_driver_names");
-                        downloadDriverNamesButton.Text = extractingButtonText;
                         if (Directory.Exists(AudioPlayer.soundFilesPath + @"\driver_names_temp"))
                         {
                             Directory.Delete(AudioPlayer.soundFilesPath + @"\driver_names_temp", true);
@@ -1710,11 +1709,11 @@ namespace CrewChiefV4
         {
             if (e.Error == null && !e.Cancelled)
             {
+                String extractingButtonText = Configuration.getUIString("extracting_personalisations");
+                downloadPersonalisationsButton.Text = extractingButtonText;
                 new Thread(() =>
                 {
                     Thread.CurrentThread.IsBackground = true;
-                    String extractingButtonText = Configuration.getUIString("extracting_personalisations");
-                    downloadPersonalisationsButton.Text = extractingButtonText;
                     Boolean success = false;
                     try
                     {
