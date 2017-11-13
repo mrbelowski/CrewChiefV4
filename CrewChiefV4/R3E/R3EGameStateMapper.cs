@@ -686,7 +686,7 @@ namespace CrewChiefV4.RaceRoom
                             participantStruct.LapDistance, shared.CarSpeed);
                         currentGameState.SessionData.stoppedInLandmark = participantStruct.InPitlane == 1 ? null : stoppedInLandmark;
                     }
-                    // TODO: invalid out and in laps? Or update the Laptimes event to check for it?
+
                     if (currentGameState.PitData.InPitlane)
                     {
                         if (currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.SessionRunningTime > 10 && 
@@ -702,6 +702,7 @@ namespace CrewChiefV4.RaceRoom
                         else if (participantStruct.TrackSector == 1)
                         {
                             currentGameState.PitData.OnInLap = false;
+                            currentGameState.SessionData.CurrentLapIsValid = false;
                             currentGameState.PitData.OnOutLap = true;
                         }
                     }
