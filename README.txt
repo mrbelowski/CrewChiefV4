@@ -10,7 +10,7 @@ For support and discussions about Crew Chief we have our very own forum here: ht
 
 Changelog
 ---------
-Version 4.8.1.5: Better UI handling of sound pack downloads (app should no longer appear to hang while unpacking sounds); Announce retired and DQ'ed drivers in RF2; Fixed stale driverID in iRacing; Minor bug fixes - Mark out laps as invalid in R3E (should prevent stale lap time calls at the end of an out lap), RF2 pre-lights message fixes, pCARS 2 pit exit messages
+Version 4.8.1.5: Better UI handling of sound pack downloads (app should no longer appear to hang while unpacking sounds); Announce retired and DQ'ed drivers in RF2; Fixed stale driverID in iRacing; Minor bug fixes - Mark out laps as invalid in R3E (should prevent stale lap time calls at the end of an out lap), RF2 pre-lights and overtake messages and track landmark mapping getting lost on session restart, pCARS 2 pit exit messages;
 
 Version 4.8.1.4: Better pruning of pCARS2 stale and duplicated opponent data in online sessions (hacks adapted from pCARS1 to work around bugs inherited from pCARS1); Added opponent retired and opponent disqualified messages (pCARS2 / R3E); Some bugfixes in R3E for invalid lap handling; R3E and pCARS2 car and track mapping fixes
 
