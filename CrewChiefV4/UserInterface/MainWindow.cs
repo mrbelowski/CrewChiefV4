@@ -1603,15 +1603,15 @@ namespace CrewChiefV4
                 {
                     Thread.CurrentThread.IsBackground = true;
                     Boolean success = false;
-                    Thread unzippingThread = null;
+                    Thread progressThread = null;
                     try
                     {
                         if (Directory.Exists(AudioPlayer.soundFilesPath + @"\sounds_temp"))
                         {
                             Directory.Delete(AudioPlayer.soundFilesPath + @"\sounds_temp", true);
                         }
-                        unzippingThread = createUnzippingThread(downloadSoundPackButton, extractingButtonText);
-                        unzippingThread.Start(); 
+                        progressThread = createProgressThread(downloadSoundPackButton, extractingButtonText);
+                        progressThread.Start(); 
                         ZipFile.ExtractToDirectory(AudioPlayer.soundFilesPath + @"\" + soundPackTempFileName, AudioPlayer.soundFilesPath + @"\sounds_temp");
                         // It's important to note that the order of these two calls must *not* matter. If it does, the update process results will be inconsistent.
                         // The update pack can contain file rename instructions and file delete instructions but it can *never* contain obsolete files (or files
@@ -1623,9 +1623,9 @@ namespace CrewChiefV4
                     catch (Exception) { }
                     finally
                     {
-                        if (unzippingThread != null)
+                        if (progressThread != null)
                         {
-                            unzippingThread.Abort();
+                            progressThread.Abort();
                             Thread.Sleep(100);
                             downloadSoundPackButton.Text = Configuration.getUIString("sound_pack_is_up_to_date");
                         }
@@ -1666,15 +1666,15 @@ namespace CrewChiefV4
                 {
                     Thread.CurrentThread.IsBackground = true;
                     Boolean success = false;
-                    Thread unzippingThread = null;
+                    Thread progressThread = null;
                     try
                     {
                         if (Directory.Exists(AudioPlayer.soundFilesPath + @"\driver_names_temp"))
                         {
                             Directory.Delete(AudioPlayer.soundFilesPath + @"\driver_names_temp", true);
                         }
-                        unzippingThread = createUnzippingThread(downloadDriverNamesButton, extractingButtonText);
-                        unzippingThread.Start(); 
+                        progressThread = createProgressThread(downloadDriverNamesButton, extractingButtonText);
+                        progressThread.Start(); 
                         ZipFile.ExtractToDirectory(AudioPlayer.soundFilesPath + @"\" + driverNamesTempFileName, AudioPlayer.soundFilesPath + @"\driver_names_temp", Encoding.UTF8);
                         UpdateHelper.MoveDirectory(AudioPlayer.soundFilesPath + @"\driver_names_temp", AudioPlayer.soundFilesPath);
                         success = true;
@@ -1682,9 +1682,9 @@ namespace CrewChiefV4
                     catch (Exception) { }
                     finally
                     {
-                        if (unzippingThread != null)
+                        if (progressThread != null)
                         {
-                            unzippingThread.Abort();
+                            progressThread.Abort();
                             Thread.Sleep(100);
                             downloadDriverNamesButton.Text = Configuration.getUIString("driver_names_are_up_to_date");
                         }
@@ -1725,7 +1725,7 @@ namespace CrewChiefV4
                 {
                     Thread.CurrentThread.IsBackground = true;
                     Boolean success = false;
-                    Thread unzippingThread = null;
+                    Thread progressThread = null;
                     try
                     {
                         if (e.Error == null && !e.Cancelled)
@@ -1735,8 +1735,8 @@ namespace CrewChiefV4
                             {
                                 Directory.Delete(AudioPlayer.soundFilesPath + @"\personalisations_temp", true);
                             }
-                            unzippingThread = createUnzippingThread(downloadPersonalisationsButton, extractingButtonText);
-                            unzippingThread.Start();
+                            progressThread = createProgressThread(downloadPersonalisationsButton, extractingButtonText);
+                            progressThread.Start();
                             ZipFile.ExtractToDirectory(AudioPlayer.soundFilesPath + @"\" + personalisationsTempFileName, AudioPlayer.soundFilesPath + @"\personalisations_temp", Encoding.UTF8);
                             UpdateHelper.MoveDirectory(AudioPlayer.soundFilesPath + @"\personalisations_temp", AudioPlayer.soundFilesPath + @"\personalisations");
                             success = true;
@@ -1748,9 +1748,9 @@ namespace CrewChiefV4
                     }
                     finally
                     {
-                        if (unzippingThread != null)
+                        if (progressThread != null)
                         {
-                            unzippingThread.Abort();
+                            progressThread.Abort();
                             Thread.Sleep(100);
                             downloadPersonalisationsButton.Text = Configuration.getUIString("personalisations_are_up_to_date");
                         }
@@ -1782,7 +1782,7 @@ namespace CrewChiefV4
         }
 
         // 'ticks' the button so the user knows something's happening
-        private Thread createUnzippingThread(Button button, String text)
+        private Thread createProgressThread(Button button, String text)
         {
             return new Thread(() =>
             {
