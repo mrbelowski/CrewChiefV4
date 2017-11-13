@@ -223,16 +223,7 @@ namespace CrewChiefV4.rFactor1
             brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(currentGameState.carClass);
             currentGameState.SessionData.DriverRawName = getStringFromBytes(player.driverName).ToLower();
             currentGameState.SessionData.TrackDefinition = new TrackDefinition(getStringFromBytes(shared.trackName), shared.lapDist);
-            if (previousGameState == null || previousGameState.SessionData.TrackDefinition.name != currentGameState.SessionData.TrackDefinition.name)
-            {
-                // new game or new track
-                TrackDataContainer tdc = TrackData.TRACK_LANDMARKS_DATA.getTrackDataForTrackName(currentGameState.SessionData.TrackDefinition.name, shared.lapDist);
-                currentGameState.SessionData.TrackDefinition.trackLandmarks = tdc.trackLandmarks;
-                currentGameState.SessionData.TrackDefinition.isOval = tdc.isOval;
-                currentGameState.SessionData.TrackDefinition.setGapPoints();
-                GlobalBehaviourSettings.UpdateFromTrackDefinition(currentGameState.SessionData.TrackDefinition);
-            }
-            else if (previousGameState != null)
+            if (previousGameState != null)
             {
                 // copy from previous gamestate
                 currentGameState.SessionData.TrackDefinition.trackLandmarks = previousGameState.SessionData.TrackDefinition.trackLandmarks;
@@ -273,8 +264,14 @@ namespace CrewChiefV4.rFactor1
             {
                 previousGameState = null; 
                 GlobalBehaviourSettings.UpdateFromCarClass(currentGameState.carClass);
+
+                // Initialize track landmarks for this session.
+                TrackDataContainer tdc = TrackData.TRACK_LANDMARKS_DATA.getTrackDataForTrackName(currentGameState.SessionData.TrackDefinition.name, shared.lapDist);
+                currentGameState.SessionData.TrackDefinition.trackLandmarks = tdc.trackLandmarks;
+                currentGameState.SessionData.TrackDefinition.isOval = tdc.isOval;
+                currentGameState.SessionData.TrackDefinition.setGapPoints();
+                GlobalBehaviourSettings.UpdateFromTrackDefinition(currentGameState.SessionData.TrackDefinition);
             }
-            
 
             currentGameState.SessionData.SessionStartTime = currentGameState.SessionData.IsNewSession ? currentGameState.Now : previousGameState.SessionData.SessionStartTime;
             currentGameState.SessionData.SessionHasFixedTime = currentGameState.SessionData.SessionTotalRunTime > 0;
