@@ -1603,13 +1603,14 @@ namespace CrewChiefV4
                 {
                     Thread.CurrentThread.IsBackground = true;
                     Boolean success = false;
+                    Thread unzippingThread = null;
                     try
                     {
                         if (Directory.Exists(AudioPlayer.soundFilesPath + @"\sounds_temp"))
                         {
                             Directory.Delete(AudioPlayer.soundFilesPath + @"\sounds_temp", true);
                         }
-                        Thread unzippingThread = createUnzippingThread(downloadSoundPackButton, extractingButtonText);
+                        unzippingThread = createUnzippingThread(downloadSoundPackButton, extractingButtonText);
                         unzippingThread.Start(); 
                         ZipFile.ExtractToDirectory(AudioPlayer.soundFilesPath + @"\" + soundPackTempFileName, AudioPlayer.soundFilesPath + @"\sounds_temp");
                         // It's important to note that the order of these two calls must *not* matter. If it does, the update process results will be inconsistent.
@@ -1617,13 +1618,17 @@ namespace CrewChiefV4
                         // with old names). As long as this is the case, it shouldn't matter what order we do these in...
                         UpdateHelper.ProcessFileUpdates(AudioPlayer.soundFilesPath + @"\sounds_temp");
                         UpdateHelper.MoveDirectory(AudioPlayer.soundFilesPath + @"\sounds_temp", AudioPlayer.soundFilesPath);
-                        unzippingThread.Abort();
                         success = true;
-                        downloadSoundPackButton.Text = Configuration.getUIString("sound_pack_is_up_to_date");
                     }
                     catch (Exception) { }
                     finally
                     {
+                        if (unzippingThread != null)
+                        {
+                            unzippingThread.Abort();
+                            Thread.Sleep(100);
+                            downloadSoundPackButton.Text = Configuration.getUIString("sound_pack_is_up_to_date");
+                        }
                         if (success)
                         {
                             try
@@ -1661,23 +1666,28 @@ namespace CrewChiefV4
                 {
                     Thread.CurrentThread.IsBackground = true;
                     Boolean success = false;
+                    Thread unzippingThread = null;
                     try
                     {
                         if (Directory.Exists(AudioPlayer.soundFilesPath + @"\driver_names_temp"))
                         {
                             Directory.Delete(AudioPlayer.soundFilesPath + @"\driver_names_temp", true);
                         }
-                        Thread unzippingThread = createUnzippingThread(downloadDriverNamesButton, extractingButtonText);
+                        unzippingThread = createUnzippingThread(downloadDriverNamesButton, extractingButtonText);
                         unzippingThread.Start(); 
                         ZipFile.ExtractToDirectory(AudioPlayer.soundFilesPath + @"\" + driverNamesTempFileName, AudioPlayer.soundFilesPath + @"\driver_names_temp", Encoding.UTF8);
                         UpdateHelper.MoveDirectory(AudioPlayer.soundFilesPath + @"\driver_names_temp", AudioPlayer.soundFilesPath);
-                        unzippingThread.Abort();
                         success = true;
-                        downloadDriverNamesButton.Text = Configuration.getUIString("driver_names_are_up_to_date");
                     }
                     catch (Exception) { }
                     finally
                     {
+                        if (unzippingThread != null)
+                        {
+                            unzippingThread.Abort();
+                            Thread.Sleep(100);
+                            downloadDriverNamesButton.Text = Configuration.getUIString("driver_names_are_up_to_date");
+                        }
                         if (success)
                         {
                             try
@@ -1715,6 +1725,7 @@ namespace CrewChiefV4
                 {
                     Thread.CurrentThread.IsBackground = true;
                     Boolean success = false;
+                    Thread unzippingThread = null;
                     try
                     {
                         if (e.Error == null && !e.Cancelled)
@@ -1724,13 +1735,11 @@ namespace CrewChiefV4
                             {
                                 Directory.Delete(AudioPlayer.soundFilesPath + @"\personalisations_temp", true);
                             }
-                            Thread unzippingThread = createUnzippingThread(downloadPersonalisationsButton, extractingButtonText);
+                            unzippingThread = createUnzippingThread(downloadPersonalisationsButton, extractingButtonText);
                             unzippingThread.Start();
                             ZipFile.ExtractToDirectory(AudioPlayer.soundFilesPath + @"\" + personalisationsTempFileName, AudioPlayer.soundFilesPath + @"\personalisations_temp", Encoding.UTF8);
                             UpdateHelper.MoveDirectory(AudioPlayer.soundFilesPath + @"\personalisations_temp", AudioPlayer.soundFilesPath + @"\personalisations");
-                            unzippingThread.Abort();
                             success = true;
-                            downloadPersonalisationsButton.Text = Configuration.getUIString("personalisations_are_up_to_date");
                         }
                     }
                     catch (Exception e2)
@@ -1739,6 +1748,12 @@ namespace CrewChiefV4
                     }
                     finally
                     {
+                        if (unzippingThread != null)
+                        {
+                            unzippingThread.Abort();
+                            Thread.Sleep(100);
+                            downloadPersonalisationsButton.Text = Configuration.getUIString("personalisations_are_up_to_date");
+                        }
                         if (success)
                         {
                             try
