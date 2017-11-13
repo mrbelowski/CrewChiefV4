@@ -10,6 +10,8 @@ For support and discussions about Crew Chief we have our very own forum here: ht
 
 Changelog
 ---------
+Version 4.8.1.5: Better UI handling of sound pack downloads (app should no longer appear to hang while unpacking sounds); Announce retired and DQ'ed drivers in RF2; Fixed stale driverID in iRacing; Minor bug fixes - Mark out laps as invalid in R3E (should prevent stale lap time calls at the end of an out lap), RF2 pre-lights and overtake messages and track landmark mapping getting lost on session restart, pCARS 2 pit exit messages;
+
 Version 4.8.1.4: Better pruning of pCARS2 stale and duplicated opponent data in online sessions (hacks adapted from pCARS1 to work around bugs inherited from pCARS1); Added opponent retired and opponent disqualified messages (pCARS2 / R3E); Some bugfixes in R3E for invalid lap handling; R3E and pCARS2 car and track mapping fixes
 
 Version 4.8.1.3: Fixed an issue in the speech recogniser where grammars were initialised multiple times, reducing recognition accuracy - this should make the recogniser work more reliably; Fixed an issue in R3E and AC where a lap invalidated in sector 3 could cause stale best-lap data to be announced; Remove opponents who are reported as DNF / DQ / DNS in R3E; Added experimental option 'Disable alternative voice commands' (disabled by default). Enabling this will force the speech recogniser to only load the first command from each row in speech_recognition_config.txt. Instead of recognising any of "who's leading", "who's in the lead", "who is leading", "who is in the lead", or "who's the leader" the app will only recognise the first in the list - "who's leading". This will limit the number of phrases the recogniser understands and *may* improve recognition accuracy

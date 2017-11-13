@@ -60,7 +60,7 @@ namespace CrewChiefV4.iRacing
 
             SessionPhase lastSessionPhase = SessionPhase.Unavailable;
             SessionType lastSessionType = SessionType.Unavailable;
-
+            int? previousSessionNumber = -1;
             float lastSessionRunningTime = 0;
             if (previousGameState != null)
             {
@@ -69,6 +69,7 @@ namespace CrewChiefV4.iRacing
                 lastSessionType = previousGameState.SessionData.SessionType;
                 currentGameState.SessionData.SessionStartPosition = previousGameState.SessionData.SessionStartPosition;
                 currentGameState.readLandmarksForThisLap = previousGameState.readLandmarksForThisLap;
+                previousSessionNumber = previousGameState.SessionData.SessionIteration;
             }
             currentGameState.SessionData.SessionType = mapToSessionType(shared.SessionData.SessionType);
             currentGameState.SessionData.SessionRunningTime = (float)shared.Telemetry.SessionTime;
@@ -82,6 +83,7 @@ namespace CrewChiefV4.iRacing
             currentGameState.SessionData.NumCarsAtStartOfSession = shared.Drivers.Count;
 
             int sessionNumber = shared.Telemetry.SessionNum;
+            currentGameState.SessionData.SessionIteration = sessionNumber;
             int PlayerCarIdx = shared.Telemetry.PlayerCarIdx;
 
             Boolean justGoneGreen = false;
@@ -95,15 +97,16 @@ namespace CrewChiefV4.iRacing
                 Console.WriteLine(playerCar.Live.TrackSurface.ToString());
                 prevTrackSurface = playerCar.Live.TrackSurface.ToString();
             }*/
+
             Boolean sessionOfSameTypeRestarted = ((currentGameState.SessionData.SessionType == SessionType.Race && lastSessionType == SessionType.Race) ||
                 (currentGameState.SessionData.SessionType == SessionType.Practice && lastSessionType == SessionType.Practice) ||
                 (currentGameState.SessionData.SessionType == SessionType.Qualify && lastSessionType == SessionType.Qualify)) &&
                 ((lastSessionPhase == SessionPhase.Green || lastSessionPhase == SessionPhase.FullCourseYellow) || lastSessionPhase == SessionPhase.Finished) &&
                 (currentGameState.SessionData.SessionPhase == SessionPhase.Countdown);
 
-            if (sessionOfSameTypeRestarted || currentGameState.SessionData.SessionType != SessionType.Unavailable
+            if (sessionOfSameTypeRestarted || currentGameState.SessionData.SessionType != SessionType.Unavailable 
                 && lastSessionPhase != SessionPhase.Countdown
-                && lastSessionType != currentGameState.SessionData.SessionType)
+                && lastSessionType != currentGameState.SessionData.SessionType || sessionNumber != previousSessionNumber)
             {
                 currentGameState.SessionData.IsNewSession = true;
                 Console.WriteLine("New session, trigger data:");
