@@ -177,6 +177,9 @@ namespace CrewChiefV4.iRacing
                     iRacingStructWrapper structWrapper = new iRacingStructWrapper();
                     structWrapper.ticksWhenRead = DateTime.Now.Ticks;
 
+
+                    _DriverId = (int)sdk.GetData("PlayerCarIdx");
+
                     int newUpdate = sdk.Header.SessionInfoUpdate;
                     bool hasNewSessionData = false;
                     if (newUpdate != lastUpdate)
