@@ -108,6 +108,7 @@ namespace CrewChiefV4.assetto
         private float severeAeroDamageThreshold = 200.0f;
         private float destroyedAeroDamageThreshold = 400.0f;
 
+        #region WaYToManyTyres
         public ACSGameStateMapper()
         {
 
@@ -756,6 +757,7 @@ namespace CrewChiefV4.assetto
             acTyres.Add("Vintage (V)", new AcTyres(tyreWearThresholdsVintage, tyreTempsThresholdsVintage, 95f));
 
         }
+        #endregion
 
         public void versionCheck(Object memoryMappedFileStruct)
         {
