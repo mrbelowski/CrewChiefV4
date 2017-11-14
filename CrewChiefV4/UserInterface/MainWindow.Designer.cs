@@ -47,7 +47,7 @@ namespace CrewChiefV4
             this.buttonActionSelect = new System.Windows.Forms.ListBox();
             this.controllersList = new System.Windows.Forms.ListBox();
             this.assignButtonToAction = new System.Windows.Forms.Button();
-            this.deleteAssigmentButton = new System.Windows.Forms.Button();    
+            this.deleteAssigmentButton = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.button1 = new System.Windows.Forms.Button();
