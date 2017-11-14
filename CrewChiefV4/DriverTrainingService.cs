@@ -25,6 +25,8 @@ namespace CrewChiefV4
 
         private static String folderPathForSession;
 
+        private static Object _lock = new Object();
+
         public static void loadTrainingSession(GameEnum gameEnum, String trackName, CarData.CarClassEnum carClass)
         {
             if (!isRecordingSession && !isPlayingSession)
@@ -39,10 +41,26 @@ namespace CrewChiefV4
                     String fileName = System.IO.Path.Combine(folderPathForSession, "metadata.json");
                     if (File.Exists(fileName))
                     {
-                        DriverTrainingService.recordingMetaData = JsonConvert.DeserializeObject<MetaData>(File.ReadAllText(System.IO.Path.Combine(folderPathForSession, "metadata.json")));
+                        try
+                        {
+                            DriverTrainingService.recordingMetaData = JsonConvert.DeserializeObject<MetaData>(File.ReadAllText(fileName));
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine("Unable to parse training metadata file: " + e.Message);
+                            return;
+                        }
                         foreach (MetaDataEntry entry in DriverTrainingService.recordingMetaData.entries)
                         {
-                            SoundCache.loadSingleSound(entry.recordingName, System.IO.Path.Combine(DriverTrainingService.folderPathForSession, entry.fileName));
+                            try
+                            {
+                                SoundCache.loadSingleSound(entry.recordingName, System.IO.Path.Combine(DriverTrainingService.folderPathForSession, entry.fileName));
+                            }
+                            catch (Exception e)
+                            {
+                                Console.WriteLine("Unable to load a sound from training set " + DriverTrainingService.folderPathForSession + " : " + e.Message);
+                                return;
+                            }
                         }
                         isPlayingSession = true;
                     }
@@ -87,16 +105,40 @@ namespace CrewChiefV4
             if (!isPlayingSession && !isRecordingSession)
             {
                 Console.WriteLine("Recording a training session for circuit " + trackName + " with car class " + carClass.ToString());
-                isRecordingSession = true;
                 DriverTrainingService.gameEnum = gameEnum;
                 DriverTrainingService.trackName = trackName;
                 DriverTrainingService.carClass = carClass;
-                DriverTrainingService.recordingMetaData = new MetaData(gameEnum.ToString(), carClass.ToString(), trackName);
                 DriverTrainingService.folderPathForSession = getFolderPathForSession(gameEnum, trackName, carClass);
-                if (!System.IO.Directory.Exists(folderPathForSession))
+                Boolean createFolder = true;
+                Boolean createNewMetaData = true;
+                if (System.IO.Directory.Exists(folderPathForSession))
+                {
+                    createFolder = false;
+                    String fileName = System.IO.Path.Combine(folderPathForSession, "metadata.json");
+                    if (File.Exists(fileName))
+                    {
+                        try
+                        {
+                            DriverTrainingService.recordingMetaData = JsonConvert.DeserializeObject<MetaData>(File.ReadAllText(fileName));
+                            Console.WriteLine("A training session for this game / track / car combination already exists. This will be extended");
+                            createNewMetaData = false;
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine("Unable to load existing metadata - renaming to 'broken_" + fileName + "', " + e.Message);
+                            File.Move(fileName, "broken_" + fileName);
+                        }
+                    }
+                }
+                if (createFolder)
                 {
                     System.IO.Directory.CreateDirectory(folderPathForSession);
+                } 
+                if (createNewMetaData) 
+                {
+                    DriverTrainingService.recordingMetaData = new MetaData(gameEnum.ToString(), carClass.ToString(), trackName);
                 }
+                isRecordingSession = true;
             }
         }
 
@@ -124,7 +166,14 @@ namespace CrewChiefV4
             }
             if (isRecordingSession)
             {
-                File.WriteAllText(System.IO.Path.Combine(folderPathForSession, "metadata.json"), JsonConvert.SerializeObject(DriverTrainingService.recordingMetaData));
+                try
+                {
+                    File.WriteAllText(System.IO.Path.Combine(folderPathForSession, "metadata.json"), JsonConvert.SerializeObject(DriverTrainingService.recordingMetaData));
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Unable to complete recording session : " + e.Message);
+                }
                 isRecordingSession = false;
             }
         }
@@ -133,7 +182,14 @@ namespace CrewChiefV4
         {
             if (DriverTrainingService.isRecordingSound)
             {
-                DriverTrainingService.waveSource.StopRecording();
+                try
+                {
+                    DriverTrainingService.waveSource.StopRecording();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Failed to record a training session sound " + e.Message);
+                }
                 DriverTrainingService.isRecordingSound = false;
             }
         }
@@ -144,21 +200,30 @@ namespace CrewChiefV4
             {
                 if (DriverTrainingService.isRecordingSound)
                 {
-                    Console.WriteLine("bugger off i'm busy");
+                    Console.WriteLine("sound already being recorded");
                 }
                 else
-                {
-                    DriverTrainingService.isRecordingSound = true;
+                {                    
                     String fileName = distanceRoundTrack + ".wav";
-                    String recordingName = DriverTrainingService.trackName + "_" + DriverTrainingService.carClass.ToString() + "_" + fileName;
-                    DriverTrainingService.recordingMetaData.entries.Add(new MetaDataEntry(distanceRoundTrack, recordingName, fileName));
-                    DriverTrainingService.isRecordingSound = true;
-                    DriverTrainingService.waveSource = new WaveInEvent();
-                    DriverTrainingService.waveSource.WaveFormat = new WaveFormat(22050, 1);
-                    DriverTrainingService.waveSource.DataAvailable += new EventHandler<WaveInEventArgs>(waveSource_DataAvailable);
-                    DriverTrainingService.waveSource.RecordingStopped += new EventHandler<StoppedEventArgs>(waveSource_RecordingStopped);
-                    DriverTrainingService.waveFile = new WaveFileWriter(createFileName(fileName), waveSource.WaveFormat);
-                    DriverTrainingService.waveSource.StartRecording();
+                    String recordingName = DriverTrainingService.trackName + "_" + DriverTrainingService.carClass.ToString() + "_" + fileName;                   
+                    try
+                    {
+                        lock (_lock) 
+                        { 
+                            DriverTrainingService.waveSource = new WaveInEvent();
+                            DriverTrainingService.waveSource.WaveFormat = new WaveFormat(22050, 1);
+                            DriverTrainingService.waveSource.DataAvailable += new EventHandler<WaveInEventArgs>(waveSource_DataAvailable);
+                            DriverTrainingService.waveSource.RecordingStopped += new EventHandler<StoppedEventArgs>(waveSource_RecordingStopped);
+                            DriverTrainingService.waveFile = new WaveFileWriter(createFileName(fileName), waveSource.WaveFormat);
+                            DriverTrainingService.waveSource.StartRecording();                            
+                        }
+                        DriverTrainingService.recordingMetaData.entries.Add(new MetaDataEntry(distanceRoundTrack, recordingName, fileName));
+                        DriverTrainingService.isRecordingSound = true;
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("Unable to create a training session sound " + e.Message);
+                    }
                 }
             }
         }
@@ -170,25 +235,31 @@ namespace CrewChiefV4
 
         static void waveSource_DataAvailable(object sender, WaveInEventArgs e)
         {
-            if (DriverTrainingService.waveFile != null)
+            lock (_lock)
             {
-                DriverTrainingService.waveFile.Write(e.Buffer, 0, e.BytesRecorded);
-                DriverTrainingService.waveFile.Flush();
+                if (DriverTrainingService.waveFile != null)
+                {
+                    DriverTrainingService.waveFile.Write(e.Buffer, 0, e.BytesRecorded);
+                    DriverTrainingService.waveFile.Flush();
+                }
             }
         }
 
         static void waveSource_RecordingStopped(object sender, StoppedEventArgs e)
         {
-            if (DriverTrainingService.waveSource != null)
+            lock (_lock)
             {
-                DriverTrainingService.waveSource.Dispose();
-                DriverTrainingService.waveSource = null;
-            }
+                if (DriverTrainingService.waveSource != null)
+                {
+                    DriverTrainingService.waveSource.Dispose();
+                    DriverTrainingService.waveSource = null;
+                }
 
-            if (DriverTrainingService.waveFile != null)
-            {
-                DriverTrainingService.waveFile.Dispose();
-                DriverTrainingService.waveFile = null;
+                if (DriverTrainingService.waveFile != null)
+                {
+                    DriverTrainingService.waveFile.Dispose();
+                    DriverTrainingService.waveFile = null;
+                }
             }
         }
     }

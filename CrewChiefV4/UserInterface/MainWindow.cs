@@ -849,7 +849,10 @@ namespace CrewChiefV4
                                 DriverTrainingService.startRecordingMessage((int)CrewChief.currentGameState.PositionAndMotionData.DistanceRoundTrack);
                             }
                         }
-                        crewChief.speechRecogniser.recognizeAsync();
+                        else
+                        {
+                            crewChief.speechRecogniser.recognizeAsync();
+                        }
                         Console.WriteLine("Listening...");
 
                         if (rejectMessagesWhenTalking)
@@ -874,17 +877,16 @@ namespace CrewChiefV4
                         else
                         {
                             crewChief.speechRecogniser.recognizeAsyncCancel();
+                            new Thread(() =>
+                            {
+                                Thread.Sleep(2000);
+                                if (!channelOpen && !SpeechRecogniser.gotRecognitionResult)
+                                {
+                                    crewChief.youWot();
+                                }
+                            }).Start();
                         }
                         channelOpen = false;
-
-                        new Thread(() =>
-                        {
-                            Thread.Sleep(2000);
-                            if (!channelOpen && !SpeechRecogniser.gotRecognitionResult)
-                            {
-                                crewChief.youWot();
-                            }
-                        }).Start();
                     }
                 }
             }
