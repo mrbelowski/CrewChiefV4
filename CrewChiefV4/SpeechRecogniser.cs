@@ -472,7 +472,7 @@ namespace CrewChiefV4
         public void addNewOpponentName(String rawDriverName)
         {
             try
-            {                
+            {
                 String usableName = DriverNameHelper.getUsableDriverName(rawDriverName);
                 if (usableName != null && usableName.Length > 0)
                 {
@@ -482,7 +482,7 @@ namespace CrewChiefV4
                     }
                     if (initialised)
                     {
-                        Console.WriteLine("adding opponent name to speech recogniser: " + Environment.NewLine + usableName);
+                        Console.WriteLine("Adding new (mid-session joined) opponent name to speech recogniser: " + Environment.NewLine + usableName);
                         Choices opponentChoices = new Choices();
                         opponentChoices.Add(WHERE_IS + " " + usableName);
                         opponentChoices.Add(WHATS + " " + usableName + POSSESSIVE + " " + LAST_LAP);
@@ -497,7 +497,7 @@ namespace CrewChiefV4
                         sre.LoadGrammar(newOpponentGrammar);
                         opponentGrammarList.Add(newOpponentGrammar);
                         dynamicGrammarSize+=5;
-                        Console.WriteLine("added 5 items to dynamic (opponent) grammar, total is now " + dynamicGrammarSize);
+                        Console.WriteLine("Added 5 items to dynamic (opponent) grammar, total is now " + dynamicGrammarSize);
                     }
                     // This method is called when a new driver appears mid-session. We need to load the sound file for this new driver
                     // so do it here - nasty nasty hack, need to refactor this. The alternative is to call
@@ -524,7 +524,7 @@ namespace CrewChiefV4
             Choices opponentChoices = new Choices();
             if (useNames)
             {
-                Console.WriteLine("adding opponent names to speech recogniser: " + Environment.NewLine + String.Join(Environment.NewLine, names));
+                Console.WriteLine("Adding " + names.Count + " new session opponent names to speech recogniser" );
                 foreach (String name in names)
                 {
                     opponentChoices.Add(WHERE_IS + " " + name);
