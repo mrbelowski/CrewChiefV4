@@ -48,6 +48,8 @@ namespace CrewChiefV4
             this.controllersList = new System.Windows.Forms.ListBox();
             this.assignButtonToAction = new System.Windows.Forms.Button();
             this.deleteAssigmentButton = new System.Windows.Forms.Button();
+            this.recordTrainingSessionButton = new System.Windows.Forms.Button();
+            this.playTrainingSessionButton = new System.Windows.Forms.Button();            
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.button1 = new System.Windows.Forms.Button();
@@ -145,6 +147,28 @@ namespace CrewChiefV4
             this.deleteAssigmentButton.Text = Configuration.getUIString("delete_assignment");
             this.deleteAssigmentButton.UseVisualStyleBackColor = true;
             this.deleteAssigmentButton.Click += new System.EventHandler(this.deleteAssignmentButtonClicked);
+            // 
+            // recordTrainingSessionButton
+            // 
+            this.recordTrainingSessionButton.Location = new System.Drawing.Point(323, 635);
+            this.recordTrainingSessionButton.Name = "recordTrainingSessionButton";
+            this.recordTrainingSessionButton.Size = new System.Drawing.Size(220, 30);
+            this.recordTrainingSessionButton.TabIndex = 10;
+            this.recordTrainingSessionButton.Text = Configuration.getUIString("record_training_session_start");
+            this.recordTrainingSessionButton.UseVisualStyleBackColor = true;
+            this.recordTrainingSessionButton.Click += new System.EventHandler(this.recordTrainingSessionButtonClicked);
+            this.recordTrainingSessionButton.Enabled = false;
+            // 
+            // playTrainingSessionButton
+            // 
+            this.playTrainingSessionButton.Location = new System.Drawing.Point(570, 635);
+            this.playTrainingSessionButton.Name = "playTrainingSessionButton";
+            this.playTrainingSessionButton.Size = new System.Drawing.Size(220, 30);
+            this.playTrainingSessionButton.TabIndex = 10;
+            this.playTrainingSessionButton.Text = Configuration.getUIString("play_training_session_start");
+            this.playTrainingSessionButton.UseVisualStyleBackColor = true;
+            this.playTrainingSessionButton.Click += new System.EventHandler(this.playTrainingSessionButtonClicked);
+            this.playTrainingSessionButton.Enabled = false;
             // 
             // label1
             // 
@@ -516,6 +540,8 @@ namespace CrewChiefV4
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.deleteAssigmentButton);
+            this.Controls.Add(this.recordTrainingSessionButton);
+            this.Controls.Add(this.playTrainingSessionButton);
             this.Controls.Add(this.assignButtonToAction);
             this.Controls.Add(this.controllersList);
             this.Controls.Add(this.buttonActionSelect);
@@ -550,6 +576,8 @@ namespace CrewChiefV4
         private System.Windows.Forms.ListBox controllersList;
         private System.Windows.Forms.Button assignButtonToAction;
         private System.Windows.Forms.Button deleteAssigmentButton;
+        private System.Windows.Forms.Button recordTrainingSessionButton;
+        private System.Windows.Forms.Button playTrainingSessionButton;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Button button1;

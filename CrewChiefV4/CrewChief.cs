@@ -709,6 +709,11 @@ namespace CrewChiefV4
                                         triggerEvent(entry.Key, entry.Value, previousGameState, currentGameState);
                                     }
                                 }
+                                if (DriverTrainingService.isPlayingSession)
+                                {
+                                    DriverTrainingService.checkDistanceAndPlayIfNeeded(previousGameState.PositionAndMotionData.DistanceRoundTrack,
+                                        currentGameState.PositionAndMotionData.DistanceRoundTrack, audioPlayer);
+                                }
                                 if (spotter != null && GlobalBehaviourSettings.spotterEnabled && !spotterIsRunning && !loadDataFromFile)
                                 {
                                     Console.WriteLine("********** starting spotter***********");
