@@ -216,11 +216,19 @@ namespace CrewChiefV4.Audio
         public static void loadDriverNameSound(String name)
         {
             // if the name is in the availableDriverNames array then we have a sound file for it, so we can load it
-            if (allowCaching && availableDriverNames.Contains(name))
+            if (!allowCaching)
+            {
+                return;
+            }
+            if (availableDriverNames.Contains(name))
             {
                 singleSounds[name].loadAndCache(true);
                 SoundCache.dynamicLoadedSounds.Remove(name);
                 SoundCache.dynamicLoadedSounds.AddLast(name);
+            }
+            else
+            {
+                Console.WriteLine("Unvocalized driver name: " + name);
             }
         }
 
