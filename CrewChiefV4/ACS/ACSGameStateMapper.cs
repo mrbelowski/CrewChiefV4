@@ -108,6 +108,7 @@ namespace CrewChiefV4.assetto
         private float severeAeroDamageThreshold = 200.0f;
         private float destroyedAeroDamageThreshold = 400.0f;
 
+        #region WaYToManyTyres
         public ACSGameStateMapper()
         {
 
@@ -756,6 +757,7 @@ namespace CrewChiefV4.assetto
             acTyres.Add("Vintage (V)", new AcTyres(tyreWearThresholdsVintage, tyreTempsThresholdsVintage, 95f));
 
         }
+        #endregion
 
         public void versionCheck(Object memoryMappedFileStruct)
         {
@@ -1195,7 +1197,7 @@ namespace CrewChiefV4.assetto
 
                     currentGameState.SessionData.DeltaTime.deltaPoints = previousGameState.SessionData.DeltaTime.deltaPoints;
                     currentGameState.SessionData.DeltaTime.currentDeltaPoint = previousGameState.SessionData.DeltaTime.currentDeltaPoint;
-                    currentGameState.SessionData.DeltaTime.nextDeltaPoint = previousGameState.SessionData.DeltaTime.currentDeltaPoint;
+                    currentGameState.SessionData.DeltaTime.nextDeltaPoint = previousGameState.SessionData.DeltaTime.nextDeltaPoint;
                     currentGameState.SessionData.DeltaTime.lapsCompleted = previousGameState.SessionData.DeltaTime.lapsCompleted;
                     currentGameState.SessionData.DeltaTime.totalDistanceTravelled = previousGameState.SessionData.DeltaTime.totalDistanceTravelled;
                     currentGameState.SessionData.DeltaTime.trackLength = previousGameState.SessionData.DeltaTime.trackLength;
