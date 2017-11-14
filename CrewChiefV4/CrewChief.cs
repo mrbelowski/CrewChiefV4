@@ -356,9 +356,11 @@ namespace CrewChiefV4
                 {
                     if (!DriverTrainingService.isPlayingSession)
                     {
-                        DriverTrainingService.loadTrainingSession(CrewChief.gameDefinition.gameEnum,
-                                CrewChief.currentGameState.SessionData.TrackDefinition.name, CrewChief.currentGameState.carClass.carClassEnum);
-                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
+                        if (DriverTrainingService.loadTrainingSession(CrewChief.gameDefinition.gameEnum,
+                                CrewChief.currentGameState.SessionData.TrackDefinition.name, CrewChief.currentGameState.carClass.carClassEnum))
+                        {
+                            audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
+                        }
                     }
                 }
                 else

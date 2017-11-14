@@ -27,7 +27,7 @@ namespace CrewChiefV4
 
         private static Object _lock = new Object();
 
-        public static void loadTrainingSession(GameEnum gameEnum, String trackName, CarData.CarClassEnum carClass)
+        public static Boolean loadTrainingSession(GameEnum gameEnum, String trackName, CarData.CarClassEnum carClass)
         {
             if (!isRecordingSession && !isPlayingSession)
             {
@@ -35,45 +35,63 @@ namespace CrewChiefV4
 
                 isRecordingSession = false;
                 isRecordingSound = false;
-                DriverTrainingService.folderPathForSession = getFolderPathForSession(gameEnum, trackName, carClass);
-                if (Directory.Exists(DriverTrainingService.folderPathForSession))
+                if (carClass != CarData.CarClassEnum.USER_CREATED && carClass != CarData.CarClassEnum.UNKNOWN_RACE)
                 {
-                    String fileName = System.IO.Path.Combine(folderPathForSession, "metadata.json");
-                    if (File.Exists(fileName))
+                    DriverTrainingService.folderPathForSession = getCarSpecificFolderPath(gameEnum, trackName, carClass);
+                    if (!Directory.Exists(DriverTrainingService.folderPathForSession))
                     {
-                        try
+                        Console.WriteLine("No training folder exists for car class " + carClass + ", game " + gameEnum + ", track " + trackName + 
+                            ". Checking for training data folder applicable to any car");
+                        DriverTrainingService.folderPathForSession = getAnyCarFolderPath(gameEnum, trackName);
+                        if (!Directory.Exists(DriverTrainingService.folderPathForSession))
                         {
-                            DriverTrainingService.recordingMetaData = JsonConvert.DeserializeObject<MetaData>(File.ReadAllText(fileName));
+                            Console.WriteLine("Unable to find any training data set for game " + gameEnum + ", track " + trackName);
+                            return false;
                         }
-                        catch (Exception e)
-                        {
-                            Console.WriteLine("Unable to parse training metadata file: " + e.Message);
-                            return;
-                        }
-                        foreach (MetaDataEntry entry in DriverTrainingService.recordingMetaData.entries)
-                        {
-                            try
-                            {
-                                SoundCache.loadSingleSound(entry.recordingName, System.IO.Path.Combine(DriverTrainingService.folderPathForSession, entry.fileName));
-                            }
-                            catch (Exception e)
-                            {
-                                Console.WriteLine("Unable to load a sound from training set " + DriverTrainingService.folderPathForSession + " : " + e.Message);
-                                return;
-                            }
-                        }
-                        isPlayingSession = true;
-                    }
-                    else
-                    {
-                        Console.WriteLine("No metadata.json file exists in the training session folder " + DriverTrainingService.folderPathForSession);
                     }
                 }
                 else
                 {
-                    Console.WriteLine("Unable to find a training session with path " + DriverTrainingService.folderPathForSession);
+                    DriverTrainingService.folderPathForSession = getAnyCarFolderPath(gameEnum, trackName);
+                    if (!Directory.Exists(DriverTrainingService.folderPathForSession))
+                    {
+                        Console.WriteLine("Unable to find any training data set for game " + gameEnum + ", track " + trackName);
+                        return false;
+                    }
+                }
+                
+                String fileName = System.IO.Path.Combine(folderPathForSession, "metadata.json");
+                if (File.Exists(fileName))
+                {
+                    try
+                    {
+                        DriverTrainingService.recordingMetaData = JsonConvert.DeserializeObject<MetaData>(File.ReadAllText(fileName));
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("Unable to parse training metadata file: " + e.Message);
+                        return false;
+                    }
+                    foreach (MetaDataEntry entry in DriverTrainingService.recordingMetaData.entries)
+                    {
+                        try
+                        {
+                            SoundCache.loadSingleSound(entry.recordingName, System.IO.Path.Combine(DriverTrainingService.folderPathForSession, entry.fileName));
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine("Unable to load a sound from training set " + DriverTrainingService.folderPathForSession + " : " + e.Message);
+                            return false;
+                        }
+                    }
+                    isPlayingSession = true;
+                }
+                else
+                {
+                    Console.WriteLine("No metadata.json file exists in the training session folder " + DriverTrainingService.folderPathForSession);
                 }
             }
+            return true;
         }
 
         public static void stopPlayingTrainingSession()
@@ -108,7 +126,16 @@ namespace CrewChiefV4
                 DriverTrainingService.gameEnum = gameEnum;
                 DriverTrainingService.trackName = trackName;
                 DriverTrainingService.carClass = carClass;
-                DriverTrainingService.folderPathForSession = getFolderPathForSession(gameEnum, trackName, carClass);
+                if (carClass == CarData.CarClassEnum.UNKNOWN_RACE || carClass == CarData.CarClassEnum.USER_CREATED)
+                {
+                    Console.WriteLine("Recording session for any car class");
+                    DriverTrainingService.folderPathForSession = getAnyCarFolderPath(gameEnum, trackName);
+                }
+                else
+                {
+                    Console.WriteLine("Recording session for car class " + carClass.ToString());
+                    DriverTrainingService.folderPathForSession = getCarSpecificFolderPath(gameEnum, trackName, carClass);
+                }
                 Boolean createFolder = true;
                 Boolean createNewMetaData = true;
                 if (System.IO.Directory.Exists(folderPathForSession))
@@ -142,10 +169,16 @@ namespace CrewChiefV4
             }
         }
 
-        private static String getFolderPathForSession(GameEnum gameEnum, String trackName, CarData.CarClassEnum carClass)
+        private static String getCarSpecificFolderPath(GameEnum gameEnum, String trackName, CarData.CarClassEnum carClass)
         {
             return System.IO.Path.Combine(Environment.GetFolderPath(
-                Environment.SpecialFolder.MyDocuments), "CrewChiefV4", "training_sounds", gameEnum.ToString(), trackName, carClass.ToString());
+                Environment.SpecialFolder.MyDocuments), "CrewChiefV4", "training_sounds", gameEnum.ToString(), carClass.ToString(), trackName);
+        }
+
+        private static String getAnyCarFolderPath(GameEnum gameEnum, String trackName)
+        {
+            return System.IO.Path.Combine(Environment.GetFolderPath(
+                Environment.SpecialFolder.MyDocuments), "CrewChiefV4", "training_sounds", gameEnum.ToString(), trackName);
         }
 
         public static void abortRecordingSession()
