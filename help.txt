@@ -202,7 +202,7 @@ Start a practice session and press the 'Start / stop recording training session'
 
 Drive slowly around the track and when you reach a point on the track where you want to record some training advice (say, you're approaching a braking zone), hold the "Talk to Crew Chief" button down and record your advice (perhaps something like "brake at the 100 metre board, put the left side wheels in the pit exit lane. 3rd gear, turn in late and hard") and release the button when you're done. Drive to the next point where you want to record something and repeat the process. Keep doing this until you're satisfied you've got all the advice recorded that you want - note that you can do this over multiple laps, or even multiple sessions (if the app spots an existing training session in your Documents folder for the same game / car / track combination it will add to it). When you're done, press the "Start / stop recording training session" button again and the app will save all the data.
 
-Doing this creates a set of .wav files and a metadata.json file which contains supporting information allowing the wav files at the track distance to be matched up. The wav files can be filtered and modified as you like - just ensure they aren't renamed.
+Doing this creates a set of .wav files and a metadata.json file which contains supporting information allowing the wav files and the track distance to be matched up. The wav files can be filtered and modified as you like - just ensure they aren't renamed.
 
 
 Playing back training sessions:

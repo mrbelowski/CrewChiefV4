@@ -201,7 +201,8 @@ namespace CrewChiefV4
             {
                 try
                 {
-                    File.WriteAllText(System.IO.Path.Combine(folderPathForSession, "metadata.json"), JsonConvert.SerializeObject(DriverTrainingService.recordingMetaData));
+                    File.WriteAllText(System.IO.Path.Combine(folderPathForSession, "metadata.json"), 
+                        JsonConvert.SerializeObject(DriverTrainingService.recordingMetaData, Formatting.Indented));
                 }
                 catch (Exception e)
                 {
