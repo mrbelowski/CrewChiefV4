@@ -1338,7 +1338,7 @@ namespace CrewChiefV4
         {
             if (IsAppRunning && CrewChief.currentGameState != null && CrewChief.currentGameState.SessionData.TrackDefinition != null)
             {
-                if (DriverTrainingService.isRecordingSession)
+                if (DriverTrainingService.isPlayingSession)
                 {
                     DriverTrainingService.stopPlayingTrainingSession();
                     playTrainingSessionButton.Text = Configuration.getUIString("play_training_session_start");
