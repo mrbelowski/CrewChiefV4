@@ -42,7 +42,12 @@ namespace CrewChiefV4.rFactor1
         // dynamically calculated wheel circumferences
         private float[] wheelCircumference = new float[] { 0, 0 };
 
-        SessionPhase lastSessionPhase = SessionPhase.Unavailable;
+        private SessionPhase lastSessionPhase = SessionPhase.Unavailable;
+
+        // Track landmarks cache.
+        private string lastSessionTrackName = null;
+        private TrackDataContainer lastSessionTrackDataContainer = null;
+        private float lastSessionTrackLength = -1.0f;
 
         public RF1GameStateMapper()
         {
@@ -266,7 +271,22 @@ namespace CrewChiefV4.rFactor1
                 GlobalBehaviourSettings.UpdateFromCarClass(currentGameState.carClass);
 
                 // Initialize track landmarks for this session.
-                TrackDataContainer tdc = TrackData.TRACK_LANDMARKS_DATA.getTrackDataForTrackName(currentGameState.SessionData.TrackDefinition.name, shared.lapDist);
+                TrackDataContainer tdc = null;
+                if (this.lastSessionTrackDataContainer != null
+                    && this.lastSessionTrackName == currentGameState.SessionData.TrackDefinition.name
+                    && this.lastSessionTrackLength == shared.lapDist)
+                {
+                    tdc = this.lastSessionTrackDataContainer;
+                    if (tdc.trackLandmarks.Count > 0)
+                        Console.WriteLine(tdc.trackLandmarks.Count + " landmarks defined for this track");
+                }
+                else
+                {
+                    tdc = TrackData.TRACK_LANDMARKS_DATA.getTrackDataForTrackName(currentGameState.SessionData.TrackDefinition.name, shared.lapDist);
+                    this.lastSessionTrackDataContainer = tdc;
+                    this.lastSessionTrackName = currentGameState.SessionData.TrackDefinition.name;
+                    this.lastSessionTrackLength = shared.lapDist;
+                }
                 currentGameState.SessionData.TrackDefinition.trackLandmarks = tdc.trackLandmarks;
                 currentGameState.SessionData.TrackDefinition.isOval = tdc.isOval;
                 currentGameState.SessionData.TrackDefinition.setGapPoints();
@@ -325,7 +345,7 @@ namespace CrewChiefV4.rFactor1
 
                 currentGameState.SessionData.DeltaTime.deltaPoints = previousGameState.SessionData.DeltaTime.deltaPoints;
                 currentGameState.SessionData.DeltaTime.currentDeltaPoint = previousGameState.SessionData.DeltaTime.currentDeltaPoint;
-                currentGameState.SessionData.DeltaTime.nextDeltaPoint = previousGameState.SessionData.DeltaTime.currentDeltaPoint;
+                currentGameState.SessionData.DeltaTime.nextDeltaPoint = previousGameState.SessionData.DeltaTime.nextDeltaPoint;
                 currentGameState.SessionData.DeltaTime.lapsCompleted = previousGameState.SessionData.DeltaTime.lapsCompleted;
                 currentGameState.SessionData.DeltaTime.totalDistanceTravelled = previousGameState.SessionData.DeltaTime.totalDistanceTravelled;
                 currentGameState.SessionData.DeltaTime.trackLength = previousGameState.SessionData.DeltaTime.trackLength;

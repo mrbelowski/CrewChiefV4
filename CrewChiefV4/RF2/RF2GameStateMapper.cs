@@ -79,6 +79,11 @@ namespace CrewChiefV4.rFactor2
         // True if it looks like track has no DRS zones defined.
         private bool detectedTrackNoDRSZones = false;
 
+        // Track landmarks cache.
+        private string lastSessionTrackName = null;
+        private TrackDataContainer lastSessionTrackDataContainer = null;
+        private double lastSessionTrackLength = -1.0;
+
         public RF2GameStateMapper()
         {
             this.tyreWearThresholds.Add(new CornerData.EnumWithThresholds(TyreCondition.NEW, -10000.0f, this.scrubbedTyreWearPercent));
@@ -493,7 +498,25 @@ namespace CrewChiefV4.rFactor2
                     Console.WriteLine('\t' + m.ToString());
 
                 // Initialize track landmarks for this session.
-                var tdc = TrackData.TRACK_LANDMARKS_DATA.getTrackDataForTrackName(csd.TrackDefinition.name, (float)shared.scoring.mScoringInfo.mLapDist);
+                TrackDataContainer tdc = null;
+                if (this.lastSessionTrackDataContainer != null
+                    && this.lastSessionTrackName == csd.TrackDefinition.name
+                    && this.lastSessionTrackLength == shared.scoring.mScoringInfo.mLapDist)
+                {
+                    tdc = this.lastSessionTrackDataContainer;
+
+                    if (tdc.trackLandmarks.Count > 0)
+                        Console.WriteLine(tdc.trackLandmarks.Count + " landmarks defined for this track");
+                }
+                else
+                {
+                    tdc = TrackData.TRACK_LANDMARKS_DATA.getTrackDataForTrackName(csd.TrackDefinition.name, (float)shared.scoring.mScoringInfo.mLapDist);
+
+                    this.lastSessionTrackDataContainer = tdc;
+                    this.lastSessionTrackName = csd.TrackDefinition.name;
+                    this.lastSessionTrackLength = shared.scoring.mScoringInfo.mLapDist;
+                }
+
                 csd.TrackDefinition.trackLandmarks = tdc.trackLandmarks;
                 csd.TrackDefinition.isOval = tdc.isOval;
                 csd.TrackDefinition.setGapPoints();
@@ -512,7 +535,7 @@ namespace CrewChiefV4.rFactor2
 
                 csd.DeltaTime.deltaPoints = psd.DeltaTime.deltaPoints;
                 csd.DeltaTime.currentDeltaPoint = psd.DeltaTime.currentDeltaPoint;
-                csd.DeltaTime.nextDeltaPoint = psd.DeltaTime.currentDeltaPoint;
+                csd.DeltaTime.nextDeltaPoint = psd.DeltaTime.nextDeltaPoint;
                 csd.DeltaTime.lapsCompleted = psd.DeltaTime.lapsCompleted;
                 csd.DeltaTime.totalDistanceTravelled = psd.DeltaTime.totalDistanceTravelled;
                 csd.DeltaTime.trackLength = psd.DeltaTime.trackLength;
