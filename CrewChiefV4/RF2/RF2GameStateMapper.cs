@@ -535,7 +535,7 @@ namespace CrewChiefV4.rFactor2
 
                 csd.DeltaTime.deltaPoints = psd.DeltaTime.deltaPoints;
                 csd.DeltaTime.currentDeltaPoint = psd.DeltaTime.currentDeltaPoint;
-                csd.DeltaTime.nextDeltaPoint = psd.DeltaTime.currentDeltaPoint;
+                csd.DeltaTime.nextDeltaPoint = psd.DeltaTime.nextDeltaPoint;
                 csd.DeltaTime.lapsCompleted = psd.DeltaTime.lapsCompleted;
                 csd.DeltaTime.totalDistanceTravelled = psd.DeltaTime.totalDistanceTravelled;
                 csd.DeltaTime.trackLength = psd.DeltaTime.trackLength;
