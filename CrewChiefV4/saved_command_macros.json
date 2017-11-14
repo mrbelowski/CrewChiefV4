@@ -104,6 +104,26 @@
 		{
 		    "action": "Radio Adjustments Black Box",
 			"key": "F10"
+		},
+		{
+		    "action": "Select Next Control",
+			"key": "KEY_W"
+		},
+		{
+		    "action": "Select Previous Control",
+			"key": "KEY_S"
+		},
+		{
+		    "action": "Increment Selected Control",
+			"key": "KEY_D"
+		},
+		{
+		    "action": "Decrement Selected Control",
+			"key": "KEY_A"
+		},
+		{
+		    "action": "Toggle Selected Control",
+			"key": "SPACE_BAR"
 		}
 		]
 	}],
@@ -500,6 +520,72 @@
 			"description": "iRacing only",
 			"gameDefinition": "IRACING",
 			"actionSequence": [ "Radio Adjustments Black Box" ],
+			"keyPressTime": 10,
+			"waitBetweenEachCommand": 200
+		}]
+	},
+	{
+		"name": "Select Next Control",
+		"description": "Selects The Next Control",
+		"voiceTriggers": [ "menu next" ],
+		"commandSets": [
+		{
+			"description": "iRacing only",
+			"gameDefinition": "IRACING",
+			"actionSequence": [ "Select Next Control" ],
+			"keyPressTime": 10,
+			"waitBetweenEachCommand": 200
+		}]
+	},
+	{
+		"name": "Select Previous Control",
+		"description": "Selects The Previous Control",
+		"voiceTriggers": [ "menu previous" ],
+		"commandSets": [
+		{
+			"description": "iRacing only",
+			"gameDefinition": "IRACING",
+			"actionSequence": [ "Select Previous Control" ],
+			"keyPressTime": 10,
+			"waitBetweenEachCommand": 200
+		}]
+	},
+	{
+		"name": "Increment Selected Control",
+		"description": "Increase Value Of Selected Control",
+		"voiceTriggers": [ "menu increase" ],
+		"commandSets": [
+		{
+			"description": "iRacing only",
+			"gameDefinition": "IRACING",
+			"actionSequence": [ "Increment Selected Control" ],
+			"keyPressTime": 30,
+			"waitBetweenEachCommand": 200
+		}]
+	},
+	{
+		"name": "Decrement Selected Control",
+		"description": "Decrease Value Of Selected Control",
+		"voiceTriggers": [ "menu decrease" ],
+		"commandSets": [
+		{
+			"description": "iRacing only",
+			"gameDefinition": "IRACING",
+			"actionSequence": [ "Decrement Selected Control" ],
+			"keyPressTime": 10,
+			"waitBetweenEachCommand": 200
+		}]
+	}
+	,
+	{
+		"name": "Toggle Selected Control",
+		"description": "Toggles The Selected Control",
+		"voiceTriggers": [ "menu toggle" ],
+		"commandSets": [
+		{
+			"description": "iRacing only",
+			"gameDefinition": "IRACING",
+			"actionSequence": [ "Toggle Selected Control" ],
 			"keyPressTime": 10,
 			"waitBetweenEachCommand": 200
 		}]
