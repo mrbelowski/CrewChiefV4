@@ -60,6 +60,52 @@
 			"key": "KEY_D"
 		}
 		]
+	},
+	{
+	    "description": "iRacing command mappings - these are the key assignments in the Options -> Controls",
+	    "gameDefinition": "IRACING",
+		"keyBindings" : [
+		{
+		    "action": "Lap Timing Black Box",
+			"key": "F1"
+		},
+		{
+		    "action": "Standings Black Box",
+			"key": "F2"
+		},
+		{
+		    "action": "Relative Black Box",
+			"key": "F3"
+		},
+		{
+		    "action": "Fuel Black Box",
+			"key": "F4"
+		},
+		{
+		    "action": "Tires Black Box",
+			"key": "F5"
+		},
+		{
+		    "action": "Tire Info Black Box",
+			"key": "F6"
+		},
+		{
+		    "action": "Pit-stop Adjustments Black Box",
+			"key": "F7"
+		},
+		{
+		    "action": "In-car Adjustments Black Box",
+			"key": "F8"
+		},
+		{
+		    "action": "Mirror Adjustments Black Box",
+			"key": "F9"
+		},
+		{
+		    "action": "Radio Adjustments Black Box",
+			"key": "F10"
+		}
+		]
 	}],
 	"macros": [ 
 	{
@@ -326,6 +372,136 @@
 			"actionSequence": [ "ICM Menu Right" ],
 			"keyPressTime": 30,
 			"waitBetweenEachCommand": 100
+		}]
+	},
+	{
+		"name": "Lap Timing Black Box",
+		"description": "Displays Lap Timing Black Box",
+		"voiceTriggers": [ "black box lap time" ],
+		"commandSets": [
+		{
+			"description": "iRacing only",
+			"gameDefinition": "IRACING",
+			"actionSequence": [ "Lap Timing Black Box" ],
+			"keyPressTime": 10,
+			"waitBetweenEachCommand": 200
+		}]
+	},
+	{
+		"name": "Standings Black Box",
+		"description": "Displays Standings Black Box",
+		"voiceTriggers": [ "black box standings" ],
+		"commandSets": [
+		{
+			"description": "iRacing only",
+			"gameDefinition": "IRACING",
+			"actionSequence": [ "Standings Black Box" ],
+			"keyPressTime": 10,
+			"waitBetweenEachCommand": 200
+		}]
+	},
+	{
+		"name": "Relative Black Box",
+		"description": "Displays Relative Black Box",
+		"voiceTriggers": [ "black box relative" ],
+		"commandSets": [
+		{
+			"description": "iRacing only",
+			"gameDefinition": "IRACING",
+			"actionSequence": [ "Relative Black Box" ],
+			"keyPressTime": 10,
+			"waitBetweenEachCommand": 200
+		}]
+	},
+	{
+		"name": "Fuel Black Box",
+		"description": "Displays Fuel Black Box",
+		"voiceTriggers": [ "black box fuel" ],
+		"commandSets": [
+		{
+			"description": "iRacing only",
+			"gameDefinition": "IRACING",
+			"actionSequence": [ "Fuel Black Box" ],
+			"keyPressTime": 10,
+			"waitBetweenEachCommand": 200
+		}]
+	},
+	{
+		"name": "Tires Black Box",
+		"description": "Displays Tires Black Box",
+		"voiceTriggers": [ "black box tires" ],
+		"commandSets": [
+		{
+			"description": "iRacing only",
+			"gameDefinition": "IRACING",
+			"actionSequence": [ "Tires Black Box" ],
+			"keyPressTime": 10,
+			"waitBetweenEachCommand": 200
+		}]
+	},
+	{
+		"name": "Tire Info Black Box",
+		"description": "Displays Tire Info Black Box",
+		"voiceTriggers": [ "black box tire info" ],
+		"commandSets": [
+		{
+			"description": "iRacing only",
+			"gameDefinition": "IRACING",
+			"actionSequence": [ "Tire Info Black Box" ],
+			"keyPressTime": 10,
+			"waitBetweenEachCommand": 200
+		}]
+	},
+	{
+		"name": "Pit-stop Adjustments Black Box",
+		"description": "Displays Pit-stop Adjustments Black Box",
+		"voiceTriggers": [ "black box pit stop" ],
+		"commandSets": [
+		{
+			"description": "iRacing only",
+			"gameDefinition": "IRACING",
+			"actionSequence": [ "Pit-stop Adjustments Black Box" ],
+			"keyPressTime": 10,
+			"waitBetweenEachCommand": 200
+		}]
+	},
+	{
+		"name": "In-car Adjustments Black Box",
+		"description": "Displays In-car Adjustments Black Box",
+		"voiceTriggers": [ "black box car" ],
+		"commandSets": [
+		{
+			"description": "iRacing only",
+			"gameDefinition": "IRACING",
+			"actionSequence": [ "In-car Adjustments Black Box" ],
+			"keyPressTime": 10,
+			"waitBetweenEachCommand": 200
+		}]
+	},
+	{
+		"name": "Mirror Adjustments Black Box",
+		"description": "Displays Mirror Adjustments Black Box",
+		"voiceTriggers": [ "black box mirror" ],
+		"commandSets": [
+		{
+			"description": "iRacing only",
+			"gameDefinition": "IRACING",
+			"actionSequence": [ "Mirror Adjustments Black Box" ],
+			"keyPressTime": 10,
+			"waitBetweenEachCommand": 200
+		}]
+	},
+	{
+		"name": "Radio Adjustments Black Box",
+		"description": "Displays Radio Adjustments Black Box",
+		"voiceTriggers": [ "black box radio" ],
+		"commandSets": [
+		{
+			"description": "iRacing only",
+			"gameDefinition": "IRACING",
+			"actionSequence": [ "Radio Adjustments Black Box" ],
+			"keyPressTime": 10,
+			"waitBetweenEachCommand": 200
 		}]
 	}]
 }
