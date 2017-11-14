@@ -1330,7 +1330,7 @@ namespace CrewChiefV4
             }
             else
             {
-                Console.WriteLine("Start a session first");
+                Console.WriteLine("No track or car has been loaded - start an on-track session before recording a training session");
             }
         }
 
@@ -1354,7 +1354,7 @@ namespace CrewChiefV4
             }
             else
             {
-                Console.WriteLine("Start a session first");
+                Console.WriteLine("No track or car has been loaded - start an on-track session before loading a training session");
             }
         }
 
