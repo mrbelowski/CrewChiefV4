@@ -1226,9 +1226,11 @@ namespace CrewChiefV4.rFactor2
 
                 if (opponent.DriverNameSet && opponentPrevious == null && CrewChief.enableDriverNames)
                 {
-                    this.speechRecogniser.addNewOpponentName(opponent.DriverRawName);
-                    Console.WriteLine("New driver " + opponent.DriverRawName +
-                        " is using car class " + opponent.CarClass.getClassIdentifier() +
+                    if (!csd.IsNewSession)
+                        this.speechRecogniser.addNewOpponentName(opponent.DriverRawName);
+
+                    Console.WriteLine("New driver \"" + driverName +
+                        "\" is using car class " + opponent.CarClass.getClassIdentifier() +
                         " at position " + opponent.Position.ToString());
                 }
                 
@@ -1686,7 +1688,7 @@ namespace CrewChiefV4.rFactor2
                 Console.WriteLine("SessionRunTime " + csd.SessionTotalRunTime);
                 Console.WriteLine("SessionStartPosition " + csd.SessionStartPosition);
                 Console.WriteLine("SessionStartTime " + csd.SessionStartTime);
-                Console.WriteLine("TrackName " + csd.TrackDefinition.name);
+                Console.WriteLine("Track Name \"" + csd.TrackDefinition.name + "\"");
                 Console.WriteLine("Player is using car class " + cgs.carClass.getClassIdentifier() +
                     " at position " + csd.Position.ToString());
 
