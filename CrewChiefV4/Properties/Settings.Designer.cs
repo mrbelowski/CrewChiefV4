@@ -2662,5 +2662,77 @@ namespace CrewChiefV4.Properties {
                 this["disable_alternative_voice_commands"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-1")]
+        public int TOGGLE_TRAINING_RECORDING_button_index {
+            get {
+                return ((int)(this["TOGGLE_TRAINING_RECORDING_button_index"]));
+            }
+            set {
+                this["TOGGLE_TRAINING_RECORDING_button_index"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string TOGGLE_TRAINING_RECORDING_device_guid {
+            get {
+                return ((string)(this["TOGGLE_TRAINING_RECORDING_device_guid"]));
+            }
+            set {
+                this["TOGGLE_TRAINING_RECORDING_device_guid"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string TOGGLE_TRAINING_RECORDING_device_type {
+            get {
+                return ((string)(this["TOGGLE_TRAINING_RECORDING_device_type"]));
+            }
+            set {
+                this["TOGGLE_TRAINING_RECORDING_device_type"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-1")]
+        public int TOGGLE_TRAINING_PLAYBACK_button_index {
+            get {
+                return ((int)(this["TOGGLE_TRAINING_PLAYBACK_button_index"]));
+            }
+            set {
+                this["TOGGLE_TRAINING_PLAYBACK_button_index"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string TOGGLE_TRAINING_PLAYBACK_device_guid {
+            get {
+                return ((string)(this["TOGGLE_TRAINING_PLAYBACK_device_guid"]));
+            }
+            set {
+                this["TOGGLE_TRAINING_PLAYBACK_device_guid"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string TOGGLE_TRAINING_PLAYBACK_device_type {
+            get {
+                return ((string)(this["TOGGLE_TRAINING_PLAYBACK_device_type"]));
+            }
+            set {
+                this["TOGGLE_TRAINING_PLAYBACK_device_type"] = value;
+            }
+        }
     }
 }

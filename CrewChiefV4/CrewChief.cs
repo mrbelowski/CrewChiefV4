@@ -343,6 +343,50 @@ namespace CrewChiefV4
             audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderDidntUnderstand, 0, null));
         }
 
+        public void toggleTrainingPlayback()
+        {
+            if (DriverTrainingService.isPlayingSession)
+            {
+                DriverTrainingService.stopPlayingTrainingSession();
+                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
+            }
+            else
+            {
+                if (CrewChief.currentGameState != null && CrewChief.currentGameState.SessionData.TrackDefinition != null)
+                {
+                    if (!DriverTrainingService.isPlayingSession)
+                    {
+                        DriverTrainingService.loadTrainingSession(CrewChief.gameDefinition.gameEnum,
+                                CrewChief.currentGameState.SessionData.TrackDefinition.name, CrewChief.currentGameState.carClass.carClassEnum);
+                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("No track or car has been loaded - start an on-track session before loading a training session");
+                }
+            }
+        }
+        
+        public void toggleTrainingRecording()
+        {
+            if (DriverTrainingService.isRecordingSession)
+            {
+                DriverTrainingService.completeRecordingSession();
+            }
+            else
+            {
+                if (CrewChief.currentGameState != null && CrewChief.currentGameState.SessionData.TrackDefinition != null)
+                {
+                    DriverTrainingService.startRecordingSession(CrewChief.gameDefinition.gameEnum,
+                        CrewChief.currentGameState.SessionData.TrackDefinition.name, CrewChief.currentGameState.carClass.carClassEnum);
+                }
+                else
+                {
+                    Console.WriteLine("No track or car has been loaded - start an on-track session before recording a training session");
+                }
+            }
+        }
 
         // nasty... these triggers come from the speech recogniser or from button presses, and invoke speech
         // recognition 'respond' methods in the events

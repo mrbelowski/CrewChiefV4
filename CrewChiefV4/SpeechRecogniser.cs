@@ -121,6 +121,9 @@ namespace CrewChiefV4
         public static String[] SESSION_STATUS = Configuration.getSpeechRecognitionPhrases("SESSION_STATUS");
         public static String[] STATUS = Configuration.getSpeechRecognitionPhrases("STATUS");
 
+        public static String[] START_TRAINING_PLAYBACK = Configuration.getSpeechRecognitionPhrases("START_TRAINING_PLAYBACK");
+        public static String[] STOP_TRAINING_PLAYBACK = Configuration.getSpeechRecognitionPhrases("STOP_TRAINING_PLAYBACK");
+
         private CrewChief crewChief;
 
         public Boolean initialised = false;
@@ -353,6 +356,9 @@ namespace CrewChiefV4
                 validateAndAdd(CAR_STATUS, staticSpeechChoices);
                 validateAndAdd(SESSION_STATUS, staticSpeechChoices);
                 validateAndAdd(STATUS, staticSpeechChoices);
+
+                validateAndAdd(START_TRAINING_PLAYBACK, staticSpeechChoices);
+                validateAndAdd(STOP_TRAINING_PLAYBACK, staticSpeechChoices);
 
                 foreach (String s in CALCULATE_FUEL_FOR)
                 {
@@ -847,6 +853,20 @@ namespace CrewChiefV4
             else if (ResultContains(recognisedSpeech, SESSION_STATUS))
             {
                 CrewChief.getSessionStatus();
+            }
+            else if (ResultContains(recognisedSpeech, START_TRAINING_PLAYBACK))
+            {
+                if (!DriverTrainingService.isPlayingSession)
+                {
+                    crewChief.toggleTrainingPlayback();
+                }
+            }
+            else if (ResultContains(recognisedSpeech, STOP_TRAINING_PLAYBACK))
+            {
+                if (DriverTrainingService.isPlayingSession)
+                {
+                    crewChief.toggleTrainingPlayback();
+                }
             }
             return null;
         }

@@ -980,6 +980,18 @@ namespace CrewChiefV4
                         CrewChief.getCarStatus();
                         nextPollWait = 1000;
                     }
+                    else if (controllerConfiguration.hasOutstandingClick(ControllerConfiguration.TOGGLE_TRAINING_RECORDING))
+                    {
+                        Console.WriteLine("Start / stop training recording");
+                        crewChief.toggleTrainingRecording();
+                        nextPollWait = 1000;
+                    }
+                    else if (controllerConfiguration.hasOutstandingClick(ControllerConfiguration.TOGGLE_TRAINING_PLAYBACK))
+                    {
+                        Console.WriteLine("Start / stop training playback");
+                        crewChief.toggleTrainingPlayback();
+                        nextPollWait = 1000;
+                    }
                     else if (controllerConfiguration.hasOutstandingClick(ControllerConfiguration.PRINT_TRACK_DATA))
                     {
                         if (CrewChief.currentGameState != null && CrewChief.currentGameState.SessionData != null &&
@@ -1097,8 +1109,6 @@ namespace CrewChiefV4
                 this.scanControllersButton.Enabled = false;
                 this.personalisationBox.Enabled = false;
                 this.spotterNameBox.Enabled = false;
-                this.recordTrainingSessionButton.Enabled = true;
-                this.playTrainingSessionButton.Enabled = true;
                 ThreadStart crewChiefWork = runApp;
                 Thread crewChiefThread = new Thread(crewChiefWork);
 
@@ -1153,12 +1163,6 @@ namespace CrewChiefV4
                 this.scanControllersButton.Enabled = true;
                 this.personalisationBox.Enabled = true;
                 this.spotterNameBox.Enabled = true;
-                this.recordTrainingSessionButton.Enabled = false;
-                this.playTrainingSessionButton.Enabled = false;
-                recordTrainingSessionButton.Text = Configuration.getUIString("record_training_session_start");
-                this.recordTrainingSessionButton.Enabled = false;
-                playTrainingSessionButton.Text = Configuration.getUIString("play_training_session_start");
-                this.playTrainingSessionButton.Enabled = false;
                 DriverTrainingService.completeRecordingSession();
                 DriverTrainingService.stopPlayingTrainingSession();
             }
@@ -1311,55 +1315,7 @@ namespace CrewChiefV4
             }
             controllerConfiguration.saveSettings();
         }
-
-        private void recordTrainingSessionButtonClicked(object sender, EventArgs e)
-        {
-            if (IsAppRunning && CrewChief.currentGameState != null && CrewChief.currentGameState.SessionData.TrackDefinition != null)
-            {
-                if (DriverTrainingService.isRecordingSession)
-                {
-                    DriverTrainingService.completeRecordingSession();
-                    recordTrainingSessionButton.Text = Configuration.getUIString("record_training_session_start");
-                    playTrainingSessionButton.Enabled = true;
-                }
-                else
-                {
-                    DriverTrainingService.startRecordingSession(CrewChief.gameDefinition.gameEnum,
-                        CrewChief.currentGameState.SessionData.TrackDefinition.name, CrewChief.currentGameState.carClass.carClassEnum);
-                    recordTrainingSessionButton.Text = Configuration.getUIString("record_training_session_stop");
-                    playTrainingSessionButton.Enabled = false;
-                }
-            }
-            else
-            {
-                Console.WriteLine("No track or car has been loaded - start an on-track session before recording a training session");
-            }
-        }
-
-        private void playTrainingSessionButtonClicked(object sender, EventArgs e)
-        {
-            if (IsAppRunning && CrewChief.currentGameState != null && CrewChief.currentGameState.SessionData.TrackDefinition != null)
-            {
-                if (DriverTrainingService.isPlayingSession)
-                {
-                    DriverTrainingService.stopPlayingTrainingSession();
-                    playTrainingSessionButton.Text = Configuration.getUIString("play_training_session_start");
-                    recordTrainingSessionButton.Enabled = true;
-                }
-                else
-                {                    
-                    DriverTrainingService.loadTrainingSession(CrewChief.gameDefinition.gameEnum,
-                        CrewChief.currentGameState.SessionData.TrackDefinition.name, CrewChief.currentGameState.carClass.carClassEnum);
-                    playTrainingSessionButton.Text = Configuration.getUIString("play_training_session_stop");
-                    recordTrainingSessionButton.Enabled = false;
-                }
-            }
-            else
-            {
-                Console.WriteLine("No track or car has been loaded - start an on-track session before loading a training session");
-            }
-        }
-
+        
         private void editPropertiesButtonClicked(object sender, EventArgs e)
         {
             // If minized to tray, hide tray icon while properties dialog is shown,
