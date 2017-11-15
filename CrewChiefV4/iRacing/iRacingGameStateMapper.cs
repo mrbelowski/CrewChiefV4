@@ -61,7 +61,7 @@ namespace CrewChiefV4.iRacing
             if (shared.Telemetry.IsReplayPlaying)
             {
                 CrewChief.trackName = shared.SessionData.Track.CodeName;
-                CrewChief.carClass = CarData.getCarClassForIRacingId(shared.Driver.Car.CarClassId).carClassEnum;
+                CrewChief.carClass = CarData.getCarClassForIRacingId(shared.Driver.Car.CarClassId, shared.Driver.Car.CarId).carClassEnum;
                 CrewChief.viewingReplay = true;
                 CrewChief.distanceRoundTrack = shared.Driver.Live.CorrectedLapDistance * ((float)shared.SessionData.Track.Length * 1000 );
             }
@@ -172,11 +172,10 @@ namespace CrewChiefV4.iRacing
                 currentGameState.PitData.InPitlane = shared.Telemetry.OnPitRoad;
                 currentGameState.PositionAndMotionData.DistanceRoundTrack = playerCar.Live.CorrectedLapDistance * currentGameState.SessionData.TrackDefinition.trackLength;
                 //TODO update car classes
-                currentGameState.carClass = CarData.getCarClassForIRacingId(playerCar.Car.CarClassId);
+                currentGameState.carClass = CarData.getCarClassForIRacingId(playerCar.Car.CarClassId, playerCar.Car.CarId);
                 CarData.IRACING_CLASS_ID = playerCar.Car.CarClassId;
                 GlobalBehaviourSettings.UpdateFromCarClass(currentGameState.carClass);
-                Console.WriteLine("Player is using car class " + currentGameState.carClass.getClassIdentifier() + " (class ID " + playerCar.Car.CarClassId + ")");
-
+                Console.WriteLine("Player is using car class " + currentGameState.carClass.getClassIdentifier() + " (class ID " + playerCar.Car.CarClassId + " car ID " + playerCar.Car.CarId + ")");
                 
                 currentGameState.SessionData.DeltaTime = new DeltaTime(currentGameState.SessionData.TrackDefinition.trackLength, currentGameState.PositionAndMotionData.DistanceRoundTrack, currentGameState.Now);
                 currentGameState.SessionData.SectorNumber = playerCar.Live.CurrentFakeSector;
@@ -190,7 +189,7 @@ namespace CrewChiefV4.iRacing
                     else
                     {
                         currentGameState.OpponentData.Add(driverName, createOpponentData(driver, driverName,
-                            true, CarData.getCarClassForIRacingId(driver.Car.CarClassId).carClassEnum, currentGameState.SessionData.TrackDefinition.trackLength));
+                            true, CarData.getCarClassForIRacingId(driver.Car.CarClassId, driver.Car.CarId).carClassEnum, currentGameState.SessionData.TrackDefinition.trackLength));
                     }
 
                 }
@@ -228,11 +227,10 @@ namespace CrewChiefV4.iRacing
                         currentGameState.SessionData.TrackDefinition.setGapPoints();
                         GlobalBehaviourSettings.UpdateFromTrackDefinition(currentGameState.SessionData.TrackDefinition);
 
-                        currentGameState.carClass = CarData.getCarClassForIRacingId(playerCar.Car.CarClassId);
+                        currentGameState.carClass = CarData.getCarClassForIRacingId(playerCar.Car.CarClassId, playerCar.Car.CarId);
                         GlobalBehaviourSettings.UpdateFromCarClass(currentGameState.carClass);
                         currentGameState.SessionData.DeltaTime = new DeltaTime(currentGameState.SessionData.TrackDefinition.trackLength, currentGameState.PositionAndMotionData.DistanceRoundTrack, currentGameState.Now);
-
-                        Console.WriteLine("Player is using car class " + currentGameState.carClass.getClassIdentifier());
+                        Console.WriteLine("Player is using car class " + currentGameState.carClass.getClassIdentifier() + " (class ID " + playerCar.Car.CarClassId + " car ID " + playerCar.Car.CarId + ")");
 
                         if (previousGameState != null)
                         {
@@ -553,7 +551,7 @@ namespace CrewChiefV4.iRacing
 
                 if (currentGameState.carClass.carClassEnum == CarData.CarClassEnum.UNKNOWN_RACE)
                 {
-                    currentGameState.carClass = CarData.getCarClassForIRacingId(playerCar.Car.CarClassId);
+                    currentGameState.carClass = CarData.getCarClassForIRacingId(playerCar.Car.CarClassId, playerCar.Car.CarId);
                 }
 
             }
@@ -762,7 +760,7 @@ namespace CrewChiefV4.iRacing
                     if (!driver.CurrentResults.IsOut || !driver.IsPacecar || !driver.Live.TrackSurface.HasFlag(TrackSurfaces.NotInWorld) || !driver.IsSpectator)
                     {
                         currentGameState.OpponentData.Add(driverName, createOpponentData(driver, driverName,
-                            false, CarData.getCarClassForIRacingId(driver.Car.CarClassId).carClassEnum, currentGameState.SessionData.TrackDefinition.trackLength));
+                            false, CarData.getCarClassForIRacingId(driver.Car.CarClassId, driver.Car.CarId).carClassEnum, currentGameState.SessionData.TrackDefinition.trackLength));
                     }
                 }
             }
@@ -1119,11 +1117,11 @@ namespace CrewChiefV4.iRacing
             opponentData.CompletedLaps = opponentCar.CurrentResults.LapsComplete;
             opponentData.DistanceRoundTrack = opponentCar.Live.CorrectedLapDistance * trackLength;
             opponentData.DeltaTime = new DeltaTime(trackLength, opponentData.DistanceRoundTrack, DateTime.Now);
-            opponentData.CarClass = CarData.getCarClassForIRacingId(opponentCar.Car.CarClassId);
+            opponentData.CarClass = CarData.getCarClassForIRacingId(opponentCar.Car.CarClassId, opponentCar.Car.CarId);
             opponentData.CurrentSectorNumber = opponentCar.Live.CurrentFakeSector;
             
             Console.WriteLine("New driver " + driverName + " is using car class " +
-                opponentData.CarClass.getClassIdentifier() + " (class ID " + opponentCar.Car.CarClassId + ")");
+                opponentData.CarClass.getClassIdentifier() + " (class ID " + opponentCar.Car.CarClassId + " car ID " + opponentCar.Car.CarId + ")");
 
             return opponentData;
         }

@@ -12,7 +12,7 @@
 #    "rf1ClassNames": as above, for rFactor1, AMS, GSC, FTruck, and other RF1 based games (the Reiza games)
 #    "acClassNames": as above, for Assetto Corsa
 #    "raceroomClassIds": this is an array of integers or R3E class IDs  
-#    "iracingClassIds": this is an array of integers or iRacing class IDs 
+#    "iracingCarIds": this is an array of integers or iRacing car IDs  
 #    "brakeType": can be "Carbon", "Ceramic", "Iron_Race" or "Iron_Road"
 #    "maxColdBrakeTemp": used to override cold brake temperature (celsius) upper threshold.  Specifies max temperature at which brakes are still considered cold.  If not specified, comes from the built in brakeType.
 #    "maxWarmBrakeTemp": used to override warm (ok) brake temperature (celsius) upper threshold.  Specifies max temperature at which brakes are still considered warm/ok.  Above that value, brakes are overheating.  If not specified, comes from the built in brakeType.
@@ -148,7 +148,7 @@
 			"pCarsClassNames": ["*GTE*"],
 			"rf2ClassNames": ["*GTE*", "URD_EGT_Darche", "URD_EGT_AM", "URD_EGT_Bayro", "URD_EGT_Ferruccio", "URD_EGT_Venom", "URD_EGT_C7R"],
             "acClassNames": [ "ks_lamborghini_huracan_st", "ks_glickenhaus_scg003", "*GTE*" ],
-            "iracingClassIds" : [100],
+			"iracingCarIds" : [ 92, 93 ],
 			"brakeType": "Ceramic",
 			"timesInHundredths": true,
 			"enabledMessageTypes": "ALL"
@@ -166,7 +166,6 @@
             "pCarsClassNames": [ "GT3" ],
             "rf2ClassNames": [ "*GT3*" ],
             "acClassNames": [ "ks_audi_r8_lms", "*GT3*" ],
-            "iracingClassIds": [ 101 ],
             "timesInHundredths": true,
             "enabledMessageTypes": "ALL"
         },
