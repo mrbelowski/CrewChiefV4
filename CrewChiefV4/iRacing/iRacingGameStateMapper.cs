@@ -58,6 +58,14 @@ namespace CrewChiefV4.iRacing
                 return null;
             }
 
+            if (shared.Telemetry.IsReplayPlaying)
+            {
+                CrewChief.trackName = shared.SessionData.Track.CodeName;
+                CrewChief.carClass = CarData.getCarClassForIRacingId(shared.Driver.Car.CarClassId).carClassEnum;
+                CrewChief.viewingReplay = true;
+                CrewChief.distanceRoundTrack = shared.Driver.Live.CorrectedLapDistance * ((float)shared.SessionData.Track.Length * 1000 );
+            }
+
             SessionPhase lastSessionPhase = SessionPhase.Unavailable;
             SessionType lastSessionType = SessionType.Unavailable;
             int? previousSessionNumber = -1;
