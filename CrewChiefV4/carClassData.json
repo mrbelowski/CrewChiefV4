@@ -166,6 +166,7 @@
             "pCarsClassNames": [ "GT3" ],
             "rf2ClassNames": [ "*GT3*" ],
             "acClassNames": [ "ks_audi_r8_lms", "*GT3*" ],
+			"iracingCarIds": [ 43, 55, 59, 72, 73, 94 ],
             "timesInHundredths": true,
             "enabledMessageTypes": "ALL"
         },

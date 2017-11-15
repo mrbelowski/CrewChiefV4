@@ -175,7 +175,7 @@ namespace CrewChiefV4.iRacing
                 currentGameState.carClass = CarData.getCarClassForIRacingId(playerCar.Car.CarClassId, playerCar.Car.CarId);
                 CarData.IRACING_CLASS_ID = playerCar.Car.CarClassId;
                 GlobalBehaviourSettings.UpdateFromCarClass(currentGameState.carClass);
-                Console.WriteLine("Player is using car class " + currentGameState.carClass.getClassIdentifier() + " (class ID " + playerCar.Car.CarClassId + " car ID " + playerCar.Car.CarId + ")");
+                Console.WriteLine("Player is using car class " + currentGameState.carClass.getClassIdentifier() + " (car ID " + playerCar.Car.CarId + ")");
                 
                 currentGameState.SessionData.DeltaTime = new DeltaTime(currentGameState.SessionData.TrackDefinition.trackLength, currentGameState.PositionAndMotionData.DistanceRoundTrack, currentGameState.Now);
                 currentGameState.SessionData.SectorNumber = playerCar.Live.CurrentFakeSector;
@@ -230,7 +230,7 @@ namespace CrewChiefV4.iRacing
                         currentGameState.carClass = CarData.getCarClassForIRacingId(playerCar.Car.CarClassId, playerCar.Car.CarId);
                         GlobalBehaviourSettings.UpdateFromCarClass(currentGameState.carClass);
                         currentGameState.SessionData.DeltaTime = new DeltaTime(currentGameState.SessionData.TrackDefinition.trackLength, currentGameState.PositionAndMotionData.DistanceRoundTrack, currentGameState.Now);
-                        Console.WriteLine("Player is using car class " + currentGameState.carClass.getClassIdentifier() + " (class ID " + playerCar.Car.CarClassId + " car ID " + playerCar.Car.CarId + ")");
+                        Console.WriteLine("Player is using car class " + currentGameState.carClass.getClassIdentifier() + " (car ID " + playerCar.Car.CarId + ")");
 
                         if (previousGameState != null)
                         {
@@ -1121,7 +1121,7 @@ namespace CrewChiefV4.iRacing
             opponentData.CurrentSectorNumber = opponentCar.Live.CurrentFakeSector;
             
             Console.WriteLine("New driver " + driverName + " is using car class " +
-                opponentData.CarClass.getClassIdentifier() + " (class ID " + opponentCar.Car.CarClassId + " car ID " + opponentCar.Car.CarId + ")");
+                opponentData.CarClass.getClassIdentifier() + " (car ID " + opponentCar.Car.CarId + ")");
 
             return opponentData;
         }
