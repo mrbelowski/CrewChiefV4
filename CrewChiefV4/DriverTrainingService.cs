@@ -99,8 +99,20 @@ namespace CrewChiefV4
                 {
                     Console.WriteLine("No metadata.json file exists in the training session folder " + DriverTrainingService.folderPathForSession);
                 }
+                return true;
             }
-            return true;
+            else
+            {
+                if (isRecordingSession)
+                {
+                    Console.WriteLine("A recording is already in progress, complete this first");
+                }
+                else
+                {
+                    Console.WriteLine("Already playing a session");
+                }
+                return false;
+            }
         }
 
         public static void stopPlayingTrainingSession()
@@ -230,8 +242,8 @@ namespace CrewChiefV4
                 {
                     Console.WriteLine("Unable to complete recording session : " + e.Message);
                 }
-                isRecordingSession = false;
-            }
+            } 
+            isRecordingSession = false;
         }
 
         public static void stopRecordingMessage()
