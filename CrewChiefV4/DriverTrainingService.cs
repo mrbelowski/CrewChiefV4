@@ -68,6 +68,10 @@ namespace CrewChiefV4
                     try
                     {
                         DriverTrainingService.recordingMetaData = JsonConvert.DeserializeObject<MetaData>(File.ReadAllText(fileName));
+                        if (DriverTrainingService.recordingMetaData.description != null && !DriverTrainingService.recordingMetaData.description.Equals(""))
+                        {
+                            Console.WriteLine("Playing training session with description " + DriverTrainingService.recordingMetaData.description);
+                        }
                     }
                     catch (Exception e)
                     {
@@ -95,8 +99,20 @@ namespace CrewChiefV4
                 {
                     Console.WriteLine("No metadata.json file exists in the training session folder " + DriverTrainingService.folderPathForSession);
                 }
+                return true;
             }
-            return true;
+            else
+            {
+                if (isRecordingSession)
+                {
+                    Console.WriteLine("A recording is already in progress, complete this first");
+                }
+                else
+                {
+                    Console.WriteLine("Already playing a session");
+                }
+                return false;
+            }
         }
 
         public static void stopPlayingTrainingSession()
@@ -117,6 +133,14 @@ namespace CrewChiefV4
                 {
                     if (previousDistanceRoundTrack < entry.distanceRoundTrack && currentDistanceRoundTrack > entry.distanceRoundTrack)
                     {
+                        if (entry.description != null && !entry.description.Equals(""))
+                        {
+                            Console.WriteLine("Playing entry at distance " + entry.distanceRoundTrack + " with description " + entry.description);
+                        }
+                        else
+                        {
+                            Console.WriteLine("Playing entry at distance " + entry.distanceRoundTrack);
+                        }
                         QueuedMessage message = new QueuedMessage(entry.getRandomRecordingName(), 0, null);
                         message.expiryTime = (now.Ticks / TimeSpan.TicksPerMillisecond) + expireUnplayedMessagesAfter;
                         audioPlayer.playMessageImmediately(message);
@@ -218,8 +242,8 @@ namespace CrewChiefV4
                 {
                     Console.WriteLine("Unable to complete recording session : " + e.Message);
                 }
-                isRecordingSession = false;
-            }
+            } 
+            isRecordingSession = false;
         }
 
         public static void stopRecordingMessage()
@@ -333,6 +357,7 @@ namespace CrewChiefV4
 
     public class MetaData
     {
+        public String description { get; set; }
         public String gameEnumName {get; set;}
         public String carClassName { get; set; }
         public String trackName { get; set; }
@@ -341,6 +366,7 @@ namespace CrewChiefV4
         public MetaData()
         {
             this.entries = new List<MetaDataEntry>();
+            this.description = "";
         }
 
         public MetaData(String gameEnumName, String carClassName, String trackName)
@@ -348,6 +374,7 @@ namespace CrewChiefV4
             this.gameEnumName = gameEnumName;
             this.carClassName = carClassName;
             this.trackName = trackName;
+            this.description = "";
             this.entries = new List<MetaDataEntry>();
         }
 
@@ -367,6 +394,14 @@ namespace CrewChiefV4
             }
             if (closestDifference <= range)
             {
+                if (closestEntry.description != null && !closestEntry.description.Equals(""))
+                {
+                    Console.WriteLine("Adding this recording to existing entry " + closestEntry.description + " at distance " + closestEntry.distanceRoundTrack);
+                }
+                else
+                {
+                    Console.WriteLine("Adding this recording to existing entry at distance " + closestEntry.distanceRoundTrack);
+                }
                 return closestEntry;
             }
             else
@@ -378,6 +413,7 @@ namespace CrewChiefV4
 
     public class MetaDataEntry
     {
+        public String description { get; set; }
         public int distanceRoundTrack { get; set; }
         public List<String> recordingNames { get; set; }
         public List<String> fileNames { get; set; }
@@ -386,11 +422,13 @@ namespace CrewChiefV4
         {
             this.recordingNames = new List<string>();
             this.fileNames = new List<string>();
+            this.description = "";
         }
 
         public MetaDataEntry(int distanceRoundTrack)
         {
             this.distanceRoundTrack = distanceRoundTrack;
+            this.description = "";
             this.recordingNames = new List<string>();
             this.fileNames = new List<string>();
         }

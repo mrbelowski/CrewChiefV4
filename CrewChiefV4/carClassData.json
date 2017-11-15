@@ -783,7 +783,7 @@
         },
 		{
 			"carClassEnum": "TRACKDAY_A",
-            "raceroomClassIds": [ 252 ],
+            "raceroomClassIds": [ 255 ],
 			"pCarsClassNames": ["Track Day A"],
 			"brakeType": "Ceramic",
 			"timesInHundredths": true,
