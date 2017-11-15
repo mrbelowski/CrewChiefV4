@@ -80,6 +80,13 @@ namespace CrewChiefV4
 
         private SessionEndMessages sessionEndMessages;
 
+        // used for the training session recorder - need to separate out from the currentGameState so we can
+        // set these even when viewing replays
+        public static String trackName = "";
+        public static CarData.CarClassEnum carClass = CarData.CarClassEnum.UNKNOWN_RACE;
+        public static Boolean viewingReplay = false;
+        public static float distanceRoundTrack = -1;
+
         public CrewChief()
         {
             speechRecogniser = new SpeechRecogniser(this);
@@ -378,15 +385,17 @@ namespace CrewChiefV4
             }
             else
             {
-                if (CrewChief.currentGameState != null && CrewChief.currentGameState.SessionData.TrackDefinition != null)
+                if (CrewChief.trackName == null || CrewChief.trackName.Equals(""))
                 {
-                    DriverTrainingService.startRecordingSession(CrewChief.gameDefinition.gameEnum,
-                        CrewChief.currentGameState.SessionData.TrackDefinition.name, CrewChief.currentGameState.carClass.carClassEnum);
+                    Console.WriteLine("No track has been loaded - start an on-track session before recording a training session");
+                    return;
                 }
-                else
+                if (CrewChief.carClass == CarData.CarClassEnum.UNKNOWN_RACE || CrewChief.carClass == CarData.CarClassEnum.USER_CREATED)
                 {
-                    Console.WriteLine("No track or car has been loaded - start an on-track session before recording a training session");
+                    Console.WriteLine("No car class has been set - this training session will not be class specific");
                 }
+                DriverTrainingService.startRecordingSession(CrewChief.gameDefinition.gameEnum,
+                    CrewChief.trackName, CrewChief.carClass);                
             }
         }
 

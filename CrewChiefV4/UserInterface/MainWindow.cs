@@ -844,9 +844,9 @@ namespace CrewChiefV4
 
                         if (DriverTrainingService.isRecordingSession)
                         {
-                            if (CrewChief.currentGameState != null)
+                            if (CrewChief.distanceRoundTrack > 0)
                             {
-                                DriverTrainingService.startRecordingMessage((int)CrewChief.currentGameState.PositionAndMotionData.DistanceRoundTrack);
+                                DriverTrainingService.startRecordingMessage((int)CrewChief.distanceRoundTrack);
                             }
                         }
                         else

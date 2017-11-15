@@ -127,6 +127,7 @@ namespace CrewChiefV4
 
         public static void startRecordingSession(GameEnum gameEnum, String trackName, CarData.CarClassEnum carClass)
         {
+            // TODO: remove <, >, : , ", /, \ , |, ?, * from track and car name
             if (!isPlayingSession && !isRecordingSession)
             {
                 Console.WriteLine("Recording a training session for circuit " + trackName + " with car class " + carClass.ToString());
@@ -179,13 +180,15 @@ namespace CrewChiefV4
         private static String getCarSpecificFolderPath(GameEnum gameEnum, String trackName, CarData.CarClassEnum carClass)
         {
             return System.IO.Path.Combine(Environment.GetFolderPath(
-                Environment.SpecialFolder.MyDocuments), "CrewChiefV4", "training_sounds", gameEnum.ToString(), carClass.ToString(), trackName);
+                Environment.SpecialFolder.MyDocuments), "CrewChiefV4", "training_sounds", 
+                makeValidForPathName(gameEnum.ToString()), makeValidForPathName(carClass.ToString()), makeValidForPathName(trackName));
         }
 
         private static String getAnyCarFolderPath(GameEnum gameEnum, String trackName)
         {
             return System.IO.Path.Combine(Environment.GetFolderPath(
-                Environment.SpecialFolder.MyDocuments), "CrewChiefV4", "training_sounds", gameEnum.ToString(), trackName);
+                Environment.SpecialFolder.MyDocuments), "CrewChiefV4", "training_sounds",
+                makeValidForPathName(gameEnum.ToString()), makeValidForPathName(trackName));
         }
 
         public static void abortRecordingSession()
@@ -315,6 +318,16 @@ namespace CrewChiefV4
                     DriverTrainingService.waveFile = null;
                 }
             }
+        }
+
+        // replaces reserved characters so we can use this string in a path name
+        private static String makeValidForPathName(String text)
+        {
+            foreach (char c in System.IO.Path.GetInvalidFileNameChars())
+            {
+                text = text.Replace(c, '_');
+            }
+            return text;
         }
     }
 

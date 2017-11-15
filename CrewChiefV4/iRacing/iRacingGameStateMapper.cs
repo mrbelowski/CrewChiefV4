@@ -839,6 +839,18 @@ namespace CrewChiefV4.iRacing
 
 
             // Console.WriteLine("Session running time = " + currentGameState.SessionData.SessionRunningTime + " type = " + currentGameState.SessionData.SessionType + " phase " + currentGameState.SessionData.SessionPhase + " run time = " + currentGameState.SessionData.SessionTotalRunTime);
+
+            if (currentGameState.SessionData.TrackDefinition != null)
+            {
+                CrewChief.trackName = currentGameState.SessionData.TrackDefinition.name;
+            }
+            if (currentGameState.carClass != null)
+            {
+                CrewChief.carClass = currentGameState.carClass.carClassEnum;
+            }
+            CrewChief.distanceRoundTrack = currentGameState.PositionAndMotionData.DistanceRoundTrack;
+            CrewChief.viewingReplay = false;
+
             return currentGameState;
         }
 
