@@ -12,6 +12,8 @@ namespace CrewChiefV4
 {
     class DriverTrainingService
     {
+        private static long expireUnplayedMessagesAfter = 500;  // milliseconds
+        private static int combineEntriesCloserThan = 20; // if a new entry's lap distance is within 20 metres of an existing entry's lap distance, combine them
         public static Boolean isPlayingSession = false;
         public static Boolean isRecordingSession = false;
         private static Boolean isRecordingSound = false;
@@ -74,14 +76,17 @@ namespace CrewChiefV4
                     }
                     foreach (MetaDataEntry entry in DriverTrainingService.recordingMetaData.entries)
                     {
-                        try
+                        for (int i = 0; i < entry.recordingNames.Count; i++)
                         {
-                            SoundCache.loadSingleSound(entry.recordingName, System.IO.Path.Combine(DriverTrainingService.folderPathForSession, entry.fileName));
-                        }
-                        catch (Exception e)
-                        {
-                            Console.WriteLine("Unable to load a sound from training set " + DriverTrainingService.folderPathForSession + " : " + e.Message);
-                            return false;
+                            try
+                            {
+                                SoundCache.loadSingleSound(entry.recordingNames[i], System.IO.Path.Combine(DriverTrainingService.folderPathForSession, entry.fileNames[i]));
+                            }
+                            catch (Exception e)
+                            {
+                                Console.WriteLine("Unable to load a sound from training set " + DriverTrainingService.folderPathForSession + " : " + e.Message);
+                                return false;
+                            }
                         }
                     }
                     isPlayingSession = true;
@@ -104,7 +109,7 @@ namespace CrewChiefV4
             isRecordingSession = false;
         }
 
-        public static void checkDistanceAndPlayIfNeeded(float previousDistanceRoundTrack, float currentDistanceRoundTrack, AudioPlayer audioPlayer)
+        public static void checkDistanceAndPlayIfNeeded(DateTime now, float previousDistanceRoundTrack, float currentDistanceRoundTrack, AudioPlayer audioPlayer)
         {
             if (isPlayingSession && !isRecordingSession && DriverTrainingService.recordingMetaData != null)
             {
@@ -112,7 +117,9 @@ namespace CrewChiefV4
                 {
                     if (previousDistanceRoundTrack < entry.distanceRoundTrack && currentDistanceRoundTrack > entry.distanceRoundTrack)
                     {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(entry.recordingName, 0, null));
+                        QueuedMessage message = new QueuedMessage(entry.getRandomRecordingName(), 0, null);
+                        message.expiryTime = (now.Ticks / TimeSpan.TicksPerMillisecond) + expireUnplayedMessagesAfter;
+                        audioPlayer.playMessageImmediately(message);
                     }
                 }
             }
@@ -237,9 +244,17 @@ namespace CrewChiefV4
                     Console.WriteLine("sound already being recorded");
                 }
                 else
-                {                    
-                    String fileName = distanceRoundTrack + ".wav";
-                    String recordingName = DriverTrainingService.trackName + "_" + DriverTrainingService.carClass.ToString() + "_" + fileName;                   
+                {
+                    Boolean addMetaDataEntry = false;
+                    MetaDataEntry entry = DriverTrainingService.recordingMetaData.getClosestEntryInRange(distanceRoundTrack, combineEntriesCloserThan);
+                    if (entry == null)
+                    {
+                        addMetaDataEntry = true;
+                        entry = new MetaDataEntry(distanceRoundTrack);
+                    }
+                    int recordingIndex = entry.recordingNames.Count;
+                    String fileName = distanceRoundTrack + "_" + recordingIndex + ".wav";
+                    String recordingName = DriverTrainingService.trackName + "_" + DriverTrainingService.carClass.ToString() + "_" + fileName;
                     try
                     {
                         lock (_lock) 
@@ -251,7 +266,12 @@ namespace CrewChiefV4
                             DriverTrainingService.waveFile = new WaveFileWriter(createFileName(fileName), waveSource.WaveFormat);
                             DriverTrainingService.waveSource.StartRecording();                            
                         }
-                        DriverTrainingService.recordingMetaData.entries.Add(new MetaDataEntry(distanceRoundTrack, recordingName, fileName));
+                        entry.recordingNames.Add(recordingName);
+                        entry.fileNames.Add(fileName);
+                        if (addMetaDataEntry)
+                        {
+                            DriverTrainingService.recordingMetaData.entries.Add(entry);
+                        }
                         DriverTrainingService.isRecordingSound = true;
                     }
                     catch (Exception e)
@@ -304,10 +324,12 @@ namespace CrewChiefV4
         public String carClassName { get; set; }
         public String trackName { get; set; }
         public List<MetaDataEntry> entries { get; set; }
+
         public MetaData()
         {
             this.entries = new List<MetaDataEntry>();
         }
+
         public MetaData(String gameEnumName, String carClassName, String trackName)
         {
             this.gameEnumName = gameEnumName;
@@ -315,22 +337,55 @@ namespace CrewChiefV4
             this.trackName = trackName;
             this.entries = new List<MetaDataEntry>();
         }
+
+        public MetaDataEntry getClosestEntryInRange(int distanceRoundTrack, int range)
+        {
+            int closestDifference = int.MaxValue;
+            MetaDataEntry closestEntry = null;
+            foreach (MetaDataEntry entry in entries)
+            {
+                // TODO: include track length in this calculation
+                int difference = Math.Abs(entry.distanceRoundTrack - distanceRoundTrack);
+                if (difference < closestDifference)
+                {
+                    closestDifference = difference;
+                    closestEntry = entry;
+                }
+            }
+            if (closestDifference <= range)
+            {
+                return closestEntry;
+            }
+            else
+            {
+                return null;
+            }
+        }
     }
 
     public class MetaDataEntry
     {
         public int distanceRoundTrack { get; set; }
-        public String recordingName { get; set; }
-        public String fileName { get; set; }
+        public List<String> recordingNames { get; set; }
+        public List<String> fileNames { get; set; }
+
         public MetaDataEntry()
         {
-
+            this.recordingNames = new List<string>();
+            this.fileNames = new List<string>();
         }
-        public MetaDataEntry(int distanceRoundTrack, String recordingName, String fileName)
+
+        public MetaDataEntry(int distanceRoundTrack)
         {
             this.distanceRoundTrack = distanceRoundTrack;
-            this.recordingName = recordingName;
-            this.fileName = fileName;
+            this.recordingNames = new List<string>();
+            this.fileNames = new List<string>();
+        }
+
+        public String getRandomRecordingName()
+        {
+            int index = Utilities.random.Next(recordingNames.Count);
+            return recordingNames[index];
         }
     }
 }

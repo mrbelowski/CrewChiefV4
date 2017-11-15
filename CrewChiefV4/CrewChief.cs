@@ -757,7 +757,7 @@ namespace CrewChiefV4
                                 }
                                 if (DriverTrainingService.isPlayingSession)
                                 {
-                                    DriverTrainingService.checkDistanceAndPlayIfNeeded(previousGameState.PositionAndMotionData.DistanceRoundTrack,
+                                    DriverTrainingService.checkDistanceAndPlayIfNeeded(currentGameState.Now, previousGameState.PositionAndMotionData.DistanceRoundTrack,
                                         currentGameState.PositionAndMotionData.DistanceRoundTrack, audioPlayer);
                                 }
                                 if (spotter != null && GlobalBehaviourSettings.spotterEnabled && !spotterIsRunning && !loadDataFromFile)
