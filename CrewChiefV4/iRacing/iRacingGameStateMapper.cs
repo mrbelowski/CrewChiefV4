@@ -216,7 +216,7 @@ namespace CrewChiefV4.iRacing
 
                         TrackDataContainer tdc = TrackData.TRACK_LANDMARKS_DATA.getTrackDataForTrackName(shared.SessionData.Track.CodeName, currentGameState.SessionData.TrackDefinition.trackLength);
                         currentGameState.SessionData.TrackDefinition.trackLandmarks = tdc.trackLandmarks;
-                        currentGameState.SessionData.TrackDefinition.isOval = tdc.isOval;
+                        currentGameState.SessionData.TrackDefinition.isOval = tdc.isOval || shared.SessionData.Track.IsOval;
                         currentGameState.SessionData.TrackDefinition.setGapPoints();
                         GlobalBehaviourSettings.UpdateFromTrackDefinition(currentGameState.SessionData.TrackDefinition);
 
