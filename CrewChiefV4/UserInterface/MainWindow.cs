@@ -842,7 +842,7 @@ namespace CrewChiefV4
                         if (rejectMessagesWhenTalking)
                             crewChief.audioPlayer.muteBackgroundPlayer(true /*mute*/);
 
-                        if (DriverTrainingService.isRecordingSession)
+                        if (DriverTrainingService.isRecordingPaceNotes)
                         {
                             if (CrewChief.distanceRoundTrack > 0)
                             {
@@ -870,7 +870,7 @@ namespace CrewChiefV4
                         }
 
                         Console.WriteLine("Stopping listening...");
-                        if (DriverTrainingService.isRecordingSession)
+                        if (DriverTrainingService.isRecordingPaceNotes)
                         {
                             DriverTrainingService.stopRecordingMessage();
                         }
@@ -980,16 +980,16 @@ namespace CrewChiefV4
                         CrewChief.getCarStatus();
                         nextPollWait = 1000;
                     }
-                    else if (controllerConfiguration.hasOutstandingClick(ControllerConfiguration.TOGGLE_TRAINING_RECORDING))
+                    else if (controllerConfiguration.hasOutstandingClick(ControllerConfiguration.TOGGLE_PACE_NOTES_RECORDING))
                     {
-                        Console.WriteLine("Start / stop training recording");
-                        crewChief.toggleTrainingRecording();
+                        Console.WriteLine("Start / stop pace notes recording");
+                        crewChief.togglePaceNotesRecording();
                         nextPollWait = 1000;
                     }
-                    else if (controllerConfiguration.hasOutstandingClick(ControllerConfiguration.TOGGLE_TRAINING_PLAYBACK))
+                    else if (controllerConfiguration.hasOutstandingClick(ControllerConfiguration.TOGGLE_PACE_NOTES_PLAYBACK))
                     {
-                        Console.WriteLine("Start / stop training playback");
-                        crewChief.toggleTrainingPlayback();
+                        Console.WriteLine("Start / stop pace notes playback");
+                        crewChief.togglePaceNotesPlayback();
                         nextPollWait = 1000;
                     }
                     else if (controllerConfiguration.hasOutstandingClick(ControllerConfiguration.PRINT_TRACK_DATA))
@@ -1163,8 +1163,8 @@ namespace CrewChiefV4
                 this.scanControllersButton.Enabled = true;
                 this.personalisationBox.Enabled = true;
                 this.spotterNameBox.Enabled = true;
-                DriverTrainingService.completeRecordingSession();
-                DriverTrainingService.stopPlayingTrainingSession();
+                DriverTrainingService.completeRecordingPaceNotes();
+                DriverTrainingService.stopPlayingPaceNotes();
             }
 
             this.gameDefinitionList.Enabled = !this._IsAppRunning;

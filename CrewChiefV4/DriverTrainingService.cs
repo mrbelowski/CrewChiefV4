@@ -14,8 +14,8 @@ namespace CrewChiefV4
     {
         private static long expireUnplayedMessagesAfter = 500;  // milliseconds
         private static int combineEntriesCloserThan = 20; // if a new entry's lap distance is within 20 metres of an existing entry's lap distance, combine them
-        public static Boolean isPlayingSession = false;
-        public static Boolean isRecordingSession = false;
+        public static Boolean isPlayingPaceNotes = false;
+        public static Boolean isRecordingPaceNotes = false;
         private static Boolean isRecordingSound = false;
         private static MetaData recordingMetaData;
         private static WaveInEvent waveSource = null;
@@ -25,44 +25,44 @@ namespace CrewChiefV4
         private static String trackName;
         private static CarData.CarClassEnum carClass;
 
-        private static String folderPathForSession;
+        private static String folderPathForPaceNotes;
 
         private static Object _lock = new Object();
 
-        public static Boolean loadTrainingSession(GameEnum gameEnum, String trackName, CarData.CarClassEnum carClass)
+        public static Boolean loadPaceNotes(GameEnum gameEnum, String trackName, CarData.CarClassEnum carClass)
         {
-            if (!isRecordingSession && !isPlayingSession)
+            if (!isRecordingPaceNotes && !isPlayingPaceNotes)
             {
-                Console.WriteLine("Playing a training session for circuit " + trackName + " with car class " + carClass.ToString());
+                Console.WriteLine("Playing pace notes for circuit " + trackName + " with car class " + carClass.ToString());
 
-                isRecordingSession = false;
+                isRecordingPaceNotes = false;
                 isRecordingSound = false;
                 if (carClass != CarData.CarClassEnum.USER_CREATED && carClass != CarData.CarClassEnum.UNKNOWN_RACE)
                 {
-                    DriverTrainingService.folderPathForSession = getCarSpecificFolderPath(gameEnum, trackName, carClass);
-                    if (!Directory.Exists(DriverTrainingService.folderPathForSession))
+                    DriverTrainingService.folderPathForPaceNotes = getCarSpecificFolderPath(gameEnum, trackName, carClass);
+                    if (!Directory.Exists(DriverTrainingService.folderPathForPaceNotes))
                     {
-                        Console.WriteLine("No training folder exists for car class " + carClass + ", game " + gameEnum + ", track " + trackName + 
-                            ". Checking for training data folder applicable to any car");
-                        DriverTrainingService.folderPathForSession = getAnyCarFolderPath(gameEnum, trackName);
-                        if (!Directory.Exists(DriverTrainingService.folderPathForSession))
+                        Console.WriteLine("No pace notes folder exists for car class " + carClass + ", game " + gameEnum + ", track " + trackName +
+                            ". Checking for pace notes folder applicable to any car");
+                        DriverTrainingService.folderPathForPaceNotes = getAnyCarFolderPath(gameEnum, trackName);
+                        if (!Directory.Exists(DriverTrainingService.folderPathForPaceNotes))
                         {
-                            Console.WriteLine("Unable to find any training data set for game " + gameEnum + ", track " + trackName);
+                            Console.WriteLine("Unable to find any pace notes set for game " + gameEnum + ", track " + trackName);
                             return false;
                         }
                     }
                 }
                 else
                 {
-                    DriverTrainingService.folderPathForSession = getAnyCarFolderPath(gameEnum, trackName);
-                    if (!Directory.Exists(DriverTrainingService.folderPathForSession))
+                    DriverTrainingService.folderPathForPaceNotes = getAnyCarFolderPath(gameEnum, trackName);
+                    if (!Directory.Exists(DriverTrainingService.folderPathForPaceNotes))
                     {
-                        Console.WriteLine("Unable to find any training data set for game " + gameEnum + ", track " + trackName);
+                        Console.WriteLine("Unable to find any pace notes set for game " + gameEnum + ", track " + trackName);
                         return false;
                     }
                 }
-                
-                String fileName = System.IO.Path.Combine(folderPathForSession, "metadata.json");
+
+                String fileName = System.IO.Path.Combine(folderPathForPaceNotes, "metadata.json");
                 if (File.Exists(fileName))
                 {
                     try
@@ -70,12 +70,12 @@ namespace CrewChiefV4
                         DriverTrainingService.recordingMetaData = JsonConvert.DeserializeObject<MetaData>(File.ReadAllText(fileName));
                         if (DriverTrainingService.recordingMetaData.description != null && !DriverTrainingService.recordingMetaData.description.Equals(""))
                         {
-                            Console.WriteLine("Playing training session with description " + DriverTrainingService.recordingMetaData.description);
+                            Console.WriteLine("Playing pace notes with description " + DriverTrainingService.recordingMetaData.description);
                         }
                     }
                     catch (Exception e)
                     {
-                        Console.WriteLine("Unable to parse training metadata file: " + e.Message);
+                        Console.WriteLine("Unable to parse pace notes metadata file: " + e.Message);
                         return false;
                     }
                     foreach (MetaDataEntry entry in DriverTrainingService.recordingMetaData.entries)
@@ -84,26 +84,26 @@ namespace CrewChiefV4
                         {
                             try
                             {
-                                SoundCache.loadSingleSound(entry.recordingNames[i], System.IO.Path.Combine(DriverTrainingService.folderPathForSession, entry.fileNames[i]));
+                                SoundCache.loadSingleSound(entry.recordingNames[i], System.IO.Path.Combine(DriverTrainingService.folderPathForPaceNotes, entry.fileNames[i]));
                             }
                             catch (Exception e)
                             {
-                                Console.WriteLine("Unable to load a sound from training set " + DriverTrainingService.folderPathForSession + " : " + e.Message);
+                                Console.WriteLine("Unable to load a sound from pace notes set " + DriverTrainingService.folderPathForPaceNotes + " : " + e.Message);
                                 return false;
                             }
                         }
                     }
-                    isPlayingSession = true;
+                    isPlayingPaceNotes = true;
                 }
                 else
                 {
-                    Console.WriteLine("No metadata.json file exists in the training session folder " + DriverTrainingService.folderPathForSession);
+                    Console.WriteLine("No metadata.json file exists in the pace notes folder " + DriverTrainingService.folderPathForPaceNotes);
                 }
                 return true;
             }
             else
             {
-                if (isRecordingSession)
+                if (isRecordingPaceNotes)
                 {
                     Console.WriteLine("A recording is already in progress, complete this first");
                 }
@@ -115,19 +115,19 @@ namespace CrewChiefV4
             }
         }
 
-        public static void stopPlayingTrainingSession()
+        public static void stopPlayingPaceNotes()
         {
-            isPlayingSession = false;
+            isPlayingPaceNotes = false;
         }
 
-        public static void stopRecordingTrainingSession()
+        public static void stopRecordingPaceNotes()
         {
-            isRecordingSession = false;
+            isRecordingPaceNotes = false;
         }
 
         public static void checkDistanceAndPlayIfNeeded(DateTime now, float previousDistanceRoundTrack, float currentDistanceRoundTrack, AudioPlayer audioPlayer)
         {
-            if (isPlayingSession && !isRecordingSession && DriverTrainingService.recordingMetaData != null)
+            if (isPlayingPaceNotes && !isRecordingPaceNotes && DriverTrainingService.recordingMetaData != null)
             {
                 foreach (MetaDataEntry entry in DriverTrainingService.recordingMetaData.entries)
                 {
@@ -149,37 +149,36 @@ namespace CrewChiefV4
             }
         }
 
-        public static void startRecordingSession(GameEnum gameEnum, String trackName, CarData.CarClassEnum carClass)
+        public static void startRecordingPaceNotes(GameEnum gameEnum, String trackName, CarData.CarClassEnum carClass)
         {
-            // TODO: remove <, >, : , ", /, \ , |, ?, * from track and car name
-            if (!isPlayingSession && !isRecordingSession)
+            if (!isPlayingPaceNotes && !isRecordingPaceNotes)
             {
-                Console.WriteLine("Recording a training session for circuit " + trackName + " with car class " + carClass.ToString());
+                Console.WriteLine("Recording a pace notes session for circuit " + trackName + " with car class " + carClass.ToString());
                 DriverTrainingService.gameEnum = gameEnum;
                 DriverTrainingService.trackName = trackName;
                 DriverTrainingService.carClass = carClass;
                 if (carClass == CarData.CarClassEnum.UNKNOWN_RACE || carClass == CarData.CarClassEnum.USER_CREATED)
                 {
-                    Console.WriteLine("Recording session for any car class");
-                    DriverTrainingService.folderPathForSession = getAnyCarFolderPath(gameEnum, trackName);
+                    Console.WriteLine("Recording pace notes for any car class");
+                    DriverTrainingService.folderPathForPaceNotes = getAnyCarFolderPath(gameEnum, trackName);
                 }
                 else
                 {
-                    Console.WriteLine("Recording session for car class " + carClass.ToString());
-                    DriverTrainingService.folderPathForSession = getCarSpecificFolderPath(gameEnum, trackName, carClass);
+                    Console.WriteLine("Recording pace notes for car class " + carClass.ToString());
+                    DriverTrainingService.folderPathForPaceNotes = getCarSpecificFolderPath(gameEnum, trackName, carClass);
                 }
                 Boolean createFolder = true;
                 Boolean createNewMetaData = true;
-                if (System.IO.Directory.Exists(folderPathForSession))
+                if (System.IO.Directory.Exists(folderPathForPaceNotes))
                 {
                     createFolder = false;
-                    String fileName = System.IO.Path.Combine(folderPathForSession, "metadata.json");
+                    String fileName = System.IO.Path.Combine(folderPathForPaceNotes, "metadata.json");
                     if (File.Exists(fileName))
                     {
                         try
                         {
                             DriverTrainingService.recordingMetaData = JsonConvert.DeserializeObject<MetaData>(File.ReadAllText(fileName));
-                            Console.WriteLine("A training session for this game / track / car combination already exists. This will be extended");
+                            Console.WriteLine("Pace notes for this game / track / car combination already exists. This will be extended");
                             createNewMetaData = false;
                         }
                         catch (Exception e)
@@ -191,51 +190,51 @@ namespace CrewChiefV4
                 }
                 if (createFolder)
                 {
-                    System.IO.Directory.CreateDirectory(folderPathForSession);
+                    System.IO.Directory.CreateDirectory(folderPathForPaceNotes);
                 } 
                 if (createNewMetaData) 
                 {
                     DriverTrainingService.recordingMetaData = new MetaData(gameEnum.ToString(), carClass.ToString(), trackName);
                 }
-                isRecordingSession = true;
+                isRecordingPaceNotes = true;
             }
         }
 
         private static String getCarSpecificFolderPath(GameEnum gameEnum, String trackName, CarData.CarClassEnum carClass)
         {
             return System.IO.Path.Combine(Environment.GetFolderPath(
-                Environment.SpecialFolder.MyDocuments), "CrewChiefV4", "training_sounds", 
+                Environment.SpecialFolder.MyDocuments), "CrewChiefV4", "pace_notes", 
                 makeValidForPathName(gameEnum.ToString()), makeValidForPathName(carClass.ToString()), makeValidForPathName(trackName));
         }
 
         private static String getAnyCarFolderPath(GameEnum gameEnum, String trackName)
         {
             return System.IO.Path.Combine(Environment.GetFolderPath(
-                Environment.SpecialFolder.MyDocuments), "CrewChiefV4", "training_sounds",
+                Environment.SpecialFolder.MyDocuments), "CrewChiefV4", "pace_notes",
                 makeValidForPathName(gameEnum.ToString()), makeValidForPathName(trackName));
         }
 
-        public static void abortRecordingSession()
+        public static void abortRecordingPaceNotes()
         {
             if (isRecordingSound)
             {
                 stopRecordingMessage();
             }
-            System.IO.Directory.Delete(folderPathForSession, true);
-            isRecordingSession = false;
+            System.IO.Directory.Delete(folderPathForPaceNotes, true);
+            isRecordingPaceNotes = false;
         }
 
-        public static void completeRecordingSession()
+        public static void completeRecordingPaceNotes()
         {
             if (isRecordingSound)
             {
                 stopRecordingMessage();
             }
-            if (isRecordingSession)
+            if (isRecordingPaceNotes)
             {
                 try
                 {
-                    File.WriteAllText(System.IO.Path.Combine(folderPathForSession, "metadata.json"), 
+                    File.WriteAllText(System.IO.Path.Combine(folderPathForPaceNotes, "metadata.json"), 
                         JsonConvert.SerializeObject(DriverTrainingService.recordingMetaData, Formatting.Indented));
                 }
                 catch (Exception e)
@@ -243,7 +242,7 @@ namespace CrewChiefV4
                     Console.WriteLine("Unable to complete recording session : " + e.Message);
                 }
             } 
-            isRecordingSession = false;
+            isRecordingPaceNotes = false;
         }
 
         public static void stopRecordingMessage()
@@ -256,7 +255,7 @@ namespace CrewChiefV4
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine("Failed to record a training session sound " + e.Message);
+                    Console.WriteLine("Failed to record a pace notes session sound " + e.Message);
                 }
                 DriverTrainingService.isRecordingSound = false;
             }
@@ -264,7 +263,7 @@ namespace CrewChiefV4
 
         public static void startRecordingMessage(int distanceRoundTrack)
         {
-            if (isRecordingSession)
+            if (isRecordingPaceNotes)
             {
                 if (DriverTrainingService.isRecordingSound)
                 {
@@ -303,7 +302,7 @@ namespace CrewChiefV4
                     }
                     catch (Exception e)
                     {
-                        Console.WriteLine("Unable to create a training session sound " + e.Message);
+                        Console.WriteLine("Unable to create a pace notes sound " + e.Message);
                     }
                 }
             }
@@ -311,7 +310,7 @@ namespace CrewChiefV4
 
         private static String createFileName(String name)
         {
-            return System.IO.Path.Combine(DriverTrainingService.folderPathForSession, name);
+            return System.IO.Path.Combine(DriverTrainingService.folderPathForPaceNotes, name);
         }
 
         static void waveSource_DataAvailable(object sender, WaveInEventArgs e)

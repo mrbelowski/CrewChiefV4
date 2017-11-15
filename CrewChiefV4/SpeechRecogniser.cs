@@ -121,8 +121,8 @@ namespace CrewChiefV4
         public static String[] SESSION_STATUS = Configuration.getSpeechRecognitionPhrases("SESSION_STATUS");
         public static String[] STATUS = Configuration.getSpeechRecognitionPhrases("STATUS");
 
-        public static String[] START_TRAINING_PLAYBACK = Configuration.getSpeechRecognitionPhrases("START_TRAINING_PLAYBACK");
-        public static String[] STOP_TRAINING_PLAYBACK = Configuration.getSpeechRecognitionPhrases("STOP_TRAINING_PLAYBACK");
+        public static String[] START_PACE_NOTES_PLAYBACK = Configuration.getSpeechRecognitionPhrases("START_PACE_NOTES_PLAYBACK");
+        public static String[] STOP_PACE_NOTES_PLAYBACK = Configuration.getSpeechRecognitionPhrases("STOP_PACE_NOTES_PLAYBACK");
 
         private CrewChief crewChief;
 
@@ -357,8 +357,8 @@ namespace CrewChiefV4
                 validateAndAdd(SESSION_STATUS, staticSpeechChoices);
                 validateAndAdd(STATUS, staticSpeechChoices);
 
-                validateAndAdd(START_TRAINING_PLAYBACK, staticSpeechChoices);
-                validateAndAdd(STOP_TRAINING_PLAYBACK, staticSpeechChoices);
+                validateAndAdd(START_PACE_NOTES_PLAYBACK, staticSpeechChoices);
+                validateAndAdd(STOP_PACE_NOTES_PLAYBACK, staticSpeechChoices);
 
                 foreach (String s in CALCULATE_FUEL_FOR)
                 {
@@ -854,18 +854,18 @@ namespace CrewChiefV4
             {
                 CrewChief.getSessionStatus();
             }
-            else if (ResultContains(recognisedSpeech, START_TRAINING_PLAYBACK))
+            else if (ResultContains(recognisedSpeech, START_PACE_NOTES_PLAYBACK))
             {
-                if (!DriverTrainingService.isPlayingSession)
+                if (!DriverTrainingService.isPlayingPaceNotes)
                 {
-                    crewChief.toggleTrainingPlayback();
+                    crewChief.togglePaceNotesPlayback();
                 }
             }
-            else if (ResultContains(recognisedSpeech, STOP_TRAINING_PLAYBACK))
+            else if (ResultContains(recognisedSpeech, STOP_PACE_NOTES_PLAYBACK))
             {
-                if (DriverTrainingService.isPlayingSession)
+                if (DriverTrainingService.isPlayingPaceNotes)
                 {
-                    crewChief.toggleTrainingPlayback();
+                    crewChief.togglePaceNotesPlayback();
                 }
             }
             return null;
