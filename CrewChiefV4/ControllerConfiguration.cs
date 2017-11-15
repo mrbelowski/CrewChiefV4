@@ -38,7 +38,10 @@ namespace CrewChiefV4
         public static String GET_CAR_STATUS = Configuration.getUIString("get_car_status");
         public static String GET_STATUS = Configuration.getUIString("get_status");
         public static String GET_SESSION_STATUS = Configuration.getUIString("get_session_status");
-        public static String GET_DAMAGE_REPORT = Configuration.getUIString("get_damage_report");        
+        public static String GET_DAMAGE_REPORT = Configuration.getUIString("get_damage_report");
+                
+        public static String TOGGLE_PACE_NOTES_RECORDING = Configuration.getUIString("toggle_pace_notes_recording");
+        public static String TOGGLE_PACE_NOTES_PLAYBACK = Configuration.getUIString("toggle_pace_notes_playback");        
 
         private ControllerData networkGamePad = new ControllerData(Configuration.getUIString("udp_network_data_buttons"), DeviceType.Gamepad, UDP_NETWORK_CONTROLLER_GUID);
         
@@ -86,6 +89,8 @@ namespace CrewChiefV4
             addButtonAssignment(GET_DAMAGE_REPORT);
             addButtonAssignment(GET_SESSION_STATUS);
             addButtonAssignment(GET_STATUS);
+            addButtonAssignment(TOGGLE_PACE_NOTES_PLAYBACK);
+            addButtonAssignment(TOGGLE_PACE_NOTES_RECORDING);
             controllers = loadControllers();
         }
 
@@ -122,7 +127,8 @@ namespace CrewChiefV4
             pollForButtonClicks(buttonAssignments[buttonAssignmentIndexes[GET_SESSION_STATUS]]);
             pollForButtonClicks(buttonAssignments[buttonAssignmentIndexes[GET_DAMAGE_REPORT]]);
             pollForButtonClicks(buttonAssignments[buttonAssignmentIndexes[GET_CAR_STATUS]]);
-
+            pollForButtonClicks(buttonAssignments[buttonAssignmentIndexes[TOGGLE_PACE_NOTES_PLAYBACK]]);
+            pollForButtonClicks(buttonAssignments[buttonAssignmentIndexes[TOGGLE_PACE_NOTES_RECORDING]]);
         }
 
         private void pollForButtonClicks(ButtonAssignment ba)
@@ -278,6 +284,14 @@ namespace CrewChiefV4
                 {
                     actionId = "GET_STATUS";
                 }
+                else if (buttonAssignment.action == TOGGLE_PACE_NOTES_PLAYBACK)
+                {
+                    actionId = "TOGGLE_PACE_NOTES_PLAYBACK";
+                }
+                else if (buttonAssignment.action == TOGGLE_PACE_NOTES_RECORDING)
+                {
+                    actionId = "TOGGLE_PACE_NOTES_RECORDING";
+                }
 
                 if (buttonAssignment.controller != null && (buttonAssignment.joystick != null || buttonAssignment.controller.guid == UDP_NETWORK_CONTROLLER_GUID) && buttonAssignment.buttonIndex != -1)
                 {
@@ -405,6 +419,20 @@ namespace CrewChiefV4
             if (getSessionStatusButtonIndex != -1 && getSessionStatusDeviceGuid.Length > 0)
             {
                 loadAssignment(parent, GET_SESSION_STATUS, getSessionStatusButtonIndex, getSessionStatusDeviceGuid);
+            }
+
+            int togglePaceNotesPlaybackButtonIndex = UserSettings.GetUserSettings().getInt("TOGGLE_PACE_NOTES_PLAYBACK_button_index");
+            String togglePaceNotesPlaybackDeviceGuid = UserSettings.GetUserSettings().getString("TOGGLE_PACE_NOTES_PLAYBACK_device_guid");
+            if (togglePaceNotesPlaybackButtonIndex != -1 && togglePaceNotesPlaybackDeviceGuid.Length > 0)
+            {
+                loadAssignment(parent, TOGGLE_PACE_NOTES_PLAYBACK, togglePaceNotesPlaybackButtonIndex, togglePaceNotesPlaybackDeviceGuid);
+            }
+
+            int togglePaceNotesRecordingButtonIndex = UserSettings.GetUserSettings().getInt("TOGGLE_PACE_NOTES_RECORDING_button_index");
+            String togglePaceNotesRecordingDeviceGuid = UserSettings.GetUserSettings().getString("TOGGLE_PACE_NOTES_RECORDING_device_guid");
+            if (togglePaceNotesRecordingButtonIndex != -1 && togglePaceNotesRecordingDeviceGuid.Length > 0)
+            {
+                loadAssignment(parent, TOGGLE_PACE_NOTES_RECORDING, togglePaceNotesRecordingButtonIndex, togglePaceNotesRecordingDeviceGuid);
             }
         }
 

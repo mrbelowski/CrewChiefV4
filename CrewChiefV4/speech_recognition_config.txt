@@ -97,6 +97,9 @@ CAR_STATUS = car status
 SESSION_STATUS = session status:race status
 STATUS = full update:full status:update me
 
+START_PACE_NOTES_PLAYBACK = start pace notes
+STOP_PACE_NOTES_PLAYBACK = stop pace notes
+
 #################################################
 # Dynamic recognition phrase fragments - these are used to build up recognition sentences for opponent information.
 # Multiple options are NOT supported here - each must be a single word or phrase. These are combined for each opponent

@@ -842,7 +842,17 @@ namespace CrewChiefV4
                         if (rejectMessagesWhenTalking)
                             crewChief.audioPlayer.muteBackgroundPlayer(true /*mute*/);
 
-                        crewChief.speechRecogniser.recognizeAsync();
+                        if (DriverTrainingService.isRecordingPaceNotes)
+                        {
+                            if (CrewChief.distanceRoundTrack > 0)
+                            {
+                                DriverTrainingService.startRecordingMessage((int)CrewChief.distanceRoundTrack);
+                            }
+                        }
+                        else
+                        {
+                            crewChief.speechRecogniser.recognizeAsync();
+                        }
                         Console.WriteLine("Listening...");
 
                         if (rejectMessagesWhenTalking)
@@ -860,17 +870,23 @@ namespace CrewChiefV4
                         }
 
                         Console.WriteLine("Stopping listening...");
-                        crewChief.speechRecogniser.recognizeAsyncCancel();
-                        channelOpen = false;
-
-                        new Thread(() =>
+                        if (DriverTrainingService.isRecordingPaceNotes)
                         {
-                            Thread.Sleep(2000);
-                            if (!channelOpen && !SpeechRecogniser.gotRecognitionResult)
+                            DriverTrainingService.stopRecordingMessage();
+                        }
+                        else
+                        {
+                            crewChief.speechRecogniser.recognizeAsyncCancel();
+                            new Thread(() =>
                             {
-                                crewChief.youWot();
-                            }
-                        }).Start();
+                                Thread.Sleep(2000);
+                                if (!channelOpen && !SpeechRecogniser.gotRecognitionResult)
+                                {
+                                    crewChief.youWot();
+                                }
+                            }).Start();
+                        }
+                        channelOpen = false;
                     }
                 }
             }
@@ -962,6 +978,18 @@ namespace CrewChiefV4
                     {
                         Console.WriteLine("Getting car status");
                         CrewChief.getCarStatus();
+                        nextPollWait = 1000;
+                    }
+                    else if (controllerConfiguration.hasOutstandingClick(ControllerConfiguration.TOGGLE_PACE_NOTES_RECORDING))
+                    {
+                        Console.WriteLine("Start / stop pace notes recording");
+                        crewChief.togglePaceNotesRecording();
+                        nextPollWait = 1000;
+                    }
+                    else if (controllerConfiguration.hasOutstandingClick(ControllerConfiguration.TOGGLE_PACE_NOTES_PLAYBACK))
+                    {
+                        Console.WriteLine("Start / stop pace notes playback");
+                        crewChief.togglePaceNotesPlayback();
                         nextPollWait = 1000;
                     }
                     else if (controllerConfiguration.hasOutstandingClick(ControllerConfiguration.PRINT_TRACK_DATA))
@@ -1135,6 +1163,8 @@ namespace CrewChiefV4
                 this.scanControllersButton.Enabled = true;
                 this.personalisationBox.Enabled = true;
                 this.spotterNameBox.Enabled = true;
+                DriverTrainingService.completeRecordingPaceNotes();
+                DriverTrainingService.stopPlayingPaceNotes();
             }
 
             this.gameDefinitionList.Enabled = !this._IsAppRunning;
@@ -1285,7 +1315,7 @@ namespace CrewChiefV4
             }
             controllerConfiguration.saveSettings();
         }
-
+        
         private void editPropertiesButtonClicked(object sender, EventArgs e)
         {
             // If minized to tray, hide tray icon while properties dialog is shown,

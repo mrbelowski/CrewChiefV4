@@ -133,12 +133,19 @@ namespace CrewChiefV4.RaceRoom
             GameStateData currentGameState = new GameStateData(wrapper.ticksWhenRead);
             RaceRoomData.RaceRoomShared shared = wrapper.data;
 
+            if (shared.ControlType == (int)RaceRoomConstant.Control.Replay)
+            {
+                CrewChief.trackName = getNameFromBytes(shared.TrackName);
+                CrewChief.carClass = CarData.getCarClassForRaceRoomId(shared.VehicleInfo.ClassId).carClassEnum;
+                CrewChief.viewingReplay = true;
+                CrewChief.distanceRoundTrack = shared.LapDistance;
+            }
+
             if (shared.Player.GameSimulationTime <= 0 || shared.VehicleInfo.SlotId < 0 ||
                 shared.ControlType == (int)RaceRoomConstant.Control.Remote || shared.ControlType == (int)RaceRoomConstant.Control.Replay)
             {
                 return previousGameState;
             }
-
             Boolean isCarRunning = CheckIsCarRunning(shared);
             SessionPhase lastSessionPhase = SessionPhase.Unavailable;
             float lastSessionRunningTime = 0;
@@ -1306,6 +1313,18 @@ namespace CrewChiefV4.RaceRoom
             currentGameState.OvertakingAids = getOvertakingAids(shared, currentGameState.carClass.carClassEnum, currentGameState.SessionData.CompletedLaps,
                 currentGameState.SessionData.SessionNumberOfLaps, currentGameState.SessionData.SessionTimeRemaining,
                 currentGameState.SessionData.SessionType);
+
+            if (currentGameState.SessionData.TrackDefinition != null)
+            {
+                CrewChief.trackName = currentGameState.SessionData.TrackDefinition.name;
+            }
+            if (currentGameState.carClass != null)
+            {
+                CrewChief.carClass = currentGameState.carClass.carClassEnum;
+            }
+            CrewChief.distanceRoundTrack = currentGameState.PositionAndMotionData.DistanceRoundTrack;
+            CrewChief.viewingReplay = false;
+
             return currentGameState;
         }
 
