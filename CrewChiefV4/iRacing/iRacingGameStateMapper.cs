@@ -69,6 +69,7 @@ namespace CrewChiefV4.iRacing
             SessionPhase lastSessionPhase = SessionPhase.Unavailable;
             SessionType lastSessionType = SessionType.Unavailable;
             int? previousSessionNumber = -1;
+            int previousSessionId = -1;
             float lastSessionRunningTime = 0;
             if (previousGameState != null)
             {
@@ -78,10 +79,12 @@ namespace CrewChiefV4.iRacing
                 currentGameState.SessionData.SessionStartPosition = previousGameState.SessionData.SessionStartPosition;
                 currentGameState.readLandmarksForThisLap = previousGameState.readLandmarksForThisLap;
                 previousSessionNumber = previousGameState.SessionData.SessionIteration;
+                previousSessionId = previousGameState.SessionData.SessionId;
             }
             currentGameState.SessionData.SessionType = mapToSessionType(shared.SessionData.SessionType);
             currentGameState.SessionData.SessionRunningTime = (float)shared.Telemetry.SessionTime;
             currentGameState.SessionData.SessionTimeRemaining = (float)shared.Telemetry.SessionTimeRemain;
+
             int previousLapsCompleted = previousGameState == null ? 0 : previousGameState.SessionData.CompletedLaps;
 
             currentGameState.SessionData.SessionPhase = mapToSessionPhase(lastSessionPhase, shared.Telemetry.SessionState, currentGameState.SessionData.SessionType, shared.Telemetry.IsReplayPlaying,
@@ -91,7 +94,12 @@ namespace CrewChiefV4.iRacing
             currentGameState.SessionData.NumCarsAtStartOfSession = shared.Drivers.Count;
 
             int sessionNumber = shared.Telemetry.SessionNum;
+            
+
             currentGameState.SessionData.SessionIteration = sessionNumber;
+
+            currentGameState.SessionData.SessionId = shared.SessionData.SessionId;
+
             int PlayerCarIdx = shared.Telemetry.PlayerCarIdx;
 
             Boolean justGoneGreen = false;
@@ -114,7 +122,7 @@ namespace CrewChiefV4.iRacing
 
             if (sessionOfSameTypeRestarted || currentGameState.SessionData.SessionType != SessionType.Unavailable 
                 && lastSessionPhase != SessionPhase.Countdown
-                && lastSessionType != currentGameState.SessionData.SessionType || sessionNumber != previousSessionNumber)
+                && lastSessionType != currentGameState.SessionData.SessionType || sessionNumber != previousSessionNumber || previousSessionId != currentGameState.SessionData.SessionId)
             {
                 currentGameState.SessionData.IsNewSession = true;
                 Console.WriteLine("New session, trigger data:");
@@ -176,7 +184,8 @@ namespace CrewChiefV4.iRacing
                 CarData.IRACING_CLASS_ID = playerCar.Car.CarClassId;
                 GlobalBehaviourSettings.UpdateFromCarClass(currentGameState.carClass);
                 Console.WriteLine("Player is using car class " + currentGameState.carClass.getClassIdentifier() + " (car ID " + playerCar.Car.CarId + ")");
-                
+                currentGameState.SessionData.PlayerCarNr = Parser.ParseInt(playerCar.CarNumber);
+
                 currentGameState.SessionData.DeltaTime = new DeltaTime(currentGameState.SessionData.TrackDefinition.trackLength, currentGameState.PositionAndMotionData.DistanceRoundTrack, currentGameState.Now);
                 currentGameState.SessionData.SectorNumber = playerCar.Live.CurrentFakeSector;
                 foreach (Driver driver in shared.Drivers)
@@ -231,6 +240,7 @@ namespace CrewChiefV4.iRacing
                         GlobalBehaviourSettings.UpdateFromCarClass(currentGameState.carClass);
                         currentGameState.SessionData.DeltaTime = new DeltaTime(currentGameState.SessionData.TrackDefinition.trackLength, currentGameState.PositionAndMotionData.DistanceRoundTrack, currentGameState.Now);
                         Console.WriteLine("Player is using car class " + currentGameState.carClass.getClassIdentifier() + " (car ID " + playerCar.Car.CarId + ")");
+                        currentGameState.SessionData.PlayerCarNr = Parser.ParseInt(playerCar.CarNumber);
 
                         if (previousGameState != null)
                         {
@@ -1119,7 +1129,7 @@ namespace CrewChiefV4.iRacing
             opponentData.DeltaTime = new DeltaTime(trackLength, opponentData.DistanceRoundTrack, DateTime.Now);
             opponentData.CarClass = CarData.getCarClassForIRacingId(opponentCar.Car.CarClassId, opponentCar.Car.CarId);
             opponentData.CurrentSectorNumber = opponentCar.Live.CurrentFakeSector;
-            
+            opponentData.CarNr = Parser.ParseInt(opponentCar.CarNumber);
             Console.WriteLine("New driver " + driverName + " is using car class " +
                 opponentData.CarClass.getClassIdentifier() + " (car ID " + opponentCar.Car.CarId + ")");
 
