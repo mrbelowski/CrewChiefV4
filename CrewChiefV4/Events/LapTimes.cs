@@ -239,7 +239,7 @@ namespace CrewChiefV4.Events
                             deltaPlayerLastToSessionBestInClassSet = true;
                         }
                     }
-                    else if (currentGameState.SessionData.PlayerLapTimeSessionBest > 0)
+                    else if (currentGameState.SessionData.PlayerLapTimeSessionBest > 0 && currentGameState.SessionData.CompletedLaps > 1)
                     {
                         deltaPlayerLastToSessionBestInClass = TimeSpan.FromSeconds(currentGameState.SessionData.LapTimePrevious - currentGameState.SessionData.PlayerLapTimeSessionBest);
                         deltaPlayerLastToSessionBestInClassSet = true;
