@@ -205,7 +205,7 @@ namespace CrewChiefV4
             [JsonConverter(typeof(CarClassEnumConverter))]
             public CarClassEnum carClassEnum { get; set; }
             public List<int> raceroomClassIds { get; set; }
-            public List<int> iracingClassIds { get; set; }
+            public List<int> iracingCarIds { get; set; }
             public List<string> pCarsClassNames { get; set; }
             public List<string> rf1ClassNames { get; set; }
             public List<string> rf2ClassNames { get; set; }
@@ -250,7 +250,7 @@ namespace CrewChiefV4
                 // initialise with default values
                 this.carClassEnum = CarClassEnum.UNKNOWN_RACE;
                 this.raceroomClassIds = new List<int>();
-                this.iracingClassIds = new List<int>();
+                this.iracingCarIds = new List<int>();
                 this.pCarsClassNames = new List<string>();
                 this.rf1ClassNames = new List<string>();
                 this.rf2ClassNames = new List<string>();
@@ -550,18 +550,22 @@ namespace CrewChiefV4
             newCarClass.placeholderClassId = carClassId.ToString();
             return newCarClass;
         }
-        public static CarClass getCarClassForIRacingId(int carClassId)
+        public static CarClass getCarClassForIRacingId(int carClassId, int carId)
         {
             // first check if it's in the cache
             if (intToCarClass.ContainsKey(carClassId))
             {
                 return intToCarClass[carClassId];
             }
+            if (intToCarClass.ContainsKey(carId))
+            {
+                return intToCarClass[carId];
+            }
             foreach (CarClass carClass in CAR_CLASSES.carClasses)
             {
-                if (carClass.iracingClassIds.Contains(carClassId))
+                if (carClass.iracingCarIds.Contains(carId))
                 {
-                    intToCarClass.Add(carClassId, carClass);
+                    intToCarClass.Add(carId, carClass);
                     return carClass;
                 }
             }

@@ -1710,6 +1710,18 @@ namespace CrewChiefV4.rFactor2
                 Console.WriteLine("Leader has finished race, player has done " + csd.CompletedLaps +
                     " laps, session time = " + csd.SessionRunningTime);
             }
+
+            if (csd.TrackDefinition != null)
+            {
+                CrewChief.trackName = csd.TrackDefinition.name;
+            }
+            if (cgs.carClass != null)
+            {
+                CrewChief.carClass = cgs.carClass.carClassEnum;
+            }
+            CrewChief.distanceRoundTrack = cgs.PositionAndMotionData.DistanceRoundTrack;
+            CrewChief.viewingReplay = false;
+
             return cgs;
         }
 

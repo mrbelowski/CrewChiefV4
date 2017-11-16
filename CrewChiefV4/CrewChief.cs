@@ -80,6 +80,13 @@ namespace CrewChiefV4
 
         private SessionEndMessages sessionEndMessages;
 
+        // used for the pace notes recorder - need to separate out from the currentGameState so we can
+        // set these even when viewing replays
+        public static String trackName = "";
+        public static CarData.CarClassEnum carClass = CarData.CarClassEnum.UNKNOWN_RACE;
+        public static Boolean viewingReplay = false;
+        public static float distanceRoundTrack = -1;
+
         public CrewChief()
         {
             speechRecogniser = new SpeechRecogniser(this);
@@ -343,6 +350,54 @@ namespace CrewChiefV4
             audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderDidntUnderstand, 0, null));
         }
 
+        public void togglePaceNotesPlayback()
+        {
+            if (DriverTrainingService.isPlayingPaceNotes)
+            {
+                DriverTrainingService.stopPlayingPaceNotes();
+                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
+            }
+            else
+            {
+                if (CrewChief.currentGameState != null && CrewChief.currentGameState.SessionData.TrackDefinition != null)
+                {
+                    if (!DriverTrainingService.isPlayingPaceNotes)
+                    {
+                        if (DriverTrainingService.loadPaceNotes(CrewChief.gameDefinition.gameEnum,
+                                CrewChief.currentGameState.SessionData.TrackDefinition.name, CrewChief.currentGameState.carClass.carClassEnum))
+                        {
+                            audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
+                        }
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("No track or car has been loaded - start an on-track session before loading a pace notes");
+                }
+            }
+        }
+        
+        public void togglePaceNotesRecording()
+        {
+            if (DriverTrainingService.isRecordingPaceNotes)
+            {
+                DriverTrainingService.completeRecordingPaceNotes();
+            }
+            else
+            {
+                if (CrewChief.trackName == null || CrewChief.trackName.Equals(""))
+                {
+                    Console.WriteLine("No track has been loaded - start an on-track session before recording pace notes");
+                    return;
+                }
+                if (CrewChief.carClass == CarData.CarClassEnum.UNKNOWN_RACE || CrewChief.carClass == CarData.CarClassEnum.USER_CREATED)
+                {
+                    Console.WriteLine("No car class has been set - this pace notes session will not be class specific");
+                }
+                DriverTrainingService.startRecordingPaceNotes(CrewChief.gameDefinition.gameEnum,
+                    CrewChief.trackName, CrewChief.carClass);                
+            }
+        }
 
         // nasty... these triggers come from the speech recogniser or from button presses, and invoke speech
         // recognition 'respond' methods in the events
@@ -360,7 +415,7 @@ namespace CrewChiefV4
         }
 
         public static void getSessionStatus()
-        {
+       {
             getEvent("Penalties").respond(SpeechRecogniser.SESSION_STATUS[0]);
             getEvent("RaceTime").respond(SpeechRecogniser.SESSION_STATUS[0]);
             getEvent("Position").respond(SpeechRecogniser.SESSION_STATUS[0]);
@@ -708,6 +763,11 @@ namespace CrewChiefV4
                                     {
                                         triggerEvent(entry.Key, entry.Value, previousGameState, currentGameState);
                                     }
+                                }
+                                if (DriverTrainingService.isPlayingPaceNotes)
+                                {
+                                    DriverTrainingService.checkDistanceAndPlayIfNeeded(currentGameState.Now, previousGameState.PositionAndMotionData.DistanceRoundTrack,
+                                        currentGameState.PositionAndMotionData.DistanceRoundTrack, audioPlayer);
                                 }
                                 if (spotter != null && GlobalBehaviourSettings.spotterEnabled && !spotterIsRunning && !loadDataFromFile)
                                 {
