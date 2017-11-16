@@ -728,11 +728,13 @@ namespace CrewChiefV4.Events
                 float matchingRacePaceThreshold = currentGameState.SessionData.LapTimePrevious * matchingRacePacePercent / 100;
 
                 // no point in reporting lap awesomeness if we have no comparison data:
-                Boolean hasCompletedMoreThanOneLap = currentGameState.SessionData.CompletedLaps > 1;                
+                Boolean hasPlayerLapComparisonData = currentGameState.SessionData.CompletedLaps > 1
+                    && currentGameState.SessionData.LapTimePrevious > 0
+                    && currentGameState.SessionData.PreviousLapWasValid;
                 Boolean sessionHasOpponents = currentGameState.SessionData.SessionType != SessionType.HotLap && currentGameState.OpponentData.Count > 0;
-                Boolean hasOpponentLapData = sessionHasOpponents && bestLapDataForOpponents[0] > 0;
+                Boolean hasOpponentLapComparisonData = sessionHasOpponents && bestLapDataForOpponents[0] > 0;
 
-                if (!hasCompletedMoreThanOneLap && !hasOpponentLapData)
+                if (!hasPlayerLapComparisonData && !hasOpponentLapComparisonData)
                 {
                     return LastLapRating.NO_DATA;
                 }
