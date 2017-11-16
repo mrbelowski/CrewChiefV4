@@ -326,7 +326,9 @@ namespace CrewChiefV4.iRacing
                     currentGameState.SessionData.trackLandmarksTiming = previousGameState.SessionData.trackLandmarksTiming;
                     currentGameState.SessionData.CompletedLaps = previousGameState.SessionData.CompletedLaps;
                     currentGameState.FlagData.useImprovisedIncidentCalling = previousGameState.FlagData.useImprovisedIncidentCalling;
-                    
+                    currentGameState.OpponentData = previousGameState.OpponentData;
+                    currentGameState.SessionData.SectorNumber = previousGameState.SessionData.SectorNumber;
+
                     currentGameState.SessionData.DeltaTime.deltaPoints = previousGameState.SessionData.DeltaTime.deltaPoints;
                     currentGameState.SessionData.DeltaTime.currentDeltaPoint = previousGameState.SessionData.DeltaTime.currentDeltaPoint;
                     currentGameState.SessionData.DeltaTime.nextDeltaPoint = previousGameState.SessionData.DeltaTime.nextDeltaPoint;
@@ -405,11 +407,6 @@ namespace CrewChiefV4.iRacing
                 currentGameState.SessionData.OverallSessionBestLapTime = shared.Telemetry.LapBestLapTime;
             }
 
-            if (previousGameState != null && !currentGameState.SessionData.IsNewSession)
-            {
-                currentGameState.OpponentData = previousGameState.OpponentData;
-                currentGameState.SessionData.SectorNumber = previousGameState.SessionData.SectorNumber;
-            }
             if (currentGameState.SessionData.Position == 1)
             {
                 currentGameState.SessionData.LeaderSectorNumber = currentGameState.SessionData.SectorNumber;
@@ -437,7 +434,7 @@ namespace CrewChiefV4.iRacing
                     currentGameState.SessionData.LapTimePreviousEstimateForInvalidLap = currentGameState.SessionData.SessionRunningTime - currentGameState.SessionData.SessionTimesAtEndOfSectors[3];
                     currentGameState.SessionData.SessionTimesAtEndOfSectors[3] = currentGameState.SessionData.SessionRunningTime;
                     float sectorTime = (float)playerCar.CurrentResults.FakeSector3.SectorTime;
-                    if (sectorTime > 0 && previousGameState != null && previousGameState.SessionData.CurrentLapIsValid)
+                    if (sectorTime > 0 && previousGameState != null && previousGameState.SessionData.CurrentLapIsValid && playerCar.Live.Lap > 1)
                     {
                         Console.WriteLine("sector 3 time: " + TimeSpan.FromSeconds(sectorTime).ToString(@"mm\:ss\.fff"));
                         currentGameState.SessionData.LastSector3Time = sectorTime;
@@ -974,7 +971,7 @@ namespace CrewChiefV4.iRacing
             {
                 if (opponentData.OpponentLapData.Count > 0)
                 {
-                    opponentData.CompleteLapWithProvidedLapTime(racePosition, sessionRunningTime, completedLapTime, true,
+                    opponentData.CompleteLapWithProvidedLapTime(racePosition, sessionRunningTime, completedLapTime, opponentData.LastLapValid,
                         false, trackTempreture, airTemperature, sessionLengthIsTime, sessionTimeRemaining, 3);
                 }
                 opponentData.StartNewLap(completedLaps + 1, racePosition, isInPits, sessionRunningTime, false, trackTempreture, airTemperature);
