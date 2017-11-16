@@ -10,7 +10,7 @@ For support and discussions about Crew Chief we have our very own forum here: ht
 
 Changelog
 ---------
-Version 4.8.1.6: Opponent to player delta bug fixes (all games); added iRacing pit macros; more iRacing fixes; added new Pace Notes feature for recording and playing back user-created pace notes
+Version 4.8.1.7: Opponent to player delta bug fixes (all games); added iRacing pit macros; more iRacing fixes; added new Pace Notes feature for recording and playing back user-created pace notes (see Help); fixed arrow keys not working for pit macros
 
 Version 4.8.1.5: Better UI handling of sound pack downloads (app should no longer appear to hang while unpacking sounds); Announce retired and DQ'ed drivers in RF2; Fixed stale driverID in iRacing; Minor bug fixes - Mark out laps as invalid in R3E (should prevent stale lap time calls at the end of an out lap), RF2 pre-lights and overtake messages and track landmark mapping getting lost on session restart, pCARS 2 pit exit messages;
 
