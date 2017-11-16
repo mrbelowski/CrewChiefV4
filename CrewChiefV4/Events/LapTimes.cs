@@ -313,7 +313,9 @@ namespace CrewChiefV4.Events
             {
                 Boolean sectorsReportedForLap = false;                
                 if (currentGameState.SessionData.IsNewLap && 
-                    ((currentGameState.SessionData.SessionType == SessionType.HotLap && currentGameState.SessionData.CompletedLaps > 0) || currentGameState.SessionData.CompletedLaps > 1))
+                    (((currentGameState.SessionData.SessionType == SessionType.HotLap || currentGameState.SessionData.SessionType == SessionType.Qualify) 
+                            && currentGameState.SessionData.CompletedLaps > 0) ||
+                      currentGameState.SessionData.CompletedLaps > 1))
                 {
                     if (lapTimesWindow == null)
                     {
