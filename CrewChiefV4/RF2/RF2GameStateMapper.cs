@@ -342,7 +342,7 @@ namespace CrewChiefV4.rFactor2
             for (int i = 0; i < shared.scoring.mScoringInfo.mNumVehicles; ++i)
             {
                 var vehicle = shared.scoring.mVehicles[i];
-                switch (MapToControlType((rFactor2Constants.rF2Control)vehicle.mControl))
+                switch (this.MapToControlType((rFactor2Constants.rF2Control)vehicle.mControl))
                 {
                     case ControlType.AI:
                     case ControlType.Player:
@@ -353,6 +353,7 @@ namespace CrewChiefV4.rFactor2
                         if (vehicle.mPlace == 1)
                             leaderScoring = vehicle;
                         break;
+
                     default:
                         continue;
                 }
@@ -361,7 +362,7 @@ namespace CrewChiefV4.rFactor2
                     break;
             }
 
-            // can't find the player or session leader vehicle info (replay)
+            // Can't find the player or session leader vehicle info (replay).  No useful data is available.
             if (playerScoring.mIsPlayer != 1 || leaderScoring.mPlace != 1)
                 return pgs;
 
@@ -443,12 +444,12 @@ namespace CrewChiefV4.rFactor2
             csd.SessionType = mapToSessionType(shared);
             csd.SessionPhase = mapToSessionPhase((rFactor2Constants.rF2GamePhase)shared.scoring.mScoringInfo.mGamePhase, csd.SessionType, ref playerScoring);
 
-            var carClassId = GetStringFromBytes(playerScoring.mVehicleClass);
+            var carClassId = RF2GameStateMapper.GetStringFromBytes(playerScoring.mVehicleClass);
             cgs.carClass = CarData.getCarClassForClassName(carClassId);
             CarData.CLASS_ID = carClassId;
             this.brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(cgs.carClass);
-            csd.DriverRawName = GetStringFromBytes(playerScoring.mDriverName).ToLower();
-            csd.TrackDefinition = new TrackDefinition(GetStringFromBytes(shared.scoring.mScoringInfo.mTrackName), (float)shared.scoring.mScoringInfo.mLapDist);
+            csd.DriverRawName = RF2GameStateMapper.GetStringFromBytes(playerScoring.mDriverName).ToLower();
+            csd.TrackDefinition = new TrackDefinition(RF2GameStateMapper.GetStringFromBytes(shared.scoring.mScoringInfo.mTrackName), (float)shared.scoring.mScoringInfo.mLapDist);
             csd.SessionNumberOfLaps = shared.scoring.mScoringInfo.mMaxLaps > 0 && shared.scoring.mScoringInfo.mMaxLaps < 1000 ? shared.scoring.mScoringInfo.mMaxLaps : 0;
 
             // default to 60:30 if both session time and number of laps undefined (test day)
@@ -735,7 +736,7 @@ namespace CrewChiefV4.rFactor2
             else if (this.enablePitLaneApproachHeuristics)
             {
                 // We need to have completed at least one full lap before we attempt guessing on pit lane approach.
-                if (pgs != null 
+                if (pgs != null
                     && !pgs.PitData.OnOutLap
                     && !cgs.PitData.OnOutLap
                     && !cgs.PitData.InPitlane
@@ -1006,8 +1007,8 @@ namespace CrewChiefV4.rFactor2
                 cgs.TyreData.LeftRearIsSpinning = Math.Abs(wheelRearLeft.mRotation) > maxRotatingSpeed;
                 cgs.TyreData.RightRearIsSpinning = Math.Abs(wheelRearRight.mRotation) > maxRotatingSpeed;
 #if DEBUG
-//                RF2GameStateMapper.writeSpinningLockingDebugMsg(cgs, wheelFrontLeft.mRotation, wheelFrontRight.mRotation,
-//                    wheelRearLeft.mRotation, wheelRearRight.mRotation, minRotatingSpeed, maxRotatingSpeed);
+                //                RF2GameStateMapper.writeSpinningLockingDebugMsg(cgs, wheelFrontLeft.mRotation, wheelFrontRight.mRotation,
+                //                    wheelRearLeft.mRotation, wheelRearRight.mRotation, minRotatingSpeed, maxRotatingSpeed);
 #endif
             }
 
@@ -1049,8 +1050,8 @@ namespace CrewChiefV4.rFactor2
             // Many of rF2 tracks have no DRS zones defined.  One of the symptoms is DRS alloweved immediately on race start.
             // Disallow DRS messages in such case.
             if (!this.detectedTrackNoDRSZones
-                && csd.CompletedLaps == 0 
-                && csd.SessionRunningTime > 10 
+                && csd.CompletedLaps == 0
+                && csd.SessionRunningTime > 10
                 && cgs.OvertakingAids.DrsAvailable)
             {
                 this.detectedTrackNoDRSZones = true;
@@ -1100,7 +1101,7 @@ namespace CrewChiefV4.rFactor2
                     csd.PlayerClassSessionBestLapTime = csd.PlayerLapTimeSessionBest > 0.0f ?
                         csd.PlayerLapTimeSessionBest : -1.0f;
 
-                    if (csd.IsNewLap 
+                    if (csd.IsNewLap
                         && psd != null && !psd.IsNewLap
                         && csd.LapTimePrevious > 0.0f
                         && csd.PreviousLapWasValid)
@@ -1233,7 +1234,7 @@ namespace CrewChiefV4.rFactor2
                         "\" is using car class " + opponent.CarClass.getClassIdentifier() +
                         " at position " + opponent.Position.ToString());
                 }
-                
+
                 // Carry over state
                 if (opponentPrevious != null)
                 {
@@ -1270,7 +1271,7 @@ namespace CrewChiefV4.rFactor2
                     opponent.DistanceRoundTrack = (float)vehicleScoring.mLapDist;
                 }
 
-                if (opponentPrevious != null) 
+                if (opponentPrevious != null)
                 {
                     // if we've just crossed the 'near to pit entry' mark, update our near-pit-entry position. Otherwise copy it from the previous state
                     if (opponentPrevious.DistanceRoundTrack < csd.TrackDefinition.distanceForNearPitEntryChecks
@@ -1301,7 +1302,7 @@ namespace CrewChiefV4.rFactor2
                 opponent.LastLapTime = vehicleScoring.mLastLapTime > 0 ? (float)vehicleScoring.mLastLapTime : -1.0f;
 
                 var isInPits = vehicleScoring.mInPits == 1;
-                
+
                 if (csd.SessionType == SessionType.Race && csd.SessionRunningTime > 10
                     && opponentPrevious != null && !opponentPrevious.InPits && isInPits)
                 {
@@ -1504,7 +1505,7 @@ namespace CrewChiefV4.rFactor2
                 else if (shared.scoring.mScoringInfo.mYellowFlagState == (sbyte)rFactor2Constants.rF2YellowFlagState.PitOpen
                     || shared.scoring.mScoringInfo.mYellowFlagState == (sbyte)rFactor2Constants.rF2YellowFlagState.PitClosed)
                 {
-                    if (playerRulesIdx != -1 
+                    if (playerRulesIdx != -1
                         && shared.scoring.mScoringInfo.mYellowFlagState == (sbyte)rFactor2Constants.rF2YellowFlagState.PitClosed)
                     {
                         var allowedToPit = shared.rules.mParticipants[playerRulesIdx].mAllowedToPit;
@@ -1516,7 +1517,7 @@ namespace CrewChiefV4.rFactor2
                         cgs.FlagData.fcyPhase = pitsClosedForPlayer ? FullCourseYellowPhase.PITS_CLOSED : FullCourseYellowPhase.PITS_OPEN;
                     }
                     else
-                        cgs.FlagData.fcyPhase = FullCourseYellowPhase.PITS_OPEN; 
+                        cgs.FlagData.fcyPhase = FullCourseYellowPhase.PITS_OPEN;
                 }
                 else if (shared.scoring.mScoringInfo.mYellowFlagState == (sbyte)rFactor2Constants.rF2YellowFlagState.PitLeadLap)
                     cgs.FlagData.fcyPhase = FullCourseYellowPhase.PITS_OPEN_LEAD_LAP_VEHICLES;
@@ -1604,8 +1605,8 @@ namespace CrewChiefV4.rFactor2
 
             // --------------------------------
             // Frozen order data
-            if (this.enableFrozenOrderMessages 
-                && playerRulesIdx != -1 
+            if (this.enableFrozenOrderMessages
+                && playerRulesIdx != -1
                 && pgs != null)
                 cgs.FrozenOrderData = this.GetFrozenOrderData(pgs.FrozenOrderData, ref playerScoring, ref shared.scoring, ref shared.rules.mParticipants[playerRulesIdx], ref shared.rules);
 
@@ -1711,14 +1712,8 @@ namespace CrewChiefV4.rFactor2
                     " laps, session time = " + csd.SessionRunningTime);
             }
 
-            if (csd.TrackDefinition != null)
-            {
-                CrewChief.trackName = csd.TrackDefinition.name;
-            }
-            if (cgs.carClass != null)
-            {
-                CrewChief.carClass = cgs.carClass.carClassEnum;
-            }
+            CrewChief.trackName = csd.TrackDefinition.name;
+            CrewChief.carClass = cgs.carClass.carClassEnum;
             CrewChief.distanceRoundTrack = cgs.PositionAndMotionData.DistanceRoundTrack;
             CrewChief.viewingReplay = false;
 
@@ -1899,10 +1894,10 @@ namespace CrewChiefV4.rFactor2
         // NOTE: This can be made generic for all sims, but I am not sure if anyone needs this but me
         private static void writeDebugMsg(string msg)
         {
-            Console.WriteLine("DEBUG_MSG: " +  msg);
+            Console.WriteLine("DEBUG_MSG: " + msg);
         }
 
-        private static void writeSpinningLockingDebugMsg(GameStateData cgs, double frontLeftRotation, double frontRightRotation, 
+        private static void writeSpinningLockingDebugMsg(GameStateData cgs, double frontLeftRotation, double frontRightRotation,
             double rearLeftRotation, double rearRightRotation, float minRotatingSpeed, float maxRotatingSpeed)
         {
             if (cgs.TyreData.LeftFrontIsLocked)
@@ -2016,7 +2011,7 @@ namespace CrewChiefV4.rFactor2
                             || o.CarClass != CarData.getCarClassForClassName(GetStringFromBytes(vehicleScoring.mVehicleClass))
                             || opponentKeysProcessed.Contains(possibleKey))
                             continue;
-                        
+
                         // distance from predicted position
                         float targetDist = o.Speed * timeDelta;
                         float dist = (float)Math.Abs(Math.Sqrt((double)((o.WorldPosition[0] - worldPos[0]) * (o.WorldPosition[0] - worldPos[0]) +
