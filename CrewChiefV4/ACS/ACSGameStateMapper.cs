@@ -811,6 +811,15 @@ namespace CrewChiefV4.assetto
             {
                 return null;
             }*/
+
+            if (status == AC_STATUS.AC_REPLAY)
+            {
+                CrewChief.trackName = shared.acsStatic.track + ":" + shared.acsStatic.trackConfiguration;
+                CrewChief.carClass = CarData.getCarClassForClassName(shared.acsStatic.carModel).carClassEnum;
+                CrewChief.viewingReplay = true;
+                CrewChief.distanceRoundTrack = spLineLengthToDistanceRoundTrack(shared.acsChief.vehicle[0].spLineLength, shared.acsStatic.trackSPlineLength);
+            }
+
             if (status == AC_STATUS.AC_REPLAY || status == AC_STATUS.AC_OFF || shared.acsChief.numVehicles <= 0)
             {
                 return previousGameState;
@@ -1894,6 +1903,18 @@ namespace CrewChiefV4.assetto
                 currentGameState.Conditions.addSample(currentGameState.Now, currentGameState.SessionData.CompletedLaps, currentGameState.SessionData.SectorNumber,
                     shared.acsPhysics.airTemp, shared.acsPhysics.roadTemp, 0, 0, 0, 0, 0);
             }
+
+            if (currentGameState.SessionData.TrackDefinition != null)
+            {
+                CrewChief.trackName = currentGameState.SessionData.TrackDefinition.name;
+            }
+            if (currentGameState.carClass != null)
+            {
+                CrewChief.carClass = currentGameState.carClass.carClassEnum;
+            }
+            CrewChief.distanceRoundTrack = currentGameState.PositionAndMotionData.DistanceRoundTrack;
+            CrewChief.viewingReplay = false;
+
             return currentGameState;
         }
 

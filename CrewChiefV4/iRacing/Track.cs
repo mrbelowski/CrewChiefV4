@@ -25,7 +25,7 @@ namespace CrewChiefV4.iRacing
             track.CodeName = query["TrackName"].GetValue();
             track.Length = Parser.ParseTrackLength(query["TrackLength"].GetValue());
             track.NightMode = query["WeekendOptions"]["NightMode"].GetValue() == "1";
-            track.IsOval = query["TrackType"].GetValue() !=  "road course";
+            track.IsOval = query["Category"].GetValue() != "Road";
 
             return track;
         }

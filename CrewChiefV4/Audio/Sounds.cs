@@ -196,6 +196,20 @@ namespace CrewChiefV4.Audio
             }
         }
 
+        public static void loadSingleSound(String soundName, String fullPath)
+        {
+            if (!singleSounds.ContainsKey(soundName))
+            {
+                SingleSound singleSound = new SingleSound(fullPath, true, true, true);
+                singleSounds.Add(soundName, singleSound);
+            }
+        }
+
+        public static Boolean hasSingleSound(String soundName)
+        {
+            return availableDriverNames.Contains(soundName) || singleSounds.ContainsKey(soundName);
+        }
+
         public static void loadDriverNameSounds(List<String> names)
         {
             new Thread(() =>

@@ -341,6 +341,15 @@ namespace CrewChiefV4.PCars
         {
             pCarsAPIStruct shared = ((CrewChiefV4.PCars.PCarsSharedMemoryReader.PCarsStructWrapper)memoryMappedFileStruct).data;
             long ticks = ((CrewChiefV4.PCars.PCarsSharedMemoryReader.PCarsStructWrapper)memoryMappedFileStruct).ticksWhenRead;
+
+            if (shared.mGameState == (uint)eGameState.GAME_VIEWING_REPLAY)
+            {
+                CrewChief.trackName = StructHelper.getNameFromBytes(shared.mTrackLocation) + ":" + StructHelper.getNameFromBytes(shared.mTrackVariation);
+                CrewChief.carClass = CarData.getCarClassForClassName(StructHelper.getNameFromBytes(shared.mCarClassName)).carClassEnum;
+                CrewChief.viewingReplay = true;
+                CrewChief.distanceRoundTrack = shared.mParticipantData[shared.mViewedParticipantIndex].mCurrentLapDistance;
+            }
+
             // game state is 3 for paused, 5 for replay. No idea what 4 is...
             if (shared.mGameState == (uint)eGameState.GAME_FRONT_END ||
                 shared.mGameState == (uint)eGameState.GAME_INGAME_PAUSED || 
@@ -1264,6 +1273,18 @@ namespace CrewChiefV4.PCars
             }
             currentGameState.CloudBrightness = shared.mCloudBrightness;
             currentGameState.RainDensity = shared.mRainDensity;
+
+            if (currentGameState.SessionData.TrackDefinition != null)
+            {
+                CrewChief.trackName = currentGameState.SessionData.TrackDefinition.name;
+            }
+            if (currentGameState.carClass != null)
+            {
+                CrewChief.carClass = currentGameState.carClass.carClassEnum;
+            }
+            CrewChief.distanceRoundTrack = currentGameState.PositionAndMotionData.DistanceRoundTrack;
+            CrewChief.viewingReplay = false;
+
             return currentGameState;
         }
 

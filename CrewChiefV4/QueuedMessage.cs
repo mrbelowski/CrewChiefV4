@@ -265,7 +265,7 @@ namespace CrewChiefV4
                 {
                     case FragmentType.Text:
                         if (messageFragment.text.StartsWith(AudioPlayer.PAUSE_ID) || SoundCache.availableSounds.Contains(messageFragment.text) ||
-                            SoundCache.availableDriverNames.Contains(messageFragment.text))
+                            SoundCache.hasSingleSound(messageFragment.text))
                         {
                             messages.Add(messageFragment.text);
                         }

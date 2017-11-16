@@ -1,0 +1,378 @@
+{
+  "description": "",
+  "gameEnumName": "RACE_ROOM",
+  "carClassName": "TC1",
+  "trackName": "Macau",
+  "entries": [
+    {
+      "description": "",
+      "distanceRoundTrack": 605,
+      "recordingNames": [
+        "Macau_TC1_605_0.wav",
+        "Macau_TC1_605_1.wav",
+        "Macau_TC1_605_2.wav"
+      ],
+      "fileNames": [
+        "605_0.wav",
+        "605_1.wav",
+        "605_2.wav"
+      ]
+    },
+    {
+      "description": "",
+      "distanceRoundTrack": 1510,
+      "recordingNames": [
+        "Macau_TC1_1510_0.wav",
+        "Macau_TC1_1510_1.wav",
+        "Macau_TC1_1510_2.wav"
+      ],
+      "fileNames": [
+        "1510_0.wav",
+        "1510_1.wav",
+        "1510_2.wav"
+      ]
+    },
+    {
+      "description": "",
+      "distanceRoundTrack": 1772,
+      "recordingNames": [
+        "Macau_TC1_1772_0.wav",
+        "Macau_TC1_1772_1.wav",
+        "Macau_TC1_1772_2.wav"
+      ],
+      "fileNames": [
+        "1772_0.wav",
+        "1772_1.wav",
+        "1772_2.wav"
+      ]
+    },
+    {
+      "description": "",
+      "distanceRoundTrack": 1882,
+      "recordingNames": [
+        "Macau_TC1_1882_0.wav",
+        "Macau_TC1_1882_1.wav"
+      ],
+      "fileNames": [
+        "1882_0.wav",
+        "1882_1.wav"
+      ]
+    },
+    {
+      "description": "",
+      "distanceRoundTrack": 1942,
+      "recordingNames": [
+        "Macau_TC1_1942_0.wav",
+        "Macau_TC1_1942_1.wav",
+        "Macau_TC1_1942_2.wav"
+      ],
+      "fileNames": [
+        "1942_0.wav",
+        "1942_1.wav",
+        "1942_2.wav"
+      ]
+    },
+    {
+      "description": "",
+      "distanceRoundTrack": 2098,
+      "recordingNames": [
+        "Macau_TC1_2098_0.wav",
+        "Macau_TC1_2098_1.wav",
+        "Macau_TC1_2098_2.wav"
+      ],
+      "fileNames": [
+        "2098_0.wav",
+        "2098_1.wav",
+        "2098_2.wav"
+      ]
+    },
+    {
+      "description": "",
+      "distanceRoundTrack": 2324,
+      "recordingNames": [
+        "Macau_TC1_2324_0.wav",
+        "Macau_TC1_2324_1.wav",
+        "Macau_TC1_2324_2.wav"
+      ],
+      "fileNames": [
+        "2324_0.wav",
+        "2324_1.wav",
+        "2324_2.wav"
+      ]
+    },
+    {
+      "description": "",
+      "distanceRoundTrack": 2439,
+      "recordingNames": [
+        "Macau_TC1_2439_0.wav",
+        "Macau_TC1_2439_1.wav",
+        "Macau_TC1_2439_2.wav"
+      ],
+      "fileNames": [
+        "2439_0.wav",
+        "2439_1.wav",
+        "2439_2.wav"
+      ]
+    },
+    {
+      "description": "",
+      "distanceRoundTrack": 2510,
+      "recordingNames": [
+        "Macau_TC1_2510_0.wav",
+        "Macau_TC1_2510_1.wav",
+        "Macau_TC1_2510_2.wav"
+      ],
+      "fileNames": [
+        "2510_0.wav",
+        "2510_1.wav",
+        "2510_2.wav"
+      ]
+    },
+    {
+      "description": "",
+      "distanceRoundTrack": 2660,
+      "recordingNames": [
+        "Macau_TC1_2660_0.wav",
+        "Macau_TC1_2660_1.wav",
+        "Macau_TC1_2660_2.wav"
+      ],
+      "fileNames": [
+        "2660_0.wav",
+        "2660_1.wav",
+        "2660_2.wav"
+      ]
+    },
+    {
+      "description": "",
+      "distanceRoundTrack": 2831,
+      "recordingNames": [
+        "Macau_TC1_2831_0.wav",
+        "Macau_TC1_2831_1.wav",
+        "Macau_TC1_2831_2.wav"
+      ],
+      "fileNames": [
+        "2831_0.wav",
+        "2831_1.wav",
+        "2831_2.wav"
+      ]
+    },
+    {
+      "description": "",
+      "distanceRoundTrack": 3017,
+      "recordingNames": [
+        "Macau_TC1_3017_0.wav",
+        "Macau_TC1_3017_1.wav"
+      ],
+      "fileNames": [
+        "3017_0.wav",
+        "3017_1.wav"
+      ]
+    },
+    {
+      "description": "",
+      "distanceRoundTrack": 3314,
+      "recordingNames": [
+        "Macau_TC1_3314_0.wav",
+        "Macau_TC1_3314_1.wav",
+        "Macau_TC1_3314_2.wav"
+      ],
+      "fileNames": [
+        "3314_0.wav",
+        "3314_1.wav",
+        "3314_2.wav"
+      ]
+    },
+    {
+      "description": "",
+      "distanceRoundTrack": 3425,
+      "recordingNames": [
+        "Macau_TC1_3425_0.wav",
+        "Macau_TC1_3425_1.wav",
+        "Macau_TC1_3425_2.wav"
+      ],
+      "fileNames": [
+        "3425_0.wav",
+        "3425_1.wav",
+        "3425_2.wav"
+      ]
+    },
+    {
+      "description": "",
+      "distanceRoundTrack": 3531,
+      "recordingNames": [
+        "Macau_TC1_3531_0.wav",
+        "Macau_TC1_3531_1.wav",
+        "Macau_TC1_3531_2.wav"
+      ],
+      "fileNames": [
+        "3531_0.wav",
+        "3531_1.wav",
+        "3531_2.wav"
+      ]
+    },
+    {
+      "description": "",
+      "distanceRoundTrack": 3591,
+      "recordingNames": [
+        "Macau_TC1_3591_0.wav",
+        "Macau_TC1_3591_1.wav",
+        "Macau_TC1_3591_2.wav"
+      ],
+      "fileNames": [
+        "3591_0.wav",
+        "3591_1.wav",
+        "3591_2.wav"
+      ]
+    },
+    {
+      "description": "",
+      "distanceRoundTrack": 3692,
+      "recordingNames": [
+        "Macau_TC1_3692_0.wav",
+        "Macau_TC1_3692_1.wav",
+        "Macau_TC1_3692_2.wav"
+      ],
+      "fileNames": [
+        "3692_0.wav",
+        "3692_1.wav",
+        "3692_2.wav"
+      ]
+    },
+    {
+      "description": "",
+      "distanceRoundTrack": 3924,
+      "recordingNames": [
+        "Macau_TC1_3924_0.wav",
+        "Macau_TC1_3924_1.wav",
+        "Macau_TC1_3924_2.wav"
+      ],
+      "fileNames": [
+        "3924_0.wav",
+        "3924_1.wav",
+        "3924_2.wav"
+      ]
+    },
+    {
+      "description": "",
+      "distanceRoundTrack": 4000,
+      "recordingNames": [
+        "Macau_TC1_4000_0.wav",
+        "Macau_TC1_4000_1.wav",
+        "Macau_TC1_4000_2.wav"
+      ],
+      "fileNames": [
+        "4000_0.wav",
+        "4000_1.wav",
+        "4000_2.wav"
+      ]
+    },
+    {
+      "description": "",
+      "distanceRoundTrack": 4035,
+      "recordingNames": [
+        "Macau_TC1_4035_0.wav",
+        "Macau_TC1_4035_1.wav",
+        "Macau_TC1_4035_2.wav"
+      ],
+      "fileNames": [
+        "4035_0.wav",
+        "4035_1.wav",
+        "4035_2.wav"
+      ]
+    },
+    {
+      "description": "",
+      "distanceRoundTrack": 4111,
+      "recordingNames": [
+        "Macau_TC1_4111_0.wav",
+        "Macau_TC1_4111_1.wav",
+        "Macau_TC1_4111_2.wav"
+      ],
+      "fileNames": [
+        "4111_0.wav",
+        "4111_1.wav",
+        "4111_2.wav"
+      ]
+    },
+    {
+      "description": "",
+      "distanceRoundTrack": 4217,
+      "recordingNames": [
+        "Macau_TC1_4217_0.wav",
+        "Macau_TC1_4217_1.wav",
+        "Macau_TC1_4217_2.wav"
+      ],
+      "fileNames": [
+        "4217_0.wav",
+        "4217_1.wav",
+        "4217_2.wav"
+      ]
+    },
+    {
+      "description": "",
+      "distanceRoundTrack": 4409,
+      "recordingNames": [
+        "Macau_TC1_4409_0.wav",
+        "Macau_TC1_4409_1.wav",
+        "Macau_TC1_4409_2.wav"
+      ],
+      "fileNames": [
+        "4409_0.wav",
+        "4409_1.wav",
+        "4409_2.wav"
+      ]
+    },
+    {
+      "description": "",
+      "distanceRoundTrack": 4637,
+      "recordingNames": [
+        "Macau_TC1_4637_0.wav",
+        "Macau_TC1_4637_1.wav",
+        "Macau_TC1_4637_2.wav"
+      ],
+      "fileNames": [
+        "4637_0.wav",
+        "4637_1.wav",
+        "4637_2.wav"
+      ]
+    },
+    {
+      "description": "",
+      "distanceRoundTrack": 4907,
+      "recordingNames": [
+        "Macau_TC1_4907_0.wav",
+        "Macau_TC1_4907_1.wav"
+      ],
+      "fileNames": [
+        "4907_0.wav",
+        "4907_1.wav"
+      ]
+    },
+    {
+      "description": "",
+      "distanceRoundTrack": 5492,
+      "recordingNames": [
+        "Macau_TC1_5492_0.wav",
+        "Macau_TC1_5492_1.wav",
+        "Macau_TC1_5492_2.wav"
+      ],
+      "fileNames": [
+        "5492_0.wav",
+        "5492_1.wav",
+        "5492_2.wav"
+      ]
+    },
+    {
+      "description": "",
+      "distanceRoundTrack": 5695,
+      "recordingNames": [
+        "Macau_TC1_5695_0.wav",
+        "Macau_TC1_5695_1.wav"
+      ],
+      "fileNames": [
+        "5695_0.wav",
+        "5695_1.wav"
+      ]
+    }
+  ]
+}
