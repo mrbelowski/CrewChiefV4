@@ -46,7 +46,9 @@ You need Morten Roslev's Python plugin for Assetto Corsa. The app will check if 
 
 If this process fails for any reason, copy the folder called 'CrewChiefEx' from the app's plugins folder - usually C:\Program Files (x86)\Britton IT Ltd\CrewChiefV4\plugins\assettocorsa\apps\python\CrewChiefEx to the Asstto Corsa python folder (usually something like C:\Program Files (x86)\Steam\steamapps\common\assettocorsa\apps\python). You might need to enable this plugin in the Assetto Corsa UI. Once you've done this just select the game from Crew Chief's Game menu and press the Start button.
 
+iRacing:
 
+To use Crew Chief with iRacing simply select iRacing from Crew Chief's Game menu and click the Start button.
 
 Startup issues
 ------------------
