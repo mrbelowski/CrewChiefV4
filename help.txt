@@ -186,6 +186,29 @@ You can select strategies with the voice commands "strategy one" / "strat one", 
 
 If you want to manually navigate the pit menu with voice commands, use "pit menu toggle", "pit menu up", "pit menu down", "pit menu left" and "pit menu right".
 
+iRacing
+
+default key bindings:
+"Lap Timing Black Box": F1
+"Standings Black Box":  F2 
+"Relative Black Box":   F3
+"Fuel Black Box":       F4
+"Tires Black Box":      F5
+"Tire Info Black Box"   F6
+"Pit-stop Adjustments Black Box" :  F7
+"In-car Adjustments Black Box":     F8
+"Mirror Adjustments Black Box":     F9
+"Radio Adjustments Black Box":      F10
+"Select Next Control":              UP
+"Select Previous Control":          DOWN
+"Increment Selected Control":       RIGHT
+"Decrement Selected Control":       LEFT
+"Toggle Selected Control":          SPACE_BAR
+
+You can change the black boxes by saying one of the following commands: "black box lap time", "black box standings", "black box relative",
+"black box fuel", "black box tires", "black box tire info", "black box pit stop", "black box car", "black box mirror" or "black box radio"
+
+You can navigate the by saying one of the following commands: "menu next", "menu previous", "menu increase", "menu decrease" or "menu toggle"
 
 
 Pace notes
