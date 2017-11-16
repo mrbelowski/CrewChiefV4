@@ -364,7 +364,15 @@ namespace CrewChiefV4.iRacing
             currentGameState.SessionData.CompletedLaps = playerCar.Live.LapsCompleted;
             //TODO validate laptimes
             currentGameState.SessionData.LapTimeCurrent = shared.Telemetry.LapCurrentLapTime;
-            currentGameState.SessionData.CurrentLapIsValid = true;
+            if(playerCar.Live.Lap <= 0)
+            {
+                currentGameState.SessionData.CurrentLapIsValid = false;
+            }
+            else
+            {
+                currentGameState.SessionData.CurrentLapIsValid = true;
+            }
+            
 
             currentGameState.SessionData.NumCars = shared.Drivers.Count;
 
