@@ -237,6 +237,9 @@ namespace CrewChiefV4.GameState
         // zero indexed - you multi iteration sessions like DTM qual
         public int SessionIteration = 0;
 
+        //iRacing session id, if changed we have a new session(usefull for detecting practice session to practice session change)
+        public int SessionId = -1;
+
         // as soon as the player leaves the racing surface this is set to false
         public Boolean CurrentLapIsValid = true;
 
@@ -353,6 +356,8 @@ namespace CrewChiefV4.GameState
         public Dictionary<TyreType, float> PlayerBestLapTimeByTyre = new Dictionary<TyreType, float>();
 
         public DeltaTime DeltaTime = new DeltaTime();
+
+        public int PlayerCarNr = -1;
 
         public SessionData()
         {
@@ -611,6 +616,8 @@ namespace CrewChiefV4.GameState
         public DeltaTime DeltaTime = null;
 
         public bool IsAtPitExit = false;
+
+        public int CarNr = -1;
 
         public override string ToString()
         {
