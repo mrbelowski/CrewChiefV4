@@ -36,11 +36,11 @@ namespace CrewChiefV4.Audio
             lock (this)
             {
                 float volume = getBackgroundVolume();
-                if (playing || muted || volume <= 0 || this.deviceIdWhenCached != AudioPlayer.naudioBackgroundPlaybackDeviceId)
+                if (playing || muted || volume <= 0)
                 {
                     return;
                 }
-                if (!initialised || volume != this.volumeWhenCached)
+                if (!initialised || volume != this.volumeWhenCached || this.deviceIdWhenCached != AudioPlayer.naudioBackgroundPlaybackDeviceId)
                 {
                     initialise(this.defaultBackgroundSound);
                 }

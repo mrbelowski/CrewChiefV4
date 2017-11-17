@@ -1091,10 +1091,6 @@ namespace CrewChiefV4.Audio
                     this.waveOut = new NAudio.Wave.WaveOutEvent();
                     this.deviceIdWhenCached = AudioPlayer.naudioMessagesPlaybackDeviceId;
                     this.waveOut.DeviceNumber = this.deviceIdWhenCached;
-                    if (!loadedFile)
-                    {
-                        LoadFile();
-                    }
                     this.memoryStream = new MemoryStream(this.fileBytes);
                     this.reader = new NAudio.Wave.WaveFileReader(this.memoryStream);
 
@@ -1167,7 +1163,11 @@ namespace CrewChiefV4.Audio
 
         public void Stop()
         {
-            if (this.soundPlayer != null)
+            if (AudioPlayer.playWithNAudio && this.waveOut != null)
+            {
+                this.waveOut.Stop();
+            }
+            else if (!AudioPlayer.playWithNAudio && this.soundPlayer != null)
             {
                 this.soundPlayer.Stop();
             }
