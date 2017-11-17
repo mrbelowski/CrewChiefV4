@@ -77,7 +77,7 @@ WHERE_AM_I_FASTER = where should I attack:where am I faster:where can I attack
 WHERE_AM_I_SLOWER = where should I defend:where am I slower:where is he faster:where will he attack
 
 HOW_LONGS_LEFT = how long's left:how many laps left:how many laps to go
-SPOT = spot
+SPOT = spot:start spotting:enabled spotter
 DONT_SPOT = don't spot
 REPEAT_LAST_MESSAGE = repeat last message:say again
 HAVE_I_SERVED_MY_PENALTY = have I served my penalty
