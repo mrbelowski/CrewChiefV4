@@ -942,10 +942,11 @@ namespace CrewChiefV4.Audio
 
         private void PlayNAudio()
         {
-            if (!allowCaching)
+            // if the file isn't yet loaded, play by reading it directly
+            if (!allowCaching || ! loadedFile)
             {
                 NAudio.Wave.WaveOutEvent uncachedWaveOut = new NAudio.Wave.WaveOutEvent();
-                waveOut.DeviceNumber = AudioPlayer.naudioMessagesPlaybackDeviceId;
+                uncachedWaveOut.DeviceNumber = AudioPlayer.naudioMessagesPlaybackDeviceId;
                 NAudio.Wave.WaveFileReader uncachedReader = new NAudio.Wave.WaveFileReader(fullPath);
                 uncachedWaveOut.PlaybackStopped += new EventHandler<NAudio.Wave.StoppedEventArgs>(playbackStopped);
                 NAudio.Wave.SampleProviders.SampleChannel sampleChannel = new NAudio.Wave.SampleProviders.SampleChannel(uncachedReader);
@@ -981,6 +982,7 @@ namespace CrewChiefV4.Audio
                 { 
                     LoadNAudioWaveOutAndCache();
                 }
+                this.reader.CurrentTime = TimeSpan.Zero;
                 this.waveOut.Play();
                 try
                 {
