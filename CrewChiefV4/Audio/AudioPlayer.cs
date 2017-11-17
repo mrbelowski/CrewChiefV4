@@ -1098,6 +1098,7 @@ namespace CrewChiefV4.Audio
 
         public void Dispose()
         {
+            backgroundPlayer.dispose();
             if (soundCache != null)
             {
                 try
