@@ -955,7 +955,6 @@ namespace CrewChiefV4.Audio
                 {
                     this.playWaitHandle.WaitOne();
                 }
-<<<<<<< HEAD
                 catch (Exception e)
                 {
                     Console.WriteLine("Exception " + e.Message + " playing sound " + this.fullPath);
@@ -970,47 +969,9 @@ namespace CrewChiefV4.Audio
                     uncachedWaveOut.Dispose();
                 }
                 catch (Exception) { }
-=======
-                ms = new MemoryStream(this.fileBytes);
-                reader = new NAudio.Wave.WaveFileReader(ms);
-            } 
-            else
-            {
-                reader = new NAudio.Wave.WaveFileReader(fullPath);
-            }
-            
-            waveOut.PlaybackStopped += new EventHandler<NAudio.Wave.StoppedEventArgs>(playbackStopped);
-            NAudio.Wave.SampleProviders.SampleChannel sampleChannel = new NAudio.Wave.SampleProviders.SampleChannel(reader);
-            sampleChannel.Volume = getVolume();
-            waveOut.Init(new NAudio.Wave.SampleProviders.SampleToWaveProvider(sampleChannel));
-            waveOut.Play();
-            try
-            {
-                this.playWaitHandle.WaitOne();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Exception " + e.Message + " playing sound " + this.fullPath);
-            }
-            try
-            {
-                if (reader != null)
-                {
-                    reader.Dispose();
-                }
-            }
-            catch (Exception) { }
-            try
-            {
-                if (waveOut != null)
-                {
-                    waveOut.Dispose();
-                }
->>>>>>> f7ec612f30cfac6d07e974f9ddf050a9554688e5
             }
             else
             {
-<<<<<<< HEAD
                 if (getVolume() != volumeWhenCached)
                 {
                     UnLoad();
@@ -1027,11 +988,6 @@ namespace CrewChiefV4.Audio
                 catch (Exception e)
                 {
                     Console.WriteLine("Exception " + e.Message + " playing sound " + this.fullPath);
-=======
-                if (ms != null)
-                {
-                    ms.Dispose();
->>>>>>> f7ec612f30cfac6d07e974f9ddf050a9554688e5
                 }
             }
         }
