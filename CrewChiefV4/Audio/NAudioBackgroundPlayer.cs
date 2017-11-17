@@ -76,7 +76,7 @@ namespace CrewChiefV4.Audio
                 }
                 catch (Exception) { }
             }
-            this.reader = reader = new NAudio.Wave.WaveFileReader(Path.Combine(backgroundFilesPath, backgroundSoundName));
+            this.reader = new NAudio.Wave.WaveFileReader(Path.Combine(backgroundFilesPath, backgroundSoundName));
             this.waveOut = new NAudio.Wave.WaveOutEvent();
             backgroundLength = reader.TotalTime;
         }

@@ -950,7 +950,14 @@ namespace CrewChiefV4.Audio
             sampleChannel.Volume = getVolume();
             waveOut.Init(new NAudio.Wave.SampleProviders.SampleToWaveProvider(sampleChannel));
             waveOut.Play();
-            this.playWaitHandle.WaitOne();
+            try
+            {
+                this.playWaitHandle.WaitOne();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Exception " + e.Message + " playing sound " + this.fullPath);
+            }
             try
             {
                 reader.Dispose();
