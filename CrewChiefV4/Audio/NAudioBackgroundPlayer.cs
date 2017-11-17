@@ -60,10 +60,10 @@ namespace CrewChiefV4.Audio
             lock (this)
             {
                 if (initialised)
-                {
-                    this.waveOut.Stop();
+                {                    
                     try
                     {
+                        this.waveOut.Stop();
                         this.waveOut.Dispose();
                     }
                     catch (Exception) { }
