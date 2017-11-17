@@ -11,8 +11,10 @@ namespace CrewChiefV4.Audio
     {
         private Boolean playing = false;
 
-        private NAudio.Wave.WaveOutEvent waveOut = null;
+        // will be re-used and only disposed when we stop the app or switch background sounds
         private NAudio.Wave.WaveFileReader reader = null;
+        // this is initialsed and disposed each time it's used. We hold a reference here so it can be stopped externally
+        private NAudio.Wave.WaveOutEvent waveOut = null;
 
         private TimeSpan backgroundLength = TimeSpan.Zero;
 
@@ -29,67 +31,85 @@ namespace CrewChiefV4.Audio
 
         public override void play()
         {
-            if (playing || muted)
+            lock (this)
             {
-                return;
-            }
-            if (!initialised)
-            {
-                initialise(this.defaultBackgroundSound);
-            }
-            int backgroundOffset = Utilities.random.Next(0, (int) backgroundLength.TotalSeconds - backgroundLeadout);
-            reader.CurrentTime = TimeSpan.FromSeconds(backgroundOffset);
-            long samples = reader.SampleCount;
+                float volume = getBackgroundVolume();
+                if (playing || muted || volume <= 0)
+                {
+                    return;
+                }
+                if (!initialised)
+                {
+                    initialise(this.defaultBackgroundSound);
+                }
+                int backgroundOffset = Utilities.random.Next(0, (int)backgroundLength.TotalSeconds - backgroundLeadout);
+                reader.CurrentTime = TimeSpan.FromSeconds(backgroundOffset);
+                long samples = reader.SampleCount;
 
-            NAudio.Wave.SampleProviders.SampleChannel sampleChannel = new NAudio.Wave.SampleProviders.SampleChannel(reader);
-            sampleChannel.Volume = getBackgroundVolume();
-            this.waveOut.DeviceNumber = AudioPlayer.naudioBackgroundPlaybackDeviceId;
-            this.waveOut.Init(new NAudio.Wave.SampleProviders.SampleToWaveProvider(sampleChannel));
-            this.waveOut.Play();
+                NAudio.Wave.SampleProviders.SampleChannel sampleChannel = new NAudio.Wave.SampleProviders.SampleChannel(reader);
+                sampleChannel.Volume = volume;
+                this.waveOut = new NAudio.Wave.WaveOutEvent();
+                this.waveOut.DeviceNumber = AudioPlayer.naudioBackgroundPlaybackDeviceId;
+                this.waveOut.Init(new NAudio.Wave.SampleProviders.SampleToWaveProvider(sampleChannel));
+                this.waveOut.Play();
+            }
         }
 
         public override void stop()
         {
-            if (initialised)
+            lock (this)
             {
-                waveOut.Stop();
+                if (initialised)
+                {
+                    try
+                    {
+                        this.waveOut.Dispose();
+                    }
+                    catch (Exception) { }
+                }
             }
         }
 
         public override void initialise(String initialBackgroundSound)
         {
-            this.reader = new NAudio.Wave.WaveFileReader(Path.Combine(backgroundFilesPath, initialBackgroundSound));
-            this.waveOut = new NAudio.Wave.WaveOutEvent();
-            backgroundLength = reader.TotalTime;
-            initialised = true;
+            lock (this)
+            {
+                this.reader = new NAudio.Wave.WaveFileReader(Path.Combine(backgroundFilesPath, initialBackgroundSound));
+                backgroundLength = reader.TotalTime;
+                initialised = true;
+            }
         }
 
         public override void setBackgroundSound(String backgroundSoundName)
         {
-            if (initialised)
+            lock (this)
             {
-                stop();
-                try
+                if (initialised)
                 {
-                    this.reader.Dispose();
-                    this.waveOut.Dispose();
+                    stop();
+                    try
+                    {
+                        this.reader.Dispose();
+                    }
+                    catch (Exception) { }
                 }
-                catch (Exception) { }
+                this.reader = new NAudio.Wave.WaveFileReader(Path.Combine(backgroundFilesPath, backgroundSoundName));
+                backgroundLength = reader.TotalTime;
             }
-            this.reader = new NAudio.Wave.WaveFileReader(Path.Combine(backgroundFilesPath, backgroundSoundName));
-            this.waveOut = new NAudio.Wave.WaveOutEvent();
-            backgroundLength = reader.TotalTime;
         }
 
         public override void dispose()
         {
-            try
+            lock (this)
             {
-                reader.Dispose();
-                waveOut.Dispose();
+                try
+                {
+                    reader.Dispose();
+                    waveOut.Dispose();
+                }
+                catch (Exception) { }
+                base.dispose();
             }
-            catch (Exception) { }
-            base.dispose();
         }
     }
 }
