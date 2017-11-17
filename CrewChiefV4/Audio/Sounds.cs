@@ -860,6 +860,7 @@ namespace CrewChiefV4.Audio
         private NAudio.Wave.WaveOutEvent waveOut;
         private NAudio.Wave.WaveFileReader reader;
         private float volumeWhenCached = 0;
+        private int deviceIdWhenCached = 0;
 
         private Boolean allowCaching;
         private Boolean loadedSoundPlayer = false;
@@ -972,7 +973,7 @@ namespace CrewChiefV4.Audio
             }
             else
             {
-                if (getVolume() != volumeWhenCached)
+                if (getVolume() != volumeWhenCached || this.deviceIdWhenCached != AudioPlayer.naudioMessagesPlaybackDeviceId)
                 {
                     UnLoad();
                 }
@@ -1088,7 +1089,8 @@ namespace CrewChiefV4.Audio
                 if (!loadedSoundPlayer)
                 {
                     this.waveOut = new NAudio.Wave.WaveOutEvent();
-                    this.waveOut.DeviceNumber = AudioPlayer.naudioMessagesPlaybackDeviceId;
+                    this.deviceIdWhenCached = AudioPlayer.naudioMessagesPlaybackDeviceId;
+                    this.waveOut.DeviceNumber = this.deviceIdWhenCached;
                     if (!loadedFile)
                     {
                         LoadFile();
@@ -1098,7 +1100,7 @@ namespace CrewChiefV4.Audio
 
                     this.waveOut.PlaybackStopped += new EventHandler<NAudio.Wave.StoppedEventArgs>(playbackStopped);
                     NAudio.Wave.SampleProviders.SampleChannel sampleChannel = new NAudio.Wave.SampleProviders.SampleChannel(reader);
-                    volumeWhenCached = getVolume();
+                    this.volumeWhenCached = getVolume();
                     sampleChannel.Volume = volumeWhenCached;
                     this.waveOut.Init(new NAudio.Wave.SampleProviders.SampleToWaveProvider(sampleChannel));
                     loadedSoundPlayer = true;
