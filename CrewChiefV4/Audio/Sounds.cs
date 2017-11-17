@@ -1117,16 +1117,22 @@ namespace CrewChiefV4.Audio
                     unloaded = true;
                     if (AudioPlayer.playWithNAudio)
                     {
-                        try
+                        if (this.reader != null)
                         {
-                            this.reader.Dispose();
+                            try
+                            {
+                                this.reader.Dispose();
+                            }
+                            catch (Exception) { }
                         }
-                        catch (Exception) { }
-                        try
+                        if (this.waveOut != null)
                         {
-                            this.waveOut.Dispose();
+                            try
+                            {
+                                this.waveOut.Dispose();
+                            }
+                            catch (Exception) { }
                         }
-                        catch (Exception) { }
                     }
                     else
                     {
