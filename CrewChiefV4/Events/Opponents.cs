@@ -196,7 +196,7 @@ namespace CrewChiefV4.Events
 
                     // in race sessions, announce tyre type changes once the session is underway
                     if (currentGameState.SessionData.SessionType == SessionType.Race &&
-                        currentGameState.SessionData.SessionRunningTime > 10 && opponentData.hasJustChangedToDifferentTyreType)
+                        currentGameState.SessionData.SessionRunningTime > 30 && opponentData.hasJustChangedToDifferentTyreType)
                     {
                         // this may be a race position or an OpponentData object
                         Object opponentIdentifier = getOpponentIdentifierForTyreChange(opponentData, currentGameState.SessionData.Position);
