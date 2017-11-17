@@ -61,6 +61,7 @@ namespace CrewChiefV4.Audio
             {
                 if (initialised)
                 {
+                    this.waveOut.Stop();
                     try
                     {
                         this.waveOut.Dispose();
