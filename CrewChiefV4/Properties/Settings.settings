@@ -680,5 +680,14 @@
     <Setting Name="TOGGLE_PACE_NOTES_PLAYBACK_device_type" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="use_naudio" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="NAUDIO_DEVICE_INDEX_MESSAGES" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="NAUDIO_DEVICE_INDEX_BACKGROUND" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

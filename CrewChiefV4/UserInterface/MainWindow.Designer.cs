@@ -61,6 +61,8 @@ namespace CrewChiefV4
             this.voiceDisableButton = new System.Windows.Forms.RadioButton();
             this.button2 = new System.Windows.Forms.Button();
             this.messagesVolumeSlider = new System.Windows.Forms.TrackBar();
+            this.messagesAudioDeviceBox = new System.Windows.Forms.ComboBox();
+            this.backgroundAudioDeviceBox = new System.Windows.Forms.ComboBox();
             this.label3 = new System.Windows.Forms.Label();
             this.backgroundVolumeSlider = new System.Windows.Forms.TrackBar();
             this.label4 = new System.Windows.Forms.Label();
@@ -80,6 +82,8 @@ namespace CrewChiefV4
             this.personalisationsProgressBar = new System.Windows.Forms.ProgressBar();
             this.personalisationBox = new System.Windows.Forms.ComboBox();
             this.spotterNameLabel = new System.Windows.Forms.Label();
+            this.messagesAudioDeviceLabel = new System.Windows.Forms.Label();
+            this.backgroundAudioDeviceLabel = new System.Windows.Forms.Label();
             this.spotterNameBox = new System.Windows.Forms.ComboBox();
             this.donateLink = new System.Windows.Forms.LinkLabel();
             this.groupBox1.SuspendLayout();
@@ -89,7 +93,7 @@ namespace CrewChiefV4
             // 
             // textBox1
             // 
-            this.textBox1.Location = new System.Drawing.Point(41, 190);
+            this.textBox1.Location = new System.Drawing.Point(41, 215);
             this.textBox1.MaxLength = 99999999;
             this.textBox1.Multiline = true;
             this.textBox1.Name = "textBox1";
@@ -176,7 +180,7 @@ namespace CrewChiefV4
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(991, 93);
+            this.button1.Location = new System.Drawing.Point(991, 105);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(143, 31);
             this.button1.TabIndex = 14;
@@ -187,7 +191,7 @@ namespace CrewChiefV4
             // 
             // help button
             // 
-            this.helpButton.Location = new System.Drawing.Point(991, 125);
+            this.helpButton.Location = new System.Drawing.Point(991, 137);
             this.helpButton.Name = "help";
             this.helpButton.Size = new System.Drawing.Size(143, 31);
             this.helpButton.TabIndex = 97;
@@ -198,7 +202,7 @@ namespace CrewChiefV4
             // 
             // about button
             // 
-            this.aboutButton.Location = new System.Drawing.Point(991, 157);
+            this.aboutButton.Location = new System.Drawing.Point(991, 169);
             this.aboutButton.Name = "about";
             this.aboutButton.Size = new System.Drawing.Size(143, 31);
             this.aboutButton.TabIndex = 98;
@@ -319,8 +323,8 @@ namespace CrewChiefV4
             this.gameDefinitionList.Items.AddRange(GameDefinition.getGameDefinitionFriendlyNames());
             this.gameDefinitionList.Location = new System.Drawing.Point(782, 28);
             this.gameDefinitionList.Name = "gameDefinitionList";
-            this.gameDefinitionList.MinimumSize = new System.Drawing.Size(203, 160);
-            this.gameDefinitionList.MaximumSize = new System.Drawing.Size(203, 160);
+            this.gameDefinitionList.MinimumSize = new System.Drawing.Size(203, 173);
+            this.gameDefinitionList.MaximumSize = new System.Drawing.Size(203, 173);
             this.gameDefinitionList.TabIndex = 21;
             this.gameDefinitionList.SelectedValueChanged += new System.EventHandler(this.updateSelectedGameDefinition);
             // 
@@ -399,7 +403,7 @@ namespace CrewChiefV4
             // 
             // soundPackProgressBar
             // 
-            this.soundPackProgressBar.Location = new System.Drawing.Point(39, 156);
+            this.soundPackProgressBar.Location = new System.Drawing.Point(39, 176);
             this.soundPackProgressBar.Name = "soundPackProgressBar";
             this.soundPackProgressBar.Size = new System.Drawing.Size(220, 23);
             this.soundPackProgressBar.TabIndex = 28;
@@ -407,7 +411,7 @@ namespace CrewChiefV4
             // downloadSoundPackButton
             // 
             this.downloadSoundPackButton.Enabled = false;
-            this.downloadSoundPackButton.Location = new System.Drawing.Point(39, 103);
+            this.downloadSoundPackButton.Location = new System.Drawing.Point(39, 123);
             this.downloadSoundPackButton.Name = "downloadSoundPackButton";
             this.downloadSoundPackButton.Size = new System.Drawing.Size(220, 37);
             this.downloadSoundPackButton.TabIndex = 29;
@@ -418,7 +422,7 @@ namespace CrewChiefV4
             // downloadDriverNamesButton
             // 
             this.downloadDriverNamesButton.Enabled = false;
-            this.downloadDriverNamesButton.Location = new System.Drawing.Point(295, 103);
+            this.downloadDriverNamesButton.Location = new System.Drawing.Point(295, 123);
             this.downloadDriverNamesButton.Name = "downloadDriverNamesButton";
             this.downloadDriverNamesButton.Size = new System.Drawing.Size(220, 37);
             this.downloadDriverNamesButton.TabIndex = 30;
@@ -428,7 +432,7 @@ namespace CrewChiefV4
             // 
             // driverNamesProgressBar
             // 
-            this.driverNamesProgressBar.Location = new System.Drawing.Point(295, 156);
+            this.driverNamesProgressBar.Location = new System.Drawing.Point(295, 176);
             this.driverNamesProgressBar.Name = "driverNamesProgressBar";
             this.driverNamesProgressBar.Size = new System.Drawing.Size(220, 23);
             this.driverNamesProgressBar.TabIndex = 31;
@@ -436,7 +440,7 @@ namespace CrewChiefV4
             // downloadPersonalisationsButton
             // 
             this.downloadPersonalisationsButton.Enabled = false;
-            this.downloadPersonalisationsButton.Location = new System.Drawing.Point(550, 103);
+            this.downloadPersonalisationsButton.Location = new System.Drawing.Point(550, 123);
             this.downloadPersonalisationsButton.Name = "downloadPersonalisationsButton";
             this.downloadPersonalisationsButton.Size = new System.Drawing.Size(220, 37);
             this.downloadPersonalisationsButton.TabIndex = 95;
@@ -446,7 +450,7 @@ namespace CrewChiefV4
             // 
             // personalisationsProgressBar
             // 
-            this.personalisationsProgressBar.Location = new System.Drawing.Point(550, 156);
+            this.personalisationsProgressBar.Location = new System.Drawing.Point(550, 176);
             this.personalisationsProgressBar.Name = "personalisationsProgressBar";
             this.personalisationsProgressBar.Size = new System.Drawing.Size(220, 23);
             this.personalisationsProgressBar.TabIndex = 31;
@@ -483,6 +487,44 @@ namespace CrewChiefV4
             // Associate the event-handling method with the 
             // SelectedIndexChanged event.
             this.personalisationBox.SelectedIndexChanged += new System.EventHandler(this.personalisationBox_SelectedIndexChanged);
+
+            this.messagesAudioDeviceLabel.AutoSize = true;
+            this.messagesAudioDeviceLabel.Location = new System.Drawing.Point(330, 70);
+            this.messagesAudioDeviceLabel.Name = "messagesAudioDeviceLabel";
+            this.messagesAudioDeviceLabel.Size = new System.Drawing.Size(100, 13);
+            this.messagesAudioDeviceLabel.TabIndex = 22;
+            this.messagesAudioDeviceLabel.Text = Configuration.getUIString("messages_audio_device_label");
+            this.messagesAudioDeviceLabel.Visible = false;
+
+            this.messagesAudioDeviceBox.Location = new System.Drawing.Point(330, 90);
+            this.messagesAudioDeviceBox.IntegralHeight = false;
+            this.messagesAudioDeviceBox.MaxDropDownItems = 5;
+            this.messagesAudioDeviceBox.DropDownStyle = ComboBoxStyle.DropDownList;
+            this.messagesAudioDeviceBox.Name = "messagesAudioDeviceBox";
+            this.messagesAudioDeviceBox.Size = new System.Drawing.Size(190, 400);
+            this.messagesAudioDeviceBox.TabIndex = 94;
+            this.messagesAudioDeviceBox.Visible = false;
+            this.messagesAudioDeviceBox.Enabled = false;
+
+            this.backgroundAudioDeviceLabel.AutoSize = true;
+            this.backgroundAudioDeviceLabel.Location = new System.Drawing.Point(550, 70);
+            this.backgroundAudioDeviceLabel.Name = "backgroundAudioDeviceLabel";
+            this.backgroundAudioDeviceLabel.Size = new System.Drawing.Size(100, 13);
+            this.backgroundAudioDeviceLabel.TabIndex = 22;
+            this.backgroundAudioDeviceLabel.Text = Configuration.getUIString("background_audio_device_label");
+            this.backgroundAudioDeviceLabel.Visible = false;
+
+            this.backgroundAudioDeviceBox.Location = new System.Drawing.Point(550, 90);
+            this.backgroundAudioDeviceBox.IntegralHeight = false;
+            this.backgroundAudioDeviceBox.MaxDropDownItems = 5;
+            this.backgroundAudioDeviceBox.DropDownStyle = ComboBoxStyle.DropDownList;
+            this.backgroundAudioDeviceBox.Name = "backgroundAudioDeviceBox";
+            this.backgroundAudioDeviceBox.Size = new System.Drawing.Size(190, 400);
+            this.backgroundAudioDeviceBox.TabIndex = 94;
+            this.backgroundAudioDeviceBox.Visible = false;
+            this.backgroundAudioDeviceBox.Enabled = false;
+            // the handler for this is added when we initialise
+
             // 
             // MainWindow
             // 
@@ -507,6 +549,8 @@ namespace CrewChiefV4
             this.Controls.Add(this.backgroundVolumeSlider);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.messagesVolumeSlider);
+            this.Controls.Add(this.messagesAudioDeviceBox);
+            this.Controls.Add(this.backgroundAudioDeviceBox);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.button1);
@@ -526,6 +570,8 @@ namespace CrewChiefV4
             this.Controls.Add(this.spotterNameBox);
             this.Controls.Add(this.personalisationLabel);
             this.Controls.Add(this.spotterNameLabel);
+            this.Controls.Add(this.messagesAudioDeviceLabel);
+            this.Controls.Add(this.backgroundAudioDeviceLabel);
             this.Controls.Add(this.donateLink);
             this.Name = "MainWindow";
             this.Text = "Crew Chief V4";
@@ -563,6 +609,8 @@ namespace CrewChiefV4
         private System.Windows.Forms.RadioButton voiceDisableButton;
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.TrackBar messagesVolumeSlider;
+        private System.Windows.Forms.ComboBox messagesAudioDeviceBox;
+        private System.Windows.Forms.ComboBox backgroundAudioDeviceBox;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TrackBar backgroundVolumeSlider;
         private System.Windows.Forms.Label label4;
@@ -582,6 +630,8 @@ namespace CrewChiefV4
         private System.Windows.Forms.ProgressBar personalisationsProgressBar;
         private System.Windows.Forms.ComboBox personalisationBox;
         private System.Windows.Forms.Label spotterNameLabel;
+        private System.Windows.Forms.Label messagesAudioDeviceLabel;
+        private System.Windows.Forms.Label backgroundAudioDeviceLabel;
         private System.Windows.Forms.ComboBox spotterNameBox;
         private System.Windows.Forms.LinkLabel donateLink;
     }

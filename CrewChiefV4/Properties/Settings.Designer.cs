@@ -2734,5 +2734,41 @@ namespace CrewChiefV4.Properties {
                 this["TOGGLE_PACE_NOTES_PLAYBACK_device_type"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool use_naudio {
+            get {
+                return ((bool)(this["use_naudio"]));
+            }
+            set {
+                this["use_naudio"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int NAUDIO_DEVICE_INDEX_MESSAGES {
+            get {
+                return ((int)(this["NAUDIO_DEVICE_INDEX_MESSAGES"]));
+            }
+            set {
+                this["NAUDIO_DEVICE_INDEX_MESSAGES"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int NAUDIO_DEVICE_INDEX_BACKGROUND {
+            get {
+                return ((int)(this["NAUDIO_DEVICE_INDEX_BACKGROUND"]));
+            }
+            set {
+                this["NAUDIO_DEVICE_INDEX_BACKGROUND"] = value;
+            }
+        }
     }
 }
