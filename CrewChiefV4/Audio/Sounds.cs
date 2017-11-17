@@ -932,13 +932,15 @@ namespace CrewChiefV4.Audio
             NAudio.Wave.WaveOutEvent waveOut = new NAudio.Wave.WaveOutEvent();
             waveOut.DeviceNumber = AudioPlayer.naudioMessagesPlaybackDeviceId;
             NAudio.Wave.WaveFileReader reader = null;
+            MemoryStream ms = null;
             if (allowCaching)
             {
                 if (!loadedFile)
                 {
                     LoadFile();
                 }
-                reader = new NAudio.Wave.WaveFileReader(new MemoryStream(this.fileBytes));
+                ms = new MemoryStream(this.fileBytes);
+                reader = new NAudio.Wave.WaveFileReader(ms);
             } 
             else
             {
@@ -961,7 +963,16 @@ namespace CrewChiefV4.Audio
             try
             {
                 reader.Dispose();
+            }
+            catch (Exception) { }
+            try
+            {
                 waveOut.Dispose();
+            }
+            catch (Exception) { }
+            try
+            {
+                ms.Dispose();
             }
             catch (Exception) { }
         }
