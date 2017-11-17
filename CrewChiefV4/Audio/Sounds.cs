@@ -17,7 +17,7 @@ namespace CrewChiefV4.Audio
         public static Boolean useTTS = UserSettings.GetUserSettings().getBoolean("use_tts_for_missing_names");
         private double minSecondsBetweenPersonalisedMessages = (double)UserSettings.GetUserSettings().getInt("min_time_between_personalised_messages");
         public static Boolean eagerLoadSoundFiles = UserSettings.GetUserSettings().getBoolean("load_sound_files_on_startup");
-        
+               
         private static LinkedList<String> dynamicLoadedSounds = new LinkedList<String>();
         public static Dictionary<String, SoundSet> soundSets = new Dictionary<String, SoundSet>();
         private static Dictionary<String, SingleSound> singleSounds = new Dictionary<String, SingleSound>();
@@ -45,7 +45,7 @@ namespace CrewChiefV4.Audio
         public static SpeechSynthesizer synthesizer;
 
         public static Boolean hasSuitableTTSVoice = false;
-
+        
         public SoundCache(DirectoryInfo soundsFolder, String[] eventTypesToKeepCached, Boolean useSwearyMessages, Boolean allowCaching, String selectedPersonalisation)
         {
             // ensure the static state is nuked before we start updating it
@@ -864,6 +864,8 @@ namespace CrewChiefV4.Audio
         public SoundSet prefixSoundSet = null;
         public SoundSet suffixSoundSet = null;
 
+        AutoResetEvent playWaitHandle = new AutoResetEvent(false);
+
         public SingleSound(int pauseLength)
         {
             this.isPause = true;
@@ -888,7 +890,7 @@ namespace CrewChiefV4.Audio
         public void loadAndCache(Boolean loadSoundPlayer)
         {
             LoadFile();
-            if (loadSoundPlayer)
+            if (loadSoundPlayer && !AudioPlayer.playWithNAudio)
             {
                 LoadSoundPlayer();
             }
@@ -914,25 +916,95 @@ namespace CrewChiefV4.Audio
             }
             else
             {
-                if (!allowCaching)
+                if (AudioPlayer.playWithNAudio)
                 {
-                    SoundPlayer soundPlayer = new SoundPlayer(fullPath);
-                    soundPlayer.Load();
-                    soundPlayer.PlaySync();
-                    try
-                    {
-                        soundPlayer.Dispose();
-                    }
-                    catch (Exception) { }
+                    PlayNAudio();
                 }
                 else
                 {
-                    if (!loadedSoundPlayer)
-                    {
-                        LoadSoundPlayer();
-                    }
-                    this.soundPlayer.PlaySync();
+                    PlaySoundPlayer();
                 }
+            }
+        }
+
+        private void PlayNAudio()
+        {
+            NAudio.Wave.WaveOutEvent waveOut = new NAudio.Wave.WaveOutEvent();
+            waveOut.DeviceNumber = AudioPlayer.naudioMessagesPlaybackDeviceId;
+            NAudio.Wave.WaveFileReader reader = null;
+            if (allowCaching)
+            {
+                if (!loadedFile)
+                {
+                    LoadFile();
+                }
+                reader = new NAudio.Wave.WaveFileReader(new MemoryStream(this.fileBytes));
+            } 
+            else
+            {
+                reader = new NAudio.Wave.WaveFileReader(fullPath);
+            }
+            
+            waveOut.PlaybackStopped += new EventHandler<NAudio.Wave.StoppedEventArgs>(playbackStopped);
+            NAudio.Wave.SampleProviders.SampleChannel sampleChannel = new NAudio.Wave.SampleProviders.SampleChannel(reader);
+            sampleChannel.Volume = getVolume();
+            waveOut.Init(new NAudio.Wave.SampleProviders.SampleToWaveProvider(sampleChannel));
+            waveOut.Play();
+            try
+            {
+                this.playWaitHandle.WaitOne();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Exception " + e.Message + " playing sound " + this.fullPath);
+            }
+            try
+            {
+                reader.Dispose();
+                waveOut.Dispose();
+            }
+            catch (Exception) { }
+        }
+
+        private void playbackStopped(object sender, NAudio.Wave.StoppedEventArgs e)
+        {
+            this.playWaitHandle.Set();
+        }
+
+        private float getVolume()
+        {
+            float volume = UserSettings.GetUserSettings().getFloat("messages_volume");
+            if (volume > 1)
+            {
+                volume = 1;
+            }
+            if (volume < 0)
+            {
+                volume = 0;
+            }
+            return volume;
+        }
+
+        private void PlaySoundPlayer()
+        {
+            if (!allowCaching)
+            {
+                SoundPlayer soundPlayer = new SoundPlayer(fullPath);
+                soundPlayer.Load();
+                soundPlayer.PlaySync();
+                try
+                {
+                    soundPlayer.Dispose();
+                }
+                catch (Exception) { }
+            }
+            else
+            {
+                if (!loadedSoundPlayer)
+                {
+                    LoadSoundPlayer();
+                }
+                this.soundPlayer.PlaySync();
             }
         }
 

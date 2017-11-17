@@ -102,6 +102,9 @@
     <Compile Include="ACS\ACSGameStateMapper.cs" />
     <Compile Include="ACS\ACSSharedMemoryReader.cs" />
     <Compile Include="ACS\ACSSpotter.cs" />
+    <Compile Include="Audio\BackgroundPlayer.cs" />
+    <Compile Include="Audio\MediaPlayerBackgroundPlayer.cs" />
+    <Compile Include="Audio\NAudioBackgroundPlayer.cs" />
     <Compile Include="Audio\PlaybackModerator.cs" />
     <Compile Include="Audio\Sounds.cs" />
     <Compile Include="CarData.cs" />
