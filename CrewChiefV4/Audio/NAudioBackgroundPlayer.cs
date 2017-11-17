@@ -90,7 +90,10 @@ namespace CrewChiefV4.Audio
                     stop();
                     try
                     {
-                        this.reader.Dispose();
+                        if (this.reader != null)
+                        {
+                            this.reader.Dispose();
+                        }
                     }
                     catch (Exception) { }
                 }
@@ -106,8 +109,14 @@ namespace CrewChiefV4.Audio
             {
                 try
                 {
-                    reader.Dispose();
-                    waveOut.Dispose();
+                    if (reader != null)
+                    {
+                        reader.Dispose();
+                    }
+                    if (waveOut != null)
+                    {
+                        waveOut.Dispose();
+                    }
                 }
                 catch (Exception) { }
                 base.dispose();
