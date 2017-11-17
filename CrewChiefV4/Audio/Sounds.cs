@@ -962,17 +962,26 @@ namespace CrewChiefV4.Audio
             }
             try
             {
-                reader.Dispose();
+                if (reader != null)
+                {
+                    reader.Dispose();
+                }
             }
             catch (Exception) { }
             try
             {
-                waveOut.Dispose();
+                if (waveOut != null)
+                {
+                    waveOut.Dispose();
+                }
             }
             catch (Exception) { }
             try
             {
-                ms.Dispose();
+                if (ms != null)
+                {
+                    ms.Dispose();
+                }
             }
             catch (Exception) { }
         }
