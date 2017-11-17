@@ -59,7 +59,7 @@ namespace CrewChiefV4.Audio
         {
             lock (this)
             {
-                if (initialised)
+                if (initialised && this.waveOut != null)
                 {                    
                     try
                     {
@@ -96,6 +96,7 @@ namespace CrewChiefV4.Audio
                 }
                 this.reader = new NAudio.Wave.WaveFileReader(Path.Combine(backgroundFilesPath, backgroundSoundName));
                 backgroundLength = reader.TotalTime;
+                initialised = true;
             }
         }
 
