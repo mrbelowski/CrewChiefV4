@@ -396,33 +396,36 @@ namespace CrewChiefV4.Audio
 
         public void StopAndUnloadAll()
         {
-            if (synthesizer != null)
+            new Thread(() =>
             {
-                try
+                if (synthesizer != null)
                 {
-                    synthesizer.Dispose();
-                    synthesizer = null;
+                    try
+                    {
+                        synthesizer.Dispose();
+                        synthesizer = null;
+                    }
+                    catch (Exception) { }
                 }
-                catch (Exception) { }
-            }
-            foreach (SoundSet soundSet in soundSets.Values)
-            {                
-                try
+                foreach (SoundSet soundSet in soundSets.Values)
                 {
-                    soundSet.StopAll();
-                    soundSet.UnLoadAll();
+                    try
+                    {
+                        soundSet.StopAll();
+                        soundSet.UnLoadAll();
+                    }
+                    catch (Exception) { }
                 }
-                catch (Exception) { }
-            }
-            foreach (SingleSound singleSound in singleSounds.Values)
-            {                
-                try
+                foreach (SingleSound singleSound in singleSounds.Values)
                 {
-                    singleSound.Stop();
-                    singleSound.UnLoad();
+                    try
+                    {
+                        singleSound.Stop();
+                        singleSound.UnLoad();
+                    }
+                    catch (Exception) { }
                 }
-                catch (Exception) { }
-            }
+            }).Start();
         }
 
         public void StopAll()
@@ -1165,7 +1168,7 @@ namespace CrewChiefV4.Audio
 
         public void Stop()
         {
-            if (AudioPlayer.playWithNAudio && this.waveOut != null)
+            if (AudioPlayer.playWithNAudio && this.waveOut != null && this.waveOut.PlaybackState == NAudio.Wave.PlaybackState.Playing)
             {
                 this.waveOut.Stop();
             }
