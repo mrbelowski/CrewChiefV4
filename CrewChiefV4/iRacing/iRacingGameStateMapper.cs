@@ -26,7 +26,7 @@ namespace CrewChiefV4.iRacing
 
         public void setSpeechRecogniser(SpeechRecogniser speechRecogniser)
         {
-            speechRecogniser.addiRacingPitStopSpeechRecogniser();
+            speechRecogniser.addiRacingSpeechRecogniser();
             this.speechRecogniser = speechRecogniser;            
         }
 
@@ -857,6 +857,11 @@ namespace CrewChiefV4.iRacing
                 currentGameState.PenaltiesData.CutTrackWarnings = previousGameState.PenaltiesData.CutTrackWarnings + 1;
             }
             currentGameState.PenaltiesData.NumPenalties = shared.Telemetry.PlayerCarMyIncidentCount;
+
+            currentGameState.TyreData.FrontLeftPressure = shared.Telemetry.LFcoldPressure;
+            currentGameState.TyreData.FrontRightPressure = shared.Telemetry.RFcoldPressure;
+            currentGameState.TyreData.RearLeftPressure = shared.Telemetry.LRcoldPressure;
+            currentGameState.TyreData.RearRightPressure = shared.Telemetry.RRcoldPressure;
             //Console.WriteLine("Speed:" + playerCar.SpeedKph);
 
 

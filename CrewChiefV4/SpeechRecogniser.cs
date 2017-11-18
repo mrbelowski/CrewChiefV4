@@ -133,9 +133,12 @@ namespace CrewChiefV4
         public static String[] PIT_STOP_CLEAR_WIND_SCREEN = Configuration.getSpeechRecognitionPhrases("PIT_STOP_CLEAR_WIND_SCREEN");
         public static String[] PIT_STOP_CLEAR_FAST_REPAIR = Configuration.getSpeechRecognitionPhrases("PIT_STOP_CLEAR_FAST_REPAIR");
         public static String[] PIT_STOP_CLEAR_FUEL = Configuration.getSpeechRecognitionPhrases("PIT_STOP_CLEAR_FUEL");
-        //public static String[] PIT_STOP_ADD = Configuration.getSpeechRecognitionPhrases("PIT_STOP_ADD");
-        
-        
+
+        public static String[] PIT_STOP_CHANGE_ALL_TYRES = Configuration.getSpeechRecognitionPhrases("PIT_STOP_CHANGE_ALL_TYRES");
+        public static String[] PIT_STOP_CHANGE_FRONT_LEFT_TYRE = Configuration.getSpeechRecognitionPhrases("PIT_STOP_CHANGE_FRONT_LEFT_TYRE");
+        public static String[] PIT_STOP_CHANGE_FRONT_RIGHT_TYRE = Configuration.getSpeechRecognitionPhrases("PIT_STOP_CHANGE_FRONT_RIGHT_TYRE");
+        public static String[] PIT_STOP_CHANGE_REAR_LEFT_TYRE = Configuration.getSpeechRecognitionPhrases("PIT_STOP_CHANGE_REAR_LEFT_TYRE");
+        public static String[] PIT_STOP_CHANGE_REAR_RIGHT_TYRE = Configuration.getSpeechRecognitionPhrases("PIT_STOP_CHANGE_REAR_RIGHT_TYRE");
 
         private CrewChief crewChief;
 
@@ -154,6 +157,8 @@ namespace CrewChiefV4
         private System.Globalization.CultureInfo cultureInfo;
 
         public static Dictionary<String, int> numberToNumber = getNumberMappings();
+
+        public static Dictionary<String, int> bigNumberToNumber = getBigNumberMappings();
 
         public static Dictionary<String, int> hoursToNumber = getHourMappings();
 
@@ -205,6 +210,15 @@ namespace CrewChiefV4
         {
             Dictionary<String, int> dict = new Dictionary<string, int>();
             for (int i = 1; i <= 90; i++)
+            {
+                dict.Add(Configuration.getSpeechRecognitionConfigOption(i.ToString()), i);
+            }
+            return dict;
+        }
+        private static Dictionary<String, int> getBigNumberMappings()
+        {
+            Dictionary<String, int> dict = new Dictionary<string, int>();
+            for (int i = 1; i <= 199; i++)
             {
                 dict.Add(Configuration.getSpeechRecognitionConfigOption(i.ToString()), i);
             }
@@ -610,7 +624,7 @@ namespace CrewChiefV4
             Console.WriteLine("Loaded " + dynamicGrammarSize + " items into dynamic (opponent) grammar");
         }
 
-        public void addiRacingPitStopSpeechRecogniser()
+        public void addiRacingSpeechRecogniser()
         {
             try
             {
@@ -623,15 +637,20 @@ namespace CrewChiefV4
                 validateAndAdd(PIT_STOP_CLEAR_WIND_SCREEN, iRacingChoices);
                 validateAndAdd(PIT_STOP_CLEAR_FAST_REPAIR, iRacingChoices);
                 validateAndAdd(PIT_STOP_CLEAR_FUEL, iRacingChoices);
-                iRacingGrammarSize += 7;
-                //validateAndAdd(PIT_STOP_TEAROFF, staticSpeechChoices);
+                validateAndAdd(PIT_STOP_CHANGE_ALL_TYRES, iRacingChoices);
+                validateAndAdd(PIT_STOP_CHANGE_FRONT_LEFT_TYRE, iRacingChoices);
+                validateAndAdd(PIT_STOP_CHANGE_FRONT_RIGHT_TYRE, iRacingChoices);
+                validateAndAdd(PIT_STOP_CHANGE_REAR_LEFT_TYRE, iRacingChoices);
+                validateAndAdd(PIT_STOP_CHANGE_REAR_RIGHT_TYRE, iRacingChoices);
+
+                iRacingGrammarSize += 12;
                 foreach (String s in PIT_STOP_ADD)
                 {
                     if (s == null || s.Trim().Count() == 0)
                     {
                         continue;
                     }
-                    foreach (KeyValuePair<String, int> entry in numberToNumber)
+                    foreach (KeyValuePair<String, int> entry in bigNumberToNumber)
                     {
                         foreach (String litersArray in LITERS)
                         {
@@ -644,6 +663,88 @@ namespace CrewChiefV4
                         break;
                     }
                 }
+
+                foreach (String s in PIT_STOP_CHANGE_ALL_TYRES)
+                {
+                    if (s == null || s.Trim().Count() == 0)
+                    {
+                        continue;
+                    }
+                    foreach (KeyValuePair<String, int> entry in bigNumberToNumber)
+                    {
+                        iRacingGrammarSize++;
+                        iRacingChoices.Add(s + " " + entry.Key);
+                    }
+                    if (disable_alternative_voice_commands)
+                    {
+                        break;
+                    }
+                }
+                foreach (String s in PIT_STOP_CHANGE_FRONT_LEFT_TYRE)
+                {
+                    if (s == null || s.Trim().Count() == 0)
+                    {
+                        continue;
+                    }
+                    foreach (KeyValuePair<String, int> entry in bigNumberToNumber)
+                    {
+                        iRacingGrammarSize++;
+                        iRacingChoices.Add(s + " " + entry.Key);
+                    }
+                    if (disable_alternative_voice_commands)
+                    {
+                        break;
+                    }
+                }
+                foreach (String s in PIT_STOP_CHANGE_FRONT_RIGHT_TYRE)
+                {
+                    if (s == null || s.Trim().Count() == 0)
+                    {
+                        continue;
+                    }
+                    foreach (KeyValuePair<String, int> entry in bigNumberToNumber)
+                    {
+                        iRacingGrammarSize++;
+                        iRacingChoices.Add(s + " " + entry.Key);
+                    }
+                    if (disable_alternative_voice_commands)
+                    {
+                        break;
+                    }
+                }
+                foreach (String s in PIT_STOP_CHANGE_REAR_LEFT_TYRE)
+                {
+                    if (s == null || s.Trim().Count() == 0)
+                    {
+                        continue;
+                    }
+                    foreach (KeyValuePair<String, int> entry in bigNumberToNumber)
+                    {
+                        iRacingGrammarSize++;
+                        iRacingChoices.Add(s + " " + entry.Key);
+                    }
+                    if (disable_alternative_voice_commands)
+                    {
+                        break;
+                    }
+                }
+                foreach (String s in PIT_STOP_CHANGE_REAR_RIGHT_TYRE)
+                {
+                    if (s == null || s.Trim().Count() == 0)
+                    {
+                        continue;
+                    }
+                    foreach (KeyValuePair<String, int> entry in bigNumberToNumber)
+                    {
+                        iRacingGrammarSize++;
+                        iRacingChoices.Add(s + " " + entry.Key);
+                    }
+                    if (disable_alternative_voice_commands)
+                    {
+                        break;
+                    }
+                }
+
 
                 GrammarBuilder iRacingGrammarBuilder = new GrammarBuilder();
                 iRacingGrammarBuilder.Culture = cultureInfo;
@@ -931,9 +1032,12 @@ namespace CrewChiefV4
             else if (ResultContains(recognisedSpeech, PIT_STOP_ADD) || ResultContains(recognisedSpeech, PIT_STOP_TEAROFF) ||
                 ResultContains(recognisedSpeech, PIT_STOP_FAST_REPAIR) || ResultContains(recognisedSpeech, PIT_STOP_CLEAR_ALL) || 
                 ResultContains(recognisedSpeech, PIT_STOP_CLEAR_TYRES) || ResultContains(recognisedSpeech, PIT_STOP_CLEAR_WIND_SCREEN) || 
-                ResultContains(recognisedSpeech, PIT_STOP_CLEAR_FAST_REPAIR) || ResultContains(recognisedSpeech, PIT_STOP_CLEAR_FUEL))
+                ResultContains(recognisedSpeech, PIT_STOP_CLEAR_FAST_REPAIR) || ResultContains(recognisedSpeech, PIT_STOP_CLEAR_FUEL) || 
+                ResultContains(recognisedSpeech, PIT_STOP_CHANGE_ALL_TYRES) || ResultContains(recognisedSpeech, PIT_STOP_CHANGE_FRONT_LEFT_TYRE) ||
+                ResultContains(recognisedSpeech, PIT_STOP_CHANGE_FRONT_RIGHT_TYRE) || ResultContains(recognisedSpeech, PIT_STOP_CHANGE_REAR_LEFT_TYRE) ||
+                ResultContains(recognisedSpeech, PIT_STOP_CHANGE_REAR_RIGHT_TYRE))
             {
-                 return CrewChief.getEvent("PitStop");
+                return CrewChief.getEvent("IRacingBroadcastMessageEvent");
             }
             return null;
         }
