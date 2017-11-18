@@ -745,17 +745,54 @@ namespace CrewChiefV4
                 this.messagesAudioDeviceBox.Enabled = true;
                 this.messagesAudioDeviceBox.Visible = true;
                 this.messagesAudioDeviceLabel.Visible = true;
-                this.messagesAudioDeviceBox.Items.AddRange(this.crewChief.audioPlayer.playbackDeviceNames);
+                this.messagesAudioDeviceBox.Items.AddRange(this.crewChief.audioPlayer.playbackDevices.Keys.ToArray());
                 // only register the value changed listener after loading the available values
-                this.messagesAudioDeviceBox.Text = crewChief.audioPlayer.playbackDeviceNames[UserSettings.GetUserSettings().getInt("NAUDIO_DEVICE_INDEX_MESSAGES")];
+                String messagesPlaybackGuid = UserSettings.GetUserSettings().getString("NAUDIO_DEVICE_GUID_MESSAGES");
+                Boolean foundMessagesDeviceGuid = false;
+                if (messagesPlaybackGuid != null)
+                {
+                    foreach (KeyValuePair<string, Tuple<string, int>> entry in this.crewChief.audioPlayer.playbackDevices)
+                    {
+                        if (messagesPlaybackGuid.Equals(entry.Value.Item1))
+                        {
+                            this.messagesAudioDeviceBox.Text = entry.Key;
+                            AudioPlayer.naudioMessagesPlaybackDeviceId = entry.Value.Item2;
+                            foundMessagesDeviceGuid = true;
+                            break;
+                        }
+                    }
+                }
+                if (!foundMessagesDeviceGuid && this.crewChief.audioPlayer.playbackDevices.Count > 0)
+                {
+                    this.messagesAudioDeviceBox.Text = this.crewChief.audioPlayer.playbackDevices.First().Key;
+                }
                 this.messagesAudioDeviceBox.SelectedValueChanged += new System.EventHandler(this.messagesAudioDeviceSelected);
 
                 this.backgroundAudioDeviceBox.Enabled = true;
                 this.backgroundAudioDeviceBox.Visible = true;
                 this.backgroundAudioDeviceLabel.Visible = true;
-                this.backgroundAudioDeviceBox.Items.AddRange(this.crewChief.audioPlayer.playbackDeviceNames);
+                this.backgroundAudioDeviceBox.Items.AddRange(this.crewChief.audioPlayer.playbackDevices.Keys.ToArray());
+                String backgroundPlaybackGuid = UserSettings.GetUserSettings().getString("NAUDIO_DEVICE_GUID_BACKGROUND");
                 // only register the value changed listener after loading the available values
-                this.backgroundAudioDeviceBox.Text = crewChief.audioPlayer.playbackDeviceNames[UserSettings.GetUserSettings().getInt("NAUDIO_DEVICE_INDEX_BACKGROUND")];
+                Boolean foundBackgroundDeviceGuid = false;
+                if (backgroundPlaybackGuid != null)
+                {
+                    foreach (KeyValuePair<string, Tuple<string, int>> entry in this.crewChief.audioPlayer.playbackDevices)
+                    {
+                        if (backgroundPlaybackGuid.Equals(entry.Value.Item1))
+                        {
+                            this.backgroundAudioDeviceBox.Text = entry.Key;
+                            AudioPlayer.naudioBackgroundPlaybackDeviceId = entry.Value.Item2;
+                            foundBackgroundDeviceGuid = true;
+                            break;
+                        }
+                    }
+                }
+                if (!foundBackgroundDeviceGuid && this.crewChief.audioPlayer.playbackDevices.Count > 0)
+                {
+                    this.backgroundAudioDeviceBox.Text = this.crewChief.audioPlayer.playbackDevices.First().Key;
+                }
+                this.messagesAudioDeviceBox.SelectedValueChanged += new System.EventHandler(this.messagesAudioDeviceSelected);
                 this.backgroundAudioDeviceBox.SelectedValueChanged += new System.EventHandler(this.backgroundAudioDeviceSelected);
             }
 
@@ -1484,18 +1521,26 @@ namespace CrewChiefV4
 
         private void messagesAudioDeviceSelected(object sender, EventArgs e)
         {
-            int deviceId = Array.IndexOf(crewChief.audioPlayer.playbackDeviceNames, this.messagesAudioDeviceBox.Text);
-            AudioPlayer.naudioMessagesPlaybackDeviceId = deviceId;
-            UserSettings.GetUserSettings().setProperty("NAUDIO_DEVICE_INDEX_MESSAGES", deviceId);
-            UserSettings.GetUserSettings().saveUserSettings();
+            if (crewChief.audioPlayer.playbackDevices.ContainsKey(this.messagesAudioDeviceBox.Text))
+            {
+                int deviceId =crewChief.audioPlayer.playbackDevices[this.messagesAudioDeviceBox.Text].Item2;
+                AudioPlayer.naudioMessagesPlaybackDeviceId = deviceId;
+                UserSettings.GetUserSettings().setProperty("NAUDIO_DEVICE_GUID_MESSAGES",
+                    crewChief.audioPlayer.playbackDevices[this.messagesAudioDeviceBox.Text].Item1);
+                UserSettings.GetUserSettings().saveUserSettings();
+            }
         }
 
         private void backgroundAudioDeviceSelected(object sender, EventArgs e)
         {
-            int deviceId = Array.IndexOf(crewChief.audioPlayer.playbackDeviceNames, this.backgroundAudioDeviceBox.Text);
-            AudioPlayer.naudioBackgroundPlaybackDeviceId = deviceId;
-            UserSettings.GetUserSettings().setProperty("NAUDIO_DEVICE_INDEX_BACKGROUND", deviceId);
-            UserSettings.GetUserSettings().saveUserSettings();
+            if (crewChief.audioPlayer.playbackDevices.ContainsKey(this.backgroundAudioDeviceBox.Text))
+            {
+                int deviceId = crewChief.audioPlayer.playbackDevices[this.backgroundAudioDeviceBox.Text].Item2; 
+                AudioPlayer.naudioBackgroundPlaybackDeviceId = deviceId;
+                UserSettings.GetUserSettings().setProperty("NAUDIO_DEVICE_GUID_BACKGROUND",
+                    crewChief.audioPlayer.playbackDevices[this.backgroundAudioDeviceBox.Text].Item1);
+                UserSettings.GetUserSettings().saveUserSettings();
+            }
         }
 
         private void spotterNameSelected(object sender, EventArgs e)

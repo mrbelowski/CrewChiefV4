@@ -25,6 +25,7 @@ namespace CrewChiefV4.Audio
         public static Boolean playWithNAudio = UserSettings.GetUserSettings().getBoolean("use_naudio");
         public static int naudioMessagesPlaybackDeviceId = 0;
         public static int naudioBackgroundPlaybackDeviceId = 0;
+        public Dictionary<string, Tuple<string, int>> playbackDevices = new Dictionary<string, Tuple<string, int>>();
         
         public static String folderAcknowlegeOK = "acknowledge/OK";
         public static String folderYellowEnabled = "acknowledge/yellowEnabled";
@@ -114,9 +115,7 @@ namespace CrewChiefV4.Audio
         public String selectedPersonalisation = NO_PERSONALISATION_SELECTED;
 
         private SynchronizationContext mainThreadContext = null;
-
-        public String[] playbackDeviceNames;
-
+        
         public AudioPlayer()
         {
             this.mainThreadContext = SynchronizationContext.Current;
@@ -188,15 +187,23 @@ namespace CrewChiefV4.Audio
 
             if (UserSettings.GetUserSettings().getBoolean("use_naudio"))
             {
-                playbackDeviceNames = new String[NAudio.Wave.WaveOut.DeviceCount];
+                playbackDevices.Clear();
                 for (int deviceId = 0; deviceId < NAudio.Wave.WaveOut.DeviceCount; deviceId++)
                 {
                     NAudio.Wave.WaveOutCapabilities capabilities = NAudio.Wave.WaveOut.GetCapabilities(deviceId);
-                    playbackDeviceNames[deviceId] = capabilities.ProductName;
+                    String rawName = capabilities.ProductName;
+                    String name = rawName;
+                    int nameAddition = 0;
+                    while (playbackDevices.Keys.Contains(name))
+                    {
+                        nameAddition++;
+                        name = rawName += "(" + nameAddition + ")";
+                    }
+                    playbackDevices.Add(name, new Tuple<string, int>(capabilities.ProductGuid.ToString(), deviceId));
                 }
             }
         }
-
+        
         public void initialise()
         {
             DirectoryInfo soundDirectory = new DirectoryInfo(soundFilesPath);
