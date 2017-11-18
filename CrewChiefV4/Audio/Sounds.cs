@@ -370,6 +370,7 @@ namespace CrewChiefV4.Audio
         {
             if (SoundCache.activeSoundPlayers > maxCacheSize)
             {
+                var watch = System.Diagnostics.Stopwatch.StartNew();
                 int purgeCount = 0;
                 var soundToPurge = SoundCache.dynamicLoadedSounds.First;
                 while (soundToPurge != null && purgeCount <= purgeBlockSize)
@@ -390,7 +391,9 @@ namespace CrewChiefV4.Audio
                     SoundCache.dynamicLoadedSounds.Remove(soundToPurge);
                     soundToPurge = nextSoundToPurge;
                 }
-                Console.WriteLine("Purged " + purgeCount + " sounds, there are now " + SoundCache.activeSoundPlayers + " active SoundPlayer objects");
+                watch.Stop();
+                var elapsedMs = watch.ElapsedMilliseconds;
+                Console.WriteLine("Purged " + purgeCount + " sounds in " + elapsedMs + "ms, there are now " + SoundCache.activeSoundPlayers + " active SoundPlayer objects");
             }
         }
 

@@ -2749,25 +2749,25 @@ namespace CrewChiefV4.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public int NAUDIO_DEVICE_INDEX_MESSAGES {
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string NAUDIO_DEVICE_GUID_MESSAGES {
             get {
-                return ((int)(this["NAUDIO_DEVICE_INDEX_MESSAGES"]));
+                return ((string)(this["NAUDIO_DEVICE_GUID_MESSAGES"]));
             }
             set {
-                this["NAUDIO_DEVICE_INDEX_MESSAGES"] = value;
+                this["NAUDIO_DEVICE_GUID_MESSAGES"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public int NAUDIO_DEVICE_INDEX_BACKGROUND {
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string NAUDIO_DEVICE_GUID_BACKGROUND {
             get {
-                return ((int)(this["NAUDIO_DEVICE_INDEX_BACKGROUND"]));
+                return ((string)(this["NAUDIO_DEVICE_GUID_BACKGROUND"]));
             }
             set {
-                this["NAUDIO_DEVICE_INDEX_BACKGROUND"] = value;
+                this["NAUDIO_DEVICE_GUID_BACKGROUND"] = value;
             }
         }
     }
