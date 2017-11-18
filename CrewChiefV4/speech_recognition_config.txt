@@ -191,6 +191,13 @@ HOURS = hours
 
 # used for iracing pitstop's commands
 PIT_STOP_ADD = pitstop add
+PIT_STOP_TEAROFF = pitstop tearoff:pitstop windscreen
+PIT_STOP_FAST_REPAIR = pitstop fast repair:pitstop repair
+PIT_STOP_CLEAR_ALL = pitstop clear all
+PIT_STOP_CLEAR_TYRES = pitstop clear tyres
+PIT_STOP_CLEAR_WIND_SCREEN = pitstop clear tearoff:pitstop clear windscreen
+PIT_STOP_CLEAR_FAST_REPAIR = pitstop clear fast repair
+PIT_STOP_CLEAR_FUEL = pitstop clear fuel
 LITERS = liters
 
 #################################################

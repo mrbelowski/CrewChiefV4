@@ -27,7 +27,10 @@ namespace iRSDKSharp
         LR = 5,
         RR = 6,
         ClearTires = 7,
-        FastRepair = 8
+        FastRepair = 8,
+        ClearWS = 9,
+        ClearFR = 10,
+        ClearFuel = 11
     };
 
     public enum TelemCommandModeTypes { Stop = 0, Start, Restart };

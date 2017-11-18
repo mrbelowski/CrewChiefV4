@@ -80,6 +80,30 @@ namespace CrewChiefV4.Events
             iRacingSDK.BroadcastMessage(BroadcastMessageTypes.PitCommand, (int)PitCommandModeTypes.ClearTires, 0);
         }
 
+        /// <summary>
+        /// Clear tearoff.
+        /// </summary>
+        public static void ClearTearoff()
+        {
+            iRacingSDK.BroadcastMessage(BroadcastMessageTypes.PitCommand, (int)PitCommandModeTypes.ClearWS, 0);
+        }
+
+        /// <summary>
+        /// Clear tearoff.
+        /// </summary>
+        public static void ClearFastRepair()
+        {
+            iRacingSDK.BroadcastMessage(BroadcastMessageTypes.PitCommand, (int)PitCommandModeTypes.ClearFR, 0);
+        }
+
+        /// <summary>
+        /// Clear tearoff.
+        /// </summary>
+        public static void ClearFuel()
+        {
+            iRacingSDK.BroadcastMessage(BroadcastMessageTypes.PitCommand, (int)PitCommandModeTypes.ClearFuel, 0);
+        }
+
         public class Tire
         {
             internal Tire() { }
@@ -113,8 +137,6 @@ namespace CrewChiefV4.Events
             public Tire LeftRear { get; set; }
             public Tire RightRear { get; set; }
         }
-
-
     }
 
     class PitStop : AbstractEvent
@@ -122,40 +144,98 @@ namespace CrewChiefV4.Events
         public PitStop(AudioPlayer audioPlayer)
         {
             this.audioPlayer = audioPlayer;
+            this.lastColdFLPressure = -1;
+            this.lastColdFRPressure = -1;
+            this.lastColdRLPressure = -1;
+            this.lastColdRRPressure = -1;
         }
+        int lastColdFLPressure = -1;
+        int lastColdFRPressure = -1;
+        int lastColdRLPressure = -1;
+        int lastColdRRPressure = -1;
+
         public override void clearState()
         {
-
+            this.lastColdFLPressure = -1;
+            this.lastColdFRPressure = -1;
+            this.lastColdRLPressure = -1;
+            this.lastColdRRPressure = -1;
         }
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
-
+            lastColdFLPressure = (int)currentGameState.TyreData.FrontLeftPressure;
+            lastColdFRPressure = (int)currentGameState.TyreData.FrontRightPressure;
+            lastColdRLPressure = (int)currentGameState.TyreData.RearLeftPressure;
+            lastColdRRPressure = (int)currentGameState.TyreData.RearRightPressure;
         }
         public override void respond(String voiceMessage)
         {
             if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PIT_STOP_ADD))
             {
-                int unit = 0;
+                int amount = 0;
                 foreach (KeyValuePair<String, int> entry in SpeechRecogniser.numberToNumber)
                 {
                     if (voiceMessage.Contains(" " + entry.Key + " "))
                     {
-                        unit = entry.Value;
+                        amount = entry.Value;
                         break;
                     }
                 }
-                if (unit == 0)
+                if (amount == 0)
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderDidntUnderstand, 0, null));
                     return;
                 }
                 if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.LITERS))
                 {
-                    PitCommandControl.AddFuel(unit);
+                    PitCommandControl.AddFuel(amount);
                     audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
                     return;
                 }
             }
+            else if(SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PIT_STOP_TEAROFF))
+            {
+                PitCommandControl.Tearoff();
+                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
+                return;
+            }
+            else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PIT_STOP_FAST_REPAIR))
+            {
+                PitCommandControl.FastRepair();
+                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
+                return;
+            }
+            else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PIT_STOP_CLEAR_ALL))
+            {
+                PitCommandControl.Clear();
+                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
+                return;
+            }
+            else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PIT_STOP_CLEAR_TYRES))
+            {
+                PitCommandControl.ClearTires();
+                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
+                return;
+            }
+            else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PIT_STOP_CLEAR_WIND_SCREEN))
+            {
+                PitCommandControl.ClearTearoff();
+                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
+                return;
+            }
+            else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PIT_STOP_CLEAR_FAST_REPAIR))
+            {
+                PitCommandControl.ClearFastRepair();
+                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
+                return;
+            }
+            else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PIT_STOP_CLEAR_FUEL))
+            {
+                PitCommandControl.ClearFuel();
+                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
+                return;
+            }
+
         }
     }
 }

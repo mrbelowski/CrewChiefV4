@@ -26,7 +26,8 @@ namespace CrewChiefV4.iRacing
 
         public void setSpeechRecogniser(SpeechRecogniser speechRecogniser)
         {
-            this.speechRecogniser = speechRecogniser;
+            speechRecogniser.addiRacingPitStopSpeechRecogniser();
+            this.speechRecogniser = speechRecogniser;            
         }
 
         Dictionary<string, DateTime> lastActiveTimeForOpponents = new Dictionary<string, DateTime>();

@@ -126,6 +126,16 @@ namespace CrewChiefV4
 
         public static String[] PIT_STOP_ADD = Configuration.getSpeechRecognitionPhrases("PIT_STOP_ADD");
         public static String[] LITERS = Configuration.getSpeechRecognitionPhrases("LITERS");
+        public static String[] PIT_STOP_TEAROFF = Configuration.getSpeechRecognitionPhrases("PIT_STOP_TEAROFF");
+        public static String[] PIT_STOP_FAST_REPAIR = Configuration.getSpeechRecognitionPhrases("PIT_STOP_FAST_REPAIR");
+        public static String[] PIT_STOP_CLEAR_ALL = Configuration.getSpeechRecognitionPhrases("PIT_STOP_CLEAR_ALL");
+        public static String[] PIT_STOP_CLEAR_TYRES = Configuration.getSpeechRecognitionPhrases("PIT_STOP_CLEAR_TYRES");
+        public static String[] PIT_STOP_CLEAR_WIND_SCREEN = Configuration.getSpeechRecognitionPhrases("PIT_STOP_CLEAR_WIND_SCREEN");
+        public static String[] PIT_STOP_CLEAR_FAST_REPAIR = Configuration.getSpeechRecognitionPhrases("PIT_STOP_CLEAR_FAST_REPAIR");
+        public static String[] PIT_STOP_CLEAR_FUEL = Configuration.getSpeechRecognitionPhrases("PIT_STOP_CLEAR_FUEL");
+        //public static String[] PIT_STOP_ADD = Configuration.getSpeechRecognitionPhrases("PIT_STOP_ADD");
+        
+        
 
         private CrewChief crewChief;
 
@@ -156,7 +166,7 @@ namespace CrewChiefV4
 
         private int staticGrammarSize = 0;
         private int dynamicGrammarSize = 0;
-
+        private int iRacingGrammarSize = 0;
         // load voice commands for triggering keyboard macros. The String key of the input Dictionary is the
         // command list key in speech_recognition_config.txt. When one of these phrases is heard the map value
         // CommandMacro is executed.
@@ -422,26 +432,6 @@ namespace CrewChiefV4
                         break;
                     }
                 }
-                foreach (String s in PIT_STOP_ADD)
-                {
-                    if (s == null || s.Trim().Count() == 0)
-                    {
-                        continue;
-                    }
-                    foreach (KeyValuePair<String, int> entry in numberToNumber)
-                    {
-                        foreach (String litersArray in LITERS)
-                        {
-                            staticGrammarSize++;
-                            staticSpeechChoices.Add(s + " " + entry.Key + " " + litersArray);
-                        }
-                    }
-                    if (disable_alternative_voice_commands)
-                    {
-                        break;
-                    }
-
-                }
 
                 validateAndAdd(KEEP_QUIET, staticSpeechChoices);
                 validateAndAdd(KEEP_ME_INFORMED, staticSpeechChoices);
@@ -620,6 +610,53 @@ namespace CrewChiefV4
             Console.WriteLine("Loaded " + dynamicGrammarSize + " items into dynamic (opponent) grammar");
         }
 
+        public void addiRacingPitStopSpeechRecogniser()
+        {
+            try
+            {
+                iRacingGrammarSize = 0;
+                Choices iRacingChoices = new Choices();
+                validateAndAdd(PIT_STOP_TEAROFF, iRacingChoices);
+                validateAndAdd(PIT_STOP_FAST_REPAIR, iRacingChoices);
+                validateAndAdd(PIT_STOP_CLEAR_ALL, iRacingChoices);
+                validateAndAdd(PIT_STOP_CLEAR_TYRES, iRacingChoices);
+                validateAndAdd(PIT_STOP_CLEAR_WIND_SCREEN, iRacingChoices);
+                validateAndAdd(PIT_STOP_CLEAR_FAST_REPAIR, iRacingChoices);
+                validateAndAdd(PIT_STOP_CLEAR_FUEL, iRacingChoices);
+                iRacingGrammarSize += 7;
+                //validateAndAdd(PIT_STOP_TEAROFF, staticSpeechChoices);
+                foreach (String s in PIT_STOP_ADD)
+                {
+                    if (s == null || s.Trim().Count() == 0)
+                    {
+                        continue;
+                    }
+                    foreach (KeyValuePair<String, int> entry in numberToNumber)
+                    {
+                        foreach (String litersArray in LITERS)
+                        {
+                            iRacingGrammarSize++;
+                            iRacingChoices.Add(s + " " + entry.Key + " " + litersArray);
+                        }
+                    }
+                    if (disable_alternative_voice_commands)
+                    {
+                        break;
+                    }
+                }
+
+                GrammarBuilder iRacingGrammarBuilder = new GrammarBuilder();
+                iRacingGrammarBuilder.Culture = cultureInfo;
+                iRacingGrammarBuilder.Append(iRacingChoices);
+                Grammar iRacingGrammar = new Grammar(iRacingGrammarBuilder);
+                sre.LoadGrammar(iRacingGrammar);
+                Console.WriteLine("Loaded " + iRacingGrammarSize + " items into iRacing grammar");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Unable to add iRacing pit stop commands to speech recognition engine - " + e.Message);
+            }
+        }
         public static Boolean ResultContains(String result, String[] alternatives)
         {
             foreach (String alternative in alternatives)
@@ -891,7 +928,10 @@ namespace CrewChiefV4
                     crewChief.togglePaceNotesPlayback();
                 }
             }
-            else if (ResultContains(recognisedSpeech,PIT_STOP_ADD))
+            else if (ResultContains(recognisedSpeech, PIT_STOP_ADD) || ResultContains(recognisedSpeech, PIT_STOP_TEAROFF) ||
+                ResultContains(recognisedSpeech, PIT_STOP_FAST_REPAIR) || ResultContains(recognisedSpeech, PIT_STOP_CLEAR_ALL) || 
+                ResultContains(recognisedSpeech, PIT_STOP_CLEAR_TYRES) || ResultContains(recognisedSpeech, PIT_STOP_CLEAR_WIND_SCREEN) || 
+                ResultContains(recognisedSpeech, PIT_STOP_CLEAR_FAST_REPAIR) || ResultContains(recognisedSpeech, PIT_STOP_CLEAR_FUEL))
             {
                  return CrewChief.getEvent("PitStop");
             }
