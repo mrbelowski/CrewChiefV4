@@ -427,7 +427,11 @@ namespace CrewChiefV4
                         staticGrammarSize++;
                         staticSpeechChoices.Add(s + " " + "one" + " " + minuteArray);
                     }
-
+                    foreach (String hourArray in HOUR)
+                    {
+                        staticGrammarSize++;
+                        staticSpeechChoices.Add(s + " " + "one" + " " + hourArray);
+                    }
                     foreach (String lapsArray in LAPS)
                     {
                         staticGrammarSize++;
@@ -449,6 +453,17 @@ namespace CrewChiefV4
                         gb.Append(minutesArray);
                         g = new Grammar(gb);
                         sre.LoadGrammar(g); 
+                    }
+                    foreach (String minutesArray in HOURS)
+                    {
+                        staticGrammarSize++;
+                        gb = new GrammarBuilder();
+                        gb.Culture = cultureInfo;
+                        gb.Append(s);
+                        gb.Append(new SemanticResultKey(s, houresChoices));
+                        gb.Append(minutesArray);
+                        g = new Grammar(gb);
+                        sre.LoadGrammar(g);
                     }
                     if (disable_alternative_voice_commands)
                     {
