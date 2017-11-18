@@ -628,116 +628,125 @@ namespace CrewChiefV4
         {
             try
             {
-                iRacingGrammarSize = 0;
-                Choices iRacingChoices = new Choices();
-                validateAndAdd(PIT_STOP_TEAROFF, iRacingChoices);
-                validateAndAdd(PIT_STOP_FAST_REPAIR, iRacingChoices);
-                validateAndAdd(PIT_STOP_CLEAR_ALL, iRacingChoices);
-                validateAndAdd(PIT_STOP_CLEAR_TYRES, iRacingChoices);
-                validateAndAdd(PIT_STOP_CLEAR_WIND_SCREEN, iRacingChoices);
-                validateAndAdd(PIT_STOP_CLEAR_FAST_REPAIR, iRacingChoices);
-                validateAndAdd(PIT_STOP_CLEAR_FUEL, iRacingChoices);
-                validateAndAdd(PIT_STOP_CHANGE_ALL_TYRES, iRacingChoices);
-                validateAndAdd(PIT_STOP_CHANGE_FRONT_LEFT_TYRE, iRacingChoices);
-                validateAndAdd(PIT_STOP_CHANGE_FRONT_RIGHT_TYRE, iRacingChoices);
-                validateAndAdd(PIT_STOP_CHANGE_REAR_LEFT_TYRE, iRacingChoices);
-                validateAndAdd(PIT_STOP_CHANGE_REAR_RIGHT_TYRE, iRacingChoices);
-
-                iRacingGrammarSize += 12;
-                foreach (String s in PIT_STOP_ADD)
+                Choices digits = new Choices();
+                GrammarBuilder digitValues = new GrammarBuilder();
+                digitValues.Culture = cultureInfo;
+                foreach (KeyValuePair<String, int> entry in bigNumberToNumber)
                 {
-                    if (s == null || s.Trim().Count() == 0)
-                    {
-                        continue;
-                    }
-                    foreach (KeyValuePair<String, int> entry in bigNumberToNumber)
-                    {
-                        foreach (String litersArray in LITERS)
-                        {
-                            iRacingGrammarSize++;
-                            iRacingChoices.Add(s + " " + entry.Key + " " + litersArray);
-                        }
-                    }
-                    if (disable_alternative_voice_commands)
-                    {
-                        break;
-                    }
+                    SemanticResultValue temp = new SemanticResultValue(entry.Key, entry.Value);
+                    digits.Add(temp);
+                    digitValues.Append(temp);
                 }
 
+                GrammarBuilder gb = new GrammarBuilder();
+                gb.Culture = cultureInfo;
+                Grammar g = null;
                 foreach (String s in PIT_STOP_CHANGE_ALL_TYRES)
                 {
                     if (s == null || s.Trim().Count() == 0)
                     {
                         continue;
                     }
-                    foreach (KeyValuePair<String, int> entry in bigNumberToNumber)
-                    {
-                        iRacingGrammarSize++;
-                        iRacingChoices.Add(s + " " + entry.Key);
-                    }
+                    gb = new GrammarBuilder();
+                    gb.Culture = cultureInfo;
+                    gb.Append(s);
+                    gb.Append(new SemanticResultKey(s, digits));
+                    g = new Grammar(gb);
+                    sre.LoadGrammar(g);                   
                     if (disable_alternative_voice_commands)
                     {
                         break;
                     }
                 }
+
                 foreach (String s in PIT_STOP_CHANGE_FRONT_LEFT_TYRE)
                 {
                     if (s == null || s.Trim().Count() == 0)
                     {
                         continue;
                     }
-                    foreach (KeyValuePair<String, int> entry in bigNumberToNumber)
-                    {
-                        iRacingGrammarSize++;
-                        iRacingChoices.Add(s + " " + entry.Key);
-                    }
+                    gb = new GrammarBuilder();
+                    gb.Culture = cultureInfo;
+                    gb.Append(s);
+                    gb.Append(new SemanticResultKey(s, digits));
+                    g = new Grammar(gb);
+                    sre.LoadGrammar(g);
                     if (disable_alternative_voice_commands)
                     {
                         break;
                     }
                 }
+
                 foreach (String s in PIT_STOP_CHANGE_FRONT_RIGHT_TYRE)
                 {
                     if (s == null || s.Trim().Count() == 0)
                     {
                         continue;
                     }
-                    foreach (KeyValuePair<String, int> entry in bigNumberToNumber)
-                    {
-                        iRacingGrammarSize++;
-                        iRacingChoices.Add(s + " " + entry.Key);
-                    }
+                    gb = new GrammarBuilder();
+                    gb.Culture = cultureInfo;
+                    gb.Append(s);
+                    gb.Append(new SemanticResultKey(s, digits));
+                    g = new Grammar(gb);
+                    sre.LoadGrammar(g);
                     if (disable_alternative_voice_commands)
                     {
                         break;
                     }
                 }
+
                 foreach (String s in PIT_STOP_CHANGE_REAR_LEFT_TYRE)
                 {
                     if (s == null || s.Trim().Count() == 0)
                     {
                         continue;
                     }
-                    foreach (KeyValuePair<String, int> entry in bigNumberToNumber)
-                    {
-                        iRacingGrammarSize++;
-                        iRacingChoices.Add(s + " " + entry.Key);
-                    }
+                    gb = new GrammarBuilder();
+                    gb.Culture = cultureInfo;
+                    gb.Append(s);
+                    gb.Append(new SemanticResultKey(s, digits));
+                    g = new Grammar(gb);
+                    sre.LoadGrammar(g);
                     if (disable_alternative_voice_commands)
                     {
                         break;
                     }
                 }
+
                 foreach (String s in PIT_STOP_CHANGE_REAR_RIGHT_TYRE)
                 {
                     if (s == null || s.Trim().Count() == 0)
                     {
                         continue;
                     }
-                    foreach (KeyValuePair<String, int> entry in bigNumberToNumber)
+                    gb = new GrammarBuilder();
+                    gb.Culture = cultureInfo;
+                    gb.Append(s);
+                    gb.Append(new SemanticResultKey(s, digits));
+                    g = new Grammar(gb);
+                    sre.LoadGrammar(g);
+                    if (disable_alternative_voice_commands)
                     {
-                        iRacingGrammarSize++;
-                        iRacingChoices.Add(s + " " + entry.Key);
+                        break;
+                    }
+                }
+
+                foreach (String s in PIT_STOP_ADD)
+                {
+                    if (s == null || s.Trim().Count() == 0)
+                    {
+                        continue;
+                    }
+
+                    foreach (String litersArray in LITERS)
+                    {
+                        gb = new GrammarBuilder();
+                        gb.Culture = cultureInfo;
+                        gb.Append(s);
+                        gb.Append(new SemanticResultKey(s, digits));
+                        gb.Append(litersArray);
+                        g = new Grammar(gb);
+                        sre.LoadGrammar(g);
                     }
                     if (disable_alternative_voice_commands)
                     {
@@ -745,10 +754,26 @@ namespace CrewChiefV4
                     }
                 }
 
+                iRacingGrammarSize = 0;
+                Choices iRacingChoices = new Choices();                
+                iRacingChoices.Add(PIT_STOP_TEAROFF);
+                iRacingChoices.Add(PIT_STOP_FAST_REPAIR);
+                iRacingChoices.Add(PIT_STOP_CLEAR_ALL);
+                iRacingChoices.Add(PIT_STOP_CLEAR_TYRES);
+                iRacingChoices.Add(PIT_STOP_CLEAR_WIND_SCREEN);
+                iRacingChoices.Add(PIT_STOP_CLEAR_FAST_REPAIR);
+                iRacingChoices.Add(PIT_STOP_CLEAR_FUEL);
+                
+                iRacingChoices.Add(PIT_STOP_CHANGE_ALL_TYRES);
+                iRacingChoices.Add(PIT_STOP_CHANGE_FRONT_LEFT_TYRE);
+                iRacingChoices.Add(PIT_STOP_CHANGE_FRONT_RIGHT_TYRE);
+                iRacingChoices.Add(PIT_STOP_CHANGE_REAR_LEFT_TYRE);
+                iRacingChoices.Add(PIT_STOP_CHANGE_REAR_RIGHT_TYRE);
 
-                GrammarBuilder iRacingGrammarBuilder = new GrammarBuilder();
+                iRacingGrammarSize += 12;                                             
+             
+                GrammarBuilder iRacingGrammarBuilder = new GrammarBuilder(iRacingChoices);
                 iRacingGrammarBuilder.Culture = cultureInfo;
-                iRacingGrammarBuilder.Append(iRacingChoices);
                 Grammar iRacingGrammar = new Grammar(iRacingGrammarBuilder);
                 sre.LoadGrammar(iRacingGrammar);
                 Console.WriteLine("Loaded " + iRacingGrammarSize + " items into iRacing grammar");
