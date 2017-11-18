@@ -199,11 +199,11 @@ PIT_STOP_CLEAR_WIND_SCREEN = pitstop clear tearoff:pitstop clear windscreen
 PIT_STOP_CLEAR_FAST_REPAIR = pitstop clear fast repair
 PIT_STOP_CLEAR_FUEL = pitstop clear fuel
 
-PIT_STOP_CHANGE_ALL_TYRES = change all tyres
-PIT_STOP_CHANGE_FRONT_LEFT_TYRE = change left front tyre
-PIT_STOP_CHANGE_FRONT_RIGHT_TYRE = change right front tyre
-PIT_STOP_CHANGE_REAR_LEFT_TYRE = change left rear tyre
-PIT_STOP_CHANGE_REAR_RIGHT_TYRE = change right rear tyre
+PIT_STOP_CHANGE_ALL_TYRES = pitstop change all tyres
+PIT_STOP_CHANGE_FRONT_LEFT_TYRE = pitstop change left front
+PIT_STOP_CHANGE_FRONT_RIGHT_TYRE = pitstop change right front
+PIT_STOP_CHANGE_REAR_LEFT_TYRE = pitstop change left rear
+PIT_STOP_CHANGE_REAR_RIGHT_TYRE = pitstop change right rear
 
 LITERS = liters
 
@@ -312,6 +312,7 @@ LITERS = liters
 98 = ninety-eight
 99 = ninety-nine
 100 = one-hundred
+101 = one-hundred-and-one
 102 = one-hundred-and-two
 103 = one-hundred-and-three
 104 = one-hundred-and-four
