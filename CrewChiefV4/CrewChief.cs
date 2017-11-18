@@ -109,6 +109,7 @@ namespace CrewChiefV4
             eventsList.Add("ConditionsMonitor", new ConditionsMonitor(audioPlayer));
             eventsList.Add("OvertakingAidsMonitor", new OvertakingAidsMonitor(audioPlayer));
             eventsList.Add("FrozenOrderMonitor", new FrozenOrderMonitor(audioPlayer));
+            eventsList.Add("PitStop", new PitStop(audioPlayer));
             sessionEndMessages = new SessionEndMessages(audioPlayer);
             DriverNameHelper.readRawNamesToUsableNamesFiles(AudioPlayer.soundFilesPath);
         }

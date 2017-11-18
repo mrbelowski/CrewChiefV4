@@ -124,6 +124,9 @@ namespace CrewChiefV4
         public static String[] START_PACE_NOTES_PLAYBACK = Configuration.getSpeechRecognitionPhrases("START_PACE_NOTES_PLAYBACK");
         public static String[] STOP_PACE_NOTES_PLAYBACK = Configuration.getSpeechRecognitionPhrases("STOP_PACE_NOTES_PLAYBACK");
 
+        public static String[] PIT_STOP_ADD = Configuration.getSpeechRecognitionPhrases("PIT_STOP_ADD");
+        public static String[] LITERS = Configuration.getSpeechRecognitionPhrases("LITERS");
+
         private CrewChief crewChief;
 
         public Boolean initialised = false;
@@ -418,6 +421,26 @@ namespace CrewChiefV4
                     {
                         break;
                     }
+                }
+                foreach (String s in PIT_STOP_ADD)
+                {
+                    if (s == null || s.Trim().Count() == 0)
+                    {
+                        continue;
+                    }
+                    foreach (KeyValuePair<String, int> entry in numberToNumber)
+                    {
+                        foreach (String litersArray in LITERS)
+                        {
+                            staticGrammarSize++;
+                            staticSpeechChoices.Add(s + " " + entry.Key + " " + litersArray);
+                        }
+                    }
+                    if (disable_alternative_voice_commands)
+                    {
+                        break;
+                    }
+
                 }
 
                 validateAndAdd(KEEP_QUIET, staticSpeechChoices);
@@ -867,6 +890,10 @@ namespace CrewChiefV4
                 {
                     crewChief.togglePaceNotesPlayback();
                 }
+            }
+            else if (ResultContains(recognisedSpeech,PIT_STOP_ADD))
+            {
+                 return CrewChief.getEvent("PitStop");
             }
             return null;
         }

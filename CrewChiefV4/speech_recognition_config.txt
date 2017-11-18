@@ -100,6 +100,8 @@ STATUS = full update:full status:update me
 START_PACE_NOTES_PLAYBACK = start pace notes
 STOP_PACE_NOTES_PLAYBACK = stop pace notes
 
+
+
 #################################################
 # Dynamic recognition phrase fragments - these are used to build up recognition sentences for opponent information.
 # Multiple options are NOT supported here - each must be a single word or phrase. These are combined for each opponent
@@ -187,6 +189,9 @@ MINUTES = minutes
 HOUR = hour
 HOURS = hours
 
+# used for iracing pitstop's commands
+PIT_STOP_ADD = pitstop add
+LITERS = liters
 
 #################################################
 # numbers - these are the text strings the voice recogniser will listen for (it's not good at listening for numeric characters)
