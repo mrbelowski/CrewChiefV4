@@ -387,59 +387,68 @@ namespace CrewChiefV4
                 validateAndAdd(START_PACE_NOTES_PLAYBACK, staticSpeechChoices);
                 validateAndAdd(STOP_PACE_NOTES_PLAYBACK, staticSpeechChoices);
 
+                Choices digits = new Choices();
+                GrammarBuilder digitValues = new GrammarBuilder();
+                digitValues.Culture = cultureInfo;
+                foreach (KeyValuePair<String, int> entry in numberToNumber)
+                {
+                    SemanticResultValue temp = new SemanticResultValue(entry.Key, entry.Value);
+                    digits.Add(temp);
+                    digitValues.Append(temp);
+                }
+                Choices houresChoices = new Choices();
+                GrammarBuilder houresValues = new GrammarBuilder();
+                houresValues.Culture = cultureInfo;
+                foreach (KeyValuePair<String, int> entry in hoursToNumber)
+                {
+                    SemanticResultValue temp = new SemanticResultValue(entry.Key, entry.Value);
+                    houresChoices.Add(temp);
+                    houresValues.Append(temp);
+                }
+
+                GrammarBuilder gb = new GrammarBuilder();
+                gb.Culture = cultureInfo;
+                Grammar g = null;
+
                 foreach (String s in CALCULATE_FUEL_FOR)
                 {
                     if (s == null || s.Trim().Count() == 0)
                     {
                         continue;
                     }
-                    foreach (KeyValuePair<String, int> entry in numberToNumber)
+                    foreach (String lapArray in LAP)
                     {
-                        if(entry.Value == 1)
-                        {
-                            foreach (String lapArray in LAP)
-                            {
-                                staticGrammarSize++;
-                                staticSpeechChoices.Add(s + " " + entry.Key + " " + lapArray);
-                            }
-                            foreach (String minuteArray in MINUTE)
-                            {
-                                staticGrammarSize++;
-                                staticSpeechChoices.Add(s + " " + entry.Key + " " + minuteArray);
-                            }
-                        }
-                        else
-                        {
-                            foreach (String lapsArray in LAPS)
-                            {
-                                staticGrammarSize++;
-                                staticSpeechChoices.Add(s + " " + entry.Key + " " + lapsArray);
-                            }
-                            foreach (String minutesArray in MINUTES)
-                            {
-                                staticGrammarSize++;
-                                staticSpeechChoices.Add(s + " " + entry.Key + " " + minutesArray);
-                            }
-                        }
+
+                        staticGrammarSize++;
+                        staticSpeechChoices.Add(s + " " + "one" + " " + lapArray);
                     }
-                    foreach (KeyValuePair<String, int> entry in hoursToNumber)
+                    foreach (String minuteArray in MINUTE)
                     {
-                        if (entry.Value == 1)
-                        {
-                            foreach (String hourArray in HOUR)
-                            {
-                                staticGrammarSize++;
-                                staticSpeechChoices.Add(s + " " + entry.Key + " " + hourArray);
-                            }
-                        }
-                        else
-                        {
-                            foreach (String hoursArray in HOURS)
-                            {
-                                staticGrammarSize++;
-                                staticSpeechChoices.Add(s + " " + entry.Key + " " + hoursArray);
-                            }
-                        }
+                        staticGrammarSize++;
+                        staticSpeechChoices.Add(s + " " + "one" + " " + minuteArray);
+                    }
+
+                    foreach (String lapsArray in LAPS)
+                    {
+                        staticGrammarSize++;
+                        gb = new GrammarBuilder();
+                        gb.Culture = cultureInfo;
+                        gb.Append(s);
+                        gb.Append(new SemanticResultKey(s, digits));
+                        gb.Append(lapsArray);
+                        g = new Grammar(gb);
+                        sre.LoadGrammar(g); 
+                    }
+                    foreach (String minutesArray in MINUTES)
+                    {
+                        staticGrammarSize++;
+                        gb = new GrammarBuilder();
+                        gb.Culture = cultureInfo;
+                        gb.Append(s);
+                        gb.Append(new SemanticResultKey(s, digits));
+                        gb.Append(minutesArray);
+                        g = new Grammar(gb);
+                        sre.LoadGrammar(g); 
                     }
                     if (disable_alternative_voice_commands)
                     {
@@ -628,6 +637,7 @@ namespace CrewChiefV4
         {
             try
             {
+                iRacingGrammarSize = 0;
                 Choices digits = new Choices();
                 GrammarBuilder digitValues = new GrammarBuilder();
                 digitValues.Culture = cultureInfo;
@@ -647,6 +657,7 @@ namespace CrewChiefV4
                     {
                         continue;
                     }
+                    iRacingGrammarSize++;
                     gb = new GrammarBuilder();
                     gb.Culture = cultureInfo;
                     gb.Append(s);
@@ -665,6 +676,7 @@ namespace CrewChiefV4
                     {
                         continue;
                     }
+                    iRacingGrammarSize++;
                     gb = new GrammarBuilder();
                     gb.Culture = cultureInfo;
                     gb.Append(s);
@@ -683,6 +695,7 @@ namespace CrewChiefV4
                     {
                         continue;
                     }
+                    iRacingGrammarSize++;
                     gb = new GrammarBuilder();
                     gb.Culture = cultureInfo;
                     gb.Append(s);
@@ -701,6 +714,7 @@ namespace CrewChiefV4
                     {
                         continue;
                     }
+                    iRacingGrammarSize++;
                     gb = new GrammarBuilder();
                     gb.Culture = cultureInfo;
                     gb.Append(s);
@@ -719,6 +733,7 @@ namespace CrewChiefV4
                     {
                         continue;
                     }
+                    iRacingGrammarSize++;
                     gb = new GrammarBuilder();
                     gb.Culture = cultureInfo;
                     gb.Append(s);
@@ -740,6 +755,7 @@ namespace CrewChiefV4
 
                     foreach (String litersArray in LITERS)
                     {
+                        iRacingGrammarSize++;
                         gb = new GrammarBuilder();
                         gb.Culture = cultureInfo;
                         gb.Append(s);
@@ -753,8 +769,7 @@ namespace CrewChiefV4
                         break;
                     }
                 }
-
-                iRacingGrammarSize = 0;
+                
                 Choices iRacingChoices = new Choices();                
                 iRacingChoices.Add(PIT_STOP_TEAROFF);
                 iRacingChoices.Add(PIT_STOP_FAST_REPAIR);
