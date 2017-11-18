@@ -89,7 +89,7 @@ namespace CrewChiefV4.Events
         }
 
         /// <summary>
-        /// Clear tearoff.
+        /// Clear fast repair.
         /// </summary>
         public static void ClearFastRepair()
         {
@@ -97,7 +97,7 @@ namespace CrewChiefV4.Events
         }
 
         /// <summary>
-        /// Clear tearoff.
+        /// Clear clear fuel.
         /// </summary>
         public static void ClearFuel()
         {
@@ -139,9 +139,9 @@ namespace CrewChiefV4.Events
         }
     }
 
-    class PitStop : AbstractEvent
+    class PitStopCommands : AbstractEvent
     {
-        public PitStop(AudioPlayer audioPlayer)
+        public PitStopCommands(AudioPlayer audioPlayer)
         {
             this.audioPlayer = audioPlayer;
             this.lastColdFLPressure = -1;
