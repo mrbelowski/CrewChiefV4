@@ -254,10 +254,7 @@ namespace CrewChiefV4
                         gb.Culture = cultureInfo;
                         gb.Append(s);
                         gb.Append(new SemanticResultKey(s, coices));
-                        if (append != null && append.Length > 0)
-                        {
-                            gb.Append(sa);
-                        }
+                        gb.Append(sa);
                         Grammar g = new Grammar(gb);
                         sre.LoadGrammar(g);
                     }
