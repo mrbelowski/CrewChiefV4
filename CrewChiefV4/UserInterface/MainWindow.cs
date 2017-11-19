@@ -747,22 +747,22 @@ namespace CrewChiefV4
                 this.messagesAudioDeviceLabel.Visible = true;
                 this.messagesAudioDeviceBox.Items.AddRange(this.crewChief.audioPlayer.playbackDevices.Keys.ToArray());
                 // only register the value changed listener after loading the available values
-                String messagesPlaybackGuid = UserSettings.GetUserSettings().getString("NAUDIO_DEVICE_GUID_MESSAGES");
-                Boolean foundMessagesDeviceGuid = false;
-                if (messagesPlaybackGuid != null)
+                String messagesPlaybackName = UserSettings.GetUserSettings().getString("NAUDIO_WAVEOUT_DEVICE_NANE_MESSAGES");
+                Boolean foundMessagesDeviceName = false;
+                if (!string.IsNullOrWhiteSpace(messagesPlaybackName))
                 {
                     foreach (KeyValuePair<string, Tuple<string, int>> entry in this.crewChief.audioPlayer.playbackDevices)
                     {
-                        if (messagesPlaybackGuid.Equals(entry.Value.Item1))
+                        if (messagesPlaybackName == entry.Value.Item1)
                         {
                             this.messagesAudioDeviceBox.Text = entry.Key;
                             AudioPlayer.naudioMessagesPlaybackDeviceId = entry.Value.Item2;
-                            foundMessagesDeviceGuid = true;
+                            foundMessagesDeviceName = true;
                             break;
                         }
                     }
                 }
-                if (!foundMessagesDeviceGuid && this.crewChief.audioPlayer.playbackDevices.Count > 0)
+                if (!foundMessagesDeviceName && this.crewChief.audioPlayer.playbackDevices.Count > 0)
                 {
                     this.messagesAudioDeviceBox.Text = this.crewChief.audioPlayer.playbackDevices.First().Key;
                 }
@@ -772,23 +772,23 @@ namespace CrewChiefV4
                 this.backgroundAudioDeviceBox.Visible = true;
                 this.backgroundAudioDeviceLabel.Visible = true;
                 this.backgroundAudioDeviceBox.Items.AddRange(this.crewChief.audioPlayer.playbackDevices.Keys.ToArray());
-                String backgroundPlaybackGuid = UserSettings.GetUserSettings().getString("NAUDIO_DEVICE_GUID_BACKGROUND");
+                String backgroundPlaybackName = UserSettings.GetUserSettings().getString("NAUDIO_WAVEOUT_DEVICE_NANE_BACKGROUND");
                 // only register the value changed listener after loading the available values
-                Boolean foundBackgroundDeviceGuid = false;
-                if (backgroundPlaybackGuid != null)
+                Boolean foundBackgroundDeviceName = false;
+                if (!string.IsNullOrWhiteSpace(backgroundPlaybackName))
                 {
                     foreach (KeyValuePair<string, Tuple<string, int>> entry in this.crewChief.audioPlayer.playbackDevices)
                     {
-                        if (backgroundPlaybackGuid.Equals(entry.Value.Item1))
+                        if (backgroundPlaybackName == entry.Value.Item1)
                         {
                             this.backgroundAudioDeviceBox.Text = entry.Key;
                             AudioPlayer.naudioBackgroundPlaybackDeviceId = entry.Value.Item2;
-                            foundBackgroundDeviceGuid = true;
+                            foundBackgroundDeviceName = true;
                             break;
                         }
                     }
                 }
-                if (!foundBackgroundDeviceGuid && this.crewChief.audioPlayer.playbackDevices.Count > 0)
+                if (!foundBackgroundDeviceName && this.crewChief.audioPlayer.playbackDevices.Count > 0)
                 {
                     this.backgroundAudioDeviceBox.Text = this.crewChief.audioPlayer.playbackDevices.First().Key;
                 }
@@ -1523,9 +1523,9 @@ namespace CrewChiefV4
         {
             if (crewChief.audioPlayer.playbackDevices.ContainsKey(this.messagesAudioDeviceBox.Text))
             {
-                int deviceId =crewChief.audioPlayer.playbackDevices[this.messagesAudioDeviceBox.Text].Item2;
+                int deviceId = crewChief.audioPlayer.playbackDevices[this.messagesAudioDeviceBox.Text].Item2;
                 AudioPlayer.naudioMessagesPlaybackDeviceId = deviceId;
-                UserSettings.GetUserSettings().setProperty("NAUDIO_DEVICE_GUID_MESSAGES",
+                UserSettings.GetUserSettings().setProperty("NAUDIO_WAVEOUT_DEVICE_NANE_MESSAGES",
                     crewChief.audioPlayer.playbackDevices[this.messagesAudioDeviceBox.Text].Item1);
                 UserSettings.GetUserSettings().saveUserSettings();
             }
@@ -1537,7 +1537,7 @@ namespace CrewChiefV4
             {
                 int deviceId = crewChief.audioPlayer.playbackDevices[this.backgroundAudioDeviceBox.Text].Item2; 
                 AudioPlayer.naudioBackgroundPlaybackDeviceId = deviceId;
-                UserSettings.GetUserSettings().setProperty("NAUDIO_DEVICE_GUID_BACKGROUND",
+                UserSettings.GetUserSettings().setProperty("NAUDIO_WAVEOUT_DEVICE_NANE_BACKGROUND",
                     crewChief.audioPlayer.playbackDevices[this.backgroundAudioDeviceBox.Text].Item1);
                 UserSettings.GetUserSettings().saveUserSettings();
             }
