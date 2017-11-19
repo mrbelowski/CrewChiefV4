@@ -683,10 +683,10 @@
     <Setting Name="use_naudio" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="NAUDIO_DEVICE_GUID_MESSAGES" Type="System.String" Scope="User">
+    <Setting Name="NAUDIO_WAVEOUT_DEVICE_NANE_MESSAGES" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="NAUDIO_DEVICE_GUID_BACKGROUND" Type="System.String" Scope="User">
+    <Setting Name="NAUDIO_WAVEOUT_DEVICE_NANE_BACKGROUND" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
   </Settings>

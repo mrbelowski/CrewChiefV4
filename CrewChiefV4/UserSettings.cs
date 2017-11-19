@@ -47,7 +47,7 @@ namespace CrewChiefV4
             "messages_volume", "last_game_definition", "REPEAT_LAST_MESSAGE_BUTTON", "UpdateSettings", "VOLUME_UP", "VOLUME_DOWN", "GET_FUEL_STATUS",
             ControllerConfiguration.ControllerData.PROPERTY_CONTAINER, "PERSONALISATION_NAME", "app_version", "PRINT_TRACK_DATA", "spotter_name",
             "update_notify_attempted", "last_trace_file_name", "READ_CORNER_NAMES_FOR_LAP", "GET_CAR_STATUS", "GET_SESSION_STATUS", "GET_DAMAGE_REPORT", "GET_STATUS",
-            "TOGGLE_PACE_NOTES_", "NAUDIO_DEVICE_INDEX"};
+            "TOGGLE_PACE_NOTES_", "NAUDIO_WAVEOUT_DEVICE_NANE_MESSAGES", "NAUDIO_WAVEOUT_DEVICE_NANE_BACKGROUND"};
 
         private UserSettings()
         {

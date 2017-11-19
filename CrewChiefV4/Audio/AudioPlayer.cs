@@ -199,7 +199,7 @@ namespace CrewChiefV4.Audio
                         nameAddition++;
                         name = rawName += "(" + nameAddition + ")";
                     }
-                    playbackDevices.Add(name, new Tuple<string, int>(capabilities.ProductGuid.ToString(), deviceId));
+                    playbackDevices.Add(name, new Tuple<string, int>(capabilities.ProductName, deviceId));
                 }
             }
         }
