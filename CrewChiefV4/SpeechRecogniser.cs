@@ -156,11 +156,13 @@ namespace CrewChiefV4
         
         private System.Globalization.CultureInfo cultureInfo;
 
-        public static Dictionary<String, int> numberToNumber = getNumberMappings();
+        public static Dictionary<String, int> numberToNumber = getNumberMappings(1, 90);
 
-        public static Dictionary<String, int> bigNumberToNumber = getBigNumberMappings();
+        public static Dictionary<String, int> bigNumberToNumber = getNumberMappings(1, 199);
 
-        public static Dictionary<String, int> hoursToNumber = getHourMappings();
+        public static Dictionary<String, int> hoursToNumber = getNumberMappings(1, 24);
+
+        public static Dictionary<String, int> opponentNumberToNumber = getNumberMappings(1, 64);
 
         public static Boolean waitingForSpeech = false;
 
@@ -206,35 +208,17 @@ namespace CrewChiefV4
             Console.WriteLine("Loaded " + voiceTriggeredMacros.Count + " macro voice triggers into the speech recogniser");
         }
 
-        private static Dictionary<String, int> getNumberMappings()
+        private static Dictionary<String, int> getNumberMappings(int start, int end)
         {
             Dictionary<String, int> dict = new Dictionary<string, int>();
-            for (int i = 1; i <= 90; i++)
-            {
-                dict.Add(Configuration.getSpeechRecognitionConfigOption(i.ToString()), i);
-            }
-            return dict;
-        }
-        private static Dictionary<String, int> getBigNumberMappings()
-        {
-            Dictionary<String, int> dict = new Dictionary<string, int>();
-            for (int i = 1; i <= 199; i++)
+            for (int i = start; i <= end; i++)
             {
                 dict.Add(Configuration.getSpeechRecognitionConfigOption(i.ToString()), i);
             }
             return dict;
         }
 
-        private static Dictionary<String, int> getHourMappings()
-        {
-            Dictionary<String, int> dict = new Dictionary<string, int>();
-            for (int i = 1; i <= 24; i++)
-            {
-                dict.Add(Configuration.getSpeechRecognitionConfigOption(i.ToString()), i);
-            }
-            return dict;
-        }
-        private void addNumberMappingPhrase(String[] phrases, Choices coices, String[] append = null)
+        private void addNumberMappingPhrases(String[] phrases, Choices coices, String[] append = null)
         {
             foreach(string s in phrases)
             {
@@ -274,6 +258,22 @@ namespace CrewChiefV4
                 }
             }
         }
+        private void addOpponentNumberMappingPhrase(String phrase, Choices coices, String append = null)
+        {
+            GrammarBuilder gb = new GrammarBuilder();
+            gb.Culture = cultureInfo;
+            gb.Append(phrase);
+            gb.Append(new SemanticResultKey(phrase, coices));
+            if(append != null)
+            {
+                gb.Append(append);
+            }            
+            Grammar g = new Grammar(gb);
+            sre.LoadGrammar(g);
+            //add to opponent gramma list
+            opponentGrammarList.Add(g);
+        }
+
         public void Dispose()
         {
             if (sre != null)
@@ -468,9 +468,11 @@ namespace CrewChiefV4
                     houresChoices.Add(temp);
                 }
 
-                addNumberMappingPhrase(CALCULATE_FUEL_FOR, digitsChoices, LAPS);
-                addNumberMappingPhrase(CALCULATE_FUEL_FOR, digitsChoices, MINUTES);
-                addNumberMappingPhrase(CALCULATE_FUEL_FOR, houresChoices, HOURS);
+                addNumberMappingPhrases(CALCULATE_FUEL_FOR, digitsChoices, LAPS);
+                addNumberMappingPhrases(CALCULATE_FUEL_FOR, digitsChoices, MINUTES);
+                addNumberMappingPhrases(CALCULATE_FUEL_FOR, houresChoices, HOURS);
+                //i know this number is incorrect but still trying to figure out how to handle it correctly.
+                staticGrammarSize += 3;
 
                 GrammarBuilder staticGrammarBuilder = new GrammarBuilder();
                 staticGrammarBuilder.Culture = cultureInfo;
@@ -565,10 +567,38 @@ namespace CrewChiefV4
                     dynamicGrammarSize += 5;
                 }
             }
-            foreach (KeyValuePair<String, int> entry in numberToNumber)
+            Choices possessiveDigitsChoices = new Choices();
+            foreach (KeyValuePair<String, int> entry in opponentNumberToNumber)
             {
+                SemanticResultValue temp = new SemanticResultValue(entry.Key + POSSESSIVE, entry.Value);
+                possessiveDigitsChoices.Add(temp);
+            }
+            Choices digitsChoices = new Choices();
+            foreach (KeyValuePair<String, int> entry in opponentNumberToNumber)
+            {
+                SemanticResultValue temp = new SemanticResultValue(entry.Key + POSSESSIVE, entry.Value);
+                digitsChoices.Add(temp);
+            }
+
+            addOpponentNumberMappingPhrase(WHATS + " " + POSITION_LONG, possessiveDigitsChoices, LAST_LAP);
+            addOpponentNumberMappingPhrase(WHATS + " " + POSITION_LONG, possessiveDigitsChoices, BEST_LAP);
+            addOpponentNumberMappingPhrase(WHAT_TYRE_IS + " " + POSITION_LONG, digitsChoices, ON);
+            addOpponentNumberMappingPhrase(WHAT_TYRES_IS + " " + POSITION_LONG, digitsChoices, ON);
+            addOpponentNumberMappingPhrase(WHATS + " " + POSITION_SHORT, possessiveDigitsChoices, LAST_LAP);
+            addOpponentNumberMappingPhrase(WHATS + " " + POSITION_SHORT, possessiveDigitsChoices, BEST_LAP);
+            addOpponentNumberMappingPhrase(WHOS_IN + " " + POSITION_SHORT, digitsChoices);
+            addOpponentNumberMappingPhrase(WHOS_IN + " " + POSITION_LONG, digitsChoices);
+            addOpponentNumberMappingPhrase(WHAT_TYRE_IS + " " + POSITION_SHORT, digitsChoices, ON);
+            addOpponentNumberMappingPhrase(WHAT_TYRES_IS + " " + POSITION_SHORT, digitsChoices, ON);
+            addOpponentNumberMappingPhrase(WHERE_IS + " " + POSITION_SHORT, digitsChoices);
+            addOpponentNumberMappingPhrase(WHERE_IS + " " + POSITION_LONG, digitsChoices);
+            //i know this number is incorrect but still trying to figure out how to handle it correctly.
+            dynamicGrammarSize += 12;
+
+/*            foreach (KeyValuePair<String, int> entry in opponentNumberToNumber)
+            {               
                 opponentChoices.Add(WHATS + " " + POSITION_LONG + " " + entry.Key + POSSESSIVE + " " + LAST_LAP);
-                opponentChoices.Add(WHATS + " " + POSITION_LONG + " " + entry.Key + POSSESSIVE + " " + BEST_LAP);
+                opponentChoices.Add(WHATS + " " + POSITION_LONG + " " + entry.Key + POSSESSIVE + " " + BEST_LAP);                
                 opponentChoices.Add(WHAT_TYRE_IS + " " + POSITION_LONG + " " + entry.Key + " " + ON);
                 opponentChoices.Add(WHAT_TYRES_IS + " " + POSITION_LONG + " " + entry.Key + " " + ON);
                 opponentChoices.Add(WHATS + " " + POSITION_SHORT + " " + entry.Key + POSSESSIVE + " " + LAST_LAP);
@@ -580,7 +610,7 @@ namespace CrewChiefV4
                 opponentChoices.Add(WHERE_IS + " " + POSITION_SHORT + " " + entry.Key);
                 opponentChoices.Add(WHERE_IS + " " + POSITION_LONG + " " + entry.Key);
                 dynamicGrammarSize += 12;
-            }
+            }*/
             opponentChoices.Add(WHATS + " " + THE_LEADER + POSSESSIVE + " " + BEST_LAP);
             opponentChoices.Add(WHATS + " " + THE_LEADER + POSSESSIVE + " " + LAST_LAP);
 
@@ -632,13 +662,14 @@ namespace CrewChiefV4
                     SemanticResultValue temp = new SemanticResultValue(entry.Key, entry.Value);
                     digitsChoices.Add(temp);
                 }
-                addNumberMappingPhrase(PIT_STOP_CHANGE_ALL_TYRES, digitsChoices);               
-                addNumberMappingPhrase(PIT_STOP_CHANGE_FRONT_LEFT_TYRE, digitsChoices);
-                addNumberMappingPhrase(PIT_STOP_CHANGE_FRONT_RIGHT_TYRE, digitsChoices);
-                addNumberMappingPhrase(PIT_STOP_CHANGE_REAR_LEFT_TYRE, digitsChoices);
-                addNumberMappingPhrase(PIT_STOP_CHANGE_REAR_RIGHT_TYRE, digitsChoices);
-                addNumberMappingPhrase(PIT_STOP_ADD, digitsChoices, LITERS);
-                                
+                addNumberMappingPhrases(PIT_STOP_CHANGE_ALL_TYRES, digitsChoices);               
+                addNumberMappingPhrases(PIT_STOP_CHANGE_FRONT_LEFT_TYRE, digitsChoices);
+                addNumberMappingPhrases(PIT_STOP_CHANGE_FRONT_RIGHT_TYRE, digitsChoices);
+                addNumberMappingPhrases(PIT_STOP_CHANGE_REAR_LEFT_TYRE, digitsChoices);
+                addNumberMappingPhrases(PIT_STOP_CHANGE_REAR_RIGHT_TYRE, digitsChoices);
+                addNumberMappingPhrases(PIT_STOP_ADD, digitsChoices, LITERS);
+                //i know this number is incorrect but still trying to figure out how to handle it correctly.
+                iRacingGrammarSize += 6;                 
                 Choices iRacingChoices = new Choices();                
                 iRacingChoices.Add(PIT_STOP_TEAROFF);
                 iRacingChoices.Add(PIT_STOP_FAST_REPAIR);
