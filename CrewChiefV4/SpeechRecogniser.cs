@@ -576,7 +576,7 @@ namespace CrewChiefV4
             Choices digitsChoices = new Choices();
             foreach (KeyValuePair<String, int> entry in opponentNumberToNumber)
             {
-                SemanticResultValue temp = new SemanticResultValue(entry.Key + POSSESSIVE, entry.Value);
+                SemanticResultValue temp = new SemanticResultValue(entry.Key, entry.Value);
                 digitsChoices.Add(temp);
             }
 
