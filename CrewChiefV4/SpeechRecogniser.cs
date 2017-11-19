@@ -234,7 +234,49 @@ namespace CrewChiefV4
             }
             return dict;
         }
-
+        private void addNumberMappingPhrase(String[] phrases, Choices coices, String[] append = null)
+        {
+            foreach(string s in phrases)
+            {
+                if (s == null || s.Trim().Count() == 0)
+                {
+                    continue;
+                }
+                if(append != null)
+                {
+                    foreach(string sa in append)
+                    {
+                        if (sa == null || sa.Trim().Count() == 0)
+                        {
+                            continue;
+                        }
+                        GrammarBuilder gb = new GrammarBuilder();
+                        gb.Culture = cultureInfo;
+                        gb.Append(s);
+                        gb.Append(new SemanticResultKey(s, coices));
+                        if (append != null && append.Length > 0)
+                        {
+                            gb.Append(sa);
+                        }
+                        Grammar g = new Grammar(gb);
+                        sre.LoadGrammar(g);
+                    }
+                }
+                else
+                {
+                    GrammarBuilder gb = new GrammarBuilder();
+                    gb.Culture = cultureInfo;
+                    gb.Append(s);
+                    gb.Append(new SemanticResultKey(s, coices));
+                    Grammar g = new Grammar(gb);
+                    sre.LoadGrammar(g);
+                }
+                if (disable_alternative_voice_commands)
+                {
+                    break;
+                }
+            }
+        }
         public void Dispose()
         {
             if (sre != null)
@@ -387,13 +429,13 @@ namespace CrewChiefV4
                 validateAndAdd(START_PACE_NOTES_PLAYBACK, staticSpeechChoices);
                 validateAndAdd(STOP_PACE_NOTES_PLAYBACK, staticSpeechChoices);
 
-                Choices digits = new Choices();
+                Choices digitsChoices = new Choices();
                 GrammarBuilder digitValues = new GrammarBuilder();
                 digitValues.Culture = cultureInfo;
                 foreach (KeyValuePair<String, int> entry in numberToNumber)
                 {
                     SemanticResultValue temp = new SemanticResultValue(entry.Key, entry.Value);
-                    digits.Add(temp);
+                    digitsChoices.Add(temp);
                     digitValues.Append(temp);
                 }
                 Choices houresChoices = new Choices();
@@ -410,15 +452,10 @@ namespace CrewChiefV4
                 gb.Culture = cultureInfo;
                 Grammar g = null;
 
-                foreach (String s in CALCULATE_FUEL_FOR)
+                foreach (string s in CALCULATE_FUEL_FOR)
                 {
-                    if (s == null || s.Trim().Count() == 0)
-                    {
-                        continue;
-                    }
                     foreach (String lapArray in LAP)
                     {
-
                         staticGrammarSize++;
                         staticSpeechChoices.Add(s + " " + "one" + " " + lapArray);
                     }
@@ -432,45 +469,18 @@ namespace CrewChiefV4
                         staticGrammarSize++;
                         staticSpeechChoices.Add(s + " " + "one" + " " + hourArray);
                     }
-                    foreach (String lapsArray in LAPS)
-                    {
-                        staticGrammarSize++;
-                        gb = new GrammarBuilder();
-                        gb.Culture = cultureInfo;
-                        gb.Append(s);
-                        gb.Append(new SemanticResultKey(s, digits));
-                        gb.Append(lapsArray);
-                        g = new Grammar(gb);
-                        sre.LoadGrammar(g); 
-                    }
-                    foreach (String minutesArray in MINUTES)
-                    {
-                        staticGrammarSize++;
-                        gb = new GrammarBuilder();
-                        gb.Culture = cultureInfo;
-                        gb.Append(s);
-                        gb.Append(new SemanticResultKey(s, digits));
-                        gb.Append(minutesArray);
-                        g = new Grammar(gb);
-                        sre.LoadGrammar(g); 
-                    }
-                    foreach (String minutesArray in HOURS)
-                    {
-                        staticGrammarSize++;
-                        gb = new GrammarBuilder();
-                        gb.Culture = cultureInfo;
-                        gb.Append(s);
-                        gb.Append(new SemanticResultKey(s, houresChoices));
-                        gb.Append(minutesArray);
-                        g = new Grammar(gb);
-                        sre.LoadGrammar(g);
-                    }
-                    if (disable_alternative_voice_commands)
-                    {
-                        break;
-                    }
                 }
 
+                staticGrammarSize++;
+                addNumberMappingPhrase(CALCULATE_FUEL_FOR, digitsChoices, LAPS);
+                
+                staticGrammarSize++;
+                addNumberMappingPhrase(CALCULATE_FUEL_FOR, digitsChoices, MINUTES);
+                
+                staticGrammarSize++;
+                addNumberMappingPhrase(CALCULATE_FUEL_FOR, houresChoices, HOURS);
+
+                
                 validateAndAdd(KEEP_QUIET, staticSpeechChoices);
                 validateAndAdd(KEEP_ME_INFORMED, staticSpeechChoices);
                 validateAndAdd(TELL_ME_THE_GAPS, staticSpeechChoices);
@@ -653,138 +663,34 @@ namespace CrewChiefV4
             try
             {
                 iRacingGrammarSize = 0;
-                Choices digits = new Choices();
+                Choices digitsChoices = new Choices();
                 GrammarBuilder digitValues = new GrammarBuilder();
                 digitValues.Culture = cultureInfo;
                 foreach (KeyValuePair<String, int> entry in bigNumberToNumber)
                 {
                     SemanticResultValue temp = new SemanticResultValue(entry.Key, entry.Value);
-                    digits.Add(temp);
+                    digitsChoices.Add(temp);
                     digitValues.Append(temp);
                 }
 
-                GrammarBuilder gb = new GrammarBuilder();
-                gb.Culture = cultureInfo;
-                Grammar g = null;
-                foreach (String s in PIT_STOP_CHANGE_ALL_TYRES)
-                {
-                    if (s == null || s.Trim().Count() == 0)
-                    {
-                        continue;
-                    }
-                    iRacingGrammarSize++;
-                    gb = new GrammarBuilder();
-                    gb.Culture = cultureInfo;
-                    gb.Append(s);
-                    gb.Append(new SemanticResultKey(s, digits));
-                    g = new Grammar(gb);
-                    sre.LoadGrammar(g);                   
-                    if (disable_alternative_voice_commands)
-                    {
-                        break;
-                    }
-                }
-
-                foreach (String s in PIT_STOP_CHANGE_FRONT_LEFT_TYRE)
-                {
-                    if (s == null || s.Trim().Count() == 0)
-                    {
-                        continue;
-                    }
-                    iRacingGrammarSize++;
-                    gb = new GrammarBuilder();
-                    gb.Culture = cultureInfo;
-                    gb.Append(s);
-                    gb.Append(new SemanticResultKey(s, digits));
-                    g = new Grammar(gb);
-                    sre.LoadGrammar(g);
-                    if (disable_alternative_voice_commands)
-                    {
-                        break;
-                    }
-                }
-
-                foreach (String s in PIT_STOP_CHANGE_FRONT_RIGHT_TYRE)
-                {
-                    if (s == null || s.Trim().Count() == 0)
-                    {
-                        continue;
-                    }
-                    iRacingGrammarSize++;
-                    gb = new GrammarBuilder();
-                    gb.Culture = cultureInfo;
-                    gb.Append(s);
-                    gb.Append(new SemanticResultKey(s, digits));
-                    g = new Grammar(gb);
-                    sre.LoadGrammar(g);
-                    if (disable_alternative_voice_commands)
-                    {
-                        break;
-                    }
-                }
-
-                foreach (String s in PIT_STOP_CHANGE_REAR_LEFT_TYRE)
-                {
-                    if (s == null || s.Trim().Count() == 0)
-                    {
-                        continue;
-                    }
-                    iRacingGrammarSize++;
-                    gb = new GrammarBuilder();
-                    gb.Culture = cultureInfo;
-                    gb.Append(s);
-                    gb.Append(new SemanticResultKey(s, digits));
-                    g = new Grammar(gb);
-                    sre.LoadGrammar(g);
-                    if (disable_alternative_voice_commands)
-                    {
-                        break;
-                    }
-                }
-
-                foreach (String s in PIT_STOP_CHANGE_REAR_RIGHT_TYRE)
-                {
-                    if (s == null || s.Trim().Count() == 0)
-                    {
-                        continue;
-                    }
-                    iRacingGrammarSize++;
-                    gb = new GrammarBuilder();
-                    gb.Culture = cultureInfo;
-                    gb.Append(s);
-                    gb.Append(new SemanticResultKey(s, digits));
-                    g = new Grammar(gb);
-                    sre.LoadGrammar(g);
-                    if (disable_alternative_voice_commands)
-                    {
-                        break;
-                    }
-                }
-
-                foreach (String s in PIT_STOP_ADD)
-                {
-                    if (s == null || s.Trim().Count() == 0)
-                    {
-                        continue;
-                    }
-
-                    foreach (String litersArray in LITERS)
-                    {
-                        iRacingGrammarSize++;
-                        gb = new GrammarBuilder();
-                        gb.Culture = cultureInfo;
-                        gb.Append(s);
-                        gb.Append(new SemanticResultKey(s, digits));
-                        gb.Append(litersArray);
-                        g = new Grammar(gb);
-                        sre.LoadGrammar(g);
-                    }
-                    if (disable_alternative_voice_commands)
-                    {
-                        break;
-                    }
-                }
+                iRacingGrammarSize++;
+                addNumberMappingPhrase(PIT_STOP_CHANGE_ALL_TYRES, digitsChoices);               
                 
+                iRacingGrammarSize++;
+                addNumberMappingPhrase(PIT_STOP_CHANGE_FRONT_LEFT_TYRE, digitsChoices);
+
+                iRacingGrammarSize++;
+                addNumberMappingPhrase(PIT_STOP_CHANGE_FRONT_RIGHT_TYRE, digitsChoices);
+
+                iRacingGrammarSize++;
+                addNumberMappingPhrase(PIT_STOP_CHANGE_REAR_LEFT_TYRE, digitsChoices);
+
+                iRacingGrammarSize++;
+                addNumberMappingPhrase(PIT_STOP_CHANGE_REAR_RIGHT_TYRE, digitsChoices);
+
+                iRacingGrammarSize++;
+                addNumberMappingPhrase(PIT_STOP_ADD, digitsChoices, LITERS);
+                                
                 Choices iRacingChoices = new Choices();                
                 iRacingChoices.Add(PIT_STOP_TEAROFF);
                 iRacingChoices.Add(PIT_STOP_FAST_REPAIR);

@@ -121,6 +121,7 @@ namespace CrewChiefV4.Events
                     if (voiceMessage.Contains(" " + entry.Key))
                     {
                         amount = entry.Value;
+                        break;
                     }
                 }
                 if(amount != 0)
