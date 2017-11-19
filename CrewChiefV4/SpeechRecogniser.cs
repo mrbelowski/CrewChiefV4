@@ -218,7 +218,7 @@ namespace CrewChiefV4
             return dict;
         }
 
-        private void addNumberMappingPhrases(String[] phrases, Choices coices, String[] append = null)
+        private void addNumberMappingPhrases(String[] phrases, Choices choices, String[] append = null)
         {
             foreach(string s in phrases)
             {
@@ -237,7 +237,7 @@ namespace CrewChiefV4
                         GrammarBuilder gb = new GrammarBuilder();
                         gb.Culture = cultureInfo;
                         gb.Append(s);
-                        gb.Append(new SemanticResultKey(s, coices));
+                        gb.Append(new SemanticResultKey(s, choices));
                         gb.Append(sa);
                         Grammar g = new Grammar(gb);
                         sre.LoadGrammar(g);
@@ -248,7 +248,7 @@ namespace CrewChiefV4
                     GrammarBuilder gb = new GrammarBuilder();
                     gb.Culture = cultureInfo;
                     gb.Append(s);
-                    gb.Append(new SemanticResultKey(s, coices));
+                    gb.Append(new SemanticResultKey(s, choices));
                     Grammar g = new Grammar(gb);
                     sre.LoadGrammar(g);
                 }
@@ -258,12 +258,12 @@ namespace CrewChiefV4
                 }
             }
         }
-        private void addOpponentNumberMappingPhrase(String phrase, Choices coices, String append = null)
+        private void addOpponentNumberMappingPhrase(String phrase, Choices choices, String append = null)
         {
             GrammarBuilder gb = new GrammarBuilder();
             gb.Culture = cultureInfo;
             gb.Append(phrase);
-            gb.Append(new SemanticResultKey(phrase, coices));
+            gb.Append(new SemanticResultKey(phrase, choices));
             if(append != null)
             {
                 gb.Append(append);

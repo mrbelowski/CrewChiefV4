@@ -617,6 +617,9 @@ namespace CrewChiefV4.GameState
 
         public bool IsAtPitExit = false;
 
+        public bool isApporchingPits = false;
+
+
         public int CarNr = -1;
 
         public override string ToString()
@@ -985,10 +988,14 @@ namespace CrewChiefV4.GameState
         public DateTime NewLapDataTimerExpiry = DateTime.MaxValue;
         public Boolean WaitingForNewLapData = false;
 
-        public bool HasNewLapData(float gameProvidedLastLapTime, bool hasCrossedSFLine, Boolean previousOpponentDataWaitingForNewLapData,
-            DateTime previousOpponentNewLapDataTimerExpiry, float previousOpponentLastLapTime, Boolean previousOpponentLastLapValid)
+        public int CompleatedLapsWhenHasNewLapDataWasLastTrue = -1;
+
+        public bool HasNewLapData(float gameProvidedLastLapTime, bool hasCrossedSFLine, int compleatedLaps, Boolean previousOpponentDataWaitingForNewLapData,
+            DateTime previousOpponentNewLapDataTimerExpiry, float previousOpponentLastLapTime, Boolean previousOpponentLastLapValid, int previousCompleatedLapsWhenHasNewLapDataWasLastTrue)
         {
-            if (hasCrossedSFLine)
+            // here we need to make sure that CompleatedLaps is bigger then CompleatedLapsWhenHasNewLapDataWasLastTrue
+            // else the user will have jumped to pits 
+            if (hasCrossedSFLine && compleatedLaps > CompleatedLapsWhenHasNewLapDataWasLastTrue)
             {
                 // reset the timer and start waiting for an updated laptime...
                 this.WaitingForNewLapData = true;
@@ -1007,12 +1014,14 @@ namespace CrewChiefV4.GameState
                 this.WaitingForNewLapData = false;
                 this.LastLapTime = gameProvidedLastLapTime;
                 this.LastLapValid = gameProvidedLastLapTime > 0;
+                this.CompleatedLapsWhenHasNewLapDataWasLastTrue = compleatedLaps;
                 return true;
             }
             else
             {
                 this.LastLapTime = previousOpponentLastLapTime;
                 this.LastLapValid = previousOpponentLastLapValid;
+                this.CompleatedLapsWhenHasNewLapDataWasLastTrue = previousCompleatedLapsWhenHasNewLapDataWasLastTrue;
             }
             return false;
         }
