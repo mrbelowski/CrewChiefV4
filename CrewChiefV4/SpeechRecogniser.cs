@@ -425,58 +425,6 @@ namespace CrewChiefV4
 
                 validateAndAdd(START_PACE_NOTES_PLAYBACK, staticSpeechChoices);
                 validateAndAdd(STOP_PACE_NOTES_PLAYBACK, staticSpeechChoices);
-
-                Choices digitsChoices = new Choices();
-                GrammarBuilder digitValues = new GrammarBuilder();
-                digitValues.Culture = cultureInfo;
-                foreach (KeyValuePair<String, int> entry in numberToNumber)
-                {
-                    SemanticResultValue temp = new SemanticResultValue(entry.Key, entry.Value);
-                    digitsChoices.Add(temp);
-                    digitValues.Append(temp);
-                }
-                Choices houresChoices = new Choices();
-                GrammarBuilder houresValues = new GrammarBuilder();
-                houresValues.Culture = cultureInfo;
-                foreach (KeyValuePair<String, int> entry in hoursToNumber)
-                {
-                    SemanticResultValue temp = new SemanticResultValue(entry.Key, entry.Value);
-                    houresChoices.Add(temp);
-                    houresValues.Append(temp);
-                }
-
-                GrammarBuilder gb = new GrammarBuilder();
-                gb.Culture = cultureInfo;
-                Grammar g = null;
-
-                foreach (string s in CALCULATE_FUEL_FOR)
-                {
-                    foreach (String lapArray in LAP)
-                    {
-                        staticGrammarSize++;
-                        staticSpeechChoices.Add(s + " " + "one" + " " + lapArray);
-                    }
-                    foreach (String minuteArray in MINUTE)
-                    {
-                        staticGrammarSize++;
-                        staticSpeechChoices.Add(s + " " + "one" + " " + minuteArray);
-                    }
-                    foreach (String hourArray in HOUR)
-                    {
-                        staticGrammarSize++;
-                        staticSpeechChoices.Add(s + " " + "one" + " " + hourArray);
-                    }
-                }
-
-                staticGrammarSize++;
-                addNumberMappingPhrase(CALCULATE_FUEL_FOR, digitsChoices, LAPS);
-                
-                staticGrammarSize++;
-                addNumberMappingPhrase(CALCULATE_FUEL_FOR, digitsChoices, MINUTES);
-                
-                staticGrammarSize++;
-                addNumberMappingPhrase(CALCULATE_FUEL_FOR, houresChoices, HOURS);
-
                 
                 validateAndAdd(KEEP_QUIET, staticSpeechChoices);
                 validateAndAdd(KEEP_ME_INFORMED, staticSpeechChoices);
@@ -505,6 +453,24 @@ namespace CrewChiefV4
                 validateAndAdd(WHATS_THE_AIR_TEMP, staticSpeechChoices);
                 validateAndAdd(WHATS_THE_TRACK_TEMP, staticSpeechChoices);
                 validateAndAdd(RADIO_CHECK, staticSpeechChoices);
+
+                //Choices that has a number associated
+                Choices digitsChoices = new Choices();
+                foreach (KeyValuePair<String, int> entry in numberToNumber)
+                {
+                    SemanticResultValue temp = new SemanticResultValue(entry.Key, entry.Value);
+                    digitsChoices.Add(temp);
+                }
+                Choices houresChoices = new Choices();
+                foreach (KeyValuePair<String, int> entry in hoursToNumber)
+                {
+                    SemanticResultValue temp = new SemanticResultValue(entry.Key, entry.Value);
+                    houresChoices.Add(temp);
+                }
+
+                addNumberMappingPhrase(CALCULATE_FUEL_FOR, digitsChoices, LAPS);
+                addNumberMappingPhrase(CALCULATE_FUEL_FOR, digitsChoices, MINUTES);
+                addNumberMappingPhrase(CALCULATE_FUEL_FOR, houresChoices, HOURS);
 
                 GrammarBuilder staticGrammarBuilder = new GrammarBuilder();
                 staticGrammarBuilder.Culture = cultureInfo;
@@ -661,31 +627,16 @@ namespace CrewChiefV4
             {
                 iRacingGrammarSize = 0;
                 Choices digitsChoices = new Choices();
-                GrammarBuilder digitValues = new GrammarBuilder();
-                digitValues.Culture = cultureInfo;
                 foreach (KeyValuePair<String, int> entry in bigNumberToNumber)
                 {
                     SemanticResultValue temp = new SemanticResultValue(entry.Key, entry.Value);
                     digitsChoices.Add(temp);
-                    digitValues.Append(temp);
                 }
-
-                iRacingGrammarSize++;
                 addNumberMappingPhrase(PIT_STOP_CHANGE_ALL_TYRES, digitsChoices);               
-                
-                iRacingGrammarSize++;
                 addNumberMappingPhrase(PIT_STOP_CHANGE_FRONT_LEFT_TYRE, digitsChoices);
-
-                iRacingGrammarSize++;
                 addNumberMappingPhrase(PIT_STOP_CHANGE_FRONT_RIGHT_TYRE, digitsChoices);
-
-                iRacingGrammarSize++;
                 addNumberMappingPhrase(PIT_STOP_CHANGE_REAR_LEFT_TYRE, digitsChoices);
-
-                iRacingGrammarSize++;
                 addNumberMappingPhrase(PIT_STOP_CHANGE_REAR_RIGHT_TYRE, digitsChoices);
-
-                iRacingGrammarSize++;
                 addNumberMappingPhrase(PIT_STOP_ADD, digitsChoices, LITERS);
                                 
                 Choices iRacingChoices = new Choices();                
