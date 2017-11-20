@@ -218,7 +218,7 @@ namespace CrewChiefV4.iRacing
             {
                 // In P or Q, set live position from result position (== best lap according to iRacing)
                 // In P or Q, set live position from result position (== best lap according to iRacing)
-                foreach (var driver in _drivers.OrderBy(d => d.CurrentResults.Position))
+                foreach (var driver in _drivers)
                 {
                     if(info.CarIdxPosition[driver.Id] > 0)
                     {
