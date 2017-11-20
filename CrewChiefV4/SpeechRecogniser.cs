@@ -160,6 +160,8 @@ namespace CrewChiefV4
 
         public static Dictionary<String[], int> racePositionNumberToNumber = getNumberMappings(1, 64);
 
+        private Choices digitsChoices;
+
         public static Boolean waitingForSpeech = false;
 
         public static Boolean gotRecognitionResult = false;
@@ -378,6 +380,14 @@ namespace CrewChiefV4
                 {
                     Console.WriteLine("Loading all voice command alternatives from speech_recognition_config.txt");
                 }
+                this.digitsChoices = new Choices();
+                foreach (KeyValuePair<String[], int> entry in numberToNumber)
+                {
+                    foreach (String numberStr in entry.Key)
+                    {
+                        digitsChoices.Add(numberStr);
+                    }
+                }
                 Choices staticSpeechChoices = new Choices();
                 validateAndAdd(HOWS_MY_TYRE_WEAR, staticSpeechChoices);
                 validateAndAdd(HOWS_MY_TRANSMISSION, staticSpeechChoices);
@@ -446,14 +456,6 @@ namespace CrewChiefV4
                 sre.LoadGrammar(staticGrammar);
 
                 // now the fuel choices
-                Choices digitsChoices = new Choices();
-                foreach (KeyValuePair<String[], int> entry in numberToNumber)
-                {
-                    foreach (String numberStr in entry.Key)
-                    {
-                        digitsChoices.Add(numberStr);
-                    }
-                }
                 List<string> fuelTimeChoices = new List<string>();
                 if (disable_alternative_voice_commands)
                 {
@@ -467,7 +469,7 @@ namespace CrewChiefV4
                     fuelTimeChoices.AddRange(MINUTES);
                     fuelTimeChoices.AddRange(HOURS);
                 }
-                addCompoundChoices(CALCULATE_FUEL_FOR, false, digitsChoices, fuelTimeChoices.ToArray(), true);
+                addCompoundChoices(CALCULATE_FUEL_FOR, false, this.digitsChoices, fuelTimeChoices.ToArray(), true);
             }
             catch (Exception e)
             {
@@ -591,14 +593,6 @@ namespace CrewChiefV4
         {
             try
             {
-                Choices digitsChoices = new Choices();
-                foreach (KeyValuePair<String[], int> entry in numberToNumber)
-                {
-                    foreach (String numberStr in entry.Key)
-                    {
-                        digitsChoices.Add(numberStr);
-                    }
-                }
                 List<string> tyrePressureChangePhrases = new List<string>();
                 if (disable_alternative_voice_commands)
                 {
@@ -617,8 +611,8 @@ namespace CrewChiefV4
                     tyrePressureChangePhrases.AddRange(PIT_STOP_CHANGE_REAR_RIGHT_TYRE);
                 }
 
-                addCompoundChoices(tyrePressureChangePhrases.ToArray(), true, digitsChoices, null, true);
-                addCompoundChoices(PIT_STOP_ADD, false, digitsChoices, LITERS, true);
+                addCompoundChoices(tyrePressureChangePhrases.ToArray(), true, this.digitsChoices, null, true);
+                addCompoundChoices(PIT_STOP_ADD, false, this.digitsChoices, LITERS, true);
 
                 Choices iRacingChoices = new Choices();
                 iRacingChoices.Add(PIT_STOP_TEAROFF);
