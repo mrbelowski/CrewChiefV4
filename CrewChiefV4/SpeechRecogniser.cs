@@ -460,15 +460,22 @@ namespace CrewChiefV4
                 {
                     digitsChoices.Add(entry.Key);
                 }
-                Choices houresChoices = new Choices();
-                foreach (KeyValuePair<String, int> entry in hoursToNumber)
-                {
-                    houresChoices.Add(entry.Key);
-                }
 
-                addNumberMappingPhrases(CALCULATE_FUEL_FOR, digitsChoices, LAPS);
-                addNumberMappingPhrases(CALCULATE_FUEL_FOR, digitsChoices, MINUTES);
-                addNumberMappingPhrases(CALCULATE_FUEL_FOR, houresChoices, HOURS);
+                Choices fuelChoices = new Choices();
+                fuelChoices.Add(CALCULATE_FUEL_FOR);
+                
+                Choices unitChoices = new Choices();
+                unitChoices.Add(LAPS);
+                unitChoices.Add(MINUTES);
+                unitChoices.Add(HOURS);
+                
+                GrammarBuilder gb = new GrammarBuilder(fuelChoices);
+                gb.Culture = cultureInfo;
+                gb.Append(digitsChoices);
+                gb.Append(unitChoices);
+                Grammar g = new Grammar(gb);
+                sre.LoadGrammar(g);
+
                 //i know this number is incorrect but still trying to figure out how to handle it correctly.
                 staticGrammarSize += 3;
 
@@ -657,12 +664,15 @@ namespace CrewChiefV4
                 {
                     digitsChoices.Add(entry.Key);
                 }
+
+
                 addNumberMappingPhrases(PIT_STOP_CHANGE_ALL_TYRES, digitsChoices);               
                 addNumberMappingPhrases(PIT_STOP_CHANGE_FRONT_LEFT_TYRE, digitsChoices);
                 addNumberMappingPhrases(PIT_STOP_CHANGE_FRONT_RIGHT_TYRE, digitsChoices);
                 addNumberMappingPhrases(PIT_STOP_CHANGE_REAR_LEFT_TYRE, digitsChoices);
                 addNumberMappingPhrases(PIT_STOP_CHANGE_REAR_RIGHT_TYRE, digitsChoices);
                 addNumberMappingPhrases(PIT_STOP_ADD, digitsChoices, LITERS);
+
                 //i know this number is incorrect but still trying to figure out how to handle it correctly.
                 iRacingGrammarSize += 6;                 
                 Choices iRacingChoices = new Choices();                
