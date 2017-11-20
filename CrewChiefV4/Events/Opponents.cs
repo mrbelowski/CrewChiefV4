@@ -506,7 +506,7 @@ namespace CrewChiefV4.Events
                         }
                     }  
                 } 
-                else if (voiceMessage.StartsWith(SpeechRecogniser.WHERE_IS))
+                else if (voiceMessage.StartsWith(SpeechRecogniser.WHERE_IS) || voiceMessage.StartsWith(SpeechRecogniser.WHERES))
                 {
                     Tuple<string, Boolean> response = getOpponentKey(voiceMessage, "");
                     string opponentKey = response.Item1;
