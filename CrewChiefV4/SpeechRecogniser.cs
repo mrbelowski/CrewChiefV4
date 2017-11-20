@@ -448,37 +448,33 @@ namespace CrewChiefV4
                 validateAndAdd(WHATS_THE_TRACK_TEMP, staticSpeechChoices);
                 validateAndAdd(RADIO_CHECK, staticSpeechChoices);
 
-                //Choices that has a number associated
-                Choices digitsChoices = new Choices();
-                foreach (KeyValuePair<String, int> entry in numberToNumber)
-                {
-                    digitsChoices.Add(entry.Key);
-                }
-
-                Choices fuelChoices = new Choices();
-                fuelChoices.Add(CALCULATE_FUEL_FOR);
-                
-                Choices unitChoices = new Choices();
-                unitChoices.Add(LAPS);
-                unitChoices.Add(MINUTES);
-                unitChoices.Add(HOURS);
-                
-                GrammarBuilder gb = new GrammarBuilder(fuelChoices);
-                gb.Culture = cultureInfo;
-                gb.Append(digitsChoices);
-                gb.Append(unitChoices);
-                Grammar g = new Grammar(gb);
-                sre.LoadGrammar(g);
-
-                //i know this number is incorrect but still trying to figure out how to handle it correctly.
-                staticGrammarSize += 3;
-
                 GrammarBuilder staticGrammarBuilder = new GrammarBuilder();
                 staticGrammarBuilder.Culture = cultureInfo;
                 staticGrammarBuilder.Append(staticSpeechChoices);
                 Grammar staticGrammar = new Grammar(staticGrammarBuilder);
                 sre.LoadGrammar(staticGrammar);
                 Console.WriteLine("Loaded " + staticGrammarSize + " items into static grammar");
+
+                // now the fuel choices
+                Choices digitsChoices = new Choices();
+                foreach (KeyValuePair<String, int> entry in numberToNumber)
+                {
+                    digitsChoices.Add(entry.Key);
+                }
+                List<string> fuelTimeChoices = new List<string>();
+                if (disable_alternative_voice_commands)
+                {
+                    fuelTimeChoices.Add(LAPS[0]);
+                    fuelTimeChoices.Add(MINUTES[0]);
+                    fuelTimeChoices.Add(HOURS[0]);
+                }
+                else
+                {
+                    fuelTimeChoices.AddRange(LAPS);
+                    fuelTimeChoices.AddRange(MINUTES);
+                    fuelTimeChoices.AddRange(HOURS);
+                }
+                addCompoundChoices(CALCULATE_FUEL_FOR, false, digitsChoices, fuelTimeChoices.ToArray(), true);
             }
             catch (Exception e)
             {
