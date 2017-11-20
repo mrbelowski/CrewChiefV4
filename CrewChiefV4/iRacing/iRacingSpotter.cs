@@ -56,8 +56,11 @@ namespace CrewChiefV4.iRacing
 
         public void trigger(Object lastStateObj, Object currentStateObj, GameStateData currentGameState)
         {
-            int currentState = (int)currentStateObj;
-            internalSpotter.triggerInternal((int)currentState);
+            if(enabled)
+            {
+                int currentState = (int)currentStateObj;
+                internalSpotter.triggerInternal((int)currentState);
+            }
             return;
         }
 
