@@ -217,6 +217,11 @@ namespace CrewChiefV4
             return dict;
         }
 
+        // if alwaysUseAllPhrases is true, we add all the phrase options to the recogniser even if the disable_alternative_voice_commands option is true.
+        // If alwaysUseAllAppends is true we do the same thing with the append options.
+        //
+        // The generatedGrammars are loaded by this method call, they're only returned to allow us to detect which grammar has been triggered - the
+        // opponent grammar processing stuff needs this.
         private List<Grammar> addCompoundChoices(String[] phrases, Boolean alwaysUseAllPhrases, Choices choices, String[] append, Boolean alwaysUseAllAppends)
         {
             List<Grammar> generatedGrammars = new List<Grammar>();
