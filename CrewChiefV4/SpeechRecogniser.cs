@@ -237,7 +237,7 @@ namespace CrewChiefV4
                         GrammarBuilder gb = new GrammarBuilder();
                         gb.Culture = cultureInfo;
                         gb.Append(s);
-                        gb.Append(new SemanticResultKey(s, choices));
+                        gb.Append(choices);
                         gb.Append(sa);
                         Grammar g = new Grammar(gb);
                         sre.LoadGrammar(g);
@@ -248,7 +248,7 @@ namespace CrewChiefV4
                     GrammarBuilder gb = new GrammarBuilder();
                     gb.Culture = cultureInfo;
                     gb.Append(s);
-                    gb.Append(new SemanticResultKey(s, choices));
+                    gb.Append(choices);
                     Grammar g = new Grammar(gb);
                     sre.LoadGrammar(g);
                 }
@@ -263,7 +263,7 @@ namespace CrewChiefV4
             GrammarBuilder gb = new GrammarBuilder();
             gb.Culture = cultureInfo;
             gb.Append(phrase);
-            gb.Append(new SemanticResultKey(phrase, choices));
+            gb.Append(choices);
             if(append != null)
             {
                 gb.Append(append);
@@ -458,14 +458,12 @@ namespace CrewChiefV4
                 Choices digitsChoices = new Choices();
                 foreach (KeyValuePair<String, int> entry in numberToNumber)
                 {
-                    SemanticResultValue temp = new SemanticResultValue(entry.Key, entry.Value);
-                    digitsChoices.Add(temp);
+                    digitsChoices.Add(entry.Key);
                 }
                 Choices houresChoices = new Choices();
                 foreach (KeyValuePair<String, int> entry in hoursToNumber)
                 {
-                    SemanticResultValue temp = new SemanticResultValue(entry.Key, entry.Value);
-                    houresChoices.Add(temp);
+                    houresChoices.Add(entry.Key);
                 }
 
                 addNumberMappingPhrases(CALCULATE_FUEL_FOR, digitsChoices, LAPS);
@@ -570,14 +568,12 @@ namespace CrewChiefV4
             Choices possessiveDigitsChoices = new Choices();
             foreach (KeyValuePair<String, int> entry in opponentNumberToNumber)
             {
-                SemanticResultValue temp = new SemanticResultValue(entry.Key + POSSESSIVE, entry.Value);
-                possessiveDigitsChoices.Add(temp);
+                possessiveDigitsChoices.Add(entry.Key + POSSESSIVE);
             }
             Choices digitsChoices = new Choices();
             foreach (KeyValuePair<String, int> entry in opponentNumberToNumber)
             {
-                SemanticResultValue temp = new SemanticResultValue(entry.Key, entry.Value);
-                digitsChoices.Add(temp);
+                digitsChoices.Add(entry.Key);
             }
 
             addOpponentNumberMappingPhrase(WHATS + " " + POSITION_LONG, possessiveDigitsChoices, LAST_LAP);
@@ -659,8 +655,7 @@ namespace CrewChiefV4
                 Choices digitsChoices = new Choices();
                 foreach (KeyValuePair<String, int> entry in bigNumberToNumber)
                 {
-                    SemanticResultValue temp = new SemanticResultValue(entry.Key, entry.Value);
-                    digitsChoices.Add(temp);
+                    digitsChoices.Add(entry.Key);
                 }
                 addNumberMappingPhrases(PIT_STOP_CHANGE_ALL_TYRES, digitsChoices);               
                 addNumberMappingPhrases(PIT_STOP_CHANGE_FRONT_LEFT_TYRE, digitsChoices);
