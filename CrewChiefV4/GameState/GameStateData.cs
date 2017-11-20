@@ -988,9 +988,9 @@ namespace CrewChiefV4.GameState
         public DateTime NewLapDataTimerExpiry = DateTime.MaxValue;
         public Boolean WaitingForNewLapData = false;
 
-        public int CompleatedLapsWhenHasNewLapDataWasLastTrue = -1;
+        public int CompleatedLapsWhenHasNewLapDataWasLastTrue = -2;
 
-        public bool HasNewLapData(float gameProvidedLastLapTime, bool hasCrossedSFLine, int compleatedLaps, Boolean previousOpponentDataWaitingForNewLapData,
+        public bool HasNewLapData(float gameProvidedLastLapTime, bool hasCrossedSFLine, int compleatedLaps, Boolean isRace, Boolean previousOpponentDataWaitingForNewLapData,
             DateTime previousOpponentNewLapDataTimerExpiry, float previousOpponentLastLapTime, Boolean previousOpponentLastLapValid, int previousCompleatedLapsWhenHasNewLapDataWasLastTrue)
         {
             // here we need to make sure that CompleatedLaps is bigger then CompleatedLapsWhenHasNewLapDataWasLastTrue

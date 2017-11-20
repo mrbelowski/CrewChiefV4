@@ -597,7 +597,7 @@ namespace CrewChiefV4.iRacing
                         bool previousIsApporchingPits = false;
                         Boolean previousOpponentDataWaitingForNewLapData = false;
                         DateTime previousOpponentNewLapDataTimerExpiry = DateTime.MaxValue;
-                        int previousCompleatedLapsWhenHasNewLapDataWasLastTrue = 0;
+                        int previousCompleatedLapsWhenHasNewLapDataWasLastTrue = -2;
                         float previousOpponentLastLapTime = -1;
                         Boolean previousOpponentLastLapValid = false;
 
@@ -962,7 +962,7 @@ namespace CrewChiefV4.iRacing
                 opponentData.NumPitStops++;
             }
             opponentData.InPits = isInPits;
-            bool hasNewLapData = opponentData.HasNewLapData(completedLapTime, hasCrossedSFLine,completedLaps, previousOpponentDataWaitingForNewLapData, previousOpponentNewLapDataTimerExpiry, previousOpponentLastLapTime, previousOpponentLastLapValid, previousCompleatedLapsWhenHasNewLapDataWasLastTrue);
+            bool hasNewLapData = opponentData.HasNewLapData(completedLapTime, hasCrossedSFLine,completedLaps, isRace, previousOpponentDataWaitingForNewLapData, previousOpponentNewLapDataTimerExpiry, previousOpponentLastLapTime, previousOpponentLastLapValid, previousCompleatedLapsWhenHasNewLapDataWasLastTrue);
             
             if (hasNewLapData)
             {
