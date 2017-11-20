@@ -141,6 +141,24 @@ The app understands lots of command including:
 "Session status / race status" : give an overview of the session - time left, position, gaps, pitstop status etc
 "Full update / full status / update me" : damage report, car status and session status combined
 "What's the time / what time is it" : read the current (clock) time
+"pitstop add [X liters]" (adds X amount of fuel next pitstop, this option is iRacing only)
+"pitstop tearoff / pitstop windscreen" (enable next pitstop, this option is iRacing only)
+"pitstop fast repair / pitstop repair" (enable fast repair next pitstop, this option is iRacing only)
+"pitstop clear all" (clears all selected pitstop options, this option is iRacing only)
+"pitstop clear tyres (clears all tyre selections" next pitstop, this option is iRacing only)
+"pitstop clear tearoff / pitstop clear windscreen" (clears tearoff selection next pitstop, this option is iRacing only)
+"pitstop clear fast repair" (clears fast repair selection next pitstop, this option is iRacing only)
+"pitstop clear fuel" (clears fuel refueling next pitstop, this option is iRacing only)
+"pitstop change all tyres" (change all tyres next pitstop, this option is iRacing only)
+"pitstop change left front tyre" (change left front tyre next pitstop, this option is iRacing only)
+"pitstop change right front tyre" (change right front tyre next pitstop, this option is iRacing only)
+"pitstop change left rear tyre" (change left rear tyre next pitstop, this option is iRacing only)
+"pitstop change right rear tyre" (change right rear tyre next pitstop, this option is iRacing only)
+"pitstop change tyres pressure [ new value ]" (change right rear tyre pressure next pitstop, this option is iRacing only)
+"pitstop change left front tyre pressure [ new value ]" (change left front tyre next pressure pitstop, this option is iRacing only)
+"pitstop change right front tyre pressure [ new value ]" (change right front tyre pressure next pitstop, this option is iRacing only)
+"pitstop change left rear tyre pressure [ new value ]" (change left rear tyre pressure next pitstop, this option is iRacing only)
+"pitstop change right rear tyre pressure [ new value ]" (change right rear tyre pressure next pitstop, this option is iRacing only)
 
 
 
