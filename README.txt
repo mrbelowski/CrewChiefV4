@@ -330,6 +330,24 @@ I've not finished implementing this but currently the app understands and respon
 "Where should I attack / where am I faster / where can I attack": If the app has enough data, will report the corner name where you're gaining the most time on the guy in front
 "Where should I defend / where am I slower / where is he faster / where will he attack": If the app has enough data, will report the corner name where you're losing the most time to the guy behind
 "Read corner names / corner names / tell me the corner names": read out each corner name when you hit the mid-point of the corner, for this lap only (useful to test corner name mappings)
+"pitstop add [X liters]" (adds X amount of fuel next pitstop, this option is iRacing only)
+"pitstop tearoff / pitstop windscreen" (enable next pitstop, this option is iRacing only)
+"pitstop fast repair / pitstop repair" (enable fast repair next pitstop, this option is iRacing only)
+"pitstop clear all" (clears all selected pitstop options, this option is iRacing only)
+"pitstop clear tyres (clears all tyre selections" next pitstop, this option is iRacing only)
+"pitstop clear tearoff / pitstop clear windscreen" (clears tearoff selection next pitstop, this option is iRacing only)
+"pitstop clear fast repair" (clears fast repair selection next pitstop, this option is iRacing only)
+"pitstop clear fuel" (clears fuel refueling next pitstop, this option is iRacing only)
+"pitstop change all tyres" (change all tyres next pitstop, this option is iRacing only)
+"pitstop change left front tyre" (change left front tyre next pitstop, this option is iRacing only)
+"pitstop change right front tyre" (change right front tyre next pitstop, this option is iRacing only)
+"pitstop change left rear tyre" (change left rear tyre next pitstop, this option is iRacing only)
+"pitstop change right rear tyre" (change right rear tyre next pitstop, this option is iRacing only)
+"pitstop change tyres pressure [ new value ]" (change right rear tyre pressure next pitstop, this option is iRacing only)
+"pitstop change left front tyre pressure [ new value ]" (change left front tyre next pressure pitstop, this option is iRacing only)
+"pitstop change right front tyre pressure [ new value ]" (change right front tyre pressure next pitstop, this option is iRacing only)
+"pitstop change left rear tyre pressure [ new value ]" (change left rear tyre pressure next pitstop, this option is iRacing only)
+"pitstop change right rear tyre pressure [ new value ]" (change right rear tyre pressure next pitstop, this option is iRacing only)
 
 
 Speech recognition customisation
