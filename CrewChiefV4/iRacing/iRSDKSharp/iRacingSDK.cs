@@ -27,7 +27,10 @@ namespace iRSDKSharp
         LR = 5,
         RR = 6,
         ClearTires = 7,
-        FastRepair = 8
+        FastRepair = 8,
+        ClearWS = 9,
+        ClearFR = 10,
+        ClearFuel = 11
     };
 
     public enum TelemCommandModeTypes { Stop = 0, Start, Restart };
@@ -222,17 +225,17 @@ namespace iRSDKSharp
         {
             return RegisterWindowMessage(Defines.PadCarNumName);
         }
-        IntPtr GetBroadcastMessageID()
+        static IntPtr GetBroadcastMessageID()
         {
             return RegisterWindowMessage(Defines.BroadcastMessageName);
         }
 
-        public void BroadcastMessage(BroadcastMessageTypes msg, int var1, int var2, int var3)
+        public static void BroadcastMessage(BroadcastMessageTypes msg, int var1, int var2, int var3)
         {
             BroadcastMessage(msg, var1, MakeLong((short)var2, (short)var3));
         }
 
-        public int BroadcastMessage(BroadcastMessageTypes msg, int var1, int var2)
+        public static int BroadcastMessage(BroadcastMessageTypes msg, int var1, int var2)
         {
             IntPtr msgId = GetBroadcastMessageID();
             IntPtr hwndBroadcast = IntPtr.Add(IntPtr.Zero, 0xffff);
@@ -250,7 +253,7 @@ namespace iRSDKSharp
         [DllImport("user32.dll")]
         private static extern IntPtr PostMessage(IntPtr hWnd, int Msg, int wParam, int lParam);
 
-        public int MakeLong(short lowPart, short highPart)
+        public static int MakeLong(short lowPart, short highPart)
         {
             return (int)(((ushort)lowPart) | (uint)(highPart << 16));
         }
