@@ -190,16 +190,33 @@ namespace CrewChiefV4.Audio
                 playbackDevices.Clear();
                 for (int deviceId = 0; deviceId < NAudio.Wave.WaveOut.DeviceCount; deviceId++)
                 {
+                    // the audio device stuff makes no guarantee as to the presence of sensible device and product guids,
+                    // so we have to do the best we can here
                     NAudio.Wave.WaveOutCapabilities capabilities = NAudio.Wave.WaveOut.GetCapabilities(deviceId);
+                    Boolean hasNameGuid = capabilities.NameGuid != null && !capabilities.NameGuid.Equals(Guid.Empty);
+                    Boolean hasProductGuid = capabilities.ProductGuid != null && !capabilities.ProductGuid.Equals(Guid.Empty);
                     String rawName = capabilities.ProductName;
-                    String name = rawName;
+                    String name = rawName;                    
                     int nameAddition = 0;
                     while (playbackDevices.Keys.Contains(name))
                     {
                         nameAddition++;
                         name = rawName += "(" + nameAddition + ")";
                     }
-                    playbackDevices.Add(name, new Tuple<string, int>(capabilities.ProductGuid.ToString(), deviceId));
+                    String guidToUse;
+                    if (hasNameGuid)
+                    {
+                        guidToUse = capabilities.NameGuid.ToString();
+                    }
+                    else if (hasProductGuid)
+                    {
+                        guidToUse = capabilities.ProductGuid.ToString() + "_" + name;
+                    }
+                    else
+                    {
+                        guidToUse = name;
+                    }
+                    playbackDevices.Add(name, new Tuple<string, int>(guidToUse, deviceId));
                 }
             }
         }
