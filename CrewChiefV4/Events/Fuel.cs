@@ -509,15 +509,7 @@ namespace CrewChiefV4.Events
             Boolean haveData = false;
             if (fuelUseActive && averageUsagePerMinute > 0)
             {
-                int timeToUse = 0;
-                if(hours > 0)
-                {
-                    timeToUse = hours * 60;
-                }
-                else
-                {
-                    timeToUse = minutes;
-                }   
+                int  timeToUse = (hours * 60) + minutes;
                 // round up
                 float totalUsage = ((float)Math.Ceiling(averageUsagePerMinute * timeToUse));
                 if (totalUsage > 0)

@@ -120,6 +120,7 @@
     <Compile Include="Events\FrozenOrderMonitor.cs" />
     <Compile Include="Events\OvertakingAidsMonitor.cs" />
     <Compile Include="Events\ConditionsMonitor.cs" />
+    <Compile Include="Events\IRacingBroadcastMessageEvent.cs" />
     <Compile Include="Events\SessionEndMessages.cs" />
     <Compile Include="Events\Opponents.cs" />
     <Compile Include="Events\FlagsMonitor.cs" />
