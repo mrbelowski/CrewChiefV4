@@ -47,12 +47,15 @@ namespace CrewChiefV4.Events
             if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PIT_STOP_ADD))
             {
                 int amount = 0;
-                foreach (KeyValuePair<String, int> entry in SpeechRecogniser.bigNumberToNumber)
+                foreach (KeyValuePair<String[], int> entry in SpeechRecogniser.numberToNumber)
                 {
-                    if (voiceMessage.Contains(" " + entry.Key + " "))
+                    foreach (String numberStr in entry.Key)
                     {
-                        amount = entry.Value;
-                        break;
+                        if (voiceMessage.Contains(" " + numberStr + " "))
+                        {
+                            amount = entry.Value;
+                            break;
+                        }
                     }
                 }
                 if (amount == 0)
@@ -116,12 +119,15 @@ namespace CrewChiefV4.Events
                 SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PIT_STOP_CHANGE_REAR_RIGHT_TYRE))
             {
                 int amount = 0;
-                foreach (KeyValuePair<String, int> entry in SpeechRecogniser.bigNumberToNumber)
+                foreach (KeyValuePair<String[], int> entry in SpeechRecogniser.numberToNumber)
                 {
-                    if (voiceMessage.Contains(" " + entry.Key))
+                    foreach (String numberStr in entry.Key)
                     {
-                        amount = entry.Value;
-                        break;
+                        if (voiceMessage.Contains(" " + numberStr + " "))
+                        {
+                            amount = entry.Value;
+                            break;
+                        }
                     }
                 }
                 if(amount != 0)

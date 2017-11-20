@@ -156,13 +156,9 @@ namespace CrewChiefV4
         
         private System.Globalization.CultureInfo cultureInfo;
 
-        public static Dictionary<String, int> numberToNumber = getNumberMappings(1, 90);
+        public static Dictionary<String[], int> numberToNumber = getNumberMappings(1, 199);
 
-        public static Dictionary<String, int> bigNumberToNumber = getNumberMappings(1, 199);
-
-        public static Dictionary<String, int> hoursToNumber = getNumberMappings(1, 24);
-
-        public static Dictionary<String, int> opponentNumberToNumber = getNumberMappings(1, 64);
+        public static Dictionary<String[], int> racePositionNumberToNumber = getNumberMappings(1, 64);
 
         public static Boolean waitingForSpeech = false;
 
@@ -171,8 +167,6 @@ namespace CrewChiefV4
         // guard against race condition between closing channel and sre_SpeechRecognised event completing
         public static Boolean keepRecognisingInHoldMode = false;
 
-        private int staticGrammarSize = 0;
-        private int iRacingGrammarSize = 0;
         // load voice commands for triggering keyboard macros. The String key of the input Dictionary is the
         // command list key in speech_recognition_config.txt. When one of these phrases is heard the map value
         // CommandMacro is executed.
@@ -207,12 +201,12 @@ namespace CrewChiefV4
             Console.WriteLine("Loaded " + voiceTriggeredMacros.Count + " macro voice triggers into the speech recogniser");
         }
 
-        private static Dictionary<String, int> getNumberMappings(int start, int end)
+        private static Dictionary<String[], int> getNumberMappings(int start, int end)
         {
-            Dictionary<String, int> dict = new Dictionary<string, int>();
+            Dictionary<String[], int> dict = new Dictionary<string[], int>();
             for (int i = start; i <= end; i++)
             {
-                dict.Add(Configuration.getSpeechRecognitionConfigOption(i.ToString()), i);
+                dict.Add(Configuration.getSpeechRecognitionPhrases(i.ToString()), i);
             }
             return dict;
         }
@@ -318,12 +312,10 @@ namespace CrewChiefV4
                 {
                     if (disable_alternative_voice_commands)
                     {
-                        staticGrammarSize++;
                         choices.Add(speechPhrases[0]);
                     }
                     else
                     {
-                        staticGrammarSize+=speechPhrases.Length;
                         choices.Add(speechPhrases);
                     }                    
                 }
@@ -386,7 +378,6 @@ namespace CrewChiefV4
                 {
                     Console.WriteLine("Loading all voice command alternatives from speech_recognition_config.txt");
                 }
-                staticGrammarSize = 0;
                 Choices staticSpeechChoices = new Choices();
                 validateAndAdd(HOWS_MY_TYRE_WEAR, staticSpeechChoices);
                 validateAndAdd(HOWS_MY_TRANSMISSION, staticSpeechChoices);
@@ -453,13 +444,15 @@ namespace CrewChiefV4
                 staticGrammarBuilder.Append(staticSpeechChoices);
                 Grammar staticGrammar = new Grammar(staticGrammarBuilder);
                 sre.LoadGrammar(staticGrammar);
-                Console.WriteLine("Loaded " + staticGrammarSize + " items into static grammar");
 
                 // now the fuel choices
                 Choices digitsChoices = new Choices();
-                foreach (KeyValuePair<String, int> entry in numberToNumber)
+                foreach (KeyValuePair<String[], int> entry in numberToNumber)
                 {
-                    digitsChoices.Add(entry.Key);
+                    foreach (String numberStr in entry.Key)
+                    {
+                        digitsChoices.Add(numberStr);
+                    }
                 }
                 List<string> fuelTimeChoices = new List<string>();
                 if (disable_alternative_voice_commands)
@@ -555,14 +548,17 @@ namespace CrewChiefV4
                 }
             }
 
-            foreach (KeyValuePair<String, int> entry in opponentNumberToNumber)
+            foreach (KeyValuePair<String[], int> entry in racePositionNumberToNumber)
             {
-                opponentNameOrPositionChoices.Add(POSITION_LONG + " " + entry.Key);
-                opponentNameOrPositionChoices.Add(POSITION_SHORT + " " + entry.Key);
-                opponentPositionChoices.Add(POSITION_LONG + " " + entry.Key);
-                opponentPositionChoices.Add(POSITION_SHORT + " " + entry.Key);
-                opponentNameOrPositionPossessiveChoices.Add(POSITION_LONG + " " + entry.Key + POSSESSIVE);
-                opponentNameOrPositionPossessiveChoices.Add(POSITION_SHORT + " " + entry.Key + POSSESSIVE);
+                foreach (String numberStr in entry.Key)
+                {
+                    opponentNameOrPositionChoices.Add(POSITION_LONG + " " + numberStr);
+                    opponentNameOrPositionChoices.Add(POSITION_SHORT + " " + numberStr);
+                    opponentPositionChoices.Add(POSITION_LONG + " " + numberStr);
+                    opponentPositionChoices.Add(POSITION_SHORT + " " + numberStr);
+                    opponentNameOrPositionPossessiveChoices.Add(POSITION_LONG + " " + numberStr + POSSESSIVE);
+                    opponentNameOrPositionPossessiveChoices.Add(POSITION_SHORT + " " + numberStr + POSSESSIVE);
+                }
             }
             opponentNameOrPositionChoices.Add(THE_GUY_AHEAD);
             opponentNameOrPositionChoices.Add(THE_CAR_AHEAD);
@@ -595,11 +591,13 @@ namespace CrewChiefV4
         {
             try
             {
-                iRacingGrammarSize = 0;
                 Choices digitsChoices = new Choices();
-                foreach (KeyValuePair<String, int> entry in bigNumberToNumber)
+                foreach (KeyValuePair<String[], int> entry in numberToNumber)
                 {
-                    digitsChoices.Add(entry.Key);
+                    foreach (String numberStr in entry.Key)
+                    {
+                        digitsChoices.Add(numberStr);
+                    }
                 }
                 List<string> tyrePressureChangePhrases = new List<string>();
                 if (disable_alternative_voice_commands)
@@ -622,8 +620,6 @@ namespace CrewChiefV4
                 addCompoundChoices(tyrePressureChangePhrases.ToArray(), true, digitsChoices, null, true);
                 addCompoundChoices(PIT_STOP_ADD, false, digitsChoices, LITERS, true);
 
-                //i know this number is incorrect but still trying to figure out how to handle it correctly.
-                iRacingGrammarSize += 6;                 
                 Choices iRacingChoices = new Choices();
                 iRacingChoices.Add(PIT_STOP_TEAROFF);
                 iRacingChoices.Add(PIT_STOP_FAST_REPAIR);
@@ -639,13 +635,11 @@ namespace CrewChiefV4
                 iRacingChoices.Add(PIT_STOP_CHANGE_REAR_LEFT_TYRE);
                 iRacingChoices.Add(PIT_STOP_CHANGE_REAR_RIGHT_TYRE);
 
-                iRacingGrammarSize += 12;                                             
              
                 GrammarBuilder iRacingGrammarBuilder = new GrammarBuilder(iRacingChoices);
                 iRacingGrammarBuilder.Culture = cultureInfo;
                 Grammar iRacingGrammar = new Grammar(iRacingGrammarBuilder);
                 sre.LoadGrammar(iRacingGrammar);
-                Console.WriteLine("Loaded " + iRacingGrammarSize + " items into iRacing grammar");
             }
             catch (Exception e)
             {

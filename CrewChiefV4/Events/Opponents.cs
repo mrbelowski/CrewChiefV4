@@ -394,22 +394,25 @@ namespace CrewChiefV4.Events
             else if (voiceMessage.Contains(SpeechRecogniser.POSITION_LONG) || voiceMessage.Contains(SpeechRecogniser.POSITION_SHORT))
             {
                 int position = 0;
-                foreach (KeyValuePair<String, int> entry in SpeechRecogniser.numberToNumber)
+                foreach (KeyValuePair<String[], int> entry in SpeechRecogniser.racePositionNumberToNumber)
                 {
-                    if (expectedNumberSuffix.Length > 0)
+                    foreach (String numberStr in entry.Key)
                     {
-                        if (voiceMessage.Contains(" " + entry.Key + expectedNumberSuffix))
+                        if (expectedNumberSuffix.Length > 0)
                         {
-                            position = entry.Value;
-                            break;
+                            if (voiceMessage.Contains(" " + numberStr + expectedNumberSuffix))
+                            {
+                                position = entry.Value;
+                                break;
+                            }
                         }
-                    }
-                    else
-                    {
-                        if (voiceMessage.EndsWith(" " + entry.Key))
+                        else
                         {
-                            position = entry.Value;
-                            break;
+                            if (voiceMessage.EndsWith(" " + numberStr))
+                            {
+                                position = entry.Value;
+                                break;
+                            }
                         }
                     }
                 }
