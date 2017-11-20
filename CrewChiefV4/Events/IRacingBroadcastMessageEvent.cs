@@ -124,7 +124,7 @@ namespace CrewChiefV4.Events
                 {
                     foreach (String numberStr in entry.Key)
                     {
-                        if (voiceMessage.Contains(" " + numberStr + " "))
+                        if (voiceMessage.Contains(" " + numberStr))
                         {
                             amount = entry.Value;
                             break;
