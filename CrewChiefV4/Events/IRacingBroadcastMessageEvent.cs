@@ -133,7 +133,6 @@ namespace CrewChiefV4.Events
                 }
                 if (amount == 0)
                 {
-                    Console.WriteLine("amount " + amount + " message " + voiceMessage);
                     audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderDidntUnderstand, 0, null));
                     return;
                 }
