@@ -124,6 +124,7 @@ namespace CrewChiefV4
         public static String[] START_PACE_NOTES_PLAYBACK = Configuration.getSpeechRecognitionPhrases("START_PACE_NOTES_PLAYBACK");
         public static String[] STOP_PACE_NOTES_PLAYBACK = Configuration.getSpeechRecognitionPhrases("STOP_PACE_NOTES_PLAYBACK");
 
+        public static String[] PIT_STOP = Configuration.getSpeechRecognitionPhrases("PIT_STOP");
         public static String[] PIT_STOP_ADD = Configuration.getSpeechRecognitionPhrases("PIT_STOP_ADD");
         public static String[] LITERS = Configuration.getSpeechRecognitionPhrases("LITERS");
         public static String[] PIT_STOP_TEAROFF = Configuration.getSpeechRecognitionPhrases("PIT_STOP_TEAROFF");
@@ -139,6 +140,12 @@ namespace CrewChiefV4
         public static String[] PIT_STOP_CHANGE_FRONT_RIGHT_TYRE = Configuration.getSpeechRecognitionPhrases("PIT_STOP_CHANGE_FRONT_RIGHT_TYRE");
         public static String[] PIT_STOP_CHANGE_REAR_LEFT_TYRE = Configuration.getSpeechRecognitionPhrases("PIT_STOP_CHANGE_REAR_LEFT_TYRE");
         public static String[] PIT_STOP_CHANGE_REAR_RIGHT_TYRE = Configuration.getSpeechRecognitionPhrases("PIT_STOP_CHANGE_REAR_RIGHT_TYRE");
+
+        public static String[] PIT_STOP_CHANGE_TYRE_PRESSURE = Configuration.getSpeechRecognitionPhrases("PIT_STOP_CHANGE_TYRE_PRESSURE");
+        public static String[] PIT_STOP_CHANGE_FRONT_LEFT_TYRE_PRESSURE = Configuration.getSpeechRecognitionPhrases("PIT_STOP_CHANGE_FRONT_LEFT_TYRE_PRESSURE");
+        public static String[] PIT_STOP_CHANGE_FRONT_RIGHT_TYRE_PRESSURE = Configuration.getSpeechRecognitionPhrases("PIT_STOP_CHANGE_FRONT_RIGHT_TYRE_PRESSURE");
+        public static String[] PIT_STOP_CHANGE_REAR_LEFT_TYRE_PRESSURE = Configuration.getSpeechRecognitionPhrases("PIT_STOP_CHANGE_REAR_LEFT_TYRE_PRESSURE");
+        public static String[] PIT_STOP_CHANGE_REAR_RIGHT_TYRE_PRESSURE = Configuration.getSpeechRecognitionPhrases("PIT_STOP_CHANGE_REAR_RIGHT_TYRE_PRESSURE");
 
         private CrewChief crewChief;
 
@@ -156,13 +163,11 @@ namespace CrewChiefV4
         
         private System.Globalization.CultureInfo cultureInfo;
 
-        public static Dictionary<String, int> numberToNumber = getNumberMappings(1, 90);
+        public static Dictionary<String[], int> numberToNumber = getNumberMappings(1, 199);
 
-        public static Dictionary<String, int> bigNumberToNumber = getNumberMappings(1, 199);
+        public static Dictionary<String[], int> racePositionNumberToNumber = getNumberMappings(1, 64);
 
-        public static Dictionary<String, int> hoursToNumber = getNumberMappings(1, 24);
-
-        public static Dictionary<String, int> opponentNumberToNumber = getNumberMappings(1, 64);
+        private Choices digitsChoices;
 
         public static Boolean waitingForSpeech = false;
 
@@ -171,9 +176,6 @@ namespace CrewChiefV4
         // guard against race condition between closing channel and sre_SpeechRecognised event completing
         public static Boolean keepRecognisingInHoldMode = false;
 
-        private int staticGrammarSize = 0;
-        private int dynamicGrammarSize = 0;
-        private int iRacingGrammarSize = 0;
         // load voice commands for triggering keyboard macros. The String key of the input Dictionary is the
         // command list key in speech_recognition_config.txt. When one of these phrases is heard the map value
         // CommandMacro is executed.
@@ -208,70 +210,65 @@ namespace CrewChiefV4
             Console.WriteLine("Loaded " + voiceTriggeredMacros.Count + " macro voice triggers into the speech recogniser");
         }
 
-        private static Dictionary<String, int> getNumberMappings(int start, int end)
+        private static Dictionary<String[], int> getNumberMappings(int start, int end)
         {
-            Dictionary<String, int> dict = new Dictionary<string, int>();
+            Dictionary<String[], int> dict = new Dictionary<string[], int>();
             for (int i = start; i <= end; i++)
             {
-                dict.Add(Configuration.getSpeechRecognitionConfigOption(i.ToString()), i);
+                dict.Add(Configuration.getSpeechRecognitionPhrases(i.ToString()), i);
             }
             return dict;
         }
 
-        private void addNumberMappingPhrases(String[] phrases, Choices choices, String[] append = null)
+        // if alwaysUseAllPhrases is true, we add all the phrase options to the recogniser even if the disable_alternative_voice_commands option is true.
+        // If alwaysUseAllAppends is true we do the same thing with the append options.
+        //
+        // The generatedGrammars are loaded by this method call, they're only returned to allow us to detect which grammar has been triggered - the
+        // opponent grammar processing stuff needs this.
+        private List<Grammar> addCompoundChoices(String[] phrases, Boolean alwaysUseAllPhrases, Choices choices, String[] append, Boolean alwaysUseAllAppends)
         {
+            List<Grammar> generatedGrammars = new List<Grammar>();
             foreach(string s in phrases)
             {
                 if (s == null || s.Trim().Count() == 0)
                 {
                     continue;
                 }
-                if(append != null)
+                GrammarBuilder gb = new GrammarBuilder();
+                gb.Culture = cultureInfo;
+                gb.Append(s);
+                gb.Append(choices);
+                Boolean addAppendChoices = false;
+                if (append != null && append.Length > 0)
                 {
-                    foreach(string sa in append)
+                    Choices appendChoices = new Choices();
+                    foreach (string sa in append)
                     {
                         if (sa == null || sa.Trim().Count() == 0)
                         {
                             continue;
                         }
-                        GrammarBuilder gb = new GrammarBuilder();
-                        gb.Culture = cultureInfo;
-                        gb.Append(s);
-                        gb.Append(choices);
-                        gb.Append(sa);
-                        Grammar g = new Grammar(gb);
-                        sre.LoadGrammar(g);
+                        addAppendChoices = true;
+                        appendChoices.Add(sa.Trim().Trim());
+                        if (disable_alternative_voice_commands && !alwaysUseAllAppends)
+                        {
+                            break;
+                        }
+                    }
+                    if (addAppendChoices)
+                    {
+                        gb.Append(appendChoices);
                     }
                 }
-                else
-                {
-                    GrammarBuilder gb = new GrammarBuilder();
-                    gb.Culture = cultureInfo;
-                    gb.Append(s);
-                    gb.Append(choices);
-                    Grammar g = new Grammar(gb);
-                    sre.LoadGrammar(g);
-                }
-                if (disable_alternative_voice_commands)
+                if (disable_alternative_voice_commands && !alwaysUseAllPhrases)
                 {
                     break;
                 }
+                Grammar grammar = new Grammar(gb);
+                sre.LoadGrammar(grammar);
+                generatedGrammars.Add(grammar);
             }
-        }
-        private void addOpponentNumberMappingPhrase(String phrase, Choices choices, String append = null)
-        {
-            GrammarBuilder gb = new GrammarBuilder();
-            gb.Culture = cultureInfo;
-            gb.Append(phrase);
-            gb.Append(choices);
-            if(append != null)
-            {
-                gb.Append(append);
-            }            
-            Grammar g = new Grammar(gb);
-            sre.LoadGrammar(g);
-            //add to opponent gramma list
-            opponentGrammarList.Add(g);
+            return generatedGrammars;
         }
 
         public void Dispose()
@@ -324,12 +321,10 @@ namespace CrewChiefV4
                 {
                     if (disable_alternative_voice_commands)
                     {
-                        staticGrammarSize++;
                         choices.Add(speechPhrases[0]);
                     }
                     else
                     {
-                        staticGrammarSize+=speechPhrases.Length;
                         choices.Add(speechPhrases);
                     }                    
                 }
@@ -392,7 +387,14 @@ namespace CrewChiefV4
                 {
                     Console.WriteLine("Loading all voice command alternatives from speech_recognition_config.txt");
                 }
-                staticGrammarSize = 0;
+                this.digitsChoices = new Choices();
+                foreach (KeyValuePair<String[], int> entry in numberToNumber)
+                {
+                    foreach (String numberStr in entry.Key)
+                    {
+                        digitsChoices.Add(numberStr);
+                    }
+                }
                 Choices staticSpeechChoices = new Choices();
                 validateAndAdd(HOWS_MY_TYRE_WEAR, staticSpeechChoices);
                 validateAndAdd(HOWS_MY_TRANSMISSION, staticSpeechChoices);
@@ -454,37 +456,27 @@ namespace CrewChiefV4
                 validateAndAdd(WHATS_THE_TRACK_TEMP, staticSpeechChoices);
                 validateAndAdd(RADIO_CHECK, staticSpeechChoices);
 
-                //Choices that has a number associated
-                Choices digitsChoices = new Choices();
-                foreach (KeyValuePair<String, int> entry in numberToNumber)
-                {
-                    digitsChoices.Add(entry.Key);
-                }
-
-                Choices fuelChoices = new Choices();
-                fuelChoices.Add(CALCULATE_FUEL_FOR);
-                
-                Choices unitChoices = new Choices();
-                unitChoices.Add(LAPS);
-                unitChoices.Add(MINUTES);
-                unitChoices.Add(HOURS);
-                
-                GrammarBuilder gb = new GrammarBuilder(fuelChoices);
-                gb.Culture = cultureInfo;
-                gb.Append(digitsChoices);
-                gb.Append(unitChoices);
-                Grammar g = new Grammar(gb);
-                sre.LoadGrammar(g);
-
-                //i know this number is incorrect but still trying to figure out how to handle it correctly.
-                staticGrammarSize += 3;
-
                 GrammarBuilder staticGrammarBuilder = new GrammarBuilder();
                 staticGrammarBuilder.Culture = cultureInfo;
                 staticGrammarBuilder.Append(staticSpeechChoices);
                 Grammar staticGrammar = new Grammar(staticGrammarBuilder);
                 sre.LoadGrammar(staticGrammar);
-                Console.WriteLine("Loaded " + staticGrammarSize + " items into static grammar");
+
+                // now the fuel choices
+                List<string> fuelTimeChoices = new List<string>();
+                if (disable_alternative_voice_commands)
+                {
+                    fuelTimeChoices.Add(LAPS[0]);
+                    fuelTimeChoices.Add(MINUTES[0]);
+                    fuelTimeChoices.Add(HOURS[0]);
+                }
+                else
+                {
+                    fuelTimeChoices.AddRange(LAPS);
+                    fuelTimeChoices.AddRange(MINUTES);
+                    fuelTimeChoices.AddRange(HOURS);
+                }
+                addCompoundChoices(CALCULATE_FUEL_FOR, false, this.digitsChoices, fuelTimeChoices.ToArray(), true);
             }
             catch (Exception e)
             {
@@ -520,21 +512,12 @@ namespace CrewChiefV4
                     if (initialised)
                     {
                         Console.WriteLine("Adding new (mid-session joined) opponent name to speech recogniser: " + Environment.NewLine + usableName);
-                        Choices opponentChoices = new Choices();
-                        opponentChoices.Add(WHERE_IS + " " + usableName);
-                        opponentChoices.Add(WHATS + " " + usableName + POSSESSIVE + " " + LAST_LAP);
-                        opponentChoices.Add(WHATS + " " + usableName + POSSESSIVE + " " + BEST_LAP);
-                        opponentChoices.Add(WHAT_TYRES_IS + " " + usableName + " " + ON);
-                        opponentChoices.Add(WHAT_TYRE_IS + " " + usableName + " " + ON);
+                        Choices opponentNameChoices = new Choices(usableName);
+                        Choices opponentNamePossessiveChoices = new Choices(usableName + POSSESSIVE);
 
-                        GrammarBuilder opponentGrammarBuilder = new GrammarBuilder();
-                        opponentGrammarBuilder.Culture = cultureInfo;
-                        opponentGrammarBuilder.Append(opponentChoices);
-                        Grammar newOpponentGrammar = new Grammar(opponentGrammarBuilder);
-                        sre.LoadGrammar(newOpponentGrammar);
-                        opponentGrammarList.Add(newOpponentGrammar);
-                        dynamicGrammarSize+=5;
-                        Console.WriteLine("Added 5 items to dynamic (opponent) grammar, total is now " + dynamicGrammarSize);
+                        opponentGrammarList.AddRange(addCompoundChoices(new String[] { WHERE_IS, WHERES }, false, opponentNameChoices, null, true));
+                        opponentGrammarList.AddRange(addCompoundChoices(new String[] { WHAT_TYRE_IS, WHAT_TYRES_IS }, false, opponentNameChoices, new String[] { ON }, true));
+                        opponentGrammarList.AddRange(addCompoundChoices(new String[] { WHATS }, true, opponentNamePossessiveChoices, new String[] { LAST_LAP, BEST_LAP }, true));
                     }
                     // This method is called when a new driver appears mid-session. We need to load the sound file for this new driver
                     // so do it here - nasty nasty hack, need to refactor this. The alternative is to call
@@ -552,91 +535,57 @@ namespace CrewChiefV4
         public void addOpponentSpeechRecognition(List<String> names, Boolean useNames)
         {
             driverNamesInUse.Clear();
-            dynamicGrammarSize = 0;
             foreach (Grammar opponentGrammar in opponentGrammarList)
             {
                 sre.UnloadGrammar(opponentGrammar);
             }
             opponentGrammarList.Clear();
             Choices opponentChoices = new Choices();
+
+            // need choice sets for names, possessive names, positions, possessive positions, and combined:
+            Choices opponentNameOrPositionChoices = new Choices();
+            Choices opponentPositionChoices = new Choices();
+            Choices opponentNameOrPositionPossessiveChoices = new Choices();
+
             if (useNames)
             {
-                Console.WriteLine("Adding " + names.Count + " new session opponent names to speech recogniser" );
+                Console.WriteLine("Adding " + names.Count + " new session opponent names to speech recogniser" );                
                 foreach (String name in names)
                 {
-                    opponentChoices.Add(WHERE_IS + " " + name);
-                    opponentChoices.Add(WHATS + " " + name + POSSESSIVE + " " + LAST_LAP);
-                    opponentChoices.Add(WHATS + " " + name + POSSESSIVE + " " + BEST_LAP);
-                    opponentChoices.Add(WHAT_TYRES_IS + " " + name + " " + ON);
-                    opponentChoices.Add(WHAT_TYRE_IS + " " + name + " " + ON);
-                    dynamicGrammarSize += 5;
+                    opponentNameOrPositionChoices.Add(name);
+                    opponentNameOrPositionPossessiveChoices.Add(name + POSSESSIVE);
                 }
             }
-            Choices possessiveDigitsChoices = new Choices();
-            foreach (KeyValuePair<String, int> entry in opponentNumberToNumber)
+
+            foreach (KeyValuePair<String[], int> entry in racePositionNumberToNumber)
             {
-                possessiveDigitsChoices.Add(entry.Key + POSSESSIVE);
+                foreach (String numberStr in entry.Key)
+                {
+                    opponentNameOrPositionChoices.Add(POSITION_LONG + " " + numberStr);
+                    opponentNameOrPositionChoices.Add(POSITION_SHORT + " " + numberStr);
+                    opponentPositionChoices.Add(POSITION_LONG + " " + numberStr);
+                    opponentPositionChoices.Add(POSITION_SHORT + " " + numberStr);
+                    opponentNameOrPositionPossessiveChoices.Add(POSITION_LONG + " " + numberStr + POSSESSIVE);
+                    opponentNameOrPositionPossessiveChoices.Add(POSITION_SHORT + " " + numberStr + POSSESSIVE);
+                }
             }
-            Choices digitsChoices = new Choices();
-            foreach (KeyValuePair<String, int> entry in opponentNumberToNumber)
-            {
-                digitsChoices.Add(entry.Key);
-            }
+            opponentNameOrPositionChoices.Add(THE_GUY_AHEAD);
+            opponentNameOrPositionChoices.Add(THE_CAR_AHEAD);
+            opponentNameOrPositionChoices.Add(THE_GUY_IN_FRONT);
+            opponentNameOrPositionChoices.Add(THE_GUY_BEHIND);
+            opponentNameOrPositionChoices.Add(THE_CAR_BEHIND);
+            opponentNameOrPositionChoices.Add(THE_LEADER);
+            opponentNameOrPositionPossessiveChoices.Add(THE_GUY_AHEAD);
+            opponentNameOrPositionPossessiveChoices.Add(THE_CAR_AHEAD);
+            opponentNameOrPositionPossessiveChoices.Add(THE_GUY_IN_FRONT);
+            opponentNameOrPositionPossessiveChoices.Add(THE_GUY_BEHIND);
+            opponentNameOrPositionPossessiveChoices.Add(THE_CAR_BEHIND);
+            opponentNameOrPositionPossessiveChoices.Add(THE_LEADER);
 
-            addOpponentNumberMappingPhrase(WHATS + " " + POSITION_LONG, possessiveDigitsChoices, LAST_LAP);
-            addOpponentNumberMappingPhrase(WHATS + " " + POSITION_LONG, possessiveDigitsChoices, BEST_LAP);
-            addOpponentNumberMappingPhrase(WHAT_TYRE_IS + " " + POSITION_LONG, digitsChoices, ON);
-            addOpponentNumberMappingPhrase(WHAT_TYRES_IS + " " + POSITION_LONG, digitsChoices, ON);
-            addOpponentNumberMappingPhrase(WHATS + " " + POSITION_SHORT, possessiveDigitsChoices, LAST_LAP);
-            addOpponentNumberMappingPhrase(WHATS + " " + POSITION_SHORT, possessiveDigitsChoices, BEST_LAP);
-            addOpponentNumberMappingPhrase(WHOS_IN + " " + POSITION_SHORT, digitsChoices);
-            addOpponentNumberMappingPhrase(WHOS_IN + " " + POSITION_LONG, digitsChoices);
-            addOpponentNumberMappingPhrase(WHAT_TYRE_IS + " " + POSITION_SHORT, digitsChoices, ON);
-            addOpponentNumberMappingPhrase(WHAT_TYRES_IS + " " + POSITION_SHORT, digitsChoices, ON);
-            addOpponentNumberMappingPhrase(WHERE_IS + " " + POSITION_SHORT, digitsChoices);
-            addOpponentNumberMappingPhrase(WHERE_IS + " " + POSITION_LONG, digitsChoices);
-            //i know this number is incorrect but still trying to figure out how to handle it correctly.
-            dynamicGrammarSize += 12;
-
-/*            foreach (KeyValuePair<String, int> entry in opponentNumberToNumber)
-            {               
-                opponentChoices.Add(WHATS + " " + POSITION_LONG + " " + entry.Key + POSSESSIVE + " " + LAST_LAP);
-                opponentChoices.Add(WHATS + " " + POSITION_LONG + " " + entry.Key + POSSESSIVE + " " + BEST_LAP);                
-                opponentChoices.Add(WHAT_TYRE_IS + " " + POSITION_LONG + " " + entry.Key + " " + ON);
-                opponentChoices.Add(WHAT_TYRES_IS + " " + POSITION_LONG + " " + entry.Key + " " + ON);
-                opponentChoices.Add(WHATS + " " + POSITION_SHORT + " " + entry.Key + POSSESSIVE + " " + LAST_LAP);
-                opponentChoices.Add(WHATS + " " + POSITION_SHORT + " " + entry.Key + POSSESSIVE + " " + BEST_LAP);
-                opponentChoices.Add(WHOS_IN + " " + POSITION_SHORT + " " + entry.Key);
-                opponentChoices.Add(WHOS_IN + " " + POSITION_LONG + " " + entry.Key);
-                opponentChoices.Add(WHAT_TYRE_IS + " " + POSITION_SHORT + " " + entry.Key + " " + ON);
-                opponentChoices.Add(WHAT_TYRES_IS + " " + POSITION_SHORT + " " + entry.Key + " " + ON);
-                opponentChoices.Add(WHERE_IS + " " + POSITION_SHORT + " " + entry.Key);
-                opponentChoices.Add(WHERE_IS + " " + POSITION_LONG + " " + entry.Key);
-                dynamicGrammarSize += 12;
-            }*/
-            opponentChoices.Add(WHATS + " " + THE_LEADER + POSSESSIVE + " " + BEST_LAP);
-            opponentChoices.Add(WHATS + " " + THE_LEADER + POSSESSIVE + " " + LAST_LAP);
-
-            opponentChoices.Add(WHATS + " " + THE_GUY_IN_FRONT + POSSESSIVE + " " + BEST_LAP);
-            opponentChoices.Add(WHATS + " " + THE_GUY_IN_FRONT + POSSESSIVE + " " + LAST_LAP);
-            opponentChoices.Add(WHATS + " " + THE_CAR_IN_FRONT + POSSESSIVE + " " + BEST_LAP);
-            opponentChoices.Add(WHATS + " " + THE_CAR_IN_FRONT + POSSESSIVE + " " + LAST_LAP);
-            opponentChoices.Add(WHATS + " " + THE_GUY_AHEAD + POSSESSIVE + " " + BEST_LAP);
-            opponentChoices.Add(WHATS + " " + THE_GUY_AHEAD + POSSESSIVE + " " + LAST_LAP);
-            opponentChoices.Add(WHATS + " " + THE_CAR_AHEAD + POSSESSIVE + " " + BEST_LAP);
-            opponentChoices.Add(WHATS + " " + THE_CAR_AHEAD + POSSESSIVE + " " + LAST_LAP);
-            opponentChoices.Add(WHATS + " " + THE_CAR_BEHIND + POSSESSIVE + " " + BEST_LAP);
-            opponentChoices.Add(WHATS + " " + THE_CAR_BEHIND + POSSESSIVE + " " + LAST_LAP);
-            opponentChoices.Add(WHATS + " " + THE_GUY_BEHIND + POSSESSIVE + " " + BEST_LAP);
-            opponentChoices.Add(WHATS + " " + THE_GUY_BEHIND + POSSESSIVE + " " + LAST_LAP);
-
-            opponentChoices.Add(WHAT_TYRE_IS + " " + THE_GUY_IN_FRONT + " " + ON);
-            opponentChoices.Add(WHAT_TYRES_IS + " " + THE_GUY_IN_FRONT + " " + ON);
-            opponentChoices.Add(WHAT_TYRE_IS + " " + THE_GUY_AHEAD + " " + ON);
-            opponentChoices.Add(WHAT_TYRES_IS + " " + THE_GUY_AHEAD + " " + ON);
-            opponentChoices.Add(WHAT_TYRE_IS + " " + THE_GUY_BEHIND + " " + ON);
-            opponentChoices.Add(WHAT_TYRES_IS + " " + THE_GUY_BEHIND + " " + ON);
-            dynamicGrammarSize += 20;
+            opponentGrammarList.AddRange(addCompoundChoices(new String[] { WHERE_IS, WHERES}, false, opponentNameOrPositionChoices, null, true));
+            opponentGrammarList.AddRange(addCompoundChoices(new String[] { WHOS_IN }, false, opponentPositionChoices, null, true));
+            opponentGrammarList.AddRange(addCompoundChoices(new String[] { WHAT_TYRE_IS, WHAT_TYRES_IS }, false, opponentNameOrPositionChoices, new String[] { ON }, true));
+            opponentGrammarList.AddRange(addCompoundChoices(new String[] { WHATS }, false, opponentNameOrPositionPossessiveChoices, new String[] { LAST_LAP, BEST_LAP }, true));
 
             validateAndAdd(WHOS_IN_FRONT_IN_THE_RACE, opponentChoices);
             validateAndAdd(WHOS_BEHIND_IN_THE_RACE, opponentChoices);
@@ -644,59 +593,52 @@ namespace CrewChiefV4
             validateAndAdd(WHOS_BEHIND_ON_TRACK, opponentChoices);
             validateAndAdd(WHOS_LEADING, opponentChoices);            
 
-            GrammarBuilder opponentGrammarBuilder = new GrammarBuilder();
-            opponentGrammarBuilder.Culture = cultureInfo;
-            opponentGrammarBuilder.Append(opponentChoices);
-            Grammar newOpponentGrammar = new Grammar(opponentGrammarBuilder);
-            sre.LoadGrammar(newOpponentGrammar);
-            opponentGrammarList.Add(newOpponentGrammar);
             driverNamesInUse.AddRange(names);
-            Console.WriteLine("Loaded " + dynamicGrammarSize + " items into dynamic (opponent) grammar");
         }
 
         public void addiRacingSpeechRecogniser()
         {
             try
             {
-                iRacingGrammarSize = 0;
-                Choices digitsChoices = new Choices();
-                foreach (KeyValuePair<String, int> entry in bigNumberToNumber)
+                List<string> tyrePressureChangePhrases = new List<string>();
+                if (disable_alternative_voice_commands)
                 {
-                    digitsChoices.Add(entry.Key);
+                    tyrePressureChangePhrases.Add(PIT_STOP_CHANGE_TYRE_PRESSURE[0]);
+                    tyrePressureChangePhrases.Add(PIT_STOP_CHANGE_FRONT_LEFT_TYRE_PRESSURE[0]);
+                    tyrePressureChangePhrases.Add(PIT_STOP_CHANGE_FRONT_RIGHT_TYRE_PRESSURE[0]);
+                    tyrePressureChangePhrases.Add(PIT_STOP_CHANGE_REAR_LEFT_TYRE_PRESSURE[0]);
+                    tyrePressureChangePhrases.Add(PIT_STOP_CHANGE_REAR_RIGHT_TYRE_PRESSURE[0]);
+                }
+                else
+                {
+                    tyrePressureChangePhrases.AddRange(PIT_STOP_CHANGE_TYRE_PRESSURE);
+                    tyrePressureChangePhrases.AddRange(PIT_STOP_CHANGE_FRONT_LEFT_TYRE_PRESSURE);
+                    tyrePressureChangePhrases.AddRange(PIT_STOP_CHANGE_FRONT_RIGHT_TYRE_PRESSURE);
+                    tyrePressureChangePhrases.AddRange(PIT_STOP_CHANGE_REAR_LEFT_TYRE_PRESSURE);
+                    tyrePressureChangePhrases.AddRange(PIT_STOP_CHANGE_REAR_RIGHT_TYRE_PRESSURE);
                 }
 
+                addCompoundChoices(tyrePressureChangePhrases.ToArray(), true, this.digitsChoices, null, true);
+                addCompoundChoices(PIT_STOP_ADD, false, this.digitsChoices, LITERS, true);
 
-                addNumberMappingPhrases(PIT_STOP_CHANGE_ALL_TYRES, digitsChoices);               
-                addNumberMappingPhrases(PIT_STOP_CHANGE_FRONT_LEFT_TYRE, digitsChoices);
-                addNumberMappingPhrases(PIT_STOP_CHANGE_FRONT_RIGHT_TYRE, digitsChoices);
-                addNumberMappingPhrases(PIT_STOP_CHANGE_REAR_LEFT_TYRE, digitsChoices);
-                addNumberMappingPhrases(PIT_STOP_CHANGE_REAR_RIGHT_TYRE, digitsChoices);
-                addNumberMappingPhrases(PIT_STOP_ADD, digitsChoices, LITERS);
-
-                //i know this number is incorrect but still trying to figure out how to handle it correctly.
-                iRacingGrammarSize += 6;                 
-                Choices iRacingChoices = new Choices();                
-                iRacingChoices.Add(PIT_STOP_TEAROFF);
-                iRacingChoices.Add(PIT_STOP_FAST_REPAIR);
-                iRacingChoices.Add(PIT_STOP_CLEAR_ALL);
-                iRacingChoices.Add(PIT_STOP_CLEAR_TYRES);
-                iRacingChoices.Add(PIT_STOP_CLEAR_WIND_SCREEN);
-                iRacingChoices.Add(PIT_STOP_CLEAR_FAST_REPAIR);
-                iRacingChoices.Add(PIT_STOP_CLEAR_FUEL);
-                
-                iRacingChoices.Add(PIT_STOP_CHANGE_ALL_TYRES);
-                iRacingChoices.Add(PIT_STOP_CHANGE_FRONT_LEFT_TYRE);
-                iRacingChoices.Add(PIT_STOP_CHANGE_FRONT_RIGHT_TYRE);
-                iRacingChoices.Add(PIT_STOP_CHANGE_REAR_LEFT_TYRE);
-                iRacingChoices.Add(PIT_STOP_CHANGE_REAR_RIGHT_TYRE);
-
-                iRacingGrammarSize += 12;                                             
-             
+                Choices iRacingChoices = new Choices();
+                validateAndAdd(PIT_STOP_TEAROFF, iRacingChoices);
+                validateAndAdd(PIT_STOP_FAST_REPAIR, iRacingChoices);
+                validateAndAdd(PIT_STOP_CLEAR_ALL, iRacingChoices);
+                validateAndAdd(PIT_STOP_CLEAR_TYRES, iRacingChoices);
+                validateAndAdd(PIT_STOP_CLEAR_WIND_SCREEN, iRacingChoices);
+                validateAndAdd(PIT_STOP_CLEAR_FAST_REPAIR, iRacingChoices);
+                validateAndAdd(PIT_STOP_CLEAR_FUEL, iRacingChoices);
+                validateAndAdd(PIT_STOP_CHANGE_ALL_TYRES, iRacingChoices);
+                validateAndAdd(PIT_STOP_CHANGE_FRONT_LEFT_TYRE, iRacingChoices);
+                validateAndAdd(PIT_STOP_CHANGE_FRONT_RIGHT_TYRE, iRacingChoices);
+                validateAndAdd(PIT_STOP_CHANGE_REAR_LEFT_TYRE, iRacingChoices);
+                validateAndAdd(PIT_STOP_CHANGE_REAR_RIGHT_TYRE, iRacingChoices);
+  
                 GrammarBuilder iRacingGrammarBuilder = new GrammarBuilder(iRacingChoices);
                 iRacingGrammarBuilder.Culture = cultureInfo;
                 Grammar iRacingGrammar = new Grammar(iRacingGrammarBuilder);
                 sre.LoadGrammar(iRacingGrammar);
-                Console.WriteLine("Loaded " + iRacingGrammarSize + " items into iRacing grammar");
             }
             catch (Exception e)
             {
@@ -974,13 +916,7 @@ namespace CrewChiefV4
                     crewChief.togglePaceNotesPlayback();
                 }
             }
-            else if (ResultContains(recognisedSpeech, PIT_STOP_ADD) || ResultContains(recognisedSpeech, PIT_STOP_TEAROFF) ||
-                ResultContains(recognisedSpeech, PIT_STOP_FAST_REPAIR) || ResultContains(recognisedSpeech, PIT_STOP_CLEAR_ALL) || 
-                ResultContains(recognisedSpeech, PIT_STOP_CLEAR_TYRES) || ResultContains(recognisedSpeech, PIT_STOP_CLEAR_WIND_SCREEN) || 
-                ResultContains(recognisedSpeech, PIT_STOP_CLEAR_FAST_REPAIR) || ResultContains(recognisedSpeech, PIT_STOP_CLEAR_FUEL) || 
-                ResultContains(recognisedSpeech, PIT_STOP_CHANGE_ALL_TYRES) || ResultContains(recognisedSpeech, PIT_STOP_CHANGE_FRONT_LEFT_TYRE) ||
-                ResultContains(recognisedSpeech, PIT_STOP_CHANGE_FRONT_RIGHT_TYRE) || ResultContains(recognisedSpeech, PIT_STOP_CHANGE_REAR_LEFT_TYRE) ||
-                ResultContains(recognisedSpeech, PIT_STOP_CHANGE_REAR_RIGHT_TYRE))
+            else if (ResultContains(recognisedSpeech, PIT_STOP))                
             {
                 return CrewChief.getEvent("IRacingBroadcastMessageEvent");
             }

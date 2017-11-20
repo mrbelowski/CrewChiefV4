@@ -649,12 +649,15 @@ namespace CrewChiefV4.Events
             else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.CALCULATE_FUEL_FOR))
             {
                 int unit = 0;
-                foreach (KeyValuePair<String, int> entry in SpeechRecogniser.numberToNumber)
+                foreach (KeyValuePair<String[], int> entry in SpeechRecogniser.numberToNumber)
                 {
-                    if (voiceMessage.Contains(" " + entry.Key + " "))
+                    foreach (String numberStr in entry.Key)
                     {
-                        unit = entry.Value;
-                        break;
+                        if (voiceMessage.Contains(" " + numberStr + " "))
+                        {
+                            unit = entry.Value;
+                            break;
+                        }
                     }
                 }
                 if (unit == 0)
