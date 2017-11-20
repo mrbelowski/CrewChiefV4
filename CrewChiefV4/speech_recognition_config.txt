@@ -190,6 +190,7 @@ HOUR = hour
 HOURS = hours
 
 # used for iracing pitstop's commands
+PIT_STOP = pitstop
 PIT_STOP_ADD = pitstop add
 PIT_STOP_TEAROFF = pitstop tearoff:pitstop windscreen
 PIT_STOP_FAST_REPAIR = pitstop fast repair:pitstop repair
@@ -200,10 +201,16 @@ PIT_STOP_CLEAR_FAST_REPAIR = pitstop clear fast repair
 PIT_STOP_CLEAR_FUEL = pitstop clear fuel
 
 PIT_STOP_CHANGE_ALL_TYRES = pitstop change all tyres
-PIT_STOP_CHANGE_FRONT_LEFT_TYRE = pitstop change left front
-PIT_STOP_CHANGE_FRONT_RIGHT_TYRE = pitstop change right front
-PIT_STOP_CHANGE_REAR_LEFT_TYRE = pitstop change left rear
-PIT_STOP_CHANGE_REAR_RIGHT_TYRE = pitstop change right rear
+PIT_STOP_CHANGE_FRONT_LEFT_TYRE = pitstop change left front tyre
+PIT_STOP_CHANGE_FRONT_RIGHT_TYRE = pitstop change right front tyre
+PIT_STOP_CHANGE_REAR_LEFT_TYRE = pitstop change left rear tyre
+PIT_STOP_CHANGE_REAR_RIGHT_TYRE = pitstop change right rear tyre
+
+PIT_STOP_CHANGE_TYRE_PRESSURE = pitstop change tyres pressure
+PIT_STOP_CHANGE_FRONT_LEFT_TYRE_PRESSURE = pitstop change left front tyre pressure
+PIT_STOP_CHANGE_FRONT_RIGHT_TYRE_PRESSURE = pitstop change right front tyre pressure
+PIT_STOP_CHANGE_REAR_LEFT_TYRE_PRESSURE = pitstop change left rear tyre pressure
+PIT_STOP_CHANGE_REAR_RIGHT_TYRE_PRESSURE = pitstop change right rear tyre pressure
 
 LITERS = liters
 

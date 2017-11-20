@@ -42,6 +42,7 @@ namespace CrewChiefV4.Events
             lastColdRLPressure = (int)currentGameState.TyreData.RearLeftPressure;
             lastColdRRPressure = (int)currentGameState.TyreData.RearRightPressure;
         }
+
         public override void respond(String voiceMessage)
         {
             if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PIT_STOP_ADD))
@@ -112,11 +113,11 @@ namespace CrewChiefV4.Events
                 audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
                 return;
             }
-            else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PIT_STOP_CHANGE_ALL_TYRES) ||
-                SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PIT_STOP_CHANGE_FRONT_LEFT_TYRE) ||
-                SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PIT_STOP_CHANGE_FRONT_RIGHT_TYRE) ||
-                SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PIT_STOP_CHANGE_REAR_LEFT_TYRE) ||
-                SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PIT_STOP_CHANGE_REAR_RIGHT_TYRE))
+            else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PIT_STOP_CHANGE_TYRE_PRESSURE) ||
+                SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PIT_STOP_CHANGE_FRONT_LEFT_TYRE_PRESSURE) ||
+                SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PIT_STOP_CHANGE_FRONT_RIGHT_TYRE_PRESSURE) ||
+                SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PIT_STOP_CHANGE_REAR_LEFT_TYRE_PRESSURE) ||
+                SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PIT_STOP_CHANGE_REAR_RIGHT_TYRE_PRESSURE))
             {
                 int amount = 0;
                 foreach (KeyValuePair<String[], int> entry in SpeechRecogniser.numberToNumber)
@@ -130,79 +131,84 @@ namespace CrewChiefV4.Events
                         }
                     }
                 }
-                if(amount != 0)
+                if (amount == 0)
                 {
-                    if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PIT_STOP_CHANGE_ALL_TYRES))
-                    {
-                        ChangeTire(PitCommandModeTypes.LF, amount);
-                        ChangeTire(PitCommandModeTypes.RF, amount);
-                        ChangeTire(PitCommandModeTypes.LR, amount);
-                        ChangeTire(PitCommandModeTypes.RR, amount);
-                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
-                        return;
-                    }
-                    else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PIT_STOP_CHANGE_FRONT_LEFT_TYRE))
-                    {
-                        ChangeTire(PitCommandModeTypes.LF, amount);
-                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
-                        return;
-                    }
-                    else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PIT_STOP_CHANGE_FRONT_RIGHT_TYRE))
-                    {
-                        ChangeTire(PitCommandModeTypes.RF, amount);
-                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
-                        return;
-                    }
-                    else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PIT_STOP_CHANGE_REAR_LEFT_TYRE))
-                    {
-                        ChangeTire(PitCommandModeTypes.LR, amount);
-                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
-                        return;
-                    }
-                    else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PIT_STOP_CHANGE_REAR_RIGHT_TYRE))
-                    {
-                        ChangeTire(PitCommandModeTypes.RR, amount);
-                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
-                        return;
-                    }
+                    Console.WriteLine("amount " + amount + " message " + voiceMessage);
+                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderDidntUnderstand, 0, null));
+                    return;
                 }
                 else
                 {
-                    if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PIT_STOP_CHANGE_ALL_TYRES))
+                    if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PIT_STOP_CHANGE_TYRE_PRESSURE))
                     {
-                        ChangeTire(PitCommandModeTypes.LF, lastColdFLPressure);
-                        ChangeTire(PitCommandModeTypes.RF, lastColdFRPressure);
-                        ChangeTire(PitCommandModeTypes.LR, lastColdRLPressure);
-                        ChangeTire(PitCommandModeTypes.RR, lastColdRRPressure);
+                        ChangeTire(PitCommandModeTypes.LF, amount);
+                        ChangeTire(PitCommandModeTypes.RF, amount);
+                        ChangeTire(PitCommandModeTypes.LR, amount);
+                        ChangeTire(PitCommandModeTypes.RR, amount);
                         audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
                         return;
                     }
-                    else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PIT_STOP_CHANGE_FRONT_LEFT_TYRE))
+                    else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PIT_STOP_CHANGE_FRONT_LEFT_TYRE_PRESSURE))
                     {
-                        ChangeTire(PitCommandModeTypes.LF, lastColdFLPressure);
+                        ChangeTire(PitCommandModeTypes.LF, amount);
                         audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
                         return;
                     }
-                    else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PIT_STOP_CHANGE_FRONT_RIGHT_TYRE))
+                    else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PIT_STOP_CHANGE_FRONT_RIGHT_TYRE_PRESSURE))
                     {
-                        ChangeTire(PitCommandModeTypes.RF, lastColdFRPressure);
+                        ChangeTire(PitCommandModeTypes.RF, amount);
                         audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
                         return;
                     }
-                    else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PIT_STOP_CHANGE_REAR_LEFT_TYRE))
+                    else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PIT_STOP_CHANGE_REAR_LEFT_TYRE_PRESSURE))
                     {
-                        ChangeTire(PitCommandModeTypes.LR, lastColdRLPressure);
+                        ChangeTire(PitCommandModeTypes.LR, amount);
                         audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
                         return;
                     }
-                    else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PIT_STOP_CHANGE_REAR_RIGHT_TYRE))
+                    else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PIT_STOP_CHANGE_REAR_RIGHT_TYRE_PRESSURE))
                     {
-                        ChangeTire(PitCommandModeTypes.RR, lastColdRRPressure);
+                        ChangeTire(PitCommandModeTypes.RR, amount);
                         audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
                         return;
                     }
-                }                                   
+
+                }
+                  
             }
+            else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PIT_STOP_CHANGE_ALL_TYRES))
+            {
+                ChangeTire(PitCommandModeTypes.LF, lastColdFLPressure);
+                ChangeTire(PitCommandModeTypes.RF, lastColdFRPressure);
+                ChangeTire(PitCommandModeTypes.LR, lastColdRLPressure);
+                ChangeTire(PitCommandModeTypes.RR, lastColdRRPressure);
+                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
+                return;
+            }
+            else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PIT_STOP_CHANGE_FRONT_LEFT_TYRE))
+            {
+                ChangeTire(PitCommandModeTypes.LF, lastColdFLPressure);
+                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
+                return;
+            }
+            else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PIT_STOP_CHANGE_FRONT_RIGHT_TYRE))
+            {
+                ChangeTire(PitCommandModeTypes.RF, lastColdFRPressure);
+                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
+                return;
+            }
+            else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PIT_STOP_CHANGE_REAR_LEFT_TYRE))
+            {
+                ChangeTire(PitCommandModeTypes.LR, lastColdRLPressure);
+                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
+                return;
+            }
+            else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PIT_STOP_CHANGE_REAR_RIGHT_TYRE))
+            {
+                ChangeTire(PitCommandModeTypes.RR, lastColdRRPressure);
+                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
+                return;
+            } 
         }
 
         /// <summary>
@@ -218,25 +224,6 @@ namespace CrewChiefV4.Events
         {
             iRacingSDK.BroadcastMessage(BroadcastMessageTypes.PitCommand, (int)type, pressure);
         }
-
-        /// <summary>
-        /// Schedule to change one or more tires and set their new pressures.
-        /// </summary>
-        /// <param name="change">The scheduled tire changes.</param>
-        /*public void ChangeTires(PitCommandModeTypes change)
-        {
-            if (change.LeftFront != null && change.LeftFront.Change)
-                ChangeTire(PitCommandModeTypes.LF, change.LeftFront.Pressure);
-
-            if (change.RightFront != null && change.RightFront.Change)
-                ChangeTire(PitCommandModeTypes.RF, change.RightFront.Pressure);
-
-            if (change.LeftRear != null && change.LeftRear.Change)
-                ChangeTire(PitCommandModeTypes.LR, change.LeftRear.Pressure);
-
-            if (change.RightRear != null && change.RightRear.Change)
-                ChangeTire(PitCommandModeTypes.RR, change.RightRear.Pressure);
-        }*/
 
         /// <summary>
         /// Schedule to use a windshield tear-off in the next pitstop.
