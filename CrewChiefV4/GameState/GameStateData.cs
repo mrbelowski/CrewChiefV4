@@ -466,6 +466,18 @@ namespace CrewChiefV4.GameState
                 }
                 if (lapIsValid && thisSectorTime > 0)
                 {
+                    if(sectorNumberJustCompleted == 1)
+                    {
+                        LastSector1Time = thisSectorTime;
+                    }
+                    if (sectorNumberJustCompleted == 2)
+                    {
+                        LastSector2Time = thisSectorTime;
+                    }
+                    if (sectorNumberJustCompleted == 3)
+                    {
+                        LastSector3Time = thisSectorTime;
+                    }
                     if (sectorNumberJustCompleted == 1 && (PlayerBestSector1Time == -1 || thisSectorTime < PlayerBestSector1Time))
                     {
                         PlayerBestSector1Time = thisSectorTime;
@@ -477,6 +489,21 @@ namespace CrewChiefV4.GameState
                     if (sectorNumberJustCompleted == 3 && (PlayerBestSector3Time == -1 || thisSectorTime < PlayerBestSector3Time))
                     {
                         PlayerBestSector3Time = thisSectorTime;
+                    }
+                }
+                else
+                {
+                    if (sectorNumberJustCompleted == 1)
+                    {
+                        LastSector1Time = -1;
+                    }
+                    if (sectorNumberJustCompleted == 2)
+                    {
+                        LastSector2Time = -1;
+                    }
+                    if (sectorNumberJustCompleted == 3)
+                    {
+                        LastSector3Time = -1;
                     }
                 }
                 lapData.SectorTimes[sectorNumberJustCompleted - 1] = thisSectorTime;
@@ -987,25 +1014,28 @@ namespace CrewChiefV4.GameState
 
         public DateTime NewLapDataTimerExpiry = DateTime.MaxValue;
         public Boolean WaitingForNewLapData = false;
-
         public int CompleatedLapsWhenHasNewLapDataWasLastTrue = -2;
+        public float GameTimeWhenLastCrossedStartFinishLine = -1;
 
-        public bool HasNewLapData(float gameProvidedLastLapTime, bool hasCrossedSFLine, int compleatedLaps, Boolean isRace, Boolean previousOpponentDataWaitingForNewLapData,
-            DateTime previousOpponentNewLapDataTimerExpiry, float previousOpponentLastLapTime, Boolean previousOpponentLastLapValid, int previousCompleatedLapsWhenHasNewLapDataWasLastTrue)
+        public bool HasNewLapData(float gameProvidedLastLapTime, bool hasCrossedSFLine, int compleatedLaps, Boolean isRace, float sessionRunningTime, Boolean previousOpponentDataWaitingForNewLapData,
+            DateTime previousOpponentNewLapDataTimerExpiry, float previousOpponentLastLapTime, Boolean previousOpponentLastLapValid,
+            int previousOpponentCompleatedLapsWhenHasNewLapDataWasLastTrue, float previousOpponentGameTimeWhenLastCrossedStartFinishLine)
         {
             // here we need to make sure that CompleatedLaps is bigger then CompleatedLapsWhenHasNewLapDataWasLastTrue
             // else the user will have jumped to pits 
-            if (hasCrossedSFLine && compleatedLaps > CompleatedLapsWhenHasNewLapDataWasLastTrue)
+            if ((hasCrossedSFLine && compleatedLaps > CompleatedLapsWhenHasNewLapDataWasLastTrue) || (isRace && hasCrossedSFLine))
             {
                 // reset the timer and start waiting for an updated laptime...
                 this.WaitingForNewLapData = true;
                 this.NewLapDataTimerExpiry = DateTime.Now.Add(TimeSpan.FromSeconds(3));
+                this.GameTimeWhenLastCrossedStartFinishLine = sessionRunningTime;
             }
             else
             {
                 // not a new lap but may be waiting, so copy over the wait variables
                 this.WaitingForNewLapData = previousOpponentDataWaitingForNewLapData;
                 this.NewLapDataTimerExpiry = previousOpponentNewLapDataTimerExpiry;
+                this.GameTimeWhenLastCrossedStartFinishLine = previousOpponentGameTimeWhenLastCrossedStartFinishLine;
             }
             // if we're waiting, see if the timer has expired or we have a change in the previous laptime value
             if (this.WaitingForNewLapData && (previousOpponentLastLapTime != gameProvidedLastLapTime || DateTime.Now > this.NewLapDataTimerExpiry))
@@ -1021,7 +1051,7 @@ namespace CrewChiefV4.GameState
             {
                 this.LastLapTime = previousOpponentLastLapTime;
                 this.LastLapValid = previousOpponentLastLapValid;
-                this.CompleatedLapsWhenHasNewLapDataWasLastTrue = previousCompleatedLapsWhenHasNewLapDataWasLastTrue;
+                this.CompleatedLapsWhenHasNewLapDataWasLastTrue = previousOpponentCompleatedLapsWhenHasNewLapDataWasLastTrue;
             }
             return false;
         }
@@ -1884,7 +1914,7 @@ namespace CrewChiefV4.GameState
         public float RainDensity = -1;
 
         public Boolean readLandmarksForThisLap = false;
-
+        public float GameTimeWhenLastCrossedStartFinishLine = -1;
         //call this after setting currentGameState.SessionData.SectorNumber and currentGameState.SessionData.IsNewSector
         public bool HasNewLapData(GameStateData previousGameState, float gameProvidedLastLapTime, bool hasCrossedSFLine)
         {
@@ -1895,12 +1925,14 @@ namespace CrewChiefV4.GameState
                     // reset the timer and start waiting for an updated laptime...
                     this.WaitingForNewLapData = true;
                     this.NewLapDataTimerExpiry = this.Now.Add(GameStateData.MaxWaitForNewLapData);
+                    this.GameTimeWhenLastCrossedStartFinishLine = this.SessionData.SessionRunningTime;
                 }
                 else
                 {
                     // not a new lap but may be waiting, so copy over the wait variables
                     this.WaitingForNewLapData = previousGameState.WaitingForNewLapData;
                     this.NewLapDataTimerExpiry = previousGameState.NewLapDataTimerExpiry;
+                    this.GameTimeWhenLastCrossedStartFinishLine = previousGameState.GameTimeWhenLastCrossedStartFinishLine;
                 }
                 // if we're waiting, see if the timer has expired or we have a change in the previous laptime value
                 if (this.WaitingForNewLapData && (previousGameState.SessionData.LapTimePrevious != gameProvidedLastLapTime || this.Now > this.NewLapDataTimerExpiry) || previousGameState.SessionData.LapTimePrevious != gameProvidedLastLapTime)

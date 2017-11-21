@@ -1437,6 +1437,7 @@ namespace CrewChiefV4.assetto
                                     int currentOpponentRacePosition = 0;
                                     OpponentData previousOpponentData = getOpponentForName(previousGameState, participantName);
                                     int previousCompleatedLapsWhenHasNewLapDataWasLastTrue = -2;
+                                    float previousOpponentGameTimeWhenLastCrossedStartFinishLine = -1;
                                     // store some previous opponent data that we'll need later
                                     if (previousOpponentData != null)
                                     {
@@ -1452,6 +1453,7 @@ namespace CrewChiefV4.assetto
                                         previousOpponentDataWaitingForNewLapData = previousOpponentData.WaitingForNewLapData;
                                         previousOpponentNewLapDataTimerExpiry = previousOpponentData.NewLapDataTimerExpiry;
                                         previousCompleatedLapsWhenHasNewLapDataWasLastTrue = previousOpponentData.CompleatedLapsWhenHasNewLapDataWasLastTrue;
+                                        previousOpponentGameTimeWhenLastCrossedStartFinishLine = previousOpponentData.GameTimeWhenLastCrossedStartFinishLine;
 
                                         previousOpponentLastLapTime = previousOpponentData.LastLapTime;
                                         previousOpponentLastLapValid = previousOpponentData.LastLapValid;
@@ -1556,7 +1558,8 @@ namespace CrewChiefV4.assetto
                                         numberOfSectorsOnTrack, shared.acsPhysics.airTemp, shared.acsPhysics.roadTemp, currentGameState.SessionData.SessionType == SessionType.Race,
                                         currentGameState.SessionData.TrackDefinition.distanceForNearPitEntryChecks,
                                         previousOpponentCompletedLaps, previousOpponentDataWaitingForNewLapData,
-                                        previousOpponentNewLapDataTimerExpiry, previousOpponentLastLapTime, previousOpponentLastLapValid, previousCompleatedLapsWhenHasNewLapDataWasLastTrue);
+                                        previousOpponentNewLapDataTimerExpiry, previousOpponentLastLapTime, previousOpponentLastLapValid, previousCompleatedLapsWhenHasNewLapDataWasLastTrue,
+                                        previousOpponentGameTimeWhenLastCrossedStartFinishLine);
 
                                     if (previousOpponentData != null)
                                     {
@@ -2009,7 +2012,8 @@ namespace CrewChiefV4.assetto
             int trackNumberOfSectors, float airTemperature, float trackTempreture, Boolean isRace, float nearPitEntryPointDistance,
             /* previous tick data for hasNewLapData check*/
             int previousOpponentDataLapsCompleted, Boolean previousOpponentDataWaitingForNewLapData,
-            DateTime previousOpponentNewLapDataTimerExpiry, float previousOpponentLastLapTime, Boolean previousOpponentLastLapValid, int previousCompleatedLapsWhenHasNewLapDataWasLastTrue)
+            DateTime previousOpponentNewLapDataTimerExpiry, float previousOpponentLastLapTime, Boolean previousOpponentLastLapValid,
+            int previousCompleatedLapsWhenHasNewLapDataWasLastTrue, float previousOpponentGameTimeWhenLastCrossedStartFinishLine)
         {
             float previousDistanceRoundTrack = opponentData.DistanceRoundTrack;
             opponentData.DistanceRoundTrack = distanceRoundTrack;
@@ -2035,8 +2039,10 @@ namespace CrewChiefV4.assetto
             opponentData.IsNewLap = false;
             opponentData.InPits = isInPits;
             bool hasCrossedSFline = opponentData.CurrentSectorNumber == 3 && sector == 1;
-            bool hasNewLapData = opponentData.HasNewLapData(lastLapTime, hasCrossedSFline, completedLaps, isRace, previousOpponentDataWaitingForNewLapData,
-                previousOpponentNewLapDataTimerExpiry, previousOpponentLastLapTime, previousOpponentLastLapValid,previousCompleatedLapsWhenHasNewLapDataWasLastTrue);
+
+            bool hasNewLapData = opponentData.HasNewLapData(lastLapTime, hasCrossedSFline, completedLaps, isRace, sessionRunningTime, previousOpponentDataWaitingForNewLapData,
+                 previousOpponentNewLapDataTimerExpiry, previousOpponentLastLapTime, previousOpponentLastLapValid, previousCompleatedLapsWhenHasNewLapDataWasLastTrue, previousOpponentGameTimeWhenLastCrossedStartFinishLine);
+
 
             if (opponentData.CurrentSectorNumber == 3 && sector == 3 && (!lapIsValid || !validSpeed))
             {

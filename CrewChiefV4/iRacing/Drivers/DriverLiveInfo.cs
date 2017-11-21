@@ -45,8 +45,7 @@ namespace CrewChiefV4.iRacing
         public double Speed { get; private set; }
         public double SpeedKph { get; private set; }
         
-        public int CurrentFakeSector  { get; set; }
-        public float LastLaptime { get; set; }
+        public int CurrentSector  { get; set; }
         public int LapsCompleted { get; set; }
         public bool IsNewLap { get; set; }
         public bool PreviousLapWasValid { get; set; }
@@ -57,20 +56,13 @@ namespace CrewChiefV4.iRacing
         private double _prevSpeedUpdateDist;
         private int _prevLap;
         private int _prevSector;
-        public float CurrentLapTime 
-        { 
-            get
-            {
-                return SessionTime - (float)this.Driver.CurrentResults.FakeSector1.EnterSessionTime;
-            }
-        }
         public void ParseTelemetry(iRacingData e)
         {   
                      
             this.LapDistance = e.CarIdxLapDistPct[this.Driver.Id];
             this.Lap = e.CarIdxLap[this.Driver.Id];
 
-            if (this._prevSector == 3 && (this.CurrentFakeSector == 1))
+            if (this._prevSector == 3 && (this.CurrentSector == 1))
             {
                 HasCrossedSFLine = true;
             }
@@ -78,9 +70,9 @@ namespace CrewChiefV4.iRacing
             {
                 HasCrossedSFLine = false;
             }
-            if (this._prevSector != this.CurrentFakeSector)
+            if (this._prevSector != this.CurrentSector)
             {
-                this._prevSector = this.CurrentFakeSector;
+                this._prevSector = this.CurrentSector;
             }
 
             this.CorrectedLapDistance = FixPercentagesOnLapChange(e.CarIdxLapDistPct[this.Driver.Id]);
@@ -98,25 +90,11 @@ namespace CrewChiefV4.iRacing
             //we do not have lastlaptime from opponents available in telemetry so we use data from sessioninfo.
             if(Driver.Id == e.PlayerCarIdx)
             {
-                if (UseDelayedLaptimes && !e.IsReplayPlaying)
-                {
-                    this.LapTimePrevious = e.LapLastLapTime;
-                }
-                else
-                {
-                    this.LapTimePrevious = this.LastLaptime;
-                }                             
+                this.LapTimePrevious = e.LapLastLapTime;                            
             }
             else
             {
-                if (UseDelayedLaptimes && !e.IsReplayPlaying)
-                {
-                    this.LapTimePrevious = this._driver.CurrentResults.LastTime;
-                }
-                else
-                {
-                    this.LapTimePrevious = this.LastLaptime;
-                }                
+                this.LapTimePrevious = this._driver.CurrentResults.LastTime;                
             }                
         }
 
