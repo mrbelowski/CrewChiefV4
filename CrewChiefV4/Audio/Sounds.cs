@@ -28,10 +28,13 @@ namespace CrewChiefV4.Audio
         private static Boolean allowCaching;
         private String[] eventTypesToKeepCached;
         private int maxCacheSize = 600;
-        private int purgeBlockSize = 100;
+        private int soundPlayerPurgeBlockSize = 100;
+        private int nAudioPurgeBlockSize = 50;
         public static int currentSoundsLoaded;
         public static int activeSoundPlayers;
         public static int prefixesAndSuffixesCount = 0;
+
+        private Boolean purging = false;
         
         public static String OPTIONAL_PREFIX_IDENTIFIER = "op_prefix";
         public static String OPTIONAL_SUFFIX_IDENTIFIER = "op_suffix";
@@ -237,8 +240,11 @@ namespace CrewChiefV4.Audio
             if (availableDriverNames.Contains(name))
             {
                 singleSounds[name].loadAndCache(true);
-                SoundCache.dynamicLoadedSounds.Remove(name);
-                SoundCache.dynamicLoadedSounds.AddLast(name);
+                lock (SoundCache.dynamicLoadedSounds)
+                {
+                    SoundCache.dynamicLoadedSounds.Remove(name);
+                    SoundCache.dynamicLoadedSounds.AddLast(name);
+                }
             }
             else
             {
@@ -303,8 +309,11 @@ namespace CrewChiefV4.Audio
                         singleSound = soundSet.getSingleSound(preferPersonalised);
                         if (!soundSet.cachePermanently)
                         {
-                            SoundCache.dynamicLoadedSounds.Remove(soundName);
-                            SoundCache.dynamicLoadedSounds.AddLast(soundName);
+                            lock (SoundCache.dynamicLoadedSounds)
+                            {
+                                SoundCache.dynamicLoadedSounds.Remove(soundName);
+                                SoundCache.dynamicLoadedSounds.AddLast(soundName);
+                            }
                         }
                     }
                     else if (singleSounds.ContainsKey(soundName))
@@ -312,8 +321,11 @@ namespace CrewChiefV4.Audio
                         singleSound = singleSounds[soundName];
                         if (!singleSound.cachePermanently)
                         {
-                            SoundCache.dynamicLoadedSounds.Remove(soundName);
-                            SoundCache.dynamicLoadedSounds.AddLast(soundName);
+                            lock (SoundCache.dynamicLoadedSounds)
+                            {
+                                SoundCache.dynamicLoadedSounds.Remove(soundName);
+                                SoundCache.dynamicLoadedSounds.AddLast(soundName);
+                            }
                         }
                     }                    
                     if (singleSound != null)
@@ -368,32 +380,45 @@ namespace CrewChiefV4.Audio
 
         public void ExpireCachedSounds()
         {
-            if (SoundCache.activeSoundPlayers > maxCacheSize)
+            if (!purging && SoundCache.activeSoundPlayers > maxCacheSize)
             {
-                var watch = System.Diagnostics.Stopwatch.StartNew();
-                int purgeCount = 0;
-                var soundToPurge = SoundCache.dynamicLoadedSounds.First;
-                while (soundToPurge != null && purgeCount <= purgeBlockSize)
+                purging = true;
+                new Thread(() =>
                 {
-                    String soundToPurgeValue = soundToPurge.Value;
-                    if (soundSets.ContainsKey(soundToPurgeValue))
+                    int purgeBlockSize = AudioPlayer.playWithNAudio ? nAudioPurgeBlockSize : soundPlayerPurgeBlockSize;
+                    var watch = System.Diagnostics.Stopwatch.StartNew();
+                    int purgeCount = 0;
+                    LinkedListNode<String> soundToPurge;
+                    lock (SoundCache.dynamicLoadedSounds)
                     {
-                        purgeCount += soundSets[soundToPurgeValue].UnLoadAll();
+                        soundToPurge = SoundCache.dynamicLoadedSounds.First;
                     }
-                    else if (singleSounds.ContainsKey(soundToPurgeValue))
+                    while (soundToPurge != null && purgeCount <= purgeBlockSize)
                     {
-                        if (singleSounds[soundToPurgeValue].UnLoad())
+                        String soundToPurgeValue = soundToPurge.Value;
+                        if (soundSets.ContainsKey(soundToPurgeValue))
                         {
-                            purgeCount++;
+                            purgeCount += soundSets[soundToPurgeValue].UnLoadAll();
+                        }
+                        else if (singleSounds.ContainsKey(soundToPurgeValue))
+                        {
+                            if (singleSounds[soundToPurgeValue].UnLoad())
+                            {
+                                purgeCount++;
+                            }
+                        }
+                        lock (SoundCache.dynamicLoadedSounds)
+                        {
+                            var nextSoundToPurge = soundToPurge.Next;
+                            SoundCache.dynamicLoadedSounds.Remove(soundToPurge);
+                            soundToPurge = nextSoundToPurge;
                         }
                     }
-                    var nextSoundToPurge = soundToPurge.Next;
-                    SoundCache.dynamicLoadedSounds.Remove(soundToPurge);
-                    soundToPurge = nextSoundToPurge;
-                }
-                watch.Stop();
-                var elapsedMs = watch.ElapsedMilliseconds;
-                Console.WriteLine("Purged " + purgeCount + " sounds in " + elapsedMs + "ms, there are now " + SoundCache.activeSoundPlayers + " active SoundPlayer objects");
+                    watch.Stop();
+                    var elapsedMs = watch.ElapsedMilliseconds;
+                    Console.WriteLine("Purged " + purgeCount + " sounds in " + elapsedMs + "ms, there are now " + SoundCache.activeSoundPlayers + " active SoundPlayer objects");
+                    purging = false;
+                }).Start();
             }
         }
 
@@ -961,7 +986,8 @@ namespace CrewChiefV4.Audio
                 uncachedWaveOut.Play();
                 try
                 {
-                    this.playWaitHandle.WaitOne();
+                    // stop waiting after 30 seconds
+                    this.playWaitHandle.WaitOne(30000);
                 }
                 catch (Exception e)
                 {
@@ -980,19 +1006,22 @@ namespace CrewChiefV4.Audio
             }
             else
             {
-                if (getVolume() != volumeWhenCached || this.deviceIdWhenCached != AudioPlayer.naudioMessagesPlaybackDeviceId)
+                lock (this)
                 {
-                    UnLoad();
+                    if (getVolume() != volumeWhenCached || this.deviceIdWhenCached != AudioPlayer.naudioMessagesPlaybackDeviceId)
+                    {
+                        UnLoad();
+                    }
+                    if (!loadedSoundPlayer)
+                    {
+                        LoadNAudioWaveOutAndCache();
+                    }
+                    this.reader.CurrentTime = TimeSpan.Zero;
+                    this.waveOut.Play();
                 }
-                if (!loadedSoundPlayer)
-                { 
-                    LoadNAudioWaveOutAndCache();
-                }
-                this.reader.CurrentTime = TimeSpan.Zero;
-                this.waveOut.Play();
                 try
                 {
-                    this.playWaitHandle.WaitOne();
+                    this.playWaitHandle.WaitOne(10000);
                 }
                 catch (Exception e)
                 {
@@ -1035,11 +1064,14 @@ namespace CrewChiefV4.Audio
             }
             else
             {
-                if (!loadedSoundPlayer)
+                lock (this)
                 {
-                    LoadSoundPlayer();
+                    if (!loadedSoundPlayer)
+                    {
+                        LoadSoundPlayer();
+                    }
+                    this.soundPlayer.PlaySync();
                 }
-                this.soundPlayer.PlaySync();
             }
         }
 
