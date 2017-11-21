@@ -2,7 +2,7 @@ CrewChief version 4.8
 
 Written by Jim Britton (main app, voice acting, Raceroom and PCars implementations), Morten Roslev (Assetto Corsa and iRacing implementation), Vytautas Leonavičius (rFactor2 implementation) and Dan Allongo (Automobilista and rFactor1 implementation). The application is the result of lots of lots of hard work and input from the guys above as well as some great advice and support from the community and the guys at Sector3 and SMS.
 
-Additional material from Scoops (fantastic track layout mapping work). Fantastic alternate spotter sounds by Geoffrey Lessel, Matt Orr (aka EmptyBox), Clare Britton, Mike Schreiner and Phil Linden. Also a thank you to Nick Thissen for his work on iRacingSdkWrapper.
+Additional material from Scoops (fantastic track layout mapping work). Fantastic alternate spotter sounds by Geoffrey Lessel, Matt Orr (aka EmptyBox), Clare Britton, Mike Schreiner, Phil Linden and Micha (last name?). Also a thank you to Nick Thissen for his work on iRacingSdkWrapper.
 
 The source code for Crew Chief is available here: https://github.com/mrbelowski/CrewChiefV4
 
@@ -10,7 +10,9 @@ For support and discussions about Crew Chief we have our very own forum here: ht
 
 Changelog
 ---------
-Version 4.8.1.6: Opponent to player delta bug fixes (all games); added iRacing pit macros; more iRacing fixes; added new Pace Notes feature for recording and playing back user-created pace notes
+Version 4.8.1.9: Improvements to speech recogntion accuracy; integrated nAudio library for sound playback which allows you to choose play back devices for messages and background sounds (disabled by default - enable this with the "Use nAudio for playback" option) - this also allows the app to play back at higher volumes; added lots of iRacing pit commands (see the voice commands section in Help); lots of iRacing bug fixes; added a new spotter (Micha - in the latest sound pack)
+
+Version 4.8.1.7: Opponent to player delta bug fixes (all games); added macros for some iRacing black-box interactions; lots of iRacing fixes; added new Pace Notes feature for recording and playing back user-created pace notes (see Help); fixed arrow keys not working for macros; fixed a few minor lap time reporting issues
 
 Version 4.8.1.5: Better UI handling of sound pack downloads (app should no longer appear to hang while unpacking sounds); Announce retired and DQ'ed drivers in RF2; Fixed stale driverID in iRacing; Minor bug fixes - Mark out laps as invalid in R3E (should prevent stale lap time calls at the end of an out lap), RF2 pre-lights and overtake messages and track landmark mapping getting lost on session restart, pCARS 2 pit exit messages;
 
@@ -330,6 +332,24 @@ I've not finished implementing this but currently the app understands and respon
 "Where should I attack / where am I faster / where can I attack": If the app has enough data, will report the corner name where you're gaining the most time on the guy in front
 "Where should I defend / where am I slower / where is he faster / where will he attack": If the app has enough data, will report the corner name where you're losing the most time to the guy behind
 "Read corner names / corner names / tell me the corner names": read out each corner name when you hit the mid-point of the corner, for this lap only (useful to test corner name mappings)
+"pitstop add [X liters]" (adds X amount of fuel next pitstop, this option is iRacing only)
+"pitstop tearoff / pitstop windscreen" (enable next pitstop, this option is iRacing only)
+"pitstop fast repair / pitstop repair" (enable fast repair next pitstop, this option is iRacing only)
+"pitstop clear all" (clears all selected pitstop options, this option is iRacing only)
+"pitstop clear tyres (clears all tyre selections" next pitstop, this option is iRacing only)
+"pitstop clear tearoff / pitstop clear windscreen" (clears tearoff selection next pitstop, this option is iRacing only)
+"pitstop clear fast repair" (clears fast repair selection next pitstop, this option is iRacing only)
+"pitstop clear fuel" (clears fuel refueling next pitstop, this option is iRacing only)
+"pitstop change all tyres" (change all tyres next pitstop, this option is iRacing only)
+"pitstop change left front tyre" (change left front tyre next pitstop, this option is iRacing only)
+"pitstop change right front tyre" (change right front tyre next pitstop, this option is iRacing only)
+"pitstop change left rear tyre" (change left rear tyre next pitstop, this option is iRacing only)
+"pitstop change right rear tyre" (change right rear tyre next pitstop, this option is iRacing only)
+"pitstop change tyres pressure [ new value ]" (change right rear tyre pressure next pitstop, this option is iRacing only)
+"pitstop change left front tyre pressure [ new value ]" (change left front tyre next pressure pitstop, this option is iRacing only)
+"pitstop change right front tyre pressure [ new value ]" (change right front tyre pressure next pitstop, this option is iRacing only)
+"pitstop change left rear tyre pressure [ new value ]" (change left rear tyre pressure next pitstop, this option is iRacing only)
+"pitstop change right rear tyre pressure [ new value ]" (change right rear tyre pressure next pitstop, this option is iRacing only)
 
 
 Speech recognition customisation

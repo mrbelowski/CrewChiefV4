@@ -17,7 +17,7 @@ namespace CrewChiefV4.Audio
         public static Boolean useTTS = UserSettings.GetUserSettings().getBoolean("use_tts_for_missing_names");
         private double minSecondsBetweenPersonalisedMessages = (double)UserSettings.GetUserSettings().getInt("min_time_between_personalised_messages");
         public static Boolean eagerLoadSoundFiles = UserSettings.GetUserSettings().getBoolean("load_sound_files_on_startup");
-        
+               
         private static LinkedList<String> dynamicLoadedSounds = new LinkedList<String>();
         public static Dictionary<String, SoundSet> soundSets = new Dictionary<String, SoundSet>();
         private static Dictionary<String, SingleSound> singleSounds = new Dictionary<String, SingleSound>();
@@ -28,10 +28,13 @@ namespace CrewChiefV4.Audio
         private static Boolean allowCaching;
         private String[] eventTypesToKeepCached;
         private int maxCacheSize = 600;
-        private int purgeBlockSize = 100;
+        private int soundPlayerPurgeBlockSize = 100;
+        private int nAudioPurgeBlockSize = 50;
         public static int currentSoundsLoaded;
         public static int activeSoundPlayers;
         public static int prefixesAndSuffixesCount = 0;
+
+        private Boolean purging = false;
         
         public static String OPTIONAL_PREFIX_IDENTIFIER = "op_prefix";
         public static String OPTIONAL_SUFFIX_IDENTIFIER = "op_suffix";
@@ -45,7 +48,7 @@ namespace CrewChiefV4.Audio
         public static SpeechSynthesizer synthesizer;
 
         public static Boolean hasSuitableTTSVoice = false;
-
+        
         public SoundCache(DirectoryInfo soundsFolder, String[] eventTypesToKeepCached, Boolean useSwearyMessages, Boolean allowCaching, String selectedPersonalisation)
         {
             // ensure the static state is nuked before we start updating it
@@ -237,8 +240,11 @@ namespace CrewChiefV4.Audio
             if (availableDriverNames.Contains(name))
             {
                 singleSounds[name].loadAndCache(true);
-                SoundCache.dynamicLoadedSounds.Remove(name);
-                SoundCache.dynamicLoadedSounds.AddLast(name);
+                lock (SoundCache.dynamicLoadedSounds)
+                {
+                    SoundCache.dynamicLoadedSounds.Remove(name);
+                    SoundCache.dynamicLoadedSounds.AddLast(name);
+                }
             }
             else
             {
@@ -303,8 +309,11 @@ namespace CrewChiefV4.Audio
                         singleSound = soundSet.getSingleSound(preferPersonalised);
                         if (!soundSet.cachePermanently)
                         {
-                            SoundCache.dynamicLoadedSounds.Remove(soundName);
-                            SoundCache.dynamicLoadedSounds.AddLast(soundName);
+                            lock (SoundCache.dynamicLoadedSounds)
+                            {
+                                SoundCache.dynamicLoadedSounds.Remove(soundName);
+                                SoundCache.dynamicLoadedSounds.AddLast(soundName);
+                            }
                         }
                     }
                     else if (singleSounds.ContainsKey(soundName))
@@ -312,8 +321,11 @@ namespace CrewChiefV4.Audio
                         singleSound = singleSounds[soundName];
                         if (!singleSound.cachePermanently)
                         {
-                            SoundCache.dynamicLoadedSounds.Remove(soundName);
-                            SoundCache.dynamicLoadedSounds.AddLast(soundName);
+                            lock (SoundCache.dynamicLoadedSounds)
+                            {
+                                SoundCache.dynamicLoadedSounds.Remove(soundName);
+                                SoundCache.dynamicLoadedSounds.AddLast(soundName);
+                            }
                         }
                     }                    
                     if (singleSound != null)
@@ -368,61 +380,80 @@ namespace CrewChiefV4.Audio
 
         public void ExpireCachedSounds()
         {
-            if (SoundCache.activeSoundPlayers > maxCacheSize)
+            if (!purging && SoundCache.activeSoundPlayers > maxCacheSize)
             {
-                int purgeCount = 0;
-                var soundToPurge = SoundCache.dynamicLoadedSounds.First;
-                while (soundToPurge != null && purgeCount <= purgeBlockSize)
+                purging = true;
+                new Thread(() =>
                 {
-                    String soundToPurgeValue = soundToPurge.Value;
-                    if (soundSets.ContainsKey(soundToPurgeValue))
+                    int purgeBlockSize = AudioPlayer.playWithNAudio ? nAudioPurgeBlockSize : soundPlayerPurgeBlockSize;
+                    var watch = System.Diagnostics.Stopwatch.StartNew();
+                    int purgeCount = 0;
+                    LinkedListNode<String> soundToPurge;
+                    lock (SoundCache.dynamicLoadedSounds)
                     {
-                        purgeCount += soundSets[soundToPurgeValue].UnLoadAll();
+                        soundToPurge = SoundCache.dynamicLoadedSounds.First;
                     }
-                    else if (singleSounds.ContainsKey(soundToPurgeValue))
+                    while (soundToPurge != null && purgeCount <= purgeBlockSize)
                     {
-                        if (singleSounds[soundToPurgeValue].UnLoad())
+                        String soundToPurgeValue = soundToPurge.Value;
+                        if (soundSets.ContainsKey(soundToPurgeValue))
                         {
-                            purgeCount++;
+                            purgeCount += soundSets[soundToPurgeValue].UnLoadAll();
+                        }
+                        else if (singleSounds.ContainsKey(soundToPurgeValue))
+                        {
+                            if (singleSounds[soundToPurgeValue].UnLoad())
+                            {
+                                purgeCount++;
+                            }
+                        }
+                        lock (SoundCache.dynamicLoadedSounds)
+                        {
+                            var nextSoundToPurge = soundToPurge.Next;
+                            SoundCache.dynamicLoadedSounds.Remove(soundToPurge);
+                            soundToPurge = nextSoundToPurge;
                         }
                     }
-                    var nextSoundToPurge = soundToPurge.Next;
-                    SoundCache.dynamicLoadedSounds.Remove(soundToPurge);
-                    soundToPurge = nextSoundToPurge;
-                }
-                Console.WriteLine("Purged " + purgeCount + " sounds, there are now " + SoundCache.activeSoundPlayers + " active SoundPlayer objects");
+                    watch.Stop();
+                    var elapsedMs = watch.ElapsedMilliseconds;
+                    Console.WriteLine("Purged " + purgeCount + " sounds in " + elapsedMs + "ms, there are now " + SoundCache.activeSoundPlayers + " active SoundPlayer objects");
+                    purging = false;
+                }).Start();
             }
         }
 
         public void StopAndUnloadAll()
         {
-            if (synthesizer != null)
+            new Thread(() =>
             {
-                try
+                if (synthesizer != null)
                 {
-                    synthesizer.Dispose();
-                    synthesizer = null;
+                    try
+                    {
+                        synthesizer.Dispose();
+                        synthesizer = null;
+                    }
+                    catch (Exception) { }
                 }
-                catch (Exception) { }
-            }
-            foreach (SoundSet soundSet in soundSets.Values)
-            {                
-                try
+                foreach (SoundSet soundSet in soundSets.Values)
                 {
-                    soundSet.StopAll();
-                    soundSet.UnLoadAll();
+                    try
+                    {
+                        soundSet.StopAll();
+                        soundSet.UnLoadAll();
+                    }
+                    catch (Exception) { }
                 }
-                catch (Exception) { }
-            }
-            foreach (SingleSound singleSound in singleSounds.Values)
-            {                
-                try
+                foreach (SingleSound singleSound in singleSounds.Values)
                 {
-                    singleSound.Stop();
-                    singleSound.UnLoad();
+                    try
+                    {
+                        singleSound.Stop();
+                        singleSound.UnLoad();
+                    }
+                    catch (Exception) { }
                 }
-                catch (Exception) { }
-            }
+            }).Start();
         }
 
         public void StopAll()
@@ -856,6 +887,12 @@ namespace CrewChiefV4.Audio
         private byte[] fileBytes;
         private MemoryStream memoryStream;
         private SoundPlayer soundPlayer;
+
+        private NAudio.Wave.WaveOutEvent waveOut;
+        private NAudio.Wave.WaveFileReader reader;
+        private float volumeWhenCached = 0;
+        private int deviceIdWhenCached = 0;
+
         private Boolean allowCaching;
         private Boolean loadedSoundPlayer = false;
         private Boolean loadedFile = false;
@@ -863,6 +900,8 @@ namespace CrewChiefV4.Audio
 
         public SoundSet prefixSoundSet = null;
         public SoundSet suffixSoundSet = null;
+
+        AutoResetEvent playWaitHandle = new AutoResetEvent(false);
 
         public SingleSound(int pauseLength)
         {
@@ -890,7 +929,14 @@ namespace CrewChiefV4.Audio
             LoadFile();
             if (loadSoundPlayer)
             {
-                LoadSoundPlayer();
+                if (AudioPlayer.playWithNAudio)
+                {
+                    LoadNAudioWaveOutAndCache();
+                }
+                else
+                {
+                    LoadSoundPlayer();
+                }
             }
         }
 
@@ -914,18 +960,111 @@ namespace CrewChiefV4.Audio
             }
             else
             {
-                if (!allowCaching)
+                if (AudioPlayer.playWithNAudio)
                 {
-                    SoundPlayer soundPlayer = new SoundPlayer(fullPath);
-                    soundPlayer.Load();
-                    soundPlayer.PlaySync();
-                    try
-                    {
-                        soundPlayer.Dispose();
-                    }
-                    catch (Exception) { }
+                    PlayNAudio();
                 }
                 else
+                {
+                    PlaySoundPlayer();
+                }
+            }
+        }
+
+        private void PlayNAudio()
+        {
+            // if the file isn't yet loaded, play by reading it directly
+            if (!allowCaching || ! loadedFile)
+            {
+                NAudio.Wave.WaveOutEvent uncachedWaveOut = new NAudio.Wave.WaveOutEvent();
+                uncachedWaveOut.DeviceNumber = AudioPlayer.naudioMessagesPlaybackDeviceId;
+                NAudio.Wave.WaveFileReader uncachedReader = new NAudio.Wave.WaveFileReader(fullPath);
+                uncachedWaveOut.PlaybackStopped += new EventHandler<NAudio.Wave.StoppedEventArgs>(playbackStopped);
+                NAudio.Wave.SampleProviders.SampleChannel sampleChannel = new NAudio.Wave.SampleProviders.SampleChannel(uncachedReader);
+                sampleChannel.Volume = getVolume();
+                uncachedWaveOut.Init(new NAudio.Wave.SampleProviders.SampleToWaveProvider(sampleChannel));
+                uncachedWaveOut.Play();
+                try
+                {
+                    // stop waiting after 30 seconds
+                    this.playWaitHandle.WaitOne(30000);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Exception " + e.Message + " playing sound " + this.fullPath);
+                }
+                try
+                {
+                    uncachedReader.Dispose();
+                }
+                catch (Exception) { }
+                try
+                {
+                    uncachedWaveOut.Dispose();
+                }
+                catch (Exception) { }
+            }
+            else
+            {
+                lock (this)
+                {
+                    if (getVolume() != volumeWhenCached || this.deviceIdWhenCached != AudioPlayer.naudioMessagesPlaybackDeviceId)
+                    {
+                        UnLoad();
+                    }
+                    if (!loadedSoundPlayer)
+                    {
+                        LoadNAudioWaveOutAndCache();
+                    }
+                    this.reader.CurrentTime = TimeSpan.Zero;
+                    this.waveOut.Play();
+                }
+                try
+                {
+                    this.playWaitHandle.WaitOne(10000);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Exception " + e.Message + " playing sound " + this.fullPath);
+                }
+            }
+        }
+
+        private void playbackStopped(object sender, NAudio.Wave.StoppedEventArgs e)
+        {
+            this.playWaitHandle.Set();
+        }
+
+        private float getVolume()
+        {
+            float volume = UserSettings.GetUserSettings().getFloat("messages_volume");
+            if (volume > 1)
+            {
+                volume = 1;
+            }
+            if (volume < 0)
+            {
+                volume = 0;
+            }
+            return volume;
+        }
+
+        private void PlaySoundPlayer()
+        {
+            if (!allowCaching)
+            {
+                SoundPlayer soundPlayer = new SoundPlayer(fullPath);
+                soundPlayer.Load();
+                soundPlayer.PlaySync();
+                try
+                {
+                    soundPlayer.Dispose();
+                }
+                catch (Exception) { }
+            }
+            else
+            {
+                lock (this)
                 {
                     if (!loadedSoundPlayer)
                     {
@@ -960,7 +1099,7 @@ namespace CrewChiefV4.Audio
             }
         }
 
-        public void LoadSoundPlayer()
+        private void LoadSoundPlayer()
         {
             lock (this)
             {
@@ -979,6 +1118,33 @@ namespace CrewChiefV4.Audio
             }
         }
 
+        private void LoadNAudioWaveOutAndCache()
+        {
+            lock (this)
+            {
+                if (!loadedFile)
+                {
+                    LoadFile();
+                }
+                if (!loadedSoundPlayer)
+                {
+                    this.waveOut = new NAudio.Wave.WaveOutEvent();
+                    this.deviceIdWhenCached = AudioPlayer.naudioMessagesPlaybackDeviceId;
+                    this.waveOut.DeviceNumber = this.deviceIdWhenCached;
+                    this.memoryStream = new MemoryStream(this.fileBytes);
+                    this.reader = new NAudio.Wave.WaveFileReader(this.memoryStream);
+
+                    this.waveOut.PlaybackStopped += new EventHandler<NAudio.Wave.StoppedEventArgs>(playbackStopped);
+                    NAudio.Wave.SampleProviders.SampleChannel sampleChannel = new NAudio.Wave.SampleProviders.SampleChannel(reader);
+                    this.volumeWhenCached = getVolume();
+                    sampleChannel.Volume = volumeWhenCached;
+                    this.waveOut.Init(new NAudio.Wave.SampleProviders.SampleToWaveProvider(sampleChannel));
+                    loadedSoundPlayer = true;
+                    SoundCache.activeSoundPlayers++;
+                }
+            }
+        }
+
         public Boolean UnLoad()
         {
             Boolean unloaded = false;
@@ -987,15 +1153,37 @@ namespace CrewChiefV4.Audio
                 if (loadedSoundPlayer)
                 {                
                     unloaded = true;
-                    if (this.soundPlayer != null)
+                    if (AudioPlayer.playWithNAudio)
                     {
-                        this.soundPlayer.Stop();
-                        try
+                        if (this.reader != null)
                         {
-                            this.soundPlayer.Dispose();
+                            try
+                            {
+                                this.reader.Dispose();
+                            }
+                            catch (Exception) { }
                         }
-                        catch (Exception) { }
-                        this.soundPlayer = null;
+                        if (this.waveOut != null)
+                        {
+                            try
+                            {
+                                this.waveOut.Dispose();
+                            }
+                            catch (Exception) { }
+                        }
+                    }
+                    else
+                    {
+                        if (this.soundPlayer != null)
+                        {
+                            this.soundPlayer.Stop();
+                            try
+                            {
+                                this.soundPlayer.Dispose();
+                            }
+                            catch (Exception) { }
+                            this.soundPlayer = null;
+                        }
                     }
                     if (this.memoryStream != null)
                     {
@@ -1015,7 +1203,11 @@ namespace CrewChiefV4.Audio
 
         public void Stop()
         {
-            if (this.soundPlayer != null)
+            if (AudioPlayer.playWithNAudio && this.waveOut != null && this.waveOut.PlaybackState == NAudio.Wave.PlaybackState.Playing)
+            {
+                this.waveOut.Stop();
+            }
+            else if (!AudioPlayer.playWithNAudio && this.soundPlayer != null)
             {
                 this.soundPlayer.Stop();
             }

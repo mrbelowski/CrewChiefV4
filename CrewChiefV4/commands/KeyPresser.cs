@@ -77,16 +77,20 @@ namespace CrewChiefV4.commands
 
         [DllImport("user32.dll")]
         public static extern uint MapVirtualKey(uint uCode, uint uMapType);
+
+        private static KeyCode[] extendedKeys = { KeyCode.UP, KeyCode.DOWN, KeyCode.LEFT, KeyCode.RIGHT, 
+                                           KeyCode.INSERT, KeyCode.HOME, KeyCode.PAGE_UP, KeyCode.PAGEDOWN, KeyCode.DELETE, KeyCode.END };
         
         public static void SendScanCodeKeyPress(KeyCode keyCode, int holdTimeMillis)
         {
             ushort scanCode = (ushort)MapVirtualKey((ushort)keyCode, 0);
-            press(scanCode);
+            press(scanCode, extendedKeys.Contains(keyCode));
             Thread.Sleep(holdTimeMillis);
             release(scanCode);
         }
-        private static void press(ushort scanCode)
+        private static void press(ushort scanCode, Boolean extended)
         {
+            uint eventScanCode = extended ? KEYEVENTF_SCANCODE | KEYEVENTF_EXTENDEDKEY : KEYEVENTF_SCANCODE;
             INPUT[] inputs = new INPUT[]
             {
                 new INPUT
@@ -98,7 +102,7 @@ namespace CrewChiefV4.commands
                         {
                             wVk = 0,
                             wScan = scanCode,
-                            dwFlags = KEYEVENTF_SCANCODE,
+                            dwFlags = eventScanCode,
                             dwExtraInfo = GetMessageExtraInfo(),
                         }
                     }

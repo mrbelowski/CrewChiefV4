@@ -138,10 +138,6 @@ namespace CrewChiefV4.iRacing
                             {
                                 Console.WriteLine("Session num too many attempts");
                             }
-                            if (this.DriverId == -1)
-                            {
-                                _DriverId = (int)sdk.GetData("PlayerCarIdx");
-                            }
                             Console.WriteLine("Initialised iRacing shared memory");
                         }
                     }

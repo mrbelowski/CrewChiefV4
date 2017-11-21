@@ -475,9 +475,6 @@ enable_rf2_pit_lane_approach_heuristics_help = Experimental: If enabled, CC will
 enable_command_macros = Enable command macros
 enable_command_macros_help = Enable voice-triggered command macros for pit actions etc
 
-iracing_delayed_laptimes = iRacing delayed laptimes
-iracing_delayed_laptimes_help = Enables delayed but accurate laptimes for iRacing
-
 pcars_enable_rain_prediction = Enable PCars rain prediction using CloudBrightness
 pcars_enable_rain_prediction_help = Use CloudBrightness to guess when it might rain - can be quite inaccurate
 
@@ -491,3 +488,8 @@ disable_alternative_voice_commands_help = Experimental: If enabled, CC will only
 
 toggle_pace_notes_recording = Start / stop recording pace notes
 toggle_pace_notes_playback = Start / stop playing pace notes
+
+messages_audio_device_label = Messages playback device
+background_audio_device_label = Background playback device
+use_naudio = Use nAudio for playback
+use_naudio_help = nAudio playback library allows playback device selection and higher volumes

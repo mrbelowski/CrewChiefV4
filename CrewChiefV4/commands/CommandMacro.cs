@@ -1,7 +1,9 @@
 ﻿using CrewChiefV4.Audio;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 
@@ -25,8 +27,43 @@ namespace CrewChiefV4.commands
                 Console.WriteLine("Macro \"" + macro.name + "\" can be triggered automatically");
             }
         }
+        [DllImport("user32.dll")]
+        static extern bool SetForegroundWindow(IntPtr hWnd);
+        [DllImport("user32.dll")]
+        static extern IntPtr GetForegroundWindow();
+
+        bool BringGameWindowToFront(String processName, String[] alternateProcessNames, IntPtr currentForgroundWindow)
+        {
+            Process[] p = Process.GetProcessesByName(processName);
+            if (p.Count() > 0)
+            {
+                if (p[0].MainWindowHandle != currentForgroundWindow)
+                {
+                    SetForegroundWindow(p[0].MainWindowHandle);
+                    return true;
+                }               
+            }                
+            else if (alternateProcessNames != null && alternateProcessNames.Length > 0)
+            {
+                foreach (String alternateProcessName in alternateProcessNames)
+                {
+                    p = Process.GetProcessesByName(processName);
+                    if (p.Count() > 0)
+                    {
+                        if (p[0].MainWindowHandle != currentForgroundWindow)
+                        {
+                            SetForegroundWindow(p[0].MainWindowHandle);
+                            return true;
+                        }                       
+                    } 
+                }
+            }
+            return false;
+        }
+
         public void execute()
         {
+           
             execute(false);
         }
 
@@ -45,6 +82,9 @@ namespace CrewChiefV4.commands
                     }
                     new Thread(() =>
                     {
+                        IntPtr currentForgroundWindow = GetForegroundWindow();
+                        bool hasChangedForgroundWindow = BringGameWindowToFront(CrewChief.gameDefinition.processName, CrewChief.gameDefinition.alternativeProcessNames, currentForgroundWindow);
+
                         foreach (ActionItem actionItem in commandSet.getActionItems(true, assignmentsByGame[commandSet.gameDefinition]))
                         {
                             if (actionItem.pauseMillis > 0)
@@ -56,11 +96,16 @@ namespace CrewChiefV4.commands
                                 KeyPresser.SendScanCodeKeyPress(actionItem.keyCode, commandSet.keyPressTime);
                             }
                             Thread.Sleep(commandSet.waitBetweenEachCommand);
-                        } 
+                        }
+                        if (hasChangedForgroundWindow)
+                        {
+                            SetForegroundWindow(currentForgroundWindow);
+                        }                        
                     }).Start();                                  
                     break;
                 }
             }
+            
         }
     }
 

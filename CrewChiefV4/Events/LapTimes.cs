@@ -239,7 +239,7 @@ namespace CrewChiefV4.Events
                             deltaPlayerLastToSessionBestInClassSet = true;
                         }
                     }
-                    else if (currentGameState.SessionData.PlayerLapTimeSessionBest > 0)
+                    else if (currentGameState.SessionData.PlayerLapTimeSessionBest > 0 && currentGameState.SessionData.CompletedLaps > 1)
                     {
                         deltaPlayerLastToSessionBestInClass = TimeSpan.FromSeconds(currentGameState.SessionData.LapTimePrevious - currentGameState.SessionData.PlayerLapTimeSessionBest);
                         deltaPlayerLastToSessionBestInClassSet = true;
@@ -313,7 +313,9 @@ namespace CrewChiefV4.Events
             {
                 Boolean sectorsReportedForLap = false;                
                 if (currentGameState.SessionData.IsNewLap && 
-                    ((currentGameState.SessionData.SessionType == SessionType.HotLap && currentGameState.SessionData.CompletedLaps > 0) || currentGameState.SessionData.CompletedLaps > 1))
+                    (((currentGameState.SessionData.SessionType == SessionType.HotLap || currentGameState.SessionData.SessionType == SessionType.Qualify) 
+                            && currentGameState.SessionData.CompletedLaps > 0) ||
+                      currentGameState.SessionData.CompletedLaps > 1))
                 {
                     if (lapTimesWindow == null)
                     {
@@ -359,7 +361,8 @@ namespace CrewChiefV4.Events
                             {
                                 if (currentGameState.SessionData.SessionType == SessionType.HotLap || currentGameState.OpponentData.Count == 0)
                                 {
-                                    if (lastLapRating == LastLapRating.BEST_IN_CLASS || (deltaPlayerLastToSessionBestInClass <= TimeSpan.Zero))
+                                    if (currentGameState.SessionData.CompletedLaps > 1 && 
+                                        (lastLapRating == LastLapRating.BEST_IN_CLASS || deltaPlayerLastToSessionBestInClass <= TimeSpan.Zero))
                                     {
                                         audioPlayer.playMessage(new QueuedMessage(folderPersonalBest, 0, this));
                                     }
@@ -431,8 +434,9 @@ namespace CrewChiefV4.Events
                                 }
                                 else
                                 {
-                                    if (lastLapRating == LastLapRating.PERSONAL_BEST_STILL_SLOW || lastLapRating == LastLapRating.PERSONAL_BEST_CLOSE_TO_CLASS_LEADER ||
-                                        lastLapRating == LastLapRating.PERSONAL_BEST_CLOSE_TO_OVERALL_LEADER)
+                                    if (currentGameState.SessionData.CompletedLaps > 1 && 
+                                        (lastLapRating == LastLapRating.PERSONAL_BEST_STILL_SLOW || lastLapRating == LastLapRating.PERSONAL_BEST_CLOSE_TO_CLASS_LEADER ||
+                                         lastLapRating == LastLapRating.PERSONAL_BEST_CLOSE_TO_OVERALL_LEADER))
                                     {
                                         audioPlayer.playMessage(new QueuedMessage(folderPersonalBest, 0, this));
                                     }
@@ -722,6 +726,19 @@ namespace CrewChiefV4.Events
             {
                 float closeThreshold = currentGameState.SessionData.LapTimePrevious * goodLapPercent / 100;
                 float matchingRacePaceThreshold = currentGameState.SessionData.LapTimePrevious * matchingRacePacePercent / 100;
+
+                // no point in reporting lap awesomeness if we have no comparison data:
+                Boolean hasPlayerLapComparisonData = currentGameState.SessionData.CompletedLaps > 1
+                    && currentGameState.SessionData.LapTimePrevious > 0
+                    && currentGameState.SessionData.PreviousLapWasValid;
+                Boolean sessionHasOpponents = currentGameState.SessionData.SessionType != SessionType.HotLap && currentGameState.OpponentData.Count > 0;
+                Boolean hasOpponentLapComparisonData = sessionHasOpponents && bestLapDataForOpponents[0] > 0;
+
+                if (!hasPlayerLapComparisonData && !hasOpponentLapComparisonData)
+                {
+                    return LastLapRating.NO_DATA;
+                }
+
                 if (currentGameState.SessionData.OverallSessionBestLapTime == currentGameState.SessionData.LapTimePrevious)
                 {
                     return LastLapRating.BEST_OVERALL;
@@ -761,7 +778,8 @@ namespace CrewChiefV4.Events
                 {
                     return LastLapRating.CLOSE_TO_CLASS_LEADER;
                 }
-                else if (currentGameState.SessionData.PlayerLapTimeSessionBest >= currentGameState.SessionData.LapTimePrevious - closeThreshold)
+                else if (currentGameState.SessionData.PlayerLapTimeSessionBest >= currentGameState.SessionData.LapTimePrevious - closeThreshold
+                    && currentGameState.SessionData.CompletedLaps > 1)
                 {
                     return LastLapRating.CLOSE_TO_PERSONAL_BEST;
                 }
