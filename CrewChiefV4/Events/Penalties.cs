@@ -328,7 +328,7 @@ namespace CrewChiefV4.Events
                     if (lapsCompleted - penaltyLap == 2)
                     {
                         audioPlayer.playMessageImmediately(new QueuedMessage("youHaveAPenaltyBoxThisLap",
-                            MessageContents(folderYouHavePenalty, MandatoryPitStops.folderMandatoryPitStopsPitThisLap), 0, null));
+                            MessageContents(folderYouHavePenalty, PitStops.folderMandatoryPitStopsPitThisLap), 0, null));
                     }
                     else
                     {
@@ -350,7 +350,7 @@ namespace CrewChiefV4.Events
                         if (lapsCompleted - penaltyLap == 2)
                         {
                             audioPlayer.playMessageImmediately(new QueuedMessage("youHaveAPenaltyBoxThisLap",
-                                MessageContents(folderYouHavePenalty, MandatoryPitStops.folderMandatoryPitStopsPitThisLap), 0, null));
+                                MessageContents(folderYouHavePenalty, PitStops.folderMandatoryPitStopsPitThisLap), 0, null));
                         }
                         else
                         {
@@ -371,7 +371,7 @@ namespace CrewChiefV4.Events
                         messages.Add(MessageFragment.Text(folderYouStillHavePenalty));
                         if (lapsCompleted - penaltyLap == 2)
                         {
-                            messages.Add(MessageFragment.Text(MandatoryPitStops.folderMandatoryPitStopsPitThisLap));
+                            messages.Add(MessageFragment.Text(PitStops.folderMandatoryPitStopsPitThisLap));
                         }
                         audioPlayer.playMessageImmediately(new QueuedMessage("noYouStillHaveAPenalty", messages, 0, null));
                     }
@@ -390,7 +390,7 @@ namespace CrewChiefV4.Events
                         messages.Add(MessageFragment.Text(folderYouStillHavePenalty));
                         if (lapsCompleted - penaltyLap == 2)
                         {
-                            messages.Add(MessageFragment.Text(MandatoryPitStops.folderMandatoryPitStopsPitThisLap));
+                            messages.Add(MessageFragment.Text(PitStops.folderMandatoryPitStopsPitThisLap));
                         }
                         audioPlayer.playMessageImmediately(new QueuedMessage("yesYouStillHaveAPenalty", messages, 0, null));
                     }
