@@ -150,13 +150,13 @@ namespace CrewChiefV4.Events
                 if (currentGameState.SessionData.SessionHasFixedTime)
                 {
                     Console.WriteLine("pre-start message for mandatory stop time");
-                    possibleMessages.Add(new QueuedMessage("pit_window_time", MessageContents(MandatoryPitStops.folderMandatoryPitStopsPitWindowOpensAfter,
+                    possibleMessages.Add(new QueuedMessage("pit_window_time", MessageContents(PitStops.folderMandatoryPitStopsPitWindowOpensAfter,
                         TimeSpan.FromMinutes(currentGameState.PitData.PitWindowStart)), 0, this));
                 } 
                 else
                 {
                     Console.WriteLine("pre-start message for mandatory stop lap");
-                    possibleMessages.Add(new QueuedMessage("pit_window_lap", MessageContents(MandatoryPitStops.folderMandatoryPitStopsPitWindowOpensOnLap,
+                    possibleMessages.Add(new QueuedMessage("pit_window_lap", MessageContents(PitStops.folderMandatoryPitStopsPitWindowOpensOnLap,
                         currentGameState.PitData.PitWindowStart), 0, this));
                 }
             }

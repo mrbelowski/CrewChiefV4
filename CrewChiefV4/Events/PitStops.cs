@@ -7,7 +7,7 @@ using CrewChiefV4.Audio;
 
 namespace CrewChiefV4.Events
 {
-    class MandatoryPitStops : AbstractEvent
+    class PitStops : AbstractEvent
     {
         public static String folderMandatoryPitStopsPitWindowOpensOnLap = "mandatory_pit_stops/pit_window_opens_on_lap";
         public static String folderMandatoryPitStopsPitWindowOpensAfter = "mandatory_pit_stops/pit_window_opens_after";
@@ -114,7 +114,7 @@ namespace CrewChiefV4.Events
 
         private Boolean enableWindowWarnings = true;
         
-        public MandatoryPitStops(AudioPlayer audioPlayer)
+        public PitStops(AudioPlayer audioPlayer)
         {
             this.audioPlayer = audioPlayer;
         }
