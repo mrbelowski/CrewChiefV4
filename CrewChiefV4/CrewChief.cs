@@ -97,7 +97,7 @@ namespace CrewChiefV4
             eventsList.Add("LapCounter", new LapCounter(audioPlayer));
             eventsList.Add("LapTimes", new LapTimes(audioPlayer));
             eventsList.Add("Penalties", new Penalties(audioPlayer));
-            eventsList.Add("MandatoryPitStops", new MandatoryPitStops(audioPlayer));
+            eventsList.Add("PitStops", new PitStops(audioPlayer));
             eventsList.Add("Fuel", new Fuel(audioPlayer));
             eventsList.Add("Opponents", new Opponents(audioPlayer));
             eventsList.Add("RaceTime", new RaceTime(audioPlayer));
@@ -407,7 +407,7 @@ namespace CrewChiefV4
             getEvent("Penalties").respond(SpeechRecogniser.STATUS[0]);
             getEvent("RaceTime").respond(SpeechRecogniser.STATUS[0]);
             getEvent("Position").respond(SpeechRecogniser.STATUS[0]);
-            getEvent("MandatoryPitStops").respond(SpeechRecogniser.STATUS[0]);
+            getEvent("PitStops").respond(SpeechRecogniser.STATUS[0]);
             getEvent("DamageReporting").respond(SpeechRecogniser.STATUS[0]);
             getEvent("Fuel").respond(SpeechRecogniser.STATUS[0]);
             getEvent("TyreMonitor").respond(SpeechRecogniser.STATUS[0]);
@@ -420,7 +420,7 @@ namespace CrewChiefV4
             getEvent("Penalties").respond(SpeechRecogniser.SESSION_STATUS[0]);
             getEvent("RaceTime").respond(SpeechRecogniser.SESSION_STATUS[0]);
             getEvent("Position").respond(SpeechRecogniser.SESSION_STATUS[0]);
-            getEvent("MandatoryPitStops").respond(SpeechRecogniser.SESSION_STATUS[0]);
+            getEvent("PitStops").respond(SpeechRecogniser.SESSION_STATUS[0]);
             getEvent("Timings").respond(SpeechRecogniser.SESSION_STATUS[0]);
         }
 

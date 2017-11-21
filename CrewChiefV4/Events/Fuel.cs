@@ -345,7 +345,7 @@ namespace CrewChiefV4.Events
                                 if (!playedPitForFuelNow)
                                 {
                                     playedPitForFuelNow = true;
-                                    audioPlayer.playMessage(new QueuedMessage(MandatoryPitStops.folderMandatoryPitStopsPitThisLap, 10, this));
+                                    audioPlayer.playMessage(new QueuedMessage(PitStops.folderMandatoryPitStopsPitThisLap, 10, this));
                                 }
                             }
                         }
@@ -391,7 +391,7 @@ namespace CrewChiefV4.Events
                                 playedFiveMinutesRemaining = true;
                                 playedTenMinutesRemaining = true;
                                 audioPlayer.playMessage(new QueuedMessage("pit_for_fuel_now",
-                                    MessageContents(folderAboutToRunOut, MandatoryPitStops.folderMandatoryPitStopsPitThisLap), 0, this));
+                                    MessageContents(folderAboutToRunOut, PitStops.folderMandatoryPitStopsPitThisLap), 0, this));
                             }
                             if (estimatedFuelMinutesLeft <= 2 && estimatedFuelMinutesLeft > 1.8 && !playedTwoMinutesRemaining)
                             {
