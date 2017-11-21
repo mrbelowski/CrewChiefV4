@@ -142,6 +142,8 @@ namespace CrewChiefV4
 
         public void Dispose()
         {
+            running = false;
+            spotterIsRunning = false;
             if (gameDataReader != null)
             {
                 gameDataReader.Dispose();
@@ -633,6 +635,11 @@ namespace CrewChiefV4
                         else
                         {
                             rawGameData = gameDataReader.ReadGameData(false);
+                        }
+                        // another Thread may have stopped the app - check here before processing the game data
+                        if (!running)
+                        {
+                            continue;
                         }
                         gameStateMapper.versionCheck(rawGameData);
 
