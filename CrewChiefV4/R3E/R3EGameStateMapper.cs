@@ -416,6 +416,7 @@ namespace CrewChiefV4.RaceRoom
                     currentGameState.SessionData.GameTimeAtLastPositionFrontChange = previousGameState.SessionData.GameTimeAtLastPositionFrontChange;
                     currentGameState.SessionData.GameTimeAtLastPositionBehindChange = previousGameState.SessionData.GameTimeAtLastPositionBehindChange;
                     currentGameState.SessionData.CurrentLapIsValid = previousGameState.SessionData.CurrentLapIsValid;
+                    currentGameState.SessionData.PreviousLapWasValid = previousGameState.SessionData.PreviousLapWasValid;
                     currentGameState.SessionData.LastSector1Time = previousGameState.SessionData.LastSector1Time;
                     currentGameState.SessionData.LastSector2Time = previousGameState.SessionData.LastSector2Time;
                     currentGameState.SessionData.LastSector3Time = previousGameState.SessionData.LastSector3Time;
@@ -521,7 +522,6 @@ namespace CrewChiefV4.RaceRoom
 
             currentGameState.SessionData.LapTimeCurrent = shared.LapTimeCurrentSelf;
             currentGameState.SessionData.LapTimePrevious = shared.LapTimePreviousSelf;
-            currentGameState.SessionData.PreviousLapWasValid = shared.LapTimePreviousSelf > 0;
             currentGameState.SessionData.NumCars = shared.NumCars;
             
             currentGameState.SessionData.Position = getRacePosition(currentGameState.SessionData.DriverRawName, currentGameState.SessionData.Position, shared.Position, currentGameState.Now);
@@ -578,6 +578,7 @@ namespace CrewChiefV4.RaceRoom
                     if (currentGameState.SessionData.IsNewLap)
                     {
                         currentGameState.readLandmarksForThisLap = false;
+                        currentGameState.SessionData.PreviousLapWasValid = currentGameState.SessionData.CurrentLapIsValid;
                         currentGameState.SessionData.CurrentLapIsValid = true;
                     }
                     
@@ -710,6 +711,7 @@ namespace CrewChiefV4.RaceRoom
                         {
                             currentGameState.PitData.OnInLap = false;
                             currentGameState.SessionData.CurrentLapIsValid = false;
+                            currentGameState.SessionData.PreviousLapWasValid = false;
                             currentGameState.PitData.OnOutLap = true;
                         }
                     }

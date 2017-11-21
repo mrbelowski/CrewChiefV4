@@ -158,41 +158,20 @@ namespace CrewChiefV4.iRacing
                     return;
                 }
 
-                var t = telemetry.SessionTime;
-                
+                var t = telemetry.SessionTime;                
                 // Check lap crossing
                 if (p0 - p1 > 0.5) // more than 50% jump in track distance == lap crossing occurred from 0.99xx -> 0.00x
                 {
-                    this.Live.CurrentFakeSector = 1;
+                    this.Live.CurrentSector = 1;
                     p0 -= 1;
                 }
                     
                 // Check 'fake' sectors (divide track into thirds)
-                int sectorcount = 3;
-                foreach (var s in results.FakeSectorTimes)
+                foreach (var s in results.Sectors)
                 {
                     if (p1 > s.StartPercentage && p0 <= s.StartPercentage)
-                    {
-                        // Crossed into new sector
-                        var crossTime = (float)(t - (p1 - s.StartPercentage) * dp);
-
-                        // Finish previous
-                        
-                        var prevNum = s.Number <= 0 ? sectorcount - 1 : s.Number - 1;
-                        var sector = results.FakeSectorTimes[prevNum];
-                        if (s.Number == 0 && sector != null && sector.EnterSessionTime > 0 && results.FakeSector1.EnterSessionTime > 0)
-                        {
-                            this.Live.LastLaptime = (float)(crossTime - results.FakeSector1.EnterSessionTime);
-                        }
-                        if (sector != null && sector.EnterSessionTime > 0)
-                        {
-                            sector.SectorTime = (float)(crossTime - sector.EnterSessionTime);
-                        }
-
-                        // Begin next sector
-                        s.EnterSessionTime = crossTime;                        
-                        this.Live.CurrentFakeSector = s.Number + 1;
-
+                    {                    
+                        this.Live.CurrentSector = s.Number + 1;
                         break;
                     }
                 }

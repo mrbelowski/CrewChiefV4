@@ -102,6 +102,9 @@
     <Compile Include="ACS\ACSGameStateMapper.cs" />
     <Compile Include="ACS\ACSSharedMemoryReader.cs" />
     <Compile Include="ACS\ACSSpotter.cs" />
+    <Compile Include="Audio\BackgroundPlayer.cs" />
+    <Compile Include="Audio\MediaPlayerBackgroundPlayer.cs" />
+    <Compile Include="Audio\NAudioBackgroundPlayer.cs" />
     <Compile Include="Audio\PlaybackModerator.cs" />
     <Compile Include="Audio\Sounds.cs" />
     <Compile Include="CarData.cs" />
@@ -117,6 +120,7 @@
     <Compile Include="Events\FrozenOrderMonitor.cs" />
     <Compile Include="Events\OvertakingAidsMonitor.cs" />
     <Compile Include="Events\ConditionsMonitor.cs" />
+    <Compile Include="Events\IRacingBroadcastMessageEvent.cs" />
     <Compile Include="Events\SessionEndMessages.cs" />
     <Compile Include="Events\Opponents.cs" />
     <Compile Include="Events\FlagsMonitor.cs" />
@@ -229,7 +233,7 @@
     <Compile Include="Events\DamageReporting.cs" />
     <Compile Include="CrewChief.cs" />
     <Compile Include="Events\LapTimes.cs" />
-    <Compile Include="Events\MandatoryPitStops.cs" />
+    <Compile Include="Events\PitStops.cs" />
     <Compile Include="Events\PearlsOfWisdom.cs" />
     <Compile Include="Events\Penalties.cs" />
     <Compile Include="Events\Position.cs" />

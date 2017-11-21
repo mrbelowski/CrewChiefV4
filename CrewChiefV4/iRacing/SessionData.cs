@@ -13,6 +13,7 @@ namespace CrewChiefV4.iRacing
         public Track Track { get; set; }
         public string EventType { get; set; }
         public string SessionType { get; set; }
+        public int SessionId { get; set; }
         public int SubsessionId { get; set; }
         public string SessionTimeString { get; set; }
 
@@ -25,6 +26,8 @@ namespace CrewChiefV4.iRacing
 
             var weekend = info["WeekendInfo"];
             this.SubsessionId = Parser.ParseInt(weekend["SubSessionID"].GetValue());
+            this.SessionId = Parser.ParseInt(weekend["SessionID"].GetValue());
+
             this.EventType = weekend["EventType"].GetValue();
 
             var session = info["SessionInfo"]["Sessions"]["SessionNum", sessionNumber];

@@ -107,19 +107,19 @@
 		},
 		{
 		    "action": "Select Next Control",
-			"key": "KEY_W"
+			"key": "UP"
 		},
 		{
 		    "action": "Select Previous Control",
-			"key": "KEY_S"
+			"key": "DOWN"
 		},
 		{
 		    "action": "Increment Selected Control",
-			"key": "KEY_D"
+			"key": "RIGHT"
 		},
 		{
 		    "action": "Decrement Selected Control",
-			"key": "KEY_A"
+			"key": "LEFT"
 		},
 		{
 		    "action": "Toggle Selected Control",

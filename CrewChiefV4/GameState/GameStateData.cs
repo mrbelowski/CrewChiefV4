@@ -237,6 +237,9 @@ namespace CrewChiefV4.GameState
         // zero indexed - you multi iteration sessions like DTM qual
         public int SessionIteration = 0;
 
+        //iRacing session id, if changed we have a new session(usefull for detecting practice session to practice session change)
+        public int SessionId = -1;
+
         // as soon as the player leaves the racing surface this is set to false
         public Boolean CurrentLapIsValid = true;
 
@@ -354,6 +357,8 @@ namespace CrewChiefV4.GameState
 
         public DeltaTime DeltaTime = new DeltaTime();
 
+        public int PlayerCarNr = -1;
+
         public SessionData()
         {
             SessionTimesAtEndOfSectors.Add(1, -1);
@@ -461,6 +466,18 @@ namespace CrewChiefV4.GameState
                 }
                 if (lapIsValid && thisSectorTime > 0)
                 {
+                    if(sectorNumberJustCompleted == 1)
+                    {
+                        LastSector1Time = thisSectorTime;
+                    }
+                    if (sectorNumberJustCompleted == 2)
+                    {
+                        LastSector2Time = thisSectorTime;
+                    }
+                    if (sectorNumberJustCompleted == 3)
+                    {
+                        LastSector3Time = thisSectorTime;
+                    }
                     if (sectorNumberJustCompleted == 1 && (PlayerBestSector1Time == -1 || thisSectorTime < PlayerBestSector1Time))
                     {
                         PlayerBestSector1Time = thisSectorTime;
@@ -472,6 +489,21 @@ namespace CrewChiefV4.GameState
                     if (sectorNumberJustCompleted == 3 && (PlayerBestSector3Time == -1 || thisSectorTime < PlayerBestSector3Time))
                     {
                         PlayerBestSector3Time = thisSectorTime;
+                    }
+                }
+                else
+                {
+                    if (sectorNumberJustCompleted == 1)
+                    {
+                        LastSector1Time = -1;
+                    }
+                    if (sectorNumberJustCompleted == 2)
+                    {
+                        LastSector2Time = -1;
+                    }
+                    if (sectorNumberJustCompleted == 3)
+                    {
+                        LastSector3Time = -1;
                     }
                 }
                 lapData.SectorTimes[sectorNumberJustCompleted - 1] = thisSectorTime;
@@ -611,6 +643,11 @@ namespace CrewChiefV4.GameState
         public DeltaTime DeltaTime = null;
 
         public bool IsAtPitExit = false;
+
+        public bool isApporchingPits = false;
+
+
+        public int CarNr = -1;
 
         public override string ToString()
         {
@@ -977,21 +1014,28 @@ namespace CrewChiefV4.GameState
 
         public DateTime NewLapDataTimerExpiry = DateTime.MaxValue;
         public Boolean WaitingForNewLapData = false;
+        public int CompleatedLapsWhenHasNewLapDataWasLastTrue = -2;
+        public float GameTimeWhenLastCrossedStartFinishLine = -1;
 
-        public bool HasNewLapData(float gameProvidedLastLapTime, bool hasCrossedSFLine, Boolean previousOpponentDataWaitingForNewLapData,
-            DateTime previousOpponentNewLapDataTimerExpiry, float previousOpponentLastLapTime, Boolean previousOpponentLastLapValid)
+        public bool HasNewLapData(float gameProvidedLastLapTime, bool hasCrossedSFLine, int compleatedLaps, Boolean isRace, float sessionRunningTime, Boolean previousOpponentDataWaitingForNewLapData,
+            DateTime previousOpponentNewLapDataTimerExpiry, float previousOpponentLastLapTime, Boolean previousOpponentLastLapValid,
+            int previousOpponentCompleatedLapsWhenHasNewLapDataWasLastTrue, float previousOpponentGameTimeWhenLastCrossedStartFinishLine)
         {
-            if (hasCrossedSFLine)
+            // here we need to make sure that CompleatedLaps is bigger then CompleatedLapsWhenHasNewLapDataWasLastTrue
+            // else the user will have jumped to pits 
+            if ((hasCrossedSFLine && compleatedLaps > CompleatedLapsWhenHasNewLapDataWasLastTrue) || (isRace && hasCrossedSFLine))
             {
                 // reset the timer and start waiting for an updated laptime...
                 this.WaitingForNewLapData = true;
                 this.NewLapDataTimerExpiry = DateTime.Now.Add(TimeSpan.FromSeconds(3));
+                this.GameTimeWhenLastCrossedStartFinishLine = sessionRunningTime;
             }
             else
             {
                 // not a new lap but may be waiting, so copy over the wait variables
                 this.WaitingForNewLapData = previousOpponentDataWaitingForNewLapData;
                 this.NewLapDataTimerExpiry = previousOpponentNewLapDataTimerExpiry;
+                this.GameTimeWhenLastCrossedStartFinishLine = previousOpponentGameTimeWhenLastCrossedStartFinishLine;
             }
             // if we're waiting, see if the timer has expired or we have a change in the previous laptime value
             if (this.WaitingForNewLapData && (previousOpponentLastLapTime != gameProvidedLastLapTime || DateTime.Now > this.NewLapDataTimerExpiry))
@@ -1000,12 +1044,14 @@ namespace CrewChiefV4.GameState
                 this.WaitingForNewLapData = false;
                 this.LastLapTime = gameProvidedLastLapTime;
                 this.LastLapValid = gameProvidedLastLapTime > 0;
+                this.CompleatedLapsWhenHasNewLapDataWasLastTrue = compleatedLaps;
                 return true;
             }
             else
             {
                 this.LastLapTime = previousOpponentLastLapTime;
                 this.LastLapValid = previousOpponentLastLapValid;
+                this.CompleatedLapsWhenHasNewLapDataWasLastTrue = previousOpponentCompleatedLapsWhenHasNewLapDataWasLastTrue;
             }
             return false;
         }
@@ -1868,23 +1914,27 @@ namespace CrewChiefV4.GameState
         public float RainDensity = -1;
 
         public Boolean readLandmarksForThisLap = false;
-
+        public float GameTimeWhenLastCrossedStartFinishLine = -1;
+        public int CompleatedLapsWhenHasNewLapDataWasLastTrue = -2;
         //call this after setting currentGameState.SessionData.SectorNumber and currentGameState.SessionData.IsNewSector
         public bool HasNewLapData(GameStateData previousGameState, float gameProvidedLastLapTime, bool hasCrossedSFLine)
         {
             if (previousGameState != null)
             {
-                if (hasCrossedSFLine)
+                if ((hasCrossedSFLine && CompleatedLapsWhenHasNewLapDataWasLastTrue < this.SessionData.CompletedLaps) || 
+                    (this.SessionData.SessionType == SessionType.Race && hasCrossedSFLine))
                 {
                     // reset the timer and start waiting for an updated laptime...
                     this.WaitingForNewLapData = true;
                     this.NewLapDataTimerExpiry = this.Now.Add(GameStateData.MaxWaitForNewLapData);
+                    this.GameTimeWhenLastCrossedStartFinishLine = this.SessionData.SessionRunningTime;
                 }
                 else
                 {
                     // not a new lap but may be waiting, so copy over the wait variables
                     this.WaitingForNewLapData = previousGameState.WaitingForNewLapData;
                     this.NewLapDataTimerExpiry = previousGameState.NewLapDataTimerExpiry;
+                    this.GameTimeWhenLastCrossedStartFinishLine = previousGameState.GameTimeWhenLastCrossedStartFinishLine;
                 }
                 // if we're waiting, see if the timer has expired or we have a change in the previous laptime value
                 if (this.WaitingForNewLapData && (previousGameState.SessionData.LapTimePrevious != gameProvidedLastLapTime || this.Now > this.NewLapDataTimerExpiry) || previousGameState.SessionData.LapTimePrevious != gameProvidedLastLapTime)
@@ -1893,12 +1943,14 @@ namespace CrewChiefV4.GameState
                     this.WaitingForNewLapData = false;
                     this.SessionData.LapTimePrevious = gameProvidedLastLapTime;
                     this.SessionData.PreviousLapWasValid = gameProvidedLastLapTime > 1;
+                    this.CompleatedLapsWhenHasNewLapDataWasLastTrue = this.SessionData.CompletedLaps;
                     return true;
                 }
                 else
                 {
                     this.SessionData.LapTimePrevious = previousGameState.SessionData.LapTimePrevious;
                     this.SessionData.PreviousLapWasValid = previousGameState.SessionData.PreviousLapWasValid;
+                    this.CompleatedLapsWhenHasNewLapDataWasLastTrue = previousGameState.CompleatedLapsWhenHasNewLapDataWasLastTrue;
                     
                 }
             }

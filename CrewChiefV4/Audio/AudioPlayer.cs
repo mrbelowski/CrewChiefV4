@@ -21,6 +21,11 @@ namespace CrewChiefV4.Audio
         public Boolean disablePearlsOfWisdom = false;   // used for the last 2 laps / 3 minutes of a race session only
         public Boolean mute = false;
         public static float minimumSoundPackVersion = 105f;
+
+        public static Boolean playWithNAudio = UserSettings.GetUserSettings().getBoolean("use_naudio");
+        public static int naudioMessagesPlaybackDeviceId = 0;
+        public static int naudioBackgroundPlaybackDeviceId = 0;
+        public Dictionary<string, Tuple<string, int>> playbackDevices = new Dictionary<string, Tuple<string, int>>();
         
         public static String folderAcknowlegeOK = "acknowledge/OK";
         public static String folderYellowEnabled = "acknowledge/yellowEnabled";
@@ -74,14 +79,11 @@ namespace CrewChiefV4.Audio
 
         private OrderedDictionary immediateClips = new OrderedDictionary();
 
-        // All access should be via UI thread.
-        private MediaPlayer backgroundPlayer;
+        private BackgroundPlayer backgroundPlayer;
 
         public static String soundFilesPath;
 
         private String backgroundFilesPath;
-
-        private int backgroundLeadout = 30;
 
         public static String dtmPitWindowOpenBackground = "dtm_pit_window_open.wav";
 
@@ -90,8 +92,6 @@ namespace CrewChiefV4.Audio
         private PearlsOfWisdom pearlsOfWisdom = new PearlsOfWisdom();
 
         DateTime timeLastPearlOfWisdomPlayed = DateTime.Now;
-
-        private Boolean backgroundPlayerInitialised = false;
 
         public Boolean initialised = false;
 
@@ -114,8 +114,8 @@ namespace CrewChiefV4.Audio
 
         public String selectedPersonalisation = NO_PERSONALISATION_SELECTED;
 
-        private SynchronizationContext mainThreadContext = null; 
-
+        private SynchronizationContext mainThreadContext = null;
+        
         public AudioPlayer()
         {
             this.mainThreadContext = SynchronizationContext.Current;
@@ -184,14 +184,57 @@ namespace CrewChiefV4.Audio
             {
                 selectedPersonalisation = savedPersonalisation;
             }
-        }
 
+            if (UserSettings.GetUserSettings().getBoolean("use_naudio"))
+            {
+                playbackDevices.Clear();
+                for (int deviceId = 0; deviceId < NAudio.Wave.WaveOut.DeviceCount; deviceId++)
+                {
+                    // the audio device stuff makes no guarantee as to the presence of sensible device and product guids,
+                    // so we have to do the best we can here
+                    NAudio.Wave.WaveOutCapabilities capabilities = NAudio.Wave.WaveOut.GetCapabilities(deviceId);
+                    Boolean hasNameGuid = capabilities.NameGuid != null && !capabilities.NameGuid.Equals(Guid.Empty);
+                    Boolean hasProductGuid = capabilities.ProductGuid != null && !capabilities.ProductGuid.Equals(Guid.Empty);
+                    String rawName = capabilities.ProductName;
+                    String name = rawName;                    
+                    int nameAddition = 0;
+                    while (playbackDevices.Keys.Contains(name))
+                    {
+                        nameAddition++;
+                        name = rawName += "(" + nameAddition + ")";
+                    }
+                    String guidToUse;
+                    if (hasNameGuid)
+                    {
+                        guidToUse = capabilities.NameGuid.ToString();
+                    }
+                    else if (hasProductGuid)
+                    {
+                        guidToUse = capabilities.ProductGuid.ToString() + "_" + name;
+                    }
+                    else
+                    {
+                        guidToUse = name;
+                    }
+                    playbackDevices.Add(name, new Tuple<string, int>(guidToUse, deviceId));
+                }
+            }
+        }
+        
         public void initialise()
         {
             DirectoryInfo soundDirectory = new DirectoryInfo(soundFilesPath);
             backgroundFilesPath = Path.Combine(soundFilesPath, "background_sounds");
 
-            initialiseBackgroundPlayer();
+            if (UserSettings.GetUserSettings().getBoolean("use_naudio"))
+            {
+                this.backgroundPlayer = new NAudioBackgroundPlayer(backgroundFilesPath, dtmPitWindowClosedBackground);
+            }
+            else
+            {
+                this.backgroundPlayer = new MediaPlayerBackgroundPlayer(mainThreadContext, backgroundFilesPath, dtmPitWindowClosedBackground);
+            }
+            this.backgroundPlayer.initialise(dtmPitWindowClosedBackground);
 
             if (!soundDirectory.Exists)
             {
@@ -259,20 +302,6 @@ namespace CrewChiefV4.Audio
         public void stopMonitor()
         {
             monitorRunning = false;
-        }
-
-        private float getBackgroundVolume()
-        {
-            float volume = UserSettings.GetUserSettings().getFloat("background_volume");
-            if (volume > 1)
-            {
-                volume = 1;
-            }
-            if (volume < 0)
-            {
-                volume = 0;
-            }
-            return volume;
         }
 
         public float getSoundPackVersion(DirectoryInfo soundDirectory)
@@ -378,107 +407,19 @@ namespace CrewChiefV4.Audio
 
         public void setBackgroundSound(String backgroundSoundName)
         {
-            if (getBackgroundVolume() > 0 && !mute)
-            {
-                try
-                {
-                    this.mainThreadContext.Send(delegate
-                    {
-                        Console.WriteLine("Setting background sounds file to  " + backgroundSoundName);
-                        String path = Path.Combine(backgroundFilesPath, backgroundSoundName);
-                        if (!backgroundPlayerInitialised)
-                        {
-                            initialiseBackgroundPlayer();
-                        }
-                        backgroundPlayer.Volume = 0.0;
-                        backgroundPlayer.Open(new System.Uri(path, System.UriKind.Absolute));
-                    }, null);
-                }
-                catch (Exception)
-                {
-                    // ignore - edge case where the app's closing so as removed the UI thread when this call is invoked
-                }
-            }
+            this.backgroundPlayer.setBackgroundSound(backgroundSoundName);
         }
-
-        private void initialiseBackgroundPlayer()
-        {
-            if (backgroundPlayer != null 
-                && backgroundPlayerInitialised
-                && getBackgroundVolume() > 0)
-                return;
-
-            try
-            {
-                this.mainThreadContext.Send(delegate
-                {
-                    if (!backgroundPlayerInitialised && getBackgroundVolume() > 0)
-                    {
-                        backgroundPlayer = new MediaPlayer();
-                        backgroundPlayer.MediaEnded += new EventHandler(backgroundPlayer_MediaEnded);
-
-                        // Start background player muted, as otherwise it causes some noise (sounds like some buffers are flushed).
-                        backgroundPlayer.Volume = 0.0;
-                        backgroundPlayerInitialised = true;
-                        setBackgroundSound(dtmPitWindowClosedBackground);
-                    }
-                }, null);
-            }
-            catch (Exception)
-            {
-                // ignore - edge case where the app's closing so as removed the UI thread when this call is invoked
-            }
-        }
-
-        private void stopBackgroundPlayer()
-        {
-            if (backgroundPlayer == null || !backgroundPlayerInitialised)
-                return;
-            try
-            {
-                this.mainThreadContext.Send(delegate
-                {
-                    try
-                    {
-                        backgroundPlayer.Stop();
-                        backgroundPlayer.Volume = 0.0;
-                    }
-                    catch (Exception) { }
-                    backgroundPlayerInitialised = false;
-                    backgroundPlayer = null;
-                }, null);
-            }
-            catch (Exception)
-            {
-                // ignore - edge case where the app's closing so as removed the UI thread when this call is invoked
-            }
-        }
-
+        
         public void muteBackgroundPlayer(bool doMute)
         {
-            if (backgroundPlayer == null || !backgroundPlayerInitialised)
-                return;
-
-            try
-            {
-                this.mainThreadContext.Send(delegate
-                {
-                    if (doMute && !backgroundPlayer.IsMuted)
-                        backgroundPlayer.IsMuted = true;
-                    else if (!doMute && backgroundPlayer.IsMuted)
-                        backgroundPlayer.IsMuted = false;
-                }, null);
-            }
-            catch (Exception)
-            {
-                // ignore - edge case where the app's closing so as removed the UI thread when this call is invoked
-            }
+            this.backgroundPlayer.mute(doMute);
         }
 
         private void monitorQueue()
         {
             Console.WriteLine("Monitor starting");
-            initialiseBackgroundPlayer();
+            // ensure the BGP is initialised:
+            this.backgroundPlayer.initialise(dtmPitWindowClosedBackground);
             DateTime nextQueueCheck = DateTime.Now;
             while (monitorRunning)
             {
@@ -533,7 +474,7 @@ namespace CrewChiefV4.Audio
             }
             //writeMessagePlayedStats();
             playedMessagesCount.Clear();
-            stopBackgroundPlayer();
+            this.backgroundPlayer.stop();
         }
 
         private void writeMessagePlayedStats()
@@ -559,7 +500,8 @@ namespace CrewChiefV4.Audio
 
         private void monitorQueueNoImmediateMessages()
         {
-            initialiseBackgroundPlayer();
+            // ensure the BGP is initialised:
+            this.backgroundPlayer.initialise(dtmPitWindowClosedBackground); 
             while (monitorRunning)
             {
                 Thread.Sleep(queueMonitorInterval);
@@ -579,7 +521,7 @@ namespace CrewChiefV4.Audio
             }
             writeMessagePlayedStats();
             playedMessagesCount.Clear();
-            stopBackgroundPlayer();
+            this.backgroundPlayer.stop();
         }
 
         private void playQueueContents(OrderedDictionary queueToPlay, Boolean isImmediateMessages)
@@ -876,41 +818,7 @@ namespace CrewChiefV4.Audio
             if (!channelOpen)
             {
                 channelOpen = true;
-                if (getBackgroundVolume() > 0)
-                {
-                    try
-                    {
-                        this.mainThreadContext.Send(delegate
-                        {
-                            // this looks like we're doing it the wrong way round but there's a short
-                            // delay playing the event sound, so if we kick off the background before the bleep
-                            if (!backgroundPlayerInitialised)
-                            {
-                                initialiseBackgroundPlayer();
-                            }
-                            int backgroundDuration = 0;
-                            int backgroundOffset = 0;
-                            if (backgroundPlayer.NaturalDuration.HasTimeSpan)
-                            {
-                                backgroundDuration = (backgroundPlayer.NaturalDuration.TimeSpan.Minutes * 60) +
-                                    backgroundPlayer.NaturalDuration.TimeSpan.Seconds;
-                                //Console.WriteLine("Duration from file is " + backgroundDuration);
-                                backgroundOffset = Utilities.random.Next(0, backgroundDuration - backgroundLeadout);
-                            }
-                            //Console.WriteLine("Background offset = " + backgroundOffset);
-                            backgroundPlayer.Position = TimeSpan.FromSeconds(backgroundOffset);
-
-                            // Restore the desired volume.
-                            backgroundPlayer.Volume = getBackgroundVolume();
-                            backgroundPlayer.Play();
-                        }, null);
-                    }
-                    catch (Exception)
-                    {
-                        // ignore - edge case where the app's closing so as removed the UI thread when this call is invoked
-                    }
-                }
-
+                this.backgroundPlayer.play();
                 if (useShortBeepWhenOpeningChannel)
                 {
                     playShortStartSpeakingBeep();
@@ -927,31 +835,7 @@ namespace CrewChiefV4.Audio
             if (channelOpen)
             {
                 playEndSpeakingBeep();
-                if (getBackgroundVolume() > 0 && !mute)
-                {
-                    try
-                    {
-                        this.mainThreadContext.Send(delegate
-                        {
-                            if (!backgroundPlayerInitialised)
-                            {
-                                initialiseBackgroundPlayer();
-                            }
-                            try
-                            {
-                                backgroundPlayer.Stop();
-                            }
-                            catch (Exception)
-                            {
-                                Console.WriteLine("Unable to stop background player");
-                            }
-                        }, null);
-                    }
-                    catch (Exception)
-                    {
-                        // ignore - edge case where the app's closing so as removed the UI thread when this call is invoked
-                    }
-                }
+                this.backgroundPlayer.stop();
                 if (soundCache != null)
                 {
                     soundCache.ExpireCachedSounds();
@@ -1174,23 +1058,7 @@ namespace CrewChiefV4.Audio
                 }
             }
         }
-
-        private void backgroundPlayer_MediaEnded(object sender, EventArgs e)
-        {
-            try
-            {
-                this.mainThreadContext.Send(delegate
-                {
-                    Console.WriteLine("looping...");
-                    backgroundPlayer.Position = TimeSpan.FromMilliseconds(1);
-                }, null);
-            }
-            catch (Exception)
-            {
-                // ignore - edge case where the app's closing so as removed the UI thread when this call is invoked
-            }
-        }
-
+        
         // checks that another pearl isn't already queued. If one of the same type is already
         // in the queue this method just returns false. If a conflicting pearl is in the queue
         // this method removes it and returns false, so we don't end up with, for example, 
@@ -1254,6 +1122,7 @@ namespace CrewChiefV4.Audio
 
         public void Dispose()
         {
+            backgroundPlayer.dispose();
             if (soundCache != null)
             {
                 try

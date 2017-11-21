@@ -605,9 +605,6 @@
     <Setting Name="enable_command_macros" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="iracing_delayed_laptimes" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
-    </Setting>
     <Setting Name="pcars_enable_rain_prediction" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
@@ -678,6 +675,15 @@
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="TOGGLE_PACE_NOTES_PLAYBACK_device_type" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="use_naudio" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="NAUDIO_DEVICE_GUID_MESSAGES" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="NAUDIO_DEVICE_GUID_BACKGROUND" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
   </Settings>

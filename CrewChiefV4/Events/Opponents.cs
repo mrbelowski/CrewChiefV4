@@ -196,7 +196,7 @@ namespace CrewChiefV4.Events
 
                     // in race sessions, announce tyre type changes once the session is underway
                     if (currentGameState.SessionData.SessionType == SessionType.Race &&
-                        currentGameState.SessionData.SessionRunningTime > 10 && opponentData.hasJustChangedToDifferentTyreType)
+                        currentGameState.SessionData.SessionRunningTime > 30 && opponentData.hasJustChangedToDifferentTyreType)
                     {
                         // this may be a race position or an OpponentData object
                         Object opponentIdentifier = getOpponentIdentifierForTyreChange(opponentData, currentGameState.SessionData.Position);
@@ -394,22 +394,25 @@ namespace CrewChiefV4.Events
             else if (voiceMessage.Contains(SpeechRecogniser.POSITION_LONG) || voiceMessage.Contains(SpeechRecogniser.POSITION_SHORT))
             {
                 int position = 0;
-                foreach (KeyValuePair<String, int> entry in SpeechRecogniser.numberToNumber)
+                foreach (KeyValuePair<String[], int> entry in SpeechRecogniser.racePositionNumberToNumber)
                 {
-                    if (expectedNumberSuffix.Length > 0)
+                    foreach (String numberStr in entry.Key)
                     {
-                        if (voiceMessage.Contains(" " + entry.Key + expectedNumberSuffix))
+                        if (expectedNumberSuffix.Length > 0)
                         {
-                            position = entry.Value;
-                            break;
+                            if (voiceMessage.Contains(" " + numberStr + expectedNumberSuffix))
+                            {
+                                position = entry.Value;
+                                break;
+                            }
                         }
-                    }
-                    else
-                    {
-                        if (voiceMessage.EndsWith(" " + entry.Key))
+                        else
                         {
-                            position = entry.Value;
-                            break;
+                            if (voiceMessage.EndsWith(" " + numberStr))
+                            {
+                                position = entry.Value;
+                                break;
+                            }
                         }
                     }
                 }
@@ -506,7 +509,7 @@ namespace CrewChiefV4.Events
                         }
                     }  
                 } 
-                else if (voiceMessage.StartsWith(SpeechRecogniser.WHERE_IS))
+                else if (voiceMessage.StartsWith(SpeechRecogniser.WHERE_IS) || voiceMessage.StartsWith(SpeechRecogniser.WHERES))
                 {
                     Tuple<string, Boolean> response = getOpponentKey(voiceMessage, "");
                     string opponentKey = response.Item1;

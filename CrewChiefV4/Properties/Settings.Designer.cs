@@ -2438,18 +2438,6 @@ namespace CrewChiefV4.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool iracing_delayed_laptimes {
-            get {
-                return ((bool)(this["iracing_delayed_laptimes"]));
-            }
-            set {
-                this["iracing_delayed_laptimes"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
         public bool pcars_enable_rain_prediction {
             get {
                 return ((bool)(this["pcars_enable_rain_prediction"]));
@@ -2732,6 +2720,42 @@ namespace CrewChiefV4.Properties {
             }
             set {
                 this["TOGGLE_PACE_NOTES_PLAYBACK_device_type"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool use_naudio {
+            get {
+                return ((bool)(this["use_naudio"]));
+            }
+            set {
+                this["use_naudio"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string NAUDIO_DEVICE_GUID_MESSAGES {
+            get {
+                return ((string)(this["NAUDIO_DEVICE_GUID_MESSAGES"]));
+            }
+            set {
+                this["NAUDIO_DEVICE_GUID_MESSAGES"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string NAUDIO_DEVICE_GUID_BACKGROUND {
+            get {
+                return ((string)(this["NAUDIO_DEVICE_GUID_BACKGROUND"]));
+            }
+            set {
+                this["NAUDIO_DEVICE_GUID_BACKGROUND"] = value;
             }
         }
     }

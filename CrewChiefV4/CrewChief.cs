@@ -97,7 +97,7 @@ namespace CrewChiefV4
             eventsList.Add("LapCounter", new LapCounter(audioPlayer));
             eventsList.Add("LapTimes", new LapTimes(audioPlayer));
             eventsList.Add("Penalties", new Penalties(audioPlayer));
-            eventsList.Add("MandatoryPitStops", new MandatoryPitStops(audioPlayer));
+            eventsList.Add("PitStops", new PitStops(audioPlayer));
             eventsList.Add("Fuel", new Fuel(audioPlayer));
             eventsList.Add("Opponents", new Opponents(audioPlayer));
             eventsList.Add("RaceTime", new RaceTime(audioPlayer));
@@ -109,6 +109,7 @@ namespace CrewChiefV4
             eventsList.Add("ConditionsMonitor", new ConditionsMonitor(audioPlayer));
             eventsList.Add("OvertakingAidsMonitor", new OvertakingAidsMonitor(audioPlayer));
             eventsList.Add("FrozenOrderMonitor", new FrozenOrderMonitor(audioPlayer));
+            eventsList.Add("IRacingBroadcastMessageEvent", new IRacingBroadcastMessageEvent(audioPlayer));
             sessionEndMessages = new SessionEndMessages(audioPlayer);
             DriverNameHelper.readRawNamesToUsableNamesFiles(AudioPlayer.soundFilesPath);
         }
@@ -141,6 +142,8 @@ namespace CrewChiefV4
 
         public void Dispose()
         {
+            running = false;
+            spotterIsRunning = false;
             if (gameDataReader != null)
             {
                 gameDataReader.Dispose();
@@ -406,7 +409,7 @@ namespace CrewChiefV4
             getEvent("Penalties").respond(SpeechRecogniser.STATUS[0]);
             getEvent("RaceTime").respond(SpeechRecogniser.STATUS[0]);
             getEvent("Position").respond(SpeechRecogniser.STATUS[0]);
-            getEvent("MandatoryPitStops").respond(SpeechRecogniser.STATUS[0]);
+            getEvent("PitStops").respond(SpeechRecogniser.STATUS[0]);
             getEvent("DamageReporting").respond(SpeechRecogniser.STATUS[0]);
             getEvent("Fuel").respond(SpeechRecogniser.STATUS[0]);
             getEvent("TyreMonitor").respond(SpeechRecogniser.STATUS[0]);
@@ -419,7 +422,7 @@ namespace CrewChiefV4
             getEvent("Penalties").respond(SpeechRecogniser.SESSION_STATUS[0]);
             getEvent("RaceTime").respond(SpeechRecogniser.SESSION_STATUS[0]);
             getEvent("Position").respond(SpeechRecogniser.SESSION_STATUS[0]);
-            getEvent("MandatoryPitStops").respond(SpeechRecogniser.SESSION_STATUS[0]);
+            getEvent("PitStops").respond(SpeechRecogniser.SESSION_STATUS[0]);
             getEvent("Timings").respond(SpeechRecogniser.SESSION_STATUS[0]);
         }
 
@@ -632,6 +635,11 @@ namespace CrewChiefV4
                         else
                         {
                             rawGameData = gameDataReader.ReadGameData(false);
+                        }
+                        // another Thread may have stopped the app - check here before processing the game data
+                        if (!running)
+                        {
+                            continue;
                         }
                         gameStateMapper.versionCheck(rawGameData);
 

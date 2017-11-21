@@ -46,7 +46,9 @@ You need Morten Roslev's Python plugin for Assetto Corsa. The app will check if 
 
 If this process fails for any reason, copy the folder called 'CrewChiefEx' from the app's plugins folder - usually C:\Program Files (x86)\Britton IT Ltd\CrewChiefV4\plugins\assettocorsa\apps\python\CrewChiefEx to the Asstto Corsa python folder (usually something like C:\Program Files (x86)\Steam\steamapps\common\assettocorsa\apps\python). You might need to enable this plugin in the Assetto Corsa UI. Once you've done this just select the game from Crew Chief's Game menu and press the Start button.
 
+iRacing:
 
+To use Crew Chief with iRacing simply select iRacing from Crew Chief's Game menu and click the Start button.
 
 Startup issues
 ------------------
@@ -139,6 +141,24 @@ The app understands lots of command including:
 "Session status / race status" : give an overview of the session - time left, position, gaps, pitstop status etc
 "Full update / full status / update me" : damage report, car status and session status combined
 "What's the time / what time is it" : read the current (clock) time
+"pitstop add [X liters]" (adds X amount of fuel next pitstop, this option is iRacing only)
+"pitstop tearoff / pitstop windscreen" (enable next pitstop, this option is iRacing only)
+"pitstop fast repair / pitstop repair" (enable fast repair next pitstop, this option is iRacing only)
+"pitstop clear all" (clears all selected pitstop options, this option is iRacing only)
+"pitstop clear tyres (clears all tyre selections" next pitstop, this option is iRacing only)
+"pitstop clear tearoff / pitstop clear windscreen" (clears tearoff selection next pitstop, this option is iRacing only)
+"pitstop clear fast repair" (clears fast repair selection next pitstop, this option is iRacing only)
+"pitstop clear fuel" (clears fuel refueling next pitstop, this option is iRacing only)
+"pitstop change all tyres" (change all tyres next pitstop, this option is iRacing only)
+"pitstop change left front tyre" (change left front tyre next pitstop, this option is iRacing only)
+"pitstop change right front tyre" (change right front tyre next pitstop, this option is iRacing only)
+"pitstop change left rear tyre" (change left rear tyre next pitstop, this option is iRacing only)
+"pitstop change right rear tyre" (change right rear tyre next pitstop, this option is iRacing only)
+"pitstop change tyres pressure [ new value ]" (change right rear tyre pressure next pitstop, this option is iRacing only)
+"pitstop change left front tyre pressure [ new value ]" (change left front tyre next pressure pitstop, this option is iRacing only)
+"pitstop change right front tyre pressure [ new value ]" (change right front tyre pressure next pitstop, this option is iRacing only)
+"pitstop change left rear tyre pressure [ new value ]" (change left rear tyre pressure next pitstop, this option is iRacing only)
+"pitstop change right rear tyre pressure [ new value ]" (change right rear tyre pressure next pitstop, this option is iRacing only)
 
 
 
@@ -186,6 +206,29 @@ You can select strategies with the voice commands "strategy one" / "strat one", 
 
 If you want to manually navigate the pit menu with voice commands, use "pit menu toggle", "pit menu up", "pit menu down", "pit menu left" and "pit menu right".
 
+iRacing
+
+default key bindings:
+"Lap Timing Black Box": F1
+"Standings Black Box":  F2 
+"Relative Black Box":   F3
+"Fuel Black Box":       F4
+"Tires Black Box":      F5
+"Tire Info Black Box"   F6
+"Pit-stop Adjustments Black Box" :  F7
+"In-car Adjustments Black Box":     F8
+"Mirror Adjustments Black Box":     F9
+"Radio Adjustments Black Box":      F10
+"Select Next Control":              UP
+"Select Previous Control":          DOWN
+"Increment Selected Control":       RIGHT
+"Decrement Selected Control":       LEFT
+"Toggle Selected Control":          SPACE_BAR
+
+You can change the black boxes by saying one of the following commands: "black box lap time", "black box standings", "black box relative",
+"black box fuel", "black box tires", "black box tire info", "black box pit stop", "black box car", "black box mirror" or "black box radio"
+
+You can navigate the by saying one of the following commands: "menu next", "menu previous", "menu increase", "menu decrease" or "menu toggle"
 
 
 Pace notes
@@ -209,3 +252,6 @@ Doing this creates a set of .wav files and a metadata.json file which contains s
 
 Playing back pace notes:
 If there are pace notes for the game / car / track combination you're using in your Documents folder, you can start this running with the voice command "start pace notes" and stop it with the voice command "stop pace notes", or you can assign a button to the "Start / stop playing pace notes" action. When the pace notes are being played, each of the messages in the session will be played when you reach the point on the track where it was recorded. They will continue to be played until you press the button again or make the "stop pace notes" voice command.
+
+
+There's a sample pace notes set available for Raceroom's Macau circuit in the WTCC 2014 - 2017 cars. You can view it in action here https://youtu.be/hz7lu23ckUE. You can download it here http://crewchief.isnais.de/ExamplePaceNotes.zip. Unzip this to your Documents folder so it creates a directory structure like the ones described above, then when you start a WTCC session at Macau you can start the pace notes playing with the "start pace notes" voice command or "Start / stop playing pace notes" button.
