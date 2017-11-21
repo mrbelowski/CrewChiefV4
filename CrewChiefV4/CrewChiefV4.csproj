@@ -233,7 +233,7 @@
     <Compile Include="Events\DamageReporting.cs" />
     <Compile Include="CrewChief.cs" />
     <Compile Include="Events\LapTimes.cs" />
-    <Compile Include="Events\MandatoryPitStops.cs" />
+    <Compile Include="Events\PitStops.cs" />
     <Compile Include="Events\PearlsOfWisdom.cs" />
     <Compile Include="Events\Penalties.cs" />
     <Compile Include="Events\Position.cs" />

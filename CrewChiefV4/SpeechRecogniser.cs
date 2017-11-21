@@ -870,7 +870,7 @@ namespace CrewChiefV4
             }
             else if (ResultContains(recognisedSpeech, DO_I_HAVE_A_MANDATORY_PIT_STOP))
             {
-                return CrewChief.getEvent("MandatoryPitStops");
+                return CrewChief.getEvent("PitStops");
             }
             else if (ResultContains(recognisedSpeech, HOW_ARE_MY_ENGINE_TEMPS))
             {
