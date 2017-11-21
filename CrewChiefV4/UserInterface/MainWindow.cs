@@ -908,14 +908,15 @@ namespace CrewChiefV4
                         {
                             if (CrewChief.distanceRoundTrack > 0)
                             {
+                                Console.WriteLine("Recording pace note...");
                                 DriverTrainingService.startRecordingMessage((int)CrewChief.distanceRoundTrack);
                             }
                         }
                         else
                         {
+                            Console.WriteLine("Listening for voice command...");
                             crewChief.speechRecogniser.recognizeAsync();
                         }
-                        Console.WriteLine("Listening...");
 
                         if (rejectMessagesWhenTalking)
                             setMessagesVolume(0.0f);
@@ -931,13 +932,14 @@ namespace CrewChiefV4
                             crewChief.audioPlayer.muteBackgroundPlayer(false /*mute*/);
                         }
 
-                        Console.WriteLine("Stopping listening...");
                         if (DriverTrainingService.isRecordingPaceNotes)
                         {
+                            Console.WriteLine("Saving recorded pace note");
                             DriverTrainingService.stopRecordingMessage();
                         }
                         else
                         {
+                            Console.WriteLine("Invoking speech recognition...");
                             crewChief.speechRecogniser.recognizeAsyncCancel();
                             new Thread(() =>
                             {

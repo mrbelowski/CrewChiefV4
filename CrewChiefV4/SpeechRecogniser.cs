@@ -749,7 +749,14 @@ namespace CrewChiefV4
             SpeechRecogniser.waitingForSpeech = true;
             SpeechRecogniser.gotRecognitionResult = false;
             SpeechRecogniser.keepRecognisingInHoldMode = true;
-            sre.RecognizeAsync(RecognizeMode.Multiple);
+            try
+            {
+                sre.RecognizeAsync(RecognizeMode.Multiple);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Unable to start speech recognition " + e.Message);
+            }
         }
 
         public void recognizeAsyncCancel()
