@@ -2438,18 +2438,6 @@ namespace CrewChiefV4.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool iracing_delayed_laptimes {
-            get {
-                return ((bool)(this["iracing_delayed_laptimes"]));
-            }
-            set {
-                this["iracing_delayed_laptimes"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
         public bool pcars_enable_rain_prediction {
             get {
                 return ((bool)(this["pcars_enable_rain_prediction"]));

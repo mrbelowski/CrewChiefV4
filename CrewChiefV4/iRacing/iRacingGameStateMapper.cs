@@ -436,8 +436,7 @@ namespace CrewChiefV4.iRacing
                     validSpeed = false;
                 }
                 if (currentSector == 1 && currentGameState.SessionData.IsNewLap)
-                {
-                   
+                {                   
                     currentGameState.SessionData.PositionAtStartOfCurrentLap = currentGameState.SessionData.Position;
                     currentGameState.SessionData.formattedPlayerLapTimes.Add(TimeSpan.FromSeconds(playerCar.Live.LapTimePrevious).ToString(@"mm\:ss\.fff"));
                     Console.WriteLine(TimeSpan.FromSeconds(playerCar.Live.LapTimePrevious).ToString(@"mm\:ss\.fff"));

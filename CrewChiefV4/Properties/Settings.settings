@@ -605,9 +605,6 @@
     <Setting Name="enable_command_macros" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="iracing_delayed_laptimes" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
-    </Setting>
     <Setting Name="pcars_enable_rain_prediction" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
