@@ -183,6 +183,10 @@ namespace CrewChiefV4
         // CommandMacro is executed.
         public void loadMacroVoiceTriggers(Dictionary<string, ExecutableCommandMacro> voiceTriggeredMacros) 
         {
+            if (!initialised)
+            {
+                return;
+            }
             macroLookup.Clear();
             if (macroGrammar != null && macroGrammar.Loaded)
             {
@@ -502,6 +506,10 @@ namespace CrewChiefV4
         
         public void addNewOpponentName(String rawDriverName)
         {
+            if (!initialised)
+            {
+                return;
+            }
             try
             {
                 String usableName = DriverNameHelper.getUsableDriverName(rawDriverName);
@@ -536,6 +544,10 @@ namespace CrewChiefV4
 
         public void addOpponentSpeechRecognition(List<String> names, Boolean useNames)
         {
+            if (!initialised)
+            {
+                return;
+            }
             driverNamesInUse.Clear();
             foreach (Grammar opponentGrammar in opponentGrammarList)
             {
@@ -600,6 +612,10 @@ namespace CrewChiefV4
 
         public void addiRacingSpeechRecogniser()
         {
+            if (!initialised)
+            {
+                return;
+            }
             try
             {
                 iracingPitstopGrammarList.Clear();
