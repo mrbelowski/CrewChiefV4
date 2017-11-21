@@ -1915,12 +1915,14 @@ namespace CrewChiefV4.GameState
 
         public Boolean readLandmarksForThisLap = false;
         public float GameTimeWhenLastCrossedStartFinishLine = -1;
+        public int CompleatedLapsWhenHasNewLapDataWasLastTrue = -2;
         //call this after setting currentGameState.SessionData.SectorNumber and currentGameState.SessionData.IsNewSector
         public bool HasNewLapData(GameStateData previousGameState, float gameProvidedLastLapTime, bool hasCrossedSFLine)
         {
             if (previousGameState != null)
             {
-                if (hasCrossedSFLine)
+                if ((hasCrossedSFLine && CompleatedLapsWhenHasNewLapDataWasLastTrue < this.SessionData.CompletedLaps) || 
+                    (this.SessionData.SessionType == SessionType.Race && hasCrossedSFLine))
                 {
                     // reset the timer and start waiting for an updated laptime...
                     this.WaitingForNewLapData = true;
@@ -1941,12 +1943,14 @@ namespace CrewChiefV4.GameState
                     this.WaitingForNewLapData = false;
                     this.SessionData.LapTimePrevious = gameProvidedLastLapTime;
                     this.SessionData.PreviousLapWasValid = gameProvidedLastLapTime > 1;
+                    this.CompleatedLapsWhenHasNewLapDataWasLastTrue = this.SessionData.CompletedLaps;
                     return true;
                 }
                 else
                 {
                     this.SessionData.LapTimePrevious = previousGameState.SessionData.LapTimePrevious;
                     this.SessionData.PreviousLapWasValid = previousGameState.SessionData.PreviousLapWasValid;
+                    this.CompleatedLapsWhenHasNewLapDataWasLastTrue = previousGameState.CompleatedLapsWhenHasNewLapDataWasLastTrue;
                     
                 }
             }
