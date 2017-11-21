@@ -329,7 +329,7 @@ namespace CrewChiefV4.iRacing
                     currentGameState.FlagData.useImprovisedIncidentCalling = previousGameState.FlagData.useImprovisedIncidentCalling;
                     currentGameState.OpponentData = previousGameState.OpponentData;
                     currentGameState.SessionData.SectorNumber = previousGameState.SessionData.SectorNumber;
-
+                    currentGameState.GameTimeWhenLastCrossedStartFinishLine = previousGameState.GameTimeWhenLastCrossedStartFinishLine;
                     currentGameState.SessionData.DeltaTime.deltaPoints = previousGameState.SessionData.DeltaTime.deltaPoints;
                     currentGameState.SessionData.DeltaTime.currentDeltaPoint = previousGameState.SessionData.DeltaTime.currentDeltaPoint;
                     currentGameState.SessionData.DeltaTime.nextDeltaPoint = previousGameState.SessionData.DeltaTime.nextDeltaPoint;
