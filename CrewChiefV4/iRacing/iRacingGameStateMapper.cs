@@ -934,11 +934,12 @@ namespace CrewChiefV4.iRacing
             float previousDistanceRoundTrack = opponentData.DistanceRoundTrack;
             opponentData.DistanceRoundTrack = distanceRoundTrack;
             Boolean validSpeed = true;
-            if (speed > 500 || speed < 0)
+            if (speed > 500)
             {
                 // faster than 500m/s (1000+mph) suggests the player has quit to the pit. Might need to reassess this as the data are quite noisy
                 validSpeed = false;
                 opponentData.Speed = 0;
+                Console.WriteLine("Speed of car when invalidated" + speed);
             }
             opponentData.Speed = speed;
 
@@ -968,8 +969,9 @@ namespace CrewChiefV4.iRacing
             {
                 if (opponentData.OpponentLapData.Count > 0)
                 {
-                    opponentData.CompleteLapWithProvidedLapTime(racePosition, sessionRunningTime, completedLapTime, opponentData.LastLapValid,
+                    opponentData.CompleteLapWithProvidedLapTime(racePosition, sessionRunningTime, completedLapTime, opponentData.LastLapValid && validSpeed,
                         false, trackTempreture, airTemperature, sessionLengthIsTime, sessionTimeRemaining, 3);
+                    //Console.WriteLine(opponentData.DriverRawName + " Compleated laps: " + completedLaps + " time: " + TimeSpan.FromSeconds(completedLapTime).ToString(@"mm\:ss\.fff") + " lap valid: " + (opponentData.LastLapValid && validSpeed));
                 }
                 opponentData.StartNewLap(completedLaps + 1, racePosition, isInPits, sessionRunningTime, false, trackTempreture, airTemperature);
                 opponentData.IsNewLap = true;
@@ -978,7 +980,7 @@ namespace CrewChiefV4.iRacing
             {
                 if (opponentData.CurrentSectorNumber == 1 && sector == 2 || opponentData.CurrentSectorNumber == 2 && sector == 3)
                 {
-                    opponentData.AddCumulativeSectorData(opponentData.CurrentSectorNumber, racePosition, currentLaptime, sessionRunningTime, currentLapValid, false, trackTempreture, airTemperature);                    
+                    opponentData.AddCumulativeSectorData(opponentData.CurrentSectorNumber, racePosition, currentLaptime, sessionRunningTime, currentLapValid && validSpeed, false, trackTempreture, airTemperature);                    
                 }
                 opponentData.CurrentSectorNumber = sector;
             }
