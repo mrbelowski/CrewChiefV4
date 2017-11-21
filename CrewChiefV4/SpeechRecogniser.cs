@@ -124,6 +124,7 @@ namespace CrewChiefV4
         public static String[] START_PACE_NOTES_PLAYBACK = Configuration.getSpeechRecognitionPhrases("START_PACE_NOTES_PLAYBACK");
         public static String[] STOP_PACE_NOTES_PLAYBACK = Configuration.getSpeechRecognitionPhrases("STOP_PACE_NOTES_PLAYBACK");
 
+        // pitstop commands specific to iRacing:
         public static String[] PIT_STOP = Configuration.getSpeechRecognitionPhrases("PIT_STOP");
         public static String[] PIT_STOP_ADD = Configuration.getSpeechRecognitionPhrases("PIT_STOP_ADD");
         public static String[] LITERS = Configuration.getSpeechRecognitionPhrases("LITERS");
@@ -156,6 +157,7 @@ namespace CrewChiefV4
         private List<String> driverNamesInUse = new List<string>();
 
         private List<Grammar> opponentGrammarList = new List<Grammar>();
+        private List<Grammar> iracingPitstopGrammarList = new List<Grammar>();
 
         private Grammar macroGrammar = null;
 
@@ -600,6 +602,7 @@ namespace CrewChiefV4
         {
             try
             {
+                iracingPitstopGrammarList.Clear();
                 List<string> tyrePressureChangePhrases = new List<string>();
                 if (disable_alternative_voice_commands)
                 {
@@ -618,8 +621,8 @@ namespace CrewChiefV4
                     tyrePressureChangePhrases.AddRange(PIT_STOP_CHANGE_REAR_RIGHT_TYRE_PRESSURE);
                 }
 
-                addCompoundChoices(tyrePressureChangePhrases.ToArray(), true, this.digitsChoices, null, true);
-                addCompoundChoices(PIT_STOP_ADD, false, this.digitsChoices, LITERS, true);
+                iracingPitstopGrammarList.AddRange(addCompoundChoices(tyrePressureChangePhrases.ToArray(), true, this.digitsChoices, null, true));
+                iracingPitstopGrammarList.AddRange(addCompoundChoices(PIT_STOP_ADD, false, this.digitsChoices, LITERS, true));
 
                 Choices iRacingChoices = new Choices();
                 validateAndAdd(PIT_STOP_TEAROFF, iRacingChoices);
@@ -638,6 +641,7 @@ namespace CrewChiefV4
                 GrammarBuilder iRacingGrammarBuilder = new GrammarBuilder(iRacingChoices);
                 iRacingGrammarBuilder.Culture = cultureInfo;
                 Grammar iRacingGrammar = new Grammar(iRacingGrammarBuilder);
+                iracingPitstopGrammarList.Add(iRacingGrammar);
                 sre.LoadGrammar(iRacingGrammar);
             }
             catch (Exception e)
@@ -688,6 +692,10 @@ namespace CrewChiefV4
                     if (macroGrammar == e.Result.Grammar && macroLookup.ContainsKey(e.Result.Text))
                     {
                         macroLookup[e.Result.Text].execute();
+                    }
+                    else if (iracingPitstopGrammarList.Contains(e.Result.Grammar))
+                    {
+                        CrewChief.getEvent("IRacingBroadcastMessageEvent").respond(e.Result.Text);
                     }
                     else if (ResultContains(e.Result.Text, REPEAT_LAST_MESSAGE))
                     {
@@ -922,10 +930,6 @@ namespace CrewChiefV4
                 {
                     crewChief.togglePaceNotesPlayback();
                 }
-            }
-            else if (ResultContains(recognisedSpeech, PIT_STOP))                
-            {
-                return CrewChief.getEvent("IRacingBroadcastMessageEvent");
             }
             return null;
         }
