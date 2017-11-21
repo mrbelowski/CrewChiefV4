@@ -7,9 +7,7 @@ namespace CrewChiefV4.iRacing
     [Serializable]
     public class DriverLiveInfo
     {
-        private const float SPEED_CALC_INTERVAL = 0.1f;
-        private bool  UseDelayedLaptimes = UserSettings.GetUserSettings().getBoolean("iracing_delayed_laptimes");
-        
+        private const float SPEED_CALC_INTERVAL = 0.1f;  
         public DriverLiveInfo(Driver driver)
         {
             _driver = driver;
