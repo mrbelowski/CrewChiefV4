@@ -16,7 +16,7 @@ namespace CrewChiefV4.iRacing
             this.LastTime = -1;
             this.FastestTime = -1;
             this.QualifyingPosition = -1;
-            this.FakeSectorTimes = new[]
+            this.Sectors = new[]
                     {
                         new Sector() {Number = 0, StartPercentage = 0f},
                         new Sector() {Number = 1, StartPercentage = 0.333f},
@@ -40,22 +40,7 @@ namespace CrewChiefV4.iRacing
         public int LapsDriven { get; set; }
         
 
-        public Sector[] FakeSectorTimes { get; set; }
-
-        public Sector FakeSector1
-        {
-            get { return FakeSectorTimes == null || FakeSectorTimes.Length == 0 ? null : FakeSectorTimes[0]; }
-        }
-
-        public Sector FakeSector2
-        {
-            get { return FakeSectorTimes == null || FakeSectorTimes.Length == 0 ? null : FakeSectorTimes[1]; }
-        }
-        
-        public Sector FakeSector3
-        {
-            get { return FakeSectorTimes == null || FakeSectorTimes.Length == 0 ? null : FakeSectorTimes[2]; }
-        }
+        public Sector[] Sectors { get; set; }
 
         public int Incidents { get; set; }
         public string OutReason { get; set; }
