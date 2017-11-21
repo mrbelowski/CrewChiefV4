@@ -556,8 +556,11 @@ namespace CrewChiefV4.Events
                     }
                     else
                     {
-                        audioPlayer.playMessageImmediately(new QueuedMessage("Fuel/estimate",
-                            MessageContents(folderWeEstimate, lapsOfFuelLeft, folderLapsRemaining), 0, null));
+                        List<MessageFragment> messageFragments = new List<MessageFragment>();
+                        messageFragments.Add(MessageFragment.Text(folderWeEstimate));
+                        messageFragments.Add(MessageFragment.Integer(lapsOfFuelLeft, false));
+                        messageFragments.Add(MessageFragment.Text(folderLapsRemaining));
+                        audioPlayer.playMessageImmediately(new QueuedMessage("Fuel/estimate", messageFragments, 0, null));
                     }                    
                 }
                 else if (averageUsagePerMinute > 0)
@@ -571,8 +574,11 @@ namespace CrewChiefV4.Events
                     }
                     else
                     {
-                        audioPlayer.playMessageImmediately(new QueuedMessage("Fuel/estimate",
-                            MessageContents(folderWeEstimate, minutesOfFuelLeft, folderMinutesRemaining), 0, null));
+                        List<MessageFragment> messageFragments = new List<MessageFragment>();
+                        messageFragments.Add(MessageFragment.Text(folderWeEstimate));
+                        messageFragments.Add(MessageFragment.Integer(minutesOfFuelLeft, false));
+                        messageFragments.Add(MessageFragment.Text(folderMinutesRemaining));
+                        audioPlayer.playMessageImmediately(new QueuedMessage("Fuel/estimate", messageFragments, 0, null));
                     }                    
                 }
             }
@@ -586,8 +592,10 @@ namespace CrewChiefV4.Events
                 else if (currentFuel >= 2)
                 {
                     haveData = true;
-                    audioPlayer.playMessageImmediately(new QueuedMessage("Fuel/level",
-                                MessageContents((int)currentFuel, folderLitresRemaining), 0, null));
+                    List<MessageFragment> messageFragments = new List<MessageFragment>();
+                    messageFragments.Add(MessageFragment.Integer((int)currentFuel, false));
+                    messageFragments.Add(MessageFragment.Text(folderLitresRemaining));
+                    audioPlayer.playMessageImmediately(new QueuedMessage("Fuel/level", messageFragments, 0, null));
                 }
                 else if (currentFuel >= 1)
                 {
