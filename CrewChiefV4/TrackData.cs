@@ -503,6 +503,42 @@ namespace CrewChiefV4
         public static void loadTrackLandmarksData()
         {
             TRACK_LANDMARKS_DATA = TrackLandmarksData.getTrackLandmarksDataFromFile(getDefaultTrackLandmarksFileLocation());
+            loadUserCreatedTrackLandmarkFiles();
+        }
+        static void loadUserCreatedTrackLandmarkFiles()
+        {
+            String userLandmarks = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "CrewChiefV4", "TrackLandmarks");
+            if(Directory.Exists(userLandmarks))
+            {
+                ProcessDirectory(userLandmarks);
+            }
+            else
+            {
+                Console.WriteLine("No user defined landmarks defined");
+            }             
+        }
+
+        public static void ProcessDirectory(string targetDirectory)
+        {
+            string[] fileEntries = Directory.GetFiles(targetDirectory);
+            
+            foreach (string fileName in fileEntries)
+            {
+                TrackLandmarksData data = TrackLandmarksData.getTrackLandmarksDataFromFile(fileName);
+                if(TRACK_LANDMARKS_DATA == null)
+                {
+                    TRACK_LANDMARKS_DATA = data;
+                }
+                else
+                {
+                    TRACK_LANDMARKS_DATA.trackLandmarksData.AddRange(data.trackLandmarksData);
+                }
+            }
+            string[] subdirectoryEntries = Directory.GetDirectories(targetDirectory);
+            foreach (string subdirectory in subdirectoryEntries)
+            {
+                ProcessDirectory(subdirectory);
+            }                
         }
 
         public static String getLandmarkForLapDistance(TrackDefinition currentTrack, float lapDistance)
