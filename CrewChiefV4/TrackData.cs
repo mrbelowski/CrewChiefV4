@@ -19,10 +19,12 @@ namespace CrewChiefV4
         public static void startRecordingTrackLandmarks(GameEnum gameEnum, String trackName, int trackId)
         {
             isRecordingTrackLandmarks = true;
-            folderPathForTrackLandmark = getLandMarkSpecificFolderPath(gameEnum, trackName);                                              
-            
+            folderPathForTrackLandmark = getLandMarkSpecificFolderPath(gameEnum, trackName);
+            Boolean createDirectory = true;
+            Boolean fileBroken = false;
             if (Directory.Exists(folderPathForTrackLandmark))
             {
+                createDirectory = false;
                 String fileName = Path.Combine(folderPathForTrackLandmark, "TrackLandmarks.json");
                 if(File.Exists(fileName))
                 {
@@ -30,17 +32,22 @@ namespace CrewChiefV4
                     {
                         trackLandmarksDataRecording = JsonConvert.DeserializeObject<TrackLandmarksData>(File.ReadAllText(fileName));
                         currentRecording = trackLandmarksDataRecording.trackLandmarksData.FirstOrDefault();
+                        
                     }
                     catch (Exception e)
                     {
                         Console.WriteLine("Unable to load existing tracklandmarksdata - renaming to 'broken_" + fileName + "', " + e.Message);
-                        File.Move(fileName, "broken_" + fileName);                        
+                        File.Move(fileName, "broken_" + fileName);
+                        fileBroken = true;
                     }
                 }               
             }
-            else
+            if (createDirectory || fileBroken)
             {
-                System.IO.Directory.CreateDirectory(folderPathForTrackLandmark);                
+                if (createDirectory)
+                {
+                    System.IO.Directory.CreateDirectory(folderPathForTrackLandmark);
+                }                                
                 trackLandmarksDataRecording = new TrackLandmarksData();
                 currentRecording = new TrackLandmarksForTrack();
                 switch (gameEnum)
