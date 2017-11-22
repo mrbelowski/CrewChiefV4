@@ -7,12 +7,128 @@ using System.Text;
 
 namespace CrewChiefV4
 {
+    public class TrackLandMarksRecorder
+    {
+        public static Boolean isRecordingTrackLandmarks = false;
+        private static TrackLandmarksForTrack currentRecording = null;
+        private static TrackLandmarksData trackLandmarksDataRecording = null;
+        private static Boolean hasStartedNewTrackLandmark = false;
+        private static TrackLandmark currentLandmark = null;
+        private static String folderPathForTrackLandmark;
+        public static void startRecordingTrackLandmarks(GameEnum gameEnum, String trackName, int trackId)
+        {
+            isRecordingTrackLandmarks = true;
+            folderPathForTrackLandmark = getLandMarkSpecificFolderPath(gameEnum, trackName);            
+            trackLandmarksDataRecording = new TrackLandmarksData();            
+            currentRecording = new TrackLandmarksForTrack();
+           
+            switch (gameEnum)
+            {
+                case GameEnum.ASSETTO_32BIT:
+                case GameEnum.ASSETTO_64BIT:
+                    currentRecording.acTrackNames = new string [] {trackName};
+                    break;
+                case GameEnum.PCARS_32BIT:
+                case GameEnum.PCARS_64BIT:
+                case GameEnum.PCARS2:
+                case GameEnum.PCARS_NETWORK:
+                case GameEnum.PCARS2_NETWORK:
+                    currentRecording.pcarsTrackName = trackName;
+                    break;
+                case GameEnum.RF1:
+                    currentRecording.rf1TrackNames = new string[] { trackName };
+                    break;
+                case GameEnum.RF2_64BIT:
+                    currentRecording.rf2TrackNames = new string[] { trackName }; 
+                    break;
+                case GameEnum.IRACING:
+                    currentRecording.irTrackName = trackName; 
+                    break;
+                case GameEnum.RACE_ROOM:
+                    currentRecording.raceroomLayoutId = trackId;
+                    break;
+                default:
+                    break;
+            }
+            Console.WriteLine("Recording track landmark data for game " + gameEnum + " and track " + trackName);
+        }
+
+        public static void addLandMark(float distanceRoundTrack)
+        {
+            if (currentRecording == null)
+            {
+                return;
+            }
+            if(!hasStartedNewTrackLandmark)
+            {
+                hasStartedNewTrackLandmark = true;
+                currentLandmark = new TrackLandmark();
+                currentLandmark.distanceRoundLapStart = distanceRoundTrack;
+                currentLandmark.isCommonOvertakingSpot = false;              
+            }
+            else
+            {
+                currentLandmark.distanceRoundLapEnd = distanceRoundTrack;
+                currentRecording.trackLandmarks.Add(currentLandmark);
+                hasStartedNewTrackLandmark = false;
+            }
+        }
+
+        public static void completeRecordingTrackLandmarks()
+        {
+            if (isRecordingTrackLandmarks)
+            {
+                if (!System.IO.Directory.Exists(folderPathForTrackLandmark))
+                {
+                    System.IO.Directory.CreateDirectory(folderPathForTrackLandmark);
+                }
+                try
+                {
+                    //for later use when reloading / appending to existing gets implemented.
+                    currentRecording.trackLandmarks.OrderBy(e => e.distanceRoundLapStart);
+                    int turn = 1;
+                    foreach (TrackLandmark lm in currentRecording.trackLandmarks)
+                    {
+                        lm.landmarkName = "turn" + turn;
+                        turn++;
+                    }
+                    trackLandmarksDataRecording.trackLandmarksData.Add(currentRecording);
+                    File.WriteAllText(System.IO.Path.Combine(folderPathForTrackLandmark, "TrackLandmarks.json"),
+                        JsonConvert.SerializeObject(trackLandmarksDataRecording, Formatting.Indented));
+
+                    Console.WriteLine("Done Recording track landmark data");
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Unable to complete landmark recording session : " + e.Message);
+                }
+            }
+            isRecordingTrackLandmarks = false;
+        }
+
+        private static String getLandMarkSpecificFolderPath(GameEnum gameEnum, String trackName)
+        {
+            return System.IO.Path.Combine(Environment.GetFolderPath(
+                Environment.SpecialFolder.MyDocuments), "CrewChiefV4", "TrackLandmarks",
+                makeValidForPathName(gameEnum.ToString()), makeValidForPathName(trackName));
+        }
+
+        private static String makeValidForPathName(String text)
+        {
+            foreach (char c in System.IO.Path.GetInvalidFileNameChars())
+            {
+                text = text.Replace(c, '_');
+            }
+            return text;
+        }
+    }
+
     public class TrackLandmark
     {
         public String landmarkName { get; set; }
         public float distanceRoundLapStart { get; set; }
         public float distanceRoundLapEnd { get; set; }
-        public Boolean isCommonOvertakingSpot { get; set; }
+        public Boolean isCommonOvertakingSpot { get; set; }        
         public float midPoint = -1;
 
         public float getMidPoint()
@@ -40,7 +156,13 @@ namespace CrewChiefV4
         {
             this.trackLandmarks = new List<TrackLandmark>();
             this.raceroomLayoutId = -1;
-            approximateTrackLength = -1;
+            this.approximateTrackLength = -1;
+            this.acTrackNames = new string[] { };
+            this.rf1TrackNames = new string[] { };
+            this.rf2TrackNames = new string[] { };
+            this.pcarsTrackName = "";
+            this.irTrackName = "";
+            this.isOval = false;
         }
     }
 

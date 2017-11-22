@@ -1056,6 +1056,18 @@ namespace CrewChiefV4
                         crewChief.togglePaceNotesPlayback();
                         nextPollWait = 1000;
                     }
+                    else if (controllerConfiguration.hasOutstandingClick(ControllerConfiguration.TOGGLE_TRACK_LANDMARKS_RECORDING))
+                    {
+                        Console.WriteLine("Start / stop track landmark recording");
+                        crewChief.toggleTrackLandmarkRecording();
+                        nextPollWait = 1000;
+                    }
+                    else if (controllerConfiguration.hasOutstandingClick(ControllerConfiguration.ADD_TRACK_LANDMARK))
+                    {
+                        Console.WriteLine("Add track landmark");
+                        crewChief.toggleAddTrackLandmark();
+                        nextPollWait = 1000;
+                    }    
                     else if (controllerConfiguration.hasOutstandingClick(ControllerConfiguration.PRINT_TRACK_DATA))
                     {
                         if (CrewChief.currentGameState != null && CrewChief.currentGameState.SessionData != null &&

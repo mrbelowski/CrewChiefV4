@@ -2758,5 +2758,77 @@ namespace CrewChiefV4.Properties {
                 this["NAUDIO_DEVICE_GUID_BACKGROUND"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-1")]
+        public int TOGGLE_TRACK_LANDMARKS_RECORDING_button_index {
+            get {
+                return ((int)(this["TOGGLE_TRACK_LANDMARKS_RECORDING_button_index"]));
+            }
+            set {
+                this["TOGGLE_TRACK_LANDMARKS_RECORDING_button_index"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string TOGGLE_TRACK_LANDMARKS_RECORDING_device_guid {
+            get {
+                return ((string)(this["TOGGLE_TRACK_LANDMARKS_RECORDING_device_guid"]));
+            }
+            set {
+                this["TOGGLE_TRACK_LANDMARKS_RECORDING_device_guid"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string TOGGLE_TRACK_LANDMARKS_RECORDING_device_type {
+            get {
+                return ((string)(this["TOGGLE_TRACK_LANDMARKS_RECORDING_device_type"]));
+            }
+            set {
+                this["TOGGLE_TRACK_LANDMARKS_RECORDING_device_type"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-1")]
+        public int ADD_TRACK_LANDMARK_button_index {
+            get {
+                return ((int)(this["ADD_TRACK_LANDMARK_button_index"]));
+            }
+            set {
+                this["ADD_TRACK_LANDMARK_button_index"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string ADD_TRACK_LANDMARK_device_guid {
+            get {
+                return ((string)(this["ADD_TRACK_LANDMARK_device_guid"]));
+            }
+            set {
+                this["ADD_TRACK_LANDMARK_device_guid"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string ADD_TRACK_LANDMARK_device_type {
+            get {
+                return ((string)(this["ADD_TRACK_LANDMARK_device_type"]));
+            }
+            set {
+                this["ADD_TRACK_LANDMARK_device_type"] = value;
+            }
+        }
     }
 }
