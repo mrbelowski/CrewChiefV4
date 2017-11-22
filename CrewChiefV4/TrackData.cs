@@ -514,7 +514,7 @@ namespace CrewChiefV4
             }
             else
             {
-                Console.WriteLine("No user defined landmarks defined");
+                Console.WriteLine("No user defined landmarks found");
             }             
         }
 
