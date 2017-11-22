@@ -427,7 +427,7 @@ namespace CrewChiefV4
         {
             if (TrackLandMarksRecorder.isRecordingTrackLandmarks)
             {
-                TrackLandMarksRecorder.addLandMark(CrewChief.distanceRoundTrack);
+                TrackLandMarksRecorder.addLandmark(CrewChief.distanceRoundTrack);
             }
         }
         // nasty... these triggers come from the speech recogniser or from button presses, and invoke speech
