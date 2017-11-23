@@ -41,7 +41,10 @@ namespace CrewChiefV4
         public static String GET_DAMAGE_REPORT = Configuration.getUIString("get_damage_report");
                 
         public static String TOGGLE_PACE_NOTES_RECORDING = Configuration.getUIString("toggle_pace_notes_recording");
-        public static String TOGGLE_PACE_NOTES_PLAYBACK = Configuration.getUIString("toggle_pace_notes_playback");        
+        public static String TOGGLE_PACE_NOTES_PLAYBACK = Configuration.getUIString("toggle_pace_notes_playback");
+
+        public static String TOGGLE_TRACK_LANDMARKS_RECORDING = Configuration.getUIString("toggle_track_landmarks_recording");
+        public static String ADD_TRACK_LANDMARK = Configuration.getUIString("add_track_landmark");
 
         private ControllerData networkGamePad = new ControllerData(Configuration.getUIString("udp_network_data_buttons"), DeviceType.Gamepad, UDP_NETWORK_CONTROLLER_GUID);
         
@@ -91,6 +94,8 @@ namespace CrewChiefV4
             addButtonAssignment(GET_STATUS);
             addButtonAssignment(TOGGLE_PACE_NOTES_PLAYBACK);
             addButtonAssignment(TOGGLE_PACE_NOTES_RECORDING);
+            addButtonAssignment(TOGGLE_TRACK_LANDMARKS_RECORDING);
+            addButtonAssignment(ADD_TRACK_LANDMARK);
             controllers = loadControllers();
         }
 
@@ -129,6 +134,9 @@ namespace CrewChiefV4
             pollForButtonClicks(buttonAssignments[buttonAssignmentIndexes[GET_CAR_STATUS]]);
             pollForButtonClicks(buttonAssignments[buttonAssignmentIndexes[TOGGLE_PACE_NOTES_PLAYBACK]]);
             pollForButtonClicks(buttonAssignments[buttonAssignmentIndexes[TOGGLE_PACE_NOTES_RECORDING]]);
+            pollForButtonClicks(buttonAssignments[buttonAssignmentIndexes[TOGGLE_TRACK_LANDMARKS_RECORDING]]);
+            pollForButtonClicks(buttonAssignments[buttonAssignmentIndexes[ADD_TRACK_LANDMARK]]);
+            
         }
 
         private void pollForButtonClicks(ButtonAssignment ba)
@@ -292,7 +300,14 @@ namespace CrewChiefV4
                 {
                     actionId = "TOGGLE_PACE_NOTES_RECORDING";
                 }
-
+                else if (buttonAssignment.action == TOGGLE_TRACK_LANDMARKS_RECORDING)
+                {
+                    actionId = "TOGGLE_TRACK_LANDMARKS_RECORDING";
+                }
+                else if (buttonAssignment.action == ADD_TRACK_LANDMARK)
+                {
+                    actionId = "ADD_TRACK_LANDMARK";
+                }
                 if (buttonAssignment.controller != null && (buttonAssignment.joystick != null || buttonAssignment.controller.guid == UDP_NETWORK_CONTROLLER_GUID) && buttonAssignment.buttonIndex != -1)
                 {
                     UserSettings.GetUserSettings().setProperty(actionId + "_button_index", buttonAssignment.buttonIndex);
@@ -433,6 +448,18 @@ namespace CrewChiefV4
             if (togglePaceNotesRecordingButtonIndex != -1 && togglePaceNotesRecordingDeviceGuid.Length > 0)
             {
                 loadAssignment(parent, TOGGLE_PACE_NOTES_RECORDING, togglePaceNotesRecordingButtonIndex, togglePaceNotesRecordingDeviceGuid);
+            }
+            int toggleTrackLandmarkButtonIndex = UserSettings.GetUserSettings().getInt("TOGGLE_TRACK_LANDMARKS_RECORDING_button_index");
+            String toggleTrackLandmarkRecordingDeviceGuid = UserSettings.GetUserSettings().getString("TOGGLE_TRACK_LANDMARKS_RECORDING_device_guid");
+            if (toggleTrackLandmarkButtonIndex != -1 && toggleTrackLandmarkRecordingDeviceGuid.Length > 0)
+            {
+                loadAssignment(parent, TOGGLE_TRACK_LANDMARKS_RECORDING, toggleTrackLandmarkButtonIndex, toggleTrackLandmarkRecordingDeviceGuid);
+            }
+            int addTracklandmarkButtonIndex = UserSettings.GetUserSettings().getInt("ADD_TRACK_LANDMARK_button_index");
+            String addTracklandmarkDeviceGuid = UserSettings.GetUserSettings().getString("ADD_TRACK_LANDMARK_device_guid");
+            if (addTracklandmarkButtonIndex != -1 && addTracklandmarkDeviceGuid.Length > 0)
+            {
+                loadAssignment(parent, ADD_TRACK_LANDMARK, addTracklandmarkButtonIndex, addTracklandmarkDeviceGuid);
             }
         }
 

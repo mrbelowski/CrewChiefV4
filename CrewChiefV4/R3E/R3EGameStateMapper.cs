@@ -139,6 +139,7 @@ namespace CrewChiefV4.RaceRoom
                 CrewChief.carClass = CarData.getCarClassForRaceRoomId(shared.VehicleInfo.ClassId).carClassEnum;
                 CrewChief.viewingReplay = true;
                 CrewChief.distanceRoundTrack = shared.LapDistance;
+                CrewChief.raceroomTrackId = shared.LayoutId;
             }
 
             if (shared.Player.GameSimulationTime <= 0 || shared.VehicleInfo.SlotId < 0 ||
@@ -1325,6 +1326,7 @@ namespace CrewChiefV4.RaceRoom
                 CrewChief.carClass = currentGameState.carClass.carClassEnum;
             }
             CrewChief.distanceRoundTrack = currentGameState.PositionAndMotionData.DistanceRoundTrack;
+            CrewChief.raceroomTrackId = shared.LayoutId;
             CrewChief.viewingReplay = false;
 
             return currentGameState;

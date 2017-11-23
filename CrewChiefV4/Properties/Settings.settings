@@ -686,5 +686,23 @@
     <Setting Name="NAUDIO_DEVICE_GUID_BACKGROUND" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="TOGGLE_TRACK_LANDMARKS_RECORDING_button_index" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">-1</Value>
+    </Setting>
+    <Setting Name="TOGGLE_TRACK_LANDMARKS_RECORDING_device_guid" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="TOGGLE_TRACK_LANDMARKS_RECORDING_device_type" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="ADD_TRACK_LANDMARK_button_index" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">-1</Value>
+    </Setting>
+    <Setting Name="ADD_TRACK_LANDMARK_device_guid" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="ADD_TRACK_LANDMARK_device_type" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
   </Settings>
 </SettingsFile>
