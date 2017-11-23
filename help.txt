@@ -255,3 +255,23 @@ If there are pace notes for the game / car / track combination you're using in y
 
 
 There's a sample pace notes set available for Raceroom's Macau circuit in the WTCC 2014 - 2017 cars. You can view it in action here https://youtu.be/hz7lu23ckUE. You can download it here http://crewchief.isnais.de/ExamplePaceNotes.zip. Unzip this to your Documents folder so it creates a directory structure like the ones described above, then when you start a WTCC session at Macau you can start the pace notes playing with the "start pace notes" voice command or "Start / stop playing pace notes" button.
+
+
+Track Landmarks(corner mappings) recording.
+-----------------
+Please, keep corner mappings tight (from breaking point to exit). Do not include straights!
+To get the best results, the begin-distance should be taken at your typical turn-in point and the end-distance taken at the point where your wheels are pretty much straight-ahead. For some corners this is easy and very clear, in others not so much so in those cases just use your best judgement
+
+To start recording a track landmarks file first thing you have todo is assign 2 buttons, one to start/stop the recording "Start / stop track landmarks recording" action and one to add start/end point "Add Start / end track landmark" action.
+
+Start a practice session and wait untill your on track then press the "Start / stop track landmarks recording" button, now you can start adding landmarks by pressing the "Add Start / end track landmark" button, first press on the button will be start point of the track landmark, 2th press will be end point.
+Once you have added all the landmarks press the "Start / stop track landmarks recording" butten to end the recording, this will produce a file called trackLandmarks.json located in C:\Users\[user name]\Documents\CrewChiefV4\track_landmarks\[game]\[track]\trackLandmarks.json.
+
+Track Landmarks(corner mappings) consists of:
+-Track Name or Raceroom ID and list of:
+-landmarkName
+-distanceRoundLapStart
+-distanceRoundLapEnd
+-isCommonOvertakingSpot (default false)
+
+To load your newly added landmarks file you have to restart the app! 
