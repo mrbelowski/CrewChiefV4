@@ -569,7 +569,9 @@ namespace CrewChiefV4.RaceRoom
                             brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(currentGameState.carClass);
                         }
                     }
-                    
+
+                    // Note that the participantStruct.TrackSector does NOT get updated if the participant exits to the pits. If he does this,
+                    // participantStruct.TrackSector will remain at whatever it was when he exited until he starts he next flying lap
                     currentGameState.SessionData.IsNewSector = participantStruct.TrackSector != 0 && currentGameState.SessionData.SectorNumber != participantStruct.TrackSector;
                     currentGameState.SessionData.IsNewLap = previousGameState != null && previousGameState.SessionData.IsNewLap == false &&
                         (shared.CompletedLaps == previousGameState.SessionData.CompletedLaps + 1 ||
@@ -698,33 +700,31 @@ namespace CrewChiefV4.RaceRoom
 
                     if (currentGameState.PitData.InPitlane)
                     {
-                        if (currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.SessionRunningTime > 10 && 
-                            previousGameState != null && !previousGameState.PitData.InPitlane)
+                        currentGameState.SessionData.CurrentLapIsValid = false;
+                        // the track sector number is nonsense when we're on an out lap
+                        if (previousGameState != null && !previousGameState.PitData.InPitlane)
                         {
-                            currentGameState.PitData.NumPitStops++;
-                        }
-                        if (participantStruct.TrackSector == 3)
-                        {
+                            if (currentGameState.SessionData.SessionRunningTime > 30 && currentGameState.SessionData.SessionType == SessionType.Race)
+                            {
+                                currentGameState.PitData.NumPitStops++;
+                            }
                             currentGameState.PitData.OnInLap = true;
                             currentGameState.PitData.OnOutLap = false;
                         }
-                        else if (participantStruct.TrackSector == 1)
-                        {
-                            currentGameState.PitData.OnInLap = false;
-                            currentGameState.SessionData.CurrentLapIsValid = false;
-                            currentGameState.SessionData.PreviousLapWasValid = false;
-                            currentGameState.PitData.OnOutLap = true;
-                        }
+                    }
+                    else if (previousGameState != null && previousGameState.PitData.InPitlane)
+                    {
+                        currentGameState.PitData.OnInLap = false;
+                        currentGameState.PitData.OnOutLap = true;
+                        currentGameState.SessionData.PreviousLapWasValid = false;
+                        currentGameState.SessionData.CurrentLapIsValid = false;
+                        currentGameState.PitData.IsAtPitExit = true;
                     }
                     else if (currentGameState.SessionData.IsNewLap)
                     {
                         // starting a new lap while not in the pitlane so clear the in / out lap flags
                         currentGameState.PitData.OnInLap = false;
-                        currentGameState.PitData.OnOutLap = false;
-                    }
-                    if (previousGameState != null && currentGameState.PitData.OnOutLap && previousGameState.PitData.InPitlane && !currentGameState.PitData.InPitlane)
-                    {
-                        currentGameState.PitData.IsAtPitExit = true;
+                        currentGameState.PitData.OnOutLap = false;                        
                     }
                     break;
                 }
@@ -808,6 +808,7 @@ namespace CrewChiefV4.RaceRoom
                             float[] previousOpponentWorldPosition = new float[] { 0, 0, 0 };
                             float previousOpponentSpeed = 0;
                             float previousDistanceRoundTrack = 0;
+                            Boolean previousOpponentInPits = false;
                             if (previousGameState.OpponentData.ContainsKey(driverName))
                             {
                                 previousOpponentData = previousGameState.OpponentData[driverName];
@@ -816,6 +817,7 @@ namespace CrewChiefV4.RaceRoom
                                 previousOpponentPosition = previousOpponentData.Position;
                                 previousOpponentIsEnteringPits = previousOpponentData.isEnteringPits();
                                 previousOpponentIsExitingPits = previousOpponentData.isExitingPits();
+                                previousOpponentInPits = previousOpponentData.InPits;
                                 previousOpponentWorldPosition = previousOpponentData.WorldPosition;
                                 previousOpponentSpeed = previousOpponentData.Speed;
                                 newOpponentLap = previousOpponentData.CurrentSectorNumber == 3 && participantStruct.TrackSector == 1;
@@ -884,8 +886,8 @@ namespace CrewChiefV4.RaceRoom
                             {
                                 currentGameState.SessionData.HasLeadChanged = true;
                             }
-                            Boolean isEnteringPits = participantStruct.InPitlane == 1 && currentOpponentSector == 3;
-                            Boolean isLeavingPits = participantStruct.InPitlane == 1 && currentOpponentSector == 1;
+                            Boolean isEnteringPits = participantStruct.InPitlane == 1 && !previousOpponentInPits;
+                            Boolean isLeavingPits = previousOpponentInPits && participantStruct.InPitlane != 1;
 
                             if (isEnteringPits && !previousOpponentIsEnteringPits)
                             {
@@ -1673,10 +1675,15 @@ namespace CrewChiefV4.RaceRoom
             }
             opponentData.WorldPosition = currentWorldPosition;
             opponentData.IsNewLap = false;
-
-            if (sessionRunningTime > 10 && isRace && !opponentData.InPits && isInPits)
+            Boolean wasInPits = opponentData.InPits;
+            if (sessionRunningTime > 30 && !wasInPits && isInPits)
             {
-                opponentData.NumPitStops++;
+                opponentData.InvalidateCurrentLap();
+                opponentData.setInLap();
+                if (isRace)
+                {
+                    opponentData.NumPitStops++;
+                }
             }
             opponentData.InPits = isInPits;
             TyreType previousTyreType = opponentData.CurrentTyres;
@@ -1726,9 +1733,9 @@ namespace CrewChiefV4.RaceRoom
                 opponentData.CurrentSectorNumber = sector;
             }
             opponentData.CompletedLaps = completedLaps;
-            if (sector == 3 && isInPits)
-            {
-                opponentData.setInLap();
+            if (wasInPits && !isInPits)
+            {                
+                opponentData.InvalidateCurrentLap();
             }
         }
 
