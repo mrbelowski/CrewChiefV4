@@ -83,6 +83,7 @@ namespace CrewChiefV4
         // used for the pace notes recorder - need to separate out from the currentGameState so we can
         // set these even when viewing replays
         public static String trackName = "";
+        public static int raceroomTrackId = -1;
         public static CarData.CarClassEnum carClass = CarData.CarClassEnum.UNKNOWN_RACE;
         public static Boolean viewingReplay = false;
         public static float distanceRoundTrack = -1;
@@ -401,7 +402,34 @@ namespace CrewChiefV4
                     CrewChief.trackName, CrewChief.carClass);                
             }
         }
-
+        public void toggleTrackLandmarkRecording()
+        {
+            if(TrackLandMarksRecorder.isRecordingTrackLandmarks)
+            {
+                TrackLandMarksRecorder.completeRecordingTrackLandmarks();
+            }
+            else
+            {
+                if (CrewChief.trackName == null || CrewChief.trackName.Equals(""))
+                {
+                    Console.WriteLine("No track has been loaded - start an on-track session before recording landmarks");
+                    return;
+                }
+                else
+                {
+                    TrackLandMarksRecorder.startRecordingTrackLandmarks(CrewChief.gameDefinition.gameEnum,
+                    CrewChief.trackName, CrewChief.raceroomTrackId);
+                }
+                
+            }
+        }
+        public void toggleAddTrackLandmark()
+        {
+            if (TrackLandMarksRecorder.isRecordingTrackLandmarks)
+            {
+                TrackLandMarksRecorder.addLandmark(CrewChief.distanceRoundTrack);
+            }
+        }
         // nasty... these triggers come from the speech recogniser or from button presses, and invoke speech
         // recognition 'respond' methods in the events
         public static void getStatus()

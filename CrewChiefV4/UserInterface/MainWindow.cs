@@ -362,22 +362,22 @@ namespace CrewChiefV4
         public void updateMessagesVolume(float messagesVolume)
         {
             currentVolume = messagesVolume;
-            setMessagesVolume(messagesVolume);
+            setMessagesVolume(messagesVolume, false);
             messagesVolumeSlider.Value = (int)(messagesVolume * 10f);
         }
 
         private void messagesVolumeSlider_Scroll(object sender, EventArgs e)
         {
             float volFloat = (float)messagesVolumeSlider.Value / 10;
-            setMessagesVolume(volFloat);
+            setMessagesVolume(volFloat, false);
             currentVolume = volFloat;
             UserSettings.GetUserSettings().setProperty("messages_volume", volFloat);
             UserSettings.GetUserSettings().saveUserSettings();
         }
 
-        private void setMessagesVolume(float vol)
+        private void setMessagesVolume(float vol, Boolean changeEvenIfUsingNaudio)
         {
-            if (!UserSettings.GetUserSettings().getBoolean("use_naudio"))
+            if (changeEvenIfUsingNaudio || !UserSettings.GetUserSettings().getBoolean("use_naudio"))
             {
                 int NewVolume = (int)(((float)ushort.MaxValue) * vol);
                 // Set the same volume for both the left and the right channels
@@ -919,7 +919,7 @@ namespace CrewChiefV4
                         }
 
                         if (rejectMessagesWhenTalking)
-                            setMessagesVolume(0.0f);
+                            setMessagesVolume(0.0f, true);
                     }
                     else if (channelOpen && !controllerConfiguration.isChannelOpen())
                     {
@@ -928,7 +928,7 @@ namespace CrewChiefV4
                             // Drop any outstanding messages queued while user was talking, this should prevent weird half phrases.
                             crewChief.audioPlayer.purgeQueues();
 
-                            setMessagesVolume(currentVolume);
+                            setMessagesVolume(currentVolume, true);
                             crewChief.audioPlayer.muteBackgroundPlayer(false /*mute*/);
                         }
 
@@ -1056,6 +1056,18 @@ namespace CrewChiefV4
                         crewChief.togglePaceNotesPlayback();
                         nextPollWait = 1000;
                     }
+                    else if (controllerConfiguration.hasOutstandingClick(ControllerConfiguration.TOGGLE_TRACK_LANDMARKS_RECORDING))
+                    {
+                        Console.WriteLine("Start / stop track landmark recording");
+                        crewChief.toggleTrackLandmarkRecording();
+                        nextPollWait = 1000;
+                    }
+                    else if (controllerConfiguration.hasOutstandingClick(ControllerConfiguration.ADD_TRACK_LANDMARK))
+                    {
+                        //dont confirm press here we do that in addLandmark
+                        crewChief.toggleAddTrackLandmark();
+                        nextPollWait = 1000;
+                    }    
                     else if (controllerConfiguration.hasOutstandingClick(ControllerConfiguration.PRINT_TRACK_DATA))
                     {
                         if (CrewChief.currentGameState != null && CrewChief.currentGameState.SessionData != null &&

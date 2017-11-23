@@ -7,12 +7,158 @@ using System.Text;
 
 namespace CrewChiefV4
 {
+    public class TrackLandMarksRecorder
+    {
+        public static Boolean isRecordingTrackLandmarks = false;
+        private static TrackLandmarksForTrack currentRecording = null;
+        private static TrackLandmarksData trackLandmarksDataRecording = null;
+        private static Boolean hasStartedNewTrackLandmark = false;
+        private static TrackLandmark currentLandmark = null;
+        private static String folderPathForTrackLandmark;
+
+        public static void startRecordingTrackLandmarks(GameEnum gameEnum, String trackName, int trackId)
+        {
+            isRecordingTrackLandmarks = true;
+            folderPathForTrackLandmark = getLandMarkSpecificFolderPath(gameEnum, trackName);
+            Boolean createDirectory = true;
+            Boolean fileBroken = true;
+            if (Directory.Exists(folderPathForTrackLandmark))
+            {
+                createDirectory = false;
+                String fileName = Path.Combine(folderPathForTrackLandmark, "trackLandmarks.json");
+                if(File.Exists(fileName))
+                {
+                    try
+                    {
+                        trackLandmarksDataRecording = JsonConvert.DeserializeObject<TrackLandmarksData>(File.ReadAllText(fileName));
+                        currentRecording = trackLandmarksDataRecording.trackLandmarksData.FirstOrDefault();
+                        fileBroken = false;
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("Unable to load existing tracklandmarksdata - renaming to 'broken_" + fileName + "', " + e.Message);
+                        File.Move(fileName, "broken_" + fileName);
+                        fileBroken = true;
+                    }
+                }               
+            }
+            if (createDirectory || fileBroken)
+            {
+                if (createDirectory)
+                {
+                    Directory.CreateDirectory(folderPathForTrackLandmark);
+                }                                
+                trackLandmarksDataRecording = new TrackLandmarksData();
+                currentRecording = new TrackLandmarksForTrack();
+                switch (gameEnum)
+                {
+                    case GameEnum.ASSETTO_32BIT:
+                    case GameEnum.ASSETTO_64BIT:
+                        currentRecording.acTrackNames = new string[] { trackName };
+                        break;
+                    case GameEnum.PCARS_32BIT:
+                    case GameEnum.PCARS_64BIT:
+                    case GameEnum.PCARS2:
+                    case GameEnum.PCARS_NETWORK:
+                    case GameEnum.PCARS2_NETWORK:
+                        currentRecording.pcarsTrackName = trackName;
+                        break;
+                    case GameEnum.RF1:
+                        currentRecording.rf1TrackNames = new string[] { trackName };
+                        break;
+                    case GameEnum.RF2_64BIT:
+                        currentRecording.rf2TrackNames = new string[] { trackName };
+                        break;
+                    case GameEnum.IRACING:
+                        currentRecording.irTrackName = trackName;
+                        break;
+                    case GameEnum.RACE_ROOM:
+                        currentRecording.raceroomLayoutId = trackId;
+                        break;
+                    default:
+                        break;
+                }
+            }
+            Console.WriteLine("Recording track landmark data for game " + gameEnum + " and track " + trackName);
+        }
+
+        public static void addLandmark(float distanceRoundTrack)
+        {
+            if (currentRecording == null || !isRecordingTrackLandmarks)
+            {
+                Console.WriteLine("Please start a track landmark recoding session before adding landmarks");
+                return;
+            }
+            if(!hasStartedNewTrackLandmark)
+            {
+                Console.WriteLine("Setting landmark start point at " + distanceRoundTrack + "m");
+                hasStartedNewTrackLandmark = true;
+                currentLandmark = new TrackLandmark();
+                currentLandmark.distanceRoundLapStart = distanceRoundTrack;
+                currentLandmark.isCommonOvertakingSpot = false;              
+            }
+            else
+            {
+                Console.WriteLine("Setting landmark end point at " + distanceRoundTrack + "m");
+                currentLandmark.distanceRoundLapEnd = distanceRoundTrack;
+                currentRecording.trackLandmarks.Add(currentLandmark);
+                hasStartedNewTrackLandmark = false;
+            }
+        }
+
+        public static void completeRecordingTrackLandmarks()
+        {
+            if (isRecordingTrackLandmarks)
+            {
+                //re-order landmarks by distanceRoundLapStart                   
+                int turn = 1;
+                List<TrackLandmark> tml = currentRecording.trackLandmarks.OrderBy(e => e.distanceRoundLapStart).ToList();
+                foreach (TrackLandmark lm in tml)
+                {
+                    lm.landmarkName = "turn" + turn;
+                    turn++;
+                }
+                currentRecording.trackLandmarks = tml;
+                trackLandmarksDataRecording.trackLandmarksData.Clear();
+                trackLandmarksDataRecording.trackLandmarksData.Add(currentRecording);
+                try
+                {
+                    File.WriteAllText(Path.Combine(folderPathForTrackLandmark, "trackLandmarks.json"),
+                        JsonConvert.SerializeObject(trackLandmarksDataRecording, Formatting.Indented));
+
+                    Console.WriteLine("Done Recording track landmark data to " + Path.Combine(folderPathForTrackLandmark, "trackLandmarks.json"));
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Unable to complete landmark recording session : " + e.Message);
+                }
+            }
+            isRecordingTrackLandmarks = false;
+        }
+
+        private static String getLandMarkSpecificFolderPath(GameEnum gameEnum, String trackName)
+        {
+            return Path.Combine(Environment.GetFolderPath(
+                Environment.SpecialFolder.MyDocuments), "CrewChiefV4", "track_landmarks",
+                makeValidForPathName(gameEnum.ToString()), makeValidForPathName(trackName));
+        }
+
+        private static String makeValidForPathName(String text)
+        {
+            foreach (char c in Path.GetInvalidFileNameChars())
+            {
+                text = text.Replace(c, '_');
+            }
+            return text;
+        }
+    }
+
     public class TrackLandmark
     {
         public String landmarkName { get; set; }
         public float distanceRoundLapStart { get; set; }
         public float distanceRoundLapEnd { get; set; }
-        public Boolean isCommonOvertakingSpot { get; set; }
+        public Boolean isCommonOvertakingSpot { get; set; }        
         public float midPoint = -1;
 
         public float getMidPoint()
@@ -40,7 +186,13 @@ namespace CrewChiefV4
         {
             this.trackLandmarks = new List<TrackLandmark>();
             this.raceroomLayoutId = -1;
-            approximateTrackLength = -1;
+            this.approximateTrackLength = -1;
+            this.acTrackNames = new string[] { };
+            this.rf1TrackNames = new string[] { };
+            this.rf2TrackNames = new string[] { };
+            this.pcarsTrackName = "";
+            this.irTrackName = "";
+            this.isOval = false;
         }
     }
 
@@ -351,6 +503,42 @@ namespace CrewChiefV4
         public static void loadTrackLandmarksData()
         {
             TRACK_LANDMARKS_DATA = TrackLandmarksData.getTrackLandmarksDataFromFile(getDefaultTrackLandmarksFileLocation());
+            loadUserCreatedTrackLandmarkFiles();
+        }
+        static void loadUserCreatedTrackLandmarkFiles()
+        {
+            String userLandmarks = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "CrewChiefV4", "track_landmarks");
+            if(Directory.Exists(userLandmarks))
+            {
+                ProcessDirectory(userLandmarks);
+            }
+            else
+            {
+                Console.WriteLine("No user defined landmarks found");
+            }             
+        }
+
+        public static void ProcessDirectory(string targetDirectory)
+        {
+            string[] fileEntries = Directory.GetFiles(targetDirectory);
+            
+            foreach (string fileName in fileEntries)
+            {
+                TrackLandmarksData data = TrackLandmarksData.getTrackLandmarksDataFromFile(fileName);
+                if(TRACK_LANDMARKS_DATA == null)
+                {
+                    TRACK_LANDMARKS_DATA = data;
+                }
+                else
+                {
+                    TRACK_LANDMARKS_DATA.trackLandmarksData.AddRange(data.trackLandmarksData);
+                }
+            }
+            string[] subdirectoryEntries = Directory.GetDirectories(targetDirectory);
+            foreach (string subdirectory in subdirectoryEntries)
+            {
+                ProcessDirectory(subdirectory);
+            }                
         }
 
         public static String getLandmarkForLapDistance(TrackDefinition currentTrack, float lapDistance)
