@@ -259,12 +259,12 @@ There's a sample pace notes set available for Raceroom's Macau circuit in the WT
 
 Track Landmarks(corner mappings) recording.
 -----------------
-Please, keep corner mappings tight (from breaking point to exit). Do not include straights!
-To get the best results, the begin-distance should be taken at your typical turn-in point and the end-distance taken at the point where your wheels are pretty much straight-ahead. For some corners this is easy and very clear, in others not so much so in those cases just use your best judgement
+Please, keep corner mappings tight (from turn-in point to corner exit). Do not include straights!
+To get the best results, the begin-distance should be taken at your typical turn-in point and the end-distance taken at the point where your wheels are pretty much straight-ahead. For some corners this is easy and very clear, in others not so much so in those cases just use your best judgement.
 
-To start recording a track landmarks file first thing you have todo is assign 2 buttons, one to start/stop the recording "Start / stop track landmarks recording" action and one to add start/end point "Add Start / end track landmark" action.
+To start recording a track landmarks file, the first thing you have todo is assign 2 buttons - one to start/stop the recording ("Start / stop track landmarks recording" action) and one to add start/end point ("Add Start / end track landmark" action).
 
-Start a practice session and wait untill your on track then press the "Start / stop track landmarks recording" button, now you can start adding landmarks by pressing the "Add Start / end track landmark" button, first press on the button will be start point of the track landmark, 2th press will be end point.
+Start a practice session and wait until you're on track then press the "Start / stop track landmarks recording" button, now you can start adding landmarks by pressing the "Add Start / end track landmark" button. The first press on the button will be start point of the track landmark, the 2nd press will be end point.
 Once you have added all the landmarks press the "Start / stop track landmarks recording" butten to end the recording, this will produce a file called trackLandmarks.json located in C:\Users\[user name]\Documents\CrewChiefV4\track_landmarks\[game]\[track]\trackLandmarks.json.
 
 Track Landmarks(corner mappings) consists of:
@@ -273,5 +273,9 @@ Track Landmarks(corner mappings) consists of:
 -distanceRoundLapStart
 -distanceRoundLapEnd
 -isCommonOvertakingSpot (default false)
+
+This file will contain default corner names ("turn 1", "turn 2" and so-on). All corners will have isCommonOvertakingSpot set to false. Edit the file to change the isCommonOvertakingSpot value to 'true' where appropriate. You can also modify the corner names in this file. Note that, if you want the app to use these corner names, they will have to exist in C:\Users\[user name]\AppData\local\CrewChiefV4\sounds\voice\corner_names\
+
+You can request new names on the Crew Chief forum.
 
 To load your newly added landmarks file you have to restart the app! 
