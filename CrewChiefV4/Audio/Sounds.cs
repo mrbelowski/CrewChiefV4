@@ -982,16 +982,17 @@ namespace CrewChiefV4.Audio
                 uncachedWaveOut.PlaybackStopped += new EventHandler<NAudio.Wave.StoppedEventArgs>(playbackStopped);
                 NAudio.Wave.SampleProviders.SampleChannel sampleChannel = new NAudio.Wave.SampleProviders.SampleChannel(uncachedReader);
                 sampleChannel.Volume = getVolume();
-                uncachedWaveOut.Init(new NAudio.Wave.SampleProviders.SampleToWaveProvider(sampleChannel));
-                uncachedWaveOut.Play();
+
                 try
                 {
+                    uncachedWaveOut.Init(new NAudio.Wave.SampleProviders.SampleToWaveProvider(sampleChannel));
+                    uncachedWaveOut.Play();
                     // stop waiting after 30 seconds
                     this.playWaitHandle.WaitOne(30000);
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine("Exception " + e.Message + " playing sound " + this.fullPath);
+                    Console.WriteLine("Exception " + e.Message + " playing sound " + this.fullPath + " stack trace " + e.StackTrace);
                 }
                 try
                 {
@@ -1008,24 +1009,27 @@ namespace CrewChiefV4.Audio
             {
                 lock (this)
                 {
-                    if (getVolume() != volumeWhenCached || this.deviceIdWhenCached != AudioPlayer.naudioMessagesPlaybackDeviceId)
+                    try
                     {
-                        UnLoad();
+                        if (getVolume() != volumeWhenCached || this.deviceIdWhenCached != AudioPlayer.naudioMessagesPlaybackDeviceId)
+                        {
+                            UnLoad();
+                        }
+                        if (!loadedSoundPlayer)
+                        {
+                            LoadNAudioWaveOutAndCache();
+                        }
+                        if (loadedSoundPlayer)
+                        {
+                            this.reader.CurrentTime = TimeSpan.Zero;
+                            this.waveOut.Play();
+                            this.playWaitHandle.WaitOne(30000);
+                        }
                     }
-                    if (!loadedSoundPlayer)
+                    catch (Exception e)
                     {
-                        LoadNAudioWaveOutAndCache();
+                        Console.WriteLine("Exception " + e.Message + " playing sound " + this.fullPath + " stack trace " + e.StackTrace);
                     }
-                    this.reader.CurrentTime = TimeSpan.Zero;
-                    this.waveOut.Play();
-                }
-                try
-                {
-                    this.playWaitHandle.WaitOne(10000);
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine("Exception " + e.Message + " playing sound " + this.fullPath);
                 }
             }
         }
@@ -1128,19 +1132,26 @@ namespace CrewChiefV4.Audio
                 }
                 if (!loadedSoundPlayer)
                 {
-                    this.waveOut = new NAudio.Wave.WaveOutEvent();
-                    this.deviceIdWhenCached = AudioPlayer.naudioMessagesPlaybackDeviceId;
-                    this.waveOut.DeviceNumber = this.deviceIdWhenCached;
-                    this.memoryStream = new MemoryStream(this.fileBytes);
-                    this.reader = new NAudio.Wave.WaveFileReader(this.memoryStream);
+                    try
+                    {
+                        this.waveOut = new NAudio.Wave.WaveOutEvent();
+                        this.deviceIdWhenCached = AudioPlayer.naudioMessagesPlaybackDeviceId;
+                        this.waveOut.DeviceNumber = this.deviceIdWhenCached;
+                        this.memoryStream = new MemoryStream(this.fileBytes);
+                        this.reader = new NAudio.Wave.WaveFileReader(this.memoryStream);
 
-                    this.waveOut.PlaybackStopped += new EventHandler<NAudio.Wave.StoppedEventArgs>(playbackStopped);
-                    NAudio.Wave.SampleProviders.SampleChannel sampleChannel = new NAudio.Wave.SampleProviders.SampleChannel(reader);
-                    this.volumeWhenCached = getVolume();
-                    sampleChannel.Volume = volumeWhenCached;
-                    this.waveOut.Init(new NAudio.Wave.SampleProviders.SampleToWaveProvider(sampleChannel));
-                    loadedSoundPlayer = true;
-                    SoundCache.activeSoundPlayers++;
+                        this.waveOut.PlaybackStopped += new EventHandler<NAudio.Wave.StoppedEventArgs>(playbackStopped);
+                        NAudio.Wave.SampleProviders.SampleChannel sampleChannel = new NAudio.Wave.SampleProviders.SampleChannel(reader);
+                        this.volumeWhenCached = getVolume();
+                        sampleChannel.Volume = volumeWhenCached;
+                        this.waveOut.Init(new NAudio.Wave.SampleProviders.SampleToWaveProvider(sampleChannel));
+                        loadedSoundPlayer = true;
+                        SoundCache.activeSoundPlayers++;
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("Failed to initialise nAudio sound " + this.fullPath + " stack trace " + e.StackTrace);
+                    }
                 }
             }
         }
