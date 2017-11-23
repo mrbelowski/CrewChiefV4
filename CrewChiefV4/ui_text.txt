@@ -493,3 +493,6 @@ messages_audio_device_label = Messages playback device
 background_audio_device_label = Background playback device
 use_naudio = Use nAudio for playback
 use_naudio_help = nAudio playback library allows playback device selection and higher volumes
+
+toggle_track_landmarks_recording = Start / stop track landmarks recording
+add_track_landmark = Add Start / end track landmark

@@ -616,6 +616,17 @@ namespace CrewChiefV4
             {
                 return;
             }
+            foreach (Grammar iracingGrammar in iracingPitstopGrammarList)
+            {
+                try
+                {
+                    sre.UnloadGrammar(iracingGrammar);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Failed to unload iracing grammar: " + e.Message);
+                }
+            }
             try
             {
                 iracingPitstopGrammarList.Clear();

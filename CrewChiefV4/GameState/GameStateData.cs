@@ -270,6 +270,8 @@ namespace CrewChiefV4.GameState
         public int Position = 0;
 
         public int UnFilteredPosition = 0;
+        
+        public int ClassPosition = 0;
 
         public float GameTimeAtLastPositionFrontChange = 0;
 
@@ -297,10 +299,10 @@ namespace CrewChiefV4.GameState
         public Single PlayerLapTimeSessionBestPrevious = -1;
 
         // ...
-        public Single TimeDeltaFront = 0;
+        public Single TimeDeltaFront = -1;
 
         // ...
-        public Single TimeDeltaBehind = 0;
+        public Single TimeDeltaBehind = -1;
 
         // 0 means we don't know what sector we're in. This is 1-indexed
         public int SectorNumber = 0;
@@ -579,6 +581,8 @@ namespace CrewChiefV4.GameState
         public int Position = 0;
 
         public int UnFilteredPosition = 0;
+
+        public int ClassPosition = 0;
 
         public float SessionTimeAtLastPositionChange = -1;
 
