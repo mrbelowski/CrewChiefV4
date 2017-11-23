@@ -10,7 +10,7 @@ For support and discussions about Crew Chief we have our very own forum here: ht
 
 Changelog
 ---------
-Version 4.8.2.0: Work-around for R3E missing sector number updates when cars exit to pits (should fix a lot of inaccurate calls in practice and qualifying); fixed mute not working properly in nAudio mode; Simplified track landmark generation (see Help)
+Version 4.8.2.0: Work-around for R3E missing sector number updates when cars exit to pits (should fix a lot of inaccurate calls in practice and qualifying); fixed mute not working properly in nAudio mode; Simplified track landmark generation (see Help); Some internal bugfixes
 
 Version 4.8.1.9: Improvements to speech recogntion accuracy; integrated nAudio library for sound playback which allows you to choose play back devices for messages and background sounds (disabled by default - enable this with the "Use nAudio for playback" option) - this also allows the app to play back at higher volumes; added lots of iRacing pit commands (see the voice commands section in Help); lots of iRacing bug fixes; added a new spotter (Micha - in the latest sound pack)
 
