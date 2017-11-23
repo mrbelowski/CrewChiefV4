@@ -33,6 +33,7 @@ namespace CrewChiefV4
                         trackLandmarksDataRecording = JsonConvert.DeserializeObject<TrackLandmarksData>(File.ReadAllText(fileName));
                         currentRecording = trackLandmarksDataRecording.trackLandmarksData.FirstOrDefault();
                         fileBroken = false;
+                        Console.WriteLine("Recording started found existing tracklandmarksdata - appending to" + fileName);
                     }
                     catch (Exception e)
                     {
@@ -78,10 +79,33 @@ namespace CrewChiefV4
                     default:
                         break;
                 }
+                Console.WriteLine("Recording track landmark data for game " + gameEnum + " and track " + trackName);
             }
-            Console.WriteLine("Recording track landmark data for game " + gameEnum + " and track " + trackName);
+            
         }
-
+        private static List<TrackLandmark> removeOverlappingLandmarks( TrackLandmark landmark )
+        {
+            List<TrackLandmark> landmarksToKeep = new List<TrackLandmark>();
+            foreach(var lm in currentRecording.trackLandmarks)
+            {
+                //starting inside another landmark
+                if((landmark.distanceRoundLapStart >= lm.distanceRoundLapStart && landmark.distanceRoundLapStart <= lm.distanceRoundLapEnd) ||
+                    //wraps around another landmark
+                    (landmark.distanceRoundLapStart <= lm.distanceRoundLapStart && landmark.distanceRoundLapEnd >= lm.distanceRoundLapEnd) ||
+                    //ends inside another landmark
+                    (landmark.distanceRoundLapEnd >= lm.distanceRoundLapStart && landmark.distanceRoundLapEnd <= lm.distanceRoundLapEnd))
+                {
+                    Console.WriteLine("Found overlapping landmark at " + lm.landmarkName + " so removing it");
+                    continue;
+                }
+                else
+                {
+                    landmarksToKeep.Add(lm);
+                }
+            }
+            landmarksToKeep.Add(landmark);
+            return landmarksToKeep;
+        }
         public static void addLandmark(float distanceRoundTrack)
         {
             if (currentRecording == null || !isRecordingTrackLandmarks)
@@ -101,7 +125,7 @@ namespace CrewChiefV4
             {
                 Console.WriteLine("Setting landmark end point at " + distanceRoundTrack + "m");
                 currentLandmark.distanceRoundLapEnd = distanceRoundTrack;
-                currentRecording.trackLandmarks.Add(currentLandmark);
+                currentRecording.trackLandmarks = removeOverlappingLandmarks(currentLandmark);
                 hasStartedNewTrackLandmark = false;
             }
         }
