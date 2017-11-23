@@ -84,7 +84,7 @@ namespace CrewChiefV4
 
         public static void addLandmark(float distanceRoundTrack)
         {
-            if (currentRecording == null)
+            if (currentRecording == null || !isRecordingTrackLandmarks)
             {
                 Console.WriteLine("Please start a track landmark recoding session before adding landmarks");
                 return;
