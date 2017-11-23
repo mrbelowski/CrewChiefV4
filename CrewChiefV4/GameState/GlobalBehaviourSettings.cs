@@ -45,8 +45,10 @@ namespace CrewChiefV4.GameState
 
         public static Boolean spotterEnabled = UserSettings.GetUserSettings().getBoolean("enable_spotter");
 
-        public static List<MessageTypes> defaultEnabledMessageTypes = new List<MessageTypes> { 
+        public static readonly List<MessageTypes> defaultEnabledMessageTypes = new List<MessageTypes> { 
             MessageTypes.TYRE_TEMPS, MessageTypes.TYRE_WEAR, MessageTypes.BRAKE_TEMPS, MessageTypes.BRAKE_DAMAGE, MessageTypes.FUEL, MessageTypes.LOCKING_AND_SPINNING };
+        public static readonly List<MessageTypes> defaultBatteryPoweredEnabledMessageTypes = new List<MessageTypes> {
+            MessageTypes.TYRE_TEMPS, MessageTypes.TYRE_WEAR, MessageTypes.BRAKE_TEMPS, MessageTypes.BRAKE_DAMAGE, MessageTypes.BATTERY, MessageTypes.LOCKING_AND_SPINNING };
         public static List<MessageTypes> enabledMessageTypes = new List<MessageTypes>();
 
         static GlobalBehaviourSettings()
@@ -58,14 +60,14 @@ namespace CrewChiefV4.GameState
         {
             useAmericanTerms = carClass.useAmericanTerms;
             useHundredths = (realisticMode && carClass.timesInHundredths) || alwaysUseHundredths;
-            enabledMessageTypes.Clear();            
+            enabledMessageTypes.Clear();
             if (realisticMode && carClass.enabledMessageTypes != null && carClass.enabledMessageTypes.Length > 0)
             {
                 parseMessageTypes(carClass.enabledMessageTypes);
             }
             else
             {
-                enabledMessageTypes.AddRange(defaultEnabledMessageTypes);
+                enabledMessageTypes.AddRange(carClass.isBatteryPowered ? defaultBatteryPoweredEnabledMessageTypes : defaultEnabledMessageTypes);
             }
 
             if (carClass.spotterVehicleLength > 0)
@@ -154,6 +156,6 @@ namespace CrewChiefV4.GameState
      */
     public enum MessageTypes
     {
-        TYRE_TEMPS, TYRE_WEAR, BRAKE_TEMPS, BRAKE_DAMAGE, FUEL, LOCKING_AND_SPINNING, ALL, NONE
+        TYRE_TEMPS, TYRE_WEAR, BRAKE_TEMPS, BRAKE_DAMAGE, FUEL, BATTERY, LOCKING_AND_SPINNING, ALL, NONE
     }
 }
