@@ -1064,7 +1064,7 @@ namespace CrewChiefV4
                     }
                     else if (controllerConfiguration.hasOutstandingClick(ControllerConfiguration.ADD_TRACK_LANDMARK))
                     {
-                        Console.WriteLine("Add track landmark");
+                        //dont confirm press here we do that in addLandmark
                         crewChief.toggleAddTrackLandmark();
                         nextPollWait = 1000;
                     }    

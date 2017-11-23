@@ -25,7 +25,7 @@ namespace CrewChiefV4
             if (Directory.Exists(folderPathForTrackLandmark))
             {
                 createDirectory = false;
-                String fileName = Path.Combine(folderPathForTrackLandmark, "TrackLandmarks.json");
+                String fileName = Path.Combine(folderPathForTrackLandmark, "trackLandmarks.json");
                 if(File.Exists(fileName))
                 {
                     try
@@ -91,7 +91,7 @@ namespace CrewChiefV4
             }
             if(!hasStartedNewTrackLandmark)
             {
-                Console.WriteLine("Setting landmark start point");
+                Console.WriteLine("Setting landmark start point at " + distanceRoundTrack + "m");
                 hasStartedNewTrackLandmark = true;
                 currentLandmark = new TrackLandmark();
                 currentLandmark.distanceRoundLapStart = distanceRoundTrack;
@@ -99,7 +99,7 @@ namespace CrewChiefV4
             }
             else
             {
-                Console.WriteLine("Setting landmark end point");
+                Console.WriteLine("Setting landmark end point at " + distanceRoundTrack + "m");
                 currentLandmark.distanceRoundLapEnd = distanceRoundTrack;
                 currentRecording.trackLandmarks.Add(currentLandmark);
                 hasStartedNewTrackLandmark = false;
@@ -123,10 +123,10 @@ namespace CrewChiefV4
                 trackLandmarksDataRecording.trackLandmarksData.Add(currentRecording);
                 try
                 {
-                    File.WriteAllText(Path.Combine(folderPathForTrackLandmark, "TrackLandmarks.json"),
+                    File.WriteAllText(Path.Combine(folderPathForTrackLandmark, "trackLandmarks.json"),
                         JsonConvert.SerializeObject(trackLandmarksDataRecording, Formatting.Indented));
 
-                    Console.WriteLine("Done Recording track landmark data to " + Path.Combine(folderPathForTrackLandmark, "TrackLandmarks.json"));
+                    Console.WriteLine("Done Recording track landmark data to " + Path.Combine(folderPathForTrackLandmark, "trackLandmarks.json"));
                 }
                 catch (Exception e)
                 {
@@ -139,7 +139,7 @@ namespace CrewChiefV4
         private static String getLandMarkSpecificFolderPath(GameEnum gameEnum, String trackName)
         {
             return Path.Combine(Environment.GetFolderPath(
-                Environment.SpecialFolder.MyDocuments), "CrewChiefV4", "TrackLandmarks",
+                Environment.SpecialFolder.MyDocuments), "CrewChiefV4", "track_landmarks",
                 makeValidForPathName(gameEnum.ToString()), makeValidForPathName(trackName));
         }
 
@@ -507,7 +507,7 @@ namespace CrewChiefV4
         }
         static void loadUserCreatedTrackLandmarkFiles()
         {
-            String userLandmarks = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "CrewChiefV4", "TrackLandmarks");
+            String userLandmarks = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "CrewChiefV4", "track_landmarks");
             if(Directory.Exists(userLandmarks))
             {
                 ProcessDirectory(userLandmarks);
