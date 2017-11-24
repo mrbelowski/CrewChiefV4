@@ -81,9 +81,13 @@ namespace CrewChiefV4.assetto
             {
                 thisSectorTime = cumulativeSectorTime - lapData.SectorTimes[0];
             }
-            else if (sectorNumberJustCompleted == 3)
+            else if (sectorNumberJustCompleted >= 3)
             {
                 thisSectorTime = cumulativeSectorTime - lapData.SectorTimes[1] - lapData.SectorTimes[0];
+            }
+            if (sectorNumberJustCompleted > 3)
+            {
+                sectorNumberJustCompleted = 3;
             }
             lapData.SectorTimes[sectorNumberJustCompleted - 1] = thisSectorTime;
             lapData.SectorPositions[sectorNumberJustCompleted - 1] = position;
