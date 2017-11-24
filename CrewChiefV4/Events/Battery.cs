@@ -28,10 +28,12 @@ namespace CrewChiefV4.Events
         private float currLapMinBatteryLeft = float.MaxValue;
 
         bool batteryUseActive = false;
-        private float gameTimeWhenSessionInitialized = float.MinValue;
+        private float gameTimeWhenSessionInitialized = -1.0f;
         private bool sessionHasFixedNumberOfLaps = false;
         private int halfDistance = -1;
         private int halfTime = -1;
+        private int currLapBatteryUseSectorCheck = -1;
+        private float initialBatteryChargePercentage = -1.0f;
 
         public Battery(AudioPlayer audioPlayer)
         {
@@ -53,8 +55,7 @@ namespace CrewChiefV4.Events
                 return;
 
             this.batteryUseActive = currentGameState.BatteryData.BatteryUseActive;
-
-            float currBattLeftPct = currentGameState.BatteryData.BatteryPercentageLeft;
+            var currBattLeftPct = currentGameState.BatteryData.BatteryPercentageLeft;
 
             // Only track fuel data after the session has settled down
             if (this.batteryUseActive && currentGameState.SessionData.SessionRunningTime > 15 &&
@@ -76,6 +77,9 @@ namespace CrewChiefV4.Events
                     this.clearState();
                     this.gameTimeWhenSessionInitialized = currentGameState.SessionData.SessionRunningTime;
 
+                    // NOTE: This may have to be 100% instead.
+                    this.initialBatteryChargePercentage = currBattLeftPct;
+
                     if (currentGameState.SessionData.SessionNumberOfLaps > 1)
                     {
                         this.sessionHasFixedNumberOfLaps = true;
@@ -87,7 +91,9 @@ namespace CrewChiefV4.Events
                         this.halfTime = (int)Math.Ceiling(currentGameState.SessionData.SessionTotalRunTime / 2.0f);
                     }
 
-                    Console.WriteLine("Battery use tracking initilized: halfDistance = " + this.halfDistance + " halfTime = " + this.halfTime);
+                    Console.WriteLine(string.Format("Battery use tracking initilized: initialChargePercentage = {0}%    halfDistance = {1} laps    halfTime = {2} minutes",
+                        this.initialBatteryChargePercentage.ToString("0.000"), this.halfDistance, this.halfTime));
+
                     this.sessionInitialized = true;
                 }
 
@@ -100,13 +106,15 @@ namespace CrewChiefV4.Events
                         MinimumBatteryPercentageLeft = this.currLapMinBatteryLeft
                     });
 
-                    Console.WriteLine("Last lap average battery left percentage: "
-                        + (this.currLapBatteryPercentageLeftAccumulator / this.currLapNumBatteryMeasurements).ToString("0.000")
-                        + "%.  Min percentage: " + this.currLapMinBatteryLeft.ToString("0.000"));
+                    Console.WriteLine(string.Format("Last lap average battery left percentage: {0}%  Min percentage: {1}%.",
+                        (this.currLapBatteryPercentageLeftAccumulator / this.currLapNumBatteryMeasurements).ToString("0.000"),
+                        this.currLapMinBatteryLeft.ToString("0.000")));
 
                     this.currLapBatteryPercentageLeftAccumulator = 0.0f;
                     this.currLapNumBatteryMeasurements = 0;
                     this.currLapMinBatteryLeft = float.MaxValue;
+
+                    this.currLapBatteryUseSectorCheck = Utilities.random.Next(1, 3);
                 }
 
                 this.currLapBatteryPercentageLeftAccumulator += currBattLeftPct;
@@ -116,8 +124,16 @@ namespace CrewChiefV4.Events
                     this.currLapMinBatteryLeft = currBattLeftPct;
 
                 // Warnings for particular fuel levels
-                if (this.enableBatteryMessages)
+                if (this.enableBatteryMessages
+                    //&& this.currLapBatteryUseSectorCheck == currentGameState.SessionData.SectorNumber
+                    && this.batteryStats.Count > 0)
                 {
+                    var prevLapStats = this.batteryStats.Last();
+
+                    // Get battery use per lap:
+                    var averageUsagePerLap = (this.initialBatteryChargePercentage - prevLapStats.AverageBatteryPercentageLeft) / this.batteryStats.Count;
+
+
                     /*if (currentBatteryPercentage <= 2 && !played2LitreWarning)
                     {
                         played2LitreWarning = true;
