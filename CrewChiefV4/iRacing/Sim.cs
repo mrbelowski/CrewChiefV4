@@ -192,7 +192,7 @@ namespace CrewChiefV4.iRacing
             foreach (var driver in _drivers)
             {
                 driver.Live.CalculateSpeed(info, _sessionData.Track.Length);
-                driver.UpdateSectorTimes(_sessionData.Track, info);
+                driver.UpdateSector(_sessionData.Track, info);
                 driver.UpdateLiveInfo(info);                
             }
             this.CalculateLivePositions(info);
