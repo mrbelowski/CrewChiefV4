@@ -139,7 +139,10 @@ namespace CrewChiefV4
                 List<TrackLandmark> tml = currentRecording.trackLandmarks.OrderBy(e => e.distanceRoundLapStart).ToList();
                 foreach (TrackLandmark lm in tml)
                 {
-                    lm.landmarkName = "turn" + turn;
+                    if (lm.landmarkName == null || lm.landmarkName.Length == 0)
+                    {
+                        lm.landmarkName = "turn" + turn;
+                    }
                     turn++;
                 }
                 currentRecording.trackLandmarks = tml;
