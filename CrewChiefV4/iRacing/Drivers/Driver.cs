@@ -139,7 +139,7 @@ namespace CrewChiefV4.iRacing
             return timePos;
         }
         */
-        public void UpdateSectorTimes(Track track, iRacingData telemetry)
+        public void UpdateSector(Track track, iRacingData telemetry)
         {
             if (track == null) 
                 return;
@@ -174,8 +174,7 @@ namespace CrewChiefV4.iRacing
                         this.Live.CurrentSector = s.Number + 1;
                         break;
                     }
-                }
-                
+                }                
                 _prevPos = p1;
             }
         }
