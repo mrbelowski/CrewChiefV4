@@ -974,7 +974,7 @@ namespace CrewChiefV4.Audio
         private void PlayNAudio()
         {
             // if the file isn't yet loaded, play by reading it directly
-            if (!allowCaching || ! loadedFile)
+            if (!allowCaching || !loadedFile)
             {
                 NAudio.Wave.WaveOutEvent uncachedWaveOut = new NAudio.Wave.WaveOutEvent();
                 uncachedWaveOut.DeviceNumber = AudioPlayer.naudioMessagesPlaybackDeviceId;
