@@ -926,7 +926,7 @@ namespace CrewChiefV4.GameState
                     cumulativeSectorTime = gameTimeAtSectorEnd - lapData.GameTimeAtLapStart;
                 }
                 float thisSectorTime;
-                if (sectorNumberJustCompleted == 3 && lapData.SectorTimes[0] > 0 && lapData.SectorTimes[1] > 0)
+                if (sectorNumberJustCompleted >= 3 && lapData.SectorTimes[0] > 0 && lapData.SectorTimes[1] > 0)
                 {
                     thisSectorTime = cumulativeSectorTime - lapData.SectorTimes[0] - lapData.SectorTimes[1];
                 }
@@ -962,6 +962,12 @@ namespace CrewChiefV4.GameState
                         bestSector3Time = thisSectorTime;
                     }
                 }
+                // special case here - if a track has > 3 sectors, accumulate the data for all sectors > 3 into sector3
+                if (sectorNumberJustCompleted > 3)
+                {
+                    sectorNumberJustCompleted = 3;
+                }
+                
                 lapData.SectorTimes[sectorNumberJustCompleted - 1] = thisSectorTime;
                 lapData.SectorPositions[sectorNumberJustCompleted - 1] = position;
                 lapData.GameTimeAtSectorEnd[sectorNumberJustCompleted - 1] = gameTimeAtSectorEnd;
