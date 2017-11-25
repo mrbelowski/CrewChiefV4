@@ -872,7 +872,9 @@ namespace CrewChiefV4.PCars2
                     currentGameState.OpponentData.Remove(inactiveOpponent);
                 }
             }
-            
+
+            currentGameState.sortClassPositions();
+
             currentGameState.SessionData.LapTimePrevious = shared.mLastLapTime;
             if (currentGameState.SessionData.IsNewLap)
             {
