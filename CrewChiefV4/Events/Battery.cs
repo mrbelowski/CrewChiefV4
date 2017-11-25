@@ -54,6 +54,18 @@ namespace CrewChiefV4.Events
         private int halfTime = -1;
         private int currLapBatteryUseSectorCheck = -1;
         private float initialBatteryChargePercentage = -1.0f;
+        private bool playedPitForBatteryNow = false;
+
+        // Checking if we need to read fuel messages involves a bit of arithmetic and stuff, so only do this every few seconds
+        private DateTime nextBatteryStatusCheck = DateTime.MinValue;
+        private readonly TimeSpan batteryStatusCheckInterval = TimeSpan.FromSeconds(5);
+
+        private bool playedHalfDistanceBatteryEstimate = false;
+        private bool playedHalfTimeBatteryEstimate = false;
+        private bool playedTwoMinutesRemaining = false;
+        private bool playedFiveMinutesRemaining = false;
+        private bool playedTenMinutesRemaining = false;
+        private bool playedHalfBatteryChargeWarning = false;
 
         public Battery(AudioPlayer audioPlayer)
         {
@@ -62,7 +74,30 @@ namespace CrewChiefV4.Events
 
         public override void clearState()
         {
-            // TODO: reinint
+            this.initialized = false;
+
+            this.batteryStats.Clear();
+            this.currLapNumBatteryMeasurements = 0;
+            this.currLapBatteryPercentageLeftAccumulator = 0.0f;
+            this.currLapMinBatteryLeft = float.MaxValue;
+
+            this.batteryUseActive = false;
+            this.gameTimeWhenInitialized = -1.0f;
+            this.sessionHasFixedNumberOfLaps = false;
+            this.halfDistance = -1;
+            this.halfTime = -1;
+            this.currLapBatteryUseSectorCheck = -1;
+            this.initialBatteryChargePercentage = -1.0f;
+
+            this.nextBatteryStatusCheck = DateTime.MinValue;
+
+            this.playedPitForBatteryNow = false;
+            this.playedHalfDistanceBatteryEstimate = false;
+            this.playedHalfTimeBatteryEstimate = false;
+            this.playedTwoMinutesRemaining = false;
+            this.playedFiveMinutesRemaining = false;
+            this.playedTenMinutesRemaining = false;
+            this.playedHalfBatteryChargeWarning = false;
         }
 
         public override List<SessionType> applicableSessionTypes
@@ -94,7 +129,7 @@ namespace CrewChiefV4.Events
                     currentGameState.PositionAndMotionData.CarSpeed > 10)))
             {    
                 if (!this.initialized
-                    || (previousGameState != null && previousGameState.PitData.InPitlane && !currentGameState.PitData.InPitlane))  // Vehicle swap
+                    || (previousGameState != null && previousGameState.PitData.InPitlane && !currentGameState.PitData.InPitlane))  // Vehicle swap or some magical recharge ?
                 {
                     this.clearState();
                     this.gameTimeWhenInitialized = currentGameState.SessionData.SessionRunningTime;
@@ -166,6 +201,16 @@ namespace CrewChiefV4.Events
 
                     // Not sure about per level warnings, what is user supposed to do if his battery is at 5%?  Is such warning valuable?
                     // or your battery is running low?
+                    /*if (currentFuel <= 2 && !played2LitreWarning)
+                    {
+                        played2LitreWarning = true;
+                        audioPlayer.playMessage(new QueuedMessage("Fuel/level", MessageContents(2, folderLitresRemaining), 0, this));
+                    }
+                    else if (currentFuel <= 1 && !played1LitreWarning)
+                    {
+                        played1LitreWarning = true;
+                        audioPlayer.playMessage(new QueuedMessage("Fuel/level", MessageContents(folderOneLitreRemaining), 0, this));
+                    }*/
 
                     // Warnings for fixed lap sessions.
                     if (averageUsagePerLap > 0.0f
@@ -173,125 +218,142 @@ namespace CrewChiefV4.Events
                     {
                         // NOTE: this might be a problem on long track like Nords.
                         var estBattLapsLeft = (int)Math.Floor(prevLapStats.AverageBatteryPercentageLeft / averageUsagePerLap);
-                        if (this.halfDistance != -1 
+                        if (this.halfDistance != -1
+                            && !this.playedHalfDistanceBatteryEstimate
                             && currentGameState.SessionData.SessionType == SessionType.Race
                             && currentGameState.SessionData.CompletedLaps == this.halfDistance)
                         {
+                            Console.WriteLine(string.Format("Half race distance, starting battery = {0}%, previous lap avg charge = {1}%,  previous lap min charge = {2}%, current battery level = {3}%, usage per lap = {4}%",
+                                this.initialBatteryChargePercentage.ToString("0.000"), prevLapStats.AverageBatteryPercentageLeft.ToString("0.000"), prevLapStats.MinimumBatteryPercentageLeft.ToString("0.000"), averageUsagePerLap.ToString("0.000")));
+
+                            this.playedHalfDistanceBatteryEstimate = true;
+
                             if (estBattLapsLeft < this.halfDistance
                                 && prevLapStats.AverageBatteryPercentageLeft / this.initialBatteryChargePercentage < 0.6f)
                             {
-                                // NOTE: that's the spot if we want to handle vehicle swap.
-                                this.audioPlayer.playMessage(new QueuedMessage(folderHalfDistanceLowBattery, 0, this));
+                                if (currentGameState.PitData.IsElectricVehicleSwapAllowed)
+                                {
+                                    this.audioPlayer.playMessage(new QueuedMessage(RaceTime.folderHalfWayHome, 0, this));
+                                    this.audioPlayer.playMessage(new QueuedMessage("Battery/estimate", MessageContents(Battery.folderWeEstimate, estBattLapsLeft, Battery.folderLapsRemaining), 0, this));
+                                }
+                                else
+                                    this.audioPlayer.playMessage(new QueuedMessage(Battery.folderHalfDistanceLowBattery, 0, this));
                             }
                             else
-                                this.audioPlayer.playMessage(new QueuedMessage(folderHalfDistanceGoodBattery, 0, this));
+                                this.audioPlayer.playMessage(new QueuedMessage(Battery.folderHalfDistanceGoodBattery, 0, this));
                         }
                         else if (estBattLapsLeft == 4)
                         {
                             Console.WriteLine(string.Format("4 laps of battery charge left, starting battery = {0}%, previous lap avg charge = {1}%,  previous lap min charge = {2}%, current battery level = {3}%, usage per lap = {4}%",
                                 this.initialBatteryChargePercentage.ToString("0.000"), prevLapStats.AverageBatteryPercentageLeft.ToString("0.000"), prevLapStats.MinimumBatteryPercentageLeft.ToString("0.000"), averageUsagePerLap.ToString("0.000")));
-                            //audioPlayer.playMessage(new QueuedMessage(folderFourLapsEstimate, 0, this));
+                            this.audioPlayer.playMessage(new QueuedMessage(Battery.folderFourLapsEstimate, 0, this));
                         }
                         else if (estBattLapsLeft == 3)
                         {
                             Console.WriteLine(string.Format("3 laps of battery charge left, starting battery = {0}%, previous lap avg charge = {1}%,  previous lap min charge = {2}%, current battery level = {3}%, usage per lap = {4}%",
                                 this.initialBatteryChargePercentage.ToString("0.000"), prevLapStats.AverageBatteryPercentageLeft.ToString("0.000"), prevLapStats.MinimumBatteryPercentageLeft.ToString("0.000"), averageUsagePerLap.ToString("0.000")));
-                            //audioPlayer.playMessage(new QueuedMessage(folderThreeLapsEstimate, 0, this));
+                            this.audioPlayer.playMessage(new QueuedMessage(Battery.folderThreeLapsEstimate, 0, this));
                         }
                         else if (estBattLapsLeft == 2)
                         {
                             Console.WriteLine(string.Format("2 laps of battery charge left, starting battery = {0}%, previous lap avg charge = {1}%,  previous lap min charge = {2}%, current battery level = {3}%, usage per lap = {4}%",
                                 this.initialBatteryChargePercentage.ToString("0.000"), prevLapStats.AverageBatteryPercentageLeft.ToString("0.000"), prevLapStats.MinimumBatteryPercentageLeft.ToString("0.000"), averageUsagePerLap.ToString("0.000")));
-                            //audioPlayer.playMessage(new QueuedMessage(folderTwoLapsEstimate, 0, this));
+                            this.audioPlayer.playMessage(new QueuedMessage(Battery.folderTwoLapsEstimate, 0, this));
                         }
                         else if (estBattLapsLeft == 1)
                         {
                             Console.WriteLine(string.Format("1 lap of battery charge left, starting battery = {0}%, previous lap avg charge = {1}%,  previous lap min charge = {2}%, current battery level = {3}%, usage per lap = {4}%",
                                 this.initialBatteryChargePercentage.ToString("0.000"), prevLapStats.AverageBatteryPercentageLeft.ToString("0.000"), prevLapStats.MinimumBatteryPercentageLeft.ToString("0.000"), averageUsagePerLap.ToString("0.000")));
-                            //audioPlayer.playMessage(new QueuedMessage(folderOneLapEstimate, 0, this));
-                            // if we've not played the pit-now message, play it with a bit of a delay - should probably wait for sector3 here
+                            this.audioPlayer.playMessage(new QueuedMessage(Battery.folderOneLapEstimate, 0, this));
+
+                            // If we've not played the pit-now message, play it with a bit of a delay - should probably wait for sector3 here
                             // but i'd have to move some stuff around and I'm an idle fucker
-                            /*if (!playedPitForFuelNow)
+                            if (!this.playedPitForBatteryNow)
                             {
-                                playedPitForFuelNow = true;
-                                audioPlayer.playMessage(new QueuedMessage(PitStops.folderMandatoryPitStopsPitThisLap, 10, this));
-                            }*/
+                                this.playedPitForBatteryNow = true;
+                                this.audioPlayer.playMessage(new QueuedMessage(PitStops.folderMandatoryPitStopsPitThisLap, 10, this));
+                            }
                         }
                     }
 
                     // warnings for fixed time sessions - check every 5 seconds
-                    else if (currentGameState.Now > nextFuelStatusCheck &&
-                        currentGameState.SessionData.SessionNumberOfLaps <= 0 && currentGameState.SessionData.SessionTotalRunTime > 0 && averageUsagePerMinute > 0)
+                    else if (currentGameState.Now > this.nextBatteryStatusCheck
+                        && currentGameState.SessionData.SessionNumberOfLaps <= 0
+                        && currentGameState.SessionData.SessionTotalRunTime > 0.0f 
+                        && averageUsagePerMinute > 0.0f)
                     {
-                        nextFuelStatusCheck = currentGameState.Now.Add(fuelStatusCheckInterval);
-                        if (halfTime != -1 && !playedHalfTimeFuelEstimate && currentGameState.SessionData.SessionTimeRemaining <= halfTime &&
-                            currentGameState.SessionData.SessionTimeRemaining > halfTime - 30)
+                        this.nextBatteryStatusCheck = currentGameState.Now.Add(this.batteryStatusCheckInterval);
+                        if (halfTime != -1
+                            && !this.playedHalfTimeBatteryEstimate
+                            && currentGameState.SessionData.SessionTimeRemaining <= halfTime
+                            && currentGameState.SessionData.SessionTimeRemaining > halfTime - 30)
                         {
-                            Console.WriteLine("Half race distance. Fuel in tank = " + currentGameState.FuelData.FuelLeft + ", average usage per minute = " + averageUsagePerMinute);
-                            playedHalfTimeFuelEstimate = true;
+                            Console.WriteLine(string.Format("Half race time, starting battery = {0}%, previous lap avg charge = {1}%,  previous lap min charge = {2}%, current battery level = {3}%, usage per minute = {4}%",
+                                this.initialBatteryChargePercentage.ToString("0.000"), prevLapStats.AverageBatteryPercentageLeft.ToString("0.000"), prevLapStats.MinimumBatteryPercentageLeft.ToString("0.000"), averageUsagePerMinute.ToString("0.000")));
+                            this.playedHalfTimeBatteryEstimate = true;
+
                             if (currentGameState.SessionData.SessionType == SessionType.Race)
                             {
-                                if (averageUsagePerMinute * halfTime / 60 > currentGameState.FuelData.FuelLeft && currentGameState.FuelData.FuelLeft / initialFuelLevel < 0.6)
+                                if (averageUsagePerMinute * this.halfTime / 60.0f > currentGameState.FuelData.FuelLeft
+                                    && prevLapStats.AverageBatteryPercentageLeft / this.initialBatteryChargePercentage < 0.6)
                                 {
-                                    if (currentGameState.PitData.IsRefuellingAllowed)
+                                    if (currentGameState.PitData.IsElectricVehicleSwapAllowed)
                                     {
-                                        int minutesLeft = (int)Math.Floor(currentGameState.FuelData.FuelLeft / averageUsagePerMinute);
-                                        audioPlayer.playMessage(new QueuedMessage(RaceTime.folderHalfWayHome, 0, this));
-                                        audioPlayer.playMessage(new QueuedMessage("Fuel/estimate", MessageContents(
-                                            folderWeEstimate, minutesLeft, folderMinutesRemaining), 0, this));
+                                        var minutesLeft = (int)Math.Floor(prevLapStats.AverageBatteryPercentageLeft / averageUsagePerMinute);
+                                        this.audioPlayer.playMessage(new QueuedMessage(RaceTime.folderHalfWayHome, 0, this));
+                                        this.audioPlayer.playMessage(new QueuedMessage("Battery/estimate", MessageContents(
+                                            Battery.folderWeEstimate, minutesLeft, Battery.folderMinutesRemaining), 0, this));
                                     }
                                     else
-                                    {
-                                        audioPlayer.playMessage(new QueuedMessage(folderHalfDistanceLowFuel, 0, this));
-                                    }
+                                        this.audioPlayer.playMessage(new QueuedMessage(Battery.folderHalfDistanceLowBattery, 0, this));
                                 }
                                 else
-                                {
-                                    audioPlayer.playMessage(new QueuedMessage(folderHalfDistanceGoodFuel, 0, this));
-                                }
+                                    this.audioPlayer.playMessage(new QueuedMessage(Battery.folderHalfDistanceGoodBattery, 0, this));
                             }
                         }
 
-                        float estimatedFuelMinutesLeft = currentGameState.FuelData.FuelLeft / averageUsagePerMinute;
-                        if (estimatedFuelMinutesLeft < 1.5 && !playedPitForFuelNow)
+                        var estimatedFuelMinutesLeft = prevLapStats.AverageBatteryPercentageLeft / averageUsagePerMinute;
+                        if (estimatedFuelMinutesLeft < 1.5f && !this.playedPitForBatteryNow)
                         {
-                            playedPitForFuelNow = true;
-                            playedTwoMinutesRemaining = true;
-                            playedFiveMinutesRemaining = true;
-                            playedTenMinutesRemaining = true;
-                            audioPlayer.playMessage(new QueuedMessage("pit_for_fuel_now",
-                                MessageContents(folderAboutToRunOut, PitStops.folderMandatoryPitStopsPitThisLap), 0, this));
+                            this.playedPitForBatteryNow = true;
+                            this.playedTwoMinutesRemaining = true;
+                            this.playedFiveMinutesRemaining = true;
+                            this.playedTenMinutesRemaining = true;
+                            this.audioPlayer.playMessage(new QueuedMessage("pit_for_vehicle_swap_now",
+                                MessageContents(Battery.folderAboutToRunOut, PitStops.folderMandatoryPitStopsPitThisLap), 0, this));
                         }
-                        if (estimatedFuelMinutesLeft <= 2 && estimatedFuelMinutesLeft > 1.8 && !playedTwoMinutesRemaining)
+                        if (estimatedFuelMinutesLeft <= 2 && estimatedFuelMinutesLeft > 1.8f && !this.playedTwoMinutesRemaining)
                         {
-                            playedTwoMinutesRemaining = true;
-                            playedFiveMinutesRemaining = true;
-                            playedTenMinutesRemaining = true;
-                            audioPlayer.playMessage(new QueuedMessage(folderTwoMinutesFuel, 0, this));
+                            this.playedTwoMinutesRemaining = true;
+                            this.playedFiveMinutesRemaining = true;
+                            this.playedTenMinutesRemaining = true;
+                            this.audioPlayer.playMessage(new QueuedMessage(Battery.folderTwoMinutesBattery, 0, this));
                         }
-                        else if (estimatedFuelMinutesLeft <= 5 && estimatedFuelMinutesLeft > 4.8 && !playedFiveMinutesRemaining)
+                        else if (estimatedFuelMinutesLeft <= 5 && estimatedFuelMinutesLeft > 4.8f && !this.playedFiveMinutesRemaining)
                         {
-                            playedFiveMinutesRemaining = true;
-                            playedTenMinutesRemaining = true;
-                            audioPlayer.playMessage(new QueuedMessage(folderFiveMinutesFuel, 0, this));
+                            this.playedFiveMinutesRemaining = true;
+                            this.playedTenMinutesRemaining = true;
+                            this.audioPlayer.playMessage(new QueuedMessage(Battery.folderFiveMinutesBattery, 0, this));
                         }
-                        else if (estimatedFuelMinutesLeft <= 10 && estimatedFuelMinutesLeft > 9.8 && !playedTenMinutesRemaining)
+                        else if (estimatedFuelMinutesLeft <= 10 && estimatedFuelMinutesLeft > 9.8 && !this.playedTenMinutesRemaining)
                         {
-                            playedTenMinutesRemaining = true;
-                            audioPlayer.playMessage(new QueuedMessage(folderTenMinutesFuel, 0, this));
-
+                            this.playedTenMinutesRemaining = true;
+                            this.audioPlayer.playMessage(new QueuedMessage(Battery.folderTenMinutesBattery, 0, this));
                         }
-                        else if (!playedHalfTankWarning && currentGameState.FuelData.FuelLeft / initialFuelLevel <= 0.55 && 
-                            currentGameState.FuelData.FuelLeft / initialFuelLevel >= 0.45 && !hasBeenRefuelled)
+                        else if (!this.playedHalfBatteryChargeWarning  && prevLapStats.AverageBatteryPercentageLeft / this.initialBatteryChargePercentage <= 0.55f &&
+                            prevLapStats.AverageBatteryPercentageLeft / this.initialBatteryChargePercentage >= 0.45f)
                         {
                             // warning message for fuel left - these play as soon as the fuel reaches 1/2 tank left
-                            playedHalfTankWarning = true;
-                            audioPlayer.playMessage(new QueuedMessage(folderHalfTankWarning, 0, this));
+                            this.playedHalfBatteryChargeWarning = true;
+                            this.audioPlayer.playMessage(new QueuedMessage(Battery.folderHalfChargeWarning, 0, this));
                         }
                     }
                 }
             }
         }
+        // TODO: I think interesting stats would be:
+        // all the same things as fuel +
+        // for the last lap, we could report average charge level, and minimal charge level, which actually represents "worst case"
         /*
         private Boolean reportFuelConsumption()
         {

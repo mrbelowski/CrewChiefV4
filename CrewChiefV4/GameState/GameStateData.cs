@@ -1537,6 +1537,8 @@ namespace CrewChiefV4.GameState
 
         public Boolean IsRefuellingAllowed = false;
 
+        public Boolean IsElectricVehicleSwapAllowed = false;
+
         public Boolean HasRequestedPitStop = false;
 
         public Boolean LeaderIsPitting = false;
