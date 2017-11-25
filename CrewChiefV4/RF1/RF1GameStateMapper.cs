@@ -907,6 +907,9 @@ namespace CrewChiefV4.rFactor1
                     currentGameState.OpponentData.Add(opponentKey, opponent);
                 }
             }
+
+            currentGameState.sortClassPositions();
+
             currentGameState.PitData.InPitlane = player.inPits == 1;
             if (previousGameState != null)
             {

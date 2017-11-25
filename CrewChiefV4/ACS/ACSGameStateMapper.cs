@@ -1640,6 +1640,7 @@ namespace CrewChiefV4.assetto
 
                 }
 
+                currentGameState.sortClassPositions();
                 
                 // more to come here 
                 //currentGameState.SessionData.LapTimePrevious = mapToFloatTime(shared.acsGraphic.iLastTime);
