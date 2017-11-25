@@ -704,5 +704,8 @@
     <Setting Name="ADD_TRACK_LANDMARK_device_type" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="enable_battery_messages" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
