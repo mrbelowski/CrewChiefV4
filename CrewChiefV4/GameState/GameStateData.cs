@@ -2130,6 +2130,31 @@ namespace CrewChiefV4.GameState
             return null;
         }
 
+        public void sortClassPositions()
+        {
+            List<OpponentData> opponents = this.OpponentData.Values.ToList();
+            OpponentData player = new OpponentData() { Position = this.SessionData.Position, CarClass = this.carClass };
+            opponents.Add(player);
+            var dict = (from opponent in opponents group opponent by opponent.CarClass.getClassIdentifier()).ToDictionary(d => d.Key, d => d.ToList());
+            foreach (var drivers in dict.Values)
+            {
+                var pos = 1;
+                foreach (var driver in drivers.OrderBy(d => d.Position))
+                {
+                    if (this.SessionData.Position == driver.Position)
+                    {
+                        this.SessionData.ClassPosition = pos;
+                    }
+                    else
+                    {
+                        driver.Position = pos;
+                    }
+                    pos++;
+                }
+            }
+            opponents.Remove(player);
+        }
+
         public void display()
         {
             Console.WriteLine("Laps completed = " + SessionData.CompletedLaps);
