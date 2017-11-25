@@ -47,6 +47,15 @@ namespace CrewChiefV4.Events
         private float currLapBatteryPercentageLeftAccumulator = 0.0f;
         private float currLapMinBatteryLeft = float.MaxValue;
 
+        class BatteryWindowedStatsEntry
+        {
+            internal float BatteryPercentageLeft = -1.0f;
+            internal float SessionRunningTime = -1.0f;
+        };
+
+        private const float averagedChargeWindowTime = 30.0f;
+        private List<BatteryWindowedStatsEntry> windowedBatteryStats = new List<BatteryWindowedStatsEntry>();
+
         bool batteryUseActive = false;
         private float gameTimeWhenInitialized = -1.0f;
         private bool sessionHasFixedNumberOfLaps = false;
@@ -77,6 +86,7 @@ namespace CrewChiefV4.Events
             this.initialized = false;
 
             this.batteryStats.Clear();
+            this.windowedBatteryStats.Clear();
             this.currLapNumBatteryMeasurements = 0;
             this.currLapBatteryPercentageLeftAccumulator = 0.0f;
             this.currLapMinBatteryLeft = float.MaxValue;
@@ -133,6 +143,7 @@ namespace CrewChiefV4.Events
                 {
                     // Not sure if stats should be cleared or not here.  Keep it around for now.
                     // this.batteryStats.Clear();
+                    this.windowedBatteryStats.Clear();
                     this.currLapNumBatteryMeasurements = 0;
                     this.currLapBatteryPercentageLeftAccumulator = 0.0f;
                     this.currLapMinBatteryLeft = float.MaxValue;
@@ -166,9 +177,9 @@ namespace CrewChiefV4.Events
                     }
                 }
 
-                // Don't track out laps.
-                if (currentGameState.PitData.OnOutLap
-                    || (previousGameState != null && previousGameState.PitData.OnOutLap))
+                if (currentGameState.PitData.OnOutLap  // Don't track out laps.
+                    || (previousGameState != null && previousGameState.PitData.OnOutLap)
+                    || currentGameState.PitData.InPitlane)  // or in pit lane.
                     return;
 
                 if (currentGameState.SessionData.IsNewLap
@@ -198,6 +209,16 @@ namespace CrewChiefV4.Events
 
                 this.currLapMinBatteryLeft = Math.Min(this.currLapMinBatteryLeft, currBattLeftPct);
 
+                // Track windowed average charge level.
+                this.windowedBatteryStats.Add(new BatteryWindowedStatsEntry()
+                {
+                    BatteryPercentageLeft = currBattLeftPct,
+                    SessionRunningTime = currentGameState.SessionData.SessionRunningTime
+                });
+
+                // Remove records older than Battery.averagedChargeWindowTime.
+                this.windowedBatteryStats.RemoveAll(e => (currentGameState.SessionData.SessionRunningTime - e.SessionRunningTime) > Battery.averagedChargeWindowTime);
+
                 // NOTE: unlike fuel messages, here we process data on new sector and randomly in cetain sector.  This is to reduce message overload on the new lap.
                 // Warnings for particular battery levels
                 if (this.enableBatteryMessages
@@ -213,6 +234,9 @@ namespace CrewChiefV4.Events
                     // Calculate per minute usage:
                     var batteryDrainSinceMonitoringStart = this.initialBatteryChargePercentage - prevLapStats.AverageBatteryPercentageLeft;
                     var averageUsagePerMinute = (batteryDrainSinceMonitoringStart / prevLapStats.SessionRunningTime) * 60.0f;
+
+                    // Calculate windowed average charge level:
+                    var windowedAverageCharge = this.windowedBatteryStats.Average(e => e.BatteryPercentageLeft);
 
                     // Not sure about per level warnings, what is user supposed to do if his battery is at 5%?  Is such warning valuable?
                     // or your battery is running low?
@@ -231,8 +255,9 @@ namespace CrewChiefV4.Events
                     if (averageUsagePerLap > 0.0f
                         && (currentGameState.SessionData.SessionNumberOfLaps > 0 || currentGameState.SessionData.SessionType == SessionType.HotLap))
                     {
-                        var battStatusMsg = string.Format("starting battery = {0}%, previous lap avg charge = {1}%,  previous lap min charge = {2}%, current battery level = {3}%, usage per lap = {4}%",
+                        var battStatusMsg = string.Format("starting battery = {0}%,  windowed avg charge = {1}%  previous lap avg charge = {2}%,  previous lap min charge = {3}%, current battery level = {4}%, usage per lap = {5}%",
                             this.initialBatteryChargePercentage.ToString("0.000"),
+                            windowedAverageCharge.ToString("0.000"),
                             prevLapStats.AverageBatteryPercentageLeft.ToString("0.000"),
                             prevLapStats.MinimumBatteryPercentageLeft.ToString("0.000"),
                             currentGameState.BatteryData.BatteryPercentageLeft.ToString("0.000"),
@@ -299,8 +324,9 @@ namespace CrewChiefV4.Events
                         && currentGameState.SessionData.SessionTotalRunTime > 0.0f 
                         && averageUsagePerMinute > 0.0f)
                     {
-                        var battStatusMsg = string.Format("starting battery = {0}%, previous lap avg charge = {1}%,  previous lap min charge = {2}%, current battery level = {3}%, usage per minute = {4}%",
+                        var battStatusMsg = string.Format("starting battery = {0}%,  windowed avg charge = {1}%,  previous lap avg charge = {2}%,  previous lap min charge = {3}%, current battery level = {4}%, usage per minute = {5}%",
                             this.initialBatteryChargePercentage.ToString("0.000"),
+                            windowedAverageCharge.ToString("0.000"),
                             prevLapStats.AverageBatteryPercentageLeft.ToString("0.000"),
                             prevLapStats.MinimumBatteryPercentageLeft.ToString("0.000"),
                             currentGameState.BatteryData.BatteryPercentageLeft.ToString("0.000"),
