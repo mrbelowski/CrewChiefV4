@@ -183,8 +183,10 @@ namespace CrewChiefV4.Events
 
                 this.currLapMinBatteryLeft = Math.Min(this.currLapMinBatteryLeft, currBattLeftPct);
 
+                // NOTE: unlike fuel messages, here we process data on new sector and randomly in cetain sector.  This is to reduce message overload on the new lap.
                 // Warnings for particular battery levels
                 if (this.enableBatteryMessages
+                    && currentGameState.SessionData.IsNewSector
                     && this.currLapBatteryUseSectorCheck == currentGameState.SessionData.SectorNumber
                     && this.batteryStats.Count > 0)
                 {
@@ -214,6 +216,13 @@ namespace CrewChiefV4.Events
                     if (averageUsagePerLap > 0.0f
                         && (currentGameState.SessionData.SessionNumberOfLaps > 0 || currentGameState.SessionData.SessionType == SessionType.HotLap))
                     {
+                        var battStatusMsg = string.Format("starting battery = {0}%, previous lap avg charge = {1}%,  previous lap min charge = {2}%, current battery level = {3}%, usage per lap = {4}%",
+                            this.initialBatteryChargePercentage.ToString("0.000"),
+                            prevLapStats.AverageBatteryPercentageLeft.ToString("0.000"),
+                            prevLapStats.MinimumBatteryPercentageLeft.ToString("0.000"),
+                            currentGameState.BatteryData.BatteryPercentageLeft.ToString("0.000"),
+                            averageUsagePerLap.ToString("0.000"));
+
                         // NOTE: this might be a problem on long track like Nords.
                         var estBattLapsLeft = (int)Math.Floor(prevLapStats.AverageBatteryPercentageLeft / averageUsagePerLap);
                         if (this.halfDistance != -1
@@ -221,8 +230,7 @@ namespace CrewChiefV4.Events
                             && currentGameState.SessionData.SessionType == SessionType.Race
                             && currentGameState.SessionData.CompletedLaps == this.halfDistance)
                         {
-                            Console.WriteLine(string.Format("Half race distance, starting battery = {0}%, previous lap avg charge = {1}%,  previous lap min charge = {2}%, current battery level = {3}%, usage per lap = {4}%",
-                                this.initialBatteryChargePercentage.ToString("0.000"), prevLapStats.AverageBatteryPercentageLeft.ToString("0.000"), prevLapStats.MinimumBatteryPercentageLeft.ToString("0.000"), averageUsagePerLap.ToString("0.000")));
+                            Console.WriteLine("Half race distance, " + battStatusMsg);
 
                             this.playedHalfDistanceBatteryEstimate = true;
 
@@ -242,26 +250,22 @@ namespace CrewChiefV4.Events
                         }
                         else if (estBattLapsLeft == 4)
                         {
-                            Console.WriteLine(string.Format("4 laps of battery charge left, starting battery = {0}%, previous lap avg charge = {1}%,  previous lap min charge = {2}%, current battery level = {3}%, usage per lap = {4}%",
-                                this.initialBatteryChargePercentage.ToString("0.000"), prevLapStats.AverageBatteryPercentageLeft.ToString("0.000"), prevLapStats.MinimumBatteryPercentageLeft.ToString("0.000"), averageUsagePerLap.ToString("0.000")));
+                            Console.WriteLine("4 laps of battery charge left, " + battStatusMsg);
                             this.audioPlayer.playMessage(new QueuedMessage(Battery.folderFourLapsEstimate, 0, this));
                         }
                         else if (estBattLapsLeft == 3)
                         {
-                            Console.WriteLine(string.Format("3 laps of battery charge left, starting battery = {0}%, previous lap avg charge = {1}%,  previous lap min charge = {2}%, current battery level = {3}%, usage per lap = {4}%",
-                                this.initialBatteryChargePercentage.ToString("0.000"), prevLapStats.AverageBatteryPercentageLeft.ToString("0.000"), prevLapStats.MinimumBatteryPercentageLeft.ToString("0.000"), averageUsagePerLap.ToString("0.000")));
+                            Console.WriteLine("3 laps of battery charge left, " + battStatusMsg);
                             this.audioPlayer.playMessage(new QueuedMessage(Battery.folderThreeLapsEstimate, 0, this));
                         }
                         else if (estBattLapsLeft == 2)
                         {
-                            Console.WriteLine(string.Format("2 laps of battery charge left, starting battery = {0}%, previous lap avg charge = {1}%,  previous lap min charge = {2}%, current battery level = {3}%, usage per lap = {4}%",
-                                this.initialBatteryChargePercentage.ToString("0.000"), prevLapStats.AverageBatteryPercentageLeft.ToString("0.000"), prevLapStats.MinimumBatteryPercentageLeft.ToString("0.000"), averageUsagePerLap.ToString("0.000")));
+                            Console.WriteLine("2 laps of battery charge left, " + battStatusMsg);
                             this.audioPlayer.playMessage(new QueuedMessage(Battery.folderTwoLapsEstimate, 0, this));
                         }
                         else if (estBattLapsLeft == 1)
                         {
-                            Console.WriteLine(string.Format("1 lap of battery charge left, starting battery = {0}%, previous lap avg charge = {1}%,  previous lap min charge = {2}%, current battery level = {3}%, usage per lap = {4}%",
-                                this.initialBatteryChargePercentage.ToString("0.000"), prevLapStats.AverageBatteryPercentageLeft.ToString("0.000"), prevLapStats.MinimumBatteryPercentageLeft.ToString("0.000"), averageUsagePerLap.ToString("0.000")));
+                            Console.WriteLine("1 lap of battery charge left, " + battStatusMsg);
                             this.audioPlayer.playMessage(new QueuedMessage(Battery.folderOneLapEstimate, 0, this));
 
                             // If we've not played the pit-now message, play it with a bit of a delay - should probably wait for sector3 here
@@ -280,14 +284,20 @@ namespace CrewChiefV4.Events
                         && currentGameState.SessionData.SessionTotalRunTime > 0.0f 
                         && averageUsagePerMinute > 0.0f)
                     {
+                        var battStatusMsg = string.Format("starting battery = {0}%, previous lap avg charge = {1}%,  previous lap min charge = {2}%, current battery level = {3}%, usage per minute = {4}%",
+                            this.initialBatteryChargePercentage.ToString("0.000"),
+                            prevLapStats.AverageBatteryPercentageLeft.ToString("0.000"),
+                            prevLapStats.MinimumBatteryPercentageLeft.ToString("0.000"),
+                            currentGameState.BatteryData.BatteryPercentageLeft.ToString("0.000"),
+                            averageUsagePerMinute.ToString("0.000"));
+
                         this.nextBatteryStatusCheck = currentGameState.Now.Add(this.batteryStatusCheckInterval);
                         if (halfTime != -1
                             && !this.playedHalfTimeBatteryEstimate
                             && currentGameState.SessionData.SessionTimeRemaining <= halfTime
                             && currentGameState.SessionData.SessionTimeRemaining > halfTime - 30)
                         {
-                            Console.WriteLine(string.Format("Half race time, starting battery = {0}%, previous lap avg charge = {1}%,  previous lap min charge = {2}%, current battery level = {3}%, usage per minute = {4}%",
-                                this.initialBatteryChargePercentage.ToString("0.000"), prevLapStats.AverageBatteryPercentageLeft.ToString("0.000"), prevLapStats.MinimumBatteryPercentageLeft.ToString("0.000"), averageUsagePerMinute.ToString("0.000")));
+                            Console.WriteLine("Half race time, " + battStatusMsg);
                             this.playedHalfTimeBatteryEstimate = true;
 
                             if (currentGameState.SessionData.SessionType == SessionType.Race)
@@ -313,6 +323,8 @@ namespace CrewChiefV4.Events
                         var estimatedBatteryMinutesLeft = prevLapStats.AverageBatteryPercentageLeft / averageUsagePerMinute;
                         if (estimatedBatteryMinutesLeft < 1.5f && !this.playedPitForBatteryNow)
                         {
+                            Console.WriteLine("Less than 1.5 mins of battery charge left, " + battStatusMsg);
+
                             this.playedPitForBatteryNow = true;
                             this.playedTwoMinutesRemaining = true;
                             this.playedFiveMinutesRemaining = true;
@@ -322,6 +334,8 @@ namespace CrewChiefV4.Events
                         }
                         if (estimatedBatteryMinutesLeft <= 2.0f && estimatedBatteryMinutesLeft > 1.8f && !this.playedTwoMinutesRemaining)
                         {
+                            Console.WriteLine("Less than 2 mins of battery charge left, " + battStatusMsg);
+
                             this.playedTwoMinutesRemaining = true;
                             this.playedFiveMinutesRemaining = true;
                             this.playedTenMinutesRemaining = true;
@@ -329,18 +343,24 @@ namespace CrewChiefV4.Events
                         }
                         else if (estimatedBatteryMinutesLeft <= 5.0f && estimatedBatteryMinutesLeft > 4.8f && !this.playedFiveMinutesRemaining)
                         {
+                            Console.WriteLine("Less than 5 mins of battery charge left, " + battStatusMsg);
+                            
                             this.playedFiveMinutesRemaining = true;
                             this.playedTenMinutesRemaining = true;
                             this.audioPlayer.playMessage(new QueuedMessage(Battery.folderFiveMinutesBattery, 0, this));
                         }
                         else if (estimatedBatteryMinutesLeft <= 10.0f && estimatedBatteryMinutesLeft > 9.8f && !this.playedTenMinutesRemaining)
                         {
+                            Console.WriteLine("Less than 10 mins of battery charge left, " + battStatusMsg);
+
                             this.playedTenMinutesRemaining = true;
                             this.audioPlayer.playMessage(new QueuedMessage(Battery.folderTenMinutesBattery, 0, this));
                         }
                         else if (!this.playedHalfBatteryChargeWarning && prevLapStats.AverageBatteryPercentageLeft / this.initialBatteryChargePercentage <= 0.55f &&
                             prevLapStats.AverageBatteryPercentageLeft / this.initialBatteryChargePercentage >= 0.45f)
                         {
+                            Console.WriteLine("Less than 50% of battery charge left, " + battStatusMsg);
+
                             // warning message for battery left - these play as soon previous lap average charge drops below 1/2.
                             this.playedHalfBatteryChargeWarning = true;
                             this.audioPlayer.playMessage(new QueuedMessage(Battery.folderHalfChargeWarning, 0, this));
