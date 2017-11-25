@@ -322,25 +322,25 @@ namespace CrewChiefV4.Events
                             this.audioPlayer.playMessage(new QueuedMessage("pit_for_vehicle_swap_now",
                                 MessageContents(Battery.folderAboutToRunOut, PitStops.folderMandatoryPitStopsPitThisLap), 0, this));
                         }
-                        if (estimatedFuelMinutesLeft <= 2 && estimatedFuelMinutesLeft > 1.8f && !this.playedTwoMinutesRemaining)
+                        if (estimatedFuelMinutesLeft <= 2.0f && estimatedFuelMinutesLeft > 1.8f && !this.playedTwoMinutesRemaining)
                         {
                             this.playedTwoMinutesRemaining = true;
                             this.playedFiveMinutesRemaining = true;
                             this.playedTenMinutesRemaining = true;
                             this.audioPlayer.playMessage(new QueuedMessage(Battery.folderTwoMinutesBattery, 0, this));
                         }
-                        else if (estimatedFuelMinutesLeft <= 5 && estimatedFuelMinutesLeft > 4.8f && !this.playedFiveMinutesRemaining)
+                        else if (estimatedFuelMinutesLeft <= 5.0f && estimatedFuelMinutesLeft > 4.8f && !this.playedFiveMinutesRemaining)
                         {
                             this.playedFiveMinutesRemaining = true;
                             this.playedTenMinutesRemaining = true;
                             this.audioPlayer.playMessage(new QueuedMessage(Battery.folderFiveMinutesBattery, 0, this));
                         }
-                        else if (estimatedFuelMinutesLeft <= 10 && estimatedFuelMinutesLeft > 9.8 && !this.playedTenMinutesRemaining)
+                        else if (estimatedFuelMinutesLeft <= 10.0f && estimatedFuelMinutesLeft > 9.8f && !this.playedTenMinutesRemaining)
                         {
                             this.playedTenMinutesRemaining = true;
                             this.audioPlayer.playMessage(new QueuedMessage(Battery.folderTenMinutesBattery, 0, this));
                         }
-                        else if (!this.playedHalfBatteryChargeWarning  && prevLapStats.AverageBatteryPercentageLeft / this.initialBatteryChargePercentage <= 0.55f &&
+                        else if (!this.playedHalfBatteryChargeWarning && prevLapStats.AverageBatteryPercentageLeft / this.initialBatteryChargePercentage <= 0.55f &&
                             prevLapStats.AverageBatteryPercentageLeft / this.initialBatteryChargePercentage >= 0.45f)
                         {
                             // warning message for fuel left - these play as soon as the fuel reaches 1/2 tank left
