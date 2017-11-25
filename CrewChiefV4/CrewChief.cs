@@ -283,7 +283,14 @@ namespace CrewChiefV4
 
         public void reportFuelStatus()
         {
-            ((Fuel)eventsList["Fuel"]).reportFuelStatus(true);
+            if (GlobalBehaviourSettings.enabledMessageTypes.Contains(MessageTypes.BATTERY))
+            {
+                ((Battery)eventsList["Battery"]).reportBatteryStatus(true);
+            }
+            else
+            {
+                ((Fuel)eventsList["Fuel"]).reportFuelStatus(true);
+            }
         }
 
         public void toggleSpotterMode()
@@ -440,7 +447,14 @@ namespace CrewChiefV4
             getEvent("Position").respond(SpeechRecogniser.STATUS[0]);
             getEvent("PitStops").respond(SpeechRecogniser.STATUS[0]);
             getEvent("DamageReporting").respond(SpeechRecogniser.STATUS[0]);
-            getEvent("Fuel").respond(SpeechRecogniser.STATUS[0]);
+            if (GlobalBehaviourSettings.enabledMessageTypes.Contains(MessageTypes.BATTERY))
+            {
+                getEvent("Battery").respond(SpeechRecogniser.CAR_STATUS[0]);
+            }
+            else
+            {
+                getEvent("Fuel").respond(SpeechRecogniser.CAR_STATUS[0]);
+            }
             getEvent("TyreMonitor").respond(SpeechRecogniser.STATUS[0]);
             getEvent("EngineMonitor").respond(SpeechRecogniser.STATUS[0]);
             getEvent("Timings").respond(SpeechRecogniser.STATUS[0]);
@@ -458,7 +472,14 @@ namespace CrewChiefV4
         public static void getCarStatus()
         {
             getEvent("DamageReporting").respond(SpeechRecogniser.CAR_STATUS[0]);
-            getEvent("Fuel").respond(SpeechRecogniser.CAR_STATUS[0]);
+            if (GlobalBehaviourSettings.enabledMessageTypes.Contains(MessageTypes.BATTERY))
+            {
+                getEvent("Battery").respond(SpeechRecogniser.CAR_STATUS[0]);
+            }
+            else
+            {
+                getEvent("Fuel").respond(SpeechRecogniser.CAR_STATUS[0]);
+            }
             getEvent("TyreMonitor").respond(SpeechRecogniser.CAR_STATUS[0]);
             getEvent("EngineMonitor").respond(SpeechRecogniser.CAR_STATUS[0]);
         }

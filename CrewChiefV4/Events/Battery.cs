@@ -388,6 +388,23 @@ namespace CrewChiefV4.Events
         // all the same things as fuel +
         // for the last lap, we could report average charge level, and minimal charge level, which actually represents "worst case"
 
+        public void reportBatteryStatus(Boolean allowNoDataMessage)
+        {
+            // TODO: Implement me :)
+            audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+        }
+        
+        public override void respond(String voiceMessage)
+        {
+            // TODO: implement me :)
+            if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOWS_MY_BATTERY) ||
+                SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.CAR_STATUS) ||
+                SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.STATUS))
+            {
+                reportBatteryStatus(SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOWS_MY_BATTERY));
+            }
+        }
+
 
         /*
         private Boolean reportFuelConsumption()
