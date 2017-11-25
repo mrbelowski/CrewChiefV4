@@ -36,6 +36,7 @@ namespace CrewChiefV4.Events
         {
             internal float AverageBatteryPercentageLeft = -1.0f;
             internal float MinimumBatteryPercentageLeft = float.MaxValue;
+            internal float SessionRunningTime = -1.0f;
         };
 
         bool initialized = false;
@@ -56,7 +57,7 @@ namespace CrewChiefV4.Events
         private float initialBatteryChargePercentage = -1.0f;
         private bool playedPitForBatteryNow = false;
 
-        // Checking if we need to read fuel messages involves a bit of arithmetic and stuff, so only do this every few seconds
+        // Checking if we need to read battery messages involves a bit of arithmetic and stuff, so only do this every few seconds
         private DateTime nextBatteryStatusCheck = DateTime.MinValue;
         private readonly TimeSpan batteryStatusCheckInterval = TimeSpan.FromSeconds(5);
 
@@ -125,7 +126,7 @@ namespace CrewChiefV4.Events
                     (currentGameState.SessionData.SessionPhase == SessionPhase.Green || 
                      currentGameState.SessionData.SessionPhase == SessionPhase.FullCourseYellow || 
                      currentGameState.SessionData.SessionPhase == SessionPhase.Countdown) &&
-                    // Don't process fuel data in prac and qual until we're actually moving:
+                    // Don't process battery data in prac and qual until we're actually moving:
                     currentGameState.PositionAndMotionData.CarSpeed > 10)))
             {    
                 if (!this.initialized
@@ -133,8 +134,6 @@ namespace CrewChiefV4.Events
                 {
                     this.clearState();
                     this.gameTimeWhenInitialized = currentGameState.SessionData.SessionRunningTime;
-
-                    // NOTE: This may have to be 100% instead.
                     this.initialBatteryChargePercentage = currBattLeftPct;
 
                     if (!this.initialized)
@@ -163,7 +162,8 @@ namespace CrewChiefV4.Events
                     this.batteryStats.Add(new BatteryStatsEntry()
                     {
                         AverageBatteryPercentageLeft = this.currLapBatteryPercentageLeftAccumulator / this.currLapNumBatteryMeasurements,
-                        MinimumBatteryPercentageLeft = this.currLapMinBatteryLeft
+                        MinimumBatteryPercentageLeft = this.currLapMinBatteryLeft,
+                        SessionRunningTime = currentGameState.SessionData.SessionRunningTime
                     });
 
                     Console.WriteLine(string.Format("Last lap average battery left percentage: {0}%  Min percentage: {1}%.",
@@ -177,15 +177,15 @@ namespace CrewChiefV4.Events
                     this.currLapBatteryUseSectorCheck = Utilities.random.Next(1, 3);
                 }
 
+                // Update this lap stats.
                 this.currLapBatteryPercentageLeftAccumulator += currBattLeftPct;
                 ++this.currLapNumBatteryMeasurements;
 
-                if (this.currLapMinBatteryLeft > currBattLeftPct)
-                    this.currLapMinBatteryLeft = currBattLeftPct;
+                this.currLapMinBatteryLeft = Math.Min(this.currLapMinBatteryLeft, currBattLeftPct);
 
-                // Warnings for particular fuel levels
+                // Warnings for particular battery levels
                 if (this.enableBatteryMessages
-                    //&& this.currLapBatteryUseSectorCheck == currentGameState.SessionData.SectorNumber
+                    && this.currLapBatteryUseSectorCheck == currentGameState.SessionData.SectorNumber
                     && this.batteryStats.Count > 0)
                 {
                     var prevLapStats = this.batteryStats.Last();
@@ -194,10 +194,8 @@ namespace CrewChiefV4.Events
                     var averageUsagePerLap = (this.initialBatteryChargePercentage - prevLapStats.AverageBatteryPercentageLeft) / this.batteryStats.Count;
 
                     // Calculate per minute usage:
-                    var raceTimeElapsed = this.gameTimeWhenInitialized - currentGameState.SessionData.SessionRunningTime;
                     var batteryDrainSinceMonitoringStart = this.initialBatteryChargePercentage - prevLapStats.AverageBatteryPercentageLeft;
-
-                    var averageUsagePerMinute = (batteryDrainSinceMonitoringStart / raceTimeElapsed) * 60.0f;
+                    var averageUsagePerMinute = (batteryDrainSinceMonitoringStart / prevLapStats.SessionRunningTime) * 60.0f;
 
                     // Not sure about per level warnings, what is user supposed to do if his battery is at 5%?  Is such warning valuable?
                     // or your battery is running low?
@@ -294,7 +292,7 @@ namespace CrewChiefV4.Events
 
                             if (currentGameState.SessionData.SessionType == SessionType.Race)
                             {
-                                if (averageUsagePerMinute * this.halfTime / 60.0f > currentGameState.FuelData.FuelLeft
+                                if (averageUsagePerMinute * this.halfTime / 60.0f > prevLapStats.AverageBatteryPercentageLeft
                                     && prevLapStats.AverageBatteryPercentageLeft / this.initialBatteryChargePercentage < 0.6)
                                 {
                                     if (currentGameState.PitData.IsElectricVehicleSwapAllowed)
@@ -312,8 +310,8 @@ namespace CrewChiefV4.Events
                             }
                         }
 
-                        var estimatedFuelMinutesLeft = prevLapStats.AverageBatteryPercentageLeft / averageUsagePerMinute;
-                        if (estimatedFuelMinutesLeft < 1.5f && !this.playedPitForBatteryNow)
+                        var estimatedBatteryMinutesLeft = prevLapStats.AverageBatteryPercentageLeft / averageUsagePerMinute;
+                        if (estimatedBatteryMinutesLeft < 1.5f && !this.playedPitForBatteryNow)
                         {
                             this.playedPitForBatteryNow = true;
                             this.playedTwoMinutesRemaining = true;
@@ -322,20 +320,20 @@ namespace CrewChiefV4.Events
                             this.audioPlayer.playMessage(new QueuedMessage("pit_for_vehicle_swap_now",
                                 MessageContents(Battery.folderAboutToRunOut, PitStops.folderMandatoryPitStopsPitThisLap), 0, this));
                         }
-                        if (estimatedFuelMinutesLeft <= 2.0f && estimatedFuelMinutesLeft > 1.8f && !this.playedTwoMinutesRemaining)
+                        if (estimatedBatteryMinutesLeft <= 2.0f && estimatedBatteryMinutesLeft > 1.8f && !this.playedTwoMinutesRemaining)
                         {
                             this.playedTwoMinutesRemaining = true;
                             this.playedFiveMinutesRemaining = true;
                             this.playedTenMinutesRemaining = true;
                             this.audioPlayer.playMessage(new QueuedMessage(Battery.folderTwoMinutesBattery, 0, this));
                         }
-                        else if (estimatedFuelMinutesLeft <= 5.0f && estimatedFuelMinutesLeft > 4.8f && !this.playedFiveMinutesRemaining)
+                        else if (estimatedBatteryMinutesLeft <= 5.0f && estimatedBatteryMinutesLeft > 4.8f && !this.playedFiveMinutesRemaining)
                         {
                             this.playedFiveMinutesRemaining = true;
                             this.playedTenMinutesRemaining = true;
                             this.audioPlayer.playMessage(new QueuedMessage(Battery.folderFiveMinutesBattery, 0, this));
                         }
-                        else if (estimatedFuelMinutesLeft <= 10.0f && estimatedFuelMinutesLeft > 9.8f && !this.playedTenMinutesRemaining)
+                        else if (estimatedBatteryMinutesLeft <= 10.0f && estimatedBatteryMinutesLeft > 9.8f && !this.playedTenMinutesRemaining)
                         {
                             this.playedTenMinutesRemaining = true;
                             this.audioPlayer.playMessage(new QueuedMessage(Battery.folderTenMinutesBattery, 0, this));
@@ -343,7 +341,7 @@ namespace CrewChiefV4.Events
                         else if (!this.playedHalfBatteryChargeWarning && prevLapStats.AverageBatteryPercentageLeft / this.initialBatteryChargePercentage <= 0.55f &&
                             prevLapStats.AverageBatteryPercentageLeft / this.initialBatteryChargePercentage >= 0.45f)
                         {
-                            // warning message for fuel left - these play as soon as the fuel reaches 1/2 tank left
+                            // warning message for battery left - these play as soon previous lap average charge drops below 1/2.
                             this.playedHalfBatteryChargeWarning = true;
                             this.audioPlayer.playMessage(new QueuedMessage(Battery.folderHalfChargeWarning, 0, this));
                         }
