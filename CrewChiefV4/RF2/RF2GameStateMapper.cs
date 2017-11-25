@@ -1461,6 +1461,8 @@ namespace CrewChiefV4.rFactor2
                     cgs.OpponentData.Add(opponentKey, opponent);
             }
 
+            cgs.sortClassPositions();
+
             if (pgs != null)
             {
                 csd.HasLeadChanged = !csd.HasLeadChanged && psd.Position > 1 && csd.Position == 1 ? true : csd.HasLeadChanged;

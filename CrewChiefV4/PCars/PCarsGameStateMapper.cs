@@ -1021,6 +1021,8 @@ namespace CrewChiefV4.PCars
                 }
             }
 
+            currentGameState.sortClassPositions();
+
             currentGameState.SessionData.LapTimePrevious = shared.mLastLapTime;
             if (currentGameState.SessionData.IsNewLap)
             {
