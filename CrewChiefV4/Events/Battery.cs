@@ -26,10 +26,9 @@ namespace CrewChiefV4.Events
         private const string folderLapsRemaining = "battery/laps_remaining";
         private const string folderWeEstimate = "battery/we_estimate";
         private const string folderPlentyOfBattery = "battery/plenty_of_battery";
-        private const string folderLitresRemaining = "battery/litres_remaining";
-        private const string folderOneLitreRemaining = "battery/one_litre_remaining";
+        private const string folderPercentRemaining = "battery/percent_remaining";
         private const string folderAboutToRunOut = "battery/about_to_run_out";
-        private const string folderPercentagePerLap = "battery/litres_per_lap";
+        private const string folderPercentagePerLap = "battery/percent_per_lap";
         private const string folderPercent = "battery/percent";
 
         class BatteryStatsEntry
