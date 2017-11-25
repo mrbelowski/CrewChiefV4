@@ -54,7 +54,7 @@ namespace CrewChiefV4.Events
         };
 
         private const float averagedChargeWindowTime = 30.0f;
-        private List<BatteryWindowedStatsEntry> windowedBatteryStats = new List<BatteryWindowedStatsEntry>();
+        private LinkedList<BatteryWindowedStatsEntry> windowedBatteryStats = new LinkedList<BatteryWindowedStatsEntry>();
 
         bool batteryUseActive = false;
         private float gameTimeWhenInitialized = -1.0f;
@@ -177,6 +177,29 @@ namespace CrewChiefV4.Events
                     }
                 }
 
+                if (!currentGameState.PitData.InPitlane)
+                {
+                    // Track windowed average charge level.
+                    this.windowedBatteryStats.AddLast(new BatteryWindowedStatsEntry()
+                    {
+                        BatteryPercentageLeft = currBattLeftPct,
+                        SessionRunningTime = currentGameState.SessionData.SessionRunningTime
+                    });
+
+                    // Remove records older than Battery.averagedChargeWindowTime.
+                    var entry = this.windowedBatteryStats.First;
+                    while (entry != null)
+                    {
+                        var next = entry.Next;
+                        if ((currentGameState.SessionData.SessionRunningTime - entry.Value.SessionRunningTime) > Battery.averagedChargeWindowTime)
+                            this.windowedBatteryStats.Remove(entry);
+                        else
+                            break;  // We're done.
+
+                        entry = next;
+                    }
+                }
+
                 if (currentGameState.PitData.OnOutLap  // Don't track out laps.
                     || (previousGameState != null && previousGameState.PitData.OnOutLap)
                     || currentGameState.PitData.InPitlane)  // or in pit lane.
@@ -192,9 +215,10 @@ namespace CrewChiefV4.Events
                         SessionRunningTime = currentGameState.SessionData.SessionRunningTime
                     });
 
-                    Console.WriteLine(string.Format("Last lap average battery left percentage: {0}%  min percentage: {1}%  curr percentage {2}%",
+                    Console.WriteLine(string.Format("Last lap average battery left percentage: {0}%  min percentage: {1}%  windowed avg: {2}%,  curr percentage {3}%",
                         this.batteryStats.Last().AverageBatteryPercentageLeft.ToString("0.000"),
                         this.batteryStats.Last().MinimumBatteryPercentageLeft.ToString("0.000"),
+                        this.windowedBatteryStats.Average(e => e.BatteryPercentageLeft).ToString("0.000"),
                         currBattLeftPct.ToString("0.000")));
 
                     this.currLapBatteryPercentageLeftAccumulator = 0.0f;
@@ -209,16 +233,6 @@ namespace CrewChiefV4.Events
                 ++this.currLapNumBatteryMeasurements;
 
                 this.currLapMinBatteryLeft = Math.Min(this.currLapMinBatteryLeft, currBattLeftPct);
-
-                // Track windowed average charge level.
-                this.windowedBatteryStats.Add(new BatteryWindowedStatsEntry()
-                {
-                    BatteryPercentageLeft = currBattLeftPct,
-                    SessionRunningTime = currentGameState.SessionData.SessionRunningTime
-                });
-
-                // Remove records older than Battery.averagedChargeWindowTime.
-                this.windowedBatteryStats.RemoveAll(e => (currentGameState.SessionData.SessionRunningTime - e.SessionRunningTime) > Battery.averagedChargeWindowTime);
 
                 // NOTE: unlike fuel messages, here we process data on new sector and randomly in cetain sector.  This is to reduce message overload on the new lap.
                 // Warnings for particular battery levels
@@ -410,299 +424,151 @@ namespace CrewChiefV4.Events
                 }
             }
         }
-        // TODO: I think interesting stats would be:
-        // all the same things as fuel +
-        // for the last lap, we could report average charge level, and minimal charge level, which actually represents "worst case"
 
         public void reportBatteryStatus(Boolean allowNoDataMessage)
         {
-            // TODO: Implement me :)
-            audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+            var reportedRemaining = this.reportBatteryRemaining(allowNoDataMessage);
+            var reportedUse = this.reportBatteryUse();
+            if (!reportedUse && !reportedRemaining && allowNoDataMessage)
+                this.audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
         }
         
         public override void respond(String voiceMessage)
         {
-            // TODO: implement me :)
             if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOWS_MY_BATTERY) ||
                 SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.CAR_STATUS) ||
                 SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.STATUS))
             {
-                reportBatteryStatus(SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOWS_MY_BATTERY));
+                this.reportBatteryStatus(SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOWS_MY_BATTERY));
             }
         }
 
-
-        /*
-        private Boolean reportFuelConsumption()
+        private Boolean reportBatteryUse()
         {
-            Boolean haveData = false;
-            if (batteryUseActive && averageUsagePerLap > 0)
+            var haveData = false;
+            if (!this.initialized || this.batteryStats.Count == 0)
+                return haveData;
+
+            var averageUsagePerLap = (this.initialBatteryChargePercentage - this.batteryStats.Last().AverageBatteryPercentageLeft) / this.batteryStats.Count;
+            if (this.batteryUseActive && averageUsagePerLap > 0.0f)
             {
                 // round to 1dp
-                float meanUsePerLap = ((float)Math.Round(averageUsagePerLap * 10f)) / 10f;
-                if (meanUsePerLap == 0)
+                var meanUsePerLap = ((float)Math.Round(averageUsagePerLap * 10.0f)) / 10.0f;
+                if (meanUsePerLap == 0.0f)
                 {
-                    // rounded fuel use is < 0.1 litres per lap - can't really do anything with this.
+                    // rounded battery use is < 0.1 litres per lap - can't really do anything with this.
                     return false;
                 }
+
                 // get the whole and fractional part (yeah, I know this is shit)
-                String str = meanUsePerLap.ToString();
-                int pointPosition = str.IndexOf('.');
-                int wholePart = 0;
-                int fractionalPart = 0;
+                var str = meanUsePerLap.ToString();
+                var pointPosition = str.IndexOf('.');
+                var wholePart = 0;
+                var fractionalPart = 0;
                 if (pointPosition > 0)
                 {
                     wholePart = int.Parse(str.Substring(0, pointPosition));
                     fractionalPart = int.Parse(str[pointPosition + 1].ToString());
                 }
                 else
-                {
                     wholePart = (int)meanUsePerLap;
-                }
-                if (meanUsePerLap > 0)
+
+                if (meanUsePerLap > 0.0f)
                 {
                     haveData = true;
                     if (fractionalPart > 0)
-                    {
-                        audioPlayer.playMessageImmediately(new QueuedMessage("Fuel/mean_use_per_lap",
-                                MessageContents(wholePart, NumberReader.folderPoint, fractionalPart, folderLitresPerLap), 0, null));
-                    }
+                        this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/mean_use_per_lap",
+                                MessageContents(wholePart, NumberReader.folderPoint, fractionalPart, Battery.folderPercentagePerLap), 0, null));
                     else
-                    {
-                        audioPlayer.playMessageImmediately(new QueuedMessage("Fuel/mean_use_per_lap",
-                                MessageContents(wholePart, folderLitresPerLap), 0, null));
-                    }
+                        this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/mean_use_per_lap",
+                                MessageContents(wholePart, Battery.folderPercentagePerLap), 0, null));
                 }
             }
+
             return haveData;
         }
 
-        private Boolean reportFuelConsumptionForLaps(int numberOfLaps)
+        private Boolean reportBatteryRemaining(Boolean allowNowDataMessage)
         {
-            Boolean haveData = false;
-            if (batteryUseActive && averageUsagePerLap > 0)
-            {
-                // round up
-                float totalUsage = (float)Math.Ceiling(averageUsagePerLap * numberOfLaps);
-                if (totalUsage > 0)
-                {
-                    haveData = true;
-                    // build up the message fragments the verbose way, so we can prevent the number reader from shortening hundreds to
-                    // stuff like "one thirty two" - we always want "one hundred and thirty two"
-                    List<MessageFragment> messageFragments = new List<MessageFragment>();
-                    messageFragments.Add(MessageFragment.Text(folderWeEstimate));
-                    messageFragments.Add(MessageFragment.Integer(Convert.ToInt32(totalUsage), false));
-                    messageFragments.Add(MessageFragment.Text(folderLitres));
-                    QueuedMessage fuelEstimateMessage = new QueuedMessage("Fuel/estimate",
-                            messageFragments, 0, null);
-                    // play this immediately or play "stand by", and queue it to be played in a few seconds
-                    if (delayResponses && Utilities.random.Next(10) >= 2 && SoundCache.availableSounds.Contains(AudioPlayer.folderStandBy))
-                    {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderStandBy, 0, null));
-                        int secondsDelay = Math.Max(5, Utilities.random.Next(8));
-                        audioPlayer.pauseQueue(secondsDelay);
-                        fuelEstimateMessage.dueTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + (1000 * secondsDelay);
-                        audioPlayer.playDelayedImmediateMessage(fuelEstimateMessage);
-                    }
-                    else
-                    {
-                        audioPlayer.playMessageImmediately(fuelEstimateMessage);
-                    }
-                }
-            }
-            return haveData;
-        }
-        private Boolean reportFuelConsumptionForTime(int hours, int minutes)
-        {
-            Boolean haveData = false;
-            if (batteryUseActive && averageUsagePerMinute > 0)
-            {
-                int  timeToUse = (hours * 60) + minutes;
-                // round up
-                float totalUsage = ((float)Math.Ceiling(averageUsagePerMinute * timeToUse));
-                if (totalUsage > 0)
-                {
-                    haveData = true;
-                    // build up the message fragments the verbose way, so we can prevent the number reader from shortening hundreds to
-                    // stuff like "one thirty two" - we always want "one hundred and thirty two"
-                    List<MessageFragment> messageFragments = new List<MessageFragment>();
-                    messageFragments.Add(MessageFragment.Text(folderWeEstimate));
-                    messageFragments.Add(MessageFragment.Integer(Convert.ToInt32(totalUsage), false));
-                    messageFragments.Add(MessageFragment.Text(folderLitres));
-                    QueuedMessage fuelEstimateMessage = new QueuedMessage("Fuel/estimate",
-                            messageFragments, 0, null);
-                    // play this immediately or play "stand by", and queue it to be played in a few seconds
-                    if (delayResponses && Utilities.random.Next(10) >= 2 && SoundCache.availableSounds.Contains(AudioPlayer.folderStandBy))
-                    {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderStandBy, 0, null));
-                        int secondsDelay = Math.Max(5, Utilities.random.Next(8));
-                        audioPlayer.pauseQueue(secondsDelay);
-                        fuelEstimateMessage.dueTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + (1000 * secondsDelay);
-                        audioPlayer.playDelayedImmediateMessage(fuelEstimateMessage);
-                    }
-                    else
-                    {
-                        audioPlayer.playMessageImmediately(fuelEstimateMessage);
-                    }
-                }
-            }
-            return haveData;
-        }
-        private Boolean reportFuelRemaining(Boolean allowNowDataMessage)
-        {
-            Boolean haveData = false;
-            if (initialised && currentBatteryPercentage > -1)
-            {
-                if (sessionHasFixedNumberOfLaps && averageUsagePerLap > 0)
-                {
-                    haveData = true;
-                    int lapsOfFuelLeft = (int)Math.Floor(currentBatteryPercentage / averageUsagePerLap);
-                    if (lapsOfFuelLeft <= 1)
-                    {
-                        audioPlayer.playMessageImmediately(new QueuedMessage("Fuel/estimate",
-                            MessageContents(folderAboutToRunOut), 0, null));
-                    }
-                    else
-                    {
-                        List<MessageFragment> messageFragments = new List<MessageFragment>();
-                        messageFragments.Add(MessageFragment.Text(folderWeEstimate));
-                        messageFragments.Add(MessageFragment.Integer(lapsOfFuelLeft, false));
-                        messageFragments.Add(MessageFragment.Text(folderLapsRemaining));
-                        audioPlayer.playMessageImmediately(new QueuedMessage("Fuel/estimate", messageFragments, 0, null));
-                    }                    
-                }
-                else if (averageUsagePerMinute > 0)
-                {
-                    haveData = true;
-                    int minutesOfFuelLeft = (int)Math.Floor(currentBatteryPercentage / averageUsagePerMinute);
-                    if (minutesOfFuelLeft <= 1)
-                    {
-                        audioPlayer.playMessageImmediately(new QueuedMessage("Fuel/estimate",
-                            MessageContents(folderAboutToRunOut), 0, null));
-                    }
-                    else
-                    {
-                        List<MessageFragment> messageFragments = new List<MessageFragment>();
-                        messageFragments.Add(MessageFragment.Text(folderWeEstimate));
-                        messageFragments.Add(MessageFragment.Integer(minutesOfFuelLeft, false));
-                        messageFragments.Add(MessageFragment.Text(folderMinutesRemaining));
-                        audioPlayer.playMessageImmediately(new QueuedMessage("Fuel/estimate", messageFragments, 0, null));
-                    }                    
-                }
-            }
-            if (!haveData)
-            {
-                if (!batteryUseActive && allowNowDataMessage)
-                {
-                    haveData = true;
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderPlentyOfFuel, 0, null));
-                }
-                else if (currentBatteryPercentage >= 2)
-                {
-                    haveData = true;
-                    List<MessageFragment> messageFragments = new List<MessageFragment>();
-                    messageFragments.Add(MessageFragment.Integer((int)currentBatteryPercentage, false));
-                    messageFragments.Add(MessageFragment.Text(folderLitresRemaining));
-                    audioPlayer.playMessageImmediately(new QueuedMessage("Fuel/level", messageFragments, 0, null));
-                }
-                else if (currentBatteryPercentage >= 1)
-                {
-                    haveData = true;
-                    audioPlayer.playMessageImmediately(new QueuedMessage("Fuel/level",
-                                MessageContents(folderOneLitreRemaining), 0, null));
-                }
-                else if (currentBatteryPercentage > 0)
-                {
-                    haveData = true;
-                    audioPlayer.playMessageImmediately(new QueuedMessage("Fuel/level",
-                            MessageContents(folderAboutToRunOut), 0, null));
-                }
-            }
-            return haveData;
-        }
+            var haveData = false;
+            if (windowedBatteryStats.Count == 0)
+                return haveData;  // Nothing we can do.
 
-        public void reportFuelStatus(Boolean allowNoDataMessage)
-        {            
-            Boolean reportedRemaining = reportFuelRemaining(allowNoDataMessage);
-            Boolean reportedConsumption = reportFuelConsumption();
-            if (!reportedConsumption && !reportedRemaining && allowNoDataMessage)
-            {
-                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
-            }
-        }
+            // Calculate windowed average charge level:
+            var windowedAverageChargeLeft = this.windowedBatteryStats.Average(e => e.BatteryPercentageLeft);
 
-        public override void respond(String voiceMessage)
-        {
-            if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.WHATS_MY_FUEL_USAGE))
+            if (!this.initialized || this.batteryStats.Count == 0)
             {
-                if (!reportFuelConsumption())
+                // Handle no rich data available cases.
+                if (!this.batteryUseActive && allowNowDataMessage)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));                    
+                    haveData = true;
+                    this.audioPlayer.playMessageImmediately(new QueuedMessage(Battery.folderPlentyOfBattery, 0, null));
                 }
+                else if (windowedAverageChargeLeft >= 3.0f)
+                {
+                    haveData = true;
+                    var messageFragments = new List<MessageFragment>();
+                    messageFragments.Add(MessageFragment.Integer((int)windowedAverageChargeLeft, false));
+                    messageFragments.Add(MessageFragment.Text(Battery.folderPercentRemaining));
+                    this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/level", messageFragments, 0, null));
+                }
+                else if (windowedAverageChargeLeft > 0)
+                {
+                    haveData = true;
+                    this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/level",
+                            MessageContents(Battery.folderAboutToRunOut), 0, null));
+                }
+
+                return haveData;
             }
-            else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.WHATS_MY_FUEL_LEVEL))
+
+            var prevLapStats = this.batteryStats.Last();
+            if (sessionHasFixedNumberOfLaps)
             {
-                if (!batteryUseActive)
+                // Get battery use per lap:
+                var averageUsagePerLap = (this.initialBatteryChargePercentage - prevLapStats.AverageBatteryPercentageLeft) / this.batteryStats.Count;
+
+                haveData = true;
+                var lapsOfBatteryChargeLeft = (int)Math.Floor(windowedAverageChargeLeft / averageUsagePerLap);
+                if (lapsOfBatteryChargeLeft <= 1)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
-                }
-                else if (currentBatteryPercentage >= 2)
-                {
-                    audioPlayer.playMessageImmediately(new QueuedMessage("Fuel/level",
-                                MessageContents((int)currentBatteryPercentage, folderLitresRemaining), 0, null));
+                    this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/estimate",
+                        MessageContents(Battery.folderAboutToRunOut), 0, null));
                 }
                 else
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderAboutToRunOut, 0, null));
+                    var messageFragments = new List<MessageFragment>();
+                    messageFragments.Add(MessageFragment.Text(Battery.folderWeEstimate));
+                    messageFragments.Add(MessageFragment.Integer(lapsOfBatteryChargeLeft, false));
+                    messageFragments.Add(MessageFragment.Text(Battery.folderLapsRemaining));
+                    this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/estimate", messageFragments, 0, null));
                 }
             }
-            else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOWS_MY_FUEL) ||
-                SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.CAR_STATUS) ||
-                SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.STATUS))
+            else  // Timed race.
             {
-                reportFuelStatus(SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOWS_MY_FUEL));
-            }
-            else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.CALCULATE_FUEL_FOR))
-            {
-                int unit = 0;
-                foreach (KeyValuePair<String[], int> entry in SpeechRecogniser.numberToNumber)
+                // Calculate per minute usage:
+                var batteryDrainSinceMonitoringStart = this.initialBatteryChargePercentage - prevLapStats.AverageBatteryPercentageLeft;
+                var averageUsagePerMinute = (batteryDrainSinceMonitoringStart / prevLapStats.SessionRunningTime) * 60.0f;
+
+                haveData = true;
+                var minutesOfBatteryChargeLeft = (int)Math.Floor(windowedAverageChargeLeft / averageUsagePerMinute);
+                if (minutesOfBatteryChargeLeft <= 1)
                 {
-                    foreach (String numberStr in entry.Key)
-                    {
-                        if (voiceMessage.Contains(" " + numberStr + " "))
-                        {
-                            unit = entry.Value;
-                            break;
-                        }
-                    }
+                    audioPlayer.playMessageImmediately(new QueuedMessage("Battery/estimate",
+                        MessageContents(Battery.folderAboutToRunOut), 0, null));
                 }
-                if (unit == 0)
+                else
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderDidntUnderstand, 0, null));
-                    return;
-                }
-                if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.LAP) || SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.LAPS))
-                {
-                    if (!reportFuelConsumptionForLaps(unit))
-                    {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
-                    } 
-                }
-                else if(SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.MINUTE) || SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.MINUTES))
-                {
-                    if (!reportFuelConsumptionForTime(0, unit))
-                    {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
-                    } 
-                }
-                else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOUR) || SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOURS))
-                {
-                    if (!reportFuelConsumptionForTime(unit, 0))
-                    {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
-                    }
+                    var messageFragments = new List<MessageFragment>();
+                    messageFragments.Add(MessageFragment.Text(Battery.folderWeEstimate));
+                    messageFragments.Add(MessageFragment.Integer(minutesOfBatteryChargeLeft, false));
+                    messageFragments.Add(MessageFragment.Text(Battery.folderMinutesRemaining));
+                    audioPlayer.playMessageImmediately(new QueuedMessage("Battery/estimate", messageFragments, 0, null));
                 }
             }
-        }*/
+
+            return haveData;
+        }
     }
 }
