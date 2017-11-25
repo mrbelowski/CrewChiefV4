@@ -195,9 +195,9 @@ namespace CrewChiefV4.Events
 
                     // Calculate per minute usage:
                     var raceTimeElapsed = this.gameTimeWhenInitialized - currentGameState.SessionData.SessionRunningTime;
-                    var batterDrainSinceStart = this.initialBatteryChargePercentage - prevLapStats.AverageBatteryPercentageLeft;
+                    var batteryDrainSinceMonitoringStart = this.initialBatteryChargePercentage - prevLapStats.AverageBatteryPercentageLeft;
 
-                    var averageUsagePerMinute = (batterDrainSinceStart / raceTimeElapsed) * 60.0f;
+                    var averageUsagePerMinute = (batteryDrainSinceMonitoringStart / raceTimeElapsed) * 60.0f;
 
                     // Not sure about per level warnings, what is user supposed to do if his battery is at 5%?  Is such warning valuable?
                     // or your battery is running low?
@@ -354,6 +354,8 @@ namespace CrewChiefV4.Events
         // TODO: I think interesting stats would be:
         // all the same things as fuel +
         // for the last lap, we could report average charge level, and minimal charge level, which actually represents "worst case"
+
+
         /*
         private Boolean reportFuelConsumption()
         {
