@@ -623,7 +623,7 @@ namespace CrewChiefV4.rFactor2
 
             ///////////////////////////////////
             // Pit Data
-            cgs.PitData.IsRefuellingAllowed = true;
+            cgs.PitData.IsRefuellingAllowed = cgs.PitData.IsElectricVehicleSwapAllowed = true;
 
             if (this.enablePitStopPrediction)
             {
@@ -1480,9 +1480,9 @@ namespace CrewChiefV4.rFactor2
             }
 
             // --------------------------------
-            // fuel data
-            cgs.FuelData.FuelUseActive = shared.extended.mPhysics.mFuelMult > 0;
-            cgs.FuelData.FuelLeft = (float)playerTelemetry.mFuel;
+            // fuel/battery data
+            cgs.FuelData.FuelUseActive = cgs.BatteryData.BatteryUseActive = shared.extended.mPhysics.mFuelMult > 0;
+            cgs.FuelData.FuelLeft = cgs.BatteryData.BatteryPercentageLeft = (float)playerTelemetry.mFuel;
 
             // --------------------------------
             // flags data
