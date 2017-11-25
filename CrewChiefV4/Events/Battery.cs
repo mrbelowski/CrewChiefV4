@@ -117,22 +117,31 @@ namespace CrewChiefV4.Events
             // Only track battery data after the session has settled down
             if (this.batteryUseActive && currentGameState.SessionData.SessionRunningTime > 15 &&
                 ((currentGameState.SessionData.SessionType == SessionType.Race &&
-                    (currentGameState.SessionData.SessionPhase == SessionPhase.Green || 
-                     currentGameState.SessionData.SessionPhase == SessionPhase.FullCourseYellow || 
+                    (currentGameState.SessionData.SessionPhase == SessionPhase.Green ||
+                     currentGameState.SessionData.SessionPhase == SessionPhase.FullCourseYellow ||
                      currentGameState.SessionData.SessionPhase == SessionPhase.Checkered)) ||
                  ((currentGameState.SessionData.SessionType == SessionType.Qualify ||
-                   currentGameState.SessionData.SessionType == SessionType.Practice || 
+                   currentGameState.SessionData.SessionType == SessionType.Practice ||
                    currentGameState.SessionData.SessionType == SessionType.HotLap) &&
-                    (currentGameState.SessionData.SessionPhase == SessionPhase.Green || 
-                     currentGameState.SessionData.SessionPhase == SessionPhase.FullCourseYellow || 
+                    (currentGameState.SessionData.SessionPhase == SessionPhase.Green ||
+                     currentGameState.SessionData.SessionPhase == SessionPhase.FullCourseYellow ||
                      currentGameState.SessionData.SessionPhase == SessionPhase.Countdown) &&
                     // Don't process battery data in prac and qual until we're actually moving:
                     currentGameState.PositionAndMotionData.CarSpeed > 10)))
-            {    
+            {
                 if (!this.initialized
                     || (previousGameState != null && previousGameState.PitData.InPitlane && !currentGameState.PitData.InPitlane))  // Vehicle swap or some magical recharge ?
                 {
-                    this.clearState();
+                    // Not sure if stats should be cleared or not here.  Keep it around for now.
+                    // this.batteryStats.Clear();
+                    this.currLapNumBatteryMeasurements = 0;
+                    this.currLapBatteryPercentageLeftAccumulator = 0.0f;
+                    this.currLapMinBatteryLeft = float.MaxValue;
+                    this.playedPitForBatteryNow = false;
+                    this.playedTwoMinutesRemaining = false;
+                    this.playedFiveMinutesRemaining = false;
+                    this.playedTenMinutesRemaining = false;
+
                     this.gameTimeWhenInitialized = currentGameState.SessionData.SessionRunningTime;
                     this.initialBatteryChargePercentage = currBattLeftPct;
 
@@ -150,11 +159,18 @@ namespace CrewChiefV4.Events
                         }
 
                         Console.WriteLine(string.Format("Battery use tracking initilized: initialChargePercentage = {0}%    halfDistance = {1} laps    halfTime = {2} minutes",
-                            this.initialBatteryChargePercentage.ToString("0.000"), this.halfDistance, this.halfTime));
+                            this.initialBatteryChargePercentage.ToString("0.000"),
+                            this.halfDistance,
+                            this.halfTime));
 
                         this.initialized = true;
                     }
                 }
+
+                // Don't track out laps.
+                if (currentGameState.PitData.OnOutLap
+                    || (previousGameState != null && previousGameState.PitData.OnOutLap))
+                    return;
 
                 if (currentGameState.SessionData.IsNewLap
                     && this.currLapNumBatteryMeasurements > 0)
@@ -167,8 +183,8 @@ namespace CrewChiefV4.Events
                     });
 
                     Console.WriteLine(string.Format("Last lap average battery left percentage: {0}%  Min percentage: {1}%.",
-                        (this.currLapBatteryPercentageLeftAccumulator / this.currLapNumBatteryMeasurements).ToString("0.000"),
-                        this.currLapMinBatteryLeft.ToString("0.000")));
+                        this.batteryStats.Last().AverageBatteryPercentageLeft.ToString("0.000"),
+                        this.batteryStats.Last().MinimumBatteryPercentageLeft.ToString("0.000")));
 
                     this.currLapBatteryPercentageLeftAccumulator = 0.0f;
                     this.currLapNumBatteryMeasurements = 0;
