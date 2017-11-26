@@ -10,6 +10,8 @@ For support and discussions about Crew Chief we have our very own forum here: ht
 
 Changelog
 ---------
+Version 4.8.2.2: Added TTS volume boost property when using nAudio playback (by default the TTS sounds are now played at 2x volume, which balances them better with the the other sounds; Added "Only use TTS when there is no alternative" option. When set to 'true' (the default) the app will drop messages or use generic terms to refer to opponents when it doesn't have a driver name recording. It will use TTS for driver names only if the message is considered essential (when e.g. responding to "who's in front?" voice command).  The recommended TTS configuration is now to enable TTS, set "Only use TTS when there is no alternative" to true and set "TTS volume boost (nAudio only)" to 2 (if using nAudio playback).
+
 Version 4.8.2.1: Work-around for R3E missing sector number updates when cars exit to pits (should fix a lot of inaccurate calls in practice and qualifying); fixed mute not working properly in nAudio mode; Simplified track landmark generation (see Help); Some internal bugfixes
 
 Version 4.8.1.9: Improvements to speech recogntion accuracy; integrated nAudio library for sound playback which allows you to choose play back devices for messages and background sounds (disabled by default - enable this with the "Use nAudio for playback" option) - this also allows the app to play back at higher volumes; added lots of iRacing pit commands (see the voice commands section in Help); lots of iRacing bug fixes; added a new spotter (Micha - in the latest sound pack)
