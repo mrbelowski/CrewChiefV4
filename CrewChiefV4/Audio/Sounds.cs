@@ -17,6 +17,7 @@ namespace CrewChiefV4.Audio
         public static Boolean useTTS = UserSettings.GetUserSettings().getBoolean("use_tts_for_missing_names");
         private double minSecondsBetweenPersonalisedMessages = (double)UserSettings.GetUserSettings().getInt("min_time_between_personalised_messages");
         public static Boolean eagerLoadSoundFiles = UserSettings.GetUserSettings().getBoolean("load_sound_files_on_startup");
+        public static float ttsNaudioVolumeBoost = UserSettings.GetUserSettings().getFloat("tts_naudio_volume_boost");
                
         private static LinkedList<String> dynamicLoadedSounds = new LinkedList<String>();
         public static Dictionary<String, SoundSet> soundSets = new Dictionary<String, SoundSet>();
@@ -110,9 +111,8 @@ namespace CrewChiefV4.Audio
                     // which will probably be shit, but MS TTS is shit anyway and now it's even shitter because it crashes the fucking
                     // app on start up. Nobbers.
                     // synthesizer.SelectVoiceByHints(VoiceGender.Male, hasAdult ? VoiceAge.Adult : VoiceAge.Senior);
-                    synthesizer.SetOutputToDefaultAudioDevice();
                     synthesizer.Volume = 100;
-                    synthesizer.Rate = 0;
+                    synthesizer.Rate = 1;
                 }
                 catch (Exception) {
                     Console.WriteLine("Unable to initialise the TTS engine, TTS will not be available. " +
@@ -297,7 +297,22 @@ namespace CrewChiefV4.Audio
                 }
                 else if (soundName.StartsWith(TTS_IDENTIFIER))
                 {
-                    singleSoundsToPlay.Add(new SingleSound(soundName.Substring(TTS_IDENTIFIER.Count())));
+                    SingleSound singleSound = null;
+                    if (!singleSounds.ContainsKey(soundName))
+                    {
+                        singleSound = new SingleSound(soundName.Substring(TTS_IDENTIFIER.Count()));
+                        singleSounds.Add(soundName, singleSound);
+                    }
+                    else
+                    {
+                        singleSound = singleSounds[soundName];
+                    }
+                    lock (SoundCache.dynamicLoadedSounds)
+                    {
+                        SoundCache.dynamicLoadedSounds.Remove(soundName);
+                        SoundCache.dynamicLoadedSounds.AddLast(soundName);
+                    }
+                    singleSoundsToPlay.Add(singleSound);
                 }
                 else
                 {
@@ -912,6 +927,9 @@ namespace CrewChiefV4.Audio
         public SingleSound(String textToRender)
         {
             this.ttsString = textToRender;
+            // always eagerly load and cache TTS phrases:
+            allowCaching = true;
+            LoadFile();
         }
 
         public SingleSound(String fullPath, Boolean loadFile, Boolean createSoundPlayerImmediatelyAfterLoading, Boolean allowCaching)
@@ -946,28 +964,13 @@ namespace CrewChiefV4.Audio
                 return;
 
             PlaybackModerator.PreProcessSound(this);
-
-            if (ttsString != null && SoundCache.synthesizer != null)
+            if (AudioPlayer.playWithNAudio)
             {
-                try
-                {
-                    SoundCache.synthesizer.Speak(ttsString);
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine("TTS failed with sound " + ttsString + ", " + e.Message);
-                }
+                PlayNAudio();
             }
             else
             {
-                if (AudioPlayer.playWithNAudio)
-                {
-                    PlayNAudio();
-                }
-                else
-                {
-                    PlaySoundPlayer();
-                }
+                PlaySoundPlayer();
             }
         }
 
@@ -1042,6 +1045,10 @@ namespace CrewChiefV4.Audio
         private float getVolume()
         {
             float volume = UserSettings.GetUserSettings().getFloat("messages_volume");
+            if (ttsString != null)
+            {
+                volume = volume * SoundCache.ttsNaudioVolumeBoost;
+            }
             if (volume > 1)
             {
                 volume = 1;
@@ -1087,7 +1094,18 @@ namespace CrewChiefV4.Audio
                 {
                     try
                     {
-                        this.fileBytes = File.ReadAllBytes(fullPath);
+                        if (ttsString != null)
+                        {
+                            this.memoryStream = new MemoryStream();
+                            SoundCache.synthesizer.SetOutputToWaveStream(this.memoryStream);
+                            SoundCache.synthesizer.Speak(ttsString);
+                            this.memoryStream.Position = 0;
+                            SoundCache.synthesizer.SetOutputToNull();
+                        }
+                        else
+                        {
+                            this.fileBytes = File.ReadAllBytes(fullPath);
+                        }
                         loadedFile = true;
                         SoundCache.currentSoundsLoaded++;
                     }
@@ -1113,7 +1131,21 @@ namespace CrewChiefV4.Audio
                 }
                 if (!loadedSoundPlayer)
                 {
-                    this.memoryStream = new MemoryStream(this.fileBytes);
+                    // if we have file bytes, load them
+                    if (this.fileBytes != null)
+                    {
+                        this.memoryStream = new MemoryStream(this.fileBytes);
+                    }
+                    // if we have the TTS memory stream, use it
+                    else if (this.memoryStream != null && ttsString != null)
+                    {
+                        Console.WriteLine("Loading TTS sound for " + ttsString);
+                    }
+                    else
+                    {
+                        Console.WriteLine("No sound data available");
+                        return;
+                    }
                     this.soundPlayer = new SoundPlayer(memoryStream);
                     this.soundPlayer.Load();
                     loadedSoundPlayer = true;
@@ -1137,7 +1169,21 @@ namespace CrewChiefV4.Audio
                         this.waveOut = new NAudio.Wave.WaveOutEvent();
                         this.deviceIdWhenCached = AudioPlayer.naudioMessagesPlaybackDeviceId;
                         this.waveOut.DeviceNumber = this.deviceIdWhenCached;
-                        this.memoryStream = new MemoryStream(this.fileBytes);
+                        // if we have file bytes, load them
+                        if (this.fileBytes != null)
+                        {
+                            this.memoryStream = new MemoryStream(this.fileBytes);
+                        }
+                        // if we have the TTS memory stream, use it
+                        else if (this.memoryStream != null && ttsString != null)
+                        {
+                            Console.WriteLine("Loading TTS sound for " + ttsString);
+                        }
+                        else
+                        {
+                            Console.WriteLine("No sound data available");
+                            return;
+                        }
                         this.reader = new NAudio.Wave.WaveFileReader(this.memoryStream);
 
                         this.waveOut.PlaybackStopped += new EventHandler<NAudio.Wave.StoppedEventArgs>(playbackStopped);

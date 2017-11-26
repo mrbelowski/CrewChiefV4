@@ -704,5 +704,8 @@
     <Setting Name="ADD_TRACK_LANDMARK_device_type" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="tts_naudio_volume_boost" Type="System.Single" Scope="User">
+      <Value Profile="(Default)">1.5</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

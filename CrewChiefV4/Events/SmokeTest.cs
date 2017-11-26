@@ -117,7 +117,6 @@ namespace CrewChiefV4.Events
                 Thread.Sleep(800);
                 audioPlayer.playSpotterMessage(new QueuedMessage(SMOKE_TEST_SPOTTER, MessageContents(NoisyCartesianCoordinateSpotter.folderSpotterRadioCheck), 0, this), false);
             }
-
             //PlaybackModerator.SetTracing(true /*enabled*/);
             //this.BeepOutInTest();
 
