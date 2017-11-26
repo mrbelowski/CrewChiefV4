@@ -2830,5 +2830,17 @@ namespace CrewChiefV4.Properties {
                 this["ADD_TRACK_LANDMARK_device_type"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1.5")]
+        public float tts_naudio_volume_boost {
+            get {
+                return ((float)(this["tts_naudio_volume_boost"]));
+            }
+            set {
+                this["tts_naudio_volume_boost"] = value;
+            }
+        }
     }
 }
