@@ -497,3 +497,12 @@ use_naudio_help = nAudio playback library allows playback device selection and h
 
 toggle_track_landmarks_recording = Start / stop track landmarks recording
 add_track_landmark = Add Start / end track landmark
+
+tts_naudio_volume_boost = TTS volume boost (nAudio only)
+tts_naudio_volume_boost_help = Increase text-to-speech volume by this amount (up to the allowed maximum)
+
+use_tts_only_when_necessary = Only use TTS when there is no alternative
+use_tts_only_when_necessary_help = Prefer generic terms for opponents or skip optional messages instead of using TTS names
+
+iracing_pit_tyre_pressure_in_psi = iRacing tyre pressure adjustments in PSI
+iracing_pit_tyre_pressure_in_psi_help = Assume tyre adjust tyre pressure commands are in PSI (disable this to use kPa)

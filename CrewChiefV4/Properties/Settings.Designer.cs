@@ -2842,5 +2842,41 @@ namespace CrewChiefV4.Properties {
                 this["enable_battery_messages"] = value;
             }
         }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1.5")]
+        public float tts_naudio_volume_boost {
+            get {
+                return ((float)(this["tts_naudio_volume_boost"]));
+            }
+            set {
+                this["tts_naudio_volume_boost"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool use_tts_only_when_necessary {
+            get {
+                return ((bool)(this["use_tts_only_when_necessary"]));
+            }
+            set {
+                this["use_tts_only_when_necessary"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool iracing_pit_tyre_pressure_in_psi {
+            get {
+                return ((bool)(this["iracing_pit_tyre_pressure_in_psi"]));
+            }
+            set {
+                this["iracing_pit_tyre_pressure_in_psi"] = value;
+            }
+        }
     }
 }
