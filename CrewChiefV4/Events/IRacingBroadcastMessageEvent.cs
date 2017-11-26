@@ -11,10 +11,17 @@ using iRSDKSharp;
 namespace CrewChiefV4.Events
 {
 
-
+    enum PressureUnit
+    {
+        PSI, KPA
+    }
 
     class IRacingBroadcastMessageEvent : AbstractEvent
     {
+        private static float kpaPerPsi = 6.89476f;
+        private PressureUnit pressureUnit = UserSettings.GetUserSettings().getBoolean("iracing_pit_tyre_pressure_in_psi") ?
+            PressureUnit.PSI : PressureUnit.KPA;
+
         public IRacingBroadcastMessageEvent(AudioPlayer audioPlayer)
         {
             this.audioPlayer = audioPlayer;
@@ -138,6 +145,10 @@ namespace CrewChiefV4.Events
                 }
                 else
                 {
+                    if (pressureUnit == PressureUnit.PSI)
+                    {
+                        amount = convertPSItoKPA(amount);
+                    }
                     if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PIT_STOP_CHANGE_TYRE_PRESSURE))
                     {
                         ChangeTire(PitCommandModeTypes.LF, amount);
@@ -278,6 +289,11 @@ namespace CrewChiefV4.Events
         public void ClearFuel()
         {
             iRacingSDK.BroadcastMessage(BroadcastMessageTypes.PitCommand, (int)PitCommandModeTypes.ClearFuel, 0);
+        }
+
+        private int convertPSItoKPA(int psi)
+        {
+            return (int)Math.Round(psi * kpaPerPsi);
         }
     }
 }

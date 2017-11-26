@@ -710,5 +710,8 @@
     <Setting Name="use_tts_only_when_necessary" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
+    <Setting Name="iracing_pit_tyre_pressure_in_psi" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

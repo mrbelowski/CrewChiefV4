@@ -2854,5 +2854,17 @@ namespace CrewChiefV4.Properties {
                 this["use_tts_only_when_necessary"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool iracing_pit_tyre_pressure_in_psi {
+            get {
+                return ((bool)(this["iracing_pit_tyre_pressure_in_psi"]));
+            }
+            set {
+                this["iracing_pit_tyre_pressure_in_psi"] = value;
+            }
+        }
     }
 }
