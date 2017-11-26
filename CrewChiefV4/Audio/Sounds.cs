@@ -1049,10 +1049,11 @@ namespace CrewChiefV4.Audio
             {
                 volume = volume * SoundCache.ttsNaudioVolumeBoost;
             }
-            if (volume > 1)
+            // volume can be higher than 1, it seems. Not sure if this is device dependent
+            /*if (volume > 1)
             {
                 volume = 1;
-            }
+            }*/
             if (volume < 0)
             {
                 volume = 0;
