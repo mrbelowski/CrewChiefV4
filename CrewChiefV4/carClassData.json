@@ -434,8 +434,6 @@
 			"timesInHundredths": true,
 			"isBatteryPowered": true,
 			"enabledMessageTypes": "TYRE_TEMPS, BRAKE_TEMPS, BATTERY, LOCKING_AND_SPINNING",
-			"isDRSCapable": true,
-			"DRSRange": 1.0,
 			"pitCrewPreparationTime": 17
 		},
 		{
