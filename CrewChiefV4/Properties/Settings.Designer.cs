@@ -2842,5 +2842,17 @@ namespace CrewChiefV4.Properties {
                 this["tts_naudio_volume_boost"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool use_tts_only_when_necessary {
+            get {
+                return ((bool)(this["use_tts_only_when_necessary"]));
+            }
+            set {
+                this["use_tts_only_when_necessary"] = value;
+            }
+        }
     }
 }
