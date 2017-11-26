@@ -351,7 +351,7 @@ namespace CrewChiefV4.Events
                     // warnings for fixed time sessions - check every 5 seconds
                     else if (currentGameState.Now > this.nextBatteryStatusCheck
                         && currentGameState.SessionData.SessionNumberOfLaps <= 0
-                        && currentGameState.SessionData.SessionTotalRunTime > 0.0f 
+                        && currentGameState.SessionData.SessionTotalRunTime > 0.0f
                         && this.averageUsagePerMinute > 0.0f)
                     {
                         var battStatusMsg = string.Format("starting battery = {0}%,  windowed avg charge = {1}%,  previous lap avg charge = {2}%,  previous lap min charge = {3}%, current battery level = {4}%, usage per minute = {5}%",
@@ -415,7 +415,7 @@ namespace CrewChiefV4.Events
                         else if (estBattMinsLeft <= 5.0f && estBattMinsLeft > 4.8f && !this.playedFiveMinutesRemaining)
                         {
                             Console.WriteLine("Less than 5 mins of battery charge left, " + battStatusMsg);
-                            
+
                             this.playedFiveMinutesRemaining = true;
                             this.playedTenMinutesRemaining = true;
                             this.audioPlayer.playMessage(new QueuedMessage(Battery.folderFiveMinutesBattery, 0, this));
@@ -448,7 +448,7 @@ namespace CrewChiefV4.Events
             if (!reportedUse && !reportedRemaining && allowNoDataMessage)
                 this.audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
         }
-        
+
         public override void respond(String voiceMessage)
         {
             if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOWS_MY_BATTERY) ||
@@ -560,7 +560,7 @@ namespace CrewChiefV4.Events
                 var minutesOfBatteryChargeLeft = (int)Math.Floor(windowedAverageChargeLeft / this.averageUsagePerMinute);
                 if (minutesOfBatteryChargeLeft <= 1)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage("Battery/estimate",
+                    this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/estimate",
                         MessageContents(Battery.folderAboutToRunOut), 0, null));
                 }
                 else
@@ -569,7 +569,7 @@ namespace CrewChiefV4.Events
                     messageFragments.Add(MessageFragment.Text(Battery.folderWeEstimate));
                     messageFragments.Add(MessageFragment.Integer(minutesOfBatteryChargeLeft, false));
                     messageFragments.Add(MessageFragment.Text(Battery.folderMinutesRemaining));
-                    audioPlayer.playMessageImmediately(new QueuedMessage("Battery/estimate", messageFragments, 0, null));
+                    this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/estimate", messageFragments, 0, null));
                 }
             }
 
