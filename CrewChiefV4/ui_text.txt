@@ -502,3 +502,6 @@ tts_naudio_volume_boost_help = Increase text-to-speech volume by this amount (up
 
 use_tts_only_when_necessary = Only use TTS when there is no alternative
 use_tts_only_when_necessary_help = Prefer generic terms for opponents or skip optional messages instead of using TTS names
+
+iracing_pit_tyre_pressure_in_psi = iRacing tyre pressure adjustments in PSI
+iracing_pit_tyre_pressure_in_psi_help = Assume tyre adjust tyre pressure commands are in PSI (disable this to use kPa)
