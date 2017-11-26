@@ -162,6 +162,15 @@ The app understands lots of command including:
 
 
 
+Text to speech
+--------------
+The app contains lots of opponent driver name recordings (several thousand) but this is only a small faction of the opponent names you're likely to encounter. The app can use Windows' built in text to speech functionality to create sounds for missing driver names. These TTS names will sound wrong and immersion-breaking, but they can be quite useful. Windows 10 includes a default voice called David (on English versions) which is the least-worst option. Windows 7's TTS voice is hopeless. I don't know what other versions sound like.
+
+There are 3 basic TTS modes - disabled (the default, no TTS is used, if the app doesn't have a driver name recording it refer to the driver using generic terms, or drop some messages relating to this driver). 'Only when necessary' mode (enable TTS, enable "Only use TTS when there is no alternative") will use TTS only when the app has no alternative, so you'll hardly ever hear TTS names. If you ask "who's in front?" and the app has no driver name sound for this opponent, it *will* use a TTS sound instead of saying something daft like "I can't pronounce that". If you disable 'Only when necessary' mode, the app will use TTS names rather than generic terms in exactly the same way as it would use real driver name recordings. So you'll hear quite a lot of TTS names which will sound pretty bad.
+
+TTS sounds tend to be much quieter than the recorded sounds, and aren't filtered or compressed. To make their volume balance with other sounds there's a "TTS volume boost (nAudio only)" property which increases the TTS sound volume by this factor (so 1 means 'no increase', 2 - the default - means double the volume). The default is 2 and seems to work well, but note this only works when you're using nAudio for playback.
+
+
 Command macros
 --------------
 The app can send sequences of key presses in response to voice command or some specific (hard-coded) in-game events. These can be used for anything you like, but their primary function is to ease the pain of navigating the awkward in-game pit menus. The app comes with a default set of command macros which (at the time of writing) are for PCars2 and Raceroom only. More will be added for other games. The default commands can be found in [install folder]/saved_command_macros.json. If you want to make your own, copy this file to a your Documents folder, in a subfolder called CrewChiefV4 (i.e. Documents/CrewChiefV4/saved_command_macros.json) and edit it as you like. 
