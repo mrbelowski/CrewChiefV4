@@ -23,6 +23,9 @@ namespace CrewChiefV4.Audio
         public static float minimumSoundPackVersion = 105f;
 
         public static Boolean playWithNAudio = UserSettings.GetUserSettings().getBoolean("use_naudio");
+        // prefer to drop messages or use generic terms instead of TTS names
+        public static Boolean useTTSOnlyWhenNecessary = UserSettings.GetUserSettings().getBoolean("use_tts_only_when_necessary");
+        
         public static int naudioMessagesPlaybackDeviceId = 0;
         public static int naudioBackgroundPlaybackDeviceId = 0;
         public Dictionary<string, Tuple<string, int>> playbackDevices = new Dictionary<string, Tuple<string, int>>();
@@ -1141,6 +1144,11 @@ namespace CrewChiefV4.Audio
             {
                 unpauseTime = DateTime.Now + TimeSpan.FromSeconds(seconds);
             }
+        }
+
+        public static Boolean canReadName(String rawName)
+        {
+            return (SoundCache.hasSuitableTTSVoice && !useTTSOnlyWhenNecessary) || SoundCache.availableDriverNames.Contains(DriverNameHelper.getUsableDriverName(rawName));
         }
     }
 }

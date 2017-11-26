@@ -84,7 +84,7 @@ namespace CrewChiefV4.Events
         private int maxDistanceMovedForYellowAnnouncement = UserSettings.GetUserSettings().getInt("max_distance_moved_for_yellow_announcement");
 
         private Boolean reportAllowedOvertakesUnderYellow = UserSettings.GetUserSettings().getBoolean("report_allowed_overtakes_under_yellow");
-
+        
         // for new (RF2 and R3E) impl
         private FlagEnum[] lastSectorFlags = new FlagEnum[] { FlagEnum.GREEN, FlagEnum.GREEN, FlagEnum.GREEN };
         private FlagEnum[] lastSectorFlagsReported = new FlagEnum[] { FlagEnum.GREEN, FlagEnum.GREEN, FlagEnum.GREEN };
@@ -816,7 +816,7 @@ namespace CrewChiefV4.Events
                             }
                             // are we fighting with him and can we call him by name?
                             Boolean isInteresting = Math.Abs(currentGameState.SessionData.Position - opponent.Position) <= 2 &&
-                                (canReadName(opponent.DriverRawName) || opponent.Position <= folderPositionHasGoneOff.Length);
+                                (AudioPlayer.canReadName(opponent.DriverRawName) || opponent.Position <= folderPositionHasGoneOff.Length);
                             if ((isApproaching || isInteresting) &&
                                 (!incidentWarnings.ContainsKey(landmark) || incidentWarnings[landmark] + incidentRepeatFrequency < currentGameState.Now))
                             {
@@ -861,7 +861,7 @@ namespace CrewChiefV4.Events
                         {
                             foreach (OpponentData opponent in driversCrashedInCorner)
                             {
-                                if (canReadName(opponent.DriverRawName))
+                                if (AudioPlayer.canReadName(opponent.DriverRawName))
                                 {
                                     opponentNamesToRead.Add(opponent);
                                 }
@@ -951,7 +951,7 @@ namespace CrewChiefV4.Events
                         {
                             // this guy is in the same sector as the yellow but has only travelled 10m in 2 seconds or has lost a load of places so he's probably involved
                             involvedDrivers.Add(new NamePositionPair(opponent.DriverRawName, incidentCandidate.positionAtStartOfIncident, opponent.DistanceRoundTrack,
-                                canReadName(opponent.DriverRawName), incidentCandidate.opponentDataKey));
+                                AudioPlayer.canReadName(opponent.DriverRawName), incidentCandidate.opponentDataKey));
                         }
                         else
                         {
@@ -1096,12 +1096,6 @@ namespace CrewChiefV4.Events
                 }
             }
             return false;
-        }
-
-
-        private Boolean canReadName(String rawName)
-        {
-            return SoundCache.hasSuitableTTSVoice || SoundCache.availableDriverNames.Contains(DriverNameHelper.getUsableDriverName(rawName));
         }
     }
 
