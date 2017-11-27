@@ -23,6 +23,8 @@ namespace CrewChiefV4.Events
         private const string folderTenMinutesBattery = "battery/ten_minutes_battery";
         private const string folderTwoMinutesBattery = "battery/two_minutes_battery";
         private const string folderFiveMinutesBattery = "battery/five_minutes_battery";
+        private const string folderLowBattery = "battery/low_battery";
+        private const string folderCriticalBattery = "battery/critical_battery";
         private const string folderMinutesRemaining = "battery/minutes_remaining";
         private const string folderLapsRemaining = "battery/laps_remaining";
         private const string folderWeEstimate = "battery/we_estimate";
@@ -54,7 +56,7 @@ namespace CrewChiefV4.Events
             internal float SessionRunningTime = -1.0f;
         };
 
-        private const float averagedChargeWindowTime = 30.0f;
+        private const float averagedChargeWindowTime = 15.0f;
         private LinkedList<BatteryWindowedStatsEntry> windowedBatteryStats = new LinkedList<BatteryWindowedStatsEntry>();
 
         bool batteryUseActive = false;
@@ -75,9 +77,12 @@ namespace CrewChiefV4.Events
         private bool playedTwoMinutesRemaining = false;
         private bool playedFiveMinutesRemaining = false;
         private bool playedTenMinutesRemaining = false;
+        private bool playedBatteryLowWarning = false;
+        private bool playedBatteryCriticalWarning = false;
         private bool playedHalfBatteryChargeWarning = false;
 
         // Cache variables to be used in command responses (separate thread, can't access collections).
+        // It should be ok that they aren't from the same update, otherwise we'll have to lock.
         private float averageUsagePerLap = -1.0f;
         private float averageUsagePerMinute = -1.0f;
         private float windowedAverageChargeLeft = -1.0f;
@@ -114,6 +119,8 @@ namespace CrewChiefV4.Events
             this.playedFiveMinutesRemaining = false;
             this.playedTenMinutesRemaining = false;
             this.playedHalfBatteryChargeWarning = false;
+            this.playedBatteryLowWarning = false;
+            this.playedBatteryCriticalWarning = false;
 
             this.averageUsagePerLap = -1.0f;
             this.averageUsagePerMinute = -1.0f;
@@ -162,6 +169,8 @@ namespace CrewChiefV4.Events
                     this.playedTwoMinutesRemaining = false;
                     this.playedFiveMinutesRemaining = false;
                     this.playedTenMinutesRemaining = false;
+                    this.playedBatteryLowWarning = false;
+                    this.playedBatteryCriticalWarning = false;
 
                     this.gameTimeWhenInitialized = currentGameState.SessionData.SessionRunningTime;
                     this.initialBatteryChargePercentage = currBattLeftPct;
@@ -269,18 +278,17 @@ namespace CrewChiefV4.Events
 
                     var prevLapStats = this.batteryStats.Last();
 
-                    // Not sure about per level warnings, what is user supposed to do if his battery is at 5%?  Is such warning valuable?
-                    // or your battery is running low?
-                    /*if (currentFuel <= 2 && !played2LitreWarning)
+                    // For now assume 10% is low, below 5% is critical.  Alternatively, this could be tied to avg per lap consumption.
+                    if (this.windowedAverageChargeLeft <= 10.0f && !this.playedBatteryLowWarning)
                     {
-                        played2LitreWarning = true;
-                        audioPlayer.playMessage(new QueuedMessage("Fuel/level", MessageContents(2, folderLitresRemaining), 0, this));
+                        this.playedBatteryLowWarning = true;
+                        this.audioPlayer.playMessage(new QueuedMessage("Battery/level", MessageContents(Battery.folderLowBattery), 0, this));
                     }
-                    else if (currentFuel <= 1 && !played1LitreWarning)
+                    else if (this.windowedAverageChargeLeft <= 5.0f && !this.playedBatteryCriticalWarning)
                     {
-                        played1LitreWarning = true;
-                        audioPlayer.playMessage(new QueuedMessage("Fuel/level", MessageContents(folderOneLitreRemaining), 0, this));
-                    }*/
+                        this.playedBatteryCriticalWarning = true;
+                        this.audioPlayer.playMessage(new QueuedMessage("Battery/level", MessageContents(Battery.folderCriticalBattery), 0, this));
+                    }
 
                     // Warnings for fixed lap sessions.
                     if (this.averageUsagePerLap > 0.0f
@@ -518,13 +526,23 @@ namespace CrewChiefV4.Events
                     haveData = true;
                     this.audioPlayer.playMessageImmediately(new QueuedMessage(Battery.folderPlentyOfBattery, 0, null));
                 }
-                else if (this.windowedAverageChargeLeft >= 3.0f)
+                else if (this.windowedAverageChargeLeft >= 10.0f)
                 {
                     haveData = true;
                     var messageFragments = new List<MessageFragment>();
                     messageFragments.Add(MessageFragment.Integer((int)windowedAverageChargeLeft, false));
                     messageFragments.Add(MessageFragment.Text(Battery.folderPercentRemaining));
                     this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/level", messageFragments, 0, null));
+                }
+                else if (this.windowedAverageChargeLeft > 5.0f)
+                {
+                    haveData = true;
+                    this.audioPlayer.playMessage(new QueuedMessage("Battery/level", MessageContents(Battery.folderLowBattery), 0, this));
+                }
+                else if (this.windowedAverageChargeLeft <= 2.0f)
+                {
+                    haveData = true;
+                    this.audioPlayer.playMessage(new QueuedMessage("Battery/level", MessageContents(Battery.folderCriticalBattery), 0, this));
                 }
                 else if (this.windowedAverageChargeLeft > 0)
                 {
@@ -536,11 +554,16 @@ namespace CrewChiefV4.Events
                 return haveData;
             }
 
-            if (sessionHasFixedNumberOfLaps && this.averageUsagePerLap > 0.0f)
+            if (this.sessionHasFixedNumberOfLaps && this.averageUsagePerLap > 0.0f)
             {
                 haveData = true;
                 var lapsOfBatteryChargeLeft = (int)Math.Floor(this.windowedAverageChargeLeft / this.averageUsagePerLap);
-                if (lapsOfBatteryChargeLeft <= 1)
+                if (lapsOfBatteryChargeLeft < 0)
+                {
+                    // nothing to report (pit stop reset on a separate thread)
+                    haveData = false;
+                }
+                else if (lapsOfBatteryChargeLeft <= 1)
                 {
                     this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/estimate",
                         MessageContents(Battery.folderAboutToRunOut), 0, null));
@@ -558,7 +581,12 @@ namespace CrewChiefV4.Events
             {
                 haveData = true;
                 var minutesOfBatteryChargeLeft = (int)Math.Floor(windowedAverageChargeLeft / this.averageUsagePerMinute);
-                if (minutesOfBatteryChargeLeft <= 1)
+                if (minutesOfBatteryChargeLeft < 0)
+                {
+                    // nothing to report (pit stop reset on a separate thread)
+                    haveData = false;
+                }
+                else if (minutesOfBatteryChargeLeft <= 1)
                 {
                     this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/estimate",
                         MessageContents(Battery.folderAboutToRunOut), 0, null));
