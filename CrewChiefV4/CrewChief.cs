@@ -100,7 +100,6 @@ namespace CrewChiefV4
             eventsList.Add("Penalties", new Penalties(audioPlayer));
             eventsList.Add("PitStops", new PitStops(audioPlayer));
             eventsList.Add("Fuel", new Fuel(audioPlayer));
-            eventsList.Add("Battery", new Battery(audioPlayer));
             eventsList.Add("Opponents", new Opponents(audioPlayer));
             eventsList.Add("RaceTime", new RaceTime(audioPlayer));
             eventsList.Add("TyreMonitor", new TyreMonitor(audioPlayer));
@@ -283,14 +282,7 @@ namespace CrewChiefV4
 
         public void reportFuelStatus()
         {
-            if (GlobalBehaviourSettings.enabledMessageTypes.Contains(MessageTypes.BATTERY))
-            {
-                ((Battery)eventsList["Battery"]).reportBatteryStatus(true);
-            }
-            else
-            {
-                ((Fuel)eventsList["Fuel"]).reportFuelStatus(true);
-            }
+            ((Fuel)eventsList["Fuel"]).reportFuelStatus(true);
         }
 
         public void toggleSpotterMode()
@@ -447,14 +439,7 @@ namespace CrewChiefV4
             getEvent("Position").respond(SpeechRecogniser.STATUS[0]);
             getEvent("PitStops").respond(SpeechRecogniser.STATUS[0]);
             getEvent("DamageReporting").respond(SpeechRecogniser.STATUS[0]);
-            if (GlobalBehaviourSettings.enabledMessageTypes.Contains(MessageTypes.BATTERY))
-            {
-                getEvent("Battery").respond(SpeechRecogniser.CAR_STATUS[0]);
-            }
-            else
-            {
-                getEvent("Fuel").respond(SpeechRecogniser.CAR_STATUS[0]);
-            }
+            getEvent("Fuel").respond(SpeechRecogniser.STATUS[0]);
             getEvent("TyreMonitor").respond(SpeechRecogniser.STATUS[0]);
             getEvent("EngineMonitor").respond(SpeechRecogniser.STATUS[0]);
             getEvent("Timings").respond(SpeechRecogniser.STATUS[0]);
@@ -472,14 +457,7 @@ namespace CrewChiefV4
         public static void getCarStatus()
         {
             getEvent("DamageReporting").respond(SpeechRecogniser.CAR_STATUS[0]);
-            if (GlobalBehaviourSettings.enabledMessageTypes.Contains(MessageTypes.BATTERY))
-            {
-                getEvent("Battery").respond(SpeechRecogniser.CAR_STATUS[0]);
-            }
-            else
-            {
-                getEvent("Fuel").respond(SpeechRecogniser.CAR_STATUS[0]);
-            }
+            getEvent("Fuel").respond(SpeechRecogniser.CAR_STATUS[0]);
             getEvent("TyreMonitor").respond(SpeechRecogniser.CAR_STATUS[0]);
             getEvent("EngineMonitor").respond(SpeechRecogniser.CAR_STATUS[0]);
         }
