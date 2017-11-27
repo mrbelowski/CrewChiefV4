@@ -77,6 +77,9 @@ namespace CrewChiefV4.Events
         private bool playedTwoMinutesRemaining = false;
         private bool playedFiveMinutesRemaining = false;
         private bool playedTenMinutesRemaining = false;
+        private bool playedFourLapsRemaining = false;
+        private bool playedThreeLapsRemaining = false;
+        private bool playedTwoLapsRemaining = false;
         private bool playedBatteryLowWarning = false;
         private bool playedBatteryCriticalWarning = false;
         private bool playedHalfBatteryChargeWarning = false;
@@ -118,6 +121,10 @@ namespace CrewChiefV4.Events
             this.playedTwoMinutesRemaining = false;
             this.playedFiveMinutesRemaining = false;
             this.playedTenMinutesRemaining = false;
+            this.playedFourLapsRemaining = false;
+            this.playedThreeLapsRemaining = false;
+            this.playedTwoLapsRemaining = false;
+
             this.playedHalfBatteryChargeWarning = false;
             this.playedBatteryLowWarning = false;
             this.playedBatteryCriticalWarning = false;
@@ -169,6 +176,9 @@ namespace CrewChiefV4.Events
                     this.playedTwoMinutesRemaining = false;
                     this.playedFiveMinutesRemaining = false;
                     this.playedTenMinutesRemaining = false;
+                    this.playedFourLapsRemaining = false;
+                    this.playedThreeLapsRemaining = false;
+                    this.playedTwoLapsRemaining = false;
                     this.playedBatteryLowWarning = false;
                     this.playedBatteryCriticalWarning = false;
 
@@ -326,18 +336,21 @@ namespace CrewChiefV4.Events
                             else
                                 this.audioPlayer.playMessage(new QueuedMessage(Battery.folderHalfDistanceGoodBattery, 0, this));
                         }
-                        else if (estBattLapsLeft == 4)
+                        else if (estBattLapsLeft == 4 && !this.playedFourLapsRemaining)
                         {
+                            this.playedFourLapsRemaining = true;
                             Console.WriteLine("4 laps of battery charge left, " + battStatusMsg);
                             this.audioPlayer.playMessage(new QueuedMessage(Battery.folderFourLapsEstimate, 0, this));
                         }
-                        else if (estBattLapsLeft == 3)
+                        else if (estBattLapsLeft == 3 && !this.playedThreeLapsRemaining)
                         {
+                            this.playedThreeLapsRemaining = true;
                             Console.WriteLine("3 laps of battery charge left, " + battStatusMsg);
                             this.audioPlayer.playMessage(new QueuedMessage(Battery.folderThreeLapsEstimate, 0, this));
                         }
-                        else if (estBattLapsLeft == 2)
+                        else if (estBattLapsLeft == 2 && !this.playedTwoLapsRemaining)
                         {
+                            this.playedTwoLapsRemaining = true;
                             Console.WriteLine("2 laps of battery charge left, " + battStatusMsg);
                             this.audioPlayer.playMessage(new QueuedMessage(Battery.folderTwoLapsEstimate, 0, this));
                         }
