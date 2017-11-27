@@ -25,7 +25,11 @@ namespace CrewChiefV4.Audio
 
         public override void setBackgroundSound(String backgroundSoundName)
         {
-            if (getBackgroundVolume() > 0 && !muted)
+            if (!initialised)
+            {
+                initialise(backgroundSoundName);
+            }
+            else if (getBackgroundVolume() > 0 && !muted)
             {
                 try
                 {
@@ -33,12 +37,12 @@ namespace CrewChiefV4.Audio
                     {
                         Console.WriteLine("Setting background sounds file to  " + backgroundSoundName);
                         String path = Path.Combine(backgroundFilesPath, backgroundSoundName);
-                        if (!initialised)
+                        if (initialised)
                         {
-                            initialise(backgroundSoundName);
+                            backgroundPlayer.Close();
+                            backgroundPlayer.Volume = 0.0;
+                            backgroundPlayer.Open(new System.Uri(path, System.UriKind.Absolute));
                         }
-                        backgroundPlayer.Volume = 0.0;
-                        backgroundPlayer.Open(new System.Uri(path, System.UriKind.Absolute));
                     }, null);
                 }
                 catch (Exception)
@@ -66,8 +70,9 @@ namespace CrewChiefV4.Audio
 
                         // Start background player muted, as otherwise it causes some noise (sounds like some buffers are flushed).
                         backgroundPlayer.Volume = 0.0;
+                        String path = Path.Combine(backgroundFilesPath, initialBackgroundSound);
+                        backgroundPlayer.Open(new System.Uri(path, System.UriKind.Absolute));
                         initialised = true;
-                        setBackgroundSound(initialBackgroundSound);
                     }
                 }, null);
             }
@@ -129,8 +134,6 @@ namespace CrewChiefV4.Audio
                         backgroundPlayer.Volume = 0.0;
                     }
                     catch (Exception) { }
-                    initialised = false;
-                    backgroundPlayer = null;
                 }, null);
             }
             catch (Exception)

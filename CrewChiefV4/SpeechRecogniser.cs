@@ -129,6 +129,7 @@ namespace CrewChiefV4
         public static String[] PIT_STOP = Configuration.getSpeechRecognitionPhrases("PIT_STOP");
         public static String[] PIT_STOP_ADD = Configuration.getSpeechRecognitionPhrases("PIT_STOP_ADD");
         public static String[] LITERS = Configuration.getSpeechRecognitionPhrases("LITERS");
+        public static String[] GALLONS = Configuration.getSpeechRecognitionPhrases("GALLONS");
         public static String[] PIT_STOP_TEAROFF = Configuration.getSpeechRecognitionPhrases("PIT_STOP_TEAROFF");
         public static String[] PIT_STOP_FAST_REPAIR = Configuration.getSpeechRecognitionPhrases("PIT_STOP_FAST_REPAIR");
         public static String[] PIT_STOP_CLEAR_ALL = Configuration.getSpeechRecognitionPhrases("PIT_STOP_CLEAR_ALL");
@@ -464,6 +465,12 @@ namespace CrewChiefV4
                 validateAndAdd(WHATS_THE_TRACK_TEMP, staticSpeechChoices);
                 validateAndAdd(RADIO_CHECK, staticSpeechChoices);
 
+                validateAndAdd(WHOS_IN_FRONT_IN_THE_RACE, staticSpeechChoices);
+                validateAndAdd(WHOS_BEHIND_IN_THE_RACE, staticSpeechChoices);
+                validateAndAdd(WHOS_IN_FRONT_ON_TRACK, staticSpeechChoices);
+                validateAndAdd(WHOS_BEHIND_ON_TRACK, staticSpeechChoices);
+                validateAndAdd(WHOS_LEADING, staticSpeechChoices);  
+
                 GrammarBuilder staticGrammarBuilder = new GrammarBuilder();
                 staticGrammarBuilder.Culture = cultureInfo;
                 staticGrammarBuilder.Append(staticSpeechChoices);
@@ -601,13 +608,7 @@ namespace CrewChiefV4
             opponentGrammarList.AddRange(addCompoundChoices(new String[] { WHERE_IS, WHERES}, false, opponentNameOrPositionChoices, null, true));
             opponentGrammarList.AddRange(addCompoundChoices(new String[] { WHOS_IN }, false, opponentPositionChoices, null, true));
             opponentGrammarList.AddRange(addCompoundChoices(new String[] { WHAT_TYRE_IS, WHAT_TYRES_IS }, false, opponentNameOrPositionChoices, new String[] { ON }, true));
-            opponentGrammarList.AddRange(addCompoundChoices(new String[] { WHATS }, false, opponentNameOrPositionPossessiveChoices, new String[] { LAST_LAP, BEST_LAP }, true));
-
-            validateAndAdd(WHOS_IN_FRONT_IN_THE_RACE, opponentChoices);
-            validateAndAdd(WHOS_BEHIND_IN_THE_RACE, opponentChoices);
-            validateAndAdd(WHOS_IN_FRONT_ON_TRACK, opponentChoices);
-            validateAndAdd(WHOS_BEHIND_ON_TRACK, opponentChoices);
-            validateAndAdd(WHOS_LEADING, opponentChoices);            
+            opponentGrammarList.AddRange(addCompoundChoices(new String[] { WHATS }, false, opponentNameOrPositionPossessiveChoices, new String[] { LAST_LAP, BEST_LAP }, true));          
 
             driverNamesInUse.AddRange(names);
         }
@@ -651,7 +652,10 @@ namespace CrewChiefV4
                 }
 
                 iracingPitstopGrammarList.AddRange(addCompoundChoices(tyrePressureChangePhrases.ToArray(), true, this.digitsChoices, null, true));
-                iracingPitstopGrammarList.AddRange(addCompoundChoices(PIT_STOP_ADD, false, this.digitsChoices, LITERS, true));
+                List<string> litresAndGallons = new List<string>();
+                litresAndGallons.AddRange(LITERS);
+                litresAndGallons.AddRange(GALLONS);
+                iracingPitstopGrammarList.AddRange(addCompoundChoices(PIT_STOP_ADD, false, this.digitsChoices, litresAndGallons.ToArray(), true));
 
                 Choices iRacingChoices = new Choices();
                 validateAndAdd(PIT_STOP_TEAROFF, iRacingChoices);
@@ -930,7 +934,12 @@ namespace CrewChiefV4
             {
                 return CrewChief.getEvent("ConditionsMonitor");
             }
-            else if (ResultContains(recognisedSpeech, WHAT_TYRES_AM_I_ON))
+            else if (ResultContains(recognisedSpeech, WHAT_TYRES_AM_I_ON) ||
+                ResultContains(recognisedSpeech, WHOS_IN_FRONT_ON_TRACK) ||
+                ResultContains(recognisedSpeech, WHOS_IN_FRONT_IN_THE_RACE) ||
+                ResultContains(recognisedSpeech, WHOS_BEHIND_ON_TRACK) ||
+                ResultContains(recognisedSpeech, WHOS_BEHIND_IN_THE_RACE) ||
+                ResultContains(recognisedSpeech, WHOS_LEADING))
             {
                 return CrewChief.getEvent("Opponents");
             }
