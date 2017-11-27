@@ -30,6 +30,7 @@ namespace CrewChiefV4
         public static String[] HOWS_MY_SUSPENSION = Configuration.getSpeechRecognitionPhrases("HOWS_MY_SUSPENSION");
         public static String[] HOWS_MY_BRAKES = Configuration.getSpeechRecognitionPhrases("HOWS_MY_BRAKES");
         public static String[] HOWS_MY_FUEL = Configuration.getSpeechRecognitionPhrases("HOWS_MY_FUEL");
+        public static String[] HOWS_MY_BATTERY = Configuration.getSpeechRecognitionPhrases("HOWS_MY_BATTERY");
         public static String[] HOWS_MY_PACE = Configuration.getSpeechRecognitionPhrases("HOWS_MY_PACE");
         public static String[] HOW_ARE_MY_TYRE_TEMPS = Configuration.getSpeechRecognitionPhrases("HOW_ARE_MY_TYRE_TEMPS");
         public static String[] WHAT_ARE_MY_TYRE_TEMPS = Configuration.getSpeechRecognitionPhrases("WHAT_ARE_MY_TYRE_TEMPS");
@@ -410,6 +411,7 @@ namespace CrewChiefV4
                 validateAndAdd(HOWS_MY_SUSPENSION, staticSpeechChoices);
                 validateAndAdd(HOWS_MY_BRAKES, staticSpeechChoices);
                 validateAndAdd(HOWS_MY_FUEL, staticSpeechChoices);
+                validateAndAdd(HOWS_MY_BATTERY, staticSpeechChoices);
                 validateAndAdd(HOWS_MY_PACE, staticSpeechChoices);
                 validateAndAdd(HOW_ARE_MY_TYRE_TEMPS, staticSpeechChoices);
                 validateAndAdd(WHAT_ARE_MY_TYRE_TEMPS, staticSpeechChoices);
@@ -874,6 +876,11 @@ namespace CrewChiefV4
                 || ResultContains(recognisedSpeech, CALCULATE_FUEL_FOR))
             {
                 return CrewChief.getEvent("Fuel");
+            }
+            else if (// TODO: other battery queries
+                ResultContains(recognisedSpeech, HOWS_MY_BATTERY))
+            {
+                return CrewChief.getEvent("Battery");
             }
             else if (ResultContains(recognisedSpeech, WHATS_MY_GAP_IN_FRONT) ||
                 ResultContains(recognisedSpeech, WHATS_MY_GAP_BEHIND) ||
