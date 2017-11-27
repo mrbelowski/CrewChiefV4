@@ -37,14 +37,11 @@ namespace CrewChiefV4.Audio
                     {
                         Console.WriteLine("Setting background sounds file to  " + backgroundSoundName);
                         String path = Path.Combine(backgroundFilesPath, backgroundSoundName);
-                        lock (this)
+                        if (initialised)
                         {
-                            if (initialised)
-                            {
-                                backgroundPlayer.Close();
-                                backgroundPlayer.Volume = 0.0;
-                                backgroundPlayer.Open(new System.Uri(path, System.UriKind.Absolute));
-                            }
+                            backgroundPlayer.Close();
+                            backgroundPlayer.Volume = 0.0;
+                            backgroundPlayer.Open(new System.Uri(path, System.UriKind.Absolute));
                         }
                     }, null);
                 }
@@ -66,19 +63,16 @@ namespace CrewChiefV4.Audio
             {
                 this.mainThreadContext.Send(delegate
                 {
-                    lock (this)
+                    if (!initialised && getBackgroundVolume() > 0)
                     {
-                        if (!initialised && getBackgroundVolume() > 0)
-                        {
-                            backgroundPlayer = new MediaPlayer();
-                            backgroundPlayer.MediaEnded += new EventHandler(backgroundPlayer_MediaEnded);
+                        backgroundPlayer = new MediaPlayer();
+                        backgroundPlayer.MediaEnded += new EventHandler(backgroundPlayer_MediaEnded);
 
-                            // Start background player muted, as otherwise it causes some noise (sounds like some buffers are flushed).
-                            backgroundPlayer.Volume = 0.0;
-                            String path = Path.Combine(backgroundFilesPath, initialBackgroundSound);
-                            backgroundPlayer.Open(new System.Uri(path, System.UriKind.Absolute));
-                            initialised = true;
-                        }
+                        // Start background player muted, as otherwise it causes some noise (sounds like some buffers are flushed).
+                        backgroundPlayer.Volume = 0.0;
+                        String path = Path.Combine(backgroundFilesPath, initialBackgroundSound);
+                        backgroundPlayer.Open(new System.Uri(path, System.UriKind.Absolute));
+                        initialised = true;
                     }
                 }, null);
             }
