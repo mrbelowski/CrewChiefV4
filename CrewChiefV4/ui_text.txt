@@ -149,7 +149,6 @@ enable_damage_messages = Enable damage messages
 enable_driver_names = Enable driver names
 enable_drs_messages = Enable DRS messages
 enable_fuel_messages = Enable fuel messages
-enable_battery_messages = Enable battery messages
 enable_gap_messages = Enable gap messages
 enable_green_light_messages = Enable green light messages
 enable_pearls_of_wisdom	= Enable pearls of wisdom

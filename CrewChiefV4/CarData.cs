@@ -65,7 +65,7 @@ namespace CrewChiefV4
             ROAD_SUPERCAR, GROUPC, GROUPA, GROUP4, GROUP5, GROUP6, GTO,
             VINTAGE_INDY_65, VINTAGE_F3_A, VINTAGE_F1_A, VINTAGE_F1_A1, VINTAGE_PROTOTYPE_B, VINTAGE_GT_D, VINTAGE_GT_C, HISTORIC_TOURING_1, HISTORIC_TOURING_2, VINTAGE_F1_B,
             VINTAGE_F1_C, VINTAGE_STOCK_CAR,
-            F1, F2, F3, F4, FF, FORMULA_E, TC1, TC2, TC1_2014, AUDI_TT_CUP, AUDI_TT_VLN, CLIO_CUP, DTM, DTM_2013, V8_SUPERCAR, DTM_2014, DTM_2015, DTM_2016, TRANS_AM, HILL_CLIMB_ICONS, FORMULA_RENAULT,
+            F1, F2, F3, F4, FF, TC1, TC2, TC1_2014, AUDI_TT_CUP, AUDI_TT_VLN, CLIO_CUP, DTM, DTM_2013, V8_SUPERCAR, DTM_2014, DTM_2015, DTM_2016, TRANS_AM, HILL_CLIMB_ICONS, FORMULA_RENAULT,
             MEGANE_TROPHY, NSU_TT, KTM_RR, INDYCAR, HYPER_CAR, HYPER_CAR_RACE, UNKNOWN_RACE, STOCK_V8, BOXER_CUP, NASCAR_2016, ISI_STOCKCAR_2015, RADICAL_SR3, USER_CREATED,
             RS01_TROPHY, TRACKDAY_A, TRACKDAY_B, BMW_235I, CARRERA_CUP, R3E_SILHOUETTE
         }
@@ -237,7 +237,6 @@ namespace CrewChiefV4
             public bool isDRSCapable { get; set; }
             public float DRSRange { get; set; }
             public int pitCrewPreparationTime { get; set; }
-            public bool isBatteryPowered { get; set; }
 
             public String placeholderClassId = "";
 
@@ -273,7 +272,6 @@ namespace CrewChiefV4
                 this.isDRSCapable = false;
                 this.DRSRange = -1.0f;
                 this.pitCrewPreparationTime = 25;
-                this.isBatteryPowered = false;
             }
 
             public String getClassIdentifier()
