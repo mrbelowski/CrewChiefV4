@@ -462,6 +462,12 @@ namespace CrewChiefV4
                 validateAndAdd(WHATS_THE_TRACK_TEMP, staticSpeechChoices);
                 validateAndAdd(RADIO_CHECK, staticSpeechChoices);
 
+                validateAndAdd(WHOS_IN_FRONT_IN_THE_RACE, staticSpeechChoices);
+                validateAndAdd(WHOS_BEHIND_IN_THE_RACE, staticSpeechChoices);
+                validateAndAdd(WHOS_IN_FRONT_ON_TRACK, staticSpeechChoices);
+                validateAndAdd(WHOS_BEHIND_ON_TRACK, staticSpeechChoices);
+                validateAndAdd(WHOS_LEADING, staticSpeechChoices);  
+
                 GrammarBuilder staticGrammarBuilder = new GrammarBuilder();
                 staticGrammarBuilder.Culture = cultureInfo;
                 staticGrammarBuilder.Append(staticSpeechChoices);
@@ -599,13 +605,7 @@ namespace CrewChiefV4
             opponentGrammarList.AddRange(addCompoundChoices(new String[] { WHERE_IS, WHERES}, false, opponentNameOrPositionChoices, null, true));
             opponentGrammarList.AddRange(addCompoundChoices(new String[] { WHOS_IN }, false, opponentPositionChoices, null, true));
             opponentGrammarList.AddRange(addCompoundChoices(new String[] { WHAT_TYRE_IS, WHAT_TYRES_IS }, false, opponentNameOrPositionChoices, new String[] { ON }, true));
-            opponentGrammarList.AddRange(addCompoundChoices(new String[] { WHATS }, false, opponentNameOrPositionPossessiveChoices, new String[] { LAST_LAP, BEST_LAP }, true));
-
-            validateAndAdd(WHOS_IN_FRONT_IN_THE_RACE, opponentChoices);
-            validateAndAdd(WHOS_BEHIND_IN_THE_RACE, opponentChoices);
-            validateAndAdd(WHOS_IN_FRONT_ON_TRACK, opponentChoices);
-            validateAndAdd(WHOS_BEHIND_ON_TRACK, opponentChoices);
-            validateAndAdd(WHOS_LEADING, opponentChoices);            
+            opponentGrammarList.AddRange(addCompoundChoices(new String[] { WHATS }, false, opponentNameOrPositionPossessiveChoices, new String[] { LAST_LAP, BEST_LAP }, true));          
 
             driverNamesInUse.AddRange(names);
         }
