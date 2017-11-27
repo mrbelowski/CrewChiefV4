@@ -422,53 +422,47 @@ namespace CrewChiefV4.Audio
             {
                 return;
             }
-            if (!purging)
+            if (!purging && SoundCache.activeSoundPlayerObjects > maxSoundPlayerCacheSize)
             {
-                if (SoundCache.activeSoundPlayerObjects > maxSoundPlayerCacheSize)
+                purging = true;
+                new Thread(() =>
                 {
-                    purging = true;
-                    new Thread(() =>
+                    Thread.CurrentThread.IsBackground = true;
+                    var watch = System.Diagnostics.Stopwatch.StartNew();
+                    int purgeCount = 0;
+                    LinkedListNode<String> soundToPurge;
+                    lock (SoundCache.dynamicLoadedSounds)
                     {
-                        Thread.CurrentThread.IsBackground = true;
-                        var watch = System.Diagnostics.Stopwatch.StartNew();
-                        int purgeCount = 0;
-                        LinkedListNode<String> soundToPurge;
+                        soundToPurge = SoundCache.dynamicLoadedSounds.First;
+                    }
+                    while (soundToPurge != null && purgeCount <= soundPlayerPurgeBlockSize)
+                    {
+                        String soundToPurgeValue = soundToPurge.Value;
+                        if (soundSets.ContainsKey(soundToPurgeValue))
+                        {
+                            purgeCount += soundSets[soundToPurgeValue].UnLoadAll();
+                        }
+                        else if (singleSounds.ContainsKey(soundToPurgeValue))
+                        {
+                            if (singleSounds[soundToPurgeValue].UnLoad())
+                            {
+                                purgeCount++;
+                            }
+                        }
                         lock (SoundCache.dynamicLoadedSounds)
                         {
-                            soundToPurge = SoundCache.dynamicLoadedSounds.First;
+                            var nextSoundToPurge = soundToPurge.Next;
+                            SoundCache.dynamicLoadedSounds.Remove(soundToPurge);
+                            soundToPurge = nextSoundToPurge;
                         }
-                        while (soundToPurge != null && purgeCount <= soundPlayerPurgeBlockSize)
-                        {
-                            String soundToPurgeValue = soundToPurge.Value;
-                            if (soundSets.ContainsKey(soundToPurgeValue))
-                            {
-                                purgeCount += soundSets[soundToPurgeValue].UnLoadAll();
-                            }
-                            else if (singleSounds.ContainsKey(soundToPurgeValue))
-                            {
-                                if (singleSounds[soundToPurgeValue].UnLoad())
-                                {
-                                    purgeCount++;
-                                }
-                            }
-                            lock (SoundCache.dynamicLoadedSounds)
-                            {
-                                var nextSoundToPurge = soundToPurge.Next;
-                                SoundCache.dynamicLoadedSounds.Remove(soundToPurge);
-                                soundToPurge = nextSoundToPurge;
-                            }
-                        }
-                        watch.Stop();
-                        var elapsedMs = watch.ElapsedMilliseconds;
-                        Console.WriteLine("Purged " + purgeCount + " sounds in " + elapsedMs + "ms, there are now " + SoundCache.activeSoundPlayerObjects + " active SoundPlayer objects");
-                        purging = false;
-                    }).Start();
-                }
-                else
-                {
-                    Console.WriteLine("Skipping purge, there are now there are now " + SoundCache.activeSoundPlayerObjects + " active SoundPlayer objects");
-                }
+                    }
+                    watch.Stop();
+                    var elapsedMs = watch.ElapsedMilliseconds;
+                    Console.WriteLine("Purged " + purgeCount + " sounds in " + elapsedMs + "ms, there are now " + SoundCache.activeSoundPlayerObjects + " active SoundPlayer objects");
+                    purging = false;
+                }).Start();
             }
+            
         }
 
         public void StopAndUnloadAll()
