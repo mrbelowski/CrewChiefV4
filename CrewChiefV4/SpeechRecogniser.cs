@@ -923,7 +923,12 @@ namespace CrewChiefV4
             {
                 return CrewChief.getEvent("ConditionsMonitor");
             }
-            else if (ResultContains(recognisedSpeech, WHAT_TYRES_AM_I_ON))
+            else if (ResultContains(recognisedSpeech, WHAT_TYRES_AM_I_ON) ||
+                ResultContains(recognisedSpeech, WHOS_IN_FRONT_ON_TRACK) ||
+                ResultContains(recognisedSpeech, WHOS_IN_FRONT_IN_THE_RACE) ||
+                ResultContains(recognisedSpeech, WHOS_BEHIND_ON_TRACK) ||
+                ResultContains(recognisedSpeech, WHOS_BEHIND_IN_THE_RACE) ||
+                ResultContains(recognisedSpeech, WHOS_LEADING))
             {
                 return CrewChief.getEvent("Opponents");
             }
