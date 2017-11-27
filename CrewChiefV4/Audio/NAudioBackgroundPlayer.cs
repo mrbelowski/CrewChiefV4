@@ -42,6 +42,7 @@ namespace CrewChiefV4.Audio
                 }
                 if (!initialised || volume != this.volumeWhenCached || this.deviceIdWhenCached != AudioPlayer.naudioBackgroundPlaybackDeviceId)
                 {
+                    initialised = false;
                     initialise(this.defaultBackgroundSound);
                 }
                 int backgroundOffset = Utilities.random.Next(0, (int)backgroundLength.TotalSeconds - backgroundLeadout);
@@ -88,11 +89,14 @@ namespace CrewChiefV4.Audio
 
         public override void initialise(String initialBackgroundSound)
         {
-            lock (this)
+            if (!this.initialised)
             {
-                initReader(initialBackgroundSound);
-                initWaveOut();
-                initialised = true;
+                lock (this)
+                {
+                    initReader(initialBackgroundSound);
+                    initWaveOut();
+                    initialised = true;
+                }
             }
         }
 

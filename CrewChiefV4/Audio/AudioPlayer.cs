@@ -305,6 +305,7 @@ namespace CrewChiefV4.Audio
         public void stopMonitor()
         {
             monitorRunning = false;
+            channelOpen = false;
         }
 
         public float getSoundPackVersion(DirectoryInfo soundDirectory)
