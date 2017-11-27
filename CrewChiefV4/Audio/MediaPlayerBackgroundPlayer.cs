@@ -25,7 +25,11 @@ namespace CrewChiefV4.Audio
 
         public override void setBackgroundSound(String backgroundSoundName)
         {
-            if (getBackgroundVolume() > 0 && !muted)
+            if (!initialised)
+            {
+                initialise(backgroundSoundName);
+            }
+            else if (getBackgroundVolume() > 0 && !muted)
             {
                 try
                 {
@@ -33,12 +37,15 @@ namespace CrewChiefV4.Audio
                     {
                         Console.WriteLine("Setting background sounds file to  " + backgroundSoundName);
                         String path = Path.Combine(backgroundFilesPath, backgroundSoundName);
-                        if (!initialised)
+                        lock (this)
                         {
-                            initialise(backgroundSoundName);
+                            if (initialised)
+                            {
+                                backgroundPlayer.Close();
+                                backgroundPlayer.Volume = 0.0;
+                                backgroundPlayer.Open(new System.Uri(path, System.UriKind.Absolute));
+                            }
                         }
-                        backgroundPlayer.Volume = 0.0;
-                        backgroundPlayer.Open(new System.Uri(path, System.UriKind.Absolute));
                     }, null);
                 }
                 catch (Exception)
@@ -59,15 +66,19 @@ namespace CrewChiefV4.Audio
             {
                 this.mainThreadContext.Send(delegate
                 {
-                    if (!initialised && getBackgroundVolume() > 0)
+                    lock (this)
                     {
-                        backgroundPlayer = new MediaPlayer();
-                        backgroundPlayer.MediaEnded += new EventHandler(backgroundPlayer_MediaEnded);
+                        if (!initialised && getBackgroundVolume() > 0)
+                        {
+                            backgroundPlayer = new MediaPlayer();
+                            backgroundPlayer.MediaEnded += new EventHandler(backgroundPlayer_MediaEnded);
 
-                        // Start background player muted, as otherwise it causes some noise (sounds like some buffers are flushed).
-                        backgroundPlayer.Volume = 0.0;
-                        initialised = true;
-                        setBackgroundSound(initialBackgroundSound);
+                            // Start background player muted, as otherwise it causes some noise (sounds like some buffers are flushed).
+                            backgroundPlayer.Volume = 0.0;
+                            String path = Path.Combine(backgroundFilesPath, initialBackgroundSound);
+                            backgroundPlayer.Open(new System.Uri(path, System.UriKind.Absolute));
+                            initialised = true;
+                        }
                     }
                 }, null);
             }
