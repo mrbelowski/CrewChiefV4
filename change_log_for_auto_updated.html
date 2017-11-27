@@ -1,6 +1,16 @@
 <!DOCTYPE html>
 <html>
 <body>
+<h2>Version 4.8.2.2</h2>
+<ul>
+	<li>Fixed some performance issues when using nAudio playback</li>
+	<li>Added battery tracking for electric vehicles (Forumla E)</li>
+	<li>Added "TTS volume boost (nAudio only)" when using nAudio playback (by default the TTS sounds are now played at 2x volume, which balances them better with the the other sounds; Added "Only use TTS when there is no alternative" option. When set to 'true' (the default) the app will drop messages or use generic terms to refer to opponents when it doesn't have a driver name recording. It will use TTS for driver names only if the message is considered essential (when e.g. responding to "who's in front?" voice command).  The recommended TTS configuration is now to enable TTS, set "Only use TTS when there is no alternative" to true and set "TTS volume boost (nAudio only)" to 2 (if using nAudio playback) - see 'Help and getting started' for more information</li>
+	<li>Allow iracing tyre pressure adjustment voice commands to be made in PSI (when property "iRacing tyre pressure adjustments in PSI" is true the app assumes you mean PSI)</li>
+	<li>Fixed broken voice recognition for "who's ahead", "who's behind" and "who's leading" commands</li>
+	<li>Added Ross spotter to latest sound pack</li>
+	<li>Allow iRacing fuel to be added in gallons</li>
+</ul>
 <h2>Version 4.8.2.1</h2>
 <ul>
 	<li>Work-around for R3E missing sector number updates when cars exit to pits (should fix a lot of inaccurate calls in practice and qualifying)</li>
