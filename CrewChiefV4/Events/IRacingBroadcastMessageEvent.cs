@@ -10,7 +10,6 @@ using iRSDKSharp;
 
 namespace CrewChiefV4.Events
 {
-
     enum PressureUnit
     {
         PSI, KPA
@@ -19,6 +18,7 @@ namespace CrewChiefV4.Events
     class IRacingBroadcastMessageEvent : AbstractEvent
     {
         private static float kpaPerPsi = 6.89476f;
+        private static float litresPerGallon = 4.54609f;
         private PressureUnit pressureUnit = UserSettings.GetUserSettings().getBoolean("iracing_pit_tyre_pressure_in_psi") ?
             PressureUnit.PSI : PressureUnit.KPA;
 
@@ -74,6 +74,12 @@ namespace CrewChiefV4.Events
                 if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.LITERS))
                 {
                     AddFuel(amount);
+                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
+                    return;
+                }
+                else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.GALLONS))
+                {
+                    AddFuel(convertGallonsToLitres(amount));
                     audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
                     return;
                 }
@@ -294,6 +300,11 @@ namespace CrewChiefV4.Events
         private int convertPSItoKPA(int psi)
         {
             return (int)Math.Round(psi * kpaPerPsi);
+        }
+
+        private int convertGallonsToLitres(int gallons)
+        {
+            return (int)Math.Round(gallons * litresPerGallon);
         }
     }
 }

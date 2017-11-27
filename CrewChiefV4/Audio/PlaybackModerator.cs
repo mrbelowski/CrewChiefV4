@@ -179,7 +179,8 @@ namespace CrewChiefV4.Audio
             var isSpotterSound = sound.isSpotter;  // Alternatively, we could assign a role to each queued sound.  We'll need this if we get more "personas" than Chief and Spotter.
             if (((!PlaybackModerator.lastSoundWasSpotter && isSpotterSound)  // If we are flipping from the Chief to Spotter
                 || (PlaybackModerator.lastSoundWasSpotter && !isSpotterSound))  // Or from the Spotter to Chief
-                && PlaybackModerator.audioPlayer.isChannelOpen())  // And, channel is still open
+                && PlaybackModerator.audioPlayer.isChannelOpen()  // And, channel is still open
+                && !PlaybackModerator.lastSoundPreProcessed.isBleep)    // and the last sound wasn't also a beep (to stop the spotter kicking off with a double-beep)
             {
                 // Ok, so idea here is that Chief and Spotter have different bleeps.  So we use opposing sets.
                 string keyBleepOut = null;
