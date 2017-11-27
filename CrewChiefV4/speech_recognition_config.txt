@@ -213,6 +213,7 @@ PIT_STOP_CHANGE_REAR_LEFT_TYRE_PRESSURE = pitstop change left rear tyre pressure
 PIT_STOP_CHANGE_REAR_RIGHT_TYRE_PRESSURE = pitstop change right rear tyre pressure
 
 LITERS = liters
+GALLONS = gallons
 
 #################################################
 # numbers - these are the text strings the voice recogniser will listen for (it's not good at listening for numeric characters)

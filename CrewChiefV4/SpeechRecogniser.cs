@@ -128,6 +128,7 @@ namespace CrewChiefV4
         public static String[] PIT_STOP = Configuration.getSpeechRecognitionPhrases("PIT_STOP");
         public static String[] PIT_STOP_ADD = Configuration.getSpeechRecognitionPhrases("PIT_STOP_ADD");
         public static String[] LITERS = Configuration.getSpeechRecognitionPhrases("LITERS");
+        public static String[] GALLONS = Configuration.getSpeechRecognitionPhrases("GALLONS");
         public static String[] PIT_STOP_TEAROFF = Configuration.getSpeechRecognitionPhrases("PIT_STOP_TEAROFF");
         public static String[] PIT_STOP_FAST_REPAIR = Configuration.getSpeechRecognitionPhrases("PIT_STOP_FAST_REPAIR");
         public static String[] PIT_STOP_CLEAR_ALL = Configuration.getSpeechRecognitionPhrases("PIT_STOP_CLEAR_ALL");
@@ -649,7 +650,10 @@ namespace CrewChiefV4
                 }
 
                 iracingPitstopGrammarList.AddRange(addCompoundChoices(tyrePressureChangePhrases.ToArray(), true, this.digitsChoices, null, true));
-                iracingPitstopGrammarList.AddRange(addCompoundChoices(PIT_STOP_ADD, false, this.digitsChoices, LITERS, true));
+                List<string> litresAndGallons = new List<string>();
+                litresAndGallons.AddRange(LITERS);
+                litresAndGallons.AddRange(GALLONS);
+                iracingPitstopGrammarList.AddRange(addCompoundChoices(PIT_STOP_ADD, false, this.digitsChoices, litresAndGallons.ToArray(), true));
 
                 Choices iRacingChoices = new Choices();
                 validateAndAdd(PIT_STOP_TEAROFF, iRacingChoices);
