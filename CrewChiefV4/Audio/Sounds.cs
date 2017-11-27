@@ -530,6 +530,7 @@ namespace CrewChiefV4.Audio
                     if (bleepFile.Name.StartsWith(alternate_prefix + "start") && !singleSounds.ContainsKey("start_bleep"))
                     {
                         SingleSound sound = new SingleSound(bleepFile.FullName, true, allowCaching, allowCaching);
+                        sound.isBleep = true;
                         if (eagerLoadSoundFiles)
                         {
                             sound.LoadAndCacheFile();
@@ -538,13 +539,13 @@ namespace CrewChiefV4.Audio
                         {
                             sound.LoadAndCacheSound();
                         }
-                        sound.isBleep = true;
                         singleSounds.Add("start_bleep", sound);
                         availableSounds.Add("start_bleep");
                     }
                     else if (bleepFile.Name.StartsWith(alternate_prefix + "end") && !singleSounds.ContainsKey("end_bleep"))
                     {
                         SingleSound sound = new SingleSound(bleepFile.FullName, true, allowCaching, allowCaching);
+                        sound.isBleep = true;
                         if (eagerLoadSoundFiles)
                         {
                             sound.LoadAndCacheFile();
@@ -553,13 +554,13 @@ namespace CrewChiefV4.Audio
                         {
                             sound.LoadAndCacheSound();
                         }
-                        sound.isBleep = true;
                         singleSounds.Add("end_bleep", sound);
                         availableSounds.Add("end_bleep");
                     }
                     else if (bleepFile.Name.StartsWith(alternate_prefix + "short_start") && !singleSounds.ContainsKey("short_start_bleep"))
                     {
                         SingleSound sound = new SingleSound(bleepFile.FullName, true, allowCaching, allowCaching);
+                        sound.isBleep = true;
                         if (eagerLoadSoundFiles)
                         {
                             sound.LoadAndCacheFile();
@@ -568,13 +569,13 @@ namespace CrewChiefV4.Audio
                         {
                             sound.LoadAndCacheSound();
                         }
-                        sound.isBleep = true;
                         singleSounds.Add("short_start_bleep", sound);
                         availableSounds.Add("short_start_bleep");
                     }
                     else if (bleepFile.Name.StartsWith("listen_start") && !singleSounds.ContainsKey("listen_start_sound"))
                     {
                         SingleSound sound = new SingleSound(bleepFile.FullName, true, allowCaching, allowCaching);
+                        sound.isBleep = true;
                         if (eagerLoadSoundFiles)
                         {
                             sound.LoadAndCacheFile();
@@ -583,13 +584,13 @@ namespace CrewChiefV4.Audio
                         {
                             sound.LoadAndCacheSound();
                         }
-                        sound.isBleep = true;
                         singleSounds.Add("listen_start_sound", sound);
                         availableSounds.Add("listen_start_sound");
                     }
                     else if (bleepFile.Name.StartsWith(opposite_prefix + "start") && !singleSounds.ContainsKey("alternate_start_bleep"))
                     {
                         SingleSound sound = new SingleSound(bleepFile.FullName, true, allowCaching, allowCaching);
+                        sound.isBleep = true;
                         if (eagerLoadSoundFiles)
                         {
                             sound.LoadAndCacheFile();
@@ -598,13 +599,13 @@ namespace CrewChiefV4.Audio
                         {
                             sound.LoadAndCacheSound();
                         }
-                        sound.isBleep = true;
                         singleSounds.Add("alternate_start_bleep", sound);
                         availableSounds.Add("alternate_start_bleep");
                     }
                     else if (bleepFile.Name.StartsWith(opposite_prefix + "end") && !singleSounds.ContainsKey("alternate_end_bleep"))
                     {
                         SingleSound sound = new SingleSound(bleepFile.FullName, true, allowCaching, allowCaching);
+                        sound.isBleep = true;
                         if (eagerLoadSoundFiles)
                         {
                             sound.LoadAndCacheFile();
@@ -613,13 +614,13 @@ namespace CrewChiefV4.Audio
                         {
                             sound.LoadAndCacheSound();
                         }
-                        sound.isBleep = true;
                         singleSounds.Add("alternate_end_bleep", sound);
                         availableSounds.Add("alternate_end_bleep");
                     }
                     else if (bleepFile.Name.StartsWith(opposite_prefix + "short_start") && !singleSounds.ContainsKey("alternate_short_start_bleep"))
                     {
                         SingleSound sound = new SingleSound(bleepFile.FullName, true, allowCaching, allowCaching);
+                        sound.isBleep = true;
                         if (eagerLoadSoundFiles)
                         {
                             sound.LoadAndCacheFile();
@@ -628,7 +629,6 @@ namespace CrewChiefV4.Audio
                         {
                             sound.LoadAndCacheSound();
                         }
-                        sound.isBleep = true;
                         singleSounds.Add("alternate_short_start_bleep", sound);
                         availableSounds.Add("alternate_short_start_bleep");
                     }
@@ -1016,6 +1016,7 @@ namespace CrewChiefV4.Audio
         public SoundSet suffixSoundSet = null;
 
         private NAudio.Wave.WaveOut waveOut;
+        private NAudio.Wave.WaveFileReader reader;
 
         AutoResetEvent playWaitHandle = new AutoResetEvent(false);
 
@@ -1085,8 +1086,13 @@ namespace CrewChiefV4.Audio
                 {
                     LoadAndCacheFile();
                 }
-                // nAudio players aren't cache
-                if (!AudioPlayer.playWithNAudio && !loadedSoundPlayer)
+                // only beeps are cached when using nAudio
+                if (AudioPlayer.playWithNAudio && isBleep)
+                {
+                    LoadNAudioWaveOut();
+                    loadedSoundPlayer = true;
+                }
+                else if (!AudioPlayer.playWithNAudio && !loadedSoundPlayer)
                 {
                     // if we have file bytes, load them
                     if (this.fileBytes != null)
@@ -1205,44 +1211,31 @@ namespace CrewChiefV4.Audio
                         {
                             LoadAndCacheFile();
                         }
-                        this.waveOut = new NAudio.Wave.WaveOut();
-                        this.waveOut.DeviceNumber = AudioPlayer.naudioMessagesPlaybackDeviceId;
-                        // if we have file bytes, load them
-                        if (this.fileBytes != null)
+                        // beeps are forceably cached:
+                        if (isBleep && loadedSoundPlayer)
                         {
-                            this.memoryStream = new MemoryStream(this.fileBytes);
-                        }
-                        // if we have the TTS memory stream, use it
-                        else if (this.memoryStream != null)
-                        {
-                            Console.WriteLine("Loading TTS sound for " + ttsString);
+                            this.reader.CurrentTime = TimeSpan.Zero;
+                            this.waveOut.Play();
+                            this.playWaitHandle.WaitOne(30000);
                         }
                         else
                         {
-                            Console.WriteLine("No sound data available");
-                            return;
+                            LoadNAudioWaveOut();
+                            this.waveOut.Play();
+                            this.playWaitHandle.WaitOne(30000);
+                            try
+                            {
+                                this.reader.Dispose();
+                            }
+                            catch (Exception)
+                            { }
+                            try
+                            {
+                                this.waveOut.Stop();
+                                this.waveOut.Dispose();
+                            }
+                            catch (Exception) { }
                         }
-                        NAudio.Wave.WaveFileReader reader = new NAudio.Wave.WaveFileReader(this.memoryStream);
-                        this.waveOut.PlaybackStopped += new EventHandler<NAudio.Wave.StoppedEventArgs>(playbackStopped);
-                        NAudio.Wave.SampleProviders.SampleChannel sampleChannel = new NAudio.Wave.SampleProviders.SampleChannel(reader);
-                        sampleChannel.Volume = getVolume();
-                        this.waveOut.Init(new NAudio.Wave.SampleProviders.SampleToWaveProvider(sampleChannel));
-
-                        reader.CurrentTime = TimeSpan.Zero;
-                        this.waveOut.Play();
-                        this.playWaitHandle.WaitOne(30000);
-                        try
-                        {
-                            reader.Dispose();
-                        }
-                        catch (Exception)
-                        { }
-                        try
-                        {
-                            this.waveOut.Stop();
-                            this.waveOut.Dispose();
-                        }
-                        catch (Exception) { }                        
                     }
                     catch (Exception e)
                     {
@@ -1250,6 +1243,33 @@ namespace CrewChiefV4.Audio
                     }
                 }
             }
+        }
+
+        private void LoadNAudioWaveOut()
+        {
+            this.waveOut = new NAudio.Wave.WaveOut();
+            this.waveOut.DeviceNumber = AudioPlayer.naudioMessagesPlaybackDeviceId;
+            // if we have file bytes, load them
+            if (this.fileBytes != null)
+            {
+                this.memoryStream = new MemoryStream(this.fileBytes);
+            }
+            // if we have the TTS memory stream, use it
+            else if (this.memoryStream != null)
+            {
+                Console.WriteLine("Loading TTS sound for " + ttsString);
+            }
+            else
+            {
+                Console.WriteLine("No sound data available");
+                return;
+            }
+            this.reader = new NAudio.Wave.WaveFileReader(this.memoryStream);
+            this.waveOut.PlaybackStopped += new EventHandler<NAudio.Wave.StoppedEventArgs>(playbackStopped);
+            NAudio.Wave.SampleProviders.SampleChannel sampleChannel = new NAudio.Wave.SampleProviders.SampleChannel(this.reader);
+            sampleChannel.Volume = getVolume();
+            this.waveOut.Init(new NAudio.Wave.SampleProviders.SampleToWaveProvider(sampleChannel));
+            this.reader.CurrentTime = TimeSpan.Zero;
         }
 
         private void playbackStopped(object sender, NAudio.Wave.StoppedEventArgs e)
