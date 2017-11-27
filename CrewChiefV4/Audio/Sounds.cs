@@ -1102,6 +1102,7 @@ namespace CrewChiefV4.Audio
                     // if we have the TTS memory stream, use it
                     else if (this.memoryStream != null && ttsString != null)
                     {
+                        this.memoryStream.Position = 0;
                         Console.WriteLine("Loading TTS sound for " + ttsString);
                     }
                     else
@@ -1258,6 +1259,7 @@ namespace CrewChiefV4.Audio
             else if (this.memoryStream != null)
             {
                 Console.WriteLine("Loading TTS sound for " + ttsString);
+                this.memoryStream.Position = 0;
             }
             else
             {
