@@ -111,6 +111,11 @@ namespace CrewChiefV4.Events
             audioPlayer.playMessage(new QueuedMessage(ConditionsMonitor.folderRainLightDecreasing, 0, this));
             audioPlayer.playMessage(new QueuedMessage(ConditionsMonitor.folderDrizzleDecreasing, 0, this));*/
 
+            OpponentData o = new OpponentData();
+            o.DriverRawName = "nog";
+
+            audioPlayer.playMessage(new QueuedMessage("name test", MessageContents(Opponents.folderNewFastestLapFor, o, TimeSpan.FromSeconds(91.2)), 0, this));
+
             audioPlayer.playMessage(new QueuedMessage(SMOKE_TEST, MessageContents(folderTest), 0, this));
             if (NoisyCartesianCoordinateSpotter.folderSpotterRadioCheck != null)
             {
