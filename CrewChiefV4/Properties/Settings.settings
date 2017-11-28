@@ -704,14 +704,20 @@
     <Setting Name="ADD_TRACK_LANDMARK_device_type" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="tts_naudio_volume_boost" Type="System.Single" Scope="User">
-      <Value Profile="(Default)">1.5</Value>
+    <Setting Name="tts_volume_boost" Type="System.Single" Scope="User">
+      <Value Profile="(Default)">2</Value>
     </Setting>
     <Setting Name="use_tts_only_when_necessary" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="iracing_pit_tyre_pressure_in_psi" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="tts_trim_end_milliseconds" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">600</Value>
+    </Setting>
+    <Setting Name="tts_trim_start_milliseconds" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">100</Value>
     </Setting>
   </Settings>
 </SettingsFile>

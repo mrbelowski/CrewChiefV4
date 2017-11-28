@@ -2833,13 +2833,13 @@ namespace CrewChiefV4.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1.5")]
-        public float tts_naudio_volume_boost {
+        [global::System.Configuration.DefaultSettingValueAttribute("2")]
+        public float tts_volume_boost {
             get {
-                return ((float)(this["tts_naudio_volume_boost"]));
+                return ((float)(this["tts_volume_boost"]));
             }
             set {
-                this["tts_naudio_volume_boost"] = value;
+                this["tts_volume_boost"] = value;
             }
         }
         
@@ -2864,6 +2864,30 @@ namespace CrewChiefV4.Properties {
             }
             set {
                 this["iracing_pit_tyre_pressure_in_psi"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("600")]
+        public int tts_trim_end_milliseconds {
+            get {
+                return ((int)(this["tts_trim_end_milliseconds"]));
+            }
+            set {
+                this["tts_trim_end_milliseconds"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("100")]
+        public int tts_trim_start_milliseconds {
+            get {
+                return ((int)(this["tts_trim_start_milliseconds"]));
+            }
+            set {
+                this["tts_trim_start_milliseconds"] = value;
             }
         }
     }
