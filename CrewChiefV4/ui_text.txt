@@ -498,8 +498,12 @@ use_naudio_help = nAudio playback library allows playback device selection and h
 toggle_track_landmarks_recording = Start / stop track landmarks recording
 add_track_landmark = Add Start / end track landmark
 
-tts_naudio_volume_boost = TTS volume boost (nAudio only)
-tts_naudio_volume_boost_help = Increase text-to-speech volume by this amount (up to the allowed maximum)
+tts_volume_boost = TTS volume boost
+tts_volume_boost_help = Increase text-to-speech volume by this amount (up to the allowed maximum)
+tts_trim_start_milliseconds = Trim start of TTS sounds (milliseconds)
+tts_trim_end_milliseconds = Trim end of TTS sounds (milliseconds)
+tts_trim_start_milliseconds_help = Trim this many milliseconds off the start of TTS sounds to remove pauses before they play
+tts_trim_end_milliseconds_help = Trim this many milliseconds off the end of TTS sounds to remove pauses after they play
 
 use_tts_only_when_necessary = Only use TTS when there is no alternative
 use_tts_only_when_necessary_help = Prefer generic terms for opponents or skip optional messages instead of using TTS names
