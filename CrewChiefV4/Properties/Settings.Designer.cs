@@ -2830,7 +2830,19 @@ namespace CrewChiefV4.Properties {
                 this["ADD_TRACK_LANDMARK_device_type"] = value;
             }
         }
-        
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool enable_battery_messages {
+            get {
+                return ((bool)(this["enable_battery_messages"]));
+            }
+            set {
+                this["enable_battery_messages"] = value;
+            }
+        }
+
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("2")]
@@ -2842,7 +2854,7 @@ namespace CrewChiefV4.Properties {
                 this["tts_volume_boost"] = value;
             }
         }
-        
+
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True")]

@@ -136,6 +136,16 @@ namespace CrewChiefV4.GameState
         public Boolean FuelUseActive = false;
     }
 
+    public class BatteryData
+    {
+        // Current battery charge level
+        // Unit: % of full charge (100%)
+        public Single BatteryPercentageLeft = 0;
+
+        public Boolean BatteryUseActive = false;
+    }
+
+
     public class CarDamageData
     {
         public Boolean DamageEnabled = false;
@@ -1527,6 +1537,8 @@ namespace CrewChiefV4.GameState
 
         public Boolean IsRefuellingAllowed = false;
 
+        public Boolean IsElectricVehicleSwapAllowed = false;
+
         public Boolean HasRequestedPitStop = false;
 
         public Boolean LeaderIsPitting = false;
@@ -1884,6 +1896,8 @@ namespace CrewChiefV4.GameState
         public TransmissionData TransmissionData = new TransmissionData();
 
         public FuelData FuelData = new FuelData();
+
+        public BatteryData BatteryData = new BatteryData();
 
         public CarDamageData CarDamageData = new CarDamageData();
 
