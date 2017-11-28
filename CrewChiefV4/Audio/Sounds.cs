@@ -17,7 +17,9 @@ namespace CrewChiefV4.Audio
         public static Boolean useTTS = UserSettings.GetUserSettings().getBoolean("use_tts_for_missing_names");
         private double minSecondsBetweenPersonalisedMessages = (double)UserSettings.GetUserSettings().getInt("min_time_between_personalised_messages");
         public static Boolean eagerLoadSoundFiles = UserSettings.GetUserSettings().getBoolean("load_sound_files_on_startup");
-        public static float ttsNaudioVolumeBoost = UserSettings.GetUserSettings().getFloat("tts_naudio_volume_boost");
+        public static float ttsVolumeBoost = UserSettings.GetUserSettings().getFloat("tts_volume_boost");
+        public static int ttsTrimStartMilliseconds = UserSettings.GetUserSettings().getInt("tts_trim_start_milliseconds");
+        public static int ttsTrimEndMilliseconds = UserSettings.GetUserSettings().getInt("tts_trim_end_milliseconds");
                
         private static LinkedList<String> dynamicLoadedSounds = new LinkedList<String>();
         public static Dictionary<String, SoundSet> soundSets = new Dictionary<String, SoundSet>();
@@ -1002,7 +1004,7 @@ namespace CrewChiefV4.Audio
         public Boolean isBleep = false;
         public int pauseLength = 0;
         public String fullPath;
-        private byte[] fileBytes;
+        private byte[] fileBytes = null;
         private MemoryStream memoryStream;
         private SoundPlayer soundPlayer;
 
@@ -1053,10 +1055,20 @@ namespace CrewChiefV4.Audio
                     {
                         if (ttsString != null)
                         {
-                            this.memoryStream = new MemoryStream();
-                            SoundCache.synthesizer.SetOutputToWaveStream(this.memoryStream);
+                            MemoryStream rawStream = new MemoryStream();
+                            SoundCache.synthesizer.SetOutputToWaveStream(rawStream);
                             SoundCache.synthesizer.Speak(ttsString);
-                            this.memoryStream.Position = 0;
+                            rawStream.Position = 0;
+                            try
+                            {
+                                this.fileBytes = ConvertTTSWaveStreamToBytes(rawStream, SoundCache.ttsTrimStartMilliseconds, SoundCache.ttsTrimEndMilliseconds);
+                            }
+                            catch (Exception e)
+                            {
+                                // unable to trim and convert the tts stream, so save the raw stream and use that instead
+                                Console.WriteLine("Failed to pre-process TTS audio data: " + e.StackTrace);
+                                this.memoryStream = rawStream;
+                            }
                             SoundCache.synthesizer.SetOutputToNull();
                         }
                         else
@@ -1102,6 +1114,7 @@ namespace CrewChiefV4.Audio
                     // if we have the TTS memory stream, use it
                     else if (this.memoryStream != null && ttsString != null)
                     {
+                        this.memoryStream.Position = 0;
                         Console.WriteLine("Loading TTS sound for " + ttsString);
                     }
                     else
@@ -1176,7 +1189,7 @@ namespace CrewChiefV4.Audio
                 NAudio.Wave.WaveFileReader uncachedReader = new NAudio.Wave.WaveFileReader(fullPath);
                 uncachedWaveOut.PlaybackStopped += new EventHandler<NAudio.Wave.StoppedEventArgs>(playbackStopped);
                 NAudio.Wave.SampleProviders.SampleChannel sampleChannel = new NAudio.Wave.SampleProviders.SampleChannel(uncachedReader);
-                sampleChannel.Volume = getVolume();
+                sampleChannel.Volume = getVolume(1f);
 
                 try
                 {
@@ -1223,6 +1236,16 @@ namespace CrewChiefV4.Audio
                             LoadNAudioWaveOut();
                             this.waveOut.Play();
                             this.playWaitHandle.WaitOne(30000);
+                            // if we loaded this from the raw file bytes, we can close the associated stream after playing
+                            if (this.fileBytes != null)
+                            {
+                                try
+                                {
+                                    this.memoryStream.Dispose();
+                                }
+                                catch (Exception)
+                                { }
+                            }
                             try
                             {
                                 this.reader.Dispose();
@@ -1249,15 +1272,18 @@ namespace CrewChiefV4.Audio
         {
             this.waveOut = new NAudio.Wave.WaveOut();
             this.waveOut.DeviceNumber = AudioPlayer.naudioMessagesPlaybackDeviceId;
+            // used when we're loading a TTS sound that's not been pre-processed. Should never need this, unless the preprocessing has failed
+            float volumeBoost = 1f;
             // if we have file bytes, load them
             if (this.fileBytes != null)
             {
                 this.memoryStream = new MemoryStream(this.fileBytes);
             }
             // if we have the TTS memory stream, use it
-            else if (this.memoryStream != null)
+            else if (this.memoryStream != null && this.ttsString != null)
             {
-                Console.WriteLine("Loading TTS sound for " + ttsString);
+                volumeBoost = SoundCache.ttsVolumeBoost;
+                this.memoryStream.Position = 0;
             }
             else
             {
@@ -1267,7 +1293,7 @@ namespace CrewChiefV4.Audio
             this.reader = new NAudio.Wave.WaveFileReader(this.memoryStream);
             this.waveOut.PlaybackStopped += new EventHandler<NAudio.Wave.StoppedEventArgs>(playbackStopped);
             NAudio.Wave.SampleProviders.SampleChannel sampleChannel = new NAudio.Wave.SampleProviders.SampleChannel(this.reader);
-            sampleChannel.Volume = getVolume();
+            sampleChannel.Volume = getVolume(volumeBoost);
             this.waveOut.Init(new NAudio.Wave.SampleProviders.SampleToWaveProvider(sampleChannel));
             this.reader.CurrentTime = TimeSpan.Zero;
         }
@@ -1277,13 +1303,9 @@ namespace CrewChiefV4.Audio
             this.playWaitHandle.Set();
         }
 
-        private float getVolume()
+        private float getVolume(float boost)
         {
-            float volume = UserSettings.GetUserSettings().getFloat("messages_volume");
-            if (ttsString != null)
-            {
-                volume = volume * SoundCache.ttsNaudioVolumeBoost;
-            }
+            float volume = UserSettings.GetUserSettings().getFloat("messages_volume") * boost;
             // volume can be higher than 1, it seems. Not sure if this is device dependent
             /*if (volume > 1)
             {
@@ -1350,6 +1372,87 @@ namespace CrewChiefV4.Audio
             {
                 this.soundPlayer.Stop();
             }
+        }
+
+        private byte[] ConvertTTSWaveStreamToBytes(MemoryStream inputStream, int startMillisecondsToTrim, int endMillisecondsToTrim)
+        {
+            NAudio.Wave.WaveFileReader reader = new NAudio.Wave.WaveFileReader(inputStream);
+            // can only do volume stuff if it's a 16 bit wav stream (which it should be)
+            Boolean canProcessVolume = reader.WaveFormat.BitsPerSample == 16;
+
+            // work out how many bytes to trim off the start and end
+            int totalMilliseconds = (int)reader.TotalTime.TotalMilliseconds;
+
+            // don't trim the start if the resulting sound file would be < 1 second long - some issue prevents nAudio loading the byte array
+            // if the start is trimmed and the sound is very short
+            if (totalMilliseconds - startMillisecondsToTrim - endMillisecondsToTrim < 1000)
+            {
+                startMillisecondsToTrim = 0;
+            }
+            double bytesPerMillisecond = (double)reader.WaveFormat.AverageBytesPerSecond / 1000d;
+            int startPos = (int)(startMillisecondsToTrim * bytesPerMillisecond);
+            startPos = startPos - startPos % reader.WaveFormat.BlockAlign;
+
+            int endBytesToTrim = (int)(endMillisecondsToTrim * bytesPerMillisecond);
+            endBytesToTrim = endBytesToTrim - endBytesToTrim % reader.WaveFormat.BlockAlign;
+            int endPos = (int)reader.Length - endBytesToTrim;
+
+            if (startPos > endPos)
+            {
+                startPos = 0;
+            }
+
+            byte[] buffer = new byte[reader.BlockAlign * 100];
+            MemoryStream outputStream = new MemoryStream();
+
+            // process the wave file header
+            int headerLength = (int) (inputStream.Length - reader.Length);  // PCM wave file header size should be 46 bytes, the last 4 bytes are the sample count
+            byte[] header = new byte[headerLength];
+            outputStream.SetLength((endPos - startPos) + headerLength);
+            inputStream.Position = 0;
+            inputStream.Read(header, 0, headerLength);
+            uint dataSize = BitConverter.ToUInt32(header, headerLength - 4);
+            dataSize = dataSize - ((uint)endBytesToTrim + (uint)startPos);
+            byte[] newSize = BitConverter.GetBytes(dataSize);
+            header[headerLength - 4] = newSize[0];
+            header[headerLength - 3] = newSize[1];
+            header[headerLength - 2] = newSize[2];
+            header[headerLength - 1] = newSize[3];
+            outputStream.Write(header, 0, headerLength);
+            reader.Position = startPos;
+            while (reader.Position < endPos)
+            {
+                int bytesRequired = (int)(endPos - reader.Position);
+                if (bytesRequired > 0)
+                {
+                    int bytesToRead = Math.Min(bytesRequired, buffer.Length);
+                    int bytesRead = reader.Read(buffer, 0, bytesToRead);
+
+                    if (canProcessVolume)
+                    { 
+                        for (int i = 0; i < buffer.Length; i+=2)
+                        {
+                            Int16 sample = BitConverter.ToInt16(buffer, i);
+                            if (sample > 0)
+                            {
+                                sample = (short)Math.Min(short.MaxValue, sample * SoundCache.ttsVolumeBoost);
+                            }
+                            else
+                            {
+                                sample = (short)Math.Max(short.MinValue, sample * SoundCache.ttsVolumeBoost);
+                            }
+                            byte[] bytes = BitConverter.GetBytes(sample);
+                            buffer[i] = bytes[0];
+                            buffer[i+1] = bytes[1];
+                        }
+                    }
+                    if (bytesRead > 0)
+                    {
+                        outputStream.Write(buffer, 0, bytesRead);
+                    }
+                }
+            }
+            return outputStream.ToArray();
         }
     }
 }
