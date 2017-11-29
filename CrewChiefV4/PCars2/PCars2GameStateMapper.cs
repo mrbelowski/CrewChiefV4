@@ -947,8 +947,8 @@ namespace CrewChiefV4.PCars2
                 // estimate the pit window close lap / time
                 if (currentGameState.SessionData.SessionHasFixedTime)
                 {
-                    currentGameState.PitData.PitWindowEnd = (int)((currentGameState.SessionData.SessionTotalRunTime - 120f) / 60f);
-                    // TODO: fixme, there's no pit schedule data in shared memory because that would be too 'working'.
+                    currentGameState.PitData.PitWindowEnd = (int)((currentGameState.SessionData.SessionTotalRunTime - 60f) / 60f);
+
                     currentGameState.PitData.PitWindow = currentGameState.SessionData.SessionRunningTime >= currentGameState.PitData.PitWindowStart &&
                         currentGameState.SessionData.SessionRunningTime <= currentGameState.PitData.PitWindowEnd ?
                             currentGameState.PitData.PitWindow = PitWindow.Open : currentGameState.PitData.PitWindow = PitWindow.Closed;
@@ -956,13 +956,13 @@ namespace CrewChiefV4.PCars2
                 else
                 {
                     currentGameState.PitData.PitWindowEnd = currentGameState.SessionData.SessionNumberOfLaps - 1;
-                    // TODO: fixme, there's no pit schedule data in shared memory because that would be too 'working'.
+
                     currentGameState.PitData.PitWindow = currentGameState.SessionData.CompletedLaps >= currentGameState.PitData.PitWindowStart &&
                         currentGameState.SessionData.CompletedLaps <= currentGameState.PitData.PitWindowEnd ?
                             currentGameState.PitData.PitWindow = PitWindow.Open : currentGameState.PitData.PitWindow = PitWindow.Closed;
                 }
-                currentGameState.PitData.IsMakingMandatoryPitStop = (currentGameState.PitData.PitWindow == PitWindow.Open || currentGameState.PitData.PitWindow == PitWindow.StopInProgress) &&
-                                                                    (currentGameState.PitData.OnInLap || currentGameState.PitData.OnOutLap);
+                // can we trust the PIT_SCHEDULE_MANDATORY enum here?
+                currentGameState.PitData.IsMakingMandatoryPitStop = shared.mPitSchedule == (uint)ePitSchedule.PIT_SCHEDULE_MANDATORY;
                 if (previousGameState != null)
                 {
                     currentGameState.PitData.MandatoryPitStopCompleted = previousGameState.PitData.MandatoryPitStopCompleted || currentGameState.PitData.IsMakingMandatoryPitStop;
@@ -988,11 +988,9 @@ namespace CrewChiefV4.PCars2
             currentGameState.FuelData.FuelPressure = shared.mFuelPressureKPa;
             currentGameState.FuelData.FuelUseActive = true;         // no way to tell if it's disabled
 
-            // TODO: broken pit schedule data
-            /*
             currentGameState.PenaltiesData.HasDriveThrough = shared.mPitSchedule == (int)ePitSchedule.PIT_SCHEDULE_DRIVE_THROUGH;
             currentGameState.PenaltiesData.HasStopAndGo = shared.mPitSchedule == (int)ePitSchedule.PIT_SCHEDULE_STOP_GO;
-            */
+            
             currentGameState.PositionAndMotionData.CarSpeed = shared.mSpeed;
 
             currentGameState.SessionData.DeltaTime.SetNextDeltaPoint(currentGameState.PositionAndMotionData.DistanceRoundTrack, 

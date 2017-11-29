@@ -183,7 +183,6 @@ namespace CrewChiefV4.PCars2
             existingState.mSplitTimeAhead = timingsData.sSplitTimeAhead;
             existingState.mSplitTimeBehind = timingsData.sSplitTimeBehind;
             existingState.mSplitTime = timingsData.sSplitTime;  // what's this?
-            byte[] participantHighestFlags = new byte[32];
             if (existingState.mParticipantData == null)
             {
                 existingState.mParticipantData = new pCars2APIParticipantStruct[32];
@@ -243,8 +242,10 @@ namespace CrewChiefV4.PCars2
                         existingState.mRaceState = existingState.mRaceStates[i];
                     }
                     existingState.mLapsInvalidated[i] = lapInvalidated;
-                    existingState.mPitModes[i] = newParticipantInfo.sPitModeSchedule;
-                    participantHighestFlags[i] = newParticipantInfo.sHighestFlag;
+                    existingState.mPitModes[i] = (uint) newParticipantInfo.sPitModeSchedule & 28;
+                    existingState.mPitSchedules[i] = (uint) newParticipantInfo.sPitModeSchedule & 3;
+                    existingState.mHighestFlagColours[i] = (uint)newParticipantInfo.sHighestFlag & 28;
+                    existingState.mHighestFlagReasons[i] = (uint)newParticipantInfo.sHighestFlag & 3;
                     // no obvious slot in MMF for currentTime - do we need it if we have currentsectortime for S3?
                     if (existingPartInfo.mCurrentSector == 1)
                     {
@@ -272,7 +273,10 @@ namespace CrewChiefV4.PCars2
                     if (i == existingState.mViewedParticipantIndex)
                     {
                         existingState.mLapInvalidated = lapInvalidated == 1;
-                        existingState.mHighestFlagColour = newParticipantInfo.sHighestFlag;
+                        existingState.mHighestFlagColour = existingState.mHighestFlagColours[i];
+                        existingState.mHighestFlagReason = existingState.mHighestFlagReasons[i];
+                        existingState.mPitMode = existingState.mPitModes[i];
+                        existingState.mPitSchedule = existingState.mPitSchedules[i];
                     }
                 }
                 else
@@ -282,7 +286,6 @@ namespace CrewChiefV4.PCars2
                 }
                 existingState.mParticipantData[i] = existingPartInfo;
             }
-            existingState.participantHighestFlags = participantHighestFlags;
             return existingState;
         }
 
@@ -293,8 +296,7 @@ namespace CrewChiefV4.PCars2
             existingState.mAmbientTemperature = gameStateData.sAmbientTemperature;
             existingState.mTrackTemperature = gameStateData.sTrackTemperature;
             existingState.mRainDensity = gameStateData.sRainDensity;
-            // snow isn't in the shared memory data...
-            existingState.snowDensity = gameStateData.sSnowDensity;
+            existingState.mSnowDensity = gameStateData.sSnowDensity;
             existingState.mWindSpeed = gameStateData.sWindSpeed;
             existingState.mWindDirectionX = gameStateData.sWindDirectionX;
             existingState.mWindDirectionY = gameStateData.sWindDirectionY;
@@ -498,6 +500,12 @@ namespace CrewChiefV4.PCars2
     [Serializable]
     public struct pCars2APIStruct
     {
+        public override string ToString()
+        {
+            return "num participants " + mNumParticipants + " viewed index " + mViewedParticipantIndex + " driver name " +
+                StructHelper.getNameFromBytes(mParticipantData[mViewedParticipantIndex].mName) + " LF tyre " + StructHelper.getNameFromBytes(mLFTyreCompoundName);
+        }
+
          // Version Number
         public uint mVersion;                           // [ RANGE = 0->... ]
         public uint mBuildVersionNumber;                // [ RANGE = 0->... ]   [ UNSET = 0 ]
@@ -560,11 +568,11 @@ namespace CrewChiefV4.PCars2
 
         // Flags
         public uint mHighestFlagColour;                 // [ enum (Type#5) Flag Colour ]
-        public uint mmfOnly_mHighestFlagReason;                 // [ enum (Type#6) Flag Reason ]
+        public uint mHighestFlagReason;                 // [ enum (Type#6) Flag Reason ]
 
         // Pit Info
-        public uint mmfOnly_mPitMode;                           // [ enum (Type#7) Pit Mode ]
-        public uint mmfOnly_mPitSchedule;                       // [ enum (Type#8) Pit Stop Schedule ]
+        public uint mPitMode;                           // [ enum (Type#7) Pit Mode ]
+        public uint mPitSchedule;                       // [ enum (Type#8) Pit Stop Schedule ]
 
         // Car State
         public uint mCarFlags;                          // [ enum (Type#9) Car Flags ]
@@ -723,20 +731,33 @@ namespace CrewChiefV4.PCars2
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
         public byte[] mTranslatedTrackVariation; // [ string ]]
 
+        public float mBrakeBias;																		// [ RANGE = 0.0f->1.0f... ]   [ UNSET = -1.0f ]
+	    public float mTurboBoostPressure;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 40)]
+        public byte[] mLFTyreCompoundName;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 40)]
+        public byte[] mRFTyreCompoundName;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 40)]
+        public byte[] mLRTyreCompoundName;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 40)]
+        public byte[] mRRTyreCompoundName;
+	    [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
+        public uint[] mPitSchedules;  // [ enum (Type#7)  Pit Mode ]
+	    [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
+        public uint[] mHighestFlagColours;                 // [ enum (Type#5) Flag Colour ]
+	    [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
+        public uint[] mHighestFlagReasons;                 // [ enum (Type#6) Flag Reason ]
+	    [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
+        public uint[] mNationalities;					   // [ nationality table , SP AND UNSET = 0 ] See nationalities.txt file for details
+	    public float mSnowDensity;					       // [ UNITS = How much snow will fall ]   [ RANGE = 0.0f->1.0f ], this will be non zero only in Snow season, in other seasons whatever is falling from the sky is reported as rain
+	
+
         // extra from the UDP data
         public uint mSessionLengthTimeFromGame;  // seconds, 0 => not a timed session
         public byte mJoyPad1;
-        public byte mJoyPad2;
-        public byte mDPad;
-        // UDP has player tyre types. Shared memory does not. Dumb.
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
-        public byte[] mLFTyreCompoundName;
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
-        public byte[] mRFTyreCompoundName;
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
-        public byte[] mLRTyreCompoundName;
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
-        public byte[] mRRTyreCompoundName;
+        public byte mJoyPad2;        public byte mDPad;
+        
+
         // and other stuff that's missing from the MMF:
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
         public float[] mSuspensionRideHeight;
@@ -746,7 +767,6 @@ namespace CrewChiefV4.PCars2
         // more per-participant data items not in the shared memory. Or documented.
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
         public byte[] participantHighestFlags;
-        public float snowDensity;
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
         public float[] lastSectorTimes;
 
