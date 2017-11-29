@@ -243,8 +243,8 @@ namespace CrewChiefV4.PCars2
         public ushort sCurrentLapDistance;							// 12 --
         public byte sRacePosition;									// 14 -- holds the race position, + top bit shows if the participant is active or not
         public byte sSector;										// 15 -- sector + extra precision bits for x/z position
-        public byte sHighestFlag;									// 16 --
-        public byte sPitModeSchedule;								// 17 --
+        public byte sHighestFlag;									// 16 -- (enum 3 bits/enum 2 bits) Flag colour and reason
+        public byte sPitModeSchedule;								// 17 -- (enum 3 bits/enum 2 bits) Pit mode and Pit schedule 
         public ushort sCarIndex;										// 18 -- top bit shows if participant is (local or remote) human player or not
         public byte sRaceState;										// 20 -- race state flags + invalidated lap indication --
         public byte sCurrentLap;									// 21 -- 
