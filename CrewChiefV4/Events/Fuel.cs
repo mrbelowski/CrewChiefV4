@@ -614,7 +614,17 @@ namespace CrewChiefV4.Events
         }
 
         public void reportFuelStatus(Boolean allowNoDataMessage)
-        {            
+        {
+            if (!GlobalBehaviourSettings.enabledMessageTypes.Contains(MessageTypes.FUEL))
+            {
+                if (allowNoDataMessage)
+                {
+                    this.audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+                }
+
+                return;
+            }
+
             Boolean reportedRemaining = reportFuelRemaining(allowNoDataMessage);
             Boolean reportedConsumption = reportFuelConsumption();
             if (!reportedConsumption && !reportedRemaining && allowNoDataMessage)
@@ -625,6 +635,13 @@ namespace CrewChiefV4.Events
 
         public override void respond(String voiceMessage)
         {
+            if (!GlobalBehaviourSettings.enabledMessageTypes.Contains(MessageTypes.FUEL))
+            {
+                this.audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+
+                return;
+            }
+
             if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.WHATS_MY_FUEL_USAGE))
             {
                 if (!reportFuelConsumption())
