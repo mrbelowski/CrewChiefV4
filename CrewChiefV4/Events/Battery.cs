@@ -165,8 +165,7 @@ namespace CrewChiefV4.Events
                 if (!this.initialized
                     || (previousGameState != null && previousGameState.PitData.InPitlane && !currentGameState.PitData.InPitlane))  // Vehicle swap or some magical recharge ?
                 {
-                    // Not sure if stats should be cleared or not here.  Keep it around for now.
-                    // this.batteryStats.Clear();
+                    this.batteryStats.Clear();
                     this.windowedBatteryStats.Clear();
                     this.windowedAverageChargeLeft = -1.0f;
                     this.currLapNumBatteryMeasurements = 0;
@@ -464,7 +463,11 @@ namespace CrewChiefV4.Events
 
         public void reportBatteryStatus(Boolean allowNoDataMessage)
         {
+            // TODO: report actual charge level first, always.
             var reportedRemaining = this.reportBatteryRemaining(allowNoDataMessage);
+
+            // TODO: don't report avg use if we're running low already.
+            // TODO: instead of reporting avg battery use, report battery usage for the last lap.  This is much more informative, because user can sense how settings/driving impact the drain.
             var reportedUse = this.reportBatteryUse();
             if (!reportedUse && !reportedRemaining && allowNoDataMessage)
                 this.audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
@@ -480,7 +483,7 @@ namespace CrewChiefV4.Events
             }
         }
 
-        private Boolean reportBatteryUse()
+        private bool reportBatteryUse()
         {
             var haveData = false;
             if (!this.initialized || this.averageUsagePerLap < 0.0f)
@@ -524,7 +527,7 @@ namespace CrewChiefV4.Events
             return haveData;
         }
 
-        private Boolean reportBatteryRemaining(Boolean allowNowDataMessage)
+        private bool reportBatteryRemaining(bool allowNowDataMessage)
         {
             var haveData = false;
             if (this.windowedAverageChargeLeft < 0.0f)
