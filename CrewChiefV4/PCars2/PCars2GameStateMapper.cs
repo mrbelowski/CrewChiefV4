@@ -474,6 +474,7 @@ namespace CrewChiefV4.PCars2
                     currentGameState.OpponentData = previousGameState.OpponentData;
                     currentGameState.PitData.PitWindowStart = previousGameState.PitData.PitWindowStart;
                     currentGameState.PitData.PitWindowEnd = previousGameState.PitData.PitWindowEnd;
+                    currentGameState.PitData.PitWindow = previousGameState.PitData.PitWindow;
                     currentGameState.PitData.HasMandatoryPitStop = previousGameState.PitData.HasMandatoryPitStop;
                     currentGameState.PitData.HasMandatoryTyreChange = previousGameState.PitData.HasMandatoryTyreChange;
                     currentGameState.PitData.MandatoryTyreChangeRequiredTyreType = previousGameState.PitData.MandatoryTyreChangeRequiredTyreType;
@@ -938,31 +939,24 @@ namespace CrewChiefV4.PCars2
             currentGameState.PitData.IsAtPitExit = previousGameState != null && currentGameState.PitData.OnOutLap && 
                 previousGameState.PitData.InPitlane && !currentGameState.PitData.InPitlane;
             // looks like this is fucked up in the data - UDP has pitModeSchedule for each participant, MMF has pitMode. We need both.
-            currentGameState.PitData.HasRequestedPitStop = false;
-            currentGameState.PitData.PitWindow = PitWindow.Unavailable;
+            currentGameState.PitData.HasRequestedPitStop = shared.mPitSchedule == (uint) ePitSchedule.PIT_SCHEDULE_PLAYER_REQUESTED;
             if (currentGameState.SessionData.SessionType == SessionType.Race && shared.mEnforcedPitStopLap > 0)
             {
                 currentGameState.PitData.HasMandatoryPitStop = true;
                 currentGameState.PitData.PitWindowStart = (int) shared.mEnforcedPitStopLap;
+                
                 // estimate the pit window close lap / time
                 if (currentGameState.SessionData.SessionHasFixedTime)
                 {
                     currentGameState.PitData.PitWindowEnd = (int)((currentGameState.SessionData.SessionTotalRunTime - 60f) / 60f);
-
-                    currentGameState.PitData.PitWindow = currentGameState.SessionData.SessionRunningTime >= currentGameState.PitData.PitWindowStart &&
-                        currentGameState.SessionData.SessionRunningTime <= currentGameState.PitData.PitWindowEnd ?
-                            currentGameState.PitData.PitWindow = PitWindow.Open : currentGameState.PitData.PitWindow = PitWindow.Closed;
                 }
                 else
                 {
                     currentGameState.PitData.PitWindowEnd = currentGameState.SessionData.SessionNumberOfLaps - 1;
-
-                    currentGameState.PitData.PitWindow = currentGameState.SessionData.CompletedLaps >= currentGameState.PitData.PitWindowStart &&
-                        currentGameState.SessionData.CompletedLaps <= currentGameState.PitData.PitWindowEnd ?
-                            currentGameState.PitData.PitWindow = PitWindow.Open : currentGameState.PitData.PitWindow = PitWindow.Closed;
                 }
-                // can we trust the PIT_SCHEDULE_MANDATORY enum here?
-                currentGameState.PitData.IsMakingMandatoryPitStop = shared.mPitSchedule == (uint)ePitSchedule.PIT_SCHEDULE_MANDATORY;
+                currentGameState.PitData.PitWindow = mapToPitWindow(currentGameState, shared.mPitSchedule, shared.mPitMode);
+                currentGameState.PitData.IsMakingMandatoryPitStop = (currentGameState.PitData.PitWindow == PitWindow.Open || currentGameState.PitData.PitWindow == PitWindow.StopInProgress) &&
+                        (currentGameState.PitData.OnInLap || currentGameState.PitData.OnOutLap);
                 if (previousGameState != null)
                 {
                     currentGameState.PitData.MandatoryPitStopCompleted = previousGameState.PitData.MandatoryPitStopCompleted || currentGameState.PitData.IsMakingMandatoryPitStop;
@@ -1522,8 +1516,11 @@ namespace CrewChiefV4.PCars2
                         return PitWindow.Completed;
                     }
                     else 
-                    if ((pitSchedule == (uint)ePitSchedule.PIT_SCHEDULE_PLAYER_REQUESTED || pitSchedule == (uint)ePitSchedule.PIT_SCHEDULE_ENGINEER_REQUESTED) &&
-                        (pitMode == (uint)ePitMode.PIT_MODE_DRIVING_INTO_PITS || pitMode == (uint)ePitMode.PIT_MODE_IN_PIT))
+                    if ((pitSchedule == (uint)ePitSchedule.PIT_SCHEDULE_PLAYER_REQUESTED ||
+                         pitSchedule == (uint)ePitSchedule.PIT_SCHEDULE_ENGINEER_REQUESTED ||
+                         pitSchedule == (uint)ePitSchedule.PIT_SCHEDULE_MANDATORY ||
+                         pitSchedule == (uint)ePitSchedule.PIT_SCHEDULE_DAMAGE_REQUESTED) &&
+                        (pitMode == (uint)ePitMode.PIT_MODE_DRIVING_INTO_PITS || pitMode == (uint)ePitMode.PIT_MODE_IN_PIT || pitMode == (uint) ePitMode.PIT_MODE_IN_PIT))
                     {
                         return PitWindow.StopInProgress;
                     }
