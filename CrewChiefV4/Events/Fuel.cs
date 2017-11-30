@@ -634,7 +634,7 @@ namespace CrewChiefV4.Events
                     if (delayResponses && Utilities.random.Next(10) >= 2 && SoundCache.availableSounds.Contains(AudioPlayer.folderStandBy))
                     {
                         audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderStandBy, 0, null));
-                        int secondsDelay = Math.Max(5, Utilities.random.Next(8));
+                        int secondsDelay = Math.Max(7, Utilities.random.Next(8));
                         audioPlayer.pauseQueue(secondsDelay);
                         fuelEstimateMessage.dueTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + (1000 * secondsDelay);
                         audioPlayer.playDelayedImmediateMessage(fuelEstimateMessage);
@@ -696,7 +696,7 @@ namespace CrewChiefV4.Events
                     if (delayResponses && Utilities.random.Next(10) >= 2 && SoundCache.availableSounds.Contains(AudioPlayer.folderStandBy))
                     {
                         audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderStandBy, 0, null));
-                        int secondsDelay = Math.Max(5, Utilities.random.Next(8));
+                        int secondsDelay = Math.Max(7, Utilities.random.Next(9));
                         audioPlayer.pauseQueue(secondsDelay);
                         fuelEstimateMessage.dueTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + (1000 * secondsDelay);
                         audioPlayer.playDelayedImmediateMessage(fuelEstimateMessage);
