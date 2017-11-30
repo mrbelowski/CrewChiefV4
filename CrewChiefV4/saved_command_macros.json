@@ -58,6 +58,10 @@
 		{
 		    "action": "ICM Menu Right",
 			"key": "KEY_D"
+		},
+		{
+		    "action": "Pit Request Toggle",
+			"key": "KEY_Q"
 		}
 		]
 	},
@@ -154,7 +158,7 @@
 		{
 			"description": "pcars2 version, keyPressTime longer",
 			"gameDefinition": "PCARS2",
-			"actionSequence": [ "Car Management", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Right", "ICM Menu Down", "ICM Menu Down", "ICM Menu Down", "ICM Menu Right" ],
+			"actionSequence": [ "Pit Request Toggle" ],
 			"keyPressTime": 30,
 			"waitBetweenEachCommand": 100
 		}]
