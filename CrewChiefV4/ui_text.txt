@@ -510,3 +510,6 @@ use_tts_only_when_necessary_help = Prefer generic terms for opponents or skip op
 
 iracing_pit_tyre_pressure_in_psi = iRacing tyre pressure adjustments in PSI
 iracing_pit_tyre_pressure_in_psi_help = Assume tyre adjust tyre pressure commands are in PSI (disable this to use kPa)
+
+report_fuel_in_gallons = Fuel reports in gallons
+report_fuel_in_gallons_help = Reports fuel consumption in gallons instead of liters
