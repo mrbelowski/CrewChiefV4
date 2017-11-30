@@ -1541,6 +1541,8 @@ namespace CrewChiefV4.GameState
 
         public Boolean HasRequestedPitStop = false;
 
+        public Boolean PitStallOccupied = false;
+
         public Boolean LeaderIsPitting = false;
 
         public Boolean CarInFrontIsPitting = false;

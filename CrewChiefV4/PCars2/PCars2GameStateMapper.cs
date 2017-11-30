@@ -938,8 +938,13 @@ namespace CrewChiefV4.PCars2
 
             currentGameState.PitData.IsAtPitExit = previousGameState != null && currentGameState.PitData.OnOutLap && 
                 previousGameState.PitData.InPitlane && !currentGameState.PitData.InPitlane;
-            // looks like this is fucked up in the data - UDP has pitModeSchedule for each participant, MMF has pitMode. We need both.
-            currentGameState.PitData.HasRequestedPitStop = shared.mPitSchedule == (uint) ePitSchedule.PIT_SCHEDULE_PLAYER_REQUESTED;
+
+            currentGameState.PitData.HasRequestedPitStop = shared.mPitSchedule == (uint)ePitSchedule.PIT_SCHEDULE_PLAYER_REQUESTED;
+            currentGameState.PitData.PitStallOccupied = shared.mPitSchedule == (uint)ePitSchedule.PIT_SCHEDULE_PITSPOT_OCCUPIED;
+            currentGameState.PitData.IsPitCrewReady = !currentGameState.PitData.PitStallOccupied;
+            currentGameState.PitData.IsPitCrewDone = currentGameState.SessionData.SessionType == SessionType.Race && shared.mPitMode == (uint)ePitMode.PIT_MODE_DRIVING_OUT_OF_PITS;
+            currentGameState.PitData.IsApproachingPitlane = shared.mPitMode == (uint)ePitMode.PIT_MODE_DRIVING_INTO_PITS;
+           
             if (currentGameState.SessionData.SessionType == SessionType.Race && shared.mEnforcedPitStopLap > 0)
             {
                 currentGameState.PitData.HasMandatoryPitStop = true;
