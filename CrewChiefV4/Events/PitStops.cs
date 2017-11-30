@@ -116,6 +116,8 @@ namespace CrewChiefV4.Events
         private Boolean enableWindowWarnings = true;
 
         private Boolean pitStallOccupied = false;
+
+        private Boolean warnedAboutOccupiedPitOnThisLap = false;
         
         public PitStops(AudioPlayer audioPlayer)
         {
@@ -156,6 +158,7 @@ namespace CrewChiefV4.Events
             maxDistanceOnCurrentTyre = -1;
             enableWindowWarnings = true;
             pitStallOccupied = false;
+            warnedAboutOccupiedPitOnThisLap = false;
         }
 
         public override bool isMessageStillValid(String eventSubType, GameStateData currentGameState, Dictionary<String, Object> validationData)
@@ -182,6 +185,10 @@ namespace CrewChiefV4.Events
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
             this.pitStallOccupied = currentGameState.PitData.PitStallOccupied;
+            if (currentGameState.SessionData.IsNewLap)
+            {
+                warnedAboutOccupiedPitOnThisLap = false;
+            }
             // AMS (RF1) uses the pit window calculations to make 'box now' calls for scheduled stops, but we don't want 
             // the pit window opening / closing warnings.
             // Try also applying the same approach to rF2.
@@ -529,13 +536,22 @@ namespace CrewChiefV4.Events
                 // different logic for PCars2 pit-crew-ready checks
                 if (CrewChief.gameDefinition.gameEnum == GameEnum.PCARS2 || CrewChief.gameDefinition.gameEnum == GameEnum.PCARS2_NETWORK)
                 {
+                    if (!previousGameState.PitData.PitStallOccupied && currentGameState.PitData.PitStallOccupied)
+                    {
+                        audioPlayer.playMessage(new QueuedMessage(folderPitStallOccupied, Utilities.random.Next(1, 3), this));
+                        warnedAboutOccupiedPitOnThisLap = true;
+                    }
                     if (currentGameState.SessionData.SectorNumber == 3 && 
                         previousGameState.SessionData.SectorNumber == 2 &&
                         currentGameState.PitData.HasRequestedPitStop)
                     {
                         if (currentGameState.PitData.PitStallOccupied)
                         {
-                            audioPlayer.playMessage(new QueuedMessage(folderPitStallOccupied, Utilities.random.Next(1, 3), this));
+                            if (!warnedAboutOccupiedPitOnThisLap)
+                            {
+                                audioPlayer.playMessage(new QueuedMessage(folderPitStallOccupied, Utilities.random.Next(1, 3), this));
+                                warnedAboutOccupiedPitOnThisLap = true;
+                            }
                         }
                         else
                         {
@@ -558,7 +574,8 @@ namespace CrewChiefV4.Events
                     && (currentGameState.Now - timeOfPitRequestOrCancel).TotalSeconds > minSecondsBetweenPitRequestCancel)
                 {
                     timeOfPitRequestOrCancel = currentGameState.Now;
-                    audioPlayer.playMessage(new QueuedMessage(folderPitStopRequestReceived, Utilities.random.Next(1, 3), this));
+                    // respond immediately to this request
+                    audioPlayer.playMessage(new QueuedMessage(folderPitStopRequestReceived, 0, this));
                 }
                 if (!currentGameState.PitData.InPitlane && !previousGameState.PitData.InPitlane  // Make sure we're not in pits.  More checks might be needed.
                     && previousGameState.PitData.HasRequestedPitStop
