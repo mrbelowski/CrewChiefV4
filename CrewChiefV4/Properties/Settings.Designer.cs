@@ -2912,10 +2912,10 @@ namespace CrewChiefV4.Properties {
             }
             set {
                 this["spotter_volume_boost"] = value;
-			}
-		}
+            }
+        }
 
-		[global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool report_fuel_in_gallons {
