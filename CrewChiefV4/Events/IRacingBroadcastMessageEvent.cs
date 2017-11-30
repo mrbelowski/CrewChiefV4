@@ -18,7 +18,7 @@ namespace CrewChiefV4.Events
     class IRacingBroadcastMessageEvent : AbstractEvent
     {
         private static float kpaPerPsi = 6.89476f;
-        private static float litresPerGallon = 4.54609f;
+        private static float litresPerGallon = 3.78541f;
         private PressureUnit pressureUnit = UserSettings.GetUserSettings().getBoolean("iracing_pit_tyre_pressure_in_psi") ?
             PressureUnit.PSI : PressureUnit.KPA;
 
