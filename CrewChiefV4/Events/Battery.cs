@@ -87,11 +87,15 @@ namespace CrewChiefV4.Events
         private bool playedHalfBatteryChargeWarning = false;
 
         // Cache variables to be used in command responses (separate thread, can't access collections).
-        // It should be ok that they aren't from the same update, otherwise we'll have to lock.
+        // It is not critical for all values to be consistent.  But if that changes we'll have to lock.
         private float averageUsagePerLap = -1.0f;
         private float averageUsagePerMinute = -1.0f;
         private float prevLapBatteryUse = -1.0f;
         private float windowedAverageChargeLeft = -1.0f;
+
+        // We don't calculate averaged stats for the OutLap (because they largely vary on how the pit lane is).
+        // Instead, just capture battery level at a lap start (windowed avg).  That way we can still announce last lap use.
+        private float firstFullLapInitialChargeLeft = -1.0f;
 
         public Battery(AudioPlayer audioPlayer)
         {
@@ -136,6 +140,7 @@ namespace CrewChiefV4.Events
             this.averageUsagePerMinute = -1.0f;
             this.prevLapBatteryUse = -1.0f;
             this.windowedAverageChargeLeft = -1.0f;
+            this.firstFullLapInitialChargeLeft = -1.0f;
         }
 
         public override List<SessionType> applicableSessionTypes
@@ -189,6 +194,7 @@ namespace CrewChiefV4.Events
                     this.averageUsagePerMinute = -1.0f;
                     this.prevLapBatteryUse = -1.0f;
                     this.windowedAverageChargeLeft = -1.0f;
+                    this.firstFullLapInitialChargeLeft = -1.0f;
 
                     this.gameTimeWhenInitialized = currentGameState.SessionData.SessionRunningTime;
                     this.initialBatteryChargePercentage = currBattLeftPct;
@@ -241,6 +247,10 @@ namespace CrewChiefV4.Events
                     this.windowedAverageChargeLeft = this.windowedBatteryStats.Average(e => e.BatteryPercentageLeft);
                 }
 
+                if (currentGameState.SessionData.IsNewLap
+                    && this.firstFullLapInitialChargeLeft == -1.0f)
+                    this.firstFullLapInitialChargeLeft = this.windowedAverageChargeLeft;
+
                 if (currentGameState.PitData.OnOutLap  // Don't track out laps.
                     || (previousGameState != null && previousGameState.PitData.OnOutLap)
                     || currentGameState.PitData.InPitlane)  // or in pit lane.
@@ -275,8 +285,8 @@ namespace CrewChiefV4.Events
                     // Save previous lap consumption:
                     if (this.batteryStats.Count > 1)
                         this.prevLapBatteryUse = this.batteryStats[this.batteryStats.Count - 2].AverageBatteryPercentageLeft - prevLapStats.AverageBatteryPercentageLeft;
-                    else  // For the first lap, just subtract initial charge and current charge, average isn't meaningful yet.
-                        this.prevLapBatteryUse = this.initialBatteryChargePercentage - currBattLeftPct;
+                    else if (this.firstFullLapInitialChargeLeft != -1.0f)
+                        this.prevLapBatteryUse = this.firstFullLapInitialChargeLeft - this.windowedAverageChargeLeft;
 
                     Console.WriteLine(string.Format("Last lap average battery left percentage: {0}%  min percentage: {1}%  windowed avg: {2}%,  curr percentage {3}%  last lap use: {4}%",
                         this.batteryStats.Last().AverageBatteryPercentageLeft.ToString("0.000"),
@@ -527,6 +537,7 @@ namespace CrewChiefV4.Events
 
             if (this.batteryUseActive && this.prevLapBatteryUse > 0.0f)
             {
+                // TODO: refactor to call Morten's function.
                 // round to 1dp
                 var prevLapUse = ((float)Math.Round(this.prevLapBatteryUse * 10.0f)) / 10.0f;
                 if (prevLapUse == 0.0f)
