@@ -498,8 +498,8 @@ use_naudio_help = nAudio playback library allows playback device selection and h
 toggle_track_landmarks_recording = Start / stop track landmarks recording
 add_track_landmark = Add Start / end track landmark
 
-tts_volume_boost = TTS volume boost
-tts_volume_boost_help = Increase text-to-speech volume by this amount (up to the allowed maximum)
+tts_volume_boost = TTS volume boost (scale)
+tts_volume_boost_help = Scale (multiply) text-to-speech volume by this amount
 tts_trim_start_milliseconds = Trim start of TTS sounds (milliseconds)
 tts_trim_end_milliseconds = Trim end of TTS sounds (milliseconds)
 tts_trim_start_milliseconds_help = Trim this many milliseconds off the start of TTS sounds to remove pauses before they play
@@ -510,3 +510,6 @@ use_tts_only_when_necessary_help = Prefer generic terms for opponents or skip op
 
 iracing_pit_tyre_pressure_in_psi = iRacing tyre pressure adjustments in PSI
 iracing_pit_tyre_pressure_in_psi_help = Assume tyre adjust tyre pressure commands are in PSI (disable this to use kPa)
+
+spotter_volume_boost = Spotter volume boost (scale)
+spotter_volume_boost_help = Scale (multiply) spotter volume by this amount (nAudio only)

@@ -18,6 +18,7 @@ namespace CrewChiefV4.Audio
         private double minSecondsBetweenPersonalisedMessages = (double)UserSettings.GetUserSettings().getInt("min_time_between_personalised_messages");
         public static Boolean eagerLoadSoundFiles = UserSettings.GetUserSettings().getBoolean("load_sound_files_on_startup");
         public static float ttsVolumeBoost = UserSettings.GetUserSettings().getFloat("tts_volume_boost");
+        public static float spotterVolumeBoost = UserSettings.GetUserSettings().getFloat("spotter_volume_boost");
         public static int ttsTrimStartMilliseconds = UserSettings.GetUserSettings().getInt("tts_trim_start_milliseconds");
         public static int ttsTrimEndMilliseconds = UserSettings.GetUserSettings().getInt("tts_trim_end_milliseconds");
                
@@ -1272,8 +1273,8 @@ namespace CrewChiefV4.Audio
         {
             this.waveOut = new NAudio.Wave.WaveOut();
             this.waveOut.DeviceNumber = AudioPlayer.naudioMessagesPlaybackDeviceId;
-            // used when we're loading a TTS sound that's not been pre-processed. Should never need this, unless the preprocessing has failed
-            float volumeBoost = 1f;
+
+            float volumeBoost = isSpotter ? SoundCache.spotterVolumeBoost : 1f;
             // if we have file bytes, load them
             if (this.fileBytes != null)
             {
