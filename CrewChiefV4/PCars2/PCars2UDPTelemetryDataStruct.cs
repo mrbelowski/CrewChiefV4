@@ -155,6 +155,11 @@ namespace CrewChiefV4.PCars2
         public byte[] lrTyreCompound;
         [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 40)]
         public byte[] rrTyreCompound;
+
+        public float sTurboBoostPressure;	// 538 4
+        [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 3)]
+        public float[] sFullPosition;	// 542 12 -- position of the viewed participant with "full" precision (full? but it's a float[])
+        public byte sBrakeBias;	// 554 1 -- quantized brake bias
     }
 
     
@@ -223,6 +228,10 @@ namespace CrewChiefV4.PCars2
         public uint sParticipantsChangedTimestamp;
         [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 16)]
         public nameString[] sName;	// 323
+        [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 16)]
+        public uint[] sNationality;	//	1040 64 
+        [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 16)]
+        public ushort[]	sIndex;	// 1104 32 -- session unique index for MP races
     };
 
     /*******************************************************************************************************************
@@ -250,6 +259,7 @@ namespace CrewChiefV4.PCars2
         public byte sCurrentLap;									// 21 -- 
         public float sCurrentTime;									// 22 --
         public float sCurrentSectorTime;								// 26 --
+        public ushort sMPParticipantIndex;	// 30 -- matching sIndex from sParticipantsData
     };
 
     [Serializable]
@@ -270,7 +280,8 @@ namespace CrewChiefV4.PCars2
         public float sSplitTimeBehind;										// 25 -- 
         public float sSplitTime;												// 29 --
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
-        public sParticipantInfo[] sParticipants;		// 33 960
+        public sParticipantInfo[] sParticipants;		// 33 1024
+        public ushort sLocalParticipantIndex;	// 1057 -- identifies which of the MP participants is the local player
     };																						// 30
 
     /*******************************************************************************************************************
@@ -324,7 +335,9 @@ namespace CrewChiefV4.PCars2
         public float sFastestSector1Time;							// 11
         public float sFastestSector2Time;							// 16
         public float sFastestSector3Time;							// 20
-    };																					// 24
+        public uint sParticipantOnlineRep;	// 24 (u16 rank type + u16 strength, 0 in SP races)
+        public ushort sMPParticipantIndex;	// 28 -- matching sIndex from sParticipantsData
+    };																					
 
     [Serializable]
     public struct sParticipantsStats
