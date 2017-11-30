@@ -2905,7 +2905,6 @@ namespace CrewChiefV4.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-
         [global::System.Configuration.DefaultSettingValueAttribute("1")]
         public float spotter_volume_boost {
             get {
