@@ -39,13 +39,23 @@ namespace CrewChiefV4.Events
 
         public static String folderLitresRemaining = "fuel/litres_remaining";
 
+        public static String folderGallonsRemaining = "fuel/gallons_remaining";
+
         public static String folderOneLitreRemaining = "fuel/one_litre_remaining";
+
+        public static String folderOneGallonRemaining = "fuel/one_gallon_remaining";
+
+        public static String folderHalfAGallonRemaining = "fuel/half_a_gallon_remaining";
 
         public static String folderAboutToRunOut = "fuel/about_to_run_out";
 
         public static String folderLitresPerLap = "fuel/litres_per_lap";
 
+        public static String folderGallonsPerLap = "fuel/gallons_per_lap";
+
         public static String folderLitres = "fuel/litres";
+
+        public static String folderGallons = "fuel/gallons";
 
         private float averageUsagePerLap;
 
@@ -226,7 +236,15 @@ namespace CrewChiefV4.Events
                             }
                         }
                     }
-                    Console.WriteLine("Fuel level initialised, initialFuelLevel = " + initialFuelLevel + ", halfDistance = " + halfDistance + " halfTime = " + halfTime);
+                    if (fuelReportsInGallon)
+                    {
+                        Console.WriteLine("Fuel level initialised, initialFuelLevel = " + convertLitersToGallons(initialFuelLevel) + " gallons, halfDistance = " + halfDistance + " halfTime = " + halfTime);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Fuel level initialised, initialFuelLevel = " + initialFuelLevel + " liters, halfDistance = " + halfDistance + " halfTime = " + halfTime);
+                    }
+                    
                     initialised = true;                    
                 }
                 if (initialised)
@@ -250,25 +268,23 @@ namespace CrewChiefV4.Events
                             averageUsagePerLap = averageUsagePerLap / fuelUseByLapsWindowLength;
                             if(fuelReportsInGallon)
                             {
-                                Console.WriteLine("fuel use per lap (windowed calc) = " + convertLitersToGallons(averageUsagePerLap) + " fuel left = " + convertLitersToGallons(currentGameState.FuelData.FuelLeft));
+                                Console.WriteLine("fuel use per lap (windowed calc) = " + convertLitersToGallons(averageUsagePerLap) + " fuel(gallons) left = " + convertLitersToGallons(currentGameState.FuelData.FuelLeft));
                             }
                             else
                             {
-                                Console.WriteLine("fuel use per lap (windowed calc) = " + averageUsagePerLap + " fuel left = " + currentGameState.FuelData.FuelLeft);
-                            }
-                            
-
+                                Console.WriteLine("fuel use per lap (windowed calc) = " + averageUsagePerLap + " fuel(liters) left = " + currentGameState.FuelData.FuelLeft);
+                            }                            
                         }
                         else
                         {
                             averageUsagePerLap = (initialFuelLevel - currentGameState.FuelData.FuelLeft) / lapsCompletedSinceFuelReset;
                             if (fuelReportsInGallon)
                             {
-                                Console.WriteLine("fuel use per lap (basic calc) = " + convertLitersToGallons(averageUsagePerLap) + " fuel left = " + convertLitersToGallons(currentGameState.FuelData.FuelLeft));
+                                Console.WriteLine("fuel use per lap (basic calc) = " + convertLitersToGallons(averageUsagePerLap) + " fuel left(gallons) = " + convertLitersToGallons(currentGameState.FuelData.FuelLeft));
                             }
                             else
                             {
-                                Console.WriteLine("fuel use per lap (basic calc) = " + averageUsagePerLap + " fuel left = " + currentGameState.FuelData.FuelLeft);
+                                Console.WriteLine("fuel use per lap (basic calc) = " + averageUsagePerLap + " fuel(liters) left = " + currentGameState.FuelData.FuelLeft);
                             }
                         }
                     }
@@ -291,12 +307,12 @@ namespace CrewChiefV4.Events
                             averageUsagePerMinute = 60 * averageUsagePerMinute / (fuelUseByTimeWindowLength * fuelUseSampleTime);
 
                             if (fuelReportsInGallon)
-                            {                                
-                                Console.WriteLine("fuel use per minute (windowed calc) = " + convertLitersToGallons(averageUsagePerMinute) + " fuel left = " + convertLitersToGallons(currentGameState.FuelData.FuelLeft));
+                            {
+                                Console.WriteLine("fuel use per minute (windowed calc) = " + convertLitersToGallons(averageUsagePerMinute) + " fuel(gallons) left = " + convertLitersToGallons(currentGameState.FuelData.FuelLeft));
                             }
                             else
                             {
-                                Console.WriteLine("fuel use per minute (windowed calc) = " + averageUsagePerMinute + " fuel left = " + currentGameState.FuelData.FuelLeft);
+                                Console.WriteLine("fuel use per minute (windowed calc) = " + averageUsagePerMinute + " fuel left(liters) = " + currentGameState.FuelData.FuelLeft);
                             }
                         }
                         else
@@ -305,11 +321,11 @@ namespace CrewChiefV4.Events
                             
                             if (fuelReportsInGallon)
                             {
-                                Console.WriteLine("fuel use per minute (basic calc) = " + convertLitersToGallons(averageUsagePerMinute) + " fuel left = " + convertLitersToGallons(currentGameState.FuelData.FuelLeft));
+                                Console.WriteLine("fuel use per minute (basic calc) = " + convertLitersToGallons(averageUsagePerMinute) + " fuel(gallons) left = " + convertLitersToGallons(currentGameState.FuelData.FuelLeft));
                             }
                             else
                             {
-                                Console.WriteLine("fuel use per minute (basic calc) = " + averageUsagePerMinute + " fuel left = " + currentGameState.FuelData.FuelLeft);
+                                Console.WriteLine("fuel use per minute (basic calc) = " + averageUsagePerMinute + " fuel(liters) left = " + currentGameState.FuelData.FuelLeft);
                             }
                             
                         }
@@ -318,16 +334,35 @@ namespace CrewChiefV4.Events
                     // warnings for particular fuel levels
                     if (enableFuelMessages)
                     {
-                        if (currentFuel <= 2 && !played2LitreWarning)
+                        if(fuelReportsInGallon)
                         {
-                            played2LitreWarning = true;
-                            audioPlayer.playMessage(new QueuedMessage("Fuel/level", MessageContents(2, folderLitresRemaining), 0, this));
+                            if (convertLitersToGallons(currentFuel) <= 1 && !played2LitreWarning)
+                            {
+                                // yes i know its not 2 liters but who really cares.
+                                played2LitreWarning = true;
+                                audioPlayer.playMessage(new QueuedMessage("Fuel/level", MessageContents(folderOneGallonRemaining), 0, this));
+                            }
+                            else if (convertLitersToGallons(currentFuel) <= 0.5f && !played1LitreWarning)
+                            {
+                                //^^
+                                played1LitreWarning = true;
+                                audioPlayer.playMessage(new QueuedMessage("Fuel/level", MessageContents(folderHalfAGallonRemaining), 0, this));
+                            }
                         }
-                        else if (currentFuel <= 1 && !played1LitreWarning)
+                        else
                         {
-                            played1LitreWarning = true;
-                            audioPlayer.playMessage(new QueuedMessage("Fuel/level", MessageContents(folderOneLitreRemaining), 0, this));
+                            if (currentFuel <= 2 && !played2LitreWarning)
+                            {
+                                played2LitreWarning = true;
+                                audioPlayer.playMessage(new QueuedMessage("Fuel/level", MessageContents(2, folderLitresRemaining), 0, this));
+                            }
+                            else if (currentFuel <= 1 && !played1LitreWarning)
+                            {
+                                played1LitreWarning = true;
+                                audioPlayer.playMessage(new QueuedMessage("Fuel/level", MessageContents(folderOneLitreRemaining), 0, this));
+                            }
                         }
+
 
                         // warnings for fixed lap sessions
                         if (currentGameState.SessionData.IsNewLap && averageUsagePerLap > 0 &&
@@ -356,26 +391,56 @@ namespace CrewChiefV4.Events
                             }
                             else if (estimatedFuelLapsLeft == 4)
                             {
-                                Console.WriteLine("4 laps fuel left, starting fuel = " + initialFuelLevel +
-                                        ", current fuel = " + currentGameState.FuelData.FuelLeft + ", usage per lap = " + averageUsagePerLap);
+                                if(fuelReportsInGallon)
+                                {
+                                    Console.WriteLine("4 laps fuel left, starting fuel = " + convertLitersToGallons(initialFuelLevel) +
+                                            ", current fuel = " + convertLitersToGallons(currentGameState.FuelData.FuelLeft) + ", usage per lap = " + convertLitersToGallons(averageUsagePerLap));
+                                }
+                                else
+                                {
+                                    Console.WriteLine("4 laps fuel left, starting fuel = " + initialFuelLevel +
+                                            ", current fuel = " + currentGameState.FuelData.FuelLeft + ", usage per lap = " + averageUsagePerLap);                                    
+                                }
                                 audioPlayer.playMessage(new QueuedMessage(folderFourLapsEstimate, 0, this));
                             }
                             else if (estimatedFuelLapsLeft == 3)
                             {
-                                Console.WriteLine("3 laps fuel left, starting fuel = " + initialFuelLevel +
-                                    ", current fuel = " + currentGameState.FuelData.FuelLeft + ", usage per lap = " + averageUsagePerLap);
-                                audioPlayer.playMessage(new QueuedMessage(folderThreeLapsEstimate, 0, this));
+                                if (fuelReportsInGallon)
+                                {
+                                    Console.WriteLine("3 laps fuel left, starting fuel = " + convertLitersToGallons(initialFuelLevel) +
+                                            ", current fuel = " + convertLitersToGallons(currentGameState.FuelData.FuelLeft) + ", usage per lap = " + convertLitersToGallons(averageUsagePerLap));
+                                }
+                                else
+                                {
+                                    Console.WriteLine("3 laps fuel left, starting fuel = " + initialFuelLevel +
+                                            ", current fuel = " + currentGameState.FuelData.FuelLeft + ", usage per lap = " + averageUsagePerLap);
+                                }
                             }
                             else if (estimatedFuelLapsLeft == 2)
                             {
-                                Console.WriteLine("2 laps fuel left, starting fuel = " + initialFuelLevel +
-                                    ", current fuel = " + currentGameState.FuelData.FuelLeft + ", usage per lap = " + averageUsagePerLap);
-                                audioPlayer.playMessage(new QueuedMessage(folderTwoLapsEstimate, 0, this));
+                                if (fuelReportsInGallon)
+                                {
+                                    Console.WriteLine("2 laps fuel left, starting fuel = " + convertLitersToGallons(initialFuelLevel) +
+                                            ", current fuel = " + convertLitersToGallons(currentGameState.FuelData.FuelLeft) + ", usage per lap = " + convertLitersToGallons(averageUsagePerLap));
+                                }
+                                else
+                                {
+                                    Console.WriteLine("2 laps fuel left, starting fuel = " + initialFuelLevel +
+                                            ", current fuel = " + currentGameState.FuelData.FuelLeft + ", usage per lap = " + averageUsagePerLap);
+                                }
                             }
                             else if (estimatedFuelLapsLeft == 1)
                             {
-                                Console.WriteLine("1 lap fuel left, starting fuel = " + initialFuelLevel +
-                                    ", current fuel = " + currentGameState.FuelData.FuelLeft + ", usage per lap = " + averageUsagePerLap);
+                                if (fuelReportsInGallon)
+                                {
+                                    Console.WriteLine("1 laps fuel left, starting fuel = " + convertLitersToGallons(initialFuelLevel) +
+                                            ", current fuel = " + convertLitersToGallons(currentGameState.FuelData.FuelLeft) + ", usage per lap = " + convertLitersToGallons(averageUsagePerLap));
+                                }
+                                else
+                                {
+                                    Console.WriteLine("1 laps fuel left, starting fuel = " + initialFuelLevel +
+                                            ", current fuel = " + currentGameState.FuelData.FuelLeft + ", usage per lap = " + averageUsagePerLap);
+                                }                                
                                 audioPlayer.playMessage(new QueuedMessage(folderOneLapEstimate, 0, this));
                                 // if we've not played the pit-now message, play it with a bit of a delay - should probably wait for sector3 here
                                 // but i'd have to move some stuff around and I'm an idle fucker
@@ -395,7 +460,15 @@ namespace CrewChiefV4.Events
                             if (halfTime != -1 && !playedHalfTimeFuelEstimate && currentGameState.SessionData.SessionTimeRemaining <= halfTime &&
                                 currentGameState.SessionData.SessionTimeRemaining > halfTime - 30)
                             {
-                                Console.WriteLine("Half race distance. Fuel in tank = " + currentGameState.FuelData.FuelLeft + ", average usage per minute = " + averageUsagePerMinute);
+                                if (fuelReportsInGallon)
+                                {
+                                    Console.WriteLine("Half race distance. Fuel(gallons) in tank = " + convertLitersToGallons(currentGameState.FuelData.FuelLeft) +
+                                        ", average usage per minute = " + convertLitersToGallons(averageUsagePerMinute));                                    
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Half race distance. Fuel(liters) in tank = " + currentGameState.FuelData.FuelLeft + ", average usage per minute = " + averageUsagePerMinute);
+                                }
                                 playedHalfTimeFuelEstimate = true;
                                 if (currentGameState.SessionData.SessionType == SessionType.Race)
                                 {
@@ -474,19 +547,40 @@ namespace CrewChiefV4.Events
                     // rounded fuel use is < 0.1 litres per lap - can't really do anything with this.
                     return false;
                 }
+                if(fuelReportsInGallon)
+                {
+                    meanUsePerLap = convertLitersToGallons(averageUsagePerLap, true);
+                }
                 Tuple<int, int> wholeandfractional = wholeAndFractionalPart(meanUsePerLap);
                 if (meanUsePerLap > 0)
                 {
                     haveData = true;
+
                     if (wholeandfractional.Item2 > 0)
                     {
-                        audioPlayer.playMessageImmediately(new QueuedMessage("Fuel/mean_use_per_lap",
-                                MessageContents(wholeandfractional.Item1, NumberReader.folderPoint, wholeandfractional.Item2, folderLitresPerLap), 0, null));
+                        if (fuelReportsInGallon)
+                        {
+                            audioPlayer.playMessageImmediately(new QueuedMessage("Fuel/mean_use_per_lap",
+                                    MessageContents(wholeandfractional.Item1, NumberReader.folderPoint, wholeandfractional.Item2, folderGallonsPerLap), 0, null));
+                        }
+                        else
+                        {
+                            audioPlayer.playMessageImmediately(new QueuedMessage("Fuel/mean_use_per_lap",
+                                    MessageContents(wholeandfractional.Item1, NumberReader.folderPoint, wholeandfractional.Item2, folderLitresPerLap), 0, null));
+                        }
                     }
                     else
                     {
-                        audioPlayer.playMessageImmediately(new QueuedMessage("Fuel/mean_use_per_lap",
-                                MessageContents(wholeandfractional.Item1, folderLitresPerLap), 0, null));
+                        if (fuelReportsInGallon)
+                        {
+                            audioPlayer.playMessageImmediately(new QueuedMessage("Fuel/mean_use_per_lap",
+                                    MessageContents(wholeandfractional.Item1, folderGallonsPerLap), 0, null));
+                        }
+                        else
+                        {
+                            audioPlayer.playMessageImmediately(new QueuedMessage("Fuel/mean_use_per_lap",
+                                    MessageContents(wholeandfractional.Item1, folderLitresPerLap), 0, null));
+                        }
                     }
                 }
             }
@@ -517,16 +611,16 @@ namespace CrewChiefV4.Events
                     messageFragments.Add(MessageFragment.Text(folderWeEstimate));
                     if(fuelReportsInGallon)
                     {
+                        // for gallons we want both whole and fractional part cause its a stupid unit.
                         Tuple<int, int> wholeandfractional = wholeAndFractionalPart(totalUsage);
                         if (wholeandfractional.Item2 > 0)
-                        {
-                            messageFragments.AddRange(MessageContents(wholeandfractional.Item1, NumberReader.folderPoint, wholeandfractional.Item2, folderLitres));
-                            messageFragments.Add(MessageFragment.Text(folderLitres));
+                        {                            
+                            messageFragments.AddRange(MessageContents(wholeandfractional.Item1, NumberReader.folderPoint, wholeandfractional.Item2, folderGallons));
                         }
                         else
                         {
                             messageFragments.Add(MessageFragment.Integer(Convert.ToInt32(wholeandfractional.Item1), false));
-                            messageFragments.Add(MessageFragment.Text(folderLitres));
+                            messageFragments.Add(MessageFragment.Text(folderGallons));
                         }
                     }
                     else
@@ -560,16 +654,42 @@ namespace CrewChiefV4.Events
             {
                 int  timeToUse = (hours * 60) + minutes;
                 // round up
-                float totalUsage = ((float)Math.Ceiling(averageUsagePerMinute * timeToUse));
+                float totalUsage = 0;
+                if(fuelReportsInGallon)
+                {
+                    totalUsage = convertLitersToGallons(averageUsagePerMinute * timeToUse, true);
+                }
+                else
+                {
+                    totalUsage = ((float)Math.Ceiling(averageUsagePerMinute * timeToUse));
+                }                              
                 if (totalUsage > 0)
                 {
                     haveData = true;
                     // build up the message fragments the verbose way, so we can prevent the number reader from shortening hundreds to
-                    // stuff like "one thirty two" - we always want "one hundred and thirty two"
+                    // stuff like "one thirty two" - we always want "one hundred and thirty two"    
                     List<MessageFragment> messageFragments = new List<MessageFragment>();
                     messageFragments.Add(MessageFragment.Text(folderWeEstimate));
-                    messageFragments.Add(MessageFragment.Integer(Convert.ToInt32(totalUsage), false));
-                    messageFragments.Add(MessageFragment.Text(folderLitres));
+                    if (fuelReportsInGallon)
+                    {
+                        // for gallons we want both whole and fractional part cause its a stupid unit.
+                        Tuple<int, int> wholeandfractional = wholeAndFractionalPart(totalUsage);
+                        if (wholeandfractional.Item2 > 0)
+                        {
+                            messageFragments.AddRange(MessageContents(wholeandfractional.Item1, NumberReader.folderPoint, wholeandfractional.Item2, folderGallons));
+                        }
+                        else
+                        {
+                            messageFragments.Add(MessageFragment.Integer(Convert.ToInt32(wholeandfractional.Item1), false));
+                            messageFragments.Add(MessageFragment.Text(folderGallons));
+                        }
+                    }
+                    else
+                    {                    
+                        messageFragments.Add(MessageFragment.Integer(Convert.ToInt32(totalUsage), false));
+                        messageFragments.Add(MessageFragment.Text(folderLitres));
+                    }
+
                     QueuedMessage fuelEstimateMessage = new QueuedMessage("Fuel/estimate",
                             messageFragments, 0, null);
                     // play this immediately or play "stand by", and queue it to be played in a few seconds
@@ -637,27 +757,72 @@ namespace CrewChiefV4.Events
                 {
                     haveData = true;
                     audioPlayer.playMessageImmediately(new QueuedMessage(folderPlentyOfFuel, 0, null));
+                    return haveData;
                 }
-                else if (currentFuel >= 2)
+                if(fuelReportsInGallon)
                 {
-                    haveData = true;
-                    List<MessageFragment> messageFragments = new List<MessageFragment>();
-                    messageFragments.Add(MessageFragment.Integer((int)currentFuel, false));
-                    messageFragments.Add(MessageFragment.Text(folderLitresRemaining));
-                    audioPlayer.playMessageImmediately(new QueuedMessage("Fuel/level", messageFragments, 0, null));
+                    if (convertLitersToGallons(currentFuel) >= 2)
+                    {
+                        haveData = true;
+                        List<MessageFragment> messageFragments = new List<MessageFragment>();
+
+                        // for gallons we want both whole and fractional part cause its a stupid unit.
+                        Tuple<int, int> wholeandfractional = wholeAndFractionalPart(convertLitersToGallons(currentFuel,true));
+                        if (wholeandfractional.Item2 > 0)
+                        {
+                            messageFragments.AddRange(MessageContents(wholeandfractional.Item1, NumberReader.folderPoint, wholeandfractional.Item2, folderGallonsRemaining));
+                        }
+                        else
+                        {
+                            messageFragments.Add(MessageFragment.Integer(Convert.ToInt32(wholeandfractional.Item1), false));
+                            messageFragments.Add(MessageFragment.Text(folderGallonsRemaining));
+                        }
+                        audioPlayer.playMessageImmediately(new QueuedMessage("Fuel/level", messageFragments, 0, null));
+                    }
+                    else if (convertLitersToGallons(currentFuel) >= 1)
+                    {
+                        haveData = true;
+                        audioPlayer.playMessageImmediately(new QueuedMessage("Fuel/level",
+                                    MessageContents(folderOneGallonRemaining), 0, null));
+                    }
+                    else if (convertLitersToGallons(currentFuel) > 0.5f)
+                    {
+                        haveData = true;
+                        audioPlayer.playMessageImmediately(new QueuedMessage("Fuel/level",
+                                MessageContents(folderHalfAGallonRemaining), 0, null));
+                    }
+                    else if (convertLitersToGallons(currentFuel) > 0)
+                    {
+                        haveData = true;
+                        audioPlayer.playMessageImmediately(new QueuedMessage("Fuel/level",
+                                MessageContents(folderAboutToRunOut), 0, null));
+                    }
                 }
-                else if (currentFuel >= 1)
+                else
                 {
-                    haveData = true;
-                    audioPlayer.playMessageImmediately(new QueuedMessage("Fuel/level",
-                                MessageContents(folderOneLitreRemaining), 0, null));
+                    if (currentFuel >= 2)
+                    {
+                        haveData = true;
+                        List<MessageFragment> messageFragments = new List<MessageFragment>();
+                        messageFragments.Add(MessageFragment.Integer((int)currentFuel, false));
+                        messageFragments.Add(MessageFragment.Text(folderLitresRemaining));
+                        audioPlayer.playMessageImmediately(new QueuedMessage("Fuel/level", messageFragments, 0, null));
+                    }
+                    else if (currentFuel >= 1)
+                    {
+                        haveData = true;
+                        audioPlayer.playMessageImmediately(new QueuedMessage("Fuel/level",
+                                    MessageContents(folderOneLitreRemaining), 0, null));
+                    }
+                    else if (currentFuel > 0)
+                    {
+                        haveData = true;
+                        audioPlayer.playMessageImmediately(new QueuedMessage("Fuel/level",
+                                MessageContents(folderAboutToRunOut), 0, null));
+                    }
                 }
-                else if (currentFuel > 0)
-                {
-                    haveData = true;
-                    audioPlayer.playMessageImmediately(new QueuedMessage("Fuel/level",
-                            MessageContents(folderAboutToRunOut), 0, null));
-                }
+
+
             }
             return haveData;
         }
