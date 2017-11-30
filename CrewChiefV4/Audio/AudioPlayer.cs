@@ -28,7 +28,7 @@ namespace CrewChiefV4.Audio
         
         public static int naudioMessagesPlaybackDeviceId = 0;
         public static int naudioBackgroundPlaybackDeviceId = 0;
-        public Dictionary<string, Tuple<string, int>> playbackDevices = new Dictionary<string, Tuple<string, int>>();
+        public static Dictionary<string, Tuple<string, int>> playbackDevices = new Dictionary<string, Tuple<string, int>>();
         
         public static String folderAcknowlegeOK = "acknowledge/OK";
         public static String folderYellowEnabled = "acknowledge/yellowEnabled";
@@ -118,6 +118,44 @@ namespace CrewChiefV4.Audio
         public String selectedPersonalisation = NO_PERSONALISATION_SELECTED;
 
         private SynchronizationContext mainThreadContext = null;
+
+        static AudioPlayer()
+        {
+            if (UserSettings.GetUserSettings().getBoolean("use_naudio"))
+            {
+                playbackDevices.Clear();
+                for (int deviceId = 0; deviceId < NAudio.Wave.WaveOut.DeviceCount; deviceId++)
+                {
+                    // the audio device stuff makes no guarantee as to the presence of sensible device and product guids,
+                    // so we have to do the best we can here
+                    NAudio.Wave.WaveOutCapabilities capabilities = NAudio.Wave.WaveOut.GetCapabilities(deviceId);
+                    Boolean hasNameGuid = capabilities.NameGuid != null && !capabilities.NameGuid.Equals(Guid.Empty);
+                    Boolean hasProductGuid = capabilities.ProductGuid != null && !capabilities.ProductGuid.Equals(Guid.Empty);
+                    String rawName = capabilities.ProductName;
+                    String name = rawName;
+                    int nameAddition = 0;
+                    while (playbackDevices.Keys.Contains(name))
+                    {
+                        nameAddition++;
+                        name = rawName += "(" + nameAddition + ")";
+                    }
+                    String guidToUse;
+                    if (hasNameGuid)
+                    {
+                        guidToUse = capabilities.NameGuid.ToString();
+                    }
+                    else if (hasProductGuid)
+                    {
+                        guidToUse = capabilities.ProductGuid.ToString() + "_" + name;
+                    }
+                    else
+                    {
+                        guidToUse = name;
+                    }
+                    playbackDevices.Add(name, new Tuple<string, int>(guidToUse, deviceId));
+                }
+            }
+        }
         
         public AudioPlayer()
         {
@@ -186,41 +224,6 @@ namespace CrewChiefV4.Audio
             if (savedPersonalisation != null && savedPersonalisation.Length > 0)
             {
                 selectedPersonalisation = savedPersonalisation;
-            }
-
-            if (UserSettings.GetUserSettings().getBoolean("use_naudio"))
-            {
-                playbackDevices.Clear();
-                for (int deviceId = 0; deviceId < NAudio.Wave.WaveOut.DeviceCount; deviceId++)
-                {
-                    // the audio device stuff makes no guarantee as to the presence of sensible device and product guids,
-                    // so we have to do the best we can here
-                    NAudio.Wave.WaveOutCapabilities capabilities = NAudio.Wave.WaveOut.GetCapabilities(deviceId);
-                    Boolean hasNameGuid = capabilities.NameGuid != null && !capabilities.NameGuid.Equals(Guid.Empty);
-                    Boolean hasProductGuid = capabilities.ProductGuid != null && !capabilities.ProductGuid.Equals(Guid.Empty);
-                    String rawName = capabilities.ProductName;
-                    String name = rawName;                    
-                    int nameAddition = 0;
-                    while (playbackDevices.Keys.Contains(name))
-                    {
-                        nameAddition++;
-                        name = rawName += "(" + nameAddition + ")";
-                    }
-                    String guidToUse;
-                    if (hasNameGuid)
-                    {
-                        guidToUse = capabilities.NameGuid.ToString();
-                    }
-                    else if (hasProductGuid)
-                    {
-                        guidToUse = capabilities.ProductGuid.ToString() + "_" + name;
-                    }
-                    else
-                    {
-                        guidToUse = name;
-                    }
-                    playbackDevices.Add(name, new Tuple<string, int>(guidToUse, deviceId));
-                }
             }
         }
         
