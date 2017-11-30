@@ -546,22 +546,15 @@ namespace CrewChiefV4.Events
                     return false;
                 }
 
-                // get the whole and fractional part (yeah, I know this is shit)
-                var str = prevLapUse.ToString();
-                var pointPosition = str.IndexOf('.');
-                var wholePart = 0;
-                var fractionalPart = 0;
-                if (pointPosition > 0)
-                {
-                    wholePart = int.Parse(str.Substring(0, pointPosition));
-                    fractionalPart = int.Parse(str[pointPosition + 1].ToString());
-                }
-                else
-                    wholePart = (int)prevLapUse;
+                var wholeAndFractional = Utilities.WholeAndFractionalPart(prevLapUse);
 
                 if (prevLapUse > 0.0f)
                 {
                     haveData = true;
+
+                    var wholePart = wholeAndFractional.Item1;
+                    var fractionalPart = wholeAndFractional.Item2;
+
                     if (fractionalPart > 0)
                     {
                         var messageFragments = new List<MessageFragment>();
