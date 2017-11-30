@@ -2905,6 +2905,7 @@ namespace CrewChiefV4.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+
         [global::System.Configuration.DefaultSettingValueAttribute("1")]
         public float spotter_volume_boost {
             get {
@@ -2912,6 +2913,18 @@ namespace CrewChiefV4.Properties {
             }
             set {
                 this["spotter_volume_boost"] = value;
+			}
+		}
+
+		[global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool report_fuel_in_gallons {
+            get {
+                return ((bool)(this["report_fuel_in_gallons"]));
+            }
+            set {
+                this["report_fuel_in_gallons"] = value;
             }
         }
     }

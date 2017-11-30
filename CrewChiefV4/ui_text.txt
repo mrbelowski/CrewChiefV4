@@ -513,3 +513,7 @@ iracing_pit_tyre_pressure_in_psi_help = Assume tyre adjust tyre pressure command
 
 spotter_volume_boost = Spotter volume boost (scale)
 spotter_volume_boost_help = Scale (multiply) spotter volume by this amount (nAudio only)
+
+report_fuel_in_gallons = Fuel reports in gallons
+report_fuel_in_gallons_help = Reports fuel consumption in gallons instead of liters
+
