@@ -2830,7 +2830,7 @@ namespace CrewChiefV4.Properties {
                 this["ADD_TRACK_LANDMARK_device_type"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True")]
@@ -2842,7 +2842,7 @@ namespace CrewChiefV4.Properties {
                 this["enable_battery_messages"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("2")]
@@ -2854,7 +2854,7 @@ namespace CrewChiefV4.Properties {
                 this["tts_volume_boost"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True")]
@@ -2900,6 +2900,30 @@ namespace CrewChiefV4.Properties {
             }
             set {
                 this["tts_trim_start_milliseconds"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public float spotter_volume_boost {
+            get {
+                return ((float)(this["spotter_volume_boost"]));
+            }
+            set {
+                this["spotter_volume_boost"] = value;
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool report_fuel_in_gallons {
+            get {
+                return ((bool)(this["report_fuel_in_gallons"]));
+            }
+            set {
+                this["report_fuel_in_gallons"] = value;
             }
         }
     }

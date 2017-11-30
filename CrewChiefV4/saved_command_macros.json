@@ -131,7 +131,6 @@
 	{
 		"name": "request pit",
 		"description": "requests a pitstop",
-		"confirmationMessage": "acknowledge/OK",
 		"voiceTriggers": [ "request pit", "box this lap", "in this lap" ],
 		"buttonTriggers": [ 
 		{
