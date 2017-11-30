@@ -381,9 +381,8 @@ namespace CrewChiefV4
             }
             catch (Exception e)
             {
-                Console.WriteLine("Unable to set default audio device");
+                Console.WriteLine("Unable to set default audio device, speech recognition may not function and may crash the app");
                 Console.WriteLine("Exception message: " + e.Message);
-                return;
             }
             try
             {
