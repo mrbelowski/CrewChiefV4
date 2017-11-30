@@ -57,6 +57,7 @@ namespace CrewChiefV4.Events
         // pit stop messages
         private String folderWatchYourPitSpeed = "mandatory_pit_stops/watch_your_pit_speed";
         private String folderPitCrewReady = "mandatory_pit_stops/pit_crew_ready";
+        private String folderPitStallOccupied = "mandatory_pit_stops/pit_stall_occupied";
         private String folderStopCompleteGo = "mandatory_pit_stops/stop_complete_go";
         private String folderPitStopRequestReceived = "mandatory_pit_stops/pit_stop_requested";
         private String folderPitStopRequestCancelled = "mandatory_pit_stops/pit_request_cancelled";
@@ -113,6 +114,8 @@ namespace CrewChiefV4.Events
         private const int minSecondsBetweenPitRequestCancel = 5;
 
         private Boolean enableWindowWarnings = true;
+
+        private Boolean pitStallOccupied = false;
         
         public PitStops(AudioPlayer audioPlayer)
         {
@@ -152,6 +155,7 @@ namespace CrewChiefV4.Events
             minDistanceOnCurrentTyre = -1;
             maxDistanceOnCurrentTyre = -1;
             enableWindowWarnings = true;
+            pitStallOccupied = false;
         }
 
         public override bool isMessageStillValid(String eventSubType, GameStateData currentGameState, Dictionary<String, Object> validationData)
@@ -177,6 +181,7 @@ namespace CrewChiefV4.Events
 
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
+            this.pitStallOccupied = currentGameState.PitData.PitStallOccupied;
             // AMS (RF1) uses the pit window calculations to make 'box now' calls for scheduled stops, but we don't want 
             // the pit window opening / closing warnings.
             // Try also applying the same approach to rF2.
@@ -521,7 +526,24 @@ namespace CrewChiefV4.Events
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage(folderWatchYourPitSpeed, 0, this));
                 }
-                if (!previousGameState.PitData.IsPitCrewReady
+                // different logic for PCars2 pit-crew-ready checks
+                if (CrewChief.gameDefinition.gameEnum == GameEnum.PCARS2 || CrewChief.gameDefinition.gameEnum == GameEnum.PCARS2_NETWORK)
+                {
+                    if (currentGameState.SessionData.SectorNumber == 3 && 
+                        previousGameState.SessionData.SectorNumber == 2 &&
+                        currentGameState.PitData.HasRequestedPitStop)
+                    {
+                        if (currentGameState.PitData.PitStallOccupied)
+                        {
+                            audioPlayer.playMessage(new QueuedMessage(folderPitStallOccupied, Utilities.random.Next(1, 3), this));
+                        }
+                        else
+                        {
+                            audioPlayer.playMessage(new QueuedMessage(folderPitCrewReady, Utilities.random.Next(1, 3), this));
+                        }
+                    }
+                }
+                else if (!previousGameState.PitData.IsPitCrewReady
                     && currentGameState.PitData.IsPitCrewReady)
                 {
                     audioPlayer.playMessage(new QueuedMessage(folderPitCrewReady, Utilities.random.Next(1, 3), this));
@@ -547,12 +569,22 @@ namespace CrewChiefV4.Events
                     audioPlayer.playMessage(new QueuedMessage(folderPitStopRequestCancelled, Utilities.random.Next(1, 3), this));
                 }
             }
-
         }
 
         public override void respond(String voiceMessage)
         {
-            if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.SESSION_STATUS) ||
+            if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.IS_MY_PIT_BOX_OCCUPIED))
+            {
+                if (this.pitStallOccupied)
+                {
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderPitStallOccupied, 0, null));
+                }
+                else
+                {
+                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNo, 0, null));
+                }
+            }
+            else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.SESSION_STATUS) ||
                  SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.STATUS))
             {
                 if (enableWindowWarnings && pitDataInitialised)

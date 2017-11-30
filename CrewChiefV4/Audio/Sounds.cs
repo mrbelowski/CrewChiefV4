@@ -18,6 +18,7 @@ namespace CrewChiefV4.Audio
         private double minSecondsBetweenPersonalisedMessages = (double)UserSettings.GetUserSettings().getInt("min_time_between_personalised_messages");
         public static Boolean eagerLoadSoundFiles = UserSettings.GetUserSettings().getBoolean("load_sound_files_on_startup");
         public static float ttsVolumeBoost = UserSettings.GetUserSettings().getFloat("tts_volume_boost");
+        public static float spotterVolumeBoost = UserSettings.GetUserSettings().getFloat("spotter_volume_boost");
         public static int ttsTrimStartMilliseconds = UserSettings.GetUserSettings().getInt("tts_trim_start_milliseconds");
         public static int ttsTrimEndMilliseconds = UserSettings.GetUserSettings().getInt("tts_trim_end_milliseconds");
                
@@ -1188,19 +1189,37 @@ namespace CrewChiefV4.Audio
                 uncachedWaveOut.DeviceNumber = AudioPlayer.naudioMessagesPlaybackDeviceId;
                 NAudio.Wave.WaveFileReader uncachedReader = new NAudio.Wave.WaveFileReader(fullPath);
                 uncachedWaveOut.PlaybackStopped += new EventHandler<NAudio.Wave.StoppedEventArgs>(playbackStopped);
-                NAudio.Wave.SampleProviders.SampleChannel sampleChannel = new NAudio.Wave.SampleProviders.SampleChannel(uncachedReader);
-                sampleChannel.Volume = getVolume(1f);
+                float volume = getVolume(isSpotter ? SoundCache.spotterVolumeBoost : 1f);
 
-                try
+                if (volume == 1f)
                 {
-                    uncachedWaveOut.Init(new NAudio.Wave.SampleProviders.SampleToWaveProvider(sampleChannel));
-                    uncachedWaveOut.Play();
-                    // stop waiting after 30 seconds
-                    this.playWaitHandle.WaitOne(30000);
+                    try
+                    {
+                        uncachedWaveOut.Init(uncachedReader);
+                        uncachedWaveOut.Play();
+                        // stop waiting after 30 seconds
+                        this.playWaitHandle.WaitOne(30000);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("Exception " + e.Message + " playing sound " + this.fullPath + " stack trace " + e.StackTrace);
+                    }
                 }
-                catch (Exception e)
+                else
                 {
-                    Console.WriteLine("Exception " + e.Message + " playing sound " + this.fullPath + " stack trace " + e.StackTrace);
+                    NAudio.Wave.SampleProviders.SampleChannel sampleChannel = new NAudio.Wave.SampleProviders.SampleChannel(uncachedReader);
+                    sampleChannel.Volume = volume;
+                    try
+                    {
+                        uncachedWaveOut.Init(new NAudio.Wave.SampleProviders.SampleToWaveProvider(sampleChannel));
+                        uncachedWaveOut.Play();
+                        // stop waiting after 30 seconds
+                        this.playWaitHandle.WaitOne(30000);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("Exception " + e.Message + " playing sound " + this.fullPath + " stack trace " + e.StackTrace);
+                    }
                 }
                 try
                 {
@@ -1272,8 +1291,8 @@ namespace CrewChiefV4.Audio
         {
             this.waveOut = new NAudio.Wave.WaveOut();
             this.waveOut.DeviceNumber = AudioPlayer.naudioMessagesPlaybackDeviceId;
-            // used when we're loading a TTS sound that's not been pre-processed. Should never need this, unless the preprocessing has failed
-            float volumeBoost = 1f;
+
+            float volumeBoost = isSpotter ? SoundCache.spotterVolumeBoost : 1f;
             // if we have file bytes, load them
             if (this.fileBytes != null)
             {
@@ -1292,9 +1311,17 @@ namespace CrewChiefV4.Audio
             }
             this.reader = new NAudio.Wave.WaveFileReader(this.memoryStream);
             this.waveOut.PlaybackStopped += new EventHandler<NAudio.Wave.StoppedEventArgs>(playbackStopped);
-            NAudio.Wave.SampleProviders.SampleChannel sampleChannel = new NAudio.Wave.SampleProviders.SampleChannel(this.reader);
-            sampleChannel.Volume = getVolume(volumeBoost);
-            this.waveOut.Init(new NAudio.Wave.SampleProviders.SampleToWaveProvider(sampleChannel));
+            float volume = getVolume(volumeBoost);
+            if (volume == 1f)
+            {
+                this.waveOut.Init(this.reader);
+            }
+            else
+            {
+                NAudio.Wave.SampleProviders.SampleChannel sampleChannel = new NAudio.Wave.SampleProviders.SampleChannel(this.reader);
+                sampleChannel.Volume = getVolume(volumeBoost);
+                this.waveOut.Init(new NAudio.Wave.SampleProviders.SampleToWaveProvider(sampleChannel));
+            }
             this.reader.CurrentTime = TimeSpan.Zero;
         }
 

@@ -49,6 +49,7 @@ WHATS_MY_POSITION = what's my position
 WHATS_MY_FUEL_LEVEL = what's my fuel level
 WHATS_MY_FUEL_USAGE = what's my fuel usage:what's my fuel consumption:what's my fuel use
 WHAT_TYRES_AM_I_ON = what tires am i on:what tire am i on:what tire type am i on
+IS_MY_PIT_BOX_OCCUPIED = is my pit box occupied:is my pit stall occupied
 
 ### combined with a number of laps or a time to give a fuel load estimate (needs 3 or 4 laps of data)
 ### e.g. "how much fuel for 10 minutes", "how much fuel for 1 hour", "how much fuel for 30 laps"
