@@ -1374,8 +1374,11 @@ namespace CrewChiefV4
                 }
                 runListenForButtonPressesThread = controllerConfiguration.listenForButtons(voiceOption == VoiceOptionEnum.TOGGLE);
             }
-            this.assignButtonToAction.Text = Configuration.getUIString("assign");
-            controllerConfiguration.saveSettings();
+            else
+            {
+                isAssigningButton = false;
+            }
+            this.assignButtonToAction.Text = Configuration.getUIString("assign");            
         }
 
         private void deleteAssignmentButtonClicked(object sender, EventArgs e)

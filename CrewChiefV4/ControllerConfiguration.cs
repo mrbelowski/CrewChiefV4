@@ -636,31 +636,40 @@ namespace CrewChiefV4
             {
                 listenForAssignment = true;
                 // Instantiate the joystick
-                var joystick = new Joystick(directInput, controllerData.guid);
-                // Acquire the joystick
-                joystick.SetCooperativeLevel(parent, (CooperativeLevel.NonExclusive | CooperativeLevel.Background));
-                joystick.Properties.BufferSize = 128;
-                joystick.Acquire();                
-                while (listenForAssignment)
+                try
                 {
-                    Boolean[] buttons = joystick.GetCurrentState().Buttons;
-                    for (int i = 0; i < buttons.Count(); i++)
+                    var joystick = new Joystick(directInput, controllerData.guid);
+                    // Acquire the joystick
+                    joystick.SetCooperativeLevel(parent, (CooperativeLevel.NonExclusive | CooperativeLevel.Background));
+                    joystick.Properties.BufferSize = 128;
+                    joystick.Acquire();
+                    while (listenForAssignment)
                     {
-                        if (buttons[i])
+                        Boolean[] buttons = joystick.GetCurrentState().Buttons;
+                        for (int i = 0; i < buttons.Count(); i++)
                         {
-                            Console.WriteLine("Got button at index " + i);
-                            removeAssignmentsForControllerAndButton(controllerData.guid, i);
-                            buttonAssignment.controller = controllerData;
-                            buttonAssignment.joystick = joystick;
-                            buttonAssignment.buttonIndex = i;
-                            listenForAssignment = false;
-                            gotAssignment = true;
+                            if (buttons[i])
+                            {
+                                Console.WriteLine("Got button at index " + i);
+                                removeAssignmentsForControllerAndButton(controllerData.guid, i);
+                                buttonAssignment.controller = controllerData;
+                                buttonAssignment.joystick = joystick;
+                                buttonAssignment.buttonIndex = i;
+                                listenForAssignment = false;
+                                gotAssignment = true;
+                            }
                         }
                     }
+                    if (!gotAssignment)
+                    {
+                        joystick.Unacquire();
+                    }
                 }
-                if (!gotAssignment)
+                catch (Exception e)
                 {
-                    joystick.Unacquire();
+                    Console.WriteLine("Unable to acquire device " + controllerData.deviceName + " error: " + e.Message);
+                    listenForAssignment = false;
+                    gotAssignment = false;
                 }
             }
             return gotAssignment;

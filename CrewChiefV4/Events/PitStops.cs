@@ -577,7 +577,10 @@ namespace CrewChiefV4.Events
                     // respond immediately to this request
                     audioPlayer.playMessage(new QueuedMessage(folderPitStopRequestReceived, 0, this));
                 }
-                if (!currentGameState.PitData.InPitlane && !previousGameState.PitData.InPitlane  // Make sure we're not in pits.  More checks might be needed.
+                // don't play pit request cancelled in pCars2 because the request often cancels itself for no reason at all (other than pcars2 being a mess)
+                // - the pit crew may or may not be ready for you when this happens. It's just one of the many mysteries of pCars2.
+                if (CrewChief.gameDefinition.gameEnum != GameEnum.PCARS2 && CrewChief.gameDefinition.gameEnum != GameEnum.PCARS2_NETWORK
+                    && !currentGameState.PitData.InPitlane && !previousGameState.PitData.InPitlane  // Make sure we're not in pits.  More checks might be needed.
                     && previousGameState.PitData.HasRequestedPitStop
                     && !currentGameState.PitData.HasRequestedPitStop
                     && (currentGameState.Now - timeOfPitRequestOrCancel).TotalSeconds > minSecondsBetweenPitRequestCancel)
