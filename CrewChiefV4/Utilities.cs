@@ -125,5 +125,27 @@ namespace CrewChiefV4
             Console.WriteLine("Failed to resolve trace file full path: " + fileNameToResolve);
             return null;
         }
+
+
+        public static Tuple<int, int> WholeAndFractionalPart(float realNumber)
+        {
+            // get the whole and fractional part (yeah, I know this is shit)
+            var str = realNumber.ToString();
+            int pointPosition = str.IndexOf('.');
+            int wholePart = 0;
+            int fractionalPart = 0;
+            if (pointPosition > 0)
+            {
+                wholePart = int.Parse(str.Substring(0, pointPosition));
+                fractionalPart = int.Parse(str[pointPosition + 1].ToString());
+            }
+            else
+            {
+                wholePart = (int)realNumber;
+            }
+
+            return new Tuple<int, int>(wholePart, fractionalPart);
+        }
+
     }
 }

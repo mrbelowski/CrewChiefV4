@@ -455,7 +455,7 @@ reset_warning_text = This will reset all the Crew Chief settings to their defaul
 reset_warning_title = Reset All Settings to Default Values
 
 spotter_name_label = Spotter voice (requires restart)
-get_fuel_status = Report fuel status
+get_fuel_status = Report fuel/battery status
 
 toggle_manual_formation_lap = Toggle manual formation lap mode
 read_corner_names_for_lap = Read corner names for current lap
