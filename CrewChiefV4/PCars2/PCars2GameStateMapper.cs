@@ -942,7 +942,11 @@ namespace CrewChiefV4.PCars2
             currentGameState.PitData.HasRequestedPitStop = shared.mPitSchedule == (uint)ePitSchedule.PIT_SCHEDULE_PLAYER_REQUESTED;
             currentGameState.PitData.PitStallOccupied = shared.mPitSchedule == (uint)ePitSchedule.PIT_SCHEDULE_PITSPOT_OCCUPIED;
             currentGameState.PitData.IsPitCrewReady = !currentGameState.PitData.PitStallOccupied;
-            currentGameState.PitData.IsPitCrewDone = currentGameState.SessionData.SessionType == SessionType.Race && shared.mPitMode == (uint)ePitMode.PIT_MODE_DRIVING_OUT_OF_PITS;
+            
+            currentGameState.PitData.IsPitCrewDone = currentGameState.SessionData.SessionType == SessionType.Race && 
+                shared.mPitMode == (uint)ePitMode.PIT_MODE_DRIVING_OUT_OF_PITS &&
+                previousGameState != null && previousGameState.PositionAndMotionData.CarSpeed < 1;    // don't allow the 'go go go' message unless we were actually stopped
+            
             currentGameState.PitData.IsApproachingPitlane = shared.mPitMode == (uint)ePitMode.PIT_MODE_DRIVING_INTO_PITS;
            
             if (currentGameState.SessionData.SessionType == SessionType.Race && shared.mEnforcedPitStopLap > 0)
