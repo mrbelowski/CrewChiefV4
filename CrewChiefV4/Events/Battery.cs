@@ -10,8 +10,6 @@ namespace CrewChiefV4.Events
 {
     class Battery : AbstractEvent
     {
-        private const bool ExperimentalFeaturesOn = false;
-
         private readonly bool EnableBatteryMessages = UserSettings.GetUserSettings().getBoolean("enable_battery_messages");
 
         private const string folderOneLapEstimate = "battery/one_lap_battery";
@@ -36,6 +34,8 @@ namespace CrewChiefV4.Events
         private const string folderPercent = "battery/percent";
         private const string folderOnLastLapYouUsed = "battery/on_last_lap_you_used";
         private const string folderPercentOfYourBattery = "battery/percent_of_your_battery";
+        private const string folderUseIncreasing = "battery/battery_use_increasing";
+        private const string folderUseDecreasing = "battery/battery_use_reducing";
 
         class BatteryStatsEntry
         {
@@ -102,6 +102,7 @@ namespace CrewChiefV4.Events
         // Instead, just capture battery level at a lap start (windowed avg).  That way we can still announce last lap use.
         private float firstFullLapInitialChargeLeft = -1.0f;
         private float firstFullLapGameTime = -1.0f;
+        private BatteryUseTrend lastReportedTrend = BatteryUseTrend.Unknown;
 
         public Battery(AudioPlayer audioPlayer)
         {
@@ -148,6 +149,8 @@ namespace CrewChiefV4.Events
             this.windowedAverageChargeLeft = -1.0f;
             this.firstFullLapInitialChargeLeft = -1.0f;
             this.firstFullLapGameTime = -1.0f;
+
+            this.lastReportedTrend = BatteryUseTrend.Unknown;
         }
 
         public override List<SessionType> applicableSessionTypes
@@ -203,6 +206,8 @@ namespace CrewChiefV4.Events
                     this.windowedAverageChargeLeft = -1.0f;
                     this.firstFullLapInitialChargeLeft = -1.0f;
                     this.firstFullLapGameTime = -1.0f;
+
+                    this.lastReportedTrend = BatteryUseTrend.Unknown;
 
                     this.initialBatteryGameTime = currentGameState.SessionData.SessionRunningTime;
                     this.initialBatteryChargePercentage = currBattLeftPct;
@@ -495,8 +500,7 @@ namespace CrewChiefV4.Events
                         }
                     }  // if Timed or fixed lap race
 
-                    if (Battery.ExperimentalFeaturesOn
-                        && !this.playedPitForBatteryNow
+                    if (!this.playedPitForBatteryNow
                         && !this.playedTwoMinutesRemaining
                         && !this.playedFiveMinutesRemaining
                         && !this.playedTenMinutesRemaining
@@ -518,10 +522,20 @@ namespace CrewChiefV4.Events
                         else if (bu == Battery.BatteryUseTrend.Increasing)
                         {
                             Console.WriteLine("Battery use trend: Increasing");
+                            if (this.lastReportedTrend != Battery.BatteryUseTrend.Increasing)
+                            {
+                                this.audioPlayer.playMessage(new QueuedMessage("Battery/trend", MessageContents(Battery.folderUseIncreasing), 0, this));
+                                this.lastReportedTrend = Battery.BatteryUseTrend.Increasing;
+                            }
                         }
                         else if (bu == Battery.BatteryUseTrend.Decreasing)
                         {
                             Console.WriteLine("Battery use trend: Decreasing");
+                            if (this.lastReportedTrend != Battery.BatteryUseTrend.Decreasing)
+                            {
+                                this.audioPlayer.playMessage(new QueuedMessage("Battery/trend", MessageContents(Battery.folderUseDecreasing), 0, this));
+                                this.lastReportedTrend = Battery.BatteryUseTrend.Decreasing;
+                            }
                         }
                     }
                 }
@@ -542,13 +556,15 @@ namespace CrewChiefV4.Events
             if (this.batteryStats.Count < 5)
                 return Battery.BatteryUseTrend.Unknown;
 
+            const int lapsToAverage = 3;
+
             // Calculate 3 lap average consumption excluding last lap.
             var acc = 0.0f;
-            var startIdx = this.batteryStats.Count - 5;
-            for (var i = startIdx; i < this.batteryStats.Count - 3; ++i)
+            var startIdx = this.batteryStats.Count - lapsToAverage - 2;  // Last lap excluded from the average.
+            for (var i = startIdx; i < this.batteryStats.Count - 2; ++i)
                 acc += (this.batteryStats[i].AverageBatteryPercentageLeft - this.batteryStats[i + 1].AverageBatteryPercentageLeft);
 
-            var avgUse = acc / 3;
+            var avgUse = acc / lapsToAverage;
 
             var testLap1Use = this.batteryStats[this.batteryStats.Count - 3].AverageBatteryPercentageLeft 
                 - this.batteryStats[this.batteryStats.Count - 2].AverageBatteryPercentageLeft;
