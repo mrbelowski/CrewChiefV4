@@ -10,8 +10,7 @@ namespace CrewChiefV4.Events
 {
     class Battery : AbstractEvent
     {
-        private readonly bool enableBatteryMessages = UserSettings.GetUserSettings().getBoolean("enable_battery_messages");
-        private readonly bool delayResponses = UserSettings.GetUserSettings().getBoolean("enable_delayed_responses");
+        private readonly bool EnableBatteryMessages = UserSettings.GetUserSettings().getBoolean("enable_battery_messages");
 
         private const string folderOneLapEstimate = "battery/one_lap_battery";
         private const string folderTwoLapsEstimate = "battery/two_laps_battery";
@@ -33,6 +32,10 @@ namespace CrewChiefV4.Events
         private const string folderAboutToRunOut = "battery/about_to_run_out";
         private const string folderPercentagePerLap = "battery/percent_per_lap";
         private const string folderPercent = "battery/percent";
+        private const string folderOnLastLapYouUsed = "battery/on_last_lap_you_used";
+        private const string folderPercentOfYourBattery = "battery/percent_of_your_battery";
+        private const string folderUseIncreasing = "battery/battery_use_increasing";
+        private const string folderUseDecreasing = "battery/battery_use_reducing";
 
         class BatteryStatsEntry
         {
@@ -56,22 +59,26 @@ namespace CrewChiefV4.Events
             internal float SessionRunningTime = -1.0f;
         };
 
-        private const float averagedChargeWindowTime = 15.0f;
+        private const float BatteryLowThreshold = 10.0f;
+        private const float BatteryCriticalThreshold = 5.0f;
+
+        private const float AveragedChargeWindowTime = 15.0f;
         private LinkedList<BatteryWindowedStatsEntry> windowedBatteryStats = new LinkedList<BatteryWindowedStatsEntry>();
 
         bool batteryUseActive = false;
-        private float gameTimeWhenInitialized = -1.0f;
+
         private bool sessionHasFixedNumberOfLaps = false;
         private int halfDistance = -1;
         private int halfTime = -1;
         private int currLapBatteryUseSectorCheck = -1;
         private float initialBatteryChargePercentage = -1.0f;
-        private bool playedPitForBatteryNow = false;
+        private float initialBatteryGameTime = -1.0f;
 
         // Checking if we need to read battery messages involves a bit of arithmetic and stuff, so only do this every few seconds
         private DateTime nextBatteryStatusCheck = DateTime.MinValue;
         private readonly TimeSpan batteryStatusCheckInterval = TimeSpan.FromSeconds(5);
 
+        private bool playedPitForBatteryNow = false;
         private bool playedHalfDistanceBatteryEstimate = false;
         private bool playedHalfTimeBatteryEstimate = false;
         private bool playedTwoMinutesRemaining = false;
@@ -85,10 +92,17 @@ namespace CrewChiefV4.Events
         private bool playedHalfBatteryChargeWarning = false;
 
         // Cache variables to be used in command responses (separate thread, can't access collections).
-        // It should be ok that they aren't from the same update, otherwise we'll have to lock.
+        // It is not critical for all values to be consistent.  But if that changes we'll have to lock.
         private float averageUsagePerLap = -1.0f;
         private float averageUsagePerMinute = -1.0f;
+        private float prevLapBatteryUse = -1.0f;
         private float windowedAverageChargeLeft = -1.0f;
+
+        // We don't calculate averaged stats for the OutLap (because they largely vary on how the pit lane is).
+        // Instead, just capture battery level at a lap start (windowed avg).  That way we can still announce last lap use.
+        private float firstFullLapInitialChargeLeft = -1.0f;
+        private float firstFullLapGameTime = -1.0f;
+        private BatteryUseTrend lastReportedTrend = BatteryUseTrend.Unknown;
 
         public Battery(AudioPlayer audioPlayer)
         {
@@ -106,7 +120,7 @@ namespace CrewChiefV4.Events
             this.currLapMinBatteryLeft = float.MaxValue;
 
             this.batteryUseActive = false;
-            this.gameTimeWhenInitialized = -1.0f;
+            this.initialBatteryGameTime = -1.0f;
             this.sessionHasFixedNumberOfLaps = false;
             this.halfDistance = -1;
             this.halfTime = -1;
@@ -131,7 +145,12 @@ namespace CrewChiefV4.Events
 
             this.averageUsagePerLap = -1.0f;
             this.averageUsagePerMinute = -1.0f;
+            this.prevLapBatteryUse = -1.0f;
             this.windowedAverageChargeLeft = -1.0f;
+            this.firstFullLapInitialChargeLeft = -1.0f;
+            this.firstFullLapGameTime = -1.0f;
+
+            this.lastReportedTrend = BatteryUseTrend.Unknown;
         }
 
         public override List<SessionType> applicableSessionTypes
@@ -165,10 +184,8 @@ namespace CrewChiefV4.Events
                 if (!this.initialized
                     || (previousGameState != null && previousGameState.PitData.InPitlane && !currentGameState.PitData.InPitlane))  // Vehicle swap or some magical recharge ?
                 {
-                    // Not sure if stats should be cleared or not here.  Keep it around for now.
-                    // this.batteryStats.Clear();
+                    this.batteryStats.Clear();
                     this.windowedBatteryStats.Clear();
-                    this.windowedAverageChargeLeft = -1.0f;
                     this.currLapNumBatteryMeasurements = 0;
                     this.currLapBatteryPercentageLeftAccumulator = 0.0f;
                     this.currLapMinBatteryLeft = float.MaxValue;
@@ -182,7 +199,17 @@ namespace CrewChiefV4.Events
                     this.playedBatteryLowWarning = false;
                     this.playedBatteryCriticalWarning = false;
 
-                    this.gameTimeWhenInitialized = currentGameState.SessionData.SessionRunningTime;
+                    // Clear usage stats on pit in.
+                    this.averageUsagePerLap = -1.0f;
+                    this.averageUsagePerMinute = -1.0f;
+                    this.prevLapBatteryUse = -1.0f;
+                    this.windowedAverageChargeLeft = -1.0f;
+                    this.firstFullLapInitialChargeLeft = -1.0f;
+                    this.firstFullLapGameTime = -1.0f;
+
+                    this.lastReportedTrend = BatteryUseTrend.Unknown;
+
+                    this.initialBatteryGameTime = currentGameState.SessionData.SessionRunningTime;
                     this.initialBatteryChargePercentage = currBattLeftPct;
 
                     if (!this.initialized)
@@ -198,8 +225,7 @@ namespace CrewChiefV4.Events
                             this.halfTime = (int)Math.Ceiling(currentGameState.SessionData.SessionTotalRunTime / 2.0f);
                         }
 
-                        Console.WriteLine(string.Format("Battery use tracking initilized: initialChargePercentage = {0}%    halfDistance = {1} laps    halfTime = {2} minutes",
-                            this.initialBatteryChargePercentage.ToString("0.000"),
+                        Console.WriteLine(string.Format("Battery use tracking initilized: halfDistance = {0} laps    halfTime = {1} minutes",
                             this.halfDistance,
                             this.halfTime));
 
@@ -221,7 +247,7 @@ namespace CrewChiefV4.Events
                     while (entry != null)
                     {
                         var next = entry.Next;
-                        if ((currentGameState.SessionData.SessionRunningTime - entry.Value.SessionRunningTime) > Battery.averagedChargeWindowTime)
+                        if ((currentGameState.SessionData.SessionRunningTime - entry.Value.SessionRunningTime) > Battery.AveragedChargeWindowTime)
                             this.windowedBatteryStats.Remove(entry);
                         else
                             break;  // We're done.
@@ -231,6 +257,13 @@ namespace CrewChiefV4.Events
 
                     // Calculate windowed average charge level:
                     this.windowedAverageChargeLeft = this.windowedBatteryStats.Average(e => e.BatteryPercentageLeft);
+                }
+
+                if (currentGameState.SessionData.IsNewLap
+                    && this.firstFullLapInitialChargeLeft == -1.0f)
+                {
+                    this.firstFullLapInitialChargeLeft = this.windowedAverageChargeLeft;
+                    this.firstFullLapGameTime = currentGameState.SessionData.SessionRunningTime;
                 }
 
                 if (currentGameState.PitData.OnOutLap  // Don't track out laps.
@@ -248,12 +281,6 @@ namespace CrewChiefV4.Events
                         SessionRunningTime = currentGameState.SessionData.SessionRunningTime
                     });
 
-                    Console.WriteLine(string.Format("Last lap average battery left percentage: {0}%  min percentage: {1}%  windowed avg: {2}%,  curr percentage {3}%",
-                        this.batteryStats.Last().AverageBatteryPercentageLeft.ToString("0.000"),
-                        this.batteryStats.Last().MinimumBatteryPercentageLeft.ToString("0.000"),
-                        this.windowedBatteryStats.Average(e => e.BatteryPercentageLeft).ToString("0.000"),
-                        currBattLeftPct.ToString("0.000")));
-
                     this.currLapBatteryPercentageLeftAccumulator = 0.0f;
                     this.currLapNumBatteryMeasurements = 0;
                     this.currLapMinBatteryLeft = float.MaxValue;
@@ -264,11 +291,25 @@ namespace CrewChiefV4.Events
                     var prevLapStats = this.batteryStats.Last();
 
                     // Get battery use per lap:
-                    this.averageUsagePerLap = (this.initialBatteryChargePercentage - prevLapStats.AverageBatteryPercentageLeft) / this.batteryStats.Count;
+                    Debug.Assert(this.firstFullLapInitialChargeLeft != -1.0f);
+                    var batteryDrainSinceMonitoringStart = this.firstFullLapInitialChargeLeft - this.windowedAverageChargeLeft;
+                    this.averageUsagePerLap = batteryDrainSinceMonitoringStart / this.batteryStats.Count;
 
                     // Calculate per minute usage:
-                    var batteryDrainSinceMonitoringStart = this.initialBatteryChargePercentage - prevLapStats.AverageBatteryPercentageLeft;
-                    this.averageUsagePerMinute = (batteryDrainSinceMonitoringStart / prevLapStats.SessionRunningTime) * 60.0f;
+                    this.averageUsagePerMinute = (batteryDrainSinceMonitoringStart / (prevLapStats.SessionRunningTime - this.firstFullLapGameTime)) * 60.0f;
+
+                    // Save previous lap consumption:
+                    if (this.batteryStats.Count > 1)
+                        this.prevLapBatteryUse = this.batteryStats[this.batteryStats.Count - 2].AverageBatteryPercentageLeft - prevLapStats.AverageBatteryPercentageLeft;
+                    else if (this.firstFullLapInitialChargeLeft != -1.0f)
+                        this.prevLapBatteryUse = this.firstFullLapInitialChargeLeft - this.windowedAverageChargeLeft;
+
+                    Console.WriteLine(string.Format("Last lap average battery left percentage: {0}%  min percentage: {1}%  windowed avg: {2}%,  curr percentage {3}%  last lap use: {4}%",
+                        this.batteryStats.Last().AverageBatteryPercentageLeft.ToString("0.000"),
+                        this.batteryStats.Last().MinimumBatteryPercentageLeft.ToString("0.000"),
+                        this.windowedBatteryStats.Average(e => e.BatteryPercentageLeft).ToString("0.000"),
+                        currBattLeftPct.ToString("0.000"),
+                        this.prevLapBatteryUse.ToString("0.000")));
                 }
 
                 // Update this lap stats.
@@ -279,7 +320,7 @@ namespace CrewChiefV4.Events
 
                 // NOTE: unlike fuel messages, here we process data on new sector and randomly in cetain sector.  This is to reduce message overload on the new lap.
                 // Warnings for particular battery levels
-                if (this.enableBatteryMessages
+                if (this.EnableBatteryMessages
                     && currentGameState.SessionData.IsNewSector
                     && this.currLapBatteryUseSectorCheck == currentGameState.SessionData.SectorNumber
                     && this.batteryStats.Count > 0)
@@ -289,12 +330,12 @@ namespace CrewChiefV4.Events
                     var prevLapStats = this.batteryStats.Last();
 
                     // For now assume 10% is low, below 5% is critical.  Alternatively, this could be tied to avg per lap consumption.
-                    if (this.windowedAverageChargeLeft <= 10.0f && !this.playedBatteryLowWarning)
+                    if (this.windowedAverageChargeLeft <= Battery.BatteryLowThreshold && !this.playedBatteryLowWarning)
                     {
                         this.playedBatteryLowWarning = true;
                         this.audioPlayer.playMessage(new QueuedMessage("Battery/level", MessageContents(Battery.folderLowBattery), 0, this));
                     }
-                    else if (this.windowedAverageChargeLeft <= 5.0f && !this.playedBatteryCriticalWarning)
+                    else if (this.windowedAverageChargeLeft <= Battery.BatteryCriticalThreshold && !this.playedBatteryCriticalWarning)
                     {
                         this.playedBatteryCriticalWarning = true;
                         this.audioPlayer.playMessage(new QueuedMessage("Battery/level", MessageContents(Battery.folderCriticalBattery), 0, this));
@@ -304,12 +345,12 @@ namespace CrewChiefV4.Events
                     if (this.averageUsagePerLap > 0.0f
                         && (currentGameState.SessionData.SessionNumberOfLaps > 0 || currentGameState.SessionData.SessionType == SessionType.HotLap))
                     {
-                        var battStatusMsg = string.Format("starting battery = {0}%,  windowed avg charge = {1}%  previous lap avg charge = {2}%,  previous lap min charge = {3}%, current battery level = {4}%, usage per lap = {5}%",
-                            this.initialBatteryChargePercentage.ToString("0.000"),
+                        var battStatusMsg = string.Format("windowed avg charge = {0}%  previous lap avg charge = {1}%,  previous lap min charge = {2}%, current battery level = {3}%,  prev lap usage = {4}%,  usage per lap = {5}%",
                             this.windowedAverageChargeLeft.ToString("0.000"),
                             prevLapStats.AverageBatteryPercentageLeft.ToString("0.000"),
                             prevLapStats.MinimumBatteryPercentageLeft.ToString("0.000"),
                             currentGameState.BatteryData.BatteryPercentageLeft.ToString("0.000"),
+                            this.prevLapBatteryUse.ToString("0.000"),
                             this.averageUsagePerLap.ToString("0.000"));
 
                         var estBattLapsLeft = (int)Math.Floor(this.windowedAverageChargeLeft / this.averageUsagePerLap);
@@ -375,12 +416,12 @@ namespace CrewChiefV4.Events
                         && currentGameState.SessionData.SessionTotalRunTime > 0.0f
                         && this.averageUsagePerMinute > 0.0f)
                     {
-                        var battStatusMsg = string.Format("starting battery = {0}%,  windowed avg charge = {1}%,  previous lap avg charge = {2}%,  previous lap min charge = {3}%, current battery level = {4}%, usage per minute = {5}%",
-                            this.initialBatteryChargePercentage.ToString("0.000"),
+                        var battStatusMsg = string.Format("windowed avg charge = {0}%,  previous lap avg charge = {1}%,  previous lap min charge = {2}%, current battery level = {3}%,  prev lap usage = {4}%,  usage per minute = {5}%",
                             this.windowedAverageChargeLeft.ToString("0.000"),
                             prevLapStats.AverageBatteryPercentageLeft.ToString("0.000"),
                             prevLapStats.MinimumBatteryPercentageLeft.ToString("0.000"),
                             currentGameState.BatteryData.BatteryPercentageLeft.ToString("0.000"),
+                            this.prevLapBatteryUse.ToString("0.000"),
                             this.averageUsagePerMinute.ToString("0.000"));
 
                         this.nextBatteryStatusCheck = currentGameState.Now.Add(this.batteryStatusCheckInterval);
@@ -457,21 +498,124 @@ namespace CrewChiefV4.Events
                             this.playedHalfBatteryChargeWarning = true;
                             this.audioPlayer.playMessage(new QueuedMessage(Battery.folderHalfChargeWarning, 0, this));
                         }
+                    }  // if Timed or fixed lap race
+
+                    if (!this.playedPitForBatteryNow
+                        && !this.playedTwoMinutesRemaining
+                        && !this.playedFiveMinutesRemaining
+                        && !this.playedTenMinutesRemaining
+                        && !this.playedFourLapsRemaining
+                        && !this.playedThreeLapsRemaining
+                        && !this.playedTwoLapsRemaining
+                        && !this.playedBatteryLowWarning
+                        && !this.playedBatteryCriticalWarning)
+                    {
+                        var bu = this.EvaluateBatteryUse();
+                        if (bu == Battery.BatteryUseTrend.Unknown)
+                        {
+                            Console.WriteLine("Battery use trend: Unknown");
+                        }
+                        else if (bu == Battery.BatteryUseTrend.Stable)
+                        {
+                            Console.WriteLine("Battery use trend: Stable");
+                        }
+                        else if (bu == Battery.BatteryUseTrend.Increasing)
+                        {
+                            Console.WriteLine("Battery use trend: Increasing");
+                            if (this.lastReportedTrend != Battery.BatteryUseTrend.Increasing)
+                            {
+                                this.audioPlayer.playMessage(new QueuedMessage("Battery/trend", MessageContents(Battery.folderUseIncreasing), 0, this));
+                                this.lastReportedTrend = Battery.BatteryUseTrend.Increasing;
+                            }
+                        }
+                        else if (bu == Battery.BatteryUseTrend.Decreasing)
+                        {
+                            Console.WriteLine("Battery use trend: Decreasing");
+                            if (this.lastReportedTrend != Battery.BatteryUseTrend.Decreasing)
+                            {
+                                this.audioPlayer.playMessage(new QueuedMessage("Battery/trend", MessageContents(Battery.folderUseDecreasing), 0, this));
+                                this.lastReportedTrend = Battery.BatteryUseTrend.Decreasing;
+                            }
+                        }
                     }
                 }
             }
         }
 
+        private enum BatteryUseTrend
+        {
+            Unknown,
+            Stable,
+            Increasing,
+            Decreasing
+        }
+
+        private BatteryUseTrend EvaluateBatteryUse()
+        {
+            // Need at least 5 data points.
+            if (this.batteryStats.Count < 5)
+                return Battery.BatteryUseTrend.Unknown;
+
+            const int lapsToAverage = 3;
+
+            // Calculate 3 lap average consumption excluding last lap.
+            var acc = 0.0f;
+            var startIdx = this.batteryStats.Count - lapsToAverage - 2;  // Last lap excluded from the average.
+            for (var i = startIdx; i < this.batteryStats.Count - 2; ++i)
+                acc += (this.batteryStats[i].AverageBatteryPercentageLeft - this.batteryStats[i + 1].AverageBatteryPercentageLeft);
+
+            var avgUse = acc / lapsToAverage;
+
+            var testLap1Use = this.batteryStats[this.batteryStats.Count - 3].AverageBatteryPercentageLeft 
+                - this.batteryStats[this.batteryStats.Count - 2].AverageBatteryPercentageLeft;
+
+            var testLap2Use = this.batteryStats[this.batteryStats.Count - 2].AverageBatteryPercentageLeft
+                - this.batteryStats.Last().AverageBatteryPercentageLeft;
+
+            // If both most recent laps are lower than calculated average, use is decreasing.
+            if (testLap1Use < avgUse && testLap2Use < avgUse)
+                return Battery.BatteryUseTrend.Decreasing;
+            // Else, both most recent laps are higher than calculated average, use is increasing.
+            else if (testLap1Use > avgUse && testLap2Use > avgUse)
+                return Battery.BatteryUseTrend.Increasing;
+
+            // If neither is true, consumption is stable
+            return Battery.BatteryUseTrend.Stable;
+        }
+
+
         public void reportBatteryStatus(Boolean allowNoDataMessage)
         {
-            var reportedRemaining = this.reportBatteryRemaining(allowNoDataMessage);
-            var reportedUse = this.reportBatteryUse();
+            if (!GlobalBehaviourSettings.enabledMessageTypes.Contains(MessageTypes.BATTERY))
+            {
+                if (allowNoDataMessage)
+                    this.audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+
+                return;
+            }
+
+            var batteryRunningLow = false;
+            var reportedRemaining = this.reportBatteryRemaining(allowNoDataMessage, out batteryRunningLow);
+
+            var reportedUse = false;
+
+            // Don't report usage stats if we're running low already, it sounds a bit weird.
+            if (!batteryRunningLow)
+                reportedUse = this.reportBatteryUse();
+
             if (!reportedUse && !reportedRemaining && allowNoDataMessage)
                 this.audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
         }
 
         public override void respond(String voiceMessage)
         {
+            if (!GlobalBehaviourSettings.enabledMessageTypes.Contains(MessageTypes.BATTERY))
+            {
+                this.audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+
+                return;
+            }
+
             if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOWS_MY_BATTERY) ||
                 SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.CAR_STATUS) ||
                 SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.STATUS))
@@ -480,92 +624,103 @@ namespace CrewChiefV4.Events
             }
         }
 
-        private Boolean reportBatteryUse()
+        private bool reportBatteryUse()
         {
             var haveData = false;
-            if (!this.initialized || this.averageUsagePerLap < 0.0f)
+            if (!this.initialized || this.prevLapBatteryUse < 0.0f)
                 return haveData;
 
-            if (this.batteryUseActive && this.averageUsagePerLap > 0.0f)
+            if (this.batteryUseActive && this.prevLapBatteryUse > 0.0f)
             {
                 // round to 1dp
-                var meanUsePerLap = ((float)Math.Round(this.averageUsagePerLap * 10.0f)) / 10.0f;
-                if (meanUsePerLap == 0.0f)
+                var prevLapUse = ((float)Math.Round(this.prevLapBatteryUse * 10.0f)) / 10.0f;
+                if (prevLapUse == 0.0f)
                 {
                     // rounded battery use is < 0.1 litres per lap - can't really do anything with this.
                     return false;
                 }
 
-                // get the whole and fractional part (yeah, I know this is shit)
-                var str = meanUsePerLap.ToString();
-                var pointPosition = str.IndexOf('.');
-                var wholePart = 0;
-                var fractionalPart = 0;
-                if (pointPosition > 0)
-                {
-                    wholePart = int.Parse(str.Substring(0, pointPosition));
-                    fractionalPart = int.Parse(str[pointPosition + 1].ToString());
-                }
-                else
-                    wholePart = (int)meanUsePerLap;
+                var wholeAndFractional = Utilities.WholeAndFractionalPart(prevLapUse);
 
-                if (meanUsePerLap > 0.0f)
+                if (prevLapUse > 0.0f)
                 {
                     haveData = true;
+
+                    var wholePart = wholeAndFractional.Item1;
+                    var fractionalPart = wholeAndFractional.Item2;
+
                     if (fractionalPart > 0)
-                        this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/mean_use_per_lap",
-                                MessageContents(wholePart, NumberReader.folderPoint, fractionalPart, Battery.folderPercentagePerLap), 0, null));
+                    {
+                        var messageFragments = new List<MessageFragment>();
+                        messageFragments.Add(MessageFragment.Text(Battery.folderOnLastLapYouUsed));
+                        messageFragments.Add(MessageFragment.Integer(wholePart, false));
+                        messageFragments.Add(MessageFragment.Text(NumberReader.folderPoint));
+                        messageFragments.Add(MessageFragment.Integer(fractionalPart, false));
+                        messageFragments.Add(MessageFragment.Text(Battery.folderPercentOfYourBattery));
+
+                        this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/prev_lap_use", messageFragments, 0, null));
+                    }
                     else
-                        this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/mean_use_per_lap",
-                                MessageContents(wholePart, Battery.folderPercentagePerLap), 0, null));
+                    {
+                        var messageFragments = new List<MessageFragment>();
+                        messageFragments.Add(MessageFragment.Text(Battery.folderOnLastLapYouUsed));
+                        messageFragments.Add(MessageFragment.Integer(wholePart, false));
+                        messageFragments.Add(MessageFragment.Text(Battery.folderPercentOfYourBattery));
+
+                        this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/prev_lap_use", messageFragments, 0, null));
+                    }
                 }
             }
 
             return haveData;
         }
 
-        private Boolean reportBatteryRemaining(Boolean allowNowDataMessage)
+        private bool reportBatteryRemaining(bool allowNowDataMessage, out bool batteryRunningLow)
         {
             var haveData = false;
+            batteryRunningLow = false;
+
             if (this.windowedAverageChargeLeft < 0.0f)
                 return haveData;  // Nothing we can do.
 
-            if (!this.initialized  // Never initialized
-                || (this.averageUsagePerLap < 0.0f && this.averageUsagePerMinute < 0.0f))  // or usage stats not available yet
-            {
-                // Handle no rich data available cases.
-                if (!this.batteryUseActive && allowNowDataMessage)
-                {
-                    haveData = true;
-                    this.audioPlayer.playMessageImmediately(new QueuedMessage(Battery.folderPlentyOfBattery, 0, null));
-                }
-                else if (this.windowedAverageChargeLeft >= 10.0f)
-                {
-                    haveData = true;
-                    var messageFragments = new List<MessageFragment>();
-                    messageFragments.Add(MessageFragment.Integer((int)windowedAverageChargeLeft, false));
-                    messageFragments.Add(MessageFragment.Text(Battery.folderPercentRemaining));
-                    this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/level", messageFragments, 0, null));
-                }
-                else if (this.windowedAverageChargeLeft > 5.0f)
-                {
-                    haveData = true;
-                    this.audioPlayer.playMessage(new QueuedMessage("Battery/level", MessageContents(Battery.folderLowBattery), 0, this));
-                }
-                else if (this.windowedAverageChargeLeft <= 2.0f)
-                {
-                    haveData = true;
-                    this.audioPlayer.playMessage(new QueuedMessage("Battery/level", MessageContents(Battery.folderCriticalBattery), 0, this));
-                }
-                else if (this.windowedAverageChargeLeft > 0)
-                {
-                    haveData = true;
-                    this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/level",
-                            MessageContents(Battery.folderAboutToRunOut), 0, null));
-                }
+            // Assume battery is running low.
+            batteryRunningLow = true;
 
-                return haveData;
+            // Handle no rich data available cases.
+            if (!this.batteryUseActive && allowNowDataMessage)
+            {
+                haveData = true;
+                batteryRunningLow = false;
+                this.audioPlayer.playMessageImmediately(new QueuedMessage(Battery.folderPlentyOfBattery, 0, null));
             }
+            else if (this.windowedAverageChargeLeft >= Battery.BatteryLowThreshold)
+            {
+                haveData = true;
+                batteryRunningLow = false;
+                var messageFragments = new List<MessageFragment>();
+                messageFragments.Add(MessageFragment.Integer((int)windowedAverageChargeLeft, false));
+                messageFragments.Add(MessageFragment.Text(Battery.folderPercentRemaining));
+                this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/level", messageFragments, 0, null));
+            }
+            else if (this.windowedAverageChargeLeft > Battery.BatteryCriticalThreshold)
+            {
+                haveData = true;
+                this.audioPlayer.playMessage(new QueuedMessage("Battery/level", MessageContents(Battery.folderLowBattery), 0, this));
+            }
+            else if (this.windowedAverageChargeLeft <= 2.0f)
+            {
+                haveData = true;
+                this.audioPlayer.playMessage(new QueuedMessage("Battery/level", MessageContents(Battery.folderCriticalBattery), 0, this));
+            }
+            else if (this.windowedAverageChargeLeft > 0)
+            {
+                haveData = true;
+                this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/level",
+                        MessageContents(Battery.folderAboutToRunOut), 0, null));
+            }
+
+            if (batteryRunningLow || !this.batteryUseActive)
+                return haveData;
 
             if (this.sessionHasFixedNumberOfLaps && this.averageUsagePerLap > 0.0f)
             {

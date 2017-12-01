@@ -551,7 +551,7 @@ namespace CrewChiefV4.Events
                 {
                     meanUsePerLap = convertLitersToGallons(averageUsagePerLap, true);
                 }
-                Tuple<int, int> wholeandfractional = wholeAndFractionalPart(meanUsePerLap);
+                Tuple<int, int> wholeandfractional = Utilities.WholeAndFractionalPart(meanUsePerLap);
                 if (meanUsePerLap > 0)
                 {
                     haveData = true;
@@ -612,7 +612,7 @@ namespace CrewChiefV4.Events
                     if(fuelReportsInGallon)
                     {
                         // for gallons we want both whole and fractional part cause its a stupid unit.
-                        Tuple<int, int> wholeandfractional = wholeAndFractionalPart(totalUsage);
+                        Tuple<int, int> wholeandfractional = Utilities.WholeAndFractionalPart(totalUsage);
                         if (wholeandfractional.Item2 > 0)
                         {                            
                             messageFragments.AddRange(MessageContents(wholeandfractional.Item1, NumberReader.folderPoint, wholeandfractional.Item2, folderGallons));
@@ -673,7 +673,7 @@ namespace CrewChiefV4.Events
                     if (fuelReportsInGallon)
                     {
                         // for gallons we want both whole and fractional part cause its a stupid unit.
-                        Tuple<int, int> wholeandfractional = wholeAndFractionalPart(totalUsage);
+                        Tuple<int, int> wholeandfractional = Utilities.WholeAndFractionalPart(totalUsage);
                         if (wholeandfractional.Item2 > 0)
                         {
                             messageFragments.AddRange(MessageContents(wholeandfractional.Item1, NumberReader.folderPoint, wholeandfractional.Item2, folderGallons));
@@ -767,7 +767,7 @@ namespace CrewChiefV4.Events
                         List<MessageFragment> messageFragments = new List<MessageFragment>();
 
                         // for gallons we want both whole and fractional part cause its a stupid unit.
-                        Tuple<int, int> wholeandfractional = wholeAndFractionalPart(convertLitersToGallons(currentFuel,true));
+                        Tuple<int, int> wholeandfractional = Utilities.WholeAndFractionalPart(convertLitersToGallons(currentFuel, true));
                         if (wholeandfractional.Item2 > 0)
                         {
                             messageFragments.AddRange(MessageContents(wholeandfractional.Item1, NumberReader.folderPoint, wholeandfractional.Item2, folderGallonsRemaining));
@@ -828,7 +828,17 @@ namespace CrewChiefV4.Events
         }
 
         public void reportFuelStatus(Boolean allowNoDataMessage)
-        {            
+        {
+            if (!GlobalBehaviourSettings.enabledMessageTypes.Contains(MessageTypes.FUEL))
+            {
+                if (allowNoDataMessage)
+                {
+                    this.audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+                }
+
+                return;
+            }
+
             Boolean reportedRemaining = reportFuelRemaining(allowNoDataMessage);
             Boolean reportedConsumption = reportFuelConsumption();
             if (!reportedConsumption && !reportedRemaining && allowNoDataMessage)
@@ -839,6 +849,13 @@ namespace CrewChiefV4.Events
 
         public override void respond(String voiceMessage)
         {
+            if (!GlobalBehaviourSettings.enabledMessageTypes.Contains(MessageTypes.FUEL))
+            {
+                this.audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+
+                return;
+            }
+
             if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.WHATS_MY_FUEL_USAGE))
             {
                 if (!reportFuelConsumption())
@@ -922,24 +939,6 @@ namespace CrewChiefV4.Events
                 return ((float)Math.Round(gallons * 10f)) / 10f;
             }
             return gallons;
-        }
-        private Tuple<int,int> wholeAndFractionalPart(float cantThinkOfANaming)
-        {
-            // get the whole and fractional part (yeah, I know this is shit)
-            String str = cantThinkOfANaming.ToString();
-            int pointPosition = str.IndexOf('.');
-            int wholePart = 0;
-            int fractionalPart = 0;
-            if (pointPosition > 0)
-            {
-                wholePart = int.Parse(str.Substring(0, pointPosition));
-                fractionalPart = int.Parse(str[pointPosition + 1].ToString());
-            }
-            else
-            {
-                wholePart = (int)cantThinkOfANaming;
-            }
-            return new Tuple<int, int>(wholePart, fractionalPart);
         }
     }
 }

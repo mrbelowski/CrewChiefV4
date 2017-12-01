@@ -1014,7 +1014,7 @@ namespace CrewChiefV4
                     }
                     else if (controllerConfiguration.hasOutstandingClick(ControllerConfiguration.GET_FUEL_STATUS))
                     {
-                        Console.WriteLine("Getting fuel status");
+                        Console.WriteLine("Getting fuel/battery status");
                         crewChief.reportFuelStatus();
                         nextPollWait = 1000;
                     }
