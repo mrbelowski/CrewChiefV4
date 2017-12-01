@@ -472,6 +472,7 @@ namespace CrewChiefV4.PCars2
                     currentGameState.SessionData.SessionIteration = previousGameState.SessionData.SessionIteration;
                     currentGameState.SessionData.PositionAtStartOfCurrentLap = previousGameState.SessionData.PositionAtStartOfCurrentLap;
                     currentGameState.OpponentData = previousGameState.OpponentData;
+
                     currentGameState.PitData.PitWindowStart = previousGameState.PitData.PitWindowStart;
                     currentGameState.PitData.PitWindowEnd = previousGameState.PitData.PitWindowEnd;
                     currentGameState.PitData.PitWindow = previousGameState.PitData.PitWindow;
@@ -483,7 +484,10 @@ namespace CrewChiefV4.PCars2
                     currentGameState.PitData.MinPermittedDistanceOnCurrentTyre = previousGameState.PitData.MinPermittedDistanceOnCurrentTyre;
                     currentGameState.PitData.OnInLap = previousGameState.PitData.OnInLap;
                     currentGameState.PitData.OnOutLap = previousGameState.PitData.OnOutLap;
-                    // the other properties of PitData are updated each tick, and shouldn't be copied over here. Nasty...
+                    currentGameState.PitData.HasRequestedPitStop = previousGameState.PitData.HasRequestedPitStop;
+                    currentGameState.PitData.PitStallOccupied = previousGameState.PitData.PitStallOccupied;
+                    currentGameState.PitData.IsPitCrewReady = previousGameState.PitData.IsPitCrewReady;
+
                     currentGameState.SessionData.SessionTimesAtEndOfSectors = previousGameState.SessionData.SessionTimesAtEndOfSectors;
                     currentGameState.PenaltiesData.CutTrackWarnings = previousGameState.PenaltiesData.CutTrackWarnings;
                     currentGameState.SessionData.formattedPlayerLapTimes = previousGameState.SessionData.formattedPlayerLapTimes;                    
@@ -939,13 +943,32 @@ namespace CrewChiefV4.PCars2
             currentGameState.PitData.IsAtPitExit = previousGameState != null && currentGameState.PitData.OnOutLap && 
                 previousGameState.PitData.InPitlane && !currentGameState.PitData.InPitlane;
 
-            currentGameState.PitData.HasRequestedPitStop = shared.mPitSchedule == (uint)ePitSchedule.PIT_SCHEDULE_PLAYER_REQUESTED;
-            currentGameState.PitData.PitStallOccupied = shared.mPitSchedule == (uint)ePitSchedule.PIT_SCHEDULE_PITSPOT_OCCUPIED;
-            currentGameState.PitData.IsPitCrewReady = !currentGameState.PitData.PitStallOccupied;
+            ePitSchedule pitShedule = (ePitSchedule)shared.mPitSchedule;
+            if (pitShedule == ePitSchedule.PIT_SCHEDULE_NONE)
+            {
+                currentGameState.PitData.HasRequestedPitStop = false;
+                currentGameState.PitData.PitStallOccupied = false;
+                currentGameState.PitData.IsPitCrewReady = false;
+            }
+            else if (pitShedule == ePitSchedule.PIT_SCHEDULE_PLAYER_REQUESTED)
+            {
+                currentGameState.PitData.HasRequestedPitStop = true;
+                currentGameState.PitData.IsPitCrewReady = true;
+                currentGameState.PitData.PitStallOccupied = false;
+            }
+            else if (pitShedule == ePitSchedule.PIT_SCHEDULE_PITSPOT_OCCUPIED)
+            {
+                currentGameState.PitData.PitStallOccupied = true;
+                currentGameState.PitData.IsPitCrewReady = false;
+            }
             
             currentGameState.PitData.IsPitCrewDone = currentGameState.SessionData.SessionType == SessionType.Race && 
                 shared.mPitMode == (uint)ePitMode.PIT_MODE_DRIVING_OUT_OF_PITS &&
                 previousGameState != null && previousGameState.PositionAndMotionData.CarSpeed < 1;    // don't allow the 'go go go' message unless we were actually stopped
+            if (currentGameState.PitData.IsPitCrewDone)
+            {
+                currentGameState.PitData.IsPitCrewReady = false;
+            }
             
             currentGameState.PitData.IsApproachingPitlane = shared.mPitMode == (uint)ePitMode.PIT_MODE_DRIVING_INTO_PITS;
            
@@ -991,8 +1014,8 @@ namespace CrewChiefV4.PCars2
             currentGameState.FuelData.FuelPressure = shared.mFuelPressureKPa;
             currentGameState.FuelData.FuelUseActive = true;         // no way to tell if it's disabled
 
-            currentGameState.PenaltiesData.HasDriveThrough = shared.mPitSchedule == (int)ePitSchedule.PIT_SCHEDULE_DRIVE_THROUGH;
-            currentGameState.PenaltiesData.HasStopAndGo = shared.mPitSchedule == (int)ePitSchedule.PIT_SCHEDULE_STOP_GO;
+            currentGameState.PenaltiesData.HasDriveThrough = pitShedule == ePitSchedule.PIT_SCHEDULE_DRIVE_THROUGH;
+            currentGameState.PenaltiesData.HasStopAndGo = pitShedule == ePitSchedule.PIT_SCHEDULE_STOP_GO;
             
             currentGameState.PositionAndMotionData.CarSpeed = shared.mSpeed;
 
