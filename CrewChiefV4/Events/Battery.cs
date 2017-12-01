@@ -216,8 +216,7 @@ namespace CrewChiefV4.Events
                             this.halfTime = (int)Math.Ceiling(currentGameState.SessionData.SessionTotalRunTime / 2.0f);
                         }
 
-                        Console.WriteLine(string.Format("Battery use tracking initilized: initialChargePercentage = {0}%    halfDistance = {1} laps    halfTime = {2} minutes",
-                            this.initialBatteryChargePercentage.ToString("0.000"),
+                        Console.WriteLine(string.Format("Battery use tracking initilized: halfDistance = {0} laps    halfTime = {1} minutes",
                             this.halfDistance,
                             this.halfTime));
 
@@ -286,8 +285,9 @@ namespace CrewChiefV4.Events
 
                     // Calculate per minute usage:
                     //var batteryDrainSinceMonitoringStart = this.initialBatteryChargePercentage - prevLapStats.AverageBatteryPercentageLeft;
+                    // TODO: need to move this to this.firstFullLapInitialChargeLeft.  For that, need to also track the time it was set.  First lap messes math up.
                     var batteryDrainSinceMonitoringStart = this.initialBatteryChargePercentage - this.windowedAverageChargeLeft;
-                    this.averageUsagePerMinute = (batteryDrainSinceMonitoringStart / prevLapStats.SessionRunningTime) * 60.0f;
+                    this.averageUsagePerMinute = (batteryDrainSinceMonitoringStart / (prevLapStats.SessionRunningTime - this.gameTimeWhenInitialized)) * 60.0f;
 
                     // Save previous lap consumption:
                     if (this.batteryStats.Count > 1)
@@ -336,8 +336,7 @@ namespace CrewChiefV4.Events
                     if (this.averageUsagePerLap > 0.0f
                         && (currentGameState.SessionData.SessionNumberOfLaps > 0 || currentGameState.SessionData.SessionType == SessionType.HotLap))
                     {
-                        var battStatusMsg = string.Format("starting battery = {0}%,  windowed avg charge = {1}%  previous lap avg charge = {2}%,  previous lap min charge = {3}%, current battery level = {4}%,  prev lap usage = {5}%,  usage per lap = {6}%",
-                            this.initialBatteryChargePercentage.ToString("0.000"),
+                        var battStatusMsg = string.Format("windowed avg charge = {0}%  previous lap avg charge = {1}%,  previous lap min charge = {2}%, current battery level = {3}%,  prev lap usage = {4}%,  usage per lap = {5}%",
                             this.windowedAverageChargeLeft.ToString("0.000"),
                             prevLapStats.AverageBatteryPercentageLeft.ToString("0.000"),
                             prevLapStats.MinimumBatteryPercentageLeft.ToString("0.000"),
@@ -408,8 +407,7 @@ namespace CrewChiefV4.Events
                         && currentGameState.SessionData.SessionTotalRunTime > 0.0f
                         && this.averageUsagePerMinute > 0.0f)
                     {
-                        var battStatusMsg = string.Format("starting battery = {0}%,  windowed avg charge = {1}%,  previous lap avg charge = {2}%,  previous lap min charge = {3}%, current battery level = {4}%,  prev lap usage = {5}%,  usage per minute = {6}%",
-                            this.initialBatteryChargePercentage.ToString("0.000"),
+                        var battStatusMsg = string.Format("windowed avg charge = {0}%,  previous lap avg charge = {1}%,  previous lap min charge = {2}%, current battery level = {3}%,  prev lap usage = {4}%,  usage per minute = {5}%",
                             this.windowedAverageChargeLeft.ToString("0.000"),
                             prevLapStats.AverageBatteryPercentageLeft.ToString("0.000"),
                             prevLapStats.MinimumBatteryPercentageLeft.ToString("0.000"),
@@ -540,12 +538,13 @@ namespace CrewChiefV4.Events
             if (this.batteryStats.Count < 5)
                 return Battery.BatteryUseTrend.Unknown;
 
-            // Calculate average consumption excluding 2 laps laps.
-            var acc = this.firstFullLapInitialChargeLeft - this.batteryStats.First().AverageBatteryPercentageLeft;
-            for (var i = 1; i < this.batteryStats.Count - 2; ++i)
-                acc += (this.batteryStats[i - 1].AverageBatteryPercentageLeft - this.batteryStats[i].AverageBatteryPercentageLeft);
+            // Calculate 3 lap average consumption excluding last lap.
+            var acc = 0.0f;
+            var startIdx = this.batteryStats.Count - 5;
+            for (var i = startIdx; i < this.batteryStats.Count - 3; ++i)
+                acc += (this.batteryStats[i].AverageBatteryPercentageLeft - this.batteryStats[i + 1].AverageBatteryPercentageLeft);
 
-            var avgUse = acc / (this.batteryStats.Count - 2);
+            var avgUse = acc / 3;
 
             var testLap1Use = this.batteryStats[this.batteryStats.Count - 3].AverageBatteryPercentageLeft 
                 - this.batteryStats[this.batteryStats.Count - 2].AverageBatteryPercentageLeft;
