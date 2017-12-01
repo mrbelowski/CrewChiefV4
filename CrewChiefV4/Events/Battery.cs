@@ -281,12 +281,14 @@ namespace CrewChiefV4.Events
                     // Get battery use per lap:
                     //this.averageUsagePerLap = (this.initialBatteryChargePercentage - prevLapStats.AverageBatteryPercentageLeft) / this.batteryStats.Count;
                     Debug.Assert(this.firstFullLapInitialChargeLeft != -1.0f);
-                    this.averageUsagePerLap = (this.firstFullLapInitialChargeLeft - this.windowedAverageChargeLeft) / this.batteryStats.Count;
+                    var batteryDrainSinceMonitoringStart = this.firstFullLapInitialChargeLeft - this.windowedAverageChargeLeft;
+                    this.averageUsagePerLap = batteryDrainSinceMonitoringStart / this.batteryStats.Count;
 
                     // Calculate per minute usage:
                     //var batteryDrainSinceMonitoringStart = this.initialBatteryChargePercentage - prevLapStats.AverageBatteryPercentageLeft;
                     // TODO: need to move this to this.firstFullLapInitialChargeLeft.  For that, need to also track the time it was set.  First lap messes math up.
-                    var batteryDrainSinceMonitoringStart = this.initialBatteryChargePercentage - this.windowedAverageChargeLeft;
+                    //var batteryDrainSinceMonitoringStart = this.initialBatteryChargePercentage - this.windowedAverageChargeLeft;
+                    // Remove game time blah.
                     this.averageUsagePerMinute = (batteryDrainSinceMonitoringStart / (prevLapStats.SessionRunningTime - this.gameTimeWhenInitialized)) * 60.0f;
 
                     // Save previous lap consumption:
