@@ -10,7 +10,7 @@ namespace CrewChiefV4.Events
 {
     class Battery : AbstractEvent
     {
-        private const bool ExperimentalFeaturesOn = true;
+        private const bool ExperimentalFeaturesOn = false;
 
         private readonly bool EnableBatteryMessages = UserSettings.GetUserSettings().getBoolean("enable_battery_messages");
 
@@ -66,18 +66,19 @@ namespace CrewChiefV4.Events
         private LinkedList<BatteryWindowedStatsEntry> windowedBatteryStats = new LinkedList<BatteryWindowedStatsEntry>();
 
         bool batteryUseActive = false;
-        private float gameTimeWhenInitialized = -1.0f;
+
         private bool sessionHasFixedNumberOfLaps = false;
         private int halfDistance = -1;
         private int halfTime = -1;
         private int currLapBatteryUseSectorCheck = -1;
         private float initialBatteryChargePercentage = -1.0f;
-        private bool playedPitForBatteryNow = false;
+        private float initialBatteryGameTime = -1.0f;
 
         // Checking if we need to read battery messages involves a bit of arithmetic and stuff, so only do this every few seconds
         private DateTime nextBatteryStatusCheck = DateTime.MinValue;
         private readonly TimeSpan batteryStatusCheckInterval = TimeSpan.FromSeconds(5);
 
+        private bool playedPitForBatteryNow = false;
         private bool playedHalfDistanceBatteryEstimate = false;
         private bool playedHalfTimeBatteryEstimate = false;
         private bool playedTwoMinutesRemaining = false;
@@ -100,6 +101,7 @@ namespace CrewChiefV4.Events
         // We don't calculate averaged stats for the OutLap (because they largely vary on how the pit lane is).
         // Instead, just capture battery level at a lap start (windowed avg).  That way we can still announce last lap use.
         private float firstFullLapInitialChargeLeft = -1.0f;
+        private float firstFullLapGameTime = -1.0f;
 
         public Battery(AudioPlayer audioPlayer)
         {
@@ -117,7 +119,7 @@ namespace CrewChiefV4.Events
             this.currLapMinBatteryLeft = float.MaxValue;
 
             this.batteryUseActive = false;
-            this.gameTimeWhenInitialized = -1.0f;
+            this.initialBatteryGameTime = -1.0f;
             this.sessionHasFixedNumberOfLaps = false;
             this.halfDistance = -1;
             this.halfTime = -1;
@@ -145,6 +147,7 @@ namespace CrewChiefV4.Events
             this.prevLapBatteryUse = -1.0f;
             this.windowedAverageChargeLeft = -1.0f;
             this.firstFullLapInitialChargeLeft = -1.0f;
+            this.firstFullLapGameTime = -1.0f;
         }
 
         public override List<SessionType> applicableSessionTypes
@@ -199,8 +202,9 @@ namespace CrewChiefV4.Events
                     this.prevLapBatteryUse = -1.0f;
                     this.windowedAverageChargeLeft = -1.0f;
                     this.firstFullLapInitialChargeLeft = -1.0f;
+                    this.firstFullLapGameTime = -1.0f;
 
-                    this.gameTimeWhenInitialized = currentGameState.SessionData.SessionRunningTime;
+                    this.initialBatteryGameTime = currentGameState.SessionData.SessionRunningTime;
                     this.initialBatteryChargePercentage = currBattLeftPct;
 
                     if (!this.initialized)
@@ -252,7 +256,10 @@ namespace CrewChiefV4.Events
 
                 if (currentGameState.SessionData.IsNewLap
                     && this.firstFullLapInitialChargeLeft == -1.0f)
+                {
                     this.firstFullLapInitialChargeLeft = this.windowedAverageChargeLeft;
+                    this.firstFullLapGameTime = currentGameState.SessionData.SessionRunningTime;
+                }
 
                 if (currentGameState.PitData.OnOutLap  // Don't track out laps.
                     || (previousGameState != null && previousGameState.PitData.OnOutLap)
@@ -279,17 +286,12 @@ namespace CrewChiefV4.Events
                     var prevLapStats = this.batteryStats.Last();
 
                     // Get battery use per lap:
-                    //this.averageUsagePerLap = (this.initialBatteryChargePercentage - prevLapStats.AverageBatteryPercentageLeft) / this.batteryStats.Count;
                     Debug.Assert(this.firstFullLapInitialChargeLeft != -1.0f);
                     var batteryDrainSinceMonitoringStart = this.firstFullLapInitialChargeLeft - this.windowedAverageChargeLeft;
                     this.averageUsagePerLap = batteryDrainSinceMonitoringStart / this.batteryStats.Count;
 
                     // Calculate per minute usage:
-                    //var batteryDrainSinceMonitoringStart = this.initialBatteryChargePercentage - prevLapStats.AverageBatteryPercentageLeft;
-                    // TODO: need to move this to this.firstFullLapInitialChargeLeft.  For that, need to also track the time it was set.  First lap messes math up.
-                    //var batteryDrainSinceMonitoringStart = this.initialBatteryChargePercentage - this.windowedAverageChargeLeft;
-                    // Remove game time blah.
-                    this.averageUsagePerMinute = (batteryDrainSinceMonitoringStart / (prevLapStats.SessionRunningTime - this.gameTimeWhenInitialized)) * 60.0f;
+                    this.averageUsagePerMinute = (batteryDrainSinceMonitoringStart / (prevLapStats.SessionRunningTime - this.firstFullLapGameTime)) * 60.0f;
 
                     // Save previous lap consumption:
                     if (this.batteryStats.Count > 1)
