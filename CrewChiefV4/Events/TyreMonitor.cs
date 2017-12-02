@@ -383,6 +383,20 @@ namespace CrewChiefV4.Events
                 "  |------|  " + Math.Round(tyreData.RearRight_LeftTemp, 2) + 
                 ", " + Math.Round(tyreData.RearRight_CenterTemp, 2) + 
                 ", " + Math.Round(tyreData.RearRight_RightTemp, 2));
+
+            Console.WriteLine("-------------------------");
+            Console.WriteLine("Peak fronts:    " + Math.Round(tyreData.PeakFrontLeftTemperatureForLap, 2) +
+                "  |------|  " + Math.Round(tyreData.PeakFrontRightTemperatureForLap, 2));
+            Console.WriteLine("Peak rears:    " + Math.Round(tyreData.PeakRearLeftTemperatureForLap, 2) +
+                "  |------|  " + Math.Round(tyreData.PeakRearRightTemperatureForLap, 2));
+
+            Console.WriteLine("-------------------------");
+            Console.WriteLine("Temperature interpretation:");
+            foreach (var key in tyreData.TyreTempStatus.cornersForEachStatus)
+            {
+                Console.WriteLine("Status: " + key);
+            }
+
             Console.WriteLine("-------------------------");
             Console.WriteLine("Wear, percentage  |------|  percentage");
             Console.WriteLine("Fronts:    " + Math.Round(tyreData.FrontLeftPercentWear, 2) +
