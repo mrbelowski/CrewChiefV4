@@ -14263,6 +14263,73 @@
 					"isCommonOvertakingSpot": true
 				}
 			]
+		},
+		{
+			"rf2TrackNames": [
+				"Hong Kong"
+			],
+			"trackLandmarks": [{
+					"landmarkName": "turn1",
+					"distanceRoundLapStart": 146.661469,
+					"distanceRoundLapEnd": 190.171463,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn2",
+					"distanceRoundLapStart": 723.6508,
+					"distanceRoundLapEnd": 766.1762,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn3",
+					"distanceRoundLapStart": 843.668,
+					"distanceRoundLapEnd": 874.777466,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn4",
+					"distanceRoundLapStart": 885.0,
+					"distanceRoundLapEnd": 903.2036,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn5",
+					"distanceRoundLapStart": 950.1227,
+					"distanceRoundLapEnd": 1032.37256,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn6",
+					"distanceRoundLapStart": 1130.11438,
+					"distanceRoundLapEnd": 1179.56909,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn7",
+					"distanceRoundLapStart": 1234.741,
+					"distanceRoundLapEnd": 1315.307,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn8",
+					"distanceRoundLapStart": 1349.90991,
+					"distanceRoundLapEnd": 1391.59668,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "turn9",
+					"distanceRoundLapStart": 1512.45117,
+					"distanceRoundLapEnd": 1561.51355,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn10",
+					"distanceRoundLapStart": 1610.1781,
+					"distanceRoundLapEnd": 1716.66724,
+					"isCommonOvertakingSpot": true
+				}
+			],
+			"isOval": false
 		}
 	]
 }
