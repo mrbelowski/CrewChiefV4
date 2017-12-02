@@ -1216,7 +1216,7 @@ namespace CrewChiefV4.RaceRoom
             // no way to have unmatched tyre types in R3E
             currentGameState.TyreData.HasMatchedTyreTypes = true;
             currentGameState.TyreData.TyreWearActive = shared.TireWearActive == 1;
-            TyreType tyreType = mapToTyreType(shared.TireTypeFront, shared.TireSubTypeFront, shared.TireTypeRear, shared.TireSubTypeFront, currentGameState.carClass.carClassEnum);            
+            TyreType tyreType = mapToTyreType(shared.TireTypeFront, shared.TireSubTypeFront, shared.TireTypeRear, shared.TireSubTypeFront, currentGameState.carClass.carClassEnum);
             currentGameState.TyreData.FrontLeft_CenterTemp = shared.TireTemp.FrontLeft_Center;
             currentGameState.TyreData.FrontLeft_LeftTemp = shared.TireTemp.FrontLeft_Left;
             currentGameState.TyreData.FrontLeft_RightTemp = shared.TireTemp.FrontLeft_Right;
@@ -1284,7 +1284,7 @@ namespace CrewChiefV4.RaceRoom
             currentGameState.TyreData.TyreConditionStatus = CornerData.getCornerData(tyreWearThresholds, currentGameState.TyreData.FrontLeftPercentWear,
                 currentGameState.TyreData.FrontRightPercentWear, currentGameState.TyreData.RearLeftPercentWear, currentGameState.TyreData.RearRightPercentWear);
 
-            var tyreTempThresholds = CarData.getTyreTempThresholds(currentGameState.carClass);
+            var tyreTempThresholds = CarData.getTyreTempThresholds(currentGameState.carClass, tyreType);
             currentGameState.TyreData.TyreTempStatus = CornerData.getCornerData(tyreTempThresholds,
                 currentGameState.TyreData.PeakFrontLeftTemperatureForLap, currentGameState.TyreData.PeakFrontRightTemperatureForLap,
                 currentGameState.TyreData.PeakRearLeftTemperatureForLap, currentGameState.TyreData.PeakRearRightTemperatureForLap);
@@ -1391,17 +1391,21 @@ namespace CrewChiefV4.RaceRoom
         private TyreType mapToTyreType(int tire_type_front, int tire_sub_type_front, int tire_type_rear, int tire_sub_type_rear, CarData.CarClassEnum carClass)
         {
             // TODO: handle cases where the front and rears are different types or subtypes. Here we assume the rears are always the same as the fronts
-            if ((int)RaceRoomConstant.TireSubType.Hard == tire_sub_type_front)
+            if (CarData.r3e2017TyreModelClasses.Contains(carClass))
             {
-                return TyreType.Hard;
+                return TyreType.R3E_2017;
+            } 
+            else if (carClass == CarData.CarClassEnum. F1 && (int)RaceRoomConstant.TireSubType.Hard == tire_sub_type_front)
+            {
+                return TyreType.R3E_2016_HARD;
             }
-            else if ((int)RaceRoomConstant.TireSubType.Medium == tire_sub_type_front)
+            else if (carClass == CarData.CarClassEnum.F1 && (int)RaceRoomConstant.TireSubType.Medium == tire_sub_type_front)
             {
-                return TyreType.Medium;
+                return TyreType.R3E_2016_MEDIUM;
             }
-            else if ((int)RaceRoomConstant.TireSubType.Soft == tire_sub_type_front)
+            else if (carClass == CarData.CarClassEnum.F1 && (int)RaceRoomConstant.TireSubType.Soft == tire_sub_type_front)
             {
-                return TyreType.Soft;
+                return TyreType.R3E_2016_SOFT;
             }
             else if ((int)RaceRoomConstant.TireSubType.Alternate == tire_sub_type_front)
             {
@@ -1421,9 +1425,9 @@ namespace CrewChiefV4.RaceRoom
             {
                 return TyreType.Prime;
             }
-            else if (CarData.r3eNewTyreModelClasses.Contains(carClass))
+            else if (CarData.r3e2016TyreModelClasses.Contains(carClass))
             {
-                return TyreType.R3E_NEW;
+                return TyreType.R3E_2016;
             }
             else
             {
