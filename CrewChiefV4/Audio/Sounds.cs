@@ -538,10 +538,6 @@ namespace CrewChiefV4.Audio
                         {
                             sound.LoadAndCacheFile();
                         }
-                        if (allowCaching)
-                        {
-                            sound.LoadAndCacheSound();
-                        }
                         singleSounds.Add("start_bleep", sound);
                         availableSounds.Add("start_bleep");
                     }
@@ -552,10 +548,6 @@ namespace CrewChiefV4.Audio
                         if (eagerLoadSoundFiles)
                         {
                             sound.LoadAndCacheFile();
-                        }
-                        if (allowCaching)
-                        {
-                            sound.LoadAndCacheSound();
                         }
                         singleSounds.Add("end_bleep", sound);
                         availableSounds.Add("end_bleep");
@@ -568,10 +560,6 @@ namespace CrewChiefV4.Audio
                         {
                             sound.LoadAndCacheFile();
                         }
-                        if (allowCaching)
-                        {
-                            sound.LoadAndCacheSound();
-                        }
                         singleSounds.Add("short_start_bleep", sound);
                         availableSounds.Add("short_start_bleep");
                     }
@@ -582,10 +570,6 @@ namespace CrewChiefV4.Audio
                         if (eagerLoadSoundFiles)
                         {
                             sound.LoadAndCacheFile();
-                        }
-                        if (allowCaching)
-                        {
-                            sound.LoadAndCacheSound();
                         }
                         singleSounds.Add("listen_start_sound", sound);
                         availableSounds.Add("listen_start_sound");
@@ -598,10 +582,6 @@ namespace CrewChiefV4.Audio
                         {
                             sound.LoadAndCacheFile();
                         }
-                        if (allowCaching)
-                        {
-                            sound.LoadAndCacheSound();
-                        }
                         singleSounds.Add("alternate_start_bleep", sound);
                         availableSounds.Add("alternate_start_bleep");
                     }
@@ -613,10 +593,6 @@ namespace CrewChiefV4.Audio
                         {
                             sound.LoadAndCacheFile();
                         }
-                        if (allowCaching)
-                        {
-                            sound.LoadAndCacheSound();
-                        }
                         singleSounds.Add("alternate_end_bleep", sound);
                         availableSounds.Add("alternate_end_bleep");
                     }
@@ -627,10 +603,6 @@ namespace CrewChiefV4.Audio
                         if (eagerLoadSoundFiles)
                         {
                             sound.LoadAndCacheFile();
-                        }
-                        if (allowCaching)
-                        {
-                            sound.LoadAndCacheSound();
                         }
                         singleSounds.Add("alternate_short_start_bleep", sound);
                         availableSounds.Add("alternate_short_start_bleep");
@@ -1020,6 +992,8 @@ namespace CrewChiefV4.Audio
 
         private NAudio.Wave.WaveOut waveOut;
         private NAudio.Wave.WaveFileReader reader;
+        // only used for bleeps
+        private int deviceIdWhenCached = 0;
 
         AutoResetEvent playWaitHandle = new AutoResetEvent(false);
 
@@ -1102,8 +1076,29 @@ namespace CrewChiefV4.Audio
                 // only beeps are cached when using nAudio
                 if (AudioPlayer.playWithNAudio && isBleep)
                 {
-                    LoadNAudioWaveOut();
-                    loadedSoundPlayer = true;
+                    if (loadedSoundPlayer && AudioPlayer.naudioMessagesPlaybackDeviceId != deviceIdWhenCached)
+                    {
+                        // naudio device ID has changed since the beep was cached, so unload and re-cache it
+                        try
+                        {
+                            this.reader.Dispose();
+                        }
+                        catch (Exception)
+                        { }
+                        try
+                        {
+                            this.waveOut.Stop();
+                            this.waveOut.Dispose();
+                        }
+                        catch (Exception) { }
+                        loadedSoundPlayer = false;
+                    }
+                    if (!loadedSoundPlayer)
+                    {
+                        LoadNAudioWaveOut();
+                        loadedSoundPlayer = true;
+                        deviceIdWhenCached = AudioPlayer.naudioMessagesPlaybackDeviceId;
+                    }
                 }
                 else if (!AudioPlayer.playWithNAudio && !loadedSoundPlayer)
                 {
@@ -1244,8 +1239,9 @@ namespace CrewChiefV4.Audio
                             LoadAndCacheFile();
                         }
                         // beeps are forceably cached:
-                        if (isBleep && loadedSoundPlayer)
+                        if (isBleep)
                         {
+                            LoadAndCacheSound();
                             this.reader.CurrentTime = TimeSpan.Zero;
                             this.waveOut.Play();
                             this.playWaitHandle.WaitOne(30000);
