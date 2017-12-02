@@ -59,6 +59,7 @@ namespace CrewChiefV4.Events
             internal float SessionRunningTime = -1.0f;
         };
 
+        private const int NumLapsAverageWindow = 3;
         private const float BatteryLowThreshold = 10.0f;
         private const float BatteryCriticalThreshold = 5.0f;
 
@@ -293,9 +294,23 @@ namespace CrewChiefV4.Events
                     // Get battery use per lap:
                     Debug.Assert(this.firstFullLapInitialChargeLeft != -1.0f);
                     var batteryDrainSinceMonitoringStart = this.firstFullLapInitialChargeLeft - this.windowedAverageChargeLeft;
-                    this.averageUsagePerLap = batteryDrainSinceMonitoringStart / this.batteryStats.Count;
+
+                    if (this.batteryStats.Count > 1)
+                    {
+                        var startIdx = Math.Max(0, this.batteryStats.Count - Battery.NumLapsAverageWindow - 1);
+                        var numDataPoints = Math.Min(this.batteryStats.Count - 1, Battery.NumLapsAverageWindow);
+
+                        var acc = 0.0f;
+                        for (var i = startIdx; i < this.batteryStats.Count - 1; ++i)
+                            acc += this.batteryStats[i].AverageBatteryPercentageLeft - this.batteryStats[i + 1].AverageBatteryPercentageLeft;
+
+                        this.averageUsagePerLap = acc / numDataPoints;
+                    }
+                    else
+                        this.averageUsagePerLap = batteryDrainSinceMonitoringStart / this.batteryStats.Count;
 
                     // Calculate per minute usage:
+                    // TODO: move to windowed as well.
                     this.averageUsagePerMinute = (batteryDrainSinceMonitoringStart / (prevLapStats.SessionRunningTime - this.firstFullLapGameTime)) * 60.0f;
 
                     // Save previous lap consumption:
@@ -304,12 +319,14 @@ namespace CrewChiefV4.Events
                     else if (this.firstFullLapInitialChargeLeft != -1.0f)
                         this.prevLapBatteryUse = this.firstFullLapInitialChargeLeft - this.windowedAverageChargeLeft;
 
-                    Console.WriteLine(string.Format("Last lap average battery left percentage: {0}%  min percentage: {1}%  windowed avg: {2}%,  curr percentage {3}%  last lap use: {4}%",
+                    Console.WriteLine(string.Format("Last lap average battery left percentage: {0}%  min percentage: {1}%  windowed charge: {2}%,  curr percentage {3}%  last lap use: {4}%  windowed avg per lap: {5}%  avg per min: {6}%",
                         this.batteryStats.Last().AverageBatteryPercentageLeft.ToString("0.000"),
                         this.batteryStats.Last().MinimumBatteryPercentageLeft.ToString("0.000"),
-                        this.windowedBatteryStats.Average(e => e.BatteryPercentageLeft).ToString("0.000"),
+                        this.windowedAverageChargeLeft,
                         currBattLeftPct.ToString("0.000"),
-                        this.prevLapBatteryUse.ToString("0.000")));
+                        this.prevLapBatteryUse.ToString("0.000"),
+                        this.averageUsagePerLap.ToString("0.000"),
+                        this.averageUsagePerMinute.ToString("0.000")));
                 }
 
                 // Update this lap stats.
