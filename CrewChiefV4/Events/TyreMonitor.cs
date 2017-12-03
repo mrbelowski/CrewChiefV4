@@ -469,7 +469,7 @@ namespace CrewChiefV4.Events
                     currentGameState.carClass.carClassEnum != CarData.CarClassEnum.KART_F1 &&
                     currentGameState.carClass.carClassEnum != CarData.CarClassEnum.KART_JUNIOR;
 
-                if (Utilities.random.Next(0, 1) == 0)
+                if (Utilities.random.Next(0, 2) == 0)
                 {
                     thisLapTyreConditionReportSector = 2;
                     thisLapTyreTempReportSector = 3;
