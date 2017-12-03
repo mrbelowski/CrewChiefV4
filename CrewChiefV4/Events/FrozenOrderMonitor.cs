@@ -154,9 +154,9 @@ namespace CrewChiefV4.Events
                 Console.WriteLine("Frozen Order: New Phase detected: " + cfod.Phase);
 
                 if (cfod.Phase == FrozenOrderPhase.Rolling)
-                    audioPlayer.playMessage(new QueuedMessage(folderRollingStartReminder, Utilities.random.Next(0, 2), this));
+                    audioPlayer.playMessage(new QueuedMessage(folderRollingStartReminder, Utilities.random.Next(0, 3), this));
                 else if (cfod.Phase == FrozenOrderPhase.FormationStanding)
-                    audioPlayer.playMessage(new QueuedMessage(folderStandingStartReminder, Utilities.random.Next(0, 2), this));
+                    audioPlayer.playMessage(new QueuedMessage(folderStandingStartReminder, Utilities.random.Next(0, 3), this));
 
                 // Clear previous state.
                 this.clearState();
@@ -206,8 +206,8 @@ namespace CrewChiefV4.Events
                         if (shouldFollowSafetyCar || SoundCache.hasSuitableTTSVoice || SoundCache.availableDriverNames.Contains(usableDriverNameToFollow))
                         {
                             if (cfod.AssignedColumn == FrozenOrderColumn.None
-                                || Utilities.random.Next(1, 10) > 8)  // Randomly, announce message without coulmn info.
-                                audioPlayer.playMessage(new QueuedMessage("frozen_order/follow_driver", MessageContents(folderFollow, usableDriverNameToFollow), Utilities.random.Next(0, 2), this, validationData));
+                                || Utilities.random.Next(1, 11) > 8)  // Randomly, announce message without coulmn info.
+                                audioPlayer.playMessage(new QueuedMessage("frozen_order/follow_driver", MessageContents(folderFollow, usableDriverNameToFollow), Utilities.random.Next(0, 3), this, validationData));
                             else
                             {
                                 string columnName;
@@ -215,7 +215,7 @@ namespace CrewChiefV4.Events
                                     columnName = cfod.AssignedColumn == FrozenOrderColumn.Left ? folderInTheInsideColumn : folderInTheOutsideColumn;
                                 else
                                     columnName = cfod.AssignedColumn == FrozenOrderColumn.Left ? folderInTheLeftColumn : folderInTheRightColumn;
-                                audioPlayer.playMessage(new QueuedMessage("frozen_order/follow_driver", MessageContents(folderFollow, usableDriverNameToFollow, columnName), Utilities.random.Next(0, 2), this, validationData));
+                                audioPlayer.playMessage(new QueuedMessage("frozen_order/follow_driver", MessageContents(folderFollow, usableDriverNameToFollow, columnName), Utilities.random.Next(0, 3), this, validationData));
                             }
                         }
                     }
@@ -223,20 +223,20 @@ namespace CrewChiefV4.Events
                     {
                         // Follow messages are only meaningful if there's name to announce.
                         if ((shouldFollowSafetyCar || SoundCache.hasSuitableTTSVoice || SoundCache.availableDriverNames.Contains(usableDriverNameToFollow))
-                            && Utilities.random.Next(1, 10) > 2)  // Randomly, announce message without name.
+                            && Utilities.random.Next(1, 11) > 2)  // Randomly, announce message without name.
                             audioPlayer.playMessage(new QueuedMessage("frozen_order/allow_driver_to_pass", 
-                                MessageContents(folderAllow, usableDriverNameToFollow, folderToPass), Utilities.random.Next(1, 3), this, validationData));
+                                MessageContents(folderAllow, usableDriverNameToFollow, folderToPass), Utilities.random.Next(1, 4), this, validationData));
                         else
-                            audioPlayer.playMessage(new QueuedMessage(folderYoureAheadOfAGuyYouShouldBeFollowing, Utilities.random.Next(1, 3), this, validationData));
+                            audioPlayer.playMessage(new QueuedMessage(folderYoureAheadOfAGuyYouShouldBeFollowing, Utilities.random.Next(1, 4), this, validationData));
                     }
                     else if (this.newFrozenOrderAction == FrozenOrderAction.CatchUp)
                     {
                         if ((SoundCache.hasSuitableTTSVoice || SoundCache.availableDriverNames.Contains(usableDriverNameToFollow))
-                            && Utilities.random.Next(1, 10) > 2)  // Randomly, announce message without name.
+                            && Utilities.random.Next(1, 11) > 2)  // Randomly, announce message without name.
                             audioPlayer.playMessage(new QueuedMessage("frozen_order/allow_driver_to_pass", 
-                                MessageContents(folderCatchUpTo, usableDriverNameToFollow), Utilities.random.Next(1, 3), this, validationData));
+                                MessageContents(folderCatchUpTo, usableDriverNameToFollow), Utilities.random.Next(1, 4), this, validationData));
                         else
-                            audioPlayer.playMessage(new QueuedMessage(folderYouNeedToCatchUpToTheGuyAhead, Utilities.random.Next(1, 3), this, validationData));
+                            audioPlayer.playMessage(new QueuedMessage(folderYouNeedToCatchUpToTheGuyAhead, Utilities.random.Next(1, 4), this, validationData));
                     }
                 }
             }
@@ -266,25 +266,25 @@ namespace CrewChiefV4.Events
                     {
                         // Follow messages are only meaningful if there's name to announce.
                         if (shouldFollowSafetyCar || SoundCache.hasSuitableTTSVoice || SoundCache.availableDriverNames.Contains(usableDriverNameToFollow))
-                            audioPlayer.playMessage(new QueuedMessage("frozen_order/follow_driver", MessageContents(folderFollow, usableDriverNameToFollow), Utilities.random.Next(0, 2), this, validationData));
+                            audioPlayer.playMessage(new QueuedMessage("frozen_order/follow_driver", MessageContents(folderFollow, usableDriverNameToFollow), Utilities.random.Next(0, 3), this, validationData));
                     }
                     else if (this.newFrozenOrderAction == FrozenOrderAction.AllowToPass)
                     {
                         if ((shouldFollowSafetyCar || SoundCache.hasSuitableTTSVoice || SoundCache.availableDriverNames.Contains(usableDriverNameToFollow))
-                             && Utilities.random.Next(1, 10) > 2)  // Randomly, announce message without name.
+                             && Utilities.random.Next(1, 11) > 2)  // Randomly, announce message without name.
                             audioPlayer.playMessage(new QueuedMessage("frozen_order/allow_driver_to_pass", 
-                                MessageContents(folderAllow, usableDriverNameToFollow, folderToPass), Utilities.random.Next(1, 3), this, validationData));
+                                MessageContents(folderAllow, usableDriverNameToFollow, folderToPass), Utilities.random.Next(1, 4), this, validationData));
                         else
-                            audioPlayer.playMessage(new QueuedMessage(folderYoureAheadOfAGuyYouShouldBeFollowing, Utilities.random.Next(1, 3), this, validationData));
+                            audioPlayer.playMessage(new QueuedMessage(folderYoureAheadOfAGuyYouShouldBeFollowing, Utilities.random.Next(1, 4), this, validationData));
                     }
                     else if (this.newFrozenOrderAction == FrozenOrderAction.CatchUp)
                     {
                         if ((shouldFollowSafetyCar || SoundCache.hasSuitableTTSVoice || SoundCache.availableDriverNames.Contains(usableDriverNameToFollow))
-                             && Utilities.random.Next(1, 10) > 2)  // Randomly, announce message without name.
+                             && Utilities.random.Next(1, 11) > 2)  // Randomly, announce message without name.
                             audioPlayer.playMessage(new QueuedMessage("frozen_order/catch_up_to_driver", 
-                                MessageContents(folderCatchUpTo, usableDriverNameToFollow), Utilities.random.Next(1, 3), this, validationData));
+                                MessageContents(folderCatchUpTo, usableDriverNameToFollow), Utilities.random.Next(1, 4), this, validationData));
                         else
-                            audioPlayer.playMessage(new QueuedMessage(folderYouNeedToCatchUpToTheGuyAhead, Utilities.random.Next(1, 3), this, validationData));
+                            audioPlayer.playMessage(new QueuedMessage(folderYouNeedToCatchUpToTheGuyAhead, Utilities.random.Next(1, 4), this, validationData));
                     }
                 }
             }
@@ -308,16 +308,16 @@ namespace CrewChiefV4.Events
                             audioPlayer.playMessage(new QueuedMessage(folderWereStartingFromPole, 0, this));
                         else
                             audioPlayer.playMessage(new QueuedMessage("frozen_order/youre_starting_from_pole_in_column",
-                                    MessageContents(folderWereStartingFromPole, columnName), Utilities.random.Next(0, 1), this));
+                                    MessageContents(folderWereStartingFromPole, columnName), Utilities.random.Next(0, 3), this));
                     }
                     else
                     {
                         if (columnName == null)
                             audioPlayer.playMessage(new QueuedMessage("frozen_order/youre_starting_from_pos",
-                                    MessageContents(folderWeStartingFromPosition, cfod.AssignedPosition), Utilities.random.Next(0, 1), this));
+                                    MessageContents(folderWeStartingFromPosition, cfod.AssignedPosition), Utilities.random.Next(0, 3), this));
                         else
                             audioPlayer.playMessage(new QueuedMessage("frozen_order/youre_starting_from_pos_row_in_column",
-                                    MessageContents(folderWeStartingFromPosition, cfod.AssignedPosition, folderRow, cfod.AssignedGridPosition, columnName), Utilities.random.Next(0, 1), this));
+                                    MessageContents(folderWeStartingFromPosition, cfod.AssignedPosition, folderRow, cfod.AssignedGridPosition, columnName), Utilities.random.Next(0, 3), this));
                     }
                 }
 
@@ -332,12 +332,12 @@ namespace CrewChiefV4.Events
                         if (columnName == null)
                         {
                             audioPlayer.playMessage(new QueuedMessage("frozen_order/get_ready_starting_from_pole",
-                                    MessageContents(LapCounter.folderGetReady, folderWereStartingFromPole), Utilities.random.Next(0, 2), this));
+                                    MessageContents(LapCounter.folderGetReady, folderWereStartingFromPole), Utilities.random.Next(0, 3), this));
                         }
                         else
                         {
                             audioPlayer.playMessage(new QueuedMessage("frozen_order/get_ready_starting_from_pole_in_column",
-                                    MessageContents(LapCounter.folderGetReady, folderWereStartingFromPole, columnName), Utilities.random.Next(0, 2), this));
+                                    MessageContents(LapCounter.folderGetReady, folderWereStartingFromPole, columnName), Utilities.random.Next(0, 3), this));
                         }
                     }
                     else
@@ -345,12 +345,12 @@ namespace CrewChiefV4.Events
                         if (columnName == null)
                         {
                             audioPlayer.playMessage(new QueuedMessage("frozen_order/get_ready_youre_starting_from_pos",
-                                    MessageContents(LapCounter.folderGetReady, folderWeStartingFromPosition, cfod.AssignedPosition), Utilities.random.Next(0, 2), this));
+                                    MessageContents(LapCounter.folderGetReady, folderWeStartingFromPosition, cfod.AssignedPosition), Utilities.random.Next(0, 3), this));
                         }
                         else
                         {
                             audioPlayer.playMessage(new QueuedMessage("frozen_order/get_ready_youre_starting_from_pos_row_in_column",
-                                    MessageContents(LapCounter.folderGetReady, folderWeStartingFromPosition, cfod.AssignedPosition, folderRow, cfod.AssignedGridPosition, columnName), Utilities.random.Next(0, 2), this));
+                                    MessageContents(LapCounter.folderGetReady, folderWeStartingFromPosition, cfod.AssignedPosition, folderRow, cfod.AssignedGridPosition, columnName), Utilities.random.Next(0, 3), this));
                         }
                     }
                 }
@@ -361,13 +361,13 @@ namespace CrewChiefV4.Events
             {
                 // TODO: may also need to announce basic "SC in" message.
                 var kmPerHour = cfod.SafetyCarSpeed * 3.6f;
-                List<MessageFragment> messageFragments = new List<MessageFragment>();                
+                var messageFragments = new List<MessageFragment>();
                 if (useAmericanTerms)
                 {
                     messageFragments.Add(MessageFragment.Text(FrozenOrderMonitor.folderPaceCarSpeedIs));
                     var milesPerHour = kmPerHour * 0.621371f;
                     messageFragments.Add(MessageFragment.Integer((int)Math.Round(milesPerHour), false));
-                    messageFragments.Add(MessageFragment.Text(FrozenOrderMonitor.folderMilesPerHour));                    
+                    messageFragments.Add(MessageFragment.Text(FrozenOrderMonitor.folderMilesPerHour));
                 }
                 else
                 {
@@ -375,7 +375,7 @@ namespace CrewChiefV4.Events
                     messageFragments.Add(MessageFragment.Integer((int)Math.Round(kmPerHour), false));
                     messageFragments.Add(MessageFragment.Text(FrozenOrderMonitor.folderKilometresPerHour));
                 }
-                audioPlayer.playMessage(new QueuedMessage("frozen_order/pace_car_speed", messageFragments, Utilities.random.Next(10, 15), this));
+                audioPlayer.playMessage(new QueuedMessage("frozen_order/pace_car_speed", messageFragments, Utilities.random.Next(10, 16), this));
             }
 
             // Announce SC left.
