@@ -159,6 +159,8 @@ namespace CrewChiefV4.Events
 
         // check at start of which sector (1=s/f line)
         private int checkBrakesAtSector = 3;
+        private float lastBrakeTempCheckSessionTime = -1.0f;
+        private const float SecondsBetweenBrakeTempCheck = 120.0f;
 
         private Boolean reportedTyreWearForCurrentPitEntry;
 
@@ -354,6 +356,8 @@ namespace CrewChiefV4.Events
             currentCornerName = null;
             enableCornerSpecificLockingAndSpinningChecks = false;
             playerClassSessionBestLapTimeByTyre = null;
+
+            lastBrakeTempCheckSessionTime = -1.0f;
         }
 
         private Boolean isBrakeTempPeakForLap(float leftFront, float rightFront, float leftRear, float rightRear) 
@@ -468,6 +472,8 @@ namespace CrewChiefV4.Events
                     currentGameState.carClass.carClassEnum != CarData.CarClassEnum.Kart_2 &&
                     currentGameState.carClass.carClassEnum != CarData.CarClassEnum.KART_F1 &&
                     currentGameState.carClass.carClassEnum != CarData.CarClassEnum.KART_JUNIOR;
+
+                checkBrakesAtSector = Utilities.random.Next(1, 4);
 
                 if (Utilities.random.Next(0, 2) == 0)
                 {
@@ -703,12 +709,14 @@ namespace CrewChiefV4.Events
                 
                 if (!currentGameState.SessionData.LeaderHasFinishedRace &&
                      ((checkBrakesAtSector == 1 && currentGameState.SessionData.IsNewLap) ||
-                     ((currentGameState.SessionData.IsNewSector && currentGameState.SessionData.SectorNumber == checkBrakesAtSector))))
+                     ((currentGameState.SessionData.IsNewSector && currentGameState.SessionData.SectorNumber == checkBrakesAtSector))) &&
+                     (lastBrakeTempCheckSessionTime == -1.0f || ((currentGameState.SessionData.SessionRunningTime - lastBrakeTempCheckSessionTime) > TyreMonitor.SecondsBetweenBrakeTempCheck)))
                 {
                     if (!currentGameState.PitData.InPitlane && currentGameState.SessionData.CompletedLaps >= lapsIntoSessionBeforeTempMessage)
                     {
                         if (enableBrakeTempWarnings)
                         {
+                            lastBrakeTempCheckSessionTime = currentGameState.SessionData.SessionRunningTime;
                             reportBrakeTempStatus(false, true);
                         }
                     }
