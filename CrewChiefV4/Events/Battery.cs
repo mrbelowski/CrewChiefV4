@@ -59,7 +59,7 @@ namespace CrewChiefV4.Events
             internal float SessionRunningTime = -1.0f;
         };
 
-        private const int NumLapsAverageWindow = 3;
+        private const int NumLapsAverageWindow = 5;
         private const float BatteryLowThreshold = 10.0f;
         private const float BatteryCriticalThreshold = 5.0f;
 
