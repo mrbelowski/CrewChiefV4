@@ -48,6 +48,7 @@ namespace CrewChiefV4.Events
             this.lastColdRRPressure = -1;
             this.incidentsCount = -1;
             this.maxIncidentCount = -1;
+            this.iRating = -1;
             this.haslimitedIncidents = false;
             this.licenseLevel = new Tuple<string, float>("invalid", -1);
         }
@@ -70,6 +71,7 @@ namespace CrewChiefV4.Events
             this.lastColdRRPressure = -1;
             this.incidentsCount = -1;
             this.maxIncidentCount = -1;
+            this.iRating = -1;
             this.haslimitedIncidents = false;
             this.licenseLevel = new Tuple<string, float>("invalid", -1);
 
@@ -280,11 +282,16 @@ namespace CrewChiefV4.Events
             }
             else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.WHATS_MY_IRATING))
             {
-                if (haslimitedIncidents)
+                if(iRating != -1)
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage("license/irating", MessageContents(iRating), 0, null));
+                    return;
                 }
-                return;
+                else
+                {
+                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+                    return;
+                }
             }
             else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.WHATS_MY_LICENSE_CLASS))
             {
