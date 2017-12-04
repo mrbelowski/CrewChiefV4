@@ -47,12 +47,12 @@ namespace CrewChiefV4.Events
         public static String folderHasJustRetired = "opponents/has_just_retired";
         public static String folderHasJustBeenDisqualified = "opponents/has_just_been_disqualified";
 
-        public static String folderLicensA = "licens/a_licens";
-        public static String folderLicensB = "licens/b_licens";
-        public static String folderLicensC = "licens/c_licens";
-        public static String folderLicensD = "licens/d_licens";
-        public static String folderLicensR = "licens/r_licens";
-        public static String folderLicensPro = "licens/pro_licens";
+        public static String folderLicenseA = "licence/a_licence";
+        public static String folderLicenseB = "licence/b_licence";
+        public static String folderLicenseC = "licence/c_licence";
+        public static String folderLicenseD = "licence/d_licence";
+        public static String folderLicenseR = "licence/r_licence";
+        public static String folderLicensePro = "licence/pro_licence";
 
 
         private int frequencyOfOpponentRaceLapTimes = UserSettings.GetUserSettings().getInt("frequency_of_opponent_race_lap_times");
@@ -126,7 +126,7 @@ namespace CrewChiefV4.Events
                             Console.WriteLine("new leader message for opponent " + expectedLeaderName +
                                     " no longer valid - player is now leader");
                             return false;
-                        }                        
+                        }
                         OpponentData actualLeader = currentGameState.getOpponentAtPosition(1, false);
                         String actualLeaderName = actualLeader == null ? null : actualLeader.DriverRawName;
                         if (actualLeaderName != expectedLeaderName)
@@ -177,7 +177,7 @@ namespace CrewChiefV4.Events
                 {
                     return Position.folderStub + positionToCheck;
                 }
-            }            
+            }
             return null;
         }
 
@@ -253,7 +253,7 @@ namespace CrewChiefV4.Events
                                 (currentGameState.SessionData.SessionType == SessionType.Race || frequencyOfOpponentPracticeAndQualLapTimes > 0))
                             {
                                 // he's leading, and has recorded 3 or more laps, and this one's his fastest
-                                Console.WriteLine("Leader fast lap - this lap time = " + opponentData.LastLapTime +" session best = " + currentFastestLap);
+                                Console.WriteLine("Leader fast lap - this lap time = " + opponentData.LastLapTime + " session best = " + currentFastestLap);
                                 audioPlayer.playMessage(new QueuedMessage("leader_good_laptime", MessageContents(folderLeaderHasJustDoneA,
                                         TimeSpanWrapper.FromSeconds(opponentData.LastLapTime, Precision.AUTO_LAPTIMES)), 0, this));
                             }
@@ -262,8 +262,8 @@ namespace CrewChiefV4.Events
                             {
                                 // he's ahead of us, and has recorded 3 or more laps, and this one's his fastest
                                 Console.WriteLine("Car ahead fast lap - this lap time = " + opponentData.LastLapTime + " session best = " + currentFastestLap);
-                                 audioPlayer.playMessage(new QueuedMessage("car_ahead_good_laptime", MessageContents(folderTheCarAheadHasJustDoneA,
-                                        TimeSpanWrapper.FromSeconds(opponentData.LastLapTime, Precision.AUTO_LAPTIMES)), 0, this));
+                                audioPlayer.playMessage(new QueuedMessage("car_ahead_good_laptime", MessageContents(folderTheCarAheadHasJustDoneA,
+                                       TimeSpanWrapper.FromSeconds(opponentData.LastLapTime, Precision.AUTO_LAPTIMES)), 0, this));
                             }
                             else if (!currentGameState.isLast() && opponentData.UnFilteredPosition == currentGameState.SessionData.Position + 1 &&
                                 (currentGameState.SessionData.SessionType == SessionType.Race || Utilities.random.Next(10) < frequencyOfOpponentPracticeAndQualLapTimes))
@@ -328,7 +328,7 @@ namespace CrewChiefV4.Events
                                 Utilities.random.Next(Position.maxSecondsToWaitBeforeReportingPass + 1, Position.maxSecondsToWaitBeforeReportingPass + 3), this,
                                 new Dictionary<string, object> { { validationDriverAheadKey, opponentData.DriverRawName } }));
                             nextCarAheadChangeMessage = currentGameState.Now.Add(TimeSpan.FromSeconds(30));
-                        }                        
+                        }
                     }
                 }
                 if (currentGameState.SessionData.HasLeadChanged)
@@ -337,7 +337,7 @@ namespace CrewChiefV4.Events
                     if (leader != null)
                     {
                         String name = leader.DriverRawName;
-                        if (currentGameState.SessionData.Position > 1 && previousGameState.SessionData.Position > 1 && 
+                        if (currentGameState.SessionData.Position > 1 && previousGameState.SessionData.Position > 1 &&
                             currentGameState.Now > nextLeadChangeMessage && leader.CanUseName && AudioPlayer.canReadName(name))
                         {
                             Console.WriteLine("Lead change, current leader is " + name + " laps completed = " + currentGameState.SessionData.CompletedLaps);
@@ -345,20 +345,20 @@ namespace CrewChiefV4.Events
                                 new Dictionary<string, object> { { validationNewLeaderKey, name } }));
                             nextLeadChangeMessage = currentGameState.Now.Add(TimeSpan.FromSeconds(30));
                         }
-                    }                    
+                    }
                 }
 
-                if (currentGameState.PitData.LeaderIsPitting && 
+                if (currentGameState.PitData.LeaderIsPitting &&
                     currentGameState.SessionData.SessionPhase != SessionPhase.Countdown && currentGameState.SessionData.SessionPhase != SessionPhase.Formation)
                 {
-                    audioPlayer.playMessage(new QueuedMessage("leader_is_pitting", MessageContents(folderTheLeader, currentGameState.PitData.OpponentForLeaderPitting, 
+                    audioPlayer.playMessage(new QueuedMessage("leader_is_pitting", MessageContents(folderTheLeader, currentGameState.PitData.OpponentForLeaderPitting,
                         folderIsPitting), MessageContents(folderLeaderIsPitting), 0, this));
                 }
 
                 if (currentGameState.PitData.CarInFrontIsPitting && currentGameState.SessionData.TimeDeltaFront > 3 &&
                     currentGameState.SessionData.SessionPhase != SessionPhase.Countdown && currentGameState.SessionData.SessionPhase != SessionPhase.Formation)
                 {
-                    audioPlayer.playMessage(new QueuedMessage("car_in_front_is_pitting", MessageContents(currentGameState.PitData.OpponentForCarAheadPitting, 
+                    audioPlayer.playMessage(new QueuedMessage("car_in_front_is_pitting", MessageContents(currentGameState.PitData.OpponentForCarAheadPitting,
                         folderAheadIsPitting), MessageContents(folderCarAheadIsPitting), 0, this));
                 }
 
@@ -470,7 +470,7 @@ namespace CrewChiefV4.Events
             {
                 return currentGameState.OpponentData[opponentKey].LicensLevel;
             }
-            return new Tuple<String, float> ("invalid", -1);
+            return new Tuple<String, float>("invalid", -1);
         }
         private int getOpponentIRating(string opponentKey)
         {
@@ -506,7 +506,7 @@ namespace CrewChiefV4.Events
                 }
                 else if (voiceMessage.StartsWith(SpeechRecogniser.WHATS) &&
                     (voiceMessage.EndsWith(SpeechRecogniser.LAST_LAP) || voiceMessage.EndsWith(SpeechRecogniser.BEST_LAP) ||
-                    voiceMessage.EndsWith(SpeechRecogniser.LICENS_CLASS) ||
+                    voiceMessage.EndsWith(SpeechRecogniser.LICENSE_CLASS) ||
                     voiceMessage.EndsWith(SpeechRecogniser.IRATING)))
                 {
                     if (voiceMessage.EndsWith(SpeechRecogniser.LAST_LAP))
@@ -517,8 +517,8 @@ namespace CrewChiefV4.Events
                             gotData = true;
                             audioPlayer.playMessageImmediately(new QueuedMessage("opponentLastLap", MessageContents(
                                 TimeSpanWrapper.FromSeconds(lastLap, Precision.AUTO_LAPTIMES)), 0, null));
-                            
-                        }                       
+
+                        }
                     }
                     else if (voiceMessage.EndsWith(SpeechRecogniser.BEST_LAP))
                     {
@@ -528,51 +528,64 @@ namespace CrewChiefV4.Events
                             gotData = true;
                             audioPlayer.playMessageImmediately(new QueuedMessage("opponentBestLap", MessageContents(
                                 TimeSpanWrapper.FromSeconds(bestLap, Precision.AUTO_LAPTIMES)), 0, null));
-                            
+
                         }
                     }
-                    else if (voiceMessage.EndsWith(SpeechRecogniser.LICENS_CLASS))
+                    else if (voiceMessage.EndsWith(SpeechRecogniser.LICENSE_CLASS))
                     {
-                        Tuple<string, float> licensLevel = getOpponentLicensLevel(getOpponentKey(voiceMessage, SpeechRecogniser.POSSESSIVE + " ").Item1);
-                        if(licensLevel.Item2 != -1)
+                        Tuple<string, float> licenseLevel = getOpponentLicensLevel(getOpponentKey(voiceMessage, SpeechRecogniser.POSSESSIVE + " ").Item1);
+                        if (licenseLevel.Item2 != -1)
                         {
                             gotData = true;
-                            if(licensLevel.Item1.ToLower() == "a")
+                            Tuple<int, int> wholeandfractional = Utilities.WholeAndFractionalPart(licenseLevel.Item2);
+                            List<MessageFragment> messageFragments = new List<MessageFragment>();
+
+                            if (licenseLevel.Item1.ToLower() == "a")
                             {
-                                audioPlayer.playMessageImmediately(new QueuedMessage("opponentLicens", MessageContents(folderLicensA, licensLevel.Item2), 0, null));
+                                messageFragments.Add(MessageFragment.Text(folderLicenseA));
                             }
-                            else if (licensLevel.Item1.ToLower() == "b")
+                            else if (licenseLevel.Item1.ToLower() == "b")
                             {
-                                audioPlayer.playMessageImmediately(new QueuedMessage("opponentLicens", MessageContents(folderLicensB, licensLevel.Item2), 0, null));
+                                messageFragments.Add(MessageFragment.Text(folderLicenseB));
                             }
-                            else if (licensLevel.Item1.ToLower() == "c")
+                            else if (licenseLevel.Item1.ToLower() == "c")
                             {
-                                audioPlayer.playMessageImmediately(new QueuedMessage("opponentLicens", MessageContents(folderLicensC, licensLevel.Item2), 0, null));
+                                messageFragments.Add(MessageFragment.Text(folderLicenseB));
                             }
-                            else if (licensLevel.Item1.ToLower() == "d")
+                            else if (licenseLevel.Item1.ToLower() == "d")
                             {
-                                audioPlayer.playMessageImmediately(new QueuedMessage("opponentLicens", MessageContents(folderLicensD, licensLevel.Item2), 0, null));
+                                messageFragments.Add(MessageFragment.Text(folderLicenseB));
                             }
-                            else if (licensLevel.Item1.ToLower() == "r")
+                            else if (licenseLevel.Item1.ToLower() == "r")
                             {
-                                audioPlayer.playMessageImmediately(new QueuedMessage("opponentLicens", MessageContents(folderLicensR, licensLevel.Item2), 0, null));
+                                messageFragments.Add(MessageFragment.Text(folderLicenseB));
                             }
-                            else if (licensLevel.Item1.ToLower() == "pro")
+                            else if (licenseLevel.Item1.ToLower() == "pro")
                             {
-                                audioPlayer.playMessageImmediately(new QueuedMessage("opponentLicens", MessageContents(folderLicensPro, licensLevel.Item2), 0, null));
+                                messageFragments.Add(MessageFragment.Text(folderLicenseB));
+                            }
+                            else
+                            {
+                                gotData = false;
+                            }
+                            if (gotData)
+                            {
+                                messageFragments.AddRange(MessageContents(wholeandfractional.Item1, NumberReader.folderPoint, wholeandfractional.Item2));
+                                QueuedMessage licenceLevelMessage = new QueuedMessage("License/license", messageFragments, 0, null);
+                                audioPlayer.playDelayedImmediateMessage(licenceLevelMessage);
                             }
                         }
                     }
                     else
                     {
                         int rating = getOpponentIRating(getOpponentKey(voiceMessage, SpeechRecogniser.POSSESSIVE + " ").Item1);
-                        if(rating != -1)
+                        if (rating != -1)
                         {
                             gotData = true;
                             audioPlayer.playMessageImmediately(new QueuedMessage("opponentiRating", MessageContents(rating), 0, null));
-                        }                        
+                        }
                     }
-                } 
+                }
                 else if (voiceMessage.StartsWith(SpeechRecogniser.WHERE_IS) || voiceMessage.StartsWith(SpeechRecogniser.WHERES))
                 {
                     Tuple<string, Boolean> response = getOpponentKey(voiceMessage, "");
@@ -595,7 +608,7 @@ namespace CrewChiefV4.Events
                                 if (!gotByPositionNumber)
                                 {
                                     if (SoundCache.availableSounds.Contains(folderOpponentPositionIntro))
-                                    { 
+                                    {
                                         audioPlayer.playMessageImmediately(new QueuedMessage("opponentPosition", MessageContents(folderOpponentPositionIntro, Position.folderStub + position), 0, null));
                                     }
                                     else
@@ -636,7 +649,7 @@ namespace CrewChiefV4.Events
                                         {
                                             audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta",
                                                 MessageContents(folderOpponentPositionIntro, Position.folderStub + position, Pause(200), lapDifference, Position.folderLapsBehind), 0, null));
-                                        } 
+                                        }
                                         else
                                         {
                                             audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta",
@@ -722,7 +735,7 @@ namespace CrewChiefV4.Events
                         else
                         {
                             Console.WriteLine("Driver " + opponent.DriverRawName + " is no longer active in this session");
-                        }  
+                        }
                     }
                 }
                 else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.WHOS_BEHIND_ON_TRACK))
@@ -745,7 +758,7 @@ namespace CrewChiefV4.Events
                         }
                         if (queuedMessage.canBePlayed)
                         {
-                            audioPlayer.playMessageImmediately(queuedMessage);                            
+                            audioPlayer.playMessageImmediately(queuedMessage);
                             gotData = true;
                         }
                     }
@@ -768,11 +781,11 @@ namespace CrewChiefV4.Events
                                     Position.folderStub + opponent.Position),
                                     MessageContents(Position.folderStub + opponent.Position, folderCantPronounceName), 0, null);
                         }
-                        
+
                         if (queuedMessage.canBePlayed)
                         {
                             audioPlayer.playMessageImmediately(queuedMessage);
-                            
+
                             gotData = true;
                         }
                     }
@@ -782,10 +795,10 @@ namespace CrewChiefV4.Events
                     if (currentGameState.isLast())
                     {
                         audioPlayer.playMessageImmediately(new QueuedMessage(Position.folderLast, 0, null));
-                        
+
                         gotData = true;
-                    } 
-                    else 
+                    }
+                    else
                     {
                         OpponentData opponent = currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position + 1, false);
                         if (opponent != null)
@@ -799,11 +812,11 @@ namespace CrewChiefV4.Events
                             {
                                 queuedMessage = new QueuedMessage("opponentName", MessageContents(opponent), MessageContents(folderCantPronounceName), 0, null);
                             }
-                        
+
                             if (queuedMessage.canBePlayed)
                             {
                                 audioPlayer.playMessageImmediately(queuedMessage);
-                                
+
                                 gotData = true;
                             }
                         }
@@ -814,7 +827,7 @@ namespace CrewChiefV4.Events
                     if (currentGameState.SessionData.Position == 1)
                     {
                         audioPlayer.playMessageImmediately(new QueuedMessage(Position.folderLeading, 0, null));
-                        
+
                         gotData = true;
                     }
                     else
@@ -831,11 +844,11 @@ namespace CrewChiefV4.Events
                             {
                                 queuedMessage = new QueuedMessage("opponentName", MessageContents(opponent), MessageContents(folderCantPronounceName), 0, null);
                             }
-                        
+
                             if (queuedMessage.canBePlayed)
                             {
                                 audioPlayer.playMessageImmediately(queuedMessage);
-                                
+
                                 gotData = true;
                             }
                         }
@@ -858,7 +871,7 @@ namespace CrewChiefV4.Events
                         if (queuedMessage.canBePlayed)
                         {
                             audioPlayer.playMessageImmediately(queuedMessage);
-                            
+
                             gotData = true;
                         }
                     }
@@ -871,7 +884,7 @@ namespace CrewChiefV4.Events
                         if (opponentKey == positionIsPlayerKey)
                         {
                             audioPlayer.playMessageImmediately(new QueuedMessage(folderWeAre, 0, null));
-                            
+
                             gotData = true;
                         }
                         else if (currentGameState.OpponentData.ContainsKey(opponentKey))
@@ -889,7 +902,7 @@ namespace CrewChiefV4.Events
                             if (queuedMessage.canBePlayed)
                             {
                                 audioPlayer.playMessageImmediately(queuedMessage);
-                                
+
                                 gotData = true;
                             }
                         }
@@ -899,8 +912,8 @@ namespace CrewChiefV4.Events
             if (!gotData)
             {
                 audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
-                
-            }       
+
+            }
         }
 
         private float getOpponentBestLap(List<float> opponentLapTimes, int lapsToCheck)
