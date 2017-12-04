@@ -49,7 +49,7 @@ WHATS_MY_POSITION = what's my position
 WHATS_MY_FUEL_LEVEL = what's my fuel level
 WHATS_MY_FUEL_USAGE = what's my fuel usage:what's my fuel consumption:what's my fuel use
 WHATS_MY_IRATING = whats my eye rating
-WHATS_MY_LICENCE_CLASS = what's my licence class
+WHATS_MY_LICENSE_CLASS = what's my licence class
 WHAT_TYRES_AM_I_ON = what tires am i on:what tire am i on:what tire type am i on
 IS_MY_PIT_BOX_OCCUPIED = is my pit box occupied:is my pit stall occupied
 
@@ -119,22 +119,40 @@ STOP_PACE_NOTES_PLAYBACK = stop pace notes
 # WHERE_IS + (driver_name)										[reads his position and the gap to the player]
 # WHATS + (driver_name) + POSSESSIVE + LAST_LAP					[driver's last lap time]
 # WHATS + (driver_name) + POSSESSIVE + BEST_LAP					[driver's best lap time]
+# WHATS + (driver_name) + IRATING								[driver's irating - iracing only]
+# WHATS + (driver_name) + LICENSE_CLASS							[driver's license class - iracing only]
 # WHATS + POSITION_LONG (number) + POSSESSIVE + LAST_LAP		[driver in position (number)'s last lap time]
 # WHATS + POSITION_LONG (number) + POSSESSIVE + BEST_LAP		[driver in position (number)'s best lap time]
+# WHATS + POSITION_LONG (number) + IRATING						[driver in position (number)'s irating - iracing only]
+# WHATS + POSITION_LONG (number) + LICENSE_CLASS				[driver in position (number)'s license class - iracing only]
 # WHATS + POSITION_SHORT (number) + POSSESSIVE + LAST_LAP		[driver in P (number)'s last lap time]
 # WHATS + POSITION_SHORT (number) + POSSESSIVE + BEST_LAP		[driver in P (number)'s best lap time]
+# WHATS + POSITION_SHORT (number) + IRATING						[driver in P (number)'s irating - iracing only]
+# WHATS + POSITION_SHORT (number) + LICENSE_CLASS				[driver in P (number)'s license class - iracing only]
 # WHATS + THE_LEADER + POSSESSIVE + LAST_LAP					[leader's last lap time]
 # WHATS + THE_LEADER + POSSESSIVE + BEST_LAP					[leader's best lap time]
+# WHATS + THE_LEADER + POSSESSIVE + IRATING						[leader's irating - iracing only]
+# WHATS + THE_LEADER + POSSESSIVE + LICENSE_CLASS				[leader's license class - iracing only]
 # WHATS + THE_GUY_IN_FRONT + POSSESSIVE + LAST_LAP				[car in front's last lap time]
 # WHATS + THE_GUY_IN_FRONT + POSSESSIVE + BEST_LAP				[car in front's best lap time]
+# WHATS + THE_GUY_IN_FRONT + POSSESSIVE + IRATING				[car in front's irating - iracing only]
+# WHATS + THE_GUY_IN_FRONT + POSSESSIVE + LICENSE_CLASS			[car in front's license class - iracing only]
 # WHATS + THE_CAR_IN_FRONT + POSSESSIVE + LAST_LAP				[car in front's last lap time]
 # WHATS + THE_CAR_IN_FRONT + POSSESSIVE + BEST_LAP				[car in front's best lap time]
+# WHATS + THE_CAR_IN_FRONT + POSSESSIVE + IRATING				[car in front's irating - iracing only]
+# WHATS + THE_CAR_IN_FRONT + POSSESSIVE + LICENSE_CLASS			[car in front's license class - iracing only]
 # WHATS + THE_GUY_AHEAD + POSSESSIVE + LAST_LAP					[car in front's last lap time]
 # WHATS + THE_GUY_AHEAD + POSSESSIVE + BEST_LAP					[car in front's best lap time]
+# WHATS + THE_GUY_AHEAD + POSSESSIVE + IRATING					[car in front's irating - iracing only]
+# WHATS + THE_GUY_AHEAD + POSSESSIVE + LICENSE_CLASS			[car in front's license class - iracing only]
 # WHATS + THE_CAR_BEHIND + POSSESSIVE + LAST_LAP				[car behind's last lap time]
 # WHATS + THE_CAR_BEHIND + POSSESSIVE + BEST_LAP				[car behind's best lap time]
+# WHATS + THE_CAR_BEHIND + POSSESSIVE + IRATING					[car behind's irating - iracing only]
+# WHATS + THE_CAR_BEHIND + POSSESSIVE + LICENSE_CLASS			[car behind's license class - iracing only]
 # WHATS + THE_GUY_BEHIND + POSSESSIVE + LAST_LAP				[car behind's last lap time]
 # WHATS + THE_GUY_BEHIND + POSSESSIVE + BEST_LAP				[car behind's best lap time]
+# WHATS + THE_GUY_BEHIND + POSSESSIVE + IRATING					[car behind's irating - iracing only]
+# WHATS + THE_GUY_BEHIND + POSSESSIVE + LICENSE_CLASS			[car behind's license class - iracing only]
 # WHAT_TYRE_IS + (driver_name) + ON								[the tyre type being used by (driver_name) - raceroom only]
 # WHAT_TYRES_IS + (driver_name) + ON							[the tyre type being used by (driver_name) - raceroom only]
 # WHAT_TYRE_IS + THE_GUY_IN_FRONT + ON							[the tyre type being used by the car ahead - raceroom only]
