@@ -20,6 +20,10 @@ namespace CrewChiefV4.iRacing
         public string RaceLaps { get; set; }
         public double RaceTime { get; set; }
 
+        public string IncidentLimitString { get; set; }
+
+        public int IncidentLimit { get; set; }
+
         public void Update(SessionInfo info, int sessionNumber)
         {
             this.Track = Track.FromSessionInfo(info);
@@ -40,6 +44,18 @@ namespace CrewChiefV4.iRacing
             
             this.RaceLaps = laps;
             this.RaceTime = time;
+
+            var weekendOptions = weekend["WeekendOptions"];
+
+            this.IncidentLimitString = weekendOptions["IncidentLimit"].GetValue();
+            if(!IsLimitedIncidents)
+            {
+                IncidentLimit = Parser.ParseInt(IncidentLimitString);
+            }
+            else
+            {
+                IncidentLimit = -1;
+            }
         }
         public bool IsLimitedSessionLaps
         {
@@ -56,6 +72,12 @@ namespace CrewChiefV4.iRacing
                 return SessionTimeString.ToLower() != "unlimited";
             }
         }
-
+        public bool IsLimitedIncidents
+        {
+            get
+            {
+                return IncidentLimitString.ToLower() != "unlimited";
+            }
+        }
     }
 }
