@@ -372,6 +372,21 @@ namespace CrewChiefV4.GameState
 
         public int PlayerCarNr = -1;
 
+        // Currently only used in iRacing.
+        public int MaxIncidentCount = -1;
+
+        public int CurrentIncidentCount = 0;
+
+        public int CurrentTeamIncidentCount = 0;
+
+        public int CurrentDriverIncidentCount = 0;
+
+        public Boolean HasLimitedIncidents = false;
+
+        public Tuple<String, float> LicensLevel = new Tuple<String, float>("invalid", -1);
+
+        public int iRating = 0;
+
         public SessionData()
         {
             SessionTimesAtEndOfSectors.Add(1, -1);
@@ -661,8 +676,11 @@ namespace CrewChiefV4.GameState
 
         public bool isApporchingPits = false;
 
-
         public int CarNr = -1;
+
+        public Tuple<String, float> LicensLevel = new Tuple<String, float>("invalid", -1);
+
+        public int iRating = -1;
 
         public override string ToString()
         {
