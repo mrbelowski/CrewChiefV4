@@ -25,10 +25,12 @@ namespace CrewChiefV4.Events
         public static String folderYouHave = "incidents/you_have";
 
         public static String folderincidents = "incidents/incidents";
+        public static String folderincidentlimit = "incidents/the_incident_limit_is";
+        public static String folderUnlimited = "incidents/no_incident_limit";
 
-        public static String folderincidentlimit = "incidents/incident_limit";
-
-        public static String folderUnlimited = "incidents/unlimited";
+        public static String folderincidentPoints = "incidents/incident_points";
+        public static String folderincidentPointslimit = "incidents/the_incident_points_limit_is";
+        public static String folderUnlimitedPoints = "incidents/no_incident_points_limit";
 
         public IRacingBroadcastMessageEvent(AudioPlayer audioPlayer)
         {
