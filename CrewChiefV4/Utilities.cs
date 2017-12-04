@@ -127,7 +127,7 @@ namespace CrewChiefV4
         }
 
 
-        public static Tuple<int, int> WholeAndFractionalPart(float realNumber)
+        public static Tuple<int, int> WholeAndFractionalPart(float realNumber, int fractions = 1)
         {
             // get the whole and fractional part (yeah, I know this is shit)
             var str = realNumber.ToString();
@@ -137,7 +137,7 @@ namespace CrewChiefV4
             if (pointPosition > 0)
             {
                 wholePart = int.Parse(str.Substring(0, pointPosition));
-                fractionalPart = int.Parse(str[pointPosition + 1].ToString());
+                fractionalPart = int.Parse(str.Substring(pointPosition + 1, fractions).ToString());
             }
             else
             {

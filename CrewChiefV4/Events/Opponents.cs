@@ -537,7 +537,7 @@ namespace CrewChiefV4.Events
                         if (licenseLevel.Item2 != -1)
                         {
                             gotData = true;
-                            Tuple<int, int> wholeandfractional = Utilities.WholeAndFractionalPart(licenseLevel.Item2);
+                            Tuple<int, int> wholeandfractional = Utilities.WholeAndFractionalPart(licenseLevel.Item2, 2);
                             List<MessageFragment> messageFragments = new List<MessageFragment>();
 
                             if (licenseLevel.Item1.ToLower() == "a")
