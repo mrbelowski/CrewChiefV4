@@ -1,4 +1,4 @@
-Update the Assembly Information Assembly Version in CrewChiefV4 -> project -> properties (4.x.y.0) - this is needed for the autoupdater to work
+Update the Assembly Information Assembly Version in CrewChiefV4 -> project -> properties (4.x.y.z) - this is needed for the autoupdater to work
 
 Go to General Information in Organize Your Setup (in the build project in Solution Explorer)
 
@@ -8,17 +8,20 @@ CAREFULLY change Product Code in Organize Setup -> General Info -> product code,
 Ensure the build type is 'SingleImage' (white box in top tool bar), then clean / build to create a .msi with all the goodies packaged into it.
 
 
-Update the contents of auto_update_data.xml - the title and version elements, and if necessary the sound pack version stuff
-Update the change_log_for_auto_updated.txt
+Update the contents of primary/auto_update_data.xml and secondary/auto_update_data.xml - the title, version and date elements, and if necessary the sound pack version stuff
+Update the readme and change_log_for_auto_updated.txt for the changes
 
-Push the newly built /.../SingleImage/DiskImages/DISK1/CrewChiefV4.msi and the 2 text files up to DropBox, overwriting the existing ones (and therefore keeping the same URLs)
+Push the newly built /.../SingleImage/DiskImages/DISK1/CrewChiefV4.msi, the change_log_for_auto_updated.xml and primary/auto_update_data.xml to the Crew Chief FTP server. It's safest (but not essential) to rename the existing Crew.msi instead of deleting it. Push the newly built /.../SingleImage/DiskImages/DISK1/CrewChiefV4.msi and change_log_for_auto_updated.xml to the secondary FTP server. Push and secondary/auto_update_data.xml to GoogleDrive, overwriting the existing one (and therefore keeping the same URL)
 
 
-The sound pack and driver names pack each have a version info file - sound_pack_version_info and driver_names_version_info. These are in the root of the sounds folder and the root of the driver_names folder respectively. These start at 100.
+The sound pack, personalisations and driver names pack each have a version info file - sound_pack_version_info.txt, personalisations_version_info.txt and driver_names_version_info.txt. These are in the root of the sounds folder, root of the personalisations folder and the root of the driver_names folder respectively. These start at 100.
 
-The sound pack is the voice, fx, background_sounds folders and sound_pack_version_info file, zipped from the root of sounds (i.e. no additional top level folder in the .zip). The driver names pack is just the zipped driver_names folder (the zip file contains a single folder called driver_names, which has the all the contents in it, including the version file).
+The sound pack is the voice, fx, background_sounds folders, sound_pack_version_info.txt and updates.txt files, zipped from the root of sounds (i.e. no additional top level folder in the .zip). The driver names pack is just the zipped driver_names folder (the zip file contains a single folder called driver_names, which has the all the contents in it, including the version file). Same for the personalisations.
 
-ZIP ENCODING!!!	The auto updater stuff requires UTF-8 Always as the encoding. This will NOT work with Windows built in Zip file viewer. This means we need to zip the auto update driver names zip file using UTF-8 "Always" encoding and unzip it with Encoding.UTF8. The sound files doesn't have this complication.
+The sound pack has 3 update files - the base_sound_pack.zip (everything), the update_sound_pack.zip (an older update file, which contains all the newer sounds and is used to update older installations) and a update_2_sound_pack.zip (all the newer sounds used to update newer installations). The driver_names and personalisation still only have 2 update files. But this needs to be reworked as a lot of bandwidth is getting wasted in the update.
+
+ZIP ENCODING!!!	The auto updater stuff requires UTF-8 Always as the encoding for driver names (which can have non-Latin chars in their file names). This will NOT work with Windows built in Zip file viewer. This means we need to zip the auto update driver names zip file using UTF-8 "Always" encoding and unzip it with Encoding.UTF8. The sound files and personalisations don't have this complication (for now - all personalisations use Latin-1 chars only).
+
 Use DotNetZip for this
 flavor:traditional zip
 ZIP64?: AsNecessary
