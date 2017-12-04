@@ -261,6 +261,12 @@ namespace CrewChiefV4
 
         public void enableManualFormationLapMode()
         {
+            // Prevent accidential trigger during the race.  Luckily, there's a handy hack awailable.
+            if (currentGameState != null && currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.CompletedLaps >=1)
+            {
+                Console.WriteLine("Rejecting manual formation lap request due to race already in progress");
+                return;
+            }
             if (!GameStateData.useManualFormationLap)
             {
                 GameStateData.useManualFormationLap = true;
