@@ -217,6 +217,8 @@ PIT_STOP_CHANGE_REAR_RIGHT_TYRE_PRESSURE = pitstop change right rear tyre pressu
 LITERS = liters
 GALLONS = gallons
 
+HOW_MANY_INCIDENT_POINTS = how many incidents do i have:what's my incident count
+WHATS_THE_INCIDENT_LIMIT = what's the incident limit
 #################################################
 # numbers - these are the text strings the voice recogniser will listen for (it's not good at listening for numeric characters)
 # These are used by the dynamic phrases, and are combined with the dynamic phrase fragments above

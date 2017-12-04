@@ -152,6 +152,10 @@ namespace CrewChiefV4
         public static String[] PIT_STOP_CHANGE_REAR_LEFT_TYRE_PRESSURE = Configuration.getSpeechRecognitionPhrases("PIT_STOP_CHANGE_REAR_LEFT_TYRE_PRESSURE");
         public static String[] PIT_STOP_CHANGE_REAR_RIGHT_TYRE_PRESSURE = Configuration.getSpeechRecognitionPhrases("PIT_STOP_CHANGE_REAR_RIGHT_TYRE_PRESSURE");
 
+        public static String[] HOW_MANY_INCIDENT_POINTS = Configuration.getSpeechRecognitionPhrases("HOW_MANY_INCIDENT_POINTS");
+        public static String[] WHATS_THE_INCIDENT_LIMIT = Configuration.getSpeechRecognitionPhrases("WHATS_THE_INCIDENT_LIMIT");
+        
+
         private CrewChief crewChief;
 
         public Boolean initialised = false;
@@ -672,6 +676,8 @@ namespace CrewChiefV4
                 validateAndAdd(PIT_STOP_CHANGE_FRONT_RIGHT_TYRE, iRacingChoices);
                 validateAndAdd(PIT_STOP_CHANGE_REAR_LEFT_TYRE, iRacingChoices);
                 validateAndAdd(PIT_STOP_CHANGE_REAR_RIGHT_TYRE, iRacingChoices);
+                validateAndAdd(HOW_MANY_INCIDENT_POINTS, iRacingChoices);
+                validateAndAdd(WHATS_THE_INCIDENT_LIMIT, iRacingChoices);
   
                 GrammarBuilder iRacingGrammarBuilder = new GrammarBuilder(iRacingChoices);
                 iRacingGrammarBuilder.Culture = cultureInfo;

@@ -372,6 +372,17 @@ namespace CrewChiefV4.GameState
 
         public int PlayerCarNr = -1;
 
+        // Currently only used in iRacing.
+        public int MaxIncidentCount = -1;
+
+        public int CurrentIncidentCount = 0;
+
+        public int CurrentTeamIncidentCount = 0;
+
+        public int CurrentDriverIncidentCount = 0;
+
+        public Boolean HasLimitedIncidents = false;
+
         public SessionData()
         {
             SessionTimesAtEndOfSectors.Add(1, -1);

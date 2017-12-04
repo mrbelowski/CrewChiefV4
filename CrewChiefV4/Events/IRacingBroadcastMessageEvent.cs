@@ -22,6 +22,14 @@ namespace CrewChiefV4.Events
         private PressureUnit pressureUnit = UserSettings.GetUserSettings().getBoolean("iracing_pit_tyre_pressure_in_psi") ?
             PressureUnit.PSI : PressureUnit.KPA;
 
+        public static String folderYouHave = "incidents/you_have";
+
+        public static String folderinsidents = "incidents/insidents";
+
+        public static String folderinsidentlimit = "incidents/insident_limit";
+
+        public static String folderUnlimited = "incidents/unlimited";
+
         public IRacingBroadcastMessageEvent(AudioPlayer audioPlayer)
         {
             this.audioPlayer = audioPlayer;
@@ -29,11 +37,17 @@ namespace CrewChiefV4.Events
             this.lastColdFRPressure = -1;
             this.lastColdRLPressure = -1;
             this.lastColdRRPressure = -1;
+            this.incidentsCount = -1;
+            this.maxIncidentCount = -1;
+            this.haslimitedIncidents = false;
         }
         int lastColdFLPressure = -1;
         int lastColdFRPressure = -1;
         int lastColdRLPressure = -1;
         int lastColdRRPressure = -1;
+        int maxIncidentCount = -1;
+        int incidentsCount = -1;
+        bool haslimitedIncidents = false;
 
         public override void clearState()
         {
@@ -41,6 +55,10 @@ namespace CrewChiefV4.Events
             this.lastColdFRPressure = -1;
             this.lastColdRLPressure = -1;
             this.lastColdRRPressure = -1;
+            this.incidentsCount = -1;
+            this.maxIncidentCount = -1;
+            this.haslimitedIncidents = false;
+
         }
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
@@ -48,6 +66,10 @@ namespace CrewChiefV4.Events
             lastColdFRPressure = (int)currentGameState.TyreData.FrontRightPressure;
             lastColdRLPressure = (int)currentGameState.TyreData.RearLeftPressure;
             lastColdRRPressure = (int)currentGameState.TyreData.RearRightPressure;
+                        
+            maxIncidentCount = currentGameState.SessionData.MaxIncidentCount;
+            incidentsCount = currentGameState.SessionData.CurrentIncidentCount;
+            haslimitedIncidents = currentGameState.SessionData.HasLimitedIncidents;
         }
 
         public override void respond(String voiceMessage)
@@ -188,9 +210,7 @@ namespace CrewChiefV4.Events
                         audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
                         return;
                     }
-
-                }
-                  
+                }                  
             }
             else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PIT_STOP_CHANGE_ALL_TYRES))
             {
@@ -224,8 +244,27 @@ namespace CrewChiefV4.Events
                 ChangeTire(PitCommandModeTypes.RR, lastColdRRPressure);
                 audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
                 return;
-            } 
+            }
+            else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOW_MANY_INCIDENT_POINTS))
+            {
+                audioPlayer.playMessageImmediately(new QueuedMessage("Incidents/incidents", MessageContents(folderYouHave, incidentsCount, folderinsidents), 0, null));
+                return;
+            }
+            else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.WHATS_THE_INCIDENT_LIMIT))
+            {
+                if (haslimitedIncidents)
+                {
+                    audioPlayer.playMessageImmediately(new QueuedMessage("Incidents/limit", MessageContents(folderinsidentlimit, maxIncidentCount), 0, null));
+                }
+                else
+                {
+                    audioPlayer.playMessageImmediately(new QueuedMessage("Incidents/limit", MessageContents(folderUnlimited), 0, null));
+                }                
+                return;
+            }   
         }
+
+
 
         /// <summary>
         /// Schedule to add the specified amount of fuel (in liters) in the next pitstop.
