@@ -177,6 +177,9 @@ THE_GUY_BEHIND = the guy behind
 WHAT_TYRES_IS = what tires is
 WHAT_TYRE_IS = what tire is
 
+LICENS_CLASS = licens class
+IRATING = i rating
+
 # this one is used for Raceroom tyre questions - "what tyres is Bob on". The "on" could be "using", or "running", or whatever, but can only be a single item (no lists)
 ON = on
 
@@ -216,6 +219,10 @@ PIT_STOP_CHANGE_REAR_RIGHT_TYRE_PRESSURE = pitstop change right rear tyre pressu
 
 LITERS = liters
 GALLONS = gallons
+
+HOW_MANY_INCIDENT_POINTS = how many incidents do i have:what's my incident count
+WHATS_THE_INCIDENT_LIMIT = what's the incident limit
+
 
 #################################################
 # numbers - these are the text strings the voice recogniser will listen for (it's not good at listening for numeric characters)

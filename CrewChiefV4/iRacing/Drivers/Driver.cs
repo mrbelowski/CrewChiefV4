@@ -13,6 +13,7 @@ namespace CrewChiefV4.iRacing
             this.Car = new DriverCarInfo();
             this.Live = new DriverLiveInfo(this);
             this.CurrentResults = new DriverSessionResults();
+            this.licensLevel = new Tuple<string, float>("invalid", -1);
         }
 
         /// <summary>
@@ -30,6 +31,8 @@ namespace CrewChiefV4.iRacing
         public string TeamName { get; set; }
 
         public int IRating { get; set; }
+        public string LicensLevelString { get; set; }
+        public Tuple<String, float> licensLevel { get; set; }
 
         public bool IsSpectator { get; set; }
         public bool IsPacecar { get; set; }
@@ -40,6 +43,8 @@ namespace CrewChiefV4.iRacing
         public DriverCarInfo Car { get; set; }
         public DriverSessionResults CurrentResults { get; set; }
         public DriverLiveInfo Live { get; private set; }
+
+        
         private double _prevPos;
         private double _prevTime;
         private double _prevSpeed;
@@ -55,6 +60,10 @@ namespace CrewChiefV4.iRacing
             this.ShortName = query["AbbrevName"].GetValue();
 
             this.IRating = Parser.ParseInt(query["IRating"].GetValue());
+            this.LicensLevelString = query["LicString"].GetValue();
+
+            this.licensLevel = Parser.ParseLicens(LicensLevelString);
+
             this.IsSpectator = Parser.ParseInt(query["IsSpectator"].GetValue()) == 1;
 
             this.ClubName = query["ClubName"].GetValue();

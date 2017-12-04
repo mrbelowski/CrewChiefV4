@@ -168,6 +168,11 @@ namespace CrewChiefV4.iRacing
                     Console.WriteLine("SessionTotalRunTime = " + currentGameState.SessionData.SessionTotalRunTime);
                 }
 
+                currentGameState.SessionData.MaxIncidentCount = shared.SessionData.IncidentLimit;
+                currentGameState.SessionData.CurrentIncidentCount = shared.Telemetry.PlayerCarMyIncidentCount;
+                currentGameState.SessionData.CurrentDriverIncidentCount = shared.Telemetry.PlayerCarDriverIncidentCount;
+                currentGameState.SessionData.CurrentTeamIncidentCount = shared.Telemetry.PlayerCarTeamIncidentCount;
+
                 lastActiveTimeForOpponents.Clear();
                 nextOpponentCleanupTime = currentGameState.Now + opponentCleanupInterval;
 
@@ -335,6 +340,12 @@ namespace CrewChiefV4.iRacing
                     currentGameState.SessionData.DeltaTime.lapsCompleted = previousGameState.SessionData.DeltaTime.lapsCompleted;
                     currentGameState.SessionData.DeltaTime.totalDistanceTravelled = previousGameState.SessionData.DeltaTime.totalDistanceTravelled;
                     currentGameState.SessionData.DeltaTime.trackLength = previousGameState.SessionData.DeltaTime.trackLength;
+
+                    currentGameState.SessionData.MaxIncidentCount = previousGameState.SessionData.MaxIncidentCount;
+                    currentGameState.SessionData.CurrentIncidentCount = previousGameState.SessionData.CurrentIncidentCount;
+                    currentGameState.SessionData.CurrentDriverIncidentCount = previousGameState.SessionData.CurrentDriverIncidentCount;                    
+                    currentGameState.SessionData.CurrentTeamIncidentCount = previousGameState.SessionData.CurrentTeamIncidentCount;
+                    currentGameState.SessionData.HasLimitedIncidents = previousGameState.SessionData.HasLimitedIncidents;
                 }
             }
 
@@ -343,6 +354,13 @@ namespace CrewChiefV4.iRacing
             currentGameState.ControlData.BrakePedal = shared.Telemetry.Brake;
             currentGameState.TransmissionData.Gear = shared.Telemetry.Gear;
 
+            currentGameState.SessionData.CurrentIncidentCount = shared.Telemetry.PlayerCarMyIncidentCount;
+            currentGameState.SessionData.CurrentDriverIncidentCount = shared.Telemetry.PlayerCarDriverIncidentCount;
+            currentGameState.SessionData.CurrentTeamIncidentCount = shared.Telemetry.PlayerCarTeamIncidentCount;
+            currentGameState.SessionData.HasLimitedIncidents = shared.SessionData.IsLimitedIncidents;
+            currentGameState.SessionData.MaxIncidentCount = shared.SessionData.IncidentLimit;
+            currentGameState.SessionData.LicensLevel = playerCar.licensLevel;
+            currentGameState.SessionData.iRating = playerCar.IRating;
             //TODO add yellow 
             SessionFlags flag = (SessionFlags)shared.Telemetry.SessionFlags;
             if (flag.HasFlag(SessionFlags.Black) && !flag.HasFlag(SessionFlags.Furled))
@@ -634,7 +652,8 @@ namespace CrewChiefV4.iRacing
                             }
                         }
 
-                        
+                        currentOpponentData.LicensLevel = driver.licensLevel;
+                        currentOpponentData.iRating = driver.IRating;
                         updateOpponentData(currentOpponentData, currentOpponentRacePosition,currentOpponentRacePosition, currentOpponentClassPosition, currentOpponentLapsCompleted,
                                  currentOpponentSector, (float)driver.Live.LapTimePrevious, hasCrossedSFLine,
                                  shared.Telemetry.CarIdxOnPitRoad[driver.Id], previousIsInPits, previousOpponentLapValid, currentOpponentLapValid, currentGameState.SessionData.SessionRunningTime, currentOpponentLapDistance,
