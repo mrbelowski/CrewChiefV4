@@ -731,7 +731,9 @@ namespace CrewChiefV4.Events
                 batteryRunningLow = false;
                 this.audioPlayer.playMessageImmediately(new QueuedMessage(Battery.folderPlentyOfBattery, 0, null));
             }
-            else if (this.windowedAverageChargeLeft >= Battery.BatteryLowThreshold)
+            else if ((this.averageUsagePerLap > 0.0f  // If avg usage per lap available, calculate threshold dynamically.
+                    && this.windowedAverageChargeLeft > (this.averageUsagePerLap * Battery.BatteryLowLapsFactor))
+                || (this.averageUsagePerLap < 0.0f && this.windowedAverageChargeLeft > Battery.BatteryLowThreshold))  // In a corner case of no avg use available, just use fixed threshold.
             {
                 haveData = true;
                 batteryRunningLow = false;
@@ -740,21 +742,20 @@ namespace CrewChiefV4.Events
                 messageFragments.Add(MessageFragment.Text(Battery.folderPercentRemaining));
                 this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/level", messageFragments, 0, null));
             }
-            else if (this.windowedAverageChargeLeft > Battery.BatteryCriticalThreshold)
+            else if ((this.averageUsagePerLap > 0.0f  // If avg usage per lap available, calculate threshold dynamically.
+                    && this.windowedAverageChargeLeft > (this.averageUsagePerLap * Battery.BatteryCriticaLapsFactor))
+                || (this.averageUsagePerLap < 0.0f && this.windowedAverageChargeLeft > Battery.BatteryCriticalThreshold))  // In a corner case of no avg use available, just use fixed threshold.
             {
                 haveData = true;
                 this.audioPlayer.playMessage(new QueuedMessage("Battery/level", MessageContents(Battery.folderLowBattery), 0, this));
             }
-            else if (this.windowedAverageChargeLeft <= 2.0f)
-            {
-                haveData = true;
-                this.audioPlayer.playMessage(new QueuedMessage("Battery/level", MessageContents(Battery.folderCriticalBattery), 0, this));
-            }
             else if (this.windowedAverageChargeLeft > 0)
             {
                 haveData = true;
-                this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/level",
-                        MessageContents(Battery.folderAboutToRunOut), 0, null));
+                var messageFragments = new List<MessageFragment>();
+                messageFragments.Add(MessageFragment.Text(Battery.folderCriticalBattery));
+                messageFragments.Add(MessageFragment.Text(Battery.folderAboutToRunOut));
+                this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/level", messageFragments, 0, null));
             }
 
             if (batteryRunningLow || !this.batteryUseActive)
