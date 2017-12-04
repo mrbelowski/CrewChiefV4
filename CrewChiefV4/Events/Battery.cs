@@ -536,13 +536,13 @@ namespace CrewChiefV4.Events
                         if (bu == Battery.BatteryUseTrend.Increasing
                             && this.lastReportedTrend != Battery.BatteryUseTrend.Increasing)
                         {
-                            this.audioPlayer.playMessage(new QueuedMessage("Battery/trend", MessageContents(Battery.folderUseIncreasing), 0, this));
+                            this.audioPlayer.playMessage(new QueuedMessage("Battery/trend", MessageContents(Battery.folderUseIncreasing), Utilities.random.Next(0, 11), this));
                             this.lastReportedTrend = Battery.BatteryUseTrend.Increasing;
                         }
                         else if (bu == Battery.BatteryUseTrend.Decreasing
                             && this.lastReportedTrend != Battery.BatteryUseTrend.Decreasing)
                         {
-                            this.audioPlayer.playMessage(new QueuedMessage("Battery/trend", MessageContents(Battery.folderUseDecreasing), 0, this));
+                            this.audioPlayer.playMessage(new QueuedMessage("Battery/trend", MessageContents(Battery.folderUseDecreasing), Utilities.random.Next(0, 11), this));
                             this.lastReportedTrend = Battery.BatteryUseTrend.Decreasing;
                         }
                         else if (bu == Battery.BatteryUseTrend.Stable)
