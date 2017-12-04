@@ -45,10 +45,12 @@ namespace CrewChiefV4
         public static String[] WHATS_MY_POSITION = Configuration.getSpeechRecognitionPhrases("WHATS_MY_POSITION");
         public static String[] WHATS_MY_FUEL_LEVEL = Configuration.getSpeechRecognitionPhrases("WHATS_MY_FUEL_LEVEL");
         public static String[] WHATS_MY_FUEL_USAGE = Configuration.getSpeechRecognitionPhrases("WHATS_MY_FUEL_USAGE");
+        public static String[] WHATS_MY_IRATING = Configuration.getSpeechRecognitionPhrases("WHATS_MY_IRATING");
+        public static String[] WHATS_MY_LICENSE_CLASS = Configuration.getSpeechRecognitionPhrases("WHATS_MY_LICENSE_CLASS");
         public static String[] WHAT_TYRES_AM_I_ON = Configuration.getSpeechRecognitionPhrases("WHAT_TYRES_AM_I_ON");
         public static String[] WHAT_ARE_THE_RELATIVE_TYRE_PERFORMANCES = Configuration.getSpeechRecognitionPhrases("WHAT_ARE_THE_RELATIVE_TYRE_PERFORMANCES");
-        
-        
+
+
         public static String[] CALCULATE_FUEL_FOR = Configuration.getSpeechRecognitionPhrases("CALCULATE_FUEL_FOR");
         public static String[] LAP = Configuration.getSpeechRecognitionPhrases("LAP");
         public static String[] LAPS = Configuration.getSpeechRecognitionPhrases("LAPS");
@@ -103,7 +105,7 @@ namespace CrewChiefV4
         public static String WHOS_IN = Configuration.getSpeechRecognitionConfigOption("WHOS_IN");
         public static String WHATS = Configuration.getSpeechRecognitionConfigOption("WHATS");
         public static String BEST_LAP = Configuration.getSpeechRecognitionConfigOption("BEST_LAP");
-        public static String BEST_LAP_TIME = Configuration.getSpeechRecognitionConfigOption("BEST_LAP_TIME"); 
+        public static String BEST_LAP_TIME = Configuration.getSpeechRecognitionConfigOption("BEST_LAP_TIME");
         public static String LAST_LAP = Configuration.getSpeechRecognitionConfigOption("LAST_LAP");
         public static String LAST_LAP_TIME = Configuration.getSpeechRecognitionConfigOption("LAST_LAP_TIME");
         public static String THE_LEADER = Configuration.getSpeechRecognitionConfigOption("THE_LEADER");
@@ -118,7 +120,7 @@ namespace CrewChiefV4
         public static String WHAT_TYRE_IS = Configuration.getSpeechRecognitionConfigOption("WHAT_TYRE_IS");
 
         public static String IRATING = Configuration.getSpeechRecognitionConfigOption("IRATING");
-        public static String LICENS_CLASS = Configuration.getSpeechRecognitionConfigOption("LICENS_CLASS");
+        public static String LICENSE_CLASS = Configuration.getSpeechRecognitionConfigOption("LICENS_CLASS");
 
         public static String[] PLAY_CORNER_NAMES = Configuration.getSpeechRecognitionPhrases("PLAY_CORNER_NAMES");
 
@@ -174,7 +176,7 @@ namespace CrewChiefV4
         private Grammar macroGrammar = null;
 
         private Dictionary<String, ExecutableCommandMacro> macroLookup = new Dictionary<string, ExecutableCommandMacro>();
-        
+
         private System.Globalization.CultureInfo cultureInfo;
 
         public static Dictionary<String[], int> numberToNumber = getNumberMappings(1, 199);
@@ -186,14 +188,14 @@ namespace CrewChiefV4
         public static Boolean waitingForSpeech = false;
 
         public static Boolean gotRecognitionResult = false;
-        
+
         // guard against race condition between closing channel and sre_SpeechRecognised event completing
         public static Boolean keepRecognisingInHoldMode = false;
 
         // load voice commands for triggering keyboard macros. The String key of the input Dictionary is the
         // command list key in speech_recognition_config.txt. When one of these phrases is heard the map value
         // CommandMacro is executed.
-        public void loadMacroVoiceTriggers(Dictionary<string, ExecutableCommandMacro> voiceTriggeredMacros) 
+        public void loadMacroVoiceTriggers(Dictionary<string, ExecutableCommandMacro> voiceTriggeredMacros)
         {
             if (!initialised)
             {
@@ -218,7 +220,7 @@ namespace CrewChiefV4
                     macroLookup.Add(triggerPhrase, voiceTriggeredMacros[triggerPhrase]);
                 }
                 macroChoices.Add(triggerPhrase);
-                
+
             }
             GrammarBuilder macroGrammarBuilder = new GrammarBuilder();
             macroGrammarBuilder.Culture = cultureInfo;
@@ -246,7 +248,7 @@ namespace CrewChiefV4
         private List<Grammar> addCompoundChoices(String[] phrases, Boolean alwaysUseAllPhrases, Choices choices, String[] append, Boolean alwaysUseAllAppends)
         {
             List<Grammar> generatedGrammars = new List<Grammar>();
-            foreach(string s in phrases)
+            foreach (string s in phrases)
             {
                 if (s == null || s.Trim().Count() == 0)
                 {
@@ -344,7 +346,7 @@ namespace CrewChiefV4
                     else
                     {
                         choices.Add(speechPhrases);
-                    }                    
+                    }
                 }
             }
         }
@@ -379,7 +381,7 @@ namespace CrewChiefV4
                 catch (Exception e)
                 {
                     Console.WriteLine("Unable to initialise speech engine with the OS's default English voice recognition pack (location name " + defaultLocale + "). " +
-                        "Check that SpeechPlatformRuntime.msi and at least one of MSSpeech_SR_en-GB_TELE.msi, MSSpeech_SR_en-US_TELE.msi, " + 
+                        "Check that SpeechPlatformRuntime.msi and at least one of MSSpeech_SR_en-GB_TELE.msi, MSSpeech_SR_en-US_TELE.msi, " +
                         "MSSpeech_SR_en-AU_TELE.msi, MSSpeech_SR_en-CA_TELE.msi or MSSpeech_SR_en-IN_TELE.msi are installed.");
                     Console.WriteLine("Exception message: " + e.Message);
                     return;
@@ -445,7 +447,7 @@ namespace CrewChiefV4
 
                 validateAndAdd(START_PACE_NOTES_PLAYBACK, staticSpeechChoices);
                 validateAndAdd(STOP_PACE_NOTES_PLAYBACK, staticSpeechChoices);
-                
+
                 validateAndAdd(KEEP_QUIET, staticSpeechChoices);
                 validateAndAdd(KEEP_ME_INFORMED, staticSpeechChoices);
                 validateAndAdd(TELL_ME_THE_GAPS, staticSpeechChoices);
@@ -479,7 +481,7 @@ namespace CrewChiefV4
                 validateAndAdd(WHOS_BEHIND_IN_THE_RACE, staticSpeechChoices);
                 validateAndAdd(WHOS_IN_FRONT_ON_TRACK, staticSpeechChoices);
                 validateAndAdd(WHOS_BEHIND_ON_TRACK, staticSpeechChoices);
-                validateAndAdd(WHOS_LEADING, staticSpeechChoices);  
+                validateAndAdd(WHOS_LEADING, staticSpeechChoices);
 
                 GrammarBuilder staticGrammarBuilder = new GrammarBuilder();
                 staticGrammarBuilder.Culture = cultureInfo;
@@ -522,7 +524,7 @@ namespace CrewChiefV4
             }
             initialised = true;
         }
-        
+
         public void addNewOpponentName(String rawDriverName)
         {
             if (!initialised)
@@ -546,7 +548,7 @@ namespace CrewChiefV4
 
                         opponentGrammarList.AddRange(addCompoundChoices(new String[] { WHERE_IS, WHERES }, false, opponentNameChoices, null, true));
                         opponentGrammarList.AddRange(addCompoundChoices(new String[] { WHAT_TYRE_IS, WHAT_TYRES_IS }, false, opponentNameChoices, new String[] { ON }, true));
-                        opponentGrammarList.AddRange(addCompoundChoices(new String[] { WHATS }, true, opponentNamePossessiveChoices, new String[] { LAST_LAP, BEST_LAP, IRATING, LICENS_CLASS }, true));
+                        opponentGrammarList.AddRange(addCompoundChoices(new String[] { WHATS }, true, opponentNamePossessiveChoices, new String[] { LAST_LAP, BEST_LAP, IRATING, LICENSE_CLASS }, true));
                     }
                     // This method is called when a new driver appears mid-session. We need to load the sound file for this new driver
                     // so do it here - nasty nasty hack, need to refactor this. The alternative is to call
@@ -582,7 +584,7 @@ namespace CrewChiefV4
 
             if (useNames)
             {
-                Console.WriteLine("Adding " + names.Count + " new session opponent names to speech recogniser" );                
+                Console.WriteLine("Adding " + names.Count + " new session opponent names to speech recogniser");
                 foreach (String name in names)
                 {
                     opponentNameOrPositionChoices.Add(name);
@@ -615,10 +617,10 @@ namespace CrewChiefV4
             opponentNameOrPositionPossessiveChoices.Add(THE_CAR_BEHIND);
             opponentNameOrPositionPossessiveChoices.Add(THE_LEADER);
 
-            opponentGrammarList.AddRange(addCompoundChoices(new String[] { WHERE_IS, WHERES}, false, opponentNameOrPositionChoices, null, true));
+            opponentGrammarList.AddRange(addCompoundChoices(new String[] { WHERE_IS, WHERES }, false, opponentNameOrPositionChoices, null, true));
             opponentGrammarList.AddRange(addCompoundChoices(new String[] { WHOS_IN }, false, opponentPositionChoices, null, true));
             opponentGrammarList.AddRange(addCompoundChoices(new String[] { WHAT_TYRE_IS, WHAT_TYRES_IS }, false, opponentNameOrPositionChoices, new String[] { ON }, true));
-            opponentGrammarList.AddRange(addCompoundChoices(new String[] { WHATS }, false, opponentNameOrPositionPossessiveChoices, new String[] { LAST_LAP, BEST_LAP }, true));          
+            opponentGrammarList.AddRange(addCompoundChoices(new String[] { WHATS }, false, opponentNameOrPositionPossessiveChoices, new String[] { LAST_LAP, BEST_LAP, IRATING, LICENSE_CLASS }, true));
 
             driverNamesInUse.AddRange(names);
         }
@@ -682,7 +684,10 @@ namespace CrewChiefV4
                 validateAndAdd(PIT_STOP_CHANGE_REAR_RIGHT_TYRE, iRacingChoices);
                 validateAndAdd(HOW_MANY_INCIDENT_POINTS, iRacingChoices);
                 validateAndAdd(WHATS_THE_INCIDENT_LIMIT, iRacingChoices);
-  
+                validateAndAdd(WHATS_MY_IRATING, iRacingChoices);
+                validateAndAdd(WHATS_MY_LICENSE_CLASS, iRacingChoices);
+
+
                 GrammarBuilder iRacingGrammarBuilder = new GrammarBuilder(iRacingChoices);
                 iRacingGrammarBuilder.Culture = cultureInfo;
                 Grammar iRacingGrammar = new Grammar(iRacingGrammarBuilder);
@@ -755,7 +760,7 @@ namespace CrewChiefV4
                         }
                     }
                 }
-                else 
+                else
                 {
                     crewChief.youWot();
                 }
@@ -764,7 +769,7 @@ namespace CrewChiefV4
             {
                 Console.WriteLine("Unable to respond - error message: " + exception.Message);
             }
-            
+
             // 'stop' the recogniser if we're ALWAYS_ON (because we restart it below) or TOGGLE
             // (because the user might have forgotten to press the button to close the channel).
             // For HOLD mode, let the recogniser continue listening and executing commands (invoking this 
@@ -778,7 +783,7 @@ namespace CrewChiefV4
             }
             else if (voiceOptionEnum == MainWindow.VoiceOptionEnum.ALWAYS_ON)
             {
-                sre.RecognizeAsyncStop(); 
+                sre.RecognizeAsyncStop();
                 Thread.Sleep(500);
                 Console.WriteLine("restarting speech recognition");
                 recognizeAsync();
@@ -817,7 +822,7 @@ namespace CrewChiefV4
             Console.WriteLine("cancelling wait for speech");
             SpeechRecogniser.waitingForSpeech = false;
             SpeechRecogniser.keepRecognisingInHoldMode = false;
-            sre.RecognizeAsyncCancel();            
+            sre.RecognizeAsyncCancel();
         }
 
         private AbstractEvent getEventForSpeech(String recognisedSpeech)
@@ -882,7 +887,7 @@ namespace CrewChiefV4
             {
                 crewChief.disableKeepQuietMode();
             }
-            else if (ResultContains(recognisedSpeech, WHATS_MY_FUEL_LEVEL) 
+            else if (ResultContains(recognisedSpeech, WHATS_MY_FUEL_LEVEL)
                 || ResultContains(recognisedSpeech, HOWS_MY_FUEL)
                 || ResultContains(recognisedSpeech, WHATS_MY_FUEL_USAGE)
                 || ResultContains(recognisedSpeech, CALCULATE_FUEL_FOR))
@@ -956,7 +961,7 @@ namespace CrewChiefV4
             {
                 return CrewChief.getEvent("Opponents");
             }
-                // multiple events for status reporting:
+            // multiple events for status reporting:
             else if (ResultContains(recognisedSpeech, DAMAGE_REPORT))
             {
                 CrewChief.getDamageReport();
