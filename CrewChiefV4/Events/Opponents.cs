@@ -47,6 +47,14 @@ namespace CrewChiefV4.Events
         public static String folderHasJustRetired = "opponents/has_just_retired";
         public static String folderHasJustBeenDisqualified = "opponents/has_just_been_disqualified";
 
+        public static String folderLicensA = "licens/a_licens";
+        public static String folderLicensB = "licens/b_licens";
+        public static String folderLicensC = "licens/c_licens";
+        public static String folderLicensD = "licens/d_licens";
+        public static String folderLicensR = "licens/r_licens";
+        public static String folderLicensPro = "licens/pro_licens";
+
+
         private int frequencyOfOpponentRaceLapTimes = UserSettings.GetUserSettings().getInt("frequency_of_opponent_race_lap_times");
         private int frequencyOfOpponentPracticeAndQualLapTimes = UserSettings.GetUserSettings().getInt("frequency_of_opponent_practice_and_qual_lap_times");
 
@@ -455,7 +463,23 @@ namespace CrewChiefV4.Events
             }
             return -1;
         }
-        
+
+        private Tuple<String, float> getOpponentLicensLevel(string opponentKey)
+        {
+            if (opponentKey != null && currentGameState.OpponentData.ContainsKey(opponentKey))
+            {
+                return currentGameState.OpponentData[opponentKey].LicensLevel;
+            }
+            return new Tuple<String, float> ("invalid", -1);
+        }
+        private int getOpponentIRating(string opponentKey)
+        {
+            if (opponentKey != null && currentGameState.OpponentData.ContainsKey(opponentKey))
+            {
+                return currentGameState.OpponentData[opponentKey].iRating;
+            }
+            return -1;
+        }
         public override void respond(String voiceMessage)
         {
             Boolean gotData = false;
@@ -480,8 +504,10 @@ namespace CrewChiefV4.Events
                         }
                     }
                 }
-                else if (voiceMessage.StartsWith(SpeechRecogniser.WHATS) && 
-                    (voiceMessage.EndsWith(SpeechRecogniser.LAST_LAP) || voiceMessage.EndsWith(SpeechRecogniser.BEST_LAP)))
+                else if (voiceMessage.StartsWith(SpeechRecogniser.WHATS) &&
+                    (voiceMessage.EndsWith(SpeechRecogniser.LAST_LAP) || voiceMessage.EndsWith(SpeechRecogniser.BEST_LAP) ||
+                    voiceMessage.EndsWith(SpeechRecogniser.LICENS_CLASS) ||
+                    voiceMessage.EndsWith(SpeechRecogniser.IRATING)))
                 {
                     if (voiceMessage.EndsWith(SpeechRecogniser.LAST_LAP))
                     {
@@ -494,7 +520,7 @@ namespace CrewChiefV4.Events
                             
                         }                       
                     }
-                    else
+                    else if (voiceMessage.EndsWith(SpeechRecogniser.BEST_LAP))
                     {
                         float bestLap = getOpponentBestLap(getOpponentKey(voiceMessage, SpeechRecogniser.POSSESSIVE + " ").Item1);
                         if (bestLap != -1)
@@ -504,7 +530,48 @@ namespace CrewChiefV4.Events
                                 TimeSpanWrapper.FromSeconds(bestLap, Precision.AUTO_LAPTIMES)), 0, null));
                             
                         }
-                    }  
+                    }
+                    else if (voiceMessage.EndsWith(SpeechRecogniser.LICENS_CLASS))
+                    {
+                        Tuple<string, float> licensLevel = getOpponentLicensLevel(getOpponentKey(voiceMessage, SpeechRecogniser.POSSESSIVE + " ").Item1);
+                        if(licensLevel.Item2 != -1)
+                        {
+                            gotData = true;
+                            if(licensLevel.Item1.ToLower() == "a")
+                            {
+                                audioPlayer.playMessageImmediately(new QueuedMessage("opponentLicens", MessageContents(folderLicensA, licensLevel.Item2), 0, null));
+                            }
+                            else if (licensLevel.Item1.ToLower() == "b")
+                            {
+                                audioPlayer.playMessageImmediately(new QueuedMessage("opponentLicens", MessageContents(folderLicensB, licensLevel.Item2), 0, null));
+                            }
+                            else if (licensLevel.Item1.ToLower() == "c")
+                            {
+                                audioPlayer.playMessageImmediately(new QueuedMessage("opponentLicens", MessageContents(folderLicensC, licensLevel.Item2), 0, null));
+                            }
+                            else if (licensLevel.Item1.ToLower() == "d")
+                            {
+                                audioPlayer.playMessageImmediately(new QueuedMessage("opponentLicens", MessageContents(folderLicensD, licensLevel.Item2), 0, null));
+                            }
+                            else if (licensLevel.Item1.ToLower() == "r")
+                            {
+                                audioPlayer.playMessageImmediately(new QueuedMessage("opponentLicens", MessageContents(folderLicensR, licensLevel.Item2), 0, null));
+                            }
+                            else if (licensLevel.Item1.ToLower() == "pro")
+                            {
+                                audioPlayer.playMessageImmediately(new QueuedMessage("opponentLicens", MessageContents(folderLicensPro, licensLevel.Item2), 0, null));
+                            }
+                        }
+                    }
+                    else
+                    {
+                        int rating = getOpponentIRating(getOpponentKey(voiceMessage, SpeechRecogniser.POSSESSIVE + " ").Item1);
+                        if(rating != -1)
+                        {
+                            gotData = true;
+                            audioPlayer.playMessageImmediately(new QueuedMessage("opponentiRating", MessageContents(rating), 0, null));
+                        }                        
+                    }
                 } 
                 else if (voiceMessage.StartsWith(SpeechRecogniser.WHERE_IS) || voiceMessage.StartsWith(SpeechRecogniser.WHERES))
                 {

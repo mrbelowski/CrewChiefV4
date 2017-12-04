@@ -383,6 +383,10 @@ namespace CrewChiefV4.GameState
 
         public Boolean HasLimitedIncidents = false;
 
+        public Tuple<String, float> LicensLevel = new Tuple<String, float>("invalid", -1);
+
+        public int iRating = 0;
+
         public SessionData()
         {
             SessionTimesAtEndOfSectors.Add(1, -1);
@@ -672,8 +676,11 @@ namespace CrewChiefV4.GameState
 
         public bool isApporchingPits = false;
 
-
         public int CarNr = -1;
+
+        public Tuple<String, float> LicensLevel = new Tuple<String, float>("invalid", -1);
+
+        public int iRating = -1;
 
         public override string ToString()
         {
