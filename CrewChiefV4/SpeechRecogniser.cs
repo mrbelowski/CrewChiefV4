@@ -120,7 +120,7 @@ namespace CrewChiefV4
         public static String WHAT_TYRE_IS = Configuration.getSpeechRecognitionConfigOption("WHAT_TYRE_IS");
 
         public static String IRATING = Configuration.getSpeechRecognitionConfigOption("IRATING");
-        public static String LICENSE_CLASS = Configuration.getSpeechRecognitionConfigOption("LICENS_CLASS");
+        public static String LICENSE_CLASS = Configuration.getSpeechRecognitionConfigOption("LICENSE_CLASS");
 
         public static String[] PLAY_CORNER_NAMES = Configuration.getSpeechRecognitionPhrases("PLAY_CORNER_NAMES");
 
