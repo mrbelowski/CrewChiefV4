@@ -24,9 +24,9 @@ namespace CrewChiefV4.Events
 
         public static String folderYouHave = "incidents/you_have";
 
-        public static String folderinsidents = "incidents/insidents";
+        public static String folderincidents = "incidents/incidents";
 
-        public static String folderinsidentlimit = "incidents/insident_limit";
+        public static String folderincidentlimit = "incidents/incident_limit";
 
         public static String folderUnlimited = "incidents/unlimited";
 
@@ -247,14 +247,14 @@ namespace CrewChiefV4.Events
             }
             else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOW_MANY_INCIDENT_POINTS))
             {
-                audioPlayer.playMessageImmediately(new QueuedMessage("Incidents/incidents", MessageContents(folderYouHave, incidentsCount, folderinsidents), 0, null));
+                audioPlayer.playMessageImmediately(new QueuedMessage("Incidents/incidents", MessageContents(folderYouHave, incidentsCount, folderincidents), 0, null));
                 return;
             }
             else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.WHATS_THE_INCIDENT_LIMIT))
             {
                 if (haslimitedIncidents)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage("Incidents/limit", MessageContents(folderinsidentlimit, maxIncidentCount), 0, null));
+                    audioPlayer.playMessageImmediately(new QueuedMessage("Incidents/limit", MessageContents(folderincidentlimit, maxIncidentCount), 0, null));
                 }
                 else
                 {
