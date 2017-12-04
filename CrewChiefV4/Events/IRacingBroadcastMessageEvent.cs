@@ -315,19 +315,19 @@ namespace CrewChiefV4.Events
                     }
                     else if (licenseLevel.Item1.ToLower() == "c")
                     {
-                        messageFragments.Add(MessageFragment.Text(folderLicenseB));
+                        messageFragments.Add(MessageFragment.Text(folderLicenseC));
                     }
                     else if (licenseLevel.Item1.ToLower() == "d")
                     {
-                        messageFragments.Add(MessageFragment.Text(folderLicenseB));
+                        messageFragments.Add(MessageFragment.Text(folderLicenseD));
                     }
                     else if (licenseLevel.Item1.ToLower() == "r")
                     {
-                        messageFragments.Add(MessageFragment.Text(folderLicenseB));
+                        messageFragments.Add(MessageFragment.Text(folderLicenseR));
                     }
                     else if (licenseLevel.Item1.ToLower() == "pro")
                     {
-                        messageFragments.Add(MessageFragment.Text(folderLicenseB));
+                        messageFragments.Add(MessageFragment.Text(folderLicensePro));
                     }
                     else
                     {
