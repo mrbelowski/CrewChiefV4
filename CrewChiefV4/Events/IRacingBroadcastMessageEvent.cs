@@ -49,7 +49,7 @@ namespace CrewChiefV4.Events
             this.incidentsCount = -1;
             this.maxIncidentCount = -1;
             this.iRating = -1;
-            this.haslimitedIncidents = false;
+            this.hasLimitedIncidents = false;
             this.licenseLevel = new Tuple<string, float>("invalid", -1);
         }
         int lastColdFLPressure = -1;
@@ -59,7 +59,7 @@ namespace CrewChiefV4.Events
         int maxIncidentCount = -1;
         int incidentsCount = -1;
         int iRating = -1;
-        bool haslimitedIncidents = false;
+        bool hasLimitedIncidents = false;
         Tuple<String, float> licenseLevel = new Tuple<string, float>("invalid", -1);
 
 
@@ -72,7 +72,7 @@ namespace CrewChiefV4.Events
             this.incidentsCount = -1;
             this.maxIncidentCount = -1;
             this.iRating = -1;
-            this.haslimitedIncidents = false;
+            this.hasLimitedIncidents = false;
             this.licenseLevel = new Tuple<string, float>("invalid", -1);
 
         }
@@ -85,7 +85,7 @@ namespace CrewChiefV4.Events
 
             maxIncidentCount = currentGameState.SessionData.MaxIncidentCount;
             incidentsCount = currentGameState.SessionData.CurrentIncidentCount;
-            haslimitedIncidents = currentGameState.SessionData.HasLimitedIncidents;
+            hasLimitedIncidents = currentGameState.SessionData.HasLimitedIncidents;
             licenseLevel = currentGameState.SessionData.LicenseLevel;
             iRating = currentGameState.SessionData.iRating;
         }
@@ -270,7 +270,7 @@ namespace CrewChiefV4.Events
             }
             else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.WHATS_THE_INCIDENT_LIMIT))
             {
-                if (haslimitedIncidents)
+                if (hasLimitedIncidents)
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage("Incidents/limit", MessageContents(folderincidentlimit, maxIncidentCount), 0, null));
                 }
