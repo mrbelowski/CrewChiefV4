@@ -275,7 +275,8 @@ namespace CrewChiefV4.Events
                     return;
 
                 if (currentGameState.SessionData.IsNewLap
-                    && this.currLapNumBatteryMeasurements > 0)
+                    && this.currLapNumBatteryMeasurements > 0
+                    && currentGameState.SessionData.SessionRunningTime > 5.0f)  // Guard against getting called too early.
                 {
                     this.batteryStats.Add(new BatteryStatsEntry()
                     {
@@ -318,17 +319,18 @@ namespace CrewChiefV4.Events
                     else
                     {
                         // If this is first lap completed, just use its consumption.
-                        this.averageUsagePerLap = batteryDrainSinceMonitoringStart;
-                        this.averageUsagePerMinute = (batteryDrainSinceMonitoringStart / (prevLapStats.SessionRunningTime - this.firstFullLapGameTime)) * 60.0f;
-                        this.prevLapBatteryUse = this.firstFullLapInitialChargeLeft - this.windowedAverageChargeLeft;
+                        this.averageUsagePerLap = this.prevLapBatteryUse = batteryDrainSinceMonitoringStart > 0.0f ? batteryDrainSinceMonitoringStart : -1.0f;
+
+                        this.averageUsagePerMinute = batteryDrainSinceMonitoringStart > 0.0f
+                            ? (batteryDrainSinceMonitoringStart / (prevLapStats.SessionRunningTime - this.firstFullLapGameTime)) * 60.0f : -1.0f;
                     }
 
-                    Console.WriteLine(string.Format("Last lap average battery left percentage: {0}%  min percentage: {1}%  windowed charge: {2}%,  curr percentage {3}%  last lap use: {4}%  windowed avg per lap: {5}%  avg per min: {6}%",
+                    Console.WriteLine(string.Format("Last lap battery use: {0}%  avg battery left: {1}%  min: {2}%  windowed charge: {3}%,  curr charge: {4}%  windowed avg use per lap: {5}%  avg use per minute: {6}%",
+                        this.prevLapBatteryUse.ToString("0.000"),
                         this.batteryStats.Last().AverageBatteryPercentageLeft.ToString("0.000"),
                         this.batteryStats.Last().MinimumBatteryPercentageLeft.ToString("0.000"),
                         this.windowedAverageChargeLeft,
                         currBattLeftPct.ToString("0.000"),
-                        this.prevLapBatteryUse.ToString("0.000"),
                         this.averageUsagePerLap.ToString("0.000"),
                         this.averageUsagePerMinute.ToString("0.000")));
 
