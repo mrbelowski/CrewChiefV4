@@ -32,6 +32,13 @@ namespace CrewChiefV4.Events
         public static String folderincidentPointslimit = "incidents/the_incident_points_limit_is";
         public static String folderUnlimitedPoints = "incidents/no_incident_points_limit";
 
+        public static String folderLicenseA = "licence/a_licence";
+        public static String folderLicenseB = "licence/b_licence";
+        public static String folderLicenseC = "licence/c_licence";
+        public static String folderLicenseD = "licence/d_licence";
+        public static String folderLicenseR = "licence/r_licence";
+        public static String folderLicensePro = "licence/pro_licence";
+
         public IRacingBroadcastMessageEvent(AudioPlayer audioPlayer)
         {
             this.audioPlayer = audioPlayer;
@@ -41,7 +48,9 @@ namespace CrewChiefV4.Events
             this.lastColdRRPressure = -1;
             this.incidentsCount = -1;
             this.maxIncidentCount = -1;
-            this.haslimitedIncidents = false;
+            this.iRating = -1;
+            this.hasLimitedIncidents = false;
+            this.licenseLevel = new Tuple<string, float>("invalid", -1);
         }
         int lastColdFLPressure = -1;
         int lastColdFRPressure = -1;
@@ -49,7 +58,10 @@ namespace CrewChiefV4.Events
         int lastColdRRPressure = -1;
         int maxIncidentCount = -1;
         int incidentsCount = -1;
-        bool haslimitedIncidents = false;
+        int iRating = -1;
+        bool hasLimitedIncidents = false;
+        Tuple<String, float> licenseLevel = new Tuple<string, float>("invalid", -1);
+
 
         public override void clearState()
         {
@@ -59,7 +71,9 @@ namespace CrewChiefV4.Events
             this.lastColdRRPressure = -1;
             this.incidentsCount = -1;
             this.maxIncidentCount = -1;
-            this.haslimitedIncidents = false;
+            this.iRating = -1;
+            this.hasLimitedIncidents = false;
+            this.licenseLevel = new Tuple<string, float>("invalid", -1);
 
         }
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
@@ -68,10 +82,12 @@ namespace CrewChiefV4.Events
             lastColdFRPressure = (int)currentGameState.TyreData.FrontRightPressure;
             lastColdRLPressure = (int)currentGameState.TyreData.RearLeftPressure;
             lastColdRRPressure = (int)currentGameState.TyreData.RearRightPressure;
-                        
+
             maxIncidentCount = currentGameState.SessionData.MaxIncidentCount;
             incidentsCount = currentGameState.SessionData.CurrentIncidentCount;
-            haslimitedIncidents = currentGameState.SessionData.HasLimitedIncidents;
+            hasLimitedIncidents = currentGameState.SessionData.HasLimitedIncidents;
+            licenseLevel = currentGameState.SessionData.LicenseLevel;
+            iRating = currentGameState.SessionData.iRating;
         }
 
         public override void respond(String voiceMessage)
@@ -108,7 +124,7 @@ namespace CrewChiefV4.Events
                     return;
                 }
             }
-            else if(SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PIT_STOP_TEAROFF))
+            else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PIT_STOP_TEAROFF))
             {
                 Tearoff();
                 audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
@@ -212,7 +228,7 @@ namespace CrewChiefV4.Events
                         audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
                         return;
                     }
-                }                  
+                }
             }
             else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PIT_STOP_CHANGE_ALL_TYRES))
             {
@@ -254,16 +270,76 @@ namespace CrewChiefV4.Events
             }
             else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.WHATS_THE_INCIDENT_LIMIT))
             {
-                if (haslimitedIncidents)
+                if (hasLimitedIncidents)
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage("Incidents/limit", MessageContents(folderincidentlimit, maxIncidentCount), 0, null));
                 }
                 else
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage("Incidents/limit", MessageContents(folderUnlimited), 0, null));
-                }                
+                }
                 return;
-            }   
+            }
+            else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.WHATS_MY_IRATING))
+            {
+                if(iRating != -1)
+                {
+                    audioPlayer.playMessageImmediately(new QueuedMessage("license/irating", MessageContents(iRating), 0, null));
+                    return;
+                }
+                else
+                {
+                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+                    return;
+                }
+            }
+            else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.WHATS_MY_LICENSE_CLASS))
+            {
+                if (licenseLevel.Item2 == -1)
+                {
+                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+                    return;
+                }
+                if (licenseLevel.Item2 != -1)
+                {
+                    Tuple<int, int> wholeandfractional = Utilities.WholeAndFractionalPart(licenseLevel.Item2);
+                    List<MessageFragment> messageFragments = new List<MessageFragment>();
+
+                    if (licenseLevel.Item1.ToLower() == "a")
+                    {
+                        messageFragments.Add(MessageFragment.Text(folderLicenseA));
+                    }
+                    else if (licenseLevel.Item1.ToLower() == "b")
+                    {
+                        messageFragments.Add(MessageFragment.Text(folderLicenseB));
+                    }
+                    else if (licenseLevel.Item1.ToLower() == "c")
+                    {
+                        messageFragments.Add(MessageFragment.Text(folderLicenseB));
+                    }
+                    else if (licenseLevel.Item1.ToLower() == "d")
+                    {
+                        messageFragments.Add(MessageFragment.Text(folderLicenseB));
+                    }
+                    else if (licenseLevel.Item1.ToLower() == "r")
+                    {
+                        messageFragments.Add(MessageFragment.Text(folderLicenseB));
+                    }
+                    else if (licenseLevel.Item1.ToLower() == "pro")
+                    {
+                        messageFragments.Add(MessageFragment.Text(folderLicenseB));
+                    }
+                    else
+                    {
+                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+                        return;
+                    }
+                    messageFragments.AddRange(MessageContents(wholeandfractional.Item1, NumberReader.folderPoint, wholeandfractional.Item2));
+                    QueuedMessage licenceLevelMessage = new QueuedMessage("License/license", messageFragments, 0, null);
+                    audioPlayer.playDelayedImmediateMessage(licenceLevelMessage);
+                }
+                return;
+            }
         }
 
 

@@ -383,7 +383,7 @@ namespace CrewChiefV4.GameState
 
         public Boolean HasLimitedIncidents = false;
 
-        public Tuple<String, float> LicensLevel = new Tuple<String, float>("invalid", -1);
+        public Tuple<String, float> LicenseLevel = new Tuple<String, float>("invalid", -1);
 
         public int iRating = 0;
 
