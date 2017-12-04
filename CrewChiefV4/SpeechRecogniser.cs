@@ -117,6 +117,9 @@ namespace CrewChiefV4
         public static String WHAT_TYRES_IS = Configuration.getSpeechRecognitionConfigOption("WHAT_TYRES_IS");
         public static String WHAT_TYRE_IS = Configuration.getSpeechRecognitionConfigOption("WHAT_TYRE_IS");
 
+        public static String IRATING = Configuration.getSpeechRecognitionConfigOption("IRATING");
+        public static String LICENS_CLASS = Configuration.getSpeechRecognitionConfigOption("LICENS_CLASS");
+
         public static String[] PLAY_CORNER_NAMES = Configuration.getSpeechRecognitionPhrases("PLAY_CORNER_NAMES");
 
         public static String[] DAMAGE_REPORT = Configuration.getSpeechRecognitionPhrases("DAMAGE_REPORT");
@@ -154,7 +157,8 @@ namespace CrewChiefV4
 
         public static String[] HOW_MANY_INCIDENT_POINTS = Configuration.getSpeechRecognitionPhrases("HOW_MANY_INCIDENT_POINTS");
         public static String[] WHATS_THE_INCIDENT_LIMIT = Configuration.getSpeechRecognitionPhrases("WHATS_THE_INCIDENT_LIMIT");
-        
+
+
 
         private CrewChief crewChief;
 
@@ -542,7 +546,7 @@ namespace CrewChiefV4
 
                         opponentGrammarList.AddRange(addCompoundChoices(new String[] { WHERE_IS, WHERES }, false, opponentNameChoices, null, true));
                         opponentGrammarList.AddRange(addCompoundChoices(new String[] { WHAT_TYRE_IS, WHAT_TYRES_IS }, false, opponentNameChoices, new String[] { ON }, true));
-                        opponentGrammarList.AddRange(addCompoundChoices(new String[] { WHATS }, true, opponentNamePossessiveChoices, new String[] { LAST_LAP, BEST_LAP }, true));
+                        opponentGrammarList.AddRange(addCompoundChoices(new String[] { WHATS }, true, opponentNamePossessiveChoices, new String[] { LAST_LAP, BEST_LAP, IRATING, LICENS_CLASS }, true));
                     }
                     // This method is called when a new driver appears mid-session. We need to load the sound file for this new driver
                     // so do it here - nasty nasty hack, need to refactor this. The alternative is to call

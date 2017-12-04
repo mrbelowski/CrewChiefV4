@@ -55,6 +55,26 @@ namespace CrewChiefV4.iRacing
             return 0;
         }
 
+        public static Tuple<String, float> ParseLicens(string value)
+        {
+            // value = "600.00 sec"
+            float level = 0f;
+            String licens = "";
+            var indexOflicens = value.IndexOf(" ");
+            if (indexOflicens > 0)
+            {
+                licens = value.Substring(0, indexOflicens);
+                value = value.Substring(indexOflicens + 1);
+            }
+            
+            if (float.TryParse(value, NumberStyles.AllowDecimalPoint | NumberStyles.AllowTrailingWhite, CultureInfo.InvariantCulture, out level))
+            {
+                return new Tuple<String, float>(licens, level);
+            }
+
+            return new Tuple<String, float>("invalid", -1);
+        }
+
         public static Color ParseColor(string value)
         {
             if (!string.IsNullOrWhiteSpace(value) && value.StartsWith("0x"))

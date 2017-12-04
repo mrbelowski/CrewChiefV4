@@ -359,8 +359,8 @@ namespace CrewChiefV4.iRacing
             currentGameState.SessionData.CurrentTeamIncidentCount = shared.Telemetry.PlayerCarTeamIncidentCount;
             currentGameState.SessionData.HasLimitedIncidents = shared.SessionData.IsLimitedIncidents;
             currentGameState.SessionData.MaxIncidentCount = shared.SessionData.IncidentLimit;
-            
-
+            currentGameState.SessionData.LicensLevel = playerCar.licensLevel;
+            currentGameState.SessionData.iRating = playerCar.IRating;
             //TODO add yellow 
             SessionFlags flag = (SessionFlags)shared.Telemetry.SessionFlags;
             if (flag.HasFlag(SessionFlags.Black) && !flag.HasFlag(SessionFlags.Furled))
@@ -652,7 +652,8 @@ namespace CrewChiefV4.iRacing
                             }
                         }
 
-                        
+                        currentOpponentData.LicensLevel = driver.licensLevel;
+                        currentOpponentData.iRating = driver.IRating;
                         updateOpponentData(currentOpponentData, currentOpponentRacePosition,currentOpponentRacePosition, currentOpponentClassPosition, currentOpponentLapsCompleted,
                                  currentOpponentSector, (float)driver.Live.LapTimePrevious, hasCrossedSFLine,
                                  shared.Telemetry.CarIdxOnPitRoad[driver.Id], previousIsInPits, previousOpponentLapValid, currentOpponentLapValid, currentGameState.SessionData.SessionRunningTime, currentOpponentLapDistance,
