@@ -48,7 +48,7 @@ namespace CrewChiefV4.iRacing
             var weekendOptions = weekend["WeekendOptions"];
 
             this.IncidentLimitString = weekendOptions["IncidentLimit"].GetValue();
-            if(!IsLimitedIncidents)
+            if(IsLimitedIncidents)
             {
                 IncidentLimit = Parser.ParseInt(IncidentLimitString);
             }
