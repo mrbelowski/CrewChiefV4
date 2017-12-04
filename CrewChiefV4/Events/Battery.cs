@@ -764,7 +764,6 @@ namespace CrewChiefV4.Events
             {
                 haveData = true;
                 var lapsOfBatteryChargeLeft = (int)Math.Floor(this.windowedAverageChargeLeft / this.averageUsagePerLap);
-                Console.WriteLine($"CURR CHARGE: {this.windowedAverageChargeLeft.ToString("0.000")}  CURR AVG: {this.averageUsagePerLap.ToString("0.000")}  ESTIMATED: {lapsOfBatteryChargeLeft}");
                 if (lapsOfBatteryChargeLeft < 0)
                 {
                     // nothing to report (pit stop reset on a separate thread)
