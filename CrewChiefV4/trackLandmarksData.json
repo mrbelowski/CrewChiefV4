@@ -14302,25 +14302,25 @@
 					"landmarkName": "turn6",
 					"distanceRoundLapStart": 1130.11438,
 					"distanceRoundLapEnd": 1179.56909,
-					"isCommonOvertakingSpot": false
+					"isCommonOvertakingSpot": true
 				},
 				{
 					"landmarkName": "turn7",
 					"distanceRoundLapStart": 1234.741,
 					"distanceRoundLapEnd": 1315.307,
-					"isCommonOvertakingSpot": false
+					"isCommonOvertakingSpot": true
 				},
 				{
 					"landmarkName": "turn8",
 					"distanceRoundLapStart": 1349.90991,
 					"distanceRoundLapEnd": 1391.59668,
-					"isCommonOvertakingSpot": false
+					"isCommonOvertakingSpot": true
 				},
 				{
 					"landmarkName": "turn9",
 					"distanceRoundLapStart": 1512.45117,
 					"distanceRoundLapEnd": 1561.51355,
-					"isCommonOvertakingSpot": true
+					"isCommonOvertakingSpot": false
 				},
 				{
 					"landmarkName": "turn10",
