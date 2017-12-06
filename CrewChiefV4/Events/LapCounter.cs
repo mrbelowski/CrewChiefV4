@@ -545,11 +545,11 @@ namespace CrewChiefV4.Events
                 messageContentsNoName = MessageContents(folderManualStartInitialIntro,
                         Position.folderStub + currentGameState.SessionData.Position, folderManualStartInitialOutroNoDriverName);
             }
-            if (manualFormationDoubleFile && gridSide != GridSide.LEFT)
+            if (manualFormationDoubleFile && gridSide == GridSide.LEFT)
             {
                 messageContentsWithName.Add(MessageFragment.Text(FrozenOrderMonitor.folderInTheLeftColumn));
             }
-            else if (manualFormationDoubleFile && gridSide != GridSide.RIGHT)
+            else if (manualFormationDoubleFile && gridSide == GridSide.RIGHT)
             {
                 messageContentsWithName.Add(MessageFragment.Text(FrozenOrderMonitor.folderInTheRightColumn));
             }
