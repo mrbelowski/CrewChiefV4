@@ -12,10 +12,6 @@ namespace CrewChiefV4.PCars2
 {
     class PCars2Spotterv2 : Spotter
     {
-        private NoisyCartesianCoordinateSpotter internalSpotter;
-
-        private Boolean paused = false;
-
         // don't activate the spotter unless this many seconds have elapsed (race starts are messy)
         private int timeAfterRaceStartToActivate = UserSettings.GetUserSettings().getInt("time_after_race_start_for_spotter");
 
@@ -25,12 +21,6 @@ namespace CrewChiefV4.PCars2
         // when we're clearly directly behind the car
         private float carLength = UserSettings.GetUserSettings().getFloat("pcars_spotter_car_length");
         
-        private Boolean enabled;
-
-        private Boolean initialEnabledState;
-        
-        private AudioPlayer audioPlayer;
-
         private DateTime timeToStartSpotting = DateTime.Now;
 
         private Dictionary<String, List<float>> previousOpponentSpeeds = new Dictionary<String, List<float>>();
@@ -59,23 +49,47 @@ namespace CrewChiefV4.PCars2
             }
         }
 
-        public void clearState()
+        public override void clearState()
         {
             timeToStartSpotting = DateTime.Now;
             internalSpotter.clearState();
         }
 
-        public void pause()
+        // For double-file manual rolling starts. Will only work when the cars are all nicely settled on the grid - preferably 
+        // when the game thinks the race has just started
+        public override GridSide getGridSide(Object currentStateObj)
         {
-            paused = true;
+            CrewChiefV4.PCars2.PCars2SharedMemoryReader.PCars2StructWrapper currentWrapper = (CrewChiefV4.PCars2.PCars2SharedMemoryReader.PCars2StructWrapper)currentStateObj;
+            pCars2APIStruct latestRawData = currentWrapper.data;
+            int playerIndex = PCars2GameStateMapper.getPlayerIndex(latestRawData);
+            pCars2APIParticipantStruct playerData = latestRawData.mParticipantData[playerIndex];
+            float playerRotation = latestRawData.mOrientation[1];
+            if (playerRotation < 0)
+            {
+                playerRotation = (float)(2 * Math.PI) + playerRotation;
+            }
+            playerRotation = (float)(2 * Math.PI) - playerRotation;
+            float playerXPosition = playerData.mWorldPosition[0];
+            float playerZPosition = playerData.mWorldPosition[2];
+            int playerStartingPosition = (int) playerData.mRacePosition;
+            int numCars = latestRawData.mNumParticipants;
+            return getGridSideInternal(latestRawData, playerRotation, playerXPosition, playerZPosition, playerStartingPosition, numCars);
         }
 
-        public void unpause()
+        protected override float[] getWorldPositionOfDriverAtPosition(Object currentStateObj, int position)
         {
-            paused = false;
+            pCars2APIStruct latestRawData = (pCars2APIStruct)currentStateObj;
+            foreach (pCars2APIParticipantStruct participant in latestRawData.mParticipantData)
+            {
+                if (participant.mRacePosition == position)
+                {
+                    return new float[] { participant.mWorldPosition[0], participant.mWorldPosition[2] };
+                }
+            }
+            return new float[] { 0, 0 };
         }
 
-        public void trigger(Object lastStateObj, Object currentStateObj, GameStateData currentGameState)
+        public override void trigger(Object lastStateObj, Object currentStateObj, GameStateData currentGameState)
         {
             if (paused)
             {
@@ -169,21 +183,7 @@ namespace CrewChiefV4.PCars2
                 }
             }
         }
-
-        public void enableSpotter()
-        {
-            enabled = true;
-            audioPlayer.playMessageImmediately(new QueuedMessage(NoisyCartesianCoordinateSpotter.folderEnableSpotter, 0, null));
-            
-        }
-
-        public void disableSpotter()
-        {
-            enabled = false;
-            audioPlayer.playMessageImmediately(new QueuedMessage(NoisyCartesianCoordinateSpotter.folderDisableSpotter, 0, null));
-            
-        }
-
+        
         private float getSpeed(float[] current, float[] previous, float timeInterval)
         {
             return (float)(Math.Sqrt(Math.Pow(current[0] - previous[0], 2) + Math.Pow(current[1] - previous[1], 2))) / timeInterval;

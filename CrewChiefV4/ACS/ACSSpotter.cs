@@ -12,10 +12,6 @@ namespace CrewChiefV4.assetto
 {
     class ACSSpotter : Spotter
     {
-        private NoisyCartesianCoordinateSpotter internalSpotter;
-
-        private Boolean paused = false;
-
         // how long is a car? we use 3.5 meters by default here. Too long and we'll get 'hold your line' messages
         // when we're clearly directly behind the car
         private float carLength =  UserSettings.GetUserSettings().getFloat("acs_spotter_car_length");
@@ -24,13 +20,7 @@ namespace CrewChiefV4.assetto
 
         // don't activate the spotter unless this many seconds have elapsed (race starts are messy)
         private int timeAfterRaceStartToActivate = UserSettings.GetUserSettings().getInt("time_after_race_start_for_spotter");
-
-        private Boolean enabled;
-
-        private Boolean initialEnabledState;
-
-        private AudioPlayer audioPlayer;
-
+        
         private DateTime previousTime = DateTime.Now;
 
         private string currentPlayerCarClassID = "#not_set#";
@@ -44,35 +34,57 @@ namespace CrewChiefV4.assetto
             Console.WriteLine("ACSSpotter enable");
         }
 
-        public void clearState()
+        public override void clearState()
         {
             previousTime = DateTime.Now;
             internalSpotter.clearState();
         }
 
-        public void pause()
+        // For double-file manual rolling starts. Will only work when the cars are all nicely settled on the grid - preferably 
+        // when the game thinks the race has just started
+        public override GridSide getGridSide(Object currentStateObj)
         {
-            paused = true;
+            AssettoCorsaShared latestRawData = ((ACSSharedMemoryReader.ACSStructWrapper)currentStateObj).data;
+            acsVehicleInfo playerData = latestRawData.acsChief.vehicle[0];
+            float playerRotation = latestRawData.acsPhysics.heading;
+            if (playerRotation < 0)
+            {
+                playerRotation = (float)(2 * Math.PI) + playerRotation;
+            }
+            playerRotation = (float)(2 * Math.PI) - playerRotation;
+            float playerXPosition = playerData.worldPosition.x;
+            float playerZPosition = playerData.worldPosition.y;
+            int playerStartingPosition = playerData.carLeaderboardPosition;
+            int numCars = latestRawData.acsChief.numVehicles;
+            return getGridSideInternal(latestRawData, playerRotation, playerXPosition, playerZPosition, playerStartingPosition, numCars);
         }
 
-        public void unpause()
+        protected override float[] getWorldPositionOfDriverAtPosition(Object currentStateObj, int position)
         {
-            paused = false;
+            AssettoCorsaShared latestRawData = (AssettoCorsaShared)currentStateObj;
+            foreach (acsVehicleInfo vehicleInfo in latestRawData.acsChief.vehicle)
+            {
+                if (vehicleInfo.carLeaderboardPosition == position)
+                {
+                    return new float[] { vehicleInfo.worldPosition.x, vehicleInfo.worldPosition.y };
+                }
+            }
+            return new float[] { 0, 0 };
         }
+
         public float mapToFloatTime(int time)
         {
             TimeSpan ts = TimeSpan.FromTicks(time);
             return (float)ts.TotalMilliseconds * 10;
         }
-        public void trigger(Object lastStateObj, Object currentStateObj, GameStateData currentGameState)
+        public override void trigger(Object lastStateObj, Object currentStateObj, GameStateData currentGameState)
         {
-
             if (paused)
             {
                 return;
             }
-            AssettoCorsaShared lastState = ((ACSSharedMemoryReader.ACSStructWrapper)lastStateObj).data;
             AssettoCorsaShared currentState = ((ACSSharedMemoryReader.ACSStructWrapper)currentStateObj).data;
+            AssettoCorsaShared lastState = ((ACSSharedMemoryReader.ACSStructWrapper)lastStateObj).data;
 
             if (!enabled || currentState.acsChief.numVehicles <= 1 || 
                 (mapToFloatTime(currentState.acsChief.vehicle[0].currentLapTimeMS) < timeAfterRaceStartToActivate &&
@@ -136,18 +148,6 @@ namespace CrewChiefV4.assetto
                 }
                 internalSpotter.triggerInternal(playerRotation, currentPlayerPosition, playerVelocityData, currentOpponentPositions);
             }
-        }
-
-        public void enableSpotter()
-        {
-            enabled = true;
-            audioPlayer.playMessageImmediately(new QueuedMessage(NoisyCartesianCoordinateSpotter.folderEnableSpotter, 0, null));
-        }
-        public void disableSpotter()
-        {
-            enabled = false;
-            audioPlayer.playMessageImmediately(new QueuedMessage(NoisyCartesianCoordinateSpotter.folderDisableSpotter, 0, null));
-
         }
     }
 }

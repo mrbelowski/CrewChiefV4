@@ -12,23 +12,13 @@ namespace CrewChiefV4.RaceRoom
 {
     class R3ESpotterv2 : Spotter
     {
-        private NoisyCartesianCoordinateSpotter internalSpotter;
-
-        private Boolean paused = false;
-        
         // how long is a car? we use 3.5 meters by default here. Too long and we'll get 'hold your line' messages
         // when we're clearly directly behind the car
         private float carLength = UserSettings.GetUserSettings().getFloat("r3e_spotter_car_length");
 
         // don't activate the spotter unless this many seconds have elapsed (race starts are messy)
         private int timeAfterRaceStartToActivate = UserSettings.GetUserSettings().getInt("time_after_race_start_for_spotter");
-
-        private Boolean enabled;
-
-        private Boolean initialEnabledState;
-
-        private AudioPlayer audioPlayer;
-
+        
         private float carWidth = 1.8f;
 
         private DateTime previousTime = DateTime.Now;
@@ -45,20 +35,10 @@ namespace CrewChiefV4.RaceRoom
             this.internalSpotter = new NoisyCartesianCoordinateSpotter(audioPlayer, initialEnabledState, carLength, carWidth);
         }
 
-        public void clearState()
+        public override void clearState()
         {
             previousTime = DateTime.Now;
             internalSpotter.clearState();
-        }
-
-        public void pause()
-        {
-            paused = true;
-        }
-
-        public void unpause()
-        {
-            paused = false;
         }
 
         private DriverData getDriverData(RaceRoomShared shared, int slot_id)
@@ -73,15 +53,46 @@ namespace CrewChiefV4.RaceRoom
             throw new Exception("no driver data for slotID " + slot_id);
         }
 
-        public void trigger(Object lastStateObj, Object currentStateObj, GameStateData currentGameState)
+        // For double-file manual rolling starts. Will only work when the cars are all nicely settled on the grid - preferably 
+        // when the game thinks the race has just started
+        public override GridSide getGridSide(Object currentStateObj)
+        {
+            RaceRoomShared latestRawData = ((CrewChiefV4.RaceRoom.R3ESharedMemoryReader.R3EStructWrapper)currentStateObj).data;
+            DriverData playerData = getDriverData(latestRawData, latestRawData.VehicleInfo.SlotId);
+            float playerRotation = latestRawData.CarOrientation.Yaw;                
+            if (playerRotation < 0)
+            {
+                playerRotation = (float)(2 * Math.PI) + playerRotation;
+            }
+            playerRotation = (float)(2 * Math.PI) - playerRotation;
+            float playerXPosition = playerData.Position.X;
+            float playerZPosition = playerData.Position.Z;
+            int playerStartingPosition = latestRawData.Position;
+            int numCars = latestRawData.NumCars;
+            return getGridSideInternal(latestRawData, playerRotation, playerXPosition, playerZPosition, playerStartingPosition, numCars);
+        }
+
+        protected override float[] getWorldPositionOfDriverAtPosition(Object currentStateObj, int position)
+        {
+            RaceRoomShared latestRawData = (RaceRoomShared)currentStateObj;
+            foreach (DriverData driverData in latestRawData.DriverData)
+            {
+                if (driverData.Place == position)
+                {
+                    return new float[] {driverData.Position.X, driverData.Position.Z};
+                }
+            }
+            return new float[]{0, 0};
+        }
+        
+        public override void trigger(Object lastStateObj, Object currentStateObj, GameStateData currentGameState)
         {
             if (paused)
             {
                 return;
             }
-
-            RaceRoomShared lastState = ((CrewChiefV4.RaceRoom.R3ESharedMemoryReader.R3EStructWrapper)lastStateObj).data;
             RaceRoomShared currentState = ((CrewChiefV4.RaceRoom.R3ESharedMemoryReader.R3EStructWrapper)currentStateObj).data;
+            RaceRoomShared lastState = ((CrewChiefV4.RaceRoom.R3ESharedMemoryReader.R3EStructWrapper)lastStateObj).data;            
             
             if (!enabled || currentState.Player.GameSimulationTime < timeAfterRaceStartToActivate ||
                 currentState.ControlType != (int)RaceRoomConstant.Control.Player || 
@@ -150,20 +161,6 @@ namespace CrewChiefV4.RaceRoom
                 playerRotation = (float)(2 * Math.PI) - playerRotation;
                 internalSpotter.triggerInternal(playerRotation, currentPlayerPosition, playerVelocityData, currentOpponentPositions);
             }
-        }
-
-        public void enableSpotter()
-        {
-            enabled = true;
-            audioPlayer.playMessageImmediately(new QueuedMessage(NoisyCartesianCoordinateSpotter.folderEnableSpotter, 0, null));
-            
-        }
-
-        public void disableSpotter()
-        {
-            enabled = false;
-            audioPlayer.playMessageImmediately(new QueuedMessage(NoisyCartesianCoordinateSpotter.folderDisableSpotter, 0, null));
-            
         }
     }
 }
