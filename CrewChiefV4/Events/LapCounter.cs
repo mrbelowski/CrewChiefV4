@@ -496,7 +496,7 @@ namespace CrewChiefV4.Events
             audioPlayer.playMessage(new QueuedMessage(folderGetReady, 0, this));
             playedManualStartGetReady = true;
         }
-
+        
         private void playManualStartInitialMessage(GameStateData currentGameState)
         {
             manualStartOpponentAhead = currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position - 1, true);

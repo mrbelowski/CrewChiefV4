@@ -1,4 +1,5 @@
-﻿using CrewChiefV4.GameState;
+﻿using CrewChiefV4.Audio;
+using CrewChiefV4.GameState;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,18 +7,51 @@ using System.Text;
 
 namespace CrewChiefV4.Events
 {
-    interface Spotter
+    public abstract class Spotter
     {
-        void clearState();
+        protected NoisyCartesianCoordinateSpotter internalSpotter;
 
-        void trigger(Object lastState, Object currentState, GameStateData currentGameState);
+        protected Boolean paused = false;
 
-        void enableSpotter();
+        protected Boolean enabled;
 
-        void disableSpotter();
+        protected Boolean initialEnabledState;
 
-        void pause();
+        protected AudioPlayer audioPlayer;
 
-        void unpause();
+        public abstract void clearState();
+
+        public abstract void trigger(Object lastState, Object currentState, GameStateData currentGameState);
+
+        public void enableSpotter()
+        {
+            enabled = true;
+            audioPlayer.playMessageImmediately(new QueuedMessage(NoisyCartesianCoordinateSpotter.folderEnableSpotter, 0, null));
+        }
+        public void disableSpotter()
+        {
+            enabled = false;
+            audioPlayer.playMessageImmediately(new QueuedMessage(NoisyCartesianCoordinateSpotter.folderDisableSpotter, 0, null));
+        }
+
+        public void pause()
+        {
+            this.paused = true;
+        }
+
+        public void unpause()
+        {
+            this.paused = false;
+        }
+
+        public virtual GridSide getGridSide()
+        {
+            return GridSide.UNKNOWN;
+        }
+    }
+
+    public enum GridSide
+    {
+        UNKNOWN, LEFT, RIGHT
     }
 }
