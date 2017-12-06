@@ -1674,6 +1674,23 @@ namespace CrewChiefV4.rFactor2
                 }
             }
 
+            if (csd.SessionPhase == SessionPhase.FullCourseYellow)
+            {
+                var mainMsg = RF2GameStateMapper.GetStringFromBytes(shared.rules.mTrackRules.mMessage);
+
+                if (!string.IsNullOrWhiteSpace(mainMsg))
+                    Debug.WriteLine(mainMsg);
+
+                for (var i = 0; i < shared.rules.mTrackRules.mNumParticipants; ++i)
+                {
+                    var p = shared.rules.mParticipants[i];
+
+                    var pcptMsg = RF2GameStateMapper.GetStringFromBytes(p.mMessage);
+                    if (!string.IsNullOrWhiteSpace(pcptMsg))
+                        Debug.WriteLine(pcptMsg);
+                }
+            }
+
             // --------------------------------
             // console output
             if (csd.IsNewSession)
