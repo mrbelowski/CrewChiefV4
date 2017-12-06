@@ -517,3 +517,5 @@ spotter_volume_boost_help = Scale (multiply) spotter volume by this amount (nAud
 report_fuel_in_gallons = Fuel reports in gallons
 report_fuel_in_gallons_help = Reports fuel consumption in gallons instead of liters
 
+manual_formation_double_file = Manual formation lap double-file start
+manual_formation_double_file_help = Assume manual formation lap starts use 2 lines of cars
