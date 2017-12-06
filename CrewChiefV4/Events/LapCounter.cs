@@ -567,7 +567,7 @@ namespace CrewChiefV4.Events
                 // go when leader crosses line, so make sure we don't say "hold position until the start line"
                 messageContentsWithName = MessageContents(folderManualStartInitialIntro,
                         Position.folderStub + currentGameState.SessionData.Position, folderManualStartInitialOutroWithDriverName1,
-                        manualStartOpponentToFollow);
+                        getOpponent(currentGameState, manualStartOpponentToFollow));
                 messageContentsNoName = MessageContents(folderManualStartInitialIntro,
                         Position.folderStub + currentGameState.SessionData.Position, folderHoldYourPosition);
                 if (manualFormationDoubleFile && gridSide == GridSide.LEFT)
@@ -585,7 +585,7 @@ namespace CrewChiefV4.Events
                 {
                     messageContentsWithName = MessageContents(folderManualStartInitialIntro,
                             Position.folderStub + currentGameState.SessionData.Position, folderManualStartInitialOutroWithDriverName1,
-                            manualStartOpponentToFollow, FrozenOrderMonitor.folderInTheLeftColumn, folderManualStartInitialOutroWithDriverName2);
+                            getOpponent(currentGameState, manualStartOpponentToFollow), FrozenOrderMonitor.folderInTheLeftColumn, folderManualStartInitialOutroWithDriverName2);
                     messageContentsNoName = MessageContents(folderManualStartInitialIntro,
                             Position.folderStub + currentGameState.SessionData.Position, FrozenOrderMonitor.folderInTheLeftColumn, folderManualStartInitialOutroNoDriverName);
                 }
@@ -593,7 +593,7 @@ namespace CrewChiefV4.Events
                 {
                     messageContentsWithName = MessageContents(folderManualStartInitialIntro,
                             Position.folderStub + currentGameState.SessionData.Position, folderManualStartInitialOutroWithDriverName1,
-                            manualStartOpponentToFollow, FrozenOrderMonitor.folderInTheRightColumn, folderManualStartInitialOutroWithDriverName2);
+                            getOpponent(currentGameState, manualStartOpponentToFollow), FrozenOrderMonitor.folderInTheRightColumn, folderManualStartInitialOutroWithDriverName2);
                     messageContentsNoName = MessageContents(folderManualStartInitialIntro,
                             Position.folderStub + currentGameState.SessionData.Position, FrozenOrderMonitor.folderInTheRightColumn, folderManualStartInitialOutroNoDriverName);
                 }
@@ -601,7 +601,7 @@ namespace CrewChiefV4.Events
                 {
                     messageContentsWithName = MessageContents(folderManualStartInitialIntro,
                             Position.folderStub + currentGameState.SessionData.Position, folderManualStartInitialOutroWithDriverName1,
-                            manualStartOpponentToFollow, folderManualStartInitialOutroWithDriverName2);
+                            getOpponent(currentGameState, manualStartOpponentToFollow), folderManualStartInitialOutroWithDriverName2);
                     messageContentsNoName = MessageContents(folderManualStartInitialIntro,
                             Position.folderStub + currentGameState.SessionData.Position, folderManualStartInitialOutroNoDriverName);
                 }
@@ -638,7 +638,7 @@ namespace CrewChiefV4.Events
                     validationData.Add("OpponentToFollowName", this.manualStartOpponentToFollow);
 
                     audioPlayer.playMessage(new QueuedMessage("give_position_back",
-                        MessageContents(folderGivePositionBack, folderManualStartInitialOutroWithDriverName1, manualStartOpponentToFollow),
+                        MessageContents(folderGivePositionBack, folderManualStartInitialOutroWithDriverName1, getOpponent(currentGameState, manualStartOpponentToFollow)),
                         MessageContents(folderGivePositionBack), 5, this, validationData));                    
                 }
             }
@@ -668,13 +668,13 @@ namespace CrewChiefV4.Events
                     if (gridSide == GridSide.LEFT)
                     {
                         messageContentsWithName = MessageContents(folderManualStartInitialOutroWithDriverName1,
-                                manualStartOpponentToFollow, FrozenOrderMonitor.folderInTheLeftColumn);
+                                getOpponent(currentGameState, manualStartOpponentToFollow), FrozenOrderMonitor.folderInTheLeftColumn);
                         messageContentsNoName = MessageContents(folderHoldYourPosition, FrozenOrderMonitor.folderInTheLeftColumn);
                     }
                     else
                     {
                         messageContentsWithName = MessageContents(folderManualStartInitialOutroWithDriverName1,
-                                manualStartOpponentToFollow, FrozenOrderMonitor.folderInTheRightColumn);
+                                getOpponent(currentGameState, manualStartOpponentToFollow), FrozenOrderMonitor.folderInTheRightColumn);
                         messageContentsNoName = MessageContents(folderHoldYourPosition, FrozenOrderMonitor.folderInTheRightColumn);
                     }
                 }
@@ -683,13 +683,13 @@ namespace CrewChiefV4.Events
                     if (gridSide == GridSide.LEFT)
                     {
                         messageContentsWithName = MessageContents(folderManualStartInitialOutroWithDriverName1,
-                                manualStartOpponentToFollow, FrozenOrderMonitor.folderInTheLeftColumn, folderManualStartInitialOutroWithDriverName2);
+                                getOpponent(currentGameState, manualStartOpponentToFollow), FrozenOrderMonitor.folderInTheLeftColumn, folderManualStartInitialOutroWithDriverName2);
                         messageContentsNoName = MessageContents(folderManualStartInitialOutroNoDriverName, FrozenOrderMonitor.folderInTheLeftColumn);
                     }
                     else
                     {
                         messageContentsWithName = MessageContents(folderManualStartInitialOutroWithDriverName1,
-                                manualStartOpponentToFollow, FrozenOrderMonitor.folderInTheRightColumn, folderManualStartInitialOutroWithDriverName2);
+                                getOpponent(currentGameState, manualStartOpponentToFollow), FrozenOrderMonitor.folderInTheRightColumn, folderManualStartInitialOutroWithDriverName2);
                         messageContentsNoName = MessageContents(folderManualStartInitialOutroNoDriverName, FrozenOrderMonitor.folderInTheRightColumn);
                     }
                 }

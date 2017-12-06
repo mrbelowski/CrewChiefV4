@@ -71,11 +71,11 @@ namespace CrewChiefV4.Events
                         playerXPosition, playerZPosition, worldPositionOfOpponent[0], worldPositionOfOpponent[1]);
                     if (alignedCoordiates[0] < -2)
                     {
-                        return GridSide.RIGHT;
+                        return GridSide.LEFT;
                     }
                     else if (alignedCoordiates[0] > 2)
                     {
-                        return GridSide.LEFT;
+                        return GridSide.RIGHT;
                     }
                 }
                 if (countForwards)
