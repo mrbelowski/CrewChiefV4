@@ -160,7 +160,9 @@ namespace CrewChiefV4
         public static String[] HOW_MANY_INCIDENT_POINTS = Configuration.getSpeechRecognitionPhrases("HOW_MANY_INCIDENT_POINTS");
         public static String[] WHATS_THE_INCIDENT_LIMIT = Configuration.getSpeechRecognitionPhrases("WHATS_THE_INCIDENT_LIMIT");
 
+        public static String[] MORE_INFO = Configuration.getSpeechRecognitionPhrases("MORE_INFO");
 
+        private String lastRecognisedText = null;
 
         private CrewChief crewChief;
 
@@ -483,6 +485,8 @@ namespace CrewChiefV4
                 validateAndAdd(WHOS_BEHIND_ON_TRACK, staticSpeechChoices);
                 validateAndAdd(WHOS_LEADING, staticSpeechChoices);
 
+                validateAndAdd(MORE_INFO, staticSpeechChoices);
+
                 GrammarBuilder staticGrammarBuilder = new GrammarBuilder();
                 staticGrammarBuilder.Culture = cultureInfo;
                 staticGrammarBuilder.Append(staticSpeechChoices);
@@ -730,6 +734,7 @@ namespace CrewChiefV4
                 {
                     if (e.Result.Confidence > minimum_name_voice_recognition_confidence)
                     {
+                        this.lastRecognisedText = e.Result.Text;
                         CrewChief.getEvent("Opponents").respond(e.Result.Text);
                     }
                     else
@@ -741,18 +746,29 @@ namespace CrewChiefV4
                 {
                     if (macroGrammar == e.Result.Grammar && macroLookup.ContainsKey(e.Result.Text))
                     {
+                        this.lastRecognisedText = e.Result.Text;
                         macroLookup[e.Result.Text].execute();
                     }
                     else if (iracingPitstopGrammarList.Contains(e.Result.Grammar))
                     {
+                        this.lastRecognisedText = e.Result.Text;
                         CrewChief.getEvent("IRacingBroadcastMessageEvent").respond(e.Result.Text);
                     }
                     else if (ResultContains(e.Result.Text, REPEAT_LAST_MESSAGE))
                     {
                         crewChief.audioPlayer.repeatLastMessage();
                     }
+                    else if (ResultContains(e.Result.Text, MORE_INFO) && this.lastRecognisedText != null)
+                    {
+                        AbstractEvent abstractEvent = getEventForSpeech(this.lastRecognisedText);
+                        if (abstractEvent != null)
+                        {
+                            abstractEvent.respondMoreInformation(this.lastRecognisedText);
+                        }
+                    }
                     else
                     {
+                        this.lastRecognisedText = e.Result.Text;
                         AbstractEvent abstractEvent = getEventForSpeech(e.Result.Text);
                         if (abstractEvent != null)
                         {

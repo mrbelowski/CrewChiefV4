@@ -177,6 +177,11 @@ namespace CrewChiefV4.Events
             // no-op, override in the subclasses
         }
 
+        public virtual void respondMoreInformation(String voiceMessage)
+        {
+            // no-op, override in the subclasses
+        }
+
         public void setPearlsOfWisdom(PearlsOfWisdom pearlsOfWisdom)
         {
             this.pearlsOfWisdom = pearlsOfWisdom;

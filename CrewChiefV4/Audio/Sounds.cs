@@ -15,6 +15,7 @@ namespace CrewChiefV4.Audio
         public static String TTS_IDENTIFIER = "TTS_IDENTIFIER";
         private Boolean useAlternateBeeps = UserSettings.GetUserSettings().getBoolean("use_alternate_beeps");
         public static Boolean useTTS = UserSettings.GetUserSettings().getBoolean("use_tts_for_missing_names");
+        public static Boolean useTTSOnlyWhenNecessary = UserSettings.GetUserSettings().getBoolean("use_tts_only_when_necessary");
         private double minSecondsBetweenPersonalisedMessages = (double)UserSettings.GetUserSettings().getInt("min_time_between_personalised_messages");
         public static Boolean eagerLoadSoundFiles = UserSettings.GetUserSettings().getBoolean("load_sound_files_on_startup");
         public static float ttsVolumeBoost = UserSettings.GetUserSettings().getFloat("tts_volume_boost");
