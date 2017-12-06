@@ -536,22 +536,41 @@ namespace CrewChiefV4.Events
                         manualStartOpponentAhead);
                 messageContentsNoName = MessageContents(folderManualStartInitialIntro,
                         Position.folderStub + currentGameState.SessionData.Position, folderHoldYourPosition);
+                if (manualFormationDoubleFile && gridSide == GridSide.LEFT)
+                {
+                    messageContentsWithName.Add(MessageFragment.Text(FrozenOrderMonitor.folderInTheLeftColumn));
+                }
+                else if (manualFormationDoubleFile && gridSide == GridSide.RIGHT)
+                {
+                    messageContentsWithName.Add(MessageFragment.Text(FrozenOrderMonitor.folderInTheRightColumn));
+                }
             }
             else
             {
-                messageContentsWithName = MessageContents(folderManualStartInitialIntro,
-                        Position.folderStub + currentGameState.SessionData.Position, folderManualStartInitialOutroWithDriverName1,
-                        manualStartOpponentAhead, folderManualStartInitialOutroWithDriverName2);
-                messageContentsNoName = MessageContents(folderManualStartInitialIntro,
-                        Position.folderStub + currentGameState.SessionData.Position, folderManualStartInitialOutroNoDriverName);
-            }
-            if (manualFormationDoubleFile && gridSide == GridSide.LEFT)
-            {
-                messageContentsWithName.Add(MessageFragment.Text(FrozenOrderMonitor.folderInTheLeftColumn));
-            }
-            else if (manualFormationDoubleFile && gridSide == GridSide.RIGHT)
-            {
-                messageContentsWithName.Add(MessageFragment.Text(FrozenOrderMonitor.folderInTheRightColumn));
+                if (manualFormationDoubleFile && gridSide == GridSide.LEFT)
+                {
+                    messageContentsWithName = MessageContents(folderManualStartInitialIntro,
+                            Position.folderStub + currentGameState.SessionData.Position, folderManualStartInitialOutroWithDriverName1,
+                            manualStartOpponentAhead, FrozenOrderMonitor.folderInTheLeftColumn, folderManualStartInitialOutroWithDriverName2);
+                    messageContentsNoName = MessageContents(folderManualStartInitialIntro,
+                            Position.folderStub + currentGameState.SessionData.Position, FrozenOrderMonitor.folderInTheLeftColumn, folderManualStartInitialOutroNoDriverName);
+                }
+                else if (manualFormationDoubleFile && gridSide == GridSide.RIGHT)
+                {
+                    messageContentsWithName = MessageContents(folderManualStartInitialIntro,
+                            Position.folderStub + currentGameState.SessionData.Position, folderManualStartInitialOutroWithDriverName1,
+                            manualStartOpponentAhead, FrozenOrderMonitor.folderInTheRightColumn, folderManualStartInitialOutroWithDriverName2);
+                    messageContentsNoName = MessageContents(folderManualStartInitialIntro,
+                            Position.folderStub + currentGameState.SessionData.Position, FrozenOrderMonitor.folderInTheRightColumn, folderManualStartInitialOutroNoDriverName);
+                }
+                else
+                {
+                    messageContentsWithName = MessageContents(folderManualStartInitialIntro,
+                            Position.folderStub + currentGameState.SessionData.Position, folderManualStartInitialOutroWithDriverName1,
+                            manualStartOpponentAhead, folderManualStartInitialOutroWithDriverName2);
+                    messageContentsNoName = MessageContents(folderManualStartInitialIntro,
+                            Position.folderStub + currentGameState.SessionData.Position, folderManualStartInitialOutroNoDriverName);
+                }
             }
             audioPlayer.playMessage(new QueuedMessage("manual_start_intro", messageContentsWithName, messageContentsNoName, 0, this));
             playedManualStartInitialMessage = true;
