@@ -82,6 +82,8 @@ namespace CrewChiefV4.Events
         // special case for LapCounter - needs access to the CrewChief class to interrogate the spotter
         private CrewChief crewChief;
 
+        private GridSide gridSide = GridSide.UNKNOWN;
+
         public override List<SessionPhase> applicableSessionPhases
         {
             get { return new List<SessionPhase> { SessionPhase.Countdown, SessionPhase.Formation, SessionPhase.Gridwalk, SessionPhase.Green, SessionPhase.Checkered, SessionPhase.Finished }; }
@@ -127,6 +129,7 @@ namespace CrewChiefV4.Events
             playedManualStartPlayedGoGoGo = false;
             nextManualFormationOvertakeWarning = DateTime.MinValue;
             manualStartOpponentAhead = null;
+            gridSide = GridSide.UNKNOWN;
         }
 
         private void playPreLightsMessage(GameStateData currentGameState, int maxNumberToPlay)
@@ -304,6 +307,7 @@ namespace CrewChiefV4.Events
                     {
                         checkForIllegalPassesOnFormationLap(currentGameState);
                         checkForManualFormationRaceStart(currentGameState, currentGameState.SessionData.Position == 1);
+                        checkForManualDoubleFileReminder(previousGameState, currentGameState);
                     }
                 }
                 // now check if we really are on a manual formation lap. We have to do this *after* checking for the race start (above) because
@@ -478,7 +482,6 @@ namespace CrewChiefV4.Events
                     }
                     // 2 laps left, so prevent any further pearls of wisdom being added
                 }
-                
             }
         }
 
@@ -503,8 +506,7 @@ namespace CrewChiefV4.Events
         }
         
         private void playManualStartInitialMessage(GameStateData currentGameState)
-        {
-            GridSide gridSide = GridSide.UNKNOWN;
+        {            
             if (manualFormationDoubleFile)
             {
                 gridSide = this.crewChief.getGridSide();
@@ -610,6 +612,49 @@ namespace CrewChiefV4.Events
                         }
                     }
                 }
+            }
+        }
+
+        private void checkForManualDoubleFileReminder(GameStateData previousGameState, GameStateData currentGameState)
+        {
+            if (manualFormationDoubleFile && gridSide != GridSide.UNKNOWN && previousGameState != null &&
+                previousGameState.SessionData.SectorNumber == 2 && currentGameState.SessionData.SectorNumber == 3)
+            {
+                // use the driver name in front if we have it - if we're starting on pole the manualStartOpponentAhead var will be null,
+                // which will force the audio player to use the secondary message
+                List<MessageFragment> messageContentsWithName = null;
+                List<MessageFragment> messageContentsNoName = null;
+                if (manualFormationGoWhenLeaderCrossesLine)
+                {
+                    if (gridSide == GridSide.LEFT)
+                    {
+                        messageContentsWithName = MessageContents(folderManualStartInitialOutroWithDriverName1,
+                                manualStartOpponentAhead, FrozenOrderMonitor.folderInTheLeftColumn);
+                        messageContentsNoName = MessageContents(folderHoldYourPosition, FrozenOrderMonitor.folderInTheLeftColumn);
+                    }
+                    else
+                    {
+                        messageContentsWithName = MessageContents(folderManualStartInitialOutroWithDriverName1,
+                                manualStartOpponentAhead, FrozenOrderMonitor.folderInTheRightColumn);
+                        messageContentsNoName = MessageContents(folderHoldYourPosition, FrozenOrderMonitor.folderInTheRightColumn);
+                    }
+                }
+                else
+                {
+                    if (gridSide == GridSide.LEFT)
+                    {
+                        messageContentsWithName = MessageContents(folderManualStartInitialOutroWithDriverName1,
+                                manualStartOpponentAhead, FrozenOrderMonitor.folderInTheLeftColumn, folderManualStartInitialOutroWithDriverName2);
+                        messageContentsNoName = MessageContents(folderManualStartInitialOutroNoDriverName, FrozenOrderMonitor.folderInTheLeftColumn);
+                    }
+                    else
+                    {
+                        messageContentsWithName = MessageContents(folderManualStartInitialOutroWithDriverName1,
+                                manualStartOpponentAhead, FrozenOrderMonitor.folderInTheRightColumn, folderManualStartInitialOutroWithDriverName2);
+                        messageContentsNoName = MessageContents(folderManualStartInitialOutroNoDriverName, FrozenOrderMonitor.folderInTheRightColumn);
+                    }
+                }
+                audioPlayer.playMessage(new QueuedMessage("manual_start_double_file_reminder", messageContentsWithName, messageContentsNoName, 0, this));
             }
         }
 
