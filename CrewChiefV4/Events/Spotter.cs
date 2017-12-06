@@ -46,7 +46,7 @@ namespace CrewChiefV4.Events
 
         protected virtual float[] getWorldPositionOfDriverAtPosition(Object currentStateObj, int position)
         {
-            return new float[] { 0, 0 };
+            return null;
         }
 
         public virtual GridSide getGridSide(Object currentStateObj)
