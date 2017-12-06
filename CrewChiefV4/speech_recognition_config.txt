@@ -105,6 +105,7 @@ STATUS = full update:full status:update me
 START_PACE_NOTES_PLAYBACK = start pace notes
 STOP_PACE_NOTES_PLAYBACK = stop pace notes
 
+MORE_INFO = clarify:tell me more:more information:more info
 
 
 #################################################
