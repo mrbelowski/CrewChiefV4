@@ -411,14 +411,6 @@ namespace CrewChiefV4.Events
                     {
                         Console.WriteLine("Purged " + purgeCount + " outstanding messages at green light");
                     }
-                    List<int> positions = new List<int>();
-                    positions.Add(currentGameState.SessionData.Position);
-                    foreach (OpponentData opponent in currentGameState.OpponentData.Values)
-                    {
-                        positions.Add(opponent.Position);
-                    }
-                    positions.Sort();
-                    Console.WriteLine("Occupied positions " + String.Join(",", positions));
                     audioPlayer.playMessageImmediately(new QueuedMessage(folderGreenGreenGreen, 0, this));
                     audioPlayer.disablePearlsOfWisdom = false;
                 }
@@ -578,29 +570,44 @@ namespace CrewChiefV4.Events
 
         private void checkForIllegalPassesOnFormationLap(GameStateData currentGameState)
         {
-            if (GameStateData.onManualFormationLap && currentGameState.SessionData.SessionStartPosition > currentGameState.SessionData.Position &&
-                            nextManualFormationOvertakeWarning < currentGameState.Now)
+            if (GameStateData.onManualFormationLap)
             {
-                // we've overtaken someone
-                nextManualFormationOvertakeWarning = currentGameState.Now.AddSeconds(30);
-                // if the number of cars in the session has reduced, just play a 'hold your position' message - 
-                // perhaps someone disconnected in front.
-                if (currentGameState.SessionData.NumCarsAtStartOfSession > currentGameState.SessionData.NumCars)
+                if (manualFormationDoubleFile)
                 {
-                    audioPlayer.playMessage(new QueuedMessage(folderHoldYourPosition, 0, this));
-                }
-                else
-                {
-                    // check if the car in front has changed
-                    OpponentData currentOpponentInFront = currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position - 1, true);
-                    if (manualStartOpponentAhead != null &&
-                        (currentOpponentInFront == null || !manualStartOpponentAhead.DriverRawName.Equals(currentOpponentInFront.DriverRawName)))
+                    if (nextManualFormationOvertakeWarning < currentGameState.Now &&
+                        manualStartOpponentAhead != null && manualStartOpponentAhead.Position > currentGameState.SessionData.Position)
                     {
-                        // delay and validate this message so we don't grumble about a different car in front if a couple of
-                        // cars fall back through the field for whatever reason
+                        // we've overtaken the guy in front of us in our pace line
+                        nextManualFormationOvertakeWarning = currentGameState.Now.AddSeconds(30);
                         audioPlayer.playMessage(new QueuedMessage("give_position_back",
                             MessageContents(folderGivePositionBack, folderManualStartInitialOutroWithDriverName1, manualStartOpponentAhead),
-                            MessageContents(folderGivePositionBack), 5, this, new Dictionary<String, Object>()));
+                            MessageContents(folderGivePositionBack), 0, this));
+                    }
+                }
+                else if (currentGameState.SessionData.SessionStartPosition > currentGameState.SessionData.Position &&
+                              nextManualFormationOvertakeWarning < currentGameState.Now)
+                {
+                    // we've overtaken someone
+                    nextManualFormationOvertakeWarning = currentGameState.Now.AddSeconds(30);
+                    // if the number of cars in the session has reduced, just play a 'hold your position' message - 
+                    // perhaps someone disconnected in front.
+                    if (currentGameState.SessionData.NumCarsAtStartOfSession > currentGameState.SessionData.NumCars)
+                    {
+                        audioPlayer.playMessage(new QueuedMessage(folderHoldYourPosition, 0, this));
+                    }
+                    else
+                    {
+                        // check if the car in front has changed
+                        OpponentData currentOpponentInFront = currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position - 1, true);
+                        if (manualStartOpponentAhead != null &&
+                            (currentOpponentInFront == null || !manualStartOpponentAhead.DriverRawName.Equals(currentOpponentInFront.DriverRawName)))
+                        {
+                            // delay and validate this message so we don't grumble about a different car in front if a couple of
+                            // cars fall back through the field for whatever reason
+                            audioPlayer.playMessage(new QueuedMessage("give_position_back",
+                                MessageContents(folderGivePositionBack, folderManualStartInitialOutroWithDriverName1, manualStartOpponentAhead),
+                                MessageContents(folderGivePositionBack), 5, this, new Dictionary<String, Object>()));
+                        }
                     }
                 }
             }
