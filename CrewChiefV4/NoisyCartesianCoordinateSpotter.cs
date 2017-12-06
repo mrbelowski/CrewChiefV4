@@ -26,7 +26,7 @@ namespace CrewChiefV4
         }
     }
 
-    class NoisyCartesianCoordinateSpotter
+    public class NoisyCartesianCoordinateSpotter
     {
         private float calculateOpponentSpeedsEvery = 200f;
 

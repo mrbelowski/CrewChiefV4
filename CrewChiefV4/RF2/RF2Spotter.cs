@@ -23,15 +23,7 @@ namespace CrewChiefV4.rFactor2
 
         // don't activate the spotter unless this many seconds have elapsed (race starts are messy)
         private readonly int timeAfterRaceStartToActivate = UserSettings.GetUserSettings().getInt("time_after_race_start_for_spotter");
-
-        private NoisyCartesianCoordinateSpotter internalSpotter;
-
-        private Boolean paused = false;
-        private Boolean enabled;
-        private Boolean initialEnabledState;
-
-        private AudioPlayer audioPlayer;
-
+        
         private DateTime previousTime = DateTime.Now;
         private string currentPlayerCarClassID = "#not_set#";
 
@@ -44,20 +36,10 @@ namespace CrewChiefV4.rFactor2
                 audioPlayer, initialEnabledState, carLength, carWidth);
         }
 
-        public void clearState()
+        public override void clearState()
         {
             this.previousTime = DateTime.Now;
             this.internalSpotter.clearState();
-        }
-
-        public void pause()
-        {
-            this.paused = true;
-        }
-
-        public void unpause()
-        {
-            this.paused = false;
         }
 
         private rF2VehicleScoring getVehicleInfo(CrewChiefV4.rFactor2.RF2SharedMemoryReader.RF2StructWrapper shared)
@@ -71,7 +53,7 @@ namespace CrewChiefV4.rFactor2
             throw new Exception("no vehicle for player!");
         }
 
-        public void trigger(Object lastStateObj, Object currentStateObj, GameStateData currentGameState)
+        public override void trigger(Object lastStateObj, Object currentStateObj, GameStateData currentGameState)
         {
             if (this.paused)
                 return;
@@ -195,18 +177,6 @@ namespace CrewChiefV4.rFactor2
             }
 
             this.internalSpotter.triggerInternal(playerRotation, currentPlayerPosition, playerVelocityData, currentOpponentPositions);
-        }
-
-        public void enableSpotter()
-        {
-            this.enabled = true;
-            this.audioPlayer.playMessageImmediately(new QueuedMessage(NoisyCartesianCoordinateSpotter.folderEnableSpotter, 0, null));
-        }
-
-        public void disableSpotter()
-        {
-            this.enabled = false;
-            this.audioPlayer.playMessageImmediately(new QueuedMessage(NoisyCartesianCoordinateSpotter.folderDisableSpotter, 0, null));
         }
     }
 }

@@ -12,9 +12,6 @@ namespace CrewChiefV4.PCars
 {
     class PCarsSpotterv2 : Spotter
     {
-        private NoisyCartesianCoordinateSpotter internalSpotter;
-
-        private Boolean paused = false;
 
         // don't activate the spotter unless this many seconds have elapsed (race starts are messy)
         private int timeAfterRaceStartToActivate = UserSettings.GetUserSettings().getInt("time_after_race_start_for_spotter");
@@ -25,12 +22,6 @@ namespace CrewChiefV4.PCars
         // when we're clearly directly behind the car
         private float carLength = UserSettings.GetUserSettings().getFloat("pcars_spotter_car_length");
         
-        private Boolean enabled;
-
-        private Boolean initialEnabledState;
-        
-        private AudioPlayer audioPlayer;
-
         private DateTime timeToStartSpotting = DateTime.Now;
 
         private Dictionary<String, List<float>> previousOpponentSpeeds = new Dictionary<String, List<float>>();
@@ -57,23 +48,13 @@ namespace CrewChiefV4.PCars
             }
         }
 
-        public void clearState()
+        public override void clearState()
         {
             timeToStartSpotting = DateTime.Now;
             internalSpotter.clearState();
         }
 
-        public void pause()
-        {
-            paused = true;
-        }
-
-        public void unpause()
-        {
-            paused = false;
-        }
-
-        public void trigger(Object lastStateObj, Object currentStateObj, GameStateData currentGameState)
+        public override void trigger(Object lastStateObj, Object currentStateObj, GameStateData currentGameState)
         {
             if (paused)
             {
@@ -159,20 +140,6 @@ namespace CrewChiefV4.PCars
                     }
                 }
             }
-        }
-
-        public void enableSpotter()
-        {
-            enabled = true;
-            audioPlayer.playMessageImmediately(new QueuedMessage(NoisyCartesianCoordinateSpotter.folderEnableSpotter, 0, null));
-            
-        }
-
-        public void disableSpotter()
-        {
-            enabled = false;
-            audioPlayer.playMessageImmediately(new QueuedMessage(NoisyCartesianCoordinateSpotter.folderDisableSpotter, 0, null));
-            
         }
 
         private float getSpeed(float[] current, float[] previous, float timeInterval)
