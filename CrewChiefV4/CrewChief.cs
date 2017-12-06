@@ -88,6 +88,8 @@ namespace CrewChiefV4
         public static Boolean viewingReplay = false;
         public static float distanceRoundTrack = -1;
 
+        private Object latestRawGameData;
+
         public CrewChief()
         {
             speechRecogniser = new SpeechRecogniser(this);
@@ -95,7 +97,7 @@ namespace CrewChiefV4
             audioPlayer.initialise();
             eventsList.Add("Timings", new Timings(audioPlayer));
             eventsList.Add("Position", new Position(audioPlayer));
-            eventsList.Add("LapCounter", new LapCounter(audioPlayer));
+            eventsList.Add("LapCounter", new LapCounter(audioPlayer, this));
             eventsList.Add("LapTimes", new LapTimes(audioPlayer));
             eventsList.Add("Penalties", new Penalties(audioPlayer));
             eventsList.Add("PitStops", new PitStops(audioPlayer));
@@ -564,6 +566,11 @@ namespace CrewChiefV4
             spotterIsRunning = false;
         }
 
+        public GridSide getGridSide()
+        {
+            return this.spotter.getGridSide(this.latestRawGameData);
+        }
+
         public Boolean Run(String filenameToRun, int interval, Boolean dumpToFile)
         {
             loadDataFromFile = false;
@@ -668,11 +675,11 @@ namespace CrewChiefV4
                     if (loadDataFromFile || mapped)
                     {
                         stateCleared = false;
-                        Object rawGameData;
+                        
                         if (loadDataFromFile)
                         {
-                            rawGameData = gameDataReader.ReadGameDataFromFile(filenameToRun);
-                            if (rawGameData == null)
+                            latestRawGameData = gameDataReader.ReadGameDataFromFile(filenameToRun);
+                            if (latestRawGameData == null)
                             {
                                 Console.WriteLine("Reached the end of the data file, sleeping to clear queued messages");
                                 Thread.Sleep(5000);
@@ -690,19 +697,19 @@ namespace CrewChiefV4
                         }
                         else
                         {
-                            rawGameData = gameDataReader.ReadGameData(false);
+                            latestRawGameData = gameDataReader.ReadGameData(false);
                         }
                         // another Thread may have stopped the app - check here before processing the game data
                         if (!running)
                         {
                             continue;
                         }
-                        gameStateMapper.versionCheck(rawGameData);
+                        gameStateMapper.versionCheck(latestRawGameData);
 
                         GameStateData nextGameState = null;
                         try
                         {
-                            nextGameState = gameStateMapper.mapToGameStateData(rawGameData, currentGameState);
+                            nextGameState = gameStateMapper.mapToGameStateData(latestRawGameData, currentGameState);
                         }
                         catch (Exception e)
                         {

@@ -44,8 +44,67 @@ namespace CrewChiefV4.Events
             this.paused = false;
         }
 
-        public virtual GridSide getGridSide()
+        protected virtual float[] getWorldPositionOfDriverAtPosition(Object currentStateObj, int position)
         {
+            return new float[] { 0, 0 };
+        }
+
+        public virtual GridSide getGridSide(Object currentStateObj)
+        {
+            return GridSide.UNKNOWN;
+        }
+
+        protected GridSide getGridSideInternal(Object currentStateObj, float playerRotation, float playerXPosition, float playerZPosition, int playerStartingPosition, int numCars)
+        {
+            Boolean countForwards = playerStartingPosition != 1;
+
+            float[] worldPositionOfOpponent = null;
+            int opponentStartingPositionToCheck = countForwards ? playerStartingPosition - 1 : playerStartingPosition + 1;
+            int opponentCheckCount = 0;
+            // only check 5 opponents, then give up
+            while (opponentCheckCount < 5)
+            {
+                worldPositionOfOpponent = getWorldPositionOfDriverAtPosition(currentStateObj, opponentStartingPositionToCheck);
+                if (worldPositionOfOpponent != null)
+                {
+                    float[] alignedCoordiates = this.internalSpotter.getAlignedXZCoordinates(playerRotation,
+                        playerXPosition, playerZPosition, worldPositionOfOpponent[0], worldPositionOfOpponent[1]);
+                    if (alignedCoordiates[0] < -2)
+                    {
+                        return GridSide.RIGHT;
+                    }
+                    else if (alignedCoordiates[0] > 2)
+                    {
+                        return GridSide.LEFT;
+                    }
+                }
+                if (countForwards)
+                {
+                    if (opponentStartingPositionToCheck == 1)
+                    {
+                        // we're counting forwards and have reached pole, so go back from the player
+                        opponentStartingPositionToCheck = playerStartingPosition + 1;
+                        countForwards = false;
+                    }
+                    else
+                    {
+                        opponentStartingPositionToCheck--;
+                    }
+                }
+                else
+                {
+                    if (opponentStartingPositionToCheck == numCars - 1)
+                    {
+                        // we're counting backwards and have reached last, so go forward from the player
+                        opponentStartingPositionToCheck = playerStartingPosition - 1;
+                        countForwards = true;
+                    }
+                    else
+                    {
+                        opponentStartingPositionToCheck++;
+                    }
+                }
+            }
             return GridSide.UNKNOWN;
         }
     }

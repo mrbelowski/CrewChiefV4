@@ -2914,7 +2914,7 @@ namespace CrewChiefV4.Properties {
                 this["spotter_volume_boost"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
@@ -2924,6 +2924,18 @@ namespace CrewChiefV4.Properties {
             }
             set {
                 this["report_fuel_in_gallons"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool manual_formation_double_file {
+            get {
+                return ((bool)(this["manual_formation_double_file"]));
+            }
+            set {
+                this["manual_formation_double_file"] = value;
             }
         }
     }

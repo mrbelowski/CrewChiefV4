@@ -53,15 +53,46 @@ namespace CrewChiefV4.RaceRoom
             throw new Exception("no driver data for slotID " + slot_id);
         }
 
+        // For double-file manual rolling starts. Will only work when the cars are all nicely settled on the grid - preferably 
+        // when the game thinks the race has just started
+        public override GridSide getGridSide(Object currentStateObj)
+        {
+            RaceRoomShared latestRawData = ((CrewChiefV4.RaceRoom.R3ESharedMemoryReader.R3EStructWrapper)currentStateObj).data;
+            DriverData playerData = getDriverData(latestRawData, latestRawData.VehicleInfo.SlotId);
+            float playerRotation = latestRawData.CarOrientation.Yaw;                
+            if (playerRotation < 0)
+            {
+                playerRotation = (float)(2 * Math.PI) + playerRotation;
+            }
+            playerRotation = (float)(2 * Math.PI) - playerRotation;
+            float playerXPosition = playerData.Position.X;
+            float playerZPosition = playerData.Position.Z;
+            int playerStartingPosition = latestRawData.Position;
+            int numCars = latestRawData.NumCars;
+            return getGridSideInternal(latestRawData, playerRotation, playerXPosition, playerZPosition, playerStartingPosition, numCars);
+        }
+
+        protected override float[] getWorldPositionOfDriverAtPosition(Object currentStateObj, int position)
+        {
+            RaceRoomShared latestRawData = (RaceRoomShared)currentStateObj;
+            foreach (DriverData driverData in latestRawData.DriverData)
+            {
+                if (driverData.Place == position)
+                {
+                    return new float[] {driverData.Position.X, driverData.Position.Z};
+                }
+            }
+            return new float[]{0, 0};
+        }
+        
         public override void trigger(Object lastStateObj, Object currentStateObj, GameStateData currentGameState)
         {
             if (paused)
             {
                 return;
             }
-
-            RaceRoomShared lastState = ((CrewChiefV4.RaceRoom.R3ESharedMemoryReader.R3EStructWrapper)lastStateObj).data;
             RaceRoomShared currentState = ((CrewChiefV4.RaceRoom.R3ESharedMemoryReader.R3EStructWrapper)currentStateObj).data;
+            RaceRoomShared lastState = ((CrewChiefV4.RaceRoom.R3ESharedMemoryReader.R3EStructWrapper)lastStateObj).data;            
             
             if (!enabled || currentState.Player.GameSimulationTime < timeAfterRaceStartToActivate ||
                 currentState.ControlType != (int)RaceRoomConstant.Control.Player || 

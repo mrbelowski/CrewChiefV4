@@ -40,6 +40,38 @@ namespace CrewChiefV4.assetto
             internalSpotter.clearState();
         }
 
+        // For double-file manual rolling starts. Will only work when the cars are all nicely settled on the grid - preferably 
+        // when the game thinks the race has just started
+        public override GridSide getGridSide(Object currentStateObj)
+        {
+            AssettoCorsaShared latestRawData = ((ACSSharedMemoryReader.ACSStructWrapper)currentStateObj).data;
+            acsVehicleInfo playerData = latestRawData.acsChief.vehicle[0];
+            float playerRotation = latestRawData.acsPhysics.heading;
+            if (playerRotation < 0)
+            {
+                playerRotation = (float)(2 * Math.PI) + playerRotation;
+            }
+            playerRotation = (float)(2 * Math.PI) - playerRotation;
+            float playerXPosition = playerData.worldPosition.x;
+            float playerZPosition = playerData.worldPosition.y;
+            int playerStartingPosition = playerData.carLeaderboardPosition;
+            int numCars = latestRawData.acsChief.numVehicles;
+            return getGridSideInternal(latestRawData, playerRotation, playerXPosition, playerZPosition, playerStartingPosition, numCars);
+        }
+
+        protected override float[] getWorldPositionOfDriverAtPosition(Object currentStateObj, int position)
+        {
+            AssettoCorsaShared latestRawData = (AssettoCorsaShared)currentStateObj;
+            foreach (acsVehicleInfo vehicleInfo in latestRawData.acsChief.vehicle)
+            {
+                if (vehicleInfo.carLeaderboardPosition == position)
+                {
+                    return new float[] { vehicleInfo.worldPosition.x, vehicleInfo.worldPosition.y };
+                }
+            }
+            return new float[] { 0, 0 };
+        }
+
         public float mapToFloatTime(int time)
         {
             TimeSpan ts = TimeSpan.FromTicks(time);
@@ -47,13 +79,12 @@ namespace CrewChiefV4.assetto
         }
         public override void trigger(Object lastStateObj, Object currentStateObj, GameStateData currentGameState)
         {
-
             if (paused)
             {
                 return;
             }
-            AssettoCorsaShared lastState = ((ACSSharedMemoryReader.ACSStructWrapper)lastStateObj).data;
             AssettoCorsaShared currentState = ((ACSSharedMemoryReader.ACSStructWrapper)currentStateObj).data;
+            AssettoCorsaShared lastState = ((ACSSharedMemoryReader.ACSStructWrapper)lastStateObj).data;
 
             if (!enabled || currentState.acsChief.numVehicles <= 1 || 
                 (mapToFloatTime(currentState.acsChief.vehicle[0].currentLapTimeMS) < timeAfterRaceStartToActivate &&
