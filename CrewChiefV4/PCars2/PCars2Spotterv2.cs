@@ -55,6 +55,40 @@ namespace CrewChiefV4.PCars2
             internalSpotter.clearState();
         }
 
+        // For double-file manual rolling starts. Will only work when the cars are all nicely settled on the grid - preferably 
+        // when the game thinks the race has just started
+        public override GridSide getGridSide(Object currentStateObj)
+        {
+            CrewChiefV4.PCars2.PCars2SharedMemoryReader.PCars2StructWrapper currentWrapper = (CrewChiefV4.PCars2.PCars2SharedMemoryReader.PCars2StructWrapper)currentStateObj;
+            pCars2APIStruct latestRawData = currentWrapper.data;
+            int playerIndex = PCars2GameStateMapper.getPlayerIndex(latestRawData);
+            pCars2APIParticipantStruct playerData = latestRawData.mParticipantData[playerIndex];
+            float playerRotation = latestRawData.mOrientation[1];
+            if (playerRotation < 0)
+            {
+                playerRotation = (float)(2 * Math.PI) + playerRotation;
+            }
+            playerRotation = (float)(2 * Math.PI) - playerRotation;
+            float playerXPosition = playerData.mWorldPosition[0];
+            float playerZPosition = playerData.mWorldPosition[2];
+            int playerStartingPosition = (int) playerData.mRacePosition;
+            int numCars = latestRawData.mNumParticipants;
+            return getGridSideInternal(latestRawData, playerRotation, playerXPosition, playerZPosition, playerStartingPosition, numCars);
+        }
+
+        protected override float[] getWorldPositionOfDriverAtPosition(Object currentStateObj, int position)
+        {
+            pCars2APIStruct latestRawData = (pCars2APIStruct)currentStateObj;
+            foreach (pCars2APIParticipantStruct participant in latestRawData.mParticipantData)
+            {
+                if (participant.mRacePosition == position)
+                {
+                    return new float[] { participant.mWorldPosition[0], participant.mWorldPosition[2] };
+                }
+            }
+            return new float[] { 0, 0 };
+        }
+
         public override void trigger(Object lastStateObj, Object currentStateObj, GameStateData currentGameState)
         {
             if (paused)

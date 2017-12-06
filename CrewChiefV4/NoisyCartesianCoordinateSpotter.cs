@@ -474,7 +474,7 @@ namespace CrewChiefV4
             return Math.Abs(playerX - opponentX) < maxClosingSpeed && Math.Abs(playerZ - opponentZ) < maxClosingSpeed;
         }
 
-        private Tuple<Side, float> getSideAndSeparation(float playerRotationInRadians, float playerX, float playerZ, float oppponentX, float opponentZ, Boolean isOpponentSpeedInRange)
+        public float[] getAlignedXZCoordinates(float playerRotationInRadians, float playerX, float playerZ, float oppponentX, float opponentZ)
         {
             float rawXCoordinate = oppponentX - playerX;
             float rawZCoordinate = opponentZ - playerZ;
@@ -483,6 +483,14 @@ namespace CrewChiefV4
             // We assume that both cars have similar orientations (or at least, any orientation difference isn't going to be relevant)
             float alignedXCoordinate = ((float)Math.Cos(playerRotationInRadians) * rawXCoordinate) + ((float)Math.Sin(playerRotationInRadians) * rawZCoordinate);
             float alignedZCoordinate = ((float)Math.Cos(playerRotationInRadians) * rawZCoordinate) - ((float)Math.Sin(playerRotationInRadians) * rawXCoordinate);
+            return new float[] {alignedXCoordinate, alignedZCoordinate};
+        }
+
+        private Tuple<Side, float> getSideAndSeparation(float playerRotationInRadians, float playerX, float playerZ, float oppponentX, float opponentZ, Boolean isOpponentSpeedInRange)
+        {
+            float[] alignedCoordinates = getAlignedXZCoordinates(playerRotationInRadians, playerX, playerZ, oppponentX, opponentZ);
+            float alignedXCoordinate = alignedCoordinates[0];
+            float alignedZCoordinate = alignedCoordinates[1];
 
             //Console.WriteLine("raw x " + rawXCoordinate + ", raw y = " + rawYCoordinate + ", aligned x " + alignedXCoordinate + ", aligned y " + alignedYCoordinate);
 

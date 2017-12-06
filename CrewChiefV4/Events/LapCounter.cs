@@ -32,6 +32,7 @@ namespace CrewChiefV4.Events
         // some folks might want to start racing when the leader crosses the line, others might not be allowed to overtake
         // until their car crosses the line
         private Boolean manualFormationGoWhenLeaderCrossesLine = UserSettings.GetUserSettings().getBoolean("manual_formation_go_with_leader");
+        private Boolean manualFormationDoubleFile = UserSettings.GetUserSettings().getBoolean("manual_formation_double_file");
 
         private Boolean playedManualStartGetReady = false;
         private Boolean playedManualStartLeaderHasCrossedLine = false;
@@ -78,6 +79,9 @@ namespace CrewChiefV4.Events
         private DateTime nextManualFormationOvertakeWarning = DateTime.MinValue;
         private int currentPosition = -1;
 
+        // special case for LapCounter - needs access to the CrewChief class to interrogate the spotter
+        private CrewChief crewChief;
+
         public override List<SessionPhase> applicableSessionPhases
         {
             get { return new List<SessionPhase> { SessionPhase.Countdown, SessionPhase.Formation, SessionPhase.Gridwalk, SessionPhase.Green, SessionPhase.Checkered, SessionPhase.Finished }; }
@@ -88,9 +92,10 @@ namespace CrewChiefV4.Events
             get { return new List<SessionType> { SessionType.Practice, SessionType.Qualify, SessionType.Race }; }
         }
 
-        public LapCounter(AudioPlayer audioPlayer)
+        public LapCounter(AudioPlayer audioPlayer, CrewChief crewChief)
         {
             this.audioPlayer = audioPlayer;
+            this.crewChief = crewChief;
         }
 
         public override bool isMessageStillValid(string eventSubType, GameStateData currentGameState, Dictionary<String, Object> validationData)
@@ -406,6 +411,14 @@ namespace CrewChiefV4.Events
                     {
                         Console.WriteLine("Purged " + purgeCount + " outstanding messages at green light");
                     }
+                    List<int> positions = new List<int>();
+                    positions.Add(currentGameState.SessionData.Position);
+                    foreach (OpponentData opponent in currentGameState.OpponentData.Values)
+                    {
+                        positions.Add(opponent.Position);
+                    }
+                    positions.Sort();
+                    Console.WriteLine("Occupied positions " + String.Join(",", positions));
                     audioPlayer.playMessageImmediately(new QueuedMessage(folderGreenGreenGreen, 0, this));
                     audioPlayer.disablePearlsOfWisdom = false;
                 }
@@ -499,29 +512,48 @@ namespace CrewChiefV4.Events
         
         private void playManualStartInitialMessage(GameStateData currentGameState)
         {
-            manualStartOpponentAhead = currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position - 1, true);
+            GridSide gridSide = GridSide.UNKNOWN;
+            if (manualFormationDoubleFile)
+            {
+                gridSide = this.crewChief.getGridSide();
+                manualStartOpponentAhead = currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position - 2, true);
+            }
+            else
+            {
+                manualStartOpponentAhead = currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position - 1, true);
+            }
+
             // use the driver name in front if we have it - if we're starting on pole the manualStartOpponentAhead var will be null,
             // which will force the audio player to use the secondary message
+            List<MessageFragment> messageContentsWithName;
+            List<MessageFragment> messageContentsNoName;
 
             if (manualFormationGoWhenLeaderCrossesLine)
             {
                 // go when leader crosses line, so make sure we don't say "hold position until the start line"
-                audioPlayer.playMessage(new QueuedMessage("manual_start_intro",
-                    MessageContents(folderManualStartInitialIntro,
+                messageContentsWithName = MessageContents(folderManualStartInitialIntro,
                         Position.folderStub + currentGameState.SessionData.Position, folderManualStartInitialOutroWithDriverName1,
-                        manualStartOpponentAhead),
-                    MessageContents(folderManualStartInitialIntro,
-                        Position.folderStub + currentGameState.SessionData.Position, folderHoldYourPosition), 0, this));
+                        manualStartOpponentAhead);
+                messageContentsNoName = MessageContents(folderManualStartInitialIntro,
+                        Position.folderStub + currentGameState.SessionData.Position, folderHoldYourPosition);
             }
             else
             {
-                audioPlayer.playMessage(new QueuedMessage("manual_start_intro",
-                    MessageContents(folderManualStartInitialIntro,
+                messageContentsWithName = MessageContents(folderManualStartInitialIntro,
                         Position.folderStub + currentGameState.SessionData.Position, folderManualStartInitialOutroWithDriverName1,
-                        manualStartOpponentAhead, folderManualStartInitialOutroWithDriverName2),
-                    MessageContents(folderManualStartInitialIntro,
-                        Position.folderStub + currentGameState.SessionData.Position, folderManualStartInitialOutroNoDriverName), 0, this));
+                        manualStartOpponentAhead, folderManualStartInitialOutroWithDriverName2);
+                messageContentsNoName = MessageContents(folderManualStartInitialIntro,
+                        Position.folderStub + currentGameState.SessionData.Position, folderManualStartInitialOutroNoDriverName);
             }
+            if (manualFormationDoubleFile && gridSide != GridSide.LEFT)
+            {
+                messageContentsWithName.Add(MessageFragment.Text(FrozenOrderMonitor.folderInTheLeftColumn));
+            }
+            else if (manualFormationDoubleFile && gridSide != GridSide.RIGHT)
+            {
+                messageContentsWithName.Add(MessageFragment.Text(FrozenOrderMonitor.folderInTheRightColumn));
+            }
+            audioPlayer.playMessage(new QueuedMessage("manual_start_intro", messageContentsWithName, messageContentsNoName, 0, this));
             playedManualStartInitialMessage = true;
         }
 
