@@ -24,6 +24,7 @@ namespace CrewChiefV4.Events
         public static String folderManualStartInitialOutroNoDriverName = "lap_counter/hold_this_position_until_start_line";
         public static String folderManualStartInitialOutroWithDriverName1 = "lap_counter/hold_position_behind";
         public static String folderManualStartInitialOutroWithDriverName2 = "lap_counter/until_start_line";
+        public static String folderManualStartRejoinAtBack = "lap_counter/rejoin_at_back";
 
         // toggle / request acknowledgements when enabling / disabling manual formation lap mode
         public static String folderManualFormationLapModeEnabled = "lap_counter/manual_formation_lap_mode_enabled";
@@ -38,7 +39,8 @@ namespace CrewChiefV4.Events
         private Boolean playedManualStartLeaderHasCrossedLine = false;
         private Boolean playedManualStartPlayedGoGoGo = false;
         private Boolean playedManualStartInitialMessage = false;
-        private OpponentData manualStartOpponentAhead = null;
+
+        private String manualStartOpponentToFollow = null;
 
         // used by the FrozenOrder event
         public static String folderGetReady = "lap_counter/get_ready";
@@ -84,6 +86,10 @@ namespace CrewChiefV4.Events
 
         private GridSide gridSide = GridSide.UNKNOWN;
 
+        private int manualFormationStartingPosition = 0;
+
+        private Boolean playedRejoinAtBackMessage = false;
+
         public override List<SessionPhase> applicableSessionPhases
         {
             get { return new List<SessionPhase> { SessionPhase.Countdown, SessionPhase.Formation, SessionPhase.Gridwalk, SessionPhase.Green, SessionPhase.Checkered, SessionPhase.Finished }; }
@@ -102,15 +108,15 @@ namespace CrewChiefV4.Events
 
         public override bool isMessageStillValid(string eventSubType, GameStateData currentGameState, Dictionary<String, Object> validationData)
         {
-            // this validates that the 'give position back' messasge only so we don't care what's in the validationData. only that it is not null
-            if (validationData != null && manualStartOpponentAhead != null)
-            {
-                OpponentData currentCarAhead = currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position - 1, true);
-                if (currentCarAhead != null && currentCarAhead.DriverRawName.Equals(manualStartOpponentAhead.DriverRawName))
+            // this validates that the 'give position back' message
+            if (validationData != null) 
+            { 
+                OpponentData opponentWeOvertook = getOpponent(currentGameState, (String) validationData["OpponentToFollowName"]);
+                if (opponentWeOvertook != null && currentGameState.SessionData.Position > opponentWeOvertook.Position
+                    && !hasOpponentDroppedBack((int) validationData["PlayerPosition"], opponentWeOvertook))
                 {
-                    // the opponent in front is who should be in front, so the message is invalid
                     return false;
-                }
+                }     
             }
             return true;
         }
@@ -128,8 +134,19 @@ namespace CrewChiefV4.Events
             playedManualStartInitialMessage = false;
             playedManualStartPlayedGoGoGo = false;
             nextManualFormationOvertakeWarning = DateTime.MinValue;
-            manualStartOpponentAhead = null;
+            manualStartOpponentToFollow = null;
             gridSide = GridSide.UNKNOWN;
+            manualFormationStartingPosition = 0;
+            playedRejoinAtBackMessage = false;
+        }
+
+        private OpponentData getOpponent(GameStateData currentGameState, String opponentName)
+        {
+            if (opponentName != null && currentGameState.OpponentData.ContainsKey(opponentName))
+            {
+                return currentGameState.OpponentData[opponentName];
+            }
+            return null;
         }
 
         private void playPreLightsMessage(GameStateData currentGameState, int maxNumberToPlay)
@@ -504,19 +521,42 @@ namespace CrewChiefV4.Events
             audioPlayer.playMessage(new QueuedMessage(folderGetReady, 0, this));
             playedManualStartGetReady = true;
         }
-        
-        private void playManualStartInitialMessage(GameStateData currentGameState)
-        {            
+
+        private void setOpponentToFollowAndStartPosition(GameStateData currentGameState, Boolean playerHasCrashed, Boolean getGridSide)
+        {
+            this.manualFormationStartingPosition = playerHasCrashed ? currentGameState.SessionData.NumCars : currentGameState.SessionData.Position;
             if (manualFormationDoubleFile)
             {
-                gridSide = this.crewChief.getGridSide();
-                manualStartOpponentAhead = currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position - 2, true);
+                if (getGridSide)
+                {
+                    gridSide = this.crewChief.getGridSide();
+                }
+                if (playerHasCrashed)
+                {
+                    gridSide = GridSide.UNKNOWN;
+                    manualStartOpponentToFollow = null;
+                }
+                else
+                {
+                    manualStartOpponentToFollow = currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position - 2, true).DriverRawName;
+                }
             }
             else
             {
-                manualStartOpponentAhead = currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position - 1, true);
+                if (playerHasCrashed)
+                {
+                    manualStartOpponentToFollow = null;
+                }
+                else
+                {
+                    manualStartOpponentToFollow = currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position - 1, true).DriverRawName;
+                }
             }
-
+        }
+        
+        private void playManualStartInitialMessage(GameStateData currentGameState)
+        {
+            setOpponentToFollowAndStartPosition(currentGameState, false, true);
             // use the driver name in front if we have it - if we're starting on pole the manualStartOpponentAhead var will be null,
             // which will force the audio player to use the secondary message
             List<MessageFragment> messageContentsWithName;
@@ -527,7 +567,7 @@ namespace CrewChiefV4.Events
                 // go when leader crosses line, so make sure we don't say "hold position until the start line"
                 messageContentsWithName = MessageContents(folderManualStartInitialIntro,
                         Position.folderStub + currentGameState.SessionData.Position, folderManualStartInitialOutroWithDriverName1,
-                        manualStartOpponentAhead);
+                        manualStartOpponentToFollow);
                 messageContentsNoName = MessageContents(folderManualStartInitialIntro,
                         Position.folderStub + currentGameState.SessionData.Position, folderHoldYourPosition);
                 if (manualFormationDoubleFile && gridSide == GridSide.LEFT)
@@ -545,7 +585,7 @@ namespace CrewChiefV4.Events
                 {
                     messageContentsWithName = MessageContents(folderManualStartInitialIntro,
                             Position.folderStub + currentGameState.SessionData.Position, folderManualStartInitialOutroWithDriverName1,
-                            manualStartOpponentAhead, FrozenOrderMonitor.folderInTheLeftColumn, folderManualStartInitialOutroWithDriverName2);
+                            manualStartOpponentToFollow, FrozenOrderMonitor.folderInTheLeftColumn, folderManualStartInitialOutroWithDriverName2);
                     messageContentsNoName = MessageContents(folderManualStartInitialIntro,
                             Position.folderStub + currentGameState.SessionData.Position, FrozenOrderMonitor.folderInTheLeftColumn, folderManualStartInitialOutroNoDriverName);
                 }
@@ -553,7 +593,7 @@ namespace CrewChiefV4.Events
                 {
                     messageContentsWithName = MessageContents(folderManualStartInitialIntro,
                             Position.folderStub + currentGameState.SessionData.Position, folderManualStartInitialOutroWithDriverName1,
-                            manualStartOpponentAhead, FrozenOrderMonitor.folderInTheRightColumn, folderManualStartInitialOutroWithDriverName2);
+                            manualStartOpponentToFollow, FrozenOrderMonitor.folderInTheRightColumn, folderManualStartInitialOutroWithDriverName2);
                     messageContentsNoName = MessageContents(folderManualStartInitialIntro,
                             Position.folderStub + currentGameState.SessionData.Position, FrozenOrderMonitor.folderInTheRightColumn, folderManualStartInitialOutroNoDriverName);
                 }
@@ -561,7 +601,7 @@ namespace CrewChiefV4.Events
                 {
                     messageContentsWithName = MessageContents(folderManualStartInitialIntro,
                             Position.folderStub + currentGameState.SessionData.Position, folderManualStartInitialOutroWithDriverName1,
-                            manualStartOpponentAhead, folderManualStartInitialOutroWithDriverName2);
+                            manualStartOpponentToFollow, folderManualStartInitialOutroWithDriverName2);
                     messageContentsNoName = MessageContents(folderManualStartInitialIntro,
                             Position.folderStub + currentGameState.SessionData.Position, folderManualStartInitialOutroNoDriverName);
                 }
@@ -572,47 +612,46 @@ namespace CrewChiefV4.Events
 
         private void checkForIllegalPassesOnFormationLap(GameStateData currentGameState)
         {
-            if (GameStateData.onManualFormationLap)
+            OpponentData opponentToFollow = getOpponent(currentGameState, this.manualStartOpponentToFollow);
+            if (hasOpponentDroppedBack(currentGameState.SessionData.Position, opponentToFollow))
+            {
+                setOpponentToFollowAndStartPosition(currentGameState, false, false);
+            }
+            else if (haveWeDroppedBack(currentGameState))
+            {
+                if (!playedRejoinAtBackMessage)
+                {
+                    playedRejoinAtBackMessage = true;
+                    audioPlayer.playMessage(new QueuedMessage("rejoin_at_back", MessageContents(folderManualStartRejoinAtBack), 0, this));
+                }
+                setOpponentToFollowAndStartPosition(currentGameState, true, false);
+            }
+            else if (GameStateData.onManualFormationLap && nextManualFormationOvertakeWarning < currentGameState.Now &&
+                opponentToFollow != null && opponentToFollow.Position > currentGameState.SessionData.Position)
             {
                 if (manualFormationDoubleFile)
                 {
-                    if (nextManualFormationOvertakeWarning < currentGameState.Now &&
-                        manualStartOpponentAhead != null && manualStartOpponentAhead.Position > currentGameState.SessionData.Position)
-                    {
-                        // we've overtaken the guy in front of us in our pace line
-                        nextManualFormationOvertakeWarning = currentGameState.Now.AddSeconds(30);
-                        audioPlayer.playMessage(new QueuedMessage("give_position_back",
-                            MessageContents(folderGivePositionBack, folderManualStartInitialOutroWithDriverName1, manualStartOpponentAhead),
-                            MessageContents(folderGivePositionBack), 0, this));
-                    }
-                }
-                else if (currentGameState.SessionData.SessionStartPosition > currentGameState.SessionData.Position &&
-                              nextManualFormationOvertakeWarning < currentGameState.Now)
-                {
-                    // we've overtaken someone
+                    // we've overtaken the guy in we're supposed to be following
                     nextManualFormationOvertakeWarning = currentGameState.Now.AddSeconds(30);
-                    // if the number of cars in the session has reduced, just play a 'hold your position' message - 
-                    // perhaps someone disconnected in front.
-                    if (currentGameState.SessionData.NumCarsAtStartOfSession > currentGameState.SessionData.NumCars)
-                    {
-                        audioPlayer.playMessage(new QueuedMessage(folderHoldYourPosition, 0, this));
-                    }
-                    else
-                    {
-                        // check if the car in front has changed
-                        OpponentData currentOpponentInFront = currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position - 1, true);
-                        if (manualStartOpponentAhead != null &&
-                            (currentOpponentInFront == null || !manualStartOpponentAhead.DriverRawName.Equals(currentOpponentInFront.DriverRawName)))
-                        {
-                            // delay and validate this message so we don't grumble about a different car in front if a couple of
-                            // cars fall back through the field for whatever reason
-                            audioPlayer.playMessage(new QueuedMessage("give_position_back",
-                                MessageContents(folderGivePositionBack, folderManualStartInitialOutroWithDriverName1, manualStartOpponentAhead),
-                                MessageContents(folderGivePositionBack), 5, this, new Dictionary<String, Object>()));
-                        }
-                    }
+                    Dictionary<String, Object> validationData = new Dictionary<string, object>();
+                    validationData.Add("PlayerPosition", currentGameState.SessionData.Position);
+                    validationData.Add("OpponentToFollowName", this.manualStartOpponentToFollow);
+
+                    audioPlayer.playMessage(new QueuedMessage("give_position_back",
+                        MessageContents(folderGivePositionBack, folderManualStartInitialOutroWithDriverName1, manualStartOpponentToFollow),
+                        MessageContents(folderGivePositionBack), 5, this, validationData));                    
                 }
             }
+        }
+
+        private Boolean hasOpponentDroppedBack(int playerPosition, OpponentData opponent)
+        {
+            return opponent != null && opponent.Position > playerPosition + 3;
+        }
+
+        private Boolean haveWeDroppedBack(GameStateData currentGameState)
+        {
+            return currentGameState.SessionData.Position > manualFormationStartingPosition + 3;
         }
 
         private void checkForManualDoubleFileReminder(GameStateData previousGameState, GameStateData currentGameState)
@@ -629,13 +668,13 @@ namespace CrewChiefV4.Events
                     if (gridSide == GridSide.LEFT)
                     {
                         messageContentsWithName = MessageContents(folderManualStartInitialOutroWithDriverName1,
-                                manualStartOpponentAhead, FrozenOrderMonitor.folderInTheLeftColumn);
+                                manualStartOpponentToFollow, FrozenOrderMonitor.folderInTheLeftColumn);
                         messageContentsNoName = MessageContents(folderHoldYourPosition, FrozenOrderMonitor.folderInTheLeftColumn);
                     }
                     else
                     {
                         messageContentsWithName = MessageContents(folderManualStartInitialOutroWithDriverName1,
-                                manualStartOpponentAhead, FrozenOrderMonitor.folderInTheRightColumn);
+                                manualStartOpponentToFollow, FrozenOrderMonitor.folderInTheRightColumn);
                         messageContentsNoName = MessageContents(folderHoldYourPosition, FrozenOrderMonitor.folderInTheRightColumn);
                     }
                 }
@@ -644,13 +683,13 @@ namespace CrewChiefV4.Events
                     if (gridSide == GridSide.LEFT)
                     {
                         messageContentsWithName = MessageContents(folderManualStartInitialOutroWithDriverName1,
-                                manualStartOpponentAhead, FrozenOrderMonitor.folderInTheLeftColumn, folderManualStartInitialOutroWithDriverName2);
+                                manualStartOpponentToFollow, FrozenOrderMonitor.folderInTheLeftColumn, folderManualStartInitialOutroWithDriverName2);
                         messageContentsNoName = MessageContents(folderManualStartInitialOutroNoDriverName, FrozenOrderMonitor.folderInTheLeftColumn);
                     }
                     else
                     {
                         messageContentsWithName = MessageContents(folderManualStartInitialOutroWithDriverName1,
-                                manualStartOpponentAhead, FrozenOrderMonitor.folderInTheRightColumn, folderManualStartInitialOutroWithDriverName2);
+                                manualStartOpponentToFollow, FrozenOrderMonitor.folderInTheRightColumn, folderManualStartInitialOutroWithDriverName2);
                         messageContentsNoName = MessageContents(folderManualStartInitialOutroNoDriverName, FrozenOrderMonitor.folderInTheRightColumn);
                     }
                 }
