@@ -90,6 +90,8 @@ namespace CrewChiefV4.Events
 
         private Boolean playedRejoinAtBackMessage = false;
 
+        private Boolean playedPreLightsRollingStartWarning = false;
+
         public override List<SessionPhase> applicableSessionPhases
         {
             get { return new List<SessionPhase> { SessionPhase.Countdown, SessionPhase.Formation, SessionPhase.Gridwalk, SessionPhase.Green, SessionPhase.Checkered, SessionPhase.Finished }; }
@@ -138,6 +140,7 @@ namespace CrewChiefV4.Events
             gridSide = GridSide.UNKNOWN;
             manualFormationStartingPosition = 0;
             playedRejoinAtBackMessage = false;
+            playedPreLightsRollingStartWarning = false;
         }
 
         private OpponentData getOpponent(GameStateData currentGameState, String opponentName)
@@ -310,6 +313,16 @@ namespace CrewChiefV4.Events
                 // when the session is first cleared, this will be true if we're using manual formation laps:
                 if (GameStateData.onManualFormationLap) 
                 {
+                    if (!playedPreLightsRollingStartWarning &&
+                        currentGameState.SessionData.SessionType == SessionType.Race && 
+                        (currentGameState.SessionData.SessionPhase == SessionPhase.Countdown ||
+                         currentGameState.SessionData.SessionPhase == SessionPhase.Formation ||
+                         currentGameState.SessionData.SessionPhase == SessionPhase.Gridwalk))
+                    {
+                        playedPreLightsRollingStartWarning = true;
+                        audioPlayer.playMessage(new QueuedMessage(FrozenOrderMonitor.folderRollingStartReminder, 0, this));
+                    }
+
                     // when the lights change to green, give some info:
                     if (!playedManualStartInitialMessage && previousGameState != null &&
                         currentGameState.SessionData.SessionType == SessionType.Race &&
@@ -616,6 +629,28 @@ namespace CrewChiefV4.Events
             if (hasOpponentDroppedBack(currentGameState.SessionData.Position, opponentToFollow))
             {
                 setOpponentToFollowAndStartPosition(currentGameState, false, false);
+                OpponentData newOpponentToFollow = getOpponent(currentGameState, manualStartOpponentToFollow);
+                if (AudioPlayer.canReadName(newOpponentToFollow.DriverRawName))
+                {
+                    if (manualFormationDoubleFile)
+                    {
+                        if (gridSide == GridSide.LEFT)
+                        {
+                            audioPlayer.playMessage(new QueuedMessage("new_car_to_follow", MessageContents(folderManualStartInitialOutroWithDriverName1,
+                                    newOpponentToFollow, FrozenOrderMonitor.folderInTheLeftColumn), 0, this));
+                        }
+                        else
+                        {
+                            audioPlayer.playMessage(new QueuedMessage("new_car_to_follow", MessageContents(folderManualStartInitialOutroWithDriverName1,
+                                    newOpponentToFollow, FrozenOrderMonitor.folderInTheRightColumn), 0, this));
+                        }
+                    }
+                    else
+                    {
+                        audioPlayer.playMessage(new QueuedMessage("new_car_to_follow", MessageContents(folderManualStartInitialOutroWithDriverName1,
+                                    newOpponentToFollow), 0, this));
+                    }
+                }
             }
             else if (haveWeDroppedBack(currentGameState))
             {
