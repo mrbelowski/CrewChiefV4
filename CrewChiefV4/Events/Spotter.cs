@@ -49,13 +49,15 @@ namespace CrewChiefV4.Events
             return null;
         }
 
-        public virtual GridSide getGridSide(Object currentStateObj)
+        public virtual Tuple<GridSide, Dictionary<int, GridSide>> getGridSide(Object currentStateObj)
         {
-            return GridSide.UNKNOWN;
+            return new Tuple<GridSide, Dictionary<int, GridSide>>(GridSide.UNKNOWN, new Dictionary<int, GridSide>());
         }
 
-        protected GridSide getGridSideInternal(Object currentStateObj, float playerRotation, float playerXPosition, float playerZPosition, int playerStartingPosition, int numCars)
+        protected Tuple<GridSide, Dictionary<int, GridSide>> getGridSideInternal(Object currentStateObj, float playerRotation, float playerXPosition,
+            float playerZPosition, int playerStartingPosition, int numCars)
         {
+            GridSide playerGridSide = GridSide.UNKNOWN;
             Boolean countForwards = playerStartingPosition != 1;
 
             float[] worldPositionOfOpponent = null;
@@ -71,11 +73,13 @@ namespace CrewChiefV4.Events
                         playerXPosition, playerZPosition, worldPositionOfOpponent[0], worldPositionOfOpponent[1]);
                     if (alignedCoordiates[0] < -2)
                     {
-                        return GridSide.LEFT;
+                        playerGridSide = GridSide.LEFT;
+                        break;
                     }
                     else if (alignedCoordiates[0] > 2)
                     {
-                        return GridSide.RIGHT;
+                        playerGridSide = GridSide.RIGHT;
+                        break;
                     }
                 }
                 if (countForwards)
@@ -105,7 +109,39 @@ namespace CrewChiefV4.Events
                     }
                 }
             }
-            return GridSide.UNKNOWN;
+            // now get GridSide for the opponents starting ahead
+            int opponentAheadPosition = playerStartingPosition - 1;
+            Dictionary<int, GridSide> opponentGridSides = new Dictionary<int, GridSide>();
+            while (opponentAheadPosition > 0)
+            {
+                worldPositionOfOpponent = getWorldPositionOfDriverAtPosition(currentStateObj, opponentAheadPosition);
+                if (worldPositionOfOpponent != null)
+                {
+                    float[] alignedCoordiates = this.internalSpotter.getAlignedXZCoordinates(playerRotation,
+                        playerXPosition, playerZPosition, worldPositionOfOpponent[0], worldPositionOfOpponent[1]);
+                    if (Math.Abs(alignedCoordiates[0]) > 2)
+                    {
+                        if (playerGridSide == GridSide.LEFT)
+                        {
+                            opponentGridSides.Add(opponentAheadPosition, GridSide.RIGHT);
+                        }
+                        else if (playerGridSide == GridSide.RIGHT)
+                        {
+                            opponentGridSides.Add(opponentAheadPosition, GridSide.LEFT);
+                        }
+                    }
+                    else if (playerGridSide == GridSide.LEFT)
+                    {
+                        opponentGridSides.Add(opponentAheadPosition, GridSide.LEFT);
+                    }
+                    else if (playerGridSide == GridSide.RIGHT)
+                    {
+                        opponentGridSides.Add(opponentAheadPosition, GridSide.RIGHT);
+                    }
+                }
+                opponentAheadPosition--;
+            }
+            return new Tuple<GridSide, Dictionary<int, GridSide>>(playerGridSide, opponentGridSides);
         }
     }
 

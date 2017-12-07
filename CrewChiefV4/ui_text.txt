@@ -522,3 +522,6 @@ report_fuel_in_gallons_help = Reports fuel consumption in gallons instead of lit
 
 manual_formation_double_file = Manual formation lap double-file start
 manual_formation_double_file_help = Assume manual formation lap starts use 2 lines of cars
+
+save_list_of_unvocalized_names = Save driver names with no sound
+save_list_of_unvocalized_names_help = Write unvocalized driver names to file

@@ -57,7 +57,7 @@ namespace CrewChiefV4.PCars2
 
         // For double-file manual rolling starts. Will only work when the cars are all nicely settled on the grid - preferably 
         // when the game thinks the race has just started
-        public override GridSide getGridSide(Object currentStateObj)
+        public override Tuple<GridSide, Dictionary<int, GridSide>> getGridSide(Object currentStateObj)
         {
             CrewChiefV4.PCars2.PCars2SharedMemoryReader.PCars2StructWrapper currentWrapper = (CrewChiefV4.PCars2.PCars2SharedMemoryReader.PCars2StructWrapper)currentStateObj;
             pCars2APIStruct latestRawData = currentWrapper.data;
