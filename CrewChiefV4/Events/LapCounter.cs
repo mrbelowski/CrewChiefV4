@@ -86,6 +86,8 @@ namespace CrewChiefV4.Events
 
         private GridSide gridSide = GridSide.UNKNOWN;
 
+        private Dictionary<String, GridSide> opponentsInFrontGridSides = new Dictionary<string, GridSide>();
+
         private int manualFormationStartingPosition = 0;
 
         private Boolean playedRejoinAtBackMessage = false;
@@ -141,6 +143,7 @@ namespace CrewChiefV4.Events
             manualFormationStartingPosition = 0;
             playedRejoinAtBackMessage = false;
             playedPreLightsRollingStartWarning = false;
+            opponentsInFrontGridSides = new Dictionary<string, GridSide>();
         }
 
         private OpponentData getOpponent(GameStateData currentGameState, String opponentName)
@@ -542,7 +545,20 @@ namespace CrewChiefV4.Events
             {
                 if (getGridSide)
                 {
-                    gridSide = this.crewChief.getGridSide();
+                    Tuple<GridSide, Dictionary<int, GridSide>> playerAndOpponentsInFrontGridSides = this.crewChief.getGridSide();
+                    gridSide = playerAndOpponentsInFrontGridSides.Item1;
+                    // match up the opponent grid sides to their names
+                    foreach (int opponentPosition in playerAndOpponentsInFrontGridSides.Item2.Keys)
+                    {
+                        foreach (OpponentData opponent in currentGameState.OpponentData.Values)
+                        {
+                            if (!opponentsInFrontGridSides.ContainsKey(opponent.DriverRawName) && opponent.Position == opponentPosition)
+                            {
+                                opponentsInFrontGridSides.Add(opponent.DriverRawName, playerAndOpponentsInFrontGridSides.Item2[opponentPosition]);
+                                break;
+                            }
+                        }
+                    }
                 }
                 if (playerHasCrashed)
                 {
@@ -551,7 +567,20 @@ namespace CrewChiefV4.Events
                 }
                 else
                 {
-                    manualStartOpponentToFollow = currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position - 2, true).DriverRawName;
+                    // get the next opponent in front who started on the same grid side as the player
+                    int closestSameSidePosition = 0;
+                    String nameOfDriverInFront = null;
+                    foreach (String opponentNameInFront in opponentsInFrontGridSides.Keys)
+                    {
+                        if (opponentsInFrontGridSides[opponentNameInFront] == gridSide &&
+                            currentGameState.OpponentData[opponentNameInFront].Position < manualFormationStartingPosition &&
+                            currentGameState.OpponentData[opponentNameInFront].Position > closestSameSidePosition)
+                        {
+                            closestSameSidePosition = currentGameState.OpponentData[opponentNameInFront].Position;
+                            nameOfDriverInFront = opponentNameInFront;
+                        }
+                    }
+                    manualStartOpponentToFollow = nameOfDriverInFront;                    
                 }
             }
             else
