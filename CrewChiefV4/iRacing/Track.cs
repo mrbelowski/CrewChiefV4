@@ -7,6 +7,7 @@ namespace CrewChiefV4.iRacing
     {
         public Track()
         {
+            IsOval = false;
         }
 
         public int Id { get; set; }
@@ -15,6 +16,7 @@ namespace CrewChiefV4.iRacing
         public double Length { get; set; }
         public bool NightMode { get; set; }
         public bool IsOval { get; set; }
+        public string Category { get; set; }
         public static Track FromSessionInfo(SessionInfo info)
         {
             var track = new Track();
@@ -25,7 +27,8 @@ namespace CrewChiefV4.iRacing
             track.CodeName = query["TrackName"].GetValue();
             track.Length = Parser.ParseTrackLength(query["TrackLength"].GetValue());
             track.NightMode = query["WeekendOptions"]["NightMode"].GetValue() == "1";
-            track.IsOval = query["Category"].GetValue() != "Road";
+            track.Category = query["Category"].GetValue();
+            track.IsOval = query["Category"].GetValue().ToLower().Contains("oval");
 
             return track;
         }
