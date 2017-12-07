@@ -37,6 +37,14 @@ namespace CrewChiefV4.Events
         private const string folderUseIncreasing = "battery/battery_use_increasing";
         private const string folderUseDecreasing = "battery/battery_use_reducing";
         private const string folderUseStable = "battery/battery_use_stable";
+        private const string folderShouldMakeEnd = "battery/current_charge_should_make_end";
+        private const string folderShouldMakeHalfDistance = "battery/current_charge_should_make_half_distance";
+        private const string folderReduceUseToMakeEnd = "battery/reduce_battery_use_to_make_end";
+        private const string folderReduceUseHalfDistance = "battery/reduce_battery_use_to_make_half_distance";
+        private const string folderIncreaseUseEasilyMakeEnd = "battery/increase_battery_use_easily_make_end";
+        private const string folderIncreaseUseEasilyMakeHalfDistance = "battery/increase_battery_use_easily_make_half_distance";
+        private const string folderWontMakeEndWoPit = "battery/wont_make_end_without_pitstop";
+        private const string folderWontMakeHalfDistanceWoPit = "battery/wont_make_half_distance_without_pitstop";
 
         class BatteryStatsEntry
         {
@@ -74,6 +82,10 @@ namespace CrewChiefV4.Events
         private bool sessionHasFixedNumberOfLaps = false;
         private int halfDistance = -1;
         private int halfTime = -1;
+        private int sessionNumberOfLaps = -1;
+        private float sessionTotalRunTime = -1.0f;
+        private float sessionRunningTime = -1.0f;
+        private int completedLaps = -1;
         private int currLapBatteryUseSectorCheck = -1;
         private float initialBatteryChargePercentage = -1.0f;
         private float initialBatteryGameTime = -1.0f;
@@ -128,6 +140,10 @@ namespace CrewChiefV4.Events
             this.sessionHasFixedNumberOfLaps = false;
             this.halfDistance = -1;
             this.halfTime = -1;
+            this.sessionNumberOfLaps = -1;
+            this.sessionTotalRunTime = -1.0f;
+            this.sessionRunningTime = -1.0f;
+            this.completedLaps = -1;
             this.currLapBatteryUseSectorCheck = -1;
             this.initialBatteryChargePercentage = -1.0f;
 
@@ -169,6 +185,9 @@ namespace CrewChiefV4.Events
 
             this.batteryUseActive = currentGameState.BatteryData.BatteryUseActive;
             var currBattLeftPct = currentGameState.BatteryData.BatteryPercentageLeft;
+
+            this.sessionRunningTime = currentGameState.SessionData.SessionRunningTime;
+            this.completedLaps = currentGameState.SessionData.CompletedLaps;
 
             // Only track battery data after the session has settled down
             if (this.batteryUseActive && currentGameState.SessionData.SessionRunningTime > 15 &&
@@ -222,11 +241,13 @@ namespace CrewChiefV4.Events
                         {
                             this.sessionHasFixedNumberOfLaps = true;
                             this.halfDistance = (int)Math.Ceiling(currentGameState.SessionData.SessionNumberOfLaps / 2.0f);
+                            this.sessionNumberOfLaps = currentGameState.SessionData.SessionNumberOfLaps;
                         }
                         else if (currentGameState.SessionData.SessionTotalRunTime > 0.0f)
                         {
                             this.sessionHasFixedNumberOfLaps = false;
                             this.halfTime = (int)Math.Ceiling(currentGameState.SessionData.SessionTotalRunTime / 2.0f);
+                            this.sessionTotalRunTime = currentGameState.SessionData.SessionTotalRunTime;
                         }
 
                         Console.WriteLine(string.Format("Battery use tracking initilized: halfDistance = {0} laps    halfTime = {1} minutes",
@@ -825,6 +846,15 @@ namespace CrewChiefV4.Events
             return haveData;
         }
 
+        private enum BatteryAdvice
+        {
+            Unknown,
+            WontMakeItWithoutPitting,
+            ReduceBatteryUse,
+            BatteryUseSpotOn,
+            IncreaseBatteryUse,
+        }
+
         public void reportExtendedBatteryStatus(Boolean allowNoDataMessage)
         {
             if (!GlobalBehaviourSettings.enabledMessageTypes.Contains(MessageTypes.BATTERY))
@@ -835,6 +865,9 @@ namespace CrewChiefV4.Events
                 return;
             }
 
+            if (!this.initialized && this.windowedAverageChargeLeft < 0.0f)
+                return;
+
             // Report usage trend:
             var bu = this.EvaluateBatteryUse();
             if (bu == BatteryUseTrend.Decreasing)
@@ -844,10 +877,12 @@ namespace CrewChiefV4.Events
             else if (bu == BatteryUseTrend.Stable)
                 this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/trend", MessageContents(Battery.folderUseStable), 0, this));
 
-            return;
-/*
+            var midRaceReached = false;
+            var batteryAdvice = BatteryAdvice.Unknown;
+
             // Predict if user will be able to make it to half distance (for a pit in) or to finish.
             // Intention is to help user to adjust driving to more/less aggressive.
+            // Note: all this was done with FE bias, where you pit once.  If we need to support more than 1 pit nicely more work is necessary.
             if (this.sessionHasFixedNumberOfLaps && this.averageUsagePerLap > 0.0f)
             {
                 var lapsOfBatteryChargeLeft = (int)Math.Floor(this.windowedAverageChargeLeft / this.averageUsagePerLap);
@@ -857,16 +892,37 @@ namespace CrewChiefV4.Events
                     return;
                 }
 
-                else if (lapsOfBatteryChargeLeft <= 1)
-                    this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/estimate", MessageContents(Battery.folderAboutToRunOut), 0, null));
-                else
+                midRaceReached = this.completedLaps >= this.halfDistance;
+                if (!midRaceReached)
                 {
-                    var messageFragments = new List<MessageFragment>();
-                    messageFragments.Add(MessageFragment.Text(Battery.folderWeEstimate));
-                    messageFragments.Add(MessageFragment.Integer(lapsOfBatteryChargeLeft, false));
-                    messageFragments.Add(MessageFragment.Text(Battery.folderLapsRemaining));
-                    this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/estimate", messageFragments, 0, null));
+                    // If we're close the mid race, see if it makes sense to consider end of race messages.
+                    midRaceReached = this.completedLaps >= this.halfDistance * 0.66f  // we're within 33% of completing half race.
+                        && this.windowedAverageChargeLeft > 70.0f;  // 70% or above charge.
                 }
+
+                var lapsToGo = midRaceReached
+                    ? this.sessionNumberOfLaps - this.completedLaps
+                    : this.halfDistance - this.completedLaps;
+
+                Debug.Assert(lapsToGo >= 0);
+
+                var lapsBalance = lapsOfBatteryChargeLeft - lapsToGo;
+                if (lapsBalance == 0 || lapsBalance == 1)
+                    batteryAdvice = BatteryAdvice.BatteryUseSpotOn;
+                else if (lapsBalance > 1)
+                    batteryAdvice = BatteryAdvice.IncreaseBatteryUse;
+                else if (lapsBalance < 0  // We're below target
+                    && Math.Abs(lapsBalance) <= (lapsToGo * 0.25f))  // but still within 25% of remaining distance.
+                    batteryAdvice = BatteryAdvice.ReduceBatteryUse;
+                else if (lapsBalance < 0  // We're below target
+                    && Math.Abs(lapsBalance) > (lapsToGo * 0.25f))  // And it's hopeless.
+                    batteryAdvice = BatteryAdvice.WontMakeItWithoutPitting;
+
+                Console.WriteLine(string.Format("Battery Advice:{0}  Reached mid:{1}  Laps to go:{2}  Laps balance:{3}"),
+                    batteryAdvice,
+                    midRaceReached,
+                    lapsToGo,
+                    lapsBalance);
             }
             else if (this.averageUsagePerMinute > 0.0f) // Timed race.
             {
@@ -876,17 +932,48 @@ namespace CrewChiefV4.Events
                     // nothing to report (pit stop reset on a separate thread)
                     return;
                 }
-                else if (minutesOfBatteryChargeLeft <= 1)
-                    this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/estimate", MessageContents(Battery.folderAboutToRunOut), 0, null));
-                else
+
+                midRaceReached = this.sessionRunningTime >= this.halfTime;
+                if (!midRaceReached)
                 {
-                    var messageFragments = new List<MessageFragment>();
-                    messageFragments.Add(MessageFragment.Text(Battery.folderWeEstimate));
-                    messageFragments.Add(MessageFragment.Integer(minutesOfBatteryChargeLeft, false));
-                    messageFragments.Add(MessageFragment.Text(Battery.folderMinutesRemaining));
-                    this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/estimate", messageFragments, 0, null));
+                    // If we're close the mid race, see if it makes sense to consider end of race messages.
+                    midRaceReached = this.sessionRunningTime >= this.halfTime * 0.66f  // we're within 33% of completing half race.
+                        && this.windowedAverageChargeLeft > 70.0f;  // 70% or above charge.
                 }
-            }*/
+
+                var minsToGo = midRaceReached
+                    ? this.sessionTotalRunTime - this.sessionRunningTime
+                    : this.halfTime - this.sessionRunningTime;
+
+                Debug.Assert(minsToGo >= 0);
+
+                var minsBalance = minutesOfBatteryChargeLeft - minsToGo;
+                if (minsBalance >= 0 || minsBalance <= 2)
+                    batteryAdvice = BatteryAdvice.BatteryUseSpotOn;
+                else if (minsBalance > 2)
+                    batteryAdvice = BatteryAdvice.IncreaseBatteryUse;
+                else if (minsBalance < 0  // We're below target
+                    && Math.Abs(minsBalance) <= (minsToGo * 0.25f))  // but still within 25% of remaining distance.
+                    batteryAdvice = BatteryAdvice.ReduceBatteryUse;
+                else if (minsBalance < 0  // We're below target
+                    && Math.Abs(minsBalance) > (minsToGo * 0.25f))  // And it's hopeless.
+                    batteryAdvice = BatteryAdvice.WontMakeItWithoutPitting;
+
+                Console.WriteLine(string.Format("Battery Advice:{0}  Reached mid:{1}  Mins to go:{2}  Mins balance:{3}"),
+                    batteryAdvice,
+                    midRaceReached,
+                    minsToGo,
+                    minsBalance);
+            }
+
+            if (batteryAdvice == BatteryAdvice.BatteryUseSpotOn)
+                this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/advice", MessageContents(midRaceReached ? Battery.folderShouldMakeEnd : Battery.folderShouldMakeHalfDistance), 0, this));
+            else if (batteryAdvice == BatteryAdvice.IncreaseBatteryUse)
+                this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/advice", MessageContents(midRaceReached ? Battery.folderIncreaseUseEasilyMakeEnd : Battery.folderIncreaseUseEasilyMakeHalfDistance), 0, this));
+            else if (batteryAdvice == BatteryAdvice.ReduceBatteryUse)
+                this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/advice", MessageContents(midRaceReached ? Battery.folderReduceUseToMakeEnd : Battery.folderReduceUseHalfDistance), 0, this));
+            else if (batteryAdvice == BatteryAdvice.WontMakeItWithoutPitting)
+                this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/advice", MessageContents(midRaceReached ? Battery.folderWontMakeEndWoPit : Battery.folderWontMakeHalfDistanceWoPit), 0, this));
         }
     }
 }
