@@ -113,6 +113,7 @@ namespace CrewChiefV4.Events
         private float averageUsagePerMinute = -1.0f;
         private float prevLapBatteryUse = -1.0f;
         private float windowedAverageChargeLeft = -1.0f;
+        private int numBatteryStatsEntries = -1;
 
         // We don't calculate averaged stats for the OutLap (because they largely vary on how the pit lane is).
         // Instead, just capture battery level at a lap start (windowed avg).  That way we can still announce last lap use.
@@ -167,6 +168,8 @@ namespace CrewChiefV4.Events
             this.averageUsagePerMinute = -1.0f;
             this.prevLapBatteryUse = -1.0f;
             this.windowedAverageChargeLeft = -1.0f;
+            this.numBatteryStatsEntries = -1;
+
             this.firstFullLapInitialChargeLeft = -1.0f;
             this.firstFullLapGameTime = -1.0f;
 
@@ -227,6 +230,7 @@ namespace CrewChiefV4.Events
                     this.averageUsagePerMinute = -1.0f;
                     this.prevLapBatteryUse = -1.0f;
                     this.windowedAverageChargeLeft = -1.0f;
+                    this.numBatteryStatsEntries = -1;
                     this.firstFullLapInitialChargeLeft = -1.0f;
                     this.firstFullLapGameTime = -1.0f;
 
@@ -307,6 +311,7 @@ namespace CrewChiefV4.Events
                         SessionRunningTime = currentGameState.SessionData.SessionRunningTime
                     });
 
+                    this.numBatteryStatsEntries = this.batteryStats.Count;
                     this.currLapBatteryPercentageLeftAccumulator = 0.0f;
                     this.currLapNumBatteryMeasurements = 0;
                     this.currLapMinBatteryLeft = float.MaxValue;
@@ -865,7 +870,10 @@ namespace CrewChiefV4.Events
                 return;
             }
 
-            if (!this.initialized && this.windowedAverageChargeLeft < 0.0f)
+            // No point in advising without data.
+            if (!this.initialized
+                || this.windowedAverageChargeLeft < 0.0f
+                || this.numBatteryStatsEntries < 3)
                 return;
 
             // Report usage trend:
@@ -918,11 +926,11 @@ namespace CrewChiefV4.Events
                     && Math.Abs(lapsBalance) > (lapsToGo * 0.25f))  // And it's hopeless.
                     batteryAdvice = BatteryAdvice.WontMakeItWithoutPitting;
 
-                Console.WriteLine(string.Format("Battery Advice:{0}  Reached mid:{1}  Laps to go:{2}  Laps balance:{3}"),
+                Console.WriteLine(string.Format("Battery Advice:{0}  Reached mid:{1}  Laps to go:{2}  Laps balance:{3}",
                     batteryAdvice,
                     midRaceReached,
                     lapsToGo,
-                    lapsBalance);
+                    lapsBalance));
             }
             else if (this.averageUsagePerMinute > 0.0f) // Timed race.
             {
@@ -959,11 +967,11 @@ namespace CrewChiefV4.Events
                     && Math.Abs(minsBalance) > (minsToGo * 0.25f))  // And it's hopeless.
                     batteryAdvice = BatteryAdvice.WontMakeItWithoutPitting;
 
-                Console.WriteLine(string.Format("Battery Advice:{0}  Reached mid:{1}  Mins to go:{2}  Mins balance:{3}"),
+                Console.WriteLine(string.Format("Battery Advice:{0}  Reached mid:{1}  Mins to go:{2}  Mins balance:{3}",
                     batteryAdvice,
                     midRaceReached,
                     minsToGo,
-                    minsBalance);
+                    minsBalance));
             }
 
             if (batteryAdvice == BatteryAdvice.BatteryUseSpotOn)
