@@ -2938,5 +2938,17 @@ namespace CrewChiefV4.Properties {
                 this["manual_formation_double_file"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool use_verbose_responses {
+            get {
+                return ((bool)(this["use_verbose_responses"]));
+            }
+            set {
+                this["use_verbose_responses"] = value;
+            }
+        }
     }
 }

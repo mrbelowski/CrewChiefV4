@@ -20,6 +20,7 @@ namespace CrewChiefV4
         private float minimum_name_voice_recognition_confidence = UserSettings.GetUserSettings().getFloat("minimum_name_voice_recognition_confidence");
         private float minimum_voice_recognition_confidence = UserSettings.GetUserSettings().getFloat("minimum_voice_recognition_confidence");
         private Boolean disable_alternative_voice_commands = UserSettings.GetUserSettings().getBoolean("disable_alternative_voice_commands");
+        private static Boolean use_verbose_responses = UserSettings.GetUserSettings().getBoolean("use_verbose_responses");
 
         private static String defaultLocale = Configuration.getSpeechRecognitionConfigOption("defaultLocale");
 
@@ -758,7 +759,7 @@ namespace CrewChiefV4
                     {
                         crewChief.audioPlayer.repeatLastMessage();
                     }
-                    else if (ResultContains(e.Result.Text, MORE_INFO) && this.lastRecognisedText != null)
+                    else if (ResultContains(e.Result.Text, MORE_INFO) && this.lastRecognisedText != null && !use_verbose_responses)
                     {
                         AbstractEvent abstractEvent = getEventForSpeech(this.lastRecognisedText);
                         if (abstractEvent != null)
@@ -773,6 +774,12 @@ namespace CrewChiefV4
                         if (abstractEvent != null)
                         {
                             abstractEvent.respond(e.Result.Text);
+
+                            if (use_verbose_responses)
+                            {
+                                // In verbose mode, always respond with more info.
+                                abstractEvent.respondMoreInformation(this.lastRecognisedText);
+                            }
                         }
                     }
                 }

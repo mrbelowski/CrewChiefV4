@@ -487,6 +487,9 @@ get_damage_report = Report car damage
 disable_alternative_voice_commands = Disable alternative voice commands
 disable_alternative_voice_commands_help = Experimental: If enabled, CC will only use the first item from each voice command set - may improve recognition accuracy
 
+use_verbose_responses = Use verbose command responses
+use_verbose_responses_help = If enabled, will automatically request more info for the previously recognized command
+
 toggle_pace_notes_recording = Start / stop recording pace notes
 toggle_pace_notes_playback = Start / stop playing pace notes
 
