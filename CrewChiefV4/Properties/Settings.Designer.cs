@@ -2938,5 +2938,17 @@ namespace CrewChiefV4.Properties {
                 this["manual_formation_double_file"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool save_list_of_unvocalized_names {
+            get {
+                return ((bool)(this["save_list_of_unvocalized_names"]));
+            }
+            set {
+                this["save_list_of_unvocalized_names"] = value;
+            }
+        }
     }
 }

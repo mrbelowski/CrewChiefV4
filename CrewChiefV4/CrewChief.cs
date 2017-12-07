@@ -900,6 +900,10 @@ namespace CrewChiefV4
                     //ignore
                 }
             }
+            if (SoundCache.dumpListOfUnvocalizedNames)
+            {
+                DriverNameHelper.dumpUnvocalizedNames();
+            }
             mapped = false;
 
             return true;
