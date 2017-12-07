@@ -59,7 +59,7 @@ namespace CrewChiefV4.GameState
 
         public static void UpdateFromCarClass(CarData.CarClass carClass) 
         {
-            useAmericanTerms = carClass.useAmericanTerms | defaultToAmericanTerms;
+            useAmericanTerms = carClass.useAmericanTerms || defaultToAmericanTerms;
             useHundredths = (realisticMode && carClass.timesInHundredths) || alwaysUseHundredths;
             enabledMessageTypes.Clear();
             if (realisticMode && carClass.enabledMessageTypes != null && carClass.enabledMessageTypes.Length > 0)

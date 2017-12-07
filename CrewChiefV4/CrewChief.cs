@@ -571,7 +571,7 @@ namespace CrewChiefV4
             spotterIsRunning = false;
         }
 
-        public GridSide getGridSide()
+        public Tuple<GridSide, Dictionary<int, GridSide>> getGridSide()
         {
             return this.spotter.getGridSide(this.latestRawGameData);
         }
@@ -904,6 +904,10 @@ namespace CrewChiefV4
                 {
                     //ignore
                 }
+            }
+            if (SoundCache.dumpListOfUnvocalizedNames)
+            {
+                DriverNameHelper.dumpUnvocalizedNames();
             }
             mapped = false;
 

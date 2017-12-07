@@ -11,6 +11,8 @@ namespace CrewChiefV4
 {
     class DriverNameHelper
     {
+        public static HashSet<String> unvocalizedNames = new HashSet<string>();
+
         // if there's more than 2 names, and the second to last name isn't one of the common middle bits, 
         // use the last part
         private static Boolean optimisticSurnameExtraction = true;
@@ -277,6 +279,53 @@ namespace CrewChiefV4
                 }
             }
             return trimmedList.ToArray();
+        }
+
+        public static void dumpUnvocalizedNames()
+        {
+            HashSet<String> existingNamesInFile = getNamesAlreadyInFile(getUnvocalizedDriverNamesFileLocation());
+            existingNamesInFile.UnionWith(unvocalizedNames);
+            List<String> namesToAdd = new List<String>(existingNamesInFile);
+            namesToAdd.Sort();
+            TextWriter tw = new StreamWriter(getUnvocalizedDriverNamesFileLocation(), false);
+            foreach (String name in namesToAdd)
+            {
+                tw.WriteLine(name);
+            }
+            tw.Close();
+        }
+
+        private static HashSet<String> getNamesAlreadyInFile(String fullFilePath)
+        {
+            HashSet<String> names = new HashSet<string>();
+            StreamReader file = null;
+            try
+            {
+                file = new StreamReader(fullFilePath);
+                String line;
+                while ((line = file.ReadLine()) != null)
+                {
+                    names.Add(line.Trim());
+                }
+            }
+            catch (Exception e)
+            {
+                // ignore - file doesn't exist so it'll be created
+            }
+            finally
+            {
+                if (file != null)
+                {
+                    file.Close();
+                }
+            }
+            return names;
+        }
+
+        private static String getUnvocalizedDriverNamesFileLocation()
+        {
+            return System.IO.Path.Combine(Environment.GetFolderPath(
+                Environment.SpecialFolder.MyDocuments), "CrewChiefV4", "unvocalized_driver_names.txt");
         }
     }
 }
