@@ -173,7 +173,7 @@ One final point. If the app says "Jim is faster than you", let him through :)
 
 Changelog
 ---------
-Version 4.8.2.7: Experimental support for double-file manual rolling starts (R3E, pCARS2 & AC only); fixed arrow keys and some other keys not being released when used in command macros; iRacing rally cross fixes; some internal fixes
+Version 4.8.2.7: Experimental support for double-file manual rolling starts (R3E, pCARS2 & AC only - enable with "Manual formation lap double-file start" property); fixed arrow keys and some other keys not being released when used in command macros; iRacing rally cross fixes; more Formula E battery tracking logic and messages; split some longer voice command responses so if you want to hear more, you have to ask ("more information" / "more info" / "clarify"); added missing RF1 / AMS blue flag override ("Enable AMS / rF1 blue on slower" property); some internal fixes
 
 Version 4.8.2.6: Fixed some nAudio bugs that meant the radio beeps were being sent to the wrong audio device; added Hong Kong track mappings (RF2 Formula E pack); fixed tyre temperature thresholds on some R3E car classes; added voice command to get player incident count ("how many incidents do I have" / "what's my incident count") and session incident limit ("what's the incident limit") - iRacing only; added voice command to get player licence ("what's my licence class") and iRating ("whats my iRating") - iRacing only; added voice command to get opponent licence ("what's [the guy in front's / the leader's / p10's / Bob's] licence class") and iRating ("what's [the guy in front's / the leader's / p10's / Bob's] iRating") - iRacing only; battery monitoring bug fixes
 
