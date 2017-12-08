@@ -26,6 +26,8 @@ namespace CrewChiefV4.rFactor1
         private float wornOutTyreWearPercent = 85f;
 
         private Boolean enablePitWindowHack = UserSettings.GetUserSettings().getBoolean("enable_ams_pit_schedule_messages");
+        private readonly bool enableBlueOnSlower = UserSettings.GetUserSettings().getBoolean("enable_ams_blue_on_slower");
+
         private bool incrementCutTrackCountWhenLeavingRacingSurface = true;
 
         private List<CornerData.EnumWithThresholds> brakeTempThresholdsForPlayersCar = null;
@@ -988,7 +990,8 @@ namespace CrewChiefV4.rFactor1
             // --------------------------------
             // flags data
             FlagEnum Flag = FlagEnum.UNKNOWN;
-            if (!currentGameState.FlagData.isFullCourseYellow)  // Don't announce blue on slower under FCY.
+            if (this.enableBlueOnSlower
+                && !currentGameState.FlagData.isFullCourseYellow)  // Don't announce blue on slower under FCY.
             {
                 foreach (var opponent in currentGameState.OpponentData.Values)
                 {
@@ -1001,7 +1004,7 @@ namespace CrewChiefV4.rFactor1
 
                     if (opponent.getCurrentLapData().InLap
                         || opponent.getCurrentLapData().OutLap
-                        || opponent.Position > currentGameState.SessionData.Position)
+                        || opponent.Position + 2 > currentGameState.SessionData.Position)   // ignore blue if this opponent is directly ahead of us in the race
                     {
                         continue;
                     }
