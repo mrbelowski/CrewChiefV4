@@ -2950,7 +2950,7 @@ namespace CrewChiefV4.Properties {
                 this["use_verbose_responses"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
@@ -2960,6 +2960,18 @@ namespace CrewChiefV4.Properties {
             }
             set {
                 this["save_list_of_unvocalized_names"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool enable_ams_blue_on_slower {
+            get {
+                return ((bool)(this["enable_ams_blue_on_slower"]));
+            }
+            set {
+                this["enable_ams_blue_on_slower"] = value;
             }
         }
     }
