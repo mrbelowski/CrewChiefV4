@@ -26,6 +26,8 @@ namespace CrewChiefV4.Events
         public static String folderManualStartInitialOutroWithDriverName2 = "lap_counter/until_start_line";
         public static String folderManualStartRejoinAtBack = "lap_counter/rejoin_at_back";
         public static String folderManualStartFormUpBehind = "lap_counter/form_up_behind";
+        public static String folderManualStartStartingOnLeftBehind = "lap_counter/starting_in_left_lane_behind";
+        public static String folderManualStartStartingOnRightBehind = "lap_counter/starting_in_right_lane_behind";
 
         // toggle / request acknowledgements when enabling / disabling manual formation lap mode
         public static String folderManualFormationLapModeEnabled = "lap_counter/manual_formation_lap_mode_enabled";
@@ -628,16 +630,14 @@ namespace CrewChiefV4.Events
                 if (manualFormationDoubleFile && gridSide == GridSide.LEFT)
                 {
                     messageContentsWithName = MessageContents(folderManualStartInitialIntro,
-                            Position.folderStub + currentGameState.SessionData.Position, folderManualStartInitialOutroWithDriverName1,
-                            opponentToLineUpBehind, folderManualStartInitialOutroWithDriverName2, FrozenOrderMonitor.folderInTheLeftColumn);
+                            Position.folderStub + currentGameState.SessionData.Position, folderManualStartStartingOnLeftBehind, opponentToLineUpBehind);
                     messageContentsNoName = MessageContents(folderManualStartInitialIntro,
                             Position.folderStub + currentGameState.SessionData.Position, FrozenOrderMonitor.folderInTheLeftColumn, folderManualStartInitialOutroNoDriverName);
                 }
                 else if (manualFormationDoubleFile && gridSide == GridSide.RIGHT)
                 {
                     messageContentsWithName = MessageContents(folderManualStartInitialIntro,
-                            Position.folderStub + currentGameState.SessionData.Position, folderManualStartInitialOutroWithDriverName1,
-                            opponentToLineUpBehind, folderManualStartInitialOutroWithDriverName2, FrozenOrderMonitor.folderInTheRightColumn);
+                            Position.folderStub + currentGameState.SessionData.Position, folderManualStartStartingOnRightBehind, opponentToLineUpBehind);
                     messageContentsNoName = MessageContents(folderManualStartInitialIntro,
                             Position.folderStub + currentGameState.SessionData.Position, FrozenOrderMonitor.folderInTheRightColumn, folderManualStartInitialOutroNoDriverName);
                 }
