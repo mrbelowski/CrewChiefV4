@@ -45,6 +45,9 @@ namespace CrewChiefV4.Events
         private const string folderIncreaseUseEasilyMakeHalfDistance = "battery/increase_battery_use_easily_make_half_distance";
         private const string folderWontMakeEndWoPit = "battery/wont_make_end_without_pitstop";
         private const string folderWontMakeHalfDistanceWoPit = "battery/wont_make_half_distance_without_pitstop";
+        private const string folderWeWillGetAnother = "battery/we_will_get_another";
+        private const string folderLaps = "battery/laps";
+        private const string folderMinutes = "battery/minutes";
 
         class BatteryStatsEntry
         {
@@ -809,6 +812,19 @@ namespace CrewChiefV4.Events
 
             if (this.sessionHasFixedNumberOfLaps && this.averageUsagePerLap > 0.0f)
             {
+                // if we've already read something about the battery, use a different phrasing here
+                String introSound;
+                String outroSound;
+                if (haveData)
+                {
+                    introSound = Battery.folderWeWillGetAnother;
+                    outroSound = Battery.folderLaps;
+                }
+                else
+                {
+                    introSound = Battery.folderWeEstimate;
+                    outroSound = Battery.folderLapsRemaining;
+                }
                 haveData = true;
                 var lapsOfBatteryChargeLeft = (int)Math.Floor(this.windowedAverageChargeLeft / this.averageUsagePerLap);
                 if (lapsOfBatteryChargeLeft < 0)
@@ -821,14 +837,27 @@ namespace CrewChiefV4.Events
                 else
                 {
                     var messageFragments = new List<MessageFragment>();
-                    messageFragments.Add(MessageFragment.Text(Battery.folderWeEstimate));
+                    messageFragments.Add(MessageFragment.Text(introSound));
                     messageFragments.Add(MessageFragment.Integer(lapsOfBatteryChargeLeft, false));
-                    messageFragments.Add(MessageFragment.Text(Battery.folderLapsRemaining));
+                    messageFragments.Add(MessageFragment.Text(outroSound));
                     this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/estimate", messageFragments, 0, null));
                 }
             }
             else if (this.averageUsagePerMinute > 0.0f) // Timed race.
             {
+                // if we've already read something about the battery, use a different phrasing here
+                String introSound;
+                String outroSound;
+                if (haveData)
+                {
+                    introSound = Battery.folderWeWillGetAnother;
+                    outroSound = Battery.folderMinutes;
+                }
+                else
+                {
+                    introSound = Battery.folderWeEstimate;
+                    outroSound = Battery.folderMinutesRemaining;
+                }
                 haveData = true;
                 var minutesOfBatteryChargeLeft = (int)Math.Floor(windowedAverageChargeLeft / this.averageUsagePerMinute);
                 if (minutesOfBatteryChargeLeft < 0)
@@ -841,9 +870,9 @@ namespace CrewChiefV4.Events
                 else
                 {
                     var messageFragments = new List<MessageFragment>();
-                    messageFragments.Add(MessageFragment.Text(Battery.folderWeEstimate));
+                    messageFragments.Add(MessageFragment.Text(introSound));
                     messageFragments.Add(MessageFragment.Integer(minutesOfBatteryChargeLeft, false));
-                    messageFragments.Add(MessageFragment.Text(Battery.folderMinutesRemaining));
+                    messageFragments.Add(MessageFragment.Text(outroSound));
                     this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/estimate", messageFragments, 0, null));
                 }
             }
