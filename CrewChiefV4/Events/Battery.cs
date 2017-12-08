@@ -971,14 +971,14 @@ namespace CrewChiefV4.Events
                         && this.windowedAverageChargeLeft > 70.0f;  // 70% or above charge.
                 }
 
-                var minsToGo = midRaceReached
+                var minsToGo = (midRaceReached
                     ? this.sessionTotalRunTime - this.sessionRunningTime
-                    : this.halfTime - this.sessionRunningTime;
+                    : this.halfTime - this.sessionRunningTime) / 60.0f;
 
                 Debug.Assert(minsToGo >= 0);
 
                 var minsBalance = minutesOfBatteryChargeLeft - minsToGo;
-                if (minsBalance >= 0 || minsBalance <= 2)
+                if (minsBalance >= 0 && minsBalance <= 2)
                     batteryAdvice = BatteryAdvice.BatteryUseSpotOn;
                 else if (minsBalance > 2)
                     batteryAdvice = BatteryAdvice.IncreaseBatteryUse;
