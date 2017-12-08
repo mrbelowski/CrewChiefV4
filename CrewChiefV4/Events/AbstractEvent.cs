@@ -179,7 +179,7 @@ namespace CrewChiefV4.Events
 
         public virtual void respondMoreInformation(String voiceMessage)
         {
-            // no-op, override in the subclasses
+            audioPlayer.playMessageImmediately(new QueuedMessage("no_more_information", MessageContents(AudioPlayer.folderNoMoreData), 0, this));
         }
 
         public void setPearlsOfWisdom(PearlsOfWisdom pearlsOfWisdom)

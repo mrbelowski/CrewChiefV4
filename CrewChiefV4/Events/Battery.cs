@@ -874,7 +874,10 @@ namespace CrewChiefV4.Events
             if (!this.initialized
                 || this.windowedAverageChargeLeft < 0.0f
                 || this.numBatteryStatsEntries < 3)
+            {
+                base.respondMoreInformation("");
                 return;
+            }
 
             // Report usage trend:
             var bu = this.EvaluateBatteryUse();
