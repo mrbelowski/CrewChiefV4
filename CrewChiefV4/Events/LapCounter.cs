@@ -25,6 +25,7 @@ namespace CrewChiefV4.Events
         public static String folderManualStartInitialOutroWithDriverName1 = "lap_counter/hold_position_behind";
         public static String folderManualStartInitialOutroWithDriverName2 = "lap_counter/until_start_line";
         public static String folderManualStartRejoinAtBack = "lap_counter/rejoin_at_back";
+        public static String folderManualStartFormUpBehind = "lap_counter/form_up_behind";
 
         // toggle / request acknowledgements when enabling / disabling manual formation lap mode
         public static String folderManualFormationLapModeEnabled = "lap_counter/manual_formation_lap_mode_enabled";
@@ -604,12 +605,13 @@ namespace CrewChiefV4.Events
             List<MessageFragment> messageContentsWithName;
             List<MessageFragment> messageContentsNoName;
 
+            OpponentData opponentToLineUpBehind = getOpponent(currentGameState, manualStartOpponentToFollow);
             if (manualFormationGoWhenLeaderCrossesLine)
             {
                 // go when leader crosses line, so make sure we don't say "hold position until the start line"
                 messageContentsWithName = MessageContents(folderManualStartInitialIntro,
                         Position.folderStub + currentGameState.SessionData.Position, folderManualStartInitialOutroWithDriverName1,
-                        getOpponent(currentGameState, manualStartOpponentToFollow));
+                        opponentToLineUpBehind);
                 messageContentsNoName = MessageContents(folderManualStartInitialIntro,
                         Position.folderStub + currentGameState.SessionData.Position, folderHoldYourPosition);
                 if (manualFormationDoubleFile && gridSide == GridSide.LEFT)
@@ -627,7 +629,7 @@ namespace CrewChiefV4.Events
                 {
                     messageContentsWithName = MessageContents(folderManualStartInitialIntro,
                             Position.folderStub + currentGameState.SessionData.Position, folderManualStartInitialOutroWithDriverName1,
-                            getOpponent(currentGameState, manualStartOpponentToFollow), FrozenOrderMonitor.folderInTheLeftColumn, folderManualStartInitialOutroWithDriverName2);
+                            opponentToLineUpBehind, folderManualStartInitialOutroWithDriverName2, FrozenOrderMonitor.folderInTheLeftColumn);
                     messageContentsNoName = MessageContents(folderManualStartInitialIntro,
                             Position.folderStub + currentGameState.SessionData.Position, FrozenOrderMonitor.folderInTheLeftColumn, folderManualStartInitialOutroNoDriverName);
                 }
@@ -635,7 +637,7 @@ namespace CrewChiefV4.Events
                 {
                     messageContentsWithName = MessageContents(folderManualStartInitialIntro,
                             Position.folderStub + currentGameState.SessionData.Position, folderManualStartInitialOutroWithDriverName1,
-                            getOpponent(currentGameState, manualStartOpponentToFollow), FrozenOrderMonitor.folderInTheRightColumn, folderManualStartInitialOutroWithDriverName2);
+                            opponentToLineUpBehind, folderManualStartInitialOutroWithDriverName2, FrozenOrderMonitor.folderInTheRightColumn);
                     messageContentsNoName = MessageContents(folderManualStartInitialIntro,
                             Position.folderStub + currentGameState.SessionData.Position, FrozenOrderMonitor.folderInTheRightColumn, folderManualStartInitialOutroNoDriverName);
                 }
@@ -643,12 +645,19 @@ namespace CrewChiefV4.Events
                 {
                     messageContentsWithName = MessageContents(folderManualStartInitialIntro,
                             Position.folderStub + currentGameState.SessionData.Position, folderManualStartInitialOutroWithDriverName1,
-                            getOpponent(currentGameState, manualStartOpponentToFollow), folderManualStartInitialOutroWithDriverName2);
+                            opponentToLineUpBehind, folderManualStartInitialOutroWithDriverName2);
                     messageContentsNoName = MessageContents(folderManualStartInitialIntro,
                             Position.folderStub + currentGameState.SessionData.Position, folderManualStartInitialOutroNoDriverName);
                 }
             }
-            audioPlayer.playMessage(new QueuedMessage("manual_start_intro", messageContentsWithName, messageContentsNoName, 0, this));
+            if (opponentToLineUpBehind == null)
+            {
+                audioPlayer.playMessage(new QueuedMessage("manual_start_intro", messageContentsNoName, 0, this));
+            }
+            else
+            {
+                audioPlayer.playMessage(new QueuedMessage("manual_start_intro", messageContentsWithName, messageContentsNoName, 0, this));
+            }
             playedManualStartInitialMessage = true;
         }
 
@@ -727,18 +736,17 @@ namespace CrewChiefV4.Events
                 // which will force the audio player to use the secondary message
                 List<MessageFragment> messageContentsWithName = null;
                 List<MessageFragment> messageContentsNoName = null;
+                OpponentData opponentToLineUpBehind = getOpponent(currentGameState, manualStartOpponentToFollow);
                 if (manualFormationGoWhenLeaderCrossesLine)
                 {
                     if (gridSide == GridSide.LEFT)
                     {
-                        messageContentsWithName = MessageContents(folderManualStartInitialOutroWithDriverName1,
-                                getOpponent(currentGameState, manualStartOpponentToFollow), FrozenOrderMonitor.folderInTheLeftColumn);
+                        messageContentsWithName = MessageContents(folderManualStartFormUpBehind, opponentToLineUpBehind, FrozenOrderMonitor.folderInTheLeftColumn);
                         messageContentsNoName = MessageContents(folderHoldYourPosition, FrozenOrderMonitor.folderInTheLeftColumn);
                     }
                     else
                     {
-                        messageContentsWithName = MessageContents(folderManualStartInitialOutroWithDriverName1,
-                                getOpponent(currentGameState, manualStartOpponentToFollow), FrozenOrderMonitor.folderInTheRightColumn);
+                        messageContentsWithName = MessageContents(folderManualStartFormUpBehind, opponentToLineUpBehind, FrozenOrderMonitor.folderInTheRightColumn);
                         messageContentsNoName = MessageContents(folderHoldYourPosition, FrozenOrderMonitor.folderInTheRightColumn);
                     }
                 }
@@ -746,18 +754,25 @@ namespace CrewChiefV4.Events
                 {
                     if (gridSide == GridSide.LEFT)
                     {
-                        messageContentsWithName = MessageContents(folderManualStartInitialOutroWithDriverName1,
-                                getOpponent(currentGameState, manualStartOpponentToFollow), FrozenOrderMonitor.folderInTheLeftColumn, folderManualStartInitialOutroWithDriverName2);
+                        messageContentsWithName = MessageContents(folderManualStartFormUpBehind, opponentToLineUpBehind,
+                            FrozenOrderMonitor.folderInTheLeftColumn);
                         messageContentsNoName = MessageContents(folderManualStartInitialOutroNoDriverName, FrozenOrderMonitor.folderInTheLeftColumn);
                     }
                     else
                     {
-                        messageContentsWithName = MessageContents(folderManualStartInitialOutroWithDriverName1,
-                                getOpponent(currentGameState, manualStartOpponentToFollow), FrozenOrderMonitor.folderInTheRightColumn, folderManualStartInitialOutroWithDriverName2);
+                        messageContentsWithName = MessageContents(folderManualStartFormUpBehind, opponentToLineUpBehind,
+                            FrozenOrderMonitor.folderInTheRightColumn);
                         messageContentsNoName = MessageContents(folderManualStartInitialOutroNoDriverName, FrozenOrderMonitor.folderInTheRightColumn);
                     }
                 }
-                audioPlayer.playMessage(new QueuedMessage("manual_start_double_file_reminder", messageContentsWithName, messageContentsNoName, 0, this));
+                if (opponentToLineUpBehind == null)
+                {
+                    audioPlayer.playMessage(new QueuedMessage("manual_start_double_file_reminder", messageContentsNoName, 0, this));
+                }
+                else
+                {
+                    audioPlayer.playMessage(new QueuedMessage("manual_start_double_file_reminder", messageContentsWithName, messageContentsNoName, 0, this));
+                }
             }
         }
 
