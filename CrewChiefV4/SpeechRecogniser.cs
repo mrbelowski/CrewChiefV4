@@ -764,7 +764,7 @@ namespace CrewChiefV4
                         AbstractEvent abstractEvent = getEventForSpeech(this.lastRecognisedText);
                         if (abstractEvent != null)
                         {
-                            abstractEvent.respondMoreInformation(this.lastRecognisedText);
+                            abstractEvent.respondMoreInformation(this.lastRecognisedText, true);
                         }
                     }
                     else
@@ -778,7 +778,7 @@ namespace CrewChiefV4
                             if (use_verbose_responses)
                             {
                                 // In verbose mode, always respond with more info.
-                                abstractEvent.respondMoreInformation(this.lastRecognisedText);
+                                abstractEvent.respondMoreInformation(this.lastRecognisedText, false);
                             }
                         }
                     }

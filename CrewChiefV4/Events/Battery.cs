@@ -875,7 +875,8 @@ namespace CrewChiefV4.Events
                 || this.windowedAverageChargeLeft < 0.0f
                 || this.numBatteryStatsEntries < 3)
             {
-                base.respondMoreInformation("");
+                // play the more-information equivalent of 'no data'
+                base.respondMoreInformation("", true);
                 return;
             }
 
