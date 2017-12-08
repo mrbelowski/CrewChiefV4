@@ -129,6 +129,11 @@ namespace CrewChiefV4.Events
             this.audioPlayer = audioPlayer;
         }
 
+        public override List<SessionPhase> applicableSessionPhases
+        {
+            get { return new List<SessionPhase> { SessionPhase.Green, SessionPhase.Countdown, SessionPhase.FullCourseYellow }; }
+        }
+
         public override void clearState()
         {
             this.initialized = false;
