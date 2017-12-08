@@ -525,3 +525,6 @@ manual_formation_double_file_help = Assume manual formation lap starts use 2 lin
 
 save_list_of_unvocalized_names = Save driver names with no sound
 save_list_of_unvocalized_names_help = Write unvocalized driver names to file
+
+enable_ams_blue_on_slower = Enable AMS / rF1 blue on slower
+enable_ams_blue_on_slower_help = Play 'Blue Flag' messages if car behind seems to be faster.  Useful in multi-class races
