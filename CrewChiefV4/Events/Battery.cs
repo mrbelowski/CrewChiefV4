@@ -691,7 +691,7 @@ namespace CrewChiefV4.Events
             }
         }
 
-        public override void respondMoreInformation(String voiceMessage)
+        public override void respondMoreInformation(String voiceMessage, Boolean requestedExplicitly)
         {
             if (!GlobalBehaviourSettings.enabledMessageTypes.Contains(MessageTypes.BATTERY))
             {
@@ -704,7 +704,7 @@ namespace CrewChiefV4.Events
                 SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.CAR_STATUS) ||
                 SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.STATUS))
             {
-                this.reportExtendedBatteryStatus(SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOWS_MY_BATTERY));
+                this.reportExtendedBatteryStatus(SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOWS_MY_BATTERY), requestedExplicitly);
             }
         }
 
@@ -860,7 +860,7 @@ namespace CrewChiefV4.Events
             IncreaseBatteryUse,
         }
 
-        public void reportExtendedBatteryStatus(Boolean allowNoDataMessage)
+        public void reportExtendedBatteryStatus(Boolean allowNoDataMessage, Boolean requestedExplicitly)
         {
             if (!GlobalBehaviourSettings.enabledMessageTypes.Contains(MessageTypes.BATTERY))
             {
@@ -876,7 +876,7 @@ namespace CrewChiefV4.Events
                 || this.numBatteryStatsEntries < 3)
             {
                 // play the more-information equivalent of 'no data'
-                base.respondMoreInformation("", true);
+                base.respondMoreInformation("", requestedExplicitly);
                 return;
             }
 
