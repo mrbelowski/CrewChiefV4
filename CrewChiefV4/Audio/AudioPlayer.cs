@@ -37,6 +37,7 @@ namespace CrewChiefV4.Audio
         public static String folderAcknowlegeDisableKeepQuiet = "acknowledge/keepQuietDisabled";
         public static String folderDidntUnderstand = "acknowledge/didnt_understand";
         public static String folderNoData = "acknowledge/no_data";
+        public static String folderNoMoreData = "acknowledge/no_more_data";
         public static String folderYes = "acknowledge/yes";
         public static String folderNo = "acknowledge/no";
         public static String folderDeltasEnabled = "acknowledge/deltasEnabled";
