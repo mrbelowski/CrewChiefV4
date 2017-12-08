@@ -297,7 +297,7 @@ namespace CrewChiefV4
                 ((Battery)eventsList["Battery"]).reportBatteryStatus(true);
                 if (useVerboseResponses)
                 {
-                    ((Battery)eventsList["Battery"]).reportExtendedBatteryStatus(true);
+                    ((Battery)eventsList["Battery"]).reportExtendedBatteryStatus(true, false);
                 }
             }
             else
