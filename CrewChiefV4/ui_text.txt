@@ -289,6 +289,12 @@ pcars2_launch_params = pCARS 2 launch params
 pcars2_launch_params_help = This is used to tell Steam what app to run - pCARS 2's Steam app ID is 378860. If you specified a path pCARS2AVX.exe you can leave this blank
 launch_pcars2 = Launch pCARS 2
 launch_pcars2_help = If this is true the application will attempt to launch pCARS 2 when CrewChief starts (when you click 'Start application' or the app auto starts CrewChief if you set run_immediately to true)
+iracing_launch_exe = iRacing launch exe
+iracing_launch_exe_help = This is the location of Steam.exe or the direct path to iRacingSim64DX11.exe. Use forward slashes to separate paths.
+iracing_launch_params = iRacing launch params
+iracing_launch_params_help = This is used to tell Steam what app to run - iRacing's Steam app ID is 378860. If you specified a path iRacingSim64DX11.exe you can leave this blank
+launch_iracing = Launch iRacing
+launch_iracing_help = If this is true the application will attempt to launch iRacing when CrewChief starts (when you click 'Start application' or the app auto starts CrewChief if you set run_immediately to true)
 
 run_immediately = Run immediately
 run_immediately_help = If this is true the application will start running CrewChief as soon as you start it up, using whatever options you previously set

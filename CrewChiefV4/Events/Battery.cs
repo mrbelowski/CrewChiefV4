@@ -813,19 +813,11 @@ namespace CrewChiefV4.Events
             if (this.sessionHasFixedNumberOfLaps && this.averageUsagePerLap > 0.0f)
             {
                 // if we've already read something about the battery, use a different phrasing here
-                String introSound;
-                String outroSound;
-                if (haveData)
-                {
-                    introSound = Battery.folderWeWillGetAnother;
-                    outroSound = Battery.folderLaps;
-                }
-                else
-                {
-                    introSound = Battery.folderWeEstimate;
-                    outroSound = Battery.folderLapsRemaining;
-                }
+                var introSound = haveData ? Battery.folderWeWillGetAnother : Battery.folderWeEstimate;
+                var outroSound = haveData ? Battery.folderLaps : Battery.folderLapsRemaining;
+
                 haveData = true;
+
                 var lapsOfBatteryChargeLeft = (int)Math.Floor(this.windowedAverageChargeLeft / this.averageUsagePerLap);
                 if (lapsOfBatteryChargeLeft < 0)
                 {
@@ -846,19 +838,11 @@ namespace CrewChiefV4.Events
             else if (this.averageUsagePerMinute > 0.0f) // Timed race.
             {
                 // if we've already read something about the battery, use a different phrasing here
-                String introSound;
-                String outroSound;
-                if (haveData)
-                {
-                    introSound = Battery.folderWeWillGetAnother;
-                    outroSound = Battery.folderMinutes;
-                }
-                else
-                {
-                    introSound = Battery.folderWeEstimate;
-                    outroSound = Battery.folderMinutesRemaining;
-                }
+                var introSound = haveData ? Battery.folderWeWillGetAnother : Battery.folderWeEstimate;
+                var outroSound = haveData ? Battery.folderMinutes : Battery.folderMinutesRemaining;
+
                 haveData = true;
+
                 var minutesOfBatteryChargeLeft = (int)Math.Floor(windowedAverageChargeLeft / this.averageUsagePerMinute);
                 if (minutesOfBatteryChargeLeft < 0)
                 {
