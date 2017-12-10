@@ -85,6 +85,11 @@ namespace CrewChiefV4.Events
             this.playedLastIncidentsLeftWarning = false;
         }
 
+        public override List<SessionPhase> applicableSessionPhases
+        {
+            get { return new List<SessionPhase> { SessionPhase.Green, SessionPhase.Countdown, SessionPhase.FullCourseYellow }; }
+        }
+
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
             lastColdFLPressure = (int)currentGameState.TyreData.FrontLeftPressure;
