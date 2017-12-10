@@ -83,7 +83,7 @@ namespace CrewChiefV4.Events
             if (currentGameState.PitData.IsAtPitExit && currentGameState.PositionAndMotionData.CarSpeed > 5)
             {
                 // we've just been handed control back after a pitstop
-                if (isOpponentApproachingPitExit(currentGameState))
+                if (currentGameState.SessionData.SessionRunningTime > 30 && isOpponentApproachingPitExit(currentGameState))
                 {
                     // we've exited into clean air
                     audioPlayer.playMessage(new QueuedMessage(folderTrafficBehindExitingPits, 0, this));
@@ -127,7 +127,8 @@ namespace CrewChiefV4.Events
             if(currentGameState.PositionAndMotionData.CarSpeed > 5 && isOpponentLeavingPits(currentGameState))
             {
                 //This needs another message just using it for testing
-                audioPlayer.playMessage(new QueuedMessage(folderTrafficBehindExitingPits, 0, this));
+                // JB: oh dear, this has been in the live release for ages:
+                // audioPlayer.playMessage(new QueuedMessage(folderTrafficBehindExitingPits, 0, this));
             }
 
         }
