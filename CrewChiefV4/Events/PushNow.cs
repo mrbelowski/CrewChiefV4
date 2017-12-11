@@ -24,6 +24,7 @@ namespace CrewChiefV4.Events
 
         private String folderPushExitingPits = "push_now/pits_exit_clear";
         private String folderTrafficBehindExitingPits = "push_now/pits_exit_traffic_behind";
+        private String folderOpponentExitingPits = "push_now/opponent_exiting_pits";
 
         public static String folderQualExitIntro = "push_now/we_have";
         public static String folderQualExitOutroMinutes = "push_now/minutes_to_set_a_lap";
@@ -36,6 +37,9 @@ namespace CrewChiefV4.Events
         private Boolean playedQualExitMessage = false;
         private float minTimeToBeInThisPosition = 60;
 
+        private float distanceBeforeStartLineToWarnOfPitExit = 100;
+        private float maxSpeedWhenCrossingLine = 0;
+
         public PushNow(AudioPlayer audioPlayer)
         {
             this.audioPlayer = audioPlayer;
@@ -46,6 +50,8 @@ namespace CrewChiefV4.Events
             playedNearEndTimePush = false;
             playedNearEndLapsPush = false;
             playedQualExitMessage = false;
+            maxSpeedWhenCrossingLine = 0;
+            distanceBeforeStartLineToWarnOfPitExit = 100;
         }
 
         public override List<SessionType> applicableSessionTypes
@@ -58,6 +64,14 @@ namespace CrewChiefV4.Events
             if (GameStateData.onManualFormationLap)
             {
                 return;
+            }
+            if (currentGameState.SessionData.IsNewLap && currentGameState.PositionAndMotionData.CarSpeed > maxSpeedWhenCrossingLine)
+            {
+                maxSpeedWhenCrossingLine = currentGameState.PositionAndMotionData.CarSpeed;
+                // the distance at which we check if there's a car exiting the pits will be speed dependent. 
+                // The faster we are over the line, the more notice we'll need. * 2 is a number I pulled out of my arse,
+                // it may be shit.
+                distanceBeforeStartLineToWarnOfPitExit = maxSpeedWhenCrossingLine * 2;
             }
             Boolean checkPushToGain = currentGameState.SessionData.SessionRunningTime - currentGameState.SessionData.GameTimeAtLastPositionFrontChange < minTimeToBeInThisPosition;
             Boolean checkPushToHold = currentGameState.SessionData.SessionRunningTime - currentGameState.SessionData.GameTimeAtLastPositionBehindChange < minTimeToBeInThisPosition;
@@ -124,13 +138,24 @@ namespace CrewChiefV4.Events
                     }
                 }
             }
-            if(currentGameState.PositionAndMotionData.CarSpeed > 5 && isOpponentLeavingPits(currentGameState))
+            if (previousGameState != null &&
+                currentGameState.SessionData.SectorNumber == 3 &&
+                currentGameState.PositionAndMotionData.CarSpeed > 5 && 
+                !currentGameState.PitData.InPitlane && 
+                isApproachingStartLine(currentGameState.SessionData.TrackDefinition, previousGameState.PositionAndMotionData.DistanceRoundTrack, currentGameState.PositionAndMotionData.DistanceRoundTrack) &&
+                isOpponentLeavingPits(currentGameState))
             {
-                //This needs another message just using it for testing
-                // JB: oh dear, this has been in the live release for ages:
-                // audioPlayer.playMessage(new QueuedMessage(folderTrafficBehindExitingPits, 0, this));
+                audioPlayer.playMessage(new QueuedMessage(folderOpponentExitingPits, 0, this));
             }
+        }
 
+        private Boolean isApproachingStartLine(TrackDefinition track, float previousLapDistance, float currentLapDistance)
+        {
+            if (track == null) {
+                return false;
+            }
+            float checkPoint = track.trackLength - distanceBeforeStartLineToWarnOfPitExit;
+            return previousLapDistance < checkPoint && currentLapDistance > checkPoint; 
         }
 
         private Boolean isOpponentApproachingPitExit(GameStateData currentGameState)
@@ -186,14 +211,13 @@ namespace CrewChiefV4.Events
             // games with sane lap distance data when pitting
             foreach (KeyValuePair<string, OpponentData> opponent in currentGameState.OpponentData)
             {
-                if (opponent.Value.Speed > 0 && opponent.Value.IsAtPitExit)
+                // if the opponent car is moving at approximately the pit speed limit, is exiting the pits, 
+                // has passed the start line, warn about him. Note that this method is expected to be called
+                // when the player is approaching the start line
+                if (opponent.Value.Speed > 10 && opponent.Value.Speed < 40 && opponent.Value.InPits &&
+                    opponent.Value.isExitingPits() && opponent.Value.DistanceRoundTrack > 0 && opponent.Value.DistanceRoundTrack < 300)
                 {
-                    float signedDelta = opponent.Value.DeltaTime.GetSignedDeltaTimeOnly(currentGameState.SessionData.DeltaTime);
-
-                    if (signedDelta < 5 && signedDelta > 0)
-                    {
-                        return true;
-                    }
+                    return true;
                 }
             }
             return false;           

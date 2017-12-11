@@ -61,7 +61,7 @@ namespace CrewChiefV4
             }
             if (initialised && dumpToFile)
             {
-                filenameToDump = dataFilesPath + "\\recording_" + DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss") + ".xml";
+                filenameToDump = dataFilesPath + "\\" + CrewChief.gameDefinition.gameEnum.ToString() + "_" + DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss") + ".xml";
                 Console.WriteLine("session recording will be dumped to file: " + filenameToDump);
             }
             return initialised;
