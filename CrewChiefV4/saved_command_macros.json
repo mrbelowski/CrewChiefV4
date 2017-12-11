@@ -151,7 +151,7 @@
 		{
 			"description": "r3e version, keyPressTime quite short because of low key-repeat-delay",
 			"gameDefinition": "RACE_ROOM",
-			"actionSequence": [ "Pit Request Toggle", "Pit Menu Toggle" ],
+			"actionSequence": [ "Pit Request Toggle", "WAIT_3000", "Pit Menu Toggle" ],
 			"keyPressTime": 10,
 			"waitBetweenEachCommand": 200
 		},
@@ -189,7 +189,7 @@
 		{
 			"description": "r3e only - presses the 'confirm' button when entering the pits. The 'allowAutomaticTriggering' element below tells the app that it can execute this command set when a particular event happens - in this case, the event is crossing the pit limiter line (when playing R3E)",
 			"gameDefinition": "RACE_ROOM",
-			"actionSequence": [ "Pit Menu Select", "WAIT_1000", "Pit Menu Toggle" ],
+			"actionSequence": [ "Pit Menu Select", "WAIT_2000", "Pit Menu Toggle" ],
 			"keyPressTime": 10,
 			"waitBetweenEachCommand": 200,
 			"allowAutomaticTriggering": true
