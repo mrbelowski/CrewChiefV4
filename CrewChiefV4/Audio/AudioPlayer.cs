@@ -45,6 +45,10 @@ namespace CrewChiefV4.Audio
         public static String folderRadioCheckResponse = "acknowledge/radio_check";
         public static String folderStandBy = "acknowledge/stand_by";
 
+        private String folderRants = "rants";
+        private Boolean playedRantInThisSession = false;
+        private float rantLikelihood = 0.1f;
+
         public static Boolean useAlternateBeeps = UserSettings.GetUserSettings().getBoolean("use_alternate_beeps");
         public static float pauseBetweenMessages = UserSettings.GetUserSettings().getFloat("pause_between_messages");
 
@@ -937,6 +941,18 @@ namespace CrewChiefV4.Audio
             {
                 playMessage(queuedMessage, PearlsOfWisdom.PearlType.NONE, 0);
             }
+        }
+
+        // WIP... sometimes the chief loses his shit
+        public Boolean playRant()
+        {
+            if (sweary && !playedRantInThisSession && Utilities.random.NextDouble() < rantLikelihood)
+            {
+                playedRantInThisSession = true;
+                playMessage(new QueuedMessage(folderRants, 0, null), PearlsOfWisdom.PearlType.NONE, 0);
+                return true;
+            }
+            return false;
         }
 
         // this should only be called in response to a voice message, following a 'standby' request. We want to play the 

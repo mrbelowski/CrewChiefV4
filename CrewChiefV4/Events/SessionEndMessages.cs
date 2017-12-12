@@ -130,12 +130,18 @@ namespace CrewChiefV4.Events
                     {
                         audioPlayer.playMessage(new QueuedMessage(sessionEndMessageIdentifier, AbstractEvent.MessageContents(
                             Position.folderStub + position, folderFinishedRace), 0, null));
+                        // if it's a shit finish, maybe launch into a tirade
+                        if (position - startPosition > 10)
+                        {
+                            audioPlayer.playRant();
+                        }
                     }
                 }
                 else if (isLast)
                 {
                     audioPlayer.playMessage(new QueuedMessage(sessionEndMessageIdentifier, 
                         AbstractEvent.MessageContents(folderFinishedRaceLast), 0, null));
+                    audioPlayer.playRant();
                 }
             }
             else

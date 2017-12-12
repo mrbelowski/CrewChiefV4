@@ -193,6 +193,7 @@ namespace CrewChiefV4.Events
                     {
                         // run out of laps, an not in the pitlane
                         audioPlayer.playMessage(new QueuedMessage(folderDisqualified, 5, this));
+                        audioPlayer.playRant();
                     }
                     else if (lapsCompleted - penaltyLap == 2 && currentGameState.PenaltiesData.HasDriveThrough)
                     {
