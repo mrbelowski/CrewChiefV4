@@ -48,6 +48,7 @@ namespace CrewChiefV4.Audio
         private String folderRants = "rants";
         private Boolean playedRantInThisSession = false;
         private float rantLikelihood = 0.1f;
+        public static Boolean rantWaitingToPlay = false;
 
         public static Boolean useAlternateBeeps = UserSettings.GetUserSettings().getBoolean("use_alternate_beeps");
         public static float pauseBetweenMessages = UserSettings.GetUserSettings().getFloat("pause_between_messages");
@@ -604,6 +605,11 @@ namespace CrewChiefV4.Audio
                             willBePlayedCount--;
                         }
                     }
+                    // if we've just processed a 'rant' here, set the flag to false
+                    if (queuedMessage.isRant)
+                    {
+                        AudioPlayer.rantWaitingToPlay = false;
+                    }
                 }
                 if (firstMovableEventWithPrefixOrSuffix != null)
                 {
@@ -949,7 +955,10 @@ namespace CrewChiefV4.Audio
             if (sweary && !playedRantInThisSession && Utilities.random.NextDouble() < rantLikelihood)
             {
                 playedRantInThisSession = true;
-                playMessage(new QueuedMessage(folderRants, 0, null), PearlsOfWisdom.PearlType.NONE, 0);
+                AudioPlayer.rantWaitingToPlay = true;
+                QueuedMessage rant = new QueuedMessage(folderRants, 0, null);
+                rant.isRant = true;
+                playMessage(rant, PearlsOfWisdom.PearlType.NONE, 0);
                 return true;
             }
             return false;
