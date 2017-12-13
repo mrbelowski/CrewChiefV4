@@ -45,6 +45,12 @@ namespace CrewChiefV4.Audio
         public static String folderRadioCheckResponse = "acknowledge/radio_check";
         public static String folderStandBy = "acknowledge/stand_by";
 
+        private String folderRants = "rants/general";
+        private Boolean playedRantInThisSession = false;
+        public static Boolean rantWaitingToPlay = false;
+        public static Boolean enableRants = UserSettings.GetUserSettings().getBoolean("enable_rants");
+        private static float rantLikelihood = enableRants ? 0.1f : 0;
+
         public static Boolean useAlternateBeeps = UserSettings.GetUserSettings().getBoolean("use_alternate_beeps");
         public static float pauseBetweenMessages = UserSettings.GetUserSettings().getFloat("pause_between_messages");
 
@@ -600,6 +606,11 @@ namespace CrewChiefV4.Audio
                             willBePlayedCount--;
                         }
                     }
+                    // if we've just processed a 'rant' here, set the flag to false
+                    if (queuedMessage.isRant)
+                    {
+                        AudioPlayer.rantWaitingToPlay = false;
+                    }
                 }
                 if (firstMovableEventWithPrefixOrSuffix != null)
                 {
@@ -937,6 +948,23 @@ namespace CrewChiefV4.Audio
             {
                 playMessage(queuedMessage, PearlsOfWisdom.PearlType.NONE, 0);
             }
+        }
+
+        // WIP... sometimes the chief loses his shit
+        public Boolean playRant(String messageIdentifier)
+        {
+            if (sweary && !playedRantInThisSession && Utilities.random.NextDouble() < rantLikelihood)
+            {
+                playedRantInThisSession = true;
+                AudioPlayer.rantWaitingToPlay = true;
+                List<MessageFragment> messageContents = new List<MessageFragment>();
+                messageContents.Add(MessageFragment.Text(folderRants));
+                QueuedMessage rant = new QueuedMessage(messageIdentifier, messageContents, 0, null);
+                rant.isRant = true;
+                playMessage(rant, PearlsOfWisdom.PearlType.NONE, 0);
+                return true;
+            }
+            return false;
         }
 
         // this should only be called in response to a voice message, following a 'standby' request. We want to play the 
