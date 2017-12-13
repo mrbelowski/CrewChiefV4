@@ -49,7 +49,7 @@ namespace CrewChiefV4.Audio
         private Boolean playedRantInThisSession = false;
         public static Boolean rantWaitingToPlay = false;
         public static Boolean enableRants = UserSettings.GetUserSettings().getBoolean("enable_rants");
-        private static float rantLikelihood = enableRants ? 1f : 0;
+        private static float rantLikelihood = enableRants ? 0.1f : 0;
 
         public static Boolean useAlternateBeeps = UserSettings.GetUserSettings().getBoolean("use_alternate_beeps");
         public static float pauseBetweenMessages = UserSettings.GetUserSettings().getFloat("pause_between_messages");
