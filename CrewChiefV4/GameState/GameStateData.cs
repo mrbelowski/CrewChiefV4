@@ -2166,7 +2166,7 @@ namespace CrewChiefV4.GameState
                     }
                     else
                     {
-                        driver.Position = pos;
+                        driver.ClassPosition = pos;
                     }
                     pos++;
                 }
