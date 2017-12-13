@@ -615,7 +615,7 @@ namespace CrewChiefV4.Events
                 if (damageToReportNext.Item2 == DamageLevel.DESTROYED)
                 {
                     audioPlayer.playMessage(new QueuedMessage(folderBustedEngine, 0, this));
-                    audioPlayer.playRant();
+                    audioPlayer.playRant("damage_rant");
                 }
                 else if (damageToReportNext.Item2 == DamageLevel.MAJOR)
                 {
@@ -631,7 +631,7 @@ namespace CrewChiefV4.Events
                 if (damageToReportNext.Item2 == DamageLevel.DESTROYED)
                 {
                     audioPlayer.playMessage(new QueuedMessage(folderBustedTransmission, 0, this));
-                    audioPlayer.playRant();
+                    audioPlayer.playRant("damage_rant");
                 }
                 else if (damageToReportNext.Item2 == DamageLevel.MAJOR)
                 {
@@ -647,7 +647,7 @@ namespace CrewChiefV4.Events
                 if (damageToReportNext.Item2 == DamageLevel.DESTROYED)
                 {
                     audioPlayer.playMessage(new QueuedMessage(folderBustedSuspension, 0, this));
-                    audioPlayer.playRant();
+                    audioPlayer.playRant("damage_rant");
                 }
                 else if (damageToReportNext.Item2 == DamageLevel.MAJOR || isMissingWheel)
                 {

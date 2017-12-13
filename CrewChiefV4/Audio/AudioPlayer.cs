@@ -45,7 +45,7 @@ namespace CrewChiefV4.Audio
         public static String folderRadioCheckResponse = "acknowledge/radio_check";
         public static String folderStandBy = "acknowledge/stand_by";
 
-        private String folderRants = "rants";
+        private String folderRants = "rants/general";
         private Boolean playedRantInThisSession = false;
         private float rantLikelihood = 0.1f;
         public static Boolean rantWaitingToPlay = false;
@@ -950,13 +950,15 @@ namespace CrewChiefV4.Audio
         }
 
         // WIP... sometimes the chief loses his shit
-        public Boolean playRant()
+        public Boolean playRant(String messageIdentifier)
         {
             if (sweary && !playedRantInThisSession && Utilities.random.NextDouble() < rantLikelihood)
             {
                 playedRantInThisSession = true;
                 AudioPlayer.rantWaitingToPlay = true;
-                QueuedMessage rant = new QueuedMessage(folderRants, 0, null);
+                List<MessageFragment> messageContents = new List<MessageFragment>();
+                messageContents.Add(MessageFragment.Text(folderRants));
+                QueuedMessage rant = new QueuedMessage(messageIdentifier, messageContents, 0, null);
                 rant.isRant = true;
                 playMessage(rant, PearlsOfWisdom.PearlType.NONE, 0);
                 return true;

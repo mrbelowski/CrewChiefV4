@@ -191,9 +191,9 @@ namespace CrewChiefV4.Events
                     lapsCompleted = currentGameState.SessionData.CompletedLaps;
                     if (lapsCompleted - penaltyLap == 3 && !currentGameState.PitData.InPitlane)
                     {
-                        // run out of laps, an not in the pitlane
+                        // run out of laps, and not in the pitlane
                         audioPlayer.playMessage(new QueuedMessage(folderDisqualified, 5, this));
-                        audioPlayer.playRant();
+                        audioPlayer.playRant("disqualified_rant");
                     }
                     else if (lapsCompleted - penaltyLap == 2 && currentGameState.PenaltiesData.HasDriveThrough)
                     {
