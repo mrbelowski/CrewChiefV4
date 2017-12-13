@@ -134,8 +134,8 @@ namespace CrewChiefV4.Events
                         // if it's a shit finish, maybe launch into a tirade
                         Boolean playedRant = false;
                         int positionsLost = position - startPosition;
-                        // if we've lost 10 or more positions, and this is more than half the field size, maybe play a rant
-                        if (positionsLost > 9 && positionsLost / numCars >= 0.5)
+                        // if we've lost 9 or more positions, and this is more than half the field size, maybe play a rant
+                        if (positionsLost > 8 && (float)positionsLost / (float)numCars >= 0.5f)
                         {
                             playedRant = audioPlayer.playRant(sessionEndMessageIdentifier);
                         }
