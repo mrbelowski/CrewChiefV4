@@ -96,7 +96,7 @@ namespace CrewChiefV4.Events
                 Boolean isLast = position == numCars;
                 if (isDisqualified) 
                 {
-                    if (!audioPlayer.playRant(sessionEndMessageIdentifier))
+                    if (!audioPlayer.playRant(sessionEndMessageIdentifier, AbstractEvent.MessageContents(Penalties.folderDisqualified)))
                     {
                         audioPlayer.playMessage(new QueuedMessage(sessionEndMessageIdentifier, AbstractEvent.MessageContents(
                             Penalties.folderDisqualified), 0, null));
@@ -130,14 +130,14 @@ namespace CrewChiefV4.Events
                                 Position.folderStub + position, folderGoodFinish), 0, null));
                     }
                     else
-                    {                        
+                    {
                         // if it's a shit finish, maybe launch into a tirade
                         Boolean playedRant = false;
                         int positionsLost = position - startPosition;
                         // if we've lost 9 or more positions, and this is more than half the field size, maybe play a rant
                         if (positionsLost > 8 && (float)positionsLost / (float)numCars >= 0.5f)
                         {
-                            playedRant = audioPlayer.playRant(sessionEndMessageIdentifier);
+                            playedRant = audioPlayer.playRant(sessionEndMessageIdentifier, AbstractEvent.MessageContents(Position.folderStub + position));
                         }
                         if (!playedRant)
                         {
@@ -148,7 +148,7 @@ namespace CrewChiefV4.Events
                 }
                 else if (isLast)
                 {
-                    if (!audioPlayer.playRant(sessionEndMessageIdentifier))
+                    if (!audioPlayer.playRant(sessionEndMessageIdentifier, AbstractEvent.MessageContents(Position.folderStub + position)))
                     {
                         audioPlayer.playMessage(new QueuedMessage(sessionEndMessageIdentifier,
                             AbstractEvent.MessageContents(folderFinishedRaceLast), 0, null));
