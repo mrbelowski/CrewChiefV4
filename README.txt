@@ -173,6 +173,8 @@ One final point. If the app says "Jim is faster than you", let him through :)
 
 Changelog
 ---------
+Version 4.8.2.9: Fixed a serious regression in multi-class race position tracking
+
 Version 4.8.2.8: Added more variety to race finish messages; make default R3E pit macro pause a while before closing menu; warn when an opponent car is exiting the pits; a few other minor bits and bobs
 
 Version 4.8.2.7: Experimental support for double-file manual rolling starts (R3E, pCARS2 & AC only - enable with "Manual formation lap double-file start" property); fixed arrow keys and some other keys not being released when used in command macros; iRacing rally cross fixes; more Formula E battery tracking logic and messages; split some longer voice command responses so if you want to hear more, you have to ask ("more information" / "more info" / "clarify") - currently only implemented for Formula E battery messages, but will be extended. If you want all the information in a single long response without having to ask for clarification, enable "Verbose messages" property; added missing RF1 / AMS blue flag override ("Enable AMS / rF1 blue on slower" property); some internal fixes
