@@ -1009,6 +1009,12 @@ namespace CrewChiefV4.rFactor1
                         continue;
                     }
 
+                    // Only track this if opponent car class is different.
+                    if (string.Equals(currentGameState.carClass.getClassIdentifier(), opponent.CarClass.getClassIdentifier()))
+                    {
+                        continue;
+                    }
+
                     if (isBehindWithinDistance(currentGameState.SessionData.TrackDefinition.trackLength, 8.0f, 40.0f,
                             currentGameState.PositionAndMotionData.DistanceRoundTrack, opponent.DistanceRoundTrack)
                         && opponent.Speed >= currentGameState.PositionAndMotionData.CarSpeed)
