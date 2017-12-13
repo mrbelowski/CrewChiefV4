@@ -951,13 +951,17 @@ namespace CrewChiefV4.Audio
         }
 
         // WIP... sometimes the chief loses his shit
-        public Boolean playRant(String messageIdentifier)
+        public Boolean playRant(String messageIdentifier, List<MessageFragment> messagesToPlayBeforeRanting)
         {
             if (sweary && !playedRantInThisSession && Utilities.random.NextDouble() < rantLikelihood)
             {
                 playedRantInThisSession = true;
                 AudioPlayer.rantWaitingToPlay = true;
                 List<MessageFragment> messageContents = new List<MessageFragment>();
+                if (messagesToPlayBeforeRanting != null)
+                {
+                    messageContents.AddRange(messagesToPlayBeforeRanting);
+                }
                 messageContents.Add(MessageFragment.Text(folderRants));
                 QueuedMessage rant = new QueuedMessage(messageIdentifier, messageContents, 0, null);
                 rant.isRant = true;
