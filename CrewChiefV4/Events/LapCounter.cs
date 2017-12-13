@@ -249,7 +249,7 @@ namespace CrewChiefV4.Events
             } else if (currentGameState.SessionData.SessionHasFixedTime && currentGameState.SessionData.SessionTotalRunTime > 0 && currentGameState.SessionData.SessionTotalRunTime < 1800) 
             {
                 int minutes = (int)currentGameState.SessionData.SessionTotalRunTime / 60;
-                if (currentGameState.SessionData.Position > 3 && minutes < 20)
+                if (currentGameState.SessionData.Position > 3 && minutes < 20 && minutes > 1)
                 {
                     Console.WriteLine("pre-start message for race time + get on with it");                   
                     possibleMessages.Add(new QueuedMessage("race_time", MessageContents(minutes, folderMinutesYouNeedToGetOnWithIt), 0, this));
