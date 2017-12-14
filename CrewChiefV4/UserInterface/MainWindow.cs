@@ -35,8 +35,11 @@ namespace CrewChiefV4
 
         private String basePersonalisationsDownloadLocation;
         private String updatePersonalisationsDownloadLocation;
+        private String update2PersonalisationsDownloadLocation;
         private String personalisationsTempFileName = "temp_personalisations.zip";
         private Boolean getBasePersonalisations = false;
+        private Boolean getFirstUpdatePersonalisations = false;
+
 
         private Boolean isDownloadingDriverNames = false;
         private Boolean isDownloadingSoundPack = false;
@@ -175,6 +178,7 @@ namespace CrewChiefV4
                                     update2SoundPackDownloadLocation = element.Descendants("update2soundpackurl").First().Value;
                                     updateDriverNamesDownloadLocation = element.Descendants("updatedrivernamesurl").First().Value;
                                     updatePersonalisationsDownloadLocation = element.Descendants("updatepersonalisationsurl").First().Value;
+                                    update2PersonalisationsDownloadLocation = doc.Descendants("update2personalisationsurl").First().Value;
                                     gotLanguageSpecificUpdateInfo = true;
                                     break;
                                 }
@@ -191,6 +195,7 @@ namespace CrewChiefV4
                                 update2SoundPackDownloadLocation = doc.Descendants("update2soundpackurl").First().Value;
                                 updateDriverNamesDownloadLocation = doc.Descendants("updatedrivernamesurl").First().Value;
                                 updatePersonalisationsDownloadLocation = doc.Descendants("updatepersonalisationsurl").First().Value;
+                                update2PersonalisationsDownloadLocation = doc.Descendants("update2personalisationsurl").First().Value;
                             }
                         }
                         catch (Exception e2)
@@ -272,6 +277,7 @@ namespace CrewChiefV4
                             }
                             else
                             {
+                                getFirstUpdatePersonalisations = AudioPlayer.personalisationsVersion < AudioPlayer.lastUpdatePersonalisationsVersion;
                                 downloadPersonalisationsButton.Text = Configuration.getUIString("updated_personalisations_available_press_to_download");
                             }
                             newPersonalisationsAvailable = true;
@@ -1684,9 +1690,13 @@ namespace CrewChiefV4
                     {
                         wc.DownloadFileAsync(new Uri(basePersonalisationsDownloadLocation), AudioPlayer.soundFilesPath + @"\" + personalisationsTempFileName);
                     }
-                    else
+                    else if (getFirstUpdatePersonalisations)
                     {
                         wc.DownloadFileAsync(new Uri(updatePersonalisationsDownloadLocation), AudioPlayer.soundFilesPath + @"\" + personalisationsTempFileName);
+                    }
+                    else
+                    {
+                        wc.DownloadFileAsync(new Uri(update2PersonalisationsDownloadLocation), AudioPlayer.soundFilesPath + @"\" + personalisationsTempFileName);
                     }
                 }
             }

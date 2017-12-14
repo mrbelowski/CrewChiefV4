@@ -18,9 +18,10 @@ will be pulled from the thecrewchief.org ftp server. -->
 <drivernamesversion>100</drivernamesversion>
 <basedrivernamesurl>http://crewchief.isnais.de/base_driver_names.zip</basedrivernamesurl>
 <updatedrivernamesurl>http://crewchief.isnais.de/update_driver_names.zip</updatedrivernamesurl>
-<personalisationsversion>120</personalisationsversion>
+<personalisationsversion>121</personalisationsversion>
 <basepersonalisationsurl>http://crewchief.isnais.de/personalisations.zip</basepersonalisationsurl>
 <updatepersonalisationsurl>http://crewchief.isnais.de/update_personalisations.zip</updatepersonalisationsurl>
+<update2personalisationsurl>http://crewchief.isnais.de/update_2_personalisations.zip</update2personalisationsurl>
 
 <!-- language-aware sound pack stuff for later versions-->
 <soundpack language="en">
@@ -33,8 +34,9 @@ will be pulled from the thecrewchief.org ftp server. -->
 	<drivernamesversion>123</drivernamesversion>
 	<basedrivernamesurl>http://crewchief.isnais.de/base_driver_names.zip</basedrivernamesurl>
 	<updatedrivernamesurl>http://crewchief.isnais.de/update_driver_names.zip</updatedrivernamesurl>
-	<personalisationsversion>120</personalisationsversion>
+	<personalisationsversion>121</personalisationsversion>
 	<basepersonalisationsurl>http://crewchief.isnais.de/personalisations.zip</basepersonalisationsurl>
 	<updatepersonalisationsurl>http://crewchief.isnais.de/update_personalisations.zip</updatepersonalisationsurl>
+	<update2personalisationsurl>http://crewchief.isnais.de/update_2_personalisations.zip</update2personalisationsurl>
 </soundpack>
 </item>
