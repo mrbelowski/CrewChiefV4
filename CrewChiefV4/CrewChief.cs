@@ -515,8 +515,17 @@ namespace CrewChiefV4
             if (hour > 12) {
                 hour = hour - 12;
             }
-            audioPlayer.playMessageImmediately(new QueuedMessage("current_time", 
-                AbstractEvent.MessageContents(hour, now.Minute), 0, null));
+            int minute = now.Minute;
+            if (minute < 10)
+            {
+                audioPlayer.playMessageImmediately(new QueuedMessage("current_time",
+                    AbstractEvent.MessageContents(hour, NumberReader.folderOh, now.Minute), 0, null));
+            }
+            else
+            {
+                audioPlayer.playMessageImmediately(new QueuedMessage("current_time",
+                    AbstractEvent.MessageContents(hour, now.Minute), 0, null));
+            }
         }
 
         private void startSpotterThread()
