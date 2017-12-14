@@ -173,6 +173,8 @@ One final point. If the app says "Jim is faster than you", let him through :)
 
 Changelog
 ---------
+Version 4.8.3.0: Changed personalisations download process to reduce bandwidth use
+
 Version 4.8.2.9: Fixed a serious regression in multi-class race position tracking
 
 Version 4.8.2.8: Added more variety to race finish messages; make default R3E pit macro pause a while before closing menu; warn when an opponent car is exiting the pits; a few other minor bits and bobs
