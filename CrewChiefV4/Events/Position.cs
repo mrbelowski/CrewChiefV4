@@ -332,7 +332,7 @@ namespace CrewChiefV4.Events
                 return;
             }
 
-            if (opponentKeyForCarThatJustPassedUs == null && opponentKeyForCarWeJustPassed == null)
+            if (!GlobalBehaviourSettings.useOvalLogic && opponentKeyForCarThatJustPassedUs == null && opponentKeyForCarWeJustPassed == null)
             {
                 checkForNewOvertakes(currentGameState, previousGameState);
             }
