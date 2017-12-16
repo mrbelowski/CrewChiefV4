@@ -361,7 +361,9 @@
 			"maxSafeOilTemp": 140,
 			"timesInHundredths": true,
 			"useAmericanTerms": true,
-			"enabledMessageTypes": "ALL"
+            "enabledMessageTypes": "ALL",
+            "spotterVehicleLength": 5,
+			"spotterVehicleWidth": 2,
 		},
 		{
 			"carClassEnum": "F1",

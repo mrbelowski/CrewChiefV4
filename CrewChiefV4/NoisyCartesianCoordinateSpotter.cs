@@ -178,6 +178,8 @@ namespace CrewChiefV4
 
         // don't play 'clear' or 'hold' messages unless we've actually been clear or overlapping for some time
         private TimeSpan clearMessageDelay = TimeSpan.FromMilliseconds(UserSettings.GetUserSettings().getInt("spotter_clear_delay"));
+        private TimeSpan ovalClearMessageDelay = TimeSpan.FromMilliseconds(UserSettings.GetUserSettings().getInt("spotter_oval_clear_delay"));
+
         private TimeSpan overlapMessageDelay = TimeSpan.FromMilliseconds(UserSettings.GetUserSettings().getInt("spotter_overlap_delay"));
         private static Boolean use3WideLeftAndRight = UserSettings.GetUserSettings().getBoolean("spotter_enable_three_wide_left_and_right");
 
@@ -555,21 +557,21 @@ namespace CrewChiefV4
             {
                 Console.WriteLine("clear all round");
                 nextMessageType = NextMessageType.clearAllRound;
-                nextMessageDue = now.Add(clearMessageDelay);
+                nextMessageDue = now.Add(GlobalBehaviourSettings.useOvalLogic ? ovalClearMessageDelay : clearMessageDelay);
             }
             else if (carsOnLeftCount == 0 && carsOnLeftAtPreviousTick > 0 && 
                 ((carsOnRightCount == 0 && carsOnRightAtPreviousTick == 0) || (carsOnRightCount > 0 && carsOnRightAtPreviousTick > 0)))
             {
                 // just gone clear on the left - might still be a car right
                 nextMessageType = NextMessageType.clearLeft;
-                nextMessageDue = now.Add(clearMessageDelay);
+                nextMessageDue = now.Add(GlobalBehaviourSettings.useOvalLogic ? ovalClearMessageDelay : clearMessageDelay);
             }
             else if (carsOnRightCount == 0 && carsOnRightAtPreviousTick > 0 && 
                 ((carsOnLeftCount == 0 && carsOnLeftAtPreviousTick == 0) || (carsOnLeftCount > 0 && carsOnLeftAtPreviousTick > 0)))
             {
                 // just gone clear on the right - might still be a car left
                 nextMessageType = NextMessageType.clearRight;
-                nextMessageDue = now.Add(clearMessageDelay);
+                nextMessageDue = now.Add(GlobalBehaviourSettings.useOvalLogic ? ovalClearMessageDelay : clearMessageDelay);
             }
             else if (carsOnLeftCount > 0 && carsOnRightCount > 0 && (carsOnLeftAtPreviousTick == 0 || carsOnRightAtPreviousTick == 0))
             {
