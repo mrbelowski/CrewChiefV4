@@ -242,9 +242,8 @@ namespace CrewChiefV4.Events
                 else
                 {
                     Console.WriteLine("pre-start message for race laps");
-
-                    // TODO: need to add a "laps..." message here otherwise it just plays the number. Add the "make them count" message until this is available
-                    possibleMessages.Add(new QueuedMessage("race_distance", MessageContents(currentGameState.SessionData.SessionNumberOfLaps, folderLapsMakeThemCount), 0, this));
+                    // use the 'Laps' sound from Battery here
+                    possibleMessages.Add(new QueuedMessage("race_distance", MessageContents(currentGameState.SessionData.SessionNumberOfLaps, Battery.folderLaps), 0, this));
                 }
             } else if (currentGameState.SessionData.SessionHasFixedTime && currentGameState.SessionData.SessionTotalRunTime > 0 && currentGameState.SessionData.SessionTotalRunTime < 1800) 
             {

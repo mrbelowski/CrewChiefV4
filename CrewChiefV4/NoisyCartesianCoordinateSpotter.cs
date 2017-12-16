@@ -114,7 +114,6 @@ namespace CrewChiefV4
                     }
                 }
                 String selectedSpotter = UserSettings.GetUserSettings().getString("spotter_name");
-                // TODO: select boxes and UI stuff - this may change
                 if (!defaultSpotterId.Equals(selectedSpotter))
                 {
                     if (Directory.Exists(AudioPlayer.soundFilesPath + "/voice/spotter_" + selectedSpotter))

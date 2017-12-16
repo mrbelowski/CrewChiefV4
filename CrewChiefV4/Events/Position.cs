@@ -218,7 +218,6 @@ namespace CrewChiefV4.Events
                         if (currentOpponentAheadKey != null && !currentGameState.PitData.InPitlane && currentOpponentAheadKey == opponentBehindKey && 
                             isPassMessageCandidate(gapsBehind, beingPassedCheckSamplesToCheck, minAverageGapForBeingPassedMessage))
                         {
-                            // TODO: check if we need to do a pit check here - don't think so
                             OpponentData carThatJustPassedUs = currentGameState.OpponentData[currentOpponentAheadKey];
                             if (carThatJustPassedUs.CompletedLaps == currentGameState.SessionData.CompletedLaps &&
                                 CarData.IsCarClassEqual(carThatJustPassedUs.CarClass, currentGameState.carClass))

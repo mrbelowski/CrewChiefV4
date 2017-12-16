@@ -46,7 +46,7 @@ namespace CrewChiefV4.Events
         private const string folderWontMakeEndWoPit = "battery/wont_make_end_without_pitstop";
         private const string folderWontMakeHalfDistanceWoPit = "battery/wont_make_half_distance_without_pitstop";
         private const string folderWeWillGetAnother = "battery/we_will_get_another";
-        private const string folderLaps = "battery/laps";
+        public static const string folderLaps = "battery/laps";
         private const string folderMinutes = "battery/minutes";
 
         class BatteryStatsEntry
