@@ -173,6 +173,8 @@ One final point. If the app says "Jim is faster than you", let him through :)
 
 Changelog
 ---------
+Version 4.8.3.1: Corrected some pCARS 2 track names that got changed in the last pCARS 2 patch; disable some irrelvant sounds when racing on ovals; work around for some missing spotter sounds; a few internal fixes
+
 Version 4.8.3.0: Changed personalisations download process to reduce bandwidth use
 
 Version 4.8.2.9: Fixed a serious regression in multi-class race position tracking

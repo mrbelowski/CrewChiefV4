@@ -28,6 +28,7 @@ namespace CrewChiefV4.Events
         public static String folderManualStartFormUpBehind = "lap_counter/form_up_behind";
         public static String folderManualStartStartingOnLeftBehind = "lap_counter/starting_in_left_lane_behind";
         public static String folderManualStartStartingOnRightBehind = "lap_counter/starting_in_right_lane_behind";
+        public static String folderManualStartLeaderHasGone = "lap_counter/leader_has_gone";
 
         // toggle / request acknowledgements when enabling / disabling manual formation lap mode
         public static String folderManualFormationLapModeEnabled = "lap_counter/manual_formation_lap_mode_enabled";
@@ -42,6 +43,10 @@ namespace CrewChiefV4.Events
         private Boolean playedManualStartLeaderHasCrossedLine = false;
         private Boolean playedManualStartPlayedGoGoGo = false;
         private Boolean playedManualStartInitialMessage = false;
+
+        private float distanceBeforeLineToStartLeaderAccelerationCheck = 200f;
+        private float leaderSpeedAtAccelerationCheckStart = -1;
+        private OpponentData poleSitter = null;
 
         private String manualStartOpponentToFollow = null;
 
@@ -147,6 +152,8 @@ namespace CrewChiefV4.Events
             playedRejoinAtBackMessage = false;
             playedPreLightsRollingStartWarning = false;
             opponentsInFrontGridSides = new Dictionary<string, GridSide>();
+            leaderSpeedAtAccelerationCheckStart = -1;
+            poleSitter = null;
         }
 
         private OpponentData getOpponent(GameStateData currentGameState, String opponentName)
@@ -343,6 +350,7 @@ namespace CrewChiefV4.Events
                         checkForIllegalPassesOnFormationLap(currentGameState);
                         checkForManualFormationRaceStart(currentGameState, currentGameState.SessionData.Position == 1);
                         checkForManualDoubleFileReminder(previousGameState, currentGameState);
+                        checkForLeaderHasAccelerated(previousGameState, currentGameState);
                     }
                 }
                 // now check if we really are on a manual formation lap. We have to do this *after* checking for the race start (above) because
@@ -601,6 +609,8 @@ namespace CrewChiefV4.Events
         private void playManualStartInitialMessage(GameStateData currentGameState)
         {
             setOpponentToFollowAndStartPosition(currentGameState, false, true);
+            poleSitter = currentGameState.getOpponentAtPosition(1, false);
+
             // use the driver name in front if we have it - if we're starting on pole the manualStartOpponentAhead var will be null,
             // which will force the audio player to use the secondary message
             List<MessageFragment> messageContentsWithName;
@@ -724,6 +734,32 @@ namespace CrewChiefV4.Events
         private Boolean haveWeDroppedBack(GameStateData currentGameState)
         {
             return currentGameState.SessionData.Position > manualFormationStartingPosition + 3;
+        }
+
+        private void checkForLeaderHasAccelerated(GameStateData previousGameState, GameStateData currentGameState)
+        {
+            if (previousGameState == null || currentGameState.SessionData.TrackDefinition == null ||
+                currentGameState.PositionAndMotionData.DistanceRoundTrack == 0 || poleSitter == null)
+            {
+                return;
+            }
+            float currentDistanceToStartLine = currentGameState.SessionData.TrackDefinition.trackLength - currentGameState.PositionAndMotionData.DistanceRoundTrack;
+            if (currentDistanceToStartLine < distanceBeforeLineToStartLeaderAccelerationCheck)
+            {
+                float previousDistanceToStartLine = currentGameState.SessionData.TrackDefinition.trackLength - previousGameState.PositionAndMotionData.DistanceRoundTrack;
+                if (previousDistanceToStartLine > distanceBeforeLineToStartLeaderAccelerationCheck)
+                {
+                    leaderSpeedAtAccelerationCheckStart = poleSitter.Speed;
+                }
+                else if (leaderSpeedAtAccelerationCheckStart > 0)
+                {
+                    if (poleSitter.Speed - leaderSpeedAtAccelerationCheckStart > 10)
+                    {
+                        Console.WriteLine("Looks like the leader has 'gone'");
+                        audioPlayer.playMessage(new QueuedMessage(folderManualStartLeaderHasGone, 0, this));
+                    }
+                }
+            }
         }
 
         private void checkForManualDoubleFileReminder(GameStateData previousGameState, GameStateData currentGameState)
