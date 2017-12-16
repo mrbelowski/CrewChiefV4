@@ -131,8 +131,13 @@ namespace CrewChiefV4
                         folderThreeWideYoureOnLeft = "spotter_" + selectedSpotter + "/three_wide_on_left";
                         folderCarInside = "spotter_" + selectedSpotter + "/car_inside";
                         folderCarOutside = "spotter_" + selectedSpotter + "/car_outside";
-                        folderClearInside = "spotter_" + selectedSpotter + "/clear_inside";
-                        folderClearOutside = "spotter_" + selectedSpotter + "/clear_outside";
+
+                        // Currently the Geoffrey spotter has no clear inside / clear outside sounds:
+                        Boolean hasClearInside = Directory.Exists(AudioPlayer.soundFilesPath + "/voice/spotter_" + selectedSpotter + "/clear_inside");
+                        folderClearInside = hasClearInside ? "spotter_" + selectedSpotter + "/clear_inside" : folderClearLeft;
+                        Boolean hasClearOutside = Directory.Exists(AudioPlayer.soundFilesPath + "/voice/spotter_" + selectedSpotter + "/clear_outside");                        
+                        folderClearOutside = hasClearOutside ? "spotter_" + selectedSpotter + "/clear_outside" : folderClearRight;
+
                         folderThreeWideYoureOnInside = "spotter_" + selectedSpotter + "/three_wide_on_inside";
                         folderThreeWideYoureOnOutside = "spotter_" + selectedSpotter + "/three_wide_on_outside";
                         if (Directory.Exists(AudioPlayer.soundFilesPath + "/voice/acknowledge/spotterEnabled_" + selectedSpotter))
