@@ -375,7 +375,8 @@ namespace CrewChiefV4.Events
                                         audioPlayer.playMessage(new QueuedMessage("lapTimeNotRaceGap",
                                             MessageContents(folderGapIntro, new TimeSpanWrapper(deltaPlayerLastToSessionBestInClass, Precision.AUTO_GAPS), folderGapOutroOffPace), 0, this));
                                     }
-                                    if (practiceAndQualSectorReportsLapEnd && frequencyOfPracticeAndQualSectorDeltaReports > Utilities.random.NextDouble() * 10)
+                                    if (!GlobalBehaviourSettings.useOvalLogic &&
+                                        practiceAndQualSectorReportsLapEnd && frequencyOfPracticeAndQualSectorDeltaReports > Utilities.random.NextDouble() * 10)
                                     {
                                         List<MessageFragment> sectorMessageFragments = getSectorDeltaMessages(SectorReportOption.ALL, currentGameState.SessionData.LastSector1Time, lapAndSectorsComparisonData[1],
                                             currentGameState.SessionData.LastSector2Time, lapAndSectorsComparisonData[2], currentGameState.SessionData.LastSector3Time, lapAndSectorsComparisonData[3], true);
@@ -453,7 +454,8 @@ namespace CrewChiefV4.Events
                                         audioPlayer.playMessage(new QueuedMessage("lapTimeNotRaceGap",
                                             MessageContents(folderGapIntro, new TimeSpanWrapper(deltaPlayerLastToSessionBestInClass, Precision.AUTO_GAPS), folderGapOutroOffPace), Utilities.random.Next(0, 8), this));
                                     }
-                                    if (practiceAndQualSectorReportsLapEnd && frequencyOfPracticeAndQualSectorDeltaReports > Utilities.random.NextDouble() * 10)
+                                    if (!GlobalBehaviourSettings.useOvalLogic && 
+                                        practiceAndQualSectorReportsLapEnd && frequencyOfPracticeAndQualSectorDeltaReports > Utilities.random.NextDouble() * 10)
                                     {
                                         List<MessageFragment> sectorMessageFragments = getSectorDeltaMessages(SectorReportOption.ALL, currentGameState.SessionData.LastSector1Time, lapAndSectorsComparisonData[1],
                                             currentGameState.SessionData.LastSector2Time, lapAndSectorsComparisonData[2], currentGameState.SessionData.LastSector3Time, lapAndSectorsComparisonData[3], true);
@@ -516,7 +518,8 @@ namespace CrewChiefV4.Events
                                     }
                                 }
 
-                                if (raceSectorReportsAtLapEnd && frequencyOfRaceSectorDeltaReports > Utilities.random.NextDouble() * 10)
+                                if (!GlobalBehaviourSettings.useOvalLogic && 
+                                    raceSectorReportsAtLapEnd && frequencyOfRaceSectorDeltaReports > Utilities.random.NextDouble() * 10)
                                 {
                                     double r = Utilities.random.NextDouble();
                                     SectorReportOption reportOption = SectorReportOption.ALL;
@@ -617,7 +620,8 @@ namespace CrewChiefV4.Events
                                 break;
                         }
                         List<MessageFragment> messageFragments = getSingleSectorDeltaMessages(sectorEnum, playerSector, comparisonSector);
-                        if (messageFragments.Count() > 0)
+                        if (!GlobalBehaviourSettings.useOvalLogic && 
+                            messageFragments.Count() > 0)
                         {
                             audioPlayer.playMessage(new QueuedMessage("singleSectorDelta", messageFragments, Utilities.random.Next(2, 4), this));
                         }

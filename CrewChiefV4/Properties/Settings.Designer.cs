@@ -2986,5 +2986,17 @@ namespace CrewChiefV4.Properties {
                 this["enable_rants"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("500")]
+        public int spotter_oval_clear_delay {
+            get {
+                return ((int)(this["spotter_oval_clear_delay"]));
+            }
+            set {
+                this["spotter_oval_clear_delay"] = value;
+            }
+        }
     }
 }

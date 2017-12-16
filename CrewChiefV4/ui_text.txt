@@ -536,3 +536,6 @@ enable_ams_blue_on_slower_help = Play 'Blue Flag' messages if car behind seems t
 
 enable_rants = Enable rants
 enable_rants_help = Allow the Chief to occasionally express his disappointment in colourful and forceful terms
+
+spotter_oval_clear_delay = Spotter oval clear delay
+spotter_oval_clear_delay_help = You need to be clear for this many milliseconds before the Spotter calls 'clear' on ovals
