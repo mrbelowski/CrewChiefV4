@@ -347,7 +347,8 @@ namespace CrewChiefV4.Events
                         playManualStartInitialMessage(currentGameState);
                     }
                     // don't bother with any other messages until things have had a few seconds to settle down:
-                    else if (currentGameState.SessionData.SessionRunningTime > 10)
+                    else if (currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.SessionRunningTime > 10
+                        && currentGameState.SessionData.SessionPhase == SessionPhase.Green)
                     {
                         checkForIllegalPassesOnFormationLap(currentGameState);
                         checkForManualFormationRaceStart(currentGameState, currentGameState.SessionData.Position == 1);
