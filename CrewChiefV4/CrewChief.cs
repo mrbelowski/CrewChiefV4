@@ -711,7 +711,15 @@ namespace CrewChiefV4
                         }
                         else
                         {
-                            latestRawGameData = gameDataReader.ReadGameData(false);
+                            try
+                            {
+                                latestRawGameData = gameDataReader.ReadGameData(false);
+                            }
+                            catch (GameDataReadException e)
+                            {
+                                Console.WriteLine("Error reading game data ", e.cause.StackTrace);
+                                continue;
+                            }
                         }
                         // another Thread may have stopped the app - check here before processing the game data
                         if (!running)
