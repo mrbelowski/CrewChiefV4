@@ -2127,6 +2127,11 @@ namespace CrewChiefV4
         {
             Process.Start("http://thecrewchief.org/misc.php?do=donate");
         }
+
+        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            crewChief.speechRecogniser.changeInputDevice((int)comboBox1.SelectedIndex);
+        }
     }
 
     public class ControlWriter : TextWriter

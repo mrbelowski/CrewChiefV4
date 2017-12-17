@@ -561,6 +561,7 @@ namespace CrewChiefV4
             this.comboBox1.Name = "comboBox1";
             this.comboBox1.Size = new System.Drawing.Size(220, 21);
             this.comboBox1.TabIndex = 101;
+            this.comboBox1.SelectedIndexChanged += new System.EventHandler(this.comboBox1_SelectedIndexChanged);
             // 
             // MainWindow
             // 

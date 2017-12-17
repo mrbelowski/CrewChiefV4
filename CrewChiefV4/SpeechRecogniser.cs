@@ -203,6 +203,10 @@ namespace CrewChiefV4
             set => recordingDevices = value;
         }
 
+        private System.IO.MemoryStream buffer = new System.IO.MemoryStream();
+
+        NAudio.Wave.WaveInEvent waveIn = new NAudio.Wave.WaveInEvent();
+
         // load voice commands for triggering keyboard macros. The String key of the input Dictionary is the
         // command list key in speech_recognition_config.txt. When one of these phrases is heard the map value
         // CommandMacro is executed.
@@ -407,7 +411,17 @@ namespace CrewChiefV4
             }
             try
             {
-                sre.SetInputToDefaultAudioDevice();
+                //sre.SetInputToDefaultAudioDevice();
+                waveIn.DeviceNumber = 0;
+                waveIn.DataAvailable += waveIn_DataAvailable;
+                waveIn.StartRecording();
+                Microsoft.Speech.AudioFormat.SpeechAudioFormatInfo safi =
+                    new Microsoft.Speech.AudioFormat.SpeechAudioFormatInfo(
+                        waveIn.WaveFormat.SampleRate,
+                         Microsoft.Speech.AudioFormat.AudioBitsPerSample.Sixteen,
+                        Microsoft.Speech.AudioFormat.AudioChannel.Stereo);
+                 sre.SetInputToAudioStream(buffer, safi);
+
             }
             catch (Exception e)
             {
@@ -852,6 +866,7 @@ namespace CrewChiefV4
             catch (Exception e)
             {
                 Console.WriteLine("Unable to start speech recognition " + e.Message);
+                Console.WriteLine(e.StackTrace);
             }
         }
 
@@ -1031,6 +1046,20 @@ namespace CrewChiefV4
                 }
             }
             return null;
+        }
+
+        public void changeInputDevice(int dev)
+        {
+            waveIn.StopRecording();
+            sre.RecognizeAsyncStop();
+            waveIn.DeviceNumber = dev;
+            waveIn.StartRecording();
+            sre.RecognizeAsync();
+        }
+
+        private void waveIn_DataAvailable(object sender, NAudio.Wave.WaveInEventArgs e)
+        {
+            buffer.Write(e.Buffer, 0, e.BytesRecorded);
         }
     }
 }
