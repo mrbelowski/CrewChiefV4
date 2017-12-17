@@ -200,6 +200,7 @@ namespace CrewChiefV4.iRacing
                 }
                 catch (Exception ex)
                 {
+                    Console.WriteLine("Error reading game data ", ex.StackTrace);
                     throw new GameDataReadException(ex.Message, ex);
                 }
             }
