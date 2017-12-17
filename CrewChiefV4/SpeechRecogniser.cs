@@ -195,6 +195,14 @@ namespace CrewChiefV4
         // guard against race condition between closing channel and sre_SpeechRecognised event completing
         public static Boolean keepRecognisingInHoldMode = false;
 
+        private static List<String> recordingDevices = new List<string>();
+
+        public List<String> RecDevs
+        {
+            get => recordingDevices;
+            set => recordingDevices = value;
+        }
+
         // load voice commands for triggering keyboard macros. The String key of the input Dictionary is the
         // command list key in speech_recognition_config.txt. When one of these phrases is heard the map value
         // CommandMacro is executed.
@@ -319,6 +327,13 @@ namespace CrewChiefV4
             {
                 minimum_voice_recognition_confidence = 0.5f;
             }
+
+            int nRecDevices = NAudio.Wave.WaveIn.DeviceCount;
+            for(int ii=0;ii<nRecDevices;ii++)
+            {
+                recordingDevices.Add(NAudio.Wave.WaveIn.GetCapabilities(ii).ProductName); 
+            }
+
         }
 
         private void initWithLocale(String locale)

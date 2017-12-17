@@ -331,6 +331,11 @@ namespace CrewChiefV4
                 }
             }).Start();
 
+            int nRecDev = crewChief.speechRecogniser.RecDevs.Count;
+            for (int ii = 0; ii < nRecDev; ii++)
+                comboBox1.Items.Add(crewChief.speechRecogniser.RecDevs[ii]);
+            comboBox1.SelectedIndex = 0;
+
             if (UserSettings.GetUserSettings().getBoolean("minimize_on_startup"))
             {
                 if (this.minimizeToTray)
