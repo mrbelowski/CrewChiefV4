@@ -47,6 +47,7 @@ namespace CrewChiefV4.Events
         private float distanceBeforeLineToStartLeaderAccelerationCheck = 200f;
         private float leaderSpeedAtAccelerationCheckStart = -1;
         private OpponentData poleSitter = null;
+        private Boolean leaderHasGone = false;
 
         private String manualStartOpponentToFollow = null;
 
@@ -154,6 +155,7 @@ namespace CrewChiefV4.Events
             opponentsInFrontGridSides = new Dictionary<string, GridSide>();
             leaderSpeedAtAccelerationCheckStart = -1;
             poleSitter = null;
+            leaderHasGone = false;
         }
 
         private OpponentData getOpponent(GameStateData currentGameState, String opponentName)
@@ -738,7 +740,7 @@ namespace CrewChiefV4.Events
 
         private void checkForLeaderHasAccelerated(GameStateData previousGameState, GameStateData currentGameState)
         {
-            if (previousGameState == null || currentGameState.SessionData.TrackDefinition == null ||
+            if (leaderHasGone || previousGameState == null || currentGameState.SessionData.TrackDefinition == null ||
                 currentGameState.PositionAndMotionData.DistanceRoundTrack == 0 || poleSitter == null)
             {
                 return;
@@ -757,6 +759,7 @@ namespace CrewChiefV4.Events
                     {
                         Console.WriteLine("Looks like the leader has 'gone'");
                         audioPlayer.playMessage(new QueuedMessage(folderManualStartLeaderHasGone, 0, this));
+                        leaderHasGone = true;
                     }
                 }
             }
