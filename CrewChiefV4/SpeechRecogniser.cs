@@ -415,7 +415,6 @@ namespace CrewChiefV4
                 waveIn.WaveFormat = new NAudio.Wave.WaveFormat(8000, 1);
                 waveIn.DataAvailable += new EventHandler<NAudio.Wave.WaveInEventArgs>(waveIn_DataAvailable);
                 waveIn.NumberOfBuffers = 3;
-                waveIn.StartRecording();
 
             }
             catch (Exception e)
@@ -856,13 +855,7 @@ namespace CrewChiefV4
             SpeechRecogniser.keepRecognisingInHoldMode = true;
             try
             {
-                Microsoft.Speech.AudioFormat.SpeechAudioFormatInfo safi =
-                    new Microsoft.Speech.AudioFormat.SpeechAudioFormatInfo(
-                        waveIn.WaveFormat.SampleRate,
-                         Microsoft.Speech.AudioFormat.AudioBitsPerSample.Sixteen,
-                        Microsoft.Speech.AudioFormat.AudioChannel.Mono);
-                sre.SetInputToAudioStream(buffer, safi);
-                sre.RecognizeAsync(RecognizeMode.Multiple);
+                waveIn.StartRecording();
             }
             catch (Exception e)
             {
@@ -876,7 +869,15 @@ namespace CrewChiefV4
             Console.WriteLine("cancelling wait for speech");
             SpeechRecogniser.waitingForSpeech = false;
             SpeechRecogniser.keepRecognisingInHoldMode = false;
-            sre.RecognizeAsyncCancel();
+            waveIn.StopRecording();
+            Microsoft.Speech.AudioFormat.SpeechAudioFormatInfo safi =
+    new Microsoft.Speech.AudioFormat.SpeechAudioFormatInfo(
+        waveIn.WaveFormat.SampleRate,
+         Microsoft.Speech.AudioFormat.AudioBitsPerSample.Sixteen,
+        Microsoft.Speech.AudioFormat.AudioChannel.Mono);
+            sre.SetInputToAudioStream(buffer, safi); // otherwise input gets unset
+            sre.RecognizeAsync(RecognizeMode.Multiple); // before this call
+
         }
 
         private AbstractEvent getEventForSpeech(String recognisedSpeech)
@@ -1051,16 +1052,12 @@ namespace CrewChiefV4
 
         public void changeInputDevice(int dev)
         {
-            waveIn.StopRecording();
             waveIn.DeviceNumber = dev;
-            waveIn.StartRecording();
         }
 
         private void waveIn_DataAvailable(object sender, NAudio.Wave.WaveInEventArgs e)
         {
-            buffer.Write(e.Buffer, 0, e.BytesRecorded);
-            //if (buffer.Length > 1600)
-            //    System.Diagnostics.Debugger.Break();
+            buffer.Write(e.Buffer, (int)buffer.Position, e.BytesRecorded);
         }
     }
 }
