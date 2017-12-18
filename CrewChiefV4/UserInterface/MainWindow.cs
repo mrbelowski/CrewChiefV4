@@ -333,8 +333,8 @@ namespace CrewChiefV4
 
             int nRecDev = crewChief.speechRecogniser.RecDevs.Count;
             for (int ii = 0; ii < nRecDev; ii++)
-                comboBox1.Items.Add(crewChief.speechRecogniser.RecDevs[ii]);
-            //comboBox1.SelectedIndex = 0;
+                recordingDeviceBox.Items.Add(crewChief.speechRecogniser.RecDevs[ii]);
+            recordingDeviceBox.SelectedIndex = UserSettings.GetUserSettings().getInt("naudio_recording_device_idx");
 
             if (UserSettings.GetUserSettings().getBoolean("minimize_on_startup"))
             {
@@ -2128,9 +2128,10 @@ namespace CrewChiefV4
             Process.Start("http://thecrewchief.org/misc.php?do=donate");
         }
 
-        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        private void recordingDeviceBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            crewChief.speechRecogniser.changeInputDevice((int)comboBox1.SelectedIndex);
+            UserSettings.GetUserSettings().setProperty("naudio_recording_device_idx", (int)recordingDeviceBox.SelectedIndex);
+            crewChief.speechRecogniser.changeInputDevice((int)recordingDeviceBox.SelectedIndex);
         }
     }
 

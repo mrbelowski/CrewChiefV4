@@ -86,7 +86,8 @@ namespace CrewChiefV4
             this.backgroundAudioDeviceLabel = new System.Windows.Forms.Label();
             this.spotterNameBox = new System.Windows.Forms.ComboBox();
             this.donateLink = new System.Windows.Forms.LinkLabel();
-            this.comboBox1 = new System.Windows.Forms.ComboBox();
+            this.recordingDeviceBox = new System.Windows.Forms.ComboBox();
+            this.speechRecordingDeviceLabel = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.messagesVolumeSlider)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.backgroundVolumeSlider)).BeginInit();
@@ -553,22 +554,32 @@ namespace CrewChiefV4
             this.donateLink.Text = "donate_link_text";
             this.donateLink.Click += new System.EventHandler(this.internetPanHandler);
             // 
-            // comboBox1
+            // recordingDeviceBox
             // 
-            this.comboBox1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBox1.FormattingEnabled = true;
-            this.comboBox1.Location = new System.Drawing.Point(38, 90);
-            this.comboBox1.Name = "comboBox1";
-            this.comboBox1.Size = new System.Drawing.Size(220, 21);
-            this.comboBox1.TabIndex = 101;
-            this.comboBox1.SelectedIndexChanged += new System.EventHandler(this.comboBox1_SelectedIndexChanged);
+            this.recordingDeviceBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.recordingDeviceBox.FormattingEnabled = true;
+            this.recordingDeviceBox.Location = new System.Drawing.Point(38, 90);
+            this.recordingDeviceBox.Name = "recordingDeviceBox";
+            this.recordingDeviceBox.Size = new System.Drawing.Size(220, 21);
+            this.recordingDeviceBox.TabIndex = 101;
+            this.recordingDeviceBox.SelectedIndexChanged += new System.EventHandler(this.recordingDeviceBox_SelectedIndexChanged);
+            // 
+            // speechRecordingDeviceLabel
+            // 
+            this.speechRecordingDeviceLabel.AutoSize = true;
+            this.speechRecordingDeviceLabel.Location = new System.Drawing.Point(38, 70);
+            this.speechRecordingDeviceLabel.Name = "speechRecordingDeviceLabel";
+            this.speechRecordingDeviceLabel.Size = new System.Drawing.Size(130, 13);
+            this.speechRecordingDeviceLabel.TabIndex = 102;
+            this.speechRecordingDeviceLabel.Text = "speech_recording_device";
             // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1146, 692);
-            this.Controls.Add(this.comboBox1);
+            this.Controls.Add(this.speechRecordingDeviceLabel);
+            this.Controls.Add(this.recordingDeviceBox);
             this.Controls.Add(this.driverNamesProgressBar);
             this.Controls.Add(this.downloadDriverNamesButton);
             this.Controls.Add(this.downloadSoundPackButton);
@@ -672,6 +683,7 @@ namespace CrewChiefV4
         private System.Windows.Forms.Label backgroundAudioDeviceLabel;
         private System.Windows.Forms.ComboBox spotterNameBox;
         private System.Windows.Forms.LinkLabel donateLink;
-        private ComboBox comboBox1;
+        private ComboBox recordingDeviceBox;
+        private Label speechRecordingDeviceLabel;
     }
 }
