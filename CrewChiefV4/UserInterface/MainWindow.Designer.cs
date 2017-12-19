@@ -128,9 +128,9 @@ namespace CrewChiefV4
             // buttonActionSelect
             // 
             this.buttonActionSelect.FormattingEnabled = true;
-            this.buttonActionSelect.Location = new System.Drawing.Point(323, 520);
+            this.buttonActionSelect.Location = new System.Drawing.Point(295, 520);
             this.buttonActionSelect.Name = "buttonActionSelect";
-            this.buttonActionSelect.Size = new System.Drawing.Size(468, 108);
+            this.buttonActionSelect.Size = new System.Drawing.Size(528, 115);
             this.buttonActionSelect.TabIndex = 7;
             this.buttonActionSelect.SelectedIndexChanged += new System.EventHandler(this.buttonActionSelect_SelectedIndexChanged);
             // 
@@ -145,9 +145,9 @@ namespace CrewChiefV4
             // 
             // assignButtonToAction
             // 
-            this.assignButtonToAction.Location = new System.Drawing.Point(797, 520);
+            this.assignButtonToAction.Location = new System.Drawing.Point(830, 520);
             this.assignButtonToAction.Name = "assignButtonToAction";
-            this.assignButtonToAction.Size = new System.Drawing.Size(167, 39);
+            this.assignButtonToAction.Size = new System.Drawing.Size(130, 39);
             this.assignButtonToAction.TabIndex = 9;
             this.assignButtonToAction.Text = "assign_control";
             this.assignButtonToAction.UseVisualStyleBackColor = true;
@@ -155,9 +155,9 @@ namespace CrewChiefV4
             // 
             // deleteAssigmentButton
             // 
-            this.deleteAssigmentButton.Location = new System.Drawing.Point(797, 564);
+            this.deleteAssigmentButton.Location = new System.Drawing.Point(830, 564);
             this.deleteAssigmentButton.Name = "deleteAssigmentButton";
-            this.deleteAssigmentButton.Size = new System.Drawing.Size(167, 40);
+            this.deleteAssigmentButton.Size = new System.Drawing.Size(130, 40);
             this.deleteAssigmentButton.TabIndex = 10;
             this.deleteAssigmentButton.Text = "delete_assignment";
             this.deleteAssigmentButton.UseVisualStyleBackColor = true;
