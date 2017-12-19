@@ -331,6 +331,11 @@ namespace CrewChiefV4
                 }
             }).Start();
 
+            int nRecDev = crewChief.speechRecogniser.RecDevs.Count;
+            for (int ii = 0; ii < nRecDev; ii++)
+                recordingDeviceBox.Items.Add(crewChief.speechRecogniser.RecDevs[ii]);
+            recordingDeviceBox.SelectedIndex = UserSettings.GetUserSettings().getInt("naudio_recording_device_idx");
+
             if (UserSettings.GetUserSettings().getBoolean("minimize_on_startup"))
             {
                 if (this.minimizeToTray)
@@ -1517,7 +1522,7 @@ namespace CrewChiefV4
                 runListenForButtonPressesThread = controllerConfiguration.listenForButtons(false);
                 try
                 {
-                    initialiseSpeechEngine();
+                    //initialiseSpeechEngine();
                     crewChief.speechRecogniser.voiceOptionEnum = VoiceOptionEnum.ALWAYS_ON;
                     voiceOption = VoiceOptionEnum.ALWAYS_ON;
                     UserSettings.GetUserSettings().setProperty("VOICE_OPTION", getVoiceOptionString());
@@ -2121,6 +2126,12 @@ namespace CrewChiefV4
         private void internetPanHandler(object sender, EventArgs e)
         {
             Process.Start("http://thecrewchief.org/misc.php?do=donate");
+        }
+
+        private void recordingDeviceBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            UserSettings.GetUserSettings().setProperty("naudio_recording_device_idx", (int)recordingDeviceBox.SelectedIndex);
+            crewChief.speechRecogniser.changeInputDevice((int)recordingDeviceBox.SelectedIndex);
         }
     }
 

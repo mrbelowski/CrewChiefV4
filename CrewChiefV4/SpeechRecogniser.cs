@@ -195,6 +195,20 @@ namespace CrewChiefV4
         // guard against race condition between closing channel and sre_SpeechRecognised event completing
         public static Boolean keepRecognisingInHoldMode = false;
 
+        private static List<String> recordingDevices = new List<string>();
+
+        public List<String> RecDevs
+        {
+            get => recordingDevices;
+            set => recordingDevices = value;
+        }
+
+        private RingBufferStream.RingBufferStream buffer = new RingBufferStream.RingBufferStream(48000);
+
+        NAudio.Wave.WaveInEvent waveIn = new NAudio.Wave.WaveInEvent();
+
+        private bool keepRecording = true;
+
         // load voice commands for triggering keyboard macros. The String key of the input Dictionary is the
         // command list key in speech_recognition_config.txt. When one of these phrases is heard the map value
         // CommandMacro is executed.
@@ -319,6 +333,13 @@ namespace CrewChiefV4
             {
                 minimum_voice_recognition_confidence = 0.5f;
             }
+
+            int nRecDevices = NAudio.Wave.WaveIn.DeviceCount;
+            for(int ii=0;ii<nRecDevices;ii++)
+            {
+                recordingDevices.Add(NAudio.Wave.WaveIn.GetCapabilities(ii).ProductName); 
+            }
+
         }
 
         private void initWithLocale(String locale)
@@ -392,7 +413,11 @@ namespace CrewChiefV4
             }
             try
             {
-                sre.SetInputToDefaultAudioDevice();
+                //sre.SetInputToDefaultAudioDevice();
+                waveIn.WaveFormat = new NAudio.Wave.WaveFormat(8000, 1);
+                waveIn.DataAvailable += new EventHandler<NAudio.Wave.WaveInEventArgs>(waveIn_DataAvailable);
+                waveIn.NumberOfBuffers = 3;
+
             }
             catch (Exception e)
             {
@@ -806,10 +831,10 @@ namespace CrewChiefV4
             }
             else if (voiceOptionEnum == MainWindow.VoiceOptionEnum.ALWAYS_ON)
             {
-                sre.RecognizeAsyncStop();
-                Thread.Sleep(500);
-                Console.WriteLine("restarting speech recognition");
-                recognizeAsync();
+                //sre.RecognizeAsyncStop();
+                //Thread.Sleep(500);
+                //Console.WriteLine("restarting speech recognition");
+                //recognizeAsync();
                 // in always-on mode, we're now waiting-for-speech until we get another result
                 waitingForSpeech = true;
             }
@@ -832,11 +857,35 @@ namespace CrewChiefV4
             SpeechRecogniser.keepRecognisingInHoldMode = true;
             try
             {
-                sre.RecognizeAsync(RecognizeMode.Multiple);
+                if (MainWindow.voiceOption == MainWindow.VoiceOptionEnum.HOLD)
+                {
+                    waveIn.StartRecording();
+                }
+                else if (MainWindow.voiceOption == MainWindow.VoiceOptionEnum.ALWAYS_ON)
+                {
+                    keepRecording = true;
+                    (new Thread(() =>
+                    {
+                        waveIn.StartRecording();
+                        while (keepRecording)
+                        {
+                            Thread.Sleep(5000); // fill the 5s ringbuffer, then process
+                            Microsoft.Speech.AudioFormat.SpeechAudioFormatInfo safi =
+new Microsoft.Speech.AudioFormat.SpeechAudioFormatInfo(
+waveIn.WaveFormat.SampleRate,
+Microsoft.Speech.AudioFormat.AudioBitsPerSample.Sixteen,
+Microsoft.Speech.AudioFormat.AudioChannel.Mono);
+                            sre.SetInputToAudioStream(buffer, safi); // otherwise input gets unset
+                            sre.RecognizeAsync(RecognizeMode.Multiple); // before this call
+                        }
+                        waveIn.StopRecording();
+                    })).Start();                    
+                }
             }
             catch (Exception e)
             {
                 Console.WriteLine("Unable to start speech recognition " + e.Message);
+                Console.WriteLine(e.StackTrace);
             }
         }
 
@@ -844,8 +893,25 @@ namespace CrewChiefV4
         {
             Console.WriteLine("cancelling wait for speech");
             SpeechRecogniser.waitingForSpeech = false;
-            SpeechRecogniser.keepRecognisingInHoldMode = false;
-            sre.RecognizeAsyncCancel();
+
+            if (MainWindow.voiceOption == MainWindow.VoiceOptionEnum.HOLD)
+            {
+                SpeechRecogniser.keepRecognisingInHoldMode = false;
+                waveIn.StopRecording();
+                Microsoft.Speech.AudioFormat.SpeechAudioFormatInfo safi =
+        new Microsoft.Speech.AudioFormat.SpeechAudioFormatInfo(
+            waveIn.WaveFormat.SampleRate,
+             Microsoft.Speech.AudioFormat.AudioBitsPerSample.Sixteen,
+            Microsoft.Speech.AudioFormat.AudioChannel.Mono);
+                sre.SetInputToAudioStream(buffer, safi); // otherwise input gets unset
+                sre.RecognizeAsync(RecognizeMode.Multiple); // before this call
+            }
+            else if (MainWindow.voiceOption == MainWindow.VoiceOptionEnum.ALWAYS_ON)
+            {
+                keepRecording = false;
+                sre.RecognizeAsyncCancel();
+            }
+
         }
 
         private AbstractEvent getEventForSpeech(String recognisedSpeech)
@@ -1016,6 +1082,19 @@ namespace CrewChiefV4
                 }
             }
             return null;
+        }
+
+        public void changeInputDevice(int dev)
+        {
+            waveIn.DeviceNumber = dev;
+        }
+
+        private void waveIn_DataAvailable(object sender, NAudio.Wave.WaveInEventArgs e)
+        {
+            lock (buffer)
+            {
+                buffer.Write(e.Buffer, (int)buffer.Position, e.BytesRecorded);
+            }
         }
     }
 }
