@@ -47,6 +47,7 @@ namespace CrewChiefV4.Events
         private float distanceBeforeLineToStartLeaderAccelerationCheck = 200f;
         private float leaderSpeedAtAccelerationCheckStart = -1;
         private OpponentData poleSitter = null;
+        private Boolean leaderHasGone = false;
 
         private String manualStartOpponentToFollow = null;
 
@@ -154,6 +155,7 @@ namespace CrewChiefV4.Events
             opponentsInFrontGridSides = new Dictionary<string, GridSide>();
             leaderSpeedAtAccelerationCheckStart = -1;
             poleSitter = null;
+            leaderHasGone = false;
         }
 
         private OpponentData getOpponent(GameStateData currentGameState, String opponentName)
@@ -345,7 +347,8 @@ namespace CrewChiefV4.Events
                         playManualStartInitialMessage(currentGameState);
                     }
                     // don't bother with any other messages until things have had a few seconds to settle down:
-                    else if (currentGameState.SessionData.SessionRunningTime > 10)
+                    else if (currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.SessionRunningTime > 10
+                        && currentGameState.SessionData.SessionPhase == SessionPhase.Green)
                     {
                         checkForIllegalPassesOnFormationLap(currentGameState);
                         checkForManualFormationRaceStart(currentGameState, currentGameState.SessionData.Position == 1);
@@ -356,7 +359,7 @@ namespace CrewChiefV4.Events
                 // now check if we really are on a manual formation lap. We have to do this *after* checking for the race start (above) because
                 // this will switch manual formation lap stuff off as soon as we cross the line (so would suppress the 'green green green' message).
                 // We want to ensure it's switched off if we're not in a race session, for obvious reasons.
-                GameStateData.onManualFormationLap = currentGameState.SessionData.SessionType == SessionType.Race && !playedManualStartPlayedGoGoGo;
+                GameStateData.onManualFormationLap = currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.CompletedLaps < 1;
             }
             else
             {
@@ -535,11 +538,16 @@ namespace CrewChiefV4.Events
                 audioPlayer.playMessageImmediately(new QueuedMessage(folderGreenGreenGreen, 0, this));
             }
             GameStateData.onManualFormationLap = false;
-            // switch off the other updates
-            playedManualStartPlayedGoGoGo = true;
-            playedManualStartLeaderHasCrossedLine = true;
-            playedManualStartGetReady = true;
-            playedManualStartInitialMessage = true;
+            // reset
+            playedManualStartPlayedGoGoGo = false;
+            playedManualStartLeaderHasCrossedLine = false;
+            playedManualStartGetReady = false;
+            playedManualStartInitialMessage = false;
+            leaderSpeedAtAccelerationCheckStart = -1;
+            poleSitter = null;
+            leaderHasGone = false;
+            manualStartOpponentToFollow = null;
+            manualFormationStartingPosition = 0;
         }
 
         private void playManualStartGetReady()
@@ -672,7 +680,15 @@ namespace CrewChiefV4.Events
 
         private void checkForIllegalPassesOnFormationLap(GameStateData currentGameState)
         {
+            if (this.manualStartOpponentToFollow == null)
+            {
+                return;
+            }
             OpponentData opponentToFollow = getOpponent(currentGameState, this.manualStartOpponentToFollow);
+            if (opponentToFollow == null)
+            {
+                return;
+            }
             if (hasOpponentDroppedBack(currentGameState.SessionData.Position, opponentToFollow))
             {
                 setOpponentToFollowAndStartPosition(currentGameState, false, false);
@@ -738,7 +754,7 @@ namespace CrewChiefV4.Events
 
         private void checkForLeaderHasAccelerated(GameStateData previousGameState, GameStateData currentGameState)
         {
-            if (previousGameState == null || currentGameState.SessionData.TrackDefinition == null ||
+            if (leaderHasGone || previousGameState == null || currentGameState.SessionData.TrackDefinition == null ||
                 currentGameState.PositionAndMotionData.DistanceRoundTrack == 0 || poleSitter == null)
             {
                 return;
@@ -753,10 +769,11 @@ namespace CrewChiefV4.Events
                 }
                 else if (leaderSpeedAtAccelerationCheckStart > 0)
                 {
-                    if (poleSitter.Speed - leaderSpeedAtAccelerationCheckStart > 10)
+                    if (poleSitter.Speed - leaderSpeedAtAccelerationCheckStart > 5)
                     {
                         Console.WriteLine("Looks like the leader has 'gone'");
                         audioPlayer.playMessage(new QueuedMessage(folderManualStartLeaderHasGone, 0, this));
+                        leaderHasGone = true;
                     }
                 }
             }

@@ -186,7 +186,8 @@ namespace CrewChiefV4.Events
             }
             currentFuel = currentGameState.FuelData.FuelLeft;
             // only track fuel data after the session has settled down
-            if (fuelUseActive && currentGameState.SessionData.SessionRunningTime > 15 &&
+            if (fuelUseActive && !GameStateData.onManualFormationLap &&
+                currentGameState.SessionData.SessionRunningTime > 15 &&
                 ((currentGameState.SessionData.SessionType == SessionType.Race &&
                     (currentGameState.SessionData.SessionPhase == SessionPhase.Green || 
                      currentGameState.SessionData.SessionPhase == SessionPhase.FullCourseYellow || 
