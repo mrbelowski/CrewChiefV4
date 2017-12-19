@@ -680,7 +680,7 @@ namespace CrewChiefV4.Events
 
         private void checkForIllegalPassesOnFormationLap(GameStateData currentGameState)
         {
-            if (this.manualStartOpponentToFollow == null)
+            if (this.manualStartOpponentToFollow == null || playedManualStartPlayedGoGoGo)
             {
                 return;
             }
@@ -755,7 +755,7 @@ namespace CrewChiefV4.Events
         private void checkForLeaderHasAccelerated(GameStateData previousGameState, GameStateData currentGameState)
         {
             if (leaderHasGone || previousGameState == null || currentGameState.SessionData.TrackDefinition == null ||
-                currentGameState.PositionAndMotionData.DistanceRoundTrack == 0 || poleSitter == null)
+                currentGameState.PositionAndMotionData.DistanceRoundTrack == 0 || poleSitter == null || playedManualStartPlayedGoGoGo)
             {
                 return;
             }
