@@ -17,6 +17,12 @@ namespace CrewChiefV4
 
         public static Dictionary<string, Tuple<string, int>> speechRecognitionDevices = new Dictionary<string, Tuple<string, int>>();
         public static int naudioSpeechRecognitionDeviceId = 0;
+        // used in nAudio mode:
+        private Boolean useNAudio = UserSettings.GetUserSettings().getBoolean("use_naudio_for_speech_recognition");
+        private RingBufferStream.RingBufferStream buffer = new RingBufferStream.RingBufferStream(48000);
+        private NAudio.Wave.WaveInEvent waveIn = new NAudio.Wave.WaveInEvent(); 
+        private bool keepRecording = true;
+        //
 
         private String location = UserSettings.GetUserSettings().getString("speech_recognition_location");
 
@@ -398,6 +404,11 @@ namespace CrewChiefV4
         public void initialiseSpeechEngine()
         {
             initialised = false;
+            if (useNAudio) {
+                buffer = new RingBufferStream.RingBufferStream(48000);
+                waveIn = new NAudio.Wave.WaveInEvent(); 
+            }
+
             if (location != null && location.Length > 0)
             {
                 try
@@ -433,7 +444,16 @@ namespace CrewChiefV4
             }
             try
             {
-                sre.SetInputToDefaultAudioDevice();
+                if (useNAudio)
+                {
+                    waveIn.WaveFormat = new NAudio.Wave.WaveFormat(8000, 1);
+                    waveIn.DataAvailable += new EventHandler<NAudio.Wave.WaveInEventArgs>(waveIn_DataAvailable);
+                    waveIn.NumberOfBuffers = 3;
+                }
+                else
+                {
+                    sre.SetInputToDefaultAudioDevice();
+                }
             }
             catch (Exception e)
             {
@@ -847,10 +867,13 @@ namespace CrewChiefV4
             }
             else if (voiceOptionEnum == MainWindow.VoiceOptionEnum.ALWAYS_ON)
             {
-                sre.RecognizeAsyncStop();
-                Thread.Sleep(500);
-                Console.WriteLine("restarting speech recognition");
-                recognizeAsync();
+                if (!useNAudio)
+                {
+                    sre.RecognizeAsyncStop();
+                    Thread.Sleep(500);
+                    Console.WriteLine("restarting speech recognition");
+                    recognizeAsync();
+                }
                 // in always-on mode, we're now waiting-for-speech until we get another result
                 waitingForSpeech = true;
             }
@@ -873,7 +896,37 @@ namespace CrewChiefV4
             SpeechRecogniser.keepRecognisingInHoldMode = true;
             try
             {
-                sre.RecognizeAsync(RecognizeMode.Multiple);
+                if (useNAudio)
+                {
+                    Console.WriteLine("Getting audio from nAudio input stream");
+                    if (MainWindow.voiceOption == MainWindow.VoiceOptionEnum.HOLD)
+                    {
+                         waveIn.StartRecording();
+                    }
+                    else if (MainWindow.voiceOption == MainWindow.VoiceOptionEnum.ALWAYS_ON)
+                    {
+                        keepRecording = true;
+                        (new Thread(() =>
+                        {
+                            waveIn.StartRecording();
+                            while (keepRecording)
+                            {
+                                Thread.Sleep(5000); // fill the 5s ringbuffer, then process
+                                Microsoft.Speech.AudioFormat.SpeechAudioFormatInfo safi =
+                                    new Microsoft.Speech.AudioFormat.SpeechAudioFormatInfo(
+                                        waveIn.WaveFormat.SampleRate, Microsoft.Speech.AudioFormat.AudioBitsPerSample.Sixteen, Microsoft.Speech.AudioFormat.AudioChannel.Mono);
+                                sre.SetInputToAudioStream(buffer, safi); // otherwise input gets unset
+                                sre.RecognizeAsync(RecognizeMode.Multiple); // before this call
+                            }
+                            waveIn.StopRecording();
+                        })).Start();                    
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Getting audio from default device");
+                    sre.RecognizeAsync(RecognizeMode.Multiple);
+                }
             }
             catch (Exception e)
             {
@@ -885,8 +938,36 @@ namespace CrewChiefV4
         {
             Console.WriteLine("cancelling wait for speech");
             SpeechRecogniser.waitingForSpeech = false;
-            SpeechRecogniser.keepRecognisingInHoldMode = false;
-            sre.RecognizeAsyncCancel();
+            if (useNAudio)
+            {
+                if (MainWindow.voiceOption == MainWindow.VoiceOptionEnum.HOLD)
+                {
+                    SpeechRecogniser.keepRecognisingInHoldMode = false;
+                    waveIn.StopRecording();
+                    Microsoft.Speech.AudioFormat.SpeechAudioFormatInfo safi = new Microsoft.Speech.AudioFormat.SpeechAudioFormatInfo(
+                        waveIn.WaveFormat.SampleRate, Microsoft.Speech.AudioFormat.AudioBitsPerSample.Sixteen, Microsoft.Speech.AudioFormat.AudioChannel.Mono);
+                    sre.SetInputToAudioStream(buffer, safi); // otherwise input gets unset
+                    sre.RecognizeAsync(RecognizeMode.Multiple); // before this call
+                }
+                else if (MainWindow.voiceOption == MainWindow.VoiceOptionEnum.ALWAYS_ON)
+                {
+                    keepRecording = false;
+                    sre.RecognizeAsyncCancel();
+                }
+            }
+            else
+            {
+                SpeechRecogniser.keepRecognisingInHoldMode = false;
+                sre.RecognizeAsyncCancel();
+            }
+        }
+
+        private void waveIn_DataAvailable(object sender, NAudio.Wave.WaveInEventArgs e)
+        {
+            lock (buffer)
+            {
+                buffer.Write(e.Buffer, (int)buffer.Position, e.BytesRecorded);
+            }
         }
 
         private AbstractEvent getEventForSpeech(String recognisedSpeech)
