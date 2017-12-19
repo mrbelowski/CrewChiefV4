@@ -15,6 +15,9 @@ namespace CrewChiefV4
     {
         private SpeechRecognitionEngine sre;
 
+        public static Dictionary<string, Tuple<string, int>> speechRecognitionDevices = new Dictionary<string, Tuple<string, int>>();
+        public static int naudioSpeechRecognitionDeviceId = 0;
+
         private String location = UserSettings.GetUserSettings().getString("speech_recognition_location");
 
         private float minimum_name_voice_recognition_confidence = UserSettings.GetUserSettings().getFloat("minimum_name_voice_recognition_confidence");
@@ -194,6 +197,44 @@ namespace CrewChiefV4
 
         // guard against race condition between closing channel and sre_SpeechRecognised event completing
         public static Boolean keepRecognisingInHoldMode = false;
+
+        static SpeechRecogniser () 
+        {
+            if (UserSettings.GetUserSettings().getBoolean("use_naudio_for_speech_recognition"))
+            {
+                speechRecognitionDevices.Clear();
+                for (int deviceId = 0; deviceId < NAudio.Wave.WaveIn.DeviceCount; deviceId++)
+                {
+                    // the audio device stuff makes no guarantee as to the presence of sensible device and product guids,
+                    // so we have to do the best we can here
+                    NAudio.Wave.WaveInCapabilities capabilities = NAudio.Wave.WaveIn.GetCapabilities(deviceId);
+                    Boolean hasNameGuid = capabilities.NameGuid != null && !capabilities.NameGuid.Equals(Guid.Empty);
+                    Boolean hasProductGuid = capabilities.ProductGuid != null && !capabilities.ProductGuid.Equals(Guid.Empty);
+                    String rawName = capabilities.ProductName;
+                    String name = rawName;
+                    int nameAddition = 0;
+                    while (speechRecognitionDevices.Keys.Contains(name))
+                    {
+                        nameAddition++;
+                        name = rawName += "(" + nameAddition + ")";
+                    }
+                    String guidToUse;
+                    if (hasNameGuid)
+                    {
+                        guidToUse = capabilities.NameGuid.ToString();
+                    }
+                    else if (hasProductGuid)
+                    {
+                        guidToUse = capabilities.ProductGuid.ToString() + "_" + name;
+                    }
+                    else
+                    {
+                        guidToUse = name;
+                    }
+                    speechRecognitionDevices.Add(name, new Tuple<string, int>(guidToUse, deviceId));
+                }
+            }
+        }
 
         // load voice commands for triggering keyboard macros. The String key of the input Dictionary is the
         // command list key in speech_recognition_config.txt. When one of these phrases is heard the map value
