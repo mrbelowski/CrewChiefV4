@@ -50,14 +50,13 @@ namespace CrewChiefV4.iRacing
         }
         public GameStateData mapToGameStateData(Object memoryMappedFileStruct, GameStateData previousGameState)
         {
-            CrewChiefV4.iRacing.iRacingSharedMemoryReader.iRacingStructWrapper wrapper = (CrewChiefV4.iRacing.iRacingSharedMemoryReader.iRacingStructWrapper)memoryMappedFileStruct;
-            GameStateData currentGameState = new GameStateData(wrapper.ticksWhenRead);
-            Sim shared = wrapper.data;
-
             if (memoryMappedFileStruct == null)
             {
                 return null;
             }
+            CrewChiefV4.iRacing.iRacingSharedMemoryReader.iRacingStructWrapper wrapper = (CrewChiefV4.iRacing.iRacingSharedMemoryReader.iRacingStructWrapper)memoryMappedFileStruct;
+            GameStateData currentGameState = new GameStateData(wrapper.ticksWhenRead);
+            Sim shared = wrapper.data;
 
             if (shared.Telemetry.IsReplayPlaying)
             {
