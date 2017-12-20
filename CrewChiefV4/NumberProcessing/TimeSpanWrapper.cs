@@ -33,6 +33,7 @@ namespace CrewChiefV4.NumberProcessing
                     (timeSpan < gapsInHundredthsThreshold ||
                     (GlobalBehaviourSettings.useOvalLogic && timeSpan < ovalGapsInHundredthsThreshold)))
                 {
+                    Console.WriteLine("Using hundreths for gap of " + timeSpan);
                     return Precision.HUNDREDTHS;
                 }
                 else
@@ -44,6 +45,7 @@ namespace CrewChiefV4.NumberProcessing
             {
                 if (GlobalBehaviourSettings.useHundredths)
                 {
+                    Console.WriteLine("Using hundreths for laptime of " + timeSpan);
                     return Precision.HUNDREDTHS;
                 }
                 else
