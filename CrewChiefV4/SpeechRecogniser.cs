@@ -15,12 +15,12 @@ namespace CrewChiefV4
     {
         private SpeechRecognitionEngine sre;
 
-        public static Dictionary<string, Tuple<string, int>> speechRecognitionDevices = new Dictionary<string, Tuple<string, int>>();
-        public static int naudioSpeechRecognitionDeviceId = 0;
         // used in nAudio mode:
+        public static Dictionary<string, Tuple<string, int>> speechRecognitionDevices = new Dictionary<string, Tuple<string, int>>();
+        public static int initialSpeechInputDeviceIndex = 0;
         private Boolean useNAudio = UserSettings.GetUserSettings().getBoolean("use_naudio_for_speech_recognition");
-        private RingBufferStream.RingBufferStream buffer = new RingBufferStream.RingBufferStream(48000);
-        private NAudio.Wave.WaveInEvent waveIn = new NAudio.Wave.WaveInEvent(); 
+        private RingBufferStream.RingBufferStream buffer;
+        private NAudio.Wave.WaveInEvent waveIn;
         private bool keepRecording = true;
         //
 
@@ -343,6 +343,14 @@ namespace CrewChiefV4
 
         public void Dispose()
         {
+            if (waveIn != null)
+            {
+                try
+                {
+                    waveIn.Dispose();
+                }
+                catch (Exception) { }
+            }
             if (sre != null)
             {
                 try
@@ -406,7 +414,8 @@ namespace CrewChiefV4
             initialised = false;
             if (useNAudio) {
                 buffer = new RingBufferStream.RingBufferStream(48000);
-                waveIn = new NAudio.Wave.WaveInEvent(); 
+                waveIn = new NAudio.Wave.WaveInEvent();
+                waveIn.DeviceNumber = SpeechRecogniser.initialSpeechInputDeviceIndex;
             }
 
             if (location != null && location.Length > 0)
@@ -959,6 +968,14 @@ namespace CrewChiefV4
             {
                 SpeechRecogniser.keepRecognisingInHoldMode = false;
                 sre.RecognizeAsyncCancel();
+            }
+        }
+
+        public void changeInputDevice(int dev)
+        {
+            if (initialised)
+            {
+                waveIn.DeviceNumber = dev;
             }
         }
 

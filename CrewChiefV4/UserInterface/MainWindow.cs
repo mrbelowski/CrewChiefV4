@@ -790,7 +790,7 @@ namespace CrewChiefV4
                         if (speechRecognitionDeviceGuid.Equals(entry.Value.Item1))
                         {
                             this.speechRecognitionDeviceBox.Text = entry.Key;
-                            SpeechRecogniser.naudioSpeechRecognitionDeviceId = entry.Value.Item2;
+                            SpeechRecogniser.initialSpeechInputDeviceIndex = entry.Value.Item2;
                             foundspeechRecognitionDeviceGuid = true;
                             break;
                         }
@@ -1586,7 +1586,7 @@ namespace CrewChiefV4
             if (SpeechRecogniser.speechRecognitionDevices.ContainsKey(this.speechRecognitionDeviceBox.Text))
             {
                 int deviceId = SpeechRecogniser.speechRecognitionDevices[this.speechRecognitionDeviceBox.Text].Item2;
-                SpeechRecogniser.naudioSpeechRecognitionDeviceId = deviceId;
+                crewChief.speechRecogniser.changeInputDevice(deviceId);
                 UserSettings.GetUserSettings().setProperty("NAUDIO_RECORDING_DEVICE_GUID",
                     SpeechRecogniser.speechRecognitionDevices[this.speechRecognitionDeviceBox.Text].Item1);
                 UserSettings.GetUserSettings().saveUserSettings();
