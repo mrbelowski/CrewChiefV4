@@ -2998,5 +2998,29 @@ namespace CrewChiefV4.Properties {
                 this["spotter_oval_clear_delay"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool use_naudio_for_speech_recognition {
+            get {
+                return ((bool)(this["use_naudio_for_speech_recognition"]));
+            }
+            set {
+                this["use_naudio_for_speech_recognition"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string NAUDIO_RECORDING_DEVICE_GUID {
+            get {
+                return ((string)(this["NAUDIO_RECORDING_DEVICE_GUID"]));
+            }
+            set {
+                this["NAUDIO_RECORDING_DEVICE_GUID"] = value;
+            }
+        }
     }
 }
