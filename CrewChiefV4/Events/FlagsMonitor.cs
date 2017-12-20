@@ -984,6 +984,17 @@ namespace CrewChiefV4.Events
                 return;
             }
 
+            // remove driver who are no longer in the opponentdata
+            List<NamePositionPair> driversInvolvedAndConnected = new List<NamePositionPair>();
+            foreach (NamePositionPair driverInvolved in driversInvolvedInCurrentIncident)
+            {
+                if (opponents.ContainsKey(driverInvolved.opponentKey))
+                {
+                    driversInvolvedAndConnected.Add(driverInvolved);
+                }
+            }
+            driversInvolvedInCurrentIncident = driversInvolvedAndConnected;
+
             // no pileup so read name / positions / corners as appropriate
             // there may be many of these, so we need to sort the list then pick the top few
             driversInvolvedInCurrentIncident.Sort(new NamePositionPairComparer(positionAtStartOfIncident));
