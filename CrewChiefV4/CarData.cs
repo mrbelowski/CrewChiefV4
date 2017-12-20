@@ -33,7 +33,7 @@ namespace CrewChiefV4
         // - the game sends the core temp, not the surface temp
 
         // model circa 2016:
-        private static float maxColdR3E2016TyreTempPeak = 90;
+        private static float maxColdR3E2016TyreTempPeak = 88;
         private static float maxWarmR3E2016TyreTempPeak = 99;
         private static float maxHotR3E2016TyreTempPeak = 104;
 
