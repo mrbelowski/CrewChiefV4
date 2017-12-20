@@ -774,6 +774,35 @@ namespace CrewChiefV4
                 this.backgroundAudioDeviceBox.SelectedValueChanged += new System.EventHandler(this.backgroundAudioDeviceSelected);
             }
 
+            if (UserSettings.GetUserSettings().getBoolean("use_naudio_for_speech_recognition"))
+            {
+                this.speechRecognitionDeviceBox.Enabled = true;
+                this.speechRecognitionDeviceBox.Visible = true;
+                this.speechRecognitionDeviceLabel.Visible = true;
+                this.speechRecognitionDeviceBox.Items.AddRange(SpeechRecogniser.speechRecognitionDevices.Keys.ToArray());
+                // only register the value changed listener after loading the available values
+                String speechRecognitionDeviceGuid = UserSettings.GetUserSettings().getString("NAUDIO_RECORDING_DEVICE_GUID");
+                Boolean foundspeechRecognitionDeviceGuid = false;
+                if (speechRecognitionDeviceGuid != null)
+                {
+                    foreach (KeyValuePair<string, Tuple<string, int>> entry in SpeechRecogniser.speechRecognitionDevices)
+                    {
+                        if (speechRecognitionDeviceGuid.Equals(entry.Value.Item1))
+                        {
+                            this.speechRecognitionDeviceBox.Text = entry.Key;
+                            SpeechRecogniser.initialSpeechInputDeviceIndex = entry.Value.Item2;
+                            foundspeechRecognitionDeviceGuid = true;
+                            break;
+                        }
+                    }
+                }
+                if (!foundspeechRecognitionDeviceGuid && SpeechRecogniser.speechRecognitionDevices.Count > 0)
+                {
+                    this.speechRecognitionDeviceBox.Text = SpeechRecogniser.speechRecognitionDevices.First().Key;
+                }
+                this.speechRecognitionDeviceBox.SelectedValueChanged += new System.EventHandler(this.speechRecognitionDeviceSelected);
+            }
+
             crewChief = new CrewChief();
             this.personalisationBox.Items.AddRange(this.crewChief.audioPlayer.personalisationsArray);
             this.spotterNameBox.Items.AddRange(NoisyCartesianCoordinateSpotter.availableSpotters.ToArray());
@@ -1548,6 +1577,18 @@ namespace CrewChiefV4
                 AudioPlayer.naudioMessagesPlaybackDeviceId = deviceId;
                 UserSettings.GetUserSettings().setProperty("NAUDIO_DEVICE_GUID_MESSAGES",
                     AudioPlayer.playbackDevices[this.messagesAudioDeviceBox.Text].Item1);
+                UserSettings.GetUserSettings().saveUserSettings();
+            }
+        }
+
+        private void speechRecognitionDeviceSelected(object sender, EventArgs e)
+        {
+            if (SpeechRecogniser.speechRecognitionDevices.ContainsKey(this.speechRecognitionDeviceBox.Text))
+            {
+                int deviceId = SpeechRecogniser.speechRecognitionDevices[this.speechRecognitionDeviceBox.Text].Item2;
+                crewChief.speechRecogniser.changeInputDevice(deviceId);
+                UserSettings.GetUserSettings().setProperty("NAUDIO_RECORDING_DEVICE_GUID",
+                    SpeechRecogniser.speechRecognitionDevices[this.speechRecognitionDeviceBox.Text].Item1);
                 UserSettings.GetUserSettings().saveUserSettings();
             }
         }
