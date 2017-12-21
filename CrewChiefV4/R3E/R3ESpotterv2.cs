@@ -55,7 +55,7 @@ namespace CrewChiefV4.RaceRoom
 
         // For double-file manual rolling starts. Will only work when the cars are all nicely settled on the grid - preferably 
         // when the game thinks the race has just started
-        public override GridSide getGridSide(Object currentStateObj)
+        public override Tuple<GridSide, Dictionary<int, GridSide>> getGridSide(Object currentStateObj)
         {
             RaceRoomShared latestRawData = ((CrewChiefV4.RaceRoom.R3ESharedMemoryReader.R3EStructWrapper)currentStateObj).data;
             DriverData playerData = getDriverData(latestRawData, latestRawData.VehicleInfo.SlotId);

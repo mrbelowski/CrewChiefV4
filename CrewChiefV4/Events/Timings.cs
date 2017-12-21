@@ -282,7 +282,7 @@ namespace CrewChiefV4.Events
                     {
                         if (gapInFrontStatus == GapStatus.CLOSE)
                         {
-                            if (sectorsSinceLastCloseCarAheadReport >= sectorsUntilNextCloseCarAheadReport)
+                            if (!GlobalBehaviourSettings.useOvalLogic && sectorsSinceLastCloseCarAheadReport >= sectorsUntilNextCloseCarAheadReport)
                             {
                                 sectorsSinceLastCloseCarAheadReport = 0;
                                 // only prefer mid-lap gap reports if we're on a track with no ad-hoc gapPoints
@@ -384,7 +384,7 @@ namespace CrewChiefV4.Events
                     {
                         if (gapBehindStatus == GapStatus.CLOSE)
                         {
-                            if (sectorsSinceLastCloseCarBehindReport >= sectorsUntilNextCloseCarBehindReport)
+                            if (!GlobalBehaviourSettings.useOvalLogic && sectorsSinceLastCloseCarBehindReport >= sectorsUntilNextCloseCarBehindReport)
                             {
                                 sectorsSinceLastCloseCarBehindReport = 0;
                                 // only prefer mid-lap gap reports if we're on a track with no ad-hoc gapPoints

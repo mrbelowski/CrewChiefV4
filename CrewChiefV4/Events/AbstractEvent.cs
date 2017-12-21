@@ -177,9 +177,15 @@ namespace CrewChiefV4.Events
             // no-op, override in the subclasses
         }
 
-        public virtual void respondMoreInformation(String voiceMessage)
+        // if we've made this request from an explicit voice command ("clarify") and we end up here, it means
+        // the event doesn't have a more-information response, so reply "we have no more information".
+        public virtual void respondMoreInformation(String voiceMessage, Boolean requestedExplicitly)
         {
-            // no-op, override in the subclasses
+            if (requestedExplicitly)
+            {
+                audioPlayer.playMessageImmediately(new QueuedMessage("no_more_information", MessageContents(AudioPlayer.folderNoMoreData), 0, this));
+            }
+            // otherwise do nothing
         }
 
         public void setPearlsOfWisdom(PearlsOfWisdom pearlsOfWisdom)

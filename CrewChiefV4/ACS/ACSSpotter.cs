@@ -42,7 +42,7 @@ namespace CrewChiefV4.assetto
 
         // For double-file manual rolling starts. Will only work when the cars are all nicely settled on the grid - preferably 
         // when the game thinks the race has just started
-        public override GridSide getGridSide(Object currentStateObj)
+        public override Tuple<GridSide, Dictionary<int, GridSide>> getGridSide(Object currentStateObj)
         {
             AssettoCorsaShared latestRawData = ((ACSSharedMemoryReader.ACSStructWrapper)currentStateObj).data;
             acsVehicleInfo playerData = latestRawData.acsChief.vehicle[0];

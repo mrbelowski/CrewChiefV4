@@ -11,7 +11,8 @@ namespace CrewChiefV4.NumberProcessing
     {
         public TimeSpan timeSpan;
         private Precision precision;
-        private static TimeSpan gapsInHundredthsThreshold = TimeSpan.FromMilliseconds(200);
+        private static TimeSpan gapsInHundredthsThreshold = TimeSpan.FromMilliseconds(500);
+        private static TimeSpan ovalGapsInHundredthsThreshold = TimeSpan.FromMilliseconds(2000);
         private static TimeSpan gapsSecondsThreshold = TimeSpan.FromSeconds(10);
 
         public TimeSpanWrapper(TimeSpan timeSpan, Precision precision)
@@ -28,8 +29,11 @@ namespace CrewChiefV4.NumberProcessing
                 {
                     return Precision.SECONDS;
                 }
-                else if (timeSpan < gapsInHundredthsThreshold || GlobalBehaviourSettings.useHundredths)
+                else if (GlobalBehaviourSettings.useHundredths && 
+                    (timeSpan < gapsInHundredthsThreshold ||
+                    (GlobalBehaviourSettings.useOvalLogic && timeSpan < ovalGapsInHundredthsThreshold)))
                 {
+                    Console.WriteLine("Using hundreths for gap of " + timeSpan);
                     return Precision.HUNDREDTHS;
                 }
                 else
@@ -41,6 +45,7 @@ namespace CrewChiefV4.NumberProcessing
             {
                 if (GlobalBehaviourSettings.useHundredths)
                 {
+                    Console.WriteLine("Using hundreths for laptime of " + timeSpan);
                     return Precision.HUNDREDTHS;
                 }
                 else

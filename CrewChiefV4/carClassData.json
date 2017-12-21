@@ -185,7 +185,7 @@
 		},
 		{
 			"carClassEnum": "GT4",
-			"raceroomClassIds": [5825],
+			"raceroomClassIds": [6648],
 			"pCarsClassNames": ["GT4"],
 			"rf2ClassNames": ["*GT4*"],
 			"acClassNames": ["*GT4*", "ks_bmw_m235i_racing", "lotus_evora_gx"],
@@ -361,7 +361,9 @@
 			"maxSafeOilTemp": 140,
 			"timesInHundredths": true,
 			"useAmericanTerms": true,
-			"enabledMessageTypes": "ALL"
+            "enabledMessageTypes": "ALL",
+            "spotterVehicleLength": 5,
+			"spotterVehicleWidth": 2,
 		},
 		{
 			"carClassEnum": "F1",

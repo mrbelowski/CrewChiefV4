@@ -84,9 +84,10 @@ namespace CrewChiefV4.commands
         public static void SendScanCodeKeyPress(KeyCode keyCode, int holdTimeMillis)
         {
             ushort scanCode = (ushort)MapVirtualKey((ushort)keyCode, 0);
-            press(scanCode, extendedKeys.Contains(keyCode));
+            Boolean extended = extendedKeys.Contains(keyCode);
+            press(scanCode, extended);
             Thread.Sleep(holdTimeMillis);
-            release(scanCode);
+            release(scanCode, extended);
         }
         private static void press(ushort scanCode, Boolean extended)
         {
@@ -112,8 +113,9 @@ namespace CrewChiefV4.commands
             SendInput((uint)inputs.Length, inputs, Marshal.SizeOf(typeof(INPUT)));
         }
 
-        private static void release(ushort scanCode)
+        private static void release(ushort scanCode, Boolean extended)
         {
+            uint eventScanCode = extended ? KEYEVENTF_SCANCODE | KEYEVENTF_KEYUP | KEYEVENTF_EXTENDEDKEY : KEYEVENTF_SCANCODE | KEYEVENTF_KEYUP;
             INPUT[] inputs = new INPUT[]
             {
                 new INPUT
@@ -125,7 +127,7 @@ namespace CrewChiefV4.commands
                         {
                             wVk = 0,
                             wScan = scanCode,
-                            dwFlags = KEYEVENTF_SCANCODE | KEYEVENTF_KEYUP,
+                            dwFlags = eventScanCode,
                             dwExtraInfo = GetMessageExtraInfo(),
                         }
                     }

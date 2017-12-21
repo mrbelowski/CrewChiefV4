@@ -75,6 +75,8 @@ namespace CrewChiefV4.Events
         private String folderKnackeredAllRound = "tyre_monitor/knackered_all_round";
 
         private String folderGoodWear = "tyre_monitor/good_wear";
+        // same as above but filtered to remove sounds that only work when used in a voice command response
+        private String folderGoodWearGeneral = "tyre_monitor/good_wear_general";
 
         private String folderMinorWearLeftFront = "tyre_monitor/minor_wear_left_front";
         private String folderMinorWearLeftRear = "tyre_monitor/minor_wear_left_rear";
@@ -213,7 +215,7 @@ namespace CrewChiefV4.Events
         private List<Boolean> leftRearLockedList = new List<Boolean>();
         private List<Boolean> rightRearLockedList = new List<Boolean>();
         private String currentCornerName = null;
-        private TimeSpan cornerLockWarningMaxFrequency = TimeSpan.FromSeconds(120); 
+        private TimeSpan cornerLockWarningMaxFrequency = TimeSpan.FromSeconds(180); 
         private TimeSpan cornerSpinningWarningMaxFrequency = TimeSpan.FromSeconds(120);
 
         private Dictionary<String, DateTime> cornerLockWarningsPlayed = new Dictionary<string, DateTime>();
@@ -684,7 +686,7 @@ namespace CrewChiefV4.Events
                 if (currentGameState.SessionData.IsNewSector && currentGameState.SessionData.SectorNumber == thisLapTyreConditionReportSector
                     && !currentGameState.PitData.InPitlane && enableTyreWearWarnings && !currentGameState.SessionData.LeaderHasFinishedRace)
                 {
-                    reportCurrentTyreConditionStatus(false, false, delayResponses);
+                    reportCurrentTyreConditionStatus(false, false, delayResponses, false);
                 }
                 if (!currentGameState.PitData.InPitlane && !reportedEstimatedTimeLeft && enableTyreWearWarnings && !currentGameState.SessionData.LeaderHasFinishedRace)
                 {
@@ -811,7 +813,7 @@ namespace CrewChiefV4.Events
             lastBrakeTempMessage = messageContents;
         }
 
-        private void reportCurrentTyreConditionStatus(Boolean playImmediately, Boolean playEvenIfUnchanged, Boolean allowDelayedResponse)
+        private void reportCurrentTyreConditionStatus(Boolean playImmediately, Boolean playEvenIfUnchanged, Boolean allowDelayedResponse, Boolean tyreStatusRequestOnly)
         {
             List<MessageFragment> messageContents = new List<MessageFragment>();
             addTyreConditionWarningMessages(currentTyreConditionStatus.getCornersForStatus(TyreCondition.MINOR_WEAR), TyreCondition.MINOR_WEAR, messageContents);
@@ -820,7 +822,7 @@ namespace CrewChiefV4.Events
             Boolean wearIsGood = false;
             if (messageContents.Count == 0)
             {
-                messageContents.Add(MessageFragment.Text(folderGoodWear));
+                messageContents.Add(MessageFragment.Text(tyreStatusRequestOnly ? folderGoodWear : folderGoodWearGeneral));
                 wearIsGood = true;
             }
 
@@ -1011,7 +1013,7 @@ namespace CrewChiefV4.Events
                 Boolean forStatusReport = !SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOWS_MY_TYRE_WEAR);
                 if (currentTyreConditionStatus != null)
                 {
-                    reportCurrentTyreConditionStatus(true, true, delayResponses);
+                    reportCurrentTyreConditionStatus(true, true, delayResponses, true);
                 }
                 else if (!forStatusReport)
                 {
@@ -1034,7 +1036,7 @@ namespace CrewChiefV4.Events
             {
                 if (currentTyreConditionStatus != null)
                 {
-                    reportCurrentTyreConditionStatus(true, true, false);
+                    reportCurrentTyreConditionStatus(true, true, false, false);
                 }
                 if (currentTyreTempStatus != null)
                 {

@@ -195,7 +195,6 @@ namespace CrewChiefV4.PCars
                     existingPartInfo.mCurrentLap = newPartInfo.sCurrentLap;
                     existingPartInfo.mCurrentLapDistance = newPartInfo.sCurrentLapDistance;
                     existingPartInfo.mLapsCompleted = (uint) newPartInfo.sLapsCompleted & 127;
-                    // TODO: there's a 'lapInvalidated' flag here but nowhere to put it in the existing struct
                     Boolean lapInvalidated = (newPartInfo.sLapsCompleted >> 7) == 1;
                     existingPartInfo.mRacePosition = (uint) newPartInfo.sRacePosition & 127;
                     existingPartInfo.mCurrentSector = (uint)newPartInfo.sSector & 7;
@@ -233,7 +232,6 @@ namespace CrewChiefV4.PCars
                 existingState.mParticipantData[i] = existingPartInfo;
             }
 
-            // TODO: buttons
             return existingState;
         }
 
@@ -581,9 +579,7 @@ namespace CrewChiefV4.PCars
         public float mEngineTorque;
 
         public int mEnforcedPitStopLap;
-
-        // TODO: front wing and rear wing 
-
+        
         public Boolean hasNewPositionData;
 
         public Boolean[] isSameClassAsPlayer;

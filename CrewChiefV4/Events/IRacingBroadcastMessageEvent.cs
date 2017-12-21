@@ -39,6 +39,21 @@ namespace CrewChiefV4.Events
         public static String folderLicenseR = "licence/r_licence";
         public static String folderLicensePro = "licence/pro_licence";
 
+        private Boolean playedIncidentsWarning = false;
+        private Boolean playedLastIncidentsLeftWarning = false;
+
+        private int lastColdFLPressure = -1;
+        private int lastColdFRPressure = -1;
+        private int lastColdRLPressure = -1;
+        private int lastColdRRPressure = -1;
+
+        private int maxIncidentCount = -1;
+        private int incidentsCount = -1;
+        private int iRating = -1;
+        private Boolean hasLimitedIncidents = false;
+        
+        private Tuple<String, float> licenseLevel = new Tuple<string, float>("invalid", -1);
+
         public IRacingBroadcastMessageEvent(AudioPlayer audioPlayer)
         {
             this.audioPlayer = audioPlayer;
@@ -51,17 +66,9 @@ namespace CrewChiefV4.Events
             this.iRating = -1;
             this.hasLimitedIncidents = false;
             this.licenseLevel = new Tuple<string, float>("invalid", -1);
+            this.playedIncidentsWarning = false;
+            this.playedLastIncidentsLeftWarning = false;
         }
-        int lastColdFLPressure = -1;
-        int lastColdFRPressure = -1;
-        int lastColdRLPressure = -1;
-        int lastColdRRPressure = -1;
-        int maxIncidentCount = -1;
-        int incidentsCount = -1;
-        int iRating = -1;
-        bool hasLimitedIncidents = false;
-        Tuple<String, float> licenseLevel = new Tuple<string, float>("invalid", -1);
-
 
         public override void clearState()
         {
@@ -74,8 +81,15 @@ namespace CrewChiefV4.Events
             this.iRating = -1;
             this.hasLimitedIncidents = false;
             this.licenseLevel = new Tuple<string, float>("invalid", -1);
-
+            this.playedIncidentsWarning = false;
+            this.playedLastIncidentsLeftWarning = false;
         }
+
+        public override List<SessionPhase> applicableSessionPhases
+        {
+            get { return new List<SessionPhase> { SessionPhase.Green, SessionPhase.Countdown, SessionPhase.FullCourseYellow }; }
+        }
+
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
             lastColdFLPressure = (int)currentGameState.TyreData.FrontLeftPressure;
@@ -88,6 +102,24 @@ namespace CrewChiefV4.Events
             hasLimitedIncidents = currentGameState.SessionData.HasLimitedIncidents;
             licenseLevel = currentGameState.SessionData.LicenseLevel;
             iRating = currentGameState.SessionData.iRating;
+/*
+            if (hasLimitedIncidents)
+            {
+                //play < 5 incident left warning.
+                if (incidentsCount >= maxIncidentCount - 5 && !playedIncidentsWarning)
+                {
+                    playedIncidentsWarning = true;
+                    audioPlayer.playMessageImmediately(new QueuedMessage("Incidents/limit", MessageContents(folderYouHave, incidentsCount, folderincidentPoints,
+                        Pause(200), folderincidentPointslimit, maxIncidentCount), 0, null));
+                    
+                }
+                else if (incidentsCount >= maxIncidentCount - 1 && !playedLastIncidentsLeftWarning)
+                {
+                    playedLastIncidentsLeftWarning = true;
+                    //play 1 incident left warning.
+                }
+            }
+ */
         }
 
         public override void respond(String voiceMessage)

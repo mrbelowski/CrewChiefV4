@@ -14,6 +14,7 @@ namespace CrewChiefV4.Audio
     {
         public static String TTS_IDENTIFIER = "TTS_IDENTIFIER";
         private Boolean useAlternateBeeps = UserSettings.GetUserSettings().getBoolean("use_alternate_beeps");
+        public static Boolean dumpListOfUnvocalizedNames = UserSettings.GetUserSettings().getBoolean("save_list_of_unvocalized_names");
         public static Boolean useTTS = UserSettings.GetUserSettings().getBoolean("use_tts_for_missing_names");
         public static Boolean useTTSOnlyWhenNecessary = UserSettings.GetUserSettings().getBoolean("use_tts_only_when_necessary");
         private double minSecondsBetweenPersonalisedMessages = (double)UserSettings.GetUserSettings().getInt("min_time_between_personalised_messages");
@@ -259,12 +260,17 @@ namespace CrewChiefV4.Audio
 
         public static void loadDriverNameSound(String name)
         {
+            Boolean isInAvailableNames = availableDriverNames.Contains(name);
+            if (dumpListOfUnvocalizedNames && !isInAvailableNames)
+            {
+                DriverNameHelper.unvocalizedNames.Add(name);
+            }
             // if the name is in the availableDriverNames array then we have a sound file for it, so we can load it
             if (!allowCaching)
             {
                 return;
             }
-            if (availableDriverNames.Contains(name))
+            if (isInAvailableNames)
             {
                 singleSounds[name].LoadAndCacheSound();
                 lock (SoundCache.dynamicLoadedSounds)
@@ -863,7 +869,7 @@ namespace CrewChiefV4.Audio
             {
                 initialise();
             }
-            if (preferPersonalised && singleSoundsWithPrefixOrSuffix.Count > 0)
+            if (!AudioPlayer.rantWaitingToPlay && preferPersonalised && singleSoundsWithPrefixOrSuffix.Count > 0)
             {
                 if (prefixOrSuffixIndexes == null || prefixOrSuffixIndexesPosition == prefixOrSuffixIndexes.Count)
                 {

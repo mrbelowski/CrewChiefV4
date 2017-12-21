@@ -925,6 +925,11 @@ namespace CrewChiefV4.Events
             {
                 string opponentKey = entry.Key;
                 OpponentData opponentData = entry.Value;
+                if (opponentData.DistanceRoundTrack == 0)
+                {
+                    // fuck's sake... pCARS2's data is so shit. This value will be 0 when a car enters the pitlane.
+                    continue;
+                }
                 if ((flagSector == -1 || opponentData.CurrentSectorNumber == flagSector) && !opponentData.InPits)
                 {
                     LapData lapData = opponentData.getCurrentLapData();
@@ -944,6 +949,11 @@ namespace CrewChiefV4.Events
                 if (opponents.ContainsKey(incidentCandidate.opponentDataKey))
                 {
                     OpponentData opponent = opponents[incidentCandidate.opponentDataKey];
+                    if (opponent.DistanceRoundTrack == 0)
+                    {
+                        // fuck's sake... pCARS2's data is so shit. This value will be 0 when a car enters the pitlane.
+                        continue;
+                    }
                     if (flagSector == -1 || opponent.CurrentSectorNumber == flagSector)
                     {
                         if ((Math.Abs(opponent.DistanceRoundTrack - incidentCandidate.distanceRoundTrackAtStartOfIncident) < maxDistanceMovedForYellowAnnouncement) ||
@@ -973,6 +983,17 @@ namespace CrewChiefV4.Events
             {
                 return;
             }
+
+            // remove driver who are no longer in the opponentdata
+            List<NamePositionPair> driversInvolvedAndConnected = new List<NamePositionPair>();
+            foreach (NamePositionPair driverInvolved in driversInvolvedInCurrentIncident)
+            {
+                if (opponents.ContainsKey(driverInvolved.opponentKey))
+                {
+                    driversInvolvedAndConnected.Add(driverInvolved);
+                }
+            }
+            driversInvolvedInCurrentIncident = driversInvolvedAndConnected;
 
             // no pileup so read name / positions / corners as appropriate
             // there may be many of these, so we need to sort the list then pick the top few
