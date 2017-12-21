@@ -215,7 +215,7 @@ namespace CrewChiefV4.Events
         private List<Boolean> leftRearLockedList = new List<Boolean>();
         private List<Boolean> rightRearLockedList = new List<Boolean>();
         private String currentCornerName = null;
-        private TimeSpan cornerLockWarningMaxFrequency = TimeSpan.FromSeconds(120); 
+        private TimeSpan cornerLockWarningMaxFrequency = TimeSpan.FromSeconds(180); 
         private TimeSpan cornerSpinningWarningMaxFrequency = TimeSpan.FromSeconds(120);
 
         private Dictionary<String, DateTime> cornerLockWarningsPlayed = new Dictionary<string, DateTime>();
