@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CrewChiefV4.GameState;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -24,6 +25,11 @@ namespace CrewChiefV4
 
         public PearlMessagePosition getMessagePosition(double messageProbability)
         {
+            // disable these for ovals because they make no sense
+            if (GlobalBehaviourSettings.useOvalLogic)
+            {
+                return PearlMessagePosition.NONE;
+            }
             if (messageProbability * pearlsFrequency > Utilities.random.NextDouble() * 10)
             {
                 if (Utilities.random.NextDouble() < 0.33)

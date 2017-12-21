@@ -50,14 +50,13 @@ namespace CrewChiefV4.iRacing
         }
         public GameStateData mapToGameStateData(Object memoryMappedFileStruct, GameStateData previousGameState)
         {
-            CrewChiefV4.iRacing.iRacingSharedMemoryReader.iRacingStructWrapper wrapper = (CrewChiefV4.iRacing.iRacingSharedMemoryReader.iRacingStructWrapper)memoryMappedFileStruct;
-            GameStateData currentGameState = new GameStateData(wrapper.ticksWhenRead);
-            Sim shared = wrapper.data;
-
             if (memoryMappedFileStruct == null)
             {
                 return null;
             }
+            CrewChiefV4.iRacing.iRacingSharedMemoryReader.iRacingStructWrapper wrapper = (CrewChiefV4.iRacing.iRacingSharedMemoryReader.iRacingStructWrapper)memoryMappedFileStruct;
+            GameStateData currentGameState = new GameStateData(wrapper.ticksWhenRead);
+            Sim shared = wrapper.data;
 
             if (shared.Telemetry.IsReplayPlaying)
             {
@@ -361,6 +360,7 @@ namespace CrewChiefV4.iRacing
             currentGameState.SessionData.MaxIncidentCount = shared.SessionData.IncidentLimit;
             currentGameState.SessionData.LicenseLevel = playerCar.licensLevel;
             currentGameState.SessionData.iRating = playerCar.IRating;
+
             //TODO add yellow 
             SessionFlags flag = (SessionFlags)shared.Telemetry.SessionFlags;
             if (flag.HasFlag(SessionFlags.Black) && !flag.HasFlag(SessionFlags.Furled))
@@ -375,11 +375,6 @@ namespace CrewChiefV4.iRacing
             {
                 currentGameState.FlagData.isLocalYellow = true;
             }
-
-            //currentGameState.SessionData.LapTimePrevious = (float)playerCar.Live.LapTimePrevious;
-
-            //currentGameState.SessionData.PreviousLapWasValid = playerCar.Live.PreviousLapWasValid;
-
 
             currentGameState.SessionData.CompletedLaps = playerCar.Live.LapsCompleted;
             //TODO validate laptimes
@@ -989,12 +984,7 @@ namespace CrewChiefV4.iRacing
             int previousLapsCompleted, int laps, SessionFlags sessionFlags, bool isInPit, bool fixedTimeSession,
             double sessionTimeRemaining, double sessionRunningTime)
         {
-            // here we assume a timed session must be at least 1 minute - if the time remaining < 0 and we've been running for < 60 seconds, it's bollocks
-            //if (fixedTimeSession && sessionTimeRemaining < 0 && sessionRunningTime < 60)
-            //{
-            // Console.WriteLine("assuming unavailable - fixed time with " + sessionTimeRemaining + " left and has run for " + sessionRunningTime);
-            //    return SessionPhase.Unavailable;
-            //}
+            /*
             if (!prevSessionFlags.Equals(sessionFlags.ToString()))
             {
                 Console.WriteLine(sessionFlags.ToString());
@@ -1005,6 +995,7 @@ namespace CrewChiefV4.iRacing
                 Console.WriteLine(sessionState.ToString());
                 prevSessionStates = sessionState.ToString();
             }
+            */
             if (currentSessionType == SessionType.Practice)
             {
                 if (sessionState.HasFlag(SessionStates.CoolDown))

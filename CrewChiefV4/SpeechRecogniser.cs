@@ -15,11 +15,21 @@ namespace CrewChiefV4
     {
         private SpeechRecognitionEngine sre;
 
+        // used in nAudio mode:
+        public static Dictionary<string, Tuple<string, int>> speechRecognitionDevices = new Dictionary<string, Tuple<string, int>>();
+        public static int initialSpeechInputDeviceIndex = 0;
+        private Boolean useNAudio = UserSettings.GetUserSettings().getBoolean("use_naudio_for_speech_recognition");
+        private RingBufferStream.RingBufferStream buffer;
+        private NAudio.Wave.WaveInEvent waveIn;
+        private bool keepRecording = true;
+        //
+
         private String location = UserSettings.GetUserSettings().getString("speech_recognition_location");
 
         private float minimum_name_voice_recognition_confidence = UserSettings.GetUserSettings().getFloat("minimum_name_voice_recognition_confidence");
         private float minimum_voice_recognition_confidence = UserSettings.GetUserSettings().getFloat("minimum_voice_recognition_confidence");
         private Boolean disable_alternative_voice_commands = UserSettings.GetUserSettings().getBoolean("disable_alternative_voice_commands");
+        private static Boolean use_verbose_responses = UserSettings.GetUserSettings().getBoolean("use_verbose_responses");
 
         private static String defaultLocale = Configuration.getSpeechRecognitionConfigOption("defaultLocale");
 
@@ -194,6 +204,44 @@ namespace CrewChiefV4
         // guard against race condition between closing channel and sre_SpeechRecognised event completing
         public static Boolean keepRecognisingInHoldMode = false;
 
+        static SpeechRecogniser () 
+        {
+            if (UserSettings.GetUserSettings().getBoolean("use_naudio_for_speech_recognition"))
+            {
+                speechRecognitionDevices.Clear();
+                for (int deviceId = 0; deviceId < NAudio.Wave.WaveIn.DeviceCount; deviceId++)
+                {
+                    // the audio device stuff makes no guarantee as to the presence of sensible device and product guids,
+                    // so we have to do the best we can here
+                    NAudio.Wave.WaveInCapabilities capabilities = NAudio.Wave.WaveIn.GetCapabilities(deviceId);
+                    Boolean hasNameGuid = capabilities.NameGuid != null && !capabilities.NameGuid.Equals(Guid.Empty);
+                    Boolean hasProductGuid = capabilities.ProductGuid != null && !capabilities.ProductGuid.Equals(Guid.Empty);
+                    String rawName = capabilities.ProductName;
+                    String name = rawName;
+                    int nameAddition = 0;
+                    while (speechRecognitionDevices.Keys.Contains(name))
+                    {
+                        nameAddition++;
+                        name = rawName += "(" + nameAddition + ")";
+                    }
+                    String guidToUse;
+                    if (hasNameGuid)
+                    {
+                        guidToUse = capabilities.NameGuid.ToString();
+                    }
+                    else if (hasProductGuid)
+                    {
+                        guidToUse = capabilities.ProductGuid.ToString() + "_" + name;
+                    }
+                    else
+                    {
+                        guidToUse = name;
+                    }
+                    speechRecognitionDevices.Add(name, new Tuple<string, int>(guidToUse, deviceId));
+                }
+            }
+        }
+
         // load voice commands for triggering keyboard macros. The String key of the input Dictionary is the
         // command list key in speech_recognition_config.txt. When one of these phrases is heard the map value
         // CommandMacro is executed.
@@ -295,6 +343,14 @@ namespace CrewChiefV4
 
         public void Dispose()
         {
+            if (waveIn != null)
+            {
+                try
+                {
+                    waveIn.Dispose();
+                }
+                catch (Exception) { }
+            }
             if (sre != null)
             {
                 try
@@ -356,6 +412,12 @@ namespace CrewChiefV4
         public void initialiseSpeechEngine()
         {
             initialised = false;
+            if (useNAudio) {
+                buffer = new RingBufferStream.RingBufferStream(48000);
+                waveIn = new NAudio.Wave.WaveInEvent();
+                waveIn.DeviceNumber = SpeechRecogniser.initialSpeechInputDeviceIndex;
+            }
+
             if (location != null && location.Length > 0)
             {
                 try
@@ -391,7 +453,16 @@ namespace CrewChiefV4
             }
             try
             {
-                sre.SetInputToDefaultAudioDevice();
+                if (useNAudio)
+                {
+                    waveIn.WaveFormat = new NAudio.Wave.WaveFormat(8000, 1);
+                    waveIn.DataAvailable += new EventHandler<NAudio.Wave.WaveInEventArgs>(waveIn_DataAvailable);
+                    waveIn.NumberOfBuffers = 3;
+                }
+                else
+                {
+                    sre.SetInputToDefaultAudioDevice();
+                }
             }
             catch (Exception e)
             {
@@ -758,12 +829,12 @@ namespace CrewChiefV4
                     {
                         crewChief.audioPlayer.repeatLastMessage();
                     }
-                    else if (ResultContains(e.Result.Text, MORE_INFO) && this.lastRecognisedText != null)
+                    else if (ResultContains(e.Result.Text, MORE_INFO) && this.lastRecognisedText != null && !use_verbose_responses)
                     {
                         AbstractEvent abstractEvent = getEventForSpeech(this.lastRecognisedText);
                         if (abstractEvent != null)
                         {
-                            abstractEvent.respondMoreInformation(this.lastRecognisedText);
+                            abstractEvent.respondMoreInformation(this.lastRecognisedText, true);
                         }
                     }
                     else
@@ -773,6 +844,12 @@ namespace CrewChiefV4
                         if (abstractEvent != null)
                         {
                             abstractEvent.respond(e.Result.Text);
+
+                            if (use_verbose_responses)
+                            {
+                                // In verbose mode, always respond with more info.
+                                abstractEvent.respondMoreInformation(this.lastRecognisedText, false);
+                            }
                         }
                     }
                 }
@@ -799,10 +876,13 @@ namespace CrewChiefV4
             }
             else if (voiceOptionEnum == MainWindow.VoiceOptionEnum.ALWAYS_ON)
             {
-                sre.RecognizeAsyncStop();
-                Thread.Sleep(500);
-                Console.WriteLine("restarting speech recognition");
-                recognizeAsync();
+                if (!useNAudio)
+                {
+                    sre.RecognizeAsyncStop();
+                    Thread.Sleep(500);
+                    Console.WriteLine("restarting speech recognition");
+                    recognizeAsync();
+                }
                 // in always-on mode, we're now waiting-for-speech until we get another result
                 waitingForSpeech = true;
             }
@@ -825,7 +905,37 @@ namespace CrewChiefV4
             SpeechRecogniser.keepRecognisingInHoldMode = true;
             try
             {
-                sre.RecognizeAsync(RecognizeMode.Multiple);
+                if (useNAudio)
+                {
+                    Console.WriteLine("Getting audio from nAudio input stream");
+                    if (MainWindow.voiceOption == MainWindow.VoiceOptionEnum.HOLD)
+                    {
+                         waveIn.StartRecording();
+                    }
+                    else if (MainWindow.voiceOption == MainWindow.VoiceOptionEnum.ALWAYS_ON)
+                    {
+                        keepRecording = true;
+                        (new Thread(() =>
+                        {
+                            waveIn.StartRecording();
+                            while (keepRecording)
+                            {
+                                Thread.Sleep(5000); // fill the 5s ringbuffer, then process
+                                Microsoft.Speech.AudioFormat.SpeechAudioFormatInfo safi =
+                                    new Microsoft.Speech.AudioFormat.SpeechAudioFormatInfo(
+                                        waveIn.WaveFormat.SampleRate, Microsoft.Speech.AudioFormat.AudioBitsPerSample.Sixteen, Microsoft.Speech.AudioFormat.AudioChannel.Mono);
+                                sre.SetInputToAudioStream(buffer, safi); // otherwise input gets unset
+                                sre.RecognizeAsync(RecognizeMode.Multiple); // before this call
+                            }
+                            waveIn.StopRecording();
+                        })).Start();                    
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Getting audio from default device");
+                    sre.RecognizeAsync(RecognizeMode.Multiple);
+                }
             }
             catch (Exception e)
             {
@@ -837,8 +947,44 @@ namespace CrewChiefV4
         {
             Console.WriteLine("cancelling wait for speech");
             SpeechRecogniser.waitingForSpeech = false;
-            SpeechRecogniser.keepRecognisingInHoldMode = false;
-            sre.RecognizeAsyncCancel();
+            if (useNAudio)
+            {
+                if (MainWindow.voiceOption == MainWindow.VoiceOptionEnum.HOLD)
+                {
+                    SpeechRecogniser.keepRecognisingInHoldMode = false;
+                    waveIn.StopRecording();
+                    Microsoft.Speech.AudioFormat.SpeechAudioFormatInfo safi = new Microsoft.Speech.AudioFormat.SpeechAudioFormatInfo(
+                        waveIn.WaveFormat.SampleRate, Microsoft.Speech.AudioFormat.AudioBitsPerSample.Sixteen, Microsoft.Speech.AudioFormat.AudioChannel.Mono);
+                    sre.SetInputToAudioStream(buffer, safi); // otherwise input gets unset
+                    sre.RecognizeAsync(RecognizeMode.Multiple); // before this call
+                }
+                else if (MainWindow.voiceOption == MainWindow.VoiceOptionEnum.ALWAYS_ON)
+                {
+                    keepRecording = false;
+                    sre.RecognizeAsyncCancel();
+                }
+            }
+            else
+            {
+                SpeechRecogniser.keepRecognisingInHoldMode = false;
+                sre.RecognizeAsyncCancel();
+            }
+        }
+
+        public void changeInputDevice(int dev)
+        {
+            if (initialised)
+            {
+                waveIn.DeviceNumber = dev;
+            }
+        }
+
+        private void waveIn_DataAvailable(object sender, NAudio.Wave.WaveInEventArgs e)
+        {
+            lock (buffer)
+            {
+                buffer.Write(e.Buffer, (int)buffer.Position, e.BytesRecorded);
+            }
         }
 
         private AbstractEvent getEventForSpeech(String recognisedSpeech)

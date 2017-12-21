@@ -96,8 +96,11 @@ namespace CrewChiefV4.Events
                 Boolean isLast = position == numCars;
                 if (isDisqualified) 
                 {
-                    audioPlayer.playMessage(new QueuedMessage(sessionEndMessageIdentifier, AbstractEvent.MessageContents(
-                        Penalties.folderDisqualified), 0, null));
+                    if (!audioPlayer.playRant(sessionEndMessageIdentifier, AbstractEvent.MessageContents(Penalties.folderDisqualified)))
+                    {
+                        audioPlayer.playMessage(new QueuedMessage(sessionEndMessageIdentifier, AbstractEvent.MessageContents(
+                            Penalties.folderDisqualified), 0, null));
+                    }                    
                 }
                 else if (isDNF)
                 {
@@ -128,14 +131,28 @@ namespace CrewChiefV4.Events
                     }
                     else
                     {
-                        audioPlayer.playMessage(new QueuedMessage(sessionEndMessageIdentifier, AbstractEvent.MessageContents(
-                            Position.folderStub + position, folderFinishedRace), 0, null));
+                        // if it's a shit finish, maybe launch into a tirade
+                        Boolean playedRant = false;
+                        int positionsLost = position - startPosition;
+                        // if we've lost 9 or more positions, and this is more than half the field size, maybe play a rant
+                        if (positionsLost > 8 && (float)positionsLost / (float)numCars >= 0.5f)
+                        {
+                            playedRant = audioPlayer.playRant(sessionEndMessageIdentifier, AbstractEvent.MessageContents(Position.folderStub + position));
+                        }
+                        if (!playedRant)
+                        {
+                            audioPlayer.playMessage(new QueuedMessage(sessionEndMessageIdentifier, AbstractEvent.MessageContents(
+                                Position.folderStub + position, folderFinishedRace), 0, null));
+                        }
                     }
                 }
                 else if (isLast)
                 {
-                    audioPlayer.playMessage(new QueuedMessage(sessionEndMessageIdentifier, 
-                        AbstractEvent.MessageContents(folderFinishedRaceLast), 0, null));
+                    if (!audioPlayer.playRant(sessionEndMessageIdentifier, AbstractEvent.MessageContents(Position.folderStub + position)))
+                    {
+                        audioPlayer.playMessage(new QueuedMessage(sessionEndMessageIdentifier,
+                            AbstractEvent.MessageContents(folderFinishedRaceLast), 0, null));
+                    }
                 }
             }
             else

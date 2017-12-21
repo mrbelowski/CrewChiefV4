@@ -166,6 +166,11 @@ namespace CrewChiefV4.Events
             get { return new List<SessionType> { SessionType.Practice, SessionType.Qualify, SessionType.Race }; }
         }
 
+        public override List<SessionPhase> applicableSessionPhases
+        {
+            get { return new List<SessionPhase> { SessionPhase.Green, SessionPhase.Countdown, SessionPhase.FullCourseYellow }; }
+        }
+
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
             if (!GlobalBehaviourSettings.enabledMessageTypes.Contains(MessageTypes.FUEL))
@@ -181,7 +186,8 @@ namespace CrewChiefV4.Events
             }
             currentFuel = currentGameState.FuelData.FuelLeft;
             // only track fuel data after the session has settled down
-            if (fuelUseActive && currentGameState.SessionData.SessionRunningTime > 15 &&
+            if (fuelUseActive && !GameStateData.onManualFormationLap &&
+                currentGameState.SessionData.SessionRunningTime > 15 &&
                 ((currentGameState.SessionData.SessionType == SessionType.Race &&
                     (currentGameState.SessionData.SessionPhase == SessionPhase.Green || 
                      currentGameState.SessionData.SessionPhase == SessionPhase.FullCourseYellow || 

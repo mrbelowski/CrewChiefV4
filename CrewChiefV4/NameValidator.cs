@@ -13,7 +13,8 @@ namespace CrewChiefV4
         // Mostly for wrecking but some notable exceptions - sangalli for thinking it's ok to threaten people, 
         // hance, hotdog and koch for being extraordinarily ignorant and rude, and so on. My app, my rules :)
          private static HashSet<String> wankers = new HashSet<String>(StringComparer.InvariantCultureIgnoreCase) { "mr.sisterfister", "bigsilverhotdog", 
-             "paul hance", "aline senna", "giuseppe sangalli", "patrick förster", "chris iwaski", "gazman", "peter koch"};
+             "paul hance", "aline senna", "giuseppe sangalli", "patrick förster", "chris iwaski", "gazman", "peter koch",
+             "andreas christiansen" };
  
           public static void validateName(String name)
           {

@@ -37,6 +37,7 @@ namespace CrewChiefV4.GameState
 
         public static Boolean realisticMode = UserSettings.GetUserSettings().getBoolean("realistic_mode");
         public static Boolean alwaysUseHundredths = UserSettings.GetUserSettings().getBoolean("always_report_time_in_hundredths");
+        public static Boolean defaultToAmericanTerms = UserSettings.GetUserSettings().getBoolean("use_american_terms");
         public static Boolean useAmericanTerms = false; // if true we use american phrasing where appropriate ("pace car" etc).
         public static Boolean useOvalLogic = false;    // if true, we don't care about cold brakes and cold left side tyres (?)
         public static Boolean useHundredths = false;
@@ -58,8 +59,8 @@ namespace CrewChiefV4.GameState
 
         public static void UpdateFromCarClass(CarData.CarClass carClass) 
         {
-            useAmericanTerms = carClass.useAmericanTerms;
-            useHundredths = (realisticMode && carClass.timesInHundredths) || alwaysUseHundredths;
+            useAmericanTerms = carClass.useAmericanTerms || defaultToAmericanTerms;
+            useHundredths = carClass.timesInHundredths || alwaysUseHundredths;
             enabledMessageTypes.Clear();
             if (realisticMode && carClass.enabledMessageTypes != null && carClass.enabledMessageTypes.Length > 0)
             {
@@ -116,6 +117,10 @@ namespace CrewChiefV4.GameState
         {
             useOvalLogic = trackDefinition.isOval;
             spotterEnabled = useOvalLogic || !realisticMode;
+            if (useOvalLogic)
+            {
+                Console.WriteLine("track is marked as oval");
+            }
         }
 
         private static void parseMessageTypes(String messageTypes)

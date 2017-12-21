@@ -672,8 +672,6 @@ namespace CrewChiefV4.GameState
 
         public DeltaTime DeltaTime = null;
 
-        public bool IsAtPitExit = false;
-
         public bool isApporchingPits = false;
 
         public int CarNr = -1;
@@ -2168,7 +2166,7 @@ namespace CrewChiefV4.GameState
                     }
                     else
                     {
-                        driver.Position = pos;
+                        driver.ClassPosition = pos;
                     }
                     pos++;
                 }

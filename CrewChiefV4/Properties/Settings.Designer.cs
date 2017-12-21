@@ -2938,5 +2938,89 @@ namespace CrewChiefV4.Properties {
                 this["manual_formation_double_file"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool use_verbose_responses {
+            get {
+                return ((bool)(this["use_verbose_responses"]));
+            }
+            set {
+                this["use_verbose_responses"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool save_list_of_unvocalized_names {
+            get {
+                return ((bool)(this["save_list_of_unvocalized_names"]));
+            }
+            set {
+                this["save_list_of_unvocalized_names"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool enable_ams_blue_on_slower {
+            get {
+                return ((bool)(this["enable_ams_blue_on_slower"]));
+            }
+            set {
+                this["enable_ams_blue_on_slower"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool enable_rants {
+            get {
+                return ((bool)(this["enable_rants"]));
+            }
+            set {
+                this["enable_rants"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("500")]
+        public int spotter_oval_clear_delay {
+            get {
+                return ((int)(this["spotter_oval_clear_delay"]));
+            }
+            set {
+                this["spotter_oval_clear_delay"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool use_naudio_for_speech_recognition {
+            get {
+                return ((bool)(this["use_naudio_for_speech_recognition"]));
+            }
+            set {
+                this["use_naudio_for_speech_recognition"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string NAUDIO_RECORDING_DEVICE_GUID {
+            get {
+                return ((string)(this["NAUDIO_RECORDING_DEVICE_GUID"]));
+            }
+            set {
+                this["NAUDIO_RECORDING_DEVICE_GUID"] = value;
+            }
+        }
     }
 }

@@ -1,6 +1,6 @@
 CrewChief version 4.8
 
-Written by Jim Britton (main app, voice acting, Raceroom and PCars implementations), Morten Roslev (Assetto Corsa and iRacing implementation), Vytautas Leonavičius (rFactor2 implementation) and Dan Allongo (Automobilista and rFactor1 implementation). The application is the result of lots of lots of hard work and input from the guys above as well as some great advice and support from the community and the guys at Sector3 and SMS.
+Written by Jim Britton (main app, voice acting, Raceroom and PCars implementations), Morten Roslev (Assetto Corsa and iRacing implementation), Vytautas Leonavičius (rFactor2 implementation), Dan Allongo (Automobilista and rFactor1 implementation) and Daniel Nowak (nAudio speech recognition port). The application is the result of lots of lots of hard work and input from the guys above as well as some great advice and support from the community and the guys at Sector3 and SMS.
 
 Additional material from Scoops (fantastic track layout mapping work). Fantastic alternate spotter sounds by Geoffrey Lessel, Matt Orr (aka EmptyBox), Clare Britton, Mike Schreiner, Phil Linden and Micha (last name?). Also a thank you to Nick Thissen for his work on iRacingSdkWrapper.
 
@@ -173,6 +173,18 @@ One final point. If the app says "Jim is faster than you", let him through :)
 
 Changelog
 ---------
+Version 4.8.3.2: Fixed AC plugin after game update - the app should ask if you want to update the plugin when you first launch it in AC mode; More fixes to the manual rolling start logic; iRacing session transition crash fix; some car class tweaks; added nAudio speech recognition code to allow voice recognition input device selection (enable with property "Use nAudio for speech recognition" - thanks to Daniel Nowak for this one); disable sector delta messages on ovals and use more generous spotter parameters
+
+Version 4.8.3.1: Corrected some pCARS 2 track names that got changed in the last pCARS 2 patch; disable some irrelvant sounds when racing on ovals; work around for some missing spotter sounds; a few internal fixes
+
+Version 4.8.3.0: Changed personalisations download process to reduce bandwidth use
+
+Version 4.8.2.9: Fixed a serious regression in multi-class race position tracking
+
+Version 4.8.2.8: Added more variety to race finish messages; make default R3E pit macro pause a while before closing menu; warn when an opponent car is exiting the pits; a few other minor bits and bobs
+
+Version 4.8.2.7: Experimental support for double-file manual rolling starts (R3E, pCARS2 & AC only - enable with "Manual formation lap double-file start" property); fixed arrow keys and some other keys not being released when used in command macros; iRacing rally cross fixes; more Formula E battery tracking logic and messages; split some longer voice command responses so if you want to hear more, you have to ask ("more information" / "more info" / "clarify") - currently only implemented for Formula E battery messages, but will be extended. If you want all the information in a single long response without having to ask for clarification, enable "Verbose messages" property; added missing RF1 / AMS blue flag override ("Enable AMS / rF1 blue on slower" property); some internal fixes
+
 Version 4.8.2.6: Fixed some nAudio bugs that meant the radio beeps were being sent to the wrong audio device; added Hong Kong track mappings (RF2 Formula E pack); fixed tyre temperature thresholds on some R3E car classes; added voice command to get player incident count ("how many incidents do I have" / "what's my incident count") and session incident limit ("what's the incident limit") - iRacing only; added voice command to get player licence ("what's my licence class") and iRating ("whats my iRating") - iRacing only; added voice command to get opponent licence ("what's [the guy in front's / the leader's / p10's / Bob's] licence class") and iRating ("what's [the guy in front's / the leader's / p10's / Bob's] iRating") - iRacing only; battery monitoring bug fixes
 
 Version 4.8.2.5: Reworked battery status message (response to voice command/button command), added battery use increase/decrease detection; added pit stop related messages for pCARS2; some internal bug fixing; allow spotter sounds ("car left" etc) to have their volume scaled relative to the other voice messages (property "spotter_volume_boost")

@@ -32,6 +32,7 @@ namespace CrewChiefV4
         public static Boolean readOpponentDeltasForEveryLap = false;
         // initial state from properties but can be overridden during a session:
         public static Boolean yellowFlagMessagesEnabled = UserSettings.GetUserSettings().getBoolean("enable_yellow_flag_messages");
+        private static Boolean useVerboseResponses = UserSettings.GetUserSettings().getBoolean("use_verbose_responses");
         private Boolean keepQuietEnabled = false;
                 
         public static Boolean enableDriverNames = UserSettings.GetUserSettings().getBoolean("enable_driver_names");
@@ -294,6 +295,10 @@ namespace CrewChiefV4
             if (GlobalBehaviourSettings.enabledMessageTypes.Contains(MessageTypes.BATTERY))
             {
                 ((Battery)eventsList["Battery"]).reportBatteryStatus(true);
+                if (useVerboseResponses)
+                {
+                    ((Battery)eventsList["Battery"]).reportExtendedBatteryStatus(true, false);
+                }
             }
             else
             {
@@ -510,8 +515,17 @@ namespace CrewChiefV4
             if (hour > 12) {
                 hour = hour - 12;
             }
-            audioPlayer.playMessageImmediately(new QueuedMessage("current_time", 
-                AbstractEvent.MessageContents(hour, now.Minute), 0, null));
+            int minute = now.Minute;
+            if (minute < 10)
+            {
+                audioPlayer.playMessageImmediately(new QueuedMessage("current_time",
+                    AbstractEvent.MessageContents(hour, NumberReader.folderOh, now.Minute), 0, null));
+            }
+            else
+            {
+                audioPlayer.playMessageImmediately(new QueuedMessage("current_time",
+                    AbstractEvent.MessageContents(hour, now.Minute), 0, null));
+            }
         }
 
         private void startSpotterThread()
@@ -566,7 +580,7 @@ namespace CrewChiefV4
             spotterIsRunning = false;
         }
 
-        public GridSide getGridSide()
+        public Tuple<GridSide, Dictionary<int, GridSide>> getGridSide()
         {
             return this.spotter.getGridSide(this.latestRawGameData);
         }
@@ -697,7 +711,15 @@ namespace CrewChiefV4
                         }
                         else
                         {
-                            latestRawGameData = gameDataReader.ReadGameData(false);
+                            try
+                            {
+                                latestRawGameData = gameDataReader.ReadGameData(false);
+                            }
+                            catch (GameDataReadException e)
+                            {
+                                Console.WriteLine("Error reading game data ", e.cause.StackTrace);
+                                continue;
+                            }
                         }
                         // another Thread may have stopped the app - check here before processing the game data
                         if (!running)
@@ -899,6 +921,10 @@ namespace CrewChiefV4
                 {
                     //ignore
                 }
+            }
+            if (SoundCache.dumpListOfUnvocalizedNames)
+            {
+                DriverNameHelper.dumpUnvocalizedNames();
             }
             mapped = false;
 

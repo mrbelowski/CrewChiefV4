@@ -289,6 +289,11 @@ pcars2_launch_params = pCARS 2 launch params
 pcars2_launch_params_help = This is used to tell Steam what app to run - pCARS 2's Steam app ID is 378860. If you specified a path pCARS2AVX.exe you can leave this blank
 launch_pcars2 = Launch pCARS 2
 launch_pcars2_help = If this is true the application will attempt to launch pCARS 2 when CrewChief starts (when you click 'Start application' or the app auto starts CrewChief if you set run_immediately to true)
+iracing_launch_exe = iRacing launch exe
+iracing_launch_exe_help = This is the path to iRacingSim64DX11.exe. Use forward slashes to separate paths.
+iracing_launch_params = iRacing launch params
+launch_iracing = Launch iRacing
+launch_iracing_help = If this is true the application will attempt to launch iRacing when CrewChief starts (when you click 'Start application' or the app auto starts CrewChief if you set run_immediately to true)
 
 run_immediately = Run immediately
 run_immediately_help = If this is true the application will start running CrewChief as soon as you start it up, using whatever options you previously set
@@ -401,7 +406,7 @@ report_allowed_overtakes_under_yellow = Report allowed overtakes under yellow
 report_allowed_overtakes_under_yellow_help = Play can-overtake and no-overtaking messages during yellow flags (R3E only)
 
 enable_rf2_blue_on_slower = Enable rF2 blue on slower
-enable_rf2_blue_on_slower_help = Play 'Blue Flag' messages if car behind seems to be faster.  Useful in multi-class races
+enable_rf2_blue_on_slower_help = Play 'Blue Flag' messages if car behind seems to be faster and is of different car class.  Useful in multi-class races
 enable_rf2_pit_stop_prediction = Enable rF2 pit stop prediction
 enable_rf2_pit_stop_prediction_help = Play 'box now' messages when using offline scheduled pit stops
 enable_stockcars_mode = Enable Stock Cars mode
@@ -487,6 +492,9 @@ get_damage_report = Report car damage
 disable_alternative_voice_commands = Disable alternative voice commands
 disable_alternative_voice_commands_help = Experimental: If enabled, CC will only use the first item from each voice command set - may improve recognition accuracy
 
+use_verbose_responses = Use verbose command responses
+use_verbose_responses_help = If enabled, will automatically request more info for the previously issued voice or button command
+
 toggle_pace_notes_recording = Start / stop recording pace notes
 toggle_pace_notes_playback = Start / stop playing pace notes
 
@@ -519,3 +527,20 @@ report_fuel_in_gallons_help = Reports fuel consumption in gallons instead of lit
 
 manual_formation_double_file = Manual formation lap double-file start
 manual_formation_double_file_help = Assume manual formation lap starts use 2 lines of cars
+
+save_list_of_unvocalized_names = Save driver names with no sound
+save_list_of_unvocalized_names_help = Write unvocalized driver names to file
+
+enable_ams_blue_on_slower = Enable AMS / rF1 blue on slower
+enable_ams_blue_on_slower_help = Play 'Blue Flag' messages if car behind seems to be faster.  Useful in multi-class races
+
+enable_rants = Enable rants
+enable_rants_help = Allow the Chief to occasionally express his disappointment in colourful and forceful terms
+
+spotter_oval_clear_delay = Spotter oval clear delay
+spotter_oval_clear_delay_help = You need to be clear for this many milliseconds before the Spotter calls 'clear' on ovals
+
+use_naudio_for_speech_recognition = Use nAudio for speech recognition
+use_naudio_for_speech_recognition_help = nAudio allows speech recognition device selection
+
+speech_recognition_device_label = Speech input device

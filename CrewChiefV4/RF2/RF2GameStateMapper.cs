@@ -462,7 +462,7 @@ namespace CrewChiefV4.rFactor2
             // If any difference between current and previous states suggests it is a new session
             if (pgs == null
                 || csd.SessionType != psd.SessionType
-                || !String.Equals(cgs.carClass.getClassIdentifier(), pgs.carClass.getClassIdentifier())
+                || !string.Equals(cgs.carClass.getClassIdentifier(), pgs.carClass.getClassIdentifier())
                 || csd.DriverRawName != psd.DriverRawName
                 || csd.TrackDefinition.name != psd.TrackDefinition.name  // TODO: this is empty sometimes, investigate 
                 || csd.TrackDefinition.trackLength != psd.TrackDefinition.trackLength
@@ -1575,16 +1575,16 @@ namespace CrewChiefV4.rFactor2
                     if (csd.SessionType != SessionType.Race
                         || csd.CompletedLaps < 1
                         || cgs.PositionAndMotionData.DistanceRoundTrack < 0.0f)
-                    {
                         break;
-                    }
-
+                    
                     if (opponent.getCurrentLapData().InLap
                         || opponent.getCurrentLapData().OutLap
                         || opponent.Position > csd.Position)
-                    {
                         continue;
-                    }
+                    
+                    // Only track this if opponent car class is different.
+                    if (string.Equals(cgs.carClass.getClassIdentifier(), opponent.CarClass.getClassIdentifier()))
+                        continue;
 
                     if (IsBehindWithinDistance(csd.TrackDefinition.trackLength, 8.0f, 40.0f,
                             cgs.PositionAndMotionData.DistanceRoundTrack, opponent.DistanceRoundTrack)
