@@ -1719,6 +1719,7 @@ namespace CrewChiefV4.RaceRoom
                         if (opponentData.LastLapTime == completedLapTime)
                         {
                             opponentData.InvalidateCurrentLap();
+                            opponentData.LastLapTime = -1;
                         }
                         else
                         {

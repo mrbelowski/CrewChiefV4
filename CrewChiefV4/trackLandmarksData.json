@@ -1044,6 +1044,7 @@
 		},
 		{
 			"pcarsTrackName": "Mazda Raceway:Laguna Seca",
+			"acTrackNames": [ "ks_laguna_seca:" ],
 			"raceroomLayoutId": 1856,
 			"irTrackName": "lagunaseca",
 			"trackLandmarks": [{
