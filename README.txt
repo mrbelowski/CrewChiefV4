@@ -173,7 +173,7 @@ One final point. If the app says "Jim is faster than you", let him through :)
 
 Changelog
 ---------
-Version 4.8.3.2: More fixes to the manual rolling start logic; iRacing session transition crash fix; some car class tweaks; added nAudio speech recognition code to allow voice recognition input device selection (enable with property "Use nAudio for speech recognition" - thanks to Daniel Nowak for this one); disable sector delta messages on ovals and use more generous spotter parameters
+Version 4.8.3.2: Fixed AC plugin after game update - the app should ask if you want to update the plugin when you first launch it in AC mode; More fixes to the manual rolling start logic; iRacing session transition crash fix; some car class tweaks; added nAudio speech recognition code to allow voice recognition input device selection (enable with property "Use nAudio for speech recognition" - thanks to Daniel Nowak for this one); disable sector delta messages on ovals and use more generous spotter parameters
 
 Version 4.8.3.1: Corrected some pCARS 2 track names that got changed in the last pCARS 2 patch; disable some irrelvant sounds when racing on ovals; work around for some missing spotter sounds; a few internal fixes
 
