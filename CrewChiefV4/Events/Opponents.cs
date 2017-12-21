@@ -239,8 +239,12 @@ namespace CrewChiefV4.Events
                             (currentGameState.SessionData.SessionType != SessionType.Race && opponentData.CompletedLaps > 1)) && opponentData.LastLapTime <= currentFastestLap &&
                             (opponentData.CanUseName && AudioPlayer.canReadName(opponentData.DriverRawName)))
                         {
-                            audioPlayer.playMessage(new QueuedMessage("new_fastest_lap", MessageContents(folderNewFastestLapFor, opponentData,
-                                        TimeSpanWrapper.FromSeconds(opponentData.LastLapTime, Precision.AUTO_LAPTIMES)), 0, this));
+                            if ((currentGameState.SessionData.SessionType == SessionType.Race && frequencyOfOpponentRaceLapTimes > 0) ||
+                                (currentGameState.SessionData.SessionType != SessionType.Race && frequencyOfOpponentPracticeAndQualLapTimes > 0))
+                            {
+                                audioPlayer.playMessage(new QueuedMessage("new_fastest_lap", MessageContents(folderNewFastestLapFor, opponentData,
+                                            TimeSpanWrapper.FromSeconds(opponentData.LastLapTime, Precision.AUTO_LAPTIMES)), 0, this));
+                            }
                         }
                         else if ((currentGameState.SessionData.SessionType == SessionType.Race &&
                                 (opponentData.LastLapTime <= opponentData.CurrentBestLapTime &&
