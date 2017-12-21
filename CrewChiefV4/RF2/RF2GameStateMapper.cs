@@ -96,7 +96,7 @@ namespace CrewChiefV4.rFactor2
             this.suspensionDamageThresholds.Add(new CornerData.EnumWithThresholds(DamageLevel.DESTROYED, 1.0f, 2.0f));
         }
 
-        private int[] minimumSupportedVersionParts = new int[] { 2, 2, 1, 0 };
+        private int[] minimumSupportedVersionParts = new int[] { 2, 3, 0, 0 };
         public static bool pluginVerified = false;
         private string lastVersionString;
         public void versionCheck(Object memoryMappedFileStruct)
@@ -151,7 +151,7 @@ namespace CrewChiefV4.rFactor2
             {
                 RF2GameStateMapper.pluginVerified = true;
 
-                var msg = "rFactor 2 Shared Memory version: " + versionStr + " 64bit";
+                var msg = "rFactor 2 Shared Memory version: " + versionStr + " 64bit." + (shared.extended.isStockCarRulesPluginHosted != 0 ? "  Stock Car Rules plugin hosted." : "");
                 Console.WriteLine(msg);
             }
         }
