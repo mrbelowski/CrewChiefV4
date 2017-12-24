@@ -1606,8 +1606,17 @@ namespace CrewChiefV4.rFactor2
             csd.Flag = currFlag;
 
             // --------------------------------
+            // Stock Car Rules data
+            if (GlobalBehaviourSettings.useAmericanTerms
+                && csd.SessionPhase == SessionPhase.FullCourseYellow)
+            {
+                // TODO:  Conver TR/TRP to SCR Data
+            }
+
+
+            // --------------------------------
             // Frozen order data
-            if (this.enableFrozenOrderMessages
+                if (this.enableFrozenOrderMessages
                 && playerRulesIdx != -1
                 && pgs != null)
                 cgs.FrozenOrderData = this.GetFrozenOrderData(pgs.FrozenOrderData, ref playerScoring, ref shared.scoring, ref shared.rules.mParticipants[playerRulesIdx], ref shared.rules);
