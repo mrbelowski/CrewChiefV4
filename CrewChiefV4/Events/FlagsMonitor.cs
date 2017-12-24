@@ -339,6 +339,14 @@ namespace CrewChiefV4.Events
                 processIllegalOvertakes(previousGameState, currentGameState);
                 illegalPassCarsCountAtLastAnnouncement = currentGameState.FlagData.numCarsPassedIllegally;
             }
+
+            // Stock Car Rules data
+            if (GlobalBehaviourSettings.useAmericanTerms
+                && currentGameState.SessionData.SessionPhase == SessionPhase.FullCourseYellow)
+            {
+                // TODO:  Conver TR/TRP to SCR Data
+            }
+
         }
 
         // note that these messages still play even if the yellow flag messages are disabled - I suppose they're penalty related
