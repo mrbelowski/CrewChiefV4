@@ -14,6 +14,30 @@ namespace CrewChiefV4.rFactor2
 {
     public class RF2GameStateMapper : GameStateMapper
     {
+        // User preference constants.
+        private readonly bool enablePitStopPrediction = UserSettings.GetUserSettings().getBoolean("enable_rf2_pit_stop_prediction");
+
+        // TODO: drop this.
+        private readonly bool enableBlueOnSlower = UserSettings.GetUserSettings().getBoolean("enable_rf2_blue_on_slower");
+        private readonly bool enableFrozenOrderMessages = UserSettings.GetUserSettings().getBoolean("enable_rf2_frozen_order_messages");
+        private readonly bool enableCutTrackHeuristics = UserSettings.GetUserSettings().getBoolean("enable_rf2_cut_track_heuristics");
+        private readonly bool enablePitLaneApproachHeuristics = UserSettings.GetUserSettings().getBoolean("enable_rf2_pit_lane_approach_heuristics");
+
+        // TODO: drop these.
+        private const bool incrementCutTrackCountWhenLeavingRacingSurface = true;
+        private const bool resetMinWidthEveryLap = true;
+
+        // Stock Car Rules plugin message constants.
+        private readonly string scrLuckyDogPassOnLeftUpper = "Lucky Dog: Pass Field On Left".ToUpperInvariant();
+        private readonly string scrAllowLuckyDogPassOnLeftUpper = "Allow Lucky Dog To Pass On Left".ToUpperInvariant();
+        private readonly string scrLuckyDogIsUpperPrefix = "Lucky Dog: ".ToUpperInvariant();
+        private readonly string scrLeaderChooseLaneUpper = "Choose A Lane By Staying Left Or Right".ToUpperInvariant();
+
+        // Note: "wave around" is a prefix message, because apparently ISI plugin says "on left",
+        // but custom plugin leagues use says "on right".
+        private readonly string scrWaveArroundPassOnUpperPrefix = "Wave Around: Pass Field On".ToUpperInvariant();
+        private readonly string scrMoveToEOLLUpper = "Move To End Of Longest Line".ToUpperInvariant();
+
         private SpeechRecogniser speechRecogniser;
 
         public static string playerName = null;
@@ -22,7 +46,7 @@ namespace CrewChiefV4.rFactor2
         private List<CornerData.EnumWithThresholds> tyreWearThresholds = new List<CornerData.EnumWithThresholds>();
 
         // Numbers below are pretty good match for HUD colors, all series, tire types.  Yay for best in class physics ;)
-        // Exact thresholds probably depend on tire type/series, even user preferences.  Maybe expose this via car class data in the future.
+        // Exact thresholds/ probably depend on tire type/series, even user preferences.  Maybe expose this via car class data in the future.
         private float scrubbedTyreWearPercent = 5.0f;
         private float minorTyreWearPercent = 20.0f;  // Turns Yellow in HUD.
         private float majorTyreWearPercent = 50.0f;  // Turns Red in HUD.
@@ -66,23 +90,6 @@ namespace CrewChiefV4.rFactor2
 
         // Player mTotalLaps when FCY frozen position assigned (used to calculate distance to SC).
         private float playerLapsWhenFCYPosAssigned = -1;
-
-        // Stock Car Rules plugin messages.
-        private readonly string scrLuckyDogPassOnLeftUpper = "Lucky Dog: Pass Field On Left".ToUpperInvariant();
-        private readonly string scrAllowLuckyDogPassOnLeftUpper = "Allow Lucky Dog To Pass On Left".ToUpperInvariant();
-        private readonly string scrLuckyDogIsUpperPrefix = "Lucky Dog: ".ToUpperInvariant();
-        private readonly string scrLeaderChooseLaneUpper = "Choose A Lane By Staying Left Or Right".ToUpperInvariant();
-        private readonly string scrWaveArroundPassOnUpperPrefix = "Wave Around: Pass Field On".ToUpperInvariant();
-        private readonly string scrMoveToEOLLUpper = "Move To End Of Longest Line".ToUpperInvariant();
-
-        // User preferences.
-        private readonly bool enablePitStopPrediction = UserSettings.GetUserSettings().getBoolean("enable_rf2_pit_stop_prediction");
-        private readonly bool enableBlueOnSlower = UserSettings.GetUserSettings().getBoolean("enable_rf2_blue_on_slower");
-        private readonly bool enableFrozenOrderMessages = UserSettings.GetUserSettings().getBoolean("enable_rf2_frozen_order_messages");
-        private readonly bool enableCutTrackHeuristics = UserSettings.GetUserSettings().getBoolean("enable_rf2_cut_track_heuristics");
-        private readonly bool enablePitLaneApproachHeuristics = UserSettings.GetUserSettings().getBoolean("enable_rf2_pit_lane_approach_heuristics");
-        private const bool incrementCutTrackCountWhenLeavingRacingSurface = true;
-        private const bool resetMinWidthEveryLap = true;
 
         // True if it looks like track has no DRS zones defined.
         private bool detectedTrackNoDRSZones = false;
@@ -1584,12 +1591,12 @@ namespace CrewChiefV4.rFactor2
                         || csd.CompletedLaps < 1
                         || cgs.PositionAndMotionData.DistanceRoundTrack < 0.0f)
                         break;
-                    
+
                     if (opponent.getCurrentLapData().InLap
                         || opponent.getCurrentLapData().OutLap
                         || opponent.Position > csd.Position)
                         continue;
-                    
+
                     // Only track this if opponent car class is different.
                     if (string.Equals(cgs.carClass.getClassIdentifier(), opponent.CarClass.getClassIdentifier()))
                         continue;
@@ -1616,16 +1623,41 @@ namespace CrewChiefV4.rFactor2
             // --------------------------------
             // Stock Car Rules data
             if (GlobalBehaviourSettings.useAmericanTerms
+                && playerRulesIdx != -1
                 && csd.SessionPhase == SessionPhase.FullCourseYellow
                 && csd.SessionType == SessionType.Race)
             {
-                // TODO:  Conver TR/TRP to SCR Data
+                // TODO: Detect if any of the opponents has WA, and introduce new sub rule.
+                var globalMsgUpper = RF2GameStateMapper.GetStringFromBytes(shared.rules.mTrackRules.mMessage).ToUpperInvariant();
+                var playerMsgUpper = RF2GameStateMapper.GetStringFromBytes(shared.rules.mParticipants[playerRulesIdx].mMessage);
+
+                if (!string.IsNullOrWhiteSpace(globalMsgUpper)
+                    && globalMsgUpper.Length > this.scrLuckyDogIsUpperPrefix.Length
+                    && globalMsgUpper.StartsWith(this.scrLuckyDogIsUpperPrefix))
+                {
+                    cgs.StockCarRulesData.luckyDogNameRaw = globalMsgUpper.Substring(globalMsgUpper.Length - 1).ToLowerInvariant();
+                    cgs.StockCarRulesData.luckyDogNameRaw = RF2GameStateMapper.GetSanitizedDriverName(cgs.StockCarRulesData.luckyDogNameRaw);
+                }
+
+                if (!string.IsNullOrWhiteSpace(playerMsgUpper))
+                {
+                    if (playerMsgUpper == this.scrAllowLuckyDogPassOnLeftUpper)
+                        cgs.StockCarRulesData.stockCarRuleApplicable = StockCarRule.LUCKY_DOG_ALLOW_TO_PASS_ON_LEFT;
+                    else if (playerMsgUpper == this.scrLuckyDogPassOnLeftUpper)
+                        cgs.StockCarRulesData.stockCarRuleApplicable = StockCarRule.LUCKY_DOG_PASS_ON_LEFT;
+                    else if (playerMsgUpper == this.scrLeaderChooseLaneUpper)
+                        cgs.StockCarRulesData.stockCarRuleApplicable = StockCarRule.LEADER_CHOOSE_LANE;
+                    else if (playerMsgUpper == this.scrMoveToEOLLUpper)
+                        cgs.StockCarRulesData.stockCarRuleApplicable = StockCarRule.MOVE_TO_EOLL;
+                    else if (playerMsgUpper.StartsWith(this.scrWaveArroundPassOnUpperPrefix))
+                        cgs.StockCarRulesData.stockCarRuleApplicable = StockCarRule.WAVE_AROUND_PASS_ON_RIGHT;
+               }
             }
 
 
             // --------------------------------
             // Frozen order data
-                if (this.enableFrozenOrderMessages
+            if (this.enableFrozenOrderMessages
                 && playerRulesIdx != -1
                 && pgs != null)
                 cgs.FrozenOrderData = this.GetFrozenOrderData(pgs.FrozenOrderData, ref playerScoring, ref shared.scoring, ref shared.rules.mParticipants[playerRulesIdx], ref shared.rules);

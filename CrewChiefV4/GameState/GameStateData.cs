@@ -74,7 +74,7 @@ namespace CrewChiefV4.GameState
     public enum StockCarRule
     {
         NONE,
-        LEADER_CHOOSE_LINE,
+        LEADER_CHOOSE_LANE,
         LUCKY_DOG_PASS_ON_LEFT,  // Player's LD
         LUCKY_DOG_ALLOW_TO_PASS_ON_LEFT,  // Opponent's LD
         MOVE_TO_EOLL,

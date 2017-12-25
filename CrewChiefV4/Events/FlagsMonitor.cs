@@ -81,6 +81,22 @@ namespace CrewChiefV4.Events
         private String folderNoOvertaking = "flags/no_overtaking";
         private String folderClearToOvertake = "flags/clear_to_overtake";
 
+        // StockCarRulesData states
+        private String folderLeaderChooseLane = "flags/choose_a_lane_by_staying_left_or_right";
+        private String folderOpponentIsLuckyDog = "flags/is_the_lucky_dog";
+        private String folderAllowLuckyDogPass = "flags/let_the_lucky_dog_pass_on_left";
+        private String folderWeAreLuckyDog = "flags/we_are_the_lucky_dog";
+
+        // TODO: not clear if both are needed.  I think those need to be simply merged.
+        private String folderEOLLPenalty = "flags/move_to_end_of_longest_line_for_penalty";
+        private String folderMoveToEOLL = "flags/move_to_the_end_of_the_longest_line";
+
+        // TODO: not clear if left is correct.
+        private String folderWaveAroundPassOnLeft = "flags/wave_around_pass_field_on_left";
+
+        // TODO: not clear if left is correct.
+        private String folderWeHaveBeenWavedAround = "flags/we_have_been_waved_around";
+
         private int maxDistanceMovedForYellowAnnouncement = UserSettings.GetUserSettings().getInt("max_distance_moved_for_yellow_announcement");
 
         private Boolean reportAllowedOvertakesUnderYellow = UserSettings.GetUserSettings().getBoolean("report_allowed_overtakes_under_yellow");
@@ -342,12 +358,59 @@ namespace CrewChiefV4.Events
 
             // Stock Car Rules data
             if (GlobalBehaviourSettings.useAmericanTerms
-                && currentGameState.SessionData.SessionPhase == SessionPhase.FullCourseYellow)
+                && currentGameState.SessionData.SessionType == SessionType.Race
+                && previousGameState != null
+                && currentGameState.SessionData.SessionPhase == SessionPhase.FullCourseYellow
+                && currentGameState.StockCarRulesData.stockCarRuleApplicable != StockCarRule.NONE)
             {
-                // TODO:  Conver TR/TRP to SCR Data
+                if (!string.IsNullOrWhiteSpace(currentGameState.StockCarRulesData.luckyDogNameRaw)
+                    && previousGameState.StockCarRulesData.luckyDogNameRaw != currentGameState.StockCarRulesData.luckyDogNameRaw
+                    && currentGameState.StockCarRulesData.stockCarRuleApplicable != StockCarRule.LUCKY_DOG_PASS_ON_LEFT)  // Make sure that's not player.
+                {
+                    if (currentGameState.StockCarRulesData.luckyDogNameRaw == currentGameState.SessionData.DriverRawName)
+                    {
+                        Console.WriteLine("Won't announce current lucky dog because it appears to be player");
+                    }
+                    else
+                    {
+                        var usableDriverName = DriverNameHelper.getUsableDriverName(currentGameState.StockCarRulesData.luckyDogNameRaw);
+                        if (SoundCache.hasSuitableTTSVoice || SoundCache.availableDriverNames.Contains(usableDriverName))
+                        {
+                            Console.WriteLine("STOCK CAR RULES, LD IS " + usableDriverName);
+                            audioPlayer.playMessageImmediately(new QueuedMessage("flags/lucky_dog_is",
+                                MessageContents(folderOpponentIsLuckyDog, usableDriverName), 0, this));
+                        }
+                    }
+                }
+
+                // See if rule has changed.
+                if (previousGameState.StockCarRulesData.stockCarRuleApplicable != currentGameState.StockCarRulesData.stockCarRuleApplicable)
+                {
+                    Console.WriteLine("STOCK CAR RULES: " + currentGameState.StockCarRulesData.stockCarRuleApplicable);
+                    if (currentGameState.StockCarRulesData.stockCarRuleApplicable == StockCarRule.LUCKY_DOG_PASS_ON_LEFT)
+                    {
+                        audioPlayer.playMessage(new QueuedMessage(folderWeAreLuckyDog, Utilities.random.Next(3, 6), this));
+                    }
+                    else if (currentGameState.StockCarRulesData.stockCarRuleApplicable == StockCarRule.LUCKY_DOG_ALLOW_TO_PASS_ON_LEFT)
+                    {
+                        audioPlayer.playMessage(new QueuedMessage(folderAllowLuckyDogPass, Utilities.random.Next(3, 6), this));
+                    }
+                    else if (currentGameState.StockCarRulesData.stockCarRuleApplicable == StockCarRule.LEADER_CHOOSE_LANE)
+                    {
+                        audioPlayer.playMessage(new QueuedMessage(folderLeaderChooseLane, Utilities.random.Next(3, 6), this));
+                    }
+                    else if (currentGameState.StockCarRulesData.stockCarRuleApplicable == StockCarRule.WAVE_AROUND_PASS_ON_RIGHT)
+                    {
+                        audioPlayer.playMessage(new QueuedMessage(folderWaveAroundPassOnLeft, Utilities.random.Next(3, 6), this));
+                    }
+                    else if (currentGameState.StockCarRulesData.stockCarRuleApplicable == StockCarRule.MOVE_TO_EOLL)
+                    {
+                        audioPlayer.playMessage(new QueuedMessage(folderEOLLPenalty, Utilities.random.Next(3, 6), this)); ;
+                    }
+                }
             }
 
-        }
+}
 
         // note that these messages still play even if the yellow flag messages are disabled - I suppose they're penalty related
         private void processIllegalOvertakes(GameStateData previousGameState, GameStateData currentGameState)
