@@ -67,6 +67,14 @@ namespace CrewChiefV4.rFactor2
         // Player mTotalLaps when FCY frozen position assigned (used to calculate distance to SC).
         private float playerLapsWhenFCYPosAssigned = -1;
 
+        // Stock Car Rules plugin messages.
+        private readonly string scrLuckyDogPassOnLeftUpper = "Lucky Dog: Pass Field On Left".ToUpperInvariant();
+        private readonly string scrAllowLuckyDogPassOnLeftUpper = "Allow Lucky Dog To Pass On Left".ToUpperInvariant();
+        private readonly string scrLuckyDogIsUpperPrefix = "Lucky Dog: ".ToUpperInvariant();
+        private readonly string scrLeaderChooseLaneUpper = "Choose A Lane By Staying Left Or Right".ToUpperInvariant();
+        private readonly string scrWaveArroundPassOnUpperPrefix = "Wave Around: Pass Field On".ToUpperInvariant();
+        private readonly string scrMoveToEOLLUpper = "Move To End Of Longest Line".ToUpperInvariant();
+
         // User preferences.
         private readonly bool enablePitStopPrediction = UserSettings.GetUserSettings().getBoolean("enable_rf2_pit_stop_prediction");
         private readonly bool enableBlueOnSlower = UserSettings.GetUserSettings().getBoolean("enable_rf2_blue_on_slower");
@@ -1608,7 +1616,8 @@ namespace CrewChiefV4.rFactor2
             // --------------------------------
             // Stock Car Rules data
             if (GlobalBehaviourSettings.useAmericanTerms
-                && csd.SessionPhase == SessionPhase.FullCourseYellow)
+                && csd.SessionPhase == SessionPhase.FullCourseYellow
+                && csd.SessionType == SessionType.Race)
             {
                 // TODO:  Conver TR/TRP to SCR Data
             }
