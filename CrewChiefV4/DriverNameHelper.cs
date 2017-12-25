@@ -156,7 +156,7 @@ namespace CrewChiefV4
         }
 
         public static String getUsableDriverName(String rawDriverName)
-        {            
+        {
             if (!usableNamesForSession.ContainsKey(rawDriverName))
             {
                 String usableDriverName = null;
