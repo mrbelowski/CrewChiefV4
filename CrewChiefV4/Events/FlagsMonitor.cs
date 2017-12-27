@@ -98,7 +98,6 @@ namespace CrewChiefV4.Events
         private String folderWeHaveBeenWavedAround = "flags/we_have_been_waved_around";
 
         private int maxDistanceMovedForYellowAnnouncement = UserSettings.GetUserSettings().getInt("max_distance_moved_for_yellow_announcement");
-
         private Boolean reportAllowedOvertakesUnderYellow = UserSettings.GetUserSettings().getBoolean("report_allowed_overtakes_under_yellow");
         
         // for new (RF2 and R3E) impl
