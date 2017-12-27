@@ -425,9 +425,6 @@
     <Setting Name="rf2_spotter_car_length" Type="System.Single" Scope="User">
       <Value Profile="(Default)">4.5</Value>
     </Setting>
-    <Setting Name="enable_rf2_blue_on_slower" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
-    </Setting>
     <Setting Name="enable_rf2_pit_stop_prediction" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
