@@ -86,15 +86,7 @@ namespace CrewChiefV4.Events
         private String folderOpponentIsLuckyDog = "flags/is_the_lucky_dog";
         private String folderAllowLuckyDogPass = "flags/let_the_lucky_dog_pass_on_left";
         private String folderWeAreLuckyDog = "flags/we_are_the_lucky_dog";
-
-        // TODO: not clear if both are needed.  I think those need to be simply merged.
         private String folderEOLLPenalty = "flags/move_to_end_of_longest_line_for_penalty";
-        private String folderMoveToEOLL = "flags/move_to_the_end_of_the_longest_line";
-
-        // TODO: not clear if left is correct.
-        private String folderWaveAroundPassOnLeft = "flags/wave_around_pass_field_on_left";
-
-        // TODO: not clear if left is correct.
         private String folderWeHaveBeenWavedAround = "flags/we_have_been_waved_around";
 
         private int maxDistanceMovedForYellowAnnouncement = UserSettings.GetUserSettings().getInt("max_distance_moved_for_yellow_announcement");
@@ -348,14 +340,18 @@ namespace CrewChiefV4.Events
                     audioPlayer.playMessage(new QueuedMessage(folderWhiteFlagEU, 0, this));
                 }
             }
-            if (currentGameState.FlagData.numCarsPassedIllegally >= 0 
+            if (currentGameState.FlagData.numCarsPassedIllegally >= 0
                 && currentGameState.Now > nextIllegalPassWarning && currentGameState.FlagData.numCarsPassedIllegally != illegalPassCarsCountAtLastAnnouncement)
-            {                
+            {
                 processIllegalOvertakes(previousGameState, currentGameState);
                 illegalPassCarsCountAtLastAnnouncement = currentGameState.FlagData.numCarsPassedIllegally;
             }
 
-            // Stock Car Rules data
+            processsStockCarRules(previousGameState, currentGameState);
+        }
+
+        private void processsStockCarRules(GameStateData previousGameState, GameStateData currentGameState)
+        {
             if (GlobalBehaviourSettings.useAmericanTerms
                 && currentGameState.SessionData.SessionType == SessionType.Race
                 && previousGameState != null
@@ -388,28 +384,27 @@ namespace CrewChiefV4.Events
                     Console.WriteLine("STOCK CAR RULES: " + currentGameState.StockCarRulesData.stockCarRuleApplicable);
                     if (currentGameState.StockCarRulesData.stockCarRuleApplicable == StockCarRule.LUCKY_DOG_PASS_ON_LEFT)
                     {
-                        audioPlayer.playMessage(new QueuedMessage(folderWeAreLuckyDog, Utilities.random.Next(3, 6), this));
+                        audioPlayer.playMessage(new QueuedMessage(folderWeAreLuckyDog, Utilities.random.Next(3, 7), this));
                     }
                     else if (currentGameState.StockCarRulesData.stockCarRuleApplicable == StockCarRule.LUCKY_DOG_ALLOW_TO_PASS_ON_LEFT)
                     {
-                        audioPlayer.playMessage(new QueuedMessage(folderAllowLuckyDogPass, Utilities.random.Next(3, 6), this));
+                        audioPlayer.playMessage(new QueuedMessage(folderAllowLuckyDogPass, Utilities.random.Next(3, 7), this));
                     }
                     else if (currentGameState.StockCarRulesData.stockCarRuleApplicable == StockCarRule.LEADER_CHOOSE_LANE)
                     {
-                        audioPlayer.playMessage(new QueuedMessage(folderLeaderChooseLane, Utilities.random.Next(3, 6), this));
+                        audioPlayer.playMessage(new QueuedMessage(folderLeaderChooseLane, Utilities.random.Next(3, 7), this));
                     }
                     else if (currentGameState.StockCarRulesData.stockCarRuleApplicable == StockCarRule.WAVE_AROUND_PASS_ON_RIGHT)
                     {
-                        audioPlayer.playMessage(new QueuedMessage(folderWaveAroundPassOnLeft, Utilities.random.Next(3, 6), this));
+                        audioPlayer.playMessage(new QueuedMessage(folderWeHaveBeenWavedAround, Utilities.random.Next(3, 7), this));
                     }
                     else if (currentGameState.StockCarRulesData.stockCarRuleApplicable == StockCarRule.MOVE_TO_EOLL)
                     {
-                        audioPlayer.playMessage(new QueuedMessage(folderEOLLPenalty, Utilities.random.Next(3, 6), this)); ;
+                        audioPlayer.playMessage(new QueuedMessage(folderEOLLPenalty, Utilities.random.Next(3, 7), this));
                     }
                 }
             }
-
-}
+        }
 
         // note that these messages still play even if the yellow flag messages are disabled - I suppose they're penalty related
         private void processIllegalOvertakes(GameStateData previousGameState, GameStateData currentGameState)
