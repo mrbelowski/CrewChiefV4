@@ -87,6 +87,10 @@ namespace CrewChiefV4.rFactor2
         // True if it looks like track has no DRS zones defined.
         private bool detectedTrackNoDRSZones = false;
 
+        // Stock Car Rules debug messages
+        private string lastUnknownGlobalRuleMessage = null;
+        private string lastUnknownPlayerRuleMessage = null;
+
         // Track landmarks cache.
         private string lastSessionTrackName = null;
         private TrackDataContainer lastSessionTrackDataContainer = null;
@@ -189,6 +193,8 @@ namespace CrewChiefV4.rFactor2
             this.minTrackWidth = -1.0;
             this.timePitStopRequested = DateTime.MinValue;
             this.isApproachingPitEntry = false;
+            this.lastUnknownGlobalRuleMessage = null;
+            this.lastUnknownPlayerRuleMessage = null;
             RF2GameStateMapper.sanitizedNamesMap.Clear();
         }
 
@@ -704,9 +710,7 @@ namespace CrewChiefV4.rFactor2
                 && pgs.PitData.HasRequestedPitStop
                 && cgs.PitData.HasRequestedPitStop
                 && (cgs.Now - this.timePitStopRequested).TotalSeconds > cgs.carClass.pitCrewPreparationTime)
-            {
                 cgs.PitData.IsPitCrewReady = true;
-            }
 
             // This sometimes fires under Countdown, so limit to phases when message might make sense.
             if (csd.SessionPhase == SessionPhase.Green
@@ -1558,37 +1562,8 @@ namespace CrewChiefV4.rFactor2
 
             // --------------------------------
             // Stock Car Rules data
-            if (GlobalBehaviourSettings.useAmericanTerms
-                && playerRulesIdx != -1
-                && csd.SessionPhase == SessionPhase.FullCourseYellow
-                && csd.SessionType == SessionType.Race)
-            {
-                var globalMsgUpper = RF2GameStateMapper.GetStringFromBytes(shared.rules.mTrackRules.mMessage).ToUpperInvariant();
-                var playerMsgUpper = RF2GameStateMapper.GetStringFromBytes(shared.rules.mParticipants[playerRulesIdx].mMessage);
-
-                if (!string.IsNullOrWhiteSpace(globalMsgUpper)
-                    && globalMsgUpper.Length > this.scrLuckyDogIsUpperPrefix.Length
-                    && globalMsgUpper.StartsWith(this.scrLuckyDogIsUpperPrefix))
-                {
-                    cgs.StockCarRulesData.luckyDogNameRaw = globalMsgUpper.Substring(globalMsgUpper.Length - 1).ToLowerInvariant();
-                    cgs.StockCarRulesData.luckyDogNameRaw = RF2GameStateMapper.GetSanitizedDriverName(cgs.StockCarRulesData.luckyDogNameRaw);
-                }
-
-                if (!string.IsNullOrWhiteSpace(playerMsgUpper))
-                {
-                    if (playerMsgUpper == this.scrAllowLuckyDogPassOnLeftUpper)
-                        cgs.StockCarRulesData.stockCarRuleApplicable = StockCarRule.LUCKY_DOG_ALLOW_TO_PASS_ON_LEFT;
-                    else if (playerMsgUpper == this.scrLuckyDogPassOnLeftUpper)
-                        cgs.StockCarRulesData.stockCarRuleApplicable = StockCarRule.LUCKY_DOG_PASS_ON_LEFT;
-                    else if (playerMsgUpper == this.scrLeaderChooseLaneUpper)
-                        cgs.StockCarRulesData.stockCarRuleApplicable = StockCarRule.LEADER_CHOOSE_LANE;
-                    else if (playerMsgUpper == this.scrMoveToEOLLUpper)
-                        cgs.StockCarRulesData.stockCarRuleApplicable = StockCarRule.MOVE_TO_EOLL;
-                    else if (playerMsgUpper.StartsWith(this.scrWaveArroundPassOnUpperPrefix))
-                        cgs.StockCarRulesData.stockCarRuleApplicable = StockCarRule.WAVE_AROUND_PASS_ON_RIGHT;
-               }
-            }
-
+            if (playerRulesIdx != -1)
+                cgs.StockCarRulesData = this.GetStockCarRulesData(cgs, ref shared.rules.mParticipants[playerRulesIdx], ref shared.rules);
 
             // --------------------------------
             // Frozen order data
@@ -1721,6 +1696,59 @@ namespace CrewChiefV4.rFactor2
             CrewChief.viewingReplay = false;
 
             return cgs;
+        }
+
+        private StockCarRulesData GetStockCarRulesData(GameStateData currentGameState, ref rF2TrackRulesParticipant playerRules, ref rF2Rules rules)
+        {
+            var scrData = new StockCarRulesData();
+            var cgs = currentGameState;
+
+            if (!GlobalBehaviourSettings.useAmericanTerms
+                || cgs.SessionData.SessionPhase != SessionPhase.FullCourseYellow
+                || cgs.SessionData.SessionType != SessionType.Race)
+                return scrData;
+
+            var globalMsgUpper = RF2GameStateMapper.GetStringFromBytes(rules.mTrackRules.mMessage).ToUpperInvariant();
+            var playerMsgUpper = RF2GameStateMapper.GetStringFromBytes(playerRules.mMessage);
+
+            if (!string.IsNullOrWhiteSpace(globalMsgUpper))
+            {
+                if (globalMsgUpper.Length > this.scrLuckyDogIsUpperPrefix.Length
+                    && globalMsgUpper.StartsWith(this.scrLuckyDogIsUpperPrefix))
+                {
+                    scrData.luckyDogNameRaw = globalMsgUpper.Substring(globalMsgUpper.Length - 1).ToLowerInvariant();
+                    scrData.luckyDogNameRaw = RF2GameStateMapper.GetSanitizedDriverName(scrData.luckyDogNameRaw);
+                }
+                else
+                {
+                    if (this.lastUnknownGlobalRuleMessage != globalMsgUpper)
+                    {
+                        this.lastUnknownGlobalRuleMessage = globalMsgUpper;
+                        Console.WriteLine("Unrecognized global rule message: " + globalMsgUpper);
+                    }
+                }
+            }
+
+            if (!string.IsNullOrWhiteSpace(playerMsgUpper))
+            {
+                if (playerMsgUpper == this.scrAllowLuckyDogPassOnLeftUpper)
+                    scrData.stockCarRuleApplicable = StockCarRule.LUCKY_DOG_ALLOW_TO_PASS_ON_LEFT;
+                else if (playerMsgUpper == this.scrLuckyDogPassOnLeftUpper)
+                    scrData.stockCarRuleApplicable = StockCarRule.LUCKY_DOG_PASS_ON_LEFT;
+                else if (playerMsgUpper == this.scrLeaderChooseLaneUpper)
+                    scrData.stockCarRuleApplicable = StockCarRule.LEADER_CHOOSE_LANE;
+                else if (playerMsgUpper == this.scrMoveToEOLLUpper)
+                    scrData.stockCarRuleApplicable = StockCarRule.MOVE_TO_EOLL;
+                else if (playerMsgUpper.StartsWith(this.scrWaveArroundPassOnUpperPrefix))
+                    scrData.stockCarRuleApplicable = StockCarRule.WAVE_AROUND_PASS_ON_RIGHT;
+                else if (this.lastUnknownPlayerRuleMessage != playerMsgUpper)
+                {
+                    this.lastUnknownPlayerRuleMessage = playerMsgUpper;
+                    Console.WriteLine("Unrecognized player rule message: " + playerMsgUpper);
+                }
+            }
+
+            return scrData;
         }
 
         private static double getVehicleSpeed(ref rF2VehicleTelemetry vehicleTelemetry)
