@@ -1709,7 +1709,7 @@ namespace CrewChiefV4.rFactor2
                 return scrData;
 
             var globalMsgUpper = RF2GameStateMapper.GetStringFromBytes(rules.mTrackRules.mMessage).ToUpperInvariant();
-            var playerMsgUpper = RF2GameStateMapper.GetStringFromBytes(playerRules.mMessage);
+            var playerMsgUpper = RF2GameStateMapper.GetStringFromBytes(playerRules.mMessage).ToUpperInvariant();
 
             if (!string.IsNullOrWhiteSpace(globalMsgUpper))
             {
