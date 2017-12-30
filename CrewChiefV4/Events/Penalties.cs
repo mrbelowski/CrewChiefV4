@@ -135,7 +135,7 @@ namespace CrewChiefV4.Events
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
             if (currentGameState.SessionData.SessionType == SessionType.Race && previousGameState != null && 
-                currentGameState.PenaltiesData.HasDriveThrough || currentGameState.PenaltiesData.HasStopAndGo || currentGameState.PenaltiesData.HasTimeDeduction)
+                (currentGameState.PenaltiesData.HasDriveThrough || currentGameState.PenaltiesData.HasStopAndGo || currentGameState.PenaltiesData.HasTimeDeduction))
             {
                 if (currentGameState.PenaltiesData.HasDriveThrough && !previousGameState.PenaltiesData.HasDriveThrough)
                 {
