@@ -482,6 +482,7 @@ namespace CrewChiefV4
                         userCarClass.placeholderClassId = userCarClassIds[userCarClassIndex];
                         Console.WriteLine("Adding a user defined class with ID " + userCarClass.placeholderClassId);
                         userCarClassIndex++;
+                        userCarClassesCount++;
                     }
                 }
                 if (!isInUserCarClasses)
