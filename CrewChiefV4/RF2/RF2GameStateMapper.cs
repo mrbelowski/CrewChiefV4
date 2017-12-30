@@ -16,10 +16,10 @@ namespace CrewChiefV4.rFactor2
     {
         // User preference constants.
         private readonly bool enablePitStopPrediction = UserSettings.GetUserSettings().getBoolean("enable_rf2_pit_stop_prediction");
-
         private readonly bool enableFrozenOrderMessages = UserSettings.GetUserSettings().getBoolean("enable_rf2_frozen_order_messages");
         private readonly bool enableCutTrackHeuristics = UserSettings.GetUserSettings().getBoolean("enable_rf2_cut_track_heuristics");
         private readonly bool enablePitLaneApproachHeuristics = UserSettings.GetUserSettings().getBoolean("enable_rf2_pit_lane_approach_heuristics");
+        private readonly bool enableFCYPitStateMessages = UserSettings.GetUserSettings().getBoolean("enable_rf2_pit_state_during_fcy");
 
         // Stock Car Rules plugin message constants.
         private readonly string scrLuckyDogPassOnLeftUpper = "Lucky Dog: Pass Field On Left".ToUpperInvariant();
@@ -1492,7 +1492,9 @@ namespace CrewChiefV4.rFactor2
                 else if (shared.scoring.mScoringInfo.mYellowFlagState == (sbyte)rFactor2Constants.rF2YellowFlagState.PitOpen
                     || shared.scoring.mScoringInfo.mYellowFlagState == (sbyte)rFactor2Constants.rF2YellowFlagState.PitClosed)
                 {
-                    if (playerRulesIdx != -1
+                    if (!this.enableFCYPitStateMessages)
+                        cgs.FlagData.fcyPhase = FullCourseYellowPhase.IN_PROGRESS;
+                    else if (playerRulesIdx != -1
                         && shared.scoring.mScoringInfo.mYellowFlagState == (sbyte)rFactor2Constants.rF2YellowFlagState.PitClosed)
                     {
                         var allowedToPit = shared.rules.mParticipants[playerRulesIdx].mAllowedToPit;
@@ -1507,7 +1509,7 @@ namespace CrewChiefV4.rFactor2
                         cgs.FlagData.fcyPhase = FullCourseYellowPhase.PITS_OPEN;
                 }
                 else if (shared.scoring.mScoringInfo.mYellowFlagState == (sbyte)rFactor2Constants.rF2YellowFlagState.PitLeadLap)
-                    cgs.FlagData.fcyPhase = FullCourseYellowPhase.PITS_OPEN_LEAD_LAP_VEHICLES;
+                    cgs.FlagData.fcyPhase = this.enableFCYPitStateMessages ? FullCourseYellowPhase.PITS_OPEN_LEAD_LAP_VEHICLES : FullCourseYellowPhase.IN_PROGRESS;
                 else if (shared.scoring.mScoringInfo.mYellowFlagState == (sbyte)rFactor2Constants.rF2YellowFlagState.LastLap)
                 {
                     if (pgs != null)

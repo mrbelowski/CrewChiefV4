@@ -12,7 +12,7 @@ namespace CrewChiefV4.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "12.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "14.0.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -1196,18 +1196,6 @@ namespace CrewChiefV4.Properties {
             }
             set {
                 this["enable_push_to_pass_messages"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool enable_stockcars_mode {
-            get {
-                return ((bool)(this["enable_stockcars_mode"]));
-            }
-            set {
-                this["enable_stockcars_mode"] = value;
             }
         }
         
@@ -3026,12 +3014,12 @@ namespace CrewChiefV4.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public string enable_rf1_pit_state_during_fcy {
+        public string enable_ams_pit_state_during_fcy {
             get {
-                return ((string)(this["enable_rf1_pit_state_during_fcy"]));
+                return ((string)(this["enable_ams_pit_state_during_fcy"]));
             }
             set {
-                this["enable_rf1_pit_state_during_fcy"] = value;
+                this["enable_ams_pit_state_during_fcy"] = value;
             }
         }
     }

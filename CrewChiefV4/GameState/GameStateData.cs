@@ -63,7 +63,7 @@ namespace CrewChiefV4.GameState
 
     public enum FullCourseYellowPhase
     {
-        PENDING, PITS_CLOSED, PITS_OPEN_LEAD_LAP_VEHICLES, PITS_OPEN, LAST_LAP_NEXT, LAST_LAP_CURRENT, RACING
+        PENDING, IN_PROGRESS, PITS_CLOSED, PITS_OPEN_LEAD_LAP_VEHICLES, PITS_OPEN, LAST_LAP_NEXT, LAST_LAP_CURRENT, RACING
     }
 
     public enum PassAllowedUnderYellow

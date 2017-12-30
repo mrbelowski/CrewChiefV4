@@ -407,8 +407,6 @@ report_allowed_overtakes_under_yellow_help = Play can-overtake and no-overtaking
 
 enable_rf2_pit_stop_prediction = Enable rF2 pit stop prediction
 enable_rf2_pit_stop_prediction_help = Play 'box now' messages when using offline scheduled pit stops
-enable_stockcars_mode = Enable Stock Cars mode
-enable_stockcars_mode_help = Uses Stock Cars wording for FCY phase, and enables White flag on last lap
 
 enable_simple_incident_detection = Enable simple incident detection
 enable_simple_incident_detection_help = Watch for and report very slow cars as incidents (pCARS and AC only)
@@ -542,3 +540,9 @@ use_naudio_for_speech_recognition = Use nAudio for speech recognition
 use_naudio_for_speech_recognition_help = nAudio allows speech recognition device selection
 
 speech_recognition_device_label = Speech input device
+
+enable_rf2_pit_state_during_fcy = Enable rF2 FCY pit state messages
+enable_rf2_pit_state_during_fcy_help = Announce pit state during Safety Car/Pace Car phase
+
+enable_ams_pit_state_during_fcy = Enable AMS / rF1 FCY pit state messages
+enable_ams_pit_state_during_fcy_help = Announce pit state during Safety Car/Pace Car phase

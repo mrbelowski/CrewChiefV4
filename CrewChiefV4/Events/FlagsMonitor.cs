@@ -35,6 +35,7 @@ namespace CrewChiefV4.Events
         private String folderFCYellowLastLapNextEU = "flags/fc_yellow_last_lap_next_eu";
         private String folderFCYellowLastLapCurrentEU = "flags/fc_yellow_last_lap_current_eu";
         private String folderFCYellowPrepareForGreenEU = "flags/fc_yellow_prepare_for_green_eu";
+        private String folderFCYellowInProgressEU = "flags/fc_yellow_in_progress_eu";
         private String folderFCYellowStartUS = "flags/fc_yellow_start_usa";
         private String folderFCYellowPitsClosedUS = "flags/fc_yellow_pits_closed_usa";
         private String folderFCYellowPitsOpenLeadLapCarsUS = "flags/fc_yellow_pits_open_lead_lap_cars_usa";
@@ -42,6 +43,7 @@ namespace CrewChiefV4.Events
         private String folderFCYellowLastLapNextUS = "flags/fc_yellow_last_lap_next_usa";
         private String folderFCYellowLastLapCurrentUS = "flags/fc_yellow_last_lap_current_usa";
         private String folderFCYellowPrepareForGreenUS = "flags/fc_yellow_prepare_for_green_usa";
+        private String folderFCYellowInProgressUS = "flags/fc_yellow_in_progress_usa";
         private String folderFCYellowGreenFlag = "flags/fc_yellow_green_flag";
 
         private String[] folderYellowFlagSectors = new String[] { "flags/yellow_flag_sector_1", "flags/yellow_flag_sector_2", "flags/yellow_flag_sector_3" };
@@ -97,7 +99,7 @@ namespace CrewChiefV4.Events
         private FlagEnum[] lastSectorFlagsReported = new FlagEnum[] { FlagEnum.GREEN, FlagEnum.GREEN, FlagEnum.GREEN };
         private DateTime[] lastSectorFlagsReportedTime = new DateTime[] { DateTime.MinValue, DateTime.MinValue, DateTime.MinValue };
         private FullCourseYellowPhase lastFCYAnnounced = FullCourseYellowPhase.RACING;
-        private DateTime lastFCYAccounedTime = DateTime.MinValue;
+        private DateTime lastFCYAccountedTime = DateTime.MinValue;
         private TimeSpan timeBetweenYellowAndClearFlagMessages = TimeSpan.FromSeconds(3);
         private TimeSpan minTimeBetweenNewYellowFlagMessages = TimeSpan.FromSeconds(10);
 
@@ -111,7 +113,7 @@ namespace CrewChiefV4.Events
 
         private DateTime nextIncidentDriversCheck = DateTime.MaxValue;
 
-        private TimeSpan fcyPitStatusReminderMinTime = TimeSpan.FromSeconds(UserSettings.GetUserSettings().getInt("time_between_caution_period_status_reminders"));
+        private TimeSpan fcyStatusReminderMinTime = TimeSpan.FromSeconds(UserSettings.GetUserSettings().getInt("time_between_caution_period_status_reminders"));
 
         private Boolean reportYellowsInAllSectors = UserSettings.GetUserSettings().getBoolean("report_yellows_in_all_sectors");
         private Boolean enableSimpleIncidentDetection = UserSettings.GetUserSettings().getBoolean("enable_simple_incident_detection");
@@ -267,7 +269,7 @@ namespace CrewChiefV4.Events
             lastSectorFlagsReportedTime = new DateTime[] { DateTime.MinValue, DateTime.MinValue, DateTime.MinValue };
             nextIncidentDriversCheck = DateTime.MaxValue;
             lastFCYAnnounced = FullCourseYellowPhase.RACING;
-            lastFCYAccounedTime = DateTime.MinValue;
+            lastFCYAccountedTime = DateTime.MinValue;
             lastLocalYellowAnnouncedTime = DateTime.MinValue;
             lastLocalYellowClearAnnouncedTime = DateTime.MinValue;
             lastOvertakeAllowedReportTime = DateTime.MinValue;
@@ -476,7 +478,7 @@ namespace CrewChiefV4.Events
                 if (announceFCYPhase(previousGameState.FlagData.fcyPhase, currentGameState.FlagData.fcyPhase, currentGameState.Now, playerStartedSector3))
                 {
                     lastFCYAnnounced = currentGameState.FlagData.fcyPhase;
-                    lastFCYAccounedTime = currentGameState.Now;
+                    lastFCYAccountedTime = currentGameState.Now;
                     switch (currentGameState.FlagData.fcyPhase)
                     {
                         case FullCourseYellowPhase.PENDING:
@@ -498,31 +500,37 @@ namespace CrewChiefV4.Events
                         case FullCourseYellowPhase.PITS_CLOSED:
                             if (CrewChief.yellowFlagMessagesEnabled)
                             {
-                                audioPlayer.playMessage(new QueuedMessage(GlobalBehaviourSettings.useAmericanTerms ? folderFCYellowPitsClosedUS : folderFCYellowPitsClosedEU, Utilities.random.Next(1, 3), this));
+                                audioPlayer.playMessage(new QueuedMessage(GlobalBehaviourSettings.useAmericanTerms ? folderFCYellowPitsClosedUS : folderFCYellowPitsClosedEU, Utilities.random.Next(1, 4), this));
                             }
                             break;
                         case FullCourseYellowPhase.PITS_OPEN_LEAD_LAP_VEHICLES:
                             if (CrewChief.yellowFlagMessagesEnabled)
                             {
-                                audioPlayer.playMessage(new QueuedMessage(GlobalBehaviourSettings.useAmericanTerms ? folderFCYellowPitsOpenLeadLapCarsUS : folderFCYellowPitsOpenLeadLapCarsEU, 0, this));
+                                audioPlayer.playMessage(new QueuedMessage(GlobalBehaviourSettings.useAmericanTerms ? folderFCYellowPitsOpenLeadLapCarsUS : folderFCYellowPitsOpenLeadLapCarsEU, Utilities.random.Next(1, 4), this));
                             }
                             break;
                         case FullCourseYellowPhase.PITS_OPEN:
                             if (CrewChief.yellowFlagMessagesEnabled)
                             {
-                                audioPlayer.playMessage(new QueuedMessage(GlobalBehaviourSettings.useAmericanTerms ? folderFCYellowPitsOpenUS : folderFCYellowPitsOpenEU, Utilities.random.Next(1, 3), this));
+                                audioPlayer.playMessage(new QueuedMessage(GlobalBehaviourSettings.useAmericanTerms ? folderFCYellowPitsOpenUS : folderFCYellowPitsOpenEU, Utilities.random.Next(1, 4), this));
+                            }
+                            break;
+                        case FullCourseYellowPhase.IN_PROGRESS:
+                            if (CrewChief.yellowFlagMessagesEnabled)
+                            {
+                                audioPlayer.playMessage(new QueuedMessage(GlobalBehaviourSettings.useAmericanTerms ? folderFCYellowInProgressUS : folderFCYellowInProgressEU, Utilities.random.Next(1, 4), this));
                             }
                             break;
                         case FullCourseYellowPhase.LAST_LAP_NEXT:
                             if (CrewChief.yellowFlagMessagesEnabled)
                             {
-                                audioPlayer.playMessage(new QueuedMessage(GlobalBehaviourSettings.useAmericanTerms ? folderFCYellowLastLapNextUS : folderFCYellowLastLapNextEU, 0, this));
+                                audioPlayer.playMessage(new QueuedMessage(GlobalBehaviourSettings.useAmericanTerms ? folderFCYellowLastLapNextUS : folderFCYellowLastLapNextEU, Utilities.random.Next(1, 4), this));
                             }
                             break;
                         case FullCourseYellowPhase.LAST_LAP_CURRENT:
                             if (CrewChief.yellowFlagMessagesEnabled)
                             {
-                                audioPlayer.playMessage(new QueuedMessage(GlobalBehaviourSettings.useAmericanTerms ? folderFCYellowLastLapCurrentUS : folderFCYellowLastLapCurrentEU, 0, this));
+                                audioPlayer.playMessage(new QueuedMessage(GlobalBehaviourSettings.useAmericanTerms ? folderFCYellowLastLapCurrentUS : folderFCYellowLastLapCurrentEU, Utilities.random.Next(1, 4), this));
                             }
                             break;
                         case FullCourseYellowPhase.RACING:
@@ -821,7 +829,8 @@ namespace CrewChiefV4.Events
             return (previousPhase != currentPhase && currentPhase != lastFCYAnnounced) ||
                 ((currentPhase == FullCourseYellowPhase.PITS_CLOSED ||
                  currentPhase == FullCourseYellowPhase.PITS_OPEN_LEAD_LAP_VEHICLES ||
-                 currentPhase == FullCourseYellowPhase.PITS_OPEN) && now > lastFCYAccounedTime + fcyPitStatusReminderMinTime && startedSector3);
+                 currentPhase == FullCourseYellowPhase.PITS_OPEN ||
+                 currentPhase == FullCourseYellowPhase.IN_PROGRESS) && now > lastFCYAccountedTime + fcyStatusReminderMinTime && startedSector3);
         }
 
         /**
