@@ -303,7 +303,7 @@ namespace CrewChiefV4.Events
                         }
                         if (enableDamageMessages)
                         {
-                            playDamageToReport();
+                            playDamageToReport(currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.NumCars > 2);
                         }
                     }
                 }
@@ -596,7 +596,7 @@ namespace CrewChiefV4.Events
             }
         }
 
-        private void playDamageToReport()
+        private void playDamageToReport(Boolean allowRants)
         {
             if (isMissingWheel || damageToReportNext.Item2 > DamageLevel.MINOR)
             {
@@ -621,7 +621,10 @@ namespace CrewChiefV4.Events
                 if (damageToReportNext.Item2 == DamageLevel.DESTROYED)
                 {
                     audioPlayer.playMessage(new QueuedMessage(folderBustedEngine, 0, this));
-                    audioPlayer.playRant("damage_rant", null);
+                    if (allowRants)
+                    {
+                        audioPlayer.playRant("damage_rant", null);
+                    }
                 }
                 else if (damageToReportNext.Item2 == DamageLevel.MAJOR)
                 {
@@ -637,7 +640,10 @@ namespace CrewChiefV4.Events
                 if (damageToReportNext.Item2 == DamageLevel.DESTROYED)
                 {
                     audioPlayer.playMessage(new QueuedMessage(folderBustedTransmission, 0, this));
-                    audioPlayer.playRant("damage_rant", null);
+                    if (allowRants)
+                    {
+                        audioPlayer.playRant("damage_rant", null);
+                    }
                 }
                 else if (damageToReportNext.Item2 == DamageLevel.MAJOR)
                 {
@@ -653,7 +659,10 @@ namespace CrewChiefV4.Events
                 if (damageToReportNext.Item2 == DamageLevel.DESTROYED)
                 {
                     audioPlayer.playMessage(new QueuedMessage(folderBustedSuspension, 0, this));
-                    audioPlayer.playRant("damage_rant", null);
+                    if (allowRants)
+                    {
+                        audioPlayer.playRant("damage_rant", null);
+                    }
                 }
                 else if (damageToReportNext.Item2 == DamageLevel.MAJOR || isMissingWheel)
                 {
