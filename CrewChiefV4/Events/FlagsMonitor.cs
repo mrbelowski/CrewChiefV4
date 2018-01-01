@@ -373,7 +373,7 @@ namespace CrewChiefV4.Events
                         var usableDriverName = DriverNameHelper.getUsableDriverName(currentGameState.StockCarRulesData.luckyDogNameRaw);
                         if (SoundCache.hasSuitableTTSVoice || SoundCache.availableDriverNames.Contains(usableDriverName))
                         {
-                            Console.WriteLine("STOCK CAR RULES, LD IS " + usableDriverName);
+                            Console.WriteLine("Stock Car Rule triggered: Lucky Dog is - " + usableDriverName);
                             audioPlayer.playMessageImmediately(new QueuedMessage("flags/lucky_dog_is",
                                 MessageContents(folderOpponentIsLuckyDog, usableDriverName), 0, this));
                         }
@@ -383,7 +383,7 @@ namespace CrewChiefV4.Events
                 // See if rule has changed.
                 if (previousGameState.StockCarRulesData.stockCarRuleApplicable != currentGameState.StockCarRulesData.stockCarRuleApplicable)
                 {
-                    Console.WriteLine("STOCK CAR RULES: " + currentGameState.StockCarRulesData.stockCarRuleApplicable);
+                    Console.WriteLine("Stock Car Rule triggered: " + currentGameState.StockCarRulesData.stockCarRuleApplicable);
                     if (currentGameState.StockCarRulesData.stockCarRuleApplicable == StockCarRule.LUCKY_DOG_PASS_ON_LEFT)
                     {
                         audioPlayer.playMessage(new QueuedMessage(folderWeAreLuckyDog, Utilities.random.Next(3, 7), this));

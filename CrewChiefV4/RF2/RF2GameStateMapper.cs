@@ -1718,7 +1718,7 @@ namespace CrewChiefV4.rFactor2
                 if (globalMsgUpper.Length > this.scrLuckyDogIsUpperPrefix.Length
                     && globalMsgUpper.StartsWith(this.scrLuckyDogIsUpperPrefix))
                 {
-                    scrData.luckyDogNameRaw = globalMsgUpper.Substring(globalMsgUpper.Length - 1).ToLowerInvariant();
+                    scrData.luckyDogNameRaw = globalMsgUpper.Substring(this.scrLuckyDogIsUpperPrefix.Length).ToLowerInvariant();
                     scrData.luckyDogNameRaw = RF2GameStateMapper.GetSanitizedDriverName(scrData.luckyDogNameRaw);
                 }
                 else
