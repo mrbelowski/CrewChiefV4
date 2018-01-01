@@ -752,5 +752,8 @@
     <Setting Name="NAUDIO_RECORDING_DEVICE_GUID" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="bring_game_window_to_front_for_macros" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

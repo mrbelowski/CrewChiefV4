@@ -544,3 +544,6 @@ use_naudio_for_speech_recognition = Use nAudio for speech recognition
 use_naudio_for_speech_recognition_help = nAudio allows speech recognition device selection
 
 speech_recognition_device_label = Speech input device
+
+bring_game_window_to_front_for_macros = Ensure game is on top for command macros
+bring_game_window_to_front_for_macros_help = Bring the game window to the front (on top) before running command macros
