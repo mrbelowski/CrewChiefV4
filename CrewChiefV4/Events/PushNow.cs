@@ -133,7 +133,10 @@ namespace CrewChiefV4.Events
                     else if (currentGameState.SessionData.SessionHasFixedTime)
                     {
                         int minutesLeft = (int)Math.Floor(currentGameState.SessionData.SessionTimeRemaining / 60f);
-                        audioPlayer.playMessage(new QueuedMessage("qual_pit_exit", MessageContents(folderQualExitIntro, minutesLeft, folderQualExitOutroMinutes), 0, this));
+                        if (minutesLeft > 1)
+                        {
+                            audioPlayer.playMessage(new QueuedMessage("qual_pit_exit", MessageContents(folderQualExitIntro, minutesLeft, folderQualExitOutroMinutes), 0, this));
+                        }
                     }
                 }
             }

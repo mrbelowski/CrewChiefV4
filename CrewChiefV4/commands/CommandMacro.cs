@@ -12,6 +12,7 @@ namespace CrewChiefV4.commands
     // wrapper that actually runs the macro
     public class ExecutableCommandMacro
     {
+        Boolean bringGameWindowToFrontForMacros = UserSettings.GetUserSettings().getBoolean("bring_game_window_to_front_for_macros");
         AudioPlayer audioPlayer;
         Macro macro;
         Dictionary<String, KeyBinding[]> assignmentsByGame;
@@ -34,6 +35,10 @@ namespace CrewChiefV4.commands
 
         bool BringGameWindowToFront(String processName, String[] alternateProcessNames, IntPtr currentForgroundWindow)
         {
+            if (!bringGameWindowToFrontForMacros)
+            {
+                return false;
+            }
             Process[] p = Process.GetProcessesByName(processName);
             if (p.Count() > 0)
             {

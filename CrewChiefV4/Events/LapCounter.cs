@@ -242,7 +242,9 @@ namespace CrewChiefV4.Events
             }
             if (currentGameState.SessionData.SessionNumberOfLaps > 0) {
                 // check how long the race is
-                if (currentGameState.SessionData.Position > 3 && currentGameState.SessionData.TrackDefinition.trackLength * currentGameState.SessionData.SessionNumberOfLaps < 20000)
+                if (currentGameState.SessionData.Position > 3 && currentGameState.SessionData.TrackDefinition != null && 
+                    currentGameState.SessionData.TrackDefinition.trackLength > 0 && 
+                    currentGameState.SessionData.TrackDefinition.trackLength * currentGameState.SessionData.SessionNumberOfLaps < 20000)
                 {
                     // anything less than 20000 metres worth of racing (e.g. 10 laps of Brands Indy) should have a 'make them count'
                     Console.WriteLine("pre-start message for race laps + get on with it");

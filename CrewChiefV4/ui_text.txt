@@ -546,3 +546,6 @@ enable_rf2_pit_state_during_fcy_help = Announce pit state during Safety Car/Pace
 
 enable_ams_pit_state_during_fcy = Enable AMS / rF1 FCY pit state messages
 enable_ams_pit_state_during_fcy_help = Announce pit state during Safety Car/Pace Car phase
+
+bring_game_window_to_front_for_macros = Ensure game is on top for command macros
+bring_game_window_to_front_for_macros_help = Bring the game window to the front (on top) before running command macros

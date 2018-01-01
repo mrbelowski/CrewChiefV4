@@ -752,5 +752,8 @@
     <Setting Name="enable_ams_pit_state_during_fcy" Type="System.String" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
+    <Setting Name="bring_game_window_to_front_for_macros" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
