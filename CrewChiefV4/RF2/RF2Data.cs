@@ -677,6 +677,7 @@ namespace CrewChiefV4.rFactor2
             // MM_NOT_USED
             // TrackRulesActionV01 *mAction;         // array of recent actions
             // MM_NEW
+
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 8)]
             [XmlIgnore] public byte[] pointer1;
 
