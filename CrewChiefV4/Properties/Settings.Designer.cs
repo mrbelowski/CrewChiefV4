@@ -3022,5 +3022,17 @@ namespace CrewChiefV4.Properties {
                 this["NAUDIO_RECORDING_DEVICE_GUID"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool bring_game_window_to_front_for_macros {
+            get {
+                return ((bool)(this["bring_game_window_to_front_for_macros"]));
+            }
+            set {
+                this["bring_game_window_to_front_for_macros"] = value;
+            }
+        }
     }
 }
