@@ -3020,6 +3020,17 @@ namespace CrewChiefV4.Properties {
             }
             set {
                 this["enable_ams_pit_state_during_fcy"] = value;
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool bring_game_window_to_front_for_macros {
+            get {
+                return ((bool)(this["bring_game_window_to_front_for_macros"]));
+            }
+            set {
+                this["bring_game_window_to_front_for_macros"] = value;
             }
         }
     }
