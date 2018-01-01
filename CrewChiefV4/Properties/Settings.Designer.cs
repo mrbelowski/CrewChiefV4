@@ -3020,6 +3020,7 @@ namespace CrewChiefV4.Properties {
             }
             set {
                 this["enable_ams_pit_state_during_fcy"] = value;
+            }
         }
 
         [global::System.Configuration.UserScopedSettingAttribute()]
