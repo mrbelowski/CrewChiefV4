@@ -27,6 +27,7 @@ namespace CrewChiefV4.rFactor1
 
         private Boolean enablePitWindowHack = UserSettings.GetUserSettings().getBoolean("enable_ams_pit_schedule_messages");
         private readonly bool enableBlueOnSlower = UserSettings.GetUserSettings().getBoolean("enable_ams_blue_on_slower");
+        private readonly bool enableFCYPitStateMessages = UserSettings.GetUserSettings().getBoolean("enable_ams_pit_state_during_fcy");
 
         private bool incrementCutTrackCountWhenLeavingRacingSurface = true;
 
@@ -184,11 +185,11 @@ namespace CrewChiefV4.rFactor1
                 if (shared.yellowFlagState == (sbyte)rFactor1Constant.rfYellowFlagState.pending)
                     currentGameState.FlagData.fcyPhase = FullCourseYellowPhase.PENDING;
                 else if (shared.yellowFlagState == (sbyte)rFactor1Constant.rfYellowFlagState.pitClosed)
-                    currentGameState.FlagData.fcyPhase = FullCourseYellowPhase.PITS_CLOSED;
+                    currentGameState.FlagData.fcyPhase = this.enableFCYPitStateMessages ? FullCourseYellowPhase.PITS_CLOSED : FullCourseYellowPhase.IN_PROGRESS;
                 else if (shared.yellowFlagState == (sbyte)rFactor1Constant.rfYellowFlagState.pitOpen)
-                    currentGameState.FlagData.fcyPhase = FullCourseYellowPhase.PITS_OPEN;
+                    currentGameState.FlagData.fcyPhase = this.enableFCYPitStateMessages ? FullCourseYellowPhase.PITS_OPEN : FullCourseYellowPhase.IN_PROGRESS;
                 else if (shared.yellowFlagState == (sbyte)rFactor1Constant.rfYellowFlagState.pitLeadLap)
-                    currentGameState.FlagData.fcyPhase = FullCourseYellowPhase.PITS_OPEN_LEAD_LAP_VEHICLES;
+                    currentGameState.FlagData.fcyPhase = this.enableFCYPitStateMessages ? FullCourseYellowPhase.PITS_OPEN_LEAD_LAP_VEHICLES : FullCourseYellowPhase.IN_PROGRESS;
                 else if (shared.yellowFlagState == (sbyte)rFactor1Constant.rfYellowFlagState.lastLap)
                 {
                     if (previousGameState != null)
@@ -196,7 +197,7 @@ namespace CrewChiefV4.rFactor1
                         if (previousGameState.FlagData.fcyPhase != FullCourseYellowPhase.LAST_LAP_NEXT && previousGameState.FlagData.fcyPhase != FullCourseYellowPhase.LAST_LAP_CURRENT)
                             // Initial last lap phase
                             currentGameState.FlagData.fcyPhase = FullCourseYellowPhase.LAST_LAP_NEXT;
-                        else if (currentGameState.SessionData.CompletedLaps != previousGameState.SessionData.CompletedLaps && 
+                        else if (currentGameState.SessionData.CompletedLaps != previousGameState.SessionData.CompletedLaps &&
                             previousGameState.FlagData.fcyPhase == FullCourseYellowPhase.LAST_LAP_NEXT)
                             // Once we reach the end of current lap, and this lap is next last lap, switch to last lap current phase.
                             currentGameState.FlagData.fcyPhase = FullCourseYellowPhase.LAST_LAP_CURRENT;

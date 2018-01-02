@@ -35,8 +35,11 @@ namespace CrewChiefV4
 
         private String basePersonalisationsDownloadLocation;
         private String updatePersonalisationsDownloadLocation;
+        private String update2PersonalisationsDownloadLocation;
         private String personalisationsTempFileName = "temp_personalisations.zip";
         private Boolean getBasePersonalisations = false;
+        private Boolean getFirstUpdatePersonalisations = false;
+
 
         private Boolean isDownloadingDriverNames = false;
         private Boolean isDownloadingSoundPack = false;
@@ -175,6 +178,7 @@ namespace CrewChiefV4
                                     update2SoundPackDownloadLocation = element.Descendants("update2soundpackurl").First().Value;
                                     updateDriverNamesDownloadLocation = element.Descendants("updatedrivernamesurl").First().Value;
                                     updatePersonalisationsDownloadLocation = element.Descendants("updatepersonalisationsurl").First().Value;
+                                    update2PersonalisationsDownloadLocation = doc.Descendants("update2personalisationsurl").First().Value;
                                     gotLanguageSpecificUpdateInfo = true;
                                     break;
                                 }
@@ -191,6 +195,7 @@ namespace CrewChiefV4
                                 update2SoundPackDownloadLocation = doc.Descendants("update2soundpackurl").First().Value;
                                 updateDriverNamesDownloadLocation = doc.Descendants("updatedrivernamesurl").First().Value;
                                 updatePersonalisationsDownloadLocation = doc.Descendants("updatepersonalisationsurl").First().Value;
+                                update2PersonalisationsDownloadLocation = doc.Descendants("update2personalisationsurl").First().Value;
                             }
                         }
                         catch (Exception e2)
@@ -272,6 +277,7 @@ namespace CrewChiefV4
                             }
                             else
                             {
+                                getFirstUpdatePersonalisations = AudioPlayer.personalisationsVersion < AudioPlayer.lastUpdatePersonalisationsVersion;
                                 downloadPersonalisationsButton.Text = Configuration.getUIString("updated_personalisations_available_press_to_download");
                             }
                             newPersonalisationsAvailable = true;
@@ -766,6 +772,35 @@ namespace CrewChiefV4
                 }
                 this.messagesAudioDeviceBox.SelectedValueChanged += new System.EventHandler(this.messagesAudioDeviceSelected);
                 this.backgroundAudioDeviceBox.SelectedValueChanged += new System.EventHandler(this.backgroundAudioDeviceSelected);
+            }
+
+            if (UserSettings.GetUserSettings().getBoolean("use_naudio_for_speech_recognition"))
+            {
+                this.speechRecognitionDeviceBox.Enabled = true;
+                this.speechRecognitionDeviceBox.Visible = true;
+                this.speechRecognitionDeviceLabel.Visible = true;
+                this.speechRecognitionDeviceBox.Items.AddRange(SpeechRecogniser.speechRecognitionDevices.Keys.ToArray());
+                // only register the value changed listener after loading the available values
+                String speechRecognitionDeviceGuid = UserSettings.GetUserSettings().getString("NAUDIO_RECORDING_DEVICE_GUID");
+                Boolean foundspeechRecognitionDeviceGuid = false;
+                if (speechRecognitionDeviceGuid != null)
+                {
+                    foreach (KeyValuePair<string, Tuple<string, int>> entry in SpeechRecogniser.speechRecognitionDevices)
+                    {
+                        if (speechRecognitionDeviceGuid.Equals(entry.Value.Item1))
+                        {
+                            this.speechRecognitionDeviceBox.Text = entry.Key;
+                            SpeechRecogniser.initialSpeechInputDeviceIndex = entry.Value.Item2;
+                            foundspeechRecognitionDeviceGuid = true;
+                            break;
+                        }
+                    }
+                }
+                if (!foundspeechRecognitionDeviceGuid && SpeechRecogniser.speechRecognitionDevices.Count > 0)
+                {
+                    this.speechRecognitionDeviceBox.Text = SpeechRecogniser.speechRecognitionDevices.First().Key;
+                }
+                this.speechRecognitionDeviceBox.SelectedValueChanged += new System.EventHandler(this.speechRecognitionDeviceSelected);
             }
 
             crewChief = new CrewChief();
@@ -1546,6 +1581,18 @@ namespace CrewChiefV4
             }
         }
 
+        private void speechRecognitionDeviceSelected(object sender, EventArgs e)
+        {
+            if (SpeechRecogniser.speechRecognitionDevices.ContainsKey(this.speechRecognitionDeviceBox.Text))
+            {
+                int deviceId = SpeechRecogniser.speechRecognitionDevices[this.speechRecognitionDeviceBox.Text].Item2;
+                crewChief.speechRecogniser.changeInputDevice(deviceId);
+                UserSettings.GetUserSettings().setProperty("NAUDIO_RECORDING_DEVICE_GUID",
+                    SpeechRecogniser.speechRecognitionDevices[this.speechRecognitionDeviceBox.Text].Item1);
+                UserSettings.GetUserSettings().saveUserSettings();
+            }
+        }
+
         private void backgroundAudioDeviceSelected(object sender, EventArgs e)
         {
             if (AudioPlayer.playbackDevices.ContainsKey(this.backgroundAudioDeviceBox.Text))
@@ -1684,9 +1731,13 @@ namespace CrewChiefV4
                     {
                         wc.DownloadFileAsync(new Uri(basePersonalisationsDownloadLocation), AudioPlayer.soundFilesPath + @"\" + personalisationsTempFileName);
                     }
-                    else
+                    else if (getFirstUpdatePersonalisations)
                     {
                         wc.DownloadFileAsync(new Uri(updatePersonalisationsDownloadLocation), AudioPlayer.soundFilesPath + @"\" + personalisationsTempFileName);
+                    }
+                    else
+                    {
+                        wc.DownloadFileAsync(new Uri(update2PersonalisationsDownloadLocation), AudioPlayer.soundFilesPath + @"\" + personalisationsTempFileName);
                     }
                 }
             }

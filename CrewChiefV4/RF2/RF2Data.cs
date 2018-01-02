@@ -639,7 +639,7 @@ namespace CrewChiefV4.rFactor2
             [XmlIgnore] public double mGoalRelativeDistance;         // calculated based on where the leader is, and adjusted by the desired column spacing and the column/position assignments
 
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 96)]
-            [XmlIgnore] public byte[] mMessage;                  // a message for this participant to explain what is going on (untranslated; it will get run through translator on client machines)
+            public byte[] mMessage;                  // a message for this participant to explain what is going on (untranslated; it will get run through translator on client machines)
 
             // future expansion
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 192)]
@@ -677,7 +677,7 @@ namespace CrewChiefV4.rFactor2
             // MM_NOT_USED
             // TrackRulesActionV01 *mAction;         // array of recent actions
             // MM_NEW
-            
+
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 8)]
             [XmlIgnore] public byte[] pointer1;
 
@@ -715,7 +715,7 @@ namespace CrewChiefV4.rFactor2
             [XmlIgnore] public float mMaximumSpeed;                  // maximum speed that anybody should be driving (-1 to indicate no limit)
 
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 96)]
-            [XmlIgnore] public byte[] mMessage;                  // a message for everybody to explain what is going on (which will get run through translator on client machines)
+            public byte[] mMessage;                  // a message for everybody to explain what is going on (which will get run through translator on client machines)
 
             // MM_NOT_USED
             // TrackRulesParticipantV01 *mParticipant;         // array of partipants (vehicles)
@@ -727,6 +727,7 @@ namespace CrewChiefV4.rFactor2
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 256)]
             [XmlIgnore] public byte[] mInputOutputExpansion;
         };
+
 
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi, Pack = 4)]
         public struct rF2MappedBufferHeader
@@ -829,6 +830,7 @@ namespace CrewChiefV4.rFactor2
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 8)]
             public byte[] mVersion;                            // API version
             public byte is64bit;                               // Is 64bit plugin?
+            public byte isStockCarRulesPluginHosted;           // Is StockCarRules.dll successfully loaded into SM plugin?
 
             // Physics options (updated on session start):
             public rF2PhysicsOptions mPhysics;
@@ -846,6 +848,10 @@ namespace CrewChiefV4.rFactor2
             [XmlIgnore] public Int64 mTicksSessionStarted;                 // Ticks when session started.
             public Int64 mTicksSessionEnded;                   // Ticks when session ended.
             public rF2SessionTransitionCapture mSessionTransitionCapture;  // Contains partial internals capture at session transition time.
+
+            // Captured non-empty MessageInfoV01::mText message.
+            [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 128)]
+            public byte[] mDisplayedMessageUpdateCapture;
         }
 
 

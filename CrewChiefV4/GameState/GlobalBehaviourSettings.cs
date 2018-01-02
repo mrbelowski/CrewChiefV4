@@ -60,7 +60,7 @@ namespace CrewChiefV4.GameState
         public static void UpdateFromCarClass(CarData.CarClass carClass) 
         {
             useAmericanTerms = carClass.useAmericanTerms || defaultToAmericanTerms;
-            useHundredths = (realisticMode && carClass.timesInHundredths) || alwaysUseHundredths;
+            useHundredths = carClass.timesInHundredths || alwaysUseHundredths;
             enabledMessageTypes.Clear();
             if (realisticMode && carClass.enabledMessageTypes != null && carClass.enabledMessageTypes.Length > 0)
             {
@@ -117,6 +117,10 @@ namespace CrewChiefV4.GameState
         {
             useOvalLogic = trackDefinition.isOval;
             spotterEnabled = useOvalLogic || !realisticMode;
+            if (useOvalLogic)
+            {
+                Console.WriteLine("track is marked as oval");
+            }
         }
 
         private static void parseMessageTypes(String messageTypes)

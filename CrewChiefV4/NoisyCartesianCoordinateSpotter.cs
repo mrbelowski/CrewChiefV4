@@ -114,7 +114,6 @@ namespace CrewChiefV4
                     }
                 }
                 String selectedSpotter = UserSettings.GetUserSettings().getString("spotter_name");
-                // TODO: select boxes and UI stuff - this may change
                 if (!defaultSpotterId.Equals(selectedSpotter))
                 {
                     if (Directory.Exists(AudioPlayer.soundFilesPath + "/voice/spotter_" + selectedSpotter))
@@ -131,8 +130,13 @@ namespace CrewChiefV4
                         folderThreeWideYoureOnLeft = "spotter_" + selectedSpotter + "/three_wide_on_left";
                         folderCarInside = "spotter_" + selectedSpotter + "/car_inside";
                         folderCarOutside = "spotter_" + selectedSpotter + "/car_outside";
-                        folderClearInside = "spotter_" + selectedSpotter + "/clear_inside";
-                        folderClearOutside = "spotter_" + selectedSpotter + "/clear_outside";
+
+                        // Currently the Geoffrey spotter has no clear inside / clear outside sounds:
+                        Boolean hasClearInside = Directory.Exists(AudioPlayer.soundFilesPath + "/voice/spotter_" + selectedSpotter + "/clear_inside");
+                        folderClearInside = hasClearInside ? "spotter_" + selectedSpotter + "/clear_inside" : folderClearLeft;
+                        Boolean hasClearOutside = Directory.Exists(AudioPlayer.soundFilesPath + "/voice/spotter_" + selectedSpotter + "/clear_outside");                        
+                        folderClearOutside = hasClearOutside ? "spotter_" + selectedSpotter + "/clear_outside" : folderClearRight;
+
                         folderThreeWideYoureOnInside = "spotter_" + selectedSpotter + "/three_wide_on_inside";
                         folderThreeWideYoureOnOutside = "spotter_" + selectedSpotter + "/three_wide_on_outside";
                         if (Directory.Exists(AudioPlayer.soundFilesPath + "/voice/acknowledge/spotterEnabled_" + selectedSpotter))
@@ -174,6 +178,8 @@ namespace CrewChiefV4
 
         // don't play 'clear' or 'hold' messages unless we've actually been clear or overlapping for some time
         private TimeSpan clearMessageDelay = TimeSpan.FromMilliseconds(UserSettings.GetUserSettings().getInt("spotter_clear_delay"));
+        private TimeSpan ovalClearMessageDelay = TimeSpan.FromMilliseconds(UserSettings.GetUserSettings().getInt("spotter_oval_clear_delay"));
+
         private TimeSpan overlapMessageDelay = TimeSpan.FromMilliseconds(UserSettings.GetUserSettings().getInt("spotter_overlap_delay"));
         private static Boolean use3WideLeftAndRight = UserSettings.GetUserSettings().getBoolean("spotter_enable_three_wide_left_and_right");
 
@@ -551,21 +557,21 @@ namespace CrewChiefV4
             {
                 Console.WriteLine("clear all round");
                 nextMessageType = NextMessageType.clearAllRound;
-                nextMessageDue = now.Add(clearMessageDelay);
+                nextMessageDue = now.Add(GlobalBehaviourSettings.useOvalLogic ? ovalClearMessageDelay : clearMessageDelay);
             }
             else if (carsOnLeftCount == 0 && carsOnLeftAtPreviousTick > 0 && 
                 ((carsOnRightCount == 0 && carsOnRightAtPreviousTick == 0) || (carsOnRightCount > 0 && carsOnRightAtPreviousTick > 0)))
             {
                 // just gone clear on the left - might still be a car right
                 nextMessageType = NextMessageType.clearLeft;
-                nextMessageDue = now.Add(clearMessageDelay);
+                nextMessageDue = now.Add(GlobalBehaviourSettings.useOvalLogic ? ovalClearMessageDelay : clearMessageDelay);
             }
             else if (carsOnRightCount == 0 && carsOnRightAtPreviousTick > 0 && 
                 ((carsOnLeftCount == 0 && carsOnLeftAtPreviousTick == 0) || (carsOnLeftCount > 0 && carsOnLeftAtPreviousTick > 0)))
             {
                 // just gone clear on the right - might still be a car left
                 nextMessageType = NextMessageType.clearRight;
-                nextMessageDue = now.Add(clearMessageDelay);
+                nextMessageDue = now.Add(GlobalBehaviourSettings.useOvalLogic ? ovalClearMessageDelay : clearMessageDelay);
             }
             else if (carsOnLeftCount > 0 && carsOnRightCount > 0 && (carsOnLeftAtPreviousTick == 0 || carsOnRightAtPreviousTick == 0))
             {

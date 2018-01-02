@@ -5,6 +5,9 @@ using System.Text;
 using CrewChiefV4.GameState;
 using CrewChiefV4.Audio;
 
+//
+// TODO: disable some of these events in the last few laps, or change the behaviour so the messages are more appropriate
+
 namespace CrewChiefV4.Events
 {
     class Fuel : AbstractEvent
@@ -186,7 +189,8 @@ namespace CrewChiefV4.Events
             }
             currentFuel = currentGameState.FuelData.FuelLeft;
             // only track fuel data after the session has settled down
-            if (fuelUseActive && currentGameState.SessionData.SessionRunningTime > 15 &&
+            if (fuelUseActive && !GameStateData.onManualFormationLap &&
+                currentGameState.SessionData.SessionRunningTime > 15 &&
                 ((currentGameState.SessionData.SessionType == SessionType.Race &&
                     (currentGameState.SessionData.SessionPhase == SessionPhase.Green || 
                      currentGameState.SessionData.SessionPhase == SessionPhase.FullCourseYellow || 
@@ -375,6 +379,7 @@ namespace CrewChiefV4.Events
                             lapsCompletedSinceFuelReset > 0)
                         {
                             int estimatedFuelLapsLeft = (int)Math.Floor(currentGameState.FuelData.FuelLeft / averageUsagePerLap);
+                            int raceLapsRemaining = currentGameState.SessionData.SessionNumberOfLaps - currentGameState.SessionData.CompletedLaps;
                             if (halfDistance != -1 && currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.CompletedLaps == halfDistance)
                             {
                                 if (estimatedFuelLapsLeft < halfDistance && currentGameState.FuelData.FuelLeft / initialFuelLevel < 0.6)
@@ -394,7 +399,7 @@ namespace CrewChiefV4.Events
                                     audioPlayer.playMessage(new QueuedMessage(folderHalfDistanceGoodFuel, 0, this));
                                 }
                             }
-                            else if (estimatedFuelLapsLeft == 4)
+                            else if (raceLapsRemaining > 3 && estimatedFuelLapsLeft == 4)
                             {
                                 if(fuelReportsInGallon)
                                 {
@@ -408,7 +413,7 @@ namespace CrewChiefV4.Events
                                 }
                                 audioPlayer.playMessage(new QueuedMessage(folderFourLapsEstimate, 0, this));
                             }
-                            else if (estimatedFuelLapsLeft == 3)
+                            else if (raceLapsRemaining > 2 && estimatedFuelLapsLeft == 3)
                             {
                                 if (fuelReportsInGallon)
                                 {
@@ -421,7 +426,7 @@ namespace CrewChiefV4.Events
                                             ", current fuel = " + currentGameState.FuelData.FuelLeft + ", usage per lap = " + averageUsagePerLap);
                                 }
                             }
-                            else if (estimatedFuelLapsLeft == 2)
+                            else if (raceLapsRemaining > 1 && estimatedFuelLapsLeft == 2)
                             {
                                 if (fuelReportsInGallon)
                                 {
@@ -434,7 +439,7 @@ namespace CrewChiefV4.Events
                                             ", current fuel = " + currentGameState.FuelData.FuelLeft + ", usage per lap = " + averageUsagePerLap);
                                 }
                             }
-                            else if (estimatedFuelLapsLeft == 1)
+                            else if (raceLapsRemaining > 0 && estimatedFuelLapsLeft == 1)
                             {
                                 if (fuelReportsInGallon)
                                 {
@@ -449,7 +454,7 @@ namespace CrewChiefV4.Events
                                 audioPlayer.playMessage(new QueuedMessage(folderOneLapEstimate, 0, this));
                                 // if we've not played the pit-now message, play it with a bit of a delay - should probably wait for sector3 here
                                 // but i'd have to move some stuff around and I'm an idle fucker
-                                if (!playedPitForFuelNow)
+                                if (!playedPitForFuelNow && raceLapsRemaining > 1)
                                 {
                                     playedPitForFuelNow = true;
                                     audioPlayer.playMessage(new QueuedMessage(PitStops.folderMandatoryPitStopsPitThisLap, 10, this));
@@ -505,8 +510,22 @@ namespace CrewChiefV4.Events
                                 playedTwoMinutesRemaining = true;
                                 playedFiveMinutesRemaining = true;
                                 playedTenMinutesRemaining = true;
-                                audioPlayer.playMessage(new QueuedMessage("pit_for_fuel_now",
-                                    MessageContents(folderAboutToRunOut, PitStops.folderMandatoryPitStopsPitThisLap), 0, this));
+                                float cutoffForRefuelCall = currentGameState.SessionData.PlayerLapTimeSessionBest * 2;
+                                if (cutoffForRefuelCall == 0)
+                                {
+                                    // shouldn't need this, but just in case...
+                                    cutoffForRefuelCall = 120;
+                                }
+                                if (currentGameState.SessionData.SessionTimeRemaining > cutoffForRefuelCall)
+                                {
+                                    audioPlayer.playMessage(new QueuedMessage("pit_for_fuel_now",
+                                        MessageContents(folderAboutToRunOut, PitStops.folderMandatoryPitStopsPitThisLap), 0, this));
+                                }
+                                else
+                                {
+                                    // going to run out, but don't call the player into the pits - it's up to him
+                                    audioPlayer.playMessage(new QueuedMessage("about_to_run_out_of_fuel", MessageContents(folderAboutToRunOut), 0, this));
+                                }
                             }
                             if (estimatedFuelMinutesLeft <= 2 && estimatedFuelMinutesLeft > 1.8 && !playedTwoMinutesRemaining)
                             {

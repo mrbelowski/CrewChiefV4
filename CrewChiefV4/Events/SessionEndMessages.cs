@@ -51,7 +51,7 @@ namespace CrewChiefV4.Events
                     if (lastSessionPhase == SessionPhase.Finished)
                     {
                         // only play session end message for races if we've actually finished, not restarted
-                        playFinishMessage(sessionType, startPosition, finishPosition, numCars, isDisqualified, isDNF);
+                        playFinishMessage(sessionType, startPosition, finishPosition, numCars, isDisqualified, isDNF, completedLaps);
                     }
                     else
                     {
@@ -70,7 +70,7 @@ namespace CrewChiefV4.Events
                     if (lastSessionPhase == SessionPhase.Green || lastSessionPhase == SessionPhase.FullCourseYellow || 
                         lastSessionPhase == SessionPhase.Finished || lastSessionPhase == SessionPhase.Checkered)
                     {
-                        playFinishMessage(sessionType, startPosition, finishPosition, numCars, false, isDNF);
+                        playFinishMessage(sessionType, startPosition, finishPosition, numCars, false, isDNF, completedLaps);
                     }
                     else
                     {
@@ -84,7 +84,7 @@ namespace CrewChiefV4.Events
             }
         }
 
-        public void playFinishMessage(SessionType sessionType, int startPosition, int position, int numCars, Boolean isDisqualified, Boolean isDNF)
+        public void playFinishMessage(SessionType sessionType, int startPosition, int position, int numCars, Boolean isDisqualified, Boolean isDNF, int completedLaps)
         {
             audioPlayer.suspendPearlsOfWisdom();
             if (position < 1)
@@ -96,8 +96,16 @@ namespace CrewChiefV4.Events
                 Boolean isLast = position == numCars;
                 if (isDisqualified) 
                 {
-                    audioPlayer.playMessage(new QueuedMessage(sessionEndMessageIdentifier, AbstractEvent.MessageContents(
-                        Penalties.folderDisqualified), 0, null));
+                    Boolean playedRant = false;
+                    if (completedLaps > 1)
+                    {
+                        playedRant = audioPlayer.playRant(sessionEndMessageIdentifier, AbstractEvent.MessageContents(Penalties.folderDisqualified));
+                    }
+                    if (!playedRant)
+                    {
+                        audioPlayer.playMessage(new QueuedMessage(sessionEndMessageIdentifier, AbstractEvent.MessageContents(
+                            Penalties.folderDisqualified), 0, null));
+                    }                    
                 }
                 else if (isDNF)
                 {
@@ -128,14 +136,33 @@ namespace CrewChiefV4.Events
                     }
                     else
                     {
-                        audioPlayer.playMessage(new QueuedMessage(sessionEndMessageIdentifier, AbstractEvent.MessageContents(
-                            Position.folderStub + position, folderFinishedRace), 0, null));
+                        // if it's a shit finish, maybe launch into a tirade
+                        Boolean playedRant = false;
+                        int positionsLost = position - startPosition;
+                        // if we've lost 9 or more positions, and this is more than half the field size, maybe play a rant
+                        if (numCars > 2 && completedLaps > 1 && positionsLost > 8 && (float)positionsLost / (float)numCars >= 0.5f)
+                        {
+                            playedRant = audioPlayer.playRant(sessionEndMessageIdentifier, AbstractEvent.MessageContents(Position.folderStub + position));
+                        }
+                        if (!playedRant)
+                        {
+                            audioPlayer.playMessage(new QueuedMessage(sessionEndMessageIdentifier, AbstractEvent.MessageContents(
+                                Position.folderStub + position, folderFinishedRace), 0, null));
+                        }
                     }
                 }
                 else if (isLast)
                 {
-                    audioPlayer.playMessage(new QueuedMessage(sessionEndMessageIdentifier, 
-                        AbstractEvent.MessageContents(folderFinishedRaceLast), 0, null));
+                    Boolean playedRant = false;
+                    if (numCars > 5 && completedLaps > 1)
+                    {
+                        playedRant = audioPlayer.playRant(sessionEndMessageIdentifier, AbstractEvent.MessageContents(Position.folderStub + position));
+                    }
+                    if (!playedRant)
+                    {
+                        audioPlayer.playMessage(new QueuedMessage(sessionEndMessageIdentifier,
+                            AbstractEvent.MessageContents(folderFinishedRaceLast), 0, null));
+                    }
                 }
             }
             else

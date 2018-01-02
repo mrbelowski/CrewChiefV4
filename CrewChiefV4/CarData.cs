@@ -33,7 +33,7 @@ namespace CrewChiefV4
         // - the game sends the core temp, not the surface temp
 
         // model circa 2016:
-        private static float maxColdR3E2016TyreTempPeak = 90;
+        private static float maxColdR3E2016TyreTempPeak = 88;
         private static float maxWarmR3E2016TyreTempPeak = 99;
         private static float maxHotR3E2016TyreTempPeak = 104;
 
@@ -59,8 +59,8 @@ namespace CrewChiefV4
 
         // model late 2017:
         private static float maxColdR3E2017TyreTempPeak = 67;
-        private static float maxWarmR3E2017TyreTempPeak = 88;
-        private static float maxHotR3E2017TyreTempPeak = 100;
+        private static float maxWarmR3E2017TyreTempPeak = 90;
+        private static float maxHotR3E2017TyreTempPeak = 102;
 
 
         private static float maxColdIronRoadBrakeTemp = 80;
@@ -482,6 +482,7 @@ namespace CrewChiefV4
                         userCarClass.placeholderClassId = userCarClassIds[userCarClassIndex];
                         Console.WriteLine("Adding a user defined class with ID " + userCarClass.placeholderClassId);
                         userCarClassIndex++;
+                        userCarClassesCount++;
                     }
                 }
                 if (!isInUserCarClasses)

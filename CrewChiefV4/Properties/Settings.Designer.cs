@@ -1201,18 +1201,6 @@ namespace CrewChiefV4.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool enable_stockcars_mode {
-            get {
-                return ((bool)(this["enable_stockcars_mode"]));
-            }
-            set {
-                this["enable_stockcars_mode"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True")]
         public bool UpdateSettings {
             get {
@@ -1712,18 +1700,6 @@ namespace CrewChiefV4.Properties {
             }
             set {
                 this["rf2_spotter_car_length"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool enable_rf2_blue_on_slower {
-            get {
-                return ((bool)(this["enable_rf2_blue_on_slower"]));
-            }
-            set {
-                this["enable_rf2_blue_on_slower"] = value;
             }
         }
         
@@ -2972,6 +2948,90 @@ namespace CrewChiefV4.Properties {
             }
             set {
                 this["enable_ams_blue_on_slower"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool enable_rants {
+            get {
+                return ((bool)(this["enable_rants"]));
+            }
+            set {
+                this["enable_rants"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("500")]
+        public int spotter_oval_clear_delay {
+            get {
+                return ((int)(this["spotter_oval_clear_delay"]));
+            }
+            set {
+                this["spotter_oval_clear_delay"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool use_naudio_for_speech_recognition {
+            get {
+                return ((bool)(this["use_naudio_for_speech_recognition"]));
+            }
+            set {
+                this["use_naudio_for_speech_recognition"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string NAUDIO_RECORDING_DEVICE_GUID {
+            get {
+                return ((string)(this["NAUDIO_RECORDING_DEVICE_GUID"]));
+            }
+            set {
+                this["NAUDIO_RECORDING_DEVICE_GUID"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool enable_rf2_pit_state_during_fcy {
+            get {
+                return ((bool)(this["enable_rf2_pit_state_during_fcy"]));
+            }
+            set {
+                this["enable_rf2_pit_state_during_fcy"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public string enable_ams_pit_state_during_fcy {
+            get {
+                return ((string)(this["enable_ams_pit_state_during_fcy"]));
+            }
+            set {
+                this["enable_ams_pit_state_during_fcy"] = value;
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool bring_game_window_to_front_for_macros {
+            get {
+                return ((bool)(this["bring_game_window_to_front_for_macros"]));
+            }
+            set {
+                this["bring_game_window_to_front_for_macros"] = value;
             }
         }
     }
