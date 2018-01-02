@@ -90,6 +90,20 @@ namespace CrewChiefV4.Events
         private String folderWeAreLuckyDog = "flags/we_are_the_lucky_dog";
         private String folderEOLLPenalty = "flags/move_to_end_of_longest_line_for_penalty";
         private String folderWeHaveBeenWavedAround = "flags/we_have_been_waved_around";
+        private String folderPassDriverForLuckyDogPositionIntro = "flags/pass_drivername_for_lucky_dog_position_intro";
+        private String folderPassDriverForLuckyDogPositionOutro = "flags/pass_drivername_for_lucky_dog_position_outro";
+        private String folderPassCarAheadForLuckyPositionDog = "flags/pass_this_guy_to_get_lucky_dog_position";
+        private String folderWeAreInLuckyDogPosition = "flags/we_are_in_lucky_dog_position";
+
+        // green flag lucky-dog tracking
+        private enum GreenFlagLuckyDogStatus { NONE, PASS_FOR_LUCKY_DOG, WE_ARE_IN_LUCKY_DOG }
+        private TimeSpan minTimeBetweenGreenFlagLuckyDogMessages = TimeSpan.FromMinutes(2);
+        private TimeSpan greenFlagLuckyDogCheckInterval = TimeSpan.FromSeconds(2);
+        private int maxGreenFlagLuckyDogMessagesPerSession = 2;
+        private GreenFlagLuckyDogStatus lastGreenFlagLuckyDogStatusAnnounced = GreenFlagLuckyDogStatus.NONE;
+        private DateTime nextGreenFlagLuckyDogCheckDue = DateTime.MinValue;
+        private int greenFlagLuckyDogMessageCountInSession = 0;
+        //
 
         private int maxDistanceMovedForYellowAnnouncement = UserSettings.GetUserSettings().getInt("max_distance_moved_for_yellow_announcement");
         private Boolean reportAllowedOvertakesUnderYellow = UserSettings.GetUserSettings().getBoolean("report_allowed_overtakes_under_yellow");
@@ -295,6 +309,10 @@ namespace CrewChiefV4.Events
             incidentAheadSettledTime = DateTime.MinValue;
             waitingToWarnOfIncident = false;
             hasReportedIsUnderLocalYellow = false;
+
+            lastGreenFlagLuckyDogStatusAnnounced = GreenFlagLuckyDogStatus.NONE;
+            greenFlagLuckyDogMessageCountInSession = 0;
+            nextGreenFlagLuckyDogCheckDue = DateTime.MinValue;
         }
 
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
@@ -356,56 +374,151 @@ namespace CrewChiefV4.Events
         {
             if (GlobalBehaviourSettings.useAmericanTerms
                 && currentGameState.SessionData.SessionType == SessionType.Race
-                && previousGameState != null
-                && currentGameState.SessionData.SessionPhase == SessionPhase.FullCourseYellow
-                && currentGameState.StockCarRulesData.stockCarRuleApplicable != StockCarRule.NONE)
+                && previousGameState != null)
             {
-                if (!string.IsNullOrWhiteSpace(currentGameState.StockCarRulesData.luckyDogNameRaw)
-                    && previousGameState.StockCarRulesData.luckyDogNameRaw != currentGameState.StockCarRulesData.luckyDogNameRaw
-                    && currentGameState.StockCarRulesData.stockCarRuleApplicable != StockCarRule.LUCKY_DOG_PASS_ON_LEFT)  // Make sure that's not player.
+                if (currentGameState.SessionData.SessionPhase == SessionPhase.FullCourseYellow
+                    && currentGameState.StockCarRulesData.stockCarRuleApplicable != StockCarRule.NONE)
                 {
-                    if (currentGameState.StockCarRulesData.luckyDogNameRaw == currentGameState.SessionData.DriverRawName)
+                    if (!string.IsNullOrWhiteSpace(currentGameState.StockCarRulesData.luckyDogNameRaw)
+                        && previousGameState.StockCarRulesData.luckyDogNameRaw != currentGameState.StockCarRulesData.luckyDogNameRaw
+                        && currentGameState.StockCarRulesData.stockCarRuleApplicable != StockCarRule.LUCKY_DOG_PASS_ON_LEFT)  // Make sure that's not player.
                     {
-                        Console.WriteLine("Won't announce current lucky dog because it appears to be player");
-                    }
-                    else
-                    {
-                        var usableDriverName = DriverNameHelper.getUsableDriverName(currentGameState.StockCarRulesData.luckyDogNameRaw);
-                        if (SoundCache.hasSuitableTTSVoice || SoundCache.availableDriverNames.Contains(usableDriverName))
+                        if (currentGameState.StockCarRulesData.luckyDogNameRaw == currentGameState.SessionData.DriverRawName)
                         {
-                            Console.WriteLine("Stock Car Rule triggered: Lucky Dog is - " + usableDriverName);
-                            audioPlayer.playMessageImmediately(new QueuedMessage("flags/lucky_dog_is",
-                                MessageContents(folderOpponentIsLuckyDog, usableDriverName), 0, this));
+                            Console.WriteLine("Won't announce current lucky dog because it appears to be player");
+                        }
+                        else
+                        {
+                            var usableDriverName = DriverNameHelper.getUsableDriverName(currentGameState.StockCarRulesData.luckyDogNameRaw);
+                            if (SoundCache.hasSuitableTTSVoice || SoundCache.availableDriverNames.Contains(usableDriverName))
+                            {
+                                Console.WriteLine("Stock Car Rule triggered: Lucky Dog is - " + usableDriverName);
+                                audioPlayer.playMessageImmediately(new QueuedMessage("flags/lucky_dog_is",
+                                    MessageContents(folderOpponentIsLuckyDog, usableDriverName), 0, this));
+                            }
+                        }
+                    }
+
+                    // See if rule has changed.
+                    if (previousGameState.StockCarRulesData.stockCarRuleApplicable != currentGameState.StockCarRulesData.stockCarRuleApplicable)
+                    {
+                        Console.WriteLine("Stock Car Rule triggered: " + currentGameState.StockCarRulesData.stockCarRuleApplicable);
+                        if (currentGameState.StockCarRulesData.stockCarRuleApplicable == StockCarRule.LUCKY_DOG_PASS_ON_LEFT)
+                        {
+                            audioPlayer.playMessage(new QueuedMessage(folderWeAreLuckyDog, Utilities.random.Next(3, 7), this));
+                        }
+                        else if (currentGameState.StockCarRulesData.stockCarRuleApplicable == StockCarRule.LUCKY_DOG_ALLOW_TO_PASS_ON_LEFT)
+                        {
+                            audioPlayer.playMessage(new QueuedMessage(folderAllowLuckyDogPass, Utilities.random.Next(3, 7), this));
+                        }
+                        else if (currentGameState.StockCarRulesData.stockCarRuleApplicable == StockCarRule.LEADER_CHOOSE_LANE)
+                        {
+                            audioPlayer.playMessage(new QueuedMessage(folderLeaderChooseLane, Utilities.random.Next(3, 7), this));
+                        }
+                        else if (currentGameState.StockCarRulesData.stockCarRuleApplicable == StockCarRule.WAVE_AROUND_PASS_ON_RIGHT)
+                        {
+                            audioPlayer.playMessage(new QueuedMessage(folderWeHaveBeenWavedAround, Utilities.random.Next(3, 7), this));
+                        }
+                        else if (currentGameState.StockCarRulesData.stockCarRuleApplicable == StockCarRule.MOVE_TO_EOLL)
+                        {
+                            audioPlayer.playMessage(new QueuedMessage(folderEOLLPenalty, Utilities.random.Next(3, 7), this));
                         }
                     }
                 }
-
-                // See if rule has changed.
-                if (previousGameState.StockCarRulesData.stockCarRuleApplicable != currentGameState.StockCarRulesData.stockCarRuleApplicable)
+                else if (greenFlagLuckyDogMessageCountInSession < maxGreenFlagLuckyDogMessagesPerSession
+                    && currentGameState.Now > nextGreenFlagLuckyDogCheckDue
+                    && currentGameState.SessionData.SessionPhase == SessionPhase.Green
+                    && currentGameState.StockCarRulesData.stockCarRuleApplicable == StockCarRule.NONE)
                 {
-                    Console.WriteLine("Stock Car Rule triggered: " + currentGameState.StockCarRulesData.stockCarRuleApplicable);
-                    if (currentGameState.StockCarRulesData.stockCarRuleApplicable == StockCarRule.LUCKY_DOG_PASS_ON_LEFT)
+                    GreenFlagLuckyDogStatus currentGreenFlagLuckyDogStatus = getGreenFlagLuckyDogPosition(currentGameState);
+                    if (currentGreenFlagLuckyDogStatus != GreenFlagLuckyDogStatus.NONE
+                        && currentGreenFlagLuckyDogStatus != lastGreenFlagLuckyDogStatusAnnounced)
                     {
-                        audioPlayer.playMessage(new QueuedMessage(folderWeAreLuckyDog, Utilities.random.Next(3, 7), this));
+                        if (currentGreenFlagLuckyDogStatus == GreenFlagLuckyDogStatus.WE_ARE_IN_LUCKY_DOG)
+                        {
+                            audioPlayer.playMessage(new QueuedMessage(folderWeAreInLuckyDogPosition, 0, this));
+                        }
+                        else
+                        {
+                            OpponentData carAhead = currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position - 1, true);
+                            if (carAhead != null && AudioPlayer.canReadName(carAhead.DriverRawName))
+                            {
+                                audioPlayer.playMessage(new QueuedMessage("push_to_pass_lucky_dog", 
+                                    MessageContents(folderPassDriverForLuckyDogPositionIntro, carAhead, folderPassDriverForLuckyDogPositionOutro), 0, this));
+                            }
+                            else
+                            {
+                                audioPlayer.playMessage(new QueuedMessage(folderPassCarAheadForLuckyPositionDog, 0, this));
+                            }
+                        }
+                        greenFlagLuckyDogMessageCountInSession++;
+                        lastGreenFlagLuckyDogStatusAnnounced = currentGreenFlagLuckyDogStatus;
+                        nextGreenFlagLuckyDogCheckDue = currentGameState.Now.Add(minTimeBetweenGreenFlagLuckyDogMessages);
                     }
-                    else if (currentGameState.StockCarRulesData.stockCarRuleApplicable == StockCarRule.LUCKY_DOG_ALLOW_TO_PASS_ON_LEFT)
+                    else
                     {
-                        audioPlayer.playMessage(new QueuedMessage(folderAllowLuckyDogPass, Utilities.random.Next(3, 7), this));
-                    }
-                    else if (currentGameState.StockCarRulesData.stockCarRuleApplicable == StockCarRule.LEADER_CHOOSE_LANE)
-                    {
-                        audioPlayer.playMessage(new QueuedMessage(folderLeaderChooseLane, Utilities.random.Next(3, 7), this));
-                    }
-                    else if (currentGameState.StockCarRulesData.stockCarRuleApplicable == StockCarRule.WAVE_AROUND_PASS_ON_RIGHT)
-                    {
-                        audioPlayer.playMessage(new QueuedMessage(folderWeHaveBeenWavedAround, Utilities.random.Next(3, 7), this));
-                    }
-                    else if (currentGameState.StockCarRulesData.stockCarRuleApplicable == StockCarRule.MOVE_TO_EOLL)
-                    {
-                        audioPlayer.playMessage(new QueuedMessage(folderEOLLPenalty, Utilities.random.Next(3, 7), this));
+                        nextGreenFlagLuckyDogCheckDue = currentGameState.Now.Add(greenFlagLuckyDogCheckInterval);
                     }
                 }
             }
+        }
+
+        private GreenFlagLuckyDogStatus getGreenFlagLuckyDogPosition(GameStateData currentGameState)
+        {
+            if (currentGameState.SessionData.Position > 1 &&
+                currentGameState.SessionData.TrackDefinition != null && currentGameState.SessionData.TrackDefinition.trackLength > 0)
+            {
+                float trackLength = currentGameState.SessionData.TrackDefinition.trackLength;
+                OpponentData leader = currentGameState.getOpponentAtPosition(1, true);
+                OpponentData carAhead = currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position - 1, true);
+                if (carAhead != null && leader != null && leader.CompletedLaps > 0)
+                {
+                    float leaderRaceDistance = (trackLength * leader.CompletedLaps) + leader.DistanceRoundTrack;
+                    float carAheadRaceDistance = (trackLength * carAhead.CompletedLaps) + carAhead.DistanceRoundTrack;
+                    float myRaceDistance = (trackLength * currentGameState.SessionData.CompletedLaps) + currentGameState.PositionAndMotionData.DistanceRoundTrack;
+                    // this will be zero if the car ahead is the leader:
+                    float carAheadDistanceToLeader = leaderRaceDistance - carAheadRaceDistance;
+                    float myDistanceToLeader = leaderRaceDistance - myRaceDistance;
+
+                    // sanity checks - car ahead distance to leader can be 0 (if he's the leader). Our distance must be positive.
+                    if (carAheadDistanceToLeader < 0 || myDistanceToLeader <= 0)
+                    {
+                        return GreenFlagLuckyDogStatus.NONE;
+                    }
+
+                    // see if we're the lucky dog:
+                    if (carAheadDistanceToLeader >= 0 && myDistanceToLeader > 0 && carAheadDistanceToLeader < trackLength && myDistanceToLeader > trackLength)
+                    {
+                        // we're the first lapped car
+                        return GreenFlagLuckyDogStatus.WE_ARE_IN_LUCKY_DOG;
+                    }
+
+                    // if we're in p3 or higher, see if the guy in front is the lucky dog:
+                    if (currentGameState.SessionData.Position > 2)
+                    {
+                        // check if car ahead is lucky dog - need to get the car ahead of him
+                        OpponentData car2PlacesAhead = currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position - 2, true);
+                        if (car2PlacesAhead != null)
+                        {
+                            float car2PlacesAheadRaceDistance = (trackLength * car2PlacesAhead.CompletedLaps) + car2PlacesAhead.DistanceRoundTrack;
+                            float car2PlacesAheadDistanceToLeader = leaderRaceDistance - car2PlacesAheadRaceDistance;
+                            // sanity check - this quantity should always be positive. If it's not, the race position is out of sync with the
+                            // lap count and / or distance round the track
+                            if (car2PlacesAheadDistanceToLeader < 0)
+                            {
+                                return GreenFlagLuckyDogStatus.NONE;
+                            }
+
+                            if (car2PlacesAheadDistanceToLeader < trackLength && carAheadDistanceToLeader > trackLength)
+                            {
+                                // the car 2 places ahead is on the lead lap, the car ahead is lapped, so he's the lucky dog
+                                return GreenFlagLuckyDogStatus.PASS_FOR_LUCKY_DOG;
+                            }
+                        }
+                    }
+                }
+            }
+            return GreenFlagLuckyDogStatus.NONE;
         }
 
         // note that these messages still play even if the yellow flag messages are disabled - I suppose they're penalty related
