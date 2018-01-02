@@ -104,6 +104,7 @@ namespace CrewChiefV4.GameState
     {
         public StockCarRule stockCarRuleApplicable = StockCarRule.NONE;
         public String luckyDogNameRaw;
+        public Boolean stockCarRulesEnabled = false;
     }
 
     public class TransmissionData
