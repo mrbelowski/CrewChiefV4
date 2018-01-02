@@ -272,7 +272,7 @@ namespace CrewChiefV4.Events
                     else
                     {
                         Console.WriteLine("pre-start message for race time");
-                        possibleMessages.Add(new QueuedMessage("race_time", MessageContents(minutes), 0, this));
+                        possibleMessages.Add(new QueuedMessage("race_time", MessageContents(minutes, Battery.folderMinutes), 0, this));
                     }
                 }
                 else
@@ -352,7 +352,7 @@ namespace CrewChiefV4.Events
             else
             {
                 Console.WriteLine("pre-start message for race time");
-                return MessageContents(minutes);
+                return MessageContents(minutes, Battery.folderMinutes);
             }
         }
 
