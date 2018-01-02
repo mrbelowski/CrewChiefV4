@@ -646,7 +646,47 @@ namespace CrewChiefV4.Events
             rightFrontTyreTemp = currentGameState.TyreData.FrontRight_CenterTemp;
             leftRearTyreTemp = currentGameState.TyreData.RearLeft_CenterTemp;
             rightRearTyreTemp = currentGameState.TyreData.RearRight_CenterTemp;
+            
+            currentTyreTempStatus = currentGameState.TyreData.TyreTempStatus;
+            currentBrakeTempStatus = currentGameState.TyreData.BrakeTempStatus;
 
+            if (isBrakeTempPeakForLap(currentGameState.TyreData.LeftFrontBrakeTemp, 
+                currentGameState.TyreData.RightFrontBrakeTemp, currentGameState.TyreData.LeftRearBrakeTemp,
+                currentGameState.TyreData.RightRearBrakeTemp))
+            {
+                peakBrakeTempStatus = currentGameState.TyreData.BrakeTempStatus;
+            }
+
+            completedLaps = currentGameState.SessionData.CompletedLaps;
+            lapsInSession = currentGameState.SessionData.SessionNumberOfLaps;
+            timeInSession = currentGameState.SessionData.SessionTotalRunTime;
+            timeElapsed = currentGameState.SessionData.SessionRunningTime;
+                    
+            if (enableTyreTempWarnings && !currentGameState.SessionData.LeaderHasFinishedRace &&
+                !currentGameState.PitData.InPitlane &&
+                currentGameState.SessionData.CompletedLaps >= lapsIntoSessionBeforeTempMessage &&
+                currentGameState.SessionData.IsNewSector && currentGameState.SessionData.SectorNumber == thisLapTyreTempReportSector)
+            {
+                reportCurrentTyreTempStatus(false);
+            }
+                
+            if (!currentGameState.SessionData.LeaderHasFinishedRace &&
+                    ((checkBrakesAtSector == 1 && currentGameState.SessionData.IsNewLap) ||
+                    ((currentGameState.SessionData.IsNewSector && currentGameState.SessionData.SectorNumber == checkBrakesAtSector))) &&
+                    (lastBrakeTempCheckSessionTime == -1.0f || ((currentGameState.SessionData.SessionRunningTime - lastBrakeTempCheckSessionTime) > TyreMonitor.SecondsBetweenBrakeTempCheck)))
+            {
+                if (!currentGameState.PitData.InPitlane && currentGameState.SessionData.CompletedLaps >= lapsIntoSessionBeforeTempMessage)
+                {
+                    if (enableBrakeTempWarnings && !GlobalBehaviourSettings.useOvalLogic)
+                    {
+                        lastBrakeTempCheckSessionTime = currentGameState.SessionData.SessionRunningTime;
+                        reportBrakeTempStatus(false, true);
+                    }
+                }
+                peakBrakeTempForLap = 0;
+            }
+
+            // only do tyre wear stuff if tyre wear is active
             if (currentGameState.TyreData.TyreWearActive)
             {
                 leftFrontWearPercent = currentGameState.TyreData.FrontLeftPercentWear;
@@ -655,21 +695,7 @@ namespace CrewChiefV4.Events
                 rightRearWearPercent = currentGameState.TyreData.RearRightPercentWear;
 
                 currentTyreConditionStatus = currentGameState.TyreData.TyreConditionStatus;
-                currentTyreTempStatus = currentGameState.TyreData.TyreTempStatus;
-                currentBrakeTempStatus = currentGameState.TyreData.BrakeTempStatus;
-
-                if (isBrakeTempPeakForLap(currentGameState.TyreData.LeftFrontBrakeTemp, 
-                    currentGameState.TyreData.RightFrontBrakeTemp, currentGameState.TyreData.LeftRearBrakeTemp,
-                    currentGameState.TyreData.RightRearBrakeTemp))
-                {
-                    peakBrakeTempStatus = currentGameState.TyreData.BrakeTempStatus;
-                }
-
-                completedLaps = currentGameState.SessionData.CompletedLaps;
-                lapsInSession = currentGameState.SessionData.SessionNumberOfLaps;
-                timeInSession = currentGameState.SessionData.SessionTotalRunTime;
-                timeElapsed = currentGameState.SessionData.SessionRunningTime;
-                    
+                
                 if (currentGameState.PitData.InPitlane && !currentGameState.SessionData.LeaderHasFinishedRace)
                 {
                     if (currentGameState.SessionData.SessionType == SessionType.Race && enableTyreWearWarnings && !reportedTyreWearForCurrentPitEntry)
@@ -699,30 +725,6 @@ namespace CrewChiefV4.Events
                     currentGameState.TyreData.RearLeftPercentWear < previousGameState.TyreData.RearLeftPercentWear))
                 {
                     reportedEstimatedTimeLeft = true;
-                }
-
-                if (enableTyreTempWarnings && !currentGameState.SessionData.LeaderHasFinishedRace &&
-                    !currentGameState.PitData.InPitlane &&
-                    currentGameState.SessionData.CompletedLaps >= lapsIntoSessionBeforeTempMessage &&
-                    currentGameState.SessionData.IsNewSector && currentGameState.SessionData.SectorNumber == thisLapTyreTempReportSector)
-                {
-                    reportCurrentTyreTempStatus(false);
-                }
-                
-                if (!currentGameState.SessionData.LeaderHasFinishedRace &&
-                     ((checkBrakesAtSector == 1 && currentGameState.SessionData.IsNewLap) ||
-                     ((currentGameState.SessionData.IsNewSector && currentGameState.SessionData.SectorNumber == checkBrakesAtSector))) &&
-                     (lastBrakeTempCheckSessionTime == -1.0f || ((currentGameState.SessionData.SessionRunningTime - lastBrakeTempCheckSessionTime) > TyreMonitor.SecondsBetweenBrakeTempCheck)))
-                {
-                    if (!currentGameState.PitData.InPitlane && currentGameState.SessionData.CompletedLaps >= lapsIntoSessionBeforeTempMessage)
-                    {
-                        if (enableBrakeTempWarnings)
-                        {
-                            lastBrakeTempCheckSessionTime = currentGameState.SessionData.SessionRunningTime;
-                            reportBrakeTempStatus(false, true);
-                        }
-                    }
-                    peakBrakeTempForLap = 0;
                 }
             }
         }
