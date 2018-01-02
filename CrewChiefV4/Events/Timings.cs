@@ -243,7 +243,7 @@ namespace CrewChiefV4.Events
             {
                 return;
             }
-            if (!currentGameState.PitData.InPitlane && enableGapMessages)
+            if (!currentGameState.PitData.InPitlane && enableGapMessages && !currentGameState.FlagData.currentLapIsFCY)
             {
                 if (isRace && !CrewChief.readOpponentDeltasForEveryLap &&
                     IsNewSectorOrGapPoint(previousGameState, currentGameState))

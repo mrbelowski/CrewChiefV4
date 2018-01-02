@@ -557,6 +557,9 @@ namespace CrewChiefV4.rFactor2
 
                 cgs.retriedDriverNames = pgs.retriedDriverNames;
                 cgs.disqualifiedDriverNames = pgs.disqualifiedDriverNames;
+
+                cgs.FlagData.currentLapIsFCY = pgs.FlagData.currentLapIsFCY;
+                cgs.FlagData.previousLapWasFCY = pgs.FlagData.previousLapWasFCY;
             }
 
             csd.SessionStartTime = csd.IsNewSession ? cgs.Now : psd.SessionStartTime;
@@ -582,7 +585,11 @@ namespace CrewChiefV4.rFactor2
             csd.IsNewSector = csd.IsNewSession || csd.SectorNumber != psd.SectorNumber;
             csd.IsNewLap = csd.IsNewSession || (csd.IsNewSector && csd.SectorNumber == 1);
             if (csd.IsNewLap)
+            {
                 cgs.readLandmarksForThisLap = false;
+                cgs.FlagData.previousLapWasFCY = pgs != null && pgs.FlagData.currentLapIsFCY;
+                cgs.FlagData.currentLapIsFCY = cgs.FlagData.isFullCourseYellow;
+            }
             csd.PositionAtStartOfCurrentLap = csd.IsNewLap ? csd.Position : psd.PositionAtStartOfCurrentLap;
             // TODO: See if Black Flag handling needed here.
             csd.IsDisqualified = (rFactor2Constants.rF2FinishStatus)playerScoring.mFinishStatus == rFactor2Constants.rF2FinishStatus.Dq;
@@ -1487,6 +1494,7 @@ namespace CrewChiefV4.rFactor2
             }
             else if (cgs.FlagData.isFullCourseYellow)
             {
+                cgs.FlagData.currentLapIsFCY = true;
                 if (shared.scoring.mScoringInfo.mYellowFlagState == (sbyte)rFactor2Constants.rF2YellowFlagState.Pending)
                     cgs.FlagData.fcyPhase = FullCourseYellowPhase.PENDING;
                 else if (shared.scoring.mScoringInfo.mYellowFlagState == (sbyte)rFactor2Constants.rF2YellowFlagState.PitOpen
