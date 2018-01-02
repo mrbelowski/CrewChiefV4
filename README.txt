@@ -70,6 +70,11 @@ I've not finished implementing this but currently the app understands and respon
 "Where should I attack / where am I faster / where can I attack": If the app has enough data, will report the corner name where you're gaining the most time on the guy in front
 "Where should I defend / where am I slower / where is he faster / where will he attack": If the app has enough data, will report the corner name where you're losing the most time to the guy behind
 "Read corner names / corner names / tell me the corner names": read out each corner name when you hit the mid-point of the corner, for this lap only (useful to test corner name mappings)
+"Damage report" / "How's my car" / "Is my car ok?": report any damage the car has sustained
+"Car status": report any damage the car has sustained, tyre and brake temperature status and fuel / battery status
+"Session status" / "Race status": report race position, gaps, time / laps left in session
+"Full update" / "Full status" / "Update me": combines all of the above three status reports (will produce a very verbose response)
+
 "pitstop add [X liters]" (adds X amount of fuel next pitstop, this option is iRacing only)
 "pitstop tearoff / pitstop windscreen" (enable next pitstop, this option is iRacing only)
 "pitstop fast repair / pitstop repair" (enable fast repair next pitstop, this option is iRacing only)
