@@ -490,7 +490,7 @@ namespace CrewChiefV4.Events
                     if (carAheadDistanceToLeader < trackLength && myDistanceToLeader > trackLength)
                     {
                         // we're the first lapped car. Only allow a lucky dog call if he's not in the pit or on an out lap
-                        return !carAhead.InPits && !carAhead.isExitingPits() ? GreenFlagLuckyDogStatus.WE_ARE_IN_LUCKY_DOG | GreenFlagLuckyDogStatus.NONE;
+                        return carAhead.InPits || carAhead.isExitingPits() ? GreenFlagLuckyDogStatus.NONE : GreenFlagLuckyDogStatus.WE_ARE_IN_LUCKY_DOG;
                     }
 
                     // if we're in p3 or higher, see if the guy in front is the lucky dog:
@@ -513,7 +513,7 @@ namespace CrewChiefV4.Events
                             {
                                 // the car 2 places ahead is on the lead lap, the car ahead is lapped, so he's the lucky dog.
                                 // Only allow a lucky dog call if he's not in the pit or on an out lap
-                                return !car2PlacesAhead.InPits && !car2PlacesAhead.isExitingPits() ? GreenFlagLuckyDogStatus.PASS_FOR_LUCKY_DOG | GreenFlagLuckyDogStatus.NONE;                                
+                                return car2PlacesAhead.InPits || car2PlacesAhead.isExitingPits() ? GreenFlagLuckyDogStatus.NONE : GreenFlagLuckyDogStatus.PASS_FOR_LUCKY_DOG;                                
                             }
                         }
                     }
