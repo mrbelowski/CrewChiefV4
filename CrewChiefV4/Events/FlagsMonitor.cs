@@ -98,7 +98,7 @@ namespace CrewChiefV4.Events
         // green flag lucky-dog tracking
         private enum GreenFlagLuckyDogStatus { NONE, PASS_FOR_LUCKY_DOG, WE_ARE_IN_LUCKY_DOG }
         private TimeSpan minTimeBetweenGreenFlagLuckyDogMessages = TimeSpan.FromMinutes(2);
-        private TimeSpan greenFlagLuckyDogCheckInterval = TimeSpan.FromSeconds(2);
+        private TimeSpan greenFlagLuckyDogCheckInterval = TimeSpan.FromSeconds(15);
         private int maxGreenFlagLuckyDogMessagesPerSession = 2;
         private GreenFlagLuckyDogStatus lastGreenFlagLuckyDogStatusAnnounced = GreenFlagLuckyDogStatus.NONE;
         private DateTime nextGreenFlagLuckyDogCheckDue = DateTime.MinValue;
