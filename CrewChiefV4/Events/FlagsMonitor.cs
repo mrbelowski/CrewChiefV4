@@ -372,6 +372,9 @@ namespace CrewChiefV4.Events
 
         private void processsStockCarRules(GameStateData previousGameState, GameStateData currentGameState)
         {
+            if (!currentGameState.StockCarRulesData.stockCarRulesEnabled)
+                return;
+
             if (GlobalBehaviourSettings.useAmericanTerms
                 && currentGameState.SessionData.SessionType == SessionType.Race
                 && previousGameState != null)
