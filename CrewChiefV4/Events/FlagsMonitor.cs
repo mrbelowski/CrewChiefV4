@@ -487,7 +487,7 @@ namespace CrewChiefV4.Events
                     }
 
                     // see if we're the lucky dog:
-                    if (carAheadDistanceToLeader >= 0 && myDistanceToLeader > 0 && carAheadDistanceToLeader < trackLength && myDistanceToLeader > trackLength)
+                    if (carAheadDistanceToLeader < trackLength && myDistanceToLeader > trackLength)
                     {
                         // we're the first lapped car
                         return GreenFlagLuckyDogStatus.WE_ARE_IN_LUCKY_DOG;
