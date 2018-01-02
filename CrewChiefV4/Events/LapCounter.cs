@@ -89,6 +89,7 @@ namespace CrewChiefV4.Events
 
         private DateTime nextManualFormationOvertakeWarning = DateTime.MinValue;
         private int currentPosition = -1;
+        private float currentSessionTotalRunTime = -1.0f;
 
         // special case for LapCounter - needs access to the CrewChief class to interrogate the spotter
         private CrewChief crewChief;
@@ -256,20 +257,34 @@ namespace CrewChiefV4.Events
                     // use the 'Laps' sound from Battery here
                     possibleMessages.Add(new QueuedMessage("race_distance", MessageContents(currentGameState.SessionData.SessionNumberOfLaps, Battery.folderLaps), 0, this));
                 }
-            } else if (currentGameState.SessionData.SessionHasFixedTime && currentGameState.SessionData.SessionTotalRunTime > 0 && currentGameState.SessionData.SessionTotalRunTime < 1800) 
+            }
+            else if (currentGameState.SessionData.SessionHasFixedTime && currentGameState.SessionData.SessionTotalRunTime > 0 && currentGameState.SessionData.SessionTotalRunTime < 1800) 
             {
-                int minutes = (int)currentGameState.SessionData.SessionTotalRunTime / 60;
-                if (currentGameState.SessionData.Position > 3 && minutes < 20 && minutes > 1)
+                if (CrewChief.gameDefinition.gameEnum != GameEnum.RF2_64BIT)
                 {
-                    Console.WriteLine("pre-start message for race time + get on with it");                   
-                    possibleMessages.Add(new QueuedMessage("race_time", MessageContents(minutes, folderMinutesYouNeedToGetOnWithIt), 0, this));
+                    int minutes = (int)currentGameState.SessionData.SessionTotalRunTime / 60;
+                    if (currentGameState.SessionData.Position > 3 && minutes < 20 && minutes > 1)
+                    {
+                        Console.WriteLine("pre-start message for race time + get on with it");
+                        possibleMessages.Add(new QueuedMessage("race_time", MessageContents(minutes, folderMinutesYouNeedToGetOnWithIt), 0, this));
+                    }
+                    //dont play pre-start message for race time unless its more then 2 minuts
+                    else
+                    {
+                        Console.WriteLine("pre-start message for race time");
+                        possibleMessages.Add(new QueuedMessage("race_time", MessageContents(minutes), 0, this));
+                    }
                 }
-                //dont play pre-start message for race time unless its more then 2 minuts
                 else
                 {
-                    Console.WriteLine("pre-start message for race time");
-                    possibleMessages.Add(new QueuedMessage("race_time", MessageContents(minutes), 0, this));
+                    // In rF2 there's a delay for timed session total running time to get updated (usually by the end of a gridwalk).
+                    Console.WriteLine("pre-start message for race time (delay evaluated)");
+
+                    DelayedMessageEvent delayedMessageEvent = new DelayedMessageEvent("getSessionTotalRunningTimeTimeMessages", new Object[] {
+                        currentGameState.SessionData.SessionTotalRunTime }, this);
+                    possibleMessages.Add(new QueuedMessage("race_time", delayedMessageEvent, 1 /*secondsDelay*/, null));
                 }
+
             }
             // now pick a random selection
             if (possibleMessages.Count > 0)
@@ -320,9 +335,33 @@ namespace CrewChiefV4.Events
             }
         }
 
+        public List<MessageFragment> getSessionTotalRunningTimeTimeMessages(float sessionTotalRunningTimeWnenQueued)
+        {
+            if (this.currentSessionTotalRunTime != sessionTotalRunningTimeWnenQueued)
+            {
+                Console.WriteLine("pre-start delay-evaluated session running time updated from: " + sessionTotalRunningTimeWnenQueued + " to: " + this.currentSessionTotalRunTime);
+            }
+
+            int minutes = (int)this.currentSessionTotalRunTime / 60;
+            if (this.currentPosition > 3 && minutes < 20 && minutes > 1)
+            {
+                Console.WriteLine("pre-start message for race time + get on with it");
+                return MessageContents(minutes, folderMinutesYouNeedToGetOnWithIt);
+            }
+            //dont play pre-start message for race time unless its more then 2 minuts
+            else
+            {
+                Console.WriteLine("pre-start message for race time");
+                return MessageContents(minutes);
+            }
+        }
+
+
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
+            // Hack for delayed variables during rF2 session startup.
             this.currentPosition = currentGameState.SessionData.Position;
+            this.currentSessionTotalRunTime = currentGameState.SessionData.SessionTotalRunTime;
 
             if (GameStateData.useManualFormationLap)
             {
