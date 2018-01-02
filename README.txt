@@ -199,6 +199,8 @@ One final point. If the app says "Jim is faster than you", let him through :)
 
 Changelog
 ---------
+Version 4.9.0.1: Hotfix to prevent some stock car rules messages triggering when they shouldn't
+
 Version 4.9.0.0: Added support for rF2 StockCarRules plugin, CC will now announce Lucky Dog, Wave Around, EOLL messages. To enable make sure you enable the "Use American terms" option, disable StockCarRules plugin in rF2, and set "EnableStockCarRulesPlugin":1 for "rFactor2SharedMemoryMapPlugin64.dll" - see the "rFactor2 Stock Car Rules (SCR) plugin" section above or  http://thecrewchief.org/showthread.php?407-How-to-enable-rF2-Stock-Car-Rules-in-Crew-Chief&p=2931&viewfull=1#post2931 for more details; Add option to disable pit state announcement during FCY in rF2 and rF1/AMS; Disable brake temp messages on ovals; fixed pit macros not working for some R3E players; prevent some messages playing when they're no longer relevant; some internal fixes
 
 Version 4.8.3.2: Fixed AC plugin after game update - the app should ask if you want to update the plugin when you first launch it in AC mode; More fixes to the manual rolling start logic; iRacing session transition crash fix; some car class tweaks; added nAudio speech recognition code to allow voice recognition input device selection (enable with property "Use nAudio for speech recognition" - thanks to Daniel Nowak for this one); disable sector delta messages on ovals and use more generous spotter parameters
