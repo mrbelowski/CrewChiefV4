@@ -1201,18 +1201,6 @@ namespace CrewChiefV4.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool enable_stockcars_mode {
-            get {
-                return ((bool)(this["enable_stockcars_mode"]));
-            }
-            set {
-                this["enable_stockcars_mode"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True")]
         public bool UpdateSettings {
             get {
@@ -1712,18 +1700,6 @@ namespace CrewChiefV4.Properties {
             }
             set {
                 this["rf2_spotter_car_length"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool enable_rf2_blue_on_slower {
-            get {
-                return ((bool)(this["enable_rf2_blue_on_slower"]));
-            }
-            set {
-                this["enable_rf2_blue_on_slower"] = value;
             }
         }
         
@@ -3023,6 +2999,30 @@ namespace CrewChiefV4.Properties {
             }
         }
         
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool enable_rf2_pit_state_during_fcy {
+            get {
+                return ((bool)(this["enable_rf2_pit_state_during_fcy"]));
+            }
+            set {
+                this["enable_rf2_pit_state_during_fcy"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public string enable_ams_pit_state_during_fcy {
+            get {
+                return ((string)(this["enable_ams_pit_state_during_fcy"]));
+            }
+            set {
+                this["enable_ams_pit_state_during_fcy"] = value;
+            }
+        }
+
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True")]

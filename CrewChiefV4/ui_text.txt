@@ -405,12 +405,8 @@ install_plugin_popup_enable_title = Enable Plugin
 report_allowed_overtakes_under_yellow = Report allowed overtakes under yellow
 report_allowed_overtakes_under_yellow_help = Play can-overtake and no-overtaking messages during yellow flags (R3E only)
 
-enable_rf2_blue_on_slower = Enable rF2 blue on slower
-enable_rf2_blue_on_slower_help = Play 'Blue Flag' messages if car behind seems to be faster and is of different car class.  Useful in multi-class races
 enable_rf2_pit_stop_prediction = Enable rF2 pit stop prediction
 enable_rf2_pit_stop_prediction_help = Play 'box now' messages when using offline scheduled pit stops
-enable_stockcars_mode = Enable Stock Cars mode
-enable_stockcars_mode_help = Uses Stock Cars wording for FCY phase, and enables White flag on last lap
 
 enable_simple_incident_detection = Enable simple incident detection
 enable_simple_incident_detection_help = Watch for and report very slow cars as incidents (pCARS and AC only)
@@ -544,6 +540,12 @@ use_naudio_for_speech_recognition = Use nAudio for speech recognition
 use_naudio_for_speech_recognition_help = nAudio allows speech recognition device selection
 
 speech_recognition_device_label = Speech input device
+
+enable_rf2_pit_state_during_fcy = Enable rF2 FCY pit state messages
+enable_rf2_pit_state_during_fcy_help = Announce pit state during Safety Car/Pace Car phase
+
+enable_ams_pit_state_during_fcy = Enable AMS / rF1 FCY pit state messages
+enable_ams_pit_state_during_fcy_help = Announce pit state during Safety Car/Pace Car phase
 
 bring_game_window_to_front_for_macros = Ensure game is on top for command macros
 bring_game_window_to_front_for_macros_help = Bring the game window to the front (on top) before running command macros

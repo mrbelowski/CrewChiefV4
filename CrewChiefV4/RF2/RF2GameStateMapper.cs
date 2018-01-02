@@ -14,6 +14,24 @@ namespace CrewChiefV4.rFactor2
 {
     public class RF2GameStateMapper : GameStateMapper
     {
+        // User preference constants.
+        private readonly bool enablePitStopPrediction = UserSettings.GetUserSettings().getBoolean("enable_rf2_pit_stop_prediction");
+        private readonly bool enableFrozenOrderMessages = UserSettings.GetUserSettings().getBoolean("enable_rf2_frozen_order_messages");
+        private readonly bool enableCutTrackHeuristics = UserSettings.GetUserSettings().getBoolean("enable_rf2_cut_track_heuristics");
+        private readonly bool enablePitLaneApproachHeuristics = UserSettings.GetUserSettings().getBoolean("enable_rf2_pit_lane_approach_heuristics");
+        private readonly bool enableFCYPitStateMessages = UserSettings.GetUserSettings().getBoolean("enable_rf2_pit_state_during_fcy");
+
+        // Stock Car Rules plugin message constants.
+        private readonly string scrLuckyDogPassOnLeftUpper = "Lucky Dog: Pass Field On Left".ToUpperInvariant();
+        private readonly string scrAllowLuckyDogPassOnLeftUpper = "Allow Lucky Dog To Pass On Left".ToUpperInvariant();
+        private readonly string scrLuckyDogIsUpperPrefix = "Lucky Dog: ".ToUpperInvariant();
+        private readonly string scrLeaderChooseLaneUpper = "Choose A Lane By Staying Left Or Right".ToUpperInvariant();
+
+        // Note: "wave around" is a prefix message, because apparently ISI plugin says "on left",
+        // but custom plugin leagues use says "on right".
+        private readonly string scrWaveArroundPassOnUpperPrefix = "Wave Around: Pass Field On".ToUpperInvariant();
+        private readonly string scrMoveToEOLLUpper = "Move To End Of Longest Line".ToUpperInvariant();
+
         private SpeechRecogniser speechRecogniser;
 
         public static string playerName = null;
@@ -22,7 +40,7 @@ namespace CrewChiefV4.rFactor2
         private List<CornerData.EnumWithThresholds> tyreWearThresholds = new List<CornerData.EnumWithThresholds>();
 
         // Numbers below are pretty good match for HUD colors, all series, tire types.  Yay for best in class physics ;)
-        // Exact thresholds probably depend on tire type/series, even user preferences.  Maybe expose this via car class data in the future.
+        // Exact thresholds/ probably depend on tire type/series, even user preferences.  Maybe expose this via car class data in the future.
         private float scrubbedTyreWearPercent = 5.0f;
         private float minorTyreWearPercent = 20.0f;  // Turns Yellow in HUD.
         private float majorTyreWearPercent = 50.0f;  // Turns Red in HUD.
@@ -55,8 +73,7 @@ namespace CrewChiefV4.rFactor2
 
         // Experimantal: If true, means we completed at least one full lap since exiting the pits (out lap excluded)
         // and minTrackWidth is ready to be used for pit lane approach detection.
-        // However, it looks like depending on track authoring errors this might cause bad width stuck, so this is disabled currently.
-        private bool trackWidthMapped = false;
+        // However, it looks like depending on track authoring errors this might cause bad width stuck, so this is by default disabled currently.
         private DateTime timePitStopRequested = DateTime.MinValue;
         private bool isApproachingPitEntry = false;
 
@@ -67,17 +84,12 @@ namespace CrewChiefV4.rFactor2
         // Player mTotalLaps when FCY frozen position assigned (used to calculate distance to SC).
         private float playerLapsWhenFCYPosAssigned = -1;
 
-        // User preferences.
-        private readonly bool enablePitStopPrediction = UserSettings.GetUserSettings().getBoolean("enable_rf2_pit_stop_prediction");
-        private readonly bool enableBlueOnSlower = UserSettings.GetUserSettings().getBoolean("enable_rf2_blue_on_slower");
-        private readonly bool enableFrozenOrderMessages = UserSettings.GetUserSettings().getBoolean("enable_rf2_frozen_order_messages");
-        private readonly bool enableCutTrackHeuristics = UserSettings.GetUserSettings().getBoolean("enable_rf2_cut_track_heuristics");
-        private readonly bool enablePitLaneApproachHeuristics = UserSettings.GetUserSettings().getBoolean("enable_rf2_pit_lane_approach_heuristics");
-        private const bool incrementCutTrackCountWhenLeavingRacingSurface = true;
-        private const bool resetMinWidthEveryLap = true;
-
         // True if it looks like track has no DRS zones defined.
         private bool detectedTrackNoDRSZones = false;
+
+        // Stock Car Rules debug messages
+        private string lastUnknownGlobalRuleMessage = null;
+        private string lastUnknownPlayerRuleMessage = null;
 
         // Track landmarks cache.
         private string lastSessionTrackName = null;
@@ -96,7 +108,7 @@ namespace CrewChiefV4.rFactor2
             this.suspensionDamageThresholds.Add(new CornerData.EnumWithThresholds(DamageLevel.DESTROYED, 1.0f, 2.0f));
         }
 
-        private int[] minimumSupportedVersionParts = new int[] { 2, 2, 1, 0 };
+        private int[] minimumSupportedVersionParts = new int[] { 2, 3, 1, 2 };
         public static bool pluginVerified = false;
         private string lastVersionString;
         public void versionCheck(Object memoryMappedFileStruct)
@@ -151,7 +163,7 @@ namespace CrewChiefV4.rFactor2
             {
                 RF2GameStateMapper.pluginVerified = true;
 
-                var msg = "rFactor 2 Shared Memory version: " + versionStr + " 64bit";
+                var msg = "rFactor 2 Shared Memory version: " + versionStr + " 64bit." + (shared.extended.isStockCarRulesPluginHosted != 0 ? "  Stock Car Rules plugin hosted." : "");
                 Console.WriteLine(msg);
             }
         }
@@ -181,7 +193,8 @@ namespace CrewChiefV4.rFactor2
             this.minTrackWidth = -1.0;
             this.timePitStopRequested = DateTime.MinValue;
             this.isApproachingPitEntry = false;
-            this.trackWidthMapped = false;
+            this.lastUnknownGlobalRuleMessage = null;
+            this.lastUnknownPlayerRuleMessage = null;
             RF2GameStateMapper.sanitizedNamesMap.Clear();
         }
 
@@ -565,18 +578,6 @@ namespace CrewChiefV4.rFactor2
             if (csd.SessionType == SessionType.Race && csd.SessionPhase == SessionPhase.Countdown)
                 csd.SessionStartPosition = csd.Position;
 
-            // TODO: Below is for debugging only, remove once more insight gathered.
-            if (psd != null && csd.SessionType == SessionType.Race && (csd.SessionPhase == SessionPhase.Gridwalk || csd.SessionPhase == SessionPhase.Countdown))
-            {
-                if (csd.SessionStartPosition != playerScoring.mPlace)
-                {
-                    Console.WriteLine(string.Format("Position mismatch detected: phase:{0}  prev pos:{1}  curr pos:{2}  ET:{3}",
-                        csd.SessionPhase, csd.SessionStartPosition, playerScoring.mPlace, shared.scoring.mScoringInfo.mCurrentET.ToString("0.000")));
-
-                    csd.SessionStartPosition = playerScoring.mPlace;
-                }
-            }
-
             csd.SectorNumber = playerScoring.mSector == 0 ? 3 : playerScoring.mSector;
             csd.IsNewSector = csd.IsNewSession || csd.SectorNumber != psd.SectorNumber;
             csd.IsNewLap = csd.IsNewSession || (csd.IsNewSector && csd.SectorNumber == 1);
@@ -709,9 +710,7 @@ namespace CrewChiefV4.rFactor2
                 && pgs.PitData.HasRequestedPitStop
                 && cgs.PitData.HasRequestedPitStop
                 && (cgs.Now - this.timePitStopRequested).TotalSeconds > cgs.carClass.pitCrewPreparationTime)
-            {
                 cgs.PitData.IsPitCrewReady = true;
-            }
 
             // This sometimes fires under Countdown, so limit to phases when message might make sense.
             if (csd.SessionPhase == SessionPhase.Green
@@ -719,7 +718,7 @@ namespace CrewChiefV4.rFactor2
                 || csd.SessionPhase == SessionPhase.Formation)
                 cgs.PitData.IsPitCrewDone = (rFactor2Constants.rF2PitState)playerScoring.mPitState == rFactor2Constants.rF2PitState.Exiting;
 
-            if (csd.IsNewLap && RF2GameStateMapper.resetMinWidthEveryLap)
+            if (csd.IsNewLap)
             {
                 this.minTrackWidth = -1.0;
                 this.isApproachingPitEntry = false;
@@ -731,22 +730,9 @@ namespace CrewChiefV4.rFactor2
             {
                 this.minTrackWidth = -1.0;
                 this.isApproachingPitEntry = false;
-                this.trackWidthMapped = false;
             }
             else if (this.enablePitLaneApproachHeuristics)
             {
-                // We need to have completed at least one full lap before we attempt guessing on pit lane approach.
-                if (pgs != null
-                    && !pgs.PitData.OnOutLap
-                    && !cgs.PitData.OnOutLap
-                    && !cgs.PitData.InPitlane
-                    && csd.IsNewLap
-                    && csd.CompletedLaps > 0
-                    && this.minTrackWidth != -1.0)
-                {
-                    this.trackWidthMapped = true;
-                }
-
                 if (cgs.PitData.InPitlane)
                     this.isApproachingPitEntry = false;
 
@@ -762,7 +748,6 @@ namespace CrewChiefV4.rFactor2
                     // - this appears like narrowest part of a track surface (tracked for an entire lap)
                     // - and pit is requested, assume we're approaching pit entry.
                     if (cgs.SessionData.SessionType == SessionType.Race
-                        && (this.trackWidthMapped == true || RF2GameStateMapper.resetMinWidthEveryLap)
                         && cgs.PositionAndMotionData.DistanceRoundTrack > shared.rules.mTrackRules.mPitLaneStartDist
                         && cgs.PitData.HasRequestedPitStop)
                         this.isApproachingPitEntry = true;
@@ -1507,7 +1492,9 @@ namespace CrewChiefV4.rFactor2
                 else if (shared.scoring.mScoringInfo.mYellowFlagState == (sbyte)rFactor2Constants.rF2YellowFlagState.PitOpen
                     || shared.scoring.mScoringInfo.mYellowFlagState == (sbyte)rFactor2Constants.rF2YellowFlagState.PitClosed)
                 {
-                    if (playerRulesIdx != -1
+                    if (!this.enableFCYPitStateMessages)
+                        cgs.FlagData.fcyPhase = FullCourseYellowPhase.IN_PROGRESS;
+                    else if (playerRulesIdx != -1
                         && shared.scoring.mScoringInfo.mYellowFlagState == (sbyte)rFactor2Constants.rF2YellowFlagState.PitClosed)
                     {
                         var allowedToPit = shared.rules.mParticipants[playerRulesIdx].mAllowedToPit;
@@ -1522,7 +1509,7 @@ namespace CrewChiefV4.rFactor2
                         cgs.FlagData.fcyPhase = FullCourseYellowPhase.PITS_OPEN;
                 }
                 else if (shared.scoring.mScoringInfo.mYellowFlagState == (sbyte)rFactor2Constants.rF2YellowFlagState.PitLeadLap)
-                    cgs.FlagData.fcyPhase = FullCourseYellowPhase.PITS_OPEN_LEAD_LAP_VEHICLES;
+                    cgs.FlagData.fcyPhase = this.enableFCYPitStateMessages ? FullCourseYellowPhase.PITS_OPEN_LEAD_LAP_VEHICLES : FullCourseYellowPhase.IN_PROGRESS;
                 else if (shared.scoring.mScoringInfo.mYellowFlagState == (sbyte)rFactor2Constants.rF2YellowFlagState.LastLap)
                 {
                     if (pgs != null)
@@ -1567,43 +1554,18 @@ namespace CrewChiefV4.rFactor2
 
             if (playerScoring.mFlag == (byte)rFactor2Constants.rF2PrimaryFlag.Blue)
                 currFlag = FlagEnum.BLUE;
-            else if (this.enableBlueOnSlower
-                && !cgs.FlagData.isFullCourseYellow)  // Don't announce blue on slower under FCY.
-            {
-                foreach (var opponent in cgs.OpponentData.Values)
-                {
-                    if (csd.SessionType != SessionType.Race
-                        || csd.CompletedLaps < 1
-                        || cgs.PositionAndMotionData.DistanceRoundTrack < 0.0f)
-                        break;
-                    
-                    if (opponent.getCurrentLapData().InLap
-                        || opponent.getCurrentLapData().OutLap
-                        || opponent.Position > csd.Position)
-                        continue;
-                    
-                    // Only track this if opponent car class is different.
-                    if (string.Equals(cgs.carClass.getClassIdentifier(), opponent.CarClass.getClassIdentifier()))
-                        continue;
-
-                    if (IsBehindWithinDistance(csd.TrackDefinition.trackLength, 8.0f, 40.0f,
-                            cgs.PositionAndMotionData.DistanceRoundTrack, opponent.DistanceRoundTrack)
-                        && opponent.Speed >= cgs.PositionAndMotionData.CarSpeed)
-                    {
-                        currFlag = FlagEnum.BLUE;
-                        break;
-                    }
-                }
-            }
 
             if (csd.IsDisqualified
                 && pgs != null
                 && !psd.IsDisqualified)
-            {
                 currFlag = FlagEnum.BLACK;
-            }
 
             csd.Flag = currFlag;
+
+            // --------------------------------
+            // Stock Car Rules data
+            if (playerRulesIdx != -1)
+                cgs.StockCarRulesData = this.GetStockCarRulesData(cgs, ref shared.rules.mParticipants[playerRulesIdx], ref shared.rules);
 
             // --------------------------------
             // Frozen order data
@@ -1632,8 +1594,7 @@ namespace CrewChiefV4.rFactor2
             }
 
             // Improvised cut track warnings based on surface type.
-            if (RF2GameStateMapper.incrementCutTrackCountWhenLeavingRacingSurface
-                && !cutTrackByInvalidLapDetected
+            if (!cutTrackByInvalidLapDetected
                 && !cgs.PitData.InPitlane
                 && !cgs.PitData.OnOutLap)
             {
@@ -1671,6 +1632,23 @@ namespace CrewChiefV4.rFactor2
                         Console.WriteLine("Player off track: by distance.");
                         cgs.PenaltiesData.CutTrackWarnings = pgs.PenaltiesData.CutTrackWarnings + 1;
                     }
+                }
+            }
+
+            if (csd.SessionPhase == SessionPhase.FullCourseYellow)
+            {
+                var mainMsg = RF2GameStateMapper.GetStringFromBytes(shared.rules.mTrackRules.mMessage);
+
+                if (!string.IsNullOrWhiteSpace(mainMsg))
+                    Debug.WriteLine(mainMsg);
+
+                for (var i = 0; i < shared.rules.mTrackRules.mNumParticipants; ++i)
+                {
+                    var p = shared.rules.mParticipants[i];
+
+                    var pcptMsg = RF2GameStateMapper.GetStringFromBytes(p.mMessage);
+                    if (!string.IsNullOrWhiteSpace(pcptMsg))
+                        Debug.WriteLine(pcptMsg);
                 }
             }
 
@@ -1720,6 +1698,59 @@ namespace CrewChiefV4.rFactor2
             CrewChief.viewingReplay = false;
 
             return cgs;
+        }
+
+        private StockCarRulesData GetStockCarRulesData(GameStateData currentGameState, ref rF2TrackRulesParticipant playerRules, ref rF2Rules rules)
+        {
+            var scrData = new StockCarRulesData();
+            var cgs = currentGameState;
+
+            if (!GlobalBehaviourSettings.useAmericanTerms
+                || cgs.SessionData.SessionPhase != SessionPhase.FullCourseYellow
+                || cgs.SessionData.SessionType != SessionType.Race)
+                return scrData;
+
+            var globalMsgUpper = RF2GameStateMapper.GetStringFromBytes(rules.mTrackRules.mMessage).ToUpperInvariant();
+            var playerMsgUpper = RF2GameStateMapper.GetStringFromBytes(playerRules.mMessage).ToUpperInvariant();
+
+            if (!string.IsNullOrWhiteSpace(globalMsgUpper))
+            {
+                if (globalMsgUpper.Length > this.scrLuckyDogIsUpperPrefix.Length
+                    && globalMsgUpper.StartsWith(this.scrLuckyDogIsUpperPrefix))
+                {
+                    scrData.luckyDogNameRaw = globalMsgUpper.Substring(this.scrLuckyDogIsUpperPrefix.Length).ToLowerInvariant();
+                    scrData.luckyDogNameRaw = RF2GameStateMapper.GetSanitizedDriverName(scrData.luckyDogNameRaw);
+                }
+                else
+                {
+                    if (this.lastUnknownGlobalRuleMessage != globalMsgUpper)
+                    {
+                        this.lastUnknownGlobalRuleMessage = globalMsgUpper;
+                        Console.WriteLine("Unrecognized global rule message: " + globalMsgUpper);
+                    }
+                }
+            }
+
+            if (!string.IsNullOrWhiteSpace(playerMsgUpper))
+            {
+                if (playerMsgUpper == this.scrAllowLuckyDogPassOnLeftUpper)
+                    scrData.stockCarRuleApplicable = StockCarRule.LUCKY_DOG_ALLOW_TO_PASS_ON_LEFT;
+                else if (playerMsgUpper == this.scrLuckyDogPassOnLeftUpper)
+                    scrData.stockCarRuleApplicable = StockCarRule.LUCKY_DOG_PASS_ON_LEFT;
+                else if (playerMsgUpper == this.scrLeaderChooseLaneUpper)
+                    scrData.stockCarRuleApplicable = StockCarRule.LEADER_CHOOSE_LANE;
+                else if (playerMsgUpper == this.scrMoveToEOLLUpper)
+                    scrData.stockCarRuleApplicable = StockCarRule.MOVE_TO_EOLL;
+                else if (playerMsgUpper.StartsWith(this.scrWaveArroundPassOnUpperPrefix))
+                    scrData.stockCarRuleApplicable = StockCarRule.WAVE_AROUND_PASS_ON_RIGHT;
+                else if (this.lastUnknownPlayerRuleMessage != playerMsgUpper)
+                {
+                    this.lastUnknownPlayerRuleMessage = playerMsgUpper;
+                    Console.WriteLine("Unrecognized player rule message: " + playerMsgUpper);
+                }
+            }
+
+            return scrData;
         }
 
         private static double getVehicleSpeed(ref rF2VehicleTelemetry vehicleTelemetry)
