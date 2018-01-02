@@ -119,6 +119,27 @@ If you want to have the game pre-selected, start the app like this for PCars: [f
 This can be used in conjunction with the launch_pcars / launch_raceroom / [game]_launch_exe / [game]_launch_params and run_immediately options to set crew chief up to start the game selected in the app launch argument, and start its own process. I'll provide examples of this approach soon. 
 
 
+rFactor2 Stock Car Rules (SCR) plugin
+-------------------------------------
+rFactor 2 Stock Car Rules (SCR) are implemented as a plugin. The Shared Memory plugin which Crew Chief uses does not see the output of the SCR plugin, because rF2 (partially) isolates plugins from each other. In order to work around this issue the Shared Memory plugin has to load the SCR plugin and forward all rF2 calls to it.
+
+Steps to enable Stock Car Rules in the Crew Chief:
+
+ - Let Crew Chief update the rF2 Shared Memory plugin to the latest version by starting rF2 and CC once, then exit the game.
+ - Make sure StockCarRules.dll "Enabled" is set to 0 (yes, disabled) in UserData\player\CustomPluginVariables.json. Do NOT Delete the plugin.
+ - In UserData\player\CustomPluginVariables.json make sure SM plugin configuration looks like this:
+
+ "rFactor2SharedMemoryMapPlugin64.dll":{
+    "Enabled":1,
+    "DebugISIInternals":0,
+    "DebugOutputLevel":0,
+    "EnableStockCarRulesPlugin":1
+}
+
+The SCR plugin and the messages associated with stock car rules will be enabled automatically for vehicle classes which have useAmericanTerms = true in their definition (some built in classes will have this). You can also force it to be enabled for all classes by selecting the "Use American terms" option in the Preferences screen.
+
+
+
 Known Issues Which Aren't Fixable
 ---------------------------------
 
@@ -173,7 +194,7 @@ One final point. If the app says "Jim is faster than you", let him through :)
 
 Changelog
 ---------
-Version 4.9.0.0: Added support for rF2 StockCarRules plugin, CC will now announce Lucky Dog, Wave Around, EOLL messages. To enable make sure you enable the "Use American terms" option, disable StockCarRules plugin in rF2, and set "EnableStockCarRulesPlugin":1 for "rFactor2SharedMemoryMapPlugin64.dll" - see http://thecrewchief.org/showthread.php?407-How-to-enable-rF2-Stock-Car-Rules-in-Crew-Chief&p=2931&viewfull=1#post2931 for more details; Add option to disable pit state announcement during FCY in rF2 and rF1/AMS; Disable brake temp messages on ovals; fixed pit macros not working for some R3E players; prevent some messages playing when they're no longer relevant; some internal fixes
+Version 4.9.0.0: Added support for rF2 StockCarRules plugin, CC will now announce Lucky Dog, Wave Around, EOLL messages. To enable make sure you enable the "Use American terms" option, disable StockCarRules plugin in rF2, and set "EnableStockCarRulesPlugin":1 for "rFactor2SharedMemoryMapPlugin64.dll" - see the "rFactor2 Stock Car Rules (SCR) plugin" section above or  http://thecrewchief.org/showthread.php?407-How-to-enable-rF2-Stock-Car-Rules-in-Crew-Chief&p=2931&viewfull=1#post2931 for more details; Add option to disable pit state announcement during FCY in rF2 and rF1/AMS; Disable brake temp messages on ovals; fixed pit macros not working for some R3E players; prevent some messages playing when they're no longer relevant; some internal fixes
 
 Version 4.8.3.2: Fixed AC plugin after game update - the app should ask if you want to update the plugin when you first launch it in AC mode; More fixes to the manual rolling start logic; iRacing session transition crash fix; some car class tweaks; added nAudio speech recognition code to allow voice recognition input device selection (enable with property "Use nAudio for speech recognition" - thanks to Daniel Nowak for this one); disable sector delta messages on ovals and use more generous spotter parameters
 
