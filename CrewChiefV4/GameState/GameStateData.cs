@@ -63,14 +63,24 @@ namespace CrewChiefV4.GameState
 
     public enum FullCourseYellowPhase
     {
-        PENDING, PITS_CLOSED, PITS_OPEN_LEAD_LAP_VEHICLES, PITS_OPEN, LAST_LAP_NEXT, LAST_LAP_CURRENT, RACING
+        PENDING, IN_PROGRESS, PITS_CLOSED, PITS_OPEN_LEAD_LAP_VEHICLES, PITS_OPEN, LAST_LAP_NEXT, LAST_LAP_CURRENT, RACING
     }
 
     public enum PassAllowedUnderYellow
     {
         YES, NO, NO_DATA
     }
-    
+
+    public enum StockCarRule
+    {
+        NONE,
+        LEADER_CHOOSE_LANE,
+        LUCKY_DOG_PASS_ON_LEFT,  // Player's LD
+        LUCKY_DOG_ALLOW_TO_PASS_ON_LEFT,  // Opponent's LD
+        MOVE_TO_EOLL,
+        WAVE_AROUND_PASS_ON_RIGHT  // Or left??
+    }
+
     public class FlagData
     {
         // holds newer (AMS, RF2 & Raceroom) flag data. This is game dependent - only AMS, RF2 and R3E will use this.
@@ -88,6 +98,12 @@ namespace CrewChiefV4.GameState
         // bit of a hack... allow the mapper to decide which flag implemenation to use for yellow calls
         // as this is game dependent and option dependent (i.e. R3E players may have 'full flag rules' off)
         public Boolean useImprovisedIncidentCalling = true;
+    }
+
+    public class StockCarRulesData
+    {
+        public StockCarRule stockCarRuleApplicable = StockCarRule.NONE;
+        public String luckyDogNameRaw;
     }
 
     public class TransmissionData
@@ -1939,6 +1955,8 @@ namespace CrewChiefV4.GameState
         public OvertakingAids OvertakingAids = new OvertakingAids();
 
         public FlagData FlagData = new FlagData();
+
+        public StockCarRulesData StockCarRulesData = new StockCarRulesData();
 
         public FrozenOrderData FrozenOrderData = new FrozenOrderData();
 

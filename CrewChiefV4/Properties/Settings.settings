@@ -296,9 +296,6 @@
     <Setting Name="enable_push_to_pass_messages" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="enable_stockcars_mode" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
-    </Setting>
     <Setting Name="UpdateSettings" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
@@ -424,9 +421,6 @@
     </Setting>
     <Setting Name="rf2_spotter_car_length" Type="System.Single" Scope="User">
       <Value Profile="(Default)">4.5</Value>
-    </Setting>
-    <Setting Name="enable_rf2_blue_on_slower" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="enable_rf2_pit_stop_prediction" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
@@ -751,6 +745,12 @@
     </Setting>
     <Setting Name="NAUDIO_RECORDING_DEVICE_GUID" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="enable_rf2_pit_state_during_fcy" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="enable_ams_pit_state_during_fcy" Type="System.String" Scope="User">
+      <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="bring_game_window_to_front_for_macros" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
