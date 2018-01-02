@@ -1565,7 +1565,7 @@ namespace CrewChiefV4.rFactor2
             // --------------------------------
             // Stock Car Rules data
             if (playerRulesIdx != -1)
-                cgs.StockCarRulesData = this.GetStockCarRulesData(cgs, ref shared.rules.mParticipants[playerRulesIdx], ref shared.rules);
+                cgs.StockCarRulesData = this.GetStockCarRulesData(cgs, ref shared.rules.mParticipants[playerRulesIdx], ref shared.rules, ref shared);
 
             // --------------------------------
             // Frozen order data
@@ -1700,12 +1700,15 @@ namespace CrewChiefV4.rFactor2
             return cgs;
         }
 
-        private StockCarRulesData GetStockCarRulesData(GameStateData currentGameState, ref rF2TrackRulesParticipant playerRules, ref rF2Rules rules)
+        private StockCarRulesData GetStockCarRulesData(GameStateData currentGameState, ref rF2TrackRulesParticipant playerRules, ref rF2Rules rules, ref CrewChiefV4.rFactor2.RF2SharedMemoryReader.RF2StructWrapper shared)
         {
             var scrData = new StockCarRulesData();
+            scrData.stockCarRulesEnabled = shared.extended.isStockCarRulesPluginHosted != 0;
+
             var cgs = currentGameState;
 
-            if (!GlobalBehaviourSettings.useAmericanTerms
+            if (!scrData.stockCarRulesEnabled
+                || !GlobalBehaviourSettings.useAmericanTerms
                 || cgs.SessionData.SessionPhase != SessionPhase.FullCourseYellow
                 || cgs.SessionData.SessionType != SessionType.Race)
                 return scrData;
