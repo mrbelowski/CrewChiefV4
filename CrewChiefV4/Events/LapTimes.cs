@@ -309,7 +309,8 @@ namespace CrewChiefV4.Events
             }
             // TODO: in R3E this previousGameState OnOutLap doesn't appear to true when we start our flying lap
             if (!currentGameState.PitData.OnInLap && previousGameState != null && !previousGameState.PitData.OnOutLap 
-                && !currentGameState.PitData.InPitlane)   // as this is a new lap, check whether the *previous* state was an outlap
+                && !currentGameState.PitData.InPitlane   // as this is a new lap, check whether the *previous* state was an outlap
+                && !currentGameState.FlagData.previousLapWasFCY)    // don't announce lap times if we've just gone green after FCY
             {
                 Boolean sectorsReportedForLap = false;                
                 if (currentGameState.SessionData.IsNewLap && 

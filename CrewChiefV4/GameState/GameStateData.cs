@@ -90,6 +90,8 @@ namespace CrewChiefV4.GameState
         // note that for RaceRoom we might have to calculate this. < 0 means we've passed the incident.
         public float distanceToNearestIncident = -1;
         public FullCourseYellowPhase fcyPhase = FullCourseYellowPhase.RACING;
+        public Boolean currentLapIsFCY = false;
+        public Boolean previousLapWasFCY = false;
         public int lapCountWhenLastWentGreen = -1;
         // cars passed under yellow - need to give back this many places to avoid penalty (only implemented for R3E)
         public int numCarsPassedIllegally = 0;
