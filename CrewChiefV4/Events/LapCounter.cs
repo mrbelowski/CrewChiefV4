@@ -28,6 +28,7 @@ namespace CrewChiefV4.Events
         public static String folderManualStartFormUpBehind = "lap_counter/form_up_behind";
         public static String folderManualStartStartingOnLeftBehind = "lap_counter/starting_in_left_lane_behind";
         public static String folderManualStartStartingOnRightBehind = "lap_counter/starting_in_right_lane_behind";
+        public static String folderManualStartLeaderHasGone = "lap_counter/leader_has_gone";
 
         // toggle / request acknowledgements when enabling / disabling manual formation lap mode
         public static String folderManualFormationLapModeEnabled = "lap_counter/manual_formation_lap_mode_enabled";
@@ -42,6 +43,11 @@ namespace CrewChiefV4.Events
         private Boolean playedManualStartLeaderHasCrossedLine = false;
         private Boolean playedManualStartPlayedGoGoGo = false;
         private Boolean playedManualStartInitialMessage = false;
+
+        private float distanceBeforeLineToStartLeaderAccelerationCheck = 200f;
+        private float leaderSpeedAtAccelerationCheckStart = -1;
+        private OpponentData poleSitter = null;
+        private Boolean leaderHasGone = false;
 
         private String manualStartOpponentToFollow = null;
 
@@ -83,6 +89,7 @@ namespace CrewChiefV4.Events
 
         private DateTime nextManualFormationOvertakeWarning = DateTime.MinValue;
         private int currentPosition = -1;
+        private float currentSessionTotalRunTime = -1.0f;
 
         // special case for LapCounter - needs access to the CrewChief class to interrogate the spotter
         private CrewChief crewChief;
@@ -147,6 +154,9 @@ namespace CrewChiefV4.Events
             playedRejoinAtBackMessage = false;
             playedPreLightsRollingStartWarning = false;
             opponentsInFrontGridSides = new Dictionary<string, GridSide>();
+            leaderSpeedAtAccelerationCheckStart = -1;
+            poleSitter = null;
+            leaderHasGone = false;
         }
 
         private OpponentData getOpponent(GameStateData currentGameState, String opponentName)
@@ -233,7 +243,9 @@ namespace CrewChiefV4.Events
             }
             if (currentGameState.SessionData.SessionNumberOfLaps > 0) {
                 // check how long the race is
-                if (currentGameState.SessionData.Position > 3 && currentGameState.SessionData.TrackDefinition.trackLength * currentGameState.SessionData.SessionNumberOfLaps < 20000)
+                if (currentGameState.SessionData.Position > 3 && currentGameState.SessionData.TrackDefinition != null && 
+                    currentGameState.SessionData.TrackDefinition.trackLength > 0 && 
+                    currentGameState.SessionData.TrackDefinition.trackLength * currentGameState.SessionData.SessionNumberOfLaps < 20000)
                 {
                     // anything less than 20000 metres worth of racing (e.g. 10 laps of Brands Indy) should have a 'make them count'
                     Console.WriteLine("pre-start message for race laps + get on with it");
@@ -242,24 +254,37 @@ namespace CrewChiefV4.Events
                 else
                 {
                     Console.WriteLine("pre-start message for race laps");
-
-                    // TODO: need to add a "laps..." message here otherwise it just plays the number. Add the "make them count" message until this is available
-                    possibleMessages.Add(new QueuedMessage("race_distance", MessageContents(currentGameState.SessionData.SessionNumberOfLaps, folderLapsMakeThemCount), 0, this));
+                    // use the 'Laps' sound from Battery here
+                    possibleMessages.Add(new QueuedMessage("race_distance", MessageContents(currentGameState.SessionData.SessionNumberOfLaps, Battery.folderLaps), 0, this));
                 }
-            } else if (currentGameState.SessionData.SessionHasFixedTime && currentGameState.SessionData.SessionTotalRunTime > 0 && currentGameState.SessionData.SessionTotalRunTime < 1800) 
+            }
+            else if (currentGameState.SessionData.SessionHasFixedTime && currentGameState.SessionData.SessionTotalRunTime > 0 && currentGameState.SessionData.SessionTotalRunTime < 1800) 
             {
-                int minutes = (int)currentGameState.SessionData.SessionTotalRunTime / 60;
-                if (currentGameState.SessionData.Position > 3 && minutes < 20)
+                if (CrewChief.gameDefinition.gameEnum != GameEnum.RF2_64BIT)
                 {
-                    Console.WriteLine("pre-start message for race time + get on with it");                   
-                    possibleMessages.Add(new QueuedMessage("race_time", MessageContents(minutes, folderMinutesYouNeedToGetOnWithIt), 0, this));
+                    int minutes = (int)currentGameState.SessionData.SessionTotalRunTime / 60;
+                    if (currentGameState.SessionData.Position > 3 && minutes < 20 && minutes > 1)
+                    {
+                        Console.WriteLine("pre-start message for race time + get on with it");
+                        possibleMessages.Add(new QueuedMessage("race_time", MessageContents(minutes, folderMinutesYouNeedToGetOnWithIt), 0, this));
+                    }
+                    //dont play pre-start message for race time unless its more then 2 minuts
+                    else
+                    {
+                        Console.WriteLine("pre-start message for race time");
+                        possibleMessages.Add(new QueuedMessage("race_time", MessageContents(minutes, Battery.folderMinutes), 0, this));
+                    }
                 }
-                //dont play pre-start message for race time unless its more then 2 minuts
                 else
                 {
-                    Console.WriteLine("pre-start message for race time");
-                    possibleMessages.Add(new QueuedMessage("race_time", MessageContents(minutes), 0, this));
+                    // In rF2 there's a delay for timed session total running time to get updated (usually by the end of a gridwalk).
+                    Console.WriteLine("pre-start message for race time (delay evaluated)");
+
+                    DelayedMessageEvent delayedMessageEvent = new DelayedMessageEvent("getSessionTotalRunningTimeTimeMessages", new Object[] {
+                        currentGameState.SessionData.SessionTotalRunTime }, this);
+                    possibleMessages.Add(new QueuedMessage("race_time", delayedMessageEvent, 1 /*secondsDelay*/, null));
                 }
+
             }
             // now pick a random selection
             if (possibleMessages.Count > 0)
@@ -310,9 +335,33 @@ namespace CrewChiefV4.Events
             }
         }
 
+        public List<MessageFragment> getSessionTotalRunningTimeTimeMessages(float sessionTotalRunningTimeWnenQueued)
+        {
+            if (this.currentSessionTotalRunTime != sessionTotalRunningTimeWnenQueued)
+            {
+                Console.WriteLine("pre-start delay-evaluated session running time updated from: " + sessionTotalRunningTimeWnenQueued + " to: " + this.currentSessionTotalRunTime);
+            }
+
+            int minutes = (int)this.currentSessionTotalRunTime / 60;
+            if (this.currentPosition > 3 && minutes < 20 && minutes > 1)
+            {
+                Console.WriteLine("pre-start message for race time + get on with it");
+                return MessageContents(minutes, folderMinutesYouNeedToGetOnWithIt);
+            }
+            //dont play pre-start message for race time unless its more then 2 minuts
+            else
+            {
+                Console.WriteLine("pre-start message for race time");
+                return MessageContents(minutes, Battery.folderMinutes);
+            }
+        }
+
+
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
+            // Hack for delayed variables during rF2 session startup.
             this.currentPosition = currentGameState.SessionData.Position;
+            this.currentSessionTotalRunTime = currentGameState.SessionData.SessionTotalRunTime;
 
             if (GameStateData.useManualFormationLap)
             {
@@ -339,17 +388,19 @@ namespace CrewChiefV4.Events
                         playManualStartInitialMessage(currentGameState);
                     }
                     // don't bother with any other messages until things have had a few seconds to settle down:
-                    else if (currentGameState.SessionData.SessionRunningTime > 10)
+                    else if (currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.SessionRunningTime > 10
+                        && currentGameState.SessionData.SessionPhase == SessionPhase.Green)
                     {
                         checkForIllegalPassesOnFormationLap(currentGameState);
                         checkForManualFormationRaceStart(currentGameState, currentGameState.SessionData.Position == 1);
                         checkForManualDoubleFileReminder(previousGameState, currentGameState);
+                        checkForLeaderHasAccelerated(previousGameState, currentGameState);
                     }
                 }
                 // now check if we really are on a manual formation lap. We have to do this *after* checking for the race start (above) because
                 // this will switch manual formation lap stuff off as soon as we cross the line (so would suppress the 'green green green' message).
                 // We want to ensure it's switched off if we're not in a race session, for obvious reasons.
-                GameStateData.onManualFormationLap = currentGameState.SessionData.SessionType == SessionType.Race && !playedManualStartPlayedGoGoGo;
+                GameStateData.onManualFormationLap = currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.CompletedLaps < 1;
             }
             else
             {
@@ -528,11 +579,16 @@ namespace CrewChiefV4.Events
                 audioPlayer.playMessageImmediately(new QueuedMessage(folderGreenGreenGreen, 0, this));
             }
             GameStateData.onManualFormationLap = false;
-            // switch off the other updates
-            playedManualStartPlayedGoGoGo = true;
-            playedManualStartLeaderHasCrossedLine = true;
-            playedManualStartGetReady = true;
-            playedManualStartInitialMessage = true;
+            // reset
+            playedManualStartPlayedGoGoGo = false;
+            playedManualStartLeaderHasCrossedLine = false;
+            playedManualStartGetReady = false;
+            playedManualStartInitialMessage = false;
+            leaderSpeedAtAccelerationCheckStart = -1;
+            poleSitter = null;
+            leaderHasGone = false;
+            manualStartOpponentToFollow = null;
+            manualFormationStartingPosition = 0;
         }
 
         private void playManualStartGetReady()
@@ -602,6 +658,8 @@ namespace CrewChiefV4.Events
         private void playManualStartInitialMessage(GameStateData currentGameState)
         {
             setOpponentToFollowAndStartPosition(currentGameState, false, true);
+            poleSitter = currentGameState.getOpponentAtPosition(1, false);
+
             // use the driver name in front if we have it - if we're starting on pole the manualStartOpponentAhead var will be null,
             // which will force the audio player to use the secondary message
             List<MessageFragment> messageContentsWithName;
@@ -663,7 +721,15 @@ namespace CrewChiefV4.Events
 
         private void checkForIllegalPassesOnFormationLap(GameStateData currentGameState)
         {
+            if (this.manualStartOpponentToFollow == null || playedManualStartPlayedGoGoGo)
+            {
+                return;
+            }
             OpponentData opponentToFollow = getOpponent(currentGameState, this.manualStartOpponentToFollow);
+            if (opponentToFollow == null)
+            {
+                return;
+            }
             if (hasOpponentDroppedBack(currentGameState.SessionData.Position, opponentToFollow))
             {
                 setOpponentToFollowAndStartPosition(currentGameState, false, false);
@@ -725,6 +791,33 @@ namespace CrewChiefV4.Events
         private Boolean haveWeDroppedBack(GameStateData currentGameState)
         {
             return currentGameState.SessionData.Position > manualFormationStartingPosition + 3;
+        }
+
+        private void checkForLeaderHasAccelerated(GameStateData previousGameState, GameStateData currentGameState)
+        {
+            if (leaderHasGone || previousGameState == null || currentGameState.SessionData.TrackDefinition == null ||
+                currentGameState.PositionAndMotionData.DistanceRoundTrack == 0 || poleSitter == null || playedManualStartPlayedGoGoGo)
+            {
+                return;
+            }
+            float currentDistanceToStartLine = currentGameState.SessionData.TrackDefinition.trackLength - currentGameState.PositionAndMotionData.DistanceRoundTrack;
+            if (currentDistanceToStartLine < distanceBeforeLineToStartLeaderAccelerationCheck)
+            {
+                float previousDistanceToStartLine = currentGameState.SessionData.TrackDefinition.trackLength - previousGameState.PositionAndMotionData.DistanceRoundTrack;
+                if (previousDistanceToStartLine > distanceBeforeLineToStartLeaderAccelerationCheck)
+                {
+                    leaderSpeedAtAccelerationCheckStart = poleSitter.Speed;
+                }
+                else if (leaderSpeedAtAccelerationCheckStart > 0)
+                {
+                    if (poleSitter.Speed - leaderSpeedAtAccelerationCheckStart > 5)
+                    {
+                        Console.WriteLine("Looks like the leader has 'gone'");
+                        audioPlayer.playMessage(new QueuedMessage(folderManualStartLeaderHasGone, 0, this));
+                        leaderHasGone = true;
+                    }
+                }
+            }
         }
 
         private void checkForManualDoubleFileReminder(GameStateData previousGameState, GameStateData currentGameState)

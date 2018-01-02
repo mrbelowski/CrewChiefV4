@@ -165,38 +165,44 @@ namespace CrewChiefV4.iRacing
                 try
                 {
 
-                    if (forSpotter)
+                    if (sdk.IsConnected())
                     {
-                        var carLeftRight = (int)sdk.GetData("CarLeftRight");
-                        return carLeftRight;
+                        iRacingStructWrapper structWrapper = new iRacingStructWrapper();
+                        structWrapper.ticksWhenRead = DateTime.Now.Ticks;
+                        if (forSpotter)
+                        {
+                            var carLeftRight = (int)sdk.GetData("CarLeftRight");
+                            return carLeftRight;
+                        }
+
+                        _DriverId = (int)sdk.GetData("PlayerCarIdx");
+
+                        int newUpdate = sdk.Header.SessionInfoUpdate;
+                        bool hasNewSessionData = false;
+                        if (newUpdate != lastUpdate)
+                        {
+                            // Get the session info string
+                            SessionInfo sessionInfo = new SessionInfo(sdk.GetSessionInfoString());
+                            // Raise the SessionInfoUpdated event and pass along the session info and session time.
+                            sim.SdkOnSessionInfoUpdated(sessionInfo, (int)TryGetSessionNum(), DriverId);
+                            lastUpdate = newUpdate;
+                            hasNewSessionData = true;
+                        }
+                        iRacingData irData = new iRacingData(sdk, hasNewSessionData && dumpToFile);
+
+                        sim.SdkOnTelemetryUpdated(irData);
+                        structWrapper.data = sim;
+
+                        if (!forSpotter && dumpToFile && dataToDump != null)
+                        {
+                            dataToDump.Add(new iRacingStructDumpWrapper() { ticksWhenRead = structWrapper.ticksWhenRead, data = irData });
+                        }
+                        return structWrapper;
                     }
-                    iRacingStructWrapper structWrapper = new iRacingStructWrapper();
-                    structWrapper.ticksWhenRead = DateTime.Now.Ticks;
-
-
-                    _DriverId = (int)sdk.GetData("PlayerCarIdx");
-
-                    int newUpdate = sdk.Header.SessionInfoUpdate;
-                    bool hasNewSessionData = false;
-                    if (newUpdate != lastUpdate)
+                    else
                     {
-                        // Get the session info string
-                        SessionInfo sessionInfo = new SessionInfo(sdk.GetSessionInfoString());
-                        // Raise the SessionInfoUpdated event and pass along the session info and session time.
-                        sim.SdkOnSessionInfoUpdated(sessionInfo, (int)TryGetSessionNum(), DriverId);
-                        lastUpdate = newUpdate;
-                        hasNewSessionData = true;
-                    }
-                    iRacingData irData = new iRacingData(sdk, hasNewSessionData && dumpToFile);
-
-                    sim.SdkOnTelemetryUpdated(irData);
-                    structWrapper.data = sim;
-
-                    if (!forSpotter && dumpToFile && dataToDump != null )
-                    {
-                        dataToDump.Add(new iRacingStructDumpWrapper() { ticksWhenRead = structWrapper.ticksWhenRead, data = irData });
-                    }
-                    return structWrapper;
+                        return null;
+                    }                    
                 }
                 catch (Exception ex)
                 {

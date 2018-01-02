@@ -156,6 +156,8 @@ namespace CrewChiefV4
 
         private NumberReader numberReader = NumberReaderFactory.GetNumberReader();
 
+        public Boolean isRant = false;
+
         // used for creating a pearl of wisdom message where we need to copy the dueTime from the original
         public QueuedMessage(AbstractEvent abstractEvent)
         {

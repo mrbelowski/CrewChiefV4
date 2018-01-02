@@ -9,7 +9,8 @@ namespace CrewChiefV4
     {
         public static String folderPoint = "numbers/point";
         public static String folderMinutes = "numbers/minutes";
-        public static String folderMinute = "numbers/minute"; 
+        public static String folderMinute = "numbers/minute";
+        public static String folderOh = "numbers/oh";
 
         /**
          * Language specific implementation to speak an integer, using whatever rules and words this language requires.

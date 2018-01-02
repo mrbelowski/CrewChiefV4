@@ -702,8 +702,6 @@ namespace CrewChiefV4.RaceRoom
             public Int32 sector3Yellow;
             public Single closestYellowLapDistance;
 
-            // TODO: 
-            // planned next R3E release:
             public FlagsExtended2 FlagsExtended2;
 
             //

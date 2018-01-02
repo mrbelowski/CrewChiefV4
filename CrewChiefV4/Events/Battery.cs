@@ -46,8 +46,8 @@ namespace CrewChiefV4.Events
         private const string folderWontMakeEndWoPit = "battery/wont_make_end_without_pitstop";
         private const string folderWontMakeHalfDistanceWoPit = "battery/wont_make_half_distance_without_pitstop";
         private const string folderWeWillGetAnother = "battery/we_will_get_another";
-        private const string folderLaps = "battery/laps";
-        private const string folderMinutes = "battery/minutes";
+        public static readonly string folderLaps = "battery/laps";
+        public static readonly string folderMinutes = "battery/minutes";
 
         class BatteryStatsEntry
         {
@@ -418,6 +418,8 @@ namespace CrewChiefV4.Events
                             this.averageUsagePerLap.ToString("0.000"));
 
                         var estBattLapsLeft = (int)Math.Floor(this.windowedAverageChargeLeft / this.averageUsagePerLap);
+                        int raceLapsRemaining = currentGameState.SessionData.SessionNumberOfLaps - currentGameState.SessionData.CompletedLaps;
+
                         if (this.halfDistance != -1
                             && !this.playedHalfDistanceBatteryEstimate
                             && currentGameState.SessionData.SessionType == SessionType.Race
@@ -441,32 +443,32 @@ namespace CrewChiefV4.Events
                             else
                                 this.audioPlayer.playMessage(new QueuedMessage(Battery.folderHalfDistanceGoodBattery, 0, this));
                         }
-                        else if (estBattLapsLeft == 4 && !this.playedFourLapsRemaining)
+                        else if (raceLapsRemaining > 3 && estBattLapsLeft == 4 && !this.playedFourLapsRemaining)
                         {
                             this.playedFourLapsRemaining = true;
                             Console.WriteLine("4 laps of battery charge left, " + battStatusMsg);
                             this.audioPlayer.playMessage(new QueuedMessage(Battery.folderFourLapsEstimate, 0, this));
                         }
-                        else if (estBattLapsLeft == 3 && !this.playedThreeLapsRemaining)
+                        else if (raceLapsRemaining > 2 && estBattLapsLeft == 3 && !this.playedThreeLapsRemaining)
                         {
                             this.playedThreeLapsRemaining = true;
                             Console.WriteLine("3 laps of battery charge left, " + battStatusMsg);
                             this.audioPlayer.playMessage(new QueuedMessage(Battery.folderThreeLapsEstimate, 0, this));
                         }
-                        else if (estBattLapsLeft == 2 && !this.playedTwoLapsRemaining)
+                        else if (raceLapsRemaining > 1 && estBattLapsLeft == 2 && !this.playedTwoLapsRemaining)
                         {
                             this.playedTwoLapsRemaining = true;
                             Console.WriteLine("2 laps of battery charge left, " + battStatusMsg);
                             this.audioPlayer.playMessage(new QueuedMessage(Battery.folderTwoLapsEstimate, 0, this));
                         }
-                        else if (estBattLapsLeft == 1)
+                        else if (raceLapsRemaining > 0 && estBattLapsLeft == 1)
                         {
                             Console.WriteLine("1 lap of battery charge left, " + battStatusMsg);
                             this.audioPlayer.playMessage(new QueuedMessage(Battery.folderOneLapEstimate, 0, this));
 
                             // If we've not played the pit-now message, play it with a bit of a delay - should probably wait for sector3 here
                             // but i'd have to move some stuff around and I'm an idle fucker
-                            if (!this.playedPitForBatteryNow)
+                            if (!this.playedPitForBatteryNow && raceLapsRemaining > 1)
                             {
                                 this.playedPitForBatteryNow = true;
                                 this.audioPlayer.playMessage(new QueuedMessage(PitStops.folderMandatoryPitStopsPitThisLap, 10, this));
@@ -525,8 +527,21 @@ namespace CrewChiefV4.Events
                             this.playedTwoMinutesRemaining = true;
                             this.playedFiveMinutesRemaining = true;
                             this.playedTenMinutesRemaining = true;
-                            this.audioPlayer.playMessage(new QueuedMessage("pit_for_vehicle_swap_now",
-                                MessageContents(Battery.folderAboutToRunOut, PitStops.folderMandatoryPitStopsPitThisLap), 0, this));
+                            float cutoffForVehicleSwapCall = currentGameState.SessionData.PlayerLapTimeSessionBest * 2;
+                            if (cutoffForVehicleSwapCall == 0)
+                            {
+                                // shouldn't need this, but just in case...
+                                cutoffForVehicleSwapCall = 120;
+                            }
+                            if (currentGameState.SessionData.SessionTimeRemaining > cutoffForVehicleSwapCall)
+                            {
+                                this.audioPlayer.playMessage(new QueuedMessage("pit_for_vehicle_swap_now",
+                                    MessageContents(Battery.folderAboutToRunOut, PitStops.folderMandatoryPitStopsPitThisLap), 0, this));
+                            }
+                            else
+                            {
+                                this.audioPlayer.playMessage(new QueuedMessage("about_to_run_out_of_battery", MessageContents(Battery.folderAboutToRunOut), 0, this));
+                            }
                         }
                         if (estBattMinsLeft <= 2.0f && estBattMinsLeft > 1.8f && !this.playedTwoMinutesRemaining)
                         {

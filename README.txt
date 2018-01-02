@@ -1,6 +1,6 @@
-CrewChief version 4.8
+CrewChief version 4.9
 
-Written by Jim Britton (main app, voice acting, Raceroom and PCars implementations), Morten Roslev (Assetto Corsa and iRacing implementation), Vytautas Leonavičius (rFactor2 implementation) and Dan Allongo (Automobilista and rFactor1 implementation). The application is the result of lots of lots of hard work and input from the guys above as well as some great advice and support from the community and the guys at Sector3 and SMS.
+Written by Jim Britton (main app, voice acting, Raceroom and PCars implementations), Morten Roslev (Assetto Corsa and iRacing implementation), Vytautas Leonavičius (rFactor2 implementation), Dan Allongo (Automobilista and rFactor1 implementation), Daniel Nowak (nAudio speech recognition port) and Mike Schreiner (technical input on stock car rules). The application is the result of lots of lots of hard work and input from the guys above as well as some great advice and support from the community and the guys at Sector3 and SMS.
 
 Additional material from Scoops (fantastic track layout mapping work). Fantastic alternate spotter sounds by Geoffrey Lessel, Matt Orr (aka EmptyBox), Clare Britton, Mike Schreiner, Phil Linden and Micha (last name?). Also a thank you to Nick Thissen for his work on iRacingSdkWrapper.
 
@@ -70,6 +70,11 @@ I've not finished implementing this but currently the app understands and respon
 "Where should I attack / where am I faster / where can I attack": If the app has enough data, will report the corner name where you're gaining the most time on the guy in front
 "Where should I defend / where am I slower / where is he faster / where will he attack": If the app has enough data, will report the corner name where you're losing the most time to the guy behind
 "Read corner names / corner names / tell me the corner names": read out each corner name when you hit the mid-point of the corner, for this lap only (useful to test corner name mappings)
+"Damage report" / "How's my car" / "Is my car ok?": report any damage the car has sustained
+"Car status": report any damage the car has sustained, tyre and brake temperature status and fuel / battery status
+"Session status" / "Race status": report race position, gaps, time / laps left in session
+"Full update" / "Full status" / "Update me": combines all of the above three status reports (will produce a very verbose response)
+
 "pitstop add [X liters]" (adds X amount of fuel next pitstop, this option is iRacing only)
 "pitstop tearoff / pitstop windscreen" (enable next pitstop, this option is iRacing only)
 "pitstop fast repair / pitstop repair" (enable fast repair next pitstop, this option is iRacing only)
@@ -117,6 +122,27 @@ Program start arguments
 -----------------------
 If you want to have the game pre-selected, start the app like this for PCars: [full path]\CrewChiefV4.exe PCARS_64BIT. Or use R3E or PCARS_32BIT.
 This can be used in conjunction with the launch_pcars / launch_raceroom / [game]_launch_exe / [game]_launch_params and run_immediately options to set crew chief up to start the game selected in the app launch argument, and start its own process. I'll provide examples of this approach soon. 
+
+
+rFactor2 Stock Car Rules (SCR) plugin
+-------------------------------------
+rFactor 2 Stock Car Rules (SCR) are implemented as a plugin. The Shared Memory plugin which Crew Chief uses does not see the output of the SCR plugin, because rF2 (partially) isolates plugins from each other. In order to work around this issue the Shared Memory plugin has to load the SCR plugin and forward all rF2 calls to it.
+
+Steps to enable Stock Car Rules in the Crew Chief:
+
+ - Let Crew Chief update the rF2 Shared Memory plugin to the latest version by starting rF2 and CC once, then exit the game.
+ - Make sure StockCarRules.dll "Enabled" is set to 0 (yes, disabled) in UserData\player\CustomPluginVariables.json. Do NOT Delete the plugin.
+ - In UserData\player\CustomPluginVariables.json make sure SM plugin configuration looks like this:
+
+ "rFactor2SharedMemoryMapPlugin64.dll":{
+    "Enabled":1,
+    "DebugISIInternals":0,
+    "DebugOutputLevel":0,
+    "EnableStockCarRulesPlugin":1
+}
+
+The SCR plugin and the messages associated with stock car rules will be enabled automatically for vehicle classes which have useAmericanTerms = true in their definition (some built in classes will have this). You can also force it to be enabled for all classes by selecting the "Use American terms" option in the Preferences screen.
+
 
 
 Known Issues Which Aren't Fixable
@@ -173,6 +199,18 @@ One final point. If the app says "Jim is faster than you", let him through :)
 
 Changelog
 ---------
+Version 4.9.0.0: Added support for rF2 StockCarRules plugin, CC will now announce Lucky Dog, Wave Around, EOLL messages. To enable make sure you enable the "Use American terms" option, disable StockCarRules plugin in rF2, and set "EnableStockCarRulesPlugin":1 for "rFactor2SharedMemoryMapPlugin64.dll" - see the "rFactor2 Stock Car Rules (SCR) plugin" section above or  http://thecrewchief.org/showthread.php?407-How-to-enable-rF2-Stock-Car-Rules-in-Crew-Chief&p=2931&viewfull=1#post2931 for more details; Add option to disable pit state announcement during FCY in rF2 and rF1/AMS; Disable brake temp messages on ovals; fixed pit macros not working for some R3E players; prevent some messages playing when they're no longer relevant; some internal fixes
+
+Version 4.8.3.2: Fixed AC plugin after game update - the app should ask if you want to update the plugin when you first launch it in AC mode; More fixes to the manual rolling start logic; iRacing session transition crash fix; some car class tweaks; added nAudio speech recognition code to allow voice recognition input device selection (enable with property "Use nAudio for speech recognition" - thanks to Daniel Nowak for this one); disable sector delta messages on ovals and use more generous spotter parameters
+
+Version 4.8.3.1: Corrected some pCARS 2 track names that got changed in the last pCARS 2 patch; disable some irrelvant sounds when racing on ovals; work around for some missing spotter sounds; a few internal fixes
+
+Version 4.8.3.0: Changed personalisations download process to reduce bandwidth use
+
+Version 4.8.2.9: Fixed a serious regression in multi-class race position tracking
+
+Version 4.8.2.8: Added more variety to race finish messages; make default R3E pit macro pause a while before closing menu; warn when an opponent car is exiting the pits; a few other minor bits and bobs
+
 Version 4.8.2.7: Experimental support for double-file manual rolling starts (R3E, pCARS2 & AC only - enable with "Manual formation lap double-file start" property); fixed arrow keys and some other keys not being released when used in command macros; iRacing rally cross fixes; more Formula E battery tracking logic and messages; split some longer voice command responses so if you want to hear more, you have to ask ("more information" / "more info" / "clarify") - currently only implemented for Formula E battery messages, but will be extended. If you want all the information in a single long response without having to ask for clarification, enable "Verbose messages" property; added missing RF1 / AMS blue flag override ("Enable AMS / rF1 blue on slower" property); some internal fixes
 
 Version 4.8.2.6: Fixed some nAudio bugs that meant the radio beeps were being sent to the wrong audio device; added Hong Kong track mappings (RF2 Formula E pack); fixed tyre temperature thresholds on some R3E car classes; added voice command to get player incident count ("how many incidents do I have" / "what's my incident count") and session incident limit ("what's the incident limit") - iRacing only; added voice command to get player licence ("what's my licence class") and iRating ("whats my iRating") - iRacing only; added voice command to get opponent licence ("what's [the guy in front's / the leader's / p10's / Bob's] licence class") and iRating ("what's [the guy in front's / the leader's / p10's / Bob's] iRating") - iRacing only; battery monitoring bug fixes

@@ -869,7 +869,7 @@ namespace CrewChiefV4.Audio
             {
                 initialise();
             }
-            if (preferPersonalised && singleSoundsWithPrefixOrSuffix.Count > 0)
+            if (!AudioPlayer.rantWaitingToPlay && preferPersonalised && singleSoundsWithPrefixOrSuffix.Count > 0)
             {
                 if (prefixOrSuffixIndexes == null || prefixOrSuffixIndexesPosition == prefixOrSuffixIndexes.Count)
                 {

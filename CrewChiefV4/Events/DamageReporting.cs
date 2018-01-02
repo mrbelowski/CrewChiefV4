@@ -23,7 +23,11 @@ namespace CrewChiefV4.Events
         private String folderMinorTransmissionDamage = "damage_reporting/minor_transmission_damage";
         private String folderMinorEngineDamage = "damage_reporting/minor_engine_damage";
         private String folderMinorAeroDamage = "damage_reporting/minor_aero_damage";
+        // same as above but filtered to remove sounds that only work when used in a voice command response
+        private String folderMinorAeroDamageGeneral = "damage_reporting/minor_aero_damage_general";
         private String folderMinorSuspensionDamage = "damage_reporting/minor_suspension_damage";
+        // same as above but filtered to remove sounds that only work when used in a voice command response
+        private String folderMinorSuspensionDamageGeneral = "damage_reporting/minor_suspension_damage_general";
         private String folderMinorBrakeDamage = "damage_reporting/minor_brake_damage";
 
         private String folderSevereTransmissionDamage = "damage_reporting/severe_transmission_damage";
@@ -43,6 +47,8 @@ namespace CrewChiefV4.Events
         private String folderNoSuspensionDamage = "damage_reporting/no_suspension_damage"; 
         private String folderNoBrakeDamage = "damage_reporting/no_brake_damage";
         private String folderJustAScratch = "damage_reporting/trivial_aero_damage";
+        // same as above but filtered to remove sounds that only work when used in a voice command response
+        private String folderJustAScratchGeneral = "damage_reporting/trivial_aero_damage_general";
 
         private String folderMissingWheel = "damage_reporting/missing_wheel";
 
@@ -297,7 +303,7 @@ namespace CrewChiefV4.Events
                         }
                         if (enableDamageMessages)
                         {
-                            playDamageToReport();
+                            playDamageToReport(currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.NumCars > 2);
                         }
                     }
                 }
@@ -335,11 +341,11 @@ namespace CrewChiefV4.Events
                     }
                     else if (aeroDamage == DamageLevel.MINOR)
                     {
-                        damageMessage = new QueuedMessage(folderMinorAeroDamage, 0, null);
+                        damageMessage = new QueuedMessage(includeNoDamage ? folderMinorAeroDamage : folderMinorAeroDamageGeneral, 0, null);
                     }
                     else if (aeroDamage == DamageLevel.TRIVIAL)
                     {
-                        damageMessage = new QueuedMessage(folderJustAScratch, 0, null);
+                        damageMessage = new QueuedMessage(includeNoDamage ? folderJustAScratch : folderJustAScratchGeneral, 0, null);
                     }
                     break;
                 case Component.BRAKES:
@@ -406,7 +412,7 @@ namespace CrewChiefV4.Events
                     }
                     else if (maxSuspensionDamage == DamageLevel.MINOR && !isMissingWheel)
                     {
-                        damageMessage = new QueuedMessage(folderMinorSuspensionDamage, 0, null);                        
+                        damageMessage = new QueuedMessage(includeNoDamage ? folderMinorSuspensionDamage : folderMinorSuspensionDamageGeneral, 0, null);                        
                     }
                     break;
                 case Component.TRANNY:
@@ -590,7 +596,7 @@ namespace CrewChiefV4.Events
             }
         }
 
-        private void playDamageToReport()
+        private void playDamageToReport(Boolean allowRants)
         {
             if (isMissingWheel || damageToReportNext.Item2 > DamageLevel.MINOR)
             {
@@ -615,6 +621,10 @@ namespace CrewChiefV4.Events
                 if (damageToReportNext.Item2 == DamageLevel.DESTROYED)
                 {
                     audioPlayer.playMessage(new QueuedMessage(folderBustedEngine, 0, this));
+                    if (allowRants)
+                    {
+                        audioPlayer.playRant("damage_rant", null);
+                    }
                 }
                 else if (damageToReportNext.Item2 == DamageLevel.MAJOR)
                 {
@@ -630,6 +640,10 @@ namespace CrewChiefV4.Events
                 if (damageToReportNext.Item2 == DamageLevel.DESTROYED)
                 {
                     audioPlayer.playMessage(new QueuedMessage(folderBustedTransmission, 0, this));
+                    if (allowRants)
+                    {
+                        audioPlayer.playRant("damage_rant", null);
+                    }
                 }
                 else if (damageToReportNext.Item2 == DamageLevel.MAJOR)
                 {
@@ -645,6 +659,10 @@ namespace CrewChiefV4.Events
                 if (damageToReportNext.Item2 == DamageLevel.DESTROYED)
                 {
                     audioPlayer.playMessage(new QueuedMessage(folderBustedSuspension, 0, this));
+                    if (allowRants)
+                    {
+                        audioPlayer.playRant("damage_rant", null);
+                    }
                 }
                 else if (damageToReportNext.Item2 == DamageLevel.MAJOR || isMissingWheel)
                 {

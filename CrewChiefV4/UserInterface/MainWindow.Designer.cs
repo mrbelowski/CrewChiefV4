@@ -62,6 +62,7 @@ namespace CrewChiefV4
             this.button2 = new System.Windows.Forms.Button();
             this.messagesVolumeSlider = new System.Windows.Forms.TrackBar();
             this.messagesAudioDeviceBox = new System.Windows.Forms.ComboBox();
+            this.speechRecognitionDeviceBox = new System.Windows.Forms.ComboBox();
             this.backgroundAudioDeviceBox = new System.Windows.Forms.ComboBox();
             this.label3 = new System.Windows.Forms.Label();
             this.backgroundVolumeSlider = new System.Windows.Forms.TrackBar();
@@ -83,6 +84,7 @@ namespace CrewChiefV4
             this.personalisationBox = new System.Windows.Forms.ComboBox();
             this.spotterNameLabel = new System.Windows.Forms.Label();
             this.messagesAudioDeviceLabel = new System.Windows.Forms.Label();
+            this.speechRecognitionDeviceLabel = new System.Windows.Forms.Label();
             this.backgroundAudioDeviceLabel = new System.Windows.Forms.Label();
             this.spotterNameBox = new System.Windows.Forms.ComboBox();
             this.donateLink = new System.Windows.Forms.LinkLabel();
@@ -106,7 +108,7 @@ namespace CrewChiefV4
             // 
             this.startApplicationButton.Location = new System.Drawing.Point(41, 28);
             this.startApplicationButton.Name = "startApplicationButton";
-            this.startApplicationButton.Size = new System.Drawing.Size(137, 41);
+            this.startApplicationButton.Size = new System.Drawing.Size(137, 38);
             this.startApplicationButton.TabIndex = 5;
             this.startApplicationButton.Text = Configuration.getUIString("start_application");
             this.startApplicationButton.UseVisualStyleBackColor = true;
@@ -115,9 +117,9 @@ namespace CrewChiefV4
             // buttonActionSelect
             // 
             this.buttonActionSelect.FormattingEnabled = true;
-            this.buttonActionSelect.Location = new System.Drawing.Point(323, 520);
+            this.buttonActionSelect.Location = new System.Drawing.Point(295, 520);
             this.buttonActionSelect.Name = "buttonActionSelect";
-            this.buttonActionSelect.Size = new System.Drawing.Size(468, 115);
+            this.buttonActionSelect.Size = new System.Drawing.Size(528, 115);
             this.buttonActionSelect.TabIndex = 7;
             this.buttonActionSelect.SelectedIndexChanged += new System.EventHandler(this.buttonActionSelect_SelectedIndexChanged);
             // 
@@ -132,9 +134,9 @@ namespace CrewChiefV4
             // 
             // assignButtonToAction
             // 
-            this.assignButtonToAction.Location = new System.Drawing.Point(797, 520);
+            this.assignButtonToAction.Location = new System.Drawing.Point(830, 520);
             this.assignButtonToAction.Name = "assignButtonToAction";
-            this.assignButtonToAction.Size = new System.Drawing.Size(167, 39);
+            this.assignButtonToAction.Size = new System.Drawing.Size(130, 39);
             this.assignButtonToAction.TabIndex = 9;
             this.assignButtonToAction.Text = Configuration.getUIString("assign_control");
             this.assignButtonToAction.UseVisualStyleBackColor = true;
@@ -142,9 +144,9 @@ namespace CrewChiefV4
             // 
             // deleteAssigmentButton
             // 
-            this.deleteAssigmentButton.Location = new System.Drawing.Point(797, 564);
+            this.deleteAssigmentButton.Location = new System.Drawing.Point(830, 564);
             this.deleteAssigmentButton.Name = "deleteAssigmentButton";
-            this.deleteAssigmentButton.Size = new System.Drawing.Size(167, 40);
+            this.deleteAssigmentButton.Size = new System.Drawing.Size(130, 40);
             this.deleteAssigmentButton.TabIndex = 10;
             this.deleteAssigmentButton.Text = Configuration.getUIString("delete_assignment");
             this.deleteAssigmentButton.UseVisualStyleBackColor = true;
@@ -276,7 +278,7 @@ namespace CrewChiefV4
             // 
             this.button2.Location = new System.Drawing.Point(184, 28);
             this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(137, 41);
+            this.button2.Size = new System.Drawing.Size(137, 38);
             this.button2.TabIndex = 16;
             this.button2.Text = Configuration.getUIString("clear_console");
             this.button2.UseVisualStyleBackColor = true;
@@ -488,6 +490,34 @@ namespace CrewChiefV4
             // SelectedIndexChanged event.
             this.personalisationBox.SelectedIndexChanged += new System.EventHandler(this.personalisationBox_SelectedIndexChanged);
 
+            this.speechRecognitionDeviceLabel.AutoSize = true;
+            this.speechRecognitionDeviceLabel.Location = new System.Drawing.Point(115, 70);
+            this.speechRecognitionDeviceLabel.Name = "speechRecognitionDeviceLabel";
+            this.speechRecognitionDeviceLabel.Size = new System.Drawing.Size(100, 13);
+            this.speechRecognitionDeviceLabel.TabIndex = 22;
+            this.speechRecognitionDeviceLabel.Text = Configuration.getUIString("speech_recognition_device_label");
+            this.speechRecognitionDeviceLabel.Visible = false;
+
+            this.speechRecognitionDeviceBox.Location = new System.Drawing.Point(115, 90);
+            this.speechRecognitionDeviceBox.IntegralHeight = false;
+            this.speechRecognitionDeviceBox.MaxDropDownItems = 5;
+            this.speechRecognitionDeviceBox.DropDownStyle = ComboBoxStyle.DropDownList;
+            this.speechRecognitionDeviceBox.Name = "speechRecognitionDeviceBox";
+            this.speechRecognitionDeviceBox.Size = new System.Drawing.Size(190, 400);
+            this.speechRecognitionDeviceBox.TabIndex = 94;
+            this.speechRecognitionDeviceBox.Visible = false;
+            this.speechRecognitionDeviceBox.Enabled = false;
+
+            this.messagesAudioDeviceBox.Location = new System.Drawing.Point(330, 90);
+            this.messagesAudioDeviceBox.IntegralHeight = false;
+            this.messagesAudioDeviceBox.MaxDropDownItems = 5;
+            this.messagesAudioDeviceBox.DropDownStyle = ComboBoxStyle.DropDownList;
+            this.messagesAudioDeviceBox.Name = "messagesAudioDeviceBox";
+            this.messagesAudioDeviceBox.Size = new System.Drawing.Size(190, 400);
+            this.messagesAudioDeviceBox.TabIndex = 94;
+            this.messagesAudioDeviceBox.Visible = false;
+            this.messagesAudioDeviceBox.Enabled = false;
+
             this.messagesAudioDeviceLabel.AutoSize = true;
             this.messagesAudioDeviceLabel.Location = new System.Drawing.Point(330, 70);
             this.messagesAudioDeviceLabel.Name = "messagesAudioDeviceLabel";
@@ -550,6 +580,7 @@ namespace CrewChiefV4
             this.Controls.Add(this.label3);
             this.Controls.Add(this.messagesVolumeSlider);
             this.Controls.Add(this.messagesAudioDeviceBox);
+            this.Controls.Add(this.speechRecognitionDeviceBox);
             this.Controls.Add(this.backgroundAudioDeviceBox);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.groupBox1);
@@ -571,6 +602,7 @@ namespace CrewChiefV4
             this.Controls.Add(this.personalisationLabel);
             this.Controls.Add(this.spotterNameLabel);
             this.Controls.Add(this.messagesAudioDeviceLabel);
+            this.Controls.Add(this.speechRecognitionDeviceLabel);
             this.Controls.Add(this.backgroundAudioDeviceLabel);
             this.Controls.Add(this.donateLink);
             this.Name = "MainWindow";
@@ -609,6 +641,7 @@ namespace CrewChiefV4
         private System.Windows.Forms.RadioButton voiceDisableButton;
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.TrackBar messagesVolumeSlider;
+        private System.Windows.Forms.ComboBox speechRecognitionDeviceBox;
         private System.Windows.Forms.ComboBox messagesAudioDeviceBox;
         private System.Windows.Forms.ComboBox backgroundAudioDeviceBox;
         private System.Windows.Forms.Label label3;
@@ -631,6 +664,7 @@ namespace CrewChiefV4
         private System.Windows.Forms.ComboBox personalisationBox;
         private System.Windows.Forms.Label spotterNameLabel;
         private System.Windows.Forms.Label messagesAudioDeviceLabel;
+        private System.Windows.Forms.Label speechRecognitionDeviceLabel;
         private System.Windows.Forms.Label backgroundAudioDeviceLabel;
         private System.Windows.Forms.ComboBox spotterNameBox;
         private System.Windows.Forms.LinkLabel donateLink;
