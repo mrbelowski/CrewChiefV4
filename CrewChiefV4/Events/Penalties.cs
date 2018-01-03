@@ -36,6 +36,8 @@ namespace CrewChiefV4.Events
 
         public static String folderCutTrackInRace = "penalties/cut_track_in_race";
 
+        private String folderPossibleTrackLimitsViolation = "penalties/possible_track_limits_warning";
+
         public static String folderLapDeleted = "penalties/lap_deleted";
 
         public static String folderCutTrackPracticeOrQual = "penalties/cut_track_in_prac_or_qual";
@@ -74,6 +76,8 @@ namespace CrewChiefV4.Events
 
         private Boolean playedNotServedPenalty;
 
+        private Boolean warnedOfPossibleTrackLimitsViolationOnThisLap = false;
+
         public Penalties(AudioPlayer audioPlayer)
         {
             this.audioPlayer = audioPlayer;
@@ -85,6 +89,7 @@ namespace CrewChiefV4.Events
             lastCutTrackWarningTime = DateTime.MinValue;
             cutTrackWarningsCount = 0;
             hasHadAPenalty = false;
+            warnedOfPossibleTrackLimitsViolationOnThisLap = false;
         }
 
         private void clearPenaltyState()
@@ -106,6 +111,10 @@ namespace CrewChiefV4.Events
         {
             if (base.isMessageStillValid(eventSubType, currentGameState, validationData))
             {
+                if (eventSubType == folderPossibleTrackLimitsViolation)
+                {
+                    return true;
+                }
                 // When a new penalty is given we queue a 'three laps left to serve' delayed message.
                 // If, the moment message is about to play, the player has started a new lap, this message is no longer valid so shouldn't be played
                 if (eventSubType == folderThreeLapsToServe)
@@ -134,6 +143,10 @@ namespace CrewChiefV4.Events
 
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
+            if (currentGameState.SessionData.IsNewLap)
+            {
+                warnedOfPossibleTrackLimitsViolationOnThisLap = false;
+            }
             if (currentGameState.SessionData.SessionType == SessionType.Race && previousGameState != null && 
                 (currentGameState.PenaltiesData.HasDriveThrough || currentGameState.PenaltiesData.HasStopAndGo || currentGameState.PenaltiesData.HasTimeDeduction))
             {
@@ -305,6 +318,12 @@ namespace CrewChiefV4.Events
                         audioPlayer.playMessage(new QueuedMessage(folderTwoLapsToServe, pitstopDelay, this));
                     }
                 }
+            }
+            else if (currentGameState.PenaltiesData.PossibleTrackLimitsViolation && playCutTrackWarnings && !warnedOfPossibleTrackLimitsViolationOnThisLap)
+            {
+                warnedOfPossibleTrackLimitsViolationOnThisLap = true;
+                audioPlayer.playMessage(new QueuedMessage(folderPossibleTrackLimitsViolation, 0, this));
+                Console.WriteLine("Possible track limit violation at lap distance " + currentGameState.PositionAndMotionData.DistanceRoundTrack);
             }
             else
             {
