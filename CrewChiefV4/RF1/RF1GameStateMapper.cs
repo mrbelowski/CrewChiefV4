@@ -239,6 +239,12 @@ namespace CrewChiefV4.rFactor1
                 currentGameState.readLandmarksForThisLap = previousGameState.readLandmarksForThisLap;
                 currentGameState.retriedDriverNames = previousGameState.retriedDriverNames;
                 currentGameState.disqualifiedDriverNames = previousGameState.disqualifiedDriverNames;
+                currentGameState.FlagData.currentLapIsFCY = previousGameState.FlagData.currentLapIsFCY;
+                currentGameState.FlagData.previousLapWasFCY = previousGameState.FlagData.previousLapWasFCY;
+            }
+            if (currentGameState.FlagData.isFullCourseYellow)
+            {
+                currentGameState.FlagData.currentLapIsFCY = true;
             }
 
             currentGameState.SessionData.TrackDefinition.setGapPoints();
@@ -313,6 +319,8 @@ namespace CrewChiefV4.rFactor1
             if (currentGameState.SessionData.IsNewLap)
             {
                 currentGameState.readLandmarksForThisLap = false;
+                currentGameState.FlagData.previousLapWasFCY = previousGameState != null && previousGameState.FlagData.currentLapIsFCY;
+                currentGameState.FlagData.currentLapIsFCY = currentGameState.FlagData.isFullCourseYellow;
             }
             currentGameState.SessionData.PositionAtStartOfCurrentLap = currentGameState.SessionData.IsNewLap ? currentGameState.SessionData.Position : previousGameState.SessionData.PositionAtStartOfCurrentLap;
             currentGameState.SessionData.IsDisqualified = (rFactor1Constant.rfFinishStatus)player.finishStatus == rFactor1Constant.rfFinishStatus.dq;

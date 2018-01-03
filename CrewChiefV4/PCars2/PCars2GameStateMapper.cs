@@ -8,11 +8,6 @@ using System.Diagnostics;
 
 /**
  * Maps memory mapped file to a local game-agnostic representation.
- * 
- * 
- * Weather...
- * 
- * cloud brightness varies a *lot*. Perhaps it's for that section of track?
  */
 namespace CrewChiefV4.PCars2
 {
@@ -36,6 +31,11 @@ namespace CrewChiefV4.PCars2
             (uint)eTerrainMaterials.TERRAIN_COBBLES, (uint)eTerrainMaterials.TERRAIN_DRAINS, (uint)eTerrainMaterials.TERRAIN_EXIT_RUMBLE_STRIPS,
             (uint)eTerrainMaterials.TERRAIN_LOW_GRIP_ROAD, (uint)eTerrainMaterials.TERRAIN_MARBLES,(uint)eTerrainMaterials.TERRAIN_PAVEMENT,
             (uint)eTerrainMaterials.TERRAIN_ROAD, (uint)eTerrainMaterials.TERRAIN_RUMBLE_STRIPS, (uint)eTerrainMaterials.TERRAIN_SAND_ROAD};
+
+        // 3 or 4 wheels on any of these terrains triggers a possible cut warning
+        private HashSet<eTerrainMaterials> illegalSurfaces = new HashSet<eTerrainMaterials>(
+            new eTerrainMaterials[]{ eTerrainMaterials.TERRAIN_GRASSY_BERMS, eTerrainMaterials.TERRAIN_GRASS, eTerrainMaterials.TERRAIN_LONG_GRASS,
+                                     eTerrainMaterials.TERRAIN_SLOPE_GRASS, eTerrainMaterials.TERRAIN_RUNOFF_ROAD, eTerrainMaterials.TERRAIN_ILLEGAL_STRIP });
 
         private float trivialEngineDamageThreshold = 0.05f;
         private float minorEngineDamageThreshold = 0.20f;
@@ -78,7 +78,7 @@ namespace CrewChiefV4.PCars2
         TimeSpan opponentCleanupInterval = TimeSpan.FromSeconds(4);
         HashSet<uint> positionsFilledForThisTick = new HashSet<uint>();
         List<String> opponentDriverNamesProcessedForThisTick = new List<String>();
-
+        
         public PCars2GameStateMapper()
         {
             CornerData.EnumWithThresholds suspensionDamageNone = new CornerData.EnumWithThresholds(DamageLevel.NONE, -10000, trivialSuspensionDamageThreshold);
@@ -188,6 +188,7 @@ namespace CrewChiefV4.PCars2
                 }
                 return previousGameState;
             }
+
             int playerIndex = getPlayerIndex(shared);
             pCars2APIParticipantStruct playerData = shared.mParticipantData[playerIndex];
 
@@ -1163,6 +1164,27 @@ namespace CrewChiefV4.PCars2
             }
             CrewChief.distanceRoundTrack = currentGameState.PositionAndMotionData.DistanceRoundTrack;
             CrewChief.viewingReplay = false;
+
+            if (currentGameState.PositionAndMotionData.DistanceRoundTrack > 0 && currentGameState.PositionAndMotionData.CarSpeed > 0 
+                && !currentGameState.PitData.InPitlane && currentGameState.SessionData.CurrentLapIsValid)
+            {
+                eTerrainMaterials[] terrainMaterials = new eTerrainMaterials[] {(eTerrainMaterials)shared.mTerrain[0], 
+                    (eTerrainMaterials)shared.mTerrain[1], (eTerrainMaterials)shared.mTerrain[2], (eTerrainMaterials)shared.mTerrain[3] };
+
+                int illegalSurfacesCount = 0;
+                foreach (eTerrainMaterials material in terrainMaterials)
+                {
+                    if (illegalSurfaces.Contains(material))
+                    {
+                        illegalSurfacesCount++;
+                        if (illegalSurfacesCount > 2)
+                        {
+                            currentGameState.PenaltiesData.PossibleTrackLimitsViolation = true;
+                            break;
+                        }
+                    }
+                }
+            }
 
             return currentGameState;
         }
