@@ -135,7 +135,7 @@ Steps to enable Stock Car Rules in the Crew Chief:
  - In UserData\player\CustomPluginVariables.json make sure SM plugin configuration looks like this:
 
  "rFactor2SharedMemoryMapPlugin64.dll":{
-    "Enabled":1,
+    " Enabled":1,
     "DebugISIInternals":0,
     "DebugOutputLevel":0,
     "EnableStockCarRulesPlugin":1
