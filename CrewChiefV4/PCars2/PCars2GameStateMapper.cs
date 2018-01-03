@@ -8,11 +8,6 @@ using System.Diagnostics;
 
 /**
  * Maps memory mapped file to a local game-agnostic representation.
- * 
- * 
- * Weather...
- * 
- * cloud brightness varies a *lot*. Perhaps it's for that section of track?
  */
 namespace CrewChiefV4.PCars2
 {
@@ -78,6 +73,8 @@ namespace CrewChiefV4.PCars2
         TimeSpan opponentCleanupInterval = TimeSpan.FromSeconds(4);
         HashSet<uint> positionsFilledForThisTick = new HashSet<uint>();
         List<String> opponentDriverNamesProcessedForThisTick = new List<String>();
+
+        DateTime timeWhenLapWasStarted = DateTime.MinValue;
 
         public PCars2GameStateMapper()
         {
@@ -538,6 +535,22 @@ namespace CrewChiefV4.PCars2
             }
             if (shared.mLapInvalidated)
             {
+                if (previousGameState != null && 
+                    previousGameState.PositionAndMotionData.DistanceRoundTrack > 0 && previousGameState.PositionAndMotionData.CarSpeed > 0 &&
+                    previousGameState.SessionData.CurrentLapIsValid && previousGameState.SessionData.TrackDefinition != null) 
+                {
+                    Boolean leftWheelsOffRacingSurface = !racingSurfaces.Contains(shared.mTerrain[0]) && !racingSurfaces.Contains(shared.mTerrain[2]);
+                    Boolean rightWheelsOffRacingSurface = !racingSurfaces.Contains(shared.mTerrain[1]) && !racingSurfaces.Contains(shared.mTerrain[3]);
+                    Console.WriteLine("Lap invalidated in sector " + previousGameState.SessionData.SectorNumber + 
+                        " after " + (currentGameState.Now - timeWhenLapWasStarted).TotalSeconds + " seconds " +
+                        " at lap distance " + previousGameState.PositionAndMotionData.DistanceRoundTrack + 
+                        " (distance remaining = " + (previousGameState.SessionData.TrackDefinition.trackLength - previousGameState.PositionAndMotionData.DistanceRoundTrack) +
+                        ") previous lap was valid = " + previousGameState.SessionData.PreviousLapWasValid + 
+                        " terrain under wheels: " + 
+                        (eTerrainMaterials) shared.mTerrain[0] + ", " + (eTerrainMaterials) shared.mTerrain[1] + ", " +
+                        (eTerrainMaterials) shared.mTerrain[2] + ", " + (eTerrainMaterials) shared.mTerrain[3]);
+                    
+                }
                 currentGameState.SessionData.CurrentLapIsValid = false;
             }
             if (currentGameState.SessionData.IsNewSector)
@@ -602,6 +615,8 @@ namespace CrewChiefV4.PCars2
             if (currentGameState.SessionData.IsNewLap)
             {
                 currentGameState.readLandmarksForThisLap = false;
+                Console.WriteLine("Starting new lap, valid = " + currentGameState.SessionData.CurrentLapIsValid);
+                timeWhenLapWasStarted = currentGameState.Now;
             }
             currentGameState.PitData.InPitlane = shared.mPitModes[playerIndex] == (int)ePitMode.PIT_MODE_DRIVING_INTO_PITS ||
                 shared.mPitModes[playerIndex] == (int)ePitMode.PIT_MODE_IN_PIT ||
