@@ -111,6 +111,10 @@ namespace CrewChiefV4.Events
         {
             if (base.isMessageStillValid(eventSubType, currentGameState, validationData))
             {
+                if (eventSubType == folderPossibleTrackLimitsViolation)
+                {
+                    return true;
+                }
                 // When a new penalty is given we queue a 'three laps left to serve' delayed message.
                 // If, the moment message is about to play, the player has started a new lap, this message is no longer valid so shouldn't be played
                 if (eventSubType == folderThreeLapsToServe)
@@ -315,6 +319,12 @@ namespace CrewChiefV4.Events
                     }
                 }
             }
+            else if (currentGameState.PenaltiesData.PossibleTrackLimitsViolation && playCutTrackWarnings && !warnedOfPossibleTrackLimitsViolationOnThisLap)
+            {
+                warnedOfPossibleTrackLimitsViolationOnThisLap = true;
+                audioPlayer.playMessage(new QueuedMessage(folderPossibleTrackLimitsViolation, 0, this));
+                Console.WriteLine("Possible track limit violation at lap distance " + currentGameState.PositionAndMotionData.DistanceRoundTrack);
+            }
             else
             {
                 clearPenaltyState();
@@ -327,12 +337,7 @@ namespace CrewChiefV4.Events
                 (CrewChief.gameDefinition.gameEnum == GameEnum.RF1 || CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT))))
             {
                 audioPlayer.playMessage(new QueuedMessage(folderPenaltyServed, 0, this));
-            }    
-            if (currentGameState.PenaltiesData.PossibleTrackLimitsViolation && playCutTrackWarnings && !warnedOfPossibleTrackLimitsViolationOnThisLap)
-            {
-                warnedOfPossibleTrackLimitsViolationOnThisLap = true;
-                audioPlayer.playMessage(new QueuedMessage(folderPossibleTrackLimitsViolation, 0, this));
-            }
+            }            
         }
 
         public override void respond(string voiceMessage)

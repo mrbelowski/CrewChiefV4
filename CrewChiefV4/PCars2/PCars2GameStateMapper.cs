@@ -32,6 +32,11 @@ namespace CrewChiefV4.PCars2
             (uint)eTerrainMaterials.TERRAIN_LOW_GRIP_ROAD, (uint)eTerrainMaterials.TERRAIN_MARBLES,(uint)eTerrainMaterials.TERRAIN_PAVEMENT,
             (uint)eTerrainMaterials.TERRAIN_ROAD, (uint)eTerrainMaterials.TERRAIN_RUMBLE_STRIPS, (uint)eTerrainMaterials.TERRAIN_SAND_ROAD};
 
+        // 3 or 4 wheels on any of these terrains triggers a possible cut warning
+        private HashSet<eTerrainMaterials> illegalSurfaces = new HashSet<eTerrainMaterials>(
+            new eTerrainMaterials[]{ eTerrainMaterials.TERRAIN_GRASSY_BERMS, eTerrainMaterials.TERRAIN_GRASS, eTerrainMaterials.TERRAIN_LONG_GRASS,
+                                     eTerrainMaterials.TERRAIN_SLOPE_GRASS, eTerrainMaterials.TERRAIN_RUNOFF_ROAD, eTerrainMaterials.TERRAIN_ILLEGAL_STRIP });
+
         private float trivialEngineDamageThreshold = 0.05f;
         private float minorEngineDamageThreshold = 0.20f;
         private float severeEngineDamageThreshold = 0.45f;
@@ -1161,18 +1166,18 @@ namespace CrewChiefV4.PCars2
             CrewChief.viewingReplay = false;
 
             if (currentGameState.PositionAndMotionData.DistanceRoundTrack > 0 && currentGameState.PositionAndMotionData.CarSpeed > 0 
-                && !currentGameState.PitData.InPitlane)
+                && !currentGameState.PitData.InPitlane && currentGameState.SessionData.CurrentLapIsValid)
             {
                 eTerrainMaterials[] terrainMaterials = new eTerrainMaterials[] {(eTerrainMaterials)shared.mTerrain[0], 
                     (eTerrainMaterials)shared.mTerrain[1], (eTerrainMaterials)shared.mTerrain[2], (eTerrainMaterials)shared.mTerrain[3] };
 
-                int illegalStripCount = 0;
+                int illegalSurfacesCount = 0;
                 foreach (eTerrainMaterials material in terrainMaterials)
                 {
-                    if (material == eTerrainMaterials.TERRAIN_ILLEGAL_STRIP)
+                    if (illegalSurfaces.Contains(material))
                     {
-                        illegalStripCount++;
-                        if (illegalStripCount > 2)
+                        illegalSurfacesCount++;
+                        if (illegalSurfacesCount > 2)
                         {
                             currentGameState.PenaltiesData.PossibleTrackLimitsViolation = true;
                             break;
