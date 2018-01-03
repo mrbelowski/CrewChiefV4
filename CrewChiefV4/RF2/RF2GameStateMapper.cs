@@ -1580,7 +1580,7 @@ namespace CrewChiefV4.rFactor2
             if (this.enableFrozenOrderMessages
                 && playerRulesIdx != -1
                 && pgs != null)
-                cgs.FrozenOrderData = this.GetFrozenOrderData(pgs.FrozenOrderData, ref playerScoring, ref shared.scoring, ref shared.rules.mParticipants[playerRulesIdx], ref shared.rules);
+                cgs.FrozenOrderData = this.GetFrozenOrderData(pgs.FrozenOrderData, ref playerScoring, ref shared.scoring, ref shared.rules.mParticipants[playerRulesIdx], ref shared.rules, cgs.StockCarRulesData.stockCarRulesEnabled);
 
             // --------------------------------
             // penalties data
@@ -2239,7 +2239,8 @@ namespace CrewChiefV4.rFactor2
                 vehicleTelemetry.mWheels[i].mTemperature = new double[3];
         }
 
-        private FrozenOrderData GetFrozenOrderData(FrozenOrderData prevFrozenOrderData, ref rF2VehicleScoring vehicle, ref rF2Scoring scoring, ref rF2TrackRulesParticipant vehicleRules, ref rF2Rules rules)
+        private FrozenOrderData GetFrozenOrderData(FrozenOrderData prevFrozenOrderData, ref rF2VehicleScoring vehicle, ref rF2Scoring scoring, 
+            ref rF2TrackRulesParticipant vehicleRules, ref rF2Rules rules, Boolean stockCarRulesEnabled)
         {
             var fod = new FrozenOrderData();
 
@@ -2283,6 +2284,13 @@ namespace CrewChiefV4.rFactor2
                 {
                     gridOrder = false;
                     fod.AssignedPosition = vehicleRules.mPositionAssignment + 1;  // + 1, because it is zero based with 0 meaning follow SC.
+                    if (stockCarRulesEnabled)
+                    {
+                        if (vehicleRules.mColumnAssignment == rF2TrackRulesColumn.LeftLane)
+                            fod.AssignedColumn = FrozenOrderColumn.Left;
+                        else if (vehicleRules.mColumnAssignment == rF2TrackRulesColumn.RightLane)
+                            fod.AssignedColumn = FrozenOrderColumn.Right;
+                    }
 
                     // Initialize player laps when FCY was assigned.  This is used as a base to calculate SC full distance.6
                     if (this.playerLapsWhenFCYPosAssigned == -1)
