@@ -74,7 +74,10 @@ namespace CrewChiefV4.PCars2
         HashSet<uint> positionsFilledForThisTick = new HashSet<uint>();
         List<String> opponentDriverNamesProcessedForThisTick = new List<String>();
 
+        // debug stuff for tracking track limits issues
         DateTime timeWhenLapWasStarted = DateTime.MinValue;
+        LinkedList<eTerrainMaterials[]> recentTerrainData = new LinkedList<eTerrainMaterials[]>();
+        int terrainSamplesToCount = 50; // 5 seconds of data at default tick rate
 
         public PCars2GameStateMapper()
         {
@@ -185,6 +188,17 @@ namespace CrewChiefV4.PCars2
                 }
                 return previousGameState;
             }
+
+            if (Debugger.IsAttached)
+            {
+                if (recentTerrainData.Count > terrainSamplesToCount)
+                {
+                    recentTerrainData.RemoveFirst();
+                }
+                recentTerrainData.AddLast(new eTerrainMaterials[] { 
+                (eTerrainMaterials)shared.mTerrain[0], (eTerrainMaterials)shared.mTerrain[1], (eTerrainMaterials)shared.mTerrain[2], (eTerrainMaterials)shared.mTerrain[3] });
+            }
+
             int playerIndex = getPlayerIndex(shared);
             pCars2APIParticipantStruct playerData = shared.mParticipantData[playerIndex];
 
@@ -538,18 +552,19 @@ namespace CrewChiefV4.PCars2
                 if (previousGameState != null && 
                     previousGameState.PositionAndMotionData.DistanceRoundTrack > 0 && previousGameState.PositionAndMotionData.CarSpeed > 0 &&
                     previousGameState.SessionData.CurrentLapIsValid && previousGameState.SessionData.TrackDefinition != null) 
-                {
-                    Boolean leftWheelsOffRacingSurface = !racingSurfaces.Contains(shared.mTerrain[0]) && !racingSurfaces.Contains(shared.mTerrain[2]);
-                    Boolean rightWheelsOffRacingSurface = !racingSurfaces.Contains(shared.mTerrain[1]) && !racingSurfaces.Contains(shared.mTerrain[3]);
+                {                    
                     Console.WriteLine("Lap invalidated in sector " + previousGameState.SessionData.SectorNumber + 
                         " after " + (currentGameState.Now - timeWhenLapWasStarted).TotalSeconds + " seconds " +
                         " at lap distance " + previousGameState.PositionAndMotionData.DistanceRoundTrack + 
-                        " (distance remaining = " + (previousGameState.SessionData.TrackDefinition.trackLength - previousGameState.PositionAndMotionData.DistanceRoundTrack) +
-                        ") previous lap was valid = " + previousGameState.SessionData.PreviousLapWasValid + 
-                        " terrain under wheels: " + 
-                        (eTerrainMaterials) shared.mTerrain[0] + ", " + (eTerrainMaterials) shared.mTerrain[1] + ", " +
-                        (eTerrainMaterials) shared.mTerrain[2] + ", " + (eTerrainMaterials) shared.mTerrain[3]);
-                    
+                        " (distance remaining = " + (previousGameState.SessionData.TrackDefinition.trackLength - previousGameState.PositionAndMotionData.DistanceRoundTrack) + ")");
+                    if (Debugger.IsAttached) 
+                    {
+                        Console.WriteLine(" terrain under wheels for last 5 seconds: ");
+                        foreach (eTerrainMaterials[] terrainSample in recentTerrainData)
+                        {
+                            Console.WriteLine(String.Join(", ", terrainSample));
+                        }
+                    }
                 }
                 currentGameState.SessionData.CurrentLapIsValid = false;
             }
