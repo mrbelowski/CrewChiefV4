@@ -1643,6 +1643,8 @@ namespace CrewChiefV4.GameState
         public int CutTrackWarnings = 0;
 
         public Boolean IsOffRacingSurface = false;
+
+        public Boolean PossibleTrackLimitsViolation = false;
     }
 
     public class TyreData

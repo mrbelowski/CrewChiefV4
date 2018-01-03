@@ -36,6 +36,8 @@ namespace CrewChiefV4.Events
 
         public static String folderCutTrackInRace = "penalties/cut_track_in_race";
 
+        private String folderPossibleTrackLimitsViolation = "penalties/possible_track_limits_warning";
+
         public static String folderLapDeleted = "penalties/lap_deleted";
 
         public static String folderCutTrackPracticeOrQual = "penalties/cut_track_in_prac_or_qual";
@@ -74,6 +76,8 @@ namespace CrewChiefV4.Events
 
         private Boolean playedNotServedPenalty;
 
+        private Boolean warnedOfPossibleTrackLimitsViolationOnThisLap = false;
+
         public Penalties(AudioPlayer audioPlayer)
         {
             this.audioPlayer = audioPlayer;
@@ -85,6 +89,7 @@ namespace CrewChiefV4.Events
             lastCutTrackWarningTime = DateTime.MinValue;
             cutTrackWarningsCount = 0;
             hasHadAPenalty = false;
+            warnedOfPossibleTrackLimitsViolationOnThisLap = false;
         }
 
         private void clearPenaltyState()
@@ -134,6 +139,10 @@ namespace CrewChiefV4.Events
 
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
+            if (currentGameState.SessionData.IsNewLap)
+            {
+                warnedOfPossibleTrackLimitsViolationOnThisLap = false;
+            }
             if (currentGameState.SessionData.SessionType == SessionType.Race && previousGameState != null && 
                 (currentGameState.PenaltiesData.HasDriveThrough || currentGameState.PenaltiesData.HasStopAndGo || currentGameState.PenaltiesData.HasTimeDeduction))
             {
@@ -318,7 +327,12 @@ namespace CrewChiefV4.Events
                 (CrewChief.gameDefinition.gameEnum == GameEnum.RF1 || CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT))))
             {
                 audioPlayer.playMessage(new QueuedMessage(folderPenaltyServed, 0, this));
-            }            
+            }    
+            if (currentGameState.PenaltiesData.PossibleTrackLimitsViolation && playCutTrackWarnings && !warnedOfPossibleTrackLimitsViolationOnThisLap)
+            {
+                warnedOfPossibleTrackLimitsViolationOnThisLap = true;
+                audioPlayer.playMessage(new QueuedMessage(folderPossibleTrackLimitsViolation, 0, this));
+            }
         }
 
         public override void respond(string voiceMessage)

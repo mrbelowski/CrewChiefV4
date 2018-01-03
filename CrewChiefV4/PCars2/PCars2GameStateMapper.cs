@@ -73,12 +73,7 @@ namespace CrewChiefV4.PCars2
         TimeSpan opponentCleanupInterval = TimeSpan.FromSeconds(4);
         HashSet<uint> positionsFilledForThisTick = new HashSet<uint>();
         List<String> opponentDriverNamesProcessedForThisTick = new List<String>();
-
-        // debug stuff for tracking track limits issues
-        DateTime timeWhenLapWasStarted = DateTime.MinValue;
-        LinkedList<eTerrainMaterials[]> recentTerrainData = new LinkedList<eTerrainMaterials[]>();
-        int terrainSamplesToCount = 50; // 5 seconds of data at default tick rate
-
+        
         public PCars2GameStateMapper()
         {
             CornerData.EnumWithThresholds suspensionDamageNone = new CornerData.EnumWithThresholds(DamageLevel.NONE, -10000, trivialSuspensionDamageThreshold);
@@ -187,16 +182,6 @@ namespace CrewChiefV4.PCars2
                     previousGameState.SessionData.SessionPhase = SessionPhase.Unavailable;
                 }
                 return previousGameState;
-            }
-
-            if (Debugger.IsAttached)
-            {
-                if (recentTerrainData.Count > terrainSamplesToCount)
-                {
-                    recentTerrainData.RemoveFirst();
-                }
-                recentTerrainData.AddLast(new eTerrainMaterials[] { 
-                (eTerrainMaterials)shared.mTerrain[0], (eTerrainMaterials)shared.mTerrain[1], (eTerrainMaterials)shared.mTerrain[2], (eTerrainMaterials)shared.mTerrain[3] });
             }
 
             int playerIndex = getPlayerIndex(shared);
@@ -549,23 +534,6 @@ namespace CrewChiefV4.PCars2
             }
             if (shared.mLapInvalidated)
             {
-                if (previousGameState != null && 
-                    previousGameState.PositionAndMotionData.DistanceRoundTrack > 0 && previousGameState.PositionAndMotionData.CarSpeed > 0 &&
-                    previousGameState.SessionData.CurrentLapIsValid && previousGameState.SessionData.TrackDefinition != null) 
-                {                    
-                    Console.WriteLine("Lap invalidated in sector " + previousGameState.SessionData.SectorNumber + 
-                        " after " + (currentGameState.Now - timeWhenLapWasStarted).TotalSeconds + " seconds " +
-                        " at lap distance " + previousGameState.PositionAndMotionData.DistanceRoundTrack + 
-                        " (distance remaining = " + (previousGameState.SessionData.TrackDefinition.trackLength - previousGameState.PositionAndMotionData.DistanceRoundTrack) + ")");
-                    if (Debugger.IsAttached) 
-                    {
-                        Console.WriteLine(" terrain under wheels for last 5 seconds: ");
-                        foreach (eTerrainMaterials[] terrainSample in recentTerrainData)
-                        {
-                            Console.WriteLine(String.Join(", ", terrainSample));
-                        }
-                    }
-                }
                 currentGameState.SessionData.CurrentLapIsValid = false;
             }
             if (currentGameState.SessionData.IsNewSector)
@@ -630,8 +598,6 @@ namespace CrewChiefV4.PCars2
             if (currentGameState.SessionData.IsNewLap)
             {
                 currentGameState.readLandmarksForThisLap = false;
-                Console.WriteLine("Starting new lap, valid = " + currentGameState.SessionData.CurrentLapIsValid);
-                timeWhenLapWasStarted = currentGameState.Now;
             }
             currentGameState.PitData.InPitlane = shared.mPitModes[playerIndex] == (int)ePitMode.PIT_MODE_DRIVING_INTO_PITS ||
                 shared.mPitModes[playerIndex] == (int)ePitMode.PIT_MODE_IN_PIT ||
@@ -1193,6 +1159,27 @@ namespace CrewChiefV4.PCars2
             }
             CrewChief.distanceRoundTrack = currentGameState.PositionAndMotionData.DistanceRoundTrack;
             CrewChief.viewingReplay = false;
+
+            if (currentGameState.PositionAndMotionData.DistanceRoundTrack > 0 && currentGameState.PositionAndMotionData.CarSpeed > 0 
+                && !currentGameState.PitData.InPitlane)
+            {
+                eTerrainMaterials[] terrainMaterials = new eTerrainMaterials[] {(eTerrainMaterials)shared.mTerrain[0], 
+                    (eTerrainMaterials)shared.mTerrain[1], (eTerrainMaterials)shared.mTerrain[2], (eTerrainMaterials)shared.mTerrain[3] };
+
+                int illegalStripCount = 0;
+                foreach (eTerrainMaterials material in terrainMaterials)
+                {
+                    if (material == eTerrainMaterials.TERRAIN_ILLEGAL_STRIP)
+                    {
+                        illegalStripCount++;
+                        if (illegalStripCount > 2)
+                        {
+                            currentGameState.PenaltiesData.PossibleTrackLimitsViolation = true;
+                            break;
+                        }
+                    }
+                }
+            }
 
             return currentGameState;
         }
