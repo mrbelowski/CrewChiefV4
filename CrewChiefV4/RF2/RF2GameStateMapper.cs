@@ -2240,7 +2240,7 @@ namespace CrewChiefV4.rFactor2
         }
 
         private FrozenOrderData GetFrozenOrderData(FrozenOrderData prevFrozenOrderData, ref rF2VehicleScoring vehicle, ref rF2Scoring scoring, 
-            ref rF2TrackRulesParticipant vehicleRules, ref rF2Rules rules, Boolean stockCarRulesEnabled)
+            ref rF2TrackRulesParticipant vehicleRules, ref rF2Rules rules, bool stockCarRulesEnabled)
         {
             var fod = new FrozenOrderData();
 
@@ -2284,15 +2284,12 @@ namespace CrewChiefV4.rFactor2
                 {
                     gridOrder = false;
                     fod.AssignedPosition = vehicleRules.mPositionAssignment + 1;  // + 1, because it is zero based with 0 meaning follow SC.
-                    if (stockCarRulesEnabled)
-                    {
-                        if (vehicleRules.mColumnAssignment == rF2TrackRulesColumn.LeftLane)
-                            fod.AssignedColumn = FrozenOrderColumn.Left;
-                        else if (vehicleRules.mColumnAssignment == rF2TrackRulesColumn.RightLane)
-                            fod.AssignedColumn = FrozenOrderColumn.Right;
-                    }
 
-                    // Initialize player laps when FCY was assigned.  This is used as a base to calculate SC full distance.6
+                    // TODO: this needs testing with SCR on and different Double file type to make sure order is correct.
+                    if (GlobalBehaviourSettings.useAmericanTerms && stockCarRulesEnabled)
+                        fod.AssignedColumn = vehicleRules.mColumnAssignment == rF2TrackRulesColumn.LeftLane ? FrozenOrderColumn.Left : FrozenOrderColumn.Right;
+
+                    // Initialize player laps when FCY was assigned.  This is used as a base to calculate SC full distance.
                     if (this.playerLapsWhenFCYPosAssigned == -1)
                         this.playerLapsWhenFCYPosAssigned = vehicle.mTotalLaps;
                 }

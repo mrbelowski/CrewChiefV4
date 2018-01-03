@@ -347,7 +347,12 @@ namespace CrewChiefV4.rFactor2
                                 // However, this causes memory pressure (~250Mb/minute with 22 vehicles), so probably better done here.
                                 wrapper.telemetry.mVehicles = this.GetPopulatedVehicleInfoArray<rF2VehicleTelemetry>(wrapper.telemetry.mVehicles, wrapper.telemetry.mNumVehicles);
                                 wrapper.scoring.mVehicles = this.GetPopulatedVehicleInfoArray<rF2VehicleScoring>(wrapper.scoring.mVehicles, wrapper.scoring.mScoringInfo.mNumVehicles);
+
+                                // For rules, exclude empty messages from serialization.
+                                wrapper.rules.mTrackRules.mMessage = wrapper.rules.mTrackRules.mMessage[0] != 0 ? wrapper.rules.mTrackRules.mMessage : null;
                                 wrapper.rules.mParticipants = this.GetPopulatedVehicleInfoArray<rF2TrackRulesParticipant>(wrapper.rules.mParticipants, wrapper.rules.mTrackRules.mNumParticipants);
+                                for (int i = 0; i < wrapper.rules.mParticipants.Length; ++i)
+                                    wrapper.rules.mParticipants[i].mMessage = wrapper.rules.mParticipants[i].mMessage[0] != 0 ? wrapper.rules.mParticipants[i].mMessage : null;
 
                                 int maxmID = 0;
                                 foreach (var vehicleScoring in wrapper.scoring.mVehicles)
