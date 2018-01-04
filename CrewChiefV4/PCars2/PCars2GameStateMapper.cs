@@ -194,7 +194,12 @@ namespace CrewChiefV4.PCars2
 
             String playerName = StructHelper.getNameFromBytes(shared.mParticipantData[playerIndex].mName);
 
-            GameStateData currentGameState = new GameStateData(ticks);          
+            GameStateData currentGameState = new GameStateData(ticks);
+
+            /*Console.WriteLine("SessionState: " + (eSessionState)shared.mSessionState + " RaceState: " + (eRaceState)shared.mRaceState + 
+                " GameState: " + (eGameState) shared.mGameState + " PitMode: " + (ePitMode) shared.mPitMode +
+                " EventTimeRemaining: " + shared.mEventTimeRemaining + " LapsInEvent: " + 
+                shared.mLapsInEvent + " SequenceNumber: " + shared.mSequenceNumber);*/
             
             NameValidator.validateName(playerName);
             currentGameState.SessionData.CompletedLaps = (int)playerData.mLapsCompleted;
@@ -277,7 +282,7 @@ namespace CrewChiefV4.PCars2
 
             currentGameState.SessionData.SessionPhase = mapToSessionPhase(currentGameState.SessionData.SessionType,
                 shared.mSessionState, shared.mRaceState, shared.mNumParticipants, leaderHasFinished, lastSessionPhase, lastSessionTimeRemaining,
-                lastSessionRunningTime, shared.mPitModes[playerIndex], previousGameState == null ? null : previousGameState.OpponentData,
+                lastSessionRunningTime, shared.mPitModes[playerIndex], (eGameState)shared.mGameState, previousGameState == null ? null : previousGameState.OpponentData,
                 shared.mSpeed, currentGameState.Now);
                         
             currentGameState.SessionData.TrackDefinition = TrackData.getTrackDefinition(StructHelper.getNameFromBytes(shared.mTrackLocation)
@@ -293,11 +298,28 @@ namespace CrewChiefV4.PCars2
                 (currentGameState.SessionData.SessionType == SessionType.Race ||
                     currentGameState.SessionData.SessionHasFixedTime && currentGameState.SessionData.SessionTimeRemaining > lastSessionTimeRemaining + 1);
             Boolean justGoneGreen = false;
-            if (sessionOfSameTypeRestarted ||
-                (currentGameState.SessionData.SessionType != SessionType.Unavailable && 
-                    (lastSessionType != currentGameState.SessionData.SessionType ||                
-                        lastSessionTrack == null || lastSessionTrack.name != currentGameState.SessionData.TrackDefinition.name ||
-                            (currentGameState.SessionData.SessionHasFixedTime && currentGameState.SessionData.SessionTimeRemaining > lastSessionTimeRemaining + 1))))
+
+
+            // pcars will update the session type before updating the race state, so it goes [qual / finished] -> [race / finished] -> [race / not started]
+            // so don't count this as a valid transition
+            eSessionState rawSessionState = (eSessionState) shared.mSessionState;
+            eRaceState rawRaceState = (eRaceState) shared.mRaceState;
+            Boolean ignoreFinishedStatus = previousGameState != null && 
+                ((previousGameState.SessionData.SessionType == SessionType.Practice && rawSessionState == eSessionState.SESSION_QUALIFY) ||
+                 (previousGameState.SessionData.SessionType == SessionType.Qualify && rawSessionState == eSessionState.SESSION_RACE))
+                 && rawRaceState == eRaceState.RACESTATE_FINISHED;
+            if (ignoreFinishedStatus)
+            {
+                // don't allow the session type to be updated here
+                currentGameState.SessionData.SessionType = previousGameState.SessionData.SessionType;
+            }
+            if (!ignoreFinishedStatus && 
+                (sessionOfSameTypeRestarted ||
+                 (currentGameState.SessionData.SessionType != SessionType.Unavailable && 
+                     (lastSessionType != currentGameState.SessionData.SessionType ||                
+                         lastSessionTrack == null || lastSessionTrack.name != currentGameState.SessionData.TrackDefinition.name ||
+                             (currentGameState.SessionData.SessionHasFixedTime && currentGameState.SessionData.SessionTimeRemaining > lastSessionTimeRemaining + 1))))
+                )
             {
                 lastGuessAtPlayerIndex = -1;
                 lastActiveTimeForOpponents.Clear();
@@ -1379,7 +1401,8 @@ namespace CrewChiefV4.PCars2
          * When we retire to the pit box, the raceState is set to RaceNotStarted
          */
         private SessionPhase mapToSessionPhase(SessionType sessionType, uint sessionState, uint raceState, int numParticipants, Boolean leaderHasFinishedRace, 
-            SessionPhase previousSessionPhase, float sessionTimeRemaining, float sessionRunTime, uint pitMode, Dictionary<string, OpponentData> opponentData, float playerSpeed, DateTime now)
+            SessionPhase previousSessionPhase, float sessionTimeRemaining, float sessionRunTime, uint pitMode, eGameState gameState,
+            Dictionary<string, OpponentData> opponentData, float playerSpeed, DateTime now)
         {
             if (numParticipants < 1)
             {
@@ -1392,6 +1415,10 @@ namespace CrewChiefV4.PCars2
                     if (sessionState == (uint)eSessionState.SESSION_FORMATION_LAP)
                     {
                         return SessionPhase.Formation;
+                    }
+                    else if (gameState == eGameState.GAME_INGAME_INMENU_TIME_TICKING)
+                    {
+                        return SessionPhase.Gridwalk;
                     }
                     else if (pitMode != (uint) ePitMode.PIT_MODE_IN_GARAGE)
                     {

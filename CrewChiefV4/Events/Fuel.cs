@@ -5,9 +5,6 @@ using System.Text;
 using CrewChiefV4.GameState;
 using CrewChiefV4.Audio;
 
-//
-// TODO: disable some of these events in the last few laps, or change the behaviour so the messages are more appropriate
-
 namespace CrewChiefV4.Events
 {
     class Fuel : AbstractEvent

@@ -245,7 +245,7 @@ namespace CrewChiefV4.Events
                 // check how long the race is
                 if (currentGameState.SessionData.Position > 3 && currentGameState.SessionData.TrackDefinition != null && 
                     currentGameState.SessionData.TrackDefinition.trackLength > 0 && 
-                    currentGameState.SessionData.TrackDefinition.trackLength * currentGameState.SessionData.SessionNumberOfLaps < 20000)
+                    currentGameState.SessionData.TrackDefinition.trackLength * currentGameState.SessionData.SessionNumberOfLaps < 30000)
                 {
                     // anything less than 20000 metres worth of racing (e.g. 10 laps of Brands Indy) should have a 'make them count'
                     Console.WriteLine("pre-start message for race laps + get on with it");
@@ -451,11 +451,18 @@ namespace CrewChiefV4.Events
                 }
                 else
                 {
-                    int preLightsMessageCount = CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_32BIT ||
-                                                CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_64BIT ||
-                                                CrewChief.gameDefinition.gameEnum == GameEnum.PCARS2 ||
-                                                CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_NETWORK ||
-                                                CrewChief.gameDefinition.gameEnum == GameEnum.PCARS2_NETWORK ? 1 : 2;
+                    int preLightsMessageCount = 2;
+                    if (CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_32BIT ||
+                        CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_64BIT ||
+                        CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_NETWORK ||
+                        CrewChief.gameDefinition.gameEnum == GameEnum.PCARS2_NETWORK)
+                    {
+                        preLightsMessageCount = 1;
+                    }
+                    else if (CrewChief.gameDefinition.gameEnum == GameEnum.PCARS2)
+                    {
+                        preLightsMessageCount = 10;
+                    }
                     if (!playedPreLightsMessage && currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.SessionPhase == SessionPhase.Gridwalk &&
                         (playPreLightsInRaceroom || CrewChief.gameDefinition.gameEnum != GameEnum.RACE_ROOM))
                     {

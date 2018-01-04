@@ -32,7 +32,7 @@ namespace CrewChiefV4.RaceRoom
         public enum SessionPhase
         {
             Unavailable = -1,
-            // TODO: verify this. Why has "garage" changed from 0?
+            // TODO: is there a zero here?
             Garage = 1,
             Gridwalk = 2,
             Formation = 3,
