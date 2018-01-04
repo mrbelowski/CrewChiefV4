@@ -1643,23 +1643,6 @@ namespace CrewChiefV4.rFactor2
                 }
             }
 
-            if (csd.SessionPhase == SessionPhase.FullCourseYellow)
-            {
-                var mainMsg = RF2GameStateMapper.GetStringFromBytes(shared.rules.mTrackRules.mMessage);
-
-                if (!string.IsNullOrWhiteSpace(mainMsg))
-                    Debug.WriteLine(mainMsg);
-
-                for (var i = 0; i < shared.rules.mTrackRules.mNumParticipants; ++i)
-                {
-                    var p = shared.rules.mParticipants[i];
-
-                    var pcptMsg = RF2GameStateMapper.GetStringFromBytes(p.mMessage);
-                    if (!string.IsNullOrWhiteSpace(pcptMsg))
-                        Debug.WriteLine(pcptMsg);
-                }
-            }
-
             // --------------------------------
             // console output
             if (csd.IsNewSession)
@@ -1721,8 +1704,9 @@ namespace CrewChiefV4.rFactor2
                 || cgs.SessionData.SessionType != SessionType.Race)
                 return scrData;
 
-            var globalMsgUpper = RF2GameStateMapper.GetStringFromBytes(rules.mTrackRules.mMessage).ToUpperInvariant();
-            var playerMsgUpper = RF2GameStateMapper.GetStringFromBytes(playerRules.mMessage).ToUpperInvariant();
+            // When saving session to file, mMessage strings might be null if empty.
+            var globalMsgUpper = rules.mTrackRules.mMessage != null ? RF2GameStateMapper.GetStringFromBytes(rules.mTrackRules.mMessage).ToUpperInvariant() : null;
+            var playerMsgUpper = playerRules.mMessage != null ? RF2GameStateMapper.GetStringFromBytes(playerRules.mMessage).ToUpperInvariant() : null;
 
             if (!string.IsNullOrWhiteSpace(globalMsgUpper))
             {
@@ -2286,18 +2270,29 @@ namespace CrewChiefV4.rFactor2
                     fod.AssignedPosition = vehicleRules.mPositionAssignment + 1;  // + 1, because it is zero based with 0 meaning follow SC.
 
                     // TODO: this needs testing with SCR on and different Double file type to make sure order is correct.
+                    // TODO: depending on DoubleFileType setting, we may or may not receive Grid order on the last lap of FCY.
+                    // need to check if position jumps on last lap from line order to grid.
                     if (GlobalBehaviourSettings.useAmericanTerms && stockCarRulesEnabled)
-                        fod.AssignedColumn = vehicleRules.mColumnAssignment == rF2TrackRulesColumn.LeftLane ? FrozenOrderColumn.Left : FrozenOrderColumn.Right;
+                    {
+                        if (vehicleRules.mColumnAssignment == rF2TrackRulesColumn.LeftLane)
+                            fod.AssignedColumn = FrozenOrderColumn.Left;
+                        else if (vehicleRules.mColumnAssignment == rF2TrackRulesColumn.RightLane)
+                            fod.AssignedColumn = FrozenOrderColumn.Right;
+                    }
 
                     // Initialize player laps when FCY was assigned.  This is used as a base to calculate SC full distance.
                     if (this.playerLapsWhenFCYPosAssigned == -1)
                         this.playerLapsWhenFCYPosAssigned = vehicle.mTotalLaps;
                 }
-                else  // SCR plugin is enabled or this is not FCY case, the the order reported is grid order, with columns specified.
+                else  // If this is not FCY case, the the order reported is grid order, with columns specified.  // TODO: this is likely hit on last lap of SCR double file.
                 {
                     gridOrder = true;
                     fod.AssignedGridPosition = vehicleRules.mPositionAssignment + 1;
-                    fod.AssignedColumn = vehicleRules.mColumnAssignment == rF2TrackRulesColumn.LeftLane ? FrozenOrderColumn.Left : FrozenOrderColumn.Right;
+
+                    if (vehicleRules.mColumnAssignment == rF2TrackRulesColumn.LeftLane)
+                        fod.AssignedColumn = FrozenOrderColumn.Left;
+                    else if (vehicleRules.mColumnAssignment == rF2TrackRulesColumn.RightLane)
+                        fod.AssignedColumn = FrozenOrderColumn.Right;
 
                     if (rules.mTrackRules.mPoleColumn == rF2TrackRulesColumn.LeftLane)
                     {

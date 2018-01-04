@@ -270,7 +270,7 @@ namespace CrewChiefV4.Events
                     if (this.newFrozenOrderAction == FrozenOrderAction.Follow
                         && prevDriverToFollow != this.currDriverToFollow)  // Don't announce Follow messages for the driver that we caught up to or allowed to pass.
                     {
-                        var announceLane = useAmericanTerms 
+                        var announceLane = useAmericanTerms
                             && currentGameState.StockCarRulesData.stockCarRulesEnabled
                             && currentGameState.FlagData.fcyPhase == FullCourseYellowPhase.LAST_LAP_NEXT;
 
@@ -278,11 +278,10 @@ namespace CrewChiefV4.Events
                         {
                             if (announceLane && cfod.AssignedColumn == FrozenOrderColumn.Left)
                                 audioPlayer.playMessage(new QueuedMessage("frozen_order/follow_driver", MessageContents(folderFollow, usableDriverNameToFollow, 
-                                        useOvalLogic ? folderInTheInsideColumn : folderInTheLeftColumn), Utilities.random.Next(0, 3), this, validationData));
+                                    useOvalLogic ? folderInTheInsideColumn : folderInTheLeftColumn), Utilities.random.Next(0, 3), this, validationData));
                             else if (announceLane && cfod.AssignedColumn == FrozenOrderColumn.Right)
                                 audioPlayer.playMessage(new QueuedMessage("frozen_order/follow_driver",
-                                    MessageContents(folderFollow, usableDriverNameToFollow, 
-                                        useOvalLogic ? folderInTheOutsideColumn : folderInTheRightColumn), Utilities.random.Next(0, 3), this, validationData));
+                                    MessageContents(folderFollow, usableDriverNameToFollow, useOvalLogic ? folderInTheOutsideColumn : folderInTheRightColumn), Utilities.random.Next(0, 3), this, validationData));
                             else
                                 audioPlayer.playMessage(new QueuedMessage("frozen_order/follow_driver", MessageContents(folderFollow, usableDriverNameToFollow), Utilities.random.Next(0, 3), this, validationData));
                         }
