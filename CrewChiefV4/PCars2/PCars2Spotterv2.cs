@@ -97,12 +97,15 @@ namespace CrewChiefV4.PCars2
             }
             CrewChiefV4.PCars2.PCars2SharedMemoryReader.PCars2StructWrapper currentWrapper = (CrewChiefV4.PCars2.PCars2SharedMemoryReader.PCars2StructWrapper)currentStateObj;
             pCars2APIStruct currentState = currentWrapper.data;
+            ePitMode pitMode = (ePitMode) currentState.mPitMode;
+            eGameState gameState = (eGameState) currentState.mGameState;
 
             // game state is 3 for paused, 5 for replay. No idea what 4 is...
-            if (currentState.mGameState == (uint)eGameState.GAME_FRONT_END ||
-                (currentState.mGameState == (uint)eGameState.GAME_INGAME_PAUSED && !System.Diagnostics.Debugger.IsAttached) ||
-                currentState.mGameState == (uint)eGameState.GAME_INGAME_REPLAY || currentState.mGameState == (uint)eGameState.GAME_FRONT_END_REPLAY ||
-                currentState.mGameState == (uint)eGameState.GAME_EXITED)
+            if (pitMode != ePitMode.PIT_MODE_NONE || 
+                gameState == eGameState.GAME_FRONT_END ||
+                (gameState == eGameState.GAME_INGAME_PAUSED && !System.Diagnostics.Debugger.IsAttached) ||
+                gameState == eGameState.GAME_INGAME_REPLAY || gameState == eGameState.GAME_FRONT_END_REPLAY ||
+                gameState == eGameState.GAME_EXITED)
             {
                 // don't ignore the paused game updates if we're in debug mode                
                 return;
@@ -146,41 +149,39 @@ namespace CrewChiefV4.PCars2
                 }
                 float[] currentPlayerPosition = new float[] { playerData.mWorldPosition[0], playerData.mWorldPosition[2] };
 
-                if (/*playerData.mPitMode == (uint)ePitMode.PIT_MODE_NONE*/ true)
-                {
-                    List<float[]> currentOpponentPositions = new List<float[]>();
-                    float[] playerVelocityData = new float[3];
-                    playerVelocityData[0] = currentState.mSpeed;
-                    playerVelocityData[1] = currentState.mWorldVelocity[0];
-                    playerVelocityData[2] = currentState.mWorldVelocity[2];
+                List<float[]> currentOpponentPositions = new List<float[]>();
+                float[] playerVelocityData = new float[3];
+                playerVelocityData[0] = currentState.mSpeed;
+                playerVelocityData[1] = currentState.mWorldVelocity[0];
+                playerVelocityData[2] = currentState.mWorldVelocity[2];
 
-                    positionsFilledForThisTick.Clear();
-                    positionsFilledForThisTick.Add(playerData.mRacePosition);
-                    for (int i = 0; i < currentState.mParticipantData.Count(); i++)
+                positionsFilledForThisTick.Clear();
+                positionsFilledForThisTick.Add(playerData.mRacePosition);
+                for (int i = 0; i < currentState.mParticipantData.Count(); i++)
+                {
+                    if (i == playerIndex)
                     {
-                        if (i == playerIndex)
-                        {
-                            continue;
-                        }
-                        pCars2APIParticipantStruct opponentData = currentState.mParticipantData[i];
-                        if (opponentData.mIsActive && !positionsFilledForThisTick.Contains(opponentData.mRacePosition))
-                        {
-                            float[] currentPositions = new float[] { opponentData.mWorldPosition[0], opponentData.mWorldPosition[2] };
-                            currentOpponentPositions.Add(currentPositions);
-                            positionsFilledForThisTick.Add(opponentData.mRacePosition);
-                        }
+                        continue;
                     }
-                    if (currentOpponentPositions.Count() > 0)
+                    pCars2APIParticipantStruct opponentData = currentState.mParticipantData[i];
+                    if (opponentData.mIsActive && !positionsFilledForThisTick.Contains(opponentData.mRacePosition))
                     {
-                        float playerRotation = currentState.mOrientation[1];
-                        if (playerRotation < 0)
-                        {
-                            playerRotation = (float)(2 * Math.PI) + playerRotation;
-                        }
-                        playerRotation = (float)(2 * Math.PI) - playerRotation;
-                        internalSpotter.triggerInternal(playerRotation, currentPlayerPosition, playerVelocityData, currentOpponentPositions);
+                        float[] currentPositions = new float[] { opponentData.mWorldPosition[0], opponentData.mWorldPosition[2] };
+                        currentOpponentPositions.Add(currentPositions);
+                        positionsFilledForThisTick.Add(opponentData.mRacePosition);
                     }
                 }
+                if (currentOpponentPositions.Count() > 0)
+                {
+                    float playerRotation = currentState.mOrientation[1];
+                    if (playerRotation < 0)
+                    {
+                        playerRotation = (float)(2 * Math.PI) + playerRotation;
+                    }
+                    playerRotation = (float)(2 * Math.PI) - playerRotation;
+                    internalSpotter.triggerInternal(playerRotation, currentPlayerPosition, playerVelocityData, currentOpponentPositions);
+                }
+                
             }
         }
         
