@@ -115,15 +115,15 @@ namespace CrewChiefV4
     }
 
     public class QueuedMessage
-    {
+    {        
+        // Note that even when queuing a message with 0 delay, we always wait 1 complete update interval. This is to 
+        // (hopefully...) address issues where some data in the block get updated (like the lap count), but other data haven't 
+        // get been updated (like the session phase)
+        private static readonly int updateInterval = UserSettings.GetUserSettings().getInt("update_interval");
 
-        private Boolean prefix_hundred_and_thousand_with_one = Boolean.Parse(Configuration.getSoundConfigOption("prefix_hundred_and_thousand_with_one"));
-        private Boolean say_and_between_hundred_and_units = Boolean.Parse(Configuration.getSoundConfigOption("say_and_between_hundred_and_units"));
-        private Boolean say_and_between_thousand_and_units = Boolean.Parse(Configuration.getSoundConfigOption("say_and_between_thousand_and_units"));
-        private Boolean allow_short_hundreds = Boolean.Parse(Configuration.getSoundConfigOption("allow_short_hundreds"));   // allow "one oh four", instead of "one hundred and four"
-        private Boolean always_use_thousands = Boolean.Parse(Configuration.getSoundConfigOption("always_use_thousands"));   // don't allow "thirteen hundred" etc
+        private static readonly NumberReader numberReader = NumberReaderFactory.GetNumberReader();
 
-        private static String compoundMessageIdentifier = "COMPOUND_";
+        private static readonly String compoundMessageIdentifier = "COMPOUND_";
         
         public int maxPermittedQueueLengthForMessage = 0;         // 0 => don't check queue length
         public long dueTime;
@@ -145,16 +145,9 @@ namespace CrewChiefV4
 
         public long expiryTime = 0;
 
-        // Note that even when queuing a message with 0 delay, we always wait 1 complete update interval. This is to 
-        // (hopefully...) address issues where some data in the block get updated (like the lap count), but other data haven't 
-        // get been updated (like the session phase)
-        private int updateInterval = UserSettings.GetUserSettings().getInt("update_interval");
-
         // if any of the sound clips in this message are missing, this will be set to false when the constructors
         // get the message folders to use
         public Boolean canBePlayed = true;
-
-        private NumberReader numberReader = NumberReaderFactory.GetNumberReader();
 
         public Boolean isRant = false;
 
