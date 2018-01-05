@@ -82,48 +82,106 @@ namespace CrewChiefV4
                 }
                 name = name.Replace('-', ' ');
                 name = name.Replace('.', ' ');
+                name = name.Replace("$", "s");
+                name = name.Trim();
                 if (name.EndsWith("]") && name.Contains("["))
                 {
-                    name = name.Substring(0, name.LastIndexOf('['));
+                    name = name.Substring(0, name.IndexOf('['));
+                    name = name.Trim();
                 }
                 if (name.StartsWith("[") && name.Contains("]"))
                 {
                     name = name.Substring(name.LastIndexOf(']') + 1);
-                }
+                    name = name.Trim();
+                }                
                 if (name.EndsWith(")") && name.Contains("("))
                 {
                     name = name.Substring(0, name.LastIndexOf('('));
+                    name = name.Trim();
                 }
                 if (name.StartsWith("(") && name.Contains(")"))
                 {
                     name = name.Substring(name.LastIndexOf(')') + 1);
+                    name = name.Trim();
                 }
                 if (name.EndsWith(">") && name.Contains("<"))
                 {
                     name = name.Substring(0, name.LastIndexOf('<'));
+                    name = name.Trim();
                 }
                 if (name.StartsWith("<") && name.Contains(">"))
                 {
                     name = name.Substring(name.LastIndexOf('>') + 1);
+                    name = name.Trim();
                 }
                 if (name.EndsWith("}") && name.Contains("{"))
                 {
                     name = name.Substring(0, name.LastIndexOf('{'));
+                    name = name.Trim();
                 }
                 if (name.StartsWith("{") && name.Contains("}"))
                 {
                     name = name.Substring(name.LastIndexOf('}') + 1);
+                    name = name.Trim();
                 }
-                for (int i = 0; i < 4; i++)
+                if (name.Count() < 2)
                 {
-                    if (name.Count() > 1 && Char.IsNumber(name[name.Count() - 1]))
+                    return null;
+                }
+
+                // handle letter -> number substitutions
+                String nameWithLetterSubstitutions = "";
+                for (int i = 0; i < name.Count(); i++)
+                {
+                    char ch = name[i];
+                    Boolean changedNumberForLetter = false;
+                    // see if this is a letter -> number subtitution - can only handle one of these
+                    if (i > 0 && i < name.Count() - 1)
                     {
-                        name = name.Substring(0, name.Count() - 1);
+                        if (Char.IsNumber(ch) && Char.IsLetter(name[i - 1]) && Char.IsLetter(name[i + 1]))
+                        {
+                            if (ch == '1')
+                            {
+                                changedNumberForLetter = true;
+                                nameWithLetterSubstitutions = nameWithLetterSubstitutions + 'i';
+                            }
+                            else if (ch == '3')
+                            {
+                                changedNumberForLetter = true;
+                                nameWithLetterSubstitutions = nameWithLetterSubstitutions + 'e';
+                            }
+                            else if (ch == '0')
+                            {
+                                changedNumberForLetter = true;
+                                nameWithLetterSubstitutions = nameWithLetterSubstitutions + 'o';
+                            }
+                        }
                     }
-                    else
+                    if (!changedNumberForLetter)
                     {
-                        break;
+                        nameWithLetterSubstitutions = nameWithLetterSubstitutions + ch;
                     }
+                }
+                name = nameWithLetterSubstitutions;
+
+                // trim numbers off the end
+                while (name.Count() > 2 && char.IsNumber(name[name.Count() - 1]))
+                {
+                    name = name.Substring(0, name.Count() - 1);
+                }
+                if (name.Count() < 2)
+                {
+                    return null;
+                }
+                // trim numbers off the start
+                int index = 0;
+                while (name.Count() > 2 && index < name.Count() - 1 && char.IsNumber(name[index]))
+                {
+                    name = name.Substring(index + 1);
+                }
+                if (name.Count() < 2)
+                {
+                    return null;
                 }
                 Boolean allCharsValid = true;
                 String charsFromName = "";
