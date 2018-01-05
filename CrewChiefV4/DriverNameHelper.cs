@@ -195,7 +195,7 @@ namespace CrewChiefV4
                         if (ch == '1')
                         {
                             changedNumberForLetter = true;
-                            nameWithLetterSubstitutions = nameWithLetterSubstitutions + 'i';
+                            nameWithLetterSubstitutions = nameWithLetterSubstitutions + 'l';
                         }
                         else if (ch == '3')
                         {
