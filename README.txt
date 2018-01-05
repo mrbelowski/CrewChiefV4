@@ -199,7 +199,7 @@ One final point. If the app says "Jim is faster than you", let him through :)
 
 Changelog
 ---------
-Version 4.9.0.2: Fixed some issues in pCARS 2 session end detection and pre-start message triggering; disable pcars2 spotter in pits
+Version 4.9.0.2: Fixed some issues in pCARS 2 session end detection and pre-start message triggering; disable pcars2 spotter in pits; some minor performance improvements
 
 Version 4.9.0.1: Hotfix to prevent some stock car rules messages triggering when they shouldn't; don't read lap times or gaps if we're under full course yellow; added possible track cut warning for pCars2
 
