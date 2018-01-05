@@ -463,7 +463,7 @@ namespace CrewChiefV4.Events
                     }
                     else if (CrewChief.gameDefinition.gameEnum == GameEnum.PCARS2)
                     {
-                        preLightsMessageCount = 10;
+                        preLightsMessageCount = 2 + Utilities.random.Next(6);
                     }
                     if (!playedPreLightsMessage && currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.SessionPhase == SessionPhase.Gridwalk &&
                         (playPreLightsInRaceroom || CrewChief.gameDefinition.gameEnum != GameEnum.RACE_ROOM))
