@@ -687,14 +687,13 @@ namespace CrewChiefV4.Events
             }
 
             // only do tyre wear stuff if tyre wear is active
+            currentTyreConditionStatus = currentGameState.TyreData.TyreConditionStatus;
             if (currentGameState.TyreData.TyreWearActive)
             {
                 leftFrontWearPercent = currentGameState.TyreData.FrontLeftPercentWear;
                 leftRearWearPercent = currentGameState.TyreData.RearLeftPercentWear;
                 rightFrontWearPercent = currentGameState.TyreData.FrontRightPercentWear;
                 rightRearWearPercent = currentGameState.TyreData.RearRightPercentWear;
-
-                currentTyreConditionStatus = currentGameState.TyreData.TyreConditionStatus;
                 
                 if (currentGameState.PitData.InPitlane && !currentGameState.SessionData.LeaderHasFinishedRace)
                 {
