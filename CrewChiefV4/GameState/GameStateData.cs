@@ -1837,7 +1837,22 @@ namespace CrewChiefV4.GameState
             this.lapsCompleted = lapsCompleted;
             this.totalDistanceTravelled = (lapsCompleted * this.trackLength) + distanceRoundTrackOnCurrentLap;
 
-            nextDeltaPoint = deltaPoints.FirstOrDefault(d => d.Key >= distanceRoundTrackOnCurrentLap).Key;
+            // JB: this lamba expression is significantly slower than the expanded equivalent below:
+            //
+            // nextDeltaPoint = deltaPoints.FirstOrDefault(d => d.Key >= distanceRoundTrackOnCurrentLap).Key;
+
+            // expanded equivalent:
+            float deltaPoint = 0;
+            foreach (float key in deltaPoints.Keys)
+            {
+                if (key >= distanceRoundTrackOnCurrentLap)
+                {
+                    deltaPoint = key;
+                    break;
+                }
+            }
+            this.nextDeltaPoint = deltaPoint;
+            //
 
             if (currentDeltaPoint != nextDeltaPoint || speed < 5)
             {
