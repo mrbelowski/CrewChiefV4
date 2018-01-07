@@ -161,11 +161,11 @@ namespace CrewChiefV4.Events
             } 
             else if (frequencyOfRaceSectorDeltaReports > 5)
             {
-                maxQueueLengthForRaceSectorDeltaReports = 5;
+                maxQueueLengthForRaceSectorDeltaReports = 4;
             }
             else
             {
-                maxQueueLengthForRaceSectorDeltaReports = 4;
+                maxQueueLengthForRaceSectorDeltaReports = 3;
             }
             if (frequencyOfPlayerRaceLapTimeReports > 7)
             {
@@ -1273,7 +1273,7 @@ namespace CrewChiefV4.Events
                     {
                         messageFragments.Add(MessageFragment.Text(folderSector1and2TwoTenthsOffThePace));
                     }
-                    else if (nearlyEqual(delta1,  1f))
+                    else if (nearlyEqual(delta1, 1f))
                     {
                         messageFragments.Add(MessageFragment.Text(folderSector1and2ASecondOffThePace));
                     }
@@ -1435,25 +1435,30 @@ namespace CrewChiefV4.Events
 
         public static Boolean nearlyEqual(float a, float b)
         {
-            return nearlyEqual(a, b, 0.01f);
-        }
-
-        public static Boolean nearlyEqual(float a, float b, float epsilon) {
             if (a == b)
             {
                 return true;
             }
+            // calculate a suitable epsilon
             float absA = Math.Abs(a);
             float absB = Math.Abs(b);
-            float diff = Math.Abs(a - b);
-
-            if (a == 0 || b == 0 || diff < float.Epsilon) {
-                // a or b is zero or both are extremely close to it
-                // relative error is less meaningful here
-                return diff < (epsilon * float.Epsilon);
-            } else { // use relative error
-                return diff / (absA + absB) < epsilon;
+            float min = Math.Min(a, b);
+            float epsilon;
+            if (min <= 0.1f)
+            {
+                epsilon = 0.04f;
             }
+            else if (min <= 0.5f)
+            {
+                epsilon = 0.1f;
+            }
+            else
+            {
+                epsilon = 0.15f;
+            }
+            
+            float diff = Math.Abs(absA - absB);
+            return diff < epsilon;
         }
     }
 }
