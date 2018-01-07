@@ -561,7 +561,6 @@ namespace CrewChiefV4.GameState
                 {
                     lapData.IsValid = false;
                 }
-                
             }
         }
 
@@ -927,7 +926,7 @@ namespace CrewChiefV4.GameState
         {
             if (OpponentLapData.Count > 0)
             {                
-                LapData lapData = OpponentLapData[OpponentLapData.Count - 1];
+                LapData lapData = OpponentLapData[OpponentLapData.Count - 1]; 
                 if (OpponentLapData.Count == 1 || !lapData.hasMissingSectors) 
                 {
                     AddCumulativeSectorData(numberOfSectors, position, providedLapTime, gameTimeAtLapEnd, lapData.IsValid, isRaining, trackTemp, airTemp);
