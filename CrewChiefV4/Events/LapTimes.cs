@@ -1159,7 +1159,7 @@ namespace CrewChiefV4.Events
             }
             if (messages.Count > 0)
             {
-                Console.WriteLine("sector = " + sector + " playerTime = " + playerTime + " comparisonTime = " + comparisonTime);
+                Console.WriteLine("sector = " + sector + " delta (-ve = player faster) = " + (playerTime - comparisonTime));
                 Console.WriteLine("resolved delta message: " + String.Join(", ", messages));
             }
             return messages;
@@ -1422,9 +1422,9 @@ namespace CrewChiefV4.Events
             }
             if (messageFragments.Count > 0)
             {
-                Console.WriteLine("playerS1 = " + playerSector1 + " comparisonS1 = " + comparisonSector1 +
-                    " playerS2 = " + playerSector2 + " comparisonS2 = " + comparisonSector2 +
-                    " playerS3 = " + playerSector3 + " comparisonS3 = " + comparisonSector3);
+                Console.WriteLine("s1 delta (-ve = player faster) = " + (playerSector1 - comparisonSector1) +
+                    " s2 delta  = " + (playerSector2 - comparisonSector2) +
+                    " s3 delta  = " + (playerSector3 - comparisonSector3));
                 Console.WriteLine("resolved delta message: " + String.Join(", ", messageFragments));
             }
             return messageFragments;
