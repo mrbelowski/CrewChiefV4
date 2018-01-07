@@ -199,6 +199,8 @@ One final point. If the app says "Jim is faster than you", let him through :)
 
 Changelog
 ---------
+Version 4.9.0.3: Don't make Assetto Corsa spotter calls when viewing replays; reworked some of the sector gap logic; derive opponent laptimes and sector 3 times in Raceroom instead of using data provided by the game - this introduces some small (up to 0.1 second) inaccuracies in opponent times, but the data provided by the game is very unreliable; reduce frequency of repeated "the next car is..." messages
+
 Version 4.9.0.2: Fixed some issues in pCARS 2 session end detection and pre-start message triggering; disable pcars2 spotter in pits; some minor performance improvements
 
 Version 4.9.0.1: Hotfix to prevent some stock car rules messages triggering when they shouldn't; don't read lap times or gaps if we're under full course yellow; added possible track cut warning for pCars2
