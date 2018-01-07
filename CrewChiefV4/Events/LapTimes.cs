@@ -1157,6 +1157,11 @@ namespace CrewChiefV4.Events
                     messages.Add(MessageFragment.Text(folderOffThePace));
                 }
             }
+            if (messages.Count > 0)
+            {
+                Console.WriteLine("sector = " + sector + " playerTime = " + playerTime + " comparisonTime = " + comparisonTime);
+                Console.WriteLine("resolved delta message: " + String.Join(", ", messages));
+            }
             return messages;
         }
         
@@ -1234,7 +1239,7 @@ namespace CrewChiefV4.Events
                     reportedDelta1 = true;
                     reportedDelta2 = true;
                     reportedDelta3 = true;
-                    if (delta1 < 0.04)
+                    if (delta1 < 0.05)
                     {
                         messageFragments.Add(MessageFragment.Text(folderAllSectorsFast));
                     }
@@ -1415,6 +1420,13 @@ namespace CrewChiefV4.Events
                     messageFragments.Add(MessageFragment.Text(folderOffThePace));
                 }
             }
+            if (messageFragments.Count > 0)
+            {
+                Console.WriteLine("playerS1 = " + playerSector1 + " comparisonS1 = " + comparisonSector1 +
+                    " playerS2 = " + playerSector2 + " comparisonS2 = " + comparisonSector2 +
+                    " playerS3 = " + playerSector3 + " comparisonS3 = " + comparisonSector3);
+                Console.WriteLine("resolved delta message: " + String.Join(", ", messageFragments));
+            }
             return messageFragments;
         }
 
@@ -1442,13 +1454,13 @@ namespace CrewChiefV4.Events
             // calculate a suitable epsilon
             float absA = Math.Abs(a);
             float absB = Math.Abs(b);
-            float min = Math.Min(a, b);
+            float diff = Math.Abs(absA - absB);
             float epsilon;
-            if (min <= 0.1f)
+            if (diff <= 0.1f)
             {
                 epsilon = 0.04f;
             }
-            else if (min <= 0.5f)
+            else if (diff <= 0.5f)
             {
                 epsilon = 0.1f;
             }
@@ -1457,7 +1469,6 @@ namespace CrewChiefV4.Events
                 epsilon = 0.15f;
             }
             
-            float diff = Math.Abs(absA - absB);
             return diff < epsilon;
         }
     }
