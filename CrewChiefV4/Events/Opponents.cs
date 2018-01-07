@@ -333,7 +333,7 @@ namespace CrewChiefV4.Events
                         String opponentName = opponentData.DriverRawName;
                         if (opponentData != null && !opponentData.isEnteringPits() && !opponentData.InPits &&
                             opponentData.CanUseName && AudioPlayer.canReadName(opponentName) &&
-                            (!onlyAnnounceOpponentAfter.ContainsKey(opponentName) || onlyAnnounceOpponentAfter[opponentName] > currentGameState.Now))
+                            (!onlyAnnounceOpponentAfter.ContainsKey(opponentName) || currentGameState.Now > onlyAnnounceOpponentAfter[opponentName]))
                         {
                             audioPlayer.playMessage(new QueuedMessage("new_car_ahead", MessageContents(folderNextCarIs, opponentData),
                                 Utilities.random.Next(Position.maxSecondsToWaitBeforeReportingPass + 1, Position.maxSecondsToWaitBeforeReportingPass + 3), this,
