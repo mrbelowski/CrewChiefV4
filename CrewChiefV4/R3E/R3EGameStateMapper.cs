@@ -1714,17 +1714,20 @@ namespace CrewChiefV4.RaceRoom
                 {
                     if (opponentData.OpponentLapData.Count > 0)
                     {
-                        // if the opponent hasn't set a valid time, the game will not update the lastSector3Time, so we check to see if this has changed - 
-                        // if it's identical to the previous time, assume it's invalid
-                        if (opponentData.LastLapTime == completedLapTime)
+                        // the game-provided sector3 times appear to be nonsense in the participant data array, so for sector3 we use
+                        // the built-in timer (based on the GameTime reported by the game). Only do this if we have enough data for the 
+                        // calculation and the reported lap is valid
+                        if (lapIsValid && completedLapTime > 0)
                         {
-                            opponentData.InvalidateCurrentLap();
-                            opponentData.LastLapTime = -1;
+                            LapData lapData = opponentData.getCurrentLapData();
+                            if (lapData != null && lapData.GameTimeAtSectorEnd[1] > 0)
+                            {
+                                float gameTimeAtStartOfS3 = lapData.GameTimeAtSectorEnd[1];
+                                float timedLapTime = lapData.SectorTimes[0] + lapData.SectorTimes[1] + sessionRunningTime - gameTimeAtStartOfS3;
+                                completedLapTime = timedLapTime;
+                            }
                         }
-                        else
-                        {
-                            opponentData.CompleteLapWithProvidedLapTime(racePosition, sessionRunningTime, completedLapTime, false, 20, 20, sessionLengthIsTime, sessionTimeRemaining, 3);
-                        }
+                        opponentData.CompleteLapWithProvidedLapTime(racePosition, sessionRunningTime, completedLapTime, false, 20, 20, sessionLengthIsTime, sessionTimeRemaining, 3);
                     }
                     opponentData.StartNewLap(completedLaps + 1, racePosition, isInPits, sessionRunningTime, false, 20, 20);
                     opponentData.IsNewLap = true;
@@ -1734,7 +1737,7 @@ namespace CrewChiefV4.RaceRoom
                     opponentData.AddCumulativeSectorData(opponentData.CurrentSectorNumber, racePosition, sectorTime, sessionRunningTime, lapIsValid && validSpeed, false, 20, 20);
                     if (sector == 2)
                     {
-                        opponentData.CurrentTyres = mapToTyreType(tire_type_front, tyre_sub_type_front, tire_type_rear, tyre_sub_type_rear, opponentData.CarClass.carClassEnum);
+                        opponentData.CurrentTyres = mapToTyreType(tire_type_front, tyre_sub_type_front, tire_type_rear, tyre_sub_type_rear, opponentData.CarClass.carClassEnum);                        
                     }
                 }
                 opponentData.CurrentSectorNumber = sector;
