@@ -86,7 +86,8 @@ namespace CrewChiefV4.assetto
             AssettoCorsaShared currentState = ((ACSSharedMemoryReader.ACSStructWrapper)currentStateObj).data;
             AssettoCorsaShared lastState = ((ACSSharedMemoryReader.ACSStructWrapper)lastStateObj).data;
 
-            if (!enabled || currentState.acsChief.numVehicles <= 1 || 
+            if (!enabled || currentState.acsChief.numVehicles <= 1 ||
+                currentState.acsGraphic.status == AC_STATUS.AC_REPLAY ||
                 (mapToFloatTime(currentState.acsChief.vehicle[0].currentLapTimeMS) < timeAfterRaceStartToActivate &&
                 currentState.acsChief.vehicle[0].lapCount <= 0))
             { 
