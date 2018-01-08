@@ -2,8 +2,8 @@
 <!-- this is the 'primary' auto update data - the app will check this one first. All downloads from this source
 will be pulled from the thecrewchief.org ftp server. -->
 <item>
-<title>Crew Chief 4.9.0.1, updated 03 January 2018</title>
-<version>4.9.0.1</version>
+<title>Crew Chief 4.9.0.3, updated 08 January 2018</title>
+<version>4.9.0.3</version>
 <!-- indirect link via a download script which tracks the number of downloads (just the number, not IP addresses or anything else) -->
 <url>http://thecrewchief.org/downloads.php</url>
 <changelog>http://thecrewchief.org/downloads/change_log_for_auto_updated.html</changelog>
@@ -18,7 +18,7 @@ will be pulled from the thecrewchief.org ftp server. -->
 <drivernamesversion>100</drivernamesversion>
 <basedrivernamesurl>http://crewchief.isnais.de/base_driver_names.zip</basedrivernamesurl>
 <updatedrivernamesurl>http://crewchief.isnais.de/update_driver_names.zip</updatedrivernamesurl>
-<personalisationsversion>124</personalisationsversion>
+<personalisationsversion>125</personalisationsversion>
 <basepersonalisationsurl>http://crewchief.isnais.de/personalisations.zip</basepersonalisationsurl>
 <updatepersonalisationsurl>http://crewchief.isnais.de/update_personalisations.zip</updatepersonalisationsurl>
 <update2personalisationsurl>http://crewchief.isnais.de/update_2_personalisations.zip</update2personalisationsurl>
@@ -31,10 +31,10 @@ will be pulled from the thecrewchief.org ftp server. -->
 	<updatesoundpackurl>http://crewchief.isnais.de/update_sound_pack.zip</updatesoundpackurl>
 	<!-- sound pack update from version 121 upwards will use this update pack -->
 	<update2soundpackurl>http://crewchief.isnais.de/update_2_sound_pack.zip</update2soundpackurl>
-	<drivernamesversion>126</drivernamesversion>
+	<drivernamesversion>127</drivernamesversion>
 	<basedrivernamesurl>http://crewchief.isnais.de/base_driver_names.zip</basedrivernamesurl>
 	<updatedrivernamesurl>http://crewchief.isnais.de/update_driver_names.zip</updatedrivernamesurl>
-	<personalisationsversion>124</personalisationsversion>
+	<personalisationsversion>125</personalisationsversion>
 	<basepersonalisationsurl>http://crewchief.isnais.de/personalisations.zip</basepersonalisationsurl>
 	<updatepersonalisationsurl>http://crewchief.isnais.de/update_personalisations.zip</updatepersonalisationsurl>
 	<update2personalisationsurl>http://crewchief.isnais.de/update_2_personalisations.zip</update2personalisationsurl>

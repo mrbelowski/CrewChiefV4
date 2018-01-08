@@ -369,6 +369,7 @@ namespace CrewChiefV4.Events
                 if (GameStateData.onManualFormationLap) 
                 {
                     if (!playedPreLightsRollingStartWarning &&
+                        !currentGameState.PitData.InPitlane &&
                         currentGameState.SessionData.SessionType == SessionType.Race && 
                         (currentGameState.SessionData.SessionPhase == SessionPhase.Countdown ||
                          currentGameState.SessionData.SessionPhase == SessionPhase.Formation ||
@@ -380,6 +381,7 @@ namespace CrewChiefV4.Events
 
                     // when the lights change to green, give some info:
                     if (!playedManualStartInitialMessage && previousGameState != null &&
+                        !currentGameState.PitData.InPitlane &&
                         currentGameState.SessionData.SessionType == SessionType.Race &&
                         currentGameState.SessionData.SessionPhase == SessionPhase.Green &&
                         (previousGameState.SessionData.SessionPhase == SessionPhase.Formation ||
@@ -389,7 +391,7 @@ namespace CrewChiefV4.Events
                     }
                     // don't bother with any other messages until things have had a few seconds to settle down:
                     else if (currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.SessionRunningTime > 10
-                        && currentGameState.SessionData.SessionPhase == SessionPhase.Green)
+                        && currentGameState.SessionData.SessionPhase == SessionPhase.Green && !currentGameState.PitData.InPitlane)
                     {
                         checkForIllegalPassesOnFormationLap(currentGameState);
                         checkForManualFormationRaceStart(currentGameState, currentGameState.SessionData.Position == 1);
@@ -461,7 +463,7 @@ namespace CrewChiefV4.Events
                     }
                     else if (CrewChief.gameDefinition.gameEnum == GameEnum.PCARS2)
                     {
-                        preLightsMessageCount = 10;
+                        preLightsMessageCount = 2 + Utilities.random.Next(6);
                     }
                     if (!playedPreLightsMessage && currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.SessionPhase == SessionPhase.Gridwalk &&
                         (playPreLightsInRaceroom || CrewChief.gameDefinition.gameEnum != GameEnum.RACE_ROOM))
@@ -895,16 +897,15 @@ namespace CrewChiefV4.Events
             {
                 if (manualFormationGoWhenLeaderCrossesLine)
                 {
-                    // here we're only interested in what the leader is up to
-                    OpponentData leader = currentGameState.getOpponentAtPosition(1, false);
-                    if (leader != null)
+                    // here we're only interested in what the pole sitter is up to
+                    if (poleSitter != null)
                     {
-                        if (!playedManualStartGetReady && leader.CurrentSectorNumber == 3 &&
-                            leader.DistanceRoundTrack > currentGameState.SessionData.TrackDefinition.trackLength - 200)
+                        if (!playedManualStartGetReady && poleSitter.CurrentSectorNumber == 3 &&
+                            poleSitter.DistanceRoundTrack > currentGameState.SessionData.TrackDefinition.trackLength - 200)
                         {
                             playManualStartGetReady();
                         }
-                        else if (leader.CompletedLaps == 1)
+                        else if (poleSitter.CompletedLaps == 1)
                         {
                             playManualStartGreenFlag();
                         }
@@ -925,8 +926,7 @@ namespace CrewChiefV4.Events
                     else if (currentGameState.SessionData.Position > 3)
                     {
                         // don't say "leader has crossed the line" if we're right behind him - this would delay the 'go go go' call
-                        OpponentData leader = currentGameState.getOpponentAtPosition(1, false);
-                        if (leader != null && !playedManualStartLeaderHasCrossedLine && leader.CompletedLaps == 1)
+                        if (poleSitter != null && !playedManualStartLeaderHasCrossedLine && poleSitter.CompletedLaps == 1)
                         {
                             playedManualStartLeaderHasCrossedLine = true;
                             audioPlayer.playMessageImmediately(new QueuedMessage(folderLeaderHasCrossedStartLine, 0, this));

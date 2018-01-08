@@ -919,7 +919,8 @@ namespace CrewChiefV4.RaceRoom
                                     participantStruct.TireTypeRear, participantStruct.TireSubTypeRear,
                                     currentGameState.SessionData.SessionHasFixedTime, currentGameState.SessionData.SessionTimeRemaining,
                                     currentGameState.SessionData.SessionType == SessionType.Race,
-                                    currentGameState.SessionData.TrackDefinition.distanceForNearPitEntryChecks);
+                                    currentGameState.SessionData.TrackDefinition.distanceForNearPitEntryChecks,
+                                    participantStruct.LapTimeCurrentSelf);
 
                             currentOpponentData.DeltaTime.SetNextDeltaPoint(currentOpponentLapDistance, currentOpponentData.CompletedLaps, currentOpponentData.Speed, currentGameState.Now);
 
@@ -985,7 +986,7 @@ namespace CrewChiefV4.RaceRoom
                                 {
                                     currentGameState.SessionData.Flag = FlagEnum.BLUE;
                                 }
-                            }
+                            }                            
                         }
                     }
                     else
@@ -1655,7 +1656,8 @@ namespace CrewChiefV4.RaceRoom
         private void upateOpponentData(OpponentData opponentData, int racePosition, int unfilteredRacePosition, int completedLaps, int sector, float sectorTime, 
             float completedLapTime, Boolean isInPits, Boolean lapIsValid, float sessionRunningTime, float secondsSinceLastUpdate, float[] currentWorldPosition,
             float[] previousWorldPosition, float distanceRoundTrack, int tire_type_front, int tyre_sub_type_front, int tire_type_rear, int tyre_sub_type_rear,  
-            Boolean sessionLengthIsTime, float sessionTimeRemaining, Boolean isRace, float nearPitEntryPointDistance)
+            Boolean sessionLengthIsTime, float sessionTimeRemaining, Boolean isRace, float nearPitEntryPointDistance,
+            /* currentLapTime is used only to correct the game time at lap start */float currentLapTime)
         {
             float previousDistanceRoundTrack = opponentData.DistanceRoundTrack;
             opponentData.DistanceRoundTrack = distanceRoundTrack;
@@ -1669,6 +1671,10 @@ namespace CrewChiefV4.RaceRoom
                 opponentData.Speed = 0;
             }
             opponentData.Speed = speed;
+
+            // the valid flag should actually be a combination of these 3 things:
+            lapIsValid = lapIsValid && validSpeed && currentLapTime > -1;
+
             if (opponentData.Position != racePosition) 
             {
                 opponentData.SessionTimeAtLastPositionChange = sessionRunningTime;
@@ -1703,38 +1709,43 @@ namespace CrewChiefV4.RaceRoom
                     opponentData.hasJustChangedToDifferentTyreType = true;
                 }
             }
-            if (opponentData.CurrentSectorNumber == 3 && sector == 3 && (!lapIsValid || !validSpeed))
+
+            // special case for S3 - invalidate immediately because we won't get a chance to invalidate once the lap is finished
+            LapData currentLapData = opponentData.getCurrentLapData();
+            if (opponentData.CurrentSectorNumber == 3 && sector == 3 && currentLapData != null && currentLapData.IsValid && !lapIsValid)
             {
-                // special case for s3 - need to invalidate lap immediately
                 opponentData.InvalidateCurrentLap();
             }
             if (opponentData.CurrentSectorNumber != sector)
             {
                 if (opponentData.CurrentSectorNumber == 3 && sector == 1)
                 {
+                    // correct the game time at lap start - if we're 0.1 into the current lap, the game time when we started
+                    // this lap is sessionRunningTime - 0.1
+                    if (currentLapTime > 0)
+                    {
+                        sessionRunningTime = sessionRunningTime - currentLapTime;
+                    }
                     if (opponentData.OpponentLapData.Count > 0)
                     {
-                        // if the opponent hasn't set a valid time, the game will not update the lastSector3Time, so we check to see if this has changed - 
-                        // if it's identical to the previous time, assume it's invalid
-                        if (opponentData.LastLapTime == completedLapTime)
+                        // the game-provided sector3 times appear to be nonsense in the participant data array, so for sector3 we use
+                        // the built-in timer (based on the GameTime reported by the game).
+                        if (currentLapData.GameTimeAtLapStart > 0)
                         {
-                            opponentData.InvalidateCurrentLap();
-                            opponentData.LastLapTime = -1;
+                            completedLapTime = sessionRunningTime - currentLapData.GameTimeAtLapStart;
                         }
-                        else
-                        {
-                            opponentData.CompleteLapWithProvidedLapTime(racePosition, sessionRunningTime, completedLapTime, false, 20, 20, sessionLengthIsTime, sessionTimeRemaining, 3);
-                        }
+                        opponentData.CompleteLapWithProvidedLapTime(racePosition, sessionRunningTime, currentLapData.IsValid ? completedLapTime : -1, 
+                            false, 20, 20, sessionLengthIsTime, sessionTimeRemaining, 3);
                     }
                     opponentData.StartNewLap(completedLaps + 1, racePosition, isInPits, sessionRunningTime, false, 20, 20);
                     opponentData.IsNewLap = true;
                 }
                 else if (opponentData.CurrentSectorNumber == 1 && sector == 2 || opponentData.CurrentSectorNumber == 2 && sector == 3)
                 {
-                    opponentData.AddCumulativeSectorData(opponentData.CurrentSectorNumber, racePosition, sectorTime, sessionRunningTime, lapIsValid && validSpeed, false, 20, 20);
+                    opponentData.AddCumulativeSectorData(opponentData.CurrentSectorNumber, racePosition, sectorTime, sessionRunningTime, lapIsValid, false, 20, 20);
                     if (sector == 2)
                     {
-                        opponentData.CurrentTyres = mapToTyreType(tire_type_front, tyre_sub_type_front, tire_type_rear, tyre_sub_type_rear, opponentData.CarClass.carClassEnum);
+                        opponentData.CurrentTyres = mapToTyreType(tire_type_front, tyre_sub_type_front, tire_type_rear, tyre_sub_type_rear, opponentData.CarClass.carClassEnum);                        
                     }
                 }
                 opponentData.CurrentSectorNumber = sector;

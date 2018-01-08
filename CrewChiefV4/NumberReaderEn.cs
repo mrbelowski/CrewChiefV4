@@ -18,11 +18,11 @@ namespace CrewChiefV4.NumberProcessing
      */
     public class NumberReaderEn : NumberReader
     {
-        private Boolean prefix_hundred_and_thousand_with_one = Boolean.Parse(Configuration.getSoundConfigOption("prefix_hundred_and_thousand_with_one"));
-        private Boolean say_and_between_hundred_and_units = Boolean.Parse(Configuration.getSoundConfigOption("say_and_between_hundred_and_units"));
-        private Boolean say_and_between_thousand_and_units = Boolean.Parse(Configuration.getSoundConfigOption("say_and_between_thousand_and_units"));
-        private Boolean global_allow_short_hundreds = Boolean.Parse(Configuration.getSoundConfigOption("allow_short_hundreds"));   // allow "one oh four", instead of "one hundred and four"
-        private Boolean always_use_thousands = Boolean.Parse(Configuration.getSoundConfigOption("always_use_thousands"));   // don't allow "thirteen hundred" etc
+        private static Boolean prefix_hundred_and_thousand_with_one = true;
+        private static Boolean say_and_between_hundred_and_units = true;
+        private static Boolean say_and_between_thousand_and_units = true;
+        private static Boolean global_allow_short_hundreds = true;   // allow "one oh four", instead of "one hundred and four"
+        private static Boolean always_use_thousands = false;   // don't allow "thirteen hundred" etc
 
         // this folder contains lots of subfolders, one for each number from 0 to 99, so we can add a folder to the 
         // list to play called "numbers/[number]" - i.e. numbers/45 or numbers/1. This is used a lot in the implementations below.
@@ -40,6 +40,22 @@ namespace CrewChiefV4.NumberProcessing
         private static String folderHours = "numbers/hours";
         private static String folderHour = "numbers/hour";
         private static String folderMinus = "numbers/minus";
+
+        static NumberReaderEn()
+        {
+            try
+            {
+                prefix_hundred_and_thousand_with_one = Boolean.Parse(Configuration.getSoundConfigOption("prefix_hundred_and_thousand_with_one"));
+                say_and_between_hundred_and_units = Boolean.Parse(Configuration.getSoundConfigOption("say_and_between_hundred_and_units"));
+                say_and_between_thousand_and_units = Boolean.Parse(Configuration.getSoundConfigOption("say_and_between_thousand_and_units"));
+                global_allow_short_hundreds = Boolean.Parse(Configuration.getSoundConfigOption("allow_short_hundreds"));   // allow "one oh four", instead of "one hundred and four"
+                always_use_thousands = Boolean.Parse(Configuration.getSoundConfigOption("always_use_thousands"));   // don't allow "thirteen hundred" etc
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("Unable to load number reader config");
+            }
+        }
 
         protected override String getLocale()
         {
