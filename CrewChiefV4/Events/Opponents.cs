@@ -74,6 +74,7 @@ namespace CrewChiefV4.Events
         // this prevents us from bouncing between 'next car is...' messages:
         private Dictionary<string, DateTime> onlyAnnounceOpponentAfter = new Dictionary<string, DateTime>();
         private TimeSpan waitBeforeAnnouncingSameOpponentAhead = TimeSpan.FromMinutes(3);
+        private String lastNextCarAheadOpponentName = null;
 
         public Opponents(AudioPlayer audioPlayer)
         {
@@ -94,6 +95,7 @@ namespace CrewChiefV4.Events
             nextCarAheadChangeMessage = DateTime.MinValue;
             announcedRetirementsAndDQs.Clear();
             onlyAnnounceOpponentAfter.Clear();
+            lastNextCarAheadOpponentName = null;
         }
 
         public override bool isMessageStillValid(string eventSubType, GameStateData currentGameState, Dictionary<String, Object> validationData)
@@ -330,16 +332,21 @@ namespace CrewChiefV4.Events
                         && currentGameState.SessionData.CompletedLaps > 0)
                     {
                         OpponentData opponentData = currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position - 1, false);
-                        if (opponentData != null && !opponentData.isEnteringPits() && !opponentData.InPits &&
-                            opponentData.CanUseName && AudioPlayer.canReadName(opponentData.DriverRawName) &&
-                            (!onlyAnnounceOpponentAfter.ContainsKey(opponentData.DriverRawName) || currentGameState.Now > onlyAnnounceOpponentAfter[opponentData.DriverRawName]))
+                        if (opponentData != null)
                         {
-                            Console.WriteLine("new car ahead: " + opponentData.DriverRawName);
-                            audioPlayer.playMessage(new QueuedMessage("new_car_ahead", MessageContents(folderNextCarIs, opponentData),
-                                Utilities.random.Next(Position.maxSecondsToWaitBeforeReportingPass + 1, Position.maxSecondsToWaitBeforeReportingPass + 3), this,
-                                new Dictionary<string, object> { { validationDriverAheadKey, opponentData.DriverRawName } }));
-                            nextCarAheadChangeMessage = currentGameState.Now.Add(TimeSpan.FromSeconds(30));
-                            onlyAnnounceOpponentAfter[opponentData.DriverRawName] = currentGameState.Now.Add(waitBeforeAnnouncingSameOpponentAhead);
+                            String opponentName = opponentData.DriverRawName;
+                            if (!opponentData.isEnteringPits() && !opponentData.InPits && (lastNextCarAheadOpponentName == null || !lastNextCarAheadOpponentName.Equals(opponentName)) &&
+                                opponentData.CanUseName && AudioPlayer.canReadName(opponentName) &&
+                                (!onlyAnnounceOpponentAfter.ContainsKey(opponentName) || currentGameState.Now > onlyAnnounceOpponentAfter[opponentName]))
+                            {
+                                Console.WriteLine("new car ahead: " + opponentName);
+                                audioPlayer.playMessage(new QueuedMessage("new_car_ahead", MessageContents(folderNextCarIs, opponentData),
+                                    Utilities.random.Next(Position.maxSecondsToWaitBeforeReportingPass + 1, Position.maxSecondsToWaitBeforeReportingPass + 3), this,
+                                    new Dictionary<string, object> { { validationDriverAheadKey, opponentData.DriverRawName } }));
+                                nextCarAheadChangeMessage = currentGameState.Now.Add(TimeSpan.FromSeconds(30));
+                                onlyAnnounceOpponentAfter[opponentName] = currentGameState.Now.Add(waitBeforeAnnouncingSameOpponentAhead);
+                                lastNextCarAheadOpponentName = opponentName;
+                            }
                         }
                     }
                 }
