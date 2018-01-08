@@ -330,17 +330,16 @@ namespace CrewChiefV4.Events
                         && currentGameState.SessionData.CompletedLaps > 0)
                     {
                         OpponentData opponentData = currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position - 1, false);
-                        String opponentName = opponentData.DriverRawName;
                         if (opponentData != null && !opponentData.isEnteringPits() && !opponentData.InPits &&
-                            opponentData.CanUseName && AudioPlayer.canReadName(opponentName) &&
-                            (!onlyAnnounceOpponentAfter.ContainsKey(opponentName) || currentGameState.Now > onlyAnnounceOpponentAfter[opponentName]))
+                            opponentData.CanUseName && AudioPlayer.canReadName(opponentData.DriverRawName) &&
+                            (!onlyAnnounceOpponentAfter.ContainsKey(opponentData.DriverRawName) || currentGameState.Now > onlyAnnounceOpponentAfter[opponentData.DriverRawName]))
                         {
-                            Console.WriteLine("new car ahead: " + opponentName);
+                            Console.WriteLine("new car ahead: " + opponentData.DriverRawName);
                             audioPlayer.playMessage(new QueuedMessage("new_car_ahead", MessageContents(folderNextCarIs, opponentData),
                                 Utilities.random.Next(Position.maxSecondsToWaitBeforeReportingPass + 1, Position.maxSecondsToWaitBeforeReportingPass + 3), this,
                                 new Dictionary<string, object> { { validationDriverAheadKey, opponentData.DriverRawName } }));
                             nextCarAheadChangeMessage = currentGameState.Now.Add(TimeSpan.FromSeconds(30));
-                            onlyAnnounceOpponentAfter[opponentName] = currentGameState.Now.Add(waitBeforeAnnouncingSameOpponentAhead);
+                            onlyAnnounceOpponentAfter[opponentData.DriverRawName] = currentGameState.Now.Add(waitBeforeAnnouncingSameOpponentAhead);
                         }
                     }
                 }
