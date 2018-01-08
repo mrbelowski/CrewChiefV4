@@ -717,7 +717,7 @@ namespace CrewChiefV4
                             }
                             catch (GameDataReadException e)
                             {
-                                Console.WriteLine("Error reading game data ", e.cause.StackTrace);
+                                Console.WriteLine("Error reading game data " + e.cause.StackTrace);
                                 continue;
                             }
                         }
@@ -950,7 +950,7 @@ namespace CrewChiefV4
                 }
                 if (!faultingEvents.ContainsKey(eventName))
                 {
-                    Console.WriteLine("Event " + eventName + " threw exception " + e.Message);
+                    Console.WriteLine("Event " + eventName + " threw exception " + e.Message + " stack " + e.StackTrace);
                     Console.WriteLine("This is the first time this event has failed in this session");
                     faultingEvents.Add(eventName, e.Message);
                     faultingEventsCount.Add(eventName, 1);

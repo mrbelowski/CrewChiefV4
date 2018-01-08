@@ -21,6 +21,11 @@ namespace CrewChiefV4.NumberProcessing
             this.precision = precision;
         }
 
+        public override string ToString()
+        {
+            return this.timeSpan.ToString();
+        }
+
         public Precision getPrecision()
         {
             if (precision == Precision.AUTO_GAPS) 

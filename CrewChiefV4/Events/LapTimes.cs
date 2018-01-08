@@ -161,11 +161,11 @@ namespace CrewChiefV4.Events
             } 
             else if (frequencyOfRaceSectorDeltaReports > 5)
             {
-                maxQueueLengthForRaceSectorDeltaReports = 5;
+                maxQueueLengthForRaceSectorDeltaReports = 4;
             }
             else
             {
-                maxQueueLengthForRaceSectorDeltaReports = 4;
+                maxQueueLengthForRaceSectorDeltaReports = 3;
             }
             if (frequencyOfPlayerRaceLapTimeReports > 7)
             {
@@ -1157,6 +1157,11 @@ namespace CrewChiefV4.Events
                     messages.Add(MessageFragment.Text(folderOffThePace));
                 }
             }
+            if (messages.Count > 0)
+            {
+                Console.WriteLine("sector = " + sector + " delta (-ve = player faster) = " + (playerTime - comparisonTime));
+                Console.WriteLine("resolved delta message: " + String.Join(", ", messages));
+            }
             return messages;
         }
         
@@ -1234,7 +1239,7 @@ namespace CrewChiefV4.Events
                     reportedDelta1 = true;
                     reportedDelta2 = true;
                     reportedDelta3 = true;
-                    if (delta1 < 0.04)
+                    if (delta1 < 0.05)
                     {
                         messageFragments.Add(MessageFragment.Text(folderAllSectorsFast));
                     }
@@ -1273,7 +1278,7 @@ namespace CrewChiefV4.Events
                     {
                         messageFragments.Add(MessageFragment.Text(folderSector1and2TwoTenthsOffThePace));
                     }
-                    else if (nearlyEqual(delta1,  1f))
+                    else if (nearlyEqual(delta1, 1f))
                     {
                         messageFragments.Add(MessageFragment.Text(folderSector1and2ASecondOffThePace));
                     }
@@ -1415,6 +1420,13 @@ namespace CrewChiefV4.Events
                     messageFragments.Add(MessageFragment.Text(folderOffThePace));
                 }
             }
+            if (messageFragments.Count > 0)
+            {
+                Console.WriteLine("s1 delta (-ve = player faster) = " + (playerSector1 - comparisonSector1) +
+                    " s2 delta  = " + (playerSector2 - comparisonSector2) +
+                    " s3 delta  = " + (playerSector3 - comparisonSector3));
+                Console.WriteLine("resolved delta message: " + String.Join(", ", messageFragments));
+            }
             return messageFragments;
         }
 
@@ -1435,25 +1447,29 @@ namespace CrewChiefV4.Events
 
         public static Boolean nearlyEqual(float a, float b)
         {
-            return nearlyEqual(a, b, 0.01f);
-        }
-
-        public static Boolean nearlyEqual(float a, float b, float epsilon) {
             if (a == b)
             {
                 return true;
             }
+            // calculate a suitable epsilon
             float absA = Math.Abs(a);
             float absB = Math.Abs(b);
-            float diff = Math.Abs(a - b);
-
-            if (a == 0 || b == 0 || diff < float.Epsilon) {
-                // a or b is zero or both are extremely close to it
-                // relative error is less meaningful here
-                return diff < (epsilon * float.Epsilon);
-            } else { // use relative error
-                return diff / (absA + absB) < epsilon;
+            float diff = Math.Abs(absA - absB);
+            float epsilon;
+            if (diff <= 0.1f)
+            {
+                epsilon = 0.04f;
             }
+            else if (diff <= 0.5f)
+            {
+                epsilon = 0.1f;
+            }
+            else
+            {
+                epsilon = 0.15f;
+            }
+            
+            return diff < epsilon;
         }
     }
 }

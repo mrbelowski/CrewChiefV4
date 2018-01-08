@@ -68,62 +68,27 @@ namespace CrewChiefV4
             catch (IOException)
             {}
         }
-
+        
         private static String validateAndCleanUpName(String name)
         {
             try
             {
-                name = name.Replace('_', ' ');
-                // be a bit careful with hypens - if it's before the first space, just remove it as
-                // it's a separated firstname
-                if (name.IndexOf(' ') > 0 && name.IndexOf('-') > 0 && name.IndexOf('-') < name.IndexOf(' '))
+                name = replaceObviousChars(name);
+                name = cleanBrackets(name);
+                if (name.Count() < 2)
                 {
-                    name = name.Replace("-", "");
+                    return null;
                 }
-                name = name.Replace('-', ' ');
-                name = name.Replace('.', ' ');
-                if (name.EndsWith("]") && name.Contains("["))
+                name = undoNumberSubstitutions(name);
+                name = trimNumbersOffEnd(name);
+                if (name.Count() < 2)
                 {
-                    name = name.Substring(0, name.LastIndexOf('['));
+                    return null;
                 }
-                if (name.StartsWith("[") && name.Contains("]"))
+                name = trimNumbersOffStart(name);
+                if (name.Count() < 2)
                 {
-                    name = name.Substring(name.LastIndexOf(']') + 1);
-                }
-                if (name.EndsWith(")") && name.Contains("("))
-                {
-                    name = name.Substring(0, name.LastIndexOf('('));
-                }
-                if (name.StartsWith("(") && name.Contains(")"))
-                {
-                    name = name.Substring(name.LastIndexOf(')') + 1);
-                }
-                if (name.EndsWith(">") && name.Contains("<"))
-                {
-                    name = name.Substring(0, name.LastIndexOf('<'));
-                }
-                if (name.StartsWith("<") && name.Contains(">"))
-                {
-                    name = name.Substring(name.LastIndexOf('>') + 1);
-                }
-                if (name.EndsWith("}") && name.Contains("{"))
-                {
-                    name = name.Substring(0, name.LastIndexOf('{'));
-                }
-                if (name.StartsWith("{") && name.Contains("}"))
-                {
-                    name = name.Substring(name.LastIndexOf('}') + 1);
-                }
-                for (int i = 0; i < 4; i++)
-                {
-                    if (name.Count() > 1 && Char.IsNumber(name[name.Count() - 1]))
-                    {
-                        name = name.Substring(0, name.Count() - 1);
-                    }
-                    else
-                    {
-                        break;
-                    }
+                    return null;
                 }
                 Boolean allCharsValid = true;
                 String charsFromName = "";
@@ -154,6 +119,125 @@ namespace CrewChiefV4
             }
             return null;
         }
+        private static String replaceObviousChars(String name)
+        {
+            name = name.Replace('_', ' ');
+            // be a bit careful with hypens - if it's before the first space, just remove it as
+            // it's a separated firstname
+            if (name.IndexOf(' ') > 0 && name.IndexOf('-') > 0 && name.IndexOf('-') < name.IndexOf(' '))
+            {
+                name = name.Replace("-", "");
+            }
+            name = name.Replace('-', ' ');
+            name = name.Replace('.', ' ');
+            name = name.Replace("$", "s");
+            return name.Trim();
+        }
+
+        private static String cleanBrackets(String name)
+        {
+            if (name.EndsWith("]") && name.Contains("["))
+            {
+                name = name.Substring(0, name.IndexOf('['));
+                name = name.Trim();
+            }
+            if (name.StartsWith("[") && name.Contains("]"))
+            {
+                name = name.Substring(name.LastIndexOf(']') + 1);
+                name = name.Trim();
+            }
+            if (name.EndsWith(")") && name.Contains("("))
+            {
+                name = name.Substring(0, name.LastIndexOf('('));
+                name = name.Trim();
+            }
+            if (name.StartsWith("(") && name.Contains(")"))
+            {
+                name = name.Substring(name.LastIndexOf(')') + 1);
+                name = name.Trim();
+            }
+            if (name.EndsWith(">") && name.Contains("<"))
+            {
+                name = name.Substring(0, name.LastIndexOf('<'));
+                name = name.Trim();
+            }
+            if (name.StartsWith("<") && name.Contains(">"))
+            {
+                name = name.Substring(name.LastIndexOf('>') + 1);
+                name = name.Trim();
+            }
+            if (name.EndsWith("}") && name.Contains("{"))
+            {
+                name = name.Substring(0, name.LastIndexOf('{'));
+                name = name.Trim();
+            }
+            if (name.StartsWith("{") && name.Contains("}"))
+            {
+                name = name.Substring(name.LastIndexOf('}') + 1);
+                name = name.Trim();
+            }
+            return name;
+        }
+
+        private static String undoNumberSubstitutions(String name)
+        {
+            // handle letter -> number substitutions
+            String nameWithLetterSubstitutions = "";
+            for (int i = 0; i < name.Count(); i++)
+            {
+                char ch = name[i];
+                Boolean changedNumberForLetter = false;
+                // see if this is a letter -> number subtitution - can only handle one of these
+                if (i > 0 && i < name.Count() - 1)
+                {
+                    if (Char.IsNumber(ch) && Char.IsLetter(name[i - 1]) && Char.IsLetter(name[i + 1]))
+                    {
+                        if (ch == '1')
+                        {
+                            changedNumberForLetter = true;
+                            nameWithLetterSubstitutions = nameWithLetterSubstitutions + 'l';
+                        }
+                        else if (ch == '3')
+                        {
+                            changedNumberForLetter = true;
+                            nameWithLetterSubstitutions = nameWithLetterSubstitutions + 'e';
+                        }
+                        else if (ch == '0')
+                        {
+                            changedNumberForLetter = true;
+                            nameWithLetterSubstitutions = nameWithLetterSubstitutions + 'o';
+                        }
+                    }
+                }
+                if (!changedNumberForLetter)
+                {
+                    nameWithLetterSubstitutions = nameWithLetterSubstitutions + ch;
+                }
+            }
+            return nameWithLetterSubstitutions;
+        }
+
+        private static String trimNumbersOffEnd(String name)
+        {
+            // trim numbers off the end
+            while (name.Count() > 2 && char.IsNumber(name[name.Count() - 1]))
+            {
+                name = name.Substring(0, name.Count() - 1);
+            }
+            return name;
+        }
+
+        private static String trimNumbersOffStart(String name)
+        {
+            int index = 0;
+            while (name.Count() > 2 && index < name.Count() - 1 && char.IsNumber(name[index]))
+            {
+                name = name.Substring(index + 1);
+            }
+            return name;
+        }
+
+
 
         public static String getUsableDriverName(String rawDriverName)
         {

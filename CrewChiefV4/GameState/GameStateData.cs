@@ -561,7 +561,6 @@ namespace CrewChiefV4.GameState
                 {
                     lapData.IsValid = false;
                 }
-                
             }
         }
 
@@ -927,7 +926,7 @@ namespace CrewChiefV4.GameState
         {
             if (OpponentLapData.Count > 0)
             {                
-                LapData lapData = OpponentLapData[OpponentLapData.Count - 1];
+                LapData lapData = OpponentLapData[OpponentLapData.Count - 1]; 
                 if (OpponentLapData.Count == 1 || !lapData.hasMissingSectors) 
                 {
                     AddCumulativeSectorData(numberOfSectors, position, providedLapTime, gameTimeAtLapEnd, lapData.IsValid, isRaining, trackTemp, airTemp);
@@ -1837,7 +1836,22 @@ namespace CrewChiefV4.GameState
             this.lapsCompleted = lapsCompleted;
             this.totalDistanceTravelled = (lapsCompleted * this.trackLength) + distanceRoundTrackOnCurrentLap;
 
-            nextDeltaPoint = deltaPoints.FirstOrDefault(d => d.Key >= distanceRoundTrackOnCurrentLap).Key;
+            // JB: this lambda expression is significantly slower than the expanded equivalent below:
+            //
+            // nextDeltaPoint = deltaPoints.FirstOrDefault(d => d.Key >= distanceRoundTrackOnCurrentLap).Key;
+
+            // expanded equivalent:
+            float deltaPoint = 0;
+            foreach (float key in deltaPoints.Keys)
+            {
+                if (key >= distanceRoundTrackOnCurrentLap)
+                {
+                    deltaPoint = key;
+                    break;
+                }
+            }
+            this.nextDeltaPoint = deltaPoint;
+            //
 
             if (currentDeltaPoint != nextDeltaPoint || speed < 5)
             {

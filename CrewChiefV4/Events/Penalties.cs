@@ -322,7 +322,7 @@ namespace CrewChiefV4.Events
             else if (currentGameState.PenaltiesData.PossibleTrackLimitsViolation && playCutTrackWarnings && !warnedOfPossibleTrackLimitsViolationOnThisLap)
             {
                 warnedOfPossibleTrackLimitsViolationOnThisLap = true;
-                audioPlayer.playMessage(new QueuedMessage(folderPossibleTrackLimitsViolation, 0, this));
+                audioPlayer.playMessage(new QueuedMessage(folderPossibleTrackLimitsViolation, 2 + Utilities.random.Next(3), this));
                 Console.WriteLine("Possible track limit violation at lap distance " + currentGameState.PositionAndMotionData.DistanceRoundTrack);
             }
             else
