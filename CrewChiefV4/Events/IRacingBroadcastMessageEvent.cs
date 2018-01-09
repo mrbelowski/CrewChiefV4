@@ -156,6 +156,27 @@ namespace CrewChiefV4.Events
                     return;
                 }
             }
+            else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.FUEL_TO_THE_END))
+            {
+                Fuel fuelEvent = (Fuel)CrewChief.getEvent("Fuel");
+                int litresNeeded = fuelEvent.getLitresToEndOfRace();
+
+                if (litresNeeded == -1)
+                {
+                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+                }
+                else if (litresNeeded == 0)
+                {
+                    audioPlayer.playMessageImmediately(new QueuedMessage(Fuel.folderPlentyOfFuel, 0, null));
+                }
+                if (litresNeeded > 0)
+                {
+                    AddFuel(litresNeeded);
+                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
+                    return;
+                }
+
+            }
             else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PIT_STOP_TEAROFF))
             {
                 Tearoff();
