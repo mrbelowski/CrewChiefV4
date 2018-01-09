@@ -478,7 +478,7 @@ namespace CrewChiefV4.RaceRoom
             {
                 currentGameState.FlagData.useImprovisedIncidentCalling = false;
             }
-            // TODO: this hack ONLY APPLIES TO THE CURRENT R3E VERSION: the flag rules cover blue and yellow with a single in-game option.
+            // the flag rules cover blue and yellow with a single in-game option.
             // So as soon as we see any yellow flag data we know that the game is also handling blues, so we turn this off too.
             if (!currentGameState.FlagData.useImprovisedIncidentCalling)
             {

@@ -654,7 +654,6 @@ namespace CrewChiefV4.PCars2
                 currentGameState.SessionData.GameTimeAtLastPositionBehindChange = currentGameState.SessionData.SessionRunningTime;
             }
 
-            // TODO: assume non-cumulative sectors....
             currentGameState.SessionData.LapTimeCurrent = shared.mCurrentSector1Times[playerIndex] +
                 shared.mCurrentSector3Times[playerIndex] + shared.mCurrentSector3Times[playerIndex];
             currentGameState.SessionData.TimeDeltaBehind = shared.mSplitTimeBehind;
