@@ -556,6 +556,7 @@ namespace CrewChiefV4
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
             base.OnFormClosing(e);
+            MacroManager.stop();
             lock (cw)
             {
                 cw.textbox = null;
