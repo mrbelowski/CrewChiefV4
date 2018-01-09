@@ -87,7 +87,11 @@ namespace CrewChiefV4.commands
         {
             if (keyBeingPressed != null)
             {
-                release(keyBeingPressed.Item1, keyBeingPressed.Item2);
+                try
+                {
+                    release(keyBeingPressed.Item1, keyBeingPressed.Item2);
+                }
+                catch (Exception) { /*swallow*/ }
             }
         }
         
