@@ -73,8 +73,7 @@ namespace CrewChiefV4.commands
         }
 
         public void execute()
-        {
-           
+        {           
             execute(false);
         }
 
@@ -105,6 +104,10 @@ namespace CrewChiefV4.commands
 
                             foreach (ActionItem actionItem in commandSet.getActionItems(true, assignmentsByGame[commandSet.gameDefinition]))
                             {
+                                if (MacroManager.stopped)
+                                {
+                                    break;
+                                }
                                 if (actionItem.pauseMillis > 0)
                                 {
                                     Thread.Sleep(actionItem.pauseMillis);
@@ -116,9 +119,13 @@ namespace CrewChiefV4.commands
                                         AbstractEvent eventToCall = CrewChief.getEvent(commandSet.resolveMultipleCountWithEvent);
                                         if (eventToCall != null)
                                         {
-                                            int count = eventToCall.resolveMacroKeyPressCount(macro.name, commandSet.gameDefinition);
+                                            int count = eventToCall.resolveMacroKeyPressCount(macro.name);
                                             for (int i = 0; i < count; i++)
                                             {
+                                                if (MacroManager.stopped)
+                                                {
+                                                    break;
+                                                }
                                                 KeyPresser.SendScanCodeKeyPress(actionItem.keyCode, commandSet.keyPressTime);
                                                 Thread.Sleep(commandSet.waitBetweenEachCommand);
                                             }

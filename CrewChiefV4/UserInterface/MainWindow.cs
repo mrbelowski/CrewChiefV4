@@ -1252,6 +1252,7 @@ namespace CrewChiefV4
             }
             else
             {
+                MacroManager.stop();
                 if ((voiceOption == VoiceOptionEnum.ALWAYS_ON || voiceOption == VoiceOptionEnum.TOGGLE) && crewChief.speechRecogniser != null && crewChief.speechRecogniser.initialised)
                 {
                     Console.WriteLine("Stopping listening...");

@@ -485,7 +485,7 @@ namespace CrewChiefV4.Events
                         // If we've not yet played the pre-lights messages, just play one of them here, but not for RaceRoom as the lights will already have started
                         if (!playedPreLightsMessage && CrewChief.gameDefinition.gameEnum != GameEnum.RACE_ROOM)
                         {
-                            playPreLightsMessage(currentGameState, preLightsMessageCount);
+                            playPreLightsMessage(currentGameState, 1);
                             purgePreLightsMessages = false;
                         }
                         if (purgePreLightsMessages)
