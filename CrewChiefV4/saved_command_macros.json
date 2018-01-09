@@ -172,7 +172,7 @@
 		"name": "r3e auto fuel",
 		"description": "this macro requires the pit menu to be in a specific state before it's called - we must have no refuelling selected (i.e. the fuel is not green) and the fuel amount must be one of the built in options (NOT an amount in litres)",
 		"confirmationMessage": "acknowledge/fuel_to_end",
-		"voiceTriggers": [ "fuel to the end" ],
+		"voiceTriggers": [ "fuel to the end", "fuel to the end of the race" ],
 		"buttonTriggers": [],
 		"commandSets": [
 		{

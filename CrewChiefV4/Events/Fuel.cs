@@ -55,7 +55,11 @@ namespace CrewChiefV4.Events
 
         public static String folderLitres = "fuel/litres";
 
+        public static String folderLitre = "fuel/litre";
+
         public static String folderGallons = "fuel/gallons";
+
+        public static String folderGallon = "fuel/gallon";
 
         private float averageUsagePerLap;
 
@@ -657,14 +661,16 @@ namespace CrewChiefV4.Events
                         }
                         else
                         {
-                            messageFragments.Add(MessageFragment.Integer(Convert.ToInt32(wholeandfractional.Item1), false));
-                            messageFragments.Add(MessageFragment.Text(folderGallons));
+                            int usage = Convert.ToInt32(wholeandfractional.Item1);
+                            messageFragments.Add(MessageFragment.Integer(usage, false));
+                            messageFragments.Add(MessageFragment.Text(usage == 1 ? folderGallon : folderGallons));
                         }
                     }
                     else
-                    {                        
-                        messageFragments.Add(MessageFragment.Integer(Convert.ToInt32(totalUsage), false));
-                        messageFragments.Add(MessageFragment.Text(folderLitres));
+                    {
+                        int usage = Convert.ToInt32(totalUsage);
+                        messageFragments.Add(MessageFragment.Integer(usage, false));
+                        messageFragments.Add(MessageFragment.Text(usage == 1 ? folderLitre : folderLitres));
                     }
                     QueuedMessage fuelEstimateMessage = new QueuedMessage("Fuel/estimate", messageFragments, 0, null);
 
@@ -718,14 +724,16 @@ namespace CrewChiefV4.Events
                         }
                         else
                         {
-                            messageFragments.Add(MessageFragment.Integer(Convert.ToInt32(wholeandfractional.Item1), false));
-                            messageFragments.Add(MessageFragment.Text(folderGallons));
+                            int usage = Convert.ToInt32(wholeandfractional.Item1);
+                            messageFragments.Add(MessageFragment.Integer(usage, false));
+                            messageFragments.Add(MessageFragment.Text(usage == 1 ? folderGallon : folderGallons));
                         }
                     }
                     else
-                    {                    
-                        messageFragments.Add(MessageFragment.Integer(Convert.ToInt32(totalUsage), false));
-                        messageFragments.Add(MessageFragment.Text(folderLitres));
+                    {
+                        int usage = Convert.ToInt32(totalUsage);
+                        messageFragments.Add(MessageFragment.Integer(usage, false));
+                        messageFragments.Add(MessageFragment.Text(usage == 1 ? folderLitre : folderLitres));
                     }
 
                     QueuedMessage fuelEstimateMessage = new QueuedMessage("Fuel/estimate",
@@ -925,13 +933,18 @@ namespace CrewChiefV4.Events
             }
             else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOW_MUCH_FUEL_TO_END_OF_RACE))
             {
-                if (!fuelUseActive)
+                int litresNeeded = getLitresToEndOfRace();
+                if (!fuelUseActive || litresNeeded == -1)
+                {
+                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+                } 
+                else if (litresNeeded == 0)
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage(folderPlentyOfFuel, 0, null));
                 }
                 else
                 {
-                    QueuedMessage fuelMessage = new QueuedMessage("fuel_estimate_to_end", MessageContents(getLitresToEndOfRace(), folderLitres), 0, null);
+                    QueuedMessage fuelMessage = new QueuedMessage("fuel_estimate_to_end", MessageContents(litresNeeded, litresNeeded == 1 ? folderLitre : folderLitres), 0, null);
                     if (delayResponses && Utilities.random.Next(10) >= 2 && SoundCache.availableSounds.Contains(AudioPlayer.folderStandBy))
                     {
                         audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderStandBy, 0, null));
@@ -989,33 +1002,39 @@ namespace CrewChiefV4.Events
             }
         }
 
+        // -1 means no data
         private int getLitresToEndOfRace()
         {
-            int litresNeeded = 0;
+            int additionalLitresNeeded = -1;
             if (fuelUseActive)
             {
-                if (sessionHasFixedNumberOfLaps)
+                if (sessionHasFixedNumberOfLaps && averageUsagePerLap > 0)
                 {
-                    litresNeeded = (int)(averageUsagePerLap * lapsRemaining) + 1;
-                    Console.WriteLine("Use per lap = " + averageUsagePerLap + " laps to go = " + lapsRemaining + " litres to end = " + litresNeeded);
+                    float totalLitresNeededToEnd = (averageUsagePerLap * lapsRemaining) + 1f;
+                    additionalLitresNeeded = (int) Math.Max(0, totalLitresNeededToEnd - currentFuel);
+                    Console.WriteLine("Use per lap = " + averageUsagePerLap + " laps to go = " + lapsRemaining + " current fuel = " + 
+                        currentFuel + " additional fuel needed = " + totalLitresNeededToEnd);
                 }
-                else
+                else if (averageUsagePerMinute > 0)
                 {
                     float maxMinutesRemaining = (secondsRemaining + bestLapTime) / 60f;
-                    litresNeeded = (int)Math.Ceiling(averageUsagePerMinute * maxMinutesRemaining) + 1;
-                    Console.WriteLine("Use per minute = " + averageUsagePerMinute + " estimated minutes to go (including final lap) = " + maxMinutesRemaining + " litres to end = " + litresNeeded);
+                    float totalLitresNeededToEnd = (float)Math.Ceiling(averageUsagePerMinute * maxMinutesRemaining) + 1;
+                    additionalLitresNeeded = (int) Math.Max(0, totalLitresNeededToEnd - currentFuel);
+                    Console.WriteLine("Use per minute = " + averageUsagePerMinute + " estimated minutes to go (including final lap) = " + 
+                        maxMinutesRemaining + " current fuel = " + currentFuel + " additional fuel needed = " + totalLitresNeededToEnd);
                 }
             }
-            return litresNeeded;
+            return additionalLitresNeeded;
         }
 
         public override int resolveMacroKeyPressCount(String macroName, String gameName)
         {
             // only used for r3e auto-fuel amount selection at present
-            Console.WriteLine("getting fuel requirement keypress count");int litresNeeded = 0;
+            Console.WriteLine("getting fuel requirement keypress count");
             if (gameName.Equals(GameDefinition.raceRoom.gameEnum.ToString()))
             {
-                return getLitresToEndOfRace();
+                int litresToEnd = getLitresToEndOfRace();
+                return litresToEnd == -1 ? 0 : litresToEnd;
             }
             return 0;
         }
