@@ -1,4 +1,5 @@
 ﻿using CrewChiefV4.Audio;
+using CrewChiefV4.Events;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -12,6 +13,11 @@ namespace CrewChiefV4.commands
     // wrapper that actually runs the macro
     public class ExecutableCommandMacro
     {
+        // a magic string...
+        private static readonly String MULTIPLE_IDENTIFIER = "Multiple";
+
+        private static Object mutex = new Object();
+
         Boolean bringGameWindowToFrontForMacros = UserSettings.GetUserSettings().getBoolean("bring_game_window_to_front_for_macros");
         AudioPlayer audioPlayer;
         Macro macro;
@@ -85,27 +91,51 @@ namespace CrewChiefV4.commands
                     {
                         audioPlayer.playMessageImmediately(new QueuedMessage(macro.confirmationMessage, 0, null));
                     }
+                    else if (commandSet.confirmationMessage != null && commandSet.confirmationMessage.Length > 0 && !supressConfirmationMessage)
+                    {
+                        audioPlayer.playMessageImmediately(new QueuedMessage(commandSet.confirmationMessage, 0, null));
+                    }
                     new Thread(() =>
                     {
-                        IntPtr currentForgroundWindow = GetForegroundWindow();
-                        bool hasChangedForgroundWindow = BringGameWindowToFront(CrewChief.gameDefinition.processName, CrewChief.gameDefinition.alternativeProcessNames, currentForgroundWindow);
+                        // only allow macros to excute one at a time
+                        lock (ExecutableCommandMacro.mutex)
+                        {
+                            IntPtr currentForgroundWindow = GetForegroundWindow();
+                            bool hasChangedForgroundWindow = BringGameWindowToFront(CrewChief.gameDefinition.processName, CrewChief.gameDefinition.alternativeProcessNames, currentForgroundWindow);
 
-                        foreach (ActionItem actionItem in commandSet.getActionItems(true, assignmentsByGame[commandSet.gameDefinition]))
-                        {
-                            if (actionItem.pauseMillis > 0)
+                            foreach (ActionItem actionItem in commandSet.getActionItems(true, assignmentsByGame[commandSet.gameDefinition]))
                             {
-                                Thread.Sleep(actionItem.pauseMillis);
+                                if (actionItem.pauseMillis > 0)
+                                {
+                                    Thread.Sleep(actionItem.pauseMillis);
+                                }
+                                else
+                                {
+                                    if (actionItem.actionText.StartsWith(MULTIPLE_IDENTIFIER))
+                                    {
+                                        AbstractEvent eventToCall = CrewChief.getEvent(commandSet.resolveMultipleCountWithEvent);
+                                        if (eventToCall != null)
+                                        {
+                                            int count = eventToCall.resolveMacroKeyPressCount(macro.name, commandSet.gameDefinition);
+                                            for (int i = 0; i < count; i++)
+                                            {
+                                                KeyPresser.SendScanCodeKeyPress(actionItem.keyCode, commandSet.keyPressTime);
+                                                Thread.Sleep(commandSet.waitBetweenEachCommand);
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        KeyPresser.SendScanCodeKeyPress(actionItem.keyCode, commandSet.keyPressTime);
+                                        Thread.Sleep(commandSet.waitBetweenEachCommand);
+                                    }
+                                }
                             }
-                            else
+                            if (hasChangedForgroundWindow)
                             {
-                                KeyPresser.SendScanCodeKeyPress(actionItem.keyCode, commandSet.keyPressTime);
+                                SetForegroundWindow(currentForgroundWindow);
                             }
-                            Thread.Sleep(commandSet.waitBetweenEachCommand);
                         }
-                        if (hasChangedForgroundWindow)
-                        {
-                            SetForegroundWindow(currentForgroundWindow);
-                        }                        
                     }).Start();                                  
                     break;
                 }
@@ -153,6 +183,8 @@ namespace CrewChiefV4.commands
 		public int keyPressTime { get; set; }
         public int waitBetweenEachCommand { get; set; }
         public Boolean allowAutomaticTriggering { get; set; }
+        public String resolveMultipleCountWithEvent { get; set; }
+        public String confirmationMessage { get; set; }
 
         private List<ActionItem> actionItems = null;
 
