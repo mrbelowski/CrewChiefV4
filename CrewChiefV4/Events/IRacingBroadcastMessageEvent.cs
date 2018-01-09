@@ -169,7 +169,7 @@ namespace CrewChiefV4.Events
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage(Fuel.folderPlentyOfFuel, 0, null));
                 }
-                if (litresNeeded > 0)
+                else if(litresNeeded > 0)
                 {
                     AddFuel(litresNeeded);
                     audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
