@@ -61,6 +61,7 @@ namespace CrewChiefV4
         public static String[] WHAT_ARE_THE_RELATIVE_TYRE_PERFORMANCES = Configuration.getSpeechRecognitionPhrases("WHAT_ARE_THE_RELATIVE_TYRE_PERFORMANCES");
 
 
+        public static String[] HOW_MUCH_FUEL_TO_END_OF_RACE = Configuration.getSpeechRecognitionPhrases("HOW_MUCH_FUEL_TO_END_OF_RACE");
         public static String[] CALCULATE_FUEL_FOR = Configuration.getSpeechRecognitionPhrases("CALCULATE_FUEL_FOR");
         public static String[] LAP = Configuration.getSpeechRecognitionPhrases("LAP");
         public static String[] LAPS = Configuration.getSpeechRecognitionPhrases("LAPS");
@@ -509,6 +510,7 @@ namespace CrewChiefV4
                 validateAndAdd(WHATS_MY_POSITION, staticSpeechChoices);
                 validateAndAdd(WHATS_MY_FUEL_LEVEL, staticSpeechChoices);
                 validateAndAdd(WHATS_MY_FUEL_USAGE, staticSpeechChoices);
+                validateAndAdd(HOW_MUCH_FUEL_TO_END_OF_RACE, staticSpeechChoices);
                 validateAndAdd(WHAT_TYRES_AM_I_ON, staticSpeechChoices);
                 validateAndAdd(WHAT_ARE_THE_RELATIVE_TYRE_PERFORMANCES, staticSpeechChoices);
                 validateAndAdd(PLAY_CORNER_NAMES, staticSpeechChoices);
@@ -1052,7 +1054,8 @@ namespace CrewChiefV4
             else if (ResultContains(recognisedSpeech, WHATS_MY_FUEL_LEVEL)
                 || ResultContains(recognisedSpeech, HOWS_MY_FUEL)
                 || ResultContains(recognisedSpeech, WHATS_MY_FUEL_USAGE)
-                || ResultContains(recognisedSpeech, CALCULATE_FUEL_FOR))
+                || ResultContains(recognisedSpeech, CALCULATE_FUEL_FOR)
+                || ResultContains(recognisedSpeech, HOW_MUCH_FUEL_TO_END_OF_RACE))
             {
                 return CrewChief.getEvent("Fuel");
             }

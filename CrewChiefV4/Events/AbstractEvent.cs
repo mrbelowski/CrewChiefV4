@@ -177,6 +177,12 @@ namespace CrewChiefV4.Events
             // no-op, override in the subclasses
         }
 
+        public virtual int resolveMacroKeyPressCount(String macroName, String gameName)
+        {
+            // only used for r3e auto-fuel amount selection at present
+            return 0;
+        }
+
         // if we've made this request from an explicit voice command ("clarify") and we end up here, it means
         // the event doesn't have a more-information response, so reply "we have no more information".
         public virtual void respondMoreInformation(String voiceMessage, Boolean requestedExplicitly)
