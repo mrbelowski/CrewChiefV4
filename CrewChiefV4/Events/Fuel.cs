@@ -1012,31 +1012,28 @@ namespace CrewChiefV4.Events
                 {
                     float totalLitresNeededToEnd = (averageUsagePerLap * lapsRemaining) + 1f;
                     additionalLitresNeeded = (int) Math.Max(0, totalLitresNeededToEnd - currentFuel);
-                    Console.WriteLine("Use per lap = " + averageUsagePerLap + " laps to go = " + lapsRemaining + " current fuel = " + 
-                        currentFuel + " additional fuel needed = " + totalLitresNeededToEnd);
+                    Console.WriteLine("Use per lap = " + averageUsagePerLap + " laps to go = " + lapsRemaining + " current fuel = " +
+                        currentFuel + " additional fuel needed = " + additionalLitresNeeded);
                 }
                 else if (averageUsagePerMinute > 0)
                 {
                     float maxMinutesRemaining = (secondsRemaining + bestLapTime) / 60f;
                     float totalLitresNeededToEnd = (float)Math.Ceiling(averageUsagePerMinute * maxMinutesRemaining) + 1;
                     additionalLitresNeeded = (int) Math.Max(0, totalLitresNeededToEnd - currentFuel);
-                    Console.WriteLine("Use per minute = " + averageUsagePerMinute + " estimated minutes to go (including final lap) = " + 
-                        maxMinutesRemaining + " current fuel = " + currentFuel + " additional fuel needed = " + totalLitresNeededToEnd);
+                    Console.WriteLine("Use per minute = " + averageUsagePerMinute + " estimated minutes to go (including final lap) = " +
+                        maxMinutesRemaining + " current fuel = " + currentFuel + " additional fuel needed = " + additionalLitresNeeded);
                 }
             }
             return additionalLitresNeeded;
         }
 
-        public override int resolveMacroKeyPressCount(String macroName, String gameName)
+        public override int resolveMacroKeyPressCount(String macroName)
         {
             // only used for r3e auto-fuel amount selection at present
             Console.WriteLine("getting fuel requirement keypress count");
-            if (gameName.Equals(GameDefinition.raceRoom.gameEnum.ToString()))
-            {
-                int litresToEnd = getLitresToEndOfRace();
-                return litresToEnd == -1 ? 0 : litresToEnd;
-            }
-            return 0;
+            int litresToEnd = getLitresToEndOfRace();
+            // don't allow more than 150 key presses here
+            return litresToEnd == -1 ? 0 : litresToEnd > 150 ? 150 : litresToEnd;
         }
 
         private float convertLitersToGallons(float liters, Boolean roundTo1dp = false)

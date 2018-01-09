@@ -10,12 +10,21 @@ namespace CrewChiefV4.commands
 {
     class MacroManager
     {
+        public static Boolean stopped = false;
+
         // make all the macros available so the events can press buttons as they see fit:
         public static Dictionary<string, ExecutableCommandMacro> macros = new Dictionary<string, ExecutableCommandMacro>();
+
+        public static void stop()
+        {
+            stopped = true;
+            KeyPresser.releasePressedKey();
+        }
 
         // This is called immediately after initialising the speech recogniser in MainWindow
         public static void initialise(AudioPlayer audioPlayer, SpeechRecogniser speechRecogniser)
         {
+            stopped = false;
             macros.Clear();
             if (UserSettings.GetUserSettings().getBoolean("enable_command_macros"))
             {

@@ -177,9 +177,9 @@ namespace CrewChiefV4.Events
             // no-op, override in the subclasses
         }
 
-        public virtual int resolveMacroKeyPressCount(String macroName, String gameName)
+        public virtual int resolveMacroKeyPressCount(String macroName)
         {
-            // only used for r3e auto-fuel amount selection at present
+            // only used for auto-fuel amount selection at present
             return 0;
         }
 

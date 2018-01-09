@@ -18,6 +18,8 @@ namespace CrewChiefV4.commands
         const uint KEYEVENTF_UNICODE = 0x0004;
         const uint KEYEVENTF_SCANCODE = 0x0008;
 
+        static Tuple<ushort, Boolean> keyBeingPressed = null;
+
         struct INPUT
         {
             public int type;
@@ -80,6 +82,14 @@ namespace CrewChiefV4.commands
 
         private static KeyCode[] extendedKeys = { KeyCode.UP, KeyCode.DOWN, KeyCode.LEFT, KeyCode.RIGHT, 
                                            KeyCode.INSERT, KeyCode.HOME, KeyCode.PAGE_UP, KeyCode.PAGEDOWN, KeyCode.DELETE, KeyCode.END };
+
+        public static void releasePressedKey()
+        {
+            if (keyBeingPressed != null)
+            {
+                release(keyBeingPressed.Item1, keyBeingPressed.Item2);
+            }
+        }
         
         public static void SendScanCodeKeyPress(KeyCode keyCode, int holdTimeMillis)
         {
@@ -109,7 +119,7 @@ namespace CrewChiefV4.commands
                     }
                 }
             };
-
+            keyBeingPressed = new Tuple<ushort,bool>(scanCode, extended);
             SendInput((uint)inputs.Length, inputs, Marshal.SizeOf(typeof(INPUT)));
         }
 
@@ -134,6 +144,7 @@ namespace CrewChiefV4.commands
                 }
             };
             SendInput((uint)inputs.Length, inputs, Marshal.SizeOf(typeof(INPUT)));
+            keyBeingPressed = null;
         }
 
         public enum KeyCode : ushort
