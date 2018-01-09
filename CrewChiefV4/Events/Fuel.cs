@@ -1003,7 +1003,7 @@ namespace CrewChiefV4.Events
         }
 
         // -1 means no data
-        private int getLitresToEndOfRace()
+        public int getLitresToEndOfRace()
         {
             int additionalLitresNeeded = -1;
             if (fuelUseActive)
