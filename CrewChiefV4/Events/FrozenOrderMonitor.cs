@@ -26,10 +26,12 @@ namespace CrewChiefV4.Events
         // Last FO Action and Driver name announced.
         private FrozenOrderAction currFrozenOrderAction = FrozenOrderAction.None;
         private string currDriverToFollow = null;
+        private FrozenOrderColumn currFrozenOrderColumn = FrozenOrderColumn.None;
 
         // Next FO Action and Driver to be announced if it stays stable for a ACTION_STABLE_THRESHOLD times.
         private FrozenOrderAction newFrozenOrderAction = FrozenOrderAction.None;
         private string newDriverToFollow = null;
+        private FrozenOrderColumn newFrozenOrderColumn = FrozenOrderColumn.None;
 
         private bool formationStandingStartAnnounced = false;
         private bool formationStandingPreStartReminderAnnounced = false;
@@ -134,8 +136,10 @@ namespace CrewChiefV4.Events
             this.numUpdatesActionSame = 0;
             this.newFrozenOrderAction = FrozenOrderAction.None;
             this.newDriverToFollow = null;
+            this.newFrozenOrderColumn = FrozenOrderColumn.None;
             this.currFrozenOrderAction = FrozenOrderAction.None;
             this.currDriverToFollow = null;
+            this.currFrozenOrderColumn = FrozenOrderColumn.None;
         }
 
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
@@ -172,12 +176,14 @@ namespace CrewChiefV4.Events
             // Because FO Action is distance dependent, it tends to fluctuate.
             // We need to detect when it stabilizes (values stay identical for ACTION_STABLE_THRESHOLD times).
             if (cfod.Action == pfod.Action
-                && cfod.DriverToFollowRaw == pfod.DriverToFollowRaw)
+                && cfod.DriverToFollowRaw == pfod.DriverToFollowRaw
+                && cfod.AssignedColumn == pfod.AssignedColumn)
                 ++this.numUpdatesActionSame;
             else
             {
                 this.newFrozenOrderAction = cfod.Action;
                 this.newDriverToFollow = cfod.DriverToFollowRaw;
+                this.newFrozenOrderColumn = cfod.AssignedColumn;
 
                 this.numUpdatesActionSame = 0;
             }
@@ -193,10 +199,12 @@ namespace CrewChiefV4.Events
 
                 if (isActionUpdateStable
                     && (this.currFrozenOrderAction != this.newFrozenOrderAction
-                        || this.currDriverToFollow != this.newDriverToFollow))
+                        || this.currDriverToFollow != this.newDriverToFollow
+                        || this.currFrozenOrderColumn != this.newFrozenOrderColumn))
                 {
                     this.currFrozenOrderAction = this.newFrozenOrderAction;
                     this.currDriverToFollow = this.newDriverToFollow;
+                    this.currFrozenOrderColumn = this.newFrozenOrderColumn;
 
                     var usableDriverNameToFollow = shouldFollowSafetyCar ? driverToFollow : DriverNameHelper.getUsableDriverName(driverToFollow);
 
@@ -213,7 +221,8 @@ namespace CrewChiefV4.Events
                             // Follow messages are only meaningful if there's name to announce.
                             if (cfod.AssignedColumn == FrozenOrderColumn.None
                                 || Utilities.random.Next(1, 11) > 8)  // Randomly, announce message without coulmn info.
-                                audioPlayer.playMessage(new QueuedMessage("frozen_order/follow_driver", MessageContents(folderFollow, usableDriverNameToFollow), Utilities.random.Next(0, 3), this, validationData));
+                                audioPlayer.playMessage(new QueuedMessage(!shouldFollowSafetyCar ? "frozen_order/follow_driver" : "frozen_order/follow_safety_car",
+                                    MessageContents(folderFollow, usableDriverNameToFollow), Utilities.random.Next(0, 3), this, validationData));
                             else
                             {
                                 string columnName;
@@ -221,7 +230,7 @@ namespace CrewChiefV4.Events
                                     columnName = cfod.AssignedColumn == FrozenOrderColumn.Left ? folderInTheInsideColumn : folderInTheOutsideColumn;
                                 else
                                     columnName = cfod.AssignedColumn == FrozenOrderColumn.Left ? folderInTheLeftColumn : folderInTheRightColumn;
-                                audioPlayer.playMessage(new QueuedMessage("frozen_order/follow_driver", MessageContents(folderFollow, usableDriverNameToFollow, columnName), Utilities.random.Next(0, 3), this, validationData));
+                                audioPlayer.playMessage(new QueuedMessage(!shouldFollowSafetyCar ? "frozen_order/follow_driver_in_col" : "frozen_order/follow_safecy_car_in_col", MessageContents(folderFollow, usableDriverNameToFollow, columnName), Utilities.random.Next(0, 3), this, validationData));
                             }
                         }
                     }
@@ -230,7 +239,7 @@ namespace CrewChiefV4.Events
                         // Follow messages are only meaningful if there's name to announce.
                         if ((shouldFollowSafetyCar || AudioPlayer.canReadName(usableDriverNameToFollow))
                             && Utilities.random.Next(1, 11) > 2)  // Randomly, announce message without name.
-                            audioPlayer.playMessage(new QueuedMessage("frozen_order/allow_driver_to_pass", 
+                            audioPlayer.playMessage(new QueuedMessage(!shouldFollowSafetyCar ? "frozen_order/allow_driver_to_pass" : "frozen_order/allow_safety_car_to_pass",
                                 MessageContents(folderAllow, usableDriverNameToFollow, folderToPass), Utilities.random.Next(1, 4), this, validationData));
                         else
                             audioPlayer.playMessage(new QueuedMessage(folderYoureAheadOfAGuyYouShouldBeFollowing, Utilities.random.Next(1, 4), this, validationData));
@@ -239,7 +248,7 @@ namespace CrewChiefV4.Events
                     {
                         if (AudioPlayer.canReadName(usableDriverNameToFollow)
                             && Utilities.random.Next(1, 11) > 2)  // Randomly, announce message without name.
-                            audioPlayer.playMessage(new QueuedMessage("frozen_order/allow_driver_to_pass", 
+                            audioPlayer.playMessage(new QueuedMessage(!shouldFollowSafetyCar ? "frozen_order/catch_up_to_driver" : "frozen_order/catch_up_to_safety_car",
                                 MessageContents(folderCatchUpTo, usableDriverNameToFollow), Utilities.random.Next(1, 4), this, validationData));
                         else
                             audioPlayer.playMessage(new QueuedMessage(folderYouNeedToCatchUpToTheGuyAhead, Utilities.random.Next(1, 4), this, validationData));
@@ -252,13 +261,16 @@ namespace CrewChiefV4.Events
                 var driverToFollow = shouldFollowSafetyCar ? (useAmericanTerms ? folderThePaceCar : folderTheSafetyCar) : cfod.DriverToFollowRaw;
 
                 var prevDriverToFollow = this.currDriverToFollow;
+                var prevFrozenOrderColumn = this.currFrozenOrderColumn;
 
                 if (isActionUpdateStable
                     && (this.currFrozenOrderAction != this.newFrozenOrderAction
-                        || this.currDriverToFollow != this.newDriverToFollow))
+                        || this.currDriverToFollow != this.newDriverToFollow
+                        || this.currFrozenOrderColumn != this.newFrozenOrderColumn))
                 {
                     this.currFrozenOrderAction = this.newFrozenOrderAction;
                     this.currDriverToFollow = this.newDriverToFollow;
+                    this.currFrozenOrderColumn = this.newFrozenOrderColumn;
 
                     var usableDriverNameToFollow = shouldFollowSafetyCar ? driverToFollow : DriverNameHelper.getUsableDriverName(driverToFollow);
 
@@ -267,23 +279,25 @@ namespace CrewChiefV4.Events
                     validationData.Add(FrozenOrderMonitor.validationAssignedPositionKey, cfod.AssignedPosition);
                     validationData.Add(FrozenOrderMonitor.validationDriverToFollowKey, cfod.DriverToFollowRaw);
 
-                    if (this.newFrozenOrderAction == FrozenOrderAction.Follow
-                        && prevDriverToFollow != this.currDriverToFollow)  // Don't announce Follow messages for the driver that we caught up to or allowed to pass.
-                    {
-                        var announceLane = useAmericanTerms
-                            && currentGameState.StockCarRulesData.stockCarRulesEnabled
-                            && currentGameState.FlagData.fcyPhase == FullCourseYellowPhase.LAST_LAP_NEXT;
+                    // TODO: see if last SCR lap needs to be announced for CatchUp as well.
+                    var announceLane = useAmericanTerms
+                        && currentGameState.StockCarRulesData.stockCarRulesEnabled
+                        && currentGameState.FlagData.fcyPhase == FullCourseYellowPhase.LAST_LAP_CURRENT;
 
+                    if (this.newFrozenOrderAction == FrozenOrderAction.Follow
+                        && ((prevDriverToFollow != this.currDriverToFollow)  // Don't announce Follow messages for the driver that we caught up to or allowed to pass.
+                            || (prevFrozenOrderColumn != this.currFrozenOrderColumn && announceLane)))  // But announce for SCR last FCY lap.
+                    {
                         if (shouldFollowSafetyCar || AudioPlayer.canReadName(usableDriverNameToFollow))
                         {
                             if (announceLane && cfod.AssignedColumn == FrozenOrderColumn.Left)
-                                audioPlayer.playMessage(new QueuedMessage("frozen_order/follow_driver", MessageContents(folderFollow, usableDriverNameToFollow, 
+                                audioPlayer.playMessage(new QueuedMessage(!shouldFollowSafetyCar ? "frozen_order/follow_driver_in_left" : "frozen_order/follow_safety_car_in_left", MessageContents(folderFollow, usableDriverNameToFollow, 
                                     useOvalLogic ? folderInTheInsideColumn : folderInTheLeftColumn), Utilities.random.Next(0, 3), this, validationData));
                             else if (announceLane && cfod.AssignedColumn == FrozenOrderColumn.Right)
-                                audioPlayer.playMessage(new QueuedMessage("frozen_order/follow_driver",
+                                audioPlayer.playMessage(new QueuedMessage(!shouldFollowSafetyCar ? "frozen_order/follow_driver_in_right" : "frozen_order/follow_safety_car_in_right",
                                     MessageContents(folderFollow, usableDriverNameToFollow, useOvalLogic ? folderInTheOutsideColumn : folderInTheRightColumn), Utilities.random.Next(0, 3), this, validationData));
                             else
-                                audioPlayer.playMessage(new QueuedMessage("frozen_order/follow_driver", MessageContents(folderFollow, usableDriverNameToFollow), Utilities.random.Next(0, 3), this, validationData));
+                                audioPlayer.playMessage(new QueuedMessage(!shouldFollowSafetyCar ? "frozen_order/follow_driver" : "frozen_order/follow_safety_car", MessageContents(folderFollow, usableDriverNameToFollow), Utilities.random.Next(0, 3), this, validationData));
                         }
                         else if (announceLane && cfod.AssignedColumn == FrozenOrderColumn.Left)
                             audioPlayer.playMessage(new QueuedMessage(useOvalLogic ? folderLineUpInInsideColumn : folderLineUpInLeftColumn, Utilities.random.Next(0, 3), this, validationData));
@@ -294,7 +308,7 @@ namespace CrewChiefV4.Events
                     {
                         if ((shouldFollowSafetyCar || AudioPlayer.canReadName(usableDriverNameToFollow))
                              && Utilities.random.Next(1, 11) > 2)  // Randomly, announce message without name.
-                            audioPlayer.playMessage(new QueuedMessage("frozen_order/allow_driver_to_pass", 
+                            audioPlayer.playMessage(new QueuedMessage(!shouldFollowSafetyCar ? "frozen_order/allow_driver_to_pass" : "frozen_order/allow_safety_car_to_pass", 
                                 MessageContents(folderAllow, usableDriverNameToFollow, folderToPass), Utilities.random.Next(1, 4), this, validationData));
                         else
                             audioPlayer.playMessage(new QueuedMessage(folderYoureAheadOfAGuyYouShouldBeFollowing, Utilities.random.Next(1, 4), this, validationData));
@@ -303,7 +317,7 @@ namespace CrewChiefV4.Events
                     {
                         if ((shouldFollowSafetyCar || AudioPlayer.canReadName(usableDriverNameToFollow))
                              && Utilities.random.Next(1, 11) > 2)  // Randomly, announce message without name.
-                            audioPlayer.playMessage(new QueuedMessage("frozen_order/catch_up_to_driver", 
+                            audioPlayer.playMessage(new QueuedMessage(!shouldFollowSafetyCar ? "frozen_order/catch_up_to_driver" : "frozen_order/catch_up_to_safety_car", 
                                 MessageContents(folderCatchUpTo, usableDriverNameToFollow), Utilities.random.Next(1, 4), this, validationData));
                         else
                             audioPlayer.playMessage(new QueuedMessage(folderYouNeedToCatchUpToTheGuyAhead, Utilities.random.Next(1, 4), this, validationData));

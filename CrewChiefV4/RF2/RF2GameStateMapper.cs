@@ -108,7 +108,7 @@ namespace CrewChiefV4.rFactor2
             this.suspensionDamageThresholds.Add(new CornerData.EnumWithThresholds(DamageLevel.DESTROYED, 1.0f, 2.0f));
         }
 
-        private int[] minimumSupportedVersionParts = new int[] { 2, 3, 1, 2 };
+        private int[] minimumSupportedVersionParts = new int[] { 2, 4, 0, 0 };
         public static bool pluginVerified = false;
         private string lastVersionString;
         public void versionCheck(Object memoryMappedFileStruct)
@@ -163,7 +163,8 @@ namespace CrewChiefV4.rFactor2
             {
                 RF2GameStateMapper.pluginVerified = true;
 
-                var msg = "rFactor 2 Shared Memory version: " + versionStr + " 64bit." + (shared.extended.isStockCarRulesPluginHosted != 0 ? "  Stock Car Rules plugin hosted." : "");
+                var msg = "rFactor 2 Shared Memory version: " + versionStr + " 64bit."
+                    + (shared.extended.mHostedPluginVars.StockCarRules_IsHosted != 0 ? ("  Stock Car Rules plugin hosted. (DFT:" + shared.extended.mHostedPluginVars.StockCarRules_DoubleFileType + ")")  : "");
                 Console.WriteLine(msg);
             }
         }
@@ -1580,7 +1581,7 @@ namespace CrewChiefV4.rFactor2
             if (this.enableFrozenOrderMessages
                 && playerRulesIdx != -1
                 && pgs != null)
-                cgs.FrozenOrderData = this.GetFrozenOrderData(pgs.FrozenOrderData, ref playerScoring, ref shared.scoring, ref shared.rules.mParticipants[playerRulesIdx], ref shared.rules, cgs.StockCarRulesData.stockCarRulesEnabled);
+                cgs.FrozenOrderData = this.GetFrozenOrderData(pgs.FrozenOrderData, ref playerScoring, ref shared.scoring, ref shared.rules.mParticipants[playerRulesIdx], ref shared.rules, ref shared.extended);
 
             // --------------------------------
             // penalties data
@@ -1694,7 +1695,7 @@ namespace CrewChiefV4.rFactor2
         private StockCarRulesData GetStockCarRulesData(GameStateData currentGameState, ref rF2TrackRulesParticipant playerRules, ref rF2Rules rules, ref CrewChiefV4.rFactor2.RF2SharedMemoryReader.RF2StructWrapper shared)
         {
             var scrData = new StockCarRulesData();
-            scrData.stockCarRulesEnabled = shared.extended.isStockCarRulesPluginHosted != 0;
+            scrData.stockCarRulesEnabled = shared.extended.mHostedPluginVars.StockCarRules_IsHosted != 0;
 
             var cgs = currentGameState;
 
@@ -2224,7 +2225,7 @@ namespace CrewChiefV4.rFactor2
         }
 
         private FrozenOrderData GetFrozenOrderData(FrozenOrderData prevFrozenOrderData, ref rF2VehicleScoring vehicle, ref rF2Scoring scoring, 
-            ref rF2TrackRulesParticipant vehicleRules, ref rF2Rules rules, bool stockCarRulesEnabled)
+            ref rF2TrackRulesParticipant vehicleRules, ref rF2Rules rules, ref rF2Extended extended)
         {
             var fod = new FrozenOrderData();
 
@@ -2260,31 +2261,26 @@ namespace CrewChiefV4.rFactor2
 
             Debug.Assert(fod.Phase != FrozenOrderPhase.None);
 
+            var useSCRules = GlobalBehaviourSettings.useAmericanTerms && extended.mHostedPluginVars.StockCarRules_IsHosted != 0;
             if (vehicleRules.mPositionAssignment != -1)
             {
                 var gridOrder = false;
-                // Core FCY does not use grid order.
-                if (fod.Phase == FrozenOrderPhase.FullCourseYellow/* && !MainForm.useStockCarRulesPlugin*/)
+                var scrLastLapDoubleFile = useSCRules
+                    && fod.Phase == FrozenOrderPhase.FullCourseYellow
+                    && (extended.mHostedPluginVars.StockCarRules_DoubleFileType == 1 || extended.mHostedPluginVars.StockCarRules_DoubleFileType == 2)
+                    && scoring.mScoringInfo.mYellowFlagState == (sbyte)rFactor2Constants.rF2YellowFlagState.LastLap;
+
+                if (fod.Phase == FrozenOrderPhase.FullCourseYellow  // Core FCY does not use grid order. 
+                      && !scrLastLapDoubleFile)  // With SCR rules, however, last lap might be double file depending on DoubleFileType configuration var value.
                 {
                     gridOrder = false;
                     fod.AssignedPosition = vehicleRules.mPositionAssignment + 1;  // + 1, because it is zero based with 0 meaning follow SC.
-
-                    // TODO: this needs testing with SCR on and different Double file type to make sure order is correct.
-                    // TODO: depending on DoubleFileType setting, we may or may not receive Grid order on the last lap of FCY.
-                    // need to check if position jumps on last lap from line order to grid.
-                    if (GlobalBehaviourSettings.useAmericanTerms && stockCarRulesEnabled)
-                    {
-                        if (vehicleRules.mColumnAssignment == rF2TrackRulesColumn.LeftLane)
-                            fod.AssignedColumn = FrozenOrderColumn.Left;
-                        else if (vehicleRules.mColumnAssignment == rF2TrackRulesColumn.RightLane)
-                            fod.AssignedColumn = FrozenOrderColumn.Right;
-                    }
 
                     // Initialize player laps when FCY was assigned.  This is used as a base to calculate SC full distance.
                     if (this.playerLapsWhenFCYPosAssigned == -1)
                         this.playerLapsWhenFCYPosAssigned = vehicle.mTotalLaps;
                 }
-                else  // If this is not FCY case, the the order reported is grid order, with columns specified.  // TODO: this is likely hit on last lap of SCR double file.
+                else  // This is not FCY, or last lap of Double File FCY with SCR plugin enabled.  The order reported is grid order, with columns specified.
                 {
                     gridOrder = true;
                     fod.AssignedGridPosition = vehicleRules.mPositionAssignment + 1;
@@ -2352,11 +2348,16 @@ namespace CrewChiefV4.rFactor2
                 }
                 else
                 {
-                    var scLaps = this.playerLapsWhenFCYPosAssigned == -1
-                        ? rules.mTrackRules.mSafetyCarLaps
-                        : rules.mTrackRules.mSafetyCarLaps + this.playerLapsWhenFCYPosAssigned;  // During FCY, base SC laps off the number of laps user had when pos was assigned.
+                    if (!useSCRules)
+                    {
+                        var scLaps = this.playerLapsWhenFCYPosAssigned == -1
+                            ? rules.mTrackRules.mSafetyCarLaps
+                            : rules.mTrackRules.mSafetyCarLaps + this.playerLapsWhenFCYPosAssigned;  // During FCY, base SC laps off the number of laps user had when pos was assigned.
 
-                    toFollowDist = scLaps * scoring.mScoringInfo.mLapDist + rules.mTrackRules.mSafetyCarLapDist;
+                        toFollowDist = scLaps * scoring.mScoringInfo.mLapDist + rules.mTrackRules.mSafetyCarLapDist;
+                    }
+                    else  // Note: that same logic might apply to non SCR case, need to check.
+                        toFollowDist = ((vehicle.mTotalLaps - vehicleRules.mRelativeLaps)  * scoring.mScoringInfo.mLapDist) + rules.mTrackRules.mSafetyCarLapDist;
                 }
 
                 Debug.Assert(toFollowDist != -1.0);
