@@ -52,8 +52,8 @@ WHATS_MY_IRATING = whats my eye rating
 WHATS_MY_LICENSE_CLASS = what's my licence class
 WHAT_TYRES_AM_I_ON = what tires am i on:what tire am i on:what tire type am i on
 IS_MY_PIT_BOX_OCCUPIED = is my pit box occupied:is my pit stall occupied
-
 HOW_MUCH_FUEL_TO_END_OF_RACE = how much fuel to the end:how much fuel do we need
+HOW_LONG_WILL_THESE_TYRES_LAST = how long will the tires last:how long on these tires:how long will these tires last
 
 ### combined with a number of laps or a time to give a fuel load estimate (needs 3 or 4 laps of data)
 ### e.g. "how much fuel for 10 minutes", "how much fuel for 1 hour", "how much fuel for 30 laps"

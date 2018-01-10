@@ -857,13 +857,11 @@ namespace CrewChiefV4.Events
                 if (minutesRemainingOnTheseTyres > (timeInSession - timeElapsed) / 60)
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage(folderGoodWear, 0, null));
-                    
                     return;
                 }
-                else if (minutesRemainingOnTheseTyres < 1)
+                else if (minutesRemainingOnTheseTyres <= 1)
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage(folderKnackeredAllRound, 0, null));
-                    
                     return;
                 }
             }
@@ -874,7 +872,7 @@ namespace CrewChiefV4.Events
                     MessageContents(folderMinutesOnCurrentTyresIntro, minutesRemainingOnTheseTyres, folderMinutesOnCurrentTyresOutro), 0, immediate ? null : this);
                 if (immediate)
                 {
-                    audioPlayer.playMessageImmediately(queuedMessage);                    
+                    audioPlayer.playMessageImmediately(queuedMessage);
                 }
                 else
                 {
@@ -884,7 +882,6 @@ namespace CrewChiefV4.Events
             else if (immediate)
             {
                 audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
-                
             }
         }
 
@@ -895,13 +892,11 @@ namespace CrewChiefV4.Events
                 if (lapsRemainingOnTheseTyres > lapsInSession - completedLaps)
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage(folderGoodWear, 0, null));
-                    
                     return;
                 }
-                else if (lapsRemainingOnTheseTyres < 1)
+                else if (lapsRemainingOnTheseTyres <= 1)
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage(folderKnackeredAllRound, 0, null));
-                    
                     return;
                 }
             }
@@ -913,7 +908,6 @@ namespace CrewChiefV4.Events
                 if (immediate)
                 {
                     audioPlayer.playMessageImmediately(queuedMessage);
-                    
                 }
                 else
                 {
@@ -923,16 +917,12 @@ namespace CrewChiefV4.Events
             else if (immediate)
             {
                 audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
-                
             }
         }
 
         private void reportEstimatedTyreLife(float maxWearThreshold, Boolean immediate)
         {
-            float maxWearPercent = GlobalBehaviourSettings.useOvalLogic ?
-                  Math.Max(rightFrontWearPercent, rightRearWearPercent)
-                : Math.Max(leftFrontWearPercent, Math.Max(rightFrontWearPercent, Math.Max(leftRearWearPercent, rightRearWearPercent)));
-            if (maxWearPercent >= maxWearThreshold)
+            float maxWearPercent = getMaxWearPercent();
             {
                 // 1/3 through the tyre's life
                 reportedEstimatedTimeLeft = true;
@@ -947,6 +937,12 @@ namespace CrewChiefV4.Events
                     playEstimatedTyreLifeMinutes(minutesRemainingOnTheseTyres, immediate);
                 }
             }
+        }
+
+        private float getMaxWearPercent()
+        {
+            return GlobalBehaviourSettings.useOvalLogic ? Math.Max(rightFrontWearPercent, rightRearWearPercent)
+                : Math.Max(leftFrontWearPercent, Math.Max(rightFrontWearPercent, Math.Max(leftRearWearPercent, rightRearWearPercent)));
         }
 
         private void reportCurrentTyreTemps()
@@ -1046,6 +1042,22 @@ namespace CrewChiefV4.Events
                 if (currentBrakeTempStatus != null)
                 {
                     reportBrakeTempStatus(true, true);
+                }
+            }
+            else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOW_LONG_WILL_THESE_TYRES_LAST))
+            {
+                float maxWearPercent = getMaxWearPercent();
+                {
+                    if (lapsInSession > 0 || timeInSession == 0)
+                    {
+                        int lapsRemainingOnTheseTyres = (int)(completedLaps / (maxWearPercent / 100)) - completedLaps - 1;
+                        playEstimatedTypeLifeLaps(lapsRemainingOnTheseTyres, true);
+                    }
+                    else
+                    {
+                        int minutesRemainingOnTheseTyres = (int)Math.Floor(((timeElapsed / (maxWearPercent / 100)) - timeElapsed) / 60);
+                        playEstimatedTyreLifeMinutes(minutesRemainingOnTheseTyres, true);
+                    }
                 }
             }
         }
