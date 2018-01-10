@@ -556,6 +556,7 @@ namespace CrewChiefV4
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
             base.OnFormClosing(e);
+            MacroManager.stop();
             lock (cw)
             {
                 cw.textbox = null;
@@ -1252,6 +1253,7 @@ namespace CrewChiefV4
             }
             else
             {
+                MacroManager.stop();
                 if ((voiceOption == VoiceOptionEnum.ALWAYS_ON || voiceOption == VoiceOptionEnum.TOGGLE) && crewChief.speechRecogniser != null && crewChief.speechRecogniser.initialised)
                 {
                     Console.WriteLine("Stopping listening...");

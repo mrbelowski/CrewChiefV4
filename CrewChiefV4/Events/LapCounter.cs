@@ -474,7 +474,6 @@ namespace CrewChiefV4.Events
                             purgePreLightsMessages = true;
                         }
                     }
-                    // TODO: in R3E online there's a GridWalk phase before the Countdown. In PCars they're combined. Add some messages to this phase.
 
                     // R3E's gridWalk phase isn't useable here - the data during this phase are bollocks
                     if (!playedGetReady && currentGameState.SessionData.SessionType == SessionType.Race && (currentGameState.SessionData.SessionPhase == SessionPhase.Countdown ||
@@ -486,7 +485,7 @@ namespace CrewChiefV4.Events
                         // If we've not yet played the pre-lights messages, just play one of them here, but not for RaceRoom as the lights will already have started
                         if (!playedPreLightsMessage && CrewChief.gameDefinition.gameEnum != GameEnum.RACE_ROOM)
                         {
-                            playPreLightsMessage(currentGameState, preLightsMessageCount);
+                            playPreLightsMessage(currentGameState, 1);
                             purgePreLightsMessages = false;
                         }
                         if (purgePreLightsMessages)

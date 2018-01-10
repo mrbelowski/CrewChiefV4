@@ -201,19 +201,15 @@ namespace CrewChiefV4.Events
 
         public override bool isMessageStillValid(string eventSubType, GameStateData currentGameState, Dictionary<string, object> validationData)
         {
-            // TODO: unfuck me
-            if (base.isMessageStillValid(eventSubType, currentGameState, validationData))
-            {
-                if ((eventSubType == folderImprovingTimes || eventSubType == folderConsistentTimes || eventSubType == folderWorseningTimes) &&
+            // not sure if we need this - validate that we're not in sector 2 by the time the lap consistency message is played
+            if ((eventSubType == folderImprovingTimes || eventSubType == folderConsistentTimes || eventSubType == folderWorseningTimes) &&
                     currentGameState.SessionData.SectorNumber != 1)
-                {
-                    return false;
-                }
-                return true;
+            {
+                return false;
             }
             else
             {
-                return false;
+                return base.isMessageStillValid(eventSubType, currentGameState, validationData);
             }
         }
 
@@ -1052,11 +1048,10 @@ namespace CrewChiefV4.Events
                         {
                             Console.WriteLine("Unable to get sector deltas: " + e.Message);
                         }
-                        
                     }
-                    else {
+                    else
+                    {
                         audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
-                        
                     }
                 }
             }

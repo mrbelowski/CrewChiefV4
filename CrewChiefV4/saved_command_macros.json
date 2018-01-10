@@ -2,7 +2,7 @@
     "description": "This is the default command macro configuration. You can modify this file directly if you want, but it'll be overwritten when the app is updated. Make a copy in your Documents folder in a subfolder called CrewChiefV4 and modify the copy - the app will load this file from Documents/CrewChiefV4/ if it can find it, and will then fall back to the one in the installation folder. All text in 'description' elements will be ignored. These elements are only to provide a place to put comments.",
     "assignments": [
 	{
-	    "description": "Race Room command mappings - these are the key assignments in the Controller menu -> Primary. The key is what key to press, the action maps a elements in the actionSequence list in the commandSets below. WAIT_1000 as an action makes the macro pause for (in this example) 1000 milliseconds (1 second). Use this to allow the player to see what item is about to be selected",
+	    "description": "Race Room command mappings - these are the key assignments in the Controller menu -> Primary. The key is what key to press, the action maps a elements in the actionSequence list in the commandSets below. WAIT_1000 as an action makes the macro pause for (in this example) 1000 milliseconds (1 second). Use this to allow the player to see what item is about to be selected. Actions starting with the word 'Multiple' are a bit special - the app will press this key many times, depending on the action (this is a WIP and is currently only used for R3E auto fuel selection)",
 	    "gameDefinition": "RACE_ROOM",
 		"keyBindings" : [
 		{
@@ -27,6 +27,10 @@
 		},
 		{
 		    "action": "Pit Menu Increase",
+			"key": "KEY_D"
+		},
+		{
+		    "action": "Multiple Pit Menu Increase",
 			"key": "KEY_D"
 		},
 		{
@@ -60,6 +64,9 @@
 			"key": "KEY_D"
 		},
 		{
+		    "action": "Multiple ICM Menu Right",
+			"key": "KEY_D"
+		},{
 		    "action": "Pit Request Toggle",
 			"key": "KEY_Q"
 		}
@@ -153,14 +160,41 @@
 			"gameDefinition": "RACE_ROOM",
 			"actionSequence": [ "Pit Request Toggle", "WAIT_5000", "Pit Menu Toggle" ],
 			"keyPressTime": 10,
-			"waitBetweenEachCommand": 200
+			"waitBetweenEachCommand": 200,
+			"confirmationMessage": "mandatory_pit_stops/pit_stop_requested",
 		},
 		{
 			"description": "pcars2 version, keyPressTime longer",
 			"gameDefinition": "PCARS2",
 			"actionSequence": [ "Pit Request Toggle" ],
+			"keyPressTime": 50,
+			"waitBetweenEachCommand": 200
+		}]
+	},
+    {
+		"name": " auto fuel",
+		"description": "this macro requires the pit menu to be in a specific state before it's called - we must have no refuelling selected (for R3E the fuel is not green and the fuel amount must be one of the built in options, for pCARS2 the amount must be 0 litres)",
+		"confirmationMessage": "acknowledge/fuel_to_end",
+		"voiceTriggers": [ "fuel to the end", "fuel to the end of the race" ],
+		"buttonTriggers": [],
+		"commandSets": [
+		{
+			"description": "This is an attempt to automate the fuel process for R3E using the app's current fuel estimate. Starts by pressing 'decrease' a few times to ensure the fuel menu is on 'safe', then presses 'increase' 3 times, putting the fuel amount on 0L. Then it presses 'increase' the correct number of times for the fuel required, then presses 'select' to activate refuelling, then waits a bit before closing the pit menu.",
+			"gameDefinition": "RACE_ROOM",
+			"actionSequence": [ "Pit Menu Toggle", "Pit Menu Down", "Pit Menu Select", "Pit Menu Decrease", "Pit Menu Decrease", "Pit Menu Decrease", "Pit Menu Decrease", "Pit Menu Increase", "Pit Menu Increase", "Pit Menu Increase", "Multiple Pit Menu Increase", "Pit Menu Select", "WAIT_5000", "Pit Menu Toggle"],
+			"keyPressTime": 10,
+			"waitBetweenEachCommand": 100,
+			"allowAutomaticTriggering": false,
+			"resolveMultipleCountWithEvent": "Fuel"
+		},
+		{
+			"description": "This is an attempt to automate the fuel process for pCARS2 using the app's current fuel estimate. Navigates to the adjust stratgey option, then fuel, then adds however many litres the app calculated. Note that in order for this to work, the existing strategy must be set to zero litres",
+			"gameDefinition": "PCARS2",
+			"actionSequence": [ "Car Management", "ICM Menu Up", "ICM Menu Right", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Down", "ICM Menu Down", "ICM Menu Right", "ICM Menu Down", "ICM Menu Down", "Multiple ICM Menu Right", "ICM Menu Up", "ICM Menu Up", "ICM Menu Right", "ICM Menu Up", "ICM Menu Up", "ICM Menu Right", "ICM Menu Down", "ICM Menu Right"],
 			"keyPressTime": 30,
-			"waitBetweenEachCommand": 100
+			"waitBetweenEachCommand": 100,
+			"allowAutomaticTriggering": false,
+			"resolveMultipleCountWithEvent": "Fuel"
 		}]
 	},
 	{
@@ -235,8 +269,8 @@
 			"gameDefinition": "PCARS2",
 			
 			"actionSequence": [ "Car Management", "ICM Menu Up", "ICM Menu Right", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Down", "ICM Menu Right", "ICM Menu Down", "ICM Menu Right", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Right", "ICM Menu Up", "ICM Menu Right", "ICM Menu Down", "ICM Menu Right" ],
-			"keyPressTime": 30,
-			"waitBetweenEachCommand": 100
+			"keyPressTime": 50,
+			"waitBetweenEachCommand": 200
 		}]
 	},
 	{
@@ -250,8 +284,8 @@
 			"description": "pcars2 select strat 2",
 			"gameDefinition": "PCARS2",
 			"actionSequence": [ "Car Management", "ICM Menu Up", "ICM Menu Right", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Down", "ICM Menu Right", "ICM Menu Down", "ICM Menu Down", "ICM Menu Right", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Right", "ICM Menu Up", "ICM Menu Right", "ICM Menu Down", "ICM Menu Right" ],
-			"keyPressTime": 30,
-			"waitBetweenEachCommand": 100
+			"keyPressTime": 50,
+			"waitBetweenEachCommand": 200
 		}]
 	},
 	{
@@ -265,8 +299,8 @@
 			"description": "pcars2 select strat 3",
 			"gameDefinition": "PCARS2",
 			"actionSequence": [  "Car Management", "ICM Menu Up", "ICM Menu Right", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Down", "ICM Menu Right", "ICM Menu Down", "ICM Menu Down", "ICM Menu Down", "ICM Menu Right", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Right", "ICM Menu Up", "ICM Menu Right", "ICM Menu Down", "ICM Menu Right" ],
-			"keyPressTime": 30,
-			"waitBetweenEachCommand": 100
+			"keyPressTime": 50,
+			"waitBetweenEachCommand": 200
 		}]
 	},
 	{
@@ -280,8 +314,8 @@
 			"description": "pcars2 select strat 4",
 			"gameDefinition": "PCARS2",
 			"actionSequence": [ "Car Management", "ICM Menu Up", "ICM Menu Right", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Down", "ICM Menu Right", "ICM Menu Down", "ICM Menu Down", "ICM Menu Down", "ICM Menu Down", "ICM Menu Right", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Right", "ICM Menu Up", "ICM Menu Right", "ICM Menu Down", "ICM Menu Right" ],
-			"keyPressTime": 30,
-			"waitBetweenEachCommand": 100
+			"keyPressTime": 50,
+			"waitBetweenEachCommand": 200
 		}]
 	},
 	{
@@ -300,8 +334,8 @@
 			"description": "pcars2 version",
 			"gameDefinition": "PCARS2",
 			"actionSequence": [ "Car Management" ],
-			"keyPressTime": 30,
-			"waitBetweenEachCommand": 100
+			"keyPressTime": 50,
+			"waitBetweenEachCommand": 200
 		}]
 	},
 	{
@@ -333,8 +367,8 @@
 			"description": "pcars2 version",
 			"gameDefinition": "PCARS2",
 			"actionSequence": [ "ICM Menu Up" ],
-			"keyPressTime": 30,
-			"waitBetweenEachCommand": 100
+			"keyPressTime": 50,
+			"waitBetweenEachCommand": 200
 		}]
 	},
 	{
@@ -353,8 +387,8 @@
 			"description": "pcars2 version",
 			"gameDefinition": "PCARS2",
 			"actionSequence": [ "ICM Menu Down" ],
-			"keyPressTime": 30,
-			"waitBetweenEachCommand": 100
+			"keyPressTime": 50,
+			"waitBetweenEachCommand": 200
 		}]
 	},
 	{
@@ -373,8 +407,8 @@
 			"description": "pcars2 version",
 			"gameDefinition": "PCARS2",
 			"actionSequence": [ "ICM Menu Left" ],
-			"keyPressTime": 30,
-			"waitBetweenEachCommand": 100
+			"keyPressTime": 50,
+			"waitBetweenEachCommand": 200
 		}]
 	},
 	{
@@ -393,8 +427,8 @@
 			"description": "pcars2 version",
 			"gameDefinition": "PCARS2",
 			"actionSequence": [ "ICM Menu Right" ],
-			"keyPressTime": 30,
-			"waitBetweenEachCommand": 100
+			"keyPressTime": 50,
+			"waitBetweenEachCommand": 200
 		}]
 	},
 	{
