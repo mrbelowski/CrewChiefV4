@@ -61,6 +61,8 @@ namespace CrewChiefV4.Events
 
         public static String folderGallon = "fuel/gallon";
 
+        public static String folderWillNeedToStopAgain = "fuel/will_need_to_stop_again";
+
         private float averageUsagePerLap;
 
         private float averageUsagePerMinute;
@@ -108,6 +110,8 @@ namespace CrewChiefV4.Events
         private int fuelUseSampleTime = 60;
 
         private float currentFuel = -1;
+
+        private float fuelCapacity = 0;
 
         private float gameTimeWhenFuelWasReset = 0;
 
@@ -170,6 +174,7 @@ namespace CrewChiefV4.Events
             lapsRemaining = -1;
             secondsRemaining = -1;
             bestLapTime = -1;
+            fuelCapacity = 0;
         }
 
         // fuel not implemented for HotLap modes
@@ -206,6 +211,7 @@ namespace CrewChiefV4.Events
                 lapsRemaining = currentGameState.SessionData.SessionNumberOfLaps - currentGameState.SessionData.CompletedLaps;
             }
             currentFuel = currentGameState.FuelData.FuelLeft;
+            fuelCapacity = currentGameState.FuelData.FuelCapacity;
             // only track fuel data after the session has settled down
             if (fuelUseActive && !GameStateData.onManualFormationLap &&
                 currentGameState.SessionData.SessionRunningTime > 15 &&
@@ -1051,8 +1057,16 @@ namespace CrewChiefV4.Events
             // only used for r3e auto-fuel amount selection at present
             Console.WriteLine("getting fuel requirement keypress count");
             int litresToEnd = getLitresToEndOfRace();
-            // don't allow more than 150 key presses here
-            return litresToEnd == -1 ? 0 : litresToEnd > 150 ? 150 : litresToEnd;
+
+            // limit the number of key presses to 200 here, or fuelCapacity
+            int fuelCapacityInt = (int)fuelCapacity;
+            if (fuelCapacityInt > 0 && fuelCapacityInt < litresToEnd)
+            {
+                // if we have a known fuel capacity and this is less than the calculated amount of fuel we need, warn about it.
+                audioPlayer.playMessage(new QueuedMessage(folderWillNeedToStopAgain, 4, this));
+            }
+            int maxPresses = fuelCapacityInt > 0 ? fuelCapacityInt : 200;
+            return litresToEnd == -1 ? 0 : litresToEnd > maxPresses ? maxPresses : litresToEnd;
         }
 
         private float convertLitersToGallons(float liters, Boolean roundTo1dp = false)
