@@ -822,6 +822,14 @@ namespace CrewChiefV4.rFactor2
         };
 
 
+        [StructLayout(LayoutKind.Sequential, Pack = 4)]
+        public struct rF2HostedPluginVars
+        {
+            public byte StockCarRules_IsHosted;        // Is StockCarRules.dll successfully loaded into SM plugin?
+            public int StockCarRules_DoubleFileType;   // DoubleFileType plugin variable value.
+        }
+
+
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi, Pack = 4)]
         public struct rF2Extended
         {
@@ -830,7 +838,6 @@ namespace CrewChiefV4.rFactor2
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 8)]
             public byte[] mVersion;                            // API version
             public byte is64bit;                               // Is 64bit plugin?
-            public byte isStockCarRulesPluginHosted;           // Is StockCarRules.dll successfully loaded into SM plugin?
 
             // Physics options (updated on session start):
             public rF2PhysicsOptions mPhysics;
@@ -852,6 +859,8 @@ namespace CrewChiefV4.rFactor2
             // Captured non-empty MessageInfoV01::mText message.
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 128)]
             public byte[] mDisplayedMessageUpdateCapture;
+
+            public rF2HostedPluginVars mHostedPluginVars;
         }
 
 
