@@ -156,7 +156,7 @@ namespace CrewChiefV4.Events
                     return;
                 }
             }
-            else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.FUEL_TO_THE_END))
+            else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PIT_STOP_FUEL_TO_THE_END))
             {
                 Fuel fuelEvent = (Fuel)CrewChief.getEvent("Fuel");
                 int litresNeeded = fuelEvent.getLitresToEndOfRace();
