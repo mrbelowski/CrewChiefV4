@@ -76,6 +76,8 @@ namespace CrewChiefV4.Events
         private TimeSpan waitBeforeAnnouncingSameOpponentAhead = TimeSpan.FromMinutes(3);
         private String lastNextCarAheadOpponentName = null;
 
+        private String lastLeaderAnnounced = null;
+
         public Opponents(AudioPlayer audioPlayer)
         {
             this.audioPlayer = audioPlayer;
@@ -96,6 +98,7 @@ namespace CrewChiefV4.Events
             announcedRetirementsAndDQs.Clear();
             onlyAnnounceOpponentAfter.Clear();
             lastNextCarAheadOpponentName = null;
+            lastLeaderAnnounced = null;
         }
 
         public override bool isMessageStillValid(string eventSubType, GameStateData currentGameState, Dictionary<String, Object> validationData)
@@ -357,12 +360,14 @@ namespace CrewChiefV4.Events
                     {
                         String name = leader.DriverRawName;
                         if (currentGameState.SessionData.Position > 1 && previousGameState.SessionData.Position > 1 &&
+                            !name.Equals(lastLeaderAnnounced) &&
                             currentGameState.Now > nextLeadChangeMessage && leader.CanUseName && AudioPlayer.canReadName(name))
                         {
                             Console.WriteLine("Lead change, current leader is " + name + " laps completed = " + currentGameState.SessionData.CompletedLaps);
                             audioPlayer.playMessage(new QueuedMessage("new_leader", MessageContents(leader, folderIsNowLeading), 2, this,
                                 new Dictionary<string, object> { { validationNewLeaderKey, name } }));
-                            nextLeadChangeMessage = currentGameState.Now.Add(TimeSpan.FromSeconds(30));
+                            nextLeadChangeMessage = currentGameState.Now.Add(TimeSpan.FromSeconds(60));
+                            lastLeaderAnnounced = name;
                         }
                     }
                 }
