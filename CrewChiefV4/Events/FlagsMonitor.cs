@@ -1168,9 +1168,9 @@ namespace CrewChiefV4.Events
                                     canAdd = false;
                                 }
                             }
-                            lastIncidentPositionForOpponents[opponent.DriverRawName] = opponent.DistanceRoundTrack;
                             if (canAdd)
                             {
+                                lastIncidentPositionForOpponents[opponent.DriverRawName] = opponent.DistanceRoundTrack;
                                 involvedDrivers.Add(new NamePositionPair(opponent.DriverRawName, incidentCandidate.positionAtStartOfIncident, opponent.DistanceRoundTrack,
                                     AudioPlayer.canReadName(opponent.DriverRawName), incidentCandidate.opponentDataKey));
                             }
