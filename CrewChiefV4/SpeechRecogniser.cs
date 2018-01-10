@@ -59,8 +59,9 @@ namespace CrewChiefV4
         public static String[] WHATS_MY_LICENSE_CLASS = Configuration.getSpeechRecognitionPhrases("WHATS_MY_LICENSE_CLASS");
         public static String[] WHAT_TYRES_AM_I_ON = Configuration.getSpeechRecognitionPhrases("WHAT_TYRES_AM_I_ON");
         public static String[] WHAT_ARE_THE_RELATIVE_TYRE_PERFORMANCES = Configuration.getSpeechRecognitionPhrases("WHAT_ARE_THE_RELATIVE_TYRE_PERFORMANCES");
+        public static String[] HOW_LONG_WILL_THESE_TYRES_LAST = Configuration.getSpeechRecognitionPhrases("HOW_LONG_WILL_THESE_TYRES_LAST");
 
-
+        public static String[] HOW_MUCH_FUEL_TO_END_OF_RACE = Configuration.getSpeechRecognitionPhrases("HOW_MUCH_FUEL_TO_END_OF_RACE");
         public static String[] CALCULATE_FUEL_FOR = Configuration.getSpeechRecognitionPhrases("CALCULATE_FUEL_FOR");
         public static String[] LAP = Configuration.getSpeechRecognitionPhrases("LAP");
         public static String[] LAPS = Configuration.getSpeechRecognitionPhrases("LAPS");
@@ -169,6 +170,8 @@ namespace CrewChiefV4
 
         public static String[] HOW_MANY_INCIDENT_POINTS = Configuration.getSpeechRecognitionPhrases("HOW_MANY_INCIDENT_POINTS");
         public static String[] WHATS_THE_INCIDENT_LIMIT = Configuration.getSpeechRecognitionPhrases("WHATS_THE_INCIDENT_LIMIT");
+
+        public static String[] PIT_STOP_FUEL_TO_THE_END = Configuration.getSpeechRecognitionPhrases("PIT_STOP_FUEL_TO_THE_END");
 
         public static String[] MORE_INFO = Configuration.getSpeechRecognitionPhrases("MORE_INFO");
 
@@ -509,9 +512,11 @@ namespace CrewChiefV4
                 validateAndAdd(WHATS_MY_POSITION, staticSpeechChoices);
                 validateAndAdd(WHATS_MY_FUEL_LEVEL, staticSpeechChoices);
                 validateAndAdd(WHATS_MY_FUEL_USAGE, staticSpeechChoices);
+                validateAndAdd(HOW_MUCH_FUEL_TO_END_OF_RACE, staticSpeechChoices);
                 validateAndAdd(WHAT_TYRES_AM_I_ON, staticSpeechChoices);
                 validateAndAdd(WHAT_ARE_THE_RELATIVE_TYRE_PERFORMANCES, staticSpeechChoices);
                 validateAndAdd(PLAY_CORNER_NAMES, staticSpeechChoices);
+                validateAndAdd(HOW_LONG_WILL_THESE_TYRES_LAST, staticSpeechChoices);
 
                 validateAndAdd(DAMAGE_REPORT, staticSpeechChoices);
                 validateAndAdd(CAR_STATUS, staticSpeechChoices);
@@ -761,6 +766,7 @@ namespace CrewChiefV4
                 validateAndAdd(WHATS_THE_INCIDENT_LIMIT, iRacingChoices);
                 validateAndAdd(WHATS_MY_IRATING, iRacingChoices);
                 validateAndAdd(WHATS_MY_LICENSE_CLASS, iRacingChoices);
+                validateAndAdd(PIT_STOP_FUEL_TO_THE_END, iRacingChoices);
 
 
                 GrammarBuilder iRacingGrammarBuilder = new GrammarBuilder(iRacingChoices);
@@ -1052,7 +1058,8 @@ namespace CrewChiefV4
             else if (ResultContains(recognisedSpeech, WHATS_MY_FUEL_LEVEL)
                 || ResultContains(recognisedSpeech, HOWS_MY_FUEL)
                 || ResultContains(recognisedSpeech, WHATS_MY_FUEL_USAGE)
-                || ResultContains(recognisedSpeech, CALCULATE_FUEL_FOR))
+                || ResultContains(recognisedSpeech, CALCULATE_FUEL_FOR)
+                || ResultContains(recognisedSpeech, HOW_MUCH_FUEL_TO_END_OF_RACE))
             {
                 return CrewChief.getEvent("Fuel");
             }
@@ -1086,7 +1093,8 @@ namespace CrewChiefV4
                 ResultContains(recognisedSpeech, HOWS_MY_TYRE_WEAR) ||
                 ResultContains(recognisedSpeech, HOW_ARE_MY_BRAKE_TEMPS) ||
                 ResultContains(recognisedSpeech, WHAT_ARE_MY_BRAKE_TEMPS) ||
-                ResultContains(recognisedSpeech, WHAT_ARE_THE_RELATIVE_TYRE_PERFORMANCES))
+                ResultContains(recognisedSpeech, WHAT_ARE_THE_RELATIVE_TYRE_PERFORMANCES) ||
+                ResultContains(recognisedSpeech, HOW_LONG_WILL_THESE_TYRES_LAST))
             {
                 return CrewChief.getEvent("TyreMonitor");
             }

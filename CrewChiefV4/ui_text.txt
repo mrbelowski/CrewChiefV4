@@ -450,6 +450,7 @@ search_box_tooltip_line4 = R3E - for RaceRoom Racing Experience specific prefere
 search_box_tooltip_line5 = rF1 - for rFactor 1 specific preferences
 search_box_tooltip_line6 = rF2 - for rFactor 2 specific preferences
 search_box_tooltip_line7 = pCARS - for Project CARS 1 and 2 specific preferences
+search_box_tooltip_line8 = iRacing - for iRacing specific preferences
 
 no_matches = No matches.
 reset_warning_text = This will reset all the Crew Chief settings to their default values, are you sure?

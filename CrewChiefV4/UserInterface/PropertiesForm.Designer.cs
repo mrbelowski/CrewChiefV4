@@ -76,7 +76,8 @@ namespace CrewChiefV4
                 + Configuration.getUIString("search_box_tooltip_line4") + Environment.NewLine
                 + Configuration.getUIString("search_box_tooltip_line5") + Environment.NewLine
                 + Configuration.getUIString("search_box_tooltip_line6") + Environment.NewLine
-                + Configuration.getUIString("search_box_tooltip_line7") + Environment.NewLine;
+                + Configuration.getUIString("search_box_tooltip_line7") + Environment.NewLine
+                + Configuration.getUIString("search_box_tooltip_line8") + Environment.NewLine;
             this.textBox1.Location = new System.Drawing.Point(780, 3);
             this.textBox1.Margin = new System.Windows.Forms.Padding(0, 3, 3, 3);
             this.textBox1.Name = "textBox1";

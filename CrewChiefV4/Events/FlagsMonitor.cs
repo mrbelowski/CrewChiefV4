@@ -158,6 +158,8 @@ namespace CrewChiefV4.Events
 
         int waitingForCrashedDriverInSector = -1;
 
+        private Dictionary<string, float> lastIncidentPositionForOpponents = new Dictionary<string, float>();
+
         private List<NamePositionPair> driversInvolvedInCurrentIncident = new List<NamePositionPair>();
 
         private String waitingForCrashedDriverInCorner = null;
@@ -313,6 +315,8 @@ namespace CrewChiefV4.Events
             lastGreenFlagLuckyDogStatusAnnounced = GreenFlagLuckyDogStatus.NONE;
             greenFlagLuckyDogMessageCountInSession = 0;
             nextGreenFlagLuckyDogCheckDue = DateTime.MinValue;
+
+            lastIncidentPositionForOpponents.Clear();
         }
 
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
@@ -1152,9 +1156,26 @@ namespace CrewChiefV4.Events
                         if ((Math.Abs(opponent.DistanceRoundTrack - incidentCandidate.distanceRoundTrackAtStartOfIncident) < maxDistanceMovedForYellowAnnouncement) ||
                                 opponent.Position > incidentCandidate.positionAtStartOfIncident + 3)
                         {
-                            // this guy is in the same sector as the yellow but has only travelled 10m in 2 seconds or has lost a load of places so he's probably involved
-                            involvedDrivers.Add(new NamePositionPair(opponent.DriverRawName, incidentCandidate.positionAtStartOfIncident, opponent.DistanceRoundTrack,
-                                AudioPlayer.canReadName(opponent.DriverRawName), incidentCandidate.opponentDataKey));
+                            // this guy is in the same sector as the yellow but has only travelled 10m in 2 seconds or has lost a load of places so he's probably involved.
+                            // Only add him if we've not reported him already in this spot on the track
+                            Boolean canAdd = true;
+                            if (lastIncidentPositionForOpponents.ContainsKey(opponent.DriverRawName))
+                            {
+                                // we've already reported on this guy in this session - if he's not really moved since this report, don't report him again
+                                float distanceRoundTrackAtIncident = lastIncidentPositionForOpponents[opponent.DriverRawName];
+                                // this check doesn't make sense when the incident is within 20m of the start line, but it's an edge case and this check isn't
+                                // really essential anyway so let's not worry about it
+                                if (Math.Abs(opponent.DistanceRoundTrack - distanceRoundTrackAtIncident) < 20)
+                                {
+                                    canAdd = false;
+                                }
+                            }
+                            if (canAdd)
+                            {
+                                lastIncidentPositionForOpponents[opponent.DriverRawName] = opponent.DistanceRoundTrack;
+                                involvedDrivers.Add(new NamePositionPair(opponent.DriverRawName, incidentCandidate.positionAtStartOfIncident, opponent.DistanceRoundTrack,
+                                    AudioPlayer.canReadName(opponent.DriverRawName), incidentCandidate.opponentDataKey));
+                            }
                         }
                         else
                         {
