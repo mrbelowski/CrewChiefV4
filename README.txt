@@ -50,9 +50,10 @@ I've not finished implementing this but currently the app understands and respon
 "what's [the car in front / the guy in front / the car ahead / the guy ahead]'s best lap"
 "what's [the car behind / the guy behind]'s last lap"
 "what's [the car behind / the guy behind]'s best lap"
-"what tyre(s) is [opponent driver last name / opponent race position] on" (DTM 2014 only - reports "options" or "primes")
+"what tyre(s) is [opponent driver last name / opponent race position] on"
 "what are my sector times"
 "what's my last sector time"
+"what's the [air / track] [temp / temperature]
 "who's leading" (this one only works if you have the driver name recording for the lead car)
 "who's [ahead / ahead in the race / in front / in front in the race / behind / behind in the race]" (gives the name of the car in front / behind in the race or on the timing sheet for qual / practice. This one only works if you have the driver name recording for that driver)
 "who's [ahead on track / in front on track / behind on track]" (gives the name of the car in front / behind in on track, regardless of his race / qual position. This one only works if you have the driver name recording for that driver)
@@ -74,6 +75,7 @@ I've not finished implementing this but currently the app understands and respon
 "Car status": report any damage the car has sustained, tyre and brake temperature status and fuel / battery status
 "Session status" / "Race status": report race position, gaps, time / laps left in session
 "Full update" / "Full status" / "Update me": combines all of the above three status reports (will produce a very verbose response)
+"how much fuel to the end" / "how much fuel do we need": report how many litres or gallons of fuel the app thinks you'll need to finish the race
 
 "pitstop add [X liters]" (adds X amount of fuel next pitstop, this option is iRacing only)
 "pitstop tearoff / pitstop windscreen" (enable next pitstop, this option is iRacing only)
@@ -93,6 +95,7 @@ I've not finished implementing this but currently the app understands and respon
 "pitstop change right front tyre pressure [ new value ]" (change right front tyre pressure next pitstop, this option is iRacing only)
 "pitstop change left rear tyre pressure [ new value ]" (change left rear tyre pressure next pitstop, this option is iRacing only)
 "pitstop change right rear tyre pressure [ new value ]" (change right rear tyre pressure next pitstop, this option is iRacing only)
+"pitstop fuel to the end" / "pitstop fuel to the end of the race" (add the fuel amount the app calculates you'll need to finish the race, this option is iRacing only)
 
 
 Speech recognition customisation
@@ -199,6 +202,8 @@ One final point. If the app says "Jim is faster than you", let him through :)
 
 Changelog
 ---------
+Version 4.9.0.4: Added voice command to get and estimate of how much fuel is needed to finish the race - "how much fuel to the end" / "how much fuel do we need"; Added voice command to get an estimate of how long the tyres will last (in minutes for timed sessions, laps for fixed lap number sessions) - "how long will the tires last" / "how long on these tires" / "how long will these tires last"; Added check to prevent a stopped car triggering incident warnings repeatedly; Added ability to set pit fuel amount in iRacing - "pitstop fuel to the end" / "pitstop fuel to the end of the race" - and via a macro in R3E and pCARS2 - "fuel to the end" / "fuel to the end of the race". See the 'Advanced command macros' section of the help.txt file or http://thecrewchief.org/showthread.php?263-Command-key-press-macros&p=2378&viewfull=1#post2378 for more info (please read the documentation before using this in R3E or pCARS2 as it requires the default in-game pit strategy to be configured in a particular way, and is quite fragile - use at your own risk).
+
 Version 4.9.0.3: Don't make Assetto Corsa spotter calls when viewing replays; reworked some of the sector gap logic; derive opponent laptimes and sector 3 times in Raceroom instead of using data provided by the game as the data provided by the game are always 1 lap out of date; reduce frequency of repeated "the next car is..." messages
 
 Version 4.9.0.2: Fixed some issues in pCARS 2 session end detection and pre-start message triggering; disable pcars2 spotter in pits; some minor performance improvements

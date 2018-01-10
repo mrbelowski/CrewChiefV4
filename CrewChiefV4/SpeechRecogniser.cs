@@ -171,7 +171,7 @@ namespace CrewChiefV4
         public static String[] HOW_MANY_INCIDENT_POINTS = Configuration.getSpeechRecognitionPhrases("HOW_MANY_INCIDENT_POINTS");
         public static String[] WHATS_THE_INCIDENT_LIMIT = Configuration.getSpeechRecognitionPhrases("WHATS_THE_INCIDENT_LIMIT");
 
-        public static String[] FUEL_TO_THE_END = Configuration.getSpeechRecognitionPhrases("FUEL_TO_THE_END");
+        public static String[] PIT_STOP_FUEL_TO_THE_END = Configuration.getSpeechRecognitionPhrases("PIT_STOP_FUEL_TO_THE_END");
 
         public static String[] MORE_INFO = Configuration.getSpeechRecognitionPhrases("MORE_INFO");
 
@@ -766,7 +766,7 @@ namespace CrewChiefV4
                 validateAndAdd(WHATS_THE_INCIDENT_LIMIT, iRacingChoices);
                 validateAndAdd(WHATS_MY_IRATING, iRacingChoices);
                 validateAndAdd(WHATS_MY_LICENSE_CLASS, iRacingChoices);
-                validateAndAdd(FUEL_TO_THE_END, iRacingChoices);
+                validateAndAdd(PIT_STOP_FUEL_TO_THE_END, iRacingChoices);
 
 
                 GrammarBuilder iRacingGrammarBuilder = new GrammarBuilder(iRacingChoices);

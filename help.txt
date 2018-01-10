@@ -115,10 +115,9 @@ The app understands lots of command including:
 "what's [the car in front / the guy in front / the car ahead / the guy ahead]'s best lap"
 "what's [the car behind / the guy behind]'s last lap"
 "what's [the car behind / the guy behind]'s best lap"
-"what tyre(s) is [opponent driver last name / opponent race position] on" (DTM 2014 only - reports "options" or "primes")
+"what tyre(s) is [opponent driver last name / opponent race position] on"
 "what are my sector times"
 "what's my last sector time"
-"what's the [air / track] [temp / temperature]"
 "who's leading" (this one only works if you have the driver name recording for the lead car)
 "who's [ahead / ahead in the race / in front / in front in the race / behind / behind in the race]" (gives the name of the car in front / behind in the race or on the timing sheet for qual / practice. This one only works if you have the driver name recording for that driver)
 "who's [ahead on track / in front on track / behind on track]" (gives the name of the car in front / behind in on track, regardless of his race / qual position. This one only works if you have the driver name recording for that driver)
@@ -136,11 +135,12 @@ The app understands lots of command including:
 "Where should I attack / where am I faster / where can I attack": If the app has enough data, will report the corner name where you're gaining the most time on the guy in front
 "Where should I defend / where am I slower / where is he faster / where will he attack": If the app has enough data, will report the corner name where you're losing the most time to the guy behind
 "Read corner names / corner names / tell me the corner names": read out each corner name when you hit the mid-point of the corner, for this lap only (useful to test corner name mappings)
-"Damage report / how's my car / is my car ok" : read out any damage you have
-"Car status" : read out any damage, along with tyre wear, brake wear, engine temps etc if the values for these are not in the ideal range
-"Session status / race status" : give an overview of the session - time left, position, gaps, pitstop status etc
-"Full update / full status / update me" : damage report, car status and session status combined
-"What's the time / what time is it" : read the current (clock) time
+"Damage report" / "How's my car" / "Is my car ok?": report any damage the car has sustained
+"Car status": report any damage the car has sustained, tyre and brake temperature status and fuel / battery status
+"Session status" / "Race status": report race position, gaps, time / laps left in session
+"Full update" / "Full status" / "Update me": combines all of the above three status reports (will produce a very verbose response)
+"how much fuel to the end" / "how much fuel do we need": report how many litres or gallons of fuel the app thinks you'll need to finish the race
+
 "pitstop add [X liters]" (adds X amount of fuel next pitstop, this option is iRacing only)
 "pitstop tearoff / pitstop windscreen" (enable next pitstop, this option is iRacing only)
 "pitstop fast repair / pitstop repair" (enable fast repair next pitstop, this option is iRacing only)
@@ -159,6 +159,7 @@ The app understands lots of command including:
 "pitstop change right front tyre pressure [ new value ]" (change right front tyre pressure next pitstop, this option is iRacing only)
 "pitstop change left rear tyre pressure [ new value ]" (change left rear tyre pressure next pitstop, this option is iRacing only)
 "pitstop change right rear tyre pressure [ new value ]" (change right rear tyre pressure next pitstop, this option is iRacing only)
+"pitstop fuel to the end" / "pitstop fuel to the end of the race" (add the fuel amount the app calculates you'll need to finish the race, this option is iRacing only)
 
 
 
@@ -238,6 +239,22 @@ You can change the black boxes by saying one of the following commands: "black b
 "black box fuel", "black box tires", "black box tire info", "black box pit stop", "black box car", "black box mirror" or "black box radio"
 
 You can navigate the by saying one of the following commands: "menu next", "menu previous", "menu increase", "menu decrease" or "menu toggle"
+
+
+Advanced command macros
+--------------
+
+As you can see from the previous section, key press macros are complicated and a bit dumb - the app has no idea what state the pit menu is in so it has to make lots of assumptions. I've added another macro that can request the correct amount of fuel to finish the current race. It does this by calculating the recent fuel consumption and working out how many more litres are needed to finish. It then presses a few keys to move the pit menu to the refuel amount and presses the 'increase' key the correct number of times.
+
+This will only work if the pit menu is in the correct state to begin with. Otherwise the app will be pressing lots of keys and potentially selecting lots of unwanted stuff in the pit menu. So be careful here.
+
+For this to work in Raceroom, the app requires that the game is configured to use metric measurements (gallons are silly). The default pit preset must be configured with one of the preset fuel amounts added ("safe" / "normal" / "risky"). It's essential that the fuel option is green (selected) in this strategy (otherwise the app won't be able to set a fuel amount). 
+
+For this to work in pCARS2, the app requires that the game is configured to use metric measurements (gallons are silly). The selected pit preset must have no fuel added (0 litres).
+
+Note that once you've executed this macro, the in-game pit menu will have a fuel amount selected that's some number of litres. This means the menu will be in a state where the macro can't be run again. In Raceroom this is easy enough to remedy - you just need to select the default pit preset again. In pCARS2 there's no sensible workaround.
+
+Hopefully the game devs will make these menus or the actions they trigger easier to use for 3rd party apps. But until they do, these complicated automated interactions are always going to be flaky.
 
 
 Pace notes

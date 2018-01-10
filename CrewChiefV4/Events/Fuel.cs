@@ -944,7 +944,26 @@ namespace CrewChiefV4.Events
                 }
                 else
                 {
-                    QueuedMessage fuelMessage = new QueuedMessage("fuel_estimate_to_end", MessageContents(litresNeeded, litresNeeded == 1 ? folderLitre : folderLitres), 0, null);
+                    QueuedMessage fuelMessage;
+                    if (fuelReportsInGallon)
+                    {
+                        // for gallons we want both whole and fractional part cause its a stupid unit.
+                        float gallonsNeeded = convertLitersToGallons(litresNeeded, true);
+                        Tuple<int, int> wholeandfractional = Utilities.WholeAndFractionalPart(gallonsNeeded);
+                        if (wholeandfractional.Item2 > 0)
+                        {
+                            fuelMessage = new QueuedMessage("fuel_estimate_to_end", MessageContents(wholeandfractional.Item1, NumberReader.folderPoint, wholeandfractional.Item2, folderGallons), 0, null);
+                        }
+                        else
+                        {
+                            int wholeGallons = Convert.ToInt32(wholeandfractional.Item1);
+                            fuelMessage = new QueuedMessage("fuel_estimate_to_end", MessageContents(wholeGallons, wholeGallons == 1 ? folderGallon : folderGallons), 0, null);
+                        }
+                    }
+                    else
+                    {
+                        fuelMessage = new QueuedMessage("fuel_estimate_to_end", MessageContents(litresNeeded, litresNeeded == 1 ? folderLitre : folderLitres), 0, null);
+                    }
                     if (delayResponses && Utilities.random.Next(10) >= 2 && SoundCache.availableSounds.Contains(AudioPlayer.folderStandBy))
                     {
                         audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderStandBy, 0, null));
