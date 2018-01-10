@@ -713,7 +713,8 @@ namespace CrewChiefV4.Events
                 {
                     reportCurrentTyreConditionStatus(false, false, delayResponses, false);
                 }
-                if (!currentGameState.PitData.InPitlane && !reportedEstimatedTimeLeft && enableTyreWearWarnings && !currentGameState.SessionData.LeaderHasFinishedRace)
+                if (!currentGameState.PitData.InPitlane && !reportedEstimatedTimeLeft && enableTyreWearWarnings && !currentGameState.SessionData.LeaderHasFinishedRace &&
+                    currentGameState.SessionData.SessionType == SessionType.Race)
                 {
                     reportEstimatedTyreLife(33, false);
                 }
@@ -923,6 +924,7 @@ namespace CrewChiefV4.Events
         private void reportEstimatedTyreLife(float maxWearThreshold, Boolean immediate)
         {
             float maxWearPercent = getMaxWearPercent();
+            if (maxWearPercent >= maxWearThreshold)
             {
                 // 1/3 through the tyre's life
                 reportedEstimatedTimeLeft = true;
@@ -1047,6 +1049,11 @@ namespace CrewChiefV4.Events
             else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOW_LONG_WILL_THESE_TYRES_LAST))
             {
                 float maxWearPercent = getMaxWearPercent();
+                if (maxWearPercent < 1)
+                {
+                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+                }
+                else 
                 {
                     if (lapsInSession > 0 || timeInSession == 0)
                     {
