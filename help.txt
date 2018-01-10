@@ -243,8 +243,7 @@ You can navigate the by saying one of the following commands: "menu next", "menu
 
 Advanced command macros
 --------------
-
-As you can see from the previous section, key press macros are complicated and a bit dumb - the app has no idea what state the pit menu is in so it has to make lots of assumptions. I've added another macro that can request the correct amount of fuel to finish the current race. It does this by calculating the recent fuel consumption and working out how many more litres are needed to finish. It then presses a few keys to move the pit menu to the refuel amount and presses the 'increase' key the correct number of times.
+As you can see from the previous section, key press macros are complicated and a bit dumb - the app has no idea what state the pit menu is in so it has to make lots of assumptions. I've added another macro that can request the correct amount of fuel to finish the current race, triggered with the voice command "fuel to the end" or "fuel to the end of the race". It works by calculating the recent fuel consumption and working out how many more litres are needed to finish. It then presses a few keys to move the pit menu to the refuel amount and presses the 'increase' key the correct number of times.
 
 This will only work if the pit menu is in the correct state to begin with. Otherwise the app will be pressing lots of keys and potentially selecting lots of unwanted stuff in the pit menu. So be careful here.
 
