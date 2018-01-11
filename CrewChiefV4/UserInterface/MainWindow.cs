@@ -21,6 +21,14 @@ namespace CrewChiefV4
 {
     public partial class MainWindow : Form
     {
+        // used when retrying downloads:
+        private String retryReplace = null;
+        private String retryReplaceWith = null;
+        private Boolean usingRetryAddressForSoundPack = false;
+        private Boolean usingRetryAddressForDriverNames = false;
+        private Boolean usingRetryAddressForPersonalisations = false;
+
+
         private String baseDriverNamesDownloadLocation;
         private String updateDriverNamesDownloadLocation;
         private String driverNamesTempFileName = "temp_driver_names.zip";
@@ -160,6 +168,16 @@ namespace CrewChiefV4
                     {
                         String languageToCheck = AudioPlayer.soundPackLanguage == null ? "en" : AudioPlayer.soundPackLanguage;
                         Boolean gotLanguageSpecificUpdateInfo = false;
+                        try
+                        {
+                            retryReplace = doc.Descendants("retry_replace").First().Value;
+                            retryReplaceWith = doc.Descendants("retry_replace_with").First().Value;
+                        }
+                        catch (Exception)
+                        {
+                            Console.WriteLine("no retry download location available");
+                        }
+
                         try
                         {
                             foreach (XElement element in doc.Descendants("soundpack"))
@@ -1994,58 +2012,93 @@ namespace CrewChiefV4
         }
         private void driverNamesUpdateFailed(Boolean cancelled)
         {
-            startApplicationButton.Enabled = !isDownloadingSoundPack && !isDownloadingPersonalisations;
-            if (AudioPlayer.driverNamesVersion == -1)
+            if (!cancelled && !usingRetryAddressForDriverNames && retryReplace != null && retryReplaceWith != null)
             {
-                downloadDriverNamesButton.Text = Configuration.getUIString("no_driver_names_detected_press_to_download");
+                Console.WriteLine("unable to get driver names from " + retryReplace + " will try from " + retryReplaceWith);
+                usingRetryAddressForDriverNames = true;
+                baseDriverNamesDownloadLocation = baseDriverNamesDownloadLocation.Replace(retryReplace, retryReplaceWith);
+                updateDriverNamesDownloadLocation = updateDriverNamesDownloadLocation.Replace(retryReplace, retryReplaceWith);
+                startDownload(DownloadType.DRIVER_NAMES);
             }
             else
             {
-                downloadDriverNamesButton.Text = Configuration.getUIString("updated_driver_names_available_press_to_download");
-            }
-            downloadDriverNamesButton.Enabled = true;
-            if (!cancelled)
-            {
-                MessageBox.Show(Configuration.getUIString("error_downloading_driver_names"), Configuration.getUIString("unable_to_download_driver_names"),
-                    MessageBoxButtons.OK);
+                startApplicationButton.Enabled = !isDownloadingSoundPack && !isDownloadingPersonalisations;
+                if (AudioPlayer.driverNamesVersion == -1)
+                {
+                    downloadDriverNamesButton.Text = Configuration.getUIString("no_driver_names_detected_press_to_download");
+                }
+                else
+                {
+                    downloadDriverNamesButton.Text = Configuration.getUIString("updated_driver_names_available_press_to_download");
+                }
+                downloadDriverNamesButton.Enabled = true;
+                if (!cancelled)
+                {
+                    MessageBox.Show(Configuration.getUIString("error_downloading_driver_names"), Configuration.getUIString("unable_to_download_driver_names"),
+                        MessageBoxButtons.OK);
+                }
             }
         }
 
         private void soundPackUpdateFailed(Boolean cancelled)
         {
-            startApplicationButton.Enabled = !isDownloadingDriverNames && !isDownloadingPersonalisations;
-            if (AudioPlayer.soundPackVersion == -1)
+            if (!cancelled && !usingRetryAddressForSoundPack && retryReplace != null && retryReplaceWith != null)
             {
-                downloadSoundPackButton.Text = Configuration.getUIString("no_sound_pack_detected_press_to_download");
+                Console.WriteLine("unable to get sound pack from " + retryReplace + " will try from " + retryReplaceWith);
+                usingRetryAddressForSoundPack = true;
+                baseSoundPackDownloadLocation = baseSoundPackDownloadLocation.Replace(retryReplace, retryReplaceWith);
+                updateSoundPackDownloadLocation = updateSoundPackDownloadLocation.Replace(retryReplace, retryReplaceWith);
+                update2SoundPackDownloadLocation = update2SoundPackDownloadLocation.Replace(retryReplace, retryReplaceWith);
+                startDownload(DownloadType.SOUND_PACK);
             }
             else
             {
-                downloadSoundPackButton.Text = Configuration.getUIString("updated_sound_pack_available_press_to_download");
-            }
-            downloadSoundPackButton.Enabled = true;
-            if (!cancelled)
-            {
-                MessageBox.Show(Configuration.getUIString("error_downloading_sound_pack"), Configuration.getUIString("unable_to_download_sound_pack"),
-                    MessageBoxButtons.OK);
+                startApplicationButton.Enabled = !isDownloadingDriverNames && !isDownloadingPersonalisations;
+                if (AudioPlayer.soundPackVersion == -1)
+                {
+                    downloadSoundPackButton.Text = Configuration.getUIString("no_sound_pack_detected_press_to_download");
+                }
+                else
+                {
+                    downloadSoundPackButton.Text = Configuration.getUIString("updated_sound_pack_available_press_to_download");
+                }
+                downloadSoundPackButton.Enabled = true;
+                if (!cancelled)
+                {
+                    MessageBox.Show(Configuration.getUIString("error_downloading_sound_pack"), Configuration.getUIString("unable_to_download_sound_pack"),
+                        MessageBoxButtons.OK);
+                }
             }
         }
 
         private void personalisationsUpdateFailed(Boolean cancelled)
         {
-            startApplicationButton.Enabled = !isDownloadingSoundPack && !isDownloadingDriverNames;
-            if (AudioPlayer.personalisationsVersion == -1)
+            if (!cancelled && !usingRetryAddressForPersonalisations && retryReplace != null && retryReplaceWith != null)
             {
-                downloadPersonalisationsButton.Text = Configuration.getUIString("no_personalisations_detected_press_to_download");
+                Console.WriteLine("unable to get personalisations from " + retryReplace + " will try from " + retryReplaceWith);
+                usingRetryAddressForPersonalisations = true;
+                basePersonalisationsDownloadLocation = basePersonalisationsDownloadLocation.Replace(retryReplace, retryReplaceWith);
+                updatePersonalisationsDownloadLocation = updatePersonalisationsDownloadLocation.Replace(retryReplace, retryReplaceWith);
+                update2PersonalisationsDownloadLocation = update2PersonalisationsDownloadLocation.Replace(retryReplace, retryReplaceWith);
+                startDownload(DownloadType.PERSONALISATIONS);
             }
             else
             {
-                downloadPersonalisationsButton.Text = Configuration.getUIString("updated_personalisations_available_press_to_download");
-            }
-            downloadPersonalisationsButton.Enabled = true;
-            if (!cancelled)
-            {
-                MessageBox.Show(Configuration.getUIString("error_downloading_personalisations"), Configuration.getUIString("unable_to_download_personalisations"),
-                    MessageBoxButtons.OK);
+                startApplicationButton.Enabled = !isDownloadingSoundPack && !isDownloadingDriverNames;
+                if (AudioPlayer.personalisationsVersion == -1)
+                {
+                    downloadPersonalisationsButton.Text = Configuration.getUIString("no_personalisations_detected_press_to_download");
+                }
+                else
+                {
+                    downloadPersonalisationsButton.Text = Configuration.getUIString("updated_personalisations_available_press_to_download");
+                }
+                downloadPersonalisationsButton.Enabled = true;
+                if (!cancelled)
+                {
+                    MessageBox.Show(Configuration.getUIString("error_downloading_personalisations"), Configuration.getUIString("unable_to_download_personalisations"),
+                        MessageBoxButtons.OK);
+                }
             }
         }
         
