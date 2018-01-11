@@ -81,9 +81,6 @@ namespace CrewChiefV4.rFactor2
         private double lastPlayerTelemetryET = -1.0;
         private double lastScoringET = -1.0;
 
-        // Player mTotalLaps when FCY frozen position assigned (used to calculate distance to SC).
-        private float playerLapsWhenFCYPosAssigned = -1;
-
         // True if it looks like track has no DRS zones defined.
         private bool detectedTrackNoDRSZones = false;
 
@@ -189,7 +186,6 @@ namespace CrewChiefV4.rFactor2
             this.waitingToTerminateSession = false;
             this.isOfflineSession = true;
             this.distanceOffTrack = 0;
-            this.playerLapsWhenFCYPosAssigned = -1;
             this.detectedTrackNoDRSZones = false;
             this.minTrackWidth = -1.0;
             this.timePitStopRequested = DateTime.MinValue;
@@ -2232,11 +2228,7 @@ namespace CrewChiefV4.rFactor2
             // Only applies to formation laps and FCY.
             if (scoring.mScoringInfo.mGamePhase != (int)rFactor2Constants.rF2GamePhase.Formation
                 && scoring.mScoringInfo.mGamePhase != (int)rFactor2Constants.rF2GamePhase.FullCourseYellow)
-            {
-                this.playerLapsWhenFCYPosAssigned = -1;
-
                 return fod;
-            }
 
             var foStage = rules.mTrackRules.mStage;
             if (foStage == rF2TrackRulesStage.Normal)
@@ -2275,10 +2267,6 @@ namespace CrewChiefV4.rFactor2
                 {
                     gridOrder = false;
                     fod.AssignedPosition = vehicleRules.mPositionAssignment + 1;  // + 1, because it is zero based with 0 meaning follow SC.
-
-                    // Initialize player laps when FCY was assigned.  This is used as a base to calculate SC full distance.
-                    if (this.playerLapsWhenFCYPosAssigned == -1)
-                        this.playerLapsWhenFCYPosAssigned = vehicle.mTotalLaps;
                 }
                 else  // This is not FCY, or last lap of Double File FCY with SCR plugin enabled.  The order reported is grid order, with columns specified.
                 {
@@ -2347,18 +2335,7 @@ namespace CrewChiefV4.rFactor2
                     }
                 }
                 else
-                {
-                    if (!useSCRules)
-                    {
-                        var scLaps = this.playerLapsWhenFCYPosAssigned == -1
-                            ? rules.mTrackRules.mSafetyCarLaps
-                            : rules.mTrackRules.mSafetyCarLaps + this.playerLapsWhenFCYPosAssigned;  // During FCY, base SC laps off the number of laps user had when pos was assigned.
-
-                        toFollowDist = scLaps * scoring.mScoringInfo.mLapDist + rules.mTrackRules.mSafetyCarLapDist;
-                    }
-                    else  // Note: that same logic might apply to non SCR case, need to check.
-                        toFollowDist = ((vehicle.mTotalLaps - vehicleRules.mRelativeLaps)  * scoring.mScoringInfo.mLapDist) + rules.mTrackRules.mSafetyCarLapDist;
-                }
+                    toFollowDist = ((vehicle.mTotalLaps - vehicleRules.mRelativeLaps)  * scoring.mScoringInfo.mLapDist) + rules.mTrackRules.mSafetyCarLapDist;
 
                 Debug.Assert(toFollowDist != -1.0);
 
