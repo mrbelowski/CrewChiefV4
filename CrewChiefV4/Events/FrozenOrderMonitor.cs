@@ -194,6 +194,8 @@ namespace CrewChiefV4.Events
             {
                 var shouldFollowSafetyCar = cfod.AssignedGridPosition == 1;
                 var driverToFollow = shouldFollowSafetyCar ? (useAmericanTerms ? folderThePaceCar : folderTheSafetyCar) : cfod.DriverToFollowRaw;
+                if (shouldFollowSafetyCar && cfod.SafetyCarSpeed == -1.0f)
+                    driverToFollow = "";  // TODO: we may need special message for the case when SC is not present.  For now, simply suppress wrong message.
 
                 var prevDriverToFollow = this.currDriverToFollow;
 
@@ -259,6 +261,8 @@ namespace CrewChiefV4.Events
             {
                 var shouldFollowSafetyCar = cfod.AssignedPosition == 1;
                 var driverToFollow = shouldFollowSafetyCar ? (useAmericanTerms ? folderThePaceCar : folderTheSafetyCar) : cfod.DriverToFollowRaw;
+                if (shouldFollowSafetyCar && cfod.SafetyCarSpeed == -1.0f)
+                    driverToFollow = "";  // TODO: we may need special message for the case when SC is not present.  For now, simply suppress wrong message.
 
                 var prevDriverToFollow = this.currDriverToFollow;
                 var prevFrozenOrderColumn = this.currFrozenOrderColumn;
