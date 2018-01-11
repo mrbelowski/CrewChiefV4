@@ -376,6 +376,13 @@ namespace CrewChiefV4.rFactor2
             if (playerScoring.mIsPlayer != 1 || leaderScoring.mPlace != 1)
                 return pgs;
 
+            if (RF2GameStateMapper.playerName == null)
+            {
+                var driverName = GetStringFromBytes(playerScoring.mDriverName).ToLower();
+                NameValidator.validateName(driverName);
+                RF2GameStateMapper.playerName = driverName;
+            }
+
             // Get player and leader telemetry objects.
             // NOTE: Those are not available on first entry to the garage and likely in rare
             // cases during online races.  But using just zeroed structs are mostly ok.
@@ -432,13 +439,6 @@ namespace CrewChiefV4.rFactor2
                     playerRulesIdx = i;
                     break;
                 }
-            }
-
-            if (RF2GameStateMapper.playerName == null)
-            {
-                var driverName = GetStringFromBytes(playerScoring.mDriverName).ToLower();
-                NameValidator.validateName(driverName);
-                RF2GameStateMapper.playerName = driverName;
             }
 
             // these things should remain constant during a session
