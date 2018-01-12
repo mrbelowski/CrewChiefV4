@@ -35,7 +35,15 @@ namespace CrewChiefV4.PCars2
         // 3 or 4 wheels on any of these terrains triggers a possible cut warning
         private HashSet<eTerrainMaterials> illegalSurfaces = new HashSet<eTerrainMaterials>(
             new eTerrainMaterials[]{ eTerrainMaterials.TERRAIN_GRASSY_BERMS, eTerrainMaterials.TERRAIN_GRASS, eTerrainMaterials.TERRAIN_LONG_GRASS,
-                                     eTerrainMaterials.TERRAIN_SLOPE_GRASS, eTerrainMaterials.TERRAIN_RUNOFF_ROAD, eTerrainMaterials.TERRAIN_ILLEGAL_STRIP });
+                                     eTerrainMaterials.TERRAIN_SLOPE_GRASS, eTerrainMaterials.TERRAIN_RUNOFF_ROAD, eTerrainMaterials.TERRAIN_ILLEGAL_STRIP,
+                                     eTerrainMaterials.TERRAIN_PAINT_CONCRETE_ILLEGAL, eTerrainMaterials.TERRAIN_DRY_VERGE, eTerrainMaterials.TERRAIN_GRASSCRETE });
+
+        // 2 wheels on one of these terrains, while 2 wheels are on an illegal material, will log a warning to the console
+        private HashSet<eTerrainMaterials> marginalSurfaces = new HashSet<eTerrainMaterials>(
+            new eTerrainMaterials[] { eTerrainMaterials.TERRAIN_RUMBLE_STRIPS, eTerrainMaterials.TERRAIN_PAINT_CONCRETE });
+
+        private Boolean loggedPossibleTrackLimitViolationOnThisLap = false;
+        private Boolean loggedTrackLimitViolationOnThisLap = false;
 
         private float trivialEngineDamageThreshold = 0.05f;
         private float minorEngineDamageThreshold = 0.20f;
@@ -561,6 +569,11 @@ namespace CrewChiefV4.PCars2
             }
             if (shared.mLapInvalidated)
             {
+                if (currentGameState.SessionData.CurrentLapIsValid && currentGameState.SessionData.CompletedLaps > 0)
+                {
+                    Console.WriteLine("Invalidating lap " + (currentGameState.SessionData.CompletedLaps + 1) + " in sector " + currentGameState.SessionData.SectorNumber +
+                        " at distance " + playerData.mCurrentLapDistance + " lap time " + shared.mmfOnly_mCurrentTime);
+                }
                 currentGameState.SessionData.CurrentLapIsValid = false;
             }
             if (currentGameState.SessionData.IsNewSector)
@@ -620,11 +633,12 @@ namespace CrewChiefV4.PCars2
 
             currentGameState.SessionData.Flag = mapToFlagEnum(shared.mHighestFlagColour);
             currentGameState.SessionData.NumCars = shared.mNumParticipants;
-            currentGameState.SessionData.CurrentLapIsValid = !shared.mLapInvalidated;                
             currentGameState.SessionData.IsNewLap = previousGameState == null || currentGameState.SessionData.CompletedLaps == previousGameState.SessionData.CompletedLaps + 1;
             if (currentGameState.SessionData.IsNewLap)
             {
                 currentGameState.readLandmarksForThisLap = false;
+                loggedPossibleTrackLimitViolationOnThisLap = false;
+                loggedTrackLimitViolationOnThisLap = false;
             }
             ePitMode pitMode = (ePitMode)shared.mPitMode;
             currentGameState.PitData.InPitlane = pitMode == ePitMode.PIT_MODE_DRIVING_INTO_PITS ||
@@ -1188,9 +1202,9 @@ namespace CrewChiefV4.PCars2
             if (currentGameState.PositionAndMotionData.DistanceRoundTrack > 0 && currentGameState.PositionAndMotionData.CarSpeed > 0 
                 && !currentGameState.PitData.InPitlane && currentGameState.SessionData.CurrentLapIsValid)
             {
+
                 eTerrainMaterials[] terrainMaterials = new eTerrainMaterials[] {(eTerrainMaterials)shared.mTerrain[0], 
                     (eTerrainMaterials)shared.mTerrain[1], (eTerrainMaterials)shared.mTerrain[2], (eTerrainMaterials)shared.mTerrain[3] };
-
                 int illegalSurfacesCount = 0;
                 foreach (eTerrainMaterials material in terrainMaterials)
                 {
@@ -1199,13 +1213,42 @@ namespace CrewChiefV4.PCars2
                         illegalSurfacesCount++;
                         if (illegalSurfacesCount > 2)
                         {
+                            if (!loggedTrackLimitViolationOnThisLap)
+                            {
+                                Console.WriteLine("Track limit violation, lap " + (currentGameState.SessionData.CompletedLaps + 1) + " distance " +
+                                    currentGameState.PositionAndMotionData.DistanceRoundTrack + " terrain " + String.Join(", ", terrainMaterials));
+                                loggedTrackLimitViolationOnThisLap = true;
+                            }
                             currentGameState.PenaltiesData.PossibleTrackLimitsViolation = true;
                             break;
                         }
                     }
                 }
+                if (illegalSurfacesCount == 2)
+                {
+                    int marginalSurfacesCount = 0;
+                    foreach (eTerrainMaterials material in terrainMaterials)
+                    {
+                        if (marginalSurfaces.Contains(material))
+                        {
+                            marginalSurfacesCount++;
+                        }
+                    }
+                    if (marginalSurfacesCount > 1)
+                    {
+                        if (!loggedPossibleTrackLimitViolationOnThisLap)
+                        {
+                            Console.WriteLine("Possible track limit violation, lap " + (currentGameState.SessionData.CompletedLaps + 1) + 
+                                " sector " + currentGameState.SessionData.SectorNumber + " distance " +
+                                currentGameState.PositionAndMotionData.DistanceRoundTrack + 
+                                " laptime " + shared.mmfOnly_mCurrentTime + " terrain " + String.Join(", ", terrainMaterials));
+                            loggedPossibleTrackLimitViolationOnThisLap = true;
+                        }
+                        // still not sure if these 'possible' violations (2 wheels out of track limits, 2 wheels on a rumble strip) will invalidate a lap
+                        // currentGameState.PenaltiesData.PossibleTrackLimitsViolation = true;
+                    }
+                }
             }
-
             return currentGameState;
         }
 
