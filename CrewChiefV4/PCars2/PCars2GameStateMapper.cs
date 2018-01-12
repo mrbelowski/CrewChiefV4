@@ -770,11 +770,10 @@ namespace CrewChiefV4.PCars2
                                     {
                                         currentGameState.SessionData.HasLeadChanged = true;
                                     }
-                                    Boolean isEnteringPits = shared.mPitModes[i] == (uint) ePitMode.PIT_MODE_DRIVING_INTO_PITS;
-                                    Boolean isLeavingPits = shared.mPitModes[i] == (uint)ePitMode.PIT_MODE_DRIVING_OUT_OF_PITS ||
-                                        shared.mPitModes[i] == (uint)ePitMode.PIT_MODE_DRIVING_OUT_OF_GARAGE;
-                                    Boolean isInPits = shared.mPitModes[i] == (uint)ePitMode.PIT_MODE_IN_PIT ||
-                                        shared.mPitModes[i] == (uint)ePitMode.PIT_MODE_IN_GARAGE;
+                                    ePitMode opponentPitMode = (ePitMode)shared.mPitModes[i];
+                                    Boolean isEnteringPits = opponentPitMode == ePitMode.PIT_MODE_DRIVING_INTO_PITS;
+                                    Boolean isLeavingPits = opponentPitMode == ePitMode.PIT_MODE_DRIVING_OUT_OF_PITS || opponentPitMode == ePitMode.PIT_MODE_DRIVING_OUT_OF_GARAGE;
+                                    Boolean isInPits = opponentPitMode == ePitMode.PIT_MODE_IN_PIT || opponentPitMode == ePitMode.PIT_MODE_IN_GARAGE;
 
                                     if (isEnteringPits && !previousOpponentIsEnteringPits)
                                     {
