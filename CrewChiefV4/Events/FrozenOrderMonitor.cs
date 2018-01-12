@@ -267,6 +267,7 @@ namespace CrewChiefV4.Events
                 var prevDriverToFollow = this.currDriverToFollow;
                 var prevFrozenOrderColumn = this.currFrozenOrderColumn;
 
+                // TODO: this won't trigger as I wanted if we are instructed to stay in the right column.  Probably need to check if lane needs to be announced and if it wasn't before.
                 if (isActionUpdateStable
                     && (this.currFrozenOrderAction != this.newFrozenOrderAction
                         || this.currDriverToFollow != this.newDriverToFollow
@@ -286,7 +287,7 @@ namespace CrewChiefV4.Events
                     // TODO: see if last SCR lap needs to be announced for CatchUp as well.
                     var announceLane = useAmericanTerms
                         && currentGameState.StockCarRulesData.stockCarRulesEnabled
-                        && currentGameState.FlagData.fcyPhase == FullCourseYellowPhase.LAST_LAP_CURRENT;
+                        && (currentGameState.FlagData.fcyPhase == FullCourseYellowPhase.LAST_LAP_NEXT || currentGameState.FlagData.fcyPhase == FullCourseYellowPhase.LAST_LAP_CURRENT);
 
                     if (this.newFrozenOrderAction == FrozenOrderAction.Follow
                         && ((prevDriverToFollow != this.currDriverToFollow)  // Don't announce Follow messages for the driver that we caught up to or allowed to pass.

@@ -1505,9 +1505,9 @@ namespace CrewChiefV4.rFactor2
                         var allowedToPit = shared.rules.mParticipants[playerRulesIdx].mAllowedToPit;
 
                         // Apparently, 2 means not allowed, 3 means allowed.  Currently, only SCR plugin sets this to 2.
-                        Debug.Assert(allowedToPit == 2 || allowedToPit == 3);
-
-                        var pitsClosedForPlayer = allowedToPit == 2;
+                        //Debug.Assert(allowedToPit == 2 || allowedToPit == 3);
+                        // TODO: test what allowedToPit == 0 means with core rules, what a PITA.
+                        var pitsClosedForPlayer = allowedToPit == 2 || allowedToPit == 0;
                         cgs.FlagData.fcyPhase = pitsClosedForPlayer ? FullCourseYellowPhase.PITS_CLOSED : FullCourseYellowPhase.PITS_OPEN;
                     }
                     else
