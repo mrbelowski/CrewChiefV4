@@ -626,10 +626,11 @@ namespace CrewChiefV4.PCars2
             {
                 currentGameState.readLandmarksForThisLap = false;
             }
-            currentGameState.PitData.InPitlane = shared.mPitModes[playerIndex] == (int)ePitMode.PIT_MODE_DRIVING_INTO_PITS ||
-                shared.mPitModes[playerIndex] == (int)ePitMode.PIT_MODE_IN_PIT ||
-               shared.mPitModes[playerIndex] == (int)ePitMode.PIT_MODE_DRIVING_OUT_OF_PITS ||
-                shared.mPitModes[playerIndex] == (int)ePitMode.PIT_MODE_IN_GARAGE;
+            ePitMode pitMode = (ePitMode)shared.mPitMode;
+            currentGameState.PitData.InPitlane = pitMode == ePitMode.PIT_MODE_DRIVING_INTO_PITS ||
+                pitMode == ePitMode.PIT_MODE_IN_PIT ||
+                pitMode == ePitMode.PIT_MODE_DRIVING_OUT_OF_PITS ||
+                pitMode == ePitMode.PIT_MODE_IN_GARAGE;
 
             if (previousGameState != null)
             {
@@ -944,13 +945,12 @@ namespace CrewChiefV4.PCars2
             if (currentGameState.PitData.InPitlane)
             {
                 // should we just use the sector number to check this?
-                if (shared.mPitModes[playerIndex] == (int)ePitMode.PIT_MODE_DRIVING_INTO_PITS)
+                if (pitMode == ePitMode.PIT_MODE_DRIVING_INTO_PITS)
                 {
                     currentGameState.PitData.OnInLap = true;
                     currentGameState.PitData.OnOutLap = false;
                 }
-                else if (shared.mPitModes[playerIndex] == (int)ePitMode.PIT_MODE_DRIVING_OUT_OF_PITS || shared.mPitModes[playerIndex] == (int)ePitMode.PIT_MODE_IN_GARAGE
-                    || shared.mPitModes[playerIndex] == (int)ePitMode.PIT_MODE_IN_PIT)
+                else if (pitMode == ePitMode.PIT_MODE_DRIVING_OUT_OF_PITS || pitMode == ePitMode.PIT_MODE_IN_GARAGE || pitMode == ePitMode.PIT_MODE_IN_PIT)
                 {
                     currentGameState.PitData.OnInLap = false;
                     currentGameState.PitData.OnOutLap = true;
@@ -992,7 +992,7 @@ namespace CrewChiefV4.PCars2
                 currentGameState.PitData.IsPitCrewReady = false;
             }
             
-            currentGameState.PitData.IsApproachingPitlane = shared.mPitMode == (uint)ePitMode.PIT_MODE_DRIVING_INTO_PITS;
+            currentGameState.PitData.IsApproachingPitlane = pitMode == ePitMode.PIT_MODE_DRIVING_INTO_PITS;
            
             if (currentGameState.SessionData.SessionType == SessionType.Race && shared.mEnforcedPitStopLap > 0)
             {
@@ -1008,7 +1008,7 @@ namespace CrewChiefV4.PCars2
                 {
                     currentGameState.PitData.PitWindowEnd = currentGameState.SessionData.SessionNumberOfLaps - 1;
                 }
-                currentGameState.PitData.PitWindow = mapToPitWindow(currentGameState, shared.mPitSchedule, shared.mPitMode);
+                currentGameState.PitData.PitWindow = mapToPitWindow(currentGameState, pitShedule, pitMode);
                 currentGameState.PitData.IsMakingMandatoryPitStop = (currentGameState.PitData.PitWindow == PitWindow.Open || currentGameState.PitData.PitWindow == PitWindow.StopInProgress) &&
                         (currentGameState.PitData.OnInLap || currentGameState.PitData.OnOutLap);
                 if (previousGameState != null)
@@ -1576,8 +1576,13 @@ namespace CrewChiefV4.PCars2
             return FlagEnum.UNKNOWN;
         }
 
-        private PitWindow mapToPitWindow(GameStateData currentGameState, uint pitSchedule, uint pitMode)
+        private PitWindow mapToPitWindow(GameStateData currentGameState, ePitSchedule pitSchedule, ePitMode pitMode)
         {
+            // if we've already completed out stop, just return completed here
+            if (currentGameState.PitData.PitWindow == PitWindow.Completed)
+            {
+                return PitWindow.Completed;
+            }
             if (currentGameState.PitData.PitWindowStart > 0)
             {
                 if ((currentGameState.SessionData.SessionNumberOfLaps > 0 && currentGameState.SessionData.CompletedLaps < currentGameState.PitData.PitWindowStart) ||
@@ -1591,16 +1596,15 @@ namespace CrewChiefV4.PCars2
                     (currentGameState.SessionData.SessionTotalRunTime > 0 && currentGameState.SessionData.SessionRunningTime >= currentGameState.PitData.PitWindowStart * 60))
                 {
                     if (currentGameState.PitData.PitWindow == PitWindow.Completed ||
-                        (currentGameState.PitData.PitWindow == PitWindow.StopInProgress && pitMode == (uint)ePitMode.PIT_MODE_DRIVING_OUT_OF_PITS))
+                        (currentGameState.PitData.PitWindow == PitWindow.StopInProgress && pitMode == ePitMode.PIT_MODE_DRIVING_OUT_OF_PITS))
                     {
                         return PitWindow.Completed;
                     }
-                    else 
-                    if ((pitSchedule == (uint)ePitSchedule.PIT_SCHEDULE_PLAYER_REQUESTED ||
-                         pitSchedule == (uint)ePitSchedule.PIT_SCHEDULE_ENGINEER_REQUESTED ||
-                         pitSchedule == (uint)ePitSchedule.PIT_SCHEDULE_MANDATORY ||
-                         pitSchedule == (uint)ePitSchedule.PIT_SCHEDULE_DAMAGE_REQUESTED) &&
-                        (pitMode == (uint)ePitMode.PIT_MODE_DRIVING_INTO_PITS || pitMode == (uint)ePitMode.PIT_MODE_IN_PIT || pitMode == (uint) ePitMode.PIT_MODE_IN_PIT))
+                    else if ((pitSchedule == ePitSchedule.PIT_SCHEDULE_PLAYER_REQUESTED ||
+                              pitSchedule == ePitSchedule.PIT_SCHEDULE_ENGINEER_REQUESTED ||
+                              pitSchedule == ePitSchedule.PIT_SCHEDULE_MANDATORY ||
+                              pitSchedule == ePitSchedule.PIT_SCHEDULE_DAMAGE_REQUESTED) &&
+                             (pitMode == ePitMode.PIT_MODE_DRIVING_INTO_PITS || pitMode == ePitMode.PIT_MODE_IN_PIT || pitMode ==  ePitMode.PIT_MODE_IN_GARAGE))
                     {
                         return PitWindow.StopInProgress;
                     }
