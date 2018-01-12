@@ -89,7 +89,8 @@ namespace CrewChiefV4.PCars2
 
         private float lastCollisionMagnitude = 0;
         private Boolean collisionOnThisLap = false;
-        private DateTime nextCollisionCheckDueAt = DateTime.MinValue;
+        // TODO: what to use for this value
+        private float collisionMagnitudeThreshold = 0.1f;
         
         public PCars2GameStateMapper()
         {
@@ -207,20 +208,7 @@ namespace CrewChiefV4.PCars2
             String playerName = StructHelper.getNameFromBytes(shared.mParticipantData[playerIndex].mName);
 
             GameStateData currentGameState = new GameStateData(ticks);
-
-            if (currentGameState.Now > nextCollisionCheckDueAt && shared.mLastOpponentCollisionMagnitude != lastCollisionMagnitude)
-            {
-                // oops, we've hit someone...
-                nextCollisionCheckDueAt = currentGameState.Now.Add(TimeSpan.FromSeconds(5));
-                lastCollisionMagnitude = shared.mLastOpponentCollisionMagnitude;
-                collisionOnThisLap = true;
-                if (shared.mLastOpponentCollisionIndex > -1 && shared.mLastOpponentCollisionIndex < shared.mParticipantData.Length)
-                {
-                    Console.WriteLine("Collision on lap " + (playerData.mLapsCompleted + 1) + " strength: " + shared.mLastOpponentCollisionMagnitude +
-                        " with opponent name = " + StructHelper.getNameFromBytes(shared.mParticipantData[shared.mLastOpponentCollisionIndex].mName) + 
-                        " in position " + shared.mParticipantData[shared.mLastOpponentCollisionIndex].mRacePosition);
-                }
-            }
+            
             /*Console.WriteLine("SessionState: " + (eSessionState)shared.mSessionState + " RaceState: " + (eRaceState)shared.mRaceState + 
                 " GameState: " + (eGameState) shared.mGameState + " PitMode: " + (ePitMode) shared.mPitMode +
                 " EventTimeRemaining: " + shared.mEventTimeRemaining + " LapsInEvent: " + 
@@ -584,6 +572,24 @@ namespace CrewChiefV4.PCars2
             {
                 currentGameState.SessionData.SessionRunningTime = (float)(currentGameState.Now - currentGameState.SessionData.SessionStartTime).TotalSeconds;
             }
+
+            if (shared.mLastOpponentCollisionMagnitude != lastCollisionMagnitude)
+            {
+                // oops, we've hit someone...
+                lastCollisionMagnitude = shared.mLastOpponentCollisionMagnitude;
+                if (lastCollisionMagnitude > collisionMagnitudeThreshold)
+                {
+                    currentGameState.CarDamageData.LastImpactTime = currentGameState.SessionData.SessionRunningTime;
+                    if (!collisionOnThisLap && shared.mLastOpponentCollisionIndex > -1 && shared.mLastOpponentCollisionIndex < shared.mParticipantData.Length)
+                    {
+                        Console.WriteLine("Collision on lap " + (playerData.mLapsCompleted + 1) + " strength: " + shared.mLastOpponentCollisionMagnitude +
+                            " with opponent name = " + StructHelper.getNameFromBytes(shared.mParticipantData[shared.mLastOpponentCollisionIndex].mName) +
+                            " in position " + shared.mParticipantData[shared.mLastOpponentCollisionIndex].mRacePosition);
+                    }
+                    collisionOnThisLap = true;
+                }
+            }
+
             if (shared.mLapInvalidated)
             {
                 if (currentGameState.SessionData.CurrentLapIsValid && currentGameState.SessionData.CompletedLaps > 0)
