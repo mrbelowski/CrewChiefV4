@@ -628,7 +628,7 @@ namespace CrewChiefV4.rFactor2
             [XmlIgnore] public double mCurrentRelativeDistance;      // equal to ( ( ScoringInfoV01::mLapDist * this->mRelativeLaps ) + VehicleScoringInfoV01::mLapDist )
 
             // input/output
-            [XmlIgnore] public int mRelativeLaps;                   // current formation/caution laps relative to safety car (should generally be zero except when safety car crosses s/f line); this can be decremented to implement 'wave around' or 'beneficiary rule' (a.k.a. 'lucky dog' or 'free pass')
+            public int mRelativeLaps;                   // current formation/caution laps relative to safety car (should generally be zero except when safety car crosses s/f line); this can be decremented to implement 'wave around' or 'beneficiary rule' (a.k.a. 'lucky dog' or 'free pass')
             public rF2TrackRulesColumn mColumnAssignment;// which column (line/lane) that participant is supposed to be in
             public int mPositionAssignment;             // 0-based position within column (line/lane) that participant is supposed to be located at (-1 is invalid)
             public byte mAllowedToPit;                   // whether the rules allow this particular vehicle to enter pits right now
