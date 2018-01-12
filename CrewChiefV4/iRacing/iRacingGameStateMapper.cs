@@ -86,10 +86,11 @@ namespace CrewChiefV4.iRacing
             currentGameState.SessionData.SessionTimeRemaining = (float)shared.Telemetry.SessionTimeRemain;
 
             int previousLapsCompleted = previousGameState == null ? 0 : previousGameState.SessionData.CompletedLaps;
+            int sessionNumberOfLaps = previousGameState == null ? 0 : previousGameState.SessionData.SessionNumberOfLaps;
 
             currentGameState.SessionData.SessionPhase = mapToSessionPhase(lastSessionPhase, shared.Telemetry.SessionState, currentGameState.SessionData.SessionType, shared.Telemetry.IsReplayPlaying,
                 (float)shared.Telemetry.SessionTime, previousLapsCompleted, shared.Telemetry.LapCompleted, (SessionFlags)shared.Telemetry.SessionFlags, shared.Telemetry.IsInGarage,
-                shared.SessionData.IsLimitedTime, shared.Telemetry.SessionTimeRemain, shared.Telemetry.SessionTime);
+                shared.SessionData.IsLimitedTime, shared.Telemetry.SessionTimeRemain, shared.Telemetry.SessionTime, sessionNumberOfLaps);
 
             currentGameState.SessionData.NumCarsAtStartOfSession = shared.Drivers.Count;
 
@@ -982,7 +983,7 @@ namespace CrewChiefV4.iRacing
         private SessionPhase mapToSessionPhase(SessionPhase lastSessionPhase, SessionStates sessionState,
             SessionType currentSessionType, bool isReplay, float thisSessionRunningTime,
             int previousLapsCompleted, int laps, SessionFlags sessionFlags, bool isInPit, bool fixedTimeSession,
-            double sessionTimeRemaining, double sessionRunningTime)
+            double sessionTimeRemaining, double sessionRunningTime, int sessionNumberOfLaps)
         {
             /*
             if (!prevSessionFlags.Equals(sessionFlags.ToString()))
@@ -1040,12 +1041,12 @@ namespace CrewChiefV4.iRacing
             }
             else if (currentSessionType.HasFlag(SessionType.Race))
             {
-
                 if (sessionState.HasFlag(SessionStates.Checkered) || sessionState.HasFlag(SessionStates.CoolDown))
                 {
                     if (lastSessionPhase == SessionPhase.Green || lastSessionPhase == SessionPhase.FullCourseYellow)
                     {
-                        if ((!fixedTimeSession && previousLapsCompleted != laps) || (fixedTimeSession && sessionState.HasFlag(SessionStates.CoolDown) && previousLapsCompleted != laps))
+                        // for fixed number of laps, as soon as we've completed the required number end the session
+                        if ((!fixedTimeSession && sessionNumberOfLaps > 0 && laps == sessionNumberOfLaps) || (fixedTimeSession && previousLapsCompleted != laps))
                         {
                             Console.WriteLine("finished - completed " + laps + " laps (was " + previousLapsCompleted + "), session running time = " +
                                 thisSessionRunningTime);

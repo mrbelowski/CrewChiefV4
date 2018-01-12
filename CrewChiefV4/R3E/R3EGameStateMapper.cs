@@ -888,6 +888,7 @@ namespace CrewChiefV4.RaceRoom
                                     currentGameState.SessionData.SessionHasFixedTime, currentGameState.SessionData.SessionTimeRemaining,
                                     currentGameState.SessionData.SessionType == SessionType.Race,
                                     currentGameState.SessionData.TrackDefinition.distanceForNearPitEntryChecks,
+                                    participantStruct.CarSpeed,
                                     participantStruct.LapTimeCurrentSelf);
 
                             currentOpponentData.DeltaTime.SetNextDeltaPoint(currentOpponentLapDistance, currentOpponentData.CompletedLaps, currentOpponentData.Speed, currentGameState.Now);
@@ -1624,24 +1625,12 @@ namespace CrewChiefV4.RaceRoom
         private void upateOpponentData(OpponentData opponentData, int racePosition, int unfilteredRacePosition, int completedLaps, int sector, float sectorTime, 
             float completedLapTime, Boolean isInPits, Boolean lapIsValid, float sessionRunningTime, float secondsSinceLastUpdate, float[] currentWorldPosition,
             float[] previousWorldPosition, float distanceRoundTrack, int tire_type_front, int tyre_sub_type_front, int tire_type_rear, int tyre_sub_type_rear,  
-            Boolean sessionLengthIsTime, float sessionTimeRemaining, Boolean isRace, float nearPitEntryPointDistance,
+            Boolean sessionLengthIsTime, float sessionTimeRemaining, Boolean isRace, float nearPitEntryPointDistance, float speed,
             /* currentLapTime is used only to correct the game time at lap start */float currentLapTime)
         {
             float previousDistanceRoundTrack = opponentData.DistanceRoundTrack;
             opponentData.DistanceRoundTrack = distanceRoundTrack;
-            float speed;
-            Boolean validSpeed = true;
-            speed = (float)Math.Sqrt(Math.Pow(currentWorldPosition[0] - previousWorldPosition[0], 2) + Math.Pow(currentWorldPosition[1] - previousWorldPosition[1], 2)) / secondsSinceLastUpdate;
-            if (speed > 500)
-            {
-                // faster than 500m/s (1000+mph) suggests the player has quit to the pit. Might need to reassess this as the data are quite noisy
-                validSpeed = false;
-                opponentData.Speed = 0;
-            }
             opponentData.Speed = speed;
-
-            // the valid flag should actually be a combination of these 3 things:
-            lapIsValid = lapIsValid && validSpeed && currentLapTime > -1;
 
             if (opponentData.Position != racePosition) 
             {
@@ -1694,7 +1683,7 @@ namespace CrewChiefV4.RaceRoom
                     {
                         sessionRunningTime = sessionRunningTime - currentLapTime;
                     }
-                    if (opponentData.OpponentLapData.Count > 0)
+                    if (currentLapData != null)
                     {
                         // the game-provided sector3 times appear to be nonsense in the participant data array, so for sector3 we use
                         // the built-in timer (based on the GameTime reported by the game).
@@ -1720,7 +1709,7 @@ namespace CrewChiefV4.RaceRoom
             }
             opponentData.CompletedLaps = completedLaps;
             if (wasInPits && !isInPits)
-            {                
+            {
                 opponentData.InvalidateCurrentLap();
             }
         }
