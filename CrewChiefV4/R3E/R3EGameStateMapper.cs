@@ -1647,7 +1647,6 @@ namespace CrewChiefV4.RaceRoom
             Boolean wasInPits = opponentData.InPits;
             if (sessionRunningTime > 30 && !wasInPits && isInPits)
             {
-                Console.WriteLine("opponent " + opponentData.DriverRawName + " entered pit, setting his lap to invalid");
                 opponentData.InvalidateCurrentLap();
                 opponentData.setInLap();
                 if (isRace)
@@ -1672,7 +1671,6 @@ namespace CrewChiefV4.RaceRoom
             LapData currentLapData = opponentData.getCurrentLapData();
             if (opponentData.CurrentSectorNumber == 3 && sector == 3 && currentLapData != null && currentLapData.IsValid && !lapIsValid)
             {
-                Console.WriteLine("Invalidating opponent " + opponentData.DriverRawName + " lap in S3");
                 opponentData.InvalidateCurrentLap();
             }
             if (opponentData.CurrentSectorNumber != sector)
@@ -1701,10 +1699,6 @@ namespace CrewChiefV4.RaceRoom
                 }
                 else if (opponentData.CurrentSectorNumber == 1 && sector == 2 || opponentData.CurrentSectorNumber == 2 && sector == 3)
                 {
-                    if (!lapIsValid)
-                    {
-                        Console.WriteLine("Invalidating opponent " + opponentData.DriverRawName + " lap at start of S" + sector);
-                    }
                     opponentData.AddCumulativeSectorData(opponentData.CurrentSectorNumber, racePosition, sectorTime, sessionRunningTime, lapIsValid, false, 20, 20);
                     if (sector == 2)
                     {
@@ -1716,7 +1710,6 @@ namespace CrewChiefV4.RaceRoom
             opponentData.CompletedLaps = completedLaps;
             if (wasInPits && !isInPits)
             {
-                Console.WriteLine("Opponent " + opponentData.DriverRawName + " exiting pits, setting his lap to invalid");
                 opponentData.InvalidateCurrentLap();
             }
         }
