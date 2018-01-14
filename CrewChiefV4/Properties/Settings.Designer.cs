@@ -3022,7 +3022,7 @@ namespace CrewChiefV4.Properties {
                 this["enable_ams_pit_state_during_fcy"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True")]
@@ -3032,6 +3032,18 @@ namespace CrewChiefV4.Properties {
             }
             set {
                 this["bring_game_window_to_front_for_macros"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool report_all_laps_in_hotlap_mode {
+            get {
+                return ((bool)(this["report_all_laps_in_hotlap_mode"]));
+            }
+            set {
+                this["report_all_laps_in_hotlap_mode"] = value;
             }
         }
     }
