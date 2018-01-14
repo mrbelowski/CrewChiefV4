@@ -20,6 +20,9 @@ namespace CrewChiefV4.Events
         Boolean practiceAndQualSectorReportsLapEnd = UserSettings.GetUserSettings().getBoolean("practice_and_qual_sector_reports_at_lap_end");
         Boolean disablePCarspracAndQualPoleDeltaReports = UserSettings.GetUserSettings().getBoolean("disable_pcars_prac_and_qual_pole_deltas");
 
+        Boolean reportAllLaptimesInHotlapMode = UserSettings.GetUserSettings().getBoolean("report_all_laps_in_hotlap_mode");
+
+
         int maxQueueLengthForRaceSectorDeltaReports = 0;
         int maxQueueLengthForRaceLapTimeReports = 0;
 
@@ -331,7 +334,7 @@ namespace CrewChiefV4.Events
                         if (lapIsValid)
                         {
                             Boolean playedLapTime = false;
-                            if (isHotLapping)
+                            if (isHotLapping && reportAllLaptimesInHotlapMode)
                             {
                                 // always play the laptime in hotlap mode
                                 audioPlayer.playMessage(new QueuedMessage("laptime",
