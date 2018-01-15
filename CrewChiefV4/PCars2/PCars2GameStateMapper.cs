@@ -415,6 +415,9 @@ namespace CrewChiefV4.PCars2
                 GlobalBehaviourSettings.UpdateFromTrackDefinition(currentGameState.SessionData.TrackDefinition);
 
                 currentGameState.SessionData.DeltaTime = new DeltaTime(currentGameState.SessionData.TrackDefinition.trackLength, currentGameState.PositionAndMotionData.DistanceRoundTrack, currentGameState.Now);
+
+                currentGameState.PitData.MandatoryPitStopCompleted = false;
+                currentGameState.PitData.PitWindow = shared.mEnforcedPitStopLap > 0 ? PitWindow.Closed : PitWindow.Unavailable;
             }
             else
             {
@@ -470,6 +473,9 @@ namespace CrewChiefV4.PCars2
                                 currentGameState.SessionData.SessionNumberOfLaps = previousGameState.SessionData.SessionNumberOfLaps;
                             }
                         }
+
+                        currentGameState.PitData.MandatoryPitStopCompleted = false;
+                        currentGameState.PitData.PitWindow = shared.mEnforcedPitStopLap > 0 ? PitWindow.Closed : PitWindow.Unavailable;
 
                         currentGameState.SessionData.DeltaTime = new DeltaTime(currentGameState.SessionData.TrackDefinition.trackLength, currentGameState.PositionAndMotionData.DistanceRoundTrack, currentGameState.Now);
 
@@ -1061,8 +1067,8 @@ namespace CrewChiefV4.PCars2
                 }
                 else
                 {
-                    // if the enforcedPitStopLap is < 0, assume it's completed
-                    currentGameState.PitData.MandatoryPitStopCompleted = false;
+                    // if the enforcedPitStopLap is < 0, assume it's completed - no way of knowing whether this means the stop is complete, or there was no stop in the first place
+                    currentGameState.PitData.MandatoryPitStopCompleted = true;
                     currentGameState.PitData.PitWindow = PitWindow.Completed;
                 }
             }
@@ -1676,16 +1682,12 @@ namespace CrewChiefV4.PCars2
                 else if ((currentGameState.SessionData.SessionNumberOfLaps > 0 && currentGameState.SessionData.CompletedLaps >= currentGameState.PitData.PitWindowStart) ||
                     (currentGameState.SessionData.SessionTotalRunTime > 0 && currentGameState.SessionData.SessionRunningTime >= currentGameState.PitData.PitWindowStart * 60))
                 {
-                    if (currentGameState.PitData.PitWindow == PitWindow.Completed ||
-                        (currentGameState.PitData.PitWindow == PitWindow.StopInProgress && pitMode == ePitMode.PIT_MODE_DRIVING_OUT_OF_PITS))
+                    if (currentGameState.PitData.PitWindow == PitWindow.StopInProgress && 
+                        (pitMode == ePitMode.PIT_MODE_DRIVING_OUT_OF_PITS || pitMode == ePitMode.PIT_MODE_DRIVING_OUT_OF_GARAGE))
                     {
                         return PitWindow.Completed;
                     }
-                    else if ((pitSchedule == ePitSchedule.PIT_SCHEDULE_PLAYER_REQUESTED ||
-                              pitSchedule == ePitSchedule.PIT_SCHEDULE_ENGINEER_REQUESTED ||
-                              pitSchedule == ePitSchedule.PIT_SCHEDULE_MANDATORY ||
-                              pitSchedule == ePitSchedule.PIT_SCHEDULE_DAMAGE_REQUESTED) &&
-                             (pitMode == ePitMode.PIT_MODE_DRIVING_INTO_PITS || pitMode == ePitMode.PIT_MODE_IN_PIT || pitMode ==  ePitMode.PIT_MODE_IN_GARAGE))
+                    else if (pitMode == ePitMode.PIT_MODE_DRIVING_INTO_PITS || pitMode == ePitMode.PIT_MODE_IN_PIT || pitMode ==  ePitMode.PIT_MODE_IN_GARAGE)
                     {
                         return PitWindow.StopInProgress;
                     }
