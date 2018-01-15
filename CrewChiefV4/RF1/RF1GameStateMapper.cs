@@ -52,6 +52,9 @@ namespace CrewChiefV4.rFactor1
         private TrackDataContainer lastSessionTrackDataContainer = null;
         private float lastSessionTrackLength = -1.0f;
 
+        // next track conditions sample due after:
+        private DateTime nextConditionsSampleDue = DateTime.MinValue;
+
         public RF1GameStateMapper()
         {
             tyreWearThresholds.Add(new CornerData.EnumWithThresholds(TyreCondition.NEW, -10000, scrubbedTyreWearPercent));
@@ -628,8 +631,9 @@ namespace CrewChiefV4.rFactor1
 
             // --------------------------------
             // track conditions
-            if (currentGameState.Conditions.timeOfMostRecentSample.Add(ConditionsMonitor.ConditionsSampleFrequency) < currentGameState.Now)
+            if (currentGameState.Now > nextConditionsSampleDue)
             {
+                nextConditionsSampleDue = currentGameState.Now.Add(ConditionsMonitor.ConditionsSampleFrequency);
                 currentGameState.Conditions.addSample(currentGameState.Now, currentGameState.SessionData.CompletedLaps, currentGameState.SessionData.SectorNumber,
                     shared.ambientTemp, shared.trackTemp, 0, (float)Math.Sqrt((double)(shared.wind.x * shared.wind.x + shared.wind.y * shared.wind.y + shared.wind.z * shared.wind.z)), 0, 0, 0);
             }

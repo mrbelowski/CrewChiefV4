@@ -93,6 +93,9 @@ namespace CrewChiefV4.PCars
         DateTime nextOpponentCleanupTime = DateTime.MinValue;
         TimeSpan opponentCleanupInterval = TimeSpan.FromSeconds(2);
 
+        // next track conditions sample due after:
+        private DateTime nextConditionsSampleDue = DateTime.MinValue;
+
         public PCarsGameStateMapper()
         {
             CornerData.EnumWithThresholds suspensionDamageNone = new CornerData.EnumWithThresholds(DamageLevel.NONE, -10000, trivialSuspensionDamageThreshold);
@@ -1268,8 +1271,9 @@ namespace CrewChiefV4.PCars
                 currentGameState.TyreData.RightRearIsSpinning = Math.Abs(shared.mTyreRPS[3]) > maxRotatingSpeed;
             }
 
-            if (currentGameState.Conditions.timeOfMostRecentSample.Add(ConditionsMonitor.ConditionsSampleFrequency) < currentGameState.Now)
+            if (currentGameState.Now > nextConditionsSampleDue)
             {
+                nextConditionsSampleDue = currentGameState.Now.Add(ConditionsMonitor.ConditionsSampleFrequency);
                 currentGameState.Conditions.addSample(currentGameState.Now, currentGameState.SessionData.CompletedLaps, currentGameState.SessionData.SectorNumber,
                     shared.mAmbientTemperature, shared.mTrackTemperature, shared.mRainDensity, shared.mWindSpeed, shared.mWindDirectionX, shared.mWindDirectionY, shared.mCloudBrightness);
             }
