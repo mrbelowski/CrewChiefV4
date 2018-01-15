@@ -560,6 +560,8 @@ namespace CrewChiefV4.rFactor2
 
                 cgs.FlagData.currentLapIsFCY = pgs.FlagData.currentLapIsFCY;
                 cgs.FlagData.previousLapWasFCY = pgs.FlagData.previousLapWasFCY;
+
+                cgs.Conditions.samples = pgs.Conditions.samples;
             }
 
             csd.SessionStartTime = csd.IsNewSession ? cgs.Now : psd.SessionStartTime;
@@ -619,7 +621,6 @@ namespace CrewChiefV4.rFactor2
                 csd.DeltaTime = new DeltaTime(csd.TrackDefinition.trackLength, cgs.PositionAndMotionData.DistanceRoundTrack, cgs.Now);
 
             csd.DeltaTime.SetNextDeltaPoint(cgs.PositionAndMotionData.DistanceRoundTrack, csd.CompletedLaps, cgs.PositionAndMotionData.CarSpeed, cgs.Now);
-
 
             // Is online session?
             this.isOfflineSession = true;
@@ -1028,10 +1029,6 @@ namespace CrewChiefV4.rFactor2
 
             // --------------------------------
             // track conditions
-            if (pgs != null)
-            {
-                cgs.Conditions.samples = pgs.Conditions.samples;
-            }
             if (cgs.Now > nextConditionsSampleDue)
             {
                 nextConditionsSampleDue = cgs.Now.Add(ConditionsMonitor.ConditionsSampleFrequency);
