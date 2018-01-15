@@ -38,6 +38,9 @@ namespace CrewChiefV4.iRacing
         private Dictionary<string, PendingRacePositionChange> PendingRacePositionChanges = new Dictionary<string, PendingRacePositionChange>();
         private TimeSpan PositionChangeLag = TimeSpan.FromMilliseconds(1000);
 
+        // next track conditions sample due after:
+        private DateTime nextConditionsSampleDue = DateTime.MinValue;
+
         class PendingRacePositionChange
         {
             public int newPosition;
@@ -799,8 +802,9 @@ namespace CrewChiefV4.iRacing
                 currentGameState.SessionData.GameTimeAtLastPositionBehindChange = currentGameState.SessionData.SessionRunningTime;
             }
             //conditions
-            if (currentGameState.Conditions.timeOfMostRecentSample.Add(ConditionsMonitor.ConditionsSampleFrequency) < currentGameState.Now)
+            if (currentGameState.Now > nextConditionsSampleDue)
             {
+                nextConditionsSampleDue = currentGameState.Now.Add(ConditionsMonitor.ConditionsSampleFrequency);
                 currentGameState.Conditions.addSample(currentGameState.Now, currentGameState.SessionData.CompletedLaps, currentGameState.SessionData.SectorNumber,
                     shared.Telemetry.AirTemp, shared.Telemetry.TrackTemp, 0, shared.Telemetry.WindVel, 0, 0, 0);
             }

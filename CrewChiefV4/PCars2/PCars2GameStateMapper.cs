@@ -91,6 +91,9 @@ namespace CrewChiefV4.PCars2
         private Boolean collisionOnThisLap = false;
         // TODO: what to use for this value
         private float collisionMagnitudeThreshold = 0.1f;
+
+        // next track conditions sample due after:
+        private DateTime nextConditionsSampleDue = DateTime.MinValue;
         
         public PCars2GameStateMapper()
         {
@@ -1204,8 +1207,9 @@ namespace CrewChiefV4.PCars2
                 currentGameState.TyreData.RightRearIsSpinning = Math.Abs(shared.mTyreRPS[3]) > maxRotatingSpeed;
             }
 
-            if (currentGameState.Conditions.timeOfMostRecentSample.Add(ConditionsMonitor.ConditionsSampleFrequency) < currentGameState.Now)
+            if (currentGameState.Now > nextConditionsSampleDue)
             {
+                nextConditionsSampleDue = currentGameState.Now.Add(ConditionsMonitor.ConditionsSampleFrequency);
                 currentGameState.Conditions.addSample(currentGameState.Now, currentGameState.SessionData.CompletedLaps, currentGameState.SessionData.SectorNumber,
                     shared.mAmbientTemperature, shared.mTrackTemperature, shared.mRainDensity, shared.mWindSpeed, shared.mWindDirectionX, shared.mWindDirectionY, shared.mCloudBrightness);
             }

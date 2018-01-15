@@ -52,6 +52,9 @@ namespace CrewChiefV4.assetto
 
         public List<LapData> playerLapData = new List<LapData>();
 
+        // next track conditions sample due after:
+        private DateTime nextConditionsSampleDue = DateTime.MinValue;
+
         public void StartNewLap(int lapNumber, float gameTimeAtStart)
         {
             LapData thisLapData = new LapData();
@@ -1908,8 +1911,9 @@ namespace CrewChiefV4.assetto
             }
 
             //conditions
-            if (currentGameState.Conditions.timeOfMostRecentSample.Add(ConditionsMonitor.ConditionsSampleFrequency) < currentGameState.Now)
+            if (currentGameState.Now > nextConditionsSampleDue)
             {
+                nextConditionsSampleDue = currentGameState.Now.Add(ConditionsMonitor.ConditionsSampleFrequency);
                 currentGameState.Conditions.addSample(currentGameState.Now, currentGameState.SessionData.CompletedLaps, currentGameState.SessionData.SectorNumber,
                     shared.acsPhysics.airTemp, shared.acsPhysics.roadTemp, 0, 0, 0, 0, 0);
             }
