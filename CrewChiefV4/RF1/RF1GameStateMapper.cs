@@ -631,6 +631,10 @@ namespace CrewChiefV4.rFactor1
 
             // --------------------------------
             // track conditions
+            if (previousGameState != null)
+            {
+                currentGameState.Conditions = previousGameState.Conditions;
+            }
             if (currentGameState.Now > nextConditionsSampleDue)
             {
                 nextConditionsSampleDue = currentGameState.Now.Add(ConditionsMonitor.ConditionsSampleFrequency);
