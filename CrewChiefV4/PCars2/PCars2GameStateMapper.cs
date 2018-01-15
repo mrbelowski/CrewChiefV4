@@ -1062,7 +1062,7 @@ namespace CrewChiefV4.PCars2
                 else
                 {
                     // if the enforcedPitStopLap is < 0, assume it's completed
-                    currentGameState.PitData.MandatoryPitStopCompleted = true;
+                    currentGameState.PitData.MandatoryPitStopCompleted = false;
                     currentGameState.PitData.PitWindow = PitWindow.Completed;
                 }
             }
