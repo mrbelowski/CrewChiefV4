@@ -208,6 +208,9 @@ namespace CrewChiefV4.iRacing
                     }
 
                 }
+                // add a conditions sample when we first start a session so we're not using stale or default data in the pre-lights phase
+                currentGameState.Conditions.addSample(currentGameState.Now, 0, 1, shared.Telemetry.AirTemp, shared.Telemetry.TrackTemp, 0, shared.Telemetry.WindVel, 0, 0, 0);
+
                 //need to call this after adding opponents else we have nothing to compare against 
                 Utilities.TraceEventClass(currentGameState);
             }
