@@ -239,19 +239,6 @@ namespace CrewChiefV4.Events
                     audioPlayer.playMessage(new QueuedMessage(folderTimePenalty, 0, this));
                 }
             }
-            else if (currentGameState.PositionAndMotionData.CarSpeed > 1 && playCutTrackWarnings && currentGameState.SessionData.SessionType != SessionType.Race &&
-              !currentGameState.SessionData.CurrentLapIsValid && previousGameState != null && previousGameState.SessionData.CurrentLapIsValid)
-            {
-                cutTrackWarningsCount = currentGameState.PenaltiesData.CutTrackWarnings;
-                // don't warn about cut track if the AI is driving
-                if (currentGameState.ControlData.ControlType != ControlType.AI &&
-                    lastCutTrackWarningTime.Add(cutTrackWarningFrequency) < currentGameState.Now)
-                {
-                    lastCutTrackWarningTime = currentGameState.Now;
-                    audioPlayer.playMessage(new QueuedMessage(folderLapDeleted, 2, this));
-                    clearPenaltyState();
-                }
-            }
             else if (currentGameState.PositionAndMotionData.CarSpeed > 1 && playCutTrackWarnings && 
                 currentGameState.PenaltiesData.CutTrackWarnings > cutTrackWarningsCount &&
                 currentGameState.PenaltiesData.NumPenalties == previousGameState.PenaltiesData.NumPenalties)  // Make sure we've no new penalty for this cut.
@@ -270,12 +257,29 @@ namespace CrewChiefV4.Events
                         }
                         else
                         {
-                            audioPlayer.playMessage(new QueuedMessage(folderCutTrackPracticeOrQual, 2, this));
+                            // cut track in prac / qual is the same as lap deleted. Rather than dick about with the sound files, just allow either here
+                            audioPlayer.playMessage(new QueuedMessage(Utilities.random.NextDouble() < 0.3 ? folderLapDeleted : folderCutTrackPracticeOrQual, 2, this));
                         }
                     }
                     clearPenaltyState();
                 }
             }
+            else if (currentGameState.PositionAndMotionData.CarSpeed > 1 && playCutTrackWarnings && currentGameState.SessionData.SessionType != SessionType.Race &&
+              !currentGameState.SessionData.CurrentLapIsValid && previousGameState != null && previousGameState.SessionData.CurrentLapIsValid)
+            {
+                // JB: don't think we need this block - the previous block should always trigger in preference to this, but we'll leave it here just in case
+                cutTrackWarningsCount = currentGameState.PenaltiesData.CutTrackWarnings;
+                // don't warn about cut track if the AI is driving
+                if (currentGameState.ControlData.ControlType != ControlType.AI &&
+                    lastCutTrackWarningTime.Add(cutTrackWarningFrequency) < currentGameState.Now)
+                {
+                    lastCutTrackWarningTime = currentGameState.Now;
+                    // cut track in prac / qual is the same as lap deleted. Rather than dick about with the sound files, just allow either here
+                    audioPlayer.playMessage(new QueuedMessage(Utilities.random.NextDouble() < 0.3 ? folderLapDeleted : folderCutTrackPracticeOrQual, 2, this));
+                    clearPenaltyState();
+                }
+            }
+            
             // can't read penalty type in Automobilista
             // Assume this applies to rF2 as well for now
             else if (currentGameState.SessionData.SessionType == SessionType.Race && previousGameState != null &&

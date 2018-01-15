@@ -91,6 +91,9 @@ namespace CrewChiefV4.PCars2
         private Boolean collisionOnThisLap = false;
         // TODO: what to use for this value
         private float collisionMagnitudeThreshold = 0.1f;
+
+        // next track conditions sample due after:
+        private DateTime nextConditionsSampleDue = DateTime.MinValue;
         
         public PCars2GameStateMapper()
         {
@@ -412,6 +415,9 @@ namespace CrewChiefV4.PCars2
                 GlobalBehaviourSettings.UpdateFromTrackDefinition(currentGameState.SessionData.TrackDefinition);
 
                 currentGameState.SessionData.DeltaTime = new DeltaTime(currentGameState.SessionData.TrackDefinition.trackLength, currentGameState.PositionAndMotionData.DistanceRoundTrack, currentGameState.Now);
+
+                currentGameState.PitData.MandatoryPitStopCompleted = false;
+                currentGameState.PitData.PitWindow = shared.mEnforcedPitStopLap > 0 ? PitWindow.Closed : PitWindow.Unavailable;
             }
             else
             {
@@ -467,6 +473,9 @@ namespace CrewChiefV4.PCars2
                                 currentGameState.SessionData.SessionNumberOfLaps = previousGameState.SessionData.SessionNumberOfLaps;
                             }
                         }
+
+                        currentGameState.PitData.MandatoryPitStopCompleted = false;
+                        currentGameState.PitData.PitWindow = shared.mEnforcedPitStopLap > 0 ? PitWindow.Closed : PitWindow.Unavailable;
 
                         currentGameState.SessionData.DeltaTime = new DeltaTime(currentGameState.SessionData.TrackDefinition.trackLength, currentGameState.PositionAndMotionData.DistanceRoundTrack, currentGameState.Now);
 
@@ -538,7 +547,7 @@ namespace CrewChiefV4.PCars2
                     currentGameState.SessionData.PlayerBestLapSector1Time = previousGameState.SessionData.PlayerBestLapSector1Time;
                     currentGameState.SessionData.PlayerBestLapSector2Time = previousGameState.SessionData.PlayerBestLapSector2Time;
                     currentGameState.SessionData.PlayerBestLapSector3Time = previousGameState.SessionData.PlayerBestLapSector3Time;
-                    currentGameState.Conditions = previousGameState.Conditions;
+                    currentGameState.Conditions.samples = previousGameState.Conditions.samples;
                     currentGameState.SessionData.trackLandmarksTiming = previousGameState.SessionData.trackLandmarksTiming;
                     currentGameState.SessionData.PlayerLapData = previousGameState.SessionData.PlayerLapData;
                     currentGameState.SessionData.CurrentLapIsValid = previousGameState.SessionData.CurrentLapIsValid;
@@ -1030,29 +1039,40 @@ namespace CrewChiefV4.PCars2
             }
             
             currentGameState.PitData.IsApproachingPitlane = pitMode == ePitMode.PIT_MODE_DRIVING_INTO_PITS;
-           
-            if (currentGameState.SessionData.SessionType == SessionType.Race && shared.mEnforcedPitStopLap > 0)
+
+            if (currentGameState.SessionData.SessionType == SessionType.Race)
             {
-                currentGameState.PitData.HasMandatoryPitStop = true;
-                currentGameState.PitData.PitWindowStart = (int) shared.mEnforcedPitStopLap;
-                
-                // estimate the pit window close lap / time
-                if (currentGameState.SessionData.SessionHasFixedTime)
+                if (shared.mEnforcedPitStopLap > 0)
                 {
-                    currentGameState.PitData.PitWindowEnd = (int)((currentGameState.SessionData.SessionTotalRunTime - 60f) / 60f);
+                    currentGameState.PitData.HasMandatoryPitStop = true;
+                    currentGameState.PitData.PitWindowStart = (int)shared.mEnforcedPitStopLap;
+
+                    // estimate the pit window close lap / time
+                    if (currentGameState.SessionData.SessionHasFixedTime)
+                    {
+                        currentGameState.PitData.PitWindowEnd = (int)((currentGameState.SessionData.SessionTotalRunTime - 60f) / 60f);
+                    }
+                    else
+                    {
+                        currentGameState.PitData.PitWindowEnd = currentGameState.SessionData.SessionNumberOfLaps - 1;
+                    }
+                    currentGameState.PitData.PitWindow = mapToPitWindow(currentGameState, pitShedule, pitMode);
+                    currentGameState.PitData.IsMakingMandatoryPitStop = (currentGameState.PitData.PitWindow == PitWindow.Open || currentGameState.PitData.PitWindow == PitWindow.StopInProgress) &&
+                            (currentGameState.PitData.OnInLap || currentGameState.PitData.OnOutLap);
+                    // do we need to move this out of the shared.mEnforcedPitStopLap > 0 check, as the lap may be reset to 0 after the stop is completed?
+                    if (previousGameState != null)
+                    {
+                        currentGameState.PitData.MandatoryPitStopCompleted = previousGameState.PitData.MandatoryPitStopCompleted || currentGameState.PitData.IsMakingMandatoryPitStop;
+                    }
                 }
                 else
                 {
-                    currentGameState.PitData.PitWindowEnd = currentGameState.SessionData.SessionNumberOfLaps - 1;
-                }
-                currentGameState.PitData.PitWindow = mapToPitWindow(currentGameState, pitShedule, pitMode);
-                currentGameState.PitData.IsMakingMandatoryPitStop = (currentGameState.PitData.PitWindow == PitWindow.Open || currentGameState.PitData.PitWindow == PitWindow.StopInProgress) &&
-                        (currentGameState.PitData.OnInLap || currentGameState.PitData.OnOutLap);
-                if (previousGameState != null)
-                {
-                    currentGameState.PitData.MandatoryPitStopCompleted = previousGameState.PitData.MandatoryPitStopCompleted || currentGameState.PitData.IsMakingMandatoryPitStop;
+                    // if the enforcedPitStopLap is < 0, assume it's completed - no way of knowing whether this means the stop is complete, or there was no stop in the first place
+                    currentGameState.PitData.MandatoryPitStopCompleted = true;
+                    currentGameState.PitData.PitWindow = PitWindow.Completed;
                 }
             }
+
             currentGameState.CarDamageData.DamageEnabled = true;    // no way to tell if it's disabled from the shared memory
             currentGameState.CarDamageData.OverallAeroDamage = mapToAeroDamageLevel(shared.mAeroDamage);
             currentGameState.CarDamageData.OverallEngineDamage = mapToEngineDamageLevel(shared.mEngineDamage);
@@ -1204,8 +1224,9 @@ namespace CrewChiefV4.PCars2
                 currentGameState.TyreData.RightRearIsSpinning = Math.Abs(shared.mTyreRPS[3]) > maxRotatingSpeed;
             }
 
-            if (currentGameState.Conditions.timeOfMostRecentSample.Add(ConditionsMonitor.ConditionsSampleFrequency) < currentGameState.Now)
+            if (currentGameState.Now > nextConditionsSampleDue)
             {
+                nextConditionsSampleDue = currentGameState.Now.Add(ConditionsMonitor.ConditionsSampleFrequency);
                 currentGameState.Conditions.addSample(currentGameState.Now, currentGameState.SessionData.CompletedLaps, currentGameState.SessionData.SectorNumber,
                     shared.mAmbientTemperature, shared.mTrackTemperature, shared.mRainDensity, shared.mWindSpeed, shared.mWindDirectionX, shared.mWindDirectionY, shared.mCloudBrightness);
             }
@@ -1644,7 +1665,7 @@ namespace CrewChiefV4.PCars2
 
         private PitWindow mapToPitWindow(GameStateData currentGameState, ePitSchedule pitSchedule, ePitMode pitMode)
         {
-            // if we've already completed out stop, just return completed here
+            // if we've already completed our stop, just return completed here
             if (currentGameState.PitData.PitWindow == PitWindow.Completed)
             {
                 return PitWindow.Completed;
@@ -1661,16 +1682,12 @@ namespace CrewChiefV4.PCars2
                 else if ((currentGameState.SessionData.SessionNumberOfLaps > 0 && currentGameState.SessionData.CompletedLaps >= currentGameState.PitData.PitWindowStart) ||
                     (currentGameState.SessionData.SessionTotalRunTime > 0 && currentGameState.SessionData.SessionRunningTime >= currentGameState.PitData.PitWindowStart * 60))
                 {
-                    if (currentGameState.PitData.PitWindow == PitWindow.Completed ||
-                        (currentGameState.PitData.PitWindow == PitWindow.StopInProgress && pitMode == ePitMode.PIT_MODE_DRIVING_OUT_OF_PITS))
+                    if (currentGameState.PitData.PitWindow == PitWindow.StopInProgress && 
+                        (pitMode == ePitMode.PIT_MODE_DRIVING_OUT_OF_PITS || pitMode == ePitMode.PIT_MODE_DRIVING_OUT_OF_GARAGE))
                     {
                         return PitWindow.Completed;
                     }
-                    else if ((pitSchedule == ePitSchedule.PIT_SCHEDULE_PLAYER_REQUESTED ||
-                              pitSchedule == ePitSchedule.PIT_SCHEDULE_ENGINEER_REQUESTED ||
-                              pitSchedule == ePitSchedule.PIT_SCHEDULE_MANDATORY ||
-                              pitSchedule == ePitSchedule.PIT_SCHEDULE_DAMAGE_REQUESTED) &&
-                             (pitMode == ePitMode.PIT_MODE_DRIVING_INTO_PITS || pitMode == ePitMode.PIT_MODE_IN_PIT || pitMode ==  ePitMode.PIT_MODE_IN_GARAGE))
+                    else if (pitMode == ePitMode.PIT_MODE_DRIVING_INTO_PITS || pitMode == ePitMode.PIT_MODE_IN_PIT || pitMode ==  ePitMode.PIT_MODE_IN_GARAGE)
                     {
                         return PitWindow.StopInProgress;
                     }

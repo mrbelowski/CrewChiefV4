@@ -1718,6 +1718,7 @@ namespace CrewChiefV4.GameState
 
     public class Conditions
     {
+        public List<ConditionsSample> samples = new List<ConditionsSample>();
         public class ConditionsSample
         {
             public DateTime Time;
@@ -1748,13 +1749,9 @@ namespace CrewChiefV4.GameState
             }
         }
 
-        public DateTime timeOfMostRecentSample = DateTime.MinValue;
-        public List<ConditionsSample> samples = new List<ConditionsSample>();
-
         public void addSample(DateTime time, int lapCount, int sectorNumber, float AmbientTemperature, float TrackTemperature, float RainDensity,
                 float WindSpeed, float WindDirectionX, float WindDirectionY, float CloudBrightness)
         {
-            timeOfMostRecentSample = time;
             samples.Add(new ConditionsSample(time, lapCount, sectorNumber, AmbientTemperature, TrackTemperature, RainDensity,
                 WindSpeed, WindDirectionX, WindDirectionY, CloudBrightness));
         }

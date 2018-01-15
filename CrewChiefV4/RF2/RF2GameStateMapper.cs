@@ -93,6 +93,9 @@ namespace CrewChiefV4.rFactor2
         private TrackDataContainer lastSessionTrackDataContainer = null;
         private double lastSessionTrackLength = -1.0;
 
+        // next track conditions sample due after:
+        private DateTime nextConditionsSampleDue = DateTime.MinValue;
+
         public RF2GameStateMapper()
         {
             this.tyreWearThresholds.Add(new CornerData.EnumWithThresholds(TyreCondition.NEW, -10000.0f, this.scrubbedTyreWearPercent));
@@ -1025,8 +1028,13 @@ namespace CrewChiefV4.rFactor2
 
             // --------------------------------
             // track conditions
-            if (cgs.Conditions.timeOfMostRecentSample.Add(ConditionsMonitor.ConditionsSampleFrequency) < cgs.Now)
+            if (pgs != null)
             {
+                cgs.Conditions.samples = pgs.Conditions.samples;
+            }
+            if (cgs.Now > nextConditionsSampleDue)
+            {
+                nextConditionsSampleDue = cgs.Now.Add(ConditionsMonitor.ConditionsSampleFrequency);
                 cgs.Conditions.addSample(cgs.Now, csd.CompletedLaps, csd.SectorNumber,
                     (float)shared.scoring.mScoringInfo.mAmbientTemp, (float)shared.scoring.mScoringInfo.mTrackTemp, (float)shared.scoring.mScoringInfo.mRaining,
                     (float)Math.Sqrt((double)(shared.scoring.mScoringInfo.mWind.x * shared.scoring.mScoringInfo.mWind.x + shared.scoring.mScoringInfo.mWind.y * shared.scoring.mScoringInfo.mWind.y + shared.scoring.mScoringInfo.mWind.z * shared.scoring.mScoringInfo.mWind.z)), 0, 0, 0);
