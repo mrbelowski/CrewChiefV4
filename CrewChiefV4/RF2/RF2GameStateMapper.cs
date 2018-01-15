@@ -1031,6 +1031,10 @@ namespace CrewChiefV4.rFactor2
 
             // --------------------------------
             // track conditions
+            if (pgs != null)
+            {
+                cgs.Conditions = pgs.Conditions;
+            }
             if (cgs.Now > nextConditionsSampleDue)
             {
                 nextConditionsSampleDue = cgs.Now.Add(ConditionsMonitor.ConditionsSampleFrequency);

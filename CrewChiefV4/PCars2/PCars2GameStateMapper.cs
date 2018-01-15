@@ -1051,11 +1051,13 @@ namespace CrewChiefV4.PCars2
                 currentGameState.PitData.PitWindow = mapToPitWindow(currentGameState, pitShedule, pitMode);
                 currentGameState.PitData.IsMakingMandatoryPitStop = (currentGameState.PitData.PitWindow == PitWindow.Open || currentGameState.PitData.PitWindow == PitWindow.StopInProgress) &&
                         (currentGameState.PitData.OnInLap || currentGameState.PitData.OnOutLap);
+                // do we need to move this out of the shared.mEnforcedPitStopLap > 0 check, as the lap may be reset to 0 after the stop is completed?
                 if (previousGameState != null)
                 {
                     currentGameState.PitData.MandatoryPitStopCompleted = previousGameState.PitData.MandatoryPitStopCompleted || currentGameState.PitData.IsMakingMandatoryPitStop;
                 }
-            }
+            }            
+
             currentGameState.CarDamageData.DamageEnabled = true;    // no way to tell if it's disabled from the shared memory
             currentGameState.CarDamageData.OverallAeroDamage = mapToAeroDamageLevel(shared.mAeroDamage);
             currentGameState.CarDamageData.OverallEngineDamage = mapToEngineDamageLevel(shared.mEngineDamage);
@@ -1648,7 +1650,7 @@ namespace CrewChiefV4.PCars2
 
         private PitWindow mapToPitWindow(GameStateData currentGameState, ePitSchedule pitSchedule, ePitMode pitMode)
         {
-            // if we've already completed out stop, just return completed here
+            // if we've already completed our stop, just return completed here
             if (currentGameState.PitData.PitWindow == PitWindow.Completed)
             {
                 return PitWindow.Completed;
