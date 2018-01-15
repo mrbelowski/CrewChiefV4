@@ -52,6 +52,9 @@ namespace CrewChiefV4.assetto
 
         public List<LapData> playerLapData = new List<LapData>();
 
+        // next track conditions sample due after:
+        private DateTime nextConditionsSampleDue = DateTime.MinValue;
+
         public void StartNewLap(int lapNumber, float gameTimeAtStart)
         {
             LapData thisLapData = new LapData();
@@ -1204,7 +1207,7 @@ namespace CrewChiefV4.assetto
                     currentGameState.SessionData.PlayerBestLapSector1Time = previousGameState.SessionData.PlayerBestLapSector1Time;
                     currentGameState.SessionData.PlayerBestLapSector2Time = previousGameState.SessionData.PlayerBestLapSector2Time;
                     currentGameState.SessionData.PlayerBestLapSector3Time = previousGameState.SessionData.PlayerBestLapSector3Time;
-                    currentGameState.Conditions = previousGameState.Conditions;
+                    currentGameState.Conditions.samples = previousGameState.Conditions.samples;
                     currentGameState.SessionData.trackLandmarksTiming = previousGameState.SessionData.trackLandmarksTiming;
                     currentGameState.TyreData.TyreTypeName = previousGameState.TyreData.TyreTypeName;
 
@@ -1908,8 +1911,9 @@ namespace CrewChiefV4.assetto
             }
 
             //conditions
-            if (currentGameState.Conditions.timeOfMostRecentSample.Add(ConditionsMonitor.ConditionsSampleFrequency) < currentGameState.Now)
+            if (currentGameState.Now > nextConditionsSampleDue)
             {
+                nextConditionsSampleDue = currentGameState.Now.Add(ConditionsMonitor.ConditionsSampleFrequency);
                 currentGameState.Conditions.addSample(currentGameState.Now, currentGameState.SessionData.CompletedLaps, currentGameState.SessionData.SectorNumber,
                     shared.acsPhysics.airTemp, shared.acsPhysics.roadTemp, 0, 0, 0, 0, 0);
             }

@@ -38,6 +38,9 @@ namespace CrewChiefV4.iRacing
         private Dictionary<string, PendingRacePositionChange> PendingRacePositionChanges = new Dictionary<string, PendingRacePositionChange>();
         private TimeSpan PositionChangeLag = TimeSpan.FromMilliseconds(1000);
 
+        // next track conditions sample due after:
+        private DateTime nextConditionsSampleDue = DateTime.MinValue;
+
         class PendingRacePositionChange
         {
             public int newPosition;
@@ -208,6 +211,9 @@ namespace CrewChiefV4.iRacing
                     }
 
                 }
+                // add a conditions sample when we first start a session so we're not using stale or default data in the pre-lights phase
+                currentGameState.Conditions.addSample(currentGameState.Now, 0, 1, shared.Telemetry.AirTemp, shared.Telemetry.TrackTemp, 0, shared.Telemetry.WindVel, 0, 0, 0);
+
                 //need to call this after adding opponents else we have nothing to compare against 
                 Utilities.TraceEventClass(currentGameState);
             }
@@ -346,6 +352,8 @@ namespace CrewChiefV4.iRacing
                     currentGameState.SessionData.CurrentDriverIncidentCount = previousGameState.SessionData.CurrentDriverIncidentCount;
                     currentGameState.SessionData.CurrentTeamIncidentCount = previousGameState.SessionData.CurrentTeamIncidentCount;
                     currentGameState.SessionData.HasLimitedIncidents = previousGameState.SessionData.HasLimitedIncidents;
+
+                    currentGameState.Conditions.samples = previousGameState.Conditions.samples;
                 }
             }
 
@@ -796,8 +804,9 @@ namespace CrewChiefV4.iRacing
                 currentGameState.SessionData.GameTimeAtLastPositionBehindChange = currentGameState.SessionData.SessionRunningTime;
             }
             //conditions
-            if (currentGameState.Conditions.timeOfMostRecentSample.Add(ConditionsMonitor.ConditionsSampleFrequency) < currentGameState.Now)
+            if (currentGameState.Now > nextConditionsSampleDue)
             {
+                nextConditionsSampleDue = currentGameState.Now.Add(ConditionsMonitor.ConditionsSampleFrequency);
                 currentGameState.Conditions.addSample(currentGameState.Now, currentGameState.SessionData.CompletedLaps, currentGameState.SessionData.SectorNumber,
                     shared.Telemetry.AirTemp, shared.Telemetry.TrackTemp, 0, shared.Telemetry.WindVel, 0, 0, 0);
             }
