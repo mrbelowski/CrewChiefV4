@@ -541,7 +541,7 @@ namespace CrewChiefV4.PCars2
                     currentGameState.SessionData.PlayerBestLapSector1Time = previousGameState.SessionData.PlayerBestLapSector1Time;
                     currentGameState.SessionData.PlayerBestLapSector2Time = previousGameState.SessionData.PlayerBestLapSector2Time;
                     currentGameState.SessionData.PlayerBestLapSector3Time = previousGameState.SessionData.PlayerBestLapSector3Time;
-                    currentGameState.Conditions = previousGameState.Conditions;
+                    currentGameState.Conditions.samples = previousGameState.Conditions.samples;
                     currentGameState.SessionData.trackLandmarksTiming = previousGameState.SessionData.trackLandmarksTiming;
                     currentGameState.SessionData.PlayerLapData = previousGameState.SessionData.PlayerLapData;
                     currentGameState.SessionData.CurrentLapIsValid = previousGameState.SessionData.CurrentLapIsValid;
@@ -1033,30 +1033,39 @@ namespace CrewChiefV4.PCars2
             }
             
             currentGameState.PitData.IsApproachingPitlane = pitMode == ePitMode.PIT_MODE_DRIVING_INTO_PITS;
-           
-            if (currentGameState.SessionData.SessionType == SessionType.Race && shared.mEnforcedPitStopLap > 0)
+
+            if (currentGameState.SessionData.SessionType == SessionType.Race)
             {
-                currentGameState.PitData.HasMandatoryPitStop = true;
-                currentGameState.PitData.PitWindowStart = (int) shared.mEnforcedPitStopLap;
-                
-                // estimate the pit window close lap / time
-                if (currentGameState.SessionData.SessionHasFixedTime)
+                if (shared.mEnforcedPitStopLap > 0)
                 {
-                    currentGameState.PitData.PitWindowEnd = (int)((currentGameState.SessionData.SessionTotalRunTime - 60f) / 60f);
+                    currentGameState.PitData.HasMandatoryPitStop = true;
+                    currentGameState.PitData.PitWindowStart = (int)shared.mEnforcedPitStopLap;
+
+                    // estimate the pit window close lap / time
+                    if (currentGameState.SessionData.SessionHasFixedTime)
+                    {
+                        currentGameState.PitData.PitWindowEnd = (int)((currentGameState.SessionData.SessionTotalRunTime - 60f) / 60f);
+                    }
+                    else
+                    {
+                        currentGameState.PitData.PitWindowEnd = currentGameState.SessionData.SessionNumberOfLaps - 1;
+                    }
+                    currentGameState.PitData.PitWindow = mapToPitWindow(currentGameState, pitShedule, pitMode);
+                    currentGameState.PitData.IsMakingMandatoryPitStop = (currentGameState.PitData.PitWindow == PitWindow.Open || currentGameState.PitData.PitWindow == PitWindow.StopInProgress) &&
+                            (currentGameState.PitData.OnInLap || currentGameState.PitData.OnOutLap);
+                    // do we need to move this out of the shared.mEnforcedPitStopLap > 0 check, as the lap may be reset to 0 after the stop is completed?
+                    if (previousGameState != null)
+                    {
+                        currentGameState.PitData.MandatoryPitStopCompleted = previousGameState.PitData.MandatoryPitStopCompleted || currentGameState.PitData.IsMakingMandatoryPitStop;
+                    }
                 }
                 else
                 {
-                    currentGameState.PitData.PitWindowEnd = currentGameState.SessionData.SessionNumberOfLaps - 1;
+                    // if the enforcedPitStopLap is < 0, assume it's completed
+                    currentGameState.PitData.MandatoryPitStopCompleted = true;
+                    currentGameState.PitData.PitWindow = PitWindow.Completed;
                 }
-                currentGameState.PitData.PitWindow = mapToPitWindow(currentGameState, pitShedule, pitMode);
-                currentGameState.PitData.IsMakingMandatoryPitStop = (currentGameState.PitData.PitWindow == PitWindow.Open || currentGameState.PitData.PitWindow == PitWindow.StopInProgress) &&
-                        (currentGameState.PitData.OnInLap || currentGameState.PitData.OnOutLap);
-                // do we need to move this out of the shared.mEnforcedPitStopLap > 0 check, as the lap may be reset to 0 after the stop is completed?
-                if (previousGameState != null)
-                {
-                    currentGameState.PitData.MandatoryPitStopCompleted = previousGameState.PitData.MandatoryPitStopCompleted || currentGameState.PitData.IsMakingMandatoryPitStop;
-                }
-            }            
+            }
 
             currentGameState.CarDamageData.DamageEnabled = true;    // no way to tell if it's disabled from the shared memory
             currentGameState.CarDamageData.OverallAeroDamage = mapToAeroDamageLevel(shared.mAeroDamage);

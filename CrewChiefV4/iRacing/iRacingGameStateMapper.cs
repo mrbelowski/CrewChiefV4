@@ -353,7 +353,7 @@ namespace CrewChiefV4.iRacing
                     currentGameState.SessionData.CurrentTeamIncidentCount = previousGameState.SessionData.CurrentTeamIncidentCount;
                     currentGameState.SessionData.HasLimitedIncidents = previousGameState.SessionData.HasLimitedIncidents;
 
-                    currentGameState.Conditions = previousGameState.Conditions;
+                    currentGameState.Conditions.samples = previousGameState.Conditions.samples;
                 }
             }
 

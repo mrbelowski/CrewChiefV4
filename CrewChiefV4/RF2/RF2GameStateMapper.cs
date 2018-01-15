@@ -1033,7 +1033,7 @@ namespace CrewChiefV4.rFactor2
             // track conditions
             if (pgs != null)
             {
-                cgs.Conditions = pgs.Conditions;
+                cgs.Conditions.samples = pgs.Conditions.samples;
             }
             if (cgs.Now > nextConditionsSampleDue)
             {
