@@ -1303,6 +1303,9 @@ namespace CrewChiefV4.RaceRoom
             CrewChief.raceroomTrackId = shared.LayoutId;
             CrewChief.viewingReplay = false;
 
+            currentGameState.PositionAndMotionData.Orientation[0] = shared.CarOrientation.Pitch;
+            currentGameState.PositionAndMotionData.Orientation[1] = shared.CarOrientation.Roll;
+            currentGameState.PositionAndMotionData.Orientation[2] = shared.CarOrientation.Yaw;
             return currentGameState;
         }
 
