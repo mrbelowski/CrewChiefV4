@@ -60,7 +60,7 @@ namespace CrewChiefV4.Events
         // "the car's in good shape" / "we have no significant damage" etc
         private String folderNoDamageOnAnyComponent = "damage_reporting/no_damage";
 
-        private String folderRolled = "damage_reporting/rolled";
+        private String folderRolled = "damage_reporting/rolling";
         private String folderStoppedUpsideDown = "damage_reporting/stopped_upside_down";
 
         private DamageLevel engineDamage;
