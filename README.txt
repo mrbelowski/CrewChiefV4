@@ -203,7 +203,7 @@ One final point. If the app says "Jim is faster than you", let him through :)
 Changelog
 ---------
 
-Version 4.9.0.6: Don't play 'good pass' message in pCARS 2 if we've just collided with someone (still needs some tuning); some performance improvements; fixed issues with historical weather data being lost; pCARS 2 pit window fixes (again...); fixed missing DQ / DNF session end messages; fixed mid-point fuel report saying "fuel looks good" when it clearly isn't good
+Version 4.9.0.6: Don't play 'good pass' message in pCARS 2 if we've just collided with someone (might still need some tuning); some performance improvements; fixed issues with historical weather data being lost; pCARS 2 pit window fixes (again...); fixed missing DQ / DNF session end messages; fixed mid-point fuel report saying "fuel looks good" when it clearly isn't good
 
 Version 4.9.0.5: Fixed 'box this lap' messages playing in pCARS2 even though the player had completed his mandatory stop; some pCARS2 off track warning tweaks; Reworked R3E opponent lap invalidation code - should prevent the app incorrectly invalidating opponent laps; speculative fix for session end being 1 lap too late for iRacing fixed number of lap races
 
