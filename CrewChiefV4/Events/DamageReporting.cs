@@ -282,7 +282,7 @@ namespace CrewChiefV4.Events
                 {
                     Console.WriteLine("Massive impact. Current speed = " + currentGameState.PositionAndMotionData.CarSpeed + " previous speed = " +
                             (previousGameState == null ? 0 : previousGameState.PositionAndMotionData.CarSpeed) +
-                            " acceleration = " + calculatedAcceleration);
+                            " acceleration = " + calculatedAcceleration / 9.8f + "g");
                     if (currentGameState.PositionAndMotionData.CarSpeed < 3)
                     {
                         timeOfDangerousAcceleration = currentGameState.Now;
@@ -921,7 +921,8 @@ namespace CrewChiefV4.Events
                 now.Subtract(timeOfDangerousAcceleration) < TimeSpan.FromSeconds(5))
             {
                 audioPlayer.playMessageImmediately(new QueuedMessage(folderAreYouOKFirstTry, 0, null));
-                if (MainWindow.voiceOption != MainWindow.VoiceOptionEnum.DISABLED)
+                // only kick off the 'waiting for response' stuff sometimes
+                if (MainWindow.voiceOption != MainWindow.VoiceOptionEnum.DISABLED && Utilities.random.NextDouble() > 0.5)
                 {
                     playedAreYouOKInThisSession = true;
                     waitingForDriverIsOKResponse = true;
