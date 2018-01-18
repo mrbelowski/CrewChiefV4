@@ -509,9 +509,9 @@ namespace CrewChiefV4.rFactor1
             var roll = Math.Atan2(player.oriY.x,
               Math.Sqrt(player.oriX.x * player.oriX.x + player.oriZ.x * player.oriZ.x));
 
-            currentGameState.PositionAndMotionData.Orientation[0] = (float)pitch;
-            currentGameState.PositionAndMotionData.Orientation[1] = (float)roll;
-            currentGameState.PositionAndMotionData.Orientation[2] = (float)yaw;
+            currentGameState.PositionAndMotionData.Orientation.Pitch = (float)pitch;
+            currentGameState.PositionAndMotionData.Orientation.Roll = (float)roll;
+            currentGameState.PositionAndMotionData.Orientation.Yaw = (float)yaw;
 
             // Initialize DeltaTime.
             if (currentGameState.SessionData.IsNewSession)

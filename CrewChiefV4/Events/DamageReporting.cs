@@ -89,7 +89,7 @@ namespace CrewChiefV4.Events
 
         private Component componentDestroyed = Component.NONE;
 
-        private LinkedList<float[]> orientationSamples = new LinkedList<float[]>();
+        private LinkedList<PositionAndMotionData.Euler> orientationSamples = new LinkedList<PositionAndMotionData.Euler>();
         private int orientationSamplesCount = 30;   // 3 seconds of orientation data
         private TimeSpan orientationCheckEvery = TimeSpan.FromSeconds(2);
         private DateTime nextOrientationCheckDue = DateTime.MinValue;
@@ -761,7 +761,7 @@ namespace CrewChiefV4.Events
             {
                 // lets see if we're rolling:
                 int upsideDownCount = 0;
-                foreach (float[] orientationSample in orientationSamples)
+                foreach (PositionAndMotionData.Euler orientationSample in orientationSamples)
                 {
                     if (isUpsideDown(orientationSample))
                     {
@@ -776,10 +776,10 @@ namespace CrewChiefV4.Events
             }
         }
 
-        private Boolean isUpsideDown(float[] orientation)
+        private Boolean isUpsideDown(PositionAndMotionData.Euler orientation)
         {
-            float absRoll = Math.Abs(orientation[0]);
-            float absPitch = Math.Abs(orientation[1]);
+            float absRoll = Math.Abs(orientation.Pitch);
+            float absPitch = Math.Abs(orientation.Roll);
             // 90 degrees is 1.5708 radians, but require a bit more here to allow for track camber
             return absRoll > 1.7 || absPitch > 1.7;
         }

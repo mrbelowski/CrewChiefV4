@@ -618,9 +618,9 @@ namespace CrewChiefV4.rFactor2
                 var roll = Math.Atan2(playerTelemetry.mOri[rFactor2Constants.RowY].x,
                   Math.Sqrt(playerTelemetry.mOri[rFactor2Constants.RowX].x * playerTelemetry.mOri[rFactor2Constants.RowX].x + playerTelemetry.mOri[rFactor2Constants.RowZ].x * playerTelemetry.mOri[rFactor2Constants.RowZ].x));
 
-                cgs.PositionAndMotionData.Orientation[0] = (float)pitch;
-                cgs.PositionAndMotionData.Orientation[1] = (float)roll;
-                cgs.PositionAndMotionData.Orientation[2] = (float)yaw;
+                cgs.PositionAndMotionData.Orientation.Pitch = (float)pitch;
+                cgs.PositionAndMotionData.Orientation.Roll = (float)roll;
+                cgs.PositionAndMotionData.Orientation.Yaw = (float)yaw;
             }
             else
             {
@@ -636,9 +636,9 @@ namespace CrewChiefV4.rFactor2
                 var roll = Math.Atan2(playerScoring.mOri[rFactor2Constants.RowY].x,
                   Math.Sqrt(playerScoring.mOri[rFactor2Constants.RowX].x * playerScoring.mOri[rFactor2Constants.RowX].x + playerScoring.mOri[rFactor2Constants.RowZ].x * playerScoring.mOri[rFactor2Constants.RowZ].x));
 
-                cgs.PositionAndMotionData.Orientation[0] = (float)pitch;
-                cgs.PositionAndMotionData.Orientation[1] = (float)roll;
-                cgs.PositionAndMotionData.Orientation[2] = (float)yaw;
+                cgs.PositionAndMotionData.Orientation.Pitch = (float)pitch;
+                cgs.PositionAndMotionData.Orientation.Roll = (float)roll;
+                cgs.PositionAndMotionData.Orientation.Yaw = (float)yaw;
             }
 
             // Initialize DeltaTime.
