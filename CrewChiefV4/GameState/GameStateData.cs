@@ -597,7 +597,7 @@ namespace CrewChiefV4.GameState
 
     public class PositionAndMotionData
     {
-        public class Euler
+        public class Rotation
         {
             public float Pitch = 0.0f;
             public float Roll = 0.0f;
@@ -617,7 +617,7 @@ namespace CrewChiefV4.GameState
         // not set for all games. Pitch, roll, yaw (all in radians. Not sure what 0 means here - 
         // presumably it's relative to the world rather than the track orientation under the car. Is yaw relative to the track spline or 'north'?).
         // This is only set for R3E currently, and is only used to detect the car rolling over.
-        public Euler Orientation = new Euler();
+        public Rotation Orientation = new Rotation();
     }
     
     public class OpponentData

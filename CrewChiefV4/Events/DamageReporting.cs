@@ -89,7 +89,7 @@ namespace CrewChiefV4.Events
 
         private Component componentDestroyed = Component.NONE;
 
-        private LinkedList<PositionAndMotionData.Euler> orientationSamples = new LinkedList<PositionAndMotionData.Euler>();
+        private LinkedList<PositionAndMotionData.Rotation> orientationSamples = new LinkedList<PositionAndMotionData.Rotation>();
         private int orientationSamplesCount = 30;   // 3 seconds of orientation data
         private TimeSpan orientationCheckEvery = TimeSpan.FromSeconds(2);
         private DateTime nextOrientationCheckDue = DateTime.MinValue;
@@ -761,7 +761,7 @@ namespace CrewChiefV4.Events
             {
                 // lets see if we're rolling:
                 int upsideDownCount = 0;
-                foreach (PositionAndMotionData.Euler orientationSample in orientationSamples)
+                foreach (PositionAndMotionData.Rotation orientationSample in orientationSamples)
                 {
                     if (isUpsideDown(orientationSample))
                     {
@@ -776,7 +776,7 @@ namespace CrewChiefV4.Events
             }
         }
 
-        private Boolean isUpsideDown(PositionAndMotionData.Euler orientation)
+        private Boolean isUpsideDown(PositionAndMotionData.Rotation orientation)
         {
             float absRoll = Math.Abs(orientation.Pitch);
             float absPitch = Math.Abs(orientation.Roll);
