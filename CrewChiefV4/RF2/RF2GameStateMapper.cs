@@ -609,12 +609,36 @@ namespace CrewChiefV4.rFactor2
                 cgs.PositionAndMotionData.CarSpeed = (float)RF2GameStateMapper.getVehicleSpeed(ref playerTelemetry);
                 cgs.PositionAndMotionData.DistanceRoundTrack = (float)getEstimatedLapDist(shared, ref playerScoring, ref playerTelemetry);
                 cgs.PositionAndMotionData.WorldPosition = new float[] { (float)playerTelemetry.mPos.x, (float)playerTelemetry.mPos.y, (float)playerTelemetry.mPos.z };
+
+                var yaw = Math.Atan2(playerTelemetry.mOri[rFactor2Constants.RowZ].x, playerTelemetry.mOri[rFactor2Constants.RowZ].z);
+
+                var pitch = Math.Atan2(-playerTelemetry.mOri[rFactor2Constants.RowY].z,
+                  Math.Sqrt(playerTelemetry.mOri[rFactor2Constants.RowX].z * playerTelemetry.mOri[rFactor2Constants.RowX].z + playerTelemetry.mOri[rFactor2Constants.RowZ].z * playerTelemetry.mOri[rFactor2Constants.RowZ].z));
+
+                var roll = Math.Atan2(playerTelemetry.mOri[rFactor2Constants.RowY].x,
+                  Math.Sqrt(playerTelemetry.mOri[rFactor2Constants.RowX].x * playerTelemetry.mOri[rFactor2Constants.RowX].x + playerTelemetry.mOri[rFactor2Constants.RowZ].x * playerTelemetry.mOri[rFactor2Constants.RowZ].x));
+
+                cgs.PositionAndMotionData.Orientation.Pitch = (float)pitch;
+                cgs.PositionAndMotionData.Orientation.Roll = (float)roll;
+                cgs.PositionAndMotionData.Orientation.Yaw = (float)yaw;
             }
             else
             {
                 cgs.PositionAndMotionData.CarSpeed = (float)RF2GameStateMapper.getVehicleSpeed(ref playerScoring);
                 cgs.PositionAndMotionData.DistanceRoundTrack = (float)playerScoring.mLapDist;
                 cgs.PositionAndMotionData.WorldPosition = new float[] { (float)playerScoring.mPos.x, (float)playerScoring.mPos.y, (float)playerScoring.mPos.z };
+
+                var yaw = Math.Atan2(playerScoring.mOri[rFactor2Constants.RowZ].x, playerScoring.mOri[rFactor2Constants.RowZ].z);
+
+                var pitch = Math.Atan2(-playerScoring.mOri[rFactor2Constants.RowY].z,
+                  Math.Sqrt(playerScoring.mOri[rFactor2Constants.RowX].z * playerScoring.mOri[rFactor2Constants.RowX].z + playerScoring.mOri[rFactor2Constants.RowZ].z * playerScoring.mOri[rFactor2Constants.RowZ].z));
+
+                var roll = Math.Atan2(playerScoring.mOri[rFactor2Constants.RowY].x,
+                  Math.Sqrt(playerScoring.mOri[rFactor2Constants.RowX].x * playerScoring.mOri[rFactor2Constants.RowX].x + playerScoring.mOri[rFactor2Constants.RowZ].x * playerScoring.mOri[rFactor2Constants.RowZ].x));
+
+                cgs.PositionAndMotionData.Orientation.Pitch = (float)pitch;
+                cgs.PositionAndMotionData.Orientation.Roll = (float)roll;
+                cgs.PositionAndMotionData.Orientation.Yaw = (float)yaw;
             }
 
             // Initialize DeltaTime.
@@ -1467,13 +1491,13 @@ namespace CrewChiefV4.rFactor2
             if (pgs != null)
             {
                 csd.HasLeadChanged = !csd.HasLeadChanged && psd.Position > 1 && csd.Position == 1 ? true : csd.HasLeadChanged;
-                csd.IsRacingSameCarInFront = String.Equals(pgs.getOpponentKeyInFront(false), cgs.getOpponentKeyInFront(false));
-                csd.IsRacingSameCarBehind = String.Equals(pgs.getOpponentKeyBehind(false), cgs.getOpponentKeyBehind(false));
+                csd.IsRacingSameCarInFront = string.Equals(pgs.getOpponentKeyInFront(false), cgs.getOpponentKeyInFront(false));
+                csd.IsRacingSameCarBehind = string.Equals(pgs.getOpponentKeyBehind(false), cgs.getOpponentKeyBehind(false));
                 csd.GameTimeAtLastPositionFrontChange = !csd.IsRacingSameCarInFront ? csd.SessionRunningTime : psd.GameTimeAtLastPositionFrontChange;
                 csd.GameTimeAtLastPositionBehindChange = !csd.IsRacingSameCarBehind ? csd.SessionRunningTime : psd.GameTimeAtLastPositionBehindChange;
 
                 csd.trackLandmarksTiming = previousGameState.SessionData.trackLandmarksTiming;
-                String stoppedInLandmark = csd.trackLandmarksTiming.updateLandmarkTiming(csd.TrackDefinition,
+                var stoppedInLandmark = csd.trackLandmarksTiming.updateLandmarkTiming(csd.TrackDefinition,
                     csd.SessionRunningTime, previousGameState.PositionAndMotionData.DistanceRoundTrack, cgs.PositionAndMotionData.DistanceRoundTrack,
                     cgs.PositionAndMotionData.CarSpeed);
                 cgs.SessionData.stoppedInLandmark = cgs.PitData.InPitlane ? null : stoppedInLandmark;
