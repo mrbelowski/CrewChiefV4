@@ -105,6 +105,7 @@ namespace CrewChiefV4.Events
         public static Boolean waitingForDriverIsOKResponse = false;
         private DateTime timeWhenAskedIfDriverIsOK = DateTime.MaxValue;
         private int driverIsOKRequestCount = 0;
+        private Boolean playedAreYouOKInThisSession = false;
 
         public void cancelWaitingForDriverIsOK(Boolean playMessage)
         {
@@ -146,6 +147,7 @@ namespace CrewChiefV4.Events
             isRolling = false;
             timeOfDangerousAcceleration = DateTime.MinValue;
             cancelWaitingForDriverIsOK(false);
+            playedAreYouOKInThisSession = false;
         }
 
         private Boolean hasBeenReported(Component component, DamageLevel damageLevel)
@@ -233,7 +235,8 @@ namespace CrewChiefV4.Events
             }
             
             // need to be careful with interval here
-            if (!currentGameState.PitData.InPitlane && currentGameState.PositionAndMotionData.CarSpeed > 0.001)
+            if (!playedAreYouOKInThisSession && !currentGameState.PitData.InPitlane && 
+                currentGameState.PositionAndMotionData.CarSpeed > 0.001 && currentGameState.PositionAndMotionData.CarSpeed < 3)
             {
                 float interval = CrewChief.intervalOverriddenForPlayback ? 0.1f : (float)CrewChief._timeInterval.TotalSeconds;
                 float calculatedAcceleration = previousGameState == null ? 0 :
@@ -859,11 +862,14 @@ namespace CrewChiefV4.Events
             // if we don't have the updated sounds, just return false here
             // note that this check will be 3 seconds *after* the acceleration event because we've waited for
             // the damage to settle
-            if (SoundCache.availableSounds.Contains(folderAreYouOKFirstTry) && now.Subtract(timeOfDangerousAcceleration) < TimeSpan.FromSeconds(5))
+            if (!playedAreYouOKInThisSession &&
+                SoundCache.availableSounds.Contains(folderAreYouOKFirstTry) && 
+                now.Subtract(timeOfDangerousAcceleration) < TimeSpan.FromSeconds(5))
             {
                 audioPlayer.playMessageImmediately(new QueuedMessage(folderAreYouOKFirstTry, 0, null));
                 if (MainWindow.voiceOption != MainWindow.VoiceOptionEnum.DISABLED)
                 {
+                    playedAreYouOKInThisSession = true;
                     waitingForDriverIsOKResponse = true;
                     timeWhenAskedIfDriverIsOK = now;
                     driverIsOKRequestCount = 1;
