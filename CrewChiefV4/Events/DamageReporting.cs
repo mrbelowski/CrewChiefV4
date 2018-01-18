@@ -108,6 +108,10 @@ namespace CrewChiefV4.Events
         private Boolean playedAreYouOKInThisSession = false;
         private DateTime triggerCheckDriverIsOKForIRacingAfter = DateTime.MaxValue;
 
+        private Boolean waitingAfterPotentiallyDangerousAcceleration = false;
+        private DateTime timeToRecheckAfterPotentiallyDangerousAcceleration = DateTime.MaxValue;
+        private float speedAfterPotentiallyDangerousAcceleration = float.MaxValue;
+
         public void cancelWaitingForDriverIsOK(Boolean playMessage)
         {
             DamageReporting.waitingForDriverIsOKResponse = false;
@@ -147,9 +151,13 @@ namespace CrewChiefV4.Events
             nextOrientationCheckDue = DateTime.MinValue;
             isRolling = false;
             timeOfDangerousAcceleration = DateTime.MinValue;
+
+            timeToRecheckAfterPotentiallyDangerousAcceleration = DateTime.MaxValue;
             cancelWaitingForDriverIsOK(false);
             playedAreYouOKInThisSession = false;
             triggerCheckDriverIsOKForIRacingAfter = DateTime.MaxValue;
+            waitingAfterPotentiallyDangerousAcceleration = false;
+            speedAfterPotentiallyDangerousAcceleration = float.MaxValue;
         }
 
         private Boolean hasBeenReported(Component component, DamageLevel damageLevel)
@@ -235,25 +243,59 @@ namespace CrewChiefV4.Events
                 }
                 return;
             }
+
+            if (waitingAfterPotentiallyDangerousAcceleration)
+            {
+                if (currentGameState.PositionAndMotionData.CarSpeed > speedAfterPotentiallyDangerousAcceleration + 5)
+                {
+                    Console.WriteLine("Car has accelerated, cancelling wait for crash message");
+                    waitingAfterPotentiallyDangerousAcceleration = false;
+                    timeToRecheckAfterPotentiallyDangerousAcceleration = DateTime.MaxValue;
+                }
+                else if (timeToRecheckAfterPotentiallyDangerousAcceleration > currentGameState.Now)
+                {
+                    waitingAfterPotentiallyDangerousAcceleration = false;
+                    timeToRecheckAfterPotentiallyDangerousAcceleration = DateTime.MaxValue;
+                    timeOfDangerousAcceleration = currentGameState.Now;
+                    // special case for iRacing: no damage data so we can't hang this off 'destroyed' components
+                    triggerCheckDriverIsOKForIRacingAfter = currentGameState.Now.Add(TimeSpan.FromSeconds(2));
+                }
+                else
+                {
+                    // suspend the rest of this event
+                    return;
+                }
+            }
             
             // need to be careful with interval here
             if (!playedAreYouOKInThisSession && !currentGameState.PitData.InPitlane && 
-                currentGameState.PositionAndMotionData.CarSpeed > 0.001 && currentGameState.PositionAndMotionData.CarSpeed < 3)
+                currentGameState.PositionAndMotionData.CarSpeed > 0.001)
             {
                 float interval = CrewChief.intervalOverriddenForPlayback ? 0.1f : (float)CrewChief._timeInterval.TotalSeconds;
                 float calculatedAcceleration = previousGameState == null ? 0 :
                     Math.Abs(currentGameState.PositionAndMotionData.CarSpeed - previousGameState.PositionAndMotionData.CarSpeed) / interval;
 
-                // if we're subject to > 30G (300m/s2), this is considered dangerous
+                // if we're subject to > 30G (300m/s2), this is considered dangerous. If we've stopped (or nearly stopped) immediately
+                // after the impact, assume it's a bad 'un. If we're still moving after the impact, track the speed for 3 seconds and 
+                // if it doesn't increase in that time, we can assume it's a bad 'un
                 if (calculatedAcceleration > 300)
                 {
-                    Console.WriteLine("speed = " + currentGameState.PositionAndMotionData.CarSpeed + " prev speed = " +
-                        (previousGameState == null ? 0 : previousGameState.PositionAndMotionData.CarSpeed) +
-                        " acceleration = " + calculatedAcceleration);
-                    timeOfDangerousAcceleration = currentGameState.Now;
-
-                    // special case for iRacing: no damage data so we can't hang this off 'destroyed' components
-                    triggerCheckDriverIsOKForIRacingAfter = currentGameState.Now.Add(TimeSpan.FromSeconds(4));
+                    Console.WriteLine("Massive impact. Current speed = " + currentGameState.PositionAndMotionData.CarSpeed + " previous speed = " +
+                            (previousGameState == null ? 0 : previousGameState.PositionAndMotionData.CarSpeed) +
+                            " acceleration = " + calculatedAcceleration);
+                    if (currentGameState.PositionAndMotionData.CarSpeed < 3)
+                    {
+                        timeOfDangerousAcceleration = currentGameState.Now;
+                        // special case for iRacing: no damage data so we can't hang this off 'destroyed' components
+                        triggerCheckDriverIsOKForIRacingAfter = currentGameState.Now.Add(TimeSpan.FromSeconds(4));
+                    }
+                    else
+                    {
+                        // massive acceleration but we're still moving
+                        timeToRecheckAfterPotentiallyDangerousAcceleration = currentGameState.Now.Add(TimeSpan.FromSeconds(3));
+                        waitingAfterPotentiallyDangerousAcceleration = true;
+                        speedAfterPotentiallyDangerousAcceleration = currentGameState.PositionAndMotionData.CarSpeed;
+                    }
                 }
             }
 
