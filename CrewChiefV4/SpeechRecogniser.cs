@@ -175,6 +175,8 @@ namespace CrewChiefV4
 
         public static String[] MORE_INFO = Configuration.getSpeechRecognitionPhrases("MORE_INFO");
 
+        public static String[] I_AM_OK = Configuration.getSpeechRecognitionPhrases("I_AM_OK");
+
         private String lastRecognisedText = null;
 
         private CrewChief crewChief;
@@ -562,6 +564,8 @@ namespace CrewChiefV4
                 validateAndAdd(WHOS_LEADING, staticSpeechChoices);
 
                 validateAndAdd(MORE_INFO, staticSpeechChoices);
+
+                validateAndAdd(I_AM_OK, staticSpeechChoices);
 
                 GrammarBuilder staticGrammarBuilder = new GrammarBuilder();
                 staticGrammarBuilder.Culture = cultureInfo;
@@ -995,7 +999,11 @@ namespace CrewChiefV4
 
         private AbstractEvent getEventForSpeech(String recognisedSpeech)
         {
-            if (ResultContains(recognisedSpeech, RADIO_CHECK))
+            if (DamageReporting.isWaitingForDriverIsOKResponse() && ResultContains(recognisedSpeech, I_AM_OK))
+            {
+                ((DamageReporting) CrewChief.getEvent("DamageReporting")).cancelWaitingForDriverIsOK(true);
+            }
+            else if (ResultContains(recognisedSpeech, RADIO_CHECK))
             {
                 crewChief.respondToRadioCheck();
             }

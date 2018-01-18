@@ -38,6 +38,7 @@ namespace CrewChiefV4
         public static Boolean enableDriverNames = UserSettings.GetUserSettings().getBoolean("enable_driver_names");
 
         public static TimeSpan _timeInterval = TimeSpan.FromMilliseconds(UserSettings.GetUserSettings().getInt("update_interval"));
+        public static Boolean intervalOverriddenForPlayback = false;
 
         public static TimeSpan spotterInterval = TimeSpan.FromMilliseconds(UserSettings.GetUserSettings().getInt("spotter_update_interval"));
 
@@ -211,7 +212,6 @@ namespace CrewChiefV4
                 readOpponentDeltasForEveryLap = true;
             }
             audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderDeltasEnabled, 0, null));
-            
         }
 
         public void disableDeltasMode()
@@ -221,7 +221,6 @@ namespace CrewChiefV4
                 readOpponentDeltasForEveryLap = false;
             }
             audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderDeltasDisabled, 0, null));
-            
         }
 
         public void toggleEnableYellowFlagsMode()
@@ -240,14 +239,12 @@ namespace CrewChiefV4
         {
             yellowFlagMessagesEnabled = true;
             audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderYellowEnabled, 0, null));
-
         }
 
         public void disableYellowFlagMessages()
         {
             yellowFlagMessagesEnabled = false;
             audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderYellowDisabled, 0, null));
-
         }
 
         public void toggleManualFormationLapMode()
@@ -591,6 +588,7 @@ namespace CrewChiefV4
             audioPlayer.mute = false;
             if (filenameToRun != null && System.Diagnostics.Debugger.IsAttached)
             {
+                CrewChief.intervalOverriddenForPlayback = true;
                 loadDataFromFile = true;
                 GlobalBehaviourSettings.spotterEnabled = false;
                 if (interval > 0)
@@ -604,6 +602,10 @@ namespace CrewChiefV4
                     audioPlayer.mute = true;
                 }
                 dumpToFile = false;
+            }
+            else
+            {
+                CrewChief.intervalOverriddenForPlayback = false;
             }
             SpeechRecogniser.waitingForSpeech = false;
             SpeechRecogniser.gotRecognitionResult = false;
@@ -837,7 +839,7 @@ namespace CrewChiefV4
                             {
                                 if (spotter != null)
                                 {
-                                    if (currentGameState.FlagData.isFullCourseYellow)
+                                    if (currentGameState.FlagData.isFullCourseYellow || DamageReporting.isWaitingForDriverIsOKResponse())
                                     {
                                         spotter.pause();
                                     }
@@ -855,7 +857,11 @@ namespace CrewChiefV4
                                 {
                                     if (entry.Value.isApplicableForCurrentSessionAndPhase(currentGameState.SessionData.SessionType, currentGameState.SessionData.SessionPhase))
                                     {
-                                        triggerEvent(entry.Key, entry.Value, previousGameState, currentGameState);
+                                        // special case - if we've crashed heavily and are waiting for a response from the driver, don't trigger other events
+                                        if (entry.Key.Equals("DamageReporting") || !DamageReporting.isWaitingForDriverIsOKResponse())
+                                        {
+                                            triggerEvent(entry.Key, entry.Value, previousGameState, currentGameState);
+                                        }
                                     }
                                 }
                                 if (DriverTrainingService.isPlayingPaceNotes)

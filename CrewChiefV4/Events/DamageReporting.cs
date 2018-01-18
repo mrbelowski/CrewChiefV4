@@ -63,6 +63,12 @@ namespace CrewChiefV4.Events
         private String folderRolled = "damage_reporting/rolling";
         private String folderStoppedUpsideDown = "damage_reporting/stopped_upside_down";
 
+        // just a bit of fun...
+        private String folderAreYouOKFirstTry = "damage_reporting/are_you_ok_first_try";
+        private String folderAreYouOKSecondTry = "damage_reporting/are_you_ok_second_try";
+        private String folderAreYouOKThirdTry = "damage_reporting/are_you_ok_third_try";
+        public static String folderAcknowledgeDriverIsOK = "damage_reporting/acknowledge_driver_is_ok";
+
         private DamageLevel engineDamage;
         private DamageLevel trannyDamage;
         private DamageLevel aeroDamage;
@@ -95,6 +101,28 @@ namespace CrewChiefV4.Events
         private DateTime nextOrientationCheckDue = DateTime.MinValue;
         private Boolean isRolling = false;
 
+        private DateTime timeOfBiggestAcceleration = DateTime.MinValue;
+        private float maxAcceleration = 0;
+        private static Boolean waitingForDriverIsOKResponse = false;
+        private DateTime timeWhenAskedIfDriverIsOK = DateTime.MaxValue;
+        private int driverIsOKRequestCount = 0;
+
+        public void cancelWaitingForDriverIsOK(Boolean playMessage)
+        {
+            DamageReporting.waitingForDriverIsOKResponse = false;
+            timeWhenAskedIfDriverIsOK = DateTime.MaxValue;
+            driverIsOKRequestCount = 0;
+            if (playMessage)
+            {
+                audioPlayer.playMessageImmediately(new QueuedMessage(folderAcknowledgeDriverIsOK, 0, null));
+            }
+        }
+
+        public static Boolean isWaitingForDriverIsOKResponse()
+        {
+            return waitingForDriverIsOKResponse;
+        }
+
         private enum Component
         {
             ENGINE, TRANNY, AERO, SUSPENSION, BRAKES, NONE
@@ -122,6 +150,9 @@ namespace CrewChiefV4.Events
             orientationSamples.Clear();
             nextOrientationCheckDue = DateTime.MinValue;
             isRolling = false;
+            timeOfBiggestAcceleration = DateTime.MinValue;
+            maxAcceleration = 0;
+            cancelWaitingForDriverIsOK(false);
         }
 
         private Boolean hasBeenReported(Component component, DamageLevel damageLevel)
@@ -187,6 +218,25 @@ namespace CrewChiefV4.Events
 
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
+            if (waitingForDriverIsOKResponse)
+            {
+                if (timeWhenAskedIfDriverIsOK.Add(TimeSpan.FromSeconds(8)) < currentGameState.Now)
+                {
+                    timeWhenAskedIfDriverIsOK = currentGameState.Now;
+                    if (driverIsOKRequestCount == 1)
+                    {
+                        audioPlayer.playMessageImmediately(new QueuedMessage(folderAreYouOKSecondTry, 0, null));
+                    }
+                    else if (driverIsOKRequestCount == 2)
+                    {
+                        audioPlayer.playMessageImmediately(new QueuedMessage(folderAreYouOKThirdTry, 0, null));
+                        cancelWaitingForDriverIsOK(false);
+                    }
+                    driverIsOKRequestCount++;
+                }
+                return;
+            }
+
             Boolean orientationSamplesFull = orientationSamples.Count > orientationSamplesCount;
             if (orientationSamplesFull)
             {
@@ -197,6 +247,24 @@ namespace CrewChiefV4.Events
             {
                 nextOrientationCheckDue = currentGameState.Now.Add(orientationCheckEvery);
                 checkOrientation(currentGameState.PositionAndMotionData.CarSpeed);
+            }
+
+            // need to be careful with interval here
+            if (!currentGameState.PitData.InPitlane && currentGameState.PositionAndMotionData.CarSpeed > 0.001)
+            {
+                float interval = CrewChief.intervalOverriddenForPlayback ? 0.1f : (float)CrewChief._timeInterval.TotalSeconds;
+                float calculatedAcceleration = previousGameState == null ? 0 :
+                    Math.Abs(currentGameState.PositionAndMotionData.CarSpeed - previousGameState.PositionAndMotionData.CarSpeed) / interval;
+
+                // if we're subject to > 20G (200m/s2), this is potentially interesting
+                if (calculatedAcceleration > 200)
+                {
+                    Console.WriteLine("speed = " + currentGameState.PositionAndMotionData.CarSpeed + " prev speed = " +
+                        (previousGameState.PositionAndMotionData == null ? 0 : previousGameState.PositionAndMotionData.CarSpeed) +
+                        " acc calc = " + calculatedAcceleration);
+                    timeOfBiggestAcceleration = currentGameState.Now;
+                    maxAcceleration = calculatedAcceleration;
+                }
             }
 
             if (currentGameState.CarDamageData.DamageEnabled && currentGameState.SessionData.SessionRunningTime > 10 && currentGameState.Now > nextPunctureCheck)
@@ -327,7 +395,7 @@ namespace CrewChiefV4.Events
                         }
                         if (enableDamageMessages)
                         {
-                            playDamageToReport(currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.NumCars > 2);
+                            playDamageToReport(currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.NumCars > 2, currentGameState.Now);
                         }
                     }
                 }
@@ -620,7 +688,7 @@ namespace CrewChiefV4.Events
             }
         }
 
-        private void playDamageToReport(Boolean allowRants)
+        private void playDamageToReport(Boolean allowRants, DateTime now)
         {
             if (isMissingWheel || damageToReportNext.Item2 > DamageLevel.MINOR)
             {
@@ -644,10 +712,13 @@ namespace CrewChiefV4.Events
             {
                 if (damageToReportNext.Item2 == DamageLevel.DESTROYED)
                 {
-                    audioPlayer.playMessage(new QueuedMessage(folderBustedEngine, 0, this));
-                    if (allowRants)
+                    if (!checkIfDriverIsOK(now))
                     {
-                        audioPlayer.playRant("damage_rant", null);
+                        audioPlayer.playMessage(new QueuedMessage(folderBustedEngine, 0, this));
+                        if (allowRants)
+                        {
+                            audioPlayer.playRant("damage_rant", null);
+                        }
                     }
                 }
                 else if (damageToReportNext.Item2 == DamageLevel.MAJOR)
@@ -663,10 +734,13 @@ namespace CrewChiefV4.Events
             {
                 if (damageToReportNext.Item2 == DamageLevel.DESTROYED)
                 {
-                    audioPlayer.playMessage(new QueuedMessage(folderBustedTransmission, 0, this));
-                    if (allowRants)
+                    if (!checkIfDriverIsOK(now))
                     {
-                        audioPlayer.playRant("damage_rant", null);
+                        audioPlayer.playMessage(new QueuedMessage(folderBustedTransmission, 0, this));
+                        if (allowRants)
+                        {
+                            audioPlayer.playRant("damage_rant", null);
+                        }
                     }
                 }
                 else if (damageToReportNext.Item2 == DamageLevel.MAJOR)
@@ -682,10 +756,13 @@ namespace CrewChiefV4.Events
             {
                 if (damageToReportNext.Item2 == DamageLevel.DESTROYED)
                 {
-                    audioPlayer.playMessage(new QueuedMessage(folderBustedSuspension, 0, this));
-                    if (allowRants)
+                    if (!checkIfDriverIsOK(now))
                     {
-                        audioPlayer.playRant("damage_rant", null);
+                        audioPlayer.playMessage(new QueuedMessage(folderBustedSuspension, 0, this));
+                        if (allowRants)
+                        {
+                            audioPlayer.playRant("damage_rant", null);
+                        }
                     }
                 }
                 else if (damageToReportNext.Item2 == DamageLevel.MAJOR || isMissingWheel)
@@ -720,7 +797,10 @@ namespace CrewChiefV4.Events
             {
                 if (damageToReportNext.Item2 == DamageLevel.DESTROYED)
                 {
-                    audioPlayer.playMessage(new QueuedMessage(folderSevereAeroDamage, 0, this));
+                    if (!checkIfDriverIsOK(now))
+                    {
+                        audioPlayer.playMessage(new QueuedMessage(folderSevereAeroDamage, 0, this));
+                    }
                 }
                 else if (damageToReportNext.Item2 == DamageLevel.MAJOR)
                 {
@@ -774,6 +854,23 @@ namespace CrewChiefV4.Events
                     }
                 }
             }
+        }
+
+        // returns whether we've decided to check if the driver is OK
+        private Boolean checkIfDriverIsOK(DateTime now)
+        {
+            if (maxAcceleration > 300 && now.Subtract(timeOfBiggestAcceleration) < TimeSpan.FromSeconds(5))
+            {
+                audioPlayer.playMessageImmediately(new QueuedMessage(folderAreYouOKFirstTry, 0, null));
+                if (MainWindow.voiceOption != MainWindow.VoiceOptionEnum.DISABLED)
+                {
+                    waitingForDriverIsOKResponse = true;
+                    timeWhenAskedIfDriverIsOK = now;
+                    driverIsOKRequestCount = 1;
+                }
+                return true;
+            }
+            return false;
         }
 
         private Boolean isUpsideDown(PositionAndMotionData.Rotation orientation)
