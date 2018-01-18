@@ -60,6 +60,9 @@ namespace CrewChiefV4.Events
         // "the car's in good shape" / "we have no significant damage" etc
         private String folderNoDamageOnAnyComponent = "damage_reporting/no_damage";
 
+        private String folderRolled = "damage_reporting/rolling";
+        private String folderStoppedUpsideDown = "damage_reporting/stopped_upside_down";
+
         private DamageLevel engineDamage;
         private DamageLevel trannyDamage;
         private DamageLevel aeroDamage;
@@ -86,6 +89,12 @@ namespace CrewChiefV4.Events
 
         private Component componentDestroyed = Component.NONE;
 
+        private LinkedList<PositionAndMotionData.Rotation> orientationSamples = new LinkedList<PositionAndMotionData.Rotation>();
+        private int orientationSamplesCount = 30;   // 3 seconds of orientation data
+        private TimeSpan orientationCheckEvery = TimeSpan.FromSeconds(2);
+        private DateTime nextOrientationCheckDue = DateTime.MinValue;
+        private Boolean isRolling = false;
+
         private enum Component
         {
             ENGINE, TRANNY, AERO, SUSPENSION, BRAKES, NONE
@@ -110,6 +119,9 @@ namespace CrewChiefV4.Events
             minDamageToReport = DamageLevel.TRIVIAL;
             nextPunctureCheck = DateTime.Now + timeToWaitForDamageToSettle;
             componentDestroyed = Component.NONE;
+            orientationSamples.Clear();
+            nextOrientationCheckDue = DateTime.MinValue;
+            isRolling = false;
         }
 
         private Boolean hasBeenReported(Component component, DamageLevel damageLevel)
@@ -175,6 +187,18 @@ namespace CrewChiefV4.Events
 
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
+            Boolean orientationSamplesFull = orientationSamples.Count > orientationSamplesCount;
+            if (orientationSamplesFull)
+            {
+                orientationSamples.RemoveFirst();
+            }
+            orientationSamples.AddLast(currentGameState.PositionAndMotionData.Orientation);
+            if (currentGameState.Now > nextOrientationCheckDue && orientationSamplesFull)
+            {
+                nextOrientationCheckDue = currentGameState.Now.Add(orientationCheckEvery);
+                checkOrientation(currentGameState.PositionAndMotionData.CarSpeed);
+            }
+
             if (currentGameState.CarDamageData.DamageEnabled && currentGameState.SessionData.SessionRunningTime > 10 && currentGameState.Now > nextPunctureCheck)
             {
                 nextPunctureCheck = currentGameState.Now + timeToWaitForDamageToSettle;
@@ -711,6 +735,53 @@ namespace CrewChiefV4.Events
                     audioPlayer.playMessage(new QueuedMessage(folderJustAScratch, 0, this));
                 }
             }
+        }
+
+        private void checkOrientation(float speed)
+        {
+            if (isRolling)
+            {
+                // we were rolling at the last check
+                if (speed < 2 && isUpsideDown(orientationSamples.Last.Value))
+                {
+                    // we're almost stopped and we're upside down
+                    audioPlayer.playMessage(new QueuedMessage(folderStoppedUpsideDown, 0, this));
+                }
+                else
+                {
+                    // we may be rolling, or may have reset and are now racing again:
+                    audioPlayer.playMessage(new QueuedMessage(folderRolled, 0, this));
+                }
+                // don't check again for a while:
+                isRolling = false;
+                orientationSamples.Clear();
+                nextOrientationCheckDue = nextOrientationCheckDue.Add(TimeSpan.FromMinutes(5));
+            }
+            else
+            {
+                // lets see if we're rolling:
+                int upsideDownCount = 0;
+                foreach (PositionAndMotionData.Rotation orientationSample in orientationSamples)
+                {
+                    if (isUpsideDown(orientationSample))
+                    {
+                        upsideDownCount++;
+                        if (upsideDownCount > 4)
+                        {
+                            isRolling = true;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        private Boolean isUpsideDown(PositionAndMotionData.Rotation orientation)
+        {
+            float absRoll = Math.Abs(orientation.Pitch);
+            float absPitch = Math.Abs(orientation.Roll);
+            // 90 degrees is 1.5708 radians, but require a bit more here to allow for track camber
+            return absRoll > 1.7 || absPitch > 1.7;
         }
     }
 }

@@ -1929,6 +1929,11 @@ namespace CrewChiefV4.assetto
             CrewChief.distanceRoundTrack = currentGameState.PositionAndMotionData.DistanceRoundTrack;
             CrewChief.viewingReplay = false;
 
+            currentGameState.PositionAndMotionData.Orientation.Pitch = shared.acsPhysics.pitch;
+            currentGameState.PositionAndMotionData.Orientation.Roll = shared.acsPhysics.roll;
+            currentGameState.PositionAndMotionData.Orientation.Yaw = shared.acsPhysics.heading;
+
+
             return currentGameState;
         }
 
