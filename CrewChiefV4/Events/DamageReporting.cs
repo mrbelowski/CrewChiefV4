@@ -856,9 +856,10 @@ namespace CrewChiefV4.Events
         // returns whether we've decided to check if the driver is OK
         private Boolean checkIfDriverIsOK(DateTime now)
         {
+            // if we don't have the updated sounds, just return false here
             // note that this check will be 3 seconds *after* the acceleration event because we've waited for
             // the damage to settle
-            if (now.Subtract(timeOfDangerousAcceleration) < TimeSpan.FromSeconds(5))
+            if (SoundCache.availableSounds.Contains(folderAreYouOKFirstTry) && now.Subtract(timeOfDangerousAcceleration) < TimeSpan.FromSeconds(5))
             {
                 audioPlayer.playMessageImmediately(new QueuedMessage(folderAreYouOKFirstTry, 0, null));
                 if (MainWindow.voiceOption != MainWindow.VoiceOptionEnum.DISABLED)
