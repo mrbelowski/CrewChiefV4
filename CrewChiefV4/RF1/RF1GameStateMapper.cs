@@ -501,6 +501,18 @@ namespace CrewChiefV4.rFactor1
             currentGameState.PositionAndMotionData.CarSpeed = shared.speed;
             currentGameState.PositionAndMotionData.DistanceRoundTrack = player.lapDist;
 
+            var yaw = Math.Atan2(player.oriZ.x, player.oriZ.z);
+
+            var pitch = Math.Atan2(-player.oriY.z,
+              Math.Sqrt(player.oriX.z * player.oriX.z + player.oriZ.z * player.oriZ.z));
+
+            var roll = Math.Atan2(player.oriY.x,
+              Math.Sqrt(player.oriX.x * player.oriX.x + player.oriZ.x * player.oriZ.x));
+
+            currentGameState.PositionAndMotionData.Orientation.Pitch = (float)pitch;
+            currentGameState.PositionAndMotionData.Orientation.Roll = (float)roll;
+            currentGameState.PositionAndMotionData.Orientation.Yaw = (float)yaw;
+
             // Initialize DeltaTime.
             if (currentGameState.SessionData.IsNewSession)
             {
