@@ -248,8 +248,8 @@ namespace CrewChiefV4.Events
                 if (calculatedAcceleration > 300)
                 {
                     Console.WriteLine("speed = " + currentGameState.PositionAndMotionData.CarSpeed + " prev speed = " +
-                        (previousGameState.PositionAndMotionData == null ? 0 : previousGameState.PositionAndMotionData.CarSpeed) +
-                        " acc calc = " + calculatedAcceleration);
+                        (previousGameState == null ? 0 : previousGameState.PositionAndMotionData.CarSpeed) +
+                        " acceleration = " + calculatedAcceleration);
                     timeOfDangerousAcceleration = currentGameState.Now;
 
                     // special case for iRacing: no damage data so we can't hang this off 'destroyed' components

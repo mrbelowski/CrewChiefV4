@@ -490,7 +490,7 @@ namespace CrewChiefV4.iRacing
             }
 
             currentGameState.PositionAndMotionData.DistanceRoundTrack = currentGameState.SessionData.TrackDefinition.trackLength * playerCar.Live.CorrectedLapDistance;
-            currentGameState.PositionAndMotionData.CarSpeed = (float)playerCar.Live.Speed;
+            currentGameState.PositionAndMotionData.CarSpeed = (float)shared.Telemetry.Speed;
 
             currentGameState.PositionAndMotionData.Orientation.Pitch = shared.Telemetry.Pitch;
             currentGameState.PositionAndMotionData.Orientation.Roll = shared.Telemetry.Roll;
