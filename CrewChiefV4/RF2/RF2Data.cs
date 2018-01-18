@@ -261,7 +261,7 @@ namespace CrewChiefV4.rFactor2
 
             // Orientation and derivatives
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 3)]
-            [XmlIgnore] public rF2Vec3[] mOri;               // rows of orientation matrix (use TelemQuat conversions if desired), also converts local
+            public rF2Vec3[] mOri;               // rows of orientation matrix (use TelemQuat conversions if desired), also converts local
                                                              // vehicle vectors into world X, Y, or Z using dot product of rows 0, 1, or 2 respectively
 
             [XmlIgnore] public rF2Vec3 mLocalRot;             // rotation (radians/sec) in local vehicle coordinates
@@ -482,6 +482,7 @@ namespace CrewChiefV4.rFactor2
             public double mLapStartET;            // time this lap was started
 
             // Position and derivatives
+            // TODO: remove these from serialization, no telemetry case is corner case.
             public rF2Vec3 mPos;                  // world position in meters
             public rF2Vec3 mLocalVel;             // velocity (meters/sec) in local vehicle coordinates
             public rF2Vec3 mLocalAccel;           // acceleration (meters/sec^2) in local vehicle coordinates
