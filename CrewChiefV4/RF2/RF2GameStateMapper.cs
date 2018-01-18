@@ -2251,7 +2251,8 @@ namespace CrewChiefV4.rFactor2
             var leaderLapDistAtFOPhaseStart = 0.0;
             var leaderSectorAtFOPhaseStart = -1;
             if (foStage != rF2TrackRulesStage.CautionInit && foStage != rF2TrackRulesStage.CautionUpdate  // If this is not FCY.
-              && (prevFrozenOrderData == null || prevFrozenOrderData.Phase == FrozenOrderPhase.None))  // And, this is first FO calculation.
+              && (prevFrozenOrderData == null || prevFrozenOrderData.Phase == FrozenOrderPhase.None)  // And, this is first FO calculation.
+              && rules.mTrackRules.mSafetyCarExists == 0) // And, track has no SC.
             {
                 // Find where leader is relatively to F/S line.
                 for (int i = 0; i < scoring.mScoringInfo.mNumVehicles; ++i)
