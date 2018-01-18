@@ -101,9 +101,8 @@ namespace CrewChiefV4.Events
         private DateTime nextOrientationCheckDue = DateTime.MinValue;
         private Boolean isRolling = false;
 
-        private DateTime timeOfBiggestAcceleration = DateTime.MinValue;
-        private float maxAcceleration = 0;
-        private static Boolean waitingForDriverIsOKResponse = false;
+        private DateTime timeOfDangerousAcceleration = DateTime.MinValue;
+        public static Boolean waitingForDriverIsOKResponse = false;
         private DateTime timeWhenAskedIfDriverIsOK = DateTime.MaxValue;
         private int driverIsOKRequestCount = 0;
 
@@ -117,12 +116,7 @@ namespace CrewChiefV4.Events
                 audioPlayer.playMessageImmediately(new QueuedMessage(folderAcknowledgeDriverIsOK, 0, null));
             }
         }
-
-        public static Boolean isWaitingForDriverIsOKResponse()
-        {
-            return waitingForDriverIsOKResponse;
-        }
-
+        
         private enum Component
         {
             ENGINE, TRANNY, AERO, SUSPENSION, BRAKES, NONE
@@ -150,8 +144,7 @@ namespace CrewChiefV4.Events
             orientationSamples.Clear();
             nextOrientationCheckDue = DateTime.MinValue;
             isRolling = false;
-            timeOfBiggestAcceleration = DateTime.MinValue;
-            maxAcceleration = 0;
+            timeOfDangerousAcceleration = DateTime.MinValue;
             cancelWaitingForDriverIsOK(false);
         }
 
@@ -218,6 +211,7 @@ namespace CrewChiefV4.Events
 
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
+            // if we've crashed hard and are waiting for the player to say they're OK, don't process anything else in this event:
             if (waitingForDriverIsOKResponse)
             {
                 if (timeWhenAskedIfDriverIsOK.Add(TimeSpan.FromSeconds(8)) < currentGameState.Now)
@@ -226,15 +220,33 @@ namespace CrewChiefV4.Events
                     if (driverIsOKRequestCount == 1)
                     {
                         audioPlayer.playMessageImmediately(new QueuedMessage(folderAreYouOKSecondTry, 0, null));
+                        driverIsOKRequestCount = 2;
                     }
                     else if (driverIsOKRequestCount == 2)
                     {
+                        // no response after 3 requests, he's dead, jim.
                         audioPlayer.playMessageImmediately(new QueuedMessage(folderAreYouOKThirdTry, 0, null));
                         cancelWaitingForDriverIsOK(false);
                     }
-                    driverIsOKRequestCount++;
                 }
                 return;
+            }
+            
+            // need to be careful with interval here
+            if (!currentGameState.PitData.InPitlane && currentGameState.PositionAndMotionData.CarSpeed > 0.001)
+            {
+                float interval = CrewChief.intervalOverriddenForPlayback ? 0.1f : (float)CrewChief._timeInterval.TotalSeconds;
+                float calculatedAcceleration = previousGameState == null ? 0 :
+                    Math.Abs(currentGameState.PositionAndMotionData.CarSpeed - previousGameState.PositionAndMotionData.CarSpeed) / interval;
+
+                // if we're subject to > 30G (300m/s2), this is considered dangerous
+                if (calculatedAcceleration > 300)
+                {
+                    Console.WriteLine("speed = " + currentGameState.PositionAndMotionData.CarSpeed + " prev speed = " +
+                        (previousGameState.PositionAndMotionData == null ? 0 : previousGameState.PositionAndMotionData.CarSpeed) +
+                        " acc calc = " + calculatedAcceleration);
+                    timeOfDangerousAcceleration = currentGameState.Now;
+                }
             }
 
             Boolean orientationSamplesFull = orientationSamples.Count > orientationSamplesCount;
@@ -243,30 +255,15 @@ namespace CrewChiefV4.Events
                 orientationSamples.RemoveFirst();
             }
             orientationSamples.AddLast(currentGameState.PositionAndMotionData.Orientation);
-            if (currentGameState.Now > nextOrientationCheckDue && orientationSamplesFull)
+
+            // don't check for rolling if we've just had a dangerous acceleration as we don't want both messages to trigger
+            if (currentGameState.Now > nextOrientationCheckDue && orientationSamplesFull &&
+                currentGameState.Now.Subtract(timeOfDangerousAcceleration) > TimeSpan.FromSeconds(10))
             {
                 nextOrientationCheckDue = currentGameState.Now.Add(orientationCheckEvery);
                 checkOrientation(currentGameState.PositionAndMotionData.CarSpeed);
             }
-
-            // need to be careful with interval here
-            if (!currentGameState.PitData.InPitlane && currentGameState.PositionAndMotionData.CarSpeed > 0.001)
-            {
-                float interval = CrewChief.intervalOverriddenForPlayback ? 0.1f : (float)CrewChief._timeInterval.TotalSeconds;
-                float calculatedAcceleration = previousGameState == null ? 0 :
-                    Math.Abs(currentGameState.PositionAndMotionData.CarSpeed - previousGameState.PositionAndMotionData.CarSpeed) / interval;
-
-                // if we're subject to > 20G (200m/s2), this is potentially interesting
-                if (calculatedAcceleration > 200)
-                {
-                    Console.WriteLine("speed = " + currentGameState.PositionAndMotionData.CarSpeed + " prev speed = " +
-                        (previousGameState.PositionAndMotionData == null ? 0 : previousGameState.PositionAndMotionData.CarSpeed) +
-                        " acc calc = " + calculatedAcceleration);
-                    timeOfBiggestAcceleration = currentGameState.Now;
-                    maxAcceleration = calculatedAcceleration;
-                }
-            }
-
+            
             if (currentGameState.CarDamageData.DamageEnabled && currentGameState.SessionData.SessionRunningTime > 10 && currentGameState.Now > nextPunctureCheck)
             {
                 nextPunctureCheck = currentGameState.Now + timeToWaitForDamageToSettle;
@@ -859,7 +856,9 @@ namespace CrewChiefV4.Events
         // returns whether we've decided to check if the driver is OK
         private Boolean checkIfDriverIsOK(DateTime now)
         {
-            if (maxAcceleration > 300 && now.Subtract(timeOfBiggestAcceleration) < TimeSpan.FromSeconds(5))
+            // note that this check will be 3 seconds *after* the acceleration event because we've waited for
+            // the damage to settle
+            if (now.Subtract(timeOfDangerousAcceleration) < TimeSpan.FromSeconds(5))
             {
                 audioPlayer.playMessageImmediately(new QueuedMessage(folderAreYouOKFirstTry, 0, null));
                 if (MainWindow.voiceOption != MainWindow.VoiceOptionEnum.DISABLED)

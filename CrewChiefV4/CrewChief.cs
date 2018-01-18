@@ -839,7 +839,7 @@ namespace CrewChiefV4
                             {
                                 if (spotter != null)
                                 {
-                                    if (currentGameState.FlagData.isFullCourseYellow || DamageReporting.isWaitingForDriverIsOKResponse())
+                                    if (currentGameState.FlagData.isFullCourseYellow || DamageReporting.waitingForDriverIsOKResponse)
                                     {
                                         spotter.pause();
                                     }
@@ -858,7 +858,7 @@ namespace CrewChiefV4
                                     if (entry.Value.isApplicableForCurrentSessionAndPhase(currentGameState.SessionData.SessionType, currentGameState.SessionData.SessionPhase))
                                     {
                                         // special case - if we've crashed heavily and are waiting for a response from the driver, don't trigger other events
-                                        if (entry.Key.Equals("DamageReporting") || !DamageReporting.isWaitingForDriverIsOKResponse())
+                                        if (entry.Key.Equals("DamageReporting") || !DamageReporting.waitingForDriverIsOKResponse)
                                         {
                                             triggerEvent(entry.Key, entry.Value, previousGameState, currentGameState);
                                         }

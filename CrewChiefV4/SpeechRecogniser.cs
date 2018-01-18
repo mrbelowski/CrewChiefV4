@@ -999,7 +999,7 @@ namespace CrewChiefV4
 
         private AbstractEvent getEventForSpeech(String recognisedSpeech)
         {
-            if (DamageReporting.isWaitingForDriverIsOKResponse() && ResultContains(recognisedSpeech, I_AM_OK))
+            if (DamageReporting.waitingForDriverIsOKResponse && ResultContains(recognisedSpeech, I_AM_OK))
             {
                 ((DamageReporting) CrewChief.getEvent("DamageReporting")).cancelWaitingForDriverIsOK(true);
             }
