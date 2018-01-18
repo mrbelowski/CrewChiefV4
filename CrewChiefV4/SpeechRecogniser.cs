@@ -818,10 +818,6 @@ namespace CrewChiefV4
                         this.lastRecognisedText = e.Result.Text;
                         CrewChief.getEvent("Opponents").respond(e.Result.Text);
                     }
-                    else if (DamageReporting.waitingForDriverIsOKResponse)
-                    {
-                        ((DamageReporting)CrewChief.getEvent("DamageReporting")).cancelWaitingForDriverIsOK(true, false);
-                    }
                     else
                     {
                         crewChief.youWot();
@@ -866,10 +862,6 @@ namespace CrewChiefV4
                             }
                         }
                     }
-                }
-                else if (DamageReporting.waitingForDriverIsOKResponse)
-                {
-                    ((DamageReporting)CrewChief.getEvent("DamageReporting")).cancelWaitingForDriverIsOK(true, false);
                 }
                 else
                 {

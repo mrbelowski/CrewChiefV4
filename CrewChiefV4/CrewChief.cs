@@ -368,7 +368,14 @@ namespace CrewChiefV4
 
         public void youWot()
         {
-            audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderDidntUnderstand, 0, null));
+            if (DamageReporting.waitingForDriverIsOKResponse)
+            {
+                ((DamageReporting)CrewChief.getEvent("DamageReporting")).cancelWaitingForDriverIsOK(true, false);
+            }
+            else
+            {
+                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderDidntUnderstand, 0, null));
+            }
         }
 
         public void togglePaceNotesPlayback()
