@@ -818,6 +818,10 @@ namespace CrewChiefV4
                         this.lastRecognisedText = e.Result.Text;
                         CrewChief.getEvent("Opponents").respond(e.Result.Text);
                     }
+                    else if (DamageReporting.waitingForDriverIsOKResponse)
+                    {
+                        ((DamageReporting)CrewChief.getEvent("DamageReporting")).cancelWaitingForDriverIsOK(true, false);
+                    }
                     else
                     {
                         crewChief.youWot();
@@ -862,6 +866,10 @@ namespace CrewChiefV4
                             }
                         }
                     }
+                }
+                else if (DamageReporting.waitingForDriverIsOKResponse)
+                {
+                    ((DamageReporting)CrewChief.getEvent("DamageReporting")).cancelWaitingForDriverIsOK(true, false);
                 }
                 else
                 {
@@ -1001,7 +1009,7 @@ namespace CrewChiefV4
         {
             if (DamageReporting.waitingForDriverIsOKResponse && ResultContains(recognisedSpeech, I_AM_OK))
             {
-                ((DamageReporting) CrewChief.getEvent("DamageReporting")).cancelWaitingForDriverIsOK(true);
+                ((DamageReporting) CrewChief.getEvent("DamageReporting")).cancelWaitingForDriverIsOK(true, true);
             }
             else if (ResultContains(recognisedSpeech, RADIO_CHECK))
             {

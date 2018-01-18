@@ -68,6 +68,8 @@ namespace CrewChiefV4.Events
         private String folderAreYouOKSecondTry = "damage_reporting/are_you_ok_second_try";
         private String folderAreYouOKThirdTry = "damage_reporting/are_you_ok_third_try";
         public static String folderAcknowledgeDriverIsOK = "damage_reporting/acknowledge_driver_is_ok";
+        // TODO: record a separate message for when we get a response to the "are you OK?" message but it's not understood or expected?
+        public static String folderAcknowledgeDriverIsOKAnyResponse = "acknowledge/OK";
 
         private DamageLevel engineDamage;
         private DamageLevel trannyDamage;
@@ -112,14 +114,15 @@ namespace CrewChiefV4.Events
         private DateTime timeToRecheckAfterPotentiallyDangerousAcceleration = DateTime.MaxValue;
         private float speedAfterPotentiallyDangerousAcceleration = float.MaxValue;
 
-        public void cancelWaitingForDriverIsOK(Boolean playMessage)
+        public void cancelWaitingForDriverIsOK(Boolean playMessage, Boolean expectedResponse)
         {
             DamageReporting.waitingForDriverIsOKResponse = false;
             timeWhenAskedIfDriverIsOK = DateTime.MaxValue;
             driverIsOKRequestCount = 0;
             if (playMessage)
             {
-                audioPlayer.playMessageImmediately(new QueuedMessage(folderAcknowledgeDriverIsOK, 0, null));
+                audioPlayer.playMessageImmediately(new QueuedMessage(
+                    expectedResponse ? folderAcknowledgeDriverIsOK : folderAcknowledgeDriverIsOKAnyResponse, 0, null));
             }
         }
         
@@ -153,7 +156,7 @@ namespace CrewChiefV4.Events
             timeOfDangerousAcceleration = DateTime.MinValue;
 
             timeToRecheckAfterPotentiallyDangerousAcceleration = DateTime.MaxValue;
-            cancelWaitingForDriverIsOK(false);
+            cancelWaitingForDriverIsOK(false, false);
             playedAreYouOKInThisSession = false;
             triggerCheckDriverIsOKForIRacingAfter = DateTime.MaxValue;
             waitingAfterPotentiallyDangerousAcceleration = false;
@@ -238,7 +241,7 @@ namespace CrewChiefV4.Events
                     {
                         // no response after 3 requests, he's dead, jim.
                         audioPlayer.playMessageImmediately(new QueuedMessage(folderAreYouOKThirdTry, 0, null));
-                        cancelWaitingForDriverIsOK(false);
+                        cancelWaitingForDriverIsOK(false, false);
                     }
                 }
                 return;
