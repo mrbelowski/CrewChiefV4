@@ -2244,13 +2244,37 @@ namespace CrewChiefV4.rFactor2
             if (foStage == rF2TrackRulesStage.Normal)
                 return fod; // Note, there's slight race between scoring and rules here, FO messages should have validation on them.
 
+            // rF2 currently does not expose what kind of race start is chosen.  For tracks with SC, I use presence of SC to distinguish between
+            // Formation/Standing and Rolling starts.  However, if SC does not exist (Kart tracks), I used the fact that in Rolling start leader is
+            // typically standing past S/F line (mLapDist is positive).  Obviously, there will be perverted tracks where that won't be true, but this
+            // all I could come up with, and real problem is in game being shit in this area.
+            var leaderLapDistAtFOPhaseStart = 0.0;
+            var leaderSectorAtFOPhaseStart = -1;
+            if (foStage != rF2TrackRulesStage.CautionInit && foStage != rF2TrackRulesStage.CautionUpdate  // If this is not FCY.
+              && (prevFrozenOrderData == null || prevFrozenOrderData.Phase == FrozenOrderPhase.None))  // And, this is first FO calculation.
+            {
+                // Find where leader is relatively to F/S line.
+                for (int i = 0; i < scoring.mScoringInfo.mNumVehicles; ++i)
+                {
+                    var veh = scoring.mVehicles[i];
+                    if (veh.mPlace == 1)
+                    {
+                        leaderLapDistAtFOPhaseStart = veh.mLapDist;
+                        leaderSectorAtFOPhaseStart = RF2GameStateMapper.GetSector(veh.mSector);
+                        break;
+                    }
+                }
+            }
+
             // Figure out the phase:
             if (foStage == rF2TrackRulesStage.CautionInit || foStage == rF2TrackRulesStage.CautionUpdate)
                 fod.Phase = FrozenOrderPhase.FullCourseYellow;
             else if (foStage == rF2TrackRulesStage.FormationInit || foStage == rF2TrackRulesStage.FormationUpdate)
             {
-                if (rules.mTrackRules.mSafetyCarActive == 1
-                      || prevFrozenOrderData.Phase == FrozenOrderPhase.Rolling)  // If FO started as Rolling, keep it as Rolling even after SC leaves the track
+                // Check for signs of a rolling start.
+                if ((prevFrozenOrderData != null && prevFrozenOrderData.Phase == FrozenOrderPhase.Rolling)  // If FO started as Rolling, keep it as Rolling even after SC leaves the track
+                  || (rules.mTrackRules.mSafetyCarExists == 1 && rules.mTrackRules.mSafetyCarActive == 1)  // Of, if SC exists and is active
+                  || (rules.mTrackRules.mSafetyCarExists == 0 && leaderLapDistAtFOPhaseStart > 0.0 && leaderSectorAtFOPhaseStart == 1)) // Or, if SC is not present on a track, and leader started ahead of S/F line and is insector 1.  This will be problem on some tracks.
                     fod.Phase = FrozenOrderPhase.Rolling;
                 else
                 {
