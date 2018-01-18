@@ -609,18 +609,7 @@ namespace CrewChiefV4.rFactor2
                 cgs.PositionAndMotionData.CarSpeed = (float)RF2GameStateMapper.getVehicleSpeed(ref playerTelemetry);
                 cgs.PositionAndMotionData.DistanceRoundTrack = (float)getEstimatedLapDist(shared, ref playerScoring, ref playerTelemetry);
                 cgs.PositionAndMotionData.WorldPosition = new float[] { (float)playerTelemetry.mPos.x, (float)playerTelemetry.mPos.y, (float)playerTelemetry.mPos.z };
-
-                var yaw = Math.Atan2(playerTelemetry.mOri[rFactor2Constants.RowZ].x, playerTelemetry.mOri[rFactor2Constants.RowZ].z);
-
-                var pitch = Math.Atan2(-playerTelemetry.mOri[rFactor2Constants.RowY].z,
-                  Math.Sqrt(playerTelemetry.mOri[rFactor2Constants.RowX].z * playerTelemetry.mOri[rFactor2Constants.RowX].z + playerTelemetry.mOri[rFactor2Constants.RowZ].z * playerTelemetry.mOri[rFactor2Constants.RowZ].z));
-
-                var roll = Math.Atan2(playerTelemetry.mOri[rFactor2Constants.RowY].x,
-                  Math.Sqrt(playerTelemetry.mOri[rFactor2Constants.RowX].x * playerTelemetry.mOri[rFactor2Constants.RowX].x + playerTelemetry.mOri[rFactor2Constants.RowZ].x * playerTelemetry.mOri[rFactor2Constants.RowZ].x));
-
-                cgs.PositionAndMotionData.Orientation.Pitch = (float)pitch;
-                cgs.PositionAndMotionData.Orientation.Roll = (float)roll;
-                cgs.PositionAndMotionData.Orientation.Yaw = (float)yaw;
+                cgs.PositionAndMotionData.Orientation = RF2GameStateMapper.GetRotation(ref playerTelemetry.mOri);
             }
             else
             {
@@ -628,17 +617,9 @@ namespace CrewChiefV4.rFactor2
                 cgs.PositionAndMotionData.DistanceRoundTrack = (float)playerScoring.mLapDist;
                 cgs.PositionAndMotionData.WorldPosition = new float[] { (float)playerScoring.mPos.x, (float)playerScoring.mPos.y, (float)playerScoring.mPos.z };
 
-                var yaw = Math.Atan2(playerScoring.mOri[rFactor2Constants.RowZ].x, playerScoring.mOri[rFactor2Constants.RowZ].z);
-
-                var pitch = Math.Atan2(-playerScoring.mOri[rFactor2Constants.RowY].z,
-                  Math.Sqrt(playerScoring.mOri[rFactor2Constants.RowX].z * playerScoring.mOri[rFactor2Constants.RowX].z + playerScoring.mOri[rFactor2Constants.RowZ].z * playerScoring.mOri[rFactor2Constants.RowZ].z));
-
-                var roll = Math.Atan2(playerScoring.mOri[rFactor2Constants.RowY].x,
-                  Math.Sqrt(playerScoring.mOri[rFactor2Constants.RowX].x * playerScoring.mOri[rFactor2Constants.RowX].x + playerScoring.mOri[rFactor2Constants.RowZ].x * playerScoring.mOri[rFactor2Constants.RowZ].x));
-
-                cgs.PositionAndMotionData.Orientation.Pitch = (float)pitch;
-                cgs.PositionAndMotionData.Orientation.Roll = (float)roll;
-                cgs.PositionAndMotionData.Orientation.Yaw = (float)yaw;
+                // TODO: drop mPos/mLapDist from serialization as well.
+                if (playerScoring.mOri != null)  // Don't bother with corner case of no telemetry data if we're reading from a file.
+                    cgs.PositionAndMotionData.Orientation = RF2GameStateMapper.GetRotation(ref playerScoring.mOri);
             }
 
             // Initialize DeltaTime.
@@ -1977,21 +1958,21 @@ namespace CrewChiefV4.rFactor2
             double rearLeftRotation, double rearRightRotation, float minRotatingSpeed, float maxRotatingSpeed)
         {
             if (cgs.TyreData.LeftFrontIsLocked)
-                RF2GameStateMapper.writeDebugMsg($"Left Front is locked.  minRotatingSpeed: {minRotatingSpeed:N3}  mRotation: {frontLeftRotation:N3}");
+                RF2GameStateMapper.writeDebugMsg(string.Format("Left Front is locked.  minRotatingSpeed: {0}  mRotation: {1}", minRotatingSpeed.ToString("0.000"), frontLeftRotation.ToString("0.000")));
             if (cgs.TyreData.RightFrontIsLocked)
-                RF2GameStateMapper.writeDebugMsg($"Right Front is locked.  minRotatingSpeed: {minRotatingSpeed:N3}  mRotation: {frontRightRotation:N3}");
+                RF2GameStateMapper.writeDebugMsg(string.Format("Right Front is locked.  minRotatingSpeed: {0}  mRotation: {1}", minRotatingSpeed.ToString("0.000"), frontRightRotation.ToString("0.000")));
             if (cgs.TyreData.LeftRearIsLocked)
-                RF2GameStateMapper.writeDebugMsg($"Left Rear is locked.  minRotatingSpeed: {minRotatingSpeed:N3}  mRotation: {rearLeftRotation:N3}");
+                RF2GameStateMapper.writeDebugMsg(string.Format("Left Rear is locked.  minRotatingSpeed: {0}  mRotation: {1}", minRotatingSpeed.ToString("0.000"), rearLeftRotation.ToString("0.000")));
             if (cgs.TyreData.RightRearIsLocked)
-                RF2GameStateMapper.writeDebugMsg($"Right Rear is locked.  minRotatingSpeed: {minRotatingSpeed:N3}  mRotation: {rearRightRotation:N3}");
+                RF2GameStateMapper.writeDebugMsg(string.Format("Right Rear is locked.  minRotatingSpeed: {0}  mRotation: {1}", minRotatingSpeed.ToString("0.000"), rearRightRotation.ToString("0.000")));
             if (cgs.TyreData.LeftFrontIsSpinning)
-                RF2GameStateMapper.writeDebugMsg($"Left Front is spinning.  maxRotatingSpeed: {maxRotatingSpeed:N3}  mRotation: {frontLeftRotation:N3}");
+                RF2GameStateMapper.writeDebugMsg(string.Format("Left Front is spinning.  minRotatingSpeed: {0}  mRotation: {1}", minRotatingSpeed.ToString("0.000"), frontLeftRotation.ToString("0.000")));
             if (cgs.TyreData.RightFrontIsSpinning)
-                RF2GameStateMapper.writeDebugMsg($"Right Front is spinning.  maxRotatingSpeed: {maxRotatingSpeed:N3}  mRotation: {frontRightRotation:N3}");
+                RF2GameStateMapper.writeDebugMsg(string.Format("Right Front is spinning.  minRotatingSpeed: {0}  mRotation: {1}", minRotatingSpeed.ToString("0.000"), frontRightRotation.ToString("0.000")));
             if (cgs.TyreData.LeftRearIsSpinning)
-                RF2GameStateMapper.writeDebugMsg($"Left Rear is spinning.  maxRotatingSpeed: {maxRotatingSpeed:N3}  mRotation: {rearLeftRotation:N3}");
+                RF2GameStateMapper.writeDebugMsg(string.Format("Left Rear is spinning.  minRotatingSpeed: {0}  mRotation: {1}", minRotatingSpeed.ToString("0.000"), rearLeftRotation.ToString("0.000")));
             if (cgs.TyreData.RightRearIsSpinning)
-                RF2GameStateMapper.writeDebugMsg($"Right Rear is spinning.  maxRotatingSpeed: {maxRotatingSpeed:N3}  mRotation: {rearRightRotation:N3}");
+                RF2GameStateMapper.writeDebugMsg(string.Format("Right Rear is spinning.  minRotatingSpeed: {0}  mRotation: {1}", minRotatingSpeed.ToString("0.000"), rearRightRotation.ToString("0.000")));
         }
 #endif
 
@@ -2425,6 +2406,22 @@ namespace CrewChiefV4.rFactor2
         private static int GetSector(int rf2Sector)
         {
             return rf2Sector == 0 ? 3 : rf2Sector;
+        }
+
+        private static PositionAndMotionData.Rotation GetRotation(ref rF2Vec3[] orientation)
+        {
+            var rot = new PositionAndMotionData.Rotation()
+            {
+                Yaw = (float)Math.Atan2(orientation[rFactor2Constants.RowZ].x, orientation[rFactor2Constants.RowZ].z),
+
+                Pitch = (float)Math.Atan2(-orientation[rFactor2Constants.RowY].z,
+                    Math.Sqrt(orientation[rFactor2Constants.RowX].z * orientation[rFactor2Constants.RowX].z + orientation[rFactor2Constants.RowZ].z * orientation[rFactor2Constants.RowZ].z)),
+
+                Roll = (float)Math.Atan2(orientation[rFactor2Constants.RowY].x,
+                    Math.Sqrt(orientation[rFactor2Constants.RowX].x * orientation[rFactor2Constants.RowX].x + orientation[rFactor2Constants.RowZ].x * orientation[rFactor2Constants.RowZ].x))
+            };
+
+            return rot;
         }
     }
 }
