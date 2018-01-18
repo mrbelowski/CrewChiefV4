@@ -125,6 +125,10 @@ namespace CrewChiefV4.iRacing
             LFwearL = (System.Single)sdk.GetData("LFwearL");
             LFwearM = (System.Single)sdk.GetData("LFwearM");
             LFwearR = (System.Single)sdk.GetData("LFwearR");
+
+            Pitch = (System.Single)sdk.GetData("Pitch");
+            Yaw = (System.Single)sdk.GetData("Yaw");
+            Roll = (System.Single)sdk.GetData("Roll");
         }
         public iRacingData()
         {
@@ -648,7 +652,23 @@ namespace CrewChiefV4.iRacing
         /// LF tire right percent tread remaining
         /// </summary>
         public System.Single LFwearR;
+        
+        /// <summary>
+        /// Yaw orientation. Unit: rad
+        /// </summary>
+        public System.Single Yaw;
 
+
+        /// <summary>
+        /// Pitch orientation. Unit: rad
+        /// </summary>
+        public System.Single Pitch;
+
+
+        /// <summary>
+        /// Roll orientation. Unit: rad
+        /// </summary>
+        public System.Single Roll;
 
     }
 }
