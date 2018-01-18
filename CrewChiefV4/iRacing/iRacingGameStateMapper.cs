@@ -497,6 +497,11 @@ namespace CrewChiefV4.iRacing
             currentGameState.PositionAndMotionData.Orientation.Yaw = shared.Telemetry.Yaw;
 
 
+            currentGameState.PositionAndMotionData.Orientation.Pitch = shared.Telemetry.Pitch;
+            currentGameState.PositionAndMotionData.Orientation.Roll = shared.Telemetry.Roll;
+            currentGameState.PositionAndMotionData.Orientation.Yaw = shared.Telemetry.Yaw;
+
+
             currentGameState.SessionData.DeltaTime.SetNextDeltaPoint(currentGameState.PositionAndMotionData.DistanceRoundTrack, currentGameState.SessionData.CompletedLaps,
                 (float)playerCar.Live.Speed, currentGameState.Now);
 
