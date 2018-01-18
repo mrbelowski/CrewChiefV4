@@ -106,6 +106,7 @@ namespace CrewChiefV4.Events
         private DateTime timeWhenAskedIfDriverIsOK = DateTime.MaxValue;
         private int driverIsOKRequestCount = 0;
         private Boolean playedAreYouOKInThisSession = false;
+        private DateTime triggerCheckDriverIsOKForIRacingAfter = DateTime.MaxValue;
 
         public void cancelWaitingForDriverIsOK(Boolean playMessage)
         {
@@ -148,6 +149,7 @@ namespace CrewChiefV4.Events
             timeOfDangerousAcceleration = DateTime.MinValue;
             cancelWaitingForDriverIsOK(false);
             playedAreYouOKInThisSession = false;
+            triggerCheckDriverIsOKForIRacingAfter = DateTime.MaxValue;
         }
 
         private Boolean hasBeenReported(Component component, DamageLevel damageLevel)
@@ -249,6 +251,9 @@ namespace CrewChiefV4.Events
                         (previousGameState.PositionAndMotionData == null ? 0 : previousGameState.PositionAndMotionData.CarSpeed) +
                         " acc calc = " + calculatedAcceleration);
                     timeOfDangerousAcceleration = currentGameState.Now;
+
+                    // special case for iRacing: no damage data so we can't hang this off 'destroyed' components
+                    triggerCheckDriverIsOKForIRacingAfter = currentGameState.Now.Add(TimeSpan.FromSeconds(4));
                 }
             }
 
@@ -399,6 +404,13 @@ namespace CrewChiefV4.Events
                         }
                     }
                 }
+            }
+            else if (CrewChief.gameDefinition.gameEnum == GameEnum.IRACING && currentGameState.Now > triggerCheckDriverIsOKForIRacingAfter)
+            {
+                // TODO: other checks in this if-block?
+                // TODO: should we always trigger this, or make it random?
+                triggerCheckDriverIsOKForIRacingAfter = DateTime.MaxValue;
+                checkIfDriverIsOK(currentGameState.Now);
             }
         }
 
