@@ -271,30 +271,38 @@ namespace CrewChiefV4.Events
             if (!playedAreYouOKInThisSession && !currentGameState.PitData.InPitlane && 
                 currentGameState.PositionAndMotionData.CarSpeed > 0.001)
             {
-                float interval = CrewChief.intervalOverriddenForPlayback ? 0.1f : (float)CrewChief._timeInterval.TotalSeconds;
-                float calculatedAcceleration = previousGameState == null ? 0 :
-                    Math.Abs(currentGameState.PositionAndMotionData.CarSpeed - previousGameState.PositionAndMotionData.CarSpeed) / interval;
-
-                // if we're subject to > 30G (300m/s2), this is considered dangerous. If we've stopped (or nearly stopped) immediately
-                // after the impact, assume it's a bad 'un. If we're still moving after the impact, track the speed for 3 seconds and 
-                // if it doesn't increase in that time, we can assume it's a bad 'un
-                if (calculatedAcceleration > 300)
+                if (previousGameState != null)
                 {
-                    Console.WriteLine("Massive impact. Current speed = " + currentGameState.PositionAndMotionData.CarSpeed + " previous speed = " +
-                            (previousGameState == null ? 0 : previousGameState.PositionAndMotionData.CarSpeed) +
-                            " acceleration = " + calculatedAcceleration / 9.8f + "g");
-                    if (currentGameState.PositionAndMotionData.CarSpeed < 3)
+                    double interval = (currentGameState.Now - previousGameState.Now).TotalSeconds;
+                    if (interval > 0)
                     {
-                        timeOfDangerousAcceleration = currentGameState.Now;
-                        // special case for iRacing: no damage data so we can't hang this off 'destroyed' components
-                        triggerCheckDriverIsOKForIRacingAfter = currentGameState.Now.Add(TimeSpan.FromSeconds(4));
-                    }
-                    else
-                    {
-                        // massive acceleration but we're still moving
-                        timeToRecheckAfterPotentiallyDangerousAcceleration = currentGameState.Now.Add(TimeSpan.FromSeconds(3));
-                        waitingAfterPotentiallyDangerousAcceleration = true;
-                        speedAfterPotentiallyDangerousAcceleration = currentGameState.PositionAndMotionData.CarSpeed;
+                        double calculatedAcceleration = Math.Abs(currentGameState.PositionAndMotionData.CarSpeed - previousGameState.PositionAndMotionData.CarSpeed) / interval;
+
+                        /*Console.WriteLine("Interval = " + interval + 
+                            " Current speed = " + currentGameState.PositionAndMotionData.CarSpeed +
+                                " previous speed = " + previousGameState.PositionAndMotionData.CarSpeed + " acceleration = " + calculatedAcceleration / 9.8f + "g");*/
+
+                        // if we're subject to > 30G (300m/s2), this is considered dangerous. If we've stopped (or nearly stopped) immediately
+                        // after the impact, assume it's a bad 'un. If we're still moving after the impact, track the speed for 3 seconds and 
+                        // if it doesn't increase in that time, we can assume it's a bad 'un
+                        if (calculatedAcceleration > 300)
+                        {
+                            Console.WriteLine("Massive impact. Current speed = " + currentGameState.PositionAndMotionData.CarSpeed +
+                                " previous speed = " + previousGameState.PositionAndMotionData.CarSpeed + " acceleration = " + calculatedAcceleration / 9.8f + "g");
+                            if (currentGameState.PositionAndMotionData.CarSpeed < 3)
+                            {
+                                timeOfDangerousAcceleration = currentGameState.Now;
+                                // special case for iRacing: no damage data so we can't hang this off 'destroyed' components
+                                triggerCheckDriverIsOKForIRacingAfter = currentGameState.Now.Add(TimeSpan.FromSeconds(4));
+                            }
+                            else
+                            {
+                                // massive acceleration but we're still moving
+                                timeToRecheckAfterPotentiallyDangerousAcceleration = currentGameState.Now.Add(TimeSpan.FromSeconds(3));
+                                waitingAfterPotentiallyDangerousAcceleration = true;
+                                speedAfterPotentiallyDangerousAcceleration = currentGameState.PositionAndMotionData.CarSpeed;
+                            }
+                        }
                     }
                 }
             }
@@ -920,6 +928,7 @@ namespace CrewChiefV4.Events
                 SoundCache.availableSounds.Contains(folderAreYouOKFirstTry) && 
                 now.Subtract(timeOfDangerousAcceleration) < TimeSpan.FromSeconds(5))
             {
+                audioPlayer.purgeQueues();
                 audioPlayer.playMessageImmediately(new QueuedMessage(folderAreYouOKFirstTry, 0, null));
                 // only kick off the 'waiting for response' stuff sometimes
                 if (MainWindow.voiceOption != MainWindow.VoiceOptionEnum.DISABLED && Utilities.random.NextDouble() > 0.5)

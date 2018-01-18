@@ -38,7 +38,6 @@ namespace CrewChiefV4
         public static Boolean enableDriverNames = UserSettings.GetUserSettings().getBoolean("enable_driver_names");
 
         public static TimeSpan _timeInterval = TimeSpan.FromMilliseconds(UserSettings.GetUserSettings().getInt("update_interval"));
-        public static Boolean intervalOverriddenForPlayback = false;
 
         public static TimeSpan spotterInterval = TimeSpan.FromMilliseconds(UserSettings.GetUserSettings().getInt("spotter_update_interval"));
 
@@ -588,7 +587,6 @@ namespace CrewChiefV4
             audioPlayer.mute = false;
             if (filenameToRun != null && System.Diagnostics.Debugger.IsAttached)
             {
-                CrewChief.intervalOverriddenForPlayback = true;
                 loadDataFromFile = true;
                 GlobalBehaviourSettings.spotterEnabled = false;
                 if (interval > 0)
@@ -602,10 +600,6 @@ namespace CrewChiefV4
                     audioPlayer.mute = true;
                 }
                 dumpToFile = false;
-            }
-            else
-            {
-                CrewChief.intervalOverriddenForPlayback = false;
             }
             SpeechRecogniser.waitingForSpeech = false;
             SpeechRecogniser.gotRecognitionResult = false;
